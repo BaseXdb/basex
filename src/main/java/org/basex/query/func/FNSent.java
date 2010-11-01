@@ -1,7 +1,9 @@
 package org.basex.query.func;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.ft.FTOptions.*;
 import java.util.HashMap;
+import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -9,7 +11,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.util.SentList;
 import org.basex.util.InputInfo;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
 
 /**
  * This class defines the sentiment functions.
@@ -59,22 +61,21 @@ public final class FNSent extends Fun {
     final String uri = string(checkStr(expr[1], ctx));
     SentList list = LISTS.get(uri);
     if(list == null) {
-      list = new SentList(input, uri);
+      list = new SentList(input, uri, ctx.context.prop);
       LISTS.put(uri, list);
     }
 
     double pos = 0, neg = 0;
     byte[] token1 = EMPTY, token2 = EMPTY, token3 = EMPTY, token4 = EMPTY;
-
-    final Tokenizer tk = new Tokenizer(str, null);
-    tk.st = true;
+    ctx.ftopt.set(ST, true);
+    final FTLexer tk = new FTLexer(str, (Prop) null, ctx.ftopt);
 
     // loop through all tokens
-    while(tk.more()) {
+    while(tk.hasNext()) {
       token4 = token3;
       token3 = token2;
       token2 = token1;
-      token1 = tk.get();
+      token1 = tk.next().txt;
 
       // calculate polarity
       double v = list.polarity(token1);

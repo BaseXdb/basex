@@ -26,7 +26,6 @@ import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
 import org.basex.query.ft.FTOpt;
-import org.basex.query.ft.Scoring;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
@@ -49,8 +48,9 @@ import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Tokenizer;
 import org.basex.util.Util;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.Scoring;
 
 /**
  * This abstract query expression provides the architecture for a compiled
@@ -97,7 +97,7 @@ public final class QueryContext extends Progress {
   /** Current full-text options. */
   public FTOpt ftopt;
   /** Current full-text token. */
-  public Tokenizer fttoken;
+  public FTLexer fttoken;
 
   /** Current Date. */
   public Dat date;
@@ -620,7 +620,7 @@ public final class QueryContext extends Progress {
   String info() {
     return info.toString();
   }
-  
+
   /**
    * Returns the serialization properties.
    * @return serialization properties

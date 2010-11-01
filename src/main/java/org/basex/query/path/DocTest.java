@@ -29,7 +29,7 @@ final class DocTest extends Test {
     type = Type.DOC;
 
     // not more than 2^31 documents supported
-    int[] n = new int[(int) v.size()];
+    final int[] n = new int[(int) v.size()];
     final ValueIter ir = v.iter();
     Item it;
     int c = 0;

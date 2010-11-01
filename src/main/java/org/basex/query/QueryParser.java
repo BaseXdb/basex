@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.ft.FTOptions.*;
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.SerializerProp;
@@ -73,7 +74,6 @@ import org.basex.query.ft.FTOrder;
 import org.basex.query.ft.FTWeight;
 import org.basex.query.ft.FTWindow;
 import org.basex.query.ft.FTWords;
-import org.basex.query.ft.StopWords;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
 import org.basex.query.ft.FTWords.FTMode;
@@ -109,7 +109,9 @@ import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
-import org.basex.util.Tokenizer.FTUnit;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.StopWords;
+import org.basex.util.ft.FTLexer.FTUnit;
 
 /**
  * Simple query parser; can be overwritten to support more complex parsings.
@@ -2391,6 +2393,8 @@ public class QueryParser extends InputParser {
     final FTOpt fto = new FTOpt(ctx.context.prop);
     boolean found = false;
     while(ftMatchOption(fto)) found = true;
+    // check if the options are supported:
+    FTLexer.checkFTOpt(fto);
     if(consumeWS(WEIGHT))
       expr = new FTWeight(input(), expr, enclosed(NOENCLEXPR));
     // skip options if none were specified...
@@ -2498,36 +2502,35 @@ public class QueryParser extends InputParser {
     if(!consumeWS(USING)) return false;
 
     if(consumeWS(LOWERCASE)) {
-      if(opt.isSet(FTOpt.LC) || opt.isSet(FTOpt.UC) || opt.isSet(FTOpt.CS))
+      if(opt.isSet(LC) || opt.isSet(UC) || opt.isSet(CS))
         error(FTDUP, CASE);
-      opt.set(FTOpt.CS, true);
-      opt.set(FTOpt.LC, true);
+      opt.set(CS, true);
+      opt.set(LC, true);
     } else if(consumeWS(UPPERCASE)) {
-      if(opt.isSet(FTOpt.LC) || opt.isSet(FTOpt.UC) || opt.isSet(FTOpt.CS))
+      if(opt.isSet(LC) || opt.isSet(UC) || opt.isSet(CS))
         error(FTDUP, CASE);
-      opt.set(FTOpt.CS, true);
-      opt.set(FTOpt.UC, true);
+      opt.set(CS, true);
+      opt.set(UC, true);
     } else if(consumeWS(CASE)) {
-      if(opt.isSet(FTOpt.LC) || opt.isSet(FTOpt.UC) || opt.isSet(FTOpt.CS))
+      if(opt.isSet(LC) || opt.isSet(UC) || opt.isSet(CS))
         error(FTDUP, CASE);
-      opt.set(FTOpt.CS, consumeWS(SENSITIVE));
-      if(!opt.is(FTOpt.CS)) check(INSENSITIVE);
+      opt.set(CS, consumeWS(SENSITIVE));
+      if(!opt.is(CS)) check(INSENSITIVE);
     } else if(consumeWS(DIACRITICS)) {
-      if(opt.isSet(FTOpt.DC)) error(FTDUP, DIACRITICS);
-      opt.set(FTOpt.DC, consumeWS(SENSITIVE));
-      if(!opt.is(FTOpt.DC)) check(INSENSITIVE);
+      if(opt.isSet(DC)) error(FTDUP, DIACRITICS);
+      opt.set(DC, consumeWS(SENSITIVE));
+      if(!opt.is(DC)) check(INSENSITIVE);
     } else if(consumeWS(LANGUAGE)) {
       if(opt.ln != null) error(FTDUP, LANGUAGE);
       opt.ln = lc(stringLiteral());
-      if(!eq(opt.ln, EN)) error(FTLAN, opt.ln);
     } else if(consumeWS(OPTION)) {
       optionDecl();
     } else {
       final boolean using = !consumeWS(NO);
 
       if(consumeWS2(STEMMING)) {
-        if(opt.isSet(FTOpt.ST)) error(FTDUP, STEMMING);
-        opt.set(FTOpt.ST, using);
+        if(opt.isSet(ST)) error(FTDUP, STEMMING);
+        opt.set(ST, using);
       } else if(consumeWS2(THESAURUS)) {
         if(opt.th != null) error(FTDUP, THESAURUS);
         opt.th = new ThesQuery();
@@ -2572,13 +2575,13 @@ public class QueryParser extends InputParser {
           }
         }
       } else if(consumeWS2(WILDCARDS)) {
-        if(opt.isSet(FTOpt.WC)) error(FTDUP, WILDCARDS);
-        if(opt.is(FTOpt.FZ)) error(FTFZWC);
-        opt.set(FTOpt.WC, using);
+        if(opt.isSet(WC)) error(FTDUP, WILDCARDS);
+        if(opt.is(FZ)) error(FTFZWC);
+        opt.set(WC, using);
       } else if(consumeWS2(FUZZY)) {
-        if(opt.isSet(FTOpt.FZ)) error(FTDUP, FUZZY);
-        if(opt.is(FTOpt.WC)) error(FTFZWC);
-        opt.set(FTOpt.FZ, using);
+        if(opt.isSet(FZ)) error(FTDUP, FUZZY);
+        if(opt.is(WC)) error(FTFZWC);
+        opt.set(FZ, using);
       } else {
         error(FTMATCH, consume());
         return false;

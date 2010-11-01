@@ -11,8 +11,8 @@ import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-import org.basex.util.Tokenizer;
-import org.basex.util.Tokenizer.FTUnit;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.FTLexer.FTUnit;
 
 /**
  * FTWindow expression.
@@ -46,7 +46,7 @@ public final class FTWindow extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final Tokenizer ft) throws QueryException {
+      final FTLexer ft) throws QueryException {
 
     final int n = (int) checkItr(win, ctx) - 1;
     mtc.sort();

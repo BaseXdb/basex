@@ -51,6 +51,8 @@ public interface DataText {
   String DBWCIDX = "WCINDEX";
   /** Full-text stemming. */
   String DBFTST = "FTSTEM";
+  /** Full-text language. */
+  String DBFTLN = "FTLANG";
   /** Full-text case sensitivity. */
   String DBFTCS = "FTCS";
   /** Full-text diacritics removal. */

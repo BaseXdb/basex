@@ -170,7 +170,7 @@ public final class InfoView extends View {
       if(q) {
         add(QUERYQU, cmd.toString().replaceAll("^.*? ", "").trim());
       } else if(cmd != null) {
-        text.high().add(BUTTONCMD + COLS).norm().add(cmd.toString()).nl();
+        text.high().add(BUTTONCMD + COLS).norm().addExt(cmd).nl();
       }
       if(ok) {
         text.add(info).nl();

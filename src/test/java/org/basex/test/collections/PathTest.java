@@ -135,7 +135,7 @@ public class PathTest {
     " count(collection('" + WEEK2 +
     "/week/tuesday')/root/monday/text[text() = 'text']) ";
     final QueryProcessor qp = new QueryProcessor(count, CTX);
-    String result = qp.execute().toString();
+    final String result = qp.execute().toString();
     assertEquals("3 1", result);
     qp.close();
   }

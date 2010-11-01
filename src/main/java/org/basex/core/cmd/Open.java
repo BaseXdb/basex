@@ -29,7 +29,7 @@ public final class Open extends Command {
   protected boolean run() {
     new Close().run(context);
     String db = args[0];
-    int i = db.indexOf('/');
+    final int i = db.indexOf('/');
     String path = null;
     if(i != -1) {
       path = db.substring(i + 1);

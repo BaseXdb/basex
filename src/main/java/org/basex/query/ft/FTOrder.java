@@ -8,7 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryTokens;
 import org.basex.util.InputInfo;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
 
 /**
  * FTOrder expression.
@@ -28,7 +28,7 @@ public final class FTOrder extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final Tokenizer ft) {
+      final FTLexer ft) {
 
     int p = 0, s = 0;
     boolean f = true;

@@ -6,12 +6,14 @@ import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Arrays;
+import org.basex.core.Prop;
 import org.basex.data.FTPos;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.BoolList;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.Span;
 
 /**
  * This class assembles utility methods for painting rectangle contents.
@@ -75,12 +77,13 @@ final class MapRenderer {
     int xx = r.x;
     int yy = r.y + fh;
     final int ww = r.w;
-    final Tokenizer ftt = new Tokenizer(s, null);
+    final FTLexer ftt = new FTLexer(s, null, null, true);
 
     // get index on first pre value
     int ll = 0;
-    while(ftt.moreSC()) {
-      byte[] tok = ftt.nextSC();
+    while(ftt.hasNext()) {
+      final Span span = ftt.next();
+      byte[] tok = span.txt;
       int wl = 0;
 
       for(int n = 0; n < tok.length; n += cl(tok, n))
@@ -115,13 +118,13 @@ final class MapRenderer {
       }
 
       if(draw) {
-        // colour each full-text hit
-        g.setColor(r.pos != null && r.pos.contains(ftt.pos) && !ftt.isSC()
-            ? COLORFT : textc);
+        // color each full-text hit
+        g.setColor(r.pos != null && r.pos.contains(span.pos)
+            && !span.specialChar ? COLORFT : textc);
         g.drawString(string(tok), xx + ll, yy);
       }
       ll += wl;
-      if(ftt.pa) {
+      if(ftt.isParagraph()) {
         // new paragraph
         ll = 0;
         yy += fh;
@@ -141,10 +144,11 @@ final class MapRenderer {
    * Token/Sentence/Paragraphs
    * @param g graphics reference
    * @param r rectangle
+   * @param p database properties
    * @param s text to be drawn
    * @param fs font size
    */
-  static void drawThumbnails(final Graphics g, final MapRect r,
+  static void drawThumbnails(final Graphics g, final MapRect r, final Prop p,
       final byte[] s, final int fs) {
 
     // thumbnail width
@@ -168,7 +172,8 @@ final class MapRenderer {
     r.thumbf = ff * fs;
     r.thumbal = 0;
 
-    final int[][] data = Tokenizer.getInfo(s);
+    final FTLexer lex = new FTLexer(s, p);
+    final int[][] data = lex.getInfo(s);
 
     boolean l = false;
     while(r.thumbal < 2) {

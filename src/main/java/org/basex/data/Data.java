@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -205,7 +204,7 @@ public abstract class Data {
 
   /**
    * Returns the document nodes.
-   * A dummy node is returned if the database is empty. 
+   * A dummy node is returned if the database is empty.
    * @return root nodes
    */
   public final IntList doc() {

@@ -114,7 +114,7 @@ public class Add extends ACreate {
       ctx.lock.after(true);
     }
   }
-  
+
   /**
    * Adds a document to the database.
    * @param parser parser instance

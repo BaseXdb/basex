@@ -34,8 +34,7 @@ public final class DropIndex extends ACreate {
     final Data data = context.data;
     if(data instanceof MemData) return error(PROCMM);
 
-    final CmdIndex cmd = getOption(CmdIndex.class);
-    switch(cmd) {
+    switch(getOption(CmdIndex.class)) {
       case TEXT:
         data.meta.txtindex = false;
         return drop(IndexType.TEXT, DATATXT);

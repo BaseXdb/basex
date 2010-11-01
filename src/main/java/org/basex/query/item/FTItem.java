@@ -2,7 +2,7 @@ package org.basex.query.item;
 
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
-import org.basex.query.ft.Scoring;
+import org.basex.util.ft.Scoring;
 
 /**
  * XQuery item representing a full-text Node.

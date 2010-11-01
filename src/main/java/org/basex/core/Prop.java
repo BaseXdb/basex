@@ -155,6 +155,9 @@ public final class Prop extends AProp {
   public static final Object[] CASESENS = { "CASESENS", false };
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
+  /** Language for full-text search index. */
+  public static final Object[] FTLANGUAGE = { "FTLANGUAGE", ""};
+
   /**
    * Flag for full-text scoring algorithm. Scoring mode: 0 = none, 1 = document
    * nodes, 2 = text nodes.

@@ -3,16 +3,24 @@ package org.basex.query.ft;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.ft.FTOptions.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import org.basex.core.Prop;
 import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
+import org.basex.util.BitapSearch;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenList;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.Span;
+import org.basex.util.ft.StopWords;
 
 /**
  * This class contains all ftcontains options.
@@ -21,21 +29,6 @@ import org.basex.util.Tokenizer;
  * @author Christian Gruen
  */
 public final class FTOpt extends ExprInfo {
-  /** Sensitive flag. */
-  public static final int CS = 0;
-  /** Lowercase flag. */
-  public static final int LC = 1;
-  /** Uppercase flag. */
-  public static final int UC = 2;
-  /** Diacritics flag. */
-  public static final int DC = 3;
-  /** Stemming flag. */
-  public static final int ST = 4;
-  /** Wildcards flag. */
-  public static final int WC = 5;
-  /** Fuzzy flag. */
-  public static final int FZ = 6;
-
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stopwords. */
@@ -44,6 +37,10 @@ public final class FTOpt extends ExprInfo {
   public ThesQuery th;
   /** Language. */
   public byte[] ln;
+  /** Tokenizer ID. */
+  public byte[] tokId;
+  /** Stemmer ID. */
+  public byte[] stemID;
 
   /** Flag values. */
   private final boolean[] flag = new boolean[FZ + 1];
@@ -52,10 +49,10 @@ public final class FTOpt extends ExprInfo {
 
   /** Cached tokens. */
   private final TokenList query = new TokenList();
+  /** Database properties. */
+  private final Prop prop;
   /** Levenshtein reference. */
   private Levenshtein ls;
-  /** Full-text tokenizer. */
-  private final Tokenizer qu;
   /** Levenshtein error. */
   private final int lserr;
 
@@ -64,7 +61,7 @@ public final class FTOpt extends ExprInfo {
    * @param pr database properties
    */
   public FTOpt(final Prop pr) {
-    qu = new Tokenizer(pr);
+    prop = pr;
     lserr = pr.num(Prop.LSERROR);
   }
 
@@ -91,7 +88,8 @@ public final class FTOpt extends ExprInfo {
    * @param ctx query context
    */
   void comp(final QueryContext ctx) {
-    if(sw != null) sw.comp(ctx);
+    if(sw != null && ctx.value instanceof DBNode)
+      sw.comp(((DBNode) ctx.value).data);
   }
 
   /**
@@ -123,83 +121,106 @@ public final class FTOpt extends ExprInfo {
   }
 
   /**
-   * Checks if the first token contains the second full-text term.
-   * Sequential variant.
+   * Checks if the first token contains the second full-text term. Sequential
+   * variant.
    * @param q query token
    * @param tk input tokenizer
    * @param words words reference
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final byte[] q, final Tokenizer tk, final FTWords words)
+  int contains(final byte[] q, final FTLexer tk, final FTWords words)
       throws QueryException {
 
-    // assign options to text
-    tk.st = is(ST);
-    tk.dc = is(DC);
-    tk.cs = is(CS);
-    tk.sd = sd;
-    tk.init();
+    // assign options to query:
+    final FTLexer quLexer = new FTLexer(q, prop, this);
+    if(quLexer.getFTOpt().is(FZ) && ls == null) ls = new Levenshtein();
 
-    // assign options to query
-    qu.init(q);
-    qu.st = tk.st;
-    qu.dc = tk.dc;
-    qu.cs = tk.cs;
-    qu.sd = tk.sd;
-    // the following options only apply to the query terms
-    qu.uc = is(UC);
-    qu.lc = is(LC);
-    qu.wc = is(WC);
-    qu.fz = is(FZ);
-    if(qu.fz && ls == null) ls = new Levenshtein();
-
-    // cache query tokens
+    // cache query tokens:
     query.reset();
-    qu.init();
-    while(qu.more()) query.add(qu.get());
+    final Iterator<Span> it = quLexer.iterator();
+    final ArrayList<Span> qSpanList = new ArrayList<Span>();
+    while(it.hasNext()) {
+      final Span s = it.next();
+      query.add(s.txt);
+      qSpanList.add(s);
+    }
+    final Span[] qTokenSpans = qSpanList.toArray(new Span[qSpanList.size()]);
 
-    // iterate through all input tokens
+    // assign options to text:
+    final FTOpt to = tk.getFTOpt();
+    to.set(ST, is(ST));
+    to.set(DC, is(DC));
+    to.set(CS, is(CS));
+    to.ln = ln;
+    to.th = th;
+    to.sd = sd;
+
+    final Iterator<Span> inputIter =
+      new FTLexer(tk.getText(), prop, to).iterator();
+
+    // create the comparator:
+    final Levenshtein lvs = ls;
+    final int lvserr = lserr;
+    final Comparator<Span> cmp = new Comparator<Span>() {
+
+      /** Query term extension with thesaurus terms. */
+      private byte[][] queryExtension;
+
+      @Override
+      public int compare(final Span o1, final Span o2) {
+        final byte[] inputTkn = o1.txt;
+        final byte[] queryTkn = o2.txt;
+
+        // skip stop words, i. e. if the current query token is a stop word,
+        // it is always equal to the corresponding input token:
+        if(sw != null && sw.id(queryTkn) != 0) return 0;
+
+        // [DP][JE] ugly way to send the QueryException to the caller by
+        // wrapping it in a RuntimeException:
+        try {
+          if(quLexer.getFTOpt().is(FZ) ? // perform fuzzy search?
+                lvs.similar(inputTkn, queryTkn, lvserr) :
+             quLexer.getFTOpt().is(WC) ? // perform wildcard search?
+                wc(words.input, inputTkn, queryTkn, 0, 0) :
+             /* else */
+                eq(inputTkn, queryTkn)) return 0;
+
+          else if(th != null) {
+
+            // if a thesaurus is provided, check if the current input token is
+            // the same as one of the extension tokens of the query tokens:
+
+            if (queryExtension == null)
+              queryExtension = th.find(words.input, quLexer.getText());
+
+            for(final byte[] txt : queryExtension) {
+              final FTLexer thWordLexer = new FTLexer(txt, quLexer);
+              if(thWordLexer.hasNext() && eq(thWordLexer.next().txt, inputTkn))
+                return 0;
+            }
+          }
+        } catch(final QueryException e) {
+          throw new RuntimeException(e);
+        }
+        return 1;
+      }
+    };
+
     int c = 0;
-    while(tk.more()) {
-      final int tp = tk.p;
-      final int tpos = tk.pos;
-      byte[] t = tk.get();
-      boolean f = false;
-      boolean m = false;
-      qu.init();
-      int i = -1;
-      while(++i  < query.size()) {
-        if(m) {
-          tk.more();
-          t = tk.get();
-        } else {
-          m = true;
-        }
-        final byte[] s = query.get(i);
-        if(sw != null && sw.id(s) != 0) continue;
+    final BitapSearch<Span> search = new BitapSearch<Span>(inputIter,
+        qTokenSpans, cmp);
 
-        f = qu.fz ? ls.similar(t, s, lserr) : qu.wc ?
-            wc(words.input, t, s, 0, 0) : eq(t, s);
-        if(!f) break;
-      }
-
-      if(!f && th != null) {
-        i = 0;
-        for(final byte[] txt : th.find(words.input, qu)) {
-          qu.init(txt);
-          qu.more();
-          f |= eq(qu.get(), t);
-          if(f) break;
-        }
-      }
-
-      if(f) {
+    try {
+      while(search.hasNext()) {
+        final int pos = search.next();
         ++c;
-        if(words.add(tpos, tpos + i - 1)) break;
+
+        // if add returns true (i. e. fast evaluation mode), break the loop:
+        if(words.add(pos, pos + qTokenSpans.length - 1)) break;
       }
-      tk.p = tp;
-      tk.pos = tpos;
+    } catch(final RuntimeException e) {
+      throw (QueryException) e.getCause();
     }
 
     words.all.sTokenNum++;
@@ -217,7 +238,7 @@ public final class FTOpt extends ExprInfo {
    * @return result of check, or -1 for a negative match
    * @throws QueryException query exception
    */
-  private boolean wc(final InputInfo ii, final byte[] t, final byte[] q,
+  static boolean wc(final InputInfo ii, final byte[] t, final byte[] q,
       final int tp, final int qp) throws QueryException {
 
     int ql = qp;
@@ -257,7 +278,8 @@ public final class FTOpt extends ExprInfo {
           n = 1;
         }
         // recursively evaluates wildcards (non-greedy)
-        while(!wc(ii, t, q, tl + n, ql)) if(tl + ++n > t.length) return false;
+        while(!wc(ii, t, q, tl + n, ql))
+          if(tl + ++n > t.length) return false;
         if(n > m) return false;
         tl += n;
       } else {
@@ -270,13 +292,14 @@ public final class FTOpt extends ExprInfo {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    if(is(WC)) ser.attribute(token(WILDCARDS) , TRUE);
-    if(is(FZ)) ser.attribute(token(FUZZY)     , TRUE);
-    if(is(UC)) ser.attribute(token(UPPERCASE) , TRUE);
-    if(is(LC)) ser.attribute(token(LOWERCASE) , TRUE);
+    if(is(WC)) ser.attribute(token(WILDCARDS), TRUE);
+    if(is(FZ)) ser.attribute(token(FUZZY), TRUE);
+    if(is(UC)) ser.attribute(token(UPPERCASE), TRUE);
+    if(is(LC)) ser.attribute(token(LOWERCASE), TRUE);
     if(is(DC)) ser.attribute(token(DIACRITICS), TRUE);
-    if(is(ST)) ser.attribute(token(STEMMING)  , TRUE);
-    if(th != null) ser.attribute(token(THESAURUS) , TRUE);
+    if(is(ST)) ser.attribute(token(STEMMING), TRUE);
+    if(ln != null) ser.attribute(token(LANGUAGE), ln);
+    if(th != null) ser.attribute(token(THESAURUS), TRUE);
   }
 
   @Override
@@ -286,8 +309,10 @@ public final class FTOpt extends ExprInfo {
     if(is(FZ)) s.append(' ' + USING + ' ' + FUZZY);
     if(is(UC)) s.append(' ' + USING + ' ' + UPPERCASE);
     if(is(LC)) s.append(' ' + USING + ' ' + LOWERCASE);
-    if(is(DC)) s.append(' ' + USING + ' ' + DIACRITICS + " " + SENSITIVE);
+    if(is(DC)) s.append(' ' + USING + ' ' + DIACRITICS + ' ' + SENSITIVE);
     if(is(ST) || sd != null) s.append(' ' + USING + ' ' + STEMMING);
+    if(ln != null) s.append(' ' + USING + ' ' + LANGUAGE + " '" + string(ln)
+        + '\'');
     if(th != null) s.append(' ' + USING + ' ' + THESAURUS);
     return s.toString();
   }

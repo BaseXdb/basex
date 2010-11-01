@@ -2,6 +2,7 @@ package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
@@ -21,7 +22,7 @@ import org.basex.query.path.AxisPath;
 import org.basex.query.path.AxisStep;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
 
 /**
  * FTContains expression.
@@ -35,7 +36,7 @@ public class FTContains extends ParseExpr {
   /** Full-text expression. */
   FTExpr ftexpr;
   /** Full-text parser. */
-  Tokenizer ft;
+  FTLexer ft;
 
   /**
    * Constructor.
@@ -58,7 +59,7 @@ public class FTContains extends ParseExpr {
     ctx.ftfast = ctx.ftfast && ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);
     ctx.ftfast = fast;
-    ft = new Tokenizer(ctx.context.prop);
+    ft = new FTLexer(EMPTY, ctx.context.prop, new FTOpt(ctx.context.prop));
 
     return expr.empty() ? optPre(Bln.FALSE, ctx) : this;
   }
@@ -67,13 +68,12 @@ public class FTContains extends ParseExpr {
   public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Iter iter = expr.iter(ctx);
-    final Tokenizer tmp = ctx.fttoken;
-    ctx.fttoken = ft;
+    final FTLexer tmp = ctx.fttoken;
     double s = 0;
     Item it;
 
     while((it = iter.next()) != null) {
-      ft.init(it.atom());
+      ctx.fttoken = new FTLexer(it.atom(), ft);
       final FTItem item = ftexpr.item(ctx, input);
       double d = 0;
       if(item.all.matches()) {

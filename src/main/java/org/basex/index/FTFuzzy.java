@@ -3,6 +3,7 @@ package org.basex.index;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.ft.FTOptions.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.cmd.AInfo;
@@ -11,7 +12,7 @@ import org.basex.io.DataAccess;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
 
 /**
  * This class provides access to attribute values and text contents
@@ -87,6 +88,7 @@ final class FTFuzzy extends FTIndex {
     tb.addExt("- %: %" + NL, CREATESTEM, AInfo.flag(data.meta.stemming));
     tb.addExt("- %: %" + NL, CREATECS, AInfo.flag(data.meta.casesens));
     tb.addExt("- %: %" + NL, CREATEDC, AInfo.flag(data.meta.diacritics));
+    tb.addExt("- %: %" + NL, CREATELANG, data.meta.language);
     final long l = li.length() + ti.length() + dat.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
 
@@ -99,8 +101,8 @@ final class FTFuzzy extends FTIndex {
   @Override
   public synchronized int nrIDs(final IndexToken ind) {
     // skip result count for queries which stretch over multiple index entries
-    final Tokenizer fto = (Tokenizer) ind;
-    if(fto.fz || fto.wc) return 1;
+    final FTLexer fto = (FTLexer) ind;
+    if(fto.getFTOpt().is(FZ) || fto.getFTOpt().is(WC)) return 1;
 
     final byte[] tok = fto.get();
     final int id = cache.id(tok);
@@ -119,20 +121,20 @@ final class FTFuzzy extends FTIndex {
 
   @Override
   public synchronized IndexIterator ids(final IndexToken ind) {
-    final Tokenizer ft = (Tokenizer) ind;
+    final FTLexer ft = (FTLexer) ind;
     final byte[] tok = ft.get();
 
     // support fuzzy search
-    if(ft.fz) {
+    if(ft.getFTOpt().is(FZ)) {
       int k = data.meta.prop.num(Prop.LSERROR);
       if(k == 0) k = tok.length >> 2;
-      return fuzzy(tok, k, ft.fast);
+      return fuzzy(tok, k, false);
     }
 
     // return cached or new result
     final int id = cache.id(tok);
-    return id == 0 ? get(tok, ft.fast) :
-      iter(cache.getPointer(id), cache.getSize(id), dat, ft.fast);
+    return id == 0 ? get(tok, false) :
+      iter(cache.getPointer(id), cache.getSize(id), dat, false);
   }
 
   @Override

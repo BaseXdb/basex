@@ -8,7 +8,7 @@ import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.util.InputInfo;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
 
 /**
  * FTContent expression.
@@ -38,7 +38,7 @@ public final class FTContent extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final Tokenizer ft) {
+      final FTLexer ft) {
     if(start) {
       for(final FTStringMatch sm : mtc) if(sm.s == 0) return true;
     } else if(end) {

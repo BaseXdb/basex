@@ -10,8 +10,8 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
-import org.basex.util.Tokenizer;
-import org.basex.util.Tokenizer.FTUnit;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.FTLexer.FTUnit;
 
 /**
  * Abstract FTFilter expression.
@@ -50,7 +50,7 @@ abstract class FTFilter extends FTExpr {
         FTItem it;
         while((it = ir.next()) != null) {
           if(filter(ctx, it, content() ?
-              new Tokenizer(it.atom(), ctx.context.prop) : null)) break;
+              new FTLexer(it.atom(), ctx.context.prop) : null)) break;
         }
         return it;
       }
@@ -66,7 +66,7 @@ abstract class FTFilter extends FTExpr {
    * @throws QueryException query exception
    */
   final boolean filter(final QueryContext ctx, final FTItem item,
-      final Tokenizer ft) throws QueryException {
+      final FTLexer ft) throws QueryException {
 
     final FTMatches all = item.all;
     for(int a = 0; a < all.size; ++a) {
@@ -84,7 +84,7 @@ abstract class FTFilter extends FTExpr {
    * @throws QueryException query exception
    */
   protected abstract boolean filter(final QueryContext ctx, final FTMatch m,
-      final Tokenizer ft) throws QueryException;
+      final FTLexer ft) throws QueryException;
 
   /**
    * Checks if the filter needs the whole text node to be parsed.
@@ -101,7 +101,7 @@ abstract class FTFilter extends FTExpr {
    * @param ft tokenizer
    * @return new position
    */
-  protected final int pos(final int p, final Tokenizer ft) {
+  protected final int pos(final int p, final FTLexer ft) {
     // ft can be zero if unit is WORD
     return unit == FTUnit.WORD ? p : ft.pos(p, unit);
   }

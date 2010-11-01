@@ -61,6 +61,8 @@ public final class MetaData {
   public boolean casesens;
   /** Flag for full-text diacritics removal. */
   public boolean diacritics;
+  /** Language for full-text search index. */
+  public String language;
   /** Maximal indexed full-text score. */
   public int ftscmax;
   /** Minimal indexed full-text score. */
@@ -101,6 +103,7 @@ public final class MetaData {
     wildcards = prop.is(Prop.WILDCARDS);
     stemming = prop.is(Prop.STEMMING);
     diacritics = prop.is(Prop.DIACRITICS);
+    language = prop.get(Prop.FTLANGUAGE);
     casesens = prop.is(Prop.CASESENS);
     scoring = prop.num(Prop.SCORING);
     users = new Users(false);
@@ -221,6 +224,7 @@ public final class MetaData {
       else if(k.equals(DBFTST))   stemming   = toBool(v);
       else if(k.equals(DBFTCS))   casesens   = toBool(v);
       else if(k.equals(DBFTDC))   diacritics = toBool(v);
+      else if(k.equals(DBFTLN))   language   = v;
       else if(k.equals(DBSCMAX))  ftscmax    = toInt(v);
       else if(k.equals(DBSCMIN))  ftscmin    = toInt(v);
       else if(k.equals(DBSCTYPE)) scoring    = toInt(v);
@@ -270,6 +274,7 @@ public final class MetaData {
     writeInfo(out, DBFTST,   stemming);
     writeInfo(out, DBFTCS,   casesens);
     writeInfo(out, DBFTDC,   diacritics);
+    writeInfo(out, DBFTLN,   language);
     writeInfo(out, DBSCMAX,  ftscmax);
     writeInfo(out, DBSCMIN,  ftscmin);
     writeInfo(out, DBSCTYPE, scoring);

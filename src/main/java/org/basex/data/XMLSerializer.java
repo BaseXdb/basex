@@ -11,7 +11,7 @@ import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.TokenSet;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
 import org.basex.util.Util;
 
 /**
@@ -298,15 +298,16 @@ public final class XMLSerializer extends Serializer {
     finishElement();
 
     int c = -1, wl = 0;
-    final Tokenizer ftt = new Tokenizer(b, null);
-    while(ftt.more()) {
+    final FTLexer ftt = new FTLexer(b);
+    while(ftt.hasNext()) {
+      final int end = ftt.next().end;
       ++c;
-      for(int i = wl; i < ftt.p; i += cl(b, i)) {
+      for(int i = wl; i < end; i += cl(b, i)) {
         final int ch = cp(b, i);
         if(ftChar(ch) && ftp.contains(c)) print((char) 0x10);
         ch(ch);
       }
-      wl = ftt.p;
+      wl = end;
     }
     while(wl < b.length) {
       ch(cp(b, wl));

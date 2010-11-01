@@ -10,7 +10,7 @@ import org.basex.query.item.Type;
 import org.basex.query.util.format.FormatParser.Case;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
-import org.basex.util.locale.Formatter;
+import org.basex.util.ft.Formatter;
 
 /**
  * Date formatter.

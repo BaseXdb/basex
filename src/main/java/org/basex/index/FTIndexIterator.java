@@ -2,7 +2,7 @@ package org.basex.index;
 
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
-import org.basex.query.ft.Scoring;
+import org.basex.util.ft.Scoring;
 
 /**
  * This interface provides methods for returning index results.

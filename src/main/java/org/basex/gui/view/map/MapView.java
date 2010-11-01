@@ -24,7 +24,7 @@ import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
 
 /**
  * This view is a TreeMap implementation.
@@ -396,8 +396,9 @@ public final class MapView extends View implements Runnable {
         // read content from disk
         final byte[] text = painter.content(data, f);
         // calculate tooltip
+        final FTLexer lex = new FTLexer(text, gui.context.prop);
         final TokenList tl = MapRenderer.calculateToolTip(f,
-            Tokenizer.getInfo(text), mouseX, mouseY, getWidth(), g);
+            lex.getInfo(text), mouseX, mouseY, getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
         // draw calculated tooltip
         MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl,

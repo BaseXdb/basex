@@ -1,7 +1,10 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
+import static org.basex.util.ft.FTOptions.*;
 import java.io.IOException;
+import java.util.Iterator;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
@@ -18,9 +21,9 @@ import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.Span;
 
 /**
  * FTWords expression.
@@ -125,17 +128,17 @@ public final class FTWords extends FTExpr {
       @Override
       public FTItem next() {
         if(iat == null) {
-          final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast,
-              ctx.context.prop);
-          ft.fast = ft.fast && ft.count() == 1;
-          ft.init();
+          final FTLexer ftlexer = new FTLexer(txt, ctx.context.prop, ctx.ftopt,
+              false);
+          final Iterator<Span> f = ftlexer.iterator();
           int d = 0;
-          while(ft.more()) {
-            if(ctx.ftopt.sw != null && ctx.ftopt.sw.id(ft.get()) != 0) {
+          while(f.hasNext()) {
+            final byte[] token = f.next().txt;
+            if(ctx.ftopt.sw != null && ctx.ftopt.sw.id(token) != 0) {
               ++d;
             } else {
-              final FTIndexIterator it = (FTIndexIterator) data.ids(ft);
-              iat = iat == null ? it : FTIndexIterator.phrase(iat, it, ++d);
+              final FTIndexIterator i = (FTIndexIterator) data.ids((FTLexer) f);
+              iat = iat == null ? i : FTIndexIterator.phrase(iat, i, ++d);
               d = 0;
             }
           }
@@ -176,7 +179,7 @@ public final class FTWords extends FTExpr {
         break;
       case M_ALLWORDS:
         while((it = nextStr(iter)) != null) {
-          for(final byte[] t : Token.split(it, ' ')) {
+          for(final byte[] t : split(it, ' ')) {
             final int oc = opt.contains(t, ctx.fttoken, this);
             if(oc == 0) return 0;
             len += t.length;
@@ -192,7 +195,7 @@ public final class FTWords extends FTExpr {
         break;
       case M_ANYWORD:
         while((it = nextStr(iter)) != null) {
-          for(final byte[] t : Token.split(it, ' ')) {
+          for(final byte[] t : split(it, ' ')) {
             o += opt.contains(t, ctx.fttoken, this);
             len += t.length;
           }
@@ -255,8 +258,10 @@ public final class FTWords extends FTExpr {
 
     if(txt == null || occ != null || mode != FTMode.M_ANY &&
         mode != FTMode.M_ALL && mode != FTMode.M_PHRASE ||
-        md.casesens != fto.is(FTOpt.CS) || md.diacritics != fto.is(FTOpt.DC) ||
-        md.stemming != fto.is(FTOpt.ST)) return false;
+        md.casesens != fto.is(CS) || md.diacritics != fto.is(DC) ||
+        md.stemming != fto.is(ST) ||
+        fto.ln != null && !eq(uc(token(md.language)), uc(fto.ln)))
+    return false;
 
     // no index results
     if(txt.length == 0) {
@@ -265,7 +270,7 @@ public final class FTWords extends FTExpr {
     }
 
     // limit index access to trie version and simple wildcard patterns
-    boolean wc = fto.is(FTOpt.WC);
+    boolean wc = fto.is(WC);
     if(wc) {
       wc = md.wildcards;
       // index does not support wildcards
@@ -273,11 +278,11 @@ public final class FTWords extends FTExpr {
     }
 
     // summarize number of hits; break loop if no hits are expected
-    final Tokenizer ft = new Tokenizer(txt, fto, fast, ic.ctx.context.prop);
+    final FTLexer ft = new FTLexer(txt, ic.ctx.context.prop, fto, false);
     ic.costs = 0;
-    while(ft.more()) {
-      final byte[] tok = ft.get();
-      if(tok.length > Token.MAXLEN) return false;
+    while(ft.hasNext()) {
+      final byte[] tok = ft.next().txt;
+      if(tok.length > MAXLEN) return false;
       if(fto.sw != null && fto.sw.id(tok) != 0) continue;
 
       if(wc) {

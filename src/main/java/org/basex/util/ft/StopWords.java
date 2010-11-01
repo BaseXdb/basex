@@ -1,4 +1,4 @@
-package org.basex.query.ft;
+package org.basex.util.ft;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
@@ -9,8 +9,6 @@ import org.basex.data.Data;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.query.QueryContext;
-import org.basex.query.item.DBNode;
 import org.basex.util.TokenSet;
 import org.basex.util.Util;
 
@@ -41,15 +39,14 @@ public final class StopWords extends TokenSet {
   }
 
   /**
-   * Compiles the full-text options.
-   * @param ctx query context
+   * Compiles the stop word list.
+   * @param data data reference
    */
-  void comp(final QueryContext ctx) {
+  public void comp(final Data data) {
     // stop words have already been defined..
-    if(size() != 0 || !(ctx.value instanceof DBNode)) return;
+    if(size() != 0) return;
     // try to parse the stop words file of the current database
     try {
-      final Data data = ((DBNode) ctx.value).data;
       final File file = data.meta.file(DATASWL);
       if(!file.exists()) return;
       final DataInput in = new DataInput(data.meta.file(DATASWL));

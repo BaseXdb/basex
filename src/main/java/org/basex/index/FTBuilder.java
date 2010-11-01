@@ -9,13 +9,13 @@ import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.query.ft.Scoring;
-import org.basex.query.ft.StopWords;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.Scoring;
+import org.basex.util.ft.StopWords;
 import org.basex.util.Util;
 
 /**
@@ -26,7 +26,9 @@ import org.basex.util.Util;
  */
 public abstract class FTBuilder extends IndexBuilder {
   /** Word parser. */
-  protected final Tokenizer wp;
+  protected final FTLexer wp;
+  /** Lexer position. */
+  protected int lexerPos;
   /** Scoring mode; see {@link Prop#SCORING}. */
   protected final int scm;
   /** Number of indexed tokens. */
@@ -74,7 +76,7 @@ public abstract class FTBuilder extends IndexBuilder {
     super(d);
     final Prop prop = d.meta.prop;
     scm = d.meta.scoring;
-    wp = new Tokenizer(prop);
+    wp = new FTLexer(EMPTY, prop);
     max = -1;
     min = Integer.MAX_VALUE;
     sw = new StopWords(d, prop.get(Prop.STOPWORDS));
@@ -101,9 +103,11 @@ public abstract class FTBuilder extends IndexBuilder {
       }
       if(scm == 2) unit.add(pre);
 
-      wp.init(data.text(pre, true));
-      while(wp.more()) {
-        final byte[] tok = wp.get();
+      final FTLexer lex = new FTLexer(data.text(pre, true), wp);
+      lexerPos = -1;
+      while(lex.hasNext()) {
+        final byte[] tok = lex.next().txt;
+        lexerPos++;
         // skip too long and stopword tokens
         if(tok.length <= MAXLEN && (sw.size() == 0 || sw.id(tok) == 0)) {
           // check if main-memory is exhausted

@@ -1021,6 +1021,8 @@ public interface Text {
   /** Full-text index information. */
   String CREATESTEM = lang("dc_ftstem");
   /** Full-text index information. */
+  String CREATELANG = lang("dc_ftlang");
+  /** Full-text index information. */
   String CREATECS = lang("dc_ftcs");
   /** Full-text index information. */
   String CREATEDC = lang("dc_ftdc");
@@ -1050,6 +1052,8 @@ public interface Text {
   String WCINDEXINFO = lang("dc_wcinfo");
   /** Full-text index information. */
   String FTSTEMINFO = lang("dc_ftsteminfo");
+  /** Full-text index information. */
+  String FTLANGINFO = lang("dc_ftlanginfo");
   /** Full-text index information. */
   String FTCSINFO = lang("dc_ftcsinfo");
   /** Full-text index information. */

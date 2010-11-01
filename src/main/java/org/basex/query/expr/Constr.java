@@ -110,7 +110,7 @@ public final class Constr {
         // add namespaces from ancestors
         final Atts atts = node.ns();
         if(atts != null && atts.size != 0) {
-          // TODO why only if there are already namespaces?
+          // [LK][LW] why only if there are already namespaces?
           node = node.parent();
           while(node != null && node.type == Type.ELM) {
             final Atts ns = node.ns();

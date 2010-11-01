@@ -108,7 +108,7 @@ final class MapDefault extends MapPainter {
 
       rect.thumb = MapRenderer.calcHeight(g, rect, text, fsz) >= rect.h;
       if(rect.thumb) {
-        MapRenderer.drawThumbnails(g, rect, text, fsz);
+        MapRenderer.drawThumbnails(g, rect, context.prop, text, fsz);
       } else {
         MapRenderer.drawText(g, rect, text, fsz);
       }

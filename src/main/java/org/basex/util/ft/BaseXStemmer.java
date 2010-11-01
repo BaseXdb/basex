@@ -1,16 +1,19 @@
-package org.basex.util;
+package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
 import java.util.Arrays;
+import java.util.EnumSet;
+import org.basex.core.Prop;
+import org.basex.query.ft.FTOpt;
 
 /**
- * Simple stemming algorithm. Based on the publication from
- * Porter (1980): An algorithm for suffix stripping.
+ * Simple stemming algorithm. Based on the publication from Porter (1980): An
+ * algorithm for suffix stripping.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class Stemming {
+final class BaseXStemmer extends Stemmer {
   /** Stemming character. */
   private static final byte[] AT = token("at");
   /** Stemming character. */
@@ -46,26 +49,28 @@ final class Stemming {
 
   /** Step 2. */
   private static final byte[][][] ST2 = {
-    tokens("abli", "able"), tokens("alism", "al"), tokens("aliti", "al"),
-    tokens("alli", "al"), tokens("anci", "ance"), tokens("ation", "ate"),
-    tokens("ational", "ate"), tokens("ator", "ate"), tokens("biliti", "ble"),
-    tokens("eli", "e"), tokens("enci", "ence"), tokens("entli", "ent"),
-    tokens("fulness", "ful"), tokens("iveness", "ive"), tokens("iviti", "ive"),
-    tokens("ization", "ize"), tokens("ization", "ize"), tokens("izer", "ize"),
-    tokens("izer", "ize"), tokens("ousli", "ous"), tokens("ousness", "ous"),
-    tokens("tional", "tion"),
+      tokens("abli", "able"), tokens("alism", "al"), tokens("aliti", "al"),
+      tokens("alli", "al"), tokens("anci", "ance"), tokens("ation", "ate"),
+      tokens("ational", "ate"), tokens("ator", "ate"), tokens("biliti", "ble"),
+      tokens("eli", "e"), tokens("enci", "ence"), tokens("entli", "ent"),
+      tokens("fulness", "ful"), tokens("iveness", "ive"),
+      tokens("iviti", "ive"),
+      tokens("ization", "ize"), tokens("ization", "ize"),
+      tokens("izer", "ize"),
+      tokens("izer", "ize"), tokens("ousli", "ous"), tokens("ousness", "ous"),
+      tokens("tional", "tion"),
   };
   /** Step 3. */
   private static final byte[][][] ST3 = {
-    tokens("alize", "al"), tokens("alize", "al"), tokens("ative", ""),
-    tokens("ful", ""), tokens("ical", "ic"), tokens("icate", "ic"),
-    tokens("iciti", "ic"), tokens("ness", "")
+      tokens("alize", "al"), tokens("alize", "al"), tokens("ative", ""),
+      tokens("ful", ""), tokens("ical", "ic"), tokens("icate", "ic"),
+      tokens("iciti", "ic"), tokens("ness", "")
   };
   /** Step 4. */
-  private static final byte[][] ST4 =  tokens(
+  private static final byte[][] ST4 = tokens(
       "able", "al", "ance", "ant", "ate", "ement", "ence", "ent", "er", "ible",
       "ic", "ism", "iti", "ive", "ize", "ment", "ou", "ous", "sion", "tion"
-  );
+      );
 
   /** Token to be stemmed. */
   private byte[] tok;
@@ -74,11 +79,7 @@ final class Stemming {
   /** Stemming length. */
   private int tt;
 
-  /**
-   * Stems the specified word.
-   * @param str word to be stemmed
-   * @return result
-   */
+  @Override
   byte[] stem(final byte[] str) {
     te = str.length;
     tok = str;
@@ -164,7 +165,7 @@ final class Stemming {
     if(l < 3) return false;
     final int c = l(l - 1);
     return c != 'w' && c != 'x' && c != 'y' &&
-      !v(l - 1) && v(l - 2) && !v(l - 3);
+        !v(l - 1) && v(l - 2) && !v(l - 3);
   }
 
   /**
@@ -176,7 +177,8 @@ final class Stemming {
     final int sl = s.length;
     final int l = te - sl;
     if(l < 0) return false;
-    for(int i = 0; i < sl; ++i) if(l(l + i) != s[i]) return false;
+    for(int i = 0; i < sl; ++i)
+      if(l(l + i) != s[i]) return false;
     tt = l;
     return true;
   }
@@ -215,7 +217,8 @@ final class Stemming {
    * @return result of check
    */
   private boolean v() {
-    for(int i = 0; i < tt; ++i) if(v(i)) return true;
+    for(int i = 0; i < tt; ++i)
+      if(v(i)) return true;
     return false;
   }
 
@@ -227,7 +230,7 @@ final class Stemming {
   private boolean v(final int p) {
     final int c = l(p);
     return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' ||
-      c == 'y' && p != 0 && !v(p - 1);
+        c == 'y' && p != 0 && !v(p - 1);
   }
 
   /**
@@ -254,6 +257,22 @@ final class Stemming {
    */
   private void a(final byte[] t) {
     te = tt;
-    for(final byte c : t) tok[te++] = c;
+    for(final byte c : t)
+      tok[te++] = c;
+  }
+
+  @Override
+  int getPrecedence() {
+    return 1000;
+  }
+
+  @Override
+  SpanProcessor newInstance(final Prop p, final FTOpt f) {
+    return new BaseXStemmer();
+  }
+
+  @Override
+  EnumSet<LanguageTokens> supportedLanguages() {
+    return EnumSet.of(LanguageTokens.EN);
   }
 }

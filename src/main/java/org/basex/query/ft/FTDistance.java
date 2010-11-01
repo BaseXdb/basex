@@ -12,8 +12,8 @@ import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-import org.basex.util.Tokenizer;
-import org.basex.util.Tokenizer.FTUnit;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.FTLexer.FTUnit;
 
 /**
  * FTDistance expression.
@@ -47,7 +47,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final Tokenizer ft) throws QueryException {
+      final FTLexer ft) throws QueryException {
 
     final long min = checkItr(dist[0], ctx);
     final long max = checkItr(dist[1], ctx);

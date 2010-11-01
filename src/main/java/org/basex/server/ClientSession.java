@@ -159,7 +159,7 @@ public final class ClientSession extends Session {
     info = bi.readString();
     if(!ok(bi)) throw new IOException(info);
   }
-  
+
   @Override
   public ClientQuery query(final String query) throws BaseXException {
     return new ClientQuery(query, this);

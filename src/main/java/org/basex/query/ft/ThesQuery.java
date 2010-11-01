@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenList;
-import org.basex.util.Tokenizer;
 
 /**
  * Simple Thesaurus entry for full-text requests.
@@ -17,7 +16,7 @@ public final class ThesQuery {
   private final ArrayList<Thesaurus> thes = new ArrayList<Thesaurus>(1);
 
   /**
-   * Merges two thesaurus definitions.
+   * Adds two thesaurus definitions.
    * @param th second thesaurus
    */
   public void add(final Thesaurus th) {
@@ -39,11 +38,11 @@ public final class ThesQuery {
   /**
    * Finds a thesaurus term.
    * @param ii input info
-   * @param ft tokenizer
+   * @param ft token
    * @return result list
    * @throws QueryException query exception
    */
-  byte[][] find(final InputInfo ii, final Tokenizer ft) throws QueryException {
+  byte[][] find(final InputInfo ii, final byte[] ft) throws QueryException {
     final TokenList tl = new TokenList();
     for(final Thesaurus th : thes) th.find(ii, tl, ft);
     return tl.toArray();

@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import java.io.IOException;
-
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
@@ -23,7 +22,7 @@ import org.basex.util.Token;
 public final class Put extends UpdatePrimitive {
   /** Put location. */
   private final Uri uri;
-  
+
   /** Serializer properties. */
   private final SerializerProp props;
 
@@ -46,7 +45,7 @@ public final class Put extends UpdatePrimitive {
     PrintOutput out = null;
     try {
       out = new PrintOutput(Token.string(path()));
-      
+
       SerializerProp pr = props;
       // try to reproduce non-chopped documents correctly
       if(props == null && node instanceof DBNode) {
@@ -54,7 +53,6 @@ public final class Put extends UpdatePrimitive {
         pr.set(SerializerProp.S_INDENT,
             ((DBNode) node).data.meta.chop ? YES : NO);
       }
-      
       node.serialize(new XMLSerializer(out, pr));
     } catch(final IOException ex) {
       UPPUTERR.thrw(input, path());

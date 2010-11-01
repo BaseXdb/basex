@@ -119,7 +119,7 @@ public abstract class Nod extends Item {
   /**
    * Returns the namespace hierarchy.
    * @return namespaces
-   * [LW][LK] TODO: this isn't enough
+   * [LW][LK] this isn't enough
    */
   public final Atts nsScope() {
     return nsScope(true);
@@ -129,7 +129,7 @@ public abstract class Nod extends Item {
    * Returns the namespace hierarchy.
    * @param nsInherit copy-namespaces inherit
    * @return namespaces
-   * [LW][LK] TODO: this isn't enough
+   * [LW][LK] this isn't enough
    */
   public final Atts nsScope(final boolean nsInherit) {
     final Atts ns = new Atts();

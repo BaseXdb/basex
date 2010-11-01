@@ -9,8 +9,8 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.util.BoolList;
 import org.basex.util.InputInfo;
-import org.basex.util.Tokenizer;
-import org.basex.util.Tokenizer.FTUnit;
+import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.FTLexer.FTUnit;
 
 /**
  * FTScope expression.
@@ -38,7 +38,7 @@ public final class FTScope extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final Tokenizer ft) {
+      final FTLexer ft) {
 
     if(same) {
       int s = -1;

@@ -16,7 +16,6 @@ import org.basex.util.InputInfo;
 import org.basex.util.TokenObjMap;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenList;
-import org.basex.util.Tokenizer;
 
 /**
  * Simple Thesaurus for full-text requests.
@@ -191,13 +190,13 @@ public final class Thesaurus {
    * Finds a thesaurus term.
    * @param ii input info
    * @param list result list
-   * @param ft tokenizer
+   * @param ft token
    * @throws QueryException query exception
    */
-  void find(final InputInfo ii, final TokenList list, final Tokenizer ft)
+  void find(final InputInfo ii, final TokenList list, final byte[] ft)
       throws QueryException {
     if(nodes.size() == 0) init(ii);
-    find(list, nodes.get(ft.text), 1);
+    find(list, nodes.get(ft), 1);
   }
 
   /**
@@ -213,7 +212,6 @@ public final class Thesaurus {
       if(rel.length == 0 || eq(node.rs[n], rel)) {
         final byte[] term = node.nodes[n].term;
         if(!list.contains(term)) {
-          //if(lev >= min) list.add(node.term);
           list.add(term);
           find(list, node.nodes[n], lev + 1);
         }

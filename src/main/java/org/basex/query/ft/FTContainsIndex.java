@@ -11,7 +11,7 @@ import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
-import org.basex.util.Tokenizer;
+import org.basex.util.ft.FTLexer;
 
 /**
  * Sequential FTContains expression with index access.
@@ -44,7 +44,7 @@ final class FTContainsIndex extends FTContains {
   public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Iter ir = expr.iter(ctx);
-    final Tokenizer tmp = ctx.fttoken;
+    final FTLexer tmp = ctx.fttoken;
     ctx.fttoken = ft;
 
     // create index iterator

@@ -6,12 +6,12 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
-import org.basex.query.ft.Scoring;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
+import org.basex.util.ft.Scoring;
 
 /**
  * Disk-based Node item.

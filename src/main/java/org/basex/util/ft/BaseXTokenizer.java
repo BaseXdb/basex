@@ -1,11 +1,17 @@
-package org.basex.util;
+package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.ft.FTOptions.*;
 import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import org.basex.core.Prop;
-import org.basex.index.IndexToken;
 import org.basex.query.ft.FTOpt;
-import org.basex.query.ft.StemDir;
+import org.basex.util.IntList;
+import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
+import org.basex.util.ft.FTLexer.FTUnit;
 
 /**
  * Full-text tokenizer.
@@ -13,56 +19,32 @@ import org.basex.query.ft.StemDir;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Tokenizer implements IndexToken {
-  /** Units. */
-  public enum FTUnit {
-    /** Word unit. */      WORD,
-    /** Sentence unit. */  SENTENCE,
-    /** Paragraph unit. */ PARAGRAPH;
-
-    /**
-     * Returns a string representation.
-     * @return string representation
-     */
-    @Override
-    public String toString() { return name().toLowerCase(); }
-  }
-
-  /** Stemming instance. */
-  private final Stemming stem = new Stemming();
+final class BaseXTokenizer extends Tokenizer {
   /** Cached sentence positions. */
   private final IntList sen = new IntList();
   /** Cached paragraph positions. */
   private final IntList par = new IntList();
 
-  /** Stemming dictionary. */
-  public StemDir sd;
-  /** Stemming flag. */
-  public boolean st;
   /** Diacritics flag. */
-  public boolean dc;
+  private boolean dc;
   /** Sensitivity flag. */
-  public boolean cs;
+  private boolean cs;
   /** Uppercase flag. */
-  public boolean uc;
+  private boolean uc;
   /** Lowercase flag. */
-  public boolean lc;
+  private boolean lc;
   /** Wildcard flag. */
-  public boolean wc;
-  /** Fuzzy flag. */
-  public boolean fz;
-  /** Fast evaluation flag. */
-  public boolean fast;
+  private boolean wc;
   /** Flag for a paragraph. */
-  public boolean pa;
+  boolean pa;
 
   /** Current token. */
-  public int pos;
+  int pos;
 
   /** Text. */
-  public byte[] text;
+  private byte[] text;
   /** Current character position. */
-  public int p;
+  int p;
 
   /** Current sentence. */
   private int sent;
@@ -75,16 +57,14 @@ public final class Tokenizer implements IndexToken {
 
   /** Character start position. */
   private int s;
-  /** Number of tokens. */
-  private int count;
-  /** Flag indicating a new sentence. */
-  private boolean sc;
+  /** Flag indicating, that the current token is special character. */
+  boolean sc;
 
   /**
    * Empty constructor.
    * @param pr (optional) database properties
    */
-  public Tokenizer(final Prop pr) {
+  BaseXTokenizer(final Prop pr) {
     this(EMPTY, pr);
   }
 
@@ -93,48 +73,50 @@ public final class Tokenizer implements IndexToken {
    * @param pr (optional) database properties
    * @param txt text
    */
-  public Tokenizer(final byte[] txt, final Prop pr) {
+  private BaseXTokenizer(final byte[] txt, final Prop pr) {
     init(txt);
     if(pr != null) {
-      st = pr.is(Prop.STEMMING);
       dc = pr.is(Prop.DIACRITICS);
       cs = pr.is(Prop.CASESENS);
     }
-  }
-
-  @Override
-  public IndexType type() {
-    return IndexType.FULLTEXT;
   }
 
   /**
    * Constructor.
    * @param txt text
    * @param fto full-text options
-   * @param f fast evaluation
    * @param pr database properties
    */
-  public Tokenizer(final byte[] txt, final FTOpt fto, final boolean f,
-      final Prop pr) {
+  private BaseXTokenizer(final byte[] txt, final FTOpt fto, final Prop pr) {
     this(txt, pr);
-    lc = fto.is(FTOpt.LC);
-    uc = fto.is(FTOpt.UC);
-    cs = fto.is(FTOpt.CS);
-    wc = fto.is(FTOpt.WC);
-    fz = fto.is(FTOpt.FZ);
-    st = fto.is(FTOpt.ST);
-    dc = fto.is(FTOpt.DC);
-    sd = fto.sd;
-    fast = f;
+    setFTOpt(fto);
+  }
+
+  @Override
+  Tokenizer newInstance(final byte[] txt, final Prop pr, final FTOpt f) {
+    return new BaseXTokenizer(txt, f, pr);
+  }
+
+  /**
+   * Set full-text options.
+   * @param fto new full-text option
+   */
+  private void setFTOpt(final FTOpt fto) {
+    if(null != fto) {
+      lc = fto.is(LC);
+      uc = fto.is(UC);
+      cs = fto.is(CS);
+      wc = fto.is(WC);
+      dc = fto.is(DC);
+    }
   }
 
   /**
    * Sets the text.
    * @param txt text
    */
-  public void init(final byte[] txt) {
+  private void init(final byte[] txt) {
     if(text != txt) {
-      count = -1;
       text = txt;
       sen.reset();
       par.reset();
@@ -145,7 +127,7 @@ public final class Tokenizer implements IndexToken {
   /**
    * Initializes the iterator.
    */
-  public void init() {
+  void init() {
     sent = 0;
     para = 0;
     pos = -1;
@@ -157,7 +139,7 @@ public final class Tokenizer implements IndexToken {
    * returned.
    * @return result of check
    */
-  public boolean more() {
+  boolean more() {
     final int l = text.length;
     ++pos;
 
@@ -203,7 +185,8 @@ public final class Tokenizer implements IndexToken {
           if(c == '?' || c == '*' || c == '+') {
             ++p;
           } else if(c == '{') {
-            while(++p < l && text[p] != '}');
+            while(++p < l && text[p] != '}')
+              ;
             if(p == l) break;
           }
           continue;
@@ -218,8 +201,11 @@ public final class Tokenizer implements IndexToken {
     return true;
   }
 
-  @Override
-  public byte[] get() {
+  /**
+   * Get the current token applying filters before returning the result.
+   * @return byte array representing the filtered token
+   */
+  byte[] get() {
     return get(orig());
   }
 
@@ -234,7 +220,6 @@ public final class Tokenizer implements IndexToken {
     if(!dc) n = dia(n, a);
     if(uc) n = upper(n, a);
     if(lc || !cs) n = lower(n, a);
-    if(st) n = sd == null ? stem.stem(n) : sd.stem(n);
     return n;
   }
 
@@ -247,23 +232,10 @@ public final class Tokenizer implements IndexToken {
   }
 
   /**
-   * Counts the number of tokens.
-   * @return number of tokens
-   */
-  public int count() {
-    if(count == -1) {
-      init();
-      while(more());
-      count = pos;
-    }
-    return count;
-  }
-
-  /**
    * Checks if more tokens are to be returned; special characters are included.
    * @return result of check
    */
-  public boolean moreSC() {
+  boolean moreSC() {
     final int l = text.length;
     // parse whitespaces
     pa = false;
@@ -302,29 +274,16 @@ public final class Tokenizer implements IndexToken {
   }
 
   /**
-   * Returns true if the current token is a special char.
-   * @return boolean
-   */
-  public boolean isSC() {
-    return sc;
-  }
-
-  /**
    * Get next token, including special characters.
    * @return next token
    */
-  public byte[] nextSC() {
-    return lp < p ? Arrays.copyOfRange(text, lp, p)
-        : Arrays.copyOfRange(text, p, s);
+  byte[] nextSC() {
+    return lp < p ? Arrays.copyOfRange(text, lp, p) : Arrays.copyOfRange(text,
+        p, s);
   }
 
-  /**
-   * Calculates a position value, dependent on the specified unit.
-   * @param w word position
-   * @param u unit
-   * @return new position
-   */
-  public int pos(final int w, final FTUnit u) {
+  @Override
+  int pos(final int w, final FTUnit u) {
     if(u == FTUnit.WORD) return w;
 
     // if necessary, calculate sentences and paragraphs
@@ -340,8 +299,8 @@ public final class Tokenizer implements IndexToken {
   }
 
   /**
-   * Removes diacritics from the specified token.
-   * This method supports all latin1 characters, including supplements.
+   * Removes diacritics from the specified token. This method supports all
+   * latin1 characters, including supplements.
    * @param t token to be converted
    * @param a ascii flag
    * @return converted token
@@ -357,7 +316,8 @@ public final class Tokenizer implements IndexToken {
       if(c != norm(c)) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(t, 0, i);
-        for(int j = i; j < tl; j += cl(t, j)) tb.add(norm(cp(t, j)));
+        for(int j = i; j < tl; j += cl(t, j))
+          tb.add(norm(cp(t, j)));
         return tb.finish();
       }
     }
@@ -374,11 +334,13 @@ public final class Tokenizer implements IndexToken {
   private static byte[] upper(final byte[] t, final boolean a) {
     final int tl = t.length;
     if(a) {
-      for(int i = 0; i < tl; ++i) t[i] = (byte) uc(t[i]);
+      for(int i = 0; i < tl; ++i)
+        t[i] = (byte) uc(t[i]);
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t, i)) tb.add(uc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(t, i))
+      tb.add(uc(cp(t, i)));
     return tb.finish();
   }
 
@@ -391,26 +353,19 @@ public final class Tokenizer implements IndexToken {
   private static byte[] lower(final byte[] t, final boolean a) {
     final int tl = t.length;
     if(a) {
-      for(int i = 0; i < tl; ++i) t[i] = (byte) lc(t[i]);
+      for(int i = 0; i < tl; ++i)
+        t[i] = (byte) lc(t[i]);
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t, i)) tb.add(lc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(t, i))
+      tb.add(lc(cp(t, i)));
     return tb.finish();
   }
 
-  /**
-   * Gets full-text info for the specified token; needed for visualizations.
-   * int[0]: length of each token
-   * int[1]: sentence info, length of each sentence
-   * int[2]: paragraph info, length of each paragraph
-   * int[3]: each token as int[]
-   * int[4]: punctuation marks of each sentence
-   * @param t text to be parsed
-   * @return int arrays
-   */
-  public static int[][] getInfo(final byte[] t) {
-    final Tokenizer tok = new Tokenizer(t, null);
+  @Override
+  int[][] getInfo(final byte[] t) {
+    final BaseXTokenizer tok = new BaseXTokenizer(t, null);
     final IntList[] il = new IntList[] { new IntList(), new IntList(),
         new IntList(), new IntList(), new IntList()};
     int lass = 0;
@@ -421,7 +376,8 @@ public final class Tokenizer implements IndexToken {
       final byte[] n = tok.orig();
       final int l = n.length;
       il[0].add(l);
-      for(final byte b : n) il[3].add(b);
+      for(final byte b : n)
+        il[3].add(b);
 
       if(tok.sent != lass) {
         if(sl > 0) {
@@ -457,5 +413,98 @@ public final class Tokenizer implements IndexToken {
   @Override
   public String toString() {
     return Util.name(this) + '[' + string(text) + ']';
+  }
+
+  @Override
+  int getPrecedence() {
+    return 1000;
+  }
+
+  @Override
+  public Iterator<Span> iterator() {
+    return specialChars ? iteratorSC() : new Iterator<Span>() {
+      {
+        init();
+      }
+      int calledHasNext;
+
+      @Override
+      public boolean hasNext() {
+        if (calledHasNext > 0) return true;
+        if(more()) {
+          calledHasNext++;
+          return true;
+        }
+        return false;
+      }
+
+      @Override
+      public Span next() {
+        // BaseXTokenizer requires that more() must be called before get()
+        if(calledHasNext == 0) {
+          if(hasNext()) {
+            return next();
+          }
+          throw new NoSuchElementException();
+        }
+        calledHasNext--;
+        final int left = p;
+        return new Span(get(), left, p, pos);
+      }
+
+      @Override
+      public void remove() {
+        Util.notimplemented();
+      }
+    };
+  }
+
+  @Override
+  EnumSet<LanguageTokens> supportedLanguages() {
+    return LanguageTokens.wsTokenizable();
+  }
+
+  @Override
+  boolean isParagraph() {
+    return pa;
+  }
+
+  /**
+   * Get an iterator over all tokens, including special characters.
+   * @return span iterator
+   */
+  private Iterator<Span> iteratorSC() {
+    return new Iterator<Span>() {
+      {
+        init();
+      }
+      int calledHasNext;
+
+      @Override
+      public boolean hasNext() {
+        if(moreSC()) {
+          calledHasNext++;
+          return true;
+        }
+        return false;
+      }
+
+      @Override
+      public Span next() {
+        // BaseXTokenizer requires that more() must be called before get()
+        if(calledHasNext == 0) {
+          if(hasNext()) return next();
+          throw new NoSuchElementException();
+        }
+        calledHasNext--;
+        final int left = p;
+        return new Span(nextSC(), left, p, pos, sc);
+      }
+
+      @Override
+      public void remove() {
+        Util.notimplemented();
+      }
+    };
   }
 }

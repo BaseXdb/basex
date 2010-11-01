@@ -3,7 +3,7 @@ package org.basex.query.util.format;
 import static org.basex.util.Token.*;
 import org.basex.query.util.format.FormatParser.Case;
 import org.basex.util.TokenBuilder;
-import org.basex.util.locale.Formatter;
+import org.basex.util.ft.Formatter;
 
 /**
  * Integer formatter.

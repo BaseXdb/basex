@@ -28,7 +28,7 @@ final class QueryProcess extends Progress {
   public String query;
 
   /** Print output. */
-  private PrintOutput out;
+  private final PrintOutput out;
   /** Serializer. */
   private XMLSerializer xml;
   /** Monitored flag. */

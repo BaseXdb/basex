@@ -76,7 +76,7 @@ final class GroupPartition {
    * Calculates the number of unique non-grouping variables.
    * This is #ForLet - #GroupBy
    * <p>Returns 0 for <br />
-   * <code>for $a in 1 for $a in 2 group by $a return $a</code></p>
+   * {@code for $a in 1 for $a in 2 group by $a return $a}</p>
    * @param gvs grouping vars
    * @param fls forlet vars
    * @return size of non-grouping variables container.
