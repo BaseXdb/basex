@@ -38,6 +38,17 @@ import org.jaxrx.core.ResourcePath;
  * @author Lukas Lewandowski
  */
 public final class BXJaxRx implements JaxRx {
+  /** Configuration: User. */
+  public static final String USER = "org.basex.user";
+  /** Configuration: Password. */
+  public static final String PASSWORD = "org.basex.password";
+  /** Configuration: Server port. */
+  public static final String SERVERPORT = "org.basex.serverport";
+  /** Configuration: REST path. */
+  public static final String RESTPATH = "org.basex.restpath";
+  /** Configuration: serializer options. */
+  public static final String SERIALIZER = "org.jaxrx.parameter.output";
+  
   @Override
   public HashSet<QueryParameter> getParameters() {
     final HashSet<QueryParameter> p = new HashSet<QueryParameter>();
@@ -144,7 +155,7 @@ public final class BXJaxRx implements JaxRx {
       @Override
       String code() {
         // get root directory for files
-        final String root = System.getProperty("org.basex.jaxrxpath") + "/";
+        final String root = System.getProperty("org.basex.restpath") + "/";
         final IO io = IO.get(root + file);
         exec(new Run(io.path()), out);
         return cs.info();
