@@ -48,7 +48,7 @@ public final class BXJaxRx implements JaxRx {
   public static final String RESTPATH = "org.basex.restpath";
   /** Configuration: serializer options. */
   public static final String SERIALIZER = "org.jaxrx.parameter.output";
-  
+
   @Override
   public HashSet<QueryParameter> getParameters() {
     final HashSet<QueryParameter> p = new HashSet<QueryParameter>();
@@ -223,7 +223,7 @@ public final class BXJaxRx implements JaxRx {
       throw new JaxRxException(400, ex.getMessage());
     }
   }
-  
+
   @Override
   public String update(final InputStream input, final ResourcePath rp) {
     return new BXCode() {

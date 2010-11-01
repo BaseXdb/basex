@@ -1,7 +1,6 @@
 package org.basex.api.jaxrx;
 
 import static org.basex.core.Text.*;
-
 import org.basex.BaseXServer;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -51,7 +50,7 @@ public final class JaxRxServer extends Main {
 
     // store configuration in system properties
     // if a property has already been set, the new settings will be ignored
-    
+
     // set user (use 'admin' as default)
     final boolean user = System.getProperty(BXJaxRx.USER) != null;
     if(!user) set(BXJaxRx.USER, Text.ADMIN, false);
