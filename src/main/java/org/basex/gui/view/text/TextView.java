@@ -66,26 +66,31 @@ public final class TextView extends View implements ActionListener {
     setBorder(6, 8, 8, 8);
     setFocusable(false);
 
-    header = new BaseXLabel(TEXTTIT, true, false);
-
     final BaseXBack b = new BaseXBack(Fill.NONE);
     b.setLayout(new BorderLayout());
+
+    home = BaseXButton.command(GUICommands.HOME, gui);
+    home.setEnabled(false);
+
+    BaseXBack sp = new BaseXBack(Fill.NONE);
+    sp.setLayout(new TableLayout(1, 2));
+    sp.add(home);
+    sp.add(Box.createHorizontalStrut(8));
+    b.add(sp, BorderLayout.WEST);
+
+    header = new BaseXLabel(TEXTTIT, true, false);
     b.add(header, BorderLayout.CENTER);
 
     final BaseXButton save = new BaseXButton(gui, "save", HELPSAVE);
-    home = BaseXButton.command(GUICommands.HOME, gui);
-    home.setEnabled(false);
     save.addActionListener(this);
     find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) save.getPreferredSize().getHeight());
 
-    final BaseXBack sp = new BaseXBack(Fill.NONE);
-    sp.setLayout(new TableLayout(1, 5));
+    sp = new BaseXBack(Fill.NONE);
+    sp.setLayout(new TableLayout(1, 3));
     sp.add(find);
     sp.add(Box.createHorizontalStrut(5));
     sp.add(save);
-    sp.add(Box.createHorizontalStrut(1));
-    sp.add(home);
     b.add(sp, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 

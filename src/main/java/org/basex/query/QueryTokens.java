@@ -332,6 +332,8 @@ public interface QueryTokens {
   /** Parser token. */
   String XQ11 = "1.1";
   /** Parser token. */
+  String XQ30 = "3.0";
+  /** Parser token. */
   String PAR1 = "(";
   /** Parser token. */
   String PAR2 = ")";

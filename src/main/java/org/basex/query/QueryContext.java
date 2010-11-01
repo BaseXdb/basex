@@ -73,7 +73,7 @@ public final class QueryContext extends Progress {
   /** Query string. */
   public String query;
   /** XQuery version flag. */
-  public boolean xquery11;
+  public boolean xquery30;
 
   /** Cached stop word files. */
   public HashMap<String, String> stop;
@@ -183,7 +183,7 @@ public final class QueryContext extends Progress {
     context = ctx;
     nodes = ctx.current;
     ftopt = new FTOpt(ctx.prop);
-    xquery11 = ctx.prop.is(Prop.XQUERY11);
+    xquery30 = ctx.prop.is(Prop.XQUERY11);
     inf = ctx.prop.is(Prop.QUERYINFO);
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
   }

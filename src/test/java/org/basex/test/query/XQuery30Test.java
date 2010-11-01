@@ -1,12 +1,12 @@
 package org.basex.test.query;
 
 /**
- * XQuery 1.1 tests.
+ * XQuery 3.0 tests (former: 1.1).
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class XQuery11Test extends QueryTest {
+public final class XQuery30Test extends QueryTest {
   /** Constructor. */
   static {
     doc =

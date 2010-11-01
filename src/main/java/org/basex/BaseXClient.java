@@ -48,7 +48,7 @@ public final class BaseXClient extends BaseX {
         Util.out(SERVERPW + COLS);
         pass = password();
       }
-      session = new ClientSession(context, user, pass);
+      session = new ClientSession(context, user, pass, out);
     }
     return session;
   }

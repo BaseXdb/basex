@@ -27,11 +27,11 @@ public final class Variables extends ExprInfo {
   }
 
   /**
-   * Adds a global variable.
+   * Sets a global variable.
    * @param v variable to be added
    */
-  public void addGlobal(final Var v) {
-    global.add(v);
+  public void setGlobal(final Var v) {
+    global.set(v);
     v.global = true;
   }
 

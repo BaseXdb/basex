@@ -20,7 +20,17 @@ public final class VarList extends ExprInfo {
   public int size;
 
   /**
-   * Indexes the specified variable name.
+   * Stores the specified variable.
+   * @param v variable
+   */
+  public void set(final Var v) {
+    final int i = indexOf(v);
+    if(i == -1) add(v);
+    else vars[i] = v;
+  }
+
+  /**
+   * Adds the specified variable.
    * @param v variable
    */
   public void add(final Var v) {
@@ -33,9 +43,19 @@ public final class VarList extends ExprInfo {
    * @param v variable
    * @return variable
    */
-  Var get(final Var v) {
-    for(int s = size - 1; s >= 0; s--) if(v.eq(vars[s])) return vars[s];
-    return null;
+  public Var get(final Var v) {
+    final int i = indexOf(v);
+    return i == -1 ? null : vars[i];
+  }
+
+  /**
+   * Returns the index of the specified variable, or {@code -1}.
+   * @param v variable
+   * @return index
+   */
+  private int indexOf(final Var v) {
+    for(int s = size - 1; s >= 0; s--) if(v.eq(vars[s])) return s;
+    return -1;
   }
 
   /**
