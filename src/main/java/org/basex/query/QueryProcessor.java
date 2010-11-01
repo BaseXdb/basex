@@ -133,10 +133,11 @@ public final class QueryProcessor extends Progress {
    */
   public void bind(final String n, final Object o) throws QueryException {
     Expr ex = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
-    final Var var = new Var(new QNm(Token.token(n))).bind(ex, ctx);
+    Var var = new Var(new QNm(Token.token(n))).bind(ex, ctx);
     Var gl = ctx.vars.global().get(var);
     if(gl != null && gl.type != null) {
       gl.bind(gl.type.type.e(var.item(ctx, null), ctx, null), ctx);
+      var = gl;
     }
     ctx.vars.setGlobal(var);
   }
