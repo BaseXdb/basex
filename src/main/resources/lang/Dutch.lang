@@ -396,6 +396,7 @@ srv_start=Server is gestart.
 srv_stop=Server was gestopt.
 srv_user=Gebruikersnaam
 srv_pw=Wachtwoord
+srv_reststart=Starting REST server on port %
 
 # Bye
 bye1=Prettige dag.

@@ -54,7 +54,11 @@ public final class Prop extends AProp {
   // DATABASE & PROGRAM PATHS =================================================
 
   /** Database path. */
-  public static final Object[] DBPATH = { "DBPATH", HOME + Text.NAME + "Data" };
+  public static final Object[] DBPATH =
+    { "DBPATH", HOME + Text.NAME + "Data" };
+  /** Web path. */
+  public static final Object[] RESTPATH =
+    { "RESTPATH", HOME + Text.NAME + "REST" };
 
   /** Language name. */
   public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
@@ -67,6 +71,8 @@ public final class Prop extends AProp {
   public static final Object[] PORT = { "PORT", 1984 };
   /** Client/server communication: port, used for starting the server. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
+  /** Client/server communication: port, used for starting the REST server. */
+  public static final Object[] RESTPORT = { "RESTPORT", 8984 };
 
   // TRANSIENT OPTIONS ========================================================
 

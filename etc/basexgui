@@ -10,5 +10,5 @@ BXPATH=$PWD/../target/classes
 # Options for virtual machine
 VM=-Xmx1g
 
-# Run BaseX server
-java -cp "$BXPATH" $VM org.basex.BaseXServer "$@"
+# Run BaseX GUI
+java -cp "$BXPATH" $VM org.basex.BaseXGUI "$@"

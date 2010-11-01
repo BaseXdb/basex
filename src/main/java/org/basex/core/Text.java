@@ -74,7 +74,7 @@ public interface Text {
     "  -i<input>  Open initial file or database" + NL +
     "  -o<file>   Write output to file" + NL +
     "  -q<expr>   Execute XQuery expression" + NL +
-    "  -s<pars>   Set serialization parameters" + NL +
+    "  -s<pars>   Set serialization parameter(s)" + NL +
     "  -u         Modify original files after updates" + NL +
     "  -v/V       Show (all) process info" + NL +
     "  -z         Skip output of results";
@@ -102,13 +102,22 @@ public interface Text {
   /** Start information. */
   String SERVERINFO =
     " [-s] [-dpz] [-c] [stop]" + NL +
-    " stop     Stop existing server" + NL +
-    " -c<cmd>  Execute initial database command(s)" + NL +
-    " -d       Activate debugging mode" + NL +
-    " -i       Enter interactive mode" + NL +
-    " -p<num>  Set server port" + NL +
-    " -s       Start as service" + NL +
-    " -z       Suppress logging";
+    "  stop     Stop existing server" + NL +
+    "  -c<cmd>  Execute initial database command(s)" + NL +
+    "  -d       Activate debugging mode" + NL +
+    "  -i       Enter interactive mode" + NL +
+    "  -p<num>  Set server port" + NL +
+    "  -s       Start as service" + NL +
+    "  -z       Suppress logging";
+
+  /** Start information. */
+  String RESTINFO =
+    " [-pw]" + NL +
+    "  -p<num>   Set database server port" + NL +
+    "  -P<pass>  Specify user password" + NL +
+    "  -r<num>   Set REST server port" + NL +
+    "  -s<pars>  Set serialization parameter(s)" + NL +
+    "  -U<name>  Specify user name";
 
   // SERVER ===================================================================
 
@@ -130,6 +139,8 @@ public interface Text {
   String SERVERPW = lang("srv_pw");
   /** Localhost. */
   String LOCALHOST = "localhost";
+  /** Start REST. */
+  String RESTSTART = lang("srv_reststart") + DOTS;
 
   // COMMANDS =================================================================
 

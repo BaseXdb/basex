@@ -10,4 +10,4 @@ fi
 cp="$BASEX_PATH/bin"
 img="$BASEX_PATH/images/BaseX.icns"
 
-java -Xdock:name="BaseX" -Xdock:icon="${img}" -cp ${cp} org.basex.BaseXWin $@
+java -Xdock:name="BaseX" -Xdock:icon="${img}" -cp ${cp} org.basex.BaseXGUI $@

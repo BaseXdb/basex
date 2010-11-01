@@ -11,7 +11,7 @@ set BXPATH=%PWD%/../target/classes
 REM Options for virtual machine
 set VM=-Xmx1g
 
-REM Run BaseX
-java -cp "%BXPATH%" %VM% org.basex.BaseX %*
+REM Run BaseX GUI
+java -cp "%BXPATH%" %VM% org.basex.BaseXGUI %*
 
 @endlocal

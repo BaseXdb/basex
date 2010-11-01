@@ -82,7 +82,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.basex.BaseXWin</mainClass>
+              <mainClass>org.basex.BaseXGUI</mainClass>
               <packageName>org.basex</packageName>
             </manifest>
             <manifestEntries>

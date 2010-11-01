@@ -22,7 +22,7 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BaseXWin {
+public final class BaseXGUI {
   /** Mac OS X GUI optimizations. */
   GUIMacOSX osxGUI;
 
@@ -32,14 +32,14 @@ public final class BaseXWin {
    * An XML document or query file can be specified as argument
    */
   public static void main(final String[] args) {
-    new BaseXWin(args);
+    new BaseXGUI(args);
   }
 
   /**
    * Constructor.
    * @param args command-line arguments
    */
-  public BaseXWin(final String[] args) {
+  public BaseXGUI(final String[] args) {
     // set mac specific properties
     if(Prop.MAC) {
       try {
@@ -116,7 +116,7 @@ public final class BaseXWin {
    * Shows a start window.
   private JWindow startWin() {
     final JWindow win = new JWindow();
-    final URL url = BaseXWin.class.getResource("/img/start.png");
+    final URL url = BaseXGUI.class.getResource("/img/start.png");
     final Image img = Toolkit.getDefaultToolkit().getImage(url);
 
     win.getContentPane().setBackground(Color.WHITE);

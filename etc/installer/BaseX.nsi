@@ -72,22 +72,22 @@ Function OptionsLeave
           MessageBox MB_OK "Passwords do not match."
           Abort
         ${EndIf}
-        CreateDirectory "$INSTDIR\BaseXData"
+        CreateDirectory "$INSTDIR\data"
         ; .xq file Association
         ${If} $R2 == 1
-          WriteRegStr HKCR ".xq" "" "File.xq"
-          WriteRegStr HKCR "File.xq" "" "XQuery File"
-          WriteRegStr HKCR "File.xq\shell" "" "Open"
-          WriteRegStr HKCR "File.xq\shell\Open\command" "" "$INSTDIR\${PRODUCT_NAME}${PRODUCT_VERSION}.exe %1"
-          WriteRegStr HKCR "File.xq\DefaultIcon" "" "$INSTDIR\xml.ico"
+          WriteRegStr HKCR ".xq" "" "xqfile"
+          WriteRegStr HKCR "xqfile" "" "XQuery File"
+          WriteRegStr HKCR "xqfile\shell" "" "Open"
+          WriteRegStr HKCR "xqfile\shell\Open\command" "" "$INSTDIR\${PRODUCT_NAME}${PRODUCT_VERSION}.exe \"%1\""
+          WriteRegStr HKCR "xqfile\DefaultIcon" "" "$INSTDIR\xml.ico"
         ${EndIf}
         ; .xml file Association
         ${If} $R3 == 1
-          WriteRegStr HKCR ".xml" "" "File.xml"
-          WriteRegStr HKCR "File.xml" "" "XML File"
-          WriteRegStr HKCR "File.xml\shell" "" "Open"
-          WriteRegStr HKCR "File.xml\shell\Open\command" "" "$INSTDIR\${PRODUCT_NAME}${PRODUCT_VERSION}.exe %1"
-          WriteRegStr HKCR "File.xml\DefaultIcon" "" "$INSTDIR\xml.ico"
+          WriteRegStr HKCR ".xml" "" "xmlfile"
+          WriteRegStr HKCR "xmlfile" "" "XML File"
+          WriteRegStr HKCR "xmlfile\shell" "" "Open"
+          WriteRegStr HKCR "xmlfile\shell\Open\command" "" "$INSTDIR\${PRODUCT_NAME}${PRODUCT_VERSION}.exe \"%1\""
+          WriteRegStr HKCR "xmlfile\DefaultIcon" "" "$INSTDIR\xml.ico"
         ${EndIf}
         ${RefreshShellIcons}
 FunctionEnd
@@ -115,7 +115,7 @@ Section "Hauptgruppe" SEC01
   File "..\images\xml.ico"
   File "..\images\BaseX.ico"
   File "${PRODUCT_NAME}${PRODUCT_VERSION}.exe"
-  nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData'
+  nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\data'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
                  "DisplayName" "BaseX"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \

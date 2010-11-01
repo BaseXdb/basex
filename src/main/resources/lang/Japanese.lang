@@ -399,6 +399,7 @@ srv_start=サーーバーが開始しました。
 srv_stop=サーバーが停止しました。
 srv_user=ユーザー名
 srv_pw=パスワード
+srv_reststart=Starting REST server on port %
 
 # Bye
 bye1=バイバイ

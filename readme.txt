@@ -19,7 +19,7 @@ COMPILING BASEX ----------------------------------------------------------------
  BaseX        : console mode
  BaseXServer  : server instance, waiting for requests
  BaseXClient  : console mode, interacting with the server
- BaseXWin     : graphical user interface
+ BaseXGUI     : graphical user interface
 
  Moreover, try -h to list the available command line options. For example, you
  can use BaseX to process XQuery expressions without entering the console.
@@ -37,7 +37,7 @@ RUNNING BASEX ------------------------------------------------------------------
  - Press Run -> Run...
  - Create a new "Java Application" launch configuration
  - Select "basex" as "Project"
- - Choose a "Main class" (e.g., org.basex.BaseXWin for the GUI version)
+ - Choose a "Main class" (e.g., org.basex.BaseXGUI for the GUI version)
  - Launch the project via 'Run'
 
 ADDING CHECKSTYLE --------------------------------------------------------------

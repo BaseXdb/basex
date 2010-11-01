@@ -3,11 +3,11 @@
 # Path to this script
 PWD=`dirname $0`
 
-# Path to .class files (target/classes) or BaseX.jar
+# Paths to distributed files or source directories
+#BXPATH=basex.jar
 BXPATH=$PWD/../target/classes
-#BXPATH=BaseX.jar
 
-# Assign more memory
+# Options for virtual machine
 VM=-Xmx1g
 
 # Run BaseX

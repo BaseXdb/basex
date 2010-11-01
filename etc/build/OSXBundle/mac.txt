@@ -13,7 +13,7 @@ Content:
 ----------------------------------------
 1. Launch_BaseX_with_icon_and_nice_title
 ----------------------------------------
-java -Xdock:name="BaseX on Mac OS X" -Xdock:icon="tests/BaseX.icns" -cp bin org.basex.BaseXWin
+java -Xdock:name="BaseX on Mac OS X" -Xdock:icon="tests/BaseX.icns" -cp bin org.basex.BaseXGUI
 
 -------------------------------------
 2. Building_a_Java_Application_Bundle
@@ -21,7 +21,7 @@ java -Xdock:name="BaseX on Mac OS X" -Xdock:icon="tests/BaseX.icns" -cp bin org.
 
 (a) Using Eclipse:
 	- Export/Other/Mac OS X application bundle
-	- Main class      : org.basex.BaseXWin
+	- Main class      : org.basex.BaseXGUI
 	- Arguments       : none 
 	- Application Name: BaseX
 	- Folder          : Desktop

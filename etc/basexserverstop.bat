@@ -8,10 +8,7 @@ REM Paths to distributed files or source directories
 REM set BXPATH=basex.jar
 set BXPATH=%PWD%/../target/classes
 
-REM Options for virtual machine
-set VM=-Xmx1g
-
-REM Run BaseX
-java -cp "%BXPATH%" %VM% org.basex.BaseX %*
+REM Run BaseX server
+java -cp "%BXPATH%" %VM% org.basex.BaseXServer stop
 
 @endlocal
