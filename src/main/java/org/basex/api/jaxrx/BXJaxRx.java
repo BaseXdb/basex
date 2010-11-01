@@ -110,7 +110,7 @@ public final class BXJaxRx implements JaxRx {
             sc.useDelimiter("\t");
             while(sc.hasNext()) {
               final String v = sc.next();
-              final String[] sp = v.split(":", 2);
+              final String[] sp = v.split("=", 2);
               cq.bind(sp[0], sp.length == 1 ? "" : sp[1], "");
             }
           }
