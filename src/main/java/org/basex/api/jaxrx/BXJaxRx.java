@@ -107,11 +107,13 @@ public final class BXJaxRx implements JaxRx {
           final String var = path.getValue(QueryParameter.VAR);
           if(var != null) {
             final Scanner sc = new Scanner(var);
-            sc.useDelimiter("\t");
+            sc.useDelimiter("\1");
             while(sc.hasNext()) {
               final String v = sc.next();
-              final String[] sp = v.split("=", 2);
-              cq.bind(sp[0], sp.length == 1 ? "" : sp[1], "");
+              String[] sp = v.split("\2", 3);
+              if(sp.length < 2) sp = v.split("=", 3);
+              cq.bind(sp[0], sp.length > 1 ? sp[1] : "",
+                  sp.length > 2 ? sp[2] : "");
             }
           }
           // loop through all results

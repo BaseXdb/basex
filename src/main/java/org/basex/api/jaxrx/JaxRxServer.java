@@ -71,8 +71,12 @@ public final class JaxRxServer extends Main {
     // start database server (if not done yet)
     server = new BaseXServer();
 
-    // start Jetty server
-    jetty = new JettyServer(rp);
+    // start Jetty server (if not done yet)
+    try {
+      jetty = new JettyServer(rp);
+    } catch(final Exception ex) {
+      Util.server(ex);
+    }
   }
 
   /**

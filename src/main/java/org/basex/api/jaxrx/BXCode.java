@@ -126,7 +126,7 @@ abstract class BXCode {
    * @return string with serialization parameters
    */
   final String params(final ResourcePath path) {
-    String ser = path.getValue(QueryParameter.OUTPUT);
+    String ser = path.getValue(QueryParameter.OUTPUT).replaceAll("\1", ",");
     if(ser == null) ser = "";
 
     final String wrap = path.getValue(QueryParameter.WRAP);
