@@ -35,7 +35,7 @@ namespace BaseXClient
           }
 
           // close query
-          query.Close();
+          Console.WriteLine(query.Close());
         }
         catch (IOException e)
         {

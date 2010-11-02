@@ -135,7 +135,7 @@ class Query {
 
   /* see readme.txt */
   public function close() {
-  	$this->execute("\2", $this->id);   
+  	return $this->execute("\2", $this->id);   
   }
   
   /* see readme.txt */

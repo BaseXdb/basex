@@ -25,7 +25,7 @@ try {
     }
 
     // close query instance
-    $query->close();
+    print $query->close();
 
   } catch (Exception $e) {
     // print exception

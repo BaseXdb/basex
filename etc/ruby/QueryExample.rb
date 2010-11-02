@@ -23,7 +23,7 @@ begin
     end
 
     # close query instance
-    query.close()
+    print query.close()
   
   rescue Exception => e
     # print exception

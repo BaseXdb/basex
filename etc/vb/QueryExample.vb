@@ -31,7 +31,7 @@ Module QueryExample
         End While
 
         ' close query instance
-        query.Close()
+        Console.WriteLine(query.Close())
 
       Catch e As IOException
         ' print exception

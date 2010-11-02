@@ -22,7 +22,7 @@ try:
       print query.next()
   
     # close query object  
-    query.close()
+    print query.close()
   
   except IOError as e:
     # print exception
