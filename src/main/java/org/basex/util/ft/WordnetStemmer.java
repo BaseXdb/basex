@@ -28,13 +28,12 @@ class WordnetStemmer extends Stemmer {
   private static final Class<?> IDICT_CLASS;
   /** Dictionary class. */
   private static final Class<?> DICT_CLASS;
-  /** SimpleStemmer class. */
   /** WordnetStemmer class. */
   private static final Class<?> WORDNET_CLASS;
   /** WordnetStemmer class. */
-  private static final Constructor<?> WORDNET_CTR;
+  private static final Constructor<?> CTR;
   /** WordnetStemmer.findStems method. */
-  private static final Method WORDNET_FIND_STEMS;
+  private static final Method FIND_STEMS;
   /** WordNet dictionary instance. */
   private static final Object DICT;
 
@@ -44,16 +43,16 @@ class WordnetStemmer extends Stemmer {
     if(IDICT_CLASS == null) {
       DICT_CLASS = null;
       WORDNET_CLASS = null;
-      WORDNET_FIND_STEMS = null;
-      WORDNET_CTR = null;
+      FIND_STEMS = null;
+      CTR = null;
       DICT = null;
     } else {
       DICT_CLASS = findClass(PKG + ".Dictionary");
       WORDNET_CLASS = findClass(PKG + ".morph.WordnetStemmer");
-      WORDNET_CTR = findConstructor(WORDNET_CLASS, IDICT_CLASS);
-      WORDNET_FIND_STEMS = findMethod(WORDNET_CLASS, "findStems", String.class);
-      DICT = DICT_CLASS == null || WORDNET_CLASS == null || WORDNET_CTR == null
-          || WORDNET_FIND_STEMS == null ? null : newDictionary();
+      CTR = findConstructor(WORDNET_CLASS, IDICT_CLASS);
+      FIND_STEMS = findMethod(WORDNET_CLASS, "findStems", String.class);
+      DICT = DICT_CLASS == null || WORDNET_CLASS == null || CTR == null
+          || FIND_STEMS == null ? null : newDictionary();
     }
   }
 
@@ -124,7 +123,7 @@ class WordnetStemmer extends Stemmer {
    * @return {@code true} if WordNet stemmer is available
    */
   static boolean isAvailable() {
-    return DICT != null && WORDNET_CTR != null;
+    return DICT != null && CTR != null;
   }
 
   /** Instance of WordNet stemmer. */
@@ -140,10 +139,11 @@ class WordnetStemmer extends Stemmer {
   WordnetStemmer(final LanguageTokens lang) throws QueryException {
     if(!isAvailable()) throw new RuntimeException("WordNet is not available");
 
-    if(!isLanguageSupported(lang.ln)) throw new QueryException(null, Err.FTLAN,
-        lang);
+    if(!isLanguageSupported(lang.ln))
+      throw new QueryException(null, Err.FTLAN, lang);
+
     try {
-      stemmer = WORDNET_CTR.newInstance(DICT);
+      stemmer = CTR.newInstance(DICT);
     } catch(final Exception e) {
       throw new RuntimeException(e);
     }
@@ -203,8 +203,7 @@ class WordnetStemmer extends Stemmer {
   private String stem(final String word) {
     try {
       @SuppressWarnings("unchecked")
-      final List<String> l = (List<String>) WORDNET_FIND_STEMS.invoke(stemmer,
-          word);
+      final List<String> l = (List<String>) FIND_STEMS.invoke(stemmer, word);
       final String result = l.size() == 0 ? word : l.get(0);
       return result.length() == 0 ? word : result;
     } catch(final Exception e) {

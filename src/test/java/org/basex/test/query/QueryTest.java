@@ -130,8 +130,10 @@ public abstract class QueryTest {
    * @param str string
    * @return iterator
    */
-  static ItemIter str(final String str) {
-    return item(Str.get(str));
+  static ItemIter str(final String... str) {
+    final ItemIter ii = new ItemIter();
+    for(final String s : str) ii.add(Str.get(s));
+    return ii;
   }
 
   /**

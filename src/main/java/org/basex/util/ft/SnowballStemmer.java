@@ -94,9 +94,7 @@ final class SnowballStemmer extends Stemmer {
    *           not supported by the stemmer
    */
   SnowballStemmer(final LanguageTokens lang) throws QueryException {
-    if(!isAvailable()) {
-      throw new RuntimeException("Snowball is not available");
-    }
+    if(!isAvailable()) throw new RuntimeException("Snowball is not available");
 
     stemmerClass = CLASSES.get(lang);
     if(stemmerClass == null) {
@@ -169,7 +167,6 @@ final class SnowballStemmer extends Stemmer {
       stemmerClass.setCurrent.invoke(stemmer, word);
       stemmerClass.stem.invoke(stemmer);
       return (String) stemmerClass.getCurrent.invoke(stemmer);
-
     } catch(final Exception e) {
       throw new RuntimeException(e);
     }
