@@ -60,12 +60,14 @@ final class FNFormat extends Fun {
    */
   private Str formatInteger(final QueryContext ctx) throws QueryException {
     final String pic = string(checkEStr(expr[1], ctx));
+    if(pic.length() == 0) WRONGINT.thrw(input, pic);
     if(expr[0].empty()) return Str.ZERO;
 
     final byte[] lang = expr.length == 2 ? EMPTY : checkEStr(expr[2], ctx);
     final long num = checkItr(expr[0], ctx);
-
-    return Str.get(IntFormatter.format(num, pic, string(lang)));
+    final byte[] str = IntFormatter.format(num, pic, string(lang));
+    if(str == null) PICDATE.thrw(input, pic);
+    return Str.get(str);
   }
 
   /**
@@ -82,7 +84,6 @@ final class FNFormat extends Fun {
 
     final String pic = string(checkEStr(expr[1], ctx));
     if(expr.length == 3) FORMNUM.thrw(input, expr[2]);
-
     return Str.get(NumFormatter.format(input, it, pic));
   }
 

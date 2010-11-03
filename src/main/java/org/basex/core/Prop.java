@@ -74,6 +74,9 @@ public final class Prop extends AProp {
   /** Client/server communication: port, used for starting the REST server. */
   public static final Object[] RESTPORT = { "RESTPORT", 8984 };
 
+  /** Server timeout in seconds; deactivated if set to 0. */
+  public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
+
   // TRANSIENT OPTIONS ========================================================
 
   /** The following options are not saved to disk; don't remove this flag. */
@@ -172,9 +175,6 @@ public final class Prop extends AProp {
   public static final Object[] MAB2FLAT = { "MAB2flat", false };
   /** Maximum number of index occurrences to print. */
   public static final Object[] MAXSTAT = { "MAXSTAT", 15 };
-
-  /** Server timeout in seconds; deactivated if set to 0. */
-  public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
 
   // DEEPFS OPTIONS ===========================================================
 

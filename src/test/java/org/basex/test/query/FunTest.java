@@ -129,6 +129,7 @@ public final class FunTest extends QueryTest {
       { "formnum w3-40", str("123456789"),
         "format-number(123456789, '################')" },
 
+      { "formint   0", str(""), "format-integer((), 'a')" },
       { "formint  10", str("1"), "format-integer(1, '0')" },
       { "formint  20", str("01"), "format-integer(1, '00')" },
       { "formint  30", str("Eleventh"), "format-integer(11, 'Wwo')" },
@@ -139,6 +140,10 @@ public final class FunTest extends QueryTest {
       { "formint  80", str("12345"), "format-integer(12345, 'I')" },
       { "formint  90", str("one hundred and twenty-three"),
         "format-integer(123, 'w')" },
+      { "formint  91", str("one hundred and one"),
+        "format-integer(101, 'w')" },
+      { "formint  95", str("one hundred"),
+        "format-integer(100, 'w')" },
       { "formint 100", str("One Hundredth and Twenty-Third"),
         "format-integer(123, 'Wwo')" },
 

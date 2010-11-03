@@ -68,7 +68,8 @@ public abstract class QueryTest {
 
     for(final Object[] qu : queries) {
       // added to renew document after each update test
-      if(up && ((String) qu[0]).startsWith("xxx")) {
+      final String title = (String) qu[0];
+      if(up && title.startsWith("xxx")) {
         new CreateDB(name, file).execute(context);
       }
 

@@ -1,4 +1,4 @@
-package org.basex.util.ft;
+package org.basex.query.util.format;
 
 import static org.basex.util.Token.*;
 import org.basex.util.TokenBuilder;
@@ -10,6 +10,9 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 final class FormatterEN extends Formatter {
+  /** Written number (0). */
+  private static final byte[] ZERO = token("Zero");
+
   /** Written numbers (1-20). */
   private static final byte[][] WORDS = tokens("", "One", "Two", "Three",
       "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven",
@@ -63,7 +66,8 @@ final class FormatterEN extends Formatter {
   @Override
   public byte[] word(final long n, final String ord) {
     final TokenBuilder tb = new TokenBuilder();
-    word(tb, n, ord);
+    if(n == 0) tb.add(ZERO);
+    else word(tb, n, ord);
     return tb.finish();
   }
 
@@ -112,7 +116,9 @@ final class FormatterEN extends Formatter {
    * @param ord ordinal suffix
    */
   private void word(final TokenBuilder tb, final long n, final String ord) {
-    if(n < 20) {
+    if(n == 0) {
+      //tb.add(ZERO);
+    } else if(n < 20) {
       tb.add((ord != null ? ORDINALS : WORDS)[(int) n]);
     } else if(n < 100) {
       final int r = (int) (n % 10);

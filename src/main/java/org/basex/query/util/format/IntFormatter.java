@@ -1,9 +1,9 @@
 package org.basex.query.util.format;
 
 import static org.basex.util.Token.*;
+
 import org.basex.query.util.format.FormatParser.Case;
 import org.basex.util.TokenBuilder;
-import org.basex.util.ft.Formatter;
 
 /**
  * Integer formatter.
@@ -38,7 +38,8 @@ public final class IntFormatter {
       final String lang) {
 
     final Formatter form = Formatter.get(lang);
-    return format(number, new FormatParser(picture, "1", false), form);
+    final FormatParser fp = new FormatParser(picture, "1", false);
+    return fp.error ? null : format(number, fp, form);
   }
 
   /**
@@ -57,14 +58,21 @@ public final class IntFormatter {
     if(sign) num = -num;
 
     final TokenBuilder tb = new TokenBuilder();
-    if(mp.pres.equals("a")) {
-      latin(tb, num);
-    } else if(mp.pres.equals("i")) {
+    final int ch = cp(mp.pres, 0);
+    final boolean single = mp.pres.length() == 1;
+    if(ch == 'a' && single) {
+      alpha(tb, num, 'a', 26);
+    } else if(ch == '\u03b1' && single) {
+      alpha(tb, num, '\u03b1', 25);
+    } else if(ch == 'i' && single) {
       roman(tb, num);
-    } else if(mp.pres.startsWith("w")) {
+    } else if(ch == 'w') {
       tb.add(form.word(num, mp.ord));
-    } else if(digit(cp(mp.pres, 0)) || cp(mp.pres, 0) == '#') {
-      number(tb, num, mp, form);
+    } else if(ch >= '\u2460' && ch <= '\u249b') {
+      tb.add((char) (ch + number - 1));
+    } else if(ch == '#' || (ch >= '0' && ch <= '9') ||
+        (ch >= '\u0660' && ch <= '\u0669')) {
+      number(tb, num, mp, form, ch & 0xFFFFFFF0);
     }
 
     // finalize formatted string
@@ -78,10 +86,13 @@ public final class IntFormatter {
    * Returns a Latin character sequence.
    * @param tb token builder
    * @param n number to be formatted
+   * @param f start character
+   * @param s alphabet size
    */
-  private static void latin(final TokenBuilder tb, final long n) {
-    if(n > 26) latin(tb, (n - 1) / 26);
-    tb.add((char) ('A' + (n - 1) % 26));
+  private static void alpha(final TokenBuilder tb, final long n,
+      final int f, final int s) {
+    if(n > s) alpha(tb, (n - 1) / s, f, s);
+    tb.add((char) (f + (n - 1) % s));
   }
 
   /**
@@ -107,9 +118,10 @@ public final class IntFormatter {
    * @param n number to be formatted
    * @param mp marker parser
    * @param form language-dependent formatter
+   * @param start start character
    */
   private static void number(final TokenBuilder tb, final long n,
-      final FormatParser mp, final Formatter form) {
+      final FormatParser mp, final Formatter form, final int start) {
 
     // count optional-digit-signs
     final String pres = mp.pres;
@@ -120,22 +132,23 @@ public final class IntFormatter {
     // count digits
     int d = 0;
     for(int i = 0; i < pres.length(); ++i) {
-      if(digit(pres.charAt(i))) ++d;
+      final char ch = pres.charAt(i);
+      if(ch >= start && ch <= start + 9) ++d;
     }
-
-    // create string representation
-    final String str = Long.toString(n);
-
-    // build string
+    
+    // create string representation and build string
+    final String s = Long.toString(n);
     final StringBuilder tmp = new StringBuilder();
-    final int r = o + d - str.length();
-    for(int i = r; i > o; i--) tmp.append('0');
-    tmp.append(str);
+    final int r = o + d - s.length();
+    for(int i = r; i > o; i--) tmp.append((char) start);
+    for(int i = 0; i < s.length(); i++) {
+      tmp.append((char) (s.charAt(i) - '0' + start));
+    }
 
     for(int p = pres.length() - 1, t = tmp.length() - 1; p >= 0 && t >= 0;
         p--, t--) {
       final char ch = pres.charAt(p);
-      if(!digit(ch) && ch != '#') tmp.insert(t, ch);
+      if(ch < start && ch > start + 9 && ch != '#') tmp.insert(t, ch);
     }
 
     // add ordinal suffix

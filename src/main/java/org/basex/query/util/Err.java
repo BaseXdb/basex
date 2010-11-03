@@ -530,6 +530,9 @@ public enum Err {
   /** XQTY0024: Parsing exception. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
 
+  /** XTDE0030: Parsing exception. */
+  WRONGINT(XTDE, 30, "Wrong integer format: \"%\"."),
+  
   /** XUDY0009: XQuery Update dynamic exception. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),
   /** XUDY0014: XQuery Update dynamic exception. */
@@ -657,6 +660,7 @@ public enum Err {
     /** XQDY Error type. */ XQDY,
     /** XQST Error type. */ XQST,
     /** XQTY Error type. */ XQTY,
+    /** XQTD Error type. */ XTDE,
     /** XUDY Error type. */ XUDY,
     /** XUST Error type. */ XUST,
     /** XUTY Error type. */ XUTY;

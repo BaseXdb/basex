@@ -10,30 +10,32 @@ import java.util.regex.Pattern;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class FormatParser {
+public final class FormatParser {
   /** With pattern: ","  min-width ("-" max-width)?. */
   private static final Pattern WIDTH =
     Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
 
   /** Cases. */
-  enum Case {
+  public enum Case {
     /** Lower case. */ LOWER,
     /** Upper case. */ UPPER,
     /** Standard.   */ STANDARD;
   }
 
   /** Case. */
-  final Case cs;
+  public final Case cs;
   /** Presentation modifier in lower-case. */
-  final String pres;
+  public final String pres;
+  /** Variation modifier. */
+  public String var;
   /** Error occurred while parsing. */
-  boolean error;
+  public boolean error;
   /** Ordinal suffix; {@code null} if not specified. */
-  String ord;
+  public String ord;
   /** Minimum width. */
-  int min;
+  public int min;
   /** Maximum width. */
-  int max = Integer.MAX_VALUE;
+  public int max = Integer.MAX_VALUE;
 
   /**
    * Constructor, parsing the input string. The {@link #error} variable is
@@ -42,7 +44,7 @@ final class FormatParser {
    * @param p (valid) presentation modifier
    * @param ext extended flag, allowing width modifier
    */
-  FormatParser(final String in, final String p, final boolean ext) {
+  public FormatParser(final String in, final String p, final boolean ext) {
     // no marker specified - use default settings
     String pm = p;
 
@@ -52,15 +54,20 @@ final class FormatParser {
     // find presentation modifier
     if(l != 0) {
       final int ch = cp(in, 0);
-      final int cu = ch & 0xDF;
-      if(cu == 'A' || cu == 'I') {
+      final int cu = ch & 0xFFFFFFDF;
+      if(cu == 'A' || cu == 'I' || cu == '\u0391') {
         s = 1;
       } else if(cu == 'W' || cu == 'N') {
         s = cp(in, 1) == (ch | 0x20) ? 2 : 1;
-      } else if(digit(ch) || ch == '#') {
-        s = decimal(in);
+      } else if(ch >= '\u2460' && ch <= '\u249b') {
+        s = 1;
+      } else if(ch == '#' || (ch >= '0' && ch <= '9') ||
+          (ch >= '\u0660' && ch <= '\u0669')) {
+        s = decimal(in, ch & 0xFFFFFFF0);
         // invalid decimal parsing
         error = s == -1;
+      } else {
+        error = true;
       }
       if(s != -1) pm = in.substring(0, s);
     }
@@ -75,15 +82,20 @@ final class FormatParser {
             // ordinal isn't closed by a parenthesis
             error = s == l;
             if(error) break;
-            sb.append(cp(in, s));
+            sb.append((char) cp(in, s));
           }
+          ++s;
         }
         ord = sb.toString();
+      } else if(cp(in, s) == 't') {
+        // traditional numbering (ignored)
+        ++s;
       }
     }
 
     // find remaining modifier
     if(s < l) {
+      System.out.println(s + "/" + l + ": " + in);
       if(cp(in, s) == ',') {
         pm += in.substring(s);
       } else {
@@ -121,9 +133,10 @@ final class FormatParser {
   /**
    * Parses a decimal-digit-pattern.
    * @param in input
+   * @param ba base char
    * @return end position, or {@code -1} for error
    */
-  private int decimal(final String in) {
+  private int decimal(final String in, final int ba) {
     int s = -1;
     final int l = in.length();
     boolean d = false;
@@ -138,7 +151,7 @@ final class FormatParser {
         g = false;
       } else if(ch == '*') {
         g = false;
-      } else if(digit(ch)) {
+      } else if(ch >= ba && ch <= ba + 9) {
         d = true;
         g = false;
       } else {
