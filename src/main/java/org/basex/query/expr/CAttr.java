@@ -65,7 +65,8 @@ public final class CAttr extends CFrag {
           || eq(pre, XML) ^ eq(uri, XMLURI)) CAINS.thrw(input, pre, uri);
 
       if(eq(pre, EMPTY) && !eq(uri, EMPTY)) {
-        // create a prefix if none is given but a URI exists
+        // create new standard namespace to cover most frequent cases
+        name.name(concat(NS0, name.atom()));
       }
     }
 

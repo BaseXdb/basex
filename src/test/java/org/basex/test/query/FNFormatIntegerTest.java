@@ -48,8 +48,7 @@ public final class FNFormatIntegerTest extends QueryTest {
         "string-join(for $i in 1 to 10 return format-integer($i, 'w'), '|')" },
       { "format-integer-019", "format-integer(a, 'w')" }, // XPDY0002
       { "format-integer-020", "format-integer(1, '')" }, // XTDE0030
-      /*
-      { "format-integer-021", str("1,500,000"),
+      /* { "format-integer-021", str("1,500,000"),
         "format-integer(1500000, '0,000')" },
       { "format-integer-022", str("1,500,000"),
         "format-integer(1500000, '#,###,000')" },
@@ -76,7 +75,7 @@ public final class FNFormatIntegerTest extends QueryTest {
       /* { "format-integer-040", "format-integer(1234, '123١')" },
       { "format-integer-041", str("𐒡,𐒢𐒣𐒤"),
         "format-integer(1234, '#,𐒠𐒠𐒠')" },*/
-      { "format-integer-042", str("1234"), "format-integer(1234, 'ﯴ')" },
+      /*{ "format-integer-042", str("1234"), "format-integer(1234, 'ﯴ')" },*/
       { "format-integer-043", str("-85th"), "format-integer(-85, '1o')" },
       { "format-integer-044", str("-Fifth"), "format-integer(-5, 'Wwo')" },
       { "format-integer-045", str("Zero"), "format-integer(0, 'Ww')" },

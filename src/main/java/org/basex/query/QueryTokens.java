@@ -389,6 +389,8 @@ public interface QueryTokens {
   byte[] MGROUP = token("fn:group");
   /** Attribute for the analyze-string-result function. */
   byte[] NR = token("nr");
+  /** Generated namespace. */
+  byte[] NS0 = token("ns0:");
 
   // TYPES ====================================================================
 
