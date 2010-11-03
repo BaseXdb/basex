@@ -211,14 +211,13 @@ public final class BXJaxRx implements JaxRx {
       final ClientSession cs) {
 
     final int d = rp.getDepth();
-    if(d < 2) throw new JaxRxException(400, "Document name is missing.");
-
+    final String name = rp.getResource(d - 1);
     final StringBuilder target = new StringBuilder();
     for(int i = 1; i < d - 1; i++) {
       target.append('/').append(rp.getResource(i));
     }
     try {
-      cs.add(rp.getResource(d - 1), target.toString(), input);
+      cs.add(name, target.toString(), input);
     } catch(final BaseXException ex) {
       throw new JaxRxException(400, ex.getMessage());
     }
