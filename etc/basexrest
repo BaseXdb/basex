@@ -15,6 +15,5 @@ CP=$BASEX:$BASEXAPI:$LIB/jax-rx-1.2.5.jar:$LIB/jetty-6.1.25.jar:$LIB/jetty-util-
 
 # Options for virtual machine
 VM=-Xmx1g
-
 # Run REST server
-java -cp "%CP%;." %VM% org.basex.api.jaxrx.JaxRxServer %*
+java -cp "$CP" $VM org.basex.api.jaxrx.JaxRxServer "$@"
