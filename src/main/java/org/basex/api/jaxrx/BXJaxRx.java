@@ -98,14 +98,16 @@ public final class BXJaxRx implements JaxRx {
         final int s = num(rp, QueryParameter.START, 1);
         final int m = num(rp, QueryParameter.COUNT, Integer.MAX_VALUE - s);
 
+        ClientQuery cq = null;
         try {
           cs.execute(new Set(Prop.SERIALIZER, params(path)));
           cs.setOutputStream(out);
 
           // create query instance
-          final ClientQuery cq = cs.query(xq);
+          cq = cs.query(xq);
           final String var = path.getValue(QueryParameter.VAR);
           if(var != null) {
+            // bind external variables
             final Scanner sc = new Scanner(var);
             sc.useDelimiter("\1");
             while(sc.hasNext()) {
@@ -120,10 +122,12 @@ public final class BXJaxRx implements JaxRx {
           int c = 0;
           cq.init();
           while(++c < s + m && cq.more()) if(c >= s) cq.next();
-          cq.close();
           return null;
         } catch(final BaseXException ex) {
           throw new JaxRxException(400, ex.getMessage());
+        } finally {
+          // close query instance
+          if(cq != null) try { cq.close(); } catch(final BaseXException ex) { }
         }
       }
     };

@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.xqj;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -27,7 +27,6 @@ import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQStaticContext;
 import junit.framework.TestCase;
 import org.basex.io.ArrayOutput;
-import org.basex.test.xqj.TestContentHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;

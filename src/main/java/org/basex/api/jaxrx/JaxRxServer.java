@@ -24,6 +24,8 @@ public final class JaxRxServer extends Main {
   private BaseXServer server;
   /** Jetty server. */
   private JettyServer jetty;
+  /** Quiet mode (no logging). */
+  private boolean quiet;
 
   /**
    * Main method, launching the JAX-RX/REST implementation.
@@ -68,7 +70,7 @@ public final class JaxRxServer extends Main {
     set("org.jaxrx.systemPath", BXJaxRx.class.getName(), false);
 
     // start database server (if not done yet)
-    server = new BaseXServer();
+    server = new BaseXServer(quiet ? "-z" : "");
 
     // start Jetty server (if not done yet)
     try {
@@ -121,6 +123,9 @@ public final class JaxRxServer extends Main {
         } else if(c == 'U') {
           // specify user name
           set(BXJaxRx.USER, arg.string(), true);
+        } else if(c == 'z') {
+          // suppress logging
+          quiet = true;
         } else {
           arg.check(false);
         }
