@@ -1,13 +1,15 @@
 package org.basex.test.jaxrx;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
 import org.basex.api.jaxrx.JaxRxServer;
-import org.jaxrx.core.JaxRxException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -46,21 +48,75 @@ public abstract class JaxRxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  String get(final String query) throws IOException {
-    final URL url = new URL(ROOT + "?" + query);
+  final String get(final String query) throws IOException {
+    final URL url = new URL(ROOT + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    final int code = conn.getResponseCode();
-    final InputStream is = conn.getInputStream();
-    final ByteArrayOutputStream bais = new ByteArrayOutputStream();
-    int i;
-    while((i = is.read()) != -1) bais.write(i);
-    is.close();
-    conn.disconnect();
-    final String result = bais.toString().replaceAll("\r?\n *", "");
-    if(code != HttpURLConnection.HTTP_OK) {
-      System.out.println("???????????");
-      throw new JaxRxException(code, result);
+    try {
+      return read(conn.getInputStream()).replaceAll("\r?\n *", "");
+    } catch(final IOException ex) {
+      throw new IOException(read(conn.getErrorStream()));
+    } finally {
+      conn.disconnect();
     }
-    return result;
+  }
+
+  /**
+   * Executes the specified PUT request.
+   * @param query request
+   * @return string result, or {@code null} for a failure.
+   * @throws IOException I/O exception
+   */
+  final String put(final String query) throws IOException {
+    final URL url = new URL(ROOT + "/" + query);
+    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setDoOutput(true);
+    conn.setRequestMethod("PUT");
+    final OutputStream out = new BufferedOutputStream(conn.getOutputStream());
+    final InputStream in = new BufferedInputStream(
+      new FileInputStream("etc/xml/input.xml"));
+    int i;
+    while((i = in.read()) != -1) out.write(i);
+    in.close();
+    out.close();
+    try {
+      return read(conn.getInputStream()).replaceAll("\r?\n *", "");
+    } catch(final IOException ex) {
+      throw new IOException(read(conn.getErrorStream()));
+    } finally {
+      conn.disconnect();
+    }
+  }
+
+  /**
+   * Executes the specified DELETE request.
+   * @param query request
+   * @return response code
+   * @throws IOException I/O exception
+   */
+  final String delete(final String query) throws IOException {
+    final URL url = new URL(ROOT + query);
+    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    try {
+      conn.setRequestMethod("DELETE");
+      return read(conn.getInputStream());
+      //return conn.getResponseCode();
+    } finally {
+      conn.disconnect();
+    }
+  }
+  
+  /**
+   * Returns a string result from the specified input stream.
+   * @param is input stream
+   * @return string
+   * @throws IOException I/O exception
+   */
+  final String read(final InputStream is) throws IOException {
+    final ByteArrayOutputStream bais = new ByteArrayOutputStream();
+    final BufferedInputStream bis = new BufferedInputStream(is);
+    int i;
+    while((i = bis.read()) != -1) bais.write(i);
+    is.close();
+    return bais.toString();
   }
 }
