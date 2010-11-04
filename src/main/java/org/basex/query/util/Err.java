@@ -35,6 +35,8 @@ public enum Err {
   SERVERTIMEOUT(BASX, 7, Text.SERVERTIMEOUT),
   /** BASX0008: No nodes as result. */
   QUERYNODES(BASX, 8, Text.QUERYNODESERR),
+  /** BASX0008: No nodes as result. */
+  EXPSINGLE(BASX, 9, "Database contains more than one document."),
   /** BASX0009: No nodes as result. */
   SENTLISTPARSE(BASX, 9, "% could not be parsed: %."),
   /** BASX0099: Undefined error. */

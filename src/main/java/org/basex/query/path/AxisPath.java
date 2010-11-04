@@ -124,8 +124,9 @@ public class AxisPath extends Path {
     final Value rt = root(ctx);
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
-
-    if(data == null || !data.meta.pthindex || !data.meta.uptodate) return -1;
+      
+    if(data == null || !data.meta.pthindex || !data.meta.uptodate ||
+        !data.single()) return -1;
 
     ArrayList<PathNode> nodes = data.path.root();
     for(final AxisStep s : step) {
