@@ -61,8 +61,8 @@ public final class FormatParser {
         s = cp(in, 1) == (ch | 0x20) ? 2 : 1;
       } else if(ch >= '\u2460' && ch <= '\u249b') {
         s = 1;
-      } else if(ch == '#' || (ch >= '0' && ch <= '9') ||
-          (ch >= '\u0660' && ch <= '\u0669')) {
+      } else if(ch == '#' || ch >= '0' && ch <= '9' ||
+          ch >= '\u0660' && ch <= '\u0669') {
         s = decimal(in, ch & 0xFFFFFFF0);
         // invalid decimal parsing
         error = s == -1;

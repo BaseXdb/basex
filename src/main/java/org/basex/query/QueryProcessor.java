@@ -158,7 +158,6 @@ public final class QueryProcessor extends Progress {
       QueryException {
 
     compile();
-
     SerializerProp sp = ctx.serProp;
     if(sp == null) {
       sp = new SerializerProp(ctx.context.prop.get(Prop.SERIALIZER));

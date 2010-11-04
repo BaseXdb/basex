@@ -190,13 +190,10 @@ public class FNFileTest extends QueryTest {
   /** Prepares tests. */
   @BeforeClass
   public static void prepareTest() {
-
     // /_tmpdir_/testDir1
     dir1.mkdir();
-
     // /_tmpdir_/testDir2
     dir2.mkdir();
-
     // /_tmpdir_/testDir1/testDelDir1/testDelDir2
     dirDel.mkdirs();
 
@@ -232,7 +229,6 @@ public class FNFileTest extends QueryTest {
     } catch(final IOException ex) {
       ex.printStackTrace();
     }
-
   }
 
    /** Finishes the test. */

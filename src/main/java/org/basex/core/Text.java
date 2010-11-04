@@ -117,7 +117,8 @@ public interface Text {
     "  -P<pass>  Specify user password" + NL +
     "  -r<num>   Set REST server port" + NL +
     "  -s<pars>  Set serialization parameter(s)" + NL +
-    "  -U<name>  Specify user name";
+    "  -U<name>  Specify user name" + NL +
+    "  -z        Suppress logging";
 
   // SERVER ===================================================================
 

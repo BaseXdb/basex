@@ -70,8 +70,8 @@ public final class IntFormatter {
       tb.add(form.word(num, mp.ord));
     } else if(ch >= '\u2460' && ch <= '\u249b') {
       tb.add((char) (ch + number - 1));
-    } else if(ch == '#' || (ch >= '0' && ch <= '9') ||
-        (ch >= '\u0660' && ch <= '\u0669')) {
+    } else if(ch == '#' || ch >= '0' && ch <= '9' ||
+        ch >= '\u0660' && ch <= '\u0669') {
       number(tb, num, mp, form, ch & 0xFFFFFFF0);
     }
 

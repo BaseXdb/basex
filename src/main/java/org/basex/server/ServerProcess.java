@@ -257,9 +257,9 @@ public final class ServerProcess extends Thread {
       } else {
         // find query process
         qp = queries.get(arg);
-        // avoid multiple close calls
+        // ID has already been removed
         if(qp == null && sc != CLOSE)
-          throw new BaseXException("Unknown query ID (" + arg + ")");
+          throw new IOException("Unknown query ID (" + arg + ")");
 
         if(sc == BIND) {
           qp.bind(in.readString(), in.readString(), in.readString());
@@ -276,9 +276,7 @@ public final class ServerProcess extends Thread {
       }
       // send 0 as success flag
       out.write(0);
-    } catch(final BaseXException ex) {
-      err = ex.getMessage();
-    } catch(final QueryException ex) {
+    } catch(final Exception ex) {
       // log exception (static or runtime)
       err = ex.getMessage();
       if(qp != null) qp.close(true);
