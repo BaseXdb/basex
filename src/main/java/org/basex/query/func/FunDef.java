@@ -497,7 +497,7 @@ public enum FunDef {
    * @param e expression array
    * @return function
    */
-  public Fun newInstance(final InputInfo ii, final Expr... e) {
+  public Fun get(final InputInfo ii, final Expr... e) {
     try {
       return func.getDeclaredConstructor(InputInfo.class, FunDef.class,
           Expr[].class).newInstance(ii, this, e);

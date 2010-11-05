@@ -27,9 +27,9 @@ public final class BitapSearch<T> {
    * current element of {@link #haystack}. */
   private final BitSet mask;
   /** Is the method {@link #hasNext} already called? */
-  private boolean calledHasNext;
+  private boolean next;
   /** The current position in the {@link #haystack} iterator; first is 0. */
-  private int currentPosition;
+  private int pos;
 
   /**
    * Constructor.
@@ -55,21 +55,21 @@ public final class BitapSearch<T> {
    */
   public boolean hasNext() {
     if(mask == null) return false;
-    if(calledHasNext) return currentPosition >= 0;
+    if(next) return pos >= 0;
 
     // find next hit:
-    calledHasNext = true;
+    next = true;
 
     while(haystack.hasNext()) {
       final T current = haystack.next();
-      currentPosition++;
+      pos++;
       for(int k = needle.length; k >= 1; k--)
         mask.set(k, mask.get(k - 1)
             && cmp.compare(current, needle[k - 1]) == 0);
       if(mask.get(needle.length)) return true;
     }
 
-    currentPosition = -1;
+    pos = -1;
     return false;
   }
 
@@ -79,8 +79,8 @@ public final class BitapSearch<T> {
    */
   public int next() {
     if(hasNext()) {
-      calledHasNext = false;
-      return currentPosition - needle.length;
+      next = false;
+      return pos - needle.length;
     }
     throw new NoSuchElementException();
   }

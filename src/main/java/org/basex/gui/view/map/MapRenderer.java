@@ -120,11 +120,11 @@ final class MapRenderer {
       if(draw) {
         // color each full-text hit
         g.setColor(r.pos != null && r.pos.contains(span.pos)
-            && !span.specialChar ? COLORFT : textc);
+            && !span.special ? COLORFT : textc);
         g.drawString(string(tok), xx + ll, yy);
       }
       ll += wl;
-      if(ftt.isParagraph()) {
+      if(ftt.paragraph()) {
         // new paragraph
         ll = 0;
         yy += fh;
@@ -173,7 +173,7 @@ final class MapRenderer {
     r.thumbal = 0;
 
     final FTLexer lex = new FTLexer(s, p);
-    final int[][] data = lex.getInfo(s);
+    final int[][] data = lex.info(s);
 
     boolean l = false;
     while(r.thumbal < 2) {

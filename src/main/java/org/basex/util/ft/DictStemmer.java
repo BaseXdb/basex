@@ -13,51 +13,51 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Dimitar Popov
  */
-final class DictionaryStemmer extends SpanProcessor {
+final class DictStemmer extends SpanProcessor {
   /** Stem dictionary. */
-  final StemDir dictionary;
+  final StemDir dict;
 
   /**
    * Constructor.
-   * @param dict stem dictionary
+   * @param d stem dictionary
    */
-  DictionaryStemmer(final StemDir dict) {
-    dictionary = dict;
+  DictStemmer(final StemDir d) {
+    dict = d;
   }
 
   @Override
-  SpanProcessor newInstance(final Prop p, final FTOpt f) {
-    return new DictionaryStemmer(f.sd);
+  SpanProcessor get(final Prop p, final FTOpt f) {
+    return new DictStemmer(f.sd);
   }
 
   @Override
-  SPType getType() {
+  SPType type() {
     return SPType.stemmer;
   }
 
   @Override
-  int getPrecedence() {
+  int prec() {
     return 1001;
   }
 
   @Override
-  EnumSet<LanguageTokens> supportedLanguages() {
+  EnumSet<Language> languages() {
     // [DP][JE] the user should supply the language of the dictionary
-    return EnumSet.allOf(LanguageTokens.class);
+    return EnumSet.allOf(Language.class);
   }
 
   @Override
-  Iterator<Span> process(final Iterator<Span> iterator) {
+  Iterator<Span> process(final Iterator<Span> iter) {
     return new Iterator<Span>() {
       @Override
       public boolean hasNext() {
-        return iterator.hasNext();
+        return iter.hasNext();
       }
 
       @Override
       public Span next() {
-        final Span s = iterator.next();
-        if (dictionary != null) s.txt = dictionary.stem(s.txt);
+        final Span s = iter.next();
+        if(dict != null) s.txt = dict.stem(s.txt);
         return s;
       }
 

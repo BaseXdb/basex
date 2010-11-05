@@ -300,7 +300,7 @@ public final class XMLSerializer extends Serializer {
     int c = -1, wl = 0;
     final FTLexer ftt = new FTLexer(b);
     while(ftt.hasNext()) {
-      final int end = ftt.next().end;
+      final int end = ftt.next().start;
       ++c;
       for(int i = wl; i < end; i += cl(b, i)) {
         final int ch = cp(b, i);

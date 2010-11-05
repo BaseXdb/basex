@@ -18,8 +18,8 @@ import org.xml.sax.XMLReader;
 
 /**
  * This class uses TagSoup to convert HTML input to well-formed XML.
- * TagSoup was written by John Cowan and licensed under Apache 2.0
- * http://home.ccil.org/~cowan/XML/tagsoup/
+ * TagSoup was written by John Cowan and is based on the Apache 2.0 License:
+ * {@code http://home.ccil.org/~cowan/XML/tagsoup/}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

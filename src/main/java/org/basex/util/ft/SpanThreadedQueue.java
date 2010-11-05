@@ -15,19 +15,19 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Jens Erat
  */
-class SpanThreadedQueue extends SpanProcessor {
+final class SpanThreadedQueue extends SpanProcessor {
   /** Queue used for caching. */
   final BlockingQueue<Span> queue = new LinkedBlockingQueue<Span>();
   /** special span token used as last element marker. */
-  static final Span LAST = new Span(null, 0, 0, 0);
+  static final Span LAST = new Span(null, 0, 0, false);
 
   @Override
-  SPType getType() {
+  SPType type() {
     return SPType.special;
   }
 
   @Override
-  SpanProcessor newInstance(final Prop p, final FTOpt f) {
+  SpanProcessor get(final Prop p, final FTOpt f) {
     return null;
   }
 
@@ -92,13 +92,13 @@ class SpanThreadedQueue extends SpanProcessor {
   }
 
   @Override
-  int getPrecedence() {
+  int prec() {
     return 0;
   }
 
   @Override
-  public EnumSet<LanguageTokens> supportedLanguages() {
-    return EnumSet.allOf(LanguageTokens.class);
+  public EnumSet<Language> languages() {
+    return EnumSet.allOf(Language.class);
   }
 
 }

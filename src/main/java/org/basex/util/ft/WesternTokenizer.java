@@ -10,7 +10,6 @@ import org.basex.query.ft.FTOpt;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
-import org.basex.util.ft.FTLexer.FTUnit;
 
 /**
  * Full-text tokenizer.
@@ -18,7 +17,7 @@ import org.basex.util.ft.FTLexer.FTUnit;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class BaseXTokenizer extends Tokenizer {
+final class WesternTokenizer extends Tokenizer {
   /** Cached sentence positions. */
   private final IntList sen = new IntList();
   /** Cached paragraph positions. */
@@ -61,7 +60,7 @@ final class BaseXTokenizer extends Tokenizer {
    * Empty constructor.
    * @param pr (optional) database properties
    */
-  BaseXTokenizer(final Prop pr) {
+  WesternTokenizer(final Prop pr) {
     this(EMPTY, pr);
   }
 
@@ -70,12 +69,11 @@ final class BaseXTokenizer extends Tokenizer {
    * @param pr (optional) database properties
    * @param txt text
    */
-  private BaseXTokenizer(final byte[] txt, final Prop pr) {
+  private WesternTokenizer(final byte[] txt, final Prop pr) {
     init(txt);
-    if(pr != null) {
-      dc = pr.is(Prop.DIACRITICS);
-      cs = pr.is(Prop.CASESENS);
-    }
+    if(pr == null) return;
+    dc = pr.is(Prop.DIACRITICS);
+    cs = pr.is(Prop.CASESENS);
   }
 
   /**
@@ -84,14 +82,14 @@ final class BaseXTokenizer extends Tokenizer {
    * @param fto full-text options
    * @param pr database properties
    */
-  private BaseXTokenizer(final byte[] txt, final FTOpt fto, final Prop pr) {
+  private WesternTokenizer(final byte[] txt, final FTOpt fto, final Prop pr) {
     this(txt, pr);
     setFTOpt(fto);
   }
 
   @Override
-  Tokenizer newInstance(final byte[] txt, final Prop pr, final FTOpt f) {
-    return new BaseXTokenizer(txt, f, pr);
+  Tokenizer get(final byte[] txt, final Prop pr, final FTOpt f) {
+    return new WesternTokenizer(txt, f, pr);
   }
 
   /**
@@ -99,13 +97,12 @@ final class BaseXTokenizer extends Tokenizer {
    * @param fto new full-text option
    */
   private void setFTOpt(final FTOpt fto) {
-    if(null != fto) {
-      lc = fto.is(LC);
-      uc = fto.is(UC);
-      cs = fto.is(CS);
-      wc = fto.is(WC);
-      dc = fto.is(DC);
-    }
+    if(fto == null) return;
+    lc = fto.is(LC);
+    uc = fto.is(UC);
+    cs = fto.is(CS);
+    wc = fto.is(WC);
+    dc = fto.is(DC);
   }
 
   /**
@@ -361,8 +358,8 @@ final class BaseXTokenizer extends Tokenizer {
   }
 
   @Override
-  int[][] getInfo(final byte[] t) {
-    final BaseXTokenizer tok = new BaseXTokenizer(t, null);
+  int[][] info(final byte[] t) {
+    final WesternTokenizer tok = new WesternTokenizer(t, null);
     final IntList[] il = new IntList[] { new IntList(), new IntList(),
         new IntList(), new IntList(), new IntList()};
     int lass = 0;
@@ -413,7 +410,7 @@ final class BaseXTokenizer extends Tokenizer {
   }
 
   @Override
-  int getPrecedence() {
+  int prec() {
     return 1000;
   }
 
@@ -425,14 +422,14 @@ final class BaseXTokenizer extends Tokenizer {
 
       @Override
       public boolean hasNext() {
-        if(next <= 0 && (specialChars ? moreSC() : more())) next++;
+        if(next <= 0 && (special ? moreSC() : more())) next++;
         return next > 0;
       }
 
       @Override
       public Span next() {
         if(--next < 0) hasNext();
-        return new Span(get(), p, p, pos, sc);
+        return new Span(special ? getSC() : get(), p, pos, sc);
       }
 
       @Override
@@ -443,12 +440,12 @@ final class BaseXTokenizer extends Tokenizer {
   }
 
   @Override
-  EnumSet<LanguageTokens> supportedLanguages() {
-    return LanguageTokens.wsTokenizable();
+  EnumSet<Language> languages() {
+    return Language.wsTokenizable();
   }
 
   @Override
-  boolean isParagraph() {
+  boolean paragraph() {
     return pa;
   }
 }

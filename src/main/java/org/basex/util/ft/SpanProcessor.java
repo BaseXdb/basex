@@ -17,7 +17,7 @@ abstract class SpanProcessor extends LanguageDependent {
    * @param f full-text options
    * @return span processor
    */
-  abstract SpanProcessor newInstance(final Prop p, final FTOpt f);
+  abstract SpanProcessor get(final Prop p, final FTOpt f);
 
   /**
    * Process a token.
@@ -30,11 +30,11 @@ abstract class SpanProcessor extends LanguageDependent {
    * Returns type of {@link SpanProcessor}.
    * @return type
    */
-  abstract SPType getType();
+  abstract SPType type();
 
   /** Processor type. */
   static enum SPType {
-    /** SpanProcessor is stemmer. */
+    /** SpanProcessor is a stemmer. */
     stemmer,
     /** SpanProcessor has a special function. */
     special;

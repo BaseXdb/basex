@@ -11,7 +11,7 @@ import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
 import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTLexer.FTUnit;
+import org.basex.util.ft.FTUnit;
 
 /**
  * Abstract FTFilter expression.

@@ -2,7 +2,6 @@ package org.basex.util.ft;
 
 import org.basex.core.Prop;
 import org.basex.query.ft.FTOpt;
-import org.basex.util.ft.FTLexer.FTUnit;
 
 /**
  * Abstract tokenizer.
@@ -12,7 +11,7 @@ import org.basex.util.ft.FTLexer.FTUnit;
  */
 abstract class Tokenizer extends LanguageDependent implements Iterable<Span> {
   /** Are special characters included? */
-  protected boolean specialChars;
+  protected boolean special;
 
   /**
    * Factory method.
@@ -21,7 +20,7 @@ abstract class Tokenizer extends LanguageDependent implements Iterable<Span> {
    * @param f full-text options
    * @return tokenizer instance
    */
-  abstract Tokenizer newInstance(final byte[] t, final Prop p, final FTOpt f);
+  abstract Tokenizer get(final byte[] t, final Prop p, final FTOpt f);
 
   /**
    * Factory method.
@@ -31,17 +30,16 @@ abstract class Tokenizer extends LanguageDependent implements Iterable<Span> {
    * @param sc include special characters
    * @return tokenizer instance
    */
-  Tokenizer newInstance(final byte[] t, final Prop p, final FTOpt f,
+  final Tokenizer get(final byte[] t, final Prop p, final FTOpt f,
       final boolean sc) {
-
-    final Tokenizer tk = newInstance(t, p, f);
-    tk.specialChars = sc;
+    final Tokenizer tk = get(t, p, f);
+    tk.special = sc;
     return tk;
   }
 
   /**
    * Gets full-text info for the specified token; needed for visualizations.
-   * Must not be implemented by all tokenizers.
+   * Does not have to be implemented by all tokenizers.
    * <ul>
    * <li/>int[0]: length of each token
    * <li/>int[1]: sentence info, length of each sentence
@@ -52,22 +50,22 @@ abstract class Tokenizer extends LanguageDependent implements Iterable<Span> {
    * @param t text to be parsed
    * @return int arrays or empty array if not implemented
    */
-  int[][] getInfo(@SuppressWarnings("unused") final byte[] t) {
+  int[][] info(@SuppressWarnings("unused") final byte[] t) {
     return new int[0][];
   }
 
   /**
-   * Checks if current token is a paragraph. Must not be implemented by all
-   * tokenizers. Returns false if not implemented.
+   * Checks if current token is a paragraph. Does not have to be implemented
+   * by all tokenizers. Returns false if not implemented.
    * @return whether current token is a paragraph
    */
-  boolean isParagraph() {
+  boolean paragraph() {
     return false;
   }
 
   /**
-   * Calculates a position value, dependent on the specified unit. Must not be
-   * implemented by all tokenizers. Returns 0 if not implemented.
+   * Calculates a position value, dependent on the specified unit. Does not have
+   * to be implemented by all tokenizers. Returns 0 if not implemented.
    * @param w word position
    * @param u unit
    * @return new position

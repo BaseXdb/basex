@@ -13,7 +13,7 @@ import org.basex.query.ft.FTOpt;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class BaseXStemmer extends Stemmer {
+final class EnglishStemmer extends Stemmer {
   /** Stemming character. */
   private static final byte[] AT = token("at");
   /** Stemming character. */
@@ -257,22 +257,21 @@ final class BaseXStemmer extends Stemmer {
    */
   private void a(final byte[] t) {
     te = tt;
-    for(final byte c : t)
-      tok[te++] = c;
+    for(final byte c : t) tok[te++] = c;
   }
 
   @Override
-  int getPrecedence() {
+  int prec() {
     return 1000;
   }
 
   @Override
-  SpanProcessor newInstance(final Prop p, final FTOpt f) {
-    return new BaseXStemmer();
+  SpanProcessor get(final Prop p, final FTOpt f) {
+    return new EnglishStemmer();
   }
 
   @Override
-  EnumSet<LanguageTokens> supportedLanguages() {
-    return EnumSet.of(LanguageTokens.EN);
+  EnumSet<Language> languages() {
+    return EnumSet.of(Language.EN);
   }
 }

@@ -16,9 +16,8 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
-import org.basex.util.Token;
 import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.LanguageTokens;
+import org.basex.util.ft.Language;
 
 /**
  * Full-text creation dialog.
@@ -82,13 +81,10 @@ final class DialogFT extends BaseXBack {
     final BaseXBack b1 = new BaseXBack();
     b1.setLayout(new TableLayout(1, 2, 6, 0));
     b1.add(check[4]);
-    final EnumSet<LanguageTokens> langset = new FTLexer(Token.EMPTY,
-        dialog.gui.context.prop).supportedLanguages();
+    final EnumSet<Language> langset = FTLexer.languages();
     final String[] langs = new String[langset.size()];
     int i = 0;
-    for(final LanguageTokens l : langset) {
-      langs[i++] = l.name();
-    }
+    for(final Language l : langset) langs[i++] = l.toString();
     language = new BaseXCombo(langs, d);
     b1.add(language);
     add(b1);
@@ -163,10 +159,11 @@ final class DialogFT extends BaseXBack {
     gui.set(Prop.STEMMING, check[1].isSelected());
     gui.set(Prop.CASESENS, check[2].isSelected());
     gui.set(Prop.DIACRITICS, check[3].isSelected());
-    gui.set(Prop.FTLANGUAGE,
-        check[4].isSelected() ? language.getSelectedItem().toString() : "");
-    gui.set(Prop.SCORING,
-        check[5].isSelected() ? scoring.getSelectedIndex() + 1 : 0);
+    final String lang = check[4].isSelected() ?
+        Language.forName(language.getSelectedItem().toString()).name() : "";
+    gui.set(Prop.FTLANGUAGE, lang);
+    gui.set(Prop.SCORING, check[5].isSelected() ?
+        scoring.getSelectedIndex() + 1 : 0);
     gui.set(Prop.STOPWORDS, check[6].isSelected() ? swpath.getText() : "");
   }
 }

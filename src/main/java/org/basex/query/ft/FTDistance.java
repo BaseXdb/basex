@@ -13,7 +13,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTLexer.FTUnit;
+import org.basex.util.ft.FTUnit;
 
 /**
  * FTDistance expression.

@@ -14,40 +14,40 @@ abstract class LanguageDependent implements Comparable<LanguageDependent> {
   @Override
   public int compareTo(final LanguageDependent o) {
     // Higher precedence value = better
-    return o.getPrecedence() - getPrecedence();
+    return o.prec() - prec();
   }
 
   /**
-   * Returns precedence of SpanProcessor.
-   * @return precedence of SpanProcessor.
+   * Returns the precedence of the processor.
+   * @return precedence
    */
-  abstract int getPrecedence();
+  abstract int prec();
 
   /**
-   * Checks if class is represented by identifier.
+   * Checks if the class is represented by the specified identifier.
    * @param id identifier
    * @return true if represented by identifier
    */
   @SuppressWarnings("unused")
-  boolean isRepresentedByIdentifier(final byte[] id) {
+  boolean eq(final byte[] id) {
     return false;
   }
 
   /**
-   * Checks if class supports language.
+   * Checks if the specified language is supported.
    * @param ln language
    * @return true if language is supported
    */
-  boolean isLanguageSupported(final byte[] ln) {
-    for(final LanguageTokens lt : supportedLanguages()) {
+  boolean supports(final byte[] ln) {
+    for(final Language lt : languages()) {
       if(Token.eq(ln, lt.ln)) return true;
     }
     return false;
   }
 
   /**
-   * Returns supported languages.
-   * @return supported languages
+   * Returns the supported languages.
+   * @return languages
    */
-  abstract EnumSet<LanguageTokens> supportedLanguages();
+  abstract EnumSet<Language> languages();
 }

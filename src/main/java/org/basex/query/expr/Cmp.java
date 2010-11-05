@@ -67,10 +67,10 @@ abstract class Cmp extends Arr {
        o == Op.EQ && v != (int) v) return Bln.FALSE;
     // EXISTS: c > (v<1), c >= (v<=1), c != (v=0)
     if(o == Op.GT && v < 1 || o == Op.GE && v <= 1 || o == Op.NE && v == 0)
-      return FunDef.EXISTS.newInstance(input, ((Fun) expr[0]).expr);
+      return FunDef.EXISTS.get(input, ((Fun) expr[0]).expr);
     // EMPTY: c < (v<=1), c <= (v<1), c = (v=0)
     if(o == Op.LT && v <= 1 || o == Op.LE && v < 1 || o == Op.EQ && v == 0)
-      return FunDef.EMPTY.newInstance(input, ((Fun) expr[0]).expr);
+      return FunDef.EMPTY.get(input, ((Fun) expr[0]).expr);
 
     return this;
   }

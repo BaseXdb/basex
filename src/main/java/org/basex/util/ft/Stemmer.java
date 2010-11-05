@@ -20,10 +20,7 @@ abstract class Stemmer extends SpanProcessor {
   abstract byte[] stem(final byte[] word);
 
   @Override
-  SpanProcessor newInstance(final Prop p, final FTOpt f) {
-    // [DP][JE] Auto-generated method stub
-    return null;
-  }
+  abstract SpanProcessor get(final Prop p, final FTOpt f);
 
   @Override
   Iterator<Span> process(final Iterator<Span> iterator) {
@@ -48,7 +45,7 @@ abstract class Stemmer extends SpanProcessor {
   }
 
   @Override
-  SPType getType() {
+  SPType type() {
     return SPType.stemmer;
   }
 
@@ -58,14 +55,14 @@ abstract class Stemmer extends SpanProcessor {
    * @param f {@link FTOpt}
    * @return language
    */
-  protected static LanguageTokens getLanguage(final Prop p, final FTOpt f) {
+  protected static Language getLanguage(final Prop p, final FTOpt f) {
     try {
       if(f != null && f.ln != null) {
-        return LanguageTokens.valueOf(f.ln);
+        return Language.valueOf(f.ln);
       } else if(p != null && p.get(Prop.FTLANGUAGE).length() > 0) {
-        return LanguageTokens.valueOf(p.get(Prop.FTLANGUAGE).toUpperCase());
+        return Language.valueOf(p.get(Prop.FTLANGUAGE).toUpperCase());
       } else {
-        return LanguageTokens.DEFAULT;
+        return Language.DEFAULT;
       }
     } catch(final IllegalArgumentException e) {
       // [DP][JE] invalid language supplied!

@@ -1,7 +1,7 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.LanguageTokens.*;
+import static org.basex.util.ft.Language.*;
 import java.lang.reflect.Method;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -9,9 +9,12 @@ import org.basex.core.Prop;
 import org.basex.query.QueryException;
 import org.basex.query.ft.FTOpt;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 
 /**
- * Stemmer implementation using the Snowball stemmer.
+ * Stemmer implementation using the Snowball stemmer
+ * The Snowball stemmers were written by Dr Martin Porter and Richard Boulton
+ * and is based on the BSD License: {@code http://snowball.tartarus.org/}).
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Dimitar Popov
@@ -20,37 +23,36 @@ final class SnowballStemmer extends Stemmer {
   /** Name of the stemmer. */
   private static final byte[] NAME = token("Snowball");
   /** Name of the package with all Snowball stemmers. */
-  private static final String PKG = "org.tartarus.snowball.ext";
+  private static final String PKG = "org.tartarus.snowball";
   /** Stemmer classes which the Snowball library provides. */
-  private static final EnumMap<LanguageTokens, StemmerClass> CLASSES =
-      new EnumMap<LanguageTokens, StemmerClass>(LanguageTokens.class);
+  private static final EnumMap<Language, StemmerClass> CLASSES =
+      new EnumMap<Language, StemmerClass>(Language.class);
 
   /** Stemmer class corresponding to the required properties. */
-  private final StemmerClass stemmerClass;
+  private final StemmerClass clazz;
   /** Stemmer instance. */
   private final Object stemmer;
 
   static {
     try {
       // if the base class cannot be loaded, then we shouldn't try to load any:
-      Class.forName("org.tartarus.snowball.SnowballStemmer");
-      add(CLASSES, DA, "danishStemmer");
-      add(CLASSES, DE, "germanStemmer");
-      add(CLASSES, EN, "englishStemmer");
-      add(CLASSES, ES, "spanishStemmer");
-      add(CLASSES, FI, "finnishStemmer");
-      add(CLASSES, FR, "frenchStemmer");
-      add(CLASSES, HU, "hungarianStemmer");
-      add(CLASSES, IT, "italianStemmer");
-      add(CLASSES, NL, "dutchStemmer");
-      add(CLASSES, NO, "norwegianStemmer");
-      add(CLASSES, PT, "portugueseStemmer");
-      add(CLASSES, RO, "romanianStemmer");
-      add(CLASSES, RU, "russianStemmer");
-      add(CLASSES, SV, "swedishStemmer");
-      add(CLASSES, TR, "turkishStemmer");
+      Class.forName(PKG + ".SnowballStemmer");
+      add(CLASSES, DA);
+      add(CLASSES, DE);
+      add(CLASSES, EN);
+      add(CLASSES, ES);
+      add(CLASSES, FI);
+      add(CLASSES, FR);
+      add(CLASSES, HU);
+      add(CLASSES, IT);
+      add(CLASSES, NL);
+      add(CLASSES, NO);
+      add(CLASSES, PT);
+      add(CLASSES, RO);
+      add(CLASSES, RU);
+      add(CLASSES, SV);
+      add(CLASSES, TR);
     } catch(final ClassNotFoundException e) {
-      ;
     }
   }
 
@@ -59,58 +61,49 @@ final class SnowballStemmer extends Stemmer {
    * stemmers.
    * @param stemmers a list of available Snowball stemmers
    * @param lang language
-   * @param className Snowball stemmer class name
    */
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   private static void add(
-      final EnumMap<LanguageTokens, StemmerClass> stemmers,
-      final LanguageTokens lang, final String className) {
+      final EnumMap<Language, StemmerClass> stemmers, final Language lang) {
 
     try {
+      final String clz = lang.toString().toLowerCase() + "Stemmer";
       final Class<Stemmer> c = (Class<Stemmer>)
-        Class.forName(PKG + "." + className);
+        Class.forName(PKG + ".ext." + clz);
       stemmers.put(lang,
           new StemmerClass(c, c.getMethod("setCurrent", String.class),
               c.getMethod("stem"), c.getMethod("getCurrent")));
     } catch(final Exception e) {
-      ;
+      e.printStackTrace();
     }
   }
 
   /**
-   * Is the Snowball library available?
-   * @return {@code true} if Snowball stemmers are available
+   * Checks if the library is available.
+   * @return result of check
    */
-  static boolean isAvailable() {
+  static boolean available() {
     return CLASSES.size() > 0;
   }
 
   /**
-   * Construct a Snowball stemmer. If the Snowball library is not available, a
-   * {@link RuntimeException} will be thrown. Call {@link #isAvailable()}
-   * first!
+   * Constructs a Snowball stemmer. Call {@link #available()} first to
+   * check if the library is available.
    * @param lang language of the text to stem
-   * @throws QueryException if the language specified in the input properties is
-   *           not supported by the stemmer
+   * @throws QueryException if the specified language is not supported
    */
-  SnowballStemmer(final LanguageTokens lang) throws QueryException {
-    if(!isAvailable()) throw new RuntimeException("Snowball is not available");
-
-    stemmerClass = CLASSES.get(lang);
-    if(stemmerClass == null) {
-      // [DP][JE] what should we do in case of an unsupported language?
-      throw new QueryException(null, Err.FTLAN, lang);
-    }
-
+  SnowballStemmer(final Language lang) throws QueryException {
+    clazz = CLASSES.get(lang);
+    if(clazz == null) Err.FTLAN.thrw(null, lang);
     try {
-      stemmer = stemmerClass.stemmerClass.newInstance();
+      stemmer = clazz.clazz.newInstance();
     } catch(final Exception e) {
       throw new RuntimeException(e);
     }
   }
 
   @Override
-  SpanProcessor newInstance(final Prop p, final FTOpt f) {
+  SpanProcessor get(final Prop p, final FTOpt f) {
     try {
       return new SnowballStemmer(getLanguage(p, f));
     } catch(final QueryException e) {
@@ -121,23 +114,23 @@ final class SnowballStemmer extends Stemmer {
   }
 
   @Override
-  boolean isLanguageSupported(final byte[] lang) {
-    return CLASSES.containsKey(LanguageTokens.valueOf(lang));
+  boolean supports(final byte[] lang) {
+    return CLASSES.containsKey(Language.valueOf(lang));
   }
 
   @Override
-  boolean isRepresentedByIdentifier(final byte[] id) {
-    return id != null && eq(id, NAME);
+  boolean eq(final byte[] id) {
+    return id != null && Token.eq(id, NAME);
   }
 
   @Override
-  int getPrecedence() {
+  int prec() {
     // [DP][JE] what would be an appropriate value?
     return 100;
   }
 
   @Override
-  EnumSet<LanguageTokens> supportedLanguages() {
+  EnumSet<Language> languages() {
     return EnumSet.copyOf(CLASSES.keySet());
   }
 
@@ -164,9 +157,9 @@ final class SnowballStemmer extends Stemmer {
    */
   private String stem(final String word) {
     try {
-      stemmerClass.setCurrent.invoke(stemmer, word);
-      stemmerClass.stem.invoke(stemmer);
-      return (String) stemmerClass.getCurrent.invoke(stemmer);
+      clazz.setCurrent.invoke(stemmer, word);
+      clazz.stem.invoke(stemmer);
+      return (String) clazz.getCurrent.invoke(stemmer);
     } catch(final Exception e) {
       throw new RuntimeException(e);
     }
@@ -177,7 +170,7 @@ final class SnowballStemmer extends Stemmer {
    */
   private static class StemmerClass {
     /** Class implementing {@link SnowballStemmer}. */
-    final Class<Stemmer> stemmerClass;
+    final Class<Stemmer> clazz;
     /** Method {@code setCurrent}. */
     final Method setCurrent;
     /** Method {@code stem}. */
@@ -194,7 +187,7 @@ final class SnowballStemmer extends Stemmer {
      */
     StemmerClass(final Class<Stemmer> sc, final Method s,
         final Method stm, final Method g) {
-      stemmerClass = sc;
+      clazz = sc;
       setCurrent = s;
       stem = stm;
       getCurrent = g;

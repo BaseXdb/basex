@@ -134,7 +134,7 @@ public final class FTOpt extends ExprInfo {
 
     // assign options to query:
     final FTLexer quLexer = new FTLexer(q, prop, this);
-    if(quLexer.getFTOpt().is(FZ) && ls == null) ls = new Levenshtein();
+    if(quLexer.ftOpt().is(FZ) && ls == null) ls = new Levenshtein();
 
     // cache query tokens:
     query.reset();
@@ -148,7 +148,7 @@ public final class FTOpt extends ExprInfo {
     final Span[] qTokenSpans = qSpanList.toArray(new Span[qSpanList.size()]);
 
     // assign options to text:
-    final FTOpt to = tk.getFTOpt();
+    final FTOpt to = tk.ftOpt();
     to.set(ST, is(ST));
     to.set(DC, is(DC));
     to.set(CS, is(CS));
@@ -157,7 +157,7 @@ public final class FTOpt extends ExprInfo {
     to.sd = sd;
 
     final Iterator<Span> inputIter =
-      new FTLexer(tk.getText(), prop, to).iterator();
+      new FTLexer(tk.text(), prop, to).iterator();
 
     // create the comparator:
     final Levenshtein lvs = ls;
@@ -178,9 +178,9 @@ public final class FTOpt extends ExprInfo {
         // [DP][JE] ugly way to send the QueryException to the caller by
         // wrapping it in a RuntimeException:
         try {
-          if(quLexer.getFTOpt().is(FZ) ? // perform fuzzy search?
+          if(quLexer.ftOpt().is(FZ) ? // perform fuzzy search?
                 lvs.similar(inputTkn, queryTkn, lvserr) :
-             quLexer.getFTOpt().is(WC) ? // perform wildcard search?
+             quLexer.ftOpt().is(WC) ? // perform wildcard search?
                 wc(words.input, inputTkn, queryTkn, 0, 0) :
              /* else */
                 eq(inputTkn, queryTkn)) return 0;
@@ -191,7 +191,7 @@ public final class FTOpt extends ExprInfo {
             // the same as one of the extension tokens of the query tokens:
 
             if (queryExtension == null)
-              queryExtension = th.find(words.input, quLexer.getText());
+              queryExtension = th.find(words.input, quLexer.text());
 
             for(final byte[] txt : queryExtension) {
               final FTLexer thWordLexer = new FTLexer(txt, quLexer);

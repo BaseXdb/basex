@@ -66,7 +66,7 @@ final class FTTrie extends FTIndex {
   public synchronized int nrIDs(final IndexToken ind) {
     // skip result count for queries which stretch over multiple index entries
     final FTLexer fto = (FTLexer) ind;
-    if(fto.getFTOpt().is(FZ) || fto.getFTOpt().is(WC)) return 1;
+    if(fto.ftOpt().is(FZ) || fto.ftOpt().is(WC)) return 1;
 
     final byte[] tok = fto.get();
     final int id = cache.id(tok);
@@ -89,14 +89,14 @@ final class FTTrie extends FTIndex {
     final byte[] tok = ft.get();
 
     // support fuzzy search
-    if(ft.getFTOpt().is(FZ)) {
+    if(ft.ftOpt().is(FZ)) {
       int k = data.meta.prop.num(Prop.LSERROR);
       if(k == 0) k = tok.length >> 2;
       return fuzzy(0, null, -1, tok, 0, 0, 0, k, false);
     }
 
     // support wildcards
-    if(ft.getFTOpt().is(WC)) {
+    if(ft.ftOpt().is(WC)) {
       final int pw = indexOf(tok, '.');
       if(pw != -1) return wc(tok, pw, false);
     }

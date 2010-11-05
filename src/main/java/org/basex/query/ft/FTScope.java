@@ -10,7 +10,7 @@ import org.basex.query.QueryContext;
 import org.basex.util.BoolList;
 import org.basex.util.InputInfo;
 import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTLexer.FTUnit;
+import org.basex.util.ft.FTUnit;
 
 /**
  * FTScope expression.

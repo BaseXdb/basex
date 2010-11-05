@@ -110,8 +110,8 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
 import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.FTUnit;
 import org.basex.util.ft.StopWords;
-import org.basex.util.ft.FTLexer.FTUnit;
 
 /**
  * Simple query parser; can be overwritten to support more complex parsings.
