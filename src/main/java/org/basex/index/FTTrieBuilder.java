@@ -69,7 +69,7 @@ final class FTTrieBuilder extends FTBuilder {
 
   @Override
   void index(final byte[] tok) {
-    hash.index(tok, pre, lexerPos);
+    hash.index(tok, pre, pos);
   }
 
   @Override

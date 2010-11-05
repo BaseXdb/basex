@@ -10,9 +10,7 @@ import org.basex.util.ft.FTLexer.FTUnit;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Jens Erat
  */
-abstract class Tokenizer extends LanguageDependent implements
-    Iterable<Span> {
-
+abstract class Tokenizer extends LanguageDependent implements Iterable<Span> {
   /** Are special characters included? */
   protected boolean specialChars;
 

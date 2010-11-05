@@ -5,7 +5,6 @@ import static org.basex.util.ft.FTOptions.*;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import org.basex.core.Prop;
 import org.basex.query.ft.FTOpt;
 import org.basex.util.IntList;
@@ -36,16 +35,10 @@ final class BaseXTokenizer extends Tokenizer {
   /** Wildcard flag. */
   private boolean wc;
   /** Flag for a paragraph. */
-  boolean pa;
-
-  /** Current token. */
-  int pos;
+  private boolean pa;
 
   /** Text. */
   private byte[] text;
-  /** Current character position. */
-  int p;
-
   /** Current sentence. */
   private int sent;
   /** Current paragraph. */
@@ -54,10 +47,14 @@ final class BaseXTokenizer extends Tokenizer {
   private int pm;
   /** Last character position. */
   private int lp;
-
   /** Character start position. */
   private int s;
-  /** Flag indicating, that the current token is special character. */
+
+  /** Current token. */
+  int pos;
+  /** Current character position. */
+  int p;
+  /** Flag indicating a special character. */
   boolean sc;
 
   /**
@@ -277,7 +274,7 @@ final class BaseXTokenizer extends Tokenizer {
    * Get next token, including special characters.
    * @return next token
    */
-  byte[] nextSC() {
+  byte[] getSC() {
     return lp < p ? Arrays.copyOfRange(text, lp, p) : Arrays.copyOfRange(text,
         p, s);
   }
@@ -422,34 +419,20 @@ final class BaseXTokenizer extends Tokenizer {
 
   @Override
   public Iterator<Span> iterator() {
-    return specialChars ? iteratorSC() : new Iterator<Span>() {
-      {
-        init();
-      }
-      int calledHasNext;
+    return new Iterator<Span>() {
+      { init(); }
+      int next;
 
       @Override
       public boolean hasNext() {
-        if (calledHasNext > 0) return true;
-        if(more()) {
-          calledHasNext++;
-          return true;
-        }
-        return false;
+        if(next <= 0 && (specialChars ? moreSC() : more())) next++;
+        return next > 0;
       }
 
       @Override
       public Span next() {
-        // BaseXTokenizer requires that more() must be called before get()
-        if(calledHasNext == 0) {
-          if(hasNext()) {
-            return next();
-          }
-          throw new NoSuchElementException();
-        }
-        calledHasNext--;
-        final int left = p;
-        return new Span(get(), left, p, pos);
+        if(--next < 0) hasNext();
+        return new Span(get(), p, p, pos, sc);
       }
 
       @Override
@@ -467,44 +450,5 @@ final class BaseXTokenizer extends Tokenizer {
   @Override
   boolean isParagraph() {
     return pa;
-  }
-
-  /**
-   * Get an iterator over all tokens, including special characters.
-   * @return span iterator
-   */
-  private Iterator<Span> iteratorSC() {
-    return new Iterator<Span>() {
-      {
-        init();
-      }
-      int calledHasNext;
-
-      @Override
-      public boolean hasNext() {
-        if(moreSC()) {
-          calledHasNext++;
-          return true;
-        }
-        return false;
-      }
-
-      @Override
-      public Span next() {
-        // BaseXTokenizer requires that more() must be called before get()
-        if(calledHasNext == 0) {
-          if(hasNext()) return next();
-          throw new NoSuchElementException();
-        }
-        calledHasNext--;
-        final int left = p;
-        return new Span(nextSC(), left, p, pos, sc);
-      }
-
-      @Override
-      public void remove() {
-        Util.notimplemented();
-      }
-    };
   }
 }

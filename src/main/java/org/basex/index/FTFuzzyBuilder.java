@@ -59,7 +59,7 @@ final class FTFuzzyBuilder extends FTBuilder {
 
   @Override
   void index(final byte[] tok) {
-    tree.index(tok, pre, lexerPos, csize);
+    tree.index(tok, pre, pos, csize);
   }
 
   @Override

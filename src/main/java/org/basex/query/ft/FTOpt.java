@@ -163,7 +163,6 @@ public final class FTOpt extends ExprInfo {
     final Levenshtein lvs = ls;
     final int lvserr = lserr;
     final Comparator<Span> cmp = new Comparator<Span>() {
-
       /** Query term extension with thesaurus terms. */
       private byte[][] queryExtension;
 

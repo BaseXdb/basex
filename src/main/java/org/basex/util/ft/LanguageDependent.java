@@ -28,8 +28,8 @@ abstract class LanguageDependent implements Comparable<LanguageDependent> {
    * @param id identifier
    * @return true if represented by identifier
    */
-  boolean isRepresentedByIdentifier(
-      @SuppressWarnings("unused") final byte[] id) {
+  @SuppressWarnings("unused")
+  boolean isRepresentedByIdentifier(final byte[] id) {
     return false;
   }
 

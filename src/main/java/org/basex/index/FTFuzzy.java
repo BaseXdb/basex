@@ -133,8 +133,12 @@ final class FTFuzzy extends FTIndex {
 
     // return cached or new result
     final int id = cache.id(tok);
-    return id == 0 ? get(tok, false) :
-      iter(cache.getPointer(id), cache.getSize(id), dat, false);
+    if(id == 0) {
+      final int p = token(tok);
+      return p > -1 ? iter(pointer(p, tok.length),
+          size(p, tok.length), dat, false) : FTIndexIterator.EMP;
+    }
+    return iter(cache.getPointer(id), cache.getSize(id), dat, false);
   }
 
   @Override
@@ -247,17 +251,5 @@ final class FTFuzzy extends FTIndex {
       }
     }
     return it;
-  }
-
-  /**
-   * Gets pre- and pos values, stored for token out of index.
-   * @param tok token looking for
-   * @param f fast evaluation
-   * @return iterator
-   */
-  private synchronized FTIndexIterator get(final byte[] tok, final boolean f) {
-    final int p = token(tok);
-    return p > -1 ? iter(pointer(p, tok.length),
-        size(p, tok.length), dat, f) : FTIndexIterator.EMP;
   }
 }

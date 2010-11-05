@@ -35,8 +35,6 @@ final class QueryProcess extends Progress {
   private boolean monitored;
   /** Iterator. */
   private Iter iter;
-  /** Current item. */
-  private Item item;
 
   /**
    * Constructor.
@@ -92,15 +90,34 @@ final class QueryProcess extends Progress {
    */
   void next() throws IOException, QueryException {
     if(xml == null) init();
-    if(stopped) SERVERTIMEOUT.thrw(null);
+    xml.init();
+    final Item item = iter.next();
+    if(item != null) next(item);
+  }
 
-    item = iter.next();
-    if(item != null) {
-      xml.init();
-      xml.openResult();
-      item.serialize(xml);
-      xml.closeResult();
-    }
+  /**
+   * Evaluates the complete query.
+   * @throws IOException Exception
+   * @throws QueryException query exception
+   */
+  public void execute() throws IOException, QueryException {
+    if(xml == null) init();
+    Item it;
+    while((it = iter.next()) != null) next(it);
+    close(false);
+  }
+
+  /**
+   * Serializes the specified item.
+   * @param it item to be serialized
+   * @throws IOException Exception
+   * @throws QueryException query exception
+   */
+  private void next(final Item it) throws IOException, QueryException {
+    if(stopped) SERVERTIMEOUT.thrw(null);
+    xml.openResult();
+    it.serialize(xml);
+    xml.closeResult();
   }
 
   /**

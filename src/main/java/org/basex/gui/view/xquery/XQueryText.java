@@ -65,7 +65,7 @@ final class XQueryText extends BaseXText {
   @Override
   protected void release(final boolean force) {
     final byte[] qu = getText();
-    final boolean module = isModule(qu);
+    final boolean module = module(qu);
     final boolean diff = !Token.eq(qu, last);
     view.modified(view.modified || diff, false);
 
@@ -100,7 +100,7 @@ final class XQueryText extends BaseXText {
   private void query(final byte[] query, final boolean force) {
     if(force) {
       last = query;
-      if(isModule(query)) return;
+      if(module(query)) return;
       view.stop.setEnabled(true);
       final String qu = Token.string(query);
       gui.execute(new XQuery(qu.trim().isEmpty() ? "()" : qu));
@@ -114,7 +114,7 @@ final class XQueryText extends BaseXText {
    * @param qu query to check
    * @return result of check
    */
-  private boolean isModule(final byte[] qu) {
+  private boolean module(final byte[] qu) {
     return Token.string(qu).trim().startsWith("module namespace ");
   }
 

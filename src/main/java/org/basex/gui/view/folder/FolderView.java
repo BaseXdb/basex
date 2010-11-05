@@ -490,7 +490,7 @@ public final class FolderView extends View {
         return;
       }
 
-      if(right ^ opened[focusPre] && (!ViewData.isLeaf(gui.prop, data, focusPre)
+      if(right ^ opened[focusPre] && (!ViewData.leaf(gui.prop, data, focusPre)
           || data.attSize(focusPre, kind) > 1)) {
         opened[focusPre] = right;
         refreshHeight();

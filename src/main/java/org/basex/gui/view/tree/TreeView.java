@@ -235,7 +235,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(inFocus && !winChange) {
 
-      if(!refreshedFocus && tr.isBigRectangle(sub, frn, flv)) {
+      if(!refreshedFocus && tr.bigRect(sub, frn, flv)) {
         final int f = getMostSizedNode(data, frn, flv, frect, fpre);
         if(f >= 0) fpre = f;
       }
@@ -251,7 +251,7 @@ public final class TreeView extends View implements TreeViewOptions {
         final int as = d.attSize(fpre, k);
         g.setColor(Color.BLACK);
         g.drawString("pre: " + fpre + " level: " + flv + "  level-size: "
-            + sub.getLevelSize(frn, flv) + "  node-size: " + (s - as)
+            + sub.levelSize(frn, flv) + "  node-size: " + (s - as)
             + "  node: " + Token.string(ViewData.tag(gui.prop, d, fpre)), 2,
             wheight - 6);
       }
@@ -277,7 +277,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
       for(int lv = 0; lv < h; ++lv) {
 
-        final boolean br = tr.isBigRectangle(sub, rn, lv);
+        final boolean br = tr.bigRect(sub, rn, lv);
         final TreeRect[] lr = tr.getTreeRectsPerLevel(rn, lv);
 
         for(int i = 0; i < lr.length; ++i) {
@@ -357,7 +357,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param y y-coordinate
    * @return position is marked or not
    */
-  private boolean isMarked(final int x, final int y) {
+  private boolean marked(final int x, final int y) {
     if(markedImage != null) {
       final int h = markedImage.getHeight();
       final int w = markedImage.getWidth();
@@ -383,13 +383,13 @@ public final class TreeView extends View implements TreeViewOptions {
 
     final int y = getYperLevel(lv);
     final int h = nodeHeight;
-    final boolean br = tr.isBigRectangle(sub, rn, lv);
+    final boolean br = tr.bigRect(sub, rn, lv);
     boolean txt = !br && fontHeight <= h;
     boolean fill = false;
     boolean border = false;
     final int xx = r.x;
     final int ww = r.w;
-    final boolean marked = isMarked(xx, y);
+    final boolean marked = marked(xx, y);
 
     Color borderColor = null;
     Color fillColor = null;
@@ -527,9 +527,9 @@ public final class TreeView extends View implements TreeViewOptions {
             && (yL <= t || yL + nodeHeight <= t)) {
 
           final TreeRect[] rlv = tr.getTreeRectsPerLevel(r, i);
-          final int s = sub.getLevelSize(r, i);
+          final int s = sub.levelSize(r, i);
 
-          if(tr.isBigRectangle(sub, r, i)) {
+          if(tr.bigRect(sub, r, i)) {
 
             if(rl > 1) {
               final TreeBorder tb = sub.getTreeBorder(r, i);
@@ -595,7 +595,7 @@ public final class TreeView extends View implements TreeViewOptions {
         final int y = getYperLevel(lv);
         final ListIterator<Integer> li = marklink.listIterator();
 
-        if(tr.isBigRectangle(sub, rn, lv)) {
+        if(tr.bigRect(sub, rn, lv)) {
 
           while(li.hasNext()) {
             final int pre = li.next();
@@ -605,7 +605,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
             if(ix > -1) {
               li.remove();
-              final int x = (int) (rect.w * ix / (double) sub.getLevelSize(rn,
+              final int x = (int) (rect.w * ix / (double) sub.levelSize(rn,
                   lv));
               mg.setColor(colormark1);
               mg.fillRect(rect.x + x, y, 2, nodeHeight + 1);
@@ -639,7 +639,7 @@ public final class TreeView extends View implements TreeViewOptions {
   private int getBigRectPosition(final int rn, final int lv, final int pre,
       final TreeRect r) {
     final int idx = sub.getPreIndex(rn, lv, pre);
-    final double ratio = idx / (double) sub.getLevelSize(rn, lv);
+    final double ratio = idx / (double) sub.levelSize(rn, lv);
     return r.x + (int) Math.round(r.w * ratio) + 1;
   }
 
@@ -692,8 +692,8 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(lv == -1) return;
 
-    final boolean br = tr.isBigRectangle(sub, rn, lv);
-    final boolean isRoot = roots[rn] == pre;
+    final boolean br = tr.bigRect(sub, rn, lv);
+    final boolean root = roots[rn] == pre;
     final int height = sub.getSubtreeHeight(rn);
 
     final Data d = gui.context.data;
@@ -715,7 +715,7 @@ public final class TreeView extends View implements TreeViewOptions {
         lv, r, px, rc);
 
     // if there are ancestors draw them
-    if(!isRoot) {
+    if(!root) {
       final int par = d.parent(pre, k);
       final int lvp = lv - 1;
       final TreeRect parRect = tr.searchRect(sub, rn, lvp, par);
@@ -729,7 +729,7 @@ public final class TreeView extends View implements TreeViewOptions {
         g, rn, lv, r, pre, rc, t);
 
     // draws node text
-    if(t == DRAW_HIGHLIGHT) drawThumbnails(g, rn, lv, pre, r, isRoot);
+    if(t == DRAW_HIGHLIGHT) drawThumbnails(g, rn, lv, pre, r, root);
   }
 
   /**
@@ -739,10 +739,10 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param lv level
    * @param pre pre
    * @param r rect
-   * @param isRoot is root node?
+   * @param root root flag
    */
   private void drawThumbnails(final Graphics g, final int rn, final int lv,
-      final int pre, final TreeRect r, final boolean isRoot) {
+      final int pre, final TreeRect r, final boolean root) {
     final int x = r.x;
     final int y = getYperLevel(lv);
     final int h = nodeHeight;
@@ -751,7 +751,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     g.setColor(COLORS[8]);
 
-    if(isRoot) {
+    if(root) {
       g.fillRect(x, y + h, w + 2, fontHeight + 2);
       g.setColor(COLORS[6]);
       g.drawRect(x - 1, y + h + 1, w + 3, fontHeight + 1);
@@ -781,7 +781,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final byte t) {
 
     final Data d = gui.context.current.data;
-    final boolean br = tr.isBigRectangle(sub, rn, lv);
+    final boolean br = tr.bigRect(sub, rn, lv);
 
     if(!br && t != DRAW_CONN) drawRectangle(g, rn, lv, r, pre, t);
 
@@ -789,7 +789,7 @@ public final class TreeView extends View implements TreeViewOptions {
     final TreeBorder[] sbo = sub.subtree(d, pre);
 
     if(sub.getSubtreeHeight(rn) >= lvd && sbo.length >= 2) {
-      final boolean brd = tr.isBigRectangle(sub, rn, lvd);
+      final boolean brd = tr.bigRect(sub, rn, lvd);
 
       if(brd) {
         drawBigRectDescendants(g, rn, lvd, sbo, px, t);
@@ -842,7 +842,7 @@ public final class TreeView extends View implements TreeViewOptions {
     int cen = parc;
     int i;
 
-    for(i = 1; i < subt.length && tr.isBigRectangle(sub, rn, lvv); ++i) {
+    for(i = 1; i < subt.length && tr.bigRect(sub, rn, lvv); ++i) {
       final TreeBorder bos = sub.getTreeBorder(rn, lvv);
       final TreeBorder bo = subt[i];
 
@@ -874,7 +874,7 @@ public final class TreeView extends View implements TreeViewOptions {
       }
 
       if(lvv + 1 < sub.getSubtreeHeight(rn)
-          && !tr.isBigRectangle(sub, rn, lvv + 1)) {
+          && !tr.bigRect(sub, rn, lvv + 1)) {
         final Data d = gui.context.current.data;
         for(int j = start; j < start + bo.size; ++j) {
           final int pre = sub.getPrePerIndex(rn, lvv, j);
@@ -990,7 +990,7 @@ public final class TreeView extends View implements TreeViewOptions {
       for(int r = 0; r < roots.length; ++r) {
         for(int i = 0; i < sub.getSubtreeHeight(r); ++i) {
 
-          if(tr.isBigRectangle(sub, r, i)) {
+          if(tr.bigRect(sub, r, i)) {
             final int index = sub.getPreIndex(r, i, fpre);
 
             if(index > -1) {
@@ -1033,7 +1033,7 @@ public final class TreeView extends View implements TreeViewOptions {
           int pre = -1;
 
           // if multiple pre values, then approximate pre value
-          if(tr.isBigRectangle(sub, rn, lv)) {
+          if(tr.bigRect(sub, rn, lv)) {
             pre = tr.getPrePerXPos(sub, rn, lv, mx);
           } else {
             pre = sub.getPrePerIndex(rn, lv, i);
@@ -1147,7 +1147,7 @@ public final class TreeView extends View implements TreeViewOptions {
   private int getHitBigRectNodesNum(final int rn, final int lv,
       final TreeRect r) {
     final int w = r.w;
-    final int ls = sub.getLevelSize(rn, lv);
+    final int ls = sub.levelSize(rn, lv);
     return Math.max(ls / Math.max(w, 1), 1);
   }
 
@@ -1199,11 +1199,11 @@ public final class TreeView extends View implements TreeViewOptions {
     if(left) {
       if(flv >= sub.getSubtreeHeight(frn)) return;
 
-      if(tr.isBigRectangle(sub, frn, flv)) {
+      if(tr.bigRect(sub, frn, flv)) {
         final Nodes ns = new Nodes(gui.context.data);
         int sum = getHitBigRectNodesNum(frn, flv, frect);
         final int fix = sub.getPreIndex(frn, flv, fpre);
-        if(fix + sum + 1 == sub.getLevelSize(frn, flv)) ++sum;
+        if(fix + sum + 1 == sub.levelSize(frn, flv)) ++sum;
         final int[] m = new int[sum];
         for(int i = 0; i < sum; ++i) {
           final int pre = sub.getPrePerIndex(frn, flv, i + fix);
@@ -1220,7 +1220,7 @@ public final class TreeView extends View implements TreeViewOptions {
         refreshContext(false, false);
       }
     } else {
-      if(!isMarked(mousePosX, mousePosY)) {
+      if(!marked(mousePosX, mousePosY)) {
         gui.notify.mark(0, null);
       }
     }

@@ -55,7 +55,7 @@ final class MapDefault extends MapPainter {
       g.setColor(mark ? col : COLORS[lvl]);
 
       if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 ||
-          ViewData.isLeaf(prop, data, pre)) {
+          ViewData.leaf(prop, data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);
       } else {
         // painting only border for non-leaf nodes..

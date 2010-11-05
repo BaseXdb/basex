@@ -73,18 +73,17 @@ final class MapFS extends MapPainter {
       // level 1: next context node, set marker pointer to 0
       final int lvl = r.level;
 
-      final boolean isImage = GUIFS.get().mime(fs.name(r.pre)) ==
-        GUIFS.Type.IMAGE;
+      final boolean img = GUIFS.get().mime(fs.name(r.pre)) == GUIFS.Type.IMAGE;
       final boolean full = r.w == ww && r.h == hh;
       Color col = color(rects, ri);
       final boolean mark = col != null;
 
-      if(full && isImage) col = Color.black;
+      if(full && img) col = Color.black;
       else if(full || col == null) col = COLORS[lvl];
       g.setColor(col);
 
       if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 ||
-          ViewData.isLeaf(prop, data, pre)) {
+          ViewData.leaf(prop, data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);
       } else {
         // painting only border for non-leaf nodes..
@@ -155,8 +154,8 @@ final class MapFS extends MapPainter {
           ViewData.path(data, pre) : ViewData.tag(prop, data, pre);
 
     // image display
-    final boolean isImage = gfs.mime(name) == GUIFS.Type.IMAGE;
-    if(isImage) {
+    final boolean img = gfs.mime(name) == GUIFS.Type.IMAGE;
+    if(img) {
       final Image image = images.get(pre);
       if(image != null) {
         final int ww = rect.w - (PICOFFSET << 1);
@@ -174,7 +173,7 @@ final class MapFS extends MapPainter {
       }
     }
 
-    final boolean full = !isImage && rect.w >= prop.num(GUIProp.FONTSIZE) * 12
+    final boolean full = !img && rect.w >= prop.num(GUIProp.FONTSIZE) * 12
       && rect.h >= prop.num(GUIProp.FONTSIZE) * 8 || rect.w == view.getWidth()
       && rect.h == view.getHeight();
 

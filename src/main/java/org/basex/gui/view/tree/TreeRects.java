@@ -76,7 +76,7 @@ final class TreeRects implements TreeViewOptions {
 
     for(int lv = 0; lv < h; ++lv) {
 
-      w = dw / sub.getLevelSize(rn, lv);
+      w = dw / sub.levelSize(rn, lv);
 
       if(w < 2) {
         bigRectangle(rn, lv, ds, dw);
@@ -116,7 +116,7 @@ final class TreeRects implements TreeViewOptions {
       final Graphics g, final int rn, final int lv, final int ds,
       final double w, final boolean slim) {
 
-    final int subSi = sub.getLevelSize(rn, lv);
+    final int subSi = sub.levelSize(rn, lv);
     // new array, to be filled with the rectangles of the current level
     rects[rn][lv] = new TreeRect[subSi];
 
@@ -196,8 +196,8 @@ final class TreeRects implements TreeViewOptions {
    * @param lv level
    * @return boolean
    */
-  boolean isBigRectangle(final TreeSubtree sub, final int rn, final int lv) {
-    return !(sub.getLevelSize(rn, lv) == rects[rn][lv].length);
+  boolean bigRect(final TreeSubtree sub, final int rn, final int lv) {
+    return !(sub.levelSize(rn, lv) == rects[rn][lv].length);
   }
 
   /**
@@ -212,7 +212,7 @@ final class TreeRects implements TreeViewOptions {
       final int x) {
     final TreeRect r = getTreeRectsPerLevel(rn, lv)[0];
     final double ratio = (x - r.x) / (double) r.w;
-    final int idx = (int) (ratio * sub.getLevelSize(rn, lv));
+    final int idx = (int) (ratio * sub.levelSize(rn, lv));
     return sub.getPrePerIndex(rn, lv, idx);
   }
 
@@ -228,7 +228,7 @@ final class TreeRects implements TreeViewOptions {
       final int pre) {
 
     final int i = sub.searchPreArrayPos(rn, lv, pre);
-    return i < 0 ? null : isBigRectangle(sub, rn, lv) ? rects[rn][lv][0]
+    return i < 0 ? null : bigRect(sub, rn, lv) ? rects[rn][lv][0]
         : rects[rn][lv][i];
   }
 

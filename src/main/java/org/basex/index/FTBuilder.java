@@ -27,8 +27,8 @@ import org.basex.util.Util;
 public abstract class FTBuilder extends IndexBuilder {
   /** Word parser. */
   protected final FTLexer wp;
-  /** Lexer position. */
-  protected int lexerPos;
+  /** Current lexer position. */
+  protected int pos;
   /** Scoring mode; see {@link Prop#SCORING}. */
   protected final int scm;
   /** Number of indexed tokens. */
@@ -104,10 +104,10 @@ public abstract class FTBuilder extends IndexBuilder {
       if(scm == 2) unit.add(pre);
 
       final FTLexer lex = new FTLexer(data.text(pre, true), wp);
-      lexerPos = -1;
+      pos = -1;
       while(lex.hasNext()) {
         final byte[] tok = lex.next().txt;
-        lexerPos++;
+        ++pos;
         // skip too long and stopword tokens
         if(tok.length <= MAXLEN && (sw.size() == 0 || sw.id(tok) == 0)) {
           // check if main-memory is exhausted

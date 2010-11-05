@@ -28,7 +28,7 @@ public final class ViewData {
    * @param pre pre value
    * @return result of comparison
    */
-  public static boolean isLeaf(final GUIProp prop, final Data d,
+  public static boolean leaf(final GUIProp prop, final Data d,
       final int pre) {
     final int kind = d.kind(pre);
     if(kind == Data.ATTR) return true;

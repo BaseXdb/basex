@@ -30,7 +30,6 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
@@ -313,16 +312,6 @@ public final class QueryContext extends Progress {
       ir.add(i);
     }
     return ir;
-  }
-
-  /**
-   * Determines if the given node has been constructed via a transform
-   * expression.
-   * @param nod node to be checked
-   * @return true, if part of copied nodes
-   */
-  public boolean isCopiedNod(final Nod nod) {
-    return nod instanceof DBNode && copiedNods.contains(((DBNode) nod).data);
   }
 
   /**

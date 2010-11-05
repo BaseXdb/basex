@@ -26,8 +26,8 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
   double thumbf;
   /** Width of a space between two thumbnails. */
   double thumbsw;
-  /** Is Leaf in Treemap? */
-  boolean isLeaf;
+  /** Leaf node flag. */
+  boolean leaf;
 
   /**
    * Simple rectangle constructor.
@@ -80,7 +80,7 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
     rect.thumblh = thumblh;
     rect.thumbf = thumbf;
     rect.thumbsw = thumbsw;
-    rect.isLeaf = isLeaf;
+    rect.leaf = leaf;
     return rect;
   }
 

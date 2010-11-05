@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.NCN;
 import org.basex.query.item.Nod;
@@ -81,8 +82,7 @@ final class FNQName extends Fun {
         // [LK] find out if inherit flag has a persistent effect - if positive,
         // we're screwed. test case added to unresolved namespace tests.
         final Nod nod = (Nod) checkType(it2, Type.ELM);
-        final Atts at = nod.nsScope(ctx.isCopiedNod(nod) ?
-            ctx.nsInherit : true);
+        final Atts at = nod.nsScope(copiedNod(nod, ctx) ? ctx.nsInherit : true);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:
@@ -95,6 +95,18 @@ final class FNQName extends Fun {
       default:
         return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Determines if the given node has been constructed via a transform
+   * expression.
+   * @param nod node to be checked
+   * @param ctx query context
+   * @return true, if part of copied nodes
+   */
+  public boolean copiedNod(final Nod nod, final QueryContext ctx) {
+    return nod instanceof DBNode &&
+      ctx.copiedNods.contains(((DBNode) nod).data);
   }
 
   /**

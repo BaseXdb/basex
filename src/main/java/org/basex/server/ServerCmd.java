@@ -15,6 +15,8 @@ public enum ServerCmd {
   INIT(4),
   /** Code for returning next query result: {id}0. */
   NEXT(1),
+  /** Code for executing the complete query: {id}0. */
+  EXEC(5),
   /** Code for closing the iterator: {id}0. */
   CLOSE(2),
   /** Code for creating a database: {name}0{input}0. */

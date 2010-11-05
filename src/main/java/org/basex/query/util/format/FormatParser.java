@@ -95,7 +95,6 @@ public final class FormatParser {
 
     // find remaining modifier
     if(s < l) {
-      System.out.println(s + "/" + l + ": " + in);
       if(cp(in, s) == ',') {
         pm += in.substring(s);
       } else {

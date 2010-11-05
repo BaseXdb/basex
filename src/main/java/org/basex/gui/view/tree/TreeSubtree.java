@@ -91,7 +91,7 @@ final class TreeSubtree {
    * @param lv level
    * @return size
    */
-  int getLevelSize(final int rn, final int lv) {
+  int levelSize(final int rn, final int lv) {
     return getTreeBorder(rn, lv).size;
   }
 
