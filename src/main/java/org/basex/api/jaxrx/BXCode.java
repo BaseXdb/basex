@@ -126,7 +126,7 @@ abstract class BXCode {
    * @return string with serialization parameters
    */
   final String params(final ResourcePath path) {
-    String ser = path.getValue(QueryParameter.OUTPUT).replaceAll("\1", ",");
+    String ser = path.getValue(QueryParameter.OUTPUT);
     if(ser == null) ser = "";
 
     final String wrap = path.getValue(QueryParameter.WRAP);
@@ -136,8 +136,8 @@ abstract class BXCode {
              "," + SerializerProp.S_WRAP_URI[0] + "=" + URL;
     } else if(!wrap.equals(DataText.NO)) {
       throw new JaxRxException(400, SerializerProp.error(
-          QueryParameter.WRAP.toString(), DataText.YES, DataText.NO));
+          QueryParameter.WRAP.toString(), wrap, DataText.YES, DataText.NO));
     }
-    return ser;
+    return ser.replaceAll("^,", "");
   }
 }

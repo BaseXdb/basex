@@ -261,8 +261,9 @@ public final class BXJaxRx implements JaxRx {
     return new BXCode() {
       @Override
       String code() {
+        final boolean root = rp.getDepth() == 1;
         try {
-          if(rp.getDepth() == 1) {
+          if(root) {
             cs.execute(new DropDB(db(rp)));
           } else {
             cs.execute(new Open(db(rp)));
@@ -271,6 +272,7 @@ public final class BXJaxRx implements JaxRx {
           return cs.info();
         } catch(final BaseXException ex) {
           // return exception if process failed
+          if(root) throw new JaxRxException(ex);
           throw new JaxRxException(404, ex.getMessage());
         }
       }
