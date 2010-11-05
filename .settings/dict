@@ -237,3 +237,4 @@ stemmer
 snowball
 tokenized
 multithreading
+curr

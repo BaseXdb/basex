@@ -1,7 +1,6 @@
 package org.basex.query.util.format;
 
 import java.util.HashMap;
-
 import org.basex.util.Util;
 
 /**

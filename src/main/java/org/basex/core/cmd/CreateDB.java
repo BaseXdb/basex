@@ -105,16 +105,31 @@ public class CreateDB extends ACreate {
   public static synchronized String xml(final String name,
       final InputStream input, final Context ctx) throws BaseXException {
 
+    final BufferedInputStream is = new BufferedInputStream(input);
+    final SAXSource sax = new SAXSource(new InputSource(is));
+    final SAXWrapper sw = new SAXWrapper(sax, ctx.prop);
+    return xml(name, sw, ctx);
+  }
+
+  /**
+   * Creates a database for the specified file.
+   * @param name name of the database
+   * @param parser parser
+   * @param ctx database context
+   * @return info string
+   * @throws BaseXException database exception
+   */
+  public static synchronized String xml(final String name,
+      final Parser parser, final Context ctx) throws BaseXException {
+
     if(!ctx.user.perm(User.CREATE))
       throw new BaseXException(PERMNO, CmdPerm.CREATE);
 
     BaseXException bxex = null;
     final Performance p = new Performance();
-    final BufferedInputStream is = new BufferedInputStream(input);
-    final SAXSource sax = new SAXSource(new InputSource(is));
     ctx.lock.before(true);
     try {
-      ctx.openDB(xml(new SAXWrapper(sax, ctx.prop), name, ctx));
+      ctx.openDB(xml(parser, name, ctx));
     } catch(final IOException ex) {
       bxex = new BaseXException(ex);
     }

@@ -38,7 +38,7 @@ public enum Err {
   /** BASX0008: No nodes as result. */
   EXPSINGLE(BASX, 9, "Database contains more than one document."),
   /** BASX0009: No nodes as result. */
-  SENTLISTPARSE(BASX, 9, "% could not be parsed: %."),
+  SENTLISTPARSE(BASX, 10, "% could not be parsed: %."),
   /** BASX0099: Undefined error. */
   UNDEF(BASX, 99, "%."),
 
@@ -534,7 +534,7 @@ public enum Err {
 
   /** XTDE0030: Parsing exception. */
   WRONGINT(XTDE, 30, "Wrong integer format: \"%\"."),
-  
+
   /** XUDY0009: XQuery Update dynamic exception. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),
   /** XUDY0014: XQuery Update dynamic exception. */

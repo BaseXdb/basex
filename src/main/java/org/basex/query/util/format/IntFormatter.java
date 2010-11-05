@@ -1,7 +1,6 @@
 package org.basex.query.util.format;
 
 import static org.basex.util.Token.*;
-
 import org.basex.query.util.format.FormatParser.Case;
 import org.basex.util.TokenBuilder;
 
@@ -135,7 +134,7 @@ public final class IntFormatter {
       final char ch = pres.charAt(i);
       if(ch >= start && ch <= start + 9) ++d;
     }
-    
+
     // create string representation and build string
     final String s = Long.toString(n);
     final StringBuilder tmp = new StringBuilder();

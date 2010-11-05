@@ -478,7 +478,7 @@ public final class QueryContext extends Progress {
 
     // add node to global array
     final DBNode node = new DBNode(data, 0, Data.DOC);
-    if(!data.single() && !col) EXPSINGLE.thrw(ii); 
+    if(!data.single() && !col) EXPSINGLE.thrw(ii);
     addDoc(node);
     return node;
   }

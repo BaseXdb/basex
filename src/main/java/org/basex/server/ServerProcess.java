@@ -6,6 +6,7 @@ import static org.basex.server.ServerCmd.*;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
+import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
@@ -201,7 +202,9 @@ public final class ServerProcess extends Thread {
     try {
       final String name = in.readString();
       final WrapInputStream is = new WrapInputStream(in);
-      final String info = CreateDB.xml(name, is, context);
+      final String info = is.curr() == -1 ?
+          CreateDB.xml(name, Parser.emptyParser(name), context) :
+        CreateDB.xml(name, is, context);
       // send {MSG}0 and 0 as success flag
       out.writeString(info);
       out.write(0);

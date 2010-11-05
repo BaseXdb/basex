@@ -148,7 +148,7 @@ final class SnowballStemmer extends Stemmer {
 
   // [DP][JE] the following methods should be available in all Stemmers:
   // ...used at all?
-  
+
   /**
    * Get the stemmer name.
    * @return the stemmer name

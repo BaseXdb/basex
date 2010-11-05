@@ -5,6 +5,10 @@ import java.io.InputStream;
 
 /**
  * This class wraps a {@link BufferInput} reference to a standard input stream.
+ * {@code -1} is returned if the end of the stream is reached.
+ * The method {@link #curr()} can be called to return the current stream
+ * value, which is the first value to be returned, or the most recent value
+ * that has been returned by {@link #read()}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -12,25 +16,33 @@ import java.io.InputStream;
 public class WrapInputStream extends InputStream {
   /** Buffer input. */
   private final BufferInput bi;
-  /** Flag for reading more bytes. */
-  private boolean more = true;
+  /** Current value. */
+  private int curr;
 
   /**
    * Constructor.
    * @param buffer buffer input to be wrapped
+   * @throws IOException I/O exception
    */
-  public WrapInputStream(final BufferInput buffer) {
+  public WrapInputStream(final BufferInput buffer) throws IOException {
     bi = buffer;
+    read();
+  }
+
+  /**
+   * Returns the current value.
+   * @return current value
+   */
+  public int curr() {
+    return curr;
   }
 
   @Override
   public int read() throws IOException {
-    // always return -1 if end of stream was reached
-    if(more) {
-      final int c = bi.read();
-      if(c != 0) return c;
-      more = false;
-    }
-    return -1;
+    final int v = curr;
+    if(v == -1) return -1;
+    curr = bi.read();
+    if(curr == 0) curr = -1;
+    return v;
   }
 }

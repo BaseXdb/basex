@@ -112,19 +112,22 @@ public final class SerializerProp extends AProp {
 
     final String val = get(key);
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw new IOException(error(key[0].toString(), allowed));
+    throw new IOException(error(key[0].toString(), val, allowed));
   }
 
   /**
    * Returns an exception string for a wrong key.
    * @param key property key
+   * @param found found value
    * @param allowed allowed values
    * @return string
    */
-  public static String error(final String key, final String... allowed) {
+  public static String error(final String key, final String found,
+      final String... allowed) {
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt(SERVAL, key, allowed[0]);
     for(int a = 1; a < allowed.length; ++a) tb.addExt(SERVAL2, allowed[a]);
+    tb.addExt(SERVAL3, found);
     return tb.toString();
   }
 }
