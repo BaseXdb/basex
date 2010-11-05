@@ -667,7 +667,7 @@ public abstract class W3CTS {
           def = FunDef.DB;
           src = IO.get(src).dbname();
         }
-        expr = def.newInstance(null, Str.get(src));
+        expr = def.get(null, Str.get(src));
       }
       if(var != null) qp.bind(string(data.atom(var.list[c])), expr);
     }
