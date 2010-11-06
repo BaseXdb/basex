@@ -234,7 +234,7 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public Query(final String query) throws IOException {
-      id = execute(0, query);
+      id = exec(0, query);
     }
 
     /**
@@ -243,7 +243,7 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public String init() throws IOException {
-      return execute(4, id);
+      return exec(4, id);
     }
 
     /**
@@ -263,7 +263,7 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public boolean more() throws IOException {
-      next = execute(1, id);
+      next = exec(1, id);
       return next.length() != 0;
     }
 
@@ -274,6 +274,15 @@ public class BaseXClient {
     public String next() {
       return next;
     }
+    
+    /**
+     * Returns the whole result of the query.
+     * @return result string
+     * @throws IOException I/O Exception
+     */
+    public String execute() throws IOException {
+      return exec(5, id);
+    }
 
     /**
      * Closes the query.
@@ -281,7 +290,7 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public String close() throws IOException {
-      final String s = execute(2, id);
+      final String s = exec(2, id);
       out.flush();
       return s;
     }
@@ -293,7 +302,7 @@ public class BaseXClient {
      * @return resulting string
      * @throws IOException I/O exception
      */
-    private String execute(final int cmd, final String arg)
+    private String exec(final int cmd, final String arg)
         throws IOException {
 
       out.write(cmd);
