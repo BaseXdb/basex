@@ -263,7 +263,6 @@ public final class ServerProcess extends Thread {
         // ID has already been removed
         if(qp == null && sc != CLOSE)
           throw new IOException("Unknown query ID (" + arg + ")");
-
         if(sc == BIND) {
           qp.bind(in.readString(), in.readString(), in.readString());
         } else if(sc == INIT) {
@@ -273,6 +272,8 @@ public final class ServerProcess extends Thread {
         } else if(sc == CLOSE && qp != null) {
           qp.close(false);
           queries.remove(arg);
+        } else if(sc == EXEC) {
+          qp.execute();
         }
         // send 0 as end marker
         out.write(0);
