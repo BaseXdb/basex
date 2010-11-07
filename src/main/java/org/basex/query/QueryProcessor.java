@@ -1,7 +1,7 @@
 package org.basex.query;
 
-import static org.basex.query.QueryTokens.*;
 import static org.basex.core.Text.*;
+import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -66,8 +66,10 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void parse() throws QueryException {
-    if(!parsed) ctx.parse(query);
-    parsed = true;
+    if(!parsed) {
+      ctx.parse(query);
+      parsed = true;
+    }
   }
 
   /**
@@ -76,8 +78,10 @@ public final class QueryProcessor extends Progress {
    */
   public void compile() throws QueryException {
     parse();
-    if(!compiled) ctx.compile();
-    compiled = true;
+    if(!compiled) {
+      ctx.compile();
+      compiled = true;
+    }
   }
 
   /**
