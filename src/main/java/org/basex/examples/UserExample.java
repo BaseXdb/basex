@@ -12,9 +12,6 @@ import org.basex.core.cmd.*;
  * @author BaseX Team
  */
 public class UserExample {
-  /** Default constructor. */
-  protected UserExample() { }
-
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments

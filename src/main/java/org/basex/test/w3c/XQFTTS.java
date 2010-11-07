@@ -5,10 +5,10 @@ import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryProcessor;
-import org.basex.query.ft.StemDir;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
 import org.basex.util.Util;
+import org.basex.util.ft.StemDir;
 import org.basex.util.ft.StopWords;
 
 /**
