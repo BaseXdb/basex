@@ -20,15 +20,15 @@ DESCRIPTION --------------------------------------------------------------------
  database command as argument. The method returns the result or throws
  an exception with the received error message.
 
- Some bindings offer a faster execute() method, which will write the result to
- a specified output stream.
+ To speedup execution, an output stream can be specified by some bindings; this
+ way, all results will be directred to that output stream.
 
- The query() method creates an iterator for the specified query. The resulting
- items will be returned via the more() and next() methods. If an error occurs,
- an exception will be thrown.
+ The query() method creates a query object. Variables can be bound to that
+ object, and the result can either be requested by execute(), or by the
+ more() and next() methods. If an error occurs, an exception will be thrown.
 
- Last but not least, some bindings offer the create() method as an efficient
- solution to create new database instances.
+ Next, some bindings contain the create() and add() method to create new
+ database instances or add documents to existing databases.
 
  Most bindings are accompanied by some example files, demonstrating how
  database commands can be executed and how the query iterator can be used.
@@ -42,9 +42,6 @@ class Session:
 
   // Executes a command and returns the result
   String execute(String command)
-
-  // Executes a command and writes the result to an output stream
-  void execute(String command, OutputStream out)
 
   // Returns a query object for the specified query
   Query query(String query)
@@ -69,42 +66,57 @@ class Query:
   // Initializes the iterator
   String init()
 
-  // Checks for next item of the result and returns boolean
+  // Executes the query
+  String execute()
+
+  // Iterator: checks if a query returns more items
   boolean more()
 
-  // Returns next result item
+  // Returns next item
   String next()
+
+  // Returns query information
+  String info()
 
   // Closes the iterator and query
   String close()
 
 
-STREAM PROTOCOL (BaseX 6.3.1 ff.) ----------------------------------------------
+TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
 
  {...} = string; \n = single byte
  
  Authentication:
  1. Client connects to server socket
  2. Server sends timestamp: {timestamp} \0
- 3. Client sends username and hash: {username} \0 {md5(md5(password) + timestamp)} \0
- 4. Server sends \0 (successful) or \1 (error)
+ 3. Client sends username and hash:
+    {username} \0 {md5(md5(password) + timestamp)} \0
+ 4. Server sends \0 (success) or \1 (error)
 
- Client streams:
- - command:        -> {command} \0
- - iterator: start -> \0 {query} \0
-             bind  -> \3 {id} \0 {variable} \0 {value}\0 {type}\0
-             init  -> \4 {id} \0
-             next  -> \1 {id} \0
-             end   -> \2 {id} \0
+ Client transfer:
+ - command:       -> {command} \0
+ - create:        -> \8 {name} \0 {input} \0
+ - add:           -> \9 {name} \0 {target} \0 {input} \0
+ - query: start   -> \0 {query} \0
+          bind    -> \3 {id} \0 {variable} \0 {value}\0 {type}\0
+          execute -> \5 {id} \0
+          info    -> \6 {id} \0
+          next    -> \1 {id} \0
+          init    -> \4 {id} \0
+          end     -> \2 {id} \0
 
  Server streams:
- - command:  success -> {result} \0 {info} \0 \0
-             error   -> \0 {error} \0 \1
- - iterator: start   -> {id} \0 \0
-             bind    -> \0 \0
-             init    -> {result} \0 \0
-             next    -> {result} \0 \0
-             close   -> {result} \0 \0
-             error   -> \0 \1 {error} \0
+ - command:       -> {result} \0 {info} \0 \0
+ - create:        -> {info} \0 \0
+ - add:           -> {info} \0 \0
+          error   -> \0 {error} \0 \1
+ - query: start   -> {id} \0 \0
+          bind    -> \0 \0
+          execute -> {result} \0 \0
+          init    -> {result} \0 \0
+          next    -> {result} \0 \0
+          info    -> {result} \0 \0
+          close   -> {result} \0 \0
+          error   -> \0 \1 {error} \0
 
 ============================================= DBIS Group, University of Konstanz

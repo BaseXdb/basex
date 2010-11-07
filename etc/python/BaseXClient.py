@@ -1,5 +1,5 @@
 # Language Binding for BaseX.
-# Works with BaseX 6.1.9 and later
+# Works with BaseX 6.3.1 and later
 # Documentation: http://basex.org/api
 #
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -100,19 +100,19 @@ class Query():
   # see readme.txt
   def __init__(self, session, q):
     self.__session = session
-    self.__id = self.execute('\0', q)
+    self.__id = self.exec('\0', q)
   
   # see readme.txt  
   def init(self):
-    return self.execute('\4', self.__id)
+    return self.exec('\4', self.__id)
     
   # see readme.txt  
   def bind(self, name, value):
-    self.execute('\3', self.__id + '\0' + name + '\0' + value + '\0')
+    self.exec('\3', self.__id + '\0' + name + '\0' + value + '\0')
   
   # see readme.txt
   def more(self):
-    self.__next = self.execute('\1', self.__id)  
+    self.__next = self.exec('\1', self.__id)  
     return len(self.__next) != 0  
     
   # see readme.txt
@@ -120,11 +120,19 @@ class Query():
     return self.__next
   
   # see readme.txt  
-  def close(self):
-    return self.execute('\2', self.__id)
+  def execute(self):
+    return self.exec('\5', self.__id)
   
   # see readme.txt  
-  def execute(self, cmd, arg):
+  def info(self):
+    return self.exec('\6', self.__id)
+  
+  # see readme.txt  
+  def close(self):
+    return self.exec('\2', self.__id)
+  
+  # see readme.txt  
+  def exec(self, cmd, arg):
     self.__session.send(cmd + arg)
     s = self.__session.receive()
     if not self.__session.ok():

@@ -1,5 +1,5 @@
 ﻿' Language Binding for BaseX.
-' Works with BaseX 6.1.9 and later
+' Works with BaseX 6.3.1 and later
 ' Documentation: http://basex.org/api
 '
 ' (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -161,38 +161,48 @@ End Class
     ' see readme.txt
     Public Sub New(s As Session, query As String)
       session = s
-      id = Execute(0, query)
+      id = Exec(0, query)
     End Sub
     
     ' see readme.txt
     Public Function Init() As String
-      Return Execute(4, id)
+      Return Exec(4, id)
     End Function
       
     ' see readme.txt
     Public Sub Bind(name As String, value As String)
-      Execute(3, id)
+      Exec(3, id)
     End Sub
 
     ' see readme.txt 
     Public Function More() As Boolean
-      nextItem = Execute(1, id)
+      nextItem = Exec(1, id)
       Return nextItem.Length <> 0
     End Function
 
     ' see readme.txt
-    Public Function Nexty() As String
+    Public Function Next() As String
       Return nextItem
     End Function
 
     ' see readme.txt 
+    Public Function Execute() As String
+      Return Exec(5, id)
+    End Function
+
+    ' see readme.txt 
+    Public Function Info() As String
+      Return Exec(6, id)
+    End Function
+
+    ' see readme.txt 
     Public Function Close() As String
-      Return Execute(2, id)
+      Return Exec(2, id)
     End Function
     
     
     ' see readme.txt
-    Public Function Execute(cmd As Integer, arg As String) As String
+    Public Function Exec(cmd As Integer, arg As String) As String
       session.stream.WriteByte(cmd)
       session.send(arg)
       Dim Res As String = session.Receive()

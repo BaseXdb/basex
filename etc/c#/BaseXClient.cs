@@ -175,25 +175,25 @@ namespace BaseXClient
     public Query(Session s, string query)
     {
       session = s;
-      id = Execute(0, query);
+      id = Exec(0, query);
     }
 
     /** see readme.txt */
     public string Init()
     {
-      return Execute(4, id);
+      return Exec(4, id);
     }
 
     /** see readme.txt */
     public void Bind(string name, string value)
     {
-      Execute(3, id + '\0' + name + '\0' + value + '\0');
+      Exec(3, id + '\0' + name + '\0' + value + '\0');
     }
 
     /** see readme.txt */
     public bool More()
     {
-      next = Execute(1, id);
+      next = Exec(1, id);
       return next.Length != 0;
     }
 
@@ -204,13 +204,25 @@ namespace BaseXClient
     }
 
     /** see readme.txt */
-    public string Close()
+    public string Execute()
     {
-      return Execute(2, id);
+      return Exec(5, id);
     }
 
     /** see readme.txt */
-    private string Execute(byte cmd, string arg)
+    public string Info()
+    {
+      return Exec(6, id);
+    }
+
+    /** see readme.txt */
+    public string Close()
+    {
+      return Exec(2, id);
+    }
+
+    /** see readme.txt */
+    private string Exec(byte cmd, string arg)
     {
       session.stream.WriteByte(cmd);
       session.Send(arg);

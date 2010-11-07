@@ -1,7 +1,7 @@
 <?php
 /*
  * Language Binding for BaseX.
- * Works with BaseX 6.1.9 and later
+ * Works with BaseX 6.3.1 and later
  * Documentation: http://basex.org/api
  * 
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -135,7 +135,12 @@ class Query {
   
   /* see readme.txt */
   public function execute() {
-  	return $this->exec("\5", $this->id);
+    return $this->exec("\5", $this->id);
+  }
+  
+  /* see readme.txt */
+  public function execute() {
+    return $this->exec("\6", $this->id);
   }
   
   /* see readme.txt */

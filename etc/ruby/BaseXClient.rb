@@ -1,5 +1,5 @@
 # Language Binding for BaseX.
-# Works with BaseX 6.1.9 and later
+# Works with BaseX 6.3.1 and later
 # Documentation: http://basex.org/api
 #
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -112,6 +112,16 @@ class Query
   # see readme.txt
   def next()
     return @next
+  end
+  
+  # see readme.txt
+  def execute()
+    return execute("\5", @id)
+  end
+  
+  # see readme.txt
+  def info()
+    return execute("\6", @id)
   end
   
   # see readme.txt

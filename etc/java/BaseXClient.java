@@ -222,7 +222,7 @@ public class BaseXClient {
   /**
    * Inner class for iterative query execution.
    */
-  class Query {
+  public class Query {
     /** Query id. */
     private final String id;
     /** Next result item. */
@@ -238,8 +238,8 @@ public class BaseXClient {
     }
 
     /**
-     * Checks for the next item.
-     * @return item string
+     * Initializes the query.
+     * @return result header
      * @throws IOException I/O exception
      */
     public String init() throws IOException {
@@ -254,7 +254,7 @@ public class BaseXClient {
      */
     public void bind(final String name, final String value)
         throws IOException {
-      execute(3, id + '\0' + name + '\0' + value + '\0');
+      exec(3, id + '\0' + name + '\0' + value + '\0');
     }
 
     /**
@@ -277,7 +277,7 @@ public class BaseXClient {
     
     /**
      * Returns the whole result of the query.
-     * @return result string
+     * @return query result
      * @throws IOException I/O Exception
      */
     public String execute() throws IOException {
@@ -285,8 +285,17 @@ public class BaseXClient {
     }
 
     /**
+     * Returns the query info.
+     * @return query info
+     * @throws IOException I/O exception
+     */
+    public String info() throws IOException {
+      return exec(6, id);
+    }
+
+    /**
      * Closes the query.
-     * @return item string
+     * @return result footer
      * @throws IOException I/O exception
      */
     public String close() throws IOException {

@@ -115,25 +115,25 @@ sub new {
   $session = shift;
   my $cmd = shift;
   my $self = bless({}, $class);
-  $id = execute("\0", $cmd);
+  $id = exec("\0", $cmd);
   return $self;
 }
 
 # see readme.txt
 sub init {
-  return execute("\4", $id);
+  return exec("\4", $id);
 }
 
 # see readme.txt
 sub bind {
   my $name = shift;
   my $value = shift;
-  execute("\3", "$id\0$name\0$value\0");
+  exec("\3", "$id\0$name\0$value\0");
 }
 
 # see readme.txt
 sub more {
-  $next = execute("\1", $id);
+  $next = exec("\1", $id);
   return $next;
 }
 
@@ -143,12 +143,22 @@ sub next {
 }
 
 # see readme.txt
-sub close {
-  return execute("\2", $id);
+sub execute {
+  return exec("\5", $id);
 }
 
 # see readme.txt
-sub execute {
+sub info {
+  return exec("\6", $id);
+}
+
+# see readme.txt
+sub close {
+  return exec("\2", $id);
+}
+
+# see readme.txt
+sub exec {
   my $cmd = shift;
   my $arg = shift;
   $session->send("$cmd$arg");
