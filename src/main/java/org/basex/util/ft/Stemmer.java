@@ -1,9 +1,7 @@
 package org.basex.util.ft;
 
-import java.util.Iterator;
-import org.basex.core.Prop;
-import org.basex.query.ft.FTOpt;
-import org.basex.util.Util;
+import java.util.Collections;
+import java.util.LinkedList;
 
 /**
  * Implementation of common stemmer methods.
@@ -11,7 +9,25 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Dimitar Popov
  */
-abstract class Stemmer extends SpanProcessor {
+public abstract class Stemmer extends LanguageImpl {
+  /** List of available stemmers. */
+  public static final LinkedList<Stemmer> IMPL;
+
+  /** Load stemmers and order them by precedence. */
+  static {
+    IMPL = new LinkedList<Stemmer>();
+    // Built-in stemmers
+    IMPL.add(new EnglishStemmer());
+    IMPL.add(new GermanStemmer());
+
+    if(SnowballStemmer.available()) IMPL.add(new SnowballStemmer());
+    if(LuceneStemmer.available()) IMPL.add(new LuceneStemmer());
+    if(WordnetStemmer.available()) IMPL.add(WordnetStemmer.get());
+
+    // sort stemmers and tokenizers by precedence
+    Collections.sort(IMPL);
+  }
+
   /**
    * Stem a word.
    * @param word input word to stem
@@ -19,54 +35,41 @@ abstract class Stemmer extends SpanProcessor {
    */
   abstract byte[] stem(final byte[] word);
 
-  @Override
-  abstract SpanProcessor get(final Prop p, final FTOpt f);
+  /**
+   * Factory method.
+   * @param l language
+   * @return span processor
+   */
+  abstract Stemmer get(final Language l);
 
-  @Override
-  Iterator<Span> process(final Iterator<Span> iterator) {
-    return new Iterator<Span>() {
+  /**
+   * Returns an iterator, wrapping the specified iterator.
+   * @param iter input iterator
+   * @return output iterator
+   */
+  final FTIterator iter(final FTIterator iter) {
+    return new FTIterator() {
+      @Override
+      public void init(final byte[] txt) {
+        iter.init(txt);
+      }
+
       @Override
       public boolean hasNext() {
-        return iterator.hasNext();
+        return iter.hasNext();
       }
 
       @Override
       public Span next() {
-        final Span s = iterator.next();
-        s.txt = stem(s.txt);
+        final Span s = iter.next();
+        s.text = stem(s.text);
         return s;
       };
 
       @Override
-      public void remove() {
-        Util.notimplemented();
-      }
+      public byte[] nextToken() {
+        return stem(iter.nextToken());
+      };
     };
-  }
-
-  @Override
-  SPType type() {
-    return SPType.stemmer;
-  }
-
-  /**
-   * Decide what language is required from {@link Prop} and {@link FTOpt}.
-   * @param p {@link Prop}
-   * @param f {@link FTOpt}
-   * @return language
-   */
-  protected static Language getLanguage(final Prop p, final FTOpt f) {
-    try {
-      if(f != null && f.ln != null) {
-        return Language.valueOf(f.ln);
-      } else if(p != null && p.get(Prop.FTLANGUAGE).length() > 0) {
-        return Language.valueOf(p.get(Prop.FTLANGUAGE).toUpperCase());
-      } else {
-        return Language.DEFAULT;
-      }
-    } catch(final IllegalArgumentException e) {
-      // [DP][JE] invalid language supplied!
-      return null;
-    }
   }
 }

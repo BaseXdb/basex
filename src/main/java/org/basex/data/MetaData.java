@@ -12,6 +12,7 @@ import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.util.Util;
+import org.basex.util.ft.Language;
 
 /**
  * This class provides meta information on a database.
@@ -61,12 +62,12 @@ public final class MetaData {
   public boolean casesens;
   /** Flag for full-text diacritics removal. */
   public boolean diacritics;
-  /** Language for full-text search index. */
-  public String language;
+  /** Language of full-text search index. */
+  public Language language;
   /** Maximal indexed full-text score. */
-  public int ftscmax;
+  public int maxscore;
   /** Minimal indexed full-text score. */
-  public int ftscmin;
+  public int minscore;
   /** Scoring mode: see {@link Prop#SCORING}. */
   public int scoring;
 
@@ -103,9 +104,9 @@ public final class MetaData {
     wildcards = prop.is(Prop.WILDCARDS);
     stemming = prop.is(Prop.STEMMING);
     diacritics = prop.is(Prop.DIACRITICS);
-    language = prop.get(Prop.FTLANGUAGE);
     casesens = prop.is(Prop.CASESENS);
     scoring = prop.num(Prop.SCORING);
+    language = Language.get(prop.get(Prop.LANGUAGE));
     users = new Users(false);
   }
 
@@ -224,9 +225,9 @@ public final class MetaData {
       else if(k.equals(DBFTST))   stemming   = toBool(v);
       else if(k.equals(DBFTCS))   casesens   = toBool(v);
       else if(k.equals(DBFTDC))   diacritics = toBool(v);
-      else if(k.equals(DBFTLN))   language   = v;
-      else if(k.equals(DBSCMAX))  ftscmax    = toInt(v);
-      else if(k.equals(DBSCMIN))  ftscmin    = toInt(v);
+      else if(k.equals(DBFTLN))   language   = Language.get(v);
+      else if(k.equals(DBSCMAX))  maxscore   = toInt(v);
+      else if(k.equals(DBSCMIN))  minscore   = toInt(v);
       else if(k.equals(DBSCTYPE)) scoring    = toInt(v);
       else if(k.equals(DBTIME))   time       = toLong(v);
       else if(k.equals(DBUTD))    uptodate   = toBool(v);
@@ -274,9 +275,9 @@ public final class MetaData {
     writeInfo(out, DBFTST,   stemming);
     writeInfo(out, DBFTCS,   casesens);
     writeInfo(out, DBFTDC,   diacritics);
-    writeInfo(out, DBFTLN,   language);
-    writeInfo(out, DBSCMAX,  ftscmax);
-    writeInfo(out, DBSCMIN,  ftscmin);
+    if(language != null) writeInfo(out, DBFTLN, language.name());
+    writeInfo(out, DBSCMAX,  maxscore);
+    writeInfo(out, DBSCMIN,  minscore);
     writeInfo(out, DBSCTYPE, scoring);
     writeInfo(out, DBTIME,   time);
     writeInfo(out, DBUTD,    uptodate);

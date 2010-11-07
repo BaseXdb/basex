@@ -26,7 +26,7 @@ import org.basex.util.Util;
  */
 public abstract class FTBuilder extends IndexBuilder {
   /** Word parser. */
-  protected final FTLexer wp;
+  protected final FTLexer lex;
   /** Current lexer position. */
   protected int pos;
   /** Scoring mode; see {@link Prop#SCORING}. */
@@ -76,7 +76,7 @@ public abstract class FTBuilder extends IndexBuilder {
     super(d);
     final Prop prop = d.meta.prop;
     scm = d.meta.scoring;
-    wp = new FTLexer(EMPTY, prop);
+    lex = new FTLexer(prop);
     max = -1;
     min = Integer.MAX_VALUE;
     sw = new StopWords(d, prop.get(Prop.STOPWORDS));
@@ -103,10 +103,10 @@ public abstract class FTBuilder extends IndexBuilder {
       }
       if(scm == 2) unit.add(pre);
 
-      final FTLexer lex = new FTLexer(data.text(pre, true), wp);
       pos = -1;
+      lex.init(data.text(pre, true));
       while(lex.hasNext()) {
-        final byte[] tok = lex.next().txt;
+        final byte[] tok = lex.nextToken();
         ++pos;
         // skip too long and stopword tokens
         if(tok.length <= MAXLEN && (sw.size() == 0 || sw.id(tok) == 0)) {
@@ -135,8 +135,8 @@ public abstract class FTBuilder extends IndexBuilder {
 
     // set meta data
     if(scm > 0) {
-      data.meta.ftscmax = max;
-      data.meta.ftscmin = min;
+      data.meta.maxscore = max;
+      data.meta.minscore = min;
     }
     data.meta.ftxindex = true;
     data.meta.dirty = true;

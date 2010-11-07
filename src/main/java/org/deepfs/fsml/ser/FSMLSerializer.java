@@ -4,10 +4,10 @@ import static org.deepfs.fs.DeepFS.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import org.basex.util.Atts;
+import org.basex.util.StringList;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.MetaElem;
@@ -210,9 +210,9 @@ public final class FSMLSerializer {
       }
 
       // serialize metadata
-      final TreeMap<MetaElem, ArrayList<String>> meta = d.getMeta();
+      final TreeMap<MetaElem, StringList> meta = d.getMeta();
       if(meta != null) {
-        for(final Entry<MetaElem, ArrayList<String>> e : meta.entrySet())
+        for(final Entry<MetaElem, StringList> e : meta.entrySet())
           for(final String val : e.getValue())
             nodeAndText(e.getKey().get(), null, val);
       }

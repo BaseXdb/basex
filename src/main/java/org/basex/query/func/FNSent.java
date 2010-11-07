@@ -1,9 +1,9 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.FTOptions.*;
+import static org.basex.util.ft.FTFlag.*;
 import java.util.HashMap;
-import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -61,21 +61,25 @@ public final class FNSent extends Fun {
     final String uri = string(checkStr(expr[1], ctx));
     SentList list = LISTS.get(uri);
     if(list == null) {
-      list = new SentList(input, uri, ctx.context.prop);
-      LISTS.put(uri, list);
+      try {
+        list = new SentList(uri, ctx.context.prop);
+        LISTS.put(uri, list);
+      } catch(final Exception ex) {
+        SENTLISTPARSE.thrw(input, uri, ex);
+      }
     }
 
     double pos = 0, neg = 0;
     byte[] token1 = EMPTY, token2 = EMPTY, token3 = EMPTY, token4 = EMPTY;
     ctx.ftopt.set(ST, true);
-    final FTLexer tk = new FTLexer(str, (Prop) null, ctx.ftopt);
+    final FTLexer tk = new FTLexer(str, ctx.context.prop, ctx.ftopt);
 
     // loop through all tokens
     while(tk.hasNext()) {
       token4 = token3;
       token3 = token2;
       token2 = token1;
-      token1 = tk.next().txt;
+      token1 = tk.next().text;
 
       // calculate polarity
       double v = list.polarity(token1);

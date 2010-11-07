@@ -5,9 +5,11 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
+import org.basex.util.ft.FTOpt;
 
 /**
  * FTOptions expression.
@@ -34,7 +36,8 @@ public final class FTOptions extends FTExpr {
   public FTExpr comp(final QueryContext ctx) throws QueryException {
     final FTOpt tmp = ctx.ftopt;
     opt.init(tmp);
-    opt.comp(ctx);
+    if(opt.sw != null && ctx.value instanceof DBNode)
+      opt.sw.comp(((DBNode) ctx.value).data);
     ctx.ftopt = opt;
     expr[0] = expr[0].comp(ctx);
     ctx.ftopt = tmp;

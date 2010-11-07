@@ -108,10 +108,9 @@ public final class Thesaurus {
   /**
    * Initializes the thesaurus.
    * @param ii input info
-   * @return success flag
    * @throws QueryException query exception
    */
-  private boolean init(final InputInfo ii) throws QueryException {
+  private void init(final InputInfo ii) throws QueryException {
     try {
       final Data data = MemBuilder.build(
           Parser.fileParser(file, ctx.prop, ""), ctx.prop);
@@ -122,7 +121,6 @@ public final class Thesaurus {
     } catch(final IOException ex) {
       NOTHES.thrw(ii, file);
     }
-    return true;
   }
 
   /**

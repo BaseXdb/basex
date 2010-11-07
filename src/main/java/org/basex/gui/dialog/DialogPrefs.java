@@ -111,7 +111,7 @@ public final class DialogPrefs extends Dialog {
     p.setLayout(new TableLayout(1, 2, 12, 0));
 
     lang = new BaseXCombo(LANGS[0], this);
-    lang.setSelectedItem(prop.get(Prop.LANGUAGE));
+    lang.setSelectedItem(prop.get(Prop.LANG));
 
     p.add(lang);
     creds = new BaseXLabel();
@@ -138,7 +138,7 @@ public final class DialogPrefs extends Dialog {
   public void close() {
     final Prop prop = gui.context.prop;
     prop.set(Prop.DBPATH, path.getText());
-    prop.set(Prop.LANGUAGE, lang.getSelectedItem().toString());
+    prop.set(Prop.LANG, lang.getSelectedItem().toString());
     final GUIProp gprop = gui.prop;
     gprop.set(GUIProp.MOUSEFOCUS, focus.isSelected());
     gprop.set(GUIProp.SHOWNAME, names.isSelected());

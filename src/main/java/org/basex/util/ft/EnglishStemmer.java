@@ -3,12 +3,10 @@ package org.basex.util.ft;
 import static org.basex.util.Token.*;
 import java.util.Arrays;
 import java.util.EnumSet;
-import org.basex.core.Prop;
-import org.basex.query.ft.FTOpt;
 
 /**
- * Simple stemming algorithm. Based on the publication from Porter (1980): An
- * algorithm for suffix stripping.
+ * English stemming algorithm, based on the publication from Porter (1980):
+ * An algorithm for suffix stripping.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -266,7 +264,7 @@ final class EnglishStemmer extends Stemmer {
   }
 
   @Override
-  SpanProcessor get(final Prop p, final FTOpt f) {
+  Stemmer get(final Language l) {
     return new EnglishStemmer();
   }
 

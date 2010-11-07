@@ -47,7 +47,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer ft) throws QueryException {
+      final FTLexer lex) throws QueryException {
 
     final long min = checkItr(dist[0], ctx);
     final long max = checkItr(dist[1], ctx);
@@ -61,7 +61,7 @@ public final class FTDistance extends FTFilter {
         match.add(m);
       } else {
         if(sm != null) {
-          final int d = pos(m.s, ft) - pos(sm.e, ft) - 1;
+          final int d = pos(m.s, lex) - pos(sm.e, lex) - 1;
           if(d < min || d > max) return false;
         } else {
           f = m;

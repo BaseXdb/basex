@@ -58,7 +58,7 @@ public final class DialogAbout extends Dialog {
     pp.add(new BaseXLabel(CONTRIBUTE1));
     pp.add(new BaseXLabel(CONTRIBUTE2));
     pp.add(Box.createVerticalStrut(7));
-    final String lang = main.context.prop.get(Prop.LANGUAGE);
+    final String lang = main.context.prop.get(Prop.LANG);
     pp.add(new BaseXLabel(TRANSLATION + DialogPrefs.creds(lang)));
     p.add(pp, BorderLayout.EAST);
     add(p, BorderLayout.NORTH);

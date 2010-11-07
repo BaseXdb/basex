@@ -26,8 +26,6 @@ public final class FormatParser {
   public final Case cs;
   /** Presentation modifier in lower-case. */
   public final String pres;
-  /** Variation modifier. */
-  public String var;
   /** Error occurred while parsing. */
   public boolean error;
   /** Ordinal suffix; {@code null} if not specified. */

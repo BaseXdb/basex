@@ -38,14 +38,14 @@ public final class FTContent extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer ft) {
+      final FTLexer lex) {
     if(start) {
       for(final FTStringMatch sm : mtc) if(sm.s == 0) return true;
     } else if(end) {
-      final int p = ft.count() - 1;
+      final int p = lex.count() - 1;
       for(final FTStringMatch sm : mtc) if(sm.e == p) return true;
     } else {
-      final int s = ft.count();
+      final int s = lex.count();
       final boolean[] bl = new boolean[s];
       for(final FTStringMatch sm : mtc) {
         if(sm.g) continue;

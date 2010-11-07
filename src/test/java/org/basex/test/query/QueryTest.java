@@ -85,8 +85,10 @@ public abstract class QueryTest {
           ((Nodes) cmp).data = ((Nodes) val).data;
         }
         if(!correct || !val.sameAs(cmp)) {
+          final String cp = !(cmp instanceof Nodes) ||
+            ((Nodes) cmp).data != null ? cmp.toString() : "--";
           sb.append("-- " + qu[0] + ": " + query + "\n[E] " + (correct ?
-              qu[1] : "error") + "\n[F] " + val + " " + details() + "\n");
+              cp : "error") + "\n[F] " + val + " " + details() + "\n");
           ++fail;
         }
       } catch(final BaseXException ex) {

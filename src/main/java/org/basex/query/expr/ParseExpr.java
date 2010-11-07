@@ -173,7 +173,7 @@ public abstract class ParseExpr extends Expr {
   public final double checkDbl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = checkEmptyType(e.item(ctx, input), Type.DBL);;
+    final Item it = checkEmptyType(e.item(ctx, input), Type.DBL);
     if(!it.unt() && !it.num()) Err.number(this, it);
     return it.dbl(input);
   }

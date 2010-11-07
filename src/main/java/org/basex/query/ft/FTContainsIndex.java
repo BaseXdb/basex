@@ -45,7 +45,7 @@ final class FTContainsIndex extends FTContains {
       throws QueryException {
     final Iter ir = expr.iter(ctx);
     final FTLexer tmp = ctx.fttoken;
-    ctx.fttoken = ft;
+    ctx.fttoken = lex;
 
     // create index iterator
     if(fti == null) {

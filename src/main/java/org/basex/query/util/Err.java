@@ -27,18 +27,16 @@ public enum Err {
   NODB(BASX, 3, "Database '%' not found."),
   /** BASX0004: Evaluation exception. */
   NOPRE(BASX, 4, "Pre value '%' out of range."),
-  /** BASX0005: Command unknown. */
-  CMDNO(BASX, 5, Text.CMDNO),
   /** BASX0006: No permissions. */
-  PERMNO(BASX, 6, Text.PERMNO),
+  PERMNO(BASX, 5, Text.PERMNO),
   /** BASX0007: Server timeout. */
-  SERVERTIMEOUT(BASX, 7, Text.SERVERTIMEOUT),
+  SERVERTIMEOUT(BASX, 6, Text.SERVERTIMEOUT),
   /** BASX0008: No nodes as result. */
-  QUERYNODES(BASX, 8, Text.QUERYNODESERR),
+  QUERYNODES(BASX, 7, Text.QUERYNODESERR),
   /** BASX0008: No nodes as result. */
-  EXPSINGLE(BASX, 9, "Database contains more than one document."),
+  EXPSINGLE(BASX, 8, "Database contains more than one document."),
   /** BASX0009: No nodes as result. */
-  SENTLISTPARSE(BASX, 10, "% could not be parsed: %."),
+  SENTLISTPARSE(BASX, 9, "% could not be parsed: %."),
   /** BASX0099: Undefined error. */
   UNDEF(BASX, 99, "%."),
 
@@ -411,13 +409,9 @@ public enum Err {
   CPIWRONG(XPTY, 4, "% not allowed as PI name: \"%\"."),
   /** XPTY0004: Typing exception. */
   INVQNAME(XPTY, 4, "Invalid QName: \"%\"."),
-  /** XPTY0004: Typing exception. */
-  XPNODES(XPTY, 19, "%: nodes expected, % found."),
 
   /** XPTY0018: Typing exception. */
   EVALNODESVALS(XPTY, 18, "Result yields both nodes and atomic values."),
-  /** XPTY0019: Typing exception. */
-  EVALNODES(XPTY, 19, "Nodes needed for expression '%'."),
   /** XPTY0019: Typing exception. */
   NODESPATH(XPTY, 19, "Context node required for %; % found."),
 

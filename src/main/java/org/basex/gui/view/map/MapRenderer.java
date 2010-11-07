@@ -77,13 +77,13 @@ final class MapRenderer {
     int xx = r.x;
     int yy = r.y + fh;
     final int ww = r.w;
-    final FTLexer ftt = new FTLexer(s, null, null, true);
 
     // get index on first pre value
     int ll = 0;
-    while(ftt.hasNext()) {
-      final Span span = ftt.next();
-      byte[] tok = span.txt;
+    final FTLexer lex = new FTLexer(s, null, null, true);
+    while(lex.hasNext()) {
+      final Span span = lex.next();
+      byte[] tok = span.text;
       int wl = 0;
 
       for(int n = 0; n < tok.length; n += cl(tok, n))
@@ -124,7 +124,7 @@ final class MapRenderer {
         g.drawString(string(tok), xx + ll, yy);
       }
       ll += wl;
-      if(ftt.paragraph()) {
+      if(lex.paragraph()) {
         // new paragraph
         ll = 0;
         yy += fh;
@@ -172,9 +172,7 @@ final class MapRenderer {
     r.thumbf = ff * fs;
     r.thumbal = 0;
 
-    final FTLexer lex = new FTLexer(s, p);
-    final int[][] data = lex.info(s);
-
+    final int[][] data = new FTLexer(s, p).info();
     boolean l = false;
     while(r.thumbal < 2) {
       // find parameter setting for the available space

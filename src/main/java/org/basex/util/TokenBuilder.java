@@ -68,6 +68,14 @@ public final class TokenBuilder {
   }
 
   /**
+   * Sets the number of entries.
+   * @param s number of entries
+   */
+  public void size(final int s) {
+    size = s;
+  }
+
+  /**
    * Resets the token buffer.
    */
   public void reset() {
@@ -132,6 +140,52 @@ public final class TokenBuilder {
       addByte((byte) (ch >>  0 & 0x3F | 0x80));
     }
     return this;
+  }
+
+  /**
+   * Returns the codepoint at the specified position.
+   * @param p position
+   * @return character
+   */
+  public int cp(final int p) {
+    return Token.cp(chars, p);
+  }
+
+  /**
+   * Returns the codepoint length of the specified byte.
+   * @param p position
+   * @return character
+   */
+  public int cl(final int p) {
+    return Token.cl(chars, p);
+  }
+
+  /**
+   * Returns the byte at the specified position.
+   * @param p position
+   * @return byte
+   */
+  public byte get(final int p) {
+    return chars[p];
+  }
+
+  /**
+   * Sets a byte at the specified position.
+   * @param b byte to be set
+   * @param p position
+   */
+  public void set(final byte b, final int p) {
+    chars[p] = b;
+  }
+
+  /**
+   * Deletes bytes from the token.
+   * @param p position
+   * @param s number of bytes to be removed
+   */
+  public void delete(final int p, final int s) {
+    Array.move(chars, p + s, -s, size - p - s);
+    size -= s;
   }
 
   /**

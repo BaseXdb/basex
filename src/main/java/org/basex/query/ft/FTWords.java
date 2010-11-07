@@ -2,9 +2,8 @@ package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.FTOptions.*;
+import static org.basex.util.ft.FTFlag.*;
 import java.io.IOException;
-import java.util.Iterator;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
@@ -23,24 +22,31 @@ import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.Span;
+import org.basex.util.ft.FTOpt;
 
 /**
  * FTWords expression.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class FTWords extends FTExpr {
   /** Words mode. */
   public enum FTMode {
-    /** All option. */       M_ALL,
-    /** All words option. */ M_ALLWORDS,
-    /** Any option. */       M_ANY,
-    /** Any words option. */ M_ANYWORD,
-    /** Phrase search. */    M_PHRASE
+    /** All option. */
+    M_ALL,
+    /** All words option. */
+    M_ALLWORDS,
+    /** Any option. */
+    M_ANY,
+    /** Any words option. */
+    M_ANYWORD,
+    /** Phrase search. */
+    M_PHRASE
   }
 
+  /** Full-text tokenizer. */
+  FTTokenizer ftt;
   /** Data reference. */
   Data data;
   /** Single word. */
@@ -97,12 +103,14 @@ public final class FTWords extends FTExpr {
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
     if(occ != null) {
-      for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].comp(ctx);
+      for(int o = 0; o < occ.length; ++o)
+        occ[o] = occ[o].comp(ctx);
     }
     query = query.comp(ctx);
     if(query instanceof Str) txt = ((Str) query).atom();
     simple = mode == FTMode.M_ANY && txt != null && occ == null;
     fast = ctx.ftfast && occ == null;
+    ftt = new FTTokenizer(ctx.context.prop, this);
     return this;
   }
 
@@ -115,8 +123,8 @@ public final class FTWords extends FTExpr {
     final int c = contains(ctx);
     if(c == 0) all.size = 0;
     // scoring: pass on number of tokens
-    return new FTItem(all, fast || c == 0 ? 0 :
-      ctx.score.word(c, ctx.fttoken.count()));
+    return new FTItem(all, fast || c == 0 ? 0 : ctx.score.word(c,
+        ctx.fttoken.count()));
   }
 
   @Override
@@ -128,16 +136,14 @@ public final class FTWords extends FTExpr {
       @Override
       public FTItem next() {
         if(iat == null) {
-          final FTLexer ftlexer = new FTLexer(txt, ctx.context.prop, ctx.ftopt,
-              false);
-          final Iterator<Span> f = ftlexer.iterator();
+          final FTLexer lex = new FTLexer(txt, ctx.context.prop, ctx.ftopt);
           int d = 0;
-          while(f.hasNext()) {
-            final byte[] token = f.next().txt;
+          while(lex.hasNext()) {
+            final byte[] token = lex.nextToken();
             if(ctx.ftopt.sw != null && ctx.ftopt.sw.id(token) != 0) {
               ++d;
             } else {
-              final FTIndexIterator i = (FTIndexIterator) data.ids((FTLexer) f);
+              final FTIndexIterator i = (FTIndexIterator) data.ids(lex);
               iat = iat == null ? i : FTIndexIterator.phrase(iat, i, ++d);
               d = 0;
             }
@@ -158,9 +164,8 @@ public final class FTWords extends FTExpr {
    */
   private int contains(final QueryContext ctx) throws QueryException {
     // speed up default case
-    final FTOpt opt = ctx.ftopt;
     first = true;
-    if(simple) return opt.contains(txt, ctx.fttoken, this);
+    if(simple) return ftt.contains(txt, ctx.fttoken, ctx.ftopt);
 
     // process special cases
     final Iter iter = ctx.iter(query);
@@ -171,7 +176,7 @@ public final class FTWords extends FTExpr {
     switch(mode) {
       case M_ALL:
         while((it = nextStr(iter)) != null) {
-          final int oc = opt.contains(it, ctx.fttoken, this);
+          final int oc = ftt.contains(it, ctx.fttoken, ctx.ftopt);
           if(oc == 0) return 0;
           len += it.length;
           o += oc;
@@ -180,7 +185,7 @@ public final class FTWords extends FTExpr {
       case M_ALLWORDS:
         while((it = nextStr(iter)) != null) {
           for(final byte[] t : split(it, ' ')) {
-            final int oc = opt.contains(t, ctx.fttoken, this);
+            final int oc = ftt.contains(t, ctx.fttoken, ctx.ftopt);
             if(oc == 0) return 0;
             len += t.length;
             o += oc;
@@ -189,14 +194,14 @@ public final class FTWords extends FTExpr {
         break;
       case M_ANY:
         while((it = nextStr(iter)) != null) {
-          o += opt.contains(it, ctx.fttoken, this);
+          o += ftt.contains(it, ctx.fttoken, ctx.ftopt);
           len += it.length;
         }
         break;
       case M_ANYWORD:
         while((it = nextStr(iter)) != null) {
           for(final byte[] t : split(it, ' ')) {
-            o += opt.contains(t, ctx.fttoken, this);
+            o += ftt.contains(t, ctx.fttoken, ctx.ftopt);
             len += t.length;
           }
         }
@@ -207,7 +212,7 @@ public final class FTWords extends FTExpr {
           tb.add(it);
           tb.add(' ');
         }
-        o += opt.contains(tb.finish(), ctx.fttoken, this);
+        o += ftt.contains(tb.finish(), ctx.fttoken, ctx.ftopt);
         len += tb.size();
         break;
     }
@@ -226,15 +231,15 @@ public final class FTWords extends FTExpr {
    */
   boolean add(final int s, final int e) {
     // [CG] XQFT: check if this is needed and correct
-    if(!first && (mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS))
-      all.and(s, e);
+    if(!first && (mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS)) all.and(
+        s, e);
     else all.or(s, e);
     return fast;
   }
 
   /**
-   * Checks if the next item is a string.
-   * Returns a token representation or an exception.
+   * Checks if the next item is a string. Returns a token representation or an
+   * exception.
    * @param iter iterator to be checked
    * @return item
    * @throws QueryException query exception
@@ -247,21 +252,18 @@ public final class FTWords extends FTExpr {
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     /*
-     * If the following conditions yield true, the index is accessed:
-     * - the query is a simple String item
-     * - no FTTimes option is specified
-     * - FTMode is different to ANY, ALL and PHRASE
-     * - case sensitivity, diacritics and stemming flags comply with index
+     * If the following conditions yield true, the index is accessed: - the
+     * query is a simple String item - no FTTimes option is specified - FTMode
+     * is different to ANY, ALL and PHRASE - case sensitivity, diacritics and
+     * stemming flags comply with index
      */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ic.ctx.ftopt;
 
-    if(txt == null || occ != null || mode != FTMode.M_ANY &&
-        mode != FTMode.M_ALL && mode != FTMode.M_PHRASE ||
-        md.casesens != fto.is(CS) || md.diacritics != fto.is(DC) ||
-        md.stemming != fto.is(ST) ||
-        fto.ln != null && !eq(uc(token(md.language)), uc(fto.ln)))
-    return false;
+    if(txt == null || occ != null || mode != FTMode.M_ANY
+        && mode != FTMode.M_ALL && mode != FTMode.M_PHRASE
+        || md.casesens != fto.is(CS) || md.diacritics != fto.is(DC)
+        || md.stemming != fto.is(ST) || md.language != fto.ln) return false;
 
     // no index results
     if(txt.length == 0) {
@@ -278,10 +280,10 @@ public final class FTWords extends FTExpr {
     }
 
     // summarize number of hits; break loop if no hits are expected
-    final FTLexer ft = new FTLexer(txt, ic.ctx.context.prop, fto, false);
+    final FTLexer ft = new FTLexer(txt, ic.ctx.context.prop, fto);
     ic.costs = 0;
     while(ft.hasNext()) {
-      final byte[] tok = ft.next().txt;
+      final byte[] tok = ft.nextToken();
       if(tok.length > MAXLEN) return false;
       if(fto.sw != null && fto.sw.id(tok) != 0) continue;
 
@@ -327,7 +329,8 @@ public final class FTWords extends FTExpr {
   @Override
   public FTExpr remove(final Var v) {
     if(occ != null) {
-      for(int o = 0; o != occ.length; ++o) occ[o] = occ[o].remove(v);
+      for(int o = 0; o != occ.length; ++o)
+        occ[o] = occ[o].remove(v);
     }
     query = query.remove(v);
     return this;
@@ -352,10 +355,18 @@ public final class FTWords extends FTExpr {
     sb.append(query);
     if(!(query instanceof Str)) sb.append(" }");
     switch(mode) {
-      case M_ALL:      sb.append(' ' + ALL); break;
-      case M_ALLWORDS: sb.append(' ' + ALL + ' ' + WORDS); break;
-      case M_ANYWORD:  sb.append(' ' + ANY + ' ' + WORD); break;
-      case M_PHRASE:   sb.append(' ' + PHRASE); break;
+      case M_ALL:
+        sb.append(' ' + ALL);
+        break;
+      case M_ALLWORDS:
+        sb.append(' ' + ALL + ' ' + WORDS);
+        break;
+      case M_ANYWORD:
+        sb.append(' ' + ANY + ' ' + WORD);
+        break;
+      case M_PHRASE:
+        sb.append(' ' + PHRASE);
+        break;
       default:
     }
 

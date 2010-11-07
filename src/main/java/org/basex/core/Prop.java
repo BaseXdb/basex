@@ -28,8 +28,6 @@ public final class Prop extends AProp {
   private static final String OS = System.getProperty("os.name").toUpperCase();
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.startsWith("MAC");
-  /** Flag denoting if OS belongs to Win family. */
-  public static final boolean WIN = OS.startsWith("WIN");
 
   /** User's home directory. */
   public static final String HOME;
@@ -61,7 +59,7 @@ public final class Prop extends AProp {
     { "RESTPATH", HOME + Text.NAME + "REST" };
 
   /** Language name. */
-  public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
+  public static final Object[] LANG = { "LANG", "English" };
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };
 
@@ -159,7 +157,7 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Language for full-text search index. */
-  public static final Object[] FTLANGUAGE = { "FTLANGUAGE", ""};
+  public static final Object[] LANGUAGE = { "LANGUAGE", ""};
 
   /**
    * Flag for full-text scoring algorithm. Scoring mode: 0 = none, 1 = document
@@ -206,7 +204,7 @@ public final class Prop extends AProp {
   public static boolean gui;
 
   /** Language (applied after restart). */
-  static String language = LANGUAGE[1].toString();
+  static String language = LANG[1].toString();
   /** Flag for showing language keys. */
   static boolean langkeys;
 
@@ -242,7 +240,7 @@ public final class Prop extends AProp {
   protected void finish() {
     // set static properties
     if(this == root) {
-      Prop.language = get(Prop.LANGUAGE);
+      Prop.language = get(Prop.LANG);
       Prop.langkeys = is(Prop.LANGKEYS);
       Util.debug = is(Prop.DEBUG);
     }

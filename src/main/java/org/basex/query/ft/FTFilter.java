@@ -19,7 +19,7 @@ import org.basex.util.ft.FTUnit;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-abstract class FTFilter extends FTExpr {
+public abstract class FTFilter extends FTExpr {
   /** Optional unit. */
   protected FTUnit unit = FTUnit.WORD;
 
@@ -49,8 +49,7 @@ abstract class FTFilter extends FTExpr {
       public FTItem next() throws QueryException {
         FTItem it;
         while((it = ir.next()) != null) {
-          if(filter(ctx, it, content() ?
-              new FTLexer(it.atom(), ctx.context.prop) : null)) break;
+          if(filter(ctx, it, content() ? new FTLexer(it.atom()) : null)) break;
         }
         return it;
       }
@@ -61,16 +60,16 @@ abstract class FTFilter extends FTExpr {
    * Evaluates the position filters.
    * @param ctx query context
    * @param item input node
-   * @param ft tokenizer
+   * @param lex tokenizer
    * @return result of check
    * @throws QueryException query exception
    */
   final boolean filter(final QueryContext ctx, final FTItem item,
-      final FTLexer ft) throws QueryException {
+      final FTLexer lex) throws QueryException {
 
     final FTMatches all = item.all;
     for(int a = 0; a < all.size; ++a) {
-      if(!filter(ctx, all.match[a], ft)) all.delete(a--);
+      if(!filter(ctx, all.match[a], lex)) all.delete(a--);
     }
     return all.size != 0;
   }
@@ -87,7 +86,7 @@ abstract class FTFilter extends FTExpr {
       final FTLexer ft) throws QueryException;
 
   /**
-   * Checks if the filter needs the whole text node to be parsed.
+   * Checks if the filter requires the whole text node to be parsed.
    * Is overwritten by some filters to perform other checks.
    * @return result of check
    */

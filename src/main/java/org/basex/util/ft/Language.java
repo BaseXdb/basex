@@ -1,7 +1,6 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
-import java.util.EnumSet;
 
 /**
  * This class contains language tokens which are valid for the xml:lang
@@ -22,96 +21,82 @@ import java.util.EnumSet;
  * @author Jens Erat
  */
 public enum Language {
-  /** English. */    EN("en", "English"),
-  /** Arabic. */     AR("ar", "Arabic"),
-  /** Brazilian. */  BR("br", "Brazilian"),
-  /** Bulgarian. */  BG("bg", "Bulgarian"),
-  /** Chinese. */    ZH("zh", "Chinese", false),
-  /** Czech. */      CS("cs", "Czech"),
-  /** Danish. */     DA("da", "Danish"),
-  /** Dutch. */      NL("nl", "Dutch"),
-  /** Finnish. */    FI("fi", "Finnish"),
-  /** French. */     FR("fr", "French"),
-  /** German. */     DE("de", "German"),
-  /** Greek. */      EL("el", "Greek"),
-  /** Hungarian. */  HU("hu", "Hungarian"),
-  /** Italian. */    IT("it", "Italian"),
-  /** Japanese. */   JA("ja", "Japanese", false),
-  /** Korean. */     KO("ko", "Korean", false),
-  /** Norwegian. */  NO("no", "Norwegian"),
-  /** Persian. */    FA("pa", "Persian"),
-  /** Portuguese. */ PT("pt", "Portuguese"),
-  /** Romanian. */   RO("ro", "Romanian"),
-  /** Russian. */    RU("ru", "Russian"),
-  /** Spanish. */    ES("es", "Spanish"),
-  /** Swedish. */    SV("sv", "Swedish"),
-  /** Thai. */       TH("th", "Thai", false),
-  /** Turkish. */    TR("tr", "Turkish");
+  /** English. */    EN("English"),
+  /** Arabic. */     AR("Arabic"),
+  /** Brazilian. */  BR("Brazilian"),
+  /** Bulgarian. */  BG("Bulgarian"),
+  /** Chinese. */    ZH("Chinese", false),
+  /** Czech. */      CS("Czech"),
+  /** Danish. */     DA("Danish"),
+  /** Dutch. */      NL("Dutch"),
+  /** Finnish. */    FI("Finnish"),
+  /** French. */     FR("French"),
+  /** German. */     DE("German"),
+  /** Greek. */      EL("Greek"),
+  /** Hungarian. */  HU("Hungarian"),
+  /** Italian. */    IT("Italian"),
+  /** Japanese. */   JA("Japanese", false),
+  /** Korean. */     KO("Korean", false),
+  /** Norwegian. */  NO("Norwegian"),
+  /** Persian. */    FA("Persian"),
+  /** Portuguese. */ PT("Portuguese"),
+  /** Romanian. */   RO("Romanian"),
+  /** Russian. */    RU("Russian"),
+  /** Spanish. */    ES("Spanish"),
+  /** Swedish. */    SV("Swedish"),
+  /** Thai. */       TH("Thai", false),
+  /** Turkish. */    TR("Turkish");
 
   /** Default language. */
-  static final Language DEFAULT = EN;
-  /** Language code. */
-  final byte[] ln;
+  public static final Language DEFAULT = EN;
 
-  /** Whether language is whitespace-tokenizable (e. g., Chinese is not). */
-  private final boolean wsTokenizable;
-  /** Language name. */
-  private final String name;
+  /** Whether language uses white-spaces (e. g., Chinese does not). */
+  final boolean ws;
+  /** Full name. */
+  private final String full;
 
   /**
    * Constructor.
-   * @param l language code
    * @param n name of language
    */
-  private Language(final String l, final String n) {
-    this(l, n, true);
+  private Language(final String n) {
+    this(n, true);
   }
 
   /**
    * Constructor.
-   * @param l language code
-   * @param n name of language
-   * @param ws is language whitespace-tokenizable?
+   * @param f full name of language
+   * @param w is language whitespace-tokenizable?
    */
-  private Language(final String l, final String n, final boolean ws) {
-    ln = token(l);
-    name = n;
-    wsTokenizable = ws;
+  private Language(final String f, final boolean w) {
+    full = f;
+    ws = w;
   }
 
   /**
-   * Returns all languages which are whitespace-tokenizable.
-   * @return all whitespace-tokenizable languages
-   */
-  public static EnumSet<Language> wsTokenizable() {
-    final EnumSet<Language> lns = EnumSet.noneOf(Language.class);
-    for(final Language lt : values()) {
-      if(lt.wsTokenizable) lns.add(lt);
-    }
-    return lns;
-  }
-
-  /**
-   * Returns the code for the specified language, or {@code null}.
-   * @param lang name of language
+   * Returns the enumeration value of the specified language, or {@code null}.
+   * @param lang name or code of language
    * @return language code
    */
-  public static Language forName(final String lang) {
-    for(final Language lt : values()) if(lt.name.equals(lang)) return lt;
+  public static Language get(final String lang) {
+    for(final Language lt : values()) {
+      if(lang.equalsIgnoreCase(lt.full) ||
+         lang.equalsIgnoreCase(lt.name())) return lt;
+    }
     return null;
   }
 
   /**
-   * Get the enumeration value of language represented as token.
-   * @param code language code represented as byte array representation
+   * Returns the enumeration value of the specified language, or {@code null}.
+   * @param lang name or code of language
    * @return enum value
    */
-  public static Language valueOf(final byte[] code) {
-    return Language.valueOf(string(uc(code)));
+  public static Language get(final byte[] lang) {
+    return Language.get(string(uc(lang)));
   }
-  
+
   @Override
   public String toString() {
-    return name;
+    return full;
   }
 }

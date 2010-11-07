@@ -46,7 +46,7 @@ public final class FTWindow extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer ft) throws QueryException {
+      final FTLexer lex) throws QueryException {
 
     final int n = (int) checkItr(win, ctx) - 1;
     mtc.sort();
@@ -57,15 +57,15 @@ public final class FTWindow extends FTFilter {
       if(f == null) f = m;
       f.g |= m.e - f.e > 1;
       f.e = m.e;
-      if(pos(f.e, ft) - pos(f.s, ft) > n) return false;
+      if(pos(f.e, lex) - pos(f.s, lex) > n) return false;
     }
     if(f == null) return false;
 
-    final int w = n - pos(f.e, ft) + pos(f.s, ft);
-    for(int s = pos(f.s, ft) - w; s <= pos(f.s, ft); ++s) {
+    final int w = n - pos(f.e, lex) + pos(f.s, lex);
+    for(int s = pos(f.s, lex) - w; s <= pos(f.s, lex); ++s) {
       boolean h = false;
       for(final FTStringMatch m : mtc) {
-        h = m.ex && pos(m.s, ft) >= s && pos(m.e, ft) <= s + w;
+        h = m.ex && pos(m.s, lex) >= s && pos(m.e, lex) <= s + w;
         if(h) break;
       }
       if(!h) {

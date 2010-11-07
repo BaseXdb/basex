@@ -1,16 +1,12 @@
 package org.basex.query.util;
 
 import static org.basex.util.Token.*;
-import static org.basex.query.util.Err.*;
-import static org.basex.util.ft.FTOptions.*;
+import static org.basex.util.ft.FTFlag.*;
 import javax.xml.parsers.SAXParserFactory;
 import org.basex.core.Prop;
-import org.basex.query.QueryException;
-import org.basex.query.ft.FTOpt;
-import org.basex.util.InputInfo;
 import org.basex.util.TokenSet;
 import org.basex.util.ft.FTLexer;
-import org.basex.util.Util;
+import org.basex.util.ft.FTOpt;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -32,23 +28,15 @@ public final class SentList extends DefaultHandler {
 
   /**
    * Default constructor.
-   * @param ii input info
    * @param uri path to word list
    * @param p database properties
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  public SentList(final InputInfo ii, final String uri, final Prop p)
-      throws QueryException {
-
+  public SentList(final String uri, final Prop p) throws Exception {
     prop = p;
-    try {
-      // [OE] could be extended for other XML formats
-      // or plain texts
-      SAXParserFactory.newInstance().newSAXParser().parse(uri, this);
-    } catch(final Exception ex) {
-      Util.debug(ex);
-      SENTLISTPARSE.thrw(ii, uri, ex);
-    }
+    // [OE] could be extended for other XML formats
+    // or plain texts
+    SAXParserFactory.newInstance().newSAXParser().parse(uri, this);
   }
 
   /**
@@ -86,12 +74,12 @@ public final class SentList extends DefaultHandler {
       if(term.equals("negative")) posMode = 1;
       if(term.equals("negated"))  posMode = 2;
     } else if(qName.equals("word")) {
-      final FTOpt fto = new FTOpt(prop);
+      final FTOpt fto = new FTOpt();
       fto.set(ST, true);
       final FTLexer tk = new FTLexer(
           lc(token(atts.getValue("name"))), prop, fto);
       tk.hasNext();
-      words[posMode].add(tk.next().txt);
+      words[posMode].add(tk.next().text);
     }
   }
 }

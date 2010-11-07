@@ -48,18 +48,4 @@ public enum ServerCmd {
     // current default for unknown codes: database command.
     return CMD;
   }
-
-  /**
-   * Returns the server command for the specified control byte.
-   * @param code control code
-   * @return server command
-   */
-  static ServerCmd get(final String code) {
-    try {
-      return valueOf(code);
-    } catch(final Exception ex) {
-      // current default for unknown codes: database command.
-      return CMD;
-    }
-  }
 }

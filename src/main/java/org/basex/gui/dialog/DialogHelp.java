@@ -49,7 +49,9 @@ public final class DialogHelp extends Dialog {
     area.setText(help);
   }
 
-  @Override
+  /**
+   * Refreshes the help area.
+   */
   public void refresh() {
     area.setFont(GUIConstants.font);
   }

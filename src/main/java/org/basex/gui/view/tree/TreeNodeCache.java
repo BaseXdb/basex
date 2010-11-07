@@ -117,9 +117,9 @@ final class TreeNodeCache implements TreeViewOptions {
     final IntList line = new IntList();
     for(int i = 0; i < l; ++i) {
       final int p = parentList.get(i);
-      final ChildIterator iterator = new ChildIterator(data, p);
-      while(iterator.more()) {
-        final int pre = iterator.next();
+      final ChildIterator iter = new ChildIterator(data, p);
+      while(iter.more()) {
+        final int pre = iter.next();
         if(data.kind(pre) == Data.ELEM || !ONLY_ELEMENT_NODES) line.add(pre);
       }
     }

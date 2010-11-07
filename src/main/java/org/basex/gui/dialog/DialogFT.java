@@ -62,7 +62,7 @@ final class DialogFT extends BaseXBack {
         FTSCINFO, FTSWINFO };
     final boolean[] val = {
         prop.is(Prop.WILDCARDS), prop.is(Prop.STEMMING), prop.is(Prop.CASESENS),
-        prop.is(Prop.DIACRITICS), prop.get(Prop.FTLANGUAGE).length() != 0,
+        prop.is(Prop.DIACRITICS), prop.get(Prop.LANGUAGE).length() != 0,
         prop.num(Prop.SCORING) > 0, !sw.isEmpty() };
 
     for(int f = 0; f < check.length; ++f) {
@@ -160,8 +160,8 @@ final class DialogFT extends BaseXBack {
     gui.set(Prop.CASESENS, check[2].isSelected());
     gui.set(Prop.DIACRITICS, check[3].isSelected());
     final String lang = check[4].isSelected() ?
-        Language.forName(language.getSelectedItem().toString()).name() : "";
-    gui.set(Prop.FTLANGUAGE, lang);
+        Language.get(language.getSelectedItem().toString()).name() : "";
+    gui.set(Prop.LANGUAGE, lang);
     gui.set(Prop.SCORING, check[5].isSelected() ?
         scoring.getSelectedIndex() + 1 : 0);
     gui.set(Prop.STOPWORDS, check[6].isSelected() ? swpath.getText() : "");

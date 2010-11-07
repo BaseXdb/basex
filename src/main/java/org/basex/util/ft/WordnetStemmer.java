@@ -6,11 +6,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.List;
-import org.basex.core.Prop;
-import org.basex.query.QueryException;
-import org.basex.query.ft.FTOpt;
-import org.basex.query.util.Err;
-import org.basex.util.Token;
 
 /**
  * Stemmer implementation using the WordNet stemmer.
@@ -21,8 +16,6 @@ import org.basex.util.Token;
  * @author Dimitar Popov
  */
 final class WordnetStemmer extends Stemmer {
-  /** Name of the stemmer. */
-  private static final byte[] NAME = token("WordNet");
   /** Path to the WordNet dictionary files; relative to current directory. */
   private static final String PATH = "etc/wndict";
   /** Name of the package of the WordNet stemmer. */
@@ -55,52 +48,9 @@ final class WordnetStemmer extends Stemmer {
       WORDNET_CLASS = findClass(PKG + ".morph.WordnetStemmer");
       CTR = findConstructor(WORDNET_CLASS, IDICT_CLASS);
       FIND_STEMS = findMethod(WORDNET_CLASS, "findStems", String.class);
-      DICT = DICT_CLASS == null || WORDNET_CLASS == null || CTR == null
-          || FIND_STEMS == null ? null : newDict();
+      DICT = DICT_CLASS == null || WORDNET_CLASS == null || CTR == null ||
+        FIND_STEMS == null ? null : newDict();
     }
-  }
-
-  /**
-   * Find a class by name.
-   * @param name class name
-   * @return {@code null} if the class is not found
-   */
-  private static Class<?> findClass(final String name) {
-    try {
-      return Class.forName(name);
-    } catch(final Exception e) { }
-    return null;
-  }
-
-  /**
-   * Find a method by name and parameter types.
-   * @param c class to search for the method
-   * @param name method name
-   * @param parameterTypes method parameters
-   * @return {@code null} if the class is not found
-   */
-  private static Method findMethod(final Class<?> c, final String name,
-      final Class<?>... parameterTypes) {
-
-    try {
-      if(c != null) return c.getMethod(name, parameterTypes);
-    } catch(final Exception e) { }
-    return null;
-  }
-
-  /**
-   * Find a constructor by parameter types.
-   * @param c class to search for the constructor
-   * @param parameterTypes constructor parameters
-   * @return {@code null} if the class is not found
-   */
-  private static Constructor<?> findConstructor(final Class<?> c,
-      final Class<?>... parameterTypes) {
-
-    try {
-      if(c != null) return c.getConstructor(parameterTypes);
-    } catch(final Exception e) { }
-    return null;
   }
 
   /**
@@ -126,43 +76,40 @@ final class WordnetStemmer extends Stemmer {
     return DICT != null && CTR != null;
   }
 
+  /** Singleton instance. */
+  private static WordnetStemmer instance;
   /** Instance of WordNet stemmer. */
   private final Object stemmer;
 
   /**
+   * Returns a singleton instance of the stemmer.
+   * @return instance
+   */
+  static Stemmer get() {
+    if(instance == null) instance = new WordnetStemmer();
+    return instance;
+  }
+
+  /**
    * Constructs a WordNet stemmer. Call {@link #available()} first to
    * check if the library is available.
-   * @param lang language of the text to stem
-   * @throws QueryException if the specified language is not supported
    */
-  WordnetStemmer(final Language lang) throws QueryException {
-    if(!supports(lang.ln)) Err.FTLAN.thrw(null, lang);
+  private WordnetStemmer() {
     try {
       stemmer = CTR.newInstance(DICT);
     } catch(final Exception e) {
       throw new RuntimeException(e);
     }
+  }  
+
+  @Override
+  Stemmer get(final Language l) {
+    return get();
   }
 
   @Override
-  SpanProcessor get(final Prop p, final FTOpt f) {
-    try {
-      return new WordnetStemmer(getLanguage(p, f));
-    } catch(final QueryException e) {
-      // [DP][JE] language is unsupported!
-      e.printStackTrace();
-      return null;
-    }
-  }
-
-  @Override
-  boolean supports(final byte[] lang) {
-    return Token.eq(lang, Language.EN.ln);
-  }
-
-  @Override
-  boolean eq(final byte[] id) {
-    return id != null && Token.eq(id, NAME);
+  public boolean supports(final Language lang) {
+    return lang == Language.EN;
   }
 
   @Override
@@ -172,35 +119,17 @@ final class WordnetStemmer extends Stemmer {
 
   @Override
   int prec() {
-    // [DP][JE] what would be an appropriate value?
     return 10;
   }
 
   @Override
   byte[] stem(final byte[] word) {
-    return token(stem(string(word)));
-  }
-
-  // [DP][JE] the following methods should be available in all Stemmers:
-  /**
-   * Returns the stemmer name.
-   * @return the stemmer name
-   */
-  byte[] getStemmerName() {
-    return NAME;
-  }
-
-  /**
-   * Stems a word.
-   * @param word input word to stem
-   * @return the stem of the word
-   */
-  private String stem(final String word) {
     try {
       @SuppressWarnings("unchecked")
-      final List<String> l = (List<String>) FIND_STEMS.invoke(stemmer, word);
-      final String result = l.size() == 0 ? word : l.get(0);
-      return result.length() == 0 ? word : result;
+      final List<String> l = (List<String>)
+        FIND_STEMS.invoke(stemmer, string(word));
+      final byte[] result = l.size() == 0 ? word : token(l.get(0));
+      return result.length == 0 ? word : result;
     } catch(final Exception e) {
       throw new RuntimeException(e);
     }

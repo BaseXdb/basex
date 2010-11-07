@@ -12,6 +12,7 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.util.Util;
+import org.basex.util.ft.Language;
 
 /**
  * Evaluates the 'create db' command and creates a new index.
@@ -50,8 +51,8 @@ public final class CreateIndex extends ACreate {
           data.meta.stemming = prop.is(Prop.STEMMING);
           data.meta.casesens = prop.is(Prop.CASESENS);
           data.meta.diacritics = prop.is(Prop.DIACRITICS);
-          data.meta.language = prop.get(Prop.FTLANGUAGE);
           data.meta.scoring = prop.num(Prop.SCORING);
+          data.meta.language = Language.get(prop.get(Prop.LANGUAGE));
           index = IndexType.FULLTEXT;
           break;
         case PATH:

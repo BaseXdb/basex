@@ -21,6 +21,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Type;
 import org.basex.util.Atts;
+import org.basex.util.StringList;
 import org.basex.util.Util;
 import org.basex.util.XMLToken;
 import org.deepfs.fs.DeepFS;
@@ -54,7 +55,7 @@ public final class DeepFile {
   /** The file system attributes for the file. */
   private Atts fsAtts;
   /** Map, containing all metadata key-value pairs for the current file. */
-  private final TreeMap<MetaElem, ArrayList<String>> metaElements;
+  private final TreeMap<MetaElem, StringList> metaElements;
   /** List with all file fragments (fs:content elements). */
   private final ArrayList<DeepFile> fileFragments;
   /** All text contents that are extracted from the file. */
@@ -203,7 +204,7 @@ public final class DeepFile {
     offset = position;
     size = contentSize;
     fileFragments = new ArrayList<DeepFile>();
-    metaElements = meta ? new TreeMap<MetaElem, ArrayList<String>>() : null;
+    metaElements = meta ? new TreeMap<MetaElem, StringList>() : null;
     textContents = p.is(Prop.FSCONT) ? new ArrayList<Content>() : null;
     xmlContents = p.is(Prop.FSXML) ? new ArrayList<Content>() : null;
   }
@@ -342,7 +343,7 @@ public final class DeepFile {
    * extraction is disabled.
    * @return the metadata
    */
-  public TreeMap<MetaElem, ArrayList<String>> getMeta() {
+  public TreeMap<MetaElem, StringList> getMeta() {
     return metaElements;
   }
 
@@ -437,7 +438,7 @@ public final class DeepFile {
     final String s = value.trim();
     if(s.isEmpty()) return;
 
-    final ArrayList<String> vals;
+    final StringList vals;
     if(metaElements.containsKey(e)) {
       if(!e.isMultiVal()) {
         Util.debug(
@@ -447,7 +448,7 @@ public final class DeepFile {
       }
       vals = metaElements.get(e);
     } else {
-      vals = new ArrayList<String>();
+      vals = new StringList();
       metaElements.put(e, vals);
     }
     vals.add(s);
@@ -586,9 +587,9 @@ public final class DeepFile {
   public void finishMetaExtraction() throws IOException {
     metaFinished = true;
     if(metaElements != null) {
-      final ArrayList<String> type = metaElements.get(MetaElem.TYPE);
+      final StringList type = metaElements.get(MetaElem.TYPE);
       if(type != null && type.get(0).equals(FileType.MESSAGE.toString())) {
-        ArrayList<String> creator = metaElements.get(MetaElem.CREATOR_NAME);
+        StringList creator = metaElements.get(MetaElem.CREATOR_NAME);
         boolean err = false;
         if(creator != null) {
           if(creator.size() > 1) err = true;
@@ -607,19 +608,6 @@ public final class DeepFile {
     }
     if(fsAtts == null) fsAtts = extractFSAtts();
   }
-
-  /*
-   * Returns the string values for the {@link MetaElem}.
-   * @param elem the metadata element
-   * @return the metadata values as Strings
-  public String[] getValues(final MetaElem elem) {
-    final ArrayList<String> vals = metaElements.get(elem);
-    if(vals == null) return null;
-    final int max = vals.size();
-    final String[] strings = new String[max];
-    return strings;
-  }
-   */
 
   /**
    * Returns true, if a value is set for the given metadata element.
@@ -713,10 +701,10 @@ public final class DeepFile {
 
   /** Sets format and type to 'unknown'. */
   private void unknown() {
-    final ArrayList<String> val = new ArrayList<String>();
+    final StringList val = new StringList();
     val.add(MimeType.UNKNOWN.toString());
     metaElements.put(MetaElem.FORMAT, val);
-    val.clear();
+    val.reset();
     val.add(FileType.UNKNOWN_TYPE.toString());
     metaElements.put(MetaElem.TYPE, val);
   }
@@ -743,13 +731,12 @@ public final class DeepFile {
     String uidVal = null;
     String gidVal = null;
     if(metaElements != null) {
-      final ArrayList<String> uid = metaElements.get(MetaElem.FS_OWNER_USER_ID);
+      final StringList uid = metaElements.get(MetaElem.FS_OWNER_USER_ID);
       if(uid != null) {
         uidVal = uid.get(0);
         metaElements.remove(MetaElem.FS_OWNER_USER_ID);
       }
-      final ArrayList<String> gid =
-        metaElements.get(MetaElem.FS_OWNER_GROUP_ID);
+      final StringList gid = metaElements.get(MetaElem.FS_OWNER_GROUP_ID);
       if(gid != null) {
         gidVal = gid.get(0);
         metaElements.remove(MetaElem.FS_OWNER_GROUP_ID);

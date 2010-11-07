@@ -98,11 +98,13 @@ public final class Find extends AQuery {
     final TokenBuilder opt = new TokenBuilder();
     final MetaData md = data.meta;
     if(md.ftxindex) {
-      if(md.wildcards)  opt.add(' ' + USING + ' ' + WILDCARDS);
-      if(md.stemming)   opt.add(' ' + USING + ' ' + STEMMING);
-      if(md.casesens)   opt.add(' ' + USING + ' ' + CASE + ' ' + SENSITIVE);
-      if(md.diacritics) opt.add(' ' + USING + ' ' + DIACRITICS + ' ' +
-          SENSITIVE);
+      if(md.wildcards) opt.add(' ' + USING + ' ' + WILDCARDS);
+      if(md.stemming) opt.add(' ' + USING + ' ' + STEMMING);
+      if(md.casesens) opt.add(' ' + USING + ' ' + CASE + ' ' + SENSITIVE);
+      if(md.diacritics)
+        opt.add(' ' + USING + ' ' + DIACRITICS + ' ' + SENSITIVE);
+      if(md.language != null)
+        opt.add(' ' + USING + ' ' + LANGUAGE + " '" + md.language + "'");
     }
 
     // create final string

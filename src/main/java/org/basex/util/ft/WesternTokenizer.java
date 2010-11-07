@@ -1,12 +1,10 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.FTOptions.*;
+import static org.basex.util.ft.FTFlag.*;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Iterator;
 import org.basex.core.Prop;
-import org.basex.query.ft.FTOpt;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -47,12 +45,12 @@ final class WesternTokenizer extends Tokenizer {
   /** Last character position. */
   private int lp;
   /** Character start position. */
-  private int s;
+  private int spos;
 
-  /** Current token. */
+  /** Current token position. */
   int pos;
   /** Current character position. */
-  int p;
+  int cpos;
   /** Flag indicating a special character. */
   boolean sc;
 
@@ -66,50 +64,43 @@ final class WesternTokenizer extends Tokenizer {
 
   /**
    * Constructor.
+   * @param txt text
+   * @param pr database properties
+   * @param f full-text options
+   */
+  private WesternTokenizer(final byte[] txt, final Prop pr, final FTOpt f) {
+    this(txt, pr);
+    if(f == null) return;
+    lc = f.is(LC);
+    uc = f.is(UC);
+    cs = f.is(CS);
+    wc = f.is(WC);
+    dc = f.is(DC);
+  }
+
+  /**
+   * Constructor.
    * @param pr (optional) database properties
    * @param txt text
    */
   private WesternTokenizer(final byte[] txt, final Prop pr) {
     init(txt);
-    if(pr == null) return;
-    dc = pr.is(Prop.DIACRITICS);
-    cs = pr.is(Prop.CASESENS);
-  }
-
-  /**
-   * Constructor.
-   * @param txt text
-   * @param fto full-text options
-   * @param pr database properties
-   */
-  private WesternTokenizer(final byte[] txt, final FTOpt fto, final Prop pr) {
-    this(txt, pr);
-    setFTOpt(fto);
+    if(pr != null) {
+      dc = pr.is(Prop.DIACRITICS);
+      cs = pr.is(Prop.CASESENS);
+    }
   }
 
   @Override
   Tokenizer get(final byte[] txt, final Prop pr, final FTOpt f) {
-    return new WesternTokenizer(txt, f, pr);
+    return new WesternTokenizer(txt, pr, f);
   }
 
   /**
-   * Set full-text options.
-   * @param fto new full-text option
-   */
-  private void setFTOpt(final FTOpt fto) {
-    if(fto == null) return;
-    lc = fto.is(LC);
-    uc = fto.is(UC);
-    cs = fto.is(CS);
-    wc = fto.is(WC);
-    dc = fto.is(DC);
-  }
-
-  /**
-   * Sets the text.
+   * Initializes the iterator.
    * @param txt text
    */
-  private void init(final byte[] txt) {
+  void init(final byte[] txt) {
     if(text != txt) {
       text = txt;
       sen.reset();
@@ -125,7 +116,7 @@ final class WesternTokenizer extends Tokenizer {
     sent = 0;
     para = 0;
     pos = -1;
-    p = 0;
+    cpos = 0;
   }
 
   /**
@@ -137,13 +128,13 @@ final class WesternTokenizer extends Tokenizer {
     final int l = text.length;
     ++pos;
 
-    lp = p;
+    lp = cpos;
     // parse whitespaces
     boolean sn = false;
     pa = false;
     boolean bs = false;
-    for(; p < l; p += cl(text, p)) {
-      final int c = cp(text, p);
+    for(; cpos < l; cpos += cl(text, cpos)) {
+      final int c = cp(text, cpos);
       if(wc && !bs) {
         bs = c == '\\';
         if(bs) continue;
@@ -158,36 +149,36 @@ final class WesternTokenizer extends Tokenizer {
         pa = true;
         ++para;
       } else if(ftChar(c)) {
-        if(bs) --p;
+        if(bs) --cpos;
         break;
       }
       bs = false;
     }
     // end of text...
-    s = p;
-    if(p == l) return false;
+    spos = cpos;
+    if(cpos == l) return false;
 
     // parse token
-    for(; p < l; p += cl(text, p)) {
-      int c = cp(text, p);
+    for(; cpos < l; cpos += cl(text, cpos)) {
+      int c = cp(text, cpos);
       // parse wildcards
       if(wc && !bs) {
         bs = c == '\\';
         if(bs) continue;
         if(c == '.') {
-          c = p + 1 < l ? text[p + 1] : 0;
+          c = cpos + 1 < l ? text[cpos + 1] : 0;
           if(c == '?' || c == '*' || c == '+') {
-            ++p;
+            ++cpos;
           } else if(c == '{') {
-            while(++p < l && text[p] != '}')
+            while(++cpos < l && text[cpos] != '}')
               ;
-            if(p == l) break;
+            if(cpos == l) break;
           }
           continue;
         }
       }
       if(!ftChar(c)) {
-        if(bs) --p;
+        if(bs) --cpos;
         break;
       }
       bs = false;
@@ -196,20 +187,11 @@ final class WesternTokenizer extends Tokenizer {
   }
 
   /**
-   * Get the current token applying filters before returning the result.
-   * @return byte array representing the filtered token
-   */
-  byte[] get() {
-    return get(orig());
-  }
-
-  /**
-   * Returns a normalized version of the specified token.
-   * @param tok input token
+   * Returns a normalized version of the current token.
    * @return result
    */
-  private byte[] get(final byte[] tok) {
-    byte[] n = tok;
+  byte[] get() {
+    byte[] n = orig();
     final boolean a = ascii(n);
     if(!dc) n = dia(n, a);
     if(uc) n = upper(n, a);
@@ -222,7 +204,10 @@ final class WesternTokenizer extends Tokenizer {
    * @return original token
    */
   private byte[] orig() {
-    return Arrays.copyOfRange(text, s, p);
+    final int l = cpos - spos;
+    final byte[] copy = new byte[l];
+    System.arraycopy(text, spos, copy, 0, l);
+    return copy;
   }
 
   /**
@@ -234,12 +219,12 @@ final class WesternTokenizer extends Tokenizer {
     // parse whitespaces
     pa = false;
     sc = false;
-    lp = p;
-    for(; p < l; p += cl(text, p)) {
-      final int c = cp(text, p);
+    lp = cpos;
+    for(; cpos < l; cpos += cl(text, cpos)) {
+      final int c = cp(text, cpos);
       if(c == '\n') {
         pa = true;
-        ++p;
+        ++cpos;
         sc = true;
         break;
       } else if(ftChar(c)) {
@@ -249,18 +234,18 @@ final class WesternTokenizer extends Tokenizer {
     }
 
     // special chars found
-    if(lp < p) return true;
+    if(lp < cpos) return true;
     ++pos;
 
     // end of text...
-    s = p;
-    if(p == l) return false;
+    spos = cpos;
+    if(cpos == l) return false;
 
     // parse token
-    for(; p < l; p += cl(text, p)) {
-      final int c = cp(text, p);
+    for(; cpos < l; cpos += cl(text, cpos)) {
+      final int c = cp(text, cpos);
       if(!ftChar(c)) {
-        s = p - cl(text, p);
+        spos = cpos - cl(text, cpos);
         break;
       }
     }
@@ -272,8 +257,8 @@ final class WesternTokenizer extends Tokenizer {
    * @return next token
    */
   byte[] getSC() {
-    return lp < p ? Arrays.copyOfRange(text, lp, p) : Arrays.copyOfRange(text,
-        p, s);
+    return lp < cpos ? Arrays.copyOfRange(text, lp, cpos) :
+      Arrays.copyOfRange(text, cpos, spos);
   }
 
   @Override
@@ -358,32 +343,33 @@ final class WesternTokenizer extends Tokenizer {
   }
 
   @Override
-  int[][] info(final byte[] t) {
-    final WesternTokenizer tok = new WesternTokenizer(t, null);
+  int[][] info() {
+    init();
     final IntList[] il = new IntList[] { new IntList(), new IntList(),
         new IntList(), new IntList(), new IntList()};
     int lass = 0;
     int lasp = 0;
     int sl = 0;
     int pl = 0;
-    while(tok.more()) {
-      final byte[] n = tok.orig();
+
+    while(more()) {
+      final byte[] n = orig();
       final int l = n.length;
       il[0].add(l);
       for(final byte b : n)
         il[3].add(b);
 
-      if(tok.sent != lass) {
+      if(sent != lass) {
         if(sl > 0) {
           il[1].add(sl);
-          il[4].add(tok.pm);
+          il[4].add(pm);
         }
-        lass = tok.sent;
+        lass = sent;
         sl = 0;
       }
-      if(tok.para != lasp) {
+      if(para != lasp) {
         if(pl > 0) il[2].add(pl);
-        lasp = tok.para;
+        lasp = para;
         pl = 0;
       }
 
@@ -391,9 +377,9 @@ final class WesternTokenizer extends Tokenizer {
       pl += l;
     }
 
-    if(tok.sent != lass && sl > 0) {
+    if(sent != lass && sl > 0) {
       il[1].add(sl);
-      il[4].add(tok.pm);
+      il[4].add(pm);
     }
     if(pl > 0) il[2].add(pl);
 
@@ -405,21 +391,33 @@ final class WesternTokenizer extends Tokenizer {
   }
 
   @Override
-  public String toString() {
-    return Util.name(this) + '[' + string(text) + ']';
-  }
-
-  @Override
   int prec() {
     return 1000;
   }
 
   @Override
-  public Iterator<Span> iterator() {
-    return new Iterator<Span>() {
-      { init(); }
+  EnumSet<Language> languages() {
+    final EnumSet<Language> lns = EnumSet.noneOf(Language.class);
+    for(final Language lt : Language.values()) if(lt.ws) lns.add(lt);
+    return lns;
+  }
+
+  @Override
+  boolean paragraph() {
+    return pa;
+  }
+
+  @Override
+  public FTIterator iter() {
+    init();
+    return new FTIterator() {
       int next;
 
+      @Override
+      public void init(final byte[] txt) {
+        WesternTokenizer.this.init(txt);
+      }
+      
       @Override
       public boolean hasNext() {
         if(next <= 0 && (special ? moreSC() : more())) next++;
@@ -428,24 +426,19 @@ final class WesternTokenizer extends Tokenizer {
 
       @Override
       public Span next() {
-        if(--next < 0) hasNext();
-        return new Span(special ? getSC() : get(), p, pos, sc);
+        return new Span(nextToken(), cpos, pos, sc);
       }
 
       @Override
-      public void remove() {
-        Util.notimplemented();
+      public byte[] nextToken() {
+        if(--next < 0) hasNext();
+        return special ? getSC() : get();
       }
     };
   }
 
   @Override
-  EnumSet<Language> languages() {
-    return Language.wsTokenizable();
-  }
-
-  @Override
-  boolean paragraph() {
-    return pa;
+  public String toString() {
+    return Util.name(this) + '[' + string(text) + ']';
   }
 }

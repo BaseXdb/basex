@@ -487,6 +487,4 @@ public interface QueryTokens {
   byte[] MAX = token("max");
   /** Minimum . */
   byte[] INF = token("inf");
-  /** Default language. */
-  byte[] EN = token("en");
 }

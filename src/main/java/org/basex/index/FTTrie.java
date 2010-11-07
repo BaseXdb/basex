@@ -3,7 +3,7 @@ package org.basex.index;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.FTOptions.*;
+import static org.basex.util.ft.FTFlag.*;
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.core.Prop;
@@ -65,10 +65,10 @@ final class FTTrie extends FTIndex {
   @Override
   public synchronized int nrIDs(final IndexToken ind) {
     // skip result count for queries which stretch over multiple index entries
-    final FTLexer fto = (FTLexer) ind;
-    if(fto.ftOpt().is(FZ) || fto.ftOpt().is(WC)) return 1;
+    final FTLexer lex = (FTLexer) ind;
+    if(lex.ftOpt().is(FZ) || lex.ftOpt().is(WC)) return 1;
 
-    final byte[] tok = fto.get();
+    final byte[] tok = lex.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
 
@@ -85,18 +85,18 @@ final class FTTrie extends FTIndex {
 
   @Override
   public synchronized IndexIterator ids(final IndexToken ind) {
-    final FTLexer ft = (FTLexer) ind;
-    final byte[] tok = ft.get();
+    final FTLexer lex = (FTLexer) ind;
+    final byte[] tok = lex.get();
 
     // support fuzzy search
-    if(ft.ftOpt().is(FZ)) {
+    if(lex.ftOpt().is(FZ)) {
       int k = data.meta.prop.num(Prop.LSERROR);
       if(k == 0) k = tok.length >> 2;
       return fuzzy(0, null, -1, tok, 0, 0, 0, k, false);
     }
 
     // support wildcards
-    if(ft.ftOpt().is(WC)) {
+    if(lex.ftOpt().is(WC)) {
       final int pw = indexOf(tok, '.');
       if(pw != -1) return wc(tok, pw, false);
     }

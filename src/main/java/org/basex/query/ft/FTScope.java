@@ -38,13 +38,13 @@ public final class FTScope extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer ft) {
+      final FTLexer lex) {
 
     if(same) {
       int s = -1;
       for(final FTStringMatch sm : mtc) {
         if(sm.ex) continue;
-        final int p = pos(sm.s, ft);
+        final int p = pos(sm.s, lex);
         if(s == -1) s = p;
         else if(s != p) return false;
       }
@@ -55,9 +55,9 @@ public final class FTScope extends FTFilter {
     for(final FTStringMatch sm : mtc) {
       if(sm.ex) continue;
       c++;
-      final int p = pos(sm.s, ft);
+      final int p = pos(sm.s, lex);
       final int s = bl.size();
-      if(p < s && bl.get(p) && p == pos(sm.e, ft)) return false;
+      if(p < s && bl.get(p) && p == pos(sm.e, lex)) return false;
       bl.set(true, p);
     }
     return c > 1;

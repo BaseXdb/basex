@@ -6,19 +6,19 @@ package org.basex.util.ft;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public interface FTOptions {
+public enum FTFlag {
   /** Sensitive flag. */
-  int CS = 0;
+  CS,
   /** Lowercase flag. */
-  int LC = 1;
+  LC,
   /** Uppercase flag. */
-  int UC = 2;
+  UC,
   /** Diacritics flag. */
-  int DC = 3;
+  DC,
   /** Stemming flag. */
-  int ST = 4;
+  ST,
   /** Wildcards flag. */
-  int WC = 5;
+  WC,
   /** Fuzzy flag. */
-  int FZ = 6;
+  FZ;
 }

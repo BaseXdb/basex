@@ -1,7 +1,8 @@
 package org.basex.util.ft;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import org.basex.core.Prop;
-import org.basex.query.ft.FTOpt;
 
 /**
  * Abstract tokenizer.
@@ -9,9 +10,19 @@ import org.basex.query.ft.FTOpt;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Jens Erat
  */
-abstract class Tokenizer extends LanguageDependent implements Iterable<Span> {
+public abstract class Tokenizer extends LanguageImpl {
+  /** List of available tokenizers. */
+  public static final LinkedList<Tokenizer> IMPL;
+
   /** Are special characters included? */
   protected boolean special;
+
+  /** Load tokenizer classes and order them by precedence. */
+  static {
+    IMPL = new LinkedList<Tokenizer>();
+    IMPL.add(new WesternTokenizer(null));
+    Collections.sort(IMPL);
+  }
 
   /**
    * Factory method.
@@ -47,10 +58,9 @@ abstract class Tokenizer extends LanguageDependent implements Iterable<Span> {
    * <li/>int[3]: each token as int[]
    * <li/>int[4]: punctuation marks of each sentence
    * </ul>
-   * @param t text to be parsed
    * @return int arrays or empty array if not implemented
    */
-  int[][] info(@SuppressWarnings("unused") final byte[] t) {
+  int[][] info() {
     return new int[0][];
   }
 
@@ -70,8 +80,14 @@ abstract class Tokenizer extends LanguageDependent implements Iterable<Span> {
    * @param u unit
    * @return new position
    */
-  int pos(@SuppressWarnings("unused") final int w,
-      @SuppressWarnings("unused") final FTUnit u) {
+  @SuppressWarnings("unused")
+  int pos(final int w, final FTUnit u) {
     return 0;
   }
+  
+  /**
+   * Returns an iterator.
+   * @return iterator
+   */
+  abstract FTIterator iter();
 }

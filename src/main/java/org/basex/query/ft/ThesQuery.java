@@ -27,7 +27,7 @@ public final class ThesQuery {
    * Merges two thesaurus definitions.
    * @param th second thesaurus
    */
-  void merge(final ThesQuery th) {
+  public void merge(final ThesQuery th) {
     for(final Thesaurus t : th.thes) {
       boolean f = false;
       for(final Thesaurus tt : thes) f |= tt.sameAs(t);

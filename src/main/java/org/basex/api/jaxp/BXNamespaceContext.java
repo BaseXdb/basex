@@ -1,10 +1,10 @@
 package org.basex.api.jaxp;
 
 import static org.basex.util.Token.*;
-import java.util.ArrayList;
 import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
 import org.basex.query.util.Namespaces;
+import org.basex.util.StringList;
 
 /**
  * This class provides access to namespace context.
@@ -37,7 +37,7 @@ public final class BXNamespaceContext implements NamespaceContext {
 
   @Override
   public Iterator<String> getPrefixes(final String uri) {
-    final ArrayList<String> list = new ArrayList<String>();
+    final StringList list = new StringList();
     final String pre = getPrefix(uri);
     if(!pre.isEmpty()) list.add(pre);
     return list.iterator();

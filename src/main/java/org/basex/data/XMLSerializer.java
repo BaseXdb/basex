@@ -63,7 +63,7 @@ public final class XMLSerializer extends Serializer {
   private final String mth;
 
   /** Output stream. */
-  private PrintOutput out;
+  private final PrintOutput out;
   /** System document type. */
   private String docsys;
   /** Public document type. */
@@ -192,16 +192,6 @@ public final class XMLSerializer extends Serializer {
   }
 
   /**
-   * Sets a new output stream.
-   * @param os output stream
-   * @return self reference
-   */
-  public XMLSerializer out(final PrintOutput os) {
-    out = os;
-    return this;
-  }
-
-  /**
    * Initializes the serializer (resets current indentation).
    */
   public void init() {
@@ -298,16 +288,16 @@ public final class XMLSerializer extends Serializer {
     finishElement();
 
     int c = -1, wl = 0;
-    final FTLexer ftt = new FTLexer(b);
-    while(ftt.hasNext()) {
-      final int end = ftt.next().start;
+    final FTLexer lex = new FTLexer(b);
+    while(lex.hasNext()) {
+      final int pos = lex.next().cpos;
       ++c;
-      for(int i = wl; i < end; i += cl(b, i)) {
+      for(int i = wl; i < pos; i += cl(b, i)) {
         final int ch = cp(b, i);
         if(ftChar(ch) && ftp.contains(c)) print((char) 0x10);
         ch(ch);
       }
-      wl = end;
+      wl = pos;
     }
     while(wl < b.length) {
       ch(cp(b, wl));

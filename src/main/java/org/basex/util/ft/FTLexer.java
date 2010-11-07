@@ -1,17 +1,11 @@
 package org.basex.util.ft;
 
-import static org.basex.util.Token.*;
-import static org.basex.util.ft.FTOptions.*;
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import org.basex.core.Prop;
+import org.basex.data.XMLSerializer;
+import org.basex.index.FTBuilder;
 import org.basex.index.IndexToken;
-import org.basex.query.QueryException;
-import org.basex.query.ft.FTOpt;
-import org.basex.query.util.Err;
-import org.basex.util.Util;
+import org.basex.query.ft.FTFilter;
 
 /**
  * Performs full-text lexing on token. Calls tokenizers, stemmers matching to
@@ -20,80 +14,48 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Jens Erat
  */
-public final class FTLexer implements Iterator<Span>, Iterable<Span>,
-    IndexToken {
-
-  /** Index type. */
-  private static final IndexType INDEXTYPE = IndexType.FULLTEXT;
-  /** List of available stemmers. */
-  private static final LinkedList<SpanProcessor> STEMMERS;
-  /** List of available tokenizers. */
-  private static final LinkedList<Tokenizer> TOKENIZERS;
-
+public final class FTLexer extends FTIterator implements IndexToken {
   /** Tokenizer. */
   private final Tokenizer tok;
   /** Full-text options. */
   private final FTOpt fto;
-  /** database properties. */
-  private final Prop prop;
-  /** String to be tokenized. */
-  private final byte[] text;
+  /** Text to be tokenized. */
+  private byte[] text;
+
   /** Iterator over result tokens. */
-  private Iterator<Span> iterator;
+  private FTIterator iter;
   /** The last parsed span. */
-  private Span currentSpan;
+  private Span curr;
+  /** The last parsed text. */
+  private byte[] ctxt;
 
-  /** Load stemmer and tokenizer classes and order them by precedence. */
-  static {
-    STEMMERS = new LinkedList<SpanProcessor>();
-    TOKENIZERS = new LinkedList<Tokenizer>();
-
-    // Built-in stemmers and tokenizers
-    STEMMERS.add(new EnglishStemmer());
-    TOKENIZERS.add(new WesternTokenizer(null));
-
-    /* SPI / Plug-In processors
-     * final ServiceLoader<SpanProcessor> spLoader =
-     * ServiceLoader.load(SpanProcessor.class); for(final SpanProcessor sp :
-     * spLoader) { switch(sp.type()) { case stemmer: stemmers.add(sp); break;
-     * default: break; } }
-     */
-
-    try {
-      if(SnowballStemmer.available()) {
-        STEMMERS.add(new SnowballStemmer(Language.DEFAULT));
-      }
-      if(WordnetStemmer.available()) {
-        STEMMERS.add(new WordnetStemmer(Language.DEFAULT));
-      }
-    } catch(final QueryException ex) {
-      Util.notexpected(ex);
-    }
-
-    // sort stemmers and tokenizers by precedence
-    Collections.sort(STEMMERS);
-    Collections.sort(TOKENIZERS);
+  /**
+   * Constructor. Called by the {@link FTBuilder}.
+   * @param p database properties
+   */
+  public FTLexer(final Prop p) {
+    this(null, p, null, false);
   }
 
   /**
-   * Constructor.
+   * Constructor. Called by the {@link XMLSerializer} and {@link FTFilter}.
    * @param t text to analyze
    */
   public FTLexer(final byte[] t) {
-    this(t, null, null);
+    this(t, null, null, false);
   }
 
   /**
-   * Constructor.
+   * Constructor. Called by the map visualization.
    * @param t text to analyze
    * @param p database properties
    */
   public FTLexer(final byte[] t, final Prop p) {
-    this(t, p, null);
+    this(t, p, null, false);
   }
 
   /**
-   * Constructor. Finds tokenizer and stemmer based on database properties.
+   * Default constructor.
    * @param txt text to analyze
    * @param p database properties
    * @param f full-text options
@@ -103,7 +65,7 @@ public final class FTLexer implements Iterator<Span>, Iterable<Span>,
   }
 
   /**
-   * Constructor. Finds tokenizer and stemmer based on database properties.
+   * Constructor. Called by the map visualization.
    * @param txt text to analyze
    * @param pr database properties
    * @param opt full-text options
@@ -111,25 +73,19 @@ public final class FTLexer implements Iterator<Span>, Iterable<Span>,
    */
   public FTLexer(final byte[] txt, final Prop pr, final FTOpt opt,
       final boolean sc) {
-    prop = pr;
+
     fto = opt;
     text = txt;
 
     // check if language option is provided:
-    final byte[] lang;
-    final String lstr;
-    if(fto != null && fto.ln != null) {
-      lang = fto.ln;
-    } else if(prop != null && (lstr = pr.get(Prop.FTLANGUAGE)).length() > 0) {
-      lang = token(lstr);
-    } else {
-      lang = Language.DEFAULT.ln;
-    }
+    Language lang = opt != null ? opt.ln : pr != null ?
+        Language.get(pr.get(Prop.LANGUAGE)) : null;
+    if(lang == null) lang = Language.DEFAULT;
 
-    // look for matching tokenizer:
-    Tokenizer tk = TOKENIZERS.getFirst();
+    // use default tokenizer if specific tokenizer is not available.
+    Tokenizer tk = Tokenizer.IMPL.getFirst();
     if(lang != null) {
-      for(final Tokenizer t : TOKENIZERS) {
+      for(final Tokenizer t : Tokenizer.IMPL) {
         if(t.supports(lang)) {
           tk = t;
           break;
@@ -137,68 +93,24 @@ public final class FTLexer implements Iterator<Span>, Iterable<Span>,
       }
     }
     tok = tk.get(txt, pr, opt, sc);
-    iterator = tok.iterator();
+    iter = tok.iter();
 
     // check if stemming is required:
-    if(opt != null && opt.isSet(ST) && opt.is(ST) && opt.sd == null ||
-        opt == null && pr != null && pr.is(Prop.STEMMING)) {
-
-      // look for matching stemmer:
-      SpanProcessor sp = STEMMERS.getFirst();
-      for(final SpanProcessor stem : STEMMERS) {
-        if(stem.supports(lang)) {
-          sp = stem;
-          break;
+    if(opt != null ? opt.is(FTFlag.ST) : pr != null && pr.is(Prop.STEMMING)) {
+      if(opt == null || opt.sd == null) {
+        // use default stemmer if specific stemmer is not available.
+        Stemmer st = Stemmer.IMPL.getFirst();
+        for(final Stemmer stem : Stemmer.IMPL) {
+          if(stem.supports(lang)) {
+            st = stem;
+            break;
+          }
         }
-      }
-      iterator = sp.get(pr, opt).process(iterator);
-      // Additional layer for multithreading
-      // SpanProcessor queue = new SpanThreadedQueue();
-      // iterator = queue.process(iterator);
-    } else if(opt != null && opt.isSet(ST) && opt.is(ST) &&
-        opt.sd != null) iterator = new DictStemmer(opt.sd).process(iterator);
-  }
-
-  /**
-   * Copy constructor.
-   * @param t Text to tokenize
-   * @param copy Instance to copy
-   */
-  public FTLexer(final byte[] t, final FTLexer copy) {
-    this(t, copy.prop, copy.fto, copy.tok.special);
-  }
-
-  /**
-   * Checks if full text options are provided by the database setup.
-   * @param f full text options
-   * @return whether full text options are provided
-   * @throws QueryException if full text options aren't provided
-   */
-  public static boolean checkFTOpt(final FTOpt f) throws QueryException {
-    // use default language if not provided
-    final byte[] lang = f != null && f.ln != null ? f.ln : Language.DEFAULT.ln;
-
-    boolean supp = false;
-    // Check tokenizers if language is specified
-    for(final Tokenizer t : TOKENIZERS) {
-      if(t.supports(lang)) {
-        supp = true;
-        break;
+        iter = st.get(lang).iter(iter);
+      } else {
+        iter = new DictStemmer(opt.sd).iter(iter);
       }
     }
-    // Check stemmers if language is specified (if we use stemming)
-    if(supp && f != null && f.isSet(ST) && f.is(ST) &&
-        f.sd == null || f == null) {
-      supp = false;
-      for(final SpanProcessor s : STEMMERS) {
-        if(s.supports(lang)) {
-          supp = true;
-          break;
-        }
-      }
-    }
-    if(!supp) Err.FTLAN.thrw(null, lang);
-    return supp;
   }
 
   /**
@@ -206,47 +118,51 @@ public final class FTLexer implements Iterator<Span>, Iterable<Span>,
    * @return token count
    */
   public int count() {
-    // calculate all tokens and count them. caching them would be more efficient
-    // if they would be used after calling count() - not done currently. On the
-    // other hand, caching would add some memory overhead.
-    final Iterator<Span> it = iterator();
-    int count = 0;
-    while(it.hasNext()) {
-      it.next();
-      count++;
+    init(text);
+    int c = 0;
+    while(hasNext()) {
+      nextToken();
+      c++;
     }
-    return count;
+    return c;
+  }
+
+  @Override
+  public void init(final byte[] txt) {
+    text = txt;
+    iter.init(txt);
   }
 
   @Override
   public boolean hasNext() {
-    return iterator.hasNext();
+    return iter.hasNext();
   }
 
   @Override
   public Span next() {
-    currentSpan = iterator.next();
-    return currentSpan;
+    curr = iter.next();
+    return curr;
   }
 
   @Override
-  public void remove() {
-    Util.notimplemented();
+  public byte[] nextToken() {
+    ctxt = iter.nextToken();
+    return ctxt;
   }
 
   @Override
   public IndexType type() {
-    return INDEXTYPE;
+    return IndexType.FULLTEXT;
   }
 
   /**
-   * Returns the current token. Inherited from IndexToken. Use next() if not
-   * using this interface.
-   * @return Current token.
+   * Returns the original token. Inherited from {@link IndexToken};
+   * use {@link #next} or {@link #nextToken} if not using this interface.
+   * @return current token.
    */
   @Override
   public byte[] get() {
-    return currentSpan.txt;
+    return ctxt != null ? ctxt : curr.text;
   }
 
   /**
@@ -296,16 +212,10 @@ public final class FTLexer implements Iterator<Span>, Iterable<Span>,
    * <li/>int[3]: each token as int[]
    * <li/>int[4]: punctuation marks of each sentence
    * </ul>
-   * @param t text to be parsed
    * @return int arrays or empty array if not implemented
    */
-  public int[][] info(final byte[] t) {
-    return tok.info(t);
-  }
-
-  @Override
-  public Iterator<Span> iterator() {
-    return new FTLexer(text, prop, fto);
+  public int[][] info() {
+    return tok.info();
   }
 
   /**
@@ -314,9 +224,9 @@ public final class FTLexer implements Iterator<Span>, Iterable<Span>,
    */
   public static EnumSet<Language> languages() {
     final EnumSet<Language> ln = EnumSet.noneOf(Language.class);
-    for(final Tokenizer t : TOKENIZERS) ln.addAll(t.languages());
+    for(final Tokenizer t : Tokenizer.IMPL) ln.addAll(t.languages());
     final EnumSet<Language> sln = EnumSet.noneOf(Language.class);
-    for(final SpanProcessor stem : STEMMERS) sln.addAll(stem.languages());
+    for(final Stemmer stem : Stemmer.IMPL) sln.addAll(stem.languages());
     // intersection of languages tokenizers and stemmers support
     ln.retainAll(sln);
     return ln;

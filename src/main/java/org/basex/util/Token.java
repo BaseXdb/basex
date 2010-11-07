@@ -257,7 +257,7 @@ public final class Token {
   }
 
   /**
-   * Returns the expected codepoint length of the specified byte.
+   * Returns the codepoint length of the specified byte.
    * @param first first character byte
    * @return character length
    */
@@ -266,7 +266,7 @@ public final class Token {
   }
 
   /**
-   * Returns the expected codepoint length of the specified byte.
+   * Returns the codepoint length of the specified byte.
    * @param token token
    * @param pos character position
    * @return character length

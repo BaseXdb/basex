@@ -43,8 +43,8 @@ public abstract class FTIndex implements Index {
   FTIndex(final Data d) {
     data = d;
     scm = d.meta.scoring;
-    max = Math.log(data.meta.ftscmax + 1);
-    min = Math.log(data.meta.ftscmin - 1);
+    max = Math.log(data.meta.maxscore + 1);
+    min = Math.log(data.meta.minscore - 1);
   }
 
   /**

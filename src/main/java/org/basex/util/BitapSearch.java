@@ -3,7 +3,6 @@ package org.basex.util;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * Generalized search algorithm based on the Bitap string matching algorithm.
@@ -25,7 +24,8 @@ public final class BitapSearch<T> {
   private final Comparator<T> cmp;
   /** Bit mask, showing which elements from {@link #needle} are equal to the
    * current element of {@link #haystack}. */
-  private final BitSet mask;
+  private final BitSet msk;
+
   /** Is the method {@link #hasNext} already called? */
   private boolean next;
   /** The current position in the {@link #haystack} iterator; first is 0. */
@@ -41,11 +41,11 @@ public final class BitapSearch<T> {
     haystack = h;
     needle = n;
     cmp = c;
-    if(needle.length == 0) {
-      mask = null;
+    if(n.length == 0) {
+      msk = null;
     } else {
-      mask = new BitSet(needle.length + 1);
-      mask.set(0);
+      msk = new BitSet(n.length + 1);
+      msk.set(0);
     }
   }
 
@@ -54,21 +54,20 @@ public final class BitapSearch<T> {
    * @return {@code true} if yes
    */
   public boolean hasNext() {
-    if(mask == null) return false;
+    if(msk == null) return false;
     if(next) return pos >= 0;
 
     // find next hit:
     next = true;
 
     while(haystack.hasNext()) {
-      final T current = haystack.next();
+      final T curr = haystack.next();
       pos++;
-      for(int k = needle.length; k >= 1; k--)
-        mask.set(k, mask.get(k - 1)
-            && cmp.compare(current, needle[k - 1]) == 0);
-      if(mask.get(needle.length)) return true;
+      for(int k = needle.length; k >= 1; k--) {
+        msk.set(k, msk.get(k - 1) && cmp.compare(curr, needle[k - 1]) == 0);
+      }
+      if(msk.get(needle.length)) return true;
     }
-
     pos = -1;
     return false;
   }
@@ -78,10 +77,7 @@ public final class BitapSearch<T> {
    * @return start position of the match; first position is 0
    */
   public int next() {
-    if(hasNext()) {
-      next = false;
-      return pos - needle.length;
-    }
-    throw new NoSuchElementException();
+    if(hasNext()) next = false;
+    return pos - needle.length;
   }
 }

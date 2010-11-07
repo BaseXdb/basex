@@ -6,9 +6,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -47,13 +49,15 @@ public abstract class AProp {
     }
     if(prop == null) return;
 
+    final StringList read = new StringList();
     final TokenBuilder err = new TokenBuilder();
     final File file = new File(filename);
     if(!file.exists()) {
-      err.addExt("Saving properties in \"" + filename + "\"..." + NL, filename);
+      err.addExt("Saving properties in \"%\"..." + NL, filename);
     } else {
+      BufferedReader br = null;
       try {
-        final BufferedReader br = new BufferedReader(new FileReader(file));
+        br = new BufferedReader(new FileReader(file));
         String line = null;
 
         while((line = br.readLine()) != null) {
@@ -67,6 +71,7 @@ public abstract class AProp {
 
           final String val = line.substring(d + 1).trim();
           String key = line.substring(0, d).trim().toUpperCase();
+
           // extract numeric value in key
           int num = 0;
           for(int s = 0; s < key.length(); ++s) {
@@ -76,6 +81,7 @@ public abstract class AProp {
               break;
             }
           }
+          read.add(key);
 
           final Object entry = props.get(key);
           if(entry == null) {
@@ -96,12 +102,31 @@ public abstract class AProp {
             ((int[]) entry)[num] = Integer.parseInt(val);
           }
         }
-        br.close();
       } catch(final Exception ex) {
         err.addExt("% could not be parsed." + NL, filename);
         Util.debug(ex);
+      } finally {
+        if(br != null) try { br.close(); } catch(final IOException ex) { }
       }
     }
+
+    // check if all mandatory files have been read
+    try {
+      if(err.size() == 0) {
+        boolean ok = true;
+        for(final Field f : getClass().getFields()) {
+          final Object obj = f.get(null);
+          if(!(obj instanceof Object[])) continue;
+          final String key = ((Object[]) obj)[0].toString();
+          if(key.equals(Prop.SKIP[0])) break;
+          ok &= read.contains(key);
+        }
+        if(!ok) err.addExt("Saving properties in \"%\"..." + NL, filename);
+      }
+    } catch(final IllegalAccessException ex) {
+      Util.notexpected(ex);
+    }
+
     if(err.size() != 0) {
       Util.err(err.toString());
       write();

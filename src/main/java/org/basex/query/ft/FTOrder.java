@@ -28,7 +28,7 @@ public final class FTOrder extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer ft) {
+      final FTLexer lex) {
 
     int p = 0, s = 0;
     boolean f = true;

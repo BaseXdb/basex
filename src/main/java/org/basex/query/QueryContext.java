@@ -25,7 +25,6 @@ import org.basex.data.Serializer;
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
-import org.basex.query.ft.FTOpt;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
@@ -49,6 +48,7 @@ import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.Scoring;
 
 /**
@@ -181,7 +181,7 @@ public final class QueryContext extends Progress {
   public QueryContext(final Context ctx) {
     context = ctx;
     nodes = ctx.current;
-    ftopt = new FTOpt(ctx.prop);
+    ftopt = new FTOpt();
     xquery30 = ctx.prop.is(Prop.XQUERY11);
     inf = ctx.prop.is(Prop.QUERYINFO);
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
