@@ -3,16 +3,18 @@ package org.basex.query.ft;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
+
 import java.util.ArrayList;
-import java.util.Comparator;
+
 import org.basex.core.Prop;
 import org.basex.query.QueryException;
-import org.basex.util.BitapSearch;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
+import org.basex.util.TokenList;
+import org.basex.util.ft.FTBitapSearch;
+import org.basex.util.ft.FTBitapSearch.TokenComparator;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
-import org.basex.util.ft.Span;
 
 /**
  * This class performs the full-text tokenization.
@@ -54,9 +56,9 @@ public final class FTTokenizer {
 
     // cache query tokens:
     final FTLexer quLex = new FTLexer(q, prop, fto);
-    final ArrayList<Span> quSpan = new ArrayList<Span>();
-    while(quLex.hasNext()) quSpan.add(quLex.next());
-    final Span[] quTokens = quSpan.toArray(new Span[quSpan.size()]);
+    final TokenList quList = new TokenList();
+    while(quLex.hasNext()) quList.add(quLex.nextToken());
+    final byte[][] quTokens = quList.toArray();
 
     // assign options to text:
     final FTOpt to = lex.ftOpt();
@@ -68,55 +70,56 @@ public final class FTTokenizer {
     to.sd = fto.sd;
 
     // create the comparator:
-    final Comparator<Span> cmp = new Comparator<Span>() {
-      /** Query term extension with thesaurus terms. */
-      private byte[][] thes;
-
+    final TokenComparator cmp = new TokenComparator() {
       @Override
-      public int compare(final Span o1, final Span o2) {
-        final byte[] in = o1.text;
-        final byte[] qu = o2.text;
+      public boolean equal(final byte[] t1, final byte[] t2)
+        throws QueryException {
+        final byte[] in = t1;
+        final byte[] qu = t2;
 
         // skip stop words, i. e. if the current query token is a stop word,
         // it is always equal to the corresponding input token:
-        if(fto.sw != null && fto.sw.id(qu) != 0) return 0;
+        if(fto.sw != null && fto.sw.id(qu) != 0) return true;
 
-        // [DP][JE] ugly way to send the QueryException to the caller by
-        // wrapping it in a RuntimeException:
-        try {
-          // choose fuzzy, wildcard or default search
-          if(fto.is(FZ) ? ls.similar(in, qu, lserr) :
-            fto.is(WC) ? wc(words.input, in, qu, 0, 0) : eq(in, qu)) return 0;
+        // [DP] QueryException is only thrown by wc, during parsing of the wild-
+        // card expression; it might be more efficient, if an automaton is built
+        // before doing the actual search; thus the wild-card expression will
+        // not be parsed by each comparison and will also eliminate the need of
+        // throwing an exception :)
 
-          if(fto.th != null) {
-            // if a thesaurus is provided, check if the current input token is
-            // the same as one of the extension tokens of the query tokens:
-            if(thes == null) thes = fto.th.find(words.input, q);
-
-            for(final byte[] txt : thes) {
-              quLex.init(txt);
-              if(quLex.hasNext() && eq(quLex.nextToken(), in)) return 0;
-            }
-          }
-        } catch(final QueryException e) {
-          throw new RuntimeException(e);
-        }
-        return 1;
+        // choose fuzzy, wildcard or default search
+        return fto.is(FZ) ? ls.similar(in, qu, lserr) :
+          fto.is(WC) ? wc(words.input, in, qu, 0, 0) : eq(in, qu);
       }
     };
+    
+    final ArrayList<byte[][]> extendedQuTokenList = new ArrayList<byte[][]>(1);
+    extendedQuTokenList.add(quTokens);
+    
+    // if thesaurus is required, add the terms which extend the query:
+    if(fto.th != null) {
+      final byte[][] extensionTokens = fto.th.find(words.input, quLex.text());
+      for(int i = 0; i < extensionTokens.length; i++) {
+        // parse each extension term to a set of tokens:
+        final TokenList tokens = new TokenList();
+        // [DP] should we apply the same FT options (e.g. stemming, etc.) to the
+        // thesaurus tokens?
+        quLex.init(extensionTokens[i]);
+        while(quLex.hasNext()) tokens.add(quLex.nextToken());
+        // add each thesaurus term as an additional query term:
+        extendedQuTokenList.add(tokens.toArray());
+      }
+    }
 
     final FTLexer ftl = new FTLexer(lex.text(), prop, to);
-    final BitapSearch<Span> bs = new BitapSearch<Span>(ftl, quTokens, cmp);
+    final FTBitapSearch bs = new FTBitapSearch(ftl, extendedQuTokenList, cmp);
     int c = 0;
-    try {
-      while(bs.hasNext()) {
-        final int pos = bs.next();
-        ++c;
-        // if add returns true (i. e. fast evaluation mode), break the loop:
-        if(words.add(pos, pos + quTokens.length - 1)) break;
-      }
-    } catch(final RuntimeException e) {
-      throw (QueryException) e.getCause();
+
+    while(bs.hasNext()) {
+      final int pos = bs.next();
+      ++c;
+      // if add returns true (i. e. fast evaluation mode), break the loop:
+      if(words.add(pos, pos + quTokens.length - 1)) break;
     }
 
     words.all.sTokenNum++;
