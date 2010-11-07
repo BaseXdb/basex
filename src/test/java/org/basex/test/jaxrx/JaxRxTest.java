@@ -302,20 +302,20 @@ public final class JaxRxTest {
     // no database left
     assertContains(delete("/rest"), "No database");
   }
-  
+
   // PRIVATE METHODS ==========================================================
 
   /**
    * Checks if a string is contained in another string.
    * @param str string
-   * @param sub sub string 
+   * @param sub sub string
    */
   private void assertContains(final String str, final String sub) {
     if(!str.contains(sub)) {
       fail("'" + sub + "' not contained in '" + str + "'.");
     }
   }
-  
+
   /**
    * Executes the specified GET request.
    * @param query request

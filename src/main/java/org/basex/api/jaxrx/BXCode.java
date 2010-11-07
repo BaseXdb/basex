@@ -1,13 +1,7 @@
 package org.basex.api.jaxrx;
 
 import static org.jaxrx.core.URLConstants.*;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import org.basex.core.Prop;
 import org.basex.data.DataText;
 import org.basex.data.SerializerProp;
 import org.basex.server.ClientSession;
@@ -85,39 +79,6 @@ abstract class BXCode {
       sb.append('/').append(path.getResource(i));
     }
     return sb.substring(Math.min(1, sb.length()));
-  }
-
-  /**
-   * Caches the input stream contents to a temporary file on disk.
-   * @param in input stream
-   * @return file reference
-   * @throws IOException I/O exception
-   */
-  final File cache(final InputStream in) throws IOException {
-    // use current number of milliseconds as filename
-    final File file = new File(Prop.TMP + System.currentTimeMillis());
-    final BufferedInputStream bis = new BufferedInputStream(in);
-    final BufferedOutputStream bos = new BufferedOutputStream(
-        new FileOutputStream(file));
-
-    try {
-      while(true) {
-        final int b = bis.read();
-        if(b == -1) break;
-        bos.write(b);
-      }
-      bos.close();
-
-      if(file.length() == 0)
-        throw new JaxRxException(400, "XML input was missing.");
-
-      return file;
-    } catch(final IOException ex) {
-      // try to delete temporary file before returning the exception
-      try { bos.close(); } catch(final Exception exx) { /**/ }
-      file.delete();
-      throw ex;
-    }
   }
 
   /**
