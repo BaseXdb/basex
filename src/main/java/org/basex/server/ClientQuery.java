@@ -66,6 +66,11 @@ public final class ClientQuery extends Query {
   }
 
   @Override
+  public String info() throws BaseXException {
+    return print(exec(ServerCmd.INFO, id));
+  }
+
+  @Override
   public String close() throws BaseXException {
     return print(exec(ServerCmd.CLOSE, id));
   }

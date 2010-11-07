@@ -10,7 +10,7 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-abstract class FTIterator implements Iterator<Span> {
+public abstract class FTIterator implements Iterator<Span> {
   /**
    * Initializes the iterator.
    * @param text text

@@ -1,5 +1,6 @@
 package org.basex.server;
 
+import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import org.basex.core.Context;
@@ -11,6 +12,8 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
+import org.basex.util.Performance;
+import org.basex.util.TokenBuilder;
 
 /**
  * Container for processes executing a query with iterative results.
@@ -20,15 +23,20 @@ import org.basex.query.iter.Iter;
  * @author Christian Gruen
  */
 final class QueryProcess extends Progress {
+  /** Performance. */
+  private final Performance p = new Performance();
   /** Query processor. */
   private final QueryProcessor qp;
   /** Database context. */
   private final Context ctx;
-  /** Query string. */
-  public String query;
-
   /** Print output. */
   private final PrintOutput out;
+
+  /** Query info. */
+  private TokenBuilder info;
+  /** Query results. */
+  private int hits;
+
   /** Serializer. */
   private XMLSerializer xml;
   /** Monitored flag. */
@@ -46,7 +54,6 @@ final class QueryProcess extends Progress {
   QueryProcess(final String qu, final PrintOutput po, final Context c)
       throws QueryException {
 
-    query = qu;
     qp = new QueryProcessor(qu, c);
     try {
       qp.parse();
@@ -66,7 +73,7 @@ final class QueryProcess extends Progress {
    * @param t type
    * @throws QueryException query exception
    */
-  public void bind(final String n, final String o, final String t)
+  void bind(final String n, final String o, final String t)
       throws QueryException {
     qp.bind(n, o, t);
   }
@@ -76,7 +83,7 @@ final class QueryProcess extends Progress {
    * @throws IOException Exception
    * @throws QueryException query exception
    */
-  public void init() throws IOException, QueryException {
+  void init() throws IOException, QueryException {
     monitored = true;
     ctx.lock.before(qp.ctx.updating);
     xml = qp.getSerializer(out);
@@ -91,8 +98,8 @@ final class QueryProcess extends Progress {
   void next() throws IOException, QueryException {
     if(xml == null) init();
     xml.init();
-    final Item item = iter.next();
-    if(item != null) next(item);
+    final Item it = iter.next();
+    if(it != null) next(it);
   }
 
   /**
@@ -100,7 +107,7 @@ final class QueryProcess extends Progress {
    * @throws IOException Exception
    * @throws QueryException query exception
    */
-  public void execute() throws IOException, QueryException {
+  void execute() throws IOException, QueryException {
     if(xml == null) init();
     Item it;
     while((it = iter.next()) != null) next(it);
@@ -108,16 +115,12 @@ final class QueryProcess extends Progress {
   }
 
   /**
-   * Serializes the specified item.
-   * @param it item to be serialized
+   * Returns the query info.
    * @throws IOException Exception
-   * @throws QueryException query exception
    */
-  private void next(final Item it) throws IOException, QueryException {
-    if(stopped) SERVERTIMEOUT.thrw(null);
-    xml.openResult();
-    it.serialize(xml);
-    xml.closeResult();
+  void info() throws IOException {
+    initInfo();
+    out.print(info.finish());
   }
 
   /**
@@ -130,5 +133,33 @@ final class QueryProcess extends Progress {
     qp.stopTimeout();
     qp.close();
     if(monitored) ctx.lock.after(qp.ctx.updating);
+    initInfo();
+  }
+
+  /**
+   * Serializes the specified item.
+   * @param it item to be serialized
+   * @throws IOException Exception
+   * @throws QueryException query exception
+   */
+  private void next(final Item it) throws IOException, QueryException {
+    if(stopped) SERVERTIME.thrw(null);
+    xml.openResult();
+    it.serialize(xml);
+    xml.closeResult();
+    hits++;
+  }
+
+  /**
+   * Initializes the query info.
+   */
+  private void initInfo() {
+    if(info == null) {
+      final int up = qp.updates();
+      info = new TokenBuilder();
+      info.addExt(QUERYHITS + "% %" + NL, hits, hits == 1 ? VALHIT : VALHITS);
+      info.addExt(QUERYUPDATED + "% %" + NL, up, up == 1 ? VALHIT : VALHITS);
+      info.addExt(QUERYTOTAL + "%", p);
+    }
   }
 }

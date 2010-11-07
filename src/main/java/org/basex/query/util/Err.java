@@ -30,7 +30,7 @@ public enum Err {
   /** BASX0006: No permissions. */
   PERMNO(BASX, 5, Text.PERMNO),
   /** BASX0007: Server timeout. */
-  SERVERTIMEOUT(BASX, 6, Text.SERVERTIMEOUT),
+  SERVERTIME(BASX, 6, Text.SERVERTIMEOUT),
   /** BASX0008: No nodes as result. */
   QUERYNODES(BASX, 7, Text.QUERYNODESERR),
   /** BASX0008: No nodes as result. */

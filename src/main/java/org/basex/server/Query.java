@@ -62,6 +62,13 @@ public abstract class Query {
   public abstract String execute() throws BaseXException;
 
   /**
+   * Returns the query info.
+   * @return item string or {@code null}.
+   * @throws BaseXException command exception
+   */
+  public abstract String info() throws BaseXException;
+
+  /**
    * Finishes result serialization and closes the iterator.
    * @return result footer or {@code null}.
    * @throws BaseXException command exception

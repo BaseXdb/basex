@@ -2,6 +2,7 @@ package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
+
 import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
@@ -115,6 +116,15 @@ public final class ServerQueryTest {
   @Test
   public void query() throws BaseXException {
     final ClientQuery cq = cs.query("1");
+    assertEquals("1", cq.execute());
+    assertEquals("", cq.close());
+  }
+
+  /** Runs a query and retrieves the result as string.
+   * @throws BaseXException command exception */
+  @Test
+  public void query2() throws BaseXException {
+    final ClientQuery cq = cs.query("1");
     if(!cq.more()) fail("No result returned");
     assertEquals("1", cq.next());
     assertEquals("", cq.close());
@@ -134,8 +144,8 @@ public final class ServerQueryTest {
   @Test
   public void queryClose() throws BaseXException {
     final ClientQuery cq = cs.query("()");
-    cq.close();
-    cq.close();
+    assertEquals("", cq.close());
+    assertEquals("", cq.close());
     cq.close();
   }
 
@@ -222,7 +232,7 @@ public final class ServerQueryTest {
   @Test
   public void queryBind() throws BaseXException {
     final ClientQuery cq = cs.query("declare variable $a external; $a");
-    cq.bind("a", "5");
+    cq.bind("$a", "5");
     assertEquals("5", cq.next());
     cq.close();
   }
@@ -242,7 +252,7 @@ public final class ServerQueryTest {
   public void queryBindURI() throws BaseXException {
     final ClientQuery cq = cs.query(
         "declare variable $a external; $a");
-    cq.bind("a", "X", "xs:anyURI");
+    cq.bind("$a", "X", "xs:anyURI");
     assertEquals("X", cq.next());
     cq.close();
   }
@@ -265,7 +275,20 @@ public final class ServerQueryTest {
     final ClientQuery cq = cs.query(
         "declare variable $a as xs:integer external; $a");
     cq.bind("a", "1");
-    assertEquals("1", cq.next());
+    assertEquals("1", cq.execute());
+    cq.close();
+  }
+
+  /** Runs a query, omitting more().
+   * @throws BaseXException command exception */
+  @Test
+  public void queryInfo() throws BaseXException {
+    final ClientQuery cq = cs.query("1 to 2");
+    cq.execute();
+    final String info = cq.info();
+    if(!info.contains("Total Time")) {
+      fail("'Total Time' not contained in '" + info + "'.");
+    }
     cq.close();
   }
 

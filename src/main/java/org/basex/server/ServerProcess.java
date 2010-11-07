@@ -250,11 +250,11 @@ public final class ServerProcess extends Thread {
     String err = null;
     try {
       if(sc == QUERY) {
-        qp = new QueryProcess(arg, out, context);
+        final String query = arg;
+        qp = new QueryProcess(query, out, context);
         arg = Integer.toString(id++);
         queries.put(arg, qp);
-
-        log.write(this, arg, qp.query, OK);
+        log.write(this, arg, query, OK);
         // send {ID}0
         out.writeString(arg);
       } else {
@@ -269,11 +269,13 @@ public final class ServerProcess extends Thread {
           qp.init();
         } else if(sc == NEXT) {
           qp.next();
+        } else if(sc == EXEC) {
+          qp.execute();
+        } else if(sc == INFO) {
+          qp.info();
         } else if(sc == CLOSE && qp != null) {
           qp.close(false);
           queries.remove(arg);
-        } else if(sc == EXEC) {
-          qp.execute();
         }
         // send 0 as end marker
         out.write(0);
