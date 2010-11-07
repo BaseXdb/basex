@@ -224,7 +224,7 @@ public class BaseXClient {
   /**
    * Inner class for iterative query execution.
    */
-  class Query {
+  public class Query {
     /** Query id. */
     private final String id;
     /** Next result item. */
@@ -236,16 +236,16 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public Query(final String query) throws IOException {
-      id = execute(0, query);
+      id = exec(0, query);
     }
 
     /**
-     * Checks for the next item.
-     * @return item string
+     * Initializes the query.
+     * @return result header
      * @throws IOException I/O exception
      */
     public String init() throws IOException {
-      return execute(4, id);
+      return exec(4, id);
     }
 
     /**
@@ -256,7 +256,7 @@ public class BaseXClient {
      */
     public void bind(final String name, final String value)
         throws IOException {
-      execute(3, id + '\0' + name + '\0' + value + '\0');
+      exec(3, id + '\0' + name + '\0' + value + '\0');
     }
 
     /**
@@ -265,7 +265,7 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public boolean more() throws IOException {
-      next = execute(1, id);
+      next = exec(1, id);
       return next.length() != 0;
     }
 
@@ -278,12 +278,30 @@ public class BaseXClient {
     }
 
     /**
+     * Returns the complete result.
+     * @return query result
+     * @throws IOException I/O exception
+     */
+    public String execute() throws IOException {
+      return exec(5, id);
+    }
+
+    /**
+     * Returns the query info.
+     * @return query info
+     * @throws IOException I/O exception
+     */
+    public String info() throws IOException {
+      return exec(6, id);
+    }
+
+    /**
      * Closes the query.
-     * @return item string
+     * @return result footer
      * @throws IOException I/O exception
      */
     public String close() throws IOException {
-      final String s = execute(2, id);
+      final String s = exec(2, id);
       out.flush();
       return s;
     }
@@ -295,7 +313,7 @@ public class BaseXClient {
      * @return resulting string
      * @throws IOException I/O exception
      */
-    private String execute(final int cmd, final String arg)
+    private String exec(final int cmd, final String arg)
         throws IOException {
 
       out.write(cmd);
