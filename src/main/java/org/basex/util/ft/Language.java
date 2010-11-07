@@ -1,6 +1,9 @@
 package org.basex.util.ft;
 
+import static java.util.EnumSet.*;
 import static org.basex.util.Token.*;
+
+import java.util.EnumSet;
 
 /**
  * This class contains language tokens which are valid for the xml:lang
@@ -49,6 +52,13 @@ public enum Language {
 
   /** Default language. */
   public static final Language DEFAULT = EN;
+
+  /** Subset with western languages. */
+  public static final EnumSet<Language> WESTERN = noneOf(Language.class);
+
+  static {
+    for(final Language lt : Language.values()) if(lt.ws) WESTERN.add(lt);
+  }
 
   /** Whether language uses white-spaces (e. g., Chinese does not). */
   final boolean ws;
