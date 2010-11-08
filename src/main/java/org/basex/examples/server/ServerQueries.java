@@ -57,7 +57,7 @@ public final class ServerQueries {
     System.out.print("\n* Use query instance: ");
 
     session.execute("set queryinfo on");
-    
+
     // Create query instance
     ClientQuery query = session.query("1 to 3");
 
@@ -91,7 +91,7 @@ public final class ServerQueries {
     System.out.print("\n* Bind variable $a: ");
 
     session.execute("set queryinfo on");
-    
+
     // Create query instance
     query = session.query("declare variable $a as xs:int external; 1 to $a");
 
