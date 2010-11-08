@@ -274,7 +274,7 @@ public class BaseXClient {
     public String next() {
       return next;
     }
-    
+
     /**
      * Returns the whole result of the query.
      * @return query result
