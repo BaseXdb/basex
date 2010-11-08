@@ -165,7 +165,7 @@ public class CreateDB extends ACreate {
       if(data.meta.atvindex) data.setIndex(IndexType.ATTRIBUTE,
         new ValueBuilder(data, false).build());
       if(data.meta.ftxindex) data.setIndex(IndexType.FULLTEXT,
-        FTBuilder.get(data, data.meta.wildcards).build());
+        FTBuilder.get(data).build());
       data.close();
     } catch(final IOException ex) {
       try {

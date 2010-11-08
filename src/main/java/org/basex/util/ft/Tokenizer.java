@@ -84,7 +84,7 @@ public abstract class Tokenizer extends LanguageImpl {
   int pos(final int w, final FTUnit u) {
     return 0;
   }
-  
+
   /**
    * Returns an iterator.
    * @return iterator

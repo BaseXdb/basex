@@ -52,7 +52,8 @@ final class FTTrie extends FTIndex {
     tb.addExt("- %: %" + NL, CREATESTEM, AInfo.flag(data.meta.stemming));
     tb.addExt("- %: %" + NL, CREATECS, AInfo.flag(data.meta.casesens));
     tb.addExt("- %: %" + NL, CREATEDC, AInfo.flag(data.meta.diacritics));
-    tb.addExt("- %: %" + NL, CREATELANG, data.meta.language);
+    if(data.meta.language != null)
+      tb.addExt("- %: %" + NL, CREATELANG, data.meta.language);
     final long l = inA.length() + inB.length() + inC.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
 

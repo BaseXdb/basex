@@ -84,12 +84,10 @@ public final class FTLexer extends FTIterator implements IndexToken {
 
     // use default tokenizer if specific tokenizer is not available.
     Tokenizer tk = Tokenizer.IMPL.getFirst();
-    if(lang != null) {
-      for(final Tokenizer t : Tokenizer.IMPL) {
-        if(t.supports(lang)) {
-          tk = t;
-          break;
-        }
+    for(final Tokenizer t : Tokenizer.IMPL) {
+      if(t.supports(lang)) {
+        tk = t;
+        break;
       }
     }
     tok = tk.get(txt, pr, opt, sc);

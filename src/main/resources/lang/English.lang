@@ -360,6 +360,7 @@ pc_deleted=% document(s) deleted in %.
 pc_filenf=File or directory "%" not found.
 pc_pathnf=File or directory not found.
 pc_dbnf=Please enter a database name.
+pc_langnf=Language '%' not supported.
 pc_err="%" could not be parsed.
 pc_pos="%" (Line %)
 

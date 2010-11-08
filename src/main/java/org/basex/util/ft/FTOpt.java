@@ -74,34 +74,6 @@ public class FTOpt extends ExprInfo {
     return b != null && b.booleanValue();
   }
 
-  /**
-   * Checks if full text options are provided by the database setup.
-   * @return whether full text options are provided
-   */
-  public boolean supported() {
-    // use default language if not provided
-    final Language lang = ln != null ? ln : Language.DEFAULT;
-    boolean supp = false;
-    // Check tokenizers if language is specified
-    for(final Tokenizer t : Tokenizer.IMPL) {
-      if(t.supports(lang)) {
-        supp = true;
-        break;
-      }
-    }
-    // Check stemmers if language is specified (if we use stemming)
-    if(supp && is(ST) && sd == null) {
-      supp = false;
-      for(final Stemmer s : Stemmer.IMPL) {
-        if(s.supports(lang)) {
-          supp = true;
-          break;
-        }
-      }
-    }
-    return supp;
-  }
-
   @Override
   public void plan(final Serializer ser) throws IOException {
     if(is(WC)) ser.attribute(token(WILDCARDS), TRUE);

@@ -1,7 +1,6 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
-
 import org.basex.util.Util;
 
 /**

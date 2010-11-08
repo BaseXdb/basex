@@ -360,6 +360,7 @@ pc_deleted=% document(o/i) cancellato in %.
 pc_filenf=Documento o cartella "%" non trovati.
 pc_pathnf=Documento o cartella non trovati.
 pc_dbnf=Inserisci un nome per la base di dati.
+pc_langnf=Language '%' not supported.
 pc_err="%" non può essere analizzato.
 pc_pos="%" (Linea %)
 

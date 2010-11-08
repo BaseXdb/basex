@@ -58,8 +58,8 @@ public final class DialogCreateFS extends Dialog {
   private final BaseXCheckBox atvindex;
   /** Full-text index flag. */
   private final BaseXCheckBox ftxindex;
-  /** Full-text indexing. */
-  private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
+  /** Editable full-text options. */
+  private final DialogFT ft;
 
   /** Directory path. */
   final BaseXTextField path;
@@ -76,7 +76,7 @@ public final class DialogCreateFS extends Dialog {
 
     // create panels
     final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new TableLayout(3, 1));
+    p1.setLayout(new BorderLayout());
     p1.setBorder(8, 8, 8, 8);
 
     BaseXBack p = new BaseXBack();
@@ -85,9 +85,14 @@ public final class DialogCreateFS extends Dialog {
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.prop;
 
-    final BaseXLabel lab = new BaseXLabel(IMPORTFSTEXT, false, true);
-    lab.setBorder(new EmptyBorder(4, 4, 0, 0));
-    p.add(lab);
+    BaseXLabel l = new BaseXLabel(IMPORTFSTEXT, false, true);
+    l.setBorder(0, 0, 4, 0);
+    p.add(l);
+    p.add(new BaseXLabel());
+
+    path = new BaseXTextField(gprop.get(GUIProp.FSBACKING), this);
+    path.addKeyListener(keys);
+    p.add(path);
 
     browse = new BaseXButton(BUTTONBROWSE, this);
     browse.addActionListener(new ActionListener() {
@@ -103,9 +108,9 @@ public final class DialogCreateFS extends Dialog {
     });
     p.add(browse);
 
-    path = new BaseXTextField(gprop.get(GUIProp.FSBACKING), this);
-    path.addKeyListener(keys);
-    p.add(path);
+    l = new BaseXLabel(CREATENAME, false, true);
+    l.setBorder(8, 0, 4, 0);
+    p.add(l);
 
     all = new BaseXCheckBox(IMPORTALL, gprop.is(GUIProp.FSALL), this);
     all.setToolTipText(IMPORTALLINFO);
@@ -118,19 +123,13 @@ public final class DialogCreateFS extends Dialog {
     });
     p.add(all);
 
-    final BaseXLabel lab1 = new BaseXLabel(CREATENAME, false, true);
-    lab1.setBorder(new EmptyBorder(4, 4, 4, 0));
-    p.add(lab1);
-    p.add(new BaseXLabel());
-
     dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), this);
     dbname.addKeyListener(keys);
     p.add(dbname);
-    p1.add(p);
+    p1.add(p, BorderLayout.CENTER);
 
     info = new BaseXLabel(" ");
-    info.setBorder(20, 0, 10, 0);
-    p1.add(info);
+    p1.add(info, BorderLayout.SOUTH);
 
     // Metadata panel
     final BaseXBack p2 = new BaseXBack();
@@ -184,11 +183,6 @@ public final class DialogCreateFS extends Dialog {
     p3.setLayout(new TableLayout(6, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
 
-    pathindex = new BaseXCheckBox(INFOPATHINDEX,
-        prop.is(Prop.PATHINDEX), 0, this);
-    p3.add(pathindex);
-    p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
-
     txtindex = new BaseXCheckBox(INFOTEXTINDEX,
         prop.is(Prop.TEXTINDEX), 0, this);
     p3.add(txtindex);
@@ -199,22 +193,20 @@ public final class DialogCreateFS extends Dialog {
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
 
+    pathindex = new BaseXCheckBox(INFOPATHINDEX,
+        prop.is(Prop.PATHINDEX), 0, this);
+    p3.add(pathindex);
+    p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
+
     final BaseXBack p4 = new BaseXBack();
-    p4.setLayout(new TableLayout(10, 1, 0, 0));
+    p4.setLayout(new TableLayout(2, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 
-    ftxindex = new BaseXCheckBox(INFOFTINDEX, false, 0, this);
+    ftxindex = new BaseXCheckBox(INFOFTINDEX, prop.is(Prop.FTINDEX), 0, this);
     p4.add(ftxindex);
-    p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 
-    final String[] cb = { CREATEWC, CREATESTEM, CREATECS, CREATEDC };
-    final boolean[] val = { prop.is(Prop.WILDCARDS), prop.is(Prop.STEMMING),
-        prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS)
-    };
-    for(int f = 0; f < ft.length; ++f) {
-      ft[f] = new BaseXCheckBox(cb[f], val[f], this);
-      p4.add(ft[f]);
-    }
+    ft = new DialogFT(this, true);
+    p4.add(ft);
 
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p1);
@@ -225,7 +217,6 @@ public final class DialogCreateFS extends Dialog {
 
     // create buttons
     buttons = okCancel(this);
-
     set(buttons, BorderLayout.SOUTH);
 
     action(null);
@@ -234,25 +225,21 @@ public final class DialogCreateFS extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    final boolean ftx = ftxindex.isSelected();
-    for(final BaseXCheckBox f : ft) f.setEnabled(ftx);
+    ft.action(ftxindex.isSelected());
 
     final boolean sel = !all.isSelected();
     path.setEnabled(sel);
     browse.setEnabled(sel);
     maxsize.setEnabled(cont.isSelected());
 
-    boolean cAll; // import all is chosen?
-    boolean cNam; // dbname given?
-
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.prop;
     final String nm = dbname.getText().trim();
-    cNam = !nm.isEmpty();
+    final boolean cNam = !nm.isEmpty();
     if(cNam) gprop.set(GUIProp.FSDBNAME, nm);
     ok = cNam;
 
-    cAll = all.isSelected();
+    boolean cAll = all.isSelected();
     if(cAll) gprop.set(GUIProp.FSBACKING, path.getText());
 
     if(!cAll && cNam) {
@@ -286,6 +273,7 @@ public final class DialogCreateFS extends Dialog {
   @Override
   public void close() {
     if(!ok) return;
+    super.close();
 
     gui.set(Prop.FSCONT, cont.isSelected());
     gui.set(Prop.FSMETA, meta.isSelected());
@@ -295,15 +283,11 @@ public final class DialogCreateFS extends Dialog {
     gui.set(Prop.TEXTINDEX, txtindex.isSelected());
     gui.set(Prop.ATTRINDEX, atvindex.isSelected());
     gui.set(Prop.FTINDEX, ftxindex.isSelected());
-    gui.set(Prop.WILDCARDS, ft[0].isSelected());
-    gui.set(Prop.STEMMING, ft[1].isSelected());
-    gui.set(Prop.CASESENS, ft[2].isSelected());
-    gui.set(Prop.DIACRITICS, ft[3].isSelected());
+    ft.close();
 
     final GUIProp gprop = gui.prop;
     gprop.set(GUIProp.FSALL, all.isSelected());
     gprop.set(GUIProp.FSBACKING, path.getText());
     gprop.set(GUIProp.FSDBNAME, dbname.getText());
-    super.close();
   }
 }

@@ -360,6 +360,7 @@ pc_deleted=% document(s) supprimé dans %.
 pc_filenf=Fichier ou dossier "%" introuvable.
 pc_pathnf=Fichier ou dossier introuvable.
 pc_dbnf=Entrer un nom de base de données.
+pc_langnf=Language '%' not supported.
 pc_err="%" n'a pu être parsé.
 pc_pos="%" (ligne %)
 

@@ -56,7 +56,7 @@ public final class DialogPrefs extends Dialog {
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(11, 1, 0, 0));
+    pp.setLayout(new TableLayout(11, 1));
     pp.add(new BaseXLabel(DATABASEPATH, true, true));
 
     BaseXBack p = new BaseXBack();

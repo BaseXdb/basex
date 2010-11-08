@@ -341,7 +341,9 @@ public final class FTTest extends QueryTest {
 
       { "FTLanguage 1", nod(14),
         "//* [text() contains text 'hello' using language 'en']" },
-      { "FTLanguage 2", // error
+      { "FTLanguage 2", nod(14),
+        "//* [text() contains text 'hello' using language 'de']" },
+      { "FTLanguage 3", // error
         "//* [text() contains text 'hello' using language 'jp']" },
 
       { "FTStopWords 1", nod(7, 9, 11), "//* [text() contains text " +

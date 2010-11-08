@@ -2,7 +2,6 @@ package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
-
 import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;

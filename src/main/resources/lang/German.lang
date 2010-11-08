@@ -360,6 +360,7 @@ pc_deleted=% Dokument(e) gelöscht (%).
 pc_filenf="%" wurde nicht gefunden.
 pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
+pc_langnf=Sprache '%' wird nicht unterstützt.
 pc_err="%" konnte nicht eingelesen werden.
 pc_pos="%" (Zeile %)
 

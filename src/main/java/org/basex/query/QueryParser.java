@@ -2393,8 +2393,9 @@ public class QueryParser extends InputParser {
     final FTOpt fto = new FTOpt();
     boolean found = false;
     while(ftMatchOption(fto)) found = true;
-    // check if the options are supported:
-    if(!fto.supported()) error(Err.FTLAN, fto.ln);
+    // check if specified language is available
+    if(!Language.supported(fto.ln, fto.is(ST) && fto.sd == null))
+      error(Err.FTLAN, fto.ln);
     // consume weight option
     if(consumeWS(WEIGHT))
       expr = new FTWeight(input(), expr, enclosed(NOENCLEXPR));
@@ -2521,7 +2522,7 @@ public class QueryParser extends InputParser {
     } else if(consumeWS(LANGUAGE)) {
       if(opt.ln != null) error(FTDUP, LANGUAGE);
       final byte[] lan = stringLiteral();
-      opt.ln = Language.get(lan);
+      opt.ln = Language.get(string(lan));
       if(opt.ln == null) error(FTLAN, lan);
     } else if(consumeWS(OPTION)) {
       optionDecl();

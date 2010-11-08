@@ -88,7 +88,8 @@ final class FTFuzzy extends FTIndex {
     tb.addExt("- %: %" + NL, CREATESTEM, AInfo.flag(data.meta.stemming));
     tb.addExt("- %: %" + NL, CREATECS, AInfo.flag(data.meta.casesens));
     tb.addExt("- %: %" + NL, CREATEDC, AInfo.flag(data.meta.diacritics));
-    tb.addExt("- %: %" + NL, CREATELANG, data.meta.language);
+    if(data.meta.language != null)
+      tb.addExt("- %: %" + NL, CREATELANG, data.meta.language);
     final long l = li.length() + ti.length() + dat.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
 

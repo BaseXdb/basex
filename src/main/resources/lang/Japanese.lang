@@ -362,6 +362,7 @@ pc_deleted=% document(s) deleted in %.
 pc_filenf=ファイル "%" が見付かりませんでした。
 pc_pathnf=ファイル又はディレクトリが見付かりませんでした。
 pc_dbnf=データベース名を入力してください。
+pc_langnf=Language '%' not supported.
 pc_err="%" をパースできませんでした。
 pc_pos=% (%行、)
 

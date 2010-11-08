@@ -28,7 +28,7 @@ final class LuceneStemmer extends Stemmer {
 
   static {
     try {
-      add(DE); add(FR); add(NL); add(RU);
+      add(PT, "br.Brazilian"); add(DE); add(FR); add(NL); add(RU);
     } catch(final Exception ex) {
       // class path was not found
     }
@@ -40,8 +40,19 @@ final class LuceneStemmer extends Stemmer {
    * @throws Exception exception
    */
   private static void add(final Language lang) throws Exception {
+    add(lang, lang.name().toLowerCase() + '.' + lang);
+  }
+
+  /**
+   * Check if a stemmer class is available, and add it the the list of stemmers.
+   * @param lang language
+   * @param path class path
+   * @throws Exception exception
+   */
+  private static void add(final Language lang, final String path)
+      throws Exception {
     final Class<?> c = Class.forName(
-        PKG + '.' + lang.name().toLowerCase() + '.' + lang + "Stemmer");
+        PKG + '.' + path + "Stemmer");
     final Method m = findMethod(c, "stem", String.class);
     CLASSES.put(lang, new StemmerClass(c, m));
   }

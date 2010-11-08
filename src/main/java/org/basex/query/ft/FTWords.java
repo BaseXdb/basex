@@ -26,7 +26,7 @@ import org.basex.util.ft.FTOpt;
 
 /**
  * FTWords expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */

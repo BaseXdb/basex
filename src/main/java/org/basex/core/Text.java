@@ -417,6 +417,8 @@ public interface Text {
   String PATHWHICH = lang("pc_pathnf");
   /** Missing database name. */
   String DBWHICH = lang("pc_dbnf");
+  /** Language not supported. */
+  String LANGWHICH = lang("pc_langnf");
 
   // DATABASE COMMANDS ========================================================
 
@@ -1037,32 +1039,32 @@ public interface Text {
   String CREATESCT2 = lang("dc_ftsct2");
 
   /** Whitespaces information. */
-  String CHOPPINGINFO = lang("dc_chopinfo");
+  String CHOPPINGINFO = lang("dc_chopinfo") + DOT;
   /** Whitespaces information. */
-  String INTPARSEINFO = lang("dc_intparseinfo");
+  String INTPARSEINFO = lang("dc_intparseinfo") + DOT;
 
   /** Path summary information. */
-  String PATHINDEXINFO = lang("dc_pathinfo");
+  String PATHINDEXINFO = lang("dc_pathinfo") + DOT;
   /** Text index information. */
-  String TXTINDEXINFO = lang("dc_txtinfo");
+  String TXTINDEXINFO = lang("dc_txtinfo") + DOT;
   /** Attribute value index information. */
-  String ATTINDEXINFO = lang("dc_attinfo");
+  String ATTINDEXINFO = lang("dc_attinfo") + DOT;
   /** Full-text index information. */
-  String FTINDEXINFO = lang("dc_ftxinfo");
+  String FTINDEXINFO = lang("dc_ftxinfo") + DOT;
   /** Full-text index information. */
-  String WCINDEXINFO = lang("dc_wcinfo");
+  String WCINDEXINFO = lang("dc_wcinfo") + DOT;
   /** Full-text index information. */
-  String FTSTEMINFO = lang("dc_ftsteminfo");
+  String FTSTEMINFO = lang("dc_ftsteminfo") + DOT;
   /** Full-text index information. */
-  String FTLANGINFO = lang("dc_ftlanginfo");
+  String FTLANGINFO = lang("dc_ftlanginfo") + DOT;
   /** Full-text index information. */
-  String FTCSINFO = lang("dc_ftcsinfo");
+  String FTCSINFO = lang("dc_ftcsinfo") + DOT;
   /** Full-text index information. */
-  String FTDCINFO = lang("dc_ftdcinfo");
+  String FTDCINFO = lang("dc_ftdcinfo") + DOT;
   /** Full-text index information. */
-  String FTSCINFO = lang("dc_ftscinfo");
+  String FTSCINFO = lang("dc_ftscinfo") + DOT;
   /** Full-text index information. */
-  String FTSWINFO = lang("dc_ftswinfo");
+  String FTSWINFO = lang("dc_ftswinfo") + DOT;
 
   /** General info. */
   String GENERALINFO = lang("dc_general");

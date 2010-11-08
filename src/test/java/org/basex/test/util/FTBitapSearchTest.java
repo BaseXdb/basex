@@ -2,10 +2,8 @@ package org.basex.test.util;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-
 import org.basex.query.QueryException;
 import org.basex.util.TokenList;
 import org.basex.util.ft.FTBitapSearch;
@@ -52,7 +50,7 @@ public class FTBitapSearchTest {
       final byte[][] hs = new byte[h.length][];
       for(int i = 0; i < h.length; i++)
         hs[i] = token(h[i]);
-      
+
       haystack = new FTIterator() {
         /** Index of current element. */
         private int cnt;
@@ -77,10 +75,9 @@ public class FTBitapSearchTest {
         public void init(final byte[] text) { }
       };
       needles = new ArrayList<byte[][]>(n.length);
-      for(int i = 0; i < n.length; i++) {
-        final TokenList needle = new TokenList(n[i].length);
-        for(int j = 0; j < n[i].length; j++)
-          needle.add(token(n[i][j]));
+      for(final String[] s : n) {
+        final TokenList needle = new TokenList(s.length);
+        for(final String t : s) needle.add(token(t));
         needles.add(needle.toArray());
       }
     }
@@ -169,7 +166,7 @@ public class FTBitapSearchTest {
           fail("Test " + i + ": expected " + TESTS[i].expected.length +
               " hits, got more!");
       }
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       fail(e.getMessage());
     }
   }

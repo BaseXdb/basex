@@ -3,7 +3,6 @@ package org.basex.util.ft;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.NoSuchElementException;
-
 import org.basex.query.QueryException;
 
 /**
@@ -11,7 +10,7 @@ import org.basex.query.QueryException;
  * The implementation is based on the implementation in Wikipedia, but uses
  * {@link BitSet} for fast bit operation. This version works with a set of
  * needles and each one of it can be matched in the haystack.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Dimitar Popov
  * @see <a href="http://en.wikipedia.org/wiki/Bitap_algorithm"
@@ -57,7 +56,7 @@ public class FTBitapSearch {
     for(int i = 0; i < sorted.length; i++) {
       if(n.get(i) != null && n.get(i).length > 0) sorted[++count] = i;
     }
-    
+
     masks = new BitSet[++count];
     // sort the needles by length (longest first):
     for(int i = 0; i < count; i++) {
@@ -128,7 +127,7 @@ public class FTBitapSearch {
 
   /**
    * Token comparator.
-   * 
+   *
    * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
    * @author Dimitar Popov
    */

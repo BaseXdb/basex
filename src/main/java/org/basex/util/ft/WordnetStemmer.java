@@ -100,7 +100,7 @@ final class WordnetStemmer extends Stemmer {
     } catch(final Exception e) {
       throw new RuntimeException(e);
     }
-  }  
+  }
 
   @Override
   Stemmer get(final Language l) {

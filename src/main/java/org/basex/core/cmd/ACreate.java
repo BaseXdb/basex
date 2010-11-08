@@ -112,7 +112,7 @@ public abstract class ACreate extends Command {
     switch(i) {
       case TEXT: b = new ValueBuilder(d, true); break;
       case ATTRIBUTE: b = new ValueBuilder(d, false); break;
-      case FULLTEXT: b = FTBuilder.get(d, d.meta.wildcards); break;
+      case FULLTEXT: b = FTBuilder.get(d); break;
       case PATH: b = new PathBuilder(d); break;
       default: Util.notexpected();
     }

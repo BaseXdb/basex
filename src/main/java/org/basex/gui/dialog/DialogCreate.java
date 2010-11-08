@@ -79,12 +79,14 @@ public final class DialogCreate extends Dialog {
 
     // create panels
     final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new TableLayout(2, 1, 0, 4));
+    p1.setLayout(new BorderLayout());
     p1.setBorder(8, 8, 8, 8);
 
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(6, 2, 6, 0));
-    p.add(new BaseXLabel(CREATETITLE + COL, false, true));
+    BaseXLabel l = new BaseXLabel(CREATETITLE + COL, true, true);
+    l.setBorder(0, 0, 4, 0);
+    p.add(l);
     p.add(new BaseXLabel());
 
     path = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
@@ -98,7 +100,8 @@ public final class DialogCreate extends Dialog {
     });
     p.add(browse);
 
-    BaseXLabel l = new BaseXLabel(CREATEPATTERN + COL, false, true);
+    l = new BaseXLabel(CREATEPATTERN + COL, true, true);
+    l.setBorder(8, 0, 4, 0);
     p.add(l);
     p.add(new BaseXLabel());
 
@@ -106,7 +109,7 @@ public final class DialogCreate extends Dialog {
     p.add(filter);
     p.add(new BaseXLabel());
     l = new BaseXLabel(CREATENAME, false, true);
-    l.setBorder(5, 0, 0, 0);
+    l.setBorder(8, 0, 4, 0);
     p.add(l);
     p.add(new BaseXLabel());
 
@@ -116,13 +119,11 @@ public final class DialogCreate extends Dialog {
     dbname.addKeyListener(keys);
     p.add(dbname);
     p.add(new BaseXLabel());
-    p1.add(p);
+    p1.add(p, BorderLayout.CENTER);
 
     info = new BaseXLabel(" ");
-    info.setBorder(42, 0, 0, 0);
-    p1.add(info);
+    p1.add(info, BorderLayout.SOUTH);
 
-    // create checkboxes
     final BaseXBack p2 = new BaseXBack();
     p2.setLayout(new TableLayout(14, 1));
     p2.setBorder(8, 8, 8, 8);
@@ -134,18 +135,18 @@ public final class DialogCreate extends Dialog {
 
     entities = new BaseXCheckBox(CREATEENTITIES, prop.is(Prop.ENTITY), this);
     p2.add(entities);
-
     dtd = new BaseXCheckBox(CREATEDTD, prop.is(Prop.DTD), 12, this);
     p2.add(dtd);
 
     chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, this);
     p2.add(chop);
-    p2.add(new BaseXLabel(CHOPPINGINFO, true, false));
+    p2.add(new BaseXLabel(CHOPPINGINFO, false, false));
     p2.add(new BaseXLabel(" "));
+
     final BaseXBack fl = new BaseXBack();
-    fl.setLayout(new TableLayout(2, 2));
+    fl.setLayout(new TableLayout(2, 2, 6, 0));
     usecat = new BaseXCheckBox(USECATFILE,
-        prop.get(Prop.CATFILE).length() > 0, 12, this);
+        !prop.get(Prop.CATFILE).isEmpty(), 0, this);
     fl.add(usecat);
     fl.add(new BaseXLabel());
     cfile = new BaseXTextField(prop.get(Prop.CATFILE), this);
@@ -159,7 +160,6 @@ public final class DialogCreate extends Dialog {
     fl.add(browsec);
     p2.add(fl);
 
-   // create checkboxes
     final BaseXBack p3 = new BaseXBack();
     p3.setLayout(new TableLayout(6, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
@@ -179,9 +179,7 @@ public final class DialogCreate extends Dialog {
     p3.add(pathindex);
     p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
 
-    // create checkboxes
     final BaseXBack p4 = new BaseXBack();
-
     p4.setLayout(new TableLayout(2, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 

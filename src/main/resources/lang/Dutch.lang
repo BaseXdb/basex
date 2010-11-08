@@ -360,6 +360,7 @@ pc_deleted=% documenten verwijderd in %.
 pc_filenf=Bestand of folder "%" niet gevonden.
 pc_pathnf=Bestand of folder niet gevonden.
 pc_dbnf=Geefde database een naam.
+pc_langnf=Language '%' not supported.
 pc_err="%" voldoet niet aan de grammatica.
 pc_pos="%" (Regel %)
 

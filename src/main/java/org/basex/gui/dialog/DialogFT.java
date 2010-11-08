@@ -3,7 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.EnumSet;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -16,6 +15,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.Language;
 
@@ -26,12 +26,29 @@ import org.basex.util.ft.Language;
  * @author Christian Gruen
  */
 final class DialogFT extends BaseXBack {
+  /** Language flag. */
+  private static final int F_LANG = 0;
+  /** Stemming flag. */
+  private static final int F_STEM = 1;
+  /** Case flag. */
+  private static final int F_CASE = 2;
+  /** Diacritics flag. */
+  private static final int F_DIA = 3;
+  /** Wildcards flag. */
+  private static final int F_WILD = 4;
+  /** Scoring flag. */
+  private static final int F_SCORE = 5;
+  /** Stopwords flag. */
+  private static final int F_STOP = 6;
+  /** Number of flags. */
+  private static final int FLAGS = 7;
+
   /** Dialog reference. */
   private final Dialog dialog;
   /** Full-text indexing. */
-  private final BaseXCheckBox[] check = new BaseXCheckBox[7];
+  private final BaseXCheckBox[] check = new BaseXCheckBox[FLAGS];
   /** Full-text labels. */
-  private final BaseXLabel[] labels = new BaseXLabel[7];
+  private final BaseXLabel[] labels = new BaseXLabel[FLAGS];
   /** Full-text language. */
   private final BaseXCombo language;
   /** Full-text scoring type. */
@@ -48,22 +65,20 @@ final class DialogFT extends BaseXBack {
    */
   DialogFT(final Dialog d, final boolean create) {
     dialog = d;
-    setLayout(new TableLayout(14, 1));
+    setLayout(new TableLayout(create ? 9 : 16, 1));
 
     final Prop prop = d.gui.context.prop;
     add(new BaseXLabel(FTINDEXINFO, true, false));
 
     final String sw = prop.get(Prop.STOPWORDS);
-    final String[] cb = {
-        CREATEWC, CREATESTEM, CREATECS, CREATEDC, CREATELANG,
-        CREATESCT, CREATESW };
-    final String[] desc = {
-        WCINDEXINFO, FTSTEMINFO, FTCSINFO, FTDCINFO, FTLANGINFO,
-        FTSCINFO, FTSWINFO };
+    final String[] cb = { CREATELANG, CREATEWC, CREATESTEM, CREATECS,
+        CREATEDC, CREATESCT, CREATESW };
+    final String[] desc = { FTLANGINFO, WCINDEXINFO, FTSTEMINFO, FTCSINFO,
+        FTDCINFO, FTSCINFO, FTSWINFO };
     final boolean[] val = {
-        prop.is(Prop.WILDCARDS), prop.is(Prop.STEMMING), prop.is(Prop.CASESENS),
-        prop.is(Prop.DIACRITICS), prop.get(Prop.LANGUAGE).length() != 0,
-        prop.num(Prop.SCORING) > 0, !sw.isEmpty() };
+        !prop.get(Prop.LANGUAGE).isEmpty(), prop.is(Prop.WILDCARDS),
+        prop.is(Prop.STEMMING), prop.is(Prop.CASESENS),
+        prop.is(Prop.DIACRITICS), prop.num(Prop.SCORING) > 0, !sw.isEmpty() };
 
     for(int f = 0; f < check.length; ++f) {
       check[f] = new BaseXCheckBox(cb[f], val[f], create ? 1 : 0, d);
@@ -72,37 +87,39 @@ final class DialogFT extends BaseXBack {
       } else {
         check[f].setToolTipText(desc[f]);
       }
-      if(f < check.length - 2) {
-        add(check[f]);
-        if(!create) add(labels[f]);
-      }
     }
 
     final BaseXBack b1 = new BaseXBack();
     b1.setLayout(new TableLayout(1, 2, 6, 0));
-    b1.add(check[4]);
-    final EnumSet<Language> langset = FTLexer.languages();
-    final String[] langs = new String[langset.size()];
-    int i = 0;
-    for(final Language l : langset) langs[i++] = l.toString();
-    language = new BaseXCombo(langs, d);
+    b1.add(check[F_LANG]);
+    final StringList langs = new StringList();
+    for(final Language l : FTLexer.languages()) langs.add(l.toString());
+    language = new BaseXCombo(langs.toArray(), d);
+    final Language ln = Language.get(prop.get(Prop.LANGUAGE));
+    language.setSelectedItem((ln == null ? Language.DEFAULT : ln).toString());
+
     b1.add(language);
     add(b1);
-    if(!create) add(labels[4]);
+    if(!create) add(labels[F_LANG]);
+
+    for(int f = F_STEM; f < F_SCORE; ++f) {
+      add(check[f]);
+      if(!create) add(labels[f]);
+    }
 
     final BaseXBack b2 = new BaseXBack();
     b2.setLayout(new TableLayout(1, 2, 6, 0));
-    b2.add(check[5]);
+    b2.add(check[F_SCORE]);
     scoring = new BaseXCombo(new String[] { CREATESCT1, CREATESCT2}, d);
     b2.add(scoring);
     add(b2);
-    if(!create) add(labels[5]);
+    if(!create) add(labels[F_SCORE]);
 
-    add(check[6]);
+    add(check[F_STOP]);
     final BaseXBack b3 = new BaseXBack();
     b3.setLayout(new TableLayout(1, 2, 6, 0));
-    swpath = new BaseXTextField(sw.isEmpty() ? d.gui.prop.get(GUIProp.STOPPATH)
-        : sw, d);
+    swpath = new BaseXTextField(
+        sw.isEmpty() ? d.gui.prop.get(GUIProp.STOPPATH) : sw, d);
     b3.add(swpath);
 
     swbrowse = new BaseXButton(BUTTONBROWSE, d);
@@ -114,7 +131,7 @@ final class DialogFT extends BaseXBack {
     });
     b3.add(swbrowse);
     add(b3);
-    if(!create) add(labels[6]);
+    if(!create) add(labels[F_STOP]);
   }
 
   /**
@@ -140,10 +157,10 @@ final class DialogFT extends BaseXBack {
       check[f].setEnabled(ftx);
       if(labels[f] != null) labels[f].setEnabled(ftx);
     }
-    language.setEnabled(ftx && check[4].isSelected());
-    scoring.setEnabled(ftx && check[5].isSelected());
-    swbrowse.setEnabled(ftx && check[6].isSelected());
-    swpath.setEnabled(ftx && check[6].isSelected());
+    language.setEnabled(ftx && check[F_LANG].isSelected());
+    scoring.setEnabled(ftx && check[F_SCORE].isSelected());
+    swbrowse.setEnabled(ftx && check[F_STOP].isSelected());
+    swpath.setEnabled(ftx && check[F_STOP].isSelected());
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);
     final boolean exists = !sw.isEmpty() && file.exists();
@@ -155,15 +172,14 @@ final class DialogFT extends BaseXBack {
    */
   void close() {
     final GUI gui = dialog.gui;
-    gui.set(Prop.WILDCARDS, check[0].isSelected());
-    gui.set(Prop.STEMMING, check[1].isSelected());
-    gui.set(Prop.CASESENS, check[2].isSelected());
-    gui.set(Prop.DIACRITICS, check[3].isSelected());
-    final String lang = check[4].isSelected() ?
-        Language.get(language.getSelectedItem().toString()).name() : "";
-    gui.set(Prop.LANGUAGE, lang);
-    gui.set(Prop.SCORING, check[5].isSelected() ?
+    gui.set(Prop.LANGUAGE, check[F_LANG].isSelected() ?
+        Language.get(language.getSelectedItem().toString()).name() : "");
+    gui.set(Prop.STEMMING, check[F_STEM].isSelected());
+    gui.set(Prop.CASESENS, check[F_CASE].isSelected());
+    gui.set(Prop.DIACRITICS, check[F_DIA].isSelected());
+    gui.set(Prop.WILDCARDS, check[F_WILD].isSelected());
+    gui.set(Prop.SCORING, check[F_SCORE].isSelected() ?
         scoring.getSelectedIndex() + 1 : 0);
-    gui.set(Prop.STOPWORDS, check[6].isSelected() ? swpath.getText() : "");
+    gui.set(Prop.STOPWORDS, check[F_STOP].isSelected() ? swpath.getText() : "");
   }
 }

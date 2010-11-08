@@ -1,7 +1,6 @@
 package org.basex.util.ft;
 
 import java.util.Iterator;
-
 import org.basex.util.Util;
 
 /**
@@ -23,7 +22,7 @@ public abstract class FTIterator implements Iterator<Span> {
    * @return token
    */
   public abstract byte[] nextToken();
-  
+
   @Override
   public final void remove() {
     Util.notimplemented();

@@ -3,9 +3,7 @@ package org.basex.query.ft;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
-
 import java.util.ArrayList;
-
 import org.basex.core.Prop;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
@@ -84,28 +82,28 @@ public final class FTTokenizer {
         return
             // skip stop words, i. e. if the current query token is a stop word,
             // it is always equal to the corresponding input token:
-            fto.sw != null && fto.sw.id(qu) != 0 ? true :
+            fto.sw != null && fto.sw.id(qu) != 0 ||
             // fuzzy search:
-            fto.is(FZ) ? ls.similar(in, qu, lserr) :
+            (fto.is(FZ) ? ls.similar(in, qu, lserr) :
             // wildcard search:
             fto.is(WC) ? wc(words.input, in, qu, 0, 0) :
             // simple search:
-            eq(in, qu);
+            eq(in, qu));
       }
     };
 
     final ArrayList<byte[][]> extendedQuTokenList = new ArrayList<byte[][]>(1);
     extendedQuTokenList.add(quTokens);
-    
+
     // if thesaurus is required, add the terms which extend the query:
     if(fto.th != null) {
       final byte[][] extensionTokens = fto.th.find(words.input, quLex.text());
-      for(int i = 0; i < extensionTokens.length; i++) {
+      for(final byte[] ext : extensionTokens) {
         // parse each extension term to a set of tokens:
         final TokenList tokens = new TokenList();
         // [DP] should we apply the same FT options (e.g. stemming, etc.) to the
         // thesaurus tokens?
-        quLex.init(extensionTokens[i]);
+        quLex.init(ext);
         while(quLex.hasNext()) tokens.add(quLex.nextToken());
         // add each thesaurus term as an additional query term:
         extendedQuTokenList.add(tokens.toArray());

@@ -14,6 +14,7 @@ import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.Language;
 import org.basex.util.ft.Scoring;
 import org.basex.util.ft.StopWords;
 import org.basex.util.Util;
@@ -58,13 +59,19 @@ public abstract class FTBuilder extends IndexBuilder {
   /**
    * Returns a new full-text index builder.
    * @param d data reference
-   * @param wild wildcard index
    * @return index builder
    * @throws IOException IOException
    */
-  public static FTBuilder get(final Data d, final boolean wild)
+  public static FTBuilder get(final Data d)
       throws IOException {
-    return wild ? new FTTrieBuilder(d) : new FTFuzzyBuilder(d);
+
+    final String lang = d.meta.prop.get(Prop.LANGUAGE);
+    final Language ln = Language.get(lang);
+    if(!Language.supported(ln, d.meta.prop.is(Prop.STEMMING)) ||
+       !lang.isEmpty() && ln == null)
+      throw new IOException(Util.info(LANGWHICH, lang));
+
+    return d.meta.wildcards ? new FTTrieBuilder(d) : new FTFuzzyBuilder(d);
   }
 
   /**

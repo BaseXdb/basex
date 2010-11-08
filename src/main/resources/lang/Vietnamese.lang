@@ -358,6 +358,7 @@ pc_deleted=% document(s) deleted in %.
 pc_filenf=Tệp và thư mục "%" không tìm thấy.
 pc_pathnf=Tệp hay thư mục không tìm thấy.
 pc_dbnf=Xin nhập vào tên cơ sở dữ liệu.
+pc_langnf=Language '%' not supported.
 pc_err="%" không thể phân tích.
 pc_pos="%" (Dòng %)
 
