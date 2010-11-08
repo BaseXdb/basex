@@ -139,7 +139,7 @@ class Query {
   }
   
   /* see readme.txt */
-  public function execute() {
+  public function info() {
     return $this->exec("\6", $this->id);
   }
   
