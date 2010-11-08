@@ -5,9 +5,8 @@
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${JAR}"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
-!define ALPHA "abcdefghijklmnopqrstuvwxyz "
+!define ALPHA "abcdefghijklmnopqrstuvwxyz1234567890"
 !define NUMERIC "1234567890"
-
 RequestExecutionLevel admin
 
 ; MUI 1.67 compatible ------
@@ -53,13 +52,15 @@ FunctionEnd
 Function OptionsLeave
 # Get the user entered values.
 # first password field
-!insertmacro MUI_INSTALLOPTIONS_READ $R0 "Options" "Field 2" "State"
+!insertmacro MUI_INSTALLOPTIONS_READ $R0 "Options" "Field 5" "State"
 # second password field
-!insertmacro MUI_INSTALLOPTIONS_READ $R1 "Options" "Field 3" "State"
+!insertmacro MUI_INSTALLOPTIONS_READ $R1 "Options" "Field 6" "State"
 # webport field
-!insertmacro MUI_INSTALLOPTIONS_READ $R3 "Options" "Field 11" "State"
+!insertmacro MUI_INSTALLOPTIONS_READ $R2 "Options" "Field 15" "State"
+# port field
+!insertmacro MUI_INSTALLOPTIONS_READ $R3 "Options" "Field 14" "State"
 # dbpath field
-!insertmacro MUI_INSTALLOPTIONS_READ $R4 "Options" "Field 12" "State"
+!insertmacro MUI_INSTALLOPTIONS_READ $R4 "Options" "Field 13" "State"
 # Admin password modification
 ${If} $R1 == $R0
   Push "$R1"
@@ -70,7 +71,7 @@ ${If} $R1 == $R0
     MessageBox MB_OK "Passwords contain invalid characters."
     Abort
   ${ElseIf} $R0 != "admin"
-    nsExec::Exec '$INSTDIR\basex.bat -c alter user admin $R0'
+      nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -c alter user admin $R0'
   ${EndIf}
 ${Else}
   MessageBox MB_OK "Passwords do not match."
@@ -99,6 +100,27 @@ ${If} $R3 != "8984"
   ${EndIf}
 ${EndIf}
 CreateDirectory "$INSTDIR\$R4"
+# xq field
+!insertmacro MUI_INSTALLOPTIONS_READ $R5 "Options" "Field 9" "State"
+# xml field
+!insertmacro MUI_INSTALLOPTIONS_READ $R6 "Options" "Field 11" "State"
+# .xq file Association
+        ${If} $R5 == 1
+          WriteRegStr HKCR ".xq" "" "xqfile"
+          WriteRegStr HKCR "xqfile" "" "XQuery File"
+          WriteRegStr HKCR "xqfile\shell" "" "Open"
+          WriteRegStr HKCR "xqfile\shell\Open\command" "" '"$INSTDIR\${PRODUCT_NAME}.exe" "%1"'
+          WriteRegStr HKCR "xqfile\DefaultIcon" "" "$INSTDIR\xml.ico"
+        ${EndIf}
+# .xml file Association
+        ${If} $R6 == 1
+          WriteRegStr HKCR ".xml" "" "xmlfile"
+          WriteRegStr HKCR "xmlfile" "" "XML File"
+          WriteRegStr HKCR "xmlfile\shell" "" "Open"
+          WriteRegStr HKCR "xmlfile\shell\Open\command" "" '"$INSTDIR\${PRODUCT_NAME}.exe" "%1"'
+          WriteRegStr HKCR "xmlfile\DefaultIcon" "" "$INSTDIR\xml.ico"
+        ${EndIf}
+        ${RefreshShellIcons}
 FunctionEnd
 
 ; Language files
@@ -119,22 +141,26 @@ Section "Hauptgruppe" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   File "${PRODUCT_NAME}.exe"
-  File "basexserver.bat"
-  File "basexserverstop.bat"
-  File "basexclient.bat"
-  File "basex.bat"
-  File "basexrest.bat"
+  CreateDirectory "$INSTDIR\bin"
+  SetOutPath "$INSTDIR\bin"
+  File "bin\basexserver.bat"
+  File "bin\basexserverstop.bat"
+  File "bin\basexclient.bat"
+  File "bin\basex.bat"
+  File "bin\basexrest.bat"
+  #CreateDirectory "$INSTDIR\lib"
+  #SetOutPath "$INSTDIR\lib"
+  SetOutPath "$INSTDIR"
   File "${JAR}"
   File "..\..\license.txt"
   File ".basex"
   File "..\images\BaseX.ico"
-  MessageBox MB_OK $R4
-  # set dbpath
-  nsExec::Exec '$INSTDIR\basex.bat -Wc set dbpath $INSTDIR\$R4'
-  # set port
-  nsExec::Exec '$INSTDIR\basex.bat -Wc set port $INSTDIR\$R2'
-  #set webport
-  nsExec::Exec '$INSTDIR\basex.bat -Wc set restport $INSTDIR\$R3'
+  File "..\images\xml.ico"
+  File "..\images\shell.ico"
+  File "..\images\start.ico"
+  File "..\images\stop.ico"
+  # set dbpath, port and webport
+  nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\$R4; set port $R3; set restport $R2';
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
                  "DisplayName" "BaseX"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
@@ -144,18 +170,18 @@ Section "Hauptgruppe" SEC01
 SectionEnd
 
 Section -AdditionalIcons
-  !insertmacro MUI_INSTALLOPTIONS_READ $R5 "Options" "Field 9" "State"
-  !insertmacro MUI_INSTALLOPTIONS_READ $R6 "Options" "Field 10" "State"
-  ${If} $R5 == 1
+  !insertmacro MUI_INSTALLOPTIONS_READ $R7 "Options" "Field 9" "State"
+  !insertmacro MUI_INSTALLOPTIONS_READ $R8 "Options" "Field 10" "State"
+  ${If} $R7 == 1
     CreateShortCut "$DESKTOP\BaseX.lnk" "$INSTDIR\${PRODUCT_NAME}.exe" "" "$INSTDIR\BaseX.ico" 0
   ${EndIf}
-  ${If} $R6 == 1
+  ${If} $R8 == 1
     CreateDirectory "$SMPROGRAMS\BaseX"
     CreateShortCut "$SMPROGRAMS\BaseX\BaseX.lnk" "$INSTDIR\${PRODUCT_NAME}.exe" "" "$INSTDIR\BaseX.ico" 0
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Start).lnk" "$INSTDIR\basexserver.bat -s" "" "$INSTDIR\BaseX.ico" 0
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Stop).lnk" "$INSTDIR\basexserverstop.bat" "" "$INSTDIR\BaseX.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Start).lnk" "$INSTDIR\basexserver.bat -s" "" "$INSTDIR\start.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Stop).lnk" "$INSTDIR\basexserverstop.bat" "" "$INSTDIR\stop.ico" 0
     CreateShortCut "$SMPROGRAMS\BaseX\BaseXClient.lnk" "$INSTDIR\basexclient.bat" "" "$INSTDIR\BaseX.ico" 0
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Standalone.lnk" "$INSTDIR\basex.bat" "" "$INSTDIR\BaseX.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Standalone.lnk" "$INSTDIR\basex.bat" "" "$INSTDIR\shell.ico" 0
     CreateShortCut "$SMPROGRAMS\BaseX\BaseX REST.lnk" "$INSTDIR\basexrest.bat" "" "$INSTDIR\BaseX.ico" 0
     WriteINIStr "$SMPROGRAMS\BaseX\Website.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
     CreateShortCut "$SMPROGRAMS\BaseX\Uninstall.lnk" "$INSTDIR\uninst.exe"
@@ -188,6 +214,18 @@ Section Uninstall
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX"
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX"
+  DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
+  DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
+  DeleteRegKey HKCR ".xq"
+  DeleteRegKey HKCR "File.xq\shell\Open\command"
+  DeleteRegKey HKCR "File.xq\DefaultIcon"
+  DeleteRegKey HKCR "File.xq"
+  DeleteRegKey HKCR ".xml"
+  DeleteRegKey HKCR "File.xml\shell\Open\command"
+  DeleteRegKey HKCR "File.xml\DefaultIcon"
+  DeleteRegKey HKCR "File.xml"
+  ${RefreshShellIcons}
   SetAutoClose true
 SectionEnd
 
