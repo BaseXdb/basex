@@ -30,8 +30,7 @@ abstract class LanguageImpl implements Comparable<LanguageImpl> {
    * @return true if language is supported
    */
   public boolean supports(final Language ln) {
-    for(final Language lt : languages()) if(ln == lt) return true;
-    return false;
+    return languages().contains(ln);
   }
 
   /**
