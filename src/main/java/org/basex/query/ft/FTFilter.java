@@ -49,7 +49,8 @@ public abstract class FTFilter extends FTExpr {
       public FTItem next() throws QueryException {
         FTItem it;
         while((it = ir.next()) != null) {
-          if(filter(ctx, it, content() ? new FTLexer(it.atom()) : null)) break;
+          if(filter(ctx, it,
+              content() ? new FTLexer().init(it.atom()) : null)) break;
         }
         return it;
       }

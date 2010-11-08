@@ -59,7 +59,7 @@ public class FTContains extends ParseExpr {
     ctx.ftfast = ctx.ftfast && ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);
     ctx.ftfast = fast;
-    lex = new FTLexer(null, ctx.context.prop, new FTOpt());
+    lex = new FTLexer(new FTOpt());
 
     return expr.empty() ? optPre(Bln.FALSE, ctx) : this;
   }

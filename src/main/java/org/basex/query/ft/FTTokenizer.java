@@ -9,8 +9,10 @@ import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenList;
+import org.basex.util.TokenObjMap;
 import org.basex.util.ft.FTBitapSearch;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
+import org.basex.util.ft.FTIterator;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
 
@@ -21,10 +23,16 @@ import org.basex.util.ft.FTOpt;
  * @author Christian Gruen
  */
 public final class FTTokenizer {
+  /** Cache. */
+  final TokenObjMap<ArrayList<byte[][]>> cache =
+    new TokenObjMap<ArrayList<byte[][]>>();
+
   /** Levenshtein reference. */
   final Levenshtein ls = new Levenshtein();
   /** Database properties. */
   final FTWords words;
+  /** Full-text options. */
+  final FTOpt opt;
   /** Database properties. */
   final Prop prop;
   /** Levenshtein error. */
@@ -34,38 +42,31 @@ public final class FTTokenizer {
    * Constructor.
    * @param pr database properties
    * @param w full-text words
+   * @param o full-text options
    */
-  public FTTokenizer(final Prop pr, final FTWords w) {
+  public FTTokenizer(final Prop pr, final FTWords w, final FTOpt o) {
     prop = pr;
     lserr = pr.num(Prop.LSERROR);
     words = w;
+    opt = o;
   }
 
   /**
    * Checks if the first token contains the second full-text term.
-   * @param q query token
+   * @param query query token
    * @param lex input text
-   * @param fto full-text options
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final byte[] q, final FTLexer lex, final FTOpt fto)
-      throws QueryException {
-
-    // cache query tokens:
-    final FTLexer quLex = new FTLexer(q, prop, fto);
-    final TokenList quList = new TokenList();
-    while(quLex.hasNext()) quList.add(quLex.nextToken());
-    final byte[][] quTokens = quList.toArray();
-
+  int contains(final byte[] query, final FTLexer lex) throws QueryException {
     // assign options to text:
     final FTOpt to = lex.ftOpt();
-    to.set(ST, fto.is(ST));
-    to.set(DC, fto.is(DC));
-    to.set(CS, fto.is(CS));
-    to.ln = fto.ln;
-    to.th = fto.th;
-    to.sd = fto.sd;
+    to.set(ST, opt.is(ST));
+    to.set(DC, opt.is(DC));
+    to.set(CS, opt.is(CS));
+    to.ln = opt.ln;
+    to.th = opt.th;
+    to.sd = opt.sd;
 
     // create the comparator:
     final TokenComparator cmp = new TokenComparator() {
@@ -80,45 +81,54 @@ public final class FTTokenizer {
         // throwing an exception :)
 
         return
-            // skip stop words, i. e. if the current query token is a stop word,
-            // it is always equal to the corresponding input token:
-            fto.sw != null && fto.sw.id(qu) != 0 ||
-            // fuzzy search:
-            (fto.is(FZ) ? ls.similar(in, qu, lserr) :
-            // wildcard search:
-            fto.is(WC) ? wc(words.input, in, qu, 0, 0) :
-            // simple search:
-            eq(in, qu));
+          // skip stop words, i. e. if the current query token is a stop word,
+          // it is always equal to the corresponding input token:
+          opt.sw != null && opt.sw.id(qu) != 0 ||
+          // fuzzy search:
+          (opt.is(FZ) ? ls.similar(in, qu, lserr) :
+          // wildcard search:
+          opt.is(WC) ? wc(words.input, in, qu, 0, 0) :
+          // simple search:
+          eq(in, qu));
       }
     };
 
-    final ArrayList<byte[][]> extendedQuTokenList = new ArrayList<byte[][]>(1);
-    extendedQuTokenList.add(quTokens);
+    // [DP] cache FTBitapSearch instead ?
+    ArrayList<byte[][]> quTokens = cache.get(query);
+    if(quTokens == null) {
+      quTokens = new ArrayList<byte[][]>(1);
+      cache.add(query, quTokens);
 
-    // if thesaurus is required, add the terms which extend the query:
-    if(fto.th != null) {
-      final byte[][] extensionTokens = fto.th.find(words.input, quLex.text());
-      for(final byte[] ext : extensionTokens) {
-        // parse each extension term to a set of tokens:
-        final TokenList tokens = new TokenList();
-        // [DP] should we apply the same FT options (e.g. stemming, etc.) to the
-        // thesaurus tokens?
-        quLex.init(ext);
-        while(quLex.hasNext()) tokens.add(quLex.nextToken());
-        // add each thesaurus term as an additional query term:
-        extendedQuTokenList.add(tokens.toArray());
+      // cache query tokens:
+      final FTIterator quLex = new FTLexer(opt).init(query);
+      final TokenList quList = new TokenList();
+      while(quLex.hasNext()) quList.add(quLex.nextToken());
+      quTokens.add(quList.toArray());
+
+      // if thesaurus is required, add the terms which extend the query:
+      if(opt.th != null) {
+        for(final byte[] ext : opt.th.find(words.input, query)) {
+          // parse each extension term to a set of tokens:
+          final TokenList tl = new TokenList();
+          // [DP] should we apply the same FT options (e.g. stemming, etc.)
+          // to the thesaurus tokens?
+          quLex.init(ext);
+          while(quLex.hasNext()) tl.add(quLex.nextToken());
+          // add each thesaurus term as an additional query term:
+          quTokens.add(tl.toArray());
+        }
       }
     }
 
-    final FTLexer ftl = new FTLexer(lex.text(), prop, to);
-    final FTBitapSearch bs = new FTBitapSearch(ftl, extendedQuTokenList, cmp);
+    final FTLexer ftl = new FTLexer(to).init(lex.text());
+    final FTBitapSearch bs = new FTBitapSearch(ftl, quTokens, cmp);
     int c = 0;
 
     while(bs.hasNext()) {
       final int pos = bs.next();
       ++c;
       // if add returns true (i. e. fast evaluation mode), break the loop:
-      if(words.add(pos, pos + quTokens.length - 1)) break;
+      if(words.add(pos, pos + quTokens.get(0).length - 1)) break;
     }
 
     words.all.sTokenNum++;

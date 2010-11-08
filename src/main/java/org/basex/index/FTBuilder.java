@@ -13,7 +13,9 @@ import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.ft.FTFlag;
 import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.Language;
 import org.basex.util.ft.Scoring;
 import org.basex.util.ft.StopWords;
@@ -53,24 +55,14 @@ public abstract class FTBuilder extends IndexBuilder {
   private int token;
   /** Current frequency. */
   private int fc;
-  /** Stop word list. */
-  private final StopWords sw;
-
+ 
   /**
    * Returns a new full-text index builder.
    * @param d data reference
    * @return index builder
    * @throws IOException IOException
    */
-  public static FTBuilder get(final Data d)
-      throws IOException {
-
-    final String lang = d.meta.prop.get(Prop.LANGUAGE);
-    final Language ln = Language.get(lang);
-    if(!Language.supported(ln, d.meta.prop.is(Prop.STEMMING)) ||
-       !lang.isEmpty() && ln == null)
-      throw new IOException(Util.info(LANGWHICH, lang));
-
+  public static FTBuilder get(final Data d) throws IOException {
     return d.meta.wildcards ? new FTTrieBuilder(d) : new FTFuzzyBuilder(d);
   }
 
@@ -81,12 +73,24 @@ public abstract class FTBuilder extends IndexBuilder {
    */
   protected FTBuilder(final Data d) throws IOException {
     super(d);
+
     final Prop prop = d.meta.prop;
+    final FTOpt opt = new FTOpt();
+    opt.set(FTFlag.DC, prop.is(Prop.DIACRITICS));
+    opt.set(FTFlag.CS, prop.is(Prop.CASESENS));
+    opt.set(FTFlag.ST, prop.is(Prop.STEMMING));
+    opt.sw = new StopWords(d, prop.get(Prop.STOPWORDS));
+
+    final String lang = prop.get(Prop.LANGUAGE);
+    opt.ln = Language.get(lang);
+    if(!Language.supported(opt.ln, prop.is(Prop.STEMMING)) ||
+        !lang.isEmpty() && opt.ln == null)
+      throw new IOException(Util.info(LANGWHICH, lang));
+
     scm = d.meta.scoring;
-    lex = new FTLexer(prop);
     max = -1;
     min = Integer.MAX_VALUE;
-    sw = new StopWords(d, prop.get(Prop.STOPWORDS));
+    lex = new FTLexer(opt);
   }
 
   /**
@@ -111,6 +115,7 @@ public abstract class FTBuilder extends IndexBuilder {
       if(scm == 2) unit.add(pre);
 
       pos = -1;
+      final StopWords sw = lex.ftOpt().sw;
       lex.init(data.text(pre, true));
       while(lex.hasNext()) {
         final byte[] tok = lex.nextToken();

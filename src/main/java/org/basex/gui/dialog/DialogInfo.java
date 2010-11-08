@@ -224,13 +224,10 @@ public final class DialogInfo extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    if(cmp == optimize) {
-      opt = true;
-      close();
-    }
+    opt = cmp == optimize;
+    if(opt) close();
     if(ft != null) ft.action(indexes[3].isSelected());
-    final Data data = gui.context.data;
-    enableOK(buttons, BUTTONOPT, !data.meta.uptodate);
+    enableOK(buttons, BUTTONOPT, !gui.context.data.meta.uptodate);
   }
 
   @Override

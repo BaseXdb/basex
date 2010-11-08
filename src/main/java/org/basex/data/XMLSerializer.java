@@ -11,6 +11,7 @@ import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.TokenSet;
+import org.basex.util.ft.FTIterator;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.Util;
 
@@ -288,7 +289,7 @@ public final class XMLSerializer extends Serializer {
     finishElement();
 
     int c = -1, wl = 0;
-    final FTLexer lex = new FTLexer(b);
+    final FTIterator lex = new FTLexer().init(b);
     while(lex.hasNext()) {
       final int pos = lex.next().cpos;
       ++c;

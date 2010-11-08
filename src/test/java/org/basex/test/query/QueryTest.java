@@ -75,26 +75,28 @@ public abstract class QueryTest {
 
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
+      final Result cmp = correct ? (Result) qu[1] : null;
 
       final Command c = new XQuery(query);
       try {
         c.execute(context);
         final Result val = c.result();
-        final Result cmp = correct ? (Result) qu[1] : null;
         if(val instanceof Nodes && cmp instanceof Nodes) {
           ((Nodes) cmp).data = ((Nodes) val).data;
         }
         if(!correct || !val.sameAs(cmp)) {
           final String cp = correct && (!(cmp instanceof Nodes) ||
-            ((Nodes) cmp).data != null) ? cmp.toString() : "--";
+            ((Nodes) cmp).data != null) ? cmp.toString() : "()";
           sb.append("-- " + qu[0] + ": " + query + "\n[E] " + (correct ?
               cp : "error") + "\n[F] " + val + " " + details() + "\n");
           ++fail;
         }
       } catch(final BaseXException ex) {
         if(correct) {
+          final String cp = correct && (!(cmp instanceof Nodes) ||
+              ((Nodes) cmp).data != null) ? cmp.toString() : "()";
           sb.append("-- " + qu[0] + ": " + query + "\n[E] " +
-              qu[1] + "\n[F] " + ex.getMessage() + " " + details() + "\n");
+              cp + "\n[F] " + ex.getMessage() + " " + details() + "\n");
           ++fail;
         }
       }

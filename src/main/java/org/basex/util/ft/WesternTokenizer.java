@@ -4,8 +4,8 @@ import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 import java.util.Arrays;
 import java.util.EnumSet;
-import org.basex.core.Prop;
 import org.basex.util.IntList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -35,7 +35,7 @@ final class WesternTokenizer extends Tokenizer {
   private boolean pa;
 
   /** Text. */
-  private byte[] text;
+  private byte[] text = Token.EMPTY;;
   /** Current sentence. */
   private int sent;
   /** Current paragraph. */
@@ -48,7 +48,7 @@ final class WesternTokenizer extends Tokenizer {
   private int spos;
 
   /** Current token position. */
-  int pos;
+  int pos = -1;
   /** Current character position. */
   int cpos;
   /** Flag indicating a special character. */
@@ -56,20 +56,14 @@ final class WesternTokenizer extends Tokenizer {
 
   /**
    * Empty constructor.
-   * @param pr (optional) database properties
    */
-  WesternTokenizer(final Prop pr) {
-    this(EMPTY, pr);
-  }
+  WesternTokenizer() { }
 
   /**
    * Constructor.
-   * @param txt text
-   * @param pr database properties
-   * @param f full-text options
+   * @param f (optional) full-text options
    */
-  private WesternTokenizer(final byte[] txt, final Prop pr, final FTOpt f) {
-    this(txt, pr);
+  WesternTokenizer(final FTOpt f) {
     if(f == null) return;
     lc = f.is(LC);
     uc = f.is(UC);
@@ -78,22 +72,9 @@ final class WesternTokenizer extends Tokenizer {
     dc = f.is(DC);
   }
 
-  /**
-   * Constructor.
-   * @param pr (optional) database properties
-   * @param txt text
-   */
-  private WesternTokenizer(final byte[] txt, final Prop pr) {
-    init(txt);
-    if(pr != null) {
-      dc = pr.is(Prop.DIACRITICS);
-      cs = pr.is(Prop.CASESENS);
-    }
-  }
-
   @Override
-  Tokenizer get(final byte[] txt, final Prop pr, final FTOpt f) {
-    return new WesternTokenizer(txt, pr, f);
+  Tokenizer get(final FTOpt f) {
+    return new WesternTokenizer(f);
   }
 
   /**
@@ -412,8 +393,9 @@ final class WesternTokenizer extends Tokenizer {
       int next;
 
       @Override
-      public void init(final byte[] txt) {
+      public FTIterator init(final byte[] txt) {
         WesternTokenizer.this.init(txt);
+        return this;
       }
 
       @Override

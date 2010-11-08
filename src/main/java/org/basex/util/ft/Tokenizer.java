@@ -2,7 +2,6 @@ package org.basex.util.ft;
 
 import java.util.Collections;
 import java.util.LinkedList;
-import org.basex.core.Prop;
 
 /**
  * Abstract tokenizer.
@@ -20,30 +19,25 @@ public abstract class Tokenizer extends LanguageImpl {
   /** Load tokenizer classes and order them by precedence. */
   static {
     IMPL = new LinkedList<Tokenizer>();
-    IMPL.add(new WesternTokenizer(null));
+    IMPL.add(new WesternTokenizer());
     Collections.sort(IMPL);
   }
 
   /**
    * Factory method.
-   * @param t Text
-   * @param p database properties
    * @param f full-text options
    * @return tokenizer instance
    */
-  abstract Tokenizer get(final byte[] t, final Prop p, final FTOpt f);
+  abstract Tokenizer get(final FTOpt f);
 
   /**
    * Factory method.
-   * @param t Text
-   * @param p database properties
    * @param f full-text options
    * @param sc include special characters
    * @return tokenizer instance
    */
-  final Tokenizer get(final byte[] t, final Prop p, final FTOpt f,
-      final boolean sc) {
-    final Tokenizer tk = get(t, p, f);
+  final Tokenizer get(final FTOpt f, final boolean sc) {
+    final Tokenizer tk = get(f);
     tk.special = sc;
     return tk;
   }

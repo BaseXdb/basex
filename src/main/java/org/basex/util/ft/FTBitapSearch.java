@@ -16,17 +16,15 @@ import org.basex.query.QueryException;
  * @see <a href="http://en.wikipedia.org/wiki/Bitap_algorithm"
  *      >http://en.wikipedia.org/wiki/Bitap_algorithm</a>
  */
-public class FTBitapSearch {
+public final class FTBitapSearch {
   /** Iterator over the set of elements being searched. */
   private final FTIterator haystack;
   /** Subset of elements being searched for. */
   private final ArrayList<byte[][]> needles;
   /** Comparator used for comparing two elements for equality. */
   private final TokenComparator cmp;
-  /**
-   * Bit masks, showing which elements from a {@link #needles} are equal to the
-   * current element of {@link #haystack}.
-   */
+  /** Bit masks, showing which elements from a {@link #needles} are equal to
+   * the current element of {@link #haystack}. */
   private final BitSet[] masks;
   /** Needle indexes in {@link #needles} sorted by the length of the needle. */
   private final int[] sorted;
@@ -91,16 +89,16 @@ public class FTBitapSearch {
       // check each needle for a match:
       boolean matched = false;
       for(int i = 0; i < masks.length; i++) {
-        final int needleId = sorted[i];
-        final byte[][] n = needles.get(needleId);
-        final BitSet m = masks[needleId];
+        final int id = sorted[i];
+        final byte[][] n = needles.get(id);
+        final BitSet m = masks[id];
         // compare each element from the needle and set the corresponding bit:
         for(int k = n.length; k >= 1; k--)
           m.set(k, m.get(k - 1) && cmp.equal(current, n[k - 1]));
         // if the last element of the needle's mask is true, then all elements
         // of the needle are matched:
         if(m.get(n.length) && !matched) {
-          match = needleId;
+          match = id;
           matched = true;
         }
       }

@@ -28,14 +28,14 @@ import org.basex.util.ft.Language;
 final class DialogFT extends BaseXBack {
   /** Language flag. */
   private static final int F_LANG = 0;
-  /** Stemming flag. */
-  private static final int F_STEM = 1;
-  /** Case flag. */
-  private static final int F_CASE = 2;
-  /** Diacritics flag. */
-  private static final int F_DIA = 3;
   /** Wildcards flag. */
-  private static final int F_WILD = 4;
+  private static final int F_WILD = 1;
+  /** Stemming flag. */
+  private static final int F_STEM = 2;
+  /** Case flag. */
+  private static final int F_CASE = 3;
+  /** Diacritics flag. */
+  private static final int F_DIA = 4;
   /** Scoring flag. */
   private static final int F_SCORE = 5;
   /** Stopwords flag. */
@@ -102,7 +102,7 @@ final class DialogFT extends BaseXBack {
     add(b1);
     if(!create) add(labels[F_LANG]);
 
-    for(int f = F_STEM; f < F_SCORE; ++f) {
+    for(int f = 1; f < F_SCORE; ++f) {
       add(check[f]);
       if(!create) add(labels[f]);
     }

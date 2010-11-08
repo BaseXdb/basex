@@ -1,11 +1,10 @@
 package org.basex.util.ft;
 
 import java.util.EnumSet;
-import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
-import org.basex.index.FTBuilder;
 import org.basex.index.IndexToken;
 import org.basex.query.ft.FTFilter;
+import org.basex.util.Token;
 
 /**
  * Performs full-text lexing on token. Calls tokenizers, stemmers matching to
@@ -20,7 +19,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
   /** Full-text options. */
   private final FTOpt fto;
   /** Text to be tokenized. */
-  private byte[] text;
+  private byte[] text = Token.EMPTY;
 
   /** Iterator over result tokens. */
   private FTIterator iter;
@@ -30,56 +29,39 @@ public final class FTLexer extends FTIterator implements IndexToken {
   private byte[] ctxt;
 
   /**
-   * Constructor. Called by the {@link FTBuilder}.
-   * @param p database properties
+   * Constructor. Called by the {@link XMLSerializer}, {@link FTFilter},
+   * and the map visualizations.
    */
-  public FTLexer(final Prop p) {
-    this(null, p, null, false);
+  public FTLexer() {
+    this(null, false);
   }
 
   /**
-   * Constructor. Called by the {@link XMLSerializer} and {@link FTFilter}.
-   * @param t text to analyze
+   * Constructor. Special character,
+   * @param sc include special characters
    */
-  public FTLexer(final byte[] t) {
-    this(t, null, null, false);
-  }
-
-  /**
-   * Constructor. Called by the map visualization.
-   * @param t text to analyze
-   * @param p database properties
-   */
-  public FTLexer(final byte[] t, final Prop p) {
-    this(t, p, null, false);
+  public FTLexer(final boolean sc) {
+    this(null, sc);
   }
 
   /**
    * Default constructor.
-   * @param txt text to analyze
-   * @param p database properties
    * @param f full-text options
    */
-  public FTLexer(final byte[] txt, final Prop p, final FTOpt f) {
-    this(txt, p, f, false);
+  public FTLexer(final FTOpt f) {
+    this(f, false);
   }
 
   /**
    * Constructor. Called by the map visualization.
-   * @param txt text to analyze
-   * @param pr database properties
    * @param opt full-text options
    * @param sc include special characters
    */
-  public FTLexer(final byte[] txt, final Prop pr, final FTOpt opt,
-      final boolean sc) {
-
+  private FTLexer(final FTOpt opt, final boolean sc) {
     fto = opt;
-    text = txt;
 
     // check if language option is provided:
-    Language lang = opt != null ? opt.ln : pr != null ?
-        Language.get(pr.get(Prop.LANGUAGE)) : null;
+    Language lang = opt != null ? opt.ln : null;
     if(lang == null) lang = Language.DEFAULT;
 
     // use default tokenizer if specific tokenizer is not available.
@@ -90,12 +72,12 @@ public final class FTLexer extends FTIterator implements IndexToken {
         break;
       }
     }
-    tok = tk.get(txt, pr, opt, sc);
+    tok = tk.get(opt, sc);
     iter = tok.iter();
 
     // check if stemming is required:
-    if(opt != null ? opt.is(FTFlag.ST) : pr != null && pr.is(Prop.STEMMING)) {
-      if(opt == null || opt.sd == null) {
+    if(opt != null && opt.is(FTFlag.ST)) {
+      if(opt.sd == null) {
         // use default stemmer if specific stemmer is not available.
         Stemmer st = Stemmer.IMPL.getFirst();
         for(final Stemmer stem : Stemmer.IMPL) {
@@ -116,7 +98,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
    * @return token count
    */
   public int count() {
-    init(text);
+    init();
     int c = 0;
     while(hasNext()) {
       nextToken();
@@ -125,10 +107,18 @@ public final class FTLexer extends FTIterator implements IndexToken {
     return c;
   }
 
+  /**
+   * Initializes the iterator.
+   */
+  public void init() {
+    init(text);
+  }
+  
   @Override
-  public void init(final byte[] txt) {
+  public FTLexer init(final byte[] txt) {
     text = txt;
     iter.init(txt);
+    return this;
   }
 
   @Override
@@ -184,16 +174,16 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Returns full text options of FTLexer instance.
-   * @return full text options
+   * Returns the full-text options. Can be {@code null}.
+   * @return full-text options
    */
   public FTOpt ftOpt() {
     return fto;
   }
 
   /**
-   * Get the text currently being parsed.
-   * @return byte array representing the text
+   * Returns the text to be processed.
+   * @return text
    */
   public byte[] text() {
     return text;

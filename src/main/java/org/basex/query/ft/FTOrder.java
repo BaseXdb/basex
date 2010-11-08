@@ -45,11 +45,6 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  protected boolean content() {
-    return false;
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, token(QueryTokens.ORDERED), TRUE);
     super.plan(ser);

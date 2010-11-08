@@ -117,7 +117,7 @@ public enum Language {
   /** Limburgish. */  LI("Limburgish"),
   /** Lingala. */     LN("Lingala"),
   /** Lithuanian. */  LT("Lithuanian"),
-  /** Luba-Kat. */    LU("Luba-Katanga"),
+  /** Luba Kat. */    LU("Luba Katanga"),
   /** Luxembourg. */  LB("Luxembourgish"),
   /** Macedonian. */  MK("Macedonian"),
   /** Malagasy. */    MG("Malagasy"),
@@ -244,9 +244,10 @@ public enum Language {
    * @return language code
    */
   public static Language get(final String lang) {
+    final String ln = lang.replaceAll("-.*", "");
     for(final Language lt : values()) {
-      if(lang.equalsIgnoreCase(lt.full) ||
-         lang.equalsIgnoreCase(lt.name())) return lt;
+      if(ln.equalsIgnoreCase(lt.full) ||
+         ln.equalsIgnoreCase(lt.name())) return lt;
     }
     return null;
   }

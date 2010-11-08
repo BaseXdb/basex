@@ -2,13 +2,13 @@ package org.basex.query.ft;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 import org.basex.util.ft.FTOpt;
 
 /**
@@ -41,45 +41,7 @@ public final class FTOptions extends FTExpr {
     ctx.ftopt = opt;
     expr[0] = expr[0].comp(ctx);
     ctx.ftopt = tmp;
-    return this;
-  }
-
-  // called by sequential variant
-  @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-    final FTOpt tmp = ctx.ftopt;
-    ctx.ftopt = opt;
-    final FTItem it = expr[0].item(ctx, input);
-    ctx.ftopt = tmp;
-    return it;
-  }
-
-  // called by index variant
-  @Override
-  public FTIter iter(final QueryContext ctx) {
-    return new FTIter() {
-      final FTOpt tmp = ctx.ftopt;
-      FTIter ir;
-
-      @Override
-      public FTItem next() throws QueryException {
-        ctx.ftopt = opt;
-        if(ir == null) ir = expr[0].iter(ctx);
-        final FTItem it = ir.next();
-        ctx.ftopt = tmp;
-        return it;
-      }
-    };
-  }
-
-  @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
-    final FTOpt tmp = ic.ctx.ftopt;
-    ic.ctx.ftopt = opt;
-    final boolean ia = expr[0].indexAccessible(ic);
-    ic.ctx.ftopt = tmp;
-    return ia;
+    return expr[0];
   }
 
   @Override
@@ -93,5 +55,19 @@ public final class FTOptions extends FTExpr {
   @Override
   public String toString() {
     return expr[0].toString() + opt;
+  }
+
+  @Override
+  public FTItem item(final QueryContext ctx, final InputInfo ii) {
+    // shouldn't be called, as compile returns argument
+    Util.notexpected();
+    return null;
+  }
+
+  @Override
+  public FTIter iter(final QueryContext ctx) {
+    // shouldn't be called, as compile returns argument
+    Util.notexpected();
+    return null;
   }
 }

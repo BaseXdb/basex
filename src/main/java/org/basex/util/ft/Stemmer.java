@@ -50,8 +50,9 @@ public abstract class Stemmer extends LanguageImpl {
   final FTIterator iter(final FTIterator iter) {
     return new FTIterator() {
       @Override
-      public void init(final byte[] txt) {
+      public FTIterator init(final byte[] txt) {
         iter.init(txt);
+        return this;
       }
 
       @Override

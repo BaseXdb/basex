@@ -72,7 +72,9 @@ public class FTBitapSearchTest {
         }
 
         @Override
-        public void init(final byte[] text) { }
+        public FTIterator init(final byte[] text) {
+          return this;
+        }
       };
       needles = new ArrayList<byte[][]>(n.length);
       for(final String[] s : n) {

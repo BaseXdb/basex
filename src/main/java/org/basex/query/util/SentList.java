@@ -17,6 +17,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Oliver Egli
  */
 public final class SentList extends DefaultHandler {
+  /** Lexer instance. */
+  private final FTLexer lexer = new FTLexer(new FTOpt().set(ST, true));
   /** Token sets (positive, negative, negated). */
   private final TokenSet[] words = {
       new TokenSet(), new TokenSet(), new TokenSet()
@@ -74,12 +76,9 @@ public final class SentList extends DefaultHandler {
       if(term.equals("negative")) posMode = 1;
       if(term.equals("negated"))  posMode = 2;
     } else if(qName.equals("word")) {
-      final FTOpt fto = new FTOpt();
-      fto.set(ST, true);
-      final FTLexer tk = new FTLexer(
-          lc(token(atts.getValue("name"))), prop, fto);
-      tk.hasNext();
-      words[posMode].add(tk.next().text);
+      lexer.init(token(atts.getValue("name")));
+      lexer.hasNext();
+      words[posMode].add(lexer.next().text);
     }
   }
 }

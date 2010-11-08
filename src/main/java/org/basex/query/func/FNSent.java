@@ -12,6 +12,7 @@ import org.basex.query.item.Item;
 import org.basex.query.util.SentList;
 import org.basex.util.InputInfo;
 import org.basex.util.ft.FTLexer;
+import org.basex.util.ft.FTOpt;
 
 /**
  * This class defines the sentiment functions.
@@ -71,15 +72,16 @@ public final class FNSent extends Fun {
 
     double pos = 0, neg = 0;
     byte[] token1 = EMPTY, token2 = EMPTY, token3 = EMPTY, token4 = EMPTY;
-    ctx.ftopt.set(ST, true);
-    final FTLexer tk = new FTLexer(str, ctx.context.prop, ctx.ftopt);
+    final FTOpt fto = new FTOpt();
+    fto.set(ST, true);
 
     // loop through all tokens
+    final FTLexer tk = new FTLexer(fto).init(str);
     while(tk.hasNext()) {
       token4 = token3;
       token3 = token2;
       token2 = token1;
-      token1 = tk.next().text;
+      token1 = tk.nextToken();
 
       // calculate polarity
       double v = list.polarity(token1);

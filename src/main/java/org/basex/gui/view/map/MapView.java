@@ -396,7 +396,7 @@ public final class MapView extends View implements Runnable {
         // read content from disk
         final byte[] text = painter.content(data, f);
         // calculate tooltip
-        final int[][] info = new FTLexer(text, gui.context.prop).info();
+        final int[][] info = new FTLexer().init(text).info();
         final TokenList tl = MapRenderer.calculateToolTip(f,
             info, mouseX, mouseY, getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());

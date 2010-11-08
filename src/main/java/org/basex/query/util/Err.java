@@ -204,9 +204,9 @@ public enum Err {
   FTREG(FTDY, 20, "Invalid regular expression: '%'."),
 
   /** FTST0000: Parsing exception. */
-  FTFZWC(FTST, 0, "Only wildcards or Fuzzy search allowed."),
+  FTFZWC(FTST, 0, "Only wildcards or fuzzy search allowed."),
   /** FTST0000: Parsing exception. */
-  THESRNG(FTST, 0, "Only integers allowed for thesaurus level."),
+  THESRNG(FTST, 0, "Constant integer expected for thesaurus level."),
   /** FTST0007: Parsing exception. */
   FTIGNORE(FTST, 7, "Ignore option not supported."),
   /** FTST0008: Parsing exception. */

@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Arrays;
-import org.basex.core.Prop;
 import org.basex.data.FTPos;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.BoolList;
@@ -80,7 +79,7 @@ final class MapRenderer {
 
     // get index on first pre value
     int ll = 0;
-    final FTLexer lex = new FTLexer(s, null, null, true);
+    final FTLexer lex = new FTLexer(true).init(s);
     while(lex.hasNext()) {
       final Span span = lex.next();
       byte[] tok = span.text;
@@ -144,12 +143,11 @@ final class MapRenderer {
    * Token/Sentence/Paragraphs
    * @param g graphics reference
    * @param r rectangle
-   * @param p database properties
    * @param s text to be drawn
    * @param fs font size
    */
-  static void drawThumbnails(final Graphics g, final MapRect r, final Prop p,
-      final byte[] s, final int fs) {
+  static void drawThumbnails(final Graphics g, final MapRect r, final byte[] s,
+      final int fs) {
 
     // thumbnail width
     final double ffmax = 0.25;
@@ -172,7 +170,7 @@ final class MapRenderer {
     r.thumbf = ff * fs;
     r.thumbal = 0;
 
-    final int[][] data = new FTLexer(s, p).info();
+    final int[][] data = new FTLexer().init(s).info();
     boolean l = false;
     while(r.thumbal < 2) {
       // find parameter setting for the available space

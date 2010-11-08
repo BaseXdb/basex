@@ -102,21 +102,25 @@ public final class FTWords extends FTExpr {
 
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
-    if(occ != null) {
-      for(int o = 0; o < occ.length; ++o)
-        occ[o] = occ[o].comp(ctx);
+    // compile only once
+    if(ftt == null) {
+      if(occ != null) {
+        for(int o = 0; o < occ.length; ++o)
+          occ[o] = occ[o].comp(ctx);
+      }
+      query = query.comp(ctx);
+      if(query instanceof Str) txt = ((Str) query).atom();
+      simple = mode == FTMode.M_ANY && txt != null && occ == null;
+      fast = ctx.ftfast && occ == null;
+      ftt = new FTTokenizer(ctx.context.prop, this, ctx.ftopt);
     }
-    query = query.comp(ctx);
-    if(query instanceof Str) txt = ((Str) query).atom();
-    simple = mode == FTMode.M_ANY && txt != null && occ == null;
-    fast = ctx.ftfast && occ == null;
-    ftt = new FTTokenizer(ctx.context.prop, this);
     return this;
   }
 
   @Override
   public FTItem item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     if(tokNum == 0) tokNum = ++ctx.ftoknum;
     all.reset(tokNum);
 
@@ -136,11 +140,11 @@ public final class FTWords extends FTExpr {
       @Override
       public FTItem next() {
         if(iat == null) {
-          final FTLexer lex = new FTLexer(txt, ctx.context.prop, ctx.ftopt);
+          final FTLexer lex = new FTLexer(ftt.opt).init(txt);
           int d = 0;
           while(lex.hasNext()) {
             final byte[] token = lex.nextToken();
-            if(ctx.ftopt.sw != null && ctx.ftopt.sw.id(token) != 0) {
+            if(ftt.opt.sw != null && ftt.opt.sw.id(token) != 0) {
               ++d;
             } else {
               final FTIndexIterator i = (FTIndexIterator) data.ids(lex);
@@ -165,7 +169,8 @@ public final class FTWords extends FTExpr {
   private int contains(final QueryContext ctx) throws QueryException {
     // speed up default case
     first = true;
-    if(simple) return ftt.contains(txt, ctx.fttoken, ctx.ftopt);
+    final FTLexer fttoken = ctx.fttoken;
+    if(simple) return ftt.contains(txt, fttoken);
 
     // process special cases
     final Iter iter = ctx.iter(query);
@@ -176,7 +181,7 @@ public final class FTWords extends FTExpr {
     switch(mode) {
       case M_ALL:
         while((it = nextStr(iter)) != null) {
-          final int oc = ftt.contains(it, ctx.fttoken, ctx.ftopt);
+          final int oc = ftt.contains(it, fttoken);
           if(oc == 0) return 0;
           len += it.length;
           o += oc;
@@ -185,7 +190,7 @@ public final class FTWords extends FTExpr {
       case M_ALLWORDS:
         while((it = nextStr(iter)) != null) {
           for(final byte[] t : split(it, ' ')) {
-            final int oc = ftt.contains(t, ctx.fttoken, ctx.ftopt);
+            final int oc = ftt.contains(t, fttoken);
             if(oc == 0) return 0;
             len += t.length;
             o += oc;
@@ -194,14 +199,14 @@ public final class FTWords extends FTExpr {
         break;
       case M_ANY:
         while((it = nextStr(iter)) != null) {
-          o += ftt.contains(it, ctx.fttoken, ctx.ftopt);
+          o += ftt.contains(it, fttoken);
           len += it.length;
         }
         break;
       case M_ANYWORD:
         while((it = nextStr(iter)) != null) {
           for(final byte[] t : split(it, ' ')) {
-            o += ftt.contains(t, ctx.fttoken, ctx.ftopt);
+            o += ftt.contains(t, fttoken);
             len += t.length;
           }
         }
@@ -212,7 +217,7 @@ public final class FTWords extends FTExpr {
           tb.add(it);
           tb.add(' ');
         }
-        o += ftt.contains(tb.finish(), ctx.fttoken, ctx.ftopt);
+        o += ftt.contains(tb.finish(), fttoken);
         len += tb.size();
         break;
     }
@@ -251,14 +256,12 @@ public final class FTWords extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) {
-    /*
-     * If the following conditions yield true, the index is accessed: - the
+    /* If the following conditions yield true, the index is accessed: - the
      * query is a simple String item - no FTTimes option is specified - FTMode
      * is different to ANY, ALL and PHRASE - case sensitivity, diacritics and
-     * stemming flags comply with index
-     */
+     * stemming flags comply with index. */
     final MetaData md = ic.data.meta;
-    final FTOpt fto = ic.ctx.ftopt;
+    final FTOpt fto = ftt.opt;
 
     if(txt == null || occ != null || mode != FTMode.M_ANY
         && mode != FTMode.M_ALL && mode != FTMode.M_PHRASE
@@ -280,7 +283,7 @@ public final class FTWords extends FTExpr {
     }
 
     // summarize number of hits; break loop if no hits are expected
-    final FTLexer ft = new FTLexer(txt, ic.ctx.context.prop, fto);
+    final FTLexer ft = new FTLexer(fto).init(txt);
     ic.costs = 0;
     while(ft.hasNext()) {
       final byte[] tok = ft.nextToken();
