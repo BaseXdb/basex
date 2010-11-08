@@ -160,7 +160,7 @@ Section "Hauptgruppe" SEC01
   File "..\images\start.ico"
   File "..\images\stop.ico"
   # set dbpath, port and webport
-  nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\$R4; set port $R3; set restport $R2';
+  nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\$R4; set serverport $R3; set restport $R2';
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
                  "DisplayName" "BaseX"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
