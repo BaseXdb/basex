@@ -11,7 +11,9 @@ import java.util.EnumSet;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Jens Erat
  */
-abstract class LanguageImpl implements Comparable<LanguageImpl> {
+abstract class LanguageImpl extends FTIterator
+    implements Comparable<LanguageImpl> {
+
   @Override
   public final int compareTo(final LanguageImpl o) {
     // Higher precedence value = better

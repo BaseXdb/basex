@@ -55,11 +55,11 @@ public class FTContains extends ParseExpr {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     expr = checkUp(expr, ctx).comp(ctx).addText(ctx);
 
+    lex = new FTLexer(new FTOpt());
     final boolean fast = ctx.ftfast;
     ctx.ftfast = ctx.ftfast && ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);
     ctx.ftfast = fast;
-    lex = new FTLexer(new FTOpt());
 
     return expr.empty() ? optPre(Bln.FALSE, ctx) : this;
   }

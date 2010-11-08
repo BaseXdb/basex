@@ -15,6 +15,14 @@ final class GermanStemmer extends Stemmer {
   /** Removed characters. */
   private int subst;
 
+  /**
+   * Constructor.
+   * @param fti full-text iterator
+   */
+  GermanStemmer(final FTIterator fti) {
+    super(fti);
+  }
+
   @Override
   byte[] stem(final byte[] word) {
     subst = 0;
@@ -167,8 +175,8 @@ final class GermanStemmer extends Stemmer {
   }
 
   @Override
-  Stemmer get(final Language l) {
-    return new GermanStemmer();
+  Stemmer get(final Language l, final FTIterator fti) {
+    return new GermanStemmer(fti);
   }
 
   @Override

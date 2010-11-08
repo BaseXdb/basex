@@ -368,7 +368,7 @@ final class FNFile extends Fun {
     if(recursive) {
       // Raise an exception if the existent directory, in which
       // the dirs are to be created, is write-protected
-      final File par = getExistingParent(file);
+      final File par = existingParent(file);
       if(!par.canWrite()) MKDIR.thrw(input, file.getPath(), par.getPath());
 
       if(!file.mkdirs()) CANNOTMKDIR.thrw(input, file.getPath());
@@ -451,7 +451,7 @@ final class FNFile extends Fun {
    * @return existing parent
    * @throws QueryException query exception
    */
-  private File getExistingParent(final File file) throws QueryException {
+  private File existingParent(final File file) throws QueryException {
     try {
       File f = file.getCanonicalFile();
       do {

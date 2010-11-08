@@ -14,12 +14,12 @@ public abstract class Tokenizer extends LanguageImpl {
   public static final LinkedList<Tokenizer> IMPL;
 
   /** Are special characters included? */
-  protected boolean special;
+  boolean special;
 
   /** Load tokenizer classes and order them by precedence. */
   static {
     IMPL = new LinkedList<Tokenizer>();
-    IMPL.add(new WesternTokenizer());
+    IMPL.add(new WesternTokenizer(null));
     Collections.sort(IMPL);
   }
 
@@ -29,18 +29,6 @@ public abstract class Tokenizer extends LanguageImpl {
    * @return tokenizer instance
    */
   abstract Tokenizer get(final FTOpt f);
-
-  /**
-   * Factory method.
-   * @param f full-text options
-   * @param sc include special characters
-   * @return tokenizer instance
-   */
-  final Tokenizer get(final FTOpt f, final boolean sc) {
-    final Tokenizer tk = get(f);
-    tk.special = sc;
-    return tk;
-  }
 
   /**
    * Gets full-text info for the specified token; needed for visualizations.
@@ -78,10 +66,4 @@ public abstract class Tokenizer extends LanguageImpl {
   int pos(final int w, final FTUnit u) {
     return 0;
   }
-
-  /**
-   * Returns an iterator.
-   * @return iterator
-   */
-  abstract FTIterator iter();
 }

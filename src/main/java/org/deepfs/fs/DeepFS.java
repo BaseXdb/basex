@@ -366,7 +366,7 @@ public final class DeepFS implements DataText {
     final byte [] time = token(System.currentTimeMillis());
     final int nodeSize = 11; // 1x elem, 10x attr
     m.buffer(nodeSize);
-    m.elem(0, 1, tagID, nodeSize, nodeSize, 0, false);
+    m.elem(1, tagID, nodeSize, nodeSize, 0, false);
     m.attr(1, 1, nameID, token(fn), 0, false);
     m.attr(2, 2, sizeID, ZERO, 0, false);
     m.attr(3, 3, modeID, token(mode), 0, false);

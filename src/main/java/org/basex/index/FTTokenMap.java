@@ -34,7 +34,7 @@ final class FTTokenMap extends TokenSet {
    * @param id key to be found
    * @return sized
    */
-  int getSize(final int id) {
+  int size(final int id) {
     return sizes[id];
   }
 
@@ -43,7 +43,7 @@ final class FTTokenMap extends TokenSet {
    * @param id key to be found
    * @return pointer
    */
-  long getPointer(final int id) {
+  long pointer(final int id) {
     return pointers[id];
   }
 

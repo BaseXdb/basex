@@ -15,14 +15,16 @@ final class DictStemmer extends Stemmer {
   /**
    * Constructor.
    * @param d stem dictionary
+   * @param fti full-text iterator
    */
-  DictStemmer(final StemDir d) {
+  DictStemmer(final StemDir d, final FTIterator fti) {
+    super(fti);
     dict = d;
   }
 
   @Override
-  Stemmer get(final Language l) {
-    return new DictStemmer(dict);
+  Stemmer get(final Language l, final FTIterator fti) {
+    return new DictStemmer(dict, fti);
   }
 
   @Override

@@ -66,14 +66,18 @@ final class LuceneStemmer extends Stemmer {
   }
 
   /** Empty constructor. */
-  LuceneStemmer() { }
+  LuceneStemmer() {
+    super(null);
+  }
 
   /**
    * Constructs a stemmer instance. Call {@link #available()} first to
    * check if the library is available.
    * @param lang language of the text to stem
+   * @param fti full-text iterator
    */
-  LuceneStemmer(final Language lang) {
+  LuceneStemmer(final Language lang, final FTIterator fti) {
+    super(fti);
     clazz = CLASSES.get(lang);
     try {
       stemmer = clazz.clazz.newInstance();
@@ -83,8 +87,8 @@ final class LuceneStemmer extends Stemmer {
   }
 
   @Override
-  Stemmer get(final Language l) {
-    return new LuceneStemmer(l);
+  Stemmer get(final Language l, final FTIterator fti) {
+    return new LuceneStemmer(l, fti);
   }
 
   @Override

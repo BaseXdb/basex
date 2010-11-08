@@ -77,6 +77,14 @@ final class EnglishStemmer extends Stemmer {
   /** Stemming length. */
   private int tt;
 
+  /**
+   * Constructor.
+   * @param fti full-text iterator
+   */
+  EnglishStemmer(final FTIterator fti) {
+    super(fti);
+  }
+
   @Override
   byte[] stem(final byte[] str) {
     te = str.length;
@@ -264,8 +272,8 @@ final class EnglishStemmer extends Stemmer {
   }
 
   @Override
-  Stemmer get(final Language l) {
-    return new EnglishStemmer();
+  Stemmer get(final Language l, final FTIterator fti) {
+    return new EnglishStemmer(fti);
   }
 
   @Override

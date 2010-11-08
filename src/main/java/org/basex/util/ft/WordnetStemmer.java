@@ -76,25 +76,21 @@ final class WordnetStemmer extends Stemmer {
     return DICT != null && CTR != null;
   }
 
-  /** Singleton instance. */
-  private static WordnetStemmer instance;
   /** Instance of WordNet stemmer. */
-  private final Object stemmer;
+  private Object stemmer;
 
-  /**
-   * Returns a singleton instance of the stemmer.
-   * @return instance
-   */
-  static Stemmer get() {
-    if(instance == null) instance = new WordnetStemmer();
-    return instance;
+  /** Empty constructor. */
+  WordnetStemmer() {
+    super(null);
   }
 
   /**
    * Constructs a WordNet stemmer. Call {@link #available()} first to
    * check if the library is available.
+   * @param fti full-text iterator
    */
-  private WordnetStemmer() {
+  WordnetStemmer(final FTIterator fti) {
+    super(fti);
     try {
       stemmer = CTR.newInstance(DICT);
     } catch(final Exception e) {
@@ -103,8 +99,8 @@ final class WordnetStemmer extends Stemmer {
   }
 
   @Override
-  Stemmer get(final Language l) {
-    return get();
+  Stemmer get(final Language l, final FTIterator fti) {
+    return new WordnetStemmer(fti);
   }
 
   @Override

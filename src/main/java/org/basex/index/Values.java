@@ -80,7 +80,7 @@ public final class Values implements Index {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
 
     final int id = cache.id(tok.get());
-    if(id > 0) return iter(cache.getSize(id), cache.getPointer(id));
+    if(id > 0) return iter(cache.size(id), cache.pointer(id));
 
     final long pos = get(tok.get());
     return pos == 0 ? IndexIterator.EMPTY : iter(idxl.readNum(pos), idxl.pos());
@@ -91,7 +91,7 @@ public final class Values implements Index {
     if(it instanceof RangeToken) return idRange((RangeToken) it).size();
     final byte[] tok = it.get();
     final int id = cache.id(tok);
-    if(id > 0) return cache.getSize(id);
+    if(id > 0) return cache.size(id);
 
     final long pos = get(tok);
     if(pos == 0) return 0;

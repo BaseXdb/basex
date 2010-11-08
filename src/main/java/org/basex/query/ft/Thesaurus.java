@@ -132,10 +132,10 @@ public final class Thesaurus {
     final Nodes sub = nodes("*:synonym", in);
     if(sub.size() == 0) return;
 
-    final ThesNode node = getNode(text("*:term", in));
+    final ThesNode node = node(text("*:term", in));
     for(int n = 0; n < sub.size(); ++n) {
       final Nodes tmp = new Nodes(sub.list[n], sub.data);
-      final ThesNode snode = getNode(text("*:term", tmp));
+      final ThesNode snode = node(text("*:term", tmp));
       final byte[] rs = text("*:relationship", tmp);
       node.add(snode, rs);
 
@@ -150,7 +150,7 @@ public final class Thesaurus {
    * @param term term
    * @return node
    */
-  private ThesNode getNode(final byte[] term) {
+  private ThesNode node(final byte[] term) {
     ThesNode node = nodes.get(term);
     if(node == null) {
       node = new ThesNode();

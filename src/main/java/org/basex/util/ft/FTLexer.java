@@ -29,35 +29,18 @@ public final class FTLexer extends FTIterator implements IndexToken {
   private byte[] ctxt;
 
   /**
-   * Constructor. Called by the {@link XMLSerializer}, {@link FTFilter},
-   * and the map visualizations.
+   * Constructor, using the default full-text options. Called by the
+   * {@link XMLSerializer}, {@link FTFilter}, and the map visualizations.
    */
   public FTLexer() {
-    this(null, false);
-  }
-
-  /**
-   * Constructor. Special character,
-   * @param sc include special characters
-   */
-  public FTLexer(final boolean sc) {
-    this(null, sc);
+    this(null);
   }
 
   /**
    * Default constructor.
-   * @param f full-text options
-   */
-  public FTLexer(final FTOpt f) {
-    this(f, false);
-  }
-
-  /**
-   * Constructor. Called by the map visualization.
    * @param opt full-text options
-   * @param sc include special characters
    */
-  private FTLexer(final FTOpt opt, final boolean sc) {
+  public FTLexer(final FTOpt opt) {
     fto = opt;
 
     // check if language option is provided:
@@ -72,10 +55,10 @@ public final class FTLexer extends FTIterator implements IndexToken {
         break;
       }
     }
-    tok = tk.get(opt, sc);
-    iter = tok.iter();
+    tok = tk.get(opt);
+    iter = tok;
 
-    // check if stemming is required:
+    // wrap original iterator
     if(opt != null && opt.is(FTFlag.ST)) {
       if(opt.sd == null) {
         // use default stemmer if specific stemmer is not available.
@@ -86,25 +69,20 @@ public final class FTLexer extends FTIterator implements IndexToken {
             break;
           }
         }
-        iter = st.get(lang).iter(iter);
+        iter = st.get(lang, iter);
       } else {
-        iter = new DictStemmer(opt.sd).iter(iter);
+        iter = new DictStemmer(opt.sd, iter);
       }
     }
   }
 
   /**
-   * Returns total number of tokens.
-   * @return token count
+   * Sets the special character flag. Called by the map visualization.
+   * @return self reference
    */
-  public int count() {
-    init();
-    int c = 0;
-    while(hasNext()) {
-      nextToken();
-      c++;
-    }
-    return c;
+  public FTLexer sc() {
+    tok.special = true;
+    return this;
   }
 
   /**
@@ -113,7 +91,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
   public void init() {
     init(text);
   }
-  
+
   @Override
   public FTLexer init(final byte[] txt) {
     text = txt;
@@ -138,6 +116,20 @@ public final class FTLexer extends FTIterator implements IndexToken {
     return ctxt;
   }
 
+  /**
+   * Returns total number of tokens.
+   * @return token count
+   */
+  public int count() {
+    init();
+    int c = 0;
+    while(hasNext()) {
+      nextToken();
+      c++;
+    }
+    return c;
+  }
+
   @Override
   public IndexType type() {
     return IndexType.FULLTEXT;
@@ -151,6 +143,22 @@ public final class FTLexer extends FTIterator implements IndexToken {
   @Override
   public byte[] get() {
     return ctxt != null ? ctxt : curr.text;
+  }
+
+  /**
+   * Returns the full-text options. Can be {@code null}.
+   * @return full-text options
+   */
+  public FTOpt ftOpt() {
+    return fto;
+  }
+
+  /**
+   * Returns the text to be processed.
+   * @return text
+   */
+  public byte[] text() {
+    return text;
   }
 
   /**
@@ -174,32 +182,8 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Returns the full-text options. Can be {@code null}.
-   * @return full-text options
-   */
-  public FTOpt ftOpt() {
-    return fto;
-  }
-
-  /**
-   * Returns the text to be processed.
-   * @return text
-   */
-  public byte[] text() {
-    return text;
-  }
-
-  /**
    * Gets full-text info for the specified token; needed for visualizations.
-   * Does not have to be implemented by all tokenizers.
-   * <ul>
-   * <li/>int[0]: length of each token
-   * <li/>int[1]: sentence info, length of each sentence
-   * <li/>int[2]: paragraph info, length of each parap.get(Prop.FTLANGUAGE))
-   * graph
-   * <li/>int[3]: each token as int[]
-   * <li/>int[4]: punctuation marks of each sentence
-   * </ul>
+   * See {@link Tokenizer#info} for more info.
    * @return int arrays or empty array if not implemented
    */
   public int[][] info() {

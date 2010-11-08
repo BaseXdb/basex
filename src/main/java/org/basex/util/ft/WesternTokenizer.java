@@ -48,16 +48,13 @@ final class WesternTokenizer extends Tokenizer {
   private int spos;
 
   /** Current token position. */
-  int pos = -1;
+  private int pos = -1;
   /** Current character position. */
-  int cpos;
+  private int cpos;
   /** Flag indicating a special character. */
-  boolean sc;
-
-  /**
-   * Empty constructor.
-   */
-  WesternTokenizer() { }
+  private boolean sc;
+  /** Next pointer. */
+  private int next;
 
   /**
    * Constructor.
@@ -77,27 +74,43 @@ final class WesternTokenizer extends Tokenizer {
     return new WesternTokenizer(f);
   }
 
-  /**
-   * Initializes the iterator.
-   * @param txt text
-   */
-  void init(final byte[] txt) {
+  @Override
+  public WesternTokenizer init(final byte[] txt) {
     if(text != txt) {
       text = txt;
       sen.reset();
       par.reset();
     }
     init();
+    return this;
   }
 
   /**
    * Initializes the iterator.
    */
-  void init() {
+  private void init() {
     sent = 0;
     para = 0;
     pos = -1;
     cpos = 0;
+    next = 0;
+  }
+
+  @Override
+  public boolean hasNext() {
+    if(next <= 0 && (special ? moreSC() : more())) next++;
+    return next > 0;
+  }
+
+  @Override
+  public Span next() {
+    return new Span(nextToken(), cpos, pos, sc);
+  }
+
+  @Override
+  public byte[] nextToken() {
+    if(--next < 0) hasNext();
+    return special ? getSC() : get();
   }
 
   /**
@@ -105,7 +118,7 @@ final class WesternTokenizer extends Tokenizer {
    * returned.
    * @return result of check
    */
-  boolean more() {
+  private boolean more() {
     final int l = text.length;
     ++pos;
 
@@ -171,7 +184,7 @@ final class WesternTokenizer extends Tokenizer {
    * Returns a normalized version of the current token.
    * @return result
    */
-  byte[] get() {
+  private byte[] get() {
     byte[] n = orig();
     final boolean a = ascii(n);
     if(!dc) n = dia(n, a);
@@ -195,7 +208,7 @@ final class WesternTokenizer extends Tokenizer {
    * Checks if more tokens are to be returned; special characters are included.
    * @return result of check
    */
-  boolean moreSC() {
+  private boolean moreSC() {
     final int l = text.length;
     // parse whitespaces
     pa = false;
@@ -237,7 +250,7 @@ final class WesternTokenizer extends Tokenizer {
    * Get next token, including special characters.
    * @return next token
    */
-  byte[] getSC() {
+  private byte[] getSC() {
     return lp < cpos ? Arrays.copyOfRange(text, lp, cpos) :
       Arrays.copyOfRange(text, cpos, spos);
   }
@@ -384,37 +397,6 @@ final class WesternTokenizer extends Tokenizer {
   @Override
   boolean paragraph() {
     return pa;
-  }
-
-  @Override
-  public FTIterator iter() {
-    init();
-    return new FTIterator() {
-      int next;
-
-      @Override
-      public FTIterator init(final byte[] txt) {
-        WesternTokenizer.this.init(txt);
-        return this;
-      }
-
-      @Override
-      public boolean hasNext() {
-        if(next <= 0 && (special ? moreSC() : more())) next++;
-        return next > 0;
-      }
-
-      @Override
-      public Span next() {
-        return new Span(nextToken(), cpos, pos, sc);
-      }
-
-      @Override
-      public byte[] nextToken() {
-        if(--next < 0) hasNext();
-        return special ? getSC() : get();
-      }
-    };
   }
 
   @Override

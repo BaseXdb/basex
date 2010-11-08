@@ -8,7 +8,7 @@ package org.basex.data;
  */
 public final class FTStringMatch implements Comparable<FTStringMatch> {
   /** Query position. */
-  public final byte q;
+  public final int q;
   /** Start position. */
   public final int s;
   /** End position. */
@@ -24,7 +24,7 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
    * @param en end position
    * @param qp query pos
    */
-  FTStringMatch(final int st, final int en, final byte qp) {
+  FTStringMatch(final int st, final int en, final int qp) {
     s = st;
     e = en;
     q = qp;

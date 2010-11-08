@@ -58,14 +58,18 @@ final class SnowballStemmer extends Stemmer {
   }
 
   /** Empty constructor. */
-  SnowballStemmer() { }
+  SnowballStemmer() {
+    super(null);
+  }
 
   /**
    * Constructs a Snowball stemmer. Call {@link #available()} first to
    * check if the library is available.
+   * @param fti full-text iterator
    * @param lang language of the text to stem
    */
-  SnowballStemmer(final Language lang) {
+  SnowballStemmer(final Language lang, final FTIterator fti) {
+    super(fti);
     clazz = CLASSES.get(lang);
     try {
       stemmer = clazz.clz.newInstance();
@@ -76,8 +80,8 @@ final class SnowballStemmer extends Stemmer {
   }
 
   @Override
-  Stemmer get(final Language l) {
-    return new SnowballStemmer(l);
+  Stemmer get(final Language l, final FTIterator fti) {
+    return new SnowballStemmer(l, fti);
   }
 
   @Override

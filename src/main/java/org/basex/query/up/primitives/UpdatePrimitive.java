@@ -238,7 +238,7 @@ public abstract class UpdatePrimitive {
         uri = q.uri().atom();
         u = uri.length != 0 ? m.ns.addURI(uri) : 0;
         final int tn = m.tags.index(q.atom(), null, false);
-        m.elem(0, pre - par, tn, size(nd, true), size(nd, false), u, ne);
+        m.elem(pre - par, tn, size(nd, true), size(nd, false), u, ne);
         m.insert(ms);
         ir = nd.attr();
         p = pre + 1;

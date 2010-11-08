@@ -80,7 +80,7 @@ final class FTArray {
     if(cn == 0) {
       // root has successors
       if(cnn.length > 3) {
-        final int p = getPointer(cn);
+        final int p = pointer(cn);
         if(Token.diff(tokens.get(next.get(cnn[p])[0])[0], v[0])
             != 0) {
           // any child has an appropriate value to valueToInsert;
@@ -105,8 +105,8 @@ final class FTArray {
     byte[] r2 = v;
 
     if(is != null) {
-      r1 = getBytes(r1, is.length, r1.length);
-      r2 = getBytes(v, is.length, v.length);
+      r1 = bytes(r1, is.length, r1.length);
+      r2 = bytes(v, is.length, v.length);
     }
 
     if(is != null) {
@@ -114,7 +114,7 @@ final class FTArray {
         if(r2 != null) {
           // value of currentNode equals valueToInsert,
           // but valueToInset is longer
-          final int p = getPointer(cn);
+          final int p = pointer(cn);
           if(p == 0 ||
             Token.diff(tokens.get(next.get(cnn[p])[0])[0], r2[0]) != 0) {
             // create new node and append it, because any child from curretnNode
@@ -212,7 +212,7 @@ final class FTArray {
     final int ml = b1.length < b2.length ? b1.length : b2.length;
     int i = -1;
     while(++i < ml && Token.diff(b1[i], b2[i]) == 0);
-    return getBytes(b1, 0, i);
+    return bytes(b1, 0, i);
   }
 
   /**
@@ -222,7 +222,7 @@ final class FTArray {
    * @param endPos int
    * @return data byte[]
    */
-  private byte[] getBytes(final byte[] d, final int startPos,
+  private byte[] bytes(final byte[] d, final int startPos,
       final int endPos) {
 
     if(d == null || d.length < endPos || startPos < 0 || startPos == endPos) {
@@ -239,7 +239,7 @@ final class FTArray {
    * @param cn current node
    * @return index of the data pointer
    */
-  private int getPointer(final int cn) {
+  private int pointer(final int cn) {
     final int[] nl = next.get(cn);
     return nl[nl.length - 1] >= 0 ? nl.length - 3 : nl.length - 4;
   }

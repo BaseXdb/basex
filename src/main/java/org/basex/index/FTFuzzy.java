@@ -107,7 +107,7 @@ final class FTFuzzy extends FTIndex {
 
     final byte[] tok = lex.get();
     final int id = cache.id(tok);
-    if(id > 0) return cache.getSize(id);
+    if(id > 0) return cache.size(id);
 
     int s = 0;
     long poi = 0;
@@ -139,7 +139,7 @@ final class FTFuzzy extends FTIndex {
       return p > -1 ? iter(pointer(p, tok.length),
           size(p, tok.length), dat, false) : FTIndexIterator.EMP;
     }
-    return iter(cache.getPointer(id), cache.getSize(id), dat, false);
+    return iter(cache.pointer(id), cache.size(id), dat, false);
   }
 
   @Override

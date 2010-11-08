@@ -79,7 +79,7 @@ final class MapRenderer {
 
     // get index on first pre value
     int ll = 0;
-    final FTLexer lex = new FTLexer(true).init(s);
+    final FTLexer lex = new FTLexer().sc().init(s);
     while(lex.hasNext()) {
       final Span span = lex.next();
       byte[] tok = span.text;

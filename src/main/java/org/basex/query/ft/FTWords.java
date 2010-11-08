@@ -66,7 +66,7 @@ public final class FTWords extends FTExpr {
   /** Search mode. */
   private FTMode mode;
   /** Token number. */
-  private byte tokNum;
+  private int tokNum;
   /** Standard evaluation. */
   private boolean simple;
 
@@ -112,7 +112,7 @@ public final class FTWords extends FTExpr {
       if(query instanceof Str) txt = ((Str) query).atom();
       simple = mode == FTMode.M_ANY && txt != null && occ == null;
       fast = ctx.ftfast && occ == null;
-      ftt = new FTTokenizer(ctx.context.prop, this, ctx.ftopt);
+      ftt = new FTTokenizer(this, ctx.ftopt, ctx.context.prop);
     }
     return this;
   }
@@ -152,7 +152,7 @@ public final class FTWords extends FTExpr {
               d = 0;
             }
           }
-          iat.setTokenNum(++ctx.ftoknum);
+          iat.tokenNum(++ctx.ftoknum);
         }
         return iat.more() ? new FTItem(iat.matches(), data, iat.next(),
             txt.length, iat.indexSize(), iat.score()) : null;

@@ -23,53 +23,31 @@ import org.basex.util.ft.FTOpt;
  * @author Christian Gruen
  */
 public final class FTTokenizer {
+  /** Token comparator. */
+  private final TokenComparator cmp;
   /** Cache. */
-  final TokenObjMap<ArrayList<byte[][]>> cache =
+  private final TokenObjMap<ArrayList<byte[][]>> cache =
     new TokenObjMap<ArrayList<byte[][]>>();
-
   /** Levenshtein reference. */
   final Levenshtein ls = new Levenshtein();
   /** Database properties. */
   final FTWords words;
   /** Full-text options. */
   final FTOpt opt;
-  /** Database properties. */
-  final Prop prop;
   /** Levenshtein error. */
   final int lserr;
 
   /**
    * Constructor.
-   * @param pr database properties
    * @param w full-text words
    * @param o full-text options
+   * @param pr database properties
    */
-  public FTTokenizer(final Prop pr, final FTWords w, final FTOpt o) {
-    prop = pr;
-    lserr = pr.num(Prop.LSERROR);
+  public FTTokenizer(final FTWords w, final FTOpt o, final Prop pr) {
     words = w;
     opt = o;
-  }
-
-  /**
-   * Checks if the first token contains the second full-text term.
-   * @param query query token
-   * @param lex input text
-   * @return number of occurrences
-   * @throws QueryException query exception
-   */
-  int contains(final byte[] query, final FTLexer lex) throws QueryException {
-    // assign options to text:
-    final FTOpt to = lex.ftOpt();
-    to.set(ST, opt.is(ST));
-    to.set(DC, opt.is(DC));
-    to.set(CS, opt.is(CS));
-    to.ln = opt.ln;
-    to.th = opt.th;
-    to.sd = opt.sd;
-
-    // create the comparator:
-    final TokenComparator cmp = new TokenComparator() {
+    lserr = pr.num(Prop.LSERROR);
+    cmp = new TokenComparator() {
       @Override
       public boolean equal(final byte[] in, final byte[] qu)
         throws QueryException {
@@ -92,6 +70,24 @@ public final class FTTokenizer {
           eq(in, qu));
       }
     };
+  }
+
+  /**
+   * Checks if the first token contains the second full-text term.
+   * @param query query token
+   * @param lex input text
+   * @return number of occurrences
+   * @throws QueryException query exception
+   */
+  int contains(final byte[] query, final FTLexer lex) throws QueryException {
+    // assign options to text:
+    final FTOpt to = lex.ftOpt();
+    to.set(ST, opt.is(ST));
+    to.set(DC, opt.is(DC));
+    to.set(CS, opt.is(CS));
+    to.ln = opt.ln;
+    to.th = opt.th;
+    to.sd = opt.sd;
 
     // [DP] cache FTBitapSearch instead ?
     ArrayList<byte[][]> quTokens = cache.get(query);

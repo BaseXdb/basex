@@ -62,9 +62,6 @@ import org.deepfs.fs.DeepFS;
  * @author Christian Gruen
  */
 public abstract class Data {
-  /** Flag for ID->Pre Mapping. */
-  static final boolean IDPREMAPON = false;
-
   /** Node kind: Document. */
   public static final byte DOC = 0x00;
   /** Node kind: Element. */
@@ -105,9 +102,6 @@ public abstract class Data {
   /** Full-text index instance. */
   protected Index ftxindex;
 
-  /** LogList to realize the ID->Pre mapping. */
-  LogList loglist;
-
   /**
    * Dissolves the references to often used tag names and attributes.
    * @throws IOException I/O exception
@@ -117,9 +111,6 @@ public abstract class Data {
     if(meta.deepfs) fs = new DeepFS(this);
     nameID = atts.id(DataText.NAME);
     sizeID = atts.id(DataText.SIZE);
-
-    // initialize the ID->Pre mapping
-    if(IDPREMAPON) loglist = new LogList();
   }
 
   /**
@@ -305,8 +296,6 @@ public abstract class Data {
    * @return pre value or -1 if id was not found
    */
   public final int pre(final int id) {
-    if(IDPREMAPON) return loglist.pre(id);
-
     // find pre value in table
     for(int p = id; p < meta.size; ++p)
       if(id == id(p)) return p;
@@ -532,8 +521,6 @@ public abstract class Data {
     int s = size(pre, k);
     ns.delete(pre, s);
 
-    if(IDPREMAPON) loglist.delete(pre, s);
-
     // reduce size of ancestors
     int par = pre;
     // check if we are an attribute (different size counters)
@@ -582,8 +569,6 @@ public abstract class Data {
     meta.update();
     insert(pre, par, dt);
     attSize(par, ELEM, attSize(par, ELEM) + dt.meta.size);
-
-    if(IDPREMAPON) loglist.insert(id(pre), pre);
   }
 
   /**
@@ -699,7 +684,7 @@ public abstract class Data {
           }
           ns.open();
           byte[] nm = md.name(mpre, mk);
-          elem(pre, dis, tags.index(nm, null, false), md.attSize(mpre, mk),
+          elem(dis, tags.index(nm, null, false), md.attSize(mpre, mk),
               md.size(mpre, mk), ns.uri(nm, true), ne);
           preStack[l++] = pre;
           break;
@@ -840,7 +825,6 @@ public abstract class Data {
    */
   public final void doc(final int pre, final int s, final byte[] vl) {
     final int i = ++meta.lastid;
-    if(IDPREMAPON) loglist.insert(i, pre);
     final long v = index(vl, pre, true);
     s(DOC); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
@@ -850,7 +834,6 @@ public abstract class Data {
 
   /**
    * Adds an element entry to the internal update buffer.
-   * @param pre pre value
    * @param d parent distance
    * @param tn tag name index
    * @param as number of attributes
@@ -858,12 +841,11 @@ public abstract class Data {
    * @param u namespace uri reference
    * @param ne namespace flag
    */
-  public final void elem(final int pre, final int d, final int tn, final int as,
+  public final void elem(final int d, final int tn, final int as,
       final int s, final int u, final boolean ne) {
 
     // build and insert new entry
     final int i = ++meta.lastid;
-    if(IDPREMAPON) loglist.insert(i, pre);
     final int n = ne ? 1 << 7 : 0;
     s(as << 3 | ELEM); s(n | (byte) (tn >> 8)); s(tn); s(u);
     s(d >> 24); s(d >> 16); s(d >> 8); s(d);
@@ -882,7 +864,7 @@ public abstract class Data {
       final int k) {
 
     // build and insert new entry
-    final int i = newID(pre);
+    final int i = newID();
     final long v = index(vl, pre, true);
     s(k); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
@@ -904,7 +886,7 @@ public abstract class Data {
 
     // add attribute to text storage
     final long v = index(vl, pre, false);
-    final int i = newID(pre);
+    final int i = newID();
     final int n = ne ? 1 << 7 : 0;
     s(d << 3 | ATTR); s(n | (byte) (tn >> 8)); s(tn); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
@@ -922,13 +904,10 @@ public abstract class Data {
 
   /**
    * Generates a new id.
-   * @param pre pre value
    * @return id
    */
-  private int newID(final int pre) {
-    final int i = ++meta.lastid;
-    if(IDPREMAPON) loglist.insert(i, pre);
-    return i;
+  private int newID() {
+    return ++meta.lastid;
   }
 
   /**

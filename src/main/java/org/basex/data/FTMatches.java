@@ -18,13 +18,13 @@ public final class FTMatches implements Iterable<FTMatch> {
   /** Number of entries. */
   public int size;
   /** Current number of tokens. */
-  public byte sTokenNum;
+  public int sTokenNum;
 
   /**
    * Constructor.
    * @param s sets the token number
    */
-  public FTMatches(final byte s) {
+  public FTMatches(final int s) {
     reset(s);
   }
 
@@ -32,7 +32,7 @@ public final class FTMatches implements Iterable<FTMatch> {
    * Resets the match counter.
    * @param s sets the token number
    */
-  public void reset(final byte s) {
+  public void reset(final int s) {
     sTokenNum = s;
     size = 0;
   }

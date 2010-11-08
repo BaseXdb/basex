@@ -146,7 +146,7 @@ public final class CmpR extends Single {
     final boolean attr = s.test.type == Type.ATT && ic.data.meta.atvindex;
     if(!text && !attr || !mni || !mxi) return false;
 
-    final StatsKey key = getKey(ic, text);
+    final StatsKey key = key(ic, text);
     if(key == null) return false;
 
     // estimate costs for range access; all values out of range: no results
@@ -183,7 +183,7 @@ public final class CmpR extends Single {
    * @param text text flag
    * @return key
    */
-  private StatsKey getKey(final IndexContext ic, final boolean text) {
+  private StatsKey key(final IndexContext ic, final boolean text) {
     // statistics are not up-to-date
     if(!ic.data.meta.uptodate || ic.data.ns.size() != 0) return null;
 

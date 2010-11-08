@@ -55,7 +55,7 @@ public abstract class FTBuilder extends IndexBuilder {
   private int token;
   /** Current frequency. */
   private int fc;
- 
+
   /**
    * Returns a new full-text index builder.
    * @param d data reference

@@ -71,7 +71,7 @@ final class FTTrie extends FTIndex {
 
     final byte[] tok = lex.get();
     final int id = cache.id(tok);
-    if(id > 0) return cache.getSize(id);
+    if(id > 0) return cache.size(id);
 
     int size = 0;
     long poi = 0;
@@ -105,7 +105,7 @@ final class FTTrie extends FTIndex {
     // return cached or new result
     final int id = cache.id(tok);
     return id == 0 ? get(0, tok, false) :
-      iter(cache.getPointer(id), cache.getSize(id), inB, false);
+      iter(cache.pointer(id), cache.size(id), inB, false);
   }
 
   @Override
