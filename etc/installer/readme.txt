@@ -9,20 +9,13 @@ Install NSIS and compile the BaseX.nsi-File with NSIS.
 
 NOTES --------------------------------------------------------------------------
 
-The installer automatically gets the basex*.jar from the target folder.
-Furthermore it gets the BaseX.ico-File from the images folder.
-For each new version the version name in the BaseX.nsi-File and
-the service\wrapper.conf-File has to be set.
-
-The installed Service can be found in the Service Directory under the
-name 'BaseXServer'. The DBPath and Home Directory of the service are the
-Installationfolder.
+For each new version BaseX.exe and BaseX.jar has to be replaced with
+newest version. Furthermore it gets the BaseX.ico-File from the images folder.
 
 FILES --------------------------------------------------------------------------
 
 BaseX.nsi: Main installer file with all functions and definitions.
 Options.ini: Custom Options panel for Installation options.
-service: Folder for Tanuki Service Wrapper (http://wrapper.tanukisoftware.com)
 .basex: Flag for the right Home-Folder Configuration
 
 --------------------------------------------------------------------------------
