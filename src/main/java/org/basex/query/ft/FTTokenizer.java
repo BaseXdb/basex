@@ -72,14 +72,8 @@ public final class FTTokenizer {
     // create the comparator:
     final TokenComparator cmp = new TokenComparator() {
       @Override
-      public boolean equal(final byte[] t1, final byte[] t2)
+      public boolean equal(final byte[] in, final byte[] qu)
         throws QueryException {
-        final byte[] in = t1;
-        final byte[] qu = t2;
-
-        // skip stop words, i. e. if the current query token is a stop word,
-        // it is always equal to the corresponding input token:
-        if(fto.sw != null && fto.sw.id(qu) != 0) return true;
 
         // [DP] QueryException is only thrown by wc, during parsing of the wild-
         // card expression; it might be more efficient, if an automaton is built
@@ -87,12 +81,19 @@ public final class FTTokenizer {
         // not be parsed by each comparison and will also eliminate the need of
         // throwing an exception :)
 
-        // choose fuzzy, wildcard or default search
-        return fto.is(FZ) ? ls.similar(in, qu, lserr) :
-          fto.is(WC) ? wc(words.input, in, qu, 0, 0) : eq(in, qu);
+        return
+            // skip stop words, i. e. if the current query token is a stop word,
+            // it is always equal to the corresponding input token:
+            fto.sw != null && fto.sw.id(qu) != 0 ? true :
+            // fuzzy search:
+            fto.is(FZ) ? ls.similar(in, qu, lserr) :
+            // wildcard search:
+            fto.is(WC) ? wc(words.input, in, qu, 0, 0) :
+            // simple search:
+            eq(in, qu);
       }
     };
-    
+
     final ArrayList<byte[][]> extendedQuTokenList = new ArrayList<byte[][]>(1);
     extendedQuTokenList.add(quTokens);
     
