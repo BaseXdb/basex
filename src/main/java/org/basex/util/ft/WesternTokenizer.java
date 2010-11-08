@@ -397,9 +397,7 @@ final class WesternTokenizer extends Tokenizer {
 
   @Override
   EnumSet<Language> languages() {
-    final EnumSet<Language> lns = EnumSet.noneOf(Language.class);
-    for(final Language lt : Language.values()) if(lt.ws) lns.add(lt);
-    return lns;
+    return Language.WESTERN;
   }
 
   @Override
@@ -417,7 +415,7 @@ final class WesternTokenizer extends Tokenizer {
       public void init(final byte[] txt) {
         WesternTokenizer.this.init(txt);
       }
-      
+
       @Override
       public boolean hasNext() {
         if(next <= 0 && (special ? moreSC() : more())) next++;
