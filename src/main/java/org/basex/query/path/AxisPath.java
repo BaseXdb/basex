@@ -205,8 +205,9 @@ public class AxisPath extends Path {
       // don't allow predicates in preceding location steps
       if(s > 0 && step[s - 1].pred.length != 0) break;
 
-      if(step[s].axis != Axis.DESC) continue;
-
+      // ignore axes other than descendant, or position predicates
+      if(step[s].axis != Axis.DESC || step[s].uses(Use.POS)) continue;
+      
       // check if child steps can be retrieved for current step
       ArrayList<PathNode> nodes = pathNodes(data, s);
       if(nodes == null) continue;
