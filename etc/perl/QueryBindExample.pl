@@ -13,9 +13,12 @@ eval {
   my $session = Session->new("localhost", 1984, "admin", "admin");
 
   # create query instance
-  my $input = "for \$i in 1 to 10 return <xml>Text { \$i }</xml>";
+  my $input = "declare variable \$n external; for \$i in 1 to 10 return <xml> { \$n }: { \$i } </xml>";
   my $query = $session->query($input);
-
+	
+  # bind variable
+  $query->bind("n", "Number");
+  		
   # initialize query
   print $query->init();
 

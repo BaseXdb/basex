@@ -171,7 +171,15 @@ End Class
       
     ' see readme.txt
     Public Sub Bind(name As String, value As String)
-      Exec(3, id)
+      session.stream.WriteByte(3)
+      session.Send(id)
+      session.Send(name)
+      session.Send(value)
+      session.stream.WriteByte(0)
+      Dim Res As String = session.Receive()
+      If Not session.Ok() Then
+        Throw New IOException(session.Receive())
+      End If  
     End Sub
 
     ' see readme.txt 
@@ -181,7 +189,7 @@ End Class
     End Function
 
     ' see readme.txt
-    Public Function Next() As String
+    Public Function Nexty() As String
       Return nextItem
     End Function
 
@@ -204,7 +212,7 @@ End Class
     ' see readme.txt
     Public Function Exec(cmd As Integer, arg As String) As String
       session.stream.WriteByte(cmd)
-      session.send(arg)
+      session.Send(arg)
       Dim Res As String = session.Receive()
       If Not session.Ok() Then
         Throw New IOException(session.Receive())
