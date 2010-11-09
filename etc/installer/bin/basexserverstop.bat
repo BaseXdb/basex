@@ -5,7 +5,7 @@ REM Path to this script
 set PWD=%~dp0
 
 REM Paths to distributed files or source directories
-set BXPATH=../BaseX.jar
+set BXPATH=%PWD%/../BaseX.jar
 REM set BXPATH=%PWD%/../target/classes
 
 REM Run BaseX server

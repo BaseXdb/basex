@@ -71,7 +71,7 @@ ${If} $R1 == $R0
     MessageBox MB_OK "Passwords contain invalid characters."
     Abort
   ${ElseIf} $R0 != "admin"
-      nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -c alter user admin $R0'
+      nsExec::Exec '$INSTDIR\bin\basex.bat -c alter user admin $R0'
   ${EndIf}
 ${Else}
   MessageBox MB_OK "Passwords do not match."
@@ -180,7 +180,7 @@ Section "Hauptgruppe" SEC01
   File "..\images\start.ico"
   File "..\images\stop.ico"
   # set dbpath, port and webport
-  nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\$R4; set serverport $R3; set restport $R2';
+  nsExec::Exec '$INSTDIR\bin\basex.bat -Wc set dbpath $INSTDIR\$R4; set serverport $R3; set restport $R2';
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
                  "DisplayName" "BaseX"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
@@ -198,7 +198,7 @@ Section -AdditionalIcons
   ${If} $R8 == 1
     CreateDirectory "$SMPROGRAMS\BaseX"
     CreateShortCut "$SMPROGRAMS\BaseX\BaseX.lnk" "$INSTDIR\${PRODUCT_NAME}.exe" "" "$INSTDIR\BaseX.ico" 0
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Start).lnk" "$INSTDIR\bin\basexserver.bat -s" "" "$INSTDIR\start.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Start).lnk" "$INSTDIR\bin\basexserver.bat" "-s" "$INSTDIR\start.ico" 0
     CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Stop).lnk" "$INSTDIR\bin\basexserverstop.bat" "" "$INSTDIR\stop.ico" 0
     CreateShortCut "$SMPROGRAMS\BaseX\BaseXClient.lnk" "$INSTDIR\bin\basexclient.bat" "" "$INSTDIR\BaseX.ico" 0
     CreateShortCut "$SMPROGRAMS\BaseX\BaseX Standalone.lnk" "$INSTDIR\bin\basex.bat" "" "$INSTDIR\shell.ico" 0
