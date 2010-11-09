@@ -2,10 +2,13 @@
 # You can set additional options at the end of the file.
 
 DBPATH = C:\
-LANGUAGE = English
+RESTPATH = C:\
+LANG = English
 LANGKEYS = false
 HOST = localhost
 PORT = 1984
 SERVERPORT = 1984
+RESTPORT = 8984
+TIMEOUT = 0
 
 # User defined section

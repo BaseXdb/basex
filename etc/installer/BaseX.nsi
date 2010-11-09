@@ -143,13 +143,33 @@ Section "Hauptgruppe" SEC01
   File "${PRODUCT_NAME}.exe"
   CreateDirectory "$INSTDIR\bin"
   SetOutPath "$INSTDIR\bin"
-  File "bin\basexserver.bat"
+  File "bin\*.*"
   File "bin\basexserverstop.bat"
   File "bin\basexclient.bat"
   File "bin\basex.bat"
   File "bin\basexrest.bat"
-  #CreateDirectory "$INSTDIR\lib"
-  #SetOutPath "$INSTDIR\lib"
+  CreateDirectory "$INSTDIR\lib"
+  SetOutPath "$INSTDIR\lib"
+  File "lib\basex-api.jar"
+  File "..\..\..\basex-api\lib\asm-3.1.jar"
+  File "..\..\..\basex-api\lib\asm-LICENSE.txt"
+  File "..\..\..\basex-api\lib\jax-rx-1.2.7.jar"
+  File "..\..\..\basex-api\lib\jersey-core-1.4.jar"
+  File "..\..\..\basex-api\lib\jersey-LICENSE.txt"
+  File "..\..\..\basex-api\lib\jersey-server-1.4.jar"
+  File "..\..\..\basex-api\lib\jetty-6.1.25.jar"
+  File "..\..\..\basex-api\lib\jetty-LICENSE.TXT"
+  File "..\..\..\basex-api\lib\jetty-util-6.1.25.jar"
+  File "..\..\..\basex-api\lib\jsr311-api-1.0.jar"
+  File "..\..\..\basex-api\lib\lucene-analyzers-3.0.2.jar"
+  File "..\..\..\basex-api\lib\lucene-LICENSE.TXT"
+  File "..\..\..\basex-api\lib\servlet-api-2.5-20081211.jar"
+  File "..\..\..\basex-api\lib\snowball.jar"
+  File "..\..\..\basex-api\lib\snowball-LICENSE.txt"
+  File "..\..\..\basex-api\lib\tagsoup-1.2.jar"
+  File "..\..\..\basex-api\lib\tagsoup-LICENSE.TXT"
+  File "..\..\..\basex-api\lib\xmldb-api-1.0.jar"
+  File "..\..\..\basex-api\lib\xqj-api-1.0.jar"
   SetOutPath "$INSTDIR"
   File "${JAR}"
   File "..\..\license.txt"
@@ -178,11 +198,11 @@ Section -AdditionalIcons
   ${If} $R8 == 1
     CreateDirectory "$SMPROGRAMS\BaseX"
     CreateShortCut "$SMPROGRAMS\BaseX\BaseX.lnk" "$INSTDIR\${PRODUCT_NAME}.exe" "" "$INSTDIR\BaseX.ico" 0
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Start).lnk" "$INSTDIR\basexserver.bat -s" "" "$INSTDIR\start.ico" 0
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Stop).lnk" "$INSTDIR\basexserverstop.bat" "" "$INSTDIR\stop.ico" 0
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseXClient.lnk" "$INSTDIR\basexclient.bat" "" "$INSTDIR\BaseX.ico" 0
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Standalone.lnk" "$INSTDIR\basex.bat" "" "$INSTDIR\shell.ico" 0
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseX REST.lnk" "$INSTDIR\basexrest.bat" "" "$INSTDIR\BaseX.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Start).lnk" "$INSTDIR\bin\basexserver.bat -s" "" "$INSTDIR\start.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Server (Stop).lnk" "$INSTDIR\bin\basexserverstop.bat" "" "$INSTDIR\stop.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseXClient.lnk" "$INSTDIR\bin\basexclient.bat" "" "$INSTDIR\BaseX.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX Standalone.lnk" "$INSTDIR\bin\basex.bat" "" "$INSTDIR\shell.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX REST.lnk" "$INSTDIR\bin\basexrest.bat" "" "$INSTDIR\BaseX.ico" 0
     WriteINIStr "$SMPROGRAMS\BaseX\Website.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
     CreateShortCut "$SMPROGRAMS\BaseX\Uninstall.lnk" "$INSTDIR\uninst.exe"
   ${EndIf}

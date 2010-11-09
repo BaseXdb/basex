@@ -9,8 +9,9 @@ Install NSIS and compile the BaseX.nsi-File with NSIS.
 
 NOTES --------------------------------------------------------------------------
 
-For each new version BaseX.exe and BaseX.jar has to be replaced with
-newest version. Furthermore it gets the BaseX.ico-File from the images folder.
+For each new version BaseX.exe, BaseX.jar and lib/basex-api has to be replaced with
+newest version. Furthermore it gets the ico-Files from the images folder and the other
+lib-jars from the basex-api/lib folder.
 
 FILES --------------------------------------------------------------------------
 

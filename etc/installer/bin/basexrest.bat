@@ -5,10 +5,8 @@ REM Path to this script
 set PWD=%~dp0
 
 REM Paths to distributed files or source directories
-REM set BASEX=%PWD%/basex-%BXVERSION%.jar
-REM set BASEXAPI=%PWD%/basex-api-%BXVERSION%.jar
-set BASEX=%PWD%/../../basex/target/classes
-set BASEXAPI=%PWD%/../target/classes
+set BASEX=%PWD%/../basex.jar
+set BASEXAPI=%PWD%/../lib/basex-api.jar
 
 REM Classpath
 set LIB=%PWD%/../lib
