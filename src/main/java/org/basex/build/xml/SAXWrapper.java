@@ -3,6 +3,8 @@ package org.basex.build.xml;
 import static org.basex.core.Text.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
+
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.FileParser;
@@ -11,11 +13,10 @@ import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.util.Util;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-import com.sun.org.apache.xml.internal.resolver.CatalogManager;
-import com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver;
 
 /**
  * This class parses an XML document with Java's default SAX parser. Note that
@@ -26,6 +27,18 @@ import com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver;
  * @author Christian Gruen
  */
 public final class SAXWrapper extends FileParser {
+  
+  /** CatalogManager instance, if it is referenced in the classpath. */
+  static Object cm;
+  static {
+    try {
+      cm = Class.forName(
+       "org.apache.xml.resolver.CatalogManager").newInstance();
+    } catch(final Exception ex) {
+      cm = null;
+    }
+  }
+
   /** File counter. */
   long counter;
   /** Current line. */
@@ -89,14 +102,24 @@ public final class SAXWrapper extends FileParser {
 
       sax = new SAXHandler(builder);
       final String cat = prop.get(Prop.CATFILE);
-      if(!cat.isEmpty()) {
-        final CatalogManager cm = new CatalogManager();
-        cm.setCatalogFiles(cat);
-        cm.setIgnoreMissingProperties(true);
-        cm.setPreferPublic(true);
-        cm.setUseStaticCatalog(false);
-        cm.setVerbosity(0);
-        r.setEntityResolver(new CatalogResolver(cm));
+      if(!cat.isEmpty() && null != cm) {
+        Class<?> clazz = Class.forName(
+            "org.apache.xml.resolver.CatalogManager");
+        Method m = clazz.getMethod("setCatalogFiles", String.class);
+        m.invoke(cm, cat);
+        m = clazz.getMethod("setIgnoreMissingProperties", boolean.class);
+        m.invoke(cm, true);
+        m = clazz.getMethod("setPreferPublic", boolean.class);
+        m.invoke(cm, true);
+        m = clazz.getMethod("setUseStaticCatalog", boolean.class);
+        m.invoke(cm, false);
+        m = clazz.getMethod("setVerbosity", int.class);
+        m.invoke(cm, 0);
+        r.setEntityResolver((EntityResolver) Class.forName(
+            "org.apache.xml.resolver.tools.CatalogResolver").getConstructor(
+            new Class[] { Class.
+                forName("org.apache.xml.resolver.CatalogManager")}).newInstance(
+            cm));
       }
 
       r.setDTDHandler(sax);
