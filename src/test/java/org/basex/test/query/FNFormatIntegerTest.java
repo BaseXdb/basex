@@ -32,11 +32,19 @@ public final class FNFormatIntegerTest extends QueryTest {
         "XI|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX"),
         "string-join(for $i in 1 to 20 return format-integer($i, 'I'), '|')" },
       { "format-integer-014",
-        str("١|٢|٣|٤|٥|٦|٧|٨|٩|١٠|١١|١٢|١٣|١٤|١٥|١٦|١٧|١٨|١٩|٢٠"),
-        "string-join(for $i in 1 to 20 return format-integer($i, '١'), '|')" },
+        str("\u0661|\u0662|\u0663|\u0664|\u0665|\u0666|\u0667|\u0668|\u0669|" +
+            "\u0661\u0660|\u0661\u0661|\u0661\u0662|\u0661\u0663|\u0661" +
+            "\u0664|\u0661\u0665|\u0661\u0666|\u0661\u0667|\u0661\u0668|" +
+            "\u0661\u0669|\u0662\u0660"),
+        "string-join(for $i in 1 to 20 " +
+        "return format-integer($i, '\u0661'), '|')" },
       { "format-integer-015",
-        str("١|٢|٣|٤|٥|٦|٧|٨|٩|١٠|١١|١٢|١٣|١٤|١٥|١٦|١٧|١٨|١٩|٢٠"),
-        "string-join(for $i in 1 to 20 return format-integer($i, '٩'), '|')" },
+        str("\u0661|\u0662|\u0663|\u0664|\u0665|\u0666|\u0667|\u0668|\u0669|" +
+            "\u0661\u0660|\u0661\u0661|\u0661\u0662|\u0661\u0663|\u0661" +
+            "\u0664|\u0661\u0665|\u0661\u0666|\u0661\u0667|\u0661\u0668|" +
+            "\u0661\u0669|\u0662\u0660"),
+        "string-join(for $i in 1 to 20 " +
+        "return format-integer($i, '\u0669'), '|')" },
       { "format-integer-016",
         str("One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten"),
         "string-join(for $i in 1 to 10 return format-integer($i, 'Ww'), '|')" },
@@ -58,8 +66,8 @@ public final class FNFormatIntegerTest extends QueryTest {
       { "format-integer-026", "format-integer(1500000, '#a')" },
       { "format-integer-027", "format-integer(1500000, ',123')" },
       { "format-integer-028", "format-integer(1500000, '0,00,,000')" },
-      { "format-integer-029", str("1500𐄀0,00"),
-        "format-integer(1500000, '###𐄀0,00')" },
+      { "format-integer-029", str("1500\ud800\udd0001000,00"),
+        "format-integer(1500000, '###\ud800\udd000,00')" },
       { "format-integer-030", str("(602)347-826"),
         "format-integer(602347826, '#(000)000-000')" }, */
       { "format-integer-031", str("SECOND"), "format-integer(2, 'Wo')" },
@@ -73,31 +81,39 @@ public final class FNFormatIntegerTest extends QueryTest {
       { "format-integer-038", "format-integer(1234, '()Wwo')" },
       { "format-integer-039", "format-integer(1234, '\n')" },
       /* { "format-integer-040", "format-integer(1234, '123١')" },
-      { "format-integer-041", str("𐒡,𐒢𐒣𐒤"),
-        "format-integer(1234, '#,𐒠𐒠𐒠')" },*/
+      { "format-integer-041",
+        str("\uD801\uDCA1,\uD801\uDCA2\uD801\uDCA3\uD801\uDCA4"),
+        "format-integer(1234, '#,\uD801\uDCA0\uD801\uDCA0\uD801\uDCA0')" },*/
       /*{ "format-integer-042", str("1234"), "format-integer(1234, 'ﯴ')" },*/
       { "format-integer-043", str("-85th"), "format-integer(-85, '1o')" },
       { "format-integer-044", str("-Fifth"), "format-integer(-5, 'Wwo')" },
       { "format-integer-045", str("Zero"), "format-integer(0, 'Ww')" },
-      { "format-integer-046", str("①|②|③|④|⑤"),
-        "string-join(for $i in 1 to 5 return format-integer($i, '①'), '|')" },
-      { "format-integer-047", str("⑴|⑵|⑶|⑷|⑸"),
-        "string-join(for $i in 1 to 5 return format-integer($i, '⑴'), '|')" },
-      { "format-integer-048", str("⒈|⒉|⒊|⒋|⒌"),
-        "string-join(for $i in 1 to 5 return format-integer($i, '⒈'), '|')" },
-      { "format-integer-049", str("Α|Β|Γ|Δ|Ε"),
-        "string-join(for $i in 1 to 5 return format-integer($i, 'Α'), '|')" },
-      { "format-integer-050", str("α|β|γ|δ|ε"),
+      { "format-integer-046", str("\u2460|\u2461|\u2462|\u2463|\u2464"),
+        "string-join(for $i in 1 to 5 " +
+        "return format-integer($i, '\u2460'), '|')" },
+      { "format-integer-047", str("\u2474|\u2475|\u2476|\u2477|\u2478"),
+        "string-join(for $i in 1 to 5 " +
+        "return format-integer($i, '\u2474'), '|')" },
+      { "format-integer-048", str("\u2488|\u2489|\u248A|\u248B|\u248C"),
+        "string-join(for $i in 1 to 5 " +
+        "return format-integer($i, '\u2488'), '|')" },
+      { "format-integer-049", str("\u0391|\u0392|\u0393|\u0394|\u0395"),
+        "string-join(for $i in 1 to 5 " +
+        "return format-integer($i, '\u0391'), '|')" },
+      { "format-integer-050", str("\u03b1|\u03b2|\u03b3|\u03b4|\u03b5"),
         "string-join(for $i in 1 to 5 return format-integer($i,'α'), '|')" },
-      /* { "format-integer-051", str("12 345 678 901"),
+      /*{ "format-integer-051", str("12 345 678 901"),
         "format-integer(12345678901,'# 000')" },
-      { "format-integer-052", str("1=一|2=二|3=三|4=四|5=五|6=六|7=七|8=八|" +
-        "9=九|10=十|11=十一|12=十二|13=十三|14=十四|15=十五|16=十六|17=十七|" +
-        "18=十八|19=十九|20=二十|21=二十一|22=二十二|23=二十三|" +
-        "151=百五十一|302=三百二|469=四百六十九|2025=二千二十五"),
+      { "format-integer-052", str("1=\u4E00|2=\u4E8C|3=\u4E09|4=\u56DB|" +
+        "5=\u4E94|6=\u516D|7=\u4E03|8=\u516B|9=\u4E5D|10=\u5341|11=\u5341" +
+        "\u4E00|12=\u5341\u4E8C|13=\u5341\u4E09|14=\u5341\u56DB|15=\u5341" +
+        "\u4E94|16=\u5341\u516D|17=\u5341\u4E03|18=\u5341\u516B|19=\u5341" +
+        "\u4E5D|20=\u4E8C\u5341|21=\u4E8C\u5341\u4E00|22=\u4E8C\u5341\u4E8C|" +
+        "23=\u4E8C\u5341\u4E09|151=\u767E\u4E94\u5341\u4E00|302=\u4E09\u767E" +
+        "\u4E8C|469=\u56DB\u767E\u516D\u5341\u4E5D|2025=\u4E8C\u5343" +
+        "\u4E8C\u5341\u4E94"),
         "string-join(for $i in (1 to 23, 151, 302, 469, 2025) " +
-        "return concat($i, '=',  format-integer($i, '一'), '|')" },
-      */
+        "return concat($i, '=',  format-integer($i, '\u4e00'), '|'))" },*/
     };
   }
 }
