@@ -5,12 +5,12 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
+import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import org.basex.gui.GUI;
 
 /**
  * DoubleSlider implementation.
@@ -64,7 +64,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @param mx max value
    * @param list listener
    */
-  public BaseXDSlider(final GUI main, final double mn, final double mx,
+  public BaseXDSlider(final Window main, final double mn, final double mx,
       final ActionListener list) {
     super(main);
     listener = list;

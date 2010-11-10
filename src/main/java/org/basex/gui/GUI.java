@@ -3,7 +3,6 @@ package org.basex.gui;
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
@@ -64,11 +63,7 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class GUI extends JFrame {
-  /** Database Context. */
-  public final Context context;
-  /** GUI properties. */
-  public final GUIProp prop;
+public final class GUI extends AGUI {
   /** View Manager. */
   public final ViewNotifier notify;
 
@@ -133,10 +128,7 @@ public final class GUI extends JFrame {
    * @param gprops gui properties
    */
   public GUI(final Context ctx, final GUIProp gprops) {
-    context = ctx;
-    prop = gprops;
-    setTitle(Text.TITLE);
-    setIconImage(BaseXLayout.image("icon"));
+    super(ctx, gprops, Text.TITLE);
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
@@ -303,24 +295,6 @@ public final class GUI extends JFrame {
     super.dispose();
     prop.write();
     context.close();
-  }
-
-  /**
-   * Sets a cursor.
-   * @param c cursor to be set
-   */
-  public void cursor(final Cursor c) {
-    cursor(c, false);
-  }
-
-  /**
-   * Sets a cursor, forcing a new look if necessary.
-   * @param c cursor to be set
-   * @param force new cursor
-   */
-  public void cursor(final Cursor c, final boolean force) {
-    final Cursor cc = getCursor();
-    if(cc != c && (cc != CURSORWAIT || force)) setCursor(c);
   }
 
   /**

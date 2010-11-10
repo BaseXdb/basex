@@ -56,7 +56,7 @@ public final class BaseXButton extends JButton {
    * @param img image reference
    * @param hlp help text
    */
-  public BaseXButton(final GUI gui, final String img, final byte[] hlp) {
+  public BaseXButton(final Window gui, final String img, final byte[] hlp) {
     super(BaseXLayout.icon("cmd-" + img));
     setOpaque(false);
     BaseXLayout.addInteraction(this, hlp, gui);

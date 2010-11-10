@@ -5,7 +5,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import org.basex.gui.GUI;
+import org.basex.gui.AGUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
@@ -26,7 +26,7 @@ final class ViewMover extends BaseXPanel {
    * Constructor.
    * @param main reference to the main window
    */
-  ViewMover(final GUI main) {
+  ViewMover(final AGUI main) {
     super(HELPMOVER, main);
     BaseXLayout.setHeight(this, SIZE);
     addKeyListener(this);

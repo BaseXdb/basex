@@ -14,7 +14,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.StringTokenizer;
-import org.basex.gui.GUI;
+import org.basex.gui.AGUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
@@ -50,7 +50,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   }
 
   /** Reference to main window. */
-  private final GUI gui;
+  private final AGUI gui;
   /** States if component was moved out of the window. */
   private boolean out;
   /** View Layout. */
@@ -75,7 +75,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    * @param main reference to the main window
    * @param v view panels
    */
-  public ViewContainer(final GUI main, final View... v) {
+  public ViewContainer(final AGUI main, final View... v) {
     setMode(Fill.PLAIN);
     setLayout(new BorderLayout());
     logo = BaseXLayout.image("logo");
