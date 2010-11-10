@@ -1,14 +1,17 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import org.basex.build.xml.CatalogResolverWrapper;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -143,13 +146,17 @@ public final class DialogCreate extends Dialog {
     p2.add(new BaseXLabel(CHOPPINGINFO, false, false));
     p2.add(new BaseXLabel(" "));
 
+    // CatalogResolving
+    final boolean rsen = null != CatalogResolverWrapper.getInstance(); 
     final BaseXBack fl = new BaseXBack();
     fl.setLayout(new TableLayout(2, 2, 6, 0));
     usecat = new BaseXCheckBox(USECATFILE,
         !prop.get(Prop.CATFILE).isEmpty(), 0, this);
+    usecat.setEnabled(rsen);
     fl.add(usecat);
     fl.add(new BaseXLabel());
     cfile = new BaseXTextField(prop.get(Prop.CATFILE), this);
+    cfile.setEnabled(rsen);
     fl.add(cfile);
 
     browsec = new BaseXButton(BUTTONBROWSE, this);
@@ -157,8 +164,16 @@ public final class DialogCreate extends Dialog {
       @Override
       public void actionPerformed(final ActionEvent e) { catchoose(); }
     });
+    browsec.setEnabled(rsen);
     fl.add(browsec);
     p2.add(fl);
+    if(!rsen) {
+      final BaseXBack rsinfo = new BaseXBack();
+      rsinfo.setLayout(new TableLayout(2, 1));
+      rsinfo.add(new BaseXLabel(USECATHLP));
+      rsinfo.add(new BaseXLabel(USECATHLP2));
+      p2.add(rsinfo);
+    }
 
     final BaseXBack p3 = new BaseXBack();
     p3.setLayout(new TableLayout(6, 1, 0, 0));
@@ -265,7 +280,8 @@ public final class DialogCreate extends Dialog {
 
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());
-    usecat.setEnabled(!intparse.isSelected());
+    usecat.setEnabled(null != CatalogResolverWrapper.getInstance() && 
+        !intparse.isSelected());
     intparse.setEnabled(!usecat.isSelected());
     cfile.setEnabled(!intparse.isSelected() &&
         (!gui.context.prop.get(Prop.CATFILE).isEmpty() || usecat.isSelected()));

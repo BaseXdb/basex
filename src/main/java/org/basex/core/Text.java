@@ -995,6 +995,10 @@ public interface Text {
   String CREATETITLE = lang("dc_choose");
   /** Use Catalog file Checkbox. */
   String USECATFILE = lang("dc_usecat");
+  /** Use Catalog file not found on CP. */
+  String USECATHLP = lang("dc_usecathlp");
+  /** Use Catalog file not found on CP. */
+  String USECATHLP2 = lang("dc_usecathlp2");
 
   /** Database creation filter. */
   String CREATEPATTERN = lang("dc_pattern");
