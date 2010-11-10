@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: org.basex.BaseXGUI
-SplashScreen-Image: org/basex/gui/img/start.png
