@@ -48,7 +48,7 @@ public final class Func extends Single {
    * @throws QueryException query exception
    */
   public void check() throws QueryException {
-    if(!declared) FUNCUNKNOWN.thrw(input, var.name.atom());
+    if(!declared || expr == null) FUNCUNKNOWN.thrw(input, var.name.atom());
 
     final boolean u = expr.uses(Use.UPD);
     if(updating) {

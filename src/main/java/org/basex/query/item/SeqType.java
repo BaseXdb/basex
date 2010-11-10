@@ -104,7 +104,7 @@ public final class SeqType {
    */
   private SeqType(final Type t, final Occ o, final QNm e) {
     type = t;
-    occ = t == Type.EMP ? Occ.Z : o;
+    occ = t == Type.EMP ? Occ.Z : t == Type.SEQ ? Occ.OM : o;
     ext = e;
   }
 

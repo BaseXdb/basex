@@ -809,6 +809,7 @@ public enum Type {
    * @return sequence type
    */
   public SeqType seq() {
+    // cannot be statically instantiated due to circular dependency 
     if(seq == null) seq = new SeqType(this);
     return seq;
   }
