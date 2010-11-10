@@ -405,7 +405,7 @@ public abstract class W3CTS {
       // print compilation steps
       if(compile) {
         Util.errln("---------------------------------------------------------");
-        Util.err(xq.info());
+        Util.error(xq.info());
         Util.errln(in);
       }
 

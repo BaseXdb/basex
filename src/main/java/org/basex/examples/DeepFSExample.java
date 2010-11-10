@@ -8,6 +8,7 @@ import org.basex.core.cmd.CreateFS;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.XQuery;
+import org.basex.util.Util;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.ParserRegistry;
 import org.deepfs.fsml.ser.FSMLSerializer;
@@ -228,10 +229,10 @@ public final class DeepFSExample {
       final String name = f.getName();
       if(name.endsWith(".mp3")) {
         mp3Dir = f.getAbsolutePath();
-        if(jpgDir != null) throw new RuntimeException();
+        if(jpgDir != null) Util.notexpected();
       } else if(name.endsWith(".jpg")) {
         jpgDir = f.getAbsolutePath();
-        if(mp3Dir != null) throw new RuntimeException();
+        if(mp3Dir != null) Util.notexpected();
       }
     }
 
