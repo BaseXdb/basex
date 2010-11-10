@@ -85,7 +85,7 @@ public final class DialogMountFS extends Dialog {
 
     detail = new BaseXText(false, this);
     detail.setFont(f);
-    detail.setBorder(new EmptyBorder(5, 5, 5, 5));
+    detail.setBorder(5, 5, 5, 5);
     BaseXLayout.setWidth(detail, 420);
     info.add(detail, BorderLayout.CENTER);
 
@@ -95,7 +95,7 @@ public final class DialogMountFS extends Dialog {
     m.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5,
         5, 5)));
     final BaseXLabel lab = new BaseXLabel("Using mount point: ", false, true);
-    lab.setBorder(new EmptyBorder(5, 5, 5, 0));
+    lab.setBorder(5, 5, 5, 0);
     m.add(lab);
     m.add(new BaseXLabel());
     mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT), this);
@@ -118,7 +118,7 @@ public final class DialogMountFS extends Dialog {
     info.add(m, BorderLayout.SOUTH);
 
     final BaseXBack pp = new BaseXBack();
-    pp.setBorder(new EmptyBorder(0, 12, 0, 0));
+    pp.setBorder(0, 12, 0, 0);
     pp.setLayout(new BorderLayout());
     pp.add(info, BorderLayout.CENTER);
 

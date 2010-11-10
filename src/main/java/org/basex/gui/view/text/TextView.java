@@ -63,7 +63,7 @@ public final class TextView extends View implements ActionListener {
     super(TEXTVIEW, HELPTEXT, man);
 
     setLayout(new BorderLayout(0, 4));
-    setBorder(6, 8, 8, 8);
+    setBorder(6, 6, 6, 6);
     setFocusable(false);
 
     final BaseXBack b = new BaseXBack(Fill.NONE);

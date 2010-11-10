@@ -2200,17 +2200,17 @@ public class QueryParser extends InputParser {
    */
   private byte[] stringLiteral() throws QueryException {
     skipWS();
-    final char delim = curr();
-    if(!quote(delim)) error(NOQUOTE, found());
+    final char del = curr();
+    if(!quote(del)) error(NOQUOTE, found());
     consume();
     tok.reset();
     while(true) {
-      while(!consume(delim)) {
+      while(!consume(del)) {
         if(curr() == 0) error(NOQUOTE, found());
         entity(tok);
       }
-      if(!consume(delim)) break;
-      tok.add(delim);
+      if(!consume(del)) break;
+      tok.add(del);
     }
     return tok.finish();
   }

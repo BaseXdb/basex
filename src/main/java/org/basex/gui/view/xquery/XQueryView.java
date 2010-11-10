@@ -41,6 +41,8 @@ public final class XQueryView extends View {
   final BaseXButton stop;
   /** Info label. */
   final BaseXLabel info;
+  /** Position label. */
+  final BaseXLabel pos;
   /** Text Area. */
   final XQueryText text;
   /** Modified flag. */
@@ -63,7 +65,7 @@ public final class XQueryView extends View {
     super(XQUERYVIEW, HELPXQUERYY, man);
 
     setLayout(new BorderLayout());
-    setBorder(6, 8, 8, 8);
+    setBorder(6, 6, 6, 6);
     setFocusable(false);
 
     header = new BaseXLabel(XQUERYTIT, true, false);
@@ -145,10 +147,13 @@ public final class XQueryView extends View {
     text.addSearch(find);
 
     south = new BaseXBack(Fill.NONE);
-    south.setLayout(new BorderLayout());
+    south.setLayout(new BorderLayout(8, 0));
 
+    sp = new BaseXBack(Fill.NONE);
+    sp.setLayout(new BorderLayout(8, 0));
+
+    // parsing status (ok/error)
     info = new BaseXLabel(" ");
-    info.setCursor(GUIConstants.CURSORHAND);
     info.setText(OK, Msg.SUCCESS);
     info.addMouseListener(new MouseAdapter() {
       @Override
@@ -156,9 +161,18 @@ public final class XQueryView extends View {
         if(info.getName() == null) return;
         text.setCaret(Integer.parseInt(info.getName()));
         text.requestFocusInWindow();
+        pos.setText(text.pos());
       }
     });
-    south.add(info, BorderLayout.CENTER);
+    sp.add(info, BorderLayout.CENTER);
+
+    // col/line information
+    pos = new BaseXLabel(" ");
+
+    //pos.setBo
+    sp.add(pos, BorderLayout.EAST);
+
+    south.add(sp, BorderLayout.CENTER);
 
     stop = new BaseXButton(gui, "stop", HELPSTOP);
     stop.addKeyListener(this);
@@ -275,7 +289,7 @@ public final class XQueryView extends View {
     info.setCursor(error !=  -1 ?
         GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
 
-    info.setText(ok ? OK : inf.replaceAll(STOPPED + ".*\\r?\\n", ""),
+    info.setText(ok ? OK : inf.replaceAll(STOPPED + ".*\\r?\\n\\[.*?\\] ", ""),
         ok ? Msg.SUCCESS : Msg.ERROR);
     info.setToolTipText(ok ? null : inf);
     stop.setEnabled(false);

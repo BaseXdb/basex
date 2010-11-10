@@ -61,7 +61,7 @@ public final class InfoView extends View {
    */
   public InfoView(final ViewNotifier man) {
     super(INFOVIEW, HELPINFOO, man);
-    setBorder(6, 8, 8, 8);
+    setBorder(6, 6, 6, 6);
     setLayout(new BorderLayout());
 
     north = new BaseXBack(Fill.NONE);

@@ -124,6 +124,15 @@ public class BaseXText extends BaseXPanel {
   }
 
   /**
+   * Returns the cursor coordinates.
+   * @return line/column
+   */
+  public final String pos() {
+    final int[] pos = rend.pos();
+    return pos[0] + " : " + pos[1];
+  }
+
+  /**
    * Finds the specified term.
    * @param t output text
    * @param b backward browsing
@@ -260,7 +269,7 @@ public class BaseXText extends BaseXPanel {
   }
 
   @Override
-  public final void mouseReleased(final MouseEvent e) {
+  public void mouseReleased(final MouseEvent e) {
     if(!SwingUtilities.isLeftMouseButton(e)) return;
     rend.stopSelect();
   }
@@ -451,6 +460,7 @@ public class BaseXText extends BaseXPanel {
           }
           text.endMark();
         }
+        if(undo != null) undo.cursor(text.cursor());
         text.delete();
       } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || DELPREV.is(e)) {
         if(nomark) {
@@ -465,6 +475,7 @@ public class BaseXText extends BaseXPanel {
           }
           text.endMark();
         }
+        if(undo != null) undo.cursor(text.cursor());
         text.delete();
         down = false;
       } else {
@@ -617,6 +628,7 @@ public class BaseXText extends BaseXPanel {
     final String txt = clip();
     if(txt == null) return;
     text.pos(text.cursor());
+    if(undo != null) undo.cursor(text.cursor());
     if(text.start() != -1) text.delete();
     text.add(txt);
     if(undo != null) undo.store(text.toArray(), text.cursor());
@@ -627,6 +639,7 @@ public class BaseXText extends BaseXPanel {
    */
   protected final void delete() {
     text.pos(text.cursor());
+    if(undo != null) undo.cursor(text.cursor());
     text.delete();
     if(undo != null) undo.store(text.toArray(), text.cursor());
     text.setCaret();

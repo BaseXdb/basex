@@ -37,7 +37,7 @@ public final class ExploreView extends View {
     super(EXPLOREVIEW, HELPEXPLORE, man);
 
     setLayout(new BorderLayout(0, 4));
-    setBorder(6, 8, 8, 8);
+    setBorder(6, 6, 6, 6);
     setFocusable(false);
 
     header = new BaseXLabel(EXPLORETIT, true, false);

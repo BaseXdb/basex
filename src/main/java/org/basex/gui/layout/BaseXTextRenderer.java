@@ -29,7 +29,7 @@ final class BaseXTextRenderer extends BaseXBack {
   /** Character widths. */
   private int[] fwidth = GUIConstants.mfwidth;
   /** Color. */
-  private Color col;
+  private Color color;
   /** Color highlighting flag. */
   private boolean high;
 
@@ -149,6 +149,37 @@ final class BaseXTextRenderer extends BaseXBack {
   }
 
   /**
+   * Returns the cursor coordinates.
+   * @return line/column
+   */
+  int[] pos() {
+    final int hh = h;
+    h = Integer.MAX_VALUE;
+    final Graphics g = getGraphics();
+    int col = 1;
+    int line = 1;
+    init(g, 0);
+    boolean more = true;
+    while(more(g)) {
+      final int p = text.pos();
+      while(text.more()) {
+        more = text.pos() < text.cursor();
+        if(!more) break;
+        text.next();
+        col++;
+      }
+      if(!more) break;
+      text.pos(p);
+      if(next()) {
+        line++;
+        col = 1;
+      }
+    }
+    h = hh;
+    return new int[] { line, col };
+  }
+
+  /**
    * Sets the current font.
    * @param f font
    */
@@ -180,7 +211,7 @@ final class BaseXTextRenderer extends BaseXBack {
    */
   private void init(final Graphics g, final int pos) {
     font = dfont;
-    col = Color.black;
+    color = Color.black;
     syntax.init();
     text.init();
     x = off;
@@ -264,15 +295,17 @@ final class BaseXTextRenderer extends BaseXBack {
 
   /**
    * Finishes the current token.
+   * @return true for new line
    */
-  private void next() {
+  private boolean next() {
     final int ch = text.curr();
     if(ch == 0x0A || ch == 0x0B) {
       x = off;
       y += fontH >> (ch == 0x0A ? 0 : 1);
-    } else {
-      x += wordW;
+      return true;
     }
+    x += wordW;
+    return false;
   }
 
   /**
@@ -283,13 +316,13 @@ final class BaseXTextRenderer extends BaseXBack {
     if(high) {
       high = false;
     } else {
-      col = isEnabled() ? syntax.getColor(text) : Color.gray;
+      color = isEnabled() ? syntax.getColor(text) : Color.gray;
     }
 
     final int ch = text.curr();
     if(y > 0 && y < h) {
       if(ch == 0x10) {
-        col = GUIConstants.COLORFT;
+        color = GUIConstants.COLORFT;
         high = true;
       }
 
@@ -325,7 +358,7 @@ final class BaseXTextRenderer extends BaseXBack {
 
       // don't write whitespaces
       if(ch > ' ') {
-        g.setColor(col);
+        g.setColor(color);
         g.drawString(text.nextWord(), x, y);
       } else if(ch < 0x04) {
         g.setFont(font);
@@ -439,6 +472,7 @@ final class BaseXTextRenderer extends BaseXBack {
   private int charW(final Graphics g, final int ch) {
     return ch == '\t' ? fwidth[' '] * BaseXTextTokens.TAB : ch < ' ' ? 0 :
       ch < 256 || g == null ? fwidth[ch & 0xFF] :
+      ch >= 0xD800 && ch <= 0xDC00 ? 0 :
       g.getFontMetrics().charWidth(ch);
   }
 

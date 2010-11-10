@@ -58,8 +58,8 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Checks if the text has more words to print.
-   * @return true if the text has more words
+   * Checks if the text contains more words.
+   * @return result of check
    */
   boolean moreWords() {
     // quit if text has ended

@@ -83,13 +83,13 @@ public final class DialogOpen extends Dialog {
 
     detail = new BaseXText(false, this);
     detail.setFont(f);
-    detail.setBorder(new EmptyBorder(5, 5, 5, 5));
+    detail.setBorder(5, 5, 5, 5);
 
     BaseXLayout.setWidth(detail, 400);
     info.add(detail, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack();
-    pp.setBorder(new EmptyBorder(0, 12, 0, 0));
+    pp.setBorder(0, 12, 0, 0);
     pp.setLayout(new BorderLayout());
     pp.add(info, BorderLayout.CENTER);
 

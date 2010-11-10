@@ -3,6 +3,7 @@ package org.basex.gui.view.xquery;
 import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.cmd.XQuery;
@@ -53,7 +54,17 @@ final class XQueryText extends BaseXText {
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(Character.isDefined(e.getKeyChar())) error(-1);
+    if(Character.isDefined(e.getKeyChar())) {
+      error(-1);
+    } else {
+      view.pos.setText(pos());
+    }
+  }
+
+  @Override
+  public void mouseReleased(final MouseEvent e) {
+    super.mouseReleased(e);
+    view.pos.setText(pos());
   }
 
   @Override
@@ -66,10 +77,12 @@ final class XQueryText extends BaseXText {
   protected void release(final boolean force) {
     final byte[] qu = getText();
     final boolean module = module(qu);
-    final boolean diff = !Token.eq(qu, last);
-    view.modified(view.modified || diff, false);
+    final boolean eq = Token.eq(qu, last);
+    if(eq && !force) return;
+    view.modified(view.modified || !eq, false);
+    view.pos.setText(pos());
 
-    if(force || gui.prop.is(GUIProp.EXECRT) && !module && diff) {
+    if(force || gui.prop.is(GUIProp.EXECRT) && !module) {
       query(qu, true);
     } else {
       try {

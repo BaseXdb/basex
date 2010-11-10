@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.border.EmptyBorder;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
@@ -114,7 +113,7 @@ public final class DialogCreateFS extends Dialog {
 
     all = new BaseXCheckBox(IMPORTALL, gprop.is(GUIProp.FSALL), this);
     all.setToolTipText(IMPORTALLINFO);
-    all.setBorder(new EmptyBorder(4, 4, 0, 0));
+    //all.setBorder( 4, 4, 0, 0);
     all.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

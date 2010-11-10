@@ -27,7 +27,7 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 public final class SAXWrapper extends FileParser {
-  
+
   /** CatalogManager instance, if it is referenced in the classpath. */
   static Object cm;
   static {

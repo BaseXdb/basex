@@ -66,6 +66,14 @@ public final class Undo {
   }
 
   /**
+   * Sets the current cursor position before adding a new entry.
+   * @param c cursor position
+   */
+  public void cursor(final int c) {
+    cur[pos] = Math.min(hist[pos].length, c);
+  }
+
+  /**
    * Stores a string in the history.
    * @param str string to be stored
    * @param c cursor position

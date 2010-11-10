@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.io.File;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.basex.BaseXServer;
@@ -239,7 +238,7 @@ public final class DialogServer extends Dialog {
     logt.setFont(start.getFont());
     BaseXLayout.setHeight(logt, 100);
 
-    logt.setBorder(new EmptyBorder(5, 5, 5, 5));
+    logt.setBorder(5, 5, 5, 5);
     infoL = new BaseXLabel(" ");
     infoL.setBorder(8, 0, 0, 0);
     refreshLog = new BaseXButton(BUTTONREFRESH, this);
