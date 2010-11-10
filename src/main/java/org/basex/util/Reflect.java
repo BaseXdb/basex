@@ -4,8 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 /**
- * Functions for judging which classes (eg. tokenizers, stemmers) match to
- * chosen language.
+ * This class assembles some reflection methods. If exceptions occur, a
+ * {@code null} reference is returned or a runtime exception is thrown.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -85,26 +85,9 @@ public final class Reflect {
   }
 
   /**
-   * Invoked the specified method.
-   * @param method method to run
-   * @param object object ({@code null} for static methods) 
-   * @param args arguments
-   * @return result of method call
-   */
-  public static Object invoke(final Method method, final Object object,
-      final Object... args) {
-    try {
-      return method.invoke(object, args);
-    } catch(final Exception ex) {
-      Util.debug(ex);
-      return null;
-    }
-  }
-
-  /**
-   * Returns a class instance, or {@code null} if the instantiation failed.
+   * Returns a class instance, or throws a runtime exception.
    * @param clazz class
-   * @return instance, or {@code null}
+   * @return instance
    */
   public static Object get(final Class<?> clazz) {
     try {
@@ -116,14 +99,31 @@ public final class Reflect {
   }
 
   /**
-   * Returns a class instance, or {@code null} if the instantiation failed.
+   * Returns a class instance, or throws a runtime exception.
    * @param clazz class
    * @param args arguments
-   * @return instance, or {@code null}
+   * @return instance
    */
   public static Object get(final Constructor<?> clazz, final Object... args) {
     try {
       return clazz.newInstance(args);
+    } catch(final Exception ex) {
+      Util.debug(ex);
+      return null;
+    }
+  }
+
+  /**
+   * Invoked the specified method.
+   * @param method method to run
+   * @param object object ({@code null} for static methods) 
+   * @param args arguments
+   * @return result of method call
+   */
+  public static Object invoke(final Method method, final Object object,
+      final Object... args) {
+    try {
+      return method.invoke(object, args);
     } catch(final Exception ex) {
       Util.debug(ex);
       return null;

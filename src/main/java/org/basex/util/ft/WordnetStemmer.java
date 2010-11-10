@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.List;
-
 import org.basex.util.Reflect;
 
 /**
@@ -18,16 +17,10 @@ import org.basex.util.Reflect;
  * @author Dimitar Popov
  */
 final class WordnetStemmer extends Stemmer {
-  /** Path to the WordNet dictionary files; relative to current directory. */
-  private static final String PATH = "etc/wndict";
   /** Name of the package of the WordNet stemmer. */
   private static final String PKG = "edu.mit.jwi";
-  /** IDictionary class. */
-  private static final Class<?> IDICT_CLASS;
-  /** Dictionary class. */
-  private static final Class<?> DICT_CLASS;
-  /** WordnetStemmer class. */
-  private static final Class<?> WORDNET_CLASS;
+  /** Path to the WordNet dictionary files (currently: static). */
+  private static final String PATH = "etc/wndict";
   /** WordnetStemmer class. */
   private static final Constructor<?> CTR;
   /** WordnetStemmer.findStems method. */
@@ -38,32 +31,28 @@ final class WordnetStemmer extends Stemmer {
   static {
     // Don't try to find the other classes if Dictionary is not found:
     if(Reflect.available(PKG)) {
-      IDICT_CLASS = null;
-      DICT_CLASS = null;
-      WORDNET_CLASS = null;
       FIND_STEMS = null;
       CTR = null;
       DICT = null;
     } else {
-      IDICT_CLASS = Reflect.find(PKG + ".IDictionary");
-      DICT_CLASS = Reflect.find(PKG + ".Dictionary");
-      WORDNET_CLASS = Reflect.find(PKG + ".morph.WordnetStemmer");
-      CTR = Reflect.find(WORDNET_CLASS, IDICT_CLASS);
-      FIND_STEMS = Reflect.find(WORDNET_CLASS, "findStems", String.class);
-      DICT = DICT_CLASS == null || WORDNET_CLASS == null || CTR == null ||
-        FIND_STEMS == null ? null : newDict();
+      final Class<?> dict = Reflect.find(PKG + ".Dictionary");
+      final Class<?> wn = Reflect.find(PKG + ".morph.WordnetStemmer");
+      CTR = Reflect.find(wn, Reflect.find(PKG + ".IDictionary"));
+      FIND_STEMS = Reflect.find(wn, "findStems", String.class);
+      DICT = newDict(dict);
     }
   }
 
   /**
    * Create new instance of the WordNet dictionary.
+   * @param dct dictionary class
    * @return new instance of the WordNet dictionary
    */
-  private static Object newDict() {
+  private static Object newDict(final Class<?> dct) {
     try {
-      final Constructor<?> ctr = Reflect.find(DICT_CLASS, URL.class);
+      final Constructor<?> ctr = Reflect.find(dct, URL.class);
       final Object dict = Reflect.get(ctr, new URL("file", null, PATH));
-      return Reflect.invoke(Reflect.find(DICT_CLASS, "open"), dict);
+      return Reflect.invoke(Reflect.find(dct, "open"), dict);
     } catch(final Exception e) {
       return null;
     }
@@ -74,7 +63,7 @@ final class WordnetStemmer extends Stemmer {
    * @return result of check
    */
   static boolean available() {
-    return DICT != null && CTR != null;
+    return DICT != null;
   }
 
   /** Instance of WordNet stemmer. */
