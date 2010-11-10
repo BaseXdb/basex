@@ -7,6 +7,8 @@ import java.net.URL;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.basex.util.Reflect;
+
 /**
  * Stemmer implementation using the WordNet stemmer.
  * The WordNet stemmer is developed by George A. Miller and is based on
@@ -34,20 +36,20 @@ final class WordnetStemmer extends Stemmer {
   private static final Object DICT;
 
   static {
-    IDICT_CLASS = findClass(PKG + ".IDictionary");
-
     // Don't try to find the other classes if Dictionary is not found:
-    if(IDICT_CLASS == null) {
+    if(Reflect.available(PKG)) {
+      IDICT_CLASS = null;
       DICT_CLASS = null;
       WORDNET_CLASS = null;
       FIND_STEMS = null;
       CTR = null;
       DICT = null;
     } else {
-      DICT_CLASS = findClass(PKG + ".Dictionary");
-      WORDNET_CLASS = findClass(PKG + ".morph.WordnetStemmer");
-      CTR = findConstructor(WORDNET_CLASS, IDICT_CLASS);
-      FIND_STEMS = findMethod(WORDNET_CLASS, "findStems", String.class);
+      IDICT_CLASS = Reflect.find(PKG + ".IDictionary");
+      DICT_CLASS = Reflect.find(PKG + ".Dictionary");
+      WORDNET_CLASS = Reflect.find(PKG + ".morph.WordnetStemmer");
+      CTR = Reflect.find(WORDNET_CLASS, IDICT_CLASS);
+      FIND_STEMS = Reflect.find(WORDNET_CLASS, "findStems", String.class);
       DICT = DICT_CLASS == null || WORDNET_CLASS == null || CTR == null ||
         FIND_STEMS == null ? null : newDict();
     }
@@ -59,10 +61,9 @@ final class WordnetStemmer extends Stemmer {
    */
   private static Object newDict() {
     try {
-      final Constructor<?> ctr = DICT_CLASS.getConstructor(URL.class);
-      final Object dict = ctr.newInstance(new URL("file", null, PATH));
-      DICT_CLASS.getMethod("open").invoke(dict);
-      return dict;
+      final Constructor<?> ctr = Reflect.find(DICT_CLASS, URL.class);
+      final Object dict = Reflect.get(ctr, new URL("file", null, PATH));
+      return Reflect.invoke(Reflect.find(DICT_CLASS, "open"), dict);
     } catch(final Exception e) {
       return null;
     }
@@ -91,11 +92,7 @@ final class WordnetStemmer extends Stemmer {
    */
   WordnetStemmer(final FTIterator fti) {
     super(fti);
-    try {
-      stemmer = CTR.newInstance(DICT);
-    } catch(final Exception e) {
-      throw new RuntimeException(e);
-    }
+    stemmer = Reflect.get(CTR, DICT);
   }
 
   @Override
@@ -120,14 +117,10 @@ final class WordnetStemmer extends Stemmer {
 
   @Override
   byte[] stem(final byte[] word) {
-    try {
-      @SuppressWarnings("unchecked")
-      final List<String> l = (List<String>)
-        FIND_STEMS.invoke(stemmer, string(word));
-      final byte[] result = l.size() == 0 ? word : token(l.get(0));
-      return result.length == 0 ? word : result;
-    } catch(final Exception e) {
-      throw new RuntimeException(e);
-    }
+    @SuppressWarnings("unchecked")
+    final List<String> l = (List<String>)
+      Reflect.invoke(FIND_STEMS, stemmer, string(word));
+    final byte[] result = l.size() == 0 ? word : token(l.get(0));
+    return result.length == 0 ? word : result;
   }
 }

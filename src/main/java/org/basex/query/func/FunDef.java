@@ -5,7 +5,7 @@ import static org.basex.query.item.SeqType.*;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.SeqType;
 import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.util.Reflect;
 
 /**
  * Signatures of all XQuery functions.
@@ -498,13 +498,8 @@ public enum FunDef {
    * @return function
    */
   public Fun get(final InputInfo ii, final Expr... e) {
-    try {
-      return func.getDeclaredConstructor(InputInfo.class, FunDef.class,
-          Expr[].class).newInstance(ii, this, e);
-    } catch(final Exception ex) {
-      Util.notexpected(ex);
-      return null;
-    }
+    return (Fun) Reflect.get(Reflect.find(func, InputInfo.class, FunDef.class,
+        Expr[].class), ii, this, e);
   }
 
   @Override

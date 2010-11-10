@@ -675,7 +675,7 @@ public final class DeepFS implements DataText {
       // -- unmount running fuse
       for(int i = 3; i > 0; i--) {
         Performance.sleep(1000);
-        Util.err(i + " .. ");
+        Util.error(i + " .. ");
       }
       Util.debug("GO.");
       final String cmd = "umount -f " + data.meta.mount;

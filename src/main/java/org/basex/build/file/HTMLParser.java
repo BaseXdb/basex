@@ -5,12 +5,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
 import java.nio.charset.Charset;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
 import org.basex.io.ArrayInput;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.util.Reflect;
 import org.basex.util.Util;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -26,17 +28,11 @@ import org.xml.sax.XMLReader;
  */
 public final class HTMLParser extends XMLParser {
   /** HTML reader. */
-  private static XMLReader reader;
-
-  /* Check is TagSoup is referenced in the classpath. */
-  static {
-    try {
-      reader = (XMLReader) Class.forName(
-          "org.ccil.cowan.tagsoup.Parser").newInstance();
-    } catch(final Exception ex) {
-      reader = null;
-    }
-  }
+  private static final Class<?> READER = Reflect.find(
+      "org.ccil.cowan.tagsoup.Parser");
+  /** HTML reader. */
+  private static final Constructor<?> WRITER = Reflect.find(Reflect.find(
+      "org.ccil.cowan.tagsoup.XMLWriter"), Writer.class);
 
   /**
    * Constructor.
@@ -57,7 +53,7 @@ public final class HTMLParser extends XMLParser {
    */
   private static IO toXML(final IO io) {
     // reader could not be initialized; fall back to XML
-    if(reader == null) return io;
+    if(READER == null) return io;
 
     try {
       // tries to extract the encoding from the input
@@ -82,9 +78,8 @@ public final class HTMLParser extends XMLParser {
       is.setEncoding(Charset.isSupported(enc) ? code(enc, null) : UTF8);
       // define output
       final StringWriter sw = new StringWriter();
-      reader.setContentHandler((ContentHandler)
-          Class.forName("org.ccil.cowan.tagsoup.XMLWriter").getConstructor(
-              new Class[] { Writer.class }).newInstance(sw));
+      final XMLReader reader = (XMLReader) Reflect.get(READER);
+      reader.setContentHandler((ContentHandler) Reflect.get(WRITER, sw));
       reader.parse(is);
       return new IOContent(token(sw.toString()), io.name());
     } catch(final Exception ex) {

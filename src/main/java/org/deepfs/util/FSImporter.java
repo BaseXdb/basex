@@ -132,7 +132,7 @@ public final class FSImporter implements FSTraversal {
           try {
             bfc.close();
           } catch(final IOException e1) {
-            Util.err("FSImporter: Failed to close the file (% - %)",
+            Util.error("FSImporter: Failed to close the file (% - %)",
                 bfc.getFileName(), e1);
           }
         }

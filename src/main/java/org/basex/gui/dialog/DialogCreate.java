@@ -10,6 +10,7 @@ import org.basex.build.xml.CatalogResolverWrapper;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -147,7 +148,7 @@ public final class DialogCreate extends Dialog {
     p2.add(new BaseXLabel(" "));
 
     // CatalogResolving
-    final boolean rsen = null != CatalogResolverWrapper.getInstance(); 
+    final boolean rsen = CatalogResolverWrapper.available();
     final BaseXBack fl = new BaseXBack();
     fl.setLayout(new TableLayout(2, 2, 6, 0));
     usecat = new BaseXCheckBox(USECATFILE,
@@ -170,8 +171,12 @@ public final class DialogCreate extends Dialog {
     if(!rsen) {
       final BaseXBack rsinfo = new BaseXBack();
       rsinfo.setLayout(new TableLayout(2, 1));
-      rsinfo.add(new BaseXLabel(USECATHLP));
-      rsinfo.add(new BaseXLabel(USECATHLP2));
+      l = new BaseXLabel(USECATHLP);
+      l.setForeground(GUIConstants.COLORDARK);
+      rsinfo.add(l);
+      l = new BaseXLabel(USECATHLP2);
+      l.setForeground(GUIConstants.COLORDARK);
+      rsinfo.add(l);
       p2.add(rsinfo);
     }
 
@@ -280,7 +285,7 @@ public final class DialogCreate extends Dialog {
 
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());
-    usecat.setEnabled(null != CatalogResolverWrapper.getInstance() && 
+    usecat.setEnabled(CatalogResolverWrapper.available() &&
         !intparse.isSelected());
     intparse.setEnabled(!usecat.isSelected());
     cfile.setEnabled(!intparse.isSelected() &&

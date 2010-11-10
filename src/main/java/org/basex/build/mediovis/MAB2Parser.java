@@ -169,13 +169,13 @@ public final class MAB2Parser extends Parser {
       else entry.pos(pos);
 
       if(Util.debug) {
-        if((++i & 0x7FFF) == 0) Util.err(" " + i + "\n");
-        else if((i & 0xFFF) == 0) Util.err("!");
-        else if((i & 0x3FF) == 0) Util.err(".");
+        if((++i & 0x7FFF) == 0) Util.error(" " + i + "\n");
+        else if((i & 0xFFF) == 0) Util.error("!");
+        else if((i & 0x3FF) == 0) Util.error(".");
       }
     }
 
-    if(Util.debug) Util.err("\nParse Offsets (%): %/%\n", ids.size(), p,
+    if(Util.debug) Util.error("\nParse Offsets (%): %/%\n", ids.size(), p,
         Performance.getMem());
 
     // create all titles
@@ -191,7 +191,9 @@ public final class MAB2Parser extends Parser {
       if(entry.size != 0 && pos != 0 && !flat) builder.endElem(MEDIUM);
     }
 
-    if(Util.debug) Util.err("\nCreate Titles: %/%\n", p, Performance.getMem());
+    if(Util.debug) {
+      Util.error("\nCreate Titles: %/%\n", p, Performance.getMem());
+    }
 
     builder.endElem(LIBRARY);
     builder.endDoc();

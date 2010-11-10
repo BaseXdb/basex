@@ -256,8 +256,8 @@ public class GUIMacOSX {
   static Object invoke(final Object obj,
       final String method, final Class<?> argClass, final Object argObject)
       throws Exception {
-    final Class<?>[] argClasses = new Class[] { argClass };
-    final Object[] argObjects = new Object[] { argObject };
+    final Class<?>[] argClasses = { argClass };
+    final Object[] argObjects = { argObject };
     return invoke(obj.getClass(), obj, method, argClasses, argObjects);
   }
 

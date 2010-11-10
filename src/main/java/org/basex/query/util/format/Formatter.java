@@ -1,6 +1,8 @@
 package org.basex.query.util.format;
 
 import java.util.HashMap;
+
+import org.basex.util.Reflect;
 import org.basex.util.Util;
 
 /**
@@ -30,15 +32,10 @@ public abstract class Formatter {
     // check if formatter has already been created
     Formatter form = MAP.get(ln);
     if(form == null) {
-      try {
-        // create new instance (class name + language in upper case)
-        final String clz = Util.name(Formatter.class) + ln.toUpperCase();
-        form = (Formatter) Class.forName(clz).newInstance();
-        MAP.put(ln, form);
-      } catch(final Exception ex) {
-        // instantiation not successful: return default formatter
-        form = MAP.get(EN);
-      }
+      final String clz = Util.name(Formatter.class) + ln.toUpperCase();
+      form = (Formatter) Reflect.get(Reflect.find(clz));
+      // instantiation not successful: return default formatter
+      if(form == null) form = MAP.get(EN);
     }
     return form;
   }

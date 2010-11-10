@@ -5,7 +5,7 @@ import static org.basex.util.ft.Language.*;
 import java.lang.reflect.Method;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import org.basex.util.Util;
+import org.basex.util.Reflect;
 
 /**
  * Stemmer implementation using the Snowball stemmer.
@@ -28,25 +28,23 @@ final class SnowballStemmer extends Stemmer {
   private Object stemmer;
 
   static {
-    try {
+    if(Reflect.available(PKG)) {
       add(DA); add(DE); add(EN); add(ES); add(FI); add(FR); add(HU); add(IT);
       add(NL); add(NO); add(PT); add(RO); add(RU); add(SV); add(TR);
-    } catch(final Exception e) {
-      // class paths were not found
     }
   }
 
   /**
    * Check if a stemmer class is available, and add it the the list of stemmers.
    * @param lang language
-   * @throws Exception exception
    */
-  private static void add(final Language lang) throws Exception {
-    final Class<?> c = Class.forName(
+  private static void add(final Language lang) {
+    final Class<?> clz = Reflect.find(
         PKG + ".ext." + lang.toString().toLowerCase() + "Stemmer");
-    CLASSES.put(lang, new StemmerClass(c,
-        findMethod(c, "setCurrent", String.class),
-        findMethod(c, "stem"), findMethod(c, "getCurrent")));
+    CLASSES.put(lang, new StemmerClass(clz,
+        Reflect.find(clz, "setCurrent", String.class),
+        Reflect.find(clz, "stem"),
+        Reflect.find(clz, "getCurrent")));
   }
 
   /**
@@ -71,12 +69,7 @@ final class SnowballStemmer extends Stemmer {
   SnowballStemmer(final Language lang, final FTIterator fti) {
     super(fti);
     clazz = CLASSES.get(lang);
-    try {
-      stemmer = clazz.clz.newInstance();
-    } catch(final Exception ex) {
-      System.err.println(ex.getMessage());
-      Util.notexpected(ex);
-    }
+    stemmer = Reflect.get(clazz.clz);
   }
 
   @Override
@@ -101,13 +94,9 @@ final class SnowballStemmer extends Stemmer {
 
   @Override
   byte[] stem(final byte[] word) {
-    try {
-      clazz.setCurrent.invoke(stemmer, string(word));
-      clazz.stem.invoke(stemmer);
-      return token((String) clazz.getCurrent.invoke(stemmer));
-    } catch(final Exception e) {
-      throw new RuntimeException(e);
-    }
+    Reflect.invoke(clazz.setCurrent, stemmer, string(word));
+    Reflect.invoke(clazz.stem, stemmer);
+    return token((String) Reflect.invoke(clazz.getCurrent, stemmer));
   }
 
   /** Structure, containing stemming methods. */

@@ -343,7 +343,7 @@ public abstract class Builder extends Progress {
     }
     if(meta.size != 1) inDoc = true;
 
-    if(Util.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
+    if(Util.debug && (c++ & 0x7FFFF) == 0) Util.error(".");
 
     // check if data ranges exceed database limits,
     // based on the storage details in {@link Data}

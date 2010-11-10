@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.basex.util.Reflect;
 import org.basex.util.Util;
 import org.deepfs.fsml.parsers.IFileParser;
 import org.deepfs.fsml.parsers.TXTParser;
@@ -83,11 +85,10 @@ public final class ParserRegistry {
     if(instance == null) {
       final Class<? extends IFileParser> clazz = REGISTRY.get(suffix);
       if(clazz != null) {
-        try {
-          instance = clazz.newInstance();
-        } catch(final Exception ex) {
+        instance = (IFileParser) Reflect.get(clazz);
+        if(instance == null) {
           throw new ParserException("Failed to load " + Util.name(clazz) +
-              " for suffix " + suffix + "(" + ex.getMessage() + ")");
+              " for suffix " + suffix);
         }
       }
       // put in hash map ... even if null

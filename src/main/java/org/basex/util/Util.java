@@ -106,7 +106,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void errln(final Object obj, final Object... ext) {
-    err(obj + NL, ext);
+    error(obj + NL, ext);
   }
 
   /**
@@ -114,7 +114,7 @@ public final class Util {
    * @param string debug string
    * @param ext text optional extensions
    */
-  public static void err(final String string, final Object... ext) {
+  public static void error(final String string, final Object... ext) {
     System.err.print(info(string, ext));
   }
 

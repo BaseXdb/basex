@@ -24,6 +24,7 @@ import org.basex.query.item.Type;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
+import org.basex.util.Reflect;
 
 /**
  * Container for global function declarations.
@@ -94,14 +95,11 @@ public final class Functions extends ExprInfo {
       }
 
       final String java = sb.toString();
-      try {
-        final int i = java.lastIndexOf(".");
-        final Class<?> cls = Class.forName(java.substring(0, i));
-        final String mth = java.substring(i + 1);
-        return new FunJava(qp.input(), cls, mth, args);
-      } catch(final ClassNotFoundException ex) {
-        qp.error(FUNCJAVA, java);
-      }
+      final int i = java.lastIndexOf(".");
+      final Class<?> cls = Reflect.find(java.substring(0, i));
+      if(cls == null) qp.error(FUNCJAVA, java);
+      final String mth = java.substring(i + 1);
+      return new FunJava(qp.input(), cls, mth, args);
     }
 
     // check predefined functions

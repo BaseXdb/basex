@@ -5,6 +5,7 @@ import static org.basex.util.ft.Language.*;
 import java.lang.reflect.Method;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import org.basex.util.Reflect;
 
 /**
  * Stemmer implementation using the Lucene stemmer contributions.
@@ -27,19 +28,16 @@ final class LuceneStemmer extends Stemmer {
   private Object stemmer;
 
   static {
-    try {
+    if(Reflect.available(PKG)) {
       add(PT, "br.Brazilian"); add(DE); add(FR); add(NL); add(RU);
-    } catch(final Exception ex) {
-      // class path was not found
     }
   }
 
   /**
    * Check if a stemmer class is available, and add it the the list of stemmers.
    * @param lang language
-   * @throws Exception exception
    */
-  private static void add(final Language lang) throws Exception {
+  private static void add(final Language lang) {
     add(lang, lang.name().toLowerCase() + '.' + lang);
   }
 
@@ -47,14 +45,11 @@ final class LuceneStemmer extends Stemmer {
    * Check if a stemmer class is available, and add it the the list of stemmers.
    * @param lang language
    * @param path class path
-   * @throws Exception exception
    */
-  private static void add(final Language lang, final String path)
-      throws Exception {
-    final Class<?> c = Class.forName(
-        PKG + '.' + path + "Stemmer");
-    final Method m = findMethod(c, "stem", String.class);
-    CLASSES.put(lang, new StemmerClass(c, m));
+  private static void add(final Language lang, final String path) {
+    final Class<?> clz = Reflect.find(PKG + '.' + path + "Stemmer");
+    final Method m = Reflect.find(clz, "stem", String.class);
+    CLASSES.put(lang, new StemmerClass(clz, m));
   }
 
   /**
@@ -79,11 +74,7 @@ final class LuceneStemmer extends Stemmer {
   LuceneStemmer(final Language lang, final FTIterator fti) {
     super(fti);
     clazz = CLASSES.get(lang);
-    try {
-      stemmer = clazz.clazz.newInstance();
-    } catch(final Exception e) {
-      throw new RuntimeException(e);
-    }
+    stemmer = Reflect.get(clazz.clz);
   }
 
   @Override
@@ -108,17 +99,13 @@ final class LuceneStemmer extends Stemmer {
 
   @Override
   byte[] stem(final byte[] word) {
-    try {
-      return token((String) clazz.stem.invoke(stemmer, string(word)));
-    } catch(final Exception ex) {
-      throw new RuntimeException(ex);
-    }
+    return token((String) Reflect.invoke(clazz.stem, stemmer, string(word)));
   }
 
   /** Structure, containing stemming methods. */
   private static class StemmerClass {
     /** Class implementing the stemmer. */
-    final Class<?> clazz;
+    final Class<?> clz;
     /** Method {@code stem}. */
     final Method stem;
 
@@ -128,7 +115,7 @@ final class LuceneStemmer extends Stemmer {
      * @param stm method {@code stem}
      */
     StemmerClass(final Class<?> sc, final Method stm) {
-      clazz = sc;
+      clz = sc;
       stem = stm;
       stem.setAccessible(true);
     }

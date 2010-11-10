@@ -1,9 +1,9 @@
 package org.basex.core.cmd;
 
+import static org.basex.util.Reflect.*;
 import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.basex.util.Util;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.util.LibraryLoader;
 
@@ -41,14 +41,9 @@ public final class Mount extends Command {
     new Thread() {
       @Override
       public void run() {
-        try {
-          // DeepFSImpl.mount(mp, fs);
-          final Class<?> cls = Class.forName("org.deepfs.DeepFSImpl");
-          cls.getMethod("mount", new Class[] { String.class, DeepFS.class }).
-            invoke(null, mp, fs);
-        } catch (final Exception ex) {
-          Util.err("Cannot mount: ", ex);
-        }
+        // DeepFSImpl.mount(mp, fs);
+        final Class<?> cls = find("org.deepfs.DeepFSImpl");
+        invoke(find(cls, "mount", String.class, DeepFS.class), null, mp, fs);
       }
     }.start();
     return true;

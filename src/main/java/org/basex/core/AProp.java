@@ -128,7 +128,7 @@ public abstract class AProp {
     }
 
     if(err.size() != 0) {
-      Util.err(err.toString());
+      Util.error(err.toString());
       write();
     }
   }
