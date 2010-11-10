@@ -13,15 +13,8 @@ import org.xml.sax.XMLReader;
  */
 public final class CatalogResolverWrapper {
   /** Resolver if availiable. */
-  private static Object cm;
+  private static final Object CM = init();
 
-  static {
-    try {
-      cm = Class.
-        forName("org.apache.xml.resolver.CatalogManager").newInstance();
-    } catch(Exception e) { }
-
-  }
 
   /** private Constructor, no instantiation. */
   private CatalogResolverWrapper() {
@@ -29,11 +22,24 @@ public final class CatalogResolverWrapper {
   }
 
   /**
+   * Initializes the CatalogManager.
+   * @return CatalogManager instance iff found.
+   */
+  private static Object init() {
+    Object cmm = null;
+    try {
+      cmm = Class.forName("org.apache.xml.resolver.CatalogManager").
+      newInstance();
+    } catch(Exception e) { }
+    return cmm;
+  }  
+  
+  /**
    * Returns a CatalogResolver instance or null if it could not be found.
    * @return CatalogResolver if availiable
    */
   public static Object getInstance() {
-    return cm;
+    return CM;
   }
 
   /**
@@ -43,25 +49,25 @@ public final class CatalogResolverWrapper {
    * @param cat path.
    */
   public static void set(final XMLReader r, final String cat)  {
-    if(null == cm) return;
+    if(null == CM) return;
       try {
         Class<?> clazz = Class.
           forName("org.apache.xml.resolver.CatalogManager");
         Method m = clazz.getMethod("setCatalogFiles", String.class);
-        m.invoke(cm, cat);
+        m.invoke(CM, cat);
         m = clazz.getMethod("setIgnoreMissingProperties", boolean.class);
-        m.invoke(cm, true);
+        m.invoke(CM, true);
         m = clazz.getMethod("setPreferPublic", boolean.class);
-        m.invoke(cm, true);
+        m.invoke(CM, true);
         m = clazz.getMethod("setUseStaticCatalog", boolean.class);
-        m.invoke(cm, false);
+        m.invoke(CM, false);
         m = clazz.getMethod("setVerbosity", int.class);
-        m.invoke(cm, 0);
+        m.invoke(CM, 0);
         r.setEntityResolver((EntityResolver) Class.forName(
             "org.apache.xml.resolver.tools.CatalogResolver").getConstructor(
             new Class[] {
                 Class.forName("org.apache.xml.resolver.CatalogManager")}).
-                newInstance(cm));
+                newInstance(CM));
 
       } catch(Exception e) { }
   }
