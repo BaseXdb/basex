@@ -20,14 +20,14 @@ public final class QueryBindExample {
 
       try {
         // create query instance
-        String input = "declare variable $n external; " +
-        "for $i in 1 to 10 return <xml> { $n }: { $i } </xml>";
-        
+        String input = "declare variable $name external; " +
+        "for $i in 1 to 10 return element { $name } { $i }";
+
         BaseXClient.Query query = session.query(input);
-        
+
         // bind variable
-        query.bind("n", "Number");
-        
+        query.bind("$name", "number");
+
         // initialize iterator
         System.out.print(query.init());
 

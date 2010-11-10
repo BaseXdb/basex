@@ -22,12 +22,13 @@ namespace BaseXClient
         try
         {
           // create query instance
-          string input = "declare variable $n external;" +
-          	" for $i in 1 to 10 return <xml> { $n }: { $i } </xml>";
+          string input = "declare variable $name external;" +
+          	"for $i in 1 to 10 return element { $name } { $i }";
+
           Query query = session.Query(input);
 		  
-		  // bind variable
-		  query.Bind("n", "Number");
+		      // bind variable
+		      query.Bind("$name", "number");
 		  	
           // initialize query
           Console.WriteLine(query.Init());

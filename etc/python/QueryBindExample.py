@@ -11,12 +11,12 @@ try:
   
   try:
     # create query instance
-    input = "declare variable $n external; for $i in 1 to 10 return <xml> { $n }: { $i } </xml>"
+    input = "declare variable $name external; for $i in 1 to 10 return element { $name } { $i }"
     query = session.query(input)
-    
+
     # bind variable
-    query.bind("n", "Number")
-    
+    query.bind("$name", "number")
+
     # initialize query
     print query.init()
 

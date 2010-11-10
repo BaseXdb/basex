@@ -9,7 +9,7 @@ Imports System.IO
 
 Module QueryExample
   Sub Main()
-  	Try
+    Try
       ' initialize timer
       Dim watch As New Stopwatch()
       watch.Start()
@@ -19,15 +19,15 @@ Module QueryExample
 
       Try
         ' create query instance
-        Dim input As String = "declare variable $n external; for $i in 1 to 10 return <xml> { $n }: { $i } </xml>"
+        Dim input As String = "declare variable $name external; for $i in 1 to 10 return element { $name } { $i }"
         Dim query As Query = session.Query(input)
-        
+
         ' bind variable
-        query.Bind("n", "Number")
-        
+        query.Bind("$name", "number")
+
         ' initialize query
-		Console.WriteLine(query.Init())
-		
+        Console.WriteLine(query.Init())
+
         ' loop through all results
         While query.More()
           Console.WriteLine(query.Nexty())
