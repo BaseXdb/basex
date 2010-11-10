@@ -28,7 +28,10 @@ public final class Context extends Simple {
 
   @Override
   public Expr comp(final QueryContext ctx) {
-    if(ctx.value != null) type = ctx.value.type.seq();
+    if(ctx.value != null) {
+      type = ctx.value.type.seq();
+      size = ctx.value.size();
+    }
     return this;
   }
 
