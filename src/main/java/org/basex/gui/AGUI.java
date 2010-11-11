@@ -17,6 +17,8 @@ public abstract class AGUI extends JFrame {
   public final Context context;
   /** GUI properties. */
   public final GUIProp gprop;
+  /** Status line. */
+  public final GUIStatus status = new GUIStatus(this);
 
   /**
    * Default constructor.

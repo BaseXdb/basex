@@ -67,8 +67,6 @@ public final class GUI extends AGUI {
   /** View Manager. */
   public final ViewNotifier notify;
 
-  /** Status line. */
-  public final GUIStatus status;
   /** Input field. */
   public final GUIInput input;
   /** Filter button. */
@@ -253,7 +251,6 @@ public final class GUI extends AGUI {
     setContentBorder();
 
     // add status bar
-    status = new GUIStatus(this);
     if(gprop.is(GUIProp.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -542,7 +539,7 @@ public final class GUI extends AGUI {
       final int s = show ? menuHeight : 0;
       BaseXLayout.setHeight(menu, s);
       menu.setSize(menu.getWidth(), s);
-    } else {
+    } else { // buttons, input
       if(!show) control.remove(comp);
       else control.add(comp, layout);
     }

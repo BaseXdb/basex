@@ -48,12 +48,12 @@ public class SGUI extends AGUI {
     
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
-    final int[] ps = prop.nums(GUIProp.GUILOC);
-    final int[] sz = prop.nums(GUIProp.GUISIZE);
+    final int[] ps = gprop.nums(GUIProp.GUILOC);
+    final int[] sz = gprop.nums(GUIProp.GUISIZE);
     final int x = Math.max(0, Math.min(scr.width - sz[0], ps[0]));
     final int y = Math.max(0, Math.min(scr.height - sz[1], ps[1]));
     setBounds(x, y, sz[0], sz[1]);
-    if(prop.is(GUIProp.MAXSTATE)) {
+    if(gprop.is(GUIProp.MAXSTATE)) {
       setExtendedState(MAXIMIZED_HORIZ);
       setExtendedState(MAXIMIZED_VERT);
       setExtendedState(MAXIMIZED_BOTH);
@@ -78,7 +78,7 @@ public class SGUI extends AGUI {
     final BaseXTextField suser = new BaseXTextField(this);
     final BaseXPassword spw = new BaseXPassword(this);
     final BaseXLabel message = new BaseXLabel();
-    connection.setBorder(8, 8, 8, 8);
+    connection.border(8, 8, 8, 8);
     connection.add(new BaseXLabel("Server: "));
     connection.add(sname);
     connection.add(new BaseXLabel("Port: "));
