@@ -59,6 +59,7 @@ public class SGUI extends AGUI {
       setExtendedState(MAXIMIZED_BOTH);
     }
     setVisible(true);
+    setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     showDialog();
   }
   
@@ -108,7 +109,6 @@ public class SGUI extends AGUI {
           message.setText("Port has to be a number.");
         }
         if(client != null) {
-          System.out.println("TEST");
           dialog.dispose();
           addComponents();
         }
