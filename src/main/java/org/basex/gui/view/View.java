@@ -24,9 +24,8 @@ public abstract class View extends BaseXPanel {
    */
   protected View(final String name, final byte[] hlp, final ViewNotifier man) {
     super(hlp, man.gui);
-    setMode(GUIConstants.Fill.GRADIENT);
+    mode(GUIConstants.Fill.GRADIENT).setFocusable(true);
     setName(name);
-    setFocusable(true);
     addMouseListener(this);
     addMouseMotionListener(this);
     addMouseWheelListener(this);
@@ -88,7 +87,7 @@ public abstract class View extends BaseXPanel {
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    if(!gui.updating && gui.prop.is(GUIProp.MOUSEFOCUS))
+    if(!gui.updating && gui.gprop.is(GUIProp.MOUSEFOCUS))
       requestFocusInWindow();
   }
 

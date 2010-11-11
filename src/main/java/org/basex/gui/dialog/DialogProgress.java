@@ -64,20 +64,15 @@ public final class DialogProgress extends Dialog implements ActionListener {
       set(bar, BorderLayout.CENTER);
     }
 
-    final BaseXBack south = new BaseXBack();
-    south.setLayout(new BorderLayout());
-    south.setBorder(10, 0, 0, 0);
-
-    final BaseXBack m = new BaseXBack();
-    m.setLayout(new TableLayout(1, 2, 5, 0));
-    m.setBorder(0, 0, 0, 0);
+    final BaseXBack s = new BaseXBack(new BorderLayout()).border(10, 0, 0, 0);
+    final BaseXBack m = new BaseXBack(new TableLayout(1, 2, 5, 0));
     mem = new BaseXMem(this, false);
     m.add(new BaseXLabel(MEMUSED));
     m.add(mem);
-    south.add(m, BorderLayout.WEST);
+    s.add(m, BorderLayout.WEST);
 
-    if(cnc) south.add(new BaseXButton(BUTTONCANCEL, this), BorderLayout.EAST);
-    set(south, BorderLayout.SOUTH);
+    if(cnc) s.add(new BaseXButton(BUTTONCANCEL, this), BorderLayout.EAST);
+    set(s, BorderLayout.SOUTH);
     finish(null);
 
     prog = prg;

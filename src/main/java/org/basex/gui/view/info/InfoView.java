@@ -61,11 +61,9 @@ public final class InfoView extends View {
    */
   public InfoView(final ViewNotifier man) {
     super(INFOVIEW, HELPINFOO, man);
-    setBorder(6, 6, 6, 6);
-    setLayout(new BorderLayout());
+    border(6, 6, 6, 6).layout(new BorderLayout());
 
-    north = new BaseXBack(Fill.NONE);
-    north.setLayout(new BorderLayout());
+    north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     header = new BaseXLabel(INFOTIT);
     north.add(header, BorderLayout.NORTH);
     north.add(header, BorderLayout.NORTH);
@@ -102,12 +100,12 @@ public final class InfoView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWINFO);
+    return gui.gprop.is(GUIProp.SHOWINFO);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.prop.set(GUIProp.SHOWINFO, v);
+    gui.gprop.set(GUIProp.SHOWINFO, v);
   }
 
   @Override
@@ -258,7 +256,7 @@ public final class InfoView extends View {
 
     h = north.getHeight();
     w = getWidth() - 8;
-    bw = gui.prop.num(GUIProp.FONTSIZE) * 2 + w / 10;
+    bw = gui.gprop.num(GUIProp.FONTSIZE) * 2 + w / 10;
     bs = bw / (l - 1);
 
     // find maximum value

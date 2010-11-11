@@ -71,10 +71,10 @@ public class Add extends ACreate {
     }
 
     final String name   = io.name();
-    final String target = path(args[2]);
-    final DirParser p = new DirParser(io, context.prop, target);
+    String trg = path(args[2]);
+    final DirParser p = new DirParser(io, context.prop, trg);
     try {
-      return info(add(p, context, target + name));
+      return info(add(p, context, trg, name));
     } catch(final BaseXException ex) {
       return error(ex.getMessage());
     }
@@ -102,14 +102,12 @@ public class Add extends ACreate {
     if(data == null) return PROCNODB;
 
     String trg = path(target);
-    if(trg.length() != 0) trg += '/';
-
     final BufferedInputStream is = new BufferedInputStream(input);
     final SAXSource sax = new SAXSource(new InputSource(is));
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
     try {
       ctx.lock.before(true);
-      return add(parser, ctx, trg + name);
+      return add(parser, ctx, trg, name);
     } finally {
       ctx.lock.after(true);
     }
@@ -119,13 +117,15 @@ public class Add extends ACreate {
    * Adds a document to the database.
    * @param parser parser instance
    * @param ctx database context
-   * @param path database path
+   * @param target target
+   * @param name name
    * @return info string
    * @throws BaseXException database exception
    */
-  public static String add(final Parser parser, final Context ctx,
-      final String path) throws BaseXException {
+  private static String add(final Parser parser, final Context ctx,
+      final String target, final String name) throws BaseXException {
 
+    final String path = target + (target.isEmpty() ? "" : "/") + name;
     final Performance p = new Performance();
     try {
       final MemData md = MemBuilder.build(parser, ctx.prop, path);

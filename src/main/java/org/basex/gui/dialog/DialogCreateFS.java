@@ -74,19 +74,13 @@ public final class DialogCreateFS extends Dialog {
     db = List.list(main.context);
 
     // create panels
-    final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new BorderLayout());
-    p1.setBorder(8, 8, 8, 8);
-
-    BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(7, 2, 6, 0));
+    final BaseXBack p1 = new BaseXBack(new BorderLayout()).border(8);
+    BaseXBack p = new BaseXBack(new TableLayout(7, 2, 6, 0));
 
     final Prop prop = gui.context.prop;
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
 
-    BaseXLabel l = new BaseXLabel(IMPORTFSTEXT, false, true);
-    l.setBorder(0, 0, 4, 0);
-    p.add(l);
+    p.add(new BaseXLabel(IMPORTFSTEXT, false, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
     path = new BaseXTextField(gprop.get(GUIProp.FSBACKING), this);
@@ -106,14 +100,10 @@ public final class DialogCreateFS extends Dialog {
       }
     });
     p.add(browse);
-
-    l = new BaseXLabel(CREATENAME, false, true);
-    l.setBorder(8, 0, 4, 0);
-    p.add(l);
+    p.add(new BaseXLabel(CREATENAME, false, true).border(8, 0, 4, 0));
 
     all = new BaseXCheckBox(IMPORTALL, gprop.is(GUIProp.FSALL), this);
     all.setToolTipText(IMPORTALLINFO);
-    //all.setBorder( 4, 4, 0, 0);
     all.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -131,9 +121,7 @@ public final class DialogCreateFS extends Dialog {
     p1.add(info, BorderLayout.SOUTH);
 
     // Metadata panel
-    final BaseXBack p2 = new BaseXBack();
-    p2.setLayout(new TableLayout(4, 1));
-    p2.setBorder(8, 8, 8, 8);
+    final BaseXBack p2 = new BaseXBack(new TableLayout(4, 1)).border(8);
 
     // Include metadata checkbox
     BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, false, true);
@@ -144,8 +132,7 @@ public final class DialogCreateFS extends Dialog {
     label = new BaseXLabel(IMPORTFSTEXT2, false, true);
     p2.add(label);
 
-    p = new BaseXBack();
-    p.setLayout(new BorderLayout());
+    p = new BaseXBack(new BorderLayout());
 
     cont = new BaseXCheckBox(IMPORTCONT, prop.is(Prop.FSCONT), this);
     cont.addActionListener(new ActionListener() {
@@ -165,7 +152,7 @@ public final class DialogCreateFS extends Dialog {
     });
     p.add(xml, BorderLayout.SOUTH);
 
-    maxsize = new BaseXCombo(IMPORTFSMAX, this);
+    maxsize = new BaseXCombo(this, IMPORTFSMAX);
 
     final int m = prop.num(Prop.FSTEXTMAX);
     int i = -1;
@@ -178,10 +165,7 @@ public final class DialogCreateFS extends Dialog {
     BaseXLayout.setWidth(p, p2.getPreferredSize().width);
     p2.add(p);
 
-    final BaseXBack p3 = new BaseXBack();
-    p3.setLayout(new TableLayout(6, 1, 0, 0));
-    p3.setBorder(8, 8, 8, 8);
-
+    final BaseXBack p3 = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
     txtindex = new BaseXCheckBox(INFOTEXTINDEX,
         prop.is(Prop.TEXTINDEX), 0, this);
     p3.add(txtindex);
@@ -197,10 +181,7 @@ public final class DialogCreateFS extends Dialog {
     p3.add(pathindex);
     p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
 
-    final BaseXBack p4 = new BaseXBack();
-    p4.setLayout(new TableLayout(2, 1, 0, 0));
-    p4.setBorder(8, 8, 8, 8);
-
+    final BaseXBack p4 = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
     ftxindex = new BaseXCheckBox(INFOFTINDEX, prop.is(Prop.FTINDEX), 0, this);
     p4.add(ftxindex);
 
@@ -232,7 +213,7 @@ public final class DialogCreateFS extends Dialog {
     maxsize.setEnabled(cont.isSelected());
 
     final Prop prop = gui.context.prop;
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     final String nm = dbname.getText().trim();
     final boolean cNam = !nm.isEmpty();
     if(cNam) gprop.set(GUIProp.FSDBNAME, nm);
@@ -284,7 +265,7 @@ public final class DialogCreateFS extends Dialog {
     gui.set(Prop.FTINDEX, ftxindex.isSelected());
     ft.close();
 
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.FSALL, all.isSelected());
     gprop.set(GUIProp.FSBACKING, path.getText());
     gprop.set(GUIProp.FSDBNAME, dbname.getText());

@@ -126,10 +126,6 @@ public abstract class Command extends Progress {
     cb.init().args();
   }
 
-  /**
-   * Returns a string representation of the command.
-   * @return string representation
-   */
   @Override
   public final String toString() {
     final CommandBuilder cb = new CommandBuilder(this);

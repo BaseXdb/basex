@@ -62,18 +62,14 @@ public final class TextView extends View implements ActionListener {
   public TextView(final ViewNotifier man) {
     super(TEXTVIEW, HELPTEXT, man);
 
-    setLayout(new BorderLayout(0, 4));
-    setBorder(6, 6, 6, 6);
-    setFocusable(false);
+    border(6, 6, 6, 6).layout(new BorderLayout(0, 4)).setFocusable(false);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE);
-    b.setLayout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
 
     home = BaseXButton.command(GUICommands.HOME, gui);
     home.setEnabled(false);
 
-    BaseXBack sp = new BaseXBack(Fill.NONE);
-    sp.setLayout(new TableLayout(1, 2));
+    BaseXBack sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 2));
     sp.add(home);
     sp.add(Box.createHorizontalStrut(8));
     b.add(sp, BorderLayout.WEST);
@@ -86,8 +82,7 @@ public final class TextView extends View implements ActionListener {
     find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) save.getPreferredSize().getHeight());
 
-    sp = new BaseXBack(Fill.NONE);
-    sp.setLayout(new TableLayout(1, 3));
+    sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3));
     sp.add(find);
     sp.add(Box.createHorizontalStrut(5));
     sp.add(save);
@@ -135,12 +130,12 @@ public final class TextView extends View implements ActionListener {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWTEXT);
+    return gui.gprop.is(GUIProp.SHOWTEXT);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.prop.set(GUIProp.SHOWTEXT, v);
+    gui.gprop.set(GUIProp.SHOWTEXT, v);
   }
 
   @Override
@@ -193,10 +188,10 @@ public final class TextView extends View implements ActionListener {
   @Override
   public void actionPerformed(final ActionEvent e) {
     final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
-        gui.prop.get(GUIProp.SAVEPATH), gui);
+        gui.gprop.get(GUIProp.SAVEPATH), gui);
     final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
     if(file == null) return;
-    gui.prop.set(GUIProp.SAVEPATH, file.path());
+    gui.gprop.set(GUIProp.SAVEPATH, file.path());
 
     PrintOutput out = null;
     try {

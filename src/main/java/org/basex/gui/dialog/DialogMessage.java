@@ -27,9 +27,7 @@ final class DialogMessage extends Dialog {
   DialogMessage(final GUI main, final String txt, final Msg ic) {
     super(main, ic == Msg.ERROR ? DIALOGERR : DIALOGINFO, true);
 
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new BorderLayout());
-    p.setBorder(0, 0, 0, 16);
+    final BaseXBack p = new BaseXBack(new BorderLayout()).border(0, 0, 0, 16);
     p.setOpaque(false);
     final BaseXLabel b = new BaseXLabel();
     b.setIcon(ic.large);

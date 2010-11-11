@@ -66,8 +66,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     super(m.gui);
     main = m;
 
-    setLayout(new BorderLayout(0, 5));
-    setMode(Fill.NONE);
+    layout(new BorderLayout(0, 5)).mode(Fill.NONE);
 
     all = new BaseXTextField(gui);
     all.addKeyListener(main);
@@ -79,12 +78,9 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     });
     add(all, BorderLayout.NORTH);
 
-    panel = new BaseXBack(GUIConstants.Fill.NONE);
-    panel.setLayout(new TableLayout(20, 2, 10, 5));
+    panel = new BaseXBack(GUIConstants.Fill.NONE).layout(
+        new TableLayout(20, 2, 10, 5));
     add(panel, BorderLayout.CENTER);
-
-    final BaseXBack p = new BaseXBack(GUIConstants.Fill.NONE);
-    p.setLayout(new BorderLayout());
   }
 
   /**
@@ -156,7 +152,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     if(tmp.size() == 0) return;
 
     final String[] keys = entries(tmp.toArray());
-    final BaseXCombo cm = new BaseXCombo(keys, gui);
+    final BaseXCombo cm = new BaseXCombo(gui, keys);
     cm.addActionListener(this);
     cm.addKeyListener(main);
     panel.add(cm);
@@ -169,7 +165,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param pos position
    */
   private void addCombo(final String[] values, final int pos) {
-    final BaseXCombo cm = new BaseXCombo(values, gui);
+    final BaseXCombo cm = new BaseXCombo(gui, values);
     BaseXLayout.setWidth(cm, COMPW);
     cm.addActionListener(this);
     cm.addKeyListener(main);
@@ -321,7 +317,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     String qu = tb.toString();
     final boolean root = gui.context.root();
-    final boolean rt = gui.prop.is(GUIProp.FILTERRT);
+    final boolean rt = gui.gprop.is(GUIProp.FILTERRT);
     if(!qu.isEmpty() && !rt && !root) qu = "." + qu;
 
     String simple = all.getText().trim();

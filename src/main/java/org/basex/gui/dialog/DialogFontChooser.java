@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXListChooser;
@@ -40,9 +39,7 @@ public final class DialogFontChooser extends Dialog {
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
       getAvailableFontFamilyNames();
 
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(1, 4, 6, 6));
-
+    final BaseXBack p = new BaseXBack(new TableLayout(1, 4, 6, 6));
     font = new BaseXListChooser(fonts, this);
     font.setSize(150, 112);
     p.add(font);
@@ -56,26 +53,23 @@ public final class DialogFontChooser extends Dialog {
     size.setSize(50, 112);
     p.add(size);
 
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     font.setValue(gprop.get(GUIProp.FONT));
     font2.setValue(gprop.get(GUIProp.MONOFONT));
     type.setValue(FONTTYPES[gprop.num(GUIProp.FONTTYPE)]);
-    size.setValue(Integer.toString(gui.prop.num(GUIProp.FONTSIZE)));
+    size.setValue(Integer.toString(gui.gprop.num(GUIProp.FONTSIZE)));
 
     set(p, BorderLayout.CENTER);
-
     finish(gprop.nums(GUIProp.FONTSLOC));
-    font.requestFocusInWindow();
   }
 
   @Override
   public void action(final Object cmp) {
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.FONT, font.getValue());
     gprop.set(GUIProp.MONOFONT, font2.getValue());
     gprop.set(GUIProp.FONTTYPE, type.getIndex());
     gprop.set(GUIProp.FONTSIZE, size.getNum());
-    GUIConstants.initFonts(gprop);
-    gui.notify.layout();
+    gui.updateLayout();
   }
 }

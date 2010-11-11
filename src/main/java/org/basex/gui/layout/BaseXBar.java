@@ -84,7 +84,7 @@ public final class BaseXBar extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
     addMouseMotionListener(this);
-    setMode(Fill.NONE);
+    mode(Fill.NONE);
     BaseXLayout.setWidth(this, SIZE);
     ww = SIZE;
   }

@@ -56,8 +56,8 @@ public final class TableView extends View implements Runnable {
    */
   public TableView(final ViewNotifier man) {
     super(TABLEVIEW, HELPTABLE, man);
-    tdata = new TableData(gui.context, gui.prop);
-    setLayout(new BorderLayout());
+    tdata = new TableData(gui.context, gui.gprop);
+    layout(new BorderLayout());
     header = new TableHeader(this);
     add(header, BorderLayout.NORTH);
     scroll = new BaseXBar(this);
@@ -130,12 +130,12 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWTABLE);
+    return gui.gprop.is(GUIProp.SHOWTABLE);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.prop.set(GUIProp.SHOWTABLE, v);
+    gui.gprop.set(GUIProp.SHOWTABLE, v);
   }
 
   @Override

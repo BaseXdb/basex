@@ -70,7 +70,7 @@ public final class BaseXButton extends JButton {
   }
 
   /**
-   * Creates a new button.
+   * Creates a new button for the specified command.
    * @param cmd command
    * @param gui reference to main window
    * @return button

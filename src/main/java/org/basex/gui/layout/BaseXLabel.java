@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 import org.basex.gui.GUIConstants.Msg;
@@ -35,7 +36,7 @@ public final class BaseXLabel extends JLabel {
    */
   public BaseXLabel(final String txt, final boolean dist, final boolean bold) {
     super(txt);
-    if(dist) setBorder(0, 0, 8, 0);
+    if(dist) border(0, 0, 8, 0);
     setFont(getFont().deriveFont(bold ? 1 : 0));
   }
 
@@ -45,9 +46,21 @@ public final class BaseXLabel extends JLabel {
    * @param l left distance
    * @param b bottom distance
    * @param r right distance
+   * @return self reference
    */
-  public void setBorder(final int t, final int l, final int b, final int r) {
+  public BaseXLabel border(final int t, final int l, final int b, final int r) {
     setBorder(new EmptyBorder(t, l, b, r));
+    return this;
+  }
+
+  /**
+   * Sets the text color.
+   * @param c color
+   * @return self reference
+   */
+  public BaseXLabel color(final Color c) {
+    setForeground(c);
+    return this;
   }
 
   /**

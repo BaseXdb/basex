@@ -41,8 +41,7 @@ final class TableContent extends BaseXBack {
    */
   TableContent(final TableData d, final BaseXBar scr) {
     scroll = scr;
-    setLayout(new BorderLayout());
-    setMode(Fill.GRADIENT);
+    layout(new BorderLayout()).mode(Fill.GRADIENT);
     add(scroll, BorderLayout.EAST);
     tdata = d;
     gui = scr.gui;
@@ -60,7 +59,7 @@ final class TableContent extends BaseXBack {
 
     final int w = getWidth() - scroll.getWidth();
     final int h = getHeight();
-    final int fsz = gui.prop.num(GUIProp.FONTSIZE);
+    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
 
     final Context context = tdata.context;
     final Data data = context.data;

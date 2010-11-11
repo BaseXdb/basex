@@ -27,10 +27,8 @@ public final class DialogTreeOptions extends Dialog {
   public DialogTreeOptions(final GUI main) {
     super(main, TREEOPTIONSTITLE, false);
 
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 1, 0, 8));
-
-    final GUIProp gprop = gui.prop;
+    final BaseXBack p = new BaseXBack(new TableLayout(2, 1, 0, 8));
+    final GUIProp gprop = gui.gprop;
 
     // create checkbox
     slim = new BaseXCheckBox(TREESLIM, gprop.is(GUIProp.TREESLIMS), this);
@@ -47,7 +45,7 @@ public final class DialogTreeOptions extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.TREESLIMS, slim.isSelected());
     gprop.set(GUIProp.TREEATTS, atts.isSelected());
     gui.notify.layout();

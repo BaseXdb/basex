@@ -18,7 +18,7 @@ public final class BaseXCombo extends JComboBox {
    * @param ch combobox choices
    * @param win parent window
    */
-  public BaseXCombo(final String[] ch, final Window win) {
+  public BaseXCombo(final Window win, final String... ch) {
     super(ch);
     BaseXLayout.addInteraction(this, null, win);
 
@@ -28,29 +28,7 @@ public final class BaseXCombo extends JComboBox {
       @Override
       public void itemStateChanged(final ItemEvent ie) {
         if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) {
-          ((Dialog) win).action(null);
-        }
-      }
-    });
-  }
-
-  /**
-   * Constructor.
-   * @param listen boolean for Itemlistener
-   * @param ch combobox choices
-   * @param win parent window
-   */
-  public BaseXCombo(final boolean listen, final String[] ch, final Window win) {
-    super(ch);
-    BaseXLayout.addInteraction(this, null, win);
-
-    if(!(win instanceof Dialog)) return;
-
-    addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(final ItemEvent ie) {
-        if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) {
-          if(listen) ((Dialog) win).action(ie.getSource());
+          ((Dialog) win).action(ie.getSource());
         }
       }
     });

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.basex.util.Reflect;
 import org.basex.util.Util;
 import org.deepfs.fsml.parsers.IFileParser;

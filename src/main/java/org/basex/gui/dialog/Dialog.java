@@ -63,9 +63,7 @@ public abstract class Dialog extends JDialog {
   protected Dialog(final GUI main, final String title, final boolean modal) {
     super(main, title, modal);
     gui = main;
-    panel = new BaseXBack();
-    panel.setBorder(10, 10, 10, 10);
-    panel.setLayout(new BorderLayout());
+    panel = new BaseXBack(new BorderLayout()).border(10, 10, 10, 10);
     add(panel, BorderLayout.CENTER);
     setResizable(false);
     addWindowListener(new WindowAdapter() {
@@ -135,7 +133,7 @@ public abstract class Dialog extends JDialog {
       final Container par = getParent();
       loc[0] = getX() - par.getX();
       loc[1] = getY() - par.getY();
-      gui.prop.write();
+      gui.gprop.write();
     }
     super.dispose();
   }
@@ -167,16 +165,15 @@ public abstract class Dialog extends JDialog {
       final Object... buttons) {
 
     // horizontal/vertical layout
-    final BaseXBack panel = new BaseXBack(Fill.NONE);
-    panel.setBorder(12, 0, 0, 0);
-    panel.setLayout(new TableLayout(1, buttons.length, 8, 0));
+    final BaseXBack panel = new BaseXBack(Fill.NONE).
+      border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
+
     for(final Object b : buttons) {
       panel.add(b instanceof Component ?
         (Component) b : new BaseXButton(b.toString(), dialog));
     }
 
-    final BaseXBack but = new BaseXBack(Fill.NONE);
-    but.setLayout(new BorderLayout());
+    final BaseXBack but = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     but.add(panel, BorderLayout.EAST);
     return but;
   }

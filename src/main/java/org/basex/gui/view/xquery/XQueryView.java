@@ -64,14 +64,11 @@ public final class XQueryView extends View {
   public XQueryView(final ViewNotifier man) {
     super(XQUERYVIEW, HELPXQUERYY, man);
 
-    setLayout(new BorderLayout());
-    setBorder(6, 6, 6, 6);
-    setFocusable(false);
+    border(6, 6, 6, 6).layout(new BorderLayout()).setFocusable(false);
 
     header = new BaseXLabel(XQUERYTIT, true, false);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE);
-    b.setLayout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     b.add(header, BorderLayout.CENTER);
 
     final BaseXButton openB = BaseXButton.command(GUICommands.XQOPEN, gui);
@@ -105,10 +102,10 @@ public final class XQueryView extends View {
             setQuery(IO.get(ac.getActionCommand()));
           }
         };
-        if(gui.prop.strings(GUIProp.QUERIES).length == 0) {
+        if(gui.gprop.strings(GUIProp.QUERIES).length == 0) {
           popup.add(new JMenuItem("- No recently opened files -"));
         }
-        for(final String en : gui.prop.strings(GUIProp.QUERIES)) {
+        for(final String en : gui.gprop.strings(GUIProp.QUERIES)) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
           popup.add(jmi);
@@ -128,8 +125,7 @@ public final class XQueryView extends View {
       }
     });
 
-    BaseXBack sp = new BaseXBack(Fill.NONE);
-    sp.setLayout(new TableLayout(1, 9));
+    BaseXBack sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 9));
     sp.add(find);
     sp.add(Box.createHorizontalStrut(5));
     sp.add(openB);
@@ -146,11 +142,8 @@ public final class XQueryView extends View {
     add(text, BorderLayout.CENTER);
     text.addSearch(find);
 
-    south = new BaseXBack(Fill.NONE);
-    south.setLayout(new BorderLayout(8, 0));
-
-    sp = new BaseXBack(Fill.NONE);
-    sp.setLayout(new BorderLayout(8, 0));
+    south = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
+    sp = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
 
     // parsing status (ok/error)
     info = new BaseXLabel(" ");
@@ -197,9 +190,8 @@ public final class XQueryView extends View {
     filter = BaseXButton.command(GUICommands.FILTER, gui);
     filter.addKeyListener(this);
 
-    sp = new BaseXBack(Fill.NONE);
-    sp.setLayout(new TableLayout(1, 5));
-    sp.setBorder(4, 0, 0, 0);
+    sp = new BaseXBack(Fill.NONE).border(4, 0, 0, 0).layout(
+        new TableLayout(1, 5));
     sp.add(stop);
     sp.add(Box.createHorizontalStrut(1));
     sp.add(go);
@@ -218,9 +210,9 @@ public final class XQueryView extends View {
 
   @Override
   public void refreshMark() {
-    go.setEnabled(!gui.prop.is(GUIProp.EXECRT));
+    go.setEnabled(!gui.gprop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked;
-    filter.setEnabled(!gui.prop.is(GUIProp.FILTERRT) &&
+    filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
   }
 
@@ -239,12 +231,12 @@ public final class XQueryView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWXQUERY);
+    return gui.gprop.is(GUIProp.SHOWXQUERY);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.prop.set(GUIProp.SHOWXQUERY, v);
+    gui.gprop.set(GUIProp.SHOWXQUERY, v);
   }
 
   @Override
@@ -261,9 +253,9 @@ public final class XQueryView extends View {
     try {
       text.setText(file.content());
       gui.context.query = file;
-      gui.prop.files(file);
+      gui.gprop.files(file);
       modified(false, true);
-      if(gui.prop.is(GUIProp.EXECRT)) text.query();
+      if(gui.gprop.is(GUIProp.EXECRT)) text.query();
     } catch(final IOException ex) {
       Dialog.error(gui, NOTOPENED);
     }

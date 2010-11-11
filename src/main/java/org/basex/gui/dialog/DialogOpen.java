@@ -70,32 +70,26 @@ public final class DialogOpen extends Dialog {
     set(choice, BorderLayout.CENTER);
     choice.setSize(130, 440);
 
-    final BaseXBack info = new BaseXBack();
-    info.setLayout(new BorderLayout());
+    final BaseXBack info = new BaseXBack(new BorderLayout());
     info.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(10, 10, 10, 10)));
 
     final Font f = choice.getFont();
-    doc = new BaseXLabel(DIALOGINFO);
+    doc = new BaseXLabel(DIALOGINFO).border(0, 0, 5, 0);
     doc.setFont(f.deriveFont(f.getSize2D() + 7f));
-    doc.setBorder(0, 0, 5, 0);
     info.add(doc, BorderLayout.NORTH);
 
     detail = new BaseXText(false, this);
-    detail.setFont(f);
-    detail.setBorder(5, 5, 5, 5);
+    detail.border(5, 5, 5, 5).setFont(f);
 
     BaseXLayout.setWidth(detail, 400);
     info.add(detail, BorderLayout.CENTER);
 
-    final BaseXBack pp = new BaseXBack();
-    pp.setBorder(0, 12, 0, 0);
-    pp.setLayout(new BorderLayout());
+    final BaseXBack pp = new BaseXBack(new BorderLayout()).border(0, 12, 0, 0);
     pp.add(info, BorderLayout.CENTER);
 
     // create buttons
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new BorderLayout());
+    final BaseXBack p = new BaseXBack(new BorderLayout());
 
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);

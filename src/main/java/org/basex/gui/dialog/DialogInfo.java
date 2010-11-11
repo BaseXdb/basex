@@ -58,18 +58,16 @@ public final class DialogInfo extends Dialog {
     super(main, INFODB);
 
     // first tab
-    final BaseXBack tab1 = new BaseXBack();
+    final BaseXBack tab1 = new BaseXBack(new BorderLayout());
     tab1.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(8, 8, 8, 8)));
-    tab1.setLayout(new BorderLayout());
 
     final Data data = gui.context.data;
     final MetaData meta = data.meta;
 
     final Font f = tab1.getFont();
-    final BaseXLabel doc = new BaseXLabel(meta.name);
+    final BaseXLabel doc = new BaseXLabel(meta.name).border(0, 0, 5, 0);
     doc.setFont(f.deriveFont(f.getSize2D() + 7f));
-    doc.setBorder(0, 0, 5, 0);
     tab1.add(doc, BorderLayout.NORTH);
 
     final byte[] db = InfoDB.db(meta, true, false, true);
@@ -83,9 +81,7 @@ public final class DialogInfo extends Dialog {
     tab1.add(text, BorderLayout.CENTER);
 
     // second tab
-    final BaseXBack tab2 = new BaseXBack();
-    tab2.setLayout(new GridLayout(2, 1, 0, 8));
-    tab2.setBorder(8, 8, 8, 8);
+    final BaseXBack tab2 = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
     tab2.add(addIndex(true, data));
     tab2.add(addIndex(false, data));
 
@@ -98,19 +94,14 @@ public final class DialogInfo extends Dialog {
     for(int i = 0; i < indexes.length; ++i) {
       indexes[i] = new BaseXCheckBox(cb[i], val[i], 0, this);
       indexes[i].setEnabled(data instanceof DiskData);
-      panels[i] = new BaseXBack();
-      panels[i].setLayout(new BorderLayout());
+      panels[i] = new BaseXBack(new BorderLayout());
     }
 
     // third tab
-    final BaseXBack tab3 = new BaseXBack();
-    tab3.setLayout(new GridLayout(1, 1));
-    tab3.setBorder(8, 8, 8, 8);
-
+    final BaseXBack tab3 = new BaseXBack(new GridLayout(1, 1)).border(8);
     JComponent north = indexes[0];
     if(val[0]) {
-      north = new BaseXBack();
-      north.setLayout(new BorderLayout());
+      north = new BaseXBack(new BorderLayout());
       north.add(indexes[0], BorderLayout.WEST);
       final BaseXButton export = new BaseXButton(GUIEXPORT, this);
       export.addActionListener(new ActionListener() {
@@ -139,10 +130,7 @@ public final class DialogInfo extends Dialog {
     tab3.add(panels[0]);
 
     // fourth tab
-    final BaseXBack tab4 = new BaseXBack();
-    tab4.setLayout(new GridLayout(2, 1));
-    tab4.setBorder(8, 8, 8, 8);
-
+    final BaseXBack tab4 = new BaseXBack(new GridLayout(2, 1)).border(8);
     panels[1].add(indexes[1], BorderLayout.NORTH);
     panels[1].add(text(val[1] ? data.info(IndexType.TEXT) :
       Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
@@ -154,10 +142,7 @@ public final class DialogInfo extends Dialog {
     tab4.add(panels[2]);
 
     // fifth tab
-    final BaseXBack tab5 = new BaseXBack();
-    tab5.setLayout(new GridLayout(1, 1));
-    tab5.setBorder(8, 8, 8, 8);
-
+    final BaseXBack tab5 = new BaseXBack(new GridLayout(1, 1)).border(8);
     panels[3].add(indexes[3], BorderLayout.NORTH);
     if(!val[3]) ft = new DialogFT(this, false);
     panels[3].add(val[3] ? text(data.info(IndexType.FULLTEXT)) : ft,
@@ -190,8 +175,7 @@ public final class DialogInfo extends Dialog {
    * @return panel
    */
   private BaseXBack addIndex(final boolean tag, final Data data) {
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new BorderLayout());
+    final BaseXBack p = new BaseXBack(new BorderLayout());
     String lbl = tag ? INFOTAGS : INFOATTS;
     if(!data.meta.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);

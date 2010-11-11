@@ -33,9 +33,8 @@ public final class DialogColors extends Dialog {
   public DialogColors(final GUI main) {
     super(main, SCHEMATITLE, false);
 
-    final GUIProp gprop = gui.prop;
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(3, 2, 16, 8));
+    final GUIProp gprop = gui.gprop;
+    final BaseXBack p = new BaseXBack(new TableLayout(3, 2, 16, 8));
 
     p.add(new BaseXLabel(SCHEMARED));
     sliderRed = newSlider(gprop.num(GUIProp.COLORRED));
@@ -66,7 +65,7 @@ public final class DialogColors extends Dialog {
 
   @Override
   public void action(final Object comp) {
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.COLORRED, MAXCOLOR - sliderRed.value());
     gprop.set(GUIProp.COLORGREEN, MAXCOLOR - sliderGreen.value());
     gprop.set(GUIProp.COLORBLUE, MAXCOLOR - sliderBlue.value());

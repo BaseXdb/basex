@@ -55,15 +55,13 @@ public final class DialogPrefs extends Dialog {
     super(main, PREFSTITLE);
 
     // create checkboxes
-    final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(11, 1));
+    final BaseXBack pp = new BaseXBack(new TableLayout(11, 1));
     pp.add(new BaseXLabel(DATABASEPATH, true, true));
 
-    BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(1, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 6, 0));
 
     final Prop prop = gui.context.prop;
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     path = new BaseXTextField(prop.get(Prop.DBPATH), this);
     path.addKeyListener(keys);
 
@@ -80,10 +78,7 @@ public final class DialogPrefs extends Dialog {
     p.add(path);
     p.add(button);
     pp.add(p);
-
-    BaseXLabel label = new BaseXLabel(PREFINTER, true, true);
-    label.setBorder(10, 0, 8, 0);
-    pp.add(label);
+    pp.add(new BaseXLabel(PREFINTER, true, true).border(10, 0, 8, 0));
 
     // checkbox for realtime mouse focus
     javalook = new BaseXCheckBox(PREFLF, gprop.is(GUIProp.JAVALOOK), this);
@@ -104,19 +99,17 @@ public final class DialogPrefs extends Dialog {
     pp.add(names);
 
     // checkbox for simple file dialog
-    label = new BaseXLabel(PREFLANG, true, true);
-    pp.add(label);
+    pp.add(new BaseXLabel(PREFLANG, true, true));
 
-    p = new BaseXBack();
-    p.setLayout(new TableLayout(1, 2, 12, 0));
+    p = new BaseXBack(new TableLayout(1, 2, 12, 0));
 
-    lang = new BaseXCombo(LANGS[0], this);
+    lang = new BaseXCombo(this, LANGS[0]);
     lang.setSelectedItem(prop.get(Prop.LANG));
 
     p.add(lang);
     creds = new BaseXLabel();
     p.add(creds);
-    creds.setText(TRANSLATION + creds(lang.getSelectedItem().toString()));
+    creds.setText(TRANSLATION + creds(lang.getSelectedItem()));
 
     pp.add(p);
 
@@ -130,7 +123,7 @@ public final class DialogPrefs extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    creds.setText(TRANSLATION + creds(lang.getSelectedItem().toString()));
+    creds.setText(TRANSLATION + creds(lang.getSelectedItem()));
     gui.notify.layout();
   }
 
@@ -139,12 +132,12 @@ public final class DialogPrefs extends Dialog {
     final Prop prop = gui.context.prop;
     prop.set(Prop.DBPATH, path.getText());
     prop.set(Prop.LANG, lang.getSelectedItem().toString());
-    final GUIProp gprop = gui.prop;
+    prop.write();
+    final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.MOUSEFOCUS, focus.isSelected());
     gprop.set(GUIProp.SHOWNAME, names.isSelected());
     gprop.set(GUIProp.SIMPLEFD, simpfd.isSelected());
     gprop.set(GUIProp.JAVALOOK, javalook.isSelected());
-    prop.write();
     gprop.write();
     dispose();
   }
@@ -154,7 +147,7 @@ public final class DialogPrefs extends Dialog {
    * @param lng language
    * @return credits
    */
-  static String creds(final String lng) {
+  static String creds(final Object lng) {
     for(int i = 0; i < LANGS[0].length; ++i) {
       if(lng.equals(LANGS[0][i])) return LANGS[1][i];
     }

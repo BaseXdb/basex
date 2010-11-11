@@ -114,7 +114,7 @@ public final class DialogServer extends Dialog {
    */
   public DialogServer(final GUI main) {
     super(main, GUISERVER);
-    databases.setBorder(8, 8, 8, 8);
+    databases.border(8);
     tabs = new BaseXTabs(this);
     tabs.add(CONNECT, conn);
     tabs.add(USERS, user);
@@ -123,8 +123,7 @@ public final class DialogServer extends Dialog {
     tabs.add(LOGS, logs);
 
     // Server Tab
-    conn.setLayout(new BorderLayout(0, 32));
-    conn.setBorder(8, 8, 8, 8);
+    conn.border(8).layout(new BorderLayout(0, 32));
 
     start = new BaseXButton(BUTTONSTART, this);
     stop = new BaseXButton(BUTTONSTOP, this);
@@ -137,27 +136,23 @@ public final class DialogServer extends Dialog {
     ports.addKeyListener(keys);
     portc = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.PORT)), this);
     portc.addKeyListener(keys);
-    loguser = new BaseXTextField(gui.prop.get(GUIProp.SERVERUSER), this);
+    loguser = new BaseXTextField(gui.gprop.get(GUIProp.SERVERUSER), this);
     loguser.addKeyListener(keys);
     logpass = new BaseXPassword(main);
     logpass.addKeyListener(keys);
-    infoC = new BaseXLabel(" ");
-    infoC.setBorder(8, 0, 0, 0);
+    infoC = new BaseXLabel(" ").border(8, 0, 0, 0);
 
-    BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(6, 1, 0, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(6, 1, 0, 0));
 
     // local server panel
     p.add(new BaseXLabel(LOCALSERVER + COLS, true, true));
 
-    BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(2, 2, 8, 4));
-    pp.setBorder(0, 0, 0, 0);
+    BaseXBack pp = new BaseXBack(new TableLayout(2, 2, 8, 4)).border(
+        0, 0, 0, 0);
     pp.add(new BaseXLabel(PORT + COLS));
     pp.add(ports);
     pp.add(new BaseXLabel(" "));
-    BaseXBack ppp = new BaseXBack();
-    ppp.setLayout(new TableLayout(1, 2, 5, 0));
+    BaseXBack ppp = new BaseXBack(new TableLayout(1, 2, 5, 0));
     ppp.add(start);
     ppp.add(stop);
     pp.add(ppp);
@@ -167,8 +162,7 @@ public final class DialogServer extends Dialog {
     p.add(new BaseXLabel(ADMINLOGIN + COLS, true, true));
 
     // login panel
-    pp = new BaseXBack();
-    pp.setLayout(new TableLayout(5, 2, 8, 4));
+    pp = new BaseXBack(new TableLayout(5, 2, 8, 4));
     pp.add(new BaseXLabel(SERVERUSER + COLS));
     pp.add(loguser);
     pp.add(new BaseXLabel(SERVERPW + COLS));
@@ -178,8 +172,7 @@ public final class DialogServer extends Dialog {
     pp.add(new BaseXLabel(PORT + COLS));
     pp.add(portc);
     pp.add(new BaseXLabel(" "));
-    ppp = new BaseXBack();
-    ppp.setLayout(new TableLayout(1, 2, 5, 0));
+    ppp = new BaseXBack(new TableLayout(1, 2, 5, 0));
     ppp.add(connect);
     ppp.add(disconnect);
     pp.add(ppp);
@@ -188,8 +181,7 @@ public final class DialogServer extends Dialog {
 
     conn.add(p, BorderLayout.CENTER);
 
-    p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 1));
+    p = new BaseXBack(new TableLayout(2, 1));
     BaseXLabel l = new BaseXLabel(SERVERINFO1);
     l.setForeground(GUIConstants.COLORDARK);
     p.add(l);
@@ -199,52 +191,44 @@ public final class DialogServer extends Dialog {
     conn.add(p, BorderLayout.SOUTH);
 
     // Session Tab
-    sess.setLayout(new BorderLayout());
-    sess.setBorder(8, 8, 8, 8);
+    sess.border(8).layout(new BorderLayout());
     sese = new BaseXText(false, this);
     sese.setFont(start.getFont());
     sedb = new BaseXText(false, this);
     sedb.setFont(start.getFont());
     refreshSess = new BaseXButton(BUTTONREFRESH, this);
 
-    p = new BaseXBack();
-    p.setLayout(new GridLayout(2, 1, 0, 2));
+    p = new BaseXBack(new GridLayout(2, 1, 0, 2));
 
-    pp = new BaseXBack();
-    pp.setLayout(new BorderLayout());
+    pp = new BaseXBack(new BorderLayout());
     pp.add(new BaseXLabel(SESSIONS + COLS, false, true), BorderLayout.NORTH);
     pp.add(sese, BorderLayout.CENTER);
     p.add(pp);
 
-    pp = new BaseXBack();
-    pp.setLayout(new BorderLayout());
+    pp = new BaseXBack(new BorderLayout());
     pp.add(new BaseXLabel(DATABASES + COLS, false, true), BorderLayout.NORTH);
     pp.add(sedb, BorderLayout.CENTER);
     p.add(pp);
     sess.add(p, BorderLayout.CENTER);
 
-    p = new BaseXBack();
-    p.setLayout(new BorderLayout(0, 0));
+    p = new BaseXBack(new BorderLayout(0, 0));
     p.add(refreshSess, BorderLayout.EAST);
     sess.add(p, BorderLayout.SOUTH);
 
     // Logging Tab
-    logs.setLayout(new BorderLayout());
-    logs.setBorder(8, 8, 8, 8);
+    logs.border(8).layout(new BorderLayout());
     delete = new BaseXButton(BUTTONDELETE, this);
     deleteAll = new BaseXButton(BUTTONDELALL, this);
-    logc = new BaseXCombo(true, new String[] {}, this);
+    logc = new BaseXCombo(this);
     logt = new BaseXText(false, this);
     logt.setFont(start.getFont());
     BaseXLayout.setHeight(logt, 100);
 
-    logt.setBorder(5, 5, 5, 5);
-    infoL = new BaseXLabel(" ");
-    infoL.setBorder(8, 0, 0, 0);
+    logt.border(5, 5, 5, 5);
+    infoL = new BaseXLabel(" ").border(8, 0, 0, 0);
     refreshLog = new BaseXButton(BUTTONREFRESH, this);
 
-    p = new BaseXBack();
-    p.setLayout(new BorderLayout());
+    p = new BaseXBack(new BorderLayout());
     pp = new BaseXBack();
     pp.add(logc);
     pp.add(delete);
@@ -253,8 +237,7 @@ public final class DialogServer extends Dialog {
     logs.add(p, BorderLayout.NORTH);
     logs.add(logt, BorderLayout.CENTER);
 
-    p = new BaseXBack();
-    p.setLayout(new BorderLayout(8, 0));
+    p = new BaseXBack(new BorderLayout(8, 0));
     p.add(infoL, BorderLayout.WEST);
     p.add(refreshLog, BorderLayout.EAST);
     logs.add(p, BorderLayout.SOUTH);
@@ -321,11 +304,11 @@ public final class DialogServer extends Dialog {
         if(!connected) super.setTitle(GUISERVER);
       } else if(cmp == connect || cmp == loguser || cmp == logpass ||
           cmp == host || cmp == portc) {
-        gui.prop.set(GUIProp.SERVERUSER, loguser.getText());
+        gui.gprop.set(GUIProp.SERVERUSER, loguser.getText());
         final String pw = new String(logpass.getPassword());
         gui.set(Prop.HOST, host.getText());
         gui.set(Prop.PORT, Integer.parseInt(portc.getText()));
-        cs = new ClientSession(ctx, gui.prop.get(GUIProp.SERVERUSER), pw);
+        cs = new ClientSession(ctx, gui.gprop.get(GUIProp.SERVERUSER), pw);
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;

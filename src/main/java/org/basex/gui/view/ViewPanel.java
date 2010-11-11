@@ -19,7 +19,7 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
    * @param v view to be stored
    */
   ViewPanel(final View v) {
-    setLayout(new BorderLayout());
+    layout(new BorderLayout());
     add(new ViewMover(v.gui), BorderLayout.NORTH);
     add(v, BorderLayout.CENTER);
     view = v;
@@ -44,7 +44,7 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
    * Makes the view invisible.
    */
   public void delete() {
-    view.gui.prop.set("SHOW" + view.getName().toUpperCase(), false);
+    view.gui.gprop.set("SHOW" + view.getName().toUpperCase(), false);
     view.gui.layoutViews();
   }
 

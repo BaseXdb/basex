@@ -3,6 +3,7 @@ package org.basex.gui.layout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LayoutManager;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.util.Map;
@@ -39,17 +40,40 @@ public class BaseXBack extends JPanel {
    * @param m visualization mode
    */
   public BaseXBack(final Fill m) {
-    setMode(m);
+    mode(m);
+  }
+
+  /**
+   * Constructor, specifying an empty border.
+   * @param t top distance
+   * @param l left distance
+   * @param b bottom distance
+   * @param r right distance
+   */
+  public BaseXBack(final int t, final int l, final int b, final int r) {
+    this();
+    border(t, l, b, r);
+  }
+
+  /**
+   * Constructor, specifying a layout manager.
+   * @param lm layout manager
+   */
+  public BaseXBack(final LayoutManager lm) {
+    this();
+    layout(lm);
   }
 
   /**
    * Sets the specified fill mode.
    * @param m visualization mode
+   * @return self reference
    */
-  public final void setMode(final Fill m) {
+  public final BaseXBack mode(final Fill m) {
     mode = m;
     final boolean o = mode != Fill.NONE;
     if(isOpaque() != o) setOpaque(o);
+    return this;
   }
 
   @Override
@@ -79,10 +103,31 @@ public class BaseXBack extends JPanel {
    * @param l left distance
    * @param b bottom distance
    * @param r right distance
+   * @return self reference
    */
-  public final void setBorder(final int t, final int l, final int b,
+  public final BaseXBack border(final int t, final int l, final int b,
       final int r) {
     setBorder(new EmptyBorder(t, l, b, r));
+    return this;
+  }
+
+  /**
+   * Sets an empty border with the specified margin.
+   * @param m margin
+   * @return self reference
+   */
+  public final BaseXBack border(final int m) {
+    return border(m, m, m, m);
+  }
+
+  /**
+   * Sets the layout manager for this container.
+   * @param lm layout manager
+   * @return self reference
+   */
+  public final BaseXBack layout(final LayoutManager lm) {
+    setLayout(lm);
+    return this;
   }
 
   /**

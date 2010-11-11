@@ -65,7 +65,7 @@ final class DialogFT extends BaseXBack {
    */
   DialogFT(final Dialog d, final boolean create) {
     dialog = d;
-    setLayout(new TableLayout(create ? 9 : 16, 1));
+    layout(new TableLayout(create ? 9 : 16, 1));
 
     final Prop prop = d.gui.context.prop;
     add(new BaseXLabel(FTINDEXINFO, true, false));
@@ -89,12 +89,11 @@ final class DialogFT extends BaseXBack {
       }
     }
 
-    final BaseXBack b1 = new BaseXBack();
-    b1.setLayout(new TableLayout(1, 2, 6, 0));
+    final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 6, 0));
     b1.add(check[F_LANG]);
     final StringList langs = new StringList();
     for(final Language l : FTLexer.languages()) langs.add(l.toString());
-    language = new BaseXCombo(langs.toArray(), d);
+    language = new BaseXCombo(d, langs.toArray());
     final Language ln = Language.get(prop.get(Prop.LANGUAGE));
     language.setSelectedItem((ln == null ? Language.DEFAULT : ln).toString());
 
@@ -107,19 +106,17 @@ final class DialogFT extends BaseXBack {
       if(!create) add(labels[f]);
     }
 
-    final BaseXBack b2 = new BaseXBack();
-    b2.setLayout(new TableLayout(1, 2, 6, 0));
+    final BaseXBack b2 = new BaseXBack(new TableLayout(1, 2, 6, 0));
     b2.add(check[F_SCORE]);
-    scoring = new BaseXCombo(new String[] { CREATESCT1, CREATESCT2}, d);
+    scoring = new BaseXCombo(d, CREATESCT1, CREATESCT2);
     b2.add(scoring);
     add(b2);
     if(!create) add(labels[F_SCORE]);
 
     add(check[F_STOP]);
-    final BaseXBack b3 = new BaseXBack();
-    b3.setLayout(new TableLayout(1, 2, 6, 0));
+    final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 6, 0));
     swpath = new BaseXTextField(
-        sw.isEmpty() ? d.gui.prop.get(GUIProp.STOPPATH) : sw, d);
+        sw.isEmpty() ? d.gui.gprop.get(GUIProp.STOPPATH) : sw, d);
     b3.add(swpath);
 
     swbrowse = new BaseXButton(BUTTONBROWSE, d);
@@ -138,7 +135,7 @@ final class DialogFT extends BaseXBack {
    * Opens a file dialog to choose a stopword list.
    */
   void chooseStop() {
-    final GUIProp gprop = dialog.gui.prop;
+    final GUIProp gprop = dialog.gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
         gprop.get(GUIProp.STOPPATH), dialog.gui);
     final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
@@ -164,7 +161,7 @@ final class DialogFT extends BaseXBack {
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);
     final boolean exists = !sw.isEmpty() && file.exists();
-    if(exists) dialog.gui.prop.set(GUIProp.STOPPATH, sw);
+    if(exists) dialog.gui.gprop.set(GUIProp.STOPPATH, sw);
   }
 
   /**

@@ -61,16 +61,12 @@ public abstract class Parser extends Progress {
   public static FileParser fileParser(final IO io, final Prop prop,
       final String target) throws IOException {
 
-    // use file specific parser; should better be solved via importer property
+    // use file specific parser
     final String parser = prop.get(Prop.PARSER);
-    if(parser.equals("html"))
-      return new HTMLParser(io, target, prop);
-    if(parser.equals("csv"))
-      return new CSVParser(io, target);
-
+    if(parser.equals("html")) return new HTMLParser(io, target, prop);
+    if(parser.equals("csv")) return new CSVParser(io, target);
     // use internal parser
     if(prop.is(Prop.INTPARSE)) return new XMLParser(io, target, prop);
-
     // use default parser
     final SAXSource s = new SAXSource(io.inputSource());
     return new SAXWrapper(s, io.name(), target, prop);

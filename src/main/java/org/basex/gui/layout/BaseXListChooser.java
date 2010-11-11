@@ -47,7 +47,7 @@ public final class BaseXListChooser extends BaseXBack {
     // checks if list is purely numeric
     for(final String v : values) num = num && v.matches("[0-9]+");
 
-    setLayout(new TableLayout(2, 1));
+    layout(new TableLayout(2, 1));
     text = new BaseXTextField(d);
     text.addFocusListener(new FocusAdapter() {
       @Override

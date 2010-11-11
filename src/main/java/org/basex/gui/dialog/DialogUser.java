@@ -76,8 +76,7 @@ final class DialogUser extends BaseXBack {
     global = g;
     dia = d;
 
-    setLayout(new TableLayout(7, 1, 0, 4));
-    setBorder(8, 8, 8, 8);
+    layout(new TableLayout(7, 1, 0, 4)).border(8);
 
     user = new BaseXTextField("", dia);
     user.addKeyListener(dia.keys);
@@ -91,9 +90,7 @@ final class DialogUser extends BaseXBack {
     info = new BaseXLabel(" ");
 
     add(new BaseXLabel(CREATEU + COLS, false, true));
-    BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(1, 5, 6, 0));
-    p.setBorder(0, 0, 5, 0);
+    BaseXBack p = new BaseXBack(new TableLayout(1, 5, 6, 0)).border(0, 0, 5, 0);
     p.add(new BaseXLabel(SERVERUSER + COLS));
     p.add(user);
     p.add(new BaseXLabel(SERVERPW + COLS));
@@ -101,18 +98,16 @@ final class DialogUser extends BaseXBack {
     p.add(create);
     add(p);
 
-    tablePanel = new BaseXBack();
-    tablePanel.setLayout(new BorderLayout(0, 5));
+    tablePanel = new BaseXBack(new BorderLayout(0, 5));
 
-    databases = new BaseXCombo(true, new String[] {}, dia);
+    databases = new BaseXCombo(dia);
     BaseXLayout.setWidth(databases, 210);
-    addUser = new BaseXCombo(new String[] {}, dia);
+    addUser = new BaseXCombo(dia);
     add = new BaseXButton(BUTTONADD, dia);
     BaseXLayout.setWidth(addUser, 131);
 
     if(!global) {
-      p = new BaseXBack();
-      p.setLayout(new TableLayout(2, 3, 8, 2));
+      p = new BaseXBack(new TableLayout(2, 3, 8, 2));
       p.add(new BaseXLabel(DATABASES + COL, false, true));
       p.add(new BaseXLabel(BUTTONADD + COL, false, true));
       p.add(new BaseXLabel());
@@ -122,8 +117,7 @@ final class DialogUser extends BaseXBack {
       tablePanel.add(p, BorderLayout.NORTH);
     }
 
-    p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 2, 8, 5));
+    p = new BaseXBack(new TableLayout(2, 2, 8, 5));
     p.add(new BaseXLabel(global ? GLOBPERM : LOCPERM, false, true));
     p.add(new BaseXLabel(" "));
 
@@ -133,8 +127,7 @@ final class DialogUser extends BaseXBack {
     BaseXLayout.setWidth(sp, 350);
     p.add(sp);
 
-    final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(2, 1, 0, 5));
+    final BaseXBack pp = new BaseXBack(new TableLayout(2, 1, 0, 5));
     if(global) pp.add(alter);
     pp.add(drop);
     p.add(pp);

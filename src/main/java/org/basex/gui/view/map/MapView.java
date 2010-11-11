@@ -110,7 +110,7 @@ public final class MapView extends View implements Runnable {
     zoomStep = 0;
 
     final Data data = gui.context.data;
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     if(data != null && visible()) {
       painter = data.fs != null ? new MapFS(this, data.fs, gprop) :
         new MapDefault(this, gprop);
@@ -174,12 +174,12 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWMAP);
+    return gui.gprop.is(GUIProp.SHOWMAP);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.prop.set(GUIProp.SHOWMAP, v);
+    gui.gprop.set(GUIProp.SHOWMAP, v);
   }
 
   @Override
@@ -295,7 +295,7 @@ public final class MapView extends View implements Runnable {
     gui.cursor(CURSORWAIT);
 
     initLen();
-    layout = new MapLayout(nodes.data, textLen, gui.prop);
+    layout = new MapLayout(nodes.data, textLen, gui.gprop);
     layout.makeMap(rect, new MapList(nodes.list.clone()),
         0, (int) nodes.size() - 1);
     // rectangles are copied to avoid synchronization issues
@@ -347,7 +347,7 @@ public final class MapView extends View implements Runnable {
       if(f == null || !f.thumb) return;
     }
 
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     if(gprop.num(GUIProp.MAPOFFSETS) == 0) {
       g.setColor(COLORS[32]);
       int pre = mainRects.size;
@@ -576,7 +576,7 @@ public final class MapView extends View implements Runnable {
 
     if(focused == null) focused = mainRects.get(0);
 
-    final int fs = gui.prop.num(GUIProp.FONTSIZE);
+    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
     int o = fs + 4;
     final boolean shift = e.isShiftDown();
     if(PREVLINE.is(e)) {
@@ -616,7 +616,7 @@ public final class MapView extends View implements Runnable {
     painter.reset();
 
     final Data data = gui.context.current.data;
-    if(textLen != null || gui.prop.num(GUIProp.MAPWEIGHT) == 0) return;
+    if(textLen != null || gui.gprop.num(GUIProp.MAPWEIGHT) == 0) return;
 
     final int size = data.meta.size;
     textLen = new int[size];

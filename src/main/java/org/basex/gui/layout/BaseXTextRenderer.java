@@ -62,8 +62,7 @@ final class BaseXTextRenderer extends BaseXBack {
    * @param b scrollbar reference
    */
   BaseXTextRenderer(final BaseXTextTokens t, final BaseXBar b) {
-    setMode(GUIConstants.Fill.NONE);
-    setFont(GUIConstants.dfont);
+    mode(GUIConstants.Fill.NONE).setFont(GUIConstants.dfont);
     text = t;
     bar = b;
   }

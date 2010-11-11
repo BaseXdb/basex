@@ -139,7 +139,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
   @Override
   public boolean visible() {
-    final boolean v = gui.prop.is(GUIProp.SHOWTREE);
+    final boolean v = gui.gprop.is(GUIProp.SHOWTREE);
     if(!v) {
       sub = null;
       tr = null;
@@ -150,7 +150,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
   @Override
   public void visible(final boolean v) {
-    gui.prop.set(GUIProp.SHOWTREE, v);
+    gui.gprop.set(GUIProp.SHOWTREE, v);
   }
 
   @Override
@@ -186,7 +186,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(paintType == PAINT_NEW_INIT) {
       sub = new TreeSubtree(data, showAtts);
-      tr = new TreeRects(gui.prop);
+      tr = new TreeRects(gui.gprop);
     }
 
     if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT)
@@ -252,7 +252,7 @@ public final class TreeView extends View implements TreeViewOptions {
         g.setColor(Color.BLACK);
         g.drawString("pre: " + fpre + " level: " + flv + "  level-size: "
             + sub.levelSize(frn, flv) + "  node-size: " + (s - as)
-            + "  node: " + Token.string(ViewData.tag(gui.prop, d, fpre)), 2,
+            + "  node: " + Token.string(ViewData.tag(gui.gprop, d, fpre)), 2,
             wheight - 6);
       }
       refreshedFocus = false;
@@ -1107,7 +1107,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @return show attributes has changed
    */
   private boolean showAttsChanged() {
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     if(gprop.is(GUIProp.TREEATTS) == showAtts) return false;
     showAtts =  !showAtts;
     return true;
@@ -1118,7 +1118,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @return slim to text has changed
    */
   private boolean slimToTextChanged() {
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     if(gprop.is(GUIProp.TREESLIMS) == slimToText) return false;
     slimToText = !slimToText;
     return true;

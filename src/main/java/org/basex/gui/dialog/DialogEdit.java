@@ -58,8 +58,7 @@ public final class DialogEdit extends Dialog {
     pre = p;
 
     // create checkboxes
-    BaseXBack pp = new BaseXBack();
-    pp.setLayout(new BorderLayout());
+    BaseXBack pp = new BaseXBack(new BorderLayout());
 
     final Context context = gui.context;
     final Data data = context.data;
@@ -82,8 +81,7 @@ public final class DialogEdit extends Dialog {
       old1 = string(data.name(pre, kind));
       old3 = data.atom(pre);
     }
-    final BaseXBack b = new BaseXBack();
-    b.setLayout(new BorderLayout(0, 4));
+    final BaseXBack b = new BaseXBack(new BorderLayout(0, 4));
     if(old1 != null) {
       input1 = new BaseXTextField(old1, this);
       input1.addKeyListener(keys);
@@ -106,10 +104,8 @@ public final class DialogEdit extends Dialog {
     pp.add(b, BorderLayout.CENTER);
     set(pp, BorderLayout.CENTER);
 
-    pp = new BaseXBack();
-    pp.setLayout(new BorderLayout());
-    info = new BaseXLabel(" ");
-    info.setBorder(8, 0, 2, 0);
+    pp = new BaseXBack(new BorderLayout());
+    info = new BaseXLabel(" ").border(8, 0, 2, 0);
     pp.add(info, BorderLayout.WEST);
 
     // create buttons

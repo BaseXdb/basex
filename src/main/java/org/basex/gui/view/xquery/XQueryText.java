@@ -82,7 +82,7 @@ final class XQueryText extends BaseXText {
     view.modified(view.modified || !eq, false);
     view.pos.setText(pos());
 
-    if(force || gui.prop.is(GUIProp.EXECRT) && !module) {
+    if(force || gui.gprop.is(GUIProp.EXECRT) && !module) {
       query(qu, true);
     } else {
       try {
@@ -116,7 +116,7 @@ final class XQueryText extends BaseXText {
       if(module(query)) return;
       view.stop.setEnabled(true);
       final String qu = Token.string(query);
-      gui.execute(new XQuery(qu.trim().isEmpty() ? "()" : qu));
+      gui.execute(new XQuery(qu.trim().isEmpty() ? "()" : qu), false);
     } else {
       markError();
     }

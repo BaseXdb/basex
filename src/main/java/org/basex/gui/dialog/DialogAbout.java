@@ -32,22 +32,20 @@ public final class DialogAbout extends Dialog {
   public DialogAbout(final GUI main) {
     super(main, ABOUTTITLE, true);
 
-    BaseXBack p = new BaseXBack();
+    BaseXBack p = new BaseXBack(new BorderLayout(12, 0));
     p.setBackground(Color.white);
-    p.setLayout(new BorderLayout(12, 0));
     p.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(10, 10, 15, 22)));
 
-    BaseXLabel label = new BaseXLabel();
+    final BaseXLabel label = new BaseXLabel();
     label.setIcon(BaseXLayout.icon("logo"));
     label.setVerticalAlignment(SwingConstants.TOP);
     p.add(label, BorderLayout.WEST);
 
-    final BaseXBack pp = new BaseXBack(GUIConstants.Fill.NONE);
-    pp.setLayout(new TableLayout(15, 1));
+    final BaseXBack pp = new BaseXBack(GUIConstants.Fill.NONE).layout(
+        new TableLayout(15, 1));
 
-    label = new BaseXLabel(Text.TITLE, false, true);
-    pp.add(label);
+    pp.add(new BaseXLabel(Text.TITLE, false, true));
     pp.add(new BaseXLabel(Text.URL));
     pp.add(Box.createVerticalStrut(7));
     pp.add(new BaseXLabel(COPYRIGHT));

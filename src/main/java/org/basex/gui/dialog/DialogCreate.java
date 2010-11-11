@@ -1,11 +1,9 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import org.basex.build.xml.CatalogResolverWrapper;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
@@ -79,18 +77,13 @@ public final class DialogCreate extends Dialog {
 
     db = List.list(main.context);
     final Prop prop = gui.context.prop;
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
 
     // create panels
-    final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new BorderLayout());
-    p1.setBorder(8, 8, 8, 8);
+    final BaseXBack p1 = new BaseXBack(new BorderLayout()).border(8);
 
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(6, 2, 6, 0));
-    BaseXLabel l = new BaseXLabel(CREATETITLE + COL, true, true);
-    l.setBorder(0, 0, 4, 0);
-    p.add(l);
+    final BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
+    p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
     path = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
@@ -104,17 +97,13 @@ public final class DialogCreate extends Dialog {
     });
     p.add(browse);
 
-    l = new BaseXLabel(CREATEPATTERN + COL, true, true);
-    l.setBorder(8, 0, 4, 0);
-    p.add(l);
+    p.add(new BaseXLabel(CREATEPATTERN + COL, true, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());
 
     filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
     p.add(filter);
     p.add(new BaseXLabel());
-    l = new BaseXLabel(CREATENAME, false, true);
-    l.setBorder(8, 0, 4, 0);
-    p.add(l);
+    p.add(new BaseXLabel(CREATENAME, false, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());
 
     dbname = new BaseXTextField(this);
@@ -128,9 +117,7 @@ public final class DialogCreate extends Dialog {
     info = new BaseXLabel(" ");
     p1.add(info, BorderLayout.SOUTH);
 
-    final BaseXBack p2 = new BaseXBack();
-    p2.setLayout(new TableLayout(14, 1));
-    p2.setBorder(8, 8, 8, 8);
+    final BaseXBack p2 = new BaseXBack(new TableLayout(14, 1)).border(8);
 
     intparse = new BaseXCheckBox(CREATEINTPARSE,
         prop.is(Prop.INTPARSE), 0, this);
@@ -149,8 +136,7 @@ public final class DialogCreate extends Dialog {
 
     // CatalogResolving
     final boolean rsen = CatalogResolverWrapper.available();
-    final BaseXBack fl = new BaseXBack();
-    fl.setLayout(new TableLayout(2, 2, 6, 0));
+    final BaseXBack fl = new BaseXBack(new TableLayout(2, 2, 6, 0));
     usecat = new BaseXCheckBox(USECATFILE,
         !prop.get(Prop.CATFILE).isEmpty(), 0, this);
     usecat.setEnabled(rsen);
@@ -169,21 +155,13 @@ public final class DialogCreate extends Dialog {
     fl.add(browsec);
     p2.add(fl);
     if(!rsen) {
-      final BaseXBack rsinfo = new BaseXBack();
-      rsinfo.setLayout(new TableLayout(2, 1));
-      l = new BaseXLabel(USECATHLP);
-      l.setForeground(GUIConstants.COLORDARK);
-      rsinfo.add(l);
-      l = new BaseXLabel(USECATHLP2);
-      l.setForeground(GUIConstants.COLORDARK);
-      rsinfo.add(l);
-      p2.add(rsinfo);
+      final BaseXBack rs = new BaseXBack(new TableLayout(2, 1));
+      rs.add(new BaseXLabel(USECATHLP).color(GUIConstants.COLORDARK));
+      rs.add(new BaseXLabel(USECATHLP2).color(GUIConstants.COLORDARK));
+      p2.add(rs);
     }
 
-    final BaseXBack p3 = new BaseXBack();
-    p3.setLayout(new TableLayout(6, 1, 0, 0));
-    p3.setBorder(8, 8, 8, 8);
-
+    final BaseXBack p3 = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
     txtindex = new BaseXCheckBox(INFOTEXTINDEX,
         prop.is(Prop.TEXTINDEX), 0, this);
     p3.add(txtindex);
@@ -199,10 +177,7 @@ public final class DialogCreate extends Dialog {
     p3.add(pathindex);
     p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
 
-    final BaseXBack p4 = new BaseXBack();
-    p4.setLayout(new TableLayout(2, 1, 0, 0));
-    p4.setBorder(8, 8, 8, 8);
-
+    final BaseXBack p4 = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
     ftxindex = new BaseXCheckBox(INFOFTINDEX, prop.is(Prop.FTINDEX), 0, this);
     p4.add(ftxindex);
 
@@ -228,7 +203,7 @@ public final class DialogCreate extends Dialog {
    * Opens a file dialog to choose an XML document or directory.
    */
   void choose() {
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
         gprop.get(GUIProp.OPENPATH), gui);
     fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
@@ -246,7 +221,7 @@ public final class DialogCreate extends Dialog {
    * Opens a file dialog to choose an XML catalog or directory.
    */
   void catchoose() {
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
         gprop.get(GUIProp.OPENPATH), gui);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
@@ -294,7 +269,7 @@ public final class DialogCreate extends Dialog {
     browsec.setEnabled(cfile.isEnabled());
     final IO file = IO.get(path());
     final boolean exists = !path().isEmpty() && file.exists();
-    if(exists) gui.prop.set(GUIProp.OPENPATH, file.path());
+    if(exists) gui.gprop.set(GUIProp.OPENPATH, file.path());
     final boolean catexists = IO.get(cfile()).exists();
     if(catexists && usecat.isSelected()) gui.context.prop.set(Prop.CATFILE,
         cfile());

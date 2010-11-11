@@ -74,8 +74,7 @@ public final class BaseXDSlider extends BaseXPanel {
     max = mx;
     // choose logarithmic scaling for larger ranges
     log = Math.log(totMax) - Math.log(totMin) > 5 && totMax - totMin > 100;
-    setFocusable(true);
-    setMode(Fill.NONE);
+    mode(Fill.NONE).setFocusable(true);
 
     BaseXLayout.setHeight(this, getFont().getSize() + 9);
     BaseXLayout.setWidth(this, 200 + LABELW);

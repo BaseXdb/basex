@@ -49,7 +49,7 @@ public final class GUIInput extends BaseXTextField {
     final Font f = getFont();
     setFont(f.deriveFont((float) f.getSize() + 2));
 
-    box = new BaseXCombo(new String[] {}, main);
+    box = new BaseXCombo(main);
     box.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -71,7 +71,7 @@ public final class GUIInput extends BaseXTextField {
             final StringList sl = new StringList();
             sl.add(txt);
 
-            final GUIProp gprop = gui.prop;
+            final GUIProp gprop = gui.gprop;
             final int i = main.context.data == null ? 2 :
               gprop.num(GUIProp.SEARCHMODE);
             final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) :
@@ -117,7 +117,7 @@ public final class GUIInput extends BaseXTextField {
           if(modifier(e) || control(e)) return;
           showPopup();
           // skip commands
-          if(gui.prop.is(GUIProp.EXECRT) && !cmdMode()) main.execute();
+          if(gui.gprop.is(GUIProp.EXECRT) && !cmdMode()) main.execute();
         }
       }
     });
@@ -135,7 +135,7 @@ public final class GUIInput extends BaseXTextField {
    * @return result of check
    */
   boolean cmdMode() {
-    return gui.prop.num(GUIProp.SEARCHMODE) == 2 ||
+    return gui.gprop.num(GUIProp.SEARCHMODE) == 2 ||
       gui.context.data == null || getText().startsWith("!");
   }
 
@@ -151,7 +151,7 @@ public final class GUIInput extends BaseXTextField {
     if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
     setText(pre + sel);
     showPopup();
-    if(gui.prop.is(GUIProp.EXECRT) && !cmdMode()) gui.execute();
+    if(gui.gprop.is(GUIProp.EXECRT) && !cmdMode()) gui.execute();
   }
 
   /**
@@ -159,7 +159,7 @@ public final class GUIInput extends BaseXTextField {
    */
   void showPopup() {
     final String query = getText();
-    final int mode = gui.prop.num(GUIProp.SEARCHMODE);
+    final int mode = gui.gprop.num(GUIProp.SEARCHMODE);
     if(cmdMode()) {
       cmdPopup(query);
     } else if(mode == 1 || mode == 0 && query.startsWith("/")) {

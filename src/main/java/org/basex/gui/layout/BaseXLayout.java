@@ -54,9 +54,9 @@ public final class BaseXLayout {
   static void focus(final Component cont, final byte[] help) {
     final GUI gui = gui(cont);
     if(gui == null) return;
-    if(gui.prop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
+    if(gui.gprop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
     if(gui.fullscreen) return;
-    if(help != null && gui.prop.is(GUIProp.SHOWHELP)) gui.help.setText(help);
+    if(help != null && gui.gprop.is(GUIProp.SHOWHELP)) gui.help.setText(help);
   }
 
   /**
@@ -159,7 +159,7 @@ public final class BaseXLayout {
           gui.input.requestFocusInWindow();
         }
 
-        final int fs = gui.prop.num(GUIProp.FONTSIZE);
+        final int fs = gui.gprop.num(GUIProp.FONTSIZE);
         int nfs = fs;
         if(INCFONT1.is(e) || INCFONT2.is(e)) {
           nfs = fs + 1;
@@ -169,9 +169,8 @@ public final class BaseXLayout {
           nfs = 12;
         }
         if(fs != nfs) {
-          gui.prop.set(GUIProp.FONTSIZE, nfs);
-          GUIConstants.initFonts(gui.prop);
-          gui.notify.layout();
+          gui.gprop.set(GUIProp.FONTSIZE, nfs);
+          gui.updateLayout();
         }
       }
     });

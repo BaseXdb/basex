@@ -58,16 +58,15 @@ final class TableHeader extends BaseXPanel {
    */
   TableHeader(final TableView v) {
     super(v.gui);
-    setMode(Fill.NONE);
+    mode(Fill.NONE).setFocusable(true);
     tdata = v.tdata;
     view = v;
-    BaseXLayout.setHeight(this, gui.prop.num(GUIProp.FONTSIZE) + 8 << 1);
+    BaseXLayout.setHeight(this, gui.gprop.num(GUIProp.FONTSIZE) + 8 << 1);
     addMouseListener(this);
     addMouseMotionListener(this);
     addKeyListener(this);
     // restore default focus traversal with TAB key
     setFocusTraversalKeysEnabled(false);
-    setFocusable(true);
 
     addFocusListener(new FocusAdapter() {
       @Override
@@ -96,7 +95,7 @@ final class TableHeader extends BaseXPanel {
       return;
     }
 
-    final int fsz = gui.prop.num(GUIProp.FONTSIZE);
+    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
     final int bs = BaseXBar.SIZE;
     int w = getWidth();
     final int h = getHeight();
@@ -179,7 +178,7 @@ final class TableHeader extends BaseXPanel {
     } else {
       moveC = -1;
       if(mouseX < w) cursor = CURSORTEXT;
-      if(gui.prop.is(GUIProp.MOUSEFOCUS)) {
+      if(gui.gprop.is(GUIProp.MOUSEFOCUS)) {
         final int c = tdata.column(w, mouseX);
         if(c != -1) filter(c);
       }

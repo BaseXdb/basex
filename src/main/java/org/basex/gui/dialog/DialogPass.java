@@ -42,8 +42,7 @@ final class DialogPass extends Dialog {
     });
     info = new BaseXLabel(" ");
 
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new BorderLayout(0, 8));
+    final BaseXBack p = new BaseXBack(new BorderLayout(0, 8));
     p.add(pass, BorderLayout.NORTH);
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);

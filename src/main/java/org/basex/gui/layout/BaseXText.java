@@ -82,7 +82,7 @@ public class BaseXText extends BaseXPanel {
       }
     });
 
-    setLayout(new BorderLayout(4, 0));
+    layout(new BorderLayout(4, 0));
     scroll = new BaseXBar(this);
     rend = new BaseXTextRenderer(text, scroll);
 
@@ -95,7 +95,7 @@ public class BaseXText extends BaseXPanel {
       setBorder(new MatteBorder(1, 1, 1, 1, GUIConstants.COLORS[6]));
       un = new Undo();
     } else {
-      setMode(Fill.NONE);
+      mode(Fill.NONE);
     }
     undo = un;
 

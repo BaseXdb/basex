@@ -74,7 +74,7 @@ public final class FolderView extends View {
   public FolderView(final ViewNotifier man) {
     super(FOLDERVIEW, HELPFOLDER, man);
     createBoxes();
-    setLayout(new BorderLayout());
+    layout(new BorderLayout());
     scroll = new BaseXBar(this);
     add(scroll, BorderLayout.EAST);
     new BaseXPopup(this, POPUP);
@@ -161,12 +161,12 @@ public final class FolderView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWFOLDER);
+    return gui.gprop.is(GUIProp.SHOWFOLDER);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.prop.set(GUIProp.SHOWFOLDER, v);
+    gui.gprop.set(GUIProp.SHOWFOLDER, v);
   }
 
   @Override
@@ -238,7 +238,7 @@ public final class FolderView extends View {
     final boolean fs = data.fs != null;
     final boolean file = fs && data.fs.isFile(pre);
     final boolean dir = fs && data.fs.isDir(pre);
-    final byte[] name = file || dir ? ViewData.tag(gui.prop, data, pre) :
+    final byte[] name = file || dir ? ViewData.tag(gui.gprop, data, pre) :
       ViewData.content(data, pre, false);
 
     int p = gui.context.focused;
@@ -250,7 +250,7 @@ public final class FolderView extends View {
     int xx = x;
 
     if(elem) {
-      final boolean large = gui.prop.num(GUIProp.FONTSIZE) > 20;
+      final boolean large = gui.gprop.num(GUIProp.FONTSIZE) > 20;
       final int off = large ? 1 : 0;
       final int yy = y - boxW - (large ? 6 : 3);
       Image box = opened[pre] ? openedBox : closedBox;
@@ -275,7 +275,7 @@ public final class FolderView extends View {
       tw -= BaseXLayout.width(g, text) + 10;
       g.drawString(text, tw, yy);
     }
-    final int fsz = gui.prop.num(GUIProp.FONTSIZE);
+    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
     BaseXLayout.chopString(g, name, xx, yy - fsz, tw - xx - 10, fsz);
 
     if(gui.context.focused == pre) {
@@ -348,7 +348,7 @@ public final class FolderView extends View {
    * Creates click boxes.
    */
   private void createBoxes() {
-    final int s = gui.prop.num(GUIProp.FONTSIZE);
+    final int s = gui.gprop.num(GUIProp.FONTSIZE);
     boxMargin = s >> 2;
     lineH = s + boxMargin;
     boxW = s - boxMargin;
@@ -490,7 +490,7 @@ public final class FolderView extends View {
         return;
       }
 
-      if(right ^ opened[focusPre] && (!ViewData.leaf(gui.prop, data, focusPre)
+      if(right ^ opened[focusPre] && (!ViewData.leaf(gui.gprop, data, focusPre)
           || data.attSize(focusPre, kind) > 1)) {
         opened[focusPre] = right;
         refreshHeight();

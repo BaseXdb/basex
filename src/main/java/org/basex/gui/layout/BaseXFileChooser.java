@@ -5,7 +5,7 @@ import java.awt.FileDialog;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import org.basex.gui.GUI;
+import org.basex.gui.AGUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.io.IO;
@@ -28,7 +28,7 @@ public final class BaseXFileChooser {
   }
 
   /** Reference to main window. */
-  private GUI gui;
+  private AGUI gui;
   /** Swing file chooser. */
   private JFileChooser fc;
   /** Simple file dialog. */
@@ -43,9 +43,9 @@ public final class BaseXFileChooser {
    * @param main reference to main window
    */
   public BaseXFileChooser(final String title, final String path,
-      final GUI main) {
+      final AGUI main) {
 
-    if(main.prop.is(GUIProp.SIMPLEFD)) {
+    if(main.gprop.is(GUIProp.SIMPLEFD)) {
       fd = new FileDialog(main, title);
       fd.setDirectory(new File(path).getPath());
     } else {

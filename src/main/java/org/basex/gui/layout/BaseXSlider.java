@@ -65,8 +65,7 @@ public final class BaseXSlider extends BaseXPanel {
     max = mx;
     curr = i;
     dl = w instanceof Dialog ? (Dialog) w : null;
-    setFocusable(true);
-    setMode(Fill.NONE);
+    mode(Fill.NONE).setFocusable(true);
 
     BaseXLayout.setHeight(this, getFont().getSize() + 3);
 

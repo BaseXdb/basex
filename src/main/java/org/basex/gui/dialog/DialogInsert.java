@@ -60,10 +60,8 @@ public final class DialogInsert extends Dialog {
   public DialogInsert(final GUI main) {
     super(main, INSERTTITLE);
 
-    label1 = new BaseXLabel(EDITNAME + COLS, true, true);
-    label1.setBorder(0, 0, 0, 0);
-    label2 = new BaseXLabel(EDITVALUE + COLS, true, true);
-    label2.setBorder(0, 0, 0, 0);
+    label1 = new BaseXLabel(EDITNAME + COLS, true, true).border(0, 0, 0, 0);
+    label2 = new BaseXLabel(EDITVALUE + COLS, true, true).border(0, 0, 0, 0);
 
     input1 = new BaseXTextField(this);
     input1.addKeyListener(keys);
@@ -74,8 +72,7 @@ public final class DialogInsert extends Dialog {
     input2.addKeyListener(keys);
     BaseXLayout.setWidth(input2, 320);
 
-    final BaseXBack knd = new BaseXBack();
-    knd.setLayout(new TableLayout(1, 5));
+    final BaseXBack knd = new BaseXBack(new TableLayout(1, 5));
     final ButtonGroup group = new ButtonGroup();
 
     final ActionListener al = new ActionListener() {
@@ -96,14 +93,11 @@ public final class DialogInsert extends Dialog {
     }
     set(knd, BorderLayout.NORTH);
 
-    back = new BaseXBack();
-    back.setBorder(10, 0, 0, 0);
+    back = new BaseXBack(10, 0, 0, 0);
     set(back, BorderLayout.CENTER);
 
-    final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new BorderLayout());
-    info = new BaseXLabel(" ");
-    info.setBorder(8, 0, 2, 0);
+    final BaseXBack pp = new BaseXBack(new BorderLayout());
+    info = new BaseXLabel(" ").border(8, 0, 2, 0);
     pp.add(info, BorderLayout.WEST);
 
     buttons = okCancel(this);
@@ -127,17 +121,15 @@ public final class DialogInsert extends Dialog {
     BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 200);
 
     back.removeAll();
-    back.setLayout(new BorderLayout(0, 4));
+    back.layout(new BorderLayout(0, 4));
     if(n != Data.TEXT && n != Data.COMM) {
-      final BaseXBack b = new BaseXBack();
-      b.setLayout(new BorderLayout(0, 4));
+      final BaseXBack b = new BaseXBack(new BorderLayout(0, 4));
       b.add(label1, BorderLayout.NORTH);
       b.add(input1, BorderLayout.CENTER);
       back.add(b, BorderLayout.NORTH);
     }
     if(n != Data.ELEM) {
-      final BaseXBack b = new BaseXBack();
-      b.setLayout(new BorderLayout(0, 4));
+      final BaseXBack b = new BaseXBack(new BorderLayout(0, 4));
       b.add(label2, BorderLayout.NORTH);
       b.add(input2, BorderLayout.CENTER);
       back.add(b, BorderLayout.CENTER);

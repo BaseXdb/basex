@@ -60,11 +60,9 @@ public final class DialogExport extends Dialog {
     super(main, GUIEXPORT);
 
     // create checkboxes
-    final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(3, 1, 0, 4));
+    final BaseXBack pp = new BaseXBack(new TableLayout(3, 1, 0, 4));
 
-    BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(2, 2, 6, 0));
     out = new BaseXLabel("", false, true);
     p.add(out);
     p.add(new BaseXLabel());
@@ -83,8 +81,7 @@ public final class DialogExport extends Dialog {
     p.add(browse);
     pp.add(p);
 
-    p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 1));
+    p = new BaseXBack(new TableLayout(2, 1));
     p.add(new BaseXLabel(INFOENCODING + COL, false, true));
 
     final Prop prop = gui.context.prop;
@@ -96,7 +93,7 @@ public final class DialogExport extends Dialog {
       sp = new SerializerProp();
     }
 
-    encoding = new BaseXCombo(ENCODINGS, this);
+    encoding = new BaseXCombo(this, ENCODINGS);
     String enc = gui.context.data.meta.encoding;
     boolean f = false;
     for(final String s : ENCODINGS) f |= s.equals(enc);
@@ -116,10 +113,8 @@ public final class DialogExport extends Dialog {
     set(pp, BorderLayout.CENTER);
 
     // create buttons
-    p = new BaseXBack();
-    p.setLayout(new BorderLayout());
-    info = new BaseXLabel(" ");
-    info.setBorder(18, 0, 0, 0);
+    p = new BaseXBack(new BorderLayout());
+    info = new BaseXLabel(" ").border(18, 0, 0, 0);
     p.add(info, BorderLayout.WEST);
     buttons = okCancel(this);
     p.add(buttons, BorderLayout.EAST);

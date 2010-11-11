@@ -115,36 +115,34 @@ public final class PlotView extends View {
    */
   public PlotView(final ViewNotifier man) {
     super(PLOTVIEW, HELPPLOT, man);
-    setLayout(new BorderLayout());
-    setBorder(5, 5, 5, 5);
+    border(5, 5, 5, 5).layout(new BorderLayout());
 
-    final BaseXBack panel = new BaseXBack(Fill.NONE);
-    panel.setLayout(new BorderLayout());
+    final BaseXBack panel = new BaseXBack(Fill.NONE).layout(new BorderLayout());
 
     Box box = new Box(BoxLayout.X_AXIS);
     xLog = new BaseXCheckBox(PLOTLOG, false, null);
-    xLog.setSelected(gui.prop.is(GUIProp.PLOTXLOG));
+    xLog.setSelected(gui.gprop.is(GUIProp.PLOTXLOG));
     xLog.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        gui.prop.invert(GUIProp.PLOTXLOG);
+        gui.gprop.invert(GUIProp.PLOTXLOG);
         refreshUpdate();
       }
     });
     dots = new BaseXSlider(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        gui.prop.set(GUIProp.PLOTDOTS, dots.value());
+        gui.gprop.set(GUIProp.PLOTDOTS, dots.value());
         refreshLayout();
       }
-    }, -6, 6, gui.prop.num(GUIProp.PLOTDOTS), gui);
+    }, -6, 6, gui.gprop.num(GUIProp.PLOTDOTS), gui);
     BaseXLayout.setWidth(dots, 40);
     yLog = new BaseXCheckBox(PLOTLOG, false, null);
-    yLog.setSelected(gui.prop.is(GUIProp.PLOTYLOG));
+    yLog.setSelected(gui.gprop.is(GUIProp.PLOTYLOG));
     yLog.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        gui.prop.invert(GUIProp.PLOTYLOG);
+        gui.gprop.invert(GUIProp.PLOTYLOG);
         refreshUpdate();
       }
     });
@@ -156,27 +154,27 @@ public final class PlotView extends View {
     panel.add(box, BorderLayout.NORTH);
 
     box = new Box(BoxLayout.X_AXIS);
-    xCombo = new BaseXCombo(new String[] {}, gui);
+    xCombo = new BaseXCombo(gui);
     xCombo.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         setAxis(plotData.xAxis, xCombo);
       }
     });
-    yCombo = new BaseXCombo(new String[] {}, gui);
+    yCombo = new BaseXCombo(gui);
     yCombo.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         setAxis(plotData.yAxis, yCombo);
       }
     });
-    itemCombo = new BaseXCombo(new String[] {}, gui);
+    itemCombo = new BaseXCombo(gui);
     itemCombo.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final String item = (String) itemCombo.getSelectedItem();
-        plotData.xAxis.log = gui.prop.is(GUIProp.PLOTXLOG);
-        plotData.yAxis.log = gui.prop.is(GUIProp.PLOTYLOG);
+        plotData.xAxis.log = gui.gprop.is(GUIProp.PLOTXLOG);
+        plotData.yAxis.log = gui.gprop.is(GUIProp.PLOTYLOG);
         if(plotData.setItem(item)) {
           plotChanged = true;
           markingChanged = true;
@@ -258,8 +256,8 @@ public final class PlotView extends View {
   private BufferedImage itemImage(final boolean focus,
       final boolean marked, final boolean markedSub) {
 
-    final int size = Math.max(1, gui.prop.num(GUIProp.FONTSIZE) +
-        gui.prop.num(GUIProp.PLOTDOTS) - (focus ? 2 :
+    final int size = Math.max(1, gui.gprop.num(GUIProp.FONTSIZE) +
+        gui.gprop.num(GUIProp.PLOTDOTS) - (focus ? 2 :
           marked || markedSub ? 4 : 6));
     final BufferedImage img = new BufferedImage(size, size,
         Transparency.TRANSLUCENT);
@@ -376,7 +374,7 @@ public final class PlotView extends View {
         if(!x.isEmpty() && !y.isEmpty()) label += " | ";
         label += y.length() > 16 ? y.substring(0, 14) + ".." : y;
         final int xa = calcCoordinate(true, x1) + 15;
-        int ya = calcCoordinate(false, y1) + gui.prop.num(GUIProp.PLOTDOTS);
+        int ya = calcCoordinate(false, y1) + gui.gprop.num(GUIProp.PLOTDOTS);
         final int ww = getWidth();
 
         final byte[] nm = ViewData.attValue(data, data.nameID, focused);
@@ -387,7 +385,7 @@ public final class PlotView extends View {
           if(ol > 1) name = ol + "x: " + name + ", ...";
           final int lw = BaseXLayout.width(g, label);
           if(ya < MARGIN[0] + textH && xa < w - lw) {
-            ya += 2 * textH - gui.prop.num(GUIProp.PLOTDOTS);
+            ya += 2 * textH - gui.gprop.num(GUIProp.PLOTDOTS);
           }
           if(xa > w - lw)
             BaseXLayout.drawTooltip(g, name + ": " + label, xa, ya, ww, 10);
@@ -729,7 +727,7 @@ public final class PlotView extends View {
     final int h = getHeight();
     final int w = getWidth();
     final int textH = g.getFontMetrics().getHeight();
-    final int fs = gui.prop.num(GUIProp.FONTSIZE);
+    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
     final int imgW = BaseXLayout.width(g, cap) + fs;
     final BufferedImage img = createCaptionImage(g, cap, false, imgW);
 
@@ -759,7 +757,7 @@ public final class PlotView extends View {
   private BufferedImage createCaptionImage(final Graphics g,
       final String caption, final boolean im, final int imgW) {
     final int textH = g.getFontMetrics().getHeight();
-    final int fs = gui.prop.num(GUIProp.FONTSIZE);
+    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
 
     // caption labels are rotated, for both x and y axis. first a buffered
     // image is created which displays the rotated label ...
@@ -788,7 +786,7 @@ public final class PlotView extends View {
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();
     final int w = getWidth();
-    final int fs = gui.prop.num(GUIProp.FONTSIZE);
+    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
     final int sf = sizeFactor();
     g.setColor(color2A);
 
@@ -841,9 +839,9 @@ public final class PlotView extends View {
     // all plot data is recalculated, assignments stay the same
     plotData.refreshItems(nextContext != null && more && rightClick ?
         nextContext : gui.context.current, !more || !rightClick);
-    plotData.xAxis.log = gui.prop.is(GUIProp.PLOTXLOG);
+    plotData.xAxis.log = gui.gprop.is(GUIProp.PLOTXLOG);
     plotData.xAxis.refreshAxis();
-    plotData.yAxis.log = gui.prop.is(GUIProp.PLOTYLOG);
+    plotData.yAxis.log = gui.gprop.is(GUIProp.PLOTYLOG);
     plotData.yAxis.refreshAxis();
 
     nextContext = null;
@@ -913,12 +911,12 @@ public final class PlotView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWPLOT);
+    return gui.gprop.is(GUIProp.SHOWPLOT);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.prop.set(GUIProp.SHOWPLOT, v);
+    gui.gprop.set(GUIProp.SHOWPLOT, v);
   }
 
   @Override
@@ -1005,7 +1003,7 @@ public final class PlotView extends View {
    * @return size value
    */
   private int sizeFactor() {
-    return Math.max(2, gui.prop.num(GUIProp.FONTSIZE) << 1);
+    return Math.max(2, gui.gprop.num(GUIProp.FONTSIZE) << 1);
   }
 
   /**

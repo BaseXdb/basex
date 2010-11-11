@@ -76,15 +76,14 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    * @param v view panels
    */
   public ViewContainer(final AGUI main, final View... v) {
-    setMode(Fill.PLAIN);
-    setLayout(new BorderLayout());
+    layout(new BorderLayout()).mode(Fill.PLAIN);
     logo = BaseXLayout.image("logo");
 
     views = new ViewPanel[v.length];
     for(int i = 0; i < v.length; ++i) views[i] = new ViewPanel(v[i]);
     gui = main;
     // build layout or use default if something goes wrong
-    if(!buildLayout(gui.prop.get(GUIProp.VIEWS)) && !buildLayout(VIEWS)) {
+    if(!buildLayout(gui.gprop.get(GUIProp.VIEWS)) && !buildLayout(VIEWS)) {
       Util.errln(Util.name(this) + ": could not build layout \"%\"", VIEWS);
     }
   }
@@ -98,7 +97,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     layout.createView(this);
     validate();
     repaint();
-    gui.prop.set(GUIProp.VIEWS, layout.layoutString());
+    gui.gprop.set(GUIProp.VIEWS, layout.layoutString());
   }
 
   @Override

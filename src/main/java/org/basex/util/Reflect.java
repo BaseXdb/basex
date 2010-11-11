@@ -116,7 +116,7 @@ public final class Reflect {
   /**
    * Invoked the specified method.
    * @param method method to run
-   * @param object object ({@code null} for static methods) 
+   * @param object object ({@code null} for static methods)
    * @param args arguments
    * @return result of method call
    */

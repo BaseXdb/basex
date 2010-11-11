@@ -35,7 +35,7 @@ public final class GUIStatus extends BaseXPanel {
     addMouseListener(this);
     addMouseMotionListener(this);
 
-    setLayout(new BorderLayout());
+    layout(new BorderLayout());
     mem = new BaseXMem(main, true);
     add(mem, BorderLayout.EAST);
   }

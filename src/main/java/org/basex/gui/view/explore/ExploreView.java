@@ -36,14 +36,11 @@ public final class ExploreView extends View {
   public ExploreView(final ViewNotifier man) {
     super(EXPLOREVIEW, HELPEXPLORE, man);
 
-    setLayout(new BorderLayout(0, 4));
-    setBorder(6, 6, 6, 6);
-    setFocusable(false);
+    layout(new BorderLayout(0, 4)).border(6, 6, 6, 6).setFocusable(false);
 
     header = new BaseXLabel(EXPLORETIT, true, false);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE);
-    b.setLayout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     b.add(header, BorderLayout.CENTER);
 
     filter = BaseXButton.command(GUICommands.FILTER, gui);
@@ -69,7 +66,7 @@ public final class ExploreView extends View {
   @Override
   public void refreshMark() {
     final Nodes marked = gui.context.marked;
-    filter.setEnabled(!gui.prop.is(GUIProp.FILTERRT) &&
+    filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
   }
 
@@ -87,12 +84,12 @@ public final class ExploreView extends View {
 
   @Override
   public boolean visible() {
-    return gui.prop.is(GUIProp.SHOWEXPLORE);
+    return gui.gprop.is(GUIProp.SHOWEXPLORE);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.prop.set(GUIProp.SHOWEXPLORE, v);
+    gui.gprop.set(GUIProp.SHOWEXPLORE, v);
   }
 
   @Override

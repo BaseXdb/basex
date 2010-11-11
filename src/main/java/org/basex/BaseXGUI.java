@@ -73,7 +73,7 @@ public final class BaseXGUI {
           if(db.endsWith(IO.XQSUFFIX)) {
             gui.query.setQuery(io);
           } else {
-            gui.execute(new Check(db));
+            gui.execute(new Check(db), false);
             gprop.set(GUIProp.OPENPATH, io.path());
           }
         }

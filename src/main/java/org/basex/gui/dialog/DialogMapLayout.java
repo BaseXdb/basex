@@ -39,20 +39,18 @@ public final class DialogMapLayout extends Dialog {
   public DialogMapLayout(final GUI main) {
     super(main, MAPLAYOUTTITLE, false);
 
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(4, 1, 0, 8));
+    final BaseXBack p = new BaseXBack(new TableLayout(4, 1, 0, 8));
 
     // create list
     algo = new BaseXListChooser(MAPALG, this);
     p.add(algo);
 
     // create drop down
-    final GUIProp gprop = gui.prop;
-    border = new BaseXCombo(MAPOFFSET, this);
+    final GUIProp gprop = gui.gprop;
+    border = new BaseXCombo(this, MAPOFFSET);
     border.setSelectedIndex(gprop.num(GUIProp.MAPOFFSETS));
 
-    BaseXBack tmp = new BaseXBack();
-    tmp.setLayout(new TableLayout(1, 3));
+    BaseXBack tmp = new BaseXBack(new TableLayout(1, 3));
     tmp.add(new BaseXLabel(MAPOFF));
     tmp.add(Box.createHorizontalStrut(25));
     tmp.add(border);
@@ -65,8 +63,7 @@ public final class DialogMapLayout extends Dialog {
     sizeSlider = new BaseXSlider(0, 100, gprop.num(GUIProp.MAPWEIGHT), this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
 
-    tmp = new BaseXBack();
-    tmp.setLayout(new TableLayout(2, 1));
+    tmp = new BaseXBack(new TableLayout(2, 1));
     tmp.add(sizeLabel);
     tmp.add(sizeSlider);
     p.add(tmp);
@@ -84,7 +81,7 @@ public final class DialogMapLayout extends Dialog {
   @Override
   public void action(final Object cmp) {
     final boolean fs = gui.context.data.fs != null;
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.MAPOFFSETS, border.getSelectedIndex());
     gprop.set(GUIProp.MAPALGO, algo.getIndex());
     gprop.set(GUIProp.MAPATTS, atts.isSelected());

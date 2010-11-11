@@ -10,7 +10,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-import javax.swing.border.EmptyBorder;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.util.Util;
 import static org.basex.gui.GUIConstants.*;
@@ -63,9 +62,9 @@ public final class GUIMenu extends JMenuBar {
 
           // add a menu entry
           if(subEntry instanceof String) {
-            comp = new BaseXLabel((String) subEntry);
-            comp.setFont(getFont());
-            comp.setBorder(new EmptyBorder(2, 5, 2, 0));
+            final BaseXLabel label = new BaseXLabel((String) subEntry);
+            label.border(2, 5, 2, 0).setFont(getFont());
+            comp = label;
           } else {
             final GUICommand cmd = (GUICommand) subEntry;
             final JMenuItem item = newItem(cmd, gui);

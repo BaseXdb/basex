@@ -1,9 +1,7 @@
 package org.basex.gui;
 
 import static org.basex.gui.GUIConstants.*;
-
 import java.awt.Cursor;
-
 import javax.swing.JFrame;
 import org.basex.core.Context;
 import org.basex.gui.layout.BaseXLayout;
@@ -18,8 +16,8 @@ public abstract class AGUI extends JFrame {
   /** Database Context. */
   public final Context context;
   /** GUI properties. */
-  public final GUIProp prop;
-  
+  public final GUIProp gprop;
+
   /**
    * Default constructor.
    * @param ctx context reference
@@ -30,7 +28,7 @@ public abstract class AGUI extends JFrame {
     setIconImage(BaseXLayout.image("icon"));
     setTitle(title);
     context = ctx;
-    prop = gprops;
+    gprop = gprops;
   }
 
   /**

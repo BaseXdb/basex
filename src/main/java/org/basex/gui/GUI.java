@@ -132,31 +132,27 @@ public final class GUI extends AGUI {
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
-    final int[] ps = prop.nums(GUIProp.GUILOC);
-    final int[] sz = prop.nums(GUIProp.GUISIZE);
+    final int[] ps = gprop.nums(GUIProp.GUILOC);
+    final int[] sz = gprop.nums(GUIProp.GUISIZE);
     final int x = Math.max(0, Math.min(scr.width - sz[0], ps[0]));
     final int y = Math.max(0, Math.min(scr.height - sz[1], ps[1]));
     setBounds(x, y, sz[0], sz[1]);
-    if(prop.is(GUIProp.MAXSTATE)) {
+    if(gprop.is(GUIProp.MAXSTATE)) {
       setExtendedState(MAXIMIZED_HORIZ);
       setExtendedState(MAXIMIZED_VERT);
       setExtendedState(MAXIMIZED_BOTH);
     }
 
-    top = new BaseXBack();
-    top.setLayout(new BorderLayout());
+    top = new BaseXBack(new BorderLayout());
 
     // add header
-    control = new BaseXBack();
-    control.setLayout(new BorderLayout());
-    control.setBorder(0, 0, 0, 1);
+    control = new BaseXBack(new BorderLayout());
 
     // add menu bar
     menu = new GUIMenu(this);
-    if(prop.is(GUIProp.SHOWMENU)) setJMenuBar(menu);
+    if(gprop.is(GUIProp.SHOWMENU)) setJMenuBar(menu);
 
-    buttons = new BaseXBack();
-    buttons.setLayout(new BorderLayout());
+    buttons = new BaseXBack(new BorderLayout());
     toolbar = new GUIToolBar(TOOLBAR, this);
     buttons.add(toolbar, BorderLayout.WEST);
 
@@ -169,23 +165,20 @@ public final class GUI extends AGUI {
     b.add(hits);
 
     buttons.add(b, BorderLayout.EAST);
-    if(prop.is(GUIProp.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
+    if(gprop.is(GUIProp.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
 
-    nav = new BaseXBack();
-    nav.setLayout(new BorderLayout(5, 0));
-    nav.setBorder(2, 2, 0, 2);
+    nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
 
-    mode = new BaseXCombo(
-        new String[] { BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD }, this);
+    mode = new BaseXCombo(this, BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final int s = mode.getSelectedIndex();
-        if(s == prop.num(GUIProp.SEARCHMODE) || !mode.isEnabled()) return;
+        if(s == gprop.num(GUIProp.SEARCHMODE) || !mode.isEnabled()) return;
 
-        prop.set(GUIProp.SEARCHMODE, s);
+        gprop.set(GUIProp.SEARCHMODE, s);
         input.setText("");
         refreshControls();
       }
@@ -208,9 +201,9 @@ public final class GUI extends AGUI {
           }
         };
         final int i = context.data == null ? 2 :
-          prop.num(GUIProp.SEARCHMODE);
-        final String[] hs = i == 0 ? prop.strings(GUIProp.SEARCH) : i == 1 ?
-            prop.strings(GUIProp.XQUERY) : prop.strings(GUIProp.COMMANDS);
+          gprop.num(GUIProp.SEARCHMODE);
+        final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) : i == 1 ?
+            gprop.strings(GUIProp.XQUERY) : gprop.strings(GUIProp.COMMANDS);
         for(final String en : hs) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -220,8 +213,7 @@ public final class GUI extends AGUI {
       }
     });
 
-    b = new BaseXBack();
-    b.setLayout(new BorderLayout(5, 0));
+    b = new BaseXBack(new BorderLayout(5, 0));
     b.add(hist, BorderLayout.WEST);
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
@@ -236,14 +228,13 @@ public final class GUI extends AGUI {
 
     filter = BaseXButton.command(GUICommands.FILTER, this);
 
-    b = new BaseXBack();
-    b.setLayout(new TableLayout(1, 3));
+    b = new BaseXBack(new TableLayout(1, 3));
     b.add(go);
     b.add(Box.createHorizontalStrut(1));
     b.add(filter);
     nav.add(b, BorderLayout.EAST);
 
-    if(prop.is(GUIProp.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
+    if(gprop.is(GUIProp.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
     top.add(control, BorderLayout.NORTH);
 
     // create views
@@ -263,7 +254,7 @@ public final class GUI extends AGUI {
 
     // add status bar
     status = new GUIStatus(this);
-    if(prop.is(GUIProp.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
+    if(gprop.is(GUIProp.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     add(top);
@@ -287,23 +278,23 @@ public final class GUI extends AGUI {
   public void dispose() {
     query.confirm();
     final boolean max = getExtendedState() == MAXIMIZED_BOTH;
-    prop.set(GUIProp.MAXSTATE, max);
+    gprop.set(GUIProp.MAXSTATE, max);
     if(!max) {
-      prop.set(GUIProp.GUILOC, new int[] { getX(), getY() });
-      prop.set(GUIProp.GUISIZE, new int[] { getWidth(), getHeight() });
+      gprop.set(GUIProp.GUILOC, new int[] { getX(), getY() });
+      gprop.set(GUIProp.GUISIZE, new int[] { getWidth(), getHeight() });
     }
     super.dispose();
-    prop.write();
+    gprop.write();
     context.close();
   }
 
   /**
-   * Executes a command, depending on the current input.
+   * Executes the input of the {@link GUIInput} bar.
    */
-  protected void execute() {
+  void execute() {
     final String in = input.getText().trim();
     final boolean db = context.data != null;
-    final boolean cmd = prop.num(GUIProp.SEARCHMODE) == 2 || !db;
+    final boolean cmd = gprop.num(GUIProp.SEARCHMODE) == 2 || !db;
 
     if(cmd || in.startsWith("!")) {
       // run as command: command mode or exclamation mark as first character
@@ -320,10 +311,10 @@ public final class GUI extends AGUI {
           info.reset();
         }
       }
-    } else if(prop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
+    } else if(gprop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
       xquery(in, true);
     } else {
-      execute(new XQuery(Find.find(in, context, prop.is(GUIProp.FILTERRT))),
+      execute(new XQuery(Find.find(in, context, gprop.is(GUIProp.FILTERRT))),
           true);
     }
   }
@@ -346,46 +337,15 @@ public final class GUI extends AGUI {
   /**
    * Launches the specified command in a thread. The command is ignored
    * if an update operation takes place.
-   * @param c command to be launched
-   */
-  public void execute(final Command c) {
-    execute(c, false);
-  }
-
-  /**
-   * Launches the specified command in a thread. The command is ignored
-   * if an update operation takes place.
-   * @param c command to be launched
+   * @param cmd command to be launched
    * @param main call from main window
    */
-  private void execute(final Command c, final boolean main) {
+  public void execute(final Command cmd, final boolean main) {
     if(updating) return;
     new Thread() {
       @Override
-      public void run() { exec(c, main); }
+      public void run() { exec(cmd, main); }
     }.start();
-  }
-
-  /**
-   * Stops the current command.
-   */
-  public void stop() {
-    if(command != null) command.stop();
-    cursor(CURSORARROW, true);
-    command = null;
-  }
-
-  /**
-   * Sets a property.
-   * @param pr property to be set
-   * @param val value
-   */
-  public void set(final Object[] pr, final Object val) {
-    if(!context.prop.sameAs(pr, val)) {
-      final Set cmd = new Set(pr, val);
-      cmd.run(context);
-      info.setInfo(cmd.info(), cmd, null, true);
-    }
   }
 
   /**
@@ -394,8 +354,7 @@ public final class GUI extends AGUI {
    * @param main call from the main input field
    * @return success flag
    */
-  // [CG] GUI: check or merge exec/execute/... references
-  boolean exec(final Command c, final boolean main) {
+ boolean exec(final Command c, final boolean main) {
     final int thread = ++threadID;
 
     // wait when command is still running
@@ -480,10 +439,10 @@ public final class GUI extends AGUI {
           notify.update();
         } else if(result != null) {
           final Nodes nd = context.current;
-          if(nd != null && !nd.sameAs(current) || prop.is(GUIProp.FILTERRT)) {
+          if(nd != null && !nd.sameAs(current) || gprop.is(GUIProp.FILTERRT)) {
             // refresh context if at least one node was found
             if(nodes != null) {
-              notify.context((Nodes) result, prop.is(GUIProp.FILTERRT), null);
+              notify.context((Nodes) result, gprop.is(GUIProp.FILTERRT), null);
             }
           } else if(marked != null) {
             // refresh highlight
@@ -521,6 +480,28 @@ public final class GUI extends AGUI {
     return true;
   }
 
+ /**
+  * Stops the current process.
+  */
+ public void stop() {
+   if(command != null) command.stop();
+   cursor(CURSORARROW, true);
+   command = null;
+ }
+
+ /**
+  * Sets a property and displays the command in the info view.
+  * @param pr property to be set
+  * @param val value
+  */
+ public void set(final Object[] pr, final Object val) {
+   if(!context.prop.sameAs(pr, val)) {
+     final Set cmd = new Set(pr, val);
+     cmd.run(context);
+     info.setInfo(cmd.info(), cmd, null, true);
+   }
+ }
+
   /**
    * Sets the border of the content area.
    */
@@ -529,7 +510,7 @@ public final class GUI extends AGUI {
     final int n2 = top.getComponentCount();
 
     if(n == 0 && n2 == 2) {
-      views.setBorder(0, 0, 0, 0);
+      views.border(0, 0, 0, 0);
     } else {
       views.setBorder(new CompoundBorder(new EmptyBorder(3, 1, 3, 1),
           new EtchedBorder()));
@@ -540,8 +521,7 @@ public final class GUI extends AGUI {
    * Refreshes the layout.
    */
   public void updateLayout() {
-    init(prop);
-    repaint();
+    init(gprop);
     notify.layout();
   }
 
@@ -589,19 +569,19 @@ public final class GUI extends AGUI {
 
     filter.setEnabled(marked != null && marked.size() != 0);
 
-    final boolean inf = prop.is(GUIProp.SHOWINFO);
+    final boolean inf = gprop.is(GUIProp.SHOWINFO);
     context.prop.set(Prop.QUERYINFO, inf);
     context.prop.set(Prop.XMLPLAN, inf);
 
     final Data data = context.data;
     final boolean db = data != null;
     final int t = mode.getSelectedIndex();
-    final int s = !db ? 2 : prop.num(GUIProp.SEARCHMODE);
+    final int s = !db ? 2 : gprop.num(GUIProp.SEARCHMODE);
 
     input.help(s == 0 ? data.fs != null ? HELPSEARCHFS : HELPSEARCHXML :
       s == 1 ? HELPXPATH : HELPCMD);
     mode.setEnabled(db);
-    go.setEnabled(s == 2 || !prop.is(GUIProp.EXECRT));
+    go.setEnabled(s == 2 || !gprop.is(GUIProp.EXECRT));
 
     if(s != t) {
       mode.setSelectedIndex(s);
@@ -612,9 +592,9 @@ public final class GUI extends AGUI {
     toolbar.refresh();
     menu.refresh();
 
-    final int i = context.data == null ? 2 : prop.num(GUIProp.SEARCHMODE);
-    final String[] hs = i == 0 ? prop.strings(GUIProp.SEARCH) : i == 1 ?
-        prop.strings(GUIProp.XQUERY) : prop.strings(GUIProp.COMMANDS);
+    final int i = context.data == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
+    final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) : i == 1 ?
+        gprop.strings(GUIProp.XQUERY) : gprop.strings(GUIProp.COMMANDS);
     hist.setEnabled(hs.length != 0);
   }
 
@@ -622,7 +602,7 @@ public final class GUI extends AGUI {
    * Sets hits information.
    * @param n number of hits
    */
-  public void setHits(final long n) {
+  private void setHits(final long n) {
     hits.setText(n + " " + HITS);
   }
 
@@ -640,7 +620,7 @@ public final class GUI extends AGUI {
    */
   public void fullscreen(final boolean full) {
     if(full ^ fullscr == null) {
-      if(!prop.is(GUIProp.SHOWMENU)) GUICommands.SHOWMENU.execute(this);
+      if(!gprop.is(GUIProp.SHOWMENU)) GUICommands.SHOWMENU.execute(this);
       return;
     }
 
@@ -661,18 +641,18 @@ public final class GUI extends AGUI {
       fullscr.removeAll();
       fullscr.dispose();
       fullscr = null;
-      if(!prop.is(GUIProp.SHOWBUTTONS))
+      if(!gprop.is(GUIProp.SHOWBUTTONS))
         control.add(buttons, BorderLayout.CENTER);
-      if(!prop.is(GUIProp.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
-      if(!prop.is(GUIProp.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
+      if(!gprop.is(GUIProp.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
+      if(!gprop.is(GUIProp.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
       setJMenuBar(menu);
       add(top);
     }
 
-    prop.set(GUIProp.SHOWMENU, !full);
-    prop.set(GUIProp.SHOWBUTTONS, !full);
-    prop.set(GUIProp.SHOWINPUT, !full);
-    prop.set(GUIProp.SHOWSTATUS, !full);
+    gprop.set(GUIProp.SHOWMENU, !full);
+    gprop.set(GUIProp.SHOWBUTTONS, !full);
+    gprop.set(GUIProp.SHOWINPUT, !full);
+    gprop.set(GUIProp.SHOWSTATUS, !full);
     fullscreen = full;
 
     GraphicsEnvironment.getLocalGraphicsEnvironment().

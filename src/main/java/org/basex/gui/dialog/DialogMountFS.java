@@ -62,7 +62,7 @@ public final class DialogMountFS extends Dialog {
    */
   public DialogMountFS(final GUI main) {
     super(main, OPENMOUNTTITLE);
-    final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.gprop;
 
     // create database chooser
     final StringList db = List.listFS(main.context);
@@ -72,31 +72,26 @@ public final class DialogMountFS extends Dialog {
     set(choice, BorderLayout.CENTER);
     choice.setSize(130, 420);
 
-    final BaseXBack info = new BaseXBack();
-    info.setLayout(new BorderLayout());
+    final BaseXBack info = new BaseXBack(new BorderLayout());
     info.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(10,
         10, 10, 10)));
 
     final Font f = choice.getFont();
-    doc = new BaseXLabel(DIALOGINFO);
+    doc = new BaseXLabel(DIALOGINFO).border(0, 0, 2, 0);
     doc.setFont(f.deriveFont(f.getSize2D() + 7f));
-    doc.setBorder(0, 0, 2, 0);
     info.add(doc, BorderLayout.NORTH);
 
     detail = new BaseXText(false, this);
-    detail.setFont(f);
-    detail.setBorder(5, 5, 5, 5);
+    detail.border(5, 5, 5, 5).setFont(f);
     BaseXLayout.setWidth(detail, 420);
     info.add(detail, BorderLayout.CENTER);
 
     // -- mount panel
-    final BaseXBack m = new BaseXBack();
-    m.setLayout(new TableLayout(3, 2, 0, 0));
-    m.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5,
-        5, 5)));
-    final BaseXLabel lab = new BaseXLabel("Using mount point: ", false, true);
-    lab.setBorder(5, 5, 5, 0);
-    m.add(lab);
+    final BaseXBack m = new BaseXBack(new TableLayout(3, 2, 0, 0));
+    m.setBorder(new CompoundBorder(new EtchedBorder(),
+        new EmptyBorder(5, 5, 5, 5)));
+    m.add(new BaseXLabel("Using mount point: ", false, true).border(
+        5, 5, 5, 0));
     m.add(new BaseXLabel());
     mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT), this);
     mountpoint.addKeyListener(keys);
@@ -112,21 +107,17 @@ public final class DialogMountFS extends Dialog {
       }
     });
     m.add(browse);
-    warn = new BaseXLabel(" ");
-    warn.setBorder(5, 5, 0, 0);
+    warn = new BaseXLabel(" ").border(5, 5, 0, 0);
     m.add(warn);
     info.add(m, BorderLayout.SOUTH);
 
-    final BaseXBack pp = new BaseXBack();
-    pp.setBorder(0, 12, 0, 0);
-    pp.setLayout(new BorderLayout());
+    final BaseXBack pp = new BaseXBack(new BorderLayout()).border(0, 12, 0, 0);
     pp.add(info, BorderLayout.CENTER);
 
     // create buttons
     mount = new BaseXButton(BUTTONMOUNT, this);
     buttons = newButtons(this, mount, BUTTONCANCEL);
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new BorderLayout());
+    final BaseXBack p = new BaseXBack(new BorderLayout());
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
 
