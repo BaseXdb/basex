@@ -125,8 +125,8 @@ final class FTTrie extends FTIndex {
    */
   private synchronized FTIndexIterator get(final int id,
       final byte[] sn, final boolean f) {
-    if(sn == null || sn.length == 0) return FTIndexIterator.EMP;
 
+if(sn == null || sn.length == 0) return FTIndexIterator.EMP;
     final int[] ne = nodeId(id, sn);
     return ne == null ? FTIndexIterator.EMP :
       iter(did, ne[ne.length - 1], inB, f);

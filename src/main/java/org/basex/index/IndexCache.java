@@ -4,12 +4,12 @@ import java.util.Arrays;
 import org.basex.util.TokenSet;
 
 /**
- * This class caches sizes and pointers from full-text results.
+ * This class caches sizes and pointers from index results.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  */
-final class FTTokenMap extends TokenSet {
+final class IndexCache extends TokenSet {
   /** Number of position values. */
   private int[] sizes = new int[CAP];
   /** Pointer on token data. */

@@ -21,7 +21,7 @@ final class ValueMerge {
   /** Data reference. */
   private final Data data;
   /** Index instance. */
-  private final Values v;
+  private final DiskValues v;
 
   /** Current token. */
   byte[] token;
@@ -38,7 +38,7 @@ final class ValueMerge {
   ValueMerge(final Data d, final boolean txt, final int i) throws IOException {
     pref = (txt ? DATATXT : DATAATV) + i;
     di = new DataInput(d.meta.file(pref + 't'));
-    v = new Values(d, txt, pref);
+    v = new DiskValues(d, txt, pref);
     data = d;
     next();
   }

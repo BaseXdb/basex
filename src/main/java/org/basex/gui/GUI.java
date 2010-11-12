@@ -23,7 +23,6 @@ import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
-import org.basex.core.Text;
 import org.basex.core.cmd.Find;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
@@ -67,6 +66,8 @@ public final class GUI extends AGUI {
   /** View Manager. */
   public final ViewNotifier notify;
 
+  /** Status line. */
+  public final GUIStatus status;
   /** Input field. */
   public final GUIInput input;
   /** Filter button. */
@@ -126,7 +127,7 @@ public final class GUI extends AGUI {
    * @param gprops gui properties
    */
   public GUI(final Context ctx, final GUIProp gprops) {
-    super(ctx, gprops, Text.TITLE);
+    super(ctx, gprops);
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
@@ -251,6 +252,7 @@ public final class GUI extends AGUI {
     setContentBorder();
 
     // add status bar
+    status = new GUIStatus(this);
     if(gprop.is(GUIProp.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

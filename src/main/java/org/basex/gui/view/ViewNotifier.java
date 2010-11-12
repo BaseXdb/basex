@@ -3,7 +3,6 @@ package org.basex.gui.view;
 import static org.basex.core.Text.*;
 import java.awt.Window;
 import org.basex.core.Context;
-import org.basex.core.Text;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
@@ -90,7 +89,7 @@ public final class ViewNotifier {
     maxhist = 0;
     for(final View v : view) v.refreshInit();
     gui.layoutViews();
-    gui.setTitle(Text.TITLE + (db ? " - " + data.meta.name : ""));
+    gui.setTitle(db ? data.meta.name : null);
   }
 
   /**

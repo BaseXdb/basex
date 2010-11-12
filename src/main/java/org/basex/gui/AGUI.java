@@ -4,6 +4,7 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.Cursor;
 import javax.swing.JFrame;
 import org.basex.core.Context;
+import org.basex.core.Text;
 import org.basex.gui.layout.BaseXLayout;
 
 /**
@@ -17,22 +18,25 @@ public abstract class AGUI extends JFrame {
   public final Context context;
   /** GUI properties. */
   public final GUIProp gprop;
-  /** Status line. */
-  public final GUIStatus status = new GUIStatus(this);
 
   /**
    * Default constructor.
    * @param ctx context reference
    * @param gprops gui properties
-   * @param title window title
    */
-  protected AGUI(final Context ctx, final GUIProp gprops, final String title) {
+  protected AGUI(final Context ctx, final GUIProp gprops) {
     setIconImage(BaseXLayout.image("icon"));
-    setTitle(title);
+    setTitle(null);
     context = ctx;
     gprop = gprops;
   }
 
+  @Override
+  public void setTitle(final String title) {
+    final String t = title == null || title.isEmpty() ? "" : " - " + title;
+    super.setTitle(Text.TITLE + t);
+  }
+  
   /**
    * Sets a cursor.
    * @param c cursor to be set

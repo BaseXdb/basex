@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Values implements Index {
+public final class DiskValues implements Index {
   /** Number of hash entries. */
   private final int size;
   /** ID references. */
@@ -30,7 +30,7 @@ public final class Values implements Index {
   /** Values file. */
   private final Data data;
   /** Cache tokens. */
-  private final FTTokenMap cache = new FTTokenMap();
+  private final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
   private final byte[][] ctext;
 
@@ -40,7 +40,7 @@ public final class Values implements Index {
    * @param txt value type (texts/attributes)
    * @throws IOException IO Exception
    */
-  public Values(final Data d, final boolean txt) throws IOException {
+  public DiskValues(final Data d, final boolean txt) throws IOException {
     this(d, txt, txt ? DATATXT : DATAATV);
   }
 
@@ -51,7 +51,8 @@ public final class Values implements Index {
    * @param pre file prefix
    * @throws IOException IO Exception
    */
-  Values(final Data d, final boolean txt, final String pre) throws IOException {
+  DiskValues(final Data d, final boolean txt, final String pre)
+      throws IOException {
     data = d;
     text = txt;
     idxl = new DataAccess(d.meta.file(pre + 'l'));

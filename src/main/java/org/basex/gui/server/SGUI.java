@@ -5,15 +5,12 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.WindowConstants;
-
 import org.basex.core.Context;
-import org.basex.core.Text;
 import org.basex.gui.AGUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -44,7 +41,7 @@ public class SGUI extends AGUI {
    * @param gprops gui properties
    */
   public SGUI(final Context ctx, final GUIProp gprops) {
-    super(ctx, gprops, Text.TITLE);
+    super(ctx, gprops);
     
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();

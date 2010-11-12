@@ -175,7 +175,7 @@ public final class GUIProp extends AProp {
    * Constructor.
    */
   public GUIProp() {
-    super("win");
+    super("gui");
     files(null);
   }
 

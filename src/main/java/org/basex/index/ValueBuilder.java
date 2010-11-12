@@ -55,7 +55,7 @@ public final class ValueBuilder extends IndexBuilder {
   }
 
   @Override
-  public Values build() throws IOException {
+  public DiskValues build() throws IOException {
     // delete old index
     abort();
 
@@ -98,7 +98,7 @@ public final class ValueBuilder extends IndexBuilder {
     else data.meta.atvindex = true;
 
     Util.gc(perf);
-    return new Values(data, text);
+    return new DiskValues(data, text);
   }
 
   /**

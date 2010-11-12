@@ -7,7 +7,7 @@ import org.basex.index.FTIndex;
 import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.Names;
-import org.basex.index.Values;
+import org.basex.index.DiskValues;
 import org.basex.io.DataAccess;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
@@ -56,8 +56,8 @@ public final class DiskData extends Data {
 
       // open data and indexes..
       init();
-      if(meta.txtindex) txtindex = new Values(this, true);
-      if(meta.atvindex) atvindex = new Values(this, false);
+      if(meta.txtindex) txtindex = new DiskValues(this, true);
+      if(meta.atvindex) atvindex = new DiskValues(this, false);
       if(meta.ftxindex) ftxindex = FTIndex.get(this, meta.wildcards);
     } catch(final IOException ex) {
       throw ex;

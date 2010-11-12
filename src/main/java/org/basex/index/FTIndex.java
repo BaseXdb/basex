@@ -14,7 +14,7 @@ import org.basex.util.IntList;
  */
 public abstract class FTIndex implements Index {
   /** Cache for number of hits and data reference per token. */
-  final FTTokenMap cache = new FTTokenMap();
+  final IndexCache cache = new IndexCache();
   /** Values file. */
   final Data data;
   /** Scoring mode. 1 = document based, 2 = textnode based .*/
