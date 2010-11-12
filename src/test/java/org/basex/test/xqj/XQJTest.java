@@ -425,6 +425,7 @@ public final class XQJTest extends TestCase {
     xqe.bindNode(new QName("v"), document, null);
     xqs = xqe.executeQuery("declare variable $v external; $v");
     while(xqs.next()) xqs.getNode();
+    conn.close();
   }
 
   /**
@@ -439,6 +440,7 @@ public final class XQJTest extends TestCase {
     final XQItemType type = conn.createAtomicType(
         XQItemType.XQBASETYPE_STRING);
     expr.bindAtomicValue(new QName("v"), "A", type);
+    conn.close();
   }
 
   /**
@@ -457,6 +459,7 @@ public final class XQJTest extends TestCase {
     xqe = conn.createExpression();
     xqe.bindItem(new QName("v"), xqi);
     xqe.executeQuery("declare variable $v external; $v");
+    conn.close();
   }
 
   /**
@@ -486,6 +489,7 @@ public final class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     expr.executeQuery("declare variable $x := 1; $x");
+    conn.close();
   }
 
   /**

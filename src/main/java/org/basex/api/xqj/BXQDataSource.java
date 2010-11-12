@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
-
+import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.util.Util;
 
@@ -18,22 +18,26 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class BXQDataSource implements XQDataSource {
-  /** User key. */
-  private static final String USER = "user";
-  /** Password key. */
-  private static final String PASSWORD = "password";
   /** Log output (currently ignored). */
   private PrintWriter log;
   /** User. */
-  private String user = Text.ADMIN;
-  /** Password. */
-  private String password = Text.ADMIN;
+  private Properties props = new Properties();
   /** Timeout. */
   private int timeout;
 
+  /**
+   * Default constructor.
+   */
+  public BXQDataSource() {
+    props.setProperty(USER, Text.ADMIN);
+    props.setProperty(PASSWORD, Text.ADMIN);
+    props.setProperty(SERVERNAME, Prop.HOST[1].toString());
+    props.setProperty(PORT, Prop.PORT[1].toString());
+  }
+  
   @Override
   public BXQConnection getConnection() throws XQException {
-    return getConnection(user, password);
+    return getConnection(props.getProperty(USER), props.getProperty(PASSWORD));
   }
 
   @Override
@@ -59,9 +63,9 @@ public final class BXQDataSource implements XQDataSource {
 
   @Override
   public String getProperty(final String key) throws XQException {
-    if(USER.equals(key)) return user;
-    if(PASSWORD.equals(key)) return password;
-    throw new BXQException(PROPS);
+    final String val = key != null ? props.getProperty(key) : null;
+    if(val == null) throw new BXQException(PROPS);
+    return val;
   }
 
   @Override
@@ -90,8 +94,8 @@ public final class BXQDataSource implements XQDataSource {
   @Override
   public void setProperty(final String key, final String val)
       throws XQException {
-    if(USER.equals(key)) user = val;
-    else if(PASSWORD.equals(key)) password = val;
-    else throw new BXQException(PROPS, key);
+    
+    getProperty(key);
+    props.setProperty(key, val);
   }
 }

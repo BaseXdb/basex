@@ -56,6 +56,7 @@ abstract class BXQAbstract {
    */
   @SuppressWarnings("unused")
   public void close() throws XQException {
+    if(!closed) ctx.context.close();
     closed = true;
   }
 
@@ -182,7 +183,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  protected final DBNode createDB(final Source s, final XQItemType it)
+  protected final DBNode createNode(final Source s, final XQItemType it)
       throws XQException {
 
     valid(s, Source.class);
@@ -232,7 +233,7 @@ abstract class BXQAbstract {
   private DBNode createNode(final SAXSource s) throws XQException {
     opened();
     try {
-      return checkDB(CreateDB.xml(s, ctx.context));
+      return checkNode(CreateDB.xml(s, ctx.context));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -249,7 +250,7 @@ abstract class BXQAbstract {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
-      return checkDB(CreateDB.xml(new XMLStreamWrapper(sr), ctx.context));
+      return checkNode(CreateDB.xml(new XMLStreamWrapper(sr), ctx.context));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -263,7 +264,7 @@ abstract class BXQAbstract {
    */
   protected final DBNode createNode(final IO io) throws BXQException {
     try {
-      return checkDB(CreateDB.xml(io, ctx.context));
+      return checkNode(CreateDB.xml(io, ctx.context));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -292,7 +293,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws BXQException exception
    */
-  private DBNode checkDB(final Data d) throws BXQException {
+  private DBNode checkNode(final Data d) throws BXQException {
     valid(d, Data.class);
     return new DBNode(d, 0);
   }

@@ -49,7 +49,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
    * @throws XQException exception
    */
   BXQItem(final Item item) throws XQException {
-    this(item, new BXQDataFactory(), null);
+    this(item, new BXQDataFactory(null, null), null);
   }
 
   /**

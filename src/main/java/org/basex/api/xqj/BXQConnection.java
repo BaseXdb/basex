@@ -97,8 +97,7 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
     opened();
     valid(sc, XQStaticContext.class);
     valid(query, String.class);
-    final BXQStaticContext bsc = (BXQStaticContext) sc;
-    return new BXQPreparedExpression(query, bsc, this);
+    return new BXQPreparedExpression(query, (BXQStaticContext) sc, this);
   }
 
   @Override

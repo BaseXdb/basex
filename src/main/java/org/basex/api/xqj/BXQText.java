@@ -10,6 +10,15 @@ interface BXQText {
   /** Java XQuery API version. */
   String VERSION = "1.0";
 
+  /** Connection property. */
+  String USER = "user";
+  /** Connection property. */
+  String PASSWORD = "password";
+  /** Connection property. */
+  String SERVERNAME = "serverName";
+  /** Connection property. */
+  String PORT = "port";
+  
   /** Error message. */
   String CLOSED = " has been closed.";
   /** Error message. */

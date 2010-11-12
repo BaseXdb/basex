@@ -105,7 +105,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   @Override
   public void bindDocument(final QName qn, final Source s, final XQItemType t)
       throws XQException {
-    bind(qn, createDB(s, t), t);
+    bind(qn, createNode(s, t), t);
   }
 
   @Override

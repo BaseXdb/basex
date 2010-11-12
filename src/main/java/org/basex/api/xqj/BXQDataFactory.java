@@ -39,14 +39,6 @@ import org.w3c.dom.ls.LSOutput;
  */
 class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   /**
-   * Constructor.
-   * @throws XQException if authentication fails
-   */
-  protected BXQDataFactory() throws XQException {
-    this(null, null);
-  }
-
-  /**
    * Constructor, specifying a user name and password.
    * @param name user name
    * @param pw password
@@ -185,7 +177,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   @Override
   public BXQItem createItemFromDocument(final Source s, final XQItemType it)
       throws XQException {
-    return new BXQItem(createDB(s, it));
+    return new BXQItem(createNode(s, it));
   }
 
   @Override

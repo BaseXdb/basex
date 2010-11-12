@@ -54,7 +54,7 @@ final class BXQStaticContext implements XQStaticContext {
         throw new BXQException(DENIED, name);
     }
     ctx = new QueryContext(context);
-  }
+ }
 
   @Override
   public void declareNamespace(final String prefix, final String uri)
