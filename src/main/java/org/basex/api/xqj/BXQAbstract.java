@@ -188,48 +188,48 @@ abstract class BXQAbstract {
     valid(s, Source.class);
     check(Type.DOC, it);
     if(s instanceof SAXSource) {
-      return createDB((SAXSource) s);
+      return createNode((SAXSource) s);
     } else if(s instanceof StreamSource) {
       final StreamSource ss = (StreamSource) s;
       final InputStream is = ss.getInputStream();
-      if(is != null) return createDB(is);
+      if(is != null) return createNode(is);
       final Reader r = ss.getReader();
-      if(r != null) return createDB(r);
-      return createDB(IO.get(ss.getSystemId()));
+      if(r != null) return createNode(r);
+      return createNode(IO.get(ss.getSystemId()));
     }
     Util.notimplemented();
     return null;
   }
 
   /**
-   * Creates a database instance from the specified byte array.
+   * Creates a database node from the specified byte array.
    * @param is input stream
    * @return document node
    * @throws XQException exception
    */
-  protected final DBNode createDB(final InputStream is) throws XQException {
+  protected final DBNode createNode(final InputStream is) throws XQException {
     valid(is, InputStream.class);
-    return createDB(new SAXSource(new InputSource(is)));
+    return createNode(new SAXSource(new InputSource(is)));
   }
 
   /**
-   * Creates a database instance from the specified byte array.
+   * Creates a database node from the specified byte array.
    * @param r reader
    * @return document node
    * @throws XQException exception
    */
-  protected final DBNode createDB(final Reader r) throws XQException {
+  protected final DBNode createNode(final Reader r) throws XQException {
     valid(r, Reader.class);
-    return createDB(new SAXSource(new InputSource(r)));
+    return createNode(new SAXSource(new InputSource(r)));
   }
 
   /**
-   * Creates a database instance from the specified byte array.
+   * Creates a database node from the specified byte array.
    * @param s SAX source
    * @return document node
    * @throws XQException exception
    */
-  private DBNode createDB(final SAXSource s) throws XQException {
+  private DBNode createNode(final SAXSource s) throws XQException {
     opened();
     try {
       return checkDB(CreateDB.xml(s, ctx.context));
@@ -239,12 +239,13 @@ abstract class BXQAbstract {
   }
 
   /**
-   * Creates a database instance from the specified xml reader.
+   * Creates a database node from the specified xml reader.
    * @param sr xml stream reader
    * @return document node
    * @throws XQException exception
    */
-  protected final DBNode createDB(final XMLStreamReader sr) throws XQException {
+  protected final DBNode createNode(final XMLStreamReader sr)
+      throws XQException {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
@@ -260,7 +261,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws BXQException exception
    */
-  protected final DBNode createDB(final IO io) throws BXQException {
+  protected final DBNode createNode(final IO io) throws BXQException {
     try {
       return checkDB(CreateDB.xml(io, ctx.context));
     } catch(final IOException ex) {

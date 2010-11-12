@@ -172,14 +172,14 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQItem createItemFromDocument(final InputStream is,
       final String base, final XQItemType it) throws XQException {
     check(Type.DOC, it);
-    return new BXQItem(createDB(is));
+    return new BXQItem(createNode(is));
   }
 
   @Override
   public BXQItem createItemFromDocument(final Reader r, final String base,
       final XQItemType it) throws XQException {
     check(Type.DOC, it);
-    return new BXQItem(createDB(r));
+    return new BXQItem(createNode(r));
   }
 
   @Override
@@ -193,14 +193,14 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       final XQItemType it) throws XQException {
     valid(v, String.class);
     check(Type.DOC, it);
-    return new BXQItem(createDB(new IOContent(Token.token(v))));
+    return new BXQItem(createNode(new IOContent(Token.token(v))));
   }
 
   @Override
   public BXQItem createItemFromDocument(final XMLStreamReader sr,
       final XQItemType it) throws XQException {
     check(Type.DOC, it);
-    return new BXQItem(createDB(sr));
+    return new BXQItem(createNode(sr));
   }
 
   @Override
@@ -248,7 +248,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     } catch(final Exception ex) {
       Util.stack(ex);
     }
-    return new BXQItem(createDB(new IOContent(ba.toByteArray())));
+    return new BXQItem(createNode(new IOContent(ba.toByteArray())));
   }
 
   @Override

@@ -93,13 +93,13 @@ abstract class BXQDynamicContext extends BXQAbstract
   @Override
   public void bindDocument(final QName qn, final InputStream is,
       final String base, final XQItemType t) throws XQException {
-    bind(qn, createDB(is), t);
+    bind(qn, createNode(is), t);
   }
 
   @Override
   public void bindDocument(final QName qn, final Reader r, final String base,
       final XQItemType t) throws XQException {
-    bind(qn, createDB(r), t);
+    bind(qn, createNode(r), t);
   }
 
   @Override
@@ -112,13 +112,13 @@ abstract class BXQDynamicContext extends BXQAbstract
   public void bindDocument(final QName qn, final String v, final String base,
       final XQItemType t) throws XQException {
     valid(v, String.class);
-    bind(qn, createDB(new IOContent(Token.token(v))), t);
+    bind(qn, createNode(new IOContent(Token.token(v))), t);
   }
 
   @Override
   public void bindDocument(final QName qn, final XMLStreamReader sr,
       final XQItemType t) throws XQException {
-    bind(qn, createDB(sr), t);
+    bind(qn, createNode(sr), t);
   }
 
   @Override

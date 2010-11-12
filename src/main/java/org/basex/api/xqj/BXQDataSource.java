@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Properties;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
+
+import org.basex.core.Text;
 import org.basex.util.Util;
 
 /**
@@ -16,14 +18,22 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class BXQDataSource implements XQDataSource {
+  /** User key. */
+  private static final String USER = "user";
+  /** Password key. */
+  private static final String PASSWORD = "password";
   /** Log output (currently ignored). */
   private PrintWriter log;
+  /** User. */
+  private String user = Text.ADMIN;
+  /** Password. */
+  private String password = Text.ADMIN;
   /** Timeout. */
   private int timeout;
 
   @Override
   public BXQConnection getConnection() throws XQException {
-    return getConnection(null, null);
+    return getConnection(user, password);
   }
 
   @Override
@@ -49,12 +59,14 @@ public final class BXQDataSource implements XQDataSource {
 
   @Override
   public String getProperty(final String key) throws XQException {
+    if(USER.equals(key)) return user;
+    if(PASSWORD.equals(key)) return password;
     throw new BXQException(PROPS);
   }
 
   @Override
   public String[] getSupportedPropertyNames() {
-    return new String[] {};
+    return new String[] { USER, PASSWORD };
   }
 
   @Override
@@ -78,6 +90,8 @@ public final class BXQDataSource implements XQDataSource {
   @Override
   public void setProperty(final String key, final String val)
       throws XQException {
-    throw new BXQException(PROPS, key);
+    if(USER.equals(key)) user = val;
+    else if(PASSWORD.equals(key)) password = val;
+    else throw new BXQException(PROPS, key);
   }
 }
