@@ -438,6 +438,12 @@ public enum FunDef {
       "copy(source, destination, overwrite?)", ITEM_Z),
   /** XQuery function */
   MOVE(FILEURI, FNFile.class, 2, 2, "move(source, destination)", ITEM_Z),
+  
+  /* FNHttp functions */
+  
+  /** XQuery function */
+  SENDREQUEST(HTTPURI, FNHttp.class, 1, 2,
+      "send-request(request, href?)", ITEM_OM),
 
   /* FNBaseX functions. */
 

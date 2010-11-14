@@ -121,7 +121,7 @@ public final class Bln extends Item {
    * @return result of check
    * @throws QueryException query exception
    */
-  static boolean parse(final byte[] str, final InputInfo ii)
+  public static boolean parse(final byte[] str, final InputInfo ii)
       throws QueryException {
 
     final byte[] s = Token.trim(str);

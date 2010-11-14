@@ -26,6 +26,7 @@ public final class NSGlobal {
     NS.add(DB, DBURI);
     NS.add(SENT, SENTURI);
     NS.add(FILE, FILEURI);
+    NS.add(HTTP, HTTPURI);
   }
 
   /** Private constructor. */

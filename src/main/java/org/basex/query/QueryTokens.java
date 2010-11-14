@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.util.Token.*;
+
 import org.basex.core.Text;
 
 /**
@@ -372,6 +373,8 @@ public interface QueryTokens {
   byte[] DBURI = token(Text.URL + "/db");
   /** File module URI. */
   byte[] FILEURI = token(Text.URL + "/file");
+  /** HTTP Client URI. */
+  byte[] HTTPURI = token(Text.URL + "/http");
   /** Sentiment URI.*/
   byte[] SENTURI = token(Text.URL + "/sent");
 
@@ -427,6 +430,8 @@ public interface QueryTokens {
   byte[] LOCAL = token("local");
   /** File module token. */
   byte[] FILE = token("file");
+  /** HTTP Client token. */
+  byte[] HTTP = token("http");
   /** Sentiment token. */
   byte[] SENT = token("sent");
 

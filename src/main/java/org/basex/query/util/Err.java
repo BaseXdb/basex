@@ -136,6 +136,19 @@ public enum Err {
   COPYFAILED(FOFL, 16, "Copying from '%' to '%' failed: %."),
   /** FOFL0017: Evaluation exception. */
   ENCNOTEXISTS(FOFL, 17, "The encoding '%' is not supported."),
+  
+  /** FOHC0001: Evaluation exception. */
+  URLINV(FOHC, 1, "Invalid URL."),
+  /** FOHC0002: Evaluation exception. */
+  PROTINV(FOHC, 2, "The requested method is not valid for HTTP."),
+  /** FOHC0003: Evaluation exception. */
+  CONNERR(FOHC, 3, "Connection to '%' cannot be opened."),
+  /** FOHC0004: Evaluation exception. */
+  REQINV(FOHC, 4, "The request element is not valid. "),
+  /** FOHC0005: Evaluation exception. */
+  HTTPERR(FOHC, 5, "An HTTP error occurred: %."),
+  /** FOHC0006: Evaluation exception. */
+  CREDSERR(FOHC, 6, "Provide valid credentials."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
@@ -644,6 +657,7 @@ public enum Err {
     /** FODT Error type. */ FODT,
     /** FOER Error type. */ FOER,
     /** FOFL Error type. */ FOFL,
+    /** FOHP Error type. */ FOHC,
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,
