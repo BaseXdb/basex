@@ -18,7 +18,7 @@ interface BXQText {
   String SERVERNAME = "serverName";
   /** Connection property. */
   String PORT = "port";
-  
+
   /** Error message. */
   String CLOSED = " has been closed.";
   /** Error message. */

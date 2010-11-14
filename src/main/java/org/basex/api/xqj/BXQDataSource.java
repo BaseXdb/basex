@@ -34,7 +34,7 @@ public final class BXQDataSource implements XQDataSource {
     props.setProperty(SERVERNAME, Prop.HOST[1].toString());
     props.setProperty(PORT, Prop.PORT[1].toString());
   }
-  
+
   @Override
   public BXQConnection getConnection() throws XQException {
     return getConnection(props.getProperty(USER), props.getProperty(PASSWORD));
@@ -94,7 +94,7 @@ public final class BXQDataSource implements XQDataSource {
   @Override
   public void setProperty(final String key, final String val)
       throws XQException {
-    
+
     getProperty(key);
     props.setProperty(key, val);
   }
