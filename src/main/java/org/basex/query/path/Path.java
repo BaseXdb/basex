@@ -59,7 +59,7 @@ public abstract class Path extends ParseExpr {
     throws QueryException;
 
   /**
-   * Returns the root of the current context, or null.
+   * Returns the root of the current context or {@code null}.
    * @param ctx query context
    * @return root
    */

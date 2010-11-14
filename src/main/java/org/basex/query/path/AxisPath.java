@@ -243,8 +243,8 @@ public class AxisPath extends Path {
   }
 
   /**
-   * Returns all summary path nodes for the specified location step or null
-   * if nodes cannot be retrieved or are found on different levels.
+   * Returns all summary path nodes for the specified location step or
+   * {@code null} if nodes cannot be retrieved or are found on different levels.
    * @param data data reference
    * @param l last step to be checked
    * @return path nodes

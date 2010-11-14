@@ -1066,7 +1066,10 @@ public class QueryParser extends InputParser {
     final Expr e = range();
 
     final int p = qp;
-    if(!consumeWS(CONTAINS) || !consumeWS(TEXT)) {
+    // use "=>" as shortcut for full-text expressions
+    if(consume('=') && consume('>')) {
+      skipWS();
+    } else if(!consumeWS(CONTAINS) || !consumeWS(TEXT)) {
       qp = p;
       return e;
     }
@@ -1860,7 +1863,7 @@ public class QueryParser extends InputParser {
   /**
    * Returns a string item.
    * @param tb token builder
-   * @return text or null reference
+   * @return text or {@code null}
    */
   private Str text(final TokenBuilder tb) {
     final byte[] t = tb.finish();
@@ -1955,7 +1958,7 @@ public class QueryParser extends InputParser {
    * Consumes the specified expression or resets the query position.
    * @param expr expression
    * @param p query position
-   * @return expression or null
+   * @return expression or {@code null}
    */
   private Expr consume(final Expr expr, final int p) {
     if(expr == null) qp = p;

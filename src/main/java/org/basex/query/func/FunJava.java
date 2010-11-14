@@ -138,7 +138,7 @@ public final class FunJava extends Arr {
    * @param params parameters
    * @param args arguments
    * @param stat static flag
-   * @return argument array or null
+   * @return argument array or {@code null}
    */
   private Object[] args(final Class<?>[] params, final Value[] args,
       final boolean stat) {

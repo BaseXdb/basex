@@ -36,7 +36,7 @@ public abstract class AGUI extends JFrame {
     final String t = title == null || title.isEmpty() ? "" : " - " + title;
     super.setTitle(Text.TITLE + t);
   }
-  
+
   /**
    * Sets a cursor.
    * @param c cursor to be set

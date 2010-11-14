@@ -71,7 +71,7 @@ final class DialogFT extends BaseXBack {
     add(new BaseXLabel(FTINDEXINFO, true, false));
 
     final String sw = prop.get(Prop.STOPWORDS);
-    final String[] cb = { CREATELANG, CREATEWC, CREATESTEM, CREATECS,
+    final String[] cb = { CREATELN, CREATEWC, CREATEST, CREATECS,
         CREATEDC, CREATESCT, CREATESW };
     final String[] desc = { FTLANGINFO, WCINDEXINFO, FTSTEMINFO, FTCSINFO,
         FTDCINFO, FTSCINFO, FTSWINFO };

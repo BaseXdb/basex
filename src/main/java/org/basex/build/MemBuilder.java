@@ -25,7 +25,7 @@ public final class MemBuilder extends Builder {
   }
 
   /**
-   * Builds the main-memory database instance without database name.
+   * Builds the main memory database instance without database name.
    * @param parser parser
    * @param prop properties
    * @return data database instance
@@ -37,7 +37,7 @@ public final class MemBuilder extends Builder {
   }
 
   /**
-   * Builds a main-memory database instance.
+   * Builds a main memory database instance.
    * @param parser parser
    * @param prop properties
    * @param name name of database
@@ -54,7 +54,7 @@ public final class MemBuilder extends Builder {
     data = new MemData(tags, atts, ns, path, prop);
     meta = data.meta;
     meta.name = name;
-    // all contents will be indexed in main-memory mode
+    // all contents will be indexed in main memory mode
     meta.txtindex = true;
     meta.atvindex = true;
     meta.ftxindex = false;

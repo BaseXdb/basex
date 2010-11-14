@@ -918,7 +918,7 @@ public enum Type {
    * Finds and returns the specified data type.
    * @param type type as string
    * @param atom atomic type
-   * @return type or null
+   * @return type or {@code null}
    */
   public static Type find(final QNm type, final boolean atom) {
     // type must be atomic, or must not have a namespace
@@ -937,7 +937,7 @@ public enum Type {
   /**
    * Finds and returns the specified node type.
    * @param type type as string
-   * @return type or null
+   * @return type or {@code null}
    */
   public static Type node(final QNm type) {
     final byte[] ln = type.ln();

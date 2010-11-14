@@ -356,7 +356,7 @@ public interface Text {
 
   /** No database error. */
   String PROCNODB = lang("proc_nodb");
-  /** Main-memory error. */
+  /** Main memory error. */
   String PROCMM = lang("proc_mm");
   /** Out of memory error. */
   String PROCMEM = lang("proc_mem");
@@ -618,7 +618,7 @@ public interface Text {
   /** Maximum tree height. */
   String INFOHEIGHT = lang("info_height");
 
-  /** Info on used main-memory. */
+  /** Info on used main memory. */
   String INFOMEM = lang("info_mem");
 
   /** No document opened. */
@@ -1026,9 +1026,9 @@ public interface Text {
   /** Full-text index information. */
   String CREATEWC = lang("dc_wcindex");
   /** Full-text index information. */
-  String CREATESTEM = lang("dc_ftstem");
+  String CREATEST = lang("dc_ftstem");
   /** Full-text index information. */
-  String CREATELANG = lang("dc_ftlang");
+  String CREATELN = lang("dc_ftlang");
   /** Full-text index information. */
   String CREATECS = lang("dc_ftcs");
   /** Full-text index information. */

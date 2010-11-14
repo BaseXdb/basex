@@ -47,7 +47,7 @@ public final class XMLParser implements IFileParser {
    * memory database.
    * @param f the {@link BufferedFileChannel} to read the xml document from
    * @param prop the database properties to use
-   * @return the main-memory database or {@code null} if the document is
+   * @return the main memory database or {@code null} if the document is
    *         not well-formed
    * @throws IOException if any error occurs
    */

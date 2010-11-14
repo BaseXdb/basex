@@ -5,26 +5,35 @@ import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
- * Preserves a compressed trie index structure and useful functionality.
+ * This class is used for temporarily storing data on full-text trie nodes.
+ * The format of the trie nodes stored in {@link #next} is as follows:
+ *
+ * <ul>
+ * <li>Structure: {@code [t, n1, ..., nk, s, p0, p1]}</li>
+ * <li>{@code t}: pointer on tokens</li>
+ * <li>{@code n1, ..., nk} are the children of the node saved as pointer
+ *   on nextN</li>
+ * <li>{@code s}: size of pre values</li>
+ * <li>{@code p: pointer}</li>
+ * </ul>
+ * if {@code p} is a long value, it is split into 2 integers with
+ * {@code p0 < 0} on {@code pre/pos} where the data is stored.
+ * {@code t}, {@code s}, {@code p} are saved for every node.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  */
-final class FTArray {
+final class FTTrieArray {
   /** List saving the token values. */
   final TokenList tokens;
-  /** List saving the structure: [t, n1, ..., nk, s, p0, p1]
-   * t = pointer on tokens; n1, ..., nk are the children of the node
-   * saved as pointer on nextN; s = size of pre values; p = pointer
-   * if p is a long value, it is split into 2 ints with p0 < 0
-   * on pre/pos where the data is stored. t, s, p are saved for every node. */
+  /** Next pointers. */
   final IntArrayList next;
 
   /**
    * Constructor.
    * @param is index size, number of tokens to index
    */
-  FTArray(final int is) {
+  FTTrieArray(final int is) {
     next = new IntArrayList(is);
     tokens = new TokenList(is);
     // add root node with k, t, s

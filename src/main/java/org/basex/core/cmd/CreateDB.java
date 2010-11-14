@@ -149,7 +149,7 @@ public class CreateDB extends ACreate {
   public static synchronized Data xml(final Parser parser, final String name,
       final Context ctx) throws IOException {
 
-    // create main-memory database instance
+    // create main memory database instance
     if(ctx.prop.is(Prop.MAINMEM))
       return MemBuilder.build(parser, ctx.prop, name);
 
@@ -179,7 +179,7 @@ public class CreateDB extends ACreate {
   }
 
   /**
-   * Creates a main-memory database for the specified parser.
+   * Creates a main memory database for the specified parser.
    * @param parser input parser
    * @param ctx database context
    * @return database instance
@@ -194,7 +194,7 @@ public class CreateDB extends ACreate {
   }
 
   /**
-   * Creates a main-memory database from the specified input reference.
+   * Creates a main memory database from the specified input reference.
    * @param io input reference
    * @param ctx database context
    * @return database instance
@@ -207,7 +207,7 @@ public class CreateDB extends ACreate {
   }
 
   /**
-   * Creates a main-memory database from the specified SAX source.
+   * Creates a main memory database from the specified SAX source.
    * @param sax sax source
    * @param ctx database context
    * @return database instance

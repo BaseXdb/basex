@@ -190,7 +190,7 @@ public final class BaseXServer extends Main implements Runnable {
   /**
    * Starts the server in a separate process.
    * @param port server port
-   * @return error string, or null
+   * @return error string or {@code null}
    */
   public static String start(final int port) {
     // check if server is already running (needs some time)

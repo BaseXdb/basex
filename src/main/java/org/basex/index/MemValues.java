@@ -7,7 +7,7 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
- * This class provides a main-memory access to attribute values and
+ * This class provides a main memory access to attribute values and
  * text contents.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License

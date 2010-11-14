@@ -10,17 +10,16 @@ import org.basex.gui.layout.BaseXLayout;
 
 /**
  * Tree on the left side of the GUI.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public class MainTree {
-
   /** JTree. */
   private JTree mtree;
   /** Name of root. */
   private String serverTitle;
-  
+
   /**
    * Standard constructor.
    * @param t root title
@@ -50,7 +49,7 @@ public class MainTree {
     mtree = new JTree(server);
     setRenderer();
   }
-  
+
   /**
    * Sets the renderer.
    */
@@ -61,10 +60,10 @@ public class MainTree {
       public Component getTreeCellRendererComponent(final JTree tree,
           final Object value, final boolean sel, final boolean expanded,
           final boolean leaf, final int row, final boolean hf) {
-        
+
         super.getTreeCellRendererComponent(tree, value, sel, expanded,
             leaf, row, hf);
-        
+
         TreeNode node = (TreeNode) value;
         if(node.getType() == 1) {
           setIcon(BaseXLayout.icon("server_database"));
@@ -77,12 +76,12 @@ public class MainTree {
         } else if(node.getType() == 5) {
           setIcon(BaseXLayout.icon("cmd-showinfo"));
         }
-        return this; 
+        return this;
       }
     };
     mtree.setCellRenderer(renderer);
   }
-  
+
   /**
    * Returns the jtree.
    * @return jtree
@@ -90,15 +89,14 @@ public class MainTree {
   public JTree getTree() {
     return mtree;
   }
-  
-  
+
   /**
    * Inner class for treenode.
    */
   private final class TreeNode extends DefaultMutableTreeNode {
     /** Flag for nodetype. */
     private final int type;
-    
+
     /**
      * Standard constructor.
      * @param t type
@@ -108,7 +106,7 @@ public class MainTree {
       setUserObject(s);
       type = t;
     }
-    
+
     /**
      * Getter for the type.
      * @return value of type

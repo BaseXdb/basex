@@ -139,9 +139,9 @@ public final class Prop extends AProp {
   /** Flag for creating a path summary. */
   public static final Object[] PATHINDEX = { "PATHINDEX", true };
 
-  /** Flag for creating a main-memory database table. */
+  /** Flag for creating a main memory database table. */
   public static final Object[] TABLEMEM = { "TABLEMEM", false };
-  /** Flag for creating a main-memory database. */
+  /** Flag for creating a main memory database. */
   public static final Object[] MAINMEM = { "MAINMEM", false };
   /** Path for filtering XML Documents. */
   public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };

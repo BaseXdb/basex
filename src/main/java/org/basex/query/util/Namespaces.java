@@ -78,7 +78,7 @@ public final class Namespaces {
   /**
    * Finds the URI for the specified prefix.
    * @param pre prefix of the namespace
-   * @return uri or null value
+   * @return uri or {@code null}
    */
   public byte[] find(final byte[] pre) {
     for(int s = ns.size - 1; s >= 0; s--) {

@@ -68,7 +68,7 @@ public final class ValueBuilder extends IndexBuilder {
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0x0FFF) == 0) {
         check();
-        // check if main-memory is exhausted
+        // check if main memory is exhausted
         if(memFull()) {
           write(f + csize++, false);
           index = new ValueTree();
@@ -89,9 +89,9 @@ public final class ValueBuilder extends IndexBuilder {
       ++csize;
 
       final int sz = merge();
-      final DataAccess da = new DataAccess(data.meta.file(f + 'l'));
-      da.writeInt(sz);
-      da.close();
+      final DataAccess outL = new DataAccess(data.meta.file(f + 'l'));
+      outL.writeInt(sz);
+      outL.close();
     }
 
     if(text) data.meta.txtindex = true;
@@ -108,9 +108,9 @@ public final class ValueBuilder extends IndexBuilder {
    */
   private int merge() throws IOException {
     final String f = text ? DATATXT : DATAATV;
-    final DataOutput outl = new DataOutput(data.meta.file(f + 'l'));
-    final DataOutput outr = new DataOutput(data.meta.file(f + 'r'));
-    outl.write4(0);
+    final DataOutput outL = new DataOutput(data.meta.file(f + 'l'));
+    final DataOutput outR = new DataOutput(data.meta.file(f + 'r'));
+    outL.write4(0);
 
     final ValueMerge[] vm = new ValueMerge[csize];
     for(int i = 0; i < csize; ++i) vm[i] = new ValueMerge(data, text, i);
@@ -122,7 +122,7 @@ public final class ValueBuilder extends IndexBuilder {
       checkStop();
 
       ++sz;
-      outr.write5(outl.size());
+      outR.write5(outL.size());
       min = 0;
       ml.reset();
       for(int i = 0; i < csize; ++i) {
@@ -139,7 +139,7 @@ public final class ValueBuilder extends IndexBuilder {
 
       final int ms = ml.size();
       if(ms == 0) {
-        write(outl, vm[min].pre);
+        write(outL, vm[min].pre);
         vm[min].next();
       } else {
         final TokenBuilder tb = new TokenBuilder();
@@ -171,29 +171,29 @@ public final class ValueBuilder extends IndexBuilder {
         }
         final byte[] tmp = tb.finish();
         Num.size(tmp, tmp.length);
-        write(outl, tmp);
+        write(outL, tmp);
       }
     }
-    outr.close();
-    outl.close();
+    outR.close();
+    outL.close();
     return sz;
   }
 
   /**
    * Writes the compressed pre value array to disk, preceded by the compressed
    * number of bytes.
-   * @param outl data output
+   * @param outL data output
    * @param pres pre values
    * @throws IOException I/O exception
    */
-  private void write(final DataOutput outl, final byte[] pres)
+  private void write(final DataOutput outL, final byte[] pres)
       throws IOException {
 
     final int is = Num.size(pres);
     int v = 0;
     for(int ip = 4; ip < is; ip += Num.len(pres, ip)) ++v;
-    outl.writeNum(v);
-    outl.write(pres, 4, is - 4);
+    outL.writeNum(v);
+    outL.write(pres, 4, is - 4);
   }
 
   /**
@@ -214,13 +214,13 @@ public final class ValueBuilder extends IndexBuilder {
    */
   private void write(final String name, final boolean all) throws IOException {
     // write positions and references
-    final DataOutput outl = new DataOutput(data.meta.file(name + 'l'));
-    final DataOutput outr = new DataOutput(data.meta.file(name + 'r'));
-    outl.write4(index.size());
+    final DataOutput outL = new DataOutput(data.meta.file(name + 'l'));
+    final DataOutput outR = new DataOutput(data.meta.file(name + 'r'));
+    outL.write4(index.size());
 
     index.init();
     while(index.more()) {
-      outr.write5(outl.size());
+      outR.write5(outL.size());
       final int i = index.next();
       final byte[] pres = index.pres.get(i);
       final int is = Num.size(pres);
@@ -229,11 +229,11 @@ public final class ValueBuilder extends IndexBuilder {
         // write final structure to disk
         int v = 0;
         for(int ip = 4; ip < is; ip += Num.len(pres, ip)) ++v;
-        outl.writeNum(v);
+        outL.writeNum(v);
 
         for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {
           final int p = Num.read(pres, ip);
-          outl.writeNum(p - o);
+          outL.writeNum(p - o);
           o = p;
         }
       } else {
@@ -245,18 +245,18 @@ public final class ValueBuilder extends IndexBuilder {
           Num.add(tmp, p - o);
           o = p;
         }
-        outl.write(tmp, 0, Num.size(tmp));
+        outL.write(tmp, 0, Num.size(tmp));
       }
     }
-    outl.close();
-    outr.close();
+    outL.close();
+    outR.close();
 
     // temporarily write texts
     if(!all) {
-      final DataOutput outt = new DataOutput(data.meta.file(name + 't'));
+      final DataOutput outT = new DataOutput(data.meta.file(name + 't'));
       index.init();
-      while(index.more()) outt.writeToken(index.tokens.get(index.next()));
-      outt.close();
+      while(index.more()) outT.writeToken(index.tokens.get(index.next()));
+      outT.close();
     }
   }
 

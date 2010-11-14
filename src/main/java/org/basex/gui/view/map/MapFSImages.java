@@ -56,7 +56,7 @@ final class MapFSImages extends Thread {
   }
 
   /**
-   * Returns image with specified id or null if none was found.
+   * Returns image with specified id or {@code null} if none was found.
    * @param id cache to be found
    * @return cached image
    */

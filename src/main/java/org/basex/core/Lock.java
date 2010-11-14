@@ -101,7 +101,7 @@ public final class Lock {
   /**
    * Notifies all waiting readers.
    */
-  private synchronized void notifyReaders() {
+  private void notifyReaders() {
     while(waiting.size() > 0) {
       if(waiting.getFirst().writer) break;
       final Resource l = waiting.removeFirst();
@@ -115,7 +115,7 @@ public final class Lock {
   /**
    * Notifies a waiting writer.
    */
-  private synchronized void notifyWriter() {
+  private void notifyWriter() {
     if(waiting.size() > 0) {
       final Resource l = waiting.removeFirst();
       synchronized(l) {

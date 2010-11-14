@@ -121,7 +121,7 @@ public final class CmpR extends Single {
   /**
    * Creates an intersection of the existing and the specified expressions.
    * @param c range comparison
-   * @return resulting expression or null
+   * @return resulting expression or {@code null}
    */
   Expr intersect(final CmpR c) {
     if(!c.expr.sameAs(expr)) return null;

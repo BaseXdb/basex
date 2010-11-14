@@ -22,10 +22,10 @@ interface NodePrimitives extends Iterable<UpdatePrimitive> {
   void add(final UpdatePrimitive p) throws QueryException;
 
   /**
-   * Finds a primitive with the given type. If there is no primitive of type t
-   * the result equals null.
+   * Finds a primitive with the given type. {@code null} is returned if there
+   * is no primitive of type {@code t}.
    * @param t type of the primitive to find
-   * @return primitive of type t or null if not found
+   * @return primitive of type t or {@code null} if not found
    */
   UpdatePrimitive find(final PrimitiveType t);
 

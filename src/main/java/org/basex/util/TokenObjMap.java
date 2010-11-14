@@ -29,7 +29,7 @@ public class TokenObjMap<E> extends TokenSet {
   /**
    * Returns the value for the specified key.
    * @param key key to be found
-   * @return value or null if nothing was found
+   * @return value or {@code null} if nothing was found
    */
   @SuppressWarnings("unchecked")
   public final E get(final byte[] key) {

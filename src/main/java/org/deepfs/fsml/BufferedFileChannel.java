@@ -503,8 +503,8 @@ public final class BufferedFileChannel {
    * immediately by a line feed.
    * @param enc the input encoding
    * @return A (UTF-8-)String containing the contents of the line, not including
-   *         any line-termination characters, or null if the end of the stream
-   *         has been reached
+   *         any line-termination characters, or {@code null} if the end of
+   *         the stream has been reached
    * @throws IOException if an I/O error occurs
    */
   public String readLine(final String enc) throws IOException {

@@ -73,8 +73,6 @@ public final class FTMildNot extends FTExpr {
    */
   FTItem mildnot(final FTItem it1, final FTItem it2) {
     it1.all = mildnot(it1.all, it2.all);
-    // [CG] XQFT: check invalid mild not tests
-    //if(it1.all == null) FTMILD.error(input);
     return it1;
   }
 
@@ -82,17 +80,13 @@ public final class FTMildNot extends FTExpr {
    * Performs a mild not operation.
    * @param m1 first match list
    * @param m2 second match list
-   * @return resulting match, or null if string exclude was found
+   * @return resulting match
    */
   private static FTMatches mildnot(final FTMatches m1, final FTMatches m2) {
     final FTMatches all = new FTMatches(m1.sTokenNum);
     for(final FTMatch s1 : m1) {
-      //if(!s1.match()) return null;
       boolean n = true;
-      for(final FTMatch s2 : m2) {
-        //if(!s2.match()) return null;
-        n &= s1.notin(s2);
-      }
+      for(final FTMatch s2 : m2) n &= s1.notin(s2);
       if(n) all.add(s1);
     }
     return all;

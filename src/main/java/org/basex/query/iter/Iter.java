@@ -15,8 +15,8 @@ import org.basex.util.Array;
  */
 public abstract class Iter {
   /**
-   * Returns the next item or null if no other items are found.
-   * @return resulting item
+   * Returns the next item or {@code null} if no other items are found.
+   * @return resulting item or {@code null}
    * @throws QueryException query exception
    */
   public abstract Item next() throws QueryException;

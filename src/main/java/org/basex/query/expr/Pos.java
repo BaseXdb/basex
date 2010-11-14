@@ -58,7 +58,7 @@ public final class Pos extends Simple {
    * @param a argument
    * @param o original expression
    * @param ii input info
-   * @return resulting expression, or null
+   * @return resulting expression, or {@code null}
    * @throws QueryException query exception
    */
   static Expr get(final Op cmp, final Expr a, final Expr o,

@@ -151,7 +151,7 @@ public abstract class BXNode implements Node {
   }
 
   /**
-   * Returns a Java node for the specified argument or null.
+   * Returns a Java node for the specified argument or {@code null}.
    * @param n node instance
    * @return resulting node
    */

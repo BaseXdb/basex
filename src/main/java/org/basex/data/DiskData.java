@@ -89,7 +89,7 @@ public final class DiskData extends Data {
 
   @Override
   public void init() throws IOException {
-    // table main-memory mode..
+    // table main memory mode..
     table = meta.prop.is(Prop.TABLEMEM) ? new TableMemAccess(meta, DATATBL) :
       new TableDiskAccess(meta, DATATBL);
     texts = new DataAccess(meta.file(DATATXT));

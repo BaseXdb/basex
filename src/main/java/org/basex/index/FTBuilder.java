@@ -122,7 +122,7 @@ public abstract class FTBuilder extends IndexBuilder {
         ++pos;
         // skip too long and stopword tokens
         if(tok.length <= MAXLEN && (sw.size() == 0 || sw.id(tok) == 0)) {
-          // check if main-memory is exhausted
+          // check if main memory is exhausted
           if((ntok++ & 0xFFF) == 0 && scm == 0 && memFull()) {
             // currently no frequency support for tfidf based scoring
             writeIndex(csize++);

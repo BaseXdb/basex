@@ -136,9 +136,9 @@ public class XMLParser extends FileParser {
 
   /**
    * Returns the token for the specified token type. If the current token type
-   * is wrong, a null reference is returned.
+   * is wrong, a {@code null} reference is returned.
    * @param t token type
-   * @return token or null if the token type is wrong
+   * @return token or {@code null} if the token type is wrong
    * @throws IOException I/O exception
    */
   private byte[] consumeToken(final Type t) throws IOException {

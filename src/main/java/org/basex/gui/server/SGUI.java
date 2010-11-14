@@ -29,7 +29,7 @@ import org.basex.server.ClientSession;
  * @author Christian Gruen
  */
 public class SGUI extends AGUI {
-  
+
   /** Clientsession. */
   ClientSession client;
   /** Name of the server. */
@@ -42,7 +42,7 @@ public class SGUI extends AGUI {
    */
   public SGUI(final Context ctx, final GUIProp gprops) {
     super(ctx, gprops);
-    
+
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
     final int[] ps = gprop.nums(GUIProp.GUILOC);
@@ -59,8 +59,8 @@ public class SGUI extends AGUI {
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     showDialog();
   }
-  
-  /** 
+
+  /**
    * Shows the connection dialog.
    */
   private void showDialog() {
@@ -98,7 +98,7 @@ public class SGUI extends AGUI {
           final int p = Integer.parseInt(sport.getText());
           client = new ClientSession(sname.getText(), p, suser.getText(),
               new String(spw.getPassword()));
-          servertitle = "Server - " + suser.getText() + "@" + 
+          servertitle = "Server - " + suser.getText() + "@" +
             sname.getText() + ":" + sport.getText();
         } catch(IOException e1) {
           message.setText("Connection failed.");
@@ -114,7 +114,7 @@ public class SGUI extends AGUI {
     dialog.getContentPane().add(connection);
     dialog.setVisible(true);
   }
-  
+
   /**
    * Adds the main components.
    */
@@ -125,7 +125,7 @@ public class SGUI extends AGUI {
     add(splitPane);
     validate();
   }
-  
+
   /**
    * Returns the tree.
    * @return tree JTree

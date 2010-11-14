@@ -185,7 +185,7 @@ public abstract class UpdatePrimitive {
           u = m.ns.addURI(uri);
         }
         final int n = m.atts.index(q.atom(), null, false);
-        // attribute namespace flag is only set in main-memory instance
+        // attribute namespace flag is only set in main memory instance
         m.attr(ms, pre - par, n, nd.atom(), u, ne);
         m.insert(ms);
         return pre + 1;

@@ -13,7 +13,7 @@ import org.basex.util.TokenSet;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class FTHash extends TokenSet {
+final class FTTrieHash extends TokenSet {
   /** Compressed pre values. */
   byte[][] pre = new byte[CAP][];
   /** Compressed pos values. */

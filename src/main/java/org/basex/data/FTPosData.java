@@ -48,7 +48,7 @@ public final class FTPosData {
    * int[0] : [pos0, ..., posn]
    * int[1] : [poi0, ..., poin]
    * @param p int pre value
-   * @return int[2][n] full-text data or null
+   * @return int[2][n] full-text data or {@code null}
    */
   public FTPos get(final int p) {
     final int i = find(p);

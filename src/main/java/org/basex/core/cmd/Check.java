@@ -71,7 +71,7 @@ public final class Check extends Command {
     return MetaData.found(path, name, ctx.prop) ? Open.open(name, ctx) :
       // if flag is set to true, a new database instance is created on disk
       ctx.prop.is(Prop.FORCECREATE) ? CreateDB.xml(io, name, ctx) :
-        // otherwise, a main-memory instance is created
+        // otherwise, a main memory instance is created
         CreateDB.xml(io, ctx);
   }
 }

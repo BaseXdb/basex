@@ -579,7 +579,7 @@ public final class DeepFS implements DataText {
    * For root access ('/') return default access.
    * Note we store the pre value as inode.
    * @param path to file
-   * @return file attributes or null
+   * @return file attributes or {@code null}
    */
   public DeepStat stat(final String path) {
     final String method = "[stat] ";

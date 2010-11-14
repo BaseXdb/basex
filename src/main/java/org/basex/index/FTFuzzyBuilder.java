@@ -4,35 +4,41 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.io.DataOutput;
 import org.basex.util.IntList;
+import org.basex.util.Num;
 
 /**
  * This class builds an index for text contents, optimized for fuzzy search,
- * in an ordered table.
+ * in an ordered table:
  *
- *  - (1) the tokens are collected in main-memory (red-black tree)
- *  - (2) if main-memory, the data is written to disk, (1)
- *  - (3) merge disk data into the final format:
+ * <ol>
+ * <li> the tokens are collected in main memory (red-black tree)</li>
+ * <li> if main memory, the data is written to disk</li>
+ * <li> merge disk data</li>
+ * </ol>
  *
- * The building process is divided in two steps:
- * a)
- *    fill DataOutput(db, f + 'x') looks like:
- *    [l, p] ...
- *      - l is the length [byte] of a token
- *      - p the pointer [int] of the first token with length l
- *      there's an entry for each token length
+ * <p>The three database index files start with the prefix
+ * {@link DataText#DATAFTX} and have the following format:</p>
  *
- *    fill DataOutput(db, f + 'y') looks like:
- *    [t0, t1, ... tl, z, s]
- *      - t0, t1, ... tl-1 is the token [byte[l]]
- *      - z is the pointer on the data entries of the token [long]
- *      - s is the number of pre values, saved in data [int]
- * b)
- *    fill DataOutput(db, f + 'z') looks like: stores the full-text data;
- *      the pre values are ordered but not distinct
- *      [pre1, pos1, pre2, pos2, pre3, pos3, ...] as Nums
- *
+ * <ol>
+ * <li>{@code "x"} looks like:<br/>
+ * Structure: {@code [l, p] ...}<br/>
+ * {@code l} is the length [byte] of a token<br/>
+ * {@code p} is the pointer [int] of the first token with length {@code l}.
+ *   There's an entry for each token length
+ * </li>
+ * <li>{@code "y"} looks like:
+ * Structure: {@code [t0, t1, ... tl, z, s]}<br/>
+ * {@code t0, t1, ... tl-1} is the token [byte[l]]<br/>
+ * {@code z} is the pointer on the data entries of the token [long]<br/>
+ * {@code s} is the number of pre values, saved in data [int]
+ * </li>
+ * <li>{@code "z"} contains the {@code pre/pos} references.
+ *   The values are ordered, but not distinct:<br/>
+ *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
+ * </ol>
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
@@ -85,9 +91,9 @@ final class FTFuzzyBuilder extends FTBuilder {
     if(!merge) return;
 
     // merges temporary index files
-    final DataOutput outx = new DataOutput(data.meta.file(DATAFTX + 'x'));
-    final DataOutput outy = new DataOutput(data.meta.file(DATAFTX + 'y'));
-    final DataOutput outz = new DataOutput(data.meta.file(DATAFTX + 'z'));
+    final DataOutput outX = new DataOutput(data.meta.file(DATAFTX + 'x'));
+    final DataOutput outY = new DataOutput(data.meta.file(DATAFTX + 'y'));
+    final DataOutput outZ = new DataOutput(data.meta.file(DATAFTX + 'z'));
     final IntList ind = new IntList();
 
     // open all temporary sorted lists
@@ -115,52 +121,52 @@ final class FTFuzzyBuilder extends FTBuilder {
 
       if(ind.size() == 0 || ind.get(ind.size() - 2) < v[min].tok.length) {
         ind.add(v[min].tok.length);
-        ind.add((int) outy.size());
+        ind.add((int) outY.size());
       }
 
       // write token
-      outy.writeBytes(v[min].tok);
+      outY.writeBytes(v[min].tok);
       // pointer on full-text data
-      outy.write5(outz.size());
+      outY.write5(outZ.size());
 
       // merge and write out data size
-      final int s = merge(outz, il, v);
-      outy.write4(s);
+      final int s = merge(outZ, il, v);
+      outY.write4(s);
     }
-    writeInd(outx, ind, ind.get(ind.size() - 2) + 1, (int) outy.size());
+    writeInd(outX, ind, ind.get(ind.size() - 2) + 1, (int) outY.size());
 
-    outx.close();
-    outy.close();
-    outz.close();
+    outX.close();
+    outY.close();
+    outZ.close();
   }
 
   /**
    * Writes the token length index to disk.
-   * @param outx output
+   * @param outX output
    * @param il token length and offsets
    * @param ls last token length
    * @param lp last offset
    * @throws IOException I/O exception
    */
-  private void writeInd(final DataOutput outx, final IntList il,
+  private void writeInd(final DataOutput outX, final IntList il,
       final int ls, final int lp) throws IOException {
 
     final int is = il.size();
-    outx.write1(is >> 1);
+    outX.write1(is >> 1);
     for(int i = 0; i < is; i += 2) {
-      outx.write1(il.get(i));
-      outx.write4(il.get(i + 1));
+      outX.write1(il.get(i));
+      outX.write4(il.get(i + 1));
     }
-    outx.write1(ls);
-    outx.write4(lp);
+    outX.write1(ls);
+    outX.write4(lp);
   }
 
   @Override
   protected void writeIndex(final int cs) throws IOException {
     final String s = DATAFTX + (merge ? cs : "");
-    final DataOutput outx = new DataOutput(data.meta.file(s + 'x'));
-    final DataOutput outy = new DataOutput(data.meta.file(s + 'y'));
-    final DataOutput outz = new DataOutput(data.meta.file(s + 'z'));
+    final DataOutput outX = new DataOutput(data.meta.file(s + 'x'));
+    final DataOutput outY = new DataOutput(data.meta.file(s + 'y'));
+    final DataOutput outZ = new DataOutput(data.meta.file(s + 'z'));
 
     final IntList ind = new IntList();
     long dr = 0;
@@ -178,22 +184,22 @@ final class FTFuzzyBuilder extends FTBuilder {
         ind.add(j);
         ind.add(tr);
       }
-      for(int i = 0; i < j; ++i) outy.write1(key[i]);
+      for(int i = 0; i < j; ++i) outY.write1(key[i]);
       // write pointer on full-text data
-      outy.write5(dr);
+      outY.write5(dr);
       // write full-text data size (number of pre values)
-      outy.write4(t.nextNumPre());
+      outY.write4(t.nextNumPre());
       // write compressed pre and pos arrays
-      writeFTData(outz, t.nextPres(), t.nextPoss());
+      writeFTData(outZ, t.nextPres(), t.nextPoss());
 
-      dr = outz.size();
-      tr = (int) outy.size();
+      dr = outZ.size();
+      tr = (int) outY.size();
     }
-    writeInd(outx, ind, ++j, tr);
+    writeInd(outX, ind, ++j, tr);
 
-    outx.close();
-    outy.close();
-    outz.close();
+    outX.close();
+    outY.close();
+    outZ.close();
     tree.initFT();
   }
 }
