@@ -44,7 +44,7 @@ import org.deepfs.fs.DeepFS;
  * - Byte  8-11:  SIZE: Number of descendants
  * ELEMENT NODES (kind = 1):
  * - Byte     0:  ATTS: Number of attributes (bits: 7-3)
- * - Byte   1-2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
+ * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte     3:  NURI: Namespace URI
  * - Byte  4- 7:  DIST: Distance to parent node
  * - Byte  8-11:  SIZE: Number of descendants
@@ -53,7 +53,7 @@ import org.deepfs.fs.DeepFS;
  * - Byte  8-11:  DIST: Distance to parent node
  * ATTRIBUTE NODES (kind = 3):
  * - Byte     0:  DIST: Distance to parent node (bits: 7-3)
- * - Byte   1-2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
+ * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte  3- 7:  TEXT: Attribute value reference
  * - Byte    11:  NURI: Namespace (bits: 7-3)
  * </pre>
@@ -626,42 +626,37 @@ public abstract class Data {
       // is determined.
       if(mpre == 0) {
         // collect possible candidates for namespace root
-        final List<NSNode> candidates = new LinkedList<NSNode>();
+        final List<NSNode> cand = new LinkedList<NSNode>();
         NSNode cn = ns.rootDummy;
-        candidates.add(cn);
-        int cI = 0;
+        cand.add(cn);
+        int cI;
         while((cI = cn.fnd(par)) > -1) {
-          final NSNode ch = cn.ch[cI];
           // add candidate to stack
-          candidates.add(0, ch);
-          cn = ch;
+          cn = cn.ch[cI];
+          cand.add(0, cn);
         }
 
         cn = ns.rootDummy;
-        if(candidates.size() > 1) {
+        if(cand.size() > 1) {
           // compare candidates to ancestors of par
           int ancPre = par;
           // take first candidate from stack
-          NSNode currCandidate = candidates.remove(0);
-          while(ancPre > -1 && cn.equals(ns.rootDummy)) {
-
-            // if the current candidate is an ancestor of par or par itself,
+          NSNode curr = cand.remove(0);
+          while(ancPre > -1 && cn == ns.rootDummy) {
             // this is the new root
-            if(currCandidate.pre == ancPre) cn = currCandidate;
+            if(curr.pre == ancPre) cn = curr;
             // if the current candidate's pre value is lower than the current
             // ancestor of par or par itself we have to look for a potential
             // match for this candidate. therefore we iterate through ancestors
             // till we find one with a lower than or the same pre value as the
             // current candidate.
-            else if (currCandidate.pre < ancPre) {
-              while((ancPre = parent(ancPre, kind(ancPre)))
-                  > currCandidate.pre);
-              if(currCandidate.pre == ancPre) cn = currCandidate;
+            else if (curr.pre < ancPre) {
+              while((ancPre = parent(ancPre, kind(ancPre))) > curr.pre);
+              if(curr.pre == ancPre) cn = curr;
             }
-
             // no potential for infinite loop, cause dummy root always a match,
             // in this case ancPre ends iteration
-            if(candidates.size() > 0) currCandidate = candidates.remove(0);
+            if(cand.size() > 0) curr = cand.remove(0);
           }
         }
         ns.setNearestRoot(cn, par);

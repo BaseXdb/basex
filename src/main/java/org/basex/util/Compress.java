@@ -9,11 +9,11 @@ package org.basex.util;
  */
 public final class Compress {
   /** Byte list. */
-  private ByteList bl = new ByteList();
+  private final ByteList bl = new ByteList();
   /** Minimum compression size. */
   private final int min;
-  /** Byte list. */
-  private int v;
+  /** Temporary value, or current position. */
+  private int c;
   /** Offset. */
   private int o;
 
@@ -45,26 +45,46 @@ public final class Compress {
     bl.reset();
     Num.write(bl.list, tl, 0);
     bl.size = Num.len(tl);
-    v = 0;
+    c = 0;
     o = 0;
 
     for(int t = 0; t < tl; t++) {
       int b = txt[t];
       if(b >= 0) b = PACK[b];
       if(b >= 0x00 && b < 0x08) { // 1 xxx
-        push(1 + (b << 1), 4);
+        push(1 | b << 1, 4);
       } else if(b >= 0x08 && b < 0x10) { // 01 xxx
-        push(2 + (b << 2), 5);
+        push(2 | b << 2, 5);
       } else if(b >= 0x10 && b < 0x20) { // 001 xxxx
-        push(4 + (b << 3), 7);
+        push(4 | b << 3, 7);
       } else if(b >= 0x20 && b < 0x40) { // 0001 xxxxx
-        push(8 + (b << 4), 9);
+        push(8 | b << 4, 9);
       } else { // 0000 xxxxxxxx
         push(b << 4, 12);
       }
     }
-    if(o != 0) bl.add((byte) v);
+    if(o != 0) bl.add(c);
     return bl.size() > tl ? txt : bl.toArray();
+  }
+  
+  /**
+   * Pushes bits to the byte cache.
+   * @param b value to be pushed.
+   * @param s number of bytes
+   */
+  private void push(final int b, final int s) {
+    int bb = b, oo = o, cc = c;
+    for(int i = 0; i < s; i++) {
+      cc |= (bb & 1) << oo;
+      bb >>= 1;
+      if(++oo == 8) {
+        bl.add(cc);
+        oo = 0;
+        cc = 0;
+      }
+    }
+    o = oo;
+    c = cc;
   }
   
   /**
@@ -75,7 +95,7 @@ public final class Compress {
   public byte[] unpack(final byte[] txt) {
     bl.list = txt;
     bl.size = txt.length;
-    v = Num.len(txt, 0);
+    c = Num.len(txt, 0);
     o = 0;
     
     final int l = Num.read(txt, 0);
@@ -97,22 +117,6 @@ public final class Compress {
     }
     return res;
   }
-  
-  /**
-   * Pushes bits to the byte cache.
-   * @param b value to be pushed.
-   * @param s number of bytes
-   */
-  private void push(final int b, final int s) {
-    for(int i = 0; i < s; i++) {
-      if((b & 1 << i) != 0) v |= 1 << o;
-      if(++o == 8) {
-        bl.add((byte) v);
-        o = 0;
-        v = 0;
-      }
-    }
-  }
 
   /**
    * Pulls the specified number of bytes and returns the result.
@@ -120,14 +124,16 @@ public final class Compress {
    * @return result
    */
   private int pull(final int s) {
-    int x = 0;
+    int oo = o, cc = c, x = 0;
     for(int i = 0; i < s; i++) {
-      if((bl.list[v] & 1 << o) != 0) x |= 1 << i;
-      if(++o == 8) {
-        o = 0;
-        v++;
+      if((bl.list[cc] & 1 << oo) != 0) x |= 1 << i;
+      if(++oo == 8) {
+        oo = 0;
+        cc++;
       }
     }
+    o = oo;
+    c = cc;
     return x;
   }
 

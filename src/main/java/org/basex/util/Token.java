@@ -1206,9 +1206,9 @@ public final class Token {
       final ByteList bl = new ByteList();
       for(final byte b : md.digest()) {
         final int h = b >> 4 & 0x0F;
-        bl.add((byte) (h + (h > 9 ? 0x57 : 0x30)));
+        bl.add(h + (h > 9 ? 0x57 : 0x30));
         final int l = b & 0x0F;
-        bl.add((byte) (l + (l > 9 ? 0x57 : 0x30)));
+        bl.add(l + (l > 9 ? 0x57 : 0x30));
       }
       return string(bl.toArray());
     } catch(final Exception ex) {

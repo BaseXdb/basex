@@ -33,9 +33,9 @@ public class ByteList extends ElementList {
    * @param e entry to be added
    * @return self reference
    */
-  public final ByteList add(final byte e) {
+  public final ByteList add(final int e) {
     if(size == list.length) list = Arrays.copyOf(list, newSize());
-    list[size++] = e;
+    list[size++] = (byte) e;
     return this;
   }
 

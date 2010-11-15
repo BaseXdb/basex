@@ -518,15 +518,15 @@ public class HttpClient {
       return content;
     }
 
-    final ByteList tb = new ByteList();
+    final ByteList bl = new ByteList();
     final BufferedInputStream bis = new BufferedInputStream(input);
     int i = 0;
     try {
-      while((i = bis.read()) != -1) tb.add((byte) i);
+      while((i = bis.read()) != -1) bl.add(i);
     } finally {
       bis.close();
     }
-    return tb.toArray();
+    return bl.toArray();
   }
 
   /**

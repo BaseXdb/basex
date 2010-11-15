@@ -270,7 +270,7 @@ public abstract class IO {
     final InputStream bis = i instanceof BufferedInputStream ||
       i instanceof BufferInput ? i : new BufferedInputStream(i);
     int b;
-    while((b = bis.read()) != -1) bl.add((byte) b);
+    while((b = bis.read()) != -1) bl.add(b);
     bis.close();
     cont = bl.toArray();
     return cont;

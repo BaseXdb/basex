@@ -519,7 +519,7 @@ public final class BufferedFileChannel {
           if(remaining() > 0 && buffer(1) && get() != '\n') skip(-1);
           break out;
         } else {
-          bl.add((byte) b);
+          bl.add(b);
         }
       }
       final long r = remaining();

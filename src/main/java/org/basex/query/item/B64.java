@@ -91,13 +91,13 @@ public final class B64 extends Item {
       bl.add(H2B[b0 >> 2]);
       if(p == 1) {
         bl.add(H2B[b0 << 4 & 0x3f]);
-        bl.add((byte) '=');
-        bl.add((byte) '=');
+        bl.add('=');
+        bl.add('=');
       } else {
         final int b1 = val[c++] & 0xff;
         bl.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
         bl.add(H2B[b1 << 2 & 0x3f]);
-        bl.add((byte) '=');
+        bl.add('=');
       }
     }
     return bl.toArray();
