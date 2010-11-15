@@ -17,7 +17,15 @@ public class ByteList extends ElementList {
    * Default constructor.
    */
   public ByteList() {
-    list = new byte[CAP];
+    this(CAP);
+  }
+
+  /**
+   * Constructor, specifying an initial array capacity.
+   * @param c array capacity
+   */
+  public ByteList(final int c) {
+    list = new byte[c];
   }
 
   /**

@@ -159,6 +159,10 @@ public class Itr extends Item {
   static long parse(final byte[] val, final InputInfo ii)
       throws QueryException {
 
+    // try fast conversion
+    final long l = Token.toLong(val);
+    if(l != Long.MIN_VALUE) return l;
+    
     try {
       final String v = Token.string(Token.trim(val));
       return Long.parseLong(v.startsWith("+") ? v.substring(1) : v);

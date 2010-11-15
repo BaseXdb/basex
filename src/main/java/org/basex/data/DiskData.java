@@ -14,6 +14,7 @@ import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
+import org.basex.util.Compress;
 import org.basex.util.Token;
 import org.basex.util.Util;
 
@@ -31,6 +32,8 @@ public final class DiskData extends Data {
   private DataAccess texts;
   /** Values access file. */
   private DataAccess values;
+  /** Text compressor. */
+  private final Compress comp;
 
   /**
    * Default constructor.
@@ -40,6 +43,7 @@ public final class DiskData extends Data {
    */
   public DiskData(final String db, final Prop pr) throws IOException {
     meta = new MetaData(db, pr);
+    comp = new Compress(pr.num(Prop.COMPRESS));
 
     final DataInput in = new DataInput(meta.file(DATAINFO));
     try {
@@ -78,6 +82,7 @@ public final class DiskData extends Data {
   public DiskData(final MetaData md, final Names nm, final Names at,
       final PathSummary ps, final Namespaces n) throws IOException {
 
+    comp = new Compress(md.prop.num(Prop.COMPRESS));
     meta = md;
     tags = nm;
     atts = at;
@@ -165,31 +170,58 @@ public final class DiskData extends Data {
   @Override
   public byte[] text(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? Token.token((int) o) :
-      (text ? texts : values).readToken(o);
+    return num(o) ? Token.token((int) o) : txt(o, text);
   }
 
   @Override
-  public double textNum(final int pre, final boolean text) {
+  public long textItr(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? o & IO.NUMOFF - 1 :
-      Token.toDouble((text ? texts : values).readToken(o));
+    return num(o) ? o & IO.NUMOFF - 1 : Token.toLong(txt(o, text));
+  }
+
+  @Override
+  public double textDbl(final int pre, final boolean text) {
+    final long o = textOff(pre);
+    return num(o) ? o & IO.NUMOFF - 1 : Token.toDouble(txt(o, text));
   }
 
   @Override
   public int textLen(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? Token.numDigits((int) o) :
-      (text ? texts : values).readNum(o);
+    if(num(o)) return Token.numDigits((int) o);
+    final DataAccess da = text ? texts : values;
+    final int l = da.readNum(o & IO.CPROFF - 1);
+    // compressed: next number contains number of compressed bytes
+    return cpr(o) ? da.readNum() : l;
   }
 
   /**
-   * Returns true if the specified offset contains a numeric value.
+   * Returns a text (text, comment, pi) or attribute value.
+   * @param o text offset
+   * @param text text or attribute flag
+   * @return text
+   */
+  private byte[] txt(final long o, final boolean text) {
+    final byte[] txt = (text ? texts : values).readToken(o & IO.CPROFF - 1);
+    return cpr(o) ? comp.unpack(txt) : txt;
+  }
+  
+  /**
+   * Returns true if the specified value contains a number.
    * @param o offset
    * @return result of check
    */
   private static boolean num(final long o) {
     return (o & IO.NUMOFF) != 0;
+  }
+  
+  /**
+   * Returns true if the specified value references a compressed token.
+   * @param o offset
+   * @return result of check
+   */
+  private static boolean cpr(final long o) {
+    return (o & IO.CPROFF) != 0;
   }
 
   // UPDATE OPERATIONS ========================================================
@@ -201,17 +233,18 @@ public final class DiskData extends Data {
       textOff(pre, v | IO.NUMOFF);
     } else {
       final DataAccess da = txt ? texts : values;
-      long o = textOff(pre);
-      if(!num(o) && val.length <= textLen(pre, txt)) {
-        // text is replaced with old one if it is shorter
-        da.writeBytes(o, val);
-      } else {
-        // if old text is numeric or not placed last, append text at the end
-        if(num(o) || da.readNum(o) + da.pos() != da.length()) o = da.length();
-        // otherwise, replace it with new one
-        da.writeBytes(o, val);
-        textOff(pre, o);
-      }
+      long o = textOff(pre) & IO.CPROFF - 1;
+
+      final byte[] cpr = comp.pack(val);
+      final boolean cp = cpr != val;
+
+      // if old text is numeric or longer than the old text and not placed last,
+      // append text at the end
+      if(num(o) || cpr.length > da.readNum(o) &&
+          da.readNum(o) + da.pos() != da.length()) o = da.length();
+
+      da.writeBytes(o, cpr);
+      textOff(pre, o | (cp ? IO.CPROFF : 0));
     }
   }
 

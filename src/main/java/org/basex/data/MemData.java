@@ -72,7 +72,12 @@ public final class MemData extends Data {
   }
 
   @Override
-  public double textNum(final int pre, final boolean text) {
+  public long textItr(final int pre, final boolean text) {
+    return Token.toLong(text(pre, text));
+  }
+
+  @Override
+  public double textDbl(final int pre, final boolean text) {
     return Token.toDouble(text(pre, text));
   }
 

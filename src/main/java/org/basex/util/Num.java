@@ -36,7 +36,7 @@ public final class Num {
   public static byte[] newNum(final int val) {
     final int len = len(val);
     final byte[] array = new byte[4 + len];
-    add(array, val, 4, len);
+    write(array, val, 4, len);
     size(array, 4 + len);
     return array;
   }
@@ -49,7 +49,7 @@ public final class Num {
   public static byte[] num(final int val) {
     final int len = len(val);
     final byte[] array = new byte[len];
-    add(array, val, 0, len);
+    write(array, val, 0, len);
     return array;
   }
 
@@ -64,7 +64,7 @@ public final class Num {
     final int len = len(val);
     final int pos = size(array);
     final byte[] tmp = check(array, pos, len);
-    add(tmp, val, pos, len);
+    write(tmp, val, pos, len);
     size(tmp, pos + len);
     return tmp;
   }
@@ -89,6 +89,16 @@ public final class Num {
   }
 
   /**
+   * Compresses and writes an integer value to the specified byte array.
+   * @param array array
+   * @param v value to be written
+   * @param p position
+   */
+  public static void write(final byte[] array, final int v, final int p) {
+    write(array, v, p, len(v));
+  }
+  
+  /**
    * Returns the length of the specified array, stored in the first four bytes.
    * @param array array to be evaluated
    * @return array length
@@ -96,6 +106,18 @@ public final class Num {
   public static int size(final byte[] array) {
     return ((array[0] & 0xFF) << 24) + ((array[1] & 0xFF) << 16) +
       ((array[2] & 0xFF) << 8) + (array[3] & 0xFF);
+  }
+
+  /**
+   * Writes the specified length in the first bytes of the specified array.
+   * @param array array
+   * @param len length to be written
+   */
+  public static void size(final byte[] array, final int len) {
+    array[0] = (byte) (len >>> 24);
+    array[1] = (byte) (len >>> 16);
+    array[2] = (byte) (len >>> 8);
+    array[3] = (byte) len;
   }
 
   /**
@@ -107,6 +129,15 @@ public final class Num {
   public static int len(final byte[] array, final int val) {
     final int v = (array[val] & 0xFF) >>> 6;
     return v == 0 ? 1 : v == 1 ? 2 : v == 2 ? 4 : 5;
+  }
+
+  /**
+   * Returns the compressed length of the specified value.
+   * @param v integer value
+   * @return value length
+   */
+  public static int len(final int v) {
+    return v < 0 || v > 0x3FFFFFFF ? 5 : v > 0x3FFF ? 4 : v > 0x3F ? 2 : 1;
   }
 
   // PRIVATE STATIC METHODS ===================================================
@@ -130,7 +161,7 @@ public final class Num {
    * @param p position
    * @param l value length
    */
-  private static void add(final byte[] array, final int v, final int p,
+  private static void write(final byte[] array, final int v, final int p,
       final int l) {
     int i = p;
     if(l == 5) {
@@ -146,26 +177,5 @@ public final class Num {
       array[i++] = (byte) (v >>> 8 | 0x40);
     }
     array[i++] = (byte) v;
-  }
-
-  /**
-   * Writes the specified length in the first bytes of the specified array.
-   * @param array array
-   * @param len length to be written
-   */
-  public static void size(final byte[] array, final int len) {
-    array[0] = (byte) (len >>> 24);
-    array[1] = (byte) (len >>> 16);
-    array[2] = (byte) (len >>> 8);
-    array[3] = (byte) len;
-  }
-
-  /**
-   * Returns the compressed length of the specified value.
-   * @param v integer value
-   * @return value length
-   */
-  public static int len(final int v) {
-    return v < 0 || v > 0x3FFFFFFF ? 5 : v > 0x3FFF ? 4 : v > 0x3F ? 2 : 1;
   }
 }

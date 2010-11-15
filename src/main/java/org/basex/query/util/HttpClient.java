@@ -3,7 +3,6 @@ package org.basex.query.util;
 import static java.net.HttpURLConnection.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +11,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
@@ -37,9 +35,9 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.Atts;
+import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.Num;
-import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 
 /**
@@ -50,7 +48,6 @@ import org.basex.util.TokenMap;
  * 
  */
 public class HttpClient {
-
   /** Request element attributes. */
   /** Request attribute: HTTP method. */
   private static final byte[] METHOD = token("method");
@@ -324,17 +321,18 @@ public class HttpClient {
 
     if(src == null) {
       // Set serial parameter "method" according to MIME type
+      sb.append("method=");
       if(method == null) {
-        if(eq(mediaType, APPL_XHTML)) sb.append("method=xhtml");
+        if(eq(mediaType, APPL_XHTML)) sb.append("xhtml");
         else if(eq(mediaType, APPL_XML) || eq(mediaType, APPL_EXT_XML)
             || eq(mediaType, TXT_XML) || eq(mediaType, TXT_EXT_XML)
-            || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append("method=xml");
-        else if(eq(mediaType, TXT_HTML)) sb.append("method=html");
+            || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append("xml");
+        else if(eq(mediaType, TXT_HTML)) sb.append("html");
         else if(startsWith(mediaType, MIME_TEXT_PREFIX))
-          sb.append("method=text");
-        else sb.append("method=xml");
+          sb.append("text");
+        else sb.append("xml");
       } else {
-        sb.append("method=").append(method);
+        sb.append(method);
       }
 
       // Serialize request content according to the
@@ -350,7 +348,6 @@ public class HttpClient {
       } finally {
         out.close();
       }
-
     } else {
       // [RS] If the src attribute is present, the serialization
       // parameters shall be ignored
@@ -509,10 +506,10 @@ public class HttpClient {
       throws IOException {
 
     final InputStream input = conn.getInputStream();
-    final int contentLength = conn.getContentLength();
+    final int len = conn.getContentLength();
 
-    if(contentLength != -1) {
-      final byte[] content = new byte[contentLength];
+    if(len != -1) {
+      final byte[] content = new byte[len];
       try {
         input.read(content);
       } finally {
@@ -521,15 +518,15 @@ public class HttpClient {
       return content;
     }
 
-    final TokenBuilder tb = new TokenBuilder();
-    final BufferedInputStream bufInput = new BufferedInputStream(input);
+    final ByteList tb = new ByteList();
+    final BufferedInputStream bis = new BufferedInputStream(input);
     int i = 0;
     try {
-      while((i = bufInput.read()) != -1) tb.addByte((byte) i);
+      while((i = bis.read()) != -1) tb.add((byte) i);
     } finally {
-      bufInput.close();
+      bis.close();
     }
-    return tb.finish();
+    return tb.toArray();
   }
 
   /**

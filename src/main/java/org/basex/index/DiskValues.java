@@ -148,7 +148,7 @@ public final class DiskValues implements Index {
     for(int l = 0; l < size; ++l) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int pre = idxl.readNum();
-      final double v = data.textNum(pre, text);
+      final double v = data.textDbl(pre, text);
 
       if(v >= min && v <= max) {
         // value is in range

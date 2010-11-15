@@ -13,6 +13,7 @@ import org.basex.io.IO;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableOutput;
+import org.basex.util.Compress;
 import org.basex.util.Token;
 import org.basex.util.Util;
 
@@ -30,14 +31,16 @@ public final class DiskBuilder extends Builder {
   private DataOutput xout;
   /** Database values. */
   private DataOutput vout;
+  /** Output stream for temporary values. */
+  private DataOutput sout;
 
   /** Text pointer. */
   private long txtlen;
   /** Attribute value pointer. */
   private long vallen;
 
-  /** Output stream for temporary values. */
-  private DataOutput sout;
+  /** Text compressor. */
+  private final Compress comp;
 
   /**
    * Constructor.
@@ -46,15 +49,15 @@ public final class DiskBuilder extends Builder {
    */
   public DiskBuilder(final Parser parse, final Prop pr) {
     super(parse, pr);
+    comp = new Compress(pr.num(Prop.COMPRESS));
   }
 
   @Override
   public DiskData build(final String name) throws IOException {
-    final Prop pr = prop;
-    DropDB.drop(name, pr);
-    pr.dbpath(name).mkdirs();
+    DropDB.drop(name, prop);
+    prop.dbpath(name).mkdirs();
 
-    meta = new MetaData(name, pr);
+    meta = new MetaData(name, prop);
     meta.file = parser.file;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
@@ -111,7 +114,7 @@ public final class DiskBuilder extends Builder {
   protected void addDoc(final byte[] txt) throws IOException {
     tout.write1(Data.DOC);
     tout.write2(0);
-    tout.write5(inline(txt, true));
+    tout.write5(textOff(txt, true));
     tout.write4(0);
     tout.write4(meta.size++);
   }
@@ -134,7 +137,7 @@ public final class DiskBuilder extends Builder {
 
     tout.write1(dis << 3 | Data.ATTR);
     tout.write2(n);
-    tout.write5(inline(v, false));
+    tout.write5(textOff(v, false));
     tout.write4(u);
     tout.write4(meta.size++);
   }
@@ -145,7 +148,7 @@ public final class DiskBuilder extends Builder {
 
     tout.write1(kind);
     tout.write2(0);
-    tout.write5(inline(txt, true));
+    tout.write5(textOff(txt, true));
     tout.write4(dis);
     tout.write4(meta.size++);
   }
@@ -158,24 +161,26 @@ public final class DiskBuilder extends Builder {
   }
 
   /**
-   * Calculates the value to be inlined or returns a text position.
+   * Calculates the text offset and writes the text value.
    * @param val value to be inlined
    * @param txt text/attribute flag
    * @return inline value or text position
    * @throws IOException I/O exception
    */
-  private long inline(final byte[] val, final boolean txt) throws IOException {
+  private long textOff(final byte[] val, final boolean txt) throws IOException {
     // inline integer values...
     long v = Token.toSimpleInt(val);
-    if(v != Integer.MIN_VALUE) {
-      v |= IO.NUMOFF;
-    } else if(txt) {
+    if(v != Integer.MIN_VALUE) return v | IO.NUMOFF;
+
+    // compress text
+    final byte[] cpr = comp.pack(val);
+    if(txt) {
       v = txtlen;
-      txtlen += xout.writeToken(val);
+      txtlen += xout.writeToken(cpr);
     } else {
       v = vallen;
-      vallen += vout.writeToken(val);
+      vallen += vout.writeToken(cpr);
     }
-    return v;
+    return (cpr != val) ? v | IO.CPROFF : v;
   }
 }

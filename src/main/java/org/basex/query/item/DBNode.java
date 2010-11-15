@@ -6,10 +6,12 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
+import org.basex.query.QueryException;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.ft.Scoring;
 
@@ -80,6 +82,26 @@ public class DBNode extends Nod {
   public final byte[] atom() {
     if(val == null) val = data.atom(pre);
     return val;
+  }
+
+  @Override
+  public long itr(final InputInfo ii) throws QueryException {
+    final boolean txt = type == Type.TXT || type == Type.COM;
+    if(txt || type == Type.ATT) {
+      final long l = data.textItr(pre, txt);
+      if(l != Long.MIN_VALUE) return l;
+    }
+    return Itr.parse(data.atom(pre), ii);
+  }
+
+  @Override
+  public double dbl(final InputInfo ii) throws QueryException {
+    final boolean txt = type == Type.TXT || type == Type.COM;
+    if(txt || type == Type.ATT) {
+      final double d = data.textDbl(pre, txt);
+      if(!Double.isNaN(d)) return d;
+    }
+    return Dbl.parse(data.atom(pre), ii);
   }
 
   @Override

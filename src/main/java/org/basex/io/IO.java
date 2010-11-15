@@ -36,6 +36,8 @@ public abstract class IO {
   public static final int MAXHEIGHT = 1 << 8;
   /** Offset for inlining numbers. */
   public static final long NUMOFF = 0x8000000000L;
+  /** Offset for compressing texts. */
+  public static final long CPROFF = 0x4000000000L;
 
   /** File path and name. */
   protected String path;

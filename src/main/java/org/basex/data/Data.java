@@ -450,12 +450,20 @@ public abstract class Data {
   public abstract byte[] text(int pre, boolean text);
 
   /**
-   * Returns a text (text, comment, pi) as double value.
+   * Returns a text (text, comment, pi) or attribute value as integer value.
    * @param pre pre value
    * @param text text/attribute flag
    * @return numeric value
    */
-  public abstract double textNum(int pre, boolean text);
+  public abstract long textItr(int pre, boolean text);
+
+  /**
+   * Returns a text (text, comment, pi) or attribute value as double value.
+   * @param pre pre value
+   * @param text text/attribute flag
+   * @return numeric value
+   */
+  public abstract double textDbl(int pre, boolean text);
 
   /**
    * Returns a text (text, comment, pi) length.
