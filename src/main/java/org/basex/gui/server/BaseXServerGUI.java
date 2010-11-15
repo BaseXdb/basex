@@ -35,7 +35,7 @@ public final class BaseXServerGUI {
   }
 
   /**
-   * Constructor.
+   * Default Constructor.
    */
   public BaseXServerGUI() {
     // set mac specific properties

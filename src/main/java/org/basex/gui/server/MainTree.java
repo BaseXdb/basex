@@ -2,11 +2,18 @@ package org.basex.gui.server;
 
 import java.awt.Component;
 
+import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.basex.core.BaseXException;
+import org.basex.core.cmd.List;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.server.ClientSession;
+import org.basex.util.Table;
+import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 /**
  * Tree on the left side of the GUI.
@@ -17,35 +24,47 @@ import org.basex.gui.layout.BaseXLayout;
 public class MainTree {
   /** JTree. */
   private JTree mtree;
-  /** Name of root. */
-  private String serverTitle;
+  /** ClientSession. */
+  private ClientSession client;
 
   /**
-   * Standard constructor.
+   * Default constructor.
    * @param t root title
+   * @param cs clientSession
+   * @throws BaseXException database exception
    */
-  public MainTree(final String t) {
-    serverTitle = t;
-    init();
+  public MainTree(final String t, final ClientSession cs)
+    throws BaseXException {
+    client = cs;
+    init(t);
   }
 
   /**
    * Initializes the tree.
+   * @param t root title
+   * @throws BaseXException database exception
    */
-  private void init() {
-    TreeNode server = new TreeNode(serverTitle, 1);
-    TreeNode dbs = new TreeNode("Databases", 0);
-    TreeNode db1 = new TreeNode("Database 1", 2);
-    TreeNode db2 = new TreeNode("Database 2", 2);
-    db1.add(new TreeNode("Content", 3));
-    db1.add(new TreeNode("Users", 4));
-    db1.add(new TreeNode("Properties", 5));
-    db2.add(new TreeNode("Content", 3));
-    db2.add(new TreeNode("Users", 4));
-    db2.add(new TreeNode("Properties", 5));
-    dbs.add(db1);
-    dbs.add(db2);
+  private void init(final String t) throws BaseXException {
+    TreeNode server = new TreeNode(t, 1, 0);
+    TreeNode dbs = new TreeNode("Databases", 0, 0);
+    final Table dbnames = new Table(client.execute(new List()));
+    for(final TokenList l : dbnames.contents) {
+      TreeNode db = new TreeNode(Token.string(l.get(0)), 2, 0);
+      db.add(new TreeNode("Content", 3, 1));
+      db.add(new TreeNode("Users", 4, 1));
+      db.add(new TreeNode("Properties", 5, 1));
+      dbs.add(db);
+    }
     server.add(dbs);
+    TreeNode security = new TreeNode("Security", 0, 0);
+    security.add(new TreeNode("Logins", 6, 1));
+    server.add(security);
+    TreeNode management = new TreeNode("Management", 0, 0);
+    TreeNode logs = new TreeNode("Server Logs", 0, 0);
+    logs.add(new TreeNode("Current", 7, 1));
+    management.add(logs);
+    management.add(new TreeNode("Active Sessions", 8, 1));
+    server.add(management);
     mtree = new JTree(server);
     setRenderer();
   }
@@ -65,17 +84,8 @@ public class MainTree {
             leaf, row, hf);
 
         TreeNode node = (TreeNode) value;
-        if(node.getType() == 1) {
-          setIcon(BaseXLayout.icon("server_database"));
-        } else if(node.getType() == 2) {
-          setIcon(BaseXLayout.icon("database"));
-        } else if(node.getType() == 3) {
-          setIcon(BaseXLayout.icon("cmd-showtext"));
-        } else if(node.getType() == 4) {
-          setIcon(BaseXLayout.icon("user"));
-        } else if(node.getType() == 5) {
-          setIcon(BaseXLayout.icon("cmd-showinfo"));
-        }
+        ImageIcon ico = node.getIcon();
+        if(ico != null) setIcon(ico);
         return this;
       }
     };
@@ -93,26 +103,55 @@ public class MainTree {
   /**
    * Inner class for treenode.
    */
-  private final class TreeNode extends DefaultMutableTreeNode {
-    /** Flag for nodetype. */
+  public final class TreeNode extends DefaultMutableTreeNode {
+    /** Flag for icontype. */
+    private final int icon;
+    /** Flag for type. */
     private final int type;
 
     /**
      * Standard constructor.
-     * @param t type
      * @param s name
+     * @param i icon
+     * @param t type
      */
-    TreeNode(final String s, final int t) {
+    TreeNode(final String s, final int i, final int t) {
       setUserObject(s);
+      icon = i;
       type = t;
     }
-
+    
     /**
      * Getter for the type.
      * @return value of type
      */
     public int getType() {
       return type;
+    }
+
+    /**
+     * Getter for the icon.
+     * @return value of icon
+     */
+    public ImageIcon getIcon() {
+      if(icon == 1) {
+        return BaseXLayout.icon("server_database");
+      } else if(icon == 2) {
+        return BaseXLayout.icon("database");
+      } else if(icon == 3) {
+        return BaseXLayout.icon("cmd-showtext");
+      } else if(icon == 4) {
+        return BaseXLayout.icon("user");
+      } else if(icon == 5) {
+        return BaseXLayout.icon("cmd-showinfo");
+      } else if(icon == 6) {
+        return BaseXLayout.icon("logins");
+      } else if(icon == 7) {
+        return BaseXLayout.icon("page");
+      } else if(icon == 8) {
+        return BaseXLayout.icon("active");
+      }
+      return null;
     }
   }
 }
