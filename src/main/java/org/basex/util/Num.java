@@ -29,7 +29,8 @@ public final class Num {
   // STATIC METHODS ===========================================================
 
   /**
-   * Creates a new number array.
+   * Creates a new number array, in which the first four bytes contain
+   * the array size.
    * @param val initial value to be stored
    * @return new number array
    */
@@ -42,7 +43,7 @@ public final class Num {
   }
 
   /**
-   * Creates a new number array.
+   * Creates an array with the specified number.
    * @param val initial value to be stored
    * @return new number array
    */
@@ -97,7 +98,7 @@ public final class Num {
   public static void write(final byte[] array, final int v, final int p) {
     write(array, v, p, len(v));
   }
-  
+
   /**
    * Returns the length of the specified array, stored in the first four bytes.
    * @param array array to be evaluated

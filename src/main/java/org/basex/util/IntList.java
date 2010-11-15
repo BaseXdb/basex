@@ -114,7 +114,7 @@ public class IntList extends ElementList {
    * @param e element to be found
    * @return index of the search key, or the negative insertion point - 1
    */
-  public final int sortedIndex(final int e) {
+  public final int sortedIndexOf(final int e) {
     return Arrays.binarySearch(list, 0, size, e);
   }
 

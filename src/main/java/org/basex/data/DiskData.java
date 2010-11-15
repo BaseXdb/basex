@@ -205,7 +205,7 @@ public final class DiskData extends Data {
     final byte[] txt = (text ? texts : values).readToken(o & IO.CPROFF - 1);
     return cpr(o) ? comp.unpack(txt) : txt;
   }
-  
+
   /**
    * Returns true if the specified value contains a number.
    * @param o offset
@@ -214,7 +214,7 @@ public final class DiskData extends Data {
   private static boolean num(final long o) {
     return (o & IO.NUMOFF) != 0;
   }
-  
+
   /**
    * Returns true if the specified value references a compressed token.
    * @param o offset

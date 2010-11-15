@@ -58,6 +58,7 @@ public abstract class FTIndex implements Index {
   final synchronized FTIndexIterator iter(final long p, final int s,
       final DataAccess da, final boolean fast) {
 
+    // cache results
     da.cursor(p);
     final IntList vals = new IntList();
     for(int c = 0, lp = 0; c < s;) {

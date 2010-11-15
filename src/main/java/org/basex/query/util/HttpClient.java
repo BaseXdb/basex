@@ -42,12 +42,11 @@ import org.basex.util.TokenMap;
 
 /**
  * HTTP Client.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
- * 
  */
-public class HttpClient {
+public final class HttpClient {
   /** Request element attributes. */
   /** Request attribute: HTTP method. */
   private static final byte[] METHOD = token("method");
@@ -218,7 +217,7 @@ public class HttpClient {
             headers.add(name, value);
             break;
           }
-        } 
+        }
       } else if(eq(n.nname(), MULTIPART)) multipart = n;
       // Body child
       else if(eq(n.nname(), BODY)) body = n;

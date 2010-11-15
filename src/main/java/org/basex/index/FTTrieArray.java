@@ -41,13 +41,28 @@ final class FTTrieArray {
   }
 
   /**
+   * Bulk loader: inserts a token into the trie. The tokens have to be
+   * sorted first.
+   * @param v value, which is to be inserted
+   * @param s size of the data the node will have
+   * @param off file offset where to read the data
+   */
+  void insertSorted(final byte[] v, final int s, final long off) {
+    final int[] a = off <= Integer.MAX_VALUE ? new int[] { (int) off } :
+      new int[] { (int) (off >> 16 & 0XFFFFFF), -(int) (off & 0xFFFF) };
+    insertNode(0, v, s, a);
+  }
+
+  // PRIVATE METHODS ==========================================================
+
+  /**
    * Inserts a node in the next array.
    * @param cn int current node
    * @param ti int id to insert
    * @param ip int position where to insert ti
    * @return Id on next[currentNode]
    */
-  private int insertNodeInNextArray(final int cn, final int ti, final int ip) {
+  private int insertNode(final int cn, final int ti, final int ip) {
     final int[] cnn = next.get(cn);
     final int[] tmp = new int[cnn.length + 1];
     System.arraycopy(cnn, 0, tmp, 0, ip);
@@ -60,28 +75,14 @@ final class FTTrieArray {
   }
 
   /**
-   * Bulk loader: inserts a token into the trie. The tokens have to be
-   * sorted first.
-   * @param v value, which is to be inserted
-   * @param s size of the data the node will have
-   * @param off file offset where to read the data
-   */
-  void insertSorted(final byte[] v, final int s, final long off) {
-    final int[] a = off <= Integer.MAX_VALUE ? new int[] { (int) off } :
-      new int[] { (int) (off >> 16 & 0XFFFFFF), -(int) (off & 0xFFFF) };
-    insertNodeSorted(0, v, s, a);
-  }
-
-  /**
    * Inserts a node into the trie.
-   * @param cn current node, which gets a new node
-   * appended; start with root (0)
+   * @param cn current node, which gets a new node appended; start with root (0)
    * @param v value, which is to be inserted
    * @param s size of the data the node will have
    * @param off file offset where to read the data
    * @return nodeId, parent node of new node
    */
-  private int insertNodeSorted(final int cn, final byte[] v, final int s,
+  private int insertNode(final int cn, final byte[] v, final int s,
       final int[] off) {
 
     // currentNode is root node
@@ -90,8 +91,7 @@ final class FTTrieArray {
       // root has successors
       if(cnn.length > 3) {
         final int p = pointer(cn);
-        if(Token.diff(tokens.get(next.get(cnn[p])[0])[0], v[0])
-            != 0) {
+        if(Token.diff(tokens.get(next.get(cnn[p])[0])[0], v[0]) != 0) {
           // any child has an appropriate value to valueToInsert;
           // create new node and append it; save data
           final int[] e = new int[2 + off.length];
@@ -101,15 +101,14 @@ final class FTTrieArray {
           System.arraycopy(off, 0, e, 2, off.length);
 
           next.add(e);
-          insertNodeInNextArray(cn, next.size() - 1, p + 1);
+          insertNode(cn, next.size() - 1, p + 1);
           return next.size() - 1;
         }
-        return insertNodeSorted(cnn[p], v, s, off);
+        return insertNode(cnn[p], v, s, off);
       }
     }
 
-    final byte[] is = cnn[0] == -1 ?
-        null : calculateIntersection(tokens.get(cnn[0]), v);
+    final byte[] is = cnn[0] == -1 ? null : intersection(tokens.get(cnn[0]), v);
     byte[] r1 = cnn[0] == -1 ? null : tokens.get(next.get(cn)[0]);
     byte[] r2 = v;
 
@@ -134,10 +133,10 @@ final class FTTrieArray {
             e[1] = s;
             System.arraycopy(off, 0, e, 2, off.length);
             next.add(e);
-            insertNodeInNextArray(cn, next.size() - 1, p + 1);
+            insertNode(cn, next.size() - 1, p + 1);
             return next.size() - 1;
           }
-          return insertNodeSorted(cnn[p], r2, s, off);
+          return insertNode(cnn[p], r2, s, off);
         }
       } else {
         if(r2 == null) {
@@ -203,7 +202,7 @@ final class FTTrieArray {
 
       next.add(ne);
       final int p = cnn.length - 2;
-      insertNodeInNextArray(cn, next.size() - 1, p);
+      insertNode(cn, next.size() - 1, p);
       return next.size() - 1;
     }
     return -1;
@@ -215,10 +214,10 @@ final class FTTrieArray {
    * @param b2 input array two
    * @return intersection of b1 and b2
    */
-  private byte[] calculateIntersection(final byte[] b1, final byte[] b2) {
+  private byte[] intersection(final byte[] b1, final byte[] b2) {
     if(b1 == null || b2 == null) return null;
 
-    final int ml = b1.length < b2.length ? b1.length : b2.length;
+    final int ml = Math.min(b1.length, b2.length);
     int i = -1;
     while(++i < ml && Token.diff(b1[i], b2[i]) == 0);
     return bytes(b1, 0, i);
@@ -226,21 +225,16 @@ final class FTTrieArray {
 
   /**
    * Extracts all data from start - to end position out of data.
-   * @param d byte[]
-   * @param startPos int
-   * @param endPos int
+   * @param d data to be copied
+   * @param s start position
+   * @param e end position
    * @return data byte[]
    */
-  private byte[] bytes(final byte[] d, final int startPos,
-      final int endPos) {
-
-    if(d == null || d.length < endPos || startPos < 0 || startPos == endPos) {
-      return null;
-    }
-
-    final byte[] newByte = new byte[endPos - startPos];
-    System.arraycopy(d, startPos, newByte, 0, newByte.length);
-    return newByte;
+  private byte[] bytes(final byte[] d, final int s, final int e) {
+    if(d == null || d.length < e || s < 0 || s == e) return null;
+    final byte[] tmp = new byte[e - s];
+    System.arraycopy(d, s, tmp, 0, tmp.length);
+    return tmp;
   }
 
   /**

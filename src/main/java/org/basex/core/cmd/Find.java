@@ -231,7 +231,7 @@ public final class Find extends AQuery {
 
         if(term[0] == '<' || term[0] == '>') {
           tb.add(term[0]);
-          tb.addNum(calcNum(substring(term, 1)));
+          tb.addLong(calcNum(substring(term, 1)));
         } else {
           tb.add(" " + CT + " \"");
           tb.add(term);

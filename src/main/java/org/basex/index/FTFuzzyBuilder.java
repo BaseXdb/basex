@@ -4,10 +4,8 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.io.DataOutput;
 import org.basex.util.IntList;
-import org.basex.util.Num;
 
 /**
  * This class builds an index for text contents, optimized for fuzzy search,
@@ -19,26 +17,7 @@ import org.basex.util.Num;
  * <li> merge disk data</li>
  * </ol>
  *
- * <p>The three database index files start with the prefix
- * {@link DataText#DATAFTX} and have the following format:</p>
- *
- * <ol>
- * <li>{@code "x"} looks like:<br/>
- * Structure: {@code [l, p] ...}<br/>
- * {@code l} is the length [byte] of a token<br/>
- * {@code p} is the pointer [int] of the first token with length {@code l}.
- *   There's an entry for each token length
- * </li>
- * <li>{@code "y"} looks like:
- * Structure: {@code [t0, t1, ... tl, z, s]}<br/>
- * {@code t0, t1, ... tl-1} is the token [byte[l]]<br/>
- * {@code z} is the pointer on the data entries of the token [long]<br/>
- * {@code s} is the number of pre values, saved in data [int]
- * </li>
- * <li>{@code "z"} contains the {@code pre/pos} references.
- *   The values are ordered, but not distinct:<br/>
- *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
- * </ol>
+ * <p>The file format is described in the {@link FTFuzzy} class.</p>
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
@@ -128,10 +107,8 @@ final class FTFuzzyBuilder extends FTBuilder {
       outY.writeBytes(v[min].tok);
       // pointer on full-text data
       outY.write5(outZ.size());
-
-      // merge and write out data size
-      final int s = merge(outZ, il, v);
-      outY.write4(s);
+      // merge and write data size
+      outY.write4(merge(outZ, il, v));
     }
     writeInd(outX, ind, ind.get(ind.size() - 2) + 1, (int) outY.size());
 

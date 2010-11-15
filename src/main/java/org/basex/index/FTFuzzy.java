@@ -11,6 +11,7 @@ import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.io.DataAccess;
 import org.basex.util.Levenshtein;
+import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.ft.FTLexer;
@@ -21,21 +22,22 @@ import org.basex.util.ft.FTLexer;
  * pointer on ftdata, where to find the token and its ftdata.
  * The three database index files start with the prefix
  * {@link DataText#DATAFTX} and have the following format:</p>
+ *
  * <ul>
- * <li>The structure of li:<br/>
- *   {@code [l, p]} ... where l is the length of a token an p the pointer of
- *   the first token with length l; there's an entry for
- *   each token length [byte, int]</li>
- *
- * <li>The structure of lt:<br/>
- *   {@code [t0, t1, ... tl, z, s]} ... where t0, t1, ... tl are the byte values
- *   of the token (byte[l]); z is the pointer on
- *   the data entries of the token (int) and s is
- *   the number of pre values, saved in data (int)</li>
- *
- * <li>The structure of dat:<br/>
- *   {@code [pre0, ..., pres, pos0, pos1, ..., poss]} where pre and pos are the
- *   ft data [int[]]</li>
+ * <li>File <b>x</b> contains an entry for each token length:<br/>
+ * Structure: {@code [l, p] ...}<br/>
+ * {@code l} is the length of a token [byte].<br/>
+ * {@code p} is the pointer of the first token with length {@code l} [int].
+ * </li>
+ * <li>File <b>y</b> contains the tokens and references:<br/>
+ * Structure: {@code [t0, t1, ... tl, z, s]}<br/>
+ * {@code t0, t1, ... tl-1} is the token [byte[l]]<br/>
+ * {@code z} is the pointer on the data entries of the token [long]<br/>
+ * {@code s} is the number of pre values, saved in data [int]
+ * </li>
+ * <li>File <b>z</b> contains the {@code pre/pos} references.
+ *   The values are ordered, but not distinct:<br/>
+ *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
  * </ul>
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License

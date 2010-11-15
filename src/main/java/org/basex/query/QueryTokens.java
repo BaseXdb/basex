@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.util.Token.*;
-
 import org.basex.core.Text;
 
 /**

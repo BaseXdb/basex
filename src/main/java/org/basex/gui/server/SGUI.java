@@ -7,13 +7,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.WindowConstants;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.gui.AGUI;
@@ -33,7 +31,7 @@ import org.basex.server.ClientSession;
 /**
  * This class is the main window of the BaseXServerGUI. It is the central
  * instance for user interactions.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */

@@ -107,7 +107,7 @@ public final class IntFormatter {
       tb.add(ROMANX[v / 10 % 10]);
       tb.add(ROMANI[v % 10]);
     } else {
-      tb.addNum(n);
+      tb.addLong(n);
     }
   }
 

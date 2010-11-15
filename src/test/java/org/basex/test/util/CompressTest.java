@@ -20,7 +20,7 @@ import org.junit.Test;
  */
 public class CompressTest {
   /** Verbose flag. */
-  private static boolean verbose = true;
+  private static boolean verbose;
   /** Number of occurrences. */
   public static int[] occ = new int[256];
 
@@ -67,14 +67,14 @@ public class CompressTest {
     test(b);
   }
 
-  /** Test. 
+  /** Test.
    * @throws Exception exception */
   @Test
   public void test7() throws Exception {
     testTexts("etc/xml/xmark.xml");
   }
 
-  /** Test. 
+  /** Test.
    * @throws Exception exception */
   @Test
   public void test8() throws Exception {
@@ -85,7 +85,7 @@ public class CompressTest {
   @Test
   public void evaluate() {
     if(!verbose) return;
-    
+
     /*for(int o = 0; o < occ.length; o++) {
       int max = 0;
       for(int p = 0; p < occ.length; p++) {
@@ -97,7 +97,7 @@ public class CompressTest {
   }
 
   /**
-   * Test on all text nodes of a document. 
+   * Test on all text nodes of a document.
    * @param file file to be parsed
    * @throws Exception exception
    */

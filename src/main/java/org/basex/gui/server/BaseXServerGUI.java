@@ -3,11 +3,9 @@ package org.basex.gui.server;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.util.Enumeration;
-
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.gui.GUIConstants;

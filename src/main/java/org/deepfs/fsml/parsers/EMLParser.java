@@ -581,7 +581,7 @@ public final class EMLParser implements IFileParser {
         while(i < len) {
           final byte b = text[i++];
           if(b == '?') break;
-          subjEnc.addNum(b);
+          subjEnc.addLong(b);
         }
         final boolean utf = subjEnc.toString().equalsIgnoreCase(Token.UTF8);
         // read the encoding flag
@@ -592,7 +592,7 @@ public final class EMLParser implements IFileParser {
         else if(flag == 'B' || flag == 'b') enc = Encoding.BASE64;
         else enc = Encoding.NONE;
         final TokenBuilder tok = new TokenBuilder();
-        while(i < len && text[i] != '?') tok.addNum(text[i++]);
+        while(i < len && text[i] != '?') tok.addLong(text[i++]);
         ++i; // skip '?'
         for(final byte b : enc.decode(tok.finish(), utf)) bl.add(b);
         assert text[i] == '=';

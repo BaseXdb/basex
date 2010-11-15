@@ -120,11 +120,11 @@ public final class DTd extends Dur {
     final TokenBuilder tb = new TokenBuilder();
     if(sc.signum() < 0) tb.add('-');
     tb.add('P');
-    if(day() != 0) { tb.addNum(Math.abs(day())); tb.add('D'); }
+    if(day() != 0) { tb.addLong(Math.abs(day())); tb.add('D'); }
     if(sc.remainder(BigDecimal.valueOf(DAYSECONDS)).signum() != 0) {
       tb.add('T');
-      if(hou() != 0) { tb.addNum(Math.abs(hou())); tb.add('H'); }
-      if(min() != 0) { tb.addNum(Math.abs(min())); tb.add('M'); }
+      if(hou() != 0) { tb.addLong(Math.abs(hou())); tb.add('H'); }
+      if(min() != 0) { tb.addLong(Math.abs(min())); tb.add('M'); }
       if(sec().signum() != 0) { tb.add(sc()); tb.add('S'); }
     }
     if(sc.signum() == 0) tb.add("T0S");

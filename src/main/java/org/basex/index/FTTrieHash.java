@@ -18,8 +18,8 @@ final class FTTrieHash extends TokenSet {
   byte[][] pre = new byte[CAP][];
   /** Compressed pos values. */
   byte[][] pos = new byte[CAP][];
-  /** Number of pre values. */
-  int[] ns = new int[CAP];
+  /** Number of entries. */
+  int[] sizes = new int[CAP];
 
   /**
    * Indexes the specified token.
@@ -33,11 +33,11 @@ final class FTTrieHash extends TokenSet {
       id = -id;
       pre[id] = Num.add(pre[id], pr);
       pos[id] = Num.add(pos[id], po);
-      ++ns[id];
+      ++sizes[id];
     } else {
       pre[id] = Num.newNum(pr);
       pos[id] = Num.newNum(po);
-      ns[id] = 1;
+      sizes[id] = 1;
     }
   }
 
@@ -47,7 +47,7 @@ final class FTTrieHash extends TokenSet {
     final int s = size << 1;
     pre = Array.copyOf(pre, s);
     pos = Array.copyOf(pos, s);
-    ns = Arrays.copyOf(ns, s);
+    sizes = Arrays.copyOf(sizes, s);
   }
 
   /** Integer list. */

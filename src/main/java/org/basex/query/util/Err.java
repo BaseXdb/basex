@@ -136,7 +136,7 @@ public enum Err {
   COPYFAILED(FOFL, 16, "Copying from '%' to '%' failed: %."),
   /** FOFL0017: Evaluation exception. */
   ENCNOTEXISTS(FOFL, 17, "The encoding '%' is not supported."),
-  
+
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL."),
   /** FOHC0002: Evaluation exception. */

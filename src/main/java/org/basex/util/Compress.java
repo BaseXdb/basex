@@ -3,7 +3,7 @@ package org.basex.util;
 /**
  * This class compresses and decompresses tokens. It is inspired by the
  * Huffman coding, but was simplified to speed up processing.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -31,7 +31,7 @@ public final class Compress {
   public Compress(final int m) {
     min = m;
   }
-  
+
   /**
    * Compresses the specified text.
    * @param txt text to be packed
@@ -41,7 +41,7 @@ public final class Compress {
     // skip short texts
     final int tl = txt.length;
     if(tl <= min) return txt;
-    
+
     bl.reset();
     Num.write(bl.list, tl, 0);
     bl.size = Num.len(tl);
@@ -66,7 +66,7 @@ public final class Compress {
     if(o != 0) bl.add(c);
     return bl.size() > tl ? txt : bl.toArray();
   }
-  
+
   /**
    * Pushes bits to the byte cache.
    * @param b value to be pushed.
@@ -86,7 +86,7 @@ public final class Compress {
     o = oo;
     c = cc;
   }
-  
+
   /**
    * Decompresses the specified text.
    * @param txt text to be unpacked
@@ -97,7 +97,7 @@ public final class Compress {
     bl.size = txt.length;
     c = Num.len(txt, 0);
     o = 0;
-    
+
     final int l = Num.read(txt, 0);
     final byte[] res = new byte[l];
     for(int r = 0; r < l; r++) {
@@ -146,7 +146,7 @@ public final class Compress {
     0x70, 0x79, 0x62, 0x6B, 0x66, 0x76, 0x43, 0x53, // encode via 001 xxxx
     0x77, 0x4D, 0x41, 0x42, 0x50, 0x7A, 0x2E, 0x0A,
     0x54, 0x52, 0x4B, 0x4C, 0x47, 0x4E, 0x48, 0x6A, // encode via 0001 xxxxx
-    0x45, 0x49, 0x44, 0x46, 0x4A, 0x78, 0x4F, 0x71, 
+    0x45, 0x49, 0x44, 0x46, 0x4A, 0x78, 0x4F, 0x71,
     0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
     0x38, 0x39, 0x3A, 0x2D, 0x27, 0x2C, 0x22, 0x3F,
     0x56, 0x57, 0x55, 0x5A, 0x59, 0x51, 0x58, 0x40,
@@ -163,6 +163,6 @@ public final class Compress {
   static {
     final int pl = UNPACK.length;
     PACK = new byte[pl];
-    for(int p = 0; p < pl; p++) PACK[UNPACK[p]] = (byte) p; 
+    for(int p = 0; p < pl; p++) PACK[UNPACK[p]] = (byte) p;
   }
 }

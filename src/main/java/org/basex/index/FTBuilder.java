@@ -166,7 +166,7 @@ public abstract class FTBuilder extends IndexBuilder {
     int p = Num.read(vpre, np);
     final int ns = Num.size(vpre);
     while(np < ns) {
-      int u = unit.sortedIndex(p);
+      int u = unit.sortedIndexOf(p);
       if(u < 0) u = -u - 1;
 
       int fr = 0;
@@ -229,7 +229,8 @@ public abstract class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Writes full-text data for a single token to disk.
+   * Writes full-text data for a single token to disk.<br/>
+   * Format: {@code score? pre1 pos1 pre2 pos2 ... (0 score)? pre...}
    * @param out DataOutput for disk access
    * @param vpre compressed pre values
    * @param vpos compressed pos values
@@ -244,17 +245,17 @@ public abstract class FTBuilder extends IndexBuilder {
       if(scm > 0) {
         final int p = Num.read(vpre, np);
         if(lp != p) {
-          // find document root
-          int u = unit.sortedIndex(p);
+          // new pre value: find document root
+          int u = unit.sortedIndexOf(p);
           if(u < 0) u = -u - 1;
-
           if(lu != u) {
+            // new unit: store scoring
             final int s = Scoring.tfIDF(freq.get(fc++),
                 maxfreq[u], unit.size(), ntoken[token]);
             if(max < s) max = s;
             if(min > s) min = s;
             if(np != 4) out.write(0);
-            out.writeBytes(Num.num(s));
+            out.writeNum(s);
             lu = u;
           }
           lp = p;

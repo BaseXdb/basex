@@ -98,8 +98,8 @@ public final class FTTest extends QueryTest {
         "//wld[text() contains text '']" },
       { "FT 12", empty(),
         "//wld[text() contains text ' ']" },
-      //{ "FT 13", nod(40),
-      //  "//*[text() contains text 'yeah']" },
+      { "FT 13", nod(40),
+        "//*[text() contains text 'yeah']" },
 
       { "Preds 1", nod(7, 9, 11),
         "//w[text() contains text 'xml'][text() contains text 'Databases']" },

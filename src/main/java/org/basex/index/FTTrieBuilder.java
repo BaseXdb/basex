@@ -110,17 +110,16 @@ final class FTTrieBuilder extends FTBuilder {
 
       // write token to disk
       outT.writeToken(v[min].tok);
-
-      // merge and write out data size
-      final int s = merge(outB, il, v);
-      outT.write4(s);
-      // write out pointer on full-text data
+      // merge and write data size
+      outT.write4(merge(outB, il, v));
+      // write pointer on full-text data
       outT.write5(outB.size());
     }
 
     outT.writeToken(EMPTY);
     outT.close();
     outB.close();
+
     // write trie index structure to disk, split in subtrees
     writeSplitTrie(ind);
   }
@@ -137,7 +136,7 @@ final class FTTrieBuilder extends FTBuilder {
     while(hash.more()) {
       final int p = hash.next();
       final byte[] tok = hash.key();
-      final int ds = hash.ns[p];
+      final int ds = hash.sizes[p];
       final long cpre = outB.size();
       // write compressed pre and pos arrays
       writeFTData(outB, hash.pre[p], hash.pos[p]);
@@ -169,14 +168,13 @@ final class FTTrieBuilder extends FTBuilder {
     outA.write4(root[root.length - 2]); // data size
     // root has no data
     outA.write5(0);
-
     // write offset to first node
     outC.write4(0);
 
-    final int siz = (root.length - 3) * 5 + 11;
     // all other nodes
-    writeSubTree(null, outA, outC, 0, siz);
+    writeSubTree(null, outA, outC, 0, (root.length - 3) * 5 + 11);
 
+    outC.write4(0);
     outA.close();
     outC.close();
   }
@@ -231,6 +229,7 @@ final class FTTrieBuilder extends FTBuilder {
 
     outT.close();
     outA.close();
+    outC.write4(0);
     outC.close();
 
     // finally update root node
@@ -285,7 +284,7 @@ final class FTTrieBuilder extends FTBuilder {
       }
       // data size
       outA.write4(nxt[jl]);
-      if(nxt[jl] == 0 && nxt[jl + 1] == 0 || lp == 0) {
+      if(lp == 0 || nxt[jl] == 0 && nxt[jl + 1] == 0) {
         // node has no data
         outA.write5(nxt[jl + 1]);
       } else {
@@ -306,33 +305,33 @@ final class FTTrieBuilder extends FTBuilder {
    * Writes the data as sorted list to disk.
    * The data is stored in two files:
    * <ul>
-   * <li>'a': length|byte|,token|byte[length]|, size|int|, offset|long|,
-   * ...</li>
-   * <li>'b': written via {@link #writeFTData}</li>
+   * <li>File <b>a</b>: {@code length|byte|,token|byte[length]|,
+   * size|int|, offset|long|, ...}</li>
+   * <li>File <b>b</b>: written via {@link #writeFTData}</li>
    * </ul>
    * @param cs current file
    * @throws IOException I/O exception
    */
   @Override
   protected void writeIndex(final int cs) throws IOException {
-    final String s = DATAFTX + (merge ? cs : "");
-    final DataOutput outA = new DataOutput(data.meta.file(s + 'a'));
-    final DataOutput outB = new DataOutput(data.meta.file(s + 'b'));
+    final String f = DATAFTX + (merge ? cs : "");
+    final DataOutput outA = new DataOutput(data.meta.file(f + 'a'));
+    final DataOutput outB = new DataOutput(data.meta.file(f + 'b'));
 
     if(scm == 0) hash.init();
     else hash.initIter();
     while(hash.more()) {
       final int p = hash.next();
-      final byte[] tok = hash.key();
-      final int ds = hash.ns[p];
+      final byte[] t = hash.key();
+      final int s = hash.sizes[p];
       // write compressed pre and pos arrays
       writeFTData(outB, hash.pre[p], hash.pos[p]);
       // write token length
-      outA.write1(tok.length);
+      outA.write1(t.length);
       // write token
-      outA.writeBytes(tok);
+      outA.writeBytes(t);
       // write number of full-text data size
-      outA.write4(ds);
+      outA.write4(s);
       // write pointer on full-text data
       outA.write5(outB.size());
     }

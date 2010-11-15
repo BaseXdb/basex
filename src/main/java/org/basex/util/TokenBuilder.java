@@ -204,7 +204,7 @@ public final class TokenBuilder {
    * @param i the integer to be added
    * @return self reference
    */
-  public TokenBuilder addNum(final long i) {
+  public TokenBuilder addLong(final long i) {
     return add(token(i));
   }
 

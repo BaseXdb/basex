@@ -2,7 +2,6 @@ package org.basex.gui.server;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.Open;
@@ -21,15 +20,14 @@ import org.basex.util.Table;
  * @author Andreas Weiler
  */
 public class Tab extends BaseXBack {
-  
   /** GUI reference. */
   private SGUI gui;
-  
+
   /**
    * Default constructor.
    * @param t type
    * @param g gui reference
-   * @throws BaseXException database exception 
+   * @throws BaseXException database exception
    */
   public Tab(final String t, final SGUI g) throws BaseXException {
     gui = g;
@@ -43,7 +41,7 @@ public class Tab extends BaseXBack {
       initProps(dbname);
     }
   }
-  
+
   /**
    * Initializes the user tab.
    * @param t database name
@@ -58,7 +56,7 @@ public class Tab extends BaseXBack {
     BaseXLayout.setWidth(sp, 350);
     add(sp);
   }
-  
+
   /**
    * Initializes the content tab.
    * @param t database name
@@ -73,7 +71,7 @@ public class Tab extends BaseXBack {
     BaseXLayout.setWidth(sp, 550);
     add(sp);
   }
-  
+
   /**
    * Initializes the properties tab.
    * @param t database name
