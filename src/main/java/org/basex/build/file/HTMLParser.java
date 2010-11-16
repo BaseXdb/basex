@@ -85,6 +85,14 @@ public final class HTMLParser extends XMLParser {
     } catch(final Exception ex) {
       Util.debug(ex);
       return io;
-    }
+    }   
+  }
+  
+  /**
+   * Checks if TagSoup is in class path.
+   * @return result
+   */
+  public static boolean isAvailable() {
+    return READER != null;
   }
 }

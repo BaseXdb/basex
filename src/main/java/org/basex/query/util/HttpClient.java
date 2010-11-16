@@ -445,9 +445,10 @@ public final class HttpClient {
    * @param ctx query context
    * @return item with the result content
    * @throws IOException I/O exception
+   * @throws QueryException query exception
    */
   private Item setResultContent(final HttpURLConnection conn,
-      final QueryContext ctx) throws IOException {
+      final QueryContext ctx) throws IOException, QueryException {
 
     final byte[] contentType = reqAttrs.get(OVERMEDIATYPE) == null ?
         token(conn.getContentType()) : reqAttrs.get(OVERMEDIATYPE);
@@ -457,10 +458,11 @@ public final class HttpClient {
         || endsWith(contentType, MIME_XML_SUFFIX))
       // Parse XML
       return processXML(conn, ctx);
-    else if(eq(contentType, TXT_HTML))
+    else if(eq(contentType, TXT_HTML)) {
       // Parse HTML
-      return processHTML(conn, ctx);
-    else if(startsWith(contentType, MIME_TEXT_PREFIX))
+      if(HTMLParser.isAvailable()) return processHTML(conn, ctx); 
+      HTMLERR.thrw(info); return null;
+    } else if(startsWith(contentType, MIME_TEXT_PREFIX))
       // Process text content
       return Str.get(readHttpContent(conn));
     else
