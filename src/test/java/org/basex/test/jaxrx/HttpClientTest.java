@@ -68,7 +68,7 @@ public class HttpClientTest {
 
     // PUT
     final Command put = new XQuery("http:send-request(" + 
-        "<http:request method='put'>" +
+        "<http:request method='put' status-only='true'>" +
           "<http:body media-type='text/xml'>" +
             "<books>" +
               "<book id='1'>" +
@@ -87,7 +87,7 @@ public class HttpClientTest {
           "</http:body>" +
         "</http:request>, 'http://localhost:8984/basex/jax-rx/books')");
     put.execute(context);
-    checkResponse(put, HttpURLConnection.HTTP_CREATED, 2);
+    checkResponse(put, HttpURLConnection.HTTP_CREATED, 1);
 
     // POST - query
     final Command postQuery = new XQuery("http:send-request(" +
@@ -103,7 +103,7 @@ public class HttpClientTest {
 
     // POST - add content
     final Command postAdd = new XQuery("http:send-request(" +
-        "<http:request method='post'>" +
+        "<http:request method='post' status-only='true'>" +
           "<http:body media-type='text/xml'>" +
             "<book id='4'>" +
               "<name>The Celebrated Jumping Frog of Calaveras County</name>" +
@@ -111,7 +111,7 @@ public class HttpClientTest {
             "</book>" + "</http:body>" +
         "</http:request>, 'http://localhost:8984/basex/jax-rx/books')");
     postAdd.execute(context);
-    checkResponse(postAdd, HttpURLConnection.HTTP_CREATED, 2);
+    checkResponse(postAdd, HttpURLConnection.HTTP_CREATED, 1);
 
     // GET1 - just send a GET request
     final Command get1 = new XQuery("http:send-request(" +
@@ -138,10 +138,10 @@ public class HttpClientTest {
 
     // DELETE
     final Command delete = new XQuery("http:send-request(" +
-        "<http:request method='delete'/>, " +
+        "<http:request method='delete' status-only='true'/>, " +
         "'http://localhost:8984/basex/jax-rx/books')");
     delete.execute(context);
-    checkResponse(delete, HttpURLConnection.HTTP_OK, 2);
+    checkResponse(delete, HttpURLConnection.HTTP_OK, 1);
 
   }
 
