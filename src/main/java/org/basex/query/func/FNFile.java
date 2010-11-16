@@ -35,7 +35,7 @@ import org.basex.util.Token;
 
 /**
  * Functions on files and directories.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -121,20 +121,32 @@ final class FNFile extends Fun {
   private Iter listFiles(final QueryContext ctx) throws QueryException {
     final String path = string(checkStr(expr[0], ctx));
     final String pattern;
+    final File dir = new File(path);
 
-    final boolean recursive = expr.length > 1 && checkType(
-        expr[1].item(ctx, input), Type.BLN).bool(input);
+    // Check if directory exists
+    if(!dir.exists()) {
+      DIRNOTEXISTS.thrw(input, path);
+      return null;
+    }
+    // Check if not a directory
+    if(!dir.isDirectory()) {
+      NOTDIR.thrw(input, path);
+      return null;
+    }
+
+    final boolean recursive = expr.length > 1
+        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
 
     try {
-      pattern = expr.length != 3 ? null :
-          IOFile.regex(string(checkStr(expr[2], ctx)));
+      pattern = expr.length != 3 ? null : IOFile.regex(string(checkStr(expr[2],
+          ctx)));
     } catch(final PatternSyntaxException ex) {
       FILEPATTERN.thrw(input, expr[1]);
       return null;
     }
 
-    final List<File> files = recursive ? listRecursively(new File(
-        path)) : Arrays.asList(new File(path).listFiles());
+    final List<File> files = recursive ? listRecursively(dir)
+        : Arrays.asList(dir.listFiles());
     if(files == null) FILELIST.thrw(input, path);
 
     return new Iter() {
@@ -163,7 +175,8 @@ final class FNFile extends Fun {
     int c = 0;
     do {
       if(currFile.isDirectory()) {
-        for(final File f : currFile.listFiles()) result.add(f);
+        for(final File f : currFile.listFiles())
+          result.add(f);
       }
       currFile = result.get(c);
     } while(++c < result.size());
@@ -222,8 +235,8 @@ final class FNFile extends Fun {
   private Item write(final File file, final QueryContext ctx)
       throws QueryException {
 
-    final boolean append = expr.length == 4 &&
-        checkType(expr[3].item(ctx, input), Type.BLN).bool(input);
+    final boolean append = expr.length == 4
+        && checkType(expr[3].item(ctx, input), Type.BLN).bool(input);
 
     // Raise an exception, if the append flag is false and
     // the file to be written already exists
@@ -233,10 +246,11 @@ final class FNFile extends Fun {
     try {
       final PrintOutput out = new PrintOutput(file.getPath());
       try {
-        final XMLSerializer xml = new XMLSerializer(out,
-            FNGen.serialPar(this, 2, ctx));
+        final XMLSerializer xml = new XMLSerializer(out, FNGen.serialPar(this,
+            2, ctx));
         Item it;
-        while((it = ir.next()) != null) it.serialize(xml);
+        while((it = ir.next()) != null)
+          it.serialize(xml);
         xml.close();
       } finally {
         out.close();
@@ -259,8 +273,8 @@ final class FNFile extends Fun {
 
     final B64 b64 = (B64) checkType(expr[1].item(ctx, input), Type.B6B);
 
-    final boolean append = expr.length == 3 &&
-        checkType(expr[2].item(ctx, input), Type.BLN).bool(input);
+    final boolean append = expr.length == 3
+        && checkType(expr[2].item(ctx, input), Type.BLN).bool(input);
 
     // Raise an exception, if the append flag is false and
     // the file to be written already exists
@@ -289,8 +303,8 @@ final class FNFile extends Fun {
   private Item copy(final File src, final QueryContext ctx)
       throws QueryException {
 
-    final boolean overwrite = expr.length == 3 && checkType(
-        expr[2].item(ctx, input), Type.BLN).bool(input);
+    final boolean overwrite = expr.length == 3
+        && checkType(expr[2].item(ctx, input), Type.BLN).bool(input);
 
     final File dst = new File(string(checkStr(expr[1], ctx)));
     if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
@@ -328,8 +342,8 @@ final class FNFile extends Fun {
     final String dst = string(checkStr(expr[1], ctx));
     if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
 
-    final String destFile = dst + (dst.endsWith(Prop.SEP) ? "" : Prop.SEP) +
-      src.getName();
+    final String destFile = dst + (dst.endsWith(Prop.SEP) ? "" : Prop.SEP)
+        + src.getName();
 
     // Raise an exception if the target file already exists
     if(new File(destFile).exists()) FILEEXISTS.thrw(input, destFile);
@@ -341,8 +355,8 @@ final class FNFile extends Fun {
     // Raise an exception if a directory is to be moved
     if(src.isDirectory()) DIRMOVE.thrw(input);
 
-    if(!src.renameTo(new File(dst, src.getName())))
-      CANNOTMOVE.thrw(input, src.getPath());
+    if(!src.renameTo(new File(dst, src.getName()))) CANNOTMOVE.thrw(input,
+        src.getPath());
 
     return null;
   }
@@ -357,13 +371,13 @@ final class FNFile extends Fun {
   private Item makeDir(final File file, final QueryContext ctx)
       throws QueryException {
 
-    final boolean recursive = expr.length == 2 && checkType(
-        expr[1].item(ctx, input), Type.BLN).bool(input);
+    final boolean recursive = expr.length == 2
+        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
 
     // Raise an exception if the directory cannot be created because
     // a file with the same name already exists
-    if(file.exists() && !file.isDirectory())
-      FILEEXISTS.thrw(input, file.getName());
+    if(file.exists() && !file.isDirectory()) FILEEXISTS.thrw(input,
+        file.getName());
 
     if(recursive) {
       // Raise an exception if the existent directory, in which
@@ -404,8 +418,8 @@ final class FNFile extends Fun {
   private Item delete(final File file, final QueryContext ctx)
       throws QueryException {
 
-    final boolean recursive = expr.length == 2 && checkType(
-        expr[1].item(ctx, input), Type.BLN).bool(input);
+    final boolean recursive = expr.length == 2
+        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
 
     if(!file.exists()) PATHNOTEXISTS.thrw(input, file.getPath());
 

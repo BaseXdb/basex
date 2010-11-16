@@ -136,6 +136,10 @@ public enum Err {
   COPYFAILED(FOFL, 16, "Copying from '%' to '%' failed: %."),
   /** FOFL0017: Evaluation exception. */
   ENCNOTEXISTS(FOFL, 17, "The encoding '%' is not supported."),
+  /** FOFL0018: Evaluation exception. */
+  DIRNOTEXISTS(FOFL, 18, "Directory '%' does not exist."),
+  /** FOFL0019: Evaluation exception. */
+  NOTDIR(FOFL, 19, "'%' is not a directory."),
 
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL."),
