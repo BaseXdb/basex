@@ -1,8 +1,10 @@
 package org.basex.query.util;
 
+import static java.lang.Integer.*;
 import static java.net.HttpURLConnection.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
@@ -37,7 +40,6 @@ import org.basex.query.iter.NodeIter;
 import org.basex.util.Atts;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
-import org.basex.util.Num;
 import org.basex.util.TokenMap;
 
 /**
@@ -236,12 +238,16 @@ public final class HttpClient {
     try {
       final URL url = new URL(string(reqAttrs.get(HREF)));
       final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
+      
+      try {
       setConnectionProps(conn);
       setHttpRequestHeaders(conn);
       if(body != null) setHttpRequestContent(conn);
-      conn.disconnect();
+      conn.getResponseCode();
       return getHttpResponse(conn, ctx);
+      } finally {
+        conn.disconnect();
+      }
     } catch(MalformedURLException ex) {
       throw new QueryException(info, URLINV, ex);
     } catch(ProtocolException ex) {
@@ -259,11 +265,10 @@ public final class HttpClient {
    */
   private void setConnectionProps(final HttpURLConnection conn)
       throws ProtocolException, QueryException {
-    conn.setDoInput(true);
     if(body != null) conn.setDoOutput(true);
     conn.setRequestMethod(string(reqAttrs.get(METHOD)).toUpperCase());
     if(reqAttrs.get(TIMEOUT) != null)
-      conn.setConnectTimeout(Num.read(reqAttrs.get(TIMEOUT), 0));
+      conn.setConnectTimeout(parseInt(string(reqAttrs.get(TIMEOUT))));
     if(reqAttrs.get(REDIR) != null)
       setFollowRedirects(Bln.parse(reqAttrs.get(REDIR), info));
   }
