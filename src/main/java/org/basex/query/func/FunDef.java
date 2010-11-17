@@ -434,10 +434,9 @@ public enum FunDef {
   WRITEBIN(FILEURI, FNFile.class, 2, 3,
       "write-binary(path, data, append)", ITEM_Z),
   /** XQuery function */
-  COPY(FILEURI, FNFile.class, 2, 3,
-      "copy(source, destination, overwrite?)", ITEM_Z),
+  COPY(FILEURI, FNFile.class, 2, 3, "copy(source, target, overwrite?)", ITEM_Z),
   /** XQuery function */
-  MOVE(FILEURI, FNFile.class, 2, 2, "move(source, destination)", ITEM_Z),
+  MOVE(FILEURI, FNFile.class, 2, 2, "move(source, target)", ITEM_Z),
 
   /* FNHttp functions */
 

@@ -88,11 +88,16 @@ public final class ServerProcess extends Thread {
       context.user = context.users.get(us);
       final boolean ok = context.user != null &&
         md5(string(context.user.password) + ts).equals(pw);
+
+      if(ok) {
+        start();
+      } else if(!us.isEmpty()) {
+        // log failed login and delay feedback
+        log.write(this, "LOGIN " + us, "failed");
+        Performance.sleep(2000);
+      }
       // send {OK}
       send(ok);
-
-      if(ok) start();
-      else if(!us.isEmpty()) log.write(this, "LOGIN " + us, "failed");
       return ok;
     } catch(final IOException ex) {
       Util.stack(ex);
