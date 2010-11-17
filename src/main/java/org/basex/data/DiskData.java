@@ -60,9 +60,9 @@ public final class DiskData extends Data {
 
       // open data and indexes..
       init();
-      if(meta.txtindex) txtindex = new DiskValues(this, true);
-      if(meta.atvindex) atvindex = new DiskValues(this, false);
-      if(meta.ftxindex) ftxindex = FTIndex.get(this, meta.wildcards);
+      if(meta.textindex) txtindex = new DiskValues(this, true);
+      if(meta.attrindex) atvindex = new DiskValues(this, false);
+      if(meta.ftindex) ftxindex = FTIndex.get(this, meta.wildcards);
     } catch(final IOException ex) {
       throw ex;
     } finally {
@@ -159,10 +159,10 @@ public final class DiskData extends Data {
   @Override
   public void setIndex(final IndexType type, final Index index) {
     switch(type) {
-      case TEXT:      if(meta.txtindex) txtindex = index; break;
-      case ATTRIBUTE: if(meta.atvindex) atvindex = index; break;
-      case FULLTEXT:  if(meta.ftxindex) ftxindex = index; break;
-      case PATH:      if(meta.pthindex) path = (PathSummary) index; break;
+      case TEXT:      if(meta.textindex) txtindex = index; break;
+      case ATTRIBUTE: if(meta.attrindex) atvindex = index; break;
+      case FULLTEXT:  if(meta.ftindex) ftxindex = index; break;
+      case PATH:      if(meta.pathindex) path = (PathSummary) index; break;
       default: break;
     }
   }

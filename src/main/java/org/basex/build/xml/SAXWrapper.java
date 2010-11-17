@@ -24,7 +24,6 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 public final class SAXWrapper extends FileParser {
-
   /** File counter. */
   long counter;
   /** Current line. */

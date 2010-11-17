@@ -66,7 +66,7 @@ public final class FNSent extends Fun {
         list = new SentList(uri, ctx.context.prop);
         LISTS.put(uri, list);
       } catch(final Exception ex) {
-        SENTLISTPARSE.thrw(input, uri, ex);
+        DOCERR.thrw(input, uri);
       }
     }
 

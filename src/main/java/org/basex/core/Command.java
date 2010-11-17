@@ -173,10 +173,23 @@ public abstract class Command extends Progress {
    * @return option
    */
   protected final <E extends Enum<E>> E getOption(final Class<E> typ) {
+    final E e = getOption(args[0], typ);
+    if(e == null) error(CMDWHICH, args[0]);
+    return e;
+  }
+
+  /**
+   * Returns the specified command option.
+   * @param s string to be found
+   * @param typ options enumeration
+   * @param <E> token type
+   * @return option
+   */
+  protected static final <E extends Enum<E>> E getOption(final String s,
+      final Class<E> typ) {
     try {
-      return Enum.valueOf(typ, args[0].toUpperCase());
+      return Enum.valueOf(typ, s.toUpperCase());
     } catch(final Exception ex) {
-      error(CMDWHICH, args[0]);
       return null;
     }
   }
@@ -236,7 +249,7 @@ public abstract class Command extends Progress {
       return error(PROGERR);
     } catch(final Throwable ex) {
       // information on a critical error is output
-      Performance.gc(2);
+      Performance.gc(3);
       abort();
       if(ex instanceof OutOfMemoryError) {
         Util.stack(ex);

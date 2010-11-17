@@ -55,9 +55,9 @@ public final class MemBuilder extends Builder {
     meta = data.meta;
     meta.name = name;
     // all contents will be indexed in main memory mode
-    meta.txtindex = true;
-    meta.atvindex = true;
-    meta.ftxindex = false;
+    meta.textindex = true;
+    meta.attrindex = true;
+    meta.ftindex = false;
     meta.file = parser.file;
 
     parse(name);

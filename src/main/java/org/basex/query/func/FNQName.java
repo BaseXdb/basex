@@ -104,7 +104,7 @@ final class FNQName extends Fun {
    * @param ctx query context
    * @return true, if part of copied nodes
    */
-  public boolean copiedNod(final Nod nod, final QueryContext ctx) {
+  private boolean copiedNod(final Nod nod, final QueryContext ctx) {
     return nod instanceof DBNode &&
       ctx.copiedNods.contains(((DBNode) nod).data);
   }

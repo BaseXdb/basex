@@ -45,13 +45,13 @@ public final class PathBuilder extends IndexBuilder {
       }
       if(h < l) h = l;
     }
-    data.meta.pthindex = true;
+    data.meta.pathindex = true;
     data.flush();
     return path;
   }
 
   @Override
   public void abort() {
-    data.meta.pthindex = false;
+    data.meta.pathindex = false;
   }
 }

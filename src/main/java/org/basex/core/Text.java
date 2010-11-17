@@ -75,8 +75,9 @@ public interface Text {
     "  -o<file>   Write output to file" + NL +
     "  -q<expr>   Execute XQuery expression" + NL +
     "  -s<pars>   Set serialization parameter(s)" + NL +
-    "  -u         Modify original files after updates" + NL +
+    "  -u         Write updates back to original files" + NL +
     "  -v/V       Show (all) process info" + NL +
+    "  -w         Keep whitespaces from source files" + NL +
     "  -z         Skip output of results";
 
   /** Client mode. */
@@ -94,7 +95,7 @@ public interface Text {
     "  -q<expr>   Execute XQuery expression" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -v/V       Show (all) process info" + NL +
-    "  -w         Wrap query result to xml" + NL +
+    "  -w         Keep whitespaces from source files" + NL +
     "  -z         Skip output of results";
 
   /** Server mode. */

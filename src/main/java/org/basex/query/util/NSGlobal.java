@@ -22,11 +22,11 @@ public final class NSGlobal {
     NS.add(FN, FNURI);
     NS.add(MATH, MATHURI);
     NS.add(XML, XMLURI);
-    NS.add(BASEX, BXURI);
+    NS.add(UTIL, UTILURI);
     NS.add(DB, DBURI);
-    NS.add(SENT, SENTURI);
     NS.add(FILE, FILEURI);
     NS.add(HTTP, HTTPURI);
+    NS.add(SENT, SENTURI);
   }
 
   /** Private constructor. */

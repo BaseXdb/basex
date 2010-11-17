@@ -93,9 +93,9 @@ public abstract class ACreate extends Command {
    * @throws IOException I/O exception
    */
   protected final void index(final Data data) throws IOException {
-    if(data.meta.txtindex) index(IndexType.TEXT, data);
-    if(data.meta.atvindex) index(IndexType.ATTRIBUTE, data);
-    if(data.meta.ftxindex) index(IndexType.FULLTEXT, data);
+    if(data.meta.textindex) index(IndexType.TEXT, data);
+    if(data.meta.attrindex) index(IndexType.ATTRIBUTE, data);
+    if(data.meta.ftindex)   index(IndexType.FULLTEXT, data);
   }
 
   /**

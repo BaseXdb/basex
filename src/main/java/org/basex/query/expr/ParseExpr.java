@@ -358,8 +358,6 @@ public abstract class ParseExpr extends Expr {
    */
   protected final void checkAdmin(final QueryContext ctx)
       throws QueryException {
-
-    if(!ctx.context.user.perm(User.ADMIN))
-      PERMNO.thrw(input, CmdPerm.ADMIN);
+    if(!ctx.context.user.perm(User.ADMIN)) PERMNO.thrw(input, CmdPerm.ADMIN);
   }
 }

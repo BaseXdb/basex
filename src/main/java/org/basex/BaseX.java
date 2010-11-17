@@ -141,12 +141,6 @@ public class BaseX extends Main {
           } else if(c == 'i' && sa()) {
             // open initial file or database
             input = arg.string();
-          /*} else if(c == 'm') {
-            // hidden option: activate main memory mode
-            arg.check(set(Prop.MAINMEM, true));
-          } else if(c == 'M') {
-            // hidden option: activate table main memory mode
-            arg.check(set(Prop.TABLEMEM, true));*/
           } else if(c == 'n' && !sa()) {
             // set server name
             context.prop.set(Prop.HOST, arg.string());
@@ -182,7 +176,10 @@ public class BaseX extends Main {
             // show query info
             verbose = true;
             arg.check(set(Prop.QUERYINFO, true));
-          } else if (c == 'W') {
+          } else if(c == 'w') {
+            // activate write-back for updates
+            arg.check(set(Prop.CHOP, false));
+          } else if(c == 'W') {
             // hidden option: write properties before exit
             writeProps = true;
           } else if(c == 'x' && sa()) {

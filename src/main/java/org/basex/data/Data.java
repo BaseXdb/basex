@@ -297,7 +297,7 @@ public abstract class Data {
    */
   public final int pre(final int id) {
     // find pre value in table
-    for(int p = id; p < meta.size; ++p)
+    for(int p = Math.max(0, id); p < meta.size; ++p)
       if(id == id(p)) return p;
     for(int p = 0, ps = Math.min(meta.size, id); p < ps; ++p)
       if(id == id(p)) return p;

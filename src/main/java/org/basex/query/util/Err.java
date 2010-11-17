@@ -16,29 +16,27 @@ import org.basex.util.InputInfo;
  */
 public enum Err {
 
-  /** BASX0000: Evaluation exception. */
+  /** BASX0000: Error that it still to be defined by the specs. */
+  UNDEF(BASX, 0, "%."),
+  /** BASX0000: Not implemented yet. */
   NOTIMPL(BASX, 0, "Not implemented yet: %."),
 
   /** BASX0001: Evaluation exception. */
-  NOIDX(BASX, 1, "Index not available: '%'."),
+  NOIDX(BASX, 1, "%: Index not available."),
   /** BASX0002: Evaluation exception. */
-  WHICHIDX(BASX, 2, "Unknown index: '%'."),
+  NODBCTX(BASX, 2, "No database context set for '%'."),
   /** BASX0003: Evaluation exception. */
   NODB(BASX, 3, "Database '%' not found."),
   /** BASX0004: Evaluation exception. */
-  NOPRE(BASX, 4, "Pre value '%' out of range."),
-  /** BASX0006: No permissions. */
+  IDINVALID(BASX, 4, "%: value '%' out of range."),
+  /** BASX0005: Evaluation exception. */
   PERMNO(BASX, 5, Text.PERMNO),
-  /** BASX0007: Server timeout. */
+  /** BASX0006: Evaluation exception. */
   SERVERTIME(BASX, 6, Text.SERVERTIMEOUT),
-  /** BASX0008: No nodes as result. */
+  /** BASX0007: Evaluation exception. */
   QUERYNODES(BASX, 7, Text.QUERYNODESERR),
-  /** BASX0008: No nodes as result. */
+  /** BASX0008: Evaluation exception. */
   EXPSINGLE(BASX, 8, "Database contains more than one document."),
-  /** BASX0009: No nodes as result. */
-  SENTLISTPARSE(BASX, 9, "% could not be parsed: %."),
-  /** BASX0099: Undefined error. */
-  UNDEF(BASX, 99, "%."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),

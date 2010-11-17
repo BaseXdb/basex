@@ -97,7 +97,7 @@ public final class Find extends AQuery {
     // apply full-text specific options
     final TokenBuilder opt = new TokenBuilder();
     final MetaData md = data.meta;
-    if(md.ftxindex) {
+    if(md.ftindex) {
       if(md.wildcards) opt.add(' ' + USING + ' ' + WILDCARDS);
       if(md.stemming) opt.add(' ' + USING + ' ' + STEMMING);
       if(md.casesens) opt.add(' ' + USING + ' ' + CASE + ' ' + SENSITIVE);

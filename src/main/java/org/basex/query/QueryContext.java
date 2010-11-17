@@ -439,7 +439,6 @@ public final class QueryContext extends Progress {
 
     // check if the database has already been opened
     final String in = string(input);
-    // *TODO* @see Redmine #835
     for(int d = 0; d < docs; ++d) {
       if(doc[d].data.meta.name.equals(in)) return doc[d];
     }

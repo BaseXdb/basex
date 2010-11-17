@@ -58,9 +58,7 @@ public final class Performance {
    * @return memory consumption
    */
   public static String getMem() {
-    final Runtime rt = Runtime.getRuntime();
-    final long mem = rt.totalMemory() - rt.freeMemory();
-    return format(mem);
+    return format(mem());
   }
 
   /**
@@ -114,6 +112,15 @@ public final class Performance {
    */
   public static void gc(final int n) {
     for(int i = 0; i < n; ++i) System.gc();
+  }
+
+  /**
+   * Returns the current memory consumption in bytes.
+   * @return memory consumption
+   */
+  public static long mem() {
+    final Runtime rt = Runtime.getRuntime();
+    return rt.totalMemory() - rt.freeMemory();
   }
 
   @Override

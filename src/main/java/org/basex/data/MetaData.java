@@ -46,13 +46,13 @@ public final class MetaData {
   /** Flag for entity parsing. */
   public boolean entity;
   /** Flag for creating a text index. */
-  public boolean txtindex;
+  public boolean textindex;
   /** Flag for creating a attribute value index. */
-  public boolean atvindex;
+  public boolean attrindex;
   /** Flag for creating a full-text index. */
-  public boolean ftxindex;
+  public boolean ftindex;
   /** Flag for creating a path summary. */
-  public boolean pthindex = true;
+  public boolean pathindex = true;
 
   /** Flag for wildcard indexing. */
   public boolean wildcards;
@@ -97,10 +97,10 @@ public final class MetaData {
     prop = pr;
     chop = prop.is(Prop.CHOP);
     entity = prop.is(Prop.ENTITY);
-    pthindex = prop.is(Prop.PATHINDEX);
-    txtindex = prop.is(Prop.TEXTINDEX);
-    atvindex = prop.is(Prop.ATTRINDEX);
-    ftxindex = prop.is(Prop.FTINDEX);
+    pathindex = prop.is(Prop.PATHINDEX);
+    textindex = prop.is(Prop.TEXTINDEX);
+    attrindex = prop.is(Prop.ATTRINDEX);
+    ftindex = prop.is(Prop.FTINDEX);
     wildcards = prop.is(Prop.WILDCARDS);
     stemming = prop.is(Prop.STEMMING);
     diacritics = prop.is(Prop.DIACRITICS);
@@ -184,9 +184,9 @@ public final class MetaData {
    */
   void update() {
     time = System.currentTimeMillis();
-    txtindex = false;
-    atvindex = false;
-    ftxindex = false;
+    textindex = false;
+    attrindex = false;
+    ftindex = false;
     uptodate = false;
     dirty = true;
   }
@@ -217,10 +217,10 @@ public final class MetaData {
       else if(k.equals(DBHGHT))   height     = toInt(v);
       else if(k.equals(DBCHOP))   chop       = toBool(v);
       else if(k.equals(DBENTITY)) entity     = toBool(v);
-      else if(k.equals(DBPTHIDX)) pthindex   = toBool(v);
-      else if(k.equals(DBTXTIDX)) txtindex   = toBool(v);
-      else if(k.equals(DBATVIDX)) atvindex   = toBool(v);
-      else if(k.equals(DBFTXIDX)) ftxindex   = toBool(v);
+      else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
+      else if(k.equals(DBTXTIDX)) textindex  = toBool(v);
+      else if(k.equals(DBATVIDX)) attrindex  = toBool(v);
+      else if(k.equals(DBFTXIDX)) ftindex    = toBool(v);
       else if(k.equals(DBWCIDX))  wildcards  = toBool(v);
       else if(k.equals(DBFTST))   stemming   = toBool(v);
       else if(k.equals(DBFTCS))   casesens   = toBool(v);
@@ -267,10 +267,10 @@ public final class MetaData {
     writeInfo(out, DBSIZE,   size);
     writeInfo(out, DBCHOP,   chop);
     writeInfo(out, DBENTITY, entity);
-    writeInfo(out, DBPTHIDX, pthindex);
-    writeInfo(out, DBTXTIDX, txtindex);
-    writeInfo(out, DBATVIDX, atvindex);
-    writeInfo(out, DBFTXIDX, ftxindex);
+    writeInfo(out, DBPTHIDX, pathindex);
+    writeInfo(out, DBTXTIDX, textindex);
+    writeInfo(out, DBATVIDX, attrindex);
+    writeInfo(out, DBFTXIDX, ftindex);
     writeInfo(out, DBWCIDX,  wildcards);
     writeInfo(out, DBFTST,   stemming);
     writeInfo(out, DBFTCS,   casesens);

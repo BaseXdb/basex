@@ -89,15 +89,17 @@ public final class FTWords extends FTExpr {
    * Index constructor.
    * @param ii input info
    * @param d data reference
-   * @param t text
-   * @param f fast evaluation
+   * @param str string
+   * @param ctx query context
+   * @throws QueryException query exception
    */
-  public FTWords(final InputInfo ii, final Data d, final byte[] t,
-      final boolean f) {
+  public FTWords(final InputInfo ii, final Data d, final Str str,
+      final QueryContext ctx) throws QueryException {
     super(ii);
+    query = str;
     data = d;
-    txt = t;
-    fast = f;
+    fast = ctx.ftpos != null;
+    comp(ctx);
   }
 
   @Override
@@ -105,8 +107,7 @@ public final class FTWords extends FTExpr {
     // compile only once
     if(ftt == null) {
       if(occ != null) {
-        for(int o = 0; o < occ.length; ++o)
-          occ[o] = occ[o].comp(ctx);
+        for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].comp(ctx);
       }
       query = query.comp(ctx);
       if(query instanceof Str) txt = ((Str) query).atom();
@@ -256,10 +257,11 @@ public final class FTWords extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) {
-    /* If the following conditions yield true, the index is accessed: - the
-     * query is a simple String item - no FTTimes option is specified - FTMode
-     * is different to ANY, ALL and PHRASE - case sensitivity, diacritics and
-     * stemming flags comply with index. */
+    /* If the following conditions yield true, the index is accessed:
+     * - the query is a simple String item
+     * - no FTTimes option is specified
+     * - FTMode is different to ANY, ALL and PHRASE
+     * - case sensitivity, diacritics and stemming flags comply with index. */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ftt.opt;
 

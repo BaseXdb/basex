@@ -13,10 +13,12 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
 
 /**
@@ -47,18 +49,18 @@ public final class IndexAccess extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    Iter[] iter = {};
+  public NodeIter iter(final QueryContext ctx) throws QueryException {
+    NodeIter[] iter = {};
     final Iter ir = ctx.iter(expr);
     Item it;
     while((it = ir.next()) != null) {
       final int s = iter.length;
-      final Iter[] tmp = new Iter[s + 1];
+      final NodeIter[] tmp = new NodeIter[s + 1];
       System.arraycopy(iter, 0, tmp, 0, s);
       iter = tmp;
       iter[s] = index(it.atom());
     }
-    return iter.length == 0 ? Empty.ITER : iter.length == 1 ? iter[0] :
+    return iter.length == 0 ? new NodIter() : iter.length == 1 ? iter[0] :
       new Union(input, expr).eval(iter);
   }
 
@@ -67,17 +69,17 @@ public final class IndexAccess extends Single {
    * @param term term to be found
    * @return iterator
    */
-  private Iter index(final byte[] term) {
+  private NodeIter index(final byte[] term) {
     final Data data = ictx.data;
     final boolean mem = data instanceof MemData;
     final boolean text = ind == IndexType.TEXT;
     final byte kind = text ? Data.TEXT : Data.ATTR;
 
-    return term.length <= MAXLEN ? new Iter() {
+    return term.length <= MAXLEN ? new NodeIter() {
       final IndexIterator ii = data.ids(new ValuesToken(ind, term));
 
       @Override
-      public Item next() {
+      public Nod next() {
         while(ii.more()) {
           final int p = ii.next();
           // main memory instance: check if text is no comment, etc.
@@ -85,12 +87,12 @@ public final class IndexAccess extends Single {
         }
         return null;
       }
-    } : new Iter() {
+    } : new NodeIter() {
       // fallback solution: parse complete data if string is too long
       int pre = -1;
 
       @Override
-      public Item next() {
+      public Nod next() {
         while(++pre != data.meta.size) {
           if(data.kind(pre) == kind && eq(data.text(pre, text), term))
             return new DBNode(data, pre, kind);

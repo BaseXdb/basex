@@ -62,7 +62,7 @@ public final class QuerySuggest extends QueryParser {
 
   @Override
   protected void checkInit() {
-    if(stack != null && !stack.empty() || !data.meta.pthindex) return;
+    if(stack != null && !stack.empty() || !data.meta.pathindex) return;
     all = data.path.root();
     curr = all;
     stack = new Stack<ArrayList<PathNode>>();
@@ -70,7 +70,7 @@ public final class QuerySuggest extends QueryParser {
 
   @Override
   protected void checkAxis(final Axis axis) {
-    all = axis != Axis.CHILD && axis != Axis.DESC || !data.meta.pthindex ?
+    all = axis != Axis.CHILD && axis != Axis.DESC || !data.meta.pathindex ?
       new ArrayList<PathNode>() : data.path.desc(curr, axis == Axis.DESC);
     curr = all;
     show = true;

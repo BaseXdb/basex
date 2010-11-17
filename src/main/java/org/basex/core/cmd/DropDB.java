@@ -25,10 +25,13 @@ public final class DropDB extends ACreate {
 
   @Override
   protected boolean run() {
-    new Close().run(context);
-
-    // check if database is still pinned
+    // name of database
     final String db = args[0];
+    // close database if it's currently opened
+    if(context.data != null && db.equals(context.data.meta.name)) {
+      new Close().run(context);
+    }
+    // check if database is still pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
     // database does not exist; return true
     if(!prop.dbexists(db)) return info(DBNOTDROPPED);

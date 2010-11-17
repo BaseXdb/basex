@@ -160,11 +160,11 @@ public class CreateDB extends ACreate {
     final Builder builder = new DiskBuilder(parser, ctx.prop);
     try {
       final Data data = builder.build(name);
-      if(data.meta.txtindex) data.setIndex(IndexType.TEXT,
+      if(data.meta.textindex) data.setIndex(IndexType.TEXT,
         new ValueBuilder(data, true).build());
-      if(data.meta.atvindex) data.setIndex(IndexType.ATTRIBUTE,
+      if(data.meta.attrindex) data.setIndex(IndexType.ATTRIBUTE,
         new ValueBuilder(data, false).build());
-      if(data.meta.ftxindex) data.setIndex(IndexType.FULLTEXT,
+      if(data.meta.ftindex) data.setIndex(IndexType.FULLTEXT,
         FTBuilder.get(data).build());
       data.close();
     } catch(final IOException ex) {

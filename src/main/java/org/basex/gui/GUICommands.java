@@ -104,19 +104,19 @@ public enum GUICommands implements GUICommand {
         final Data d = gui.context.data;
         final boolean[] ind = info.indexes();
         if(info.opt) {
-          d.meta.txtindex = ind[0];
-          d.meta.atvindex = ind[1];
-          d.meta.ftxindex = ind[2];
+          d.meta.textindex = ind[0];
+          d.meta.attrindex = ind[1];
+          d.meta.ftindex = ind[2];
           progress(gui, INFOOPT, new Command[] { new Optimize() });
         } else {
           Command[] cmd = new Command[0];
-          if(ind[0] != d.meta.pthindex)
+          if(ind[0] != d.meta.pathindex)
             cmd = Array.add(cmd, cmd(ind[0], CmdIndex.PATH));
-          if(ind[1] != d.meta.txtindex)
+          if(ind[1] != d.meta.textindex)
             cmd = Array.add(cmd, cmd(ind[1], CmdIndex.TEXT));
-          if(ind[2] != d.meta.atvindex)
+          if(ind[2] != d.meta.attrindex)
             cmd = Array.add(cmd, cmd(ind[2], CmdIndex.ATTRIBUTE));
-          if(ind[3] != d.meta.ftxindex)
+          if(ind[3] != d.meta.ftindex)
             cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
 
           if(cmd.length != 0) progress(gui, PROGINDEX, cmd);
@@ -1077,6 +1077,6 @@ public enum GUICommands implements GUICommand {
    * @return function string
    */
   static String fndb(final Nodes n, final int i) {
-    return NAMELC + ":db('" + n.data.meta.name + "', " + n.list[i] + ")";
+    return "db:open-pre('" + n.data.meta.name + "', " + n.list[i] + ")";
   }
 }

@@ -36,17 +36,19 @@ public final class CreateIndex extends ACreate {
 
     try {
       IndexType index = null;
-      switch(getOption(CmdIndex.class)) {
+      final CmdIndex ci = getOption(CmdIndex.class);
+      if(ci == null) return false;
+      switch(ci) {
         case TEXT:
-          data.meta.txtindex = true;
+          data.meta.textindex = true;
           index = IndexType.TEXT;
           break;
         case ATTRIBUTE:
-          data.meta.atvindex = true;
+          data.meta.attrindex = true;
           index = IndexType.ATTRIBUTE;
           break;
         case FULLTEXT:
-          data.meta.ftxindex = true;
+          data.meta.ftindex = true;
           data.meta.wildcards = prop.is(Prop.WILDCARDS);
           data.meta.stemming = prop.is(Prop.STEMMING);
           data.meta.casesens = prop.is(Prop.CASESENS);

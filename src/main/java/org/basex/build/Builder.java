@@ -102,7 +102,7 @@ public abstract class Builder extends Progress {
    */
   public final void startDoc(final byte[] doc) throws IOException {
     preStack[lvl++] = meta.size;
-    if(meta.pthindex) path.add(0, lvl, Data.DOC);
+    if(meta.pathindex) path.add(0, lvl, Data.DOC);
     addDoc(doc);
     ns.open();
   }
@@ -309,7 +309,7 @@ public abstract class Builder extends Progress {
     // get tag reference
     int n = tags.index(tag, null, true);
 
-    if(meta.pthindex) path.add(n, lvl, Data.ELEM);
+    if(meta.pathindex) path.add(n, lvl, Data.ELEM);
 
     // cache pre value
     final int pre = meta.size;
@@ -328,7 +328,7 @@ public abstract class Builder extends Progress {
     for(int a = 0; a < as; ++a) {
       n = atts.index(att.key[a], att.val[a], true);
       u = ns.uri(att.key[a], false);
-      if(meta.pthindex) path.add(n, lvl + 1, Data.ATTR);
+      if(meta.pathindex) path.add(n, lvl + 1, Data.ATTR);
       addAttr(n, att.val[a], a + 1, u);
     }
 
@@ -379,7 +379,7 @@ public abstract class Builder extends Progress {
     final byte[] t = txt.finish();
     // text node processing for statistics
     if(kind == Data.TEXT) tags.index(tagStack[lvl - 1], t);
-    if(meta.pthindex) path.add(0, lvl, kind);
+    if(meta.pathindex) path.add(0, lvl, kind);
     addText(t, lvl == 0 ? 1 : meta.size - preStack[lvl - 1], kind);
   }
 

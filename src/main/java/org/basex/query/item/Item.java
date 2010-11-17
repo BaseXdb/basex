@@ -222,7 +222,7 @@ public abstract class Item extends Value {
    * @param s score value
    */
   public final void score(final double s) {
-    score = s;
+    if(score != null || s != 0) score = s;
   }
 
   /**

@@ -366,8 +366,8 @@ public interface QueryTokens {
   byte[] OUTPUTURI = token(W3URI + "/2009/xquery-serialization");
   /** Error URI. */
   byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
-  /** Database URI. */
-  byte[] BXURI = token(Text.URL);
+  /** Util module URI. */
+  byte[] UTILURI = token(Text.URL + "/util");
   /** DB module URI. */
   byte[] DBURI = token(Text.URL + "/db");
   /** File module URI. */
@@ -381,18 +381,6 @@ public interface QueryTokens {
   byte[] JAVAPRE = token("java:");
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
-  /** Root element for the analyze-string-result function. */
-  byte[] ANALYZE = token("fn:analyze-string-result");
-  /** Element for the analyze-string-result function. */
-  byte[] MATCH = token("fn:match");
-  /** Element for the analyze-string-result function. */
-  byte[] NONMATCH = token("fn:non-match");
-  /** Element for the analyze-string-result function. */
-  byte[] MGROUP = token("fn:group");
-  /** Attribute for the analyze-string-result function. */
-  byte[] NR = token("nr");
-  /** Generated namespace. */
-  byte[] NS0 = token("ns0:");
 
   // TYPES ====================================================================
 
@@ -417,8 +405,6 @@ public interface QueryTokens {
   byte[] MATH = token("math");
   /** Output token. */
   byte[] OUTPUT = token("output");
-  /** BaseX token. */
-  byte[] BASEX = token("basex");
   /** DB token. */
   byte[] DB = token("db");
   /** XS token. */
@@ -433,6 +419,8 @@ public interface QueryTokens {
   byte[] HTTP = token("http");
   /** Sentiment token. */
   byte[] SENT = token("sent");
+  /** Util token. */
+  byte[] UTIL = token("util");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");

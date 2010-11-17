@@ -34,19 +34,21 @@ public final class DropIndex extends ACreate {
     final Data data = context.data;
     if(data instanceof MemData) return error(PROCMM);
 
-    switch(getOption(CmdIndex.class)) {
+    final CmdIndex ci = getOption(CmdIndex.class);
+    if(ci == null) return false;
+    switch(ci) {
       case TEXT:
-        data.meta.txtindex = false;
+        data.meta.textindex = false;
         return drop(IndexType.TEXT, DATATXT);
       case ATTRIBUTE:
-        data.meta.atvindex = false;
+        data.meta.attrindex = false;
         return drop(IndexType.ATTRIBUTE, DATAATV);
       case FULLTEXT:
-        data.meta.ftxindex = false;
+        data.meta.ftindex = false;
         return drop(IndexType.FULLTEXT, DATAFTX);
       case PATH:
-        if(data.meta.pthindex) {
-          data.meta.pthindex = false;
+        if(data.meta.pathindex) {
+          data.meta.pathindex = false;
           data.path.root = null;
           data.flush();
         }

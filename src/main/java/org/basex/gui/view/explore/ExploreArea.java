@@ -98,7 +98,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final Data data = gui.context.data;
     if(!main.visible() || data == null) return;
 
-    final boolean pi = data.meta.pthindex;
+    final boolean pi = data.meta.pathindex;
     if(panel.getComponentCount() != 0) {
       if(!pi) init();
       return;
@@ -279,8 +279,8 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
             val1 = val1.replaceAll("\"", "");
             pattern = PATEX;
           } else {
-            pattern = attr && data.meta.atvindex ||
-              !attr && data.meta.txtindex ? PATSUB : PATEX;
+            pattern = attr && data.meta.attrindex ||
+              !attr && data.meta.textindex ? PATSUB : PATEX;
           }
         }
       } else if(comp instanceof BaseXCombo) {

@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -25,6 +26,9 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class CAttr extends CFrag {
+  /** Generated namespace. */
+  private static final byte[] NS0 = token("ns0:");
+
   /** Tag name. */
   private Expr atn;
   /** Computed constructor. */

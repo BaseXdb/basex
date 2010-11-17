@@ -252,8 +252,8 @@ public final class CmpG extends Cmp {
     if(s == null || op != Op.EQ) return false;
 
     // check which index applies
-    final boolean text = s.test.type == Type.TXT && ic.data.meta.txtindex;
-    final boolean attr = s.test.type == Type.ATT && ic.data.meta.atvindex;
+    final boolean text = s.test.type == Type.TXT && ic.data.meta.textindex;
+    final boolean attr = s.test.type == Type.ATT && ic.data.meta.attrindex;
     if(!text && !attr) return false;
 
     // support expressions

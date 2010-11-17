@@ -47,9 +47,7 @@ final class FNInfo extends Fun {
         } else {
           code = Token.string(((QNm) checkType(it, Type.QNM)).ln());
         }
-        if(al > 1) {
-          msg = Token.string(checkEStr(expr[1], ctx));
-        }
+        if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
         Value val = al > 2 ? expr[2].value(ctx) : null;
         final QueryException ex = new QueryException(input, code, val, msg);
         throw ex;

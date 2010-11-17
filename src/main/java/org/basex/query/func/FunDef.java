@@ -445,24 +445,49 @@ public enum FunDef {
   SENDREQUEST(HTTPURI, FNHttp.class, 1, 2,
       "send-request(request, href?)", ITEM_OM),
 
-  /* FNBaseX functions. */
+  /* FNDB functions */
 
-  /** Project specific function - evaluates the specified query. */
-  EVAL(BXURI, FNBaseX.class, 1, 1, "eval(string)", ITEM_ZM),
-  /** Project specific function - accesses an index. */
-  INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", NOD_ZM),
-  /** Project specific function - evaluates the specified query file. */
-  RUN(BXURI, FNBaseX.class, 1, 1, "run(string)", ITEM_ZM),
-  /** Project specific function - opens a database node. */
-  DB(BXURI, FNBaseX.class, 1, 2, "db(string, pre?)", NOD_ZM),
-  /** Project specific function - returns the id of a node. */
-  NODEID(BXURI, FNBaseX.class, 1, 1, "node-id(item)", ITR),
-  /** Project specific function - returns a filesystem path. */
-  FSPATH(BXURI, FNBaseX.class, 1, 1, "fspath(item)", STR),
+  /** Database function: opens a database. */
+  OPEN(DBURI, FNDb.class, 1, 1, "open(string)", NOD_ZM),
+  /** Database function: opens a specific database node. */
+  OPENPRE(DBURI, FNDb.class, 2, 2, "open-pre(string, pre)", NOD_ZM),
+  /** Database function: opens a specific database node. */
+  OPENID(DBURI, FNDb.class, 2, 2, "open-id(string, id)", NOD_ZM),
+  /** Database function: accesses the text index. */
+  TEXTIDX(DBURI, FNDb.class, 1, 1, "text-index(string)", NOD_ZM),
+  /** Database function: accesses the attribute index. */
+  ATTRIDX(DBURI, FNDb.class, 1, 2, "attribute-index(string, name?)", NOD_ZM),
+  /** Database function: accesses the full-text index. */
+  FTIDX(DBURI, FNDb.class, 1, 1, "fulltext-index(string)", NOD_ZM),
+  /** Database function: lists all database. */
+  LIST(DBURI, FNDb.class, 0, 0, "list()", STR_ZM),
+  /** Database function: lists system information. */
+  SYSTEM(DBURI, FNDb.class, 0, 0, "system()", STR),
+  /** Database function: returns database information. */
+  INFO(DBURI, FNDb.class, 0, 0, "info()", STR),
+  /** Database function: accesses the info for the specified index. */
+  IDXINFO(DBURI, FNDb.class, 1, 1, "index-info(type)", STR),
+  /** Database function: returns the node ids of database nodes. */
+  NODEID(DBURI, FNDb.class, 1, 1, "node-id(nodes)", ITR_ZM),
+  /** Database function: returns the pre values of database nodes. */
+  NODEPRE(DBURI, FNDb.class, 1, 1, "node-pre(nodes)", ITR_ZM),
 
-  /** Project specific function - returns a text sentiment. */
+  /* FNUtil functions. */
+
+  /** Utility function: evaluates the specified query. */
+  EVAL(UTILURI, FNUtil.class, 1, 1, "eval(string)", ITEM_ZM),
+  /** Utility function: evaluates the specified query file. */
+  RUN(UTILURI, FNUtil.class, 1, 1, "run(string)", ITEM_ZM),
+  /** Utility function: returns the memory consumption in mb. */
+  MB(UTILURI, FNUtil.class, 1, 2, "mb(expr, cache?)", STR),
+  /** Utility function: measures the execution time of an expression. */
+  MS(UTILURI, FNUtil.class, 1, 2, "ms(expr, cache?)", STR),
+
+  /* FNSent functions. */
+
+  /** Sentiment function: returns a text sentiment. */
   SENT(SENTURI, FNSent.class, 2, 2, "polarity(string, uri)", ITR),
-  /** Project specific function - returns a normed polarity value. */
+  /** Sentiment function: returns a normed polarity value. */
   NORMSENT(SENTURI, FNSent.class, 2, 2, "normed-polarity(string, uri)", ITR);
 
   /** Function classes. */

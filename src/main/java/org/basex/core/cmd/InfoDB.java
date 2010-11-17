@@ -75,10 +75,10 @@ public final class InfoDB extends AInfo {
         tb.add(" " + INDUPDATE + NL);
       } else {
         format(tb, INFOUPTODATE, String.valueOf(meta.uptodate));
-        format(tb, INFOPATHINDEX, flag(meta.pthindex));
-        format(tb, INFOTEXTINDEX, flag(meta.txtindex));
-        format(tb, INFOATTRINDEX, flag(meta.atvindex));
-        format(tb, INFOFTINDEX, flag(meta.ftxindex) + (meta.ftxindex &&
+        format(tb, INFOPATHINDEX, flag(meta.pathindex));
+        format(tb, INFOTEXTINDEX, flag(meta.textindex));
+        format(tb, INFOATTRINDEX, flag(meta.attrindex));
+        format(tb, INFOFTINDEX, flag(meta.ftindex) + (meta.ftindex &&
             meta.wildcards ? " (" + INFOWCINDEX + ")" : ""));
       }
     }

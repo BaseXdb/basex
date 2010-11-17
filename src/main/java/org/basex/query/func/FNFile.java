@@ -478,4 +478,10 @@ final class FNFile extends Fun {
       return null;
     }
   }
+
+  @Override
+  public boolean uses(final Use u) {
+    // prevent instant execution
+    return u == Use.CTX || super.uses(u);
+  }
 }

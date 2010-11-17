@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.util.Performance;
@@ -23,10 +25,21 @@ public final class Info extends AInfo {
 
   @Override
   protected boolean run() throws IOException {
+    out.print(info(context));
+    return true;
+  }
+
+  /**
+   * Creates a database information string.
+   * @param context database context
+   * @return info string
+   */
+  public static byte[] info(final Context context) {
+    final Prop prop = context.prop;
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INFOGENERAL + NL);
     if(context.user.perm(User.CREATE)) {
-      Performance.gc(1);
+      Performance.gc(3);
       format(tb, INFODBPATH, prop.get(Prop.DBPATH));
       format(tb, INFOMEM, Performance.getMem());
     }
@@ -41,7 +54,6 @@ public final class Info extends AInfo {
     format(tb, INFOFTINDEX, flag(prop.is(Prop.FTINDEX)) +
         (prop.is(Prop.FTINDEX) && prop.is(Prop.WILDCARDS) ?
         " (" + INFOWCINDEX + ")" : ""));
-    out.print(tb.finish());
-    return true;
+    return tb.finish();
   }
 }

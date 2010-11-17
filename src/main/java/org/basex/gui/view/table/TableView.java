@@ -72,7 +72,7 @@ public final class TableView extends View implements Runnable {
     tdata.rows = null;
 
     final Data data = gui.context.data;
-    if(!visible() || data == null || !data.meta.pthindex) return;
+    if(!visible() || data == null || !data.meta.pathindex) return;
     tdata.init(data);
     refreshContext(true, false);
   }

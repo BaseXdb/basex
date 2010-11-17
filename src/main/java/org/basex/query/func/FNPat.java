@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryContext;
@@ -31,6 +32,17 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 final class FNPat extends Fun {
+  /** Root element for the analyze-string-result function. */
+  private static final byte[] ANALYZE = token("fn:analyze-string-result");
+  /** Element for the analyze-string-result function. */
+  private static final byte[] MATCH = token("fn:match");
+  /** Element for the analyze-string-result function. */
+  private static final byte[] NONMATCH = token("fn:non-match");
+  /** Element for the analyze-string-result function. */
+  private static final byte[] MGROUP = token("fn:group");
+  /** Attribute for the analyze-string-result function. */
+  private static final byte[] NR = token("nr");
+
   /** Function namespace. */
   private static final Uri FNNS = Uri.uri(FNURI);
   /** Classes pattern. */

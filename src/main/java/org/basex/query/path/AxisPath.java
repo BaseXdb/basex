@@ -125,7 +125,7 @@ public class AxisPath extends Path {
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
 
-    if(data == null || !data.meta.pthindex || !data.meta.uptodate ||
+    if(data == null || !data.meta.pathindex || !data.meta.uptodate ||
         !data.single()) return -1;
 
     ArrayList<PathNode> nodes = data.path.root();
@@ -251,7 +251,7 @@ public class AxisPath extends Path {
    */
   private ArrayList<PathNode> pathNodes(final Data data, final int l) {
     // convert single descendant step to child steps
-    if(!data.meta.pthindex || !data.meta.uptodate) return null;
+    if(!data.meta.pathindex || !data.meta.uptodate) return null;
 
     ArrayList<PathNode> in = data.path.root();
     for(int s = 0; s <= l; ++s) {
@@ -499,7 +499,7 @@ public class AxisPath extends Path {
           // .../self:: / .../descendant-or-self::
           if(s.test == Test.NOD) continue;
           // @.../...
-          if(lsa == ATTR) return s;
+          if(lsa == ATTR && s.test.type != Type.ATT) return s;
           // text()/...
           if(ls.test == Test.TXT && s.test != Test.TXT) return s;
           if(sa == DESCORSELF) continue;

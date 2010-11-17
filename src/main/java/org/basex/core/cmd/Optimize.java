@@ -84,10 +84,10 @@ public final class Optimize extends ACreate {
     data.meta.uptodate = true;
 
     try {
-      data.meta.pthindex |= prop.is(Prop.PATHINDEX);
-      data.meta.txtindex |= prop.is(Prop.TEXTINDEX);
-      data.meta.atvindex |= prop.is(Prop.ATTRINDEX);
-      data.meta.ftxindex |= prop.is(Prop.FTINDEX);
+      data.meta.pathindex |= prop.is(Prop.PATHINDEX);
+      data.meta.textindex |= prop.is(Prop.TEXTINDEX);
+      data.meta.attrindex |= prop.is(Prop.ATTRINDEX);
+      data.meta.ftindex   |= prop.is(Prop.FTINDEX);
       index(data);
     } catch(final IOException ex) {
       Util.debug(ex);
