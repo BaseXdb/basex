@@ -159,7 +159,7 @@ public final class CommandParser extends InputParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        String arg1 = key(AS, null) ? name(cmd) : null;
+        String arg1 = key(AS, null) ? string(cmd) : null;
         String arg2 = key(TO, null) ? string(cmd) : null;
         return new Add(s ? remaining(cmd) : string(cmd), arg1, arg2);
       case DELETE:
