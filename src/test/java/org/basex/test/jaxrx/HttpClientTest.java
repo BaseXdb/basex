@@ -30,7 +30,6 @@ import org.junit.Test;
  * 
  */
 public class HttpClientTest {
-
   /** Status code. */
   private static final byte[] STATUS = token("status");
 
