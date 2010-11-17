@@ -664,7 +664,7 @@ public abstract class W3CTS {
         // assign document
         FunDef def = FunDef.DOC;
         if(!first) {
-          def = FunDef.DB;
+          def = FunDef.OPEN;
           src = IO.get(src).dbname();
         }
         expr = def.get(null, Str.get(src));
