@@ -9,7 +9,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
 
 /**
- * Evaluates the 'alter database' command and alters the name of a database.
+ * Evaluates the 'alter database' command and renames a database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -28,13 +28,19 @@ public final class AlterDB extends Command {
   protected boolean run() {
     final String db = args[0];
     final String name = args[1];
+    if(!checkName(db)) return error(NAMEINVALID, db);
+    if(!checkName(name)) return error(NAMEINVALID, name);
+
     // DB is currently locked
     if(context.pinned(db)) return error(DBLOCKED, db);
+    // DB does not exist
+    if(!prop.dbexists(db)) return error(DBNOTFOUND, db);
+    // Target DB exists already
+    if(prop.dbexists(name)) return error(DBEXISTS, name);
 
     // try to alter database
-    return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
-      alter(db, name, prop) ? info(DBALTERED, db, name) :
-        error(DBNOTALTERED, db);
+    return alter(db, name, prop) ? info(DBALTERED, db, name) :
+      error(DBNOTALTERED, db);
   }
 
   /**

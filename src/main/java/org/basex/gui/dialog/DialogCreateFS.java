@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
@@ -238,7 +240,7 @@ public final class DialogCreateFS extends Dialog {
 
     Msg icon = Msg.ERROR;
     if(ok) {
-      ok = DialogCreate.dbValid(nm);
+      ok = Command.checkName(nm);
       if(!ok) {
         inf = Util.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {

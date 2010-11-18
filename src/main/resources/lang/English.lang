@@ -120,7 +120,6 @@ dfs_meta=Include metadata
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Rename Database
-dr_exists=Database exists already
 dr_over=Old database will be overwritten
 dr_overbacking=Old database and backing store will be overwritten
 
@@ -368,6 +367,7 @@ pc_pos="%" (Line %)
 
 # Database commands
 db_no=Database '%' was not found.
+db_invalid=Name '%' is invalid.
 db_locked=Database '%' is currently locked.
 db_closed=Database '%' was closed.
 db_closeerr=Database could not be closed.
@@ -386,6 +386,9 @@ db_opened=Database '%' opened in %.
 db_exported=Database '%' exported in %.
 db_notexported=Database could not be exported to '%'.
 db_notdeleted=File '%' could not be deleted.
+db_exists=Database '%' exists already.
+db_backdrop=Backup files '%' were dropped.
+db_backnf=No backup found for '%'.
 
 # Index commands
 in_created=Index '%' created in %.
@@ -528,7 +531,8 @@ ch_drop1=Drop database, index or user.
 ch_drop2=Drops a database, index or user:
 ch_drop21=drops the database
 ch_drop22=drops the specified index
-ch_drop3=drops the specified user
+ch_drop23=drops the specified user
+ch_drop24=drops the database backup
 ch_alter1=Alter user password or database name.
 ch_alter2=Alters user password or database name:
 ch_alterpw=alters the password of a user.

@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -15,7 +16,6 @@ import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IO;
-import org.basex.util.Performance;
 
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
@@ -38,11 +38,12 @@ public final class Backup extends Command {
 
   @Override
   protected boolean run() {
-    final Performance p = new Performance();
     final String db = args[0];
+    if(!checkName(db)) return error(NAMEINVALID, db);
+
     // try to backup database
-    return !prop.dbexists(db) ? error(DBNOTFOUND, db)
-        : backup(db, prop) ? info(DBBACKUP, db, p) : error(DBNOBACKUP, db);
+    return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
+      backup(db, prop) ? info(DBBACKUP, db, perf) : error(DBNOBACKUP, db);
   }
 
   /**
@@ -51,21 +52,21 @@ public final class Backup extends Command {
    * @param pr database properties
    * @return success flag
    */
-  public static synchronized boolean backup(final String db, final Prop pr) {
+  public static boolean backup(final String db, final Prop pr) {
     try {
-      final File inFolder = pr.dbpath(db);
-      final File outFile = new File(pr.get(Prop.DBPATH) + Prop.SEP + db + "-"
-          + DATE.format(new Date()) + IO.ZIPSUFFIX);
+      final File in = pr.dbpath(db);
+      final File out = new File(pr.get(Prop.DBPATH) + Prop.SEP + db + "-" +
+          DATE.format(new Date()) + IO.ZIPSUFFIX);
       final byte[] data = new byte[IO.BLOCKSIZE];
 
       // OutputStream for zipping
       final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(
-          new FileOutputStream(outFile)));
+          new FileOutputStream(out)));
       // Process each file
-      for(final File f : inFolder.listFiles()) {
+      for(final File f : in.listFiles()) {
         final BufferedInputStream bis = new BufferedInputStream(
             new FileInputStream(f), IO.BLOCKSIZE);
-        zos.putNextEntry(new ZipEntry(inFolder.getName() + '/' + f.getName()));
+        zos.putNextEntry(new ZipEntry(in.getName() + '/' + f.getName()));
         int c;
         while((c = bis.read(data)) != -1) zos.write(data, 0, c);
         zos.closeEntry();

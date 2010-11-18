@@ -120,7 +120,6 @@ dfs_meta=Importiere Meta-Daten
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Datenbank umbenennen
-dr_exists=Datenbank existiert schon
 dr_over=Alte Datenbank wird überschrieben
 dr_overbacking=Alte Datenbank, sowie DeepFS Hilfsspeicher werden überschrieben
 
@@ -368,6 +367,7 @@ pc_pos="%" (Zeile %)
 
 # Database commands
 db_no=Die Datenbank '%' wurde nicht gefunden.
+db_invalid=Der Name '%' ist ungültig.
 db_locked=Die Datenbank '%' ist gerade gesperrt.
 db_closed=Datenbank '%' wurde geschlossen.
 db_closeerr=Die Datenbank konnte nicht geschlossen werden.
@@ -386,6 +386,9 @@ db_opened=Datenbank '%' geöffnet (%).
 db_exported=Datenbank '%' exportiert (%).
 db_notexported=Die Datenbank konnte nicht nach '%' exportiert werden.
 db_notdeleted=Die Datei '%' konnte nicht gelöscht werden.
+db_exists=Die Datenbank '%' existiert schon.
+db_backdrop=Backup-Dateien '%' wurden gelöscht.
+db_backnf=Kein Backup wurde für '%' gefunden.
 
 # Index commands
 in_created=Index erzeugt (%).
@@ -528,7 +531,8 @@ ch_drop1=Entfernen einer Datenbank, eines Index oder Benutzers.
 ch_drop2=Entfernt eine Datenbank, einen Index oder Benutzer:
 ch_drop21=entfernt die Datenbank
 ch_drop22=entfernt den angegebenen Index
-ch_drop3=entfernt den angegebenen Benutzer
+ch_drop23=entfernt den angegebenen Benutzer
+ch_drop24=entfernt das Datenbank-Backup
 ch_alter1=Ändern von Benutzerpasswörtern oder Datenbanknamen.
 ch_alter2=Ändert ein Benutzerpasswort oder einen Datenbanknamen:
 ch_alterpw=ändert das Passwort eines Benutzers.

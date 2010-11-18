@@ -120,7 +120,6 @@ dfs_meta=Include metadata
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Hernoem Database
-dr_exists=Database bestaat al
 dr_over=Oude database wordt overschreven
 dr_overbacking=Oude database en 'backing store' worden overschreven
 
@@ -368,6 +367,7 @@ pc_pos="%" (Regel %)
 
 # Database commands
 db_no=Database '%' is niet gevonden.
+db_invalid=Name '%' is invalid.
 db_locked=Database '%' is momenteel gelockt.
 db_closed=Database '%' is gesloten.
 db_closeerr=Database kon niet gesloten worden.
@@ -386,6 +386,9 @@ db_opened=Database '%' geopend in %.
 db_exported=Database '%' gexporteerd in %.
 db_notexported=Database kon niet naar '%' gexporteerd worden.
 db_notdeleted=Bestand '%' kon niet verwijderd worden.
+db_exists=Database bestaat '%' al.
+db_backdrop=Backup files '%' were dropped.
+db_backnf=No backup found for '%'.
 
 # Index commands
 in_created=Index '%' in % seconden gemaakt.
@@ -528,7 +531,8 @@ ch_drop1=Verwijder database, index van gebruiker.
 ch_drop2=Verwijder een database, index van gebruiker:
 ch_drop21=verwijdert de database
 ch_drop22=verwijdert de opgegeven index
-ch_drop3=verwijdert de opgegeven gebruiker
+ch_drop23=verwijdert de opgegeven gebruiker
+ch_drop24=verwijdert de database backup
 ch_alter1=Wijzig gebruiker password of database naam.
 ch_alter2=Wijzigt gebruiker password of database naam:
 ch_alterpw=wijzigt  de password of a gebruiker.

@@ -3,6 +3,8 @@ package org.basex.core.cmd;
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import java.io.File;
+
+import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -14,7 +16,7 @@ import org.basex.core.Commands.Cmd;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class DropDB extends ACreate {
+public final class DropDB extends Command {
   /**
    * Default constructor.
    * @param name name of database
@@ -28,9 +30,9 @@ public final class DropDB extends ACreate {
     // name of database
     final String db = args[0];
     // close database if it's currently opened
-    if(context.data != null && db.equals(context.data.meta.name)) {
+    if(context.data != null && db.equals(context.data.meta.name))
       new Close().run(context);
-    }
+
     // check if database is still pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
     // database does not exist; return true
@@ -50,7 +52,7 @@ public final class DropDB extends ACreate {
   }
 
   /**
-   * Recursively drops a database directory.
+   * Drops a database directory.
    * @param db database to delete
    * @param pat file pattern
    * @param pr database properties

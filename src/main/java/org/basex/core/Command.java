@@ -133,6 +133,16 @@ public abstract class Command extends Progress {
     return cb.toString();
   }
 
+  /**
+   * Checks if the specified filename is valid; allows only letters,
+   * digits, the underscore, and dash.
+   * @param name name to be checked
+   * @return result of check
+   */
+  public static final boolean checkName(final String name) {
+    return name != null && name.matches("[\\w-]+");
+  }
+
   // PROTECTED METHODS ========================================================
 
   /**

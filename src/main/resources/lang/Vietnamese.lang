@@ -120,7 +120,6 @@ dfs_meta=Bao gồm metadata
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Đổi tên cơ sở dữ liệu
-dr_exists=Cơ sở dữ liệu đã có rồi
 dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè
 dr_overbacking=Cơ sở dữ liệu cũ và dự phòng sẽ bị ghi đè
 
@@ -366,6 +365,7 @@ pc_pos="%" (Dòng %)
 
 # Database commands
 db_no=Cơ sở dữ liệu '%' không tìm thấy.
+db_invalid=Name '%' is invalid.
 db_locked=Database '%' is currently locked.
 db_closed=Cơ sở dữ liệu '%' đã được đóng.
 db_closeerr=Cơ sở dữ liệu không đóng được.
@@ -384,6 +384,9 @@ db_opened=Cơ sở dữ liệu '%' được mở ở %.
 db_exported=Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
 db_notexported=Database could not be exported to '%'.
 db_notdeleted=File '%' could not be deleted.
+db_exists=Cơ sở dữ liệu '%' đã có rồi
+db_backdrop=Backup files '%' were dropped.
+db_backnf=No backup found for '%'.
 
 # Index commands
 in_created=Index được tạo ở %.
@@ -526,7 +529,8 @@ ch_drop1=Xóa bỏ cơ sở dữ liệu hoặc index.
 ch_drop2=Drops a database, index or user:
 ch_drop21=drops cơ_sở_dữ_liệu
 ch_drop22=drops index_đặc_biệt
-ch_drop3=drops the specified user
+ch_drop23=drops the specified user
+ch_drop24=drops the database backup
 ch_alter1=Alter user password or database name.
 ch_alter2=Alters user password or database name:
 ch_alterpw=alters the password of a user.

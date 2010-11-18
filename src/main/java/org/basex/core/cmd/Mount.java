@@ -27,8 +27,6 @@ public final class Mount extends Command {
   protected boolean run() {
     final String db = args[0];
     final String mp = args[1];
-
-    new Close().run(context);
     new Open(db).run(context);
 
     final Data data = context.data;

@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import org.basex.build.xml.CatalogResolverWrapper;
+import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
@@ -281,7 +282,7 @@ public final class DialogCreate extends Dialog {
     String inf = !exists ? PATHWHICH : !ok ? DBWHICH : null;
     Msg icon = Msg.ERROR;
     if(ok) {
-      ok = dbValid(nm);
+      ok = Command.checkName(nm);
       if(!ok) {
         inf = Util.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
@@ -309,15 +310,5 @@ public final class DialogCreate extends Dialog {
     gui.set(Prop.FTINDEX, ftxindex.isSelected());
     gui.set(Prop.INTPARSE, intparse.isSelected());
     ft.close();
-  }
-
-  /**
-   * Checks if the specified filename is valid; allows only letters,
-   * digits and some special characters.
-   * @param fn filename
-   * @return result of check
-   */
-  static boolean dbValid(final String fn) {
-    return fn.matches("[\\w.-]+");
   }
 }

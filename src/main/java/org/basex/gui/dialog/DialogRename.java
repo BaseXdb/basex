@@ -5,6 +5,8 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
+import org.basex.core.Command;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
@@ -67,9 +69,9 @@ final class DialogRename extends Dialog {
   public void action(final Object cmp) {
     final String nm = name.getText();
     ok = !db.contains(nm) || nm.equals(old);
-    String msg = ok ? null : RENAMEEXISTS;
+    String msg = ok ? null : Util.info(DBEXISTS, db);
     if(ok) {
-      ok = !nm.isEmpty() && DialogCreate.dbValid(nm);
+      ok = !nm.isEmpty() && Command.checkName(nm);
       if(!nm.isEmpty() && !ok) msg = Util.info(INVALID, EDITNAME);
     }
     info.setText(msg, Msg.ERROR);

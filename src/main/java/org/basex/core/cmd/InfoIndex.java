@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.User;
@@ -40,7 +41,9 @@ public final class InfoIndex extends AInfo {
   protected boolean run() throws IOException {
     final Data data = context.data;
     if(args[0] != null) {
-      final byte[] info = info(getOption(CmdIndexInfo.class), data);
+      final CmdIndexInfo ci = getOption(CmdIndexInfo.class);
+      if(ci == null) return error(CMDUNKNOWN, this);
+      final byte[] info = info(ci, data);
       out.print(info);
       return info.length != 0;
     }

@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
@@ -37,31 +38,33 @@ public final class DropUser extends Command {
 
   @Override
   protected boolean run() {
-    final String usern = args[0];
-    if(usern.equals(ADMIN)) return error(USERADMIN);
+    final String name = args[0];
+    if(name.equals(ADMIN)) return error(USERADMIN);
+    if(!checkName(name)) return error(NAMEINVALID, name);
 
-    final User user = context.users.get(usern);
-    if(user == null) return error(USERNO, usern);
+    final User user = context.users.get(name);
+    if(user == null) return error(USERNO, name);
 
-    final String name = args[1];
-    if(name == null) {
+    final String db = args[1];
+    if(db != null && !checkName(db)) return error(NAMEINVALID, db);
+    if(db == null) {
       for(final ServerProcess s : context.sessions) {
-        if(s.context.user.name.equals(usern)) return error(USERLOG, usern);
+        if(s.context.user.name.equals(name)) return error(USERLOG, name);
       }
       context.users.drop(user);
     } else {
       try {
-        final Data data = Open.open(name, context);
+        final Data data = Open.open(db, context);
         data.meta.users.remove(data.meta.users.get(args[0]));
         data.flush();
         Close.close(context, data);
       } catch(final IOException ex) {
         Util.debug(ex);
         final String msg = ex.getMessage();
-        return msg.isEmpty() ? error(DBOPENERR, name) : error(msg);
+        return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
       }
     }
-    return info(USERDROP, usern);
+    return info(USERDROP, name);
   }
 
   @Override

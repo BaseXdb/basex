@@ -120,7 +120,6 @@ dfs_meta=Inclure métadonnées
 dfs_nodefaultapp=Aucune application par défaut définie pour ouvrir ce type de fichier
 
 dr_title=Renommer la base de données
-dr_exists=La base de données existe déjà
 dr_over=La base de données existante va être remplacée
 dr_overbacking=La base de données existante et la sauvegarde vont être remplacées
 
@@ -368,6 +367,7 @@ pc_pos="%" (ligne %)
 
 # Commandes Database (Base de données)
 db_no=La base de données '%' est introuvable.
+db_invalid=Name '%' is invalid.
 db_locked=La base de données '%' est actuellement verrouillée.
 db_closed=La base de données '%' a été fermée.
 db_closeerr=Impossible de fermer la base de données.
@@ -387,6 +387,9 @@ db_opened=Base de données '%' ouverte dans %.
 db_exported=Base de données '%' exportée dans %.
 db_notexported=Impossible d'exporter la base de données à '%'.
 db_notdeleted=Impossible de supprimer le fichier '%'.
+db_exists=La base de données '%' existe déjà.
+db_backdrop=Backup files '%' were dropped.
+db_backnf=No backup found for '%'.
 
 # Index commands
 in_created=Index créé dans %.
@@ -529,7 +532,8 @@ ch_drop1=Drop base de données, index ou utilisateur.
 ch_drop2=Drops a base de données, index ou utilisateur:
 ch_drop21=drops the base de données
 ch_drop22=drops the spécifié index
-ch_drop3=drops the spécifié utilisateur
+ch_drop23=drops the spécifié utilisateur
+ch_drop24=drops the backup du base de données
 ch_alter1=Alter user password or database name.
 ch_alter2=Alters user password or database name:
 ch_alterpw=alters the password of a user.

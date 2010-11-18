@@ -18,12 +18,12 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class AddTest {
+public final class CreateTest {
   /** Database context. */
   private static final Context CTX = new Context();
 
   /** Test database name. */
-  private static final String DBNAME = Util.name(AddTest.class);
+  private static final String DBNAME = Util.name(CreateTest.class);
   /** Test document name. */
   private static final String DOCNAME = "t.xml";
   /** Target. */
@@ -72,7 +72,7 @@ public class AddTest {
    * @throws BaseXException exception
    */
   @Test
-  public final void createDB() throws BaseXException {
+  public void createDB() throws BaseXException {
     new CreateDB(DBNAME).execute(CTX);
     // check if database name equals argument of create command
     assertEquals(dbName(), DBNAME);
@@ -83,7 +83,7 @@ public class AddTest {
    * @throws BaseXException exception
    */
   @Test
-  public final void createDBWithInput() throws BaseXException {
+  public void createDBWithInput() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
       new CreateDB(DBNAME, INPUTS[i]).execute(CTX);
       // check name of database
@@ -98,7 +98,7 @@ public class AddTest {
    * @throws BaseXException exception
    */
   @Test
-  public final void createDBandAdd() throws BaseXException {
+  public void createDBandAdd() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
       new CreateDB(DBNAME).execute(CTX);
       new Add(INPUTS[i]).execute(CTX);
@@ -112,7 +112,7 @@ public class AddTest {
    * @throws BaseXException exception
    */
   @Test
-  public final void createDBandAddAs() throws BaseXException {
+  public void createDBandAddAs() throws BaseXException {
     for(final String in : INPUTS) {
       new CreateDB(DBNAME).execute(CTX);
       new Add(in, DOCNAME).execute(CTX);
@@ -126,7 +126,7 @@ public class AddTest {
    * @throws BaseXException exception
    */
   @Test
-  public final void createDBandAddTo() throws BaseXException {
+  public void createDBandAddTo() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
       new CreateDB(DBNAME).execute(CTX);
       new Add(INPUTS[i], null, TARGET).execute(CTX);
@@ -140,7 +140,7 @@ public class AddTest {
    * @throws BaseXException exception
    */
   @Test
-  public final void createDBandAddAsTO() throws BaseXException {
+  public void createDBandAddAsTO() throws BaseXException {
     for(final String in : INPUTS) {
       new CreateDB(DBNAME).execute(CTX);
       new Add(in, DOCNAME, TARGET).execute(CTX);

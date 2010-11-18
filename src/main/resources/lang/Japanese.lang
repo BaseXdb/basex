@@ -120,7 +120,6 @@ dfs_meta=メタデータを含める
 dfs_nodefaultapp=このファイルタイプを開くためのデフォルトアプリケーションが登録されていません。
 
 dr_title=データベースの名前を変更
-dr_exists=同じ名前のデータベースが存在します。
 dr_over=古いデータベースは上書きされます。
 dr_overbacking=古いデータベースは上書きされます。(backing store will be deleted, too)
 
@@ -370,6 +369,7 @@ pc_pos=% (%行、)
 
 # Database commands
 db_no=データベース '%' が見付かりませんでした。
+db_invalid=Name '%' is invalid.
 db_locked=データベース '%' はロックされています。
 db_closed=データベース '%' を閉じました。
 db_closeerr=データベースを閉じる事が出来ませんでした。
@@ -389,6 +389,9 @@ db_opened=データベース "%" が % を開きました。
 db_exported=データベース "%" が % に出力しました。
 db_notexported=Database could not be exported to '%'.
 db_notdeleted=ファイル '%' を削除できませんでした。
+db_exists=同じ名前のデータベース "%" が存在します。
+db_backdrop=Backup files '%' were dropped.
+db_backnf=No backup found for '%'.
 
 # Index commands
 in_created=% にインデックスが作成されました。
@@ -528,9 +531,10 @@ ch_list1=利用可能なデータベースの一覧
 ch_list2=利用可能なデータベースの一覧を表示します。
 ch_drop1=データベース又はインデックスの削除
 ch_drop2=データベース、インデックス、あるいはユーザーを削除します。
-ch_drop3=指定されたユーザーを削除します。
 ch_drop21=データベースを削除します。
 ch_drop22=指定されたインデックスを削除します。
+ch_drop23=指定されたユーザーを削除します。
+ch_drop24=drops the database backup。
 ch_alter1=Alter user password or database name.
 ch_alter2=Alters user password or database name:
 ch_alterpw=alters the password of a user.

@@ -1,7 +1,9 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.transform.sax.SAXSource;
@@ -62,15 +64,24 @@ public class Add extends ACreate {
     final IO io = IO.get(input);
     if(!io.exists()) return error(FILEWHICH, io);
 
-    if(args[1] != null) {
+    String name = args[1];
+    if(name != null && !name.isEmpty()) {
       // set specified document name
-      io.name(args[1]);
+      io.name(name);
+      try {
+        // try to resolve name (platform dependent)
+        new File(name).getCanonicalFile();
+      } catch(final IOException ex) {
+        name = null;
+      }
+      if(name == null || name.matches(".*[\\\\/].*"))
+        return error(NAMEINVALID, args[1]);
     } else if(io instanceof IOContent) {
       // if no name exists, set database name as document name
-      io.name(context.data.meta.name + IO.XMLSUFFIX);
+      name = context.data.meta.name + IO.XMLSUFFIX;
+      io.name(name);
     }
 
-    final String name   = io.name();
     String trg = path(args[2]);
     final DirParser p = new DirParser(io, context.prop, trg);
     try {

@@ -68,8 +68,42 @@ public class CmdTest {
     no(new Add(FILE));
     ok(new CreateDB(NAME));
     ok(new Add(FILE, "input"));
-    ok(new Add(FILE, "input"));
+    ok(new Add(FILE, "input", "target"));
     ok(new Add(FLDR, "xml"));
+    no(new Add(FILE, ":"));
+    no(new Add(FILE, "\\"));
+    no(new Add(FILE, "/"));
+  }
+
+  /** Command test. */
+  @Test
+  public final void alterDB() {
+    ok(new CreateDB(NAME));
+    no(new AlterDB(NAME, USER));
+    ok(new Close());
+    ok(new AlterDB(NAME, USER));
+    no(new AlterDB(USER, "!"));
+    no(new AlterDB("!", USER));
+  }
+
+  /** Command test. */
+  @Test
+  public final void alterUser() {
+    ok(new CreateUser(USER, USER));
+    ok(new AlterUser(USER, "test"));
+    no(new AlterUser(":", USER));
+  }
+
+  /** Command test. */
+  @Test
+  public final void backup() {
+    no(new Backup(NAME));
+    ok(new CreateDB(NAME));
+    ok(new Backup(NAME));
+    ok(new Close());
+    ok(new Backup(NAME));
+    ok(new DropBackup(NAME));
+    no(new Restore(":"));
   }
 
   /** Command test. */
@@ -88,6 +122,11 @@ public class CmdTest {
     ok(new InfoDB());
     ok(new CreateDB(NAME, FILE));
     ok(new CreateDB("abcde"));
+    // invalid database names
+    no(new CreateDB(""));
+    no(new CreateDB(" "));
+    no(new CreateDB(":"));
+    no(new CreateDB("/"));
   }
 
   /** Command test. */
@@ -105,6 +144,7 @@ public class CmdTest {
     for(final CmdIndex cmd : CmdIndex.values()) no(new CreateIndex(cmd));
     ok(new CreateDB(NAME, FILE));
     for(final CmdIndex cmd : CmdIndex.values()) ok(new CreateIndex(cmd));
+    no(new CreateIndex("x"));
   }
 
   /** Command test. */
@@ -120,6 +160,8 @@ public class CmdTest {
     ok(new CreateUser(USER, "test"));
     no(new CreateUser(USER, "test"));
     ok(new DropUser(USER));
+    no(new CreateUser("", ""));
+    no(new CreateUser(":", ""));
   }
 
   /** Command test. */
@@ -157,6 +199,7 @@ public class CmdTest {
     ok(new DropDB(USER));
     ok(new DropDB(NAME));
     ok(new DropDB(NAME));
+    no(new DropDB(""));
   }
 
   /** Command test. */
@@ -165,14 +208,17 @@ public class CmdTest {
     for(final CmdIndex cmd : CmdIndex.values()) no(new DropIndex(cmd));
     ok(new CreateDB(NAME, FILE));
     for(final CmdIndex cmd : CmdIndex.values()) ok(new DropIndex(cmd));
+    no(new DropIndex("x"));
   }
 
   /** Command test. */
   @Test
   public final void dropUser() {
     ok(new CreateUser(USER, "test"));
+    no(new DropUser(USER, ":"));
     ok(new DropUser(USER));
     no(new DropUser(USER));
+    no(new DropUser(""));
   }
 
   /** Command test. */
@@ -192,6 +238,13 @@ public class CmdTest {
     no(new Find("1"));
     ok(new CreateDB(NAME, FILE));
     ok(new Find("1"));
+  }
+
+  /** Command test. */
+  @Test
+  public final void get() {
+    ok(new Get(CmdSet.CHOP));
+    no(new Get(USER));
   }
 
   /** Command test. */
@@ -231,6 +284,7 @@ public class CmdTest {
     no(new InfoIndex());
     ok(new CreateDB(NAME, FILE));
     ok(new InfoIndex());
+    no(new InfoIndex("x"));
   }
 
   /** Command test. */
@@ -265,6 +319,7 @@ public class CmdTest {
     ok(new CreateDB(NAME, FILE));
     ok(new Open(NAME));
     ok(new Open(NAME));
+    no(new Open(":"));
   }
 
   /** Command test. */
@@ -280,6 +335,18 @@ public class CmdTest {
   public final void password() {
     ok(new Password("admin"));
     no(new Password(""));
+  }
+
+  /** Command test. */
+  @Test
+  public final void restore() {
+    no(new Restore(NAME));
+    ok(new CreateDB(NAME));
+    ok(new Backup(NAME));
+    ok(new Restore(NAME));
+    ok(new DropBackup(NAME));
+    no(new Restore(NAME));
+    no(new Restore(":"));
   }
 
   /** Command test. */
@@ -308,6 +375,16 @@ public class CmdTest {
     ok(new Set("runs", 1));
     no(new Set("runs", true));
     no(new Set(USER, USER));
+  }
+
+  /** Command test. */
+  @Test
+  public final void showUsers() {
+    ok(new ShowUsers());
+    no(new ShowUsers(NAME));
+    ok(new CreateDB(NAME));
+    ok(new ShowUsers(NAME));
+    no(new ShowUsers(":"));
   }
 
   /** Command test. */

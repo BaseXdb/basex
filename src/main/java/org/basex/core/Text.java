@@ -242,7 +242,9 @@ public interface Text {
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
     LI + CmdDrop.USER + " [" + C_NAME + "]:" + NL + "  " +
-    lang("ch_drop3", C_NAME)
+      lang("ch_drop23") + NL +
+    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
+      lang("ch_drop24", C_NAME)
   };
   /** Command help. */
   String[] HELPEXPORT = {
@@ -425,6 +427,8 @@ public interface Text {
 
   /** Database not found. */
   String DBNOTFOUND = lang("db_no");
+  /** Name invalid. */
+  String NAMEINVALID = lang("db_invalid");
   /** Database locked. */
   String DBLOCKED = lang("db_locked");
   /** Database closed. */
@@ -459,6 +463,12 @@ public interface Text {
   String DBNOTEXPORTED = lang("db_notexported");
   /** Database not deleted. */
   String DBNOTDELETED = lang("db_notdeleted");
+  /** Database exists already. */
+  String DBEXISTS = lang("db_exists");
+  /** Database was dropped. */
+  String DBBACKDROP = lang("db_backdrop");
+  /** Backup was not found. */
+  String DBBACKNF = lang("db_backnf");
 
   /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");
@@ -1185,8 +1195,6 @@ public interface Text {
 
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");
-  /** Info for renaming a database. */
-  String RENAMEEXISTS = lang("dr_exists") + DOT;
   /** Info for overwriting a database. */
   String RENAMEOVER = lang("dr_over") + DOT;
   /** Info for overwriting a database and deleting backing store. */

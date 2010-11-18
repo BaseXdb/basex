@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.core.CommandBuilder;
@@ -36,6 +37,8 @@ public final class ShowUsers extends Command {
   @Override
   protected boolean run() throws IOException {
     final String name = args[0];
+    if(name != null && !checkName(name)) return error(NAMEINVALID, name);
+
     if(name == null) {
       out.println(context.users.info());
     } else {

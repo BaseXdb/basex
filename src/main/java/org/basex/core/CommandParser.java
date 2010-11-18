@@ -24,6 +24,7 @@ import org.basex.core.cmd.CreateMAB;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Cs;
 import org.basex.core.cmd.Delete;
+import org.basex.core.cmd.DropBackup;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.DropUser;
@@ -155,7 +156,7 @@ public final class CommandParser extends InputParser {
         }
         break;
       case OPEN:
-        return new Open(string(cmd));
+        return new Open(name(cmd));
       case CHECK:
         return new Check(string(cmd));
       case ADD:
@@ -191,6 +192,8 @@ public final class CommandParser extends InputParser {
             return new DropIndex(consume(CmdIndex.class, cmd));
           case USER:
             return new DropUser(name(cmd), key(ON, null) ? name(cmd) : null);
+          case BACKUP:
+            return new DropBackup(name(cmd));
         }
         break;
       case OPTIMIZE:
@@ -321,7 +324,7 @@ public final class CommandParser extends InputParser {
   private String name(final Cmd cmd) throws QueryException {
     consumeWS();
     final TokenBuilder tb = new TokenBuilder();
-    while(letterOrDigit(curr()) || curr('.') || curr('-')) tb.add(consume());
+    while(letterOrDigit(curr()) || curr('-')) tb.add(consume());
     return finish(cmd, !more() || curr(';') || ws(curr()) ? tb : null);
   }
 

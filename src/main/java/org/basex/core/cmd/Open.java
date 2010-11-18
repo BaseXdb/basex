@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
@@ -27,8 +28,10 @@ public final class Open extends Command {
 
   @Override
   protected boolean run() {
-    new Close().run(context);
     String db = args[0];
+    if(!checkName(db)) return error(NAMEINVALID, db);
+
+    new Close().run(context);
     final int i = db.indexOf('/');
     String path = null;
     if(i != -1) {
