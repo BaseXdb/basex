@@ -97,7 +97,7 @@ public final class DialogCreateFS extends Dialog {
             main).select(BaseXFileChooser.Mode.DOPEN);
         if(file != null) {
           path.setText(file.path());
-          dbname.setText(file.dbname().replaceAll("[^\\w.-]", ""));
+          dbname.setText(file.dbname().replaceAll("[^\\w-]", ""));
         }
       }
     });

@@ -214,7 +214,7 @@ public final class DialogCreate extends Dialog {
     final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
     if(file != null) {
       path.setText(file.path());
-      dbname.setText(file.dbname().replaceAll("[^\\w.-]", ""));
+      dbname.setText(file.dbname().replaceAll("[^\\w-]", ""));
       gprop.set(GUIProp.OPENPATH, file.dir());
     }
   }

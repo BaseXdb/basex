@@ -316,7 +316,7 @@ public final class CommandParser extends InputParser {
 
   /**
    * Parses and returns a name. A name is limited to letters, digits,
-   * underscores, dashes, and periods: {@code [A-Za-z0-9_.-]+}.
+   * underscores, dashes, and periods: {@code [A-Za-z0-9_-]+}.
    * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception

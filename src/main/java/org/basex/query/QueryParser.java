@@ -674,7 +674,11 @@ public class QueryParser extends InputParser {
     skipWS();
     Var[] args = {};
     final int s = ctx.vars.size();
-    while(curr() == '$') {
+    while(true) {
+      if(curr() != '$') {
+        if(args.length == 0) break;
+        error(WRONGCHAR, '$', found());
+      }
       final QNm arg = varName();
       final SeqType argType = consumeWS(AS) ? sequenceType() : null;
       final Var var = new Var(input(), arg, argType);
