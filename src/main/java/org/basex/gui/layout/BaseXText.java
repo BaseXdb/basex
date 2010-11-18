@@ -48,7 +48,6 @@ public class BaseXText extends BaseXPanel {
   private final BaseXBar scroll;
   /** Undo history; if set to {@code null}, text will be read-only. */
   protected final transient Undo undo;
-
   /** Search field. */
   private BaseXTextField find;
 
@@ -379,8 +378,8 @@ public class BaseXText extends BaseXPanel {
     text.pos(text.cursor());
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
-    if(FINDNEXT.is(e) || FINDPREV.is(e)) {
-      find(rend.find(FINDPREV.is(e), true));
+    if(FINDNEXT.is(e) || FINDPREV.is(e) || FINDNEXT2.is(e) || FINDPREV2.is(e)) {
+      find(rend.find(FINDPREV.is(e) || FINDPREV2.is(e), true));
       return;
     }
     if(SELECTALL.is(e)) {

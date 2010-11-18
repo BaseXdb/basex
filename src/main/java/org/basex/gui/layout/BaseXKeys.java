@@ -17,7 +17,9 @@ public enum BaseXKeys {
 
   /** Find search term.  */ FIND(SC, VK_F, true),
   /** Find next hit.     */ FINDNEXT(SC, VK_G, true),
+  /** Find next hit.     */ FINDNEXT2(MAC ? SC : 0, VK_F3, true),
   /** Find previous hit. */ FINDPREV(SC | SHF, VK_G, true),
+  /** Find next hit.     */ FINDPREV2(MAC ? SC | SHF : SHF, VK_F3, true),
   /** Select all.        */ SELECTALL(SC, VK_A, true),
   /** Browse back.       */ GOBACK(MAC ? SC : ALT, VK_LEFT, true),
   /** Browse back.       */ GOBACK2(VK_BACK_SPACE, true),

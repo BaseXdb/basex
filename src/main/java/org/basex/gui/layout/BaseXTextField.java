@@ -3,6 +3,8 @@ package org.basex.gui.layout;
 import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.Font;
 import java.awt.Window;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -71,6 +73,14 @@ public class BaseXTextField extends JTextField {
     setFont(f.deriveFont((float) f.getSize() + 2));
     BaseXLayout.setWidth(this, 80);
 
+    addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(final FocusEvent e) {
+        selectAll();
+      }
+    }
+    );
+    
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -78,8 +88,9 @@ public class BaseXTextField extends JTextField {
         final boolean enter = ENTER.is(e);
         if(ESCAPE.is(e) || enter && text.isEmpty()) {
           area.requestFocusInWindow();
-        } else if(enter || FINDNEXT.is(e) || FINDPREV.is(e)) {
-          area.find(text, FINDPREV.is(e) || e.isShiftDown());
+        } else if(enter || FINDNEXT.is(e) || FINDPREV.is(e) ||
+            FINDNEXT2.is(e) || FINDPREV2.is(e)) {
+          area.find(text, FINDPREV.is(e) || FINDPREV2.is(e) || e.isShiftDown());
         }
       }
       @Override
