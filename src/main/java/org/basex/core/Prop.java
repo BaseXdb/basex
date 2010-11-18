@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import java.io.File;
-import org.basex.io.IO;
 import org.basex.util.Util;
 
 /**
@@ -29,17 +28,8 @@ public final class Prop extends AProp {
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.startsWith("MAC");
 
-  /** User's home directory. */
-  public static final String HOME;
-
-  // set HOME directory of the application
-  static {
-    // retrieve application path
-    final String t = new File(Util.applicationPath()).getParent() + SEP;
-    // choose user home directory if no props are found in the application path
-    HOME = new File(t + IO.BASEXSUFFIX).exists() ? t :
-      System.getProperty("user.home") + SEP;
-  }
+  /** Directory for storing the property files, database directory, etc. */
+  public static final String HOME = Util.homeDir() + SEP;
 
   // The following properties will be saved to disk:
 

@@ -1,10 +1,13 @@
 package org.basex.util;
 
+import java.io.File;
 import static org.basex.core.Text.*;
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import org.basex.core.Prop;
+import org.basex.io.IO;
 import org.basex.server.LoginException;
 
 /**
@@ -205,12 +208,36 @@ public final class Util {
   }
 
   /**
-   * Returns the absolute path to the working directory of this application.
+   * Returns the the preferred directory for storing the property file,
+   * databases directory, etc.
+   * @return application path
+   */
+  public static String homeDir() {
+    // [TP] to be considered: System.getProperty("basex.workingdir");
+    
+    // check application directory for property files
+    String home = applicationPath();
+    final File f = new File(home);
+    if(f.isFile()) home = f.getParent();
+    if(new File(home + IO.BASEXSUFFIX).exists()) return home;
+
+    // not found; check working directory for property files
+    final String work = System.getProperty("user.dir");
+    if(new File(work + IO.BASEXSUFFIX).exists()) return work;
+
+    // not found; choose user home directory
+    return System.getProperty("user.home");
+  }
+
+  /**
+   * Returns the absolute path to this application.
    * @return application path
    */
   public static String applicationPath() {
+    // [TP] to be checked: potential null pointer exception
+
     // raw application path
-    final String path = Util.class.getProtectionDomain().
+    String path = Util.class.getProtectionDomain().
       getCodeSource().getLocation().getPath();
 
     // decode path; URLDecode returns wrong results
@@ -227,10 +254,10 @@ public final class Util {
     }
     try {
       // return path, using the correct encoding
-      return new String(tb.finish(), System.getProperty("file.encoding"));
+      return new String(tb.finish(), Prop.ENCODING);
     } catch(final Exception ex) {
-      // not expected to occur
-      return path;
+      // use default path; not expected to occur
+      return tb.toString();
     }
   }
 }
