@@ -109,7 +109,7 @@ public final class DialogCreate extends Dialog {
 
     dbname = new BaseXTextField(this);
     final String dbn = IO.get(gprop.get(GUIProp.OPENPATH)).dbname();
-    dbname.setText(dbn.replaceAll("[^\\w.-]", ""));
+    dbname.setText(dbn.replaceAll("[^\\w-]", ""));
     dbname.addKeyListener(keys);
     p.add(dbname);
     p.add(new BaseXLabel());

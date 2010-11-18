@@ -1483,7 +1483,7 @@ public class QueryParser extends InputParser {
       final byte[] name = qName(null);
       final int p2 = qp;
       if(consumeWS(PAR1)) {
-        final Type type = Type.node(new QNm(name));
+        final Type type = Type.node(new QNm(name, ctx, input()));
         if(type != null) {
           tok.reset();
           while(!consume(PAR2)) {
@@ -1653,7 +1653,7 @@ public class QueryParser extends InputParser {
    */
   private Expr functionCall() throws QueryException {
     final int p = qp;
-    final QNm name = new QNm(qName(null));
+    final QNm name = new QNm(qName(null), ctx, input());
     if(!consumeWS2(PAR1) || Type.node(name) != null) {
       qp = p;
       return null;
