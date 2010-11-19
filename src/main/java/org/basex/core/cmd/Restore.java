@@ -38,12 +38,6 @@ public final class Restore extends Command {
     String db = args[0];
     if(!checkName(db)) return error(NAMEINVALID, db);
 
-    // close database if it's currently opened
-    if(context.data != null && db.equals(context.data.meta.name))
-      new Close().run(context);
-    // check if database is pinned
-    if(context.pinned(db)) return error(DBLOCKED, db);
-
     final int i = db.indexOf("-");
     String name = null;
     if(i == -1) {
@@ -57,6 +51,12 @@ public final class Restore extends Command {
     }
     final File file = new File(name);
     if(!file.exists()) return error(DBBACKNF, db);
+
+    // close database if it's currently opened
+    if(context.data != null && db.equals(context.data.meta.name))
+      new Close().run(context);
+    // check if database is pinned
+    if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to restore database
     return restore(file, prop) ? info(DBRESTORE, file.getName(), perf) :

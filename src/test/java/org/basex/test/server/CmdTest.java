@@ -347,6 +347,9 @@ public class CmdTest {
     ok(new DropBackup(NAME));
     no(new Restore(NAME));
     no(new Restore(":"));
+    ok(new Open(NAME));
+    no(new Restore(NAME));
+    ok(new XQuery("."));
   }
 
   /** Command test. */
