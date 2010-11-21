@@ -213,17 +213,14 @@ public final class Util {
    * @return application path
    */
   public static String homeDir() {
-    // [TP] to be considered: System.getProperty("basex.workingdir");
-    
-    // check application directory for property files
-    String home = applicationPath();
-    final File f = new File(home);
-    if(f.isFile()) home = f.getParent();
-    if(new File(home + IO.BASEXSUFFIX).exists()) return home;
-
-    // not found; check working directory for property files
+    // check working directory for property file
     final String work = System.getProperty("user.dir");
-    if(new File(work + IO.BASEXSUFFIX).exists()) return work;
+    if(new File(work, IO.BASEXSUFFIX).exists()) return work;
+
+    // not found; check application directory
+    final File f = new File(applicationPath());
+    String home = f.isFile() ? f.getPath() : f.getParent();
+    if(new File(home, IO.BASEXSUFFIX).exists()) return home;
 
     // not found; choose user home directory
     return System.getProperty("user.home");
@@ -234,8 +231,6 @@ public final class Util {
    * @return application path
    */
   public static String applicationPath() {
-    // [TP] to be checked: potential null pointer exception
-
     // raw application path
     String path = Util.class.getProtectionDomain().
       getCodeSource().getLocation().getPath();
