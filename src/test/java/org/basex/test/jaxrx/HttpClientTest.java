@@ -2,9 +2,7 @@ package org.basex.test.jaxrx;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
-
 import java.net.HttpURLConnection;
-
 import org.basex.api.jaxrx.JaxRxServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -24,12 +22,12 @@ import org.junit.Test;
 
 /**
  * This class tests the HTTP Client.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
- * 
+ *
  */
-public class HttpClientTest {
+public final class HttpClientTest {
   /** Status code. */
   private static final byte[] STATUS = token("status");
 
@@ -66,7 +64,7 @@ public class HttpClientTest {
   public void testSendRequest() throws BaseXException, QueryException {
 
     // PUT
-    final Command put = new XQuery("http:send-request(" + 
+    final Command put = new XQuery("http:send-request(" +
         "<http:request method='put' status-only='true'>" +
           "<http:body media-type='text/xml'>" +
             "<books>" +
