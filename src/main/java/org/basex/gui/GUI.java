@@ -303,6 +303,8 @@ public final class GUI extends AGUI {
           for(final Command c : new CommandParser(in.substring(i),
               context).parse()) {
             if(!exec(c, c instanceof XQuery)) break;
+            // [CG] fix for 894:, maybe just for update commands...
+            if(db) notify.init();
           }
         } catch(final QueryException ex) {
           if(!info.visible()) GUICommands.SHOWINFO.execute(this);
