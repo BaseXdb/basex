@@ -8,10 +8,10 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Simple;
-import org.basex.query.item.FTItem;
-import org.basex.query.item.Item;
+import org.basex.query.item.FTNode;
+import org.basex.query.item.Nod;
 import org.basex.query.iter.FTIter;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
 
 /**
@@ -23,6 +23,7 @@ import org.basex.util.InputInfo;
 public final class FTIndexAccess extends Simple {
   /** Scoring flag. */
   final boolean scoring;
+
   /** Full-text expression. */
   private final FTExpr ftexpr;
   /** Index context. */
@@ -44,13 +45,13 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public NodeIter iter(final QueryContext ctx) throws QueryException {
     final FTIter ir = ftexpr.iter(ctx);
 
-    return new Iter() {
+    return new NodeIter() {
       @Override
-      public Item next() throws QueryException {
-        final FTItem it = ir.next();
+      public Nod next() throws QueryException {
+        final FTNode it = ir.next();
         if(it != null) {
           // add entry to visualization
           if(ctx.ftpos != null) ctx.ftpos.add(it.pre, it.all);

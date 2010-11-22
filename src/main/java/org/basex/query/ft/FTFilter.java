@@ -7,7 +7,7 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
 import org.basex.util.ft.FTLexer;
@@ -33,9 +33,9 @@ public abstract class FTFilter extends FTExpr {
   }
 
   @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii)
+  public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final FTItem it = expr[0].item(ctx, input);
+    final FTNode it = expr[0].item(ctx, input);
     filter(ctx, it, ctx.fttoken);
     return it;
   }
@@ -46,8 +46,8 @@ public abstract class FTFilter extends FTExpr {
 
     return new FTIter() {
       @Override
-      public FTItem next() throws QueryException {
-        FTItem it;
+      public FTNode next() throws QueryException {
+        FTNode it;
         while((it = ir.next()) != null) {
           if(filter(ctx, it,
               content() ? new FTLexer().init(it.atom()) : null)) break;
@@ -65,7 +65,7 @@ public abstract class FTFilter extends FTExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  final boolean filter(final QueryContext ctx, final FTItem item,
+  final boolean filter(final QueryContext ctx, final FTNode item,
       final FTLexer lex) throws QueryException {
 
     final FTMatches all = item.all;

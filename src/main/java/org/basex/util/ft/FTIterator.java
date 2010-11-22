@@ -9,7 +9,7 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class FTIterator implements Iterator<Span> {
+public abstract class FTIterator implements Iterator<FTSpan> {
   /**
    * Initializes the iterator.
    * @param text text
@@ -19,7 +19,7 @@ public abstract class FTIterator implements Iterator<Span> {
 
   /**
    * Returns the next token. May be called as an alternative to {@link #next}
-   * to avoid the creation of new {@link Span} instances.
+   * to avoid the creation of new {@link FTSpan} instances.
    * @return token
    */
   public abstract byte[] nextToken();

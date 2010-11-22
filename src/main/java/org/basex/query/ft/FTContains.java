@@ -12,7 +12,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
@@ -75,7 +75,7 @@ public class FTContains extends ParseExpr {
     ctx.fttoken = lex;
     while((it = iter.next()) != null) {
       lex.init(it.atom());
-      final FTItem item = ftexpr.item(ctx, input);
+      final FTNode item = ftexpr.item(ctx, input);
       double d = 0;
       if(item.all.matches()) {
         d = item.score();
@@ -91,11 +91,6 @@ public class FTContains extends ParseExpr {
     }
 
     ctx.fttoken = tmp;
-    /*final double is = ctx.value.score;
-    if(s != is && s != 0 && s == s && is != 0 && is == is) {
-      s = Math.max(ctx.value.score - s / ctx.value.score, s -
-        ctx.value.score / s);
-    }*/
     return Bln.get(s);
   }
 
@@ -121,8 +116,8 @@ public class FTContains extends ParseExpr {
     if(ic.seq) return new FTContainsIndex(input, expr, ie, ic);
 
     // standard index evaluation; first expression will always be an axis path
-    return ((AxisPath) expr).invertPath(new FTIndexAccess(input, ie, ic),
-        ic.step);
+    final FTIndexAccess ia = new FTIndexAccess(input, ie, ic);
+    return ((AxisPath) expr).invertPath(ia, ic.step);
   }
 
   @Override

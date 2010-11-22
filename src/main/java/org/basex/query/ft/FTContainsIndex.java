@@ -7,7 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
@@ -23,7 +23,7 @@ final class FTContainsIndex extends FTContains {
   /** Index context. */
   private final IndexContext ictx;
   /** Current node item. */
-  private FTItem ftn;
+  private FTNode ftn;
   /** Node iterator. */
   private FTIter fti;
 

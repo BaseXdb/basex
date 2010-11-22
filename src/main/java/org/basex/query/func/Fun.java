@@ -38,7 +38,7 @@ public abstract class Fun extends Arr {
   }
 
   @Override
-  public final Expr comp(final QueryContext ctx) throws QueryException {
+  public Expr comp(final QueryContext ctx) throws QueryException {
     // compile all arguments
     super.comp(ctx);
     // skip functions based on context or with non-values as arguments

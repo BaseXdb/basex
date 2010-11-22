@@ -10,6 +10,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
 import org.basex.query.item.Bln;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
@@ -204,7 +205,20 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is a node.
+   * Checks if the specified expression is a node.
+   * Returns the node or an exception.
+   * @param e expression to be checked
+   * @param ctx query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  public final Nod checkNode(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    return checkNode(checkItem(e, ctx));
+  }
+
+  /**
+   * Checks if the specified expression is a node.
    * Returns the node or an exception.
    * @param it item to be checked
    * @return item
@@ -216,6 +230,18 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression is a database node.
+   * Returns the node or an exception.
+   * @param it item to be checked
+   * @return item
+   * @throws QueryException query exception
+   */
+  public final DBNode checkDBNode(final Item it) throws QueryException {
+    if(!(it instanceof DBNode)) NODBCTX.thrw(input, this);
+    return (DBNode) it;
+  }
+
+  /**
    * Checks if the specified collation is supported.
    * @param e expression to be checked
    * @param ctx query context
@@ -224,7 +250,7 @@ public abstract class ParseExpr extends Expr {
   protected final void checkColl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = checkItem(e, ctx);
+    final Item it = e instanceof Item ? (Item) e : checkItem(e, ctx);
     if(!it.str() || !eq(URLCOLL, it.atom())) IMPLCOL.thrw(input, e);
   }
 

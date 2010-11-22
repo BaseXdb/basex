@@ -6,7 +6,6 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
-import org.basex.query.item.DBNode;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +40,7 @@ public final class FNDbTest extends FNTest {
 
     // test wrong arguments
     args("db:open", String.class);
+
     // open database with(out) inner path
     query("count(db:open('db'))", "1");
     query("count(db:open('db/'))", "1");
@@ -112,14 +112,30 @@ public final class FNDbTest extends FNTest {
   }
 
   /**
+   * Test method for the db:fulltext-mark() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testFulltextMark() throws BaseXException {
+    contains("db:fulltext-mark(//*[text() contains text '1'])",
+      "<li>Exercise <mark>1</mark></li>");
+    contains("db:fulltext-mark(//*[text() contains text '1'], 'b')",
+      "<li>Exercise <b>1</b></li>");
+    contains("db:fulltext-mark(//*[text() contains text 'Exercise'])",
+      "<li><mark>Exercise</mark> 1</li>");
+  }
+  
+  /**
    * Test method for db:node-id() and db:node-pre() functions.
    * @throws BaseXException database exception
    */
   @Test
   public void testNode() throws BaseXException {
     // wrong arguments
-    args("db:node-id", DBNode.class);
-    args("db:node-pre", DBNode.class);
+    args("db:node-id", (Class<?>) null);
+    args("db:node-pre", (Class<?>) null);
+    error("db:node-id(1)", "BASX0002");
+    error("db:node-pre(1)", "BASX0002");
 
     // test results
     query("db:node-id(/html)", "1");

@@ -5,7 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -40,6 +40,7 @@ public final class FTOptions extends FTExpr {
       opt.sw.comp(((DBNode) ctx.value).data);
     ctx.ftopt = opt;
     expr[0] = expr[0].comp(ctx);
+    tmp.mark = ctx.ftopt.mark;
     ctx.ftopt = tmp;
     return expr[0];
   }
@@ -58,7 +59,7 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii) {
+  public FTNode item(final QueryContext ctx, final InputInfo ii) {
     // shouldn't be called, as compile returns argument
     Util.notexpected();
     return null;

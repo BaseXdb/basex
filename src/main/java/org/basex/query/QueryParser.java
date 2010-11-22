@@ -824,21 +824,28 @@ public class QueryParser extends InputParser {
     do {
       final boolean fr = consumeWS(FOR, DOLLAR, NOFOR);
       boolean score = !fr && consumeWS(LET, SCORE, NOLET);
+      boolean mark = !fr && !score && consumeWS(LET, MARK, NOLET);
       if(score) check(SCORE);
+      else if(mark) check(MARK);
       else if(!fr && !consumeWS(LET, DOLLAR, NOLET)) return fl;
 
       do {
-        if(comma && !fr) score = consumeWS(SCORE);
+        if(comma && !fr) {
+          score = consumeWS(SCORE);
+          mark = !score && consumeWS(MARK);
+        }
 
         final QNm name = varName();
-        final SeqType type = score ? SeqType.DBL :
+        final SeqType type = score ? SeqType.DBL : mark ? SeqType.NOD_OM :
           consumeWS(AS) ? sequenceType() : null;
         final Var var = new Var(input(), name, type);
 
-        final Var at = fr && consumeWS(AT) ?
+        final Var ps = fr && consumeWS(AT) ?
             new Var(input(), varName(), SeqType.ITR) : null;
         final Var sc = fr && consumeWS(SCORE) ?
             new Var(input(), varName(), SeqType.DBL) : null;
+        final Var mr = fr && consumeWS(MARK) ?
+            new Var(input(), varName(), SeqType.NOD_ZM) : null;
 
         check(fr ? IN : ASSIGN);
         final Expr e = check(single(), VARMISSING);
@@ -846,18 +853,25 @@ public class QueryParser extends InputParser {
 
         if(fl == null) fl = new ForLet[1];
         else fl = Arrays.copyOf(fl, fl.length + 1);
+        if(mr != null) {
+          if(mr.name.eq(name) || sc != null && sc.name.eq(mr.name) ||
+              ps != null && mr.name.eq(ps.name)) error(VARDEFINED, mr);
+          ctx.vars.add(mr);
+        }
         if(sc != null) {
-          if(sc.name.eq(name) || at != null && sc.name.eq(at.name))
+          if(sc.name.eq(name) || ps != null && sc.name.eq(ps.name))
             error(VARDEFINED, sc);
           ctx.vars.add(sc);
         }
-        if(at != null) {
-          if(name.eq(at.name)) error(VARDEFINED, at);
-          ctx.vars.add(at);
+        if(ps != null) {
+          if(name.eq(ps.name)) error(VARDEFINED, ps);
+          ctx.vars.add(ps);
         }
-        fl[fl.length - 1] = fr ? new For(input(), e, var, at, sc) :
-          new Let(input(), e, var, score);
+        fl[fl.length - 1] = fr ? new For(input(), e, var, ps, sc, mr) :
+          new Let(input(), e, var, score, mark);
+
         score = false;
+        mark = false;
         comma = true;
       } while(consumeWS2(COMMA));
       comma = false;
@@ -923,7 +937,7 @@ public class QueryParser extends InputParser {
       check(IN);
       final Expr e = check(single(), NOSOME);
       ctx.vars.add(var);
-      fl = Array.add(fl, new For(input(), e, var, null, null));
+      fl = Array.add(fl, new For(input(), e, var));
     } while(consumeWS2(COMMA));
 
     check(SATISFIES);
@@ -1062,7 +1076,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * [FT51] Parses a FTContainsExpr.
+   * [FT51] Parses an FTContainsExpr.
    * @return query expression
    * @throws QueryException query exception
    */
@@ -2533,6 +2547,9 @@ public class QueryParser extends InputParser {
       if(opt.ln == null) error(FTLAN, lan);
     } else if(consumeWS(OPTION)) {
       optionDecl();
+    } else if(consumeWS(MARKER)) {
+      opt.mark = stringLiteral();
+      if(!XMLToken.isQName(opt.mark)) Err.value(input(), Type.QNM, opt.mark);
     } else {
       final boolean using = !consumeWS(NO);
 
@@ -2735,7 +2752,7 @@ public class QueryParser extends InputParser {
       check(ASSIGN);
       final Expr e = check(single(), INCOMPLETE);
       ctx.vars.add(v);
-      fl = Array.add(fl, new Let(input(), e, v, false));
+      fl = Array.add(fl, new Let(input(), e, v));
     } while(consumeWS(COMMA));
     check(MODIFY);
 

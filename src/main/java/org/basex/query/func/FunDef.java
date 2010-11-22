@@ -458,6 +458,8 @@ public enum FunDef {
   ATTRIDX(DBURI, FNDb.class, 1, 2, "attribute-index(string, name?)", NOD_ZM),
   /** Database function: accesses the full-text index. */
   FTIDX(DBURI, FNDb.class, 1, 1, "fulltext-index(string)", NOD_ZM),
+  /** Database function: marks the hits of a full-text request. */
+  FTMARK(DBURI, FNDb.class, 1, 2, "fulltext-mark(nodes, name?)", NOD_ZM),
   /** Database function: lists all database. */
   LIST(DBURI, FNDb.class, 0, 0, "list()", STR_ZM),
   /** Database function: lists system information. */

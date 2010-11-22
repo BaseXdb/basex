@@ -103,8 +103,8 @@ final class WesternTokenizer extends Tokenizer {
   }
 
   @Override
-  public Span next() {
-    return new Span(nextToken(), cpos, pos, sc);
+  public FTSpan next() {
+    return new FTSpan(nextToken(), cpos, pos, sc);
   }
 
   @Override
@@ -350,8 +350,7 @@ final class WesternTokenizer extends Tokenizer {
       final byte[] n = orig();
       final int l = n.length;
       il[0].add(l);
-      for(final byte b : n)
-        il[3].add(b);
+      for(final byte b : n) il[3].add(b);
 
       if(sent != lass) {
         if(sl > 0) {
@@ -366,7 +365,6 @@ final class WesternTokenizer extends Tokenizer {
         lasp = para;
         pl = 0;
       }
-
       sl += l;
       pl += l;
     }

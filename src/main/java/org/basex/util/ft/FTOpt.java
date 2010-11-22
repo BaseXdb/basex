@@ -17,10 +17,14 @@ import org.basex.query.ft.ThesQuery;
  * @author Christian Gruen
  */
 public class FTOpt extends ExprInfo {
+  /** Default tag name for marking full-text results. */
+  public static final byte[] MARKER = token("mark");
   /** Flag values. */
   private final EnumMap<FTFlag, Boolean> map =
     new EnumMap<FTFlag, Boolean>(FTFlag.class);
 
+  /** Marker. */
+  public byte[] mark = MARKER;
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stopwords. */
@@ -43,6 +47,7 @@ public class FTOpt extends ExprInfo {
     if(sd == null) sd = opt.sd;
     if(ln == null) ln = opt.ln;
     if(th == null) th = opt.th;
+    if(mark == MARKER) mark = opt.mark;
     else if(opt.th != null) th.merge(opt.th);
   }
 

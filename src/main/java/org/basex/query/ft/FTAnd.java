@@ -6,7 +6,7 @@ import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
 
@@ -44,9 +44,9 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii)
+  public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final FTItem item = expr[0].item(ctx, input);
+    final FTNode item = expr[0].item(ctx, input);
     for(int e = 1; e < expr.length; ++e) {
       and(ctx, item, expr[e].item(ctx, input));
     }
@@ -57,7 +57,7 @@ public final class FTAnd extends FTExpr {
   public FTIter iter(final QueryContext ctx) throws QueryException {
     // initialize iterators
     final FTIter[] ir = new FTIter[expr.length];
-    final FTItem[] it = new FTItem[expr.length];
+    final FTNode[] it = new FTNode[expr.length];
     for(int e = 0; e < expr.length; ++e) {
       ir[e] = expr[e].iter(ctx);
       it[e] = ir[e].next();
@@ -65,7 +65,7 @@ public final class FTAnd extends FTExpr {
 
     return new FTIter() {
       @Override
-      public FTItem next() throws QueryException {
+      public FTNode next() throws QueryException {
         // find item with lowest pre value
         for(int i = 0; i < it.length; ++i) {
           if(it[i] == null) {
@@ -90,7 +90,7 @@ public final class FTAnd extends FTExpr {
         }
 
         // merge all matches
-        final FTItem item = it[0];
+        final FTNode item = it[0];
         for(int i = 1; i < it.length; ++i) {
           // [CG] XQFT: item.all = FTMatches.not(it[i].all, 0);
           if(neg[i]) continue;
@@ -109,7 +109,7 @@ public final class FTAnd extends FTExpr {
    * @param i1 first item
    * @param i2 second item
    */
-  void and(final QueryContext ctx, final FTItem i1, final FTItem i2) {
+  void and(final QueryContext ctx, final FTNode i1, final FTNode i2) {
     final FTMatches all = new FTMatches(
         (byte) Math.max(i1.all.sTokenNum, i2.all.sTokenNum));
 

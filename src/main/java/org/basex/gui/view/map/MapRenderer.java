@@ -12,7 +12,7 @@ import org.basex.util.BoolList;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
 import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.Span;
+import org.basex.util.ft.FTSpan;
 
 /**
  * This class assembles utility methods for painting rectangle contents.
@@ -81,7 +81,7 @@ final class MapRenderer {
     int ll = 0;
     final FTLexer lex = new FTLexer().sc().init(s);
     while(lex.hasNext()) {
-      final Span span = lex.next();
+      final FTSpan span = lex.next();
       byte[] tok = span.text;
       int wl = 0;
 
@@ -118,8 +118,8 @@ final class MapRenderer {
 
       if(draw) {
         // color each full-text hit
-        g.setColor(r.pos != null && r.pos.contains(span.pos)
-            && !span.special ? COLORFT : textc);
+        g.setColor(r.pos != null && r.pos.contains(span.pos) &&
+            !span.special ? COLORFT : textc);
         g.drawString(string(tok), xx + ll, yy);
       }
       ll += wl;

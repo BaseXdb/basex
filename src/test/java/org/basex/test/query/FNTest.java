@@ -28,7 +28,7 @@ public abstract class FNTest {
    * @throws BaseXException database exception
    */
   protected static String query(final String qu) throws BaseXException {
-    return new XQuery(qu).execute(CTX);
+    return new XQuery(qu).execute(CTX).replaceAll("(\\r|\\n) *", "");
   }
 
   /**

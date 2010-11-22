@@ -9,7 +9,7 @@ import org.basex.util.TokenList;
 import org.basex.util.ft.FTBitapSearch;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
 import org.basex.util.ft.FTIterator;
-import org.basex.util.ft.Span;
+import org.basex.util.ft.FTSpan;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -69,7 +69,7 @@ public class FTBitapSearchTest {
         }
 
         @Override
-        public Span next() {
+        public FTSpan next() {
           return null;
         }
 

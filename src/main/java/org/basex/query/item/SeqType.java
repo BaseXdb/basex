@@ -59,6 +59,8 @@ public final class SeqType {
   public static final SeqType NOD_ZO = new SeqType(Type.NOD, Occ.ZO);
   /** Zero or more nodes. */
   public static final SeqType NOD_ZM = new SeqType(Type.NOD, Occ.ZM);
+  /** One or more nodes. */
+  public static final SeqType NOD_OM = new SeqType(Type.NOD, Occ.OM);
   /** Single QName. */
   public static final SeqType QNM = new SeqType(Type.QNM);
   /** Zero or one QNames. */

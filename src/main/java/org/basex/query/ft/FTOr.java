@@ -6,7 +6,7 @@ import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
 
@@ -41,9 +41,9 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii)
+  public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final FTItem item = expr[0].item(ctx, input);
+    final FTNode item = expr[0].item(ctx, input);
     for(int e = 1; e < expr.length; ++e) {
       or(ctx, item, expr[e].item(ctx, input));
     }
@@ -54,7 +54,7 @@ public final class FTOr extends FTExpr {
   public FTIter iter(final QueryContext ctx) throws QueryException {
     // initialize iterators
     final FTIter[] ir = new FTIter[expr.length];
-    final FTItem[] it = new FTItem[expr.length];
+    final FTNode[] it = new FTNode[expr.length];
     for(int e = 0; e < expr.length; ++e) {
       ir[e] = expr[e].iter(ctx);
       it[e] = ir[e].next();
@@ -62,7 +62,7 @@ public final class FTOr extends FTExpr {
 
     return new FTIter() {
       @Override
-      public FTItem next() throws QueryException {
+      public FTNode next() throws QueryException {
         // find item with smallest pre value
         int p = -1;
         for(int i = 0; i < it.length; ++i) {
@@ -72,7 +72,7 @@ public final class FTOr extends FTExpr {
         if(p == -1) return null;
 
         // merge all matches
-        final FTItem item = it[p];
+        final FTNode item = it[p];
         for(int i = 0; i < it.length; ++i) {
           if(it[i] != null && p != i && item.pre == it[i].pre) {
             or(ctx, item, it[i]);
@@ -91,7 +91,7 @@ public final class FTOr extends FTExpr {
    * @param i1 first item
    * @param i2 second item
    */
-  void or(final QueryContext ctx, final FTItem i1, final FTItem i2) {
+  void or(final QueryContext ctx, final FTNode i1, final FTNode i2) {
     final FTMatches all = new FTMatches(
         (byte) Math.max(i1.all.sTokenNum, i2.all.sTokenNum));
 

@@ -1,10 +1,11 @@
 package org.basex.query.util;
 
-import static org.basex.query.util.Err.Type.*;
+import static org.basex.query.util.Err.ErrType.*;
 import org.basex.core.Text;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;
+import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.util.InputInfo;
 
@@ -24,7 +25,7 @@ public enum Err {
   /** BASX0001: Evaluation exception. */
   NOIDX(BASX, 1, "%: Index not available."),
   /** BASX0002: Evaluation exception. */
-  NODBCTX(BASX, 2, "No database context set for '%'."),
+  NODBCTX(BASX, 2, "%: Database context needed."),
   /** BASX0003: Evaluation exception. */
   NODB(BASX, 3, "Database '%' not found."),
   /** BASX0004: Evaluation exception. */
@@ -610,7 +611,7 @@ public enum Err {
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 
   /** Error type. */
-  public final Type type;
+  public final ErrType type;
   /** Error number. */
   public final int num;
   /** Error description. */
@@ -622,7 +623,7 @@ public enum Err {
    * @param n error number
    * @param d description
    */
-  Err(final Type t, final int n, final String d) {
+  Err(final ErrType t, final int n, final String d) {
     type = t;
     num = n;
     desc = d;
@@ -651,7 +652,7 @@ public enum Err {
    * Error types.
    * @author Leo Woerteler
    */
-  public static enum Type {
+  public static enum ErrType {
     /** BASX Error type. */ BASX,
     /** FOAR Error type. */ FOAR,
     /** FOCA Error type. */ FOCA,
@@ -700,8 +701,8 @@ public enum Err {
    * @param v value
    * @throws QueryException query exception
    */
-  public static void cast(final InputInfo ii, final org.basex.query.item.Type t,
-      final Value v) throws QueryException {
+  public static void cast(final InputInfo ii, final Type t, final Value v)
+      throws QueryException {
     XPINVCAST.thrw(ii, v.type, t, v);
   }
 
@@ -713,8 +714,8 @@ public enum Err {
    * @param it found item
    * @throws QueryException query exception
    */
-  public static void type(final InputInfo ii, final String inf,
-      final org.basex.query.item.Type t, final Item it) throws QueryException {
+  public static void type(final InputInfo ii, final String inf, final Type t,
+      final Item it) throws QueryException {
     XPTYPE.thrw(ii, inf, t, it.type);
   }
 
@@ -725,8 +726,8 @@ public enum Err {
    * @param it found item
    * @throws QueryException query exception
    */
-  public static void type(final ParseExpr e, final org.basex.query.item.Type t,
-      final Item it) throws QueryException {
+  public static void type(final ParseExpr e, final Type t, final Item it)
+      throws QueryException {
     type(e.input, e.desc(), t, it);
   }
 
@@ -748,8 +749,8 @@ public enum Err {
    * @param v value
    * @throws QueryException query exception
    */
-  public static void value(final InputInfo ii,
-      final org.basex.query.item.Type t, final Object v) throws QueryException {
+  public static void value(final InputInfo ii, final Type t, final Object v)
+      throws QueryException {
     INVALUE.thrw(ii, t, v);
   }
 

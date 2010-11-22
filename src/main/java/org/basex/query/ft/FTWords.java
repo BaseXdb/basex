@@ -13,7 +13,7 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.FTIter;
@@ -119,7 +119,7 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii)
+  public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     if(tokNum == 0) tokNum = ++ctx.ftoknum;
@@ -128,7 +128,7 @@ public final class FTWords extends FTExpr {
     final int c = contains(ctx);
     if(c == 0) all.size = 0;
     // scoring: pass on number of tokens
-    return new FTItem(all, fast || c == 0 ? 0 : ctx.score.word(c,
+    return new FTNode(all, fast || c == 0 ? 0 : ctx.score.word(c,
         ctx.fttoken.count()));
   }
 
@@ -139,7 +139,7 @@ public final class FTWords extends FTExpr {
       FTIndexIterator iat;
 
       @Override
-      public FTItem next() {
+      public FTNode next() {
         if(iat == null) {
           final FTLexer lex = new FTLexer(ftt.opt).init(txt);
           int d = 0;
@@ -155,7 +155,7 @@ public final class FTWords extends FTExpr {
           }
           iat.tokenNum(++ctx.ftoknum);
         }
-        return iat.more() ? new FTItem(iat.matches(), data, iat.next(),
+        return iat.more() ? new FTNode(iat.matches(), data, iat.next(),
             txt.length, iat.indexSize(), iat.score()) : null;
       }
     };

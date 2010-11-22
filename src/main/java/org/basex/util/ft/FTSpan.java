@@ -5,18 +5,18 @@ import org.basex.util.Util;
 
 /**
  * Represents full-text token.
- * {@link #text} starts at [{@link #cpos}. Tokens may overlap.
+ * {@link #text} starts at [{@link #epos}. Tokens may overlap.
  * Right-left must not be equal to {@link #text}.length.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Jens Erat
  */
-public final class Span {
-  /** Number of tokens parsed before the current token. */
+public final class FTSpan {
+  /** Token position. */
   public int pos;
-  /** Character position in original text. */
-  public int cpos;
-  /** Is the current token a special character? */
+  /** Character end position. */
+  public int epos;
+  /** Special character flag. */
   public boolean special;
   /** Text. */
   public byte[] text;
@@ -24,13 +24,13 @@ public final class Span {
   /**
    * Constructor.
    * @param t token text
-   * @param c character position
+   * @param e end position
    * @param p number of tokens parsed before the current token
    * @param sc is a special character
    */
-  Span(final byte[] t, final int c, final int p, final boolean sc) {
+  FTSpan(final byte[] t, final int e, final int p, final boolean sc) {
     text = t;
-    cpos = c;
+    epos = e;
     pos = p;
     special = sc;
   }

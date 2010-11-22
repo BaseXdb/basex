@@ -384,7 +384,7 @@ public class DBNode extends Nod {
     switch(type) {
       case ATT:
       case PI:
-        tb.add(nname()).add("{ \"").add(chop(atom(), 64)).add("\" }");
+        tb.add(nname()).add(" { \"").add(chop(atom(), 64)).add("\" }");
         break;
       case ELM:
         tb.add(nname()).add(" { ... }");

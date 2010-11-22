@@ -66,8 +66,8 @@ public abstract class Stemmer extends LanguageImpl {
   }
 
   @Override
-  public final Span next() {
-    final Span s = iter.next();
+  public final FTSpan next() {
+    final FTSpan s = iter.next();
     s.text = stem(s.text);
     return s;
   };

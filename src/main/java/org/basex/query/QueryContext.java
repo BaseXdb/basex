@@ -127,9 +127,9 @@ public final class QueryContext extends Progress {
   /** Construction mode. */
   public boolean construct;
 
-  /** Full-text position data (only utilized by visualization). */
+  /** Full-text position data (needed for highlighting of full-text results). */
   public FTPosData ftpos;
-  /** Full-text token counter (only utilized by visualization). */
+  /** Full-text token counter (needed for highlighting of full-text results). */
   public byte ftoknum;
 
   /** Copied nodes, resulting from transform expression. */

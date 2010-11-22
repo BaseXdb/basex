@@ -155,7 +155,8 @@ public class FLWOR extends ParseExpr {
         // stop if variable is used by as position or score
         final For fr = (For) fl[g];
         if(fr.pos != null && t.uses(fr.pos) ||
-           fr.score != null && t.uses(fr.score)) break;
+           fr.score != null && t.uses(fr.score) ||
+           fr.mark != null && t.uses(fr.mark)) break;
 
         // move let clause to outer position
         System.arraycopy(fl, g, fl, g + 1, f - g);

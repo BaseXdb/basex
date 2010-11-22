@@ -3,6 +3,7 @@ package org.basex.data;
 import java.util.Arrays;
 import org.basex.util.Array;
 import org.basex.util.IntList;
+import org.basex.util.Util;
 
 /**
  * This class provides a container for query full-text positions,
@@ -22,8 +23,9 @@ public final class FTPosData {
    * Adds position data.
    * @param pre pre value
    * @param all full-text matches
+   * @return self reference
    */
-  public void add(final int pre, final FTMatches all) {
+  public FTPosData add(final int pre, final FTMatches all) {
     final IntList ps = new IntList();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
@@ -40,6 +42,7 @@ public final class FTPosData {
     } else {
       pos[c].union(ps.toArray());
     }
+    return this;
   }
 
   /**
@@ -85,5 +88,15 @@ public final class FTPosData {
       else h = m - 1;
     }
     return -l - 1;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(Util.name(this));
+    for(int i = 0; i < size; ++i) {
+      sb.append(pos[i]);
+      sb.append('\n');
+    }
+    return sb.toString();
   }
 }

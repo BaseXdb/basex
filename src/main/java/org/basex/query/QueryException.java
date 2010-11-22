@@ -155,7 +155,7 @@ public final class QueryException extends Exception {
    * Returns the error code.
    * @return error code
    */
-  public Err.Type type() {
+  public Err.ErrType type() {
     return err == null ? null : err.type;
   }
 

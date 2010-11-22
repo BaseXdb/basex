@@ -3,14 +3,17 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.data.FTPosData;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.DataBuilder;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -26,6 +29,18 @@ public final class For extends ForLet {
   protected final Var pos;
   /** Full-text score. */
   protected final Var score;
+  /** Mark variable. */
+  protected final Var mark;
+
+  /**
+   * Constructor.
+   * @param ii input info
+   * @param e variable input
+   * @param v variable
+   */
+  public For(final InputInfo ii, final Expr e, final Var v) {
+    this(ii, e, v, null, null, null);
+  }
 
   /**
    * Constructor.
@@ -34,12 +49,14 @@ public final class For extends ForLet {
    * @param v variable
    * @param p positional variable
    * @param s score variable
+   * @param m mark variable
    */
   public For(final InputInfo ii, final Expr e, final Var v, final Var p,
-      final Var s) {
+      final Var s, final Var m) {
     super(ii, e, v);
     pos = p;
     score = s;
+    mark = m;
   }
 
   @Override
@@ -49,7 +66,8 @@ public final class For extends ForLet {
 
     type = expr.type();
     // bind variable or set return type
-    if(pos != null || score != null || !type.one() || !bind(ctx)) {
+    if(pos != null || score != null || mark != null || !type.one() ||
+        !bind(ctx)) {
       var.ret = ctx.grouping ? SeqType.get(type.type, SeqType.Occ.ZM) :
         type.type.seq();
     }
@@ -57,6 +75,7 @@ public final class For extends ForLet {
     ctx.vars.add(var);
     if(pos   != null) ctx.vars.add(pos);
     if(score != null) ctx.vars.add(score);
+    if(mark  != null) ctx.vars.add(mark);
 
     size = expr.size();
     return this;
@@ -67,8 +86,11 @@ public final class For extends ForLet {
     final Var v = var.copy();
     final Var p = pos != null ? pos.copy() : null;
     final Var s = score != null ? score.copy() : null;
+    final Var m = mark != null ? mark.copy() : null;
 
     return new Iter() {
+      /** Cached position data. */
+      private FTPosData ftd;
       /** Variable stack size. */
       private int vs;
       /** Iterator flag. */
@@ -100,6 +122,7 @@ public final class For extends ForLet {
       public boolean reset() {
         if(ir != null) {
           ctx.vars.reset(vs);
+          ctx.ftpos = ftd;
           ir.reset();
           ir = null;
           c = 0;
@@ -117,6 +140,11 @@ public final class For extends ForLet {
           ctx.vars.add(v);
           if(p != null) ctx.vars.add(p);
           if(s != null) ctx.vars.add(s);
+          if(m != null) {
+            ctx.vars.add(m);
+            ftd = ctx.ftpos;
+            ctx.ftpos = new FTPosData();
+          }
         }
       }
 
@@ -130,20 +158,24 @@ public final class For extends ForLet {
         v.bind(it, ctx);
         if(p != null) p.bind(Itr.get(i), ctx);
         if(s != null) s.bind(Dbl.get(it.score()), ctx);
+        if(m != null) {
+          final DBNode node = checkDBNode(it);
+          m.bind(DataBuilder.mark(node, ctx.ftopt.mark, ctx).finish(), ctx);
+        }
         return it;
       }
     };
   }
-
+  
   @Override
   boolean simple() {
-    return pos == null && score == null;
+    return mark == null && pos == null && score == null;
   }
 
   @Override
   public boolean shadows(final Var v) {
     return var.eq(v) || pos != null && pos.eq(v) ||
-      score != null && score.eq(v);
+      score != null && score.eq(v) || mark != null && mark.eq(v);
   }
 
   @Override
@@ -152,6 +184,7 @@ public final class For extends ForLet {
     if(pos != null) ser.attribute(POS, token(pos.toString()));
     if(score != null) ser.attribute(Token.token(SCORE),
         token(score.toString()));
+    if(mark != null) ser.attribute(MRK, token(mark.toString()));
     expr.plan(ser);
     ser.closeElement();
   }
@@ -161,6 +194,7 @@ public final class For extends ForLet {
     final StringBuilder sb = new StringBuilder(FOR + " " + var + " ");
     if(pos != null) sb.append(AT + " " + pos + " ");
     if(score != null) sb.append(SCORE + " " + score + " ");
+    if(mark != null) sb.append(MARK + " " + mark + " ");
     return sb.append(IN + " " + expr).toString();
   }
 }

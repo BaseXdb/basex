@@ -6,7 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
 
@@ -33,7 +33,7 @@ public class FTExtensionSelection extends FTExpr {
   }
 
   @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii)
+  public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return expr[0].item(ctx, input);
   }

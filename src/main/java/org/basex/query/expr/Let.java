@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.data.FTPosData;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -11,7 +13,9 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.DataBuilder;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -25,6 +29,18 @@ import org.basex.util.Token;
 public final class Let extends ForLet {
   /** Scoring flag. */
   protected final boolean score;
+  /** Mark flag. */
+  protected final boolean mark;
+
+  /**
+   * Constructor.
+   * @param ii input info
+   * @param e variable input
+   * @param v variable
+   */
+  public Let(final InputInfo ii, final Expr e, final Var v) {
+    this(ii, e, v, false, false);
+  }
 
   /**
    * Constructor.
@@ -32,10 +48,13 @@ public final class Let extends ForLet {
    * @param e variable input
    * @param v variable
    * @param s score flag
+   * @param m mark flag
    */
-  public Let(final InputInfo ii, final Expr e, final Var v, final boolean s) {
+  public Let(final InputInfo ii, final Expr e, final Var v, final boolean s,
+      final boolean m) {
     super(ii, e, v);
     score = s;
+    mark = m;
   }
 
   @Override
@@ -44,9 +63,9 @@ public final class Let extends ForLet {
     expr = checkUp(expr, ctx).comp(ctx);
 
     // bind variable or set return type
-    if(score || !bind(ctx)) {
+    if(mark || score || !bind(ctx)) {
       // set return type if variable cannot be statically bound
-      var.ret = score ? SeqType.DBL : expr.type();
+      var.ret = mark ? SeqType.NOD_OM : score ? SeqType.DBL : expr.type();
     }
     ctx.vars.add(var);
 
@@ -81,14 +100,23 @@ public final class Let extends ForLet {
               ++c;
             }
             v = Dbl.get(ctx.score.let(s, c));
+          } else if(mark) {
+            final FTPosData ftd = ctx.ftpos;
+            ctx.ftpos = new FTPosData();
+            v = expr.value(ctx);
+            final ItemIter ii = new ItemIter();
+            Iter ir = v.iter();
+            Item it;
+            while((it = ir.next()) != null) {
+              ii.add(DataBuilder.mark(checkDBNode(it), ctx.ftopt.mark, ctx));
+            }
+            v = ii.finish();
+            ctx.ftpos = ftd;
           } else {
             v = expr.value(ctx);
           }
           ctx.vars.add(vr.bind(v, ctx));
           more = true;
-          // [MS] only one item at a time can be returned;
-          // check what happens with sequences as results
-          //return SeqIter.get(ir).get(0);
           return Bln.TRUE;
         }
         reset();
@@ -119,7 +147,7 @@ public final class Let extends ForLet {
 
   @Override
   boolean simple() {
-    return !score;
+    return !score && !mark;
   }
 
   @Override
@@ -129,7 +157,7 @@ public final class Let extends ForLet {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, score ? Token.token(SCORE) : VAR,
+    ser.openElement(this, score ? Token.token(SCORE) : mark ? MRK : VAR,
         token(var.toString()));
     expr.plan(ser);
     ser.closeElement();
@@ -137,7 +165,10 @@ public final class Let extends ForLet {
 
   @Override
   public String toString() {
-    return LET + " " + (score ? SCORE + " " : "") +
-      var + " " + ASSIGN + " " + expr;
+    final StringBuilder sb = new StringBuilder(LET).append(' ');
+    if(score) sb.append(SCORE).append(' ');
+    if(mark) sb.append(MARK).append(' ');
+    sb.append(var).append(' ').append(ASSIGN).append(' ').append(expr);
+    return sb.toString();
   }
 }

@@ -9,6 +9,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.NamePool;
+import org.basex.query.util.DataBuilder;
 import org.basex.util.InputInfo;
 
 /**
@@ -42,10 +43,13 @@ public abstract class NodeCopy extends UpdatePrimitive {
       Nod i;
       while((i = ni.next()) != null) seq.add(i);
     }
+    // ignore fragment nodes
+    if(!(node instanceof DBNode)) return;
+
     // text nodes still need to be merged. two adjacent iterators in c may
     // lead to two adjacent text nodes
-    md = node instanceof DBNode ?
-        buildDB(mergeText(seq), new MemData(((DBNode) node).data), null) : null;
+    md = new MemData(((DBNode) node).data);
+    new DataBuilder(md).build(mergeText(seq));
   }
 
   /**

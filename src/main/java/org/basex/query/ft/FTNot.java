@@ -7,7 +7,7 @@ import org.basex.data.FTStringMatch;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
 
@@ -35,7 +35,7 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii)
+  public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return not(ctx, expr[0].item(ctx, input));
   }
@@ -46,7 +46,7 @@ public final class FTNot extends FTExpr {
       final FTIter ir = expr[0].iter(ctx);
 
       @Override
-      public FTItem next() throws QueryException {
+      public FTNode next() throws QueryException {
         return not(ctx, ir.next());
       }
     };
@@ -58,7 +58,7 @@ public final class FTNot extends FTExpr {
    * @param item item
    * @return specified item
    */
-  FTItem not(final QueryContext ctx, final FTItem item) {
+  FTNode not(final QueryContext ctx, final FTNode item) {
     if(item != null) {
       item.all = not(item.all);
       item.score(ctx.score.not(item.score()));

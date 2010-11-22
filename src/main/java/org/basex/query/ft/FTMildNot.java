@@ -7,7 +7,7 @@ import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
 
@@ -32,7 +32,7 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii)
+  public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return mildnot(expr[0].item(ctx, input), expr[1].item(ctx, input));
   }
@@ -42,11 +42,11 @@ public final class FTMildNot extends FTExpr {
     return new FTIter() {
       final FTIter i1 = expr[0].iter(ctx);
       final FTIter i2 = expr[1].iter(ctx);
-      FTItem it1 = i1.next();
-      FTItem it2 = i2.next();
+      FTNode it1 = i1.next();
+      FTNode it2 = i2.next();
 
       @Override
-      public FTItem next() throws QueryException {
+      public FTNode next() throws QueryException {
         while(it1 != null && it2 != null) {
           final int d = it1.pre - it2.pre;
           if(d < 0) break;
@@ -58,7 +58,7 @@ public final class FTMildNot extends FTExpr {
             it1 = i1.next();
           }
         }
-        final FTItem it = it1;
+        final FTNode it = it1;
         it1 = i1.next();
         return it;
       }
@@ -71,7 +71,7 @@ public final class FTMildNot extends FTExpr {
    * @param it2 second item
    * @return specified item
    */
-  FTItem mildnot(final FTItem it1, final FTItem it2) {
+  FTNode mildnot(final FTNode it1, final FTNode it2) {
     it1.all = mildnot(it1.all, it2.all);
     return it1;
   }

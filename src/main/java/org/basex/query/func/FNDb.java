@@ -8,6 +8,7 @@ import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
 import org.basex.data.Data;
+import org.basex.data.FTPosData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -23,13 +24,17 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.NameTest;
+import org.basex.query.util.DataBuilder;
+import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
+import org.basex.util.XMLToken;
 
 /**
  * Database functions.
@@ -55,6 +60,7 @@ final class FNDb extends Fun {
       case TEXTIDX: return textIndex(ctx);
       case ATTRIDX: return attributeIndex(ctx);
       case FTIDX:   return fulltextIndex(ctx);
+      case FTMARK:  return fulltextMark(ctx);
       case LIST:    return list(ctx);
       case NODEID:  return node(ctx, true);
       case NODEPRE: return node(ctx, false);
@@ -103,7 +109,7 @@ final class FNDb extends Fun {
   private DBNode open(final QueryContext ctx, final boolean id)
       throws QueryException {
 
-    DBNode node = ctx.doc(checkStr(expr[0], ctx), true, true, input);
+    final DBNode node = ctx.doc(checkStr(expr[0], ctx), true, true, input);
     final int v = (int) checkItr(expr[1], ctx);
     final int pre = id ? node.data.pre(v) : v;
     if(pre < 0 || pre >= node.data.meta.size) IDINVALID.thrw(input, this, v);
@@ -174,6 +180,44 @@ final class FNDb extends Fun {
   }
 
   /**
+   * Performs the fulltext-mark function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter fulltextMark(final QueryContext ctx) throws QueryException {
+    // name of the marker element; default is <mark/>
+    final byte[] m = expr.length == 2 ? checkStr(expr[1], ctx) : null;
+    if(m != null && !XMLToken.isQName(m)) Err.value(input, Type.QNM, m);
+
+    return new Iter() {
+      Iter ir;
+      ItemIter ii;
+      
+      @Override
+      public Item next() throws QueryException {
+        while(true) {
+          if(ii != null) {
+            final Item it = ii.next();
+            if(it != null) return it;
+            ii = null;
+          }
+          final FTPosData ftd = ctx.ftpos;
+          ctx.ftpos = new FTPosData();
+          if(ir == null) ir = ctx.iter(expr[0]);
+          Item it = ir.next();
+          if(it != null) {
+            final byte[] mark = m != null ? m : ctx.ftopt.mark;
+            ii = DataBuilder.mark(checkDBNode(it), mark, ctx);
+          }
+          ctx.ftpos = ftd;
+          if(it == null) return null;
+        }
+      }
+    };
+  }
+
+  /**
    * Performs the list function.
    * @param ctx query context
    * @return iterator
@@ -235,10 +279,8 @@ final class FNDb extends Fun {
       public Item next() throws QueryException {
         final Item it = ir.next();
         if(it == null) return null;
-        final Nod node = checkNode(it);
-        if(!(node instanceof DBNode)) NODBCTX.thrw(input, FNDb.this);
-        final DBNode dbnode = (DBNode) node;
-        return Itr.get(id ? dbnode.data.id(dbnode.pre) : dbnode.pre);
+        final DBNode node = checkDBNode(it);
+        return Itr.get(id ? node.data.id(node.pre) : node.pre);
       }
     };
   }
@@ -253,6 +295,18 @@ final class FNDb extends Fun {
     final Data data = ctx.data();
     if(data == null) NODBCTX.thrw(input, this);
     return data;
+  }
+
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    if(def == FunDef.FTMARK) {
+      final boolean fast = ctx.ftfast;
+      ctx.ftfast = false;
+      final Expr e = super.comp(ctx);
+      ctx.ftfast = fast;
+      return e;
+    }
+    return super.comp(ctx);
   }
 
   @Override

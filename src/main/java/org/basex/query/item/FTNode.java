@@ -5,12 +5,12 @@ import org.basex.data.FTMatches;
 import org.basex.util.ft.Scoring;
 
 /**
- * XQuery item representing a full-text Node.
+ * Disk-based full-text Node item.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Sebastian Gath
+ * @author Christian Gruen
  */
-public final class FTItem extends DBNode {
+public final class FTNode extends DBNode {
   /** Length of the full-text token. */
   private final int tl;
   /** Total number of indexed results. */
@@ -24,7 +24,7 @@ public final class FTItem extends DBNode {
    * @param a matches
    * @param s scoring
    */
-  public FTItem(final FTMatches a, final double s) {
+  public FTNode(final FTMatches a, final double s) {
     this(a, null, 0, 0, 0, s);
   }
 
@@ -37,7 +37,7 @@ public final class FTItem extends DBNode {
    * @param tol token length
    * @param s score value out of the index
    */
-  public FTItem(final FTMatches a, final Data d, final int p, final int tol,
+  public FTNode(final FTMatches a, final Data d, final int p, final int tol,
       final int tis, final double s) {
     super(d, p, null, Type.TXT);
     all = a;

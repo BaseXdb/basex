@@ -8,7 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -42,7 +42,7 @@ public final class FTWeight extends FTExpr {
 
   // called by sequential variant
   @Override
-  public FTItem item(final QueryContext ctx, final InputInfo ii)
+  public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return weight(expr[0].item(ctx, input), ctx);
   }
@@ -52,7 +52,7 @@ public final class FTWeight extends FTExpr {
   public FTIter iter(final QueryContext ctx) {
     return new FTIter() {
       @Override
-      public FTItem next() throws QueryException {
+      public FTNode next() throws QueryException {
         return weight(expr[0].iter(ctx).next(), ctx);
       }
     };
@@ -65,7 +65,7 @@ public final class FTWeight extends FTExpr {
    * @return item
    * @throws QueryException query exception
    */
-  FTItem weight(final FTItem item, final QueryContext ctx)
+  FTNode weight(final FTNode item, final QueryContext ctx)
       throws QueryException {
 
     // evaluate weight

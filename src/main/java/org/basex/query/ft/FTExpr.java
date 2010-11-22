@@ -7,7 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
-import org.basex.query.item.FTItem;
+import org.basex.query.item.FTNode;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.FTIter;
 import org.basex.query.util.Var;
@@ -48,7 +48,7 @@ public abstract class FTExpr extends ParseExpr {
    * @throws QueryException query exception
    */
   @Override
-  public abstract FTItem item(final QueryContext ctx, final InputInfo ii)
+  public abstract FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException;
 
   /**

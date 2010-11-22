@@ -153,6 +153,10 @@ public interface QueryTokens {
   /** Parser token. */
   String LOWERCASE = "lowercase";
   /** Parser token. */
+  String MARK = "mark";
+  /** Parser token. */
+  String MARKER = "marker";
+  /** Parser token. */
   String MOD = "mod";
   /** Parser token. */
   String MODIFY = "modify";
@@ -443,6 +447,8 @@ public interface QueryTokens {
   byte[] OP = token("op");
   /** Query Plan. */
   byte[] POS = token("pos");
+  /** Query Plan. */
+  byte[] MRK = token("mark");
   /** Query Plan. */
   byte[] VAR = token("var");
   /** Query Plan. */

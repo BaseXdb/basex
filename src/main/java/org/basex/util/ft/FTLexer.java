@@ -24,7 +24,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
   /** Iterator over result tokens. */
   private FTIterator iter;
   /** The last parsed span. */
-  private Span curr;
+  private FTSpan curr;
   /** The last parsed text. */
   private byte[] ctxt;
 
@@ -77,7 +77,8 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Sets the special character flag. Called by the map visualization.
+   * Sets the special character flag.
+   * Returns not only tokens, but also delimiters.
    * @return self reference
    */
   public FTLexer sc() {
@@ -105,7 +106,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   @Override
-  public Span next() {
+  public FTSpan next() {
     curr = iter.next();
     return curr;
   }
