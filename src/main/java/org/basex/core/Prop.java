@@ -160,7 +160,7 @@ public final class Prop extends AProp {
   public static final Object[] STOPWORDS = { "STOPWORDS", "" };
 
   /** Levenshtein default error. */
-  public static final Object[] LSERROR = { "LSERR", 0 };
+  public static final Object[] LSERROR = { "LSERROR", 0 };
   /** Flag for creating flat MAB2 data. */
   public static final Object[] MAB2FLAT = { "MAB2flat", false };
   /** Maximum number of index occurrences to print. */
