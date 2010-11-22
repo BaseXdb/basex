@@ -21,8 +21,7 @@ import org.junit.BeforeClass;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
-public class FNFileTest extends QueryTest {
-
+public final class FNFileTest extends QueryTest {
   /** Test directory. */
   private static final String TESTDIR1 = "testDir1";
   /** Test directory. */

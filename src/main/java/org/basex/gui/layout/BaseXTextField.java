@@ -80,7 +80,7 @@ public class BaseXTextField extends JTextField {
       }
     }
     );
-    
+
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {

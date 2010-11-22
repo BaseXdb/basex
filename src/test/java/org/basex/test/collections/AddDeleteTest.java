@@ -19,7 +19,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
-public class AddDeleteTest {
+public final class AddDeleteTest {
   /** Database context. */
   private static final Context CTX = new Context();
 
@@ -76,7 +76,7 @@ public class AddDeleteTest {
    * @throws BaseXException database exception
    */
   @Test
-  public final void testAddXMLString() throws BaseXException {
+  public void testAddXMLString() throws BaseXException {
     new Add(XMLFRAG, "index.xml").execute(CTX);
     assertEquals(1, CTX.doc().length);
     new Add(XMLFRAG, "index2.xml", "a/b/c").execute(CTX);
@@ -91,7 +91,7 @@ public class AddDeleteTest {
    * @throws BaseXException exception
    */
   @Test
-  public final void testAddFile() throws BaseXException {
+  public void testAddFile() throws BaseXException {
     new Add(FILE).execute(CTX);
     assertEquals(1, CTX.doc().length);
   }
@@ -172,7 +172,7 @@ public class AddDeleteTest {
    * @throws BaseXException expected.
    */
   @Test(expected = BaseXException.class)
-  public final void testAddFileFail() throws BaseXException {
+  public void testAddFileFail() throws BaseXException {
     new Add(FILE + "/doesnotexist").execute(CTX);
   }
 }

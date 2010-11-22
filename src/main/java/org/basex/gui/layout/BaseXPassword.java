@@ -12,7 +12,7 @@ import org.basex.gui.dialog.Dialog;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class BaseXPassword extends JPasswordField {
+public final class BaseXPassword extends JPasswordField {
   /** Default width of text fields. */
   private static final int DWIDTH = 260;
 

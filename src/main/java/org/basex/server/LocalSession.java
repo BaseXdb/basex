@@ -17,7 +17,7 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class LocalSession extends Session {
+public final class LocalSession extends Session {
   /** Database context. */
   private final Context ctx;
 

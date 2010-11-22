@@ -70,7 +70,7 @@ public final class Transform extends Arr {
       final Iter ir = ctx.iter(fo.expr);
       final Item i = ir.next();
       if(i == null || !i.node() || ir.next() != null) UPCOPYMULT.thrw(input);
-      
+
       // copy node to main memory data instance
       final MemData md = new MemData(ctx.context.prop);
       new DataBuilder(md).context(ctx).build((Nod) i);

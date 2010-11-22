@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +28,7 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class Add extends ACreate {
+public final class Add extends ACreate {
   /**
    * Default constructor.
    * @param input input XML file or XML string

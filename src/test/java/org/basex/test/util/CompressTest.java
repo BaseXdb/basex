@@ -18,7 +18,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class CompressTest {
+public final class CompressTest {
   /** Verbose flag. */
   private static boolean verbose;
   /** Number of occurrences. */
@@ -62,7 +62,7 @@ public class CompressTest {
   /** Test. */
   @Test
   public void test6() {
-    final byte[] b = new byte[256 * 256];
+    final byte[] b = new byte[4096];
     for(int i = 0; i < b.length; i++) b[i] = (byte) (i & 0xFF);
     test(b);
   }

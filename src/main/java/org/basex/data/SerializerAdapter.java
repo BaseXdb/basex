@@ -11,7 +11,7 @@ import java.io.IOException;
  * @author Leo Woerteler
  */
 @SuppressWarnings("unused")
-public class SerializerAdapter extends Serializer {
+public final class SerializerAdapter extends Serializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) throws IOException { }

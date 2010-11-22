@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.User;
@@ -58,7 +57,6 @@ public final class InfoIndex extends AInfo {
     out.print(tb.finish());
     return true;
   }
-
 
   /**
    * Prints information on the specified index.

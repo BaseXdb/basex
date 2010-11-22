@@ -56,6 +56,6 @@ public final class DropBackup extends Command {
 
   @Override
   public void build(final CommandBuilder cb) {
-    cb.init(Cmd.DROP + " " + CmdDrop.DB).args();
+    cb.init(Cmd.DROP + " " + CmdDrop.BACKUP).args();
   }
 }

@@ -10,7 +10,7 @@ import java.util.Arrays;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class TokenObjMap<E> extends TokenSet {
+public final class TokenObjMap<E> extends TokenSet {
   /** Values. */
   private Object[] values = new Object[CAP];
 
@@ -20,7 +20,7 @@ public class TokenObjMap<E> extends TokenSet {
    * @param key key
    * @param val value
    */
-  public final void add(final byte[] key, final E val) {
+  public void add(final byte[] key, final E val) {
     // array bounds are checked before array is resized..
     final int i = add(key);
     values[Math.abs(i)] = val;
@@ -32,7 +32,7 @@ public class TokenObjMap<E> extends TokenSet {
    * @return value or {@code null} if nothing was found
    */
   @SuppressWarnings("unchecked")
-  public final E get(final byte[] key) {
+  public E get(final byte[] key) {
     return key != null ? (E) values[id(key)] : null;
   }
 
@@ -42,12 +42,12 @@ public class TokenObjMap<E> extends TokenSet {
    * @return value
    */
   @SuppressWarnings("unchecked")
-  public final E value(final int p) {
+  public E value(final int p) {
     return (E) values[p];
   }
 
   @Override
-  protected final void rehash() {
+  protected void rehash() {
     super.rehash();
     values = Arrays.copyOf(values, size << 1);
   }

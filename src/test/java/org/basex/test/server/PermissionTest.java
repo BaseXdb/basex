@@ -65,7 +65,7 @@ public final class PermissionTest {
       ok(new CreateUser("test", "test"), adminSession);
       testSession = new ClientSession(server.context, "test", "test");
     } catch(final Exception ex) {
-      throw new AssertionError(ex.toString());
+      fail(ex.toString());
     }
   }
 
@@ -247,7 +247,7 @@ public final class PermissionTest {
     try {
       adminSession.close();
     } catch(final Exception ex) {
-      throw new AssertionError(ex.toString());
+      fail(ex.toString());
     }
     // stop server instance
     server.stop();

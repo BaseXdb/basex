@@ -6,7 +6,7 @@ package org.basex.test.query;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class FNFormatIntegerTest extends QueryTest {
+public final class FNFormatIntTest extends QueryTest {
   /** Constructor. */
   static {
     doc = "<x/>";

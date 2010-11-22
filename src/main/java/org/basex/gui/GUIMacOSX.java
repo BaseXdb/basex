@@ -13,8 +13,7 @@ import org.basex.gui.layout.BaseXLayout;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Bastian Lemke
  */
-public class GUIMacOSX {
-
+public final class GUIMacOSX {
   /** Native class name. */
   private static final String C_APPLICATION =
     "com.apple.eawt.Application";

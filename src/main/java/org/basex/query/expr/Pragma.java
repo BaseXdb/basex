@@ -13,7 +13,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Leo Woerteler
  */
-public class Pragma extends Simple {
+public final class Pragma extends Simple {
   /** QName. */
   private final QNm qName;
   /** PragmaContents. */

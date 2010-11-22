@@ -21,7 +21,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class GFLWOR extends ParseExpr {
+public final class GFLWOR extends ParseExpr {
   /** Return expression. */
   protected Expr ret;
   /** For/Let expression. */
@@ -241,12 +241,12 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public final boolean uses(final Use u) {
+  public boolean uses(final Use u) {
     return u == Use.VAR || ret.uses(u);
   }
 
   @Override
-  public final boolean uses(final Var v) {
+  public boolean uses(final Var v) {
     for(final ForLet f : fl) {
       if(f.uses(v)) return true;
       if(f.shadows(v)) return false;
@@ -257,7 +257,7 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public final boolean removable(final Var v) {
+  public boolean removable(final Var v) {
     for(final ForLet f : fl) {
       if(!f.removable(v)) return false;
       if(f.shadows(v)) return true;
@@ -268,7 +268,7 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public final Expr remove(final Var v) {
+  public Expr remove(final Var v) {
     for(final ForLet f : fl) {
       f.remove(v);
       if(f.shadows(v)) return this;
@@ -280,7 +280,7 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws IOException {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     for(final ForLet f : fl)
       f.plan(ser);
@@ -298,7 +298,7 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public final String toString() {
+  public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i != fl.length; ++i)
       sb.append(i != 0 ? " " : "").append(fl[i]);

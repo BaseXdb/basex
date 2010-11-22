@@ -36,7 +36,7 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class CreateDB extends ACreate {
+public final class CreateDB extends ACreate {
   /**
    * Default constructor.
    * @param name name of database

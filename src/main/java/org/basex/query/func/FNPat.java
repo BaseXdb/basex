@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryContext;

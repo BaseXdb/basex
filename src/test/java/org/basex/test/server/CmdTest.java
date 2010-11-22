@@ -10,6 +10,7 @@ import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.server.LocalSession;
 import org.basex.server.Session;
+import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -31,9 +32,9 @@ public class CmdTest {
   /** Test folder. */
   private static final String FLDR = "etc/xml";
   /** Test name. */
-  private static final String NAME = "input";
+  private static final String NAME = Util.name(CmdTest.class);
   /** Test name. */
-  private static final String USER = "cmdtest";
+  private static final String USER = NAME + "2";
   /** Socket reference. */
   static Session session;
 
@@ -344,12 +345,13 @@ public class CmdTest {
     ok(new CreateDB(NAME));
     ok(new Backup(NAME));
     ok(new Restore(NAME));
+    no(new Restore(":"));
     ok(new DropBackup(NAME));
     no(new Restore(NAME));
-    no(new Restore(":"));
     ok(new Open(NAME));
     no(new Restore(NAME));
     ok(new XQuery("."));
+    ok(new Close());
   }
 
   /** Command test. */

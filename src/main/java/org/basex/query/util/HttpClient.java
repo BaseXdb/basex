@@ -4,7 +4,6 @@ import static java.lang.Integer.*;
 import static java.net.HttpURLConnection.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +12,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
@@ -238,7 +236,7 @@ public final class HttpClient {
     try {
       final URL url = new URL(string(reqAttrs.get(HREF)));
       final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      
+
       try {
       setConnectionProps(conn);
       setHttpRequestHeaders(conn);
@@ -460,7 +458,7 @@ public final class HttpClient {
       return processXML(conn, ctx);
     else if(eq(contentType, TXT_HTML)) {
       // Parse HTML
-      if(HTMLParser.isAvailable()) return processHTML(conn, ctx); 
+      if(HTMLParser.isAvailable()) return processHTML(conn, ctx);
       HTMLERR.thrw(info); return null;
     } else if(startsWith(contentType, MIME_TEXT_PREFIX))
       // Process text content

@@ -35,7 +35,7 @@ import org.basex.server.ClientSession;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class SGUI extends AGUI {
+public final class SGUI extends AGUI {
 
   /** Clientsession. */
   ClientSession client;

@@ -18,7 +18,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Leo Woerteler
  */
-public class LogListTest {
+public final class LogListTest {
   /** Database context. */
   private static Context context;
 
@@ -43,7 +43,7 @@ public class LogListTest {
    * @throws Exception exception
    */
   @Test
-  public final void insert() throws Exception {
+  public void insert() throws Exception {
     test("insert node <e/> as first into //b",
         "insert node <f/> as first into //c");
   }

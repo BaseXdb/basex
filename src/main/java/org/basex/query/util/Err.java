@@ -154,7 +154,7 @@ public enum Err {
   CREDSERR(FOHC, 6, "Provide valid credentials."),
   /** FOHC0007: Evaluation exception. */
   HTMLERR(FOHC, 7, "Error parsing HTML content."),
-  
+
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
 

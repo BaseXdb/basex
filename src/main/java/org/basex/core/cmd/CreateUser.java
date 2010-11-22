@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-
 import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
 import org.basex.core.User;

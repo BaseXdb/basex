@@ -21,7 +21,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class NamespaceTest {
+public final class NamespaceTest {
   /** Database context. */
   private static Context context;
 
@@ -41,7 +41,7 @@ public class NamespaceTest {
 
   /** Test query. */
   @Test
-  public final void copy1() {
+  public void copy1() {
     query(
         "copy $c := <x:a xmlns:x='xx'><b/></x:a>/b modify () return $c",
         "<b xmlns:x='xx'/>");
@@ -51,7 +51,7 @@ public class NamespaceTest {
    * Detects corrupt namespace hierarchy.
    */
   @Test
-  public final void copy2() {
+  public void copy2() {
     query(
         "declare namespace a='aa'; copy $c:=doc('d4') modify () return $c//a:y",
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
@@ -61,7 +61,7 @@ public class NamespaceTest {
    * Detects missing prefix declaration.
    */
   @Test
-  public final void copy3() {
+  public void copy3() {
     query(
         "declare namespace a='aa'; copy $c:=doc('d4')//a:y " +
         "modify () return $c",
@@ -72,7 +72,7 @@ public class NamespaceTest {
    * Detects duplicate namespace declaration in MemData instance.
    */
   @Test
-  public final void copy4() {
+  public void copy4() {
     query(
         "copy $c := <a xmlns='test'><b><c/></b><d/></a> " +
         "modify () return $c",
@@ -83,7 +83,7 @@ public class NamespaceTest {
    *  Detects bogus namespace after insert.
    */
   @Test
-  public final void bogusDetector() {
+  public void bogusDetector() {
     query(
         "insert node <a xmlns='test'><b><c/></b><d/></a> into doc('d1')/x",
         "declare namespace na = 'test';doc('d1')/x/na:a",
@@ -94,7 +94,7 @@ public class NamespaceTest {
    * Detects empty default namespace in serializer.
    */
   @Test
-  public final void emptyDefaultNamespace() {
+  public void emptyDefaultNamespace() {
     query("<ns:x xmlns:ns='X'><y/></ns:x>",
         "<ns:x xmlns:ns='X'><y/></ns:x>");
   }
@@ -103,7 +103,7 @@ public class NamespaceTest {
    * Detects duplicate default namespace in serializer.
    */
   @Test
-  public final void duplicateDefaultNamespace() {
+  public void duplicateDefaultNamespace() {
     query("<ns:x xmlns:ns='X'><y/></ns:x>",
         "<ns:x xmlns:ns='X'><y/></ns:x>");
   }
@@ -113,7 +113,7 @@ public class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public final void nsHierarchy() {
+  public void nsHierarchy() {
     query("insert node <f xmlns='F'/> into doc('d9')//*:e", "");
     try {
       new Open("d9").execute(context);
@@ -136,7 +136,7 @@ public class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public final void nsHierarchy2() {
+  public void nsHierarchy2() {
     query("insert node <f xmlns='F'/> into doc('d10')//*:e", "");
     try {
       new Open("d10").execute(context);
@@ -157,7 +157,7 @@ public class NamespaceTest {
 
   /** Test query. */
   @Test
-  public final void copy5() {
+  public void copy5() {
     query(
         "copy $c := <n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n> " +
         "modify () return $c",
@@ -166,7 +166,7 @@ public class NamespaceTest {
 
   /** Test query. */
   @Test
-  public final void insertD2intoD1() {
+  public void insertD2intoD1() {
     query(
         "insert node doc('d2') into doc('d1')/x",
         "doc('d1')",
@@ -175,7 +175,7 @@ public class NamespaceTest {
 
   /** Test query. */
   @Test
-  public final void insertD3intoD1() {
+  public void insertD3intoD1() {
     query(
         "insert node doc('d3') into doc('d1')/x",
         "doc('d1')/x/*",
@@ -184,7 +184,7 @@ public class NamespaceTest {
 
   /** Test query. */
   @Test
-  public final void insertD3intoD1b() {
+  public void insertD3intoD1b() {
     query(
         "insert node doc('d3') into doc('d1')/x",
         "doc('d1')/x/*/*",
@@ -195,7 +195,7 @@ public class NamespaceTest {
    * Detects missing prefix declaration.
    */
   @Test
-  public final void insertD4intoD1() {
+  public void insertD4intoD1() {
     query(
         "declare namespace a='aa'; insert node doc('d4')/a:x/a:y " +
         "into doc('d1')/x",
@@ -210,7 +210,7 @@ public class NamespaceTest {
    * a is declared twice. -> Solution?
    */
   @Test
-  public final void insertD4intoD5() {
+  public void insertD4intoD5() {
     query(
         "declare namespace a='aa';insert node doc('d4')//a:y " +
         "into doc('d5')/a:x",
@@ -222,7 +222,7 @@ public class NamespaceTest {
    * Detects duplicate namespace declarations in MemData instance.
    */
   @Test
-  public final void insertD7intoD1() {
+  public void insertD7intoD1() {
     query(
         "declare namespace x='xx';insert node doc('d7')/x:x into doc('d1')/x",
         "doc('d1')/x",
@@ -233,7 +233,7 @@ public class NamespaceTest {
    * Detects general problems with namespace references.
    */
   @Test
-  public final void insertD6intoD4() {
+  public void insertD6intoD4() {
     query(
         "declare namespace a='aa';insert node doc('d6') into doc('d4')/a:x",
         "declare namespace a='aa';doc('d4')/a:x/a:y",
@@ -244,7 +244,7 @@ public class NamespaceTest {
    * Detects wrong namespace references.
    */
   @Test
-  public final void uriStack() {
+  public void uriStack() {
     query(
         "doc('d8')",
         "<a><b xmlns='B'/><c/></a>");

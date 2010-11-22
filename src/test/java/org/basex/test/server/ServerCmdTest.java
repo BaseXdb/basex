@@ -5,6 +5,7 @@ import org.basex.BaseXServer;
 import org.basex.server.ClientSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import static org.junit.Assert.*;
 
 /**
  * This class tests the database commands with the client/server
@@ -25,7 +26,7 @@ public final class ServerCmdTest extends CmdTest {
     try {
       session = new ClientSession(CONTEXT, ADMIN, ADMIN);
     } catch(final Exception ex) {
-      throw new AssertionError(ex.toString());
+      fail(ex.toString());
     }
   }
 
@@ -35,7 +36,7 @@ public final class ServerCmdTest extends CmdTest {
     try {
       session.close();
     } catch(final Exception ex) {
-      throw new AssertionError(ex.toString());
+      fail(ex.toString());
     }
     // stop server instance
     server.stop();

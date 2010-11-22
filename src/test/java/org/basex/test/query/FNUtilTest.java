@@ -9,7 +9,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class FNUtilTest extends FNTest {
+public final class FNUtilTest extends AdvancedQueryTest {
   /**
    * Test method for the util:eval() functions.
    * @throws BaseXException database exception

@@ -19,7 +19,7 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
-public class MainTree {
+public final class MainTree {
   /** JTree. */
   private JTree mtree;
   /** ClientSession. */

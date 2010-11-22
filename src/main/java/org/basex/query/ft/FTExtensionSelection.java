@@ -16,7 +16,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Leo Woerteler
  */
-public class FTExtensionSelection extends FTExpr {
+public final class FTExtensionSelection extends FTExpr {
   /** Pragmas. */
   private final Expr[] pragmas;
 

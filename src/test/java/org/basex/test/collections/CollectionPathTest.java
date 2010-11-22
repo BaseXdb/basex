@@ -21,12 +21,12 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
-public class QueryTest {
+public final class CollectionPathTest {
   /** Database context. */
   private static final Context CTX = new Context();
 
   /** Test database name. */
-  private static final String DBNAME = Util.name(QueryTest.class);
+  private static final String DBNAME = Util.name(CollectionPathTest.class);
   /** Test files. */
   private static final String[] FILES = {
     "etc/xml/input.xml", "etc/xml/xmark.xml", "etc/xml/test.xml"

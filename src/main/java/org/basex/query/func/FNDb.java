@@ -173,7 +173,7 @@ final class FNDb extends Fun {
   private Iter fulltextIndex(final QueryContext ctx) throws QueryException {
     final IndexContext ic = new IndexContext(ctx, data(ctx), null, true);
     if(!ic.data.meta.ftindex) NOIDX.thrw(input, this);
-    
+
     final byte[] str = checkStr(expr[0], ctx);
     final FTWords words = new FTWords(input, ic.data, Str.get(str), ctx);
     return new FTIndexAccess(input, words, ic).iter(ctx);
@@ -193,7 +193,7 @@ final class FNDb extends Fun {
     return new Iter() {
       Iter ir;
       ItemIter ii;
-      
+
       @Override
       public Item next() throws QueryException {
         while(true) {

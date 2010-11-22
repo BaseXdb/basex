@@ -9,7 +9,7 @@ import java.util.Arrays;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class ByteList extends ElementList {
+public final class ByteList extends ElementList {
   /** Element container. */
   protected byte[] list;
 
@@ -33,7 +33,7 @@ public class ByteList extends ElementList {
    * @param e entry to be added
    * @return self reference
    */
-  public final ByteList add(final int e) {
+  public ByteList add(final int e) {
     if(size == list.length) list = Arrays.copyOf(list, newSize());
     list[size++] = (byte) e;
     return this;
@@ -57,7 +57,7 @@ public class ByteList extends ElementList {
    * Returns an array with all elements.
    * @return array
    */
-  public final byte[] toArray() {
+  public byte[] toArray() {
     return Arrays.copyOf(list, size);
   }
 

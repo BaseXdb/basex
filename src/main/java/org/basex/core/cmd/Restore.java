@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -53,14 +52,16 @@ public final class Restore extends Command {
     if(!file.exists()) return error(DBBACKNF, db);
 
     // close database if it's currently opened
-    if(context.data != null && db.equals(context.data.meta.name))
-      new Close().run(context);
+    final boolean close = context.data != null &&
+      db.equals(context.data.meta.name);
+    if(close) new Close().run(context);
+
     // check if database is pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to restore database
-    return restore(file, prop) ? info(DBRESTORE, file.getName(), perf) :
-      error(DBNORESTORE, db);
+    return restore(file, prop) && (!close || new Open(db).run(context)) ?
+        info(DBRESTORE, file.getName(), perf) : error(DBNORESTORE, db);
   }
 
   /**

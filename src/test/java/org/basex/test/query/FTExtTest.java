@@ -13,10 +13,10 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class FTExtTest extends FNTest {
+public final class FTExtTest extends AdvancedQueryTest {
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
-  
+
   /**
    * Initializes a test.
    * @throws BaseXException database exception
@@ -35,15 +35,6 @@ public final class FTExtTest extends FNTest {
     // open database with(out) inner path
     query("for $i mark $m in //*[text() contains text '1'] return $m",
         "<li>Exercise <mark>1</mark></li>");
-  }
-
-  /**
-   * Test method for the 'mark' modifier in the FOR clause.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void testFor2() throws BaseXException {
-    // open database with(out) inner path
     query("for $i mark $m in //*[text() contains text '1' using marker 'b'] " +
         "return $m",
         "<li>Exercise <b>1</b></li>");
@@ -58,15 +49,6 @@ public final class FTExtTest extends FNTest {
     // open database with(out) inner path
     query("let mark $m := //*[text() contains text '1'] return $m",
         "<li>Exercise <mark>1</mark></li>");
-  }
-
-  /**
-   * Test method for the 'mark' modifier in the LET clause.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void testLet2() throws BaseXException {
-    // open database with(out) inner path
     query("let mark $m := //*[text() contains text '1' using marker 'b'] " +
         "return $m",
         "<li>Exercise <b>1</b></li>");
@@ -78,29 +60,10 @@ public final class FTExtTest extends FNTest {
    */
   @Test
   public void testFTMark() throws BaseXException {
-    // open database with(out) inner path
     query("db:fulltext-mark(//*[text() contains text '1'])",
         "<li>Exercise <mark>1</mark></li>");
-  }
-
-  /**
-   * Test method for the 'db:fulltext-mark()' function.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void testFTMark2() throws BaseXException {
-    // open database with(out) inner path
     query("db:fulltext-mark(//*[text() contains text '2'], 'b')",
         "<li>Exercise <b>2</b></li>");
-  }
-
-  /**
-   * Test method for the 'db:fulltext-mark()' function.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void testFTMark3() throws BaseXException {
-    // open database with(out) inner path
     query("db:fulltext-mark(//*[text() contains text '1' using marker 'b'])",
         "<li>Exercise <b>1</b></li>");
   }

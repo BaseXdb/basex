@@ -166,7 +166,7 @@ public final class For extends ForLet {
       }
     };
   }
-  
+
   @Override
   boolean simple() {
     return mark == null && pos == null && score == null;

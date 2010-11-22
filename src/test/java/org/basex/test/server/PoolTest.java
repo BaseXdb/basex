@@ -42,7 +42,7 @@ public final class PoolTest {
       session1 = new ClientSession(server.context, ADMIN, ADMIN);
       session2 = new ClientSession(server.context, ADMIN, ADMIN);
     } catch(final Exception ex) {
-      throw new AssertionError(ex.toString());
+      fail(ex.toString());
     }
   }
 
@@ -89,7 +89,7 @@ public final class PoolTest {
       session1.close();
       session2.close();
     } catch(final Exception ex) {
-      throw new AssertionError(ex.toString());
+      fail(ex.toString());
     }
     // stop server instance
     server.stop();

@@ -5,7 +5,6 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
 import org.basex.core.Command;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;

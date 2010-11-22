@@ -16,10 +16,10 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class FNDbTest extends FNTest {
+public final class FNDbTest extends AdvancedQueryTest {
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
-  
+
   /**
    * Initializes a test.
    * @throws BaseXException database exception
@@ -124,7 +124,7 @@ public final class FNDbTest extends FNTest {
     contains("db:fulltext-mark(//*[text() contains text 'Exercise'])",
       "<li><mark>Exercise</mark> 1</li>");
   }
-  
+
   /**
    * Test method for db:node-id() and db:node-pre() functions.
    * @throws BaseXException database exception

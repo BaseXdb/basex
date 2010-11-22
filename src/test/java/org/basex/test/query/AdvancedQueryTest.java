@@ -1,7 +1,6 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.XQuery;
@@ -9,18 +8,18 @@ import org.basex.query.item.DBNode;
 import org.basex.util.Util;
 
 /**
- * This class contains some methods for testing project specific functions.
+ * This class contains some methods for performing advanced query tests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class FNTest {
+public abstract class AdvancedQueryTest {
   /** Database context. */
   protected static final Context CTX = new Context();
 
   /** Hidden constructor. */
-  protected FNTest() { }
-  
+  protected AdvancedQueryTest() { }
+
   /**
    * Runs the specified query.
    * @param qu query

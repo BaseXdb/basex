@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.core.CommandBuilder;

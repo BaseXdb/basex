@@ -13,7 +13,7 @@ import java.io.InputStream;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class WrapInputStream extends InputStream {
+public final class WrapInputStream extends InputStream {
   /** Buffer input. */
   private final BufferInput bi;
   /** Current value. */

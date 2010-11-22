@@ -19,7 +19,7 @@ import org.basex.util.Table;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
-public class Tab extends BaseXBack {
+public final class Tab extends BaseXBack {
   /** GUI reference. */
   private SGUI gui;
 

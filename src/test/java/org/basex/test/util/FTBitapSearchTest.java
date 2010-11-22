@@ -19,8 +19,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Dimitar Popov
  */
-public class FTBitapSearchTest {
-
+public final class FTBitapSearchTest {
   /** Simple comparator. */
   private static final TokenComparator CMP = new TokenComparator() {
     @Override

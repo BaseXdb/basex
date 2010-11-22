@@ -21,7 +21,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
-public class PathTest {
+public final class PathTest {
   /** Database context. */
   private static final Context CTX = new Context();
   /** Test database name. */
@@ -114,13 +114,13 @@ public class PathTest {
    */
   public void weekTest() throws Exception {
     final String count = "count(collection('" + WEEK1 +
-    "/week/monday')/root/monday/text[text() = 'text'])";
+      "/week/monday')/root/monday/text[text() = 'text'])";
     final QueryProcessor qp = new QueryProcessor(count, CTX);
     assertEquals(3, Integer.parseInt(qp.execute().toString()));
     qp.close();
     // cross-check
     final String count2 = "count(collection('" + WEEK1 +
-    "/week')/root/monday/text[text() = 'text'])";
+      "/week')/root/monday/text[text() = 'text'])";
     final QueryProcessor qp2 = new QueryProcessor(count2, CTX);
     assertEquals(4, Integer.parseInt(qp2.execute().toString()));
     qp2.close();
@@ -131,9 +131,9 @@ public class PathTest {
    */
   public void weekTest2() throws Exception {
     final String count = "count(collection('" + WEEK1 +
-    "/week/monday')/root/monday/text[text() = 'text'])," +
-    " count(collection('" + WEEK2 +
-    "/week/tuesday')/root/monday/text[text() = 'text']) ";
+      "/week/monday')/root/monday/text[text() = 'text'])," +
+      " count(collection('" + WEEK2 +
+      "/week/tuesday')/root/monday/text[text() = 'text']) ";
     final QueryProcessor qp = new QueryProcessor(count, CTX);
     final String result = qp.execute().toString();
     assertEquals("3 1", result);

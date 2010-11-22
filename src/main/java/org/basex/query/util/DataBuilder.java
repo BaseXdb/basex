@@ -87,7 +87,7 @@ public final class DataBuilder {
     }
     return ir;
   }
-  
+
   /**
    * Fills the data instance with the specified node.
    * @param n node
@@ -131,7 +131,7 @@ public final class DataBuilder {
       default:  return pre + addPI(nd, pre, par);
     }
   }
-  
+
   /**
    * Adds a document node.
    * @param nd node to be added
@@ -149,7 +149,7 @@ public final class DataBuilder {
     while((ch = ir.next()) != null) p = addNode(ch, p, pre, null);
     return p;
   }
-  
+
   /**
    * Adds an attribute.
    * @param nd node to be added
@@ -173,7 +173,7 @@ public final class DataBuilder {
     data.insert(ms);
     return 1;
   }
-  
+
   /**
    * Adds a text node.
    * @param nd node to be added
@@ -197,7 +197,7 @@ public final class DataBuilder {
 
     // adopt namespace from parent
     final int u = ndPar != null ? data.ns.uri(ndPar.nname(), true) : 0;
-    
+
     int ins = 0;
     boolean marked = false;
     final TokenBuilder tb = new TokenBuilder();
@@ -232,7 +232,7 @@ public final class DataBuilder {
     }
     return ins;
   }
-  
+
   /**
    * Adds a text.
    * @param txt text node
@@ -245,7 +245,7 @@ public final class DataBuilder {
     data.insert(ms);
     return 1;
   }
-  
+
   /**
    * Adds a processing instruction.
    * @param nd node to be added
@@ -260,7 +260,7 @@ public final class DataBuilder {
     data.insert(ms);
     return 1;
   }
-  
+
   /**
    * Adds a comment.
    * @param nd node to be added
@@ -274,7 +274,7 @@ public final class DataBuilder {
     data.insert(ms);
     return 1;
   }
-  
+
   /**
    * Adds an element node.
    * @param nd node to be added
@@ -351,7 +351,7 @@ public final class DataBuilder {
     if(s != p - pp) data.size(ms, Data.ELEM, p - pp);
     return p;
   }
-  
+
   /**
    * Determines the number of descendants of a fragment.
    * @param n fragment node
