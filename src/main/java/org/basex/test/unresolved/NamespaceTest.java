@@ -30,7 +30,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class NamespaceTest {
+public final class NamespaceTest {
   /** Database context. */
   private static Context context;
 
@@ -46,7 +46,7 @@ public class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public final void nsInAtt() {
+  public void nsInAtt() {
     query("data(<a a='{namespace-uri-for-prefix('x', <b/>)}' xmlns:x='X'/>/@a)",
         "X");
   }
@@ -56,7 +56,7 @@ public class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public final void nsInBraces() {
+  public void nsInBraces() {
     query("<a xmlns:x='X'>{namespace-uri-for-prefix('x', <b/>)}</a>/text()",
         "X");
   }
@@ -66,7 +66,7 @@ public class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public final void newPrefix() {
+  public void newPrefix() {
     query("<a>{ attribute {QName('http://bla', 'att')} {} }</a>",
         "<a xmlns:ns1='http://bla' ns1:att=''/>");
   }
@@ -76,7 +76,7 @@ public class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public final void newPrefix2() {
+  public void newPrefix2() {
     query("<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
         "  <c>{attribute {QName('ns1', 'att1')} {}," +
         "    attribute {QName('ns2', 'att2')} {}}</c>" +
@@ -91,7 +91,7 @@ public class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public final void newPrefix3() {
+  public void newPrefix3() {
     query("insert node attribute {QName('test', 'att')}{} into doc('d1')//g",
         "doc('d1')//g",
         "<g xmlns:ns2='G' xmlns:ns3='test' ns3:att=''/>");
@@ -102,7 +102,7 @@ public class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public final void xuty0004() {
+  public void xuty0004() {
     try {
       new QueryProcessor("declare variable $input-context external;" +
           "let $source as node()* := (" +
@@ -131,7 +131,7 @@ public class NamespaceTest {
    * being not able popagate the no-inherit flag to our table.
    */
   @Test
-  public final void copyPreserveNoInheritPersistent() {
+  public void copyPreserveNoInheritPersistent() {
     query("declare copy-namespaces preserve,no-inherit;" +
         "declare namespace my = 'ns';" +
         "let $v :=" +

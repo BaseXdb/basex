@@ -18,7 +18,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
-public class BaseXClient {
+public final class BaseXClient {
   /** Output stream. */
   final OutputStream out;
   /** Socket. */
@@ -224,7 +224,7 @@ public class BaseXClient {
   /**
    * Inner class for iterative query execution.
    */
-  public class Query {
+  public final class Query {
     /** Query id. */
     private final String id;
     /** Next result item. */

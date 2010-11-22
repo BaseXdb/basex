@@ -11,7 +11,7 @@ import org.basex.core.cmd.*;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public class UserExample {
+public final class UserExample {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
