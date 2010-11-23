@@ -118,6 +118,7 @@ public class BaseX extends Main {
   @Override
   protected Session session() throws IOException {
     if(session == null) session = new LocalSession(context, out);
+    session.setOutputStream(out);
     return session;
   }
 

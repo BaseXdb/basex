@@ -167,8 +167,12 @@ public enum GUICommands implements GUICommand {
           if(!Dialog.confirm(gui, Util.info(msg, file))) return;
         }
       }
-
       gui.execute(new Export(root.path()), false);
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(gui.context.data != null && !gui.context.data.empty());
     }
   },
 
@@ -1042,7 +1046,7 @@ public enum GUICommands implements GUICommand {
   }
 
   /**
-   * Selects or de-selects the specified component.
+   * Selects or deselects the specified component.
    * @param but component
    * @param select selection flag
    */
