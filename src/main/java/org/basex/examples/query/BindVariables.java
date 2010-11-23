@@ -13,7 +13,7 @@ import org.basex.query.QueryProcessor;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class BindVariable {
+public final class BindVariables {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -26,7 +26,7 @@ public final class BindVariable {
     /** Database context. */
     Context context = new Context();
 
-    System.out.println("=== BindVariable ===\n");
+    System.out.println("=== BindVariable ===");
 
     // ------------------------------------------------------------------------
     // Specify query to be executed
@@ -53,7 +53,7 @@ public final class BindVariable {
     // Execute the query
     Result result = proc.execute();
 
-    System.out.println("* Execute query:");
+    System.out.println("\n* Execute query:");
 
     // ------------------------------------------------------------------------
     // Print result as string

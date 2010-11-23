@@ -55,7 +55,6 @@ public abstract class Benchmark {
       !BaseXServer.ping(LOCALHOST, ctx.prop.num(Prop.SERVERPORT));
 
     if(start) new BaseXServer("");
-    out.println();
 
     session = local ? new LocalSession(ctx) :
       new ClientSession(ctx, "admin", "admin");
@@ -112,7 +111,7 @@ public abstract class Benchmark {
 
     if(queries.length == 0) return;
 
-    out.print("* Queries: " + queries[0]);
+    out.print("\n* Queries: " + queries[0]);
     if(queries.length > 1)out.print(", ...");
     if(r > 1) out.print(" (" + r + "x)");
     out.println();

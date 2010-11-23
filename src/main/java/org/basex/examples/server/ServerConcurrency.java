@@ -31,30 +31,30 @@ public final class ServerConcurrency {
    */
   void run() throws Exception {
 
-    System.out.println("=== ServerConcurrencyExample ===\n");
+    System.out.println("=== ServerConcurrencyExample ===");
 
     // ------------------------------------------------------------------------
     // Start server
-    System.out.println("* Start server.");
+    System.out.println("\n* Start server.");
 
     BaseXServer server = new BaseXServer();
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
-    System.out.println("* Create a client session.");
+    System.out.println("\n* Create a client session.");
 
     ClientSession session =
       new ClientSession("localhost", 1984, "admin", "admin", System.out);
 
     // ------------------------------------------------------------------------
     // Create a database
-    System.out.println("* Create a database.");
+    System.out.println("\n* Create a database.");
 
     send("CREATE DB input etc/xml/input.xml", session);
 
     // ------------------------------------------------------------------------
     // Setup some clients that simultaneously read and write from the database
-    System.out.println("* Run one reader and two writers threads.");
+    System.out.println("\n* Run one reader and two writers threads.");
 
     ClientExample reader1 = new ClientExample("//li");
     ClientExample writer1 = new ClientExample("insert node " +
@@ -68,7 +68,7 @@ public final class ServerConcurrency {
 
     // ------------------------------------------------------------------------
     // Stop the clients
-    System.out.println("* Stop client threads.");
+    System.out.println("\n* Stop client threads.");
 
     reader1.stop();
     writer1.stop();
@@ -78,7 +78,7 @@ public final class ServerConcurrency {
 
     // -------------------------------------------------------------------------
     // Show modified database contents
-    System.out.println("* Show modified database contents:");
+    System.out.println("\n* Show modified database contents:");
 
     send("XQUERY //li", session);
 
@@ -90,13 +90,13 @@ public final class ServerConcurrency {
 
     // ------------------------------------------------------------------------
     // Close the client session
-    System.out.println("* Close the client session.");
+    System.out.println("\n* Close the client session.");
 
     session.close();
 
     // ------------------------------------------------------------------------
     // Stop the server
-    System.out.println("* Stop server.");
+    System.out.println("\n* Stop server.");
 
     server.stop();
   }

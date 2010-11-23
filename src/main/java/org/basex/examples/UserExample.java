@@ -21,53 +21,53 @@ public final class UserExample {
     /** Database context. */
     final Context context = new Context();
 
-    System.out.println("=== AdministrationExample ===\n");
+    System.out.println("=== AdministrationExample ===");
 
     // ----------------------------------------------------------------------
     // Create a database
-    System.out.println("* Create a database.");
+    System.out.println("\n* Create a database.");
 
     new CreateDB("input", "etc/xml/input.xml").execute(context);
 
     // ------------------------------------------------------------------------
     // Create a new user
-    System.out.println("* Create a user.");
+    System.out.println("\n* Create a user.");
 
     new CreateUser("testuser", "password").execute(context);
 
     // ------------------------------------------------------------------------
     // Remove global user rights
-    System.out.println("* Remove global user rights.");
+    System.out.println("\n* Remove global user rights.");
 
     new Grant("NONE", "testuser").execute(context);
 
     // ------------------------------------------------------------------------
     // Grant local user rights on database 'input'
-    System.out.println("* Grant local user rights.");
+    System.out.println("\n* Grant local user rights.");
 
     new Grant("WRITE", "testuser", "input").execute(context);
 
     // ------------------------------------------------------------------------
     // Show global users
-    System.out.println("* Show global users.");
+    System.out.println("\n* Show global users.");
 
-    System.out.println(new ShowUsers().execute(context));
+    System.out.print(new ShowUsers().execute(context));
 
     // ------------------------------------------------------------------------
     // Show local users on a single database
-    System.out.println("* Show local users.");
+    System.out.println("\n* Show local users.");
 
-    System.out.println(new ShowUsers("input").execute(context));
+    System.out.print(new ShowUsers("input").execute(context));
 
     // ------------------------------------------------------------------------
     // Change user password
-    System.out.println("* Alter a user's password.");
+    System.out.println("\n* Alter a user's password.");
 
     new AlterUser("testuser", "newpass").execute(context);
 
     // ------------------------------------------------------------------------
     // Drop the database and user
-    System.out.println("* Drop the user and database.");
+    System.out.println("\n* Drop the user and database.");
 
     new DropUser("testuser").execute(context);
     new DropDB("input").execute(context);

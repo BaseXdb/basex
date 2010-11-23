@@ -21,17 +21,17 @@ public final class QueryCollection {
     /** Database context. */
     Context context = new Context();
 
-    System.out.println("=== CollectionQueryExample ===\n");
+    System.out.println("=== QueryCollection ===");
 
     // ------------------------------------------------------------------------
     // Create a collection from all XML documents in the 'etc' directory
-    System.out.println("* Create a collection.");
+    System.out.println("\n* Create a collection.");
 
     new CreateDB("Collection", "etc/").execute(context);
 
     // ------------------------------------------------------------------------
     // List all documents in the database
-    System.out.println("* List all documents in the database:");
+    System.out.println("\n* List all documents in the database:");
 
     // The XQuery base-uri() function returns a file path
     System.out.println(new XQuery(
@@ -41,7 +41,7 @@ public final class QueryCollection {
 
     // ------------------------------------------------------------------------
     // Evaluate a query on a single document
-    System.out.println("* Evaluate a query on a single document:");
+    System.out.println("\n* Evaluate a query on a single document:");
 
     // If the name of the database is omitted in the collection() function,
     // the currently opened database will be referenced
@@ -54,7 +54,7 @@ public final class QueryCollection {
 
     // ------------------------------------------------------------------------
     // Drop the database
-    System.out.println("* Drop the database.");
+    System.out.println("\n* Drop the database.");
 
     new DropDB("Collection").execute(context);
 

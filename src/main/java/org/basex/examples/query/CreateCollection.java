@@ -24,7 +24,7 @@ public final class CreateCollection {
     // Create database context
     Context context = new Context();
 
-    System.out.println("=== CollectionExample ===\n");
+    System.out.println("=== CreateCollection ===");
 
     // ------------------------------------------------------------------------
     // You can modify the CREATEFILTER property to import XML
@@ -33,7 +33,7 @@ public final class CreateCollection {
 
     // Variant 1 --------------------------------------------------------------
     // Create a collection and add all documents within the specified path
-    System.out.println("* Create a collection.");
+    System.out.println("\n* Create a collection.");
 
     new CreateDB("Collection", "etc/").execute(context);
     new DropDB("Collection").execute(context);
@@ -41,7 +41,7 @@ public final class CreateCollection {
     // Variant 2 --------------------------------------------------------------
     // Or: Create an empty collection, add documents in a second pass
     // and optimize the database to refresh the index structures
-    System.out.println("* Create an empty collection and add documents.");
+    System.out.println("\n* Create an empty collection and add documents.");
 
     new CreateDB("Collection").execute(context);
     new Add("etc/").execute(context);
@@ -49,19 +49,19 @@ public final class CreateCollection {
 
     // ------------------------------------------------------------------------
     // Remove a single document from the collection
-    System.out.println("* Remove a single document.");
+    System.out.println("\n* Remove a single document.");
 
     new Delete("test.xml").execute(context);
 
     // ------------------------------------------------------------------------
     // Show information on the currently opened database
-    System.out.println("* Show database information:");
+    System.out.println("\n* Show database information:");
 
     System.out.println(new InfoDB().execute(context));
 
     // ------------------------------------------------------------------------
     // Drop the database
-    System.out.println("* Drop the collection.");
+    System.out.println("\n* Drop the collection.");
 
     new DropDB("Collection").execute(context);
 

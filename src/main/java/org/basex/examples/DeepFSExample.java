@@ -88,13 +88,12 @@ public final class DeepFSExample {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    String xml;
 
     // -------------------------------------------------------------------------
 
     System.out.println(
-        "* Serialize a single file (without metadata and contents)");
-    xml = FSMLSerializer.serialize(FILE, false);
+        "\n* Serialize a single file (without metadata and contents)");
+    String xml = FSMLSerializer.serialize(FILE, false);
     System.out.println(xml);
 
     // -------------------------------------------------------------------------

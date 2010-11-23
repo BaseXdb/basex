@@ -41,16 +41,16 @@ public final class StressTest {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    System.out.println("=== Local StressTest ===\n");
+    System.out.println("=== Local StressTest ===");
 
     // Create test database
-    System.out.println("* Create test database.");
+    System.out.println("\n* Create test database.");
     final CreateDB cmd = new CreateDB("test", INPUT);
     cmd.execute(CONTEXT);
     System.out.print(cmd.info());
 
     // Run clients
-    System.out.println("* Run " + NCLIENTS + " client threads.");
+    System.out.println("\n* Run " + NCLIENTS + " client threads.");
     final Client[] cl = new Client[NCLIENTS];
     for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client();
     for(final Client c : cl) c.start();
@@ -64,7 +64,7 @@ public final class StressTest {
    */
   static void dropDB() throws BaseXException {
     // Drop database
-    System.out.println("* Drop test database.");
+    System.out.println("\n* Drop test database.");
 
     final DropDB cmd = new DropDB("test");
     cmd.execute(CONTEXT);

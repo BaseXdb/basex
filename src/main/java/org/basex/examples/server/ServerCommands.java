@@ -21,7 +21,7 @@ public final class ServerCommands {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerExample ===\n");
+    System.out.println("=== ServerExample ===");
 
     // ------------------------------------------------------------------------
     // Start server on default port 1984
@@ -29,25 +29,25 @@ public final class ServerCommands {
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
-    System.out.println("* Create a client session.");
+    System.out.println("\n* Create a client session.");
 
     session = new ClientSession("localhost", 1984, "admin", "admin");
 
     // ------------------------------------------------------------------------
     // Create a database
-    System.out.println("* Create a database.");
+    System.out.println("\n* Create a database.");
 
     session.execute("CREATE DB input etc/xml/input.xml");
 
     // ------------------------------------------------------------------------
     // Run a query
-    System.out.println("* Run a query:");
+    System.out.println("\n* Run a query:");
 
     System.out.println(session.execute("XQUERY //li"));
 
     // ------------------------------------------------------------------------
     // Faster version: specify an output stream and run a query
-    System.out.println("* Run a query (faster):");
+    System.out.println("\n* Run a query (faster):");
 
     session.setOutputStream(System.out);
     session.execute("XQUERY //li");
@@ -67,19 +67,19 @@ public final class ServerCommands {
 
     // ------------------------------------------------------------------------
     // Drop the database
-    System.out.println("* Close and drop the database.");
+    System.out.println("\n* Close and drop the database.");
 
     session.execute("DROP DB input");
 
     // ------------------------------------------------------------------------
     // Close the client session
-    System.out.println("* Close the client session.");
+    System.out.println("\n* Close the client session.");
 
     session.close();
 
     // ------------------------------------------------------------------------
     // Stop the server
-    System.out.println("* Stop the server.");
+    System.out.println("\n* Stop the server.");
 
     server.stop();
   }

@@ -21,11 +21,11 @@ public final class JaxRxPOSTQuery {
    * @throws IOException I/O exception
    */
   JaxRxPOSTQuery() throws IOException {
-    System.out.println("=== POST: execute a query ===\n");
+    System.out.println("=== POST: execute a query ===");
 
     // The java URL connection to the resource
     URL url = new URL("http://localhost:8984/basex/jax-rx/factbook");
-    System.out.println("* URL: " + url);
+    System.out.println("\n* URL: " + url);
 
     // Query to be sent to the server
     String request =
@@ -34,7 +34,7 @@ public final class JaxRxPOSTQuery {
       "  <parameter name='wrap' value='yes'/>\n" +
       "  <parameter name='count' value='2'/>\n" +
       "</query>";
-    System.out.println("* Query:\n" + request);
+    System.out.println("\n* Query:\n" + request);
 
     // Establish the connection to the URL
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -54,13 +54,13 @@ public final class JaxRxPOSTQuery {
 
     // Print the HTTP response code
     int code = conn.getResponseCode();
-    System.out.println("* HTTP response: " + code +
+    System.out.println("\n* HTTP response: " + code +
         " (" + conn.getResponseMessage() + ")");
 
     // Check if request was successful
     if(code == HttpURLConnection.HTTP_OK) {
       // Print the received result to standard output (same as GET request)
-      System.out.println("* Result:");
+      System.out.println("\n* Result:");
 
       // Get and cache input as UTF-8 encoded stream
       BufferedReader br = new BufferedReader(new InputStreamReader(

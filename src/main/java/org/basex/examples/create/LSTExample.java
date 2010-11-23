@@ -21,7 +21,7 @@ public final class LSTExample {
    */
   public static void main(final String[] args) throws BaseXException {
 
-    System.out.println("=== LSTExample ===\n");
+    System.out.println("=== LSTExample ===");
 
     // ------------------------------------------------------------------------
     // Create database context
@@ -33,19 +33,19 @@ public final class LSTExample {
 
     // ------------------------------------------------------------------------
     // Import the specified file
-    System.out.println("* Import: \"" + file + "\".");
+    System.out.println("\n* Import: \"" + file + "\".");
 
     new Create(new LSTParser(file), name).execute(ctx);
 
     // ------------------------------------------------------------------------
     // Perform query
-    System.out.print("* Number of files: ");
+    System.out.print("\n* Number of files: ");
 
     System.out.println(new XQuery("count(//file)").execute(ctx));
 
     // ------------------------------------------------------------------------
     // Drop database and close context
-    System.out.println("* Drop database.");
+    System.out.println("\n* Drop database.");
 
     new DropDB(name).execute(ctx);
     ctx.close();

@@ -23,11 +23,11 @@ public final class JaxRxPUT {
    * @throws IOException I/O exception
    */
   JaxRxPUT() throws IOException {
-    System.out.println("=== PUT: create a new database ===\n");
+    System.out.println("=== PUT: create a new database ===");
 
     // The java URL connection to the resource
     URL url = new URL("http://localhost:8984/basex/jax-rx/factbook");
-    System.out.println("* URL: " + url);
+    System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -43,14 +43,14 @@ public final class JaxRxPUT {
         new FileInputStream("etc/xml/factbook.xml"));
 
     // Send document to server
-    System.out.println("* Send document...");
+    System.out.println("\n* Send document...");
     int i;
     while((i = in.read()) != -1) out.write(i);
     in.close();
     out.close();
 
     // Print the HTTP response code
-    System.out.println("* HTTP response: " + conn.getResponseCode() +
+    System.out.println("\n* HTTP response: " + conn.getResponseCode() +
         " (" + conn.getResponseMessage() + ")");
 
     // Close connection

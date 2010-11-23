@@ -21,7 +21,7 @@ public final class HTMLExample {
    */
   public static void main(final String[] args) throws BaseXException {
 
-    System.out.println("=== HTMLExample ===\n");
+    System.out.println("=== HTMLExample ===");
 
     // ------------------------------------------------------------------------
     // Create database context
@@ -33,14 +33,14 @@ public final class HTMLExample {
 
     // ------------------------------------------------------------------------
     // Import the specified file
-    System.out.println("* Import: \"" + file + "\".");
+    System.out.println("\n* Import: \"" + file + "\".");
 
     new Set(Prop.PARSER, "html").execute(ctx);
     new CreateDB(name, file).execute(ctx);
 
     // ------------------------------------------------------------------------
     // Perform query
-    System.out.println("* First 10 headlines:");
+    System.out.println("\n* First 10 headlines:");
 
     String query =
       "(for $i in //*:h2/*:a/*:span[@class='titletext']" +
@@ -49,7 +49,7 @@ public final class HTMLExample {
 
     // ------------------------------------------------------------------------
     // Drop database and close context
-    System.out.println("* Drop database.");
+    System.out.println("\n* Drop database.");
 
     new DropDB(name).execute(ctx);
     ctx.close();

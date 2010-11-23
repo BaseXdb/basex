@@ -31,7 +31,7 @@ public final class SAXExample extends DefaultHandler {
    */
   private void run() throws Exception {
 
-    System.out.println("=== SAXExample ===\n");
+    System.out.println("=== SAXExample ===");
 
     // Create database context
     final Context ctx = new Context();
@@ -53,18 +53,18 @@ public final class SAXExample extends DefaultHandler {
   public void startElement(final String uri, final String ln, final String qn,
       final Attributes at) {
     // Print opening tags
-    System.out.println("* Start Element: " + qn);
+    System.out.println("\n* Start Element: " + qn);
   }
 
   @Override
   public void endElement(final String uri, final String ln, final String qn) {
     // Print closing tags
-    System.out.println("* End Element: " + qn);
+    System.out.println("\n* End Element: " + qn);
   }
 
   @Override
   public void characters(final char[] ch, final int s, final int l) {
     // Print text nodes
-    System.out.println("* Characters: " + new String(ch, s, l));
+    System.out.println("\n* Characters: " + new String(ch, s, l));
   }
 }

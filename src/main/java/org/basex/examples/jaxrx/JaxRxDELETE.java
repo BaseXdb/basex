@@ -18,11 +18,11 @@ public final class JaxRxDELETE {
    * @throws IOException I/O exception
    */
   JaxRxDELETE() throws IOException {
-    System.out.println("=== DELETE: delete a document or database ===\n");
+    System.out.println("=== DELETE: delete a document or database ===");
 
     // The java URL connection to the resource
     URL url = new URL("http://localhost:8984/basex/jax-rx/factbook/input.xml");
-    System.out.println("* URL: " + url);
+    System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -30,12 +30,12 @@ public final class JaxRxDELETE {
     conn.setRequestMethod("DELETE");
 
     // Print the HTTP response code
-    System.out.println("* HTTP response: " + conn.getResponseCode() +
+    System.out.println("\n* HTTP response: " + conn.getResponseCode() +
         " (" + conn.getResponseMessage() + ")");
 
     // The java URL connection to the resource
     url = new URL("http://localhost:8984/basex/jax-rx/factbook");
-    System.out.println("* URL: " + url);
+    System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL
     conn = (HttpURLConnection) url.openConnection();
@@ -43,7 +43,7 @@ public final class JaxRxDELETE {
     conn.setRequestMethod("DELETE");
 
     // Print the HTTP response code
-    System.out.println("* HTTP response: " + conn.getResponseCode() +
+    System.out.println("\n* HTTP response: " + conn.getResponseCode() +
         " (" + conn.getResponseMessage() + ")");
 
     // Close connection

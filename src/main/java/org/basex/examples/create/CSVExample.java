@@ -19,7 +19,7 @@ public final class CSVExample {
    */
   public static void main(final String[] args) throws BaseXException {
 
-    System.out.println("=== CSVExample ===\n");
+    System.out.println("=== CSVExample ===");
 
     // ------------------------------------------------------------------------
     // Create database context
@@ -31,20 +31,20 @@ public final class CSVExample {
 
     // ------------------------------------------------------------------------
     // Import the specified file
-    System.out.println("* Import: \"" + file + "\".");
+    System.out.println("\n* Import: \"" + file + "\".");
 
     new Set("parser", "csv").execute(ctx);
     new CreateDB(name, file).execute(ctx);
 
     // ------------------------------------------------------------------------
     // Perform query
-    System.out.print("* Number of records: ");
+    System.out.print("\n* Number of records: ");
 
     System.out.println(new XQuery("count(//record)").execute(ctx));
 
     // ------------------------------------------------------------------------
     // Drop database and close context
-    System.out.println("* Drop database.");
+    System.out.println("\n* Drop database.");
 
     new DropDB(name).execute(ctx);
     ctx.close();

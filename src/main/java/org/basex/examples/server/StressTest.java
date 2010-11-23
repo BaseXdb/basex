@@ -25,7 +25,7 @@ public final class StressTest {
   static final String INPUT = "etc/xml/factbook.xml";
   /** Query to be run ("%" serves as placeholder for dynamic content). */
   static final String QUERY =
-    "basex:db('test')/descendant::text()[position() = %]";
+    "doc('test')/descendant::text()[position() = %]";
 
   /** Server reference. */
   static BaseXServer server;
@@ -40,14 +40,14 @@ public final class StressTest {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    System.out.println("=== Server StressTest ===\n");
+    System.out.println("=== Server StressTest ===");
 
     // Run server instance
-    System.out.println("* Start server.");
+    System.out.println("\n* Start server.");
     server = new BaseXServer("-z");
 
     // Create test database
-    System.out.println("* Create test database.");
+    System.out.println("\n* Create test database.");
 
     final ClientSession cs = newSession();
     cs.execute("create db test " + INPUT);
@@ -55,7 +55,7 @@ public final class StressTest {
     cs.close();
 
     // Run clients
-    System.out.println("* Run " + NCLIENTS + " client threads.");
+    System.out.println("\n* Run " + NCLIENTS + " client threads.");
     final Client[] cl = new Client[NCLIENTS];
     for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client();
     for(final Client c : cl) c.start();
@@ -69,7 +69,7 @@ public final class StressTest {
    */
   static void stopServer() throws Exception {
     // Drop database and stop server
-    System.out.println("* Stop server and drop test database.");
+    System.out.println("\n* Stop server and drop test database.");
 
     final ClientSession cs = newSession();
     cs.execute("drop db test");
