@@ -8,13 +8,16 @@ import java.io.IOException;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.cmd.AlterDB;
+import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.List;
+import org.basex.core.cmd.Restore;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
@@ -49,6 +52,10 @@ public final class DialogOpen extends Dialog {
   private final Object drop;
   /** Open button. */
   private final Object open;
+  /** Backup button. */
+  private final Object backup;
+  /** Restore button. */
+  private final Object restore;
   /** File system flag. */
   private final boolean fsInstance;
 
@@ -90,12 +97,17 @@ public final class DialogOpen extends Dialog {
 
     // create buttons
     final BaseXBack p = new BaseXBack(new BorderLayout());
-
+    
+    backup = new BaseXButton(BUTTONBACKUP, this);
+    restore = new BaseXButton(BUTTONRESTORE, this);
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
     drop = new BaseXButton(BUTTONDROP + DOTS, this);
     buttons = dr ? newButtons(this, drop, BUTTONCANCEL) :
-      newButtons(this, rename, open, BUTTONCANCEL);
+      newButtons(this, open, BUTTONCANCEL);
+    if(!dr) {
+      p.add(newButtons(this, backup, restore, rename), BorderLayout.WEST);
+    }
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
 
@@ -131,10 +143,15 @@ public final class DialogOpen extends Dialog {
       final String old = choice.getValue();
       final DialogRename dr = new DialogRename(old, gui, fsInstance);
       if(dr.ok()) {
-        final Prop prop = gui.context.prop;
-        AlterDB.alter(old, dr.name.getText(), prop);
+        try {
+          new AlterDB(old, dr.name.getText()).execute(ctx);
+          gui.notify.init();
+        } catch(BaseXException e) {
+          Dialog.info(gui, e.getMessage());
+        }
         choice.setData(fsInstance ? List.listFS(ctx).toArray() :
           List.list(ctx).toArray());
+        action(null);
       }
     } else if(cmp == open) {
       close();
@@ -155,11 +172,31 @@ public final class DialogOpen extends Dialog {
           detail.setText(Token.EMPTY);
         }
       }
+    } else if(cmp == backup) {
+      final String db = choice.getValue().trim();
+      try {
+        new Backup(db).execute(ctx);
+        Dialog.info(gui, "Backup of '" + db + "' successfull created.");
+      } catch(BaseXException e) {
+        Dialog.info(gui, e.getMessage());
+      }
+    } else if(cmp == restore) {
+      final String db = choice.getValue().trim();
+      String dbctx = "";
+      if(ctx.data != null) dbctx = ctx.data.meta.name;
+      try {
+        new Restore(db).execute(ctx);
+        Dialog.info(gui, "Restoring of '" + db + "' successfull.");
+        if(!dbctx.equals("") && dbctx.equals(db)) {
+          gui.notify.init();
+        }
+      } catch(BaseXException e) {
+        Dialog.info(gui, e.getMessage());
+      }
     } else {
       final String db = choice.getValue().trim();
       ok = !db.isEmpty() && ctx.prop.dbexists(db);
       enableOK(buttons, BUTTONDROP + DOTS, ok);
-
       if(ok) {
         doc.setText(db);
         DataInput in = null;

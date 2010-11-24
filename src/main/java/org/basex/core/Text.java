@@ -938,8 +938,12 @@ public interface Text {
   String BUTTONOK = "  " + lang("b_ok") + "  ";
   /** Button text for confirming actions. */
   String BUTTONOPT = lang("b_opt") + DOTS;
-  /** Button text for opening files. */
+  /** Button text for renaming databases. */
   String BUTTONRENAME = lang("b_rename") + DOTS;
+  /** Button text for creating backup of databases. */
+  String BUTTONBACKUP = lang("b_backup");
+  /** Button text for restoring databases. */
+  String BUTTONRESTORE = lang("b_restore");
   /** Button text for opening files. */
   String BUTTONOPEN = lang("b_open");
   /** Button text for mounting database. */

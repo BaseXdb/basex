@@ -31,16 +31,22 @@ public final class AlterDB extends Command {
     if(!checkName(db)) return error(NAMEINVALID, db);
     if(!checkName(name)) return error(NAMEINVALID, name);
 
-    // DB is currently locked
-    if(context.pinned(db)) return error(DBLOCKED, db);
     // DB does not exist
     if(!prop.dbexists(db)) return error(DBNOTFOUND, db);
     // Target DB exists already
     if(prop.dbexists(name)) return error(DBEXISTS, name);
+    
+    // close database if it's currently opened
+    final boolean close = context.data != null &&
+      db.equals(context.data.meta.name);
+    if(close) new Close().run(context);
+    
+    // DB is currently locked
+    if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to alter database
-    return alter(db, name, prop) ? info(DBALTERED, db, name) :
-      error(DBNOTALTERED, db);
+    return alter(db, name, prop) && (!close || new Open(name).run(context))
+    ? info(DBALTERED, db, name) : error(DBNOTALTERED, db);
   }
 
   /**
