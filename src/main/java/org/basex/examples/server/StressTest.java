@@ -92,12 +92,21 @@ public final class StressTest {
   static class Client extends Thread {
     /** Client session. */
     private ClientSession session;
+    
+    /**
+     * Default constructor.
+     */
+    public Client() {
+      try {
+        session = newSession();
+      } catch(IOException e) {
+        e.printStackTrace();
+      }
+    }
 
     @Override
     public void run() {
       try {
-        session = newSession();
-
         // Perform some queries
         for(int i = 0; i < NQUERIES; ++i) {
           Performance.sleep((long) (50 * RND.nextDouble()));
