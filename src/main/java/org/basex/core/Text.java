@@ -1023,14 +1023,9 @@ public interface Text {
   String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
   /** XQ file description. */
   String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
-  /** XQueru file description. */
-  String CREATEXQUERYDESC = lang("dc_xqdesc") + " (*.xquery)";
-  /** XQM file description. */
-  String CREATEXQMDESC = lang("dc_xqdesc") + " (*.xqm)";
-  /** XQY file description. */
-  String CREATEXQYDESC = lang("dc_xqdesc") + " (*.xqy)";
-  /** XQL file description. */
-  String CREATEXQLDESC = lang("dc_xqdesc") + " (*.xql)";
+  /** XQuery file extensions description. */
+  String CREATEXQEXDESC = lang("dc_xqdesc") + 
+  " (*.xq, *.xquery, *.xqm, *.xqy, *.xql)";
   /** Dialog title for database options. */
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Whitespaces information. */

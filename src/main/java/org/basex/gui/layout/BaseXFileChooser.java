@@ -60,12 +60,23 @@ public final class BaseXFileChooser {
   /**
    * Sets a file filter.
    * @param dsc description
-   * @param suf suffixes
+   * @param suf suffix
    */
   public void addFilter(final String dsc, final String suf) {
     if(fc != null) fc.addChoosableFileFilter(new Filter(suf, dsc));
     else fd.setFile("*" + suf);
     suffix = suf;
+  }
+  
+  /**
+   * Sets a extension file filter.
+   * @param dsc description
+   * @param sufs suffixes
+   */
+  public void addExFilter(final String dsc, final String[] sufs) {
+    if(fc != null) fc.addChoosableFileFilter(new ExtensionFilter(sufs, dsc));
+    else fd.setFile("*" + sufs[0]);
+    suffix = sufs[0];
   }
 
   /**
@@ -120,7 +131,7 @@ public final class BaseXFileChooser {
   }
 
   /**
-   * Defines a file filter for XML documents.
+   * Defines a file filter for one extension.
    */
   private static class Filter extends FileFilter {
     /** Suffix. */
@@ -149,5 +160,42 @@ public final class BaseXFileChooser {
     public String getDescription() {
       return desc;
     }
+  }
+  
+  /**
+   * Defines a file filter for a list of extensions.
+   */
+  private static class ExtensionFilter extends FileFilter {
+    
+    /** Suffixes. */
+    private final String[] sufs;
+    /** Description. */
+    private final String desc;
+    
+    /**
+     * Constructor.
+     * @param s suffixes
+     * @param d description
+     */
+    ExtensionFilter(final String[] s, final String d) {
+      sufs = s;
+      desc = d;
+    }
+
+    @Override
+    public boolean accept(final File file) {
+      if(file.isDirectory()) return true;
+      final String name = file.getName().toLowerCase();
+      for(String s : sufs) {
+        if(name.endsWith(s)) return true;
+      }
+      return false;
+    }
+
+    @Override
+    public String getDescription() {
+      return desc;
+    }
+    
   }
 }

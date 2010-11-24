@@ -210,12 +210,8 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(GUIOPEN,
           gui.gprop.get(GUIProp.XQPATH), gui);
-      fc.addFilter(CREATEXQUERYDESC, IO.XQUERYSUFFIX);
-      fc.addFilter(CREATEXQMDESC, IO.XQMSUFFIX);
-      fc.addFilter(CREATEXQYDESC, IO.XQYSUFFIX);
-      fc.addFilter(CREATEXQLDESC, IO.XQLSUFFIX);
-      fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
-
+        fc.addExFilter(CREATEXQEXDESC, new String[] {IO.XQSUFFIX,
+            IO.XQUERYSUFFIX, IO.XQMSUFFIX, IO.XQYSUFFIX, IO.XQLSUFFIX});
       final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
       if(file != null) gui.query.setQuery(file);
     }
@@ -253,7 +249,8 @@ public enum GUICommands implements GUICommand {
         gui.context.query.path();
       final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
           fn == null ? gui.gprop.get(GUIProp.XQPATH) : fn, gui);
-      fc.addFilter(CREATEXQDESC, IO.XQSUFFIX);
+      fc.addExFilter(CREATEXQEXDESC, new String[] {IO.XQSUFFIX,
+          IO.XQUERYSUFFIX, IO.XQMSUFFIX, IO.XQYSUFFIX, IO.XQLSUFFIX});
 
       final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
       if(file == null) return;
