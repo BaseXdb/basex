@@ -125,7 +125,7 @@ dr_title=Đổi tên cơ sở dữ liệu
 dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè
 dr_overbacking=Cơ sở dữ liệu cũ và dự phòng sẽ bị ghi đè
 
-dd_title=Xóa bỏ cơ sở dữ liệu
+dd_title=Manage Databases
 dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.\nBạn chắc không?
 
 dx_question=Bạn thực sự muốn xóa?
@@ -238,8 +238,8 @@ c_create=Mới
 c_creatett=Tạo cơ sở dữ liệu từ văn bản XML được chọn.
 c_delete=Xóa
 c_deletett=Xóa nút XML.
-c_drop=Xóa
-c_droptt=Xóa một cơ sở dữ liệu.
+c_manage=Manage
+c_managett=Manages databases.
 c_edit=Soạn thảo
 c_edittt=Soạn thảo nút XML.
 c_exit=Thoát

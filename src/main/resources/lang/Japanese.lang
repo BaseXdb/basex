@@ -125,7 +125,7 @@ dr_title=データベースの名前を変更
 dr_over=古いデータベースは上書きされます。
 dr_overbacking=古いデータベースは上書きされます。(backing store will be deleted, too)
 
-dd_title=データベースの削除
+dd_title=Manage Databases
 dd_question=データベース '%' を削除します。\nよろしいですか。
 
 dx_question=本当に削除しますか。
@@ -238,8 +238,8 @@ c_creatett=選択されたXML文書からデータベースを作成します。
 c_cut=カット
 c_delete=ノードの削除
 c_deletett=XMLノードを削除します。
-c_drop=DBの削除
-c_droptt=データベースを削除します。
+c_manage=Manage
+c_managett=Manages databases.
 c_edit=編集
 c_edittt=XMLノードの編集
 c_exit=終了

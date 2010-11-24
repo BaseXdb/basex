@@ -8,6 +8,7 @@ import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogHelp;
+import org.basex.gui.dialog.DialogOpen;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Util;
@@ -79,7 +80,8 @@ public final class ViewNotifier {
     } else {
       // close all dialogs (except help) together with database
       for(final Window w : gui.getOwnedWindows()) {
-        if(w.isVisible() && w instanceof Dialog && !(w instanceof DialogHelp))
+        if(w.isVisible() && w instanceof Dialog && !(w instanceof DialogHelp ||
+            w instanceof DialogOpen))
           ((Dialog) w).cancel();
       }
     }

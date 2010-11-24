@@ -66,7 +66,7 @@ public final class DialogOpen extends Dialog {
    * @param fs file system flag
    */
   public DialogOpen(final GUI main, final boolean dr, final boolean fs) {
-    super(main, dr ? DROPTITLE : fs ? OPENDQETITLE : OPENTITLE);
+    super(main, dr ? MANAGETITLE : fs ? OPENDQETITLE : OPENTITLE);
 
     // create database chooser
     final StringList db = fs ? List.listFS(main.context) :
@@ -103,11 +103,9 @@ public final class DialogOpen extends Dialog {
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
     drop = new BaseXButton(BUTTONDROP + DOTS, this);
-    buttons = dr ? newButtons(this, drop, BUTTONCANCEL) :
+    buttons = dr ? newButtons(this, backup, restore, rename,
+        drop, BUTTONCANCEL) :
       newButtons(this, open, BUTTONCANCEL);
-    if(!dr) {
-      p.add(newButtons(this, backup, restore, rename), BorderLayout.WEST);
-    }
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
 
@@ -180,6 +178,7 @@ public final class DialogOpen extends Dialog {
       } catch(BaseXException e) {
         Dialog.info(gui, e.getMessage());
       }
+      action(null);
     } else if(cmp == restore) {
       final String db = choice.getValue().trim();
       String dbctx = "";
@@ -214,6 +213,8 @@ public final class DialogOpen extends Dialog {
       }
       enableOK(buttons, BUTTONOPEN, ok);
       enableOK(buttons, BUTTONRENAME, ok);
+      enableOK(buttons, BUTTONBACKUP, ok);
+      enableOK(buttons, BUTTONRESTORE, ok && Restore.list(db, ctx).size() != 0);
     }
   }
 

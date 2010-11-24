@@ -125,7 +125,7 @@ dr_title=Hernoem Database
 dr_over=Oude database wordt overschreven
 dr_overbacking=Oude database en 'backing store' worden overschreven
 
-dd_title=Verwijder Database
+dd_title=Manage Databases
 dd_question=Database '%' zal verwijderd worden.\nWeet je het zeker?
 
 dx_question=Wil je echt verwijderen?
@@ -238,8 +238,8 @@ c_create=Nieuw
 c_creatett=Maakt een nieuwe database.
 c_delete=Verwijder
 c_deletett=Verwijdert XML nodes.
-c_drop=Verwijder
-c_droptt=Verwijdert een database.
+c_manage=Manage
+c_managett=Manages databases.
 c_edit=Wijzig
 c_edittt=Wijzigt XML nodes.
 c_exit=Stop

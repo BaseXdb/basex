@@ -125,7 +125,7 @@ dr_title=Rinomina la base di dati
 dr_over=La vecchia base di dati verrà sovrascritta
 dr_overbacking=La vecchia base di dati e la memoria di appoggio verranno sovrascritti
 
-dd_title=Cancella la base di dati
+dd_title=Manage Databases
 dd_question=La base di dati '%' verrà cancellata.\nSei sicuro?
 
 dx_question=Cancellare. Sei sicuro?
@@ -238,8 +238,8 @@ c_create=Nuovo
 c_creatett=Crea una base di dati.
 c_delete=Cancella
 c_deletett=Cancella i nodi XML.
-c_drop=Cancella
-c_droptt=Cancella una base di dati.
+c_manage=Manage
+c_managett=Manages databases.
 c_edit=Modifica
 c_edittt=Modifica i nodi XML.
 c_exit=Esci

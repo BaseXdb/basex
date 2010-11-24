@@ -176,8 +176,8 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens a dialog to drop databases. */
-  DROP(GUIDROP + DOTS, null, GUIDROPTT, false, false) {
+  /** Opens a dialog to manage databases. */
+  MANAGE(GUIMANAGE + DOTS, null, GUIMANAGETT, false, false) {
     @Override
     public void execute(final GUI gui) {
       if(new DialogOpen(gui, true, false).nodb()) Dialog.warn(gui, INFONODB);

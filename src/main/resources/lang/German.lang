@@ -125,7 +125,7 @@ dr_title=Datenbank umbenennen
 dr_over=Alte Datenbank wird überschrieben
 dr_overbacking=Alte Datenbank, sowie DeepFS Hilfsspeicher werden überschrieben
 
-dd_title=Datenbank löschen
+dd_title=Datenbankmanagement
 dd_question=Die Datenbank '%' wird gelöscht.\nSind Sie sicher?
 
 dx_question=Möchten Sie wirklich löschen?
@@ -238,8 +238,8 @@ c_create=Neu
 c_creatett=Erzeugt eine neue Datenbank.
 c_delete=Löschen
 c_deletett=Löscht XML-Knoten.
-c_drop=Löschen
-c_droptt=Löscht eine Datenbank.
+c_manage=Management
+c_managett=Datenbankmangement
 c_edit=Bearbeiten
 c_edittt=Bearbeitet den derzeit ausgewählten XML-Knoten.
 c_exit=Beenden

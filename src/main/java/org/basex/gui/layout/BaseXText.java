@@ -824,7 +824,7 @@ public class BaseXText extends BaseXPanel {
     }
     @Override
     public String desc() {
-      return GUIDEL;
+      return GUIDELETE;
     }
   }
 

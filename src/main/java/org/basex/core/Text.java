@@ -752,13 +752,11 @@ public interface Text {
   /** Command info. */
   String GUIDELETE = lang("c_delete");
   /** Command info. */
-  String GUIDEL = lang("c_delete");
-  /** Command info. */
   String GUIDELETETT = lang("c_deletett");
   /** Command info. */
-  String GUIDROP = lang("c_drop");
+  String GUIMANAGE = lang("c_manage");
   /** Command info. */
-  String GUIDROPTT = lang("c_droptt");
+  String GUIMANAGETT = lang("c_managett");
   /** Command info. */
   String GUIEDIT = lang("c_edit");
   /** Command info. */
@@ -1207,8 +1205,8 @@ public interface Text {
   /** Info for overwriting a database and deleting backing store. */
   String RENAMEOVERBACKING = lang("dr_overbacking") + DOT;
 
-  /** Dialog title for dropping a database. */
-  String DROPTITLE = lang("dd_title");
+  /** Dialog title for managing databases. */
+  String MANAGETITLE = lang("dd_title");
   /** Dialog title for dropping a database. */
   String DROPCONF = lang("dd_question") + NL + " ";
 

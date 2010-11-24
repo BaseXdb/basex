@@ -125,7 +125,7 @@ dr_title=Renommer la base de données
 dr_over=La base de données existante va être remplacée
 dr_overbacking=La base de données existante et la sauvegarde vont être remplacées
 
-dd_title=Effacer la base de données
+dd_title=Manage Databases
 dd_question=La base de données '%' va être effacée.\nConfirmer ?
 
 dx_question=Voulez-vous vraiment supprimer?
@@ -238,8 +238,8 @@ c_create=Nouveau
 c_creatett=Crée une nouvelle base de données.
 c_delete=Supprimer
 c_deletett=Supprime noeuds XML.
-c_drop=Effacer
-c_droptt=Efface une base de données.
+c_manage=Manage
+c_managett=Manages databases.
 c_edit=Editer
 c_edittt=Edite les noeuds XML.
 c_exit=Quitter
