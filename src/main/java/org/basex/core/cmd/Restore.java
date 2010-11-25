@@ -51,9 +51,9 @@ public final class Restore extends Command {
     final File file = new File(name);
     if(!file.exists()) return error(DBBACKNF, db);
 
-    // close database if it's currently opened
+ // close database if it's currently opened and not opened by others
     final boolean close = context.data != null &&
-      db.equals(context.data.meta.name);
+      db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
     if(close) new Close().run(context);
 
     // check if database is pinned

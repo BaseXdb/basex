@@ -80,9 +80,9 @@ public class CmdTest {
   @Test
   public final void alterDB() {
     ok(new CreateDB(NAME));
-    no(new AlterDB(NAME, USER));
-    ok(new Close());
     ok(new AlterDB(NAME, USER));
+    ok(new Close());
+    no(new AlterDB(NAME, USER));
     no(new AlterDB(USER, "!"));
     no(new AlterDB("!", USER));
   }

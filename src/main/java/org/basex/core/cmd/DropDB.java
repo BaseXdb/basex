@@ -28,9 +28,10 @@ public final class DropDB extends Command {
   protected boolean run() {
     // name of database
     final String db = args[0];
-    // close database if it's currently opened
-    if(context.data != null && db.equals(context.data.meta.name))
-      new Close().run(context);
+    // close database if it's currently opened and not opened by others
+    final boolean close = context.data != null &&
+      db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
+    if(close) new Close().run(context);
 
     // check if database is still pinned
     if(context.pinned(db)) return error(DBLOCKED, db);

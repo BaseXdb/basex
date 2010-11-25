@@ -36,9 +36,9 @@ public final class AlterDB extends Command {
     // Target DB exists already
     if(prop.dbexists(name)) return error(DBEXISTS, name);
     
-    // close database if it's currently opened
+    // close database if it's currently opened and not opened by others
     final boolean close = context.data != null &&
-      db.equals(context.data.meta.name);
+      db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
     if(close) new Close().run(context);
     
     // DB is currently locked
