@@ -293,18 +293,20 @@ public final class GUI extends AGUI {
   void execute() {
     final String in = input.getText().trim();
     final boolean db = context.data != null;
-    final boolean cmd = gprop.num(GUIProp.SEARCHMODE) == 2 || !db;
+    final boolean cmd = gprop.num(GUIProp.SEARCHMODE) == 2 || !db; 
 
     if(cmd || in.startsWith("!")) {
       // run as command: command mode or exclamation mark as first character
       final int i = cmd ? 0 : 1;
       if(in.length() > i) {
+        long t = 0;
+        if(db) t = context.data.meta.time;
         try {
           for(final Command c : new CommandParser(in.substring(i),
               context).parse()) {
             if(!exec(c, c instanceof XQuery)) break;
             // [CG] fix for 894:, maybe just for update commands...
-            if(db) notify.init();
+            if(t != 0 && t != context.data.meta.time) notify.init();
           }
         } catch(final QueryException ex) {
           if(!info.visible()) GUICommands.SHOWINFO.execute(this);
