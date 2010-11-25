@@ -24,6 +24,6 @@ public final class XQuery extends AQuery {
 
   @Override
   public boolean writing(final Context ctx) {
-    return updating(ctx, args[0]);
+    return super.writing(ctx) || updating(ctx, args[0]);
   }
 }
