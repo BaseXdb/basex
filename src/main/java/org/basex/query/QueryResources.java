@@ -28,37 +28,38 @@ import org.basex.util.IntList;
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
-public class QueryContextRes {
+public class QueryResources {
   /** Database context. */
   public Context context;
   /** Current context value. */
   public Value value;
   /** Opened documents. */
-  DBNode[] doc;
+  DBNode[] doc = new DBNode[1];
   /** Number of documents. */
   int docs;
   /** Collections. */
-  private NodIter[] coll;
+  private NodIter[] coll = new NodIter[1];
   /** Collection names. */
-  private byte[][] collName;
+  private byte[][] collName = new byte[1][];
   /** Collection counter. */
   private int colls;
   /** Initial number of documents. */
   int rootDocs;
   /** Static Base URI. */
-  private Uri baseURI = Uri.EMPTY;
-
+  public Uri baseURI = Uri.EMPTY;
+  
+  
+  /**
+   * Default Constructor.
+   */
+  public QueryResources() { }
+  
   /**
    * Constructor.
-   * @param docref document reference
-   * @param collref collection reference
-   * @param collrefName collection name
+   * @param ctx context reference
    */
-  public QueryContextRes(final DBNode[] docref, final NodIter[] collref, 
-      final byte[][] collrefName) {
-    doc = docref;
-    coll = collref;
-    collName = collrefName;
+  public QueryResources(final Context ctx) {
+    if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
   }
   
   /**
@@ -222,7 +223,7 @@ public class QueryContextRes {
     if(value == null) return null;
     if(docNodes()) return doc[0].data;
 
-    final Iter iter = value.iter(this);
+    final Iter iter = value.iter();
     Data data = null;
     Item it;
     while((it = iter.next()) != null) {

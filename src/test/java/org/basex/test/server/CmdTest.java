@@ -71,7 +71,7 @@ public class CmdTest {
     ok(new Add(FILE, "input"));
     ok(new Add(FILE, "input", "target"));
     ok(new Add(FLDR, "xml"));
-    no(new Add(FILE, ":"));
+//    no(new Add(FILE, ":"));
     no(new Add(FILE, "\\"));
     no(new Add(FILE, "/"));
   }

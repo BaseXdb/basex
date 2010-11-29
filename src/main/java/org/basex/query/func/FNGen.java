@@ -233,7 +233,7 @@ final class FNGen extends Fun {
    */
   private Nod parseXml(final QueryContext ctx) throws QueryException {
     final byte[] cont = checkEStr(expr[0], ctx);
-    Uri base = ctx.baseURI;
+    Uri base = ctx.resource.baseURI;
     if(expr.length == 2) {
       base = Uri.uri(checkEStr(expr[1], ctx));
       if(!base.valid()) DOCBASE.thrw(input, base);

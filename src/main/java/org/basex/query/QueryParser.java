@@ -168,7 +168,7 @@ public class QueryParser extends InputParser {
   public QueryParser(final String q, final QueryContext c) {
     super(q);
     ctx = c;
-    file = c.file();
+    file = c.resource.file();
   }
 
   /**
@@ -262,7 +262,7 @@ public class QueryParser extends InputParser {
     prolog1();
     prolog2();
     if(declColl) {
-      final byte[] coll = ctx.baseURI.resolve(ctx.collation).atom();
+      final byte[] coll = ctx.resource.baseURI.resolve(ctx.collation).atom();
       if(!eq(URLCOLL, coll)) error(COLLWHICH, coll);
     }
     return expr();
@@ -518,7 +518,7 @@ public class QueryParser extends InputParser {
    */
   private void baseURIDecl() throws QueryException {
     if(declBase) error(DUPLBASE);
-    ctx.baseURI = Uri.uri(stringLiteral());
+    ctx.resource.baseURI = Uri.uri(stringLiteral());
     declBase = true;
   }
 

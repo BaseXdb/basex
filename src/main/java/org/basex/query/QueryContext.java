@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -18,7 +19,6 @@ import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.data.SerializerProp;
-import org.basex.io.IO;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
@@ -93,8 +93,6 @@ public final class QueryContext extends Progress {
   public byte[] nsFunc = FNURI;
   /** Default element namespace. */
   public byte[] nsElem = EMPTY;
-  /** Static Base URI. */
-  public Uri baseURI = Uri.EMPTY;
   /** Default collation. */
   public Uri collation = Uri.uri(URLCOLL);
 
@@ -149,8 +147,7 @@ public final class QueryContext extends Progress {
   Nodes nodes;
 
   /** Query resource. */
-  public QueryContextRes resource = new QueryContextRes(
-      new DBNode[1], new NodIter[1], new byte[1][]);
+  public QueryResources resource = new QueryResources();
   
   /**
    * Constructor.
@@ -162,7 +159,6 @@ public final class QueryContext extends Progress {
     ftopt = new FTOpt();
     xquery30 = ctx.prop.is(Prop.XQUERY11);
     inf = ctx.prop.is(Prop.QUERYINFO);
-    if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
   }
 
   /**
@@ -171,7 +167,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void parse(final String q) throws QueryException {
-    root = new QueryParser(q, this).parse(file(), null);
+    root = new QueryParser(q, this).parse(resource.file(), null);
     query = q;
   }
 
@@ -181,7 +177,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void module(final String q) throws QueryException {
-    new QueryParser(q, this).parse(file(), Uri.EMPTY);
+    new QueryParser(q, this).parse(resource.file(), Uri.EMPTY);
   }
 
   /**
@@ -346,7 +342,6 @@ public final class QueryContext extends Progress {
    * @param ctx context
    */
   public void copy(final QueryContext ctx) {
-    baseURI = ctx.baseURI;
     spaces = ctx.spaces;
     construct = ctx.construct;
     nsInherit = ctx.nsInherit;
@@ -388,14 +383,6 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Returns an IO representation of the base uri.
-   * @return IO reference
-   */
-  IO file() {
-    return baseURI != Uri.EMPTY ? IO.get(string(baseURI.atom())) : null;
-  }
-
-  /**
    * Returns info on query compilation and evaluation.
    * @return query info
    */
@@ -428,6 +415,6 @@ public final class QueryContext extends Progress {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + file() + ']';
+    return Util.name(this) + '[' + resource.file() + ']';
   }
 }
