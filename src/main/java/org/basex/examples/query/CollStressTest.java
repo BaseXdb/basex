@@ -2,8 +2,11 @@ package org.basex.examples.query;
 
 import org.basex.core.Context;
 import org.basex.core.cmd.Add;
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
+import org.basex.util.Performance;
 
 /**
  * This class adds and retrieves documents in a collection.
@@ -15,7 +18,7 @@ public final class CollStressTest {
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of documents to be added. */
-  private static final int SIZE = 1000;
+  private static final int SIZE = 500;
 
   /**
    * Runs the example code.
@@ -35,12 +38,28 @@ public final class CollStressTest {
     for(int i = 0; i < SIZE; i++) {
       new Add("<xml/>", Integer.toString(i)).execute(CONTEXT);
     }
-    System.out.print("\n* " + SIZE + " documents added.");
+    System.out.println("\n* " + SIZE + " documents added.");
 
-    // Find documents
+    // Request specific documents
+    Performance perf = new Performance();
     for(int i = 0; i < SIZE; i++) {
       new XQuery("collection('test/" + i + "')").execute(CONTEXT);
     }
-    System.out.print("\n* " + SIZE + " documents queries.");
+    System.out.println("\n* " + SIZE + " documents accessed in " + perf);
+
+    // Loop through all documents
+    new XQuery("for $i in 0 to " + (SIZE - 1) + " " +
+      "return collection(concat('test/', $i))").execute(CONTEXT);
+    System.out.println("\n* " + SIZE + " documents accessed in " + perf);
+
+    // Close database
+    new Close().execute(CONTEXT);
+
+    // Loop through all documents (open database by XQuery processor)
+    new XQuery("for $i in 0 to " + (SIZE - 1) + " " +
+      "return collection(concat('test/', $i))").execute(CONTEXT);
+    System.out.println("\n* " + SIZE + " documents accessed in " + perf);
+
+    new DropDB("test").execute(CONTEXT);
   }
 }
