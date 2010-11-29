@@ -224,7 +224,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     }
 
     if(var == XQConstants.CONTEXT_ITEM) {
-      qp.ctx.resource.value = vl;
+      qp.ctx.value = vl;
     } else {
       try {
         if(this instanceof BXQPreparedExpression) {

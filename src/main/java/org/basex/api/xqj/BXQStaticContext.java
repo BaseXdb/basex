@@ -72,7 +72,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String getBaseURI() {
-    return string(ctx.resource.baseURI.atom());
+    return string(ctx.baseURI.atom());
   }
 
   @Override
@@ -173,7 +173,7 @@ final class BXQStaticContext implements XQStaticContext {
   @Override
   public void setBaseURI(final String baseUri) throws XQException {
     BXQAbstract.valid(baseUri, String.class);
-    ctx.resource.baseURI = Uri.uri(token(baseUri));
+    ctx.baseURI = Uri.uri(token(baseUri));
   }
 
   @Override

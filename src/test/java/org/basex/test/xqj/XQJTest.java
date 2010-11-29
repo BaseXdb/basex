@@ -475,8 +475,9 @@ public final class XQJTest extends TestCase {
       fail("Error expected: no database opened.");
     } catch(final XQException ex) { /* ignored */
     }
-    expr.executeCommand("create db input etc/xml/input.xml");
+    expr.executeCommand("create db tmp etc/xml/input.xml");
     expr.executeCommand("info db");
+    expr.executeCommand("drop db tmp");
     expr.executeCommand("close");
   }
 

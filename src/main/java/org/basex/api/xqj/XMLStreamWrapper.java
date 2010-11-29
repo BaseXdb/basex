@@ -92,9 +92,4 @@ final class XMLStreamWrapper extends Parser {
   public String det() {
     return Util.info(NODESPARSED, file.name(), nodes);
   }
-
-  @Override
-  public double prog() {
-    return nodes / 1000000d % 1;
-  }
 }
