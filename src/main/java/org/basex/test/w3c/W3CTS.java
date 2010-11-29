@@ -707,12 +707,12 @@ public abstract class W3CTS {
     final NodIter col = new NodIter();
     for(final byte[] cl : colls.get(string(name))) {
       if(new File(string(cl)).exists()) {
-        col.add(qp.ctx.doc(cl, true, false, null));
+        col.add(qp.ctx.resource.doc(cl, true, false, null));
       } else {
         Util.errln("Warning: \"%\" not found.", cl);
       }
     }
-    qp.ctx.addCollection(col, name);
+    qp.ctx.resource.addCollection(col, name);
     return Uri.uri(name);
   }
 
