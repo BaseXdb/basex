@@ -63,13 +63,13 @@ public class DialogAdd extends Dialog {
     name = new BaseXTextField(this);
     name.addKeyListener(keys);
     pp.add(name);
+    pp.add(new BaseXLabel(" "));
     
     pp.add(new BaseXLabel("Target Path: "));
     pp.add(new BaseXLabel(" "));
     path = new BaseXTextField(this);
     path.addKeyListener(keys);
     pp.add(path);
-    pp.add(new BaseXLabel(" "));
     
     set(pp, BorderLayout.CENTER);
     
