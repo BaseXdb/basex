@@ -29,6 +29,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogAbout;
+import org.basex.gui.dialog.DialogAdd;
 import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
 import org.basex.gui.dialog.DialogCreateFS;
@@ -133,6 +134,16 @@ public enum GUICommands implements GUICommand {
     private Command cmd(final boolean create, final CmdIndex index) {
       return create ? new CreateIndex(index) : new DropIndex(index);
     }
+  },
+  
+  /** Shows add a document dialog. */
+  ADD(GUIADD + DOTS, null, GUIADDTT, true, false) {
+    @Override
+    public void execute(final GUI gui) {
+      final DialogAdd dialog = new DialogAdd(gui);
+      if(!dialog.ok()) return;
+      gui.execute(dialog.cmd(), false);
+    } 
   },
 
   /** Exports a document. */

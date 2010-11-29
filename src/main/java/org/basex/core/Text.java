@@ -806,6 +806,10 @@ public interface Text {
   /** Command info. */
   String GUIINFOTT = lang("c_propstt");
   /** Command info. */
+  String GUIADD = lang("c_add");
+  /** Command info. */
+  String GUIADDTT = lang("c_addtt");
+  /** Command info. */
   String GUIINSERT = lang("c_insert");
   /** Command info. */
   String GUIINSERTTT = lang("c_inserttt");

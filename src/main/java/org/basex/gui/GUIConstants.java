@@ -105,7 +105,7 @@ public final class GUIConstants {
 
   /** Two-dimensional Menu entries, containing the menu item commands. */
   static final Object[][] MENUITEMS = { {
-    MENUDB, CREATE, OPEN, INFO, EXPORT, MANAGE, CLOSE, SEPARATOR,
+    MENUDB, CREATE, OPEN, INFO, ADD, EXPORT, MANAGE, CLOSE, SEPARATOR,
     XQUERYTIT + COL,
     XQOPEN, XQSAVE, XQSAVEAS, SEPARATOR,
     SERVER, Prop.MAC ? null : SEPARATOR,
