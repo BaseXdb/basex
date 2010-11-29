@@ -92,7 +92,7 @@ public final class StressTest {
   static class Client extends Thread {
     /** Client session. */
     private ClientSession session;
-    
+
     /**
      * Default constructor.
      */

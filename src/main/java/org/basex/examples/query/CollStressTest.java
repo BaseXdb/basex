@@ -15,7 +15,7 @@ public final class CollStressTest {
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of documents to be added. */
-  private static final int SIZE = 1000; 
+  private static final int SIZE = 1000;
 
   /**
    * Runs the example code.

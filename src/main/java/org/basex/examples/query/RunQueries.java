@@ -124,7 +124,7 @@ public final class RunQueries {
     Iter iter = proc.iter();
 
     // ------------------------------------------------------------------------
-    // Iterate through all items and serialize 
+    // Iterate through all items and serialize
     Item item;
     while((item = iter.next()) != null) {
       System.out.println(item.toJava());
