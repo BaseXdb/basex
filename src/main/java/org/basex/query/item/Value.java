@@ -1,6 +1,7 @@
 package org.basex.query.item;
 
 import org.basex.query.QueryContext;
+import org.basex.query.QueryContextRes;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Var;
@@ -32,13 +33,22 @@ public abstract class Value extends Expr {
   public final ValueIter iter(final QueryContext ctx) {
     return iter();
   }
+  
+  /**
+   * Constructor.
+   * @param ctx context resource
+   * @return iterator
+   */
+  public final ValueIter iter(final QueryContextRes ctx) {
+    return iter();
+  }
 
   /**
    * Returns an iterator.
    * @return iterator
    */
   public abstract ValueIter iter();
-
+  
   @Override
   public final Value value(final QueryContext ctx) {
     return this;

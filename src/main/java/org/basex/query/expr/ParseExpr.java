@@ -289,7 +289,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Value checkCtx(final QueryContext ctx) throws QueryException {
-    final Value v = ctx.value;
+    final Value v = ctx.resource.value;
     if(v == null) XPNOCTX.thrw(input, this);
     return v;
   }
@@ -384,6 +384,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final void checkAdmin(final QueryContext ctx)
       throws QueryException {
-    if(!ctx.context.user.perm(User.ADMIN)) PERMNO.thrw(input, CmdPerm.ADMIN);
+    if(!ctx.resource.context.user.perm(User.ADMIN)) 
+      PERMNO.thrw(input, CmdPerm.ADMIN);
   }
 }

@@ -108,7 +108,8 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private NodIter collection(final QueryContext ctx) throws QueryException {
-    return ctx.coll(expr.length != 0 ? checkStr(expr[0], ctx) : null, input);
+    return ctx.resource.coll(expr.length != 0 ? checkStr(expr[0], ctx) : 
+      null, input);
   }
 
   /**
@@ -154,7 +155,8 @@ final class FNGen extends Fun {
    */
   private Nod doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, input);
-    return it == null ? null : ctx.doc(checkEStr(it), false, false, input);
+    return it == null ? null : 
+      ctx.resource.doc(checkEStr(it), false, false, input);
   }
 
   /**
@@ -237,7 +239,7 @@ final class FNGen extends Fun {
       if(!base.valid()) DOCBASE.thrw(input, base);
     }
 
-    final Prop prop = ctx.context.prop;
+    final Prop prop = ctx.resource.context.prop;
     final IO io = new IOContent(cont, string(base.atom()));
     try {
       final Parser p = Parser.fileParser(io, prop, "");

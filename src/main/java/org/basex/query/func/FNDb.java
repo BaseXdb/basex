@@ -92,7 +92,7 @@ final class FNDb extends Fun {
     final int s = indexOf(str, '/');
     final byte[] db = s == -1 ? str : substring(str, 0, s);
     final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
-    final DBNode n = ctx.doc(db, true, true, input);
+    final DBNode n = ctx.resource.doc(db, true, true, input);
     final IntList il = n.data.doc(string(path));
     final NodIter col = new NodIter();
     for(int i = 0; i < il.size(); ++i) col.add(new DBNode(n.data, il.get(i)));
@@ -109,7 +109,8 @@ final class FNDb extends Fun {
   private DBNode open(final QueryContext ctx, final boolean id)
       throws QueryException {
 
-    final DBNode node = ctx.doc(checkStr(expr[0], ctx), true, true, input);
+    final DBNode node = 
+      ctx.resource.doc(checkStr(expr[0], ctx), true, true, input);
     final int v = (int) checkItr(expr[1], ctx);
     final int pre = id ? node.data.pre(v) : v;
     if(pre < 0 || pre >= node.data.meta.size) IDINVALID.thrw(input, this, v);
@@ -224,7 +225,7 @@ final class FNDb extends Fun {
    */
   private Iter list(final QueryContext ctx) {
     final ItemIter ii = new ItemIter();
-    for(final String s : List.list(ctx.context)) ii.add(Str.get(s));
+    for(final String s : List.list(ctx.resource.context)) ii.add(Str.get(s));
     return ii;
   }
 
@@ -234,7 +235,7 @@ final class FNDb extends Fun {
    * @return iterator
    */
   private Str system(final QueryContext ctx) {
-    return Str.get(delete(Info.info(ctx.context), '\r'));
+    return Str.get(delete(Info.info(ctx.resource.context), '\r'));
   }
 
   /**
@@ -244,7 +245,7 @@ final class FNDb extends Fun {
    * @throws QueryException query exception
    */
   private Str info(final QueryContext ctx) throws QueryException {
-    final boolean create = ctx.context.user.perm(User.CREATE);
+    final boolean create = ctx.resource.context.user.perm(User.CREATE);
     final byte[] info = InfoDB.db(data(ctx).meta, false, true, create);
     return Str.get(delete(info, '\r'));
   }
@@ -292,7 +293,7 @@ final class FNDb extends Fun {
    * @throws QueryException query exception
    */
   private Data data(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.data();
+    final Data data = ctx.resource.data();
     if(data == null) NODBCTX.thrw(input, this);
     return data;
   }

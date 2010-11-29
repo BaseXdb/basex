@@ -479,9 +479,10 @@ public final class HttpClient {
       throws IOException {
 
     final IOContent io = new IOContent(readHttpContent(conn));
-    final Parser parser = new XMLParser(io, null, ctx.context.prop);
+    final Parser parser = new XMLParser(io, null, ctx.resource.context.prop);
 
-    return new DBNode(MemBuilder.build(parser, ctx.context.prop, ""), 0);
+    return new 
+      DBNode(MemBuilder.build(parser, ctx.resource.context.prop, ""), 0);
   }
 
   /**
@@ -495,9 +496,10 @@ public final class HttpClient {
       throws IOException {
 
     final IOContent io = new IOContent(readHttpContent(conn));
-    final Parser parser = new HTMLParser(io, null, ctx.context.prop);
+    final Parser parser = new HTMLParser(io, null, ctx.resource.context.prop);
 
-    return new DBNode(MemBuilder.build(parser, ctx.context.prop, ""), 0);
+    return new 
+      DBNode(MemBuilder.build(parser, ctx.resource.context.prop, ""), 0);
   }
 
   /**

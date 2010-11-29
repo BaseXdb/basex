@@ -113,7 +113,7 @@ public final class FTWords extends FTExpr {
       if(query instanceof Str) txt = ((Str) query).atom();
       simple = mode == FTMode.M_ANY && txt != null && occ == null;
       fast = ctx.ftfast && occ == null;
-      ftt = new FTTokenizer(this, ctx.ftopt, ctx.context.prop);
+      ftt = new FTTokenizer(this, ctx.ftopt, ctx.resource.context.prop);
     }
     return this;
   }

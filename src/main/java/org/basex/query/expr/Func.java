@@ -75,10 +75,10 @@ public final class Func extends Single {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // evaluate function and reset variable scope
-    final Value cv = ctx.value;
-    ctx.value = null;
+    final Value cv = ctx.resource.value;
+    ctx.resource.value = null;
     final Value v = expr.value(ctx);
-    ctx.value = cv;
+    ctx.resource.value = cv;
     return (var.type != null ? var.type.cast(v, ctx, input) : v).iter(ctx);
   }
 

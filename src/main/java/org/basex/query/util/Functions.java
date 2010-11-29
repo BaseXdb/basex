@@ -78,7 +78,7 @@ public final class Functions extends ExprInfo {
     }
 
     // check Java functions - only allowed with administrator permissions
-    if(startsWith(uri, JAVAPRE) && ctx.context.user.perm(User.ADMIN)) {
+    if(startsWith(uri, JAVAPRE) && ctx.resource.context.user.perm(User.ADMIN)) {
       final String c = string(substring(uri, JAVAPRE.length));
       // convert dashes to upper-case initials
       final StringBuilder sb = new StringBuilder(c);

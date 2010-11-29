@@ -36,8 +36,8 @@ public final class FTOptions extends FTExpr {
   public FTExpr comp(final QueryContext ctx) throws QueryException {
     final FTOpt tmp = ctx.ftopt;
     opt.init(tmp);
-    if(opt.sw != null && ctx.value instanceof DBNode)
-      opt.sw.comp(((DBNode) ctx.value).data);
+    if(opt.sw != null && ctx.resource.value instanceof DBNode)
+      opt.sw.comp(((DBNode) ctx.resource.value).data);
     ctx.ftopt = opt;
     expr[0] = expr[0].comp(ctx);
     tmp.mark = ctx.ftopt.mark;

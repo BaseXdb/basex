@@ -59,7 +59,7 @@ final class IterPosFilter extends Filter {
         }
 
         // cache context
-        final Value cv = ctx.value;
+        final Value cv = ctx.resource.value;
         final long cp = ctx.pos;
 
         Item item = null;
@@ -88,7 +88,7 @@ final class IterPosFilter extends Filter {
         if(skip && direct) iter.reset();
 
         // reset context and return result
-        ctx.value = cv;
+        ctx.resource.value = cv;
         ctx.pos = cp;
         return item;
       }

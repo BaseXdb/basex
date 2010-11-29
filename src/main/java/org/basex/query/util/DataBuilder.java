@@ -79,7 +79,7 @@ public final class DataBuilder {
       final QueryContext ctx) throws QueryException {
 
     // copy node to main memory data instance
-    final MemData md = new MemData(ctx.context.prop);
+    final MemData md = new MemData(ctx.resource.context.prop);
     new DataBuilder(md).ftpos(tag, ctx.ftpos).build(nod);
     final ItemIter ir = new ItemIter();
     for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) {

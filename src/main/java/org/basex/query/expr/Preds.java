@@ -94,7 +94,7 @@ public abstract class Preds extends ParseExpr {
       throws QueryException {
 
     // set context item and position
-    ctx.value = it;
+    ctx.resource.value = it;
     for(final Expr p : pred) {
       final Item i = p.test(ctx, input);
       if(i == null) return false;

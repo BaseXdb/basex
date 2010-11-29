@@ -49,7 +49,7 @@ final class DocTest extends Test {
     // use simple test if database contains only one document
     // (i.e., if size of the first document equals the database size)
     return data.size(0, Data.DOC) == data.meta.size ? Test.DOC :
-      new DocTest(ctx.value, data);
+      new DocTest(ctx.resource.value, data);
   }
 
   @Override

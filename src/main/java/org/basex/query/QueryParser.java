@@ -2641,7 +2641,7 @@ public class QueryParser extends InputParser {
         error(THESRNG);
       }
     }
-    thes.add(new Thesaurus(fl, rel, min, max, ctx.context));
+    thes.add(new Thesaurus(fl, rel, min, max, ctx.resource.context));
   }
 
   /**

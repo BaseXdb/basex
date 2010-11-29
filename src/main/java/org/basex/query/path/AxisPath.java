@@ -151,7 +151,7 @@ public class AxisPath extends Path {
       step = st;
       // refresh root context
       ctx.compInfo(OPTPATH);
-      ctx.value = root(ctx);
+      ctx.resource.value = root(ctx);
     }
     final AxisStep s = emptyStep();
     if(s != null) COMPSELF.thrw(input, s);
@@ -165,11 +165,11 @@ public class AxisPath extends Path {
 
     // check if all context nodes reference document nodes
     // [CG] XQuery: optimize paths without root context
-    final Data data = ctx.data();
+    final Data data = ctx.resource.data();
     if(data != null) {
-      boolean doc = ctx.docNodes();
+      boolean doc = ctx.resource.docNodes();
       if(!doc) {
-        final Iter iter = ctx.value.iter(ctx);
+        final Iter iter = ctx.resource.value.iter(ctx);
         Item it;
         while((it = iter.next()) != null) {
           doc = it.type == Type.DOC;
@@ -390,7 +390,7 @@ public class AxisPath extends Path {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Value c = ctx.value;
+    final Value c = ctx.resource.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
     Value r = root != null ? root.value(ctx) : c;
@@ -403,11 +403,11 @@ public class AxisPath extends Path {
       if(r != null) {
         final Iter ir = ctx.iter(r);
         while((r = ir.next()) != null) {
-          ctx.value = r;
+          ctx.resource.value = r;
           iter(0, citer, ctx);
         }
       } else {
-        ctx.value = null;
+        ctx.resource.value = null;
         iter(0, citer, ctx);
       }
       citer.sort();
@@ -415,7 +415,7 @@ public class AxisPath extends Path {
       citer.reset();
     }
 
-    ctx.value = c;
+    ctx.resource.value = c;
     ctx.size = cs;
     ctx.pos = cp;
     return citer;
@@ -437,7 +437,7 @@ public class AxisPath extends Path {
     Nod nod;
     while((nod = ir.next()) != null) {
       if(more) {
-        ctx.value = nod;
+        ctx.resource.value = nod;
         iter(l + 1, ni, ctx);
       } else {
         ctx.checkStop();
@@ -573,7 +573,7 @@ public class AxisPath extends Path {
     if(s.pred.length != 0 || !s.axis.down || s.test.type == Type.ATT ||
         s.test.test != Name.NAME && s.test.test != Name.STD) return this;
 
-    final Data data = ctx.data();
+    final Data data = ctx.resource.data();
     if(data == null || !data.meta.uptodate) return this;
 
     final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));

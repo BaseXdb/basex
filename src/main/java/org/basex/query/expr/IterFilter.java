@@ -38,7 +38,7 @@ final class IterFilter extends Filter {
           final Item it = iter.next();
           if(it == null) return null;
           // set context item and position
-          ctx.value = it;
+          ctx.resource.value = it;
           if(preds(it, ctx)) return it;
           // remember last node
         }
