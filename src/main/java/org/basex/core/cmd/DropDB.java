@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
+
 import java.io.File;
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
@@ -28,15 +29,16 @@ public final class DropDB extends Command {
   protected boolean run() {
     // name of database
     final String db = args[0];
+    if(!validName(db)) return error(NAMEINVALID, db);
+
+    // database does not exist; return true
+    if(!prop.dbexists(db)) return info(DBNOTDROPPED);
+
     // close database if it's currently opened and not opened by others
-    final boolean close = context.data != null &&
-      db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
-    if(close) new Close().run(context);
+    close(db);
 
     // check if database is still pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
-    // database does not exist; return true
-    if(!prop.dbexists(db)) return info(DBNOTDROPPED);
     // try to drop database
     return drop(db, prop) ? info(DBDROPPED, db) : error(DBDROPERROR);
   }

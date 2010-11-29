@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
 import org.basex.util.Util;
 
@@ -31,17 +32,10 @@ public final class Optimize extends ACreate {
 
   @Override
   protected boolean run() {
-    stats(context.data);
-    return info(DBOPTIMIZED, perf);
-  }
+    final Data data = context.data;
 
-  /**
-   * Creates new statistics.
-   * @param data data reference
-   */
-  private void stats(final Data data) {
     // refresh indexes
-    data.path.init();
+    data.pthindex.init();
     data.tags.init();
     data.atts.init();
     data.meta.dirty = true;
@@ -60,44 +54,54 @@ public final class Optimize extends ACreate {
 
       if(kind == Data.DOC) {
         parStack[level++] = pre;
-        if(path) data.path.add(0, level, kind);
+        if(path) data.pthindex.add(0, level, kind);
         ++d;
       } else if(kind == Data.ELEM) {
         final int id = data.name(pre);
         data.tags.index(data.tags.key(id), null, true);
-        if(path) data.path.add(id, level, kind);
+        if(path) data.pthindex.add(id, level, kind);
         tagStack[level] = id;
         parStack[level++] = pre;
       } else if(kind == Data.ATTR) {
         final int id = data.name(pre);
         data.atts.index(data.atts.key(id), data.text(pre, false), true);
-        if(path) data.path.add(id, level, kind);
+        if(path) data.pthindex.add(id, level, kind);
       } else {
         final byte[] txt = data.text(pre, true);
         if(kind == Data.TEXT) data.tags.index(tagStack[level - 1], txt);
-        if(path) data.path.add(0, level, kind);
+        if(path) data.pthindex.add(0, level, kind);
       }
       if(h < level) h = level;
     }
     data.meta.height = h;
     data.meta.ndocs = d;
+    data.meta.pathindex = path;
     data.meta.uptodate = true;
 
     try {
-      data.meta.pathindex |= prop.is(Prop.PATHINDEX);
-      data.meta.textindex |= prop.is(Prop.TEXTINDEX);
-      data.meta.attrindex |= prop.is(Prop.ATTRINDEX);
-      data.meta.ftindex   |= prop.is(Prop.FTINDEX);
-      index(data);
+      // global property check can be skipped as soon as id/pre mapping exists
+      if(data.meta.textindex || prop.is(Prop.TEXTINDEX))
+        index(IndexType.TEXT, data);
+      if(data.meta.attrindex || prop.is(Prop.ATTRINDEX))
+        index(IndexType.ATTRIBUTE, data);
+      if(data.meta.ftindex || prop.is(Prop.FTINDEX))
+        index(IndexType.FULLTEXT, data);
     } catch(final IOException ex) {
       Util.debug(ex);
     }
     data.flush();
+
+    return info(DBOPTIMIZED, perf);
   }
 
   @Override
   public double prog() {
     return (double) pre / size;
+  }
+
+  @Override
+  public boolean stoppable() {
+    return false;
   }
 
   @Override

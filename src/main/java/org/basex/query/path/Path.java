@@ -41,10 +41,10 @@ public abstract class Path extends ParseExpr {
       if(root instanceof Context) root = null;
     }
 
-    final Value vi = ctx.resource.value;
-    ctx.resource.value = root(ctx);
+    final Value vi = ctx.value;
+    ctx.value = root(ctx);
     final Expr e = compPath(ctx);
-    ctx.resource.value = vi;
+    ctx.value = vi;
     if(root instanceof Context) root = null;
     return e;
   }
@@ -64,7 +64,7 @@ public abstract class Path extends ParseExpr {
    * @return root
    */
   protected final Value root(final QueryContext ctx) {
-    final Value v = ctx != null ? ctx.resource.value : null;
+    final Value v = ctx != null ? ctx.value : null;
     // no root specified: return context, if it does not reference a document
     // as e.g. happens in //a(b|c)
     if(root == null) return v == null || v.type != Type.DOC ? v : null;

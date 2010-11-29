@@ -54,19 +54,15 @@ public class FTContains extends ParseExpr {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     expr = checkUp(expr, ctx).comp(ctx).addText(ctx);
-
     lex = new FTLexer(new FTOpt());
-    final boolean fast = ctx.ftfast;
-    ctx.ftfast = ctx.ftfast && ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);
-    ctx.ftfast = fast;
-
     return expr.empty() ? optPre(Bln.FALSE, ctx) : this;
   }
 
   @Override
   public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Iter iter = expr.iter(ctx);
     final FTLexer tmp = ctx.fttoken;
     double s = 0;
@@ -86,7 +82,8 @@ public class FTContains extends ParseExpr {
 
       // add entry to visualization
       if(d > 0 && ctx.ftpos != null && it instanceof DBNode) {
-        ctx.ftpos.add(((DBNode) it).pre, item.all);
+        final DBNode node = (DBNode) it;
+        ctx.ftpos.add(node.data, node.pre, item.all);
       }
     }
 

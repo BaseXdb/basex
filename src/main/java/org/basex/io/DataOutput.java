@@ -107,8 +107,8 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified tokens to the output stream; null references
-   * are replaced with an empty array.
+   * Writes the specified tokens to the output stream; {@code null} references
+   * are replaced by an empty array.
    * @param array array to be written
    * @throws IOException I/O exception
    */

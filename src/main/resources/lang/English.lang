@@ -21,6 +21,8 @@ m_layout=Layout
 
 # Buttons
 b_ok=OK
+b_yes=Yes
+b_no=No
 b_opt=Optimize
 b_rename=Rename
 b_backup=Backup
@@ -126,7 +128,8 @@ dr_over=Old database will be overwritten
 dr_overbacking=Old database and backing store will be overwritten
 
 dd_title=Manage Databases
-dd_question=Database '%' will be dropped.\nAre you sure?
+dd_question=Database '%' will be dropped.
+dd_sure=Are you sure?
 
 dx_question=Do you really want to delete?
 dq_question=Save changes to %?
@@ -381,10 +384,10 @@ db_notdropped=No database was dropped.
 db_droperror=Database could not be dropped.
 db_altered=Database '%' was renamed to '%'.
 db_notaltered=Database '%' could not be renamed.
-db_backup=Backup '%' created in %.
+db_backup=Backup for '%' created in %.
 db_nobackup=Backup of database '%' could not be created.
-db_restore=Database '%' restored in %.
-db_norestore=Database '%' could not be restored.
+db_restore='%' restored in %.
+db_norestore='%' could not be restored.
 db_notopened=Database '%' could not be opened.
 db_opened=Database '%' opened in %.
 db_exported=Database '%' exported in %.
@@ -398,6 +401,7 @@ db_backnf=No backup found for '%'.
 in_created=Index '%' created in %.
 in_dropped=Index '%' dropped in %.
 in_notdropped=Index '%' could not be dropped.
+in_notavl=Not available
 
 # Server Info
 srv_login=Access denied.
@@ -459,7 +463,7 @@ ad_kill=% sessions killed.
 ad_killself='%' cannot kill itself.
 
 # General Commands
-gc_setkey=Could not set '%'.
+gc_setwhich=Unknown option '%'
 gc_setval=Could not set '%' to '%'.
 
 # Info Strings

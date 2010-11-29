@@ -50,11 +50,11 @@ public class Filter extends Preds {
     // return empty root
     if(root.empty()) return optPre(Empty.SEQ, ctx);
 
-    final Type ct = ctx.resource.value != null ? ctx.resource.value.type : null;
-    if(ct != null) ctx.resource.value.type = root.type().type;
+    final Type ct = ctx.value != null ? ctx.value.type : null;
+    if(ct != null) ctx.value.type = root.type().type;
     final Expr e = super.comp(ctx);
     if(e != this) return e;
-    if(ct != null) ctx.resource.value.type = ct;
+    if(ct != null) ctx.value.type = ct;
 
     // no predicates.. return root
     if(pred.length == 0) return root;
@@ -99,7 +99,7 @@ public class Filter extends Preds {
     }
 
     final Iter iter = ctx.iter(root);
-    final Value cv = ctx.resource.value;
+    final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
 
@@ -115,13 +115,13 @@ public class Filter extends Preds {
       ctx.pos = 1;
       int c = 0;
       for(int s = 0; s < is; ++s) {
-        ctx.resource.value = ir.item[s];
+        ctx.value = ir.item[s];
         if(p.test(ctx, input) != null) ir.item[c++] = ir.item[s];
         ctx.pos++;
       }
       ir.size(c);
     }
-    ctx.resource.value = cv;
+    ctx.value = cv;
     ctx.size = cs;
     ctx.pos = cp;
     return ir;

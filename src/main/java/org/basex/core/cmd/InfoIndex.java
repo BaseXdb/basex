@@ -61,12 +61,10 @@ public final class InfoIndex extends AInfo {
   /**
    * Prints information on the specified index.
    * @param index index type
-   * @param data data reference
    * @return success flag
    */
-  public static byte[] info(final String index, final Data data) {
-    final CmdIndexInfo type = getOption(index, CmdIndexInfo.class);
-    return type != null ? info(type, data) : Token.EMPTY;
+  public static CmdIndexInfo info(final String index) {
+    return getOption(index, CmdIndexInfo.class);
   }
 
   /**
@@ -75,26 +73,19 @@ public final class InfoIndex extends AInfo {
    * @param data data reference
    * @return success flag
    */
-  private static byte[] info(final CmdIndexInfo idx, final Data data) {
+  public static byte[] info(final CmdIndexInfo idx, final Data data) {
     switch(idx) {
-      case TAG:
-        return info(INFOTAGS, IndexType.TAG, data);
-      case ATTNAME:
-        return info(INFOATTS, IndexType.ATTNAME, data);
-      case TEXT:
-        return !data.meta.textindex ? Token.EMPTY :
-          info(INFOTEXTINDEX, IndexType.TEXT, data);
-      case ATTRIBUTE:
-        return !data.meta.attrindex ? Token.EMPTY :
-          info(INFOATTRINDEX, IndexType.ATTRIBUTE, data);
-      case FULLTEXT:
-        return !data.meta.ftindex ? Token.EMPTY :
-          info(INFOFTINDEX, IndexType.FULLTEXT, data);
-      case PATH:
-        return !data.meta.pathindex ? Token.EMPTY :
-          info(INFOPATHINDEX, IndexType.PATH, data);
-      default:
-        return Token.EMPTY;
+      case TAG:       return info(INFOTAGS, IndexType.TAG, data, true);
+      case ATTNAME:   return info(INFOATTS, IndexType.ATTNAME, data, true);
+      case TEXT:      return info(INFOTEXTINDEX, IndexType.TEXT, data,
+          data.meta.textindex);
+      case ATTRIBUTE: return info(INFOATTRINDEX, IndexType.ATTRIBUTE, data,
+          data.meta.attrindex);
+      case FULLTEXT:  return info(INFOFTINDEX, IndexType.FULLTEXT, data,
+          data.meta.ftindex);
+      case PATH:      return info(INFOPATHINDEX, IndexType.PATH, data,
+          data.meta.pathindex);
+      default:        return Token.token(LI + INDNOTAVL);
     }
   }
 
@@ -103,12 +94,16 @@ public final class InfoIndex extends AInfo {
    * @param ds index description
    * @param it index type
    * @param data data reference
+   * @param avl states if index is available
    * @return information
    */
   private static byte[] info(final String ds, final IndexType it,
-      final Data data) {
-    return new TokenBuilder().add(ds).add(NL).add(
-        data.info(it)).add(NL).finish();
+      final Data data, final boolean avl) {
+
+    final TokenBuilder tb = new TokenBuilder(ds).add(NL);
+    if(avl) tb.add(data.info(it));
+    else tb.addExt(LI + INDNOTAVL, it);
+    return tb.add(NL).finish();
   }
 
   @Override

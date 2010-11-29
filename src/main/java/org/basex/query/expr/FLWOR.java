@@ -57,13 +57,7 @@ public class FLWOR extends ParseExpr {
 
     // optimize for/let clauses
     final int vs = ctx.vars.size();
-    for(final ForLet f : fl) {
-      // disable fast full-text evaluation if score value exists
-      final boolean fast = ctx.ftfast;
-      ctx.ftfast = ctx.ftfast && f.simple();
-      f.comp(ctx);
-      ctx.ftfast = fast;
-    }
+    for(final ForLet f : fl) f.comp(ctx);
 
     // optimize where clause
     boolean empty = false;
@@ -155,8 +149,7 @@ public class FLWOR extends ParseExpr {
         // stop if variable is used by as position or score
         final For fr = (For) fl[g];
         if(fr.pos != null && t.uses(fr.pos) ||
-           fr.score != null && t.uses(fr.score) ||
-           fr.mark != null && t.uses(fr.mark)) break;
+           fr.score != null && t.uses(fr.score)) break;
 
         // move let clause to outer position
         System.arraycopy(fl, g, fl, g + 1, f - g);

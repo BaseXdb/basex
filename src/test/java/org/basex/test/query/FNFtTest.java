@@ -1,0 +1,108 @@
+package org.basex.test.query;
+
+import org.basex.core.BaseXException;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.CreateIndex;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Set;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * This class tests the XQuery full-text extensions.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author Christian Gruen
+ */
+public final class FNFtTest extends AdvancedQueryTest {
+  /** Test file. */
+  private static final String FILE = "etc/xml/input.xml";
+
+  /**
+   * Initializes a test.
+   * @throws BaseXException database exception
+   */
+  @Before
+  public void initTest() throws BaseXException {
+    new CreateDB("db", FILE).execute(CTX);
+    new CreateIndex("fulltext").execute(CTX);
+  }
+
+  /**
+   * Test method for the ft:search() function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testSearch() throws BaseXException {
+    // test wrong arguments
+    args("ft:search", (Class<?>) null, String.class);
+
+    // check index results
+    query("ft:search(., 'assignments')", "Assignments");
+    query("ft:search(., 'XXX')", "");
+
+    // apply index options to query term
+    new Set("stemming", true).execute(CTX);
+    new CreateIndex("fulltext").execute(CTX);
+    contains("ft:search(., 'Exercises')/..", "<li>Exercise 1</li>");
+  }
+
+  /**
+   * Test method for the 'ft:mark()' function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testMark() throws BaseXException {
+    query("ft:mark(//*[text() contains text '1'])",
+      "<li>Exercise <mark>1</mark></li>");
+    query("ft:mark(//*[text() contains text '2'], 'b')",
+      "<li>Exercise <b>2</b></li>");
+    contains("ft:mark(//*[text() contains text 'Exercise'])",
+      "<li><mark>Exercise</mark> 1</li>");
+    query("copy $a := text { 'a b' } modify () " +
+      "return ft:mark($a[. contains text 'a'], 'b')", "<b>a</b> b");
+    query("copy $a := text { 'ab' } modify () " +
+      "return ft:mark($a[. contains text 'ab'], 'b')", "<b>ab</b>");
+    query("copy $a := text { 'a b' } modify () " +
+      "return ft:mark($a[. contains text 'a b'], 'b')", "<b>a</b> <b>b</b>");
+  }
+
+  /**
+   * Test method for the ft:extract() function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testExtract() throws BaseXException {
+    query("ft:extract(//*[text() contains text '1'])",
+      "<li>Exercise <mark>1</mark></li>");
+    query("ft:extract(//*[text() contains text '2'], 'b', 20)",
+      "<li>Exercise <b>2</b></li>");
+    query("ft:extract(//*[text() contains text '2'], '_o_', 1)",
+      "<li>...<_o_>2</_o_></li>");
+    contains("ft:extract(//*[text() contains text 'Exercise'], 'b', 1)",
+      "<li><b>Exercise</b>...</li>");
+  }
+
+  /**
+   * Test method for the 'ft:score()' function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testScore() throws BaseXException {
+    // test wrong arguments
+    args("ft:score", (Class<?>) null);
+
+    query("ft:score(ft:search(., '2'))", "1");
+    query("ft:score(ft:search(., 'XML'))", "1 0.5");
+  }
+
+  /**
+   * Finishes the code.
+   * @throws BaseXException database exception
+   */
+  @AfterClass
+  public static void finish() throws BaseXException {
+    new DropDB("db").execute(CTX);
+  }
+}

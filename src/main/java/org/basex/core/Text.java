@@ -478,21 +478,26 @@ public interface Text {
   String INDDROP = lang("in_dropped");
   /** Index not dropped. */
   String INDDROPERROR = lang("in_notdropped");
+  /** Index not available. */
+  String INDNOTAVL = lang("in_notavl");
 
   // DATABASE/INDEX INFORMATION ===============================================
 
   /** Index info. */
-  String TRIE = LI + "Compressed Trie";
+  String INDEXSTRUC = LI + "Structure: ";
   /** Index info. */
-  String NAMINDEX = LI + "Hash Index";
-  /** Index info. */
-  String FUZZY = LI + "Fuzzy Index";
-  /** Index info. */
-  String TXTINDEX = LI + "Tree Index";
-  /** Index info. */
-  String SIZEDISK = LI + "Size on Disk: ";
+  String SIZEDISK = LI + "Size: ";
   /** Index info. */
   String IDXENTRIES = LI + "Entries: ";
+
+  /** Index info. */
+  String TRIESTRUC = "Trie";
+  /** Index info. */
+  String HASHSTRUC = "Hash";
+  /** Index info. */
+  String FUZZYSTRUC = "Fuzzy";
+  /** Index info. */
+  String TREESTRUC = "Binary tree";
 
   // XQUERY COMMAND ===========================================================
 
@@ -595,7 +600,9 @@ public interface Text {
   // GENERAL COMMANDS =========================================================
 
   /** Invalid key. */
-  String SETKEY = lang("gc_setkey");
+  String SETWHICH = lang("gc_setwhich") + DOT;
+  /** Unknown command error. */
+  String SETSIMILAR = lang("gc_setwhich") + "; " + lang("cmd_similar");
   /** Invalid value. */
   String SETVAL = lang("gc_setval");
 
@@ -938,7 +945,11 @@ public interface Text {
   String BUTTONXQUERY = lang("b_xquery");
   /** Button text for confirming actions. */
   String BUTTONOK = "  " + lang("b_ok") + "  ";
-  /** Button text for confirming actions. */
+  /** Button text for choosing actions. */
+  String BUTTONYES = "  " + lang("b_yes") + "  ";
+  /** Button text for choosing actions. */
+  String BUTTONNO = "  " + lang("b_no") + "  ";
+  /** Button text for optimization. */
   String BUTTONOPT = lang("b_opt") + DOTS;
   /** Button text for renaming databases. */
   String BUTTONRENAME = lang("b_rename") + DOTS;
@@ -953,13 +964,13 @@ public interface Text {
   /** Button text for canceling actions. */
   String BUTTONCANCEL = lang("b_cancel");
   /** Button text for deleting files. */
-  String BUTTONDROP = lang("b_drop");
+  String BUTTONDROP = lang("b_drop") + DOTS;
   /** Button text for browsing files/directories. */
   String BUTTONBROWSE = lang("b_browse") + DOTS;
   /** Button text for creating things. */
   String BUTTONCREATE = lang("b_create");
   /** Button text for alter password. */
-  String BUTTONALTER = lang("b_alter");
+  String BUTTONALTER = lang("b_alter") + DOTS;
   /** Button for starting the server. */
   String BUTTONSTART = lang("b_start");
   /** Button for starting the server. */
@@ -1027,11 +1038,9 @@ public interface Text {
   String CREATEZIPDESC = lang("dc_zipdesc") + " (*.zip)";
   /** GZ file description. */
   String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
-  /** XQ file description. */
-  String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
   /** XQuery file extensions description. */
-  String CREATEXQEXDESC = lang("dc_xqdesc") + 
-  " (*.xq, *.xquery, *.xqm, *.xqy, *.xql)";
+  String CREATEXQEXDESC = lang("dc_xqdesc") +
+    " (*.xq, *.xqm, *.xqy, *.xql, *.xquery)";
   /** Dialog title for database options. */
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Whitespaces information. */
@@ -1141,9 +1150,9 @@ public interface Text {
   /** Local permissions. */
   String LOCPERM = lang("ds_locperm") + COLS;
   /** Question for dropping user. */
-  String DRQUESTION = lang("ds_drquestion");
+  String DRQUESTION = lang("ds_drquestion") + NL + lang("dd_sure");
   /** Question for revoking right from logged in user. */
-  String DBREVOKE = lang("ds_dbrevoke");
+  String DBREVOKE = lang("ds_dbrevoke") + NL + lang("dd_sure");
   /** Alter password. */
   String ALTERPW = lang("ds_alterpw");
   /** Invalid. */
@@ -1212,7 +1221,7 @@ public interface Text {
   /** Dialog title for managing databases. */
   String MANAGETITLE = lang("dd_title");
   /** Dialog title for dropping a database. */
-  String DROPCONF = lang("dd_question") + NL + " ";
+  String DROPCONF = lang("dd_question") + NL + lang("dd_sure");
 
   /** Dialog title for import options. */
   String PREFSTITLE = lang("dp_title");

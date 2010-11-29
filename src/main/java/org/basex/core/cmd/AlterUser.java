@@ -27,7 +27,7 @@ public final class AlterUser extends Command {
   protected boolean run() {
     final String user = args[0];
     final String pass = args[1];
-    if(!checkName(user)) return error(NAMEINVALID, user);
+    if(!validName(user)) return error(NAMEINVALID, user);
     return pass == null || pass.isEmpty() ? error(PASSNO, user) :
       context.users.alter(user, pass) ?
       info(USERALTER, user) : error(USERNO, user);

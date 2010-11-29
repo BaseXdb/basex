@@ -62,7 +62,7 @@ final class FNNode extends Fun {
         Uri base = Uri.EMPTY;
         while(!base.absolute()) {
           if(n == null) {
-            base = ctx.resource.baseURI.resolve(base);
+            base = ctx.baseURI.resolve(base);
             break;
           }
           base = Uri.uri(n.base()).resolve(base);

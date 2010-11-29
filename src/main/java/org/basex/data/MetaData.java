@@ -98,9 +98,6 @@ public final class MetaData {
     chop = prop.is(Prop.CHOP);
     entity = prop.is(Prop.ENTITY);
     pathindex = prop.is(Prop.PATHINDEX);
-    textindex = prop.is(Prop.TEXTINDEX);
-    attrindex = prop.is(Prop.ATTRINDEX);
-    ftindex = prop.is(Prop.FTINDEX);
     wildcards = prop.is(Prop.WILDCARDS);
     stemming = prop.is(Prop.STEMMING);
     diacritics = prop.is(Prop.DIACRITICS);
@@ -184,11 +181,12 @@ public final class MetaData {
    */
   void update() {
     time = System.currentTimeMillis();
+    uptodate = false;
+    dirty = true;
+    // reset of flags should be skipped as soon as id/pre mapping is supported
     textindex = false;
     attrindex = false;
     ftindex = false;
-    uptodate = false;
-    dirty = true;
   }
 
   /**

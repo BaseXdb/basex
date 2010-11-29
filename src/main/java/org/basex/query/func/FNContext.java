@@ -44,9 +44,8 @@ final class FNContext extends Fun {
       case CURRDTM:   return currDTM(ctx);
       case CURRTIME:  return currTIM(ctx);
       case IMPLZONE:  return implZone();
-      case COLLAT:    return ctx.resource.baseURI.resolve(ctx.collation);
-      case STBASEURI: return ctx.resource.baseURI != Uri.EMPTY ? 
-          ctx.resource.baseURI : null;
+      case COLLAT:    return ctx.baseURI.resolve(ctx.collation);
+      case STBASEURI: return ctx.baseURI != Uri.EMPTY ? ctx.baseURI : null;
       default: return super.item(ctx, ii);
     }
   }

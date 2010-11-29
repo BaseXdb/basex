@@ -164,7 +164,7 @@ public final class DialogMountFS extends Dialog {
       //DeepFSImpl.main(new String[] {mp, db});
       close();
     } else {
-      ok = !db.isEmpty() && ctx.prop.dbexists(db);
+      ok = ctx.prop.dbexists(db);
       warn.setText(null, null);
       if(ok) {
         doc.setText(BUTTONMOUNT + " " + db + COL);

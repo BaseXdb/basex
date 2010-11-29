@@ -21,6 +21,8 @@ m_layout=Disposizione
 
 # Buttons
 b_ok=OK
+b_yes=Sì
+b_no=No
 b_opt=Ottimizza
 b_rename=Rinomina
 b_backup=Backup
@@ -126,7 +128,8 @@ dr_over=La vecchia base di dati verrà sovrascritta
 dr_overbacking=La vecchia base di dati e la memoria di appoggio verranno sovrascritti
 
 dd_title=Manage Databases
-dd_question=La base di dati '%' verrà cancellata.\nSei sicuro?
+dd_question=La base di dati '%' verrà cancellata.
+dd_sure=Sei sicuro?
 
 dx_question=Cancellare. Sei sicuro?
 dq_question=Salva in %?
@@ -207,8 +210,8 @@ ds_localport=Porta locale
 ds_createu=Crea utente
 ds_globperm=Permessi globali
 ds_locperm=Permessi locali
-ds_drquestion=% L'utente sarà eliminato.\nSei sicuro?
-ds_dbrevoke=I permessi saranno revocati.\nSei sicuro?
+ds_drquestion=% L'utente sarà eliminato.
+ds_dbrevoke=I permessi saranno revocati.
 ds_alterpw=Modifica parola chiave
 ds_invalid=% non valido
 ds_adlogin=Accesso dell'amministratore (locale o remoto)
@@ -381,10 +384,10 @@ db_notdropped=No database was dropped.
 db_droperror=Impossibile cancellare la base di dati.
 db_altered=Database '%' was renamed to '%'.
 db_notaltered=Database '%' could not be renamed.
-db_backup=Backup '%' created in %.
+db_backup=Backup for '%' created in %.
 db_nobackup=Backup of database '%' could not be created.
-db_restore=Database '%' restored in %.
-db_norestore=Database '%' could not be restored.
+db_restore='%' restored in %.
+db_norestore='%' could not be restored.
 db_notopened=Impossibile aprire la base di dati '%'.
 db_opened=Base di dati '%' aperta in %.
 db_exported=Base di dati '%' esportata in %.
@@ -395,9 +398,10 @@ db_backdrop=Backup files '%' were dropped.
 db_backnf=No backup found for '%'.
 
 # Index commands
-in_created=Indici creati in %.
-in_dropped=Indici cancellati in %.
-in_notdropped=Impossibile cancellare gli indici.
+in_created=Indici '%' creati in %.
+in_dropped=Indici '%' cancellati in %.
+in_notdropped=Impossibile cancellare gli indici '%'.
+in_notavl=Non disponibile
 
 # Server Info
 srv_login=Accesso negato.
@@ -459,7 +463,7 @@ ad_kill=% sessione chiusa.
 ad_killself='%' non può chiudere se stessa.
 
 # General Commands
-gc_setkey=Non è possibile impostare '%'.
+gc_setwhich=Unknown option '%'
 gc_setval=Non è possibile impostare '%' a '%'.
 
 # Info Strings

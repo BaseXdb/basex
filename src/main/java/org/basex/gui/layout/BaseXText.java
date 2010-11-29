@@ -287,7 +287,7 @@ public class BaseXText extends BaseXPanel {
   @Override
   public final void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
-    if(!isEnabled()) return;
+    if(!isEnabled() || !isFocusable()) return;
 
     requestFocusInWindow();
     cursor(true);

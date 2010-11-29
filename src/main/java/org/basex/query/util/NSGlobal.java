@@ -24,6 +24,7 @@ public final class NSGlobal {
     NS.add(XML, XMLURI);
     NS.add(UTIL, UTILURI);
     NS.add(DB, DBURI);
+    NS.add(FT, FTURI);
     NS.add(FILE, FILEURI);
     NS.add(HTTP, HTTPURI);
     NS.add(SENT, SENTURI);

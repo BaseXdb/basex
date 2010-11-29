@@ -59,7 +59,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:...index() functions.
+   * Test method for the db:text(), db:attribute() and db:fulltext() functions.
    * @throws BaseXException database exception
    */
   @Test
@@ -67,31 +67,30 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String[] types = { "text", "attribute", "fulltext" };
     // drop indexes and check index queries
     for(final String type : types) new DropIndex(type).execute(CTX);
-    for(final String type : types) {
-      error("db:" + type +  "-index('xml')", "BASX0001");
-    }
+    query("db:text('xml')");
+    query("db:attribute('xml')");
     // create indexes and check index queries
     for(final String type : types) new CreateIndex(type).execute(CTX);
-    for(final String type : types) query("db:" + type +  "-index('xml')");
+    for(final String type : types) query("db:" + type +  "('xml')");
 
     // test wrong arguments
-    args("db:text-index", (Class<?>) null);
-    args("db:fulltext-index", String.class);
+    args("db:text", (Class<?>) null);
+    args("db:fulltext", String.class);
 
     // check index results
-    query("db:text-index('XML')", "XML");
-    query("db:text-index('XML')", "XML");
-    query("db:text-index('XXX')", "");
-    query("data(" + "db:attribute-index('0'))", "0");
-    query("data(" + "db:attribute-index('0', 'id'))", "0");
-    query("data(" + "db:attribute-index('0', 'X'))", "");
-    query("db:fulltext-index('assignments')", "Assignments");
-    query("db:fulltext-index('XXX')", "");
+    query("db:text('XML')", "XML");
+    query("db:text('XML')", "XML");
+    query("db:text('XXX')", "");
+    query("data(" + "db:attribute('0'))", "0");
+    query("data(" + "db:attribute('0', 'id'))", "0");
+    query("data(" + "db:attribute('0', 'X'))", "");
+    query("db:fulltext('assignments')", "Assignments");
+    query("db:fulltext('XXX')", "");
 
     // run function on closed database
     new Close().execute(CTX);
-    query("db:open('db')/db:text-index('XML')", "XML");
-    error("db:text-index('x')", "BASX0002");
+    query("db:open('db')/db:text('XML')", "XML");
+    error("db:text('x')", "BASX0002");
   }
 
   /**
@@ -109,20 +108,6 @@ public final class FNDbTest extends AdvancedQueryTest {
     contains("db:list()", "daz db dba");
     new DropDB("daz").execute(CTX);
     new DropDB("dba").execute(CTX);
-  }
-
-  /**
-   * Test method for the db:fulltext-mark() functions.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void testFulltextMark() throws BaseXException {
-    contains("db:fulltext-mark(//*[text() contains text '1'])",
-      "<li>Exercise <mark>1</mark></li>");
-    contains("db:fulltext-mark(//*[text() contains text '1'], 'b')",
-      "<li>Exercise <b>1</b></li>");
-    contains("db:fulltext-mark(//*[text() contains text 'Exercise'])",
-      "<li><mark>Exercise</mark> 1</li>");
   }
 
   /**
@@ -151,7 +136,6 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void testSystem() throws BaseXException {
     // wrong arguments
     args("db:system");
-
     // standard test
     contains("db:system()", "ON");
   }
@@ -163,41 +147,29 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void testInfo() throws BaseXException {
     // wrong arguments
-    args("db:info");
+    error("db:info(1)", "XPTY0004");
+    error("db:info('a','b')", "XPST0017");
+    error("db:info('XXX')", "BASX0001");
+
     // standard test
     contains("db:info()", "ON");
-    // run function on closed database
-    new Close().execute(CTX);
-    contains("db:open('db')/db:info()", "ON");
-    error("db:info()", "BASX0002");
-  }
-
-  /**
-   * Test method for the db:index-info() function.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void testIndexInfo() throws BaseXException {
-    // wrong arguments
-    args("db:index-info", String.class);
 
     // drop indexes and check index queries
     final String[] types = { "text", "attribute", "fulltext" };
     for(final String type : types) new DropIndex(type).execute(CTX);
-    for(final String type : types) {
-      error("db:index-info('" + type + "')", "BASX0001");
-    }
+    for(final String type : types) query("db:info('" + type + "')");
     // create indexes and check index queries
     for(final String type : types) new CreateIndex(type).execute(CTX);
-    for(final String type : types) query("db:index-info('" + type + "')");
+    for(final String type : types) query("db:info('" + type + "')");
     // check name indexes
-    query("db:index-info('tag')");
-    query("db:index-info('attname')");
+    query("db:info('tag')");
+    query("db:info('attname')");
 
     // run function on closed database
     new Close().execute(CTX);
-    contains("db:open('db')/db:index-info('tag')", ":");
-    error("db:index-info('tag')", "BASX0002");
+    contains("db:open('db')/db:info()", "ON");
+    contains("db:open('db')/db:info('tag')", ":");
+    error("db:info('tag')", "BASX0002");
   }
 
   /**

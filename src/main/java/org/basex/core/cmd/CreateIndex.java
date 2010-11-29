@@ -40,15 +40,12 @@ public final class CreateIndex extends ACreate {
       if(ci == null) return error(CMDUNKNOWN, this);
       switch(ci) {
         case TEXT:
-          data.meta.textindex = true;
           index = IndexType.TEXT;
           break;
         case ATTRIBUTE:
-          data.meta.attrindex = true;
           index = IndexType.ATTRIBUTE;
           break;
         case FULLTEXT:
-          data.meta.ftindex = true;
           data.meta.wildcards = prop.is(Prop.WILDCARDS);
           data.meta.stemming = prop.is(Prop.STEMMING);
           data.meta.casesens = prop.is(Prop.CASESENS);

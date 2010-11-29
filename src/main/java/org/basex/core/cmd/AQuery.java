@@ -27,7 +27,7 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class AQuery extends Command {
+abstract class AQuery extends Command {
   /** Query result. */
   protected Result result;
 
@@ -216,5 +216,10 @@ public abstract class AQuery extends Command {
   @Override
   public void build(final CommandBuilder cb) {
     cb.init().xquery(0);
+  }
+
+  @Override
+  public boolean stoppable() {
+    return true;
   }
 }

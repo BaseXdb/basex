@@ -128,7 +128,7 @@ public class AxisPath extends Path {
     if(data == null || !data.meta.pathindex || !data.meta.uptodate ||
         !data.single()) return -1;
 
-    ArrayList<PathNode> nodes = data.path.root();
+    ArrayList<PathNode> nodes = data.pthindex.root();
     for(final AxisStep s : step) {
       nodes = s.size(nodes, data);
       if(nodes == null) return -1;
@@ -151,7 +151,7 @@ public class AxisPath extends Path {
       step = st;
       // refresh root context
       ctx.compInfo(OPTPATH);
-      ctx.resource.value = root(ctx);
+      ctx.value = root(ctx);
     }
     final AxisStep s = emptyStep();
     if(s != null) COMPSELF.thrw(input, s);
@@ -169,14 +169,14 @@ public class AxisPath extends Path {
     if(data != null) {
       boolean doc = ctx.resource.docNodes();
       if(!doc) {
-        final Iter iter = ctx.resource.value.iter(ctx);
+        final Iter iter = ctx.value.iter(ctx);
         Item it;
         while((it = iter.next()) != null) {
           doc = it.type == Type.DOC;
           if(!doc) break;
         }
       }
-      if(doc) {
+      if(doc && data.meta.uptodate) {
         Expr e = this;
         // check index access
         if(root != null && !uses(Use.POS)) e = index(ctx, data);
@@ -222,7 +222,7 @@ public class AxisPath extends Path {
           if(nodes.get(0).name != nodes.get(j).name) tag = null;
         }
         tl.add(tag);
-        nodes = data.path.parent(nodes);
+        nodes = data.pthindex.parent(nodes);
       }
 
       // build new steps
@@ -253,7 +253,7 @@ public class AxisPath extends Path {
     // convert single descendant step to child steps
     if(!data.meta.pathindex || !data.meta.uptodate) return null;
 
-    ArrayList<PathNode> in = data.path.root();
+    ArrayList<PathNode> in = data.pthindex.root();
     for(int s = 0; s <= l; ++s) {
       final boolean desc = step[s].axis == Axis.DESC;
       if(!desc && step[s].axis != Axis.CHILD || step[s].test.test != Name.NAME)
@@ -262,7 +262,7 @@ public class AxisPath extends Path {
       final int name = data.tags.id(step[s].test.name.ln());
 
       final ArrayList<PathNode> out = new ArrayList<PathNode>();
-      for(final PathNode pn : data.path.desc(in, desc)) {
+      for(final PathNode pn : data.pthindex.desc(in, desc)) {
         if(pn.kind == Data.ELEM && name == pn.name) {
           // skip test if a tag is found on different levels
           if(out.size() != 0 && out.get(0).level() != pn.level()) return null;
@@ -390,7 +390,7 @@ public class AxisPath extends Path {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Value c = ctx.resource.value;
+    final Value c = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
     Value r = root != null ? root.value(ctx) : c;
@@ -403,11 +403,11 @@ public class AxisPath extends Path {
       if(r != null) {
         final Iter ir = ctx.iter(r);
         while((r = ir.next()) != null) {
-          ctx.resource.value = r;
+          ctx.value = r;
           iter(0, citer, ctx);
         }
       } else {
-        ctx.resource.value = null;
+        ctx.value = null;
         iter(0, citer, ctx);
       }
       citer.sort();
@@ -415,7 +415,7 @@ public class AxisPath extends Path {
       citer.reset();
     }
 
-    ctx.resource.value = c;
+    ctx.value = c;
     ctx.size = cs;
     ctx.pos = cp;
     return citer;
@@ -437,7 +437,7 @@ public class AxisPath extends Path {
     Nod nod;
     while((nod = ir.next()) != null) {
       if(more) {
-        ctx.resource.value = nod;
+        ctx.value = nod;
         iter(l + 1, ni, ctx);
       } else {
         ctx.checkStop();

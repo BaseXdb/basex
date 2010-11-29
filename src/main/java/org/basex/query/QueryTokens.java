@@ -153,10 +153,6 @@ public interface QueryTokens {
   /** Parser token. */
   String LOWERCASE = "lowercase";
   /** Parser token. */
-  String MARK = "mark";
-  /** Parser token. */
-  String MARKER = "marker";
-  /** Parser token. */
   String MOD = "mod";
   /** Parser token. */
   String MODIFY = "modify";
@@ -374,6 +370,8 @@ public interface QueryTokens {
   byte[] UTILURI = token(Text.URL + "/util");
   /** DB module URI. */
   byte[] DBURI = token(Text.URL + "/db");
+  /** FT module URI. */
+  byte[] FTURI = token(Text.URL + "/ft");
   /** File module URI. */
   byte[] FILEURI = token(Text.URL + "/file");
   /** HTTP Client URI. */
@@ -411,6 +409,8 @@ public interface QueryTokens {
   byte[] OUTPUT = token("output");
   /** DB token. */
   byte[] DB = token("db");
+  /** FT token. */
+  byte[] FT = token("ft");
   /** XS token. */
   byte[] XS = token("xs");
   /** XS token. */
@@ -447,8 +447,6 @@ public interface QueryTokens {
   byte[] OP = token("op");
   /** Query Plan. */
   byte[] POS = token("pos");
-  /** Query Plan. */
-  byte[] MRK = token("mark");
   /** Query Plan. */
   byte[] VAR = token("var");
   /** Query Plan. */

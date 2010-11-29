@@ -40,7 +40,7 @@ public final class Run extends AQuery {
   }
 
   @Override
-  public boolean writing(final Context ctx) {
+  public boolean updating(final Context ctx) {
     try {
       return updating(ctx, Token.string(IO.get(args[0]).content()));
     } catch(final IOException ex) {

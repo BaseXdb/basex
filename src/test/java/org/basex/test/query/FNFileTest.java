@@ -1,10 +1,9 @@
 package org.basex.test.query;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import org.basex.core.Prop;
+import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.item.B64;
 import org.basex.query.item.Dtm;
@@ -29,11 +28,11 @@ public final class FNFileTest extends QueryTest {
   /** Test file for file:copy. */
   private static final String TESTCOPY = "testCopy";
   /** Test file for file:delete. */
-  private static final String TESTDELDIR1 = "testDelDir1";
+  private static final String TESTDEL1 = "testDel1";
   /** Test file for file:delete with $recursive = true. */
-  private static final String TESTDELDIR2 = "testDelDir2";
+  private static final String TESTDEL2 = "testDel2";
   /** Test file for file:delete with $recursive = true. */
-  private static final String TESTDELFILE = "testDelFile";
+  private static final String TESTDEL = "testDel";
   /** Test file for file:move. */
   private static final String TESTMOVE = "testMove";
   /** Test file for file:write. */
@@ -48,27 +47,19 @@ public final class FNFileTest extends QueryTest {
   private static final String DIR3 = "test3";
 
   /** /_tmpdir_/testDir1. */
-  protected static File dir1 = new File(Prop.TMP + Prop.SEP + TESTDIR1);
+  private static File dir1 = new File(Prop.TMP, TESTDIR1);
   /** /_tmpdir_/testDir2. */
-  protected static File dir2 = new File(Prop.TMP + Prop.SEP + TESTDIR2);
+  private static File dir2 = new File(Prop.TMP, TESTDIR2);
   /** /_tmpdir_/testDir1/fileCopy. */
-  protected static File fileCopy = new File(dir1.getPath() + Prop.SEP
-      + TESTCOPY);
-  /** /_tmpdir_/testDir1/fileCopy. */
-  protected static File fileCopyOver = new File(dir2.getPath() + Prop.SEP
-      + TESTCOPY);
+  private static File fileCopy = new File(dir1, TESTCOPY);
   /** /_tmpdir_/testDir1/fileMove. */
-  protected static File fileMove = new File(dir1.getPath() + Prop.SEP
-      + TESTMOVE);
+  private static File fileMove = new File(dir1, TESTMOVE);
   /** /_tmpdir_/testDir1/testDelDir1/testDelDir2. */
-  protected static File dirDel = new File(dir1.getPath() + Prop.SEP
-      + TESTDELDIR1 + Prop.SEP + TESTDELDIR2);
+  private static File dirDel = new File(dir1 + Prop.SEP + TESTDEL1, TESTDEL2);
   /** /_tmpdir_/testDir1/testDelFile. */
-  protected static File fileDel = new File(dir1.getPath() + Prop.SEP
-      + TESTDELFILE);
+  private static File fileDel = new File(dir1, TESTDEL);
 
   static {
-
     doc = "<?xml version='1.0' encoding='UTF-8'?>\n" +
           "<ACDC>\n" +
             "<Name>\n" +
@@ -86,95 +77,92 @@ public final class FNFileTest extends QueryTest {
       ii = new ItemIter(new Item[] { new Dtm(
         new File("etc").lastModified(), null)}, 1);
     } catch(final QueryException e) {
-        ii = null;
+      ii = null;
     }
 
     queries = new Object[][] {
-
         // /_tmpdir_/testDir1/test1
         { "Test file:mkdir()", empty(),
-            "file:mkdir(\"" + dir1.getPath() + Prop.SEP + DIR1 + "\")" },
+            "file:mkdir(\"" + dir1 + Prop.SEP + DIR1 + "\")" },
 
         // /_tmpdir_/testDir1/test2/test3
         { "Test file:mkdir() with $recursive = fn:true()", empty(),
-            "file:mkdir(\"" + dir1.getPath() + Prop.SEP + DIR2 + Prop.SEP
+            "file:mkdir(\"" + dir1 + Prop.SEP + DIR2 + Prop.SEP
                 + DIR3 + "\", fn:true())"},
 
         // /_tmpdir_/testDir1
         { "Test file:is-directory()", bool(true),
-            "file:is-directory(\"" + dir1.getPath() + "\")" },
+            "file:is-directory(\"" + dir1 + "\")" },
 
         // /_tmpdir_/testDir1/fileCopy
         { "Test file:is-file()", bool(true),
-            "file:is-file(\"" + fileCopy.getPath() + "\")" },
+            "file:is-file(\"" + fileCopy + "\")" },
 
          // /_tmpdir_/testDir1/fileCopy
         { "Test file:is-readable()", bool(true),
-            "file:is-readable(\"" + fileCopy.getPath() + "\")" },
+            "file:is-readable(\"" + fileCopy + "\")" },
 
          // /_tmpdir_/testDir1/fileCopy
         { "Test file:is-writeable()", bool(true),
-            "file:is-writeable(\"" + fileCopy.getPath() + "\")" },
+            "file:is-writeable(\"" + fileCopy + "\")" },
 
         { "Test file:path-separator()", str(Prop.SEP), "file:path-separator()"},
 
          // /_tmpdir_/testDir1/fileCopy
         { "Test file:read()", str("\"" + doc + "\""),
-            "file:read(\"" + fileCopy.getPath() + "\")" },
+            "file:read(\"" + fileCopy + "\")" },
 
         // /_tmpdir_/testDir1/fileCopy
         { "Test file:read-binary()",
             new ItemIter(new Item[] { new B64(Token.token(doc))}, 1),
-            "file:read-binary(\"" + fileCopy.getPath() + "\")" },
+            "file:read-binary(\"" + fileCopy + "\")" },
 
          // /_tmpdir_/testDir1/fileWrite
         { "Test file:write()", empty(),
-            "file:write(\"" + dir1.getPath() + Prop.SEP + TESTWRITE + "\"," +
+            "file:write(\"" + dir1 + Prop.SEP + TESTWRITE + "\"," +
             "//Name/Vorname, "  + "(<indent>yes</indent>))" },
 
          // /_tmpdir_/testDir1/fileCopy
         { "Test file:write() with $append = true", empty(),
-            "file:write(\"" + fileCopy.getPath()
+            "file:write(\"" + fileCopy
             + "\", //Name/Vorname, (<indent>yes</indent>), fn:true())" },
 
         // /_tmpdir_/testDir1/fileWriteBin
         { "Test file:write-binary()", empty(),
-            "file:write-binary(\"" + dir1.getPath() + Prop.SEP + TESTWRITEBIN +
+            "file:write-binary(\"" + dir1 + Prop.SEP + TESTWRITEBIN +
             "\", \"aGF0\" cast as xs:base64Binary)" },
 
         // src:  /_tmpdir_/testDir1/fileCopy
         // dest: /_tmpdir_/testDir2/fileCopy
         { "Test file:copy() with $overwrite = true", empty(),
-            "file:copy(\"" + fileCopy.getPath() + "\", \"" +
-            dir2.getPath() + Prop.SEP + TESTCOPY + "\", fn:true())" },
+            "file:copy(\"" + fileCopy + "\", \"" +
+            dir2 + Prop.SEP + TESTCOPY + "\", fn:true())" },
 
         // src:  /_tmpdir_/testDir1
         // dest: /_tmpdir_/testDir2
         { "Test file:move()", empty(),
-            "file:move(\"" + fileMove.getPath() + "\", \"" +
-            dir2.getPath() + "\")" },
+            "file:move(\"" + fileMove + "\", \"" + dir2 + "\")" },
 
         // /_tmpdir_/testDir1/fileDel
         { "Test file:delete()", empty(),
-            "file:delete(\"" + fileDel.getPath() + "\")" },
+            "file:delete(\"" + fileDel + "\")" },
 
         // /_tmpdir_/testDir1/testDelDir1/testDelDir2
         { "Test file:delete() with $recursive = true", empty(),
-                "file:delete(\"" + dirDel.getParentFile().getPath()
-                + "\", fn:true())" },
+                "file:delete(\"" + dirDel.getParentFile() + "\", fn:true())" },
 
         // /_tmpdir_/testDir1/fileCopy
-        { "Test file:path-to-full-path()", str(fileCopy.getPath()),
-            "file:path-to-full-path(\"" + fileCopy.getPath() + "\")"},
+        { "Test file:path-to-full-path()", str(fileCopy.toString()),
+            "file:path-to-full-path(\"" + fileCopy + "\")"},
 
          // file:/_tmpdir_/testDir1/fileCopy
         { "Test file:path-to-uri()", new ItemIter(new Item[]
              { Uri.uri(Token.token(fileCopy.toURI().toString()))}, 1),
-             "file:path-to-uri(\"" + fileCopy.getPath() + "\")"},
+             "file:path-to-uri(\"" + fileCopy + "\")"},
 
         // /_tmpdir_/testDir1/fileCopy
         { "Test file:exists()", bool(true),
-            "file:file-exists(\"" + fileCopy.getPath() + "\")"},
+            "file:file-exists(\"" + fileCopy + "\")"},
 
         { "Test file:files()", empty(), "file:files(\"etc\", "
               + "fn:true(),\"[^z]\")"},
@@ -186,9 +174,12 @@ public final class FNFileTest extends QueryTest {
 
   }
 
-  /** Prepares tests. */
+  /**
+   * Prepares the tests.
+   * @throws IOException I/O exception
+   */
   @BeforeClass
-  public static void prepareTest() {
+  public static void prepareTest() throws IOException {
     // /_tmpdir_/testDir1
     dir1.mkdir();
     // /_tmpdir_/testDir2
@@ -196,66 +187,35 @@ public final class FNFileTest extends QueryTest {
     // /_tmpdir_/testDir1/testDelDir1/testDelDir2
     dirDel.mkdirs();
 
-    try {
-      final BufferedOutputStream outCopy = new BufferedOutputStream(
-          new FileOutputStream(fileCopy));
-      try {
-        outCopy.write(Token.token(doc));
-      } finally {
-        outCopy.close();
-      }
-      final BufferedOutputStream outCopyOver = new BufferedOutputStream(
-          new FileOutputStream(fileCopyOver));
-      try {
-        outCopyOver.write(Token.token(doc));
-      } finally {
-        outCopyOver.close();
-      }
-      final BufferedOutputStream outMove = new BufferedOutputStream(
-          new FileOutputStream(fileMove));
-      try {
-        outMove.write(Token.token(doc));
-      } finally {
-        outMove.close();
-      }
-      final BufferedOutputStream outDel = new BufferedOutputStream(
-          new FileOutputStream(fileDel));
-      try {
-        outDel.write(Token.token(doc));
-      } finally {
-        outDel.close();
-      }
-    } catch(final IOException ex) {
-      ex.printStackTrace();
-    }
+    IO.get(fileCopy.toString()).write(Token.token(doc));
+    IO.get(fileMove.toString()).write(Token.token(doc));
+    IO.get(fileDel.toString()).write(Token.token(doc));
   }
 
    /** Finishes the test. */
    @AfterClass
   public static void endTest() {
-
     // /_tmpdir_/testDir1/testCopy
     fileCopy.delete();
     // /_tmpdir_/testDir1/testMove
     fileMove.delete();
     // /_tmpdir_/testDir1/testWrite
-    new File(dir1.getPath() + Prop.SEP + TESTWRITE).delete();
+    new File(dir1, TESTWRITE).delete();
     // /_tmpdir_/testDir1/testWriteBin
-    new File(dir1.getPath() + Prop.SEP + TESTWRITEBIN).delete();
+    new File(dir1, TESTWRITEBIN).delete();
     // /_tmpdir_/testDir1/test1
-    new File(dir1.getPath() + Prop.SEP + DIR1).delete();
+    new File(dir1, DIR1).delete();
     // /_tmpdir_/testDir1/test2/test3
-    new File(dir1.getPath() + Prop.SEP + DIR2 + Prop.SEP + DIR3).delete();
+    new File(dir1 + Prop.SEP + DIR2, DIR3).delete();
     // /_tmpdir_/testDir1/test2
-    new File(dir1.getPath() + Prop.SEP + DIR2).delete();
+    new File(dir1, DIR2).delete();
     // /_tmpdir_/testDir1
     dir1.delete();
     // /_tmpdir_/testDir2/testCopy
-    new File(dir2.getPath() + Prop.SEP + TESTCOPY).delete();
+    new File(dir2, TESTCOPY).delete();
     // /_tmpdir_/testDir2/testMove
-    new File(dir2.getPath() + Prop.SEP + TESTMOVE).delete();
+    new File(dir2, TESTMOVE).delete();
     // /_tmpdir_/testDir2
     dir2.delete();
-
   }
 }

@@ -21,6 +21,8 @@ m_layout=レイアウト
 
 # Buttons
 b_ok=OK
+b_yes=はい
+b_no=いいえ
 b_opt=最適化
 b_rename=名前の変更
 b_backup=Backup
@@ -126,7 +128,8 @@ dr_over=古いデータベースは上書きされます。
 dr_overbacking=古いデータベースは上書きされます。(backing store will be deleted, too)
 
 dd_title=Manage Databases
-dd_question=データベース '%' を削除します。\nよろしいですか。
+dd_question=データベース '%' を削除します。
+dd_sure=よろしいですか。
 
 dx_question=本当に削除しますか。
 dq_question=% への変更を保存しますか。
@@ -207,8 +210,8 @@ ds_localport=ローカルポート
 ds_createu=ユーザー作成
 ds_globperm=グローバルパーミッション
 ds_locperm=ローカルパーミッション
-ds_drquestion=% ユーザーが削除されます。\nよろしいですか。
-ds_dbrevoke=パーミッション '%'取り消し。\nよろしいですか。
+ds_drquestion=% ユーザーが削除されます。
+ds_dbrevoke=パーミッション '%'取り消し。
 ds_alterpw=パスワードの変更
 ds_invalid=% は不正です
 ds_adlogin=管理者ログイン (ローカルあるいはリモート)
@@ -383,10 +386,10 @@ db_notdropped=No database was dropped.
 db_droperror=データベースを削除できませんでした。
 db_altered=Database '%' was renamed to '%'.
 db_notaltered=Database '%' could not be renamed.
-db_backup=Backup '%' created in %.
+db_backup=Backup for '%' created in %.
 db_nobackup=Backup of database '%' could not be created.
-db_restore=Database '%' restored in %.
-db_norestore=Database '%' could not be restored.
+db_restore='%' restored in %.
+db_norestore='%' could not be restored.
 info_nodeepfs=DeepFSデータベースが見付かりませんでした。
 db_notopened=データベースを開けませんでした。
 db_opened=データベース "%" が % を開きました。
@@ -401,6 +404,7 @@ db_backnf=No backup found for '%'.
 in_created=% にインデックスが作成されました。
 in_dropped=% インデックスを削除しました。
 in_notdropped=インデックスを削除できませんでした。
+in_notavl=not available
 
 # Server Info
 srv_login=アクセスが拒否されました。
@@ -462,7 +466,7 @@ ad_kill=% セッションが切断されました。
 ad_killself='%' 自身のセッションを切断する事は出来ません。
 
 # General Commands
-gc_setkey=Could not set '%'.
+gc_setwhich=Unknown option '%'
 gc_setval=プロパティ '%' を '%' に変更する事が出来ませんでした。
 
 # Info Strings

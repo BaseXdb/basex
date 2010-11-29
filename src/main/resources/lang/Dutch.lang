@@ -21,6 +21,8 @@ m_layout=Layout
 
 # Buttons
 b_ok=OK
+b_yes=Ja
+b_no=Neen
 b_opt=Optimaliseer
 b_rename=Hernoem
 b_backup=Backup
@@ -126,7 +128,8 @@ dr_over=Oude database wordt overschreven
 dr_overbacking=Oude database en 'backing store' worden overschreven
 
 dd_title=Manage Databases
-dd_question=Database '%' zal verwijderd worden.\nWeet je het zeker?
+dd_question=Database '%' zal verwijderd worden.
+dd_sure=Weet je het zeker?
 
 dx_question=Wil je echt verwijderen?
 dq_question=Bewaar wijzigingen in %?
@@ -207,8 +210,8 @@ ds_localport=Local Port
 ds_createu=Nieuwe gebruiker
 ds_globperm=Globale Permissies
 ds_locperm=Lokale Permissies
-ds_drquestion=% Gebruiker(s) worden verwijderd.\nWeet je het zeker?
-ds_dbrevoke=Permissie wordt ingetrokken voor de ingelogde gebruiker.\nWeet je het zeker?
+ds_drquestion=% Gebruiker(s) worden verwijderd.
+ds_dbrevoke=Permissie wordt ingetrokken voor de ingelogde gebruiker.
 ds_alterpw=Verander Wachtwoord
 ds_invalid=% is ongeldig
 ds_adlogin=Administrator Login (local of remote)
@@ -381,10 +384,10 @@ db_notdropped=Geen database verwijderd.
 db_droperror=Database kon niet verwijderd worden.
 db_altered=Database '%' is hernoemd naar '%'.
 db_notaltered=Database '%' kon niet hernoemd worden.
-db_backup=Backup '%' gemaakt in %.
+db_backup=Backup voor '%' gemaakt in %.
 db_nobackup=Backup van database '%' kon niet gemaakt worden.
-db_restore=Database '%' teruggezet in %.
-db_norestore=Database '%' kon niet teruggezet worden.
+db_restore='%' teruggezet in %.
+db_norestore='%' kon niet teruggezet worden.
 db_notopened=Database '%' kon niet geopend worden.
 db_opened=Database '%' geopend in %.
 db_exported=Database '%' gexporteerd in %.
@@ -398,6 +401,7 @@ db_backnf=No backup found for '%'.
 in_created=Index '%' in % seconden gemaakt.
 in_dropped=Index '%' in % seconden verwijderd.
 in_notdropped=Index '%' kon niet verwijderd worden.
+in_notavl=Niet beschikbaar
 
 # Server Info
 srv_login=Toegang ontzegd.
@@ -459,7 +463,7 @@ ad_kill=% sessies gestopt.
 ad_killself='%' kan zichzelf niet stoppen.
 
 # General Commands
-gc_setkey=Kon '%' geen waarde geven.
+gc_setwhich=Unknown option '%'
 gc_setval=Kon '%' niet de waarde '%' geven.
 
 # Info Strings

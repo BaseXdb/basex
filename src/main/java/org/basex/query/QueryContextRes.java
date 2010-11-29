@@ -2,23 +2,23 @@ package org.basex.query;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.util.Arrays;
-import org.basex.core.User;
-import org.basex.core.Commands.CmdPerm;
+
+import org.basex.core.Context;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Open;
 import org.basex.data.Data;
-import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.item.Uri;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
@@ -27,71 +27,35 @@ import org.basex.util.IntList;
  * This class provides access to resources.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author Elmedin Dedovic
  */
-public final class QueryResources {
+public class QueryContextRes {
   /** Database context. */
-  private final QueryContext ctx;
+  public Context context;
+  /** Current context value. */
+  public Value value;
   /** Opened documents. */
-  private DBNode[] doc = new DBNode[1];
+  DBNode[] doc;
   /** Number of documents. */
-  private int docs;
+  int docs;
   /** Collections. */
-  private NodIter[] coll = new NodIter[1];
+  private NodIter[] coll;
   /** Collection names. */
-  private byte[][] collName = new byte[1][];
+  private byte[][] collName;
   /** Collection counter. */
   private int colls;
   /** Initial number of documents. */
-  private int rootDocs;
+  int rootDocs;
+  /** Static Base URI. */
+  private Uri baseURI = Uri.EMPTY;
 
   /**
    * Constructor.
-   * @param qc query context
    */
-  QueryResources(final QueryContext qc) {
-    ctx = qc;
-  }
-
-  /**
-   * Compiles the resources.
-   * @param nodes input node set
-   * @throws QueryException query exception
-   */
-  void compile(final Nodes nodes) throws QueryException {
-    final Data data = nodes.data;
-    if(!ctx.context.perm(User.READ, data.meta))
-      Err.PERMNO.thrw(null, CmdPerm.READ);
-
-    // create globally known document nodes
-    final int s = data.empty() ? 0 : (int) nodes.size();
-    if(nodes.root) {
-      // use input node set, if it contains all documents of the database
-      doc = new DBNode[s];
-      for(int n = 0; n < s; ++n) {
-        addDoc(new DBNode(data, nodes.list[n], Data.DOC));
-      }
-    } else {
-      // otherwise, create new nodes from all documents of the database
-      final IntList il = data.doc();
-      for(int p = 0; p < il.size(); p++) {
-        addDoc(new DBNode(data, il.get(p), Data.DOC));
-      }
-    }
-    rootDocs = docs;
-
-    // create initial context items
-    if(nodes.root) {
-      // input nodes contain all roots: assign document array
-      ctx.value = Seq.get(doc, docs);
-    } else {
-      // otherwise, add all context items
-      final ItemIter ir = new ItemIter(s);
-      for(int n = 0; n < s; ++n) ir.add(new DBNode(data, nodes.list[n]));
-      ctx.value = ir.finish();
-    }
-
-    // create default collection from document array
-    addCollection(new NodIter(doc, docs), token(data.meta.name));
+  QueryContextRes() {
+    doc = new DBNode[1];
+    coll = new NodIter[1];
+    collName = new byte[1][];
   }
 
   /**
@@ -134,12 +98,12 @@ public final class QueryResources {
 
     if(db) {
       try {
-        data = Open.open(in, ctx.context);
+        data = Open.open(in, context);
       } catch(final IOException ex) {
         NODB.thrw(ii, in);
       }
     } else {
-      final IO file = ctx.base();
+      final IO file = file();
       data = doc(in, file == null, col, ii);
       if(data == null) data = doc(file.merge(in).path(), true, col, ii);
     }
@@ -165,7 +129,7 @@ public final class QueryResources {
       final InputInfo ii) throws QueryException {
 
     try {
-      return Check.check(ctx.context, path);
+      return Check.check(context, path);
     } catch(final IOException ex) {
       if(err) (col ? NOCOLL : NODOC).thrw(ii, ex.getMessage());
       return null;
@@ -252,10 +216,10 @@ public final class QueryResources {
    * @throws QueryException query exception
    */
   public Data data() throws QueryException {
-    if(ctx.value == null) return null;
+    if(value == null) return null;
     if(docNodes()) return doc[0].data;
 
-    final Iter iter = ctx.value.iter();
+    final Iter iter = value.iter();
     Data data = null;
     Item it;
     while((it = iter.next()) != null) {
@@ -272,7 +236,16 @@ public final class QueryResources {
    * @return result of check
    */
   public boolean docNodes() {
-    return ctx.value instanceof Seq && ctx.value.sameAs(Seq.get(doc, docs));
+    return value instanceof Seq &&
+    value.sameAs(Seq.get(doc, docs));
+  }
+
+  /**
+   * Returns an IO representation of the base uri.
+   * @return IO reference
+   */
+  IO file() {
+    return baseURI != Uri.EMPTY ? IO.get(string(baseURI.atom())) : null;
   }
 
   /**
@@ -280,7 +253,8 @@ public final class QueryResources {
    * @throws IOException I/O exception
    */
   void close() throws IOException {
-    for(int d = rootDocs; d < docs; ++d) Close.close(ctx.context, doc[d].data);
+    for(int d = rootDocs; d < docs; ++d)
+      Close.close(context, doc[d].data);
     docs = 0;
   }
 

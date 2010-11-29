@@ -60,7 +60,7 @@ final class FNFormat extends Fun {
    */
   private Str formatInteger(final QueryContext ctx) throws QueryException {
     final String pic = string(checkEStr(expr[1], ctx));
-    if(pic.length() == 0) WRONGINT.thrw(input, pic);
+    if(pic.isEmpty()) WRONGINT.thrw(input, pic);
     if(expr[0].empty()) return Str.ZERO;
 
     final byte[] lang = expr.length == 2 ? EMPTY : checkEStr(expr[2], ctx);

@@ -123,8 +123,7 @@ public final class FTTokenizer {
     while(bs.hasNext()) {
       final int pos = bs.next();
       ++c;
-      // if add returns true (i. e. fast evaluation mode), break the loop:
-      if(words.add(pos, pos + quTokens.get(0).length - 1)) break;
+      words.add(pos, pos + quTokens.get(0).length - 1);
     }
 
     words.all.sTokenNum++;

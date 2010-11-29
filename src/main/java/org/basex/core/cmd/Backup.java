@@ -38,7 +38,7 @@ public final class Backup extends Command {
   @Override
   protected boolean run() {
     final String db = args[0];
-    if(!checkName(db)) return error(NAMEINVALID, db);
+    if(!validName(db)) return error(NAMEINVALID, db);
 
     // try to backup database
     return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
@@ -61,6 +61,9 @@ public final class Backup extends Command {
       // OutputStream for zipping
       final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(
           new FileOutputStream(out)));
+      zos.putNextEntry(new ZipEntry(in.getName() + "/"));
+      zos.closeEntry();
+
       // Process each file
       for(final File f : in.listFiles()) {
         final BufferedInputStream bis = new BufferedInputStream(

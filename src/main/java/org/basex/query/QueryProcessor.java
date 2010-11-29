@@ -164,8 +164,8 @@ public final class QueryProcessor extends Progress {
     compile();
     SerializerProp sp = ctx.serProp;
     if(sp == null) {
-      sp = new SerializerProp(ctx.resource.context.prop.get(Prop.SERIALIZER));
-      if(ctx.resource.context.prop.is(Prop.WRAPOUTPUT)) {
+      sp = new SerializerProp(ctx.context.prop.get(Prop.SERIALIZER));
+      if(ctx.context.prop.is(Prop.WRAPOUTPUT)) {
         sp.set(SerializerProp.S_WRAP_PRE, NAMELC);
         sp.set(SerializerProp.S_WRAP_URI, URL);
       }
@@ -281,10 +281,5 @@ public final class QueryProcessor extends Progress {
   @Override
   public String det() {
     return QUERYEVAL;
-  }
-
-  @Override
-  public double prog() {
-    return 0;
   }
 }

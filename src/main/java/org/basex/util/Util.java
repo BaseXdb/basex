@@ -32,7 +32,7 @@ public final class Util {
    */
   public static String bug(final Object... ext) {
     final TokenBuilder tb = new TokenBuilder(
-        "Possible bug? Feedback is welcome: " + MAIL);
+        "Possible bug? Please send your feedback to " + MAIL);
     if(ext.length != 0) {
       tb.add(NL + NAME + ' ' + VERSION + COLS + NL);
       for(final Object e : ext) tb.add(e + NL);
@@ -201,10 +201,8 @@ public final class Util {
    * @param th error/exception instance
    */
   public static void stack(final Throwable th) {
-    final String u = Util.class.getName();
-    for(final StackTraceElement s : th.getStackTrace()) {
-      if(!s.getClassName().equals(u)) errln("  " + s);
-    }
+    errln(th.toString());
+    for(final StackTraceElement s : th.getStackTrace()) errln("  " + s);
   }
 
   /**

@@ -16,6 +16,7 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IO;
 import org.basex.util.StringList;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'restore' command and restores a backup of a database.
@@ -35,7 +36,7 @@ public final class Restore extends Command {
   @Override
   protected boolean run() {
     String db = args[0];
-    if(!checkName(db)) return error(NAMEINVALID, db);
+    if(!validName(db)) return error(NAMEINVALID, db);
 
     final int i = db.indexOf("-");
     String name = null;
@@ -51,16 +52,14 @@ public final class Restore extends Command {
     final File file = new File(name);
     if(!file.exists()) return error(DBBACKNF, db);
 
- // close database if it's currently opened and not opened by others
-    final boolean close = context.data != null &&
-      db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
-    if(close) new Close().run(context);
+    // close database if it's currently opened and not opened by others
+    final boolean closed = close(db);
 
     // check if database is pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to restore database
-    return restore(file, prop) && (!close || new Open(db).run(context)) ?
+    return restore(file, prop) && (!closed || new Open(db).run(context)) ?
         info(DBRESTORE, file.getName(), perf) : error(DBNORESTORE, db);
   }
 
@@ -90,7 +89,8 @@ public final class Restore extends Command {
       }
       zis.close();
       return true;
-    } catch(final IOException io) {
+    } catch(final IOException ex) {
+      Util.debug(ex);
       return false;
     }
   }

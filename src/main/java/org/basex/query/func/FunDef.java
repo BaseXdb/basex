@@ -271,21 +271,22 @@ public enum FunDef {
   /* FNSeq functions. */
 
   /** XQuery function. */
-  DISTINCT(FNURI, FNSeq.class, 1, 2, "distinct-values(seq, coll?)", ITEM_ZM),
+  DISTINCT(FNURI, FNSeq.class, 1, 2, "distinct-values(items, coll?)", ITEM_ZM),
   /** XQuery function. */
-  INDEXOF(FNURI, FNSeq.class, 2, 3, "index-of(seq, item, coll?)", ITR_ZM),
+  INDEXOF(FNURI, FNSeq.class, 2, 3, "index-of(items, item, coll?)", ITR_ZM),
   /** XQuery function. */
-  INSBEF(FNURI, FNSeq.class, 3, 3, "insert-before(seq, pos, seq2)", ITEM_ZM),
+  INSBEF(FNURI, FNSeq.class, 3, 3, "insert-before(items, pos, insert)",
+      ITEM_ZM),
   /** XQuery function. */
-  REMOVE(FNURI, FNSeq.class, 2, 2, "remove(seq, position)", ITEM_ZM),
+  REMOVE(FNURI, FNSeq.class, 2, 2, "remove(items, pos)", ITEM_ZM),
   /** XQuery function. */
-  REVERSE(FNURI, FNSeq.class, 1, 1, "reverse(seq)", ITEM_ZM),
+  REVERSE(FNURI, FNSeq.class, 1, 1, "reverse(items)", ITEM_ZM),
   /** XQuery function. */
-  SUBSEQ(FNURI, FNSeq.class, 2, 3, "subsequence(seq, start, len?)", ITEM_ZM),
+  SUBSEQ(FNURI, FNSeq.class, 2, 3, "subsequence(items, start, len?)", ITEM_ZM),
   /** XQuery function. */
-  HEAD(FNURI, FNSeq.class, 1, 1, "head(seq)", ITEM_ZO),
+  HEAD(FNURI, FNSeq.class, 1, 1, "head(items)", ITEM_ZO),
   /** XQuery function. */
-  TAIL(FNURI, FNSeq.class, 1, 1, "tail(seq)", ITEM_ZM),
+  TAIL(FNURI, FNSeq.class, 1, 1, "tail(items)", ITEM_ZM),
 
   /* FNSimple functions. */
 
@@ -444,7 +445,7 @@ public enum FunDef {
   SENDREQUEST(HTTPURI, FNHttp.class, 1, 2,
       "send-request(request, href?)", ITEM_OM),
 
-  /* FNDB functions */
+  /* FNDb functions */
 
   /** Database function: opens a database. */
   OPEN(DBURI, FNDb.class, 1, 1, "open(string)", NOD_ZM),
@@ -452,26 +453,33 @@ public enum FunDef {
   OPENPRE(DBURI, FNDb.class, 2, 2, "open-pre(string, pre)", NOD_ZM),
   /** Database function: opens a specific database node. */
   OPENID(DBURI, FNDb.class, 2, 2, "open-id(string, id)", NOD_ZM),
-  /** Database function: accesses the text index. */
-  TEXTIDX(DBURI, FNDb.class, 1, 1, "text-index(string)", NOD_ZM),
-  /** Database function: accesses the attribute index. */
-  ATTRIDX(DBURI, FNDb.class, 1, 2, "attribute-index(string, name?)", NOD_ZM),
-  /** Database function: accesses the full-text index. */
-  FTIDX(DBURI, FNDb.class, 1, 1, "fulltext-index(string)", NOD_ZM),
-  /** Database function: marks the hits of a full-text request. */
-  FTMARK(DBURI, FNDb.class, 1, 2, "fulltext-mark(nodes, name?)", NOD_ZM),
+  /** Database function: searches the text index. */
+  TEXT(DBURI, FNDb.class, 1, 1, "text(string)", NOD_ZM),
+  /** Database function: searches the attribute index. */
+  ATTR(DBURI, FNDb.class, 1, 2, "attribute(string, name?)", NOD_ZM),
+  /** Database function: searches the full-text index. */
+  FULLTEXT(DBURI, FNDb.class, 1, 1, "fulltext(string)", NOD_ZM),
   /** Database function: lists all database. */
   LIST(DBURI, FNDb.class, 0, 0, "list()", STR_ZM),
   /** Database function: lists system information. */
   SYSTEM(DBURI, FNDb.class, 0, 0, "system()", STR),
-  /** Database function: returns database information. */
-  INFO(DBURI, FNDb.class, 0, 0, "info()", STR),
-  /** Database function: accesses the info for the specified index. */
-  IDXINFO(DBURI, FNDb.class, 1, 1, "index-info(type)", STR),
+  /** Database function: returns database or index information. */
+  INFO(DBURI, FNDb.class, 0, 1, "info(type?)", STR),
   /** Database function: returns the node ids of database nodes. */
   NODEID(DBURI, FNDb.class, 1, 1, "node-id(nodes)", ITR_ZM),
   /** Database function: returns the pre values of database nodes. */
   NODEPRE(DBURI, FNDb.class, 1, 1, "node-pre(nodes)", ITR_ZM),
+
+  /* FNFt functions */
+
+  /** Database function: searches the full-text index. */
+  SEARCH(FTURI, FNFt.class, 2, 2, "search(node, string)", NOD_ZM),
+  /** Database function: marks the hits of a full-text request. */
+  MARK(FTURI, FNFt.class, 1, 2, "mark(nodes, tag?)", NOD_ZM),
+  /** Database function: returns the full-text score. */
+  SCORE(FTURI, FNFt.class, 1, 1, "score(items)", ITR_ZM),
+  /** Database function: extracts full-text results. */
+  EXTRACT(FTURI, FNFt.class, 1, 3, "extract(items, tag?, length?)", NOD_ZM),
 
   /* FNUtil functions. */
 

@@ -19,15 +19,13 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
 import org.basex.util.Util;
 
-
 /**
  * Add document dialog.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Christian Gruen
+ * @author Andreas Weiler
  */
 public class DialogAdd extends Dialog {
-  
   /** Document to add. */
   private final BaseXTextField file;
   /** Directory path. */
@@ -45,7 +43,7 @@ public class DialogAdd extends Dialog {
    */
   public DialogAdd(final GUI main) {
     super(main, GUIADD);
-    
+
     final BaseXBack pp = new BaseXBack(new TableLayout(7, 2, 0, 4));
     pp.add(new BaseXLabel(CREATETITLE));
     pp.add(new BaseXLabel(" "));
@@ -57,24 +55,23 @@ public class DialogAdd extends Dialog {
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
     pp.add(browse);
-    
+
     pp.add(new BaseXLabel("Name: "));
     pp.add(new BaseXLabel(" "));
     name = new BaseXTextField(this);
     name.addKeyListener(keys);
     pp.add(name);
     pp.add(new BaseXLabel(" "));
-    
     pp.add(new BaseXLabel("Target Path: "));
     pp.add(new BaseXLabel(" "));
     path = new BaseXTextField(this);
     path.addKeyListener(keys);
     pp.add(path);
-    
+
     set(pp, BorderLayout.CENTER);
-    
+
     // create buttons
-    BaseXBack p = new BaseXBack(new BorderLayout());
+    final BaseXBack p = new BaseXBack(new BorderLayout());
     info = new BaseXLabel(" ").border(18, 0, 0, 0);
     p.add(info, BorderLayout.WEST);
     buttons = okCancel(this);
@@ -83,7 +80,7 @@ public class DialogAdd extends Dialog {
     action(null);
     finish(null);
   }
-  
+
   /**
    * Opens a file dialog to choose an XML document or directory.
    */
@@ -92,34 +89,31 @@ public class DialogAdd extends Dialog {
       select(BaseXFileChooser.Mode.FDOPEN);
     if(io != null) file.setText(io.path());
   }
-  
 
   @Override
   public void action(final Object cmp) {
     ok = true;
     final IO io = IO.get(file.getText());
     final boolean exists = !file.getText().isEmpty() && io.exists();
-    String inf = !exists ? PATHWHICH : ""; 
+    String inf = !exists ? PATHWHICH : "";
     info.setText(null, null);
     if(!name.getText().isEmpty() &&
-        !Command.checkName(name.getText())) inf = Util.info(INVALID, EDITNAME);
+        !Command.validName(name.getText())) inf = Util.info(INVALID, EDITNAME);
     if(!inf.equals("")) {
       ok = false;
       info.setText(inf, Msg.ERROR);
     }
     enableOK(buttons, BUTTONOK, ok);
   }
-  
+
   /**
    * Returns the add command to be executed.
    * @return add command
    */
   public Add cmd() {
-    if(!name.getText().isEmpty() && !path.getText().isEmpty()) {
-      return new Add(file.getText(), name.getText(), path.getText());
-    } else if(!name.getText().isEmpty()) {
-      return new Add(file.getText(), name.getText());
-    }
-    return new Add(file.getText());
+    final String in = file.getText().trim();
+    final String as = name.getText().trim();
+    final String to = path.getText().trim();
+    return new Add(in, as.isEmpty() ? null : as, to.isEmpty() ? null : to);
   }
 }

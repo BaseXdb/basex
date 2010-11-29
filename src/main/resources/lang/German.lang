@@ -21,6 +21,8 @@ m_layout=Layout
 
 # Buttons
 b_ok=OK
+b_yes=Ja
+b_no=Nein
 b_opt=Optimieren
 b_rename=Umbenennen
 b_backup=Backup
@@ -126,7 +128,8 @@ dr_over=Alte Datenbank wird überschrieben
 dr_overbacking=Alte Datenbank, sowie DeepFS Hilfsspeicher werden überschrieben
 
 dd_title=Datenbankmanagement
-dd_question=Die Datenbank '%' wird gelöscht.\nSind Sie sicher?
+dd_question=Die Datenbank '%' wird gelöscht.
+dd_sure=Sind Sie sicher?
 
 dx_question=Möchten Sie wirklich löschen?
 dq_question=Änderungen speichern in %?
@@ -207,8 +210,8 @@ ds_localport=Lokaler Port
 ds_createu=Benutzer anlegen
 ds_globperm=Globale Rechte
 ds_locperm=Lokale Rechte
-ds_drquestion=% Benutzer werden entfernt.\nSind Sie sicher?
-ds_dbrevoke=Recht wird vom eingeloggten Benutzer entfernt.\nSind Sie sicher?
+ds_drquestion=% Benutzer werden entfernt.
+ds_dbrevoke=Recht wird vom eingeloggten Benutzer entfernt.
 ds_alterpw=Passwort ändern
 ds_invalid=% ist ungültig
 ds_adlogin=Administrator-Login (lokal oder remote)
@@ -381,10 +384,10 @@ db_notdropped=Keine database wurde gelöscht.
 db_droperror=Die Datenbank konnte nicht gelöscht werden.
 db_altered=Die Datenbank '%' wurde in '%' umbenannt.
 db_notaltered=Die Datenbank '%' konnte nicht umbenannt werden.
-db_backup=Backup '%' erstellt in %.
+db_backup=Backup für '%' erstellt (%).
 db_nobackup=Backup der Datenbank '%' konnte nicht erstellt werden.
-db_restore=Datenbank '%' wiederhergestellt in %.
-db_norestore=Die Datenbank '%' konnte nicht wiederhergestellt werden.
+db_restore='%' wiederhergestellt (%).
+db_norestore='%' konnte nicht wiederhergestellt werden.
 db_notopened=Die Datenbank '%' konnte nicht geöffnet werden.
 db_opened=Datenbank '%' geöffnet (%).
 db_exported=Datenbank '%' exportiert (%).
@@ -395,9 +398,10 @@ db_backdrop=Backup-Dateien '%' wurden gelöscht.
 db_backnf=Kein Backup wurde für '%' gefunden.
 
 # Index commands
-in_created=Index erzeugt (%).
-in_dropped=Index gelöscht (%).
-in_notdropped=Index konnte nicht gelöscht werden.
+in_created=Index '%' erzeugt (%).
+in_dropped=Index '%' gelöscht (%).
+in_notdropped=Index '%' konnte nicht gelöscht werden.
+in_notavl=Nicht verfügbar
 
 # Server Info
 srv_login=Zugriff wurde verweigert.
@@ -459,7 +463,7 @@ ad_kill=% Verbindungen beendet.
 ad_killself='%' kann sich nicht selbst beenden.
 
 # General Commands
-gc_setkey=Fehler beim Setzen von '%'.
+gc_setwhich=Unbekannte Option '%'
 gc_setval=Fehler beim Setzen von '%' auf '%'.
 
 # Info Strings

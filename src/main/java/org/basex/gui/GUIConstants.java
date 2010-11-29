@@ -2,6 +2,7 @@ package org.basex.gui;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUICommands.*;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -158,7 +159,9 @@ public final class GUIConstants {
     /** Error icon. */
     ERROR("error", "error"),
     /** Success icon. */
-    SUCCESS("ok", "information");
+    SUCCESS("ok", "information"),
+    /** Question icon. */
+    QUESTION("warn", "question");
 
     /** Small icon. */
     public final Icon small;

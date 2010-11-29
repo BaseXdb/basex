@@ -168,7 +168,7 @@ public class QueryParser extends InputParser {
   public QueryParser(final String q, final QueryContext c) {
     super(q);
     ctx = c;
-    file = c.resource.file();
+    file = c.base();
   }
 
   /**
@@ -262,7 +262,7 @@ public class QueryParser extends InputParser {
     prolog1();
     prolog2();
     if(declColl) {
-      final byte[] coll = ctx.resource.baseURI.resolve(ctx.collation).atom();
+      final byte[] coll = ctx.baseURI.resolve(ctx.collation).atom();
       if(!eq(URLCOLL, coll)) error(COLLWHICH, coll);
     }
     return expr();
@@ -518,7 +518,7 @@ public class QueryParser extends InputParser {
    */
   private void baseURIDecl() throws QueryException {
     if(declBase) error(DUPLBASE);
-    ctx.resource.baseURI = Uri.uri(stringLiteral());
+    ctx.baseURI = Uri.uri(stringLiteral());
     declBase = true;
   }
 
@@ -824,19 +824,14 @@ public class QueryParser extends InputParser {
     do {
       final boolean fr = consumeWS(FOR, DOLLAR, NOFOR);
       boolean score = !fr && consumeWS(LET, SCORE, NOLET);
-      boolean mark = !fr && !score && consumeWS(LET, MARK, NOLET);
       if(score) check(SCORE);
-      else if(mark) check(MARK);
       else if(!fr && !consumeWS(LET, DOLLAR, NOLET)) return fl;
 
       do {
-        if(comma && !fr) {
-          score = consumeWS(SCORE);
-          mark = !score && consumeWS(MARK);
-        }
+        if(comma && !fr) score = consumeWS(SCORE);
 
         final QNm name = varName();
-        final SeqType type = score ? SeqType.DBL : mark ? SeqType.NOD_OM :
+        final SeqType type = score ? SeqType.DBL :
           consumeWS(AS) ? sequenceType() : null;
         final Var var = new Var(input(), name, type);
 
@@ -844,8 +839,6 @@ public class QueryParser extends InputParser {
             new Var(input(), varName(), SeqType.ITR) : null;
         final Var sc = fr && consumeWS(SCORE) ?
             new Var(input(), varName(), SeqType.DBL) : null;
-        final Var mr = fr && consumeWS(MARK) ?
-            new Var(input(), varName(), SeqType.NOD_ZM) : null;
 
         check(fr ? IN : ASSIGN);
         final Expr e = check(single(), VARMISSING);
@@ -853,11 +846,6 @@ public class QueryParser extends InputParser {
 
         if(fl == null) fl = new ForLet[1];
         else fl = Arrays.copyOf(fl, fl.length + 1);
-        if(mr != null) {
-          if(mr.name.eq(name) || sc != null && sc.name.eq(mr.name) ||
-              ps != null && mr.name.eq(ps.name)) error(VARDEFINED, mr);
-          ctx.vars.add(mr);
-        }
         if(sc != null) {
           if(sc.name.eq(name) || ps != null && sc.name.eq(ps.name))
             error(VARDEFINED, sc);
@@ -867,11 +855,10 @@ public class QueryParser extends InputParser {
           if(name.eq(ps.name)) error(VARDEFINED, ps);
           ctx.vars.add(ps);
         }
-        fl[fl.length - 1] = fr ? new For(input(), e, var, ps, sc, mr) :
-          new Let(input(), e, var, score, mark);
+        fl[fl.length - 1] = fr ? new For(input(), e, var, ps, sc) :
+          new Let(input(), e, var, score);
 
         score = false;
-        mark = false;
         comma = true;
       } while(consumeWS2(COMMA));
       comma = false;
@@ -1593,8 +1580,7 @@ public class QueryParser extends InputParser {
       if(e != null) return e;
       // ordered expression
       if(consumeWS(ORDERED, BRACE1, INCOMPLETE) ||
-         consumeWS(UNORDERED, BRACE1, INCOMPLETE))
-        return enclosed(NOENCLEXPR);
+         consumeWS(UNORDERED, BRACE1, INCOMPLETE)) return enclosed(NOENCLEXPR);
     }
     return null;
   }
@@ -2547,9 +2533,6 @@ public class QueryParser extends InputParser {
       if(opt.ln == null) error(FTLAN, lan);
     } else if(consumeWS(OPTION)) {
       optionDecl();
-    } else if(consumeWS(MARKER)) {
-      opt.mark = stringLiteral();
-      if(!XMLToken.isQName(opt.mark)) Err.value(input(), Type.QNM, opt.mark);
     } else {
       final boolean using = !consumeWS(NO);
 
@@ -2641,7 +2624,7 @@ public class QueryParser extends InputParser {
         error(THESRNG);
       }
     }
-    thes.add(new Thesaurus(fl, rel, min, max, ctx.resource.context));
+    thes.add(new Thesaurus(fl, rel, min, max, ctx.context));
   }
 
   /**

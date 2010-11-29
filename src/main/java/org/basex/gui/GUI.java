@@ -85,6 +85,12 @@ public final class GUI extends AGUI {
   public boolean fullscreen;
   /** Help dialog. */
   public DialogHelp help;
+  /** Result panel. */
+  public final GUIMenu menu;
+  /** Button panel. */
+  public final BaseXBack buttons;
+  /** Navigation/input panel. */
+  public final BaseXBack nav;
 
   /** Content panel, containing all views. */
   final ViewContainer views;
@@ -92,12 +98,6 @@ public final class GUI extends AGUI {
   final BaseXButton hist;
   /** Current input Mode. */
   final BaseXCombo mode;
-  /** Result panel. */
-  final GUIMenu menu;
-  /** Button panel. */
-  final BaseXBack buttons;
-  /** Query panel. */
-  final BaseXBack nav;
 
   /** Text view. */
   private final TextView text;
@@ -199,10 +199,9 @@ public final class GUI extends AGUI {
             pop.setVisible(false);
           }
         };
-        final int i = context.data == null ? 2 :
-          gprop.num(GUIProp.SEARCHMODE);
-        final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) : i == 1 ?
-            gprop.strings(GUIProp.XQUERY) : gprop.strings(GUIProp.COMMANDS);
+        final int i = context.data == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
+        final String[] hs = gprop.strings(i == 0 ? GUIProp.SEARCH : i == 1 ?
+            GUIProp.XQUERY : GUIProp.COMMANDS);
         for(final String en : hs) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -292,23 +291,19 @@ public final class GUI extends AGUI {
    */
   void execute() {
     final String in = input.getText().trim();
-    final boolean db = context.data != null;
-    final boolean cmd = gprop.num(GUIProp.SEARCHMODE) == 2 || !db; 
-
+    final boolean cmd = mode.getSelectedIndex() == 2;
     if(cmd || in.startsWith("!")) {
       // run as command: command mode or exclamation mark as first character
       final int i = cmd ? 0 : 1;
-      if(in.length() > i) {
-        try {
-          for(final Command c : new CommandParser(in.substring(i),
-              context).parse()) {
-            if(!exec(c, c instanceof XQuery)) break;
-          }
-        } catch(final QueryException ex) {
-          if(!info.visible()) GUICommands.SHOWINFO.execute(this);
-          info.setInfo(ex.getMessage(), null, null, false);
-          info.reset();
-        }
+      if(i == in.length()) return;
+      try {
+        // parse and run all commands
+        for(final Command c : new CommandParser(in.substring(i),
+            context).parse()) if(!exec(c, true)) break;
+      } catch(final QueryException ex) {
+        if(!info.visible()) GUICommands.SHOWINFO.execute(this);
+        info.setInfo(ex.getMessage(), null, null, false);
+        info.reset();
       }
     } else if(gprop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
       xquery(in, true);
@@ -374,7 +369,7 @@ public final class GUI extends AGUI {
       // execute command and cache result
       final ArrayOutput ao =
         new ArrayOutput().max(context.prop.num(Prop.MAXTEXT));
-      final boolean up = c.writing(context);
+      final boolean up = c.updating(context);
       updating = up;
 
       boolean ok = true;
@@ -530,7 +525,7 @@ public final class GUI extends AGUI {
    * @param show true if component is visible
    * @param layout component layout
    */
-  void updateControl(final JComponent comp, final boolean show,
+  public void updateControl(final JComponent comp, final boolean show,
       final String layout) {
 
     if(comp == status) {
@@ -608,7 +603,7 @@ public final class GUI extends AGUI {
   /**
    * Turns fullscreen mode on/off.
    */
-  void fullscreen() {
+  public void fullscreen() {
     fullscreen ^= true;
     fullscreen(fullscreen);
   }

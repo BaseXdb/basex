@@ -6,7 +6,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.XMLReader;
 
 /**
- * Wraps the CatalogResolver Object.
+ * Wraps the CatalogResolver object.
  * Searches for presence of one of the xml resolver packages
  * {@code org.apache.xml.resolver.tools.CatalogResolver} or
  * {@code code com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver}.
@@ -19,7 +19,7 @@ public final class CatalogResolverWrapper {
   private static final Class<?> CMP = find(
     "org.apache.xml.resolver.CatalogManager",
     "com.sun.org.apache.xml.internal.resolver.CatalogManager");
-  /** Package declaration for CatalogResolver. */
+  /** Package declaration for CatalogResolver constructor. */
   private static final Constructor<?> CRP = find(find(
     "org.apache.xml.resolver.tools.CatalogResolver",
     "com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver"), CMP);
@@ -30,26 +30,26 @@ public final class CatalogResolverWrapper {
   private CatalogResolverWrapper() { }
 
   /**
-   * Returns a CatalogResolver instance or a {@code null} reference.
-   * @return CatalogResolver if available
+   * Checks if a CatalogResolver is available.
+   * @return result of check
    */
   public static boolean available() {
     return CM != null;
   }
 
   /**
-   * Decorates the XMLReader with the catalog resolver if it has been found on
-   * the classpath. Does nothing otherwise.
-   * @param r XMLReader
-   * @param cat path.
+   * Decorates the {@link XMLReader} with the catalog resolver if it is found
+   * in the classpath. Does nothing otherwise.
+   * @param reader XML reader
+   * @param cat path to catalog file
    */
-  public static void set(final XMLReader r, final String cat) {
+  public static void set(final XMLReader reader, final String cat) {
     if(CM == null) return;
     invoke(find(CMP, "setIgnoreMissingProperties", boolean.class), CM, true);
     invoke(find(CMP, "setCatalogFiles", String.class), CM, cat);
     invoke(find(CMP, "setPreferPublic", boolean.class), CM, true);
     invoke(find(CMP, "setUseStaticCatalog", boolean.class), CM, false);
     invoke(find(CMP, "setVerbosity", int.class), CM, 0);
-    r.setEntityResolver((EntityResolver) get(CRP, CM));
+    reader.setEntityResolver((EntityResolver) get(CRP, CM));
   }
 }

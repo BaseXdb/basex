@@ -69,7 +69,7 @@ public final class Functions extends ExprInfo {
         final Levenshtein ls = new Levenshtein();
         for(final Type t : Type.values()) {
           if(t.par != null && ls.similar(lc(ln), lc(t.nam), 0))
-            qp.error(FUNSIMILAR, ln, t.nam);
+            qp.error(FUNSIMILAR, name, t.nam);
         }
         qp.error(FUNCUNKNOWN, name.atom());
       }
@@ -78,7 +78,7 @@ public final class Functions extends ExprInfo {
     }
 
     // check Java functions - only allowed with administrator permissions
-    if(startsWith(uri, JAVAPRE) && ctx.resource.context.user.perm(User.ADMIN)) {
+    if(startsWith(uri, JAVAPRE) && ctx.context.user.perm(User.ADMIN)) {
       final String c = string(substring(uri, JAVAPRE.length));
       // convert dashes to upper-case initials
       final StringBuilder sb = new StringBuilder(c);
@@ -154,7 +154,7 @@ public final class Functions extends ExprInfo {
 
     if(NSGlobal.standard(uri)) {
       if(fun.declared) qp.error(NAMERES, name.atom());
-      else funError(fun.var.name, qp);
+      else funError(name, qp);
     }
 
     final byte[] ln = name.ln();
@@ -212,15 +212,17 @@ public final class Functions extends ExprInfo {
    */
   public void funError(final QNm name, final QueryParser qp)
       throws QueryException {
-    // find function
-    FNIndex.get().error(name.ln(), qp);
+
+    // find global function
+    FNIndex.get().error(name, qp);
 
     // find similar local function
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.ln());
     for(int n = 0; n < func.length; ++n) {
-      if(ls.similar(nm, lc(func[n].var.name.ln()), 0))
-        qp.error(FUNSIMILAR, name.atom(), func[n].var.name.atom());
+      if(ls.similar(nm, lc(func[n].var.name.ln()), 0)) {
+        qp.error(FUNSIMILAR, name, func[n].var.name.atom());
+      }
     }
   }
 

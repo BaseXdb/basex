@@ -27,8 +27,7 @@ public abstract class Item extends Value {
       return false;
     }
   };
-  /** Score value. {@link Double} was preferred over a primitive double value,
-    * as it takes less less only 4 byte on 32bit if set to {@code null}. */
+  /** Score value. Will be {@code null} if not set. */
   protected Double score;
 
   /**

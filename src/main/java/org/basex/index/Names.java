@@ -1,6 +1,7 @@
 package org.basex.index;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.StatsKey;
@@ -110,7 +111,7 @@ public final class Names extends TokenSet {
     final int[] ids = Array.createOrder(tl, false);
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(NAMINDEX + NL);
+    tb.add(INDEXSTRUC + HASHSTRUC + NL);
     tb.add(IDXENTRIES + (size - 1) + NL);
     for(int i = 0; i < size - 1; ++i) {
       final int s = ids[i];

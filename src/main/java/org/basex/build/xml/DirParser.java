@@ -95,11 +95,11 @@ public final class DirParser extends Parser {
 
   @Override
   public String det() {
-    return parser != null ? parser.det() : "";
+    return parser != null ? parser.detail() : "";
   }
 
   @Override
   public double prog() {
-    return parser != null ? parser.prog() : 0;
+    return parser != null ? parser.progress() : 0;
   }
 }

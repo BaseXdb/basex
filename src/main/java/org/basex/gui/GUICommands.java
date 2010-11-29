@@ -9,7 +9,6 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
 import javax.swing.AbstractButton;
-import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
@@ -52,7 +51,6 @@ import org.basex.io.IO;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.util.Array;
-import org.basex.util.Performance;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -76,9 +74,9 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final DialogCreate dialog = new DialogCreate(gui);
       if(!dialog.ok()) return;
-      final String in = dialog.path();
-      final String db = dialog.dbname();
-      progress(gui, PROGCREATE, new Command[] { new CreateDB(db, in) });
+      final String in = gui.gprop.get(GUIProp.CREATEPATH);
+      final String db = gui.gprop.get(GUIProp.CREATENAME);
+      DialogProgress.execute(gui, PROGCREATE, new CreateDB(db, in));
     }
   },
 
@@ -88,7 +86,8 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, false);
       if(dialog.ok()) {
-        close(gui);
+        new Close().run(gui.context);
+        gui.notify.init();
         gui.execute(new Open(dialog.db()), false);
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODBQUESTION)) CREATE.execute(gui);
@@ -107,10 +106,10 @@ public enum GUICommands implements GUICommand {
         if(info.opt) {
           d.meta.textindex = ind[0];
           d.meta.attrindex = ind[1];
-          d.meta.ftindex = ind[2];
-          progress(gui, INFOOPT, new Command[] { new Optimize() });
+          d.meta.ftindex   = ind[2];
+          DialogProgress.execute(gui, INFOOPT, new Optimize());
         } else {
-          Command[] cmd = new Command[0];
+          Command[] cmd = {};
           if(ind[0] != d.meta.pathindex)
             cmd = Array.add(cmd, cmd(ind[0], CmdIndex.PATH));
           if(ind[1] != d.meta.textindex)
@@ -120,7 +119,7 @@ public enum GUICommands implements GUICommand {
           if(ind[3] != d.meta.ftindex)
             cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
 
-          if(cmd.length != 0) progress(gui, PROGINDEX, cmd);
+          DialogProgress.execute(gui, PROGINDEX, cmd);
         }
       }
     }
@@ -135,15 +134,14 @@ public enum GUICommands implements GUICommand {
       return create ? new CreateIndex(index) : new DropIndex(index);
     }
   },
-  
+
   /** Shows add a document dialog. */
   ADD(GUIADD + DOTS, null, GUIADDTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogAdd dialog = new DialogAdd(gui);
-      if(!dialog.ok()) return;
-      gui.execute(dialog.cmd(), false);
-    } 
+      if(dialog.ok()) gui.execute(dialog.cmd(), false);
+    }
   },
 
   /** Exports a document. */
@@ -221,8 +219,8 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(GUIOPEN,
           gui.gprop.get(GUIProp.XQPATH), gui);
-        fc.addExFilter(CREATEXQEXDESC, new String[] {IO.XQSUFFIX,
-            IO.XQUERYSUFFIX, IO.XQMSUFFIX, IO.XQYSUFFIX, IO.XQLSUFFIX});
+        fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIX, IO.XQMSUFFIX,
+            IO.XQYSUFFIX, IO.XQLSUFFIX, IO.XQUERYSUFFIX);
       final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
       if(file != null) gui.query.setQuery(file);
     }
@@ -260,8 +258,8 @@ public enum GUICommands implements GUICommand {
         gui.context.query.path();
       final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
           fn == null ? gui.gprop.get(GUIProp.XQPATH) : fn, gui);
-      fc.addExFilter(CREATEXQEXDESC, new String[] {IO.XQSUFFIX,
-          IO.XQUERYSUFFIX, IO.XQMSUFFIX, IO.XQYSUFFIX, IO.XQLSUFFIX});
+      fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIX, IO.XQMSUFFIX,
+          IO.XQYSUFFIX, IO.XQLSUFFIX, IO.XQUERYSUFFIX);
 
       final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
       if(file == null) return;
@@ -323,11 +321,11 @@ public enum GUICommands implements GUICommand {
       final Nodes n = gui.context.copied;
       for(int i = 0; i < n.size(); ++i) {
         if(i > 0) sb.append(',');
-        sb.append(fndb(n, i));
+        sb.append(openPre(n, i));
       }
       gui.context.copied = null;
       gui.execute(new XQuery("insert nodes (" + sb + ") into " +
-        fndb(gui.context.marked, 0)), false);
+        openPre(gui.context.marked, 0)), false);
     }
 
     @Override
@@ -347,7 +345,7 @@ public enum GUICommands implements GUICommand {
         final Nodes n = gui.context.marked;
         for(int i = 0; i < n.size(); ++i) {
           if(i > 0) sb.append(',');
-          sb.append(fndb(n, i));
+          sb.append(openPre(n, i));
         }
         gui.context.marked = new Nodes(n.data);
         gui.context.copied = null;
@@ -382,7 +380,7 @@ public enum GUICommands implements GUICommand {
       }
 
       gui.context.copied = null;
-      gui.execute(new XQuery("insert node " + item + " into " + fndb(n, 0)),
+      gui.execute(new XQuery("insert node " + item + " into " + openPre(n, 0)),
           false);
     }
 
@@ -412,9 +410,9 @@ public enum GUICommands implements GUICommand {
       }
 
       if(rename != null) gui.execute(new XQuery("rename node " +
-        fndb(n, 0) + " as " + quote(rename)), false);
+        openPre(n, 0) + " as " + quote(rename)), false);
       if(replace != null) gui.execute(new XQuery("replace value of node " +
-        fndb(n, 0) + " with " + quote(replace)), false);
+        openPre(n, 0) + " with " + quote(replace)), false);
     }
 
     @Override
@@ -455,7 +453,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWXQUERY));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWXQUERY));
     }
   },
 
@@ -470,7 +468,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWINFO));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWINFO));
     }
   },
 
@@ -488,7 +486,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWMENU));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWMENU));
     }
   },
 
@@ -504,7 +502,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWBUTTONS));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWBUTTONS));
     }
   },
 
@@ -519,7 +517,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWINPUT));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWINPUT));
     }
   },
 
@@ -534,7 +532,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWSTATUS));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWSTATUS));
     }
   },
 
@@ -549,7 +547,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWTEXT));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWTEXT));
     }
   },
 
@@ -564,7 +562,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWMAP));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWMAP));
     }
   },
 
@@ -579,7 +577,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWTREE));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWTREE));
     }
   },
 
@@ -594,7 +592,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWFOLDER));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWFOLDER));
     }
   },
 
@@ -609,7 +607,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWPLOT));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWPLOT));
     }
   },
 
@@ -624,7 +622,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWTABLE));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWTABLE));
     }
   },
 
@@ -639,7 +637,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWEXPLORE));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWEXPLORE));
     }
   },
 
@@ -653,7 +651,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.fullscreen);
+      b.setSelected(gui.fullscreen);
     }
   },
 
@@ -671,7 +669,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.EXECRT));
+      b.setSelected(gui.gprop.is(GUIProp.EXECRT));
     }
   },
 
@@ -704,7 +702,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.FILTERRT));
+      b.setSelected(gui.gprop.is(GUIProp.FILTERRT));
     }
   },
 
@@ -757,10 +755,10 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       if(!new DialogCreateFS(gui).ok()) return;
       final GUIProp gprop = gui.gprop;
-      final String p = gprop.is(GUIProp.FSALL) ? "/"
-          : gui.gprop.get(GUIProp.FSBACKING).replace('\\', '/');
-      final String n = gprop.get(GUIProp.FSDBNAME);
-      progress(gui, CREATEFSTITLE, new Command[] { new CreateFS(n, p) });
+      final String p = gprop.is(GUIProp.FSALL) ? "/" :
+        gprop.get(GUIProp.FSPATH).replace('\\', '/');
+      final String n = gprop.get(GUIProp.FSNAME);
+      DialogProgress.execute(gui, CREATEFSTITLE, new CreateFS(n, p));
     }
   },
 
@@ -770,7 +768,8 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, true);
       if(dialog.ok()) {
-        close(gui);
+        new Close().run(gui.context);
+        gui.notify.init();
         gui.execute(new Open(dialog.db()), false);
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
@@ -784,7 +783,8 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogMountFS dialog = new DialogMountFS(gui);
       if(dialog.ok()) {
-        close(gui);
+        new Close().run(gui.context);
+        gui.notify.init();
         gui.execute(new Mount(dialog.db(), dialog.mp()), false);
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
@@ -816,7 +816,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.gprop.is(GUIProp.SHOWHELP));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWHELP));
     }
   },
 
@@ -978,91 +978,6 @@ public enum GUICommands implements GUICommand {
   // STATIC METHODS ===========================================================
 
   /**
-   * Runs the specified commands, showing a progress dialog.
-   * @param gui reference to the main window
-   * @param t dialog title
-   * @param cmds commands to be run
-   */
-  static void progress(final GUI gui, final String t, final Command[] cmds) {
-    // start database creation thread
-    new Thread() {
-      @Override
-      public void run() {
-        for(final Command cmd : cmds) {
-          final boolean ci = cmd instanceof CreateIndex;
-          final boolean fs = cmd instanceof CreateFS;
-          final boolean di = cmd instanceof DropIndex;
-          final boolean op = cmd instanceof Optimize;
-          if(!ci && !di && !op) close(gui);
-
-          // execute command
-          final DialogProgress wait = new DialogProgress(gui, t, !fs, !op, cmd);
-          final Performance perf = new Performance();
-          String info;
-          boolean ok = true;
-          try {
-            cmd.execute(gui.context);
-            info = cmd.info();
-          } catch(final BaseXException ex) {
-            info = ex.getMessage();
-            ok = false;
-          } finally {
-            wait.dispose();
-          }
-          final String time = perf.toString();
-          gui.info.setInfo(info, cmd, time, ok);
-          gui.info.reset();
-          gui.status.setText(Util.info(PROCTIME, time));
-          if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
-
-          // initialize views
-          if(!ci && !di) gui.notify.init();
-        }
-      }
-    }.start();
-  }
-
-  /**
-   * Closes the current database and initializes the GUI.
-   * @param gui gui reference
-   */
-  static void close(final GUI gui) {
-    try {
-      new Close().execute(gui.context);
-    } catch(final BaseXException ex) {
-      /* Ignored. */
-    }
-    gui.notify.init();
-  }
-
-  /**
-   * Displays a file save dialog and returns the file name or a null reference.
-   * @param gui gui reference
-   * @param single file vs directory dialog
-   * @return io reference
-   */
-  public static IO save(final GUI gui, final boolean single) {
-    // open file chooser for XML creation
-    final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
-        gui.gprop.get(GUIProp.SAVEPATH), gui);
-    fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
-
-    final IO file = fc.select(single ? BaseXFileChooser.Mode.FSAVE :
-      BaseXFileChooser.Mode.DSAVE);
-    if(file != null) gui.gprop.set(GUIProp.SAVEPATH, file.path());
-    return file;
-  }
-
-  /**
-   * Selects or deselects the specified component.
-   * @param but component
-   * @param select selection flag
-   */
-  static void select(final AbstractButton but, final boolean select) {
-    if(but.isSelected() != select) but.setSelected(select);
-  }
-
-  /**
    * Checks if data can be updated (disk mode, nodes defined, no namespaces).
    * @param n node instance
    * @param no disallowed node types
@@ -1092,7 +1007,7 @@ public enum GUICommands implements GUICommand {
    * @param i offset
    * @return function string
    */
-  static String fndb(final Nodes n, final int i) {
+  static String openPre(final Nodes n, final int i) {
     return "db:open-pre('" + n.data.meta.name + "', " + n.list[i] + ")";
   }
 }

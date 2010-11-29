@@ -82,7 +82,7 @@ public abstract class Builder extends Progress {
 
     // add document node and parse document
     parser.parse(this);
-    if(lvl != 0) error(DOCOPEN, parser.det(), tags.key(tagStack[lvl]));
+    if(lvl != 0) error(DOCOPEN, parser.detail(), tags.key(tagStack[lvl]));
 
     meta.lastid = meta.size;
     // no nodes inserted: add default document node
@@ -165,7 +165,7 @@ public abstract class Builder extends Progress {
     checkStop();
 
     if(--lvl == 0 || tags.id(tag) != tagStack[lvl])
-      error(CLOSINGTAG, parser.det(), tag, tags.key(tagStack[lvl]));
+      error(CLOSINGTAG, parser.detail(), tag, tags.key(tagStack[lvl]));
 
     final int pre = preStack[lvl];
     setSize(pre, meta.size - pre);
@@ -184,7 +184,7 @@ public abstract class Builder extends Progress {
     // check if text appears before or after root node
     final boolean ignore = !inDoc || lvl == 1;
     if((meta.chop && t.size() != 0 || !t.wsp()) && ignore)
-      error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
+      error(inDoc ? AFTERROOT : BEFOREROOT, parser.detail());
 
     if(t.size() != 0 && !ignore) addText(t, Data.TEXT);
   }
@@ -215,6 +215,8 @@ public abstract class Builder extends Progress {
     meta.encoding = enc.equals(UTF8) || enc.equals(UTF82) ? UTF8 : enc;
   }
 
+  // PROGRESS INFORMATION =====================================================
+
   @Override
   public final String tit() {
     return PROGCREATE;
@@ -222,12 +224,12 @@ public abstract class Builder extends Progress {
 
   @Override
   public final String det() {
-    return spos == 0 ? parser.det() : DBFINISH;
+    return spos == 0 ? parser.detail() : DBFINISH;
   }
 
   @Override
   public final double prog() {
-    return spos == 0 ? parser.prog() : (double) spos / ssize;
+    return spos == 0 ? parser.progress() : (double) spos / ssize;
   }
 
   // ABSTRACT METHODS =========================================================
@@ -338,7 +340,7 @@ public abstract class Builder extends Progress {
         tags.stat(tagStack[lvl - 1]).leaf = false;
       } else if(inDoc) {
         // don't allow more than one root node
-        error(MOREROOTS, parser.det(), tag);
+        error(MOREROOTS, parser.detail(), tag);
       }
     }
     if(meta.size != 1) inDoc = true;
@@ -364,7 +366,7 @@ public abstract class Builder extends Progress {
    */
   private void limit(final int v, final int l, final String m)
       throws BuildException {
-    if(v >= l) error(m, parser.det(), l);
+    if(v >= l) error(m, parser.detail(), l);
   }
 
   /**

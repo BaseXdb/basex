@@ -293,7 +293,7 @@ public abstract class Serializer {
       if(k == Data.DOC) {
         ++p;
       } else if(k == Data.TEXT) {
-        final FTPos ftd = ft != null ? ft.get(p) : null;
+        final FTPos ftd = ft != null ? ft.get(data, p) : null;
         if(ftd != null) text(data.text(p++, true), ftd);
         else text(data.text(p++, true));
       } else if(k == Data.COMM) {

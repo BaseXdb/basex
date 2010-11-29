@@ -28,15 +28,6 @@ public abstract class Progress {
   }
 
   /**
-   * Returns short information on this process.
-   * Can be overwritten to give more detailed information.
-   * @return header information
-   */
-  public String tit() {
-    return INFOWAIT;
-  }
-
-  /**
    * Returns detailed information on the current process or sub process.
    * Can be overwritten to give more detailed information.
    * @return information in detail
@@ -46,28 +37,11 @@ public abstract class Progress {
   }
 
   /**
-   * Returns short information on this process.
-   * @return header information
-   */
-  public String det() {
-    return INFOWAIT;
-  }
-
-  /**
    * Returns a progress value (0 - 1).
    * @return header information
    */
   public final double progress() {
     return sub != null ? sub.progress() : prog();
-  }
-
-  /**
-   * Returns progress information.
-   * Can be overwritten to give more detailed information.
-   * @return header information
-   */
-  public double prog() {
-    return 0;
   }
 
   /**
@@ -127,5 +101,31 @@ public abstract class Progress {
       timeout.interrupt();
       timeout = null;
     }
+  }
+
+  /**
+   * Returns short information on this process.
+   * Can be overwritten to give more detailed information.
+   * @return header information
+   */
+  protected String tit() {
+    return INFOWAIT;
+  }
+
+  /**
+   * Returns short information on this process.
+   * @return header information
+   */
+  protected String det() {
+    return INFOWAIT;
+  }
+
+  /**
+   * Returns a progress value (0 - 1).
+   * Can be overwritten to give more detailed information.
+   * @return header information
+   */
+  protected double prog() {
+    return 0;
   }
 }

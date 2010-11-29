@@ -1,7 +1,6 @@
 package org.basex.gui.dialog;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-import static javax.swing.JOptionPane.*;
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -200,13 +199,12 @@ public abstract class Dialog extends JDialog {
 
   /**
    * Static yes/no dialog.
-   * @param comp parent reference
+   * @param gui parent reference
    * @param text text
    * @return true if dialog was confirmed
    */
-  public static boolean confirm(final Component comp, final String text) {
-    return showConfirmDialog(comp, text, NAME,
-        YES_NO_OPTION, WARNING_MESSAGE) == YES_OPTION;
+  public static boolean confirm(final GUI gui, final String text) {
+    return new DialogMessage(gui, text.trim(), Msg.QUESTION).ok();
   }
 
   /**
@@ -234,5 +232,16 @@ public abstract class Dialog extends JDialog {
    */
   public static void error(final GUI gui, final String text) {
     new DialogMessage(gui, text.trim(), Msg.ERROR);
+  }
+
+  /**
+   * Shows an information or error dialog.
+   * @param gui parent reference
+   * @param ok ok flag
+   * @param text text
+   */
+  public static void show(final GUI gui, final String text, final boolean ok) {
+    if(ok) info(gui, text);
+    else error(gui, text);
   }
 }

@@ -11,7 +11,7 @@ import org.basex.util.Util;
 /**
  * This class stores node references of a database in an ascending order.
  * Instances of this class are used in the {@link Context} class to
- * reference the currently used nodes.
+ * reference the currently used, marked, and copied nodes.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -19,7 +19,7 @@ import org.basex.util.Util;
 public final class Nodes implements Result {
   /** Full-text position data (for visualization). */
   public final FTPosData ftpos;
-  /** Root flag (nodes represent root documents). */
+  /** Root flag (nodes represent all document nodes of the database). */
   public boolean root;
   /** Root node. */
   public Data data;

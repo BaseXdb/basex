@@ -860,17 +860,21 @@ public final class Token {
 
   /**
    * Returns a substring of the specified token.
-   * @param token token
-   * @param s start position
+   * Note that this method does not correctly split UTF8 character;
+   * use {@link #subtoken} instead.
+   * @param token input token
+   * @param start start position
    * @return substring
    */
-  public static byte[] substring(final byte[] token, final int s) {
-    return substring(token, s, token.length);
+  public static byte[] substring(final byte[] token, final int start) {
+    return substring(token, start, token.length);
   }
 
   /**
    * Returns a substring of the specified token.
-   * @param token token
+   * Note that this method does not correctly split UTF8 character;
+   * use {@link #subtoken} instead.
+   * @param token input token
    * @param start start position
    * @param end end position
    * @return substring
@@ -882,6 +886,39 @@ public final class Token {
     final int e = Math.min(end, token.length);
     if(s == 0 && e == token.length) return token;
     return s >= e ? EMPTY : Arrays.copyOfRange(token, s, e);
+  }
+
+  /**
+   * Returns a partial token.
+   * @param token input token
+   * @param start start position
+   * @return resulting text
+   */
+  public static byte[] subtoken(final byte[] token, final int start) {
+    return subtoken(token, start, token.length);
+  }
+
+  /**
+   * Returns a partial token.
+   * @param token input text
+   * @param start start position
+   * @param end end position
+   * @return resulting text
+   */
+  public static byte[] subtoken(final byte[] token, final int start,
+      final int end) {
+
+    int s = Math.max(0, start);
+    int e = Math.min(end, token.length);
+    if(s == 0 && e == token.length) return token;
+    if(s >= e) return EMPTY;
+
+    int t = Math.max(0, s - 4);
+    for(; t != s && t < e; t += cl(token, t)) {
+      if(t >= s) s = t;
+    }
+    for(; t < e; t += cl(token, t));
+    return Arrays.copyOfRange(token, s, t);
   }
 
   /**

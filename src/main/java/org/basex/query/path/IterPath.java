@@ -59,7 +59,7 @@ final class IterPath extends AxisPath {
           iter[0] = ctx.iter(expr[0]);
         }
 
-        final Value cv = ctx.resource.value;
+        final Value cv = ctx.value;
         final long cp = ctx.pos;
 
         while(true) {
@@ -71,7 +71,7 @@ final class IterPath extends AxisPath {
             }
           } else if(p < iter.length - 1) {
             ++p;
-            ctx.resource.value = item;
+            ctx.value = item;
             if(iter[p] == null || !iter[p].reset()) iter[p] = ctx.iter(expr[p]);
           } else {
             if(!item.node()) NODESPATH.thrw(input, this, item.type);
@@ -84,7 +84,7 @@ final class IterPath extends AxisPath {
         }
 
         // reset context and return result
-        ctx.resource.value = cv;
+        ctx.value = cv;
         ctx.pos = cp;
         return node;
       }

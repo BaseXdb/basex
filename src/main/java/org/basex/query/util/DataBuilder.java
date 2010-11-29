@@ -2,7 +2,6 @@ package org.basex.query.util;
 
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
-import org.basex.data.FTPos;
 import org.basex.data.FTPosData;
 import org.basex.data.MemData;
 import org.basex.query.QueryContext;
@@ -14,9 +13,7 @@ import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.Atts;
-import org.basex.util.TokenBuilder;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTSpan;
+import org.basex.util.TokenList;
 
 /**
  * Class for building memory-based database nodes.
@@ -28,13 +25,13 @@ public final class DataBuilder {
   /** Target data instance. */
   private final MemData data;
   /** Full-text position data. */
-  private FTPosData ftpos;
-  /** Marker tag reference. */
+  private DataFTBuilder ftbuilder;
+  /** Index reference of marker tag. */
   private int marker;
   /** Preserve flag. */
   private boolean preserve = true;
   /** Inherit flag. */
-  private final boolean inherit = true;
+  private boolean inherit = true;
 
   /**
    * Constructor.
@@ -59,11 +56,13 @@ public final class DataBuilder {
    * Attaches full-text position data.
    * @param tag name of marker tag
    * @param pos full-text position data
+   * @param len length of extract
    * @return self reference
    */
-  public DataBuilder ftpos(final byte[] tag, final FTPosData pos) {
+  private DataBuilder ftpos(final byte[] tag, final FTPosData pos,
+      final int len) {
+    ftbuilder = new DataFTBuilder(pos, len);
     marker = data.tags.index(tag, null, false);
-    ftpos = pos;
     return this;
   }
 
@@ -71,16 +70,17 @@ public final class DataBuilder {
    * Marks the full-text terms in the specified node and returns the new nodes.
    * @param nod input node
    * @param tag tag name
+   * @param len length of extract
    * @param ctx query context
    * @return resulting value
    * @throws QueryException query exception
    */
   public static ItemIter mark(final Nod nod, final byte[] tag,
-      final QueryContext ctx) throws QueryException {
+      final int len, final QueryContext ctx) throws QueryException {
 
     // copy node to main memory data instance
-    final MemData md = new MemData(ctx.resource.context.prop);
-    new DataBuilder(md).ftpos(tag, ctx.ftpos).build(nod);
+    final MemData md = new MemData(ctx.context.prop);
+    new DataBuilder(md).ftpos(tag, ctx.ftpos, len).build(nod);
     final ItemIter ir = new ItemIter();
     for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) {
       ir.add(new DBNode(md, p));
@@ -185,52 +185,26 @@ public final class DataBuilder {
   private int addText(final Nod nd, final int pre, final int par,
       final Nod ndPar) {
 
-    final byte[] val = nd.atom();
-    int dist = pre - par;
-
     // check full-text mode
-    if(ftpos == null || !(nd instanceof DBNode)) return addText(val, dist);
-
-    // check if full-text data exists for the current node
-    final FTPos ftp = ftpos.get(((DBNode) nd).pre);
-    if(ftp == null) return addText(val, dist);
+    int dist = pre - par;
+    final TokenList tl = ftbuilder != null ? ftbuilder.build(nd) : null;
+    if(tl == null) return addText(nd.atom(), dist);
 
     // adopt namespace from parent
     final int u = ndPar != null ? data.ns.uri(ndPar.nname(), true) : 0;
 
-    int ins = 0;
-    boolean marked = false;
-    final TokenBuilder tb = new TokenBuilder();
-    final FTLexer lex = new FTLexer().sc().init(val);
-    while(lex.hasNext()) {
-      final FTSpan span = lex.next();
-      // check if one of the conditions is true
-      if(ftp.contains(span.pos) ^ marked ^ (marked && span.special)) {
-        if(tb.size() != 0) {
-          // write current text node
-          ins += addText(tb.finish(), marked ? 1 : dist);
-          tb.reset();
-          dist++;
-        }
-        if(!marked) {
-          // open element
-          data.elem(dist++, marker, 1, 2, u, false);
-          data.insert(data.meta.size);
-          ins++;
-        }
-        marked ^= true;
+    for(int i = 0; i < tl.size(); i++) {
+      byte[] text = tl.get(i);
+      final boolean elem = text == null;
+      if(elem) {
+        // open element
+        data.elem(dist + i, marker, 1, 2, u, false);
+        data.insert(data.meta.size);
+        text = tl.get(++i);
       }
-      // collect data
-      tb.add(span.text);
+      addText(text, elem ? 1 : dist + i);
     }
-    if(tb.size() != 0) {
-      // write last text node
-      ins += addText(tb.finish(), marked ? 1 : dist);
-    } else {
-      // check if this can happen at all
-      System.out.println("???????");
-    }
-    return ins;
+    return tl.size();
   }
 
   /**

@@ -20,14 +20,16 @@ import org.basex.index.ValueBuilder;
 import org.basex.util.Util;
 
 /**
- * Abstract class for database creation.
+ * Abstract class for database creation commands.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class ACreate extends Command {
+abstract class ACreate extends Command {
   /** Builder instance. */
   private Builder builder;
+  /** Flag for creating new data instances. */
+  private boolean newData;
 
   /**
    * Protected constructor, specifying command arguments.
@@ -35,6 +37,7 @@ public abstract class ACreate extends Command {
    */
   protected ACreate(final String... a) {
     this(User.CREATE, a);
+    newData = true;
   }
 
   /**
@@ -46,6 +49,21 @@ public abstract class ACreate extends Command {
     super(p, a);
   }
 
+  @Override
+  public boolean newData() {
+    return newData;
+  }
+
+  @Override
+  public final boolean supportsProg() {
+    return true;
+  }
+
+  @Override
+  public boolean stoppable() {
+    return true;
+  }
+
   /**
    * Builds and creates a new database instance.
    * @param p parser instance
@@ -53,7 +71,7 @@ public abstract class ACreate extends Command {
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
-    if(!checkName(db)) return error(NAMEINVALID, db);
+    if(!validName(db)) return error(NAMEINVALID, db);
 
     // close open database
     new Close().run(context);
@@ -73,7 +91,10 @@ public abstract class ACreate extends Command {
         d.close();
         final Open open = new Open(db);
         if(!open.run(context)) return error(open.info());
-        index(context.data);
+        final Data data = context.data;
+        if(prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT, data);
+        if(prop.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, data);
+        if(prop.is(Prop.FTINDEX))   index(IndexType.FULLTEXT, data);
       }
       return info(DBCREATED, db, perf);
     } catch(final ProgressException ex) {
@@ -87,17 +108,6 @@ public abstract class ACreate extends Command {
           ex.getMessage() : Util.info(PARSEERR, p.file);
       return error(msg != null ? msg : args[0]);
     }
-  }
-
-  /**
-   * Builds the indexes.
-   * @param data data reference
-   * @throws IOException I/O exception
-   */
-  protected final void index(final Data data) throws IOException {
-    if(data.meta.textindex) index(IndexType.TEXT, data);
-    if(data.meta.attrindex) index(IndexType.ATTRIBUTE, data);
-    if(data.meta.ftindex)   index(IndexType.FULLTEXT, data);
   }
 
   /**

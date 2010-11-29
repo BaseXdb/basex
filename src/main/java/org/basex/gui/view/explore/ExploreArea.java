@@ -148,7 +148,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       }
     }
 
-    final TokenList tmp = data.path.desc(sl, data, !fs, false);
+    final TokenList tmp = data.pthindex.desc(sl, data, !fs, false);
     if(tmp.size() == 0) return;
 
     final String[] keys = entries(tmp.toArray());

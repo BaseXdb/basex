@@ -62,13 +62,7 @@ public final class GFLWOR extends ParseExpr {
 
     // optimize for/let clauses
     final int vs = ctx.vars.size();
-    for(final ForLet f : fl) {
-      // disable fast full-text evaluation if score value exists
-      final boolean fast = ctx.ftfast;
-      ctx.ftfast = ctx.ftfast && f.simple();
-      f.comp(ctx);
-      ctx.ftfast = fast;
-    }
+    for(final ForLet f : fl) f.comp(ctx);
 
     // optimize where clause
     boolean empty = false;

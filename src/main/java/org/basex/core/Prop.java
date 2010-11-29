@@ -225,7 +225,7 @@ public final class Prop extends AProp {
    * @return result of check
    */
   public boolean dbexists(final String db) {
-    return dbpath(db).exists();
+    return !db.isEmpty() && dbpath(db).exists();
   }
 
   @Override

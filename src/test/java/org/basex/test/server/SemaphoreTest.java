@@ -53,13 +53,15 @@ public final class SemaphoreTest {
     sess = createSession();
   }
 
-  /** Stops the server. */
+  /**
+   * Stops the server.
+   * @throws Exception exception
+   */
   @AfterClass
-  public static void stop() {
-    closeSession(sess);
-    for(final ClientSession s : sessions) {
-      closeSession(s);
-    }
+  public static void stop() throws Exception {
+    for(final ClientSession s : sessions) s.close();
+    sess.execute(new DropDB(NAME));
+    sess.close();
     // stop server instance
     server.stop();
   }
@@ -116,18 +118,6 @@ public final class SemaphoreTest {
       fail(ex.toString());
     }
     return null;
-  }
-
-  /**
-   * Closes a client session.
-   * @param s session to be closed
-   */
-  static void closeSession(final Session s) {
-    try {
-      s.close();
-    } catch(final IOException ex) {
-      fail(ex.toString());
-    }
   }
 
   /**

@@ -65,7 +65,9 @@ final class FTContainsIndex extends FTContains {
     if(n == null) fti = null;
 
     // add entry to visualization
-    if(found && ctx.ftpos != null && !ictx.not) ctx.ftpos.add(ftn.pre, ftn.all);
+    if(found && ctx.ftpos != null && !ictx.not) {
+      ctx.ftpos.add(ftn.data, ftn.pre, ftn.all);
+    }
 
     ctx.fttoken = tmp;
     return Bln.get(found ? 1 : 0);

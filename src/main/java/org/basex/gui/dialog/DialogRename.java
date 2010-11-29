@@ -23,7 +23,7 @@ import org.basex.util.Util;
  */
 final class DialogRename extends Dialog {
   /** New name. */
-  final BaseXTextField name;
+  private final BaseXTextField name;
   /** Old name. */
   private final String old;
   /** Buttons. */
@@ -43,6 +43,9 @@ final class DialogRename extends Dialog {
     super(main, RENAMETITLE);
     old = dbname;
     db = fs ? List.listFS(main.context) : List.list(main.context);
+
+    set(new BaseXLabel(CREATENAME, false, true).border(0, 0, 4, 0),
+        BorderLayout.NORTH);
 
     name = new BaseXTextField(dbname, this);
     name.addKeyListener(new KeyAdapter() {
@@ -64,14 +67,22 @@ final class DialogRename extends Dialog {
     finish(null);
   }
 
+  /**
+   * Returns the edited database name.
+   * @return name
+   */
+  String name() {
+    return name.getText().trim();
+  }
+
   @Override
   public void action(final Object cmp) {
-    final String nm = name.getText();
+    final String nm = name();
     ok = !db.contains(nm) || nm.equals(old);
-    String msg = ok ? null : Util.info(DBEXISTS, db);
+    String msg = ok ? null : Util.info(DBEXISTS, nm);
     if(ok) {
-      ok = !nm.isEmpty() && Command.checkName(nm);
-      if(!nm.isEmpty() && !ok) msg = Util.info(INVALID, EDITNAME);
+      ok = Command.validName(nm);
+      if(!ok) msg =  nm.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
     }
     info.setText(msg, Msg.ERROR);
     enableOK(buttons, BUTTONOK, ok && !nm.isEmpty());

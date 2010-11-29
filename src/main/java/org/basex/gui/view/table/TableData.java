@@ -95,9 +95,9 @@ final class TableData {
     if(data.fs != null) roots.add(DeepFS.FILE);
     else {
       // sort keys by occurrence
-      for(final byte[] k : data.path.desc(EMPTY, data, true, true)) {
+      for(final byte[] k : data.pthindex.desc(EMPTY, data, true, true)) {
         int c = 0;
-        for(final byte[] kk : data.path.desc(k, data, true, false)) {
+        for(final byte[] kk : data.pthindex.desc(k, data, true, false)) {
           final Names nm = startsWith(kk, '@') ? data.atts : data.tags;
           if(nm.stat(nm.id(delete(kk, '@'))).leaf) ++c;
         }
@@ -136,7 +136,7 @@ final class TableData {
     } else {
       if(r == -1 && roots.size() == 0) return;
       if(root == -1) root = data.tags.id(roots.get(0));
-      for(final byte[] k : data.path.desc(
+      for(final byte[] k : data.pthindex.desc(
           data.tags.key(root), data, true, true)) {
         final boolean elem = !startsWith(k, '@');
         final byte[] key = delete(k, '@');

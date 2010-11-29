@@ -23,7 +23,7 @@ public enum Err {
   NOTIMPL(BASX, 0, "Not implemented yet: %."),
 
   /** BASX0001: Evaluation exception. */
-  NOIDX(BASX, 1, "%: Index not available."),
+  NOIDX(BASX, 1, "Unknown index '%'."),
   /** BASX0002: Evaluation exception. */
   NODBCTX(BASX, 2, "%: Database context needed."),
   /** BASX0003: Evaluation exception. */
@@ -381,7 +381,7 @@ public enum Err {
   /** XPST0017: Parsing Exception. */
   XPARGS(XPST, 17, "Wrong arguments: % expected."),
   /** XPST0017: Parsing exception. */
-  FUNSIMILAR(XPST, 17, "Unknown function \"%\" (similar: %())."),
+  FUNSIMILAR(XPST, 17, "Unknown function name %; similar: \"%\"."),
   /** XPST0017: Parsing Exception. */
   FUNCTYPE(XPST, 17, "Wrong arguments: %(value) expected."),
   /** XPST0003: Parsing exception. */

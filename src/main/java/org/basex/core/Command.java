@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.core.cmd.Close;
 import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.io.ArrayOutput;
@@ -107,14 +108,39 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * States if the command performs updates/write operations. Needed for locking
-   * other commands.
+   * Checks if the command performs updates/write operations.
    * @param ctx context reference
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean writing(final Context ctx) {
+  public boolean updating(final Context ctx) {
     return (flags & (User.CREATE | User.WRITE)) != 0;
+  }
+
+  /**
+   * Checks if the command updates the data reference.
+   * @return result of check
+   */
+  public boolean newData() {
+    return false;
+  }
+
+  /**
+   * Returns true if this class returns a progress value.
+   * Used by the progress bar in the visualization.
+   * @return result of check
+   */
+  public boolean supportsProg() {
+    return false;
+  }
+
+  /**
+   * Returns true if this command can be stopped.
+   * Used by the progress bar in the visualization.
+   * @return result of check
+   */
+  public boolean stoppable() {
+    return false;
   }
 
   /**
@@ -139,7 +165,7 @@ public abstract class Command extends Progress {
    * @param name name to be checked
    * @return result of check
    */
-  public static final boolean checkName(final String name) {
+  public static final boolean validName(final String name) {
     return name != null && name.matches("[\\w-]+");
   }
 
@@ -204,6 +230,19 @@ public abstract class Command extends Progress {
     }
   }
 
+  /**
+   * Closes the specified database if it is currently opened and only
+   * pinned once.
+   * @param db database to be closed
+   * @return closed flag
+   */
+  protected final boolean close(final String db) {
+    final boolean close = context.data != null &&
+    db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
+    if(close) new Close().run(context);
+    return close;
+  }
+
   // PRIVATE METHODS ==========================================================
 
   /**
@@ -230,7 +269,7 @@ public abstract class Command extends Progress {
 
     // check concurrency of commands
     boolean ok = false;
-    final boolean writing = writing(ctx);
+    final boolean writing = updating(ctx);
     ctx.lock.before(writing);
     ok = run(ctx, os);
     ctx.lock.after(writing);
@@ -256,16 +295,13 @@ public abstract class Command extends Progress {
       abort();
       return error(PROGERR);
     } catch(final Throwable ex) {
-      // information on a critical error is output
-      Performance.gc(3);
+      // critical, unexpected error
+      Performance.gc(2);
+      Util.stack(ex);
       abort();
-      if(ex instanceof OutOfMemoryError) {
-        Util.stack(ex);
-        return error(PROCMEM +
-            ((flags & User.CREATE) != 0 ? PROCMEMCREATE : ""));
-      }
+      if(ex instanceof OutOfMemoryError) return error(PROCMEM +
+          ((flags & User.CREATE) != 0 ? PROCMEMCREATE : ""));
 
-      Util.debug(ex);
       final Object[] st = ex.getStackTrace();
       final Object[] obj = new Object[st.length + 1];
       obj[0] = ex.toString();

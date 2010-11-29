@@ -21,6 +21,8 @@ m_layout=Nền
 
 # Buttons
 b_ok=OK
+b_yes=Vâng
+b_no=Không
 b_opt=Tối ưu
 b_rename=Đổi tên
 b_backup=Backup
@@ -126,7 +128,8 @@ dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè
 dr_overbacking=Cơ sở dữ liệu cũ và dự phòng sẽ bị ghi đè
 
 dd_title=Manage Databases
-dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.\nBạn chắc không?
+dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.
+dd_sure=Bạn chắc không?
 
 dx_question=Bạn thực sự muốn xóa?
 dq_question=Save changes to %?
@@ -207,8 +210,8 @@ ds_localport=Local Port
 ds_createu=Create User
 ds_globperm=Global Permissions
 ds_locperm=Local Permissions
-ds_drquestion=% User(s) will be dropped.\nAre you sure?
-ds_dbrevoke=Permission will be revoked from logged in user.\nAre you sure?
+ds_drquestion=% User(s) will be dropped.
+ds_dbrevoke=Permission will be revoked from logged in user.
 ds_alterpw=Alter Password
 ds_invalid=% is invalid
 ds_adlogin=Administrator Login (local or remote)
@@ -379,10 +382,10 @@ db_notdropped=No database was dropped.
 db_droperror=Cơ sở dữ liệu không xóa bỏ được.
 db_altered=Database '%' was renamed to '%'.
 db_notaltered=Database '%' could not be renamed.
-db_backup=Backup '%' created in %.
+db_backup=Backup for '%' created in %.
 db_nobackup=Backup of database '%' could not be created.
-db_restore=Database '%' restored in %.
-db_norestore=Database '%' could not be restored.
+db_restore='%' restored in %.
+db_norestore='%' could not be restored.
 db_notopened=Cơ sở dữ liệu '%' không mở được.
 db_opened=Cơ sở dữ liệu '%' được mở ở %.
 db_exported=Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
@@ -393,9 +396,10 @@ db_backdrop=Backup files '%' were dropped.
 db_backnf=No backup found for '%'.
 
 # Index commands
-in_created=Index được tạo ở %.
-in_dropped=Index được xóa ở %.
-in_notdropped=Index không xóa được.
+in_created=Index '%' được tạo ở %.
+in_dropped=Index '%' được xóa ở %.
+in_notdropped=Index '%' không xóa được.
+in_notavl=not available
 
 # Server Info
 srv_login=Access denied.
@@ -457,7 +461,7 @@ ad_kill=% sessions killed.
 ad_killself='%' cannot kill itself.
 
 # General Commands
-gc_setkey=Could not set '%'.
+gc_setwhich=Unknown option '%'
 gc_setval=Could not set '%' to '%'.
 
 # Info Strings

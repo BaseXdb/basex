@@ -68,13 +68,14 @@ public final class BaseXGUI {
 
         // open specified document or database
         if(args.length != 0) {
-          final String db = args[0].replace('\\', '/');
-          final IO io = IO.get(db);
-          if(db.endsWith(IO.XQSUFFIX)) {
+          final String input = args[0].replace('\\', '/');
+          final IO io = IO.get(input);
+          if(input.endsWith(IO.XQSUFFIX)) {
             gui.query.setQuery(io);
           } else {
-            gui.execute(new Check(db), false);
-            gprop.set(GUIProp.OPENPATH, io.path());
+            gui.execute(new Check(input), false);
+            gprop.set(GUIProp.CREATEPATH, io.path());
+            gprop.set(GUIProp.CREATENAME, io.dbname());
           }
         }
       }

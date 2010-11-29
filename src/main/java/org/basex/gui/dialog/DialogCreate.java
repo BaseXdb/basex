@@ -87,7 +87,7 @@ public final class DialogCreate extends Dialog {
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
-    path = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
+    path = new BaseXTextField(gprop.get(GUIProp.CREATEPATH), this);
     path.addKeyListener(keys);
     p.add(path);
 
@@ -107,9 +107,7 @@ public final class DialogCreate extends Dialog {
     p.add(new BaseXLabel(CREATENAME, false, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());
 
-    dbname = new BaseXTextField(this);
-    final String dbn = IO.get(gprop.get(GUIProp.OPENPATH)).dbname();
-    dbname.setText(dbn.replaceAll("[^\\w-]", ""));
+    dbname = new BaseXTextField(gprop.get(GUIProp.CREATENAME), this);
     dbname.addKeyListener(keys);
     p.add(dbname);
     p.add(new BaseXLabel());
@@ -206,7 +204,7 @@ public final class DialogCreate extends Dialog {
   void choose() {
     final GUIProp gprop = gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        gprop.get(GUIProp.OPENPATH), gui);
+        gprop.get(GUIProp.CREATEPATH), gui);
     fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
     fc.addFilter(CREATEZIPDESC, IO.ZIPSUFFIX);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
@@ -215,74 +213,48 @@ public final class DialogCreate extends Dialog {
     if(file != null) {
       path.setText(file.path());
       dbname.setText(file.dbname().replaceAll("[^\\w-]", ""));
-      gprop.set(GUIProp.OPENPATH, file.dir());
+      gprop.set(GUIProp.CREATEPATH, file.dir());
     }
   }
+
   /**
    * Opens a file dialog to choose an XML catalog or directory.
    */
   void catchoose() {
     final GUIProp gprop = gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        gprop.get(GUIProp.OPENPATH), gui);
+        gprop.get(GUIProp.CREATEPATH), gui);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
     final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
-    if(file != null) {
-      cfile.setText(file.path());
-    }
-  }
-  /**
-   * Returns the chosen XML file or directory path.
-   * @return file or directory
-   */
-  public String path() {
-    return path.getText().trim();
-  }
-  /**
-   * Returns the chosen XML file or directory path.
-   * @return file or directory
-   */
-  public String cfile() {
-    return cfile.getText().trim();
-  }
-
-  /**
-   * Returns the database name.
-   * @return file or directory
-   */
-  public String dbname() {
-    return dbname.getText().trim();
+    if(file != null) cfile.setText(file.path());
   }
 
   @Override
   public void action(final Object cmp) {
     ft.action(ftxindex.isSelected());
 
+    intparse.setEnabled(!usecat.isSelected());
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());
-    usecat.setEnabled(CatalogResolverWrapper.available() &&
-        !intparse.isSelected());
-    intparse.setEnabled(!usecat.isSelected());
-    cfile.setEnabled(!intparse.isSelected() &&
-        (!gui.context.prop.get(Prop.CATFILE).isEmpty() || usecat.isSelected()));
 
+    usecat.setEnabled(!intparse.isSelected() &&
+        CatalogResolverWrapper.available());
+    cfile.setEnabled(usecat.isSelected());
     browsec.setEnabled(cfile.isEnabled());
-    final IO file = IO.get(path());
-    final boolean exists = !path().isEmpty() && file.exists();
-    if(exists) gui.gprop.set(GUIProp.OPENPATH, file.path());
-    final boolean catexists = IO.get(cfile()).exists();
-    if(catexists && usecat.isSelected()) gui.context.prop.set(Prop.CATFILE,
-        cfile());
-    else gui.context.prop.set(Prop.CATFILE, "");
 
-    final String nm = dbname();
-    ok = exists && !nm.isEmpty();
+    final String pth = path.getText().trim();
+    final IO in = IO.get(pth);
+    final boolean valid = !pth.isEmpty() && in.exists();
+    if(valid) gui.gprop.set(GUIProp.CREATEPATH, pth);
 
-    String inf = !exists ? PATHWHICH : !ok ? DBWHICH : null;
+    final String nm = dbname.getText().trim();
+    ok = valid && !nm.isEmpty();
+
+    String inf = !valid ? PATHWHICH : !ok ? DBWHICH : null;
     Msg icon = Msg.ERROR;
     if(ok) {
-      ok = Command.checkName(nm);
+      ok = Command.validName(nm);
       if(!ok) {
         inf = Util.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
@@ -290,8 +262,10 @@ public final class DialogCreate extends Dialog {
         icon = Msg.WARN;
       }
     }
+    if(ok) gui.gprop.set(GUIProp.CREATENAME, nm);
+
     info.setText(inf, icon);
-    filter.setEnabled(exists && file.isDir());
+    filter.setEnabled(valid && in.isDir());
     enableOK(buttons, BUTTONOK, ok);
   }
 
@@ -309,6 +283,7 @@ public final class DialogCreate extends Dialog {
     gui.set(Prop.ATTRINDEX, atvindex.isSelected());
     gui.set(Prop.FTINDEX, ftxindex.isSelected());
     gui.set(Prop.INTPARSE, intparse.isSelected());
+    gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText().trim() : "");
     ft.close();
   }
 }

@@ -44,7 +44,7 @@ public final class GUIStatus extends BaseXPanel {
    * Sets the status text.
    * @param stat the text to be set
    */
-  void setText(final String stat) {
+  public void setText(final String stat) {
     refresh(stat);
   }
 

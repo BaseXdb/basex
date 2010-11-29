@@ -3,7 +3,6 @@ package org.basex.data;
 import java.util.Arrays;
 import org.basex.util.Array;
 import org.basex.util.IntList;
-import org.basex.util.Util;
 
 /**
  * This class provides a container for query full-text positions,
@@ -16,16 +15,22 @@ import org.basex.util.Util;
 public final class FTPosData {
   /** Position references. */
   private FTPos[] pos = new FTPos[1];
+  /** Data reference. */
+  private Data data;
   /** Number of values. */
   private int size;
 
   /**
    * Adds position data.
+   * @param d data reference
    * @param pre pre value
    * @param all full-text matches
    * @return self reference
    */
-  public FTPosData add(final int pre, final FTMatches all) {
+  public FTPosData add(final Data d, final int pre, final FTMatches all) {
+    if(data == null) data = d;
+    else if(data != d) return this;
+
     final IntList ps = new IntList();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
@@ -47,15 +52,16 @@ public final class FTPosData {
 
   /**
    * Gets full-text data from the container.
-   * If no data is stored for a pre value, null is returned.
+   * If no data is stored for a pre value, {@code null} is returned.
    * int[0] : [pos0, ..., posn]
    * int[1] : [poi0, ..., poin]
+   * @param d data reference
    * @param p int pre value
    * @return int[2][n] full-text data or {@code null}
    */
-  public FTPos get(final int p) {
+  public FTPos get(final Data d, final int p) {
     final int i = find(p);
-    return i < 0 ? null : pos[i];
+    return i < 0 || data != d ? null : pos[i];
   }
 
   /**
@@ -88,15 +94,5 @@ public final class FTPosData {
       else h = m - 1;
     }
     return -l - 1;
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.name(this));
-    for(int i = 0; i < size; ++i) {
-      sb.append(pos[i]);
-      sb.append('\n');
-    }
-    return sb.toString();
   }
 }

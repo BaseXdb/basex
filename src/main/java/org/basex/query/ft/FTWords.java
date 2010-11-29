@@ -51,8 +51,6 @@ public final class FTWords extends FTExpr {
   Data data;
   /** Single word. */
   byte[] txt;
-  /** Fast evaluation. */
-  boolean fast;
 
   /** All matches. */
   FTMatches all = new FTMatches((byte) 0);
@@ -98,7 +96,6 @@ public final class FTWords extends FTExpr {
     super(ii);
     query = str;
     data = d;
-    fast = ctx.ftpos != null;
     comp(ctx);
   }
 
@@ -112,8 +109,7 @@ public final class FTWords extends FTExpr {
       query = query.comp(ctx);
       if(query instanceof Str) txt = ((Str) query).atom();
       simple = mode == FTMode.M_ANY && txt != null && occ == null;
-      fast = ctx.ftfast && occ == null;
-      ftt = new FTTokenizer(this, ctx.ftopt, ctx.resource.context.prop);
+      ftt = new FTTokenizer(this, ctx.ftopt, ctx.context.prop);
     }
     return this;
   }
@@ -128,8 +124,7 @@ public final class FTWords extends FTExpr {
     final int c = contains(ctx);
     if(c == 0) all.size = 0;
     // scoring: pass on number of tokens
-    return new FTNode(all, fast || c == 0 ? 0 : ctx.score.word(c,
-        ctx.fttoken.count()));
+    return new FTNode(all, c == 0 ? 0 : ctx.score.word(c, ctx.fttoken.count()));
   }
 
   @Override
@@ -233,14 +228,12 @@ public final class FTWords extends FTExpr {
    * Adds a match.
    * @param s start position
    * @param e end position
-   * @return fast fast evaluation
    */
-  boolean add(final int s, final int e) {
+  void add(final int s, final int e) {
     // [CG] XQFT: check if this is needed and correct
-    if(!first && (mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS)) all.and(
-        s, e);
+    if(!first && (mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS))
+      all.and(s, e);
     else all.or(s, e);
-    return fast;
   }
 
   /**

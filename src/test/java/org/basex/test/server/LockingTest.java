@@ -68,11 +68,15 @@ public final class LockingTest {
     session2 = createSession();
   }
 
-  /** Stops the server. */
+  /**
+   * Stops the server.
+   * @throws Exception exception
+   */
   @AfterClass
-  public static void stop() {
-    closeSession(session1);
-    closeSession(session2);
+  public static void stop() throws Exception {
+    session1.close();
+    session2.execute(new DropDB(NAME));
+    session2.close();
     // stop server instance
     server.stop();
   }
@@ -83,9 +87,6 @@ public final class LockingTest {
    */
   @Test
   public void createTest() throws BaseXException {
-    // drops database for clean test
-    session1.execute(new DropDB("factbook"));
-
     // second thread
     new Thread() {
       @Override
@@ -105,9 +106,7 @@ public final class LockingTest {
     // opens DB in session2 for further tests
     session2.execute(new Open(NAME));
 
-    if(server.context.datas.pins("factbook") != 2) {
-      fail("test failed conCreate");
-    }
+    if(server.context.datas.pins(NAME) != 2) fail("test failed conCreate");
   }
 
   /**
@@ -222,18 +221,6 @@ public final class LockingTest {
       fail(ex.toString());
     }
     return null;
-  }
-
-  /**
-   * Closes a client session.
-   * @param s session to be closed
-   */
-  static void closeSession(final Session s) {
-    try {
-      s.close();
-    } catch(final IOException ex) {
-      fail(ex.toString());
-    }
   }
 
   /**

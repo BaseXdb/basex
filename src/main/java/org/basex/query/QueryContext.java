@@ -7,32 +7,27 @@ import static org.basex.util.Token.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
-import org.basex.core.User;
-import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.data.SerializerProp;
+import org.basex.io.IO;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.up.Updates;
-import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Variables;
@@ -60,6 +55,10 @@ public final class QueryContext extends Progress {
   /** Namespaces. */
   public Namespaces ns = new Namespaces();
 
+  /** Query resources. */
+  public final QueryResources resource;
+  /** Database context. */
+  public final Context context;
   /** Query string. */
   public String query;
   /** XQuery version flag. */
@@ -72,6 +71,8 @@ public final class QueryContext extends Progress {
 
   /** Reference to the root expression. */
   public Expr root;
+  /** Current context value. */
+  public Value value;
   /** Current context position. */
   public long pos;
   /** Current context size. */
@@ -93,6 +94,8 @@ public final class QueryContext extends Progress {
   public byte[] nsFunc = FNURI;
   /** Default element namespace. */
   public byte[] nsElem = EMPTY;
+  /** Static Base URI. */
+  public Uri baseURI = Uri.EMPTY;
   /** Default collation. */
   public Uri collation = Uri.uri(URLCOLL);
 
@@ -146,19 +149,18 @@ public final class QueryContext extends Progress {
   /** Initial context set (default: null). */
   Nodes nodes;
 
-  /** Query resource. */
-  public QueryResources resource = new QueryResources();
-  
   /**
    * Constructor.
    * @param ctx context reference
    */
   public QueryContext(final Context ctx) {
-    resource.context = ctx;
+    resource = new QueryResources(this);
+    context = ctx;
     nodes = ctx.current;
     ftopt = new FTOpt();
     xquery30 = ctx.prop.is(Prop.XQUERY11);
     inf = ctx.prop.is(Prop.QUERYINFO);
+    if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
   }
 
   /**
@@ -167,7 +169,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void parse(final String q) throws QueryException {
-    root = new QueryParser(q, this).parse(resource.file(), null);
+    root = new QueryParser(q, this).parse(base(), null);
     query = q;
   }
 
@@ -177,74 +179,43 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void module(final String q) throws QueryException {
-    new QueryParser(q, this).parse(resource.file(), Uri.EMPTY);
+    new QueryParser(q, this).parse(base(), Uri.EMPTY);
   }
 
   /**
-   * Optimizes the expression.
+   * Compiles and optimizes the expression.
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
     // add full-text container reference
     if(nodes != null && nodes.ftpos != null) ftpos = new FTPosData();
 
+    // cache the initial context nodes
+    if(nodes != null) resource.compile(nodes);
+
+    // dump compilation info
+    if(inf) compInfo(NL + QUERYCOMP);
+
+    // cache initial context
+    final boolean empty = value == null;
+    if(empty) value = Item.DUMMY;
+
     try {
-      // cache the initial context nodes
-      if(nodes != null) {
-        final Data data = nodes.data;
-        if(!resource.context.perm(User.READ, data.meta))
-          Err.PERMNO.thrw(null, CmdPerm.READ);
-
-        final int s = data.empty() ? 0 : (int) nodes.size();
-        if(nodes.root) {
-          // create document nodes
-          resource.doc = new DBNode[s];
-          for(int n = 0; n < s; ++n) {
-            resource.addDoc(new DBNode(data, nodes.list[n], Data.DOC));
-          }
-        } else {
-          final IntList il = data.doc();
-          for(int p = 0; p < il.size(); p++)
-            resource.addDoc(new DBNode(data, il.get(p), Data.DOC));
-        }
-        resource.rootDocs = resource.docs;
-
-        // create initial context items
-        if(nodes.root) {
-          resource.value = Seq.get(resource.doc, resource.docs);
-        } else {
-          // otherwise, add all context items
-          final ItemIter ir = new ItemIter(s);
-          for(int n = 0; n < s; ++n) ir.add(new DBNode(data, nodes.list[n]));
-          resource.value = ir.finish();
-        }
-        // add default collection
-        resource.addCollection(new NodIter(resource.doc, resource.docs), 
-            token(data.meta.name));
-      }
-
-      // dump compilation info
-      if(inf) compInfo(NL + QUERYCOMP);
-
-      // cache initial context
-      final boolean empty = resource.value == null;
-      if(empty) resource.value = Item.DUMMY;
-
       // compile global functions.
       // variables will be compiled if called for the first time
       funcs.comp(this);
       // compile the expression
       root = root.comp(this);
-      // reset initial context
-      if(empty) resource.value = null;
-
-      // dump resulting query
-      if(inf) info.add(NL + QUERYRESULT + funcs + root + NL);
-
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       XPSTACK.thrw(null);
     }
+
+    // reset initial context
+    if(empty) value = null;
+
+    // dump resulting query
+    if(inf) info.add(NL + QUERYRESULT + funcs + root + NL);
   }
 
   /**
@@ -301,7 +272,7 @@ public final class QueryContext extends Progress {
 
       final Value v = iter.finish();
       updates.apply(this);
-      if(resource.context.data != null) resource.context.update();
+      if(context.data != null) context.update();
       return v.iter(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
@@ -335,13 +306,12 @@ public final class QueryContext extends Progress {
     return e.iter(this);
   }
 
-
-
   /**
    * Copies properties of the specified context.
    * @param ctx context
    */
   public void copy(final QueryContext ctx) {
+    baseURI = ctx.baseURI;
     spaces = ctx.spaces;
     construct = ctx.construct;
     nsInherit = ctx.nsInherit;
@@ -383,6 +353,14 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Returns an IO representation of the base uri.
+   * @return IO reference
+   */
+  IO base() {
+    return baseURI != Uri.EMPTY ? IO.get(string(baseURI.atom())) : null;
+  }
+
+  /**
    * Returns info on query compilation and evaluation.
    * @return query info
    */
@@ -415,6 +393,6 @@ public final class QueryContext extends Progress {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + resource.file() + ']';
+    return Util.name(this) + '[' + base() + ']';
   }
 }

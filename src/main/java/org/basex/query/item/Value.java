@@ -32,13 +32,13 @@ public abstract class Value extends Expr {
   public final ValueIter iter(final QueryContext ctx) {
     return iter();
   }
- 
+
   /**
    * Returns an iterator.
    * @return iterator
    */
   public abstract ValueIter iter();
-  
+
   @Override
   public final Value value(final QueryContext ctx) {
     return this;
