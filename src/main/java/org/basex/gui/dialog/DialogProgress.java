@@ -127,7 +127,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
           // execute command
           final Performance perf = new Performance();
           final DialogProgress wait = new DialogProgress(gui, t, cmd);
-
+          wait.setAlwaysOnTop(true);
           final boolean ok = cmd.run(gui.context);
           final String info = cmd.info();
           wait.dispose();

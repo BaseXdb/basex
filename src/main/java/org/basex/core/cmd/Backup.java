@@ -26,6 +26,8 @@ public final class Backup extends Command {
   /** Date format. */
   private static final SimpleDateFormat DATE = new SimpleDateFormat(
       "yyyy-MM-dd-HH-mm-ss");
+  /** Counter for outstanding files. */
+  private static int of;
 
   /**
    * Default constructor.
@@ -66,6 +68,7 @@ public final class Backup extends Command {
 
       // Process each file
       for(final File f : in.listFiles()) {
+        of++;
         final BufferedInputStream bis = new BufferedInputStream(
             new FileInputStream(f), IO.BLOCKSIZE);
         zos.putNextEntry(new ZipEntry(in.getName() + '/' + f.getName()));
@@ -79,5 +82,20 @@ public final class Backup extends Command {
     } catch(final IOException e) {
       return false;
     }
+  }
+  
+  @Override
+  protected String tit() {
+    return BUTTONBACKUP;
+  }
+  
+  @Override
+  public boolean supportsProg() {
+    return true;
+  }
+  
+  @Override
+  protected double prog() {
+    return (double) of / 10;
   }
 }

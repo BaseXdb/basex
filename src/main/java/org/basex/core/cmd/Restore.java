@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -25,6 +26,10 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class Restore extends Command {
+  
+  /** Counter for outstanding files. */
+  private static int of;
+
   /**
    * Default constructor.
    * @param arg optional argument
@@ -76,6 +81,7 @@ public final class Restore extends Command {
       final byte[] data = new byte[IO.BLOCKSIZE];
       ZipEntry e;
       while((e = zis.getNextEntry()) != null) {
+        of++;
         final String path = pr.get(Prop.DBPATH) + Prop.SEP + e.getName();
         if(e.isDirectory()) {
           new File(path).mkdir();
@@ -115,5 +121,21 @@ public final class Restore extends Command {
     }
     list.sort(false, false);
     return list;
+  }
+  
+  
+  @Override
+  protected String tit() {
+    return BUTTONRESTORE;
+  }
+  
+  @Override
+  public boolean supportsProg() {
+    return true;
+  }
+  
+  @Override
+  protected double prog() {
+    return (double) of / 10;
   }
 }

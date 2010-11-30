@@ -168,17 +168,13 @@ public final class DialogOpen extends Dialog {
         detail.setText(Token.EMPTY);
       }
     } else if(cmp == backup) {
-      final Backup cmd = new Backup(db);
       setCursor(GUIConstants.CURSORWAIT);
-      final boolean success = cmd.run(ctx);
-      Dialog.show(gui, cmd.info(), success);
+      DialogProgress.execute(gui, "", new Backup(db));
       setCursor(GUIConstants.CURSORARROW);
       action(null);
     } else if(cmp == restore) {
-      final Restore cmd = new Restore(db);
       setCursor(GUIConstants.CURSORWAIT);
-      final boolean success = cmd.run(ctx);
-      Dialog.show(gui, cmd.info(), success);
+      DialogProgress.execute(gui, "", new Restore(db));
       setCursor(GUIConstants.CURSORARROW);
       if(db.equals(opendb)) gui.notify.init();
     } else {
