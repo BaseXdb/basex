@@ -169,12 +169,11 @@ public final class DialogOpen extends Dialog {
       }
     } else if(cmp == backup) {
       setCursor(GUIConstants.CURSORWAIT);
-      DialogProgress.execute(gui, "", new Backup(db));
+      DialogProgress.execute(this, "", new Backup(db));
       setCursor(GUIConstants.CURSORARROW);
-      action(null);
     } else if(cmp == restore) {
       setCursor(GUIConstants.CURSORWAIT);
-      DialogProgress.execute(gui, "", new Restore(db));
+      DialogProgress.execute(this, "", new Restore(db));
       setCursor(GUIConstants.CURSORARROW);
       if(db.equals(opendb)) gui.notify.init();
     } else {

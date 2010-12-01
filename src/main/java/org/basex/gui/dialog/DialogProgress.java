@@ -145,4 +145,43 @@ public final class DialogProgress extends Dialog implements ActionListener {
       }
     }.start();
   }
+  
+  /**
+   * Runs the specified commands, decorated by a progress dialog.
+   * @param d dialog window
+   * @param t dialog title
+   * @param cmd commands to be run
+   */
+  public static void execute(final Dialog d, final String t,
+      final Command cmd) {
+ // start database creation thread
+    new Thread() {
+    @Override
+    public void run() {
+        if(cmd.newData()) {
+          new Close().run(d.gui.context);
+          d.gui.notify.init();
+        }
+
+        // execute command
+        final Performance perf = new Performance();
+        final DialogProgress wait = new DialogProgress(d.gui, t, cmd);
+        wait.setAlwaysOnTop(true);
+        final boolean ok = cmd.run(d.gui.context);
+        final String info = cmd.info();
+        wait.dispose();
+
+        final String time = perf.toString();
+        d.gui.info.setInfo(info, cmd, time, ok);
+        d.gui.info.reset();
+        d.gui.status.setText(Util.info(PROCTIME, time));
+        if(!ok) Dialog.error(d.gui, info.equals(PROGERR) ? CANCELCREATE : info);
+
+        // initialize views
+        if(cmd.newData()) d.gui.notify.init();
+        else if(cmd.updating(d.gui.context)) d.gui.notify.update();
+        d.action(null);
+    }
+  }.start();
+  }
 }
