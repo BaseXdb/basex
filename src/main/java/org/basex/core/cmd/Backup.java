@@ -65,7 +65,7 @@ public final class Backup extends Command {
           new FileOutputStream(out)));
       zos.putNextEntry(new ZipEntry(in.getName() + "/"));
       zos.closeEntry();
-
+      of = 0;
       // Process each file
       for(final File f : in.listFiles()) {
         of++;

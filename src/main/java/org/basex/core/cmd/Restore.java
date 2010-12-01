@@ -80,6 +80,7 @@ public final class Restore extends Command {
       final ZipInputStream zis = new ZipInputStream(is);
       final byte[] data = new byte[IO.BLOCKSIZE];
       ZipEntry e;
+      of = 0;
       while((e = zis.getNextEntry()) != null) {
         of++;
         final String path = pr.get(Prop.DBPATH) + Prop.SEP + e.getName();
