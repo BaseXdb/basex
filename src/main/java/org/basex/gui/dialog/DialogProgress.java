@@ -22,7 +22,7 @@ import org.basex.util.Util;
 
 /**
  * Dialog window for displaying the progress of a command execution.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -118,34 +118,44 @@ public final class DialogProgress extends Dialog implements ActionListener {
     new Thread() {
       @Override
       public void run() {
-        for(final Command cmd : cmds) {
-          if(cmd.newData()) {
-            new Close().run(gui.context);
-            gui.notify.init();
-          }
-
-          // execute command
-          final Performance perf = new Performance();
-          final DialogProgress wait = new DialogProgress(gui, t, cmd);
-          wait.setAlwaysOnTop(true);
-          final boolean ok = cmd.run(gui.context);
-          final String info = cmd.info();
-          wait.dispose();
-
-          final String time = perf.toString();
-          gui.info.setInfo(info, cmd, time, ok);
-          gui.info.reset();
-          gui.status.setText(Util.info(PROCTIME, time));
-          if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
-
-          // initialize views
-          if(cmd.newData()) gui.notify.init();
-          else if(cmd.updating(gui.context)) gui.notify.update();
-        }
+        exec(gui, t, cmds);
       }
     }.start();
   }
-  
+
+  /**
+   * Runs the specified commands, decorated by a progress dialog.
+   * @param gui reference to the main window
+   * @param t dialog title
+   * @param cmds commands to be run
+   */
+  static void exec(final GUI gui, final String t, final Command... cmds) {
+    for(final Command cmd : cmds) {
+      if(cmd.newData()) {
+        new Close().run(gui.context);
+        gui.notify.init();
+      }
+
+      // execute command
+      final Performance perf = new Performance();
+      final DialogProgress wait = new DialogProgress(gui, t, cmd);
+      wait.setAlwaysOnTop(true);
+      final boolean ok = cmd.run(gui.context);
+      final String info = cmd.info();
+      wait.dispose();
+
+      final String time = perf.toString();
+      gui.info.setInfo(info, cmd, time, ok);
+      gui.info.reset();
+      gui.status.setText(Util.info(PROCTIME, time));
+      if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
+
+      // initialize views
+      if(cmd.newData()) gui.notify.init();
+      else if(cmd.updating(gui.context)) gui.notify.update();
+    }
+  }
+
   /**
    * Runs the specified commands, decorated by a progress dialog.
    * @param d dialog window
@@ -154,34 +164,13 @@ public final class DialogProgress extends Dialog implements ActionListener {
    */
   public static void execute(final Dialog d, final String t,
       final Command cmd) {
- // start database creation thread
+    // start database creation thread
     new Thread() {
-    @Override
-    public void run() {
-        if(cmd.newData()) {
-          new Close().run(d.gui.context);
-          d.gui.notify.init();
-        }
-
-        // execute command
-        final Performance perf = new Performance();
-        final DialogProgress wait = new DialogProgress(d.gui, t, cmd);
-        wait.setAlwaysOnTop(true);
-        final boolean ok = cmd.run(d.gui.context);
-        final String info = cmd.info();
-        wait.dispose();
-
-        final String time = perf.toString();
-        d.gui.info.setInfo(info, cmd, time, ok);
-        d.gui.info.reset();
-        d.gui.status.setText(Util.info(PROCTIME, time));
-        if(!ok) Dialog.error(d.gui, info.equals(PROGERR) ? CANCELCREATE : info);
-
-        // initialize views
-        if(cmd.newData()) d.gui.notify.init();
-        else if(cmd.updating(d.gui.context)) d.gui.notify.update();
+      @Override
+      public void run() {
+        exec(d.gui, t, cmd);
         d.action(null);
-    }
-  }.start();
+      }
+    }.start();
   }
 }
