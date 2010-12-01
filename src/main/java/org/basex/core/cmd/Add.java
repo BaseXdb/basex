@@ -29,6 +29,10 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class Add extends ACreate {
+  
+  /** Builder. */
+  static MemBuilder build;
+  
   /**
    * Default constructor.
    * @param input input XML file or XML string
@@ -138,7 +142,8 @@ public final class Add extends ACreate {
     final String path = target + (target.isEmpty() ? "" : "/") + name;
     final Performance p = new Performance();
     try {
-      final MemData md = MemBuilder.build(parser, ctx.prop, path);
+      build = new MemBuilder(parser, ctx.prop);
+      final MemData md = build.build(path);
       ctx.data.insert(ctx.data.meta.size, -1, md);
       ctx.data.flush();
       ctx.update();
@@ -147,5 +152,15 @@ public final class Add extends ACreate {
       Util.debug(ex);
       throw new BaseXException(ex);
     }
+  }
+  
+  @Override
+  protected String tit() {
+    return BUTTONADD;
+  }
+  
+  @Override
+  protected double prog() {
+    return build.prog();
   }
 }
