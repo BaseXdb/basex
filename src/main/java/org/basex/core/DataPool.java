@@ -2,60 +2,61 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.basex.data.Data;
-import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
  * This class organizes all currently opened database.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class DataPool {
-  /** Data references. */
-  private Data[] data = new Data[1];
-  /** Number of current database users. */
-  private int[] pins = new int[1];
-  /** Number of data references. */
-  private int size;
+
+  /** List for data and pins. */
+  List<PData> list = Collections.synchronizedList(new ArrayList<PData>());
 
   /**
-   * Pins and returns an existing data reference for the specified
-   * database, or returns null.
+   * Pins and returns an existing data reference for the specified database, or
+   * returns null.
    * @param db name of the database
    * @return data reference
    */
   Data pin(final String db) {
-    for(int i = 0; i < size; ++i) {
-      if(data[i].meta.name.equals(db)) {
-        pins[i]++;
-        return data[i];
+    synchronized(list) {
+      for(PData d : list) {
+        if(d.data.meta.name.equals(db)) {
+          d.pins++;
+          return d.data;
+        }
       }
+      return null;
     }
-    return null;
   }
 
   /**
    * Unpins a data reference.
-   * @param d data reference
+   * @param data data reference
    * @return true if reference was removed from the pool
    */
-  boolean unpin(final Data d) {
-    for(int i = 0; i < size; ++i) {
-      if(data[i] == d) {
-        final boolean close = --pins[i] == 0;
-        if(close) {
-          Array.move(data, i + 1, -1, size - i - 1);
-          Array.move(pins, i + 1, -1, size - i - 1);
-          --size;
+  boolean unpin(final Data data) {
+    synchronized(list) {
+      for(PData d : list) {
+        if(d.data == data) {
+          final boolean close = --d.pins == 0;
+          if(close) {
+            list.remove(d);
+          }
+          return close;
         }
-        return close;
       }
+      return false;
     }
-    return false;
   }
 
   /**
@@ -64,8 +65,11 @@ public final class DataPool {
    * @return result of check
    */
   boolean pinned(final String db) {
-    for(int i = 0; i < size; ++i) if(data[i].meta.name.equals(db)) return true;
-    return false;
+    synchronized(list) {
+      for(PData d : list)
+        if(d.data.meta.name.equals(db)) return true;
+      return false;
+    }
   }
 
   /**
@@ -73,12 +77,7 @@ public final class DataPool {
    * @param d data reference
    */
   void add(final Data d) {
-    if(size == data.length) {
-      data = Arrays.copyOf(data, size << 1);
-      pins = Arrays.copyOf(pins, size << 1);
-    }
-    data[size] = d;
-    pins[size++] = 1;
+    list.add(new PData(d));
   }
 
   /**
@@ -87,10 +86,10 @@ public final class DataPool {
    */
   public String info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(SRVDATABASES, size);
-    tb.add(size != 0 ? COL : DOT);
-    for(int i = 0; i < size; ++i) {
-      tb.add(NL + LI + data[i].meta.name + " (" + pins[i] + "x)");
+    tb.addExt(SRVDATABASES, list.size());
+    tb.add(list.size() != 0 ? COL : DOT);
+    for(PData d : list) {
+      tb.add(NL + LI + d.data.meta.name + " (" + d.pins + "x)");
     }
     return tb.toString();
   }
@@ -99,24 +98,50 @@ public final class DataPool {
    * Closes all data references.
    */
   void close() {
-    try {
-      for(int i = 0; i < size; ++i) data[i].close();
-    } catch(final IOException ex) {
-      Util.debug(ex);
+    synchronized(list) {
+      try {
+        for(PData d : list)
+          d.data.close();
+      } catch(final IOException ex) {
+        Util.debug(ex);
+      }
     }
-    size = 0;
+    list.clear();
   }
 
   /**
-   * Returns the number of pins for the specified database, or 0.
-   * Used for testing.
+   * Returns the number of pins for the specified database, or 0. Used for
+   * testing.
    * @param db name of the database
    * @return number of references
    */
   public int pins(final String db) {
-    for(int i = 0; i < size; ++i) {
-      if(data[i].meta.name.equals(db)) return pins[i];
+    for(PData d : list) {
+      if(d.data.meta.name.equals(db)) return d.pins;
     }
     return 0;
+  }
+
+  /**
+   * Inner class for a data object in the pool.
+   * 
+   * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+   * @author Andreas Weiler
+   */
+  private final class PData {
+
+    /** Number of current database users. */
+    int pins;
+    /** Data reference. */
+    Data data;
+
+    /**
+     * Default constructor.
+     * @param d data reference
+     */
+    PData(final Data d) {
+      pins = 1;
+      data = d;
+    }
   }
 }
