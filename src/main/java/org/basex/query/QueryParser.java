@@ -2295,16 +2295,19 @@ public class QueryParser extends InputParser {
   private FTExpr ftSelection(final boolean prg) throws QueryException {
     FTExpr expr = ftOr(prg);
     FTExpr old;
+    FTExpr first = null;
+    boolean ordered = false;
     do {
       old = expr;
       if(consumeWS(ORDERED)) {
-        expr = new FTOrder(input(), expr);
+        ordered = true;
+        old = null;
       } else if(consumeWS(WINDOW)) {
         expr = new FTWindow(input(), expr, additive(), ftUnit());
       } else if(consumeWS(DISTANCE)) {
-        final Expr[] r = ftRange();
-        if(r == null) error(FTRANGE);
-        expr = new FTDistance(input(), expr, r, ftUnit());
+        final Expr[] rng = ftRange();
+        if(rng == null) error(FTRANGE);
+        expr = new FTDistance(input(), expr, rng, ftUnit());
       } else if(consumeWS(AT)) {
         final boolean start = consumeWS(START);
         final boolean end = !start && consumeWS(END);
@@ -2324,7 +2327,13 @@ public class QueryParser extends InputParser {
           expr = new FTScope(input(), expr, unit, same);
         }
       }
+      if(first == null && old != null && old != expr) first = expr;
     } while(old != expr);
+
+    if(ordered) {
+      if(first == null) return new FTOrder(input(), expr);
+      first.expr[0] = new FTOrder(input(), first.expr[0]);
+    }
     return expr;
   }
 

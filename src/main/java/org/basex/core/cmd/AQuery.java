@@ -106,7 +106,7 @@ abstract class AQuery extends Command {
         prnt += per.getTime();
       }
       // dump some query info
-      if(prop.is(Prop.QUERYINFO)) evalInfo(hits, updates, runs);
+      if(prop.is(Prop.QUERYINFO)) evalInfo(query, hits, updates, runs);
       out.flush();
       return info(NL + QUERYEXEC, perf.getTimer(runs));
     } catch(final QueryException ex) {
@@ -124,7 +124,7 @@ abstract class AQuery extends Command {
     error(err);
     if(Util.debug) {
       info(NL);
-      info(QUERYSTRING + qp.query());
+      info(QUERYSTRING + query);
       info(qp.info());
     }
     return false;
@@ -159,13 +159,16 @@ abstract class AQuery extends Command {
 
   /**
    * Adds evaluation information to the information string.
+   * @param query query string
    * @param hits information
    * @param updates updated items
    * @param runs number of runs
    */
-  private void evalInfo(final long hits, final long updates, final int runs) {
+  private void evalInfo(final String query, final long hits, final long updates,
+      final int runs) {
+
     info(NL);
-    info(QUERYSTRING + qp.query());
+    info(QUERYSTRING + query);
     info(qp.info());
     info(QUERYPARSE + Performance.getTimer(pars, runs));
     info(QUERYCOMPILE + Performance.getTimer(comp, runs));

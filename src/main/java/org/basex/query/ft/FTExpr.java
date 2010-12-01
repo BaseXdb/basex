@@ -21,7 +21,7 @@ import org.basex.util.InputInfo;
  */
 public abstract class FTExpr extends ParseExpr {
   /** Expression list. */
-  protected final FTExpr[] expr;
+  public final FTExpr[] expr;
 
   /**
    * Constructor.
