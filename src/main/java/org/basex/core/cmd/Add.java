@@ -29,9 +29,8 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class Add extends ACreate {
-  
   /** Builder. */
-  static MemBuilder build;
+  private MemBuilder build;
   
   /**
    * Default constructor.
@@ -88,7 +87,7 @@ public final class Add extends ACreate {
     String trg = path(args[2]);
     final DirParser p = new DirParser(io, context.prop, trg);
     try {
-      return info(add(p, context, trg, name));
+      return info(add(p, context, trg, name, this));
     } catch(final BaseXException ex) {
       return error(ex.getMessage());
     }
@@ -106,11 +105,13 @@ public final class Add extends ACreate {
    * @param target target. If {@code null}, target will be set to root
    * @param input XML input stream
    * @param ctx database context
+   * @param cmd calling command
    * @return info string
    * @throws BaseXException database exception
    */
   public static String add(final String name, final String target,
-      final InputStream input, final Context ctx) throws BaseXException {
+      final InputStream input, final Context ctx, final Add cmd)
+      throws BaseXException {
 
     final Data data = ctx.data;
     if(data == null) return PROCNODB;
@@ -121,7 +122,7 @@ public final class Add extends ACreate {
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
     try {
       ctx.lock.before(true);
-      return add(parser, ctx, trg, name);
+      return add(parser, ctx, trg, name, cmd);
     } finally {
       ctx.lock.after(true);
     }
@@ -133,16 +134,19 @@ public final class Add extends ACreate {
    * @param ctx database context
    * @param target target
    * @param name name
+   * @param cmd calling command
    * @return info string
    * @throws BaseXException database exception
    */
   private static String add(final Parser parser, final Context ctx,
-      final String target, final String name) throws BaseXException {
+      final String target, final String name, final Add cmd)
+      throws BaseXException {
 
     final String path = target + (target.isEmpty() ? "" : "/") + name;
     final Performance p = new Performance();
     try {
-      build = new MemBuilder(parser, ctx.prop);
+      final MemBuilder build = new MemBuilder(parser, ctx.prop);
+      if(cmd != null) cmd.build = build;
       final MemData md = build.build(path);
       ctx.data.insert(ctx.data.meta.size, -1, md);
       ctx.data.flush();
@@ -161,6 +165,6 @@ public final class Add extends ACreate {
   
   @Override
   protected double prog() {
-    return build.prog();
+    return build != null ? build.prog() : 0;
   }
 }

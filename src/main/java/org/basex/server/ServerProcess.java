@@ -230,7 +230,7 @@ public final class ServerProcess extends Thread {
       final String name = in.readString();
       final String path = in.readString();
       final WrapInputStream is = new WrapInputStream(in);
-      final String info = Add.add(name, path, is, context);
+      final String info = Add.add(name, path, is, context, null);
       // send {MSG}0 and 0 as success flag
       out.writeString(info);
       out.write(0);

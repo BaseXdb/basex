@@ -26,9 +26,10 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class Restore extends Command {
-  
   /** Counter for outstanding files. */
-  private static int of;
+  private int of;
+  /** Counter of total files. */
+  private int tf;
 
   /**
    * Default constructor.
@@ -74,13 +75,19 @@ public final class Restore extends Command {
    * @param pr database properties
    * @return success flag
    */
-  public static boolean restore(final File file, final Prop pr) {
+  private boolean restore(final File file, final Prop pr) {
     try {
-      final InputStream is = new BufferedInputStream(new FileInputStream(file));
-      final ZipInputStream zis = new ZipInputStream(is);
+      // count number of files
+      InputStream is = new BufferedInputStream(new FileInputStream(file));
+      ZipInputStream zis = new ZipInputStream(is);
+      while(zis.getNextEntry() != null) tf++;
+      zis.close();
+      // reopen zip stream
+      is = new BufferedInputStream(new FileInputStream(file));
+      zis = new ZipInputStream(is);
+      
       final byte[] data = new byte[IO.BLOCKSIZE];
       ZipEntry e;
-      of = 0;
       while((e = zis.getNextEntry()) != null) {
         of++;
         final String path = pr.get(Prop.DBPATH) + Prop.SEP + e.getName();
@@ -137,6 +144,6 @@ public final class Restore extends Command {
   
   @Override
   protected double prog() {
-    return (double) of / 10;
+    return (double) of / tf;
   }
 }

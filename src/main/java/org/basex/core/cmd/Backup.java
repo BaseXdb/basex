@@ -27,7 +27,9 @@ public final class Backup extends Command {
   private static final SimpleDateFormat DATE = new SimpleDateFormat(
       "yyyy-MM-dd-HH-mm-ss");
   /** Counter for outstanding files. */
-  private static int of;
+  private int of;
+  /** Counter of total files. */
+  private int tf;
 
   /**
    * Default constructor.
@@ -53,21 +55,23 @@ public final class Backup extends Command {
    * @param pr database properties
    * @return success flag
    */
-  public static boolean backup(final String db, final Prop pr) {
+  private boolean backup(final String db, final Prop pr) {
     try {
       final File in = pr.dbpath(db);
-      final File out = new File(pr.get(Prop.DBPATH) + Prop.SEP + db + "-" +
+      final File file = new File(pr.get(Prop.DBPATH) + Prop.SEP + db + "-" +
           DATE.format(new Date()) + IO.ZIPSUFFIX);
       final byte[] data = new byte[IO.BLOCKSIZE];
 
       // OutputStream for zipping
       final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(
-          new FileOutputStream(out)));
+          new FileOutputStream(file)));
       zos.putNextEntry(new ZipEntry(in.getName() + "/"));
       zos.closeEntry();
-      of = 0;
+
       // Process each file
-      for(final File f : in.listFiles()) {
+      final File[] files = in.listFiles();
+      tf = files.length;
+      for(final File f : files) {
         of++;
         final BufferedInputStream bis = new BufferedInputStream(
             new FileInputStream(f), IO.BLOCKSIZE);
@@ -96,6 +100,6 @@ public final class Backup extends Command {
   
   @Override
   protected double prog() {
-    return (double) of / 10;
+    return (double) of / tf;
   }
 }
