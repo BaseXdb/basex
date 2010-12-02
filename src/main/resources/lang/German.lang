@@ -124,6 +124,7 @@ dfs_meta=Importiere Meta-Daten
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Datenbank umbenennen
+dr_title2=Dokumente löschen
 dr_over=Alte Datenbank wird überschrieben
 dr_overbacking=Alte Datenbank, sowie DeepFS Hilfsspeicher werden überschrieben
 
@@ -269,6 +270,8 @@ c_props=Eigenschaften
 c_propstt=Zeigt Informationen über die aktuelle Datenbank an.
 c_add=Dokumente hinzufügen
 c_addtt=Fügt der aktuell geöffneten Datenbank Dokumente.
+c_drop=Dokumente löschen
+c_droptt=Löscht Dokumente aus der aktuell geöffneten Datenbank.
 c_insert=Neu
 c_inserttt=Erzeugt einen neuen XML-Knoten.
 c_maplayout=Map-Layout

@@ -21,7 +21,7 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class DialogRename extends Dialog {
+public class DialogRename extends Dialog {
   /** New name. */
   private final BaseXTextField name;
   /** Old name. */
@@ -32,18 +32,25 @@ final class DialogRename extends Dialog {
   private final BaseXLabel info;
   /** Available databases. */
   private final StringList db;
+  /** Rename or delete dialog. */
+  private final boolean wd;
+  /** Target of delete. */
+  private String target = "";
 
   /**
    * Default constructor.
    * @param dbname name of database
+   * @param tit title string
    * @param main reference to the main window
    * @param fs file system flag
+   * @param w flag for type of dialog
    */
-  DialogRename(final String dbname, final GUI main, final boolean fs) {
-    super(main, RENAMETITLE);
+  public DialogRename(final String dbname, final String tit, final GUI main,
+      final boolean fs, final boolean w) {
+    super(main, tit);
     old = dbname;
     db = fs ? List.listFS(main.context) : List.list(main.context);
-
+    wd = w;
     set(new BaseXLabel(CREATENAME, false, true).border(0, 0, 4, 0),
         BorderLayout.NORTH);
 
@@ -71,12 +78,13 @@ final class DialogRename extends Dialog {
    * Returns the edited database name.
    * @return name
    */
-  String name() {
+  public String name() {
     return name.getText().trim();
   }
 
   @Override
   public void action(final Object cmp) {
+    if(wd) {
     final String nm = name();
     ok = !db.contains(nm) || nm.equals(old);
     String msg = ok ? null : Util.info(DBEXISTS, nm);
@@ -86,6 +94,11 @@ final class DialogRename extends Dialog {
     }
     info.setText(msg, Msg.ERROR);
     enableOK(buttons, BUTTONOK, ok && !nm.isEmpty());
+    } else {
+      target = name();
+      ok = !target.isEmpty();
+      enableOK(buttons, BUTTONOK, ok);
+    }
   }
 
   @Override

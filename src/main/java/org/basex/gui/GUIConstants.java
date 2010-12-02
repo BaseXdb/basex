@@ -98,20 +98,24 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-      Text.MENUFILE, Text.MENUEDIT, Text.MENUVIEW, Text.MENUOPTIONS,
-      Text.MENUDEEPFS, Text.MENUHELP };
+      Text.MENUFILE, Text.MENUDB, Text.MENUEDIT, Text.MENUVIEW,
+      Text.MENUOPTIONS, Text.MENUDEEPFS, Text.MENUHELP };
 
   /** Separator. */
   static final String SEPARATOR = "-";
 
   /** Two-dimensional Menu entries, containing the menu item commands. */
   static final Object[][] MENUITEMS = { {
-    MENUDB, CREATE, OPEN, INFO, ADD, EXPORT, MANAGE, CLOSE, SEPARATOR,
+    MENUDB, CREATE, OPEN, MANAGE, SEPARATOR,
     XQUERYTIT + COL,
     XQOPEN, XQSAVE, XQSAVEAS, SEPARATOR,
     SERVER, Prop.MAC ? null : SEPARATOR,
     Prop.MAC ? null : EXIT
-  }, {
+  },
+  {
+    INFO, ADD, DROP, EXPORT, CLOSE
+  },
+  {
     COPY, PASTE, DELETE, INSERT, EDIT, SEPARATOR,
     SHOWXQUERY, SHOWINFO, SEPARATOR,
     COPYPATH, FILTER

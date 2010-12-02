@@ -124,6 +124,7 @@ dfs_meta=Includi i metadati
 dfs_nodefaultapp=Non esiste alcuna applicazione per aprire questo tipo di documenti
 
 dr_title=Rinomina la base di dati
+dr_title2=Delete documents
 dr_over=La vecchia base di dati verrà sovrascritta
 dr_overbacking=La vecchia base di dati e la memoria di appoggio verranno sovrascritti
 
@@ -269,6 +270,8 @@ c_props=Informazioni
 c_propstt=Mostra le informazioni sulla base di dati attualmente in uso.
 c_add=Add documents
 c_addtt=Adds documents to the currently opened database.
+c_drop=Delete documents
+c_droptt=Delete documents from the currently opened database.
 c_insert=Nuovo
 c_inserttt=Crea un nuovo nodo XML.
 c_maplayout=Disposizione della mappa

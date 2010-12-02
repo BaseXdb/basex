@@ -817,6 +817,10 @@ public interface Text {
   /** Command info. */
   String GUIADDTT = lang("c_addtt");
   /** Command info. */
+  String GUIDROP = lang("c_drop");
+  /** Command info. */
+  String GUIDROPTT = lang("c_droptt");
+  /** Command info. */
   String GUIINSERT = lang("c_insert");
   /** Command info. */
   String GUIINSERTTT = lang("c_inserttt");
@@ -1213,6 +1217,8 @@ public interface Text {
 
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");
+  /** Dialog title for dropping documents. */
+  String DROPTITLE = lang("dr_title2");
   /** Info for overwriting a database. */
   String RENAMEOVER = lang("dr_over") + DOT;
   /** Info for overwriting a database and deleting backing store. */

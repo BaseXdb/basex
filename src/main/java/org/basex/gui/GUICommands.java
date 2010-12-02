@@ -18,6 +18,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateFS;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.Cs;
+import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.Export;
 import org.basex.core.cmd.Mount;
@@ -43,6 +44,7 @@ import org.basex.gui.dialog.DialogMountFS;
 import org.basex.gui.dialog.DialogOpen;
 import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
+import org.basex.gui.dialog.DialogRename;
 import org.basex.gui.dialog.DialogServer;
 import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.layout.BaseXFileChooser;
@@ -141,6 +143,17 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogAdd dialog = new DialogAdd(gui);
       if(dialog.ok()) DialogProgress.execute(gui, "", dialog.cmd());
+    }
+  },
+  
+  /** Shows delete a document dialog. */
+  DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
+    @Override
+    public void execute(final GUI gui) {
+      final DialogRename dialog = new DialogRename("", DROPTITLE, gui,
+          false, false);
+      if(dialog.ok()) DialogProgress.execute(gui, "",
+          new Delete(dialog.name()));
     }
   },
 

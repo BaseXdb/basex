@@ -124,6 +124,7 @@ dfs_meta=メタデータを含める
 dfs_nodefaultapp=このファイルタイプを開くためのデフォルトアプリケーションが登録されていません。
 
 dr_title=データベースの名前を変更
+dr_title2=Delete documents
 dr_over=古いデータベースは上書きされます。
 dr_overbacking=古いデータベースは上書きされます。(backing store will be deleted, too)
 
@@ -269,6 +270,8 @@ c_props=情報
 c_propstt=現在選択されているデータベースについての情報を表示します
 c_add=Add documents
 c_addtt=Adds documents to the currently opened database.。
+c_drop=Delete documents
+c_droptt=Delete documents from the currently opened database.
 c_insert=新規
 c_inserttt=新しいXMLノードを作成します。
 c_maplayout=マップレイアウト

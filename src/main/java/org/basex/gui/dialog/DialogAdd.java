@@ -99,6 +99,7 @@ public class DialogAdd extends Dialog {
     info.setText(null, null);
     if(!name.getText().isEmpty() &&
         !Command.validName(name.getText())) inf = Util.info(INVALID, EDITNAME);
+    if(io.isDir()) name.setEnabled(false);
     if(!inf.equals("")) {
       ok = false;
       info.setText(inf, Msg.ERROR);

@@ -124,6 +124,7 @@ dfs_meta=Bao gồm metadata
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Đổi tên cơ sở dữ liệu
+dr_title2=Delete documents
 dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè
 dr_overbacking=Cơ sở dữ liệu cũ và dự phòng sẽ bị ghi đè
 
@@ -269,6 +270,8 @@ c_props=Thông tin
 c_propstt=Hiển thị thông tin trên cơ sở dữ liệu đang mở.
 c_add=Add documents
 c_addtt=Adds documents to the currently opened database.
+c_drop=Delete documents
+c_droptt=Delete documents from the currently opened database.
 c_insert=Mới
 c_inserttt=Tạo một nút XML mới.
 c_maplayout=Bố cục bản đồ

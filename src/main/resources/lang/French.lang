@@ -124,6 +124,7 @@ dfs_meta=Inclure métadonnées
 dfs_nodefaultapp=Aucune application par défaut définie pour ouvrir ce type de fichier
 
 dr_title=Renommer la base de données
+dr_title2=Delete documents
 dr_over=La base de données existante va être remplacée
 dr_overbacking=La base de données existante et la sauvegarde vont être remplacées
 
@@ -269,6 +270,8 @@ c_props=Propriétés
 c_propstt=Montrer les informations de la base de données actuellement ouverte.
 c_add=Add documents
 c_addtt=Adds documents to the currently opened database.
+c_drop=Delete documents
+c_droptt=Delete documents from the currently opened database.
 c_insert=Nouveau
 c_inserttt=Crée un nouveau noeud XML.
 c_maplayout=Disposition de la carte

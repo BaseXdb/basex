@@ -142,7 +142,8 @@ public final class DialogOpen extends Dialog {
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
-      final DialogRename dr = new DialogRename(db, gui, fsInstance);
+      final DialogRename dr = new DialogRename(db, RENAMETITLE, gui,
+          fsInstance, true);
       if(!dr.ok() || dr.name().equals(db)) return;
       final AlterDB cmd = new AlterDB(db, dr.name());
       if(cmd.run(ctx)) {

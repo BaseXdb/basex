@@ -124,6 +124,7 @@ dfs_meta=Include metadata
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Hernoem Database
+dr_title2=Delete documents
 dr_over=Oude database wordt overschreven
 dr_overbacking=Oude database en 'backing store' worden overschreven
 
@@ -269,6 +270,8 @@ c_props=Eigenschappen
 c_propstt=Toon informatie over de geopende database.
 c_add=Add documents
 c_addtt=Adds documents to the currently opened database.
+c_drop=Delete documents
+c_droptt=Delete documents from the currently opened database.
 c_insert=Nieuw
 c_inserttt=Maakt een nieuwe XML node.
 c_maplayout=Map Layout
