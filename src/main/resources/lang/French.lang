@@ -62,6 +62,7 @@ d_fctitle=Choisir dossier
 dc_choose=Fichier ou dossier source
 dc_pattern=File patterns (separated by commas)
 dc_name=Nom de la base de données
+dc_name2=Document Path
 dc_xmldesc=Documents XML
 dc_zipdesc=Documents XML zippés
 dc_gzdesc=Documents XML GZippés

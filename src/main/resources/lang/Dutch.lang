@@ -62,6 +62,7 @@ d_fctitle=Kies Folder
 dc_choose=Input bestand of folder
 dc_pattern=Bestands patronen (gescheiden door komma's)
 dc_name=Naam van Database
+dc_name2=Document Path
 dc_xmldesc=XML Documenten
 dc_zipdesc=ge-Zipte XML Documenten
 dc_gzdesc=ge-GZipte XML Documenten

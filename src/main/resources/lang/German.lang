@@ -62,6 +62,7 @@ d_fctitle=Verzeichnis
 dc_choose=XML-Dokument oder Verzeichnis
 dc_pattern=Dateimuster (getrennt mit Kommas)
 dc_name=Name der Datenbank
+dc_name2=Dokument Pfad
 dc_xmldesc=XML-Dokumente
 dc_zipdesc=Gezippte XML-Dokumente
 dc_gzdesc=Gezippte XML-Dokumente

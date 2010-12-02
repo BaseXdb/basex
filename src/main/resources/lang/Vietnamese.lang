@@ -62,6 +62,7 @@ d_fctitle=Chọn thư mục
 dc_choose=Nhập vào tệp hoặc thư mục
 dc_pattern=File patterns (separated by commas)
 dc_name=Tện cơ sở dữ liệu
+dc_name2=Document Path
 dc_xmldesc=Văn bản XML
 dc_zipdesc=Văn bản XML nén Zip
 dc_gzdesc=Văn bản XML nén GZip

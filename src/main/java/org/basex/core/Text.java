@@ -716,7 +716,7 @@ public interface Text {
   String MENUHELP = lang("m_help");
 
   /** Menu label. */
-  String MENUDB = lang("m_db") + COL;
+  String MENUDB = lang("m_db");
   /** Menu label. */
   String MENUMAIN = lang("m_main") + COL;
   /** Menu label. */
@@ -1036,6 +1036,8 @@ public interface Text {
   String CREATEPATTERN = lang("dc_pattern");
   /** Dialog title for creating a database. */
   String CREATENAME = lang("dc_name") + COLS;
+  /** Dialog title for creating a database. */
+  String CREATENAME2 = lang("dc_name2") + COLS;
   /** XML file description. */
   String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
   /** ZIP file description. */
