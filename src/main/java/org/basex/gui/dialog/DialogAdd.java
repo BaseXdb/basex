@@ -48,6 +48,7 @@ public class DialogAdd extends Dialog {
     pp.add(new BaseXLabel(CREATETITLE));
     pp.add(new BaseXLabel(" "));
     file = new BaseXTextField(this);
+    file.addKeyListener(keys);
     pp.add(file);
     final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
     browse.addActionListener(new ActionListener() {
@@ -88,10 +89,12 @@ public class DialogAdd extends Dialog {
     final IO io = new BaseXFileChooser(DIALOGFC, path.getText(), gui).
       select(BaseXFileChooser.Mode.FDOPEN);
     if(io != null) file.setText(io.path());
+    action(null);
   }
 
   @Override
   public void action(final Object cmp) {
+    name.setEnabled(true);
     ok = true;
     final IO io = IO.get(file.getText());
     final boolean exists = !file.getText().isEmpty() && io.exists();
