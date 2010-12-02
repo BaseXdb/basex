@@ -126,6 +126,7 @@ dfs_nodefaultapp=No default application is registered to open this file type
 dr_title=Datenbank umbenennen
 dr_title2=Dokumente löschen
 dr_over=Alte Datenbank wird überschrieben
+dr_empty=Eine leere Datenbank wird erstellt
 dr_overbacking=Alte Datenbank, sowie DeepFS Hilfsspeicher werden überschrieben
 
 dd_title=Datenbankmanagement

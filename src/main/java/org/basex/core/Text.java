@@ -1221,6 +1221,8 @@ public interface Text {
   String DROPTITLE = lang("dr_title2");
   /** Info for overwriting a database. */
   String RENAMEOVER = lang("dr_over") + DOT;
+  /** Info for creating an empty database. */
+  String EMPTYDATABASE = lang("dr_empty") + DOT;
   /** Info for overwriting a database and deleting backing store. */
   String RENAMEOVERBACKING = lang("dr_overbacking") + DOT;
 

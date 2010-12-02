@@ -126,6 +126,7 @@ dfs_nodefaultapp=このファイルタイプを開くためのデフォルトア
 dr_title=データベースの名前を変更
 dr_title2=Delete documents
 dr_over=古いデータベースは上書きされます。
+dr_empty=An empty database will be created
 dr_overbacking=古いデータベースは上書きされます。(backing store will be deleted, too)
 
 dd_title=Manage Databases

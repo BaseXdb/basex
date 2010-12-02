@@ -126,6 +126,7 @@ dfs_nodefaultapp=No default application is registered to open this file type
 dr_title=Đổi tên cơ sở dữ liệu
 dr_title2=Delete documents
 dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè
+dr_empty=An empty database will be created
 dr_overbacking=Cơ sở dữ liệu cũ và dự phòng sẽ bị ghi đè
 
 dd_title=Manage Databases

@@ -126,6 +126,7 @@ dfs_nodefaultapp=Non esiste alcuna applicazione per aprire questo tipo di docume
 dr_title=Rinomina la base di dati
 dr_title2=Delete documents
 dr_over=La vecchia base di dati verrà sovrascritta
+dr_empty=An empty database will be created
 dr_overbacking=La vecchia base di dati e la memoria di appoggio verranno sovrascritti
 
 dd_title=Manage Databases

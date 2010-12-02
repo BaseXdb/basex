@@ -242,11 +242,11 @@ public final class DialogCreate extends Dialog {
         CatalogResolverWrapper.available());
     cfile.setEnabled(usecat.isSelected());
     browsec.setEnabled(cfile.isEnabled());
-
+    boolean valid;
     final String pth = path.getText().trim();
     final IO in = IO.get(pth);
-    final boolean valid = !pth.isEmpty() && in.exists();
-    if(valid) gui.gprop.set(GUIProp.CREATEPATH, pth);
+    valid = in.exists() || pth.isEmpty();
+    gui.gprop.set(GUIProp.CREATEPATH, pth);
 
     final String nm = dbname.getText().trim();
     ok = valid && !nm.isEmpty();
@@ -257,6 +257,9 @@ public final class DialogCreate extends Dialog {
       ok = Command.validName(nm);
       if(!ok) {
         inf = Util.info(INVALID, EDITNAME);
+      } else if(pth.isEmpty()) {
+        inf = EMPTYDATABASE;
+        icon = Msg.WARN;
       } else if(db.contains(nm)) {
         inf = RENAMEOVER;
         icon = Msg.WARN;
