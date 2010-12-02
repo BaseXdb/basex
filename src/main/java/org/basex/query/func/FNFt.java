@@ -103,7 +103,7 @@ final class FNFt extends Fun {
           final FTPosData tmp = ctx.ftpos;
           ctx.ftpos = ftd;
           if(ir == null) ir = ctx.iter(expr[0]);
-          Item it = ir.next();
+          final Item it = ir.next();
           if(it != null) {
             ii = DataBuilder.mark(checkDBNode(it), mark, len, ctx);
           }

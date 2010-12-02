@@ -703,9 +703,11 @@ public interface Text {
   // MENU ENTRIES =============================================================
 
   /** Menu entry. */
-  String MENUFILE = lang("m_file");
+  String MENUDB = lang("m_db");
   /** Menu entry. */
   String MENUEDIT = lang("m_edit");
+  /** Menu entry. */
+  String MENUQUERY = lang("m_query");
   /** Menu entry. */
   String MENUVIEW = lang("m_view");
   /** Menu entry. */
@@ -714,17 +716,6 @@ public interface Text {
   String MENUDEEPFS = "DeepFS";
   /** Menu entry. */
   String MENUHELP = lang("m_help");
-
-  /** Menu label. */
-  String MENUDB = lang("m_db");
-  /** Menu label. */
-  String MENUMAIN = lang("m_main") + COL;
-  /** Menu label. */
-  String MENUVIEWS = lang("m_views") + COL;
-  /** Menu label. */
-  String MENUINTER = lang("m_inter") + COL;
-  /** Menu label. */
-  String MENULAYOUT = lang("m_layout") + COL;
 
   // GUI COMMANDS =============================================================
 
@@ -1348,9 +1339,9 @@ public interface Text {
   /** Developer info. */
   String DEVELOPER = lang("da_dev") + ": Christian Gr\u00FCn";
   /** Contributors info. */
-  String CONTRIBUTE1 = lang("da_cont1") + ": Sebastian Gath, Lukas Kircher,";
+  String CONTRIBUTE1 = lang("da_cont1") + ": Andreas Weiler, Michael Seiferle,";
   /** Developer names. */
-  String CONTRIBUTE2 = "Andreas Weiler, Alexander Holupirek " +
+  String CONTRIBUTE2 = "Lukas Kircher, Alexander Holupirek " +
     lang("da_cont2");
   /** Translation. */
   String TRANSLATION = lang("da_translation") + COLS;

@@ -169,6 +169,12 @@ public final class IOFile extends IO {
   }
 
   @Override
+  public IO parent() {
+    final String par = file.getParent();
+    return par == null ? this : IO.get(par);
+  }
+
+  @Override
   public void write(final byte[] c) throws IOException {
     FileOutputStream out = null;
     try {

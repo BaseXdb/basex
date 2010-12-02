@@ -31,7 +31,7 @@ public final class DataBuilder {
   /** Preserve flag. */
   private boolean preserve = true;
   /** Inherit flag. */
-  private boolean inherit = true;
+  private final boolean inherit = true;
 
   /**
    * Constructor.
@@ -186,7 +186,7 @@ public final class DataBuilder {
       final Nod ndPar) {
 
     // check full-text mode
-    int dist = pre - par;
+    final int dist = pre - par;
     final TokenList tl = ftbuilder != null ? ftbuilder.build(nd) : null;
     if(tl == null) return addText(nd.atom(), dist);
 

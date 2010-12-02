@@ -909,7 +909,7 @@ public final class Token {
       final int end) {
 
     int s = Math.max(0, start);
-    int e = Math.min(end, token.length);
+    final int e = Math.min(end, token.length);
     if(s == 0 && e == token.length) return token;
     if(s >= e) return EMPTY;
 

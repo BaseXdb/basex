@@ -77,14 +77,15 @@ public final class XQueryView extends View {
     saveB.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu popup = new JPopupMenu();
-        final JMenuItem save = GUIMenu.newItem(GUICommands.XQSAVE, gui);
-        final JMenuItem saveAs = GUIMenu.newItem(GUICommands.XQSAVEAS, gui);
-        GUICommands.XQSAVE.refresh(gui, save);
-        GUICommands.XQSAVEAS.refresh(gui, saveAs);
-        popup.add(save);
-        popup.add(saveAs);
-        popup.show(saveB, 0, saveB.getHeight());
+        final JPopupMenu pop = new JPopupMenu();
+        final StringBuilder mnem = new StringBuilder();
+        final JMenuItem sa = GUIMenu.newItem(GUICommands.XQSAVE, gui, mnem);
+        final JMenuItem sas = GUIMenu.newItem(GUICommands.XQSAVEAS, gui, mnem);
+        GUICommands.XQSAVE.refresh(gui, sa);
+        GUICommands.XQSAVEAS.refresh(gui, sas);
+        pop.add(sa);
+        pop.add(sas);
+        pop.show(saveB, 0, saveB.getHeight());
       }
     });
     final BaseXTextField find = new BaseXTextField(gui);

@@ -176,7 +176,7 @@ public final class HttpClient {
     // If authorization is to be sent, check that both user name and password
     // are provided
     final byte[] sendAuth = reqAttrs.get(SENDAUTH);
-    if((sendAuth != null) && Boolean.parseBoolean(string(sendAuth))) {
+    if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
       final byte[] usrname = reqAttrs.get(USRNAME);
       final byte[] passwd = reqAttrs.get(PASSWD);
 
@@ -246,11 +246,11 @@ public final class HttpClient {
       } finally {
         conn.disconnect();
       }
-    } catch(MalformedURLException ex) {
+    } catch(final MalformedURLException ex) {
       throw new QueryException(info, URLINV, ex);
-    } catch(ProtocolException ex) {
+    } catch(final ProtocolException ex) {
       throw new QueryException(info, PROTINV, ex);
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       throw new QueryException(info, HTTPERR, ex.getMessage());
     }
   }
@@ -281,9 +281,9 @@ public final class HttpClient {
 
     final byte[][] headerNames = headers.keys();
 
-    for(int i = 0; i < headerNames.length; i++)
-      conn.addRequestProperty(string(headerNames[i]),
-          string(headers.get(headerNames[i])));
+    for(final byte[] headerName : headerNames)
+      conn.addRequestProperty(string(headerName),
+          string(headers.get(headerName)));
     // HTTP Basic Authentication
     final byte[] sendAuth = reqAttrs.get(SENDAUTH);
     if(sendAuth != null && Bln.parse(sendAuth, info))

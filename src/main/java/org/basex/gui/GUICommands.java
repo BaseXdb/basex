@@ -141,7 +141,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Shows add a document dialog. */
+  /** Opens a dialog to add new documents. */
   ADD(GUIADD + DOTS, null, GUIADDTT, true, false) {
     @Override
     public void execute(final GUI gui) {
@@ -150,7 +150,7 @@ public enum GUICommands implements GUICommand {
     }
   },
   
-  /** Shows delete a document dialog. */
+  /** Opens a dialog to delete documents. */
   DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
     @Override
     public void execute(final GUI gui) {
@@ -161,7 +161,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Exports a document. */
+  /** Exports a database. */
   EXPORT(GUIEXPORT + DOTS, null, GUIEXPORTTT, true, false) {
     @Override
     public void execute(final GUI gui) {

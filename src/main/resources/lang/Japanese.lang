@@ -8,16 +8,12 @@ wait=お待ち下さい
 version=Version %
 
 # Menu Commands
-m_file=ファイル
+m_db=データベース
 m_edit=編集
 m_view=ビュー
+m_query=クエリー　　
 m_options=オプション
 m_help=ヘルプ
-m_db=データベース
-m_main=メインウィンドウ
-m_views=ビュー
-m_inter=Interaction
-m_layout=レイアウト
 
 # Buttons
 b_ok=OK
@@ -618,5 +614,5 @@ h_table=XMLノードを表形式で表示します。テキストをクリック
 h_text=このパネルはクエリーの結果やその他出力を表示します。\n\nキーボードショートカット:'-' と '+' で全てのパネルのフォントサイズを変更できます。任意のテキストを入力することによりインクリメンタルサーチでテキストを簡単に検索する事が出来ます。
 h_info=このパネルではXQueryのコンパイル・評価についての情報を簡単なプロファイル情報と共に表示します。
 h_explore=単純検索モードは簡単にXML文書内を検索できます。
-h_xquery=このテキストエリアには任意のXQuery 1.0クエリーを入力できます。入力値はキーを押す度に評価されます。\n\n以下の例は'BaseX'というtopicを持つ全ての本のタイトルを表示します。:\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=このテキストエリアには任意のXQueryクエリーを入力できます。入力値はキーを押す度に評価されます。\n\n以下の例は'BaseX'というtopicを持つ全ての本のタイトルを表示します。:\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_mover=各ビュー上部のバーをドラッグすることにより、ビューをメインウィンドウ内の任意の場所に移動することが出来ます。\nビューをメインウィンドウの外側に移動した場合、そのビューは閉じられます。

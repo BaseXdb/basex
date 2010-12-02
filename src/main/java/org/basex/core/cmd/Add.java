@@ -84,7 +84,7 @@ public final class Add extends ACreate {
       io.name(name);
     }
 
-    String trg = path(args[2]);
+    final String trg = path(args[2]);
     final DirParser p = new DirParser(io, context.prop, trg);
     try {
       return info(add(p, context, trg, name, this));
@@ -116,7 +116,7 @@ public final class Add extends ACreate {
     final Data data = ctx.data;
     if(data == null) return PROCNODB;
 
-    String trg = path(target);
+    final String trg = path(target);
     final BufferedInputStream is = new BufferedInputStream(input);
     final SAXSource sax = new SAXSource(new InputSource(is));
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);

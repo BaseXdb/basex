@@ -8,16 +8,12 @@ wait=Attendi
 version=Versione %
 
 # Menu Commands
-m_file=Documento
+m_db=Base di dati
 m_edit=Modifica
+m_query=Interrogazione
 m_view=Visualizza
 m_options=Opzioni
 m_help=Aiuto
-m_db=Base di dati
-m_main=Finestra principale
-m_views=Viste
-m_inter=Interazione
-m_layout=Disposizione
 
 # Buttons
 b_ok=OK
@@ -526,8 +522,8 @@ ch_create7=(usando [%] e [%] se FUSE è attivo)
 ch_create8=crea l'utente specificato
 ch_add1=Aggiungi documento.
 ch_add2=Adds [%] as [%] to the database, using an optional\n[%] path.
-ch_delete1=Rimuovi un documento.
-ch_delete2=Rimuovi un documento dalla base di dati corrente.
+ch_delete1=Rimuovi documenti.
+ch_delete2=Rimuovi documenti dalla base di dati corrente.
 ch_open1=Apri una base di dati.
 ch_open2=apre la base di dati [%] specificata.
 ch_info1=Mostra informazioni sulla base di dati attuale.
@@ -616,5 +612,5 @@ h_table=Questa visualizzazione mostra tutti i nodi XML in una tabella. Cliccando
 h_text=Questo pannello mostra i risultati delle interrogazioni ed altre informazioni testuali.\n\nTasti rapidi: Usa '-' e '+' per cambiare la dimensione del carattere di tutti i pannelli. Digita qualunque testo dentro il pop-up di ricerca per lanciare una ricerca incrementale. E' un buon modo per trovare punti specifici di testo.
 h_info=Questo pannello mostra informazioni sulla compilazione ed esecuzione di una interrogazione XQuery.
 h_explore=La modalità di ricerca semplice consente query semplici sul documento XML.
-h_xquery=In quest'area di testo puoi inserire qualunque interrogazione XQuery 1.0. L'input viene eseguito dopo la pressione di ogni tasto.\n\n L'esempio seguente mostra tutti i titoli dei libri con topic 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=In quest'area di testo puoi inserire qualunque interrogazione XQuery. L'input viene eseguito dopo la pressione di ogni tasto.\n\n L'esempio seguente mostra tutti i titoli dei libri con topic 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_mover=Puoi cambiare la posizione di una vista trascinando la barra sopra il pannello della vista in qualsiasi altra posizione all'interno della finestra principale.\n Se sposti una vista fuori dalla finestra principale, verrà chiusa.

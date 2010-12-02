@@ -29,7 +29,7 @@ public final class DataPool {
    */
   Data pin(final String db) {
     synchronized(list) {
-      for(PData d : list) {
+      for(final PData d : list) {
         if(d.data.meta.name.equals(db)) {
           d.pins++;
           return d.data;
@@ -46,7 +46,7 @@ public final class DataPool {
    */
   boolean unpin(final Data data) {
     synchronized(list) {
-      for(PData d : list) {
+      for(final PData d : list) {
         if(d.data == data) {
           final boolean close = --d.pins == 0;
           if(close) {
@@ -66,7 +66,7 @@ public final class DataPool {
    */
   boolean pinned(final String db) {
     synchronized(list) {
-      for(PData d : list)
+      for(final PData d : list)
         if(d.data.meta.name.equals(db)) return true;
       return false;
     }
@@ -88,7 +88,7 @@ public final class DataPool {
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt(SRVDATABASES, list.size());
     tb.add(list.size() != 0 ? COL : DOT);
-    for(PData d : list) {
+    for(final PData d : list) {
       tb.add(NL + LI + d.data.meta.name + " (" + d.pins + "x)");
     }
     return tb.toString();
@@ -100,7 +100,7 @@ public final class DataPool {
   void close() {
     synchronized(list) {
       try {
-        for(PData d : list)
+        for(final PData d : list)
           d.data.close();
       } catch(final IOException ex) {
         Util.debug(ex);
@@ -116,7 +116,7 @@ public final class DataPool {
    * @return number of references
    */
   public int pins(final String db) {
-    for(PData d : list) {
+    for(final PData d : list) {
       if(d.data.meta.name.equals(db)) return d.pins;
     }
     return 0;

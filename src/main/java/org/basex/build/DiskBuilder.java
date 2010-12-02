@@ -182,6 +182,6 @@ public final class DiskBuilder extends Builder {
       v = vallen;
       vallen += vout.writeToken(cpr);
     }
-    return (cpr != val) ? v | IO.CPROFF : v;
+    return cpr != val ? v | IO.CPROFF : v;
   }
 }

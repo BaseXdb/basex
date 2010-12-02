@@ -8,16 +8,12 @@ wait=Een ogenblik
 version=Versie %
 
 # Menu Commands
-m_file=Bestand
+m_db=Database
 m_edit=Wijzig
 m_view=View
+m_query=Query
 m_options=Opties
 m_help=Help
-m_db=Database
-m_main=Hoofd Window
-m_views=Visualisaties
-m_inter=Interactie
-m_layout=Layout
 
 # Buttons
 b_ok=OK
@@ -526,8 +522,8 @@ ch_create7=(gebruik makend van [%] en [%] als FUSE geactiveerd is)
 ch_create8=creert de opgegeven gebruiker
 ch_add1=Voeg document aan database toe.
 ch_add2=Voegt [%] als [%] toe aan de database, met een optional pad\n[%].
-ch_delete1=Verwijder document uit de database.
-ch_delete2=Verwijdert een document uit de actuele database.
+ch_delete1=Verwijder documenten uit de database.
+ch_delete2=Verwijdert documenten uit de actuele database.
 ch_open1=Open database.
 ch_open2=Opent de opgegeven database [%].
 ch_info1=Toon informatie over de actuele database.
@@ -616,5 +612,5 @@ h_table=Deze visualisatie toont XML nodes in een tabel. Als je op een tekst klik
 h_text=Dit paneel toont query resultaten en andere tekstuele output.\n\nToetsen: Type '-' en '+' om de font grootte van alle penelen te wijzigen. Type tekst in de Vind popup om incrementeel te zoeken. Dat is een gemakkelijke manier om speciale teksten te vinden.
 h_info=Dit paneel toont informatie over de compilatie en uitvoering van een XQuery request, inclusief enige profiling informatie.
 h_explore=De Eenvoudige Zoek Mode facilteert eenvoudige queries in het XML document.
-h_xquery=In dit tekst veld kun je een XQuery 1.0 invoeren. De invoer wordt uitgevoerd na elke toetsaanslag.\n\nHet volgende voorbeeld toont alle boek titels met het onderwerp 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=In dit tekst veld kun je een XQuery invoeren. De invoer wordt uitgevoerd na elke toetsaanslag.\n\nHet volgende voorbeeld toont alle boek titels met het onderwerp 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_mover=Je kunt een view verplaatsen door het met de bovenste balk te verslepen.\n Als je een view buiten het hoofd window sleept wordt het gesloten.

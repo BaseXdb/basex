@@ -8,16 +8,12 @@ wait=Bitte Warten
 version=Version %
 
 # Menu Commands
-m_file=Datei
+m_db=Datenbank
 m_edit=Bearbeiten
 m_view=Ansicht
+m_query=Anfrage
 m_options=Optionen
 m_help=Hilfe
-m_db=Datenbank
-m_main=Hauptfenster
-m_views=Visualisierungen
-m_inter=Interaktion
-m_layout=Layout
 
 # Buttons
 b_ok=OK
@@ -524,10 +520,10 @@ ch_create5=erzeugt den angegebenen Index
 ch_create6=erzeugt eine Filesystem-Datenbank [%] von [%]
 ch_create7=(mit [%] und [%], wenn FUSE aktiviert ist)
 ch_create8=erzeugt den angegebenen Benutzer
-ch_add1=Dokument hinzufügen.
+ch_add1=Hinzufügen von Dokumenten.
 ch_add2=Fügt der aktuellen Datenbank ein Dokument [%] mit [%] und [%] hinzu.
-ch_delete1=Dokument entfernen.
-ch_delete2=Entfernt ein Dokument von der aktuellen Datenbank.
+ch_delete1=Löschen von Dokumenten.
+ch_delete2=Löscht Dokumente aus der aktuell geöffneten Datenbank.
 ch_open1=Öffnen einer Datenbank.
 ch_open2=Öffnet die angegebene Datenbank [%].
 ch_info1=Anzeige von Datenbank-Informationen.
@@ -536,8 +532,8 @@ ch_info22=kein Argument: zeigt allgemeine Information an
 ch_info23=zeigt Datenbank-Informationen an
 ch_info24=zeigt Index-Informationen an
 ch_info25=zeigt interne Datenbanktabelle an
-ch_close1=Schließen der aktuellen Datenbank.
-ch_close2=Schließt die aktuelle Datenbank.
+ch_close1=Schließen der Datenbank.
+ch_close2=Schließt die aktuell geöffnete Datenbank.
 ch_list1=Anzeige aller Datenbanken.
 ch_list2=Listet alle verfügbaren Datenbanken auf.
 ch_drop1=Entfernen einer Datenbank, eines Index oder Benutzers.
@@ -616,5 +612,5 @@ h_table=Diese Visualisierung stellt die XML Knoten als Tabelle dar. Bei Klick au
 h_text=Hier werden Anfrage-Ergebnisse und alle anderen textuellen Ausgaben dargestellt.\n\nShortcuts: Drücke '-' und '+' um die Schriftgröße in allen Anzeigefeldern zu verändern. Hier kann ein beliebiger Text in das Finden-Popup eingegeben werden um eine inkrementelle Suche zu starten. Dies ist ein einfacher Weg um spezielle Textpassagen zu finden.
 h_info=Hier werden Informationen über die Kompilierung und Evaluation von XQuery-Anfragen dargestellt.
 h_explore=Der einfache Such-Modus erlaubt einfache Anfragen an das XML Dokument.
-h_xquery=In dieses Textfeld kann jede XQuery 1.0 Anfrage eingegeben werden. Die Eingabe wird nach jedem Klick ausgewertet.\n\nDas folgende Beispiel würde alle Büchertitel mit dem Thema 'BaseX' liefern:\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=In dieses Textfeld kann jede XQuery-Anfrage eingegeben werden. Die Eingabe wird nach jedem Klick ausgewertet.\n\nDas folgende Beispiel würde alle Büchertitel mit dem Thema 'BaseX' liefern:\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_mover=Die Position einer Ansicht kann durch ziehen am oberen Balken des Fensters auf jegliche Position im Hauptfenster verändert werden.\n Wenn eine Ansicht nach außerhalb des Hauptfensters bewegt wird, wird sie geschlossen.

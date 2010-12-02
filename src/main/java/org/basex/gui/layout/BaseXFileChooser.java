@@ -142,7 +142,7 @@ public final class BaseXFileChooser {
     public boolean accept(final File file) {
       if(file.isDirectory()) return true;
       final String name = file.getName().toLowerCase();
-      for(String s : sufs) {
+      for(final String s : sufs) {
         if(name.endsWith(s)) return true;
       }
       return false;

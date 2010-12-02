@@ -8,16 +8,12 @@ wait=Veuillez patienter
 version=Version %
 
 # Commandes menu
-m_file=Fichier
+m_db=Base de données
 m_edit=Edition
 m_view=Vue
+m_query=Requête
 m_options=Options
 m_help=Aide
-m_db=Base de données
-m_main=Fenêtre principale
-m_views=Visualisations
-m_inter=Interaction
-m_layout=Disposition
 
 # Boutons
 b_ok=OK
@@ -527,8 +523,8 @@ ch_create7=(utilise [%] et [%] si FUSE est activé)
 ch_create8=crée l'utilisateur specifié
 ch_add1=Ajouter document.
 ch_add2=Adds [%] as [%] to the database, using an optional\n[%] path.
-ch_delete1=Supprimer document.
-ch_delete2=Supprime un document de la base de données courante.
+ch_delete1=Supprimer documents.
+ch_delete2=Supprime documents de la base de données courante.
 ch_open1=Ouvrir base de données.
 ch_open2=Ouvre la base de données [%] spécifiée.
 ch_info1=Affiche les informations de la base de données courante.
@@ -538,7 +534,7 @@ ch_info23=Affiche les informations de la base de données
 ch_info24=Affiche les informations de l'index
 ch_info25=Afficher la table interne de la base de données
 ch_close1=Fermer la base de données.
-ch_close2=Ferme the current base de données.
+ch_close2=Ferme la base de données courante.
 ch_list1=List disponible base de donnéess.
 ch_list2=Lists all disponible base de donnéess.
 ch_drop1=Drop base de données, index ou utilisateur.
@@ -617,5 +613,5 @@ h_table=Cette visualisation affiche les noeuds XML en tableau. Si vous cliquez s
 h_text=Ce panneau affiche les résultats d'une requête et toute autre sortie texte. \n\n Utiliser les touches '-' et '+' pour changer la taille de police de tous les panneaux. Entrer du texte dans la fenêtre popup de recherche pour lancer une recherche incrémentale sur ce texte. C'est un moyen simple de trouver des portions de texte spécifiques.
 h_info=Ce panneau affiche les informations relatives à la compilation et à l'évaluation d'une requête XQuery, y compris des informations de profilage.
 h_explore=Le mode recherche simple permet des requêtes simples dans le document XML.
-h_xquery=Vous pouvez saisir dans ce champ texte n'importe quelle requête XQuery 1.0. La requête est évaluée après chaque frappe au clavier. \n\n L'exemple suivant renverrait tous les titres de livres dont le sujet est 'BaseX' : \n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=Vous pouvez saisir dans ce champ texte n'importe quelle requête XQuery. La requête est évaluée après chaque frappe au clavier. \n\n L'exemple suivant renverrait tous les titres de livres dont le sujet est 'BaseX' : \n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
 h_mover=Pour déplacer une vue, glisser-déposer la barre de menu du panneau correspondant jusqu'à l'endroit souhaité de la fenêtre principale. \n Si vous glissez-déposez une vue hors de la fenêtre principale, cette vue sera fermée.

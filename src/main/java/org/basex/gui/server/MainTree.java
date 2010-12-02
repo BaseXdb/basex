@@ -23,7 +23,7 @@ public final class MainTree {
   /** JTree. */
   private JTree mtree;
   /** ClientSession. */
-  private ClientSession client;
+  private final ClientSession client;
 
   /**
    * Default constructor.
@@ -43,22 +43,22 @@ public final class MainTree {
    * @throws BaseXException database exception
    */
   private void init(final String t) throws BaseXException {
-    TreeNode server = new TreeNode(t, 1, 0);
-    TreeNode dbs = new TreeNode("Databases", 0, 0);
+    final TreeNode server = new TreeNode(t, 1, 0);
+    final TreeNode dbs = new TreeNode("Databases", 0, 0);
     final Table dbnames = new Table(client.execute(new List()));
     for(final TokenList l : dbnames.contents) {
-      TreeNode db = new TreeNode(Token.string(l.get(0)), 2, 0);
+      final TreeNode db = new TreeNode(Token.string(l.get(0)), 2, 0);
       db.add(new TreeNode("Content", 3, 1));
       db.add(new TreeNode("Users", 4, 1));
       db.add(new TreeNode("Properties", 5, 1));
       dbs.add(db);
     }
     server.add(dbs);
-    TreeNode security = new TreeNode("Security", 0, 0);
+    final TreeNode security = new TreeNode("Security", 0, 0);
     security.add(new TreeNode("Logins", 6, 1));
     server.add(security);
-    TreeNode management = new TreeNode("Management", 0, 0);
-    TreeNode logs = new TreeNode("Server Logs", 0, 0);
+    final TreeNode management = new TreeNode("Management", 0, 0);
+    final TreeNode logs = new TreeNode("Server Logs", 0, 0);
     logs.add(new TreeNode("Current", 7, 1));
     management.add(logs);
     management.add(new TreeNode("Active Sessions", 8, 1));
@@ -72,7 +72,7 @@ public final class MainTree {
    */
   private void setRenderer() {
     // renderer for own icons
-    DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
+    final DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer() {
       @Override
       public Component getTreeCellRendererComponent(final JTree tree,
           final Object value, final boolean sel, final boolean expanded,
@@ -81,8 +81,8 @@ public final class MainTree {
         super.getTreeCellRendererComponent(tree, value, sel, expanded,
             leaf, row, hf);
 
-        TreeNode node = (TreeNode) value;
-        ImageIcon ico = node.getIcon();
+        final TreeNode node = (TreeNode) value;
+        final ImageIcon ico = node.getIcon();
         if(ico != null) setIcon(ico);
         return this;
       }

@@ -2,7 +2,6 @@ package org.basex.gui;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUICommands.*;
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -81,9 +80,9 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String VIEWS = "V H " + XQUERYVIEW + " " + FOLDERVIEW +
-    " " + MAPVIEW + " " + PLOTVIEW + " " + " - H " + TEXTVIEW + " " + INFOVIEW +
-    " " + TABLEVIEW + " " + TREEVIEW + " " + EXPLOREVIEW + " - -";
+  public static final String VIEWS = "V H " + XQUERYVIEW + ' ' + FOLDERVIEW +
+    ' ' + MAPVIEW + ' ' + PLOTVIEW + ' ' + " - H " + TEXTVIEW + ' ' + INFOVIEW +
+    ' ' + TABLEVIEW + ' ' + TREEVIEW + ' ' + EXPLOREVIEW + " - -";
 
   // TOOLBAR ==================================================================
 
@@ -98,30 +97,31 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-      Text.MENUDB, Text.MENUEDIT, Text.MENUVIEW,
-      Text.MENUOPTIONS, Text.MENUDEEPFS, Text.MENUHELP };
+    MENUDB, MENUEDIT, MENUVIEW, MENUQUERY, MENUOPTIONS, MENUDEEPFS, MENUHELP
+  };
 
   /** Separator. */
   static final String SEPARATOR = "-";
 
-  /** Two-dimensional Menu entries, containing the menu item commands. */
+  /** Two-dimensional menu entries, containing the menu item commands. */
   static final Object[][] MENUITEMS = { {
-    CREATE, OPEN, MANAGE, SEPARATOR, INFO, ADD, DROP, EXPORT, CLOSE,
-    SEPARATOR, XQOPEN, XQSAVE, XQSAVEAS, SEPARATOR,
+    CREATE, OPEN, MANAGE, SEPARATOR,
+    ADD, DROP, EXPORT, INFO, CLOSE, SEPARATOR,
     SERVER, Prop.MAC ? null : SEPARATOR,
     Prop.MAC ? null : EXIT
-  },
-  {
+  }, {
     COPY, PASTE, DELETE, INSERT, EDIT, SEPARATOR,
-    SHOWXQUERY, SHOWINFO, SEPARATOR,
     COPYPATH, FILTER
   }, {
-    MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, SEPARATOR,
-    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER, SHOWPLOT, SHOWTABLE,
+    SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, SEPARATOR,
+    SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER, SHOWPLOT, SHOWTABLE,
     SHOWEXPLORE, SEPARATOR, FULL
   }, {
-    MENUINTER, RTEXEC, RTFILTER, SEPARATOR,
-    MENULAYOUT, COLOR, FONTS, MAPLAYOUT, TREEOPTIONS,
+    SHOWXQUERY, SHOWINFO, SEPARATOR,
+    XQOPEN, XQSAVE, XQSAVEAS
+  }, {
+    RTEXEC, RTFILTER, SEPARATOR,
+    COLOR, FONTS, MAPLAYOUT, TREEOPTIONS,
     Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : PREFS
   }, {
     CREATEFS, SEPARATOR, DQE, MOUNTFS

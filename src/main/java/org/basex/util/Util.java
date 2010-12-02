@@ -217,7 +217,7 @@ public final class Util {
 
     // not found; check application directory
     final File f = new File(applicationPath());
-    String home = f.isFile() ? f.getPath() : f.getParent();
+    final String home = f.isFile() ? f.getPath() : f.getParent();
     if(new File(home, IO.BASEXSUFFIX).exists()) return home;
 
     // not found; choose user home directory
@@ -230,7 +230,7 @@ public final class Util {
    */
   public static String applicationPath() {
     // raw application path
-    String path = Util.class.getProtectionDomain().
+    final String path = Util.class.getProtectionDomain().
       getCodeSource().getLocation().getPath();
 
     // decode path; URLDecode returns wrong results
