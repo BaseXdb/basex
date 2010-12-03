@@ -166,8 +166,6 @@ public final class DialogOpen extends Dialog {
       if(choice.getValue().isEmpty()) {
         doc.setText("");
         detail.setText(Token.EMPTY);
-        ok = true;
-        return;
       }
       action(null);
     } else if(cmp == backup) {
@@ -207,6 +205,6 @@ public final class DialogOpen extends Dialog {
 
   @Override
   public void close() {
-    if(ok) dispose();
+    if(ok || choice.getValue().isEmpty()) dispose();
   }
 }
