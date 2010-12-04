@@ -2,6 +2,7 @@ package org.basex.api.jaxrx;
 
 import static org.jaxrx.core.URLConstants.*;
 import java.io.IOException;
+import org.basex.core.Text;
 import org.basex.data.DataText;
 import org.basex.data.SerializerProp;
 import org.basex.server.ClientSession;
@@ -25,7 +26,7 @@ abstract class BXCode {
    */
   BXCode() {
     try {
-      cs = new ClientSession("localhost",
+      cs = new ClientSession(Text.LOCALHOST,
           Integer.parseInt(System.getProperty("org.basex.serverport")),
           System.getProperty("org.basex.user"),
           System.getProperty("org.basex.password"));
