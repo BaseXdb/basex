@@ -235,14 +235,6 @@ public abstract class IO {
   }
 
   /**
-   * Returns the parent input, or self reference if no parent exists.
-   * @return parent
-   */
-  public IO parent() {
-    return this;
-  }
-
-  /**
    * Writes the specified file contents.
    * @param c contents
    * @throws IOException I/O exception

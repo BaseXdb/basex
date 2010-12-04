@@ -107,7 +107,7 @@ public final class DialogMountFS extends Dialog {
       }
     });
     m.add(browse);
-    warn = new BaseXLabel(" ").border(5, 5, 0, 0);
+    warn = new BaseXLabel().border(5, 5, 0, 0);
     m.add(warn);
     info.add(m, BorderLayout.SOUTH);
 

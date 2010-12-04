@@ -105,7 +105,7 @@ public final class DialogEdit extends Dialog {
     set(pp, BorderLayout.CENTER);
 
     pp = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel(" ").border(8, 0, 2, 0);
+    info = new BaseXLabel().border(8, 0, 2, 0);
     pp.add(info, BorderLayout.WEST);
 
     // create buttons
@@ -124,7 +124,7 @@ public final class DialogEdit extends Dialog {
       ok = XMLToken.isQName(token(input1.getText()));
       if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID, EDITNAME);
     }
-    info.setText(msg, Msg.WARN);
+    info.setText(msg, Msg.ERROR);
     enableOK(buttons, BUTTONOK, ok);
   }
 

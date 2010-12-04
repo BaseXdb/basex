@@ -297,16 +297,13 @@ public abstract class Command extends Progress {
     } catch(final Throwable ex) {
       // critical, unexpected error
       Performance.gc(2);
-      Util.stack(ex);
       abort();
-      if(ex instanceof OutOfMemoryError) return error(PROCMEM +
-          ((flags & User.CREATE) != 0 ? PROCMEMCREATE : ""));
-
-      final Object[] st = ex.getStackTrace();
-      final Object[] obj = new Object[st.length + 1];
-      obj[0] = ex.toString();
-      System.arraycopy(st, 0, obj, 1, st.length);
-      return error(Util.bug(obj));
+      if(ex instanceof OutOfMemoryError) {
+        Util.debug(ex);
+        return error(PROCMEM + ((flags & (User.CREATE | User.WRITE)) != 0 ?
+            PROCMEMCREATE : ""));
+      }
+      return error(Util.bug(Util.toArray(ex)));
     } finally {
       // flushes the output
       try { if(out != null) out.flush(); } catch(final IOException ex) { }

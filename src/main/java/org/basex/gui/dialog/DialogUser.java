@@ -87,7 +87,7 @@ final class DialogUser extends BaseXBack {
     BaseXLayout.setWidth(pass, 100);
     alter = new BaseXButton(BUTTONALTER, dia);
     drop = new BaseXButton(BUTTONDROP, dia);
-    info = new BaseXLabel(" ");
+    info = new BaseXLabel();
 
     add(new BaseXLabel(CREATEU + COLS, false, true));
     BaseXBack p = new BaseXBack(new TableLayout(1, 5, 6, 0)).border(0, 0, 5, 0);
@@ -119,7 +119,7 @@ final class DialogUser extends BaseXBack {
 
     p = new BaseXBack(new TableLayout(2, 2, 8, 5));
     p.add(new BaseXLabel(global ? GLOBPERM : LOCPERM, false, true));
-    p.add(new BaseXLabel(" "));
+    p.add(new BaseXLabel());
 
     table = new BaseXTable(users, dia);
     final JScrollPane sp = new JScrollPane(table);

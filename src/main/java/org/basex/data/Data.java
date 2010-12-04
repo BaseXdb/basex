@@ -586,7 +586,7 @@ public abstract class Data {
    * @param ipar parent pre value of node
    * @param md data instance to copy from
    */
-  public final void insert(final int ipre, final int ipar, final MemData md) {
+  public final void insert(final int ipre, final int ipar, final Data md) {
     meta.update();
 
     final int[] preStack = new int[IO.MAXHEIGHT];

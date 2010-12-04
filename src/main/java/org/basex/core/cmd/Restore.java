@@ -85,7 +85,7 @@ public final class Restore extends Command {
       // reopen zip stream
       is = new BufferedInputStream(new FileInputStream(file));
       zis = new ZipInputStream(is);
-      
+
       final byte[] data = new byte[IO.BLOCKSIZE];
       ZipEntry e;
       while((e = zis.getNextEntry()) != null) {
@@ -130,18 +130,18 @@ public final class Restore extends Command {
     list.sort(false, false);
     return list;
   }
-  
-  
+
+
   @Override
   protected String tit() {
     return BUTTONRESTORE;
   }
-  
+
   @Override
   public boolean supportsProg() {
     return true;
   }
-  
+
   @Override
   protected double prog() {
     return (double) of / tf;

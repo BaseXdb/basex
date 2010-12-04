@@ -4,7 +4,6 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-wait=Xin đợi tí
 version=Phiên bản %
 
 # Menu Commands
@@ -466,6 +465,7 @@ gc_setwhich=Unknown option '%'
 gc_setval=Could not set '%' to '%'.
 
 # Info Strings
+info_wait=Xin đợi tí
 info_index=Indexes
 info_opt=Đang tối ưu cơ sở dữ liệu
 info_stats=Tạo thống kê
@@ -610,5 +610,5 @@ h_table=Cách vẽ này hiển thị tất cả nut XML trong một bản(table)
 h_text=Thanh này hiển thị kết quả lệnh hỏi hay văn bản dữ liệu xuất ra khác.\n\nPhím tắt: Nhấn '-' và '+' để đổi kích cỡ phông của tất cả thanh. Gõ vào khung xòe ra để chạy một tìm kiếm tiếp. Nó là cách đơn giản để tìm một điểm văn bản cụ thể.
 h_info=Thanh này hiển thị thông tin dịch và đánh giá lệnh hỏi XQuery, bao gồm vài tiểu sử đơn giản.
 h_explore=Chế độ tìm kiếm đơn giản cho phép hỏi đơn giản trong văn bản XML.
-h_xquery=Trong vùng văn bản này, ban có thể nhập lệnh hỏi XQuery. Dữ liệu nhập được đánh giá sau mỗi lần nhấn phím.\n\n Ví dụ sau cho thấy tất cả tựa sách với chủ đề 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=Trong vùng văn bản này, ban có thể nhập lệnh hỏi XQuery. Dữ liệu nhập được đánh giá sau mỗi lần nhấn phím.\n\n Ví dụ sau cho thấy tất cả tựa sách với chủ đề 'BaseX':\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
 h_mover=Bạn có thể đổi vị trí hiển thị khi kéo thanh trên cùng của tất cả thanh hiển thị đến chỗ khác trong cửa sổ chính.\n Nếu bạn dời hiển thị ra ngoài cửa sổ chính, nó sẽ đóng.

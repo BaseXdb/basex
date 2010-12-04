@@ -12,7 +12,7 @@ import org.basex.util.Util;
 
 /**
  * This class organizes all currently opened database.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
@@ -124,7 +124,7 @@ public final class DataPool {
 
   /**
    * Inner class for a data object in the pool.
-   * 
+   *
    * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
    * @author Andreas Weiler
    */

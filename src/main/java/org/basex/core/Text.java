@@ -139,12 +139,24 @@ public interface Text {
   String SERVERUSER = lang("srv_user");
   /** Password. */
   String SERVERPW = lang("srv_pw");
-  /** Localhost. */
-  String LOCALHOST = "localhost";
   /** Start REST. */
   String RESTSTART = lang("srv_reststart") + DOTS;
 
+  /** Localhost. */
+  String LOCALHOST = "localhost";
+
   // COMMANDS =================================================================
+
+  /** Command keyword. */
+  String AS = "AS";
+  /** Command keyword. */
+  String TO = "TO";
+  /** Command keyword. */
+  String ON = "ON";
+  /** Command keyword. */
+  String TRUE = "TRUE";
+  /** Keyword. */
+  String OK = "OK";
 
   /** Command help. */
   String C_QUERY = "query";
@@ -158,19 +170,6 @@ public interface Text {
   String C_PW = "password";
   /** Command help. */
   String C_TARGET = "target";
-
-  /** Command keyword. */
-  String AS = "AS";
-  /** Command keyword. */
-  String TO = "TO";
-  /** Command keyword. */
-  String ON = "ON";
-  /** Command keyword. */
-  String USER = "USER";
-  /** Command keyword. */
-  String TRUE = "TRUE";
-  /** Keyword. */
-  String OK = "OK";
 
   /** Missing help. */
   String NOHELP = lang("ch_nohelp");
@@ -309,10 +308,10 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + USER + "|" + CmdCreate.DB + "] [...]",
+    "[" + CmdCreate.USER + "|" + CmdCreate.DB + "] [...]",
     lang("ch_alter1"),
     lang("ch_alter2") + NL  +
-    LI + USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
+    LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
     "  " + lang("ch_alterpw") + NL +
     LI + CmdCreate.DB + " [" + C_NAME + "] [newname]" + NL +
     "  " + lang("ch_alterdb")
@@ -469,9 +468,9 @@ public interface Text {
   String DBBACKDROP = lang("db_backdrop");
   /** Backup was not found. */
   String DBBACKNF = lang("db_backnf");
-
   /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");
+
   /** Index created. */
   String INDCREATED = lang("in_created");
   /** Index dropped. */
@@ -609,7 +608,7 @@ public interface Text {
   // INFO STRINGS =============================================================
 
   /** Waiting information. */
-  String INFOWAIT = lang("wait") + DOTS;
+  String INFOWAIT = lang("info_wait") + DOTS;
   /** Index information. */
   String INFOINDEX = lang("info_index");
   /** Optimize information. */

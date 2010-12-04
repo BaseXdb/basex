@@ -5,13 +5,10 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-
-import org.basex.gui.layout.BaseXLabel;
 import org.basex.util.Util;
 import static org.basex.gui.GUIConstants.*;
 
@@ -41,8 +38,8 @@ public final class GUIMenu extends JMenuBar {
 
     // create menu for each top level menu entries
     int c = 0;
-    for(int i = 0; i < MENUBAR.length; ++i)
-      for(int j = 0; j < MENUITEMS[i].length; ++j) ++c;
+    for(int b = 0; b < MENUBAR.length; ++b)
+      for(int i = 0; i < MENUITEMS[b].length; ++i) ++c;
     items = new JMenuItem[c];
 
     c = 0;
@@ -56,29 +53,18 @@ public final class GUIMenu extends JMenuBar {
       final StringBuilder mnem = new StringBuilder();
       for(int i = 0; i < MENUITEMS[b].length; ++i) {
         // add a separator
-        final Object sub = MENUITEMS[b][i];
-        if(sub == null) continue;
-        if(sub.equals(SEPARATOR)) {
+        final GUICommand cmd = MENUITEMS[b][i];
+        if(cmd == GUICommand.EMPTY) {
           menu.addSeparator();
-        } else {
-          JComponent comp = null;
-
+        } else if(cmd != null) {
           // add a menu entry
-          if(sub instanceof String) {
-            final BaseXLabel label = new BaseXLabel((String) sub);
-            label.border(2, 5, 2, 0).setFont(getFont());
-            comp = label;
-          } else {
-            final GUICommand cmd = (GUICommand) sub;
-            final JMenuItem item = newItem(cmd, gui, mnem);
-            final String sc = cmd.key();
-            if(sc != null) {
-              item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, sm)));
-            }
-            comp = item;
-            items[c++] = item;
+          final JMenuItem item = newItem(cmd, gui, mnem);
+          final String sc = cmd.key();
+          if(sc != null) {
+            item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, sm)));
           }
-          menu.add(comp);
+          items[c++] = item;
+          menu.add(item);
         }
       }
       add(menu);
@@ -95,7 +81,7 @@ public final class GUIMenu extends JMenuBar {
   public static JMenuItem newItem(final GUICommand cmd, final GUI gui,
       final StringBuilder mnem) {
 
-    final String desc = cmd.desc();
+    final String desc = cmd.label();
     final JMenuItem item = cmd.checked() ?
         new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
 
@@ -105,12 +91,12 @@ public final class GUIMenu extends JMenuBar {
         cmd.execute(gui);
       }
     });
-    
+
     setMnemonic(item, desc, mnem);
     item.setToolTipText(cmd.help());
     return item;
   }
-  
+
   /**
    * Sets a mnemomic.
    * @param item menu item
@@ -135,11 +121,12 @@ public final class GUIMenu extends JMenuBar {
    */
   void refresh() {
     int c = 0;
-    for(int i = 0; i < MENUBAR.length; ++i) {
-      for(int j = 0; j < MENUITEMS[i].length; ++j) {
-        final Object item = MENUITEMS[i][j];
-        if(!(item instanceof GUICommand)) continue;
-        ((GUICommand) item).refresh(gui, items[c++]);
+    for(int b = 0; b < MENUBAR.length; ++b) {
+      for(int i = 0; i < MENUITEMS[b].length; ++i) {
+        final GUICommand item = MENUITEMS[b][i];
+        if(item != GUICommand.EMPTY && item != null) {
+          item.refresh(gui, items[c++]);
+        }
       }
     }
   }

@@ -58,14 +58,14 @@ public final class BaseXPopup extends JPopupMenu {
       if(c == null) {
         addSeparator();
       } else {
-        final JMenuItem item = add(c.desc());
+        final JMenuItem item = add(c.label());
         item.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent e) {
             if(!gui.updating) c.execute(comp.gui);
           }
         });
-        item.setMnemonic(c.desc().charAt(0));
+        item.setMnemonic(c.label().charAt(0));
         item.setToolTipText(c.help());
       }
     }

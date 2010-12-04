@@ -67,7 +67,7 @@ import org.deepfs.util.LibraryLoader;
  */
 public enum GUICommands implements GUICommand {
 
-  /* FILE MENU */
+  /* DATABASE MENU */
 
   /** Opens a dialog to create a new database. */
   CREATE(GUICREATE + DOTS, "% N", GUICREATETT, false, false) {
@@ -94,50 +94,18 @@ public enum GUICommands implements GUICommand {
       if(dialog.ok()) {
         new Close().run(gui.context);
         gui.notify.init();
-        gui.execute(new Open(dialog.db()), false);
+        gui.execute(new Open(dialog.db()));
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODBQUESTION)) CREATE.execute(gui);
       }
     }
   },
 
-  /** Shows database info. */
-  INFO(GUIINFO + DOTS, "% D", GUIINFOTT, true, false) {
+  /** Opens a dialog to manage databases. */
+  MANAGE(GUIMANAGE + DOTS, "% M", GUIMANAGETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogInfo info = new DialogInfo(gui);
-      if(info.ok()) {
-        final Data d = gui.context.data;
-        final boolean[] ind = info.indexes();
-        if(info.opt) {
-          d.meta.textindex = ind[0];
-          d.meta.attrindex = ind[1];
-          d.meta.ftindex   = ind[2];
-          DialogProgress.execute(gui, INFOOPT, new Optimize());
-        } else {
-          Command[] cmd = {};
-          if(ind[0] != d.meta.pathindex)
-            cmd = Array.add(cmd, cmd(ind[0], CmdIndex.PATH));
-          if(ind[1] != d.meta.textindex)
-            cmd = Array.add(cmd, cmd(ind[1], CmdIndex.TEXT));
-          if(ind[2] != d.meta.attrindex)
-            cmd = Array.add(cmd, cmd(ind[2], CmdIndex.ATTRIBUTE));
-          if(ind[3] != d.meta.ftindex)
-            cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
-
-          DialogProgress.execute(gui, PROGINDEX, cmd);
-        }
-      }
-    }
-
-    /**
-     * Returns a command for creating/dropping the specified index.
-     * @param create create flag
-     * @param index name of index
-     * @return command instance
-     */
-    private Command cmd(final boolean create, final CmdIndex index) {
-      return create ? new CreateIndex(index) : new DropIndex(index);
+      if(new DialogOpen(gui, true, false).nodb()) Dialog.warn(gui, INFONODB);
     }
   },
 
@@ -149,7 +117,7 @@ public enum GUICommands implements GUICommand {
       if(dialog.ok()) DialogProgress.execute(gui, "", dialog.cmd());
     }
   },
-  
+
   /** Opens a dialog to delete documents. */
   DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
     @Override
@@ -193,7 +161,7 @@ public enum GUICommands implements GUICommand {
           if(!Dialog.confirm(gui, Util.info(msg, file))) return;
         }
       }
-      gui.execute(new Export(root.path()), false);
+      gui.execute(new Export(root.path()));
     }
 
     @Override
@@ -202,11 +170,43 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens a dialog to manage databases. */
-  MANAGE(GUIMANAGE + DOTS, null, GUIMANAGETT, false, false) {
+  /** Shows database info. */
+  INFO(GUIINFO + DOTS, "% D", GUIINFOTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogOpen(gui, true, false).nodb()) Dialog.warn(gui, INFONODB);
+      final DialogInfo info = new DialogInfo(gui);
+      if(info.ok()) {
+        final Data d = gui.context.data;
+        final boolean[] ind = info.indexes();
+        if(info.opt) {
+          d.meta.textindex = ind[0];
+          d.meta.attrindex = ind[1];
+          d.meta.ftindex   = ind[2];
+          DialogProgress.execute(gui, INFOOPT, new Optimize());
+        } else {
+          Command[] cmd = {};
+          if(ind[0] != d.meta.pathindex)
+            cmd = Array.add(cmd, cmd(ind[0], CmdIndex.PATH));
+          if(ind[1] != d.meta.textindex)
+            cmd = Array.add(cmd, cmd(ind[1], CmdIndex.TEXT));
+          if(ind[2] != d.meta.attrindex)
+            cmd = Array.add(cmd, cmd(ind[2], CmdIndex.ATTRIBUTE));
+          if(ind[3] != d.meta.ftindex)
+            cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
+
+          DialogProgress.execute(gui, PROGINDEX, cmd);
+        }
+      }
+    }
+
+    /**
+     * Returns a command for creating/dropping the specified index.
+     * @param create create flag
+     * @param index name of index
+     * @return command instance
+     */
+    private Command cmd(final boolean create, final CmdIndex index) {
+      return create ? new CreateIndex(index) : new DropIndex(index);
     }
   },
 
@@ -214,7 +214,7 @@ public enum GUICommands implements GUICommand {
   CLOSE(GUICLOSE, "% W", GUICLOSETT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.execute(new Close(), false);
+      gui.execute(new Close());
     }
   },
 
@@ -342,7 +342,7 @@ public enum GUICommands implements GUICommand {
       }
       gui.context.copied = null;
       gui.execute(new XQuery("insert nodes (" + sb + ") into " +
-        openPre(gui.context.marked, 0)), false);
+        openPre(gui.context.marked, 0)));
     }
 
     @Override
@@ -367,14 +367,14 @@ public enum GUICommands implements GUICommand {
         gui.context.marked = new Nodes(n.data);
         gui.context.copied = null;
         gui.context.focused = -1;
-        gui.execute(new XQuery("delete nodes (" + sb + ")"), false);
+        gui.execute(new XQuery("delete nodes (" + sb + ")"));
       }
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       // disallow deletion of empty node set or root node
-      b.setEnabled(updatable(gui.context.marked));
+      b.setEnabled(updatable(gui.context.marked, Data.DOC));
     }
   },
 
@@ -397,8 +397,7 @@ public enum GUICommands implements GUICommand {
       }
 
       gui.context.copied = null;
-      gui.execute(new XQuery("insert node " + item + " into " + openPre(n, 0)),
-          false);
+      gui.execute(new XQuery("insert node " + item + " into " + openPre(n, 0)));
     }
 
     @Override
@@ -427,9 +426,9 @@ public enum GUICommands implements GUICommand {
       }
 
       if(rename != null) gui.execute(new XQuery("rename node " +
-        openPre(n, 0) + " as " + quote(rename)), false);
+        openPre(n, 0) + " as " + quote(rename)));
       if(replace != null) gui.execute(new XQuery("replace value of node " +
-        openPre(n, 0) + " with " + quote(replace)), false);
+        openPre(n, 0) + " with " + quote(replace)));
     }
 
     @Override
@@ -767,7 +766,7 @@ public enum GUICommands implements GUICommand {
   /* DEEPFS MENU */
 
   /** Opens a dialog to import given directory as DeepFS instance. */
-  CREATEFS(GUICREATEFS + DOTS, "% M", GUICREATEFSTT, false, false) {
+  CREATEFS(GUICREATEFS + DOTS, null, GUICREATEFSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       if(!new DialogCreateFS(gui).ok()) return;
@@ -787,7 +786,7 @@ public enum GUICommands implements GUICommand {
       if(dialog.ok()) {
         new Close().run(gui.context);
         gui.notify.init();
-        gui.execute(new Open(dialog.db()), false);
+        gui.execute(new Open(dialog.db()));
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
       }
@@ -802,7 +801,7 @@ public enum GUICommands implements GUICommand {
       if(dialog.ok()) {
         new Close().run(gui.context);
         gui.notify.init();
-        gui.execute(new Mount(dialog.db(), dialog.mp()), false);
+        gui.execute(new Mount(dialog.db(), dialog.mp()));
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
       }
@@ -915,7 +914,7 @@ public enum GUICommands implements GUICommand {
         for(final int pre : ctx.current.list) {
           root &= ctx.data.kind(pre) == Data.DOC;
         }
-        gui.execute(new Cs(root ? "/" : ".."), false);
+        gui.execute(new Cs(root ? "/" : ".."));
       }
     }
 
@@ -929,7 +928,7 @@ public enum GUICommands implements GUICommand {
   GOHOME(GUIROOT, "alt HOME", GUIROOTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      if(!gui.context.root()) gui.execute(new Cs("/"), false);
+      if(!gui.context.root()) gui.execute(new Cs("/"));
     }
 
     @Override
@@ -942,7 +941,7 @@ public enum GUICommands implements GUICommand {
   HOME(GUIROOT, null, GUIROOTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.execute(new XQuery("/"), false);
+      gui.execute(new XQuery("/"));
     }
   };
 
@@ -976,8 +975,7 @@ public enum GUICommands implements GUICommand {
 
   @Override
   public void refresh(final GUI gui, final AbstractButton b) {
-    final boolean e = !data || gui.context.data != null;
-    if(b.isEnabled() != e) b.setEnabled(e);
+    b.setEnabled(!data || gui.context.data != null);
   }
 
   @Override
@@ -987,7 +985,7 @@ public enum GUICommands implements GUICommand {
   public String help() { return help; }
 
   @Override
-  public String desc() { return entry; }
+  public String label() { return entry; }
 
   @Override
   public String key() { return key; }
@@ -995,7 +993,7 @@ public enum GUICommands implements GUICommand {
   // STATIC METHODS ===========================================================
 
   /**
-   * Checks if data can be updated (disk mode, nodes defined, no namespaces).
+   * Checks if data can be updated.
    * @param n node instance
    * @param no disallowed node types
    * @return result of check

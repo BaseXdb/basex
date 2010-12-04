@@ -87,17 +87,17 @@ public final class Backup extends Command {
       return false;
     }
   }
-  
+
   @Override
   protected String tit() {
     return BUTTONBACKUP;
   }
-  
+
   @Override
   public boolean supportsProg() {
     return true;
   }
-  
+
   @Override
   protected double prog() {
     return (double) of / tf;

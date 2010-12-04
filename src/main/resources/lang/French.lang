@@ -4,7 +4,6 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Lancement
-wait=Veuillez patienter
 version=Version %
 
 # Commandes menu
@@ -469,6 +468,7 @@ gc_setwhich=Unknown option '%'
 gc_setval=Impossible de donner à la propriété '%' la valeur '%'.
 
 # Info Strings
+info_wait=Veuillez patienter
 info_index=Index
 info_opt=Optimisation de la base de données en cours
 info_stats=Créer statistiques
@@ -613,5 +613,5 @@ h_table=Cette visualisation affiche les noeuds XML en tableau. Si vous cliquez s
 h_text=Ce panneau affiche les résultats d'une requête et toute autre sortie texte. \n\n Utiliser les touches '-' et '+' pour changer la taille de police de tous les panneaux. Entrer du texte dans la fenêtre popup de recherche pour lancer une recherche incrémentale sur ce texte. C'est un moyen simple de trouver des portions de texte spécifiques.
 h_info=Ce panneau affiche les informations relatives à la compilation et à l'évaluation d'une requête XQuery, y compris des informations de profilage.
 h_explore=Le mode recherche simple permet des requêtes simples dans le document XML.
-h_xquery=Vous pouvez saisir dans ce champ texte n'importe quelle requête XQuery. La requête est évaluée après chaque frappe au clavier. \n\n L'exemple suivant renverrait tous les titres de livres dont le sujet est 'BaseX' : \n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=Vous pouvez saisir dans ce champ texte n'importe quelle requête XQuery. La requête est évaluée après chaque frappe au clavier. \n\n L'exemple suivant renverrait tous les titres de livres dont le sujet est 'BaseX' : \n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
 h_mover=Pour déplacer une vue, glisser-déposer la barre de menu du panneau correspondant jusqu'à l'endroit souhaité de la fenêtre principale. \n Si vous glissez-déposez une vue hors de la fenêtre principale, cette vue sera fermée.

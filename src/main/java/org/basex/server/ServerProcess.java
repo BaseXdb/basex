@@ -114,8 +114,6 @@ public final class ServerProcess extends Thread {
     try {
       while(running) {
         try {
-          // [CG] Server: replace control codes with strings.
-          //final ServerCmd sc = ServerCommand.valueOf(in.readString());
           final byte b = in.readByte();
           final ServerCmd sc = ServerCmd.get(b);
           if(sc == CREATE) {

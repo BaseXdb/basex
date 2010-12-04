@@ -97,7 +97,7 @@ public final class DialogInsert extends Dialog {
     set(back, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel(" ").border(8, 0, 2, 0);
+    info = new BaseXLabel().border(8, 0, 2, 0);
     pp.add(info, BorderLayout.WEST);
 
     buttons = okCancel(this);
@@ -148,7 +148,7 @@ public final class DialogInsert extends Dialog {
       ok = XMLToken.isQName(token(input1.getText()));
       if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID, EDITNAME);
     }
-    info.setText(msg, Msg.WARN);
+    info.setText(msg, Msg.ERROR);
     enableOK(buttons, BUTTONOK, ok);
   }
 

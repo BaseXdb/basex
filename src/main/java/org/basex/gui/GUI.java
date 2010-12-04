@@ -315,6 +315,7 @@ public final class GUI extends AGUI {
 
   /**
    * Launches a query. Adds the default namespace, if available.
+   * The command is ignored if an update operation takes place.
    * @param qu query to be run
    * @param main main window
    */
@@ -329,8 +330,17 @@ public final class GUI extends AGUI {
   }
 
   /**
-   * Launches the specified command in a thread. The command is ignored
-   * if an update operation takes place.
+   * Launches the specified command in a separate thread.
+   * The command is ignored if an update operation takes place.
+   * @param cmd command to be launched
+   */
+  public void execute(final Command cmd) {
+    execute(cmd, true);
+  }
+
+  /**
+   * Launches the specified command in a separate thread.
+   * The command is ignored if an update operation takes place.
    * @param cmd command to be launched
    * @param main call from main window
    */
@@ -348,7 +358,7 @@ public final class GUI extends AGUI {
    * @param main call from the main input field
    * @return success flag
    */
- boolean exec(final Command c, final boolean main) {
+  boolean exec(final Command c, final boolean main) {
     final int thread = ++threadID;
 
     // wait when command is still running
@@ -371,6 +381,9 @@ public final class GUI extends AGUI {
         new ArrayOutput().max(context.prop.num(Prop.MAXTEXT));
       final boolean up = c.updating(context);
       updating = up;
+
+      // resets the query editor
+      if(main && query.visible()) query.reset();
 
       boolean ok = true;
       String inf = null;
@@ -412,7 +425,6 @@ public final class GUI extends AGUI {
           ((Nodes) result).size() != 0 ? (Nodes) result : null;
 
         // treat text view different to other views
-        // [CG] fix for empty sequences
         if(ok && nodes == null) {
           // display text view
           if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
@@ -425,9 +437,6 @@ public final class GUI extends AGUI {
         if(ndata != data) {
           // database reference has changed - notify views
           notify.init();
-          // [LK] check if context really changed - an empty
-          // updating function i.e.
-          // sets up==true, but does not change the current context
         } else if(up) {
           // update command
           notify.update();

@@ -40,7 +40,7 @@ final class DialogPass extends Dialog {
         if(!modifier(e)) action(ENTER.is(e) ? e.getSource() : null);
       }
     });
-    info = new BaseXLabel(" ");
+    info = new BaseXLabel();
 
     final BaseXBack p = new BaseXBack(new BorderLayout(0, 8));
     p.add(pass, BorderLayout.NORTH);

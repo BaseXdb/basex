@@ -50,9 +50,8 @@ public class DialogAdd extends Dialog {
     p.add(new BaseXLabel());
     p.border(0, 0, 8, 0);
 
-    final IO io = IO.get(gui.gprop.get(GUIProp.CREATEPATH));
-    final IO dir = io.isDir() ? io : io.parent();
-    path = new BaseXTextField(dir.toString(), this);
+    final IO in = IO.get(gui.gprop.get(GUIProp.CREATEPATH));
+    path = new BaseXTextField(in.dir(), this);
     path.addKeyListener(keys);
     p.add(path);
 
@@ -82,7 +81,7 @@ public class DialogAdd extends Dialog {
 
     // create buttons
     p = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel(" ").border(18, 0, 0, 0);
+    info = new BaseXLabel().border(18, 0, 0, 0);
     p.add(info, BorderLayout.WEST);
     buttons = okCancel(this);
     p.add(buttons, BorderLayout.EAST);

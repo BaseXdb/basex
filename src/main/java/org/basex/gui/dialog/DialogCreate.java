@@ -113,7 +113,7 @@ public final class DialogCreate extends Dialog {
     p.add(new BaseXLabel());
     p1.add(p, BorderLayout.CENTER);
 
-    info = new BaseXLabel(" ");
+    info = new BaseXLabel();
     p1.add(info, BorderLayout.SOUTH);
 
     final BaseXBack p2 = new BaseXBack(new TableLayout(14, 1)).border(8);
@@ -131,7 +131,7 @@ public final class DialogCreate extends Dialog {
     chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, this);
     p2.add(chop);
     p2.add(new BaseXLabel(CHOPPINGINFO, false, false));
-    p2.add(new BaseXLabel(" "));
+    p2.add(new BaseXLabel());
 
     // CatalogResolving
     final boolean rsen = CatalogResolverWrapper.available();

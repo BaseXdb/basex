@@ -403,10 +403,10 @@ public final class FTTest extends QueryTest {
       { "FTDistance 7", nod(3, 37),
         "//w [text() contains text ('second' ftand 'third' window 3 words) " +
         "ftand 'sentence' distance exactly 0 words ordered]" },
-      { "FTDistance 8", nod(3, 37),
+      { "FTDistance 8", nod(37),
         "//w [. contains text 'third' ftand 'second' " +
         " ftand 'first' distance exactly 1 words ordered]" },
-      { "FTDistance 9", nod(3, 37),
+      { "FTDistance 9", nod(3),
         "//w [. contains text 'first' ftand 'second' " +
         " ftand 'third' distance exactly 1 words ordered]" },
       { "FTDistance 10", bool(true),
@@ -425,7 +425,7 @@ public final class FTTest extends QueryTest {
       { "FTWindow 4", nod(37),
         "//w [. contains text 'fifth' ftand 'third' " +
         "ftand 'second' ordered window 7 words]" },
-      { "FTWindow 4", nod(3, 37),
+      { "FTWindow 5", nod(37),
         "//w [. contains text 'fifth' ftand 'third' " +
         "ftand 'second' window 7 words ordered]" },
 

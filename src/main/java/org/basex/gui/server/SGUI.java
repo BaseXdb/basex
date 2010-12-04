@@ -14,6 +14,7 @@ import javax.swing.JTree;
 import javax.swing.WindowConstants;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
+import org.basex.core.Text;
 import org.basex.gui.AGUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
@@ -78,7 +79,7 @@ public final class SGUI extends AGUI {
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     final BaseXBack connection = new BaseXBack();
     connection.setLayout(new TableLayout(7, 2));
-    final BaseXTextField sname = new BaseXTextField("localhost", this);
+    final BaseXTextField sname = new BaseXTextField(Text.LOCALHOST, this);
     final BaseXTextField sport = new BaseXTextField("1984", this);
     final BaseXTextField suser = new BaseXTextField("admin", this);
     final BaseXPassword spw = new BaseXPassword(this);

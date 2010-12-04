@@ -4,7 +4,6 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-wait=お待ち下さい
 version=Version %
 
 # Menu Commands
@@ -391,7 +390,6 @@ db_backup=Backup for '%' created in %.
 db_nobackup=Backup of database '%' could not be created.
 db_restore='%' restored in %.
 db_norestore='%' could not be restored.
-info_nodeepfs=DeepFSデータベースが見付かりませんでした。
 db_notopened=データベースを開けませんでした。
 db_opened=データベース "%" が % を開きました。
 db_exported=データベース "%" が % に出力しました。
@@ -471,6 +469,7 @@ gc_setwhich=Unknown option '%'
 gc_setval=プロパティ '%' を '%' に変更する事が出来ませんでした。
 
 # Info Strings
+info_wait=お待ち下さい
 info_index=インデックス
 info_opt=データベースを最適化中
 info_stats=統計の作成
@@ -486,6 +485,7 @@ info_height=ツリーの高さ
 info_encoding=文字コード
 info_dbpath=データベースパス
 info_nodb=データベースが見付かりません。
+info_nodeepfs=DeepFSデータベースが見付かりませんでした。
 info_dberror=開けませんでした。
 info_query=Query Info
 info_debug=デバッグモード
@@ -614,5 +614,5 @@ h_table=XMLノードを表形式で表示します。テキストをクリック
 h_text=このパネルはクエリーの結果やその他出力を表示します。\n\nキーボードショートカット:'-' と '+' で全てのパネルのフォントサイズを変更できます。任意のテキストを入力することによりインクリメンタルサーチでテキストを簡単に検索する事が出来ます。
 h_info=このパネルではXQueryのコンパイル・評価についての情報を簡単なプロファイル情報と共に表示します。
 h_explore=単純検索モードは簡単にXML文書内を検索できます。
-h_xquery=このテキストエリアには任意のXQueryクエリーを入力できます。入力値はキーを押す度に評価されます。\n\n以下の例は'BaseX'というtopicを持つ全ての本のタイトルを表示します。:\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=このテキストエリアには任意のXQueryクエリーを入力できます。入力値はキーを押す度に評価されます。\n\n以下の例は'BaseX'というtopicを持つ全ての本のタイトルを表示します。:\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
 h_mover=各ビュー上部のバーをドラッグすることにより、ビューをメインウィンドウ内の任意の場所に移動することが出来ます。\nビューをメインウィンドウの外側に移動した場合、そのビューは閉じられます。

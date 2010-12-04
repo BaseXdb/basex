@@ -22,7 +22,7 @@ import org.basex.util.Util;
 
 /**
  * Dialog window for displaying the progress of a command execution.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -140,7 +140,9 @@ public final class DialogProgress extends Dialog implements ActionListener {
       final Performance perf = new Performance();
       final DialogProgress wait = new DialogProgress(gui, t, cmd);
       wait.setAlwaysOnTop(true);
+      gui.updating = cmd.updating(gui.context);
       final boolean ok = cmd.run(gui.context);
+      gui.updating = false;
       final String info = cmd.info();
       wait.dispose();
 

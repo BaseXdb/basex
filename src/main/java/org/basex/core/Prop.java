@@ -54,7 +54,7 @@ public final class Prop extends AProp {
   public static final Object[] LANGKEYS = { "LANGKEYS", false };
 
   /** Client/server communication: host, used for connecting new clients. */
-  public static final Object[] HOST = { "HOST", "localhost" };
+  public static final Object[] HOST = { "HOST", Text.LOCALHOST };
   /** Client/server communication: port, used for connecting new clients. */
   public static final Object[] PORT = { "PORT", 1984 };
   /** Client/server communication: port, used for starting the server. */

@@ -4,7 +4,6 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-wait=Please Wait
 version=Version %
 
 # Menu Commands
@@ -468,6 +467,7 @@ gc_setwhich=Unknown option '%'
 gc_setval=Could not set '%' to '%'.
 
 # Info Strings
+info_wait=Please Wait
 info_index=Indexes
 info_opt=Optimizing Database
 info_stats=Create statistics
@@ -612,5 +612,5 @@ h_table=This visualization displays XML nodes in a table. If you click on a text
 h_text=This panel displays query results and other textual output.\n\nKey Shortcuts: Press '-' and '+' to change the font size of all panels. Type in any text into the find popup to launch an incremental search for it. It's an easy way to find special text points.
 h_info=This panel displays information on the compilation and evaluation of an XQuery request, including some profiling information.
 h_explore=The simple search mode allows simple queries in the XML document.
-h_xquery=In this text area, you can edit your XQuery expression. The input is evaluated after each key click.\n\n The following example would show all book titles with the topic 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=In this text area, you can edit your XQuery expression. The input is evaluated after each key click.\n\n The following example would show all book titles with the topic 'BaseX':\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
 h_mover=You can change the position of a view by dragging the bar on top of all view panels to any other place inside the main window.\n If you move a view outside the main window, it will be closed.

@@ -87,7 +87,7 @@ public final class GUIConstants {
   // TOOLBAR ==================================================================
 
   /** Toolbar entries, containing the button commands. */
-  static final GUICommand[] TOOLBAR = {
+  static final GUICommands[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, GOHOME, null, CREATE, OPEN, INFO, null,
       SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER,
       SHOWPLOT, SHOWTABLE, SHOWEXPLORE, null, SHOWHELP
@@ -100,38 +100,39 @@ public final class GUIConstants {
     MENUDB, MENUEDIT, MENUVIEW, MENUQUERY, MENUOPTIONS, MENUDEEPFS, MENUHELP
   };
 
-  /** Separator. */
-  static final String SEPARATOR = "-";
-
-  /** Two-dimensional menu entries, containing the menu item commands. */
-  static final Object[][] MENUITEMS = { {
-    CREATE, OPEN, MANAGE, SEPARATOR,
-    ADD, DROP, EXPORT, INFO, CLOSE, SEPARATOR,
-    SERVER, Prop.MAC ? null : SEPARATOR,
+  /**
+   * Two-dimensional menu entries, containing the menu item commands.
+   * {@link #EMPTY} references serve as menu separators.
+   */
+  static final GUICommand[][] MENUITEMS = { {
+    CREATE, OPEN, MANAGE, EMPTY,
+    ADD, DROP, EXPORT, INFO, CLOSE, EMPTY,
+    SERVER, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : EXIT
   }, {
-    COPY, PASTE, DELETE, INSERT, EDIT, SEPARATOR,
+    COPY, PASTE, DELETE, INSERT, EDIT, EMPTY,
     COPYPATH, FILTER
   }, {
-    SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, SEPARATOR,
+    SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, EMPTY,
     SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER, SHOWPLOT, SHOWTABLE,
-    SHOWEXPLORE, SEPARATOR, FULL
+    SHOWEXPLORE, EMPTY, FULL
   }, {
-    SHOWXQUERY, SHOWINFO, SEPARATOR,
+    SHOWXQUERY, SHOWINFO, EMPTY,
     XQOPEN, XQSAVE, XQSAVEAS
   }, {
-    RTEXEC, RTFILTER, SEPARATOR,
-    COLOR, FONTS, MAPLAYOUT, TREEOPTIONS,
-    Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : PREFS
+    RTEXEC, RTFILTER, EMPTY,
+    COLOR, FONTS, MAPLAYOUT, TREEOPTIONS, Prop.MAC ? null : EMPTY,
+    Prop.MAC ? null : PREFS
   }, {
-    CREATEFS, SEPARATOR, DQE, MOUNTFS
+    CREATEFS, EMPTY, DQE, MOUNTFS
   }, {
-    SHOWHELP, Prop.MAC ? null : SEPARATOR, SHOWCOMMUNITY, SHOWUPDATES,
-    Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : ABOUT
+    SHOWHELP, Prop.MAC ? null : EMPTY,
+    SHOWCOMMUNITY, SHOWUPDATES, Prop.MAC ? null : EMPTY,
+    Prop.MAC ? null : ABOUT
   }};
 
   /** Context menu entries. */
-  public static final GUICommand[] POPUP = {
+  public static final GUICommands[] POPUP = {
     GOBACK, FILTER, null, COPY, PASTE, DELETE, INSERT, EDIT, null, COPYPATH
   };
 

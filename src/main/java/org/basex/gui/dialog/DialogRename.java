@@ -22,7 +22,7 @@ import org.basex.util.Util;
 
 /**
  * Rename database dialog.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -67,7 +67,7 @@ public class DialogRename extends Dialog {
         if(!modifier(e)) action(ENTER.is(e) ? e.getSource() : null);
       }
     });
-    info = new BaseXLabel(" ");
+    info = new BaseXLabel();
 
     final BaseXBack p = new BaseXBack(new BorderLayout(0, 8));
     p.add(name, BorderLayout.NORTH);

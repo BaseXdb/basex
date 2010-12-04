@@ -140,7 +140,7 @@ public final class DialogServer extends Dialog {
     loguser.addKeyListener(keys);
     logpass = new BaseXPassword(main);
     logpass.addKeyListener(keys);
-    infoC = new BaseXLabel(" ").border(8, 0, 0, 0);
+    infoC = new BaseXLabel().border(8, 0, 0, 0);
 
     BaseXBack p = new BaseXBack(new TableLayout(6, 1, 0, 0));
 
@@ -151,15 +151,15 @@ public final class DialogServer extends Dialog {
         0, 0, 0, 0);
     pp.add(new BaseXLabel(PORT + COLS));
     pp.add(ports);
-    pp.add(new BaseXLabel(" "));
+    pp.add(new BaseXLabel());
     BaseXBack ppp = new BaseXBack(new TableLayout(1, 2, 5, 0));
     ppp.add(start);
     ppp.add(stop);
     pp.add(ppp);
     p.add(pp);
 
-    p.add(new BaseXLabel(" ", true, true));
-    p.add(new BaseXLabel(ADMINLOGIN + COLS, true, true));
+    p.add(new BaseXLabel());
+    p.add(new BaseXLabel(ADMINLOGIN + COLS, true, true).border(8, 0, 4, 0));
 
     // login panel
     pp = new BaseXBack(new TableLayout(5, 2, 8, 4));
@@ -171,7 +171,7 @@ public final class DialogServer extends Dialog {
     pp.add(host);
     pp.add(new BaseXLabel(PORT + COLS));
     pp.add(portc);
-    pp.add(new BaseXLabel(" "));
+    pp.add(new BaseXLabel());
     ppp = new BaseXBack(new TableLayout(1, 2, 5, 0));
     ppp.add(connect);
     ppp.add(disconnect);
@@ -225,7 +225,7 @@ public final class DialogServer extends Dialog {
     BaseXLayout.setHeight(logt, 100);
 
     logt.border(5, 5, 5, 5);
-    infoL = new BaseXLabel(" ").border(8, 0, 0, 0);
+    infoL = new BaseXLabel().border(8, 0, 0, 0);
     refreshLog = new BaseXButton(BUTTONREFRESH, this);
 
     p = new BaseXBack(new BorderLayout());

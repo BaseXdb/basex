@@ -118,7 +118,7 @@ public final class DialogCreateFS extends Dialog {
     p.add(dbname);
     p1.add(p, BorderLayout.CENTER);
 
-    info = new BaseXLabel(" ");
+    info = new BaseXLabel();
     p1.add(info, BorderLayout.SOUTH);
 
     // Metadata panel
