@@ -184,7 +184,12 @@ final class FNGen extends Fun {
   private Item unparsedText(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
-    return unparsedText(io, enc, input);
+    try {
+      return Str.get(TextInput.content(io, enc).finish());
+    } catch(final IOException ex) {
+      UNDEF.thrw(input, ex);
+      return null;
+    }
   }
 
   /**
@@ -195,33 +200,14 @@ final class FNGen extends Fun {
    */
   private Bln unparsedTextAvailable(final QueryContext ctx)
       throws QueryException {
-    try {
-      final IO io = checkIO(expr[0], ctx);
-      final String e = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
-      return Bln.get(unparsedText(io, e, input) != null);
-    } catch(final QueryException ex) {
-      // error code is still to be fixed in the specs...
-      if(ex.type() == Err.UNDEF.type) return Bln.FALSE;
-      throw ex;
-    }
-  }
 
-  /**
-   * Performs the unparsed-text function. The result is optionally cached.
-   * @param io input path
-   * @param enc encoding
-   * @param input input information
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  static Str unparsedText(final IO io, final String enc, final InputInfo input)
-      throws QueryException {
-
+    final IO io = checkIO(expr[0], ctx);
+    final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     try {
-      return Str.get(TextInput.content(io, enc).finish());
+      TextInput.content(io, enc);
+      return Bln.TRUE;
     } catch(final IOException ex) {
-      UNDEF.thrw(input, ex);
-      return null;
+      return Bln.FALSE;
     }
   }
 

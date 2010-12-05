@@ -24,9 +24,11 @@ public final class Prop extends AProp {
   public static final String TMP = System.getProperty("java.io.tmpdir") + SEP;
 
   /** OS flag (should be ignored whenever possible). */
-  private static final String OS = System.getProperty("os.name").toUpperCase();
+  public static final String OS = System.getProperty("os.name").toUpperCase();
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.startsWith("MAC");
+  /** Flag denoting if OS belongs to Windows family. */
+  public static final boolean WIN = OS.startsWith("WIN");
 
   /** Directory for storing the property files, database directory, etc. */
   public static final String HOME = Util.homeDir() + SEP;

@@ -694,7 +694,7 @@ public enum Type {
           final DOCWrapper p = new DOCWrapper((Document) o, "");
           return new DBNode(MemBuilder.build(p, new Prop(false)), 0);
         } catch(final IOException ex) {
-          UNDOC.thrw(ii, ex.getMessage());
+          UNDOC.thrw(ii, ex);
         }
       }
       // document fragment

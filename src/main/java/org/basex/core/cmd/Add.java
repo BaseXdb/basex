@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
-
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;

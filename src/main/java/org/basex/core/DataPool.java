@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.basex.data.Data;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;

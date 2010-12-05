@@ -1,6 +1,8 @@
 package org.basex.test.query;
 
 import org.basex.core.BaseXException;
+import org.basex.query.func.FunDef;
+import org.basex.query.util.Err;
 import org.junit.Test;
 
 /**
@@ -10,21 +12,23 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class FNUtilTest extends AdvancedQueryTest {
+  /** Constructor. */
+  public FNUtilTest() {
+    super("util");
+  }
+
   /**
    * Test method for the util:eval() functions.
    * @throws BaseXException database exception
    */
   @Test
   public void testEval() throws BaseXException {
-    // test wrong arguments
-    args("util:eval", String.class);
-
-    // dynamically evaluate query expressions
-    query("util:eval('1')", "1");
-    query("util:eval('1 + 2')", "3");
-    error("util:eval('1+')", "XPST0003");
-    error("declare variable $a := 1; util:eval('$a')", "XPST0008");
-    error("for $a in (1,2) return util:eval('$a')", "XPST0008");
+    final String fun = check(FunDef.EVAL, String.class);
+    query(fun + "('1')", "1");
+    query(fun + "('1 + 2')", "3");
+    error(fun + "('1+')", Err.INCOMPLETE);
+    error("declare variable $a := 1; " + fun + "('$a')", Err.VARUNDEF);
+    error("for $a in (1,2) return " + fun + "('$a')", Err.VARUNDEF);
   }
 
   /**
@@ -33,12 +37,9 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testRun() throws BaseXException {
-    // test wrong arguments
-    args("util:run", String.class);
-
-    // dynamically run query files
-    query("util:run('etc/xml/input.xq')", "XML");
-    error("util:run('etc/xml/xxx.xq')", "FODC0002");
+    final String fun = check(FunDef.RUN, String.class);
+    query(fun + "('etc/xml/input.xq')", "XML");
+    error(fun + "('etc/xml/xxx.xq')", Err.UNDOC);
   }
 
   /**
@@ -47,16 +48,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testMB() throws BaseXException {
-    // wrong arguments
-    error("util:mb()", "XPST0017");
-    error("util:mb('a','b')", "XPTY0004");
-    error("util:mb('a','b','c')", "XPST0017");
-    error("util:mb(1+)", "XPST0003");
-
-    // measure memory (will always yield different results)
-    query("util:mb(())");
-    query("util:mb(1 to 10000, false())");
-    query("util:mb(1 to 10000, true())");
+    final String fun = check(FunDef.MB, (Class<?>) null, Boolean.class);
+    query(fun + "(())");
+    query(fun + "(1 to 1000, false())");
+    query(fun + "(1 to 1000, true())");
   }
 
   /**
@@ -65,15 +60,9 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testMS() throws BaseXException {
-    // wrong arguments
-    error("util:ms()", "XPST0017");
-    error("util:ms('a','b')", "XPTY0004");
-    error("util:ms('a','b','c')", "XPST0017");
-    error("util:ms(1+)", "XPST0003");
-
-    // measure time (will always yield different results)
-    query("util:ms(())");
-    query("util:ms(1 to 10000, false())");
-    query("util:ms(1 to 10000, true())");
+    final String fun = check(FunDef.MS, (Class<?>) null, Boolean.class);
+    query(fun + "(())");
+    query(fun + "(1 to 1000, false())");
+    query(fun + "(1 to 1000, true())");
   }
 }

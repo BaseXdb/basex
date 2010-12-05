@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;

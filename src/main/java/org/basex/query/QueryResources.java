@@ -167,7 +167,7 @@ public final class QueryResources {
     try {
       return Check.check(ctx.context, path);
     } catch(final IOException ex) {
-      if(err) (col ? NOCOLL : NODOC).thrw(ii, ex.getMessage());
+      if(err) (col ? NOCOLL : NODOC).thrw(ii, ex);
       return null;
     }
   }

@@ -113,7 +113,7 @@ final class FNUtil extends Fun {
     final Value v = (c ? ItemIter.get(ir) : ir).finish();
 
     // measure resulting memory consumption
-    Performance.gc(3);
+    Performance.gc(2);
     final double d = Performance.mem() - l;
 
     // loop through all results to avoid premature result disposal

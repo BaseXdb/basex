@@ -372,7 +372,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if an expression yields a valid {@link IO} instance.
+   * Checks if an expression yields a valid and existing {@link IO} instance.
    * Returns the instance or an exception.
    * @param e expression to be evaluated
    * @param ctx query context
@@ -383,7 +383,7 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     checkAdmin(ctx);
-    final byte[] name = checkEStr(e, ctx);
+    final byte[] name = checkStr(e, ctx);
     final IO io = IO.get(string(name));
     if(!io.exists()) DOCERR.thrw(input, name);
     return io;

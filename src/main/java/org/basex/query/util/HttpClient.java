@@ -181,8 +181,7 @@ public final class HttpClient {
       final byte[] passwd = reqAttrs.get(PASSWD);
 
       if(usrname == null && passwd != null
-          || usrname != null && passwd == null)
-        throw new QueryException(info, CREDSERR);
+          || usrname != null && passwd == null) CREDSERR.thrw(info);
     }
   }
 
@@ -238,21 +237,22 @@ public final class HttpClient {
       final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
       try {
-      setConnectionProps(conn);
-      setHttpRequestHeaders(conn);
-      if(body != null) setHttpRequestContent(conn);
-      conn.getResponseCode();
-      return getHttpResponse(conn, ctx);
+        setConnectionProps(conn);
+        setHttpRequestHeaders(conn);
+        if(body != null) setHttpRequestContent(conn);
+        conn.getResponseCode();
+        return getHttpResponse(conn, ctx);
       } finally {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      throw new QueryException(info, URLINV, ex);
+      URLINV.thrw(info, ex);
     } catch(final ProtocolException ex) {
-      throw new QueryException(info, PROTINV, ex);
+      PROTINV.thrw(info, ex);
     } catch(final IOException ex) {
-      throw new QueryException(info, HTTPERR, ex.getMessage());
+      HTTPERR.thrw(info, ex);
     }
+    return null;
   }
 
   /**

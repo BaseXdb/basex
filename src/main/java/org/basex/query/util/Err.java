@@ -102,43 +102,31 @@ public enum Err {
   PICCOMP(FODF, 1350, "Invalid component in string: \"%\"."),
 
   /** FOFL0001: Evaluation exception. */
-  FILEREAD(FOFL, 1, "File '%' cannot be read."),
+  PATHNOTEXISTS(FOFL, 1, "Path '%' does not exist."),
   /** FOFL0002: Evaluation exception. */
-  FILEWRITE(FOFL, 2, "File '%' cannot be written."),
+  FILEEXISTS(FOFL, 2, "File '%' already exists."),
   /** FOFL0003: Evaluation exception. */
-  FILELIST(FOFL, 3, "Files of '%' cannot be returned."),
+  NOTDIR(FOFL, 3, "Path '%' is not a directory."),
   /** FOFL0004: Evaluation exception. */
-  FILEPATTERN(FOFL, 4, "Invalid file name pattern '%'."),
+  PATHISDIR(FOFL, 4, "Path '%' is a directory."),
+
   /** FOFL0005: Evaluation exception. */
-  FILEDEL(FOFL, 5, "'%' cannot be deleted. Permission denied."),
+  DIRNOTEMPTY(FOFL, 5, "Directory '%' is not empty."),
   /** FOFL0006: Evaluation exception. */
-  PATHNOTEXISTS(FOFL, 6, "File '%' does not exist."),
+  PATHINVALID(FOFL, 6, "Invalid file path '%'."),
   /** FOFL0007: Evaluation exception. */
-  FILEDELDIR(FOFL, 7, "Directory '%' is not empty."),
+  ENCNOTEXISTS(FOFL, 7, "Encoding '%' is not supported."),
+
   /** FOFL0008: Evaluation exception. */
-  FILEEXISTS(FOFL, 8, "File '%' already exists."),
-  /** FOFL0009: Evaluation exception. */
-  DIRMOVE(FOFL, 9, "A directory cannot be moved."),
-  /** FOFL0010: Evaluation exception. */
-  FILEMOVE(FOFL, 10, "'%' cannot be moved. '%' is write-protected."),
-  /** FOFL0011: Evaluation exception. */
-  MKDIR(FOFL, 11, "'%' cannot be created. '%' is write-protected."),
-  /** FOFL0012: Evaluation exception. */
-  CANNOTMKDIR(FOFL, 12, "Directory '%' cannot be created."),
-  /** FOFL0013: Evaluation exception. */
-  CANNOTDEL(FOFL, 13, "'%' cannot be deleted."),
-  /** FOFL0014: Evaluation exception. */
-  CANNOTMOVE(FOFL, 14, "File '%' cannot be moved."),
-  /** FOFL0015: Evaluation exception. */
-  DIRINV(FOFL, 15, "The path '%' is invalid in the filesystem."),
-  /** FOFL0016: Evaluation exception. */
-  COPYFAILED(FOFL, 16, "Copying from '%' to '%' failed: %."),
-  /** FOFL0017: Evaluation exception. */
-  ENCNOTEXISTS(FOFL, 17, "The encoding '%' is not supported."),
-  /** FOFL0018: Evaluation exception. */
-  DIRNOTEXISTS(FOFL, 18, "Directory '%' does not exist."),
-  /** FOFL0019: Evaluation exception. */
-  NOTDIR(FOFL, 19, "'%' is not a directory."),
+  FILEERROR(FOFL, 8, "Operation failed: %."),
+  /** FOFL0008: Evaluation exception. */
+  CANNOTCREATE(FOFL, 8, "Directory '%' cannot be created."),
+  /** FOFL0008: Evaluation exception. */
+  CANNOTDEL(FOFL, 8, "Path '%' cannot be deleted."),
+  /** FOFL0008: Evaluation exception. */
+  CANNOTMOVE(FOFL, 8, "Moving '%' to '%' failed."),
+  /** FOFL0008: Evaluation exception. */
+  CANNOTLIST(FOFL, 8, "Files of '%' cannot be returned."),
 
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL."),

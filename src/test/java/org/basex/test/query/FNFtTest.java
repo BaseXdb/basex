@@ -5,6 +5,8 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
+import org.basex.query.func.FunDef;
+import org.basex.query.item.DBNode;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +20,11 @@ import org.junit.Test;
 public final class FNFtTest extends AdvancedQueryTest {
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
+
+  /** Constructor. */
+  public FNFtTest() {
+    super("ft");
+  }
 
   /**
    * Initializes a test.
@@ -35,17 +42,17 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void testSearch() throws BaseXException {
-    // test wrong arguments
-    args("ft:search", (Class<?>) null, String.class);
+    // test arguments
+    final String fun = check(FunDef.SEARCH, DBNode.class, String.class);
 
     // check index results
-    query("ft:search(., 'assignments')", "Assignments");
-    query("ft:search(., 'XXX')", "");
+    query(fun + "(., 'assignments')", "Assignments");
+    query(fun + "(., 'XXX')", "");
 
     // apply index options to query term
     new Set("stemming", true).execute(CTX);
     new CreateIndex("fulltext").execute(CTX);
-    contains("ft:search(., 'Exercises')/..", "<li>Exercise 1</li>");
+    contains(fun + "(., 'Exercises')/..", "<li>Exercise 1</li>");
   }
 
   /**
@@ -54,11 +61,13 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void testMark() throws BaseXException {
-    query("ft:mark(//*[text() contains text '1'])",
+    final String fun = check(FunDef.MARK, (Class<?>) null, String.class);
+
+    query(fun + "(//*[text() contains text '1'])",
       "<li>Exercise <mark>1</mark></li>");
-    query("ft:mark(//*[text() contains text '2'], 'b')",
+    query(fun + "(//*[text() contains text '2'], 'b')",
       "<li>Exercise <b>2</b></li>");
-    contains("ft:mark(//*[text() contains text 'Exercise'])",
+    contains(fun + "(//*[text() contains text 'Exercise'])",
       "<li><mark>Exercise</mark> 1</li>");
     query("copy $a := text { 'a b' } modify () " +
       "return ft:mark($a[. contains text 'a'], 'b')", "<b>a</b> b");
@@ -74,13 +83,16 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void testExtract() throws BaseXException {
-    query("ft:extract(//*[text() contains text '1'])",
+    final String fun =
+      check(FunDef.EXTRACT, (Class<?>) null, String.class, Integer.class);
+
+    query(fun + "(//*[text() contains text '1'])",
       "<li>Exercise <mark>1</mark></li>");
-    query("ft:extract(//*[text() contains text '2'], 'b', 20)",
+    query(fun + "(//*[text() contains text '2'], 'b', 20)",
       "<li>Exercise <b>2</b></li>");
-    query("ft:extract(//*[text() contains text '2'], '_o_', 1)",
+    query(fun + "(//*[text() contains text '2'], '_o_', 1)",
       "<li>...<_o_>2</_o_></li>");
-    contains("ft:extract(//*[text() contains text 'Exercise'], 'b', 1)",
+    contains(fun + "(//*[text() contains text 'Exercise'], 'b', 1)",
       "<li><b>Exercise</b>...</li>");
   }
 
@@ -90,11 +102,11 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void testScore() throws BaseXException {
-    // test wrong arguments
-    args("ft:score", (Class<?>) null);
+    // test arguments
+    final String fun = check(FunDef.SCORE, (Class<?>) null);
 
-    query("ft:score(ft:search(., '2'))", "1");
-    query("ft:score(ft:search(., 'XML'))", "1 0.5");
+    query(fun + "(ft:search(., '2'))", "1");
+    query(fun + "(ft:search(., 'XML'))", "1 0.5");
   }
 
   /**

@@ -2,22 +2,21 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.PatternSyntaxException;
 import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.PrintOutput;
+import org.basex.io.TextInput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -55,10 +54,8 @@ final class FNFile extends Fun {
     checkAdmin(ctx);
 
     switch(def) {
-      case FILES:
-        return listFiles(ctx);
-      default:
-        return super.iter(ctx);
+      case FLIST: return list(ctx);
+      default:    return super.iter(ctx);
     }
   }
 
@@ -68,48 +65,51 @@ final class FNFile extends Fun {
     checkAdmin(ctx);
 
     final File path = expr.length == 0 ? null : new File(
-        string(checkEStr(expr[0].item(ctx, input))));
+        string(checkStr(expr[0], ctx)));
 
     switch(def) {
-      case FILEEXISTS:
-        return Bln.get(path.exists());
-      case ISDIR:
-        return Bln.get(path.isDirectory());
-      case ISFILE:
-        return Bln.get(path.isFile());
-      case ISREAD:
-        return Bln.get(path.canRead());
-      case ISWRITE:
-        return Bln.get(path.canWrite());
-      case SIZE:
-        return Itr.get(path.length());
-      case LASTMOD:
-        return new Dtm(path.lastModified(), input);
-      case PATHSEP:
-        return Str.get(Prop.SEP);
-      case PATHTOFULL:
-        return Str.get(path.getAbsolutePath());
-      case PATHTOURI:
-        return pathToUri(ctx);
-      case MKDIR:
-        return makeDir(path, ctx);
-      case DELETE:
-        return delete(path, ctx);
-      case READFILE:
-        return read(ctx);
-      case READBIN:
-        return readBinary(path);
-      case WRITE:
-        return write(path, ctx);
-      case WRITEBIN:
-        return writeBinary(path, ctx);
-      case COPY:
-        return copy(path, ctx);
-      case MOVE:
-        return move(path, ctx);
-      default:
-        return super.item(ctx, ii);
+      case FEXISTS:    return Bln.get(path.exists());
+      case ISDIR:      return Bln.get(path.isDirectory());
+      case ISFILE:     return Bln.get(path.isFile());
+      case ISREAD:     return Bln.get(path.canRead());
+      case ISWRITE:    return Bln.get(path.canWrite());
+      case LASTMOD:    return lastModified(path);
+      case SIZE:       return size(path);
+      case PATHSEP:    return Str.get(Prop.SEP);
+      case PATHTOFULL: return Str.get(path.getAbsolutePath());
+      case PATHTOURI:  return pathToUri(path);
+      case CREATEDIR:  return createDirectory(path);
+      case DELETE:     return delete(path, ctx);
+      case READ:       return read(path, ctx);
+      case READBIN:    return readBinary(path);
+      case WRITE:      return write(path, ctx);
+      case WRITEBIN:   return writeBinary(path, ctx);
+      case COPY:       return copy(path, ctx);
+      case MOVE:       return move(path, ctx);
+      default:         return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Returns the last modified date of the specified path.
+   * @param path file to be deleted
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Item lastModified(final File path) throws QueryException {
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
+    return new Dtm(path.lastModified(), input);
+  }
+
+  /**
+   * Returns the size of the specified path.
+   * @param path file to be deleted
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Item size(final File path) throws QueryException {
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
+    return Itr.get(path.length());
   }
 
   /**
@@ -118,46 +118,39 @@ final class FNFile extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter listFiles(final QueryContext ctx) throws QueryException {
+  private Iter list(final QueryContext ctx) throws QueryException {
     final String path = string(checkStr(expr[0], ctx));
-    final String pattern;
     final File dir = new File(path);
 
     // Check if directory exists
-    if(!dir.exists()) {
-      DIRNOTEXISTS.thrw(input, path);
-      return null;
-    }
+    if(!dir.exists()) PATHNOTEXISTS.thrw(input, path);
     // Check if not a directory
-    if(!dir.isDirectory()) {
-      NOTDIR.thrw(input, path);
-      return null;
+    if(!dir.isDirectory()) NOTDIR.thrw(input, path);
+
+    final boolean rec = optionalBool(1, ctx);
+    final String pat = expr.length != 3 ? null :
+      IOFile.regex(string(checkStr(expr[2], ctx)));
+
+    File[] fl;
+    if(rec) {
+      List<File> list = new ArrayList<File>();
+      recList(dir, list);
+      fl = list.toArray(new File[list.size()]);
+    } else {
+      fl = dir.listFiles();
+      if(fl == null) CANNOTLIST.thrw(input, path);
     }
-
-    final boolean recursive = expr.length > 1
-        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
-
-    try {
-      pattern = expr.length != 3 ? null : IOFile.regex(string(checkStr(expr[2],
-          ctx)));
-    } catch(final PatternSyntaxException ex) {
-      FILEPATTERN.thrw(input, expr[1]);
-      return null;
-    }
-
-    final List<File> files = recursive ? listRecursively(dir)
-        : Arrays.asList(dir.listFiles());
-    if(files == null) FILELIST.thrw(input, path);
+    final File[] files = fl;
 
     return new Iter() {
       int c = -1;
 
       @Override
       public Item next() {
-        while(++c < files.size()) {
-          if(checkMatch(files.get(c), pattern)) {
-            return Str.get(files.get(c).getPath());
-          }
+        while(++c < files.length) {
+          final File f = files[c];
+          final String n = Prop.WIN ? f.getName().toLowerCase() : f.getName();
+          if(pat == null || n.matches(pat)) return Str.get(f.getPath());
         }
         return null;
       }
@@ -166,135 +159,191 @@ final class FNFile extends Fun {
 
   /**
    * Lists the files in a directory recursively.
-   * @param file directory
-   * @return file listing
+   * @param dir current directory
+   * @param list file list
    */
-  private List<File> listRecursively(final File file) {
-    final List<File> result = new ArrayList<File>();
-    File currFile = file;
-    int c = 0;
-    do {
-      if(currFile.isDirectory()) {
-        for(final File f : currFile.listFiles())
-          result.add(f);
-      }
-      currFile = result.get(c);
-    } while(++c < result.size());
-
-    return result;
+  private void recList(final File dir, final List<File> list) {
+    final File[] files = dir.listFiles();
+    if(files == null) return;
+    for(final File f : files) {
+      list.add(f);
+      if(f.isDirectory()) recList(f, list);
+    }
   }
 
   /**
-   * Checks if a file is hidden and matches the given pattern.
-   * @param file file
-   * @param pattern pattern
+   * Creates a directory.
+   * @param path directory to be created
    * @return result
+   * @throws QueryException query exception
    */
-  boolean checkMatch(final File file, final String pattern) {
-    return !file.isHidden()
-        && (pattern == null || file.getName().matches(pattern));
+  private Item createDirectory(final File path) throws QueryException {
+    // resolve symbolic links
+    File f = null;
+    try {
+      f = path.getCanonicalFile();;
+    } catch(final IOException ex) {
+      PATHINVALID.thrw(input, path);
+    }
+
+    // find lowest existing path
+    while(!f.exists()) {
+      f = f.getParentFile();
+      if(f == null) PATHINVALID.thrw(input, path);
+    }
+    // warn if lowest path points to a file
+    if(f.isFile()) FILEEXISTS.thrw(input, path);
+
+    // only create directories if path does not exist yet
+    if(!path.exists() && !path.mkdirs()) CANNOTCREATE.thrw(input, path);
+    return null;
   }
 
   /**
-   * Reads the content of a file.
+   * Deletes a file or directory.
+   * @param path file to be deleted
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Item delete(final File path, final QueryContext ctx)
+      throws QueryException {
+
+    final boolean rec = optionalBool(1, ctx);
+    if(path.exists()) {
+      if(rec) recDelete(path);
+      else delete(path);
+    }
+    return null;
+  }
+
+  /**
+   * Deletes a single file or directory.
+   * @param path file/directory to be deleted
+   * @throws QueryException query exception
+   */
+  private void delete(final File path) throws QueryException {
+    if(path.isDirectory()) {
+      final File[] ch = path.listFiles();
+      if(ch != null && ch.length != 0) DIRNOTEMPTY.thrw(input, path);
+    }
+    if(!path.delete()) CANNOTDEL.thrw(input, path);
+  }
+
+  /**
+   * Deletes a directory recursively.
+   * @param path directory to be deleted
+   * @throws QueryException query exception
+   */
+  private void recDelete(final File path) throws QueryException {
+    final File[] ch = path.listFiles();
+    if(ch != null) for(final File f : ch) recDelete(f);
+    if(!path.delete()) CANNOTDEL.thrw(input, path);
+  }
+
+  /**
+   * Reads the contents of a file.
+   * @param path input path
    * @param ctx query context
    * @return string
    * @throws QueryException query exception
    */
-  private Str read(final QueryContext ctx) throws QueryException {
-    final IO io = checkIO(expr[0], ctx);
-    final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
+  private Str read(final File path, final QueryContext ctx)
+      throws QueryException {
+
+    final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
+    if(path.isDirectory()) PATHISDIR.thrw(input, path);
 
     if(enc != null && !Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
 
-    return Str.get(FNGen.unparsedText(io, enc, input));
+    try {
+      return Str.get(TextInput.content(IO.get(path.getPath()), enc).finish());
+    } catch(final IOException ex) {
+      FILEERROR.thrw(input, ex);
+      return null;
+    }
   }
 
   /**
-   * Reads the content of a binary file.
-   * @param file input file
+   * Reads the contents of a binary file.
+   * @param path input path
    * @return Base64Binary
    * @throws QueryException query exception
    */
-  private B64 readBinary(final File file) throws QueryException {
+  private B64 readBinary(final File path) throws QueryException {
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
+    if(path.isDirectory()) PATHISDIR.thrw(input, path);
+
     try {
-      return new B64(new IOFile(file).content());
-    } catch(final IOException e) {
-      FILEREAD.thrw(input, file.getName());
+      return new B64(new IOFile(path).content());
+    } catch(final IOException ex) {
+      FILEERROR.thrw(input, ex);
       return null;
     }
   }
 
   /**
    * Writes a sequence of items to a file.
-   * @param file file to be written
+   * @param path file to be written
    * @param ctx query context
    * @return true if file was successfully written
    * @throws QueryException query exception
    */
-  private Item write(final File file, final QueryContext ctx)
+  private Item write(final File path, final QueryContext ctx)
       throws QueryException {
 
-    final boolean append = expr.length == 4
-        && checkType(expr[3].item(ctx, input), Type.BLN).bool(input);
-
-    // Raise an exception, if the append flag is false and
-    // the file to be written already exists
-    if(!append && file.exists()) FILEEXISTS.thrw(input, file.getPath());
+    final boolean append = optionalBool(3, ctx);
+    if(path.isDirectory()) PATHISDIR.thrw(input, path);
 
     final Iter ir = expr[1].iter(ctx);
     try {
-      final PrintOutput out = new PrintOutput(file.getPath());
+      final PrintOutput out = new PrintOutput(
+          new BufferedOutputStream(new FileOutputStream(path, append)));
       try {
-        final XMLSerializer xml = new XMLSerializer(out, FNGen.serialPar(this,
-            2, ctx));
+        final XMLSerializer xml = new XMLSerializer(out,
+            FNGen.serialPar(this, 2, ctx));
         Item it;
-        while((it = ir.next()) != null)
-          it.serialize(xml);
+        while((it = ir.next()) != null) it.serialize(xml);
         xml.close();
       } finally {
         out.close();
       }
-    } catch(final IOException e) {
-      FILEWRITE.thrw(input, file.getName());
+    } catch(final IOException ex) {
+      FILEERROR.thrw(input, ex);
     }
     return null;
   }
 
   /**
    * Writes the content of a binary file.
-   * @param file file to be written
+   * @param path file to be written
    * @param ctx query context
    * @return result
    * @throws QueryException query exception
    */
-  private Item writeBinary(final File file, final QueryContext ctx)
+  private Item writeBinary(final File path, final QueryContext ctx)
       throws QueryException {
 
     final B64 b64 = (B64) checkType(expr[1].item(ctx, input), Type.B6B);
-
-    final boolean append = expr.length == 3
-        && checkType(expr[2].item(ctx, input), Type.BLN).bool(input);
-
-    // Raise an exception, if the append flag is false and
-    // the file to be written already exists
-    if(!append && file.exists()) FILEEXISTS.thrw(input, file.getPath());
+    final boolean append = optionalBool(2, ctx);
+    if(path.isDirectory()) PATHISDIR.thrw(input, path);
 
     try {
-      final FileOutputStream out = new FileOutputStream(file);
+      final FileOutputStream out = new FileOutputStream(path, append);
       try {
         out.write(b64.toJava());
       } finally {
         out.close();
       }
     } catch(final IOException ex) {
-      FILEWRITE.thrw(input, file.getName());
+      FILEERROR.thrw(input, ex);
     }
     return null;
   }
 
   /**
-   * Copies a file given a source and a destination.
+   * Copies a file given a source and a target.
    * @param src source file to be copied
    * @param ctx query context
    * @return result
@@ -303,28 +352,31 @@ final class FNFile extends Fun {
   private Item copy(final File src, final QueryContext ctx)
       throws QueryException {
 
-    final boolean overwrite = expr.length == 3
-        && checkType(expr[2].item(ctx, input), Type.BLN).bool(input);
+    File trg = new File(string(checkStr(expr[1], ctx)));
+    // attach file name if target is a directory
+    if(trg.isDirectory()) {
+      trg = new File(trg, src.getName());
+    } else if(!trg.isFile()) {
+      final File par = trg.getParentFile();
+      if(!par.exists() || !par.isDirectory()) PATHINVALID.thrw(input, trg);
+    }
 
-    final File dst = new File(string(checkStr(expr[1], ctx)));
     if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
+    if(src.isDirectory()) PATHISDIR.thrw(input, src);
 
-    // Raise an exception, if the file to be copied
-    // already exists in the specified destination and
-    // the $overwrite parameter evaluates to false
-    if(!overwrite && dst.exists()) FILEEXISTS.thrw(input, dst.getName());
-
-    try {
-      final FileChannel sc = new FileInputStream(src).getChannel();
-      final FileChannel dc = new FileOutputStream(dst).getChannel();
+    if(!src.equals(trg)) {
+      FileChannel sc = null;
+      FileChannel dc = null;
       try {
+        sc = new FileInputStream(src).getChannel();
+        dc = new FileOutputStream(trg).getChannel();
         dc.transferFrom(sc, 0, sc.size());
+      } catch(final IOException ex) {
+        FILEERROR.thrw(input, ex);
       } finally {
-        sc.close();
-        dc.close();
+        if(sc != null) try { sc.close(); } catch(final IOException e) { }
+        if(dc != null) try { dc.close(); } catch(final IOException e) { }
       }
-    } catch(final IOException ex) {
-      COPYFAILED.thrw(input, src, dst, ex.getMessage());
     }
     return null;
   }
@@ -339,144 +391,40 @@ final class FNFile extends Fun {
   private Item move(final File src, final QueryContext ctx)
       throws QueryException {
 
-    final String dst = string(checkStr(expr[1], ctx));
-    if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
-
-    final String destFile = dst + (dst.endsWith(Prop.SEP) ? "" : Prop.SEP)
-        + src.getName();
-
-    // Raise an exception if the target file already exists
-    if(new File(destFile).exists()) FILEEXISTS.thrw(input, destFile);
-
-    // Raise an exception if the user has no access
-    // to the destination
-    if(!new File(dst).canWrite()) FILEMOVE.thrw(input, src.getPath(), dst);
-
-    // Raise an exception if a directory is to be moved
-    if(src.isDirectory()) DIRMOVE.thrw(input);
-
-    if(!src.renameTo(new File(dst, src.getName()))) CANNOTMOVE.thrw(input,
-        src.getPath());
-
-    return null;
-  }
-
-  /**
-   * Creates a directory.
-   * @param file directory to be created
-   * @param ctx query context
-   * @return result
-   * @throws QueryException query exception
-   */
-  private Item makeDir(final File file, final QueryContext ctx)
-      throws QueryException {
-
-    final boolean recursive = expr.length == 2
-        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
-
-    // Raise an exception if the directory cannot be created because
-    // a file with the same name already exists
-    if(file.exists() && !file.isDirectory()) FILEEXISTS.thrw(input,
-        file.getName());
-
-    if(recursive) {
-      // Raise an exception if the existent directory, in which
-      // the dirs are to be created, is write-protected
-      final File par = existingParent(file);
-      if(!par.canWrite()) MKDIR.thrw(input, file.getPath(), par.getPath());
-
-      if(!file.mkdirs()) CANNOTMKDIR.thrw(input, file.getPath());
-    } else {
-      if(!file.mkdir()) CANNOTMKDIR.thrw(input, file.getPath());
+    File trg = new File(string(checkStr(expr[1], ctx)));
+    // attach file name if target is a directory
+    if(trg.isDirectory()) {
+      trg = new File(trg, src.getName());
+    } else if(!trg.isFile()) {
+      final File par = trg.getParentFile();
+      if(!par.exists() || !par.isDirectory()) PATHINVALID.thrw(input, trg);
     }
 
+    if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
+    if(!src.renameTo(trg)) CANNOTMOVE.thrw(input, src, trg);
     return null;
   }
 
   /**
    * Transforms a file system path into a URI with the file:// scheme.
-   * @param ctx query context
+   * @param path file path
    * @return result
-   * @throws QueryException query context
    */
-  private Uri pathToUri(final QueryContext ctx) throws QueryException {
-
-    final String path = string(checkEStr(expr[0].item(ctx, input)));
-
-    final URI uri = new File(path).toURI();
-    return Uri.uri(Token.token(uri.toString()));
-
+  private Uri pathToUri(final File path) {
+    return Uri.uri(Token.token(path.toURI().toString()));
   }
 
   /**
-   * Deletes a file or directory.
-   * @param file file to be deleted
+   * Returns the value of an optional boolean.
+   * @param i argument index
    * @param ctx query context
-   * @return result
+   * @return boolean value
    * @throws QueryException query exception
    */
-  private Item delete(final File file, final QueryContext ctx)
+  private boolean optionalBool(final int i, final QueryContext ctx)
       throws QueryException {
-
-    final boolean recursive = expr.length == 2
-        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
-
-    if(!file.exists()) PATHNOTEXISTS.thrw(input, file.getPath());
-
-    if(!file.canWrite()) FILEDEL.thrw(input, file.getPath());
-
-    return recursive ? deleteRecursively(file) : delete(file);
-  }
-
-  /**
-   * Deletes a single file or directory.
-   * @param file file/directory to be deleted
-   * @return result
-   * @throws QueryException query exception
-   */
-  private Item delete(final File file) throws QueryException {
-    if(file.isDirectory() && file.listFiles().length != 0) FILEDELDIR.thrw(
-        input, file.getPath());
-    if(!file.delete()) CANNOTDEL.thrw(input, file.getPath());
-    return null;
-  }
-
-  /**
-   * Deletes a directory recursively.
-   * @param file directory to be deleted
-   * @return result
-   * @throws QueryException query exception
-   */
-  private Item deleteRecursively(final File file) throws QueryException {
-
-    if(!file.canWrite()) FILEDEL.thrw(input, file.getPath());
-    final File[] children = file.listFiles();
-    if(children != null) {
-      for(final File ch : children)
-        deleteRecursively(ch);
-    }
-    if(!file.delete()) CANNOTDEL.thrw(input, file.getPath());
-    return null;
-  }
-
-  /**
-   * Returns the lowest existing parent of the directory to be created.
-   * @param file directory to be created
-   * @return existing parent
-   * @throws QueryException query exception
-   */
-  private File existingParent(final File file) throws QueryException {
-    try {
-      File f = file.getCanonicalFile();
-      do {
-        f = f.getParentFile();
-        if(f == null) DIRINV.thrw(input, file);
-      } while(!f.exists());
-      return f;
-    } catch(final IOException ex) {
-      DIRINV.thrw(input, file);
-      return null;
-    }
+    return expr.length > i &&
+      checkType(expr[i].item(ctx, input), Type.BLN).bool(input);
   }
 
   @Override

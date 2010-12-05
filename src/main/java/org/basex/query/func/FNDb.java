@@ -161,7 +161,7 @@ final class FNDb extends Fun {
    * @throws QueryException query exception
    */
   private Iter fulltext(final QueryContext ctx) throws QueryException {
-    return FNFt.search(checkData(ctx), 0, this, ctx);
+    return FNFt.search(checkData(ctx), checkStr(expr[0], ctx), this, ctx);
   }
 
   /**

@@ -54,15 +54,6 @@ final class FNFt extends Fun {
     }
   }
 
-  @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
-    switch(def) {
-      default: return super.item(ctx, ii);
-    }
-  }
-
   /**
    * Performs the mark function.
    * @param ctx query context
@@ -139,25 +130,25 @@ final class FNFt extends Fun {
    * @throws QueryException query exception
    */
   Iter search(final QueryContext ctx) throws QueryException {
-    return search(checkDBNode(checkItem(expr[0], ctx)).data, 1, this, ctx);
+    return search(checkDBNode(checkItem(expr[0], ctx)).data,
+        checkStr(expr[1], ctx), this, ctx);
   }
 
   /**
    * Performs an index-based search.
    * @param data data reference
-   * @param i index of search string
+   * @param str search string
    * @param fun calling function
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  static Iter search(final Data data, final int i, final Fun fun,
+  static Iter search(final Data data, final byte[] str, final Fun fun,
       final QueryContext ctx) throws QueryException {
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
     if(!data.meta.ftindex) NOIDX.thrw(fun.input, fun);
 
-    final byte[] str = fun.checkStr(fun.expr[i], ctx);
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = new FTOpt();
     ctx.ftopt.set(CS, data.meta.casesens);

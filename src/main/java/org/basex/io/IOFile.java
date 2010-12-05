@@ -237,6 +237,9 @@ public final class IOFile extends IO {
         if(ch == '*') {
           sb.append('.');
           wild = true;
+        } else if(ch == '?') {
+          ch = '.';
+          wild = true;
         } else if(ch == ',') {
           ch = '|';
           if(!wild) sb.append(".*");
@@ -252,7 +255,7 @@ public final class IOFile extends IO {
       sb.append(ch);
     }
     if(!wild) sb.append(".*");
-    return sb.toString();
+    return Prop.WIN ? sb.toString().toLowerCase() : sb.toString();
   }
 
   /**

@@ -398,7 +398,7 @@ public enum FunDef {
   /* FNFile functions */
 
   /** XQuery function */
-  FILEEXISTS(FILEURI, FNFile.class, 1, 1, "file-exists(path)", BLN),
+  FEXISTS(FILEURI, FNFile.class, 1, 1, "exists(path)", BLN),
   /** XQuery function */
   ISDIR(FILEURI, FNFile.class, 1, 1, "is-directory(path)", BLN),
   /** XQuery function */
@@ -406,14 +406,14 @@ public enum FunDef {
   /** XQuery function */
   ISREAD(FILEURI, FNFile.class, 1, 1, "is-readable(path)", BLN),
   /** XQuery function */
-  ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writeable(path)", BLN),
+  ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writable(path)", BLN),
   /** XQuery function */
   LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
   /** XQuery function */
   SIZE(FILEURI, FNFile.class, 1, 1, "size(path)", ITR),
   /** XQuery function */
-  FILES(FILEURI, FNFile.class, 1, 3,
-      "files(path, recursive?, pattern?)", STR_ZM),
+  FLIST(FILEURI, FNFile.class, 1, 3,
+      "list(path, recursive?, pattern?)", STR_ZM),
   /** XQuery function */
   PATHSEP(FILEURI, FNFile.class, 0, 0, "path-separator()", STR),
   /** XQuery function */
@@ -421,11 +421,11 @@ public enum FunDef {
   /** XQuery function */
   PATHTOURI(FILEURI, FNFile.class, 1, 1, "path-to-uri(path)", URI),
   /** XQuery function */
-  MKDIR(FILEURI, FNFile.class, 1, 2, "mkdir(path, recursive?)", ITEM_Z),
+  CREATEDIR(FILEURI, FNFile.class, 1, 1, "create-directory(path)", ITEM_Z),
   /** XQuery function */
   DELETE(FILEURI, FNFile.class, 1, 2, "delete(path, recursive?)", ITEM_Z),
   /** XQuery function */
-  READFILE(FILEURI, FNFile.class, 1, 2, "read(path, encoding?)", STR),
+  READ(FILEURI, FNFile.class, 1, 2, "read(path, encoding?)", STR),
   /** XQuery function */
   READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(path)", B64),
   /** XQuery function */
@@ -433,9 +433,9 @@ public enum FunDef {
       "write(path, data, params?, append?)", ITEM_Z),
   /** XQuery function */
   WRITEBIN(FILEURI, FNFile.class, 2, 3,
-      "write-binary(path, data, append)", ITEM_Z),
+      "write-binary(path, base64, append?)", ITEM_Z),
   /** XQuery function */
-  COPY(FILEURI, FNFile.class, 2, 3, "copy(source, target, overwrite?)", ITEM_Z),
+  COPY(FILEURI, FNFile.class, 2, 2, "copy(source, target)", ITEM_Z),
   /** XQuery function */
   MOVE(FILEURI, FNFile.class, 2, 2, "move(source, target)", ITEM_Z),
 
