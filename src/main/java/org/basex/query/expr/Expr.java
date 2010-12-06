@@ -142,15 +142,12 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if the specified variable is used by an expression.
-   * This method is called by {@link FLWOR#comp} to rewrite where clauses
+   * This method is called by {@link GFLWOR#comp} to rewrite where clauses
    * as predicates. {@code true} is returned as default.
    * @param v variable to be replaced
    * @return result of check
    */
-  @SuppressWarnings("unused")
-  public boolean uses(final Var v) {
-    return true;
-  }
+  public abstract boolean uses(final Var v);
 
   /**
    * Checks if the specified variable is replaceable by a context item.
@@ -160,28 +157,24 @@ public abstract class Expr extends ExprInfo {
    * a predicate.</li>
    * <li>{@link MixedPath#removable}, if the variable occurs within
    * the path.</li>
+   * <li>{@link Group#removable}, as the group by expression depends on
+   * variable references.</li>
    * </ul>
-   * This method is called by {@link FLWOR#comp} to rewrite where clauses
+   * This method is called by {@link GFLWOR#comp} to rewrite where clauses
    * as predicates.
    * @param v variable to be replaced
    * @return result of check
    */
-  @SuppressWarnings("unused")
-  public boolean removable(final Var v) {
-    return false;
-  }
+  public abstract boolean removable(final Var v);
 
   /**
    * Substitutes all {@link VarRef} expressions for the given variable
-   * by a {@link Context} reference. This method is called by {@link FLWOR#comp}
-   * to rewrite where clauses as predicates.
+   * by a {@link Context} reference. This method is called by
+   * {@link GFLWOR#comp} to rewrite where clauses as predicates.
    * @param v variable to be replaced
    * @return new expression
    */
-  @SuppressWarnings("unused")
-  public Expr remove(final Var v) {
-    return this;
-  }
+  public abstract Expr remove(final Var v);
 
   /**
    * Compiles and simplifies effective boolean values tests.

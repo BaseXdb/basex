@@ -80,7 +80,6 @@ final class DOTData {
     { "CC6600", org.basex.query.path.Path.class },
     { "FF9900", org.basex.query.expr.Preds.class },
     // green
-    { "009900", org.basex.query.expr.FLWOR.class },
     { "009900", org.basex.query.expr.GFLWOR.class },
     { "339933", org.basex.query.util.VarList.class },
     { "33CC33", org.basex.query.expr.ForLet.class },

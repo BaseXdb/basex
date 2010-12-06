@@ -208,7 +208,7 @@ final class GroupPartition {
    * @param ctx query context.
    */
   private void cacheRet(final QueryContext ctx) {
-    // [MS] wondering why the references differ... but, hm, it's true
+    // [MS] the references differ... so you better make new ones!
     pggv = new Var[gv.length];
     pgngv = new Var[ngv.length];
     for(int j = 0; j < gv.length; ++j) pggv[j] = ctx.vars.get(gv[j]);

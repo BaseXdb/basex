@@ -37,6 +37,16 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
+  public boolean removable(final Var v) {
+    return true;
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    return this;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this);
   }

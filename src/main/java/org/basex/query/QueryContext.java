@@ -126,7 +126,7 @@ public final class QueryContext extends Progress {
 
   /** Compilation flag: current node has leaves. */
   public boolean leaf;
-  /** Compilation flag: FLWOR clause performs grouping. */
+  /** Compilation flag: GFLWOR clause performs grouping. */
   public boolean grouping;
   /** Compilation flag: full-text evaluation can be stopped after first hit. */
   public boolean ftfast = true;

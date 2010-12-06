@@ -30,13 +30,10 @@ import org.basex.query.expr.Context;
 import org.basex.query.expr.Except;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Extension;
-import org.basex.query.expr.FLWOR;
-import org.basex.query.expr.FLWR;
 import org.basex.query.expr.For;
 import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Func;
 import org.basex.query.expr.GFLWOR;
-import org.basex.query.expr.Group;
 import org.basex.query.expr.If;
 import org.basex.query.expr.Instance;
 import org.basex.query.expr.InterSect;
@@ -44,7 +41,6 @@ import org.basex.query.expr.Let;
 import org.basex.query.expr.List;
 import org.basex.query.expr.Or;
 import org.basex.query.expr.OrderBy;
-import org.basex.query.expr.Order;
 import org.basex.query.expr.Pragma;
 import org.basex.query.expr.Filter;
 import org.basex.query.expr.Range;
@@ -739,7 +735,7 @@ public class QueryParser extends InputParser {
    */
   private Expr single() throws QueryException {
     alter = null;
-    Expr e = flwor();
+    Expr e = gflwor();
     if(e == null) e = quantified();
     if(e == null) e = switchh();
     if(e == null) e = typeswitch();
@@ -763,7 +759,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr flwor() throws QueryException {
+  private Expr gflwor() throws QueryException {
     final int s = ctx.vars.size();
 
     final ForLet[] fl = forLet();
@@ -802,11 +798,7 @@ public class QueryParser extends InputParser {
     }
     final Expr ret = check(single(), NORETURN);
     ctx.vars.reset(s);
-    return ret == Empty.SEQ ? ret : order == null && group == null ?
-      new FLWR(fl, where, ret, input()) : group == null ?
-      new FLWOR(fl, where, new Order(input(), order), ret, input()) :
-      new GFLWOR(fl, where, order == null ? null : new Order(input(), order),
-        new Group(input(), group), ret, input());
+    return GFLWOR.get(fl, where, order, group, ret, input());
   }
 
   /**

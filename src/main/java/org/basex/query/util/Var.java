@@ -167,6 +167,21 @@ public final class Var extends ParseExpr {
   }
 
   @Override
+  public boolean uses(final Var v) {
+    return eq(v);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    return true;
+  }
+
+  @Override
+  public Var remove(final Var v) {
+    return this;
+  }
+
+  @Override
   public SeqType type() {
     return type != null ? type : expr != null ? expr.type() : ret;
   }

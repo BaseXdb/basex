@@ -9,7 +9,7 @@ package org.basex.test.query;
 public final class FNNotTest extends QueryTest {
   /** Constructor. */
   static {
-    doc = "<x/>";
+    doc = "<dummy/>";
 
     queries = new Object[][] {
       { "fn-notint1args-1", bool(false),

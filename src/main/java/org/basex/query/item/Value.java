@@ -122,6 +122,11 @@ public abstract class Value extends Expr {
   }
 
   @Override
+  public Expr remove(final Var v) {
+    return this;
+  }
+
+  @Override
   public final String desc() {
     return name();
   }

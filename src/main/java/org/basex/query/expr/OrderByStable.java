@@ -55,6 +55,11 @@ public final class OrderByStable extends OrderBy {
   }
 
   @Override
+  public boolean removable(final Var v) {
+    return true;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, DIR);
   }
