@@ -1,7 +1,6 @@
 package org.basex.gui;
 
 import javax.swing.JToolBar;
-
 import org.basex.gui.layout.BaseXButton;
 
 /**

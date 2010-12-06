@@ -1,7 +1,6 @@
 package org.basex.index;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.StatsKey;

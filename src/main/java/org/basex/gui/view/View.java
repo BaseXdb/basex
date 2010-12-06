@@ -3,7 +3,6 @@ package org.basex.gui.view;
 import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
