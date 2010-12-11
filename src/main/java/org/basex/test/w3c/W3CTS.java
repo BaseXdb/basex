@@ -39,7 +39,6 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
-import org.basex.query.iter.NodIter;
 import org.basex.query.iter.ItemIter;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -346,7 +345,7 @@ public abstract class W3CTS {
       if(cont.size() != 0) {
         final Data d = Check.check(context,
             srcs.get(string(data.atom(cont.list[0]))));
-        curr = new Nodes(d.doc().toArray(), d);
+        curr = new Nodes(d.doc(), d);
         curr.root = true;
       }
 
@@ -703,16 +702,7 @@ public abstract class W3CTS {
   private Uri coll(final byte[] name, final QueryProcessor qp)
       throws QueryException {
 
-    // assign collection
-    final NodIter col = new NodIter();
-    for(final byte[] cl : colls.get(string(name))) {
-      if(new File(string(cl)).exists()) {
-        col.add(qp.ctx.resource.doc(cl, true, false, null));
-      } else {
-        Util.errln("Warning: \"%\" not found.", cl);
-      }
-    }
-    qp.ctx.resource.addCollection(col, name);
+    qp.ctx.resource.addCollection(name, colls.get(string(name)));
     return Uri.uri(name);
   }
 
