@@ -35,13 +35,13 @@ public final class CollStressTest {
     cmd.execute(CONTEXT);
     System.out.print(cmd.info());
 
+    Performance perf = new Performance();
+
     // Add documents
     for(int i = 0; i < SIZE; i++) {
       new Add("<xml/>", Integer.toString(i)).execute(CONTEXT);
     }
-    System.out.println("\n* " + SIZE + " documents added.");
-
-    Performance perf = new Performance();
+    System.out.println("\n* " + SIZE + " documents added: " + perf);
 
     // Request specific documents
     for(int i = 0; i < SIZE; i++) {
@@ -59,7 +59,7 @@ public final class CollStressTest {
     System.out.println("\n* Request specific documents (db closed): " + perf);
 
     new Open("test").execute(CONTEXT);
-    
+
     // Loop through all documents
     new XQuery("for $i in 0 to " + (SIZE - 1) + " " +
       "return collection(concat('test/', $i))").execute(CONTEXT);
