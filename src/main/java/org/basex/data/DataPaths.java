@@ -74,7 +74,7 @@ final class DataPaths {
     final byte[] exact = lc(concat(slash, token(np)));
     // root path
     final byte[] start = endsWith(exact, slash) ? exact : concat(exact, slash);
-    
+
     // relevant paths: start from the first hit and return all subsequent hits
     final IntList il = new IntList();
     for(int o = find(exact); o < order.length; o++) {

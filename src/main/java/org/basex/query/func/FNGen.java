@@ -163,7 +163,7 @@ final class FNGen extends Fun {
     final byte[] in = checkEStr(it);
     if(contains(in, '<') || contains(in, '>')) INVDOC.thrw(input, in);
 
-    final Data d = ctx.resource.data(in, false, false, input);
+    final Data d = ctx.resource.data(in, false, input);
     if(!d.single()) EXPSINGLE.thrw(input);
     return new DBNode(d, 0, Data.DOC);
   }

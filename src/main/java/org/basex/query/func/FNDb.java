@@ -84,7 +84,7 @@ final class FNDb extends Fun {
     final byte[] db = s == -1 ? str : substring(str, 0, s);
     final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
 
-    final Data data = ctx.resource.data(db, true, true, input);
+    final Data data = ctx.resource.data(db, input);
     final int[] il = data.doc(string(path));
     final NodIter col = new NodIter();
     for(int i = 0; i < il.length; ++i) col.add(new DBNode(data, il[i]));
@@ -101,8 +101,7 @@ final class FNDb extends Fun {
   private DBNode open(final QueryContext ctx, final boolean id)
       throws QueryException {
 
-    final Data data =
-      ctx.resource.data(checkStr(expr[0], ctx), true, true, input);
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
     final int v = (int) checkItr(expr[1], ctx);
     final int pre = id ? data.pre(v) : v;
     if(pre < 0 || pre >= data.meta.size) IDINVALID.thrw(input, this, v);

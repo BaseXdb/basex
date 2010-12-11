@@ -101,41 +101,59 @@ public final class QueryResources {
   }
 
   /**
-   * Opens an existing data references, or creates a new main memory instance.
-   * @param input database name or file path
-   * @param col collection flag
-   * @param db database flag
+   * Opens a new database or returns a reference to an already opened database.
+   * @param name name of database
    * @param ii input info
    * @return database instance
    * @throws QueryException query exception
    */
-  public Data data(final byte[] input, final boolean col, final boolean db,
-      final InputInfo ii) throws QueryException {
+  public Data data(final byte[] name, final InputInfo ii)
+      throws QueryException {
 
-    // check if the database has already been opened
+    // check if a database with the same name has already been opened
+    final String in = string(name);
+    for(int d = 0; d < datas; ++d) {
+      if(data[d].meta.name.equals(in)) return data[d];
+    }
+
+    try {
+      // open database
+      final Data d = Open.open(in, ctx.context);
+      addData(d);
+      return d;
+    } catch(final IOException ex) {
+      NODB.thrw(ii, in);
+      return null;
+    }
+  }
+
+  /**
+   * Creates a new data reference for the specified input, or returns a
+   * reference to an already opened file or database.
+   * @param input file path or name of database
+   * @param col collection flag
+   * @param ii input info
+   * @return data reference
+   * @throws QueryException query exception
+   */
+  public Data data(final byte[] input, final boolean col, final InputInfo ii)
+      throws QueryException {
+
+    // check if a database with the same name has already been opened
     final String in = string(input);
     for(int d = 0; d < datas; ++d) {
       if(data[d].meta.name.equals(in)) return data[d];
     }
 
-    // check if the document has already been opened
+    // check if a database with the same file path has already been opened
     final IO io = IO.get(in);
     for(int d = 0; d < datas; ++d) {
       if(data[d].meta.file.eq(io)) return data[d];
     }
 
-    // get database instance
-    Data d = null;
-    if(db) {
-      try {
-        d = Open.open(in, ctx.context);
-      } catch(final IOException ex) {
-        NODB.thrw(ii, in);
-      }
-    } else {
-      d = doc(in, ctx.baseURI == Uri.EMPTY, col, ii);
-      if(d == null) d = doc(ctx.base().merge(in).path(), true, col, ii);
-    }
+    // retrieve and add new data reference
+    Data d = doc(in, ctx.baseURI == Uri.EMPTY, col, ii);
+    if(d == null) d = doc(ctx.base().merge(in).path(), true, col, ii);
     addData(d);
     return d;
   }
@@ -144,7 +162,7 @@ public final class QueryResources {
    * Adds a collection instance or returns an existing one.
    * @param input name of the collection to be returned
    * @param ii input info
-   * @return collection
+   * @return collection iterator
    * @throws QueryException query exception
    */
   public Iter collection(final byte[] input, final InputInfo ii)
@@ -160,13 +178,14 @@ public final class QueryResources {
       if(contains(input, '<') || contains(input, '\\')) COLLINV.thrw(ii, input);
       // find specified collection
       while(c < colls && !eq(collName[c], input)) ++c;
+
       // add new collection if not found
       if(c == colls) {
         final int s = indexOf(input, '/');
         if(s == -1) {
-          addCollection(data(input, true, false, ii), EMPTY);
+          addCollection(data(input, true, ii), EMPTY);
         } else {
-          addCollection(data(substring(input, 0, s), true, false, ii),
+          addCollection(data(substring(input, 0, s), true, ii),
               substring(input, s + 1));
         }
       }
@@ -176,7 +195,7 @@ public final class QueryResources {
 
   /**
    * Returns the common data reference of all context items, or {@code null}.
-   * @return database reference
+   * @return data reference
    * @throws QueryException query exception
    */
   public Data data() throws QueryException {
@@ -210,17 +229,16 @@ public final class QueryResources {
   /**
    * Adds documents of the specified data reference as a collection.
    * @param name name of collection
-   * @param docs documents
+   * @param inputs documents
    * @throws QueryException query exception
    */
-  public void addCollection(final byte[] name, final byte[][] docs)
+  public void addCollection(final byte[] name, final byte[][] inputs)
       throws QueryException {
 
-    final int ns = docs.length;
+    final int ns = inputs.length;
     final DBNode[] nodes = new DBNode[ns];
     for(int n = 0; n < ns; n++) {
-      final Data d = data(docs[n], true, false, null);
-      nodes[n] = new DBNode(d, 0, Data.DOC);
+      nodes[n] = new DBNode(data(inputs[n], true, null), 0, Data.DOC);
     }
     addCollection(Seq.get(nodes, ns), name);
   }
@@ -229,7 +247,7 @@ public final class QueryResources {
 
   /**
    * Adds documents of the specified data reference as a collection.
-   * @param d database reference
+   * @param d data reference
    * @param path inner collection path
    */
   private void addCollection(final Data d, final byte[] path) {
@@ -247,7 +265,7 @@ public final class QueryResources {
    * @param err error flag
    * @param col collection flag
    * @param ii input info
-   * @return data instance
+   * @return data reference
    * @throws QueryException query exception
    */
   private Data doc(final String path, final boolean err, final boolean col,

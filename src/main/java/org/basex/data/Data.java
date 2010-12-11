@@ -100,7 +100,7 @@ public abstract class Data {
   protected Index atvindex;
   /** Full-text index instance. */
   protected Index ftxindex;
-  
+
   /**
    * Dissolves the references to often used tag names and attributes.
    * @throws IOException I/O exception
