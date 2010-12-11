@@ -49,7 +49,7 @@ public final class DiskBuilder extends Builder {
    */
   public DiskBuilder(final Parser parse, final Prop pr) {
     super(parse, pr);
-    comp = new Compress(pr.num(Prop.COMPRESS));
+    comp = new Compress();
   }
 
   @Override

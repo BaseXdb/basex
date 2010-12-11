@@ -43,7 +43,7 @@ public final class DiskData extends Data {
    */
   public DiskData(final String db, final Prop pr) throws IOException {
     meta = new MetaData(db, pr);
-    comp = new Compress(pr.num(Prop.COMPRESS));
+    comp = new Compress();
 
     final DataInput in = new DataInput(meta.file(DATAINFO));
     try {
@@ -82,7 +82,7 @@ public final class DiskData extends Data {
   public DiskData(final MetaData md, final Names nm, final Names at,
       final PathSummary ps, final Namespaces n) throws IOException {
 
-    comp = new Compress(md.prop.num(Prop.COMPRESS));
+    comp = new Compress();
     meta = md;
     tags = nm;
     atts = at;

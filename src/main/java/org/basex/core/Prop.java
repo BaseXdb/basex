@@ -117,8 +117,6 @@ public final class Prop extends AProp {
   public static final Object[] ENTITY = { "ENTITY", false };
   /** Define import parser. */
   public static final Object[] PARSER = { "PARSER", "" };
-  /** Compress text in database. */
-  public static final Object[] COMPRESS = { "COMPRESS", Integer.MAX_VALUE };
 
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };
