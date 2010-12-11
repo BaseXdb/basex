@@ -15,7 +15,7 @@ public interface Commands {
   /** Create commands. */
   enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER }
   /** Info commands. */
-  enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
+  enum CmdInfo { NULL, DATABASE, DB, INDEX, STORAGE }
   /** Drop commands. */
   enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP }
   /** Show commands. */

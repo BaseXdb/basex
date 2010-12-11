@@ -83,7 +83,7 @@ public final class SGUI extends AGUI {
     final BaseXTextField sport = new BaseXTextField("1984", this);
     final BaseXTextField suser = new BaseXTextField("admin", this);
     final BaseXPassword spw = new BaseXPassword(this);
-    final BaseXLabel message = new BaseXLabel();
+    final BaseXLabel message = new BaseXLabel(" ");
     connection.border(8, 8, 8, 8);
     connection.add(new BaseXLabel("Server: "));
     connection.add(sname);

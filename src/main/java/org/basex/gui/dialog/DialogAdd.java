@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.basex.core.Command;
 import org.basex.core.cmd.Add;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -16,7 +15,6 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
-import org.basex.util.Util;
 
 /**
  * Add document dialog.
@@ -29,8 +27,6 @@ public class DialogAdd extends Dialog {
   private final BaseXTextField path;
   /** Directory path. */
   private final BaseXTextField target;
-  /** Name of document. */
-  private final BaseXTextField name;
   /** Database info. */
   private final BaseXLabel info;
   /** Buttons. */
@@ -43,7 +39,7 @@ public class DialogAdd extends Dialog {
   public DialogAdd(final GUI main) {
     super(main, GUIADD);
 
-    BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(4, 2, 6, 0));
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
     p.border(0, 0, 8, 0);
@@ -60,17 +56,10 @@ public class DialogAdd extends Dialog {
     });
     p.add(browse);
 
-    p.add(new BaseXLabel(EDITNAME + COL, true, true).border(8, 0, 4, 0));
+    p.add(new BaseXLabel(CREATETARGET, true, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());
 
-    name = new BaseXTextField(this);
-    name.addKeyListener(keys);
-    p.add(name);
-    p.add(new BaseXLabel());
-    p.add(new BaseXLabel("Target Path" + COL, true, true).border(8, 0, 4, 0));
-    p.add(new BaseXLabel());
-
-    target = new BaseXTextField(this);
+    target = new BaseXTextField("/", this);
     target.addKeyListener(keys);
     p.add(target);
     p.add(new BaseXLabel());
@@ -79,7 +68,7 @@ public class DialogAdd extends Dialog {
 
     // create buttons
     p = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel().border(18, 0, 0, 0);
+    info = new BaseXLabel(" ").border(18, 0, 0, 0);
     p.add(info, BorderLayout.WEST);
     buttons = okCancel(this);
     p.add(buttons, BorderLayout.EAST);
@@ -110,16 +99,10 @@ public class DialogAdd extends Dialog {
     String inf = exists ? "" : PATHWHICH;
     info.setText(null, null);
 
-    final String as = name.getText().trim();
-    if(!as.isEmpty() && !Command.validName(as)) {
-      inf = Util.info(INVALID, EDITNAME);
-    }
-
     if(!inf.isEmpty()) {
       ok = false;
       info.setText(inf, Msg.ERROR);
     }
-    if(ok) name.setEnabled(!io.isDir());
     enableOK(buttons, BUTTONOK, ok);
   }
 
@@ -129,8 +112,7 @@ public class DialogAdd extends Dialog {
    */
   public Add cmd() {
     final String in = path.getText().trim();
-    final String as = name.getText().trim();
     final String to = target.getText().trim();
-    return new Add(in, as.isEmpty() ? null : as, to.isEmpty() ? null : to);
+    return new Add(in, null, to.isEmpty() ? null : to);
   }
 }

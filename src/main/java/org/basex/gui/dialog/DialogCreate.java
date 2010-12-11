@@ -113,7 +113,7 @@ public final class DialogCreate extends Dialog {
     p.add(new BaseXLabel());
     p1.add(p, BorderLayout.CENTER);
 
-    info = new BaseXLabel();
+    info = new BaseXLabel(" ");
     p1.add(info, BorderLayout.SOUTH);
 
     final BaseXBack p2 = new BaseXBack(new TableLayout(14, 1)).border(8);

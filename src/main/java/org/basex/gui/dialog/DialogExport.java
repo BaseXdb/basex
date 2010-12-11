@@ -114,7 +114,7 @@ public final class DialogExport extends Dialog {
 
     // create buttons
     p = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel().border(18, 0, 0, 0);
+    info = new BaseXLabel(" ").border(18, 0, 0, 0);
     p.add(info, BorderLayout.WEST);
     buttons = okCancel(this);
     p.add(buttons, BorderLayout.EAST);

@@ -87,7 +87,7 @@ final class DialogUser extends BaseXBack {
     BaseXLayout.setWidth(pass, 100);
     alter = new BaseXButton(BUTTONALTER, dia);
     drop = new BaseXButton(BUTTONDROP, dia);
-    info = new BaseXLabel();
+    info = new BaseXLabel(" ");
 
     add(new BaseXLabel(CREATEU + COLS, false, true));
     BaseXBack p = new BaseXBack(new TableLayout(1, 5, 6, 0)).border(0, 0, 5, 0);

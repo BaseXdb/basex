@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.basex.core.cmd.InfoTable;
+import org.basex.core.cmd.InfoStorage;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -927,7 +927,7 @@ public abstract class Data {
    * @return table
    */
   public final String toString(final int s, final int e) {
-    return string(InfoTable.table(this, s, e));
+    return string(InfoStorage.table(this, s, e));
   }
 
   @Override

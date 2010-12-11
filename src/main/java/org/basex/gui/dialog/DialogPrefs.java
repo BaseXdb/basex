@@ -107,7 +107,7 @@ public final class DialogPrefs extends Dialog {
     lang.setSelectedItem(prop.get(Prop.LANG));
 
     p.add(lang);
-    creds = new BaseXLabel();
+    creds = new BaseXLabel(" ");
     p.add(creds);
     creds.setText(TRANSLATION + creds(lang.getSelectedItem()));
 

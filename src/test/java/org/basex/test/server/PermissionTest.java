@@ -23,7 +23,7 @@ import org.basex.core.cmd.Grant;
 import org.basex.core.cmd.Help;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
-import org.basex.core.cmd.InfoTable;
+import org.basex.core.cmd.InfoStorage;
 import org.basex.core.cmd.Kill;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
@@ -84,7 +84,7 @@ public final class PermissionTest {
     no(new Open("test"), testSession);
     no(new InfoDB(), testSession);
     no(new InfoIndex(), testSession);
-    no(new InfoTable(), testSession);
+    no(new InfoStorage(), testSession);
     // XQuery read
     no(new XQuery("//xml"), testSession);
     no(new Find("test"), testSession);
@@ -113,7 +113,7 @@ public final class PermissionTest {
 
     ok(new Open("test"), testSession);
     ok(new InfoDB(), testSession);
-    ok(new InfoTable("1", "2"), testSession);
+    ok(new InfoStorage("1", "2"), testSession);
     // XQuery read
     ok(new XQuery("//xml"), testSession);
     ok(new Find("test"), testSession);

@@ -37,7 +37,7 @@ import org.basex.core.cmd.Help;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
-import org.basex.core.cmd.InfoTable;
+import org.basex.core.cmd.InfoStorage;
 import org.basex.core.cmd.Kill;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
@@ -173,11 +173,11 @@ public final class CommandParser extends InputParser {
             return new InfoDB();
           case INDEX:
             return new InfoIndex(consume(CmdIndexInfo.class, null));
-          case TABLE:
+          case STORAGE:
             arg1 = number(null);
             arg2 = arg1 != null ? number(null) : null;
             if(arg1 == null) arg1 = xquery(null);
-            return new InfoTable(arg1, arg2);
+            return new InfoStorage(arg1, arg2);
         }
         break;
       case CLOSE:

@@ -292,11 +292,11 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void infoTable() {
-    no(new InfoTable("1", "2"));
+    no(new InfoStorage("1", "2"));
     ok(new CreateDB(NAME, FILE));
-    ok(new InfoTable("1", "2"));
-    ok(new InfoTable("1", null));
-    ok(new InfoTable("// li", null));
+    ok(new InfoStorage("1", "2"));
+    ok(new InfoStorage("1", null));
+    ok(new InfoStorage("// li", null));
   }
 
   /** Command test. */

@@ -140,7 +140,7 @@ public final class DialogServer extends Dialog {
     loguser.addKeyListener(keys);
     logpass = new BaseXPassword(main);
     logpass.addKeyListener(keys);
-    infoC = new BaseXLabel().border(8, 0, 0, 0);
+    infoC = new BaseXLabel(" ").border(8, 0, 0, 0);
 
     BaseXBack p = new BaseXBack(new TableLayout(6, 1, 0, 0));
 
@@ -225,7 +225,7 @@ public final class DialogServer extends Dialog {
     BaseXLayout.setHeight(logt, 100);
 
     logt.border(5, 5, 5, 5);
-    infoL = new BaseXLabel().border(8, 0, 0, 0);
+    infoL = new BaseXLabel(" ").border(8, 0, 0, 0);
     refreshLog = new BaseXButton(BUTTONREFRESH, this);
 
     p = new BaseXBack(new BorderLayout());

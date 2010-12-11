@@ -97,7 +97,7 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-    MENUDB, MENUEDIT, MENUVIEW, MENUQUERY, MENUOPTIONS, MENUDEEPFS, MENUHELP
+    MENUDB, MENUEDIT, MENUVIEW, MENUQUERY, MENUOPTIONS, MENUHELP
   };
 
   /**
@@ -123,8 +123,6 @@ public final class GUIConstants {
     RTEXEC, RTFILTER, EMPTY,
     COLOR, FONTS, MAPLAYOUT, TREEOPTIONS, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : PREFS
-  }, {
-    CREATEFS, EMPTY, DQE, MOUNTFS
   }, {
     SHOWHELP, Prop.MAC ? null : EMPTY,
     SHOWCOMMUNITY, SHOWUPDATES, Prop.MAC ? null : EMPTY,

@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.core.Text;
-import org.basex.core.cmd.InfoTable;
+import org.basex.core.cmd.InfoStorage;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Util;
 import org.deepfs.fs.DeepFS;
@@ -232,7 +232,7 @@ public final class DeepShell {
    * @param args argument vector
    */
   @Command(shortcut = 'i',
-      args = "", help = "info table (" + Text.NAME + " command)")
+      args = "", help = "info storage (" + Text.NAME + " command)")
   public void info(final String[] args) {
     if(args.length != 1) {
       help(new String[] { "help", "info"});
@@ -240,7 +240,7 @@ public final class DeepShell {
     }
 
     try {
-      Util.outln(new InfoTable(null, null).execute(fs.getContext()));
+      Util.outln(new InfoStorage(null, null).execute(fs.getContext()));
     } catch(final BaseXException ex) {
       Util.notexpected(ex);
     }

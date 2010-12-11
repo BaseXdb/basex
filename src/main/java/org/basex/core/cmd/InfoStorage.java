@@ -15,18 +15,18 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
 /**
- * Evaluates the 'info table' command and returns the table representation
+ * Evaluates the 'info storage' command and returns the table representation
  * of the currently opened database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class InfoTable extends AQuery {
+public final class InfoStorage extends AQuery {
   /**
    * Default constructor.
    * @param arg optional arguments
    */
-  public InfoTable(final String... arg) {
+  public InfoStorage(final String... arg) {
     super(DATAREF | User.READ, arg);
   }
 
@@ -47,6 +47,7 @@ public final class InfoTable extends AQuery {
       final Table table = th();
       for(final int n : ((Nodes) result).list) table(table, data, n);
       out.print(table.finish());
+      result = null;
     } else {
       int ps = 0;
       int pe = data.meta.size;
@@ -140,7 +141,7 @@ public final class InfoTable extends AQuery {
 
   @Override
   public void build(final CommandBuilder cb) {
-    cb.init(Cmd.INFO + " " + CmdInfo.TABLE);
+    cb.init(Cmd.INFO + " " + CmdInfo.STORAGE);
     if(args.length > 0 && args[0] != null && toInt(args[0]) ==
       Integer.MIN_VALUE) {
       cb.xquery(0);

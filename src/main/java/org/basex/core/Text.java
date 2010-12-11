@@ -213,13 +213,13 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPINFO = {
-    "([" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" + CmdInfo.TABLE + "])",
+    "([" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" + CmdInfo.STORAGE + "])",
     lang("ch_info1"),
     lang("ch_info21") + NL +
     LI + lang("ch_info22") + NL +
     LI + CmdInfo.DB + ": " + lang("ch_info23") + NL +
     LI + CmdInfo.INDEX + ": " + lang("ch_info24") + NL +
-    LI + CmdInfo.TABLE + " [start end] | [" + C_QUERY + "]: " +
+    LI + CmdInfo.STORAGE + " [start end] | [" + C_QUERY + "]: " +
     lang("ch_info25")
   };
   /** Command help. */
@@ -1024,10 +1024,10 @@ public interface Text {
 
   /** Database creation filter. */
   String CREATEPATTERN = lang("dc_pattern");
-  /** Dialog title for creating a database. */
+  /** Name of database. */
   String CREATENAME = lang("dc_name") + COLS;
-  /** Dialog title for creating a database. */
-  String CREATENAME2 = lang("dc_name2") + COLS;
+  /** Target path. */
+  String CREATETARGET = lang("dc_target") + COLS;
   /** XML file description. */
   String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
   /** ZIP file description. */
@@ -1217,6 +1217,8 @@ public interface Text {
   String EMPTYDATABASE = lang("dr_empty") + DOT;
   /** Info for overwriting a database and deleting backing store. */
   String RENAMEOVERBACKING = lang("dr_overbacking") + DOT;
+  /** % documents will be deleted. */
+  String DELETEPATH = lang("dr_delete") + DOT;
 
   /** Dialog title for managing databases. */
   String MANAGETITLE = lang("dd_title");
