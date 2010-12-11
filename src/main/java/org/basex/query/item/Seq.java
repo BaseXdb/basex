@@ -25,7 +25,7 @@ public abstract class Seq extends Value {
   }
 
   /**
-   * Returns a sequence for the specified items.
+   * Returns a value for the specified items.
    * @param v value
    * @param s size
    * @return resulting item or sequence

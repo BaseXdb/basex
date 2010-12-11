@@ -159,7 +159,7 @@ final class FNGen extends Fun {
   private Nod doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, input);
     if(it == null) return null;
-    
+
     final byte[] in = checkEStr(it);
     if(contains(in, '<') || contains(in, '>')) INVDOC.thrw(input, in);
 

@@ -15,6 +15,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
+import org.basex.query.item.DBDocSeq;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
@@ -24,7 +25,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.NameTest;
 import org.basex.util.InputInfo;
@@ -86,9 +86,7 @@ final class FNDb extends Fun {
 
     final Data data = ctx.resource.data(db, input);
     final int[] il = data.doc(string(path));
-    final NodIter col = new NodIter();
-    for(int i = 0; i < il.length; ++i) col.add(new DBNode(data, il[i]));
-    return col;
+    return DBDocSeq.get(il, il.length, data).iter();
   }
 
   /**

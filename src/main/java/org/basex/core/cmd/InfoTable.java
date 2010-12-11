@@ -124,7 +124,7 @@ public final class InfoTable extends AQuery {
     if(data.nsFlag(p)) sl.add("+" + u);
     else sl.add(u);
     sl.add(TABLEKINDS[k]);
-    
+
     byte[] cont = null;
     if(k == Data.ELEM) {
       cont = data.name(p, k);

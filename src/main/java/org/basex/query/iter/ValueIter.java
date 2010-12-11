@@ -11,4 +11,10 @@ import org.basex.query.item.Item;
 public abstract class ValueIter extends Iter {
   @Override
   public abstract Item next();
+  @Override
+  public abstract Item get(final long i);
+  @Override
+  public abstract long size();
+  @Override
+  public abstract boolean reset();
 }

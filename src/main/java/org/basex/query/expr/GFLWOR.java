@@ -72,7 +72,7 @@ public class GFLWOR extends ParseExpr {
     final Group grp = g == null ? null : new Group(ii, g);
     return new GFLWOR(f, w, ord, grp, r, ii);
   }
-  
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     compForLet(ctx);

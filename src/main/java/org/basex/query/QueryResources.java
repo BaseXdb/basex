@@ -13,6 +13,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.DBDocSeq;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
@@ -68,25 +69,18 @@ public final class QueryResources {
     addData(d);
     globalData = true;
 
+    // special case: return 0 nodes if data reference contains no documents
     final int s = d.empty() ? 0 : (int) nodes.size();
+    // assign initial context value
+    ctx.value = DBDocSeq.get(nodes.list, s, d);
 
     // use input node set if it contains all documents of the database.
     // otherwise, create new nodes from all documents of the database
     final int[] ns = nodes.root ? nodes.list : d.doc();
     final int is = nodes.root ? s : ns.length;
-    DBNode[] db = new DBNode[is];
-    for(int n = 0; n < is; ++n) db[n] = new DBNode(d, ns[n], Data.DOC);
 
-    // create default collection from document array
-    addCollection(Seq.get(db, db.length), token(d.meta.name));
-
-    // if input nodes does not equal root documents, create additional nodes
-    if(!nodes.root) {
-      db = new DBNode[s];
-      for(int n = 0; n < s; ++n) db[n] = new DBNode(d, nodes.list[n]);
-    }
-    // assign initial context value
-    ctx.value = Seq.get(db, db.length);
+    // create default collection
+    addCollection(DBDocSeq.get(ns, is, d), token(d.meta.name));
   }
 
   /**
@@ -220,7 +214,7 @@ public final class QueryResources {
    */
   public boolean docNodes() {
     // check if a global data reference exists, if context value and first
-    // collection reference are equal, and if 
+    // collection reference are equal, and if first item is a document node
     final Value val = ctx.value;
     return globalData && val.sameAs(coll[0]) &&
       (val.item() ? (Item) val : val.iter(ctx).next()).type == Type.DOC;
@@ -252,12 +246,9 @@ public final class QueryResources {
    */
   private void addCollection(final Data d, final byte[] path) {
     final int[] ns = d.doc(string(path));
-    final int is = ns.length;
-    final DBNode[] nodes = new DBNode[is];
-    for(int i = 0; i < is; ++i) nodes[i] = new DBNode(d, ns[i]);
-    addCollection(Seq.get(nodes, is), token(d.meta.name));
+    addCollection(DBDocSeq.get(ns, ns.length, d), token(d.meta.name));
   }
-  
+
   /**
    * Opens the database or creates a new database instance for the specified
    * document.

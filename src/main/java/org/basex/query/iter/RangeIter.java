@@ -47,6 +47,12 @@ public final class RangeIter extends ValueIter {
   }
 
   @Override
+  public boolean reset() {
+    pos = min - 1;
+    return true;
+  }
+
+  @Override
   public Value finish() {
     return new RangeSeq(min, max - min);
   }
