@@ -133,7 +133,7 @@ final class FNFile extends Fun {
 
     File[] fl;
     if(rec) {
-      List<File> list = new ArrayList<File>();
+      final List<File> list = new ArrayList<File>();
       recList(dir, list);
       fl = list.toArray(new File[list.size()]);
     } else {

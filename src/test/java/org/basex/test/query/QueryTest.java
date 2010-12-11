@@ -81,14 +81,19 @@ public abstract class QueryTest {
       try {
         c.execute(context);
         final Result val = c.result();
-        if(val instanceof Nodes && cmp instanceof Nodes) {
-          ((Nodes) cmp).data = ((Nodes) val).data;
+        if(cmp instanceof Nodes) {
+          ((Nodes) cmp).data = context.data;
         }
         if(!correct || !val.sameAs(cmp)) {
-          final String cp = correct && (!(cmp instanceof Nodes) ||
-            ((Nodes) cmp).data != null) ? cmp.toString() : "()";
-          sb.append("-- " + qu[0] + ": " + query + "\n[E] " + (correct ?
-              cp : "error") + "\n[F] " + val + " " + details() + "\n");
+          sb.append("-- " + qu[0] + ": " + query);
+          sb.append("\n[E#" + cmp.size() + "] ");
+          if(correct) {
+            final String cp = cmp.toString();
+            sb.append(cp.length() > 20 ? cp.substring(0, 20) + "..." : cp);
+          } else {
+            sb.append("error");
+          }
+          sb.append("\n[F#" + val.size() + "] " + val + " " + details() + "\n");
           ++fail;
         }
       } catch(final BaseXException ex) {

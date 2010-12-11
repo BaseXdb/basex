@@ -143,7 +143,7 @@ public enum GUICommands implements GUICommand {
         IO file = null;
         boolean overwrite = false;
         final Data d = gui.context.data;
-        for(final int pre : d.doc().toArray()) {
+        for(final int pre : d.doc()) {
           file = root.merge(Token.string(d.text(pre, true)));
           if(file.exists()) {
             if(overwrite) {

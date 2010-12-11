@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
+import org.basex.data.Data;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
@@ -23,9 +24,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
-import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -107,8 +106,8 @@ final class FNGen extends Fun {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private NodIter collection(final QueryContext ctx) throws QueryException {
-    return ctx.resource.coll(expr.length != 0 ? checkStr(expr[0], ctx) :
+  private Iter collection(final QueryContext ctx) throws QueryException {
+    return ctx.resource.collection(expr.length != 0 ? checkStr(expr[0], ctx) :
       null, input);
   }
 
@@ -118,12 +117,16 @@ final class FNGen extends Fun {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private ItemIter uriCollection(final QueryContext ctx) throws QueryException {
-    final NodIter coll = collection(ctx);
-    final ItemIter ir = new ItemIter();
-    Nod it = null;
-    while((it = coll.next()) != null) ir.add(Uri.uri(it.base()));
-    return ir;
+  private Iter uriCollection(final QueryContext ctx) throws QueryException {
+    final Iter coll = collection(ctx);
+    return new Iter() {
+      @Override
+      public Item next() throws QueryException {
+        final Item it = coll.next();
+        // all items will be nodes
+        return it == null ? null : Uri.uri(((Nod) it).base());
+      }
+    };
   }
 
   /**
@@ -155,8 +158,14 @@ final class FNGen extends Fun {
    */
   private Nod doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, input);
-    return it == null ? null :
-      ctx.resource.doc(checkEStr(it), false, false, input);
+    if(it == null) return null;
+    
+    final byte[] in = checkEStr(it);
+    if(contains(in, '<') || contains(in, '>')) INVDOC.thrw(input, in);
+
+    final Data d = ctx.resource.data(in, false, false, input);
+    if(!d.single()) EXPSINGLE.thrw(input);
+    return new DBNode(d, 0, Data.DOC);
   }
 
   /**

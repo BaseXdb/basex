@@ -124,9 +124,17 @@ public final class InfoTable extends AQuery {
     if(data.nsFlag(p)) sl.add("+" + u);
     else sl.add(u);
     sl.add(TABLEKINDS[k]);
-    sl.add(replace(chop(k == Data.ELEM ? data.name(p, k) : k != Data.ATTR ?
-        data.text(p, true) : concat(data.name(p, k), ATT1,
-        data.text(p, false), ATT2), 64), '\n', ' '));
+    
+    byte[] cont = null;
+    if(k == Data.ELEM) {
+      cont = data.name(p, k);
+    } else if(k == Data.ATTR) {
+      cont = new TokenBuilder(data.name(p, k)).add(ATT1).add(
+          data.text(p, false)).add(ATT2).finish();
+    } else {
+      cont = data.text(p, true);
+    }
+    sl.add(replace(chop(cont, 64), '\n', ' '));
     t.contents.add(sl);
   }
 

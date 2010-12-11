@@ -8,6 +8,7 @@ import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
+import org.basex.data.Data;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -27,7 +28,6 @@ import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.NameTest;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
 
 /**
  * Database functions.
@@ -83,10 +83,11 @@ final class FNDb extends Fun {
     final int s = indexOf(str, '/');
     final byte[] db = s == -1 ? str : substring(str, 0, s);
     final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
-    final DBNode n = ctx.resource.doc(db, true, true, input);
-    final IntList il = n.data.doc(string(path));
+
+    final Data data = ctx.resource.data(db, true, true, input);
+    final int[] il = data.doc(string(path));
     final NodIter col = new NodIter();
-    for(int i = 0; i < il.size(); ++i) col.add(new DBNode(n.data, il.get(i)));
+    for(int i = 0; i < il.length; ++i) col.add(new DBNode(data, il[i]));
     return col;
   }
 
@@ -100,12 +101,12 @@ final class FNDb extends Fun {
   private DBNode open(final QueryContext ctx, final boolean id)
       throws QueryException {
 
-    final DBNode node =
-      ctx.resource.doc(checkStr(expr[0], ctx), true, true, input);
+    final Data data =
+      ctx.resource.data(checkStr(expr[0], ctx), true, true, input);
     final int v = (int) checkItr(expr[1], ctx);
-    final int pre = id ? node.data.pre(v) : v;
-    if(pre < 0 || pre >= node.data.meta.size) IDINVALID.thrw(input, this, v);
-    return new DBNode(node.data, pre);
+    final int pre = id ? data.pre(v) : v;
+    if(pre < 0 || pre >= data.meta.size) IDINVALID.thrw(input, this, v);
+    return new DBNode(data, pre);
   }
 
   /**

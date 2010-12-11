@@ -31,8 +31,9 @@ final class MapList extends IntList {
   }
 
   @Override
-  public void sort() {
+  public MapList sort() {
     sort(weight, false);
+    return this;
   }
 
   /**

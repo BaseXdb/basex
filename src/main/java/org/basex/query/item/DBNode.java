@@ -7,6 +7,7 @@ import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.query.util.NSGlobal;
@@ -369,6 +370,12 @@ public class DBNode extends Nod {
         return parent();
       }
     };
+  }
+
+  @Override
+  public final boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof DBNode)) return false;
+    return data == ((DBNode) cmp).data && pre == ((DBNode) cmp).pre;
   }
 
   @Override

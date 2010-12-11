@@ -94,7 +94,7 @@ public abstract class AdvancedQueryTest {
    */
   protected String check(final FunDef def, final Class<?>... args) {
     final String desc = def.toString();
-    String name = pref + ":" + desc.replaceAll("\\(.*", "");
+    final String name = pref + ":" + desc.replaceAll("\\(.*", "");
     final int max = desc.contains("()") ? 0 : desc.split(",").length;
     final int min = max + 1 - desc.split("\\?").length;
     if(max != args.length) Util.notexpected("Check #arguments: " + def);

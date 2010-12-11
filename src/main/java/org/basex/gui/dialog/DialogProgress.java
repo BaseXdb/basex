@@ -99,7 +99,8 @@ public final class DialogProgress extends Dialog implements ActionListener {
   @Override
   public void actionPerformed(final ActionEvent e) {
     setTitle(command.title());
-    info.setText(command.detail());
+    final String detail = command.detail();
+    info.setText(detail.isEmpty() ? " " : detail);
     mem.repaint();
     if(bar != null) bar.setValue((int) (command.progress() * ww));
   }

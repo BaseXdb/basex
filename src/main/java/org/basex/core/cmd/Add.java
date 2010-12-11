@@ -184,7 +184,7 @@ public final class Add extends ACreate {
     } finally {
       if(large) {
         // close and drop intermediary database instance
-        if(data != null) try { data.close(); } catch(IOException e) { }
+        if(data != null) try { data.close(); } catch(final IOException e) { }
         DropDB.drop(dbname, ctx.prop);
       }
     }

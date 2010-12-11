@@ -103,14 +103,14 @@ public class DialogRename extends Dialog {
       ok = false;
       target = name();
       if(!target.isEmpty()) {
-        Data d = gui.context.data;
-        TokenList l = new TokenList();
+        final Data d = gui.context.data;
+        final TokenList l = new TokenList();
         for(int i = 0; i < d.meta.size; i += d.size(i, Data.DOC)) {
           l.add(d.text(i, true));
         }
         int tmp = 0;
         if(l.size() > 0) {
-          byte[] tmpT = Token.token(target);
+          final byte[] tmpT = Token.token(target);
           for(int i = 0; i < l.size(); ++i) if(eq(l.get(i), tmpT)) tmp++;
         }
         info.setText(tmp + " documents will be deleted.", Msg.WARN);

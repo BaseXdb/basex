@@ -14,7 +14,6 @@ import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
 import org.basex.io.TableAccess;
 import org.basex.util.Atts;
-import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 import org.deepfs.fs.DeepFS;
@@ -101,7 +100,7 @@ public abstract class Data {
   protected Index atvindex;
   /** Full-text index instance. */
   protected Index ftxindex;
-
+  
   /**
    * Dissolves the references to often used tag names and attributes.
    * @throws IOException I/O exception
@@ -198,10 +197,8 @@ public abstract class Data {
    * A single dummy node is returned if the database is empty.
    * @return root nodes
    */
-  public final IntList doc() {
-    final IntList il = new IntList();
-    for(int i = 0; i < meta.size; i += size(i, Data.DOC)) il.add(i);
-    return il;
+  public final int[] doc() {
+    return meta.paths.doc(this);
   }
 
   /**
@@ -209,27 +206,8 @@ public abstract class Data {
    * @param input input path
    * @return root nodes
    */
-  public final IntList doc(final String input) {
-    final boolean all = input.isEmpty();
-    final byte[] slash = token("/");
-    // build exact path: remove redundant slashes and switch to lower case
-    final byte[] exact = lc(concat(slash, token(input.replaceAll("/+", "/"))));
-    // build root path
-    final byte[] start = endsWith(exact, slash) ? exact : concat(exact, slash);
-    final IntList il = new IntList();
-    if(!empty()) {
-      for(int i = 0; i < meta.size; i += size(i, Data.DOC)) {
-        if(all) {
-          // add all documents
-          il.add(i);
-        } else {
-          // add documents which match specified input path
-          final byte[] pth = concat(slash, lc(text(i, true)));
-          if(eq(pth, exact) || startsWith(pth, start)) il.add(i);
-        }
-      }
-    }
-    return il;
+  public final int[] doc(final String input) {
+    return meta.paths.doc(input, this);
   }
 
   /**
@@ -387,12 +365,12 @@ public abstract class Data {
    * @return name reference
    */
   public final byte[] name(final int pre, final int k) {
-    if(k == Data.PI) {
+    if(k == PI) {
       final byte[] name = text(pre, true);
       final int i = indexOf(name, ' ');
       return i == -1 ? name : substring(name, 0, i);
     }
-    return (k == Data.ELEM ? tags : atts).key(name(pre));
+    return (k == ELEM ? tags : atts).key(name(pre));
   }
 
   /**
@@ -485,13 +463,13 @@ public abstract class Data {
   public final void rename(final int pre, final int k, final byte[] nm,
       final byte[] uri) {
     meta.update();
-    if(k == Data.PI) {
+    if(k == PI) {
       text(pre, trim(concat(nm, SPACE, atom(pre))), true);
     } else {
       // update/set namespace reference
       final int ou = ns.uri(nm, pre);
       final boolean ne = ou == 0 && uri.length != 0;
-      final int p = k == Data.ATTR ? parent(pre, k) : pre;
+      final int p = k == ATTR ? parent(pre, k) : pre;
       final int u = ne ? ns.add(p, p, pref(nm), uri) :
         ou != 0 && eq(ns.uri(ou), uri) ? ou : 0;
 

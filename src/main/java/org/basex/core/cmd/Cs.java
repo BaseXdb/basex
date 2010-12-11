@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import org.basex.core.User;
 import org.basex.data.Nodes;
-import org.basex.util.IntList;
 
 /**
  * Evaluates the 'cs' command and sets a new initial context set.
@@ -26,14 +25,7 @@ public final class Cs extends AQuery {
 
     if(result.size() != 0) {
       final Nodes nodes = (Nodes) result;
-      context.current = nodes;
-      // determine if new context set refers to root documents
-      final IntList docs = context.data.doc();
-      if(nodes.list.length != docs.size()) return true;
-      for(int i = 0; i < docs.size(); ++i) {
-        if(nodes.list[i] != docs.get(i)) return true;
-      }
-      nodes.root = true;
+      context.current = nodes.checkRoot();
     }
     return true;
   }

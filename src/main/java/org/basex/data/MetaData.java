@@ -71,6 +71,8 @@ public final class MetaData {
   /** Scoring mode: see {@link Prop#SCORING}. */
   public int scoring;
 
+  /** Root paths. */
+  protected DataPaths paths = new DataPaths();
   /** Flag for removed index structures. */
   public boolean uptodate = true;
   /** Dirty flag. */
@@ -187,6 +189,7 @@ public final class MetaData {
     textindex = false;
     attrindex = false;
     ftindex = false;
+    paths.update();
   }
 
   /**

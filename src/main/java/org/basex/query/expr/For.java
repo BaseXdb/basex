@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.data.FTPosData;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -81,8 +80,6 @@ public final class For extends ForLet {
     final Var s = score != null ? score.copy() : null;
 
     return new Iter() {
-      /** Cached position data. */
-      private FTPosData ftd;
       /** Variable stack size. */
       private int vs;
       /** Iterator flag. */
@@ -114,7 +111,6 @@ public final class For extends ForLet {
       public boolean reset() {
         if(ir != null) {
           ctx.vars.reset(vs);
-          ctx.ftpos = ftd;
           ir.reset();
           ir = null;
           c = 0;

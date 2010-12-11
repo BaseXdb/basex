@@ -99,14 +99,16 @@ public final class Nodes implements Result {
    * @return self reference
    */
   public Nodes checkRoot() {
-    root = true;
-    int c = 0;
-    for(int p = 0; c < list.length && p < data.meta.size;
-      ++c, p += data.size(p, Data.DOC)) {
-      if(p != list[c]) {
-        root = false;
-        break;
-      }
+    final int[] docs = data.doc();
+    if(list == docs) {
+      root = true;
+    } else if(list.length != docs.length) {
+      root = false;
+    } else {
+      int c = -1;
+      while(++c < list.length && list[c] == docs[c]);
+      root = c == list.length;
+      if(root) list = docs;
     }
     return this;
   }

@@ -128,9 +128,11 @@ public class IntList extends ElementList {
 
   /**
    * Sorts the data.
+   * @return self reference
    */
-  public void sort() {
+  public IntList sort() {
     Arrays.sort(list, 0, size);
+    return this;
   }
 
   /**

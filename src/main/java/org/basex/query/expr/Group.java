@@ -35,8 +35,8 @@ public final class Group extends ParseExpr {
 
   /**
    * Initializes the grouping partition.
-   * @param fl ForLet
-   * @param ob order by spec
+   * @param fl for/let clauses
+   * @param ob order by specifier
    * @throws QueryException exception
    */
   void init(final ForLet[] fl, final Order ob) throws QueryException {

@@ -163,8 +163,7 @@ public final class DiskValues implements Index {
         break;
       }
     }
-    ids.sort();
-    return iter(ids);
+    return iter(ids.sort());
   }
 
   /**

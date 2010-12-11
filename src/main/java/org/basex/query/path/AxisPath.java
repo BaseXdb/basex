@@ -164,7 +164,6 @@ public class AxisPath extends Path {
     optSteps(ctx);
 
     // check if all context nodes reference document nodes
-    // [CG] XQuery: optimize paths without root context
     final Data data = ctx.resource.data();
     if(data != null) {
       boolean doc = ctx.resource.docNodes();

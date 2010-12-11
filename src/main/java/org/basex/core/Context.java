@@ -7,7 +7,6 @@ import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
-import org.basex.util.IntList;
 
 /**
  * This class serves as a central database context.
@@ -95,7 +94,7 @@ public final class Context {
    * @return result of check
    */
   public int[] doc() {
-    return current.root ? current.list : data.doc().toArray();
+    return current.root ? current.list : data.doc();
   }
 
   /**
@@ -116,8 +115,7 @@ public final class Context {
     data = d;
     copied = null;
     marked = new Nodes(d);
-    final IntList il = path == null ? data.doc() : data.doc(path);
-    current = new Nodes(il.toArray(), data);
+    current = new Nodes(path == null ? data.doc() : data.doc(path), data);
     current.root = path == null;
   }
 
@@ -136,7 +134,7 @@ public final class Context {
    * Updates references to the document nodes.
    */
   public void update() {
-    current = new Nodes(data.doc().toArray(), data);
+    current = new Nodes(data.doc(), data);
     current.root = true;
   }
 
