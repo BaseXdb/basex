@@ -25,11 +25,10 @@ public final class DBDocSeq extends Seq {
   /**
    * Constructor.
    * @param p pre values
-   * @param s number of nodes
    * @param d data reference
    */
-  private DBDocSeq(final int[] p, final int s, final Data d) {
-    super(s);
+  private DBDocSeq(final int[] p, final Data d) {
+    super(p.length);
     pres = p;
     data = d;
   }
@@ -37,13 +36,13 @@ public final class DBDocSeq extends Seq {
   /**
    * Returns a value for the specified items.
    * @param v value
-   * @param s number of nodes
    * @param d data reference
    * @return resulting item or sequence
    */
-  public static Value get(final int[] v, final int s, final Data d) {
+  public static Value get(final int[] v, final Data d) {
+    final int s = v.length;
     return s == 0 ? Empty.SEQ : s == 1 ?
-        new DBNode(d, v[0], Data.DOC) : new DBDocSeq(v, s, d);
+        new DBNode(d, v[0], Data.DOC) : new DBDocSeq(v, d);
   }
 
   /***
@@ -95,8 +94,8 @@ public final class DBDocSeq extends Seq {
   @Override
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof DBDocSeq)) return false;
-    final DBDocSeq i = (DBDocSeq) cmp;
-    return pres == i.pres && size == i.size;
+    final DBDocSeq seq = (DBDocSeq) cmp;
+    return pres == seq.pres && size == seq.size;
   }
 
   @Override

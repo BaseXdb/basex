@@ -85,8 +85,7 @@ final class FNDb extends Fun {
     final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
 
     final Data data = ctx.resource.data(db, input);
-    final int[] il = data.doc(string(path));
-    return DBDocSeq.get(il, il.length, data).iter();
+    return DBDocSeq.get(data.doc(string(path)), data).iter();
   }
 
   /**
