@@ -42,7 +42,8 @@ import org.deepfs.fs.DeepFS;
  * - Byte  3- 7:  TEXT: Text reference
  * - Byte  8-11:  SIZE: Number of descendants
  * ELEMENT NODES (kind = 1):
- * - Byte     0:  ATTS: Number of attributes (bits: 7-3)
+ * - Byte     0:  ATTS: Number of attributes (bits: 7-3).
+ *                      Calculated in real-time, if bit range is too small
  * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte     3:  NURI: Namespace URI
  * - Byte  4- 7:  DIST: Distance to parent node
@@ -52,6 +53,7 @@ import org.deepfs.fs.DeepFS;
  * - Byte  8-11:  DIST: Distance to parent node
  * ATTRIBUTE NODES (kind = 3):
  * - Byte     0:  DIST: Distance to parent node (bits: 7-3)
+ *                      Calculated in real-time, if bit range is too small
  * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte  3- 7:  TEXT: Attribute value reference
  * - Byte    11:  NURI: Namespace (bits: 7-3)
@@ -321,12 +323,19 @@ public abstract class Data {
    */
   private int dist(final int pre, final int k) {
     switch(k) {
-      case ELEM: return table.read4(pre, 4);
+      case ELEM:
+        return table.read4(pre, 4);
       case TEXT:
       case COMM:
-      case PI:   return table.read4(pre, 8);
-      case ATTR: return table.read1(pre, 0) >> 3 & 0x1F;
-      default:   return pre + 1;
+      case PI:
+        return table.read4(pre, 8);
+      case ATTR:
+        int d = table.read1(pre, 0) >> 3 & IO.MAXATTS;
+        // skip additional attributes, if value is larger than maximum range
+        if(d >= IO.MAXATTS) while(d < pre && kind(pre - d) == ATTR) d++;
+        return d;
+      default:
+        return pre + 1;
     }
   }
 
@@ -347,7 +356,10 @@ public abstract class Data {
    * @return number of attributes
    */
   public final int attSize(final int pre, final int k) {
-    return k == ELEM ? table.read1(pre, 0) >> 3 & 0x1F : 1;
+    int s = k == ELEM ? table.read1(pre, 0) >> 3 & IO.MAXATTS : 1;
+    // skip additional attributes, if value is larger than maximum range
+    if(s >= IO.MAXATTS) while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
+    return s;
   }
 
   /**
@@ -829,7 +841,8 @@ public abstract class Data {
     // build and insert new entry
     final int i = ++meta.lastid;
     final int n = ne ? 1 << 7 : 0;
-    s(as << 3 | ELEM); s(n | (byte) (tn >> 8)); s(tn); s(u);
+    s(Math.min(IO.MAXATTS, as) << 3 | ELEM);
+    s(n | (byte) (tn >> 8)); s(tn); s(u);
     s(d >> 24); s(d >> 16); s(d >> 8); s(d);
     s(s >> 24); s(s >> 16); s(s >> 8); s(s);
     s(i >> 24); s(i >> 16); s(i >> 8); s(i);
@@ -870,7 +883,8 @@ public abstract class Data {
     final long v = index(vl, pre, false);
     final int i = newID();
     final int n = ne ? 1 << 7 : 0;
-    s(d << 3 | ATTR); s(n | (byte) (tn >> 8)); s(tn); s(v >> 32);
+    s(Math.min(IO.MAXATTS, d) << 3 | ATTR);
+    s(n | (byte) (tn >> 8)); s(tn); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(0); s(0); s(0); s(u);
     s(i >> 24); s(i >> 16); s(i >> 8); s(i);
