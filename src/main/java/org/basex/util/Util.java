@@ -235,7 +235,7 @@ public final class Util {
 
     // not found; check application directory
     final File f = new File(applicationPath());
-    final String home = f.isFile() ? f.getPath() : f.getParent();
+    final String home = f.isFile() ? f.getParent() : f.getPath();
     if(new File(home, IO.BASEXSUFFIX).exists()) return home;
 
     // not found; choose user home directory
