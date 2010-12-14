@@ -70,7 +70,7 @@ public final class DialogCreateFS extends Dialog {
   /**
    * Default constructor.
    * @param main reference to the main window
-  
+
   public DialogCreateFS(final GUI main) {
     super(main, CREATEFSTITLE);
     db = List.list(main.context);

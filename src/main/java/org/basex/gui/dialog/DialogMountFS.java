@@ -59,7 +59,7 @@ public final class DialogMountFS extends Dialog {
   /**
    * Default constructor.
    * @param main reference to the main window
-  
+
   public DialogMountFS(final GUI main) {
     super(main, OPENMOUNTTITLE);
     final GUIProp gprop = gui.gprop;
@@ -131,7 +131,7 @@ public final class DialogMountFS extends Dialog {
   /**
    * Returns the database name.
    * @return database name
-  
+
   public String db() {
     final String db = choice.getValue();
     return ok && db.length() > 0 ? db : null;
@@ -140,7 +140,7 @@ public final class DialogMountFS extends Dialog {
   /**
    * Returns the mount point.
    * @return database name
-  
+
   public String mp() {
     final String db = mountpoint.getText().trim();
     return ok && db.length() > 0 ? db : null;
@@ -149,7 +149,7 @@ public final class DialogMountFS extends Dialog {
   /**
    * Tests if no databases have been found.
    * @return result of check
-  
+
   public boolean nodb() {
     return choice.getIndex() == -1;
   }
