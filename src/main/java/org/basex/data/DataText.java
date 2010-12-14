@@ -106,6 +106,8 @@ public interface DataText {
   /** Method. */
   String M_HTML = "html";
   /** Method. */
+  String M_CSV = "csv";
+  /** Method. */
   String M_TEXT = "text";
   /** Normalization. */
   String NFC = "nfc";

@@ -77,7 +77,7 @@ public final class DirParser extends Parser {
         b.meta.filesize += file.length();
 
         // use global target as prefix
-        String targ = target.length() != 0 ? target + '/' : "";
+        String targ = !target.isEmpty() ? target + '/' : "";
         final String name = file.name();
         String path = file.path();
         // add relative path without root (prefix) and file name (suffix)

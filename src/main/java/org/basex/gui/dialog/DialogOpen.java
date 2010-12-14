@@ -120,8 +120,7 @@ public final class DialogOpen extends Dialog {
    * @return database name
    */
   public String db() {
-    final String db = choice.getValue();
-    return ok && db.length() > 0 ? db : null;
+    return ok ? choice.getValue() : null;
   }
 
   /**

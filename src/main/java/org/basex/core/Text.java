@@ -42,7 +42,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.3.4";
+  String VERSION = "6.3.5";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -1043,10 +1043,12 @@ public interface Text {
   String CREATECHOP = lang("dc_chop");
   /** Entities information. */
   String CREATEENTITIES = lang("dc_entities");
-  /** Entities information. */
+  /** DTD information. */
   String CREATEDTD = lang("dc_dtd");
-  /** SAX parsing information. */
+  /** Internal parser. */
   String CREATEINTPARSE = lang("dc_intparse");
+  /** SAX parsing information. */
+  String CREATEFORMAT = lang("dc_createformat") + COLS;
 
   /** Full-text index information. */
   String CREATEWC = lang("dc_wcindex");
@@ -1069,8 +1071,10 @@ public interface Text {
 
   /** Whitespaces information. */
   String CHOPPINGINFO = lang("dc_chopinfo") + DOT;
-  /** Whitespaces information. */
+  /** Internal parser information. */
   String INTPARSEINFO = lang("dc_intparseinfo") + DOT;
+  /** Input format information. */
+  String FORMATINFO = lang("dc_formatinfo") + DOT;
 
   /** Path summary information. */
   String PATHINDEXINFO = lang("dc_pathinfo") + DOT;

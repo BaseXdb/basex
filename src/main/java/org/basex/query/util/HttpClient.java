@@ -458,7 +458,7 @@ public final class HttpClient {
       return processXML(conn, ctx);
     else if(eq(contentType, TXT_HTML)) {
       // Parse HTML
-      if(HTMLParser.isAvailable()) return processHTML(conn, ctx);
+      if(HTMLParser.available()) return processHTML(conn, ctx);
       HTMLERR.thrw(info); return null;
     } else if(startsWith(contentType, MIME_TEXT_PREFIX))
       // Process text content

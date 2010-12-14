@@ -182,7 +182,7 @@ public final class QueryException extends Exception {
       tb.add(": \n");
     }
     final String c = code();
-    if(c.length() != 0) tb.add("[" + c + "] ");
+    if(!c.isEmpty()) tb.add("[" + c + "] ");
     return tb.add(getLocalizedMessage()).toString();
   }
 }

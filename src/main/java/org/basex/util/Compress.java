@@ -55,7 +55,7 @@ public final class Compress {
       }
     }
     if(o != 0) bl.add(c);
-    return bl.size() > tl ? txt : bl.toArray();
+    return bl.size() < tl ? bl.toArray() : txt;
   }
 
   /**

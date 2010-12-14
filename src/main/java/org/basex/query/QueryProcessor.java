@@ -117,7 +117,7 @@ public final class QueryProcessor extends Progress {
       throws QueryException {
 
     Object obj = o;
-    if(t != null && t.length() != 0) {
+    if(t != null && !t.isEmpty()) {
       final QNm type = new QNm(Token.token(t));
       if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
       final Type typ = Type.find(type, true);

@@ -41,7 +41,7 @@ public enum DeepNS {
   @Override
   public String toString() {
     final StringBuilder str = new StringBuilder("xmlns");
-    if(prefix.length() > 0) str.append(':').append(prefix);
+    if(!prefix.isEmpty()) str.append(':').append(prefix);
     return str.append("=\"").append(uri).append("\"").toString();
   }
 }

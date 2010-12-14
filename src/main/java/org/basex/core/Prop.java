@@ -116,7 +116,7 @@ public final class Prop extends AProp {
   /** Flag for entity parsing in internal parser. */
   public static final Object[] ENTITY = { "ENTITY", false };
   /** Define import parser. */
-  public static final Object[] PARSER = { "PARSER", "" };
+  public static final Object[] PARSER = { "PARSER", "XML" };
 
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };

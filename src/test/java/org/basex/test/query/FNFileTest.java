@@ -119,7 +119,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void testLastModified() throws BaseXException {
     final String fun = check(FunDef.LASTMOD, String.class);
-    assertTrue(query(fun + "('" + Prop.TMP + "')").length() != 0);
+    assertTrue(!query(fun + "('" + Prop.TMP + "')").isEmpty());
   }
 
   /**

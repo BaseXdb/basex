@@ -68,7 +68,7 @@ public abstract class Main {
     while(console) {
       Util.out("> ");
       for(final String in : inputs()) {
-        if(in.length() != 0 && !execute(in)) return true;
+        if(!in.isEmpty() && !execute(in)) return true;
       }
     }
     return false;

@@ -4,10 +4,12 @@ import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.file.CSVParser;
 import org.basex.build.file.HTMLParser;
+import org.basex.build.file.TextParser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
+import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.util.Atts;
 
@@ -62,10 +64,12 @@ public abstract class Parser extends Progress {
       final String target) throws IOException {
 
     // use file specific parser
-    final String parser = prop.get(Prop.PARSER);
-    if(parser.equals("html")) return new HTMLParser(io, target, prop);
-    if(parser.equals("csv")) return new CSVParser(io, target);
-    // use internal parser
+    final String parser = prop.get(Prop.PARSER).toLowerCase();
+    if(parser.equals(DataText.M_HTML)) return new HTMLParser(io, target, prop);
+    if(parser.equals(DataText.M_TEXT)) return new TextParser(io, target);
+    if(parser.equals(DataText.M_CSV))  return new CSVParser(io, target);
+
+    // XML: use internal parser
     if(prop.is(Prop.INTPARSE)) return new XMLParser(io, target, prop);
     // use default parser
     final SAXSource s = new SAXSource(io.inputSource());

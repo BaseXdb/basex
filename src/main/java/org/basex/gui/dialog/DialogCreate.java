@@ -4,10 +4,12 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.basex.build.file.HTMLParser;
 import org.basex.build.xml.CatalogResolverWrapper;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
+import org.basex.data.DataText;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Msg;
@@ -15,6 +17,7 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
+import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTabs;
@@ -40,6 +43,8 @@ public final class DialogCreate extends Dialog {
   /** Database info. */
   private final BaseXLabel info;
 
+  /** Parser. */
+  private final BaseXCombo parser;
   /** Internal XML parsing. */
   private final BaseXCheckBox intparse;
   /** Whitespace chopping. */
@@ -83,7 +88,7 @@ public final class DialogCreate extends Dialog {
     // create panels
     final BaseXBack p1 = new BaseXBack(new BorderLayout()).border(8);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
@@ -116,7 +121,24 @@ public final class DialogCreate extends Dialog {
     info = new BaseXLabel(" ");
     p1.add(info, BorderLayout.SOUTH);
 
-    final BaseXBack p2 = new BaseXBack(new TableLayout(14, 1)).border(8);
+    final BaseXBack p2 = new BaseXBack(new TableLayout(11, 1)).border(8);
+
+    // always use internal/external parser, chop whitespaces, ...?
+    p = new BaseXBack(new TableLayout(1, 2, 6, 0));
+
+    final BaseXLabel parse = new BaseXLabel(CREATEFORMAT, true, true);
+    final StringList parsers = new StringList();
+    parsers.add(DataText.M_XML);
+    if(HTMLParser.available()) parsers.add(DataText.M_HTML);
+    parsers.add(DataText.M_TEXT);
+    parsers.add(DataText.M_CSV);
+
+    parser = new BaseXCombo(this, parsers.toArray());
+    parser.setSelectedItem(prop.get(Prop.PARSER));
+    p.add(parse);
+    p.add(parser);
+    p2.add(p);
+    p2.add(new BaseXLabel(FORMATINFO, true, false));
 
     intparse = new BaseXCheckBox(CREATEINTPARSE,
         prop.is(Prop.INTPARSE), 0, this);
@@ -130,7 +152,7 @@ public final class DialogCreate extends Dialog {
 
     chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, this);
     p2.add(chop);
-    p2.add(new BaseXLabel(CHOPPINGINFO, false, false));
+    p2.add(new BaseXLabel(CHOPPINGINFO, false, false).border(0, 0, 8, 0));
     p2.add(new BaseXLabel());
 
     // CatalogResolving
@@ -234,14 +256,18 @@ public final class DialogCreate extends Dialog {
   public void action(final Object cmp) {
     ft.action(ftxindex.isSelected());
 
-    intparse.setEnabled(!usecat.isSelected());
+    final boolean xml = parser.getSelectedItem().toString().equals(
+        DataText.M_XML);
+    intparse.setEnabled(!usecat.isSelected() && xml);
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());
 
     usecat.setEnabled(!intparse.isSelected() &&
-        CatalogResolverWrapper.available());
+        CatalogResolverWrapper.available() && xml);
     cfile.setEnabled(usecat.isSelected());
     browsec.setEnabled(cfile.isEnabled());
+    chop.setEnabled(xml);
+
     boolean valid;
     final String pth = path.getText().trim();
     final IO in = IO.get(pth);
@@ -287,6 +313,7 @@ public final class DialogCreate extends Dialog {
     gui.set(Prop.FTINDEX, ftxindex.isSelected());
     gui.set(Prop.INTPARSE, intparse.isSelected());
     gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText().trim() : "");
+    gui.set(Prop.PARSER, parser.getSelectedItem().toString());
     ft.close();
   }
 }

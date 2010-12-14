@@ -35,6 +35,14 @@ public final class HTMLParser extends XMLParser {
       "org.ccil.cowan.tagsoup.XMLWriter"), Writer.class);
 
   /**
+   * Checks if a CatalogResolver is available.
+   * @return result of check
+   */
+  public static boolean available() {
+    return READER != null;
+  }
+
+  /**
    * Constructor.
    * @param f file reference
    * @param tar target for collection adding
@@ -54,7 +62,7 @@ public final class HTMLParser extends XMLParser {
   private static IO toXML(final IO io) {
     // reader could not be initialized; fall back to XML
     if(READER == null) return io;
-
+    
     try {
       // tries to extract the encoding from the input
       byte[] content = io.content();
@@ -86,13 +94,5 @@ public final class HTMLParser extends XMLParser {
       Util.debug(ex);
       return io;
     }
-  }
-
-  /**
-   * Checks if TagSoup is in class path.
-   * @return result
-   */
-  public static boolean isAvailable() {
-    return READER != null;
   }
 }
