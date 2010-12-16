@@ -514,7 +514,6 @@ info_browsererror=Kon geen browser openen.\nOpen zelf de URL:\n\n%
 
 # Command Help
 ch_nohelp=Sorry, geen help beschikbaar.
-ch_helpdatabase0=Database Commando's:
 ch_create1=Maak database, index van gebruiker.
 ch_create2=Maakt een nieuwe database, index van gebruiker:
 ch_create3=maakt de database [%] met een optionele [%]
@@ -552,7 +551,6 @@ ch_optimize1=Optimaliseer de database.
 ch_optimize2=Optimaliseert de actuele database structuren.
 ch_export1=Exporteer database naar XML.
 ch_export2=Exporteert de database naar [%].
-ch_helpquery0=Query Commando's:
 ch_xquery1=Evalueer XQuery.
 ch_xquery2=Evalueert de opgegeven query en print het resultaat.
 ch_run1=Evalueer bestand als XQuery.
@@ -561,7 +559,6 @@ ch_find1=Evalueer een keyword query.
 ch_find2=De volgende modifiers kunnen gebruikt worden:\n =  : zoekt naar exacte tekst nodes"\n @= : zoekt naar exacte attributen\n @  : zoekt naar attributen
 ch_cs1=Evalueer XQuery en neem resultaat als nieuwe context set.
 ch_cs2=Evalueert de query en neemt het resultaat als nieuwe context set.
-ch_helpadmin0=Admin Commando's:
 ch_kill1=Stop gebruiker sessions.
 ch_kill2=Stopt alle sessies van de opgegeven gebruiker.
 ch_backup1=Backup database.
@@ -576,7 +573,6 @@ ch_show24=toont gebruikers (van een database).
 ch_show25=toont backups.
 ch_grant1=Geef gebruiker permissies.
 ch_grant2=Geeft permissies (op een database) aan een gebruiker.
-ch_helpgeneral0=Algemene Commando's:
 ch_set1=Stel globale opties in (actuele waarden: probeer '%').
 ch_set2=Beschikbare opties [%] met waarde [%] = aan/uit:
 ch_set21=Tonen van query info

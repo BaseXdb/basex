@@ -515,7 +515,6 @@ info_browsererror=Browser konnte nicht geöffnet werden. Bitte die URL von Hand 
 
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.
-ch_helpdatabase0=Datenbank-Befehle:
 ch_create1=Erzeugung einer Datenbank, eines Index oder Benutzers.
 ch_create2=Erzeugt eine neue Datenbank, einen Index oder Benutzer:
 ch_create3=erzeugt die Datenbank [%] mit optionalem [%]
@@ -553,7 +552,6 @@ ch_optimize1=Optimierung der Datenbank.
 ch_optimize2=Optimiert die aktuelle Datenbankstruktur.
 ch_export1=Export der Datenbank nach XML.
 ch_export2=Exportiert die Datenbank nach [%].
-ch_helpquery0=Query-Befehle:
 ch_xquery1=Ausführung einer XQuery-Anfrage.
 ch_xquery2=Führt eine XQuery-Anfrage aus und zeigt das Ergebnis an.
 ch_run1=Ausführung einer Datei als XQuery-Anfrage.
@@ -562,7 +560,6 @@ ch_find1=Ausführung einer Schlüsselwort-Anfrage.
 ch_find2=Die folgenden Modifikatoren sind erlaubt:\n =  : sucht nach exakten Textknoten\n @= : sucht nach exakten Attributen\n @  : sucht nach Attributen
 ch_cs1=Ausführung einer Anfrage und Wechsel zu neuer Kontextmenge.
 ch_cs2=Führt die angegebene XQuery aus und setzt das\nErgebnis als neue Kontextmenge.
-ch_helpadmin0=Administrator-Befehle:
 ch_kill1=Beendung der Verbindungen.
 ch_kill2=Beendet alle Verbindungen des angegebenen Benutzers.
 ch_backup1=Erstellt ein Backup der Datenbank.
@@ -577,7 +574,6 @@ ch_show24=zeigt registrierte Benutzer (einer Datenbank).
 ch_show25=zeigt Backups an.
 ch_grant1=Zuweisung von Benutzerrechten.
 ch_grant2=Weist einem Benutzer (für eine Datenbank) Rechte zu.
-ch_helpgeneral0=Allgemeine Befehle:
 ch_set1=Setzen von allgemeinen Optionen (aktuelle Werte via '%').
 ch_set2=Verfügbare Optionen [%] mit [%] = on/off:
 ch_set21=Anzeige von Anfrage-Informationen

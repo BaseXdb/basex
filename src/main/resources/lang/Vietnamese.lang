@@ -513,7 +513,6 @@ info_browsererror=Failed to open a browser. Please manually open the URL in your
 
 # Command Help
 ch_nohelp=Xin lỗi, không thấy hướng dẫn nào.
-ch_helpdatabase0=Cậu lệnh cơ sở dữ liệu:
 ch_create1=Tạo cơ sở dữ liệu hay index.
 ch_create2=Creates a new database, index or user:
 ch_create3=creates the database [%] with an optional [%]
@@ -551,7 +550,6 @@ ch_optimize1=Tối ưu cơ sở dữ liệu.
 ch_optimize2=Tối ưu cấu trúc cơ sở dữ liệu hiện tại.
 ch_export1=Xuất khẩu cơ sở dữ liệu ra kiểu XML.
 ch_export2=Xuất khẩu thiết lập hiện tại ra XML [%].
-ch_helpquery0=Lệnh hỏi:
 ch_xquery1=Đánh giá lệnh hỏi XQuery.
 ch_xquery2=Đánh giá lệnh hỏi XQuery và in ra kết quả.
 ch_run1=Evaluate file as XQuery.
@@ -560,7 +558,6 @@ ch_find1=Đánh giá lệnh hỏi từ khóa.
 ch_find2=Những từ bổ nghỉa sau được dùng:\n =  : tìm chính xác những nút văn bản"\n @= : tìm chính xác những thuộc tính\n @  : tìm những thuộc tính
 ch_cs1=Đánh giá lệnh hỏi XQuery và gán kết quả theo tập hợp ngữ cảnh mới.
 ch_cs2=Đánh giá lệnh hỏi XQuery cụ thể và gán kết quả\ntheo tập hợp ngữ cảnh mới.
-ch_helpadmin0=Admin Commands:
 ch_kill1=Kill user sessions.
 ch_kill2=Kills all sessions of the specified user.
 ch_backup1=Backup database.
@@ -575,7 +572,6 @@ ch_show24=shows users (on a database).
 ch_show25=shows backups.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions (on a database) to a user.
-ch_helpgeneral0=Những câu lệnh chung:
 ch_set1=Gán lựa chọn toàn cục (current values: try '%').
 ch_set2=Có [%] với [%] = on/off:
 ch_set21=Hiển thị thông tin quy trình

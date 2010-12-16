@@ -216,11 +216,18 @@ public final class CommandParser extends InputParser {
         return new Password(string(null));
       case HELP:
         String hc = name(null);
+        String form = null;
         if(hc != null) {
-          qp = qm;
-          hc = consume(Cmd.class, cmd).toString();
+          if(hc.equalsIgnoreCase("wiki")) {
+            form = hc;
+            hc = null;
+          } else {
+            qp = qm;
+            hc = consume(Cmd.class, cmd).toString();
+            form = name(null);
+          }
         }
-        return new Help(hc);
+        return new Help(hc, form);
       case EXIT: case QUIT:
         return new Exit();
       case KILL:
@@ -401,10 +408,10 @@ public final class CommandParser extends InputParser {
     try {
       // return command reference; allow empty strings as input ("NULL")
       final String t = token == null ? "NULL" : token.toUpperCase();
-      final E cmd = Enum.valueOf(cmp, t);
-      if(!Cmd.class.isInstance(cmd) || !Cmd.class.cast(cmd).help()) return cmd;
+      return Enum.valueOf(cmp, t);
     } catch(final IllegalArgumentException ex) { /* will not happen. */ }
     }
+
     final Enum<?>[] alt = list(cmp, token);
     if(token == null) {
       // no command found
@@ -413,7 +420,7 @@ public final class CommandParser extends InputParser {
       help(list(alt), par);
     }
 
-    // find similar commands
+    // output error for similar commands
     final byte[] name = lc(token(token));
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : list(cmp, null)) {
@@ -436,7 +443,7 @@ public final class CommandParser extends InputParser {
    * @throws QueryException query exception
    */
   private void help(final StringList alt, final Cmd cmd) throws QueryException {
-    error(alt, PROCSYNTAX, cmd.help(true));
+    error(alt, PROCSYNTAX, cmd.help(true, false));
   }
 
   /**
@@ -452,10 +459,9 @@ public final class CommandParser extends InputParser {
     Enum<?>[] list = new Enum<?>[0];
     final String t = i == null ? "" : i.toUpperCase();
     for(final Enum<?> e : en.getEnumConstants()) {
-      if(Cmd.class.isInstance(e)) {
-        final Cmd c = Cmd.class.cast(e);
-        if(c.help() || c.hidden()) continue;
-      }
+      // ignore hidden commands
+      if(Cmd.class.isInstance(e) && Cmd.class.cast(e).hidden()) continue;
+
       if(e.name().startsWith(t)) {
         final int s = list.length;
         final Enum<?>[] tmp = new Enum<?>[s + 1];

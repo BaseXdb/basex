@@ -174,24 +174,22 @@ public interface Text {
   /** Missing help. */
   String NOHELP = lang("ch_nohelp");
 
-  /** Database separator. */
-  String[] HELPDB = { lang("ch_helpdatabase0") };
   /** Command help. */
   String[] HELPCREATE = {
-    "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
+    "[" + CmdCreate.DATABASE + "|" + CmdCreate.FS + "|" +
     CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
-    LI + CmdCreate.DB + " [" + C_NAME + "] ([" + INPUT + "]):"  + NL +
+    LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + INPUT + "]):"  + NL +
       "  " + lang("ch_create3", C_NAME, INPUT) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
-      "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]: " + NL +
+      "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]:" + NL +
       "  " + lang("ch_create5") + NL +
     LI + CmdCreate.FS + " [" + C_NAME + "] [" + C_PATH +
-      "] ([mountpoint] [backingstore]): " + NL +
+      "] ([mountpoint] [backingstore]):" + NL +
       "  " + lang("ch_create6", C_NAME, C_PATH) + NL +
       "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
-    LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]): " + NL +
+    LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
       "  " + lang("ch_create8")
   };
 
@@ -213,11 +211,12 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPINFO = {
-    "([" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" + CmdInfo.STORAGE + "])",
+    "([" + CmdInfo.DATABASE + "|" + CmdInfo.INDEX + "|" +
+    CmdInfo.STORAGE + "])",
     lang("ch_info1"),
     lang("ch_info21") + NL +
     LI + lang("ch_info22") + NL +
-    LI + CmdInfo.DB + ": " + lang("ch_info23") + NL +
+    LI + CmdInfo.DATABASE + ": " + lang("ch_info23") + NL +
     LI + CmdInfo.INDEX + ": " + lang("ch_info24") + NL +
     LI + CmdInfo.STORAGE + " [start end] | [" + C_QUERY + "]: " +
     lang("ch_info25")
@@ -232,10 +231,11 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "] [...]",
+    "[" + CmdDrop.DATABASE + "|" + CmdDrop.INDEX + "|" +
+    CmdDrop.USER + "] [...]",
     lang("ch_drop1"),
     lang("ch_drop2") + NL +
-    LI + CmdDrop.DB + " [" + C_NAME + "]:" + NL +
+    LI + CmdDrop.DATABASE + " [" + C_NAME + "]:" + NL +
       "  " + lang("ch_drop21") + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
@@ -249,13 +249,11 @@ public interface Text {
   String[] HELPEXPORT = {
     "[" + C_PATH + "]", lang("ch_export1"), lang("ch_export2", C_PATH)
   };
-
   /** Command help. */
   String[] HELPOPTIMIZE = {
     "", lang("ch_optimize1"), lang("ch_optimize2")
   };
-  /** Command help. */
-  String[] HELPQ = { lang("ch_helpquery0") };
+
   /** Command help. */
   String[] HELPXQUERY = {
     "[" + C_QUERY + "]", lang("ch_xquery1"), lang("ch_xquery2")
@@ -273,8 +271,6 @@ public interface Text {
     "[" + C_QUERY + "]", lang("ch_cs1"), lang("ch_cs2")
   };
 
-  /** Command help. */
-  String[] HELPA = { lang("ch_helpadmin0") };
   /** Command help. */
   String[] HELPKILL = {
     "[" + C_NAME + "]", lang("ch_kill1"), lang("ch_kill2")
@@ -308,17 +304,15 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + CmdCreate.USER + "|" + CmdCreate.DB + "] [...]",
+    "[" + CmdCreate.USER + "|" + CmdCreate.DATABASE + "] [...]",
     lang("ch_alter1"),
     lang("ch_alter2") + NL  +
     LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
     "  " + lang("ch_alterpw") + NL +
-    LI + CmdCreate.DB + " [" + C_NAME + "] [newname]" + NL +
+    LI + CmdCreate.DATABASE + " [" + C_NAME + "] [newname]" + NL +
     "  " + lang("ch_alterdb")
   };
 
-  /** Command help. */
-  String[] HELPG = { lang("ch_helpgeneral0") };
   /** Command help. */
   String[] HELPSET = {
     "[option] ([value])",
@@ -375,8 +369,8 @@ public interface Text {
   String CMDWHICH = CMDUNKNOWN + "; " + lang("help_short", "help") + DOT;
   /** Unknown command error. */
   String CMDSIMILAR = CMDUNKNOWN + "; " + lang("cmd_similar");
-  /** Database closed. */
-  String CMDHELP = lang("help_long", "help");
+  /** Try "help [...]" to get.. */
+  String CMDHELP = lang("help_long", "help") + NL;
 
   // CREATE COMMAND ===========================================================
 

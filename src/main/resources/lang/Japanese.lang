@@ -517,7 +517,6 @@ info_browsererror=Failed to open a browser. Please manually open the URL in your
 
 # Command Help
 ch_nohelp=ヘルプがありません。
-ch_helpdatabase0=データベースコマンド:
 ch_create1=データベース又はインデックスの作成
 ch_create2=新しいデータベース又はインデックス、ユーザーを作成します:
 ch_create3=creates the database [%] with an optional [%]
@@ -555,7 +554,6 @@ ch_optimize1=データベースの最適化
 ch_optimize2=現在のデータベース構造を最適化します。
 ch_export1=データベースをXMLで出力
 ch_export2=現在のコンテクストをXML文書として [%] に出力します。
-ch_helpquery0=クエリーコマンド:
 ch_xquery1=XQuery の評価
 ch_xquery2=XQueryを評価し、結果を表示します
 ch_run1=ファイルをXQueryとして評価
@@ -564,7 +562,6 @@ ch_find1=キーワードクエリーの評価
 ch_find2=以下の修飾子が使えます。:\n =  : 完全に一致するテキストノードを検索します\n @= : 完全に一致する属性を検索します。\n @  : 属性を検索します。
 ch_cs1=XQueryクエリーを評価、結果を新しいコンテキストセットに（？）
 ch_cs2=指定されたXQueryを評価し、結果を新しい\nコンテキストセットにします。
-ch_helpadmin0=管理コマンド:
 ch_kill1=ユーザーセッションの強制切断
 ch_kill2=指定されたユーザーの全てのセッションを切断します。
 ch_backup1=Backup database.
@@ -579,7 +576,6 @@ ch_show24=データベースにアクセスできるユーザーを表示しま�
 ch_show25=shows backups.
 ch_grant1=パーミッションの付与
 ch_grant2=ユーザーにデータベースに対するパーミッションを与えます。
-ch_helpgeneral0=全般的なコマンド:
 ch_set1=グローバルオプションをセットします(現在の値を見るには '%' と入力します)。
 ch_set2=Available options [%] with [%] = on/off:
 ch_set21=プロセス情報の表示

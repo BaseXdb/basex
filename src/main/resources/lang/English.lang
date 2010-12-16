@@ -351,7 +351,7 @@ cmd_similar=did you mean '%'?
 
 # Help Command
 help_short=try "%"
-help_intro=Try "%" to get some information.
+help_intro=Try "%" to get more information.
 help_long=Try "% [...]" to get info on a specific command.
 
 # Create Command
@@ -515,7 +515,6 @@ info_browsererror=Failed to open a browser.\nPlease manually open the URL:\n\n%
 
 # Command Help
 ch_nohelp=Sorry, no help available.
-ch_helpdatabase0=Database Commands:
 ch_create1=Create database, index or user.
 ch_create2=Creates a new database, index or user:
 ch_create3=creates the database [%] with an optional [%]
@@ -553,7 +552,6 @@ ch_optimize1=Optimize the database.
 ch_optimize2=Optimizes the current database structures.
 ch_export1=Export database to XML.
 ch_export2=Exports the database to [%].
-ch_helpquery0=Query Commands:
 ch_xquery1=Evaluate XQuery.
 ch_xquery2=Evaluates the specified query and prints the result.
 ch_run1=Evaluate file as XQuery.
@@ -562,7 +560,6 @@ ch_find1=Evaluate a keyword query.
 ch_find2=The following modifiers can be used:\n =  : looks for exact text nodes"\n @= : looks for exact attributes\n @  : looks for attributes
 ch_cs1=Evaluate XQuery and set result as new context set.
 ch_cs2=Evaluates the query and sets the result as new context set.
-ch_helpadmin0=Admin Commands:
 ch_kill1=Kill user sessions.
 ch_kill2=Kills all sessions of the specified user.
 ch_backup1=Backup database.
@@ -577,7 +574,6 @@ ch_show24=shows users (on a database).
 ch_show25=shows backups.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions (on a database) to a user.
-ch_helpgeneral0=General Commands:
 ch_set1=Set global options (current values: try '%').
 ch_set2=Available options [%] with value [%] = on/off:
 ch_set21=Display of query info
@@ -594,7 +590,7 @@ ch_password2=Changes the user's password.
 ch_help1=Get help on % commands.
 ch_help2=If [%] is specified, information on the specific\ncommand is printed; otherwise, all commands are listed.
 ch_exit1=Exit application.
-ch_exit2=Exits %.
+ch_exit2=Exits the % console.
 
 # Help Texts
 h_hist=Show input history.
