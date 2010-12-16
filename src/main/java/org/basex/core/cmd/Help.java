@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.Command;
 
@@ -35,7 +36,8 @@ public final class Help extends Command {
     final boolean wiki = args[1] != null;
 
     if(in != null) {
-      final Cmd cmd = Cmd.valueOf(in);
+      final Cmd cmd = getOption(in, Cmd.class);
+      if(cmd == null) return error(CMDUNKNOWN, this);
       out.print(cmd.help(true, wiki));
     } else {
       out.println(CMDHELP);

@@ -262,7 +262,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void help() {
-    ok(new Help(""));
+    no(new Help("bla"));
     ok(new Help(null));
   }
 
