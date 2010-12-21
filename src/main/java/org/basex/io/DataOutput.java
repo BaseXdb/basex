@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import org.basex.util.Token;
 
 /**
@@ -149,6 +150,34 @@ public final class DataOutput extends OutputStream {
     }
     write(v);
     return 1;
+  }
+
+
+  /**
+   * Writes the specified longs to the output stream.
+   * NOTE: the long values are not compressed!
+   * @param array array to be written
+   * @throws IOException I/O exception
+   */
+  public void writeLongs(final long[] array) throws IOException {
+    writeNum(array.length);
+    for(final long a : array) write8(a);
+  }
+
+  /**
+   * Writes a long value to the specified output stream.
+   * @param v value to be written
+   * @throws IOException I/O exception
+   */
+  public void write8(final long v) throws IOException {
+    write((byte) (v >>> 56));
+    write((byte) (v >>> 48));
+    write((byte) (v >>> 40));
+    write((byte) (v >>> 32));
+    write((byte) (v >>> 24));
+    write((byte) (v >>> 16));
+    write((byte) (v >>>  8));
+    write((byte)  v);
   }
 
   /**

@@ -3,12 +3,13 @@ package org.basex.io;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+
 import org.basex.util.Token;
 
 /**
  * This is an input stream for project specific data types.
  * It bears resemblance to Java's {@link DataInputStream}.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -94,14 +95,47 @@ public final class DataInput extends BufferInput {
   public int readNum() throws IOException {
     final int v = read();
     switch((v & 0xC0) >>> 6) {
-    case 0:
-      return v;
-    case 1:
-      return ((v & 0x3F) << 8) + read();
-    case 2:
-      return ((v & 0x3F) << 24) + (read() << 16) + (read() << 8) + read();
-    default:
-      return (read() << 24) + (read() << 16) + (read() << 8) + read();
+      case 0:
+        return v;
+      case 1:
+        return ((v & 0x3F) << 8) + read();
+      case 2:
+        return ((v & 0x3F) << 24) + (read() << 16) + (read() << 8) + read();
+      default:
+        return (read() << 24) + (read() << 16) + (read() << 8) + read();
     }
+  }
+
+  /**
+   * Reads an array of longs from the input stream.
+   * @return array of longs
+   * @throws IOException IO Exception
+   */
+  public long[] readLongs() throws IOException {
+    return readLongs(readNum());
+  }
+
+  /**
+   * Reads an array of longs with the specified size from the input stream.
+   * @param s array size
+   * @return array of longs
+   * @throws IOException IO Exception
+   */
+  public long[] readLongs(final int s) throws IOException {
+    final long[] array = new long[s];
+    for(int a = 0; a < s; ++a) array[a] = read8();
+    return array;
+  }
+
+  /**
+   * Read a long value from the input stream.
+   * @return read value
+   * @throws IOException IO Exception
+   */
+  public long read8() throws IOException {
+    return ((long) read() << 56) + ((long) (read() & 255) << 48)
+        + ((long) (read() & 255) << 40) + ((long) (read() & 255) << 32)
+        + ((long) (read() & 255) << 24) + ((read() & 255) << 16)
+        + ((read() & 255) << 8) + ((read() & 255) << 0);
   }
 }
