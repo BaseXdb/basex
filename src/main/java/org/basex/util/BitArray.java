@@ -12,9 +12,9 @@ import static java.lang.Math.*;
  */
 public class BitArray {
 
-  /** Number of bits needed to address a bit in a word; 2^6 = 64. */
+  /** Number of bits needed to address a bit in a word; 2<sup>6</sup> = 64. */
   private static final int WORD_POWER = 6;
-  /** Size of a word = 2^{@link #WORD_POWER}. */
+  /** Size of a word = 2<sup>{@link #WORD_POWER}</sup>. */
   private static final int WORD_SIZE = 1 << WORD_POWER;
   /** A bit mask of 64 bits set to 1. */
   private static final long WORD_MASK = -1L;
@@ -31,7 +31,7 @@ public class BitArray {
 
   /**
    * Construct a new bit array with the specified number of bits.
-   * @param n initial number of bits
+   * @param n initial number of bits (> 0)
    */
   public BitArray(final int n) {
     init(n);
@@ -39,7 +39,7 @@ public class BitArray {
 
   /**
    * Construct a new bit array with the specified number of bits.
-   * @param n initial number of bits
+   * @param n initial number of bits (> 0)
    */
   public BitArray(final long n) {
     init(n);
@@ -54,9 +54,14 @@ public class BitArray {
     setWords(a, l);
   }
 
+  /** Initialize the bit array with an empty array. */
+  public void init() {
+    setWords(new long[1], 0);
+  }
+
   /**
    * Initialize the bit array with a new size. All bits will be set to 0.
-   * @param n n initial number of bits
+   * @param n initial number of bits (> 0)
    */
   public void init(final int n) {
     setWords(new long[((n - 1) >>> WORD_POWER) + 1], n);
@@ -64,7 +69,7 @@ public class BitArray {
 
   /**
    * Initialize the bit array with a new size. All bits will be set to 0.
-   * @param n n initial number of bits
+   * @param n initial number of bits (> 0)
    */
   public void init(final long n) {
     setWords(new long[(int) (((n - 1L) >>> WORD_POWER) + 1L)], n);

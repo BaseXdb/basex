@@ -14,6 +14,10 @@ import org.junit.Test;
  */
 public class BitArrayTest {
 
+  /** Big numeric value. */
+  // private static final long BIG_NUM = Integer.MAX_VALUE;
+  private static final long BIG_NUM = Integer.MAX_VALUE >>> 3L;
+
   /** Instance of {@ling BitArray}. */
   private BitArray a;
 
@@ -26,7 +30,7 @@ public class BitArrayTest {
   /** Test method for {@link BitArray#BitArray(long)}. */
   @Test
   public void testBitArrayLong() {
-    final long length = Integer.MAX_VALUE + 65L;
+    final long length = BIG_NUM + 65L;
     a.init(length);
     final int wordCount = a.getWords().length;
     assertTrue("Allocate long number of words", 64L * wordCount >= length);
@@ -52,7 +56,7 @@ public class BitArrayTest {
   public void testSetInt() {
     a.set(128);
     assertTrue("Bit 128 is 0", a.get(128));
-    a.init(0);
+    a.init();
     a.set(129);
     assertTrue("Bit 129 is 0", a.get(129));
   }
@@ -102,7 +106,7 @@ public class BitArrayTest {
   /** Test method for {@link BitArray#get(long)}. */
   @Test
   public void testGetLong() {
-    final long i = Integer.MAX_VALUE + 64L;
+    final long i = BIG_NUM + 64L;
     a.init(i + 1L);
     a.set(i);
     assertTrue("Bit " + i + " is 0", a.get(i));
@@ -111,7 +115,7 @@ public class BitArrayTest {
   /** Test method for {@link BitArray#set(long)}. */
   @Test
   public void testSetLong() {
-    final long i = Integer.MAX_VALUE + 64L;
+    final long i = BIG_NUM + 64L;
     a.init(i + 1L);
     a.set(i);
     assertTrue("Bit " + i + " is 0", a.get(i));
@@ -130,7 +134,7 @@ public class BitArrayTest {
   /** Test method for {@link BitArray#clear(long)}. */
   @Test
   public void testClearLong() {
-    final long i = Integer.MAX_VALUE + 64L;
+    final long i = BIG_NUM + 64L;
     a.init(i + 1L);
     a.set(i);
     assertTrue("Bit " + i + " is 0", a.get(i));
@@ -151,7 +155,7 @@ public class BitArrayTest {
   /** Test method for {@link BitArray#nextSetBit(long)}. */
   @Test
   public void testNextSetBitLong() {
-    final long i = Integer.MAX_VALUE + 64L;
+    final long i = BIG_NUM + 64L;
     a.init(i + 1L);
     a.set(i);
     assertTrue("Bit " + i + " is 0", a.get(i));
@@ -161,7 +165,7 @@ public class BitArrayTest {
   /** Test method for {@link BitArray#nextClearBit(long)}. */
   @Test
   public void testNextClearBitLong() {
-    final long i = Integer.MAX_VALUE + 64L;
+    final long i = BIG_NUM + 64L;
     a.init(i + 1L);
     a.set(i - 1L);
     assertTrue("Bit " + i + " is 0", a.get(i - 1L));
