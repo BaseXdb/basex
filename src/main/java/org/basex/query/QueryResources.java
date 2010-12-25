@@ -211,7 +211,7 @@ public final class QueryResources {
     // check if a global data reference exists, if context value and first
     // collection reference are equal, and if first item is a document node
     final Value val = ctx.value;
-    return globalData && val.sameAs(coll[0]) &&
+    return globalData && val.sameAs(coll[0]) && val.size() != 0 &&
       (val.item() ? (Item) val : val.iter(ctx).next()).type == Type.DOC;
   }
 

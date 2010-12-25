@@ -64,7 +64,7 @@ public class BitArray {
    * @param n initial number of bits (> 0)
    */
   public void init(final int n) {
-    setWords(new long[((n - 1) >>> WORD_POWER) + 1], n);
+    setWords(new long[(Math.max(0, n - 1) >>> WORD_POWER) + 1], n);
   }
 
   /**

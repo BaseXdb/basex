@@ -7,7 +7,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
@@ -50,11 +49,11 @@ public class Filter extends Preds {
     // return empty root
     if(root.empty()) return optPre(Empty.SEQ, ctx);
 
-    final Type ct = ctx.value != null ? ctx.value.type : null;
-    if(ct != null) ctx.value.type = root.type().type;
+    final Value cv = ctx.value;
+    ctx.value = null;
     final Expr e = super.comp(ctx);
+    ctx.value = cv;
     if(e != this) return e;
-    if(ct != null) ctx.value.type = ct;
 
     // no predicates.. return root
     if(pred.length == 0) return root;
