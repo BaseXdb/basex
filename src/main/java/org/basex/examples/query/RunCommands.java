@@ -1,7 +1,6 @@
 package org.basex.examples.query;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 
 /**
@@ -50,32 +49,24 @@ public final class RunCommands {
     System.out.print(new InfoDB().execute(context));
 
     // ------------------------------------------------------------------------
-    // Optimize the internal database structures.
-    // This command is recommendable after all kinds of database updates
-    System.out.println("\n* Optimize the database.");
-
-    new Optimize().execute(context);
-
-    // ------------------------------------------------------------------------
     // Drop indexes to save disk space
     System.out.println("\n* Drop indexes.");
 
     new DropIndex("text").execute(context);
     new DropIndex("attribute").execute(context);
     new DropIndex("fulltext").execute(context);
-    new DropIndex("path").execute(context);
-
-    // ------------------------------------------------------------------------
-    // Show all existing databases
-    System.out.println("\n* Show existing databases:");
-
-    System.out.print(new List().execute(context));
 
     // ------------------------------------------------------------------------
     // Drop the database
     System.out.println("\n* Drop the database.");
 
     new DropDB("DBExample").execute(context);
+
+    // ------------------------------------------------------------------------
+    // Show all existing databases
+    System.out.println("\n* Show existing databases:");
+
+    System.out.print(new List().execute(context));
 
     // ------------------------------------------------------------------------
     // Close the database context
