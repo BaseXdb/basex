@@ -111,7 +111,7 @@ public final class Prop extends AProp {
   public static final Object[] INTPARSE = { "INTPARSE", false };
   /** Flag for parsing DTDs in internal parser. */
   public static final Object[] DTD = { "DTD", false };
-  /** Flag for parsing DTDs in internal parser. */
+  /** Path to XML Catalog file. */
   public static final Object[] CATFILE = { "CATFILE", ""};
   /** Flag for entity parsing in internal parser. */
   public static final Object[] ENTITY = { "ENTITY", false };
