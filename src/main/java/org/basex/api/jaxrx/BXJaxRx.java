@@ -1,24 +1,20 @@
 package org.basex.api.jaxrx;
 
+import static org.basex.core.Text.*;
 import static org.jaxrx.core.URLConstants.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
-import java.util.Scanner;
 import javax.ws.rs.core.StreamingOutput;
 import org.basex.core.BaseXException;
-import org.basex.core.Prop;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
-import org.basex.core.cmd.Run;
-import org.basex.core.cmd.Set;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
-import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
 import org.basex.util.Table;
 import org.basex.util.Token;
@@ -94,65 +90,9 @@ public final class BXJaxRx implements JaxRx {
       String code() {
         // wrap start and counter around query expression
         final String xq = query != null ? query : ".";
-        // evaluate first result and number of results
-        final int s = num(rp, QueryParameter.START, 1);
-        final int m = num(rp, QueryParameter.COUNT, Integer.MAX_VALUE - s);
-
-        ClientQuery cq = null;
-        try {
-          cs.execute(new Set(Prop.SERIALIZER, params(path)));
-          cs.setOutputStream(out);
-
-          // create query instance
-          cq = cs.query(xq);
-          final String var = path.getValue(QueryParameter.VAR);
-          if(var != null) {
-            // bind external variables
-            final Scanner sc = new Scanner(var);
-            sc.useDelimiter("\1");
-            while(sc.hasNext()) {
-              final String v = sc.next();
-              String[] sp = v.split("\2", 3);
-              if(sp.length < 2) sp = v.split("=", 3);
-              cq.bind(sp[0], sp.length > 1 ? sp[1] : "",
-                  sp.length > 2 ? sp[2] : "");
-            }
-          }
-          // loop through all results
-          int c = 0;
-          cq.init();
-          while(++c < s + m && cq.more()) if(c >= s) cq.next();
-          return null;
-        } catch(final BaseXException ex) {
-          throw new JaxRxException(400, ex.getMessage());
-        } finally {
-          // close query instance
-          if(cq != null) try { cq.close(); } catch(final BaseXException ex) { }
-        }
+        return runQuery(xq, rp, path, out);
       }
     };
-  }
-
-  /**
-   * Converts the specified query parameter to a positive integer.
-   * Throws an exception if the string is smaller than 1 or cannot be converted.
-   * @param rp resource path
-   * @param qp query parameter
-   * @param def default value
-   * @return integer
-   */
-  int num(final ResourcePath rp, final QueryParameter qp, final int def) {
-    final String val = rp.getValue(qp);
-    if(val == null) return def;
-
-    try {
-      final int i = Integer.parseInt(val);
-      if(i > 0) return i;
-    } catch(final NumberFormatException ex) {
-      /* exception follows for both branches. */
-    }
-    throw new JaxRxException(400, "Parameter '" + qp +
-        "' is no valid integer: " + val);
   }
 
   @Override
@@ -163,8 +103,12 @@ public final class BXJaxRx implements JaxRx {
         // get root directory for files
         final String root = System.getProperty("org.basex.restpath") + "/";
         final IO io = IO.get(root + file);
-        exec(new Run(io.path()), out);
-        return cs.info();
+        if(!io.exists()) return FILEWHICH;
+        try {
+          return runQuery(Token.string(io.content()), rp, path, out);
+        } catch(IOException e) {
+          return e.getMessage();
+        }
       }
     };
   }
