@@ -15,7 +15,7 @@ class Session
     @socket = TCPSocket.open(host, port)
 
     # receive timestamp
-    ts = readString
+    ts = receive
     hash = Digest::MD5.new
     hash.update(hash.hexdigest(pw))
     hash.update(ts)
@@ -37,8 +37,8 @@ class Session
     send(com)
 
     # receive result
-    result = readString
-    @info = readString
+    result = receive
+    @info = receive
     if ok != true
       raise @info
     end
@@ -62,7 +62,7 @@ class Session
   end
 
   # Receives a string from the socket.
-  def readString()
+  def receive()
     complete = ""
     while ((t = read) != "\0")
     complete += t
@@ -132,9 +132,9 @@ class Query
   # see readme.txt
   def exec(cmd, arg)
     @session.send(cmd + arg)
-    s = @session.readString
+    s = @session.receive
     if @session.ok != true
-      raise @session.readString
+      raise @session.receive
     end
     return s
   end

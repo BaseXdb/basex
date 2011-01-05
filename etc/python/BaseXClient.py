@@ -20,7 +20,7 @@ class Session():
     s.connect((host, port))
 
     # receive timestamp
-    ts = self.readString()
+    ts = self.receive()
 
     # send username and hashed password/timestamp
     m = hashlib.md5()
@@ -39,7 +39,7 @@ class Session():
 
     # receive result
     result = self.receive()
-    self.__info = self.readString()
+    self.__info = self.receive()
     if not self.ok():
       raise IOError(self.__info)
     return result
@@ -63,7 +63,7 @@ class Session():
     self.__bsize = 0
 
   # Receives a string from the socket.
-  def readString(self):
+  def receive(self):
     bf = array.array('B')
     while True:
       b = self.read()
@@ -93,7 +93,7 @@ class Session():
   # Returns the received string.
   def receive(self):
     self.init()
-    return self.readString()
+    return self.receive()
      
    
 class Query():
@@ -136,5 +136,5 @@ class Query():
     self.__session.send(cmd + arg)
     s = self.__session.receive()
     if not self.__session.ok():
-      raise IOError(self.__session.readString())
+      raise IOError(self.__session.receive())
     return s

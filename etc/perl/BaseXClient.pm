@@ -26,7 +26,7 @@ sub new {
     die "Can't communicate with the server.";
 
   # receive timestamp
-  my $ts = $self->_readString();
+  my $ts = $self->_receive();
 
   # send username and hashed password/timestamp
   my $pwmd5 = Digest::MD5->new()->add($pw)->hexdigest();
@@ -44,8 +44,8 @@ sub execute {
 
   # send command to server and receive result
   $self->send("$cmd");
-  $self->{result} = $self->_readString();
-  $self->{info} = $self->_readString();
+  $self->{result} = $self->_receive();
+  $self->{info} = $self->_receive();
   if (!$self->ok()) {
     die $self->{info};
   }
@@ -73,7 +73,7 @@ sub close {
 }
 
 # Receives a string from the socket.
-sub _readString {
+sub _receive {
   my $self = shift;
   my $text = "";
   $text .= $_ while $self->_read();
@@ -163,9 +163,9 @@ sub execu {
   my $cmd = shift;
   my $arg = shift;
   $session->send("$cmd$arg");
-  my $s = $session->_readString();
+  my $s = $session->_receive();
   if (!$session->ok()) {
-    die $session->_readString();
+    die $session->_receive();
   }
   return $s;
 }

@@ -74,9 +74,9 @@ public final class BaseXClient {
    * @throws IOException Exception
    */
   public String execute(final String cmd) throws IOException {
-    final OutputStream os = new ByteArrayOutputStream();
+    final ByteArrayOutputStream os = new ByteArrayOutputStream();
     execute(cmd, os);
-    return os.toString();
+    return os.toString("UTF-8");
   }
 
   /**
@@ -169,9 +169,9 @@ public final class BaseXClient {
    * @throws IOException I/O exception
    */
   String receive() throws IOException {
-    final OutputStream os = new ByteArrayOutputStream();
+    final ByteArrayOutputStream os = new ByteArrayOutputStream();
     receive(os);
-    return os.toString();
+    return os.toString("UTF-8");
   }
 
   /**
