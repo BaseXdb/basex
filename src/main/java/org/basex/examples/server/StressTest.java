@@ -18,7 +18,7 @@ public final class StressTest {
   /** Verbose flag. */
   static final boolean VERBOSE = false;
   /** Number of clients. */
-  static final int NCLIENTS = 50;
+  static final int NCLIENTS = 500;
   /** Number of runs per client. */
   static final int NQUERIES = 50;
   /** Input document. */
@@ -70,11 +70,14 @@ public final class StressTest {
   static void stopServer() throws Exception {
     // Drop database and stop server
     System.out.println("\n* Stop server and drop test database.");
-
     final ClientSession cs = newSession();
-    cs.execute("drop db test");
-    System.out.print(cs.info());
-
+    try {
+      cs.execute("drop db test");
+    
+    } catch(Exception e) {
+      System.out.print(cs.info() + "\n");
+      e.printStackTrace();
+    }
     cs.close();
     server.stop();
   }
