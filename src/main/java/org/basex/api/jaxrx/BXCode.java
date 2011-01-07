@@ -2,16 +2,9 @@ package org.basex.api.jaxrx;
 
 import static org.jaxrx.core.URLConstants.*;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Scanner;
-
-import org.basex.core.BaseXException;
-import org.basex.core.Prop;
 import org.basex.core.Text;
-import org.basex.core.cmd.Set;
 import org.basex.data.DataText;
 import org.basex.data.SerializerProp;
-import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
 import org.basex.util.Util;
 import org.jaxrx.core.JaxRxException;
@@ -74,53 +67,6 @@ abstract class BXCode {
    */
   final String db(final ResourcePath path) {
     return path.getResource(0);
-  }
-  
-  /**
-   * Runs a query.
-   * @param xq query string
-   * @param rp resource path
-   * @param path resource path
-   * @param out output stream
-   * @return query results
-   */
-  final String runQuery(final String xq, final ResourcePath rp,
-      final ResourcePath path, final OutputStream out) {
-    // evaluate first result and number of results
-    final int s = num(rp, QueryParameter.START, 1);
-    final int m = num(rp, QueryParameter.COUNT, Integer.MAX_VALUE - s);
-
-    ClientQuery cq = null;
-    try {
-      cs.execute(new Set(Prop.SERIALIZER, params(path)));
-      cs.setOutputStream(out);
-
-      // create query instance
-      cq = cs.query(xq);
-      final String var = path.getValue(QueryParameter.VAR);
-      if(var != null) {
-        // bind external variables
-        final Scanner sc = new Scanner(var);
-        sc.useDelimiter("\1");
-        while(sc.hasNext()) {
-          final String v = sc.next();
-          String[] sp = v.split("\2", 3);
-          if(sp.length < 2) sp = v.split("=", 3);
-          cq.bind(sp[0], sp.length > 1 ? sp[1] : "",
-              sp.length > 2 ? sp[2] : "");
-        }
-      }
-      // loop through all results
-      int c = 0;
-      cq.init();
-      while(++c < s + m && cq.more()) if(c >= s) cq.next();
-      return null;
-    } catch(final BaseXException ex) {
-      throw new JaxRxException(400, ex.getMessage());
-    } finally {
-      // close query instance
-      if(cq != null) try { cq.close(); } catch(final BaseXException ex) { }
-    }
   }
   
   /**

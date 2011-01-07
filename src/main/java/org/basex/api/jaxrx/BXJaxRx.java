@@ -19,6 +19,7 @@ import org.basex.server.ClientSession;
 import org.basex.util.Table;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
+import org.basex.util.Util;
 import org.jaxrx.JaxRx;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
@@ -61,7 +62,7 @@ public final class BXJaxRx implements JaxRx {
 
   @Override
   public StreamingOutput get(final ResourcePath rp) {
-    if(rp.getDepth() != 0) return query(null, rp);
+    if(rp.getDepth() != 0) return query(".", rp);
 
     return new BXOutput(null) {
       @Override
@@ -88,9 +89,7 @@ public final class BXJaxRx implements JaxRx {
     return new BXOutput(rp) {
       @Override
       String code() {
-        // wrap start and counter around query expression
-        final String xq = query != null ? query : ".";
-        return runQuery(xq, rp, path, out);
+        return query(query);
       }
     };
   }
@@ -103,11 +102,18 @@ public final class BXJaxRx implements JaxRx {
         // get root directory for files
         final String root = System.getProperty("org.basex.restpath") + "/";
         final IO io = IO.get(root + file);
-        if(!io.exists()) return FILEWHICH;
+
+        // file not found...
+        if(!io.exists()) {
+          throw new JaxRxException(404, Util.info(FILEWHICH, file));
+        }
+
         try {
-          return runQuery(Token.string(io.content()), rp, path, out);
-        } catch(IOException e) {
-          return e.getMessage();
+          // perform query
+          return query(Token.string(io.content()));
+        } catch(IOException ex) {
+          // file could not be opened for some other reason...
+          throw new JaxRxException(400, ex.getMessage());
         }
       }
     };
