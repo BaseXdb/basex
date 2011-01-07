@@ -83,7 +83,7 @@ public final class Compress {
    * @param txt text to be unpacked
    * @return unpacked text
    */
-  public byte[] unpack(final byte[] txt) {
+  public synchronized byte[] unpack(final byte[] txt) {
     // initialize decompression
     bl.list = txt;
     bl.size = txt.length;
