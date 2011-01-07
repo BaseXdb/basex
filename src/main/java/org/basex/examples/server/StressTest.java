@@ -18,7 +18,7 @@ public final class StressTest {
   /** Verbose flag. */
   static final boolean VERBOSE = false;
   /** Number of clients. */
-  static final int NCLIENTS = 500;
+  static final int NCLIENTS = 50;
   /** Number of runs per client. */
   static final int NQUERIES = 50;
   /** Input document. */
