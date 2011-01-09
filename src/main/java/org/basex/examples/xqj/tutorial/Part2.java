@@ -12,7 +12,7 @@ import javax.xml.xquery.XQDataSource;
  *
  * Part 2: Configuring XQJ Connections.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class Part2 extends Main {

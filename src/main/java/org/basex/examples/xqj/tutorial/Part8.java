@@ -20,7 +20,7 @@ import org.w3c.dom.Document;
  *
  * Part 8: Binding External Variables.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class Part8 extends Main {

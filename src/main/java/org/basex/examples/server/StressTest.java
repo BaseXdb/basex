@@ -11,7 +11,7 @@ import org.basex.util.Util;
  * This class performs a client/server stress tests with a specified
  * number of threads and queries.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class StressTest {

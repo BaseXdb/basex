@@ -8,7 +8,7 @@ import org.basex.core.cmd.*;
  * This class presents methods to directly access
  * core maintenance and administration features.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class UserExample {

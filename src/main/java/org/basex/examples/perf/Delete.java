@@ -3,7 +3,7 @@ package org.basex.examples.perf;
 /**
  * This class benchmarks delete operations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class Delete extends Benchmark {

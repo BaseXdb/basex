@@ -14,7 +14,7 @@ import org.basex.api.jaxrx.JaxRxServer;
  * This class is a simple Java client to demonstrate the JAX-RX implementation.
  * It shows the query function of the HTTP POST method.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Lukas Lewandowski
  */
 public final class JaxRxPOSTAdd {

@@ -10,7 +10,7 @@ import org.basex.query.QueryProcessor;
  * This example demonstrates how items can be bound to variables with
  * the XQuery processor.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class BindVariables {

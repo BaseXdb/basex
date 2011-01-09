@@ -8,7 +8,7 @@ import org.xmldb.api.*;
  * This class serves as an example for inserting a XML Document into a database
  * using the XML:DB API.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class XMLDBInsert {

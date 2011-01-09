@@ -12,7 +12,7 @@ import org.basex.api.xqj.BXQDataSource;
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 abstract class Main {

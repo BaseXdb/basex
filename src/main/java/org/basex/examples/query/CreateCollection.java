@@ -11,7 +11,7 @@ import org.basex.core.cmd.*;
  * For some XQuery examples in a collection context,
  * please see {@link QueryCollection}
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseXTeam
  */
 public final class CreateCollection {

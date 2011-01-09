@@ -13,7 +13,7 @@ import org.basex.server.ClientSession;
  * {@link #modify()} files.
  * For further options see {@link QueryCollection}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class ServerCollection {

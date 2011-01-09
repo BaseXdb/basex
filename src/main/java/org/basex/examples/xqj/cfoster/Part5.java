@@ -15,7 +15,7 @@ import javax.xml.xquery.XQStaticContext;
  *
  * Part 5: Stream massive amounts of XML to XQuery expressions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class Part5 extends Main {

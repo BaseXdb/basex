@@ -8,7 +8,7 @@ import org.basex.util.TokenList;
 /**
  * This class prints meta statistics.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class MetaStats extends Statistics {

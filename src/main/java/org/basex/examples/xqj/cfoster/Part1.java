@@ -11,7 +11,7 @@ import org.basex.api.xqj.BXQDataSource;
  *
  * Part 1: Setting up your environment.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class Part1 extends Main {

@@ -11,7 +11,7 @@ import org.xmldb.api.*;
  * http://exist.sourceforge.net/devguide_xmldb.html</a>
  * from Wolfgang M. Meier
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class StoreExample extends Main {

@@ -8,7 +8,7 @@ import java.io.InputStream;
  * This example shows how new databases can be created.
  * Documentation: http://basex.org/api
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  */
 public final class CreateExample {
   /**

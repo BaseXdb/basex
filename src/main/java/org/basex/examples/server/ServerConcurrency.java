@@ -12,7 +12,7 @@ import org.basex.server.ClientSession;
  * Database information will be shown before and after the
  * clients have been run.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author BaseX Team
  */
 public final class ServerConcurrency {

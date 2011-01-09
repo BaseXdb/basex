@@ -10,7 +10,7 @@ import org.basex.core.cmd.*;
  * into the database. The specified input file will be converted to XML
  * if TagSoup is found in the classpath.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class HTMLExample {

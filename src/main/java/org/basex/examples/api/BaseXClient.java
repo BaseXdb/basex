@@ -16,7 +16,7 @@ import java.security.NoSuchAlgorithmException;
  * Works with BaseX 6.3.1 and later
  * Documentation: http://basex.org/api
  *
- * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * (C) BaseX Team 2005-11, ISC License
  */
 public final class BaseXClient {
   /** Output stream. */
