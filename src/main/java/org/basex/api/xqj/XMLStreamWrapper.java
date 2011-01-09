@@ -18,7 +18,7 @@ import org.basex.util.Util;
  * Would be the easiest solution, but some large file cannot be parsed
  * with the default parser.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 final class XMLStreamWrapper extends Parser {

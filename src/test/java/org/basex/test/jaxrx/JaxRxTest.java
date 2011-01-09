@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  * This class provides a framework for JAX-RX tests.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class JaxRxTest {

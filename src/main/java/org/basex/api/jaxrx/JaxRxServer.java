@@ -16,7 +16,7 @@ import org.jaxrx.JettyServer;
  * A database server and the Jetty server is launched by the constructor.
  * The Jetty server listens for HTTP requests, which are then sent to JAX-RX.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class JaxRxServer extends Main {

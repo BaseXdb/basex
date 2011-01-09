@@ -1,4 +1,3 @@
-
 BASEX LANGUAGE BINDINGS ========================================================
 
  In this directory, you find bindings to communicate with the database server
@@ -6,7 +5,7 @@ BASEX LANGUAGE BINDINGS ========================================================
  languages, or if you feel that the existing bindings could be improved:
  Feedback is welcome.
 
- BaseX Team, 2010
+ BaseX Team, 2011
 
 DESCRIPTION --------------------------------------------------------------------
 
@@ -119,4 +118,4 @@ TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
           close   -> {result} \0 \0
           error   -> \0 \1 {error} \0
 
-============================================= DBIS Group, University of Konstanz
+================================================================================

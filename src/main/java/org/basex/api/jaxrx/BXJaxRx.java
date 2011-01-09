@@ -30,7 +30,7 @@ import org.jaxrx.core.ResourcePath;
  * It contains all methods which are necessary to answer GET, POST, PUT
  * and DELETE requests via REST.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  * @author Lukas Lewandowski
  */
