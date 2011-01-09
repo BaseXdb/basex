@@ -8,7 +8,7 @@ import org.basex.gui.GUIConstants.Msg;
 /**
  * Project specific Label implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public class BaseXLabel extends JLabel {

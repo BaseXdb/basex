@@ -37,7 +37,7 @@ import org.deepfs.fsml.ser.FSMLSerializer;
  * that is stored inside another file, e.g. a file in a ZIP-file or a picture
  * that is included in an ID3 tag.
  * </p>
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Bastian Lemke
  */
 public final class DeepFile {

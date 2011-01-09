@@ -14,7 +14,7 @@ import org.basex.util.Util;
 /**
  * Implementation of the group by clause.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Michael Seiferle
  */
 public final class Group extends ParseExpr {

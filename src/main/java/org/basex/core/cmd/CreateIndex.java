@@ -17,7 +17,7 @@ import org.basex.util.ft.Language;
 /**
  * Evaluates the 'create db' command and creates a new index.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class CreateIndex extends ACreate {

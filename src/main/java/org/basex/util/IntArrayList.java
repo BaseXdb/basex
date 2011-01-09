@@ -5,7 +5,7 @@ import java.util.Iterator;
 /**
  * This is a simple container for int arrays.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class IntArrayList extends ElementList implements Iterable<int[]> {

@@ -8,7 +8,7 @@ import org.basex.util.IntList;
  * This class provides a container for query full-text positions,
  * which is evaluated by the visualizations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

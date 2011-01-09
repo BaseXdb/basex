@@ -10,7 +10,7 @@ import java.io.InputStream;
  * value, which is the first value to be returned, or the most recent value
  * that has been returned by {@link #read()}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class WrapInputStream extends InputStream {

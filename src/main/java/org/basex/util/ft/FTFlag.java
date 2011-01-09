@@ -3,7 +3,7 @@ package org.basex.util.ft;
 /**
  * This enumeration assembles globally used full-text options.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public enum FTFlag {

@@ -10,7 +10,7 @@ import org.basex.gui.view.ViewData;
 /**
  * This class stores the rectangles.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Wolfgang Miller
  */
 final class TreeRects implements TreeViewOptions {

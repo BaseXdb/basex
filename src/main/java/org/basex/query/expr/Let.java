@@ -19,7 +19,7 @@ import org.basex.util.Token;
 /**
  * Let clause.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class Let extends ForLet {

@@ -6,7 +6,7 @@ import org.basex.util.TokenSet;
 /**
  * This class caches sizes and pointers from index results.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Sebastian Gath
  */
 final class IndexCache extends TokenSet {

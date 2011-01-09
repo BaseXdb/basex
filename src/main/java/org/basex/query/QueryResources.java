@@ -27,7 +27,7 @@ import org.basex.util.InputInfo;
 /**
  * This class provides access to resources.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  */
 public final class QueryResources {
   /** Database context. */

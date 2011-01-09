@@ -14,7 +14,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'show users' command and shows existing users.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class ShowUsers extends Command {

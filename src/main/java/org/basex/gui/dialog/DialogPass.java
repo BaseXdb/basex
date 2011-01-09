@@ -15,7 +15,7 @@ import org.basex.util.Util;
 /**
  * Open database dialog.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 final class DialogPass extends Dialog {

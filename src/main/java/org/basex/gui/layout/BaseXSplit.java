@@ -8,7 +8,7 @@ import java.awt.LayoutManager;
 /**
  * Project specific Split panel implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class BaseXSplit extends BaseXBack implements LayoutManager {

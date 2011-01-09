@@ -19,7 +19,7 @@ import static org.basex.data.DataText.*;
 /**
  * This class tests the update functionality of the BlockStorage.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Tim Petrowsky
  */
 public final class BlockAccessTest {

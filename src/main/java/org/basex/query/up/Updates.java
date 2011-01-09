@@ -19,7 +19,7 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  * Holds all update operations and primitives a snapshot contains, checks
  * constraints and finally executes the updates.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Lukas Kircher
  */
 public final class Updates {

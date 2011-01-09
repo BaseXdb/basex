@@ -11,7 +11,7 @@ import org.basex.gui.layout.TableLayout;
 /**
  * Dialog window for specifying the TreeMap layout.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Wolfgang Miller
  */
 public final class DialogTreeOptions extends Dialog {

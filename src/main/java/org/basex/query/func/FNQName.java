@@ -25,7 +25,7 @@ import org.basex.util.XMLToken;
 /**
  * QName functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 final class FNQName extends Fun {

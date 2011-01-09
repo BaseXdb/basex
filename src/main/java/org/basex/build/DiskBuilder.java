@@ -21,7 +21,7 @@ import org.basex.util.Util;
  * This class creates a disk based database instance. The storage layout is
  * described in the {@link Data} class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class DiskBuilder extends Builder {

@@ -7,7 +7,7 @@ import org.basex.util.IntList;
 /**
  * This class organizes data references used by queries.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 final class DataPaths {

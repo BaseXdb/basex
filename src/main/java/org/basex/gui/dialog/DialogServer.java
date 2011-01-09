@@ -37,7 +37,7 @@ import org.basex.util.Util;
 /**
  * Dialog window for displaying information about the server.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Andreas Weiler
  */
 public final class DialogServer extends Dialog {

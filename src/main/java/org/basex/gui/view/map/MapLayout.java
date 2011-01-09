@@ -7,7 +7,7 @@ import org.basex.gui.view.ViewData;
 /**
  * Defines shared things of TreeMap layout algorithms.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Joerg Hauser
  */
 final class MapLayout {

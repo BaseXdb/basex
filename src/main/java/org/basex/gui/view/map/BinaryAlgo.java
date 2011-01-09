@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * Binary layout algorithm.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Joerg Hauser
  */
 final class BinaryAlgo extends MapAlgo {

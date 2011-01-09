@@ -112,7 +112,7 @@ import org.basex.util.ft.StopWords;
 /**
  * Simple query parser; can be overwritten to support more complex parsings.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public class QueryParser extends InputParser {

@@ -16,7 +16,7 @@ import org.basex.util.TokenSet;
 /**
  * This class contains the namespaces of a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class Namespaces {

@@ -42,7 +42,7 @@ import org.basex.util.ft.Scoring;
 /**
  * This abstract query expression provides the architecture for a compiled
  * query. // *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class QueryContext extends Progress {

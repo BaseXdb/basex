@@ -57,7 +57,7 @@ import org.basex.util.Util;
  * This enumeration encapsulates all commands that are triggered by
  * GUI operations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public enum GUICommands implements GUICommand {

@@ -7,7 +7,7 @@ import org.w3c.dom.ProcessingInstruction;
 /**
  * DOM - Processing instruction implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class BXPI extends BXNode implements ProcessingInstruction {

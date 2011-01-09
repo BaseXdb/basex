@@ -28,7 +28,7 @@ import org.basex.util.Util;
 /**
  * Dialog window for specifying the options for importing a file system.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
 
 public final class DialogCreateFS extends Dialog {

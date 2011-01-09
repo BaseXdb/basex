@@ -9,7 +9,7 @@ import java.awt.event.KeyEvent;
 /**
  * This class offers system-dependent key mappings.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  * @author Leo Woerteler
  */

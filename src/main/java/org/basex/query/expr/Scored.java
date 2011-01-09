@@ -12,7 +12,7 @@ import org.basex.util.InputInfo;
  * Scored expression. This is a proprietary extension to XQuery FT introduced by
  * Stefan Klinger.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Leo Woerteler
  */
 public final class Scored extends Arr {

@@ -28,7 +28,7 @@ import org.basex.util.Token;
 /**
  * This class offers a real tree view.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Wolfgang Miller
  */
 public final class TreeView extends View implements TreeViewOptions {

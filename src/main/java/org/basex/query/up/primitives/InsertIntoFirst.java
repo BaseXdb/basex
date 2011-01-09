@@ -9,7 +9,7 @@ import org.basex.util.InputInfo;
 /**
  * Insert into as first primitive.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Lukas Kircher
  */
 public final class InsertIntoFirst extends NodeCopy {

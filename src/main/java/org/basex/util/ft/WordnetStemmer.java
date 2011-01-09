@@ -13,7 +13,7 @@ import org.basex.util.Reflect;
  * The WordNet stemmer is developed by George A. Miller and is based on
  * the WordNet 3.0 License: {@code http://wordnet.princeton.edu/}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Dimitar Popov
  */
 final class WordnetStemmer extends Stemmer {

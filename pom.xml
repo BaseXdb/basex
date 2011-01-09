@@ -25,8 +25,8 @@
     </repository>
   </repositories>
   <organization>
-    <name>Chair for Database and Information Systems, U Konstanz</name>
-    <url>http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis</url>
+    <name>BaseX Team</name>
+    <url>http://www.basex.org</url>
   </organization>
   <developers>
     <developer>

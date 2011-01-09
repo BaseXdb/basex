@@ -34,7 +34,7 @@ import org.deepfs.fs.DeepFS;
 /**
  * This is a simple user search panel.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
  */

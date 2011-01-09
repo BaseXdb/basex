@@ -11,7 +11,7 @@ import org.basex.util.TokenBuilder;
  * This class parses files in the CSV format
  * and sends events to the specified database builder.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class CSVParser extends FileParser {

@@ -9,7 +9,7 @@ import org.basex.util.TokenBuilder;
  * This class provides a convenient access to text input.
  * The encoding will be determined, analyzing the input.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class TextInput {

@@ -20,7 +20,7 @@ import org.basex.util.XMLToken;
 /**
  * Dialog window for editing XML nodes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class DialogEdit extends Dialog {

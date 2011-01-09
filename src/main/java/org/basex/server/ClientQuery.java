@@ -10,7 +10,7 @@ import org.basex.util.ByteList;
  * client/server architecture. All sent data is received by the
  * {@link ServerProcess} and interpreted by the {@link QueryProcess}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class ClientQuery extends Query {

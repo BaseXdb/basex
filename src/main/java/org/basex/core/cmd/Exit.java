@@ -5,7 +5,7 @@ import org.basex.core.Command;
 /**
  * Evaluates the 'exit' command and quits the console.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class Exit extends Command {

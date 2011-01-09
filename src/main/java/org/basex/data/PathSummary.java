@@ -18,7 +18,7 @@ import org.basex.util.Util;
  * This class stores the path summary of a database.
  * It contains all unique location paths.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class PathSummary implements Index {

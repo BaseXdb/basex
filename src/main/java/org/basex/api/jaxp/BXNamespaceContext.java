@@ -9,7 +9,7 @@ import org.basex.util.StringList;
 /**
  * This class provides access to namespace context.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class BXNamespaceContext implements NamespaceContext {

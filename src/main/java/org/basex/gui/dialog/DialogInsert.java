@@ -24,7 +24,7 @@ import org.basex.util.XMLToken;
 /**
  * Dialog window for inserting new database nodes.
 
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Lukas Kircher
  */
 public final class DialogInsert extends Dialog {

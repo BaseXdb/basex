@@ -7,7 +7,7 @@ import org.basex.util.Util;
  * Management of executing read/write processes. Multiple readers, single
  * writers (readers/writer lock).
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Andreas Weiler
  */
 public final class Lock {

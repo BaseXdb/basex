@@ -16,7 +16,7 @@ import org.basex.util.TokenList;
 /**
  * Tree on the left side of the GUI.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Andreas Weiler
  */
 public final class MainTree {

@@ -6,7 +6,7 @@ import org.basex.gui.view.ViewRect;
 /**
  * View rectangle.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 final class MapRect extends ViewRect implements Comparable<MapRect> {

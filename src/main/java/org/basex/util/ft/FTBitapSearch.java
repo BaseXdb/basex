@@ -11,7 +11,7 @@ import org.basex.query.QueryException;
  * {@link BitSet} for fast bit operation. This version works with a set of
  * needles and each one of it can be matched in the haystack.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Dimitar Popov
  * @see <a href="http://en.wikipedia.org/wiki/Bitap_algorithm"
  *      >http://en.wikipedia.org/wiki/Bitap_algorithm</a>
@@ -126,7 +126,7 @@ public final class FTBitapSearch {
   /**
    * Token comparator.
    *
-   * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+   * @author BaseX Team 2005-11, ISC License
    * @author Dimitar Popov
    */
   public static interface TokenComparator {

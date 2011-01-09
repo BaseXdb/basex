@@ -8,7 +8,7 @@ import org.basex.util.Util;
  * Abstract class for formatting data in different languages.
  * Implementations are expected to return strings in a capitalized syntax.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public abstract class Formatter {

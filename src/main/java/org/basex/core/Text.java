@@ -9,7 +9,7 @@ import static org.basex.util.Token.*;
  * throughout the project. If this class is called first, the Strings
  * are initialized by the {@link org.basex.core.Lang} class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public interface Text {
@@ -44,7 +44,7 @@ public interface Text {
   /** Code version. */
   String VERSION = "6.3.5";
   /** Company info. */
-  String COMPANY = "DBIS, University of Konstanz";
+  String COMPANY = "BaseX Team";
   /** Version information. */
   String VERSINFO = lang("version", VERSION);
 
@@ -1332,7 +1332,7 @@ public interface Text {
   /** About text. */
   String ABOUTTITLE = lang("da_title", NAME);
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-10 " + COMPANY;
+  String COPYRIGHT = "\u00A9 2005-11 " + COMPANY;
   /** License info. */
   String LICENSE = lang("da_license");
   /** Developer info. */

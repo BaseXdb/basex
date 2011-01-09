@@ -12,7 +12,7 @@ import org.basex.core.Commands.Cmd;
 /**
  * Evaluates the 'drop database' command and deletes a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class DropDB extends Command {

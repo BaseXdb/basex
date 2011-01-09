@@ -8,7 +8,7 @@ import org.basex.query.item.Value;
 /**
  * Range iterator, returning at least two integers.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class RangeIter extends ValueIter {

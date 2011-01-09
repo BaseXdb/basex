@@ -22,7 +22,7 @@ import org.deepfs.fsml.util.ParserUtil;
 /**
  * Parser for EML files.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Bastian Lemke
  * @author Lukas Kircher
  */

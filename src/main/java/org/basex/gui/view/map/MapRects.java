@@ -7,7 +7,7 @@ import org.basex.util.Util;
 /**
  * This class organizes all map rectangles in a simple list.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 final class MapRects implements Iterable<MapRect> {

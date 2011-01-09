@@ -16,7 +16,7 @@ import org.junit.Test;
 /**
  * Tests adding files/folders/zip files/urls to collections.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Michael Seiferle
  */
 public final class AddDeleteTest {

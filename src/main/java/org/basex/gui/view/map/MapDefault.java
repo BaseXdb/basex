@@ -13,7 +13,7 @@ import org.basex.gui.view.ViewData;
 /**
  * Adds default paint operations to TreeMap.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 final class MapDefault extends MapPainter {

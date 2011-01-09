@@ -3,7 +3,7 @@ package org.basex.test.query;
 /**
  * XQuery 3.0 tests (former: 1.1).
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class XQuery30Test extends QueryTest {

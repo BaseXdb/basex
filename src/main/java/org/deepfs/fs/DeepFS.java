@@ -28,7 +28,7 @@ import org.deepfs.fsml.DeepNS;
 /**
  * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Alexander Holupirek, Christian Gruen, Hannes Schwarz, Bastian Lemke
  */
 public final class DeepFS implements DataText {

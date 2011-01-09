@@ -11,7 +11,7 @@ import org.xml.sax.XMLReader;
  * {@code org.apache.xml.resolver.tools.CatalogResolver} or
  * {@code code com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Michael Seiferle
  */
 public final class CatalogResolverWrapper {

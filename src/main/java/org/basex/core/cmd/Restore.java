@@ -21,7 +21,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'restore' command and restores a backup of a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class Restore extends Command {

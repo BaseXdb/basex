@@ -16,7 +16,7 @@ import org.basex.io.ArrayOutput;
  * to that stream.
  * The class is implemented by {@link ClientSession} and {@link LocalSession}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public abstract class Session {

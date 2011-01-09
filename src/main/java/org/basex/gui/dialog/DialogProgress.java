@@ -22,7 +22,7 @@ import org.basex.util.Util;
 /**
  * Dialog window for displaying the progress of a command execution.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class DialogProgress extends Dialog implements ActionListener {

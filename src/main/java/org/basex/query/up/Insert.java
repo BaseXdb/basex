@@ -23,7 +23,7 @@ import org.basex.util.Util;
 /**
  * Insert expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Lukas Kircher
  */
 public final class Insert extends Update {

@@ -5,7 +5,7 @@ import static java.lang.StrictMath.*;
 /**
  * Simple default scoring model, assembling all scoring calculations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class Scoring {

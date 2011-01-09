@@ -19,7 +19,7 @@ import org.basex.io.IO;
 /**
  * Add document dialog.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Andreas Weiler
  */
 public class DialogAdd extends Dialog {

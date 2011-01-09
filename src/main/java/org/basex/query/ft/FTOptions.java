@@ -14,7 +14,7 @@ import org.basex.util.ft.FTOpt;
 /**
  * FTOptions expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class FTOptions extends FTExpr {

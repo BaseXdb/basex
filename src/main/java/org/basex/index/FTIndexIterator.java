@@ -7,7 +7,7 @@ import org.basex.util.ft.Scoring;
 /**
  * This interface provides methods for returning index results.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public abstract class FTIndexIterator extends IndexIterator {

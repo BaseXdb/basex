@@ -7,7 +7,7 @@ import static java.lang.Math.*;
  * Bit array that grows when needed. The implementation is similar to
  * {@link java.util.BitSet}.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Dimitar Popov
  */
 public class BitArray {

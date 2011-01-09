@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
  * This class assembles some reflection methods. If exceptions occur, a
  * {@code null} reference is returned or a runtime exception is thrown.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class Reflect {

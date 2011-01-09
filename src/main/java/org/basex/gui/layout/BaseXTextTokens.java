@@ -7,7 +7,7 @@ import static org.basex.util.Token.*;
 /**
  * This class allows the iteration on tokens.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class BaseXTextTokens {

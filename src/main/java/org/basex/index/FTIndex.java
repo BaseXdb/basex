@@ -9,7 +9,7 @@ import org.basex.util.IntList;
 /**
  * This abstract class defines methods for the available full-text indexes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public abstract class FTIndex implements Index {

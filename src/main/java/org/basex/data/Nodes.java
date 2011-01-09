@@ -13,7 +13,7 @@ import org.basex.util.Util;
  * Instances of this class are used in the {@link Context} class to
  * reference the currently used, marked, and copied nodes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class Nodes implements Result {

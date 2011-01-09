@@ -8,7 +8,7 @@ import org.basex.io.IO;
  * Simple command and query parser; can be overwritten to support more complex
  * parsings.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public abstract class InputParser {

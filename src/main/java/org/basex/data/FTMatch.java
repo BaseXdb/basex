@@ -8,7 +8,7 @@ import org.basex.util.Util;
  * Match full-text container,
  * referencing several {@link FTStringMatch} instances.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class FTMatch implements Iterable<FTStringMatch> {

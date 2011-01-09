@@ -19,7 +19,7 @@ import org.basex.io.IO;
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class Backup extends Command {

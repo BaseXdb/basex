@@ -10,7 +10,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'close' command and closes the current database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 public final class Close extends Command {

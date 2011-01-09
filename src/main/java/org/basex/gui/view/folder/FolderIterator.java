@@ -7,7 +7,7 @@ import org.basex.io.IO;
 /**
  * This is an iterator for the folder nodes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
 final class FolderIterator {
