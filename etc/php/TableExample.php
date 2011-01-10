@@ -3,7 +3,7 @@
  * This example shows how results from a query can be received in an iterative
  * mode and illustrated in a table.
  *
- * (C) Workgroup DBIS, University of Konstanz 2005-11, ISC License
+ * (C) BaseX Team 2005-11, ISC License
  */
 include("BaseXClient.php");
 

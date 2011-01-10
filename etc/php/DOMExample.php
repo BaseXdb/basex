@@ -4,7 +4,7 @@
  * and the result of a query can be processed in a dom document.
  * Documentation: http://basex.org/api
  *
- * (C) Workgroup DBIS, University of Konstanz 2005-11, ISC License
+ * (C) BaseX Team 2005-11, ISC License
  */
 include("BaseXClient.php");
 

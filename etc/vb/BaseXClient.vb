@@ -2,7 +2,7 @@
 ' Works with BaseX 6.3.1 and later
 ' Documentation: http://basex.org/api
 '
-' (C) Workgroup DBIS, University of Konstanz 2005-11, ISC License
+' (C) BaseX Team 2005-11, ISC License
 
 Imports System
 Imports System.Net.Sockets

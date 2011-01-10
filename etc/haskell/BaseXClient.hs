@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- |
 -- Module      : BaseXClient
--- Copyright   : (C) Workgroup DBIS, University of Konstanz 2005-11
+-- Copyright   : (C) BaseX Team 2005-11
 -- License     : ISC
 --
 -- Maintainer  : leo@woerteler.de

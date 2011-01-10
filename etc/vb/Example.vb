@@ -1,7 +1,7 @@
 ﻿' This example shows how database commands can be executed.
 ' Documentation: http://basex.org/api
 '
-' (C) Workgroup DBIS, University of Konstanz 2005-11, ISC License
+' (C) BaseX Team 2005-11, ISC License
 
 Imports System
 Imports System.Diagnostics

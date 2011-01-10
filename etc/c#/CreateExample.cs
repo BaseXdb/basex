@@ -2,7 +2,7 @@
  * This example shows how new databases can be created.
  * Documentation: http://basex.org/api
  *
- * (C) Workgroup DBIS, University of Konstanz 2005-11, ISC License
+ * (C) BaseX Team 2005-11, ISC License
  */
 using System;
 using System.Diagnostics;
