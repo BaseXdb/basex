@@ -29,9 +29,6 @@ public final class AddDeleteTest {
   private static final String FILE = "etc/xml/input.xml";
   /** Test folder. */
   private static final String FLDR = "etc/xml/dir";
-  /** Test url. */
-  private static final String URL = "http://www.inf.uni-konstanz.de/"
-      + "dbis/basex/dl/xmark.xml";
   /** Test ZIP file, same as etc/xml. */
   private static final String ZIPFILE = "etc/xml/xml.zip";
   /** Test GZIP file. */
@@ -104,19 +101,6 @@ public final class AddDeleteTest {
   public void testAddZip() throws BaseXException {
     new Add(ZIPFILE, null, "target").execute(CTX);
     assertEquals(4, CTX.doc().length);
-  }
-
-  /**
-   * Adds/deletes a URL.
-   * Disabled to allow "offline" execution.
-   * @throws BaseXException exception
-   */
-  // @Test
-  public void testAddUrl() throws BaseXException {
-    new Add(URL).execute(CTX);
-    new Add(URL, null, "bar").execute(CTX);
-    new Delete("xmark.xml").execute(CTX);
-    assertEquals(1, CTX.doc().length);
   }
 
   /**
