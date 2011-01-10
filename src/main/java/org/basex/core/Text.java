@@ -129,6 +129,8 @@ public interface Text {
   String SERVERSTOPPED = lang("srv_stop");
   /** Server is running or permission was denied. */
   String SERVERBIND = lang("srv_bind");
+  /** Unknown host. */
+  String SERVERUNKNOWN = lang("srv_unknown");
   /** Timeout exceeded. */
   String SERVERTIMEOUT = lang("srv_timeout");
   /** Connection error. */

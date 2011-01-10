@@ -6,6 +6,8 @@ import java.net.BindException;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.server.LoginException;
@@ -139,6 +141,8 @@ public final class Util {
     else if(ex instanceof ConnectException) return SERVERERROR;
     else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
     else if(ex instanceof SocketException) return SERVERBIND;
+    else if(ex instanceof UnknownHostException) 
+      return info(SERVERUNKNOWN, ex.getMessage());
     return ex.getMessage();
   }
 
