@@ -2,7 +2,7 @@
  * This example shows how queries can be executed in an iterative manner.
  * Documentation: http://basex.org/api
  *
- * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * (C) Workgroup DBIS, University of Konstanz 2005-11, ISC License
  */
 using System;
 using System.Diagnostics;

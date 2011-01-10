@@ -3,7 +3,7 @@
  * This example shows how database commands can be executed.
  * Documentation: http://basex.org/api
  *
- * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * (C) Workgroup DBIS, University of Konstanz 2005-11, ISC License
  */
 include("BaseXClient.php");
 
