@@ -156,7 +156,7 @@ public final class CommandParser extends InputParser {
         }
         break;
       case OPEN:
-        return new Open(name(cmd));
+        return new Open(string(cmd));
       case CHECK:
         return new Check(string(cmd));
       case ADD:

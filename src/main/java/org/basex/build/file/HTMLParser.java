@@ -62,7 +62,7 @@ public final class HTMLParser extends XMLParser {
   private static IO toXML(final IO io) {
     // reader could not be initialized; fall back to XML
     if(READER == null) return io;
-    
+
     try {
       // tries to extract the encoding from the input
       byte[] content = io.content();

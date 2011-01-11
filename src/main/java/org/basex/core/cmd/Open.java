@@ -28,7 +28,6 @@ public final class Open extends Command {
   @Override
   protected boolean run() {
     String db = args[0];
-    if(!validName(db)) return error(NAMEINVALID, db);
 
     new Close().run(context);
     final int i = db.indexOf('/');
@@ -37,6 +36,7 @@ public final class Open extends Command {
       path = db.substring(i + 1);
       db = db.substring(0, i);
     }
+    if(!validName(db)) return error(NAMEINVALID, db);
 
     try {
       final Data data = open(db, context);
