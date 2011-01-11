@@ -2,7 +2,6 @@ package org.basex.api.jaxrx;
 
 import java.io.OutputStream;
 import java.util.Scanner;
-
 import javax.ws.rs.core.StreamingOutput;
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
