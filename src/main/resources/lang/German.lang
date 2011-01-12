@@ -575,7 +575,7 @@ ch_show24=zeigt registrierte Benutzer (einer Datenbank).
 ch_show25=zeigt Backups an.
 ch_grant1=Zuweisung von Benutzerrechten.
 ch_grant2=Weist einem Benutzer (für eine Datenbank) Rechte zu.
-ch_set1=Setzen von allgemeinen Optionen (aktuelle Werte via '%').
+ch_set1=Setzen von allgemeinen Optionen.
 ch_set2=Verfügbare Optionen [%] mit [%] = on/off:
 ch_set21=Anzeige von Anfrage-Informationen
 ch_set22=Anzeige von Debug-Informationen
@@ -586,6 +586,8 @@ ch_set28=Text-Indexierung
 ch_set29=Attributwert-Indexierung
 ch_set31=Volltext-Indexierung
 ch_set32=Pfad-Indexierung
+ch_get1=Anzeige von globalen Optionen.
+ch_get2=Zeigt den Wert einer globalen Option an.
 ch_password1=Ändern des Passworts.
 ch_password2=Ändert das Passwort des angemeldeten Benutzers.
 ch_help1=Hilfe für %-Befehle.

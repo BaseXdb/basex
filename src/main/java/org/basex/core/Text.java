@@ -330,6 +330,12 @@ public interface Text {
     LI + CmdSet.FTINDEX   + COLS + lang("ch_set31") + NL +
     LI + CmdSet.PATHINDEX + COLS + lang("ch_set32")
   };
+
+  /** Command help. */
+  String[] HELPGET = {
+      "[option]", lang("ch_get1", "info"), lang("ch_get2", "option")
+  };
+
   /** Command help. */
   String[] HELPPASSWORD = {
     "([" + C_PW + "])", lang("ch_password1"), lang("ch_password2")

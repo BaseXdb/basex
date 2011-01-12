@@ -377,8 +377,7 @@ public final class GUI extends AGUI {
       command = c;
 
       // execute command and cache result
-      final ArrayOutput ao =
-        new ArrayOutput().max(context.prop.num(Prop.MAXTEXT));
+      final ArrayOutput ao = new ArrayOutput().max(gprop.num(GUIProp.MAXTEXT));
       final boolean up = c.updating(context);
       updating = up;
 

@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import org.basex.core.Command;
 

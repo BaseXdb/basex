@@ -107,7 +107,7 @@ final class FNNode extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && (def == FunDef.GENID || expr.length == 0 &&
+    return u == Use.X30 && (def == FunDef.GENID || expr.length == 0 &&
         (def == FunDef.DOCURI || def == FunDef.NODENAME)) ||
         u == Use.CTX && expr.length == 0 || super.uses(u);
   }

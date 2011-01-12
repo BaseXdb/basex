@@ -85,7 +85,7 @@ final class FNInfo extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && (def == FunDef.ENV || def == FunDef.ENVS) ||
+    return u == Use.X30 && (def == FunDef.ENV || def == FunDef.ENVS) ||
       u == Use.CTX && (def == FunDef.ERROR || def == FunDef.TRACE) ||
       super.uses(u);
   }

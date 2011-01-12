@@ -577,7 +577,7 @@ ch_show24=データベースにアクセスできるユーザーを表示しま�
 ch_show25=shows backups.
 ch_grant1=パーミッションの付与
 ch_grant2=ユーザーにデータベースに対するパーミッションを与えます。
-ch_set1=グローバルオプションをセットします(現在の値を見るには '%' と入力します)。
+ch_set1=グローバルオプションをセットします。
 ch_set2=Available options [%] with [%] = on/off:
 ch_set21=プロセス情報の表示
 ch_set22=デバッグ情報の表示
@@ -588,6 +588,8 @@ ch_set28=テキストのインデックス作成
 ch_set29=属性値のインデックス作成
 ch_set31=全文インデックス作成
 ch_set32=パスインデックス作成
+ch_get1=Show global option.
+ch_get2=Shows the value of a global option.
 ch_password1=パスワードの変更
 ch_password2=パスワードを変更します。
 ch_help1=ヘルプをオンにする % コマンド

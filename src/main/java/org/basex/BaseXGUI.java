@@ -70,7 +70,9 @@ public final class BaseXGUI {
         if(args.length != 0) {
           final String input = args[0].replace('\\', '/');
           final IO io = IO.get(input);
-          if(input.endsWith(IO.XQSUFFIX)) {
+          boolean xq = false;
+          for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
+          if(xq) {
             gui.query.setQuery(io);
           } else {
             gui.execute(new Check(input));

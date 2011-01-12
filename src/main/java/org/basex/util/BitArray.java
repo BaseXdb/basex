@@ -6,7 +6,7 @@ import static java.lang.Math.*;
 /**
  * Bit array that grows when needed. The implementation is similar to
  * {@link java.util.BitSet}.
- * 
+ *
  * @author BaseX Team 2005-11, ISC License
  * @author Dimitar Popov
  */

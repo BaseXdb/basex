@@ -28,7 +28,7 @@ public abstract class Expr extends ExprInfo {
     /** Position.  */ POS,
     /** Updates.   */ UPD,
     /** Variable.  */ VAR,
-    /** XQuery 11. */ X11,
+    /** XQuery 30. */ X30,
   }
 
   /**

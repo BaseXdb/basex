@@ -63,6 +63,6 @@ final class FNMath extends Fun {
   @Override
   public boolean uses(final Use u) {
     // random() is non-deterministic; don't pre-evaluate
-    return u == Use.X11 || u == Use.CTX && def == FunDef.RAND || super.uses(u);
+    return u == Use.X30 || u == Use.CTX && def == FunDef.RAND || super.uses(u);
   }
 }

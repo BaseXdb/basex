@@ -105,7 +105,7 @@ public final class Prop extends AProp {
   /** Forces database creation for unknown documents. */
   public static final Object[] FORCECREATE = { "FORCECREATE", false };
   /** Default XQuery version. */
-  public static final Object[] XQUERY11 = { "XQUERY11", true };
+  public static final Object[] XQUERY3 = { "XQUERY3", true };
 
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };
@@ -137,8 +137,6 @@ public final class Prop extends AProp {
   public static final Object[] MAINMEM = { "MAINMEM", false };
   /** Path for filtering XML Documents. */
   public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
-  /** Maximum text size to be displayed. */
-  public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
 
   /** Flag for creating a wildcard index. */
   public static final Object[] WILDCARDS = { "WILDCARDS", false };

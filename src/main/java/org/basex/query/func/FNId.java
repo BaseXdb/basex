@@ -207,7 +207,7 @@ final class FNId extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && def == FunDef.ELID ||
+    return u == Use.X30 && def == FunDef.ELID ||
       u == Use.CTX && expr.length == 1 || super.uses(u);
   }
 }

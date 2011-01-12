@@ -573,7 +573,7 @@ ch_show24=shows users (on a database).
 ch_show25=shows backups.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions (on a database) to a user.
-ch_set1=Gán lựa chọn toàn cục (current values: try '%').
+ch_set1=Gán lựa chọn toàn cục.
 ch_set2=Có [%] với [%] = on/off:
 ch_set21=Hiển thị thông tin quy trình
 ch_set22=Hiển thị thông tin chỉnh lỗi
@@ -584,6 +584,8 @@ ch_set28=Index văn bản
 ch_set29=Index giá trị thuộc tính
 ch_set31=Index nội dung
 ch_set32=Path indexing
+ch_get1=Show global option.
+ch_get2=Shows the value of a global option.
 ch_password1=Change password.
 ch_password2=Changes the user's password.
 ch_help1=Nhờ giúp đỡ % những câu lệnh.

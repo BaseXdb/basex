@@ -576,7 +576,7 @@ ch_show24=montre les utilisateurs (sur une base de données).
 ch_show25=shows backups.
 ch_grant1=Octroyer les permissions utilisateur.
 ch_grant2=Octroie les permissions à un utilisateur (sur une base de données).
-ch_set1=Définir les options globales (Valeurs courantes : essayer '%').
+ch_set1=Définir les options globales.
 ch_set2=Options [%] disponibles avec une valeur de [%] = marche/arrêt:
 ch_set21=Affichage des infos relatives au processus
 ch_set22=Affichage des infos de débug
@@ -587,6 +587,8 @@ ch_set28=Indexation texte
 ch_set29=Indexation des valeurs d'attribut
 ch_set31=Indexation plein texte
 ch_set32=Indexation chemin
+ch_get1=Show global option.
+ch_get2=Shows the value of a global option.
 ch_password1=Changer le mot de passe.
 ch_password2=Change le mot de passe de l'utilisateur.
 ch_help1=Obtenir de l'aide sur les commandes %

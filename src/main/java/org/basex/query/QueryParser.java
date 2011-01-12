@@ -242,8 +242,8 @@ public class QueryParser extends InputParser {
     }
     skipWS();
     check(';');
-    if(ver.equals(XQ10)) ctx.xquery30 = false;
-    else if(ver.equals(XQ11) || ver.equals(XQ30)) ctx.xquery30 = true;
+    if(ver.equals(XQ10)) ctx.xquery3 = false;
+    else if(ver.equals(XQ11) || ver.equals(XQ30)) ctx.xquery3 = true;
     else error(XQUERYVER, ver);
   }
 
@@ -436,7 +436,7 @@ public class QueryParser extends InputParser {
     if(!name.ns()) error(NSMISS, name);
 
     // output declaration
-    if(ctx.xquery30 && eq(name.pref(), OUTPUT)) {
+    if(ctx.xquery3 && eq(name.pref(), OUTPUT)) {
       final String key = string(name.ln());
       if(module != null) error(MODOUT);
 
@@ -630,7 +630,7 @@ public class QueryParser extends InputParser {
         o.value = null;
       }
       // bind default value
-      if(ctx.xquery30 && consumeWS(ASSIGN)) {
+      if(ctx.xquery3 && consumeWS(ASSIGN)) {
         v.bind(check(single(), VARMISSING), ctx);
       }
     } else {
@@ -773,7 +773,7 @@ public class QueryParser extends InputParser {
     }
 
     Var[] group = null;
-    if(ctx.xquery30 && consumeWS(GROUP)) {
+    if(ctx.xquery3 && consumeWS(GROUP)) {
       check(BY);
       ap = qp;
       do group = groupSpec(group); while(consumeWS2(COMMA));
@@ -2220,7 +2220,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr tryCatch() throws QueryException {
-    if(!ctx.xquery30 || !consumeWS2(TRY)) return null;
+    if(!ctx.xquery3 || !consumeWS2(TRY)) return null;
 
     final Expr tr = enclosed(NOENCLEXPR);
     check(CATCH);

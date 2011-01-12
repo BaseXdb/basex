@@ -172,6 +172,8 @@ public final class GUIProp extends AProp {
 
   /** Shows real file contents in the treemap. */
   public static final Object[] MAPFS = { "MAPFS", true };
+  /** Maximum text size to be displayed. */
+  public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
 
   /**
    * Constructor.

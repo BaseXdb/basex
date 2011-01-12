@@ -297,7 +297,7 @@ final class FNGen extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.UPD && def == FunDef.PUT || u == Use.X11 && (
+    return u == Use.UPD && def == FunDef.PUT || u == Use.X30 && (
         def == FunDef.DATA && expr.length == 0 ||
         def == FunDef.PARSE || def == FunDef.PARSETXT ||
         def == FunDef.PARSETXTAVL || def == FunDef.PARSEXML ||

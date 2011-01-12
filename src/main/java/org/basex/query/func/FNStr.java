@@ -291,7 +291,7 @@ final class FNStr extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && def == FunDef.STRJOIN && expr.length == 1 ||
+    return u == Use.X30 && def == FunDef.STRJOIN && expr.length == 1 ||
       super.uses(u);
   }
 }

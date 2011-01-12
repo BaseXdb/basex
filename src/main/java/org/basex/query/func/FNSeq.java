@@ -302,7 +302,7 @@ final class FNSeq extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && (def == FunDef.HEAD || def == FunDef.TAIL) ||
+    return u == Use.X30 && (def == FunDef.HEAD || def == FunDef.TAIL) ||
       super.uses(u);
   }
 }

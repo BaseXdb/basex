@@ -9,7 +9,6 @@ import java.io.IOException;
 import javax.swing.Box;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
-import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.gui.GUICommands;
@@ -152,7 +151,7 @@ public final class TextView extends View implements ActionListener {
     if(!visible()) return;
     try {
       final ArrayOutput ao =
-        new ArrayOutput().max(gui.context.prop.num(Prop.MAXTEXT));
+        new ArrayOutput().max(gui.gprop.num(GUIProp.MAXTEXT));
       if(n != null) n.serialize(new XMLSerializer(ao));
       setText(ao, null);
       refresh = false;

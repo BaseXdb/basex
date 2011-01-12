@@ -574,7 +574,7 @@ ch_show24=toont gebruikers (van een database).
 ch_show25=toont backups.
 ch_grant1=Geef gebruiker permissies.
 ch_grant2=Geeft permissies (op een database) aan een gebruiker.
-ch_set1=Stel globale opties in (actuele waarden: probeer '%').
+ch_set1=Stel globale opties in.
 ch_set2=Beschikbare opties [%] met waarde [%] = aan/uit:
 ch_set21=Tonen van query info
 ch_set22=Tonen van debug info
@@ -585,6 +585,8 @@ ch_set28=Tekst indexing
 ch_set29=Attribute value indexeren
 ch_set31=Full-text indexeren
 ch_set32=Path indexeren
+ch_get1=Show global option.
+ch_get2=Shows the value of a global option.
 ch_password1=Verander wachtwoord.
 ch_password2=Verandert het wachtwoord van de gebruiker.
 ch_help1=Vraag hulp over % commando's.

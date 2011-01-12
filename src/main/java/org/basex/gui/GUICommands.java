@@ -229,8 +229,7 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(GUIOPEN,
           gui.gprop.get(GUIProp.XQPATH), gui);
-        fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIX, IO.XQMSUFFIX,
-            IO.XQYSUFFIX, IO.XQLSUFFIX, IO.XQUERYSUFFIX);
+      fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
       final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
       if(file != null) gui.query.setQuery(file);
     }

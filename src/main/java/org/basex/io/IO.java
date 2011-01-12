@@ -30,6 +30,10 @@ public abstract class IO {
   public static final String XQYSUFFIX = ".xqy";
   /** XQuery file suffix. */
   public static final String XQLSUFFIX = ".xql";
+  /** XQuery suffixes. */
+  public static final String[] XQSUFFIXES = {
+    XQSUFFIX, XQMSUFFIX, XQYSUFFIX, XQLSUFFIX, XQUERYSUFFIX
+  };
   /** XML file suffix. */
   public static final String XMLSUFFIX = ".xml";
   /** ZIP file suffix. */

@@ -3,13 +3,12 @@ package org.basex.io;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.util.Token;
 
 /**
  * This is an input stream for project specific data types.
  * It bears resemblance to Java's {@link DataInputStream}.
- * 
+ *
  * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
