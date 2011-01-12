@@ -140,6 +140,16 @@ public final class CElem extends CFrag {
   }
 
   @Override
+  public boolean uses(final Use u) {
+    return tag.uses(u) || super.uses(u);
+  }
+
+  @Override
+  public boolean uses(final Var v) {
+    return tag.uses(v) || super.uses(v);
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     tag.plan(ser);

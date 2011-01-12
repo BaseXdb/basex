@@ -27,7 +27,6 @@ import org.basex.util.TokenBuilder;
 public final class CAttr extends CFrag {
   /** Generated namespace. */
   private static final byte[] NS0 = token("ns0:");
-
   /** Tag name. */
   private Expr atn;
   /** Computed constructor. */
@@ -101,6 +100,16 @@ public final class CAttr extends CFrag {
   public Expr remove(final Var v) {
     atn = atn.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return atn.uses(u) || super.uses(u);
+  }
+
+  @Override
+  public boolean uses(final Var v) {
+    return atn.uses(v) || super.uses(v);
   }
 
   @Override
