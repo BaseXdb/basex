@@ -74,8 +74,8 @@ public final class JaxRxTest {
    */
   @Test
   public void getBind() throws IOException {
-    assertEquals("123", get(
-      "?wrap=no&query=declare+variable+$x+external;$x&var=$x=123"));
+    assertEquals("123", get("?wrap=no&" +
+      "query=declare+variable+$x+as+xs:integer+external;$x&var=$x=123"));
   }
 
   /**
@@ -86,6 +86,20 @@ public final class JaxRxTest {
   public void getBind2() throws IOException {
     assertEquals("124", get("?wrap=no&var=x=123&" +
       "query=declare+variable+$x+as+xs:integer+external;$x%2b1"));
+  }
+
+  /**
+   * GET Test.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void getBind3() throws IOException {
+    assertEquals("6", get("?wrap=no&" +
+      "query=declare+variable+$a++as+xs:integer+external;" +
+      "declare+variable+$b+as+xs:integer+external;" +
+      "declare+variable+$c+as+xs:integer+external;" +
+      "$a*$b*$c&" +
+      "var=a=1&var=b=2&var=c=3"));
   }
 
   /** GET Test. */

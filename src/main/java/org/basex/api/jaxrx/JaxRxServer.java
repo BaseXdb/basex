@@ -85,7 +85,7 @@ public final class JaxRxServer extends Main {
    */
   public void stop() {
     server.stop();
-    jetty.stop();
+    if(jetty != null) jetty.stop();
   }
 
   /**
