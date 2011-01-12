@@ -68,7 +68,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       throw new JaxRxException(400, ex.getMessage());
     }
   }
-  
+
   /**
    * Runs the specified query.
    * @param query query string

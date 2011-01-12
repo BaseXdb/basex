@@ -68,7 +68,7 @@ abstract class BXCode {
   final String db(final ResourcePath path) {
     return path.getResource(0);
   }
-  
+
   /**
    * Converts the specified query parameter to a positive integer.
    * Throws an exception if the string is smaller than 1 or cannot be converted.
