@@ -169,10 +169,11 @@ public enum FunDef {
   /** XQuery function. */
   PARSETXT(FNURI, FNGen.class, 1, 2, "unparsed-text(uri, encoding?)", STR_ZO),
   /** XQuery function. */
+  PARSETXTLIN(FNURI, FNGen.class, 1, 2,
+      "unparsed-text-lines(uri, encoding?)", STR_ZM),
+  /** XQuery function. */
   PARSETXTAVL(FNURI, FNGen.class, 1, 2,
       "unparsed-text-available(uri, encoding?)", BLN),
-  /** XQuery function (might get obsolete). */
-  PARSE(FNURI, FNGen.class, 1, 2, "parse(string, base?)", NOD),
   /** XQuery function. */
   PARSEXML(FNURI, FNGen.class, 1, 2, "parse-xml(string, base?)", NOD),
   /** XQuery function. */
@@ -232,7 +233,7 @@ public enum FunDef {
   /** XQuery function. */
   TRACE(FNURI, FNInfo.class, 2, 2, "trace(item, message)", ITEM_ZM),
   /** XQuery function. */
-  ENV(FNURI, FNInfo.class, 1, 1, "get-environment-variable(string)", STR_ZO),
+  ENV(FNURI, FNInfo.class, 1, 1, "environment-variable(string)", STR_ZO),
   /** XQuery function. */
   ENVS(FNURI, FNInfo.class, 0, 0, "available-environment-variables()", STR_ZM),
 

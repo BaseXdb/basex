@@ -27,6 +27,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
+import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
@@ -50,10 +51,11 @@ final class FNGen extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case DATA:    return data(ctx);
-      case COLL:    return collection(ctx);
-      case URICOLL: return uriCollection(ctx);
-      default:      return super.iter(ctx);
+      case DATA:        return data(ctx);
+      case COLL:        return collection(ctx);
+      case URICOLL:     return uriCollection(ctx);
+      case PARSETXTLIN: return unparsedTextLines(ctx);
+      default:          return super.iter(ctx);
     }
   }
 
@@ -66,7 +68,6 @@ final class FNGen extends Fun {
       case PARSETXT:    return unparsedText(ctx);
       case PARSETXTAVL: return unparsedTextAvailable(ctx);
       case PUT:         return put(ctx);
-      case PARSE: // might get obsolete
       case PARSEXML:    return parseXml(ctx);
       case SERIALIZE:   return serialize(ctx);
       default:          return super.item(ctx, ii);
@@ -190,7 +191,7 @@ final class FNGen extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item unparsedText(final QueryContext ctx) throws QueryException {
+  private Str unparsedText(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     try {
@@ -199,6 +200,34 @@ final class FNGen extends Fun {
       UNDEF.thrw(input, ex);
       return null;
     }
+  }
+
+  /**
+   * Performs the unparsed-text-lines function.
+   * @param ctx query context
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  private Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
+    final byte[] str = unparsedText(ctx).atom();
+
+    return new Iter() {
+      int p = -1;
+      @Override
+      public Item next() {
+        final ByteList bl = new ByteList();
+        while(++p < str.length) {
+          if(str[p] == 0x0a) break;
+          if(str[p] == 0x0d) {
+            if(p + 1 < str.length && str[p + 1] == 0x0a) p++;
+            break;
+          }
+          bl.add(str[p]);
+        }
+        return p + 1 < str.length || bl.size() != 0 ?
+            Str.get(bl.toArray()) : null;
+      }
+    };
   }
 
   /**
@@ -299,7 +328,7 @@ final class FNGen extends Fun {
   public boolean uses(final Use u) {
     return u == Use.UPD && def == FunDef.PUT || u == Use.X30 && (
         def == FunDef.DATA && expr.length == 0 ||
-        def == FunDef.PARSE || def == FunDef.PARSETXT ||
+        def == FunDef.PARSETXT || def == FunDef.PARSETXTLIN ||
         def == FunDef.PARSETXTAVL || def == FunDef.PARSEXML ||
         def == FunDef.URICOLL || def == FunDef.SERIALIZE) ||
         u == Use.CTX && def == FunDef.DATA && expr.length == 0 ||
