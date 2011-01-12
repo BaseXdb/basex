@@ -7,7 +7,6 @@ import org.basex.api.jaxrx.JaxRxServer;
  * It shows the function of the HTTP DELETE method.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author Lukas Lewandowski
  */
 public final class JaxRxAll {
   /**

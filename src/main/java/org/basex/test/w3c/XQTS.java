@@ -23,6 +23,6 @@ public final class XQTS extends W3CTS {
    */
   public XQTS() {
     super("XQTS");
-    context.prop.set(Prop.XQUERY11, false);
+    context.prop.set(Prop.XQUERY3, false);
   }
 }

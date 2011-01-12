@@ -73,10 +73,9 @@ public final class StressTest {
     final ClientSession cs = newSession();
     try {
       cs.execute("drop db test");
-    
-    } catch(Exception e) {
+    } catch(Exception ex) {
       System.out.print(cs.info() + "\n");
-      e.printStackTrace();
+      ex.printStackTrace();
     }
     cs.close();
     server.stop();
@@ -102,8 +101,8 @@ public final class StressTest {
     public Client() {
       try {
         session = newSession();
-      } catch(IOException e) {
-        e.printStackTrace();
+      } catch(IOException ex) {
+        ex.printStackTrace();
       }
     }
 

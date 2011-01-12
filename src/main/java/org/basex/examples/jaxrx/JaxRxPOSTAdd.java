@@ -15,7 +15,6 @@ import org.basex.api.jaxrx.JaxRxServer;
  * It shows the add function of the HTTP POST method.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author Lukas Lewandowski
  */
 public final class JaxRxPOSTAdd {
   /**

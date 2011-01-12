@@ -12,7 +12,6 @@ import org.basex.api.jaxrx.JaxRxServer;
  * It shows the function of the HTTP GET method.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author Lukas Lewandowski
  */
 public final class JaxRxGET {
   /**

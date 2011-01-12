@@ -9,7 +9,6 @@ import org.basex.core.cmd.*;
  * some information on the database structures.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class RunCommands {
   /**
