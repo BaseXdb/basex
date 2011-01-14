@@ -16,9 +16,9 @@ import org.basex.util.Util;
  * @author Andreas Weiler
  */
 public final class DataPool {
-
   /** List for data and pins. */
-  List<PData> list = Collections.synchronizedList(new ArrayList<PData>());
+  private List<PData> list =
+    Collections.synchronizedList(new ArrayList<PData>());
 
   /**
    * Pins and returns an existing data reference for the specified database, or
