@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.basex</groupId>
   <artifactId>basex-examples</artifactId>
-  <version>6.3.5</version>
+  <version>6.5</version>
   <repositories>
     <repository>
       <id>dbis-ukn</id>
@@ -20,7 +20,7 @@
     <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex-api</artifactId>
-      <version>6.3.5</version>
+      <version>6.5</version>
     </dependency>
     <dependency>
       <groupId>org.ccil.cowan.tagsoup</groupId>
