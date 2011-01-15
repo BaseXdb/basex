@@ -26,7 +26,7 @@ public final class Close extends Command {
     try {
       final Data data = context.data;
       if(data == null) return true;
-      close(context, data);
+      close(data, context);
       context.closeDB();
       return info(DBCLOSED, data.meta.name);
     } catch(final IOException ex) {
@@ -37,11 +37,11 @@ public final class Close extends Command {
 
   /**
    * Closes the specified database.
-   * @param ctx database context
    * @param data data reference
+   * @param ctx database context
    * @throws IOException I/O exception
    */
-  public static synchronized void close(final Context ctx, final Data data)
+  public static synchronized void close(final Data data, final Context ctx)
       throws IOException {
     if(ctx.unpin(data)) data.close();
   }

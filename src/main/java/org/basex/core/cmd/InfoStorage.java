@@ -116,15 +116,15 @@ public final class InfoStorage extends AQuery {
    */
   private static void table(final Table t, final Data data, final int p) {
     final int k = data.kind(p);
-    final TokenList sl = new TokenList();
-    sl.add(p);
-    sl.add(p - data.parent(p, k));
-    sl.add(data.size(p, k));
-    sl.add(data.attSize(p, k));
+    final TokenList tl = new TokenList();
+    tl.add(p);
+    tl.add(p - data.parent(p, k));
+    tl.add(data.size(p, k));
+    tl.add(data.attSize(p, k));
     final int u = data.uri(p, k);
-    if(data.nsFlag(p)) sl.add("+" + u);
-    else sl.add(u);
-    sl.add(TABLEKINDS[k]);
+    if(data.nsFlag(p)) tl.add("+" + u);
+    else tl.add(u);
+    tl.add(TABLEKINDS[k]);
 
     byte[] cont = null;
     if(k == Data.ELEM) {
@@ -135,8 +135,8 @@ public final class InfoStorage extends AQuery {
     } else {
       cont = data.text(p, true);
     }
-    sl.add(replace(chop(cont, 64), '\n', ' '));
-    t.contents.add(sl);
+    tl.add(replace(chop(cont, 64), '\n', ' '));
+    t.contents.add(tl);
   }
 
   @Override

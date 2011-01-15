@@ -325,13 +325,13 @@ public final class Namespaces {
   private void table(final Table t, final NSNode n, final int s, final int e) {
     for(int i = 0; i < n.vals.length; i += 2) {
       if(n.pre < s || n.pre > e) continue;
-      final TokenList sl = new TokenList();
-      sl.add(n.vals[i + 1]);
-      sl.add(n.pre);
-      sl.add(n.pre - n.par.pre);
-      sl.add(pref.key(n.vals[i]));
-      sl.add(uri.key(n.vals[i + 1]));
-      t.contents.add(sl);
+      final TokenList tl = new TokenList();
+      tl.add(n.vals[i + 1]);
+      tl.add(n.pre);
+      tl.add(n.pre - n.par.pre);
+      tl.add(pref.key(n.vals[i]));
+      tl.add(uri.key(n.vals[i + 1]));
+      t.contents.add(tl);
     }
     for(int i = 0; i < n.size; i++) table(t, n.ch[i], s, e);
   }

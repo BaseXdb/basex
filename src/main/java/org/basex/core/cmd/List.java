@@ -38,7 +38,7 @@ public final class List extends Command {
     table.header.add(INFODBNAME);
     table.header.add(INFONDOCS);
     table.header.add(INFODBSIZE);
-    if(create) table.header.add(INFODOC);
+    if(create) table.header.add(INFOPATH);
 
     for(final String name : list(context)) {
       DataInput in = null;
@@ -58,12 +58,12 @@ public final class List extends Command {
         if(in != null) try { in.close(); } catch(final IOException ex) { }
       }
       if(file != null) {
-        final TokenList sl = new TokenList();
-        sl.add(name);
-        sl.add(ndocs);
-        sl.add(size);
-        if(create) sl.add(file);
-        table.contents.add(sl);
+        final TokenList tl = new TokenList();
+        tl.add(name);
+        tl.add(ndocs);
+        tl.add(size);
+        if(create) tl.add(file);
+        table.contents.add(tl);
       }
     }
     table.sort();

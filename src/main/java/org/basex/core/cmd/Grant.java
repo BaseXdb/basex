@@ -75,7 +75,7 @@ public final class Grant extends Command {
         }
         u.perm = perm;
         data.flush();
-        Close.close(context, data);
+        Close.close(data, context);
       } catch(final IOException ex) {
         Util.debug(ex);
         final String msg = ex.getMessage();

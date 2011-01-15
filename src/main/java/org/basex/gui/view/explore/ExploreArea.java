@@ -135,20 +135,20 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param data data reference
    */
   private void addKeys(final Data data) {
-    final TokenList sl = new TokenList();
+    final TokenList tl = new TokenList();
     final int cs = panel.getComponentCount();
     final boolean fs = data.fs != null;
-    if(fs) sl.add(Token.token(DeepFS.S_FILE));
+    if(fs) tl.add(Token.token(DeepFS.S_FILE));
     else {
       for(int c = 0; c < cs; c += 2) {
         final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
         if(combo.getSelectedIndex() == 0) continue;
         final String elem = combo.getSelectedItem().toString();
-        if(!elem.startsWith("@")) sl.add(Token.token(elem));
+        if(!elem.startsWith("@")) tl.add(Token.token(elem));
       }
     }
 
-    final TokenList tmp = data.pthindex.desc(sl, data, !fs, false);
+    final TokenList tmp = data.pthindex.desc(tl, data, !fs, false);
     if(tmp.size() == 0) return;
 
     final String[] keys = entries(tmp.toArray());

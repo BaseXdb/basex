@@ -40,6 +40,7 @@ import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.InfoStorage;
 import org.basex.core.cmd.Kill;
 import org.basex.core.cmd.List;
+import org.basex.core.cmd.ListDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.Password;
@@ -183,7 +184,8 @@ public final class CommandParser extends InputParser {
       case CLOSE:
         return new Close();
       case LIST:
-        return new List();
+        String input = string(null);
+        return input == null ? new List() : new ListDB(input);
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:

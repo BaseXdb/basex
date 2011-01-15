@@ -19,10 +19,10 @@ import org.basex.util.Util;
 public final class Open extends Command {
   /**
    * Default constructor.
-   * @param name name of database
+   * @param path database name and optional path
    */
-  public Open(final String name) {
-    super(STANDARD, name);
+  public Open(final String path) {
+    super(STANDARD, path);
   }
 
   @Override
@@ -77,7 +77,7 @@ public final class Open extends Command {
     // check permissions
     if(ctx.perm(User.READ, data.meta)) return data;
 
-    Close.close(ctx, data);
+    Close.close(data, ctx);
     throw new IOException(Util.info(PERMNO, CmdPerm.READ));
   }
 }

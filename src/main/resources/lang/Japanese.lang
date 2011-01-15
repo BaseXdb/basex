@@ -481,7 +481,7 @@ info_dbname=データベース名
 info_ndocs=No/Documents
 info_docsize=文書のサイズ
 info_dbsize=データベースサイズ
-info_doc=ソースのパス
+info_path=パス
 info_time=タイムスタンプ
 info_mem=メインメモリの使用量
 info_nodes=テーブルノード
@@ -578,7 +578,7 @@ ch_show25=shows backups.
 ch_grant1=パーミッションの付与
 ch_grant2=ユーザーにデータベースに対するパーミッションを与えます。
 ch_set1=グローバルオプションをセットします。
-ch_set2=Available options [%] with [%] = on/off:
+ch_set2=Available options [%]:
 ch_set21=プロセス情報の表示
 ch_set22=デバッグ情報の表示
 ch_set23=クエリー結果のシリアル化

@@ -56,7 +56,7 @@ public final class DropUser extends Command {
         final Data data = Open.open(db, context);
         data.meta.users.remove(data.meta.users.get(args[0]));
         data.flush();
-        Close.close(context, data);
+        Close.close(data, context);
       } catch(final IOException ex) {
         Util.debug(ex);
         final String msg = ex.getMessage();

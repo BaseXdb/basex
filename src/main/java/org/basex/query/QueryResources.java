@@ -84,7 +84,7 @@ public final class QueryResources {
    */
   void close() throws IOException {
     for(int d = globalData ? 1 : 0; d < datas; ++d) {
-      Close.close(ctx.context, data[d]);
+      Close.close(data[d], ctx.context);
     }
     datas = 0;
   }

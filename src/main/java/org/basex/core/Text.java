@@ -188,9 +188,9 @@ public interface Text {
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]:" + NL +
       "  " + lang("ch_create5") + NL +
     LI + CmdCreate.FS + " [" + C_NAME + "] [" + C_PATH +
-      "] ([mountpoint] [backingstore]):" + NL +
+      "] ([mountpoint] [store]):" + NL +
       "  " + lang("ch_create6", C_NAME, C_PATH) + NL +
-      "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
+      "  " + lang("ch_create7", "mountpoint", "store") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
       "  " + lang("ch_create8")
   };
@@ -209,7 +209,7 @@ public interface Text {
 
   /** Command help. */
   String[] HELPOPEN = {
-    "[" + C_NAME + "]", lang("ch_open1"), lang("ch_open2", C_NAME)
+    "[" + C_PATH + "]", lang("ch_open1"), lang("ch_open2", C_PATH)
   };
   /** Command help. */
   String[] HELPINFO = {
@@ -229,7 +229,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPLIST = {
-    "", lang("ch_list1"), lang("ch_list2")
+    "([" + C_PATH + "])", lang("ch_list1"), lang("ch_list2", C_PATH)
   };
   /** Command help. */
   String[] HELPDROP = {
@@ -622,8 +622,8 @@ public interface Text {
   String INFODBNAME = lang("info_dbname");
   /** Info on database size. */
   String INFODBSIZE = lang("info_dbsize");
-  /** Info on source document. */
-  String INFODOC = lang("info_doc");
+  /** Info on path. */
+  String INFOPATH = lang("info_path");
   /** Info on database time stamp. */
   String INFOTIME = lang("info_time");
   /** Info on number of documents. */
@@ -1221,7 +1221,7 @@ public interface Text {
   String RENAMEOVER = lang("dr_over") + DOT;
   /** Info for creating an empty database. */
   String EMPTYDATABASE = lang("dr_empty") + DOT;
-  /** Info for overwriting a database and deleting backing store. */
+  /** Info for overwriting a database and deleting store. */
   String RENAMEOVERBACKING = lang("dr_overbacking") + DOT;
   /** % documents will be deleted. */
   String DELETEPATH = lang("dr_delete") + DOT;

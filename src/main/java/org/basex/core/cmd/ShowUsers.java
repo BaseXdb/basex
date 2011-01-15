@@ -50,7 +50,7 @@ public final class ShowUsers extends Command {
         }
         out.println(data.meta.users.info());
         data.flush();
-        Close.close(context, data);
+        Close.close(data, context);
         return true;
       } catch(final IOException ex) {
         Util.debug(ex);

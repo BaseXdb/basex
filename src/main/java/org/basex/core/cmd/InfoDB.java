@@ -60,7 +60,7 @@ public final class InfoDB extends AInfo {
 
     tb.add(NL);
     tb.addExt(header, INFOCREATE);
-    if(create) format(tb, INFODOC, meta.file.path());
+    if(create) format(tb, INFOPATH, meta.file.path());
     format(tb, INFOTIME, DATE.format(new Date(meta.time)));
     format(tb, INFODOCSIZE, Performance.format(meta.filesize));
     format(tb, INFOENCODING, meta.encoding);

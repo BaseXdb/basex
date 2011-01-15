@@ -316,6 +316,14 @@ public class CmdTest {
 
   /** Command test. */
   @Test
+  public final void listdb() {
+    no(new ListDB(NAME));
+    ok(new CreateDB(NAME, FILE));
+    ok(new ListDB(NAME));
+  }
+
+  /** Command test. */
+  @Test
   public final void open() {
     no(new Open(NAME));
     ok(new CreateDB(NAME, FILE));
