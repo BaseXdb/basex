@@ -10,6 +10,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.List;
+import org.basex.core.cmd.ListDB;
 import org.basex.core.cmd.Open;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
@@ -62,21 +63,35 @@ public final class BXJaxRx implements JaxRx {
 
   @Override
   public StreamingOutput get(final ResourcePath rp) {
-    if(rp.getDepth() != 0) return query(".", rp);
-
-    return new BXOutput(null) {
+    return new BXOutput(rp) {
       @Override
       String code() throws IOException {
         final XMLSerializer xml = new XMLSerializer(out,
             new SerializerProp(params(rp)));
 
-        // retrieve list of databases
-        final Table table = new Table(exec(new List(), null));
-        for(final TokenList l : table.contents) {
-          xml.emptyElement(Token.token(JAXRX + ":" + "resource"),
-              Token.token("name"), l.get(0),
-              Token.token("documents"), l.get(1),
-              Token.token("size"), l.get(2));
+        if(rp.getDepth() != 0) {
+          final String all = rp.getResourcePath();
+
+          final Table table = new Table(exec(new ListDB(all), null));
+          xml.openElement(Token.token(JAXRX + ":" + "database"),
+              Token.token("name"), Token.token(rp.getResource(0)),
+            Token.token("documents"), Token.token(table.contents.size()));
+
+          for(final TokenList l : table.contents) {
+            xml.emptyElement(Token.token(JAXRX + ":" + "document"),
+                Token.token("path"), l.get(0),
+                Token.token("nodes"), l.get(1));
+          }
+          xml.closeElement();
+        } else {
+          // retrieve list of databases
+          final Table table = new Table(exec(new List(), null));
+          for(final TokenList l : table.contents) {
+            xml.emptyElement(Token.token(JAXRX + ":" + "database"),
+                Token.token("name"), l.get(0),
+                Token.token("documents"), l.get(1),
+                Token.token("size"), l.get(2));
+          }
         }
         xml.close();
         return null;
@@ -100,7 +115,7 @@ public final class BXJaxRx implements JaxRx {
       @Override
       String code() {
         // get root directory for files
-        final String root = System.getProperty("org.basex.restpath") + "/";
+        final String root = System.getProperty(RESTPATH) + "/";
         final IO io = IO.get(root + file);
 
         // file not found...

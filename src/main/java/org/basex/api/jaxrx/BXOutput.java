@@ -85,7 +85,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       cs.setOutputStream(out);
 
       // create query instance
-      cq = cs.query(query);
+      cq = cs.query(query.isEmpty() ? "." : query);
       final String var = path.getValue(QueryParameter.VAR);
       if(var != null) {
         // bind external variables
