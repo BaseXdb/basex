@@ -564,7 +564,7 @@ public abstract class W3CTS {
           ++err2;
         }
       }
-      if(curr != null) Close.close(context, curr.data);
+      if(curr != null) Close.close(curr.data, context);
       xq.close();
     }
 
