@@ -84,7 +84,7 @@ class Query:
 TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
 
  {...} = string; \n = single byte
- 
+
  Authentication:
  1. Client connects to server socket
  2. Server sends timestamp: {timestamp} \0
