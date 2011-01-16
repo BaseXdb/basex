@@ -82,6 +82,7 @@ dc_ftsct1=Documenten
 dc_ftsct2=Tekst Nodes
 dc_chopinfo=Deze optie verwijdert witruimte tussen tags en content
 dc_intparseinfo=Activeer deze optie om de ingebouwde XML parser te gebruiken
+dc_formatinfo=The input will be converted from the specified format to XML
 dc_pathinfo=A path summary speeds up path resolutions
 dc_txtinfo=Deze index versnelt tekst vergelijkingen in predicaten
 dc_attinfo=Deze index versnelt attribute vergelijkingen in predicaten

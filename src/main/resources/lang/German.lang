@@ -1,5 +1,5 @@
 # LANGUAGE FILE, TRANSLATED BY
-# Andreas Weiler, Project Team
+# Project Team
 #
 # The '%' character serves as placeholder for texts to be inserted
 
@@ -539,8 +539,6 @@ ch_close1=Schließen der Datenbank.
 ch_close2=Schließt die aktuell geöffnete Datenbank.
 ch_list1=Anzeige aller Datenbanken oder der Dokumente in einer Datenbank.
 ch_list2=Listet alle Datenbanken, oder die Dokumente\nin einem Datenbankpfad auf.
-ch_list1=Anzeige aller Datenbanken.
-ch_list2=Listet alle verfügbaren Datenbanken auf.
 ch_drop1=Entfernen einer Datenbank, eines Index oder Benutzers.
 ch_drop2=Entfernt eine Datenbank, einen Index oder Benutzer:
 ch_drop21=entfernt die Datenbank

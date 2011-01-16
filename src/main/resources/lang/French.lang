@@ -141,7 +141,7 @@ dx_indent=Indenter par des espaces
 dx_invpath=Chemin invalide.
 
 dp_title=Préférences
-dp_dbpath=Emplacement de la base de données (les bases de données doivent être déplacées manuellement)
+dp_dbpath=Emplacement de la base de données (doivent être déplacées manuellement)
 dp_inter=GUI & Interactions
 dp_lf=Utiliser apparence Java
 dp_focus=Focus souris temps réel
@@ -385,7 +385,6 @@ db_optimized=Base de données optimisée dans %.
 db_dropped=La base de données '%' a été effacée.
 db_notdropped=No database was dropped.
 db_droperror=Impossible d'effacer la base de données.
-db_notdropped=No database was dropped.
 db_altered=Database '%' was renamed to '%'.
 db_notaltered=Database '%' could not be renamed.
 db_backup=Backup for '%' created in %.
