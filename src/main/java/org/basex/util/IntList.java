@@ -101,14 +101,6 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Returns the uppermost element on the stack, without removing it.
-   * @return uppermost element
-   */
-  public final int peek() {
-    return list[size - 1];
-  }
-
-  /**
    * Searches the specified element via binary search.
    * Note that all elements must be sorted.
    * @param e element to be found

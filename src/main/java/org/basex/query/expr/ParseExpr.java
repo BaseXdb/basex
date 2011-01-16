@@ -208,19 +208,6 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression is a node.
    * Returns the node or an exception.
-   * @param e expression to be checked
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  public final Nod checkNode(final Expr e, final QueryContext ctx)
-      throws QueryException {
-    return checkNode(checkItem(e, ctx));
-  }
-
-  /**
-   * Checks if the specified expression is a node.
-   * Returns the node or an exception.
    * @param it item to be checked
    * @return item
    * @throws QueryException query exception

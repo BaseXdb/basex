@@ -111,8 +111,6 @@ public interface QueryTokens {
   /** Parser token. */
   String FTOR = "ftor";
   /** Parser token. */
-  String FULLTEXT = "fulltext";
-  /** Parser token. */
   String FUZZY = "fuzzy";
   /** Parser token. */
   String FUNCTION = "function";

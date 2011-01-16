@@ -63,14 +63,6 @@ public class IntSet {
   }
 
   /**
-   * Returns number of entries.
-   * @return number of entries
-   */
-  public final int size() {
-    return size - 1;
-  }
-
-  /**
    * Resizes the hash table.
    */
   protected void rehash() {

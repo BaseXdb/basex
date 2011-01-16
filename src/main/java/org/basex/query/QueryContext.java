@@ -128,8 +128,6 @@ public final class QueryContext extends Progress {
   public boolean leaf;
   /** Compilation flag: GFLWOR clause performs grouping. */
   public boolean grouping;
-  /** Compilation flag: full-text evaluation can be stopped after first hit. */
-  public boolean ftfast = true;
 
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();

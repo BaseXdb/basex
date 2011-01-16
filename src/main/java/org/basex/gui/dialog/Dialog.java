@@ -233,15 +233,4 @@ public abstract class Dialog extends JDialog {
   public static void error(final GUI gui, final String text) {
     new DialogMessage(gui, text.trim(), Msg.ERROR);
   }
-
-  /**
-   * Shows an information or error dialog.
-   * @param gui parent reference
-   * @param ok ok flag
-   * @param text text
-   */
-  public static void show(final GUI gui, final String text, final boolean ok) {
-    if(ok) info(gui, text);
-    else error(gui, text);
-  }
 }
