@@ -1,7 +1,9 @@
 package org.basex.build.file;
 
 import static org.basex.util.Token.*;
+import static org.basex.data.DataText.*;
 import java.io.IOException;
+import java.util.HashMap;
 import org.basex.build.FileParser;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
@@ -31,13 +33,23 @@ public final class CSVParser extends FileParser {
   /** Encoding. */
   private final String encoding = UTF8;
 
+  /** Enumerate columns. */
+  private final boolean cols;
+  /** Add attributes. */
+  private final boolean attr;
+  
   /**
    * Constructor.
    * @param path file path
    * @param ta database target
+   * @param props database properties
    */
-  public CSVParser(final IO path, final String ta) {
+  public CSVParser(final IO path, final String ta,
+      final HashMap<String, String> props) {
+
     super(path, ta);
+    cols = YES.equalsIgnoreCase(props.get("enumerate"));
+    attr = !NO.equalsIgnoreCase(props.get("attributes"));
   }
 
   @Override
@@ -51,8 +63,8 @@ public final class CSVParser extends FileParser {
     final BufferInput bi = new BufferInput(file.path());
     bi.encoding(encoding);
 
-    int r = 0;
-    int c = 0;
+    int r = 1;
+    int c = 1;
     int ch = 0;
     while(true) {
       if(ch == 0) ch = bi.readChar();
@@ -81,7 +93,7 @@ public final class CSVParser extends FileParser {
             builder.endElem(RECORD);
             nl = true;
           }
-          c = 0;
+          c = 1;
         } else if(ch == '"') {
           quoted = true;
         } else if(ch != 0x0D) {
@@ -102,8 +114,10 @@ public final class CSVParser extends FileParser {
    * @throws IOException I/O exception
    */
   private void record(final int r) throws IOException {
-    atts.reset();
-    atts.add(ROW, token(r));
+    if(attr) {
+      atts.reset();
+      atts.add(ROW, token(r));
+    }
     builder.startElem(RECORD, atts);
   }
 
@@ -114,11 +128,14 @@ public final class CSVParser extends FileParser {
    * @throws IOException I/O exception
    */
   private void field(final TokenBuilder tb, final int c) throws IOException {
-    atts.reset();
-    atts.add(COLUMN, token(c));
-    builder.startElem(FIELD, atts);
+    if(attr) {
+      atts.reset();
+      atts.add(COLUMN, token(c));
+    }
+    final byte[] tag = cols ? concat(COLUMN, token(c)) : FIELD;
+    builder.startElem(tag, atts);
     builder.text(tb);
-    builder.endElem(FIELD);
+    builder.endElem(tag);
     tb.reset();
   }
 }

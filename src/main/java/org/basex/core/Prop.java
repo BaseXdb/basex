@@ -117,6 +117,8 @@ public final class Prop extends AProp {
   public static final Object[] ENTITY = { "ENTITY", false };
   /** Define import parser. */
   public static final Object[] PARSER = { "PARSER", "XML" };
+  /** Define parser options. */
+  public static final Object[] PARSEROPT = { "PARSEROPT", "" };
 
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };
