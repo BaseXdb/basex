@@ -1,4 +1,4 @@
-package org.basex.test.collections;
+package org.basex.test.build;
 
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;

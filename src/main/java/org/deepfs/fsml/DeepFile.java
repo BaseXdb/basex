@@ -657,7 +657,7 @@ public final class DeepFile {
   }
 
   /**
-   * Adds a xml document or fragment to the DeepFile.
+   * Adds an XML document or fragment to the DeepFile.
    * @param position offset of the xml document/fragment inside the file
    * @param byteCount number of bytes of the xml document/fragment
    * @param data the xml document/fragment
@@ -680,7 +680,7 @@ public final class DeepFile {
   }
 
   /**
-   * Adds a xml document or fragment to the DeepFile.
+   * Adds an XML document or fragment to the DeepFile.
    * @param pos offset of the xml document/fragment inside the file
    * @param byteCount number of bytes of the xml document/fragment
    * @param xml the xml document/fragment

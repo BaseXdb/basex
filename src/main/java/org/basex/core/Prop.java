@@ -93,7 +93,7 @@ public final class Prop extends AProp {
   public static final Object[] DOTDISPLAY = { "DOTDISPLAY", true };
   /** Path to dotty. */
   public static final Object[] DOTTY = { "DOTTY", "dotty" };
-  /** Prints a XML plan. */
+  /** Prints an XML plan. */
   public static final Object[] XMLPLAN = { "XMLPLAN", false };
   /** Creates the query plan before or after compilation. */
   public static final Object[] COMPPLAN = { "COMPPLAN", true };

@@ -1,4 +1,4 @@
-package org.basex.test.storage;
+package org.basex.test.data;
 
 import org.basex.data.Data;
 import org.basex.data.MemData;

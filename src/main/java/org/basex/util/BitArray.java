@@ -72,7 +72,7 @@ public class BitArray {
    * @param n initial number of bits (> 0)
    */
   public void init(final long n) {
-    setWords(new long[(int) (((n - 1L) >>> WORD_POWER) + 1L)], n);
+    setWords(new long[(int) ((n - 1L >>> WORD_POWER) + 1L)], n);
   }
 
   /**
@@ -128,7 +128,7 @@ public class BitArray {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     final int wordIndex = i >>> WORD_POWER;
     // check if the ith bit is 1
-    return (words[wordIndex] & (1L << i)) != 0;
+    return (words[wordIndex] & 1L << i) != 0;
   }
 
   /**
@@ -140,7 +140,7 @@ public class BitArray {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     final int wordIndex = (int) (i >>> WORD_POWER);
     // check if the ith bit is 1
-    return (words[wordIndex] & (1L << i)) != 0;
+    return (words[wordIndex] & 1L << i) != 0;
   }
 
   /**
@@ -176,7 +176,7 @@ public class BitArray {
    */
   public void set(final int s, final int e) {
     final int startWord = s >>> WORD_POWER;
-    final int endWord = (e - 1) >>> WORD_POWER;
+    final int endWord = e - 1 >>> WORD_POWER;
 
     if(endWord >= words.length) expandTo(endWord + 1);
 
@@ -203,7 +203,7 @@ public class BitArray {
    */
   public void set(final long s, final long e) {
     final int startWord = (int) (s >>> WORD_POWER);
-    final int endWord = (int) ((e - 1L) >>> WORD_POWER);
+    final int endWord = (int) (e - 1L >>> WORD_POWER);
 
     if(endWord >= words.length) expandTo(endWord + 1);
 
@@ -254,7 +254,7 @@ public class BitArray {
    */
   public void clear(final int s, final int e) {
     final int startWord = s >>> WORD_POWER;
-    final int endWord = min((e - 1) >>> WORD_POWER, words.length - 1);
+    final int endWord = min(e - 1 >>> WORD_POWER, words.length - 1);
 
     final long startMask = ~(WORD_MASK << s);
     // 64 - (e % 64) = 64 - (e & 63) = -e, due to wrap
@@ -278,7 +278,7 @@ public class BitArray {
    */
   public void clear(final long s, final long e) {
     final int startWord = (int) (s >>> WORD_POWER);
-    final int endWord = min((int) ((e - 1L) >>> WORD_POWER), words.length - 1);
+    final int endWord = min((int) (e - 1L >>> WORD_POWER), words.length - 1);
 
     final long startMask = ~(WORD_MASK << s);
     // 64 - (e % 64) = 64 - (e & 63) = -e, due to wrap
@@ -303,7 +303,7 @@ public class BitArray {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     int wordIndex = i >>> WORD_POWER;
     // skip the first i bits:
-    long word = words[wordIndex] & (WORD_MASK << i);
+    long word = words[wordIndex] & WORD_MASK << i;
 
     if(word != 0) {
       return (wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
@@ -328,15 +328,15 @@ public class BitArray {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     int wordIndex = (int) (i >>> WORD_POWER);
     // skip the first i bits:
-    long word = words[wordIndex] & (WORD_MASK << i);
+    long word = words[wordIndex] & WORD_MASK << i;
 
     if(word != 0) {
-      return (((long) wordIndex) << WORD_POWER) + numberOfTrailingZeros(word);
+      return ((long) wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
     }
 
     while(++wordIndex < words.length) {
       if((word = words[wordIndex]) != 0) {
-        return (((long) wordIndex) << WORD_POWER) + numberOfTrailingZeros(word);
+        return ((long) wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
       }
     }
 
@@ -353,7 +353,7 @@ public class BitArray {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     int wordIndex = i >>> WORD_POWER;
     // invert the word and skip the first i bits:
-    long word = ~words[wordIndex] & (WORD_MASK << i);
+    long word = ~words[wordIndex] & WORD_MASK << i;
 
     if(word != 0) {
       return (wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
@@ -379,15 +379,15 @@ public class BitArray {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     int wordIndex = (int) (i >>> WORD_POWER);
     // invert the word and skip the first i bits:
-    long word = ~words[wordIndex] & (WORD_MASK << i);
+    long word = ~words[wordIndex] & WORD_MASK << i;
 
     if(word != 0) {
-      return (((long) wordIndex) << WORD_POWER) + numberOfTrailingZeros(word);
+      return ((long) wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
     }
 
     while(++wordIndex < words.length) {
       if((word = ~words[wordIndex]) != 0) {
-        return (((long) wordIndex) << WORD_POWER) + numberOfTrailingZeros(word);
+        return ((long) wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
       }
     }
 

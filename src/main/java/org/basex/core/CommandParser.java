@@ -184,7 +184,7 @@ public final class CommandParser extends InputParser {
       case CLOSE:
         return new Close();
       case LIST:
-        String input = string(null);
+        final String input = string(null);
         return input == null ? new List() : new ListDB(input);
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {

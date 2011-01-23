@@ -1,4 +1,4 @@
-package org.basex.test.collections;
+package org.basex.test.build;
 
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
@@ -33,7 +33,7 @@ public final class AddDeleteTest {
   private static final String ZIPFILE = "etc/xml/xml.zip";
   /** Test GZIP file. */
   private static final String GZIPFILE = "etc/xml/xml.gz";
-  /** Test XML Fragment. */
+  /** Test XML fragment. */
   private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
 
   /** Number of XML files for folder. */
@@ -48,7 +48,7 @@ public final class AddDeleteTest {
   }
 
   /**
-   * Creates the initial database.
+   * Creates a database.
    * @throws BaseXException exception
    */
   @Before
@@ -57,7 +57,7 @@ public final class AddDeleteTest {
   }
 
   /**
-   * Drops the initial collection.
+   * Drops the database.
    * @throws BaseXException exception
    */
   @After
@@ -66,7 +66,7 @@ public final class AddDeleteTest {
   }
 
   /**
-   * Adds a XML Fragment to the database.
+   * Adds an XML fragment to the database.
    * 1) with name and w/o target
    * 2) with name and target set
    * 3) w/o name and target set

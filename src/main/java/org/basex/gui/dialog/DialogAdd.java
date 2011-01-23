@@ -96,7 +96,7 @@ public class DialogAdd extends Dialog {
     final IO io = IO.get(in);
 
     final boolean exists = !in.isEmpty() && io.exists();
-    String inf = exists ? "" : PATHWHICH;
+    final String inf = exists ? "" : PATHWHICH;
     info.setText(null, null);
 
     if(!inf.isEmpty()) {

@@ -17,7 +17,7 @@ import org.basex.util.Util;
  */
 public final class DataPool {
   /** List for data and pins. */
-  private List<PData> list =
+  private final List<PData> list =
     Collections.synchronizedList(new ArrayList<PData>());
 
   /**

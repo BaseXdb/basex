@@ -1,7 +1,6 @@
 package org.basex.build;
 
 import java.io.IOException;
-import java.util.HashMap;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.file.CSVParser;
 import org.basex.build.file.HTMLParser;
@@ -66,12 +65,9 @@ public abstract class Parser extends Progress {
 
     // use file specific parser
     final String parser = prop.get(Prop.PARSER).toLowerCase();
-    if(parser.equals(DataText.M_HTML))
-      return new HTMLParser(io, target, prop);
-    if(parser.equals(DataText.M_TEXT))
-      return new TextParser(io, target);
-    if(parser.equals(DataText.M_CSV))
-      return new CSVParser(io, target, parserOpt(prop));
+    if(parser.equals(DataText.M_HTML)) return new HTMLParser(io, target, prop);
+    if(parser.equals(DataText.M_TEXT)) return new TextParser(io, target, prop);
+    if(parser.equals(DataText.M_CSV)) return new CSVParser(io, target, prop);
 
     // XML: use internal parser
     if(prop.is(Prop.INTPARSE)) return new XMLParser(io, target, prop);
@@ -80,21 +76,6 @@ public abstract class Parser extends Progress {
     return new SAXWrapper(s, io.name(), target, prop);
   }
 
-  /**
-   * Return parser specific options.
-   * @param prop database properties
-   * @return hash map with properties
-   */
-  static HashMap<String, String> parserOpt(final Prop prop) {
-    // parse properties
-    final HashMap<String, String> props = new HashMap<String, String>();
-    for(final String a : prop.get(Prop.PARSEROPT).split(",")) {
-      final String[] vals = a.split("=");
-      props.put(vals[0], vals.length == 1 ? "on" : vals[1]);
-    }
-    return props;
-  }
-  
   /**
    * Returns a parser instance for creating empty databases.
    * @param f file reference

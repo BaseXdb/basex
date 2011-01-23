@@ -1,4 +1,4 @@
-package org.basex.test.storage;
+package org.basex.test.data;
 
 import static org.junit.Assert.*;
 import java.io.IOException;
