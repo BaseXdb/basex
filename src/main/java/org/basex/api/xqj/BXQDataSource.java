@@ -21,7 +21,7 @@ public final class BXQDataSource implements XQDataSource {
   /** Log output (currently ignored). */
   private PrintWriter log;
   /** User. */
-  private Properties props = new Properties();
+  private final Properties props = new Properties();
   /** Timeout. */
   private int timeout;
 
