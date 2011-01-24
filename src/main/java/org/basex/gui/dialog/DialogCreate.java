@@ -125,7 +125,7 @@ public final class DialogCreate extends Dialog {
     ft = new DialogFT(this, true);
     p4.add(ft);
     
-    parsing = new DialogParsing(main);
+    parsing = new DialogParsing(this);
 
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p1);

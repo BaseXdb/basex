@@ -71,7 +71,7 @@ public class DialogAdd extends Dialog {
     info = new BaseXLabel(" ").border(18, 0, 0, 0);
     p.add(info);
     
-    parsing = new DialogParsing(main);
+    parsing = new DialogParsing(this);
     
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p);

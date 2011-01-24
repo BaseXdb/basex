@@ -9,7 +9,6 @@ import org.basex.build.file.HTMLParser;
 import org.basex.build.xml.CatalogResolverWrapper;
 import org.basex.core.Prop;
 import org.basex.data.DataText;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -48,14 +47,14 @@ public class DialogParsing extends BaseXBack {
   /** Browse Catalog file. */
   private final BaseXButton browsec;
   /** Main window reference. */
-  private final GUI gui;
+  private final Dialog dialog;
   
   /**
    * Default constructor.
-   * @param g main window reference.
+   * @param d dialog reference
    */
-  public DialogParsing(final GUI g) {
-    this.gui = g;
+  public DialogParsing(final Dialog d) {
+    this.dialog = d;
     final BaseXBack p2 = new BaseXBack(new TableLayout(11, 1)).border(8);
 
     // always use internal/external parser, chop whitespaces, ...?
@@ -68,25 +67,27 @@ public class DialogParsing extends BaseXBack {
     parsers.add(DataText.M_TEXT);
     parsers.add(DataText.M_CSV);
 
-    parser = new BaseXCombo(g, parsers.toArray());
-    parser.setSelectedItem(g.context.prop.get(Prop.PARSER));
+    parser = new BaseXCombo(d, parsers.toArray());
+    parser.setSelectedItem(dialog.gui.context.prop.get(Prop.PARSER));
     p.add(parse);
     p.add(parser);
     p2.add(p);
     p2.add(new BaseXLabel(FORMATINFO, true, false));
 
     intparse = new BaseXCheckBox(CREATEINTPARSE,
-        g.context.prop.is(Prop.INTPARSE), 0, g);
+        dialog.gui.context.prop.is(Prop.INTPARSE), 0, dialog);
     p2.add(intparse);
     p2.add(new BaseXLabel(INTPARSEINFO, true, false));
 
     entities = new BaseXCheckBox(CREATEENTITIES, 
-        g.context.prop.is(Prop.ENTITY), g);
+        dialog.gui.context.prop.is(Prop.ENTITY), dialog);
     p2.add(entities);
-    dtd = new BaseXCheckBox(CREATEDTD, g.context.prop.is(Prop.DTD), 12, g);
+    dtd = new BaseXCheckBox(CREATEDTD, 
+        dialog.gui.context.prop.is(Prop.DTD), 12, dialog);
     p2.add(dtd);
 
-    chop = new BaseXCheckBox(CREATECHOP, g.context.prop.is(Prop.CHOP), 0, g);
+    chop = new BaseXCheckBox(CREATECHOP, 
+        dialog.gui.context.prop.is(Prop.CHOP), 0, dialog);
     p2.add(chop);
     p2.add(new BaseXLabel(CHOPPINGINFO, false, false).border(0, 0, 8, 0));
     p2.add(new BaseXLabel());
@@ -95,15 +96,16 @@ public class DialogParsing extends BaseXBack {
     final boolean rsen = CatalogResolverWrapper.available();
     final BaseXBack fl = new BaseXBack(new TableLayout(2, 2, 6, 0));
     usecat = new BaseXCheckBox(USECATFILE,
-        !g.context.prop.get(Prop.CATFILE).isEmpty(), 0, g);
+        !dialog.gui.context.prop.get(Prop.CATFILE).isEmpty(), 0, dialog);
     usecat.setEnabled(rsen);
     fl.add(usecat);
     fl.add(new BaseXLabel());
-    cfile = new BaseXTextField(g.context.prop.get(Prop.CATFILE), g);
+    cfile = new BaseXTextField(
+        dialog.gui.context.prop.get(Prop.CATFILE), dialog);
     cfile.setEnabled(rsen);
     fl.add(cfile);
 
-    browsec = new BaseXButton(BUTTONBROWSE, g);
+    browsec = new BaseXButton(BUTTONBROWSE, dialog);
     browsec.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) { catchoose(); }
@@ -124,9 +126,9 @@ public class DialogParsing extends BaseXBack {
    * Opens a file dialog to choose an XML catalog or directory.
    */
   void catchoose() {
-    final GUIProp gprop = gui.gprop;
+    final GUIProp gprop = dialog.gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        gprop.get(GUIProp.CREATEPATH), gui);
+        gprop.get(GUIProp.CREATEPATH), dialog.gui);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
     final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
@@ -154,11 +156,12 @@ public class DialogParsing extends BaseXBack {
    * Closes the tab.
    */
   public void close() {
-    gui.set(Prop.CHOP, chop.isSelected());
-    gui.set(Prop.ENTITY, entities.isSelected());
-    gui.set(Prop.DTD, dtd.isSelected());
-    gui.set(Prop.INTPARSE, intparse.isSelected());
-    gui.set(Prop.PARSER, parser.getSelectedItem().toString());
-    gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText().trim() : "");
+    dialog.gui.set(Prop.CHOP, chop.isSelected());
+    dialog.gui.set(Prop.ENTITY, entities.isSelected());
+    dialog.gui.set(Prop.DTD, dtd.isSelected());
+    dialog.gui.set(Prop.INTPARSE, intparse.isSelected());
+    dialog.gui.set(Prop.PARSER, parser.getSelectedItem().toString());
+    dialog.gui.set(Prop.CATFILE,
+        usecat.isSelected() ? cfile.getText().trim() : "");
   }
 }
