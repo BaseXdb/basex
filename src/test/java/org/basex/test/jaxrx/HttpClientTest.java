@@ -139,7 +139,6 @@ public final class HttpClientTest {
         "'http://localhost:8984/basex/jax-rx/books')");
     delete.execute(context);
     checkResponse(delete, HttpURLConnection.HTTP_OK, 1);
-
   }
 
   /**

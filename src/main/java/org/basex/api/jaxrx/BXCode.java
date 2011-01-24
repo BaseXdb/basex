@@ -109,7 +109,7 @@ abstract class BXCode {
    * @param path JAX-RX path
    * @return string with serialization parameters
    */
-  final String params(final ResourcePath path) {
+  final String serial(final ResourcePath path) {
     String ser = path.getValue(QueryParameter.OUTPUT);
     if(ser == null) ser = "";
 

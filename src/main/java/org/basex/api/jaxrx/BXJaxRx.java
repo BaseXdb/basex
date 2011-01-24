@@ -67,7 +67,7 @@ public final class BXJaxRx implements JaxRx {
       @Override
       String code() throws IOException {
         final XMLSerializer xml = new XMLSerializer(out,
-            new SerializerProp(params(rp)));
+            new SerializerProp(serial(rp)));
 
         if(rp.getDepth() != 0) {
           final String all = rp.getResourcePath();
@@ -145,7 +145,7 @@ public final class BXJaxRx implements JaxRx {
 
         // serialize output and remove carriage returns
         final XMLSerializer xml =
-          new XMLSerializer(out, new SerializerProp(params(path)));
+          new XMLSerializer(out, new SerializerProp(serial(path)));
         xml.text(Token.delete(ao.toArray(), '\r'));
         xml.close();
         return cs.info();

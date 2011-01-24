@@ -45,7 +45,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       }
       try {
         // set serialization parameters
-        cs.execute(new Set(Prop.SERIALIZER, params(path)));
+        cs.execute(new Set(Prop.SERIALIZER, serial(path)));
       } catch(final BaseXException ex) {
         throw new JaxRxException(400, ex.getMessage());
       }
@@ -81,7 +81,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
 
     ClientQuery cq = null;
     try {
-      cs.execute(new Set(Prop.SERIALIZER, params(path)));
+      cs.execute(new Set(Prop.SERIALIZER, serial(path)));
       cs.setOutputStream(out);
 
       // create query instance
