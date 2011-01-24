@@ -109,7 +109,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final DialogAdd dialog = new DialogAdd(gui);
-      if(dialog.ok()) DialogProgress.execute(gui, "", dialog.cmd(gui));
+      if(dialog.ok()) DialogProgress.execute(gui, "", dialog.cmd());
     }
   },
 

@@ -4,20 +4,15 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.basex.build.file.HTMLParser;
-import org.basex.build.xml.CatalogResolverWrapper;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
-import org.basex.data.DataText;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
-import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTabs;
@@ -43,16 +38,6 @@ public final class DialogCreate extends Dialog {
   /** Database info. */
   private final BaseXLabel info;
 
-  /** Parser. */
-  private final BaseXCombo parser;
-  /** Internal XML parsing. */
-  private final BaseXCheckBox intparse;
-  /** Whitespace chopping. */
-  private final BaseXCheckBox chop;
-  /** Entities mode. */
-  private final BaseXCheckBox entities;
-  /** DTD mode. */
-  private final BaseXCheckBox dtd;
   /** Path summary flag. */
   private final BaseXCheckBox pathindex;
   /** Text index flag. */
@@ -63,16 +48,12 @@ public final class DialogCreate extends Dialog {
   private final BaseXCheckBox ftxindex;
   /** Editable full-text options. */
   private final DialogFT ft;
+  /** Editable parsing options. */
+  private final DialogParsing parsing;
   /** Buttons. */
   private final BaseXBack buttons;
   /** Available databases. */
   private final StringList db;
-  /** Catalog file. */
-  private final BaseXTextField cfile;
-  /** Use XML Catalog. */
-  private final BaseXCheckBox usecat;
-  /** Browse Catalog file. */
-  private final BaseXButton browsec;
 
   /**
    * Default constructor.
@@ -121,67 +102,6 @@ public final class DialogCreate extends Dialog {
     info = new BaseXLabel(" ");
     p1.add(info, BorderLayout.SOUTH);
 
-    final BaseXBack p2 = new BaseXBack(new TableLayout(11, 1)).border(8);
-
-    // always use internal/external parser, chop whitespaces, ...?
-    p = new BaseXBack(new TableLayout(1, 2, 6, 0));
-
-    final BaseXLabel parse = new BaseXLabel(CREATEFORMAT, true, true);
-    final StringList parsers = new StringList();
-    parsers.add(DataText.M_XML);
-    if(HTMLParser.available()) parsers.add(DataText.M_HTML);
-    parsers.add(DataText.M_TEXT);
-    parsers.add(DataText.M_CSV);
-
-    parser = new BaseXCombo(this, parsers.toArray());
-    parser.setSelectedItem(prop.get(Prop.PARSER));
-    p.add(parse);
-    p.add(parser);
-    p2.add(p);
-    p2.add(new BaseXLabel(FORMATINFO, true, false));
-
-    intparse = new BaseXCheckBox(CREATEINTPARSE,
-        prop.is(Prop.INTPARSE), 0, this);
-    p2.add(intparse);
-    p2.add(new BaseXLabel(INTPARSEINFO, true, false));
-
-    entities = new BaseXCheckBox(CREATEENTITIES, prop.is(Prop.ENTITY), this);
-    p2.add(entities);
-    dtd = new BaseXCheckBox(CREATEDTD, prop.is(Prop.DTD), 12, this);
-    p2.add(dtd);
-
-    chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, this);
-    p2.add(chop);
-    p2.add(new BaseXLabel(CHOPPINGINFO, false, false).border(0, 0, 8, 0));
-    p2.add(new BaseXLabel());
-
-    // CatalogResolving
-    final boolean rsen = CatalogResolverWrapper.available();
-    final BaseXBack fl = new BaseXBack(new TableLayout(2, 2, 6, 0));
-    usecat = new BaseXCheckBox(USECATFILE,
-        !prop.get(Prop.CATFILE).isEmpty(), 0, this);
-    usecat.setEnabled(rsen);
-    fl.add(usecat);
-    fl.add(new BaseXLabel());
-    cfile = new BaseXTextField(prop.get(Prop.CATFILE), this);
-    cfile.setEnabled(rsen);
-    fl.add(cfile);
-
-    browsec = new BaseXButton(BUTTONBROWSE, this);
-    browsec.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) { catchoose(); }
-    });
-    browsec.setEnabled(rsen);
-    fl.add(browsec);
-    p2.add(fl);
-    if(!rsen) {
-      final BaseXBack rs = new BaseXBack(new TableLayout(2, 1));
-      rs.add(new BaseXLabel(USECATHLP).color(GUIConstants.COLORDARK));
-      rs.add(new BaseXLabel(USECATHLP2).color(GUIConstants.COLORDARK));
-      p2.add(rs);
-    }
-
     final BaseXBack p3 = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
     txtindex = new BaseXCheckBox(INFOTEXTINDEX,
         prop.is(Prop.TEXTINDEX), 0, this);
@@ -204,10 +124,12 @@ public final class DialogCreate extends Dialog {
 
     ft = new DialogFT(this, true);
     p4.add(ft);
+    
+    parsing = new DialogParsing(main);
 
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p1);
-    tabs.addTab(PARSEINFO, p2);
+    tabs.addTab(PARSEINFO, parsing);
     tabs.addTab(INDEXINFO, p3);
     tabs.addTab(FTINFO, p4);
     set(tabs, BorderLayout.CENTER);
@@ -239,34 +161,10 @@ public final class DialogCreate extends Dialog {
     }
   }
 
-  /**
-   * Opens a file dialog to choose an XML catalog or directory.
-   */
-  void catchoose() {
-    final GUIProp gprop = gui.gprop;
-    final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        gprop.get(GUIProp.CREATEPATH), gui);
-    fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
-
-    final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
-    if(file != null) cfile.setText(file.path());
-  }
-
   @Override
   public void action(final Object cmp) {
     ft.action(ftxindex.isSelected());
-
-    final boolean xml = parser.getSelectedItem().toString().equals(
-        DataText.M_XML);
-    intparse.setEnabled(!usecat.isSelected() && xml);
-    entities.setEnabled(intparse.isSelected());
-    dtd.setEnabled(intparse.isSelected());
-
-    usecat.setEnabled(!intparse.isSelected() &&
-        CatalogResolverWrapper.available() && xml);
-    cfile.setEnabled(usecat.isSelected());
-    browsec.setEnabled(cfile.isEnabled());
-    chop.setEnabled(xml);
+    parsing.action();
 
     boolean valid;
     final String pth = path.getText().trim();
@@ -302,18 +200,12 @@ public final class DialogCreate extends Dialog {
   public void close() {
     if(!ok) return;
     super.close();
-
-    gui.set(Prop.CHOP, chop.isSelected());
     gui.set(Prop.CREATEFILTER, filter.getText());
-    gui.set(Prop.ENTITY, entities.isSelected());
-    gui.set(Prop.DTD, dtd.isSelected());
     gui.set(Prop.PATHINDEX, pathindex.isSelected());
     gui.set(Prop.TEXTINDEX, txtindex.isSelected());
     gui.set(Prop.ATTRINDEX, atvindex.isSelected());
     gui.set(Prop.FTINDEX, ftxindex.isSelected());
-    gui.set(Prop.INTPARSE, intparse.isSelected());
-    gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText().trim() : "");
-    gui.set(Prop.PARSER, parser.getSelectedItem().toString());
     ft.close();
+    parsing.close();
   }
 }
