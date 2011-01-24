@@ -43,6 +43,8 @@ final class QueryProcess extends Progress {
   private boolean monitored;
   /** Iterator. */
   private Iter iter;
+  /** Closed. */
+  private boolean closed;
 
   /**
    * Constructor.
@@ -129,11 +131,13 @@ final class QueryProcess extends Progress {
    * @throws IOException I/O exception
    */
   void close(final boolean forced) throws IOException {
+    if(closed) return;
     if(xml != null && !forced) xml.close();
     qp.stopTimeout();
     qp.close();
     if(monitored) ctx.lock.after(qp.ctx.updating);
     initInfo();
+    closed = true;
   }
 
   /**
