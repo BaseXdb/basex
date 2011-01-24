@@ -1,20 +1,29 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+
+import org.basex.build.file.HTMLParser;
+import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
+import org.basex.data.DataText;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 
 /**
  * Add document dialog.
@@ -31,6 +40,8 @@ public class DialogAdd extends Dialog {
   private final BaseXLabel info;
   /** Buttons. */
   private final BaseXBack buttons;
+  /** Parser. */
+  private final BaseXCombo parser;
 
   /**
    * Default constructor.
@@ -39,7 +50,7 @@ public class DialogAdd extends Dialog {
   public DialogAdd(final GUI main) {
     super(main, GUIADD);
 
-    BaseXBack p = new BaseXBack(new TableLayout(4, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
     p.border(0, 0, 8, 0);
@@ -55,7 +66,24 @@ public class DialogAdd extends Dialog {
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
     p.add(browse);
+    
+    BaseXBack p2 = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    final StringList parsers = new StringList();
+    parsers.add(DataText.M_XML);
+    if(HTMLParser.available()) parsers.add(DataText.M_HTML);
+    parsers.add(DataText.M_TEXT);
+    parsers.add(DataText.M_CSV);
 
+    parser = new BaseXCombo(this, parsers.toArray());
+    parser.setBorder(BorderFactory.createEmptyBorder(8, 0, 4, 0));
+    parser.setSelectedItem(main.context.prop.get(Prop.PARSER));
+    p2.add(new BaseXLabel(CREATEFORMAT, true, true).border(8, 0, 4, 0));
+    p2.add(parser);
+    p.add(p2);
+    p.add(new BaseXLabel());
+    p.add(new BaseXLabel(FORMATINFO, true, false));
+    p.add(new BaseXLabel());
+    
     p.add(new BaseXLabel(CREATETARGET, true, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());
 
@@ -108,9 +136,11 @@ public class DialogAdd extends Dialog {
 
   /**
    * Returns the add command to be executed.
+   * @param g reference to the main window
    * @return add command
    */
-  public Add cmd() {
+  public Add cmd(final GUI g) {
+    g.context.prop.set(Prop.PARSER, parser.getSelectedItem().toString());
     final String in = path.getText().trim();
     final String to = target.getText().trim();
     return new Add(in, null, to.isEmpty() ? null : to);
