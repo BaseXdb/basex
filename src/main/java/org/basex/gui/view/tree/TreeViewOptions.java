@@ -79,5 +79,4 @@ interface TreeViewOptions {
   byte NOT_ENOUGH_SPACE = 0;
   /** Show no attributes text. */
   byte NO_ATTS = 1;
-
 }

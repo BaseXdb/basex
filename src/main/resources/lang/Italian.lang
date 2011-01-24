@@ -416,7 +416,7 @@ srv_start=Il server è stato avviato.
 srv_stop=Il server è stato spento.
 srv_user=Utente
 srv_pw=Parola chiave
-srv_reststart=Starting REST server on port %
+srv_reststart=Starting REST Server on port %
 
 # Bye
 bye1=Buona giornata.

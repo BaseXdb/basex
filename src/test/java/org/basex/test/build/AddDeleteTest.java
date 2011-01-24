@@ -80,7 +80,6 @@ public final class AddDeleteTest {
     assertEquals(2, CTX.doc().length);
     new Add(XMLFRAG, null, "a/d/c").execute(CTX);
     assertEquals(3, CTX.doc().length);
-
   }
 
   /**

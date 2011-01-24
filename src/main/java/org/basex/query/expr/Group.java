@@ -43,7 +43,6 @@ public final class Group extends ParseExpr {
     final Var[] fs = new Var[fl.length];
     for(int i = 0; i < fl.length; ++i) fs[i] = fl[i].var;
     gp = new GroupPartition(groupby, fs, ob, input);
-
   }
 
   @Override

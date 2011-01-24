@@ -40,7 +40,5 @@ public final class FNHttp extends Fun {
 
     // Send the HTTP request
     return httpRequest.sendHttpRequest(ctx);
-
   }
-
 }

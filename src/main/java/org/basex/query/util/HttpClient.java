@@ -221,7 +221,6 @@ public final class HttpClient {
       // Body child
       else if(eq(n.nname(), BODY)) body = n;
       else REQINV.thrw(ii);
-
     }
   }
 
@@ -354,7 +353,6 @@ public final class HttpClient {
       // [RS] If the src attribute is present, the serialization
       // parameters shall be ignored
     }
-
   }
 
   /**

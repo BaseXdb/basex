@@ -40,7 +40,6 @@ public final class DialogTreeOptions extends Dialog {
 
     set(p, BorderLayout.CENTER);
     finish(gprop.nums(GUIProp.MAPLAYOUTLOC));
-
   }
 
   @Override

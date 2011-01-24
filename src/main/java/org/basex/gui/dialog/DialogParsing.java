@@ -1,10 +1,8 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import org.basex.build.file.HTMLParser;
 import org.basex.build.xml.CatalogResolverWrapper;
 import org.basex.core.Prop;
@@ -54,7 +52,7 @@ public class DialogParsing extends BaseXBack {
    * @param d dialog reference
    */
   public DialogParsing(final Dialog d) {
-    this.dialog = d;
+    dialog = d;
     final BaseXBack p2 = new BaseXBack(new TableLayout(11, 1)).border(8);
 
     // always use internal/external parser, chop whitespaces, ...?

@@ -5,6 +5,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Scanner;
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -22,9 +23,7 @@ import org.basex.query.util.Var;
 import org.basex.util.Token;
 
 /**
- * This abstract class contains various methods which allow querying in
- * the database. A variety of hierarchical parsers (XPath, XQuery, etc..)
- * can be implemented on top of this class.
+ * This class is an entry point for evaluating XQuery implementations.
  *
  * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
@@ -67,6 +66,16 @@ public final class QueryProcessor extends Progress {
    */
   public void parse() throws QueryException {
     if(!parsed) {
+      // parse pre-defined external variables
+      final Scanner sc = new Scanner(ctx.context.prop.get(Prop.BINDINGS));
+      sc.useDelimiter(",");
+      while(sc.hasNext()) {
+        final String v = sc.next();
+        String[] sp = v.split("=", 3);
+        if(sp.length < 2) sp = v.split("=", 3);
+        bind(sp[0], sp.length > 1 ? sp[1] : "", sp.length > 2 ? sp[2] : "");
+      }
+      // parse query
       ctx.parse(query);
       parsed = true;
     }

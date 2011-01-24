@@ -125,12 +125,17 @@ public class BaseX extends Main {
   @Override
   protected final boolean parseArguments(final String[] args) {
     String serial = "";
+    String bind = "";
     try {
       final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO);
       while(arg.more()) {
         if(arg.dash()) {
           final char c = arg.next();
-          if(c == 'c') {
+          if(c == 'b') {
+            // set/add serialization parameter
+            bind += "," + arg.string();
+            arg.check(set(Prop.BINDINGS, bind));
+          } else if(c == 'c') {
             // specify command to be evaluated
             commands = arg.remaining();
           } else if(c == 'd') {

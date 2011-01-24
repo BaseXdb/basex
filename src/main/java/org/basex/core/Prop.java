@@ -11,6 +11,7 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class Prop extends AProp {
+
   // CONSTANTS ================================================================
 
   /** New line string. */
@@ -81,6 +82,8 @@ public final class Prop extends AProp {
   public static final Object[] SERIALIZE = { "SERIALIZE", true };
   /** Flag for wrapping result nodes. */
   public static final Object[] WRAPOUTPUT = { "WRAPOUTPUT", false };
+  /** External variables, separated by commas. */
+  public static final Object[] BINDINGS = { "BINDINGS", "" };
   /** Serialization parameters, separated by commas. */
   public static final Object[] SERIALIZER = { "SERIALIZER", "" };
   /** Exporter serialization parameters. */

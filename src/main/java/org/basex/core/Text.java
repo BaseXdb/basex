@@ -67,8 +67,9 @@ public interface Text {
   String LOCALMODE = "Standalone";
   /** Start information. */
   String LOCALINFO =
-    " [-diosuvVwz] [-cq] [file]" + NL +
+    " [-bdiosuvVwz] [-cq] [file]" + NL +
     "  [file]     Execute XQuery file" + NL +
+    "  -b<pars>   Bind external XQuery variables" + NL +
     "  -c<cmd>    Execute database command(s)" + NL +
     "  -d         Activate debugging mode" + NL +
     "  -i<input>  Open initial file or database" + NL +
@@ -77,7 +78,7 @@ public interface Text {
     "  -s<pars>   Set serialization parameter(s)" + NL +
     "  -u         Write updates back to original files" + NL +
     "  -v/V       Show (all) process info" + NL +
-    "  -w         Keep whitespaces from source files" + NL +
+    "  -w         Retain whitespaces from source files" + NL +
     "  -z         Skip output of results";
 
   /** Client mode. */
@@ -86,6 +87,7 @@ public interface Text {
   String CLIENTINFO =
     " [-npPU] [-dovVwz] [-cq] [file]" + NL +
     "  [file]     Execute XQuery file" + NL +
+    "  -b<pars>   Bind external XQuery variables" + NL +
     "  -c<cmd>    Execute database command(s)" + NL +
     "  -d         Activate debugging mode" + NL +
     "  -n<name>   Set server (host) name" + NL +
@@ -95,14 +97,14 @@ public interface Text {
     "  -q<expr>   Execute XQuery expression" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -v/V       Show (all) process info" + NL +
-    "  -w         Keep whitespaces from source files" + NL +
-    "  -z         Skip output of results";
+    "  -w         Retain whitespaces from source files" + NL +
+    "  -z         Skip XQuery serialization";
 
   /** Server mode. */
   String SERVERMODE = "Server";
   /** Start information. */
   String SERVERINFO =
-    " [-s] [-dpz] [-c] [stop]" + NL +
+    " [-dpsz] [-c] [stop]" + NL +
     "  stop     Stop existing server" + NL +
     "  -c<cmd>  Execute initial database command(s)" + NL +
     "  -d       Activate debugging mode" + NL +
@@ -113,7 +115,7 @@ public interface Text {
 
   /** Start information. */
   String RESTINFO =
-    " [-pw]" + NL +
+    " [-pPrsUz]" + NL +
     "  -p<num>   Set database server port" + NL +
     "  -P<pass>  Specify user password" + NL +
     "  -r<num>   Set REST server port" + NL +
@@ -1301,7 +1303,7 @@ public interface Text {
     lang("dm_choice4"), lang("dm_choice5")
   };
 
-  /** Dialog title for treeview options. */
+  /** Dialog title for tree view options. */
   String TREEOPTIONSTITLE = lang("dt_title");
   /** Slim rectangles to text length. */
   String TREESLIM = lang("dt_slim");
