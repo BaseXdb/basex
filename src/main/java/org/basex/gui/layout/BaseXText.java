@@ -391,7 +391,7 @@ public class BaseXText extends BaseXPanel {
     final boolean marking = e.isShiftDown() &&
       !DELNEXT.is(e) && !DELPREV.is(e) &&  !PASTE2.is(e);
     final boolean nomark = text.start() == -1;
-    if(!PASTE2.is(e) && marking && nomark) text.startMark();
+    if(marking && nomark) text.startMark();
     boolean down = true;
     boolean consumed = true;
 
@@ -552,7 +552,30 @@ public class BaseXText extends BaseXPanel {
 
     text.pos(text.cursor());
     if(text.start() != -1) text.delete();
-    text.add(String.valueOf(e.getKeyChar()));
+    
+    if(ENTER.is(e)) {
+      // adopt indentation from previous line
+      final StringBuilder sb = new StringBuilder().append(e.getKeyChar());
+      int s = 0, t = 0;
+      for(int p = text.pos() - 1; p >= 0; p--) {
+        final byte b = text.text[p];
+        if(b == 0x0a) {
+          break;
+        } else if(b == 0x09) {
+          t++;
+        } else if(b == ' ') {
+          s++;
+        } else {
+          t = 0;
+          s = 0;
+        }
+      }
+      for(int p = 0; p < t; p++) sb.append('\t');
+      for(int p = 0; p < s; p++) sb.append(' ');
+      text.add(sb.toString());
+    } else {
+      text.add(String.valueOf(e.getKeyChar()));
+    }
     text.setCaret();
     rend.calc();
     showCursor(2);

@@ -266,7 +266,7 @@ public final class GUIConstants {
   public static final int SHF = Event.SHIFT_MASK;
   /** Alt key. */
   public static final int ALT = Event.ALT_MASK;
-  /** Ctrl key. */
+  /** Control key. */
   public static final int CTRL = Event.CTRL_MASK;
   /** Shortcut key (CTRL/META). */
   public static final int SC = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
