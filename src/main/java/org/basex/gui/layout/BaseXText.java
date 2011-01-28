@@ -551,7 +551,20 @@ public class BaseXText extends BaseXPanel {
         ESCAPE.is(e)) return;
 
     text.pos(text.cursor());
-    if(text.start() != -1) text.delete();
+
+    boolean indent = false;
+    if(text.start() != -1) {
+      // count number of lines to indent
+      if(TAB.is(e)) {
+        int s = Math.min(text.pos(), text.start());
+        int l = Math.max(text.pos(), text.start()) - 1;
+        for(int p = s; p <= l && p < text.size(); p++) {
+          indent |= text.text[p] == '\n';
+        }
+        if(indent) text.indent(s, l, e.isShiftDown());
+      }
+      if(!indent) text.delete();
+    }
     
     if(ENTER.is(e)) {
       // adopt indentation from previous line
@@ -559,9 +572,9 @@ public class BaseXText extends BaseXPanel {
       int s = 0, t = 0;
       for(int p = text.pos() - 1; p >= 0; p--) {
         final byte b = text.text[p];
-        if(b == 0x0a) {
+        if(b == '\n') {
           break;
-        } else if(b == 0x09) {
+        } else if(b == '\t') {
           t++;
         } else if(b == ' ') {
           s++;
@@ -573,7 +586,7 @@ public class BaseXText extends BaseXPanel {
       for(int p = 0; p < t; p++) sb.append('\t');
       for(int p = 0; p < s; p++) sb.append(' ');
       text.add(sb.toString());
-    } else {
+    } else if(!indent) {
       text.add(String.valueOf(e.getKeyChar()));
     }
     text.setCaret();
