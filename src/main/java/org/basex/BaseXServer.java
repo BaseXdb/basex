@@ -69,18 +69,19 @@ public final class BaseXServer extends Main implements Runnable {
     log = new Log(context, quiet);
     stop = stopFile(port);
 
-    // guarantee correct shutdown...
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        log.write(SERVERSTOPPED);
-        log.close();
-        Util.outln(SERVERSTOPPED);
-      }
-    });
-
     try {
       server = new ServerSocket(port);
+
+      // guarantee correct shutdown...
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+        @Override
+        public void run() {
+          log.write(SERVERSTOPPED);
+          log.close();
+          Util.outln(SERVERSTOPPED);
+        }
+      });
+
       new Thread(this).start();
       do Performance.sleep(100); while(!running);
 

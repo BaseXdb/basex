@@ -369,7 +369,7 @@ public class BaseXText extends BaseXPanel {
       scroll.pos(scroll.pos() - fh);
       return;
     }
-    if(COPY.is(e)) {
+    if(COPY1.is(e) || COPY2.is(e)) {
       copy();
       return;
     }
@@ -388,9 +388,10 @@ public class BaseXText extends BaseXPanel {
       return;
     }
 
-    final boolean marking = e.isShiftDown();
+    final boolean marking = e.isShiftDown() &&
+      !DELNEXT.is(e) && !DELPREV.is(e) &&  !PASTE2.is(e);
     final boolean nomark = text.start() == -1;
-    if(marking && nomark) text.startMark();
+    if(!PASTE2.is(e) && marking && nomark) text.startMark();
     boolean down = true;
     boolean consumed = true;
 
@@ -432,15 +433,15 @@ public class BaseXText extends BaseXPanel {
     }
 
     final byte[] txt = text.text;
-    if(marking && !DELNEXT.is(e) && !DELPREV.is(e)) {
+    if(marking) {
       // refresh scroll position
       text.endMark();
       text.checkMark();
     } else if(undo != null) {
       // edit operations...
-      if(CUT.is(e)) {
+      if(CUT1.is(e) || CUT2.is(e)) {
         cut();
-      } else if(PASTE.is(e)) {
+      } else if(PASTE1.is(e) || PASTE2.is(e)) {
         paste();
       } else if(UNDO.is(e)) {
         undo();

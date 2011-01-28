@@ -26,9 +26,12 @@ public enum BaseXKeys {
   /** Browse forward.    */ GOFORWARD(MAC ? SC : ALT, VK_RIGHT, true),
   /** Browse up.         */ GOUP(MAC ? SC : ALT, VK_UP, true),
   /** Browse home.       */ GOHOME(MAC ? SC : ALT, VK_HOME, true),
-  /** Copy.              */ COPY(SC, VK_C, true),
-  /** Cut.               */ CUT(SC, VK_X, true),
-  /** Paste.             */ PASTE(SC, VK_V, true),
+  /** Copy.              */ COPY1(SC, VK_C, true),
+  /** Copy.              */ COPY2(SC, VK_INSERT, true),
+  /** Cut.               */ CUT1(SC, VK_X, true),
+  /** Cut.               */ CUT2(SHF, VK_DELETE, true),
+  /** Paste.             */ PASTE1(SC, VK_V, true),
+  /** Paste.             */ PASTE2(SHF, VK_INSERT, true),
   /** Undo.              */ UNDO(SC, VK_Z, true),
   /** Redo.              */ REDO(MAC ? SC | SHF : SC, MAC ? VK_Z : VK_Y, true),
 
@@ -48,11 +51,12 @@ public enum BaseXKeys {
   /** Scroll up.         */ SCROLLUP(MAC ? ALT : SC, VK_UP, true),
   /** Scroll down.       */ SCROLLDOWN(MAC ? ALT : SC, VK_DOWN, true),
 
-  /** Delete word backwards. */ DELPREVWORD(MAC ? ALT : SC, VK_BACK_SPACE,
-                                true),
+  /** Delete word backwards.
+                         */ DELPREVWORD(MAC ? ALT : SC, VK_BACK_SPACE, true),
   /** Delete word.       */ DELNEXTWORD(MAC ? ALT : SC, VK_DELETE, true),
-  /** Delete line to begin. */ DELLINESTART(SC | (MAC ? 0 : SHF), VK_BACK_SPACE,
-                                true),
+  /** Delete line to begin.
+                         */ DELLINESTART(SC | (MAC ? 0 : SHF),
+                             VK_BACK_SPACE, true),
   /** Delete line to end.
    *                     */ DELLINEEND(SC | (MAC ? 0 : SHF), VK_DELETE, true),
   /** Delete backwards.  */ DELPREV(VK_BACK_SPACE),
@@ -68,7 +72,7 @@ public enum BaseXKeys {
   /** Execute.           */ EXEC(SC, VK_ENTER, true),
 
   /** Increment size.    */ INCFONT1(SC, VK_PLUS, true),
-  /** Increment size (2nd variant). */ INCFONT2(SC, VK_EQUALS, true),
+  /** Increment size.    */ INCFONT2(SC, VK_EQUALS, true),
   /** Decrease size.     */ DECFONT(SC, VK_MINUS, true),
   /** Standard size.     */ NORMFONT(SC, VK_0, true),
   /** Jump to input bar. */ INPUT1(SC, VK_L, true),
