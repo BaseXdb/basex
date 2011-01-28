@@ -270,9 +270,9 @@ public abstract class Command extends Progress {
     // check concurrency of commands
     boolean ok = false;
     final boolean writing = updating(ctx);
-    ctx.lock.before(writing);
+    ctx.register(writing);
     ok = run(ctx, os);
-    ctx.lock.after(writing);
+    ctx.unregister(writing);
     return ok;
   }
 

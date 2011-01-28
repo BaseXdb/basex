@@ -31,8 +31,9 @@ public final class Lock {
   /**
    * Modifications before executing a command.
    * @param w writing flag
+   * @param ctx database context
    */
-  public void before(final boolean w) {
+  public void register(final boolean w, final Context ctx) {
     if(SKIP) return;
 
     if(w) {
@@ -41,10 +42,10 @@ public final class Lock {
         return;
       }
       // exclusive lock
-      final Resource lx = new Resource(true);
+      final Resource lx = new Resource(false);
       synchronized(lx) {
         waiting.add(lx);
-        while(!lx.valid) {
+        while(lx.locked) {
           try {
             lx.wait();
           } catch(final InterruptedException ex) {
@@ -55,25 +56,26 @@ public final class Lock {
       }
     } else {
       synchronized(this) {
-        if(state != State.WRITE && waiting.size() == 0) {
+        if(state != State.WRITE && waiting.size() == 0 &&
+            activeR < ctx.prop.num(Prop.PARALLEL)) {
           state = State.READ;
           ++activeR;
           return;
         }
       }
       // shared lock
-      final Resource ls = new Resource(false);
+      final Resource ls = new Resource(true);
       synchronized(ls) {
         waiting.add(ls);
-        while(!ls.valid) {
+        while(ls.locked) {
           try {
             ls.wait();
           } catch(final InterruptedException ex) {
             Util.stack(ex);
           }
         }
-        ++activeR;
         state = State.READ;
+        ++activeR;
       }
     }
   }
@@ -82,11 +84,11 @@ public final class Lock {
    * Modifications after executing a command.
    * @param w writing flag
    */
-  public synchronized void after(final boolean w) {
+  public synchronized void unregister(final boolean w) {
     if(SKIP) return;
 
     if(w) {
-      if(waiting.size() > 0 && !waiting.getFirst().writer) {
+      if(waiting.size() > 0 && waiting.getFirst().reader) {
         notifyReaders();
       } else {
         notifyWriter();
@@ -102,14 +104,13 @@ public final class Lock {
    * Notifies all waiting readers.
    */
   private void notifyReaders() {
-    while(waiting.size() > 0) {
-      if(waiting.getFirst().writer) break;
+    do {
       final Resource l = waiting.removeFirst();
       synchronized(l) {
-        l.valid = true;
+        l.locked = false;
         l.notify();
       }
-    }
+    } while(waiting.size() > 0 && waiting.getFirst().reader);
   }
 
   /**
@@ -119,7 +120,7 @@ public final class Lock {
     if(waiting.size() > 0) {
       final Resource l = waiting.removeFirst();
       synchronized(l) {
-        l.valid = true;
+        l.locked = false;
         l.notify();
       }
     } else {
@@ -129,17 +130,17 @@ public final class Lock {
 
   /** Inner class for a locking object. */
   private static class Resource {
-    /** Writer flag. */
-    final boolean writer;
+    /** Reader flag. */
+    final boolean reader;
     /** Flag if lock can start. */
-    boolean valid;
+    boolean locked = true;
 
     /**
      * Standard constructor.
-     * @param w writing flag
+     * @param r reader flag
      */
-    Resource(final boolean w) {
-      writer = w;
+    Resource(final boolean r) {
+      reader = r;
     }
   }
 }

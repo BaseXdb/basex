@@ -110,6 +110,9 @@ public final class Prop extends AProp {
   /** Default XQuery version. */
   public static final Object[] XQUERY3 = { "XQUERY3", true };
 
+  /** Defines the number of parallel processes. */
+  public static final Object[] PARALLEL = { "PARALLEL", Integer.MAX_VALUE };
+
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };
   /** Flag for parsing DTDs in internal parser. */
@@ -153,17 +156,14 @@ public final class Prop extends AProp {
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Language for full-text search index. */
   public static final Object[] LANGUAGE = { "LANGUAGE", ""};
-
-  /**
-   * Flag for full-text scoring algorithm. Scoring mode: 0 = none, 1 = document
-   * nodes, 2 = text nodes.
-   */
+  /** Flag for full-text scoring algorithm.
+      Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] SCORING = { "SCORING", 0 };
   /** Path to full-text stopword list. */
   public static final Object[] STOPWORDS = { "STOPWORDS", "" };
-
   /** Levenshtein default error. */
   public static final Object[] LSERROR = { "LSERROR", 0 };
+
   /** Flag for creating flat MAB2 data. */
   public static final Object[] MAB2FLAT = { "MAB2flat", false };
   /** Maximum number of index occurrences to print. */

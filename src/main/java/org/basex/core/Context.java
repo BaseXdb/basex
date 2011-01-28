@@ -19,8 +19,6 @@ import org.basex.server.Sessions;
 public final class Context {
   /** Client connections. */
   public final Sessions sessions;
-  /** Process locking. */
-  public final Lock lock;
   /** Database pool. */
   public final DataPool datas;
   /** Trigger pool. */
@@ -46,6 +44,9 @@ public final class Context {
   public Nodes copied;
   /** Focused node. */
   public int focused = -1;
+
+  /** Process locking. */
+  private final Lock lock;
 
   /**
    * Constructor.
@@ -171,6 +172,22 @@ public final class Context {
    */
   public boolean pinned(final String db) {
     return datas.pinned(db);
+  }
+
+  /**
+   * Registers a process.
+   * @param w writing flag
+   */
+  public void register(final boolean w) {
+    lock.register(w, this);
+  }
+
+  /**
+   * Unregisters a process.
+   * @param w writing flag
+   */
+  public void unregister(final boolean w) {
+    lock.unregister(w);
   }
 
   /**

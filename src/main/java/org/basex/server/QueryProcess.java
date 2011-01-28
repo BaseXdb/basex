@@ -87,7 +87,7 @@ final class QueryProcess extends Progress {
    */
   void init() throws IOException, QueryException {
     monitored = true;
-    ctx.lock.before(qp.ctx.updating);
+    ctx.register(qp.ctx.updating);
     xml = qp.getSerializer(out);
     iter = qp.iter();
   }
@@ -135,7 +135,7 @@ final class QueryProcess extends Progress {
     if(xml != null && !forced) xml.close();
     qp.stopTimeout();
     qp.close();
-    if(monitored) ctx.lock.after(qp.ctx.updating);
+    if(monitored) ctx.unregister(qp.ctx.updating);
     initInfo();
     closed = true;
   }

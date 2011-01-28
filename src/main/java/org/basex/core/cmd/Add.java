@@ -124,10 +124,10 @@ public final class Add extends ACreate {
     final SAXSource sax = new SAXSource(new InputSource(is));
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
     try {
-      ctx.lock.before(true);
+      ctx.register(true);
       return add(parser, ctx, trg, name, cmd);
     } finally {
-      ctx.lock.after(true);
+      ctx.unregister(true);
     }
   }
 

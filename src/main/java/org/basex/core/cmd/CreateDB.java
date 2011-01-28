@@ -127,13 +127,13 @@ public final class CreateDB extends ACreate {
 
     BaseXException bxex = null;
     final Performance p = new Performance();
-    ctx.lock.before(true);
+    ctx.register(true);
     try {
       ctx.openDB(xml(parser, name, ctx));
     } catch(final IOException ex) {
       bxex = new BaseXException(ex);
     }
-    ctx.lock.after(true);
+    ctx.unregister(true);
     if(bxex != null) throw bxex;
     return Util.info(DBCREATED, name, p);
   }
