@@ -26,15 +26,6 @@ public abstract class Session {
   protected OutputStream out;
 
   /**
-   * Specifies an output stream. The output stream is invalidated if
-   * {@code null} is specified.
-   * @param output client output stream.
-   */
-  public void setOutputStream(final OutputStream output) {
-    out = output;
-  }
-
-  /**
    * Executes a {@link Command} instance.
    * @param command command to be executed
    * @return result
@@ -91,6 +82,15 @@ public abstract class Session {
    */
   public final String info() {
     return info;
+  }
+
+  /**
+   * Specifies an output stream. The output stream is invalidated if
+   * {@code null} is specified.
+   * @param output client output stream.
+   */
+  public void setOutputStream(final OutputStream output) {
+    out = output;
   }
 
   /**

@@ -153,6 +153,7 @@ public class BaseX extends Main {
           } else if(c == 'o') {
             // specify file for result output
             out = new PrintOutput(arg.string());
+            if(session != null) session.setOutputStream(out);
           } else if(c == 'p' && !sa()) {
             // set server port
             context.prop.set(Prop.PORT, arg.num());
