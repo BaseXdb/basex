@@ -124,20 +124,20 @@ public final class FTTokenizer {
 
   /**
    * Checks if the first token contains the second full-text term.
-   * @param tokens cached query tokens
-   * @param lex input text
+   * @param query cached query tokens
+   * @param input input text
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final FTTokens tokens, final FTLexer lex)
+  int contains(final FTTokens query, final FTLexer input)
       throws QueryException {
 
-    lex.init();
-    final FTBitapSearch bs = new FTBitapSearch(lex, tokens, cmp);
+    input.init();
+    final FTBitapSearch bs = new FTBitapSearch(input, query, cmp);
     int c = 0;
     while(bs.hasNext()) {
       final int pos = bs.next();
-      words.add(pos, pos + tokens.tokens() - 1);
+      words.add(pos, pos + query.length() - 1);
       ++c;
     }
 

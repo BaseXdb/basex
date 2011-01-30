@@ -177,10 +177,10 @@ public final class FTWords extends FTExpr {
     first = true;
     final FTLexer intok = ftt.copy(ctx.fttoken);
 
-    // speed up default processing
+    // use shortcut for default processing
     if(fast) {
       final FTTokens qtok = ftt.cache(txt);
-      return ftt.contains(qtok, intok) * qtok.tokens();
+      return ftt.contains(qtok, intok) * qtok.length();
     }
 
     // cache all query tokens (remove duplicates)
@@ -194,8 +194,10 @@ public final class FTWords extends FTExpr {
         break;
       case M_ALLWORDS:
       case M_ANYWORD:
+        final FTLexer l = new FTLexer(intok.ftOpt());
         while((q = nextToken(qu)) != null) {
-          for(final byte[] t : split(q, ' ')) tm.add(t);
+          l.init(q);
+          while(l.hasNext()) tm.add(l.nextToken());
         }
         break;
       case M_PHRASE:
@@ -211,7 +213,7 @@ public final class FTWords extends FTExpr {
       final FTTokens qtok = ftt.cache(tm.key(i));
       final int o = ftt.contains(qtok, intok);
       if(a && o == 0) return 0;
-      num = Math.max(num, o * qtok.tokens());
+      num = Math.max(num, o * qtok.length());
       oc += o;
     }
 

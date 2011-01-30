@@ -43,7 +43,7 @@ public final class FTTokens extends ElementList {
    * Returns the number of tokens of the first entry.
    * @return number of tokens
    */
-  int tokens() {
+  int length() {
     return list[0].size();
   }
 }
