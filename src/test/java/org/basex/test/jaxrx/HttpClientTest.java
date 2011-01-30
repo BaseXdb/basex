@@ -82,7 +82,7 @@ public final class HttpClientTest {
     put.execute(context);
     checkResponse(put, HttpURLConnection.HTTP_CREATED, 1);
   }
-    
+
   /**
    * Test sending of HTTP POST Query requests.
    * @throws Exception exception
@@ -101,7 +101,7 @@ public final class HttpClientTest {
     postQuery.execute(context);
     checkResponse(postQuery, HttpURLConnection.HTTP_OK, 2);
   }
-  
+
   /**
    * Test sending of HTTP POST Add requests.
    * @throws Exception exception
@@ -120,7 +120,7 @@ public final class HttpClientTest {
     postAdd.execute(context);
     checkResponse(postAdd, HttpURLConnection.HTTP_CREATED, 1);
   }
-  
+
   /**
    * Test sending of HTTP GET requests.
    * @throws Exception exception
@@ -150,7 +150,7 @@ public final class HttpClientTest {
     get3.execute(context);
     checkResponse(get3, HttpURLConnection.HTTP_OK, 1);
   }
-  
+
   /**
    * Test sending of HTTP DELETE requests.
    * @throws Exception exception
@@ -174,7 +174,7 @@ public final class HttpClientTest {
     new XQuery("http:send-request(<http:request/>)").execute(context);
   }
    */
-  
+
   /**
    * Checks the response to an HTTP request.
    * @param c command
