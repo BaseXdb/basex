@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 import java.net.HttpURLConnection;
 import org.basex.api.jaxrx.JaxRxServer;
-import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -56,14 +55,11 @@ public final class HttpClientTest {
   }
 
   /**
-   * Test sending of HTTP requests.
-   * @throws BaseXException basex exception
-   * @throws QueryException x
+   * Test sending of HTTP PUT requests.
+   * @throws Exception exception
    */
   @Test
-  public void testSendRequest() throws BaseXException, QueryException {
-
-    // PUT
+  public void testPUT() throws Exception {
     final Command put = new XQuery("http:send-request(" +
         "<http:request method='put' status-only='true'>" +
           "<http:body media-type='text/xml'>" +
@@ -85,7 +81,14 @@ public final class HttpClientTest {
         "</http:request>, 'http://localhost:8984/basex/jax-rx/books')");
     put.execute(context);
     checkResponse(put, HttpURLConnection.HTTP_CREATED, 1);
-
+  }
+    
+  /**
+   * Test sending of HTTP POST Query requests.
+   * @throws Exception exception
+   */
+  @Test
+  public void testPOSTQuery() throws Exception {
     // POST - query
     final Command postQuery = new XQuery("http:send-request(" +
         "<http:request method='post'>" +
@@ -97,7 +100,14 @@ public final class HttpClientTest {
         "</http:request>, 'http://localhost:8984/basex/jax-rx/books')");
     postQuery.execute(context);
     checkResponse(postQuery, HttpURLConnection.HTTP_OK, 2);
-
+  }
+  
+  /**
+   * Test sending of HTTP POST Add requests.
+   * @throws Exception exception
+   */
+  @Test
+  public void testPOSTAdd() throws Exception {
     // POST - add content
     final Command postAdd = new XQuery("http:send-request(" +
         "<http:request method='post' status-only='true'>" +
@@ -109,7 +119,14 @@ public final class HttpClientTest {
         "</http:request>, 'http://localhost:8984/basex/jax-rx/books')");
     postAdd.execute(context);
     checkResponse(postAdd, HttpURLConnection.HTTP_CREATED, 1);
-
+  }
+  
+  /**
+   * Test sending of HTTP GET requests.
+   * @throws Exception exception
+   */
+  @Test
+  public void testPOSTGet() throws Exception {
     // GET1 - just send a GET request
     final Command get1 = new XQuery("http:send-request(" +
         "<http:request method='get' " +
@@ -132,7 +149,14 @@ public final class HttpClientTest {
         "'http://localhost:8984/basex/jax-rx/books')");
     get3.execute(context);
     checkResponse(get3, HttpURLConnection.HTTP_OK, 1);
-
+  }
+  
+  /**
+   * Test sending of HTTP DELETE requests.
+   * @throws Exception exception
+   */
+  @Test
+  public void testPOSTDelete() throws Exception {
     // DELETE
     final Command delete = new XQuery("http:send-request(" +
         "<http:request method='delete' status-only='true'/>, " +
@@ -141,6 +165,16 @@ public final class HttpClientTest {
     checkResponse(delete, HttpURLConnection.HTTP_OK, 1);
   }
 
+  /*
+   * Test sending of HTTP requests.
+   * @throws Exception exception
+  @Test
+  public void sendSimple() throws Exception {
+    // causes a runtime exception
+    new XQuery("http:send-request(<http:request/>)").execute(context);
+  }
+   */
+  
   /**
    * Checks the response to an HTTP request.
    * @param c command
