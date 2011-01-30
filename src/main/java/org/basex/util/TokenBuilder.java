@@ -289,13 +289,15 @@ public final class TokenBuilder {
 
   /**
    * Trims leading and trailing whitespaces.
+   * @return self reference
    */
-  public void trim() {
+  public TokenBuilder trim() {
     while(size > 0 && ws(chars[size - 1])) --size;
     int s = -1;
     while(++s < size && ws(chars[s]));
     if(s != 0 && s != size) Array.move(chars, s, -s, size - s);
     size -= s;
+    return this;
   }
 
   /**

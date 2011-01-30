@@ -43,8 +43,8 @@ public class DialogAdd extends Dialog {
    */
   public DialogAdd(final GUI main) {
     super(main, GUIADD);
-    
-    BaseXBack p = new BaseXBack(new TableLayout(8, 2, 6, 0)).border(8);
+
+    final BaseXBack p = new BaseXBack(new TableLayout(8, 2, 6, 0)).border(8);
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
@@ -59,7 +59,7 @@ public class DialogAdd extends Dialog {
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
     p.add(browse);
-    
+
     p.add(new BaseXLabel(CREATETARGET, true, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());
 
@@ -67,17 +67,17 @@ public class DialogAdd extends Dialog {
     target.addKeyListener(keys);
     p.add(target);
     p.add(new BaseXLabel());
-    
+
     info = new BaseXLabel(" ").border(18, 0, 0, 0);
     p.add(info);
-    
+
     parsing = new DialogParsing(this);
-    
+
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p);
     tabs.addTab(PARSEINFO, parsing);
     set(tabs, BorderLayout.CENTER);
-    
+
     // create buttons
     buttons = okCancel(this);
     set(buttons, BorderLayout.SOUTH);

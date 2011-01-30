@@ -4,6 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
@@ -21,6 +22,8 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenObjMap;
+import org.basex.util.TokenSet;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
 
@@ -45,11 +48,15 @@ public final class FTWords extends FTExpr {
     M_PHRASE
   }
 
+  /** Cache. */
+  final TokenObjMap<ArrayList<byte[][]>> cache =
+    new TokenObjMap<ArrayList<byte[][]>>();
+
   /** Full-text tokenizer. */
   FTTokenizer ftt;
   /** Data reference. */
   Data data;
-  /** Single word. */
+  /** Single string. */
   byte[] txt;
 
   /** All matches. */
@@ -66,7 +73,7 @@ public final class FTWords extends FTExpr {
   /** Token number. */
   private int tokNum;
   /** Standard evaluation. */
-  private boolean simple;
+  private boolean fast;
 
   /**
    * Sequential constructor.
@@ -108,7 +115,10 @@ public final class FTWords extends FTExpr {
       }
       query = query.comp(ctx);
       if(query instanceof Str) txt = ((Str) query).atom();
-      simple = mode == FTMode.M_ANY && txt != null && occ == null;
+
+      // choose fast evaluation for default settings
+      fast = mode == FTMode.M_ANY && txt != null && occ == null;
+
       ftt = new FTTokenizer(this, ctx.ftopt, ctx.context.prop);
     }
     return this;
@@ -123,7 +133,8 @@ public final class FTWords extends FTExpr {
 
     final int c = contains(ctx);
     if(c == 0) all.size = 0;
-    // scoring: pass on number of tokens
+
+    // scoring: include number of tokens for calculations
     return new FTNode(all, c == 0 ? 0 : ctx.score.word(c, ctx.fttoken.count()));
   }
 
@@ -159,93 +170,78 @@ public final class FTWords extends FTExpr {
   /**
    * Evaluates the full-text match.
    * @param ctx query context
-   * @return length value, used for scoring
+   * @return number of tokens, used for scoring
    * @throws QueryException query exception
    */
   private int contains(final QueryContext ctx) throws QueryException {
-    // speed up default case
     first = true;
-    final FTLexer fttoken = ctx.fttoken;
-    if(simple) return ftt.contains(txt, fttoken);
+    final FTLexer intok = ftt.copy(ctx.fttoken);
 
-    // process special cases
-    final Iter iter = ctx.iter(query);
-    int len = 0;
-    int o = 0;
-    byte[] it;
+    // speed up default processing
+    if(fast) {
+      final FTTokens qtok = ftt.cache(txt);
+      return ftt.contains(qtok, intok) * qtok.tokens();
+    }
 
+    // cache all query tokens (remove duplicates)
+    final TokenSet tm = new TokenSet(); 
+    final Iter qu = ctx.iter(query);
+    byte[] q;
     switch(mode) {
       case M_ALL:
-        while((it = nextStr(iter)) != null) {
-          final int oc = ftt.contains(it, fttoken);
-          if(oc == 0) return 0;
-          len += it.length;
-          o += oc;
-        }
+      case M_ANY:
+        while((q = nextToken(qu)) != null) tm.add(q);
         break;
       case M_ALLWORDS:
-        while((it = nextStr(iter)) != null) {
-          for(final byte[] t : split(it, ' ')) {
-            final int oc = ftt.contains(t, fttoken);
-            if(oc == 0) return 0;
-            len += t.length;
-            o += oc;
-          }
-        }
-        break;
-      case M_ANY:
-        while((it = nextStr(iter)) != null) {
-          o += ftt.contains(it, fttoken);
-          len += it.length;
-        }
-        break;
       case M_ANYWORD:
-        while((it = nextStr(iter)) != null) {
-          for(final byte[] t : split(it, ' ')) {
-            o += ftt.contains(t, fttoken);
-            len += t.length;
-          }
+        while((q = nextToken(qu)) != null) {
+          for(final byte[] t : split(q, ' ')) tm.add(t);
         }
         break;
       case M_PHRASE:
         final TokenBuilder tb = new TokenBuilder();
-        while((it = nextStr(iter)) != null) {
-          tb.add(it);
-          tb.add(' ');
-        }
-        o += ftt.contains(tb.finish(), fttoken);
-        len += tb.size();
-        break;
+        while((q = nextToken(qu)) != null) tb.add(q).add(' ');
+        tm.add(tb.trim().finish());
     }
 
+    // find and count all occurrences
+    final boolean a = mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS;
+    int num = 0, oc = 0;
+    for(int i = 1; i <= tm.size(); i++) {
+      final FTTokens qtok = ftt.cache(tm.key(i));
+      final int o = ftt.contains(qtok, intok);
+      if(a && o == 0) return 0;
+      num = Math.max(num, o * qtok.tokens());
+      oc += o;
+    }
+
+    // check if occurrences are in valid range. if yes, return number of tokens 
     final long mn = occ != null ? checkItr(occ[0], ctx) : 1;
     final long mx = occ != null ? checkItr(occ[1], ctx) : Long.MAX_VALUE;
-    if(mn == 0 && o == 0) all = FTNot.not(all);
-    return o < mn || o > mx ? 0 : Math.max(1, len);
+    if(mn == 0 && oc == 0) all = FTNot.not(all);
+    return oc >= mn && oc <= mx ? Math.max(1, num) : 0;
   }
 
+  /**
+   * Returns the next token of the specified iterator, or {@code null}.
+   * @param iter iterator to be checked
+   * @return item
+   * @throws QueryException query exception
+   */
+  private byte[] nextToken(final Iter iter) throws QueryException {
+    final Item it = iter.next();
+    return it == null ? null : checkEStr(it);
+  }
+  
   /**
    * Adds a match.
    * @param s start position
    * @param e end position
    */
   void add(final int s, final int e) {
-    // [CG] XQFT: check if this is needed and correct
     if(!first && (mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS))
       all.and(s, e);
     else all.or(s, e);
-  }
-
-  /**
-   * Checks if the next item is a string. Returns a token representation or an
-   * exception.
-   * @param iter iterator to be checked
-   * @return item
-   * @throws QueryException query exception
-   */
-  private byte[] nextStr(final Iter iter) throws QueryException {
-    final Item it = iter.next();
-    return it == null ? null : checkEStr(it);
   }
 
   @Override

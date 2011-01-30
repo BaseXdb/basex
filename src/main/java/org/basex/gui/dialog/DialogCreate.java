@@ -69,7 +69,7 @@ public final class DialogCreate extends Dialog {
     // create panels
     final BaseXBack p1 = new BaseXBack(new BorderLayout()).border(8);
 
-    BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
+    final BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
@@ -124,7 +124,7 @@ public final class DialogCreate extends Dialog {
 
     ft = new DialogFT(this, true);
     p4.add(ft);
-    
+
     parsing = new DialogParsing(this);
 
     final BaseXTabs tabs = new BaseXTabs(this);

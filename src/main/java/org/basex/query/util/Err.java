@@ -368,7 +368,7 @@ public enum Err {
   VARUNDEF(XPST, 8, "Undefined variable %."),
   /** XPST0008: Parsing exception. */
   TYPEUNDEF(XPST, 8, "Undefined type %."),
-  
+
   /** XPST0017: Parsing Exception. */
   XPARGS(XPST, 17, "Wrong arguments: % expected."),
   /** XPST0017: Parsing exception. */

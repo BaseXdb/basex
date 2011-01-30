@@ -2,9 +2,9 @@ package org.basex.test.util;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import org.basex.query.QueryException;
+import org.basex.query.ft.FTTokens;
 import org.basex.util.TokenList;
 import org.basex.util.ft.FTBitapSearch;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
@@ -36,7 +36,7 @@ public final class FTBitapSearchTest {
     /** Set to search in. */
     public final FTIterator haystack;
     /** Set to search for. */
-    public final ArrayList<byte[][]> needles;
+    public final FTTokens needles;
     /** Indices of expected hits. */
     public final int[] expected;
 
@@ -77,11 +77,11 @@ public final class FTBitapSearchTest {
           return this;
         }
       };
-      needles = new ArrayList<byte[][]>(n.length);
+      needles = new FTTokens();
       for(final String[] s : n) {
         final TokenList needle = new TokenList(s.length);
         for(final String t : s) needle.add(token(t));
-        needles.add(needle.toArray());
+        needles.add(needle);
       }
     }
   }

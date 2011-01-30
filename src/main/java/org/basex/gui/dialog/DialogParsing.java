@@ -27,7 +27,6 @@ import org.basex.util.StringList;
  * @author Christian Gruen
  */
 public class DialogParsing extends BaseXBack {
-  
   /** Parser. */
   private final BaseXCombo parser;
   /** Internal XML parsing. */
@@ -46,7 +45,7 @@ public class DialogParsing extends BaseXBack {
   private final BaseXButton browsec;
   /** Main window reference. */
   private final Dialog dialog;
-  
+
   /**
    * Default constructor.
    * @param d dialog reference
@@ -56,7 +55,7 @@ public class DialogParsing extends BaseXBack {
     final BaseXBack p2 = new BaseXBack(new TableLayout(11, 1)).border(8);
 
     // always use internal/external parser, chop whitespaces, ...?
-    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 6, 0));
 
     final BaseXLabel parse = new BaseXLabel(CREATEFORMAT, true, true);
     final StringList parsers = new StringList();
@@ -77,14 +76,14 @@ public class DialogParsing extends BaseXBack {
     p2.add(intparse);
     p2.add(new BaseXLabel(INTPARSEINFO, true, false));
 
-    entities = new BaseXCheckBox(CREATEENTITIES, 
+    entities = new BaseXCheckBox(CREATEENTITIES,
         dialog.gui.context.prop.is(Prop.ENTITY), dialog);
     p2.add(entities);
-    dtd = new BaseXCheckBox(CREATEDTD, 
+    dtd = new BaseXCheckBox(CREATEDTD,
         dialog.gui.context.prop.is(Prop.DTD), 12, dialog);
     p2.add(dtd);
 
-    chop = new BaseXCheckBox(CREATECHOP, 
+    chop = new BaseXCheckBox(CREATECHOP,
         dialog.gui.context.prop.is(Prop.CHOP), 0, dialog);
     p2.add(chop);
     p2.add(new BaseXLabel(CHOPPINGINFO, false, false).border(0, 0, 8, 0));
@@ -119,7 +118,7 @@ public class DialogParsing extends BaseXBack {
     }
     add(p2);
   }
-  
+
   /**
    * Opens a file dialog to choose an XML catalog or directory.
    */
@@ -132,7 +131,7 @@ public class DialogParsing extends BaseXBack {
     final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
     if(file != null) cfile.setText(file.path());
   }
-  
+
   /**
    * Reacts on user input.
    */
@@ -149,7 +148,7 @@ public class DialogParsing extends BaseXBack {
     browsec.setEnabled(cfile.isEnabled());
     chop.setEnabled(xml);
   }
-  
+
   /**
    * Closes the tab.
    */

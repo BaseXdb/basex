@@ -321,7 +321,7 @@ public final class BaseXTextTokens {
     text = tb.finish();
     size = tb.size();
   }
-  
+
   /**
    * Deletes the current character.
    * Assumes that the current position allows a deletion.

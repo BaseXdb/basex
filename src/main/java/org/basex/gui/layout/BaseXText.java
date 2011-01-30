@@ -556,8 +556,8 @@ public class BaseXText extends BaseXPanel {
     if(text.start() != -1) {
       // count number of lines to indent
       if(TAB.is(e)) {
-        int s = Math.min(text.pos(), text.start());
-        int l = Math.max(text.pos(), text.start()) - 1;
+        final int s = Math.min(text.pos(), text.start());
+        final int l = Math.max(text.pos(), text.start()) - 1;
         for(int p = s; p <= l && p < text.size(); p++) {
           indent |= text.text[p] == '\n';
         }
@@ -565,7 +565,7 @@ public class BaseXText extends BaseXPanel {
       }
       if(!indent) text.delete();
     }
-    
+
     if(ENTER.is(e)) {
       // adopt indentation from previous line
       final StringBuilder sb = new StringBuilder().append(e.getKeyChar());

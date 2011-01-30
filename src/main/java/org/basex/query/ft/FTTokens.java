@@ -1,0 +1,49 @@
+package org.basex.query.ft;
+
+import java.util.Arrays;
+import org.basex.util.ElementList;
+import org.basex.util.TokenList;
+
+/**
+ * This is a container for full-text tokens.
+ *
+ * @author BaseX Team 2005-11, ISC License
+ * @author Christian Gruen
+ */
+public final class FTTokens extends ElementList {
+  /** Element container. */
+  protected TokenList[] list;
+
+  /**
+   * Constructor.
+   */
+  public FTTokens() {
+    list = new TokenList[1];
+  }
+
+  /**
+   * Adds an element.
+   * @param e element to be added
+   */
+  public void add(final TokenList e) {
+    if(size == list.length) list = Arrays.copyOf(list, newSize());
+    list[size++] = e;
+  }
+
+  /**
+   * Returns the element at the specified index.
+   * @param i index
+   * @return element
+   */
+  public TokenList get(final int i) {
+    return list[i];
+  }
+
+  /**
+   * Returns the number of tokens of the first entry.
+   * @return number of tokens
+   */
+  int tokens() {
+    return list[0].size();
+  }
+}

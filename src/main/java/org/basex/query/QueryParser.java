@@ -1064,7 +1064,7 @@ public class QueryParser extends InputParser {
 
     final int p = qp;
     // use "=>" as shortcut for full-text expressions
-    if(consume('=') && consume('>')) {
+    if(consume('=') && consume('>') || consume('<') && consume('-')) {
       skipWS();
     } else if(!consumeWS(CONTAINS) || !consumeWS(TEXT)) {
       qp = p;
@@ -1303,8 +1303,7 @@ public class QueryParser extends InputParser {
         tok.add(consume());
         c = curr();
       }
-      tok.trim();
-      pragmas = add(pragmas, new Pragma(name, tok.finish(), input()));
+      pragmas = add(pragmas, new Pragma(name, tok.trim().finish(), input()));
       qp += 2;
     }
     return pragmas;
@@ -1488,8 +1487,7 @@ public class QueryParser extends InputParser {
             tok.add(consume());
           }
           skipWS();
-          tok.trim();
-          return tok.size() == 0 ? Test.get(type) :
+          return tok.trim().size() == 0 ? Test.get(type) :
             kindTest(type, tok.finish());
         }
       } else {
