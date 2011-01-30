@@ -30,19 +30,23 @@ public final class CElem extends CFrag {
   private final Atts nsp;
   /** Tag name. */
   private Expr tag;
+  /** Computed constructor. */
+  private final boolean comp;
 
   /**
    * Constructor.
    * @param ii input info
    * @param t tag tag
+   * @param c computed constructor
    * @param cont element content
    * @param ns namespaces
    */
   public CElem(final InputInfo ii, final Expr t, final Atts ns,
-      final Expr... cont) {
+      final boolean c, final Expr... cont) {
     super(ii, cont);
     tag = t;
     nsp = ns;
+    comp = c;
   }
 
   @Override
@@ -111,7 +115,7 @@ public final class CElem extends CFrag {
 
     final Constr c = new Constr(ctx, expr);
     if(c.errAtt) NOATTALL.thrw(input);
-    if(c.duplAtt != null) ATTDUPL.thrw(input, c.duplAtt);
+    if(c.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(input, c.duplAtt);
 
     final FElem node = new FElem(tname, c.children, c.ats, c.base, nsc);
     for(int n = 0; n < c.children.size(); ++n) c.children.get(n).parent(node);

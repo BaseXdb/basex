@@ -50,7 +50,7 @@ public final class Rename extends Update {
 
     CFrag ex = null;
     if(i.type == Type.ELM) {
-      ex = new CElem(input, expr[1], new Atts());
+      ex = new CElem(input, expr[1], new Atts(), true);
     } else if(i.type == Type.ATT) {
       ex = new CAttr(input, false, expr[1]);
     } else if(i.type == Type.PI) {

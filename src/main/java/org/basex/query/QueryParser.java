@@ -238,7 +238,7 @@ public class QueryParser extends InputParser {
       // actual encoding is ignored, as input comes in as string
       boolean v = true;
       for(final byte e : enc) v &= ftChar(e) || e == '-';
-      if(!v) error(XQUERYENC2, enc);
+      if(!v || enc.length == 0) error(XQUERYENC2, enc);
     }
     skipWS();
     check(';');
@@ -386,8 +386,9 @@ public class QueryParser extends InputParser {
    */
   private void revalidationDecl() throws QueryException {
     if(declReval) error(DUPLREVAL);
-    declReval = consumeWS2(STRICT) || consumeWS2(LAX) || consumeWS2(SKIP);
-    error(NOREVAL);
+    if(consumeWS2(STRICT) || consumeWS2(LAX)) error(NOREVAL);
+    check(SKIP);
+    declReval = true;
   }
 
   /**
@@ -631,11 +632,11 @@ public class QueryParser extends InputParser {
       }
       // bind default value
       if(ctx.xquery3 && consumeWS(ASSIGN)) {
-        v.bind(check(single(), VARMISSING), ctx);
+        v.bind(check(single(), NOVARDECL), ctx);
       }
     } else {
       check(ASSIGN);
-      v.bind(check(single(), VARMISSING), ctx);
+      v.bind(check(single(), NOVARDECL), ctx);
     }
 
     // bind variable if not done yet
@@ -663,7 +664,6 @@ public class QueryParser extends InputParser {
     skipWS();
     final QNm name = new QNm(qName(FUNCNAME));
     name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
-    if(Type.find(name, false) != null) error(FUNCRES, name);
     if(module != null && !name.uri().eq(module.uri())) error(MODNS, name);
 
     check(PAR1);
@@ -833,7 +833,7 @@ public class QueryParser extends InputParser {
             new Var(input(), varName(), SeqType.DBL) : null;
 
         check(fr ? IN : ASSIGN);
-        final Expr e = check(single(), VARMISSING);
+        final Expr e = check(single(), NOVARDECL);
         ctx.vars.add(var);
 
         if(fl == null) fl = new ForLet[1];
@@ -1609,7 +1609,7 @@ public class QueryParser extends InputParser {
     if(letter(curr())) return checkDbl();
     if(!consume('.')) {
       final long l = toLong(tok.finish());
-      if(l == Long.MIN_VALUE) error(BOUNDS, tok);
+      if(l == Long.MIN_VALUE) error(RANGE, tok);
       return Itr.get(l);
     }
     tok.add('.');
@@ -1801,7 +1801,7 @@ public class QueryParser extends InputParser {
     }
 
     ctx.ns.size(s);
-    return new CElem(input(), tag, ns, cont);
+    return new CElem(input(), tag, ns, false, cont);
   }
 
   /**
@@ -1995,7 +1995,7 @@ public class QueryParser extends InputParser {
     final Expr e = expr();
     check(BRACE2);
     return new CElem(input(), name, new Atts(),
-        e == null ? new Expr[0] : new Expr[] { e });
+        true, e == null ? new Expr[0] : new Expr[] { e });
   }
 
   /**

@@ -44,7 +44,7 @@ public final class ReplacePrimitive extends NodeCopy {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPL.thrw(input, node.qname());
+    UPMULTREPL.thrw(input, node);
   }
 
   @Override

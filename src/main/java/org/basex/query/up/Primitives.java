@@ -68,7 +68,7 @@ abstract class Primitives {
         // still available after the execution of updates. that includes parent
         // nodes
         if(p.type() == PUT && parentDeleted(nodes.get(i))) {
-          UPFOEMPT.thrw(p.input, p);
+          UPFOTYPE.thrw(p.input, p);
         }
       }
     }

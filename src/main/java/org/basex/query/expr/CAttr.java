@@ -64,7 +64,9 @@ public final class CAttr extends CFrag {
     if(comp) {
       final byte[] uri = name.uri().atom();
       if(eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
-          || eq(pre, XML) ^ eq(uri, XMLURI)) CAINS.thrw(input, pre, uri);
+          || eq(pre, XML) ^ eq(uri, XMLURI)) {
+        CAINS.thrw(input, ln, uri);
+      }
 
       if(eq(pre, EMPTY) && !eq(uri, EMPTY)) {
         // create new standard namespace to cover most frequent cases

@@ -136,21 +136,6 @@ public final class HttpClient {
 
   /**
    * Constructor.
-   * @param request XQuery request element
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  public HttpClient(final Nod request, final InputInfo ii)
-      throws QueryException {
-    info = ii;
-    reqAttrs = new TokenMap();
-    headers = new TokenMap();
-    readRequestAttributes(request);
-    readRequestChildren(request, ii);
-  }
-
-  /**
-   * Constructor.
    * @param request request element
    * @param href HTTP uri
    * @param ii input info
@@ -158,8 +143,13 @@ public final class HttpClient {
    */
   public HttpClient(final Nod request, final byte[] href, final InputInfo ii)
       throws QueryException {
-    this(request, ii);
-    reqAttrs.add(HREF, href);
+
+    info = ii;
+    reqAttrs = new TokenMap();
+    headers = new TokenMap();
+    readRequestAttributes(request);
+    readRequestChildren(request, ii);
+    if(href != null) reqAttrs.add(HREF, href);
   }
 
   /**
@@ -179,9 +169,7 @@ public final class HttpClient {
     if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
       final byte[] usrname = reqAttrs.get(USRNAME);
       final byte[] passwd = reqAttrs.get(PASSWD);
-
-      if(usrname == null && passwd != null
-          || usrname != null && passwd == null) CREDSERR.thrw(info);
+      if(usrname == null ^ passwd != null) CREDSERR.thrw(info);
     }
   }
 
@@ -231,8 +219,9 @@ public final class HttpClient {
    * @throws QueryException query exception
    */
   public Iter sendHttpRequest(final QueryContext ctx) throws QueryException {
+    final String adr = string(reqAttrs.get(HREF));
     try {
-      final URL url = new URL(string(reqAttrs.get(HREF)));
+      final URL url = new URL(adr);
       final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
       try {
@@ -245,9 +234,9 @@ public final class HttpClient {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      URLINV.thrw(info, ex);
+      URLINV.thrw(info, adr);
     } catch(final ProtocolException ex) {
-      PROTINV.thrw(info, ex);
+      PROTINV.thrw(info);
     } catch(final IOException ex) {
       HTTPERR.thrw(info, ex);
     }

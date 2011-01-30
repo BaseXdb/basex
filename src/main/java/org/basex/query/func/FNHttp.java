@@ -35,10 +35,7 @@ public final class FNHttp extends Fun {
     final byte[] href = expr.length == 2 ? checkEStr(expr[1].item(ctx, input))
         : null;
 
-    final HttpClient httpRequest = href == null ? new HttpClient(request, input)
-        : new HttpClient(request, href, input);
-
     // Send the HTTP request
-    return httpRequest.sendHttpRequest(ctx);
+    return new HttpClient(request, href, input).sendHttpRequest(ctx);
   }
 }
