@@ -1,8 +1,6 @@
 package org.basex.core;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.basex.util.Util;
 
@@ -17,8 +15,7 @@ public final class Lock {
   /** Flag for skipping all locking tests. */
   private static final boolean SKIP = false;
   /** List of waiting processes for writers or reading groups. */
-  private final List<Resource> list =
-    Collections.synchronizedList(new ArrayList<Resource>());
+  private final ArrayList<Resource> list = new ArrayList<Resource>();
   /** Context. */
   private Context ctx;
 
