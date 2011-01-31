@@ -115,10 +115,12 @@ public final class DataPool {
    * @return number of references
    */
   public int pins(final String db) {
-    for(final PData d : list) {
-      if(d.data.meta.name.equals(db)) return d.pins;
+    synchronized(list) {
+      for(final PData d : list) {
+        if(d.data.meta.name.equals(db)) return d.pins;
+      }
+      return 0;
     }
-    return 0;
   }
 
   /**

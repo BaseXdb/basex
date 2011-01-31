@@ -1,7 +1,6 @@
 package org.basex.test.server;
 
 import static org.junit.Assert.*;
-import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
@@ -12,7 +11,6 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
-import org.basex.util.Performance;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,7 +29,7 @@ public final class SemaphoreTest {
   /** Test file. */
   private static final String FILE = "etc/xml/factbook.zip";
   /** Test queries. */
-  final String [] q = {
+  static final String [] QUERIES = {
       "xquery for $n in (doc('factbook')//province)[position() < 100] " +
       "       return insert node <test/> into $n",
       "xquery for $n in 1 to 100000 where $n = 0 return $n"
@@ -46,11 +44,13 @@ public final class SemaphoreTest {
   /** Socket reference. */
   static Session sess;
 
-  /** Starts the server. */
+  /** Starts the server. 
+   * @throws IOException exception
+   */
   @BeforeClass
-  public static void start() {
+  public static void start() throws IOException {
     server = new BaseXServer("-z");
-    sess = createSession();
+    sess = newSession();
   }
 
   /**
@@ -69,55 +69,31 @@ public final class SemaphoreTest {
   /**
    * Runs a test for concurrent database creations.
    * @throws BaseXException database exception
+   * @throws IOException exception
    */
   @Test
-  public void createTest() throws BaseXException {
+  public void createTest() throws BaseXException, IOException {
     // drops database for clean test
     sess.execute(new DropDB(NAME));
     // create database for clean test
     sess.execute(new CreateDB(NAME, FILE));
     for(int i = 0; i < TESTS; ++i) {
-      sessions.add(createSession());
+      sessions.add(newSession());
     }
   }
 
   /** Number of done tests. */
   static int tdone;
 
-  /** Efficiency test. */
+  /** Efficiency test. 
+   * @throws InterruptedException exception*/
   @Test
-  public void runClients() {
-    for(int n = 0; n < TESTS; ++n) {
-      final int j = n;
-      Performance.sleep(50 + rand.nextInt(200));
-      new Thread() {
-        @Override
-        public void run() {
-          try {
-            final int t = rand.nextInt(2);
-            sessions.get(j).execute(q[t]);
-            synchronized(this) { ++tdone; }
-          } catch(final BaseXException ex) {
-            fail(ex.toString());
-          }
-        }
-      }.start();
-    }
-    // wait until all test have been finished
-    while(tdone < TESTS) Performance.sleep(100);
-  }
-
-  /**
-   * Creates a client session.
-   * @return client session
-   */
-  static ClientSession createSession() {
-    try {
-      return new ClientSession(server.context, ADMIN, ADMIN);
-    } catch(final IOException ex) {
-      fail(ex.toString());
-    }
-    return null;
+  public void runClients() throws InterruptedException {
+    
+    final Client[] cl = new Client[TESTS];
+    for(int i = 0; i < TESTS; ++i) cl[i] = new Client();
+    for(final Client c : cl) c.start();
+    for(final Client c : cl) c.join();
   }
 
   /**
@@ -132,6 +108,42 @@ public final class SemaphoreTest {
     } catch(final BaseXException ex) {
       fail(ex.toString());
       return null;
+    }
+  }
+  
+  /**
+   * Returns a session instance.
+   * @return session
+   * @throws IOException exception
+   */
+  static ClientSession newSession() throws IOException {
+    return new ClientSession("localhost", 1984, "admin", "admin");
+  }
+
+  /** Single client. */
+  static class Client extends Thread {
+    /** Client session. */
+    private ClientSession session;
+
+    /**
+     * Default constructor.
+     */
+    public Client() {
+      try {
+        session = newSession();
+      } catch(IOException ex) {
+        ex.printStackTrace();
+      }
+    }
+
+    @Override
+    public void run() {
+      try {
+        final int t = rand.nextInt(2);
+        session.execute(QUERIES[t]);
+      } catch(final BaseXException ex) {
+        fail(ex.toString());
+      }
     }
   }
 }
