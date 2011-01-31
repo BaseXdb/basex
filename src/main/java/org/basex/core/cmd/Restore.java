@@ -8,8 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.basex.core.Command;
@@ -27,6 +25,10 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class Restore extends Command {
+  /** Date pattern. */
+  private static final String PATTERN =
+    "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
+
   /** Counter for outstanding files. */
   private int of;
   /** Counter of total files. */
@@ -45,16 +47,15 @@ public final class Restore extends Command {
     String db = args[0];
     if(!validName(db)) return error(NAMEINVALID, db);
     
-    String tmp = prop.get(Prop.DBPATH) + Prop.SEP + db + IO.ZIPSUFFIX;
-    File file = new File(tmp);
+    // find backup file with or without date suffix
+    File file = new File(prop.get(Prop.DBPATH) + Prop.SEP + db + IO.ZIPSUFFIX);
     if(!file.exists()) {
       final StringList list = list(db, context);
-      if(list.size() == 0) return error(DBBACKNF, db);
-      file = new File(list.get(0));
-      if(!file.exists()) return error(DBBACKNF, db);
+      if(list.size() != 0) file = new File(list.get(0));
     } else {
-      db = db.substring(0, db.length() - 20);
+      db = db.replace(PATTERN + '$', "");
     }
+    if(!file.exists()) return error(DBBACKNF, db);
 
     // close database if it's currently opened and not opened by others
     final boolean closed = close(db);
@@ -114,19 +115,13 @@ public final class Restore extends Command {
    * @return available backups
    */
   public static StringList list(final String db, final Context ctx) {
-    // create database list
     final StringList list = new StringList();
 
     final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return list;
-    final String pre = db + "-";
-    Pattern p = Pattern.compile(pre + "\\d{4}.*");
     
     for(final IO f : dir.children()) {
-      final String n = f.name();
-      Matcher m = p.matcher(n);
-      if(n.startsWith(pre) && m.matches() && 
-          n.endsWith(IO.ZIPSUFFIX)) list.add(f.path());
+      if(f.name().matches(db + PATTERN + IO.ZIPSUFFIX)) list.add(f.path());
     }
     list.sort(false, false);
     return list;

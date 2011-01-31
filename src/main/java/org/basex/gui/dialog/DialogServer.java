@@ -429,7 +429,7 @@ public final class DialogServer extends Dialog {
     if(files != null) {
       for(final String s : files) if(s.endsWith(".log")) sl.add(s);
     }
-    sl.sort(true, false);
+    sl.sort(false, false);
     for(final String s : sl) logc.addItem(s);
     action(refreshLog);
   }
