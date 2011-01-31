@@ -2,7 +2,6 @@ package org.basex.test.server;
 
 import static org.junit.Assert.*;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.Random;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
@@ -36,8 +35,6 @@ public final class SemaphoreTest {
   };
   /** Number of performance tests. */
   private static final int TESTS = 5;
-  /** List to administer the clients. */
-  static LinkedList<ClientSession> sessions = new LinkedList<ClientSession>();
 
   /** Server reference. */
   static BaseXServer server;
@@ -59,7 +56,6 @@ public final class SemaphoreTest {
    */
   @AfterClass
   public static void stop() throws Exception {
-    for(final ClientSession s : sessions) s.close();
     sess.execute(new DropDB(NAME));
     sess.close();
     // stop server instance
@@ -69,27 +65,23 @@ public final class SemaphoreTest {
   /**
    * Runs a test for concurrent database creations.
    * @throws BaseXException database exception
-   * @throws IOException exception
    */
   @Test
-  public void createTest() throws BaseXException, IOException {
+  public void createTest() throws BaseXException {
     // drops database for clean test
     sess.execute(new DropDB(NAME));
     // create database for clean test
     sess.execute(new CreateDB(NAME, FILE));
-    for(int i = 0; i < TESTS; ++i) {
-      sessions.add(newSession());
-    }
   }
 
   /** Number of done tests. */
   static int tdone;
 
   /** Efficiency test. 
-   * @throws InterruptedException exception*/
+   * @throws InterruptedException exception
+   */
   @Test
   public void runClients() throws InterruptedException {
-    
     final Client[] cl = new Client[TESTS];
     for(int i = 0; i < TESTS; ++i) cl[i] = new Client();
     for(final Client c : cl) c.start();
