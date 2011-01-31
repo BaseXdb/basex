@@ -266,7 +266,7 @@ final class FNStr extends Fun {
 
       try {
         form = Normalizer.Form.valueOf(string(n));
-      } catch(final IllegalArgumentException e) {
+      } catch(final IllegalArgumentException ex) {
         NORMUNI.thrw(input, n);
       }
     }

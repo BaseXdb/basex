@@ -1,7 +1,8 @@
 package org.basex.core;
 
 import java.util.ArrayList;
-
+import java.util.Collections;
+import java.util.List;
 import org.basex.util.Util;
 
 /**
@@ -15,9 +16,8 @@ public final class Lock {
   /** Flag for skipping all locking tests. */
   private static final boolean SKIP = false;
   /** List of waiting processes for writers or reading groups. */
-  private final ArrayList<Resource> list = new ArrayList<Resource>();
-  /** Context. */
-  private Context ctx;
+  private final List<Resource> list =
+    Collections.synchronizedList(new ArrayList<Resource>());
 
   /** States of locking. */
   private static enum State {
@@ -34,11 +34,10 @@ public final class Lock {
   /**
    * Modifications before executing a command.
    * @param w writing flag
-   * @param c database context
+   * @param ctx database context
    */
-  public void register(final boolean w, final Context c) {
+  public void register(final boolean w, final Context ctx) {
     if(SKIP) return;
-    this.ctx = c;
     if(w) {
       if(state == State.IDLE) {
         state = State.WRITE;
@@ -86,13 +85,14 @@ public final class Lock {
   /**
    * Modifications after executing a command.
    * @param w writing flag
+   * @param ctx database context
    */
-  public synchronized void unregister(final boolean w) {
+  public synchronized void unregister(final boolean w, final Context ctx) {
     if(SKIP) return;
 
     if(w) {
       if(list.size() > 0 && list.get(0).reader) {
-        notifyReaders();
+        notifyReaders(ctx);
       } else {
         notifyWriter();
       }
@@ -105,8 +105,10 @@ public final class Lock {
 
   /**
    * Notifies all waiting readers.
+   * @param ctx database context
    */
-  private void notifyReaders() {
+  private void notifyReaders(final Context ctx) {
+    final int p = ctx.prop.num(Prop.PARALLEL);
     int c = 1;
     do {
       c++;
@@ -115,8 +117,7 @@ public final class Lock {
         l.locked = false;
         l.notify();
       }
-    } while(list.size() > 0 && list.get(0).reader 
-        && c < ctx.prop.num(Prop.PARALLEL));
+    } while(list.size() > 0 && list.get(0).reader && c < p);
   }
 
   /**

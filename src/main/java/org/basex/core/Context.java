@@ -187,7 +187,7 @@ public final class Context {
    * @param w writing flag
    */
   public void unregister(final boolean w) {
-    lock.unregister(w);
+    lock.unregister(w, this);
   }
 
   /**

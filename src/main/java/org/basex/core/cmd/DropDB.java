@@ -38,6 +38,7 @@ public final class DropDB extends Command {
 
     // check if database is still pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
+
     // try to drop database
     return drop(db, prop) ? info(DBDROPPED, db) : error(DBDROPERROR);
   }

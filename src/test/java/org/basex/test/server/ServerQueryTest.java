@@ -106,7 +106,7 @@ public final class ServerQueryTest {
     try {
       cs.execute("xquery (");
       fail("Error expected.");
-    } catch(final BaseXException e) {
+    } catch(final BaseXException ex) {
     }
   }
 

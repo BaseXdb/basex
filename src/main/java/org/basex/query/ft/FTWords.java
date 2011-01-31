@@ -184,7 +184,7 @@ public final class FTWords extends FTExpr {
     }
 
     // cache all query tokens (remove duplicates)
-    final TokenSet tm = new TokenSet(); 
+    final TokenSet tm = new TokenSet();
     final Iter qu = ctx.iter(query);
     byte[] q;
     switch(mode) {
@@ -217,7 +217,7 @@ public final class FTWords extends FTExpr {
       oc += o;
     }
 
-    // check if occurrences are in valid range. if yes, return number of tokens 
+    // check if occurrences are in valid range. if yes, return number of tokens
     final long mn = occ != null ? checkItr(occ[0], ctx) : 1;
     final long mx = occ != null ? checkItr(occ[1], ctx) : Long.MAX_VALUE;
     if(mn == 0 && oc == 0) all = FTNot.not(all);
@@ -234,7 +234,7 @@ public final class FTWords extends FTExpr {
     final Item it = iter.next();
     return it == null ? null : checkEStr(it);
   }
-  
+
   /**
    * Adds a match.
    * @param s start position

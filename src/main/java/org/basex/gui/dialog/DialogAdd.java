@@ -1,11 +1,9 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import org.basex.core.cmd.Add;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;

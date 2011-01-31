@@ -169,8 +169,8 @@ public final class FTBitapSearchTest {
           fail("Test " + i + ": expected " + TESTS[i].expected.length +
               " hits, got more!");
       }
-    } catch(final QueryException e) {
-      fail(e.getMessage());
+    } catch(final QueryException ex) {
+      fail(ex.getMessage());
     }
   }
 }

@@ -83,7 +83,7 @@ public final class Backup extends Command {
       }
       zos.close();
       return true;
-    } catch(final IOException e) {
+    } catch(final IOException ex) {
       return false;
     }
   }

@@ -285,8 +285,6 @@ public final class Token {
    */
   public static int cp(final String string, final int pos) {
     return pos >= 0 && pos < string.length() ? string.charAt(pos) : 0;
-    /*try { return string.codePointAt(pos);
-    } catch(final IndexOutOfBoundsException e) { return 0; }*/
   }
 
   /**

@@ -86,7 +86,7 @@ public final class FTTokenizer {
     to.sd = opt.sd;
     return new FTLexer(to).init(lex.text());
   }
-  
+
   /**
    * Returns cached query tokens.
    * @param query query token

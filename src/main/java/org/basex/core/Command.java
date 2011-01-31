@@ -56,7 +56,7 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Executes the command and serializes textual results to the specified output
+   * Executes the command and prints the result to the specified output
    * stream. If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
    * @param os output stream reference
@@ -238,7 +238,7 @@ public abstract class Command extends Progress {
    */
   protected final boolean close(final String db) {
     final boolean close = context.data != null &&
-    db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
+      db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
     if(close) new Close().run(context);
     return close;
   }

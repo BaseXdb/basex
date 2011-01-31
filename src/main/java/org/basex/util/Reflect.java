@@ -51,7 +51,7 @@ public final class Reflect {
     try {
       try {
         return clazz.getMethod(name, types);
-      } catch(final Exception e) {
+      } catch(final Exception ex) {
         final Method m = clazz.getDeclaredMethod(name, types);
         m.setAccessible(true);
         return m;
@@ -73,7 +73,7 @@ public final class Reflect {
     try {
       try {
         return clazz.getConstructor(types);
-      } catch(final Exception e) {
+      } catch(final Exception ex) {
         final Constructor<?> m = clazz.getDeclaredConstructor(types);
         m.setAccessible(true);
         return m;

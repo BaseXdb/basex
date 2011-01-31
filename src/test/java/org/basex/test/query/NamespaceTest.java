@@ -122,12 +122,12 @@ public final class NamespaceTest {
           "    Pre[4] xmlns=\"D\" \n" +
           "    Pre[6] xmlns=\"F\" ",
           context.data.ns.toString());
-    } catch (final Exception e) {
-      fail(e.getMessage());
+    } catch (final Exception ex) {
+      fail(ex.getMessage());
     } finally {
       try {
         new Close().execute(context);
-      } catch(final BaseXException e) { }
+      } catch(final BaseXException ex) { }
     }
   }
 
@@ -146,12 +146,12 @@ public final class NamespaceTest {
           "      Pre[5] xmlns=\"G\" \n" +
           "    Pre[7] xmlns=\"F\" ",
           context.data.ns.toString());
-    } catch (final Exception e) {
-      fail(e.getMessage());
+    } catch (final Exception ex) {
+      fail(ex.getMessage());
     } finally {
       try {
         new Close().execute(context);
-      } catch(final BaseXException e) { }
+      } catch(final BaseXException ex) { }
     }
   }
 

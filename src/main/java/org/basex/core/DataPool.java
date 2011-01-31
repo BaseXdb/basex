@@ -22,7 +22,7 @@ public final class DataPool {
 
   /**
    * Pins and returns an existing data reference for the specified database, or
-   * returns null.
+   * returns {@code null}.
    * @param db name of the database
    * @return data reference
    */
@@ -127,8 +127,7 @@ public final class DataPool {
    * @author BaseX Team 2005-11, ISC License
    * @author Andreas Weiler
    */
-  private final class PData {
-
+  private static final class PData {
     /** Number of current database users. */
     int pins;
     /** Data reference. */
