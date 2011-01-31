@@ -1,6 +1,9 @@
 package org.basex.core;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.basex.util.Util;
 
 /**
@@ -14,7 +17,10 @@ public final class Lock {
   /** Flag for skipping all locking tests. */
   private static final boolean SKIP = false;
   /** List of waiting processes for writers or reading groups. */
-  private final LinkedList<Resource> waiting = new LinkedList<Resource>();
+  private final List<Resource> list =
+    Collections.synchronizedList(new ArrayList<Resource>());
+  /** Context. */
+  private Context ctx;
 
   /** States of locking. */
   private static enum State {
@@ -31,11 +37,11 @@ public final class Lock {
   /**
    * Modifications before executing a command.
    * @param w writing flag
-   * @param ctx database context
+   * @param c database context
    */
-  public void register(final boolean w, final Context ctx) {
+  public void register(final boolean w, final Context c) {
     if(SKIP) return;
-
+    this.ctx = c;
     if(w) {
       if(state == State.IDLE) {
         state = State.WRITE;
@@ -44,7 +50,7 @@ public final class Lock {
       // exclusive lock
       final Resource lx = new Resource(false);
       synchronized(lx) {
-        waiting.add(lx);
+        list.add(lx);
         while(lx.locked) {
           try {
             lx.wait();
@@ -56,7 +62,7 @@ public final class Lock {
       }
     } else {
       synchronized(this) {
-        if(state != State.WRITE && waiting.size() == 0 &&
+        if(state != State.WRITE && list.size() == 0 &&
             activeR < ctx.prop.num(Prop.PARALLEL)) {
           state = State.READ;
           ++activeR;
@@ -66,7 +72,7 @@ public final class Lock {
       // shared lock
       final Resource ls = new Resource(true);
       synchronized(ls) {
-        waiting.add(ls);
+        list.add(ls);
         while(ls.locked) {
           try {
             ls.wait();
@@ -88,7 +94,7 @@ public final class Lock {
     if(SKIP) return;
 
     if(w) {
-      if(waiting.size() > 0 && waiting.getFirst().reader) {
+      if(list.size() > 0 && list.get(0).reader) {
         notifyReaders();
       } else {
         notifyWriter();
@@ -104,21 +110,24 @@ public final class Lock {
    * Notifies all waiting readers.
    */
   private void notifyReaders() {
+    int c = 1;
     do {
-      final Resource l = waiting.removeFirst();
+      c++;
+      final Resource l = list.remove(0);
       synchronized(l) {
         l.locked = false;
         l.notify();
       }
-    } while(waiting.size() > 0 && waiting.getFirst().reader);
+    } while(list.size() > 0 && list.get(0).reader 
+        && c < ctx.prop.num(Prop.PARALLEL));
   }
 
   /**
    * Notifies a waiting writer.
    */
   private void notifyWriter() {
-    if(waiting.size() > 0) {
-      final Resource l = waiting.removeFirst();
+    if(list.size() > 0) {
+      final Resource l = list.remove(0);
       synchronized(l) {
         l.locked = false;
         l.notify();
