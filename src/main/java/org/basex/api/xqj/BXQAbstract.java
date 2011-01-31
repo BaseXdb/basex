@@ -77,7 +77,7 @@ abstract class BXQAbstract {
   }
 
   /**
-   * Checks if the specified object is null.
+   * Checks if the specified object is {@code null}.
    * @param obj object to be checked
    * @param type data type
    * @return object
