@@ -285,7 +285,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPRESTORE = {
-    "[" + C_NAME + "]", lang("ch_restore1"), lang("ch_restore2")
+    "[" + C_NAME + ".(date)]", lang("ch_restore1"), lang("ch_restore2")
   };
   /** Command help. */
   String[] HELPSHOW = {

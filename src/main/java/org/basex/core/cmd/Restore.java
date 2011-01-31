@@ -43,10 +43,10 @@ public final class Restore extends Command {
     String db = args[0];
     if(!validName(db)) return error(NAMEINVALID, db);
 
-    final int i = db.indexOf("-");
+    final int i = db.indexOf(".");
     String name = null;
     if(i == -1) {
-      final StringList list = list(db + '-', context);
+      final StringList list = list(db + '.', context);
       if(list.size() == 0) return error(DBBACKNF, db);
       name = list.get(0);
     } else {
@@ -121,7 +121,7 @@ public final class Restore extends Command {
     final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return list;
 
-    final String pre = db + (db.contains("-") ? "" : "-");
+    final String pre = db + (db.contains(".") ? "" : ".");
     for(final IO f : dir.children()) {
       final String n = f.name();
       if(n.startsWith(pre) && n.endsWith(IO.ZIPSUFFIX)) list.add(f.path());
