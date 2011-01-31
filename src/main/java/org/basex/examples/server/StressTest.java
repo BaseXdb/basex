@@ -15,16 +15,15 @@ import org.basex.util.Util;
  */
 public final class StressTest {
   /** Verbose flag. */
-  static final boolean VERBOSE = false;
+  private static final boolean VERBOSE = false;
   /** Number of clients. */
-  static final int NCLIENTS = 50;
+  private static final int NCLIENTS = 50;
   /** Number of runs per client. */
-  static final int NQUERIES = 50;
+  private static final int NQUERIES = 50;
   /** Input document. */
-  static final String INPUT = "etc/xml/factbook.xml";
+  private static final String INPUT = "etc/xml/factbook.xml";
   /** Query to be run ("%" serves as placeholder for dynamic content). */
-  static final String QUERY =
-    "doc('test')/descendant::text()[position() = %]";
+  private static final String QUERY = "(doc('test')//text())[position() = %]";
 
   /** Server reference. */
   static BaseXServer server;
@@ -32,7 +31,7 @@ public final class StressTest {
   static final Random RND = new Random();
   /** Result counter. */
   static int counter;
-  
+
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -42,7 +41,7 @@ public final class StressTest {
     System.out.println("=== Server StressTest ===");
 
     Performance perf = new Performance();
-    
+
     // Run server instance
     System.out.println("\n* Start server.");
     server = new BaseXServer("-z");
@@ -62,7 +61,7 @@ public final class StressTest {
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
     stopServer();
-    
+
     System.out.println("\n* Time: " + perf);
   }
 

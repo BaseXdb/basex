@@ -19,13 +19,13 @@ public final class StressTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Number of clients. */
-  static final int NCLIENTS = 50;
+  private static final int NCLIENTS = 50;
   /** Number of runs per client. */
-  static final int NQUERIES = 50;
+  private static final int NQUERIES = 50;
   /** Input document. */
-  static final String INPUT = "etc/xml/factbook.xml";
+  private static final String INPUT = "etc/xml/factbook.xml";
   /** Query to be run ("%" serves as placeholder for dynamic content). */
-  static final String QUERY = "descendant::text()[position() = %]";
+  private static final String QUERY = "(//text())[position() = %]";
 
   /** Global context. */
   static final Context CONTEXT = new Context();
@@ -57,9 +57,9 @@ public final class StressTest {
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
     dropDB();
-    
+
     CONTEXT.close();
-    
+
     System.out.println("\n* Time: " + perf);
   }
 
