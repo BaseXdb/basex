@@ -25,7 +25,7 @@ import org.basex.io.IO;
 public final class Backup extends Command {
   /** Date format. */
   private static final SimpleDateFormat DATE = new SimpleDateFormat(
-      "yyyy.MM.dd.HH.mm.ss");
+      "yyyy-MM-dd-HH-mm-ss");
   /** Counter for outstanding files. */
   private int of;
   /** Counter of total files. */
@@ -58,7 +58,7 @@ public final class Backup extends Command {
   private boolean backup(final String db, final Prop pr) {
     try {
       final File in = pr.dbpath(db);
-      final File file = new File(pr.get(Prop.DBPATH) + Prop.SEP + db + "." +
+      final File file = new File(pr.get(Prop.DBPATH) + Prop.SEP + db + "-" +
           DATE.format(new Date()) + IO.ZIPSUFFIX);
       final byte[] data = new byte[IO.BLOCKSIZE];
 

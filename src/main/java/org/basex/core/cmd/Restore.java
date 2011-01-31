@@ -42,19 +42,14 @@ public final class Restore extends Command {
   protected boolean run() {
     String db = args[0];
     if(!validName(db)) return error(NAMEINVALID, db);
-
-    final int i = db.indexOf(".");
-    String name = null;
-    if(i == -1) {
-      final StringList list = list(db + '.', context);
+    
+    String tmp = prop.get(Prop.DBPATH) + Prop.SEP + db + IO.ZIPSUFFIX;
+    File file = new File(tmp);
+    if(!file.exists()) {
+      final StringList list = list(db + '-', context);
       if(list.size() == 0) return error(DBBACKNF, db);
-      name = list.get(0);
-    } else {
-      if(!db.endsWith(IO.ZIPSUFFIX)) db += IO.ZIPSUFFIX;
-      name = prop.get(Prop.DBPATH) + Prop.SEP + db;
-      db = db.substring(0, i);
+      file = new File(list.get(0));
     }
-    final File file = new File(name);
     if(!file.exists()) return error(DBBACKNF, db);
 
     // close database if it's currently opened and not opened by others
@@ -121,7 +116,7 @@ public final class Restore extends Command {
     final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return list;
 
-    final String pre = db + (db.contains(".") ? "" : ".");
+    final String pre = db + (db.contains("-") ? "" : "-");
     for(final IO f : dir.children()) {
       final String n = f.name();
       if(n.startsWith(pre) && n.endsWith(IO.ZIPSUFFIX)) list.add(f.path());
