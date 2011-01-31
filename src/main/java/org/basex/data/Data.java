@@ -118,7 +118,7 @@ public abstract class Data {
    * Closes the current database.
    * @throws IOException I/O exception
    */
-  public final void close() throws IOException {
+  public final synchronized void close() throws IOException {
     if(fs != null) fs.close();
     cls();
   }

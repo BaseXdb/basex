@@ -668,7 +668,7 @@ public final class DeepFS implements DataText {
    * Closes the fuse instance.
    * @throws IOException I/O exception
    */
-  public void close() throws IOException {
+  public synchronized void close() throws IOException {
     if(data.meta.prop.is(Prop.FUSE)) {
       final String method = "[" + Text.NAME + ".close] ";
       Util.debug(method + "Initiating DeepFS shutdown sequence ");

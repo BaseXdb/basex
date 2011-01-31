@@ -91,7 +91,7 @@ public final class LockingTest {
   public void createTest() throws Exception {
     
     // first thread
-    Thread t1 = new Thread() {
+    final Thread t1 = new Thread() {
       @Override
       public void run() {
         try {
@@ -101,7 +101,7 @@ public final class LockingTest {
       }
     };
     // second thread
-    Thread t2 = new Thread() {
+    final Thread t2 = new Thread() {
       @Override
       public void run() {
         // wait until first command is running
@@ -246,7 +246,7 @@ public final class LockingTest {
   /** Single client. */
   static class Client extends Thread {
     /** Client session. */
-    private ClientSession session;
+    private final ClientSession session;
 
     /**
      * Default constructor.

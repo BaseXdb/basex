@@ -123,7 +123,7 @@ public final class SemaphoreTest {
     public Client() {
       try {
         session = newSession();
-      } catch(IOException ex) {
+      } catch(final IOException ex) {
         ex.printStackTrace();
       }
     }

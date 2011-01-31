@@ -26,16 +26,14 @@ public final class DataPool {
    * @param db name of the database
    * @return data reference
    */
-  Data pin(final String db) {
-    synchronized(list) {
-      for(final PData d : list) {
-        if(d.data.meta.name.equals(db)) {
-          d.pins++;
-          return d.data;
-        }
+  synchronized Data pin(final String db) {
+    for(final PData d : list) {
+      if(d.data.meta.name.equals(db)) {
+        d.pins++;
+        return d.data;
       }
-      return null;
     }
+    return null;
   }
 
   /**
@@ -43,19 +41,17 @@ public final class DataPool {
    * @param data data reference
    * @return true if reference was removed from the pool
    */
-  boolean unpin(final Data data) {
-    synchronized(list) {
-      for(final PData d : list) {
-        if(d.data == data) {
-          final boolean close = --d.pins == 0;
-          if(close) {
-            list.remove(d);
-          }
-          return close;
+  synchronized boolean unpin(final Data data) {
+    for(final PData d : list) {
+      if(d.data == data) {
+        final boolean close = --d.pins == 0;
+        if(close) {
+          list.remove(d);
         }
+        return close;
       }
-      return false;
     }
+    return false;
   }
 
   /**
@@ -63,19 +59,17 @@ public final class DataPool {
    * @param db name of the database
    * @return result of check
    */
-  boolean pinned(final String db) {
-    synchronized(list) {
-      for(final PData d : list)
-        if(d.data.meta.name.equals(db)) return true;
-      return false;
-    }
+  synchronized boolean pinned(final String db) {
+    for(final PData d : list)
+      if(d.data.meta.name.equals(db)) return true;
+    return false;
   }
 
   /**
    * Adds a data reference to the pool.
    * @param d data reference
    */
-  void add(final Data d) {
+  synchronized void add(final Data d) {
     list.add(new PData(d));
   }
 
@@ -96,14 +90,12 @@ public final class DataPool {
   /**
    * Closes all data references.
    */
-  void close() {
-    synchronized(list) {
-      try {
-        for(final PData d : list)
-          d.data.close();
-      } catch(final IOException ex) {
-        Util.debug(ex);
-      }
+  synchronized void close() {
+    try {
+      for(final PData d : list)
+        d.data.close();
+    } catch(final IOException ex) {
+      Util.debug(ex);
     }
     list.clear();
   }
@@ -114,13 +106,11 @@ public final class DataPool {
    * @param db name of the database
    * @return number of references
    */
-  public int pins(final String db) {
-    synchronized(list) {
-      for(final PData d : list) {
-        if(d.data.meta.name.equals(db)) return d.pins;
-      }
-      return 0;
+  public synchronized int pins(final String db) {
+    for(final PData d : list) {
+      if(d.data.meta.name.equals(db)) return d.pins;
     }
+    return 0;
   }
 
   /**

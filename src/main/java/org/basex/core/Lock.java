@@ -65,6 +65,7 @@ public final class Lock {
           return;
         }
       }
+
       // shared lock
       final Resource ls = new Resource(true);
       synchronized(ls) {
@@ -77,7 +78,9 @@ public final class Lock {
           }
         }
         state = State.READ;
-        ++activeR;
+        synchronized(this) {
+          ++activeR;
+        }
       }
     }
   }
@@ -115,7 +118,7 @@ public final class Lock {
       final Resource l = list.remove(0);
       synchronized(l) {
         l.locked = false;
-        l.notify();
+        l.notifyAll();
       }
     } while(list.size() > 0 && list.get(0).reader && c < p);
   }
@@ -128,7 +131,7 @@ public final class Lock {
       final Resource l = list.remove(0);
       synchronized(l) {
         l.locked = false;
-        l.notify();
+        l.notifyAll();
       }
     } else {
       state = State.IDLE;

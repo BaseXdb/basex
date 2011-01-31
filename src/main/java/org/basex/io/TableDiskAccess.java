@@ -68,7 +68,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public void flush() throws IOException {
+  public synchronized void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
 
     if(!dirty) return;
@@ -82,7 +82,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public void close() throws IOException {
+  public synchronized void close() throws IOException {
     flush();
     data.close();
   }

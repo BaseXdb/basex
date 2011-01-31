@@ -211,7 +211,7 @@ public final class DiskValues implements Index {
   }
 
   @Override
-  public void close() throws IOException {
+  public synchronized void close() throws IOException {
     idxl.close();
     idxr.close();
   }

@@ -143,7 +143,7 @@ public final class Context {
    * Adds the specified data reference to the pool.
    * @param d data reference
    */
-  public void pin(final Data d) {
+  public synchronized void pin(final Data d) {
     datas.add(d);
   }
 
@@ -152,7 +152,7 @@ public final class Context {
    * @param name name of database
    * @return data reference
    */
-  public Data pin(final String name) {
+  public synchronized Data pin(final String name) {
     return datas.pin(name);
   }
 
@@ -161,7 +161,7 @@ public final class Context {
    * @param d data reference
    * @return true if reference was removed from the pool
    */
-  public boolean unpin(final Data d) {
+  public synchronized boolean unpin(final Data d) {
     return datas.unpin(d);
   }
 
@@ -170,7 +170,7 @@ public final class Context {
    * @param db name of database
    * @return int use-status
    */
-  public boolean pinned(final String db) {
+  public synchronized boolean pinned(final String db) {
     return datas.pinned(db);
   }
 

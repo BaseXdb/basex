@@ -46,7 +46,7 @@ public final class Restore extends Command {
   protected boolean run() {
     String db = args[0];
     if(!validName(db)) return error(NAMEINVALID, db);
-    
+
     // find backup file with or without date suffix
     File file = new File(prop.get(Prop.DBPATH) + Prop.SEP + db + IO.ZIPSUFFIX);
     if(!file.exists()) {
@@ -119,7 +119,7 @@ public final class Restore extends Command {
 
     final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return list;
-    
+
     for(final IO f : dir.children()) {
       if(f.name().matches(db + PATTERN + IO.ZIPSUFFIX)) list.add(f.path());
     }
