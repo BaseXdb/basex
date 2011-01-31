@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.basex.core.Command;
@@ -46,11 +48,13 @@ public final class Restore extends Command {
     String tmp = prop.get(Prop.DBPATH) + Prop.SEP + db + IO.ZIPSUFFIX;
     File file = new File(tmp);
     if(!file.exists()) {
-      final StringList list = list(db + '-', context);
+      final StringList list = list(db, context);
       if(list.size() == 0) return error(DBBACKNF, db);
       file = new File(list.get(0));
+      if(!file.exists()) return error(DBBACKNF, db);
+    } else {
+      db = db.substring(0, db.length() - 20);
     }
-    if(!file.exists()) return error(DBBACKNF, db);
 
     // close database if it's currently opened and not opened by others
     final boolean closed = close(db);
@@ -115,11 +119,14 @@ public final class Restore extends Command {
 
     final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return list;
-
-    final String pre = db + (db.contains("-") ? "" : "-");
+    final String pre = db + "-";
+    Pattern p = Pattern.compile(pre + "\\d{4}.*");
+    
     for(final IO f : dir.children()) {
       final String n = f.name();
-      if(n.startsWith(pre) && n.endsWith(IO.ZIPSUFFIX)) list.add(f.path());
+      Matcher m = p.matcher(n);
+      if(n.startsWith(pre) && m.matches() && 
+          n.endsWith(IO.ZIPSUFFIX)) list.add(f.path());
     }
     list.sort(false, false);
     return list;
