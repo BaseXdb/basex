@@ -366,6 +366,7 @@ public class CmdTest {
     ok(new DropBackup("test"));
     no(new Restore("test"));
     ok(new DropBackup("test-1"));
+    ok(new DropDB("test-1"));
     ok(new Close());
   }
 
