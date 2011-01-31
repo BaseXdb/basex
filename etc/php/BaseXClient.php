@@ -19,7 +19,7 @@ class Session {
     }
 
     // receive timestamp
-    $ts = $this->receive();
+    $ts = $this->readString();
 
     // send username and hashed password/timestamp
     $md5 = hash("md5", hash("md5", $pw).$ts);
@@ -38,7 +38,7 @@ class Session {
 
     // receive result
     $result = $this->receive();
-    $this->info = $this->receive();
+    $this->info = $this->readString();
     if($this->ok() != True) {
       throw new Exception($this->info);
     }
@@ -63,7 +63,7 @@ class Session {
   }
 
   /* Receives a string from the socket. */
-  public function receive() {
+  public function readString() {
     $com = "";
     while(($d = $this->read()) != "\0") {
       $com .= $d;
@@ -98,7 +98,7 @@ class Session {
   /* Returns the result. */
   public function receive() {
     $this->init();
-    return $this->receive();
+    return $this->readString();
   }
 }
 
@@ -153,7 +153,7 @@ class Query {
   	$this->session->send("$cmd$arg");
   	$s = $this->session->receive();
   	if($this->session->ok() != True) {
-  	  throw new Exception($this->session->receive());
+  	  throw new Exception($this->session->readString());
   	}
   	return $s;
   }
