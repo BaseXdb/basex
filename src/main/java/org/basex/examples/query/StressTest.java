@@ -14,7 +14,6 @@ import org.basex.util.Util;
  * number of threads and queries.
  *
  * @author BaseX Team 2005-11, ISC License
-
  */
 public final class StressTest {
   /** Verbose flag. */
@@ -43,6 +42,8 @@ public final class StressTest {
   public static void main(final String[] args) throws Exception {
     System.out.println("=== Local StressTest ===");
 
+    Performance perf = new Performance();
+
     // Create test database
     System.out.println("\n* Create test database.");
     final CreateDB cmd = new CreateDB("test", INPUT);
@@ -58,6 +59,8 @@ public final class StressTest {
     dropDB();
     
     CONTEXT.close();
+    
+    System.out.println("\n* Time: " + perf);
   }
 
   /**

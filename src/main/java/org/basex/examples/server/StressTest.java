@@ -41,6 +41,8 @@ public final class StressTest {
   public static void main(final String[] args) throws Exception {
     System.out.println("=== Server StressTest ===");
 
+    Performance perf = new Performance();
+    
     // Run server instance
     System.out.println("\n* Start server.");
     server = new BaseXServer("-z");
@@ -60,6 +62,8 @@ public final class StressTest {
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
     stopServer();
+    
+    System.out.println("\n* Time: " + perf);
   }
 
   /**
