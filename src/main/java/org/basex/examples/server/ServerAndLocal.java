@@ -16,7 +16,6 @@ import org.basex.server.ClientSession;
  * For more information on local query processing, see {@link RunQueries}.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class ServerAndLocal {
   /** Local database context. */

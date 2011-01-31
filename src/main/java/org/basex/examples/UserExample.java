@@ -9,7 +9,6 @@ import org.basex.core.cmd.*;
  * core maintenance and administration features.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class UserExample {
   /**

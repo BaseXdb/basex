@@ -601,7 +601,7 @@ public abstract class W3CTS {
 
       for(int p = !frag ? 0 : 2; p < d.meta.size; p += d.size(p, d.kind(p)))
         it.add(new DBNode(d, p));
-    } catch (final IOException e) { /* never happens */ }
+    } catch (final IOException ex) { /* never happens */ }
     return it;
   }
 

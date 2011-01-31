@@ -4,7 +4,6 @@ package org.basex.examples.perf;
  * This class benchmarks delete operations.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class Delete extends Benchmark {
   /**

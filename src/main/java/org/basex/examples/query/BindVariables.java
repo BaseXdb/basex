@@ -11,7 +11,6 @@ import org.basex.query.QueryProcessor;
  * the XQuery processor.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class BindVariables {
   /**

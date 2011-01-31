@@ -10,7 +10,6 @@ import org.basex.core.cmd.*;
  * perform full-text requests.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class WikiExample {
   /**

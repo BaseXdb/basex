@@ -10,7 +10,6 @@ import org.basex.api.xqj.BXQDataSource;
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 abstract class Main {
   /**

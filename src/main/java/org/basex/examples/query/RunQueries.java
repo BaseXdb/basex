@@ -16,7 +16,6 @@ import org.basex.query.iter.Iter;
  * evaluated.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class RunQueries {
   /** Database context. */

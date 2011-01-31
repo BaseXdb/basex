@@ -8,7 +8,6 @@ import org.basex.server.ClientQuery;
  * This class demonstrates query execution via the client/server architecture.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class ServerQueries {
   /** Session reference. */

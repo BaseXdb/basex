@@ -9,7 +9,6 @@ import org.basex.util.TokenList;
  * This class prints meta statistics.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class MetaStats extends Statistics {
   /**

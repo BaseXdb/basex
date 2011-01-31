@@ -12,7 +12,6 @@ import org.basex.util.Util;
  * number of threads and queries.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class StressTest {
   /** Verbose flag. */
@@ -33,7 +32,7 @@ public final class StressTest {
   static final Random RND = new Random();
   /** Result counter. */
   static int counter;
-
+  
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -74,7 +73,7 @@ public final class StressTest {
     try {
       cs.execute("drop db test");
     } catch(Exception ex) {
-      System.out.print(cs.info() + "\n");
+      System.out.println(cs.info());
       ex.printStackTrace();
     }
     cs.close();
@@ -91,7 +90,7 @@ public final class StressTest {
   }
 
   /** Single client. */
-  static class Client extends Thread {
+  static final class Client extends Thread {
     /** Client session. */
     private ClientSession session;
 

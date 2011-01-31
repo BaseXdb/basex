@@ -22,7 +22,6 @@ import org.xml.sax.XMLFilter;
  * Part 10: XML Pipelines.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class Part10 extends Main {
   /**

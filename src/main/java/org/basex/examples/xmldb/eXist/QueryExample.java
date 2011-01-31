@@ -11,7 +11,6 @@ import org.xmldb.api.*;
  * from Wolfgang M. Meier
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class QueryExample extends Main {
   /**

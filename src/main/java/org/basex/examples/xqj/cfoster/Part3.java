@@ -16,7 +16,6 @@ import javax.xml.xquery.XQResultSequence;
  * Part 3: Binding Java variables to XQuery.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class Part3 extends Main {
   /** Default ISBN number. */

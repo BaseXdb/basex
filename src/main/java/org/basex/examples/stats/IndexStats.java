@@ -17,7 +17,6 @@ import org.basex.util.TokenList;
  * This class prints index statistics.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class IndexStats extends Statistics {
   /** Index pattern. */

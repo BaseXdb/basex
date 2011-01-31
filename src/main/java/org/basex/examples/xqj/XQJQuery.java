@@ -10,7 +10,6 @@ import javax.xml.xquery.XQResultSequence;
  * with the XQuery for Java (XQJ) API.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class XQJQuery {
   /** Database driver. */

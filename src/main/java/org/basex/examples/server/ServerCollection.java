@@ -14,7 +14,6 @@ import org.basex.server.ClientSession;
  * For further options see {@link QueryCollection}.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class ServerCollection {
   /** Session reference. */

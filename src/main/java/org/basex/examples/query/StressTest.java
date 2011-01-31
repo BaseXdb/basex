@@ -14,7 +14,7 @@ import org.basex.util.Util;
  * number of threads and queries.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
+
  */
 public final class StressTest {
   /** Verbose flag. */
@@ -56,6 +56,8 @@ public final class StressTest {
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
     dropDB();
+    
+    CONTEXT.close();
   }
 
   /**

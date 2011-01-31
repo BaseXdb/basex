@@ -13,7 +13,6 @@ import org.basex.api.xqj.BXQDataSource;
  * from Marc van Cappellen.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 abstract class Main {
   /**

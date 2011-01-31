@@ -13,7 +13,6 @@ import org.basex.server.ClientSession;
  * clients have been run.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class ServerConcurrency {
   /**

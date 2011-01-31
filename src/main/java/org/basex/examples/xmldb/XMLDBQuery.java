@@ -9,7 +9,6 @@ import org.xmldb.api.*;
  * API.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class XMLDBQuery {
   /** Database driver. */

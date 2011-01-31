@@ -18,7 +18,6 @@ import javax.xml.xquery.XQSequence;
  * Part 9: Creating XDM Instances.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class Part9 extends Main {
   /**

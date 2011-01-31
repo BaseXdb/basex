@@ -111,9 +111,9 @@ public final class NamespaceTest {
           "  )," +
           "  $target := $input-context/works[1]/employee[1]" +
           "return insert nodes $source into $target", context).execute();
-    } catch(QueryException e) {
-      e.printStackTrace();
-      assertEquals("XUTY0004", e.code());
+    } catch(QueryException ex) {
+      ex.printStackTrace();
+      assertEquals("XUTY0004", ex.code());
     }
     fail("should throw XUTY0004");
   }
@@ -152,7 +152,7 @@ public final class NamespaceTest {
     try {
       if(!FNSimple.deep(null, getIter(exp), getIter(actual)))
         assertEquals(exp, actual);
-    } catch(final QueryException e) { fail(e.getMessage()); }
+    } catch(final QueryException ex) { fail(ex.getMessage()); }
   }
 
   /**
@@ -164,7 +164,7 @@ public final class NamespaceTest {
     try {
       final Data ex = CreateDB.xml(new IOContent(token(xml)), context);
       return new NodIter(new Nod[]{new DBNode(ex, 0)}, 1);
-    } catch(final IOException e) { fail(e.getMessage()); }
+    } catch(final IOException ex) { fail(ex.getMessage()); }
     return null;
   }
 

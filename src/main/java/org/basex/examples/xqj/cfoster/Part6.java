@@ -16,7 +16,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * Part 6: Streaming XQuery results.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class Part6 extends Main {
   /**

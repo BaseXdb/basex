@@ -9,7 +9,6 @@ import org.basex.core.cmd.*;
  * It shows how to find and query specific documents.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class QueryCollection {
   /**

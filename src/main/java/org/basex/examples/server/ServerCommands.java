@@ -8,7 +8,6 @@ import org.basex.server.ClientSession;
  * This class demonstrates database access via the client/server architecture.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class ServerCommands {
   /** Session reference. */

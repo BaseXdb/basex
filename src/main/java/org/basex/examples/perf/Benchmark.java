@@ -20,7 +20,6 @@ import org.basex.util.Util;
  * This class benchmarks delete operations.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public abstract class Benchmark {
   /** Session. */

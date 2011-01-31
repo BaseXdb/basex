@@ -7,7 +7,6 @@ package org.basex.examples.xmldb.eXist;
  * from Wolfgang M. Meier
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 abstract class Main {
   /** Database driver. */

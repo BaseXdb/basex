@@ -13,7 +13,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * and serializing the results via the SAX API.
  *
  * @author BaseX Team 2005-11, ISC License
- * @author BaseX Team
  */
 public final class SAXExample extends DefaultHandler {
   /**
