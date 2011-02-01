@@ -102,6 +102,18 @@ public class BitArrayTest {
     assertTrue("Incorrect next clear bit", a.nextClearBit(0) == 64);
   }
 
+  /** Test method for {@link BitArray#nextClearBits(int, int)}. */
+  @Test
+  public void testNextClearBitsInt() {
+    a.setWords(new long[] {-1L, 0L}, 65);
+    int[] r = a.nextClearBits(0, 2);
+    assertTrue("Incorrect next clear bits: expected 1 bit", r.length == 1);
+    assertTrue("Incorrect next clear bits: expected bit 64", r[0] == 64);
+    
+    a.setWords(new long[] {-1L, 0L}, 64);
+    assertTrue("Incorrect next clear bits", a.nextClearBits(0, 2).length == 0);
+  }
+
   /** Test method for {@link BitArray#get(long)}. */
   @Test
   public void testGetLong() {
@@ -169,5 +181,17 @@ public class BitArrayTest {
     a.set(i - 1L);
     assertTrue("Bit " + i + " is 0", a.get(i - 1L));
     assertTrue("Incorrect next set bit", a.nextClearBit(i - 1L) == i);
+  }
+
+  /** Test method for {@link BitArray#nextClearBits(long, int)}. */
+  @Test
+  public void testNextClearBitsLong() {
+    a.setWords(new long[] {-1L, 0L}, 65);
+    long[] r = a.nextClearBits(0L, 2);
+    assertTrue("Incorrect next clear bits: expected 1 bit", r.length == 1);
+    assertTrue("Incorrect next clear bits: expected bit 64", r[0] == 64);
+    
+    a.setWords(new long[] {-1L, 0L}, 64);
+    assertTrue("Incorrect next clear bits", a.nextClearBits(0L, 2).length == 0);
   }
 }

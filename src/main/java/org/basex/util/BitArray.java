@@ -9,6 +9,7 @@ import static java.lang.Math.*;
  *
  * @author BaseX Team 2005-11, ISC License
  * @author Dimitar Popov
+ * [DP] Remove long method and method that are not used
  */
 public class BitArray {
 
@@ -21,8 +22,8 @@ public class BitArray {
 
   /** Bit storage. */
   private long[] words;
-  /** Last used bit. */
-  private long last;
+  /** Number of used bits. */
+  private long length;
 
   /** Construct a new bit array. */
   public BitArray() {
@@ -48,7 +49,7 @@ public class BitArray {
   /**
    * Construct a new bit array with the specified backing array.
    * @param a array with bits
-   * @param l last used bit
+   * @param l number of used bits
    */
   public BitArray(final long[] a, final long l) {
     setWords(a, l);
@@ -86,19 +87,19 @@ public class BitArray {
   /**
    * Initialize the bit array with the specified backing array.
    * @param a array with bits
-   * @param l last used bit
+   * @param l number of used bits
    */
   public void setWords(final long[] a, final long l) {
     words = a;
-    last = l;
+    length = l;
   }
 
   /**
-   * The last used bit.
-   * @return index of last used bit
+   * The number of used bits.
+   * @return number of used bits
    */
-  public long getLast() {
-    return last;
+  public long getLength() {
+    return length;
   }
 
   /**
@@ -110,8 +111,6 @@ public class BitArray {
     // find the last index of a word which is different from 0:
     int i;
     for(i = words.length - 1; i >= 0; i--) if(words[i] != 0) break;
-    // final int i = last >>> WORD_POWER + 1;
-    // final long[] result = new long[i];
 
     final long[] result = new long[++i];
     System.arraycopy(words, 0, result, 0, i);
@@ -152,7 +151,7 @@ public class BitArray {
     final int wordIndex = i >>> WORD_POWER;
     if(wordIndex >= words.length) expandTo(wordIndex + 1);
     words[wordIndex] |= 1L << i;
-    if(i > last) last = i;
+    if(i >= length) length = i + 1L;
   }
 
   /**
@@ -164,7 +163,7 @@ public class BitArray {
     final int wordIndex = (int) (i >>> WORD_POWER);
     if(wordIndex >= words.length) expandTo(wordIndex + 1);
     words[wordIndex] |= 1L << i;
-    if(i > last) last = i;
+    if(i >= length) length = i + 1L;
   }
 
   /**
@@ -191,7 +190,7 @@ public class BitArray {
       for(int i = startWord + 1; i < endWord; i++) words[i] = WORD_MASK;
       words[endWord] |= endMask;
     }
-    if(e > last) last = e;
+    if(e >= length) length = e + 1L;
   }
 
   /**
@@ -218,7 +217,7 @@ public class BitArray {
       for(int i = startWord + 1; i < endWord; i++) words[i] = WORD_MASK;
       words[endWord] |= endMask;
     }
-    if(e > last) last = e;
+    if(e >= length) length = e + 1L;
   }
 
   /**
@@ -346,8 +345,7 @@ public class BitArray {
   /**
    * Get the next bit set to 0, starting from the i<sup>th</sup> bit.
    * @param i index from which to start the search (inclusive)
-   * @return index of the next clear bit; -1 if there is no set bit after the
-   *         i<sup>th</sup> bit
+   * @return index of the next clear bit after the i<sup>th</sup> bit
    */
   public int nextClearBit(final int i) {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
@@ -361,19 +359,18 @@ public class BitArray {
 
     while(++wordIndex < words.length) {
       if((word = ~words[wordIndex]) != 0) {
-        return wordIndex << WORD_POWER + numberOfTrailingZeros(word);
+        return (wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
       }
     }
 
     // wordIndex * 2^6:
-    return -1;
+    return wordIndex << WORD_POWER;
   }
 
   /**
    * Get the next bit set to 0, starting from the i<sup>th</sup> bit.
    * @param i index from which to start the search (inclusive)
-   * @return index of the next clear bit; -1 if there is no set bit after the
-   *         i<sup>th</sup> bit
+   * @return index of the next clear bit after the i<sup>th</sup> bit
    */
   public long nextClearBit(final long i) {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
@@ -392,7 +389,7 @@ public class BitArray {
     }
 
     // wordIndex * 2^6:
-    return -1L;
+    return wordIndex << WORD_POWER;
   }
 
   /**
@@ -403,14 +400,23 @@ public class BitArray {
    */
   public int[] nextClearBits(final int i, final int n) {
     final int[] t = new int[n];
-    t[0] = nextClearBit(i);
-    for(int k = 1; k < n; k++)
-      if((t[k] = nextClearBit(t[k - 1] + 1)) >= last) {
-        final int[] r = new int[k];
-        System.arraycopy(t, 0, r, 0, k);
-        return r;
-      }
-    return t;
+
+    int cnt = 0;
+    int prev = i;
+
+    // try to find n clear bits:
+    while(cnt < n) {
+      final int b = nextClearBit(prev);
+      if(b >= 0 && b < length) prev = (t[cnt++] = b) + 1;
+      else break;
+    }
+
+    if(cnt == n) return t;
+
+    // if needed, create a result array with length == number of found bits:
+    final int[] r = new int[cnt];
+    System.arraycopy(t, 0, r, 0, cnt);
+    return r;
   }
 
   /**
@@ -421,14 +427,23 @@ public class BitArray {
    */
   public long[] nextClearBits(final long i, final int n) {
     final long[] t = new long[n];
-    t[0] = nextClearBit(i);
-    for(int k = 0; k < n; k++)
-      if((t[k] = nextClearBit(t[k - 1] + 1L)) >= last) {
-        final long[] r = new long[k];
-        System.arraycopy(t, 0, r, 0, k);
-        return r;
-      }
-    return t;
+
+    int cnt = 0;
+    long prev = i;
+
+    // try to find n clear bits:
+    while(cnt < n) {
+      final long b = nextClearBit(prev);
+      if(b >= 0 && b < length) prev = (t[cnt++] = b) + 1L;
+      else break;
+    }
+
+    if(cnt == n) return t;
+
+    // if needed, create a result array with length == number of found bits:
+    final long[] r = new long[cnt];
+    System.arraycopy(t, 0, r, 0, cnt);
+    return r;
   }
 
   /**
