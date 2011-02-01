@@ -6,6 +6,7 @@ import java.util.Random;
 import org.basex.BaseXServer;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
 
@@ -18,9 +19,9 @@ public class XQUFStressTestClientServer {
   /** Server. */
   BaseXServer server;
   /** Number of queries per client. */
-  static final int NQUERIES = 4;
+  static final int NQUERIES = 10;
   /** Number of clients. */
-  static final int NCLIENTS = 2;
+  static final int NCLIENTS = 10;
   /** Database name. */
   static final String DBNAME = "XQUFStress";
   /** Random number generator. */
@@ -31,11 +32,12 @@ public class XQUFStressTestClientServer {
    */
   public void startTest() {
     server = new BaseXServer("-z");
-    
-    createDB();
+    p("\n");
     queryInsert();
+    p("\n");
+    queryDelete();
+    p("\n");
     dropDB();
-    
     server.stop();
   }
 
@@ -43,37 +45,58 @@ public class XQUFStressTestClientServer {
    * Performs the query.
    */
   private void queryInsert() {
-    final String ins = "insert node <n/> into doc('" + DBNAME + "')/doc";
-    
-    System.out.println("\n* Run " + NCLIENTS + " client threads.");
     try {
-      final Client[] cl = new Client[NCLIENTS];
-      for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client(ins);
-      for(final Client c : cl) c.start();
-      for(final Client c : cl)
-        c.join();
-
-    } catch(InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * Prepares the test database.
-   */
-  private void createDB() {
-    ClientSession s;
-    try {
-      s = newSession();
+      p("INSERT ... creating database.");
+      ClientSession s = newSession();
       s.execute(new CreateDB(DBNAME, "<doc/>"));
-      p(s.info());
       s.close();
+      runClients("insert node <node/> into doc('" + DBNAME + "')/doc");
+      p("done.");
 
     } catch(Exception e) {
       e.printStackTrace();
     }
   }
   
+  /**
+   * Performs the query.
+   */
+  private void queryDelete() {
+    try {
+      p("DELETE ... creating database.");
+      ClientSession s = newSession();
+      s.execute(new CreateDB(DBNAME, "<doc/>"));
+      final int c = 100 + NQUERIES * NCLIENTS;
+      s.execute(new XQuery("for $i in 1 to " + c + 
+          " return insert node <node/> into doc('" + DBNAME + "')/doc"));
+//      p(s.execute(new XQuery("count(doc('" + DBNAME + "')/doc/node)")));
+      s.close();
+      runClients("delete nodes (doc('" + DBNAME + "')/doc/node)[1]");
+      p("done.");
+
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
+  }
+  
+  /**
+   * Starts concurrent client operations.
+   * @param q test query
+   */
+  private void runClients(final String q) {
+    p(NCLIENTS + " clients / " + NQUERIES + " queries");
+    p(q);
+    final Client[] cl = new Client[NCLIENTS];
+    for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client(q);
+    for(final Client c : cl) c.start();
+    for(final Client c : cl)
+      try {
+        c.join();
+      } catch(InterruptedException e) {
+        e.printStackTrace();
+      }
+  }
+
   /**
    * Helps printing to console.
    * @param s message string
@@ -146,6 +169,6 @@ public class XQUFStressTestClientServer {
    * @param args args
    */
   public static void main(final String[] args) {
-    new XQUFStressTestClientServer().startTest(); 
+    new XQUFStressTestClientServer().startTest();
   }
  }
