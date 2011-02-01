@@ -45,9 +45,7 @@ public final class DataPool {
     for(final PData d : list) {
       if(d.data == data) {
         final boolean close = --d.pins == 0;
-        if(close) {
-          list.remove(d);
-        }
+        if(close) list.remove(d);
         return close;
       }
     }
@@ -92,8 +90,7 @@ public final class DataPool {
    */
   synchronized void close() {
     try {
-      for(final PData d : list)
-        d.data.close();
+      for(final PData d : list) d.data.close();
     } catch(final IOException ex) {
       Util.debug(ex);
     }
@@ -121,7 +118,7 @@ public final class DataPool {
    */
   private static final class PData {
     /** Number of current database users. */
-    int pins;
+    int pins = 1;
     /** Data reference. */
     Data data;
 
@@ -130,7 +127,6 @@ public final class DataPool {
      * @param d data reference
      */
     PData(final Data d) {
-      pins = 1;
       data = d;
     }
   }

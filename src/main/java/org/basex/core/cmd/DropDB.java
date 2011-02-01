@@ -70,7 +70,9 @@ public final class DropDB extends Command {
 
     for(final File sub : files) {
       if(pat == null || sub.getName().matches(pat))
-        if(!sub.delete()) return false;
+        if(!sub.delete()) {
+          return false;
+        }
     }
     return pat != null || path.delete();
   }

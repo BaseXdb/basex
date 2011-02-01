@@ -29,6 +29,8 @@ final class XQuerySyntax extends BaseXSyntax {
   /** Keyword. */
   private static final Color FUNS = new Color(160, 0, 160);
 
+  /** Comment. */
+  private int comment;
   /** Last quote. */
   private int quote;
   /** Variable flag. */
@@ -56,12 +58,25 @@ final class XQuerySyntax extends BaseXSyntax {
   public void init() {
     quote = 0;
     var = false;
+    comment = 0;
   }
 
   @Override
   public Color getColor(final BaseXTextTokens text) {
     final int ch = text.curr();
 
+    // comment
+    if(comment == 0 && ch == '(') {
+      comment++;
+    } else if(comment == 1) {
+      comment = ch == ':' ? 2 : 0;
+    } else if(comment == 2 && ch == ':') {
+      comment++;
+    } else if(comment == 3) {
+      comment = ch == ')' ? 0 : 2;
+    }
+    if(comment != 0) return KEY;
+    
     // quotes
     if(quote == 0 && (ch == '"' || ch == '\'')) {
       quote = ch;
