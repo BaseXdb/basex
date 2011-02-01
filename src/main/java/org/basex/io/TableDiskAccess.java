@@ -3,8 +3,10 @@ package org.basex.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
+
 import org.basex.data.MetaData;
 import org.basex.util.Array;
+import org.basex.util.BitArray;
 import org.basex.util.Util;
 
 /**
@@ -26,10 +28,12 @@ public final class TableDiskAccess extends TableAccess {
   /** File storing all blocks. */
   private final RandomAccessFile data;
 
-  /** Index array storing the FirstPre values. this one is sorted ascending. */
+  /** FirstPre values (sorted ascending; length={@link #allBlocks}). */
   private int[] fpres;
-  /** Index array storing the BlockNumbers. */
+  /** Index array storing BlockNumbers (length={@link #allBlocks}). */
   private int[] pages;
+  /** Bit map storing free (=0) and occupied (=1) pages. */
+  private BitArray pagemap;
 
   /** Pre value of the first entry in the current block. */
   private int fpre = -1;
@@ -40,7 +44,7 @@ public final class TableDiskAccess extends TableAccess {
   private int allBlocks;
   /** Number of entries in the index (used blocks). */
   private int blocks;
-  /** Index number of the current block, referencing indexBlockNumber array. */
+  /** Index of the current block number in the {@link #pages} array. */
   private int index = -1;
 
   /**
@@ -56,11 +60,23 @@ public final class TableDiskAccess extends TableAccess {
 
     // read meta and index data
     final DataInput in = new DataInput(meta.file(pf + 'i'));
-    allBlocks = in.readNum();
-    blocks    = in.readNum();
-    fpres     = in.readNums();
-    pages     = in.readNums();
-    in.close();
+    allBlocks  = in.readNum();
+    blocks     = in.readNum();
+    fpres      = in.readNums();
+    pages      = in.readNums();
+
+    final int pagemapSize = in.readNum();
+    // check if the page map has been stored:
+    if(pagemapSize == 0) {
+      in.close();
+      // init the map with empty pages:
+      pagemap = new BitArray(allBlocks);
+      for(int i = 0; i < pages.length; i++) pagemap.set(pages[i]);
+      dirty = true;
+    } else {
+      pagemap = new BitArray(in.readLongs(pagemapSize), allBlocks);
+      in.close();
+    }
 
     // initialize data file
     data = new RandomAccessFile(meta.file(pf), "rw");
@@ -77,6 +93,7 @@ public final class TableDiskAccess extends TableAccess {
     out.writeNum(blocks);
     out.writeNums(fpres);
     out.writeNums(pages);
+    out.writeLongs(pagemap.getTrimmedWords());
     out.close();
     dirty = false;
   }
@@ -176,8 +193,12 @@ public final class TableDiskAccess extends TableAccess {
 
       // if whole block was deleted, remove it from the index
       if(npre == fpre) {
+        // mark the block as empty:
+        pagemap.clear(pages[index]);
+
         Array.move(fpres, index + 1, -1, blocks - index - 1);
         Array.move(pages, index + 1, -1, blocks - index - 1);
+
         readBlock(index, fpre, index + 2 > --blocks ? meta.size :
           fpres[index + 1]);
       }
@@ -189,7 +210,12 @@ public final class TableDiskAccess extends TableAccess {
     // first count them
     int unused = 0;
     while(npre < last) {
-      if(from == 0) ++unused;
+      if(from == 0) {
+        ++unused;
+        // mark the blocks as empty; range clear cannot be used because the
+        // block may not be consecutive:
+        pagemap.clear(pages[index]);
+      }
       nextBlock();
       from = 0;
     }
@@ -213,75 +239,85 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public void insert(final int pre, final byte[] entries) {
-    dirty = true;
+
+    if(entries.length <= 0) return;
+
+
+    // number of records to be inserted:
     final int nr = entries.length >>> IO.NODEPOWER;
     meta.size += nr;
-    cursor(pre - 1);
+    dirty = true;
 
-    final int ins = pre - fpre;
 
-    // all entries fit in current block
-    if(nr < ENTRIES - npre + fpre) {
-      // shift following entries forward and insert next entries
-      copy(bf.data, ins, bf.data, ins + nr, npre - pre + 1);
-      copy(entries, 0, bf.data, ins, nr);
+    // go to the block and find the offset within the block where the new
+    // records will be inserted:
+    final int split = cursor(pre - 1) + (1 << IO.NODEPOWER);
 
-      // update index entries
+    // number of bytes occupied by old records in the current block:
+    final int nold = (npre - fpre) << IO.NODEPOWER;
+    // number of bytes occupied by old records which will be after the new ones:
+    final int nlast = nold - split;
+
+
+    // special case: all entries fit in the current block:
+    if(nold + entries.length <= IO.BLOCKSIZE) {
+      System.arraycopy(bf.data, split, bf.data, split + entries.length, nlast);
+      System.arraycopy(entries, 0, bf.data, split, entries.length);
+      bf.dirty = true;
+
+      // increment first pre-values of blocks after the last modified block:
       for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
+      // update cached variables (fpre is not changed):
       npre += nr;
       return;
     }
 
-    // we need to reorganize entries
 
-    // save entries to be added into new block after inserted blocks
-    final int move = npre - pre;
-    final byte[] rest = new byte[move << IO.NODEPOWER];
-    copy(bf.data, ins, rest, 0, move);
+    // append old entries at the end of the new entries:
+    // [DP] the following can be optimized to avoid copying arrays:
+    final byte[] all = new byte[entries.length + nlast];
+    System.arraycopy(entries, 0, all, 0, entries.length);
+    System.arraycopy(bf.data, split, all, entries.length, nlast);
 
-    // make room in index for new blocks
-    int newBlocks = (int) Math.ceil((double) nr / ENTRIES) + 1;
-    // in case we insert at block boundary
-    if(pre == npre) --newBlocks;
 
-    // resize the index
-    final int s = allBlocks + newBlocks;
-    fpres = Arrays.copyOf(fpres, s);
-    pages = Arrays.copyOf(pages, s);
+    // fill in the current block with new entries:
+    // number of bytes which can fit in the first block:
+    int n = bf.data.length - split;
+    System.arraycopy(all, 0, bf.data, split, n);
+    bf.dirty = true;
 
-    Array.move(fpres, index + 1, newBlocks, blocks - index - 1);
-    Array.move(pages, index + 1, newBlocks, blocks - index - 1);
 
-    // add blocks for new entries
-    int remain = nr;
-    int pos = 0;
-    while(remain > 0) {
-      newBlock();
-      copy(entries, pos, bf.data, 0, Math.min(remain, ENTRIES));
+    // resize fpres and pages:
+    // number of blocks needed to store the remaining entries:
+    final int neededBlocks = (all.length - n + IO.BLOCKSIZE - 1) / IO.BLOCKSIZE;
+    // number of new blocks (number of needed block - number of empty blocks):
+    final int newBlocks = neededBlocks - (allBlocks - blocks);
 
-      fpres[++index] = nr - remain + pre;
-      pages[index] = (int) bf.pos;
-      ++blocks;
-      remain -= ENTRIES;
-      pos += ENTRIES;
+    // extend fpres and pages, if new blocks will be allocated:
+    if(newBlocks > 0) {
+      fpres = Arrays.copyOf(fpres, fpres.length + newBlocks);
+      pages = Arrays.copyOf(pages, pages.length + newBlocks);
     }
 
-    // add remaining part of split block
-    if(rest.length > 0) {
-      newBlock();
-      copy(rest, 0, bf.data, 0, move);
+    // make place for the blocks where the new entries will be written:
+    Array.move(fpres, index + 1, neededBlocks, blocks - index - 1);
+    Array.move(pages, index + 1, neededBlocks, blocks - index - 1);
 
-      fpres[++index] = pre + nr;
-      pages[index] = (int) bf.pos;
-      ++blocks;
+
+    // write the all remaining entries:
+    while(n < all.length) {
+      getFreeBlock();
+      n += write(all, n);
+      fpres[index + 1] = fpres[index] + ENTRIES;
+      pages[++index] = (int) bf.pos;
     }
 
-    // update index entries
+    // increment first pre-values of blocks after the last modified block:
     for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
 
-    // update cached variables
-    fpre = pre;
-    if(rest.length > 0) fpre += nr;
+
+    // update cached variables:
+    fpre = fpres[index];
     npre = index + 1 >= blocks ? meta.size : fpres[index + 1];
   }
 
@@ -385,19 +421,6 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Creates a new, empty block.
-   */
-  private void newBlock() {
-    try {
-      if(bf.dirty) writeBlock(bf);
-    } catch(final IOException ex) {
-      Util.stack(ex);
-    }
-    bf.pos = allBlocks++;
-    bf.dirty = true;
-  }
-
-  /**
    * Convenience method for copying blocks.
    * @param s source array
    * @param sp source position
@@ -410,6 +433,47 @@ public final class TableDiskAccess extends TableAccess {
     System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER,
         l << IO.NODEPOWER);
     bf.dirty = true;
+  }
+
+  /**
+   * Fill the current buffer with bytes from the specified array from the
+   * specified offset.
+   * @param s source array
+   * @param o offset from the beginning of the array
+   * @return number of written bytes
+   */
+  private int write(final byte[] s, final int o) {
+    final int len = Math.min(bf.data.length, s.length - o);
+    System.arraycopy(s, o, bf.data, 0, len);
+    bf.dirty = true;
+    return len;
+  }
+
+  /** Free the current buffer. */
+  private void flushCurrentBuffer() {
+    try {
+      if(bf.dirty) {
+        writeBlock(bf);
+        bf.dirty = false;
+      }
+    } catch(final IOException ex) {
+      Util.stack(ex);
+    }
+  }
+
+  /** Move the cursor to a free block (either new or existing empty one). */
+  private void getFreeBlock() {
+    flushCurrentBuffer();
+
+    // find an empty block:
+    bf.pos = pagemap.nextClearBit(0);
+
+    // if the block number is bigger than the total number of block, it's a new:
+    if(bf.pos > allBlocks) allBlocks = (int) bf.pos;
+
+    bf.dirty = true;
+    pagemap.set(bf.pos);
+    blocks++;
   }
 
   // TEST METHODS =============================================================
