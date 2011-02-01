@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import static java.lang.Long.*;
-import static java.lang.Math.*;
 
 /**
  * Bit array that grows when needed. The implementation is similar to
@@ -39,14 +38,6 @@ public class BitArray {
   }
 
   /**
-   * Construct a new bit array with the specified number of bits.
-   * @param n initial number of bits (> 0)
-   */
-  public BitArray(final long n) {
-    init(n);
-  }
-
-  /**
    * Construct a new bit array with the specified backing array.
    * @param a array with bits
    * @param l number of used bits
@@ -69,22 +60,6 @@ public class BitArray {
   }
 
   /**
-   * Initialize the bit array with a new size. All bits will be set to 0.
-   * @param n initial number of bits (> 0)
-   */
-  public void init(final long n) {
-    setWords(new long[(int) ((n - 1L >>> WORD_POWER) + 1L)], n);
-  }
-
-  /**
-   * The word array used to store the bits.
-   * @return array of longs
-   */
-  public long[] getWords() {
-    return words;
-  }
-
-  /**
    * Initialize the bit array with the specified backing array.
    * @param a array with bits
    * @param l number of used bits
@@ -92,14 +67,6 @@ public class BitArray {
   public void setWords(final long[] a, final long l) {
     words = a;
     length = l;
-  }
-
-  /**
-   * The number of used bits.
-   * @return number of used bits
-   */
-  public long getLength() {
-    return length;
   }
 
   /**
@@ -131,18 +98,6 @@ public class BitArray {
   }
 
   /**
-   * Get the value of the i<sup>th</sup> bit.
-   * @param i index of the bit
-   * @return <code>true</code> if the ith bit is
-   */
-  public boolean get(final long i) {
-    // calculate the index of the word in the array: i div 2^6 = i >> 6
-    final int wordIndex = (int) (i >>> WORD_POWER);
-    // check if the ith bit is 1
-    return (words[wordIndex] & 1L << i) != 0;
-  }
-
-  /**
    * Set the i<sup>th</sup> bit to 1.
    * @param i index of the bit
    */
@@ -167,60 +122,6 @@ public class BitArray {
   }
 
   /**
-   * Set a range of bits, expanding the size if necessary. <br/>
-   * NOTE: <code>s < e</code> must be true!
-   * @param s index of the first bit to set
-   * @param e index of the last bit to set + 1 (to be in conformance with
-   *          {@link java.util.BitSet})
-   */
-  public void set(final int s, final int e) {
-    final int startWord = s >>> WORD_POWER;
-    final int endWord = e - 1 >>> WORD_POWER;
-
-    if(endWord >= words.length) expandTo(endWord + 1);
-
-    final long startMask = WORD_MASK << s;
-    // 64 - (e % 64) = 64 - (e & 63) = -e, due to wrap
-    final long endMask = WORD_MASK >>> -e;
-
-    if(startWord == endWord) {
-      words[startWord] |= startMask & endMask;
-    } else {
-      words[startWord] |= startMask;
-      for(int i = startWord + 1; i < endWord; i++) words[i] = WORD_MASK;
-      words[endWord] |= endMask;
-    }
-    if(e >= length) length = e + 1L;
-  }
-
-  /**
-   * Set a range of bits, expanding the size if necessary. <br/>
-   * NOTE: <code>s < e</code> must be true!
-   * @param s index of the first bit to set
-   * @param e index of the last bit to set + 1 (to be in conformance with
-   *          {@link java.util.BitSet})
-   */
-  public void set(final long s, final long e) {
-    final int startWord = (int) (s >>> WORD_POWER);
-    final int endWord = (int) (e - 1L >>> WORD_POWER);
-
-    if(endWord >= words.length) expandTo(endWord + 1);
-
-    final long startMask = WORD_MASK << s;
-    // 64 - (e % 64) = 64 - (e & 63) = -e, due to wrap
-    final long endMask = WORD_MASK >>> -e;
-
-    if(startWord == endWord) {
-      words[startWord] |= startMask & endMask;
-    } else {
-      words[startWord] |= startMask;
-      for(int i = startWord + 1; i < endWord; i++) words[i] = WORD_MASK;
-      words[endWord] |= endMask;
-    }
-    if(e >= length) length = e + 1L;
-  }
-
-  /**
    * Set the i<sup>th</sup> bit to 0.
    * @param i index of the bit
    */
@@ -230,116 +131,6 @@ public class BitArray {
     if(wordIndex >= words.length) expandTo(wordIndex + 1);
     words[wordIndex] &= ~(1L << i);
     // it is not necessary to set the last used bit
-  }
-
-  /**
-   * Set the i<sup>th</sup> bit to 0.
-   * @param i index of the bit
-   */
-  public void clear(final long i) {
-    // calculate the index of the word in the array: i div 2^6 = i >> 6
-    final int wordIndex = (int) (i >>> WORD_POWER);
-    if(wordIndex >= words.length) expandTo(wordIndex + 1);
-    words[wordIndex] &= ~(1L << i);
-    // it is not necessary to set the last used bit
-  }
-
-  /**
-   * Clear a range of bits. <br/>
-   * NOTE: <code>s < e</code> must be true!
-   * @param s index of the first bit to set
-   * @param e index of the last bit to set + 1 (to be in conformance with
-   *          {@link java.util.BitSet})
-   */
-  public void clear(final int s, final int e) {
-    final int startWord = s >>> WORD_POWER;
-    final int endWord = min(e - 1 >>> WORD_POWER, words.length - 1);
-
-    final long startMask = ~(WORD_MASK << s);
-    // 64 - (e % 64) = 64 - (e & 63) = -e, due to wrap
-    final long endMask = ~(WORD_MASK >>> -e);
-
-    if(startWord == endWord) {
-      words[startWord] &= startMask | endMask;
-    } else {
-      words[startWord] &= startMask;
-      for(int i = startWord + 1; i < endWord; i++) words[i] = 0L;
-      words[endWord] &= endMask;
-    }
-  }
-
-  /**
-   * Clear a range of bits. <br/>
-   * NOTE: <code>s < e</code> must be true!
-   * @param s index of the first bit to set
-   * @param e index of the last bit to set + 1 (to be in conformance with
-   *          {@link java.util.BitSet})
-   */
-  public void clear(final long s, final long e) {
-    final int startWord = (int) (s >>> WORD_POWER);
-    final int endWord = min((int) (e - 1L >>> WORD_POWER), words.length - 1);
-
-    final long startMask = ~(WORD_MASK << s);
-    // 64 - (e % 64) = 64 - (e & 63) = -e, due to wrap
-    final long endMask = ~(WORD_MASK >>> -e);
-
-    if(startWord == endWord) {
-      words[startWord] &= startMask | endMask;
-    } else {
-      words[startWord] &= startMask;
-      for(int i = startWord + 1; i < endWord; i++) words[i] = 0L;
-      words[endWord] &= endMask;
-    }
-  }
-
-  /**
-   * Get the next bit set to 1, starting from the i<sup>th</sup> bit.
-   * @param i index from which to start the search (inclusive)
-   * @return index of the next set bit; -1 if there is no set bit after the
-   *         i<sup>th</sup> bit
-   */
-  public int nextSetBit(final int i) {
-    // calculate the index of the word in the array: i div 2^6 = i >> 6
-    int wordIndex = i >>> WORD_POWER;
-    // skip the first i bits:
-    long word = words[wordIndex] & WORD_MASK << i;
-
-    if(word != 0) {
-      return (wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
-    }
-
-    while(++wordIndex < words.length) {
-      if((word = words[wordIndex]) != 0) {
-        return wordIndex << WORD_POWER + numberOfTrailingZeros(word);
-      }
-    }
-
-    return -1;
-  }
-
-  /**
-   * Get the next bit set to 1, starting from the i<sup>th</sup> bit.
-   * @param i index from which to start the search (inclusive)
-   * @return index of the next set bit; -1 if there is no set bit after the
-   *         i<sup>th</sup> bit
-   */
-  public long nextSetBit(final long i) {
-    // calculate the index of the word in the array: i div 2^6 = i >> 6
-    int wordIndex = (int) (i >>> WORD_POWER);
-    // skip the first i bits:
-    long word = words[wordIndex] & WORD_MASK << i;
-
-    if(word != 0) {
-      return ((long) wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
-    }
-
-    while(++wordIndex < words.length) {
-      if((word = words[wordIndex]) != 0) {
-        return ((long) wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
-      }
-    }
-
-    return -1L;
   }
 
   /**
@@ -365,85 +156,6 @@ public class BitArray {
 
     // wordIndex * 2^6:
     return wordIndex << WORD_POWER;
-  }
-
-  /**
-   * Get the next bit set to 0, starting from the i<sup>th</sup> bit.
-   * @param i index from which to start the search (inclusive)
-   * @return index of the next clear bit after the i<sup>th</sup> bit
-   */
-  public long nextClearBit(final long i) {
-    // calculate the index of the word in the array: i div 2^6 = i >> 6
-    int wordIndex = (int) (i >>> WORD_POWER);
-    // invert the word and skip the first i bits:
-    long word = ~words[wordIndex] & WORD_MASK << i;
-
-    if(word != 0) {
-      return ((long) wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
-    }
-
-    while(++wordIndex < words.length) {
-      if((word = ~words[wordIndex]) != 0) {
-        return ((long) wordIndex << WORD_POWER) + numberOfTrailingZeros(word);
-      }
-    }
-
-    // wordIndex * 2^6:
-    return wordIndex << WORD_POWER;
-  }
-
-  /**
-   * Get the next n clear bits, starting from the i<sup>th</sup> bit.
-   * @param i index from which to start the search (inclusive)
-   * @param n number of clear bits.
-   * @return a list of clear bits
-   */
-  public int[] nextClearBits(final int i, final int n) {
-    final int[] t = new int[n];
-
-    int cnt = 0;
-    int prev = i;
-
-    // try to find n clear bits:
-    while(cnt < n) {
-      final int b = nextClearBit(prev);
-      if(b >= 0 && b < length) prev = (t[cnt++] = b) + 1;
-      else break;
-    }
-
-    if(cnt == n) return t;
-
-    // if needed, create a result array with length == number of found bits:
-    final int[] r = new int[cnt];
-    System.arraycopy(t, 0, r, 0, cnt);
-    return r;
-  }
-
-  /**
-   * Get the next n clear bits, starting from the i<sup>th</sup> bit.
-   * @param i index from which to start the search (inclusive)
-   * @param n number of clear bits.
-   * @return a list of clear bits
-   */
-  public long[] nextClearBits(final long i, final int n) {
-    final long[] t = new long[n];
-
-    int cnt = 0;
-    long prev = i;
-
-    // try to find n clear bits:
-    while(cnt < n) {
-      final long b = nextClearBit(prev);
-      if(b >= 0 && b < length) prev = (t[cnt++] = b) + 1L;
-      else break;
-    }
-
-    if(cnt == n) return t;
-
-    // if needed, create a result array with length == number of found bits:
-    final long[] r = new long[cnt];
-    System.arraycopy(t, 0, r, 0, cnt);
-    return r;
   }
 
   /**
