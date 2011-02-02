@@ -1079,6 +1079,14 @@ public interface Text {
   String INTPARSEINFO = lang("dc_intparseinfo") + DOT;
   /** Input format information. */
   String FORMATINFO = lang("dc_formatinfo") + DOT;
+  /** CSV header information. */
+  String HEADERINFO = lang("dc_headerinfo") + DOT;
+  /** CSV Database format information. */
+  String FORMINFO = lang("dc_forminfo") + DOT;
+  /** CSV Separator information. */
+  String SEPARATORINFO = lang("dc_separatorinfo") + DOT;
+  /** TEXT Lines information. */
+  String LINESINFO = lang("dc_linesinfo") + DOT;
 
   /** Path summary information. */
   String PATHINDEXINFO = lang("dc_pathinfo") + DOT;

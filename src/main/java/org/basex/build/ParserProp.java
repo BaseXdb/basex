@@ -58,4 +58,13 @@ public final class ParserProp extends AProp {
       }
     }
   }
+  
+  @Override
+  public String toString() {
+    String s = "separator=" + this.get(SEPARATOR);
+    String h = "header=" + String.valueOf(this.is(HEADER));
+    String f = "format=" + this.get(FORMAT);
+    String l = "lines=" + String.valueOf(this.is(LINES));
+    return s + "," + h + "," + f + "," + l;
+  }
 }

@@ -1,4 +1,3 @@
-# LANGUAGE FILE, TRANSLATED BY
 # Huib Verweij
 #
 # The '%' character serves as placeholder for texts to be inserted
@@ -100,6 +99,10 @@ dc_names=Namen
 dc_index=Indexen
 dc_meta=Metadata
 dc_ft=Full-Text
+dc_headerinfo=Switch this option on to use a header
+dc_linesinfo=Splits input into lines
+dc_forminfo=Choose XML format
+dc_separatorinfo=Choose column separator
 
 do_title=Open Database
 do_large=De database is % groot. Wil je enkele visualisaties\nsluiten om sneller te kunnen werken?

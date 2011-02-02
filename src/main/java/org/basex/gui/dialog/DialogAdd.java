@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import org.basex.core.cmd.Add;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -33,7 +34,7 @@ public class DialogAdd extends Dialog {
   /** Buttons. */
   private final BaseXBack buttons;
   /** Editable parsing options. */
-  private final DialogParsing parsing;
+  final DialogParsing parsing;
 
   /**
    * Default constructor.
@@ -96,7 +97,7 @@ public class DialogAdd extends Dialog {
   @Override
   public void action(final Object cmp) {
     ok = true;
-    parsing.action();
+    parsing.action(cmp);
     final String in = path.getText().trim();
     final IO io = IO.get(in);
 

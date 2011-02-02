@@ -100,6 +100,10 @@ dc_names=名前
 dc_index=インデックス
 dc_meta=メタデータ
 dc_ft=全文
+dc_headerinfo=Switch this option on to use a header
+dc_linesinfo=Splits input into lines
+dc_forminfo=Choose XML format
+dc_separatorinfo=Choose column separator
 
 do_title=データベースを開く
 do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?

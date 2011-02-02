@@ -57,16 +57,18 @@ public final class DialogOpen extends Dialog {
   private final BaseXButton restore;
   /** File system flag. */
   private final boolean fsInstance;
+  /** Manage flag. */
+  private final boolean manage;
 
   /**
    * Default constructor.
    * @param main reference to the main window
-   * @param manage show manage dialog
+   * @param m show manage dialog
    * @param fs file system flag
    */
-  public DialogOpen(final GUI main, final boolean manage, final boolean fs) {
-    super(main, manage ? MANAGETITLE : fs ? OPENDQETITLE : OPENTITLE);
-
+  public DialogOpen(final GUI main, final boolean m, final boolean fs) {
+    super(main, m ? MANAGETITLE : fs ? OPENDQETITLE : OPENTITLE);
+    manage = m;
     // create database chooser
     final StringList db = fs ? List.listFS(main.context) :
       List.list(main.context);
@@ -190,7 +192,7 @@ public final class DialogOpen extends Dialog {
           detail.setText(InfoDB.db(meta, true, true, true));
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
-          ok = false;
+          ok = manage;
         } finally {
           if(in != null) try { in.close(); } catch(final IOException ex) { }
         }

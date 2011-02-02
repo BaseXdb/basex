@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
@@ -49,7 +50,7 @@ public final class DialogCreate extends Dialog {
   /** Editable full-text options. */
   private final DialogFT ft;
   /** Editable parsing options. */
-  private final DialogParsing parsing;
+  final DialogParsing parsing;
   /** Buttons. */
   private final BaseXBack buttons;
   /** Available databases. */
@@ -164,7 +165,7 @@ public final class DialogCreate extends Dialog {
   @Override
   public void action(final Object cmp) {
     ft.action(ftxindex.isSelected());
-    parsing.action();
+    parsing.action(cmp);
 
     boolean valid;
     final String pth = path.getText().trim();
