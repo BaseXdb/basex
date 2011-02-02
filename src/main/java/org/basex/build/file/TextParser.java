@@ -76,6 +76,7 @@ public final class TextParser extends FileParser {
       }
     }
     bi.close();
+    if(!lines) builder.text(tb);
     builder.endElem(TEXT);
   }
 }
