@@ -100,11 +100,20 @@ public final class BaseXLayout {
   /**
    * Adds default interactions to the specified component.
    * @param comp component
-   * @param hlp help text
    * @param win parent window
    */
-  static void addInteraction(final Component comp, final byte[] hlp,
-        final Window win) {
+  static void addInteraction(final Component comp, final Window win) {
+    addInteraction(comp, win, null);
+  }
+
+  /**
+   * Adds default interactions to the specified component.
+   * @param comp component
+   * @param win parent window
+   * @param hlp help text
+   */
+  static void addInteraction(final Component comp, final Window win,
+        final byte[] hlp) {
 
     comp.addMouseListener(new MouseAdapter() {
       @Override

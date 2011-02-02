@@ -16,6 +16,6 @@ public final class BaseXTabs extends JTabbedPane {
    */
   public BaseXTabs(final Window win) {
     super();
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
   }
 }

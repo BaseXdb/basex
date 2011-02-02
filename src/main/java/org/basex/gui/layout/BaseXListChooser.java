@@ -153,7 +153,7 @@ public final class BaseXListChooser extends BaseXBack {
     list.addMouseListener(mouse);
     list.addMouseMotionListener(mouse);
     text.setFont(list.getFont());
-    BaseXLayout.addInteraction(list, null, d);
+    BaseXLayout.addInteraction(list, d);
 
     scroll = new JScrollPane(list,
         ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,

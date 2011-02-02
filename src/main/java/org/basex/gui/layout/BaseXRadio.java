@@ -24,7 +24,7 @@ public final class BaseXRadio extends JRadioButton {
     super(label, sel);
     setOpaque(false);
     setBorder(new EmptyBorder(0, 0, 0, 16));
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
 
     if(!(win instanceof Dialog)) return;
     addActionListener(new ActionListener() {

@@ -65,7 +65,7 @@ public class DialogParsing extends BaseXBack {
   /** Main panel. */
   private final BaseXBack main;
   /** ParserProps. */
-  ParserProp props;
+  private ParserProp props;
 
   /**
    * Default constructor.
@@ -77,8 +77,8 @@ public class DialogParsing extends BaseXBack {
     
     try {
       props = new ParserProp(d.gui.context.prop.get(Prop.PARSEROPT));
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      props = new ParserProp();
     }
     
     // always use internal/external parser, chop whitespaces, ...?
@@ -140,8 +140,7 @@ public class DialogParsing extends BaseXBack {
     xmlopts.add(entities);
     xmlopts.add(dtd);
     xmlopts.add(chop);
-    xmlopts.add(new BaseXLabel(CHOPPINGINFO, false,
-        false).border(0, 0, 8, 0));
+    xmlopts.add(new BaseXLabel(CHOPPINGINFO, false, false).border(0, 0, 8, 0));
     xmlopts.add(new BaseXLabel());
 
     // CatalogResolving
@@ -184,8 +183,8 @@ public class DialogParsing extends BaseXBack {
     if(type.equals(DataText.M_XML)) {
       main.add(xmlopts);
     } else if(type.equals(DataText.M_HTML)) {
-      BaseXLabel l = new BaseXLabel("No options for HTML");
-      BaseXBack b = new BaseXBack().border(4);
+      final BaseXLabel l = new BaseXLabel("No options for HTML");
+      final BaseXBack b = new BaseXBack().border(4);
       b.add(l);
       main.add(b);
     } else if(type.equals(DataText.M_CSV)) {
@@ -216,13 +215,13 @@ public class DialogParsing extends BaseXBack {
   void action(final Object cmp) {
     final String type = parser.getSelectedItem().toString();
     if(type.equals(DataText.M_XML)) {
-    intparse.setEnabled(!usecat.isSelected());
-    entities.setEnabled(intparse.isSelected());
-    dtd.setEnabled(intparse.isSelected());
-    usecat.setEnabled(!intparse.isSelected() && 
-        CatalogResolverWrapper.available());
-    cfile.setEnabled(usecat.isSelected());
-    browsec.setEnabled(cfile.isEnabled());
+      intparse.setEnabled(!usecat.isSelected());
+      entities.setEnabled(intparse.isSelected());
+      dtd.setEnabled(intparse.isSelected());
+      usecat.setEnabled(!intparse.isSelected() &&
+          CatalogResolverWrapper.available());
+      cfile.setEnabled(usecat.isSelected());
+      browsec.setEnabled(cfile.isEnabled());
     }
     if(cmp == parser) {
       options(type);

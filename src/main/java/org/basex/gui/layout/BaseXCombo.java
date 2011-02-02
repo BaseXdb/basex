@@ -20,7 +20,7 @@ public final class BaseXCombo extends JComboBox {
    */
   public BaseXCombo(final Window win, final String... ch) {
     super(ch);
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
 
     if(!(win instanceof Dialog)) return;
 

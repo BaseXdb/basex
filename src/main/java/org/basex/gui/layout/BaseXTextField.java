@@ -40,7 +40,7 @@ public class BaseXTextField extends JTextField {
    */
   public BaseXTextField(final String txt, final Window win) {
     BaseXLayout.setWidth(this, DWIDTH);
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
 
     if(txt != null) {
       setText(txt);

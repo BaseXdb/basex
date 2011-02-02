@@ -40,7 +40,7 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
    */
   protected BaseXPanel(final byte[] hlp, final Window win) {
     gui = win instanceof GUI ? (GUI) win : ((Dialog) win).gui;
-    BaseXLayout.addInteraction(this, hlp, win);
+    BaseXLayout.addInteraction(this, win, hlp);
   }
 
   @Override

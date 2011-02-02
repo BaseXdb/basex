@@ -26,7 +26,7 @@ import org.basex.util.Util;
  */
 public abstract class AProp {
   /** Properties. */
-  private final HashMap<String, Object> props = new HashMap<String, Object>();
+  protected final HashMap<String, Object> props = new HashMap<String, Object>();
   /** Property file. */
   private final String filename;
 

@@ -41,7 +41,7 @@ public final class BaseXTable extends JTable {
     setModel(model);
     getTableHeader().setReorderingAllowed(false);
     getTableHeader().setResizingAllowed(false);
-    BaseXLayout.addInteraction(this, null, d);
+    BaseXLayout.addInteraction(this, d);
 
     getSelectionModel().addListSelectionListener(new ListSelectionListener() {
       @Override

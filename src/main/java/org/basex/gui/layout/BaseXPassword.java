@@ -22,7 +22,7 @@ public final class BaseXPassword extends JPasswordField {
    */
   public BaseXPassword(final Window win) {
     BaseXLayout.setWidth(this, DWIDTH);
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
 
     if(!(win instanceof Dialog)) return;
     addActionListener(new ActionListener() {

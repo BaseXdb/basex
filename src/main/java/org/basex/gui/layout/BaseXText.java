@@ -61,7 +61,7 @@ public class BaseXText extends BaseXPanel {
     setFocusable(true);
     setFocusTraversalKeysEnabled(!edit);
 
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
     addMouseMotionListener(this);
     addMouseWheelListener(this);
     addComponentListener(this);

@@ -2,6 +2,8 @@ package org.basex.build;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.util.Iterator;
+
 import org.basex.core.AProp;
 import org.basex.data.DataText;
 import org.basex.util.Token;
@@ -24,14 +26,20 @@ public final class ParserProp extends AProp {
   public static final Object[] LINES = { "lines", true };
 
   /**
+   * Constructor.
+   */
+  public ParserProp() {
+    super(null);
+  }
+  
+  /**
    * Constructor, specifying initial properties.
    * @param s property string. Properties are separated with commas ({@code ,}),
    * key/values with the equality character ({@code =}).
    * @throws IOException I/O exception
    */
   public ParserProp(final String s) throws IOException {
-    super(null);
-    if(s == null) return;
+    this();
 
     for(final String ser : s.trim().split(",")) {
       if(ser.isEmpty()) continue;
@@ -61,10 +69,13 @@ public final class ParserProp extends AProp {
   
   @Override
   public String toString() {
-    String s = "separator=" + this.get(SEPARATOR);
-    String h = "header=" + String.valueOf(this.is(HEADER));
-    String f = "format=" + this.get(FORMAT);
-    String l = "lines=" + String.valueOf(this.is(LINES));
-    return s + "," + h + "," + f + "," + l;
+    final StringBuilder sb = new StringBuilder();
+    final Iterator<String> it = props.keySet().iterator();
+    while(it.hasNext()) {
+      if(sb.length() != 0) sb.append(',');
+      final String s = it.next();
+      sb.append(s + '=' + props.get(s));
+    }
+    return sb.toString();
   }
 }
