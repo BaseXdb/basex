@@ -38,7 +38,7 @@ public final class Lock {
    * @param c context
    */
   public Lock(final Context c) {
-    this.ctx = c;
+    ctx = c;
   }
 
   /**
@@ -68,8 +68,7 @@ public final class Lock {
     } else {
       synchronized(this) {
         final int p = Math.max(ctx.prop.num(Prop.PARALLEL), 1);
-        if(state != State.WRITE && list.size() == 0 &&
-            activeR < p) {
+        if(state != State.WRITE && list.size() == 0 && activeR < p) {
           state = State.READ;
           ++activeR;
           return;

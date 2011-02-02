@@ -43,11 +43,13 @@ public final class ListDB extends Command {
 
     try {
       final Data data = Open.open(db, context);
-      for(final int pre : path == null ? data.doc() : data.doc(path)) {
-        final TokenList tl = new TokenList();
-        tl.add(data.text(pre, true));
-        tl.add(data.size(pre, Data.DOC));
-        table.contents.add(tl);
+      if(!data.empty()) {
+        for(final int pre : path == null ? data.doc() : data.doc(path)) {
+          final TokenList tl = new TokenList();
+          tl.add(data.text(pre, true));
+          tl.add(data.size(pre, Data.DOC));
+          table.contents.add(tl);
+        }
       }
       Close.close(data, context);
     } catch(final IOException ex) {

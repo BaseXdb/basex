@@ -223,38 +223,38 @@ public final class IOFile extends IO {
   /**
    * Converts a file filter (glob) to a regular expression. A filter may
    * contain asterisks (*) and question marks (?); commas (,) are used to
-   * separate multiple filters. Special characters can be backslashed (\).
+   * separate multiple filters.
    * @param filter filter
    * @return regular expression
    */
   public static String regex(final String filter) {
     final StringBuilder sb = new StringBuilder();
-    boolean wild = false;
-    boolean back = false;
-    for(int f = 0; f < filter.length(); f++) {
-      char ch = filter.charAt(f);
-      if(!back) {
+    for(final String g : filter.split(",")) {
+      boolean suf = false;
+      final String glob = g.trim();
+      if(sb.length() != 0) {
+        if(!suf) sb.append(".*");
+        suf = false;
+        sb.append('|');
+      }
+      for(int f = 0; f < glob.length(); f++) {
+        char ch = glob.charAt(f);
         if(ch == '*') {
-          sb.append('.');
-          wild = true;
+          sb.append("[^.]");
         } else if(ch == '?') {
           ch = '.';
-          wild = true;
-        } else if(ch == ',') {
-          ch = '|';
-          if(!wild) sb.append(".*");
-          wild = false;
+          suf = true;
         } else if(!Character.isLetterOrDigit(ch)) {
-          back = ch == '\\';
-          if(!back) sb.append('\\');
-          if(ch == '.') wild = true;
+          if(ch == '.') {
+            suf = true;
+            if(f + 1 == glob.length()) break;
+          }
+          sb.append('\\');
         }
-      } else {
-        back = false;
+        sb.append(ch);
       }
-      sb.append(ch);
+      if(!suf) sb.append(".*");
     }
-    if(!wild) sb.append(".*");
     return Prop.WIN ? sb.toString().toLowerCase() : sb.toString();
   }
 
