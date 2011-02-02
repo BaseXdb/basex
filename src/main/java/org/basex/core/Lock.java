@@ -18,6 +18,8 @@ public final class Lock {
   /** List of waiting processes for writers or reading groups. */
   private final List<Resource> list =
     Collections.synchronizedList(new ArrayList<Resource>());
+  /** Server Context. */
+  private final Context ctx;
 
   /** States of locking. */
   private static enum State {
@@ -30,13 +32,20 @@ public final class Lock {
   private State state = State.IDLE;
   /** Number of active readers. */
   private int activeR;
+  
+  /**
+   * Default constructor.
+   * @param c context
+   */
+  public Lock(final Context c) {
+    this.ctx = c;
+  }
 
   /**
    * Modifications before executing a command.
    * @param w writing flag
-   * @param ctx database context
    */
-  public void register(final boolean w, final Context ctx) {
+  public void register(final boolean w) {
     if(SKIP) return;
     if(w) {
       if(state == State.IDLE) {
@@ -58,8 +67,9 @@ public final class Lock {
       }
     } else {
       synchronized(this) {
+        final int p = Math.max(ctx.prop.num(Prop.PARALLEL), 1);
         if(state != State.WRITE && list.size() == 0 &&
-            activeR < ctx.prop.num(Prop.PARALLEL)) {
+            activeR < p) {
           state = State.READ;
           ++activeR;
           return;
@@ -88,14 +98,13 @@ public final class Lock {
   /**
    * Modifications after executing a command.
    * @param w writing flag
-   * @param ctx database context
    */
-  public synchronized void unregister(final boolean w, final Context ctx) {
+  public synchronized void unregister(final boolean w) {
     if(SKIP) return;
 
     if(w) {
       if(list.size() > 0 && list.get(0).reader) {
-        notifyReaders(ctx);
+        notifyReaders();
       } else {
         notifyWriter();
       }
@@ -108,10 +117,9 @@ public final class Lock {
 
   /**
    * Notifies all waiting readers.
-   * @param ctx database context
    */
-  private void notifyReaders(final Context ctx) {
-    final int p = ctx.prop.num(Prop.PARALLEL);
+  private void notifyReaders() {
+    final int p = Math.max(ctx.prop.num(Prop.PARALLEL), 1);
     int c = 1;
     do {
       c++;

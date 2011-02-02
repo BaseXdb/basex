@@ -56,7 +56,7 @@ public final class Context {
     datas = new DataPool();
     triggers = new TriggerPool();
     sessions = new Sessions();
-    lock = new Lock();
+    lock = new Lock(this);
     users = new Users(true);
     user = users.get(ADMIN);
   }
@@ -179,7 +179,7 @@ public final class Context {
    * @param w writing flag
    */
   public void register(final boolean w) {
-    lock.register(w, this);
+    lock.register(w);
   }
 
   /**
@@ -187,7 +187,7 @@ public final class Context {
    * @param w writing flag
    */
   public void unregister(final boolean w) {
-    lock.unregister(w, this);
+    lock.unregister(w);
   }
 
   /**
