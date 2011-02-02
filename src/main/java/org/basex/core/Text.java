@@ -1082,9 +1082,9 @@ public interface Text {
   /** CSV header information. */
   String HEADERINFO = lang("dc_headerinfo") + DOT;
   /** CSV Database format information. */
-  String FORMINFO = lang("dc_forminfo") + DOT;
+  String FORMINFO = lang("dc_forminfo") + COL;
   /** CSV Separator information. */
-  String SEPARATORINFO = lang("dc_separatorinfo") + DOT;
+  String SEPARATORINFO = lang("dc_separatorinfo") + COL;
   /** TEXT Lines information. */
   String LINESINFO = lang("dc_linesinfo") + DOT;
 

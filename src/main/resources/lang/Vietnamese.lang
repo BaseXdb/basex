@@ -102,8 +102,8 @@ dc_meta=Metadata
 dc_ft=Nội dung
 dc_headerinfo=Switch this option on to use a header
 dc_linesinfo=Splits input into lines
-dc_forminfo=Choose XML format
-dc_separatorinfo=Choose column separator
+dc_forminfo=XML format
+dc_separatorinfo=Separator
 
 do_title=Mở cơ sở dữ liệu
 do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?

@@ -100,10 +100,10 @@ dc_names=Namen
 dc_index=Indizes
 dc_meta=Metadaten
 dc_ft=Volltext
-dc_headerinfo=Diese Option erlaubt einen CSV header
+dc_headerinfo=Diese Option erlaubt einen header
 dc_linesinfo=Teilt den Input in Zeilen
-dc_forminfo=Option für XML format
-dc_separatorinfo=Auswahl des Separators des CSV
+dc_forminfo=XML format
+dc_separatorinfo=Separator
 
 do_title=Datenbank öffnen
 do_large=Die zu öffnende Datenbank ist % groß. Wollen Sie einige\nVisualisierungen schließen, um die Arbeit zu beschleunigen?

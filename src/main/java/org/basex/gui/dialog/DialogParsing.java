@@ -1,6 +1,8 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -120,15 +122,15 @@ public class DialogParsing extends BaseXBack {
     format = new BaseXCombo(d, new String[]{"simple", "verbose"});
     format.setSelectedItem(props.get(ParserProp.FORMAT));
     
-    xmlopts = new BaseXBack(new TableLayout(9, 1)).border(4);
-    csvopts = new BaseXBack(new TableLayout(6, 1)).border(4);
-    textopts = new BaseXBack(new TableLayout(3, 1)).border(4);
+    xmlopts = new BaseXBack(new TableLayout(9, 1));
+    csvopts = new BaseXBack(new TableLayout(6, 1));
+    textopts = new BaseXBack(new TableLayout(3, 1));
     createOptionsPanels();
     
     main.add(new BaseXBack());
     options(parser.getSelectedItem().toString());
-    
     add(main);
+    setPreferredSize(new Dimension(400, 280));
   }
   
   /**
@@ -164,12 +166,18 @@ public class DialogParsing extends BaseXBack {
       rs.add(new BaseXLabel(USECATHLP2).color(GUIConstants.COLORDARK));
       xmlopts.add(rs);
     }
-    csvopts.add(header);
-    csvopts.add(new BaseXLabel(HEADERINFO, true, false));
-    csvopts.add(separator);
-    csvopts.add(new BaseXLabel(SEPARATORINFO, true, false));
-    csvopts.add(format);
-    csvopts.add(new BaseXLabel(FORMINFO, true, false));
+    BaseXBack p = new BaseXBack(new TableLayout(2, 1, 6, 0));
+    p.add(header);
+    p.add(new BaseXLabel(HEADERINFO, true, false));
+    csvopts.add(p);
+    p = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    p.add(new BaseXLabel(SEPARATORINFO, true, false));
+    p.add(separator);
+    csvopts.add(p);
+    p = new BaseXBack(new TableLayout(1, 2, 6, 0)).border(4, 0, 0, 0);
+    p.add(new BaseXLabel(FORMINFO, true, false));
+    p.add(format);
+    csvopts.add(p);
     textopts.add(lines);
     textopts.add(new BaseXLabel(LINESINFO, true, false));
   }
@@ -184,7 +192,7 @@ public class DialogParsing extends BaseXBack {
       main.add(xmlopts);
     } else if(type.equals(DataText.M_HTML)) {
       final BaseXLabel l = new BaseXLabel("No options for HTML");
-      final BaseXBack b = new BaseXBack().border(4);
+      final BaseXBack b = new BaseXBack();
       b.add(l);
       main.add(b);
     } else if(type.equals(DataText.M_CSV)) {

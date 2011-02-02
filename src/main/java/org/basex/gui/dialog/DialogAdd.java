@@ -1,10 +1,12 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -35,6 +37,8 @@ public class DialogAdd extends Dialog {
   private final BaseXBack buttons;
   /** Editable parsing options. */
   final DialogParsing parsing;
+  /** Document filter. */
+  private final BaseXTextField filter;
 
   /**
    * Default constructor.
@@ -43,7 +47,7 @@ public class DialogAdd extends Dialog {
   public DialogAdd(final GUI main) {
     super(main, GUIADD);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(8, 2, 6, 0)).border(8);
+    final BaseXBack p = new BaseXBack(new TableLayout(10, 2, 6, 0)).border(8);
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
@@ -58,6 +62,13 @@ public class DialogAdd extends Dialog {
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
     p.add(browse);
+    
+    p.add(new BaseXLabel(CREATEPATTERN + COL, true, true).border(8, 0, 4, 0));
+    p.add(new BaseXLabel());
+
+    filter = new BaseXTextField(main.context.prop.get(Prop.CREATEFILTER), this);
+    p.add(filter);
+    p.add(new BaseXLabel());
 
     p.add(new BaseXLabel(CREATETARGET, true, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());
@@ -109,6 +120,8 @@ public class DialogAdd extends Dialog {
       ok = false;
       info.setText(inf, Msg.ERROR);
     }
+
+    filter.setEnabled(exists && io.isDir());
     enableOK(buttons, BUTTONOK, ok);
   }
 
@@ -120,6 +133,7 @@ public class DialogAdd extends Dialog {
     final String in = path.getText().trim();
     final String to = target.getText().trim();
     parsing.close();
+    gui.set(Prop.CREATEFILTER, filter.getText());
     return new Add(in, null, to.isEmpty() ? null : to);
   }
 }
