@@ -128,9 +128,14 @@ public class DialogParsing extends BaseXBack {
     createOptionsPanels();
 
     main.add(new BaseXBack());
-    options(parser.getSelectedItem().toString());
+    options(DataText.M_XML);
+    Dimension dim = main.getPreferredSize();
+    String t = parser.getSelectedItem().toString();
+    if(!t.equals(DataText.M_XML)) {
+      options(t);
+      main.setPreferredSize(dim);
+    }
     add(main);
-    setPreferredSize(new Dimension(400, 280));
   }
 
   /**
