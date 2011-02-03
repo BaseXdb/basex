@@ -8,6 +8,9 @@ import java.io.IOException;
  * @author BaseX Team 2005-11, ISC License
  */
 public final class QueryBindExample {
+
+  /** Hidden default constructor. */
+  private QueryBindExample() { }
   /**
    * Main method.
    * @param args command-line arguments

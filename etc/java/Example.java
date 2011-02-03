@@ -9,6 +9,10 @@ import java.io.OutputStream;
  * @author BaseX Team 2005-11, ISC License
  */
 public final class Example {
+
+  /** Hidden default constructor. */
+  private Example() { }
+
   /**
    * Main method, launching the standalone console mode.
    * @param args command-line arguments
