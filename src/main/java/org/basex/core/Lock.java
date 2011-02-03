@@ -32,7 +32,7 @@ public final class Lock {
   private State state = State.IDLE;
   /** Number of active readers. */
   private int activeR;
-  
+
   /**
    * Default constructor.
    * @param c context

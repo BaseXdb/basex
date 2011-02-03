@@ -62,7 +62,7 @@ public class DialogAdd extends Dialog {
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
     p.add(browse);
-    
+
     p.add(new BaseXLabel(CREATEPATTERN + COL, true, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());
 

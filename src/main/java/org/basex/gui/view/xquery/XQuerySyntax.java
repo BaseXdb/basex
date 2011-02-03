@@ -76,7 +76,7 @@ final class XQuerySyntax extends BaseXSyntax {
       comment = ch == ')' ? 0 : 2;
     }
     if(comment != 0) return KEY;
-    
+
     // quotes
     if(quote == 0 && (ch == '"' || ch == '\'')) {
       quote = ch;

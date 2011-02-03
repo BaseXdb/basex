@@ -76,13 +76,13 @@ public class DialogParsing extends BaseXBack {
   public DialogParsing(final Dialog d) {
     dialog = d;
     main = new BaseXBack(new TableLayout(3, 1)).border(4);
-    
+
     try {
       props = new ParserProp(d.gui.context.prop.get(Prop.PARSEROPT));
     } catch(final IOException ex) {
       props = new ParserProp();
     }
-    
+
     // always use internal/external parser, chop whitespaces, ...?
     final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 6, 0));
 
@@ -99,7 +99,7 @@ public class DialogParsing extends BaseXBack {
     p.add(parser);
     main.add(p);
     main.add(new BaseXLabel(FORMATINFO, true, false));
-    
+
     intparse = new BaseXCheckBox(CREATEINTPARSE,
         dialog.gui.context.prop.is(Prop.INTPARSE), 0, dialog);
     entities = new BaseXCheckBox(CREATEENTITIES,
@@ -113,7 +113,7 @@ public class DialogParsing extends BaseXBack {
     cfile = new BaseXTextField(
         dialog.gui.context.prop.get(Prop.CATFILE), dialog);
     browsec = new BaseXButton(BUTTONBROWSE, dialog);
-    
+
     lines = new BaseXCheckBox("Lines", props.is(ParserProp.LINES), 0, dialog);
     header = new BaseXCheckBox("Header", props.is(ParserProp.HEADER),
         0, dialog);
@@ -121,18 +121,18 @@ public class DialogParsing extends BaseXBack {
     separator.setSelectedItem(props.get(ParserProp.SEPARATOR));
     format = new BaseXCombo(d, new String[]{"simple", "verbose"});
     format.setSelectedItem(props.get(ParserProp.FORMAT));
-    
+
     xmlopts = new BaseXBack(new TableLayout(9, 1));
     csvopts = new BaseXBack(new TableLayout(6, 1));
     textopts = new BaseXBack(new TableLayout(3, 1));
     createOptionsPanels();
-    
+
     main.add(new BaseXBack());
     options(parser.getSelectedItem().toString());
     add(main);
     setPreferredSize(new Dimension(400, 280));
   }
-  
+
   /**
    * Options panels.
    */
@@ -181,7 +181,7 @@ public class DialogParsing extends BaseXBack {
     textopts.add(lines);
     textopts.add(new BaseXLabel(LINESINFO, true, false));
   }
-  
+
   /**
    * Creates options panel.
    * @param type format type
@@ -202,7 +202,7 @@ public class DialogParsing extends BaseXBack {
     }
     validate();
   }
-  
+
   /**
    * Opens a file dialog to choose an XML catalog or directory.
    */

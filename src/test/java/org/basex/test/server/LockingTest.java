@@ -46,7 +46,7 @@ public final class LockingTest {
     "for $n at $p in doc('factbook')//city " +
     "where $c/@id = $n/@country and $n/name = 'Tirane' " +
     "return $n/population/text()";
-  
+
   /** Number of performance tests. */
   private static final int TESTS = 3;
 
@@ -60,7 +60,7 @@ public final class LockingTest {
   /** Status of test. */
   boolean done;
 
-  /** Starts the server. 
+  /** Starts the server.
    * @throws IOException exception
    */
   @BeforeClass
@@ -89,7 +89,7 @@ public final class LockingTest {
    */
   @Test
   public void createTest() throws Exception {
-    
+
     // first thread
     final Thread t1 = new Thread() {
       @Override
@@ -119,7 +119,7 @@ public final class LockingTest {
     t2.start();
     t1.join();
     t2.join();
-    
+
     // opens DB in session2 for further tests
     session2.execute(new Open(NAME));
 
@@ -171,7 +171,7 @@ public final class LockingTest {
   /** Number of done tests. */
   static int tdone;
 
-  /** Efficiency test. 
+  /** Efficiency test.
    * @throws Exception exception
    */
   @Test
@@ -218,7 +218,7 @@ public final class LockingTest {
     while(!done) Performance.sleep(100);
     done = false;
   }
-  
+
   /**
    * Returns a session instance.
    * @return session
@@ -242,7 +242,7 @@ public final class LockingTest {
       return null;
     }
   }
-  
+
   /** Single client. */
   static class Client extends Thread {
     /** Client session. */

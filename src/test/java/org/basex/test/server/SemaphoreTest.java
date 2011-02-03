@@ -41,7 +41,7 @@ public final class SemaphoreTest {
   /** Socket reference. */
   static Session sess;
 
-  /** Starts the server. 
+  /** Starts the server.
    * @throws IOException exception
    */
   @BeforeClass
@@ -77,7 +77,7 @@ public final class SemaphoreTest {
   /** Number of done tests. */
   static int tdone;
 
-  /** Efficiency test. 
+  /** Efficiency test.
    * @throws InterruptedException exception
    */
   @Test
@@ -102,7 +102,7 @@ public final class SemaphoreTest {
       return null;
     }
   }
-  
+
   /**
    * Returns a session instance.
    * @return session

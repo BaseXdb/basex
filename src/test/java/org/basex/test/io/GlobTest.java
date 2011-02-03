@@ -35,12 +35,12 @@ public final class GlobTest {
     /** Test. */ NOSUFFIX("*.", true, false, false),
     /** Test. */ NOSUFFIX2("*..", false, false, false),
     /** Test. */ BACK("\\", false, false, false);
-    
+
     /** Glob syntax. */
     final String glob;
     /** Results. */
     final boolean[] results;
-    
+
     /**
      * Constructor.
      * @param g glob syntax

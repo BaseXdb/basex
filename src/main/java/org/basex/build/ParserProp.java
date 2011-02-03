@@ -31,7 +31,7 @@ public final class ParserProp extends AProp {
   public ParserProp() {
     super(null);
   }
-  
+
   /**
    * Constructor, specifying initial properties.
    * @param s property string. Properties are separated with commas ({@code ,}),
@@ -66,7 +66,7 @@ public final class ParserProp extends AProp {
       }
     }
   }
-  
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
