@@ -105,6 +105,11 @@
     <module name="MethodName"/>
     <module name="MethodTypeParameterName"/>
     <module name="GenericWhitespace"/>
+    <module name="Regexp">
+      <property name="format" value="[ \t]+$"/>
+      <property name="illegalPattern" value="true"/>
+      <property name="message" value="Trailing whitespace"/>
+    </module>
   </module>
   <module name="StrictDuplicateCode">
     <property name="severity" value="ignore"/>

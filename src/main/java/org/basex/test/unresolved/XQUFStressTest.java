@@ -30,10 +30,10 @@ public class XQUFStressTest {
     final String op = "DELETE";
     p(op);
     final String db = DBNAME + op;
-    
+
     try {
       new CreateDB(db, "<doc/>").execute(ctx);
-      new XQuery("for $i in 1 to " + NRNODES 
+      new XQuery("for $i in 1 to " + NRNODES
           + " return insert node <node/> into /doc").
           execute(ctx);
       p("DB created.");
@@ -46,7 +46,7 @@ public class XQUFStressTest {
     }
     p("delete finished.\n");
   }
-  
+
   /**
    * Tests the insertAfter statement.
    */
@@ -56,15 +56,15 @@ public class XQUFStressTest {
     final String sec = "<section><page/></section>";
     final String doc = "<doc/>";
     final String db = DBNAME + op;
-    
+
     try {
       // fill DB
       new CreateDB(db, doc).
       execute(ctx);
-      new XQuery("for $i in 1 to " + NRNODES + " return insert node " + sec + 
+      new XQuery("for $i in 1 to " + NRNODES + " return insert node " + sec +
           "into /doc").execute(ctx);
       p("DB created.");
-      
+
       // actual query
       p("querying ...");
       new XQuery("for $page in //page " +
@@ -78,7 +78,7 @@ public class XQUFStressTest {
     }
     p("insert finished.\n");
   }
-  
+
   /**
    * Helper.
    * @param s String to be printed
@@ -86,7 +86,7 @@ public class XQUFStressTest {
   private static void p(final String s) {
     System.out.println(s);
   }
-  
+
   /**
    * Main.
    * @param args args

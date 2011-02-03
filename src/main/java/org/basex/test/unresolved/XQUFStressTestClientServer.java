@@ -26,7 +26,7 @@ public class XQUFStressTestClientServer {
   static final String DBNAME = "XQUFStress";
   /** Random number generator. */
   static final Random RND = new Random();
-  
+
   /**
    * Starting test.
    */
@@ -57,7 +57,7 @@ public class XQUFStressTestClientServer {
       e.printStackTrace();
     }
   }
-  
+
   /**
    * Performs the query.
    */
@@ -67,7 +67,7 @@ public class XQUFStressTestClientServer {
       ClientSession s = newSession();
       s.execute(new CreateDB(DBNAME, "<doc/>"));
       final int c = 100 + NQUERIES * NCLIENTS;
-      s.execute(new XQuery("for $i in 1 to " + c + 
+      s.execute(new XQuery("for $i in 1 to " + c +
           " return insert node <node/> into doc('" + DBNAME + "')/doc"));
 //      p(s.execute(new XQuery("count(doc('" + DBNAME + "')/doc/node)")));
       s.close();
@@ -78,7 +78,7 @@ public class XQUFStressTestClientServer {
       e.printStackTrace();
     }
   }
-  
+
   /**
    * Starts concurrent client operations.
    * @param q test query
@@ -104,7 +104,7 @@ public class XQUFStressTestClientServer {
   private static void p(final String s) {
     System.out.println(s);
   }
-  
+
   /**
    * Drops the database.
    */
@@ -115,12 +115,12 @@ public class XQUFStressTestClientServer {
       s.execute(new DropDB(DBNAME));
       p(s.info());
       s.close();
-      
+
     } catch(Exception e) {
       e.printStackTrace();
     }
   }
-  
+
   /**
    * Returns a session instance.
    * @return session
@@ -129,7 +129,7 @@ public class XQUFStressTestClientServer {
   static ClientSession newSession() throws IOException {
     return new ClientSession("localhost", 1984, "admin", "admin");
   }
-  
+
   /** Single client. */
   final class Client extends Thread {
     /** Client session. */
@@ -163,7 +163,7 @@ public class XQUFStressTestClientServer {
       }
     }
   }
-  
+
   /**
    * Main.
    * @param args args
