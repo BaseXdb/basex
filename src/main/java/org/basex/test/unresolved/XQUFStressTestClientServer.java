@@ -19,25 +19,30 @@ public class XQUFStressTestClientServer {
   /** Server. */
   BaseXServer server;
   /** Number of queries per client. */
-  static final int NQUERIES = 10;
+  static final int NQUERIES = 20;
   /** Number of clients. */
-  static final int NCLIENTS = 10;
+  static final int NCLIENTS = 40;
   /** Database name. */
   static final String DBNAME = "XQUFStress";
   /** Random number generator. */
   static final Random RND = new Random();
+  /** Number of runs. */
+  static final int RUNS = 20;
 
   /**
    * Starting test.
    */
   public void startTest() {
     server = new BaseXServer("-z");
-    p("\n");
-    queryInsert();
-    p("\n");
-    queryDelete();
-    p("\n");
-    dropDB();
+    
+    for(int i = RUNS; i > 0; i--) {
+      p("\n");
+      queryInsert();
+      p("\n");
+      queryDelete();
+      p("\n");
+      dropDB();
+    }
     server.stop();
   }
 
@@ -154,7 +159,8 @@ public class XQUFStressTestClientServer {
     public void run() {
       try {
         for(int i = 0; i < NQUERIES; ++i) {
-          Performance.sleep((long) (50 * RND.nextDouble()));
+//          Performance.sleep((long) (50 * RND.nextDouble()));
+          Performance.sleep(100);
           session.execute("xquery " + q);
         }
         session.close();
