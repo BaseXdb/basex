@@ -100,7 +100,6 @@ public final class Lock {
    */
   public synchronized void unregister(final boolean w) {
     if(SKIP) return;
-
     if(w) {
       if(list.size() > 0 && list.get(0).reader) {
         notifyReaders();
@@ -109,7 +108,11 @@ public final class Lock {
       }
     } else {
       if(--activeR == 0) {
-        notifyWriter();
+        if(list.size() > 0 && list.get(0).reader) {
+          notifyReaders();
+        } else {
+          notifyWriter();
+        }
       }
     }
   }
@@ -119,7 +122,7 @@ public final class Lock {
    */
   private void notifyReaders() {
     final int p = Math.max(ctx.prop.num(Prop.PARALLEL), 1);
-    int c = 1;
+    int c = 0;
     do {
       c++;
       final Resource l = list.remove(0);
