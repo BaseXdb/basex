@@ -16,10 +16,10 @@ public final class StressMemTest {
   /** Number of clients. */
   private static final int NCLIENTS = 10;
   /** Number of parallel readers. */
-  private static final int PARALLEL = 2;
+  private static final int PARALLEL = 1;
   /** Query to be run ("%" serves as placeholder for dynamic content). */
   private static final String QUERY =
-    "(for $i in 1 to 1000000 order by $i return $i)[1]";
+    "(for $i in 1 to 2000000 order by $i return $i)[1]";
 
   /** Server reference. */
   static BaseXServer server;
@@ -82,8 +82,6 @@ public final class StressMemTest {
     @Override
     public void run() {
       try {
-        Performance.sleep((long) (50 * RND.nextDouble()));
-
         // Perform query
         session.execute("xquery " + QUERY);
         session.close();
