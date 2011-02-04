@@ -34,7 +34,7 @@ public class XQUFStressTestClientServer {
    */
   public void startTest() {
     server = new BaseXServer("-z");
-    
+
     for(int i = RUNS; i > 0; i--) {
       p("\n");
       queryInsert();
