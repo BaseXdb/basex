@@ -2,6 +2,7 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,6 +59,8 @@ public class DialogParsing extends BaseXBack {
   private final BaseXButton browsec;
   /** Main window reference. */
   private final Dialog dialog;
+  /** Options panel. */
+  private BaseXBack parseropts;
   /** XML options panel. */
   private final BaseXBack xmlopts;
   /** CSV options panel. */
@@ -75,7 +78,7 @@ public class DialogParsing extends BaseXBack {
    */
   public DialogParsing(final Dialog d) {
     dialog = d;
-    main = new BaseXBack(new TableLayout(3, 1)).border(4);
+    main = new BaseXBack(new BorderLayout()).border(4);
 
     try {
       props = new ParserProp(d.gui.context.prop.get(Prop.PARSEROPT));
@@ -97,8 +100,8 @@ public class DialogParsing extends BaseXBack {
     parser.setSelectedItem(dialog.gui.context.prop.get(Prop.PARSER));
     p.add(parse);
     p.add(parser);
-    main.add(p);
-    main.add(new BaseXLabel(FORMATINFO, true, false));
+    main.add(p, BorderLayout.NORTH);
+    main.add(new BaseXLabel(FORMATINFO, true, false), BorderLayout.CENTER);
 
     intparse = new BaseXCheckBox(CREATEINTPARSE,
         dialog.gui.context.prop.is(Prop.INTPARSE), 0, dialog);
@@ -127,7 +130,6 @@ public class DialogParsing extends BaseXBack {
     textopts = new BaseXBack(new TableLayout(3, 1));
     createOptionsPanels();
 
-    main.add(new BaseXBack());
     options(DataText.M_XML);
     Dimension dim = main.getPreferredSize();
     String t = parser.getSelectedItem().toString();
@@ -192,19 +194,21 @@ public class DialogParsing extends BaseXBack {
    * @param type format type
    */
   void options(final String type) {
-    main.remove(2);
+    if(parseropts != null) main.remove(parseropts);
+
     if(type.equals(DataText.M_XML)) {
-      main.add(xmlopts);
+      parseropts = xmlopts;
     } else if(type.equals(DataText.M_HTML)) {
       final BaseXLabel l = new BaseXLabel("No options for HTML");
       final BaseXBack b = new BaseXBack();
       b.add(l);
-      main.add(b);
+      parseropts = b;
     } else if(type.equals(DataText.M_CSV)) {
-      main.add(csvopts);
+      parseropts = csvopts;
     } else if(type.equals(DataText.M_TEXT)) {
-      main.add(textopts);
+      parseropts = textopts;
     }
+    main.add(parseropts, BorderLayout.SOUTH);
     validate();
   }
 

@@ -257,7 +257,7 @@ public final class ServerProcess extends Thread {
         qp = new QueryProcess(query, out, context);
         arg = Integer.toString(id++);
         queries.put(arg, qp);
-        log.write(this, arg, query, OK);
+        log.write(this, sc + "(" + arg + ")", query, OK);
         // send {ID}0
         out.writeString(arg);
       } else {
@@ -279,6 +279,7 @@ public final class ServerProcess extends Thread {
         } else if(sc == CLOSE && qp != null) {
           qp.close(false);
           queries.remove(arg);
+          log.write(this, sc + "(" + arg + ")", OK);
         }
         // send 0 as end marker
         out.write(0);
@@ -288,12 +289,13 @@ public final class ServerProcess extends Thread {
     } catch(final Exception ex) {
       // log exception (static or runtime)
       err = ex.getMessage();
+      log.write(this, sc + "(" + arg + ")", INFOERROR + err);
+
       if(qp != null) qp.close(true);
       queries.remove(arg);
     }
     if(err != null) {
       // send 0 as end marker, 1 as error flag, and {MSG}0
-      log.write(this, arg, INFOERROR + err);
       out.write(0);
       out.write(1);
       out.writeString(err);

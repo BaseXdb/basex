@@ -27,7 +27,7 @@ public abstract class Item extends Value {
       return false;
     }
   };
-  /** Score value. Will be {@code null} if not set. */
+  /** Score value. Will be {@code null} if not assigned. */
   protected Double score;
 
   /**

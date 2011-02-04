@@ -15,7 +15,6 @@ public final class FTNode extends DBNode {
   private final int tl;
   /** Total number of indexed results. */
   private final int is;
-
   /** Full-text matches. */
   public FTMatches all;
 
