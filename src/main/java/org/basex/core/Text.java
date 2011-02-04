@@ -244,7 +244,7 @@ public interface Text {
     LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
-    LI + CmdDrop.USER + " [" + C_NAME + "]:" + NL + "  " +
+    LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [db]): " + NL + "  " +
       lang("ch_drop23") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
       lang("ch_drop24", C_NAME)
