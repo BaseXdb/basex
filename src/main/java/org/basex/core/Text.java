@@ -38,7 +38,7 @@ public interface Text {
   /** URL of the community page. */
   String COMMUNITY_URL = URL + "/community";
   /** URL of the update page. */
-  String UPDATE_URL = URL + "/maven/org/" + NAMELC + "/" + NAMELC;
+  String UPDATE_URL = URL + "/products/download/all-downloads/";
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
