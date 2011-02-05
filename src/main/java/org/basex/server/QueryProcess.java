@@ -24,7 +24,7 @@ import org.basex.util.TokenBuilder;
  */
 final class QueryProcess extends Progress {
   /** Performance. */
-  private final Performance p = new Performance();
+  private final Performance perf = new Performance();
   /** Query processor. */
   private final QueryProcessor qp;
   /** Database context. */
@@ -163,7 +163,7 @@ final class QueryProcess extends Progress {
       info = new TokenBuilder();
       info.addExt(QUERYHITS + "% %" + NL, hits, hits == 1 ? VALHIT : VALHITS);
       info.addExt(QUERYUPDATED + "% %" + NL, up, up == 1 ? VALHIT : VALHITS);
-      info.addExt(QUERYTOTAL + "%", p);
+      info.addExt(QUERYTOTAL + "%", perf);
     }
   }
 }

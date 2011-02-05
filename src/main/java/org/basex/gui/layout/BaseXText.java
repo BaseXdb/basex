@@ -137,14 +137,14 @@ public class BaseXText extends BaseXPanel {
    * @param b backward browsing
    */
   final void find(final String t, final boolean b) {
-    find(rend.find(t, b));
+    scroll(rend.find(t, b));
   }
 
   /**
    * Displays the search term.
    * @param y vertical position
    */
-  final void find(final int y) {
+  final void scroll(final int y) {
     // updates the visible area
     final int p = scroll.pos();
     final int m = y + rend.fontH() * 3 - getHeight();
@@ -379,7 +379,7 @@ public class BaseXText extends BaseXPanel {
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
     if(FINDNEXT.is(e) || FINDPREV.is(e) || FINDNEXT2.is(e) || FINDPREV2.is(e)) {
-      find(rend.find(FINDPREV.is(e) || FINDPREV2.is(e), true));
+      scroll(rend.find(FINDPREV.is(e) || FINDPREV2.is(e), true));
       return;
     }
     if(SELECTALL.is(e)) {

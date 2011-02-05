@@ -72,7 +72,7 @@ final class XQuerySyntax extends BaseXSyntax {
       comment = ch == ':' ? 2 : 0;
     } else if(comment == 2 && ch == ':') {
       comment++;
-    } else if(comment == 3) {
+    } else if(comment == 3 && ch != ':') {
       comment = ch == ')' ? 0 : 2;
     }
     if(comment != 0) return KEY;

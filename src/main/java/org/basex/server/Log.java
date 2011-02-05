@@ -63,7 +63,8 @@ public final class Log {
     try {
       final StringBuilder sb = new StringBuilder(TIME.format(now));
       for(final Object s : str) {
-        sb.append("\t" + s.toString().replaceAll("\\r?\\n", " "));
+        final String l = s.toString().replaceAll("\\r?\\n", " ");
+        sb.append("\t" + (l.length() > 128 ? l.substring(0, 125) + "..." : l));
       }
       fw.write(sb.append(NL).toString());
       fw.flush();

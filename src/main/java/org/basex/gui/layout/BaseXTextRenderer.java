@@ -86,7 +86,6 @@ final class BaseXTextRenderer extends BaseXBack {
    */
   void setText(final BaseXTextTokens t) {
     text = t;
-    search = null;
   }
 
   /**
