@@ -1,6 +1,6 @@
 package org.basex.api.jaxrx;
 
-import static org.jaxrx.core.URLConstants.*;
+import static org.jaxrx.core.JaxRxConstants.*;
 import java.io.IOException;
 import org.basex.core.Text;
 import org.basex.data.DataText;

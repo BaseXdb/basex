@@ -1,7 +1,7 @@
 package org.basex.api.jaxrx;
 
 import static org.basex.core.Text.*;
-import static org.jaxrx.core.URLConstants.*;
+import static org.jaxrx.core.JaxRxConstants.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;

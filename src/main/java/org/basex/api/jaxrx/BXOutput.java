@@ -94,7 +94,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
         while(sc.hasNext()) {
           final String v = sc.next();
           String[] sp = v.split("\2", 3);
-          if(sp.length < 2) sp = v.split("=", 3);
+          if(sp.length < 2) sp = v.split("=", 2);
           cq.bind(sp[0], sp.length > 1 ? sp[1] : "",
               sp.length > 2 ? sp[2] : "");
         }
