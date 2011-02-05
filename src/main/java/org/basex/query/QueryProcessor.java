@@ -70,10 +70,8 @@ public final class QueryProcessor extends Progress {
       final Scanner sc = new Scanner(ctx.context.prop.get(Prop.BINDINGS));
       sc.useDelimiter(",");
       while(sc.hasNext()) {
-        final String v = sc.next();
-        String[] sp = v.split("=", 3);
-        if(sp.length < 2) sp = v.split("=", 3);
-        bind(sp[0], sp.length > 1 ? sp[1] : "", sp.length > 2 ? sp[2] : "");
+        String[] sp = sc.next().split("=", 2);
+        bind(sp[0], sp.length > 1 ? sp[1] : "", "");
       }
       // parse query
       ctx.parse(query);
