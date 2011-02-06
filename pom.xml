@@ -6,9 +6,9 @@
   <version>6.5.1</version>
   <repositories>
     <repository>
-      <id>dbis-ukn</id>
-      <name>DBIS Maven Repository</name>
-      <url>http://www.inf.uni-konstanz.de/dbis/basex/maven</url>
+      <id>basex</id>
+      <name>BaseX Maven Repository</name>
+      <url>http://files.basex.org/maven</url>
     </repository>
     <repository>
       <id>central</id>
