@@ -116,7 +116,7 @@ abstract class BXCode {
     final String wrap = path.getValue(QueryParameter.WRAP);
     // wrap results by default
     if(wrap == null || wrap.equals(DataText.YES)) {
-      ser += "," + SerializerProp.S_WRAP_PRE[0] + "=" + JAXRX +
+      ser += "," + SerializerProp.S_WRAP_PREFIX[0] + "=" + JAXRX +
              "," + SerializerProp.S_WRAP_URI[0] + "=" + URL;
     } else if(!wrap.equals(DataText.NO)) {
       throw new JaxRxException(400, SerializerProp.error(
