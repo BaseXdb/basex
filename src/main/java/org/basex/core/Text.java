@@ -85,7 +85,7 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Start information. */
   String CLIENTINFO =
-    " [-npPU] [-dovVwz] [-cq] [file]" + NL +
+    " [-npPU] [-dosvVwz] [-cq] [file]" + NL +
     "  [file]     Execute XQuery file" + NL +
     "  -b<pars>   Bind external XQuery variables" + NL +
     "  -c<cmd>    Execute database command(s)" + NL +
@@ -95,6 +95,7 @@ public interface Text {
     "  -p<num>    Set server port" + NL +
     "  -P<pass>   Specify user password" + NL +
     "  -q<expr>   Execute XQuery expression" + NL +
+    "  -s<pars>  Set serialization parameter(s)" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -v/V       Show (all) process info" + NL +
     "  -w         Retain whitespaces from source files" + NL +

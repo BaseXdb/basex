@@ -63,12 +63,18 @@ public final class SerializerProp extends AProp {
   public static final Object[] S_VERSION = {
     "version", "" };
 
+  /** Specific serialization parameter: formatting. */
+  public static final Object[] S_FORMAT = {
+    "format", YES };
+  /** Specific serialization parameter: indent with spaces or tabs. */
+  public static final Object[] S_TABULATOR = {
+    "tabulator", NO };
   /** Specific serialization parameter: number of spaces to indent. */
-  public static final Object[] S_INDENT_SPACES = {
-    "indent-spaces", "2" };
+  public static final Object[] S_INDENTS = {
+    "indents", "2" };
   /** Specific serialization parameter: prefix of result wrapper. */
-  public static final Object[] S_WRAP_PRE = {
-    "wrap-pre", "" };
+  public static final Object[] S_WRAP_PREFIX = {
+    "wrap-prefix", "" };
   /** Specific serialization parameter: URI of result wrapper. */
   public static final Object[] S_WRAP_URI = {
     "wrap-uri", "" };

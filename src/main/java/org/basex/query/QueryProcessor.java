@@ -173,7 +173,7 @@ public final class QueryProcessor extends Progress {
     if(sp == null) {
       sp = new SerializerProp(ctx.context.prop.get(Prop.SERIALIZER));
       if(ctx.context.prop.is(Prop.WRAPOUTPUT)) {
-        sp.set(SerializerProp.S_WRAP_PRE, NAMELC);
+        sp.set(SerializerProp.S_WRAP_PREFIX, NAMELC);
         sp.set(SerializerProp.S_WRAP_URI, URL);
       }
     }

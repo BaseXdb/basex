@@ -23,7 +23,7 @@ import org.junit.Test;
 public final class ServerQueryTest {
   /** Serialization parameters to wrap query result with an element. */
   private static final String WRAPPER =
-    "declare option output:wrap-pre 'db';" +
+    "declare option output:wrap-prefix 'db';" +
     "declare option output:wrap-uri 'ns';";
   /** Server reference. */
   private static BaseXServer server;
@@ -83,7 +83,7 @@ public final class ServerQueryTest {
    * @throws BaseXException command exception */
   @Test
   public void commandSerial1() throws BaseXException {
-    cs.execute("set serializer wrap-pre=db,wrap-uri=ns");
+    cs.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     assertEquals(
       "<db:results xmlns:db=\"ns\">\n</db:results>",
       cs.execute("xquery ()").replaceAll("\\r", ""));
@@ -185,7 +185,7 @@ public final class ServerQueryTest {
    * @throws BaseXException command exception */
   @Test
   public void querySerial1() throws BaseXException {
-    cs.execute("set serializer wrap-pre=db,wrap-uri=ns");
+    cs.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     final ClientQuery cq = cs.query(WRAPPER + "()");
     assertEquals("<db:results xmlns:db=\"ns\">", cq.init());
     assertFalse("No result was expected.", cq.more());

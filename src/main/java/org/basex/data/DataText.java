@@ -110,7 +110,7 @@ public interface DataText {
   /** Method. */
   String M_TEXT = "text";
   /** Normalization. */
-  String NFC = "nfc";
+  String NFC = "NFC";
   /** Normalization. */
   String NONE = "none";
 
