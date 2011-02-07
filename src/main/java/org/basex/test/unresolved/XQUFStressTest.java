@@ -17,9 +17,9 @@ public class XQUFStressTest {
   /** Query string. */
   final String query = "delete nodes //n";
   /** Number of runs. */
-  private static final int RUNS = 1;
+  private static final int RUNS = 10;
   /** Number of node updates. */
-  private static final int NRNODES = 10000;
+  private static final int NRNODES = 1000;
   /** Basic database name for each test. */
   private static final String DBNAME = "TESTXQUF";
 
