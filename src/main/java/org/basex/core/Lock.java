@@ -48,9 +48,11 @@ public final class Lock {
   public void register(final boolean w) {
     if(SKIP) return;
     if(w) {
-      if(state == State.IDLE) {
-        state = State.WRITE;
-        return;
+      synchronized(this) {
+        if(state == State.IDLE) {
+          state = State.WRITE;
+          return;
+        }
       }
       // exclusive lock
       final Resource lx = new Resource(false);
