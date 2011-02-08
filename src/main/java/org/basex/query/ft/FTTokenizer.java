@@ -28,7 +28,7 @@ public final class FTTokenizer {
   final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
   /** Levenshtein reference. */
   final Levenshtein ls = new Levenshtein();
-  /** Database properties. */
+  /** Calling expression. */
   final FTWords words;
   /** Full-text options. */
   final FTOpt opt;

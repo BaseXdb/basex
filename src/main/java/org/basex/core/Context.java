@@ -46,7 +46,7 @@ public final class Context {
   public int focused = -1;
 
   /** Process locking. */
-  private final Lock lock;
+  private final LockCG lock;
 
   /**
    * Constructor.
@@ -56,7 +56,7 @@ public final class Context {
     datas = new DataPool();
     triggers = new TriggerPool();
     sessions = new Sessions();
-    lock = new Lock(this);
+    lock = new LockCG();
     users = new Users(true);
     user = users.get(ADMIN);
   }

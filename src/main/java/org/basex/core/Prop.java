@@ -110,7 +110,7 @@ public final class Prop extends AProp {
   /** Default XQuery version. */
   public static final Object[] XQUERY3 = { "XQUERY3", true };
 
-  /** Defines the number of parallel processes. */
+  /** Defines the number of parallel readers. */
   public static final Object[] PARALLEL = { "PARALLEL", Integer.MAX_VALUE };
 
   /** Use internal XML parser. */

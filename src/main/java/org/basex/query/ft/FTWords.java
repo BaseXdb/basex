@@ -76,7 +76,7 @@ public final class FTWords extends FTExpr {
   private boolean fast;
 
   /**
-   * Sequential constructor.
+   * Constructor for scan-based evaluation.
    * @param ii input info
    * @param e expression
    * @param m search mode
@@ -91,7 +91,7 @@ public final class FTWords extends FTExpr {
   }
 
   /**
-   * Index constructor.
+   * Constructor for index-based evaluation.
    * @param ii input info
    * @param d data reference
    * @param str string

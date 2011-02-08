@@ -23,7 +23,7 @@ public final class Sessions implements Iterable<ServerProcess> {
    * Adds a session to the array.
    * @param s string to be added
    */
-  public void add(final ServerProcess s) {
+  public synchronized void add(final ServerProcess s) {
     if(size == list.length) list = Arrays.copyOf(list, size << 1);
     list[size++] = s;
   }
@@ -32,7 +32,7 @@ public final class Sessions implements Iterable<ServerProcess> {
    * Returns the number of entries.
    * @return number of entries
    */
-  public int size() {
+  public synchronized int size() {
     return size;
   }
 
@@ -41,7 +41,7 @@ public final class Sessions implements Iterable<ServerProcess> {
    * @param p position
    * @return entry
    */
-  public ServerProcess get(final int p) {
+  public synchronized ServerProcess get(final int p) {
     return list[p];
   }
 
@@ -49,7 +49,7 @@ public final class Sessions implements Iterable<ServerProcess> {
    * Deletes the specified entry.
    * @param s entry to be deleted
    */
-  public void delete(final ServerProcess s) {
+  public synchronized void delete(final ServerProcess s) {
     for(int i = 0; i < size; ++i) {
       if(list[i] == s) {
         Array.move(list, i + 1, -1, --size - i);
@@ -62,7 +62,7 @@ public final class Sessions implements Iterable<ServerProcess> {
    * Returns information on the opened database instances.
    * @return data reference
    */
-  public String info() {
+  public synchronized String info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt(SRVSESSIONS, size).add(size != 0 ? COL : DOT);
     for(int i = 0; i < size; ++i)
@@ -71,7 +71,7 @@ public final class Sessions implements Iterable<ServerProcess> {
   }
 
   @Override
-  public Iterator<ServerProcess> iterator() {
+  public synchronized Iterator<ServerProcess> iterator() {
     return new Iterator<ServerProcess>() {
       private int c = -1;
       @Override
