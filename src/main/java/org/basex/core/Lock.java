@@ -112,7 +112,7 @@ public final class Lock {
         notifyNext();
       }
     } else {
-      state = State.IDLE;
+      if(activeR == 0) state = State.IDLE;
     }
   }
 
@@ -139,7 +139,7 @@ public final class Lock {
   }
 
   /** Inner class for a locking object. */
-  private static class Resource {
+  private static final class Resource {
     /** Reader flag. */
     final boolean reader;
     /** Flag if lock can start. */

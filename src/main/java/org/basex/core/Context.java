@@ -56,7 +56,7 @@ public final class Context {
     datas = new DataPool();
     triggers = new TriggerPool();
     sessions = new Sessions();
-    lock = new LockCG();
+    lock = new LockCG(this);
     users = new Users(true);
     user = users.get(ADMIN);
   }

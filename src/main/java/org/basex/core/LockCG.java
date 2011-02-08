@@ -3,19 +3,31 @@ package org.basex.core;
 import org.basex.util.Util;
 
 /**
- * Management of executing read/write processes. Multiple readers, single
- * writers (readers/writer lock).
+ * Management of executing read/write processes.
+ * Supports multiple readers, limited by {@link Prop#PARALLEL},
+ * and single writers (readers/writer lock).
  *
  * @author BaseX Team 2005-11, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class LockCG {
-  /** Synchronization object. */
-  private Object mutex = new Object();
+  /** Mutex object. */
+  private final Object mutex = new Object();
+  /** Database context. */
+  private final Context ctx;
+
   /** Number of active readers. */
   private int readers;
   /** Writer flag. */
   private boolean writer;
+
+  /**
+   * Default constructor.
+   * @param c context
+   */
+  public LockCG(final Context c) {
+    ctx = c;
+  }
 
   /**
    * Modifications before executing a command.
@@ -31,8 +43,8 @@ public final class LockCG {
                 writer = true;
                 break;
               }
-            } else {
-              readers++;
+            } else if(readers < Math.max(ctx.prop.num(Prop.PARALLEL), 1)) {
+              ++readers;
               break;
             }
           }
@@ -52,10 +64,10 @@ public final class LockCG {
     synchronized(mutex) {
       if(w) {
         writer = false;
-        mutex.notifyAll();
       } else {
-        if(--readers == 0) mutex.notifyAll();
+        --readers;
       }
+      mutex.notifyAll();
     }
   }
 }
