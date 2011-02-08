@@ -19,15 +19,15 @@ public class XQUFStressTestClientServer {
   /** Server. */
   BaseXServer server;
   /** Number of queries per client. */
-  static final int NQUERIES = 20;
+  static final int NQUERIES = 100;
   /** Number of clients. */
-  static final int NCLIENTS = 40;
+  static final int NCLIENTS = 100;
   /** Database name. */
   static final String DBNAME = "XQUFStress";
   /** Random number generator. */
   static final Random RND = new Random();
   /** Number of runs. */
-  static final int RUNS = 20;
+  static final int RUNS = 10;
 
   /**
    * Starting test.
