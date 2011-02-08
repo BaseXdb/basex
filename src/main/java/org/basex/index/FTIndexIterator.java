@@ -56,7 +56,7 @@ public abstract class FTIndexIterator extends IndexIterator {
    * @param i2 second index array iterator to merge
    * @return IndexArrayIterator
    */
-  static FTIndexIterator union(final FTIndexIterator i1,
+  public static FTIndexIterator union(final FTIndexIterator i1,
       final FTIndexIterator i2) {
 
     return new FTIndexIterator() {
@@ -106,10 +106,10 @@ public abstract class FTIndexIterator extends IndexIterator {
    * Merges two index array iterators.
    * @param i1 first index array iterator to merge
    * @param i2 second index array iterator to merge
-   * @param dis word distance
+   * @param dis word distance. Ignored if {@code 0}
    * @return IndexArrayIterator
    */
-  public static FTIndexIterator phrase(final FTIndexIterator i1,
+  public static FTIndexIterator intersect(final FTIndexIterator i1,
       final FTIndexIterator i2, final int dis) {
 
     return new FTIndexIterator() {
@@ -123,7 +123,8 @@ public abstract class FTIndexIterator extends IndexIterator {
           if(c >= 0) s = i2.more() ? i2 : null;
           if(r == null || s == null) return false;
           c = r.next() - s.next();
-          if(c == 0 && r.matches().phrase(s.matches(), dis)) return true;
+          if(c == 0 && (dis == 0 || r.matches().phrase(s.matches(), dis)))
+            return true;
         }
       }
 

@@ -10,7 +10,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
-public final class Lock {
+final class Lock {
   /** Mutex object. */
   private final Object mutex = new Object();
   /** Database context. */
@@ -25,7 +25,7 @@ public final class Lock {
    * Default constructor.
    * @param c context
    */
-  public Lock(final Context c) {
+  Lock(final Context c) {
     ctx = c;
   }
 
@@ -33,7 +33,7 @@ public final class Lock {
    * Modifications before executing a command.
    * @param w writing flag
    */
-  public void register(final boolean w) {
+  void register(final boolean w) {
     synchronized(mutex) {
       try {
         while(true) {
@@ -60,7 +60,7 @@ public final class Lock {
    * Modifications after executing a command.
    * @param w writing flag
    */
-  public synchronized void unregister(final boolean w) {
+  synchronized void unregister(final boolean w) {
     synchronized(mutex) {
       if(w) {
         writer = false;
