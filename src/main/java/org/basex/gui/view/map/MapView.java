@@ -619,6 +619,7 @@ public final class MapView extends View implements Runnable {
     if(textLen != null || gui.gprop.num(GUIProp.MAPWEIGHT) == 0) return;
 
     final int size = data.meta.size;
+    System.out.println(size);
     textLen = new int[size];
 
     final int[] parStack = new int[IO.MAXHEIGHT];

@@ -16,7 +16,7 @@ import org.basex.query.ft.ThesQuery;
  * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
-public class FTOpt extends ExprInfo {
+public final class FTOpt extends ExprInfo {
   /** Flag values. */
   private final EnumMap<FTFlag, Boolean> map =
     new EnumMap<FTFlag, Boolean>(FTFlag.class);

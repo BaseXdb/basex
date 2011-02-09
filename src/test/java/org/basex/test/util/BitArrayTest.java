@@ -12,9 +12,8 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, ISC License
  * @author Dimitar Popov
  */
-public class BitArrayTest {
-
-  /** Instance of {@ling BitArray}. */
+public final class BitArrayTest {
+  /** Instance of {@link BitArray}. */
   private BitArray a;
 
   /** Create an instance of {@link BitArray}. */
@@ -23,11 +22,11 @@ public class BitArrayTest {
     a = new BitArray();
   }
 
-  /** Test method for {@link BitArray#getTrimmedWords()}. */
+  /** Test method for {@link BitArray#toArray()}. */
   @Test
   public void testGetTrimmedWords() {
     a.setWords(new long[] {-1L, 0L}, 64);
-    assertTrue("Array not trimmed correctly", a.getTrimmedWords().length == 1);
+    assertTrue("Array not trimmed correctly", a.toArray().length == 1);
   }
 
   /** Test method for {@link BitArray#get(int)}. */

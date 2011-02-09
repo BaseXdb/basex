@@ -8,10 +8,8 @@ import static java.lang.Long.*;
  *
  * @author BaseX Team 2005-11, ISC License
  * @author Dimitar Popov
- * [DP] Remove long method and method that are not used
  */
-public class BitArray {
-
+public final class BitArray {
   /** Number of bits needed to address a bit in a word; 2<sup>6</sup> = 64. */
   private static final int WORD_POWER = 6;
   /** Size of a word = 2<sup>{@link #WORD_POWER}</sup>. */
@@ -74,14 +72,13 @@ public class BitArray {
    * word, where a bit is set.
    * @return array of longs
    */
-  public long[] getTrimmedWords() {
+  public long[] toArray() {
     // find the last index of a word which is different from 0:
-    int i;
-    for(i = words.length - 1; i >= 0; i--) if(words[i] != 0) break;
+    int i = words.length;
+    while(--i >= 0 && words[i] == 0);
 
     final long[] result = new long[++i];
     System.arraycopy(words, 0, result, 0, i);
-
     return result;
   }
 

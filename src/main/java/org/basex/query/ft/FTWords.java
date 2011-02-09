@@ -288,7 +288,7 @@ public final class FTWords extends FTExpr {
     final FTOpt fto = ftt.opt;
 
     // skip index access if index does not support wildcards
-    boolean wc = fto.is(WC);
+    final boolean wc = fto.is(WC);
     if(wc && !md.wildcards) return false;
 
     if(occ != null || md.casesens != fto.is(CS) || md.diacritics != fto.is(DC)

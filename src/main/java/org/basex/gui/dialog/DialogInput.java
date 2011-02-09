@@ -21,7 +21,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
-public class DialogInput extends Dialog {
+public final class DialogInput extends Dialog {
   /** User input. */
   private final BaseXTextField input;
   /** Old input. */

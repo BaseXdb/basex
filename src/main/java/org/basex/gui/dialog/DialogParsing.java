@@ -32,7 +32,7 @@ import org.basex.util.StringList;
  * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
-public class DialogParsing extends BaseXBack {
+public final class DialogParsing extends BaseXBack {
   /** Parser. */
   public final BaseXCombo parser;
   /** Internal XML parsing. */
@@ -131,8 +131,8 @@ public class DialogParsing extends BaseXBack {
     createOptionsPanels();
 
     options(DataText.M_XML);
-    Dimension dim = main.getPreferredSize();
-    String t = parser.getSelectedItem().toString();
+    final Dimension dim = main.getPreferredSize();
+    final String t = parser.getSelectedItem().toString();
     if(!t.equals(DataText.M_XML)) {
       options(t);
       main.setPreferredSize(dim);

@@ -26,7 +26,7 @@ import org.basex.io.IO;
  * @author BaseX Team 2005-11, ISC License
  * @author Andreas Weiler
  */
-public class DialogAdd extends Dialog {
+public final class DialogAdd extends Dialog {
   /** Document to add. */
   private final BaseXTextField path;
   /** Directory path. */

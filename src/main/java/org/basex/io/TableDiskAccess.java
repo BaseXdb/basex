@@ -65,18 +65,17 @@ public final class TableDiskAccess extends TableAccess {
     fpres      = in.readNums();
     pages      = in.readNums();
 
-    final int pagemapSize = in.readNum();
+    final int psize = in.readNum();
     // check if the page map has been stored:
-    if(pagemapSize == 0) {
-      in.close();
+    if(psize == 0) {
       // init the map with empty pages:
       pagemap = new BitArray(allBlocks);
-      for(int i = 0; i < pages.length; i++) pagemap.set(pages[i]);
+      for(final int p : pages) pagemap.set(p);
       dirty = true;
     } else {
-      pagemap = new BitArray(in.readLongs(pagemapSize), allBlocks);
-      in.close();
+      pagemap = new BitArray(in.readLongs(psize), allBlocks);
     }
+    in.close();
 
     // initialize data file
     data = new RandomAccessFile(meta.file(pf), "rw");
@@ -93,7 +92,7 @@ public final class TableDiskAccess extends TableAccess {
     out.writeNum(blocks);
     out.writeNums(fpres);
     out.writeNums(pages);
-    out.writeLongs(pagemap.getTrimmedWords());
+    out.writeLongs(pagemap.toArray());
     out.close();
     dirty = false;
   }
@@ -254,7 +253,7 @@ public final class TableDiskAccess extends TableAccess {
     final int split = cursor(pre - 1) + (1 << IO.NODEPOWER);
 
     // number of bytes occupied by old records in the current block:
-    final int nold = (npre - fpre) << IO.NODEPOWER;
+    final int nold = npre - fpre << IO.NODEPOWER;
     // number of bytes occupied by old records which will be after the new ones:
     final int nlast = nold - split;
 

@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import java.util.LinkedList;
 import org.basex.util.Util;
 
 /**
@@ -11,6 +12,8 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 final class Lock {
+  /** Queue. */
+  private final LinkedList<Object> queue = new LinkedList<Object>();
   /** Mutex object. */
   private final Object mutex = new Object();
   /** Database context. */
@@ -35,9 +38,12 @@ final class Lock {
    */
   void register(final boolean w) {
     synchronized(mutex) {
+      final Object o = new Object();
+      queue.add(o);
+
       try {
         while(true) {
-          if(!writer) {
+          if(o == queue.get(0) && !writer) {
             if(w) {
               if(readers == 0) {
                 writer = true;
@@ -53,6 +59,8 @@ final class Lock {
       } catch(final InterruptedException ex) {
         Util.stack(ex);
       }
+
+      queue.remove(0);
     }
   }
 
