@@ -40,7 +40,7 @@ public final class StressTest {
   public static void main(final String[] args) throws Exception {
     System.out.println("=== Server StressTest ===");
 
-    Performance perf = new Performance();
+    final Performance perf = new Performance();
 
     // Run server instance
     System.out.println("\n* Start server.");
@@ -75,7 +75,7 @@ public final class StressTest {
     final ClientSession cs = newSession();
     try {
       cs.execute("drop db test");
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       System.out.println(cs.info());
       ex.printStackTrace();
     }
@@ -103,7 +103,7 @@ public final class StressTest {
     public Client() {
       try {
         session = newSession();
-      } catch(IOException ex) {
+      } catch(final IOException ex) {
         ex.printStackTrace();
       }
     }

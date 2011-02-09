@@ -11,15 +11,18 @@ import org.basex.core.cmd.XQuery;
  *
  * @author BaseX Team 2005-11, ISC License
  */
-public class XQUFStressTest {
+public final class XQUFStressTest {
+  /** Verbose flag. */
+  private static final boolean VERBOSE = false;
+
   /** Current context. */
   Context ctx = new Context();
   /** Query string. */
   final String query = "delete nodes //n";
   /** Number of runs. */
-  private static final int RUNS = 10;
+  private static final int RUNS = 100;
   /** Number of node updates. */
-  private static final int NRNODES = 1000;
+  private static final int NRNODES = 100;
   /** Basic database name for each test. */
   private static final String DBNAME = "TESTXQUF";
 
@@ -41,7 +44,7 @@ public class XQUFStressTest {
       new XQuery("delete nodes //node").execute(ctx);
       p("finished.");
       new DropDB(db).execute(ctx);
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       e.printStackTrace();
     }
     p("delete finished.\n");
@@ -73,7 +76,7 @@ public class XQUFStressTest {
           execute(ctx);
       p("finished.");
       new DropDB(db).execute(ctx);
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       e.printStackTrace();
     }
     p("insert finished.\n");
@@ -84,7 +87,7 @@ public class XQUFStressTest {
    * @param s String to be printed
    */
   private static void p(final String s) {
-    System.out.println(s);
+    if(VERBOSE) System.out.println(s);
   }
 
   /**

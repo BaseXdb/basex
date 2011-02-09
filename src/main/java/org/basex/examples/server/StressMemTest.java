@@ -34,7 +34,7 @@ public final class StressMemTest {
   public static void main(final String[] args) throws Exception {
     System.out.println("=== Server StressMemTest ===");
 
-    Performance perf = new Performance();
+    final Performance perf = new Performance();
 
     // Run server instance
     System.out.println("\n* Start server with " + PARALLEL + " readers.");
@@ -74,7 +74,7 @@ public final class StressMemTest {
     public Client() {
       try {
         session = newSession();
-      } catch(IOException ex) {
+      } catch(final IOException ex) {
         ex.printStackTrace();
       }
     }

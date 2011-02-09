@@ -323,7 +323,7 @@ public abstract class W3CTS {
     final String outname = text("@name", root);
     if(single != null && !outname.startsWith(single)) return true;
 
-    Performance perf = new Performance();
+    final Performance perf = new Performance();
     if(verbose) Util.out("- " + outname);
 
     boolean inspect = false;

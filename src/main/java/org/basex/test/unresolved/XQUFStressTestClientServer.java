@@ -15,19 +15,22 @@ import org.basex.util.Performance;
  *
  * @author BaseX Team 2005-11, ISC License
  */
-public class XQUFStressTestClientServer {
+public final class XQUFStressTestClientServer {
+  /** Verbose flag. */
+  private static final boolean VERBOSE = false;
+
   /** Server. */
   BaseXServer server;
   /** Number of queries per client. */
-  static final int NQUERIES = 100;
+  static final int NQUERIES = 50;
   /** Number of clients. */
-  static final int NCLIENTS = 100;
+  static final int NCLIENTS = 50;
   /** Database name. */
   static final String DBNAME = "XQUFStress";
   /** Random number generator. */
   static final Random RND = new Random();
   /** Number of runs. */
-  static final int RUNS = 10;
+  static final int RUNS = 1;
 
   /**
    * Starting test.
@@ -52,13 +55,13 @@ public class XQUFStressTestClientServer {
   private void queryInsert() {
     try {
       p("INSERT ... creating database.");
-      ClientSession s = newSession();
+      final ClientSession s = newSession();
       s.execute(new CreateDB(DBNAME, "<doc/>"));
       s.close();
       runClients("insert node <node/> into doc('" + DBNAME + "')/doc");
       p("done.");
 
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -69,7 +72,7 @@ public class XQUFStressTestClientServer {
   private void queryDelete() {
     try {
       p("DELETE ... creating database.");
-      ClientSession s = newSession();
+      final ClientSession s = newSession();
       s.execute(new CreateDB(DBNAME, "<doc/>"));
       final int c = 100 + NQUERIES * NCLIENTS;
       s.execute(new XQuery("for $i in 1 to " + c +
@@ -79,7 +82,7 @@ public class XQUFStressTestClientServer {
       runClients("delete nodes (doc('" + DBNAME + "')/doc/node)[1]");
       p("done.");
 
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -97,7 +100,7 @@ public class XQUFStressTestClientServer {
     for(final Client c : cl)
       try {
         c.join();
-      } catch(InterruptedException e) {
+      } catch(final InterruptedException e) {
         e.printStackTrace();
       }
   }
@@ -107,7 +110,7 @@ public class XQUFStressTestClientServer {
    * @param s message string
    */
   private static void p(final String s) {
-    System.out.println(s);
+    if(VERBOSE) System.out.println(s);
   }
 
   /**
@@ -121,7 +124,7 @@ public class XQUFStressTestClientServer {
       p(s.info());
       s.close();
 
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
   }
@@ -150,7 +153,7 @@ public class XQUFStressTestClientServer {
       q = query;
       try {
         session = newSession();
-      } catch(IOException ex) {
+      } catch(final IOException ex) {
         ex.printStackTrace();
       }
     }

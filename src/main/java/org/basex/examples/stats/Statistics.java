@@ -76,7 +76,7 @@ public abstract class Statistics {
       tl.add(input);
       analyze(tl);
       table.contents.add(tl);
-    } catch(BaseXException ex) {
+    } catch(final BaseXException ex) {
       Util.errln("- " + input + ": " + ex.getMessage());
     }
   }
