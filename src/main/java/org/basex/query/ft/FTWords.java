@@ -161,11 +161,11 @@ public final class FTWords extends FTExpr {
           tl = 0;
           for(final byte[] t : txt) {
             lex.init(t);
-            tl += t.length;
             int d = 0;
             boolean f = mode != FTMode.M_PHRASE;
             while(lex.hasNext()) {
               final byte[] token = lex.nextToken();
+              tl += token.length;
               if(ftt.opt.sw != null && ftt.opt.sw.id(token) != 0) {
                 ++d;
               } else {
