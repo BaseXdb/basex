@@ -90,7 +90,7 @@ public final class StatsKey {
     } else if(kind == Kind.CAT) {
       final int cl = cats.size();
       out.writeNum(cl);
-      for(int i = 1; i <= cl; ++i) out.writeToken(cats.key(i));
+      for(final byte[] k : cats) out.writeToken(k);
     }
     out.writeNum(counter);
     out.writeBool(leaf);

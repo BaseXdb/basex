@@ -76,7 +76,6 @@ public final class Export extends Command {
       // create file path
       final IO file = root.merge(Token.string(data.text(pre, true)));
       // create dir if necessary
-
       final IO dir = IO.get(file.dir());
       if(!dir.exists()) dir.md();
 

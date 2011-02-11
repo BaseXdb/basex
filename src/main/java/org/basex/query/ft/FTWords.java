@@ -54,8 +54,8 @@ public final class FTWords extends FTExpr {
   FTMatches all = new FTMatches((byte) 0);
   /** Flag for first evaluation. */
   boolean first;
-  /** Search mode. */
-  FTMode mode;
+  /** Search mode; default: {@link FTMode#M_ANY}. */
+  FTMode mode = FTMode.M_ANY;
 
   /** Query expression. */
   private Expr query;
@@ -148,34 +148,42 @@ public final class FTWords extends FTExpr {
       public FTNode next() {
         if(iat == null) {
           final FTLexer lex = new FTLexer(ftt.opt);
-          tl = 0;
-          for(final byte[] t : txt) {
-            lex.init(t);
+
+          // index iterator tree
+          FTIndexIterator ia = null;
+          // number of distinct tokens
+          int t  = 0;
+          // loop through all tokens
+          final TokenSet ts = tokens(txt, ftt.opt);
+          for(final byte[] k : ts) {
+            lex.init(k);
+            ia = null;
             int d = 0;
-            boolean f = mode != FTMode.M_PHRASE;
             while(lex.hasNext()) {
               final byte[] token = lex.nextToken();
-              tl = mode == FTMode.M_ANY || mode == FTMode.M_ANYWORD ?
-                  Math.max(token.length, tl) : tl + token.length;
+              t += token.length;
               if(ftt.opt.sw != null && ftt.opt.sw.id(token) != 0) {
                 ++d;
               } else {
                 final FTIndexIterator ir = (FTIndexIterator) data.ids(lex);
-                if(iat == null) {
-                  iat = ir;
-                } else if(f) {
-                  if(mode == FTMode.M_ANY || mode == FTMode.M_ANYWORD) {
-                    iat = FTIndexIterator.union(ir, iat);
-                  } else {
-                    iat = FTIndexIterator.intersect(ir, iat, 0);
-                  }
+                if(ia == null) {
+                  ia = ir;
                 } else {
-                  iat = FTIndexIterator.intersect(iat, ir, ++d);
+                  ia = FTIndexIterator.intersect(ia, ir, ++d);
                   d = 0;
                 }
               }
-              f = mode == FTMode.M_ALLWORDS || mode == FTMode.M_ANYWORD;
             }
+          }
+          if(iat == null) {
+            iat = ia;
+            tl = t;
+          } else if(mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS) {
+            iat = FTIndexIterator.intersect(ia, iat, 0);
+            tl += t;
+          } else {
+            iat = FTIndexIterator.union(ia, iat);
+            tl = Math.max(t, tl);
           }
           iat.tokenNum(++ctx.ftoknum);
         }
@@ -205,34 +213,17 @@ public final class FTWords extends FTExpr {
       return num;
     }
 
-    // cache all query tokens (remove duplicates)
-    final TokenSet tm = new TokenSet();
-    final Iter qu = ctx.iter(query);
-    byte[] q;
-    switch(mode) {
-      case M_ALL:
-      case M_ANY:
-        while((q = nextToken(qu)) != null) tm.add(q);
-        break;
-      case M_ALLWORDS:
-      case M_ANYWORD:
-        final FTLexer l = new FTLexer(intok.ftOpt());
-        while((q = nextToken(qu)) != null) {
-          l.init(q);
-          while(l.hasNext()) tm.add(l.nextToken());
-        }
-        break;
-      case M_PHRASE:
-        final TokenBuilder tb = new TokenBuilder();
-        while((q = nextToken(qu)) != null) tb.add(q).add(' ');
-        tm.add(tb.trim().finish());
-    }
+    final TokenList tl = new TokenList();
+    final Iter ir = ctx.iter(query);
+    byte[] qu;
+    while((qu = nextToken(ir)) != null) tl.add(qu);
 
     // find and count all occurrences
+    final TokenSet ts = tokens(tl, intok.ftOpt());
     final boolean a = mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS;
     int oc = 0;
-    for(int i = 1; i <= tm.size(); i++) {
-      final FTTokens qtok = ftt.cache(tm.key(i));
+    for(final byte[] k : ts) {
+      final FTTokens qtok = ftt.cache(k);
       final int o = ftt.contains(qtok, intok);
       if(a && o == 0) return 0;
       num = Math.max(num, o * qtok.length());
@@ -244,6 +235,36 @@ public final class FTWords extends FTExpr {
     final long mx = occ != null ? checkItr(occ[1], ctx) : Long.MAX_VALUE;
     if(mn == 0 && oc == 0) all = FTNot.not(all);
     return oc >= mn && oc <= mx ? Math.max(1, num) : 0;
+  }
+
+  /**
+   * Caches and returns all unique tokens specified in a query.
+   * @param list token list
+   * @param ftopt full-text options
+   * @return token set
+   */
+  TokenSet tokens(final TokenList list, final FTOpt ftopt) {
+    // cache all query tokens (remove duplicates)
+    final TokenSet ts = new TokenSet();
+    switch(mode) {
+      case M_ALL:
+      case M_ANY:
+        for(final byte[] t : list) ts.add(t);
+        break;
+      case M_ALLWORDS:
+      case M_ANYWORD:
+        final FTLexer l = new FTLexer(ftopt);
+        for(final byte[] t : list) {
+          l.init(t);
+          while(l.hasNext()) ts.add(l.nextToken());
+        }
+        break;
+      case M_PHRASE:
+        final TokenBuilder tb = new TokenBuilder();
+        for(final byte[] t : list) tb.add(t).add(' ');
+        ts.add(tb.trim().finish());
+    }
+    return ts;
   }
 
   /**

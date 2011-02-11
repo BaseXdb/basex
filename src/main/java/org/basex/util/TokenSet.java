@@ -2,6 +2,8 @@ package org.basex.util;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
+
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 
@@ -12,10 +14,10 @@ import org.basex.io.DataOutput;
  * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
-public class TokenSet {
+public class TokenSet implements Iterable<byte[]> {
   /** Initial hash capacity. */
   protected static final int CAP = 1 << 3;
-  /** Hash entries. Actual hash size is {@code size - 1}. */
+  /** Hash entries. Note: actual number of entries is {@code size - 1}. */
   protected int size = 1;
   /** Hash keys. */
   protected byte[][] keys;
@@ -131,8 +133,7 @@ public class TokenSet {
    */
   public final byte[][] keys() {
     final byte[][] tmp = new byte[size()][];
-    int t = 0;
-    for(int i = 1; i < size; ++i) tmp[t++] = keys[i];
+    for(int i = 1; i < size; ++i) tmp[i - 1] = keys[i];
     return tmp;
   }
 
@@ -167,5 +168,18 @@ public class TokenSet {
     final byte[][] k = new byte[s][];
     System.arraycopy(keys, 0, k, 0, size);
     keys = k;
+  }
+
+  @Override
+  public Iterator<byte[]> iterator() {
+    return new Iterator<byte[]>() {
+      private int c;
+      @Override
+      public boolean hasNext() { return ++c < size; }
+      @Override
+      public byte[] next() { return keys[c]; }
+      @Override
+      public void remove() { Util.notexpected(); }
+    };
   }
 }

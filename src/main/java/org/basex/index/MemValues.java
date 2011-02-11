@@ -39,15 +39,6 @@ public final class MemValues extends TokenSet implements Index {
     return i;
   }
 
-  /**
-   * Returns the key for the specified id.
-   * @param id id
-   * @return token
-   */
-  public byte[] get(final int id) {
-    return key(id);
-  }
-
   @Override
   public IndexIterator ids(final IndexToken tok) {
     final int i = id(tok.get());

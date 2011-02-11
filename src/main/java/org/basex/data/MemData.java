@@ -68,7 +68,7 @@ public final class MemData extends Data {
 
   @Override
   public byte[] text(final int pre, final boolean text) {
-    return ((MemValues) (text ? txtindex : atvindex)).get((int) textOff(pre));
+    return ((MemValues) (text ? txtindex : atvindex)).key((int) textOff(pre));
   }
 
   @Override
