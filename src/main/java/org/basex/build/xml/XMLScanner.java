@@ -94,20 +94,23 @@ final class XMLScanner extends Progress {
     dtd = pr.is(Prop.DTD);
 
     String enc = null;
+    // process document declaration...
     if(consume(DOCDECL)) {
-      // process document declaration...
-      checkS();
-      if(!version()) error(DECLSTART);
-      boolean s = s();
-      enc = encoding();
-      if(enc != null) {
-        if(!s) error(WSERROR);
-        s = s();
+      if(s()) {
+        if(!version()) error(DECLSTART);
+        boolean s = s();
+        enc = encoding();
+        if(enc != null) {
+          if(!s) error(WSERROR);
+          s = s();
+        }
+        if(sddecl() != null && !s) error(WSERROR);
+        s();
+        final int ch = nextChar();
+        if(ch != '?' || nextChar() != '>') error(DECLWRONG);
+      } else {
+        prev(5);
       }
-      if(sddecl() != null && !s) error(WSERROR);
-      s();
-      final int ch = nextChar();
-      if(ch != '?' || nextChar() != '>') error(DECLWRONG);
     }
     encoding = enc == null ? UTF8 : enc;
 
