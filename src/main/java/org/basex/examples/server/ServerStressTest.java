@@ -38,7 +38,7 @@ public final class ServerStressTest {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    System.out.println("=== Server StressTest ===");
+    System.out.println("=== ServerStressTest ===");
 
     final Performance perf = new Performance();
 
