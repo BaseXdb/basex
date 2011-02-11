@@ -65,7 +65,7 @@ public abstract class CFrag extends Arr {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.FRG || super.uses(u);
+    return u == Use.CNS || super.uses(u);
   }
 
   /**

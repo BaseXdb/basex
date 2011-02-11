@@ -52,7 +52,7 @@ public final class VarRef extends ParseExpr {
      * optimizations (index access, count, ...). On the other hand, repeated
      * evaluation of the same expression is avoided. */
     if(var.global || ctx.nsElem.length != 0 || ns.size() != 0 ||
-        var.type != null || e.uses(Use.FRG) || e instanceof FuncCall) {
+        var.type != null || e.uses(Use.CNS) || e instanceof FuncCall) {
       e = var.value(ctx);
     }
 
@@ -68,7 +68,6 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public boolean uses(final Use u) {
-    // [CG] XQuery/flags: check flags (FRG?)
     return u == Use.VAR || u != Use.CTX &&
       var.expr() != null && var.expr().uses(u);
   }

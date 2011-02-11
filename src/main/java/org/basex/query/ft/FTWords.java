@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
@@ -23,7 +22,6 @@ import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
-import org.basex.util.TokenObjMap;
 import org.basex.util.TokenSet;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
@@ -37,21 +35,12 @@ import org.basex.util.ft.FTOpt;
 public final class FTWords extends FTExpr {
   /** Words mode. */
   public enum FTMode {
-    /** All option. */
-    M_ALL,
-    /** All words option. */
-    M_ALLWORDS,
-    /** Any option. */
-    M_ANY,
-    /** Any words option. */
-    M_ANYWORD,
-    /** Phrase search. */
-    M_PHRASE
+    /** All option. */       M_ALL,
+    /** All words option. */ M_ALLWORDS,
+    /** Any option. */       M_ANY,
+    /** Any words option. */ M_ANYWORD,
+    /** Phrase search. */    M_PHRASE
   }
-
-  /** Cache. */
-  final TokenObjMap<ArrayList<byte[][]>> cache =
-    new TokenObjMap<ArrayList<byte[][]>>();
 
   /** Full-text tokenizer. */
   FTTokenizer ftt;
@@ -67,13 +56,13 @@ public final class FTWords extends FTExpr {
   /** Search mode. */
   FTMode mode;
 
-  /** Expression list. */
+  /** Query expression. */
   private Expr query;
   /** Minimum and maximum occurrences. */
   private Expr[] occ;
-  /** Token number. */
+  /** Current token number. */
   private int tokNum;
-  /** Standard evaluation. */
+  /** Fast evaluation. */
   private boolean fast;
 
   /**

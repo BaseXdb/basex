@@ -172,14 +172,14 @@ public class GFLWOR extends ParseExpr {
     // loop through all clauses
     for(int f = fl.length - 1; f >= 0; --f) {
       ForLet t = fl[f];
-      // ignore for clauses
-      if(t instanceof For) continue;
+      // ignore for clauses, context expressions and constructors
+      if(t instanceof For || t.uses(Use.CTX) || t.uses(Use.CNS)) continue;
       // loop through all outer clauses
       for(int g = f - 1; g >= 0; --g) {
         // stop if variable is shadowed or used by the current clause
         if(fl[g].shadows(t.var) || t.uses(fl[g].var)) break;
         // ignore let clauses and fragment constructors
-        if(fl[g] instanceof Let || t.uses(Use.FRG)) continue;
+        if(fl[g] instanceof Let) continue;
         // stop if variable is used by as position or score
         final For fr = (For) fl[g];
         if(fr.pos != null && t.uses(fr.pos) ||
