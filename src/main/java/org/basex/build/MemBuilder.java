@@ -58,7 +58,7 @@ public final class MemBuilder extends Builder {
     meta.textindex = true;
     meta.attrindex = true;
     meta.ftindex = false;
-    meta.file = parser.file;
+    meta.path = parser.file;
 
     parse(name);
     data.init();

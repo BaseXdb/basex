@@ -339,11 +339,11 @@ public final class ServerQueryTest {
     cq2.close();
   }
 
-  /** Runs 10 queries in parallel.
+  /** Runs 5 queries in parallel.
    * @throws BaseXException command exception */
   @Test
-  public void query1000() throws BaseXException {
-    final int size = 10;
+  public void query8() throws BaseXException {
+    final int size = 8;
     final ClientQuery[] cqs = new ClientQuery[size];
     for(int q = 0; q < size; q++) cqs[q] = cs.query(String.valueOf(q));
     for(int q = 0; q < size; q++)

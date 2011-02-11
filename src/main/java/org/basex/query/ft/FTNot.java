@@ -10,6 +10,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
+import org.basex.util.ft.Scoring;
 
 /**
  * FTUnaryNot expression.
@@ -37,7 +38,7 @@ public final class FTNot extends FTExpr {
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return not(ctx, expr[0].item(ctx, input));
+    return not(expr[0].item(ctx, input));
   }
 
   @Override
@@ -47,21 +48,20 @@ public final class FTNot extends FTExpr {
 
       @Override
       public FTNode next() throws QueryException {
-        return not(ctx, ir.next());
+        return not(ir.next());
       }
     };
   }
 
   /**
    * Negates a hit.
-   * @param ctx query context
    * @param item item
    * @return specified item
    */
-  FTNode not(final QueryContext ctx, final FTNode item) {
+  FTNode not(final FTNode item) {
     if(item != null) {
       item.all = not(item.all);
-      item.score(ctx.score.not(item.score()));
+      item.score(Scoring.not(item.score()));
     }
     return item;
   }

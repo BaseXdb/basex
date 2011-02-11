@@ -25,6 +25,7 @@ import org.basex.util.TokenList;
 import org.basex.util.TokenSet;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
+import org.basex.util.ft.Scoring;
 
 /**
  * FTWords expression.
@@ -132,7 +133,7 @@ public final class FTWords extends FTExpr {
     if(c == 0) all.size = 0;
 
     // scoring: include number of tokens for calculations
-    return new FTNode(all, c == 0 ? 0 : ctx.score.word(c, ctx.fttoken.count()));
+    return new FTNode(all, c == 0 ? 0 : Scoring.word(c, ctx.fttoken.count()));
   }
 
   @Override

@@ -96,7 +96,7 @@ public final class CollectionPathTest {
       + " return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CTX);
     final Item it = qp.iter().next();
-    final String expath = '"' + CTX.data.meta.file.url().replace(DBNAME, "")
+    final String expath = '"' + CTX.data.meta.path.url().replace(DBNAME, "")
         + FILES[1] + '"';
     assertEquals(expath, it.toString());
     qp.close();

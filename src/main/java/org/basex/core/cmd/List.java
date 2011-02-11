@@ -51,7 +51,7 @@ public final class List extends Command {
         meta.read(in);
         size = meta.dbsize();
         ndocs = meta.ndocs;
-        if(context.perm(User.READ, meta)) file = meta.file.toString();
+        if(context.perm(User.READ, meta)) file = meta.path.toString();
       } catch(final IOException ex) {
         file = INFODBERR;
       } finally {

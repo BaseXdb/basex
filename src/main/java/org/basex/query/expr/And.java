@@ -9,6 +9,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
+import org.basex.util.ft.Scoring;
 
 /**
  * And expression.
@@ -68,7 +69,7 @@ public final class And extends Logical {
     for(final Expr e : expr) {
       final Item it = e.ebv(ctx, input);
       if(!it.bool(input)) return Bln.FALSE;
-      s = ctx.score.and(s, it.score());
+      s = Scoring.and(s, it.score());
     }
     // no scoring - return default boolean
     return s == 0 ? Bln.TRUE : Bln.get(s);

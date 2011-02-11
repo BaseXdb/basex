@@ -31,9 +31,9 @@ public final class MetaData {
 
   /** Encoding of XML document. */
   public String encoding = UTF8;
-  /** Original filename of XML document. */
-  public IO file;
-  /** Original file size of XML document. */
+  /** Path to original documents. */
+  public IO path;
+  /** Size of original documents. */
   public long filesize;
   /** Number of XML documents. */
   public int ndocs;
@@ -136,6 +136,7 @@ public final class MetaData {
         else if(k.equals(DBFNAME)) f = IO.get(v);
         else if(k.equals(DBTIME)) t = toLong(v);
       }
+      System.out.println("... " + path);
       return f != null && f.eq(IO.get(path)) && STORAGE.equals(str) &&
         f.date() == t;
     } catch(final IOException ex) {
@@ -210,7 +211,7 @@ public final class MetaData {
       if(k.equals(DBSTR))         storage    = v;
       else if(k.equals(IDBSTR))   istorage   = v;
       else if(k.equals(DBSIZE))   size       = toInt(v);
-      else if(k.equals(DBFNAME))  file       = IO.get(v);
+      else if(k.equals(DBFNAME))  path       = IO.get(v);
       else if(k.equals(DBFSIZE))  filesize   = toLong(v);
       else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
       else if(k.equals(DBFTDC))   diacritics = toBool(v);
@@ -260,7 +261,7 @@ public final class MetaData {
   void write(final DataOutput out) throws IOException {
     writeInfo(out, DBSTR,    STORAGE);
     writeInfo(out, IDBSTR,   ISTORAGE);
-    writeInfo(out, DBFNAME,  file.path());
+    writeInfo(out, DBFNAME,  path.path());
     writeInfo(out, DBFSIZE,  filesize);
     writeInfo(out, DBNDOCS,  ndocs);
     writeInfo(out, DBENC,    encoding);

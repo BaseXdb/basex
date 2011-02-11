@@ -9,6 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
+import org.basex.util.ft.Scoring;
 
 /**
  * FTAnd expression.
@@ -48,7 +49,7 @@ public final class FTAnd extends FTExpr {
       throws QueryException {
     final FTNode item = expr[0].item(ctx, input);
     for(int e = 1; e < expr.length; ++e) {
-      and(ctx, item, expr[e].item(ctx, input));
+      and(item, expr[e].item(ctx, input));
     }
     return item;
   }
@@ -94,7 +95,7 @@ public final class FTAnd extends FTExpr {
         for(int i = 1; i < it.length; ++i) {
           // [CG] XQFT: item.all = FTMatches.not(it[i].all, 0);
           if(neg[i]) continue;
-          and(ctx, item, it[i]);
+          and(item, it[i]);
           it[i] = ir[i].next();
         }
         it[0] = ir[0].next();
@@ -105,11 +106,10 @@ public final class FTAnd extends FTExpr {
 
   /**
    * Merges two matches.
-   * @param ctx query context
    * @param i1 first item
    * @param i2 second item
    */
-  void and(final QueryContext ctx, final FTNode i1, final FTNode i2) {
+  void and(final FTNode i1, final FTNode i2) {
     final FTMatches all = new FTMatches(
         (byte) Math.max(i1.all.sTokenNum, i2.all.sTokenNum));
 
@@ -118,7 +118,7 @@ public final class FTAnd extends FTExpr {
         all.add(new FTMatch().add(s1).add(s2));
       }
     }
-    i1.score(ctx.score.and(i1.score(), i2.score()));
+    i1.score(Scoring.and(i1.score(), i2.score()));
     i1.all = all;
   }
 

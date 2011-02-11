@@ -37,7 +37,6 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
-import org.basex.util.ft.Scoring;
 
 /**
  * This abstract query expression provides the architecture for a compiled
@@ -50,8 +49,6 @@ public final class QueryContext extends Progress {
   public final Functions funcs = new Functions();
   /** Variables. */
   public final Variables vars = new Variables();
-  /** Scoring instance. */
-  public final Scoring score = new Scoring();
   /** Namespaces. */
   public Namespaces ns = new Namespaces();
 

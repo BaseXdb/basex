@@ -12,7 +12,7 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 final class Lock {
-  /** Queue. */
+  /** Queue for all waiting processes. */
   private final LinkedList<Object> queue = new LinkedList<Object>();
   /** Mutex object. */
   private final Object mutex = new Object();
@@ -36,7 +36,7 @@ final class Lock {
    * Modifications before executing a command.
    * @param w writing flag
    */
-  void register(final boolean w) {
+  void lock(final boolean w) {
     synchronized(mutex) {
       final Object o = new Object();
       queue.add(o);
@@ -68,7 +68,7 @@ final class Lock {
    * Modifications after executing a command.
    * @param w writing flag
    */
-  synchronized void unregister(final boolean w) {
+  synchronized void unlock(final boolean w) {
     synchronized(mutex) {
       if(w) {
         writer = false;

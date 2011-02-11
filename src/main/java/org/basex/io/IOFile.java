@@ -213,9 +213,12 @@ public final class IOFile extends IO {
         file = URLDecoder.decode(file, Prop.ENCODING);
       } catch(final Exception ex) { /* ignored. */ }
     }
+    // remove file scheme
     String fn = file.startsWith(FILEPREF) ?
         file.substring(FILEPREF.length()) : file;
+        // remove leading slashes
     while(fn.startsWith("//")) fn = fn.substring(1);
+    // remove slash on Windows systems
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
   }
@@ -289,10 +292,16 @@ public final class IOFile extends IO {
      * @param tb entry
      */
     private void add(final TokenBuilder tb) {
-      final String s = tb.toString();
+      String s = tb.toString();
+      // switch first Windows letter to upper case
+      if(s.length() > 1 && s.charAt(1) == ':' && size == 0) {
+        s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
+      }
       if(s.equals("..") && size > 0) {
-        if(!list[size - 1].contains(":")) delete(size - 1);
+        // parent step
+        if(list[size - 1].indexOf(':') == -1) delete(size - 1);
       } else if(!s.equals(".") && !s.isEmpty()) {
+        // skip self and empty steps
         add(s.toString());
       }
       tb.reset();

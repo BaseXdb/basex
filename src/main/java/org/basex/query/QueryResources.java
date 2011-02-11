@@ -137,7 +137,7 @@ public final class QueryResources {
     // check if a database with the same file path has already been opened
     final IO io = IO.get(in);
     for(int d = 0; d < datas; ++d) {
-      if(data[d].meta.file.eq(io)) return data[d];
+      if(data[d].meta.path.eq(io)) return data[d];
     }
 
     // retrieve and add new data reference

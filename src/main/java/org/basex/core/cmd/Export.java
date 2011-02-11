@@ -51,7 +51,7 @@ public final class Export extends Command {
    */
   public static void export(final Context context, final Data data)
       throws IOException {
-    export(context.prop, data, data.meta.file.path());
+    export(context.prop, data, data.meta.path.path());
   }
 
   /**

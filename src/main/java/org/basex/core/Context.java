@@ -179,7 +179,7 @@ public final class Context {
    * @param w writing flag
    */
   public void register(final boolean w) {
-    lock.register(w);
+    lock.lock(w);
   }
 
   /**
@@ -187,7 +187,7 @@ public final class Context {
    * @param w writing flag
    */
   public void unregister(final boolean w) {
-    lock.unregister(w);
+    lock.unlock(w);
   }
 
   /**

@@ -144,7 +144,7 @@ final class DBPrimitives extends Primitives {
       try {
         Export.export(ctx.context, d);
       } catch(final IOException ex) {
-        UPPUTERR.thrw(null, d.meta.file);
+        UPPUTERR.thrw(null, d.meta.path);
       }
     }
   }

@@ -149,7 +149,7 @@ public class DBNode extends Nod {
   @Override
   public final byte[] base() {
     if(type != Type.DOC) return EMPTY;
-    final IO dir = IO.get(data.meta.file.path());
+    final IO dir = IO.get(data.meta.path.path());
     return token(dir.merge(string(data.text(pre, true))).url());
   }
 

@@ -15,6 +15,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.ft.Scoring;
 
 /**
  * Let clause.
@@ -90,7 +91,7 @@ public final class Let extends ForLet {
               s += it.score();
               ++c;
             }
-            v = Dbl.get(ctx.score.let(s, c));
+            v = Dbl.get(Scoring.let(s, c));
           } else {
             v = expr.value(ctx);
           }

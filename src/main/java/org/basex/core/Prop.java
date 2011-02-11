@@ -111,9 +111,7 @@ public final class Prop extends AProp {
   public static final Object[] XQUERY3 = { "XQUERY3", true };
 
   /** Defines the number of parallel readers. */
-  public static final Object[] PARALLEL = { "PARALLEL",
-    Math.min(8, Math.max(2, Runtime.getRuntime().availableProcessors()))
-  };
+  public static final Object[] PARALLEL = { "PARALLEL", 8 };
 
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };
