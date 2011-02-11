@@ -99,7 +99,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     if(!main.visible() || data == null) return;
 
     final boolean pi = data.meta.pathindex;
-    if(panel.getComponentCount() != 0) {
+    if(!pi || panel.getComponentCount() != 0) {
       if(!pi) init();
       return;
     }
@@ -138,8 +138,9 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final TokenList tl = new TokenList();
     final int cs = panel.getComponentCount();
     final boolean fs = data.fs != null;
-    if(fs) tl.add(Token.token(DeepFS.S_FILE));
-    else {
+    if(fs) {
+      tl.add(Token.token(DeepFS.S_FILE));
+    } else {
       for(int c = 0; c < cs; c += 2) {
         final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
         if(combo.getSelectedIndex() == 0) continue;
@@ -149,12 +150,11 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     }
 
     final TokenList tmp = data.pthindex.desc(tl, data, !fs, false);
-    if(tmp.size() == 0) return;
-
     final String[] keys = entries(tmp.toArray());
     final BaseXCombo cm = new BaseXCombo(gui, keys);
     cm.addActionListener(this);
     cm.addKeyListener(main);
+    if(tmp.size() == 0) cm.setEnabled(false);
     panel.add(cm);
     panel.add(new BaseXLabel(""));
   }
