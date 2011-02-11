@@ -151,7 +151,7 @@ public abstract class FTIndexIterator extends IndexIterator {
 
       @Override
       public double score() {
-        return Scoring.phrase(i1.score(), i2.score());
+        return Scoring.intersect(i1.score(), i2.score());
       }
     };
   }

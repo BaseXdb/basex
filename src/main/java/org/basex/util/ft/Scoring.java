@@ -107,7 +107,7 @@ public final class Scoring {
    * @param w2 score of word2
    * @return score of the phrase
    */
-  public static double phrase(final double w1, final double w2) {
+  public static double intersect(final double w1, final double w2) {
     return (w1 + w2) / 2;
   }
 

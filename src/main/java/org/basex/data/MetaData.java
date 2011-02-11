@@ -136,7 +136,6 @@ public final class MetaData {
         else if(k.equals(DBFNAME)) f = IO.get(v);
         else if(k.equals(DBTIME)) t = toLong(v);
       }
-      System.out.println("... " + path);
       return f != null && f.eq(IO.get(path)) && STORAGE.equals(str) &&
         f.date() == t;
     } catch(final IOException ex) {

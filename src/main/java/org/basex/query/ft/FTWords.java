@@ -155,21 +155,22 @@ public final class FTWords extends FTExpr {
             boolean f = mode != FTMode.M_PHRASE;
             while(lex.hasNext()) {
               final byte[] token = lex.nextToken();
-              tl += token.length;
+              tl = mode == FTMode.M_ANY || mode == FTMode.M_ANYWORD ?
+                  Math.max(token.length, tl) : tl + token.length;
               if(ftt.opt.sw != null && ftt.opt.sw.id(token) != 0) {
                 ++d;
               } else {
-                final FTIndexIterator i = (FTIndexIterator) data.ids(lex);
+                final FTIndexIterator ir = (FTIndexIterator) data.ids(lex);
                 if(iat == null) {
-                  iat = i;
+                  iat = ir;
                 } else if(f) {
                   if(mode == FTMode.M_ANY || mode == FTMode.M_ANYWORD) {
-                    iat = FTIndexIterator.union(i, iat);
+                    iat = FTIndexIterator.union(ir, iat);
                   } else {
-                    iat = FTIndexIterator.intersect(i, iat, 0);
+                    iat = FTIndexIterator.intersect(ir, iat, 0);
                   }
                 } else {
-                  iat = FTIndexIterator.intersect(iat, i, ++d);
+                  iat = FTIndexIterator.intersect(iat, ir, ++d);
                   d = 0;
                 }
               }
