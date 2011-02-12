@@ -64,7 +64,7 @@ public final class Check extends Command {
         if(ctx.perm(User.READ, data.meta)) return data;
         throw new IOException(Util.info(PERMNO, CmdPerm.READ));
       }
-      ctx.unpin(data);
+      if(ctx.unpin(data)) data.close();
     }
 
     // if found, an existing database is opened
