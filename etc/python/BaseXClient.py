@@ -47,6 +47,11 @@ class Session():
   # see readme.txt
   def query(self, q):
     return Query(self, q)
+    
+  # see readme.txt
+  def add(self, name, target, content):
+  	s.send(chr(9) + name + '\0' + target + '\0' + content + '\0')
+  	self.__info = self.readString()
 
   # see readme.txt
   def info(self):
