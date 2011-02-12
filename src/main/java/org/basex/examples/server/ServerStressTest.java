@@ -17,9 +17,9 @@ public final class ServerStressTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Number of clients. */
-  private static final int NCLIENTS = 100;
+  private static final int NCLIENTS = 50;
   /** Number of runs per client. */
-  private static final int NQUERIES = 100;
+  private static final int NQUERIES = 50;
   /** Input document. */
   private static final String INPUT = "etc/xml/factbook.xml";
   /** Query to be run ("%" serves as placeholder for dynamic content). */
