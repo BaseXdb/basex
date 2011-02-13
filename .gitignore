@@ -4,8 +4,13 @@
 *.DS_Store
 *.swp
 *.out
+
 # Java classfiles
 *.class
-# Maven target dir
-target
 
+# Maven target dir
+/doc
+/target
+
+# /.settings/
+/.settings/org.maven.ide.eclipse.prefs
