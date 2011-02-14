@@ -87,8 +87,8 @@ public final class SAXWrapper extends FileParser {
 
       sax = new SAXHandler(builder);
       final String cat = prop.get(Prop.CATFILE);
-
       if(!cat.isEmpty()) CatalogResolverWrapper.set(r, cat);
+
       r.setDTDHandler(sax);
       r.setContentHandler(sax);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", sax);
