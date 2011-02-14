@@ -285,7 +285,7 @@ public final class ServerQueryTest {
     final ClientQuery cq = cs.query("1 to 2");
     cq.execute();
     final String info = cq.info();
-    if(!info.contains("Total Time")) {
+    if(!info.contains(QUERYTOTAL)) {
       fail("'Total Time' not contained in '" + info + "'.");
     }
     cq.close();

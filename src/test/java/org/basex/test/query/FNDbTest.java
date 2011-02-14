@@ -1,5 +1,6 @@
 package org.basex.test.query;
 
+import static org.basex.core.Text.*;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -191,7 +192,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void testSystem() throws BaseXException {
     // wrong arguments
     final String fun = check(FunDef.SYSTEM);
-    contains(fun + "()", "ON");
+    contains(fun + "()", INFOON);
   }
 
   /**
@@ -204,7 +205,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(FunDef.INFO, String.class);
 
     // standard test
-    contains(fun + "()", "ON");
+    contains(fun + "()", INFOON);
 
     // drop indexes and check index queries
     final String[] types = { "text", "attribute", "fulltext" };
@@ -219,7 +220,7 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // run function on closed database
     new Close().execute(CTX);
-    contains("db:open('db')/" + fun + "()", "ON");
+    contains("db:open('db')/" + fun + "()", INFOON);
     contains("db:open('db')/" + fun + "('tag')", ":");
     error(fun + "('tag')", Err.NODBCTX);
   }
