@@ -4,8 +4,6 @@
 PWD=`dirname $0`
 
 # Paths to distributed files or source directories
-# BASEX=$PWD/basex.jar
-# BASEXAPI=$PWD/basex-api.jar
 BASEX=$PWD/../../basex/target/classes
 BASEXAPI=$PWD/../target/classes
 
@@ -14,7 +12,7 @@ LIB=$PWD/../lib
 CP=$BASEX:$BASEXAPI:$LIB/jax-rx-1.2.9.jar:$LIB/jetty-6.1.25.jar:$LIB/jetty-util-6.1.25.jar:$LIB/servlet-api-2.5-20081211.jar:$LIB/jersey-server-1.4.jar:$LIB/jersey-core-1.4.jar:$LIB/asm-3.1.jar
 
 # Options for virtual machine
-VM=-Xmx1g
+VM=-Xmx512m
 
-# Run REST server
+# Run code
 java -cp "$CP" $VM org.basex.api.jaxrx.JaxRxServer "$@"
