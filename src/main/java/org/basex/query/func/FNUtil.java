@@ -4,11 +4,15 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
+import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
@@ -20,6 +24,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Project specific functions.
@@ -55,6 +60,8 @@ final class FNUtil extends Fun {
       case MS: return ms(ctx);
       case FRM_BASE: return fromBase(ctx, ii);
       case TO_BASE: return toBase(ctx, ii);
+      case MD5: return hash(ctx, "MD5");
+      case SHA1: return hash(ctx, "SHA");
       default: return super.item(ctx, ii);
     }
   }
@@ -196,9 +203,9 @@ final class FNUtil extends Fun {
   private Str toBase(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-      final long num = checkItr(expr[0].item(ctx, input)),
-                 base = checkItr(expr[1].item(ctx, input));
-      if(base < 2 || base > 36) INVBASE.thrw(ii, base);
+    final long num = checkItr(expr[0], ctx),
+               base = checkItr(expr[1], ctx);
+    if(base < 2 || base > 36) INVBASE.thrw(ii, base);
 
     // use fast variant for powers of two
     for(int i = 1, p = 2; i < 6; i++, p <<= 1)
@@ -237,8 +244,9 @@ final class FNUtil extends Fun {
    */
   private Itr fromBase(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final byte[] str = checkEStr(expr[0].item(ctx, ii));
-    final long base = checkItr(expr[1].item(ctx, ii));
+
+    final byte[] str = checkStr(expr[0], ctx);
+    final long base = checkItr(expr[1], ctx);
     if(base < 2 || base > 36) INVBASE.thrw(ii, base);
 
     long res = 0;
@@ -254,9 +262,28 @@ final class FNUtil extends Fun {
     return Itr.get(res);
   }
 
+  /**
+   * Creates the hash of the given xs:string, using the algorithm {@code algo}.
+   * @param ctx query context
+   * @param algo hashing algorithm
+   * @return xs:hexBinary instance containing the hash
+   * @throws QueryException exception
+   */
+  private Hex hash(final QueryContext ctx, final String algo)
+      throws QueryException {
+    final byte[] str = checkStr(expr[0], ctx);
+    try {
+      final byte[] hash = MessageDigest.getInstance(algo).digest(str);
+      return new Hex(hash);
+    } catch(NoSuchAlgorithmException e) {
+      Util.notexpected(e);
+      return null;
+    }
+  }
+
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && !(def == FunDef.FRM_BASE || def == FunDef.TO_BASE)
-        || super.uses(u);
+    return u == Use.CTX && (def == FunDef.MB || def == FunDef.MB
+        || def == FunDef.EVAL || def == FunDef.RUN) || super.uses(u);
   }
 }

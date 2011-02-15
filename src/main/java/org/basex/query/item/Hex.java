@@ -19,6 +19,15 @@ public final class Hex extends Item {
   /**
    * Constructor.
    * @param v value
+   */
+  public Hex(final byte[] v) {
+    super(Type.HEX);
+    val = v;
+  }
+
+  /**
+   * Constructor.
+   * @param v value
    * @param ii input info
    * @throws QueryException query exception
    */
@@ -32,8 +41,7 @@ public final class Hex extends Item {
    * @param b base64 data
    */
   Hex(final B64 b) {
-    super(Type.HEX);
-    val = b.val;
+    this(b.val);
   }
 
   @Override

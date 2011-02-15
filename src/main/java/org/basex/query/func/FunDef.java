@@ -493,9 +493,13 @@ public enum FunDef {
   /** Utility function: measures the execution time of an expression. */
   MS(UTILURI, FNUtil.class, 1, 2, "ms(expr, cache?)", STR),
   /** Utility function: converts a number to a given base. */
-  TO_BASE(UTILURI, FNUtil.class, 2, 2, "integer-to-base(num, base)", STR_ZO),
+  TO_BASE(UTILURI, FNUtil.class, 2, 2, "integer-to-base(num, base)", STR),
   /** Utility function: decodes a number from a given base. */
-  FRM_BASE(UTILURI, FNUtil.class, 2, 2, "integer-from-base(str, base)", ITR_ZO),
+  FRM_BASE(UTILURI, FNUtil.class, 2, 2, "integer-from-base(str, base)", ITR),
+  /** Utility function: calculates the MD5 hash of the given xs:string. */
+  MD5(UTILURI, FNUtil.class, 1, 1, "md5(str)", STR),
+  /** Utility function: calculates the SHA1 hash of the given xs:string. */
+  SHA1(UTILURI, FNUtil.class, 1, 1, "sha1(str)", STR),
 
   /* FNSent functions. */
 

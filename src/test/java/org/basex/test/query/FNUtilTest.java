@@ -109,4 +109,22 @@ public final class FNUtilTest extends AdvancedQueryTest {
     error(fun + "('abc', 10)", Err.INVDIG);
     error(fun + "('012', 2)", Err.INVDIG);
   }
+
+  /**
+   * Test method for the util:{md5, sha1}() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testHashing() throws BaseXException {
+    final String md5 = check(FunDef.MD5, String.class);
+    final String sha1 = check(FunDef.SHA1, String.class);
+    query(md5 + "('')", "D41D8CD98F00B204E9800998ECF8427E");
+    query(sha1 + "('')", "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709");
+
+    query(md5 + "('BaseX')", "0D65185C9E296311C0A2200179E479A2");
+    query(sha1 + "('BaseX')", "3AD5958F0F27D5AFFDCA2957560F121D0597A4ED");
+
+    error(md5 + "(())", Err.XPEMPTY);
+    error(sha1 + "(())", Err.XPEMPTY);
+  }
 }
