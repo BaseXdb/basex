@@ -420,7 +420,6 @@ srv_start=Server wurde gestartet.
 srv_stop=Server wurde gestoppt.
 srv_user=Benutzer
 srv_pw=Passwort
-srv_reststart=Starte REST-Server auf Port %
 
 # Bye
 bye1=Schönen Tag noch.

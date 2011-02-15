@@ -115,12 +115,13 @@ public interface Text {
     "  -z       Suppress logging";
 
   /** Start information. */
-  String RESTINFO =
-    " [-pPrsUz]" + NL +
+  String JAXRXINFO =
+    " [-jpPsUz]" + NL +
+    "  -j<num>   Set JAX-RX server port" + NL +
     "  -p<num>   Set database server port" + NL +
     "  -P<pass>  Specify user password" + NL +
-    "  -r<num>   Set REST server port" + NL +
-    "  -s<pars>  Set serialization parameter(s)" + NL +
+    "  -s        Start as service" + NL +
+    "  -S<pars>  Set serialization parameter(s)" + NL +
     "  -U<name>  Specify user name" + NL +
     "  -z        Suppress logging";
 
@@ -144,8 +145,6 @@ public interface Text {
   String SERVERUSER = lang("srv_user");
   /** Password. */
   String SERVERPW = lang("srv_pw");
-  /** Start REST. */
-  String RESTSTART = lang("srv_reststart") + DOTS;
 
   /** Localhost. */
   String LOCALHOST = "localhost";

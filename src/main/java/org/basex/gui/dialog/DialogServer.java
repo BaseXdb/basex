@@ -289,7 +289,7 @@ public final class DialogServer extends Dialog {
           gui.set(Prop.PORT, p);
           portc.setText(ports.getText());
         }
-        msg = BaseXServer.start(p);
+        msg = BaseXServer.start(p, BaseXServer.class);
         if(msg.equals(SERVERSTART)) {
           running = true;
         } else {

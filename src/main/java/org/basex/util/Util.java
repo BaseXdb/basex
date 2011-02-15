@@ -249,7 +249,7 @@ public final class Util {
    * Returns the absolute path to this application.
    * @return application path
    */
-  public static String applicationPath() {
+  private static String applicationPath() {
     // raw application path
     final String path = Util.class.getProtectionDomain().
       getCodeSource().getLocation().getPath();

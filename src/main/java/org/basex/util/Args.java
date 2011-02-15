@@ -119,4 +119,9 @@ public final class Args {
     if(!ok) Util.outln("Usage: " + Util.name(obj) + usage);
     return ok;
   }
+
+  @Override
+  public String toString() {
+    return args;
+  }
 }

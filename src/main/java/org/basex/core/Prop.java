@@ -48,8 +48,8 @@ public final class Prop extends AProp {
   public static final Object[] DBPATH =
     { "DBPATH", HOME + Text.NAME + "Data" };
   /** Web path. */
-  public static final Object[] RESTPATH =
-    { "RESTPATH", HOME + Text.NAME + "REST" };
+  public static final Object[] JAXRXPATH =
+    { "JAXRXPATH", HOME + Text.NAME + "Web" };
 
   /** Language name. */
   public static final Object[] LANG = { "LANG", "English" };
@@ -62,8 +62,8 @@ public final class Prop extends AProp {
   public static final Object[] PORT = { "PORT", 1984 };
   /** Client/server communication: port, used for starting the server. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
-  /** Client/server communication: port, used for starting the REST server. */
-  public static final Object[] RESTPORT = { "RESTPORT", 8984 };
+  /** Client/server communication: port, used for starting the JAX-RX server. */
+  public static final Object[] JAXRXPORT = { "JAXRXPORT", 8984 };
 
   /** Server timeout in seconds; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };

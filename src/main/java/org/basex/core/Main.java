@@ -45,7 +45,7 @@ public abstract class Main {
    * Constructor.
    * @param args command-line arguments
    */
-  protected Main(final String... args) {
+  protected Main(final String[] args) {
     success = parseArguments(args);
     verbose |= console;
     if(!success) return;

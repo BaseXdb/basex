@@ -420,7 +420,6 @@ srv_start=Server is gestart.
 srv_stop=Server is gestopt.
 srv_user=Gebruikersnaam
 srv_pw=Wachtwoord
-srv_reststart=Starting REST Server on port %
 
 # Bye
 bye1=Prettige dag.
