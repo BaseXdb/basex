@@ -32,7 +32,7 @@ public final class HttpClientTest {
 
   /** Database context. */
   protected static Context context;
-  /** REST server. */
+  /** JAX-RX server. */
   private static JaxRxServer jaxrx;
 
   /**

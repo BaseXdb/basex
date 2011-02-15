@@ -31,7 +31,7 @@ public final class JaxRxTest {
   private static final String WRAP2 = "</jax-rx:results>";
   /** Root path. */
   private static final String ROOT = "http://localhost:8984/basex/jax-rx";
-  /** REST server. */
+  /** JAX-RX server. */
   private static JaxRxServer jaxrx;
 
   // INITIALIZERS =============================================================
@@ -227,10 +227,10 @@ public final class JaxRxTest {
    */
   @Test
   public void post1() throws IOException {
-    put("/rest", null);
-    post("/rest", stream("<a>A</a>"));
-    assertEquals("1", get("/rest?query=count(/)&wrap=no"));
-    delete("/rest");
+    put("/jax-rx", null);
+    post("/jax-rx", stream("<a>A</a>"));
+    assertEquals("1", get("/jax-rx?query=count(/)&wrap=no"));
+    delete("/jax-rx");
   }
 
   /**
@@ -239,9 +239,9 @@ public final class JaxRxTest {
    */
   @Test
   public void put0() throws IOException {
-    put("/rest", null);
-    assertEquals("0", get("/rest?query=count(/)&wrap=no"));
-    delete("/rest");
+    put("/jax-rx", null);
+    assertEquals("0", get("/jax-rx?query=count(/)&wrap=no"));
+    delete("/jax-rx");
   }
 
   /**
@@ -250,9 +250,9 @@ public final class JaxRxTest {
    */
   @Test
   public void put1() throws IOException {
-    put("/rest", stream("<a>A</a>"));
-    assertEquals("A", get("/rest?query=/*/text()&wrap=no"));
-    delete("/rest");
+    put("/jax-rx", stream("<a>A</a>"));
+    assertEquals("A", get("/jax-rx?query=/*/text()&wrap=no"));
+    delete("/jax-rx");
   }
 
   /**
@@ -261,10 +261,10 @@ public final class JaxRxTest {
    */
   @Test
   public void put2() throws IOException {
-    put("/rest", new FileInputStream("etc/xml/input.xml"));
-    put("/rest", new FileInputStream("etc/xml/input.xml"));
-    assertEquals("XML", get("/rest?query=//title/text()&wrap=no"));
-    delete("/rest");
+    put("/jax-rx", new FileInputStream("etc/xml/input.xml"));
+    put("/jax-rx", new FileInputStream("etc/xml/input.xml"));
+    assertEquals("XML", get("/jax-rx?query=//title/text()&wrap=no"));
+    delete("/jax-rx");
   }
 
   /**
@@ -273,13 +273,13 @@ public final class JaxRxTest {
    */
   @Test
   public void put3() throws IOException {
-    put("/rest", null);
-    put("/rest/a", stream("<a>A</a>"));
-    put("/rest/b", stream("<b>B</b>"));
-    assertEquals("2", get("/rest?query=count(//text())&wrap=no"));
-    assertEquals("2", get("?query=count(collection('rest')//text())&wrap=no"));
-    assertEquals("1", get("?query=count(collection('rest/b')/*)&wrap=no"));
-    delete("/rest");
+    put("/jax-rx", null);
+    put("/jax-rx/a", stream("<a>A</a>"));
+    put("/jax-rx/b", stream("<b>B</b>"));
+    assertEquals("2", get("/jax-rx?query=count(//text())&wrap=no"));
+    assertEquals("2", get("?query=count(db:open('jax-rx')//text())&wrap=no"));
+    assertEquals("1", get("?query=count(db:open('jax-rx/b')/*)&wrap=no"));
+    delete("/jax-rx");
   }
 
   /**
@@ -288,11 +288,11 @@ public final class JaxRxTest {
    */
   @Test
   public void delete1() throws IOException {
-    put("/rest", new FileInputStream("etc/xml/input.xml"));
+    put("/jax-rx", new FileInputStream("etc/xml/input.xml"));
     // delete database
-    assertContains(delete("/rest"), "Database '");
+    assertContains(delete("/jax-rx"), "Database '");
     // no database left
-    assertContains(delete("/rest"), "No database");
+    assertContains(delete("/jax-rx"), "No database");
   }
 
   /**
@@ -301,20 +301,20 @@ public final class JaxRxTest {
    */
   @Test
   public void delete2() throws IOException {
-    put("/rest", null);
-    post("/rest/a", stream("<a/>"));
-    post("/rest/a", stream("<a/>"));
-    post("/rest/b", stream("<b/>"));
+    put("/jax-rx", null);
+    post("/jax-rx/a", stream("<a/>"));
+    post("/jax-rx/a", stream("<a/>"));
+    post("/jax-rx/b", stream("<b/>"));
     // delete 'a' directory
-    assertContains(delete("/rest/a"), "2 document");
+    assertContains(delete("/jax-rx/a"), "2 document");
     // delete 'b' directory
-    assertContains(delete("/rest/b"), "1 document");
+    assertContains(delete("/jax-rx/b"), "1 document");
     // no 'b' directory left
-    assertContains(delete("/rest/b"), "0 document");
+    assertContains(delete("/jax-rx/b"), "0 document");
     // delete database
-    assertContains(delete("/rest"), "Database '");
+    assertContains(delete("/jax-rx"), "Database '");
     // no database left
-    assertContains(delete("/rest"), "No database");
+    assertContains(delete("/jax-rx"), "No database");
   }
 
   // PRIVATE METHODS ==========================================================

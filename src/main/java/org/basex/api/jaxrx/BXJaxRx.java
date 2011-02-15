@@ -29,7 +29,7 @@ import org.jaxrx.core.ResourcePath;
 /**
  * This class offers an implementation of the JAX-RX interface.
  * It contains all methods which are necessary to answer GET, POST, PUT
- * and DELETE requests via REST.
+ * and DELETE requests via JAX-RX.
  *
  * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
@@ -42,8 +42,8 @@ public final class BXJaxRx implements JaxRx {
   public static final String PASSWORD = "org.basex.password";
   /** Configuration: Server port. */
   public static final String SERVERPORT = "org.basex.serverport";
-  /** Configuration: REST path. */
-  public static final String RESTPATH = "org.basex.restpath";
+  /** Configuration: JAX-RX path. */
+  public static final String JAXRXPATH = "org.basex.jaxrxpath";
   /** Configuration: serializer options. */
   public static final String SERIALIZER = "org.jaxrx.parameter.output";
 
@@ -115,7 +115,7 @@ public final class BXJaxRx implements JaxRx {
       @Override
       String code() {
         // get root directory for files
-        final String root = System.getProperty(RESTPATH) + "/";
+        final String root = System.getProperty(JAXRXPATH) + "/";
         final IO io = IO.get(root + file);
 
         // file not found...

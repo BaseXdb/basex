@@ -2,16 +2,14 @@ package org.basex.api.jaxrx;
 
 import static org.basex.core.Text.*;
 import org.basex.BaseXServer;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
-import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Util;
 import org.jaxrx.JettyServer;
 
 /**
- * This is the starter class for running the REST server,
+ * This is the starter class for running the JAX-RX server,
  * based on the JAX-RX interface.
  * A database server and the Jetty server is launched by the constructor.
  * The Jetty server listens for HTTP requests, which are then sent to JAX-RX.
@@ -19,16 +17,12 @@ import org.jaxrx.JettyServer;
  * @author BaseX Team 2005-11, ISC License
  * @author Christian Gruen
  */
-public final class JaxRxServer extends Main {
-  /** Database server. */
-  private BaseXServer server;
+public final class JaxRxServer extends BaseXServer {
   /** Jetty server. */
   private JettyServer jetty;
-  /** Quiet mode (no logging). */
-  private boolean quiet;
 
   /**
-   * Main method, launching the JAX-RX/REST implementation.
+   * Main method, launching the JAX-RX implementation.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
@@ -40,15 +34,13 @@ public final class JaxRxServer extends Main {
    * @param args command-line arguments
    */
   public JaxRxServer(final String... args) {
-    if(!parseArguments(args)) return;
+    super(args);
+    if(!success || service) return;
 
     // set default ports and paths
-    set(BXJaxRx.RESTPATH, context.prop.get(Prop.RESTPATH), false);
+    set(BXJaxRx.JAXRXPATH, context.prop.get(Prop.JAXRXPATH), false);
     set(BXJaxRx.SERVERPORT, context.prop.num(Prop.SERVERPORT), false);
     set(BXJaxRx.SERIALIZER, context.prop.get(Prop.SERIALIZER), false);
-
-    final int rp = context.prop.num(Prop.RESTPORT);
-    Util.outln(RESTSTART, rp);
 
     // store configuration in system properties
     // if a property has already been set, the new settings will be ignored
@@ -69,22 +61,18 @@ public final class JaxRxServer extends Main {
     set("org.jaxrx.systemName", Text.NAMELC, false);
     set("org.jaxrx.systemPath", BXJaxRx.class.getName(), false);
 
-    // start database server (if not done yet)
-    server = new BaseXServer(quiet ? "-z" : "");
-
     // start Jetty server (if not done yet)
     try {
-      jetty = new JettyServer(rp);
+      jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT));
+      Util.outln("JAX-RX " + SERVERSTART);
     } catch(final Exception ex) {
       Util.server(ex);
     }
   }
 
-  /**
-   * Stops the servers.
-   */
-  public void stop() {
-    server.stop();
+  @Override
+  public void quit(final boolean user) {
+    super.quit(user);
     if(jetty != null) jetty.stop();
   }
 
@@ -102,21 +90,28 @@ public final class JaxRxServer extends Main {
 
   @Override
   public boolean parseArguments(final String[] args) {
+    final Args arg = new Args(args, this, JAXRXINFO);
+    boolean daemon = false;
     String serial = "";
-    final Args arg = new Args(args, this, RESTINFO);
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
-        if(c == 'p') {
+        if(c == 'D') {
+          // hidden flag: daemon mode
+          daemon = true;
+        } else if(c == 'j') {
+          // parse JAX-RX server port
+          context.prop.set(Prop.JAXRXPORT, arg.num());
+        } else if(c == 'p') {
           // parse server port
           set(BXJaxRx.SERVERPORT, arg.num(), true);
         } else if(c == 'P') {
           // specify password
           set(BXJaxRx.PASSWORD, arg.string(), true);
-        } else if(c == 'r') {
-          // parse rest server port
-          context.prop.set(Prop.RESTPORT, arg.num());
         } else if(c == 's') {
+          // set service flag
+          service = !daemon;
+        } else if(c == 'S') {
           // set/add serialization parameter
           serial += "," + arg.string();
           set(BXJaxRx.SERIALIZER, serial, true);
@@ -129,14 +124,14 @@ public final class JaxRxServer extends Main {
         } else {
           arg.check(false);
         }
+      } else {
+        arg.check(false);
+        if(arg.string().equalsIgnoreCase("stop")) {
+          stop(context.prop.num(Prop.SERVERPORT));
+          return false;
+        }
       }
     }
     return arg.finish();
-  }
-
-  @Override
-  protected Session session() {
-    // not called
-    return null;
   }
 }
