@@ -22,7 +22,7 @@ import org.junit.Test;
 /**
  * This class tests the HTTP Client.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  *
  */

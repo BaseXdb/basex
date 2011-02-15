@@ -13,7 +13,7 @@ import org.xmldb.api.base.XMLDBException;
 /**
  * Implementation of the Database Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

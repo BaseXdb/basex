@@ -14,7 +14,7 @@ import org.jaxrx.core.ResourcePath;
 /**
  * Wrapper class for running JAX-RX code.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 abstract class BXCode {

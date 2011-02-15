@@ -29,7 +29,7 @@ import static org.basex.util.Token.*;
 /**
  * XML Stream Reader implementation.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class IterStreamReader implements XMLStreamReader {

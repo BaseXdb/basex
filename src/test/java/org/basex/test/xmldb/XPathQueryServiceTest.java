@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 /**
  * This class tests the XMLDB/API XPathQueryService implementation.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")

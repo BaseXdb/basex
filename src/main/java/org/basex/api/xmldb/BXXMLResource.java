@@ -30,7 +30,7 @@ import org.xmldb.api.modules.XMLResource;
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

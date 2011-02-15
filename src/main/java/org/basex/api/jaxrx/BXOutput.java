@@ -15,7 +15,7 @@ import org.jaxrx.core.ResourcePath;
 /**
  * Wrapper class for running JAX-RX code which creates output.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 abstract class BXOutput extends BXCode implements StreamingOutput {

@@ -15,7 +15,7 @@ import org.basex.util.Token;
 /**
  * Java XQuery API - Expression.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class BXQExpression extends BXQDynamicContext implements XQExpression {

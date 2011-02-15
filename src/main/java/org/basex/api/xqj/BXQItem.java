@@ -34,7 +34,7 @@ import org.xml.sax.ContentHandler;
 /**
  * Java XQuery API - Item.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class BXQItem extends BXQAbstract implements XQResultItem {
