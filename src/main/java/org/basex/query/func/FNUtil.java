@@ -256,6 +256,7 @@ final class FNUtil extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX || super.uses(u);
+    return u == Use.CTX && !(def == FunDef.FRM_BASE || def == FunDef.TO_BASE)
+        || super.uses(u);
   }
 }
