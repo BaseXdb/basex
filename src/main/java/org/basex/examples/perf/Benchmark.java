@@ -22,6 +22,10 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, ISC License
  */
 public abstract class Benchmark {
+  /** Database context. */
+  public final Context context = new Context();
+  /** Server reference. */
+  private BaseXServer server;
   /** Session. */
   private Session session;
   /** Input document. */
@@ -34,8 +38,6 @@ public abstract class Benchmark {
   private int max = Integer.MAX_VALUE;
   /** Local vs server flag. */
   private boolean local;
-  /** Server started flag. */
-  private boolean start;
 
   /**
    * Initializes the benchmark.
@@ -47,16 +49,13 @@ public abstract class Benchmark {
     out.println("=== " + Util.name(this) + " Test ===");
     if(!parseArguments(args)) return false;
 
-    final Context ctx = new Context();
-
     // Check if server is (not) running
-    start = !local &&
-      !BaseXServer.ping(LOCALHOST, ctx.prop.num(Prop.SERVERPORT));
+    server = !local &&
+      !BaseXServer.ping(LOCALHOST, context.prop.num(Prop.SERVERPORT)) ?
+          new BaseXServer("") : null;
 
-    if(start) new BaseXServer("");
-
-    session = local ? new LocalSession(ctx) :
-      new ClientSession(ctx, "admin", "admin");
+    session = local ? new LocalSession(context) :
+      new ClientSession(context, "admin", "admin");
 
     // Create test database
     session.execute(new Set(Prop.QUERYINFO, true));
@@ -69,7 +68,7 @@ public abstract class Benchmark {
    * Stops the server.
    */
   protected void finish() {
-    if(start) BaseXServer.stop(1984);
+    if(server != null) server.stop();
   }
 
   /**
