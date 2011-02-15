@@ -59,15 +59,10 @@ public final class Check extends Command {
     final Data data = ctx.pin(name);
     if(data != null) {
       final IO in = data.meta.path;
-      try {
-        if(in.eq(io) && io.date() == in.date()) {
-          // check permissions
-          if(ctx.perm(User.READ, data.meta)) return data;
-          throw new IOException(Util.info(PERMNO, CmdPerm.READ));
-        }
-      } finally {
-        Close.close(data, ctx);
-      }
+      final boolean found = in.eq(io) && io.date() == in.date();
+      if(found && ctx.perm(User.READ, data.meta)) return data;
+      Close.close(data, ctx);
+      if(found) throw new IOException(Util.info(PERMNO, CmdPerm.READ));
     }
 
     // if found, an existing database is opened

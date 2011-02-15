@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.math.BigInteger;
-
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -17,11 +16,9 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -183,7 +180,7 @@ final class FNUtil extends Fun {
       bytes[--pos] = DIGITS[(int) (n & mask)];
       n >>>= shift;
     } while(n != 0);
-    return Str.get(Token.substring(bytes, pos));
+    return Str.get(substring(bytes, pos));
   }
 
   /** BigInteger representing 2 * ({@link Long#MAX_VALUE} + 1). */
@@ -201,7 +198,7 @@ final class FNUtil extends Fun {
 
       final long num = checkItr(expr[0].item(ctx, input)),
                  base = checkItr(expr[1].item(ctx, input));
-      if(base < 2 || base > 36) Err.INVBASE.thrw(ii, base);
+      if(base < 2 || base > 36) INVBASE.thrw(ii, base);
 
     // use fast variant for powers of two
     for(int i = 1, p = 2; i < 6; i++, p <<= 1)
@@ -242,12 +239,13 @@ final class FNUtil extends Fun {
       throws QueryException {
     final byte[] str = checkEStr(expr[0].item(ctx, ii));
     final long base = checkItr(expr[1].item(ctx, ii));
-    if(base < 2 || base > 36) Err.INVBASE.thrw(ii, base);
+    if(base < 2 || base > 36) INVBASE.thrw(ii, base);
 
     long res = 0;
     for(final byte b : str) {
-      final int num = b <= '9' ? b - '0' : b - 'a' + 10;
-      if(!(b >= '0' && b <= '9' || b >= 'a' && b <= 'z') || num >= base)
+      final int num = b <= '9' ? b - 0x30 : (b & 0xDF) - 0x37;
+      if(!(b >= '0' && b <= '9' || b >= 'a' && b <= 'z' ||
+          b >= 'A' && b <= 'Z') || num >= base)
         INVDIG.thrw(ii, base, (char) (b & 0xff));
 
       res = res * base + num;

@@ -65,4 +65,48 @@ public final class FNUtilTest extends AdvancedQueryTest {
     query(fun + "(1 to 1000, false())");
     query(fun + "(1 to 1000, true())");
   }
+
+  /**
+   * Test method for the util:integer-to-base() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testToBase() throws BaseXException {
+    final String fun = check(FunDef.TO_BASE, Integer.class, Integer.class);
+    query(fun + "(4, 2)", "100");
+    query(fun + "(65535, 2)", "1111111111111111");
+    query(fun + "(65536, 2)", "10000000000000000");
+    query(fun + "(4, 16)", "4");
+    query(fun + "(65535, 16)", "ffff");
+    query(fun + "(65536, 16)", "10000");
+    query(fun + "(4, 10)", "4");
+    query(fun + "(65535, 10)", "65535");
+    query(fun + "(65536, 10)", "65536");
+    error(fun + "(1, 1)", Err.INVBASE);
+    error(fun + "(1, 100)", Err.INVBASE);
+    error(fun + "(1, 100)", Err.INVBASE);
+  }
+
+  /**
+   * Test method for the util:integer-from-base() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testFromBase() throws BaseXException {
+    final String fun = check(FunDef.FRM_BASE, String.class, Integer.class);
+    query(fun + "('100', 2)", "4");
+    query(fun + "('1111111111111111', 2)", "65535");
+    query(fun + "('10000000000000000', 2)", "65536");
+    query(fun + "('4', 16)", "4");
+    query(fun + "('ffff', 16)", "65535");
+    query(fun + "('FFFF', 16)", "65535");
+    query(fun + "('10000', 16)", "65536");
+    query(fun + "('4', 10)", "4");
+    query(fun + "('65535', 10)", "65535");
+    query(fun + "('65536', 10)", "65536");
+    error(fun + "('1', 1)", Err.INVBASE);
+    error(fun + "('1', 100)", Err.INVBASE);
+    error(fun + "('abc', 10)", Err.INVDIG);
+    error(fun + "('012', 2)", Err.INVDIG);
+  }
 }

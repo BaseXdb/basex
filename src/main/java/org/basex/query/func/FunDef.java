@@ -492,7 +492,6 @@ public enum FunDef {
   MB(UTILURI, FNUtil.class, 1, 2, "mb(expr, cache?)", STR),
   /** Utility function: measures the execution time of an expression. */
   MS(UTILURI, FNUtil.class, 1, 2, "ms(expr, cache?)", STR),
-
   /** Utility function: converts a number to a given base. */
   TO_BASE(UTILURI, FNUtil.class, 2, 2, "integer-to-base(num, base)", STR_ZO),
   /** Utility function: decodes a number from a given base. */
