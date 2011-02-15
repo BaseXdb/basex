@@ -2,7 +2,6 @@ package org.basex.test.unresolved;
 
 import java.io.IOException;
 import java.util.Random;
-
 import org.basex.BaseXServer;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
