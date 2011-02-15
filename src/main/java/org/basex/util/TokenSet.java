@@ -3,7 +3,6 @@ package org.basex.util;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
-
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 

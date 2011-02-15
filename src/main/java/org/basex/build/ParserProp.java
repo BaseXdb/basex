@@ -3,7 +3,6 @@ package org.basex.build;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.Iterator;
-
 import org.basex.core.AProp;
 import org.basex.data.DataText;
 import org.basex.util.Token;
