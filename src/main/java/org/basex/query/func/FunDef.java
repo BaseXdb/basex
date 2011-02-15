@@ -493,6 +493,11 @@ public enum FunDef {
   /** Utility function: measures the execution time of an expression. */
   MS(UTILURI, FNUtil.class, 1, 2, "ms(expr, cache?)", STR),
 
+  /** Utility function: converts a number to a given base. */
+  TO_BASE(UTILURI, FNUtil.class, 2, 2, "integer-to-base(num, base)", STR_ZO),
+  /** Utility function: decodes a number from a given base. */
+  FRM_BASE(UTILURI, FNUtil.class, 2, 2, "integer-from-base(str, base)", ITR_ZO),
+
   /* FNSent functions. */
 
   /** Sentiment function: returns a text sentiment. */

@@ -107,7 +107,7 @@ public final class BaseXGUI {
         while(en.hasMoreElements()) {
           final Object k = en.nextElement();
           final Object v = def.get(k);
-          if(v instanceof Font) def.put(k, ((Font) v).deriveFont(0));
+          if(v instanceof Font) def.put(k, ((Font) v).deriveFont(Font.PLAIN));
         }
       }
     } catch(final Exception ex) {

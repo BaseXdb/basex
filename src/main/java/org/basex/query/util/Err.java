@@ -178,6 +178,10 @@ public enum Err {
   /** FORG0006: Evaluation exception. */
   FUNJAVA(FORG, 6, "Invalid arguments for %: %."),
   /** FORG0006: Evaluation exception. */
+  INVBASE(FORG, 6, "Unsupported base: %."),
+  /** FORG0006: Evaluation exception. */
+  INVDIG(FORG, 6, "Invalid digit for base %: %."),
+  /** FORG0006: Evaluation exception. */
   JAVAERR(FORG, 6, "Java call failed: %."),
   /** FORG0008: Function exception. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
@@ -245,6 +249,8 @@ public enum Err {
   NUMBERWS(XPST, 3, "Expecting separator after number."),
   /** XPST0003: Parsing exception. */
   NUMBERINC(XPST, 3, "Incomplete double value."),
+  /** XPST0003: Parsing exception. */
+  NUMBERITR(XPST, 3, "Unexpected decimal point."),
   /** XPST0003: Parsing exception. */
   QUERYEND(XPST, 3, "Unexpected end of query: '%'."),
   /** XPST0003: Parsing exception. */
