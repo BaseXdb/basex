@@ -12,7 +12,7 @@ import org.basex.util.InputInfo;
 /**
  * This class assembles common error messages.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public enum Err {

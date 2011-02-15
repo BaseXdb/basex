@@ -5,7 +5,7 @@ import org.basex.util.Token;
 /**
  * This class defines access to index text tokens.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class RangeToken implements IndexToken {

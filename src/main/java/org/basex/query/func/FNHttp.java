@@ -11,7 +11,7 @@ import org.basex.util.InputInfo;
 /**
  * HTTP Client Module.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
 public final class FNHttp extends Fun {

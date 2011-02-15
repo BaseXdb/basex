@@ -14,7 +14,7 @@ import org.junit.Test;
 /**
  * This class tests the XQuery full-text extensions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FNFtTest extends AdvancedQueryTest {

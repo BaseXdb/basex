@@ -21,7 +21,7 @@ import static org.basex.util.Token.*;
 /**
  * This class tests the database commands.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class CmdTest {

@@ -11,7 +11,7 @@ import org.basex.gui.GUIConstants;
  * Efficient Text Editor and Renderer, supporting syntax highlighting and
  * text selections.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class BaseXTextRenderer extends BaseXBack {

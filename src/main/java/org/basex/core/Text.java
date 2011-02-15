@@ -9,7 +9,7 @@ import static org.basex.util.Token.*;
  * throughout the project. If this class is called first, the Strings
  * are initialized by the {@link org.basex.core.Lang} class.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public interface Text {

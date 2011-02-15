@@ -29,7 +29,7 @@ import org.basex.util.Reflect;
 /**
  * Container for global function declarations.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Functions extends ExprInfo {

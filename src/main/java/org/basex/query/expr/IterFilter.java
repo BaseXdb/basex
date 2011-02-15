@@ -8,7 +8,7 @@ import org.basex.query.iter.Iter;
 /**
  * Iterative filter expression with position predicates.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class IterFilter extends Filter {

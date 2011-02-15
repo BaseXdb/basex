@@ -200,7 +200,7 @@ dz_used=Geheugengebruik
 dz_help=Als er weinig geheugen beschikbaar is, start\nBaseX dan met de Java vlag -Xmx<size>
 
 da_title=Over %
-da_license=BSD license (ISC)
+da_license=BSD License
 da_dev=Hoofd Ontwikkelaar
 da_cont1=Team
 da_cont2=en anderen

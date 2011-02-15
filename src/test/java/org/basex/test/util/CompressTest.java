@@ -16,7 +16,7 @@ import org.junit.Test;
 /**
  * Class for testing the {@link Compress} methods.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CompressTest {

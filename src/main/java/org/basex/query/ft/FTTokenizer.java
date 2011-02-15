@@ -18,7 +18,7 @@ import org.basex.util.ft.FTOpt;
 /**
  * This class performs the full-text tokenization.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FTTokenizer {

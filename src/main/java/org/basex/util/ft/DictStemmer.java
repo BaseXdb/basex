@@ -5,7 +5,7 @@ import java.util.EnumSet;
 /**
  * Dictionary-based stemmer.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
 final class DictStemmer extends Stemmer {

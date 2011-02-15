@@ -11,7 +11,7 @@ import org.basex.util.TokenList;
 /**
  * This is an interface for serializing trees.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Serializer {

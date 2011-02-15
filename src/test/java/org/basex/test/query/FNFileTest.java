@@ -13,7 +13,7 @@ import org.junit.Test;
 /**
  * This class tests the functions of the file library.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
 public final class FNFileTest extends AdvancedQueryTest {

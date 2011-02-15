@@ -17,7 +17,7 @@ import org.basex.util.ft.FTOpt;
 /**
  * This class defines the sentiment functions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Oliver Egli
  */
 public final class FNSent extends Fun {

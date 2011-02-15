@@ -17,7 +17,7 @@ import org.junit.Test;
 /**
  * This class tests the XQuery database functions prefixed with "db".
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FNDbTest extends AdvancedQueryTest {

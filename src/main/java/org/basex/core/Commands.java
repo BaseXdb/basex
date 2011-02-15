@@ -7,7 +7,7 @@ import org.basex.core.cmd.Set;
 /**
  * This class defines the available command-line commands.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")

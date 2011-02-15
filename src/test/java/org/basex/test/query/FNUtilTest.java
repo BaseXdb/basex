@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * This class tests the XQuery utility functions prefixed with "util".
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FNUtilTest extends AdvancedQueryTest {

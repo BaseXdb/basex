@@ -27,7 +27,7 @@ import org.basex.io.IOFile;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DialogExport extends Dialog {

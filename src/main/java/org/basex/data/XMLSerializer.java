@@ -18,7 +18,7 @@ import org.basex.util.Util;
 /**
  * This class serializes trees as XML.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class XMLSerializer extends Serializer {

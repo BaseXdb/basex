@@ -20,7 +20,7 @@ import org.basex.util.InputInfo;
 /**
  * Mixed path expression.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

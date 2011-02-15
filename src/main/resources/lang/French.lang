@@ -200,7 +200,7 @@ dz_used=Mémoire utilisée
 dz_help=Si la mémoire est insuffisante, lancez\nBaseX avec le paramètre Java -Xmx<size>
 
 da_title=A propos de %
-da_license=License BSD (ISC)
+da_license=License BSD
 da_dev=Developpeur principal
 da_cont1=Equipe
 da_cont2=et d'autres

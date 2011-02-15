@@ -6,7 +6,7 @@ import org.basex.util.Util;
 /**
  * Utility class to load shared libraries.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Alexander Holupirek
  */
 public final class LibraryLoader {

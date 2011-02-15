@@ -15,7 +15,7 @@ import org.basex.util.InputInfo;
 /**
  * Abstract update primitive which holds a copy of nodes to be inserted.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public abstract class NodeCopy extends UpdatePrimitive {

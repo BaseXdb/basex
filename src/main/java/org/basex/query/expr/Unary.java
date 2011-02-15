@@ -18,7 +18,7 @@ import org.basex.util.Token;
 /**
  * Unary expression.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Unary extends Single {

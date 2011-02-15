@@ -11,7 +11,7 @@ import org.basex.util.InputInfo;
 /**
  * Replace element content primitive.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class ReplaceElemContent extends UpdatePrimitive {

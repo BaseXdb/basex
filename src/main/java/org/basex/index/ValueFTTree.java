@@ -10,7 +10,7 @@ import org.basex.util.TokenList;
  * their pre and pos values. An iterator returns all compressed pre and pos
  * values in a sorted manner.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

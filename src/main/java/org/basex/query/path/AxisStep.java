@@ -27,7 +27,7 @@ import org.basex.util.Token;
 /**
  * Location Step expression.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class AxisStep extends Preds {

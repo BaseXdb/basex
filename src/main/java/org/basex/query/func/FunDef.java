@@ -10,7 +10,7 @@ import org.basex.util.Reflect;
 /**
  * Signatures of all XQuery functions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public enum FunDef {

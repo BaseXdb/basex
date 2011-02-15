@@ -33,7 +33,7 @@ import org.basex.util.Util;
  * </li>
  * </ul>
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ValueBuilder extends IndexBuilder {

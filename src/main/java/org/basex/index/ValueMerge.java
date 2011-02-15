@@ -10,7 +10,7 @@ import org.basex.io.IO;
 /**
  * This class provides data for merging temporary value indexes.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class ValueMerge {

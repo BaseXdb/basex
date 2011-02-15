@@ -3,7 +3,7 @@ package org.basex.test.query;
 /**
  * XQuery functions tests.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FNFormatIntTest extends QueryTest {

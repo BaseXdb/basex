@@ -29,7 +29,7 @@ import org.basex.util.ft.FTLexer;
 /**
  * This view is a TreeMap implementation.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Joerg Hauser
  * @author Bastian Lemke

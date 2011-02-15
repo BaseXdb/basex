@@ -8,7 +8,7 @@ import org.basex.gui.layout.BaseXTextTokens;
 /**
  * This abstract class defines syntax highlighting of text panels.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class XMLSyntax extends BaseXSyntax {

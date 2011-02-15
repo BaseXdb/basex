@@ -6,7 +6,7 @@ import org.basex.util.Token;
 /**
  * String item.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Jav extends Item {

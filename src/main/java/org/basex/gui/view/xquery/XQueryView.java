@@ -34,7 +34,7 @@ import org.basex.util.Util;
 /**
  * This view allows the input and evaluation of XQuery queries.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class XQueryView extends View {

@@ -13,7 +13,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * A container for positive and negative word lists and negations.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Oliver Egli
  */
 public final class SentList extends DefaultHandler {

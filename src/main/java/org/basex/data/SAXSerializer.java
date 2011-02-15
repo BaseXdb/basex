@@ -17,7 +17,7 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * This class serializes trees via SAX.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class SAXSerializer extends Serializer implements XMLReader {

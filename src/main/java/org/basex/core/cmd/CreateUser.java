@@ -10,7 +10,7 @@ import org.basex.core.Commands.CmdCreate;
 /**
  * Evaluates the 'create user' command and creates a new user.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CreateUser extends Command {

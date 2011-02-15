@@ -39,7 +39,7 @@ import org.deepfs.fs.DeepFS;
 /**
  * A scatter plot visualization of the database.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class PlotView extends View {

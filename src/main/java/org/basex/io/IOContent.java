@@ -7,7 +7,7 @@ import org.xml.sax.InputSource;
 /**
  * Byte contents, wrapped into an IO representation.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class IOContent extends IO {

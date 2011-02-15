@@ -35,7 +35,7 @@ import org.basex.util.Token;
 /**
  * Functions on files and directories.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
 final class FNFile extends Fun {
@@ -374,8 +374,8 @@ final class FNFile extends Fun {
       } catch(final IOException ex) {
         FILEERROR.thrw(input, ex);
       } finally {
-        if(sc != null) try { sc.close(); } catch(final IOException e) { }
-        if(dc != null) try { dc.close(); } catch(final IOException e) { }
+        if(sc != null) try { sc.close(); } catch(final IOException ex) { }
+        if(dc != null) try { dc.close(); } catch(final IOException ex) { }
       }
     }
     return null;

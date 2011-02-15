@@ -48,7 +48,7 @@ import org.basex.io.IO;
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class GUIConstants {

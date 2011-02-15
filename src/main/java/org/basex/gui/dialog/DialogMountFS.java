@@ -35,7 +35,7 @@ import org.basex.util.Token;
 /*
  * Open database dialog.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Alexander Holupirek
 public final class DialogMountFS extends Dialog {
   /** Mountpoint path.

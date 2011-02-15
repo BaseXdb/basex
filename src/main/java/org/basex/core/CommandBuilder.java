@@ -7,7 +7,7 @@ import org.basex.util.Util;
  * This class simplifies the composition of the string representation of
  * a database command.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CommandBuilder {

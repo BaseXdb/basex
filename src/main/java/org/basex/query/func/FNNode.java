@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Node functions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNNode extends Fun {

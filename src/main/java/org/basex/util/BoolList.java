@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * This is a simple container for boolean values.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BoolList extends ElementList {

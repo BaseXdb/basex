@@ -13,8 +13,8 @@
   </properties>
   <licenses>
     <license>
-      <name>ISC License</name>
-      <url>http://www.isc.org/software/license</url>
+      <name>BSD License</name>
+      <url>http://www.opensource.org/licenses/bsd-license.php</url>
     </license>
   </licenses>
   <repositories>

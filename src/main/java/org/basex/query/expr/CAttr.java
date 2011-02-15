@@ -21,7 +21,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Attribute fragment.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CAttr extends CFrag {

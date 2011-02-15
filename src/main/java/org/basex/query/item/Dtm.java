@@ -10,7 +10,7 @@ import org.basex.util.Token;
 /**
  * DateTime item.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Dtm extends Date {

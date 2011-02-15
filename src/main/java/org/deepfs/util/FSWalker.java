@@ -9,7 +9,7 @@ import java.util.ListIterator;
 /**
  * Perform a preorder traversal of a directory hierarchy and notify visitors.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Alexander Holupirek
  */
 public final class FSWalker implements FSTraversal {

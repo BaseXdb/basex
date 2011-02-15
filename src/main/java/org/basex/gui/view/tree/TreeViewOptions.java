@@ -5,7 +5,7 @@ import java.awt.Color;
 /**
  * This interface contains options for the tree view.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Wolfgang Miller
  */
 interface TreeViewOptions {

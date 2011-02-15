@@ -40,7 +40,7 @@ import org.basex.util.ft.FTLexer;
  *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
  * </ul>
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

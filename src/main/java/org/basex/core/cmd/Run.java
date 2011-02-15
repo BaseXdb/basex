@@ -12,7 +12,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'run' command and processes a query file as XQuery.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Run extends AQuery {

@@ -24,7 +24,7 @@ import org.xml.sax.XMLReader;
 /**
  * This class provides a document builder.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class BXDocBuilder extends DocumentBuilder {

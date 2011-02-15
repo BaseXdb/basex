@@ -10,7 +10,7 @@ import org.basex.query.iter.NodeIter;
 /**
  * Iterative step expression with position predicates.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class IterPosStep extends AxisStep {

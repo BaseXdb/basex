@@ -9,7 +9,7 @@ import org.basex.util.Util;
 /**
  * This class allows positional read and write access to a database file.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DataAccess {

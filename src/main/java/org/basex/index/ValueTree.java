@@ -11,7 +11,7 @@ import org.basex.util.TokenList;
  * This class indexes tokens in a balanced binary tree, including their pre
  * values. An iterator returns all compressed pre values in a sorted manner.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

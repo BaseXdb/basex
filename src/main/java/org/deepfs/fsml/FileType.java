@@ -3,7 +3,7 @@ package org.deepfs.fsml;
 /**
  * Available file types.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public enum FileType {

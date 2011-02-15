@@ -200,7 +200,7 @@ dz_used=メモリ使用量
 dz_help=メモリが少ない場合はBaseXを起動する際に、\nJavaのコマンドライン引数 -Xmx <サイズ> を付けて下さい。
 
 da_title=%について
-da_license=BSD license (ISC)
+da_license=BSD License
 da_dev=メイン開発者
 da_cont1=チーム
 da_cont2=その他の貢献者

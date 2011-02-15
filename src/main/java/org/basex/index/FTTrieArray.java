@@ -20,7 +20,7 @@ import org.basex.util.TokenList;
  * {@code p0 < 0} on {@code pre/pos} where the data is stored.
  * {@code t}, {@code s}, {@code p} are saved for every node.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Sebastian Gath
  */
 final class FTTrieArray {

@@ -14,7 +14,7 @@ import org.basex.util.Util;
 /**
  * This class organizes all users.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
 public final class Users extends ArrayList<User> {

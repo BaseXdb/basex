@@ -10,7 +10,7 @@ import org.w3c.dom.Attr;
 /**
  * Attribute node fragment.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FAttr extends FNode {

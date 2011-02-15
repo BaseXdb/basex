@@ -16,7 +16,7 @@ import org.basex.server.LoginException;
  * The methods are used for dumping error output, debugging information,
  * getting the application path, etc.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Util {

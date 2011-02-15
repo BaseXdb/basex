@@ -3,7 +3,7 @@ package org.basex.io;
 /**
  * This class swallows all data it receives.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class NullOutput extends PrintOutput {

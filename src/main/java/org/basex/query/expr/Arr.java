@@ -12,7 +12,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Abstract array expression.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Arr extends ParseExpr {

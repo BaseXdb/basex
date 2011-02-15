@@ -6,7 +6,7 @@ import org.basex.core.Command;
 /**
  * Evaluates the 'password' command and alters the user's password.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Password extends Command {

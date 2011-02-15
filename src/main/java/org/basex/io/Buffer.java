@@ -3,7 +3,7 @@ package org.basex.io;
 /**
  * This class represents a simple buffer.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class Buffer {

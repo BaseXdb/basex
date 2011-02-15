@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
 /**
  * User-defined function.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Func extends Single {

@@ -13,7 +13,7 @@ import org.basex.query.iter.ValueIter;
 /**
  * Document test for database nodes.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class DocTest extends Test {

@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
 /**
  * Name test.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class NameTest extends Test {

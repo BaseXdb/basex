@@ -3,7 +3,7 @@ package org.deepfs.fsml;
 /**
  * All namespaces used in the DeepFile.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public enum DeepNS {

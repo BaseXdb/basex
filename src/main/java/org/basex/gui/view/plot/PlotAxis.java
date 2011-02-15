@@ -10,7 +10,7 @@ import org.basex.util.TokenSet;
 /**
  * Axis component of the scatter plot visualization.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 final class PlotAxis {

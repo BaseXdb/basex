@@ -200,7 +200,7 @@ dz_used=Genutzter Speicher
 dz_help=Der verfügbare Speicher kann mit dem Java-Flag -Xmx<size> erhöht werden.
 
 da_title=Info über %
-da_license=BSD-Lizenz (ISC)
+da_license=BSD-Lizenz
 da_dev=Hauptentwickler
 da_cont1=Team
 da_cont2=und andere

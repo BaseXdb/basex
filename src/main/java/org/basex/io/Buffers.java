@@ -3,7 +3,7 @@ package org.basex.io;
 /**
  * This class provides a simple, clock-based buffer management.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class Buffers {

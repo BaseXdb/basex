@@ -5,7 +5,7 @@ import org.basex.gui.layout.BaseXBack;
 /**
  * This is an interface for view layout components.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 interface ViewLayout {

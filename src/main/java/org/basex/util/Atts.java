@@ -3,7 +3,7 @@ package org.basex.util;
 /**
  * This is a simple container for attributes (key/value tokens).
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Atts {

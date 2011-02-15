@@ -7,7 +7,7 @@ import java.util.Arrays;
  * This class serves as an efficient constructor for byte arrays.
  * It bears some resemblance to Java's {@link java.lang.StringBuilder}.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class TokenBuilder {

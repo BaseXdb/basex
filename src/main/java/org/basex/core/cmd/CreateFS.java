@@ -13,7 +13,7 @@ import org.basex.core.Commands.CmdCreate;
  * Evaluates the 'create fs' command and creates a new filesystem mapping from
  * an existing file hierarchy.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Alexander Holupirek
  * @author Bastian Lemke

@@ -10,7 +10,7 @@ import org.basex.util.Util;
 /**
  * Base64Binary item. Derived from java.util.prefs.Base64.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class B64 extends Item {

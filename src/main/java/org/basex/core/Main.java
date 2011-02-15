@@ -21,7 +21,7 @@ import org.basex.util.Util;
  * Moreover, it offers some utility methods which are used
  * throughout the project.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Main {

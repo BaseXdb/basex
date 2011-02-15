@@ -38,7 +38,7 @@ import org.w3c.dom.Text;
 /**
  * Java function definition.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FunJava extends Arr {

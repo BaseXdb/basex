@@ -7,7 +7,7 @@ import java.util.Arrays;
  * {@link TokenSet hash set}.
  * @param <E> generic value type
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class IntMap<E> extends IntSet {

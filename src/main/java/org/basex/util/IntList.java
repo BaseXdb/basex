@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * This is a simple container for int values.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class IntList extends ElementList {

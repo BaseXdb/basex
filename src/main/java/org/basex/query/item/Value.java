@@ -8,7 +8,7 @@ import org.basex.query.util.Var;
 /**
  * Abstract value.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Value extends Expr {

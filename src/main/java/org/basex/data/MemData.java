@@ -13,7 +13,7 @@ import org.basex.util.Token;
  * for textual content in a compressed memory structure.
  * The table mapping is documented in {@link Data}.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class MemData extends Data {

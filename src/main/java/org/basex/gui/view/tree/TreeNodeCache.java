@@ -7,7 +7,7 @@ import org.basex.util.IntList;
 /**
  * This class determines nodes per level and caches them.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Wolfgang Miller
  */
 final class TreeNodeCache implements TreeViewOptions {

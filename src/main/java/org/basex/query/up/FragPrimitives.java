@@ -11,7 +11,7 @@ import org.basex.util.TokenSet;
 /**
  * Holds all update primitives for a specific data reference.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 final class FragPrimitives extends Primitives {

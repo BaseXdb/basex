@@ -15,7 +15,7 @@ import org.basex.util.InputInfo;
  * Iterative path expression for location paths which return sorted and
  * duplicate-free results.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class IterPath extends AxisPath {

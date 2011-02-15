@@ -22,7 +22,7 @@ import org.basex.io.IO;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DialogPrefs extends Dialog {

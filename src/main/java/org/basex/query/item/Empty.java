@@ -11,7 +11,7 @@ import org.basex.util.Token;
 /**
  * Empty sequence.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Empty extends Value {

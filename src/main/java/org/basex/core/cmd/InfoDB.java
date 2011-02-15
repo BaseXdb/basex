@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
  * Evaluates the 'info database' command and returns information on the
  * currently opened database.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class InfoDB extends AInfo {

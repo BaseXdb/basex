@@ -20,7 +20,7 @@ import org.xml.sax.XMLReader;
  * large file cannot be parsed with the default parser due to entity handling
  * (e.g. the DBLP data).
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class SAXWrapper extends FileParser {

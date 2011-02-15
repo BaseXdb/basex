@@ -18,7 +18,7 @@ import org.basex.util.TokenList;
 /**
  * Class for building memory-based database nodes.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DataBuilder {

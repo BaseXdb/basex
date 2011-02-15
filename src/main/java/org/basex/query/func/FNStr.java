@@ -20,7 +20,7 @@ import org.basex.util.XMLToken;
 /**
  * String functions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNStr extends Fun {

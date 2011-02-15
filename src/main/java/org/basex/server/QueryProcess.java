@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Container for processes executing a query with iterative results.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

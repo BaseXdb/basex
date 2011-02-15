@@ -17,7 +17,7 @@ import org.junit.Test;
 /**
  * This class tests the order of incoming commands.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
 public final class SemaphoreTest {

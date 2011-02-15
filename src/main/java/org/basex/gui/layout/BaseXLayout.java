@@ -32,7 +32,7 @@ import org.basex.util.Util;
  * This class assembles layout and paint methods which are frequently
  * used in the GUI.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BaseXLayout {

@@ -17,7 +17,7 @@ import org.basex.util.Token;
 /**
  * Info functions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNInfo extends Fun {

@@ -20,7 +20,7 @@ import org.basex.util.Util;
 /**
  * This class parses MAB2 data and creates a hierarchical representation.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class MAB2Parser extends Parser {
@@ -584,7 +584,7 @@ public final class MAB2Parser extends Parser {
   /**
    * This is a simple data structure for storing MAB2 entries.
    *
-   * @author BaseX Team 2005-11, ISC License
+   * @author BaseX Team 2005-11, BSD License
    * @author Christian Gruen
    */
   static final class MAB2Entry {

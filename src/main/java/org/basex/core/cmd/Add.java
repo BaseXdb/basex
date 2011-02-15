@@ -27,7 +27,7 @@ import org.xml.sax.InputSource;
 /**
  * Evaluates the 'add' command and adds a document to a collection.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Add extends ACreate {

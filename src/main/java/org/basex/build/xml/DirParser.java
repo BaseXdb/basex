@@ -13,7 +13,7 @@ import org.basex.util.Util;
  * This class parses the tokens that are delivered by the
  * {@link XMLScanner} and sends them to the specified database builder.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DirParser extends Parser {

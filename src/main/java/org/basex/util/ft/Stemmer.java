@@ -6,7 +6,7 @@ import java.util.LinkedList;
 /**
  * Implementation of common stemmer methods.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
 public abstract class Stemmer extends LanguageImpl {

@@ -18,7 +18,7 @@ import org.basex.util.InputInfo;
 /**
  * Filter expression.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class Filter extends Preds {

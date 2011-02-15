@@ -19,7 +19,7 @@ import org.basex.util.IntList;
  *
  * <p>The file format is described in the {@link FTFuzzy} class.</p>
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Sebastian Gath
  * @author Christian Gruen
  */

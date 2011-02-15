@@ -4,7 +4,7 @@ package org.basex.util;
  * This is a simple hash map, extending the even simpler
  * {@link TokenSet hash set}.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class TokenMap extends TokenSet {

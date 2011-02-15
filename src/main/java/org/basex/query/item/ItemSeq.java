@@ -15,7 +15,7 @@ import org.basex.util.Token;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ItemSeq extends Seq {

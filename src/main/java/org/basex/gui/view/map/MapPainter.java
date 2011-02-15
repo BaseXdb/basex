@@ -11,7 +11,7 @@ import org.basex.gui.view.ViewData;
 /**
  * Provides an interface for data specific TreeMap visualizations.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 abstract class MapPainter {

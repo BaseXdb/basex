@@ -9,7 +9,7 @@ import org.basex.util.Util;
 /**
  * String item.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class Str extends Item {

@@ -17,7 +17,7 @@ import org.basex.util.InputInfo;
 /**
  * Sequence functions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNSeq extends Fun {

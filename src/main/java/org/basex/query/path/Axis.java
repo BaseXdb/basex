@@ -6,7 +6,7 @@ import org.basex.query.iter.NodeIter;
 /**
  * XPath axes.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public enum Axis {

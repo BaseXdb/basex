@@ -12,7 +12,7 @@ import org.basex.util.Util;
 /**
  * Full-text tokenizer.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class WesternTokenizer extends Tokenizer {

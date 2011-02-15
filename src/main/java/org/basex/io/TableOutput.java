@@ -9,7 +9,7 @@ import org.basex.util.IntList;
 /**
  * This class allows a blockwise output of the database table.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */

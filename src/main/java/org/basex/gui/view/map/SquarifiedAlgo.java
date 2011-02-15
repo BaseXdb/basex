@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * Squarified layout algorithm.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Joerg Hauser
  */
 final class SquarifiedAlgo extends MapAlgo {

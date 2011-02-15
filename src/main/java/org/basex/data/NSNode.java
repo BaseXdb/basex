@@ -9,7 +9,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This class stores a single namespace node.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class NSNode {

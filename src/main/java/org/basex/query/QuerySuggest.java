@@ -15,7 +15,7 @@ import org.basex.util.TokenBuilder;
  * This class analyzes the current path and gives suggestions for code
  * completions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class QuerySuggest extends QueryParser {

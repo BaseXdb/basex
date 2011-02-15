@@ -3,7 +3,7 @@ package org.basex.util;
 /**
  * This class parses command-line arguments.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Args {

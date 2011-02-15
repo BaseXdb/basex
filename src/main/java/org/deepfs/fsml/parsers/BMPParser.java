@@ -14,7 +14,7 @@ import org.deepfs.fsml.ParserRegistry;
 /**
  * Parser for BMP files.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Bastian Lemke
  */

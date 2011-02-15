@@ -16,7 +16,7 @@ import org.basex.util.Token;
 /**
  * Put primitive.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class Put extends UpdatePrimitive {

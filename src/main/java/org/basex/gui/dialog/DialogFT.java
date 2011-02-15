@@ -22,7 +22,7 @@ import org.basex.util.ft.Language;
 /**
  * Full-text creation dialog.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class DialogFT extends BaseXBack {

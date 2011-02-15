@@ -8,7 +8,7 @@ import java.util.EnumSet;
  * English stemming algorithm, based on the publication from Porter (1980):
  * An algorithm for suffix stripping.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class EnglishStemmer extends Stemmer {

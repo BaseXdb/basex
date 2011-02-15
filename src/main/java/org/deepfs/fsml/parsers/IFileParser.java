@@ -6,7 +6,7 @@ import org.deepfs.fsml.DeepFile;
 /**
  * Interface for metadata extractors / file parsers.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public interface IFileParser {

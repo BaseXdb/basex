@@ -13,7 +13,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'list' command and shows all documents in a database.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ListDB extends Command {

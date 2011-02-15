@@ -11,7 +11,7 @@ import org.basex.query.up.primitives.UpdatePrimitive;
 /**
  * Container that holds all update primitives for a specific database node.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 final class NodePrimitivesContainer implements NodePrimitives {

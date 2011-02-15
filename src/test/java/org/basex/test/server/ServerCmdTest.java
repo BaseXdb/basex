@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  * This class tests the database commands with the client/server
  * architecture.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ServerCmdTest extends CmdTest {

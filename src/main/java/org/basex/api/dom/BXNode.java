@@ -16,7 +16,7 @@ import org.w3c.dom.UserDataHandler;
 /**
  * DOM - Node implementation.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class BXNode implements Node {

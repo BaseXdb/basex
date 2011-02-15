@@ -13,7 +13,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * SAX Parser wrapper.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class SAXHandler extends DefaultHandler implements LexicalHandler {

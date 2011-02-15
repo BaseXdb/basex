@@ -15,7 +15,7 @@ import org.junit.Test;
 /**
  * This class tests the ID -> PRE mapping facility.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public final class LogListTest {

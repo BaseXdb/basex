@@ -12,7 +12,7 @@ import org.basex.util.InputInfo;
 /**
  * Abstract comparison.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 abstract class Cmp extends Arr {

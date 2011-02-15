@@ -41,13 +41,18 @@ import org.basex.util.XMLToken;
  * <b>Description</b>: Use tabs as separator, choose simple XML format,
  * and indicate that the file contains no header.</p>
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CSVParser extends FileParser {
+  /** Separators. */
+  public static final String[] SEPARATORS = { "comma", "semicolon", "tab" };
+  /** Formats. */
+  public static final String[] FORMATS = { "simple", "verbose" };
+
   /** CSV root element. */
   private static final byte[] CSV = token("csv");
-  /** CSV record element. */
+  /** CSV header element. */
   private static final byte[] HEADER = token("header");
   /** CSV record element. */
   private static final byte[] RECORD = token("record");
@@ -89,15 +94,15 @@ public final class CSVParser extends FileParser {
 
     // set separator
     String s = props.get(ParserProp.SEPARATOR).toLowerCase();
-    separator = s.equals("comma") ? ',' : s.equals("semicolon") ? ';' :
-      s.equals("tab") ? '\t' : -1;
+    separator = s.equals(SEPARATORS[0]) ? ',' : s.equals(SEPARATORS[1]) ? ';' :
+      s.equals(SEPARATORS[2]) ? '\t' : -1;
     if(separator == -1) throw new IOException(
         Util.info(SETVAL, ParserProp.SEPARATOR[0], s));
 
     // set XML format
     s = props.get(ParserProp.FORMAT).toLowerCase();
-    simple = s.equals("simple");
-    if(!simple && !s.equals("verbose")) throw new IOException(
+    simple = s.equals(FORMATS[0]);
+    if(!simple && !s.equals(FORMATS[1])) throw new IOException(
         Util.info(SETVAL, ParserProp.FORMAT[0], s));
   }
 

@@ -7,7 +7,7 @@ import org.basex.util.InputInfo;
 /**
  * Date item.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Dat extends Date {

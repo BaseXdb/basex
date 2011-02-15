@@ -5,7 +5,7 @@ import org.basex.util.Util;
 /**
  * Available MIME types.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public enum MimeType {

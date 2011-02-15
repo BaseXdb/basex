@@ -10,7 +10,7 @@ import org.basex.io.DataAccess;
 /**
  * This class provides access to a sorted token list.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Sebastian Gath
  */
 final class FTFuzzyList extends FTList {

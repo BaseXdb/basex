@@ -13,7 +13,7 @@ import org.basex.util.Token;
 /**
  * Sequence, containing at least two ordered database document nodes.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DBDocSeq extends Seq {

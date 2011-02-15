@@ -19,7 +19,7 @@ import org.basex.util.InputInfo;
 /**
  * Formatting functions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNFormat extends Fun {

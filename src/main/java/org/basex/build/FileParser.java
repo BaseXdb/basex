@@ -7,7 +7,7 @@ import org.basex.io.IO;
 /**
  * This class defines an abstract parser for single files.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class FileParser extends Parser {

@@ -9,7 +9,7 @@ import org.basex.util.Util;
  * AllMatches full-text container,
  * referencing several {@link FTMatch} instances.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FTMatches implements Iterable<FTMatch> {

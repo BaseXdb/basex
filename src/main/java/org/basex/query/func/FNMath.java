@@ -11,7 +11,7 @@ import org.basex.util.InputInfo;
 /**
  * Math functions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNMath extends Fun {

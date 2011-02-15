@@ -23,7 +23,7 @@ import org.w3c.dom.Text;
  * Would be the easiest solution, but some large file cannot be parsed
  * with the default parser.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DOCWrapper extends Parser {

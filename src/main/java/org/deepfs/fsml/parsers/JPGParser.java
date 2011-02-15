@@ -13,7 +13,7 @@ import org.deepfs.fsml.ParserRegistry;
 /**
  * Parser for JPG files.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Bastian Lemke
  */

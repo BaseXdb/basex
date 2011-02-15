@@ -10,7 +10,7 @@ import org.basex.io.IO;
 /**
  * Evaluates the 'create mab' command and creates a new database.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CreateMAB extends Create {

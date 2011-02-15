@@ -18,7 +18,7 @@ import org.deepfs.fsml.ParserRegistry;
 /**
  * Parser for XML files.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public final class XMLParser implements IFileParser {

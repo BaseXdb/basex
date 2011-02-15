@@ -13,7 +13,7 @@ import org.basex.server.Sessions;
  * It references the currently opened database. Moreover, it provides
  * references to the currently used, marked and copied node sets.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Context {

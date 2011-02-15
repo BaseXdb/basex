@@ -33,7 +33,7 @@ import org.xml.sax.InputSource;
 /**
  * Evaluates the 'create db' command and creates a new database.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {

@@ -6,7 +6,7 @@ import org.basex.util.Util;
 /**
  * Produces tree(1)-like output of a directory hierarchy.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Alexander Holupirek
  */
 public final class TreePrinter implements FSTraversal {

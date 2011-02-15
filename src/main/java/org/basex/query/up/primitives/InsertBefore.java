@@ -9,7 +9,7 @@ import org.basex.util.InputInfo;
 /**
  * Insert before primitive.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class InsertBefore extends NodeCopy {

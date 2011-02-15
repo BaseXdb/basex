@@ -8,7 +8,7 @@ import org.basex.util.TokenList;
 /**
  * Simple Thesaurus entry for full-text requests.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ThesQuery {

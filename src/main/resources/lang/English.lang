@@ -200,7 +200,7 @@ dz_used=Used Memory
 dz_help=If memory is low, please launch\nBaseX with the Java flag -Xmx<size>
 
 da_title=About %
-da_license=BSD license (ISC)
+da_license=BSD License
 da_dev=Main Developer
 da_cont1=Team
 da_cont2=and others

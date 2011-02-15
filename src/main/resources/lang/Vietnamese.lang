@@ -200,7 +200,7 @@ dz_used=Bộ nhớ đã sử dụng
 dz_help=Nếu ít bộ nhớ, xin chạy \nBasex với cờ Java -Xmx<size>
 
 da_title=Về %
-da_license=BSD giấy phép (ISC)
+da_license=BSD giấy phép
 da_dev=Người phát triển chính
 da_cont1=Nhóm
 da_cont2=và những người/nhóm khác

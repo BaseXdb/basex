@@ -23,7 +23,7 @@ import org.basex.gui.layout.TableLayout;
 /**
  * This class provides the architecture for consistent dialog windows.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Dialog extends JDialog {

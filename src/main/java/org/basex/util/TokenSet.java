@@ -10,7 +10,7 @@ import org.basex.io.DataOutput;
  * This is a simple hash set, storing keys in byte arrays.
  * The {@link TokenMap} class extends it to a hash map.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class TokenSet implements Iterable<byte[]> {

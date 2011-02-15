@@ -41,7 +41,7 @@ import org.basex.util.ft.FTOpt;
 /**
  * This abstract query expression provides the architecture for a compiled
  * query. // *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class QueryContext extends Progress {

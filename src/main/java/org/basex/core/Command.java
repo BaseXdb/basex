@@ -19,7 +19,7 @@ import org.basex.util.Util;
  * implementations. It evaluates queries that are sent by the GUI, the client or
  * the standalone version.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Command extends Progress {

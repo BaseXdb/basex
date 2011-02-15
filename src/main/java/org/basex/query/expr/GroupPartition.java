@@ -17,7 +17,7 @@ import org.basex.util.TokenSet;
 /**
  * Stores the grouping for a group by clause.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Michael Seiferle
  */
 final class GroupPartition {

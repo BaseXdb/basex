@@ -42,7 +42,7 @@ import org.basex.util.ft.FTLexer;
  * file <b>a</b>:<br/> {@code off0, off1, off2, ..., offN} [int]</li>
  * </ol>
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

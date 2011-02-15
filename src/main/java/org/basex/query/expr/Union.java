@@ -16,7 +16,7 @@ import org.basex.util.InputInfo;
 /**
  * Union expression.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Union extends Set {

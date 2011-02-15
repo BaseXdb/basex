@@ -12,7 +12,7 @@ import org.basex.util.Util;
 /**
  * Utility methods for file parsers.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public final class ParserUtil {

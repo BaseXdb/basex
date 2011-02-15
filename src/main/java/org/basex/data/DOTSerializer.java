@@ -13,7 +13,7 @@ import org.basex.util.Util;
 /**
  * This class serializes trees in the DOT syntax.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DOTSerializer extends Serializer {

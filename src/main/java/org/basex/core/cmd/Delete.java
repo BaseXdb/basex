@@ -8,7 +8,7 @@ import org.basex.data.Data;
 /**
  * Evaluates the 'delete' command and deletes a document from a collection.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Delete extends ACreate {

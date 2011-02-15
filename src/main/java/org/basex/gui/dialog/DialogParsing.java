@@ -1,12 +1,11 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import org.basex.build.ParserProp;
+import org.basex.build.file.CSVParser;
 import org.basex.build.file.HTMLParser;
 import org.basex.build.xml.CatalogResolverWrapper;
 import org.basex.core.Prop;
@@ -27,7 +26,7 @@ import org.basex.util.StringList;
 /**
  * Parsing options dialog.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DialogParsing extends BaseXBack {
@@ -76,7 +75,7 @@ public final class DialogParsing extends BaseXBack {
    */
   public DialogParsing(final Dialog d) {
     dialog = d;
-    main = new BaseXBack(new BorderLayout()).border(4);
+    main = new BaseXBack(new TableLayout(3, 1)).border(4);
 
     try {
       props = new ParserProp(d.gui.context.prop.get(Prop.PARSEROPT));
@@ -84,22 +83,14 @@ public final class DialogParsing extends BaseXBack {
       props = new ParserProp();
     }
 
-    // always use internal/external parser, chop whitespaces, ...?
-    final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 6, 0));
-
-    final BaseXLabel parse = new BaseXLabel(CREATEFORMAT, true, true);
     final StringList parsers = new StringList();
     parsers.add(DataText.M_XML);
     if(HTMLParser.available()) parsers.add(DataText.M_HTML);
-    parsers.add(DataText.M_TEXT);
     parsers.add(DataText.M_CSV);
+    parsers.add(DataText.M_TEXT);
 
     parser = new BaseXCombo(d, parsers.toArray());
     parser.setSelectedItem(dialog.gui.context.prop.get(Prop.PARSER));
-    p.add(parse);
-    p.add(parser);
-    main.add(p, BorderLayout.NORTH);
-    main.add(new BaseXLabel(FORMATINFO, true, false), BorderLayout.CENTER);
 
     intparse = new BaseXCheckBox(CREATEINTPARSE,
         dialog.gui.context.prop.is(Prop.INTPARSE), 0, dialog);
@@ -118,9 +109,9 @@ public final class DialogParsing extends BaseXBack {
     lines = new BaseXCheckBox("Lines", props.is(ParserProp.LINES), 0, dialog);
     header = new BaseXCheckBox("Header", props.is(ParserProp.HEADER),
         0, dialog);
-    separator = new BaseXCombo(d, new String[]{"comma", "semicolon", "tab"});
+    separator = new BaseXCombo(d, CSVParser.SEPARATORS);
     separator.setSelectedItem(props.get(ParserProp.SEPARATOR));
-    format = new BaseXCombo(d, new String[]{"simple", "verbose"});
+    format = new BaseXCombo(d, CSVParser.FORMATS);
     format.setSelectedItem(props.get(ParserProp.FORMAT));
 
     xmlopts = new BaseXBack(new TableLayout(9, 1));
@@ -128,13 +119,8 @@ public final class DialogParsing extends BaseXBack {
     textopts = new BaseXBack(new TableLayout(3, 1));
     createOptionsPanels();
 
-    options(DataText.M_XML);
-    final Dimension dim = main.getPreferredSize();
-    final String t = parser.getSelectedItem().toString();
-    if(!t.equals(DataText.M_XML)) {
-      options(t);
-      main.setPreferredSize(dim);
-    }
+    setLayout(new TableLayout(1, 1));
+    options(parser.getSelectedItem().toString());
     add(main);
   }
 
@@ -171,6 +157,7 @@ public final class DialogParsing extends BaseXBack {
       rs.add(new BaseXLabel(USECATHLP2).color(GUIConstants.COLORDARK));
       xmlopts.add(rs);
     }
+
     BaseXBack p = new BaseXBack(new TableLayout(2, 1, 6, 0));
     p.add(header);
     p.add(new BaseXLabel(HEADERINFO, true, false));
@@ -183,31 +170,37 @@ public final class DialogParsing extends BaseXBack {
     p.add(new BaseXLabel(FORMINFO, true, false));
     p.add(format);
     csvopts.add(p);
+
     textopts.add(lines);
     textopts.add(new BaseXLabel(LINESINFO, true, false));
   }
 
   /**
-   * Creates options panel.
+   * Refreshes the options panel.
    * @param type format type
    */
   void options(final String type) {
-    if(parseropts != null) main.remove(parseropts);
+    main.removeAll();
+
+    final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    p.add(new BaseXLabel(CREATEFORMAT, true, true));
+    p.add(parser);
+    main.add(p);
+    main.add(new BaseXLabel(FORMATINFO, true, false));
 
     if(type.equals(DataText.M_XML)) {
       parseropts = xmlopts;
     } else if(type.equals(DataText.M_HTML)) {
-      final BaseXLabel l = new BaseXLabel("No options for HTML");
-      final BaseXBack b = new BaseXBack();
-      b.add(l);
-      parseropts = b;
+      parseropts = new BaseXBack();
     } else if(type.equals(DataText.M_CSV)) {
       parseropts = csvopts;
     } else if(type.equals(DataText.M_TEXT)) {
       parseropts = textopts;
     }
-    main.add(parseropts, BorderLayout.SOUTH);
-    validate();
+
+    main.add(parseropts);
+    main.revalidate();
+    parser.requestFocusInWindow();
   }
 
   /**
@@ -230,17 +223,16 @@ public final class DialogParsing extends BaseXBack {
   void action(final Object cmp) {
     final String type = parser.getSelectedItem().toString();
     if(type.equals(DataText.M_XML)) {
-      intparse.setEnabled(!usecat.isSelected());
-      entities.setEnabled(intparse.isSelected());
-      dtd.setEnabled(intparse.isSelected());
-      usecat.setEnabled(!intparse.isSelected() &&
-          CatalogResolverWrapper.available());
-      cfile.setEnabled(usecat.isSelected());
-      browsec.setEnabled(cfile.isEnabled());
+      final boolean ip = intparse.isSelected();
+      final boolean uc = usecat.isSelected();
+      intparse.setEnabled(!uc);
+      entities.setEnabled(ip);
+      dtd.setEnabled(ip);
+      usecat.setEnabled(!ip && CatalogResolverWrapper.available());
+      cfile.setEnabled(uc);
+      browsec.setEnabled(uc);
     }
-    if(cmp == parser) {
-      options(type);
-    }
+    if(cmp == parser) options(type);
   }
 
   /**
@@ -252,8 +244,7 @@ public final class DialogParsing extends BaseXBack {
     dialog.gui.set(Prop.DTD, dtd.isSelected());
     dialog.gui.set(Prop.INTPARSE, intparse.isSelected());
     dialog.gui.set(Prop.PARSER, parser.getSelectedItem().toString());
-    dialog.gui.set(Prop.CATFILE,
-        usecat.isSelected() ? cfile.getText().trim() : "");
+    dialog.gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText() : "");
     props.set(ParserProp.FORMAT, format.getSelectedItem().toString());
     props.set(ParserProp.HEADER, header.isSelected());
     props.set(ParserProp.SEPARATOR, separator.getSelectedItem().toString());

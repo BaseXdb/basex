@@ -12,7 +12,7 @@ import org.w3c.dom.TypeInfo;
 /**
  * DOM - Element implementation.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BXElem extends BXNode implements Element {

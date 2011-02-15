@@ -10,7 +10,7 @@ import org.basex.util.Util;
  * This class provides a main memory access to attribute values and
  * text contents.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class MemValues extends TokenSet implements Index {

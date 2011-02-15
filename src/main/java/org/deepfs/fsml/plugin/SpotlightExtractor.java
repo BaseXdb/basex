@@ -20,7 +20,7 @@ import org.deepfs.util.LibraryLoader;
 /**
  * Extracts metadata from Apple's Spotlight.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public final class SpotlightExtractor implements IFileParser {

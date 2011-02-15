@@ -9,7 +9,7 @@ import org.basex.util.Array;
 /**
  * Caching node iterator, returning sorted nodes.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class NodIter extends NodeIter {

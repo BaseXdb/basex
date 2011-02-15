@@ -9,7 +9,7 @@ import org.basex.core.BaseXException;
  * stream that has been specified in the constructor or in
  * {@link Session#setOutputStream(java.io.OutputStream)}.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Query {

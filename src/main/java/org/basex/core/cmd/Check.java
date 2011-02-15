@@ -16,7 +16,7 @@ import org.basex.util.Util;
  * Evaluates the 'checks' command, opens an existing database or
  * creates a new one.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Check extends Command {

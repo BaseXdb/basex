@@ -10,7 +10,7 @@ import org.basex.query.QueryException;
 /**
  * Variable stack.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class VarList extends ExprInfo {

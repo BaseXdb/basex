@@ -14,7 +14,7 @@ import org.basex.util.Util;
 /**
  * Date container.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Date extends Item {

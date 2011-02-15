@@ -9,7 +9,7 @@ import java.util.Iterator;
 /**
  * This is a simple container for tokens (byte arrays).
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class TokenList extends ElementList implements Iterable<byte[]> {

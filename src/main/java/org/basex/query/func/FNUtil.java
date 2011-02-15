@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -29,7 +28,7 @@ import org.basex.util.Util;
 /**
  * Project specific functions.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNUtil extends Fun {
@@ -275,8 +274,8 @@ final class FNUtil extends Fun {
     try {
       final byte[] hash = MessageDigest.getInstance(algo).digest(str);
       return new Hex(hash);
-    } catch(NoSuchAlgorithmException e) {
-      Util.notexpected(e);
+    } catch(final NoSuchAlgorithmException ex) {
+      Util.notexpected(ex);
       return null;
     }
   }

@@ -18,7 +18,7 @@ import org.basex.util.Util;
 /**
  * Rename database/drop documents dialog.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DialogInput extends Dialog {

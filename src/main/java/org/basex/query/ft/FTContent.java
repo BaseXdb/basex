@@ -13,7 +13,7 @@ import org.basex.util.ft.FTLexer;
 /**
  * FTContent expression.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FTContent extends FTFilter {

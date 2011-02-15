@@ -20,7 +20,7 @@ import org.basex.util.Token;
  * of the typed in text. Moreover, the cursor keys can be used to scroll
  * through the list, and list entries can be chosen with mouse clicks.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BaseXListChooser extends BaseXBack {

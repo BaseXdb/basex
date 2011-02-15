@@ -7,7 +7,7 @@ import org.basex.query.item.Value;
 /**
  * GroupNode defines one valid partitioning setting.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Michael Seiferle
  */
 final class GroupNode {

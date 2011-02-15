@@ -17,7 +17,7 @@ import org.basex.util.ft.FTSpan;
 /**
  * This class assembles utility methods for painting rectangle contents.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

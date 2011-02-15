@@ -9,7 +9,7 @@ import org.basex.util.Util;
 /**
  * Stores an integer array of pre values and their corresponding weights.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Joerg Hauser
  */
 final class MapList extends IntList {

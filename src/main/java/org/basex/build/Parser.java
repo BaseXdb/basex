@@ -21,7 +21,7 @@ import org.basex.util.Atts;
  * TagSoup was written by John Cowan and licensed under Apache 2.0
  * {@code http://home.ccil.org/~cowan/XML/tagsoup/}.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Parser extends Progress {
