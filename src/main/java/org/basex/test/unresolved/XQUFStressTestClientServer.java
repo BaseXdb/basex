@@ -13,7 +13,7 @@ import org.basex.util.Performance;
 /**
  * Testing concurrent XQUF statements on a single database.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  */
 public final class XQUFStressTestClientServer {
   /** Verbose flag. */

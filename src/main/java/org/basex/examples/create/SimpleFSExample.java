@@ -10,7 +10,7 @@ import org.basex.core.cmd.XQuery;
  * This example demonstrates how to import a filesystem structure
  * into the database.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class SimpleFSExample {

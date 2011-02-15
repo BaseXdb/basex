@@ -13,7 +13,7 @@ import org.basex.util.Util;
  * This class performs a local stress tests with a specified
  * number of threads and queries.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  */
 public final class StressTest {
   /** Verbose flag. */

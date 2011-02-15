@@ -14,7 +14,7 @@ import org.deepfs.fs.DeepFS;
  * This class parses files in the LST format
  * and sends events to the specified database builder.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class LSTParser extends FileParser {

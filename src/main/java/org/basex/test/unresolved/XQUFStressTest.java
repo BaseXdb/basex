@@ -9,7 +9,7 @@ import org.basex.core.cmd.XQuery;
 /**
  * Performs bulk updates with BaseX standalone version.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  */
 public final class XQUFStressTest {
   /** Verbose flag. */
@@ -44,8 +44,8 @@ public final class XQUFStressTest {
       new XQuery("delete nodes //node").execute(ctx);
       p("finished.");
       new DropDB(db).execute(ctx);
-    } catch(final BaseXException e) {
-      e.printStackTrace();
+    } catch(final BaseXException ex) {
+      ex.printStackTrace();
     }
     p("delete finished.\n");
   }
@@ -76,8 +76,8 @@ public final class XQUFStressTest {
           execute(ctx);
       p("finished.");
       new DropDB(db).execute(ctx);
-    } catch(final BaseXException e) {
-      e.printStackTrace();
+    } catch(final BaseXException ex) {
+      ex.printStackTrace();
     }
     p("insert finished.\n");
   }

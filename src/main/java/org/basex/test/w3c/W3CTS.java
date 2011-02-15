@@ -49,7 +49,7 @@ import org.basex.util.Util;
 /**
  * XQuery Test Suite wrapper.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class W3CTS {

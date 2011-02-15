@@ -14,7 +14,7 @@ import org.basex.api.jaxrx.JaxRxServer;
  * This class is a simple Java client to demonstrate the JAX-RX implementation.
  * It shows the function of the HTTP PUT method.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  */
 public final class JaxRxPUT {
   /**

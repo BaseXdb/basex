@@ -7,7 +7,7 @@ import java.io.IOException;
  * The database server must be started first to make this example work.
  * Documentation: http://basex.org/api
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  */
 public final class QueryBindExample {
   /**

@@ -18,7 +18,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * Part 4: Processing Results.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  */
 public final class Part4 extends Main {
   /**

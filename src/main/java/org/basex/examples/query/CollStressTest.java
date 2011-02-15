@@ -12,7 +12,7 @@ import org.basex.util.Performance;
 /**
  * This class adds and retrieves documents in a collection.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  */
 public final class CollStressTest {
   /** Global context. */

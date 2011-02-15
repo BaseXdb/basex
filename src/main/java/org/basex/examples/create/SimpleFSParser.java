@@ -11,7 +11,7 @@ import org.deepfs.fs.DeepFS;
  * and sends events to the specified database builder.
  * The resulting XML representation resembles the DeepFS syntax.
  *
- * @author BaseX Team 2005-11, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class SimpleFSParser extends FileParser {
