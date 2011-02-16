@@ -500,6 +500,8 @@ public enum FunDef {
   MD5(UTILURI, FNUtil.class, 1, 1, "md5(str)", STR),
   /** Utility function: calculates the SHA1 hash of the given xs:string. */
   SHA1(UTILURI, FNUtil.class, 1, 1, "sha1(str)", STR),
+  /** Utility function: calculates the CRC32 hash of the given xs:string. */
+  CRC32(UTILURI, FNUtil.class, 1, 1, "crc32(str)", STR),
 
   /* FNSent functions. */
 

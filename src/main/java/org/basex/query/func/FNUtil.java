@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.zip.CRC32;
+
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -61,6 +63,7 @@ final class FNUtil extends Fun {
       case TO_BASE: return toBase(ctx, ii);
       case MD5: return hash(ctx, "MD5");
       case SHA1: return hash(ctx, "SHA");
+      case CRC32: return crc32(ctx);
       default: return super.item(ctx, ii);
     }
   }
@@ -278,6 +281,22 @@ final class FNUtil extends Fun {
       Util.notexpected(ex);
       return null;
     }
+  }
+
+  /**
+   * Creates the CRC32 hash of the given xs:string.
+   * @param ctx query context
+   * @return xs:hexBinary instance containing the hash
+   * @throws QueryException exception
+   */
+  private Hex crc32(final QueryContext ctx) throws QueryException {
+    final byte[] str = checkStr(expr[0], ctx);
+    final CRC32 crc = new CRC32();
+    crc.update(str);
+    final byte[] res = new byte[4];
+    for(int i = res.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8)
+      res[i] = (byte) (c & 0xFFL);
+    return new Hex(res);
   }
 
   @Override
