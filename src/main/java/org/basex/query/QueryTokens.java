@@ -322,6 +322,8 @@ public interface QueryTokens {
   /** Parser token. */
   String DOLLAR = "$";
   /** Parser token. */
+  String HASH = "#";
+  /** Parser token. */
   String DOT2 = "..";
   /** Parser token. */
   String IS = "=";
@@ -341,6 +343,8 @@ public interface QueryTokens {
   String PRAGMA = "(#";
   /** Parser token. */
   String PRAGMA2 = "#)";
+  /** Parser Token. */
+  String PLHOLDER = "?";
 
   // URIS =====================================================================
 

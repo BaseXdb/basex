@@ -16,8 +16,11 @@ import org.basex.query.expr.CElem;
 import org.basex.query.expr.CPI;
 import org.basex.query.expr.CTxt;
 import org.basex.query.expr.Arith;
+import org.basex.query.expr.DynFunCall;
+import org.basex.query.expr.LitFunc;
 import org.basex.query.expr.OrderByExpr;
 import org.basex.query.expr.OrderByStable;
+import org.basex.query.expr.PartFunApp;
 import org.basex.query.expr.TypeCase;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Castable;
@@ -667,9 +670,29 @@ public class QueryParser extends InputParser {
     if(module != null && !name.uri().eq(module.uri())) error(MODNS, name);
 
     check(PAR1);
-    skipWS();
-    Var[] args = {};
     final int s = ctx.vars.size();
+
+    final Var[] args = paramList();
+    check(PAR2);
+
+    final SeqType type = consumeWS(AS) ? sequenceType() : null;
+    final Func func = new Func(input(),
+        new Var(input(), name, type), args, true);
+    func.updating = up;
+
+    ctx.funcs.add(func, this);
+    if(!consumeWS(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
+    ctx.vars.reset(s);
+  }
+
+  /**
+   * Parses a ParamList.
+   * @return declared variables
+   * @throws QueryException query exception
+   */
+  private Var[] paramList() throws QueryException {
+    Var[] args = {};
+    skipWS();
     while(true) {
       if(curr() != '$') {
         if(args.length == 0) break;
@@ -685,16 +708,7 @@ public class QueryParser extends InputParser {
       if(!consume(',')) break;
       skipWS();
     }
-    check(PAR2);
-
-    final SeqType type = consumeWS(AS) ? sequenceType() : null;
-    final Func func = new Func(input(),
-        new Var(input(), name, type), args, true);
-    func.updating = up;
-
-    ctx.funcs.add(func, this);
-    if(!consumeWS(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
-    ctx.vars.reset(s);
+    return args;
   }
 
   /**
@@ -1525,17 +1539,38 @@ public class QueryParser extends InputParser {
    * [ 81] Parses a FilterExpr.
    * [ 82] Parses a PredicateList.
    * [ 83] Parses a Predicate.
+   * [164] Parses a DynamicFunctionInvocation (XQuery 3.0).
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr filter() throws QueryException {
-    final Expr e = primary();
-    if(!consumeWS2(BR1)) return e;
-
-    if(e == null) error(PREDMISSING);
-    Expr[] pred = {};
-    do { pred = add(pred, expr()); check(BR2); } while(consumeWS2(BR1));
-    return new Filter(input(), e, pred);
+    Expr e = primary(), old;
+    do {
+      old = e;
+      if(consumeWS2(BR1)) {
+        // PredicateList
+        if(e == null) error(PREDMISSING);
+        Expr[] pred = {};
+        do { pred = add(pred, expr()); check(BR2); } while(consumeWS2(BR1));
+        e = new Filter(input(), e, pred);
+      } else if(consumeWS2(PAR1)) {
+        // DynamicFunctionInvocation
+        Expr[] args = {};
+        boolean partial = false;
+        if(!consumeWS2(PAR2)) {
+          do {
+            if(consumeWS2(PLHOLDER)) {
+              partial = true;
+              args = add(args, null);
+            } else args = add(args, single());
+          } while(consumeWS2(COMMA));
+          check(PAR2);
+        }
+        e = new DynFunCall(input(), e, args);
+        if(partial) e = new PartFunApp(input(), e, args);
+      }
+    } while(e != old);
+    return e;
   }
 
   /**
@@ -1564,6 +1599,10 @@ public class QueryParser extends InputParser {
     if(c == '<') return constructor();
     // function calls and computed constructors
     if(letter(c)) {
+      if(ctx.xquery3) {
+        e = functionItem();
+        if(e != null) return e;
+      }
       e = functionCall();
       if(e != null) return e;
       e = compConstructor();
@@ -1576,13 +1615,59 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * [161] Parses a FunctionItemExpr.
+   * [162] Parses a LiteralFunctionItem
+   * [163] Parses a InlineFunction
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr functionItem() throws QueryException {
+    final int pos = qp;
+
+    // LiteralFunctionItem
+    if(consumeWS2(FUNCTION) && consumeWS(PAR1)) {
+
+      final int s = ctx.vars.size();
+      final Var[] args = paramList();
+      check(PAR2);
+
+      final SeqType type = consumeWS(AS) ? sequenceType() : null;
+      final Expr body = enclosed(NOFUNBODY);
+      ctx.vars.reset(s);
+
+      return new LitFunc(input(), type, args, body);
+    }
+
+    qp = pos;
+
+    // InlineFunction
+    skipWS();
+    final byte[] fn = qName(null);
+    if(fn.length > 0 && consumeWS2(HASH)) {
+      final QNm name = new QNm(fn);
+      if(name.ns()) ctx.ns.uri(name);
+      else name.uri(ctx.nsFunc);
+      final long cardinal = ((Itr) numericLiteral(true)).itr(null);
+      // TODO [CG] what to do with big number of arguments? (ex: varargs)
+      if(cardinal < 0 || cardinal > Integer.MAX_VALUE) error(FUNCUNKNOWN, fn);
+
+      final Expr[] args = new Expr[(int) cardinal];
+      final Expr f = ctx.funcs.get(name, args, ctx, this);
+      return f; // TODO create inline function wrapper
+    }
+
+    qp = pos;
+    return null;
+  }
+
+  /**
    * [ 85] Parses a Literal.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr literal() throws QueryException {
     final char c = curr();
-    if(digit(c)) return numericLiteral();
+    if(digit(c)) return numericLiteral(false);
     // decimal/double values or context item
     if(c == '.' && next() != '.') {
       consume('.');
@@ -1598,10 +1683,11 @@ public class QueryParser extends InputParser {
   /**
    * [ 86] Parses a NumericLiteral.
    * [141] Parses an IntegerLiteral.
+   * @param itr integer flag
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr numericLiteral() throws QueryException {
+  private Expr numericLiteral(final boolean itr) throws QueryException {
     tok.reset();
     while(digit(curr())) tok.add(consume());
     if(letter(curr())) return checkDbl();
@@ -1610,6 +1696,7 @@ public class QueryParser extends InputParser {
       if(l == Long.MIN_VALUE) error(RANGE, tok);
       return Itr.get(l);
     }
+    if(itr) error(NUMBERITR);
     tok.add('.');
     return decimalLiteral();
   }
@@ -1655,6 +1742,7 @@ public class QueryParser extends InputParser {
 
     // name and opening bracket found
     Expr[] exprs = {};
+    boolean partial = false;
     while(curr() != 0) {
       if(consumeWS2(PAR2)) {
         alter = FUNCUNKNOWN;
@@ -1666,13 +1754,18 @@ public class QueryParser extends InputParser {
         final Expr func = ctx.funcs.get(name, exprs, ctx, this);
         if(func != null) {
           alter = null;
-          return func;
+          return partial ? new PartFunApp(input(), func, exprs) : func;
         }
         qp = p;
         return null;
       }
       if(exprs.length != 0) check(COMMA);
-      exprs = add(exprs, single());
+
+      if(consumeWS2(PLHOLDER)) {
+        // it's a lambda
+        partial = true;
+        exprs = add(exprs, null);
+      } else exprs = add(exprs, single());
     }
     error(FUNCMISS, name.atom());
     return null;
@@ -1893,7 +1986,7 @@ public class QueryParser extends InputParser {
     if(consumeWSS()) error(PIXML, EMPTY);
     final byte[] str = trim(qName(PIWRONG));
     final Str pi = Str.get(str);
-    if(str.length == 0 || eq(lc(str), XML)) error(PIXML, pi);
+    if(!XMLToken.isNCName(str) || eq(lc(str), XML)) error(PIXML, pi);
 
     final boolean space = skipWS();
     final TokenBuilder tb = new TokenBuilder();
@@ -2090,33 +2183,67 @@ public class QueryParser extends InputParser {
    */
   private SeqType sequenceType() throws QueryException {
     skipWS();
-    final QNm type = new QNm(qName(TYPEINVALID));
-    type.uri(ctx.ns.uri(type.pref(), false, input()));
-    // parse non-atomic types
-    final boolean atom = !consumeWS(PAR1);
-    tok.reset();
-    while(!atom && !consumeWS(PAR2)) {
-      if(curr() == 0) error(FUNCMISS, type.atom());
-      tok.add(consume());
-    }
-    skipWS();
+    final Type t = itemType();
+
     // parse occurrence indicator
     final Occ occ = consume('?') ? Occ.ZO : consume('+') ? Occ.OM :
       consume('*') ? Occ.ZM : Occ.O;
     skipWS();
 
-    final Type t = Type.find(type, atom);
     if(t == Type.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
+
+    final KindTest kt = tok.size() == 0 ? null : kindTest(t, tok.finish());
+    // use empty name test if types are different
+    return SeqType.get(t, occ, kt == null ? null :
+      kt.extype == null || t == kt.extype ? kt.name : new QNm(EMPTY));
+  }
+
+  /**
+   * [169] Parses an ItemType.
+   * @return item type
+   * @throws QueryException query exception
+   */
+  private Type itemType() throws QueryException {
+    skipWS();
+
+    // parenthesized type
+    if(consume(PAR1)) {
+      final Type ret = itemType();
+      check(PAR2);
+      return ret;
+    }
+
+    final QNm type = new QNm(qName(TYPEINVALID));
+    type.uri(ctx.ns.uri(type.pref(), false, input()));
+    // parse non-atomic types
+    final boolean atom = !consumeWS(PAR1);
+
+    tok.reset();
+    if(!atom) {
+      int par = 0;
+      while(par != 0 || !consumeWS2(PAR2)) {
+        switch(curr()) {
+          case '(': par++; break;
+          case ')': par--; break;
+          case '\0': error(FUNCMISS, type.atom());
+        }
+        tok.add(consume());
+      }
+    }
+
+    final Type t = Type.find(type, atom);
+
     if(t == null) {
       if(atom) error(TYPEUNKNOWN, type);
       error(NOTYPE, new TokenBuilder("\"").add(
           type.atom()).add('(').add(tok.finish()).add(")\""));
     }
 
-    final KindTest kt = tok.size() == 0 ? null : kindTest(t, tok.finish());
-    // use empty name test if types are different
-    return SeqType.get(t, occ, kt == null ? null :
-      kt.extype == null || t == kt.extype ? kt.name : new QNm(EMPTY));
+    if(t == Type.FUNC && consumeWS2(AS)) {
+      final SeqType retType = sequenceType(); // TODO don't throw this away
+    }
+
+    return t;
   }
 
   /**

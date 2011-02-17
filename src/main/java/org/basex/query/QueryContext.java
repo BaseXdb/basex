@@ -359,7 +359,7 @@ public final class QueryContext extends Progress {
    * Returns info on query compilation and evaluation.
    * @return query info
    */
-  String info() {
+  public String info() {
     return info.toString();
   }
 
