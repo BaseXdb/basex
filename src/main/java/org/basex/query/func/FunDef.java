@@ -483,6 +483,17 @@ public enum FunDef {
   /** Database function: extracts full-text results. */
   EXTRACT(FTURI, FNFt.class, 1, 3, "extract(items, tag?, length?)", NOD_ZM),
 
+  /* FNFt functions */
+
+  /** Database function: searches the full-text index. */
+  SEARCH(FTURI, FNFt.class, 2, 2, "search(node, string)", NOD_ZM),
+  /** Database function: marks the hits of a full-text request. */
+  MARK(FTURI, FNFt.class, 1, 2, "mark(nodes, tag?)", NOD_ZM),
+  /** Database function: returns the full-text score. */
+  SCORE(FTURI, FNFt.class, 1, 1, "score(items)", ITR_ZM),
+  /** Database function: extracts full-text results. */
+  EXTRACT(FTURI, FNFt.class, 1, 3, "extract(items, tag?, length?)", NOD_ZM),
+
   /* FNUtil functions. */
 
   /** Utility function: evaluates the specified query. */
