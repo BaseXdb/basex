@@ -31,7 +31,7 @@ sub new {
   # send username and hashed password/timestamp
   my $pwmd5 = Digest::MD5->new()->add($pw)->hexdigest();
   my $complete = Digest::MD5->new()->add($pwmd5.$ts)->hexdigest();
-  $self->send("$user\0$complete");
+  $self->send($user.chr(0).$complete);
 
   # evaluate success flag
   return $self if !$self->_read() or die "Access denied.";
@@ -43,7 +43,7 @@ sub execute {
   my $cmd = shift;
 
   # send command to server and receive result
-  $self->send("$cmd");
+  $self->send($cmd);
   $self->{result} = $self->_receive();
   $self->{info} = $self->_receive();
   if (!$self->ok()) {
@@ -57,6 +57,33 @@ sub query {
   my $self = shift;
   my $cmd = shift;
   return Query->new($self, $cmd);
+}
+
+# see readme.txt
+sub create {
+  my $self = shift;
+  my $name = shift;
+  my $input = shift;
+  
+  $self->send(chr(8).$name.chr(0).$input);
+  $self->{info} = $self->_receive();
+  if (!$self->ok()) {
+    die $self->{info};
+  }
+}
+
+# see readme.txt
+sub add {
+  my $self = shift;
+  my $name = shift;
+  my $target = shift;
+  my $input = shift;
+  
+  $self->send(chr(9).$name.chr(0).$target.chr(0).$input);
+  $self->{info} = $self->_receive();
+  if (!$self->ok()) {
+    die $self->{info};
+  }
 }
 
 # see readme.txt
@@ -97,7 +124,7 @@ sub ok {
 sub send {
   my $self = shift;
   my $str = shift;
-  $self->{sock}->send("$str\0");
+  $self->{sock}->send($str.chr(0));
 }
 
 1;
@@ -115,13 +142,13 @@ sub new {
   $session = shift;
   my $cmd = shift;
   my $self = bless({}, $class);
-  $id = execu("\0", $cmd);
+  $id = execu(chr(0), $cmd);
   return $self;
 }
 
 # see readme.txt
 sub init {
-  return execu("\4", $id);
+  return execu(chr(4), $id);
 }
 
 # see readme.txt
@@ -129,12 +156,12 @@ sub bind {
   shift;
   my $name = shift;
   my $value = shift;
-  execu("\3", "$id\0$name\0$value\0");
+  execu(chr(3), $id.chr(0).$name.chr(0).$value.chr(0));
 }
 
 # see readme.txt
 sub more {
-  $next = execu("\1", $id);
+  $next = execu(chr(1), $id);
   return $next;
 }
 
@@ -145,24 +172,24 @@ sub next {
 
 # see readme.txt
 sub execute {
-  return execu("\5", $id);
+  return execu(chr(5), $id);
 }
 
 # see readme.txt
 sub info {
-  return execu("\6", $id);
+  return execu(chr(6), $id);
 }
 
 # see readme.txt
 sub close {
-  return execu("\2", $id);
+  return execu(chr(2), $id);
 }
 
 # see readme.txt
 sub execu {
   my $cmd = shift;
   my $arg = shift;
-  $session->send("$cmd$arg");
+  $session->send($cmd.$arg);
   my $s = $session->_receive();
   if (!$session->ok()) {
     die $session->_receive();

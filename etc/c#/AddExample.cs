@@ -1,5 +1,5 @@
 /*
- * This example shows how new databases can be created.
+ * This example shows how new documents can be added.
  * Documentation: http://basex.org/api
  *
  * (C) BaseX Team 2005-11, ISC License
@@ -10,7 +10,7 @@ using System.IO;
 
 namespace BaseXClient
 {
-  public class CreateExample
+  public class AddExample
   {
     public static void Main(string[] args)
     {
@@ -19,13 +19,25 @@ namespace BaseXClient
         // create session
         Session session = new Session("localhost", 1984, "admin", "admin");
 
+        // create empty database
+        session.Execute("create db database");
+        Console.WriteLine(session.Info);
+        
         // define InputStream
         MemoryStream ms = new MemoryStream(
           System.Text.Encoding.UTF8.GetBytes("<xml>Hello World!</xml>"));
-
-        // create database
-        session.Create("database", ms);
+          
+        // add document
+        session.Add("world.xml", "/world", ms);
         Console.WriteLine(session.Info);
+        
+        // define InputStream
+        MemoryStream ms = new MemoryStream(
+          System.Text.Encoding.UTF8.GetBytes("<xml>Hello Universe!</xml>"));
+          
+        // add document
+        session.Add("Universe.xml", "", ms);
+        Console.WriteLine(session.Info);  
 
         // run query on database
         Console.WriteLine(session.Execute("xquery /"));

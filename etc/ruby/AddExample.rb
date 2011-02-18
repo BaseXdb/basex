@@ -3,34 +3,35 @@
 #
 # (C) BaseX Team 2005-11, ISC License
 
-import BaseXClient
+require 'BaseXClient.rb'
 
-try:
+begin
 
   # create session
-  session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
-
+  session = Session.new("localhost", 1984, "admin", "admin")
+  
   # create empty database
   session.execute("create db database")
-  print session.info()
+  print "\n" + session.info()
   
   # add document
   session.add("World.xml", "/world", "<x>Hello World!</x>")
-  print session.info()
+  print "\n" + session.info()
   
   # add document
   session.add("Universe.xml", "", "<x>Hello Universe!</x>")
-  print session.info()
+  print "\n" + session.info() + "\n"
   
   # run query on database
-  print "\n" + session.execute("xquery collection('database')")
+  print "\n" + session.execute("xquery collection('database')") + "\n"
   
   # drop database
   session.execute("drop db database")
- 
-  # close session
-  session.close()
 
-except IOError as e:
+  # close session
+  session.close
+
+rescue Exception => e
   # print exception
-  print e
+  puts e
+end

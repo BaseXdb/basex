@@ -1,4 +1,4 @@
-﻿' This example shows how new databases can be created.
+﻿' This example shows how new documents can be added.
 ' Documentation: http://basex.org/api
 '
 ' (C) BaseX Team 2005-11, ISC License
@@ -12,18 +12,31 @@ Module CreateExample
 
       ' create session
       Dim session As New Session("localhost", 1984, "admin", "admin")
+      
+      ' create empty database
+      session.Execute("create db database")
+      Console.WriteLine(session.Info)
+      
       ' define InputStream
       Dim ms As New MemoryStream(System.Text.Encoding.UTF8.GetBytes("<xml>Hello World!</xml>"))
-      ' create database
-      session.Create("database", ms)
+      
+      ' add document
+      session.Add("World.xml", "/World", ms)
+      Console.WriteLine(session.Info)
+      
+      ' define InputStream
+      Dim ms As New MemoryStream(System.Text.Encoding.UTF8.GetBytes("<xml>Hello Universe!</xml>"))
+      
+      ' add document
+      session.Add("Universe.xml", "", ms)
       Console.WriteLine(session.Info)
 
       ' run query on database
       Console.WriteLine(session.Execute("xquery /"))
-	  
-	  ' drop database
-      session.Execute("drop db database")
       
+      ' drop database
+      session.Execute("drop db database")
+
       ' close session
       session.Close()
 	Catch e As IOException
