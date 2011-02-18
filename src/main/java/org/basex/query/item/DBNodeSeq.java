@@ -11,12 +11,12 @@ import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
- * Sequence, containing at least two ordered database document nodes.
+ * Sequence, containing at least two ordered database nodes.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DBDocSeq extends Seq {
+public final class DBNodeSeq extends Seq {
   /** Data reference. */
   private final Data data;
   /** Pre values. */
@@ -27,7 +27,7 @@ public final class DBDocSeq extends Seq {
    * @param p pre values
    * @param d data reference
    */
-  private DBDocSeq(final int[] p, final Data d) {
+  private DBNodeSeq(final int[] p, final Data d) {
     super(p.length);
     pres = p;
     data = d;
@@ -41,8 +41,8 @@ public final class DBDocSeq extends Seq {
    */
   public static Value get(final int[] v, final Data d) {
     final int s = v.length;
-    return s == 0 ? Empty.SEQ : s == 1 ?
-        new DBNode(d, v[0], Data.DOC) : new DBDocSeq(v, d);
+    return s == 0 ? Empty.SEQ : s == 1 ? new DBNode(d, v[0]) :
+      new DBNodeSeq(v, d);
   }
 
   /***
@@ -50,8 +50,8 @@ public final class DBDocSeq extends Seq {
    * @param i index
    * @return node
    */
-  DBNode node(final int i) {
-    return new DBNode(data, pres[i], Data.DOC);
+  protected DBNode node(final int i) {
+    return new DBNode(data, pres[i]);
   }
 
   @Override
@@ -93,8 +93,8 @@ public final class DBDocSeq extends Seq {
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof DBDocSeq)) return false;
-    final DBDocSeq seq = (DBDocSeq) cmp;
+    if(!(cmp instanceof DBNodeSeq)) return false;
+    final DBNodeSeq seq = (DBNodeSeq) cmp;
     return pres == seq.pres && size == seq.size;
   }
 
