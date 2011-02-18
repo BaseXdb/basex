@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * This class tests the XQuery utility functions prefixed with "util".
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FNUtilTest extends AdvancedQueryTest {
@@ -48,7 +48,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testMB() throws BaseXException {
-    final String fun = check(FunDef.MB, (Class<?>) null, Boolean.class);
+    final String fun = check(FunDef.MB, null, Boolean.class);
     query(fun + "(())");
     query(fun + "(1 to 1000, false())");
     query(fun + "(1 to 1000, true())");
@@ -60,9 +60,71 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testMS() throws BaseXException {
-    final String fun = check(FunDef.MS, (Class<?>) null, Boolean.class);
+    final String fun = check(FunDef.MS, null, Boolean.class);
     query(fun + "(())");
     query(fun + "(1 to 1000, false())");
     query(fun + "(1 to 1000, true())");
+  }
+
+  /**
+   * Test method for the util:integer-to-base() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testToBase() throws BaseXException {
+    final String fun = check(FunDef.TO_BASE, Integer.class, Integer.class);
+    query(fun + "(4, 2)", "100");
+    query(fun + "(65535, 2)", "1111111111111111");
+    query(fun + "(65536, 2)", "10000000000000000");
+    query(fun + "(4, 16)", "4");
+    query(fun + "(65535, 16)", "ffff");
+    query(fun + "(65536, 16)", "10000");
+    query(fun + "(4, 10)", "4");
+    query(fun + "(65535, 10)", "65535");
+    query(fun + "(65536, 10)", "65536");
+    error(fun + "(1, 1)", Err.INVBASE);
+    error(fun + "(1, 100)", Err.INVBASE);
+    error(fun + "(1, 100)", Err.INVBASE);
+  }
+
+  /**
+   * Test method for the util:integer-from-base() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testFromBase() throws BaseXException {
+    final String fun = check(FunDef.FRM_BASE, String.class, Integer.class);
+    query(fun + "('100', 2)", "4");
+    query(fun + "('1111111111111111', 2)", "65535");
+    query(fun + "('10000000000000000', 2)", "65536");
+    query(fun + "('4', 16)", "4");
+    query(fun + "('ffff', 16)", "65535");
+    query(fun + "('FFFF', 16)", "65535");
+    query(fun + "('10000', 16)", "65536");
+    query(fun + "('4', 10)", "4");
+    query(fun + "('65535', 10)", "65535");
+    query(fun + "('65536', 10)", "65536");
+    error(fun + "('1', 1)", Err.INVBASE);
+    error(fun + "('1', 100)", Err.INVBASE);
+    error(fun + "('abc', 10)", Err.INVDIG);
+    error(fun + "('012', 2)", Err.INVDIG);
+  }
+
+  /**
+   * Test method for the util:{md5, sha1}() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testHashing() throws BaseXException {
+    final String md5 = check(FunDef.MD5, String.class);
+    final String sha1 = check(FunDef.SHA1, String.class);
+    query(md5 + "('')", "D41D8CD98F00B204E9800998ECF8427E");
+    query(sha1 + "('')", "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709");
+
+    query(md5 + "('BaseX')", "0D65185C9E296311C0A2200179E479A2");
+    query(sha1 + "('BaseX')", "3AD5958F0F27D5AFFDCA2957560F121D0597A4ED");
+
+    error(md5 + "(())", Err.XPEMPTY);
+    error(sha1 + "(())", Err.XPEMPTY);
   }
 }

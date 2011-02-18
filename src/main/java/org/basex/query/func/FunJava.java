@@ -6,6 +6,7 @@ import static javax.xml.datatype.DatatypeConstants.*;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
@@ -26,7 +27,6 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.Util;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -38,10 +38,12 @@ import org.w3c.dom.Text;
 /**
  * Java function definition.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FunJava extends Arr {
+  /** New keyword. */
+  private static final String NEW = "new";
   /** Input Java types. */
   private static final Class<?>[] JAVA = {
     String.class, boolean.class, Boolean.class, byte.class, Byte.class,
@@ -86,9 +88,10 @@ public final class FunJava extends Arr {
 
     Object result = null;
     try {
-      result = mth.equals("new") ? constructor(arg) : method(arg);
+      result = mth.equals(NEW) ? constructor(arg) : method(arg);
+    } catch(final InvocationTargetException ex) {
+      JAVAERR.thrw(input, ex.getCause());
     } catch(final Exception ex) {
-      Util.debug(ex);
       FUNJAVA.thrw(input, desc());
     }
     return result == null ? Empty.ITER : iter(result, ctx);
@@ -250,8 +253,8 @@ public final class FunJava extends Arr {
 
   @Override
   public String desc() {
-    return cls.getName() + "." + mth + "(...)" + (mth.equals("new") ?
-        " constructor" : " method");
+    return cls.getName() + "." + mth + "(...)" +
+      (mth.equals(NEW) ? " constructor" : " method");
   }
 
   @Override

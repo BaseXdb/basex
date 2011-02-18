@@ -3,7 +3,6 @@ package org.basex.query.ft;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
-import java.util.ArrayList;
 import org.basex.core.Prop;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
@@ -19,18 +18,17 @@ import org.basex.util.ft.FTOpt;
 /**
  * This class performs the full-text tokenization.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FTTokenizer {
   /** Token comparator. */
   private final TokenComparator cmp;
   /** Cache. */
-  private final TokenObjMap<ArrayList<byte[][]>> cache =
-    new TokenObjMap<ArrayList<byte[][]>>();
+  final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
   /** Levenshtein reference. */
   final Levenshtein ls = new Levenshtein();
-  /** Database properties. */
+  /** Calling expression. */
   final FTWords words;
   /** Full-text options. */
   final FTOpt opt;
@@ -47,6 +45,7 @@ public final class FTTokenizer {
     words = w;
     opt = o;
     lserr = pr.num(Prop.LSERROR);
+
     cmp = new TokenComparator() {
       @Override
       public boolean equal(final byte[] in, final byte[] qu)
@@ -57,7 +56,6 @@ public final class FTTokenizer {
         // before doing the actual search; thus the wild-card expression will
         // not be parsed by each comparison and will also eliminate the need of
         // throwing an exception :)
-
         return
           // skip stop words, i. e. if the current query token is a stop word,
           // it is always equal to the corresponding input token:
@@ -73,13 +71,11 @@ public final class FTTokenizer {
   }
 
   /**
-   * Checks if the first token contains the second full-text term.
-   * @param query query token
-   * @param lex input text
-   * @return number of occurrences
-   * @throws QueryException query exception
+   * Returns a new lexer, adopting the tokenizer options.
+   * @param lex input lexer
+   * @return lexer
    */
-  int contains(final byte[] query, final FTLexer lex) throws QueryException {
+  FTLexer copy(final FTLexer lex) {
     // assign options to text:
     final FTOpt to = lex.ftOpt();
     to.set(ST, opt.is(ST));
@@ -88,42 +84,61 @@ public final class FTTokenizer {
     to.ln = opt.ln;
     to.th = opt.th;
     to.sd = opt.sd;
+    return new FTLexer(to).init(lex.text());
+  }
 
-    // [DP] cache FTBitapSearch instead ?
-    ArrayList<byte[][]> quTokens = cache.get(query);
-    if(quTokens == null) {
-      quTokens = new ArrayList<byte[][]>(1);
-      cache.add(query, quTokens);
+  /**
+   * Returns cached query tokens.
+   * @param query query token
+   * @return number of occurrences
+   * @throws QueryException query exception
+   */
+  FTTokens cache(final byte[] query) throws QueryException {
+    FTTokens tokens = cache.get(query);
+    if(tokens == null) {
+      tokens = new FTTokens();
+      cache.add(query, tokens);
 
       // cache query tokens:
       final FTIterator quLex = new FTLexer(opt).init(query);
-      final TokenList quList = new TokenList();
+      final TokenList quList = new TokenList(1);
       while(quLex.hasNext()) quList.add(quLex.nextToken());
-      quTokens.add(quList.toArray());
+      tokens.add(quList);
 
       // if thesaurus is required, add the terms which extend the query:
       if(opt.th != null) {
         for(final byte[] ext : opt.th.find(words.input, query)) {
           // parse each extension term to a set of tokens:
-          final TokenList tl = new TokenList();
+          final TokenList tl = new TokenList(1);
           // [DP] should we apply the same FT options (e.g. stemming, etc.)
           // to the thesaurus tokens?
           quLex.init(ext);
           while(quLex.hasNext()) tl.add(quLex.nextToken());
           // add each thesaurus term as an additional query term:
-          quTokens.add(tl.toArray());
+          tokens.add(tl);
         }
       }
     }
+    return tokens;
+  }
 
-    final FTLexer ftl = new FTLexer(to).init(lex.text());
-    final FTBitapSearch bs = new FTBitapSearch(ftl, quTokens, cmp);
+  /**
+   * Checks if the first token contains the second full-text term.
+   * @param query cached query tokens
+   * @param input input text
+   * @return number of occurrences
+   * @throws QueryException query exception
+   */
+  int contains(final FTTokens query, final FTLexer input)
+      throws QueryException {
+
+    input.init();
+    final FTBitapSearch bs = new FTBitapSearch(input, query, cmp);
     int c = 0;
-
     while(bs.hasNext()) {
       final int pos = bs.next();
+      words.add(pos, pos + query.length() - 1);
       ++c;
-      words.add(pos, pos + quTokens.get(0).length - 1);
     }
 
     words.all.sTokenNum++;

@@ -16,7 +16,7 @@ import org.basex.gui.dialog.Dialog;
 /**
  * Abstract panel implementation with a number of predefined listeners.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXPanel extends BaseXBack implements MouseListener,
@@ -40,7 +40,7 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
    */
   protected BaseXPanel(final byte[] hlp, final Window win) {
     gui = win instanceof GUI ? (GUI) win : ((Dialog) win).gui;
-    BaseXLayout.addInteraction(this, hlp, win);
+    BaseXLayout.addInteraction(this, win, hlp);
   }
 
   @Override

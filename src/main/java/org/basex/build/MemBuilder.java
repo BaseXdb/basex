@@ -8,7 +8,7 @@ import org.basex.data.MemData;
 /**
  * This class creates a memory based database instance.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class MemBuilder extends Builder {
@@ -58,7 +58,7 @@ public final class MemBuilder extends Builder {
     meta.textindex = true;
     meta.attrindex = true;
     meta.ftindex = false;
-    meta.file = parser.file;
+    meta.path = parser.file;
 
     parse(name);
     data.init();

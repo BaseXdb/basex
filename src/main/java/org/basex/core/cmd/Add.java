@@ -27,7 +27,7 @@ import org.xml.sax.InputSource;
 /**
  * Evaluates the 'add' command and adds a document to a collection.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Add extends ACreate {
@@ -118,15 +118,16 @@ public final class Add extends ACreate {
     final Data data = ctx.data;
     if(data == null) return PROCNODB;
 
-    final String trg = path(target);
+    String trg = path(target);
+    if(!trg.isEmpty()) trg = trg + "/";
     final BufferedInputStream is = new BufferedInputStream(input);
     final SAXSource sax = new SAXSource(new InputSource(is));
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
     try {
-      ctx.lock.before(true);
+      ctx.register(true);
       return add(parser, ctx, trg, name, cmd);
     } finally {
-      ctx.lock.after(true);
+      ctx.unregister(true);
     }
   }
 
@@ -184,7 +185,7 @@ public final class Add extends ACreate {
     } finally {
       if(large) {
         // close and drop intermediary database instance
-        if(data != null) try { data.close(); } catch(IOException e) { }
+        if(data != null) try { data.close(); } catch(final IOException e) { }
         DropDB.drop(dbname, ctx.prop);
       }
     }

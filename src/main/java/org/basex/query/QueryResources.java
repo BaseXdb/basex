@@ -13,36 +13,39 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.DBDocSeq;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.item.Type;
+import org.basex.query.item.Uri;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
 
 /**
  * This class provides access to resources.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  */
 public final class QueryResources {
   /** Database context. */
   private final QueryContext ctx;
-  /** Opened documents. */
-  private DBNode[] doc = new DBNode[1];
-  /** Number of documents. */
-  private int docs;
-  /** Collections. */
-  private NodIter[] coll = new NodIter[1];
-  /** Collection names. */
+
+  /** Opened databases. */
+  private Data[] data = new Data[1];
+  /** Number of databases. */
+  private int datas;
+  /** Flag for global data reference. */
+  private boolean globalData;
+
+  /** Collections: single nodes and sequences. */
+  private Value[] coll = new Value[1];
+  /** Names of collections. */
   private byte[][] collName = new byte[1][];
-  /** Collection counter. */
+  /** Number of collections. */
   private int colls;
-  /** Initial number of documents. */
-  private int rootDocs;
 
   /**
    * Constructor.
@@ -58,97 +61,186 @@ public final class QueryResources {
    * @throws QueryException query exception
    */
   void compile(final Nodes nodes) throws QueryException {
-    final Data data = nodes.data;
-    if(!ctx.context.perm(User.READ, data.meta))
+    final Data d = nodes.data;
+    if(!ctx.context.perm(User.READ, d.meta))
       Err.PERMNO.thrw(null, CmdPerm.READ);
 
-    // create globally known document nodes
-    final int s = data.empty() ? 0 : (int) nodes.size();
-    if(nodes.root) {
-      // use input node set, if it contains all documents of the database
-      doc = new DBNode[s];
-      for(int n = 0; n < s; ++n) {
-        addDoc(new DBNode(data, nodes.list[n], Data.DOC));
-      }
-    } else {
-      // otherwise, create new nodes from all documents of the database
-      final IntList il = data.doc();
-      for(int p = 0; p < il.size(); p++) {
-        addDoc(new DBNode(data, il.get(p), Data.DOC));
-      }
-    }
-    rootDocs = docs;
+    // assign initial context value: use empty node set if database is empty
+    ctx.value = DBDocSeq.get(d.empty() ? new int[0] : nodes.list, d);
 
-    // create initial context items
-    if(nodes.root) {
-      // input nodes contain all roots: assign document array
-      ctx.value = Seq.get(doc, docs);
-    } else {
-      // otherwise, add all context items
-      final ItemIter ir = new ItemIter(s);
-      for(int n = 0; n < s; ++n) ir.add(new DBNode(data, nodes.list[n]));
-      ctx.value = ir.finish();
-    }
+    // create default collection: use initial node set if it contains all
+    // documents of the database. otherwise, create new node set
+    addCollection(nodes.root ? ctx.value :
+        DBDocSeq.get(d.doc(), d), token(d.meta.name));
 
-    // create default collection from document array
-    addCollection(new NodIter(doc, docs), token(data.meta.name));
+    // add global data reference has been added, set indicator to true
+    globalData = true;
+    addData(d);
   }
 
   /**
-   * Opens an existing document/collection, or creates a new main memory
-   * document instance.
-   * @param input database name or file path
-   * @param col collection flag
-   * @param db database flag
+   * Closes the opened data references.
+   * @throws IOException I/O exception
+   */
+  void close() throws IOException {
+    for(int d = globalData ? 1 : 0; d < datas; ++d) {
+      Close.close(data[d], ctx.context);
+    }
+    datas = 0;
+  }
+
+  /**
+   * Opens a new database or returns a reference to an already opened database.
+   * @param name name of database
    * @param ii input info
    * @return database instance
    * @throws QueryException query exception
    */
-  public DBNode doc(final byte[] input, final boolean col, final boolean db,
-      final InputInfo ii) throws QueryException {
+  public Data data(final byte[] name, final InputInfo ii)
+      throws QueryException {
 
-    if(contains(input, '<') || contains(input, '>')) INVDOC.thrw(ii, input);
-
-    // check if the existing collections contain the document
-    for(int c = 0; c < colls; ++c) {
-      for(int n = 0; n < coll[c].size(); ++n) {
-        if(eq(input, coll[c].get(n).base()))
-          return (DBNode) coll[c].get(n);
-      }
+    // check if a database with the same name has already been opened
+    final String in = string(name);
+    for(int d = 0; d < datas; ++d) {
+      if(data[d].meta.name.equals(in)) return data[d];
     }
 
-    // check if the database has already been opened
+    try {
+      // open database
+      final Data d = Open.open(in, ctx.context);
+      addData(d);
+      return d;
+    } catch(final IOException ex) {
+      NODB.thrw(ii, in);
+      return null;
+    }
+  }
+
+  /**
+   * Creates a new data reference for the specified input, or returns a
+   * reference to an already opened file or database.
+   * @param input file path or name of database
+   * @param col collection flag
+   * @param ii input info
+   * @return data reference
+   * @throws QueryException query exception
+   */
+  public Data data(final byte[] input, final boolean col, final InputInfo ii)
+      throws QueryException {
+
+    // check if a database with the same name has already been opened
     final String in = string(input);
-    for(int d = 0; d < docs; ++d) {
-      if(doc[d].data.meta.name.equals(in)) return doc[d];
+    for(int d = 0; d < datas; ++d) {
+      if(data[d].meta.name.equals(in)) return data[d];
     }
 
-    // check if the document has already been opened
+    // check if a database with the same file path has already been opened
     final IO io = IO.get(in);
-    for(int d = 0; d < docs; ++d) {
-      if(doc[d].data.meta.file.eq(io)) return doc[d];
+    for(int d = 0; d < datas; ++d) {
+      if(data[d].meta.path.eq(io)) return data[d];
     }
 
-    // get database instance
-    Data data = null;
+    // retrieve and add new data reference
+    Data d = doc(in, ctx.baseURI == Uri.EMPTY, col, ii);
+    if(d == null) d = doc(ctx.base().merge(in).path(), true, col, ii);
+    addData(d);
+    return d;
+  }
 
-    if(db) {
-      try {
-        data = Open.open(in, ctx.context);
-      } catch(final IOException ex) {
-        NODB.thrw(ii, in);
-      }
+  /**
+   * Adds a collection instance or returns an existing one.
+   * @param input name of the collection to be returned
+   * @param ii input info
+   * @return collection iterator
+   * @throws QueryException query exception
+   */
+  public Iter collection(final byte[] input, final InputInfo ii)
+      throws QueryException {
+
+    // no collection specified.. return default collection/current context set
+    int c = 0;
+    if(input == null) {
+      // no default collection was defined
+      if(colls == 0) NODEFCOLL.thrw(ii);
     } else {
-      final IO file = ctx.base();
-      data = doc(in, file == null, col, ii);
-      if(data == null) data = doc(file.merge(in).path(), true, col, ii);
-    }
+      // invalid collection reference
+      if(contains(input, '<') || contains(input, '\\')) COLLINV.thrw(ii, input);
+      // find specified collection
+      while(c < colls && !eq(collName[c], input)) ++c;
 
-    // add node to global array
-    final DBNode node = new DBNode(data, 0, Data.DOC);
-    if(!data.single() && !col) EXPSINGLE.thrw(ii);
-    addDoc(node);
-    return node;
+      // add new collection if not found
+      if(c == colls) {
+        final int s = indexOf(input, '/');
+        if(s == -1) {
+          addCollection(data(input, true, ii), EMPTY);
+        } else {
+          addCollection(data(substring(input, 0, s), true, ii),
+              substring(input, s + 1));
+        }
+      }
+    }
+    return coll[c].iter();
+  }
+
+  /**
+   * Returns the common data reference of all context items, or {@code null}.
+   * @return data reference
+   * @throws QueryException query exception
+   */
+  public Data data() throws QueryException {
+    if(ctx.value == null) return null;
+    if(docNodes()) return data[0];
+
+    final Iter iter = ctx.value.iter();
+    Data db = null;
+    Item it;
+    while((it = iter.next()) != null) {
+      if(!(it instanceof DBNode)) return null;
+      final Data d = ((DBNode) it).data;
+      if(db == null) db = d;
+      else if(db != d) return null;
+    }
+    return db;
+  }
+
+  /**
+   * Returns true if the current context item contains all root document nodes.
+   * @return result of check
+   */
+  public boolean docNodes() {
+    // check if a global data reference exists, if context value and first
+    // collection reference are equal, and if first item is a document node
+    final Value val = ctx.value;
+    return globalData && val.sameAs(coll[0]) && val.size() != 0 &&
+      (val.item() ? (Item) val : val.iter(ctx).next()).type == Type.DOC;
+  }
+
+  /**
+   * Adds documents of the specified data reference as a collection.
+   * @param name name of collection
+   * @param inputs documents
+   * @throws QueryException query exception
+   */
+  public void addCollection(final byte[] name, final byte[][] inputs)
+      throws QueryException {
+
+    final int ns = inputs.length;
+    final DBNode[] nodes = new DBNode[ns];
+    for(int n = 0; n < ns; n++) {
+      nodes[n] = new DBNode(data(inputs[n], true, null), 0, Data.DOC);
+    }
+    addCollection(Seq.get(nodes, ns), name);
+  }
+
+  // PRIVATE METHODS ==========================================================
+
+  /**
+   * Adds documents of the specified data reference as a collection.
+   * @param d data reference
+   * @param path inner collection path
+   */
+  private void addCollection(final Data d, final byte[] path) {
+    addCollection(DBDocSeq.get(d.doc(string(path)), d), token(d.meta.name));
   }
 
   /**
@@ -158,7 +250,7 @@ public final class QueryResources {
    * @param err error flag
    * @param col collection flag
    * @param ii input info
-   * @return data instance
+   * @return data reference
    * @throws QueryException query exception
    */
   private Data doc(final String path, final boolean err, final boolean col,
@@ -173,115 +265,29 @@ public final class QueryResources {
   }
 
   /**
-   * Adds a collection to the global document list.
-   * @param node node to be added
+   * Adds a data reference to the global list.
+   * @param d data reference to be added
    */
-  public void addDoc(final DBNode node) {
-    if(docs == doc.length) {
-      final DBNode[] tmp = new DBNode[Array.newSize(docs)];
-      System.arraycopy(doc, 0, tmp, 0, docs);
-      doc = tmp;
+  private void addData(final Data d) {
+    if(datas == data.length) {
+      final Data[] tmp = new Data[Array.newSize(datas)];
+      System.arraycopy(data, 0, tmp, 0, datas);
+      data = tmp;
     }
-    doc[docs++] = node;
-  }
-
-  /**
-   * Adds database documents as a collection.
-   * @param db database reference
-   * @param input inner collection path
-   */
-  private void addDocs(final DBNode db, final byte[] input) {
-    final NodIter col = new NodIter();
-    final Data data = db.data;
-    final IntList il = data.doc(string(input));
-    for(int i = 0; i < il.size(); i++) col.add(new DBNode(data, il.get(i)));
-    addCollection(col, token(data.meta.name));
-  }
-
-  /**
-   * Adds a collection instance or returns an existing one.
-   * @param input name of the collection to be returned
-   * @param ii input info
-   * @return collection
-   * @throws QueryException query exception
-   */
-  public NodIter coll(final byte[] input, final InputInfo ii)
-      throws QueryException {
-
-    // no collection specified.. return default collection/current context set
-    int c = 0;
-    if(input == null) {
-      // no default collection was defined
-      if(colls == 0) NODEFCOLL.thrw(ii);
-    } else {
-      // invalid collection reference
-      if(contains(input, '<') || contains(input, '\\')) COLLINV.thrw(ii, input);
-      // find specified collection
-      while(c < colls && !eq(collName[c], input)) ++c;
-      // add new collection if not found
-      if(c == colls) {
-        final int s = indexOf(input, '/');
-        if(s == -1) {
-          addDocs(doc(input, true, false, ii), EMPTY);
-        } else {
-          addDocs(doc(substring(input, 0, s), true, false, ii),
-              substring(input, s + 1));
-        }
-      }
-    }
-    return new NodIter(coll[c].item, (int) coll[c].size());
+    data[datas++] = d;
   }
 
   /**
    * Adds a collection to the global collection list.
-   * @param ni collection nodes
+   * @param nodes collection nodes
    * @param name name
    */
-  public void addCollection(final NodIter ni, final byte[] name) {
+  private void addCollection(final Value nodes, final byte[] name) {
     if(colls == coll.length) {
       coll = Arrays.copyOf(coll, colls << 1);
       collName = Array.copyOf(collName, colls << 1);
     }
-    coll[colls] = ni;
+    coll[colls] = nodes;
     collName[colls++] = name;
   }
-
-  /**
-   * Returns the common database reference of all items, or {@code null}.
-   * @return database reference
-   * @throws QueryException query exception
-   */
-  public Data data() throws QueryException {
-    if(ctx.value == null) return null;
-    if(docNodes()) return doc[0].data;
-
-    final Iter iter = ctx.value.iter();
-    Data data = null;
-    Item it;
-    while((it = iter.next()) != null) {
-      if(!(it instanceof DBNode)) return null;
-      final Data d = ((DBNode) it).data;
-      if(data != null && d != data) return null;
-      data = d;
-    }
-    return data;
-  }
-
-  /**
-   * Returns true if the current context item contains all root document nodes.
-   * @return result of check
-   */
-  public boolean docNodes() {
-    return ctx.value instanceof Seq && ctx.value.sameAs(Seq.get(doc, docs));
-  }
-
-  /**
-   * Closes the context.
-   * @throws IOException I/O exception
-   */
-  void close() throws IOException {
-    for(int d = rootDocs; d < docs; ++d) Close.close(ctx.context, doc[d].data);
-    docs = 0;
-  }
-
 }

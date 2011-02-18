@@ -59,7 +59,7 @@ import org.basex.util.Util;
  * This class is the main window of the GUI. It is the central instance
  * for user interactions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class GUI extends AGUI {
@@ -377,8 +377,7 @@ public final class GUI extends AGUI {
       command = c;
 
       // execute command and cache result
-      final ArrayOutput ao =
-        new ArrayOutput().max(context.prop.num(Prop.MAXTEXT));
+      final ArrayOutput ao = new ArrayOutput().max(gprop.num(GUIProp.MAXTEXT));
       final boolean up = c.updating(context);
       updating = up;
 

@@ -12,7 +12,7 @@ import org.basex.util.Util;
 /**
  * This class contains some methods for performing advanced query tests.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class AdvancedQueryTest {
@@ -94,7 +94,7 @@ public abstract class AdvancedQueryTest {
    */
   protected String check(final FunDef def, final Class<?>... args) {
     final String desc = def.toString();
-    String name = pref + ":" + desc.replaceAll("\\(.*", "");
+    final String name = pref + ":" + desc.replaceAll("\\(.*", "");
     final int max = desc.contains("()") ? 0 : desc.split(",").length;
     final int min = max + 1 - desc.split("\\?").length;
     if(max != args.length) Util.notexpected("Check #arguments: " + def);

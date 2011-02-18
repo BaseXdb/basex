@@ -6,7 +6,7 @@ import org.basex.core.Text;
 /**
  * This class contains common tokens for the query implementations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public interface QueryTokens {
@@ -110,8 +110,6 @@ public interface QueryTokens {
   String FTNOT = "ftnot";
   /** Parser token. */
   String FTOR = "ftor";
-  /** Parser token. */
-  String FULLTEXT = "fulltext";
   /** Parser token. */
   String FUZZY = "fuzzy";
   /** Parser token. */

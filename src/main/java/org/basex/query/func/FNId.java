@@ -20,7 +20,7 @@ import org.basex.util.TokenList;
 /**
  * ID functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNId extends Fun {
@@ -207,7 +207,7 @@ final class FNId extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && def == FunDef.ELID ||
+    return u == Use.X30 && def == FunDef.ELID ||
       u == Use.CTX && expr.length == 1 || super.uses(u);
   }
 }

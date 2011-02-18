@@ -13,7 +13,7 @@ import org.basex.util.TokenBuilder;
  * access is needed, it is advisable to directly work on the {@link Data}
  * class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ViewData {

@@ -10,7 +10,7 @@ import org.basex.gui.dialog.Dialog;
 /**
  * Project specific RadioButton implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BaseXRadio extends JRadioButton {
@@ -24,7 +24,7 @@ public final class BaseXRadio extends JRadioButton {
     super(label, sel);
     setOpaque(false);
     setBorder(new EmptyBorder(0, 0, 0, 16));
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
 
     if(!(win instanceof Dialog)) return;
     addActionListener(new ActionListener() {

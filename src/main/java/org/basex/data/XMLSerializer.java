@@ -18,7 +18,7 @@ import org.basex.util.Util;
 /**
  * This class serializes trees as XML.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class XMLSerializer extends Serializer {
@@ -42,18 +42,22 @@ public final class XMLSerializer extends Serializer {
   private final TokenList cdata = new TokenList();
   /** Indentation flag. */
   private final boolean indent;
+  /** Format items. */
+  private final boolean items;
   /** URI escape flag. */
   private final boolean escape;
   /** Include content type flag. */
   private final boolean content;
   /** URI for wrapped results. */
-  private final byte[] wrapUri;
+  private final byte[] wUri;
   /** Prefix for wrapped results. */
-  private final byte[] wrapPre;
+  private final byte[] wPre;
   /** Wrapper flag. */
   private final boolean wrap;
   /** Number of spaces to indent. */
-  private final int spaces;
+  private final int indents;
+  /** Tabular character. */
+  private final char tab;
   /** Encoding. */
   private final String enc;
   /** XML version. */
@@ -121,14 +125,16 @@ public final class XMLSerializer extends Serializer {
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
     media   = p.get(S_MEDIA_TYPE);
-    indent  = p.check(S_INDENT, YES, NO).equals(YES);
+    items   = p.check(S_FORMAT, YES, NO).equals(YES);
+    indent  = p.check(S_INDENT, YES, NO).equals(YES) && items;
     undecl  = p.check(S_UNDECLARE_PREFIXES, YES, NO).equals(YES);
     escape  = p.check(S_ESCAPE_URI_ATTRIBUTES, YES, NO).equals(YES);
     content = p.check(S_INCLUDE_CONTENT_TYPE, YES, NO).equals(YES);
-    spaces  = Math.max(0, toInt(p.get(S_INDENT_SPACES)));
-    wrapPre = token(p.get(S_WRAP_PRE));
-    wrapUri = token(p.get(S_WRAP_URI));
-    wrap    = wrapPre.length != 0;
+    indents = Math.max(0, toInt(p.get(S_INDENTS)));
+    tab     = p.check(S_TABULATOR, YES, NO).equals(YES) ? '\t' : ' ';
+    wPre = token(p.get(S_WRAP_PREFIX));
+    wUri = token(p.get(S_WRAP_URI));
+    wrap    = wPre.length != 0 || wUri.length != 0;
 
     if(docsys.isEmpty()) {
       docsys = null;
@@ -174,8 +180,8 @@ public final class XMLSerializer extends Serializer {
 
     // open results element
     if(wrap) {
-      openElement(concat(wrapPre, COL, RESULTS));
-      namespace(wrapPre, wrapUri);
+      openElement(wPre.length != 0 ? concat(wPre, COL, RESULTS) : RESULTS);
+      namespace(wPre, wUri);
       finishElement();
     }
   }
@@ -209,7 +215,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void openResult() throws IOException {
     if(wrap) {
-      openElement(concat(wrapPre, COL, RESULT));
+      openElement(wPre.length != 0 ? concat(wPre, COL, RESULT) : RESULT);
       ind = false;
     }
   }
@@ -229,7 +235,7 @@ public final class XMLSerializer extends Serializer {
     print(' ');
     print(n);
 
-    final byte[] tagatt = mth == M_XML || tags.size() > 0 ? EMPTY :
+    final byte[] tagatt = mth == M_XML || tags.size() == 0 ? EMPTY :
       concat(lc(tags.get(tags.size() - 1)), COL, lc(n));
 
     // don't append value for boolean attributes
@@ -326,7 +332,7 @@ public final class XMLSerializer extends Serializer {
     finishElement();
     if(ind) print(' ');
     for(int k = 0; k < b.length; k += cl(b, k)) ch(cp(b, k));
-    ind = true;
+    ind = items;
     item = true;
   }
 
@@ -446,8 +452,8 @@ public final class XMLSerializer extends Serializer {
       item = false;
     } else {
       print(NL);
-      for(int l = 0, ls = (level() - (close ? 0 : 1)) * spaces; l < ls; ++l)
-        print(' ');
+      final int ls = (level() - (close ? 0 : 1)) * indents;
+      for(int l = 0; l < ls; ++l) print(tab);
     }
   }
 

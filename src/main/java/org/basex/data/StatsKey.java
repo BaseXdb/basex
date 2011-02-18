@@ -10,7 +10,7 @@ import org.basex.util.TokenSet;
  * This class provides statistics for a tag or attribute name
  * and its contents.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class StatsKey {
@@ -90,7 +90,7 @@ public final class StatsKey {
     } else if(kind == Kind.CAT) {
       final int cl = cats.size();
       out.writeNum(cl);
-      for(int i = 1; i <= cl; ++i) out.writeToken(cats.key(i));
+      for(final byte[] k : cats) out.writeToken(k);
     }
     out.writeNum(counter);
     out.writeBool(leaf);

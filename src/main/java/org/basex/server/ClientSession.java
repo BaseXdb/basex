@@ -38,7 +38,7 @@ import org.basex.util.Token;
  * command to the server.</li>
  * </ul>
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ClientSession extends Session {
@@ -56,7 +56,7 @@ public final class ClientSession extends Session {
   OutputStream sink;
   /** Trigger notifications. */
   Map<String, List<TriggerNotification>> tn;
-  
+
 //  public OutputStream offout;
 
   /**
@@ -117,7 +117,7 @@ public final class ClientSession extends Session {
       final String pw, final OutputStream output) throws IOException {
 
     super(output);
-    
+
     // initialize trigger notifications
     tn = new HashMap<String, List<TriggerNotification>>();
 
@@ -138,7 +138,7 @@ public final class ClientSession extends Session {
 
     // receive success flag
     if(!ok(bi)) throw new LoginException();
-    
+
     // final OutputStream o = new FileOutputStream("out_" + user + ".txt");
     new Thread("ClientSession " + user + ": Input Thread"
         + Thread.activeCount()) {
@@ -175,14 +175,14 @@ public final class ClientSession extends Session {
                   o.write(inf.getBytes());
               }
             }
-            
+
             // Set sink as unset.
             if (sink != null) {
               sink.flush();
               sink = null;
             } else {
               String res = o.toString();
-              
+
               if(!"".equals(res)) {
                 int idx = res.indexOf(' ');
                 String name = res.substring(0, idx);
@@ -252,7 +252,7 @@ public final class ClientSession extends Session {
   public ClientQuery query(final String query) throws BaseXException {
     return new ClientQuery(query, this);
   }
-  
+
   /**
    * Creates a trigger.
    * @param name trigger name
@@ -261,7 +261,7 @@ public final class ClientSession extends Session {
   public void createTrigger(final String name) throws BaseXException {
     execute("create trigger " + name);
   }
-  
+
   /**
    * Drops a trigger.
    * @param name trigger name
@@ -270,8 +270,7 @@ public final class ClientSession extends Session {
   public void dropTrigger(final String name) throws BaseXException {
     execute("drop trigger " + name);
   }
-  
-  
+
   /**
    * Attaches to a trigger.
    * @param name trigger name
@@ -281,26 +280,26 @@ public final class ClientSession extends Session {
   public void attachTrigger(final String name,
       final TriggerNotification notification) throws BaseXException {
     execute("attach trigger " + name);
-    
+
     if (tn.get(name) == null)
       tn.put(name, new ArrayList<TriggerNotification>(1));
-    
+
     tn.get(name).add(notification);
   }
-  
+
   /**
    * Detaches from a trigger.
    * @param name trigger name
    * @throws BaseXException exception
    */
   public void detachTrigger(final String name) throws BaseXException {
-    
+
     // empty trigger notification list.
     tn.put(name, null);
-    
+
     execute("detach trigger " + name);
   }
-  
+
   /**
    * Executes a trigger.
    * @param query query string
@@ -357,15 +356,15 @@ public final class ClientSession extends Session {
 //    }
 
     synchronized(lock) {
-      
+
       this.sink = os;
-      
+
       try {
         send(cmd);
       } catch(IOException e) {
         throw new BaseXException(e);
       }
-      
+
       try {
 //        System.out.println("LOCKED");
         lock.wait();

@@ -23,11 +23,12 @@ import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
+import org.basex.util.ft.Scoring;
 
 /**
  * FTContains expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class FTContains extends ParseExpr {
@@ -78,7 +79,7 @@ public class FTContains extends ParseExpr {
         // no scoring found - use default value
         if(d == 0) d = 1;
       }
-      s = ctx.score.and(s, d);
+      s = Scoring.and(s, d);
 
       // add entry to visualization
       if(d > 0 && ctx.ftpos != null && it instanceof DBNode) {

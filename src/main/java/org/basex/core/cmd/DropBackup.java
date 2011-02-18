@@ -13,7 +13,7 @@ import org.basex.io.IO;
 /**
  * Evaluates the 'drop backup' command and deletes backups of a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DropBackup extends Command {

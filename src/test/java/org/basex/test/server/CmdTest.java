@@ -21,7 +21,7 @@ import static org.basex.util.Token.*;
 /**
  * This class tests the database commands.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class CmdTest {
@@ -262,7 +262,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void help() {
-    ok(new Help(""));
+    no(new Help("bla"));
     ok(new Help(null));
   }
 
@@ -292,11 +292,11 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void infoTable() {
-    no(new InfoTable("1", "2"));
+    no(new InfoStorage("1", "2"));
     ok(new CreateDB(NAME, FILE));
-    ok(new InfoTable("1", "2"));
-    ok(new InfoTable("1", null));
-    ok(new InfoTable("// li", null));
+    ok(new InfoStorage("1", "2"));
+    ok(new InfoStorage("1", null));
+    ok(new InfoStorage("// li", null));
   }
 
   /** Command test. */
@@ -312,6 +312,14 @@ public class CmdTest {
     ok(new List());
     ok(new CreateDB(NAME, FILE));
     ok(new List());
+  }
+
+  /** Command test. */
+  @Test
+  public final void listdb() {
+    no(new ListDB(NAME));
+    ok(new CreateDB(NAME, FILE));
+    ok(new ListDB(NAME));
   }
 
   /** Command test. */
@@ -352,6 +360,13 @@ public class CmdTest {
     ok(new Open(NAME));
     no(new Restore(NAME));
     ok(new XQuery("."));
+    ok(new CreateDB("test-1"));
+    ok(new Backup("test-1"));
+    ok(new Restore("test-1"));
+    ok(new DropBackup("test"));
+    no(new Restore("test"));
+    ok(new DropBackup("test-1"));
+    ok(new DropDB("test-1"));
     ok(new Close());
   }
 

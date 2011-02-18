@@ -7,7 +7,7 @@ import org.basex.gui.layout.BaseXButton;
  * This is the toolbar of the main window.
  * The toolbar contents are defined in {@link GUIConstants#TOOLBAR}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class GUIToolBar extends JToolBar {

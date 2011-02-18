@@ -1,7 +1,6 @@
 package org.basex.test.server;
 
 import static org.junit.Assert.*;
-import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
@@ -20,7 +19,7 @@ import org.junit.Test;
 /**
  * This class tests the four locking cases.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
 public final class LockingTest {
@@ -47,6 +46,7 @@ public final class LockingTest {
     "for $n at $p in doc('factbook')//city " +
     "where $c/@id = $n/@country and $n/name = 'Tirane' " +
     "return $n/population/text()";
+
   /** Number of performance tests. */
   private static final int TESTS = 3;
 
@@ -60,12 +60,14 @@ public final class LockingTest {
   /** Status of test. */
   boolean done;
 
-  /** Starts the server. */
+  /** Starts the server.
+   * @throws IOException exception
+   */
   @BeforeClass
-  public static void start() {
+  public static void start() throws IOException {
     server = new BaseXServer("-z");
-    session1 = createSession();
-    session2 = createSession();
+    session1 = newSession();
+    session2 = newSession();
   }
 
   /**
@@ -83,12 +85,23 @@ public final class LockingTest {
 
   /**
    * Runs a test for concurrent database creations.
-   * @throws BaseXException database exception
+   * @throws Exception database exception
    */
   @Test
-  public void createTest() throws BaseXException {
+  public void createTest() throws Exception {
+
+    // first thread
+    final Thread t1 = new Thread() {
+      @Override
+      public void run() {
+        try {
+          session1.execute(new CreateDB(NAME, FILE));
+        } catch(final BaseXException ex) {
+        }
+      }
+    };
     // second thread
-    new Thread() {
+    final Thread t2 = new Thread() {
       @Override
       public void run() {
         // wait until first command is running
@@ -99,10 +112,14 @@ public final class LockingTest {
         } catch(final BaseXException ex) {
         }
       }
-    }.start();
+    };
 
-    // first (main) thread
-    session1.execute(new CreateDB(NAME, FILE));
+    // start and join threads
+    t1.start();
+    t2.start();
+    t1.join();
+    t2.join();
+
     // opens DB in session2 for further tests
     session2.execute(new Open(NAME));
 
@@ -154,23 +171,15 @@ public final class LockingTest {
   /** Number of done tests. */
   static int tdone;
 
-  /** Efficiency test. */
+  /** Efficiency test.
+   * @throws Exception exception
+   */
   @Test
-  public void efficiencyTest() {
-    for(int i = 0; i < TESTS; ++i) {
-      final ClientSession s = createSession();
-      new Thread() {
-        @Override
-        public void run() {
-          if(!checkRes(new XQuery(PERF), s).equals("192000"))
-            fail("efficiency test failed");
-          synchronized(this) { ++tdone; }
-        }
-      }.start();
-    }
-
-    // wait until all test have been finished
-    while(tdone < TESTS) Performance.sleep(100);
+  public void efficiencyTest() throws Exception {
+    final Client[] cl = new Client[TESTS];
+    for(int i = 0; i < TESTS; ++i) cl[i] = new Client();
+    for(final Client c : cl) c.start();
+    for(final Client c : cl) c.join();
   }
 
   /**
@@ -211,16 +220,12 @@ public final class LockingTest {
   }
 
   /**
-   * Creates a client session.
-   * @return client session
+   * Returns a session instance.
+   * @return session
+   * @throws IOException exception
    */
-  private static ClientSession createSession() {
-    try {
-      return new ClientSession(server.context, ADMIN, ADMIN);
-    } catch(final IOException ex) {
-      fail(ex.toString());
-    }
-    return null;
+  static ClientSession newSession() throws IOException {
+    return new ClientSession("localhost", 1984, "admin", "admin");
   }
 
   /**
@@ -229,12 +234,32 @@ public final class LockingTest {
    * @param session session
    * @return String result
    */
-  String checkRes(final Command cmd, final Session session) {
+  static String checkRes(final Command cmd, final Session session) {
     try {
       return session.execute(cmd);
     } catch(final BaseXException ex) {
       fail(ex.toString());
       return null;
+    }
+  }
+
+  /** Single client. */
+  static class Client extends Thread {
+    /** Client session. */
+    private final ClientSession session;
+
+    /**
+     * Default constructor.
+     * @throws IOException exception
+     */
+    public Client() throws IOException {
+        session = newSession();
+    }
+
+    @Override
+    public void run() {
+      if(!checkRes(new XQuery(PERF), session).equals("192000"))
+        fail("efficiency test failed");
     }
   }
 }

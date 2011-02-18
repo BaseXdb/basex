@@ -17,7 +17,7 @@ import org.basex.util.ft.Language;
 /**
  * This class provides meta information on a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class MetaData {
@@ -31,9 +31,9 @@ public final class MetaData {
 
   /** Encoding of XML document. */
   public String encoding = UTF8;
-  /** Original filename of XML document. */
-  public IO file;
-  /** Original file size of XML document. */
+  /** Path to original documents. */
+  public IO path;
+  /** Size of original documents. */
   public long filesize;
   /** Number of XML documents. */
   public int ndocs;
@@ -71,6 +71,8 @@ public final class MetaData {
   /** Scoring mode: see {@link Prop#SCORING}. */
   public int scoring;
 
+  /** Root paths. */
+  protected DataPaths paths = new DataPaths();
   /** Flag for removed index structures. */
   public boolean uptodate = true;
   /** Dirty flag. */
@@ -187,6 +189,7 @@ public final class MetaData {
     textindex = false;
     attrindex = false;
     ftindex = false;
+    paths.update();
   }
 
   /**
@@ -207,7 +210,7 @@ public final class MetaData {
       if(k.equals(DBSTR))         storage    = v;
       else if(k.equals(IDBSTR))   istorage   = v;
       else if(k.equals(DBSIZE))   size       = toInt(v);
-      else if(k.equals(DBFNAME))  file       = IO.get(v);
+      else if(k.equals(DBFNAME))  path       = IO.get(v);
       else if(k.equals(DBFSIZE))  filesize   = toLong(v);
       else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
       else if(k.equals(DBFTDC))   diacritics = toBool(v);
@@ -257,7 +260,7 @@ public final class MetaData {
   void write(final DataOutput out) throws IOException {
     writeInfo(out, DBSTR,    STORAGE);
     writeInfo(out, IDBSTR,   ISTORAGE);
-    writeInfo(out, DBFNAME,  file.path());
+    writeInfo(out, DBFNAME,  path.path());
     writeInfo(out, DBFSIZE,  filesize);
     writeInfo(out, DBNDOCS,  ndocs);
     writeInfo(out, DBENC,    encoding);

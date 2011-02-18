@@ -1,4 +1,4 @@
-package org.basex.test.collections;
+package org.basex.test.build;
 
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
@@ -15,7 +15,7 @@ import org.junit.Test;
 /**
  * Tests for creating databases and adding documents.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CreateTest {
@@ -33,7 +33,7 @@ public final class CreateTest {
   private static final String PATH = "etc/xml/input.xml";
   /** Test folder. */
   private static final String FOLDER = "etc/xml/dir";
-  /** Test XML Fragment. */
+  /** Test XML fragment. */
   private static final String FRAG = "<xml/>";
 
   /** First document in test folder. */

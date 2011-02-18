@@ -4,7 +4,7 @@ package org.basex.query.iter;
  * Iterator interface, extending the default iterator with a {@link #more}
  * method.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class NodeMore extends NodeIter {

@@ -20,7 +20,7 @@ import org.basex.util.XMLToken;
 /**
  * String functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNStr extends Fun {
@@ -266,7 +266,7 @@ final class FNStr extends Fun {
 
       try {
         form = Normalizer.Form.valueOf(string(n));
-      } catch(final IllegalArgumentException e) {
+      } catch(final IllegalArgumentException ex) {
         NORMUNI.thrw(input, n);
       }
     }
@@ -291,7 +291,7 @@ final class FNStr extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && def == FunDef.STRJOIN && expr.length == 1 ||
+    return u == Use.X30 && def == FunDef.STRJOIN && expr.length == 1 ||
       super.uses(u);
   }
 }

@@ -13,7 +13,7 @@ import org.junit.Test;
 /**
  * This class tests the functions of the file library.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
 public final class FNFileTest extends AdvancedQueryTest {
@@ -119,7 +119,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void testLastModified() throws BaseXException {
     final String fun = check(FunDef.LASTMOD, String.class);
-    assertTrue(query(fun + "('" + Prop.TMP + "')").length() != 0);
+    assertTrue(!query(fun + "('" + Prop.TMP + "')").isEmpty());
   }
 
   /**

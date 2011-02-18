@@ -3,7 +3,7 @@ package org.basex.util;
 /**
  * This class parses command-line arguments.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Args {
@@ -118,5 +118,10 @@ public final class Args {
   public boolean finish() {
     if(!ok) Util.outln("Usage: " + Util.name(obj) + usage);
     return ok;
+  }
+
+  @Override
+  public String toString() {
+    return args;
   }
 }

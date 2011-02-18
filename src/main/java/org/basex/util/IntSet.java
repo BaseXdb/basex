@@ -6,7 +6,7 @@ import java.util.Arrays;
  * This is a simple hash set, storing keys in byte arrays.
  * The {@link IntMap} class extends it to a hash map.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class IntSet {
@@ -60,14 +60,6 @@ public class IntSet {
       if(key == keys[id]) return id;
     }
     return 0;
-  }
-
-  /**
-   * Returns number of entries.
-   * @return number of entries
-   */
-  public final int size() {
-    return size - 1;
   }
 
   /**

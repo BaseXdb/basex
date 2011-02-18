@@ -15,7 +15,7 @@ import org.basex.util.Util;
 /**
  * Open database dialog.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class DialogPass extends Dialog {
@@ -40,7 +40,7 @@ final class DialogPass extends Dialog {
         if(!modifier(e)) action(ENTER.is(e) ? e.getSource() : null);
       }
     });
-    info = new BaseXLabel();
+    info = new BaseXLabel(" ");
 
     final BaseXBack p = new BaseXBack(new BorderLayout(0, 8));
     p.add(pass, BorderLayout.NORTH);

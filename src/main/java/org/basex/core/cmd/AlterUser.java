@@ -10,7 +10,7 @@ import org.basex.core.Commands.CmdAlter;
 /**
  * Evaluates the 'alter user' command and alters the password of a user.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class AlterUser extends Command {

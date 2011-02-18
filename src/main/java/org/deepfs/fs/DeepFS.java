@@ -28,7 +28,7 @@ import org.deepfs.fsml.DeepNS;
 /**
  * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Alexander Holupirek, Christian Gruen, Hannes Schwarz, Bastian Lemke
  */
 public final class DeepFS implements DataText {
@@ -668,7 +668,7 @@ public final class DeepFS implements DataText {
    * Closes the fuse instance.
    * @throws IOException I/O exception
    */
-  public void close() throws IOException {
+  public synchronized void close() throws IOException {
     if(data.meta.prop.is(Prop.FUSE)) {
       final String method = "[" + Text.NAME + ".close] ";
       Util.debug(method + "Initiating DeepFS shutdown sequence ");

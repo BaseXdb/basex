@@ -13,7 +13,7 @@ import org.basex.util.Util;
 /**
  * This class serializes trees in the DOT syntax.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DOTSerializer extends Serializer {
@@ -109,13 +109,14 @@ public final class DOTSerializer extends Serializer {
   @Override
   public void comment(final byte[] t) throws IOException {
     finishElement();
-    print(concat(COM1, norm(t), COM2), DOTData.COMM);
+    print(new TokenBuilder(COM1).add(norm(t)).add(COM2).finish(), DOTData.COMM);
   }
 
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
     finishElement();
-    print(concat(PI1, n, SPACE, v, PI2), DOTData.PI);
+    print(new TokenBuilder(PI1).add(n).add(SPACE).add(v).add(PI2).finish(),
+        DOTData.PI);
   }
 
   @Override

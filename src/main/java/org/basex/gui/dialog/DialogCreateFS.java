@@ -1,3 +1,4 @@
+/*
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
@@ -27,49 +28,49 @@ import org.basex.util.Util;
 /**
  * Dialog window for specifying the options for importing a file system.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
- */
+
 public final class DialogCreateFS extends Dialog {
-  /** Available databases. */
+  /** Available databases.
   private final StringList db;
-  /** Database info. */
+  /** Database info.
   private final BaseXLabel info;
-  /** Parsing complete filesystem. */
+  /** Parsing complete filesystem.
   private final BaseXCheckBox all;
-  /** Browse button. */
+  /** Browse button.
   private final BaseXButton browse;
-  /** ID3 parsing. */
+  /** ID3 parsing.
   private final BaseXCheckBox meta;
-  /** Context inclusion. */
+  /** Context inclusion.
   private final BaseXCheckBox cont;
-  /** XML inclusion. */
+  /** XML inclusion.
   private final BaseXCheckBox xml;
-  /** Button panel. */
+  /** Button panel.
   private final BaseXBack buttons;
-  /** ComboBox. */
+  /** ComboBox.
   private final BaseXCombo maxsize;
 
-  /** Path summary flag. */
+  /** Path summary flag.
   private final BaseXCheckBox pathindex;
-  /** Text index flag. */
+  /** Text index flag.
   private final BaseXCheckBox txtindex;
-  /** Attribute value index flag. */
+  /** Attribute value index flag.
   private final BaseXCheckBox atvindex;
-  /** Full-text index flag. */
+  /** Full-text index flag.
   private final BaseXCheckBox ftxindex;
-  /** Editable full-text options. */
+  /** Editable full-text options.
   private final DialogFT ft;
 
-  /** Directory path. */
+  /** Directory path.
   final BaseXTextField path;
-  /** Database name. */
+  /** Database name.
   final BaseXTextField dbname;
 
   /**
    * Default constructor.
    * @param main reference to the main window
-   */
+
   public DialogCreateFS(final GUI main) {
     super(main, CREATEFSTITLE);
     db = List.list(main.context);
@@ -118,7 +119,7 @@ public final class DialogCreateFS extends Dialog {
     p.add(dbname);
     p1.add(p, BorderLayout.CENTER);
 
-    info = new BaseXLabel();
+    info = new BaseXLabel(" ");
     p1.add(info, BorderLayout.SOUTH);
 
     // Metadata panel
@@ -272,3 +273,4 @@ public final class DialogCreateFS extends Dialog {
     ft.close();
   }
 }
+*/

@@ -15,13 +15,11 @@ import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateFS;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.Cs;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.Export;
-import org.basex.core.cmd.Mount;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.XQuery;
@@ -32,7 +30,6 @@ import org.basex.gui.dialog.DialogAbout;
 import org.basex.gui.dialog.DialogAdd;
 import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
-import org.basex.gui.dialog.DialogCreateFS;
 import org.basex.gui.dialog.DialogEdit;
 import org.basex.gui.dialog.DialogExport;
 import org.basex.gui.dialog.DialogFontChooser;
@@ -40,11 +37,10 @@ import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogInfo;
 import org.basex.gui.dialog.DialogInsert;
 import org.basex.gui.dialog.DialogMapLayout;
-import org.basex.gui.dialog.DialogMountFS;
 import org.basex.gui.dialog.DialogOpen;
 import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
-import org.basex.gui.dialog.DialogRename;
+import org.basex.gui.dialog.DialogInput;
 import org.basex.gui.dialog.DialogServer;
 import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.layout.BaseXFileChooser;
@@ -56,13 +52,12 @@ import org.basex.util.Array;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.Util;
-import org.deepfs.util.LibraryLoader;
 
 /**
  * This enumeration encapsulates all commands that are triggered by
  * GUI operations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public enum GUICommands implements GUICommand {
@@ -122,10 +117,8 @@ public enum GUICommands implements GUICommand {
   DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogRename dialog = new DialogRename("", DROPTITLE, gui,
-          false, false);
-      if(dialog.ok()) DialogProgress.execute(gui, "",
-          new Delete(dialog.name()));
+      final DialogInput d = new DialogInput("", DROPTITLE, gui, false, false);
+      if(d.ok()) DialogProgress.execute(gui, "", new Delete(d.input()));
     }
   },
 
@@ -143,7 +136,7 @@ public enum GUICommands implements GUICommand {
         IO file = null;
         boolean overwrite = false;
         final Data d = gui.context.data;
-        for(final int pre : d.doc().toArray()) {
+        for(final int pre : d.doc()) {
           file = root.merge(Token.string(d.text(pre, true)));
           if(file.exists()) {
             if(overwrite) {
@@ -236,8 +229,7 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final BaseXFileChooser fc = new BaseXFileChooser(GUIOPEN,
           gui.gprop.get(GUIProp.XQPATH), gui);
-        fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIX, IO.XQMSUFFIX,
-            IO.XQYSUFFIX, IO.XQLSUFFIX, IO.XQUERYSUFFIX);
+      fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
       final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
       if(file != null) gui.query.setQuery(file);
     }
@@ -765,7 +757,7 @@ public enum GUICommands implements GUICommand {
 
   /* DEEPFS MENU */
 
-  /** Opens a dialog to import given directory as DeepFS instance. */
+  /* Opens a dialog to import given directory as DeepFS instance.
   CREATEFS(GUICREATEFS + DOTS, null, GUICREATEFSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
@@ -778,7 +770,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens a dialog to use DeepFS instance as Desktop Query Engine. */
+  /** Opens a dialog to use DeepFS instance as Desktop Query Engine.
   DQE(GUIDQE + DOTS, null, GUIDQETT, false, false) {
     @Override
     public void execute(final GUI gui) {
@@ -793,7 +785,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens a dialog to mount DeepFS instance as Filesystem in USErspace. */
+  /** Opens a dialog to mount DeepFS instance as Filesystem in USErspace.
   MOUNTFS(GUIMOUNTFS + DOTS, null, GUIMOUNTFSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
@@ -812,7 +804,7 @@ public enum GUICommands implements GUICommand {
       // disable mount button, if native library is not available
       b.setEnabled(LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
     }
-  },
+  }, */
 
   /* HELP MENU */
 
@@ -920,7 +912,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(!gui.context.root());
+      b.setEnabled(gui.context.current != null && !gui.context.root());
     }
   },
 

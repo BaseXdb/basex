@@ -13,7 +13,7 @@ import org.basex.util.Util;
  * Instances of this class are used in the {@link Context} class to
  * reference the currently used, marked, and copied nodes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Nodes implements Result {
@@ -99,14 +99,16 @@ public final class Nodes implements Result {
    * @return self reference
    */
   public Nodes checkRoot() {
-    root = true;
-    int c = 0;
-    for(int p = 0; c < list.length && p < data.meta.size;
-      ++c, p += data.size(p, Data.DOC)) {
-      if(p != list[c]) {
-        root = false;
-        break;
-      }
+    final int[] docs = data.doc();
+    if(list == docs) {
+      root = true;
+    } else if(list.length != docs.length) {
+      root = false;
+    } else {
+      int c = -1;
+      while(++c < list.length && list[c] == docs[c]);
+      root = c == list.length;
+      if(root) list = docs;
     }
     return this;
   }

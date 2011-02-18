@@ -12,7 +12,7 @@ import org.basex.util.InputInfo;
 /**
  * Iterative step expression without positional predicates.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class IterStep extends AxisStep {

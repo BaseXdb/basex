@@ -11,7 +11,7 @@ import java.util.Arrays;
  * Note that, to guarantee a consistent string representation, all string
  * conversions should be done via the methods of this class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Token {
@@ -285,8 +285,6 @@ public final class Token {
    */
   public static int cp(final String string, final int pos) {
     return pos >= 0 && pos < string.length() ? string.charAt(pos) : 0;
-    /*try { return string.codePointAt(pos);
-    } catch(final IndexOutOfBoundsException e) { return 0; }*/
   }
 
   /**
@@ -1007,19 +1005,38 @@ public final class Token {
   }
 
   /**
-   * Concatenates the specified tokens.
-   * @param tokens tokens
+   * Concatenates two tokens.
+   * @param token1 first token
+   * @param token2 second token
    * @return resulting array
    */
-  public static byte[] concat(final byte[]... tokens) {
-    int s = 0;
-    for(final byte[] tt : tokens) s += tt.length;
-    final byte[] tmp = new byte[s];
-    int l = 0;
-    for(final byte[] tt : tokens) {
-      System.arraycopy(tt, 0, tmp, l, tt.length);
-      l += tt.length;
-    }
+  public static byte[] concat(final byte[] token1, final byte[] token2) {
+    final int t1 = token1.length;
+    final int t2 = token2.length;
+    final byte[] tmp = new byte[t1 + t2];
+    System.arraycopy(token1, 0, tmp, 0, t1);
+    System.arraycopy(token2, 0, tmp, t1, t2);
+    return tmp;
+  }
+
+  /**
+   * Concatenates three tokens. A {@link TokenBuilder} instance can be used to
+   * concatenate more than three tokens.
+   * @param token1 first token
+   * @param token2 second token
+   * @param token3 third token
+   * @return resulting array
+   */
+  public static byte[] concat(final byte[] token1, final byte[] token2,
+      final byte[] token3) {
+
+    final int t1 = token1.length;
+    final int t2 = token2.length;
+    final int t3 = token3.length;
+    final byte[] tmp = new byte[t1 + t2 + t3];
+    System.arraycopy(token1, 0, tmp, 0, t1);
+    System.arraycopy(token2, 0, tmp, t1, t2);
+    System.arraycopy(token3, 0, tmp, t1 + t2, t3);
     return tmp;
   }
 

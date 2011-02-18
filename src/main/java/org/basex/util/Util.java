@@ -6,6 +6,7 @@ import java.net.BindException;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.server.LoginException;
@@ -15,7 +16,7 @@ import org.basex.server.LoginException;
  * The methods are used for dumping error output, debugging information,
  * getting the application path, etc.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Util {
@@ -139,6 +140,8 @@ public final class Util {
     else if(ex instanceof ConnectException) return SERVERERROR;
     else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
     else if(ex instanceof SocketException) return SERVERBIND;
+    else if(ex instanceof UnknownHostException)
+      return info(SERVERUNKNOWN, ex.getMessage());
     return ex.getMessage();
   }
 
@@ -235,7 +238,7 @@ public final class Util {
 
     // not found; check application directory
     final File f = new File(applicationPath());
-    final String home = f.isFile() ? f.getPath() : f.getParent();
+    final String home = f.isFile() ? f.getParent() : f.getPath();
     if(new File(home, IO.BASEXSUFFIX).exists()) return home;
 
     // not found; choose user home directory
@@ -246,7 +249,7 @@ public final class Util {
    * Returns the absolute path to this application.
    * @return application path
    */
-  public static String applicationPath() {
+  private static String applicationPath() {
     // raw application path
     final String path = Util.class.getProtectionDomain().
       getCodeSource().getLocation().getPath();

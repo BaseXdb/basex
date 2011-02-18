@@ -3,6 +3,8 @@ package org.basex.util;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 /**
@@ -10,7 +12,7 @@ import java.util.Scanner;
  * It should be guaranteed that the {@link #header} object has the
  * same number of entries as all {@link #contents} string arrays.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Table {
@@ -21,7 +23,7 @@ public final class Table {
   public final TokenList header = new TokenList();
   /** Alignment (false: left, true: right alignment). */
   public final BoolList align = new BoolList();
-  /** Data (usually strings). */
+  /** Table contents. */
   public final ArrayList<TokenList> contents = new ArrayList<TokenList>();
   /** Data description. */
   public String desc;
@@ -69,15 +71,12 @@ public final class Table {
    * Sorts the table by the first column.
    */
   public void sort() {
-    for(int i = 0; i < contents.size() - 1; ++i) {
-      for(int j = i + 1; j < contents.size(); ++j) {
-        if(diff(lc(contents.get(i).get(0)), lc(contents.get(j).get(0))) > 0) {
-          final TokenList tmp = contents.get(i);
-          contents.set(i, contents.get(j));
-          contents.set(j, tmp);
-        }
+    Collections.sort(contents, new Comparator<TokenList>() {
+      @Override
+      public int compare(final TokenList tl1, final TokenList tl2) {
+        return diff(lc(tl1.get(0)), lc(tl2.get(0)));
       }
-    }
+    });
   }
 
   /**

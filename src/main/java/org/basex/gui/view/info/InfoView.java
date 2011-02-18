@@ -24,7 +24,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This view displays query information.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class InfoView extends View {
@@ -144,10 +144,10 @@ public final class InfoView extends View {
       } else if(line.startsWith(QUERYSTRING)) {
         qu = line.substring(s + 1).trim();
       } else if(line.startsWith(QUERYPLAN)) {
-        while(++i < split.length && split[i].length() != 0) plan.add(split[i]);
+        while(++i < split.length && !split[i].isEmpty()) plan.add(split[i]);
         --i;
       } else if(line.startsWith(QUERYCOMP)) {
-        while(++i < split.length && split[i].length() != 0) comp.add(split[i]);
+        while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
       } else if(line.startsWith(QUERYRESULT)) {
         res = line.substring(s + 1).trim();
       } else if(line.startsWith(QUERYEVAL)) {

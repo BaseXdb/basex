@@ -7,10 +7,11 @@ import org.basex.util.Util;
  * This class assembles properties which are used all around the project. They
  * are initially read from and finally written to disk.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Prop extends AProp {
+
   // CONSTANTS ================================================================
 
   /** New line string. */
@@ -47,8 +48,8 @@ public final class Prop extends AProp {
   public static final Object[] DBPATH =
     { "DBPATH", HOME + Text.NAME + "Data" };
   /** Web path. */
-  public static final Object[] RESTPATH =
-    { "RESTPATH", HOME + Text.NAME + "REST" };
+  public static final Object[] JAXRXPATH =
+    { "JAXRXPATH", HOME + Text.NAME + "Web" };
 
   /** Language name. */
   public static final Object[] LANG = { "LANG", "English" };
@@ -61,8 +62,8 @@ public final class Prop extends AProp {
   public static final Object[] PORT = { "PORT", 1984 };
   /** Client/server communication: port, used for starting the server. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
-  /** Client/server communication: port, used for starting the REST server. */
-  public static final Object[] RESTPORT = { "RESTPORT", 8984 };
+  /** Client/server communication: port, used for starting the JAX-RX server. */
+  public static final Object[] JAXRXPORT = { "JAXRXPORT", 8984 };
 
   /** Server timeout in seconds; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
@@ -81,6 +82,8 @@ public final class Prop extends AProp {
   public static final Object[] SERIALIZE = { "SERIALIZE", true };
   /** Flag for wrapping result nodes. */
   public static final Object[] WRAPOUTPUT = { "WRAPOUTPUT", false };
+  /** External variables, separated by commas. */
+  public static final Object[] BINDINGS = { "BINDINGS", "" };
   /** Serialization parameters, separated by commas. */
   public static final Object[] SERIALIZER = { "SERIALIZER", "" };
   /** Exporter serialization parameters. */
@@ -93,7 +96,7 @@ public final class Prop extends AProp {
   public static final Object[] DOTDISPLAY = { "DOTDISPLAY", true };
   /** Path to dotty. */
   public static final Object[] DOTTY = { "DOTTY", "dotty" };
-  /** Prints a XML plan. */
+  /** Prints an XML plan. */
   public static final Object[] XMLPLAN = { "XMLPLAN", false };
   /** Creates the query plan before or after compilation. */
   public static final Object[] COMPPLAN = { "COMPPLAN", true };
@@ -105,20 +108,23 @@ public final class Prop extends AProp {
   /** Forces database creation for unknown documents. */
   public static final Object[] FORCECREATE = { "FORCECREATE", false };
   /** Default XQuery version. */
-  public static final Object[] XQUERY11 = { "XQUERY11", true };
+  public static final Object[] XQUERY3 = { "XQUERY3", true };
+
+  /** Defines the number of parallel readers. */
+  public static final Object[] PARALLEL = { "PARALLEL", 8 };
 
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };
   /** Flag for parsing DTDs in internal parser. */
   public static final Object[] DTD = { "DTD", false };
-  /** Flag for parsing DTDs in internal parser. */
+  /** Path to XML Catalog file. */
   public static final Object[] CATFILE = { "CATFILE", ""};
   /** Flag for entity parsing in internal parser. */
   public static final Object[] ENTITY = { "ENTITY", false };
   /** Define import parser. */
-  public static final Object[] PARSER = { "PARSER", "" };
-  /** Compress text in database. */
-  public static final Object[] COMPRESS = { "COMPRESS", Integer.MAX_VALUE };
+  public static final Object[] PARSER = { "PARSER", "XML" };
+  /** Define parser options. */
+  public static final Object[] PARSEROPT = { "PARSEROPT", "" };
 
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };
@@ -139,8 +145,6 @@ public final class Prop extends AProp {
   public static final Object[] MAINMEM = { "MAINMEM", false };
   /** Path for filtering XML Documents. */
   public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
-  /** Maximum text size to be displayed. */
-  public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
 
   /** Flag for creating a wildcard index. */
   public static final Object[] WILDCARDS = { "WILDCARDS", false };
@@ -151,18 +155,15 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Language for full-text search index. */
-  public static final Object[] LANGUAGE = { "LANGUAGE", ""};
-
-  /**
-   * Flag for full-text scoring algorithm. Scoring mode: 0 = none, 1 = document
-   * nodes, 2 = text nodes.
-   */
+  public static final Object[] LANGUAGE = { "LANGUAGE", "" };
+  /** Flag for full-text scoring algorithm.
+      Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] SCORING = { "SCORING", 0 };
   /** Path to full-text stopword list. */
   public static final Object[] STOPWORDS = { "STOPWORDS", "" };
-
   /** Levenshtein default error. */
   public static final Object[] LSERROR = { "LSERROR", 0 };
+
   /** Flag for creating flat MAB2 data. */
   public static final Object[] MAB2FLAT = { "MAB2flat", false };
   /** Maximum number of index occurrences to print. */

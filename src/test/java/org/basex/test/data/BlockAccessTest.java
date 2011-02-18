@@ -1,4 +1,4 @@
-package org.basex.test.storage;
+package org.basex.test.data;
 
 import java.io.IOException;
 import org.junit.After;
@@ -19,7 +19,7 @@ import static org.basex.data.DataText.*;
 /**
  * This class tests the update functionality of the BlockStorage.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Tim Petrowsky
  */
 public final class BlockAccessTest {

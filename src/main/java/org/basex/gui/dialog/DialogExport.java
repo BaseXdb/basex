@@ -27,7 +27,7 @@ import org.basex.io.IOFile;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DialogExport extends Dialog {
@@ -67,7 +67,7 @@ public final class DialogExport extends Dialog {
     p.add(out);
     p.add(new BaseXLabel());
 
-    final IO io = gui.context.data.meta.file;
+    final IO io = gui.context.data.meta.path;
     final String fn = io.dir();
     path = new BaseXTextField(fn, this);
     path.addKeyListener(keys);
@@ -114,7 +114,7 @@ public final class DialogExport extends Dialog {
 
     // create buttons
     p = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel().border(18, 0, 0, 0);
+    info = new BaseXLabel(" ").border(18, 0, 0, 0);
     p.add(info, BorderLayout.WEST);
     buttons = okCancel(this);
     p.add(buttons, BorderLayout.EAST);

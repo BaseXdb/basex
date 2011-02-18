@@ -12,30 +12,28 @@ import org.basex.util.Util;
 /**
  * This class organizes all currently opened database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
 public final class DataPool {
-
   /** List for data and pins. */
-  List<PData> list = Collections.synchronizedList(new ArrayList<PData>());
+  private final List<PData> list =
+    Collections.synchronizedList(new ArrayList<PData>());
 
   /**
    * Pins and returns an existing data reference for the specified database, or
-   * returns null.
+   * returns {@code null}.
    * @param db name of the database
    * @return data reference
    */
-  Data pin(final String db) {
-    synchronized(list) {
-      for(final PData d : list) {
-        if(d.data.meta.name.equals(db)) {
-          d.pins++;
-          return d.data;
-        }
+  synchronized Data pin(final String db) {
+    for(final PData d : list) {
+      if(d.data.meta.name.equals(db)) {
+        d.pins++;
+        return d.data;
       }
-      return null;
     }
+    return null;
   }
 
   /**
@@ -43,19 +41,15 @@ public final class DataPool {
    * @param data data reference
    * @return true if reference was removed from the pool
    */
-  boolean unpin(final Data data) {
-    synchronized(list) {
-      for(final PData d : list) {
-        if(d.data == data) {
-          final boolean close = --d.pins == 0;
-          if(close) {
-            list.remove(d);
-          }
-          return close;
-        }
+  synchronized boolean unpin(final Data data) {
+    for(final PData d : list) {
+      if(d.data == data) {
+        final boolean close = --d.pins == 0;
+        if(close) list.remove(d);
+        return close;
       }
-      return false;
     }
+    return false;
   }
 
   /**
@@ -63,19 +57,17 @@ public final class DataPool {
    * @param db name of the database
    * @return result of check
    */
-  boolean pinned(final String db) {
-    synchronized(list) {
-      for(final PData d : list)
-        if(d.data.meta.name.equals(db)) return true;
-      return false;
-    }
+  synchronized boolean pinned(final String db) {
+    for(final PData d : list)
+      if(d.data.meta.name.equals(db)) return true;
+    return false;
   }
 
   /**
    * Adds a data reference to the pool.
    * @param d data reference
    */
-  void add(final Data d) {
+  synchronized void add(final Data d) {
     list.add(new PData(d));
   }
 
@@ -96,14 +88,11 @@ public final class DataPool {
   /**
    * Closes all data references.
    */
-  void close() {
-    synchronized(list) {
-      try {
-        for(final PData d : list)
-          d.data.close();
-      } catch(final IOException ex) {
-        Util.debug(ex);
-      }
+  synchronized void close() {
+    try {
+      for(final PData d : list) d.data.close();
+    } catch(final IOException ex) {
+      Util.debug(ex);
     }
     list.clear();
   }
@@ -114,7 +103,7 @@ public final class DataPool {
    * @param db name of the database
    * @return number of references
    */
-  public int pins(final String db) {
+  public synchronized int pins(final String db) {
     for(final PData d : list) {
       if(d.data.meta.name.equals(db)) return d.pins;
     }
@@ -124,13 +113,12 @@ public final class DataPool {
   /**
    * Inner class for a data object in the pool.
    *
-   * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+   * @author BaseX Team 2005-11, BSD License
    * @author Andreas Weiler
    */
-  private final class PData {
-
+  private static final class PData {
     /** Number of current database users. */
-    int pins;
+    int pins = 1;
     /** Data reference. */
     Data data;
 
@@ -139,7 +127,6 @@ public final class DataPool {
      * @param d data reference
      */
     PData(final Data d) {
-      pins = 1;
       data = d;
     }
   }

@@ -44,9 +44,10 @@ import org.basex.core.cmd.Help;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
-import org.basex.core.cmd.InfoTable;
+import org.basex.core.cmd.InfoStorage;
 import org.basex.core.cmd.Kill;
 import org.basex.core.cmd.List;
+import org.basex.core.cmd.ListDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.Password;
@@ -72,7 +73,7 @@ import org.basex.util.TokenBuilder;
  * This is a parser for command strings, creating {@link Command} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CommandParser extends InputParser {
@@ -195,17 +196,18 @@ public final class CommandParser extends InputParser {
             return new InfoDB();
           case INDEX:
             return new InfoIndex(consume(CmdIndexInfo.class, null));
-          case TABLE:
+          case STORAGE:
             arg1 = number(null);
             arg2 = arg1 != null ? number(null) : null;
             if(arg1 == null) arg1 = xquery(null);
-            return new InfoTable(arg1, arg2);
+            return new InfoStorage(arg1, arg2);
         }
         break;
       case CLOSE:
         return new Close();
       case LIST:
-        return new List();
+        final String input = string(null);
+        return input == null ? new List() : new ListDB(input);
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:
@@ -240,11 +242,18 @@ public final class CommandParser extends InputParser {
         return new Password(string(null));
       case HELP:
         String hc = name(null);
+        String form = null;
         if(hc != null) {
-          qp = qm;
-          hc = consume(Cmd.class, cmd).toString();
+          if(hc.equalsIgnoreCase("wiki")) {
+            form = hc;
+            hc = null;
+          } else {
+            qp = qm;
+            hc = consume(Cmd.class, cmd).toString();
+            form = name(null);
+          }
         }
-        return new Help(hc);
+        return new Help(hc, form);
       case EXIT: case QUIT:
         return new Exit();
       case KILL:
@@ -427,10 +436,10 @@ public final class CommandParser extends InputParser {
     try {
       // return command reference; allow empty strings as input ("NULL")
       final String t = token == null ? "NULL" : token.toUpperCase();
-      final E cmd = Enum.valueOf(cmp, t);
-      if(!Cmd.class.isInstance(cmd) || !Cmd.class.cast(cmd).help()) return cmd;
+      return Enum.valueOf(cmp, t);
     } catch(final IllegalArgumentException ex) { /* will not happen. */ }
     }
+
     final Enum<?>[] alt = list(cmp, token);
     if(token == null) {
       // no command found
@@ -439,7 +448,7 @@ public final class CommandParser extends InputParser {
       help(list(alt), par);
     }
 
-    // find similar commands
+    // output error for similar commands
     final byte[] name = lc(token(token));
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : list(cmp, null)) {
@@ -462,7 +471,7 @@ public final class CommandParser extends InputParser {
    * @throws QueryException query exception
    */
   private void help(final StringList alt, final Cmd cmd) throws QueryException {
-    error(alt, PROCSYNTAX, cmd.help(true));
+    error(alt, PROCSYNTAX, cmd.help(true, false));
   }
 
   /**
@@ -478,10 +487,9 @@ public final class CommandParser extends InputParser {
     Enum<?>[] list = new Enum<?>[0];
     final String t = i == null ? "" : i.toUpperCase();
     for(final Enum<?> e : en.getEnumConstants()) {
-      if(Cmd.class.isInstance(e)) {
-        final Cmd c = Cmd.class.cast(e);
-        if(c.help() || c.hidden()) continue;
-      }
+      // ignore hidden commands
+      if(Cmd.class.isInstance(e) && Cmd.class.cast(e).hidden()) continue;
+
       if(e.name().startsWith(t)) {
         final int s = list.length;
         final Enum<?>[] tmp = new Enum<?>[s + 1];

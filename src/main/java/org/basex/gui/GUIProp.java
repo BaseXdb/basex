@@ -11,7 +11,7 @@ import org.basex.util.StringList;
  * initially read from and finally written to disk, except for the properties
  * following the {@link #SKIP} flag.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class GUIProp extends AProp {
@@ -139,14 +139,14 @@ public final class GUIProp extends AProp {
   /** Name of new database. */
   public static final Object[] CREATENAME = { "CREATENAME", "" };
 
-  /** Path to mapped file hierarchy. */
+  /** Path to mapped file hierarchy.
   public static final Object[] FSPATH = { "FSPATH", Prop.HOME };
-  /** Name of the DeepFS database. */
+  /** Name of the DeepFS database.
   public static final Object[] FSNAME = { "FSNAME", "DeepFS" };
-  /** Name of the mountpoint. */
+  /** Name of the mountpoint.
   public static final Object[] FSMOUNT = { "FSMOUNT", "/mnt/deepfs" };
-  /** Flag indicating the mapping of the complete disk. */
-  public static final Object[] FSALL = { "FSALL", false };
+  /** Flag indicating the mapping of the complete disk.
+  public static final Object[] FSALL = { "FSALL", false };*/
 
   /** Last command inputs. */
   public static final Object[] COMMANDS = { "COMMANDS", new String[0] };
@@ -172,6 +172,8 @@ public final class GUIProp extends AProp {
 
   /** Shows real file contents in the treemap. */
   public static final Object[] MAPFS = { "MAPFS", true };
+  /** Maximum text size to be displayed. */
+  public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
 
   /**
    * Constructor.

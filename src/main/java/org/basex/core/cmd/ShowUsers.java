@@ -14,7 +14,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'show users' command and shows existing users.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ShowUsers extends Command {
@@ -50,7 +50,7 @@ public final class ShowUsers extends Command {
         }
         out.println(data.meta.users.info());
         data.flush();
-        Close.close(context, data);
+        Close.close(data, context);
         return true;
       } catch(final IOException ex) {
         Util.debug(ex);

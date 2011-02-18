@@ -12,7 +12,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'grant' command and grants permissions to users.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Grant extends Command {
@@ -75,7 +75,7 @@ public final class Grant extends Command {
         }
         u.perm = perm;
         data.flush();
-        Close.close(context, data);
+        Close.close(data, context);
       } catch(final IOException ex) {
         Util.debug(ex);
         final String msg = ex.getMessage();

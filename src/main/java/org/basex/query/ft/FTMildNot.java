@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
 /**
  * FTMildnot expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FTMildNot extends FTExpr {

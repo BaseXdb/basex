@@ -17,7 +17,7 @@ import org.basex.util.InputInfo;
 /**
  * Sequence functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNSeq extends Fun {
@@ -302,7 +302,7 @@ final class FNSeq extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && (def == FunDef.HEAD || def == FunDef.TAIL) ||
+    return u == Use.X30 && (def == FunDef.HEAD || def == FunDef.TAIL) ||
       super.uses(u);
   }
 }

@@ -11,7 +11,7 @@ import org.basex.util.InputInfo;
 /**
  * HTTP Client Module.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
 public final class FNHttp extends Fun {
@@ -35,12 +35,7 @@ public final class FNHttp extends Fun {
     final byte[] href = expr.length == 2 ? checkEStr(expr[1].item(ctx, input))
         : null;
 
-    final HttpClient httpRequest = href == null ? new HttpClient(request, input)
-        : new HttpClient(request, href, input);
-
     // Send the HTTP request
-    return httpRequest.sendHttpRequest(ctx);
-
+    return new HttpClient(request, href, input).sendHttpRequest(ctx);
   }
-
 }

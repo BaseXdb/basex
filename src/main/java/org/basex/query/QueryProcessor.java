@@ -5,6 +5,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Scanner;
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -22,11 +23,9 @@ import org.basex.query.util.Var;
 import org.basex.util.Token;
 
 /**
- * This abstract class contains various methods which allow querying in
- * the database. A variety of hierarchical parsers (XPath, XQuery, etc..)
- * can be implemented on top of this class.
+ * This class is an entry point for evaluating XQuery implementations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Progress {
@@ -67,6 +66,14 @@ public final class QueryProcessor extends Progress {
    */
   public void parse() throws QueryException {
     if(!parsed) {
+      // parse pre-defined external variables
+      final Scanner sc = new Scanner(ctx.context.prop.get(Prop.BINDINGS));
+      sc.useDelimiter(",");
+      while(sc.hasNext()) {
+        final String[] sp = sc.next().split("=", 2);
+        bind(sp[0], sp.length > 1 ? sp[1] : "", "");
+      }
+      // parse query
       ctx.parse(query);
       parsed = true;
     }
@@ -117,7 +124,7 @@ public final class QueryProcessor extends Progress {
       throws QueryException {
 
     Object obj = o;
-    if(t != null && t.length() != 0) {
+    if(t != null && !t.isEmpty()) {
       final QNm type = new QNm(Token.token(t));
       if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
       final Type typ = Type.find(type, true);
@@ -166,7 +173,7 @@ public final class QueryProcessor extends Progress {
     if(sp == null) {
       sp = new SerializerProp(ctx.context.prop.get(Prop.SERIALIZER));
       if(ctx.context.prop.is(Prop.WRAPOUTPUT)) {
-        sp.set(SerializerProp.S_WRAP_PRE, NAMELC);
+        sp.set(SerializerProp.S_WRAP_PREFIX, NAMELC);
         sp.set(SerializerProp.S_WRAP_URI, URL);
       }
     }

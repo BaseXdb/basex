@@ -23,7 +23,7 @@ import org.basex.util.Util;
  * for textual content in a compressed disk structure.
  * The table mapping is documented in {@link Data}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
@@ -43,7 +43,7 @@ public final class DiskData extends Data {
    */
   public DiskData(final String db, final Prop pr) throws IOException {
     meta = new MetaData(db, pr);
-    comp = new Compress(pr.num(Prop.COMPRESS));
+    comp = new Compress();
 
     final DataInput in = new DataInput(meta.file(DATAINFO));
     try {
@@ -82,7 +82,7 @@ public final class DiskData extends Data {
   public DiskData(final MetaData md, final Names nm, final Names at,
       final PathSummary ps, final Namespaces n) throws IOException {
 
-    comp = new Compress(md.prop.num(Prop.COMPRESS));
+    comp = new Compress();
     meta = md;
     tags = nm;
     atts = at;
@@ -146,7 +146,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void closeIndex(final IndexType type) throws IOException {
+  public synchronized void closeIndex(final IndexType type) throws IOException {
     switch(type) {
       case TEXT:      if(txtindex != null) txtindex.close(); break;
       case ATTRIBUTE: if(atvindex != null) atvindex.close(); break;

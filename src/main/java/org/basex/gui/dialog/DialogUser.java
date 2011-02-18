@@ -31,7 +31,7 @@ import org.basex.util.Util;
 /**
  * Panel for displaying information about global/local users.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
 final class DialogUser extends BaseXBack {
@@ -87,7 +87,7 @@ final class DialogUser extends BaseXBack {
     BaseXLayout.setWidth(pass, 100);
     alter = new BaseXButton(BUTTONALTER, dia);
     drop = new BaseXButton(BUTTONDROP, dia);
-    info = new BaseXLabel();
+    info = new BaseXLabel(" ");
 
     add(new BaseXLabel(CREATEU + COLS, false, true));
     BaseXBack p = new BaseXBack(new TableLayout(1, 5, 6, 0)).border(0, 0, 5, 0);

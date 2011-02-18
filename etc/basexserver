@@ -4,11 +4,14 @@
 PWD=`dirname $0`
 
 # Paths to distributed files or source directories
-#BXPATH=basex.jar
-BXPATH=$PWD/../target/classes
+BASEX=$PWD/../target/classes
 
 # Options for virtual machine
-VM=-Xmx1g
+VM=-Xmx512m
 
-# Run BaseX server
-java -cp "$BXPATH" $VM org.basex.BaseXServer "$@"
+# Classpath
+LIB=$PWD/../lib
+CP=$BASEX:$LIB/lucene-analyzers-3.0.2.jar:$LIB/tagsoup-1.2.jar:$LIB/snowball.jar
+
+# Run code
+java -cp "$BASEX" $VM org.basex.BaseXServer "$@"

@@ -7,7 +7,7 @@ import java.util.Arrays;
  * This class serves as an efficient constructor for byte arrays.
  * It bears some resemblance to Java's {@link java.lang.StringBuilder}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class TokenBuilder {
@@ -289,13 +289,15 @@ public final class TokenBuilder {
 
   /**
    * Trims leading and trailing whitespaces.
+   * @return self reference
    */
-  public void trim() {
+  public TokenBuilder trim() {
     while(size > 0 && ws(chars[size - 1])) --size;
     int s = -1;
     while(++s < size && ws(chars[s]));
     if(s != 0 && s != size) Array.move(chars, s, -s, size - s);
     size -= s;
+    return this;
   }
 
   /**

@@ -7,7 +7,7 @@ import org.basex.util.Array;
 /**
  * Layout class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class ViewAlignment implements ViewLayout {

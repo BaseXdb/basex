@@ -9,12 +9,21 @@ import org.basex.util.Util;
 /**
  * HexBinary item.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Hex extends Item {
   /** Data. */
   byte[] val;
+
+  /**
+   * Constructor.
+   * @param v value
+   */
+  public Hex(final byte[] v) {
+    super(Type.HEX);
+    val = v;
+  }
 
   /**
    * Constructor.
@@ -32,8 +41,7 @@ public final class Hex extends Item {
    * @param b base64 data
    */
   Hex(final B64 b) {
-    super(Type.HEX);
-    val = b.val;
+    this(b.val);
   }
 
   @Override

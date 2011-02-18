@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * This class tests String <-> Token conversions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public final class UTF8Test {

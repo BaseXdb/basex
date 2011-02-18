@@ -14,7 +14,7 @@ import org.basex.util.XMLToken;
 /**
  * This abstract class defines syntax highlighting of text panels.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class XQuerySyntax extends BaseXSyntax {
@@ -29,6 +29,8 @@ final class XQuerySyntax extends BaseXSyntax {
   /** Keyword. */
   private static final Color FUNS = new Color(160, 0, 160);
 
+  /** Comment. */
+  private int comment;
   /** Last quote. */
   private int quote;
   /** Variable flag. */
@@ -56,11 +58,24 @@ final class XQuerySyntax extends BaseXSyntax {
   public void init() {
     quote = 0;
     var = false;
+    comment = 0;
   }
 
   @Override
   public Color getColor(final BaseXTextTokens text) {
     final int ch = text.curr();
+
+    // comment
+    if(comment == 0 && ch == '(') {
+      comment++;
+    } else if(comment == 1) {
+      comment = ch == ':' ? 2 : 0;
+    } else if(comment == 2 && ch == ':') {
+      comment++;
+    } else if(comment == 3 && ch != ':') {
+      comment = ch == ')' ? 0 : 2;
+    }
+    if(comment != 0) return KEY;
 
     // quotes
     if(quote == 0 && (ch == '"' || ch == '\'')) {

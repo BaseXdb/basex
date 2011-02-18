@@ -8,7 +8,7 @@ import org.basex.core.Command;
 /**
  * Evaluates the 'help' command and returns help on the database commands.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Help extends Command {
@@ -17,17 +17,30 @@ public final class Help extends Command {
    * @param arg optional argument
    */
   public Help(final String arg) {
-    super(STANDARD, arg);
+    this(arg, null);
+  }
+
+  /**
+   * Default constructor.
+   * @param arg optional argument
+   * @param format optional format (e.g., Wiki)
+   */
+  public Help(final String arg, final String format) {
+    super(STANDARD, arg, format);
   }
 
   @Override
   protected boolean run() throws IOException {
-    try {
-      final Cmd cmd = Cmd.valueOf(args[0]);
-      out.print(cmd.help(true));
-    } catch(final Exception ex) {
+    final String in = args[0];
+    final boolean wiki = args[1] != null;
+
+    if(in != null) {
+      final Cmd cmd = getOption(in, Cmd.class);
+      if(cmd == null) return error(CMDUNKNOWN, this);
+      out.print(cmd.help(true, wiki));
+    } else {
       out.println(CMDHELP);
-      for(final Cmd c : Cmd.values()) out.print(c.help(false));
+      for(final Cmd c : Cmd.values()) out.print(c.help(false, wiki));
     }
     return true;
   }

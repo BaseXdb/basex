@@ -29,7 +29,7 @@ import org.basex.util.ft.FTLexer;
 /**
  * This view is a TreeMap implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Joerg Hauser
  * @author Bastian Lemke
@@ -619,6 +619,7 @@ public final class MapView extends View implements Runnable {
     if(textLen != null || gui.gprop.num(GUIProp.MAPWEIGHT) == 0) return;
 
     final int size = data.meta.size;
+    System.out.println(size);
     textLen = new int[size];
 
     final int[] parStack = new int[IO.MAXHEIGHT];

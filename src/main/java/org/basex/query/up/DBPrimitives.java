@@ -19,7 +19,7 @@ import org.basex.util.IntList;
 /**
  * Holds all update primitives for a specific data reference.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 final class DBPrimitives extends Primitives {
@@ -144,7 +144,7 @@ final class DBPrimitives extends Primitives {
       try {
         Export.export(ctx.context, d);
       } catch(final IOException ex) {
-        UPPUTERR.thrw(null, d.meta.file);
+        UPPUTERR.thrw(null, d.meta.path);
       }
     }
   }

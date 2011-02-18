@@ -21,10 +21,14 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'restore' command and restores a backup of a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Restore extends Command {
+  /** Date pattern. */
+  private static final String PATTERN =
+    "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
+
   /** Counter for outstanding files. */
   private int of;
   /** Counter of total files. */
@@ -43,18 +47,14 @@ public final class Restore extends Command {
     String db = args[0];
     if(!validName(db)) return error(NAMEINVALID, db);
 
-    final int i = db.indexOf("-");
-    String name = null;
-    if(i == -1) {
-      final StringList list = list(db + '-', context);
-      if(list.size() == 0) return error(DBBACKNF, db);
-      name = list.get(0);
+    // find backup file with or without date suffix
+    File file = new File(prop.get(Prop.DBPATH) + Prop.SEP + db + IO.ZIPSUFFIX);
+    if(!file.exists()) {
+      final StringList list = list(db, context);
+      if(list.size() != 0) file = new File(list.get(0));
     } else {
-      if(!db.endsWith(IO.ZIPSUFFIX)) db += IO.ZIPSUFFIX;
-      name = prop.get(Prop.DBPATH) + Prop.SEP + db;
-      db = db.substring(0, i);
+      db = db.replace(PATTERN + '$', "");
     }
-    final File file = new File(name);
     if(!file.exists()) return error(DBBACKNF, db);
 
     // close database if it's currently opened and not opened by others
@@ -115,16 +115,13 @@ public final class Restore extends Command {
    * @return available backups
    */
   public static StringList list(final String db, final Context ctx) {
-    // create database list
     final StringList list = new StringList();
 
     final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return list;
 
-    final String pre = db + (db.contains("-") ? "" : "-");
     for(final IO f : dir.children()) {
-      final String n = f.name();
-      if(n.startsWith(pre) && n.endsWith(IO.ZIPSUFFIX)) list.add(f.path());
+      if(f.name().matches(db + PATTERN + IO.ZIPSUFFIX)) list.add(f.path());
     }
     list.sort(false, false);
     return list;

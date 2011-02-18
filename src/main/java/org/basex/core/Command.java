@@ -19,7 +19,7 @@ import org.basex.util.Util;
  * implementations. It evaluates queries that are sent by the GUI, the client or
  * the standalone version.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Command extends Progress {
@@ -56,7 +56,7 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Executes the command and serializes textual results to the specified output
+   * Executes the command and prints the result to the specified output
    * stream. If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
    * @param os output stream reference
@@ -238,7 +238,7 @@ public abstract class Command extends Progress {
    */
   protected final boolean close(final String db) {
     final boolean close = context.data != null &&
-    db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
+      db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
     if(close) new Close().run(context);
     return close;
   }
@@ -270,9 +270,9 @@ public abstract class Command extends Progress {
     // check concurrency of commands
     boolean ok = false;
     final boolean writing = updating(ctx);
-    ctx.lock.before(writing);
+    ctx.register(writing);
     ok = run(ctx, os);
-    ctx.lock.after(writing);
+    ctx.unregister(writing);
     return ok;
   }
 

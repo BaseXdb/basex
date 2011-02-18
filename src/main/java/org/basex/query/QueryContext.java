@@ -37,12 +37,11 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
-import org.basex.util.ft.Scoring;
 
 /**
  * This abstract query expression provides the architecture for a compiled
  * query. // *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class QueryContext extends Progress {
@@ -50,8 +49,6 @@ public final class QueryContext extends Progress {
   public final Functions funcs = new Functions();
   /** Variables. */
   public final Variables vars = new Variables();
-  /** Scoring instance. */
-  public final Scoring score = new Scoring();
   /** Namespaces. */
   public Namespaces ns = new Namespaces();
 
@@ -62,7 +59,7 @@ public final class QueryContext extends Progress {
   /** Query string. */
   public String query;
   /** XQuery version flag. */
-  public boolean xquery30;
+  public boolean xquery3;
 
   /** Cached stop word files. */
   public HashMap<String, String> stop;
@@ -128,8 +125,6 @@ public final class QueryContext extends Progress {
   public boolean leaf;
   /** Compilation flag: GFLWOR clause performs grouping. */
   public boolean grouping;
-  /** Compilation flag: full-text evaluation can be stopped after first hit. */
-  public boolean ftfast = true;
 
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();
@@ -158,7 +153,7 @@ public final class QueryContext extends Progress {
     context = ctx;
     nodes = ctx.current;
     ftopt = new FTOpt();
-    xquery30 = ctx.prop.is(Prop.XQUERY11);
+    xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO);
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
   }
@@ -244,8 +239,8 @@ public final class QueryContext extends Progress {
 
       // completed... return standard nodeset with full-text positions
       final int ps = pre.size();
-      if(i == null)
-        return ps == 0 ? ir : new Nodes(pre.toArray(), data, ftpos).checkRoot();
+      if(i == null) return ps == 0 ? ir :
+          new Nodes(pre.toArray(), data, ftpos).checkRoot();
 
       // otherwise, add nodes to standard iterator
       for(int p = 0; p < ps; ++p) ir.add(new DBNode(data, pre.get(p)));

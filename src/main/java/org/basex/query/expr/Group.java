@@ -14,7 +14,7 @@ import org.basex.util.Util;
 /**
  * Implementation of the group by clause.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Michael Seiferle
  */
 public final class Group extends ParseExpr {
@@ -35,15 +35,14 @@ public final class Group extends ParseExpr {
 
   /**
    * Initializes the grouping partition.
-   * @param fl ForLet
-   * @param ob order by spec
+   * @param fl for/let clauses
+   * @param ob order by specifier
    * @throws QueryException exception
    */
   void init(final ForLet[] fl, final Order ob) throws QueryException {
     final Var[] fs = new Var[fl.length];
     for(int i = 0; i < fl.length; ++i) fs[i] = fl[i].var;
     gp = new GroupPartition(groupby, fs, ob, input);
-
   }
 
   @Override

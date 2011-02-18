@@ -15,7 +15,7 @@ import org.basex.util.Util;
 /**
  * This class indicates exceptions during query parsing or evaluation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class QueryException extends Exception {
@@ -182,7 +182,7 @@ public final class QueryException extends Exception {
       tb.add(": \n");
     }
     final String c = code();
-    if(c.length() != 0) tb.add("[" + c + "] ");
+    if(!c.isEmpty()) tb.add("[" + c + "] ");
     return tb.add(getLocalizedMessage()).toString();
   }
 }

@@ -27,7 +27,7 @@ import org.basex.util.TokenBuilder;
 /**
  * String pattern functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNPat extends Fun {
@@ -250,7 +250,7 @@ final class FNPat extends Fun {
         if(b == 'i') m |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         else if(b == 'm') m |= Pattern.MULTILINE;
         else if(b == 's') m |= Pattern.DOTALL;
-        else if(b == 'q' && ctx.xquery30) m |= Pattern.LITERAL;
+        else if(b == 'q' && ctx.xquery3) m |= Pattern.LITERAL;
         else if(b == 'x') {
           boolean cc = false;
           final ByteList bl = new ByteList();
@@ -311,6 +311,6 @@ final class FNPat extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && def == FunDef.ANALZYE || super.uses(u);
+    return u == Use.X30 && def == FunDef.ANALZYE || super.uses(u);
   }
 }

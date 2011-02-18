@@ -19,7 +19,7 @@ import org.basex.util.Util;
  * Evaluates the 'export' command and saves the currently opened database
  * to disk.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Export extends Command {
@@ -51,7 +51,7 @@ public final class Export extends Command {
    */
   public static void export(final Context context, final Data data)
       throws IOException {
-    export(context.prop, data, data.meta.file.path());
+    export(context.prop, data, data.meta.path.path());
   }
 
   /**
@@ -72,11 +72,10 @@ public final class Export extends Command {
 
     if(!root.exists()) root.md();
 
-    for(final int pre : data.doc().toArray()) {
+    for(final int pre : data.doc()) {
       // create file path
       final IO file = root.merge(Token.string(data.text(pre, true)));
       // create dir if necessary
-
       final IO dir = IO.get(file.dir());
       if(!dir.exists()) dir.md();
 

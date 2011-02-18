@@ -15,7 +15,7 @@ import org.basex.util.TokenBuilder;
  * This class provides access to attribute values and text contents
  * stored on disk.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DiskValues implements Index {
@@ -163,8 +163,7 @@ public final class DiskValues implements Index {
         break;
       }
     }
-    ids.sort();
-    return iter(ids);
+    return iter(ids.sort());
   }
 
   /**
@@ -212,7 +211,7 @@ public final class DiskValues implements Index {
   }
 
   @Override
-  public void close() throws IOException {
+  public synchronized void close() throws IOException {
     idxl.close();
     idxr.close();
   }

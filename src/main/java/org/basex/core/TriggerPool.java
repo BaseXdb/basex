@@ -11,7 +11,7 @@ import org.basex.util.Token;
 /**
  * Management of Notification Triggers.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
 public final class TriggerPool {
@@ -22,12 +22,12 @@ public final class TriggerPool {
   /**
    * Creates a trigger with the given name.
    * @param name The trigger name.
-   * @return Returns true if trigger was created successfully. 
+   * @return Returns true if trigger was created successfully.
    */
   public boolean create(final String name) {
     if (triggers.containsKey(name))
       return false;
-    
+
     triggers.put(name, new Sessions());
     return true;
   }
@@ -35,12 +35,12 @@ public final class TriggerPool {
   /**
    * Drops the named trigger from the pool.
    * @param name The trigger name.
-   * @return Returns true if trigger was deleted successfully. 
+   * @return Returns true if trigger was deleted successfully.
    */
   public boolean drop(final String name) {
     if (!triggers.containsKey(name))
       return false;
-    
+
     triggers.remove(name);
     return true;
   }
@@ -70,7 +70,7 @@ public final class TriggerPool {
     s.delete(sp);
     return true;
   }
-  
+
   /**
    * Returns information on all triggers.
    * @return Information on all triggers.
@@ -82,7 +82,7 @@ public final class TriggerPool {
     for (String name : triggers.keySet()) {
       --i;
       out.write(name.getBytes());
-      
+
       if (i != 0)
         out.write('\n');
     }
@@ -100,7 +100,7 @@ public final class TriggerPool {
     Sessions sessions = triggers.get(Token.string(name));
     if (sessions == null)
       return;
-    
+
     for (ServerProcess srv : sessions) {
       if(!srv.equals(sp)) {
         try {

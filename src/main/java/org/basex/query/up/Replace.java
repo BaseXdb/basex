@@ -24,7 +24,7 @@ import org.basex.util.Util;
 /**
  * Replace expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class Replace extends Update {

@@ -1,9 +1,10 @@
 package org.basex.util.ft;
 
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.NoSuchElementException;
 import org.basex.query.QueryException;
+import org.basex.query.ft.FTTokens;
+import org.basex.util.TokenList;
 
 /**
  * Generalized search algorithm based on the Bitap string matching algorithm.
@@ -11,7 +12,7 @@ import org.basex.query.QueryException;
  * {@link BitSet} for fast bit operation. This version works with a set of
  * needles and each one of it can be matched in the haystack.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  * @see <a href="http://en.wikipedia.org/wiki/Bitap_algorithm"
  *      >http://en.wikipedia.org/wiki/Bitap_algorithm</a>
@@ -20,7 +21,7 @@ public final class FTBitapSearch {
   /** Iterator over the set of elements being searched. */
   private final FTIterator haystack;
   /** Subset of elements being searched for. */
-  private final ArrayList<byte[][]> needles;
+  private final FTTokens needles;
   /** Comparator used for comparing two elements for equality. */
   private final TokenComparator cmp;
   /** Bit masks, showing which elements from a {@link #needles} are equal to
@@ -42,8 +43,9 @@ public final class FTBitapSearch {
    *          searched for)
    * @param c comparator for comparing two elements for equality
    */
-  public FTBitapSearch(final FTIterator h, final ArrayList<byte[][]> n,
+  public FTBitapSearch(final FTIterator h, final FTTokens n,
       final TokenComparator c) {
+
     haystack = h;
     cmp = c;
     needles = n;
@@ -52,14 +54,14 @@ public final class FTBitapSearch {
     // skip empty needles:
     int count = -1;
     for(int i = 0; i < sorted.length; i++) {
-      if(n.get(i) != null && n.get(i).length > 0) sorted[++count] = i;
+      if(n.get(i) != null && n.get(i).size() > 0) sorted[++count] = i;
     }
 
     masks = new BitSet[++count];
     // sort the needles by length (longest first):
     for(int i = 0; i < count; i++) {
       for(int j = i; j > 0
-          && n.get(sorted[j]).length > n.get(sorted[j - 1]).length; j--) {
+          && n.get(sorted[j]).size() > n.get(sorted[j - 1]).size(); j--) {
         final int t = sorted[j];
         sorted[j] = sorted[j - 1];
         sorted[j - 1] = t;
@@ -90,14 +92,14 @@ public final class FTBitapSearch {
       boolean matched = false;
       for(int i = 0; i < masks.length; i++) {
         final int id = sorted[i];
-        final byte[][] n = needles.get(id);
+        final TokenList n = needles.get(id);
         final BitSet m = masks[id];
         // compare each element from the needle and set the corresponding bit:
-        for(int k = n.length; k >= 1; k--)
-          m.set(k, m.get(k - 1) && cmp.equal(current, n[k - 1]));
+        for(int k = n.size(); k >= 1; k--)
+          m.set(k, m.get(k - 1) && cmp.equal(current, n.get(k - 1)));
         // if the last element of the needle's mask is true, then all elements
         // of the needle are matched:
-        if(m.get(n.length) && !matched) {
+        if(m.get(n.size()) && !matched) {
           match = id;
           matched = true;
         }
@@ -118,7 +120,7 @@ public final class FTBitapSearch {
   public int next() throws QueryException {
     if(hasNext()) {
       next = false;
-      return pos - needles.get(match).length;
+      return pos - needles.get(match).size();
     }
     throw new NoSuchElementException();
   }
@@ -126,7 +128,7 @@ public final class FTBitapSearch {
   /**
    * Token comparator.
    *
-   * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+   * @author BaseX Team 2005-11, BSD License
    * @author Dimitar Popov
    */
   public static interface TokenComparator {

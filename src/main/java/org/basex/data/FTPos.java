@@ -6,7 +6,7 @@ import java.util.Arrays;
  * This class contains full-text positions.
  * For each position, a pointer is stored.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FTPos {

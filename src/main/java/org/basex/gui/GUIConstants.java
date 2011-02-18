@@ -48,7 +48,7 @@ import org.basex.io.IO;
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class GUIConstants {
@@ -97,7 +97,7 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-    MENUDB, MENUEDIT, MENUVIEW, MENUQUERY, MENUOPTIONS, MENUDEEPFS, MENUHELP
+    MENUDB, MENUEDIT, MENUVIEW, MENUQUERY, MENUOPTIONS, MENUHELP
   };
 
   /**
@@ -123,8 +123,6 @@ public final class GUIConstants {
     RTEXEC, RTFILTER, EMPTY,
     COLOR, FONTS, MAPLAYOUT, TREEOPTIONS, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : PREFS
-  }, {
-    CREATEFS, EMPTY, DQE, MOUNTFS
   }, {
     SHOWHELP, Prop.MAC ? null : EMPTY,
     SHOWCOMMUNITY, SHOWUPDATES, Prop.MAC ? null : EMPTY,
@@ -268,7 +266,7 @@ public final class GUIConstants {
   public static final int SHF = Event.SHIFT_MASK;
   /** Alt key. */
   public static final int ALT = Event.ALT_MASK;
-  /** Ctrl key. */
+  /** Control key. */
   public static final int CTRL = Event.CTRL_MASK;
   /** Shortcut key (CTRL/META). */
   public static final int SC = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;

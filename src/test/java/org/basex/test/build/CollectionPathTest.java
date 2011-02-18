@@ -1,4 +1,4 @@
-package org.basex.test.collections;
+package org.basex.test.build;
 
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * Tests some queries on collections.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Michael Seiferle
  */
 public final class CollectionPathTest {
@@ -96,7 +96,7 @@ public final class CollectionPathTest {
       + " return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CTX);
     final Item it = qp.iter().next();
-    final String expath = '"' + CTX.data.meta.file.url().replace(DBNAME, "")
+    final String expath = '"' + CTX.data.meta.path.url().replace(DBNAME, "")
         + FILES[1] + '"';
     assertEquals(expath, it.toString());
     qp.close();

@@ -10,7 +10,7 @@ import org.basex.util.Reflect;
 /**
  * Signatures of all XQuery functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public enum FunDef {
@@ -169,10 +169,11 @@ public enum FunDef {
   /** XQuery function. */
   PARSETXT(FNURI, FNGen.class, 1, 2, "unparsed-text(uri, encoding?)", STR_ZO),
   /** XQuery function. */
+  PARSETXTLIN(FNURI, FNGen.class, 1, 2,
+      "unparsed-text-lines(uri, encoding?)", STR_ZM),
+  /** XQuery function. */
   PARSETXTAVL(FNURI, FNGen.class, 1, 2,
       "unparsed-text-available(uri, encoding?)", BLN),
-  /** XQuery function (might get obsolete). */
-  PARSE(FNURI, FNGen.class, 1, 2, "parse(string, base?)", NOD),
   /** XQuery function. */
   PARSEXML(FNURI, FNGen.class, 1, 2, "parse-xml(string, base?)", NOD),
   /** XQuery function. */
@@ -232,7 +233,7 @@ public enum FunDef {
   /** XQuery function. */
   TRACE(FNURI, FNInfo.class, 2, 2, "trace(item, message)", ITEM_ZM),
   /** XQuery function. */
-  ENV(FNURI, FNInfo.class, 1, 1, "get-environment-variable(string)", STR_ZO),
+  ENV(FNURI, FNInfo.class, 1, 1, "environment-variable(string)", STR_ZO),
   /** XQuery function. */
   ENVS(FNURI, FNInfo.class, 0, 0, "available-environment-variables()", STR_ZM),
 
@@ -493,6 +494,16 @@ public enum FunDef {
   MB(UTILURI, FNUtil.class, 1, 2, "mb(expr, cache?)", STR),
   /** Utility function: measures the execution time of an expression. */
   MS(UTILURI, FNUtil.class, 1, 2, "ms(expr, cache?)", STR),
+  /** Utility function: converts a number to a given base. */
+  TO_BASE(UTILURI, FNUtil.class, 2, 2, "integer-to-base(num, base)", STR),
+  /** Utility function: decodes a number from a given base. */
+  FRM_BASE(UTILURI, FNUtil.class, 2, 2, "integer-from-base(str, base)", ITR),
+  /** Utility function: calculates the MD5 hash of the given xs:string. */
+  MD5(UTILURI, FNUtil.class, 1, 1, "md5(str)", STR),
+  /** Utility function: calculates the SHA1 hash of the given xs:string. */
+  SHA1(UTILURI, FNUtil.class, 1, 1, "sha1(str)", STR),
+  /** Utility function: calculates the CRC32 hash of the given xs:string. */
+  CRC32(UTILURI, FNUtil.class, 1, 1, "crc32(str)", STR),
 
   /* FNSent functions. */
 

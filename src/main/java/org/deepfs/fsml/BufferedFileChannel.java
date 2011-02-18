@@ -19,7 +19,7 @@ import org.basex.util.Token;
  * fragment of a file. An instance of this class can either represent a regular
  * file on disk or a fragment of a file (the instance is a "subchannel").
  * </p>
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public final class BufferedFileChannel {

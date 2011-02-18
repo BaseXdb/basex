@@ -25,7 +25,7 @@ import org.basex.util.InputInfo;
 /**
  * Abstract parse expression, containing information on the original query.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class ParseExpr extends Expr {
@@ -203,19 +203,6 @@ public abstract class ParseExpr extends Expr {
   public final long checkItr(final Item it) throws QueryException {
     if(!it.unt() && !it.type.instance(Type.ITR)) Err.type(this, Type.ITR, it);
     return it.itr(input);
-  }
-
-  /**
-   * Checks if the specified expression is a node.
-   * Returns the node or an exception.
-   * @param e expression to be checked
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  public final Nod checkNode(final Expr e, final QueryContext ctx)
-      throws QueryException {
-    return checkNode(checkItem(e, ctx));
   }
 
   /**

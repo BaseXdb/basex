@@ -6,7 +6,7 @@ import org.basex.util.Util;
 /**
  * This class contains a single full-text token.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Jens Erat
  */
 public final class FTSpan {

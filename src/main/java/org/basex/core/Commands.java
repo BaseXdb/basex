@@ -7,7 +7,7 @@ import org.basex.core.cmd.Set;
 /**
  * This class defines the available command-line commands.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
@@ -15,7 +15,7 @@ public interface Commands {
   /** Create commands. */
   enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER, TRIGGER }
   /** Info commands. */
-  enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
+  enum CmdInfo { NULL, DATABASE, DB, INDEX, STORAGE }
   /** Drop commands. */
   enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP, TRIGGER }
   /** Attach commands. */
@@ -36,46 +36,34 @@ public interface Commands {
   /** Alter types. */
   enum CmdAlter { DATABASE, DB, USER }
 
-  /** Command flag: command which will not be shown in the help. */
-  int HID = 1;
-
   /** Command definitions. */
   enum Cmd {
-    // Database commands
-    HD(HID, HELPDB), CREATE(HELPCREATE), OPEN(HELPOPEN), ATTACH(HELPATTACH),
-    DETACH(HELPDETACH), CHECK(HID), ADD(HELPADD), DELETE(HELPDELETE),
-    INFO(HELPINFO), CLOSE(HELPCLOSE), LIST(HELPLIST), DROP(HELPDROP),
-    EXPORT(HELPEXPORT), OPTIMIZE(HELPOPTIMIZE),
-    // Query commands
-    HQ(HID, HELPQ), XQUERY(HELPXQUERY), FIND(HELPFIND),
-    RUN(HELPRUN), CS(HELPCS),
-    // Admin commands
-    HA(HID, HELPA), SHOW(HELPSHOW), GRANT(HELPGRANT),
-    ALTER(HELPALTER), KILL(HELPKILL), BACKUP(HELPBACKUP), RESTORE(HELPRESTORE),
-    // General commands
-    HG(HID, HELPG), GET(HID), SET(HELPSET), PASSWORD(HELPPASSWORD),
-    HELP(HELPHELP), EXIT(HELPEXIT), QUIT(HID);
 
-    /** Flags for controlling command parsing. */
-    private final int flags;
+    ADD(HELPADD), ALTER(HELPALTER), ATTACH(HELPATTACH), BACKUP(HELPBACKUP),
+    CHECK(), CLOSE(HELPCLOSE), CREATE(HELPCREATE), CS(HELPCS),
+    DELETE(HELPDELETE), DETACH(HELPDETACH), DROP(HELPDROP), EXIT(HELPEXIT),
+    EXPORT(HELPEXPORT), FIND(HELPFIND), GET(HELPGET), GRANT(HELPGRANT),
+    HELP(HELPHELP), INFO(HELPINFO), KILL(HELPKILL), LIST(HELPLIST),
+    OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), QUIT(),
+    RESTORE(HELPRESTORE), RUN(HELPRUN), SET(HELPSET), SHOW(HELPSHOW),
+    XQUERY(HELPXQUERY);
+
+
     /** Help texts. */
     private final String[] help;
 
     /**
-     * Default constructor.
-     * @param h help texts
+     * Empty constructor.
      */
-    private Cmd(final String... h) {
-      this(0, h);
+    private Cmd() {
+      this(null);
     }
 
     /**
-     * Constructor with additional flags.
-     * @param f command flags
-     * @param h help texts
+     * Default constructor.
+     * @param h help texts, or {@code null} if command is hidden.
      */
-    private Cmd(final int f, final String... h) {
-      flags = f;
+    private Cmd(final String... h) {
       help = h;
     }
 
@@ -84,77 +72,50 @@ public interface Commands {
      * @return result of check
      */
     boolean hidden() {
-      return (flags & HID) != 0;
-    }
-
-    /**
-     * Tests if this is a dummy command for formatting the help.
-     * @return result of check
-     */
-    boolean help() {
-      return help.length == 1;
+      return help == null;
     }
 
     /**
      * Returns a help string.
      * @param detail show details
+     * @param wiki print wiki format
      * @return string
      */
-    public final String help(final boolean detail) {
+    public final String help(final boolean detail, final boolean wiki) {
       final StringBuilder sb = new StringBuilder();
-      if(help.length == 0) {
-        if(detail) sb.append(NOHELP + NL);
-      } else if(help.length == 1) {
-        sb.append(NL + help[0] + NL + NL);
+      if(wiki) {
+        wiki(sb);
       } else {
-        sb.append(this + " " + help[0] + NL + "  " + help[1] + NL);
-        if(detail) sb.append(NL + help[2] + NL);
+        if(help == null) {
+          if(detail) sb.append(NOHELP + NL);
+        } else {
+          sb.append(this + " " + help[0] + NL + "  " + help[1] + NL);
+          if(detail) sb.append(NL + help[2] + NL);
+        }
       }
       return sb.toString();
     }
 
     /**
-     * Returns a help string as html.
-     * @return string
-     *
-    public final String html() {
-      final StringBuilder sb = new StringBuilder();
-      if(help.length == 1) {
-        sb.append("<br/>" + NL + "<h2>" + help[0] + "</h2>" + NL);
-      } else if(help.length > 1) {
-        String name = name().toLowerCase();
-        sb.append("<a name=\"" + name + "\"></a>");
-        sb.append("<h3>" + name.substring(0, 1).toUpperCase() +
-            name.substring(1) + "</h3>" + NL);
-        sb.append("<p>" + NL);
-        sb.append("<code>" + name() + " " + help[0] +
-            "</code><br/><br/>" + NL);
-        final String help2 = help[2];
+     * Returns a help string in the Wiki format.
+     * @param sb string builder
+     */
+    private void wiki(final StringBuilder sb) {
+      if(help == null) return;
 
-        final String help1 = Pattern.compile("\n\r?\n.*", Pattern.DOTALL).
-          matcher(help2).replaceAll("");
-        int tmp = help1.indexOf(":");
-        if(tmp == -1) tmp = help1.indexOf(".");
-        sb.append(help1.substring(0, tmp + 1));
-        sb.append(NL + "</p>" + NL + NL);
+      sb.append("===" + this + "===" + NL + NL);
+      sb.append("'''<code>" + this + " " + help[0] + "</code>'''" + NL + NL);
 
-        boolean first = true;
-        for(String s : help2.split(NL)) {
-          if(s.isEmpty()) continue;
-          if(s.startsWith(LI)) {
-            sb.append((first ? "<ul>" : "</li>") + NL);
-            sb.append(s.replaceAll(
-                "- (.*?):(.*)", "<li><code>$1</code>: $2<br/>") + NL);
-            first = false;
-          } else if(!first) {
-            sb.append(s.replaceAll("(\\[.*?\\]\\??)", "<code>$1</code>"));
-            sb.append(NL);
-          }
+      for(String s : help[2].split(NL)) {
+        if(s.startsWith("- ")) {
+          s = s.replaceAll("^- (.*?)(:|$)", "* <code>$1</code>$2");
+        } else {
+          s = s.replaceAll("^ ", ":");
+          s = s.replaceAll("\\[", "<code>[").replaceAll("\\]", "]</code>");
         }
-        if(!first) sb.append("</li>" + NL + "</ul>" + NL);
-        sb.append(NL);
+        sb.append(s).append(NL);
       }
-      return sb.toString();
-    }*/
+      sb.append(NL);
+    }
   }
 }

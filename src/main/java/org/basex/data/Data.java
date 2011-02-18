@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.basex.core.cmd.InfoTable;
+import org.basex.core.cmd.InfoStorage;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -14,7 +14,6 @@ import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
 import org.basex.io.TableAccess;
 import org.basex.util.Atts;
-import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 import org.deepfs.fs.DeepFS;
@@ -43,7 +42,8 @@ import org.deepfs.fs.DeepFS;
  * - Byte  3- 7:  TEXT: Text reference
  * - Byte  8-11:  SIZE: Number of descendants
  * ELEMENT NODES (kind = 1):
- * - Byte     0:  ATTS: Number of attributes (bits: 7-3)
+ * - Byte     0:  ATTS: Number of attributes (bits: 7-3).
+ *                      Calculated in real-time, if bit range is too small
  * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte     3:  NURI: Namespace URI
  * - Byte  4- 7:  DIST: Distance to parent node
@@ -53,12 +53,13 @@ import org.deepfs.fs.DeepFS;
  * - Byte  8-11:  DIST: Distance to parent node
  * ATTRIBUTE NODES (kind = 3):
  * - Byte     0:  DIST: Distance to parent node (bits: 7-3)
+ *                      Calculated in real-time, if bit range is too small
  * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte  3- 7:  TEXT: Attribute value reference
  * - Byte    11:  NURI: Namespace (bits: 7-3)
  * </pre>
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Data {
@@ -117,13 +118,14 @@ public abstract class Data {
    * Closes the current database.
    * @throws IOException I/O exception
    */
-  public final void close() throws IOException {
+  public final synchronized void close() throws IOException {
     if(fs != null) fs.close();
     cls();
   }
 
   /**
    * Checks if the database contains no documents.
+   * Empty databases exclusively contain a single document node.
    * @return result of check
    */
   public final boolean empty() {
@@ -198,10 +200,8 @@ public abstract class Data {
    * A single dummy node is returned if the database is empty.
    * @return root nodes
    */
-  public final IntList doc() {
-    final IntList il = new IntList();
-    for(int i = 0; i < meta.size; i += size(i, Data.DOC)) il.add(i);
-    return il;
+  public final int[] doc() {
+    return meta.paths.doc(this);
   }
 
   /**
@@ -209,27 +209,8 @@ public abstract class Data {
    * @param input input path
    * @return root nodes
    */
-  public final IntList doc(final String input) {
-    final boolean all = input.isEmpty();
-    final byte[] slash = token("/");
-    // build exact path: remove redundant slashes and switch to lower case
-    final byte[] exact = lc(concat(slash, token(input.replaceAll("/+", "/"))));
-    // build root path
-    final byte[] start = endsWith(exact, slash) ? exact : concat(exact, slash);
-    final IntList il = new IntList();
-    if(!empty()) {
-      for(int i = 0; i < meta.size; i += size(i, Data.DOC)) {
-        if(all) {
-          // add all documents
-          il.add(i);
-        } else {
-          // add documents which match specified input path
-          final byte[] pth = concat(slash, lc(text(i, true)));
-          if(eq(pth, exact) || startsWith(pth, start)) il.add(i);
-        }
-      }
-    }
-    return il;
+  public final int[] doc(final String input) {
+    return meta.paths.doc(input, this);
   }
 
   /**
@@ -342,12 +323,19 @@ public abstract class Data {
    */
   private int dist(final int pre, final int k) {
     switch(k) {
-      case ELEM: return table.read4(pre, 4);
+      case ELEM:
+        return table.read4(pre, 4);
       case TEXT:
       case COMM:
-      case PI:   return table.read4(pre, 8);
-      case ATTR: return table.read1(pre, 0) >> 3 & 0x1F;
-      default:   return pre + 1;
+      case PI:
+        return table.read4(pre, 8);
+      case ATTR:
+        int d = table.read1(pre, 0) >> 3 & IO.MAXATTS;
+        // skip additional attributes, if value is larger than maximum range
+        if(d >= IO.MAXATTS) while(d < pre && kind(pre - d) == ATTR) d++;
+        return d;
+      default:
+        return pre + 1;
     }
   }
 
@@ -368,7 +356,10 @@ public abstract class Data {
    * @return number of attributes
    */
   public final int attSize(final int pre, final int k) {
-    return k == ELEM ? table.read1(pre, 0) >> 3 & 0x1F : 1;
+    int s = k == ELEM ? table.read1(pre, 0) >> 3 & IO.MAXATTS : 1;
+    // skip additional attributes, if value is larger than maximum range
+    if(s >= IO.MAXATTS) while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
+    return s;
   }
 
   /**
@@ -387,12 +378,12 @@ public abstract class Data {
    * @return name reference
    */
   public final byte[] name(final int pre, final int k) {
-    if(k == Data.PI) {
+    if(k == PI) {
       final byte[] name = text(pre, true);
       final int i = indexOf(name, ' ');
       return i == -1 ? name : substring(name, 0, i);
     }
-    return (k == Data.ELEM ? tags : atts).key(name(pre));
+    return (k == ELEM ? tags : atts).key(name(pre));
   }
 
   /**
@@ -485,13 +476,13 @@ public abstract class Data {
   public final void rename(final int pre, final int k, final byte[] nm,
       final byte[] uri) {
     meta.update();
-    if(k == Data.PI) {
+    if(k == PI) {
       text(pre, trim(concat(nm, SPACE, atom(pre))), true);
     } else {
       // update/set namespace reference
       final int ou = ns.uri(nm, pre);
       final boolean ne = ou == 0 && uri.length != 0;
-      final int p = k == Data.ATTR ? parent(pre, k) : pre;
+      final int p = k == ATTR ? parent(pre, k) : pre;
       final int u = ne ? ns.add(p, p, pref(nm), uri) :
         ou != 0 && eq(ns.uri(ou), uri) ? ou : 0;
 
@@ -850,7 +841,8 @@ public abstract class Data {
     // build and insert new entry
     final int i = ++meta.lastid;
     final int n = ne ? 1 << 7 : 0;
-    s(as << 3 | ELEM); s(n | (byte) (tn >> 8)); s(tn); s(u);
+    s(Math.min(IO.MAXATTS, as) << 3 | ELEM);
+    s(n | (byte) (tn >> 8)); s(tn); s(u);
     s(d >> 24); s(d >> 16); s(d >> 8); s(d);
     s(s >> 24); s(s >> 16); s(s >> 8); s(s);
     s(i >> 24); s(i >> 16); s(i >> 8); s(i);
@@ -891,7 +883,8 @@ public abstract class Data {
     final long v = index(vl, pre, false);
     final int i = newID();
     final int n = ne ? 1 << 7 : 0;
-    s(d << 3 | ATTR); s(n | (byte) (tn >> 8)); s(tn); s(v >> 32);
+    s(Math.min(IO.MAXATTS, d) << 3 | ATTR);
+    s(n | (byte) (tn >> 8)); s(tn); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(0); s(0); s(0); s(u);
     s(i >> 24); s(i >> 16); s(i >> 8); s(i);
@@ -949,7 +942,7 @@ public abstract class Data {
    * @return table
    */
   public final String toString(final int s, final int e) {
-    return string(InfoTable.table(this, s, e));
+    return string(InfoStorage.table(this, s, e));
   }
 
   @Override

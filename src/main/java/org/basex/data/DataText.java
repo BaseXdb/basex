@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 /**
  * This class assembles texts which are used in the data classes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public interface DataText {
@@ -106,9 +106,11 @@ public interface DataText {
   /** Method. */
   String M_HTML = "html";
   /** Method. */
+  String M_CSV = "csv";
+  /** Method. */
   String M_TEXT = "text";
   /** Normalization. */
-  String NFC = "nfc";
+  String NFC = "NFC";
   /** Normalization. */
   String NONE = "none";
 

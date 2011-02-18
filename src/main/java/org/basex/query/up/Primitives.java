@@ -13,7 +13,7 @@ import org.basex.util.IntList;
 /**
  * Holds all update primitives for a specific data reference.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 abstract class Primitives {
@@ -68,7 +68,7 @@ abstract class Primitives {
         // still available after the execution of updates. that includes parent
         // nodes
         if(p.type() == PUT && parentDeleted(nodes.get(i))) {
-          UPFOEMPT.thrw(p.input, p);
+          UPFOTYPE.thrw(p.input, p);
         }
       }
     }

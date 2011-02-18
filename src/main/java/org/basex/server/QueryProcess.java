@@ -18,13 +18,13 @@ import org.basex.util.TokenBuilder;
 /**
  * Container for processes executing a query with iterative results.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */
 final class QueryProcess extends Progress {
   /** Performance. */
-  private final Performance p = new Performance();
+  private final Performance perf = new Performance();
   /** Query processor. */
   private final QueryProcessor qp;
   /** Database context. */
@@ -43,6 +43,8 @@ final class QueryProcess extends Progress {
   private boolean monitored;
   /** Iterator. */
   private Iter iter;
+  /** Closed. */
+  private boolean closed;
 
   /**
    * Constructor.
@@ -85,7 +87,7 @@ final class QueryProcess extends Progress {
    */
   void init() throws IOException, QueryException {
     monitored = true;
-    ctx.lock.before(qp.ctx.updating);
+    ctx.register(qp.ctx.updating);
     xml = qp.getSerializer(out);
     iter = qp.iter();
   }
@@ -129,11 +131,13 @@ final class QueryProcess extends Progress {
    * @throws IOException I/O exception
    */
   void close(final boolean forced) throws IOException {
+    if(closed) return;
     if(xml != null && !forced) xml.close();
     qp.stopTimeout();
     qp.close();
-    if(monitored) ctx.lock.after(qp.ctx.updating);
+    if(monitored) ctx.unregister(qp.ctx.updating);
     initInfo();
+    closed = true;
   }
 
   /**
@@ -159,7 +163,7 @@ final class QueryProcess extends Progress {
       info = new TokenBuilder();
       info.addExt(QUERYHITS + "% %" + NL, hits, hits == 1 ? VALHIT : VALHITS);
       info.addExt(QUERYUPDATED + "% %" + NL, up, up == 1 ? VALHIT : VALHITS);
-      info.addExt(QUERYTOTAL + "%", p);
+      info.addExt(QUERYTOTAL + "%", perf);
     }
   }
 }

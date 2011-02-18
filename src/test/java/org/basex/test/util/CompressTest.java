@@ -10,12 +10,13 @@ import org.basex.query.iter.Iter;
 import org.basex.util.Compress;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.basex.util.Util;
 import org.junit.Test;
 
 /**
  * Class for testing the {@link Compress} methods.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CompressTest {
@@ -81,21 +82,6 @@ public final class CompressTest {
     testTexts("etc/xml/factbook.zip");
   }
 
-  /** Test. */
-  @Test
-  public void evaluate() {
-    if(!verbose) return;
-
-    /*for(int o = 0; o < occ.length; o++) {
-      int max = 0;
-      for(int p = 0; p < occ.length; p++) {
-        if(occ[max] < occ[p]) max = p;
-      }
-      System.out.println("0x" + Integer.toHexString(max));
-      occ[max] = 0;
-    }*/
-  }
-
   /**
    * Test on all text nodes of a document.
    * @param file file to be parsed
@@ -148,7 +134,7 @@ public final class CompressTest {
       for(final byte[] token : tokens) {
         for(final byte t : token) occ[t & 0xFF]++;
       }
-      System.out.println((cl == tl ? "= " : "+ ") + tl + " -> " + cl);
+      Util.outln((cl == tl ? "= " : "+ ") + tl + " -> " + cl);
     }
   }
 }

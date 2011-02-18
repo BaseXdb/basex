@@ -17,7 +17,7 @@ import org.basex.util.Token;
 /**
  * Info functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNInfo extends Fun {
@@ -85,7 +85,7 @@ final class FNInfo extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && (def == FunDef.ENV || def == FunDef.ENVS) ||
+    return u == Use.X30 && (def == FunDef.ENV || def == FunDef.ENVS) ||
       u == Use.CTX && (def == FunDef.ERROR || def == FunDef.TRACE) ||
       super.uses(u);
   }

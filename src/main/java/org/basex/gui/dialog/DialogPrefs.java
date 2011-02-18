@@ -22,7 +22,7 @@ import org.basex.io.IO;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DialogPrefs extends Dialog {
@@ -107,7 +107,7 @@ public final class DialogPrefs extends Dialog {
     lang.setSelectedItem(prop.get(Prop.LANG));
 
     p.add(lang);
-    creds = new BaseXLabel();
+    creds = new BaseXLabel(" ");
     p.add(creds);
     creds.setText(TRANSLATION + creds(lang.getSelectedItem()));
 

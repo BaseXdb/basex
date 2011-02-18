@@ -13,22 +13,21 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'open' command and opens a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Open extends Command {
   /**
    * Default constructor.
-   * @param name name of database
+   * @param path database name and optional path
    */
-  public Open(final String name) {
-    super(STANDARD, name);
+  public Open(final String path) {
+    super(STANDARD, path);
   }
 
   @Override
   protected boolean run() {
     String db = args[0];
-    if(!validName(db)) return error(NAMEINVALID, db);
 
     new Close().run(context);
     final int i = db.indexOf('/');
@@ -37,6 +36,7 @@ public final class Open extends Command {
       path = db.substring(i + 1);
       db = db.substring(0, i);
     }
+    if(!validName(db)) return error(NAMEINVALID, db);
 
     try {
       final Data data = open(db, context);
@@ -77,7 +77,7 @@ public final class Open extends Command {
     // check permissions
     if(ctx.perm(User.READ, data.meta)) return data;
 
-    Close.close(ctx, data);
+    Close.close(data, ctx);
     throw new IOException(Util.info(PERMNO, CmdPerm.READ));
   }
 }

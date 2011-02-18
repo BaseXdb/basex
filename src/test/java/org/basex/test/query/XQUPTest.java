@@ -3,7 +3,7 @@ package org.basex.test.query;
 /**
  * XQuery Update Tests.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class XQUPTest extends QueryTest {

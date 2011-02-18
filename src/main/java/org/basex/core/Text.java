@@ -9,7 +9,7 @@ import static org.basex.util.Token.*;
  * throughout the project. If this class is called first, the Strings
  * are initialized by the {@link org.basex.core.Lang} class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public interface Text {
@@ -38,13 +38,13 @@ public interface Text {
   /** URL of the community page. */
   String COMMUNITY_URL = URL + "/community";
   /** URL of the update page. */
-  String UPDATE_URL = URL + "/maven/org/" + NAMELC + "/" + NAMELC;
+  String UPDATE_URL = URL + "/products/download/all-downloads/";
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.3.4";
+  String VERSION = "6.5.1";
   /** Company info. */
-  String COMPANY = "DBIS, University of Konstanz";
+  String COMPANY = "BaseX Team";
   /** Version information. */
   String VERSINFO = lang("version", VERSION);
 
@@ -67,8 +67,9 @@ public interface Text {
   String LOCALMODE = "Standalone";
   /** Start information. */
   String LOCALINFO =
-    " [-diosuvVwz] [-cq] [file]" + NL +
+    " [-bdiosuvVwz] [-cq] [file]" + NL +
     "  [file]     Execute XQuery file" + NL +
+    "  -b<pars>   Bind external XQuery variables" + NL +
     "  -c<cmd>    Execute database command(s)" + NL +
     "  -d         Activate debugging mode" + NL +
     "  -i<input>  Open initial file or database" + NL +
@@ -77,15 +78,16 @@ public interface Text {
     "  -s<pars>   Set serialization parameter(s)" + NL +
     "  -u         Write updates back to original files" + NL +
     "  -v/V       Show (all) process info" + NL +
-    "  -w         Keep whitespaces from source files" + NL +
+    "  -w         Retain whitespaces from source files" + NL +
     "  -z         Skip output of results";
 
   /** Client mode. */
   String CLIENTMODE = "Client";
   /** Start information. */
   String CLIENTINFO =
-    " [-npPU] [-dovVwz] [-cq] [file]" + NL +
+    " [-npPU] [-dosvVwz] [-cq] [file]" + NL +
     "  [file]     Execute XQuery file" + NL +
+    "  -b<pars>   Bind external XQuery variables" + NL +
     "  -c<cmd>    Execute database command(s)" + NL +
     "  -d         Activate debugging mode" + NL +
     "  -n<name>   Set server (host) name" + NL +
@@ -93,16 +95,17 @@ public interface Text {
     "  -p<num>    Set server port" + NL +
     "  -P<pass>   Specify user password" + NL +
     "  -q<expr>   Execute XQuery expression" + NL +
+    "  -s<pars>  Set serialization parameter(s)" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -v/V       Show (all) process info" + NL +
-    "  -w         Keep whitespaces from source files" + NL +
-    "  -z         Skip output of results";
+    "  -w         Retain whitespaces from source files" + NL +
+    "  -z         Skip XQuery serialization";
 
   /** Server mode. */
   String SERVERMODE = "Server";
   /** Start information. */
   String SERVERINFO =
-    " [-s] [-dpz] [-c] [stop]" + NL +
+    " [-dpsz] [-c] [stop]" + NL +
     "  stop     Stop existing server" + NL +
     "  -c<cmd>  Execute initial database command(s)" + NL +
     "  -d       Activate debugging mode" + NL +
@@ -112,12 +115,13 @@ public interface Text {
     "  -z       Suppress logging";
 
   /** Start information. */
-  String RESTINFO =
-    " [-pw]" + NL +
+  String JAXRXINFO =
+    " [-jpPsUz]" + NL +
+    "  -j<num>   Set JAX-RX server port" + NL +
     "  -p<num>   Set database server port" + NL +
     "  -P<pass>  Specify user password" + NL +
-    "  -r<num>   Set REST server port" + NL +
-    "  -s<pars>  Set serialization parameter(s)" + NL +
+    "  -s        Start as service" + NL +
+    "  -S<pars>  Set serialization parameter(s)" + NL +
     "  -U<name>  Specify user name" + NL +
     "  -z        Suppress logging";
 
@@ -129,6 +133,8 @@ public interface Text {
   String SERVERSTOPPED = lang("srv_stop");
   /** Server is running or permission was denied. */
   String SERVERBIND = lang("srv_bind");
+  /** Unknown host. */
+  String SERVERUNKNOWN = lang("srv_unknown");
   /** Timeout exceeded. */
   String SERVERTIMEOUT = lang("srv_timeout");
   /** Connection error. */
@@ -139,8 +145,6 @@ public interface Text {
   String SERVERUSER = lang("srv_user");
   /** Password. */
   String SERVERPW = lang("srv_pw");
-  /** Start REST. */
-  String RESTSTART = lang("srv_reststart") + DOTS;
 
   /** Localhost. */
   String LOCALHOST = "localhost";
@@ -174,28 +178,26 @@ public interface Text {
   /** Missing help. */
   String NOHELP = lang("ch_nohelp");
 
-  /** Database separator. */
-  String[] HELPDB = { lang("ch_helpdatabase0") };
   /** Command help. */
   String[] HELPCREATE = {
     "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
-    CmdCreate.INDEX + "|" + CmdCreate.USER + "|" 
+    CmdCreate.INDEX + "|" + CmdCreate.USER + "|"
     + CmdCreate.TRIGGER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
-    LI + CmdCreate.DB + " [" + C_NAME + "] ([" + INPUT + "]):"  + NL +
+    LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + INPUT + "]):"  + NL +
       "  " + lang("ch_create3", C_NAME, INPUT) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
-      "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]: " + NL +
+      "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]:" + NL +
       "  " + lang("ch_create5") + NL +
     LI + CmdCreate.FS + " [" + C_NAME + "] [" + C_PATH +
-      "] ([mountpoint] [backingstore]): " + NL +
+      "] ([mountpoint] [store]):" + NL +
       "  " + lang("ch_create6", C_NAME, C_PATH) + NL +
       "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]): " + NL +
       "  " + lang("ch_create8") + NL +
     LI + CmdCreate.TRIGGER + " [" + C_NAME + "]: " + NL +
-      "  " + lang("ch_create9")  
+      "  " + lang("ch_create9")
   };
 
   /** Command help. */
@@ -203,7 +205,7 @@ public interface Text {
       "TRIGGER " + "[" + C_NAME + "]", lang("ch_helpattach1"),
       lang("ch_helpattach2", C_NAME)
     };
-  
+
   /** Command help. */
   String[] HELPDETACH = {
       "TRIGGER " + "[" + C_NAME + "]", lang("ch_helpdetach1"),
@@ -224,17 +226,18 @@ public interface Text {
 
   /** Command help. */
   String[] HELPOPEN = {
-    "[" + C_NAME + "]", lang("ch_open1"), lang("ch_open2", C_NAME)
+    "[" + C_PATH + "]", lang("ch_open1"), lang("ch_open2", C_PATH)
   };
   /** Command help. */
   String[] HELPINFO = {
-    "([" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" + CmdInfo.TABLE + "])",
+    "([" + CmdInfo.DATABASE + "|" + CmdInfo.INDEX + "|" +
+    CmdInfo.STORAGE + "])",
     lang("ch_info1"),
     lang("ch_info21") + NL +
     LI + lang("ch_info22") + NL +
-    LI + CmdInfo.DB + ": " + lang("ch_info23") + NL +
+    LI + CmdInfo.DATABASE + ": " + lang("ch_info23") + NL +
     LI + CmdInfo.INDEX + ": " + lang("ch_info24") + NL +
-    LI + CmdInfo.TABLE + " [start end] | [" + C_QUERY + "]: " +
+    LI + CmdInfo.STORAGE + " [start end] | [" + C_QUERY + "]: " +
     lang("ch_info25")
   };
   /** Command help. */
@@ -243,20 +246,20 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPLIST = {
-    "", lang("ch_list1"), lang("ch_list2")
+    "([" + C_PATH + "])", lang("ch_list1"), lang("ch_list2", C_PATH)
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "|" 
+    "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "|"
     + CmdDrop.TRIGGER + "] [...]",
     lang("ch_drop1"),
     lang("ch_drop2") + NL +
-    LI + CmdDrop.DB + " [" + C_NAME + "]:" + NL +
+    LI + CmdDrop.DATABASE + " [" + C_NAME + "]:" + NL +
       "  " + lang("ch_drop21") + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
-    LI + CmdDrop.USER + " [" + C_NAME + "]:" + NL + "  " +
+    LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [db]): " + NL + "  " +
       lang("ch_drop23") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
       lang("ch_drop24", C_NAME) + NL +
@@ -267,13 +270,11 @@ public interface Text {
   String[] HELPEXPORT = {
     "[" + C_PATH + "]", lang("ch_export1"), lang("ch_export2", C_PATH)
   };
-
   /** Command help. */
   String[] HELPOPTIMIZE = {
     "", lang("ch_optimize1"), lang("ch_optimize2")
   };
-  /** Command help. */
-  String[] HELPQ = { lang("ch_helpquery0") };
+
   /** Command help. */
   String[] HELPXQUERY = {
     "[" + C_QUERY + "]", lang("ch_xquery1"), lang("ch_xquery2")
@@ -292,8 +293,6 @@ public interface Text {
   };
 
   /** Command help. */
-  String[] HELPA = { lang("ch_helpadmin0") };
-  /** Command help. */
   String[] HELPKILL = {
     "[" + C_NAME + "]", lang("ch_kill1"), lang("ch_kill2")
   };
@@ -303,7 +302,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPRESTORE = {
-    "[" + C_NAME + "]", lang("ch_restore1"), lang("ch_restore2")
+    "[" + C_NAME + "-(date)]", lang("ch_restore1"), lang("ch_restore2")
   };
   /** Command help. */
   String[] HELPSHOW = {
@@ -327,17 +326,15 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + CmdCreate.USER + "|" + CmdCreate.DB + "] [...]",
+    "[" + CmdCreate.USER + "|" + CmdCreate.DATABASE + "] [...]",
     lang("ch_alter1"),
     lang("ch_alter2") + NL  +
     LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
     "  " + lang("ch_alterpw") + NL +
-    LI + CmdCreate.DB + " [" + C_NAME + "] [newname]" + NL +
+    LI + CmdCreate.DATABASE + " [" + C_NAME + "] [newname]" + NL +
     "  " + lang("ch_alterdb")
   };
 
-  /** Command help. */
-  String[] HELPG = { lang("ch_helpgeneral0") };
   /** Command help. */
   String[] HELPSET = {
     "[option] ([value])",
@@ -353,6 +350,12 @@ public interface Text {
     LI + CmdSet.FTINDEX   + COLS + lang("ch_set31") + NL +
     LI + CmdSet.PATHINDEX + COLS + lang("ch_set32")
   };
+
+  /** Command help. */
+  String[] HELPGET = {
+      "[option]", lang("ch_get1", "info"), lang("ch_get2", "option")
+  };
+
   /** Command help. */
   String[] HELPPASSWORD = {
     "([" + C_PW + "])", lang("ch_password1"), lang("ch_password2")
@@ -394,8 +397,8 @@ public interface Text {
   String CMDWHICH = CMDUNKNOWN + "; " + lang("help_short", "help") + DOT;
   /** Unknown command error. */
   String CMDSIMILAR = CMDUNKNOWN + "; " + lang("cmd_similar");
-  /** Database closed. */
-  String CMDHELP = lang("help_long", "help");
+  /** Try "help [...]" to get.. */
+  String CMDHELP = lang("help_long", "help") + NL;
 
   // CREATE COMMAND ===========================================================
 
@@ -639,8 +642,8 @@ public interface Text {
   String INFODBNAME = lang("info_dbname");
   /** Info on database size. */
   String INFODBSIZE = lang("info_dbsize");
-  /** Info on source document. */
-  String INFODOC = lang("info_doc");
+  /** Info on path. */
+  String INFOPATH = lang("info_path");
   /** Info on database time stamp. */
   String INFOTIME = lang("info_time");
   /** Info on number of documents. */
@@ -1043,10 +1046,10 @@ public interface Text {
 
   /** Database creation filter. */
   String CREATEPATTERN = lang("dc_pattern");
-  /** Dialog title for creating a database. */
+  /** Name of database. */
   String CREATENAME = lang("dc_name") + COLS;
-  /** Dialog title for creating a database. */
-  String CREATENAME2 = lang("dc_name2") + COLS;
+  /** Target path. */
+  String CREATETARGET = lang("dc_target") + COLS;
   /** XML file description. */
   String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
   /** ZIP file description. */
@@ -1062,10 +1065,12 @@ public interface Text {
   String CREATECHOP = lang("dc_chop");
   /** Entities information. */
   String CREATEENTITIES = lang("dc_entities");
-  /** Entities information. */
+  /** DTD information. */
   String CREATEDTD = lang("dc_dtd");
-  /** SAX parsing information. */
+  /** Internal parser. */
   String CREATEINTPARSE = lang("dc_intparse");
+  /** SAX parsing information. */
+  String CREATEFORMAT = lang("dc_createformat") + COLS;
 
   /** Full-text index information. */
   String CREATEWC = lang("dc_wcindex");
@@ -1088,8 +1093,18 @@ public interface Text {
 
   /** Whitespaces information. */
   String CHOPPINGINFO = lang("dc_chopinfo") + DOT;
-  /** Whitespaces information. */
+  /** Internal parser information. */
   String INTPARSEINFO = lang("dc_intparseinfo") + DOT;
+  /** Input format information. */
+  String FORMATINFO = lang("dc_formatinfo") + DOT;
+  /** CSV header information. */
+  String HEADERINFO = lang("dc_headerinfo") + DOT;
+  /** CSV Database format information. */
+  String FORMINFO = lang("dc_forminfo") + COL;
+  /** CSV Separator information. */
+  String SEPARATORINFO = lang("dc_separatorinfo") + COL;
+  /** TEXT Lines information. */
+  String LINESINFO = lang("dc_linesinfo") + DOT;
 
   /** Path summary information. */
   String PATHINDEXINFO = lang("dc_pathinfo") + DOT;
@@ -1234,8 +1249,10 @@ public interface Text {
   String RENAMEOVER = lang("dr_over") + DOT;
   /** Info for creating an empty database. */
   String EMPTYDATABASE = lang("dr_empty") + DOT;
-  /** Info for overwriting a database and deleting backing store. */
+  /** Info for overwriting a database and deleting store. */
   String RENAMEOVERBACKING = lang("dr_overbacking") + DOT;
+  /** % documents will be deleted. */
+  String DELETEPATH = lang("dr_delete") + DOT;
 
   /** Dialog title for managing databases. */
   String MANAGETITLE = lang("dd_title");
@@ -1312,7 +1329,7 @@ public interface Text {
     lang("dm_choice4"), lang("dm_choice5")
   };
 
-  /** Dialog title for treeview options. */
+  /** Dialog title for tree view options. */
   String TREEOPTIONSTITLE = lang("dt_title");
   /** Slim rectangles to text length. */
   String TREESLIM = lang("dt_slim");
@@ -1351,7 +1368,7 @@ public interface Text {
   /** About text. */
   String ABOUTTITLE = lang("da_title", NAME);
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-10 " + COMPANY;
+  String COPYRIGHT = "\u00A9 2005-11 " + COMPANY;
   /** License info. */
   String LICENSE = lang("da_license");
   /** Developer info. */

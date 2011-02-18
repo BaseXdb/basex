@@ -13,10 +13,10 @@ import org.basex.query.ft.ThesQuery;
 /**
  * This class contains all full-text options.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class FTOpt extends ExprInfo {
+public final class FTOpt extends ExprInfo {
   /** Flag values. */
   private final EnumMap<FTFlag, Boolean> map =
     new EnumMap<FTFlag, Boolean>(FTFlag.class);

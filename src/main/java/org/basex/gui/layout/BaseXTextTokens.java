@@ -7,7 +7,7 @@ import static org.basex.util.Token.*;
 /**
  * This class allows the iteration on tokens.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BaseXTextTokens {
@@ -265,6 +265,64 @@ public final class BaseXTextTokens {
   }
 
   /**
+   * Indents lines.
+   * @param s start position
+   * @param e end position
+   * @param sh shift flag
+   */
+  void indent(final int s, final int e, final boolean sh) {
+    // extend selection to match whole lines
+    pos(s);
+    bol(true);
+    startMark();
+    pos(e);
+    forward(Integer.MAX_VALUE, true);
+    next(true);
+    endMark();
+
+    // decide if to use tab or spaces
+    boolean tab = false;
+    for(int p = 0; p < size; ++p) tab |= text[p] == '\t';
+    String add = "\t";
+    if(!tab) {
+      add = "";
+      for(int i = 0; i < TAB; i++) add += ' ';
+    }
+
+    // build new text
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(text, 0, ms);
+    for(int p = ms; p < ps; p += cl(text, p)) {
+      if(p == 0 || text[p - 1] == '\n') {
+        if(sh) {
+          // remove indentation
+          if(text[p] == '\t') {
+            me--;
+            continue;
+          }
+          if(text[p] == ' ') {
+            me--;
+            for(int i = 1; i < TAB && p + i < size && text[p + i] == ' '; i++) {
+              me--;
+              p++;
+            }
+            continue;
+          }
+        } else {
+          // add new indentation
+          tb.add(add);
+          me += add.length();
+        }
+      }
+      tb.add(cp(text, p));
+    }
+    tb.add(text, ps, size);
+    ps = me;
+    text = tb.finish();
+    size = tb.size();
+  }
+
+  /**
    * Deletes the current character.
    * Assumes that the current position allows a deletion.
    */
@@ -322,7 +380,8 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Returns the start of the text mark.
+   * Returns the start of the text mark. The value is {@code -1} if no
+   * text is selected.
    * @return start mark
    */
   int start() {

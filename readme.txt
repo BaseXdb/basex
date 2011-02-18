@@ -1,4 +1,3 @@
-
 BASEX ==========================================================================
 
  Welcome to the source code of BaseX.
@@ -53,9 +52,11 @@ ADDING CHECKSTYLE --------------------------------------------------------------
 --------------------------------------------------------------------------------
 
  Any kind of feedback is welcome; please check out the online documentation at
- http://basex.org/documentation and tell us if you run into any troubles
- while installing and running BaseX: basex-talk@mailman.uni-konstanz.de
+ http://docs.basex.org and tell us if you run into any troubles while installing
+ and running BaseX: basex-talk@mailman.uni-konstanz.de
+ You may use our public bugtracker over at Github: 
+ https://github.com/BaseXdb/BaseX/issues
 
- BaseX Team, 2010
+ BaseX Team, 2011
 
-============================================= DBIS Group, University of Konstanz
+================================================================================

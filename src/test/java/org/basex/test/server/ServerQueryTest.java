@@ -17,13 +17,13 @@ import org.junit.Test;
 /**
  * This class tests the client/server query API.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ServerQueryTest {
   /** Serialization parameters to wrap query result with an element. */
   private static final String WRAPPER =
-    "declare option output:wrap-pre 'db';" +
+    "declare option output:wrap-prefix 'db';" +
     "declare option output:wrap-uri 'ns';";
   /** Server reference. */
   private static BaseXServer server;
@@ -83,7 +83,7 @@ public final class ServerQueryTest {
    * @throws BaseXException command exception */
   @Test
   public void commandSerial1() throws BaseXException {
-    cs.execute("set serializer wrap-pre=db,wrap-uri=ns");
+    cs.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     assertEquals(
       "<db:results xmlns:db=\"ns\">\n</db:results>",
       cs.execute("xquery ()").replaceAll("\\r", ""));
@@ -106,7 +106,7 @@ public final class ServerQueryTest {
     try {
       cs.execute("xquery (");
       fail("Error expected.");
-    } catch(final BaseXException e) {
+    } catch(final BaseXException ex) {
     }
   }
 
@@ -185,7 +185,7 @@ public final class ServerQueryTest {
    * @throws BaseXException command exception */
   @Test
   public void querySerial1() throws BaseXException {
-    cs.execute("set serializer wrap-pre=db,wrap-uri=ns");
+    cs.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     final ClientQuery cq = cs.query(WRAPPER + "()");
     assertEquals("<db:results xmlns:db=\"ns\">", cq.init());
     assertFalse("No result was expected.", cq.more());
@@ -285,7 +285,7 @@ public final class ServerQueryTest {
     final ClientQuery cq = cs.query("1 to 2");
     cq.execute();
     final String info = cq.info();
-    if(!info.contains("Total Time")) {
+    if(!info.contains(QUERYTOTAL)) {
       fail("'Total Time' not contained in '" + info + "'.");
     }
     cq.close();
@@ -339,11 +339,11 @@ public final class ServerQueryTest {
     cq2.close();
   }
 
-  /** Runs 1000 queries in parallel.
+  /** Runs 5 queries in parallel.
    * @throws BaseXException command exception */
   @Test
-  public void query1000() throws BaseXException {
-    final int size = 1000;
+  public void query8() throws BaseXException {
+    final int size = 8;
     final ClientQuery[] cqs = new ClientQuery[size];
     for(int q = 0; q < size; q++) cqs[q] = cs.query(String.valueOf(q));
     for(int q = 0; q < size; q++)

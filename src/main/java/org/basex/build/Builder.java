@@ -23,7 +23,7 @@ import org.basex.util.Util;
  * are to be added or closed. The builder implementation decides whether
  * the nodes are stored on disk or kept in memory.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Builder extends Progress {
@@ -324,14 +324,14 @@ public abstract class Builder extends Progress {
     final int as = att.size;
     final boolean ne = ns.open();
     int u = ns.uri(tag, true);
-    addElem(dis, n, as + 1, u, ne);
+    addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, ne);
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
       n = atts.index(att.key[a], att.val[a], true);
       u = ns.uri(att.key[a], false);
       if(meta.pathindex) path.add(n, lvl + 1, Data.ATTR);
-      addAttr(n, att.val[a], a + 1, u);
+      addAttr(n, att.val[a], Math.min(IO.MAXATTS, a + 1), u);
     }
 
     if(lvl != 0) {
@@ -352,7 +352,6 @@ public abstract class Builder extends Progress {
     limit(tags.size(), 0x8000, LIMITTAGS);
     limit(atts.size(), 0x8000, LIMITATTS);
     limit(ns.size(), 0x100, LIMITNS);
-    limit(as, 0x20, LIMITATT);
     if(meta.size < 0) limit(0, 0, LIMITRANGE);
     return pre;
   }

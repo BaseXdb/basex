@@ -11,7 +11,7 @@ import org.basex.util.Token;
 /**
  * Empty sequence.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Empty extends Value {
@@ -20,6 +20,7 @@ public final class Empty extends Value {
   /** Empty iterator. */
   public static final ValueIter ITER = new ValueIter() {
     @Override public Item next() { return null; }
+    @Override public Item get(final long i) { return null; }
     @Override public Value finish() { return SEQ; }
     @Override public long size() { return 0; }
     @Override public boolean reset() { return true; }

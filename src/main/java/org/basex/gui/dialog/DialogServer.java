@@ -37,7 +37,7 @@ import org.basex.util.Util;
 /**
  * Dialog window for displaying information about the server.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
 public final class DialogServer extends Dialog {
@@ -140,7 +140,7 @@ public final class DialogServer extends Dialog {
     loguser.addKeyListener(keys);
     logpass = new BaseXPassword(main);
     logpass.addKeyListener(keys);
-    infoC = new BaseXLabel().border(8, 0, 0, 0);
+    infoC = new BaseXLabel(" ").border(8, 0, 0, 0);
 
     BaseXBack p = new BaseXBack(new TableLayout(6, 1, 0, 0));
 
@@ -225,7 +225,7 @@ public final class DialogServer extends Dialog {
     BaseXLayout.setHeight(logt, 100);
 
     logt.border(5, 5, 5, 5);
-    infoL = new BaseXLabel().border(8, 0, 0, 0);
+    infoL = new BaseXLabel(" ").border(8, 0, 0, 0);
     refreshLog = new BaseXButton(BUTTONREFRESH, this);
 
     p = new BaseXBack(new BorderLayout());
@@ -289,7 +289,7 @@ public final class DialogServer extends Dialog {
           gui.set(Prop.PORT, p);
           portc.setText(ports.getText());
         }
-        msg = BaseXServer.start(p);
+        msg = BaseXServer.start(p, BaseXServer.class);
         if(msg.equals(SERVERSTART)) {
           running = true;
         } else {
@@ -429,7 +429,7 @@ public final class DialogServer extends Dialog {
     if(files != null) {
       for(final String s : files) if(s.endsWith(".log")) sl.add(s);
     }
-    sl.sort(true, false);
+    sl.sort(false, false);
     for(final String s : sl) logc.addItem(s);
     action(refreshLog);
   }

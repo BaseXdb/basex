@@ -23,7 +23,7 @@ import org.xml.sax.XMLReader;
  * TagSoup was written by John Cowan and is based on the Apache 2.0 License:
  * {@code http://home.ccil.org/~cowan/XML/tagsoup/}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class HTMLParser extends XMLParser {
@@ -33,6 +33,14 @@ public final class HTMLParser extends XMLParser {
   /** HTML reader. */
   private static final Constructor<?> WRITER = Reflect.find(Reflect.find(
       "org.ccil.cowan.tagsoup.XMLWriter"), Writer.class);
+
+  /**
+   * Checks if a CatalogResolver is available.
+   * @return result of check
+   */
+  public static boolean available() {
+    return READER != null;
+  }
 
   /**
    * Constructor.
@@ -86,13 +94,5 @@ public final class HTMLParser extends XMLParser {
       Util.debug(ex);
       return io;
     }
-  }
-
-  /**
-   * Checks if TagSoup is in class path.
-   * @return result
-   */
-  public static boolean isAvailable() {
-    return READER != null;
   }
 }

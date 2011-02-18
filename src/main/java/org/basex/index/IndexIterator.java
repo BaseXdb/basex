@@ -3,7 +3,7 @@ package org.basex.index;
 /**
  * This interface provides methods for returning index results.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexIterator {
@@ -32,9 +32,9 @@ public abstract class IndexIterator {
   public abstract int next();
 
   /**
-   * Returns the scoring value out of the index.
-   * socre = -1 => no scoring value indexed
-   * @return scoring value
+   * Returns the score value.
+   * {@code -1} is returned if no scoring is available.
+   * @return score value
    */
   public abstract double score();
 

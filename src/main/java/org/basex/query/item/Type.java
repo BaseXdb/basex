@@ -36,7 +36,7 @@ import org.w3c.dom.Text;
 /**
  * XQuery data types.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public enum Type {
@@ -642,7 +642,12 @@ public enum Type {
       if(it.type != STR) error(it, ii);
       final byte[] s = trim(it.atom());
       if(s.length == 0) QNMINV.thrw(ii, s);
-      return new QNm(s, ctx, ii);
+      try {
+        return new QNm(s, ctx, ii);
+      } catch(final QueryException ex) {
+        NSDECL.thrw(ii, s);
+        return null;
+      }
     }
     @Override
     public Item e(final Object o, final InputInfo ii) {

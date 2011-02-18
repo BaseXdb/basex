@@ -3,7 +3,7 @@ package org.basex.util;
 /**
  * This class stores strings in a history.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Undo {

@@ -4,7 +4,7 @@
   <groupId>org.basex</groupId>
   <artifactId>basex</artifactId>
   <packaging>jar</packaging>
-  <version>6.3.4</version>
+  <version>6.5.2-SNAPSHOT</version>
   <name>BaseX</name>
   <url>http://basex.org</url>
   <properties>
@@ -13,8 +13,8 @@
   </properties>
   <licenses>
     <license>
-      <name>ISC License</name>
-      <url>http://www.isc.org/software/license</url>
+      <name>BSD License</name>
+      <url>http://www.opensource.org/licenses/bsd-license.php</url>
     </license>
   </licenses>
   <repositories>
@@ -25,8 +25,8 @@
     </repository>
   </repositories>
   <organization>
-    <name>Chair for Database and Information Systems, U Konstanz</name>
-    <url>http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis</url>
+    <name>BaseX Team</name>
+    <url>http://www.basex.org</url>
   </organization>
   <developers>
     <developer>

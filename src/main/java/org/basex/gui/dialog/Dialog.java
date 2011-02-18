@@ -23,7 +23,7 @@ import org.basex.gui.layout.TableLayout;
 /**
  * This class provides the architecture for consistent dialog windows.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Dialog extends JDialog {
@@ -232,16 +232,5 @@ public abstract class Dialog extends JDialog {
    */
   public static void error(final GUI gui, final String text) {
     new DialogMessage(gui, text.trim(), Msg.ERROR);
-  }
-
-  /**
-   * Shows an information or error dialog.
-   * @param gui parent reference
-   * @param ok ok flag
-   * @param text text
-   */
-  public static void show(final GUI gui, final String text, final boolean ok) {
-    if(ok) info(gui, text);
-    else error(gui, text);
   }
 }

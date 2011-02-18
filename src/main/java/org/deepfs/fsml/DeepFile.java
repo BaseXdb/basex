@@ -37,7 +37,7 @@ import org.deepfs.fsml.ser.FSMLSerializer;
  * that is stored inside another file, e.g. a file in a ZIP-file or a picture
  * that is included in an ID3 tag.
  * </p>
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public final class DeepFile {
@@ -657,7 +657,7 @@ public final class DeepFile {
   }
 
   /**
-   * Adds a xml document or fragment to the DeepFile.
+   * Adds an XML document or fragment to the DeepFile.
    * @param position offset of the xml document/fragment inside the file
    * @param byteCount number of bytes of the xml document/fragment
    * @param data the xml document/fragment
@@ -680,7 +680,7 @@ public final class DeepFile {
   }
 
   /**
-   * Adds a xml document or fragment to the DeepFile.
+   * Adds an XML document or fragment to the DeepFile.
    * @param pos offset of the xml document/fragment inside the file
    * @param byteCount number of bytes of the xml document/fragment
    * @param xml the xml document/fragment

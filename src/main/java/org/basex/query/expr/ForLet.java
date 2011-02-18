@@ -9,7 +9,7 @@ import org.basex.util.InputInfo;
 /**
  * Abstract For/Let Clause.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class ForLet extends Single {
@@ -30,12 +30,12 @@ public abstract class ForLet extends Single {
   /**
    * If possible, binds the variable at compile time.
    * @param ctx query context
-   * @return result of check
+   * @return true if expression was bound to variable
    * @throws QueryException query exception
    */
   protected boolean bind(final QueryContext ctx) throws QueryException {
     // don't bind variable if expression uses variables, context, or fragments
-    if(expr.uses(Use.VAR) || expr.uses(Use.CTX) || expr.uses(Use.FRG) ||
+    if(expr.uses(Use.VAR) || expr.uses(Use.CTX) || expr.uses(Use.CNS) ||
         ctx.grouping) return false;
 
     ctx.compInfo(OPTBIND, var);

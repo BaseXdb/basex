@@ -5,7 +5,7 @@ import java.io.PrintStream;
 /**
  * Internal representation of file status.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Alexander Holupirek
  */
 public final class DeepStat {

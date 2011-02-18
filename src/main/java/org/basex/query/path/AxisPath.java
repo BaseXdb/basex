@@ -38,7 +38,7 @@ import org.basex.util.TokenList;
 /**
  * Axis Path expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -164,7 +164,6 @@ public class AxisPath extends Path {
     optSteps(ctx);
 
     // check if all context nodes reference document nodes
-    // [CG] XQuery: optimize paths without root context
     final Data data = ctx.resource.data();
     if(data != null) {
       boolean doc = ctx.resource.docNodes();

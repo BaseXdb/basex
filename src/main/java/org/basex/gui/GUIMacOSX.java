@@ -10,7 +10,7 @@ import org.basex.gui.layout.BaseXLayout;
 /**
  * Sets some Mac OS X specific interface options.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public final class GUIMacOSX {

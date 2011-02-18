@@ -17,7 +17,7 @@ import org.basex.util.InputInfo;
 /**
  * FTContains expression with index access.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FTIndexAccess extends Simple {

@@ -16,7 +16,7 @@ import org.basex.util.ft.FTLexer;
 /**
  * Sequential FTContains expression with index access.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Sebastian Gath
  */
 final class FTContainsIndex extends FTContains {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
+import org.basex.data.Data;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
@@ -23,18 +24,17 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
-import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
+import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
  * Generating functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNGen extends Fun {
@@ -51,10 +51,11 @@ final class FNGen extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case DATA:    return data(ctx);
-      case COLL:    return collection(ctx);
-      case URICOLL: return uriCollection(ctx);
-      default:      return super.iter(ctx);
+      case DATA:        return data(ctx);
+      case COLL:        return collection(ctx);
+      case URICOLL:     return uriCollection(ctx);
+      case PARSETXTLIN: return unparsedTextLines(ctx);
+      default:          return super.iter(ctx);
     }
   }
 
@@ -67,7 +68,6 @@ final class FNGen extends Fun {
       case PARSETXT:    return unparsedText(ctx);
       case PARSETXTAVL: return unparsedTextAvailable(ctx);
       case PUT:         return put(ctx);
-      case PARSE: // might get obsolete
       case PARSEXML:    return parseXml(ctx);
       case SERIALIZE:   return serialize(ctx);
       default:          return super.item(ctx, ii);
@@ -107,8 +107,8 @@ final class FNGen extends Fun {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private NodIter collection(final QueryContext ctx) throws QueryException {
-    return ctx.resource.coll(expr.length != 0 ? checkStr(expr[0], ctx) :
+  private Iter collection(final QueryContext ctx) throws QueryException {
+    return ctx.resource.collection(expr.length != 0 ? checkStr(expr[0], ctx) :
       null, input);
   }
 
@@ -118,12 +118,16 @@ final class FNGen extends Fun {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private ItemIter uriCollection(final QueryContext ctx) throws QueryException {
-    final NodIter coll = collection(ctx);
-    final ItemIter ir = new ItemIter();
-    Nod it = null;
-    while((it = coll.next()) != null) ir.add(Uri.uri(it.base()));
-    return ir;
+  private Iter uriCollection(final QueryContext ctx) throws QueryException {
+    final Iter coll = collection(ctx);
+    return new Iter() {
+      @Override
+      public Item next() throws QueryException {
+        final Item it = coll.next();
+        // all items will be nodes
+        return it == null ? null : Uri.uri(((Nod) it).base());
+      }
+    };
   }
 
   /**
@@ -155,8 +159,14 @@ final class FNGen extends Fun {
    */
   private Nod doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, input);
-    return it == null ? null :
-      ctx.resource.doc(checkEStr(it), false, false, input);
+    if(it == null) return null;
+
+    final byte[] in = checkEStr(it);
+    if(contains(in, '<') || contains(in, '>')) INVDOC.thrw(input, in);
+
+    final Data d = ctx.resource.data(in, false, input);
+    if(!d.single()) EXPSINGLE.thrw(input);
+    return new DBNode(d, 0, Data.DOC);
   }
 
   /**
@@ -181,7 +191,7 @@ final class FNGen extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item unparsedText(final QueryContext ctx) throws QueryException {
+  private Str unparsedText(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     try {
@@ -190,6 +200,34 @@ final class FNGen extends Fun {
       UNDEF.thrw(input, ex);
       return null;
     }
+  }
+
+  /**
+   * Performs the unparsed-text-lines function.
+   * @param ctx query context
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  private Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
+    final byte[] str = unparsedText(ctx).atom();
+
+    return new Iter() {
+      int p = -1;
+      @Override
+      public Item next() {
+        final ByteList bl = new ByteList();
+        while(++p < str.length) {
+          if(str[p] == 0x0a) break;
+          if(str[p] == 0x0d) {
+            if(p + 1 < str.length && str[p + 1] == 0x0a) p++;
+            break;
+          }
+          bl.add(str[p]);
+        }
+        return p + 1 < str.length || bl.size() != 0 ?
+            Str.get(bl.toArray()) : null;
+      }
+    };
   }
 
   /**
@@ -288,9 +326,9 @@ final class FNGen extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.UPD && def == FunDef.PUT || u == Use.X11 && (
+    return u == Use.UPD && def == FunDef.PUT || u == Use.X30 && (
         def == FunDef.DATA && expr.length == 0 ||
-        def == FunDef.PARSE || def == FunDef.PARSETXT ||
+        def == FunDef.PARSETXT || def == FunDef.PARSETXTLIN ||
         def == FunDef.PARSETXTAVL || def == FunDef.PARSEXML ||
         def == FunDef.URICOLL || def == FunDef.SERIALIZE) ||
         u == Use.CTX && def == FunDef.DATA && expr.length == 0 ||

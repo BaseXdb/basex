@@ -18,7 +18,7 @@ import org.basex.util.Util;
  * This is the starter class for the stand-alone console mode.
  * It executes all commands locally.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class BaseX extends Main {
@@ -125,12 +125,17 @@ public class BaseX extends Main {
   @Override
   protected final boolean parseArguments(final String[] args) {
     String serial = "";
+    String bind = "";
     try {
       final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO);
       while(arg.more()) {
         if(arg.dash()) {
           final char c = arg.next();
-          if(c == 'c') {
+          if(c == 'b') {
+            // set/add serialization parameter
+            bind += "," + arg.string();
+            arg.check(set(Prop.BINDINGS, bind));
+          } else if(c == 'c') {
             // specify command to be evaluated
             commands = arg.remaining();
           } else if(c == 'd') {
@@ -148,6 +153,7 @@ public class BaseX extends Main {
           } else if(c == 'o') {
             // specify file for result output
             out = new PrintOutput(arg.string());
+            if(session != null) session.setOutputStream(out);
           } else if(c == 'p' && !sa()) {
             // set server port
             context.prop.set(Prop.PORT, arg.num());

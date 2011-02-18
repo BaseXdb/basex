@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
 import org.basex.core.User;
@@ -13,7 +12,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'run' command and processes a query file as XQuery.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Run extends AQuery {

@@ -20,7 +20,7 @@ import org.basex.util.XMLToken;
 /**
  * Dialog window for editing XML nodes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DialogEdit extends Dialog {
@@ -105,7 +105,7 @@ public final class DialogEdit extends Dialog {
     set(pp, BorderLayout.CENTER);
 
     pp = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel().border(8, 0, 2, 0);
+    info = new BaseXLabel(" ").border(8, 0, 2, 0);
     pp.add(info, BorderLayout.WEST);
 
     // create buttons

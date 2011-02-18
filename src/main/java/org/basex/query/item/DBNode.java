@@ -7,6 +7,7 @@ import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.query.util.NSGlobal;
@@ -18,7 +19,7 @@ import org.basex.util.ft.Scoring;
 /**
  * Disk-based Node item.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class DBNode extends Nod {
@@ -148,7 +149,7 @@ public class DBNode extends Nod {
   @Override
   public final byte[] base() {
     if(type != Type.DOC) return EMPTY;
-    final IO dir = IO.get(data.meta.file.path());
+    final IO dir = IO.get(data.meta.path.path());
     return token(dir.merge(string(data.text(pre, true))).url());
   }
 
@@ -369,6 +370,12 @@ public class DBNode extends Nod {
         return parent();
       }
     };
+  }
+
+  @Override
+  public final boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof DBNode)) return false;
+    return data == ((DBNode) cmp).data && pre == ((DBNode) cmp).pre;
   }
 
   @Override

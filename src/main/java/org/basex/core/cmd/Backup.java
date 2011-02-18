@@ -19,7 +19,7 @@ import org.basex.io.IO;
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Backup extends Command {
@@ -83,7 +83,7 @@ public final class Backup extends Command {
       }
       zos.close();
       return true;
-    } catch(final IOException e) {
+    } catch(final IOException ex) {
       return false;
     }
   }

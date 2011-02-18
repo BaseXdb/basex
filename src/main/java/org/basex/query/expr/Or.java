@@ -9,11 +9,12 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
+import org.basex.util.ft.Scoring;
 
 /**
  * Or expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Or extends Logical {
@@ -63,7 +64,7 @@ public final class Or extends Logical {
       if(it.bool(input)) {
         final double s = it.score();
         if(s == 0) return Bln.TRUE;
-        d = ctx.score.or(d, s);
+        d = Scoring.or(d, s);
         f = true;
       }
     }

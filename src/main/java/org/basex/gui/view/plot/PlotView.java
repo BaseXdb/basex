@@ -39,7 +39,7 @@ import org.deepfs.fs.DeepFS;
 /**
  * A scatter plot visualization of the database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class PlotView extends View {
@@ -379,7 +379,7 @@ public final class PlotView extends View {
 
         final byte[] nm = ViewData.attValue(data, data.nameID, focused);
         String name = nm != null ? string(nm) : "";
-        if(name.length() > 0 && plotData.xAxis.attrID != data.nameID &&
+        if(!name.isEmpty() && plotData.xAxis.attrID != data.nameID &&
             plotData.yAxis.attrID != data.nameID) {
 
           if(ol > 1) name = ol + "x: " + name + ", ...";

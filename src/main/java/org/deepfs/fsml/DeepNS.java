@@ -3,7 +3,7 @@ package org.deepfs.fsml;
 /**
  * All namespaces used in the DeepFile.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 public enum DeepNS {
@@ -41,7 +41,7 @@ public enum DeepNS {
   @Override
   public String toString() {
     final StringBuilder str = new StringBuilder("xmlns");
-    if(prefix.length() > 0) str.append(':').append(prefix);
+    if(!prefix.isEmpty()) str.append(':').append(prefix);
     return str.append("=\"").append(uri).append("\"").toString();
   }
 }

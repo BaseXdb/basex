@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * This is a simple container for int values.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class IntList extends ElementList {
@@ -101,14 +101,6 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Returns the uppermost element on the stack, without removing it.
-   * @return uppermost element
-   */
-  public final int peek() {
-    return list[size - 1];
-  }
-
-  /**
    * Searches the specified element via binary search.
    * Note that all elements must be sorted.
    * @param e element to be found
@@ -128,9 +120,11 @@ public class IntList extends ElementList {
 
   /**
    * Sorts the data.
+   * @return self reference
    */
-  public void sort() {
+  public IntList sort() {
     Arrays.sort(list, 0, size);
+    return this;
   }
 
   /**

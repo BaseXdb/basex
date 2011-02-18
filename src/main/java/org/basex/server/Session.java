@@ -16,7 +16,7 @@ import org.basex.io.ArrayOutput;
  * to that stream.
  * The class is implemented by {@link ClientSession} and {@link LocalSession}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Session {
@@ -24,15 +24,6 @@ public abstract class Session {
   protected String info;
   /** Client output. */
   protected OutputStream out;
-
-  /**
-   * Specifies an output stream. The output stream is invalidated if
-   * {@code null} is specified.
-   * @param output client output stream.
-   */
-  public void setOutputStream(final OutputStream output) {
-    out = output;
-  }
 
   /**
    * Executes a {@link Command} instance.
@@ -91,6 +82,15 @@ public abstract class Session {
    */
   public final String info() {
     return info;
+  }
+
+  /**
+   * Specifies an output stream. The output stream is invalidated if
+   * {@code null} is specified.
+   * @param output client output stream.
+   */
+  public void setOutputStream(final OutputStream output) {
+    out = output;
   }
 
   /**

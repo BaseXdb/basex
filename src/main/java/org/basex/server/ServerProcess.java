@@ -28,7 +28,7 @@ import org.basex.util.Util;
 /**
  * Single session for a client-server connection.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */
@@ -257,17 +257,22 @@ public final class ServerProcess extends Thread {
         qp = new QueryProcess(query, out, context);
         arg = Integer.toString(id++);
         queries.put(arg, qp);
-        log.write(this, arg, query, OK);
         // send {ID}0
         out.writeString(arg);
+        log.write(this, sc + "(" + arg + ")", query, OK);
       } else {
         // find query process
         qp = queries.get(arg);
         // ID has already been removed
         if(qp == null && sc != CLOSE)
           throw new IOException("Unknown query ID (" + arg + ")");
+
         if(sc == BIND) {
-          qp.bind(in.readString(), in.readString(), in.readString());
+          final String key = in.readString();
+          final String val = in.readString();
+          final String typ = in.readString();
+          qp.bind(key, val, typ);
+          log.write(this, sc + "(" + arg + ")", key, val, typ, OK);
         } else if(sc == INIT) {
           qp.init();
         } else if(sc == NEXT) {
@@ -285,15 +290,19 @@ public final class ServerProcess extends Thread {
       }
       // send 0 as success flag
       out.write(0);
+
+      // write log file (skip next calls; bind has been logged before)
+      if(sc != NEXT && sc != BIND) log.write(this, sc + "(" + arg + ")", OK);
     } catch(final Exception ex) {
       // log exception (static or runtime)
       err = ex.getMessage();
+      log.write(this, sc + "(" + arg + ")", INFOERROR + err);
+
       if(qp != null) qp.close(true);
       queries.remove(arg);
     }
     if(err != null) {
       // send 0 as end marker, 1 as error flag, and {MSG}0
-      log.write(this, arg, INFOERROR + err);
       out.write(0);
       out.write(1);
       out.writeString(err);

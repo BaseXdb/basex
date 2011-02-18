@@ -9,7 +9,7 @@ import org.basex.query.QueryException;
  * Container for all global and local variables that are specified in the
  * current context.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Variables extends ExprInfo {

@@ -17,7 +17,7 @@ import org.xml.sax.InputSource;
 /**
  * File reference, wrapped into an IO representation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
@@ -213,9 +213,12 @@ public final class IOFile extends IO {
         file = URLDecoder.decode(file, Prop.ENCODING);
       } catch(final Exception ex) { /* ignored. */ }
     }
+    // remove file scheme
     String fn = file.startsWith(FILEPREF) ?
         file.substring(FILEPREF.length()) : file;
+        // remove leading slashes
     while(fn.startsWith("//")) fn = fn.substring(1);
+    // remove slash on Windows systems
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
   }
@@ -223,38 +226,38 @@ public final class IOFile extends IO {
   /**
    * Converts a file filter (glob) to a regular expression. A filter may
    * contain asterisks (*) and question marks (?); commas (,) are used to
-   * separate multiple filters. Special characters can be backslashed (\).
+   * separate multiple filters.
    * @param filter filter
    * @return regular expression
    */
   public static String regex(final String filter) {
     final StringBuilder sb = new StringBuilder();
-    boolean wild = false;
-    boolean back = false;
-    for(int f = 0; f < filter.length(); f++) {
-      char ch = filter.charAt(f);
-      if(!back) {
+    for(final String g : filter.split(",")) {
+      boolean suf = false;
+      final String glob = g.trim();
+      if(sb.length() != 0) {
+        if(!suf) sb.append(".*");
+        suf = false;
+        sb.append('|');
+      }
+      for(int f = 0; f < glob.length(); f++) {
+        char ch = glob.charAt(f);
         if(ch == '*') {
-          sb.append('.');
-          wild = true;
+          sb.append("[^.]");
         } else if(ch == '?') {
           ch = '.';
-          wild = true;
-        } else if(ch == ',') {
-          ch = '|';
-          if(!wild) sb.append(".*");
-          wild = false;
+          suf = true;
         } else if(!Character.isLetterOrDigit(ch)) {
-          back = ch == '\\';
-          if(!back) sb.append('\\');
-          if(ch == '.') wild = true;
+          if(ch == '.') {
+            suf = true;
+            if(f + 1 == glob.length()) break;
+          }
+          sb.append('\\');
         }
-      } else {
-        back = false;
+        sb.append(ch);
       }
-      sb.append(ch);
+      if(!suf) sb.append(".*");
     }
-    if(!wild) sb.append(".*");
     return Prop.WIN ? sb.toString().toLowerCase() : sb.toString();
   }
 
@@ -289,10 +292,16 @@ public final class IOFile extends IO {
      * @param tb entry
      */
     private void add(final TokenBuilder tb) {
-      final String s = tb.toString();
+      String s = tb.toString();
+      // switch first Windows letter to upper case
+      if(s.length() > 1 && s.charAt(1) == ':' && size == 0) {
+        s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
+      }
       if(s.equals("..") && size > 0) {
-        if(!list[size - 1].contains(":")) delete(size - 1);
+        // parent step
+        if(list[size - 1].indexOf(':') == -1) delete(size - 1);
       } else if(!s.equals(".") && !s.isEmpty()) {
+        // skip self and empty steps
         add(s.toString());
       }
       tb.reset();

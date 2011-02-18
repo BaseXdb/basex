@@ -1,3 +1,4 @@
+/*
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
@@ -31,35 +32,34 @@ import org.basex.io.IO;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 
-/**
+/*
  * Open database dialog.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Alexander Holupirek
- */
 public final class DialogMountFS extends Dialog {
-  /** Mountpoint path. */
+  /** Mountpoint path.
   final BaseXTextField mountpoint;
 
-  /** List of currently available databases. */
+  /** List of currently available databases.
   private final BaseXListChooser choice;
-  /** Information panel. */
+  /** Information panel.
   private final BaseXLabel doc;
-  /** Information panel. */
+  /** Information panel.
   private final BaseXText detail;
-  /** Browse button. */
+  /** Browse button.
   private final BaseXButton browse;
-  /** Mount button. */
+  /** Mount button.
   private final Object mount;
-  /** Mountpoint warning. */
+  /** Mountpoint warning.
   private final BaseXLabel warn;
-  /** Buttons. */
+  /** Buttons.
   private final BaseXBack buttons;
 
   /**
    * Default constructor.
    * @param main reference to the main window
-   */
+
   public DialogMountFS(final GUI main) {
     super(main, OPENMOUNTTITLE);
     final GUIProp gprop = gui.gprop;
@@ -107,7 +107,7 @@ public final class DialogMountFS extends Dialog {
       }
     });
     m.add(browse);
-    warn = new BaseXLabel().border(5, 5, 0, 0);
+    warn = new BaseXLabel(" ").border(5, 5, 0, 0);
     m.add(warn);
     info.add(m, BorderLayout.SOUTH);
 
@@ -131,7 +131,7 @@ public final class DialogMountFS extends Dialog {
   /**
    * Returns the database name.
    * @return database name
-   */
+
   public String db() {
     final String db = choice.getValue();
     return ok && db.length() > 0 ? db : null;
@@ -140,7 +140,7 @@ public final class DialogMountFS extends Dialog {
   /**
    * Returns the mount point.
    * @return database name
-   */
+
   public String mp() {
     final String db = mountpoint.getText().trim();
     return ok && db.length() > 0 ? db : null;
@@ -149,7 +149,7 @@ public final class DialogMountFS extends Dialog {
   /**
    * Tests if no databases have been found.
    * @return result of check
-   */
+
   public boolean nodb() {
     return choice.getIndex() == -1;
   }
@@ -196,4 +196,4 @@ public final class DialogMountFS extends Dialog {
   public void close() {
     if(ok) dispose();
   }
-}
+}*/

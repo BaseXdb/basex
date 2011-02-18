@@ -12,7 +12,7 @@ import org.basex.util.Reflect;
  * The Lucene stemmers are based on the Apache License:
  * {@code http://lucene.apache.org/}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class LuceneStemmer extends Stemmer {

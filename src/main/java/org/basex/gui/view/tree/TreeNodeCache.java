@@ -7,7 +7,7 @@ import org.basex.util.IntList;
 /**
  * This class determines nodes per level and caches them.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Wolfgang Miller
  */
 final class TreeNodeCache implements TreeViewOptions {
@@ -39,12 +39,12 @@ final class TreeNodeCache implements TreeViewOptions {
         maxLevel = l + 1;
       } else {
         final int ts = data.meta.size;
-        final IntList roots = data.doc();
+        final int[] roots = data.doc();
         alil.add(new IntList());
-        for(int i = 0; i < roots.size(); ++i) {
-          final int root = roots.get(i);
+        for(int i = 0; i < roots.length; ++i) {
+          final int root = roots[i];
           alil.get(0).add(root);
-          final int sh = i + 1 == roots.size() ? ts : roots.get(i + 1);
+          final int sh = i + 1 == roots.length ? ts : roots[i + 1];
           for(int p = root + 1; p < sh; ++p) {
             final int k = data.kind(p);
             if(!atts && k == Data.ATTR || ONLY_ELEMENT_NODES

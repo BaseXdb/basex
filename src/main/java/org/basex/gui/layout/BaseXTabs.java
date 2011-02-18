@@ -6,7 +6,7 @@ import javax.swing.JTabbedPane;
 /**
  * Project specific TabbedPane implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BaseXTabs extends JTabbedPane {
@@ -16,6 +16,6 @@ public final class BaseXTabs extends JTabbedPane {
    */
   public BaseXTabs(final Window win) {
     super();
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
   }
 }

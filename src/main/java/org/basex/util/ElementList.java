@@ -3,7 +3,7 @@ package org.basex.util;
 /**
  * This is an abstract class for storing elements of any kind.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class ElementList {

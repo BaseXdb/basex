@@ -15,18 +15,18 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
 /**
- * Evaluates the 'info table' command and returns the table representation
+ * Evaluates the 'info storage' command and returns the table representation
  * of the currently opened database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class InfoTable extends AQuery {
+public final class InfoStorage extends AQuery {
   /**
    * Default constructor.
    * @param arg optional arguments
    */
-  public InfoTable(final String... arg) {
+  public InfoStorage(final String... arg) {
     super(DATAREF | User.READ, arg);
   }
 
@@ -47,6 +47,7 @@ public final class InfoTable extends AQuery {
       final Table table = th();
       for(final int n : ((Nodes) result).list) table(table, data, n);
       out.print(table.finish());
+      result = null;
     } else {
       int ps = 0;
       int pe = data.meta.size;
@@ -115,24 +116,32 @@ public final class InfoTable extends AQuery {
    */
   private static void table(final Table t, final Data data, final int p) {
     final int k = data.kind(p);
-    final TokenList sl = new TokenList();
-    sl.add(p);
-    sl.add(p - data.parent(p, k));
-    sl.add(data.size(p, k));
-    sl.add(data.attSize(p, k));
+    final TokenList tl = new TokenList();
+    tl.add(p);
+    tl.add(p - data.parent(p, k));
+    tl.add(data.size(p, k));
+    tl.add(data.attSize(p, k));
     final int u = data.uri(p, k);
-    if(data.nsFlag(p)) sl.add("+" + u);
-    else sl.add(u);
-    sl.add(TABLEKINDS[k]);
-    sl.add(replace(chop(k == Data.ELEM ? data.name(p, k) : k != Data.ATTR ?
-        data.text(p, true) : concat(data.name(p, k), ATT1,
-        data.text(p, false), ATT2), 64), '\n', ' '));
-    t.contents.add(sl);
+    if(data.nsFlag(p)) tl.add("+" + u);
+    else tl.add(u);
+    tl.add(TABLEKINDS[k]);
+
+    byte[] cont = null;
+    if(k == Data.ELEM) {
+      cont = data.name(p, k);
+    } else if(k == Data.ATTR) {
+      cont = new TokenBuilder(data.name(p, k)).add(ATT1).add(
+          data.text(p, false)).add(ATT2).finish();
+    } else {
+      cont = data.text(p, true);
+    }
+    tl.add(replace(chop(cont, 64), '\n', ' '));
+    t.contents.add(tl);
   }
 
   @Override
   public void build(final CommandBuilder cb) {
-    cb.init(Cmd.INFO + " " + CmdInfo.TABLE);
+    cb.init(Cmd.INFO + " " + CmdInfo.STORAGE);
     if(args.length > 0 && args[0] != null && toInt(args[0]) ==
       Integer.MIN_VALUE) {
       cb.xquery(0);

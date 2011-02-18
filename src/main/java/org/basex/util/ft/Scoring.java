@@ -3,9 +3,9 @@ package org.basex.util.ft;
 import static java.lang.StrictMath.*;
 
 /**
- * Simple default scoring model, assembling all scoring calculations.
+ * Default scoring model, assembling all score calculations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Scoring {
@@ -16,6 +16,9 @@ public final class Scoring {
   /** Scoring step. */
   private static final double SCORESTEP = 0.8;
 
+  /** Private constructor. */
+  private Scoring() { }
+
   /**
    * Calculates a score value, based on the token length
    * and complete text length.
@@ -23,7 +26,7 @@ public final class Scoring {
    * @param l complete length
    * @return result
    */
-  public double word(final int tl, final double l) {
+  public static double word(final int tl, final double l) {
     return min(1, log(1 + LOG * tl / l));
   }
 
@@ -33,7 +36,7 @@ public final class Scoring {
    * @param n new value
    * @return result
    */
-  public double and(final double o, final double n) {
+  public static double and(final double o, final double n) {
     return 1 - (1 - o) * (1 - n);
   }
 
@@ -43,7 +46,7 @@ public final class Scoring {
    * @param n new value
    * @return result
    */
-  public double or(final double o, final double n) {
+  public static double or(final double o, final double n) {
     return and(o, n);
   }
 
@@ -52,7 +55,7 @@ public final class Scoring {
    * @param d scoring value
    * @return inverse scoring value
    */
-  public double not(final double d) {
+  public static double not(final double d) {
     return 1 - d;
   }
 
@@ -62,7 +65,7 @@ public final class Scoring {
    * @param c number of values
    * @return new score value
    */
-  public double let(final double s, final int c) {
+  public static double let(final double s, final int c) {
     return s / c;
   }
 
@@ -104,7 +107,7 @@ public final class Scoring {
    * @param w2 score of word2
    * @return score of the phrase
    */
-  public static double phrase(final double w1, final double w2) {
+  public static double intersect(final double w1, final double w2) {
     return (w1 + w2) / 2;
   }
 

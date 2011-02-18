@@ -21,12 +21,12 @@ import org.basex.util.Util;
  * This class assembles properties which are used all around the project. They
  * are initially read from and finally written to disk.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class AProp {
   /** Properties. */
-  private final HashMap<String, Object> props = new HashMap<String, Object>();
+  protected final HashMap<String, Object> props = new HashMap<String, Object>();
   /** Property file. */
   private final String filename;
 

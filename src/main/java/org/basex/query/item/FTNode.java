@@ -7,7 +7,7 @@ import org.basex.util.ft.Scoring;
 /**
  * Disk-based full-text Node item.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FTNode extends DBNode {
@@ -15,7 +15,6 @@ public final class FTNode extends DBNode {
   private final int tl;
   /** Total number of indexed results. */
   private final int is;
-
   /** Full-text matches. */
   public FTMatches all;
 

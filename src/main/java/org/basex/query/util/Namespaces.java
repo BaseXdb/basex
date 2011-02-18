@@ -11,7 +11,7 @@ import org.basex.util.InputInfo;
 /**
  * Local namespaces.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Namespaces {
@@ -70,7 +70,7 @@ public final class Namespaces {
     byte[] uri = find(pre);
     if(uri == null) uri = NSGlobal.uri(pre);
     if(uri.length == 0 && pre.length != 0) {
-      (dn ? INVNAME : PREUNKNOWN).thrw(ii, pre);
+      (dn ? INVPREF : PREFUNKNOWN).thrw(ii, pre);
     }
     return uri;
   }

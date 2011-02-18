@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
  * This class provides convenience operations for XML-specific character
  * operations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class XMLToken {

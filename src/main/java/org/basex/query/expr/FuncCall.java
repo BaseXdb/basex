@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Function call.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class FuncCall extends Arr {
@@ -49,14 +49,18 @@ public final class FuncCall extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
 
-    // inline if result and arguments are all values.
-    // [CG] XQuery/Inlining:
+    // Inline if result and arguments are all values.
+    // Currently, only functions with values as
+    // return expressions are supported; otherwise, recursive functions
+    // might not be correctly evaluated
     if(func.expr.value() && values()) {
       // evaluate arguments to catch cast exceptions
       for(int a = 0; a < expr.length; ++a) func.args[a].bind(expr[a], ctx);
       ctx.compInfo(OPTINLINE, func.var.name.atom());
       return func.value(ctx);
     }
+    // User-defined functions are not pre-evaluated to avoid various issues
+    // with recursive functions
     type = func.type();
     return this;
   }

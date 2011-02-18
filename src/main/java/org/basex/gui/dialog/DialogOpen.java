@@ -33,7 +33,7 @@ import org.basex.util.Util;
 /**
  * Open database dialog.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DialogOpen extends Dialog {
@@ -57,16 +57,18 @@ public final class DialogOpen extends Dialog {
   private final BaseXButton restore;
   /** File system flag. */
   private final boolean fsInstance;
+  /** Manage flag. */
+  private final boolean manage;
 
   /**
    * Default constructor.
    * @param main reference to the main window
-   * @param manage show manage dialog
+   * @param m show manage dialog
    * @param fs file system flag
    */
-  public DialogOpen(final GUI main, final boolean manage, final boolean fs) {
-    super(main, manage ? MANAGETITLE : fs ? OPENDQETITLE : OPENTITLE);
-
+  public DialogOpen(final GUI main, final boolean m, final boolean fs) {
+    super(main, m ? MANAGETITLE : fs ? OPENDQETITLE : OPENTITLE);
+    manage = m;
     // create database chooser
     final StringList db = fs ? List.listFS(main.context) :
       List.list(main.context);
@@ -120,8 +122,7 @@ public final class DialogOpen extends Dialog {
    * @return database name
    */
   public String db() {
-    final String db = choice.getValue();
-    return ok && db.length() > 0 ? db : null;
+    return ok ? choice.getValue() : null;
   }
 
   /**
@@ -142,10 +143,10 @@ public final class DialogOpen extends Dialog {
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
-      final DialogRename dr = new DialogRename(db, RENAMETITLE, gui,
+      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui,
           fsInstance, true);
-      if(!dr.ok() || dr.name().equals(db)) return;
-      final AlterDB cmd = new AlterDB(db, dr.name());
+      if(!dr.ok() || dr.input().equals(db)) return;
+      final AlterDB cmd = new AlterDB(db, dr.input());
       if(cmd.run(ctx)) {
         gui.notify.init();
       } else {
@@ -191,7 +192,7 @@ public final class DialogOpen extends Dialog {
           detail.setText(InfoDB.db(meta, true, true, true));
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
-          ok = false;
+          ok = manage;
         } finally {
           if(in != null) try { in.close(); } catch(final IOException ex) { }
         }

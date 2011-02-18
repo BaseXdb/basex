@@ -6,7 +6,7 @@ import java.util.EnumSet;
  * Functions for judging which classes (eg. tokenizers, stemmers) match to
  * chosen language.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Jens Erat
  */
 abstract class LanguageImpl extends FTIterator

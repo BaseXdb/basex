@@ -13,7 +13,7 @@ import org.xml.sax.InputSource;
 /**
  * This class provides an API for standalone XPath processing.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class BXPath implements XPath {

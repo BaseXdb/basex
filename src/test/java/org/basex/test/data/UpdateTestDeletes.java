@@ -1,4 +1,4 @@
-package org.basex.test.storage;
+package org.basex.test.data;
 
 import org.basex.data.Data;
 import org.junit.Test;
@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 /**
  * This class tests the update features of the Data class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Tim Petrowsky
  */
 public final class UpdateTestDeletes extends UpdateTest {

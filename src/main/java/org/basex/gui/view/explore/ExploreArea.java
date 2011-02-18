@@ -34,7 +34,7 @@ import org.deepfs.fs.DeepFS;
 /**
  * This is a simple user search panel.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Bastian Lemke
  */
@@ -99,7 +99,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     if(!main.visible() || data == null) return;
 
     final boolean pi = data.meta.pathindex;
-    if(panel.getComponentCount() != 0) {
+    if(!pi || panel.getComponentCount() != 0) {
       if(!pi) init();
       return;
     }
@@ -135,26 +135,26 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param data data reference
    */
   private void addKeys(final Data data) {
-    final TokenList sl = new TokenList();
+    final TokenList tl = new TokenList();
     final int cs = panel.getComponentCount();
     final boolean fs = data.fs != null;
-    if(fs) sl.add(Token.token(DeepFS.S_FILE));
-    else {
+    if(fs) {
+      tl.add(Token.token(DeepFS.S_FILE));
+    } else {
       for(int c = 0; c < cs; c += 2) {
         final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
         if(combo.getSelectedIndex() == 0) continue;
         final String elem = combo.getSelectedItem().toString();
-        if(!elem.startsWith("@")) sl.add(Token.token(elem));
+        if(!elem.startsWith("@")) tl.add(Token.token(elem));
       }
     }
 
-    final TokenList tmp = data.pthindex.desc(sl, data, !fs, false);
-    if(tmp.size() == 0) return;
-
+    final TokenList tmp = data.pthindex.desc(tl, data, !fs, false);
     final String[] keys = entries(tmp.toArray());
     final BaseXCombo cm = new BaseXCombo(gui, keys);
     cm.addActionListener(this);
     cm.addKeyListener(main);
+    if(tmp.size() == 0) cm.setEnabled(false);
     panel.add(cm);
     panel.add(new BaseXLabel(""));
   }

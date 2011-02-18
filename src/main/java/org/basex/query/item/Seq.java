@@ -8,7 +8,7 @@ import org.basex.util.InputInfo;
 /**
  * Sequence, containing at least two items.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
@@ -25,7 +25,7 @@ public abstract class Seq extends Value {
   }
 
   /**
-   * Returns a sequence for the specified items.
+   * Returns a value representation of the specified items.
    * @param v value
    * @param s size
    * @return resulting item or sequence

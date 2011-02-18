@@ -16,7 +16,7 @@ import org.basex.util.Token;
 /**
  * Project specific CheckBox implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BaseXTable extends JTable {
@@ -41,7 +41,7 @@ public final class BaseXTable extends JTable {
     setModel(model);
     getTableHeader().setReorderingAllowed(false);
     getTableHeader().setResizingAllowed(false);
-    BaseXLayout.addInteraction(this, null, d);
+    BaseXLayout.addInteraction(this, d);
 
     getSelectionModel().addListSelectionListener(new ListSelectionListener() {
       @Override

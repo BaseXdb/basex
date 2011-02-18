@@ -10,7 +10,7 @@ import org.basex.util.Util;
 /**
  * This class contains serialization properties.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class SerializerProp extends AProp {
@@ -63,12 +63,18 @@ public final class SerializerProp extends AProp {
   public static final Object[] S_VERSION = {
     "version", "" };
 
+  /** Specific serialization parameter: formatting. */
+  public static final Object[] S_FORMAT = {
+    "format", YES };
+  /** Specific serialization parameter: indent with spaces or tabs. */
+  public static final Object[] S_TABULATOR = {
+    "tabulator", NO };
   /** Specific serialization parameter: number of spaces to indent. */
-  public static final Object[] S_INDENT_SPACES = {
-    "indent-spaces", "2" };
+  public static final Object[] S_INDENTS = {
+    "indents", "2" };
   /** Specific serialization parameter: prefix of result wrapper. */
-  public static final Object[] S_WRAP_PRE = {
-    "wrap-pre", "" };
+  public static final Object[] S_WRAP_PREFIX = {
+    "wrap-prefix", "" };
   /** Specific serialization parameter: URI of result wrapper. */
   public static final Object[] S_WRAP_URI = {
     "wrap-uri", "" };
@@ -82,8 +88,8 @@ public final class SerializerProp extends AProp {
 
   /**
    * Constructor, specifying initial properties.
-   * @param s property string. Properties are separated with commas,
-   * key/values with equality
+   * @param s property string. Properties are separated with commas ({@code ,}),
+   * key/values with the equality character ({@code =}).
    * @throws IOException I/O exception
    */
   public SerializerProp(final String s) throws IOException {

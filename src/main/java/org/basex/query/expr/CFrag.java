@@ -16,7 +16,7 @@ import org.basex.util.XMLToken;
 /**
  * Fragment constructor.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class CFrag extends Arr {
@@ -64,8 +64,8 @@ public abstract class CFrag extends Arr {
   }
 
   @Override
-  public final boolean uses(final Use u) {
-    return u == Use.FRG || super.uses(u);
+  public boolean uses(final Use u) {
+    return u == Use.CNS || super.uses(u);
   }
 
   /**

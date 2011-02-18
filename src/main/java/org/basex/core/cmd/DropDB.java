@@ -12,7 +12,7 @@ import org.basex.core.Commands.Cmd;
 /**
  * Evaluates the 'drop database' command and deletes a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DropDB extends Command {
@@ -38,6 +38,7 @@ public final class DropDB extends Command {
 
     // check if database is still pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
+
     // try to drop database
     return drop(db, prop) ? info(DBDROPPED, db) : error(DBDROPERROR);
   }
@@ -69,7 +70,9 @@ public final class DropDB extends Command {
 
     for(final File sub : files) {
       if(pat == null || sub.getName().matches(pat))
-        if(!sub.delete()) return false;
+        if(!sub.delete()) {
+          return false;
+        }
     }
     return pat != null || path.delete();
   }

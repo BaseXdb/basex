@@ -7,7 +7,7 @@ import org.basex.query.path.AxisStep;
  * Container for all information needed to determine whether an index is
  * accessible or not.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Sebastian Gath
  */
 public final class IndexContext {

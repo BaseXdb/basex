@@ -13,7 +13,7 @@ import org.basex.util.Util;
  * This class parses the tokens that are delivered by the
  * {@link XMLScanner} and sends them to the specified database builder.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DirParser extends Parser {
@@ -56,7 +56,7 @@ public final class DirParser extends Parser {
   @Override
   public void parse(final Builder b) throws IOException {
     b.meta.filesize = 0;
-    b.meta.file = IO.get(file.path());
+    b.meta.path = IO.get(file.path());
     parse(b, file);
   }
 
@@ -77,7 +77,7 @@ public final class DirParser extends Parser {
         b.meta.filesize += file.length();
 
         // use global target as prefix
-        String targ = target.length() != 0 ? target + '/' : "";
+        String targ = !target.isEmpty() ? target + '/' : "";
         final String name = file.name();
         String path = file.path();
         // add relative path without root (prefix) and file name (suffix)

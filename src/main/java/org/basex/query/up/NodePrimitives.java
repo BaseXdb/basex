@@ -10,7 +10,7 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  * {@link PrimitiveType}. There is at most one {@link UpdatePrimitive} for each
  * type. Duplicate {@link UpdatePrimitive} are merged.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 interface NodePrimitives extends Iterable<UpdatePrimitive> {

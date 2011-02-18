@@ -19,7 +19,7 @@ import org.basex.util.Util;
 /**
  * This is the starter class for the graphical frontend.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BaseXGUI {
@@ -70,7 +70,9 @@ public final class BaseXGUI {
         if(args.length != 0) {
           final String input = args[0].replace('\\', '/');
           final IO io = IO.get(input);
-          if(input.endsWith(IO.XQSUFFIX)) {
+          boolean xq = false;
+          for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
+          if(xq) {
             gui.query.setQuery(io);
           } else {
             gui.execute(new Check(input));
@@ -105,7 +107,7 @@ public final class BaseXGUI {
         while(en.hasMoreElements()) {
           final Object k = en.nextElement();
           final Object v = def.get(k);
-          if(v instanceof Font) def.put(k, ((Font) v).deriveFont(0));
+          if(v instanceof Font) def.put(k, ((Font) v).deriveFont(Font.PLAIN));
         }
       }
     } catch(final Exception ex) {

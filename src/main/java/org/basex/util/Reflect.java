@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
  * This class assembles some reflection methods. If exceptions occur, a
  * {@code null} reference is returned or a runtime exception is thrown.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Reflect {
@@ -51,7 +51,7 @@ public final class Reflect {
     try {
       try {
         return clazz.getMethod(name, types);
-      } catch(final Exception e) {
+      } catch(final Exception ex) {
         final Method m = clazz.getDeclaredMethod(name, types);
         m.setAccessible(true);
         return m;
@@ -73,7 +73,7 @@ public final class Reflect {
     try {
       try {
         return clazz.getConstructor(types);
-      } catch(final Exception e) {
+      } catch(final Exception ex) {
         final Constructor<?> m = clazz.getDeclaredConstructor(types);
         m.setAccessible(true);
         return m;

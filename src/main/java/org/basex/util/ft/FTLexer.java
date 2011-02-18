@@ -10,7 +10,7 @@ import org.basex.util.Token;
  * Performs full-text lexing on token. Calls tokenizers, stemmers matching to
  * full-text options to achieve this.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Jens Erat
  */
 public final class FTLexer extends FTIterator implements IndexToken {

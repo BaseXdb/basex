@@ -4,11 +4,7 @@
 PWD=`dirname $0`
 
 # Paths to distributed files or source directories
-#BXPATH=basex.jar
-BXPATH=$PWD/../target/classes
+BASEX=$PWD/../target/classes
 
-# Options for virtual machine
-VM=
-
-# Run BaseX
-java -cp "$BXPATH" $VM org.basex.BaseXClient "$@"
+# Run code
+java -cp "$BASEX" org.basex.BaseXClient "$@"

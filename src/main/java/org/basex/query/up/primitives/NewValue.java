@@ -8,7 +8,7 @@ import org.basex.util.InputInfo;
  * Abstract update primitive which holds an additional 'name' attribute to for
  * updating values, names, etc..
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 abstract class NewValue extends UpdatePrimitive {

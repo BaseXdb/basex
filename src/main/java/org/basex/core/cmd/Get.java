@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * Evaluates the 'get' command and return the value of a database property.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Get extends AGet {

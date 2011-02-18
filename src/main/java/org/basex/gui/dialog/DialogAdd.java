@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.basex.core.Command;
+import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -13,28 +13,30 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
-import org.basex.util.Util;
 
 /**
  * Add document dialog.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
-public class DialogAdd extends Dialog {
+public final class DialogAdd extends Dialog {
   /** Document to add. */
   private final BaseXTextField path;
   /** Directory path. */
   private final BaseXTextField target;
-  /** Name of document. */
-  private final BaseXTextField name;
   /** Database info. */
   private final BaseXLabel info;
   /** Buttons. */
   private final BaseXBack buttons;
+  /** Editable parsing options. */
+  final DialogParsing parsing;
+  /** Document filter. */
+  private final BaseXTextField filter;
 
   /**
    * Default constructor.
@@ -43,10 +45,9 @@ public class DialogAdd extends Dialog {
   public DialogAdd(final GUI main) {
     super(main, GUIADD);
 
-    BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
+    final BaseXBack p = new BaseXBack(new TableLayout(10, 2, 6, 0)).border(8);
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
-    p.border(0, 0, 8, 0);
 
     final IO in = IO.get(gui.gprop.get(GUIProp.CREATEPATH));
     path = new BaseXTextField(in.dir(), this);
@@ -60,31 +61,34 @@ public class DialogAdd extends Dialog {
     });
     p.add(browse);
 
-    p.add(new BaseXLabel(EDITNAME + COL, true, true).border(8, 0, 4, 0));
+    p.add(new BaseXLabel(CREATEPATTERN + COL, true, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());
 
-    name = new BaseXTextField(this);
-    name.addKeyListener(keys);
-    p.add(name);
-    p.add(new BaseXLabel());
-    p.add(new BaseXLabel("Target Path" + COL, true, true).border(8, 0, 4, 0));
+    filter = new BaseXTextField(main.context.prop.get(Prop.CREATEFILTER), this);
+    p.add(filter);
     p.add(new BaseXLabel());
 
-    target = new BaseXTextField(this);
+    p.add(new BaseXLabel(CREATETARGET, true, true).border(8, 0, 4, 0));
+    p.add(new BaseXLabel());
+
+    target = new BaseXTextField("/", this);
     target.addKeyListener(keys);
     p.add(target);
     p.add(new BaseXLabel());
 
-    set(p, BorderLayout.CENTER);
+    info = new BaseXLabel(" ").border(18, 0, 0, 0);
+    p.add(info);
+
+    parsing = new DialogParsing(this);
+
+    final BaseXTabs tabs = new BaseXTabs(this);
+    tabs.addTab(GENERALINFO, p);
+    tabs.addTab(PARSEINFO, parsing);
+    set(tabs, BorderLayout.CENTER);
 
     // create buttons
-    p = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel().border(18, 0, 0, 0);
-    p.add(info, BorderLayout.WEST);
     buttons = okCancel(this);
-    p.add(buttons, BorderLayout.EAST);
-    set(p, BorderLayout.SOUTH);
-
+    set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);
   }
@@ -102,24 +106,20 @@ public class DialogAdd extends Dialog {
   @Override
   public void action(final Object cmp) {
     ok = true;
-
+    parsing.action(cmp);
     final String in = path.getText().trim();
     final IO io = IO.get(in);
 
     final boolean exists = !in.isEmpty() && io.exists();
-    String inf = exists ? "" : PATHWHICH;
+    final String inf = exists ? "" : PATHWHICH;
     info.setText(null, null);
-
-    final String as = name.getText().trim();
-    if(!as.isEmpty() && !Command.validName(as)) {
-      inf = Util.info(INVALID, EDITNAME);
-    }
 
     if(!inf.isEmpty()) {
       ok = false;
       info.setText(inf, Msg.ERROR);
     }
-    if(ok) name.setEnabled(!io.isDir());
+
+    filter.setEnabled(exists && io.isDir());
     enableOK(buttons, BUTTONOK, ok);
   }
 
@@ -129,8 +129,9 @@ public class DialogAdd extends Dialog {
    */
   public Add cmd() {
     final String in = path.getText().trim();
-    final String as = name.getText().trim();
     final String to = target.getText().trim();
-    return new Add(in, as.isEmpty() ? null : as, to.isEmpty() ? null : to);
+    parsing.close();
+    gui.set(Prop.CREATEFILTER, filter.getText());
+    return new Add(in, null, to.isEmpty() ? null : to);
   }
 }

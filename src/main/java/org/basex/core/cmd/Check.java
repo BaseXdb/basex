@@ -16,7 +16,7 @@ import org.basex.util.Util;
  * Evaluates the 'checks' command, opens an existing database or
  * creates a new one.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Check extends Command {
@@ -58,13 +58,11 @@ public final class Check extends Command {
     // check if database is already opened
     final Data data = ctx.pin(name);
     if(data != null) {
-      final IO in = data.meta.file;
-      if(in.eq(io) && io.date() == in.date()) {
-        // check permissions
-        if(ctx.perm(User.READ, data.meta)) return data;
-        throw new IOException(Util.info(PERMNO, CmdPerm.READ));
-      }
-      ctx.unpin(data);
+      final IO in = data.meta.path;
+      final boolean found = in.eq(io) && io.date() == in.date();
+      if(found && ctx.perm(User.READ, data.meta)) return data;
+      Close.close(data, ctx);
+      if(found) throw new IOException(Util.info(PERMNO, CmdPerm.READ));
     }
 
     // if found, an existing database is opened

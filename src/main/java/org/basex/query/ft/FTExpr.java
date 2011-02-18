@@ -16,7 +16,7 @@ import org.basex.util.InputInfo;
 /**
  * This class defines is an abstract class for full-text expressions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class FTExpr extends ParseExpr {
@@ -90,8 +90,7 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   /**
-   * Checks if sub expressions of a mild not operator
-   * do not violate the grammar.
+   * Checks if sub expressions of a mild not operator violate the grammar.
    * @return result of check
    */
   protected boolean usesExclude() {

@@ -13,7 +13,7 @@ import org.basex.io.IO;
  * This class parses the tokens that are delivered by the {@link XMLScanner} and
  * sends them to the specified database builder.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class XMLParser extends FileParser {

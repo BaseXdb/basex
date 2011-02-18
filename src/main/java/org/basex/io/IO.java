@@ -3,6 +3,7 @@ package org.basex.io;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.basex.data.Data;
 import org.basex.util.ByteList;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -13,7 +14,7 @@ import org.xml.sax.InputSource;
  * be a local file ({@link IOFile}), a URL ({@link IOUrl}) or a byte array
  * ({@link IOContent}).
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class IO {
@@ -29,6 +30,10 @@ public abstract class IO {
   public static final String XQYSUFFIX = ".xqy";
   /** XQuery file suffix. */
   public static final String XQLSUFFIX = ".xql";
+  /** XQuery suffixes. */
+  public static final String[] XQSUFFIXES = {
+    XQSUFFIX, XQMSUFFIX, XQYSUFFIX, XQLSUFFIX, XQUERYSUFFIX
+  };
   /** XML file suffix. */
   public static final String XMLSUFFIX = ".xml";
   /** ZIP file suffix. */
@@ -42,9 +47,11 @@ public abstract class IO {
   public static final int NODEPOWER = 4;
   /** Maximum supported tree height. */
   public static final int MAXHEIGHT = 1 << 8;
-  /** Offset for inlining numbers. */
+  /** Maximum number of attributes (see bit layout in {@link Data} class). */
+  public static final int MAXATTS = 0x1F;
+  /** Offset for inlining numbers (see bit layout in {@link Data} class). */
   public static final long NUMOFF = 0x8000000000L;
-  /** Offset for compressing texts. */
+  /** Offset for compressing texts (see bit layout in {@link Data} class). */
   public static final long CPROFF = 0x4000000000L;
 
   /** File path and name. */

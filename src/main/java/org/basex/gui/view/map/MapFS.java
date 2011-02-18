@@ -25,7 +25,7 @@ import org.deepfs.fsml.MimeType;
 /**
  * Paint filesystem specific TreeMap rectangles.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class MapFS extends MapPainter {

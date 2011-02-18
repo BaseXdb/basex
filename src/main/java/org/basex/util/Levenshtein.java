@@ -8,7 +8,7 @@ import static org.basex.util.Token.*;
  * and deletions of ones, and Damerau (1964): A technique for computer
  * detection and correction of spelling errors.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Levenshtein {

@@ -9,7 +9,7 @@ import org.basex.io.DataAccess;
 /**
  * This class provides temporary access to sorted list data.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Sebastian Gath
  */
 abstract class FTList {

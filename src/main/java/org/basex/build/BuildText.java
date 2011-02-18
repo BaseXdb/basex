@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 /**
  * This interface organizes textual information for the builder package.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public interface BuildText {
@@ -19,17 +19,13 @@ public interface BuildText {
   String MOREROOTS = "%: More than one root node: '<%>'";
 
   /** Builder error. */
-  String LIMITNS = "%: Document has too many different namespaces (limit: %).";
+  String LIMITNS = "%: Too many different namespaces (limit: %).";
   /** Builder error. */
   String LIMITRANGE = "%: Document is too large for being processed.";
   /** Builder error. */
-  String LIMITTAGS = "%: Document has too many different tag names (limit: %).";
+  String LIMITTAGS = "%: Too many different tag names (limit: %).";
   /** Builder error. */
-  String LIMITATTS =
-    "%: Document has too many different attribute names (limit: %).";
-  /** Builder error. */
-  String LIMITATT =
-    "%: Element has too many different attributes (limit: %).";
+  String LIMITATTS = "%: Too many different attribute names (limit: %).";
 
   /** Parser error. */
   String PARSEINVALID = "%: % expected, % found.";

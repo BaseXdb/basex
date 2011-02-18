@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 /**
  * Project specific text field implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public class BaseXTextField extends JTextField {
@@ -40,7 +40,7 @@ public class BaseXTextField extends JTextField {
    */
   public BaseXTextField(final String txt, final Window win) {
     BaseXLayout.setWidth(this, DWIDTH);
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
 
     if(txt != null) {
       setText(txt);

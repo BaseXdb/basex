@@ -3,7 +3,7 @@ package org.deepfs.fsml.parsers;
 /**
  * An exception class used for signaling failure of a decode operation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Bastian Lemke
  */
 final class DecodingException extends Exception {

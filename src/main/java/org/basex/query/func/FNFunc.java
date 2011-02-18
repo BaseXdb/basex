@@ -11,7 +11,7 @@ import org.basex.util.InputInfo;
 /**
  * Functions on functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNFunc extends Fun {
@@ -55,6 +55,6 @@ final class FNFunc extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 || super.uses(u);
+    return u == Use.X30 || super.uses(u);
   }
 }

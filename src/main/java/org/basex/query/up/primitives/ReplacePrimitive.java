@@ -13,7 +13,7 @@ import org.basex.util.InputInfo;
 /**
  * Replace primitive.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class ReplacePrimitive extends NodeCopy {
@@ -44,7 +44,7 @@ public final class ReplacePrimitive extends NodeCopy {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPL.thrw(input, node.qname());
+    UPMULTREPL.thrw(input, node);
   }
 
   @Override

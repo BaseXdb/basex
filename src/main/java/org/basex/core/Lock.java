@@ -4,77 +4,63 @@ import java.util.LinkedList;
 import org.basex.util.Util;
 
 /**
- * Management of executing read/write processes. Multiple readers, single
- * writers (readers/writer lock).
+ * Management of executing read/write processes.
+ * Supports multiple readers, limited by {@link Prop#PARALLEL},
+ * and single writers (readers/writer lock).
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Andreas Weiler
+ * @author BaseX Team 2005-11, BSD License
+ * @author Christian Gruen
  */
-public final class Lock {
-  /** Flag for skipping all locking tests. */
-  private static final boolean SKIP = false;
-  /** List of waiting processes for writers or reading groups. */
-  private final LinkedList<Resource> waiting = new LinkedList<Resource>();
+final class Lock {
+  /** Queue for all waiting processes. */
+  private final LinkedList<Object> queue = new LinkedList<Object>();
+  /** Mutex object. */
+  private final Object mutex = new Object();
+  /** Database context. */
+  private final Context ctx;
 
-  /** States of locking. */
-  private static enum State {
-    /** Idle state. */  IDLE,
-    /** Read state. */  READ,
-    /** Write state. */ WRITE
-  }
-
-  /** State of the lock. */
-  private State state = State.IDLE;
   /** Number of active readers. */
-  private int activeR;
+  private int readers;
+  /** Writer flag. */
+  private boolean writer;
+
+  /**
+   * Default constructor.
+   * @param c context
+   */
+  Lock(final Context c) {
+    ctx = c;
+  }
 
   /**
    * Modifications before executing a command.
    * @param w writing flag
    */
-  public void before(final boolean w) {
-    if(SKIP) return;
+  void lock(final boolean w) {
+    synchronized(mutex) {
+      final Object o = new Object();
+      queue.add(o);
 
-    if(w) {
-      if(state == State.IDLE) {
-        state = State.WRITE;
-        return;
-      }
-      // exclusive lock
-      final Resource lx = new Resource(true);
-      synchronized(lx) {
-        waiting.add(lx);
-        while(!lx.valid) {
-          try {
-            lx.wait();
-          } catch(final InterruptedException ex) {
-            Util.stack(ex);
+      try {
+        while(true) {
+          if(o == queue.get(0) && !writer) {
+            if(w) {
+              if(readers == 0) {
+                writer = true;
+                break;
+              }
+            } else if(readers < Math.max(ctx.prop.num(Prop.PARALLEL), 1)) {
+              ++readers;
+              break;
+            }
           }
+          mutex.wait();
         }
-        state = State.WRITE;
+      } catch(final InterruptedException ex) {
+        Util.stack(ex);
       }
-    } else {
-      synchronized(this) {
-        if(state != State.WRITE && waiting.size() == 0) {
-          state = State.READ;
-          ++activeR;
-          return;
-        }
-      }
-      // shared lock
-      final Resource ls = new Resource(false);
-      synchronized(ls) {
-        waiting.add(ls);
-        while(!ls.valid) {
-          try {
-            ls.wait();
-          } catch(final InterruptedException ex) {
-            Util.stack(ex);
-          }
-        }
-        ++activeR;
-        state = State.READ;
-      }
+
+      queue.remove(0);
     }
   }
 
@@ -82,64 +68,14 @@ public final class Lock {
    * Modifications after executing a command.
    * @param w writing flag
    */
-  public synchronized void after(final boolean w) {
-    if(SKIP) return;
-
-    if(w) {
-      if(waiting.size() > 0 && !waiting.getFirst().writer) {
-        notifyReaders();
+  synchronized void unlock(final boolean w) {
+    synchronized(mutex) {
+      if(w) {
+        writer = false;
       } else {
-        notifyWriter();
+        --readers;
       }
-    } else {
-      if(--activeR == 0) {
-        notifyWriter();
-      }
-    }
-  }
-
-  /**
-   * Notifies all waiting readers.
-   */
-  private void notifyReaders() {
-    while(waiting.size() > 0) {
-      if(waiting.getFirst().writer) break;
-      final Resource l = waiting.removeFirst();
-      synchronized(l) {
-        l.valid = true;
-        l.notify();
-      }
-    }
-  }
-
-  /**
-   * Notifies a waiting writer.
-   */
-  private void notifyWriter() {
-    if(waiting.size() > 0) {
-      final Resource l = waiting.removeFirst();
-      synchronized(l) {
-        l.valid = true;
-        l.notify();
-      }
-    } else {
-      state = State.IDLE;
-    }
-  }
-
-  /** Inner class for a locking object. */
-  private static class Resource {
-    /** Writer flag. */
-    final boolean writer;
-    /** Flag if lock can start. */
-    boolean valid;
-
-    /**
-     * Standard constructor.
-     * @param w writing flag
-     */
-    Resource(final boolean w) {
-      writer = w;
+      mutex.notifyAll();
     }
   }
 }

@@ -21,7 +21,7 @@ import org.basex.util.Util;
  * This class creates a disk based database instance. The storage layout is
  * described in the {@link Data} class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class DiskBuilder extends Builder {
@@ -49,7 +49,7 @@ public final class DiskBuilder extends Builder {
    */
   public DiskBuilder(final Parser parse, final Prop pr) {
     super(parse, pr);
-    comp = new Compress(pr.num(Prop.COMPRESS));
+    comp = new Compress();
   }
 
   @Override
@@ -58,9 +58,9 @@ public final class DiskBuilder extends Builder {
     prop.dbpath(name).mkdirs();
 
     meta = new MetaData(name, prop);
-    meta.file = parser.file;
-    meta.filesize = meta.file.length();
-    meta.time = meta.file.date();
+    meta.path = parser.file;
+    meta.filesize = meta.path.length();
+    meta.time = meta.path.date();
     if(meta.time == 0) meta.time = System.currentTimeMillis();
 
     // calculate optimized output buffer sizes to reduce disk fragmentation

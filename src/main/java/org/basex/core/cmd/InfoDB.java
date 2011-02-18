@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
  * Evaluates the 'info database' command and returns information on the
  * currently opened database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class InfoDB extends AInfo {
@@ -60,7 +60,7 @@ public final class InfoDB extends AInfo {
 
     tb.add(NL);
     tb.addExt(header, INFOCREATE);
-    if(create) format(tb, INFODOC, meta.file.path());
+    if(create) format(tb, INFOPATH, meta.path.path());
     format(tb, INFOTIME, DATE.format(new Date(meta.time)));
     format(tb, INFODOCSIZE, Performance.format(meta.filesize));
     format(tb, INFOENCODING, meta.encoding);

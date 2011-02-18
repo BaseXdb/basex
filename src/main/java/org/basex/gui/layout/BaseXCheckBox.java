@@ -10,7 +10,7 @@ import org.basex.gui.dialog.Dialog;
 /**
  * Project specific CheckBox implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class BaseXCheckBox extends JCheckBox {
@@ -39,7 +39,7 @@ public final class BaseXCheckBox extends JCheckBox {
     setMargin(new Insets(0, 0, dist, 0));
     if(dist == 0) setFont(getFont().deriveFont(1));
 
-    BaseXLayout.addInteraction(this, null, win);
+    BaseXLayout.addInteraction(this, win);
 
     if(!(win instanceof Dialog)) return;
     addActionListener(new ActionListener() {

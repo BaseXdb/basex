@@ -7,21 +7,18 @@ import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
-import org.basex.util.IntList;
 
 /**
  * This class serves as a central database context.
  * It references the currently opened database. Moreover, it provides
  * references to the currently used, marked and copied node sets.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Context {
   /** Client connections. */
   public final Sessions sessions;
-  /** Process locking. */
-  public final Lock lock;
   /** Database pool. */
   public final DataPool datas;
   /** Trigger pool. */
@@ -39,7 +36,7 @@ public final class Context {
   public Data data;
   /** Node context. */
   public Nodes current;
-  
+
   /** Session reference. */
   public ServerProcess session;
 
@@ -51,6 +48,9 @@ public final class Context {
   /** Focused node. */
   public int focused = -1;
 
+  /** Process locking. */
+  private final Lock lock;
+
   /**
    * Constructor.
    */
@@ -59,7 +59,7 @@ public final class Context {
     datas = new DataPool();
     triggers = new TriggerPool();
     sessions = new Sessions();
-    lock = new Lock();
+    lock = new Lock(this);
     users = new Users(true);
     user = users.get(ADMIN);
   }
@@ -100,7 +100,7 @@ public final class Context {
    * @return result of check
    */
   public int[] doc() {
-    return current.root ? current.list : data.doc().toArray();
+    return current.root ? current.list : data.doc();
   }
 
   /**
@@ -121,8 +121,7 @@ public final class Context {
     data = d;
     copied = null;
     marked = new Nodes(d);
-    final IntList il = path == null ? data.doc() : data.doc(path);
-    current = new Nodes(il.toArray(), data);
+    current = new Nodes(path == null ? data.doc() : data.doc(path), data);
     current.root = path == null;
   }
 
@@ -141,7 +140,7 @@ public final class Context {
    * Updates references to the document nodes.
    */
   public void update() {
-    current = new Nodes(data.doc().toArray(), data);
+    current = new Nodes(data.doc(), data);
     current.root = true;
   }
 
@@ -149,7 +148,7 @@ public final class Context {
    * Adds the specified data reference to the pool.
    * @param d data reference
    */
-  public void pin(final Data d) {
+  public synchronized void pin(final Data d) {
     datas.add(d);
   }
 
@@ -158,7 +157,7 @@ public final class Context {
    * @param name name of database
    * @return data reference
    */
-  public Data pin(final String name) {
+  public synchronized Data pin(final String name) {
     return datas.pin(name);
   }
 
@@ -167,7 +166,7 @@ public final class Context {
    * @param d data reference
    * @return true if reference was removed from the pool
    */
-  public boolean unpin(final Data d) {
+  public synchronized boolean unpin(final Data d) {
     return datas.unpin(d);
   }
 
@@ -176,8 +175,24 @@ public final class Context {
    * @param db name of database
    * @return int use-status
    */
-  public boolean pinned(final String db) {
+  public synchronized boolean pinned(final String db) {
     return datas.pinned(db);
+  }
+
+  /**
+   * Registers a process.
+   * @param w writing flag
+   */
+  public void register(final boolean w) {
+    lock.lock(w);
+  }
+
+  /**
+   * Unregisters a process.
+   * @param w writing flag
+   */
+  public void unregister(final boolean w) {
+    lock.unlock(w);
   }
 
   /**

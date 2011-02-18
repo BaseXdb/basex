@@ -5,7 +5,7 @@ import java.awt.Color;
 /**
  * This interface contains options for the tree view.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Wolfgang Miller
  */
 interface TreeViewOptions {
@@ -79,5 +79,4 @@ interface TreeViewOptions {
   byte NOT_ENOUGH_SPACE = 0;
   /** Show no attributes text. */
   byte NO_ATTS = 1;
-
 }

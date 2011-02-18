@@ -1,4 +1,4 @@
-package org.basex.test.storage;
+package org.basex.test.data;
 
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
@@ -15,7 +15,7 @@ import org.junit.Test;
 /**
  * This class tests the ID -> PRE mapping facility.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public final class LogListTest {

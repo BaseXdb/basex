@@ -1,4 +1,4 @@
-package org.basex.test.collections;
+package org.basex.test.build;
 
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
@@ -16,7 +16,7 @@ import org.junit.Test;
 /**
  * Tests adding files/folders/zip files/urls to collections.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Michael Seiferle
  */
 public final class AddDeleteTest {
@@ -29,14 +29,11 @@ public final class AddDeleteTest {
   private static final String FILE = "etc/xml/input.xml";
   /** Test folder. */
   private static final String FLDR = "etc/xml/dir";
-  /** Test url. */
-  private static final String URL = "http://www.inf.uni-konstanz.de/"
-      + "dbis/basex/dl/xmark.xml";
   /** Test ZIP file, same as etc/xml. */
   private static final String ZIPFILE = "etc/xml/xml.zip";
   /** Test GZIP file. */
   private static final String GZIPFILE = "etc/xml/xml.gz";
-  /** Test XML Fragment. */
+  /** Test XML fragment. */
   private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
 
   /** Number of XML files for folder. */
@@ -51,7 +48,7 @@ public final class AddDeleteTest {
   }
 
   /**
-   * Creates the initial database.
+   * Creates a database.
    * @throws BaseXException exception
    */
   @Before
@@ -60,7 +57,7 @@ public final class AddDeleteTest {
   }
 
   /**
-   * Drops the initial collection.
+   * Drops the database.
    * @throws BaseXException exception
    */
   @After
@@ -69,7 +66,7 @@ public final class AddDeleteTest {
   }
 
   /**
-   * Adds a XML Fragment to the database.
+   * Adds an XML fragment to the database.
    * 1) with name and w/o target
    * 2) with name and target set
    * 3) w/o name and target set
@@ -83,7 +80,6 @@ public final class AddDeleteTest {
     assertEquals(2, CTX.doc().length);
     new Add(XMLFRAG, null, "a/d/c").execute(CTX);
     assertEquals(3, CTX.doc().length);
-
   }
 
   /**
@@ -104,19 +100,6 @@ public final class AddDeleteTest {
   public void testAddZip() throws BaseXException {
     new Add(ZIPFILE, null, "target").execute(CTX);
     assertEquals(4, CTX.doc().length);
-  }
-
-  /**
-   * Adds/deletes a URL.
-   * Disabled to allow "offline" execution.
-   * @throws BaseXException exception
-   */
-  // @Test
-  public void testAddUrl() throws BaseXException {
-    new Add(URL).execute(CTX);
-    new Add(URL, null, "bar").execute(CTX);
-    new Delete("xmark.xml").execute(CTX);
-    assertEquals(1, CTX.doc().length);
   }
 
   /**

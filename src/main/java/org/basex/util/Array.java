@@ -6,7 +6,7 @@ import java.util.Arrays;
  * This class provides convenience methods for handling arrays
  * and serves as an extension to the {@link Arrays} class of Java.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Array {
@@ -139,6 +139,28 @@ public final class Array {
     final int[] tmp = new int[l];
     for(int i = 0; i < l; ++i) tmp[i] = i;
     return new IntList(tmp);
+  }
+
+  /**
+   * Reverses the order of the elements in the given array.
+   * @param arr array
+   */
+  public static void reverse(final byte[] arr) {
+    reverse(arr, 0, arr.length);
+  }
+
+  /**
+   * Reverses the order of all elements in the given interval.
+   * @param arr array
+   * @param pos position of first element of the interval
+   * @param len length of the interval
+   */
+  public static void reverse(final byte[] arr, final int pos, final int len) {
+    for(int l = pos, r = pos + len - 1; l < r; l++, r--) {
+      final byte tmp = arr[l];
+      arr[l] = arr[r];
+      arr[r] = tmp;
+    }
   }
 
   /**

@@ -9,11 +9,12 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
 import org.basex.util.InputInfo;
+import org.basex.util.ft.Scoring;
 
 /**
  * FTOr expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -45,7 +46,7 @@ public final class FTOr extends FTExpr {
       throws QueryException {
     final FTNode item = expr[0].item(ctx, input);
     for(int e = 1; e < expr.length; ++e) {
-      or(ctx, item, expr[e].item(ctx, input));
+      or(item, expr[e].item(ctx, input));
     }
     return item;
   }
@@ -75,7 +76,7 @@ public final class FTOr extends FTExpr {
         final FTNode item = it[p];
         for(int i = 0; i < it.length; ++i) {
           if(it[i] != null && p != i && item.pre == it[i].pre) {
-            or(ctx, item, it[i]);
+            or(item, it[i]);
             it[i] = ir[i].next();
           }
         }
@@ -87,17 +88,16 @@ public final class FTOr extends FTExpr {
 
   /**
    * Merges two matches.
-   * @param ctx query context
    * @param i1 first item
    * @param i2 second item
    */
-  void or(final QueryContext ctx, final FTNode i1, final FTNode i2) {
+  void or(final FTNode i1, final FTNode i2) {
     final FTMatches all = new FTMatches(
         (byte) Math.max(i1.all.sTokenNum, i2.all.sTokenNum));
 
     for(final FTMatch m : i1.all) all.add(m);
     for(final FTMatch m : i2.all) all.add(m);
-    i1.score(ctx.score.or(i1.score(), i2.score()));
+    i1.score(Scoring.or(i1.score(), i2.score()));
     i1.all = all;
   }
 

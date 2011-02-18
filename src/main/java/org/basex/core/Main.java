@@ -21,7 +21,7 @@ import org.basex.util.Util;
  * Moreover, it offers some utility methods which are used
  * throughout the project.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Main {
@@ -45,7 +45,7 @@ public abstract class Main {
    * Constructor.
    * @param args command-line arguments
    */
-  protected Main(final String... args) {
+  protected Main(final String[] args) {
     success = parseArguments(args);
     verbose |= console;
     if(!success) return;
@@ -68,7 +68,7 @@ public abstract class Main {
     while(console) {
       Util.out("> ");
       for(final String in : inputs()) {
-        if(in.length() != 0 && !execute(in)) return true;
+        if(!in.isEmpty() && !execute(in)) return true;
       }
     }
     return false;

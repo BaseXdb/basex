@@ -21,13 +21,12 @@ import org.basex.util.TokenBuilder;
 /**
  * Attribute fragment.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CAttr extends CFrag {
   /** Generated namespace. */
   private static final byte[] NS0 = token("ns0:");
-
   /** Tag name. */
   private Expr atn;
   /** Computed constructor. */
@@ -65,7 +64,9 @@ public final class CAttr extends CFrag {
     if(comp) {
       final byte[] uri = name.uri().atom();
       if(eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
-          || eq(pre, XML) ^ eq(uri, XMLURI)) CAINS.thrw(input, pre, uri);
+          || eq(pre, XML) ^ eq(uri, XMLURI)) {
+        CAINS.thrw(input, ln, uri);
+      }
 
       if(eq(pre, EMPTY) && !eq(uri, EMPTY)) {
         // create new standard namespace to cover most frequent cases
@@ -101,6 +102,16 @@ public final class CAttr extends CFrag {
   public Expr remove(final Var v) {
     atn = atn.remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return atn.uses(u) || super.uses(u);
+  }
+
+  @Override
+  public boolean uses(final Var v) {
+    return atn.uses(v) || super.uses(v);
   }
 
   @Override

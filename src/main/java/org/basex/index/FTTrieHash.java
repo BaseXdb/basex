@@ -10,7 +10,7 @@ import org.basex.util.TokenSet;
  * This class indexes the tokens in a hash structure.
  * The iterator returns all tokens in a sorted manner.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FTTrieHash extends TokenSet {

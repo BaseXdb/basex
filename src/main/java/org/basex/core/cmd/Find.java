@@ -18,7 +18,7 @@ import org.deepfs.util.FSImporter;
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Find extends AQuery {

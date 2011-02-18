@@ -22,7 +22,7 @@ import org.basex.util.Util;
 /**
  * Abstract class for database creation commands.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 abstract class ACreate extends Command {

@@ -8,12 +8,14 @@ import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
+import org.basex.data.Data;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
+import org.basex.query.item.DBDocSeq;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
@@ -24,16 +26,14 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.NameTest;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
 
 /**
  * Database functions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class FNDb extends Fun {
@@ -85,11 +85,9 @@ final class FNDb extends Fun {
     final int s = indexOf(str, '/');
     final byte[] db = s == -1 ? str : substring(str, 0, s);
     final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
-    final DBNode n = ctx.resource.doc(db, true, true, input);
-    final IntList il = n.data.doc(string(path));
-    final NodIter col = new NodIter();
-    for(int i = 0; i < il.size(); ++i) col.add(new DBNode(n.data, il.get(i)));
-    return col;
+
+    final Data data = ctx.resource.data(db, input);
+    return DBDocSeq.get(data.doc(string(path)), data).iter();
   }
 
   /**
@@ -102,12 +100,11 @@ final class FNDb extends Fun {
   private DBNode open(final QueryContext ctx, final boolean id)
       throws QueryException {
 
-    final DBNode node =
-      ctx.resource.doc(checkStr(expr[0], ctx), true, true, input);
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
     final int v = (int) checkItr(expr[1], ctx);
-    final int pre = id ? node.data.pre(v) : v;
-    if(pre < 0 || pre >= node.data.meta.size) IDINVALID.thrw(input, this, v);
-    return new DBNode(node.data, pre);
+    final int pre = id ? data.pre(v) : v;
+    if(pre < 0 || pre >= data.meta.size) IDINVALID.thrw(input, this, v);
+    return new DBNode(data, pre);
   }
 
   /**
@@ -234,7 +231,7 @@ final class FNDb extends Fun {
     return u == Use.CTX && (def == FunDef.TEXT || def == FunDef.ATTR ||
         def == FunDef.FULLTEXT) || super.uses(u);
   }
-  
+
   /**
    * Triggers an event on registered sessions.
    * @param ctx query context

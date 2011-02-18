@@ -13,7 +13,7 @@ import org.basex.gui.view.ViewData;
 /**
  * Adds default paint operations to TreeMap.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 final class MapDefault extends MapPainter {
@@ -51,7 +51,7 @@ final class MapDefault extends MapPainter {
       Color col = color(rects, ri);
       final boolean mark = col != null;
 
-      r.pos = view.gui.context.marked.ftpos != null ? 
+      r.pos = view.gui.context.marked.ftpos != null ?
           view.gui.context.marked.ftpos.get(data, pre) : null;
       g.setColor(mark ? col : COLORS[lvl]);
 
