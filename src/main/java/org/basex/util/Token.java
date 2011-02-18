@@ -998,9 +998,9 @@ public final class Token {
   public static byte[] chop(final byte[] token, final int max) {
     if(token.length <= max) return token;
     final byte[] tt = Arrays.copyOf(token, max);
-    tt[max - 3] = '.';
-    tt[max - 2] = '.';
-    tt[max - 1] = '.';
+    if(max > 2) tt[max - 3] = '.';
+    if(max > 1) tt[max - 2] = '.';
+    if(max > 0) tt[max - 1] = '.';
     return tt;
   }
 

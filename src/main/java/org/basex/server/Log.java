@@ -1,15 +1,15 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -32,7 +32,7 @@ public final class Log {
   /** Start date of log. */
   private Date start;
   /** File writer. */
-  private OutputStreamWriter fw;
+  private FileOutputStream fos;
 
   /**
    * Constructor.
@@ -61,13 +61,13 @@ public final class Log {
       create(now);
     }
     try {
-      final StringBuilder sb = new StringBuilder(TIME.format(now));
+      final TokenBuilder tb = new TokenBuilder(TIME.format(now));
       for(final Object s : str) {
-        final String l = s.toString().replaceAll("\\r?\\n", " ");
-        sb.append("\t" + (l.length() > 128 ? l.substring(0, 125) + "..." : l));
+        tb.add('\t');
+        tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), 128));
       }
-      fw.write(sb.append(NL).toString());
-      fw.flush();
+      fos.write(tb.add(NL).finish());
+      fos.flush();
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -82,8 +82,7 @@ public final class Log {
     final String file = dir + DATE.format(d) + ".log";
     start = d;
     try {
-      fw = new OutputStreamWriter(
-          new FileOutputStream(file, true), Token.UTF8);
+      fos = new FileOutputStream(file, true);
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -95,7 +94,7 @@ public final class Log {
   public synchronized void close() {
     if(quiet) return;
     try {
-      fw.close();
+      fos.close();
     } catch(final IOException ex) {
       Util.stack(ex);
     }
