@@ -84,7 +84,7 @@ public final class DialogCreateFS extends Dialog {
     p.add(new BaseXLabel(IMPORTFSTEXT, false, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
-    path = new BaseXTextField(gprop.get(GUIProp.FSBACKING), this);
+    path = new BaseXTextField(gprop.get(GUIProp.FSPATH), this);
     path.addKeyListener(keys);
     p.add(path);
 
@@ -113,12 +113,12 @@ public final class DialogCreateFS extends Dialog {
     });
     p.add(all);
 
-    dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), this);
+    dbname = new BaseXTextField(gprop.get(GUIProp.FSNAME), this);
     dbname.addKeyListener(keys);
     p.add(dbname);
     p1.add(p, BorderLayout.CENTER);
 
-    info = new BaseXLabel(" ");
+    info = new BaseXLabel();
     p1.add(info, BorderLayout.SOUTH);
 
     // Metadata panel
@@ -217,11 +217,11 @@ public final class DialogCreateFS extends Dialog {
     final GUIProp gprop = gui.gprop;
     final String nm = dbname.getText().trim();
     final boolean cNam = !nm.isEmpty();
-    if(cNam) gprop.set(GUIProp.FSDBNAME, nm);
+    if(cNam) gprop.set(GUIProp.FSNAME, nm);
     ok = cNam;
 
     boolean cAll = all.isSelected();
-    if(cAll) gprop.set(GUIProp.FSBACKING, path.getText());
+    if(cAll) gprop.set(GUIProp.FSPATH, path.getText());
 
     if(!cAll && cNam) {
       final String p = path.getText().trim();
@@ -232,14 +232,12 @@ public final class DialogCreateFS extends Dialog {
 
     String inf = null;
 
+    Msg icon = Msg.ERROR;
     if(!ok) {
       if(!cAll) inf = PATHWHICH;
       if(!cNam) inf = DBWHICH;
-    }
-
-    Msg icon = Msg.ERROR;
-    if(ok) {
-      ok = Command.checkName(nm);
+    } else {
+      ok = Command.validName(nm);
       if(!ok) {
         inf = Util.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
@@ -247,6 +245,13 @@ public final class DialogCreateFS extends Dialog {
         icon = Msg.WARN;
       }
     }
+
+    if(ok) {
+      gprop.set(GUIProp.FSALL, all.isSelected());
+      gprop.set(GUIProp.FSPATH, path.getText());
+      gprop.set(GUIProp.FSNAME, dbname.getText());
+    }
+
     info.setText(inf, icon);
     enableOK(buttons, BUTTONOK, ok);
   }
@@ -265,10 +270,5 @@ public final class DialogCreateFS extends Dialog {
     gui.set(Prop.ATTRINDEX, atvindex.isSelected());
     gui.set(Prop.FTINDEX, ftxindex.isSelected());
     ft.close();
-
-    final GUIProp gprop = gui.gprop;
-    gprop.set(GUIProp.FSALL, all.isSelected());
-    gprop.set(GUIProp.FSBACKING, path.getText());
-    gprop.set(GUIProp.FSDBNAME, dbname.getText());
   }
 }

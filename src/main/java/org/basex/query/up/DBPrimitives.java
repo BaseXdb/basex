@@ -142,7 +142,7 @@ final class DBPrimitives extends Primitives {
 
     if(d.meta.prop.is(Prop.WRITEBACK)) {
       try {
-        Export.export(ctx.resource.context, d);
+        Export.export(ctx.context, d);
       } catch(final IOException ex) {
         UPPUTERR.thrw(null, d.meta.file);
       }

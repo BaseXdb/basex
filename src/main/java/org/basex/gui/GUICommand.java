@@ -9,6 +9,21 @@ import javax.swing.AbstractButton;
  * @author Christian Gruen
  */
 public interface GUICommand {
+  /** Separator. */
+  GUICommand EMPTY = new GUICommand() {
+    @Override
+    public void execute(final GUI gui) { }
+    @Override
+    public void refresh(final GUI gui, final AbstractButton button) { }
+    @Override
+    public boolean checked() { return false; }
+    @Override
+    public String label() { return null; }
+    @Override
+    public String help() { return null; }
+    @Override
+    public String key() { return null; }};
+
   /**
    * Executes the command.
    * @param gui reference to the main window
@@ -30,10 +45,10 @@ public interface GUICommand {
   boolean checked();
 
   /**
-   * Returns the command entry.
-   * @return command entry
+   * Returns the command label.
+   * @return command label
    */
-  String desc();
+  String label();
 
   /**
    * Returns the command help.

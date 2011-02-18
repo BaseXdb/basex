@@ -11,6 +11,7 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
+import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
@@ -21,7 +22,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class GFLWOR extends ParseExpr {
+public class GFLWOR extends ParseExpr {
   /** Return expression. */
   protected Expr ret;
   /** For/Let expression. */
@@ -42,7 +43,7 @@ public final class GFLWOR extends ParseExpr {
    * @param r return expression
    * @param ii input info
    */
-  public GFLWOR(final ForLet[] f, final Expr w, final Order o, final Group g,
+  GFLWOR(final ForLet[] f, final Expr w, final Order o, final Group g,
       final Expr r, final InputInfo ii) {
 
     super(ii);
@@ -53,8 +54,28 @@ public final class GFLWOR extends ParseExpr {
     order = o;
   }
 
+  /**
+   * Returns a GFLWOR instance.
+   * @param f variable inputs
+   * @param w where clause
+   * @param o order expression
+   * @param g group by expression
+   * @param r return expression
+   * @param ii input info
+   * @return GFLWOR instance
+   */
+  public static GFLWOR get(final ForLet[] f, final Expr w, final OrderBy[] o,
+      final Var[] g, final Expr r, final InputInfo ii) {
+
+    if(o == null && g == null) return new FLWR(f, w, r, ii);
+    final Order ord = o == null ? null : new Order(ii, o);
+    final Group grp = g == null ? null : new Group(ii, g);
+    return new GFLWOR(f, w, ord, grp, r, ii);
+  }
+  
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    compForLet(ctx);
     compWhere(ctx);
 
     final boolean grp = ctx.grouping;
@@ -62,13 +83,7 @@ public final class GFLWOR extends ParseExpr {
 
     // optimize for/let clauses
     final int vs = ctx.vars.size();
-    for(final ForLet f : fl) {
-      // disable fast full-text evaluation if score value exists
-      final boolean fast = ctx.ftfast;
-      ctx.ftfast = ctx.ftfast && f.simple();
-      f.comp(ctx);
-      ctx.ftfast = fast;
-    }
+    for(final ForLet f : fl) f.comp(ctx);
 
     // optimize where clause
     boolean empty = false;
@@ -90,6 +105,12 @@ public final class GFLWOR extends ParseExpr {
     ret = ret.comp(ctx);
     ctx.vars.reset(vs);
     ctx.grouping = grp;
+
+    // check if return always yields an empty sequence
+    if(ret == Empty.SEQ) {
+      ctx.compInfo(OPTFLWOR);
+      return ret;
+    }
 
     // remove FLWOR expression if WHERE clause always returns false
     if(empty) {
@@ -139,6 +160,39 @@ public final class GFLWOR extends ParseExpr {
     }
     type = SeqType.get(ret.type().type, SeqType.Occ.ZM);
     return this;
+  }
+
+  /**
+   * Optimizes for/let clauses. Avoids repeated calls to static let clauses.
+   * @param ctx query context
+   */
+  private void compForLet(final QueryContext ctx) {
+    // check if all clauses are simple, and if variables are removable
+    boolean m = false;
+    // loop through all clauses
+    for(int f = fl.length - 1; f >= 0; --f) {
+      ForLet t = fl[f];
+      // ignore for clauses
+      if(t instanceof For) continue;
+      // loop through all outer clauses
+      for(int g = f - 1; g >= 0; --g) {
+        // stop if variable is shadowed or used by the current clause
+        if(fl[g].shadows(t.var) || t.uses(fl[g].var)) break;
+        // ignore let clauses and fragment constructors
+        if(fl[g] instanceof Let || t.uses(Use.FRG)) continue;
+        // stop if variable is used by as position or score
+        final For fr = (For) fl[g];
+        if(fr.pos != null && t.uses(fr.pos) ||
+           fr.score != null && t.uses(fr.score)) break;
+
+        // move let clause to outer position
+        System.arraycopy(fl, g, fl, g + 1, f - g);
+        fl[g] = t;
+        t = fl[f];
+        if(!m) ctx.compInfo(OPTFORLET);
+        m = true;
+      }
+    }
   }
 
   /**
@@ -201,19 +255,21 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[fl.length];
-    final int vss = ctx.vars.size();
-
+    final int vs = ctx.vars.size();
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
 
     // evaluate pre grouping tuples
-    group.initgroup(fl, order);
-    iter(ctx, iter, 0);
-    ctx.vars.reset(vss);
+    final int s = (int) size();
+    final ValueList vl = s >= 0 ? new ValueList(s) : new ValueList();
+    if(order != null) order.init(vl, s);
+    if(group != null) group.init(fl, order);
+    iter(ctx, vl, iter, 0);
+    ctx.vars.reset(vs);
 
-    final int vs = ctx.vars.size();
     for(final ForLet aFl : fl) ctx.vars.add(aFl.var);
 
-    final Iter ir = group.gp.ret(ctx, ret);
+    // order != null, otherwise it would have been handled in group
+    final Iter ir = group != null ? group.gp.ret(ctx, ret) : ctx.iter(order);
     ctx.vars.reset(vs);
     return ir;
   }
@@ -221,32 +277,37 @@ public final class GFLWOR extends ParseExpr {
   /**
    * Performs a recursive iteration on the specified variable position.
    * @param ctx root reference
+   * @param vl value lists
    * @param it iterator
    * @param p variable position
    * @throws QueryException query exception
    */
-  private void iter(final QueryContext ctx, final Iter[] it, final int p)
-      throws QueryException {
+  private void iter(final QueryContext ctx, final ValueList vl,
+      final Iter[] it, final int p) throws QueryException {
 
     final boolean more = p + 1 != fl.length;
     while(it[p].next() != null) {
       if(more) {
-        iter(ctx, it, p + 1);
-      } else {
-        if(where == null || where.ebv(ctx, input).bool(input)) {
-          if(group != null) group.gp.add(ctx);
+        iter(ctx, vl, it, p + 1);
+      } else if(where == null || where.ebv(ctx, input).bool(input)) {
+        if(group != null) {
+          group.gp.add(ctx);
+        } else if(order != null) {
+          // order by will be handled in group by otherwise
+          order.add(ctx);
+          vl.add(ret.value(ctx));
         }
       }
     }
   }
 
   @Override
-  public boolean uses(final Use u) {
+  public final boolean uses(final Use u) {
     return u == Use.VAR || ret.uses(u);
   }
 
   @Override
-  public boolean uses(final Var v) {
+  public final boolean uses(final Var v) {
     for(final ForLet f : fl) {
       if(f.uses(v)) return true;
       if(f.shadows(v)) return false;
@@ -257,7 +318,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
+  public final boolean removable(final Var v) {
     for(final ForLet f : fl) {
       if(!f.removable(v)) return false;
       if(f.shadows(v)) return true;
@@ -268,7 +329,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
+  public final Expr remove(final Var v) {
     for(final ForLet f : fl) {
       f.remove(v);
       if(f.shadows(v)) return this;
@@ -280,10 +341,9 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(final ForLet f : fl)
-      f.plan(ser);
+    for(final ForLet f : fl) f.plan(ser);
     if(where != null) {
       ser.openElement(WHR);
       where.plan(ser);
@@ -298,13 +358,12 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i != fl.length; ++i)
-      sb.append(i != 0 ? " " : "").append(fl[i]);
-    if(where != null) sb.append(" ").append(WHERE).append(" ").append(where);
+    for(int i = 0; i != fl.length; ++i) sb.append((i != 0 ? " " : "") + fl[i]);
+    if(where != null) sb.append(" " + WHERE + " " + where);
     if(group != null) sb.append(group);
     if(order != null) sb.append(order);
-    return sb.append(" ").append(RETURN).append(" ").append(ret).toString();
+    return sb.append(" " + RETURN + " " + ret).toString();
   }
 }

@@ -5,7 +5,7 @@ import java.awt.FileDialog;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import org.basex.gui.AGUI;
+import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.io.IO;
@@ -28,7 +28,7 @@ public final class BaseXFileChooser {
   }
 
   /** Reference to main window. */
-  private AGUI gui;
+  private GUI gui;
   /** Swing file chooser. */
   private JFileChooser fc;
   /** Simple file dialog. */
@@ -43,7 +43,7 @@ public final class BaseXFileChooser {
    * @param main reference to main window
    */
   public BaseXFileChooser(final String title, final String path,
-      final AGUI main) {
+      final GUI main) {
 
     if(main.gprop.is(GUIProp.SIMPLEFD)) {
       fd = new FileDialog(main, title);
@@ -62,21 +62,10 @@ public final class BaseXFileChooser {
    * @param dsc description
    * @param suf suffix
    */
-  public void addFilter(final String dsc, final String suf) {
+  public void addFilter(final String dsc, final String... suf) {
     if(fc != null) fc.addChoosableFileFilter(new Filter(suf, dsc));
-    else fd.setFile("*" + suf);
-    suffix = suf;
-  }
-  
-  /**
-   * Sets a extension file filter.
-   * @param dsc description
-   * @param sufs suffixes
-   */
-  public void addExFilter(final String dsc, final String[] sufs) {
-    if(fc != null) fc.addChoosableFileFilter(new ExtensionFilter(sufs, dsc));
-    else fd.setFile("*" + sufs[0]);
-    suffix = sufs[0];
+    else fd.setFile("*" + suf[0]);
+    suffix = suf[0];
   }
 
   /**
@@ -131,53 +120,20 @@ public final class BaseXFileChooser {
   }
 
   /**
-   * Defines a file filter for one extension.
-   */
-  private static class Filter extends FileFilter {
-    /** Suffix. */
-    private final String suf;
-    /** Description. */
-    private final String desc;
-
-    /**
-     * Constructor.
-     * @param s suffix
-     * @param d description
-     */
-    Filter(final String s, final String d) {
-      suf = s;
-      desc = d;
-    }
-
-    @Override
-    public boolean accept(final File file) {
-      if(file.isDirectory()) return true;
-      final String name = file.getName().toLowerCase();
-      if(name.endsWith(suf)) return true;
-      return false;
-    }
-    @Override
-    public String getDescription() {
-      return desc;
-    }
-  }
-  
-  /**
    * Defines a file filter for a list of extensions.
    */
-  private static class ExtensionFilter extends FileFilter {
-    
+  private static class Filter extends FileFilter {
     /** Suffixes. */
     private final String[] sufs;
     /** Description. */
     private final String desc;
-    
+
     /**
      * Constructor.
      * @param s suffixes
      * @param d description
      */
-    ExtensionFilter(final String[] s, final String d) {
+    Filter(final String[] s, final String d) {
       sufs = s;
       desc = d;
     }
@@ -186,7 +142,7 @@ public final class BaseXFileChooser {
     public boolean accept(final File file) {
       if(file.isDirectory()) return true;
       final String name = file.getName().toLowerCase();
-      for(String s : sufs) {
+      for(final String s : sufs) {
         if(name.endsWith(s)) return true;
       }
       return false;
@@ -196,6 +152,5 @@ public final class BaseXFileChooser {
     public String getDescription() {
       return desc;
     }
-    
   }
 }

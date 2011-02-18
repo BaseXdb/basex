@@ -49,7 +49,7 @@ public final class DropIndex extends ACreate {
       case PATH:
         if(data.meta.pathindex) {
           data.meta.pathindex = false;
-          data.path.root = null;
+          data.pthindex.root = null;
           data.flush();
         }
         return info(INDDROP, perf);

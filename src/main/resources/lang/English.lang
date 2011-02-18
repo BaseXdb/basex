@@ -4,23 +4,20 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-wait=Please Wait
 version=Version %
 
 # Menu Commands
-m_file=File
+m_db=Database
 m_edit=Edit
+m_query=Query
 m_view=View
 m_options=Options
 m_help=Help
-m_db=Database
-m_main=Main Window
-m_views=Visualizations
-m_inter=Interaction
-m_layout=Layout
 
 # Buttons
 b_ok=OK
+b_yes=Yes
+b_no=No
 b_opt=Optimize
 b_rename=Rename
 b_backup=Backup
@@ -60,6 +57,7 @@ d_fctitle=Choose Directory
 dc_choose=Input file or directory
 dc_pattern=File patterns (separated by commas)
 dc_name=Name of Database
+dc_name2=Document Path
 dc_xmldesc=XML Documents
 dc_zipdesc=Zipped XML Documents
 dc_gzdesc=GZipped XML Documents
@@ -122,11 +120,14 @@ dfs_meta=Include metadata
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Rename Database
+dr_title2=Delete documents
 dr_over=Old database will be overwritten
+dr_empty=An empty database will be created
 dr_overbacking=Old database and backing store will be overwritten
 
 dd_title=Manage Databases
-dd_question=Database '%' will be dropped.\nAre you sure?
+dd_question=Database '%' will be dropped.
+dd_sure=Are you sure?
 
 dx_question=Do you really want to delete?
 dq_question=Save changes to %?
@@ -264,6 +265,10 @@ c_mountfs=Mount DB as FUSE
 c_mountfstt=Mount DeepFS database instance as filesystem in userspace (needs native operating system support and may thus be unavailable).
 c_props=Properties
 c_propstt=Show information on the currently opened database.
+c_add=Add documents
+c_addtt=Adds documents to the currently opened database.
+c_drop=Delete documents
+c_droptt=Delete documents from the currently opened database.
 c_insert=New
 c_inserttt=Creates a new XML node.
 c_maplayout=Map Layout
@@ -379,10 +384,10 @@ db_notdropped=No database was dropped.
 db_droperror=Database could not be dropped.
 db_altered=Database '%' was renamed to '%'.
 db_notaltered=Database '%' could not be renamed.
-db_backup=Backup '%' created in %.
+db_backup=Backup for '%' created in %.
 db_nobackup=Backup of database '%' could not be created.
-db_restore=Database '%' restored in %.
-db_norestore=Database '%' could not be restored.
+db_restore='%' restored in %.
+db_norestore='%' could not be restored.
 db_notopened=Database '%' could not be opened.
 db_opened=Database '%' opened in %.
 db_exported=Database '%' exported in %.
@@ -396,6 +401,7 @@ db_backnf=No backup found for '%'.
 in_created=Index '%' created in %.
 in_dropped=Index '%' dropped in %.
 in_notdropped=Index '%' could not be dropped.
+in_notavl=Not available
 
 # Server Info
 srv_login=Access denied.
@@ -457,10 +463,11 @@ ad_kill=% sessions killed.
 ad_killself='%' cannot kill itself.
 
 # General Commands
-gc_setkey=Could not set '%'.
+gc_setwhich=Unknown option '%'
 gc_setval=Could not set '%' to '%'.
 
 # Info Strings
+info_wait=Please Wait
 info_index=Indexes
 info_opt=Optimizing Database
 info_stats=Create statistics
@@ -513,10 +520,11 @@ ch_create5=creates the specified index
 ch_create6=creates filesystem database [%] for [%]
 ch_create7=(using [%] and [%] if FUSE is activated)
 ch_create8=creates the specified user
+ch_create9=creates the trigger
 ch_add1=Add document to database.
 ch_add2=Adds [%] as [%] to the database, using an optional\n[%] path.
-ch_delete1=Delete document from database.
-ch_delete2=Deletes a document from the current database.
+ch_delete1=Delete documents from database.
+ch_delete2=Deletes documents from the currently opened database.
 ch_open1=Open database.
 ch_open2=Opens the specified database [%].
 ch_info1=Show information on current database.
@@ -526,7 +534,7 @@ ch_info23=shows database information
 ch_info24=shows index information
 ch_info25=show internal database table
 ch_close1=Close current database.
-ch_close2=Closes the current database.
+ch_close2=Closes the currently opened database.
 ch_list1=List available databases.
 ch_list2=Lists all available databases.
 ch_drop1=Drop database, index or user.
@@ -535,6 +543,7 @@ ch_drop21=drops the database
 ch_drop22=drops the specified index
 ch_drop23=drops the specified user
 ch_drop24=drops the database backup
+ch_drop25=drops the trigger
 ch_alter1=Alter user password or database name.
 ch_alter2=Alters user password or database name:
 ch_alterpw=alters the password of a user.
@@ -565,6 +574,7 @@ ch_show22=shows currently opened databases.
 ch_show23=shows current database sessions.
 ch_show24=shows users (on a database).
 ch_show25=shows backups.
+ch_show26=shows triggers.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions (on a database) to a user.
 ch_helpgeneral0=General Commands:
@@ -585,6 +595,10 @@ ch_help1=Get help on % commands.
 ch_help2=If [%] is specified, information on the specific\ncommand is printed; otherwise, all commands are listed.
 ch_exit1=Exit application.
 ch_exit2=Exits %.
+ch_helpattach1=Attach a trigger.
+ch_helpattach2=Attaches a trigger.
+ch_helpdetach1=Detach a trigger.
+ch_helpdetach2=Detaches a trigger.
 
 # Help Texts
 h_hist=Show input history.
@@ -605,5 +619,5 @@ h_table=This visualization displays XML nodes in a table. If you click on a text
 h_text=This panel displays query results and other textual output.\n\nKey Shortcuts: Press '-' and '+' to change the font size of all panels. Type in any text into the find popup to launch an incremental search for it. It's an easy way to find special text points.
 h_info=This panel displays information on the compilation and evaluation of an XQuery request, including some profiling information.
 h_explore=The simple search mode allows simple queries in the XML document.
-h_xquery=In this text area, you can enter any XQuery 1.0 query. The input is evaluated after each key click.\n\n The following example would show all book titles with the topic 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=In this text area, you can edit your XQuery expression. The input is evaluated after each key click.\n\n The following example would show all book titles with the topic 'BaseX':\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
 h_mover=You can change the position of a view by dragging the bar on top of all view panels to any other place inside the main window.\n If you move a view outside the main window, it will be closed.

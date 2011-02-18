@@ -39,13 +39,13 @@ public final class DropUser extends Command {
   protected boolean run() {
     final String name = args[0];
     if(name.equals(ADMIN)) return error(USERADMIN);
-    if(!checkName(name)) return error(NAMEINVALID, name);
+    if(!validName(name)) return error(NAMEINVALID, name);
 
     final User user = context.users.get(name);
     if(user == null) return error(USERNO, name);
 
     final String db = args[1];
-    if(db != null && !checkName(db)) return error(NAMEINVALID, db);
+    if(db != null && !validName(db)) return error(NAMEINVALID, db);
     if(db == null) {
       for(final ServerProcess s : context.sessions) {
         if(s.context.user.name.equals(name)) return error(USERLOG, name);

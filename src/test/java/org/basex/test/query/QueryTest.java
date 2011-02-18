@@ -35,7 +35,7 @@ public abstract class QueryTest {
   /** Database context. */
   protected static Context context;
 
-  /** Prepares tests. */
+  /** Prepares the tests. */
   @BeforeClass
   public static void startTest() {
     context = new Context();
@@ -43,7 +43,7 @@ public abstract class QueryTest {
   }
 
   /**
-   * Finish the test.
+   * Finish the tests.
    * @throws BaseXException database exception
    */
   @AfterClass
@@ -59,7 +59,7 @@ public abstract class QueryTest {
   @Test
   public void test() throws BaseXException {
     final String file = doc.replaceAll("\\\"", "\\\\\"");
-    final String name = Util.name(this);
+    final String name = Util.name(QueryTest.class);
     final boolean up = this instanceof XQUPTest;
     new CreateDB(name, file).execute(context);
 

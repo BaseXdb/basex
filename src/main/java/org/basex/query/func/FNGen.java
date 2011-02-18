@@ -108,7 +108,7 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private NodIter collection(final QueryContext ctx) throws QueryException {
-    return ctx.resource.coll(expr.length != 0 ? checkStr(expr[0], ctx) : 
+    return ctx.resource.coll(expr.length != 0 ? checkStr(expr[0], ctx) :
       null, input);
   }
 
@@ -155,7 +155,7 @@ final class FNGen extends Fun {
    */
   private Nod doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, input);
-    return it == null ? null : 
+    return it == null ? null :
       ctx.resource.doc(checkEStr(it), false, false, input);
   }
 
@@ -184,7 +184,12 @@ final class FNGen extends Fun {
   private Item unparsedText(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
-    return unparsedText(io, enc, input);
+    try {
+      return Str.get(TextInput.content(io, enc).finish());
+    } catch(final IOException ex) {
+      UNDEF.thrw(input, ex);
+      return null;
+    }
   }
 
   /**
@@ -195,33 +200,14 @@ final class FNGen extends Fun {
    */
   private Bln unparsedTextAvailable(final QueryContext ctx)
       throws QueryException {
-    try {
-      final IO io = checkIO(expr[0], ctx);
-      final String e = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
-      return Bln.get(unparsedText(io, e, input) != null);
-    } catch(final QueryException ex) {
-      // error code is still to be fixed in the specs...
-      if(ex.type() == Err.UNDEF.type) return Bln.FALSE;
-      throw ex;
-    }
-  }
 
-  /**
-   * Performs the unparsed-text function. The result is optionally cached.
-   * @param io input path
-   * @param enc encoding
-   * @param input input information
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  static Str unparsedText(final IO io, final String enc, final InputInfo input)
-      throws QueryException {
-
+    final IO io = checkIO(expr[0], ctx);
+    final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     try {
-      return Str.get(TextInput.content(io, enc).finish());
+      TextInput.content(io, enc);
+      return Bln.TRUE;
     } catch(final IOException ex) {
-      UNDEF.thrw(input, ex);
-      return null;
+      return Bln.FALSE;
     }
   }
 
@@ -239,7 +225,7 @@ final class FNGen extends Fun {
       if(!base.valid()) DOCBASE.thrw(input, base);
     }
 
-    final Prop prop = ctx.resource.context.prop;
+    final Prop prop = ctx.context.prop;
     final IO io = new IOContent(cont, string(base.atom()));
     try {
       final Parser p = Parser.fileParser(io, prop, "");

@@ -129,18 +129,20 @@ public final class GUIProp extends AProp {
     { "HELPSIZE", new int[] { 300, 250 } };
 
   /** Path for creating new databases. */
-  public static final Object[] OPENPATH = { "OPENPATH", Prop.HOME };
+  public static final Object[] CREATEPATH = { "CREATEPATH", Prop.HOME };
   /** Path for creating new XML Documents. */
   public static final Object[] SAVEPATH = { "SAVEPATH", Prop.HOME };
   /** Path for XQuery files. */
   public static final Object[] XQPATH = { "XQPATH", Prop.HOME };
   /** Path for stopwords. */
   public static final Object[] STOPPATH = { "STOPPATH", Prop.HOME };
+  /** Name of new database. */
+  public static final Object[] CREATENAME = { "CREATENAME", "" };
 
   /** Path to mapped file hierarchy. */
-  public static final Object[] FSBACKING = { "FSBACKING", Prop.HOME };
+  public static final Object[] FSPATH = { "FSPATH", Prop.HOME };
   /** Name of the DeepFS database. */
-  public static final Object[] FSDBNAME = { "FSDBNAME", "DeepFS" };
+  public static final Object[] FSNAME = { "FSNAME", "DeepFS" };
   /** Name of the mountpoint. */
   public static final Object[] FSMOUNT = { "FSMOUNT", "/mnt/deepfs" };
   /** Flag indicating the mapping of the complete disk. */

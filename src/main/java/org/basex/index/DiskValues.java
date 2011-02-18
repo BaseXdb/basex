@@ -64,7 +64,7 @@ public final class DiskValues implements Index {
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(TXTINDEX + NL);
+    tb.add(INDEXSTRUC + TREESTRUC + NL);
     final long l = idxl.length() + idxr.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
     final IndexStats stats = new IndexStats(data);

@@ -42,7 +42,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.3.3";
+  String VERSION = "6.3.4";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -139,12 +139,24 @@ public interface Text {
   String SERVERUSER = lang("srv_user");
   /** Password. */
   String SERVERPW = lang("srv_pw");
-  /** Localhost. */
-  String LOCALHOST = "localhost";
   /** Start REST. */
   String RESTSTART = lang("srv_reststart") + DOTS;
 
+  /** Localhost. */
+  String LOCALHOST = "localhost";
+
   // COMMANDS =================================================================
+
+  /** Command keyword. */
+  String AS = "AS";
+  /** Command keyword. */
+  String TO = "TO";
+  /** Command keyword. */
+  String ON = "ON";
+  /** Command keyword. */
+  String TRUE = "TRUE";
+  /** Keyword. */
+  String OK = "OK";
 
   /** Command help. */
   String C_QUERY = "query";
@@ -159,19 +171,6 @@ public interface Text {
   /** Command help. */
   String C_TARGET = "target";
 
-  /** Command keyword. */
-  String AS = "AS";
-  /** Command keyword. */
-  String TO = "TO";
-  /** Command keyword. */
-  String ON = "ON";
-  /** Command keyword. */
-  String USER = "USER";
-  /** Command keyword. */
-  String TRUE = "TRUE";
-  /** Keyword. */
-  String OK = "OK";
-
   /** Missing help. */
   String NOHELP = lang("ch_nohelp");
 
@@ -180,7 +179,8 @@ public interface Text {
   /** Command help. */
   String[] HELPCREATE = {
     "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
-    CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
+    CmdCreate.INDEX + "|" + CmdCreate.USER + "|" 
+    + CmdCreate.TRIGGER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
     LI + CmdCreate.DB + " [" + C_NAME + "] ([" + INPUT + "]):"  + NL +
@@ -193,8 +193,22 @@ public interface Text {
       "  " + lang("ch_create6", C_NAME, C_PATH) + NL +
       "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]): " + NL +
-      "  " + lang("ch_create8")
+      "  " + lang("ch_create8") + NL +
+    LI + CmdCreate.TRIGGER + " [" + C_NAME + "]: " + NL +
+      "  " + lang("ch_create9")  
   };
+
+  /** Command help. */
+  String[] HELPATTACH = {
+      "TRIGGER " + "[" + C_NAME + "]", lang("ch_helpattach1"),
+      lang("ch_helpattach2", C_NAME)
+    };
+  
+  /** Command help. */
+  String[] HELPDETACH = {
+      "TRIGGER " + "[" + C_NAME + "]", lang("ch_helpdetach1"),
+      lang("ch_helpdetach2", C_NAME)
+    };
 
   /** Command help. */
   String[] HELPADD = {
@@ -233,7 +247,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "] [...]",
+    "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "|" 
+    + CmdDrop.TRIGGER + "] [...]",
     lang("ch_drop1"),
     lang("ch_drop2") + NL +
     LI + CmdDrop.DB + " [" + C_NAME + "]:" + NL +
@@ -244,7 +259,9 @@ public interface Text {
     LI + CmdDrop.USER + " [" + C_NAME + "]:" + NL + "  " +
       lang("ch_drop23") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
-      lang("ch_drop24", C_NAME)
+      lang("ch_drop24", C_NAME) + NL +
+    LI + CmdDrop.TRIGGER + " [" + C_NAME + "]:" + NL + "  " +
+      lang("ch_drop25", C_NAME)
   };
   /** Command help. */
   String[] HELPEXPORT = {
@@ -291,13 +308,14 @@ public interface Text {
   /** Command help. */
   String[] HELPSHOW = {
     "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
-    CmdShow.USERS + "|" + CmdShow.BACKUPS + "]",
+    CmdShow.USERS + "|" + CmdShow.BACKUPS + "|" + CmdShow.TRIGGERS + "]",
     lang("ch_show1"),
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
     LI + CmdShow.USERS + " (" + ON + " [db]): " + lang("ch_show24") + NL +
-    LI + CmdShow.BACKUPS + ": " + lang("ch_show25")
+    LI + CmdShow.BACKUPS + ": " + lang("ch_show25") + NL +
+    LI + CmdShow.TRIGGERS + ": " + lang("ch_show26")
   };
   /** Command help. */
   String[] HELPGRANT = {
@@ -309,10 +327,10 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + USER + "|" + CmdCreate.DB + "] [...]",
+    "[" + CmdCreate.USER + "|" + CmdCreate.DB + "] [...]",
     lang("ch_alter1"),
     lang("ch_alter2") + NL  +
-    LI + USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
+    LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
     "  " + lang("ch_alterpw") + NL +
     LI + CmdCreate.DB + " [" + C_NAME + "] [newname]" + NL +
     "  " + lang("ch_alterdb")
@@ -469,30 +487,35 @@ public interface Text {
   String DBBACKDROP = lang("db_backdrop");
   /** Backup was not found. */
   String DBBACKNF = lang("db_backnf");
-
   /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");
+
   /** Index created. */
   String INDCREATED = lang("in_created");
   /** Index dropped. */
   String INDDROP = lang("in_dropped");
   /** Index not dropped. */
   String INDDROPERROR = lang("in_notdropped");
+  /** Index not available. */
+  String INDNOTAVL = lang("in_notavl");
 
   // DATABASE/INDEX INFORMATION ===============================================
 
   /** Index info. */
-  String TRIE = LI + "Compressed Trie";
+  String INDEXSTRUC = LI + "Structure: ";
   /** Index info. */
-  String NAMINDEX = LI + "Hash Index";
-  /** Index info. */
-  String FUZZY = LI + "Fuzzy Index";
-  /** Index info. */
-  String TXTINDEX = LI + "Tree Index";
-  /** Index info. */
-  String SIZEDISK = LI + "Size on Disk: ";
+  String SIZEDISK = LI + "Size: ";
   /** Index info. */
   String IDXENTRIES = LI + "Entries: ";
+
+  /** Index info. */
+  String TRIESTRUC = "Trie";
+  /** Index info. */
+  String HASHSTRUC = "Hash";
+  /** Index info. */
+  String FUZZYSTRUC = "Fuzzy";
+  /** Index info. */
+  String TREESTRUC = "Binary tree";
 
   // XQUERY COMMAND ===========================================================
 
@@ -595,14 +618,16 @@ public interface Text {
   // GENERAL COMMANDS =========================================================
 
   /** Invalid key. */
-  String SETKEY = lang("gc_setkey");
+  String SETWHICH = lang("gc_setwhich") + DOT;
+  /** Unknown command error. */
+  String SETSIMILAR = lang("gc_setwhich") + "; " + lang("cmd_similar");
   /** Invalid value. */
   String SETVAL = lang("gc_setval");
 
   // INFO STRINGS =============================================================
 
   /** Waiting information. */
-  String INFOWAIT = lang("wait") + DOTS;
+  String INFOWAIT = lang("info_wait") + DOTS;
   /** Index information. */
   String INFOINDEX = lang("info_index");
   /** Optimize information. */
@@ -696,9 +721,11 @@ public interface Text {
   // MENU ENTRIES =============================================================
 
   /** Menu entry. */
-  String MENUFILE = lang("m_file");
+  String MENUDB = lang("m_db");
   /** Menu entry. */
   String MENUEDIT = lang("m_edit");
+  /** Menu entry. */
+  String MENUQUERY = lang("m_query");
   /** Menu entry. */
   String MENUVIEW = lang("m_view");
   /** Menu entry. */
@@ -707,17 +734,6 @@ public interface Text {
   String MENUDEEPFS = "DeepFS";
   /** Menu entry. */
   String MENUHELP = lang("m_help");
-
-  /** Menu label. */
-  String MENUDB = lang("m_db") + COL;
-  /** Menu label. */
-  String MENUMAIN = lang("m_main") + COL;
-  /** Menu label. */
-  String MENUVIEWS = lang("m_views") + COL;
-  /** Menu label. */
-  String MENUINTER = lang("m_inter") + COL;
-  /** Menu label. */
-  String MENULAYOUT = lang("m_layout") + COL;
 
   // GUI COMMANDS =============================================================
 
@@ -805,6 +821,14 @@ public interface Text {
   String GUIINFO = lang("c_props");
   /** Command info. */
   String GUIINFOTT = lang("c_propstt");
+  /** Command info. */
+  String GUIADD = lang("c_add");
+  /** Command info. */
+  String GUIADDTT = lang("c_addtt");
+  /** Command info. */
+  String GUIDROP = lang("c_drop");
+  /** Command info. */
+  String GUIDROPTT = lang("c_droptt");
   /** Command info. */
   String GUIINSERT = lang("c_insert");
   /** Command info. */
@@ -934,7 +958,11 @@ public interface Text {
   String BUTTONXQUERY = lang("b_xquery");
   /** Button text for confirming actions. */
   String BUTTONOK = "  " + lang("b_ok") + "  ";
-  /** Button text for confirming actions. */
+  /** Button text for choosing actions. */
+  String BUTTONYES = "  " + lang("b_yes") + "  ";
+  /** Button text for choosing actions. */
+  String BUTTONNO = "  " + lang("b_no") + "  ";
+  /** Button text for optimization. */
   String BUTTONOPT = lang("b_opt") + DOTS;
   /** Button text for renaming databases. */
   String BUTTONRENAME = lang("b_rename") + DOTS;
@@ -949,13 +977,13 @@ public interface Text {
   /** Button text for canceling actions. */
   String BUTTONCANCEL = lang("b_cancel");
   /** Button text for deleting files. */
-  String BUTTONDROP = lang("b_drop");
+  String BUTTONDROP = lang("b_drop") + DOTS;
   /** Button text for browsing files/directories. */
   String BUTTONBROWSE = lang("b_browse") + DOTS;
   /** Button text for creating things. */
   String BUTTONCREATE = lang("b_create");
   /** Button text for alter password. */
-  String BUTTONALTER = lang("b_alter");
+  String BUTTONALTER = lang("b_alter") + DOTS;
   /** Button for starting the server. */
   String BUTTONSTART = lang("b_start");
   /** Button for starting the server. */
@@ -1017,17 +1045,17 @@ public interface Text {
   String CREATEPATTERN = lang("dc_pattern");
   /** Dialog title for creating a database. */
   String CREATENAME = lang("dc_name") + COLS;
+  /** Dialog title for creating a database. */
+  String CREATENAME2 = lang("dc_name2") + COLS;
   /** XML file description. */
   String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
   /** ZIP file description. */
   String CREATEZIPDESC = lang("dc_zipdesc") + " (*.zip)";
   /** GZ file description. */
   String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
-  /** XQ file description. */
-  String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
   /** XQuery file extensions description. */
-  String CREATEXQEXDESC = lang("dc_xqdesc") + 
-  " (*.xq, *.xquery, *.xqm, *.xqy, *.xql)";
+  String CREATEXQEXDESC = lang("dc_xqdesc") +
+    " (*.xq, *.xqm, *.xqy, *.xql, *.xquery)";
   /** Dialog title for database options. */
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Whitespaces information. */
@@ -1137,9 +1165,9 @@ public interface Text {
   /** Local permissions. */
   String LOCPERM = lang("ds_locperm") + COLS;
   /** Question for dropping user. */
-  String DRQUESTION = lang("ds_drquestion");
+  String DRQUESTION = lang("ds_drquestion") + NL + lang("dd_sure");
   /** Question for revoking right from logged in user. */
-  String DBREVOKE = lang("ds_dbrevoke");
+  String DBREVOKE = lang("ds_dbrevoke") + NL + lang("dd_sure");
   /** Alter password. */
   String ALTERPW = lang("ds_alterpw");
   /** Invalid. */
@@ -1200,15 +1228,19 @@ public interface Text {
 
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");
+  /** Dialog title for dropping documents. */
+  String DROPTITLE = lang("dr_title2");
   /** Info for overwriting a database. */
   String RENAMEOVER = lang("dr_over") + DOT;
+  /** Info for creating an empty database. */
+  String EMPTYDATABASE = lang("dr_empty") + DOT;
   /** Info for overwriting a database and deleting backing store. */
   String RENAMEOVERBACKING = lang("dr_overbacking") + DOT;
 
   /** Dialog title for managing databases. */
   String MANAGETITLE = lang("dd_title");
   /** Dialog title for dropping a database. */
-  String DROPCONF = lang("dd_question") + NL + " ";
+  String DROPCONF = lang("dd_question") + NL + lang("dd_sure");
 
   /** Dialog title for import options. */
   String PREFSTITLE = lang("dp_title");
@@ -1325,9 +1357,9 @@ public interface Text {
   /** Developer info. */
   String DEVELOPER = lang("da_dev") + ": Christian Gr\u00FCn";
   /** Contributors info. */
-  String CONTRIBUTE1 = lang("da_cont1") + ": Sebastian Gath, Lukas Kircher,";
+  String CONTRIBUTE1 = lang("da_cont1") + ": Andreas Weiler, Michael Seiferle,";
   /** Developer names. */
-  String CONTRIBUTE2 = "Andreas Weiler, Alexander Holupirek " +
+  String CONTRIBUTE2 = "Lukas Kircher, Alexander Holupirek " +
     lang("da_cont2");
   /** Translation. */
   String TRANSLATION = lang("da_translation") + COLS;

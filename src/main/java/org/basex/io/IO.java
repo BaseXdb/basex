@@ -227,8 +227,8 @@ public abstract class IO {
   }
 
   /**
-   * Returns the children of a document.
-   * @return chopped filename
+   * Returns the children of a path.
+   * @return children
    */
   public IO[] children() {
     return new IO[] {};

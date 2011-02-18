@@ -42,7 +42,7 @@ public class PrintOutput extends OutputStream {
    * Constructor, given an output stream.
    * @param out output stream reference
    */
-  private PrintOutput(final OutputStream out) {
+  public PrintOutput(final OutputStream out) {
     os = out;
   }
 

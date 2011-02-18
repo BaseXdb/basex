@@ -9,7 +9,7 @@ package org.basex.test.query;
 public final class TypeTest extends QueryTest {
   /** Constructor. */
   static {
-    doc = "<x/>";
+    doc = "<dummy/>";
 
     queries = new Object[][] {
         { "Simple 1", bool(true), "1 castable as xs:integer" },
@@ -49,7 +49,6 @@ public final class TypeTest extends QueryTest {
          * - sequence type
          * - bind, query processor
          * - Functions.get
-         *
          */
     };
   }

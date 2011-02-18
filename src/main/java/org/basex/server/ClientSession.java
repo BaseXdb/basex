@@ -5,13 +5,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.core.Command;
-import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
+import org.basex.core.Context;
+import org.basex.core.Prop;
+import org.basex.io.ArrayOutput;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
+import org.basex.server.trigger.TriggerNotification;
 import org.basex.util.Token;
 
 /**
@@ -35,12 +42,22 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class ClientSession extends Session {
+  /** Socket closed message. */
+  static final String SOCKET_CLOSED = "Socket closed";
   /** Socket reference. */
   final Socket socket;
   /** Server output. */
   final PrintOutput sout;
   /** Server input. */
   final InputStream sin;
+  /** Lock object. */
+  Object lock = new Object();
+  /** Output stream. */
+  OutputStream sink;
+  /** Trigger notifications. */
+  Map<String, List<TriggerNotification>> tn;
+  
+//  public OutputStream offout;
 
   /**
    * Constructor, specifying the database context and the
@@ -100,6 +117,9 @@ public final class ClientSession extends Session {
       final String pw, final OutputStream output) throws IOException {
 
     super(output);
+    
+    // initialize trigger notifications
+    tn = new HashMap<String, List<TriggerNotification>>();
 
     // 5 seconds timeout
     socket = new Socket();
@@ -118,6 +138,74 @@ public final class ClientSession extends Session {
 
     // receive success flag
     if(!ok(bi)) throw new LoginException();
+    
+    // final OutputStream o = new FileOutputStream("out_" + user + ".txt");
+    new Thread("ClientSession " + user + ": Input Thread"
+        + Thread.activeCount()) {
+
+      /*
+       * (non-Javadoc)
+       * @see java.lang.Thread#run()
+       */
+      @Override
+      public void run() {
+        super.run();
+
+        try {
+          while(true) {
+//            System.out.println("Prepare buffer for user " + user + "\n");
+
+            final ArrayOutput o = new ArrayOutput();
+
+            int l;
+            while((l = bi.read()) != 0)
+              if (sink != null)
+                sink.write(l);
+              else
+                o.write(l);
+
+            info = bi.readString();
+            boolean ok = bi.read() == 0 ? true : false;
+            if(!ok) {
+              final String inf = info();
+              if(!inf.isEmpty()) {
+                if (sink != null)
+                  sink.write(inf.getBytes());
+                else
+                  o.write(inf.getBytes());
+              }
+            }
+            
+            // Set sink as unset.
+            if (sink != null) {
+              sink.flush();
+              sink = null;
+            } else {
+              String res = o.toString();
+              
+              if(!"".equals(res)) {
+                int idx = res.indexOf(' ');
+                String name = res.substring(0, idx);
+                String val = res.substring(idx + 1);
+                if(tn.size() > 0) for(TriggerNotification t : tn.get(name))
+                  t.update(val);
+              }
+            }
+
+            synchronized(lock) {
+              lock.notifyAll();
+//              System.out.println("UNLOCKED");
+            }
+
+            o.close();
+          }
+
+        } catch(IOException e) {
+          if (!SOCKET_CLOSED.equals(e.getMessage()))
+            e.printStackTrace();
+        }
+      }
+    }.start();
   }
 
   @Override
@@ -164,6 +252,67 @@ public final class ClientSession extends Session {
   public ClientQuery query(final String query) throws BaseXException {
     return new ClientQuery(query, this);
   }
+  
+  /**
+   * Creates a trigger.
+   * @param name trigger name
+   * @throws BaseXException exception
+   */
+  public void createTrigger(final String name) throws BaseXException {
+    execute("create trigger " + name);
+  }
+  
+  /**
+   * Drops a trigger.
+   * @param name trigger name
+   * @throws BaseXException exception
+   */
+  public void dropTrigger(final String name) throws BaseXException {
+    execute("drop trigger " + name);
+  }
+  
+  
+  /**
+   * Attaches to a trigger.
+   * @param name trigger name
+   * @param notification trigger notification
+   * @throws BaseXException exception
+   */
+  public void attachTrigger(final String name,
+      final TriggerNotification notification) throws BaseXException {
+    execute("attach trigger " + name);
+    
+    if (tn.get(name) == null)
+      tn.put(name, new ArrayList<TriggerNotification>(1));
+    
+    tn.get(name).add(notification);
+  }
+  
+  /**
+   * Detaches from a trigger.
+   * @param name trigger name
+   * @throws BaseXException exception
+   */
+  public void detachTrigger(final String name) throws BaseXException {
+    
+    // empty trigger notification list.
+    tn.put(name, null);
+    
+    execute("detach trigger " + name);
+  }
+  
+  /**
+   * Executes a trigger.
+   * @param query query string
+   * @param name trigger name
+   * @param notification trigger notification
+   * @throws BaseXException exception
+   */
+  public void trigger(final String query, final String name,
+      final String notification) throws BaseXException {
+    execute("xquery db:trigger(" + query + ", " + name + ", '" +
+        notification + "')");
+  }
 
   @Override
   public void close() throws IOException {
@@ -193,23 +342,42 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  protected void execute(final String cmd, final OutputStream os)
+  public void execute(final String cmd, final OutputStream os)
       throws BaseXException {
 
-    try {
-      send(cmd);
-      final BufferInput bi = new BufferInput(sin);
-      int l;
-      while((l = bi.read()) != 0) os.write(l);
-      info = bi.readString();
-      if(!ok(bi)) throw new BaseXException(info);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
+//    try {
+//      send(cmd);
+//      final BufferInput bi = new BufferInput(sin);
+//      int l;
+//      while((l = bi.read()) != 0) os.write(l);
+//      info = bi.readString();
+//      if(!ok(bi)) throw new BaseXException(info);
+//    } catch(final IOException ex) {
+//      throw new BaseXException(ex);
+//    }
+
+    synchronized(lock) {
+      
+      this.sink = os;
+      
+      try {
+        send(cmd);
+      } catch(IOException e) {
+        throw new BaseXException(e);
+      }
+      
+      try {
+//        System.out.println("LOCKED");
+        lock.wait();
+      } catch(InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
   }
 
   @Override
-  protected void execute(final Command cmd, final OutputStream os)
+  public void execute(final Command cmd, final OutputStream os)
       throws BaseXException {
     execute(cmd.toString(), os);
   }

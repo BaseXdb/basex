@@ -122,10 +122,10 @@ public final class Var extends ParseExpr {
   public Value value(final QueryContext ctx) throws QueryException {
     if(value == null) {
       if(expr == null) VAREMPTY.thrw(input, this);
-      final Value v = ctx.resource.value;
-      ctx.resource.value = null;
+      final Value v = ctx.value;
+      ctx.value = null;
       value = cast(expr.comp(ctx).value(ctx), ctx);
-      ctx.resource.value = v;
+      ctx.value = v;
     }
     return value;
   }
@@ -164,6 +164,21 @@ public final class Var extends ParseExpr {
   @Override
   public boolean uses(final Use u) {
     return u == Use.VAR;
+  }
+
+  @Override
+  public boolean uses(final Var v) {
+    return eq(v);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    return true;
+  }
+
+  @Override
+  public Var remove(final Var v) {
+    return this;
   }
 
   @Override

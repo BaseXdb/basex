@@ -21,7 +21,7 @@ import org.basex.util.Table;
  */
 public final class Tab extends BaseXBack {
   /** GUI reference. */
-  private SGUI gui;
+  private final SGUI gui;
 
   /**
    * Default constructor.
@@ -32,7 +32,7 @@ public final class Tab extends BaseXBack {
   public Tab(final String t, final SGUI g) throws BaseXException {
     gui = g;
     mode(Fill.NONE);
-    String dbname = t.substring(0, t.indexOf("-") - 1);
+    final String dbname = t.substring(0, t.indexOf("-") - 1);
     if(t.endsWith("Users")) {
       initUser(dbname);
     } else if(t.endsWith("Content")) {
@@ -50,7 +50,7 @@ public final class Tab extends BaseXBack {
   private void initUser(final String t) throws BaseXException {
     final Table users = new Table(gui.client.execute(new ShowUsers(t)));
     // [AW] remove Dialog reference from BaseXTable
-    BaseXTable table = new BaseXTable(users, null);
+    final BaseXTable table = new BaseXTable(users, null);
     final JScrollPane sp = new JScrollPane(table);
     BaseXLayout.setHeight(sp, 220);
     BaseXLayout.setWidth(sp, 350);
@@ -65,7 +65,7 @@ public final class Tab extends BaseXBack {
   private void initContent(final String t) throws BaseXException {
     gui.client.execute(new Open(t));
     // [AW] change to BaseXText
-    JTextArea jt = new JTextArea(gui.client.execute(new XQuery("//*")));
+    final JTextArea jt = new JTextArea(gui.client.execute(new XQuery("//*")));
     final JScrollPane sp = new JScrollPane(jt);
     BaseXLayout.setHeight(sp, 420);
     BaseXLayout.setWidth(sp, 550);
@@ -80,7 +80,7 @@ public final class Tab extends BaseXBack {
   private void initProps(final String t) throws BaseXException {
     gui.client.execute(new Open(t));
     // [AW] change to BaseXText
-    JTextArea jt = new JTextArea(gui.client.execute(new InfoDB()));
+    final JTextArea jt = new JTextArea(gui.client.execute(new InfoDB()));
     final JScrollPane sp = new JScrollPane(jt);
     BaseXLayout.setHeight(sp, 320);
     BaseXLayout.setWidth(sp, 450);

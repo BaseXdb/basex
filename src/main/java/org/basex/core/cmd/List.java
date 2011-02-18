@@ -97,10 +97,8 @@ public final class List extends Command {
    * @return available databases
    */
   public static StringList listFS(final Context ctx) {
-    final StringList dbs = list(ctx);
     final StringList dbl = new StringList();
-
-    for(final String name : dbs) {
+    for(final String name : list(ctx)) {
       DataInput in = null;
       final MetaData meta = new MetaData(name, ctx.prop);
       try {

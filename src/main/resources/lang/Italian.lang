@@ -4,23 +4,20 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-wait=Attendi
 version=Versione %
 
 # Menu Commands
-m_file=Documento
+m_db=Base di dati
 m_edit=Modifica
+m_query=Interrogazione
 m_view=Visualizza
 m_options=Opzioni
 m_help=Aiuto
-m_db=Base di dati
-m_main=Finestra principale
-m_views=Viste
-m_inter=Interazione
-m_layout=Disposizione
 
 # Buttons
 b_ok=OK
+b_yes=Sì
+b_no=No
 b_opt=Ottimizza
 b_rename=Rinomina
 b_backup=Backup
@@ -60,6 +57,7 @@ d_fctitle=Scegli una cartella
 dc_choose=Inserisci un file o una cartella
 dc_pattern=File patterns (separated by commas)
 dc_name=Nome della base di dati
+dc_name2=Document Path
 dc_xmldesc=Documenti XML
 dc_zipdesc=Documenti XML in formato Zip
 dc_gzdesc=Documenti XML in formato GZip
@@ -122,11 +120,14 @@ dfs_meta=Includi i metadati
 dfs_nodefaultapp=Non esiste alcuna applicazione per aprire questo tipo di documenti
 
 dr_title=Rinomina la base di dati
+dr_title2=Delete documents
 dr_over=La vecchia base di dati verrà sovrascritta
+dr_empty=An empty database will be created
 dr_overbacking=La vecchia base di dati e la memoria di appoggio verranno sovrascritti
 
 dd_title=Manage Databases
-dd_question=La base di dati '%' verrà cancellata.\nSei sicuro?
+dd_question=La base di dati '%' verrà cancellata.
+dd_sure=Sei sicuro?
 
 dx_question=Cancellare. Sei sicuro?
 dq_question=Salva in %?
@@ -207,8 +208,8 @@ ds_localport=Porta locale
 ds_createu=Crea utente
 ds_globperm=Permessi globali
 ds_locperm=Permessi locali
-ds_drquestion=% L'utente sarà eliminato.\nSei sicuro?
-ds_dbrevoke=I permessi saranno revocati.\nSei sicuro?
+ds_drquestion=% L'utente sarà eliminato.
+ds_dbrevoke=I permessi saranno revocati.
 ds_alterpw=Modifica parola chiave
 ds_invalid=% non valido
 ds_adlogin=Accesso dell'amministratore (locale o remoto)
@@ -264,6 +265,10 @@ c_mountfs=Monta DB come FUSE
 c_mountfstt=Monta una istanza DeepFS come sistema nello spazio utente (necessita del supporto del sistema operativo nativo).
 c_props=Informazioni
 c_propstt=Mostra le informazioni sulla base di dati attualmente in uso.
+c_add=Add documents
+c_addtt=Adds documents to the currently opened database.
+c_drop=Delete documents
+c_droptt=Delete documents from the currently opened database.
 c_insert=Nuovo
 c_inserttt=Crea un nuovo nodo XML.
 c_maplayout=Disposizione della mappa
@@ -379,10 +384,10 @@ db_notdropped=No database was dropped.
 db_droperror=Impossibile cancellare la base di dati.
 db_altered=Database '%' was renamed to '%'.
 db_notaltered=Database '%' could not be renamed.
-db_backup=Backup '%' created in %.
+db_backup=Backup for '%' created in %.
 db_nobackup=Backup of database '%' could not be created.
-db_restore=Database '%' restored in %.
-db_norestore=Database '%' could not be restored.
+db_restore='%' restored in %.
+db_norestore='%' could not be restored.
 db_notopened=Impossibile aprire la base di dati '%'.
 db_opened=Base di dati '%' aperta in %.
 db_exported=Base di dati '%' esportata in %.
@@ -393,9 +398,10 @@ db_backdrop=Backup files '%' were dropped.
 db_backnf=No backup found for '%'.
 
 # Index commands
-in_created=Indici creati in %.
-in_dropped=Indici cancellati in %.
-in_notdropped=Impossibile cancellare gli indici.
+in_created=Indici '%' creati in %.
+in_dropped=Indici '%' cancellati in %.
+in_notdropped=Impossibile cancellare gli indici '%'.
+in_notavl=Non disponibile
 
 # Server Info
 srv_login=Accesso negato.
@@ -457,10 +463,11 @@ ad_kill=% sessione chiusa.
 ad_killself='%' non può chiudere se stessa.
 
 # General Commands
-gc_setkey=Non è possibile impostare '%'.
+gc_setwhich=Unknown option '%'
 gc_setval=Non è possibile impostare '%' a '%'.
 
 # Info Strings
+info_wait=Attendi
 info_index=Indici
 info_opt=Sto ottimizzando la base di dati
 info_stats=Crea statistiche
@@ -513,10 +520,11 @@ ch_create5=crea l'indice specificato
 ch_create6=Crea un sistema DeepFS [%] per [%]
 ch_create7=(usando [%] e [%] se FUSE è attivo)
 ch_create8=crea l'utente specificato
+ch_create9=creates the trigger
 ch_add1=Aggiungi documento.
 ch_add2=Adds [%] as [%] to the database, using an optional\n[%] path.
-ch_delete1=Rimuovi un documento.
-ch_delete2=Rimuovi un documento dalla base di dati corrente.
+ch_delete1=Rimuovi documenti.
+ch_delete2=Rimuovi documenti dalla base di dati corrente.
 ch_open1=Apri una base di dati.
 ch_open2=apre la base di dati [%] specificata.
 ch_info1=Mostra informazioni sulla base di dati attuale.
@@ -535,6 +543,7 @@ ch_drop21=cancella la base di dati
 ch_drop22=cancella l'indice specificato
 ch_drop23=cancella l'utente specificato
 ch_drop24=drops the database backup
+ch_drop25=drops the trigger
 ch_alter1=Alter user password or database name.
 ch_alter2=Alters user password or database name:
 ch_alterpw=cambia la parola chiave di un utente.
@@ -565,6 +574,7 @@ ch_show22=mostra le basi di dati aperte.
 ch_show23=mostra le sessioni aperte.
 ch_show24=mostra gli utenti (su una base di dati).
 ch_show25=shows backups.
+ch_show26=shows triggers.
 ch_grant1=Assegna i permessi all'utente.
 ch_grant2=Assegna i permessi all'utente (su una base di dati) ad un utente.
 ch_helpgeneral0=Comandi generali:
@@ -585,6 +595,10 @@ ch_help1=Ottieni aiuto su % comandi.
 ch_help2=Se è specificato [%], l'informazione sullo specifico\n comando viene mostrata; altrimenti, vengono mostrati tutti i comandi.
 ch_exit1=Esci dall'applicazione.
 ch_exit2=Esci da %.
+ch_helpattach1=Attach a trigger.
+ch_helpattach2=Attaches a trigger.
+ch_helpdetach1=Detach a trigger.
+ch_helpdetach2=Detaches a trigger.
 
 # Help Texts
 h_hist=Mostra la cronologia degli inserimenti.
@@ -605,5 +619,5 @@ h_table=Questa visualizzazione mostra tutti i nodi XML in una tabella. Cliccando
 h_text=Questo pannello mostra i risultati delle interrogazioni ed altre informazioni testuali.\n\nTasti rapidi: Usa '-' e '+' per cambiare la dimensione del carattere di tutti i pannelli. Digita qualunque testo dentro il pop-up di ricerca per lanciare una ricerca incrementale. E' un buon modo per trovare punti specifici di testo.
 h_info=Questo pannello mostra informazioni sulla compilazione ed esecuzione di una interrogazione XQuery.
 h_explore=La modalità di ricerca semplice consente query semplici sul documento XML.
-h_xquery=In quest'area di testo puoi inserire qualunque interrogazione XQuery 1.0. L'input viene eseguito dopo la pressione di ogni tasto.\n\n L'esempio seguente mostra tutti i titoli dei libri con topic 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=In quest'area di testo puoi inserire qualunque interrogazione XQuery. L'input viene eseguito dopo la pressione di ogni tasto.\n\n L'esempio seguente mostra tutti i titoli dei libri con topic 'BaseX':\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
 h_mover=Puoi cambiare la posizione di una vista trascinando la barra sopra il pannello della vista in qualsiasi altra posizione all'interno della finestra principale.\n Se sposti una vista fuori dalla finestra principale, verrà chiusa.

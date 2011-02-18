@@ -4,23 +4,20 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-wait=Bitte Warten
 version=Version %
 
 # Menu Commands
-m_file=Datei
+m_db=Datenbank
 m_edit=Bearbeiten
 m_view=Ansicht
+m_query=Anfrage
 m_options=Optionen
 m_help=Hilfe
-m_db=Datenbank
-m_main=Hauptfenster
-m_views=Visualisierungen
-m_inter=Interaktion
-m_layout=Layout
 
 # Buttons
 b_ok=OK
+b_yes=Ja
+b_no=Nein
 b_opt=Optimieren
 b_rename=Umbenennen
 b_backup=Backup
@@ -60,6 +57,7 @@ d_fctitle=Verzeichnis
 dc_choose=XML-Dokument oder Verzeichnis
 dc_pattern=Dateimuster (getrennt mit Kommas)
 dc_name=Name der Datenbank
+dc_name2=Dokument Pfad
 dc_xmldesc=XML-Dokumente
 dc_zipdesc=Gezippte XML-Dokumente
 dc_gzdesc=Gezippte XML-Dokumente
@@ -122,11 +120,14 @@ dfs_meta=Importiere Meta-Daten
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Datenbank umbenennen
+dr_title2=Dokumente löschen
 dr_over=Alte Datenbank wird überschrieben
+dr_empty=Eine leere Datenbank wird erstellt
 dr_overbacking=Alte Datenbank, sowie DeepFS Hilfsspeicher werden überschrieben
 
 dd_title=Datenbankmanagement
-dd_question=Die Datenbank '%' wird gelöscht.\nSind Sie sicher?
+dd_question=Die Datenbank '%' wird gelöscht.
+dd_sure=Sind Sie sicher?
 
 dx_question=Möchten Sie wirklich löschen?
 dq_question=Änderungen speichern in %?
@@ -207,8 +208,8 @@ ds_localport=Lokaler Port
 ds_createu=Benutzer anlegen
 ds_globperm=Globale Rechte
 ds_locperm=Lokale Rechte
-ds_drquestion=% Benutzer werden entfernt.\nSind Sie sicher?
-ds_dbrevoke=Recht wird vom eingeloggten Benutzer entfernt.\nSind Sie sicher?
+ds_drquestion=% Benutzer werden entfernt.
+ds_dbrevoke=Recht wird vom eingeloggten Benutzer entfernt.
 ds_alterpw=Passwort ändern
 ds_invalid=% ist ungültig
 ds_adlogin=Administrator-Login (lokal oder remote)
@@ -264,6 +265,10 @@ c_mountfs=Mount DB as FUSE
 c_mountfstt=Mount DeepFS database instance as filesystem in userspace (needs native operating system support and may thus be unavailable).
 c_props=Eigenschaften
 c_propstt=Zeigt Informationen über die aktuelle Datenbank an.
+c_add=Dokumente hinzufügen
+c_addtt=Fügt der aktuell geöffneten Datenbank Dokumente.
+c_drop=Dokumente löschen
+c_droptt=Löscht Dokumente aus der aktuell geöffneten Datenbank.
 c_insert=Neu
 c_inserttt=Erzeugt einen neuen XML-Knoten.
 c_maplayout=Map-Layout
@@ -379,10 +384,10 @@ db_notdropped=Keine database wurde gelöscht.
 db_droperror=Die Datenbank konnte nicht gelöscht werden.
 db_altered=Die Datenbank '%' wurde in '%' umbenannt.
 db_notaltered=Die Datenbank '%' konnte nicht umbenannt werden.
-db_backup=Backup '%' erstellt in %.
+db_backup=Backup für '%' erstellt (%).
 db_nobackup=Backup der Datenbank '%' konnte nicht erstellt werden.
-db_restore=Datenbank '%' wiederhergestellt in %.
-db_norestore=Die Datenbank '%' konnte nicht wiederhergestellt werden.
+db_restore='%' wiederhergestellt (%).
+db_norestore='%' konnte nicht wiederhergestellt werden.
 db_notopened=Die Datenbank '%' konnte nicht geöffnet werden.
 db_opened=Datenbank '%' geöffnet (%).
 db_exported=Datenbank '%' exportiert (%).
@@ -393,9 +398,10 @@ db_backdrop=Backup-Dateien '%' wurden gelöscht.
 db_backnf=Kein Backup wurde für '%' gefunden.
 
 # Index commands
-in_created=Index erzeugt (%).
-in_dropped=Index gelöscht (%).
-in_notdropped=Index konnte nicht gelöscht werden.
+in_created=Index '%' erzeugt (%).
+in_dropped=Index '%' gelöscht (%).
+in_notdropped=Index '%' konnte nicht gelöscht werden.
+in_notavl=Nicht verfügbar
 
 # Server Info
 srv_login=Zugriff wurde verweigert.
@@ -457,10 +463,11 @@ ad_kill=% Verbindungen beendet.
 ad_killself='%' kann sich nicht selbst beenden.
 
 # General Commands
-gc_setkey=Fehler beim Setzen von '%'.
+gc_setwhich=Unbekannte Option '%'
 gc_setval=Fehler beim Setzen von '%' auf '%'.
 
 # Info Strings
+info_wait=Bitte warten
 info_index=Indizes
 info_opt=Optimiere Datenbank
 info_stats=Erstelle Statistiken
@@ -513,10 +520,10 @@ ch_create5=erzeugt den angegebenen Index
 ch_create6=erzeugt eine Filesystem-Datenbank [%] von [%]
 ch_create7=(mit [%] und [%], wenn FUSE aktiviert ist)
 ch_create8=erzeugt den angegebenen Benutzer
-ch_add1=Dokument hinzufügen.
+ch_add1=Hinzufügen von Dokumenten.
 ch_add2=Fügt der aktuellen Datenbank ein Dokument [%] mit [%] und [%] hinzu.
-ch_delete1=Dokument entfernen.
-ch_delete2=Entfernt ein Dokument von der aktuellen Datenbank.
+ch_delete1=Löschen von Dokumenten.
+ch_delete2=Löscht Dokumente aus der aktuell geöffneten Datenbank.
 ch_open1=Öffnen einer Datenbank.
 ch_open2=Öffnet die angegebene Datenbank [%].
 ch_info1=Anzeige von Datenbank-Informationen.
@@ -525,8 +532,8 @@ ch_info22=kein Argument: zeigt allgemeine Information an
 ch_info23=zeigt Datenbank-Informationen an
 ch_info24=zeigt Index-Informationen an
 ch_info25=zeigt interne Datenbanktabelle an
-ch_close1=Schließen der aktuellen Datenbank.
-ch_close2=Schließt die aktuelle Datenbank.
+ch_close1=Schließen der Datenbank.
+ch_close2=Schließt die aktuell geöffnete Datenbank.
 ch_list1=Anzeige aller Datenbanken.
 ch_list2=Listet alle verfügbaren Datenbanken auf.
 ch_drop1=Entfernen einer Datenbank, eines Index oder Benutzers.
@@ -605,5 +612,5 @@ h_table=Diese Visualisierung stellt die XML Knoten als Tabelle dar. Bei Klick au
 h_text=Hier werden Anfrage-Ergebnisse und alle anderen textuellen Ausgaben dargestellt.\n\nShortcuts: Drücke '-' und '+' um die Schriftgröße in allen Anzeigefeldern zu verändern. Hier kann ein beliebiger Text in das Finden-Popup eingegeben werden um eine inkrementelle Suche zu starten. Dies ist ein einfacher Weg um spezielle Textpassagen zu finden.
 h_info=Hier werden Informationen über die Kompilierung und Evaluation von XQuery-Anfragen dargestellt.
 h_explore=Der einfache Such-Modus erlaubt einfache Anfragen an das XML Dokument.
-h_xquery=In dieses Textfeld kann jede XQuery 1.0 Anfrage eingegeben werden. Die Eingabe wird nach jedem Klick ausgewertet.\n\nDas folgende Beispiel würde alle Büchertitel mit dem Thema 'BaseX' liefern:\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=In dieses Textfeld kann jede XQuery-Anfrage eingegeben werden. Die Eingabe wird nach jedem Klick ausgewertet.\n\nDas folgende Beispiel würde alle Büchertitel mit dem Thema 'BaseX' liefern:\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
 h_mover=Die Position einer Ansicht kann durch ziehen am oberen Balken des Fensters auf jegliche Position im Hauptfenster verändert werden.\n Wenn eine Ansicht nach außerhalb des Hauptfensters bewegt wird, wird sie geschlossen.

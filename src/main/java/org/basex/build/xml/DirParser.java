@@ -72,7 +72,8 @@ public final class DirParser extends Parser {
     } else {
       file = io;
       while(io.more()) {
-        if(filter != null && !filter.matcher(io.name()).matches()) continue;
+        final String nm = Prop.WIN ? io.name().toLowerCase() : io.name();
+        if(filter != null && !filter.matcher(nm).matches()) continue;
         b.meta.filesize += file.length();
 
         // use global target as prefix
@@ -95,11 +96,11 @@ public final class DirParser extends Parser {
 
   @Override
   public String det() {
-    return parser != null ? parser.det() : "";
+    return parser != null ? parser.detail() : "";
   }
 
   @Override
   public double prog() {
-    return parser != null ? parser.prog() : 0;
+    return parser != null ? parser.progress() : 0;
   }
 }

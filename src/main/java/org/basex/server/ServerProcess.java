@@ -47,7 +47,7 @@ public final class ServerProcess extends Thread {
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
-  private PrintOutput out;
+  public PrintOutput out;
   /** Current command. */
   private Command cmd;
   /** Query id counter. */
@@ -62,7 +62,7 @@ public final class ServerProcess extends Thread {
    * @param l log reference
    */
   public ServerProcess(final Socket s, final Context c, final Log l) {
-    context = new Context(c);
+    context = new Context(c, this);
     log = l;
     socket = s;
   }
@@ -114,8 +114,6 @@ public final class ServerProcess extends Thread {
     try {
       while(running) {
         try {
-          // [CG] Server: replace control codes with strings.
-          //final ServerCmd sc = ServerCommand.valueOf(in.readString());
           final byte b = in.readByte();
           final ServerCmd sc = ServerCmd.get(b);
           if(sc == CREATE) {
@@ -230,7 +228,7 @@ public final class ServerProcess extends Thread {
       final String name = in.readString();
       final String path = in.readString();
       final WrapInputStream is = new WrapInputStream(in);
-      final String info = Add.add(name, path, is, context);
+      final String info = Add.add(name, path, is, context, null);
       // send {MSG}0 and 0 as success flag
       out.writeString(info);
       out.write(0);

@@ -83,6 +83,7 @@ final class XQueryText extends BaseXText {
     view.pos.setText(pos());
 
     if(force || gui.gprop.is(GUIProp.EXECRT) && !module) {
+      view.waitInfo();
       query(qu, true);
     } else {
       try {

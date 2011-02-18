@@ -71,7 +71,6 @@ public class CmdTest {
     ok(new Add(FILE, "input"));
     ok(new Add(FILE, "input", "target"));
     ok(new Add(FLDR, "xml"));
-    no(new Add(FILE, ":"));
     no(new Add(FILE, "\\"));
     no(new Add(FILE, "/"));
   }
@@ -123,6 +122,7 @@ public class CmdTest {
     ok(new InfoDB());
     ok(new CreateDB(NAME, FILE));
     ok(new CreateDB("abcde"));
+    ok(new DropDB("abcde"));
     // invalid database names
     no(new CreateDB(""));
     no(new CreateDB(" "));
@@ -200,6 +200,7 @@ public class CmdTest {
     ok(new DropDB(USER));
     ok(new DropDB(NAME));
     ok(new DropDB(NAME));
+    no(new DropDB(":"));
     no(new DropDB(""));
   }
 

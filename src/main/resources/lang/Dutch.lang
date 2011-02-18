@@ -4,23 +4,20 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-wait=Een ogenblik
 version=Versie %
 
 # Menu Commands
-m_file=Bestand
+m_db=Database
 m_edit=Wijzig
 m_view=View
+m_query=Query
 m_options=Opties
 m_help=Help
-m_db=Database
-m_main=Hoofd Window
-m_views=Visualisaties
-m_inter=Interactie
-m_layout=Layout
 
 # Buttons
 b_ok=OK
+b_yes=Ja
+b_no=Neen
 b_opt=Optimaliseer
 b_rename=Hernoem
 b_backup=Backup
@@ -60,6 +57,7 @@ d_fctitle=Kies Folder
 dc_choose=Input bestand of folder
 dc_pattern=Bestands patronen (gescheiden door komma's)
 dc_name=Naam van Database
+dc_name2=Document Path
 dc_xmldesc=XML Documenten
 dc_zipdesc=ge-Zipte XML Documenten
 dc_gzdesc=ge-GZipte XML Documenten
@@ -122,11 +120,14 @@ dfs_meta=Include metadata
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Hernoem Database
+dr_title2=Delete documents
 dr_over=Oude database wordt overschreven
+dr_empty=An empty database will be created
 dr_overbacking=Oude database en 'backing store' worden overschreven
 
 dd_title=Manage Databases
-dd_question=Database '%' zal verwijderd worden.\nWeet je het zeker?
+dd_question=Database '%' zal verwijderd worden.
+dd_sure=Weet je het zeker?
 
 dx_question=Wil je echt verwijderen?
 dq_question=Bewaar wijzigingen in %?
@@ -207,8 +208,8 @@ ds_localport=Local Port
 ds_createu=Nieuwe gebruiker
 ds_globperm=Globale Permissies
 ds_locperm=Lokale Permissies
-ds_drquestion=% Gebruiker(s) worden verwijderd.\nWeet je het zeker?
-ds_dbrevoke=Permissie wordt ingetrokken voor de ingelogde gebruiker.\nWeet je het zeker?
+ds_drquestion=% Gebruiker(s) worden verwijderd.
+ds_dbrevoke=Permissie wordt ingetrokken voor de ingelogde gebruiker.
 ds_alterpw=Verander Wachtwoord
 ds_invalid=% is ongeldig
 ds_adlogin=Administrator Login (local of remote)
@@ -264,6 +265,10 @@ c_mountfs=Gebruik DB als FUSE
 c_mountfstt=Gebruik DeepFS database instantie als filesystem in gebruikerspace (alleen als je operating system het ondersteunt).
 c_props=Eigenschappen
 c_propstt=Toon informatie over de geopende database.
+c_add=Add documents
+c_addtt=Adds documents to the currently opened database.
+c_drop=Delete documents
+c_droptt=Delete documents from the currently opened database.
 c_insert=Nieuw
 c_inserttt=Maakt een nieuwe XML node.
 c_maplayout=Map Layout
@@ -379,10 +384,10 @@ db_notdropped=Geen database verwijderd.
 db_droperror=Database kon niet verwijderd worden.
 db_altered=Database '%' is hernoemd naar '%'.
 db_notaltered=Database '%' kon niet hernoemd worden.
-db_backup=Backup '%' gemaakt in %.
+db_backup=Backup voor '%' gemaakt in %.
 db_nobackup=Backup van database '%' kon niet gemaakt worden.
-db_restore=Database '%' teruggezet in %.
-db_norestore=Database '%' kon niet teruggezet worden.
+db_restore='%' teruggezet in %.
+db_norestore='%' kon niet teruggezet worden.
 db_notopened=Database '%' kon niet geopend worden.
 db_opened=Database '%' geopend in %.
 db_exported=Database '%' gexporteerd in %.
@@ -396,6 +401,7 @@ db_backnf=No backup found for '%'.
 in_created=Index '%' in % seconden gemaakt.
 in_dropped=Index '%' in % seconden verwijderd.
 in_notdropped=Index '%' kon niet verwijderd worden.
+in_notavl=Niet beschikbaar
 
 # Server Info
 srv_login=Toegang ontzegd.
@@ -457,10 +463,11 @@ ad_kill=% sessies gestopt.
 ad_killself='%' kan zichzelf niet stoppen.
 
 # General Commands
-gc_setkey=Kon '%' geen waarde geven.
+gc_setwhich=Unknown option '%'
 gc_setval=Kon '%' niet de waarde '%' geven.
 
 # Info Strings
+info_wait=Een ogenblik
 info_index=Indexen
 info_opt=Database optimaliseren
 info_stats=Statistieken creren
@@ -513,10 +520,11 @@ ch_create5=maakt de opgegeven index
 ch_create6=maakt filesystem database [%] voor [%]
 ch_create7=(gebruik makend van [%] en [%] als FUSE geactiveerd is)
 ch_create8=creert de opgegeven gebruiker
+ch_create9=creates the trigger
 ch_add1=Voeg document aan database toe.
 ch_add2=Voegt [%] als [%] toe aan de database, met een optional pad\n[%].
-ch_delete1=Verwijder document uit de database.
-ch_delete2=Verwijdert een document uit de actuele database.
+ch_delete1=Verwijder documenten uit de database.
+ch_delete2=Verwijdert documenten uit de actuele database.
 ch_open1=Open database.
 ch_open2=Opent de opgegeven database [%].
 ch_info1=Toon informatie over de actuele database.
@@ -535,6 +543,7 @@ ch_drop21=verwijdert de database
 ch_drop22=verwijdert de opgegeven index
 ch_drop23=verwijdert de opgegeven gebruiker
 ch_drop24=verwijdert de database backup
+ch_drop25=drops the trigger
 ch_alter1=Wijzig gebruiker password of database naam.
 ch_alter2=Wijzigt gebruiker password of database naam:
 ch_alterpw=wijzigt  de password of a gebruiker.
@@ -565,6 +574,7 @@ ch_show22=toont momenteel geopende databases.
 ch_show23=toont actuele database sessies.
 ch_show24=toont gebruikers (van een database).
 ch_show25=toont backups.
+ch_show26=toont triggers.
 ch_grant1=Geef gebruiker permissies.
 ch_grant2=Geeft permissies (op een database) aan een gebruiker.
 ch_helpgeneral0=Algemene Commando's:
@@ -585,6 +595,10 @@ ch_help1=Vraag hulp over % commando's.
 ch_help2=Als [%] is opgegeven, dan wordt informatie over het specifieke\ncommando geprint; anders worden alle commando's getoond.
 ch_exit1=Stop applicatie.
 ch_exit2=Stop %.
+ch_helpattach1=Attach a trigger.
+ch_helpattach2=Attaches a trigger.
+ch_helpdetach1=Detach a trigger.
+ch_helpdetach2=Detaches a trigger.
 
 # Help Texts
 h_hist=Toon input geschiedenis.
@@ -605,5 +619,5 @@ h_table=Deze visualisatie toont XML nodes in een tabel. Als je op een tekst klik
 h_text=Dit paneel toont query resultaten en andere tekstuele output.\n\nToetsen: Type '-' en '+' om de font grootte van alle penelen te wijzigen. Type tekst in de Vind popup om incrementeel te zoeken. Dat is een gemakkelijke manier om speciale teksten te vinden.
 h_info=Dit paneel toont informatie over de compilatie en uitvoering van een XQuery request, inclusief enige profiling informatie.
 h_explore=De Eenvoudige Zoek Mode facilteert eenvoudige queries in het XML document.
-h_xquery=In dit tekst veld kun je een XQuery 1.0 invoeren. De invoer wordt uitgevoerd na elke toetsaanslag.\n\nHet volgende voorbeeld toont alle boek titels met het onderwerp 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=In dit tekst veld kun je een XQuery invoeren. De invoer wordt uitgevoerd na elke toetsaanslag.\n\nHet volgende voorbeeld toont alle boek titels met het onderwerp 'BaseX':\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
 h_mover=Je kunt een view verplaatsen door het met de bovenste balk te verslepen.\n Als je een view buiten het hoofd window sleept wordt het gesloten.

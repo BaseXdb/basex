@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Prop.*;
+import static org.basex.util.Token.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,7 +10,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Iterator;
 import org.basex.io.IO;
+import org.basex.util.Levenshtein;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -316,6 +319,22 @@ public abstract class AProp {
    */
   public final boolean sameAs(final Object[] key, final Object val) {
     return props.get(key[0].toString()).equals(val);
+  }
+
+  /**
+   * Returns a key similar to the specified string, or {@code null}.
+   * @param key key to be found
+   * @return similar key
+   */
+  public final String similar(final String key) {
+    final byte[] name = token(key);
+    final Levenshtein ls = new Levenshtein();
+    final Iterator<String> it = props.keySet().iterator();
+    while(it.hasNext()) {
+      final String prop = it.next();
+      if(ls.similar(name, token(prop), 0)) return prop;
+    }
+    return null;
   }
 
   /**

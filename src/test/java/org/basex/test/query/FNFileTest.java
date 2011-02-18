@@ -1,19 +1,14 @@
 package org.basex.test.query;
 
-import java.io.BufferedOutputStream;
+import static org.junit.Assert.*;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import org.basex.core.BaseXException;
 import org.basex.core.Prop;
-import org.basex.query.QueryException;
-import org.basex.query.item.B64;
-import org.basex.query.item.Dtm;
-import org.basex.query.item.Item;
-import org.basex.query.item.Uri;
-import org.basex.query.iter.ItemIter;
-import org.basex.util.Token;
-import org.junit.AfterClass;
+import org.basex.query.func.FunDef;
+import org.basex.query.util.Err;
+import org.basex.util.Util;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * This class tests the functions of the file library.
@@ -21,241 +16,328 @@ import org.junit.BeforeClass;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
-public final class FNFileTest extends QueryTest {
-  /** Test directory. */
-  private static final String TESTDIR1 = "testDir1";
-  /** Test directory. */
-  private static final String TESTDIR2 = "testDir2";
-  /** Test file for file:copy. */
-  private static final String TESTCOPY = "testCopy";
-  /** Test file for file:delete. */
-  private static final String TESTDELDIR1 = "testDelDir1";
-  /** Test file for file:delete with $recursive = true. */
-  private static final String TESTDELDIR2 = "testDelDir2";
-  /** Test file for file:delete with $recursive = true. */
-  private static final String TESTDELFILE = "testDelFile";
-  /** Test file for file:move. */
-  private static final String TESTMOVE = "testMove";
-  /** Test file for file:write. */
-  private static final String TESTWRITE = "testWrite";
-  /** Test file for file:write-binary. */
-  private static final String TESTWRITEBIN = "testWriteBin";
-  /** Test directory 1 for file:mkdir. */
-  private static final String DIR1 = "test1";
-  /** Test directory 2 for file:mkdir with $recursive = true. */
-  private static final String DIR2 = "test2";
-  /** Test directory 3 for file:mkdir with $recursive = true. */
-  private static final String DIR3 = "test3";
+public final class FNFileTest extends AdvancedQueryTest {
+  /** Test name. */
+  private static final String NAME = Util.name(FNFileTest.class);
+  /** Test path. */
+  private static final String PATH1 = Prop.TMP + NAME;
+  /** Test path. */
+  private static final String PATH2 = Prop.TMP + NAME + "2";
+  /** Test path. */
+  private static final String PATH3 = Prop.TMP + NAME + "/x";
+  /** Test path. */
+  private static final String PATH4 = Prop.TMP + NAME + "/x/x";
 
-  /** /_tmpdir_/testDir1. */
-  protected static File dir1 = new File(Prop.TMP + Prop.SEP + TESTDIR1);
-  /** /_tmpdir_/testDir2. */
-  protected static File dir2 = new File(Prop.TMP + Prop.SEP + TESTDIR2);
-  /** /_tmpdir_/testDir1/fileCopy. */
-  protected static File fileCopy = new File(dir1.getPath() + Prop.SEP
-      + TESTCOPY);
-  /** /_tmpdir_/testDir1/fileCopy. */
-  protected static File fileCopyOver = new File(dir2.getPath() + Prop.SEP
-      + TESTCOPY);
-  /** /_tmpdir_/testDir1/fileMove. */
-  protected static File fileMove = new File(dir1.getPath() + Prop.SEP
-      + TESTMOVE);
-  /** /_tmpdir_/testDir1/testDelDir1/testDelDir2. */
-  protected static File dirDel = new File(dir1.getPath() + Prop.SEP
-      + TESTDELDIR1 + Prop.SEP + TESTDELDIR2);
-  /** /_tmpdir_/testDir1/testDelFile. */
-  protected static File fileDel = new File(dir1.getPath() + Prop.SEP
-      + TESTDELFILE);
-
-  static {
-
-    doc = "<?xml version='1.0' encoding='UTF-8'?>\n" +
-          "<ACDC>\n" +
-            "<Name>\n" +
-              "<Vorname>Brian</Vorname>\n" +
-              "<Nachname>Johnson</Nachname>\n" +
-            "</Name>\n" +
-            "<Name>\n" +
-              "<Vorname>Angus</Vorname>\n" +
-              "<Nachname>Young</Nachname>\n" +
-            "</Name>\n" +
-          "</ACDC>";
-
-    ItemIter ii = new ItemIter();
-    try {
-      ii = new ItemIter(new Item[] { new Dtm(
-        new File("etc").lastModified(), null)}, 1);
-    } catch(final QueryException e) {
-        ii = null;
-    }
-
-    queries = new Object[][] {
-
-        // /_tmpdir_/testDir1/test1
-        { "Test file:mkdir()", empty(),
-            "file:mkdir(\"" + dir1.getPath() + Prop.SEP + DIR1 + "\")" },
-
-        // /_tmpdir_/testDir1/test2/test3
-        { "Test file:mkdir() with $recursive = fn:true()", empty(),
-            "file:mkdir(\"" + dir1.getPath() + Prop.SEP + DIR2 + Prop.SEP
-                + DIR3 + "\", fn:true())"},
-
-        // /_tmpdir_/testDir1
-        { "Test file:is-directory()", bool(true),
-            "file:is-directory(\"" + dir1.getPath() + "\")" },
-
-        // /_tmpdir_/testDir1/fileCopy
-        { "Test file:is-file()", bool(true),
-            "file:is-file(\"" + fileCopy.getPath() + "\")" },
-
-         // /_tmpdir_/testDir1/fileCopy
-        { "Test file:is-readable()", bool(true),
-            "file:is-readable(\"" + fileCopy.getPath() + "\")" },
-
-         // /_tmpdir_/testDir1/fileCopy
-        { "Test file:is-writeable()", bool(true),
-            "file:is-writeable(\"" + fileCopy.getPath() + "\")" },
-
-        { "Test file:path-separator()", str(Prop.SEP), "file:path-separator()"},
-
-         // /_tmpdir_/testDir1/fileCopy
-        { "Test file:read()", str("\"" + doc + "\""),
-            "file:read(\"" + fileCopy.getPath() + "\")" },
-
-        // /_tmpdir_/testDir1/fileCopy
-        { "Test file:read-binary()",
-            new ItemIter(new Item[] { new B64(Token.token(doc))}, 1),
-            "file:read-binary(\"" + fileCopy.getPath() + "\")" },
-
-         // /_tmpdir_/testDir1/fileWrite
-        { "Test file:write()", empty(),
-            "file:write(\"" + dir1.getPath() + Prop.SEP + TESTWRITE + "\"," +
-            "//Name/Vorname, "  + "(<indent>yes</indent>))" },
-
-         // /_tmpdir_/testDir1/fileCopy
-        { "Test file:write() with $append = true", empty(),
-            "file:write(\"" + fileCopy.getPath()
-            + "\", //Name/Vorname, (<indent>yes</indent>), fn:true())" },
-
-        // /_tmpdir_/testDir1/fileWriteBin
-        { "Test file:write-binary()", empty(),
-            "file:write-binary(\"" + dir1.getPath() + Prop.SEP + TESTWRITEBIN +
-            "\", \"aGF0\" cast as xs:base64Binary)" },
-
-        // src:  /_tmpdir_/testDir1/fileCopy
-        // dest: /_tmpdir_/testDir2/fileCopy
-        { "Test file:copy() with $overwrite = true", empty(),
-            "file:copy(\"" + fileCopy.getPath() + "\", \"" +
-            dir2.getPath() + Prop.SEP + TESTCOPY + "\", fn:true())" },
-
-        // src:  /_tmpdir_/testDir1
-        // dest: /_tmpdir_/testDir2
-        { "Test file:move()", empty(),
-            "file:move(\"" + fileMove.getPath() + "\", \"" +
-            dir2.getPath() + "\")" },
-
-        // /_tmpdir_/testDir1/fileDel
-        { "Test file:delete()", empty(),
-            "file:delete(\"" + fileDel.getPath() + "\")" },
-
-        // /_tmpdir_/testDir1/testDelDir1/testDelDir2
-        { "Test file:delete() with $recursive = true", empty(),
-                "file:delete(\"" + dirDel.getParentFile().getPath()
-                + "\", fn:true())" },
-
-        // /_tmpdir_/testDir1/fileCopy
-        { "Test file:path-to-full-path()", str(fileCopy.getPath()),
-            "file:path-to-full-path(\"" + fileCopy.getPath() + "\")"},
-
-         // file:/_tmpdir_/testDir1/fileCopy
-        { "Test file:path-to-uri()", new ItemIter(new Item[]
-             { Uri.uri(Token.token(fileCopy.toURI().toString()))}, 1),
-             "file:path-to-uri(\"" + fileCopy.getPath() + "\")"},
-
-        // /_tmpdir_/testDir1/fileCopy
-        { "Test file:exists()", bool(true),
-            "file:file-exists(\"" + fileCopy.getPath() + "\")"},
-
-        { "Test file:files()", empty(), "file:files(\"etc\", "
-              + "fn:true(),\"[^z]\")"},
-
-        // /_tmpdir_/testDir1/fileCopy
-        { "Test file:last-modified()", ii, "file:last-modified(\"etc\")"},
-
-    };
-
+  /** Constructor. */
+  public FNFileTest() {
+    super("file");
   }
 
-  /** Prepares tests. */
+  /** Initializes the test. */
   @BeforeClass
-  public static void prepareTest() {
-    // /_tmpdir_/testDir1
-    dir1.mkdir();
-    // /_tmpdir_/testDir2
-    dir2.mkdir();
-    // /_tmpdir_/testDir1/testDelDir1/testDelDir2
-    dirDel.mkdirs();
-
-    try {
-      final BufferedOutputStream outCopy = new BufferedOutputStream(
-          new FileOutputStream(fileCopy));
-      try {
-        outCopy.write(Token.token(doc));
-      } finally {
-        outCopy.close();
-      }
-      final BufferedOutputStream outCopyOver = new BufferedOutputStream(
-          new FileOutputStream(fileCopyOver));
-      try {
-        outCopyOver.write(Token.token(doc));
-      } finally {
-        outCopyOver.close();
-      }
-      final BufferedOutputStream outMove = new BufferedOutputStream(
-          new FileOutputStream(fileMove));
-      try {
-        outMove.write(Token.token(doc));
-      } finally {
-        outMove.close();
-      }
-      final BufferedOutputStream outDel = new BufferedOutputStream(
-          new FileOutputStream(fileDel));
-      try {
-        outDel.write(Token.token(doc));
-      } finally {
-        outDel.close();
-      }
-    } catch(final IOException ex) {
-      ex.printStackTrace();
-    }
+  public static void init() {
+    new File(PATH4).delete();
+    new File(PATH3).delete();
+    new File(PATH2).delete();
+    new File(PATH1).delete();
   }
 
-   /** Finishes the test. */
-   @AfterClass
-  public static void endTest() {
+  /**
+   * Test method for the file:exists() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testExists() throws BaseXException {
+    final String fun = check(FunDef.FEXISTS, String.class);
+    query("file:write('" + PATH1 + "', ())");
+    query(fun + "('" + PATH1 + "')", "true");
+    query("file:delete('" + PATH1 + "')");
+    query(fun + "('" + PATH1 + "')", "false");
+  }
 
-    // /_tmpdir_/testDir1/testCopy
-    fileCopy.delete();
-    // /_tmpdir_/testDir1/testMove
-    fileMove.delete();
-    // /_tmpdir_/testDir1/testWrite
-    new File(dir1.getPath() + Prop.SEP + TESTWRITE).delete();
-    // /_tmpdir_/testDir1/testWriteBin
-    new File(dir1.getPath() + Prop.SEP + TESTWRITEBIN).delete();
-    // /_tmpdir_/testDir1/test1
-    new File(dir1.getPath() + Prop.SEP + DIR1).delete();
-    // /_tmpdir_/testDir1/test2/test3
-    new File(dir1.getPath() + Prop.SEP + DIR2 + Prop.SEP + DIR3).delete();
-    // /_tmpdir_/testDir1/test2
-    new File(dir1.getPath() + Prop.SEP + DIR2).delete();
-    // /_tmpdir_/testDir1
-    dir1.delete();
-    // /_tmpdir_/testDir2/testCopy
-    new File(dir2.getPath() + Prop.SEP + TESTCOPY).delete();
-    // /_tmpdir_/testDir2/testMove
-    new File(dir2.getPath() + Prop.SEP + TESTMOVE).delete();
-    // /_tmpdir_/testDir2
-    dir2.delete();
+  /**
+   * Test method for the file:is-directory() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testIsDirectory() throws BaseXException {
+    final String fun = check(FunDef.ISDIR, String.class);
+    query(fun + "('" + Prop.TMP + "')", "true");
+    query(fun + "('" + Prop.TMP + "')", "true");
+    query("file:write('" + PATH1 + "', ())");
+    query(fun + "('" + PATH1 + "')", "false");
+    query("file:delete('" + PATH1 + "')");
+    query("file:create-directory('" + PATH1 + "')");
+    query(fun + "('" + PATH1 + "')", "true");
+    query("file:delete('" + PATH1 + "')");
+  }
 
+  /**
+   * Test method for the file:is-file() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testIsFile() throws BaseXException {
+    final String fun = check(FunDef.ISFILE, String.class);
+    query(fun + "('" + Prop.TMP + "')", "false");
+    query("file:write('" + PATH1 + "', ())");
+    query(fun + "('" + PATH1 + "')", "true");
+    query("file:delete('" + PATH1 + "')");
+    query("file:create-directory('" + PATH1 + "')");
+    query(fun + "('" + PATH1 + "')", "false");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:is-readable() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testIsReadable() throws BaseXException {
+    final String fun = check(FunDef.ISREAD, String.class);
+    query("file:write('" + PATH1 + "', ())");
+    query(fun + "('" + PATH1 + "')", "true");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:is-writable() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testIsWritable() throws BaseXException {
+    final String fun = check(FunDef.ISWRITE, String.class);
+    query("file:write('" + PATH1 + "', ())");
+    query(fun + "('" + PATH1 + "')", "true");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:last-modified() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testLastModified() throws BaseXException {
+    final String fun = check(FunDef.LASTMOD, String.class);
+    assertTrue(query(fun + "('" + Prop.TMP + "')").length() != 0);
+  }
+
+  /**
+   * Test method for the file:size() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testSize() throws BaseXException {
+    final String fun = check(FunDef.SIZE, String.class);
+    query("file:write('" + PATH1 + "', 'abcd')");
+    query(fun + "('" + PATH1 + "')", "4");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:list() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testList() throws BaseXException {
+    final String fun =
+      check(FunDef.FLIST, String.class, Boolean.class, String.class);
+    error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
+    query("file:write('" + PATH1 + "', ())");
+    error(fun + "('" + PATH1 + "')", Err.NOTDIR);
+    contains(fun + "('" + Prop.TMP + "')", NAME);
+    contains(fun + "('" + Prop.TMP + "',false())", NAME);
+    contains(fun + "('" + Prop.TMP + "',false()," + "'FN')", NAME);
+    contains(fun + "('" + Prop.TMP + "',false(),'" + NAME + "')", NAME);
+    query(fun + "('" + Prop.TMP + "', false()," + "'XXX')", "");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:create-directory() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testCreateDirectory() throws BaseXException {
+    final String fun = check(FunDef.CREATEDIR, String.class);
+    query(fun + "('" + PATH1 + "')");
+    query(fun + "('" + PATH1 + "')");
+    query(fun + "('" + PATH3 + "')");
+    query("file:delete('" + PATH1 + "', true())");
+    query("file:write('" + PATH1 + "', ())");
+    error(fun + "('" + PATH1 + "')", Err.FILEEXISTS);
+    error(fun + "('" + PATH3 + "')", Err.FILEEXISTS);
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:delete() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testDelete() throws BaseXException {
+    final String fun = check(FunDef.DELETE, String.class, Boolean.class);
+    query("file:create-directory('" + PATH3 + "')");
+    error(fun + "('" + PATH1 + "')", Err.DIRNOTEMPTY);
+    query(fun + "('" + PATH3 + "')");
+    query("file:create-directory('" + PATH3 + "')");
+    query("file:write('" + PATH4 + "', ())");
+    query(fun + "('" + PATH1 + "', true())");
+  }
+
+  /**
+   * Test method for the file:read() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testRead() throws BaseXException {
+    final String fun = check(FunDef.READ, String.class, String.class);
+    error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
+    error(fun + "('" + Prop.TMP + "')", Err.PATHISDIR);
+    query("file:write('" + PATH1 + "', 'a\u00e4')");
+    query(fun + "('" + PATH1 + "')", "a\u00e4");
+    error(fun + "('" + PATH1 + "', 'UNKNOWN')", Err.ENCNOTEXISTS);
+    assertTrue(query(fun + "('" + PATH1 + "', 'CP1252')").length() == 3);
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:read-binary() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testReadBinary() throws BaseXException {
+    final String fun = check(FunDef.READBIN, String.class);
+    error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
+    error(fun + "('" + Prop.TMP + "')", Err.PATHISDIR);
+    query("file:write('" + PATH1 + "', '0')");
+    query(fun + "('" + PATH1 + "')", "MA==");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:write() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testWrite() throws BaseXException {
+    final String fun = check(FunDef.WRITE, String.class,
+        (Class<?>) null, String.class, Boolean.class);
+
+    error(fun + "('" + Prop.TMP + "', ())", Err.PATHISDIR);
+
+    query(fun + "('" + PATH1 + "', '0')");
+    query("file:size('" + PATH1 + "')", "1");
+    query(fun + "('" + PATH1 + "', '0')");
+    query("file:size('" + PATH1 + "')", "1");
+    query(fun + "('" + PATH1 + "', '0', (), true())");
+    query("file:size('" + PATH1 + "')", "2");
+    query("file:delete('" + PATH1 + "')");
+    query(fun + "('" + PATH1 + "', '0', (), true())");
+    query("file:size('" + PATH1 + "')", "1");
+    query("file:delete('" + PATH1 + "')");
+
+    query(fun + "('" + PATH1 + "', 'a\u00e4'," +
+      "<encoding>CP1252</encoding>)");
+    query("file:read('" + PATH1 + "', 'CP1252')", "a\u00e4");
+
+    query(fun + "('" + PATH1 + "', '<a/>'," + "<method>text</method>)");
+    query("file:read('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:write-binary() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testWriteBinary() throws BaseXException {
+    final String fun =
+      check(FunDef.WRITEBIN, String.class, (Class<?>) null, Boolean.class);
+
+    final String a = "xs:base64Binary('MA==')";
+    error(fun + "('" + Prop.TMP + "', " + a + ")", Err.PATHISDIR);
+    query(fun + "('" + PATH1 + "', " + a + ")");
+    query("file:size('" + PATH1 + "')", "1");
+    query(fun + "('" + PATH1 + "', " + a + ")");
+    query("file:size('" + PATH1 + "')", "1");
+    query(fun + "('" + PATH1 + "', " + a + ", true())");
+    query("file:read('" + PATH1 + "')", "00");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:copy() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testCopy() throws BaseXException {
+    final String fun = check(FunDef.COPY, String.class, String.class);
+
+    query("file:write('" + PATH1 + "', 'a')");
+    query(fun + "('" + PATH1 + "', '" + PATH2 + "')");
+    query(fun + "('" + PATH1 + "', '" + PATH2 + "')");
+    query(fun + "('" + PATH2 + "', '" + PATH2 + "')");
+    query("file:size('" + PATH1 + "')", "1");
+    query("file:size('" + PATH2 + "')", "1");
+    error(fun + "('" + PATH1 + "', '" + PATH3 + "')", Err.PATHINVALID);
+
+    query("file:delete('" + PATH1 + "')");
+    query("file:delete('" + PATH2 + "')");
+  }
+
+  /**
+   * Test method for the file:move() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testMove() throws BaseXException {
+    final String fun = check(FunDef.MOVE, String.class, String.class);
+
+    error(fun + "('" + PATH1 + "', '" + PATH2 + "')", Err.PATHNOTEXISTS);
+    query("file:write('" + PATH1 + "', 'a')");
+    query(fun + "('" + PATH1 + "', '" + PATH2 + "')");
+    query(fun + "('" + PATH2 + "', '" + PATH1 + "')");
+    query(fun + "('" + PATH1 + "', '" + PATH1 + "')");
+    error(fun + "('" + PATH1 + "', '" + PATH4 + "')", Err.PATHINVALID);
+    query("file:size('" + PATH1 + "')", "1");
+    query("file:exists('" + PATH2 + "')", "false");
+
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:path-separator() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testPathSeparator() throws BaseXException {
+    final String fun = check(FunDef.PATHSEP);
+    final String sep = query(fun + "()");
+    assertTrue(sep.equals("/") || sep.equals("\\"));
+  }
+
+  /**
+   * Test method for the file:path-to-full-path() functions.
+   * @throws Exception exception
+   */
+  @Test
+  public void testPathToFullPath() throws Exception {
+    final String fun = check(FunDef.PATHTOFULL, String.class);
+    final String path = query(fun + "('" + PATH1 + "')");
+    final String can = new File(PATH1).getAbsolutePath();
+    assertEquals(path.toLowerCase(), can.toLowerCase());
+  }
+
+  /**
+   * Test method for the file:path-to-full-path() functions.
+   * @throws Exception exception
+   */
+  @Test
+  public void testPathToURI() throws Exception {
+    final String fun = check(FunDef.PATHTOURI, String.class);
+    final String path = query(fun + "('" + PATH1 + "')");
+    final String uri = new File(PATH1).toURI().toString();
+    assertEquals(path.toLowerCase(), uri.toLowerCase());
   }
 }

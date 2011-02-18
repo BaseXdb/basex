@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -40,7 +39,7 @@ public final class Group extends ParseExpr {
    * @param ob order by spec
    * @throws QueryException exception
    */
-  void initgroup(final ForLet[] fl, final Order ob) throws QueryException {
+  void init(final ForLet[] fl, final Order ob) throws QueryException {
     final Var[] fs = new Var[fl.length];
     for(int i = 0; i < fl.length; ++i) fs[i] = fl[i].var;
     gp = new GroupPartition(groupby, fs, ob, input);
@@ -55,13 +54,8 @@ public final class Group extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    return new Iter() { // group is blocking => no iterator
-      @Override
-      public Item next() {
-        Util.notexpected(this);
-        return null;
-      }
-    };
+    Util.notexpected(this);
+    return null;
   }
 
   @Override
@@ -72,14 +66,20 @@ public final class Group extends ParseExpr {
 
   @Override
   public boolean uses(final Var v) {
-    for(final Var g : groupby) if(v.eq(g)) return true;
+    for(final Var g : groupby) if(g.uses(v)) return true;
     return false;
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final Var g : groupby) if(g.eq(v)) return false;
+    // don't allow removal if variable is used
+    for(final Var g : groupby) if(g.uses(v)) return false;
     return true;
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    return this;
   }
 
   @Override

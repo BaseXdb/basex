@@ -13,13 +13,17 @@ import org.basex.core.cmd.Set;
 @SuppressWarnings("all")
 public interface Commands {
   /** Create commands. */
-  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER }
+  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER, TRIGGER }
   /** Info commands. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
   /** Drop commands. */
-  enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP }
+  enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP, TRIGGER }
+  /** Attach commands. */
+  enum CmdAttach { TRIGGER }
+  /** Detach commands. */
+  enum CmdDetach { TRIGGER }
   /** Show commands. */
-  enum CmdShow { DATABASES, SESSIONS, USERS, BACKUPS}
+  enum CmdShow { DATABASES, SESSIONS, USERS, BACKUPS, TRIGGERS }
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Set commands. Should be synchronized with {@link Set#STRINGS}. */
@@ -38,10 +42,10 @@ public interface Commands {
   /** Command definitions. */
   enum Cmd {
     // Database commands
-    HD(HID, HELPDB), CREATE(HELPCREATE), OPEN(HELPOPEN),
-    CHECK(HID), ADD(HELPADD), DELETE(HELPDELETE), INFO(HELPINFO),
-    CLOSE(HELPCLOSE), LIST(HELPLIST), DROP(HELPDROP), EXPORT(HELPEXPORT),
-    OPTIMIZE(HELPOPTIMIZE),
+    HD(HID, HELPDB), CREATE(HELPCREATE), OPEN(HELPOPEN), ATTACH(HELPATTACH),
+    DETACH(HELPDETACH), CHECK(HID), ADD(HELPADD), DELETE(HELPDELETE),
+    INFO(HELPINFO), CLOSE(HELPCLOSE), LIST(HELPLIST), DROP(HELPDROP),
+    EXPORT(HELPEXPORT), OPTIMIZE(HELPOPTIMIZE),
     // Query commands
     HQ(HID, HELPQ), XQUERY(HELPXQUERY), FIND(HELPFIND),
     RUN(HELPRUN), CS(HELPCS),

@@ -2,7 +2,9 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -11,14 +13,14 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Performance;
 
 /**
  * Project specific functions.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -36,9 +38,12 @@ final class FNUtil extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case EVAL: return eval(ctx);
-      case RUN:  return run(ctx);
-      default:   return super.iter(ctx);
+      case EVAL:
+        return eval(ctx);
+      case RUN:
+        return run(ctx);
+      default:
+        return super.iter(ctx);
     }
   }
 
@@ -46,9 +51,12 @@ final class FNUtil extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case MB: return mb(ctx);
-      case MS: return ms(ctx);
-      default: return super.item(ctx, ii);
+      case MB:
+        return mb(ctx);
+      case MS:
+        return ms(ctx);
+      default:
+        return super.item(ctx, ii);
     }
   }
 
@@ -87,7 +95,7 @@ final class FNUtil extends Fun {
    */
   private Iter eval(final QueryContext ctx, final byte[] qu)
       throws QueryException {
-    final QueryContext qt = new QueryContext(ctx.resource.context);
+    final QueryContext qt = new QueryContext(ctx.context);
     qt.parse(string(qu));
     qt.compile();
     return ItemIter.get(qt.iter());
@@ -101,8 +109,8 @@ final class FNUtil extends Fun {
    */
   private Dbl mb(final QueryContext ctx) throws QueryException {
     // check caching flag
-    final boolean c = expr.length == 2 &&
-      checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
+    final boolean c = expr.length == 2
+        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
 
     // measure initial memory consumption
     Performance.gc(3);
@@ -113,12 +121,13 @@ final class FNUtil extends Fun {
     final Value v = (c ? ItemIter.get(ir) : ir).finish();
 
     // measure resulting memory consumption
-    Performance.gc(3);
+    Performance.gc(2);
     final double d = Performance.mem() - l;
 
     // loop through all results to avoid premature result disposal
     ir = v.iter();
-    while(ir.next() != null);
+    while(ir.next() != null)
+      ;
 
     // return memory consumption in megabytes
     return Dbl.get(Math.max(0, d) / 1024 / 1024d);
@@ -132,8 +141,8 @@ final class FNUtil extends Fun {
    */
   private Dbl ms(final QueryContext ctx) throws QueryException {
     // check caching flag
-    final boolean c = expr.length == 2 &&
-      checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
+    final boolean c = expr.length == 2
+        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
 
     // create timer
     final Performance p = new Performance();
@@ -143,7 +152,8 @@ final class FNUtil extends Fun {
     if(c) {
       ItemIter.get(ir);
     } else {
-      while(ir.next() != null);
+      while(ir.next() != null)
+        ;
     }
 
     // return measured time in milliseconds

@@ -35,7 +35,7 @@ public final class MemData extends Data {
     tags = tag;
     atts = att;
     ns = n;
-    path = s;
+    pthindex = s;
   }
 
   /**
@@ -43,7 +43,7 @@ public final class MemData extends Data {
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tags, data.atts, new Namespaces(), data.path, data.meta.prop);
+    this(data.tags, data.atts, new Namespaces(), data.pthindex, data.meta.prop);
   }
 
   /**

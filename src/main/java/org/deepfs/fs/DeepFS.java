@@ -627,7 +627,7 @@ public final class DeepFS implements DataText {
   /**
    * Reads directory entries.
    * @param path directory to be listed
-   * @return directory entries, null on failure
+   * @return directory entries, {@code null} on failure
    */
   public byte[][] readdir(final String path) {
     final int[] cld = path2preChildren(path);

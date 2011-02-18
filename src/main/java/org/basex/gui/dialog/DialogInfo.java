@@ -19,10 +19,11 @@ import org.basex.data.MetaData;
 import org.basex.data.XMLSerializer;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.gui.GUI;
-import org.basex.gui.GUICommands;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
+import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXText;
@@ -107,12 +108,12 @@ public final class DialogInfo extends Dialog {
       export.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent e) {
-          final IO file = GUICommands.save(gui, true);
+          final IO file = save(gui, true);
           if(file != null) {
             PrintOutput out = null;
             try {
               out = new PrintOutput(file.path());
-              data.path.plan(data, new XMLSerializer(out));
+              data.pthindex.plan(data, new XMLSerializer(out));
             } catch(final IOException ex) {
               Dialog.error(gui, NOTSAVED);
             } finally {
@@ -166,6 +167,25 @@ public final class DialogInfo extends Dialog {
     setResizable(true);
     setMinimumSize(getPreferredSize());
     finish(null);
+  }
+
+  /**
+   * Displays a file save dialog and returns the file name or {@code null}
+   * if dialog was canceled.
+   * @param gui gui reference
+   * @param single file vs directory dialog
+   * @return io reference
+   */
+  static IO save(final GUI gui, final boolean single) {
+    // open file chooser for XML creation
+    final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
+        gui.gprop.get(GUIProp.SAVEPATH), gui);
+    fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
+
+    final IO file = fc.select(single ? BaseXFileChooser.Mode.FSAVE :
+      BaseXFileChooser.Mode.DSAVE);
+    if(file != null) gui.gprop.set(GUIProp.SAVEPATH, file.path());
+    return file;
   }
 
   /**

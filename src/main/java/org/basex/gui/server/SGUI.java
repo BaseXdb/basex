@@ -14,6 +14,7 @@ import javax.swing.JTree;
 import javax.swing.WindowConstants;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
+import org.basex.core.Text;
 import org.basex.gui.AGUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
@@ -76,9 +77,9 @@ public final class SGUI extends AGUI {
     dialog.setSize(new Dimension(400, 250));
     dialog.setLocationRelativeTo(this);
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-    BaseXBack connection = new BaseXBack();
+    final BaseXBack connection = new BaseXBack();
     connection.setLayout(new TableLayout(7, 2));
-    final BaseXTextField sname = new BaseXTextField("localhost", this);
+    final BaseXTextField sname = new BaseXTextField(Text.LOCALHOST, this);
     final BaseXTextField sport = new BaseXTextField("1984", this);
     final BaseXTextField suser = new BaseXTextField("admin", this);
     final BaseXPassword spw = new BaseXPassword(this);
@@ -92,7 +93,7 @@ public final class SGUI extends AGUI {
     connection.add(suser);
     connection.add(new BaseXLabel("Password: "));
     connection.add(spw);
-    BaseXButton connect = new BaseXButton("Connect", this);
+    final BaseXButton connect = new BaseXButton("Connect", this);
     connection.add(new BaseXLabel("       "));
     connection.add(connect);
     connection.add(new BaseXLabel("       "));
@@ -108,16 +109,16 @@ public final class SGUI extends AGUI {
               new String(spw.getPassword()));
           title = "Server - " + suser.getText() + "@" + sname.getText() + ":"
               + sport.getText();
-        } catch(IOException e1) {
+        } catch(final IOException e1) {
           message.setText("Connection failed.");
-        } catch(NumberFormatException ne) {
+        } catch(final NumberFormatException ne) {
           message.setText("Port has to be a number.");
         }
         if(client != null) {
           dialog.dispose();
           try {
             addComponents();
-          } catch(BaseXException ex) {
+          } catch(final BaseXException ex) {
             ex.printStackTrace();
           }
         }
@@ -132,7 +133,7 @@ public final class SGUI extends AGUI {
    * @throws BaseXException database exception
    */
   void addComponents() throws BaseXException {
-    JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     splitPane.setLeftComponent(initTree());
     splitPane.setRightComponent(right);
     add(splitPane);
@@ -151,12 +152,12 @@ public final class SGUI extends AGUI {
       public void mouseClicked(final MouseEvent evt) {
         if(evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
           // retrieve selected node
-          TreeNode node = (TreeNode) jt.getLastSelectedPathComponent();
+          final TreeNode node = (TreeNode) jt.getLastSelectedPathComponent();
           if(node.getType() == 1) {
-            String t = node.getParent().toString() + " - " + node.toString();
+            final String t = node.getParent() + " - " + node;
             try {
               addTab(t, node.getIcon());
-            } catch(BaseXException e) {
+            } catch(final BaseXException e) {
               e.printStackTrace();
             }
           }
@@ -173,14 +174,14 @@ public final class SGUI extends AGUI {
    * @throws BaseXException database exception
    */
   public void addTab(final String t, final Icon ico) throws BaseXException {
-    BaseXBack b = new BaseXBack(Fill.NONE);
+    final BaseXBack b = new BaseXBack(Fill.NONE);
     b.setLayout(new TableLayout(1, 4));
-    BaseXLabel tit = new BaseXLabel(t);
+    final BaseXLabel tit = new BaseXLabel(t);
     tit.setIcon(ico);
     b.add(tit);
-    BaseXLabel w = new BaseXLabel("  ");
+    final BaseXLabel w = new BaseXLabel("  ");
     b.add(w);
-    BaseXLabel close = new BaseXLabel();
+    final BaseXLabel close = new BaseXLabel();
     close.setIcon(BaseXLayout.icon("cmd-close"));
     close.addMouseListener(new MouseAdapter() {
       @Override

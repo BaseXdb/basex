@@ -21,7 +21,7 @@ import org.basex.util.InputInfo;
  */
 public abstract class FTExpr extends ParseExpr {
   /** Expression list. */
-  protected final FTExpr[] expr;
+  public final FTExpr[] expr;
 
   /**
    * Constructor.
@@ -36,7 +36,6 @@ public abstract class FTExpr extends ParseExpr {
 
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
-    ctx.ftfast = false;
     for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
     return this;
   }

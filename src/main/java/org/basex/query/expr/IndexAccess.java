@@ -71,12 +71,22 @@ public final class IndexAccess extends Single {
    */
   private NodeIter index(final byte[] term) {
     final Data data = ictx.data;
-    final boolean mem = data instanceof MemData;
-    final boolean text = ind == IndexType.TEXT;
-    final byte kind = text ? Data.TEXT : Data.ATTR;
+    return term.length <= MAXLEN &&
+      (ind == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex) ?
+      index(data, term) : scan(data, term);
+  }
 
-    return term.length <= MAXLEN ? new NodeIter() {
-      final IndexIterator ii = data.ids(new ValuesToken(ind, term));
+  /**
+   * Returns index-based results.
+   * @param data data reference
+   * @param val value to be found
+   * @return node iterator
+   */
+  private NodeIter index(final Data data, final byte[] val) {
+    final byte kind = ind == IndexType.TEXT ? Data.TEXT : Data.ATTR;
+    final boolean mem = data instanceof MemData;
+    return new NodeIter() {
+      final IndexIterator ii = data.ids(new ValuesToken(ind, val));
 
       @Override
       public Nod next() {
@@ -87,14 +97,26 @@ public final class IndexAccess extends Single {
         }
         return null;
       }
-    } : new NodeIter() {
+    };
+  }
+
+  /**
+   * Returns scan-based results.
+   * @param data data reference
+   * @param val value to be found
+   * @return node iterator
+   */
+  private NodeIter scan(final Data data, final byte[] val) {
+    final boolean text = ind == IndexType.TEXT;
+    final byte kind = text ? Data.TEXT : Data.ATTR;
+    return new NodeIter() {
       // fallback solution: parse complete data if string is too long
       int pre = -1;
 
       @Override
       public Nod next() {
         while(++pre != data.meta.size) {
-          if(data.kind(pre) == kind && eq(data.text(pre, text), term))
+          if(data.kind(pre) == kind && eq(data.text(pre, text), val))
             return new DBNode(data, pre, kind);
         }
         return null;

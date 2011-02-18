@@ -5,12 +5,10 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-import org.basex.gui.layout.BaseXLabel;
 import org.basex.util.Util;
 import static org.basex.gui.GUIConstants.*;
 
@@ -40,42 +38,33 @@ public final class GUIMenu extends JMenuBar {
 
     // create menu for each top level menu entries
     int c = 0;
-    for(int i = 0; i < MENUBAR.length; ++i)
-      for(int j = 0; j < MENUITEMS[i].length; ++j) ++c;
+    for(int b = 0; b < MENUBAR.length; ++b)
+      for(int i = 0; i < MENUITEMS[b].length; ++i) ++c;
     items = new JMenuItem[c];
 
     c = 0;
     // loop through all menu entries
-    for(int i = 0; i < MENUBAR.length; ++i) {
-      final JMenu menu = new JMenu(MENUBAR[i]);
-      menu.setMnemonic((int) MENUBAR[i].charAt(0));
+    final StringBuilder gmnem = new StringBuilder();
+    for(int b = 0; b < MENUBAR.length; ++b) {
+      final JMenu menu = new JMenu(MENUBAR[b]);
+      setMnemonic(menu, MENUBAR[b], gmnem);
 
       // create menu point for each sub menu entry
-      for(int j = 0; j < MENUITEMS[i].length; ++j) {
+      final StringBuilder mnem = new StringBuilder();
+      for(int i = 0; i < MENUITEMS[b].length; ++i) {
         // add a separator
-        final Object subEntry = MENUITEMS[i][j];
-        if(subEntry == null) continue;
-        if(subEntry.equals(SEPARATOR)) {
+        final GUICommand cmd = MENUITEMS[b][i];
+        if(cmd == GUICommand.EMPTY) {
           menu.addSeparator();
-        } else {
-          JComponent comp = null;
-
+        } else if(cmd != null) {
           // add a menu entry
-          if(subEntry instanceof String) {
-            final BaseXLabel label = new BaseXLabel((String) subEntry);
-            label.border(2, 5, 2, 0).setFont(getFont());
-            comp = label;
-          } else {
-            final GUICommand cmd = (GUICommand) subEntry;
-            final JMenuItem item = newItem(cmd, gui);
-            final String sc = cmd.key();
-            if(sc != null) {
-              item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, sm)));
-            }
-            comp = item;
-            items[c++] = item;
+          final JMenuItem item = newItem(cmd, gui, mnem);
+          final String sc = cmd.key();
+          if(sc != null) {
+            item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, sm)));
           }
-          menu.add(comp);
+          items[c++] = item;
+          menu.add(item);
         }
       }
       add(menu);
@@ -86,20 +75,45 @@ public final class GUIMenu extends JMenuBar {
    * Creates a new menu item.
    * @param cmd command
    * @param gui gui reference
+   * @param mnem assigned mnenomics
    * @return menu item
    */
-  public static JMenuItem newItem(final GUICommand cmd, final GUI gui) {
+  public static JMenuItem newItem(final GUICommand cmd, final GUI gui,
+      final StringBuilder mnem) {
+
+    final String desc = cmd.label();
     final JMenuItem item = cmd.checked() ?
-        new JCheckBoxMenuItem(cmd.desc()) : new JMenuItem(cmd.desc());
+        new JCheckBoxMenuItem(desc) : new JMenuItem(desc);
+
     item.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         cmd.execute(gui);
       }
     });
-    item.setMnemonic(cmd.desc().charAt(0));
+
+    setMnemonic(item, desc, mnem);
     item.setToolTipText(cmd.help());
     return item;
+  }
+
+  /**
+   * Sets a mnemomic.
+   * @param item menu item
+   * @param label menu label
+   * @param mnem assigned mnemonics
+   */
+  private static void setMnemonic(final JMenuItem item, final String label,
+      final StringBuilder mnem) {
+    // find and assign unused mnemomic
+    for(int d = 0; d < label.length(); d++) {
+      final char ch = Character.toLowerCase(label.charAt(d));
+      if(mnem.indexOf(Character.toString(ch)) == -1) {
+        item.setMnemonic(ch);
+        mnem.append(ch);
+        break;
+      }
+    }
   }
 
   /**
@@ -107,11 +121,12 @@ public final class GUIMenu extends JMenuBar {
    */
   void refresh() {
     int c = 0;
-    for(int i = 0; i < MENUBAR.length; ++i) {
-      for(int j = 0; j < MENUITEMS[i].length; ++j) {
-        final Object item = MENUITEMS[i][j];
-        if(!(item instanceof GUICommand)) continue;
-        ((GUICommand) item).refresh(gui, items[c++]);
+    for(int b = 0; b < MENUBAR.length; ++b) {
+      for(int i = 0; i < MENUITEMS[b].length; ++i) {
+        final GUICommand item = MENUITEMS[b][i];
+        if(item != GUICommand.EMPTY && item != null) {
+          item.refresh(gui, items[c++]);
+        }
       }
     }
   }

@@ -54,12 +54,12 @@ public final class MixedPath extends Path {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Value v = root != null ? root.value(ctx) : checkCtx(ctx);
-    final Value c = ctx.resource.value;
+    final Value c = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    ctx.resource.value = v;
+    ctx.value = v;
     final ItemIter ir = eval(ctx);
-    ctx.resource.value = c;
+    ctx.value = c;
     ctx.size = cs;
     ctx.pos = cp;
     return ir;
@@ -73,7 +73,7 @@ public final class MixedPath extends Path {
    */
   private ItemIter eval(final QueryContext ctx) throws QueryException {
     // simple location step traversal...
-    ItemIter res = ItemIter.get(ctx.resource.value.iter(ctx));
+    ItemIter res = ItemIter.get(ctx.value.iter(ctx));
     for(final Expr e : expr) {
       final Iter ir = res;
       final ItemIter ii = new ItemIter();
@@ -82,7 +82,7 @@ public final class MixedPath extends Path {
       Item it;
       while((it = ir.next()) != null) {
         if(!it.node()) NODESPATH.thrw(input, this, it.type);
-        ctx.resource.value = it;
+        ctx.value = it;
         ii.add(ctx.iter(e));
         ctx.pos++;
       }

@@ -352,7 +352,7 @@ final class MapRenderer {
         int cttmp = 0;
         int wltmp = wl / ct;
         while(cttmp < ct) {
-          if(pp - ct + cttmp < ftp.pos.length) g.setColor(COLORFT);
+          if(pp - ct + cttmp < ftp.size()) g.setColor(COLORFT);
 
           while(ll + wltmp >= ww) {
             if(draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);

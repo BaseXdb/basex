@@ -4,23 +4,20 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-wait=Xin đợi tí
 version=Phiên bản %
 
 # Menu Commands
-m_file=Tệp
+m_db=Cơ sở dữ liệu
 m_edit=Soạn thảo
 m_view=Xem nhìn
+m_query=Hỏi
 m_options=Lựa chọn
 m_help=Giúp đỡ
-m_db=Cơ sở dữ liệu
-m_main=Cửa sổ chính
-m_views=Xem nhìn
-m_inter=Tương tác
-m_layout=Nền
 
 # Buttons
 b_ok=OK
+b_yes=Vâng
+b_no=Không
 b_opt=Tối ưu
 b_rename=Đổi tên
 b_backup=Backup
@@ -60,6 +57,7 @@ d_fctitle=Chọn thư mục
 dc_choose=Nhập vào tệp hoặc thư mục
 dc_pattern=File patterns (separated by commas)
 dc_name=Tện cơ sở dữ liệu
+dc_name2=Document Path
 dc_xmldesc=Văn bản XML
 dc_zipdesc=Văn bản XML nén Zip
 dc_gzdesc=Văn bản XML nén GZip
@@ -122,11 +120,14 @@ dfs_meta=Bao gồm metadata
 dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Đổi tên cơ sở dữ liệu
+dr_title2=Delete documents
 dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè
+dr_empty=An empty database will be created
 dr_overbacking=Cơ sở dữ liệu cũ và dự phòng sẽ bị ghi đè
 
 dd_title=Manage Databases
-dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.\nBạn chắc không?
+dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.
+dd_sure=Bạn chắc không?
 
 dx_question=Bạn thực sự muốn xóa?
 dq_question=Save changes to %?
@@ -207,8 +208,8 @@ ds_localport=Local Port
 ds_createu=Create User
 ds_globperm=Global Permissions
 ds_locperm=Local Permissions
-ds_drquestion=% User(s) will be dropped.\nAre you sure?
-ds_dbrevoke=Permission will be revoked from logged in user.\nAre you sure?
+ds_drquestion=% User(s) will be dropped.
+ds_dbrevoke=Permission will be revoked from logged in user.
 ds_alterpw=Alter Password
 ds_invalid=% is invalid
 ds_adlogin=Administrator Login (local or remote)
@@ -264,6 +265,10 @@ c_mountfs=Mount DB as FUSE
 c_mountfstt=Mount DeepFS database instance as filesystem in userspace (needs native operating system support and may thus be unavailable).
 c_props=Thông tin
 c_propstt=Hiển thị thông tin trên cơ sở dữ liệu đang mở.
+c_add=Add documents
+c_addtt=Adds documents to the currently opened database.
+c_drop=Delete documents
+c_droptt=Delete documents from the currently opened database.
 c_insert=Mới
 c_inserttt=Tạo một nút XML mới.
 c_maplayout=Bố cục bản đồ
@@ -377,10 +382,10 @@ db_notdropped=No database was dropped.
 db_droperror=Cơ sở dữ liệu không xóa bỏ được.
 db_altered=Database '%' was renamed to '%'.
 db_notaltered=Database '%' could not be renamed.
-db_backup=Backup '%' created in %.
+db_backup=Backup for '%' created in %.
 db_nobackup=Backup of database '%' could not be created.
-db_restore=Database '%' restored in %.
-db_norestore=Database '%' could not be restored.
+db_restore='%' restored in %.
+db_norestore='%' could not be restored.
 db_notopened=Cơ sở dữ liệu '%' không mở được.
 db_opened=Cơ sở dữ liệu '%' được mở ở %.
 db_exported=Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
@@ -391,9 +396,10 @@ db_backdrop=Backup files '%' were dropped.
 db_backnf=No backup found for '%'.
 
 # Index commands
-in_created=Index được tạo ở %.
-in_dropped=Index được xóa ở %.
-in_notdropped=Index không xóa được.
+in_created=Index '%' được tạo ở %.
+in_dropped=Index '%' được xóa ở %.
+in_notdropped=Index '%' không xóa được.
+in_notavl=not available
 
 # Server Info
 srv_login=Access denied.
@@ -455,10 +461,11 @@ ad_kill=% sessions killed.
 ad_killself='%' cannot kill itself.
 
 # General Commands
-gc_setkey=Could not set '%'.
+gc_setwhich=Unknown option '%'
 gc_setval=Could not set '%' to '%'.
 
 # Info Strings
+info_wait=Xin đợi tí
 info_index=Indexes
 info_opt=Đang tối ưu cơ sở dữ liệu
 info_stats=Tạo thống kê
@@ -511,10 +518,11 @@ ch_create5=creates the specified index
 ch_create6=creates filesystem database [%] for [%]
 ch_create7=(using [%] and [%] if FUSE is activated)
 ch_create8=creates the specified user
+ch_create9=creates the trigger
 ch_add1=Add document to database.
 ch_add2=Adds [%] as [%] into [%].
-ch_delete1=Delete document from database.
-ch_delete2=Deletes a document from the current database.
+ch_delete1=Delete documents from database.
+ch_delete2=Deletes documents from the current database.
 ch_open1=Mở cơ sở dữ liệu.
 ch_open2=Mở_đặc_biệt [%].
 ch_info1=Hiển thị thông tin trên cơ sở dữ liệu hiện tại.
@@ -533,6 +541,7 @@ ch_drop21=drops cơ_sở_dữ_liệu
 ch_drop22=drops index_đặc_biệt
 ch_drop23=drops the specified user
 ch_drop24=drops the database backup
+ch_drop25=drops the trigger
 ch_alter1=Alter user password or database name.
 ch_alter2=Alters user password or database name:
 ch_alterpw=alters the password of a user.
@@ -563,6 +572,7 @@ ch_show22=shows currently opened databases.
 ch_show23=shows current database sessions.
 ch_show24=shows users (on a database).
 ch_show25=shows backups.
+ch_show26=shows triggers.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions (on a database) to a user.
 ch_helpgeneral0=Những câu lệnh chung:
@@ -583,6 +593,10 @@ ch_help1=Nhờ giúp đỡ % những câu lệnh.
 ch_help2=Nếu [%] cụ thể, thông tin trên câu lệnh\n cụ thể sẽ được in ra; nếu không, liệt kê tất cả lệnh.
 ch_exit1=Exit application.
 ch_exit2=Exits %.
+ch_helpattach1=Attach a trigger.
+ch_helpattach2=Attaches a trigger.
+ch_helpdetach1=Detach a trigger.
+ch_helpdetach2=Detaches a trigger.
 
 # Help Texts
 h_hist=Hiển thị lich sử thông tin nhập.
@@ -603,5 +617,5 @@ h_table=Cách vẽ này hiển thị tất cả nut XML trong một bản(table)
 h_text=Thanh này hiển thị kết quả lệnh hỏi hay văn bản dữ liệu xuất ra khác.\n\nPhím tắt: Nhấn '-' và '+' để đổi kích cỡ phông của tất cả thanh. Gõ vào khung xòe ra để chạy một tìm kiếm tiếp. Nó là cách đơn giản để tìm một điểm văn bản cụ thể.
 h_info=Thanh này hiển thị thông tin dịch và đánh giá lệnh hỏi XQuery, bao gồm vài tiểu sử đơn giản.
 h_explore=Chế độ tìm kiếm đơn giản cho phép hỏi đơn giản trong văn bản XML.
-h_xquery=Trong vùng văn bản này, ban có thể nhập lệnh hỏi XQuery 1.0. Dữ liệu nhập được đánh giá sau mỗi lần nhấn phím.\n\n Ví dụ sau cho thấy tất cả tựa sách với chủ đề 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_xquery=Trong vùng văn bản này, ban có thể nhập lệnh hỏi XQuery. Dữ liệu nhập được đánh giá sau mỗi lần nhấn phím.\n\n Ví dụ sau cho thấy tất cả tựa sách với chủ đề 'BaseX':\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
 h_mover=Bạn có thể đổi vị trí hiển thị khi kéo thanh trên cùng của tất cả thanh hiển thị đến chỗ khác trong cửa sổ chính.\n Nếu bạn dời hiển thị ra ngoài cửa sổ chính, nó sẽ đóng.

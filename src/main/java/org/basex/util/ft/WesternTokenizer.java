@@ -104,7 +104,7 @@ final class WesternTokenizer extends Tokenizer {
 
   @Override
   public FTSpan next() {
-    return new FTSpan(nextToken(), cpos, pos, sc);
+    return new FTSpan(nextToken(), pos, sc);
   }
 
   @Override
@@ -134,7 +134,6 @@ final class WesternTokenizer extends Tokenizer {
         if(bs) continue;
         if(c == '.') break;
       }
-      // [CG] XQFT: support other languages (Jap./Chin.: U+3002, etc.)
       if(!sn && (c == '.' || c == '!' || c == '?')) {
         sn = true;
         ++sent;

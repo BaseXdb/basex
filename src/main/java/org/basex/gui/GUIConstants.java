@@ -80,14 +80,14 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String VIEWS = "V H " + XQUERYVIEW + " " + FOLDERVIEW +
-    " " + MAPVIEW + " " + PLOTVIEW + " " + " - H " + TEXTVIEW + " " + INFOVIEW +
-    " " + TABLEVIEW + " " + TREEVIEW + " " + EXPLOREVIEW + " - -";
+  public static final String VIEWS = "V H " + XQUERYVIEW + ' ' + FOLDERVIEW +
+    ' ' + MAPVIEW + ' ' + PLOTVIEW + ' ' + " - H " + TEXTVIEW + ' ' + INFOVIEW +
+    ' ' + TABLEVIEW + ' ' + TREEVIEW + ' ' + EXPLOREVIEW + " - -";
 
   // TOOLBAR ==================================================================
 
   /** Toolbar entries, containing the button commands. */
-  static final GUICommand[] TOOLBAR = {
+  static final GUICommands[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, GOHOME, null, CREATE, OPEN, INFO, null,
       SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER,
       SHOWPLOT, SHOWTABLE, SHOWEXPLORE, null, SHOWHELP
@@ -97,40 +97,42 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-      Text.MENUFILE, Text.MENUEDIT, Text.MENUVIEW, Text.MENUOPTIONS,
-      Text.MENUDEEPFS, Text.MENUHELP };
+    MENUDB, MENUEDIT, MENUVIEW, MENUQUERY, MENUOPTIONS, MENUDEEPFS, MENUHELP
+  };
 
-  /** Separator. */
-  static final String SEPARATOR = "-";
-
-  /** Two-dimensional Menu entries, containing the menu item commands. */
-  static final Object[][] MENUITEMS = { {
-    MENUDB, CREATE, OPEN, INFO, EXPORT, MANAGE, CLOSE, SEPARATOR,
-    XQUERYTIT + COL,
-    XQOPEN, XQSAVE, XQSAVEAS, SEPARATOR,
-    SERVER, Prop.MAC ? null : SEPARATOR,
+  /**
+   * Two-dimensional menu entries, containing the menu item commands.
+   * {@link #EMPTY} references serve as menu separators.
+   */
+  static final GUICommand[][] MENUITEMS = { {
+    CREATE, OPEN, MANAGE, EMPTY,
+    ADD, DROP, EXPORT, INFO, CLOSE, EMPTY,
+    SERVER, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : EXIT
   }, {
-    COPY, PASTE, DELETE, INSERT, EDIT, SEPARATOR,
-    SHOWXQUERY, SHOWINFO, SEPARATOR,
+    COPY, PASTE, DELETE, INSERT, EDIT, EMPTY,
     COPYPATH, FILTER
   }, {
-    MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, SEPARATOR,
-    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER, SHOWPLOT, SHOWTABLE,
-    SHOWEXPLORE, SEPARATOR, FULL
+    SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, EMPTY,
+    SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER, SHOWPLOT, SHOWTABLE,
+    SHOWEXPLORE, EMPTY, FULL
   }, {
-    MENUINTER, RTEXEC, RTFILTER, SEPARATOR,
-    MENULAYOUT, COLOR, FONTS, MAPLAYOUT, TREEOPTIONS,
-    Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : PREFS
+    SHOWXQUERY, SHOWINFO, EMPTY,
+    XQOPEN, XQSAVE, XQSAVEAS
   }, {
-    CREATEFS, SEPARATOR, DQE, MOUNTFS
+    RTEXEC, RTFILTER, EMPTY,
+    COLOR, FONTS, MAPLAYOUT, TREEOPTIONS, Prop.MAC ? null : EMPTY,
+    Prop.MAC ? null : PREFS
   }, {
-    SHOWHELP, Prop.MAC ? null : SEPARATOR, SHOWCOMMUNITY, SHOWUPDATES,
-    Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : ABOUT
+    CREATEFS, EMPTY, DQE, MOUNTFS
+  }, {
+    SHOWHELP, Prop.MAC ? null : EMPTY,
+    SHOWCOMMUNITY, SHOWUPDATES, Prop.MAC ? null : EMPTY,
+    Prop.MAC ? null : ABOUT
   }};
 
   /** Context menu entries. */
-  public static final GUICommand[] POPUP = {
+  public static final GUICommands[] POPUP = {
     GOBACK, FILTER, null, COPY, PASTE, DELETE, INSERT, EDIT, null, COPYPATH
   };
 
@@ -158,7 +160,9 @@ public final class GUIConstants {
     /** Error icon. */
     ERROR("error", "error"),
     /** Success icon. */
-    SUCCESS("ok", "information");
+    SUCCESS("ok", "information"),
+    /** Question icon. */
+    QUESTION("warn", "question");
 
     /** Small icon. */
     public final Icon small;

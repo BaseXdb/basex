@@ -8,9 +8,9 @@ import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogHelp;
-import org.basex.gui.dialog.DialogOpen;
 import org.basex.util.Array;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -80,9 +80,9 @@ public final class ViewNotifier {
     } else {
       // close all dialogs (except help) together with database
       for(final Window w : gui.getOwnedWindows()) {
-        if(w.isVisible() && w instanceof Dialog && !(w instanceof DialogHelp ||
-            w instanceof DialogOpen))
-          ((Dialog) w).cancel();
+        if(!(w.isVisible() && w instanceof Dialog)) continue;
+        final Dialog d = (Dialog) w;
+        if(!(d.isModal() || w instanceof DialogHelp)) ((Dialog) w).cancel();
       }
     }
 
@@ -103,7 +103,9 @@ public final class ViewNotifier {
     if(gui.context.focused == pre) return;
     gui.context.focused = pre;
     for(final View v : view) if(v != vw && v.visible()) v.refreshFocus();
-    if(pre != -1) gui.status.setPath(ViewData.path(gui.context.data, pre));
+    if(pre != -1) {
+      gui.status.setText(Token.string(ViewData.path(gui.context.data, pre)));
+    }
   }
 
   /**

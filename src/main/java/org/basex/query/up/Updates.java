@@ -72,13 +72,13 @@ public final class Updates {
     if(t && (frag || !refs.contains(((DBNode) p.node).data)))
       UPNOTCOPIED.thrw(p.input, p.node);
 
-    if(frag && fdata == null) fdata = new MemData(ctx.resource.context.prop);
+    if(frag && fdata == null) fdata = new MemData(ctx.context.prop);
     final Data d = frag ? fdata : ((DBNode) p.node).data;
 
     Primitives prim = primitives.get(d);
     if(prim == null) {
       // check permissions
-      if(!t && !frag && !ctx.resource.context.perm(User.WRITE, d.meta))
+      if(!t && !frag && !ctx.context.perm(User.WRITE, d.meta))
         PERMNO.thrw(p.input, CmdPerm.WRITE);
 
       prim = frag ? new FragPrimitives() : new DBPrimitives(d);

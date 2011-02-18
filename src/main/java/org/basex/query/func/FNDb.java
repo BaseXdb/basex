@@ -3,20 +3,17 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.core.User;
+import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
-import org.basex.data.Data;
-import org.basex.data.FTPosData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
-import org.basex.query.ft.FTIndexAccess;
-import org.basex.query.ft.FTWords;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
@@ -24,17 +21,14 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.NameTest;
-import org.basex.query.util.DataBuilder;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
-import org.basex.util.XMLToken;
 
 /**
  * Database functions.
@@ -56,15 +50,15 @@ final class FNDb extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case OPEN:    return open(ctx);
-      case TEXTIDX: return textIndex(ctx);
-      case ATTRIDX: return attributeIndex(ctx);
-      case FTIDX:   return fulltextIndex(ctx);
-      case FTMARK:  return fulltextMark(ctx);
-      case LIST:    return list(ctx);
-      case NODEID:  return node(ctx, true);
-      case NODEPRE: return node(ctx, false);
-      default:      return super.iter(ctx);
+      case OPEN:     return open(ctx);
+      case TEXT:     return text(ctx);
+      case ATTR:     return attribute(ctx);
+      case FULLTEXT: return fulltext(ctx);
+      case LIST:     return list(ctx);
+      case NODEID:   return node(ctx, true);
+      case NODEPRE:  return node(ctx, false);
+      case TRIGGER:  return trigger(ctx);
+      default:       return super.iter(ctx);
     }
   }
 
@@ -76,7 +70,6 @@ final class FNDb extends Fun {
       case OPENPRE: return open(ctx, false);
       case SYSTEM:  return system(ctx);
       case INFO:    return info(ctx);
-      case IDXINFO: return indexInfo(ctx);
       default:      return super.item(ctx, ii);
     }
   }
@@ -109,7 +102,7 @@ final class FNDb extends Fun {
   private DBNode open(final QueryContext ctx, final boolean id)
       throws QueryException {
 
-    final DBNode node = 
+    final DBNode node =
       ctx.resource.doc(checkStr(expr[0], ctx), true, true, input);
     final int v = (int) checkItr(expr[1], ctx);
     final int pre = id ? node.data.pre(v) : v;
@@ -118,26 +111,24 @@ final class FNDb extends Fun {
   }
 
   /**
-   * Performs the text-index function.
+   * Performs the text function.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter textIndex(final QueryContext ctx) throws QueryException {
-    final IndexContext ic = new IndexContext(ctx, data(ctx), null, true);
-    if(!ic.data.meta.textindex) NOIDX.thrw(input, this);
+  private Iter text(final QueryContext ctx) throws QueryException {
+    final IndexContext ic = new IndexContext(ctx, checkData(ctx), null, true);
     return new IndexAccess(input, expr[0], IndexType.TEXT, ic).iter(ctx);
   }
 
   /**
-   * Performs the attribute-index function.
+   * Performs the attribute function.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter attributeIndex(final QueryContext ctx) throws QueryException {
-    final IndexContext ic = new IndexContext(ctx, data(ctx), null, true);
-    if(!ic.data.meta.attrindex) NOIDX.thrw(input, this);
+  private Iter attribute(final QueryContext ctx) throws QueryException {
+    final IndexContext ic = new IndexContext(ctx, checkData(ctx), null, true);
     final IndexAccess ia = new IndexAccess(
         input, expr[0], IndexType.ATTRIBUTE, ic);
 
@@ -166,56 +157,13 @@ final class FNDb extends Fun {
   }
 
   /**
-   * Performs the fulltext-index function.
+   * Performs the fulltext function.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter fulltextIndex(final QueryContext ctx) throws QueryException {
-    final IndexContext ic = new IndexContext(ctx, data(ctx), null, true);
-    if(!ic.data.meta.ftindex) NOIDX.thrw(input, this);
-
-    final byte[] str = checkStr(expr[0], ctx);
-    final FTWords words = new FTWords(input, ic.data, Str.get(str), ctx);
-    return new FTIndexAccess(input, words, ic).iter(ctx);
-  }
-
-  /**
-   * Performs the fulltext-mark function.
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException query exception
-   */
-  private Iter fulltextMark(final QueryContext ctx) throws QueryException {
-    // name of the marker element; default is <mark/>
-    final byte[] m = expr.length == 2 ? checkStr(expr[1], ctx) : null;
-    if(m != null && !XMLToken.isQName(m)) Err.value(input, Type.QNM, m);
-
-    return new Iter() {
-      Iter ir;
-      ItemIter ii;
-
-      @Override
-      public Item next() throws QueryException {
-        while(true) {
-          if(ii != null) {
-            final Item it = ii.next();
-            if(it != null) return it;
-            ii = null;
-          }
-          final FTPosData ftd = ctx.ftpos;
-          ctx.ftpos = new FTPosData();
-          if(ir == null) ir = ctx.iter(expr[0]);
-          Item it = ir.next();
-          if(it != null) {
-            final byte[] mark = m != null ? m : ctx.ftopt.mark;
-            ii = DataBuilder.mark(checkDBNode(it), mark, ctx);
-          }
-          ctx.ftpos = ftd;
-          if(it == null) return null;
-        }
-      }
-    };
+  private Iter fulltext(final QueryContext ctx) throws QueryException {
+    return FNFt.search(checkData(ctx), checkStr(expr[0], ctx), this, ctx);
   }
 
   /**
@@ -225,7 +173,7 @@ final class FNDb extends Fun {
    */
   private Iter list(final QueryContext ctx) {
     final ItemIter ii = new ItemIter();
-    for(final String s : List.list(ctx.resource.context)) ii.add(Str.get(s));
+    for(final String s : List.list(ctx.context)) ii.add(Str.get(s));
     return ii;
   }
 
@@ -235,7 +183,7 @@ final class FNDb extends Fun {
    * @return iterator
    */
   private Str system(final QueryContext ctx) {
-    return Str.get(delete(Info.info(ctx.resource.context), '\r'));
+    return Str.get(delete(Info.info(ctx.context), '\r'));
   }
 
   /**
@@ -245,21 +193,16 @@ final class FNDb extends Fun {
    * @throws QueryException query exception
    */
   private Str info(final QueryContext ctx) throws QueryException {
-    final boolean create = ctx.resource.context.user.perm(User.CREATE);
-    final byte[] info = InfoDB.db(data(ctx).meta, false, true, create);
-    return Str.get(delete(info, '\r'));
-  }
-
-  /**
-   * Performs the index-info function.
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException query exception
-   */
-  private Str indexInfo(final QueryContext ctx) throws QueryException {
-    final byte[] tp = checkStr(expr[0], ctx);
-    final byte[] info = InfoIndex.info(string(tp), data(ctx));
-    if(info.length == 0) NOIDX.thrw(input, this);
+    byte[] info;
+    if(expr.length == 1) {
+      final byte[] tp = checkStr(expr[0], ctx);
+      final CmdIndexInfo cmd = InfoIndex.info(string(tp));
+      if(cmd == null) NOIDX.thrw(input, this);
+      info = InfoIndex.info(cmd, checkData(ctx));
+    } else {
+      final boolean create = ctx.context.user.perm(User.CREATE);
+      info = InfoDB.db(checkData(ctx).meta, false, true, create);
+    }
     return Str.get(delete(info, '\r'));
   }
 
@@ -286,33 +229,22 @@ final class FNDb extends Fun {
     };
   }
 
-  /**
-   * Returns the data reference.
-   * @param ctx query context
-   * @return data reference
-   * @throws QueryException query exception
-   */
-  private Data data(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.resource.data();
-    if(data == null) NODBCTX.thrw(input, this);
-    return data;
-  }
-
-  @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    if(def == FunDef.FTMARK) {
-      final boolean fast = ctx.ftfast;
-      ctx.ftfast = false;
-      final Expr e = super.comp(ctx);
-      ctx.ftfast = fast;
-      return e;
-    }
-    return super.comp(ctx);
-  }
-
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (def == FunDef.TEXTIDX || def == FunDef.ATTRIDX ||
-        def == FunDef.FTIDX) || super.uses(u);
+    return u == Use.CTX && (def == FunDef.TEXT || def == FunDef.ATTR ||
+        def == FunDef.FULLTEXT) || super.uses(u);
+  }
+  
+  /**
+   * Triggers an event on registered sessions.
+   * @param ctx query context
+   * @return The trigger result
+   * @throws QueryException query exception
+   */
+  private Iter trigger(final QueryContext ctx) throws QueryException {
+    Value v = expr[0].value(ctx);
+    ctx.context.triggers.notify(ctx.context.session,
+        expr[1].toString().getBytes(), checkStr(expr[2], ctx));
+    return v.iter();
   }
 }

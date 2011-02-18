@@ -222,7 +222,7 @@ final class TreeRects implements TreeViewOptions {
    * @param rn root number
    * @param lv level
    * @param pre the pre value to be found
-   * @return the rectangle containing the given pre value, null else
+   * @return the rectangle containing the given pre value, {@code null} else
    */
   TreeRect searchRect(final TreeSubtree sub, final int rn, final int lv,
       final int pre) {

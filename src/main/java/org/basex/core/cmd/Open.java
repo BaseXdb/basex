@@ -28,7 +28,7 @@ public final class Open extends Command {
   @Override
   protected boolean run() {
     String db = args[0];
-    if(!checkName(db)) return error(NAMEINVALID, db);
+    if(!validName(db)) return error(NAMEINVALID, db);
 
     new Close().run(context);
     final int i = db.indexOf('/');
@@ -48,6 +48,11 @@ public final class Open extends Command {
       final String msg = ex.getMessage();
       return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
     }
+  }
+
+  @Override
+  public boolean newData() {
+    return true;
   }
 
   /**

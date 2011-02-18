@@ -5,6 +5,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -137,7 +138,7 @@ public abstract class ParseExpr extends Expr {
    * @return the specified expression
    * @throws QueryException query exception
    */
-  protected final Expr checkUp(final Expr e, final QueryContext ctx)
+  public final Expr checkUp(final Expr e, final QueryContext ctx)
       throws QueryException {
     if(e != null && ctx.updating && e.uses(Use.UPD))
       UPNOT.thrw(input, desc());
@@ -150,7 +151,7 @@ public abstract class ParseExpr extends Expr {
    * @param expr expression array
    * @throws QueryException query exception
    */
-  protected void checkUp(final QueryContext ctx, final Expr... expr)
+  public void checkUp(final QueryContext ctx, final Expr... expr)
       throws QueryException {
 
     if(!ctx.updating) return;
@@ -247,7 +248,7 @@ public abstract class ParseExpr extends Expr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  protected final void checkColl(final Expr e, final QueryContext ctx)
+  public final void checkColl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
     final Item it = e instanceof Item ? (Item) e : checkItem(e, ctx);
@@ -262,7 +263,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final byte[] checkStr(final Expr e, final QueryContext ctx)
+  public final byte[] checkStr(final Expr e, final QueryContext ctx)
       throws QueryException {
     final Item it = checkItem(e, ctx);
     if(!it.str() && !it.unt()) Err.type(this, Type.STR, it);
@@ -276,7 +277,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final byte[] checkEStr(final Item it) throws QueryException {
+  public final byte[] checkEStr(final Item it) throws QueryException {
     if(it == null) return EMPTY;
     if(!it.str() && !it.unt()) Err.type(this, Type.STR, it);
     return it.atom();
@@ -289,9 +290,21 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Value checkCtx(final QueryContext ctx) throws QueryException {
-    final Value v = ctx.resource.value;
+    final Value v = ctx.value;
     if(v == null) XPNOCTX.thrw(input, this);
     return v;
+  }
+
+  /**
+   * Returns the data reference.
+   * @param ctx query context
+   * @return data reference
+   * @throws QueryException query exception
+   */
+  public final Data checkData(final QueryContext ctx) throws QueryException {
+    final Data data = ctx.resource.data();
+    if(data == null) NODBCTX.thrw(input, this);
+    return data;
   }
 
   /**
@@ -301,7 +314,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final Item checkItem(final Expr e, final QueryContext ctx)
+  public final Item checkItem(final Expr e, final QueryContext ctx)
       throws QueryException {
     return checkEmpty(e.item(ctx, input));
   }
@@ -313,7 +326,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified item
    * @throws QueryException query exception
    */
-  protected final Item checkType(final Item it, final Type t)
+  public final Item checkType(final Item it, final Type t)
       throws QueryException {
 
     if(checkEmpty(it).type != t) Err.type(this, t, it);
@@ -327,7 +340,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified item
    * @throws QueryException query exception
    */
-  protected final Item checkEmpty(final Item it) throws QueryException {
+  public final Item checkEmpty(final Item it) throws QueryException {
     if(it == null) XPEMPTY.thrw(input, desc());
     return it;
   }
@@ -339,7 +352,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified item
    * @throws QueryException query exception
    */
-  protected final Item checkEmptyType(final Item it, final Type t)
+  public final Item checkEmptyType(final Item it, final Type t)
       throws QueryException {
     if(it == null) XPEMPTYPE.thrw(input, desc(), t);
     return it;
@@ -353,24 +366,24 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final byte[] checkEStr(final Expr e, final QueryContext ctx)
+  public final byte[] checkEStr(final Expr e, final QueryContext ctx)
       throws QueryException {
     return checkEStr(e.item(ctx, input));
   }
 
   /**
-   * Checks if an expression yields a valid {@link IO} instance.
+   * Checks if an expression yields a valid and existing {@link IO} instance.
    * Returns the instance or an exception.
    * @param e expression to be evaluated
    * @param ctx query context
    * @return io instance
    * @throws QueryException query exception
    */
-  protected final IO checkIO(final Expr e, final QueryContext ctx)
+  public final IO checkIO(final Expr e, final QueryContext ctx)
       throws QueryException {
 
     checkAdmin(ctx);
-    final byte[] name = checkEStr(e, ctx);
+    final byte[] name = checkStr(e, ctx);
     final IO io = IO.get(string(name));
     if(!io.exists()) DOCERR.thrw(input, name);
     return io;
@@ -382,9 +395,7 @@ public abstract class ParseExpr extends Expr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  protected final void checkAdmin(final QueryContext ctx)
-      throws QueryException {
-    if(!ctx.resource.context.user.perm(User.ADMIN)) 
-      PERMNO.thrw(input, CmdPerm.ADMIN);
+  public final void checkAdmin(final QueryContext ctx) throws QueryException {
+    if(!ctx.context.user.perm(User.ADMIN)) PERMNO.thrw(input, CmdPerm.ADMIN);
   }
 }

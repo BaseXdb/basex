@@ -91,11 +91,11 @@ public class AxisStep extends Preds {
 
     // as predicates will not necessarily start from the document node,
     // a document context item is temporarily set to element
-    final Type ct = ctx.resource.value != null ? ctx.resource.value.type : null;
-    if(ct == Type.DOC) ctx.resource.value.type = Type.ELM;
+    final Type ct = ctx.value != null ? ctx.value.type : null;
+    if(ct == Type.DOC) ctx.value.type = Type.ELM;
 
     final Expr e = super.comp(ctx);
-    if(ct != null) ctx.resource.value.type = ct;
+    if(ct != null) ctx.value.type = ct;
     ctx.leaf = false;
 
     // return optimized step / don't re-optimize step
@@ -129,7 +129,7 @@ public class AxisStep extends Preds {
       ctx.pos = 1;
       int c = 0;
       for(int n = 0; n < nb.size(); ++n) {
-        ctx.resource.value = nb.get(n);
+        ctx.value = nb.get(n);
         final Item i = p.test(ctx, input);
         if(i != null) {
           // assign score value
@@ -187,7 +187,9 @@ public class AxisStep extends Preds {
     if(!desc && axis != Axis.CHILD) return null;
 
     final ArrayList<PathNode> out = new ArrayList<PathNode>();
-    for(final PathNode pn : nodes) data.path.desc(pn, out, name, kind, desc);
+    for(final PathNode pn : nodes) {
+      data.pthindex.desc(pn, out, name, kind, desc);
+    }
     return out;
   }
 

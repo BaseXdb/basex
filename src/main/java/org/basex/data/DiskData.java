@@ -54,7 +54,7 @@ public final class DiskData extends Data {
         if(k.isEmpty()) break;
         if(k.equals(DBTAGS))      tags = new Names(in);
         else if(k.equals(DBATTS)) atts = new Names(in);
-        else if(k.equals(DBPATH)) path = new PathSummary(in);
+        else if(k.equals(DBPATH)) pthindex = new PathSummary(in);
         else if(k.equals(DBNS))   ns   = new Namespaces(in);
       }
 
@@ -62,7 +62,7 @@ public final class DiskData extends Data {
       init();
       if(meta.textindex) txtindex = new DiskValues(this, true);
       if(meta.attrindex) atvindex = new DiskValues(this, false);
-      if(meta.ftindex) ftxindex = FTIndex.get(this, meta.wildcards);
+      if(meta.ftindex)   ftxindex = FTIndex.get(this, meta.wildcards);
     } catch(final IOException ex) {
       throw ex;
     } finally {
@@ -86,7 +86,7 @@ public final class DiskData extends Data {
     meta = md;
     tags = nm;
     atts = at;
-    path = ps;
+    pthindex = ps;
     ns = n;
     init();
     write();
@@ -114,7 +114,7 @@ public final class DiskData extends Data {
     out.writeString(DBATTS);
     atts.write(out);
     out.writeString(DBPATH);
-    path.write(out);
+    pthindex.write(out);
     out.writeString(DBNS);
     ns.write(out);
     out.write(0);
@@ -151,7 +151,7 @@ public final class DiskData extends Data {
       case TEXT:      if(txtindex != null) txtindex.close(); break;
       case ATTRIBUTE: if(atvindex != null) atvindex.close(); break;
       case FULLTEXT:  if(ftxindex != null) ftxindex.close(); break;
-      case PATH:      if(ftxindex != null) path.close(); break;
+      case PATH:      if(ftxindex != null) pthindex.close(); break;
       default: break;
     }
   }
@@ -161,8 +161,8 @@ public final class DiskData extends Data {
     switch(type) {
       case TEXT:      if(meta.textindex) txtindex = index; break;
       case ATTRIBUTE: if(meta.attrindex) atvindex = index; break;
-      case FULLTEXT:  if(meta.ftindex) ftxindex = index; break;
-      case PATH:      if(meta.pathindex) path = (PathSummary) index; break;
+      case FULLTEXT:  if(meta.ftindex)   ftxindex = index; break;
+      case PATH:      if(meta.pathindex) pthindex = (PathSummary) index; break;
       default: break;
     }
   }

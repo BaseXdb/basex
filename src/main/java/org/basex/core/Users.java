@@ -18,7 +18,7 @@ import org.basex.util.Util;
  * @author Andreas Weiler
  */
 public final class Users extends ArrayList<User> {
-  /** Filename; will be null for local user permissions. */
+  /** Filename; will be {@code null} for local user permissions. */
   private File file;
 
   /**

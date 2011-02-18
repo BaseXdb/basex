@@ -78,6 +78,11 @@ public final class OrderByExpr extends OrderBy {
   }
 
   @Override
+  public boolean removable(final Var v) {
+    return expr.removable(v);
+  }
+
+  @Override
   public OrderByExpr remove(final Var v) {
     expr = expr.remove(v);
     return this;

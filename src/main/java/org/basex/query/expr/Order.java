@@ -98,6 +98,18 @@ public final class Order extends ParseExpr {
   }
 
   @Override
+  public boolean uses(final Var v) {
+    for(final OrderBy o : ob) if(o.uses(v)) return true;
+    return false;
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    for(final OrderBy o : ob) if(!o.removable(v)) return false;
+    return true;
+  }
+
+  @Override
   public Order remove(final Var v) {
     for(int o = 0; o < ob.length; ++o) ob[o] = ob[o].remove(v);
     return this;

@@ -287,14 +287,14 @@ final class MapFS extends MapPainter {
   byte[] content(final Data data, final MapRect mr) {
     final byte[] textElem = DeepFS.TEXT_CONTENT;
     final int size = mr.pre + data.size(mr.pre, Data.ELEM);
-    for(int node = mr.pre; node < size; ++node) {
-      final byte[] nodeName = data.name(node, data.kind(node));
+    for(int pre = mr.pre; pre < size; ++pre) {
+      final byte[] nodeName = data.name(pre, data.kind(pre));
       if(eq(nodeName, textElem)) {
-        int textNodeSize = data.size(node, data.kind(node));
+        int textNodeSize = data.size(pre, data.kind(pre));
         while(--textNodeSize > 0) {
-          if(data.kind(++node) == Data.TEXT) {
-            mr.pos = view.gui.context.marked.ftpos.get(node);
-            return ViewData.content(data, node, false);
+          if(data.kind(++pre) == Data.TEXT) {
+            mr.pos = view.gui.context.marked.ftpos.get(data, pre);
+            return ViewData.content(data, pre, false);
           }
         }
       }

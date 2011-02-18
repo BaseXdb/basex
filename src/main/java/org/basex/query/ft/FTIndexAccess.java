@@ -21,9 +21,6 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public final class FTIndexAccess extends Simple {
-  /** Scoring flag. */
-  final boolean scoring;
-
   /** Full-text expression. */
   private final FTExpr ftexpr;
   /** Index context. */
@@ -41,7 +38,6 @@ public final class FTIndexAccess extends Simple {
     super(ii);
     ftexpr = ex;
     ictx = ic;
-    scoring = !ic.ctx.ftfast;
   }
 
   @Override
@@ -54,9 +50,9 @@ public final class FTIndexAccess extends Simple {
         final FTNode it = ir.next();
         if(it != null) {
           // add entry to visualization
-          if(ctx.ftpos != null) ctx.ftpos.add(it.pre, it.all);
-          // assign scoring, if necessary and not done yet
-          if(scoring) it.score();
+          if(ctx.ftpos != null) ctx.ftpos.add(it.data, it.pre, it.all);
+          // assign scoring, if not done yet
+          it.score();
           // remove matches reference to save memory
           it.all = null;
         }

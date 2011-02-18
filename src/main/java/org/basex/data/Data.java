@@ -84,7 +84,7 @@ public abstract class Data {
   /** Namespace index. */
   public Namespaces ns;
   /** Path summary. */
-  public PathSummary path;
+  public PathSummary pthindex;
 
   /** DeepFS reference. */
   public DeepFS fs;
@@ -195,7 +195,7 @@ public abstract class Data {
 
   /**
    * Returns the document nodes.
-   * A dummy node is returned if the database is empty.
+   * A single dummy node is returned if the database is empty.
    * @return root nodes
    */
   public final IntList doc() {
@@ -210,7 +210,7 @@ public abstract class Data {
    * @return root nodes
    */
   public final IntList doc(final String input) {
-    final boolean all = input.length() == 0;
+    final boolean all = input.isEmpty();
     final byte[] slash = token("/");
     // build exact path: remove redundant slashes and switch to lower case
     final byte[] exact = lc(concat(slash, token(input.replaceAll("/+", "/"))));
@@ -244,7 +244,7 @@ public abstract class Data {
       case TEXT:      return txtindex.info();
       case ATTRIBUTE: return atvindex.info();
       case FULLTEXT:  return ftxindex.info();
-      case PATH:      return path.info(this);
+      case PATH:      return pthindex.info(this);
       default:        return EMPTY;
     }
   }
@@ -586,7 +586,7 @@ public abstract class Data {
    * @param ipar parent pre value of node
    * @param md data instance to copy from
    */
-  public final void insert(final int ipre, final int ipar, final MemData md) {
+  public final void insert(final int ipre, final int ipar, final Data md) {
     meta.update();
 
     final int[] preStack = new int[IO.MAXHEIGHT];

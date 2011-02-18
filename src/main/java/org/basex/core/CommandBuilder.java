@@ -54,7 +54,7 @@ public final class CommandBuilder {
   }
 
   /**
-   * Adds the specified argument as XQuery.
+   * Adds the specified argument as XQuery string.
    * @param arg argument index
    * @return self instance
    */
@@ -75,9 +75,8 @@ public final class CommandBuilder {
   }
 
   /**
-   * Adds the specified keyword and argument.
-   * Does nothing if the argument is {@code null} or empty.
-   * @param key keyword prefix
+   * Adds an argument with an optional prefix.
+   * @param key optional keyword prefix
    * @param arg argument index
    * @return self instance
    */

@@ -11,7 +11,7 @@ import org.basex.gui.GUIConstants.Msg;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BaseXLabel extends JLabel {
+public class BaseXLabel extends JLabel {
   /**
    * Constructor.
    */

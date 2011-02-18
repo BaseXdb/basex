@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class FLWR extends FLWOR {
+public final class FLWR extends GFLWOR {
   /**
    * Constructor.
    * @param f variable inputs
@@ -22,9 +22,9 @@ public final class FLWR extends FLWOR {
    * @param r return expression
    * @param ii input info
    */
-  public FLWR(final ForLet[] f, final Expr w, final Expr r,
+  FLWR(final ForLet[] f, final Expr w, final Expr r,
       final InputInfo ii) {
-    super(f, w, null, r, ii);
+    super(f, w, null, null, r, ii);
   }
 
   @Override
@@ -32,7 +32,7 @@ public final class FLWR extends FLWOR {
     final Expr ex = super.comp(ctx);
     if(ex != this) return ex;
 
-    // simplify basic FLWOR expression (for $i in A return $i -> A)
+    // simplify basic GFLWOR expression (for $i in A return $i -> A)
     if(fl.length == 1 && where == null && ret instanceof VarRef) {
       final Var v = ((VarRef) ret).var;
       if(v.type == null && fl[0].var.eq(v)) {
@@ -84,9 +84,7 @@ public final class FLWR extends FLWOR {
         return true;
       }
 
-      /**
-       * Initializes the iterator.
-       */
+      /** Initializes the iterator. */
       private void init() throws QueryException {
         if(iter != null) return;
         iter = new Iter[fl.length];

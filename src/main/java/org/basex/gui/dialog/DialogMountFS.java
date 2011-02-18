@@ -107,7 +107,7 @@ public final class DialogMountFS extends Dialog {
       }
     });
     m.add(browse);
-    warn = new BaseXLabel(" ").border(5, 5, 0, 0);
+    warn = new BaseXLabel().border(5, 5, 0, 0);
     m.add(warn);
     info.add(m, BorderLayout.SOUTH);
 
@@ -164,7 +164,7 @@ public final class DialogMountFS extends Dialog {
       //DeepFSImpl.main(new String[] {mp, db});
       close();
     } else {
-      ok = !db.isEmpty() && ctx.prop.dbexists(db);
+      ok = ctx.prop.dbexists(db);
       warn.setText(null, null);
       if(ok) {
         doc.setText(BUTTONMOUNT + " " + db + COL);

@@ -176,13 +176,12 @@ public final class HttpClient {
     // If authorization is to be sent, check that both user name and password
     // are provided
     final byte[] sendAuth = reqAttrs.get(SENDAUTH);
-    if((sendAuth != null) && Boolean.parseBoolean(string(sendAuth))) {
+    if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
       final byte[] usrname = reqAttrs.get(USRNAME);
       final byte[] passwd = reqAttrs.get(PASSWD);
 
       if(usrname == null && passwd != null
-          || usrname != null && passwd == null)
-        throw new QueryException(info, CREDSERR);
+          || usrname != null && passwd == null) CREDSERR.thrw(info);
     }
   }
 
@@ -238,21 +237,22 @@ public final class HttpClient {
       final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
       try {
-      setConnectionProps(conn);
-      setHttpRequestHeaders(conn);
-      if(body != null) setHttpRequestContent(conn);
-      conn.getResponseCode();
-      return getHttpResponse(conn, ctx);
+        setConnectionProps(conn);
+        setHttpRequestHeaders(conn);
+        if(body != null) setHttpRequestContent(conn);
+        conn.getResponseCode();
+        return getHttpResponse(conn, ctx);
       } finally {
         conn.disconnect();
       }
-    } catch(MalformedURLException ex) {
-      throw new QueryException(info, URLINV, ex);
-    } catch(ProtocolException ex) {
-      throw new QueryException(info, PROTINV, ex);
-    } catch(IOException ex) {
-      throw new QueryException(info, HTTPERR, ex.getMessage());
+    } catch(final MalformedURLException ex) {
+      URLINV.thrw(info, ex);
+    } catch(final ProtocolException ex) {
+      PROTINV.thrw(info, ex);
+    } catch(final IOException ex) {
+      HTTPERR.thrw(info, ex);
     }
+    return null;
   }
 
   /**
@@ -281,9 +281,9 @@ public final class HttpClient {
 
     final byte[][] headerNames = headers.keys();
 
-    for(int i = 0; i < headerNames.length; i++)
-      conn.addRequestProperty(string(headerNames[i]),
-          string(headers.get(headerNames[i])));
+    for(final byte[] headerName : headerNames)
+      conn.addRequestProperty(string(headerName),
+          string(headers.get(headerName)));
     // HTTP Basic Authentication
     final byte[] sendAuth = reqAttrs.get(SENDAUTH);
     if(sendAuth != null && Bln.parse(sendAuth, info))
@@ -479,10 +479,8 @@ public final class HttpClient {
       throws IOException {
 
     final IOContent io = new IOContent(readHttpContent(conn));
-    final Parser parser = new XMLParser(io, null, ctx.resource.context.prop);
-
-    return new 
-      DBNode(MemBuilder.build(parser, ctx.resource.context.prop, ""), 0);
+    final Parser parser = new XMLParser(io, null, ctx.context.prop);
+    return new DBNode(MemBuilder.build(parser, ctx.context.prop, ""), 0);
   }
 
   /**
@@ -496,10 +494,8 @@ public final class HttpClient {
       throws IOException {
 
     final IOContent io = new IOContent(readHttpContent(conn));
-    final Parser parser = new HTMLParser(io, null, ctx.resource.context.prop);
-
-    return new 
-      DBNode(MemBuilder.build(parser, ctx.resource.context.prop, ""), 0);
+    final Parser parser = new HTMLParser(io, null, ctx.context.prop);
+    return new DBNode(MemBuilder.build(parser, ctx.context.prop, ""), 0);
   }
 
   /**

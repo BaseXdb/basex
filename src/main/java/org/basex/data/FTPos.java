@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import java.util.Arrays;
-import org.basex.util.Util;
 
 /**
  * This class contains full-text positions.
@@ -12,9 +11,9 @@ import org.basex.util.Util;
  */
 public final class FTPos {
   /** Pre value. */
-  public final int pre;
+  final int pre;
   /** Positions. */
-  public int[] pos;
+  int[] pos;
   /** Sorted flag. */
   private boolean sorted = true;
 
@@ -70,11 +69,11 @@ public final class FTPos {
     return false;
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.name(this));
-    sb.append("[" + pre + ": ");
-    for(int i = 0; i < pos.length; ++i) sb.append((i != 0 ? "," : "") + pos[i]);
-    return sb.append("]").toString();
+  /**
+   * Returns the number of positions.
+   * @return number of positions
+   */
+  public int size() {
+    return pos.length;
   }
 }

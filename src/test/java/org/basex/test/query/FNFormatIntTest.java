@@ -9,7 +9,7 @@ package org.basex.test.query;
 public final class FNFormatIntTest extends QueryTest {
   /** Constructor. */
   static {
-    doc = "<x/>";
+    doc = "<dummy/>";
 
     queries = new Object[][] {
       { "format-integer-001", str("123"), "format-integer(123, '1')" },

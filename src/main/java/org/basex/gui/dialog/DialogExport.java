@@ -63,7 +63,7 @@ public final class DialogExport extends Dialog {
     final BaseXBack pp = new BaseXBack(new TableLayout(3, 1, 0, 4));
 
     BaseXBack p = new BaseXBack(new TableLayout(2, 2, 6, 0));
-    out = new BaseXLabel("", false, true);
+    out = new BaseXLabel(OUTDIR + COL, true, true).border(0, 0, 4, 0);
     p.add(out);
     p.add(new BaseXLabel());
 
@@ -82,7 +82,7 @@ public final class DialogExport extends Dialog {
     pp.add(p);
 
     p = new BaseXBack(new TableLayout(2, 1));
-    p.add(new BaseXLabel(INFOENCODING + COL, false, true));
+    p.add(new BaseXLabel(INFOENCODING + COL, true, true).border(0, 0, 4, 0));
 
     final Prop prop = gui.context.prop;
     SerializerProp sp = null;
@@ -114,7 +114,7 @@ public final class DialogExport extends Dialog {
 
     // create buttons
     p = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel(" ").border(18, 0, 0, 0);
+    info = new BaseXLabel().border(18, 0, 0, 0);
     p.add(info, BorderLayout.WEST);
     buttons = okCancel(this);
     p.add(buttons, BorderLayout.EAST);
@@ -143,7 +143,6 @@ public final class DialogExport extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    out.setText(OUTDIR + COL);
     final IO io = IO.get(path());
     final boolean file = io instanceof IOFile;
     ok = !path().isEmpty() && file;

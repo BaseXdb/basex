@@ -172,7 +172,7 @@ final class FTTrie extends FTIndex {
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(TRIE + NL);
+    tb.add(INDEXSTRUC + TRIESTRUC + NL);
     tb.addExt("- %: %" + NL, CREATEST, AInfo.flag(data.meta.stemming));
     tb.addExt("- %: %" + NL, CREATECS, AInfo.flag(data.meta.casesens));
     tb.addExt("- %: %" + NL, CREATEDC, AInfo.flag(data.meta.diacritics));

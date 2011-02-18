@@ -30,7 +30,7 @@ public final class DialogAbout extends Dialog {
    * @param main reference to the main window
    */
   public DialogAbout(final GUI main) {
-    super(main, ABOUTTITLE, true);
+    super(main, ABOUTTITLE);
 
     BaseXBack p = new BaseXBack(new BorderLayout(12, 0));
     p.setBackground(Color.white);

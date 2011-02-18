@@ -207,9 +207,7 @@ public final class GUIInput extends BaseXTextField {
       pre = query.substring(0, qs.qm);
     } catch(final QueryException ex) {
       sl = ex.complete();
-      // [CG] Query Input fix
-      final boolean t = ex.col() == 1;
-      pre = query.substring(0, ex.col() - (t ? 1 : 0));
+      pre = query.substring(0, ex.col() - (ex.col() == 1 ? 1 : 0));
     }
     if(getCaretPosition() < pre.length()) sl = null;
     createCombo(sl);

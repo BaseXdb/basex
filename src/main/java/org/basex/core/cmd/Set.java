@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
-import org.basex.core.Command;
 import org.basex.util.Util;
 
 /**
@@ -11,7 +10,7 @@ import org.basex.util.Util;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Set extends Command {
+public final class Set extends AGet {
   /** Info strings (same order as options defined in {@link CmdSet}). */
   private static final String[] STRINGS = {
     INFOQUERY, INFODEBUG, INFOSERIALIZE, INFOCHOP, INFOENTITY, INFOTEXTINDEX,
@@ -24,8 +23,7 @@ public final class Set extends Command {
    * @param value value to set (optional, depending on the property)
    */
   public Set(final Object key, final Object value) {
-    super(STANDARD, (key instanceof Object[] ?
-        ((Object[]) key)[0] : key).toString(),
+    super((key instanceof Object[] ? ((Object[]) key)[0] : key).toString(),
         value == null ? null : value.toString());
   }
 
@@ -39,7 +37,7 @@ public final class Set extends Command {
 
     try {
       final Object type = prop.get(key);
-      if(type == null) return error(SETKEY, key);
+      if(type == null) return whichKey();
 
       if(type instanceof Boolean) {
         final boolean b = val == null ? !((Boolean) type).booleanValue() :

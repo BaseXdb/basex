@@ -48,11 +48,6 @@ public final class FSParser extends Progress {
     return fsi == null ? "" : fsi.getCurrentFileName();
   }
 
-  @Override
-  public double prog() {
-    return 0;
-  }
-
   /**
    * Used to stop the importer.
    * @author Bastian Lemke

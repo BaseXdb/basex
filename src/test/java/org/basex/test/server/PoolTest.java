@@ -80,6 +80,7 @@ public final class PoolTest {
     pins(1, NAME);
     ok(new Close(), session2);
     pins(0, NAME);
+    ok(new DropDB(NAME), session1);
   }
 
   /** Stops the server. */
@@ -107,11 +108,11 @@ public final class PoolTest {
   /**
    * Assumes that this command is successful.
    * @param cmd command reference
-   * @param s Session
+   * @param session Session
    */
-  void ok(final Command cmd, final Session s) {
+  void ok(final Command cmd, final Session session) {
     try {
-      s.execute(cmd);
+      session.execute(cmd);
     } catch(final BaseXException ex) {
       fail(ex.getMessage());
     }
@@ -120,11 +121,11 @@ public final class PoolTest {
   /**
    * Assumes that this command fails.
    * @param cmd command reference
-   * @param s Session
+   * @param session Session
    */
-  private void no(final Command cmd, final Session s) {
+  private void no(final Command cmd, final Session session) {
     try {
-      s.execute(cmd);
+      session.execute(cmd);
       fail("Command was supposed to fail.");
     } catch(final BaseXException ex) {
     }

@@ -158,6 +158,7 @@ final class DialogFT extends BaseXBack {
     scoring.setEnabled(ftx && check[F_SCORE].isSelected());
     swbrowse.setEnabled(ftx && check[F_STOP].isSelected());
     swpath.setEnabled(ftx && check[F_STOP].isSelected());
+
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);
     final boolean exists = !sw.isEmpty() && file.exists();

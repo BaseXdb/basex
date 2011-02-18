@@ -48,7 +48,7 @@ public final class LocalSession extends Session {
   @Override
   public void add(final String name, final String target,
       final InputStream input) throws BaseXException {
-    info = Add.add(name, target, input, ctx);
+    info = Add.add(name, target, input, ctx, null);
   }
 
   @Override

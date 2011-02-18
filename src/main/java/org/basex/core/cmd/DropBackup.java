@@ -29,7 +29,7 @@ public final class DropBackup extends Command {
   protected boolean run() {
     // name of database
     String db = args[0];
-    if(!checkName(db)) return error(NAMEINVALID, db);
+    if(!validName(db)) return error(NAMEINVALID, db);
     // drop backups
     if(!db.contains("-")) db += "-";
     drop(db, context);

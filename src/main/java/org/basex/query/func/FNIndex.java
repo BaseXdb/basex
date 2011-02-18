@@ -8,7 +8,9 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Expr.Use;
+import org.basex.query.item.QNm;
 import org.basex.util.Levenshtein;
+import org.basex.util.TokenBuilder;
 import org.basex.util.TokenSet;
 import org.basex.util.Util;
 
@@ -39,8 +41,8 @@ public final class FNIndex extends TokenSet {
     funcs = new FunDef[CAP];
     for(final FunDef def : FunDef.values()) {
       final String dsc = def.desc;
-      final byte[] key = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = add(key);
+      final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
+      final int i = add(fullName(def.uri, ln));
       if(i < 0) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
@@ -58,36 +60,51 @@ public final class FNIndex extends TokenSet {
   public Fun get(final byte[] name, final byte[] uri, final Expr[] args,
       final QueryParser qp) throws QueryException {
 
-    final int id = id(name);
-    if(id != 0) {
-      // create function
-      final FunDef fl = funcs[id];
-      if(!eq(fl.uri, uri)) return null;
+    final int id = id(fullName(uri, name));
+    if(id == 0) return null;
 
-      final Fun f = fl.get(qp.input(), args);
-      if(!qp.ctx.xquery30 && f.uses(Use.X11)) qp.error(FEATURE11);
-      // check number of arguments
-      if(args.length < fl.min || args.length > fl.max) qp.error(XPARGS, fl);
-      return f;
-    }
-    return null;
+    // create function
+    final FunDef fl = funcs[id];
+    if(!eq(fl.uri, uri)) return null;
+
+    final Fun f = fl.get(qp.input(), args);
+    if(!qp.ctx.xquery30 && f.uses(Use.X11)) qp.error(FEATURE11);
+    // check number of arguments
+    if(args.length < fl.min || args.length > fl.max) qp.error(XPARGS, fl);
+    return f;
   }
 
   /**
-   * Finds similar function names for throwing an error message.
+   * Throws an error if one of the pre-defined functions is similar to the
+   * specified function name.
    * @param name function name
    * @param qp query parser
    * @throws QueryException query exception
    */
-  public void error(final byte[] name, final QueryParser qp)
+  public void error(final QNm name, final QueryParser qp)
       throws QueryException {
 
-    // check similar predefined function
-    final byte[] nm = lc(name);
+    // compare specified name with names of predefined functions
+    final byte[] nm = name.ln();
     final Levenshtein ls = new Levenshtein();
     for(int k = 1; k < size; ++k) {
-      if(ls.similar(nm, lc(keys[k]), 0)) qp.error(FUNSIMILAR, name, keys[k]);
+      final byte[] ln = substring(keys[k], indexOf(keys[k], '}') + 1);
+      if(eq(nm, ln)) {
+        qp.error(FUNSIMILAR, name, keys[k]);
+      } else if(ls.similar(nm, ln, 0)) {
+        qp.error(FUNSIMILAR, name, ln);
+      }
     }
+  }
+
+  /**
+   * Returns the full function name.
+   * @param uri namespace uri
+   * @param ln local name
+   * @return full name
+   */
+  private byte[] fullName(final byte[] uri, final byte[] ln) {
+    return new TokenBuilder().add('{').add(uri).add('}').add(ln).finish();
   }
 
   @Override

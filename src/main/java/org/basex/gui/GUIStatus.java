@@ -2,13 +2,10 @@ package org.basex.gui;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
+import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXMem;
 import org.basex.gui.layout.BaseXPanel;
-import org.basex.util.Token;
 
 /**
  * This is the status bar of the main window. It displays progress information
@@ -20,10 +17,8 @@ import org.basex.util.Token;
 public final class GUIStatus extends BaseXPanel {
   /** Memory usage. */
   private final BaseXMem mem;
-  /** Current status text. */
-  private String status = OK;
-  /** Current path. */
-  private String oldStatus = OK;
+  /** Status text. */
+  private final BaseXLabel label;
 
   /**
    * Constructor.
@@ -36,43 +31,26 @@ public final class GUIStatus extends BaseXPanel {
     addMouseMotionListener(this);
 
     layout(new BorderLayout());
+    label = new BaseXLabel(OK).border(0, 6, 0, 0);
+    add(label, BorderLayout.WEST);
     mem = new BaseXMem(main, true);
     add(mem, BorderLayout.EAST);
   }
 
   /**
    * Sets the status text.
-   * @param stat the text to be set
+   * @param txt the text to be set
    */
-  void setText(final String stat) {
-    refresh(stat);
-  }
-
-  /**
-   * Refreshes the status text.
-   * @param txt status text
-   */
-  private void refresh(final String txt) {
-    status = txt;
-    oldStatus = status;
+  public void setText(final String txt) {
+    label.setText(txt);
     repaint();
   }
 
-  /**
-   * Sets the current path.
-   * @param path the path to be set
-   */
-  public void setPath(final byte[] path) {
-    status = path.length == 0 ? oldStatus : Token.string(path);
-    repaint();
-  }
-
-  @Override
+  /*@Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
     // chop and print status text
-    g.setColor(Color.black);
     final FontMetrics fm = g.getFontMetrics();
     int fw = getWidth() - mem.getWidth() - 30;
     final StringBuilder sb = new StringBuilder(status);
@@ -85,5 +63,5 @@ public final class GUIStatus extends BaseXPanel {
       sb.append(DOTS);
     }
     g.drawString(sb.toString(), 4, getFont().getSize());
-  }
+  }*/
 }

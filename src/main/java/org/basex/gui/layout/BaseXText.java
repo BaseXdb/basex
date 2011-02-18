@@ -287,7 +287,7 @@ public class BaseXText extends BaseXPanel {
   @Override
   public final void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
-    if(!isEnabled()) return;
+    if(!isEnabled() || !isFocusable()) return;
 
     requestFocusInWindow();
     cursor(true);
@@ -739,7 +739,7 @@ public class BaseXText extends BaseXPanel {
       button.setEnabled(!undo.first());
     }
     @Override
-    public String desc() {
+    public String label() {
       return GUIUNDO;
     }
   }
@@ -756,7 +756,7 @@ public class BaseXText extends BaseXPanel {
       button.setEnabled(!undo.last());
     }
     @Override
-    public String desc() {
+    public String label() {
       return GUIREDO;
     }
   }
@@ -773,7 +773,7 @@ public class BaseXText extends BaseXPanel {
       button.setEnabled(text.start() != -1);
     }
     @Override
-    public String desc() {
+    public String label() {
       return GUICUT;
     }
   }
@@ -789,7 +789,7 @@ public class BaseXText extends BaseXPanel {
       button.setEnabled(text.start() != -1);
     }
     @Override
-    public String desc() {
+    public String label() {
       return GUICOPY;
     }
   }
@@ -806,7 +806,7 @@ public class BaseXText extends BaseXPanel {
       button.setEnabled(clip() != null);
     }
     @Override
-    public String desc() {
+    public String label() {
       return GUIPASTE;
     }
   }
@@ -823,7 +823,7 @@ public class BaseXText extends BaseXPanel {
       button.setEnabled(text.start() != -1);
     }
     @Override
-    public String desc() {
+    public String label() {
       return GUIDELETE;
     }
   }
@@ -838,7 +838,7 @@ public class BaseXText extends BaseXPanel {
     public void refresh(final GUI main, final AbstractButton button) {
     }
     @Override
-    public String desc() {
+    public String label() {
       return GUIALL;
     }
   }

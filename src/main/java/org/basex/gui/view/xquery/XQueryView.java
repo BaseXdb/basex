@@ -27,6 +27,7 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
 
@@ -47,6 +48,8 @@ public final class XQueryView extends View {
   final XQueryText text;
   /** Modified flag. */
   boolean modified;
+  /** Thread counter. */
+  int threadID;
 
   /** Header string. */
   final BaseXLabel header;
@@ -77,14 +80,15 @@ public final class XQueryView extends View {
     saveB.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu popup = new JPopupMenu();
-        final JMenuItem save = GUIMenu.newItem(GUICommands.XQSAVE, gui);
-        final JMenuItem saveAs = GUIMenu.newItem(GUICommands.XQSAVEAS, gui);
-        GUICommands.XQSAVE.refresh(gui, save);
-        GUICommands.XQSAVEAS.refresh(gui, saveAs);
-        popup.add(save);
-        popup.add(saveAs);
-        popup.show(saveB, 0, saveB.getHeight());
+        final JPopupMenu pop = new JPopupMenu();
+        final StringBuilder mnem = new StringBuilder();
+        final JMenuItem sa = GUIMenu.newItem(GUICommands.XQSAVE, gui, mnem);
+        final JMenuItem sas = GUIMenu.newItem(GUICommands.XQSAVEAS, gui, mnem);
+        GUICommands.XQSAVE.refresh(gui, sa);
+        GUICommands.XQSAVEAS.refresh(gui, sas);
+        pop.add(sa);
+        pop.add(sas);
+        pop.show(saveB, 0, saveB.getHeight());
       }
     });
     final BaseXTextField find = new BaseXTextField(gui);
@@ -173,6 +177,7 @@ public final class XQueryView extends View {
       @Override
      public void actionPerformed(final ActionEvent e) {
         stop.setEnabled(false);
+        info.setText(OK, Msg.SUCCESS);
         gui.stop();
       }
     });
@@ -271,11 +276,37 @@ public final class XQueryView extends View {
   }
 
   /**
-   * Handles info messages resulting from a query execution.
+   * Initializes the info message.
+   */
+  public void reset() {
+    ++threadID;
+    info.setName(null);
+    info.setToolTipText(null);
+    info.setText(OK, Msg.SUCCESS);
+    stop.setEnabled(false);
+  }
+
+  /**
+   * Displays a waiting status.
+   */
+  public void waitInfo() {
+    final int thread = ++threadID;
+    new Thread() {
+      @Override
+      public void run() {
+        Performance.sleep(200);
+        if(thread == threadID) info.setText(INFOWAIT, Msg.SUCCESS);
+      }
+    }.start();
+  }
+
+  /**
+   * Evaluates the info message resulting from a query execution.
    * @param inf info message
    * @param ok true if query was successful
    */
   public void info(final String inf, final boolean ok) {
+    ++threadID;
     final int error = text.error(inf, ok);
     info.setName(error != -1 ? Integer.toString(error) : null);
     info.setCursor(error !=  -1 ?

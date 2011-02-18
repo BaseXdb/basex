@@ -30,13 +30,17 @@ public final class Util {
    * @param ext optional extension
    * @return dummy object
    */
-  public static String bug(final Object... ext) {
+  public static String bug(final String[] ext) {
     final TokenBuilder tb = new TokenBuilder(
-        "Possible bug? Feedback is welcome: " + MAIL);
-    if(ext.length != 0) {
-      tb.add(NL + NAME + ' ' + VERSION + COLS + NL);
-      for(final Object e : ext) tb.add(e + NL);
-    }
+        "Possible bug? Your feedback is welcome:");
+    tb.add(NL).add("Contact: ").add(MAIL);
+    tb.add(NL).add("Version: ").add(NAME).add(' ').add(VERSION);
+    tb.add(NL).add("Java: ").add(System.getProperty("java.vendor"));
+    tb.add(", ").add(System.getProperty("java.version"));
+    tb.add(NL).add("OS: ").add(System.getProperty("os.name"));
+    tb.add(", ").add(System.getProperty("os.arch"));
+    tb.add(NL).add("Stack Trace: ");
+    for(final String e : ext) tb.add(NL).add(e);
     return tb.toString();
   }
 
@@ -46,7 +50,9 @@ public final class Util {
    * @return dummy object
    */
   public static Object notexpected(final Object... ext) {
-    throw new RuntimeException(bug(ext));
+    final TokenBuilder tb = new TokenBuilder("Not expected");
+    if(ext.length != 0) tb.addExt(" (%)", ext);
+    throw new RuntimeException(tb.add('.').toString());
   }
 
   /**
@@ -201,10 +207,20 @@ public final class Util {
    * @param th error/exception instance
    */
   public static void stack(final Throwable th) {
-    final String u = Util.class.getName();
-    for(final StackTraceElement s : th.getStackTrace()) {
-      if(!s.getClassName().equals(u)) errln("  " + s);
-    }
+    for(final String s : toArray(th)) errln(s);
+  }
+
+  /**
+   * Returns an string array representation of the specified throwable.
+   * @param th throwable
+   * @return string array
+   */
+  public static String[] toArray(final Throwable th) {
+    final StackTraceElement[] st = th.getStackTrace();
+    final String[] obj = new String[st.length + 1];
+    obj[0] = th.toString();
+    for(int i = 0; i < st.length; i++) obj[i + 1] = "  " + st[i];
+    return obj;
   }
 
   /**
@@ -219,7 +235,7 @@ public final class Util {
 
     // not found; check application directory
     final File f = new File(applicationPath());
-    String home = f.isFile() ? f.getPath() : f.getParent();
+    final String home = f.isFile() ? f.getPath() : f.getParent();
     if(new File(home, IO.BASEXSUFFIX).exists()) return home;
 
     // not found; choose user home directory
@@ -232,7 +248,7 @@ public final class Util {
    */
   public static String applicationPath() {
     // raw application path
-    String path = Util.class.getProtectionDomain().
+    final String path = Util.class.getProtectionDomain().
       getCodeSource().getLocation().getPath();
 
     // decode path; URLDecode returns wrong results
