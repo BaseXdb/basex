@@ -28,7 +28,7 @@ public final class AddExample {
 
       try {
         // create empty database
-        session.execute("create db testdb");
+        session.execute("create db database");
         System.out.println(session.info());
 
         // define input stream
@@ -48,10 +48,10 @@ public final class AddExample {
 
         // run query on database
         System.out.println();
-        System.out.println(session.execute("xquery collection('testdb')"));
+        System.out.println(session.execute("xquery collection('database')"));
 
         // drop database
-        session.execute("drop db testdb");
+        session.execute("drop db database");
 
       } catch(IOException ex) {
         // print exception

@@ -68,6 +68,25 @@ Module BaseXClient
         Throw New IOException(m_info)
       End If
     End Sub
+    
+        ' see readme.txt
+    Public Sub Create(name As String, target As String, ms As Stream)
+      stream.WriteByte(9)
+      Send(name)
+      Send(target)
+      While True:
+      	Dim t As Integer = ms.ReadByte()
+      	If t = -1 Then
+      		Exit While
+      	End If
+      	stream.WriteByte(Convert.ToByte(t))
+      End While
+      stream.WriteByte(0)
+      m_info = Receive()
+      If Not Ok() Then
+        Throw New IOException(m_info)
+      End If
+    End Sub
 
     ' see readme.txt
     Public Function Query(q As String) As Query

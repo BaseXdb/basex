@@ -23,10 +23,10 @@ class Session {
 
     // send username and hashed password/timestamp
     $md5 = hash("md5", hash("md5", $pw).$ts);
-    socket_write($this->socket, "$user\0$md5\0");
+    socket_write($this->socket, $user.chr(0).$md5.chr(0));
 
     // receives success flag
-    if(socket_read($this->socket, 1) != "\0") {
+    if(socket_read($this->socket, 1) != chr(0)) {
       throw new Exception("Access denied.");
     }
   }
@@ -34,7 +34,7 @@ class Session {
   /* see readme.txt */
   public function execute($com) {
     // send command to server
-    socket_write($this->socket, "$com\0");
+    socket_write($this->socket, $com.chr(0));
 
     // receive result
     $result = $this->receive();
@@ -44,6 +44,29 @@ class Session {
     }
     return $result;
   }
+  
+  /* Returns the query object.*/
+  public function query($q) {
+    return new Query($this, $q);
+  }
+  
+  /* see readme.txt */
+  public function create($name, $input) {
+    socket_write($this->socket, chr(8).$name.chr(0).$input.chr(0));
+    $this->info = $this->receive();
+    if($this->ok() != True) {
+      throw new Exception($this->info);
+    }
+  }
+  
+  /* see readme.txt */
+  public function add($name, $target, $input) {
+    socket_write($this->socket, chr(9).$name.chr(0).$target.chr(0).$input.chr(0));
+    $this->info = $this->receive();
+    if($this->ok() != True) {
+      throw new Exception($this->info);
+    }
+  }
 
   /* see readme.txt */
   public function info() {
@@ -52,7 +75,7 @@ class Session {
 
   /* see readme.txt */
   public function close() {
-    socket_write($this->socket, "exit\0");
+    socket_write($this->socket, "exit".chr(0));
     socket_close($this->socket);
   }
 
@@ -65,7 +88,7 @@ class Session {
   /* Receives a string from the socket. */
   public function readString() {
     $com = "";
-    while(($d = $this->read()) != "\0") {
+    while(($d = $this->read()) != chr(0)) {
       $com .= $d;
     }
     return $com;
@@ -80,19 +103,14 @@ class Session {
     return $this->buffer[$this->bpos++];
   }
   
-  /* Returns the query object.*/
-  public function query($q) {
-    return new Query($this, $q);
-  }
-  
   /* Sends the str. */
   public function send($str) {
-    socket_write($this->socket, "$str\0");
+    socket_write($this->socket, $str.chr(0));
   }
   
   /* Returns success check. */
   public function ok() {
-    return $this->read() == "\0";
+    return $this->read() == chr(0);
   }
   
   /* Returns the result. */
@@ -109,22 +127,22 @@ class Query {
   /* see readme.txt */
   function __construct($s, $q) {
     $this->session = $s;
-    $this->id = $this->exec("\0", $q);
+    $this->id = $this->exec(chr(0), $q);
   }
   
   /* see readme.txt */
   function init() {
-    return $this->exec("\4", $this->id);
+    return $this->exec(chr(4), $this->id);
   }
   
   /* see readme.txt */
   function bind($name, $value) {
-    $this->exec("\3", "$this->id\0$name\0$value\0");
+    $this->exec(chr(3), $this->id.chr(0).$name.chr(0).$value.chr(0));
   }
 
   /* see readme.txt */
   public function more() {
-    $this->next = $this->exec("\1", $this->id);
+    $this->next = $this->exec(chr(1), $this->id);
     return strlen($this->next) > 0; 
   }
 
@@ -135,22 +153,22 @@ class Query {
   
   /* see readme.txt */
   public function execute() {
-    return $this->exec("\5", $this->id);
+    return $this->exec(chr(5), $this->id);
   }
   
   /* see readme.txt */
   public function info() {
-    return $this->exec("\6", $this->id);
+    return $this->exec(chr(6), $this->id);
   }
   
   /* see readme.txt */
   public function close() {
-  	return $this->exec("\2", $this->id);   
+  	return $this->exec(chr(2), $this->id);   
   }
   
   /* see readme.txt */
   public function exec($cmd, $arg) {
-  	$this->session->send("$cmd$arg");
+  	$this->session->send($cmd.$arg);
   	$s = $this->session->receive();
   	if($this->session->ok() != True) {
   	  throw new Exception($this->session->readString());

@@ -21,7 +21,7 @@ try {
 
     // loop through all results
     while($query->more()) {
-      print $query->next()."\n";
+      print $query->next()."<br/>";
     }
 
     // close query instance

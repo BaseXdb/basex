@@ -82,6 +82,26 @@ namespace BaseXClient
         throw new IOException(info);
       }
     }
+    
+    /** see readme.txt */
+    public void Add(string name, string target, Stream s)
+    {
+      stream.WriteByte(9);
+      Send(name);
+      Send(target);
+      while (true)
+      {
+      	int t = s.ReadByte();
+      	if (t == -1) break;
+      	stream.WriteByte(Convert.ToByte(t));
+      }
+      stream.WriteByte(0);
+      info = Receive();
+      if(!Ok())
+      {
+        throw new IOException(info);
+      }
+    }
 
     /** see readme.txt */
     public string Info

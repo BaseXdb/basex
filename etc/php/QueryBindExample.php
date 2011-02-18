@@ -13,19 +13,18 @@ try {
   
   try {
     // create query instance
-    $input = 'declare variable $name external; '.
-      'for $i in 1 to 10 return element { $name } { $i }';
+    $input = "declare variable \$name external; for \$i in 1 to 10 return element { \$name } { \$i }";
     $query = $session->query($input);
 
     // bind variable
-    $query->bind("$name", "number");
+    $query->bind("\$name", "number");
 
     // initialize query
     print $query->init();
 
     // loop through all results
     while($query->more()) {
-      print $query->next()."\n";
+      print htmlspecialchars($query->next())."<br/>";
     }
 
     // close query instance

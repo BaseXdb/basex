@@ -49,8 +49,15 @@ class Session():
         return Query(self, q)
     
     # see readme.txt
-    def add(self, name, target, content):
-        self.__s.send(chr(9) + name + chr(0) + target + chr(0) + content + chr(0))
+    def add(self, name, target, input):
+        self.__s.send(chr(9) + name + chr(0) + target + chr(0) + input + chr(0))
+        self.__info = self.readString()
+        if not self.ok():
+            raise IOError(self.info())
+            
+    # see readme.txt
+    def create(self, name, input):
+        self.__s.send(chr(8) + name + chr(0) + input + chr(0))
         self.__info = self.readString()
         if not self.ok():
             raise IOError(self.info())
@@ -119,6 +126,7 @@ class Session():
     def receive(self):
         self.init()
         return self.readString()
+   
    
 class Query():
     # see readme.txt
