@@ -1,6 +1,5 @@
 package org.basex.server;
 
-import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,13 +24,15 @@ public final class Log {
   /** Time format. */
   private static final SimpleDateFormat TIME =
     new SimpleDateFormat("HH:mm:ss.SSS");
+
   /** Quiet flag. */
   private final boolean quiet;
   /** Logging directory. */
   private final String dir;
+
   /** Start date of log. */
-  private Date start;
-  /** File writer. */
+  private String start;
+  /** Output stream. */
   private FileOutputStream fos;
 
   /**
@@ -42,31 +43,34 @@ public final class Log {
   public Log(final Context ctx, final boolean q) {
     dir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
     quiet = q;
-    if(quiet) return;
-
-    create(new Date());
-    write(SERVERSTART);
+    if(!q) create(new Date());
   }
 
   /**
-   * Writes into the log file.
+   * Writes an entry to the log file.
    * @param str strings to be written
    */
   public synchronized void write(final Object... str) {
     if(quiet) return;
 
+    // check if current log file is still up-to-date
     final Date now = new Date();
-    if(!DATE.format(start).equals(DATE.format(now))) {
+    if(!start.equals(DATE.format(now))) {
       close();
       create(now);
     }
+
+    // construct log text
+    final TokenBuilder tb = new TokenBuilder(TIME.format(now));
+    for(final Object s : str) {
+      tb.add('\t');
+      tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), 128));
+    }
+    tb.add(Prop.NL);
+
+    // write text and flush log file
     try {
-      final TokenBuilder tb = new TokenBuilder(TIME.format(now));
-      for(final Object s : str) {
-        tb.add('\t');
-        tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), 128));
-      }
-      fos.write(tb.add(NL).finish());
+      fos.write(tb.finish());
       fos.flush();
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -75,14 +79,13 @@ public final class Log {
 
   /**
    * Creates a log file.
-   * @param d Date
+   * @param d date, used for file name
    */
   private synchronized void create(final Date d) {
     new File(dir).mkdirs();
-    final String file = dir + DATE.format(d) + ".log";
-    start = d;
+    start = DATE.format(d);
     try {
-      fos = new FileOutputStream(file, true);
+      fos = new FileOutputStream(dir + start + ".log", true);
     } catch(final IOException ex) {
       Util.stack(ex);
     }
