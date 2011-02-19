@@ -1022,7 +1022,7 @@ final class XMLScanner extends Progress {
 
   @Override
   public String det() {
-    return Util.info(SCANPOS, input.io().name(), input.line());
+    return Util.info(SCANPOS, input.io(), input.line());
   }
 
   @Override

@@ -86,7 +86,7 @@ public final class DirParser extends Parser {
           if(path.startsWith(root)) path = path.substring(root.length());
           targ = (targ + path).replace("//", "/");
         }
-        parser = Parser.fileParser(file, prop, targ);
+        parser = Parser.fileParser(io, prop, targ);
         parser.parse(b);
 
         if(Util.debug && (++c & 0x3FF) == 0) Util.error(";");

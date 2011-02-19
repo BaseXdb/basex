@@ -106,7 +106,13 @@ public final class SAXWrapper extends FileParser {
     } catch(final ProgressException ex) {
       throw ex;
     } catch(final Exception ex) {
-      final IOException ioe = new IOException(ex.getMessage());
+      // occurs, e.g. if document encoding is invalid:
+      // prefix message with source id
+      final String id = source.getSystemId();
+      String msg = ex.getMessage();
+      if(id != null) msg = "\"" + id + "\": " + msg;
+      // wrap and return original message
+      final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
     }

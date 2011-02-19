@@ -142,10 +142,8 @@ public class XMLParser extends FileParser {
    * @throws IOException I/O exception
    */
   private byte[] consumeToken(final Type t) throws IOException {
-    if(scanner.type != t) {
-      throw new BuildException(PARSEINVALID, det(), t.string,
-          scanner.type.string);
-    }
+    if(scanner.type != t) throw new BuildException(PARSEINVALID, det(),
+        t.string, scanner.type.string);
     final byte[] tok = scanner.token.finish();
     scanner.more();
     return tok;
