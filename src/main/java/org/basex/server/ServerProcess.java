@@ -12,6 +12,7 @@ import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
+import org.basex.core.Commands.CmdCreate;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -93,7 +94,7 @@ public final class ServerProcess extends Thread {
         start();
       } else if(!us.isEmpty()) {
         // log failed login and delay feedback
-        log.write(this, "LOGIN " + us, "failed");
+        log.write(this, SERVERLOGIN + ": " + us);
         Performance.sleep(2000);
       }
       // send {OK}
@@ -165,6 +166,9 @@ public final class ServerProcess extends Thread {
         // start timeout
         cmd.startTimeout(context.prop.num(Prop.TIMEOUT));
 
+        final String c = cmd.toString().replace('\r', ' ').replace('\n', ' ');
+        log.write(this, c);
+
         // execute command and send {RESULT}
         boolean ok = true;
         String info = null;
@@ -186,8 +190,7 @@ public final class ServerProcess extends Thread {
         // send {OK}
         send(ok);
 
-        final String c = cmd.toString().replace('\r', ' ').replace('\n', ' ');
-        log.write(this, c, ok ? OK : INFOERROR + info, perf);
+        log.write(this, ok ? OK : INFOERROR + info, perf);
       }
       if(!running) log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final IOException ex) {
@@ -202,8 +205,13 @@ public final class ServerProcess extends Thread {
    * @throws IOException I/O exception
    */
   private void create() throws IOException {
+    final Performance perf = new Performance();
+    final String name = in.readString();
+    final String str = ServerCmd.CREATE + " " +
+      CmdCreate.DATABASE + " " + name + " [...]";
+    log.write(this, str);
+
     try {
-      final String name = in.readString();
       final WrapInputStream is = new WrapInputStream(in);
       final String info = is.curr() == -1 ?
           CreateDB.xml(name, Parser.emptyParser(name), context) :
@@ -211,10 +219,12 @@ public final class ServerProcess extends Thread {
       // send {MSG}0 and 0 as success flag
       out.writeString(info);
       out.write(0);
+      log.write(this, OK, perf);
     } catch(final BaseXException ex) {
       // send {MSG}0 and 1 as error flag
       out.writeString(ex.getMessage());
       out.write(1);
+      log.write(this, INFOERROR + ex.getMessage(), perf);
     }
     out.flush();
   }
@@ -224,18 +234,27 @@ public final class ServerProcess extends Thread {
    * @throws IOException I/O exception
    */
   private void add() throws IOException {
+    final Performance perf = new Performance();
+    final String name = in.readString();
+    final String path = in.readString();
+    final StringBuilder sb = new StringBuilder(ServerCmd.ADD + " ");
+    if(!name.isEmpty()) sb.append(AS + ' ' + name + ' ');
+    if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
+    final String str = sb.append("[...]").toString();
+    log.write(this, str);
+
     try {
-      final String name = in.readString();
-      final String path = in.readString();
       final WrapInputStream is = new WrapInputStream(in);
       final String info = Add.add(name, path, is, context, null);
       // send {MSG}0 and 0 as success flag
       out.writeString(info);
       out.write(0);
+      log.write(this, OK, perf);
     } catch(final BaseXException ex) {
       // send {MSG}0 and 1 as error flag
       out.writeString(ex.getMessage());
       out.write(1);
+      log.write(this, INFOERROR + ex.getMessage(), perf);
     }
     out.flush();
   }
@@ -259,6 +278,8 @@ public final class ServerProcess extends Thread {
         queries.put(arg, qp);
         // send {ID}0
         out.writeString(arg);
+
+        // write log file
         log.write(this, sc + "(" + arg + ")", query, OK);
       } else {
         // find query process

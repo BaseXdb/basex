@@ -69,6 +69,7 @@ public class BaseXServer extends Main implements Runnable {
     }
 
     log = new Log(context, quiet);
+    log.write(SERVERSTART);
     stop = stopFile(port);
 
     try {

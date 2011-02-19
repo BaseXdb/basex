@@ -340,7 +340,10 @@ public class BaseXText extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    if(modifier(e)) return;
+    final char c = e.getKeyChar();
+    // ignore single modifier keys and printable characters
+    if(modifier(e) || !Character.isISOControl(c) && Character.isDefined(c))
+      return;
 
     // operations that change the focus are put first..
     if(PREVTAB.is(e)) {

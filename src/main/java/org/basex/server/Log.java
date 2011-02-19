@@ -1,15 +1,14 @@
 package org.basex.server;
 
-import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -25,14 +24,16 @@ public final class Log {
   /** Time format. */
   private static final SimpleDateFormat TIME =
     new SimpleDateFormat("HH:mm:ss.SSS");
+
   /** Quiet flag. */
   private final boolean quiet;
   /** Logging directory. */
   private final String dir;
+
   /** Start date of log. */
-  private Date start;
-  /** File writer. */
-  private OutputStreamWriter fw;
+  private String start;
+  /** Output stream. */
+  private FileOutputStream fos;
 
   /**
    * Constructor.
@@ -42,32 +43,35 @@ public final class Log {
   public Log(final Context ctx, final boolean q) {
     dir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
     quiet = q;
-    if(quiet) return;
-
-    create(new Date());
-    write(SERVERSTART);
+    if(!q) create(new Date());
   }
 
   /**
-   * Writes into the log file.
+   * Writes an entry to the log file.
    * @param str strings to be written
    */
   public synchronized void write(final Object... str) {
     if(quiet) return;
 
+    // check if current log file is still up-to-date
     final Date now = new Date();
-    if(!DATE.format(start).equals(DATE.format(now))) {
+    if(!start.equals(DATE.format(now))) {
       close();
       create(now);
     }
+
+    // construct log text
+    final TokenBuilder tb = new TokenBuilder(TIME.format(now));
+    for(final Object s : str) {
+      tb.add('\t');
+      tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), 128));
+    }
+    tb.add(Prop.NL);
+
+    // write text and flush log file
     try {
-      final StringBuilder sb = new StringBuilder(TIME.format(now));
-      for(final Object s : str) {
-        final String l = s.toString().replaceAll("\\r?\\n", " ");
-        sb.append("\t" + (l.length() > 128 ? l.substring(0, 125) + "..." : l));
-      }
-      fw.write(sb.append(NL).toString());
-      fw.flush();
+      fos.write(tb.finish());
+      fos.flush();
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -75,15 +79,13 @@ public final class Log {
 
   /**
    * Creates a log file.
-   * @param d Date
+   * @param d date, used for file name
    */
   private synchronized void create(final Date d) {
     new File(dir).mkdirs();
-    final String file = dir + DATE.format(d) + ".log";
-    start = d;
+    start = DATE.format(d);
     try {
-      fw = new OutputStreamWriter(
-          new FileOutputStream(file, true), Token.UTF8);
+      fos = new FileOutputStream(dir + start + ".log", true);
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -95,7 +97,7 @@ public final class Log {
   public synchronized void close() {
     if(quiet) return;
     try {
-      fw.close();
+      fos.close();
     } catch(final IOException ex) {
       Util.stack(ex);
     }

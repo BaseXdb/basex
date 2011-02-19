@@ -127,7 +127,6 @@ public final class Restore extends Command {
     return list;
   }
 
-
   @Override
   protected String tit() {
     return BUTTONRESTORE;
