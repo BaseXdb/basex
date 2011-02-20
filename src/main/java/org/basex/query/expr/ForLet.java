@@ -49,9 +49,10 @@ public abstract class ForLet extends Single {
   /**
    * Checks if the clause contains a simple variable declaration, using
    * no scoring and no positioning.
+   * @param one clause returns only one item
    * @return result of check
    */
-  abstract boolean simple();
+  abstract boolean simple(final boolean one);
 
   /**
    * Checks if the clause will shadow the specified variable.
