@@ -119,7 +119,8 @@ public final class Add extends ACreate {
     if(data == null) return PROCNODB;
 
     String trg = path(target);
-    if(!trg.isEmpty()) trg = trg + "/";
+    if(!trg.isEmpty()) trg = trg + '/';
+
     final BufferedInputStream is = new BufferedInputStream(input);
     final SAXSource sax = new SAXSource(new InputSource(is));
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
