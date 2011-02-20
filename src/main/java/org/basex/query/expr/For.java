@@ -56,17 +56,14 @@ public final class For extends ForLet {
   public For comp(final QueryContext ctx) throws QueryException {
     expr = checkUp(expr, ctx).comp(ctx);
     type = expr.type();
+    size = expr.size();
+    var.ret = ctx.grouping ? SeqType.get(type.type, SeqType.Occ.ZM) :
+      type.type.seq();
 
-    // bind variable or set return type
-    //if(pos != null || score != null || !type.one() || !bind(ctx)) {
-      var.ret = ctx.grouping ? SeqType.get(type.type, SeqType.Occ.ZM) :
-        type.type.seq();
-    //}
     ctx.vars.add(var);
     if(pos   != null) ctx.vars.add(pos);
     if(score != null) ctx.vars.add(score);
 
-    size = expr.size();
     return this;
   }
 
