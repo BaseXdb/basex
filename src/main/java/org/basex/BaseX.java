@@ -78,7 +78,7 @@ public class BaseX extends Main {
         execute(commands);
       } else {
         // enter interactive mode
-        Util.outln(CONSOLE, sa() ? LOCALMODE : CLIENTMODE, CONSOLE2);
+        Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
         u = console();
       }
       if(writeProps) context.prop.write();
@@ -127,7 +127,8 @@ public class BaseX extends Main {
     String serial = "";
     String bind = "";
     try {
-      final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO);
+      final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO,
+          Util.info(CONSOLE, sa() ? LOCALMODE : CLIENTMODE));
       while(arg.more()) {
         if(arg.dash()) {
           final char c = arg.next();
