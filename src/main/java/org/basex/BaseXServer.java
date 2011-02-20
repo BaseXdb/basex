@@ -1,6 +1,7 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -88,7 +89,7 @@ public class BaseXServer extends Main implements Runnable {
       new Thread(this).start();
       while(!running) Performance.sleep(100);
 
-      Util.outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
+      Util.outln(CONSOLE + (console ? CONSOLE2 : SERVERSTART), SERVERMODE);
 
       // execute command-line arguments
       if(commands != null) execute(commands);
@@ -155,7 +156,8 @@ public class BaseXServer extends Main implements Runnable {
 
   @Override
   protected boolean parseArguments(final String[] args) {
-    final Args arg = new Args(args, this, SERVERINFO);
+    final Args arg = new Args(args, this, SERVERINFO,
+        Util.info(CONSOLE, SERVERMODE));
     boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {

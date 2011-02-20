@@ -24,15 +24,15 @@ public class XMLParser extends FileParser {
    * Creates a new XMLParser instance for collection creation.
    * The length of the rootPath is passed in to correctly chop
    * the relative path inside the collection.
-   * @param f file reference
+   * @param io parser input
    * @param tar target for collection adding
    * @param pr database properties
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO f, final String tar, final Prop pr)
+  public XMLParser(final IO io, final String tar, final Prop pr)
       throws IOException {
-    super(f, tar);
-    scanner = new XMLScanner(f, pr);
+    super(io, tar);
+    scanner = new XMLScanner(io, pr);
   }
 
   @Override

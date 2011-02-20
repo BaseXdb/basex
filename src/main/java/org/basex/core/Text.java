@@ -54,7 +54,7 @@ public interface Text {
   // CONSOLE INFO =============================================================
 
   /** Console text. */
-  String CONSOLE = TITLE + " [%]" + NL + "%";
+  String CONSOLE = TITLE + " [%]" + NL;
   /** Console text. */
   String CONSOLE2 = lang("help_intro", "help") + NL;
 
@@ -83,7 +83,7 @@ public interface Text {
 
   /** Client mode. */
   String CLIENTMODE = "Client";
-  /** Start information. */
+  /** Client start information. */
   String CLIENTINFO =
     " [-npPU] [-dosvVwz] [-cq] [file]" + NL +
     "  [file]     Execute XQuery file" + NL +
@@ -103,7 +103,7 @@ public interface Text {
 
   /** Server mode. */
   String SERVERMODE = "Server";
-  /** Start information. */
+  /** Server start information. */
   String SERVERINFO =
     " [-dpsz] [-c] [stop]" + NL +
     "  stop     Stop existing server" + NL +
@@ -113,6 +113,13 @@ public interface Text {
     "  -p<num>  Set server port" + NL +
     "  -s       Start as service" + NL +
     "  -z       Suppress logging";
+
+  /** GUI mode. */
+  String GUIMODE = "GUI";
+  /** GUI start information. */
+  String GUIINFO =
+    " [file]" + NL +
+    "  [file]  Open specified XML or XQuery file";
 
   /** Start information. */
   String JAXRXINFO =
@@ -803,9 +810,9 @@ public interface Text {
   /** Command info. */
   String GUIMOUNTFSTT = lang("c_mountfstt") + DOT;
   /** Command info. */
-  String GUIINFO = lang("c_props");
+  String GUIPROPS = lang("c_props");
   /** Command info. */
-  String GUIINFOTT = lang("c_propstt");
+  String GUIPROPSTT = lang("c_propstt");
   /** Command info. */
   String GUIADD = lang("c_add");
   /** Command info. */
