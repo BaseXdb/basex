@@ -8,8 +8,8 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
+import org.basex.query.item.SimpleType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
@@ -54,7 +54,7 @@ final class FNAcc extends Fun {
       case URIQNAME:
         it = e.item(ctx, input);
         if(it == null) return null;
-        final QNm qn = (QNm) checkType(it, Type.QNM);
+        final QNm qn = (QNm) checkType(it, SimpleType.QNM);
         return qn.hasUri() ? qn.uri() :
           Uri.uri(ctx.ns.uri(qn.pref(), true, ii));
       default:
@@ -76,7 +76,7 @@ final class FNAcc extends Fun {
     if(it == null || ir.next() != null) return Dbl.NAN;
 
     try {
-      return it.type == Type.DBL ? it : Type.DBL.e(it, ctx, input);
+      return it.type == SimpleType.DBL ? it : SimpleType.DBL.e(it, ctx, input);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     }

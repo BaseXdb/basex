@@ -9,7 +9,7 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Type;
+import org.basex.query.item.SimpleType;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
@@ -76,13 +76,16 @@ public final class FNNum extends Fun {
     final double d = it.dbl(ii);
     final boolean s = d > 0d || 1 / d > 0;
 
-    switch(it.type) {
-      case DBL: return s ? it : Dbl.get(Math.abs(it.dbl(ii)));
-      case FLT: return s ? it : Flt.get(Math.abs(it.flt(ii)));
-      case DEC: return s ? it : Dec.get(it.dec(ii).abs());
-      case ITR: return s ? it : Itr.get(Math.abs(it.itr(ii)));
-      default:  return Itr.get(Math.abs(it.itr(ii)));
+    if(it.type instanceof SimpleType) {
+      switch((SimpleType) it.type) {
+        case DBL: return s ? it : Dbl.get(Math.abs(it.dbl(ii)));
+        case FLT: return s ? it : Flt.get(Math.abs(it.flt(ii)));
+        case DEC: return s ? it : Dec.get(it.dec(ii).abs());
+        case ITR: return s ? it : Itr.get(Math.abs(it.itr(ii)));
+        default:  return Itr.get(Math.abs(it.itr(ii)));
+      }
     }
+    return Itr.get(Math.abs(it.itr(ii)));
   }
 
   /**
@@ -98,7 +101,7 @@ public final class FNNum extends Fun {
   public static Item round(final Item it, final double d, final int prec,
       final boolean h2e, final InputInfo ii) throws QueryException {
 
-    if(it.type == Type.DEC && prec >= 0) {
+    if(it.type == SimpleType.DEC && prec >= 0) {
       final BigDecimal bd = it.dec(ii);
       final int m = h2e ? BigDecimal.ROUND_HALF_EVEN : bd.signum() > 0 ?
           BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN;
@@ -133,12 +136,15 @@ public final class FNNum extends Fun {
     final Item i = it.unt() ? Dbl.get(n) : it;
     if(n == d) return i;
 
-    switch(it.type) {
-      case DEC: return Dec.get(d);
-      case DBL: return Dbl.get(d);
-      case FLT: return Flt.get((float) d);
-      default:  return Itr.get((long) d);
+    if(it.type instanceof SimpleType) {
+      switch((SimpleType) it.type) {
+        case DEC: return Dec.get(d);
+        case DBL: return Dbl.get(d);
+        case FLT: return Flt.get((float) d);
+        default:  return Itr.get((long) d);
+      }
     }
+    return Itr.get((long) d);
   }
 
   @Override

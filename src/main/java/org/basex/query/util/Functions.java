@@ -20,7 +20,9 @@ import org.basex.query.func.FunDef;
 import org.basex.query.func.FunJava;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SimpleType;
 import org.basex.query.item.Type;
+import org.basex.query.item.Types;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
@@ -64,12 +66,12 @@ public final class Functions extends ExprInfo {
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
-      final Type type = Type.find(name, true);
-      if(type == null || type == Type.NOT || type == Type.AAT) {
+      final Type type = SimpleType.find(name, true);
+      if(type == null || type == SimpleType.NOT || type == SimpleType.AAT) {
         final Levenshtein ls = new Levenshtein();
-        for(final Type t : Type.values()) {
-          if(t.par != null && ls.similar(lc(ln), lc(t.nam), 0))
-            qp.error(FUNSIMILAR, name, t.nam);
+        for(final SimpleType t : SimpleType.values()) {
+          if(t.par() != null && ls.similar(lc(ln), lc(t.nam()), 0))
+            qp.error(FUNSIMILAR, name, t.nam());
         }
         qp.error(FUNCUNKNOWN, name.atom());
       }
@@ -117,7 +119,7 @@ public final class Functions extends ExprInfo {
     }
 
     // add function call for function that has not been defined yet
-    if(Type.find(name, false) == null) {
+    if(Types.find(name, false) == null) {
       return add(qp.input(), name, add(new Func(qp.input(),
           new Var(name), new Var[args.length], false), qp), args);
     }

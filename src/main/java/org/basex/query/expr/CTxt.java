@@ -5,8 +5,8 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -55,6 +55,6 @@ public final class CTxt extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(Type.TXT.nam));
+    return toString(Token.string(NodeType.TXT.nam));
   }
 }

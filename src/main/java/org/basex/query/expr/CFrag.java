@@ -9,7 +9,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
+import org.basex.query.item.AtomType;
 import org.basex.util.InputInfo;
 import org.basex.util.XMLToken;
 
@@ -46,7 +46,7 @@ public abstract class CFrag extends Arr {
       throws QueryException {
 
     QNm n = null;
-    if(it.type == Type.QNM) {
+    if(it.type == AtomType.QNM) {
       n = (QNm) it;
     } else {
       final byte[] nm = it.atom();

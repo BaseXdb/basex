@@ -13,8 +13,8 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.RenamePrimitive;
 import org.basex.util.Atts;
@@ -49,11 +49,11 @@ public final class Rename extends Update {
     if(t.next() != null) UPWRTRGTYP.thrw(input);
 
     CFrag ex = null;
-    if(i.type == Type.ELM) {
+    if(i.type == NodeType.ELM) {
       ex = new CElem(input, expr[1], new Atts(), true);
-    } else if(i.type == Type.ATT) {
+    } else if(i.type == NodeType.ATT) {
       ex = new CAttr(input, false, expr[1]);
-    } else if(i.type == Type.PI) {
+    } else if(i.type == NodeType.PI) {
       ex = new CPI(input, expr[1], Empty.SEQ);
     } else {
       UPWRTRGTYP.thrw(input);
@@ -62,8 +62,8 @@ public final class Rename extends Update {
     // check namespace conflicts...
     final QNm rename = ex.item(ctx, input).qname();
     final Nod targ = (Nod) i;
-    final Nod test = i.type == Type.ELM ? targ :
-      i.type == Type.ATT ? targ.parent() : null;
+    final Nod test = i.type == NodeType.ELM ? targ : i.type == NodeType.ATT ?
+        targ.parent() : null;
 
     if(test != null) {
       final byte[] uri = test.uri(rename.pref(), ctx);

@@ -20,9 +20,10 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SimpleType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.Put;
@@ -78,7 +79,7 @@ final class FNGen extends Fun {
   public Expr cmp(final QueryContext ctx) {
     if(def == FunDef.DATA &&  expr.length == 1) {
       final SeqType t = expr[0].type();
-      type = t.type.node() ? SeqType.get(Type.ATM, t.occ) : t;
+      type = t.type.node() ? SeqType.get(SimpleType.ATM, t.occ) : t;
     }
     return this;
   }
@@ -141,7 +142,7 @@ final class FNGen extends Fun {
     final byte[] file = checkEStr(expr[1], ctx);
     final Item it = checkNode(checkEmpty(expr[0].item(ctx, input)));
 
-    if(it == null || it.type != Type.DOC && it.type != Type.ELM)
+    if(it == null || it.type != NodeType.DOC && it.type != NodeType.ELM)
       UPFOTYPE.thrw(input, expr[0]);
 
     final Uri u = Uri.uri(file);

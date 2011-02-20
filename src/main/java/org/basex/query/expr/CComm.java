@@ -5,7 +5,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FComm;
 import org.basex.query.item.Item;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -50,6 +50,6 @@ public final class CComm extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(Type.COM.nam));
+    return toString(Token.string(NodeType.COM.nam));
   }
 }

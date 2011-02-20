@@ -38,7 +38,7 @@ public class Dur extends Item {
    * @throws QueryException query exception
    */
   public Dur(final byte[] v, final InputInfo ii) throws QueryException {
-    this(v, Type.DUR, ii);
+    this(v, SimpleType.DUR, ii);
   }
 
   /**
@@ -54,7 +54,7 @@ public class Dur extends Item {
    * @param d duration
    */
   protected Dur(final Dur d) {
-    this(d, Type.DUR);
+    this(d, SimpleType.DUR);
   }
 
   /**

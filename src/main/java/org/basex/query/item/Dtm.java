@@ -23,7 +23,7 @@ public final class Dtm extends Date {
    * @param d date
    */
   public Dtm(final Date d) {
-    super(Type.DTM, d);
+    super(SimpleType.DTM, d);
     if(xc.getHour() == UNDEF) {
       xc.setHour(0);
       xc.setMinute(0);
@@ -38,7 +38,7 @@ public final class Dtm extends Date {
    * @throws QueryException query exception
    */
   public Dtm(final byte[] dt, final InputInfo ii) throws QueryException {
-    super(Type.DTM, dt, XDTM, ii);
+    super(SimpleType.DTM, dt, XDTM, ii);
     final int i = Token.indexOf(dt, 'T');
     if(i == -1) dateErr(dt, XDTM, ii);
     date(Token.substring(dt, 0, i), XDTM, ii);

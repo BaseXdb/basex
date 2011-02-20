@@ -79,8 +79,11 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Itr;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SimpleType;
+import org.basex.query.item.Types;
 import org.basex.query.item.SeqType.Occ;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
@@ -1463,7 +1466,7 @@ public class QueryParser extends InputParser {
     if(ax == null) {
       ax = Axis.CHILD;
       test = test(false);
-      if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
+      if(test != null && test.type == NodeType.ATT) ax = Axis.ATTR;
       checkTest(test, ax == Axis.ATTR);
     }
     if(test == null) return null;
@@ -1493,7 +1496,7 @@ public class QueryParser extends InputParser {
       final byte[] name = qName(null);
       final int p2 = qp;
       if(consumeWS(PAR1)) {
-        final Type type = Type.node(new QNm(name, ctx, input()));
+        final NodeType type = NodeType.node(new QNm(name, ctx, input()));
         if(type != null) {
           tok.reset();
           while(!consume(PAR2)) {
@@ -1735,7 +1738,7 @@ public class QueryParser extends InputParser {
   private Expr functionCall() throws QueryException {
     final int p = qp;
     final QNm name = new QNm(qName(null), ctx, input());
-    if(!consumeWS2(PAR1) || Type.node(name) != null) {
+    if(!consumeWS2(PAR1) || SimpleType.node(name) != null) {
       qp = p;
       return null;
     }
@@ -2168,8 +2171,8 @@ public class QueryParser extends InputParser {
     final QNm type = new QNm(qName(TYPEINVALID));
     type.uri(ctx.ns.uri(type.pref(), false, input()));
     skipWS();
-    final Type t = Type.find(type, true);
-    if(t == Type.AAT || t == Type.NOT) error(CASTUNKNOWN, type);
+    final Type t = Types.find(type, true);
+    if(t == SimpleType.AAT || t == SimpleType.NOT) error(CASTUNKNOWN, type);
     if(t == null) error(TYPEUNKNOWN, type);
     return SeqType.get(t, consume('?') ? Occ.ZO : Occ.O);
   }
@@ -2190,7 +2193,7 @@ public class QueryParser extends InputParser {
       consume('*') ? Occ.ZM : Occ.O;
     skipWS();
 
-    if(t == Type.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
+    if(t == SimpleType.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
 
     final KindTest kt = tok.size() == 0 ? null : kindTest(t, tok.finish());
     // use empty name test if types are different
@@ -2231,7 +2234,7 @@ public class QueryParser extends InputParser {
       }
     }
 
-    final Type t = Type.find(type, atom);
+    final Type t = Types.find(type, atom);
 
     if(t == null) {
       if(atom) error(TYPEUNKNOWN, type);
@@ -2239,7 +2242,7 @@ public class QueryParser extends InputParser {
           type.atom()).add('(').add(tok.finish()).add(")\""));
     }
 
-    if(t == Type.FUNC && consumeWS2(AS)) {
+    if(t == SimpleType.FUNC && consumeWS2(AS)) {
       final SeqType retType = sequenceType(); // TODO don't throw this away
     }
 
@@ -2257,33 +2260,34 @@ public class QueryParser extends InputParser {
       throws QueryException {
 
     byte[] nm = trim(k);
-    if(t == Type.PI) {
+    if(t == NodeType.PI) {
       final boolean s = startsWith(k, '\'') || startsWith(k, '"');
       nm = trim(delete(delete(k, '\''), '"'));
       if(!XMLToken.isNCName(nm)) {
         if(s) error(XPINVNAME, k);
         error(TESTINVALID, t, k);
       }
-      return new KindTest(t, new QNm(nm, ctx, input()), null);
+      return new KindTest((NodeType) t, new QNm(nm, ctx, input()), null);
     }
-    if(t != Type.ELM && t != Type.ATT) error(TESTINVALID, t, k);
+    if(t != NodeType.ELM && t != NodeType.ATT) error(TESTINVALID, t, k);
 
-    Type tp = t;
+    SimpleType tp = (SimpleType) t;
     final int i = indexOf(nm, ',');
     if(i != -1) {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx, input());
       if(!eq(test.uri().atom(), XSURI)) error(TYPEUNDEF, test);
 
       final byte[] ln = test.ln();
-      tp = Type.find(test, true);
+      tp = SimpleType.find(test, true);
       if(tp == null && !eq(ln, ANYTYPE) && !eq(ln, ANYSIMPLE) &&
           !eq(ln, UNTYPED)) error(VARUNDEF, test);
-      if(tp == Type.ATM || tp == Type.AAT) tp = null;
+      if(tp == SimpleType.ATM || tp == SimpleType.AAT) tp = null;
       nm = trim(substring(nm, 0, i));
     }
-    if(nm.length == 1 && nm[0] == '*') return new KindTest(t, null, tp);
+    if(nm.length == 1 && nm[0] == '*')
+      return new KindTest((NodeType) t, null, tp);
     if(!XMLToken.isQName(nm)) error(TESTINVALID, t, k);
-    return new KindTest(t, new QNm(nm, ctx, input()), tp);
+    return new KindTest((NodeType) t, new QNm(nm, ctx, input()), tp);
   }
 
   /**

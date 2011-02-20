@@ -6,8 +6,8 @@ import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.util.InputInfo;
 
@@ -41,7 +41,7 @@ public final class NameTest extends Test {
    */
   public NameTest(final QNm nm, final Name t, final boolean att,
       final InputInfo ii) {
-    type = att ? Type.ATT : Type.ELM;
+    type = att ? NodeType.ATT : NodeType.ELM;
     ln = nm != null ? nm.ln() : null;
     name = nm;
     test = t;
@@ -70,7 +70,7 @@ public final class NameTest extends Test {
 
     if(test == Name.STD && !name.ns()) {
       // no results if default and database namespaces of elements are different
-      ok = type == Type.ATT || eq(ns, ctx.nsElem);
+      ok = type == NodeType.ATT || eq(ns, ctx.nsElem);
       if(ok) {
         // identical namespace: ignore prefix to speed up test
         if(ns.length != 0) ctx.compInfo(OPTPREF, ln);
@@ -79,7 +79,7 @@ public final class NameTest extends Test {
     }
 
     // check existence of tag/attribute names
-    ok = ok && (test != Name.NAME || (type == Type.ELM ?
+    ok = ok && (test != Name.NAME || (type == NodeType.ELM ?
         data.tags : data.atts).id(ln) != 0);
 
     if(!ok) ctx.compInfo(OPTNAME, name);
@@ -103,7 +103,7 @@ public final class NameTest extends Test {
         return name.uri().eq(nod.qname(tmpq).uri());
       default:
         // check attributes, or check everything
-        return type == Type.ATT && !name.ns() ? eq(ln, nod.nname()) :
+        return type == NodeType.ATT && !name.ns() ? eq(ln, nod.nname()) :
           name.eq(nod.qname(tmpq));
     }
   }

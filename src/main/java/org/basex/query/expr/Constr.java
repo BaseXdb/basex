@@ -7,8 +7,8 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
@@ -68,10 +68,10 @@ public final class Constr {
 
     if(it == null) return false;
 
-    if(it.node() && it.type != Type.TXT) {
+    if(it.node() && it.type != NodeType.TXT) {
       Nod node = (Nod) it;
 
-      if(it.type == Type.ATT) {
+      if(it.type == NodeType.ATT) {
         // text has already been added - no attribute allowed anymore
         if(text.size() != 0 || children.size() != 0) {
           errAtt = true;
@@ -94,7 +94,7 @@ public final class Constr {
         }
         // add attribute
         ats.add(node.copy());
-      } else if(it.type == Type.DOC) {
+      } else if(it.type == NodeType.DOC) {
         final NodeIter iter = node.child();
         Nod ch;
         while((ch = iter.next()) != null) add(ctx, ch);
@@ -112,7 +112,7 @@ public final class Constr {
         if(atts != null && atts.size != 0) {
           // [LK][LW] why only if there are already namespaces?
           node = node.parent();
-          while(node != null && node.type == Type.ELM) {
+          while(node != null && node.type == NodeType.ELM) {
             final Atts ns = node.ns();
             for(int a = 0; a < ns.size; ++a) {
               if(!atts.contains(ns.key[a])) atts.add(ns.key[a], ns.val[a]);
@@ -123,9 +123,9 @@ public final class Constr {
       }
       more = false;
     } else {
-      if(more && it.type != Type.TXT) text.add(' ');
+      if(more && it.type != NodeType.TXT) text.add(' ');
       text.add(it.atom());
-      more = it.type != Type.TXT;
+      more = it.type != NodeType.TXT;
     }
     return true;
   }

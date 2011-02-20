@@ -5,7 +5,7 @@ import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.Util;
@@ -58,7 +58,7 @@ public abstract class BXNode implements Node {
    * @return node kind
    */
   protected int kind() {
-    return Nod.kind(node.type);
+    return Nod.kind(node.ndtype);
   }
 
   @Override
@@ -174,7 +174,7 @@ public abstract class BXNode implements Node {
     Nod n = node;
     Nod p;
     while((p = n.parent()) != null) n = p;
-    return n.type == Type.DOC ? (BXDoc) n.toJava() : null;
+    return n.type == NodeType.DOC ? (BXDoc) n.toJava() : null;
   }
 
   @Override
@@ -299,7 +299,7 @@ public abstract class BXNode implements Node {
     try {
       Nod n = null;
       while((n = iter.next()) != null) {
-        if(n.type == Type.ELM && (nm == null || eq(nm, n.nname())))
+        if(n.type == NodeType.ELM && (nm == null || eq(nm, n.nname())))
           nb.add(n.copy());
       }
     } catch(final QueryException ex) {

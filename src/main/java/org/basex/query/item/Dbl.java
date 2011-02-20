@@ -28,7 +28,7 @@ public final class Dbl extends Item {
    * @param v value
    */
   private Dbl(final double v) {
-    super(Type.DBL);
+    super(SimpleType.DBL);
     val = v;
   }
 

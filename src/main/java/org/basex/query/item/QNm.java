@@ -28,7 +28,7 @@ public final class QNm extends Item {
    * Empty constructor.
    */
   public QNm() {
-    super(Type.QNM);
+    super(SimpleType.QNM);
     val = EMPTY;
   }
 

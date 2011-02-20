@@ -16,7 +16,7 @@ public final class Atm extends Str {
    * @param v value
    */
   public Atm(final byte[] v) {
-    super(v, Type.ATM);
+    super(v, AtomType.ATM);
   }
 
   @Override

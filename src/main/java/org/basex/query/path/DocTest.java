@@ -6,7 +6,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.IntList;
 
@@ -25,7 +25,7 @@ final class DocTest extends Test {
    * @param n database document nodes
    */
   private DocTest(final Nodes n) {
-    type = Type.DOC;
+    type = NodeType.DOC;
     nodes = n;
   }
 

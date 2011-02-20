@@ -30,7 +30,7 @@ public final class InsertBefore extends NodeCopy {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pre = n.pre;
-    d.insert(pre, d.parent(pre, Nod.kind(node.type)), md);
+    d.insert(pre, d.parent(pre, Nod.kind(node.ndtype)), md);
     // no text merging allowed here, as this target can still be deleted or
     // replaced (see primitive order).
     // if text is merged, the second text node is also

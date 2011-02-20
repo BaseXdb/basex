@@ -15,7 +15,9 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SimpleType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -175,7 +177,7 @@ public abstract class ParseExpr extends Expr {
   public final double checkDbl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = checkEmptyType(e.item(ctx, input), Type.DBL);
+    final Item it = checkEmptyType(e.item(ctx, input), SimpleType.DBL);
     if(!it.unt() && !it.num()) Err.number(this, it);
     return it.dbl(input);
   }
@@ -190,7 +192,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final long checkItr(final Expr e, final QueryContext ctx)
       throws QueryException {
-    return checkItr(checkEmptyType(e.item(ctx, input), Type.ITR));
+    return checkItr(checkEmptyType(e.item(ctx, input), SimpleType.ITR));
   }
 
   /**
@@ -201,7 +203,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final long checkItr(final Item it) throws QueryException {
-    if(!it.unt() && !it.type.instance(Type.ITR)) Err.type(this, Type.ITR, it);
+    if(!it.unt() && !it.type.instance(SimpleType.ITR))
+      Err.type(this, SimpleType.ITR, it);
     return it.itr(input);
   }
 
@@ -213,7 +216,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Nod checkNode(final Item it) throws QueryException {
-    if(!it.node()) Err.type(this, Type.NOD, it);
+    if(!it.node()) Err.type(this, NodeType.NOD, it);
     return (Nod) it;
   }
 
@@ -253,7 +256,7 @@ public abstract class ParseExpr extends Expr {
   public final byte[] checkStr(final Expr e, final QueryContext ctx)
       throws QueryException {
     final Item it = checkItem(e, ctx);
-    if(!it.str() && !it.unt()) Err.type(this, Type.STR, it);
+    if(!it.str() && !it.unt()) Err.type(this, SimpleType.STR, it);
     return it.atom();
   }
 
@@ -266,7 +269,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final byte[] checkEStr(final Item it) throws QueryException {
     if(it == null) return EMPTY;
-    if(!it.str() && !it.unt()) Err.type(this, Type.STR, it);
+    if(!it.str() && !it.unt()) Err.type(this, SimpleType.STR, it);
     return it.atom();
   }
 

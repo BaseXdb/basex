@@ -1,7 +1,8 @@
 package org.deepfs.fsml;
 
 import static org.deepfs.fsml.DeepNS.*;
-import org.basex.query.item.Type;
+import static org.basex.query.item.SimpleType.*;
+import org.basex.query.item.SimpleType;
 import org.basex.util.Token;
 import org.basex.util.Util;
 
@@ -14,239 +15,238 @@ import org.basex.util.Util;
 public enum MetaElem {
 
   /** Type. */
-  TYPE(DCTERMS, "type", Type.STR, true),
+  TYPE(DCTERMS, "type", STR, true),
   /** Format (MIME type). */
-  FORMAT(DCTERMS, "format", Type.STR, false),
+  FORMAT(DCTERMS, "format", STR, false),
 
   // ----- duration fields ---------------------------------------------------
 
   /** Duration. */
-  DURATION(FSMETA, "duration", Type.DUR, false),
+  DURATION(FSMETA, "duration", DUR, false),
 
   // ----- date fields -------------------------------------------------------
 
   /** Date of the last change made to a metadata attribute. */
   DATETIME_ATTRIBUTE_MODIFIED(FSMETA, "dateTimeAttributeModified",
-      Type.DTM, false),
+      DTM, false),
   /** Date when the content was created. */
-  DATETIME_CREATED(FSMETA, "dateTimeCreated", Type.DTM, false),
+  DATETIME_CREATED(FSMETA, "dateTimeCreated", DTM, false),
   /** Date when the content was digitized. */
-  DATETIME_DIGITIZED(FSMETA, "dateTimeDigitized", Type.DTM, false),
+  DATETIME_DIGITIZED(FSMETA, "dateTimeDigitized", DTM, false),
   /** Date of the last usage. */
-  DATETIME_LAST_USED(FSMETA, "dateTimeLastUsed", Type.DTM, false),
+  DATETIME_LAST_USED(FSMETA, "dateTimeLastUsed", DTM, false),
   /** Original date. */
-  DATETIME_ORIGINAL(FSMETA, "dateTimeOriginal", Type.DTM, false),
+  DATETIME_ORIGINAL(FSMETA, "dateTimeOriginal", DTM, false),
   /** Year. */
-  YEAR(FSMETA, "year", Type.YEA, false),
+  YEAR(FSMETA, "year", YEA, false),
 
   // ----- integer fields ----------------------------------------------------
 
   /** Beats per minute. */
-  BEATS_PER_MINUTE(FSMETA, "beatsPerMinute", Type.INT, false),
+  BEATS_PER_MINUTE(FSMETA, "beatsPerMinute", INT, false),
   /** Bitrate. */
-  BITRATE_KBIT(FSMETA, "bitrateKBitS", Type.INT, false),
+  BITRATE_KBIT(FSMETA, "bitrateKBitS", INT, false),
   /** iTunes compilation flag. */
-  ITUNES_COMPILATION(FSMETA, "iTunesCompilation", Type.INT, false),
+  ITUNES_COMPILATION(FSMETA, "iTunesCompilation", INT, false),
   /** ISO speed ratings. */
-  ISO_SPEED_RATINGS(FSMETA, "isoSpeedRatings", Type.INT, false),
+  ISO_SPEED_RATINGS(FSMETA, "isoSpeedRatings", INT, false),
   /** Focal length in 35mm film. */
-  FOCAL_LENGTH_IN_35MM_FILM(FSMETA, "focalLengthIn35mmFilm", Type.INT, false),
+  FOCAL_LENGTH_IN_35MM_FILM(FSMETA, "focalLengthIn35mmFilm", INT, false),
   /** Group id of the owner of the file. */
-  FS_OWNER_GROUP_ID(FSMETA, "fsOwnerGroupId", Type.INT, false),
+  FS_OWNER_GROUP_ID(FSMETA, "fsOwnerGroupId", INT, false),
   /** User id of the owner of the file. */
-  FS_OWNER_USER_ID(FSMETA, "fsOwnerUserId", Type.INT, false),
+  FS_OWNER_USER_ID(FSMETA, "fsOwnerUserId", INT, false),
   /** Number of pages. */
-  NUMBER_OF_PAGES(FSMETA, "numberOfPages", Type.INT, false),
+  NUMBER_OF_PAGES(FSMETA, "numberOfPages", INT, false),
   /** Height in pixels. */
-  PIXEL_HEIGHT(FSMETA, "pixelHeight", Type.INT, false),
+  PIXEL_HEIGHT(FSMETA, "pixelHeight", INT, false),
   /** Width in pixels. */
-  PIXEL_WIDTH(FSMETA, "pixelWidth", Type.INT, false),
+  PIXEL_WIDTH(FSMETA, "pixelWidth", INT, false),
   /** Sample rate. */
-  SAMPLE_RATE(FSMETA, "sampleRate", Type.INT, false),
+  SAMPLE_RATE(FSMETA, "sampleRate", INT, false),
   /** Track number. */
-  TRACK(FSMETA, "track", Type.INT, false),
+  TRACK(FSMETA, "track", INT, false),
 
   // ----- double fields -----------------------------------------------------
 
   /** Aperture value. */
-  APERTURE_VALUE(FSMETA, "apertureValue", Type.DBL, false),
+  APERTURE_VALUE(FSMETA, "apertureValue", DBL, false),
   /** Maximum aperture value. */
-  APERTURE_VALUE_MAX(FSMETA, "apertureValueMax", Type.DBL, false),
+  APERTURE_VALUE_MAX(FSMETA, "apertureValueMax", DBL, false),
   /** Brightness value. */
-  BRIGHTNESS_VALUE(FSMETA, "brightnessValue", Type.DBL, false),
+  BRIGHTNESS_VALUE(FSMETA, "brightnessValue", DBL, false),
   /** Compressed bits per pixel. */
-  COMPRESSED_BITS_PER_PIXEL(FSMETA, "compressedBitsPerPixel", Type.DBL, false),
+  COMPRESSED_BITS_PER_PIXEL(FSMETA, "compressedBitsPerPixel", DBL, false),
   /** Digital zoom ratio. */
-  DIGITAL_ZOOM_RATIO(FSMETA, "digitalZoomRatio", Type.DBL, false),
+  DIGITAL_ZOOM_RATIO(FSMETA, "digitalZoomRatio", DBL, false),
   /** Exposure bias value. */
-  EXPOSURE_BIAS_VALUE(FSMETA, "exposureBiasValue", Type.DBL, false),
+  EXPOSURE_BIAS_VALUE(FSMETA, "exposureBiasValue", DBL, false),
   /** Exposure index. */
-  EXPOSURE_INDEX(FSMETA, "exposureIndex", Type.DBL, false),
+  EXPOSURE_INDEX(FSMETA, "exposureIndex", DBL, false),
   /** Exposure time in seconds. */
-  EXPOSURE_TIME_MS(FSMETA, "exposureTimeMs", Type.DBL, false),
+  EXPOSURE_TIME_MS(FSMETA, "exposureTimeMs", DBL, false),
   /** F number. */
-  F_NUMBER(FSMETA, "fNumber", Type.DBL, false),
+  F_NUMBER(FSMETA, "fNumber", DBL, false),
   /** Focal length. */
-  FOCAL_LENGTH(FSMETA, "focalLengthMM", Type.DBL, false),
+  FOCAL_LENGTH(FSMETA, "focalLengthMM", DBL, false),
   /** Focal plane X resolution. */
-  FOCAL_PLANE_X_RESOLUTION(FSMETA, "focalPlaneXresolution", Type.DBL, false),
+  FOCAL_PLANE_X_RESOLUTION(FSMETA, "focalPlaneXresolution", DBL, false),
   /** Focal plane Y resolution. */
-  FOCAL_PLANE_Y_RESOLUTION(FSMETA, "focalPlaneYresolution", Type.DBL, false),
+  FOCAL_PLANE_Y_RESOLUTION(FSMETA, "focalPlaneYresolution", DBL, false),
   /** Shutter speed value. */
-  SHUTTER_SPEED_VALUE(FSMETA, "shutterSpeedValue", Type.DBL, false),
+  SHUTTER_SPEED_VALUE(FSMETA, "shutterSpeedValue", DBL, false),
   /** Subject distance. */
-  SUBJECT_DISTANCE(FSMETA, "subjectDistance", Type.DBL, false),
+  SUBJECT_DISTANCE(FSMETA, "subjectDistance", DBL, false),
   /** X resolution. */
-  X_RESOLUTION(FSMETA, "xResolution", Type.DBL, false),
+  X_RESOLUTION(FSMETA, "xResolution", DBL, false),
   /** Y resolution. */
-  Y_RESOLUTION(FSMETA, "yResolution", Type.DBL, false),
+  Y_RESOLUTION(FSMETA, "yResolution", DBL, false),
 
   // ----- string fields -----------------------------------------------------
 
   /** Album name. */
-  ALBUM(FSMETA, "album", Type.STR, true),
+  ALBUM(FSMETA, "album", STR, true),
   /** Artist. */
-  ARTIST(FSMETA, "artist", Type.STR, true),
+  ARTIST(FSMETA, "artist", STR, true),
   /** City. */
-  CITY(FSMETA, "city", Type.STR, true),
+  CITY(FSMETA, "city", STR, true),
   /** Codec. */
-  CODEC(FSMETA, "codec", Type.STR, false),
+  CODEC(FSMETA, "codec", STR, false),
   /** Color space. */
-  COLOR_SPACE(FSMETA, "colorSpace", Type.STR, false),
+  COLOR_SPACE(FSMETA, "colorSpace", STR, false),
   /** Comment. */
-  COMMENT(FSMETA, "comment", Type.STR, true),
+  COMMENT(FSMETA, "comment", STR, true),
   /** Composer. */
-  COMPOSER(FSMETA, "composer", Type.STR, true),
+  COMPOSER(FSMETA, "composer", STR, true),
   /** Contrast. */
-  CONTRAST(FSMETA, "contrast", Type.STR, false),
+  CONTRAST(FSMETA, "contrast", STR, false),
   /** Contributor. */
-  CONTRIBUTOR(DCTERMS, "contributor", Type.STR, true),
+  CONTRIBUTOR(DCTERMS, "contributor", STR, true),
   /** Carbon copy receiver (name). */
-  COPY_RECEIVER_NAME(FSMETA, "copyReceiverName", Type.STR, true),
+  COPY_RECEIVER_NAME(FSMETA, "copyReceiverName", STR, true),
   /** Carbon copy receiver (email address). */
-  COPY_RECEIVER_EMAIL(FSMETA, "copyReceiverEmail", Type.STR, true),
+  COPY_RECEIVER_EMAIL(FSMETA, "copyReceiverEmail", STR, true),
   /** Country. */
-  COUNTRY(FSMETA, "country", Type.STR, true),
+  COUNTRY(FSMETA, "country", STR, true),
   /** Creator (name). */
-  CREATOR_NAME(FSMETA, "creatorName", Type.STR, true),
+  CREATOR_NAME(FSMETA, "creatorName", STR, true),
   /** Creator (email address). */
-  CREATOR_EMAIL(FSMETA, "creatorEmail", Type.STR, true),
+  CREATOR_EMAIL(FSMETA, "creatorEmail", STR, true),
   /** Custom rendered. */
-  CUSTOM_RENDERED(FSMETA, "customRendered", Type.STR, false),
+  CUSTOM_RENDERED(FSMETA, "customRendered", STR, false),
   /** Description. */
-  DESCRIPTION(DCTERMS, "description", Type.STR, true),
+  DESCRIPTION(DCTERMS, "description", STR, true),
   /** Emphasis. */
-  EMPHASIS(FSMETA, "emphasis", Type.STR, false),
+  EMPHASIS(FSMETA, "emphasis", STR, false),
   /** Encoding software. */
-  ENCODER(FSMETA, "encoder", Type.STR, false),
+  ENCODER(FSMETA, "encoder", STR, false),
   /** Encoding. */
-  ENCODING(FSMETA, "encoding", Type.STR, false),
+  ENCODING(FSMETA, "encoding", STR, false),
   /** Exposure mode. */
-  EXPOSURE_MODE(FSMETA, "exposureMode", Type.STR, false),
+  EXPOSURE_MODE(FSMETA, "exposureMode", STR, false),
   /** Exposure time as string. */
-  EXPOSURE_TIME(FSMETA, "exposureTime", Type.STR, false),
+  EXPOSURE_TIME(FSMETA, "exposureTime", STR, false),
   /** Exposure program. */
-  EXPOSURE_PROGRAM(FSMETA, "exposureProgram", Type.STR, false),
+  EXPOSURE_PROGRAM(FSMETA, "exposureProgram", STR, false),
   /** Flash. */
-  FLASH(FSMETA, "flash", Type.STR, false),
+  FLASH(FSMETA, "flash", STR, false),
   /** Focal plane resolution unit. */
-  FOCAL_PLANE_RESOLUTION_UNIT(FSMETA, "focalPlaneResolutionUnit",
-      Type.STR, false),
+  FOCAL_PLANE_RESOLUTION_UNIT(FSMETA, "focalPlaneResolutionUnit", STR, false),
   /** Gain control. */
-  GAIN_CONTROL(FSMETA, "gainControl", Type.STR, false),
+  GAIN_CONTROL(FSMETA, "gainControl", STR, false),
   /** Genre. */
-  GENRE(FSMETA, "genre", Type.STR, true),
+  GENRE(FSMETA, "genre", STR, true),
   /**
    * Headline. Publishable entry providing a synopsis of the contents of the
    * item.
    */
-  HEADLINE(FSMETA, "headline", Type.STR, false),
+  HEADLINE(FSMETA, "headline", STR, false),
   /** Blind carbon copy receiver (name). */
-  HIDDEN_RECEIVER_NAME(FSMETA, "hiddenReceiverName", Type.STR, true),
+  HIDDEN_RECEIVER_NAME(FSMETA, "hiddenReceiverName", STR, true),
   /** Blind carbon copy receiver (email address). */
-  HIDDEN_RECEIVER_EMAIL(FSMETA, "hiddenReceiverEmail", Type.STR, true),
+  HIDDEN_RECEIVER_EMAIL(FSMETA, "hiddenReceiverEmail", STR, true),
   /** Unique identifier. */
-  IDENTIFIER(DCTERMS, "identifier", Type.STR, false),
+  IDENTIFIER(DCTERMS, "identifier", STR, false),
   /** Keyword. */
-  KEYWORD(FSMETA, "keyword", Type.STR, true),
+  KEYWORD(FSMETA, "keyword", STR, true),
   /**
    * Language.
    * @see <a href="http://www.ietf.org/rfc/rfc4646.txt">RFC 4646</a>
    */
-  LANGUAGE(DCTERMS, "language", Type.STR, false),
+  LANGUAGE(DCTERMS, "language", STR, false),
   /** Light source. */
-  LIGHT_SOURCE(FSMETA, "lightSource", Type.STR, false),
+  LIGHT_SOURCE(FSMETA, "lightSource", STR, false),
   /** Lyrics. */
-  LYRICS(FSMETA, "lyrics", Type.STR, true),
+  LYRICS(FSMETA, "lyrics", STR, true),
   /** Lyricist. */
-  LYRICIST(FSMETA, "lyricist", Type.STR, true),
+  LYRICIST(FSMETA, "lyricist", STR, true),
   /** Make. */
-  MAKE(FSMETA, "make", Type.STR, false),
+  MAKE(FSMETA, "make", STR, false),
   /** Metering mode. */
-  METERING_MODE(FSMETA, "meteringMode", Type.STR, false),
+  METERING_MODE(FSMETA, "meteringMode", STR, false),
   /** Mode. */
-  MODE(FSMETA, "mode", Type.STR, false),
+  MODE(FSMETA, "mode", STR, false),
   /** Model. */
-  MODEL(FSMETA, "model", Type.STR, false),
+  MODEL(FSMETA, "model", STR, false),
   /** Orientation. */
-  ORIENTATION(FSMETA, "orientation", Type.STR, false),
+  ORIENTATION(FSMETA, "orientation", STR, false),
   /** Original artist. */
-  ORIGINAL_ARTIST(FSMETA, "originalArtist", Type.STR, false),
+  ORIGINAL_ARTIST(FSMETA, "originalArtist", STR, false),
   /** Primary chromaticities. */
-  PRIMARY_CHROMATICITIES(FSMETA, "primaryChromaticities", Type.STR, false),
+  PRIMARY_CHROMATICITIES(FSMETA, "primaryChromaticities", STR, false),
   /** Publisher. */
-  PUBLISHER(DCTERMS, "publisher", Type.STR, true),
+  PUBLISHER(DCTERMS, "publisher", STR, true),
   /** Receiver (name). */
-  RECEIVER_NAME(FSMETA, "receiverName", Type.STR, true),
+  RECEIVER_NAME(FSMETA, "receiverName", STR, true),
   /** Receiver (email address). */
-  RECEIVER_EMAIL(FSMETA, "receiverEmail", Type.STR, true),
+  RECEIVER_EMAIL(FSMETA, "receiverEmail", STR, true),
   /** ReferenceBlackWhite. */
-  REFERENCE_BLACK_WHITE(FSMETA, "referenceBlackWhite", Type.STR, false),
+  REFERENCE_BLACK_WHITE(FSMETA, "referenceBlackWhite", STR, false),
   /** Related sound file. */
-  RELATED_SOUND_FILE(FSMETA, "relatedSoundFile", Type.STR, false),
+  RELATED_SOUND_FILE(FSMETA, "relatedSoundFile", STR, false),
   /** Resolution unit. */
-  RESOLUTION_UNIT(FSMETA, "resolutionUnit", Type.STR, false),
+  RESOLUTION_UNIT(FSMETA, "resolutionUnit", STR, false),
   /** Copyright message. */
-  RIGHTS(DCTERMS, "rights", Type.STR, false),
+  RIGHTS(DCTERMS, "rights", STR, false),
   /** Saturation. */
-  SATURATION(FSMETA, "saturation", Type.STR, false),
+  SATURATION(FSMETA, "saturation", STR, false),
   /** Sharpness. */
-  SHARPNESS(FSMETA, "sharpness", Type.STR, false),
+  SHARPNESS(FSMETA, "sharpness", STR, false),
   /** Scene capture type. */
-  SCENE_CAPTURE_TYPE(FSMETA, "sceneCaptureType", Type.STR, false),
+  SCENE_CAPTURE_TYPE(FSMETA, "sceneCaptureType", STR, false),
   /** Sender (name). */
-  SENDER_NAME(FSMETA, "senderName", Type.STR, false),
+  SENDER_NAME(FSMETA, "senderName", STR, false),
   /** Sender (email address). */
-  SENDER_EMAIL(FSMETA, "senderEmail", Type.STR, false),
+  SENDER_EMAIL(FSMETA, "senderEmail", STR, false),
   /** Sensing method. */
-  SENSING_METHOD(FSMETA, "sensingMethod", Type.STR, false),
+  SENSING_METHOD(FSMETA, "sensingMethod", STR, false),
   /** Set. */
-  SET(FSMETA, "set", Type.STR, false),
+  SET(FSMETA, "set", STR, false),
   /** Software. */
-  SOFTWARE(FSMETA, "software", Type.STR, false),
+  SOFTWARE(FSMETA, "software", STR, false),
   /** Message or document subject. */
-  SUBJECT(DCTERMS, "subject", Type.STR, false),
+  SUBJECT(DCTERMS, "subject", STR, false),
   /** Subject distance range. */
-  SUBJECT_DISTANCE_RANGE(FSMETA, "subjectDistanceRange", Type.STR, false),
+  SUBJECT_DISTANCE_RANGE(FSMETA, "subjectDistanceRange", STR, false),
   /** Title. */
-  TITLE(DCTERMS, "title", Type.STR, false),
+  TITLE(DCTERMS, "title", STR, false),
   /** White balance. */
-  WHITE_BALANCE(FSMETA, "whiteBalance", Type.STR, false),
+  WHITE_BALANCE(FSMETA, "whiteBalance", STR, false),
   /** White point. */
-  WHITE_POINT(FSMETA, "whitePoint", Type.STR, false),
+  WHITE_POINT(FSMETA, "whitePoint", STR, false),
   /** YCbCrCoefficients. */
-  YCBCR_COEFFICIENTS(FSMETA, "yCbCrCoefficients", Type.STR, false),
+  YCBCR_COEFFICIENTS(FSMETA, "yCbCrCoefficients", STR, false),
   /** YCbCrPositioning. */
-  YCBCR_POSITIONING(FSMETA, "yCbCrPositioning", Type.STR, false);
+  YCBCR_POSITIONING(FSMETA, "yCbCrPositioning", STR, false);
 
   /** Metadata key. */
   private final String n;
   /** Namespace. */
   private final DeepNS ns;
   /** Default XML data type. */
-  private final Type dt;
+  private final SimpleType dt;
   /** More precise data type. */
-  private Type pdt;
+  private SimpleType pdt;
   /** Flag, if the metadata element may have multiple values. */
   private final boolean multiVal;
 
@@ -262,7 +262,7 @@ public enum MetaElem {
    * @param mv flag, if the metadata element may have multiple values
    */
   private MetaElem(final DeepNS namespace, final String name,
-      final Type dataType, final boolean mv) {
+      final SimpleType dataType, final boolean mv) {
     ns = namespace;
     n = ns.tag(name);
     dt = dataType;
@@ -299,7 +299,7 @@ public enum MetaElem {
    * Returns the xml datatype for the metadata attribute.
    * @return the xml datatype for the metadata attribute
    */
-  public Type getType() {
+  public SimpleType getType() {
     if(pdt != null) return pdt;
     return dt;
   }
@@ -328,7 +328,7 @@ public enum MetaElem {
    * data type (e.g. "short" instead of "integer").
    * @param dataType the new xml data type to set for this metadata element
    */
-  void refineDataType(final Type dataType) {
+  void refineDataType(final SimpleType dataType) {
     if(!dataType.instance(dt)) Util.notexpected("Failed to refine the xml " +
         "data type " + "for the metadata element " + n
         + " (invalid data type: " + dataType + ")");

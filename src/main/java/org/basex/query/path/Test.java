@@ -3,8 +3,8 @@ package org.basex.query.path;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.util.Util;
 
 /**
@@ -15,23 +15,23 @@ import org.basex.util.Util;
  */
 public abstract class Test {
   /** Static text node test. */
-  public static final Test TXT = new KindTest(Type.TXT);
+  public static final Test TXT = new KindTest(NodeType.TXT);
   /** Static PI node test. */
-  public static final Test PI = new KindTest(Type.PI);
+  public static final Test PI = new KindTest(NodeType.PI);
   /** Static element node test. */
-  public static final Test ELM = new KindTest(Type.ELM);
+  public static final Test ELM = new KindTest(NodeType.ELM);
   /** Static document node test. */
-  public static final Test DOC = new KindTest(Type.DOC);
+  public static final Test DOC = new KindTest(NodeType.DOC);
   /** Static attribute node test. */
-  public static final Test ATT = new KindTest(Type.ATT);
+  public static final Test ATT = new KindTest(NodeType.ATT);
   /** Static comment node test. */
-  public static final Test COM = new KindTest(Type.COM);
+  public static final Test COM = new KindTest(NodeType.COM);
   /** Static node test. */
   public static final Test NOD = new Test() {
     @Override
     public boolean eval(final Nod node) { return true; }
     @Override
-    public String toString() { return Type.NOD.toString(); }
+    public String toString() { return NodeType.NOD.toString(); }
   };
 
   /** Name test types. */
@@ -43,7 +43,7 @@ public abstract class Test {
   }
 
   /** Type of node test. */
-  public Type type;
+  public NodeType type;
   /** Type of name test. Set to {@code null} for other kind tests. */
   public Name test;
   /** Name test. Set to {@code null} for other kind tests. */
@@ -57,7 +57,7 @@ public abstract class Test {
    * @param t node type
    * @return kind test
    */
-  public static Test get(final Type t) {
+  public static Test get(final NodeType t) {
     switch(t) {
       case TXT: return TXT;
       case PI:  return PI;
@@ -66,7 +66,7 @@ public abstract class Test {
       case ATT: return ATT;
       case COM: return COM;
       case NOD: return NOD;
-      default:  Util.notexpected(); return null;
+      default:  throw Util.notexpected();
     }
   }
 

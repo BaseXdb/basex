@@ -9,8 +9,8 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import static org.basex.query.util.Err.*;
 import org.basex.query.util.Var;
@@ -129,6 +129,6 @@ public final class CAttr extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(Type.ATT.nam) + " { " + atn + " }");
+    return toString(Token.string(NodeType.ATT.nam) + " { " + atn + " }");
   }
 }

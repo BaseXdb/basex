@@ -19,7 +19,8 @@ import org.basex.util.Util;
 public final class DSim extends Date {
   /** Date pattern. */
   private static final Type[] TYPES = {
-    Type.YEA, Type.YMO, Type.MON, Type.MDA, Type.DAY,
+    SimpleType.YEA, SimpleType.YMO, SimpleType.MON, SimpleType.MDA,
+    SimpleType.DAY,
   };
   /** Date patterns. */
   private static final Pattern[] PATTERNS = {
@@ -41,9 +42,10 @@ public final class DSim extends Date {
    */
   DSim(final Date d, final Type t) {
     super(t, d);
-    if(t != Type.YEA && t != Type.YMO) xc.setYear(UNDEF);
-    if(t != Type.MON && t != Type.YMO && t != Type.MDA) xc.setMonth(UNDEF);
-    if(t != Type.DAY && t != Type.MDA) xc.setDay(UNDEF);
+    if(t != SimpleType.YEA && t != SimpleType.YMO) xc.setYear(UNDEF);
+    if(t != SimpleType.MON && t != SimpleType.YMO && t != SimpleType.MDA)
+      xc.setMonth(UNDEF);
+    if(t != SimpleType.DAY && t != SimpleType.MDA) xc.setDay(UNDEF);
     xc.setTime(UNDEF, UNDEF, UNDEF);
     xc.setMillisecond(UNDEF);
   }
@@ -63,7 +65,7 @@ public final class DSim extends Date {
     if(!mt.matches()) dateErr(d, EXAMPLES[i], ii);
     zone(mt, ZONES[i], d, ii);
 
-    if(t == Type.MDA) {
+    if(t == SimpleType.MDA) {
       final int m = xc.getMonth() - 1;
       if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0))
         DATERANGE.thrw(ii, type, d);

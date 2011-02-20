@@ -21,7 +21,7 @@ public abstract class Item extends Value {
   /** Undefined item. */
   public static final int UNDEF = Integer.MIN_VALUE;
   /** Dummy item. */
-  public static final Item DUMMY = new Item(Type.ITEM) {
+  public static final Item DUMMY = new Item(SimpleType.ITEM) {
     @Override public byte[] atom() { return Token.EMPTY; }
     @Override public boolean eq(final InputInfo ii, final Item it) {
       return false;

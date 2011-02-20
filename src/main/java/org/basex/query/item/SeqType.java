@@ -26,61 +26,61 @@ public final class SeqType {
   }
 
   /** Zero items. */
-  public static final SeqType ITEM_Z = new SeqType(Type.ITEM, Occ.Z);
+  public static final SeqType ITEM_Z = new SeqType(SimpleType.ITEM, Occ.Z);
   /** Single item. */
-  public static final SeqType ITEM = new SeqType(Type.ITEM);
+  public static final SeqType ITEM = new SeqType(SimpleType.ITEM);
   /** Zero or one item. */
-  public static final SeqType ITEM_ZO = new SeqType(Type.ITEM, Occ.ZO);
+  public static final SeqType ITEM_ZO = new SeqType(SimpleType.ITEM, Occ.ZO);
   /** Zero or more items. */
-  public static final SeqType ITEM_ZM = new SeqType(Type.ITEM, Occ.ZM);
+  public static final SeqType ITEM_ZM = new SeqType(SimpleType.ITEM, Occ.ZM);
   /** One or more items. */
-  public static final SeqType ITEM_OM = new SeqType(Type.ITEM, Occ.OM);
+  public static final SeqType ITEM_OM = new SeqType(SimpleType.ITEM, Occ.OM);
   /** Single boolean. */
-  public static final SeqType BLN = new SeqType(Type.BLN);
+  public static final SeqType BLN = new SeqType(SimpleType.BLN);
   /** Zero or one booleans. */
-  public static final SeqType BLN_ZO = new SeqType(Type.BLN, Occ.ZO);
+  public static final SeqType BLN_ZO = new SeqType(SimpleType.BLN, Occ.ZO);
   /** Single Base64Binary. */
-  public static final SeqType B64 = new SeqType(Type.B6B);
+  public static final SeqType B64 = new SeqType(SimpleType.B6B);
   /** Double number. */
-  public static final SeqType DBL = new SeqType(Type.DBL);
+  public static final SeqType DBL = new SeqType(SimpleType.DBL);
   /** Float number. */
-  public static final SeqType FLT = new SeqType(Type.FLT);
+  public static final SeqType FLT = new SeqType(SimpleType.FLT);
   /** Single number; for simplicity, numbers are summarized by this type. */
-  public static final SeqType ITR = new SeqType(Type.ITR);
+  public static final SeqType ITR = new SeqType(SimpleType.ITR);
   /** Zero or one number. */
-  public static final SeqType ITR_ZO = new SeqType(Type.ITR, Occ.ZO);
+  public static final SeqType ITR_ZO = new SeqType(SimpleType.ITR, Occ.ZO);
   /** Zero or more numbers. */
-  public static final SeqType ITR_ZM = new SeqType(Type.ITR, Occ.ZM);
+  public static final SeqType ITR_ZM = new SeqType(SimpleType.ITR, Occ.ZM);
   /** One or more numbers. */
-  public static final SeqType ITR_OM = new SeqType(Type.ITR, Occ.OM);
+  public static final SeqType ITR_OM = new SeqType(SimpleType.ITR, Occ.OM);
   /** Single node. */
-  public static final SeqType NOD = new SeqType(Type.NOD);
+  public static final SeqType NOD = new SeqType(NodeType.NOD);
   /** Zero or one nodes. */
-  public static final SeqType NOD_ZO = new SeqType(Type.NOD, Occ.ZO);
+  public static final SeqType NOD_ZO = new SeqType(NodeType.NOD, Occ.ZO);
   /** Zero or more nodes. */
-  public static final SeqType NOD_ZM = new SeqType(Type.NOD, Occ.ZM);
+  public static final SeqType NOD_ZM = new SeqType(NodeType.NOD, Occ.ZM);
   /** One or more nodes. */
-  public static final SeqType NOD_OM = new SeqType(Type.NOD, Occ.OM);
+  public static final SeqType NOD_OM = new SeqType(NodeType.NOD, Occ.OM);
   /** Single QName. */
-  public static final SeqType QNM = new SeqType(Type.QNM);
+  public static final SeqType QNM = new SeqType(SimpleType.QNM);
   /** Zero or one QNames. */
-  public static final SeqType QNM_ZO = new SeqType(Type.QNM, Occ.ZO);
+  public static final SeqType QNM_ZO = new SeqType(SimpleType.QNM, Occ.ZO);
   /** Zero or one URIs. */
-  public static final SeqType URI_ZO = new SeqType(Type.URI, Occ.ZO);
+  public static final SeqType URI_ZO = new SeqType(SimpleType.URI, Occ.ZO);
   /** Zero or more URIs. */
-  public static final SeqType URI_ZM = new SeqType(Type.URI, Occ.ZM);
+  public static final SeqType URI_ZM = new SeqType(SimpleType.URI, Occ.ZM);
   /** Single URI. */
-  public static final SeqType URI = new SeqType(Type.URI);
+  public static final SeqType URI = new SeqType(SimpleType.URI);
   /** Single string. */
-  public static final SeqType STR = new SeqType(Type.STR);
+  public static final SeqType STR = new SeqType(SimpleType.STR);
   /** Zero or one strings. */
-  public static final SeqType STR_ZO = new SeqType(Type.STR, Occ.ZO);
+  public static final SeqType STR_ZO = new SeqType(SimpleType.STR, Occ.ZO);
   /** Zero or more strings. */
-  public static final SeqType STR_ZM = new SeqType(Type.STR, Occ.ZM);
+  public static final SeqType STR_ZM = new SeqType(SimpleType.STR, Occ.ZM);
   /** Single date. */
-  public static final SeqType DAT = new SeqType(Type.DAT);
+  public static final SeqType DAT = new SeqType(SimpleType.DAT);
   /** Zero or more dates. */
-  public static final SeqType DAT_ZM = new SeqType(Type.DAT, Occ.ZO);
+  public static final SeqType DAT_ZM = new SeqType(SimpleType.DAT, Occ.ZO);
 
   /** Sequence type. */
   public final Type type;
@@ -106,7 +106,7 @@ public final class SeqType {
    */
   private SeqType(final Type t, final Occ o, final QNm e) {
     type = t;
-    occ = t == Type.EMP ? Occ.Z : t == Type.SEQ ? Occ.OM : o;
+    occ = t == SimpleType.EMP ? Occ.Z : t == SimpleType.SEQ ? Occ.OM : o;
     ext = e;
   }
 
@@ -204,7 +204,7 @@ public final class SeqType {
       if(mayBeZero()) return Empty.SEQ;
       Err.cast(ii, type, val);
     }
-    if(type == Type.EMP) Err.cast(ii, type, val);
+    if(type == SimpleType.EMP) Err.cast(ii, type, val);
 
     it = check(instance(it, ii) ? it : type.e(it, ctx, ii), ii);
     Item n = iter.next();
@@ -231,8 +231,9 @@ public final class SeqType {
     final boolean ins = it.type.instance(type);
     if(!it.unt() && !ins &&
         // implicit type promotions
-        (!it.num() || type != Type.FLT && type != Type.DBL) &&
-        (it.type != Type.URI || type != Type.STR)) Err.cast(ii, type, it);
+        (!it.num() || type != SimpleType.FLT && type != SimpleType.DBL) &&
+        (it.type != SimpleType.URI || type != SimpleType.STR))
+      Err.cast(ii, type, it);
     return ins;
   }
 
@@ -242,7 +243,7 @@ public final class SeqType {
    * @return resulting type
    */
   public SeqType intersect(final SeqType t) {
-    final Type tp = type == t.type ? type : Type.ITEM;
+    final Type tp = type == t.type ? type : SimpleType.ITEM;
     final Occ oc = occ == t.occ ? occ : zeroOrOne() && t.zeroOrOne() ?
         Occ.ZO : Occ.ZM;
     return new SeqType(tp, oc);
@@ -285,7 +286,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean num() {
-    return one() && type.num;
+    return one() && type.num();
   }
 
   /**
@@ -293,7 +294,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNum() {
-    return type.num || type == Type.ITEM;
+    return type.num() || type == SimpleType.ITEM;
   }
 
   /**

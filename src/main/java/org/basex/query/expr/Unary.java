@@ -11,6 +11,7 @@ import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SimpleType;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -56,7 +57,7 @@ public final class Unary extends Single {
     if(it.unt()) return Dbl.get(minus ? -d : d);
 
     if(!minus) return it;
-    switch(it.type) {
+    switch((SimpleType) it.type) {
       case DBL: return Dbl.get(-d);
       case FLT: return Flt.get(-it.flt(input));
       case DEC: return Dec.get(it.dec(input).negate());

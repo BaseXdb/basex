@@ -30,7 +30,7 @@ public final class InsertIntoFirst extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int pre = n.pre + add;
     final Data d = n.data;
-    d.insert(pre + d.attSize(pre, Nod.kind(node.type)), pre, md);
+    d.insert(pre + d.attSize(pre, Nod.kind(node.ndtype)), pre, md);
   }
 
   @Override

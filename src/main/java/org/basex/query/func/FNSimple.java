@@ -9,6 +9,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
@@ -189,11 +190,11 @@ public final class FNSimple extends Fun {
 
         if(desc) {
           // skip descendant comments and processing instructions
-          if(t1 == Type.PI || t1 == Type.COM) {
+          if(t1 == NodeType.PI || t1 == NodeType.COM) {
             s1 = ch[0].next();
             continue;
           }
-          if(t2 == Type.PI || t2 == Type.COM) {
+          if(t2 == NodeType.PI || t2 == NodeType.COM) {
             s2 = ch[1].next();
             continue;
           }
@@ -209,11 +210,12 @@ public final class FNSimple extends Fun {
             return false;
 
           // compare string values
-          if((t1 == Type.TXT || t1 == Type.ATT || t1 == Type.COM ||
-              t1 == Type.PI) && !Token.eq(s1.atom(), s2.atom())) return false;
+          if((t1 == NodeType.TXT || t1 == NodeType.ATT ||
+              t1 == NodeType.COM || t1 == NodeType.PI) &&
+              !Token.eq(s1.atom(), s2.atom())) return false;
 
           // compare elements
-          if(t1 == Type.ELM) {
+          if(t1 == NodeType.ELM) {
             // compare number of attributes
             if(s1.attr().finish().size() != s2.attr().finish().size())
               return false;

@@ -24,7 +24,7 @@ public final class FAttr extends FNode {
    * @param p parent
    */
   public FAttr(final QNm n, final byte[] v, final Nod p) {
-    super(Type.ATT);
+    super(NodeType.ATT);
     name = n;
     val = v;
     par = p;

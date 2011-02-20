@@ -26,7 +26,7 @@ public final class Bln extends Item {
    * @param b boolean value
    */
   private Bln(final boolean b) {
-    super(Type.BLN);
+    super(AtomType.BLN);
     val = b;
   }
 
@@ -127,7 +127,7 @@ public final class Bln extends Item {
     final byte[] s = Token.trim(str);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
     if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;
-    FUNCAST.thrw(ii, Type.BLN, str);
+    FUNCAST.thrw(ii, AtomType.BLN, str);
     return false;
   }
 

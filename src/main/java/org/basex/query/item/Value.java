@@ -57,7 +57,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean num() {
-    return type.num;
+    return type.num();
   }
 
   /**
@@ -65,7 +65,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean unt() {
-    return type.unt;
+    return type.unt();
   }
 
   /**
@@ -73,7 +73,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean str() {
-    return type.str;
+    return type.str();
   }
 
   /**
@@ -81,7 +81,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean dur() {
-    return type.dur;
+    return type.dur();
   }
 
   /**
@@ -89,7 +89,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean date() {
-    return type.dat;
+    return type.dat();
   }
 
   /**

@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.query.item.Type.*;
+import static org.basex.query.item.SimpleType.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;
@@ -81,7 +81,7 @@ final class FNAggr extends Fun {
       throws QueryException {
 
     Item res = it.unt() ? Dbl.get(it.atom(), input) : it;
-    if(!res.num() && (!res.dur() || res.type == Type.DUR))
+    if(!res.num() && (!res.dur() || res.type == DUR))
       SUMTYPE.thrw(input, this, res.type);
     final boolean n = res.num();
 

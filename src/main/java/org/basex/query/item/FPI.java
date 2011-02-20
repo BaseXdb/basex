@@ -30,7 +30,7 @@ public final class FPI extends FNode {
    * @param p parent
    */
   public FPI(final QNm n, final byte[] v, final Nod p) {
-    super(Type.PI);
+    super(NodeType.PI);
     name = n;
     val = v;
     par = p;

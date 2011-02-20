@@ -7,8 +7,9 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
+import org.basex.query.item.AtomType;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -36,7 +37,7 @@ public final class CPI extends CFrag {
   public FPI item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Item it = checkItem(expr[0], ctx);
-    if(!it.unt() && !it.str() && it.type != Type.QNM)
+    if(!it.unt() && !it.str() && it.type != AtomType.QNM)
       CPIWRONG.thrw(input, it.type, it);
 
     final byte[] nm = trim(it.atom());
@@ -61,6 +62,6 @@ public final class CPI extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(Type.PI.nam));
+    return toString(Token.string(NodeType.PI.nam));
   }
 }

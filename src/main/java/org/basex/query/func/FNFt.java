@@ -13,8 +13,8 @@ import org.basex.query.ft.FTIndexAccess;
 import org.basex.query.ft.FTWords;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
+import org.basex.query.item.SimpleType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.DataBuilder;
@@ -70,7 +70,7 @@ final class FNFt extends Fun {
     if(expr.length > 1) {
       // name of the marker element; default is <mark/>
       m = checkStr(expr[1], ctx);
-      if(!XMLToken.isQName(m)) Err.value(input, Type.QNM, m);
+      if(!XMLToken.isQName(m)) Err.value(input, SimpleType.QNM, m);
     }
     if(expr.length > 2) {
       l = (int) checkItr(expr[2], ctx);

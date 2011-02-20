@@ -8,7 +8,7 @@ import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.InsertAfter;
@@ -74,16 +74,18 @@ public final class Insert extends Update {
     final Nod n = (Nod) i;
     final Nod par = n.parent();
     if(before || after) {
-      if(n.type == Type.ATT || n.type == Type.DOC) UPTRGTYP2.thrw(input);
+      if(n.type == NodeType.ATT || n.type == NodeType.DOC)
+        UPTRGTYP2.thrw(input);
       if(par == null) UPPAREMPTY.thrw(input);
     } else {
-      if(n.type != Type.ELM && n.type != Type.DOC) UPTRGTYP.thrw(input);
+      if(n.type != NodeType.ELM && n.type != NodeType.DOC)
+        UPTRGTYP.thrw(input);
     }
 
     UpdatePrimitive up = null;
     if(aList.size() > 0) {
       final Nod targ = before || after ? par : n;
-      if(targ.type != Type.ELM)
+      if(targ.type != NodeType.ELM)
         (before || after ? UPATTELM : UPATTELM2).thrw(input);
 
       up = new InsertAttribute(input, targ, checkNS(aList, targ, ctx));

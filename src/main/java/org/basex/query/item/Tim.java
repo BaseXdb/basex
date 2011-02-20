@@ -16,7 +16,7 @@ public final class Tim extends Date {
    * @param d date
    */
   Tim(final Date d) {
-    super(Type.TIM, d);
+    super(SimpleType.TIM, d);
     xc.setYear(UNDEF);
     xc.setMonth(UNDEF);
     xc.setDay(UNDEF);
@@ -43,7 +43,7 @@ public final class Tim extends Date {
    * @throws QueryException query exception
    */
   public Tim(final byte[] tim, final InputInfo ii) throws QueryException {
-    super(Type.TIM, tim, XTIME, ii);
+    super(SimpleType.TIM, tim, XTIME, ii);
     time(tim, XTIME, ii);
   }
 }

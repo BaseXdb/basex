@@ -10,8 +10,8 @@ import org.basex.query.QueryTokens;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import static org.basex.query.util.Err.*;
 import org.basex.query.util.NSGlobal;
 import org.basex.query.util.Var;
@@ -168,6 +168,6 @@ public final class CElem extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(Type.ELM.nam) + " { " + tag + " }");
+    return toString(Token.string(NodeType.ELM.nam) + " { " + tag + " }");
   }
 }

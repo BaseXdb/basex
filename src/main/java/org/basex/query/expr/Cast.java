@@ -7,7 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
+import org.basex.query.item.SimpleType;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -39,9 +39,9 @@ public final class Cast extends Single {
     if(expr.value()) {
       // pre-evaluate value
       e = preEval(ctx);
-    } else if(type.type == Type.BLN || type.type == Type.FLT ||
-        type.type == Type.DBL || type.type == Type.QNM ||
-        type.type == Type.URI) {
+    } else if(type.type == SimpleType.BLN || type.type == SimpleType.FLT ||
+        type.type == SimpleType.DBL || type.type == SimpleType.QNM ||
+        type.type == SimpleType.URI) {
       // skip cast if specified and return types are equal
       final SeqType t = expr.type();
       if(t.eq(type)) e = expr;

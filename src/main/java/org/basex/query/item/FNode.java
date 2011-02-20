@@ -23,7 +23,7 @@ public abstract class FNode extends Nod {
    * Constructor.
    * @param t data type
    */
-  protected FNode(final Type t) {
+  protected FNode(final NodeType t) {
     super(t);
   }
 
@@ -33,7 +33,8 @@ public abstract class FNode extends Nod {
       final TokenBuilder tb = new TokenBuilder();
       for(int c = 0; c < children.size(); ++c) {
         final Nod nc = children.get(c);
-        if(nc.type == Type.ELM || nc.type == Type.TXT) tb.add(nc.atom());
+        if(nc.type == NodeType.ELM || nc.type == NodeType.TXT)
+          tb.add(nc.atom());
       }
       val = tb.finish();
     }
@@ -221,7 +222,7 @@ public abstract class FNode extends Nod {
           while(p != null) {
             final NodeIter i = p.child();
             Nod c;
-            while(n.type != Type.ATT && (c = i.next()) != null && !c.is(n));
+            while(n.type != NodeType.ATT && (c = i.next()) != null && !c.is(n));
             while((c = i.next()) != null) {
               ir.add(c.finish());
               addDesc(c.child(), ir);
