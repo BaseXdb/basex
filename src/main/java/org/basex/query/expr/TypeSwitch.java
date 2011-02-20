@@ -21,7 +21,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class TypeSwitch extends ParseExpr {
   /** Cases. */
-  private final TypeCase[] cs;
+  private final TypeCase[] cases;
   /** Condition. */
   private Expr ts;
 
@@ -34,42 +34,46 @@ public final class TypeSwitch extends ParseExpr {
   public TypeSwitch(final InputInfo ii, final Expr t, final TypeCase[] c) {
     super(ii);
     ts = t;
-    cs = c;
+    cases = c;
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     ts = checkUp(ts, ctx).comp(ctx);
-    final Expr[] tmp = new Expr[cs.length];
-    for(int i = 0; i < cs.length; ++i) tmp[i] = cs[i].expr;
+    final Expr[] tmp = new Expr[cases.length];
+    for(int i = 0; i < cases.length; ++i) tmp[i] = cases[i].expr;
     checkUp(ctx, tmp);
 
     // static condition: return branch in question
     if(ts.value()) {
-      for(final TypeCase c : cs) {
+      for(final TypeCase c : cases) {
         if(c.var.type == null || c.var.type.instance(ts.iter(ctx)))
           return optPre(c.comp(ctx, (Value) ts).expr, ctx);
       }
     }
 
     // compile branches
-    for(final TypeCase c : cs) c.comp(ctx);
+    for(final TypeCase c : cases) c.comp(ctx);
 
     // return result if all branches are equal (e.g., empty)
     boolean eq = true;
-    for(int i = 1; i < cs.length; ++i) eq &= cs[i - 1].expr.sameAs(cs[i].expr);
+    for(int i = 1; i < cases.length; ++i) {
+      eq &= cases[i - 1].expr.sameAs(cases[i].expr);
+    }
     if(eq) return optPre(Empty.SEQ, ctx);
 
     // evaluate return type
-    type = cs[0].type();
-    for(int c = 1; c < cs.length; ++c) type = type.intersect(cs[c].type());
+    type = cases[0].type();
+    for(int c = 1; c < cases.length; ++c) {
+      type = type.intersect(cases[c].type());
+    }
     return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter seq = ItemIter.get(ctx.iter(ts));
-    for(final TypeCase c : cs) {
+    for(final TypeCase c : cases) {
       seq.reset();
       final Iter iter = c.iter(ctx, seq);
       if(iter != null) return iter;
@@ -80,32 +84,33 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public boolean vacuous() {
-    for(final TypeCase c : cs) if(!c.expr.vacuous()) return false;
+    for(final TypeCase c : cases) if(!c.expr.vacuous()) return false;
     return true;
   }
 
   @Override
   public boolean uses(final Use u) {
     if(u == Use.VAR) return true;
-    for(final TypeCase c : cs) if(c.uses(u)) return true;
+    for(final TypeCase c : cases) if(c.uses(u)) return true;
     return ts.uses(u);
   }
 
   @Override
-  public boolean uses(final Var v) {
-    for(final TypeCase c : cs) if(c.uses(v)) return true;
-    return ts.uses(v);
+  public int count(final Var v) {
+    int c = 0;
+    for(final TypeCase t : cases) c += t.count(v);
+    return c + ts.count(v);
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final TypeCase c : cs) if(!c.removable(v)) return false;
+    for(final TypeCase c : cases) if(!c.removable(v)) return false;
     return ts.removable(v);
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(int c = 0; c < cs.length; ++c) cs[c].remove(v);
+    for(int c = 0; c < cases.length; ++c) cases[c].remove(v);
     ts = ts.remove(v);
     return this;
   }
@@ -113,7 +118,7 @@ public final class TypeSwitch extends ParseExpr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(final TypeCase c : cs) c.plan(ser);
+    for(final TypeCase c : cases) c.plan(ser);
     ts.plan(ser);
     ser.closeElement();
   }
@@ -121,6 +126,6 @@ public final class TypeSwitch extends ParseExpr {
   @Override
   public String toString() {
     return new TokenBuilder(TYPESWITCH + PAR1 + ts + PAR2 + ' ').addSep(
-        cs, SEP).toString();
+        cases, SEP).toString();
   }
 }

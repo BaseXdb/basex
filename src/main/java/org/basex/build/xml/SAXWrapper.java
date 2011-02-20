@@ -32,7 +32,7 @@ public final class SAXWrapper extends FileParser {
   /** SAX handler reference. */
   private SAXHandler sax;
   /** Optional XML reader. */
-  private final SAXSource source;
+  private final SAXSource src;
   /** File length. */
   private long length;
   /** Properties. */
@@ -57,7 +57,7 @@ public final class SAXWrapper extends FileParser {
   public SAXWrapper(final SAXSource s, final String n, final String ta,
       final Prop pr) {
     super(io(s, n), ta);
-    source = s;
+    src = s;
     prop = pr;
   }
 
@@ -75,9 +75,11 @@ public final class SAXWrapper extends FileParser {
 
   @Override
   public void parse() throws IOException {
-    final InputSource is = wrap(source.getInputSource());
+    final InputSource is = wrap(src.getInputSource());
+    final String input = src.getSystemId() == null ? "..." : src.getSystemId();
+
     try {
-      XMLReader r = source.getXMLReader();
+      XMLReader r = src.getXMLReader();
       if(r == null) {
         final SAXParserFactory f = SAXParserFactory.newInstance();
         f.setNamespaceAware(true);
@@ -95,18 +97,22 @@ public final class SAXWrapper extends FileParser {
       r.setErrorHandler(sax);
 
       if(is != null) r.parse(is);
-      else r.parse(source.getSystemId());
+      else r.parse(src.getSystemId());
     } catch(final SAXParseException ex) {
-      final String msg = Util.info(SCANPOS, ex.getSystemId(),
-          ex.getLineNumber(), ex.getColumnNumber())
-          + ": " + ex.getMessage();
+      final String msg = Util.info(SCANPOS, input, ex.getLineNumber(),
+          ex.getColumnNumber()) + ": " + ex.getMessage();
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
     } catch(final ProgressException ex) {
       throw ex;
     } catch(final Exception ex) {
-      final IOException ioe = new IOException(ex.getMessage());
+      // occurs, e.g. if document encoding is invalid:
+      // prefix message with source id
+      String msg = ex.getMessage();
+      if(input != null) msg = "\"" + input + "\": " + msg;
+      // wrap and return original message
+      final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
     }
@@ -132,8 +138,8 @@ public final class SAXWrapper extends FileParser {
         return i;
       }
     });
-    source.setInputSource(in);
-    source.setSystemId(is.getSystemId());
+    src.setInputSource(in);
+    src.setSystemId(is.getSystemId());
     length = file.length();
     return in;
   }

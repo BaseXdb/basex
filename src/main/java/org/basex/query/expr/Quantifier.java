@@ -95,12 +95,13 @@ public final class Quantifier extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Var v) {
+  public int count(final Var v) {
+    int c = 0;
     for(final ForLet f : fl) {
-      if(f.uses(v)) return true;
-      if(f.shadows(v)) return false;
+      c += f.count(v);
+      if(f.shadows(v)) return c;
     }
-    return sat.removable(v);
+    return c + sat.count(v);
   }
 
   @Override

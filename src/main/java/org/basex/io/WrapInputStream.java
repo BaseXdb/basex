@@ -14,18 +14,18 @@ import java.io.InputStream;
  * @author Christian Gruen
  */
 public final class WrapInputStream extends InputStream {
-  /** Buffer input. */
-  private final BufferInput bi;
+  /** Input stream. */
+  private final InputStream input;
   /** Current value. */
   private int curr;
 
   /**
    * Constructor.
-   * @param buffer buffer input to be wrapped
+   * @param in input stream to be wrapped
    * @throws IOException I/O exception
    */
-  public WrapInputStream(final BufferInput buffer) throws IOException {
-    bi = buffer;
+  public WrapInputStream(final InputStream in) throws IOException {
+    input = in;
     read();
   }
 
@@ -41,7 +41,7 @@ public final class WrapInputStream extends InputStream {
   public int read() throws IOException {
     final int v = curr;
     if(v == -1) return -1;
-    curr = bi.read();
+    curr = input.read();
     if(curr == 0) curr = -1;
     return v;
   }

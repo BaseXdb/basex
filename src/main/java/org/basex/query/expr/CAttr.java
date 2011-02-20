@@ -110,8 +110,8 @@ public final class CAttr extends CFrag {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    return atn.uses(v) || super.uses(v);
+  public int count(final Var v) {
+    return atn.count(v) + super.count(v);
   }
 
   @Override

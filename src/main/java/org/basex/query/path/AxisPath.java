@@ -589,9 +589,10 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public final boolean uses(final Var v) {
-    for(final AxisStep s : step) if(s.uses(v)) return true;
-    return super.uses(v);
+  public final int count(final Var v) {
+    int c = 0;
+    for(final AxisStep s : step) c += s.count(v);
+    return c + super.count(v);
   }
 
   @Override

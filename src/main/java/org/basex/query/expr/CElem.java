@@ -149,8 +149,8 @@ public final class CElem extends CFrag {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    return tag.uses(v) || super.uses(v);
+  public int count(final Var v) {
+    return tag.count(v) + super.count(v);
   }
 
   @Override

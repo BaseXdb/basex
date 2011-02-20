@@ -9,6 +9,8 @@ package org.basex.util;
 public final class Args {
   /** Calling object. */
   private final Object obj;
+  /** Program header. */
+  private final String header;
   /** Usage info. */
   private final String usage;
   /** Command-line arguments. */
@@ -26,13 +28,26 @@ public final class Args {
    * @param a arguments
    * @param o calling object
    * @param u usage info
+   * @param h header
    */
-  public Args(final String[] a, final Object o, final String u) {
+  public Args(final String[] a, final Object o, final String u,
+      final String h) {
     final StringBuilder sb = new StringBuilder();
     for(final String s : a) sb.append(s).append(' ');
     args = sb.toString();
     usage = u;
     obj = o;
+    header = h;
+  }
+
+  /**
+   * Simplified constructor.
+   * @param a arguments
+   * @param o calling object
+   * @param u usage info
+   */
+  public Args(final String[] a, final Object o, final String u) {
+    this(a, o, u, null);
   }
 
   /**
@@ -116,7 +131,8 @@ public final class Args {
    * @return success flag
    */
   public boolean finish() {
-    if(!ok) Util.outln("Usage: " + Util.name(obj) + usage);
+    if(!ok) Util.outln((header != null ? header : "") +
+        "Usage: " + Util.name(obj).toLowerCase() + usage);
     return ok;
   }
 

@@ -24,6 +24,7 @@ import org.basex.data.Data;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.FTBuilder;
 import org.basex.index.ValueBuilder;
+import org.basex.io.BufferInput;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.util.Performance;
@@ -105,7 +106,8 @@ public final class CreateDB extends ACreate {
   public static synchronized String xml(final String name,
       final InputStream input, final Context ctx) throws BaseXException {
 
-    final BufferedInputStream is = new BufferedInputStream(input);
+    final InputStream is = input instanceof BufferedInputStream ||
+      input instanceof BufferInput ? input : new BufferedInputStream(input);
     final SAXSource sax = new SAXSource(new InputSource(is));
     final SAXWrapper sw = new SAXWrapper(sax, ctx.prop);
     return xml(name, sw, ctx);

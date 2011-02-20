@@ -200,7 +200,8 @@ public class BufferInput extends InputStream {
         for(int c = 0; c < cb.limit(); ++c) i |= cb.get(c) << (c << 3);
         return i;
       } catch(final CharacterCodingException ex) {
-        ch = readByte();
+        // tolerate erroneous characters
+        return ch & 0xFF;
       }
     }
   }

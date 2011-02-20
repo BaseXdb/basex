@@ -214,7 +214,7 @@ public final class ServerProcess extends Thread {
     try {
       final WrapInputStream is = new WrapInputStream(in);
       final String info = is.curr() == -1 ?
-          CreateDB.xml(name, Parser.emptyParser(name), context) :
+        CreateDB.xml(name, Parser.emptyParser(name), context) :
         CreateDB.xml(name, is, context);
       // send {MSG}0 and 0 as success flag
       out.writeString(info);

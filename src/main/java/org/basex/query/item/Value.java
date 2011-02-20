@@ -112,8 +112,8 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public final boolean uses(final Var v) {
-    return false;
+  public final int count(final Var v) {
+    return 0;
   }
 
   @Override

@@ -54,23 +54,25 @@ public final class For extends ForLet {
 
   @Override
   public For comp(final QueryContext ctx) throws QueryException {
-    // always returns a self reference
     expr = checkUp(expr, ctx).comp(ctx);
-
     type = expr.type();
+
     // bind variable or set return type
-    if(pos != null || score != null || !type.one() ||
-        !bind(ctx)) {
+    //if(pos != null || score != null || !type.one() || !bind(ctx)) {
       var.ret = ctx.grouping ? SeqType.get(type.type, SeqType.Occ.ZM) :
         type.type.seq();
-    }
-
+    //}
     ctx.vars.add(var);
     if(pos   != null) ctx.vars.add(pos);
     if(score != null) ctx.vars.add(score);
 
     size = expr.size();
     return this;
+  }
+
+  @Override
+  protected boolean bind(final QueryContext ctx) throws QueryException {
+    return simple(true) && super.bind(ctx);
   }
 
   @Override
@@ -147,8 +149,8 @@ public final class For extends ForLet {
   }
 
   @Override
-  boolean simple() {
-    return pos == null && score == null;
+  boolean simple(final boolean one) {
+    return pos == null && score == null && (!one || type.one());
   }
 
   @Override
