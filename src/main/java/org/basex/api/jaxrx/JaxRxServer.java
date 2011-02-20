@@ -18,6 +18,8 @@ import org.jaxrx.JettyServer;
  * @author Christian Gruen
  */
 public final class JaxRxServer extends BaseXServer {
+  /** JAX-RX String. */
+  private static final String JAXRX = "JAX-RX";
   /** Jetty server. */
   private JettyServer jetty;
 
@@ -64,7 +66,7 @@ public final class JaxRxServer extends BaseXServer {
     // start Jetty server (if not done yet)
     try {
       jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT));
-      Util.outln("JAX-RX " + SERVERSTART);
+      Util.outln(JAXRX + ' ' + SERVERSTART);
     } catch(final Exception ex) {
       Util.server(ex);
     }
@@ -90,7 +92,7 @@ public final class JaxRxServer extends BaseXServer {
 
   @Override
   public boolean parseArguments(final String[] args) {
-    final Args arg = new Args(args, this, JAXRXINFO);
+    final Args arg = new Args(args, this, JAXRXINFO, Util.info(CONSOLE, JAXRX));
     boolean daemon = false;
     String serial = "";
     while(arg.more()) {
