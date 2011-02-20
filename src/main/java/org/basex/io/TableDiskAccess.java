@@ -479,7 +479,7 @@ public final class TableDiskAccess extends TableAccess {
 
   /**
    * Returns the number of entries; needed for JUnit tests.
-   * @return number of used blocks
+   * @return number of entries
    */
   public int size() {
     return meta.size;
