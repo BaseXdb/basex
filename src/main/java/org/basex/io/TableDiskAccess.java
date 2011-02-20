@@ -3,6 +3,7 @@ package org.basex.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
+
 import org.basex.data.MetaData;
 import org.basex.util.Array;
 import org.basex.util.BitArray;
@@ -467,7 +468,7 @@ public final class TableDiskAccess extends TableAccess {
     bf.pos = pagemap.nextClearBit(0);
 
     // if the block number is bigger than the total number of block, it's a new:
-    if(bf.pos > allBlocks) allBlocks = (int) bf.pos;
+    if(bf.pos >= allBlocks) allBlocks = (int) bf.pos + 1;
 
     bf.dirty = true;
     pagemap.set(bf.pos);
