@@ -7,15 +7,12 @@ import org.basex.io.DataOutput;
 import org.basex.util.TokenSet;
 
 /**
- * This class provides statistics for a tag or attribute name
- * and its contents.
+ * This class provides statistics for a tag or attribute name and its contents.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class StatsKey {
-  /** Maximum number of categories in statistics. */
-  private static final int MAXCATS = 50;
   /** Kind of Contents. */
   public enum Kind {
     /** Text.     */ TEXT,
@@ -24,6 +21,7 @@ public final class StatsKey {
     /** Numeric.  */ DBL,
     /** No texts. */ NONE
   }
+
   /** Node kind. */
   public Kind kind;
   /** Categories. */
@@ -36,26 +34,32 @@ public final class StatsKey {
   public int counter;
   /** Leaf node flag. */
   public boolean leaf;
+
+  /** Maximum number of string categories. */
+  private final int maxcats;
   /** Maximum text length. */
   private double len;
 
   /**
    * Default constructor.
+   * @param c number of string categories
    */
-  public StatsKey() {
+  public StatsKey(final int c) {
     cats = new TokenSet();
     kind = Kind.INT;
     min = Double.MAX_VALUE;
     max = Double.MIN_VALUE;
     leaf = true;
+    maxcats = c;
   }
 
   /**
    * Constructor, specifying an input stream.
    * @param in input stream
+   * @param c number of string categories
    * @throws IOException I/O exception
    */
-  public StatsKey(final DataInput in) throws IOException {
+  public StatsKey(final DataInput in, final int c) throws IOException {
     kind = Kind.values()[in.readNum()];
 
     if(kind == Kind.INT || kind == Kind.DBL) {
@@ -69,6 +73,7 @@ public final class StatsKey {
     counter = in.readNum();
     leaf = in.readBool();
     len = in.readDouble();
+    maxcats = c;
   }
 
   /**
@@ -101,7 +106,7 @@ public final class StatsKey {
    * Adds a value. All values are first treated as integer values. If a value
    * can't be converted to an integer, it is treated as double value. If
    * conversion fails again, it is handled as string category. Next, all values
-   * are cached. As soon as their number exceeds {@link #MAXCATS}, the cached
+   * are cached. As soon as their number exceeds {@link #maxcats}, the cached
    * values are skipped, and contents are treated as arbitrary strings.
    * @param val value to be added
    */
@@ -111,7 +116,7 @@ public final class StatsKey {
 
     if(vl == 0 || kind == Kind.TEXT || ws(val)) return;
 
-    if(cats != null && cats.size() < MAXCATS) {
+    if(cats != null && cats.size() <= maxcats) {
       if(val.length > MAXLEN) {
         kind = Kind.TEXT;
         cats = null;
@@ -131,13 +136,13 @@ public final class StatsKey {
     if(kind == Kind.DBL) {
       final double d = toDouble(val);
       if(Double.isNaN(d)) {
-        kind = cats.size() < MAXCATS ? Kind.CAT : Kind.TEXT;
+        kind = cats.size() <= maxcats ? Kind.CAT : Kind.TEXT;
       } else {
         if(min > d) min = d;
         if(max < d) max = d;
       }
     } else if(kind == Kind.CAT) {
-      if(cats.size() == MAXCATS) {
+      if(cats.size() > maxcats) {
         kind = Kind.TEXT;
         cats = null;
       }

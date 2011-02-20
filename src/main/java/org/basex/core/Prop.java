@@ -138,6 +138,8 @@ public final class Prop extends AProp {
   public static final Object[] FTINDEX = { "FTINDEX", false };
   /** Flag for creating a path summary. */
   public static final Object[] PATHINDEX = { "PATHINDEX", true };
+  /** Maximum number of name categories. */
+  public static final Object[] CATEGORIES = { "CATEGORIES", 50 };
 
   /** Flag for creating a main memory database table. */
   public static final Object[] TABLEMEM = { "TABLEMEM", false };
