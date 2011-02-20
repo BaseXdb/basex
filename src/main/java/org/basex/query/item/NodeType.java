@@ -169,6 +169,11 @@ public enum NodeType implements Type {
     return uri;
   }
 
+  @Override
+  public boolean func() {
+    return false;
+  }
+
   /**
    * Constructs a new item from the specified item.
    * @param it item to be converted
@@ -322,12 +327,9 @@ public enum NodeType implements Type {
     return this == t || par != null && par.instance(t);
   }
 
-  /**
-   * Checks if the type refers to a node.
-   * @return result of check
-   */
+  @Override
   public final boolean node() {
-    return false;
+    return true;
   }
 
   /**
@@ -354,7 +356,7 @@ public enum NodeType implements Type {
    * @param type type as string
    * @return type or {@code null}
    */
-  public static NodeType node(final QNm type) {
+  public static NodeType find(final QNm type) {
     final byte[] ln = type.ln();
     final byte[] uri = type.uri().atom();
     for(final NodeType t : values()) {

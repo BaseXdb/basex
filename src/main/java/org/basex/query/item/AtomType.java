@@ -647,10 +647,7 @@ public enum AtomType implements Type {
   SEQ("sequence", null, EMPTY, false, false, false, false, false),
 
   /** Java type. */
-  JAVA("java", null, EMPTY, true, true, true, false, false),
-
-  /** Function type. */
-  FUNC("function", ITEM, EMPTY, false, false, false, false, false);
+  JAVA("java", null, EMPTY, true, true, true, false, false);
 
   /** String representation. */
   public final byte[] nam;
@@ -709,6 +706,11 @@ public enum AtomType implements Type {
   @Override
   public byte[] uri() {
     return uri;
+  }
+
+  @Override
+  public boolean func() {
+    return false;
   }
 
   /**

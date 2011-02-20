@@ -1496,7 +1496,7 @@ public class QueryParser extends InputParser {
       final byte[] name = qName(null);
       final int p2 = qp;
       if(consumeWS(PAR1)) {
-        final NodeType type = NodeType.node(new QNm(name, ctx, input()));
+        final NodeType type = NodeType.find(new QNm(name, ctx, input()));
         if(type != null) {
           tok.reset();
           while(!consume(PAR2)) {
@@ -2242,7 +2242,7 @@ public class QueryParser extends InputParser {
           type.atom()).add('(').add(tok.finish()).add(")\""));
     }
 
-    if(t == AtomType.FUNC && consumeWS2(AS)) {
+    if(t.func() && consumeWS2(AS)) {
       final SeqType retType = sequenceType(); // TODO don't throw this away
     }
 

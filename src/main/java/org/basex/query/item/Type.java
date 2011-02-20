@@ -102,6 +102,12 @@ public interface Type {
    */
   boolean dat();
 
+  /**
+   * Checks if the type refers to a function item.
+   * @return result of check
+   */
+  boolean func();
+
   @Override
   String toString();
 }
