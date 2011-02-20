@@ -6,7 +6,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
@@ -37,7 +37,7 @@ public final class Except extends Set {
     for(int e = 1; e < expr.length; ++e) {
       if(expr[e].empty()) {
         expr = Array.delete(expr, e--);
-        ctx.compInfo(OPTREMOVE, desc(), SimpleType.EMP);
+        ctx.compInfo(OPTREMOVE, desc(), AtomType.EMP);
       }
     }
     // results must always be sorted

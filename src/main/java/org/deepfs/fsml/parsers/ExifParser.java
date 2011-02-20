@@ -8,7 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.util.Token;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
@@ -769,7 +769,7 @@ public final class ExifParser {
             }
             break;
           case ASCII:
-            if(elem.getType().instance(SimpleType.DTM))
+            if(elem.getType().instance(AtomType.DTM))
               d.addMeta(elem, readDate(b));
             else d.addMeta(elem, readAscii(b));
             break;

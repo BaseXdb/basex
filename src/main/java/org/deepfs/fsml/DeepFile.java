@@ -19,7 +19,7 @@ import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
 import org.basex.util.Atts;
 import org.basex.util.StringList;
@@ -417,7 +417,7 @@ public final class DeepFile {
    *          {@code null} if the default data type should be used
    */
   private void addMeta(final MetaElem e, final String value,
-      final SimpleType type) {
+      final AtomType type) {
     if(metaFinished || value.isEmpty()) return;
 
     if(e.equals(MetaElem.TYPE) || e.equals(MetaElem.FORMAT)) {
@@ -463,7 +463,7 @@ public final class DeepFile {
    */
   public void addMeta(final MetaElem elem, final byte[] value) {
     if(value == null) return;
-    if(!SimpleType.STR.instance(elem.getType()))
+    if(!AtomType.STR.instance(elem.getType()))
       metaDebug(elem, "string - as byte array");
     else addMeta(elem, string(clean(value, true)), null);
   }
@@ -475,7 +475,7 @@ public final class DeepFile {
    */
   public void addMeta(final MetaElem elem, final String value) {
     if(value == null) return;
-    if(!checkType(elem, SimpleType.STR)) return;
+    if(!checkType(elem, AtomType.STR)) return;
     addMeta(elem, string(clean(token(value), true)), null);
   }
 
@@ -485,8 +485,8 @@ public final class DeepFile {
    * @param value integer value
    */
   public void addMeta(final MetaElem elem, final short value) {
-    if(!checkType(elem, SimpleType.SHR)) return;
-    addMeta(elem, String.valueOf(value), SimpleType.SHR);
+    if(!checkType(elem, AtomType.SHR)) return;
+    addMeta(elem, String.valueOf(value), AtomType.SHR);
   }
 
   /**
@@ -495,7 +495,7 @@ public final class DeepFile {
    * @param value integer value
    */
   public void addMeta(final MetaElem elem, final int value) {
-    if(!SimpleType.INT.instance(elem.getType())) {
+    if(!AtomType.INT.instance(elem.getType())) {
       if(value <= Short.MAX_VALUE) addMeta(elem, (short) value);
       else metaDebug(elem, "integer");
     } else addMeta(elem, String.valueOf(value), null);
@@ -507,10 +507,10 @@ public final class DeepFile {
    * @param value long value
    */
   public void addMeta(final MetaElem elem, final long value) {
-    if(!SimpleType.LNG.instance(elem.getType())) {
+    if(!AtomType.LNG.instance(elem.getType())) {
       if(value <= Integer.MAX_VALUE) addMeta(elem, (int) value);
       else metaDebug(elem, "long");
-    } else addMeta(elem, String.valueOf(value), SimpleType.LNG);
+    } else addMeta(elem, String.valueOf(value), AtomType.LNG);
   }
 
   /**
@@ -519,8 +519,8 @@ public final class DeepFile {
    * @param value double value
    */
   public void addMeta(final MetaElem elem, final double value) {
-    if(!checkType(elem, SimpleType.DBL)) return;
-    addMeta(elem, String.valueOf(value), SimpleType.DBL);
+    if(!checkType(elem, AtomType.DBL)) return;
+    addMeta(elem, String.valueOf(value), AtomType.DBL);
   }
 
   /**
@@ -530,7 +530,7 @@ public final class DeepFile {
    */
   public void addMeta(final MetaElem elem, final Duration value) {
     if(value == null) return;
-    if(!checkType(elem, SimpleType.DUR)) return;
+    if(!checkType(elem, AtomType.DUR)) return;
     addMeta(elem, String.valueOf(value.toString()), null);
   }
 
@@ -543,8 +543,8 @@ public final class DeepFile {
     if(xgc == null) return;
     final Type t = elem.getType();
     final QName st = xgc.getXMLSchemaType();
-    if(SimpleType.DAT.instance(t) && !st.equals(DatatypeConstants.DATE)
-        || SimpleType.YEA.instance(t) && !st.equals(DatatypeConstants.GYEAR))
+    if(AtomType.DAT.instance(t) && !st.equals(DatatypeConstants.DATE)
+        || AtomType.YEA.instance(t) && !st.equals(DatatypeConstants.GYEAR))
       metaDebug(elem, st.getLocalPart());
     else {
       try {

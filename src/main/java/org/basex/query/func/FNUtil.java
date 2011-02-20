@@ -15,7 +15,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -117,7 +117,7 @@ final class FNUtil extends Fun {
   private Dbl mb(final QueryContext ctx) throws QueryException {
     // check caching flag
     final boolean c = expr.length == 2 &&
-      checkType(expr[1].item(ctx, input), SimpleType.BLN).bool(input);
+      checkType(expr[1].item(ctx, input), AtomType.BLN).bool(input);
 
     // measure initial memory consumption
     Performance.gc(3);
@@ -148,7 +148,7 @@ final class FNUtil extends Fun {
   private Dbl ms(final QueryContext ctx) throws QueryException {
     // check caching flag
     final boolean c = expr.length == 2 &&
-      checkType(expr[1].item(ctx, input), SimpleType.BLN).bool(input);
+      checkType(expr[1].item(ctx, input), AtomType.BLN).bool(input);
 
     // create timer
     final Performance p = new Performance();

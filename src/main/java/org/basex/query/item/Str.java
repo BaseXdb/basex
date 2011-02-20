@@ -23,7 +23,7 @@ public class Str extends Item {
    * @param v value
    */
   private Str(final byte[] v) {
-    this(v, SimpleType.STR);
+    this(v, AtomType.STR);
   }
 
   /**

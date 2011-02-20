@@ -20,7 +20,7 @@ import org.basex.query.func.FunDef;
 import org.basex.query.func.FunJava;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
 import org.basex.util.Array;
@@ -66,10 +66,10 @@ public final class Functions extends ExprInfo {
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
-      final Type type = SimpleType.find(name, true);
-      if(type == null || type == SimpleType.NOT || type == SimpleType.AAT) {
+      final Type type = AtomType.find(name, true);
+      if(type == null || type == AtomType.NOT || type == AtomType.AAT) {
         final Levenshtein ls = new Levenshtein();
-        for(final SimpleType t : SimpleType.values()) {
+        for(final AtomType t : AtomType.values()) {
           if(t.par() != null && ls.similar(lc(ln), lc(t.nam()), 0))
             qp.error(FUNSIMILAR, name, t.nam());
         }

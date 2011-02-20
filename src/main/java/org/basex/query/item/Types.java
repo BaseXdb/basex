@@ -19,7 +19,7 @@ public final class Types {
    */
   public static Type find(final QNm type, final boolean atom) {
     // atomic types
-    final SimpleType st = SimpleType.find(type, atom);
+    final AtomType st = AtomType.find(type, atom);
     if(st != null) return st;
 
     // node types

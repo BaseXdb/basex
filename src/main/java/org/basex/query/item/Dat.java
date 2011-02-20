@@ -16,7 +16,7 @@ public final class Dat extends Date {
    * @param d date
    */
   public Dat(final Date d) {
-    super(SimpleType.DAT, d);
+    super(AtomType.DAT, d);
     xc.setTime(UNDEF, UNDEF, UNDEF);
     xc.setMillisecond(UNDEF);
   }
@@ -42,7 +42,7 @@ public final class Dat extends Date {
    * @throws QueryException query exception
    */
   public Dat(final byte[] d, final InputInfo ii) throws QueryException {
-    super(SimpleType.DAT, d, XDATE, ii);
+    super(AtomType.DAT, d, XDATE, ii);
     date(d, XDATE, ii);
   }
 }

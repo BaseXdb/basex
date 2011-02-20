@@ -26,7 +26,7 @@ public final class YMd extends Dur {
    * @param it duration item
    */
   YMd(final Dur it) {
-    super(SimpleType.YMD);
+    super(AtomType.YMD);
     mon = it.mon;
   }
 
@@ -65,7 +65,7 @@ public final class YMd extends Dur {
    * @throws QueryException query exception
    */
   YMd(final byte[] v, final InputInfo ii) throws QueryException {
-    super(SimpleType.YMD);
+    super(AtomType.YMD);
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P")) dateErr(v, XYMD, ii);

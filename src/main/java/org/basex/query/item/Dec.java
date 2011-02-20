@@ -26,7 +26,7 @@ public final class Dec extends Item {
    * @param t string representation
    */
   public Dec(final byte[] t) {
-    super(SimpleType.DEC);
+    super(AtomType.DEC);
     val = new BigDecimal(Token.string(trim(t)));
   }
 
@@ -45,7 +45,7 @@ public final class Dec extends Item {
    * @param d decimal value
    */
   private Dec(final BigDecimal d) {
-    super(SimpleType.DEC);
+    super(AtomType.DEC);
     val = d;
   }
 
@@ -99,7 +99,7 @@ public final class Dec extends Item {
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it.type == SimpleType.DBL || it.type == SimpleType.FLT ?
+    return it.type == AtomType.DBL || it.type == AtomType.FLT ?
         it.eq(ii, this) : val.compareTo(it.dec(ii)) == 0;
   }
 
@@ -112,7 +112,7 @@ public final class Dec extends Item {
 
   @Override
   public Object toJava() {
-    return type == SimpleType.ULN ? new BigInteger(val.toString()) : val;
+    return type == AtomType.ULN ? new BigInteger(val.toString()) : val;
   }
 
   @Override
@@ -130,7 +130,7 @@ public final class Dec extends Item {
   static BigDecimal parse(final double val, final InputInfo ii)
       throws QueryException {
     if(Double.isNaN(val) || val == 1 / 0d || val == -1 / 0d)
-      Err.value(ii, SimpleType.DEC, val);
+      Err.value(ii, AtomType.DEC, val);
     return BigDecimal.valueOf(val);
   }
 
@@ -145,7 +145,7 @@ public final class Dec extends Item {
       throws QueryException {
 
     if(contains(val, 'e') || contains(val, 'E'))
-      FUNCAST.thrw(ii, SimpleType.DEC, val);
+      FUNCAST.thrw(ii, AtomType.DEC, val);
 
     try {
       return new BigDecimal(Token.string(val).trim());

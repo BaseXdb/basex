@@ -30,7 +30,7 @@ public class Itr extends Item {
    * @param v value
    */
   private Itr(final long v) {
-    this(v, SimpleType.ITR);
+    this(v, AtomType.ITR);
   }
 
   /**
@@ -48,7 +48,7 @@ public class Itr extends Item {
    * @param d date time
    */
   Itr(final Date d) {
-    this(d.xc.toGregorianCalendar().getTimeInMillis(), SimpleType.LNG);
+    this(d.xc.toGregorianCalendar().getTimeInMillis(), AtomType.LNG);
   }
 
   /**
@@ -67,7 +67,7 @@ public class Itr extends Item {
    * @return instance
    */
   public static Itr get(final long v, final Type t) {
-    return t == SimpleType.ITR ? get(v) : new Itr(v, t);
+    return t == AtomType.ITR ? get(v) : new Itr(v, t);
   }
 
   @Override
@@ -120,7 +120,7 @@ public class Itr extends Item {
 
   @Override
   public final Object toJava() {
-    switch((SimpleType) type) {
+    switch((AtomType) type) {
       case BYT: return (byte) val;
       case SHR:
       case UBY: return (short) val;

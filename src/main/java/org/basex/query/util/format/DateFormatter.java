@@ -6,7 +6,7 @@ import java.util.Calendar;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.QueryException;
 import org.basex.query.item.Date;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.util.format.FormatParser.Case;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -56,8 +56,8 @@ public final class DateFormatter {
         String pres = "1";
         long num = 0;
 
-        final boolean dat = date.type == SimpleType.DAT;
-        final boolean tim = date.type == SimpleType.TIM;
+        final boolean dat = date.type == AtomType.DAT;
+        final boolean tim = date.type == AtomType.TIM;
         final XMLGregorianCalendar gc = date.xc;
         switch(spec) {
           case 'Y':

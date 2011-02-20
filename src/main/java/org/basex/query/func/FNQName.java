@@ -12,7 +12,7 @@ import org.basex.query.item.NCN;
 import org.basex.query.item.Nod;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.ItemIter;
@@ -61,23 +61,23 @@ final class FNQName extends Fun {
         return it == null ? null : resolve(ctx, it, checkEmpty(it2));
       case QNAME:
         final byte[] uri = it == null ? EMPTY :
-          checkType(it, SimpleType.STR).atom();
+          checkType(it, AtomType.STR).atom();
         final Item it3 = it2 == null ? Str.ZERO :
-          checkType(it2, SimpleType.STR);
+          checkType(it2, AtomType.STR);
         final byte[] atm = it3.atom();
         final byte[] str = !contains(atm, ':') && eq(uri, XMLURI)
             ? concat(XMLC, atm) : atm;
-        if(!XMLToken.isQName(str)) Err.value(input, SimpleType.QNM, it3);
+        if(!XMLToken.isQName(str)) Err.value(input, AtomType.QNM, it3);
         QNm nm = new QNm(str, uri);
         if(nm.ns() && uri.length == 0)
-          Err.value(input, SimpleType.URI, nm.uri());
+          Err.value(input, AtomType.URI, nm.uri());
         return nm;
       case LOCNAMEQNAME:
         if(it == null) return null;
-        return new NCN(((QNm) checkType(it, SimpleType.QNM)).ln(), input);
+        return new NCN(((QNm) checkType(it, AtomType.QNM)).ln(), input);
       case PREQNAME:
         if(it == null) return null;
-        nm = (QNm) checkType(it, SimpleType.QNM);
+        nm = (QNm) checkType(it, AtomType.QNM);
         return !nm.ns() ? null : new NCN(nm.pref(), input);
       case NSURIPRE: // TODO [LW][LK] broken...
         final byte[] pre = checkEStr(it);
@@ -124,7 +124,7 @@ final class FNQName extends Fun {
       throws QueryException {
 
     final byte[] name = trim(checkEStr(q));
-    if(!XMLToken.isQName(name)) Err.value(input, SimpleType.QNM, q);
+    if(!XMLToken.isQName(name)) Err.value(input, AtomType.QNM, q);
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();

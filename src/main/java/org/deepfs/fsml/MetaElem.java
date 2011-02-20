@@ -1,8 +1,8 @@
 package org.deepfs.fsml;
 
 import static org.deepfs.fsml.DeepNS.*;
-import static org.basex.query.item.SimpleType.*;
-import org.basex.query.item.SimpleType;
+import static org.basex.query.item.AtomType.*;
+import org.basex.query.item.AtomType;
 import org.basex.util.Token;
 import org.basex.util.Util;
 
@@ -244,9 +244,9 @@ public enum MetaElem {
   /** Namespace. */
   private final DeepNS ns;
   /** Default XML data type. */
-  private final SimpleType dt;
+  private final AtomType dt;
   /** More precise data type. */
-  private SimpleType pdt;
+  private AtomType pdt;
   /** Flag, if the metadata element may have multiple values. */
   private final boolean multiVal;
 
@@ -262,7 +262,7 @@ public enum MetaElem {
    * @param mv flag, if the metadata element may have multiple values
    */
   private MetaElem(final DeepNS namespace, final String name,
-      final SimpleType dataType, final boolean mv) {
+      final AtomType dataType, final boolean mv) {
     ns = namespace;
     n = ns.tag(name);
     dt = dataType;
@@ -299,7 +299,7 @@ public enum MetaElem {
    * Returns the xml datatype for the metadata attribute.
    * @return the xml datatype for the metadata attribute
    */
-  public SimpleType getType() {
+  public AtomType getType() {
     if(pdt != null) return pdt;
     return dt;
   }
@@ -328,7 +328,7 @@ public enum MetaElem {
    * data type (e.g. "short" instead of "integer").
    * @param dataType the new xml data type to set for this metadata element
    */
-  void refineDataType(final SimpleType dataType) {
+  void refineDataType(final AtomType dataType) {
     if(!dataType.instance(dt)) Util.notexpected("Failed to refine the xml " +
         "data type " + "for the metadata element " + n
         + " (invalid data type: " + dataType + ")");

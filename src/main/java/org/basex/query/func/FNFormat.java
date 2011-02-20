@@ -8,7 +8,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Date;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.util.Err;
@@ -41,9 +41,9 @@ final class FNFormat extends Fun {
     switch(def) {
       case FORMINT: return formatInteger(ctx);
       case FORMNUM: return formatNumber(ctx);
-      case FORMDTM: return formatDate(SimpleType.DTM, ctx);
-      case FORMDAT: return formatDate(SimpleType.DAT, ctx);
-      case FORMTIM: return formatDate(SimpleType.TIM, ctx);
+      case FORMDTM: return formatDate(AtomType.DTM, ctx);
+      case FORMDAT: return formatDate(AtomType.DAT, ctx);
+      case FORMTIM: return formatDate(AtomType.TIM, ctx);
       default:      return super.item(ctx, ii);
     }
   }

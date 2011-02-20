@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.item.SimpleType.*;
+import static org.basex.query.item.AtomType.*;
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
 import org.basex.query.item.DTd;

@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.query.item.SimpleType.*;
+import static org.basex.query.item.AtomType.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;

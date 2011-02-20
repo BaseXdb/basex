@@ -39,7 +39,7 @@ import org.w3c.dom.Text;
 public enum NodeType implements Type {
 
   /** Node type. */
-  NOD("node", SimpleType.ITEM, EMPTY, false, true, false, false, false),
+  NOD("node", AtomType.ITEM, EMPTY, false, true, false, false, false),
 
   /** Text type. */
   TXT("text", NOD, EMPTY, false, true, false, false, false) {
@@ -239,8 +239,8 @@ public enum NodeType implements Type {
    */
   Item checkNum(final Item it, final InputInfo ii)
       throws QueryException {
-    return it.type == SimpleType.URI || !it.str() && !it.num() && !it.unt() &&
-      it.type != SimpleType.BLN ? error(it, ii) : it;
+    return it.type == AtomType.URI || !it.str() && !it.num() && !it.unt() &&
+      it.type != AtomType.BLN ? error(it, ii) : it;
   }
 
   /**
@@ -258,7 +258,7 @@ public enum NodeType implements Type {
     final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
     checkNum(it, ii);
 
-    if(it.type == SimpleType.DBL || it.type == SimpleType.FLT) {
+    if(it.type == AtomType.DBL || it.type == AtomType.FLT) {
       final double d = it.dbl(ii);
       if(isNaN(d) || d == 1 / 0d || d == -1 / 0d) Err.value(ii, this, it);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) INTRANGE.thrw(ii, d);
@@ -281,7 +281,7 @@ public enum NodeType implements Type {
    * @return item argument
    */
   static boolean str(final Item it) {
-    return (it.str() || it.unt()) && it.type != SimpleType.URI;
+    return (it.str() || it.unt()) && it.type != AtomType.URI;
   }
 
   /**

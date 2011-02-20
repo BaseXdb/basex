@@ -21,7 +21,7 @@ import org.basex.util.XMLToken;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public enum SimpleType implements Type {
+public enum AtomType implements Type {
   /** Item type. */
   ITEM("item", null, EMPTY, false, false, false, false, false),
 
@@ -749,7 +749,7 @@ public enum SimpleType implements Type {
    * @param d duration flag
    * @param t date flag
    */
-  private SimpleType(final String nm, final Type pr, final byte[] ur,
+  private AtomType(final String nm, final Type pr, final byte[] ur,
       final boolean n, final boolean u, final boolean s, final boolean d,
       final boolean t) {
     nam = token(nm);
@@ -800,7 +800,7 @@ public enum SimpleType implements Type {
     final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
     checkNum(it, ii);
 
-    if(it.type == SimpleType.DBL || it.type == SimpleType.FLT) {
+    if(it.type == AtomType.DBL || it.type == AtomType.FLT) {
       final double d = it.dbl(ii);
       if(isNaN(d) || d == 1 / 0d || d == -1 / 0d) Err.value(ii, this, it);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) INTRANGE.thrw(ii, d);
@@ -878,14 +878,14 @@ public enum SimpleType implements Type {
    * @param atom atomic type
    * @return type or {@code null}
    */
-  public static SimpleType find(final QNm type, final boolean atom) {
+  public static AtomType find(final QNm type, final boolean atom) {
     // type must be atomic, or must not have a namespace
     if(atom ^ !type.ns()) {
       final byte[] ln = type.ln();
       final byte[] uri = type.uri().atom();
-      for(final SimpleType t : values()) {
+      for(final AtomType t : values()) {
         // skip non-standard types
-        if(t == SimpleType.SEQ || t == SimpleType.JAVA) continue;
+        if(t == AtomType.SEQ || t == AtomType.JAVA) continue;
         if(eq(ln, t.nam) && eq(uri, t.uri)) return t;
       }
     }
@@ -897,10 +897,10 @@ public enum SimpleType implements Type {
    * @param type type as string
    * @return type or {@code null}
    */
-  public static SimpleType node(final QNm type) {
+  public static AtomType node(final QNm type) {
     final byte[] ln = type.ln();
     final byte[] uri = type.uri().atom();
-    for(final SimpleType t : SimpleType.values()) {
+    for(final AtomType t : AtomType.values()) {
       if(t.node() && eq(ln, t.nam) && eq(uri, t.uri)) return t;
     }
     return null;

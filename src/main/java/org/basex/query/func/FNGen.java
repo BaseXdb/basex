@@ -22,7 +22,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
@@ -79,7 +79,7 @@ final class FNGen extends Fun {
   public Expr cmp(final QueryContext ctx) {
     if(def == FunDef.DATA &&  expr.length == 1) {
       final SeqType t = expr[0].type();
-      type = t.type.node() ? SeqType.get(SimpleType.ATM, t.occ) : t;
+      type = t.type.node() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
     return this;
   }

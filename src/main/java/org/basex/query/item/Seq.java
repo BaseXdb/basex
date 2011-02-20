@@ -20,7 +20,7 @@ public abstract class Seq extends Value {
    * @param s size
    */
   protected Seq(final long s) {
-    super(SimpleType.SEQ);
+    super(AtomType.SEQ);
     size = s;
   }
 

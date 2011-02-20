@@ -22,7 +22,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Jav;
 import org.basex.query.item.NodeType;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -57,12 +57,12 @@ public final class FunJava extends Arr {
   };
   /** Resulting XQuery types. */
   private static final Type[] XQUERY = {
-    SimpleType.STR, SimpleType.BLN, SimpleType.BLN, SimpleType.BYT,
-    SimpleType.BYT, SimpleType.SHR, SimpleType.SHR, SimpleType.INT,
-    SimpleType.INT, SimpleType.LNG, SimpleType.LNG, SimpleType.FLT,
-    SimpleType.FLT, SimpleType.DBL, SimpleType.DBL, SimpleType.DEC,
-    SimpleType.ITR, SimpleType.QNM, SimpleType.STR, SimpleType.HEX,
-    SimpleType.SEQ
+    AtomType.STR, AtomType.BLN, AtomType.BLN, AtomType.BYT,
+    AtomType.BYT, AtomType.SHR, AtomType.SHR, AtomType.INT,
+    AtomType.INT, AtomType.LNG, AtomType.LNG, AtomType.FLT,
+    AtomType.FLT, AtomType.DBL, AtomType.DBL, AtomType.DEC,
+    AtomType.ITR, AtomType.QNM, AtomType.STR, AtomType.HEX,
+    AtomType.SEQ
   };
   /** Java class. */
   private final Class<?> cls;
@@ -177,7 +177,7 @@ public final class FunJava extends Arr {
    */
   private static Type type(final Class<?> par) {
     for(int j = 0; j < JAVA.length; ++j) if(par == JAVA[j]) return XQUERY[j];
-    return SimpleType.JAVA;
+    return AtomType.JAVA;
   }
 
   /**
@@ -187,7 +187,7 @@ public final class FunJava extends Arr {
    */
   public static Type type(final Object o) {
     final Type t = type(o.getClass());
-    if(t != SimpleType.JAVA) return t;
+    if(t != AtomType.JAVA) return t;
 
     if(o instanceof Element) return NodeType.ELM;
     if(o instanceof Document) return NodeType.DOC;
@@ -199,20 +199,20 @@ public final class FunJava extends Arr {
 
     if(o instanceof Duration) {
       final Duration d = (Duration) o;
-      return !d.isSet(YEARS) && !d.isSet(MONTHS) ? SimpleType.DTD :
+      return !d.isSet(YEARS) && !d.isSet(MONTHS) ? AtomType.DTD :
         !d.isSet(HOURS) && !d.isSet(MINUTES) && !d.isSet(SECONDS) ?
-          SimpleType.YMD : SimpleType.DUR;
+          AtomType.YMD : AtomType.DUR;
     }
     if(o instanceof XMLGregorianCalendar) {
       final QName type = ((XMLGregorianCalendar) o).getXMLSchemaType();
-      if(type == DATE) return SimpleType.DAT;
-      if(type == DATETIME) return SimpleType.DTM;
-      if(type == TIME) return SimpleType.TIM;
-      if(type == GYEARMONTH) return SimpleType.YMO;
-      if(type == GMONTHDAY) return SimpleType.MDA;
-      if(type == GYEAR) return SimpleType.YEA;
-      if(type == GMONTH) return SimpleType.MON;
-      if(type == GDAY) return SimpleType.DAY;
+      if(type == DATE) return AtomType.DAT;
+      if(type == DATETIME) return AtomType.DTM;
+      if(type == TIME) return AtomType.TIM;
+      if(type == GYEARMONTH) return AtomType.YMO;
+      if(type == GMONTHDAY) return AtomType.MDA;
+      if(type == GYEAR) return AtomType.YEA;
+      if(type == GMONTH) return AtomType.MON;
+      if(type == GDAY) return AtomType.DAY;
     }
     return null;
   }

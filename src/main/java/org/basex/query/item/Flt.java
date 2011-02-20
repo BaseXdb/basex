@@ -26,7 +26,7 @@ public final class Flt extends Item {
    * @param v value
    */
   private Flt(final float v) {
-    super(SimpleType.FLT);
+    super(AtomType.FLT);
     val = v;
   }
 
@@ -71,7 +71,7 @@ public final class Flt extends Item {
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it.type == SimpleType.DBL ? it.eq(ii, this) : val == it.flt(ii);
+    return it.type == AtomType.DBL ? it.eq(ii, this) : val == it.flt(ii);
   }
 
   @Override

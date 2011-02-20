@@ -18,7 +18,7 @@ public final class Jav extends Item {
    * @param v value
    */
   public Jav(final Object v) {
-    super(SimpleType.JAVA);
+    super(AtomType.JAVA);
     val = v;
   }
 

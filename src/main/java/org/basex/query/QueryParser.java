@@ -82,7 +82,7 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.SimpleType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Types;
 import org.basex.query.item.SeqType.Occ;
 import org.basex.query.item.Str;
@@ -1738,7 +1738,7 @@ public class QueryParser extends InputParser {
   private Expr functionCall() throws QueryException {
     final int p = qp;
     final QNm name = new QNm(qName(null), ctx, input());
-    if(!consumeWS2(PAR1) || SimpleType.node(name) != null) {
+    if(!consumeWS2(PAR1) || AtomType.node(name) != null) {
       qp = p;
       return null;
     }
@@ -2162,7 +2162,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * [117] Parses a SimpleType.
+   * [117] Parses a AtomType.
    * @return sequence type
    * @throws QueryException query exception
    */
@@ -2172,7 +2172,7 @@ public class QueryParser extends InputParser {
     type.uri(ctx.ns.uri(type.pref(), false, input()));
     skipWS();
     final Type t = Types.find(type, true);
-    if(t == SimpleType.AAT || t == SimpleType.NOT) error(CASTUNKNOWN, type);
+    if(t == AtomType.AAT || t == AtomType.NOT) error(CASTUNKNOWN, type);
     if(t == null) error(TYPEUNKNOWN, type);
     return SeqType.get(t, consume('?') ? Occ.ZO : Occ.O);
   }
@@ -2193,7 +2193,7 @@ public class QueryParser extends InputParser {
       consume('*') ? Occ.ZM : Occ.O;
     skipWS();
 
-    if(t == SimpleType.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
+    if(t == AtomType.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
 
     final KindTest kt = tok.size() == 0 ? null : kindTest(t, tok.finish());
     // use empty name test if types are different
@@ -2242,7 +2242,7 @@ public class QueryParser extends InputParser {
           type.atom()).add('(').add(tok.finish()).add(")\""));
     }
 
-    if(t == SimpleType.FUNC && consumeWS2(AS)) {
+    if(t == AtomType.FUNC && consumeWS2(AS)) {
       final SeqType retType = sequenceType(); // TODO don't throw this away
     }
 
@@ -2271,17 +2271,17 @@ public class QueryParser extends InputParser {
     }
     if(t != NodeType.ELM && t != NodeType.ATT) error(TESTINVALID, t, k);
 
-    SimpleType tp = (SimpleType) t;
+    AtomType tp = (AtomType) t;
     final int i = indexOf(nm, ',');
     if(i != -1) {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx, input());
       if(!eq(test.uri().atom(), XSURI)) error(TYPEUNDEF, test);
 
       final byte[] ln = test.ln();
-      tp = SimpleType.find(test, true);
+      tp = AtomType.find(test, true);
       if(tp == null && !eq(ln, ANYTYPE) && !eq(ln, ANYSIMPLE) &&
           !eq(ln, UNTYPED)) error(VARUNDEF, test);
-      if(tp == SimpleType.ATM || tp == SimpleType.AAT) tp = null;
+      if(tp == AtomType.ATM || tp == AtomType.AAT) tp = null;
       nm = trim(substring(nm, 0, i));
     }
     if(nm.length == 1 && nm[0] == '*')
