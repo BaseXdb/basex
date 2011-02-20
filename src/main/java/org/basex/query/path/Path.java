@@ -90,8 +90,8 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    return root != null && root.uses(v);
+  public int count(final Var v) {
+    return root != null ? root.count(v) : 0;
   }
 
   @Override

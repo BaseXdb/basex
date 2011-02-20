@@ -78,6 +78,16 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
+  public boolean uses(final Use u) {
+    return win.uses(u) || super.uses(u);
+  }
+
+  @Override
+  public int count(final Var v) {
+    return win.count(v) + super.count(v);
+  }
+
+  @Override
   public boolean removable(final Var v) {
     return win.removable(v) && super.removable(v);
   }
@@ -87,12 +97,6 @@ public final class FTWindow extends FTFilter {
     win = win.remove(v);
     return super.remove(v);
   }
-
-  /* [CG] XQFT: check sequential scan with NOT combinations
-  @Override
-  public boolean indexAccessible(final IndexContext ic) {
-    return false;
-  }*/
 
   @Override
   public void plan(final Serializer ser) throws IOException {

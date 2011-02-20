@@ -43,9 +43,10 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    for(final Expr e : expr) if(e.uses(v)) return true;
-    return false;
+  public int count(final Var v) {
+    int c = 0;
+    for(final Expr e : expr) c += e.count(v);
+    return c;
   }
 
   @Override

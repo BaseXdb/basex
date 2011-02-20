@@ -143,20 +143,19 @@ public abstract class Expr extends ExprInfo {
   /**
    * Indicates if an expression uses the specified type/operation.
    * Called by the compiler to test properties of sub-expressions.
-   * {@code true} is returned as default.
    * @param u use type to be checked
    * @return result of check
    */
   public abstract boolean uses(final Use u);
 
   /**
-   * Checks if the specified variable is used by an expression.
+   * Counts how often the specified variable is used by an expression.
    * This method is called by {@link GFLWOR#comp} to rewrite where clauses
-   * as predicates. {@code true} is returned as default.
-   * @param v variable to be replaced
-   * @return result of check
+   * as predicates.
+   * @param v variable to be checked
+   * @return number of occurrences
    */
-  public abstract boolean uses(final Var v);
+  public abstract int count(final Var v);
 
   /**
    * Checks if the specified variable is replaceable by a context item.

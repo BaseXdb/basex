@@ -83,7 +83,12 @@ public class GFLWOR extends ParseExpr {
 
     // optimize for/let clauses
     final int vs = ctx.vars.size();
-    for(final ForLet f : fl) f.comp(ctx);
+
+    for(int f = 0; f < fl.length; ++f) {
+      fl[f].comp(ctx);
+      // pre-evaluate and bind variable if it is used exactly once
+      if(count(fl[f].var, f) == 1) fl[f].bind(ctx);
+    }
 
     // optimize where clause
     boolean empty = false;
@@ -118,10 +123,11 @@ public class GFLWOR extends ParseExpr {
       return Empty.SEQ;
     }
 
-    // remove declarations of statically bound variables
-    for(int f = 0; f != fl.length; ++f) {
-      if(fl[f].var.expr() != null) {
-        ctx.compInfo(OPTVAR, fl[f].var);
+    // remove declarations of statically bound or unused variables
+    for(int f = 0; f < fl.length; ++f) {
+      final ForLet l = fl[f];
+      if(l.var.expr() != null || l.simple(true) && count(l.var, f) == 0) {
+        ctx.compInfo(OPTVAR, l.var);
         fl = Array.delete(fl, f--);
       }
     }
@@ -177,13 +183,13 @@ public class GFLWOR extends ParseExpr {
       // loop through all outer clauses
       for(int g = f - 1; g >= 0; --g) {
         // stop if variable is shadowed or used by the current clause
-        if(fl[g].shadows(t.var) || t.uses(fl[g].var)) break;
+        if(fl[g].shadows(t.var) || t.count(fl[g].var) != 0) break;
         // ignore let clauses and fragment constructors
         if(fl[g] instanceof Let) continue;
         // stop if variable is used by as position or score
         final For fr = (For) fl[g];
-        if(fr.pos != null && t.uses(fr.pos) ||
-           fr.score != null && t.uses(fr.score)) break;
+        if(fr.pos != null && t.count(fr.pos) != 0 ||
+           fr.score != null && t.count(fr.score) != 0) break;
 
         // move let clause to outer position
         System.arraycopy(fl, g, fl, g + 1, f - g);
@@ -204,8 +210,10 @@ public class GFLWOR extends ParseExpr {
     if(where == null) return;
 
     // check if all clauses are simple, and if variables are removable
-    for(final ForLet f : fl)
-      if(f instanceof For && (!f.simple() || !where.removable(f.var))) return;
+    for(final ForLet f : fl) {
+      if(f instanceof For && (!f.simple(false) || !where.removable(f.var)))
+        return;
+    }
 
     // create array with tests
     final Expr[] tests = where instanceof And ? ((And) where).expr :
@@ -221,7 +229,7 @@ public class GFLWOR extends ParseExpr {
         // remember index of most inner FOR clause
         if(fl[f] instanceof For) fr = f;
         // predicate is found that uses the current variable
-        if(tests[t].uses(fl[f].var)) {
+        if(tests[t].count(fl[f].var) != 0) {
           // stop rewriting if no most inner FOR clause is defined
           if(fr == -1) return;
           // attach predicate to the corresponding FOR clause, and stop
@@ -307,14 +315,27 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public final boolean uses(final Var v) {
-    for(final ForLet f : fl) {
-      if(f.uses(v)) return true;
-      if(f.shadows(v)) return false;
+  public final int count(final Var v) {
+    return count(v, -1);
+  }
+
+  /**
+   * Counts how often the specified variable is used, starting from the
+   * specified for/let index.
+   * @param v variable to be checked
+   * @param i index
+   * @return number of occurrences
+   */
+  public final int count(final Var v, final int i) {
+    int c = 0;
+    for(int f = Math.max(0, i); f < fl.length; f++) {
+      c += fl[f].count(v);
+      if((i == -1 || f > i) && fl[f].shadows(v)) return c;
     }
-    return where != null && where.uses(v)
-        || order != null && order.uses(v)
-        || group != null && group.uses(v) || ret.uses(v);
+    if(where != null) c += where.count(v);
+    if(order != null) c += order.count(v);
+    if(group != null) c += group.count(v);
+    return c + ret.count(v);
   }
 
   @Override

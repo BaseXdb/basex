@@ -92,9 +92,9 @@ public final class Catch extends Single {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    for(final Var vr : var) if(vr.eq(v)) return false;
-    return super.uses(v);
+  public int count(final Var v) {
+    for(final Var vr : var) if(vr.eq(v)) return 0;
+    return super.count(v);
   }
 
   @Override
