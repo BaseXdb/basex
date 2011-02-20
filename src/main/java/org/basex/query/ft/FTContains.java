@@ -124,8 +124,8 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final boolean uses(final Var v) {
-    return expr.uses(v) || ftexpr.uses(v);
+  public final int count(final Var v) {
+    return expr.count(v) + ftexpr.count(v);
   }
 
   @Override

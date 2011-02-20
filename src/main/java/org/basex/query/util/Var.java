@@ -167,8 +167,8 @@ public final class Var extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    return eq(v);
+  public int count(final Var v) {
+    return eq(v) ? 1 : 0;
   }
 
   @Override

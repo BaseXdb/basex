@@ -65,8 +65,8 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    return var.name != null && !var.eq(v) || super.uses(v);
+  public int count(final Var v) {
+    return var.name == null || !var.eq(v) ? super.count(v) : 0;
   }
 
   @Override
