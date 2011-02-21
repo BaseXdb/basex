@@ -345,6 +345,8 @@ public interface QueryTokens {
   String PRAGMA2 = "#)";
   /** Parser Token. */
   String PLHOLDER = "?";
+  /** Parser Token. */
+  String ASTERISK = "*";
 
   // URIS =====================================================================
 

@@ -306,25 +306,6 @@ public enum NodeType implements Type {
   }
 
   /**
-   * Finds and returns the specified data type.
-   * @param type type as string
-   * @param atom atomic type
-   * @return type or {@code null}
-   */
-  public static NodeType find(final QNm type, final boolean atom) {
-    // type must be atomic, or must not have a namespace
-    if(atom ^ !type.ns()) {
-      final byte[] ln = type.ln();
-      final byte[] uri = type.uri().atom();
-      for(final NodeType t : values()) {
-        // skip non-standard types
-        if(eq(ln, t.nam) && eq(uri, EMPTY)) return t;
-      }
-    }
-    return null;
-  }
-
-  /**
    * Finds and returns the specified node type.
    * @param type type as string
    * @return type or {@code null}

@@ -2,7 +2,9 @@ package org.basex.query.item;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import static org.basex.query.QueryTokens.*;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * XQuery 3.0 function data types.
@@ -126,4 +128,14 @@ public final class FunType implements Type {
     return new FunType(args, ret);
   }
 
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
+    if(this == ANY) {
+      tb.add('*').add(')');
+    } else {
+      tb.addSep(args, ", ").add(") as ").add(ret.toString());
+    }
+    return tb.toString();
+  }
 }

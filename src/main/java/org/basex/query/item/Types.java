@@ -1,5 +1,8 @@
 package org.basex.query.item;
 
+import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
+
 /**
  * XQuery data type register.
  *
@@ -23,9 +26,12 @@ public final class Types {
     if(st != null) return st;
 
     // node types
-    final NodeType nt = NodeType.find(type, atom);
-    if(nt != null) return nt;
+    if(!atom) {
+      final NodeType nt = NodeType.find(type);
+      if(nt != null) return nt;
+    }
 
-    return null;
+    return !atom && type.uri() == Uri.EMPTY && eq(type.ln(), token(FUNCTION)) ?
+        FunType.ANY : null;
   }
 }

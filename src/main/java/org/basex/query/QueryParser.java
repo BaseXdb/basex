@@ -78,6 +78,7 @@ import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Empty;
+import org.basex.query.item.FunType;
 import org.basex.query.item.Itr;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -2221,30 +2222,45 @@ public class QueryParser extends InputParser {
     // parse non-atomic types
     final boolean atom = !consumeWS(PAR1);
 
+    Type t = Types.find(type, atom);
+
     tok.reset();
     if(!atom) {
-      int par = 0;
-      while(par != 0 || !consumeWS2(PAR2)) {
-        switch(curr()) {
-          case '(': par++; break;
-          case ')': par--; break;
-          case '\0': error(FUNCMISS, type.atom());
-        }
-        tok.add(consume());
-      }
-      System.out.println(tok);
-    }
+      if(t != null && t.func()) {
+        // function type
+        if(!consumeWS(ASTERISK)) {
+          if(!consumeWS(PAR2)) {
+            // function has got arguments
+            SeqType[] args = {};
+            do {
+              args = Array.add(args, sequenceType());
+            } while(consumeWS(COMMA));
 
-    final Type t = Types.find(type, atom);
+            if(!consumeWS(PAR2)) error(FUNCMISS, type.atom());
+            SeqType ret = consumeWS2(AS) ? sequenceType() : SeqType.ITEM_ZM;
+
+            t = FunType.get(args, ret);
+          }
+        } else if(!consumeWS(PAR2)) {
+          error(FUNCMISS, type.atom());
+        }
+      } else {
+        int par = 0;
+        while(par != 0 || !consumeWS2(PAR2)) {
+          switch(curr()) {
+            case '(': par++; break;
+            case ')': par--; break;
+            case '\0': error(FUNCMISS, type.atom());
+          }
+          tok.add(consume());
+        }
+      }
+    }
 
     if(t == null) {
       if(atom) error(TYPEUNKNOWN, type);
       error(NOTYPE, new TokenBuilder("\"").add(
           type.atom()).add('(').add(tok.finish()).add(")\""));
-    }
-
-    if(t.func() && consumeWS2(AS)) {
-      final SeqType retType = sequenceType(); // TODO don't throw this away
     }
 
     return t;
