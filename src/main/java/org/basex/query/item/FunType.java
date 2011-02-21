@@ -106,7 +106,8 @@ public final class FunType implements Type {
   public boolean instance(final Type t) {
     // takes care of FunType.ANY
     if(this == t) return true;
-    if(!(t instanceof FunType)) return false;
+    if(this == ANY || t == ANY || !(t instanceof FunType)) return false;
+
     final FunType ft = (FunType) t;
     if(args.length != ft.args.length || !ret.instance(ft.ret)) return false;
     for(int i = 0; i < args.length; i++)

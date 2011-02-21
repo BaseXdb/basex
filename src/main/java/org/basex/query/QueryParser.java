@@ -2232,6 +2232,7 @@ public class QueryParser extends InputParser {
         }
         tok.add(consume());
       }
+      System.out.println(tok);
     }
 
     final Type t = Types.find(type, atom);
@@ -2271,14 +2272,14 @@ public class QueryParser extends InputParser {
     }
     if(t != NodeType.ELM && t != NodeType.ATT) error(TESTINVALID, t, k);
 
-    AtomType tp = (AtomType) t;
+    Type tp = t;
     final int i = indexOf(nm, ',');
     if(i != -1) {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx, input());
       if(!eq(test.uri().atom(), XSURI)) error(TYPEUNDEF, test);
 
       final byte[] ln = test.ln();
-      tp = AtomType.find(test, true);
+      tp = Types.find(test, true);
       if(tp == null && !eq(ln, ANYTYPE) && !eq(ln, ANYSIMPLE) &&
           !eq(ln, UNTYPED)) error(VARUNDEF, test);
       if(tp == AtomType.ATM || tp == AtomType.AAT) tp = null;

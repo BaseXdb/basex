@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static java.lang.Double.*;
-import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
@@ -18,7 +17,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 import org.basex.util.Util;
 import org.basex.util.XMLToken;
@@ -39,10 +37,10 @@ import org.w3c.dom.Text;
 public enum NodeType implements Type {
 
   /** Node type. */
-  NOD("node", AtomType.ITEM, EMPTY, false, true, false, false, false),
+  NOD("node", AtomType.ITEM),
 
   /** Text type. */
-  TXT("text", NOD, EMPTY, false, true, false, false, false) {
+  TXT("text", NOD) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXText ? ((BXText) o).getNod() :
@@ -51,7 +49,7 @@ public enum NodeType implements Type {
   },
 
   /** PI type. */
-  PI("processing-instruction", NOD, EMPTY, false, true, false, false, false) {
+  PI("processing-instruction", NOD) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXPI ? ((BXPI) o).getNod() :
@@ -60,7 +58,7 @@ public enum NodeType implements Type {
   },
 
   /** Element type. */
-  ELM("element", NOD, EMPTY, false, true, false, false, false) {
+  ELM("element", NOD) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXElem ? ((BXElem) o).getNod() :
@@ -69,7 +67,7 @@ public enum NodeType implements Type {
   },
 
   /** Document type. */
-  DOC("document-node", NOD, EMPTY, false, true, false, false, false) {
+  DOC("document-node", NOD) {
     @Override
     public Nod e(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXDoc) return ((BXDoc) o).getNod();
@@ -90,10 +88,10 @@ public enum NodeType implements Type {
   },
 
   /** Document element type (required by XQJ API). */
-  DEL("document-node(...)", NOD, EMPTY, false, true, false, false, false),
+  DEL("document-node(...)", NOD),
 
   /** Attribute type. */
-  ATT("attribute", NOD, EMPTY, false, true, false, false, false) {
+  ATT("attribute", NOD) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXAttr ? ((BXAttr) o).getNod() :
@@ -102,7 +100,7 @@ public enum NodeType implements Type {
   },
 
   /** Comment type. */
-  COM("comment", NOD, EMPTY, false, true, false, false, false) {
+  COM("comment", NOD) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
@@ -112,31 +110,20 @@ public enum NodeType implements Type {
 
   /** String representation. */
   public final byte[] nam;
-  /** URI representation. */
-  private final byte[] uri;
-  /** Number flag. */
-  public final boolean num;
   /** Parent type. */
   public final Type par;
-  /** Untyped flag. */
-  public final boolean unt;
-  /** String flag. */
-  public final boolean str;
-  /** Duration flag. */
-  public final boolean dur;
-  /** Date flag. */
-  public final boolean dat;
+
   /** Sequence type. */
   private SeqType seq;
 
   @Override
   public boolean dat() {
-    return dat;
+    return false;
   }
 
   @Override
   public boolean dur() {
-    return dur;
+    return false;
   }
 
   @Override
@@ -146,7 +133,7 @@ public enum NodeType implements Type {
 
   @Override
   public boolean num() {
-    return num;
+    return false;
   }
 
   @Override
@@ -156,17 +143,17 @@ public enum NodeType implements Type {
 
   @Override
   public boolean str() {
-    return str;
+    return false;
   }
 
   @Override
   public boolean unt() {
-    return unt;
+    return true;
   }
 
   @Override
   public byte[] uri() {
-    return uri;
+    return EMPTY;
   }
 
   @Override
@@ -205,24 +192,10 @@ public enum NodeType implements Type {
    * Constructor.
    * @param nm string representation
    * @param pr parent type
-   * @param ur uri
-   * @param n number flag
-   * @param u untyped flag
-   * @param s string flag
-   * @param d duration flag
-   * @param t date flag
    */
-  private NodeType(final String nm, final Type pr, final byte[] ur,
-      final boolean n, final boolean u, final boolean s, final boolean d,
-      final boolean t) {
+  private NodeType(final String nm, final Type pr) {
     nam = token(nm);
     par = pr;
-    uri = ur;
-    num = n;
-    unt = u;
-    str = s;
-    dur = d;
-    dat = t;
   }
 
   /**
@@ -345,7 +318,7 @@ public enum NodeType implements Type {
       final byte[] uri = type.uri().atom();
       for(final NodeType t : values()) {
         // skip non-standard types
-        if(eq(ln, t.nam) && eq(uri, t.uri)) return t;
+        if(eq(ln, t.nam) && eq(uri, EMPTY)) return t;
       }
     }
     return null;
@@ -360,21 +333,14 @@ public enum NodeType implements Type {
     final byte[] ln = type.ln();
     final byte[] uri = type.uri().atom();
     for(final NodeType t : values()) {
-      if(t.node() && eq(ln, t.nam) && eq(uri, t.uri)) return t;
+      if(eq(ln, t.nam) && eq(uri, EMPTY)) return t;
     }
     return null;
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    if(uri == XSURI) {
-      tb.add(XS);
-      tb.add(':');
-    }
-    tb.add(nam);
-    if(uri != XSURI) tb.add("()");
-    return tb.toString();
+    return string(nam) + "()";
   }
 
 }

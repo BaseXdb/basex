@@ -156,7 +156,7 @@ public final class Functions extends ExprInfo {
 
     if(NSGlobal.standard(uri)) {
       if(fun.declared) qp.error(NAMERES, name.atom());
-      else funError(name, qp);
+      funError(name, qp);
     }
 
     final byte[] ln = name.ln();
