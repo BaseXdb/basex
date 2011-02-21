@@ -10,7 +10,28 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class FunType implements Type {
+public final class FunType implements Type {
+
+  /** Any function type. */
+  public static final FunType ANY = new FunType(null, null);
+
+  /** Argument types. */
+  private final SeqType[] args;
+  /** Return type. */
+  private final SeqType ret;
+
+  /** This function type's sequence type. */
+  private SeqType seq;
+
+  /**
+   * Constructor.
+   * @param arg argument types
+   * @param rt return type
+   */
+  private FunType(final SeqType[] arg, final SeqType rt) {
+    args = arg;
+    ret = rt;
+  }
 
   @Override
   public boolean dat() {
@@ -19,24 +40,6 @@ public class FunType implements Type {
 
   @Override
   public boolean dur() {
-    return false;
-  }
-
-  @Override
-  public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Item e(final Object o, final InputInfo ii) throws QueryException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public boolean instance(final Type t) {
     return false;
   }
 
@@ -62,7 +65,8 @@ public class FunType implements Type {
 
   @Override
   public SeqType seq() {
-    return null;
+    if(seq == null) seq = new SeqType(this);
+    return seq;
   }
 
   @Override
@@ -85,14 +89,36 @@ public class FunType implements Type {
     return true;
   }
 
+  @Override
+  public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Item e(final Object o, final InputInfo ii) throws QueryException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public boolean instance(final Type t) {
+    if(this == t) return true;
+    if(!(t instanceof FunType)) return false;
+    final FunType ft = (FunType) t;
+    return false;
+  }
+
   /**
    * Getter for function types.
    * @param args argument types
    * @param ret return type
    * @return function type
    */
-  public static FunType instance(final Type[] args, final Type ret) {
-    return null;
+  public static FunType get(final SeqType[] args, final SeqType ret) {
+    if(args == null && ret == null) return ANY;
+    return new FunType(args, ret);
   }
 
 }

@@ -18,11 +18,45 @@ import org.basex.util.InputInfo;
 public final class SeqType {
   /** Number of occurrences (cardinality). */
   public enum Occ {
-    /** Zero. */         Z,
-    /** Zero or one. */  ZO,
-    /** Exactly one. */  O,
-    /** One or more. */  OM,
-    /** Zero or more. */ ZM,
+    /** Zero.         */  Z(0, 0, ""),
+    /** Zero or one.  */ ZO(0, 1, "?"),
+    /** Exactly one.  */  O(1, 1, ""),
+    /** One or more.  */ OM(1, Integer.MAX_VALUE, "+"),
+    /** Zero or more. */ ZM(0, Integer.MAX_VALUE, "*");
+
+    /** String representation. */
+    private final String str;
+    /** Minimal number of occurrences. */
+    public final int min;
+    /** Maximal number of occurrences. */
+    public final int max;
+
+    /**
+     * Constructor.
+     * @param mn minimal number of occurrences
+     * @param mx maximal number of occurrences
+     * @param s string representation
+     */
+    Occ(final int mn, final int mx, final String s) {
+      min = mn;
+      max = mx;
+      str = s;
+    }
+
+    /**
+     * Checks if the specified occurrence indicator is an instance of the
+     * current occurrence indicator.
+     * @param o occurrence indicator to check
+     * @return result of check
+     */
+    public boolean instance(final Occ o) {
+      return min <= o.min && max >= o.max;
+    }
+
+    @Override
+    public String toString() {
+      return str;
+    }
   }
 
   /** Zero items. */
@@ -258,11 +292,11 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type yields at most item.
+   * Tests if the type yields at most one item.
    * @return result of check
    */
   public boolean zeroOrOne() {
-    return occ != Occ.ZM && occ != Occ.OM;
+    return occ.max <= 1;
   }
 
   /**
@@ -278,7 +312,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeZero() {
-    return occ != Occ.O && occ != Occ.OM;
+    return occ.min == 0;
   }
 
   /**
@@ -329,7 +363,6 @@ public final class SeqType {
 
   @Override
   public String toString() {
-    return type + (occ == Occ.O || occ == Occ.Z ? "" :
-      occ == Occ.ZM ? "*" : occ == Occ.OM ? "+" : "?");
+    return type.toString() + occ.toString();
   }
 }

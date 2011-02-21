@@ -17,7 +17,7 @@ public abstract class Fun extends Item {
    * Constructor.
    */
   protected Fun() {
-    super(FunType.instance(null, null));
+    super(FunType.ANY);
   }
 
   @Override
