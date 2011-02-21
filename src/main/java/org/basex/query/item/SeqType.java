@@ -365,4 +365,13 @@ public final class SeqType {
   public String toString() {
     return type.toString() + occ.toString();
   }
+
+  /**
+   * Checks if the specified SeqType is an instance of the current SeqType.
+   * @param t SeqType to check
+   * @return result of check
+   */
+  public boolean instance(final SeqType t) {
+    return type.instance(t.type) && occ.instance(t.occ);
+  }
 }

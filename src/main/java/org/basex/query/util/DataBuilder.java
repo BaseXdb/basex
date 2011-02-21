@@ -8,7 +8,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.NodIter;
