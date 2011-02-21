@@ -63,6 +63,23 @@ public class IntSet {
   }
 
   /**
+   * Returns the specified key.
+   * @param i key index
+   * @return key
+   */
+  public final int key(final int i) {
+    return keys[i];
+  }
+
+  /**
+   * Returns number of entries.
+   * @return number of entries
+   */
+  public final int size() {
+    return size - 1;
+  }
+
+  /**
    * Resizes the hash table.
    */
   protected void rehash() {

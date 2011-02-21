@@ -2,13 +2,12 @@ package org.basex.query.up;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
-import java.util.HashMap;
-import java.util.Map;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.util.IntList;
+import org.basex.util.IntMap;
 
 /**
  * Holds all update primitives for a specific data reference.
@@ -18,12 +17,11 @@ import org.basex.util.IntList;
  */
 abstract class Primitives {
   /** Atomic update operations hashed by the pre value. */
-  protected final Map<Integer, NodePrimitives> op =
-    new HashMap<Integer, NodePrimitives>();
+  protected final IntMap<NodePrimitives> op = new IntMap<NodePrimitives>();
   /** Pre values of the target nodes which are updated, sorted ascending. */
   protected IntList nodes;
   /** Ids of fn:put target nodes. */
-  protected final IntList putIds = new IntList();
+  protected final IntList putIds = new IntList(1);
 
   /**
    * Adds a primitive to a primitive list depending on its type.
@@ -34,20 +32,20 @@ abstract class Primitives {
 
   /**
    * Adds the primitive to the set.
-   * @param i id key
-   * @param p update primitive
+   * @param id id key
+   * @param up update primitive
    * @throws QueryException query exception
    */
-  protected final void add(final int i, final UpdatePrimitive p)
+  protected final void add(final int id, final UpdatePrimitive up)
       throws QueryException {
 
-    if(p instanceof Put) putIds.add(i);
-    NodePrimitives l = op.get(i);
-    if(l == null) {
-      l = new NodePrimitivesContainer();
-      op.put(i, l);
+    if(up instanceof Put) putIds.add(id);
+    NodePrimitives np = op.get(id);
+    if(np == null) {
+      np = new NodePrimitivesContainer();
+      op.add(id, np);
     }
-    l.add(p);
+    np.add(up);
   }
 
   /**
@@ -58,7 +56,7 @@ abstract class Primitives {
     // get and sort keys (pre/id values)
     final int s = op.size();
     nodes = new IntList(s);
-    for(final int i : op.keySet()) nodes.add(i);
+    for(int i = 1; i <= op.size(); i++) nodes.add(op.key(i));
     nodes.sort();
 
     for(int i = 0; i < s; ++i) {

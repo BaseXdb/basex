@@ -1,6 +1,7 @@
 package org.basex.query.up.primitives;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
@@ -19,8 +20,8 @@ import org.basex.util.InputInfo;
  * @author Lukas Kircher
  */
 public abstract class NodeCopy extends UpdatePrimitive {
-  /** Insertion nodes. */
-  protected final LinkedList<NodIter> c = new LinkedList<NodIter>();
+  /** Nodes to be inserted. */
+  protected final List<NodIter> insert = new ArrayList<NodIter>(1);
   /** Final copy of insertion nodes. */
   public MemData md;
 
@@ -32,21 +33,22 @@ public abstract class NodeCopy extends UpdatePrimitive {
    */
   protected NodeCopy(final InputInfo ii, final Nod n, final NodIter ni) {
     super(ii, n);
-    c.add(ni);
+    insert.add(ni);
   }
 
   @Override
   public void prepare() throws QueryException {
-    if(c.size() == 0) return;
+    if(insert.size() == 0) return;
+
     final NodIter seq = new NodIter();
-    for(final NodIter ni : c) {
+    for(final NodIter ni : insert) {
       Nod i;
       while((i = ni.next()) != null) seq.add(i);
     }
     // ignore fragment nodes
     if(!(node instanceof DBNode)) return;
 
-    // text nodes still need to be merged. two adjacent iterators in c may
+    // text nodes still need to be merged. two adjacent iterators may
     // lead to two adjacent text nodes
     md = new MemData(((DBNode) node).data);
     new DataBuilder(md).build(mergeText(seq));

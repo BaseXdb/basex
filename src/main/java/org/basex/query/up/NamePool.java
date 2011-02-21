@@ -47,7 +47,7 @@ public final class NamePool {
 
   /**
    * Finds duplicate attributes.
-   * @return duplicate attribute
+   * @return duplicate attribute, or {@code null}
    */
   QNm duplicate() {
     for(int i = 0; i < size; ++i) if(occ[i] > 1) return names[i];
@@ -74,10 +74,10 @@ public final class NamePool {
   }
 
   /**
-   * Returns an index to an existing entry, or -1.
+   * Returns an index to an existing entry.
    * @param name name to be found
    * @param at attribute/element flag
-   * @return index offset
+   * @return index offset, or -1
    */
   private int index(final QNm name, final boolean at) {
     for(int i = 0; i < size; ++i) {

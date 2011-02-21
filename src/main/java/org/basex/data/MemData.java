@@ -51,7 +51,7 @@ public final class MemData extends Data {
    * @param pr property reference
    */
   public MemData(final Prop pr) {
-    this(new Names(), new Names(), new Namespaces(), new PathSummary(), pr);
+    this(new Names(0), new Names(0), new Namespaces(), new PathSummary(), pr);
   }
 
   @Override
