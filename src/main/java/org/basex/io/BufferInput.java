@@ -175,7 +175,7 @@ public class BufferInput extends InputStream {
    */
   public final int readChar() throws IOException {
     // handle different encodings
-    byte ch = readByte();
+    final byte ch = readByte();
     // comparison by references
     if(enc == UTF8) {
       final int cl = cl(ch);
@@ -200,7 +200,8 @@ public class BufferInput extends InputStream {
         for(int c = 0; c < cb.limit(); ++c) i |= cb.get(c) << (c << 3);
         return i;
       } catch(final CharacterCodingException ex) {
-        ch = readByte();
+        // tolerate erroneous characters
+        return ch & 0xFF;
       }
     }
   }

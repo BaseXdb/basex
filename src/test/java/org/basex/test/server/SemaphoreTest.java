@@ -124,7 +124,7 @@ public final class SemaphoreTest {
       try {
         session = newSession();
       } catch(final IOException ex) {
-        ex.printStackTrace();
+        fail(ex.toString());
       }
     }
 

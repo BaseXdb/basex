@@ -98,9 +98,10 @@ public final class Order extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    for(final OrderBy o : ob) if(o.uses(v)) return true;
-    return false;
+  public int count(final Var v) {
+    int c = 0;
+    for(final OrderBy o : ob) c += o.count(v);
+    return c;
   }
 
   @Override

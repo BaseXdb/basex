@@ -98,12 +98,13 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    for(final Let c : copies) {
-      if(c.uses(v)) return true;
-      if(c.shadows(v)) return false;
+  public int count(final Var v) {
+    int c = 0;
+    for(final Let l : copies) {
+      c += l.count(v);
+      if(l.shadows(v)) return c;
     }
-    return super.removable(v);
+    return c + super.count(v);
   }
 
   @Override

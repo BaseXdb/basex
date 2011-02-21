@@ -41,22 +41,26 @@ RUNNING BASEX ------------------------------------------------------------------
 
 ADDING CHECKSTYLE --------------------------------------------------------------
 
- Some additional guidelines are defined via the CheckStyle plugin:
+ Some additional Checkstyle guidelines are defined in the project:
 
  - Open Eclipse
  - Press "Help" -> "Install new Software..."
  - Press "Search for new features to install"
- - Enter the URL "http://eclipse-cs.sourceforge.net/update"
+ - Enter the URL: http://eclipse-cs.sourceforge.net/update
  - Follow the installation procedure and restart Eclipse
 
 --------------------------------------------------------------------------------
 
  Any kind of feedback is welcome; please check out the online documentation at
- http://docs.basex.org and tell us if you run into any troubles while installing
- and running BaseX: basex-talk@mailman.uni-konstanz.de
- You may use our public bugtracker over at Github: 
+ http://docs.basex.org
+
+ Tell us if you run into any troubles installing BaseX:
+ basex-talk@mailman.uni-konstanz.de.
+
+ You are as well invited to contribute to our bug tracker: 
  https://github.com/BaseXdb/BaseX/issues
 
+ All the best,
  BaseX Team, 2011
 
 ================================================================================

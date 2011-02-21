@@ -1,7 +1,7 @@
 package org.basex.query.up;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;
@@ -16,14 +16,13 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  */
 final class NodePrimitivesContainer implements NodePrimitives {
   /** Container for update primitives. */
-  private List<UpdatePrimitive> primitives =
-    new LinkedList<UpdatePrimitive>();
+  private List<UpdatePrimitive> prim = new ArrayList<UpdatePrimitive>(1);
   /** The corresponding node is target of a delete primitive. */
   private boolean del;
   /** The corresponding node is target of a replace primitive. */
   private boolean rep;
   /** Text node adjacency possible as a result of updates. */
-  private boolean textAdjacency;
+  private boolean adj;
 
   @Override
   public void add(final UpdatePrimitive p) throws QueryException {
@@ -31,8 +30,8 @@ final class NodePrimitivesContainer implements NodePrimitives {
   }
 
   /**
-   * Adds the given primitive to this container at a specific position.
-   * @param i position
+   * Adds the given primitive to this container at a specific index.
+   * @param i index
    * @param p Update Primitive to add
    * @throws QueryException query exception
    */
@@ -42,13 +41,13 @@ final class NodePrimitivesContainer implements NodePrimitives {
     rep |= pt == REPLACENODE;
     // text node adjacency cannot be instantly fixed if updates that affect
     // the sibling axis are still held pending
-    textAdjacency = del || rep || pt == INSERTBEFORE || pt == INSERTAFTER;
-    if(i < primitives.size()) {
-      final UpdatePrimitive a = primitives.get(i);
+    adj = del || rep || pt == INSERTBEFORE || pt == INSERTAFTER;
+    if(i < prim.size()) {
+      final UpdatePrimitive a = prim.get(i);
       if(a != null && a.type() == p.type()) a.merge(p);
-      else primitives.add(i, p);
+      else prim.add(i, p);
     } else {
-      primitives.add(p);
+      prim.add(p);
     }
   }
 
@@ -60,21 +59,20 @@ final class NodePrimitivesContainer implements NodePrimitives {
   private int findPos(final UpdatePrimitive p) {
     int i = -1;
     final int to = p.type().ordinal();
-    while(++i < primitives.size()) {
-      final int po = primitives.get(i).type().ordinal();
-      if(to <= po) return i;
+    while(++i < prim.size()) {
+      if(to <= prim.get(i).type().ordinal()) return i;
     }
     return i;
   }
 
   @Override
   public Iterator<UpdatePrimitive> iterator() {
-    return primitives.iterator();
+    return prim.iterator();
   }
 
   @Override
   public UpdatePrimitive find(final PrimitiveType t) {
-    for(final UpdatePrimitive p : primitives) if(p.type() == t) return p;
+    for(final UpdatePrimitive p : prim) if(p.type() == t) return p;
     return null;
   }
 
@@ -86,22 +84,21 @@ final class NodePrimitivesContainer implements NodePrimitives {
       // if a node is replaced, an eventual delete operation
       // is removed, as the actual node identity has been replaced.
       final PrimitiveType dominantOp = rep ? REPLACENODE : DELETE;
-      final List<UpdatePrimitive> temp = new LinkedList<UpdatePrimitive>();
+      final List<UpdatePrimitive> up = new ArrayList<UpdatePrimitive>(1);
       // if a node is deleted or replaced, all other operations performing on
       // the corresponding node identity are without effect in the end.
       // insert before/after form the only exceptions, as they do not affect
       // the actual target node, but the sibling axis.
-      for(final UpdatePrimitive p : primitives) {
-        final PrimitiveType pt = p.type();
-        if(pt == INSERTBEFORE || pt == INSERTAFTER || pt == dominantOp)
-          temp.add(p);
+      for(final UpdatePrimitive p : prim) {
+        final PrimitiveType t = p.type();
+        if(t == INSERTBEFORE || t == INSERTAFTER || t == dominantOp) up.add(p);
       }
-      primitives = temp;
+      prim = up;
     }
   }
 
   @Override
   public boolean textAdjacency() {
-    return textAdjacency;
+    return adj;
   }
 }

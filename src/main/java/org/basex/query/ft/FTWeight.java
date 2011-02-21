@@ -84,6 +84,16 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
+  public boolean uses(final Use u) {
+    return weight.uses(u) || super.uses(u);
+  }
+
+  @Override
+  public int count(final Var v) {
+    return weight.count(v) + super.count(v);
+  }
+
+  @Override
   public boolean removable(final Var v) {
     return weight.removable(v) && super.removable(v);
   }

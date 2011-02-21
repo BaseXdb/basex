@@ -39,8 +39,8 @@ abstract class Single extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    return expr.uses(v);
+  public int count(final Var v) {
+    return expr.count(v);
   }
 
   @Override

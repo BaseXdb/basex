@@ -13,7 +13,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.DBDocSeq;
+import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
@@ -66,12 +66,12 @@ public final class QueryResources {
       Err.PERMNO.thrw(null, CmdPerm.READ);
 
     // assign initial context value: use empty node set if database is empty
-    ctx.value = DBDocSeq.get(d.empty() ? new int[0] : nodes.list, d);
+    ctx.value = DBNodeSeq.get(d.empty() ? new int[0] : nodes.list, d);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
     addCollection(nodes.root ? ctx.value :
-        DBDocSeq.get(d.doc(), d), token(d.meta.name));
+        DBNodeSeq.get(d.doc(), d), token(d.meta.name));
 
     // add global data reference has been added, set indicator to true
     globalData = true;
@@ -240,7 +240,7 @@ public final class QueryResources {
    * @param path inner collection path
    */
   private void addCollection(final Data d, final byte[] path) {
-    addCollection(DBDocSeq.get(d.doc(string(path)), d), token(d.meta.name));
+    addCollection(DBNodeSeq.get(d.doc(string(path)), d), token(d.meta.name));
   }
 
   /**

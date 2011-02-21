@@ -119,7 +119,8 @@ public final class Add extends ACreate {
     if(data == null) return PROCNODB;
 
     String trg = path(target);
-    if(!trg.isEmpty()) trg = trg + "/";
+    if(!trg.isEmpty()) trg = trg + '/';
+
     final BufferedInputStream is = new BufferedInputStream(input);
     final SAXSource sax = new SAXSource(new InputSource(is));
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
@@ -147,7 +148,7 @@ public final class Add extends ACreate {
 
     final Performance p = new Performance();
 
-    final String path = target + (target.isEmpty() ? "" : "/") +
+    final String path = target + (target.isEmpty() ? "/" : "") +
         (name == null ? parser.file.name() : name);
 
     // create disk instances for large documents

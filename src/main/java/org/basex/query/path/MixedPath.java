@@ -112,6 +112,13 @@ public final class MixedPath extends Path {
   }
 
   @Override
+  public int count(final Var v) {
+    int c = 0;
+    for(final Expr e : expr) c += e.count(v);
+    return c + super.count(v);
+  }
+
+  @Override
   public boolean removable(final Var v) {
     for(final Expr e : expr) if(e.uses(Use.VAR)) return false;
     return true;

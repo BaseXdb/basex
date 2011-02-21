@@ -1,5 +1,7 @@
 package org.basex;
 
+import static org.basex.core.Text.*;
+
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.util.Enumeration;
@@ -14,6 +16,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIMacOSX;
 import org.basex.gui.GUIProp;
 import org.basex.io.IO;
+import org.basex.util.Args;
 import org.basex.util.Util;
 
 /**
@@ -24,7 +27,9 @@ import org.basex.util.Util;
  */
 public final class BaseXGUI {
   /** Mac OS X GUI optimizations. */
-  GUIMacOSX osxGUI;
+  protected GUIMacOSX osxGUI;
+  /** File, specified as argument. */
+  protected String file;
 
   /**
    * Main method.
@@ -40,6 +45,8 @@ public final class BaseXGUI {
    * @param args command-line arguments
    */
   public BaseXGUI(final String[] args) {
+    if(!parseArguments(args)) return;
+
     // set mac specific properties
     if(Prop.MAC) {
       try {
@@ -67,8 +74,8 @@ public final class BaseXGUI {
         if(osxGUI != null) osxGUI.init(gui);
 
         // open specified document or database
-        if(args.length != 0) {
-          final String input = args[0].replace('\\', '/');
+        if(file != null) {
+          final String input = file.replace('\\', '/');
           final IO io = IO.get(input);
           boolean xq = false;
           for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
@@ -116,20 +123,19 @@ public final class BaseXGUI {
   }
 
   /**
-   * Shows a start window.
-  private JWindow startWin() {
-    final JWindow win = new JWindow();
-    final URL url = BaseXGUI.class.getResource("/img/start.png");
-    final Image img = Toolkit.getDefaultToolkit().getImage(url);
-
-    win.getContentPane().setBackground(Color.WHITE);
-    win.add(new JLabel(new ImageIcon(img)));
-    win.pack();
-
-    final Dimension s = Toolkit.getDefaultToolkit().getScreenSize();
-    final Dimension p = win.getSize();
-    win.setLocation(s.width - p.width >> 1, s.height - p.height >> 1);
-    return win;
-  }
+   * Parses the command-line arguments, specified by the user.
+   * @param args command-line arguments
+   * @return success flag
    */
+  private boolean parseArguments(final String[] args) {
+    final Args arg = new Args(args, this, GUIINFO, Util.info(CONSOLE, GUIMODE));
+    while(arg.more()) {
+      if(arg.dash()) {
+        arg.check(false);
+      } else {
+        file = file == null ? arg.string() : file + " " + arg.string();
+      }
+    }
+    return arg.finish();
+  }
 }

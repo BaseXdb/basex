@@ -30,19 +30,19 @@ public abstract class Builder extends Progress {
   /** Meta data on built database. */
   public MetaData meta;
 
+  /** Tree structure. */
+  protected final PathSummary path = new PathSummary();
+  /** Namespace index. */
+  protected final Namespaces ns = new Namespaces();
   /** Parser instance. */
   protected final Parser parser;
   /** Property instance. */
   protected final Prop prop;
-
   /** Tag name index. */
-  protected final Names tags = new Names();
+  protected final Names tags;;
   /** Attribute name index. */
-  protected final Names atts = new Names();
-  /** Namespace index. */
-  protected final Namespaces ns = new Namespaces();
-  /** Tree structure. */
-  protected final PathSummary path = new PathSummary();
+  protected final Names atts;
+
   /** Number of cached size values. */
   protected int ssize;
   /** Currently stored size value. */
@@ -67,6 +67,9 @@ public abstract class Builder extends Progress {
   protected Builder(final Parser parse, final Prop pr) {
     parser = parse;
     prop = pr;
+    final int cats = pr.num(Prop.CATEGORIES);
+    tags = new Names(cats);
+    atts = new Names(cats);
   }
 
   // Public Methods ============================================================

@@ -77,9 +77,21 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
+  public boolean uses(final Use u) {
+    for(final Expr d : dist) if(d.uses(u)) return true;
+    return super.uses(u);
+  }
+
+  @Override
+  public int count(final Var v) {
+    int c = 0;
+    for(final Expr d : dist) c += d.count(v);
+    return c + super.count(v);
+  }
+
+  @Override
   public boolean removable(final Var v) {
-    for(int d = 0; d != dist.length; ++d)
-      if(!dist[d].removable(v)) return false;
+    for(final Expr d : dist) if(!d.removable(v)) return false;
     return super.removable(v);
   }
 

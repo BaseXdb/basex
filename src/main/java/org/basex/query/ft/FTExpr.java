@@ -60,15 +60,16 @@ public abstract class FTExpr extends ParseExpr {
   public abstract FTIter iter(final QueryContext ctx) throws QueryException;
 
   @Override
-  public final boolean uses(final Use u) {
+  public boolean uses(final Use u) {
     for(final FTExpr e : expr) if(e.uses(u)) return true;
     return false;
   }
 
   @Override
-  public final boolean uses(final Var v) {
-    for(final FTExpr e : expr) if(e.uses(v)) return true;
-    return false;
+  public int count(final Var v) {
+    int c = 0;
+    for(final FTExpr e : expr) c += e.count(v);
+    return c;
   }
 
   @Override

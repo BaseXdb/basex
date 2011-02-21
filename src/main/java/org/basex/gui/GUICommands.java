@@ -164,7 +164,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows database info. */
-  INFO(GUIINFO + DOTS, "% D", GUIINFOTT, true, false) {
+  INFO(GUIPROPS + DOTS, "% D", GUIPROPSTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogInfo info = new DialogInfo(gui);

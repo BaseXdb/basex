@@ -357,18 +357,28 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
+  public boolean uses(final Use u) {
+    if(occ != null) for(final Expr o : occ) if(o.uses(u)) return true;
+    return query.uses(u);
+  }
+
+  @Override
+  public int count(final Var v) {
+    int c = 0;
+    if(occ != null) for(final Expr o : occ) c += o.count(v);
+    return c + query.count(v);
+  }
+
+  @Override
   public boolean removable(final Var v) {
-    if(occ != null) {
-      for(int o = 0; o != occ.length; ++o)
-        if(!occ[o].removable(v)) return false;
-    }
+    if(occ != null) for(final Expr o : occ) if(!o.removable(v)) return false;
     return query.removable(v);
   }
 
   @Override
   public FTExpr remove(final Var v) {
     if(occ != null) {
-      for(int o = 0; o != occ.length; ++o)
+      for(int o = 0; o < occ.length; ++o)
         occ[o] = occ[o].remove(v);
     }
     query = query.remove(v);

@@ -137,13 +137,8 @@ public final class DOTSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void print(final byte[] t, final String col) throws IOException {
-    String txt = t.length > 60 ? string(t).substring(0, 60) + "..." : string(t);
-    txt = txt.replaceAll("\"|\\r|\\n", "'");
-
+    String txt = string(chop(t, 60)).replaceAll("\"|\\r|\\n", "'");
     if(compact) {
-      /*while(txt.matches(".*[A-Z][a-z]+[A-Z].*")) {
-        txt = txt.replaceAll("([A-Z])[a-z]+([A-Z])", "$1$2");
-      }*/
       txt = txt.replaceAll("\\\\n\\w+:", "\\\\n");
     }
     out.println(Util.info(DOTNODE, count, txt, col));
