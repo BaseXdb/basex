@@ -1738,7 +1738,7 @@ public class QueryParser extends InputParser {
   private Expr functionCall() throws QueryException {
     final int p = qp;
     final QNm name = new QNm(qName(null), ctx, input());
-    if(!consumeWS2(PAR1) || AtomType.node(name) != null) {
+    if(!consumeWS2(PAR1) || NodeType.find(name) != null) {
       qp = p;
       return null;
     }

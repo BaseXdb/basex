@@ -894,20 +894,6 @@ public enum AtomType implements Type {
     return null;
   }
 
-  /**
-   * Finds and returns the specified node type.
-   * @param type type as string
-   * @return type or {@code null}
-   */
-  public static AtomType node(final QNm type) {
-    final byte[] ln = type.ln();
-    final byte[] uri = type.uri().atom();
-    for(final AtomType t : AtomType.values()) {
-      if(t.node() && eq(ln, t.nam) && eq(uri, t.uri)) return t;
-    }
-    return null;
-  }
-
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();

@@ -32,14 +32,14 @@ public final class ReplacePrimitive extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int pre = n.pre + add;
     final Data d = n.data;
-    final int par = d.parent(pre, Nod.kind(n.ndtype));
+    final int par = d.parent(pre, Nod.kind(n.ndType()));
 
     //new
     d.delete(pre);
 
     if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
     else d.insert(pre, par, md);
-    if(Nod.kind(n.ndtype) == Data.TEXT) mergeTexts(d, pre, pre + 1);
+    if(Nod.kind(n.ndType()) == Data.TEXT) mergeTexts(d, pre, pre + 1);
   }
 
   @Override

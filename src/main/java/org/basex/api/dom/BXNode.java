@@ -58,7 +58,7 @@ public abstract class BXNode implements Node {
    * @return node kind
    */
   protected int kind() {
-    return Nod.kind(node.ndtype);
+    return Nod.kind(node.ndType());
   }
 
   @Override

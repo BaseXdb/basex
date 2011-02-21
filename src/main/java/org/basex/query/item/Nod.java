@@ -40,8 +40,6 @@ public abstract class Nod extends Item {
   protected byte[] val;
   /** Parent node. */
   protected Nod par;
-  /** Simple type. */
-  public final NodeType ndtype;
 
   /**
    * Constructor.
@@ -49,7 +47,6 @@ public abstract class Nod extends Item {
    */
   protected Nod(final NodeType t) {
     super(t);
-    ndtype = t;
   }
 
   @Override
@@ -397,7 +394,7 @@ public abstract class Nod extends Item {
 
   @Override
   public final BXNode toJava() {
-    switch(ndtype) {
+    switch(ndType()) {
       case DOC: return new BXDoc(this);
       case ELM: return new BXElem(this);
       case TXT: return new BXText(this);
@@ -411,5 +408,13 @@ public abstract class Nod extends Item {
   @Override
   public final SeqType type() {
     return SeqType.NOD;
+  }
+
+  /**
+   * Returns this Node's node type.
+   * @return node type
+   */
+  public final NodeType ndType() {
+    return (NodeType) type;
   }
 }

@@ -113,7 +113,7 @@ public class DBNode extends Nod {
   @Override
   public final byte[] nname() {
     if(!(type instanceof NodeType)) return EMPTY;
-    final NodeType t = (NodeType) type;
+    final NodeType t = ndType();
     switch(t) {
       case ELM: case ATT: case PI:
         return data.name(pre, kind(t));
@@ -170,7 +170,7 @@ public class DBNode extends Nod {
 
   @Override
   public final DBNode copy() {
-    final DBNode n = new DBNode(data, pre, par, ndtype);
+    final DBNode n = new DBNode(data, pre, par, ndType());
     n.root = root;
     n.score = score;
     return n;
@@ -389,8 +389,8 @@ public class DBNode extends Nod {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(ndtype.nam).add(' ');
-    switch(ndtype) {
+    final TokenBuilder tb = new TokenBuilder(type.nam()).add(' ');
+    switch((NodeType) type) {
       case ATT:
       case PI:
         tb.add(nname()).add(" { \"").add(chop(atom(), 64)).add("\" }");
