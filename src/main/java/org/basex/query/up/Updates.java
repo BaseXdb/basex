@@ -14,7 +14,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.util.Performance;
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks
@@ -98,8 +97,6 @@ public final class Updates {
     // constraints are checked first. no updates are applied if any problems
     // are found
     for(final Primitives p : primitives.values()) p.check(ctx);
-    Performance.gc(3);
-    System.out.println(Performance.getMem());
     for(final Primitives p : primitives.values()) p.apply(ctx);
   }
 
