@@ -2214,6 +2214,8 @@ public class QueryParser extends InputParser {
     if(t == AtomType.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
 
     final KindTest kt = tok.size() == 0 ? null : kindTest(t, tok.finish());
+    tok.reset();
+
     // use empty name test if types are different
     return SeqType.get(t, occ, kt == null ? null :
       kt.extype == null || t == kt.extype ? kt.name : new QNm(EMPTY));
