@@ -882,7 +882,7 @@ public enum AtomType implements Type {
    */
   public static AtomType find(final QNm type, final boolean atom) {
     // type must be atomic, or must not have a namespace
-    if(atom ^ !type.ns()) {
+    if(atom ^ type.uri() == Uri.EMPTY) {
       final byte[] ln = type.ln();
       final byte[] uri = type.uri().atom();
       for(final AtomType t : values()) {
