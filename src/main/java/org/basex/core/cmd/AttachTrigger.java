@@ -1,5 +1,7 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
+
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
 import org.basex.core.User;
@@ -25,7 +27,10 @@ public final class AttachTrigger extends Command {
   @Override
   protected boolean run() {
     final String name = args[0];
-    return context.triggers.attach(name, context.session);
+    if(context.triggers.attach(name, context.session)) {
+      return info(TRIGGERATT, name);
+    }
+    return error(TRIGGERNO, name);
   }
 
   @Override

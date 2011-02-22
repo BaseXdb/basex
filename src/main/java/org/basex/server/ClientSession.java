@@ -57,8 +57,6 @@ public final class ClientSession extends Session {
   /** Trigger notifications. */
   Map<String, List<TriggerNotification>> tn;
 
-//  public OutputStream offout;
-
   /**
    * Constructor, specifying the database context and the
    * login and password.
@@ -138,32 +136,27 @@ public final class ClientSession extends Session {
 
     // receive success flag
     if(!ok(bi)) throw new LoginException();
+    startListener();
+  }
 
-    // final OutputStream o = new FileOutputStream("out_" + user + ".txt");
-    new Thread("ClientSession " + user + ": Input Thread"
-        + Thread.activeCount()) {
-
-      /*
-       * (non-Javadoc)
-       * @see java.lang.Thread#run()
-       */
+  /**
+   * Starts the listener thread.
+   * @throws IOException I/O exception
+   */
+  private void startListener() throws IOException {
+    new Thread() {
+      BufferInput bi = new BufferInput(sin);
       @Override
       public void run() {
-        super.run();
-
         try {
           while(true) {
-//            System.out.println("Prepare buffer for user " + user + "\n");
-
             final ArrayOutput o = new ArrayOutput();
-
             int l;
             while((l = bi.read()) != 0)
               if (sink != null)
                 sink.write(l);
               else
                 o.write(l);
-
             info = bi.readString();
             boolean ok = bi.read() == 0 ? true : false;
             if(!ok) {
@@ -175,14 +168,12 @@ public final class ClientSession extends Session {
                   o.write(inf.getBytes());
               }
             }
-
             // Set sink as unset.
             if (sink != null) {
               sink.flush();
               sink = null;
             } else {
               String res = o.toString();
-
               if(!"".equals(res)) {
                 int idx = res.indexOf(' ');
                 String name = res.substring(0, idx);
@@ -191,18 +182,13 @@ public final class ClientSession extends Session {
                   t.update(val);
               }
             }
-
             synchronized(lock) {
               lock.notifyAll();
-//              System.out.println("UNLOCKED");
             }
-
             o.close();
           }
-
         } catch(IOException e) {
-          if (!SOCKET_CLOSED.equals(e.getMessage()))
-            e.printStackTrace();
+          if (!SOCKET_CLOSED.equals(e.getMessage())) e.printStackTrace();
         }
       }
     }.start();
@@ -293,10 +279,8 @@ public final class ClientSession extends Session {
    * @throws BaseXException exception
    */
   public void detachTrigger(final String name) throws BaseXException {
-
-    // empty trigger notification list.
-    tn.put(name, null);
-
+    // remove trigger notification.
+    tn.remove(name);
     execute("detach trigger " + name);
   }
 
@@ -343,33 +327,16 @@ public final class ClientSession extends Session {
   @Override
   public void execute(final String cmd, final OutputStream os)
       throws BaseXException {
-
-//    try {
-//      send(cmd);
-//      final BufferInput bi = new BufferInput(sin);
-//      int l;
-//      while((l = bi.read()) != 0) os.write(l);
-//      info = bi.readString();
-//      if(!ok(bi)) throw new BaseXException(info);
-//    } catch(final IOException ex) {
-//      throw new BaseXException(ex);
-//    }
-
     synchronized(lock) {
-
       this.sink = os;
-
       try {
         send(cmd);
       } catch(IOException e) {
         throw new BaseXException(e);
       }
-
       try {
-//        System.out.println("LOCKED");
         lock.wait();
       } catch(InterruptedException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
     }

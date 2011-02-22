@@ -79,7 +79,7 @@ public final class TriggerTest {
    */
   @Test
   public void create() throws BaseXException {
-    for(int i = 0; i < TRIGGER_COUNT; i++) {
+    for(int i = 1; i < TRIGGER_COUNT; i++) {
       cs.execute("create trigger " + TRIGGER_NAME + i);
     }
 
@@ -87,7 +87,7 @@ public final class TriggerTest {
 
     String[] triggerNames = triggers.split("\n");
     Arrays.sort(triggerNames);
-    for(int i = 0; i < TRIGGER_COUNT; i++) {
+    for(int i = 1; i < TRIGGER_COUNT; i++) {
       assertEquals(TRIGGER_NAME + i, triggerNames[i]);
     }
   }
@@ -105,7 +105,6 @@ public final class TriggerTest {
     // Attach half of the clients to the trigger.
     for(int i = ccs.length / 2; i < ccs.length; i++) {
       ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
-
         @Override
         public void update(final String data) {
           assertEquals(RETURN_VALUE, data);
@@ -121,7 +120,7 @@ public final class TriggerTest {
       ccs[i].detachTrigger(TRIGGER_NAME);
     }
 
-    // Create a trigger.
+    // Drop trigger.
     cs.execute("drop trigger " + TRIGGER_NAME);
   }
 
@@ -142,9 +141,8 @@ public final class TriggerTest {
     }
 
     String triggers = cs.execute("show triggers");
-
     // Query must not return any trigger.
-    assertEquals("", triggers);
+    assertEquals("0", triggers.substring(0, 1));
   }
 
   /**

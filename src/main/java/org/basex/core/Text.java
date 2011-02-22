@@ -632,6 +632,10 @@ public interface Text {
   String TRIGGERNO = lang("ad_triggerno");
   /** Trigger already exists. */
   String TRIGGERKNOWN = lang("ad_triggerknown");
+  /** Trigger attached. */
+  String TRIGGERATT = lang("ad_triggeratt");
+  /** Trigger detached. */
+  String TRIGGERDET = lang("ad_triggerdet");
 
   // GENERAL COMMANDS =========================================================
 
