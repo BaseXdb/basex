@@ -1,5 +1,7 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
+
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
 import org.basex.core.User;
@@ -9,8 +11,9 @@ import org.basex.core.Commands.CmdDrop;
 /**
  * Evaluates the 'drop trigger' command and drops an existing trigger.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Roman Raedle
+ * @author Andreas Weiler
  */
 public final class DropTrigger extends Command {
   /**
@@ -24,7 +27,10 @@ public final class DropTrigger extends Command {
   @Override
   protected boolean run() {
     final String name = args[0];
-    return context.triggers.drop(name);
+    if(context.triggers.drop(name)) {
+      return info(TRIGGERDROP, name);
+    }
+    return error(TRIGGERNO, name);
   }
 
   @Override

@@ -470,6 +470,10 @@ ad_passno=パスワードが入力されていません。
 ad_admin=Admin ユーザーは編集できません。
 ad_kill=% セッションが切断されました。
 ad_killself='%' 自身のセッションを切断する事は出来ません。
+ad_triggerdrop=Trigger '%' dropped.
+ad_triggercreate=Trigger '%' created.
+ad_triggerknown=Trigger '%' exists already.
+ad_triggerno=Trigger '%' is unknown.
 
 # General Commands
 gc_setwhich=Unknown option '%'

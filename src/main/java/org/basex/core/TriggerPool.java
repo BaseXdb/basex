@@ -1,17 +1,21 @@
 package org.basex.core;
 
-import java.io.ByteArrayOutputStream;
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.util.HashMap;
 
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Management of Notification Triggers.
  *
  * @author BaseX Team 2005-11, BSD License
+ * @author Christian Gruen
+ * @author Roman Raedle
  * @author Andreas Weiler
  */
 public final class TriggerPool {
@@ -20,27 +24,35 @@ public final class TriggerPool {
     new HashMap<String, Sessions>();
 
   /**
+   * Gets size of trigger list.
+   * @return size of triggers list
+   */
+  public int size() {
+    return triggers.size();
+  }
+
+  /**
    * Creates a trigger with the given name.
-   * @param name The trigger name.
-   * @return Returns true if trigger was created successfully.
+   * @param name trigger name
+   * @return true if trigger was created successfully
    */
   public boolean create(final String name) {
-    if (triggers.containsKey(name))
+    if (triggers.containsKey(name)) {
       return false;
-
+    }
     triggers.put(name, new Sessions());
     return true;
   }
 
   /**
    * Drops the named trigger from the pool.
-   * @param name The trigger name.
-   * @return Returns true if trigger was deleted successfully.
+   * @param name trigger name
+   * @return true if trigger was deleted successfully
    */
   public boolean drop(final String name) {
-    if (!triggers.containsKey(name))
+    if (!triggers.containsKey(name)) {
       return false;
-
+    }
     triggers.remove(name);
     return true;
   }
@@ -73,30 +85,24 @@ public final class TriggerPool {
 
   /**
    * Returns information on all triggers.
-   * @return Information on all triggers.
-   * @throws IOException io exception
+   * @return information on all triggers.
    */
-  public byte[] info() throws IOException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    int i = triggers.size();
+  public String info() {
+    TokenBuilder tb = new TokenBuilder();
     for (String name : triggers.keySet()) {
-      --i;
-      out.write(name.getBytes());
-
-      if (i != 0)
-        out.write('\n');
+      tb.add(NL + name);
     }
-    return out.toByteArray();
+    return tb.toString();
   }
 
   /**
    * Notifies the attached sessions about a triggered event.
    * @param sp server process
    * @param name name
-   * @param r item
+   * @param i item
    */
   public void notify(final ServerProcess sp, final byte[] name,
-      final byte[] r) {
+      final byte[] i) {
     Sessions sessions = triggers.get(Token.string(name));
     if (sessions == null)
       return;
@@ -106,7 +112,7 @@ public final class TriggerPool {
         try {
           srv.out.write(name);
           srv.out.write(' ');
-          srv.out.write(r);
+          srv.out.write(i);
           srv.out.write(0);
 //          srv.out.writeString("result");
 //          srv.out.writeString("INFO");
@@ -114,7 +120,6 @@ public final class TriggerPool {
           srv.out.write(0);
           srv.out.flush();
         } catch(IOException e) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
       }

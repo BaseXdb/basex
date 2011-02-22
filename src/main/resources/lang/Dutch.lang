@@ -468,6 +468,10 @@ ad_passno=Geen wachtwoord opgegeven.
 ad_admin=Admin gebruiker kan niet gewijzigd worden.
 ad_kill=% sessies gestopt.
 ad_killself='%' kan zichzelf niet stoppen.
+ad_triggerdrop=Trigger '%' dropped.
+ad_triggercreate=Trigger '%' created.
+ad_triggerknown=Trigger '%' exists already.
+ad_triggerno=Trigger '%' is unknown.
 
 # General Commands
 gc_setwhich=Unknown option '%'

@@ -468,6 +468,10 @@ ad_passno=Kein Passwort angegeben.
 ad_admin=Admin-Benutzer kann nicht modifiziert werden.
 ad_kill=% Verbindungen beendet.
 ad_killself='%' kann sich nicht selbst beenden.
+ad_triggerdrop=Trigger '%' entfernt.
+ad_triggercreate=Trigger '%' erzeugt.
+ad_triggerknown=Trigger '%' existiert schon.
+ad_triggerno=Unbekannter Trigger '%'.
 
 # General Commands
 gc_setwhich=Unbekannte Option '%'

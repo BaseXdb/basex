@@ -607,7 +607,7 @@ public interface Text {
   String USERCREATE = lang("ad_usercreate");
   /** Password changed. */
   String USERALTER = lang("ad_useralter");
-  /** User unknown. */
+  /** User already exists. */
   String USERKNOWN = lang("ad_userknown");
   /** No password specified. */
   String PASSNO = lang("ad_passno");
@@ -617,6 +617,14 @@ public interface Text {
   String USERKILL = lang("ad_kill");
   /** User kills itself. */
   String USERKILLSELF = lang("ad_killself");
+  /** Trigger dropped. */
+  String TRIGGERDROP = lang("ad_triggerdrop");
+  /** Trigger added. */
+  String TRIGGERCREATE = lang("ad_triggercreate");
+  /** Trigger not found. */
+  String TRIGGERNO = lang("ad_triggerno");
+  /** Trigger already exists. */
+  String TRIGGERKNOWN = lang("ad_triggerknown");
 
   // GENERAL COMMANDS =========================================================
 
