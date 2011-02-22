@@ -35,7 +35,7 @@ public final class InsertIntoFirst extends NodeCopy {
 
   @Override
   public void merge(final UpdatePrimitive p) {
-    c.add(((NodeCopy) p).c.getFirst());
+    insert.add(((NodeCopy) p).insert.get(0));
   }
 
   @Override

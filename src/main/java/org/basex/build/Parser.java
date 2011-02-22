@@ -36,10 +36,10 @@ public abstract class Parser extends Progress {
 
   /**
    * Constructor.
-   * @param f file reference
+   * @param io parser input
    */
-  protected Parser(final String f) {
-    this(IO.get(f), "");
+  protected Parser(final String io) {
+    this(IO.get(io), "");
   }
 
   /**

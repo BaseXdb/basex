@@ -51,19 +51,18 @@ public final class Let extends ForLet {
 
   @Override
   public Let comp(final QueryContext ctx) throws QueryException {
-    // always returns a self reference
     expr = checkUp(expr, ctx).comp(ctx);
-
-    // bind variable or set return type
-    if(score || !bind(ctx)) {
-      // set return type if variable cannot be statically bound
-      var.ret = score ? SeqType.DBL : expr.type();
-    }
-    ctx.vars.add(var);
-
     type = SeqType.ITEM;
     size = 1;
+    var.ret = score ? SeqType.DBL : expr.type();
+    ctx.vars.add(var);
+
     return this;
+  }
+
+  @Override
+  protected boolean bind(final QueryContext ctx) throws QueryException {
+    return simple(true) && super.bind(ctx);
   }
 
   @Override
@@ -126,7 +125,7 @@ public final class Let extends ForLet {
   }
 
   @Override
-  boolean simple() {
+  boolean simple(final boolean one) {
     return !score;
   }
 

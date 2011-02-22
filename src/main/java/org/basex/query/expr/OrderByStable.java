@@ -50,8 +50,8 @@ public final class OrderByStable extends OrderBy {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    return false;
+  public int count(final Var v) {
+    return 0;
   }
 
   @Override

@@ -1,6 +1,8 @@
 package org.basex.query.util;
 
 import static org.basex.util.Token.*;
+
+import org.basex.core.Text;
 import org.basex.data.FTPos;
 import org.basex.data.FTPosData;
 import org.basex.query.item.DBNode;
@@ -18,7 +20,7 @@ import org.basex.util.ft.FTSpan;
  */
 final class DataFTBuilder {
   /** Dots. */
-  private static final byte[] DOTS = token("...");
+  private static final byte[] DOTS = token(Text.DOTS);
   /** Full-text position data. */
   private final FTPosData ftpos;
   /** Length of full-text extract. */

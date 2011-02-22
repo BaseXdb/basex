@@ -69,7 +69,7 @@ public final class DialogCreate extends Dialog {
     // create panels
     final BaseXBack p1 = new BaseXBack(new BorderLayout()).border(8);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
@@ -103,6 +103,11 @@ public final class DialogCreate extends Dialog {
     p1.add(info, BorderLayout.SOUTH);
 
     final BaseXBack p3 = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
+    pathindex = new BaseXCheckBox(INFOPATHINDEX,
+        prop.is(Prop.PATHINDEX), 0, this);
+    p3.add(pathindex);
+    p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
+
     txtindex = new BaseXCheckBox(INFOTEXTINDEX,
         prop.is(Prop.TEXTINDEX), 0, this);
     p3.add(txtindex);
@@ -112,11 +117,6 @@ public final class DialogCreate extends Dialog {
         prop.is(Prop.ATTRINDEX), 0, this);
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
-
-    pathindex = new BaseXCheckBox(INFOPATHINDEX,
-        prop.is(Prop.PATHINDEX), 0, this);
-    p3.add(pathindex);
-    p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
 
     final BaseXBack p4 = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
     ftxindex = new BaseXCheckBox(INFOFTINDEX, prop.is(Prop.FTINDEX), 0, this);

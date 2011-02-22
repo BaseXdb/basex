@@ -432,7 +432,7 @@ public interface QueryTokens {
   /** Separator. */
   String SEP = ", ";
   /** Dots. */
-  String DOTS = "...";
+  String DOTS = Text.DOTS;
   /** Query Plan. */
   String ARG = "arg";
   /** Query Plan. */

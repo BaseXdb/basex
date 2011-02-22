@@ -64,15 +64,16 @@ public final class Group extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Var v) {
-    for(final Var g : groupby) if(g.uses(v)) return true;
-    return false;
+  public int count(final Var v) {
+    int c = 0;
+    for(final Var g : groupby) c += g.count(v);
+    return c;
   }
 
   @Override
   public boolean removable(final Var v) {
     // don't allow removal if variable is used
-    for(final Var g : groupby) if(g.uses(v)) return false;
+    for(final Var g : groupby) if(g.count(v) != 0) return false;
     return true;
   }
 

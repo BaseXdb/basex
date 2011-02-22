@@ -16,19 +16,19 @@ public abstract class FileParser extends Parser {
 
   /**
    * Constructor.
-   * @param f file reference
+   * @param io parser input
    */
-  public FileParser(final String f) {
-    super(f);
+  public FileParser(final String io) {
+    super(io);
   }
 
   /**
    * Constructor.
-   * @param f file reference
+   * @param io parser input
    * @param tar target for collection adding
    */
-  public FileParser(final IO f, final String tar) {
-    super(f, tar);
+  public FileParser(final IO io, final String tar) {
+    super(io, tar);
   }
 
   @Override

@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.CRC32;
-
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -23,9 +22,9 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
 import org.basex.util.Array;
+import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -211,33 +210,31 @@ final class FNUtil extends Fun {
   private Str toBase(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final long num = checkItr(expr[0], ctx),
-               base = checkItr(expr[1], ctx);
+    final long num = checkItr(expr[0], ctx), base = checkItr(expr[1], ctx);
     if(base < 2 || base > 36) INVBASE.thrw(ii, base);
 
     // use fast variant for powers of two
     for(int i = 1, p = 2; i < 6; i++, p <<= 1)
       if(base == p) return toBaseFast(num, i);
 
-    final TokenBuilder tb = new TokenBuilder();
+    final ByteList tb = new ByteList();
     long n = num;
     if(n < 0) {
       // unsigned value doesn't fit in any native type...
       final BigInteger[] dr = BigInteger.valueOf(n).add(
           MAX_ULONG).divideAndRemainder(BigInteger.valueOf(base));
       n = dr[0].longValue();
-      tb.addByte(DIGITS[dr[1].intValue()]);
+      tb.add(DIGITS[dr[1].intValue()]);
     } else {
-      tb.addByte(DIGITS[(int) (n % base)]);
+      tb.add(DIGITS[(int) (n % base)]);
       n /= base;
     }
-
     while (n != 0) {
-      tb.addByte(DIGITS[(int) (n % base)]);
+      tb.add(DIGITS[(int) (n % base)]);
       n /= base;
     }
 
-    final byte[] res = tb.finish();
+    final byte[] res = tb.toArray();
     Array.reverse(res);
     return Str.get(res);
   }
@@ -279,10 +276,10 @@ final class FNUtil extends Fun {
    */
   private Hex hash(final QueryContext ctx, final String algo)
       throws QueryException {
+
     final byte[] str = checkStr(expr[0], ctx);
     try {
-      final byte[] hash = MessageDigest.getInstance(algo).digest(str);
-      return new Hex(hash);
+      return new Hex(MessageDigest.getInstance(algo).digest(str));
     } catch(final NoSuchAlgorithmException ex) {
       Util.notexpected(ex);
       return null;
@@ -296,12 +293,11 @@ final class FNUtil extends Fun {
    * @throws QueryException exception
    */
   private Hex crc32(final QueryContext ctx) throws QueryException {
-    final byte[] str = checkStr(expr[0], ctx);
     final CRC32 crc = new CRC32();
-    crc.update(str);
+    crc.update(checkStr(expr[0], ctx));
     final byte[] res = new byte[4];
     for(int i = res.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8)
-      res[i] = (byte) (c & 0xFFL);
+      res[i] = (byte) (c & 0xFF);
     return new Hex(res);
   }
 

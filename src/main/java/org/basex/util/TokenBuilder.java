@@ -189,7 +189,8 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a byte to the token.
+   * Adds a byte to the token. {@link ByteList} instances should be preferred
+   * for the construction of pure byte arrays.
    * @param b the byte to be added
    * @return self reference
    */

@@ -7,8 +7,8 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
-import org.basex.query.item.Value;
 import org.basex.query.iter.ValueIter;
+import org.basex.util.IntList;
 
 /**
  * Document test for database nodes.
@@ -22,34 +22,31 @@ final class DocTest extends Test {
 
   /**
    * Constructor.
-   * @param v values
-   * @param d data reference
+   * @param n database document nodes
    */
-  private DocTest(final Value v, final Data d) {
+  private DocTest(final Nodes n) {
     type = Type.DOC;
-
-    // not more than 2^31 documents supported
-    final int[] n = new int[(int) v.size()];
-    final ValueIter ir = v.iter();
-    Item it;
-    int c = 0;
-    // loop through all documents and add pre values of documents
-    while((it = ir.next()) != null) n[c++] = ((DBNode) it).pre;
-    nodes = new Nodes(n, d);
+    nodes = n;
   }
 
   /**
    * Returns a document test. This test will only be called by
-   * {@link AxisPath#index} if all context values are database document nodes.
+   * {@link AxisPath#index} if all context values are database nodes.
    * @param ctx query context
    * @param data data reference
    * @return document test
    */
   static Test get(final QueryContext ctx, final Data data) {
-    // use simple test if database contains only one document
-    // (i.e., if size of the first document equals the database size)
-    return data.size(0, Data.DOC) == data.meta.size ? Test.DOC :
-      new DocTest(ctx.value, data);
+    // use simple test if database contains only one node
+    if(data.single()) return Test.DOC;
+
+    // loop through all documents and add pre values of documents
+    // not more than 2^31 documents supported
+    final IntList il = new IntList((int) ctx.value.size());
+    final ValueIter ir = ctx.value.iter();
+    Item it;
+    while((it = ir.next()) != null) il.add(((DBNode) it).pre);
+    return new DocTest(new Nodes(il.toArray(), data));
   }
 
   @Override
@@ -58,7 +55,7 @@ final class DocTest extends Test {
     if(nod.type != type || !(nod instanceof DBNode)) return false;
     // ensure that the pre value is contained in the target documents
     final DBNode db = (DBNode) nod;
-    return nodes.data == db.data && nodes.contains(((DBNode) nod).pre);
+    return nodes.data == db.data && nodes.contains(db.pre);
   }
 
   @Override

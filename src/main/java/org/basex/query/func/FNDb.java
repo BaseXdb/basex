@@ -15,7 +15,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
-import org.basex.query.item.DBDocSeq;
+import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
@@ -87,7 +87,7 @@ final class FNDb extends Fun {
     final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
 
     final Data data = ctx.resource.data(db, input);
-    return DBDocSeq.get(data.doc(string(path)), data).iter();
+    return DBNodeSeq.get(data.doc(string(path)), data).iter();
   }
 
   /**
