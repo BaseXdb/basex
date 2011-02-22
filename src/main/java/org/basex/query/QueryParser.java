@@ -2229,18 +2229,17 @@ public class QueryParser extends InputParser {
       if(t != null && t.func()) {
         // function type
         if(!consumeWS(ASTERISK)) {
+          SeqType[] args = {};
           if(!consumeWS(PAR2)) {
             // function has got arguments
-            SeqType[] args = {};
             do {
               args = Array.add(args, sequenceType());
             } while(consumeWS(COMMA));
 
             if(!consumeWS(PAR2)) error(FUNCMISS, type.atom());
-            SeqType ret = consumeWS2(AS) ? sequenceType() : SeqType.ITEM_ZM;
-
-            t = FunType.get(args, ret);
           }
+          SeqType ret = consumeWS2(AS) ? sequenceType() : SeqType.ITEM_ZM;
+          t = FunType.get(args, ret);
         } else if(!consumeWS(PAR2)) {
           error(FUNCMISS, type.atom());
         }
