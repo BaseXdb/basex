@@ -46,6 +46,7 @@ final class FNFunc extends Fun {
     switch(def) {
       case FUNCNAME:
       case FUNCARITY:
+      case PARTAPP:
         NOTIMPL.thrw(input, def.desc);
         return null;
       default:

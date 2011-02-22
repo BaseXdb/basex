@@ -1,14 +1,8 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryTokens.*;
-import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
-import org.basex.query.item.QNm;
 import org.basex.query.util.Var;
-import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
@@ -28,27 +22,9 @@ public final class PartFunApp extends Single {
    * @param call function expression
    * @param arg arguments
    */
-  public PartFunApp(final InputInfo ii, final Expr call, final Expr[] arg) {
+  public PartFunApp(final InputInfo ii, final Expr call, final Var[] arg) {
     super(ii, call);
-    vars = findVars(arg);
-  }
-
-  /**
-   * Binds all place-holders by variable references and returns the bound
-   * variables.
-   * @param arg argument array
-   * @return bound variables
-   */
-  private Var[] findVars(final Expr[] arg) {
-    Var[] vs = {};
-    for(int i = 0; i < arg.length; i++) {
-      if(arg[i] == null) {
-        final Var v = new Var(input, new QNm(concat(VAR, token(i))));
-        Array.add(vs, v);
-        arg[i] = new VarRef(input, v);
-      }
-    }
-    return vs;
+    vars = arg;
   }
 
   @Override

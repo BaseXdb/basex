@@ -115,6 +115,8 @@ public final class SeqType {
   public static final SeqType DAT = new SeqType(AtomType.DAT);
   /** Zero or more dates. */
   public static final SeqType DAT_ZM = new SeqType(AtomType.DAT, Occ.ZO);
+  /** Single function. */
+  public static final SeqType FUN_O = new SeqType(FunType.ANY, Occ.O);
 
   /** Sequence type. */
   public final Type type;
@@ -363,7 +365,8 @@ public final class SeqType {
 
   @Override
   public String toString() {
-    return type.toString() + occ.toString();
+    final String str = type.toString();
+    return (str.contains(" ") && occ != Occ.O ? '(' + str + ')' : str) + occ;
   }
 
   /**
