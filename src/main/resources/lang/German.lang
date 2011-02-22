@@ -472,6 +472,8 @@ ad_triggerdrop=Trigger '%' entfernt.
 ad_triggercreate=Trigger '%' erzeugt.
 ad_triggerknown=Trigger '%' existiert schon.
 ad_triggerno=Unbekannter Trigger '%'.
+ad_triggeratt=Angehängt an Trigger '%'.
+ad_triggerdet=Getrennt von Trigger '%'.
 
 # General Commands
 gc_setwhich=Unbekannte Option '%'

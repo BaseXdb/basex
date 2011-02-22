@@ -79,7 +79,7 @@ public final class TriggerTest {
    */
   @Test
   public void create() throws BaseXException {
-    for(int i = 0; i < TRIGGER_COUNT; i++) {
+    for(int i = 1; i < TRIGGER_COUNT; i++) {
       cs.execute("create trigger " + TRIGGER_NAME + i);
     }
 
@@ -87,7 +87,7 @@ public final class TriggerTest {
 
     String[] triggerNames = triggers.split("\n");
     Arrays.sort(triggerNames);
-    for(int i = 0; i < TRIGGER_COUNT; i++) {
+    for(int i = 1; i < TRIGGER_COUNT; i++) {
       assertEquals(TRIGGER_NAME + i, triggerNames[i]);
     }
   }
@@ -144,7 +144,7 @@ public final class TriggerTest {
     String triggers = cs.execute("show triggers");
 
     // Query must not return any trigger.
-    assertEquals("", triggers);
+    assertEquals("0", triggers.substring(0, 1));
   }
 
   /**
