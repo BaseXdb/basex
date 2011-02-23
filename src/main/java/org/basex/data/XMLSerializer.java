@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.data.SerializerProp.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import org.basex.core.Prop;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
@@ -121,7 +120,7 @@ public final class XMLSerializer extends Serializer {
     final String maps = p.get(S_USE_CHARACTER_MAPS);
     if(!maps.isEmpty()) error(SERMAPS, maps);
 
-    enc     = code(p.get(S_ENCODING), null);
+    enc     = normEncoding(p.get(S_ENCODING), null);
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
     media   = p.get(S_MEDIA_TYPE);
@@ -143,7 +142,7 @@ public final class XMLSerializer extends Serializer {
       docpub = null;
     }
 
-    if(!Charset.isSupported(enc)) error(SERENCODING, enc);
+    if(!supported(enc)) error(SERENCODING, enc);
     if(undecl && version.equals(V10)) error(SERUNDECL);
 
     // print byte-order-mark

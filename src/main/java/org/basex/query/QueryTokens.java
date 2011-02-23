@@ -59,6 +59,8 @@ public interface QueryTokens {
   /** Parser token. */
   String COPYNS = "copy-namespaces";
   /** Parser token. */
+  String DECFORMAT = "decimal-format";
+  /** Parser token. */
   String DECLARE = "declare";
   /** Parser token. */
   String DEFAULT = "default";
@@ -255,6 +257,8 @@ public interface QueryTokens {
   /** Parser token. */
   String TRY = "try";
   /** Parser token. */
+  String TYPE = "type";
+  /** Parser token. */
   String TYPESWITCH = "typeswitch";
   /** Parser token. */
   String UNION = "union";
@@ -295,11 +299,36 @@ public interface QueryTokens {
   /** Parser token. */
   String XQUERY = "xquery";
 
+  /** Parser token. */
+  String DF_DEC = "decimal-separator";
+  /** Parser token. */
+  String DF_DIG = "digit";
+  /** Parser token. */
+  String DF_GRP = "grouping-separator";
+  /** Parser token. */
+  String DF_INF = "infinity";
+  /** Parser token. */
+  String DF_MIN = "minus-sign";
+  /** Parser token. */
+  String DF_NAN = "NaN";
+  /** Parser token. */
+  String DF_PAT = "pattern-separator";
+  /** Parser token. */
+  String DF_PC = "percent";
+  /** Parser token. */
+  String DF_PM = "per-mille";
+  /** Parser token. */
+  String DF_ZG = "zero-digit";
+
   // ERROR INFORMATION =======================================================
 
   /** Skip flag for the syntax highlighter. */
   String IGNORE = null;
 
+  /** Decimal declarations. */
+  String[] DECFORMATS = {
+    DF_DEC, DF_DIG, DF_GRP, DF_INF, DF_MIN, DF_NAN, DF_PAT, DF_PC, DF_PM, DF_ZG
+  };
   /** Updating tokens. */
   String[] UPDATES = { INSERT, DELETE, RENAME, REPLACE };
 
@@ -450,7 +479,7 @@ public interface QueryTokens {
   /** Query Plan. */
   byte[] DATA = token("data");
   /** Query Plan. */
-  byte[] TYPE = token("type");
+  byte[] TYP = token("type");
   /** Query Plan. */
   byte[] NAM = token("name");
   /** Query Plan. */

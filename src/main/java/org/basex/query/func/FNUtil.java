@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -12,6 +11,7 @@ import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.B64;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
@@ -19,8 +19,9 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
-import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ValueIter;
 import org.basex.util.Array;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
@@ -32,6 +33,7 @@ import org.basex.util.Util;
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
+ * @author Leo Woerteler
  */
 final class FNUtil extends Fun {
   /**
@@ -47,12 +49,10 @@ final class FNUtil extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case EVAL:
-        return eval(ctx);
-      case RUN:
-        return run(ctx);
-      default:
-        return super.iter(ctx);
+      case EVAL: return eval(ctx);
+      case RUN:  return run(ctx);
+      case TO_BYTES: return bytes(ctx);
+      default:   return super.iter(ctx);
     }
   }
 
@@ -106,10 +106,34 @@ final class FNUtil extends Fun {
    */
   private Iter eval(final QueryContext ctx, final byte[] qu)
       throws QueryException {
+
     final QueryContext qt = new QueryContext(ctx.context);
     qt.parse(string(qu));
     qt.compile();
     return ItemIter.get(qt.iter());
+  }
+
+  /**
+   * Extracts the bytes from the given xs:base64Binary data.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter bytes(final QueryContext ctx) throws QueryException {
+    final byte[] bin = ((B64) checkType(expr[0].item(ctx, input),
+        Type.B6B)).toJava();
+
+    return new ValueIter() {
+      int pos;
+      @Override
+      public Item next() { return pos < bin.length ? get(pos++) : null; }
+      @Override
+      public long size() { return bin.length; }
+      @Override
+      public boolean reset() { pos = 0; return true; }
+      @Override
+      public Item get(final long i) { return new Itr(bin[(int) i], Type.BYT); }
+    };
   }
 
   /**
@@ -120,8 +144,8 @@ final class FNUtil extends Fun {
    */
   private Dbl mb(final QueryContext ctx) throws QueryException {
     // check caching flag
-    final boolean c = expr.length == 2
-        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
+    final boolean c = expr.length == 2 &&
+      checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
 
     // measure initial memory consumption
     Performance.gc(3);
@@ -137,8 +161,7 @@ final class FNUtil extends Fun {
 
     // loop through all results to avoid premature result disposal
     ir = v.iter();
-    while(ir.next() != null)
-      ;
+    while(ir.next() != null);
 
     // return memory consumption in megabytes
     return Dbl.get(Math.max(0, d) / 1024 / 1024d);
@@ -152,8 +175,8 @@ final class FNUtil extends Fun {
    */
   private Dbl ms(final QueryContext ctx) throws QueryException {
     // check caching flag
-    final boolean c = expr.length == 2
-        && checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
+    final boolean c = expr.length == 2 &&
+      checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
 
     // create timer
     final Performance p = new Performance();
@@ -163,8 +186,7 @@ final class FNUtil extends Fun {
     if(c) {
       ItemIter.get(ir);
     } else {
-      while(ir.next() != null)
-        ;
+      while(ir.next() != null);
     }
 
     // return measured time in milliseconds
