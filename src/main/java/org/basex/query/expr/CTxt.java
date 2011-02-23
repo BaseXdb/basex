@@ -41,7 +41,7 @@ public final class CTxt extends CFrag {
     boolean more = false;
     do {
       if(more) tb.add(' ');
-      tb.add(it.atom());
+      tb.add(it.atom(ii));
       more = true;
     } while((it = iter.next()) != null);
 

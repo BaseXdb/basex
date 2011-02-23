@@ -151,7 +151,7 @@ public final class FNSimple extends Fun {
    * @throws QueryException query exception
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
-    if(expr.length == 3) checkColl(expr[2], ctx);
+    if(expr.length == 3) checkColl(expr[2], ctx, input);
     return deep(input, ctx.iter(expr[0]), ctx.iter(expr[1]));
   }
 

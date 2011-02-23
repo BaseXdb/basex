@@ -156,7 +156,7 @@ public class Dur extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
     if(mon < 0 || sc.signum() < 0) tb.add('-');
     tb.add('P');
@@ -198,7 +198,7 @@ public class Dur extends Item {
 
   @Override
   public final Duration toJava() {
-    return Date.df.newDuration(Token.string(atom()));
+    return Date.df.newDuration(Token.string(atom(null)));
   }
 
   @Override
@@ -208,6 +208,6 @@ public class Dur extends Item {
 
   @Override
   public final String toString() {
-    return "\"" + Token.string(atom()) + "\"";
+    return "\"" + Token.string(atom(null)) + "\"";
   }
 }

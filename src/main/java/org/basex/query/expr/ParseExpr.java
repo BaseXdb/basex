@@ -249,13 +249,14 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified collation is supported.
    * @param e expression to be checked
    * @param ctx query context
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public final void checkColl(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final void checkColl(final Expr e, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
 
     final Item it = e instanceof Item ? (Item) e : checkItem(e, ctx);
-    if(!it.str() || !eq(URLCOLL, it.atom())) IMPLCOL.thrw(input, e);
+    if(!it.str() || !eq(URLCOLL, it.atom(ii))) IMPLCOL.thrw(input, e);
   }
 
   /**
@@ -270,7 +271,7 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
     final Item it = checkItem(e, ctx);
     if(!it.str() && !it.unt()) Err.type(this, AtomType.STR, it);
-    return it.atom();
+    return it.atom(input);
   }
 
   /**
@@ -283,7 +284,7 @@ public abstract class ParseExpr extends Expr {
   public final byte[] checkEStr(final Item it) throws QueryException {
     if(it == null) return EMPTY;
     if(!it.str() && !it.unt()) Err.type(this, AtomType.STR, it);
-    return it.atom();
+    return it.atom(input);
   }
 
   /**

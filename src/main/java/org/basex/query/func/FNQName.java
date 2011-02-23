@@ -61,10 +61,10 @@ final class FNQName extends Fun {
         return it == null ? null : resolve(ctx, it, checkEmpty(it2));
       case QNAME:
         final byte[] uri = it == null ? EMPTY :
-          checkType(it, AtomType.STR).atom();
+          checkType(it, AtomType.STR).atom(input);
         final Item it3 = it2 == null ? Str.ZERO :
           checkType(it2, AtomType.STR);
-        final byte[] atm = it3.atom();
+        final byte[] atm = it3.atom(input);
         final byte[] str = !contains(atm, ':') && eq(uri, XMLURI)
             ? concat(XMLC, atm) : atm;
         if(!XMLToken.isQName(str)) Err.value(input, AtomType.QNM, it3);

@@ -3,6 +3,7 @@ package org.basex.query.item;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -14,19 +15,26 @@ import org.basex.util.InputInfo;
  */
 public class FunItem extends Item {
 
+  /** Variables. */
+  private final Var[] args;
+  /** Function expression. */
+  private final Expr expr;
+
   /**
    * Constructor.
-   * @param args function arguments
+   * @param arg function arguments
    * @param body function body
    * @param t function type
    */
-  protected FunItem(final Var[] args, final Expr body, final FunType t) {
+  protected FunItem(final Var[] arg, final Expr body, final FunType t) {
     super(t);
+    args = arg;
+    expr = body;
   }
 
   @Override
-  public byte[] atom() {
-    // TODO throw correct error
+  public byte[] atom(final InputInfo ii) throws QueryException {
+    Err.NOATM.thrw(ii);
     return null;
   }
 

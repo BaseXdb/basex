@@ -95,7 +95,7 @@ public final class CElem extends CFrag {
     final Atts nsc = new Atts();
     for(int i = 0; i < nsp.size; ++i) nsc.add(nsp.key[i], nsp.val[i]);
 
-    final QNm tname = checkNS(qname(ctx, it, false));
+    final QNm tname = checkNS(qname(ctx, it, false, ii));
     final byte[] pref = tname.pref();
     if(!eq(pref, XML)) {
       byte[] uri = ctx.ns.find(pref);
@@ -113,7 +113,7 @@ public final class CElem extends CFrag {
       }
     }
 
-    final Constr c = new Constr(ctx, expr);
+    final Constr c = new Constr(ii, ctx, expr);
     if(c.errAtt) NOATTALL.thrw(input);
     if(c.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(input, c.duplAtt);
 

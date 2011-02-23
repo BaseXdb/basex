@@ -197,6 +197,9 @@ public enum Err {
   /** FORX0004: Evaluation exception. */
   REGERR(FORX, 4, "Regular expression: '%'."),
 
+  /** FOTY0012: Type exception. */
+  NOATM(FOTY, 12, "Function items can't be atomized: %"),
+
   /** FOUP0001: Evaluation exception. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
   /** FOUP0002: Evaluation exception. */
@@ -673,6 +676,7 @@ public enum Err {
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,
+    /** FOTY Error type. */ FOTY,
     /** FOUP Error type. */ FOUP,
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,

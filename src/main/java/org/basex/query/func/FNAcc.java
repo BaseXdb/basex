@@ -44,7 +44,7 @@ final class FNAcc extends Fun {
       case STRING:
         Item it = e.item(ctx, input);
         return it == null ? Str.ZERO : it.str() && !it.unt() ? it :
-          Str.get(it.atom());
+          Str.get(it.atom(ii));
       case NUMBER:
         return number(ctx.iter(e), ctx);
       case STRLEN:

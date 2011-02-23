@@ -80,7 +80,7 @@ final class FNAggr extends Fun {
   private Item sum(final Iter iter, final Item it, final boolean avg)
       throws QueryException {
 
-    Item res = it.unt() ? Dbl.get(it.atom(), input) : it;
+    Item res = it.unt() ? Dbl.get(it.atom(input), input) : it;
     if(!res.num() && (!res.dur() || res.type == DUR))
       SUMTYPE.thrw(input, this, res.type);
     final boolean n = res.num();
@@ -108,7 +108,7 @@ final class FNAggr extends Fun {
   private Item minmax(final Iter iter, final CmpV.Op cmp,
       final QueryContext ctx) throws QueryException {
 
-    if(expr.length == 2) checkColl(expr[1], ctx);
+    if(expr.length == 2) checkColl(expr[1], ctx, input);
 
     Item res = iter.next();
     if(res == null) return null;

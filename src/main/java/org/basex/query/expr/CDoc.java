@@ -29,7 +29,7 @@ public final class CDoc extends CFrag {
   public FDoc item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Constr con = new Constr(ctx, expr);
+    final Constr con = new Constr(ii, ctx, expr);
     if(con.errAtt || con.ats.size() != 0) XPATT.thrw(ii);
 
     final FDoc doc = new FDoc(con.children, con.base);

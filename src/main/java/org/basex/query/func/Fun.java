@@ -62,10 +62,11 @@ public abstract class Fun extends Arr {
    * Atomizes the specified item.
    * @param it input item
    * @return atomized item
+   * @throws QueryException query exception
    */
-  protected Item atom(final Item it) {
+  protected Item atom(final Item it) throws QueryException {
     return it.node() ? it.type == NodeType.PI || it.type == NodeType.COM ?
-        Str.get(it.atom()) : new Atm(it.atom()) : it;
+        Str.get(it.atom(input)) : new Atm(it.atom(input)) : it;
   }
 
   @Override

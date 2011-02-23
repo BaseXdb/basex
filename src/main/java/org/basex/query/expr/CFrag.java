@@ -39,17 +39,18 @@ public abstract class CFrag extends Arr {
    * @param ctx query context
    * @param it item
    * @param att attribute flag
+   * @param ii input info
    * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final QueryContext ctx, final Item it, final boolean att)
-      throws QueryException {
+  final QNm qname(final QueryContext ctx, final Item it, final boolean att,
+      final InputInfo ii) throws QueryException {
 
     QNm n = null;
     if(it.type == AtomType.QNM) {
       n = (QNm) it;
     } else {
-      final byte[] nm = it.atom();
+      final byte[] nm = it.atom(ii);
       if(!XMLToken.isQName(nm)) {
         (it.str() || it.unt() ? INVNAME : INVQNAME).thrw(input, nm);
       }

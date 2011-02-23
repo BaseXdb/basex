@@ -55,20 +55,29 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return val;
+  }
+
+  /**
+   * Returns an atomized string.
+   * @return Returns an atomized string.
+   */
+  public final byte[] atom() {
+    return atom(null);
   }
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.unt() ? it.eq(ii, this) : Token.eq(atom(), it.atom());
+    return !it.unt() ? it.eq(ii, this) : Token.eq(atom(), it.atom(ii));
   }
 
   @Override
   public final int diff(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.unt() ? -it.diff(ii, this) : Token.diff(atom(), it.atom());
+    return !it.unt() ? -it.diff(ii, this) :
+      Token.diff(atom(), it.atom(ii));
   }
 
   @Override

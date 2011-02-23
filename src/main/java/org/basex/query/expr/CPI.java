@@ -40,13 +40,13 @@ public final class CPI extends CFrag {
     if(!it.unt() && !it.str() && it.type != AtomType.QNM)
       CPIWRONG.thrw(input, it.type, it);
 
-    final byte[] nm = trim(it.atom());
+    final byte[] nm = trim(it.atom(ii));
     if(eq(lc(nm), XML)) CPIXML.thrw(input, nm);
     if(!XMLToken.isNCName(nm)) CPIINVAL.thrw(input, nm);
 
     final Iter iter = ctx.iter(expr[1]);
     final TokenBuilder tb = new TokenBuilder();
-    CAttr.add(tb, iter);
+    CAttr.add(tb, iter, ii);
     byte[] v = tb.finish();
 
     int i = -1;

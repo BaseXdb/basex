@@ -86,7 +86,7 @@ public final class YMd extends Dur {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
     if(mon < 0) tb.add('-');
     tb.add('P');

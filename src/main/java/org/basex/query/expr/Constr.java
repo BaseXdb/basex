@@ -13,6 +13,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -40,17 +41,18 @@ public final class Constr {
 
   /**
    * Creates the children of the constructor.
+   * @param ii input info
    * @param ctx query context
    * @param expr input expressions
    * @throws QueryException query exception
    */
-  public Constr(final QueryContext ctx, final Expr... expr)
+  public Constr(final InputInfo ii, final QueryContext ctx, final Expr... expr)
       throws QueryException {
 
     for(final Expr e : expr) {
       more = false;
       final Iter iter = ctx.iter(e);
-      while(add(ctx, iter.next()));
+      while(add(ctx, iter.next(), ii));
     }
     if(text.size() != 0) children.add(new FTxt(text.finish(), null));
   }
@@ -60,10 +62,11 @@ public final class Constr {
    * as documents are resolved to their child nodes.
    * @param ctx query context
    * @param it current item
+   * @param ii input info
    * @return true if item was added
    * @throws QueryException query exception
    */
-  private boolean add(final QueryContext ctx, final Item it)
+  private boolean add(final QueryContext ctx, final Item it, final InputInfo ii)
       throws QueryException {
 
     if(it == null) return false;
@@ -82,7 +85,7 @@ public final class Constr {
         final QNm name = node.qname();
         final byte[] ln = name.ln();
         final byte[] pre = name.pref();
-        if(eq(pre, XML) && eq(ln, BASE)) base = it.atom();
+        if(eq(pre, XML) && eq(ln, BASE)) base = it.atom(ii);
 
         // check for duplicate attribute names
         final QNm qname = node.qname();
@@ -97,7 +100,7 @@ public final class Constr {
       } else if(it.type == NodeType.DOC) {
         final NodeIter iter = node.child();
         Nod ch;
-        while((ch = iter.next()) != null) add(ctx, ch);
+        while((ch = iter.next()) != null) add(ctx, ch, ii);
       } else {
         // add text node
         if(text.size() != 0) {
@@ -124,7 +127,7 @@ public final class Constr {
       more = false;
     } else {
       if(more && it.type != NodeType.TXT) text.add(' ');
-      text.add(it.atom());
+      text.add(it.atom(ii));
       more = it.type != NodeType.TXT;
     }
     return true;

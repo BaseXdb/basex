@@ -55,7 +55,7 @@ public final class Dbl extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return Token.token(val);
   }
 

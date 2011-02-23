@@ -57,7 +57,7 @@ public final class CAttr extends CFrag {
   public FAttr item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final QNm name = qname(ctx, checkItem(atn, ctx), true);
+    final QNm name = qname(ctx, checkItem(atn, ctx), true, ii);
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
 
@@ -75,7 +75,7 @@ public final class CAttr extends CFrag {
     }
 
     final TokenBuilder tb = new TokenBuilder();
-    for(final Expr e : expr) add(tb, ctx.iter(e));
+    for(final Expr e : expr) add(tb, ctx.iter(e), ii);
     byte[] val = tb.finish();
     if(eq(pre, XML) && eq(ln, ID)) val = norm(val);
 
@@ -86,14 +86,16 @@ public final class CAttr extends CFrag {
    * Adds the atomized value of an item to a token builder.
    * @param tb token builder
    * @param ir iterator
+   * @param ii input info
    * @throws QueryException query exception
    */
-  static void add(final TokenBuilder tb, final Iter ir) throws QueryException {
+  static void add(final TokenBuilder tb, final Iter ir, final InputInfo ii)
+      throws QueryException {
     Item it = null;
     boolean m = false;
     while((it = ir.next()) != null) {
       if(m) tb.add(' ');
-      tb.add(it.atom());
+      tb.add(it.atom(ii));
       m = true;
     }
   }

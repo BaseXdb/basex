@@ -758,7 +758,8 @@ public class QueryParser extends InputParser {
       final SeqType argType = wsConsumeWs(AS) ? sequenceType() : null;
       final Var var = new Var(input(), arg, argType);
       ctx.vars.add(var);
-      for(final Var v : args) if(v.name.eq(arg)) error(FUNCDUPL, arg.atom());
+      for(final Var v : args)
+        if(v.name.eq(arg)) error(FUNCDUPL, arg.atom());
 
       args = Array.add(args, var);
       if(!consume(',')) break;

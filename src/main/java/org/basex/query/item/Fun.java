@@ -21,7 +21,7 @@ public abstract class Fun extends Item {
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] atom(final InputInfo ii) {
     throw new RuntimeException("Functions don't habe atomic values.");
   }
 

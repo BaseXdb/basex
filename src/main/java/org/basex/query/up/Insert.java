@@ -58,7 +58,7 @@ public final class Insert extends Update {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Constr c = new Constr(ctx, expr[1]);
+    final Constr c = new Constr(ii, ctx, expr[1]);
     final NodIter cList = c.children;
     final NodIter aList = c.ats;
     if(c.errAtt) UPNOATTRPER.thrw(input);

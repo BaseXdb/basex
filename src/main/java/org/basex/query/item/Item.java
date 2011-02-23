@@ -10,6 +10,7 @@ import org.basex.query.QueryException;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Abstract item.
@@ -22,7 +23,7 @@ public abstract class Item extends Value {
   public static final int UNDEF = Integer.MIN_VALUE;
   /** Dummy item. */
   public static final Item DUMMY = new Item(AtomType.ITEM) {
-    @Override public byte[] atom() { return Token.EMPTY; }
+    @Override public byte[] atom(final InputInfo ii) { return Token.EMPTY; }
     @Override public boolean eq(final InputInfo ii, final Item it) {
       return false;
     }
@@ -82,9 +83,11 @@ public abstract class Item extends Value {
 
   /**
    * Returns an atomized string.
+   * @param ii input info, use {@code null} if none is available
    * @return string representation
+   * @throws QueryException if the item can't be atomized
    */
-  public abstract byte[] atom();
+  public abstract byte[] atom(final InputInfo ii) throws QueryException;
 
   /**
    * Returns a boolean representation of the value.
@@ -104,7 +107,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(atom(), ii);
+    return Dec.parse(atom(ii), ii);
   }
 
   /**
@@ -114,7 +117,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public long itr(final InputInfo ii) throws QueryException {
-    return Itr.parse(atom(), ii);
+    return Itr.parse(atom(ii), ii);
   }
 
   /**
@@ -124,7 +127,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public float flt(final InputInfo ii) throws QueryException {
-    return Flt.parse(atom(), ii);
+    return Flt.parse(atom(ii), ii);
   }
 
   /**
@@ -134,12 +137,17 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public double dbl(final InputInfo ii) throws QueryException {
-    return Dbl.parse(atom(), ii);
+    return Dbl.parse(atom(ii), ii);
   }
 
   @Override
   public Object toJava() {
-    return Token.string(atom());
+    try {
+      return Token.string(atom(null));
+    } catch(final QueryException e) {
+      // TODO [LW] is that OK?
+      throw Util.notexpected(e);
+    }
   }
 
   /**
@@ -230,7 +238,11 @@ public abstract class Item extends Value {
    * @throws IOException I/O exception
    */
   public void serialize(final Serializer ser) throws IOException {
-    ser.item(atom());
+    try {
+      ser.item(atom(null));
+    } catch(QueryException e) {
+      throw new IOException(e.getMessage(), e);
+    }
   }
 
   /**
@@ -258,16 +270,30 @@ public abstract class Item extends Value {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(ITM, VAL, atom(), TYP, Token.token(name()));
+    try {
+      ser.emptyElement(ITM, VAL, atom(null), TYP, Token.token(name()));
+    } catch(QueryException e) {
+      throw new IOException(e.getMessage(), e);
+    }
   }
 
   @Override
   public int hashCode() {
-    return Token.hash(atom());
+    try {
+      return Token.hash(atom(null));
+    } catch(QueryException e) {
+      // TODO [LW] check this
+      throw Util.notexpected(e);
+    }
   }
 
   @Override
   public String toString() {
-    return Token.string(atom());
+    try {
+      return Token.string(atom(null));
+    } catch(QueryException e) {
+      // TODO [LW] check this
+      throw Util.notexpected(e);
+    }
   }
 }

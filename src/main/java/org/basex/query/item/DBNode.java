@@ -80,7 +80,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] atom(final InputInfo ii) {
     if(val == null) val = data.atom(pre);
     return val;
   }

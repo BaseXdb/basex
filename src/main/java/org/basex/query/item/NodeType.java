@@ -271,7 +271,7 @@ public enum NodeType implements Type {
    */
   byte[] checkName(final Item it, final InputInfo ii)
       throws QueryException {
-    final byte[] v = norm(it.atom());
+    final byte[] v = norm(it.atom(ii));
     if(!XMLToken.isNCName(v)) error(it, ii);
     return v;
   }

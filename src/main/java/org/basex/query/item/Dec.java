@@ -68,7 +68,7 @@ public final class Dec extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return chopNumber(token(val.toPlainString()));
   }
 
