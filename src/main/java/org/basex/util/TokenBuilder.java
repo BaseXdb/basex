@@ -143,6 +143,28 @@ public final class TokenBuilder {
   }
 
   /**
+   * Inserts the specified UTF8 character.
+   * @param pos insertion index
+   * @param ch the character to be added
+   * @return self reference
+   */
+  public TokenBuilder insert(final int pos, final int ch) {
+    int s = size;
+    final int cl = chars.length;
+    int l = ch <= 0x7F ? 1 : ch <= 0x7FF ? 2 : ch <= 0xFFF ? 3 : 4;
+
+    if(s + l > cl) {
+      final int ns = Math.max(s + l, (int) (cl * Array.RESIZE));
+      chars = Arrays.copyOf(chars, ns);
+    }
+    Array.move(chars, pos, l, size - pos);
+    size = pos;
+    add(ch);
+    size = s + l;
+    return this;
+  }
+
+  /**
    * Returns the codepoint at the specified position.
    * @param p position
    * @return character

@@ -111,7 +111,7 @@ public class BufferInput extends InputStream {
    */
   public final void encoding(final String e) throws IOException {
     try {
-      enc = code(e, enc);
+      enc = normEncoding(e, enc);
       csd = Charset.forName(e).newDecoder();
     } catch(final Exception ex) {
       throw new IOException(ex.toString());

@@ -305,6 +305,8 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
   /** XPST0003: Parsing exception. */
+  NODECLFORM(XPST, 3, "Expecting decimal-format property definition."),
+  /** XPST0003: Parsing exception. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** XPST0003: Parsing exception. */
   NOSWITCH(XPST, 3, "Incomplete switch expression."),
@@ -530,12 +532,20 @@ public enum Err {
   CIRCMODULE(XQST, 93, "Circular module definition."),
   /** XPST0094: Parsing exception. */
   GVARNOTDEFINED(XQST, 94, "Undefined grouping variable \"%\"."),
+  /** XPST0097: Parsing exception. */
+  INVDECFORM(XQST, 97, "Invalid decimal-format property: %=\"%\"."),
+  /** XPST0098: Parsing exception. */
+  DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format \"%\"."),
   /** XQST0108: Parsing exception. */
   MODOUT(XQST, 108, "No output declarations allowed in modules."),
   /** XPST0109: Parsing exception. */
   OUTWHICH(XQST, 109, "Unknown serialization parameter: \"%\"."),
   /** XPST0110: Parsing exception. */
-  OUTDUPL(XQST, 110, "Duplicate definition of \"output:%\"."),
+  OUTDUPL(XQST, 110, "Duplicate declaration of \"output:%\"."),
+  /** XPST0111: Parsing exception. */
+  DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
+  /** XPST0111: Parsing exception. */
+  DECDUPLPROP(XQST, 114, "Duplicate decimal-format property \"%\"."),
 
   /** XQTY0024: Parsing exception. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
