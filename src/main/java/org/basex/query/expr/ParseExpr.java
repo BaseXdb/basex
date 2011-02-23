@@ -196,6 +196,19 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified item is no empty sequence.
+   * @param it item to be checked
+   * @param t expected type
+   * @return specified item
+   * @throws QueryException query exception
+   */
+  private Item checkEmptyType(final Item it, final Type t)
+      throws QueryException {
+    if(it == null) XPEMPTYPE.thrw(input, desc(), t);
+    return it;
+  }
+
+  /**
    * Checks if the specified item is a number.
    * Returns a token representation or an exception.
    * @param it item to be checked
@@ -332,19 +345,6 @@ public abstract class ParseExpr extends Expr {
    */
   public final Item checkEmpty(final Item it) throws QueryException {
     if(it == null) XPEMPTY.thrw(input, desc());
-    return it;
-  }
-
-  /**
-   * Checks if the specified item is no empty sequence.
-   * @param it item to be checked
-   * @param t expected type
-   * @return specified item
-   * @throws QueryException query exception
-   */
-  public final Item checkEmptyType(final Item it, final Type t)
-      throws QueryException {
-    if(it == null) XPEMPTYPE.thrw(input, desc(), t);
     return it;
   }
 

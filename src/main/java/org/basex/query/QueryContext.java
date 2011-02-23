@@ -22,6 +22,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
@@ -31,6 +32,7 @@ import org.basex.query.up.Updates;
 import org.basex.query.util.Functions;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Variables;
+import org.basex.query.util.format.DecimalFormat;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -87,6 +89,9 @@ public final class QueryContext extends Progress {
   /** Current Time. */
   public Tim time;
 
+  /** Decimal-format declarations. */
+  public HashMap<QNm, DecimalFormat> decFormats =
+    new HashMap<QNm, DecimalFormat>();
   /** Default function namespace. */
   public byte[] nsFunc = FNURI;
   /** Default element namespace. */

@@ -1,5 +1,6 @@
 package org.basex.util;
 
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
@@ -221,7 +222,7 @@ public final class Token {
    * @param old (optional) old encoding
    * @return encoding
    */
-  public static String code(final String encoding, final String old) {
+  public static String normEncoding(final String encoding, final String old) {
     final String e = encoding.toUpperCase();
     if(e.equals(UTF8) || e.equals(UTF82)) return UTF8;
     if(e.equals(UTF16BE)) return UTF16BE;
@@ -229,6 +230,19 @@ public final class Token {
     if(e.equals(UTF16) || e.equals(UTF162))
       return old == UTF16BE || old == UTF16LE ? old : UTF16BE;
     return encoding;
+  }
+
+  /**
+   * Checks if the specified encoding is supported.
+   * @param encoding encoding
+   * @return result of check
+   */
+  public static boolean supported(final String encoding) {
+    try {
+      return Charset.isSupported(encoding);
+    } catch(final IllegalArgumentException ex) {
+      return false;
+    }
   }
 
   /**
@@ -256,19 +270,24 @@ public final class Token {
       (token[pos + 2] & 0x3F) << 6 | token[pos + 3] & 0x3F;
   }
 
+  /*** Character lengths. */
+  private static final int[] CHLEN = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 4
+  };
+
   /**
-   * Returns the codepoint length of the specified byte.
-   * @param first first character byte
+   * Returns the length of the specified UTF8 byte.
+   * @param cp codepoint
    * @return character length
    */
-  public static int cl(final byte first) {
-    return first >= 0 ? 1 : CHLEN[first >> 4 & 0xF];
+  public static int cl(final byte cp) {
+    return cp >= 0 ? 1 : CHLEN[cp >> 4 & 0xF];
   }
 
   /**
-   * Returns the codepoint length of the specified byte.
+   * Returns the length of a UTF8 character at the specified position.
    * @param token token
-   * @param pos character position
+   * @param pos position
    * @return character length
    */
   public static int cl(final byte[] token, final int pos) {
@@ -299,11 +318,6 @@ public final class Token {
     for(int i = 0; i < len; i += cl(token, i)) cp[pos++] = cp(token, i);
     return pos < len ? Arrays.copyOf(cp, pos) : cp;
   }
-
-  /*** Character lengths. */
-  private static final int[] CHLEN = {
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 4
-  };
 
   /**
    * Checks if the specified UTF-8 characters are valid.

@@ -37,8 +37,8 @@ final class FNId extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = checkEmptyType((expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).item(ctx, input), NodeType.NOD);
+    final Item it = checkEmpty((expr.length == 2 ? expr[1] :
+      checkCtx(ctx)).item(ctx, input));
 
     final Nod node = checkNode(it);
     switch(def) {
@@ -53,8 +53,8 @@ final class FNId extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = checkEmptyType((expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).item(ctx, input), NodeType.NOD);
+    final Item it = checkEmpty((expr.length == 2 ? expr[1] :
+      checkCtx(ctx)).item(ctx, input));
 
     switch(def) {
       case LANG:  return lang(lc(checkEStr(expr[0], ctx)), checkNode(it));

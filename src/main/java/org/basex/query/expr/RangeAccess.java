@@ -67,7 +67,7 @@ public final class RangeAccess extends Simple {
     final RangeToken rt = (RangeToken) ind;
     ser.emptyElement(this, DATA, token(ictx.data.meta.name),
         MIN, Token.token(rt.min), MAX, Token.token(rt.max),
-        TYPE, Token.token(rt.ind.toString()));
+        TYP, Token.token(rt.ind.toString()));
   }
 
   @Override

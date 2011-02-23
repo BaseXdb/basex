@@ -505,6 +505,8 @@ public enum FunDef {
   SHA1(UTILURI, FNUtil.class, 1, 1, "sha1(str)", STR),
   /** Utility function: calculates the CRC32 hash of the given xs:string. */
   CRC32(UTILURI, FNUtil.class, 1, 1, "crc32(str)", STR),
+  /** Utility function: gets the bytes from the given xs:base64Binary data. */
+  TO_BYTES(UTILURI, FNUtil.class, 1, 1, "to-bytes(base64)", BYT_ZM),
 
   /* FNSent functions. */
 

@@ -1,7 +1,6 @@
 package org.basex.query.util;
 
 import static org.basex.util.Token.*;
-
 import org.basex.core.Text;
 import org.basex.data.FTPos;
 import org.basex.data.FTPosData;

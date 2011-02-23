@@ -59,7 +59,7 @@ public final class Cast extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(type.toString()));
+    ser.openElement(this, TYP, Token.token(type.toString()));
     expr.plan(ser);
     ser.closeElement();
   }

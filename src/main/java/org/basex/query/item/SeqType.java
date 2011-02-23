@@ -114,9 +114,11 @@ public final class SeqType {
   /** Single date. */
   public static final SeqType DAT = new SeqType(AtomType.DAT);
   /** Zero or more dates. */
-  public static final SeqType DAT_ZM = new SeqType(AtomType.DAT, Occ.ZO);
+  public static final SeqType DAT_ZM = new SeqType(AtomType.DAT, Occ.ZM);
   /** Single function. */
   public static final SeqType FUN_O = new SeqType(FunType.ANY, Occ.O);
+  /** Zero or more bytes. */
+  public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZM);
 
   /** Sequence type. */
   public final Type type;
