@@ -45,6 +45,7 @@ public final class DiskData extends Data {
     meta = new MetaData(db, pr);
     comp = new Compress();
 
+    final int cats = pr.num(Prop.CATEGORIES);
     final DataInput in = new DataInput(meta.file(DATAINFO));
     try {
       // read meta data and indexes
@@ -52,8 +53,8 @@ public final class DiskData extends Data {
       while(true) {
         final String k = Token.string(in.readBytes());
         if(k.isEmpty()) break;
-        if(k.equals(DBTAGS))      tags = new Names(in);
-        else if(k.equals(DBATTS)) atts = new Names(in);
+        if(k.equals(DBTAGS))      tags = new Names(in, cats);
+        else if(k.equals(DBATTS)) atts = new Names(in, cats);
         else if(k.equals(DBPATH)) pthindex = new PathSummary(in);
         else if(k.equals(DBNS))   ns   = new Namespaces(in);
       }

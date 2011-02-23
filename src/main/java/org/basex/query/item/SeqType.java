@@ -80,7 +80,9 @@ public final class SeqType {
   /** Single date. */
   public static final SeqType DAT = new SeqType(Type.DAT);
   /** Zero or more dates. */
-  public static final SeqType DAT_ZM = new SeqType(Type.DAT, Occ.ZO);
+  public static final SeqType DAT_ZM = new SeqType(Type.DAT, Occ.ZM);
+  /** Zero or more dates. */
+  public static final SeqType BYT_ZM = new SeqType(Type.BYT, Occ.ZM);
 
   /** Sequence type. */
   public final Type type;

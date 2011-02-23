@@ -111,7 +111,7 @@ public class BufferInput extends InputStream {
    */
   public final void encoding(final String e) throws IOException {
     try {
-      enc = code(e, enc);
+      enc = normEncoding(e, enc);
       csd = Charset.forName(e).newDecoder();
     } catch(final Exception ex) {
       throw new IOException(ex.toString());
@@ -175,7 +175,7 @@ public class BufferInput extends InputStream {
    */
   public final int readChar() throws IOException {
     // handle different encodings
-    byte ch = readByte();
+    final byte ch = readByte();
     // comparison by references
     if(enc == UTF8) {
       final int cl = cl(ch);

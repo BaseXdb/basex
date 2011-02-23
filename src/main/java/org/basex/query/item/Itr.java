@@ -38,7 +38,7 @@ public class Itr extends Item {
    * @param v value
    * @param t data type
    */
-  Itr(final long v, final Type t) {
+  public Itr(final long v, final Type t) {
     super(t);
     val = v;
   }

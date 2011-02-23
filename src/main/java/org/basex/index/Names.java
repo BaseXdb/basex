@@ -21,30 +21,36 @@ import org.basex.util.TokenBuilder;
 public final class Names extends TokenSet {
   /** Statistic information. */
   private StatsKey[] stat;
+  /** Maximum number of string categories. */
+  private final int cats;
 
   /**
    * Default constructor.
+   * @param c number of string categories
    */
-  public Names() {
+  public Names(final int c) {
     stat = new StatsKey[CAP];
+    cats = c;
   }
 
   /**
    * Constructor, specifying an input file.
    * @param in input stream
+   * @param c number of string categories
    * @throws IOException I/O exception
    */
-  public Names(final DataInput in) throws IOException {
+  public Names(final DataInput in, final int c) throws IOException {
     super(in);
     stat = new StatsKey[keys.length];
-    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(in);
+    cats = c;
+    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(in, c);
   }
 
   /**
    * Initializes the statistics.
    */
   public void init() {
-    for(int s = 1; s < size; ++s) stat[s] = new StatsKey();
+    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(cats);
   }
 
   /**
@@ -57,7 +63,7 @@ public final class Names extends TokenSet {
   public int index(final byte[] k, final byte[] v, final boolean st) {
     final int s = Math.abs(add(k));
     if(st) {
-      if(stat[s] == null) stat[s] = new StatsKey();
+      if(stat[s] == null) stat[s] = new StatsKey(cats);
       if(v != null) stat[s].add(v);
       stat[s].counter++;
     }
@@ -77,7 +83,7 @@ public final class Names extends TokenSet {
   public void write(final DataOutput out) throws IOException {
     super.write(out);
     for(int s = 1; s < size; ++s) {
-      if(stat[s] == null) stat[s] = new StatsKey();
+      if(stat[s] == null) stat[s] = new StatsKey(cats);
       stat[s].finish(out);
     }
   }

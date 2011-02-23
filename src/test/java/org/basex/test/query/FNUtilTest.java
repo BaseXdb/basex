@@ -127,4 +127,28 @@ public final class FNUtilTest extends AdvancedQueryTest {
     error(md5 + "(())", Err.XPEMPTY);
     error(sha1 + "(())", Err.XPEMPTY);
   }
+
+  /**
+   * Test method for the util:crc32() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testCRC32() throws BaseXException {
+    final String fun = check(FunDef.CRC32, String.class);
+    query(fun + "('')", "00000000");
+    query(fun + "('BaseX')", "4C06FC7F");
+  }
+
+  /**
+   * Test method for the util:to-bytes() functions.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testToBytes() throws BaseXException {
+    final String fun = check(FunDef.TO_BYTES, String.class);
+    query(fun + "(xs:base64Binary('QmFzZVggaXMgY29vbA=='))",
+      "66 97 115 101 88 32 105 115 32 99 111 111 108");
+    query(fun + "(xs:base64Binary(xs:hexBinary('4261736558')))",
+      "66 97 115 101 88");
+  }
 }

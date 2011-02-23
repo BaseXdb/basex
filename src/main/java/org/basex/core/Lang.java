@@ -59,12 +59,12 @@ public final class Lang {
       if(chk) check = new HashMap<String, Boolean>();
 
       final String path = "/" + SUFFIX + "/" + lang + "." + SUFFIX;
-      final URL url = Lang.class.getResource(path);
-      if(url == null) {
+      final InputStream stream = Lang.class.getResourceAsStream(path);
+      if(stream == null) {
         Util.errln("%." + SUFFIX + " not found.", lang);
       } else {
         final BufferedReader br = new BufferedReader(new InputStreamReader(
-            (InputStream) url.getContent(), Token.UTF8));
+            stream, Token.UTF8));
         String line;
         while((line = br.readLine()) != null) {
           final int i = line.indexOf('=');

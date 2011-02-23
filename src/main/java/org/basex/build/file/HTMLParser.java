@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
-import java.nio.charset.Charset;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
 import org.basex.io.ArrayInput;
@@ -83,7 +82,7 @@ public final class HTMLParser extends XMLParser {
 
       // define input
       final InputSource is = new InputSource(new ByteArrayInputStream(content));
-      is.setEncoding(Charset.isSupported(enc) ? code(enc, null) : UTF8);
+      is.setEncoding(supported(enc) ? normEncoding(enc, null) : UTF8);
       // define output
       final StringWriter sw = new StringWriter();
       final XMLReader reader = (XMLReader) Reflect.get(READER);

@@ -23,7 +23,7 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  * @author Lukas Kircher
  */
 public final class Updates {
-  /** Update primitives which target nodes are DBNodes. */
+  /** Update primitives with {@link DBNode} instances as targets. */
   private final Map<Data, Primitives> primitives =
     new HashMap<Data, Primitives>();
   /** Data dummy for fragment updates. */
@@ -90,7 +90,6 @@ public final class Updates {
   /**
    * Checks constraints and applies all update primitives to the databases if
    * no constraints are hurt.
-   * XQueryUP specification 3.2.2
    * @param ctx query context
    * @throws QueryException query exception
    */
