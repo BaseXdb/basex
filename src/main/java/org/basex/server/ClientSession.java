@@ -15,7 +15,6 @@ import org.basex.core.Command;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.io.ArrayOutput;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
 import org.basex.server.trigger.TriggerNotification;
@@ -150,11 +149,16 @@ public final class ClientSession extends Session {
       public void run() {
         try {
           while(true) {
-            final ArrayOutput o = new ArrayOutput();
             bi = new BufferInput(sin);
             first = bi.read();
             if(first == 1) {
-              System.out.println("TRIGGER");
+              String name = bi.readString();
+              String val = bi.readString();
+              if(tn.size() > 0) for(TriggerNotification t : tn.get(name))
+                t.update(val);
+              synchronized(mutex) {
+              mutex.notifyAll();
+              }
             } else {
               synchronized(mutex) {
                 mutex.notifyAll();
@@ -165,7 +169,6 @@ public final class ClientSession extends Session {
                 }
               }
             }
-            o.close();
           }
         } catch(IOException e) {
           if (!SOCKET_CLOSED.equals(e.getMessage())) e.printStackTrace();

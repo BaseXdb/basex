@@ -97,7 +97,7 @@ public final class TriggerTest {
    * @throws BaseXException command exception
    */
   @Test
-  public void command() throws BaseXException {
+  public void trigger() throws BaseXException {
 
     // Create a trigger.
     cs.execute("create trigger " + TRIGGER_NAME);
@@ -130,13 +130,9 @@ public final class TriggerTest {
    */
   @Test
   public void drop() throws BaseXException {
-    // Create triggers.
-    for(int i = 0; i < TRIGGER_COUNT; i++) {
-      cs.execute("create trigger " + TRIGGER_NAME + i);
-    }
 
     // Drop triggers.
-    for(int i = 0; i < TRIGGER_COUNT; i++) {
+    for(int i = 1; i < TRIGGER_COUNT; i++) {
       cs.execute("drop trigger " + TRIGGER_NAME + i);
     }
 

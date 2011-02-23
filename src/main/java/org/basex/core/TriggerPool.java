@@ -115,10 +115,9 @@ public final class TriggerPool {
           srv.out.write(0);
           srv.out.write(i);
           srv.out.write(0);
-          srv.out.write(0);
           srv.out.flush();
         } catch(IOException e) {
-          e.printStackTrace();
+          sessions.delete(sp);
         }
       }
     }

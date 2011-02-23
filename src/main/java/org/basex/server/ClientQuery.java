@@ -37,8 +37,8 @@ public final class ClientQuery extends Query {
   @Override
   public void bind(final String n, final String v, final String t)
       throws BaseXException {
-    exec(ServerCmd.BIND, id + '\0' + n + '\0' + v + '\0' +
-        (t == null ? "" : t));
+    exec(ServerCmd.BIND, id + '\0' + n + '\0' + v + '\0'
+        + (t == null ? "" : t));
   }
 
   @Override
@@ -83,15 +83,22 @@ public final class ClientQuery extends Query {
    * @throws BaseXException command exception
    */
   ByteList exec(final ServerCmd cmd, final String arg) throws BaseXException {
-    try {
-      cs.sout.write(cmd.code);
-      cs.send(arg);
-      final BufferInput bi = new BufferInput(cs.sin);
-      final ByteList bl = bi.content();
-      if(!cs.ok(bi)) throw new BaseXException(bi.readString());
-      return bl;
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
+    synchronized(cs.mutex) {
+      try {
+        cs.sout.write(cmd.code);
+        cs.send(arg);
+        cs.mutex.wait();
+        BufferInput bi = cs.bi;
+        final ByteList bl = new ByteList();
+        if(cs.first != 0) {
+         bl.add(cs.first).add(bi.content().toArray());
+        }
+        cs.mutex.notifyAll();
+        if(!cs.ok(bi)) throw new BaseXException(bi.readString());
+        return bl;
+      } catch(final Exception ex) {
+        throw new BaseXException(ex);
+      }
     }
   }
 
