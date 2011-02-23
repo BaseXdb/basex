@@ -125,7 +125,7 @@ final class FNUtil extends Fun {
       int pos;
       @Override
       public Item next() {
-        return pos < bin.length ? new Itr(bin[pos++] & 0xFF, Type.BYT) : null;
+        return pos < bin.length ? new Itr(bin[pos++], Type.BYT) : null;
       }
     };
   }
