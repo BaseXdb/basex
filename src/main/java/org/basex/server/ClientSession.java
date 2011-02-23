@@ -50,12 +50,14 @@ public final class ClientSession extends Session {
   final PrintOutput sout;
   /** Server input. */
   final InputStream sin;
-  /** Lock object. */
-  Object lock = new Object();
-  /** Output stream. */
-  OutputStream sink;
+  /** Mutex object. */
+  Object mutex = new Object();
   /** Trigger notifications. */
   Map<String, List<TriggerNotification>> tn;
+  /** first byte of result. */
+  int first;
+  /** Buffer input. */
+  BufferInput bi;
 
   /**
    * Constructor, specifying the database context and the
@@ -125,7 +127,7 @@ public final class ClientSession extends Session {
     sin = socket.getInputStream();
 
     // receive timestamp
-    final BufferInput bi = new BufferInput(sin);
+    bi = new BufferInput(sin);
     final String ts = bi.readString();
 
     // send user name and hashed password/timestamp
@@ -135,55 +137,33 @@ public final class ClientSession extends Session {
     sout.flush();
 
     // receive success flag
-    if(!ok(bi)) throw new LoginException();
+    if(!ok()) throw new LoginException();
     startListener();
   }
 
   /**
    * Starts the listener thread.
-   * @throws IOException I/O exception
    */
-  private void startListener() throws IOException {
+  private void startListener() {
     new Thread() {
-      BufferInput bi = new BufferInput(sin);
       @Override
       public void run() {
         try {
           while(true) {
             final ArrayOutput o = new ArrayOutput();
-            int l;
-            while((l = bi.read()) != 0)
-              if (sink != null)
-                sink.write(l);
-              else
-                o.write(l);
-            info = bi.readString();
-            boolean ok = bi.read() == 0 ? true : false;
-            if(!ok) {
-              final String inf = info();
-              if(!inf.isEmpty()) {
-                if (sink != null)
-                  sink.write(inf.getBytes());
-                else
-                  o.write(inf.getBytes());
-              }
-            }
-            // Set sink as unset.
-            if (sink != null) {
-              sink.flush();
-              sink = null;
+            bi = new BufferInput(sin);
+            first = bi.read();
+            if(first == 1) {
+              System.out.println("TRIGGER");
             } else {
-              String res = o.toString();
-              if(!"".equals(res)) {
-                int idx = res.indexOf(' ');
-                String name = res.substring(0, idx);
-                String val = res.substring(idx + 1);
-                if(tn.size() > 0) for(TriggerNotification t : tn.get(name))
-                  t.update(val);
+              synchronized(mutex) {
+                mutex.notifyAll();
+                try {
+                  mutex.wait();
+                } catch(InterruptedException e) {
+                  e.printStackTrace();
+                }
               }
-            }
-            synchronized(lock) {
-              lock.notifyAll();
             }
             o.close();
           }
@@ -229,9 +209,9 @@ public final class ClientSession extends Session {
     while((l = input.read()) != -1) sout.write(l);
     sout.write(0);
     sout.flush();
-    final BufferInput bi = new BufferInput(sin);
+    bi = new BufferInput(sin);
     info = bi.readString();
-    if(!ok(bi)) throw new IOException(info);
+    if(!ok()) throw new IOException(info);
   }
 
   @Override
@@ -316,34 +296,48 @@ public final class ClientSession extends Session {
 
   /**
    * Checks the next success flag.
-   * @param bi buffer input
    * @return value of check
    * @throws IOException I/O exception
    */
-  boolean ok(final BufferInput bi) throws IOException {
+  boolean ok() throws IOException {
     return bi.read() == 0;
   }
 
+  /**
+   * Checks the next success flag.
+   * @param b buffer input
+   * @return value of check
+   * @throws IOException I/O exception
+   */
+  boolean ok(final BufferInput b) throws IOException {
+    return b.read() == 0;
+  }
+
   @Override
-  public void execute(final String cmd, final OutputStream os)
+  protected void execute(final String cmd, final OutputStream os)
       throws BaseXException {
-    synchronized(lock) {
-      this.sink = os;
+    synchronized(mutex) {
       try {
         send(cmd);
-      } catch(IOException e) {
-        throw new BaseXException(e);
-      }
-      try {
-        lock.wait();
-      } catch(InterruptedException e) {
-        e.printStackTrace();
+        mutex.wait();
+        int l;
+        if(first != 0) {
+        os.write(first);
+        while((l = bi.read()) != 0) os.write(l);
+        }
+        info = bi.readString();
+        mutex.notifyAll();
+        if(!ok()) {
+          throw new BaseXException(info);
+        }
+      } catch(Exception ex) {
+        throw new BaseXException(ex);
       }
     }
   }
 
   @Override
-  public void execute(final Command cmd, final OutputStream os)
+  protected void execute(final Command cmd, final OutputStream os)
       throws BaseXException {
     execute(cmd.toString(), os);
   }
