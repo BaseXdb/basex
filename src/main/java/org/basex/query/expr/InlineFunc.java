@@ -3,9 +3,11 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.item.FunItem;
+import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Var;
@@ -41,6 +43,17 @@ public class InlineFunc extends Func {
     }
     expr.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+
+    final SeqType[] at = new SeqType[args.length];
+    for(int i = 0; i < at.length; i++)
+      at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
+
+    return new FunItem(args, expr, FunType.get(at, var.type()));
   }
 
   @Override

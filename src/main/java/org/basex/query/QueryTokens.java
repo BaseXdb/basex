@@ -473,6 +473,8 @@ public interface QueryTokens {
   /** Query Plan. */
   String FUNC = "Function";
   /** Query Plan. */
+  String FITM = "Function item";
+  /** Query Plan. */
   String VARBL = "Variable";
   /** Query Info: Plan. */
   byte[] PLAN = token("QueryPlan");

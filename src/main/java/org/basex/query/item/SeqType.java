@@ -50,7 +50,7 @@ public final class SeqType {
      * @return result of check
      */
     public boolean instance(final Occ o) {
-      return min <= o.min && max >= o.max;
+      return min >= o.min && max <= o.max;
     }
 
     @Override

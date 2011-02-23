@@ -333,7 +333,7 @@ public abstract class ParseExpr extends Expr {
   public final Item checkType(final Item it, final Type t)
       throws QueryException {
 
-    if(checkEmpty(it).type != t) Err.type(this, t, it);
+    if(!checkEmpty(it).type.instance(t)) Err.type(this, t, it);
     return it;
   }
 

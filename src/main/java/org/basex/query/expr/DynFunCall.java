@@ -2,11 +2,19 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
+import java.util.Arrays;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.FunItem;
+import org.basex.query.item.FunType;
+import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
+import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
+import org.basex.util.Array;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -17,9 +25,6 @@ import org.basex.util.TokenBuilder;
  */
 public final class DynFunCall extends Arr {
 
-  /** Function reference. */
-  private Expr func;
-
   /**
    * Function constructor.
    * @param ii input info
@@ -27,23 +32,59 @@ public final class DynFunCall extends Arr {
    * @param arg arguments
    */
   public DynFunCall(final InputInfo ii, final Expr fun, final Expr[] arg) {
-    super(ii, arg);
-    func = fun;
+    super(ii, Array.add(arg, fun));
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-
-    type = func.type();
     return this;
   }
 
   @Override
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    final int n = expr.length - 1;
+
+    final Value[] argv = new Value[n];
+    // evaluate arguments
+    for(int a = 0; a < n; ++a) argv[a] = expr[a].value(ctx);
+
+    return getFun(ctx).invItem(argv, ctx, ii);
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+      final int n = expr.length - 1;
+
+      final Value[] argv = new Value[n];
+      // evaluate arguments
+      for(int a = 0; a < n; ++a) argv[a] = expr[a].value(ctx);
+
+    return getFun(ctx).invIter(argv, ctx, input);
+  }
+
+  /**
+   * Evaluates and checks the function item.
+   * @param ctx context
+   * @return function item
+   * @throws QueryException query exception
+   */
+  private FunItem getFun(final QueryContext ctx) throws QueryException {
+    final Item it = expr[expr.length - 1].item(ctx, input);
+    final SeqType[] at = new SeqType[expr.length - 1];
+    Arrays.fill(at, SeqType.ITEM_ZM);
+    final FunType t = FunType.get(at, SeqType.ITEM_ZM);
+
+    if(!(it instanceof FunItem) || !it.type.instance(t)) Err.type(this, t, it);
+    return (FunItem) it;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, Token.token(toString()));
-    func.plan(ser);
-    for(final Expr e : expr) e.plan(ser);
+    ser.openElement(this);
+    expr[expr.length - 1].plan(ser);
+    for(int i = 0; i < expr.length - 1; i++) expr[i].plan(ser);
     ser.closeElement();
   }
 
@@ -54,7 +95,12 @@ public final class DynFunCall extends Arr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(func.toString()).add('(').add(
-        toString(", ")).add(')').toString();
+    final TokenBuilder tb = new TokenBuilder(expr[expr.length - 1].toString());
+    tb.add('(');
+    for(int i = 0; i < expr.length - 1; i++) {
+      tb.add(expr[i].toString());
+      if(i < expr.length - 2) tb.add(", ");
+    }
+    return tb.add(')').toString();
   }
 }
