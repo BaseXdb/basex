@@ -11,6 +11,7 @@ import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.B64;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
@@ -48,6 +49,7 @@ final class FNUtil extends Fun {
     switch(def) {
       case EVAL: return eval(ctx);
       case RUN:  return run(ctx);
+      case TO_BYTES:  return bytes(ctx);
       default:   return super.iter(ctx);
     }
   }
@@ -106,6 +108,26 @@ final class FNUtil extends Fun {
     qt.parse(string(qu));
     qt.compile();
     return ItemIter.get(qt.iter());
+  }
+
+  /**
+   * Extracts the bytes from the given xs:base64Binary data.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter bytes(final QueryContext ctx)
+      throws QueryException {
+    final byte[] bin = ((B64) checkEmptyType(expr[0].item(ctx, input),
+        Type.B6B)).toJava();
+    return new Iter() {
+      /** Position. */
+      int pos;
+      @Override
+      public Item next() {
+        return pos < bin.length ? new Itr(bin[pos++] & 0xFF, Type.BYT) : null;
+      }
+    };
   }
 
   /**
