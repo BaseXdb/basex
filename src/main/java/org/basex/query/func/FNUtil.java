@@ -118,8 +118,8 @@ final class FNUtil extends Fun {
    */
   private Iter bytes(final QueryContext ctx)
       throws QueryException {
-    final byte[] bin = ((B64) checkEmptyType(expr[0].item(ctx, input),
-        Type.B6B)).toJava();
+    final Item it = checkItem(expr[0], ctx);
+    final byte[] bin = ((B64) checkType(it, Type.B6B)).toJava();
     return new Iter() {
       /** Position. */
       int pos;
