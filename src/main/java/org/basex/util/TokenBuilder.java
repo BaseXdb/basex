@@ -77,9 +77,11 @@ public final class TokenBuilder {
 
   /**
    * Resets the token buffer.
+   * @return self reference
    */
-  public void reset() {
+  public TokenBuilder reset() {
     size = 0;
+    return this;
   }
 
   /**
