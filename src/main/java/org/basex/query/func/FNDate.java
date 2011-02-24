@@ -14,6 +14,7 @@ import org.basex.query.item.Dtm;
 import org.basex.query.item.Dur;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
 import org.basex.query.util.Err;
@@ -47,26 +48,26 @@ final class FNDate extends Fun {
 
     switch(def) {
       case YEADUR:   return yea(checkDur(it));
-      case YEADTM:   return yea(checkDate(it, Type.DTM, ctx));
-      case YEADAT:   return yea(checkDate(it, Type.DAT, ctx));
+      case YEADTM:   return yea(checkDate(it, AtomType.DTM, ctx));
+      case YEADAT:   return yea(checkDate(it, AtomType.DAT, ctx));
       case MONDUR:   return mon(checkDur(it));
-      case MONDTM:   return mon(checkDate(it, Type.DTM, ctx));
-      case MONDAT:   return mon(checkDate(it, Type.DAT, ctx));
+      case MONDTM:   return mon(checkDate(it, AtomType.DTM, ctx));
+      case MONDAT:   return mon(checkDate(it, AtomType.DAT, ctx));
       case DAYDUR:   return day(checkDur(it));
-      case DAYDTM:   return day(checkDate(it, Type.DTM, ctx));
-      case DAYDAT:   return day(checkDate(it, Type.DAT, ctx));
+      case DAYDTM:   return day(checkDate(it, AtomType.DTM, ctx));
+      case DAYDAT:   return day(checkDate(it, AtomType.DAT, ctx));
       case HOUDUR:   return hou(checkDur(it));
-      case HOUDTM:   return hou(checkDate(it, Type.DTM, ctx));
-      case HOUTIM:   return hou(checkDate(it, Type.TIM, ctx));
+      case HOUDTM:   return hou(checkDate(it, AtomType.DTM, ctx));
+      case HOUTIM:   return hou(checkDate(it, AtomType.TIM, ctx));
       case MINDUR:   return min(checkDur(it));
-      case MINDTM:   return min(checkDate(it, Type.DTM, ctx));
-      case MINTIM:   return min(checkDate(it, Type.TIM, ctx));
+      case MINDTM:   return min(checkDate(it, AtomType.DTM, ctx));
+      case MINTIM:   return min(checkDate(it, AtomType.TIM, ctx));
       case SECDUR:   return sec(checkDur(it));
-      case SECDTM:   return sec(checkDate(it, Type.DTM, ctx));
-      case SECTIM:   return sec(checkDate(it, Type.TIM, ctx));
-      case ZONDTM:   return zon(checkDate(it, Type.DTM, ctx));
-      case ZONDAT:   return zon(checkDate(it, Type.DAT, ctx));
-      case ZONTIM:   return zon(checkDate(it, Type.TIM, ctx));
+      case SECDTM:   return sec(checkDate(it, AtomType.DTM, ctx));
+      case SECTIM:   return sec(checkDate(it, AtomType.TIM, ctx));
+      case ZONDTM:   return zon(checkDate(it, AtomType.DTM, ctx));
+      case ZONDAT:   return zon(checkDate(it, AtomType.DAT, ctx));
+      case ZONTIM:   return zon(checkDate(it, AtomType.TIM, ctx));
       case DATZON:   return datzon(it, zon, d);
       case DTMZON:   return dtmzon(it, zon, d);
       case TIMZON:   return timzon(it, zon, d);
@@ -169,8 +170,8 @@ final class FNDate extends Fun {
    * @throws QueryException query exception
    */
   private Item checkDur(final Item it) throws QueryException {
-    if(it.unt()) return new Dur(it.atom(), input);
-    if(!it.dur()) Err.type(this, Type.DUR, it);
+    if(it.unt()) return new Dur(it.atom(input), input);
+    if(!it.dur()) Err.type(this, AtomType.DUR, it);
     return it;
   }
 
@@ -185,8 +186,8 @@ final class FNDate extends Fun {
   private Item datzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.unt() ? new Dat(it.atom(), input) :
-      checkType(it, Type.DAT);
+    final Item i = it.unt() ? new Dat(it.atom(input), input) :
+      checkType(it, AtomType.DAT);
     return adjust((Date) i, zon, d);
   }
 
@@ -201,8 +202,8 @@ final class FNDate extends Fun {
   private Item dtmzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.unt() ? new Dtm(it.atom(), input) :
-      checkType(it, Type.DTM);
+    final Item i = it.unt() ? new Dtm(it.atom(input), input) :
+      checkType(it, AtomType.DTM);
     return adjust((Date) i, zon, d);
   }
 
@@ -217,8 +218,8 @@ final class FNDate extends Fun {
   private Item timzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.unt() ? new Tim(it.atom(), input) :
-      checkType(it, Type.TIM);
+    final Item i = it.unt() ? new Tim(it.atom(input), input) :
+      checkType(it, AtomType.TIM);
     return adjust((Date) i, zon, d);
   }
 
@@ -232,11 +233,11 @@ final class FNDate extends Fun {
   private Item dattim(final Item date, final Item tm) throws QueryException {
     if(tm == null) return null;
 
-    final Item d = date.unt() ? new Dat(date.atom(), input) : date;
-    final Item t = tm.unt() ? new Tim(tm.atom(), input) : tm;
+    final Item d = date.unt() ? new Dat(date.atom(input), input) : date;
+    final Item t = tm.unt() ? new Tim(tm.atom(input), input) : tm;
 
-    final Dtm dtm = new Dtm((Dat) checkType(d, Type.DAT));
-    final Tim tim = (Tim) checkType(t, Type.TIM);
+    final Dtm dtm = new Dtm((Dat) checkType(d, AtomType.DAT));
+    final Tim tim = (Tim) checkType(t, AtomType.TIM);
 
     dtm.xc.setTime(tim.xc.getHour(), tim.xc.getMinute(), tim.xc.getSecond(),
         tim.xc.getMillisecond());
@@ -272,7 +273,7 @@ final class FNDate extends Fun {
       final Calendar c = Calendar.getInstance();
       tz = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000;
     } else {
-      final DTd dtd = (DTd) checkType(zon, Type.DTD);
+      final DTd dtd = (DTd) checkType(zon, AtomType.DTD);
       tz = (int) (dtd.min() + dtd.hou() * 60);
       if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) {
         INVALZONE.thrw(input, zon);

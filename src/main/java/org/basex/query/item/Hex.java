@@ -21,7 +21,7 @@ public final class Hex extends Item {
    * @param v value
    */
   public Hex(final byte[] v) {
-    super(Type.HEX);
+    super(AtomType.HEX);
     val = v;
   }
 
@@ -32,7 +32,7 @@ public final class Hex extends Item {
    * @throws QueryException query exception
    */
   public Hex(final byte[] v, final InputInfo ii) throws QueryException {
-    super(Type.HEX);
+    super(AtomType.HEX);
     h2b(Token.trim(v), ii);
   }
 
@@ -45,7 +45,7 @@ public final class Hex extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return b2h();
   }
 

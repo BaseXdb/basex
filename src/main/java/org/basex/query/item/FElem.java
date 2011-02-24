@@ -76,7 +76,7 @@ public final class FElem extends FNode {
   public FElem(final QNm n, final NodIter ch, final NodIter at, final byte[] b,
       final Atts nsp, final Nod p) {
 
-    super(Type.ELM);
+    super(NodeType.ELM);
     name = n;
     children = ch;
     atts = at;
@@ -93,7 +93,7 @@ public final class FElem extends FNode {
    * @param nss namespaces in scope
    */
   FElem(final Element elem, final Nod p, final TokenMap nss) {
-    super(Type.ELM);
+    super(NodeType.ELM);
 
     // general stuff
     final String nu = elem.getNamespaceURI();

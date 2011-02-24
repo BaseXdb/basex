@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Func extends Single {
+public class Func extends Single {
   /** Function name, including return type. */
   public final Var var;
   /** Arguments. */

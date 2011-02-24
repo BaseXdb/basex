@@ -28,7 +28,7 @@ public final class QNm extends Item {
    * Empty constructor.
    */
   public QNm() {
-    super(Type.QNM);
+    super(AtomType.QNM);
     val = EMPTY;
   }
 
@@ -136,8 +136,16 @@ public final class QNm extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return val;
+  }
+
+  /**
+   * Returns an atomized string.
+   * @return Returns an atomized string.
+   */
+  public byte[] atom() {
+    return atom(null);
   }
 
   @Override

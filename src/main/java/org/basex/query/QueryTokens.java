@@ -351,6 +351,8 @@ public interface QueryTokens {
   /** Parser token. */
   String DOLLAR = "$";
   /** Parser token. */
+  String HASH = "#";
+  /** Parser token. */
   String DOT2 = "..";
   /** Parser token. */
   String IS = "=";
@@ -370,6 +372,10 @@ public interface QueryTokens {
   String PRAGMA = "(#";
   /** Parser token. */
   String PRAGMA2 = "#)";
+  /** Parser Token. */
+  String PLHOLDER = "?";
+  /** Parser Token. */
+  String ASTERISK = "*";
 
   // URIS =====================================================================
 
@@ -466,6 +472,8 @@ public interface QueryTokens {
   String ARG = "arg";
   /** Query Plan. */
   String FUNC = "Function";
+  /** Query Plan. */
+  String FITM = "Function item";
   /** Query Plan. */
   String VARBL = "Variable";
   /** Query Info: Plan. */

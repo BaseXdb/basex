@@ -26,7 +26,7 @@ public final class FDoc extends FNode {
    * @param b base uri
    */
   public FDoc(final NodIter ch, final byte[] b) {
-    super(Type.DOC);
+    super(NodeType.DOC);
     children = ch;
     base = b;
   }

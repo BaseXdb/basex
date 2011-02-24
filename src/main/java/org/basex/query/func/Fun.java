@@ -9,8 +9,8 @@ import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Atm;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -62,10 +62,11 @@ public abstract class Fun extends Arr {
    * Atomizes the specified item.
    * @param it input item
    * @return atomized item
+   * @throws QueryException query exception
    */
-  protected Item atom(final Item it) {
-    return it.node() ? it.type == Type.PI || it.type == Type.COM ?
-        Str.get(it.atom()) : new Atm(it.atom()) : it;
+  protected Item atom(final Item it) throws QueryException {
+    return it.node() ? it.type == NodeType.PI || it.type == NodeType.COM ?
+        Str.get(it.atom(input)) : new Atm(it.atom(input)) : it;
   }
 
   @Override

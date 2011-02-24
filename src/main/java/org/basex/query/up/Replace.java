@@ -11,6 +11,7 @@ import org.basex.query.item.FComm;
 import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -47,7 +48,7 @@ public final class Replace extends Update {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Constr c = new Constr(ctx, expr[1]);
+    final Constr c = new Constr(ii, ctx, expr[1]);
     if(c.errAtt) UPNOATTRPER.thrw(input);
     if(c.duplAtt != null) UPATTDUPL.thrw(input, c.duplAtt);
 
@@ -56,7 +57,7 @@ public final class Replace extends Update {
     // check target constraints
     if(i == null) UPSEQEMP.thrw(input, Util.name(this));
     final Type tp = i.type;
-    if(!(i instanceof Nod) || tp == Type.DOC || t.next() != null)
+    if(!(i instanceof Nod) || tp == NodeType.DOC || t.next() != null)
       UPTRGMULT.thrw(input);
     final Nod targ = (Nod) i;
 
@@ -66,16 +67,16 @@ public final class Replace extends Update {
     if(value) {
       // replace value of node
       final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).atom();
-      if(tp == Type.COM) FComm.parse(txt, input);
-      if(tp == Type.PI) FPI.parse(txt, input);
+      if(tp == NodeType.COM) FComm.parse(txt, input);
+      if(tp == NodeType.PI) FPI.parse(txt, input);
 
-      ctx.updates.add(tp == Type.ELM ?
+      ctx.updates.add(tp == NodeType.ELM ?
           new ReplaceElemContent(input, targ, txt) :
           new ReplaceValue(input, targ, new QNm(txt)), ctx);
     } else {
       final Nod par = targ.parent();
       if(par == null) UPNOPAR.thrw(input, i);
-      if(tp == Type.ATT) {
+      if(tp == NodeType.ATT) {
         // replace attribute node
         if(list.size() > 0) UPWRATTR.thrw(input);
         list = checkNS(aList, par, ctx);

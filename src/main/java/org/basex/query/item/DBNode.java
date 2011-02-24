@@ -59,7 +59,7 @@ public class DBNode extends Nod {
    * @param r parent reference
    * @param t node type
    */
-  protected DBNode(final Data d, final int p, final Nod r, final Type t) {
+  protected DBNode(final Data d, final int p, final Nod r, final NodeType t) {
     super(t);
     data = d;
     pre = p;
@@ -80,15 +80,15 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] atom(final InputInfo ii) {
     if(val == null) val = data.atom(pre);
     return val;
   }
 
   @Override
   public long itr(final InputInfo ii) throws QueryException {
-    final boolean txt = type == Type.TXT || type == Type.COM;
-    if(txt || type == Type.ATT) {
+    final boolean txt = type == NodeType.TXT || type == NodeType.COM;
+    if(txt || type == NodeType.ATT) {
       final long l = data.textItr(pre, txt);
       if(l != Long.MIN_VALUE) return l;
     }
@@ -97,8 +97,8 @@ public class DBNode extends Nod {
 
   @Override
   public double dbl(final InputInfo ii) throws QueryException {
-    final boolean txt = type == Type.TXT || type == Type.COM;
-    if(txt || type == Type.ATT) {
+    final boolean txt = type == NodeType.TXT || type == NodeType.COM;
+    if(txt || type == NodeType.ATT) {
       final double d = data.textDbl(pre, txt);
       if(!Double.isNaN(d)) return d;
     }
@@ -112,9 +112,11 @@ public class DBNode extends Nod {
 
   @Override
   public final byte[] nname() {
-    switch(type) {
+    if(!(type instanceof NodeType)) return EMPTY;
+    final NodeType t = ndType();
+    switch(t) {
       case ELM: case ATT: case PI:
-        return data.name(pre, kind(type));
+        return data.name(pre, kind(t));
       default:
         return EMPTY;
     }
@@ -142,13 +144,13 @@ public class DBNode extends Nod {
 
   @Override
   public final Atts ns() {
-    if(type == Type.ELM && nsp == null) nsp = data.ns(pre);
+    if(type == NodeType.ELM && nsp == null) nsp = data.ns(pre);
     return nsp;
   }
 
   @Override
   public final byte[] base() {
-    if(type != Type.DOC) return EMPTY;
+    if(type != NodeType.DOC) return EMPTY;
     final IO dir = IO.get(data.meta.path.path());
     return token(dir.merge(string(data.text(pre, true))).url());
   }
@@ -168,7 +170,7 @@ public class DBNode extends Nod {
 
   @Override
   public final DBNode copy() {
-    final DBNode n = new DBNode(data, pre, par, type);
+    final DBNode n = new DBNode(data, pre, par, ndType());
     n.root = root;
     n.score = score;
     return n;
@@ -387,8 +389,8 @@ public class DBNode extends Nod {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(type.nam).add(' ');
-    switch(type) {
+    final TokenBuilder tb = new TokenBuilder(type.nam()).add(' ');
+    switch((NodeType) type) {
       case ATT:
       case PI:
         tb.add(nname()).add(" { \"").add(chop(atom(), 64)).add("\" }");

@@ -23,7 +23,7 @@ public class Str extends Item {
    * @param v value
    */
   private Str(final byte[] v) {
-    this(v, Type.STR);
+    this(v, AtomType.STR);
   }
 
   /**
@@ -55,25 +55,31 @@ public class Str extends Item {
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] atom(final InputInfo ii) {
     return val;
+  }
+
+  /**
+   * Returns an atomized string.
+   * @return Returns an atomized string.
+   */
+  public final byte[] atom() {
+    return atom(null);
   }
 
   @Override
   public final boolean bool(final InputInfo ii) {
-    return atom().length != 0;
+    return atom(ii).length != 0;
   }
 
   @Override
-  @SuppressWarnings("unused")
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return Token.eq(val, it.atom());
+    return Token.eq(val, it.atom(ii));
   }
 
   @Override
-  @SuppressWarnings("unused")
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    return Token.diff(val, it.atom());
+    return Token.diff(val, it.atom(ii));
   }
 
   @Override

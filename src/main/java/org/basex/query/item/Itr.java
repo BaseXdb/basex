@@ -30,7 +30,7 @@ public class Itr extends Item {
    * @param v value
    */
   private Itr(final long v) {
-    this(v, Type.ITR);
+    this(v, AtomType.ITR);
   }
 
   /**
@@ -48,7 +48,7 @@ public class Itr extends Item {
    * @param d date time
    */
   Itr(final Date d) {
-    this(d.xc.toGregorianCalendar().getTimeInMillis(), Type.LNG);
+    this(d.xc.toGregorianCalendar().getTimeInMillis(), AtomType.LNG);
   }
 
   /**
@@ -67,11 +67,11 @@ public class Itr extends Item {
    * @return instance
    */
   public static Itr get(final long v, final Type t) {
-    return t == Type.ITR ? get(v) : new Itr(v, t);
+    return t == AtomType.ITR ? get(v) : new Itr(v, t);
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] atom(final InputInfo ii) {
     return val == 0 ? Token.ZERO : Token.token(val);
   }
 
@@ -120,7 +120,7 @@ public class Itr extends Item {
 
   @Override
   public final Object toJava() {
-    switch(type) {
+    switch((AtomType) type) {
       case BYT: return (byte) val;
       case SHR:
       case UBY: return (short) val;
@@ -128,7 +128,7 @@ public class Itr extends Item {
       case USH: return (int) val;
       case LNG:
       case UIN: return val;
-      default:  return new BigInteger(Token.string(atom()));
+      default:  return new BigInteger(Token.string(atom(null)));
     }
   }
 

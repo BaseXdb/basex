@@ -25,8 +25,8 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
@@ -325,7 +325,7 @@ final class FNFile extends Fun {
   private Item writeBinary(final File path, final QueryContext ctx)
       throws QueryException {
 
-    final B64 b64 = (B64) checkType(expr[1].item(ctx, input), Type.B6B);
+    final B64 b64 = (B64) checkType(expr[1].item(ctx, input), AtomType.B6B);
     final boolean append = optionalBool(2, ctx);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
 
@@ -424,7 +424,7 @@ final class FNFile extends Fun {
   private boolean optionalBool(final int i, final QueryContext ctx)
       throws QueryException {
     return expr.length > i &&
-      checkType(expr[i].item(ctx, input), Type.BLN).bool(input);
+      checkType(expr[i].item(ctx, input), AtomType.BLN).bool(input);
   }
 
   @Override

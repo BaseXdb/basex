@@ -57,8 +57,8 @@ public final class ItemSeq extends Seq {
   public SeqType type() {
     if(seq == null) {
       Type t = val[0].type;
-      for(int s = 1; s != size && t != Type.ITEM; ++s) {
-        if(t != val[s].type) t = Type.ITEM;
+      for(int s = 1; s != size && t != AtomType.ITEM; ++s) {
+        if(t != val[s].type) t = AtomType.ITEM;
       }
       seq = SeqType.get(t, SeqType.Occ.OM);
     }
@@ -79,7 +79,7 @@ public final class ItemSeq extends Seq {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Type.SEQ.nam, SIZE, Token.token(size));
+    ser.openElement(AtomType.SEQ.nam, SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); ++v) val[v].plan(ser);
     ser.closeElement();
   }

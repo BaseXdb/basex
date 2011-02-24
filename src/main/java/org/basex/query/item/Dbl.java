@@ -28,7 +28,7 @@ public final class Dbl extends Item {
    * @param v value
    */
   private Dbl(final double v) {
-    super(Type.DBL);
+    super(AtomType.DBL);
     val = v;
   }
 
@@ -55,7 +55,7 @@ public final class Dbl extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return Token.token(val);
   }
 

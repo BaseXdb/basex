@@ -30,7 +30,7 @@ public final class InsertAfter extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
-    final int k = Nod.kind(node.type);
+    final int k = Nod.kind(node.ndType());
     d.insert(p + d.size(p, k), d.parent(p, k), md);
   }
 

@@ -10,7 +10,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
@@ -197,7 +197,7 @@ final class FNId extends Fun {
   private Nod checkRoot(final Nod nod) throws QueryException {
     if(nod instanceof FNode) {
       Nod n = nod;
-      while(n.type != Type.DOC) {
+      while(n.type != NodeType.DOC) {
         n = n.parent();
         if(n == null) IDDOC.thrw(input);
       }

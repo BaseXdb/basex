@@ -26,7 +26,7 @@ public final class B64 extends Item {
    * @throws QueryException query exception
    */
   public B64(final byte[] d, final InputInfo ii) throws QueryException {
-    super(Type.B6B);
+    super(AtomType.B6B);
     final ByteList bl = new ByteList();
     for(final byte c : d) if(c < 0 || c > ' ') bl.add(c);
     b2h(bl.toArray(), ii);
@@ -37,7 +37,7 @@ public final class B64 extends Item {
    * @param d binary data
    */
   public B64(final byte[] d) {
-    super(Type.B6B);
+    super(AtomType.B6B);
     val = d;
   }
 
@@ -50,8 +50,8 @@ public final class B64 extends Item {
   }
 
   @Override
-  public byte[] atom() {
-    return h2b();
+  public byte[] atom(final InputInfo ii) {
+    return enc(val);
   }
 
   @Override
@@ -66,20 +66,21 @@ public final class B64 extends Item {
   }
 
   /**
-   * Hex to byte conversion.
+   * Base64-encodes the given bytes.
+   * @param bytes bytes to be encoded
    * @return base64 array
    */
-  private byte[] h2b() {
+  public static byte[] enc(final byte[] bytes) {
     final ByteList bl = new ByteList();
-    final int a = val.length;
+    final int a = bytes.length;
     final int f = a / 3;
     final int p = a - 3 * f;
 
     int c = 0;
     for(int i = 0; i < f; ++i) {
-      final int b0 = val[c++] & 0xff;
-      final int b1 = val[c++] & 0xff;
-      final int b2 = val[c++] & 0xff;
+      final int b0 = bytes[c++] & 0xff;
+      final int b1 = bytes[c++] & 0xff;
+      final int b2 = bytes[c++] & 0xff;
       bl.add(H2B[b0 >> 2]);
       bl.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
       bl.add(H2B[b1 << 2 & 0x3f | b2 >> 6]);
@@ -87,14 +88,14 @@ public final class B64 extends Item {
     }
 
     if(p != 0) {
-      final int b0 = val[c++] & 0xff;
+      final int b0 = bytes[c++] & 0xff;
       bl.add(H2B[b0 >> 2]);
       if(p == 1) {
         bl.add(H2B[b0 << 4 & 0x3f]);
         bl.add('=');
         bl.add('=');
       } else {
-        final int b1 = val[c++] & 0xff;
+        final int b1 = bytes[c++] & 0xff;
         bl.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
         bl.add(H2B[b1 << 2 & 0x3f]);
         bl.add('=');
@@ -177,7 +178,7 @@ public final class B64 extends Item {
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", h2b());
+    return Util.info("\"%\"", enc(val));
   }
 
   @Override

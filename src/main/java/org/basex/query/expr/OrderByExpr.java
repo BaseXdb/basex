@@ -56,7 +56,7 @@ public final class OrderByExpr extends OrderBy {
   void add(final QueryContext ctx) throws QueryException {
     Item it = expr.item(ctx, input);
     if(it != null) {
-      if(it.node()) it = Str.get(it.atom());
+      if(it.node()) it = Str.get(it.atom(input));
       else if(it.num() && Double.isNaN(it.dbl(input))) it = null;
     }
     seq.add(it);

@@ -5,7 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FDoc;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -29,7 +29,7 @@ public final class CDoc extends CFrag {
   public FDoc item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Constr con = new Constr(ctx, expr);
+    final Constr con = new Constr(ii, ctx, expr);
     if(con.errAtt || con.ats.size() != 0) XPATT.thrw(ii);
 
     final FDoc doc = new FDoc(con.children, con.base);
@@ -45,6 +45,6 @@ public final class CDoc extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(Type.DOC.nam));
+    return toString(Token.string(NodeType.DOC.nam));
   }
 }

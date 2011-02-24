@@ -62,7 +62,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(Type.SEQ.nam, MIN, Token.token(start),
+    ser.emptyElement(AtomType.SEQ.nam, MIN, Token.token(start),
         MAX, Token.token(start + size - 1));
   }
 

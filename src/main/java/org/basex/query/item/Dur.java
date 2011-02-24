@@ -38,7 +38,7 @@ public class Dur extends Item {
    * @throws QueryException query exception
    */
   public Dur(final byte[] v, final InputInfo ii) throws QueryException {
-    this(v, Type.DUR, ii);
+    this(v, AtomType.DUR, ii);
   }
 
   /**
@@ -54,7 +54,7 @@ public class Dur extends Item {
    * @param d duration
    */
   protected Dur(final Dur d) {
-    this(d, Type.DUR);
+    this(d, AtomType.DUR);
   }
 
   /**
@@ -156,7 +156,7 @@ public class Dur extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
     if(mon < 0 || sc.signum() < 0) tb.add('-');
     tb.add('P');
@@ -198,7 +198,7 @@ public class Dur extends Item {
 
   @Override
   public final Duration toJava() {
-    return Date.df.newDuration(Token.string(atom()));
+    return Date.df.newDuration(Token.string(atom(null)));
   }
 
   @Override
@@ -208,6 +208,6 @@ public class Dur extends Item {
 
   @Override
   public final String toString() {
-    return "\"" + Token.string(atom()) + "\"";
+    return "\"" + Token.string(atom(null)) + "\"";
   }
 }

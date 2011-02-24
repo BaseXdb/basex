@@ -13,8 +13,8 @@ import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.path.Axis;
@@ -252,8 +252,8 @@ public final class CmpG extends Cmp {
     if(s == null || op != Op.EQ) return false;
 
     // check which index applies
-    final boolean text = s.test.type == Type.TXT && ic.data.meta.textindex;
-    final boolean attr = s.test.type == Type.ATT && ic.data.meta.attrindex;
+    final boolean text = s.test.type == NodeType.TXT && ic.data.meta.textindex;
+    final boolean attr = s.test.type == NodeType.ATT && ic.data.meta.attrindex;
     if(!text && !attr) return false;
 
     // support expressions
@@ -263,7 +263,7 @@ public final class CmpG extends Cmp {
       final SeqType t = arg.type();
       // index access not possible if returned type is no string or node,
       // and if expression depends on context
-      if(arg.uses(Use.CTX) || !(t.type.str || t.type.node())) return false;
+      if(arg.uses(Use.CTX) || !(t.type.str() || t.type.node())) return false;
 
       ic.costs += Math.max(1, ic.data.meta.size / 10);
       iacc = Array.add(iacc, new IndexAccess(input, arg, ind, ic));
@@ -276,9 +276,9 @@ public final class CmpG extends Cmp {
     ic.costs = 0;
     while((it = ir.next()) != null) {
       final SeqType t = it.type();
-      if(!(t.type.str || t.type.node())) return false;
+      if(!(t.type.str() || t.type.node())) return false;
 
-      final int is = ic.data.nrIDs(new ValuesToken(ind, it.atom()));
+      final int is = ic.data.nrIDs(new ValuesToken(ind, it.atom(input)));
       // add only expressions that yield results
       if(is != 0) iacc = Array.add(iacc, new IndexAccess(input, it, ind, ic));
       ic.costs += is;

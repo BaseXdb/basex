@@ -9,8 +9,8 @@ import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
@@ -91,7 +91,7 @@ final class DBPrimitives extends Primitives {
         final int ps = pre + d.attSize(pre, Data.ELEM);
         for(int p = pre + 1; p < ps; ++p) {
           final byte[] nm = d.name(p, Data.ATTR);
-          if(!il.contains(p)) pool.add(new QNm(nm, ctx, null), Type.ATT);
+          if(!il.contains(p)) pool.add(new QNm(nm, ctx, null), NodeType.ATT);
         }
       }
     }

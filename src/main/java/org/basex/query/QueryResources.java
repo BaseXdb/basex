@@ -15,8 +15,8 @@ import org.basex.io.IO;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.Seq;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -212,7 +212,7 @@ public final class QueryResources {
     // collection reference are equal, and if first item is a document node
     final Value val = ctx.value;
     return globalData && val.sameAs(coll[0]) && val.size() != 0 &&
-      (val.item() ? (Item) val : val.iter(ctx).next()).type == Type.DOC;
+      (val.item() ? (Item) val : val.iter(ctx).next()).type == NodeType.DOC;
   }
 
   /**

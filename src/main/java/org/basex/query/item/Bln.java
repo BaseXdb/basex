@@ -26,7 +26,7 @@ public final class Bln extends Item {
    * @param b boolean value
    */
   private Bln(final boolean b) {
-    super(Type.BLN);
+    super(AtomType.BLN);
     val = b;
   }
 
@@ -59,7 +59,7 @@ public final class Bln extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return Token.token(val);
   }
 
@@ -90,12 +90,12 @@ public final class Bln extends Item {
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return val == (it.type == type ? it.bool(ii) : parse(it.atom(), ii));
+    return val == (it.type == type ? it.bool(ii) : parse(it.atom(ii), ii));
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    final boolean n = it.type == type ? it.bool(ii) : parse(it.atom(), ii);
+    final boolean n = it.type == type ? it.bool(ii) : parse(it.atom(ii), ii);
     return val ? !n ? 1 : 0 : n ? -1 : 0;
   }
 
@@ -127,7 +127,7 @@ public final class Bln extends Item {
     final byte[] s = Token.trim(str);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
     if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;
-    FUNCAST.thrw(ii, Type.BLN, str);
+    FUNCAST.thrw(ii, AtomType.BLN, str);
     return false;
   }
 

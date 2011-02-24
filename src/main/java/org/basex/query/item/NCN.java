@@ -19,7 +19,7 @@ public final class NCN extends Str {
    * @throws QueryException query exception
    */
   public NCN(final byte[] v, final InputInfo ii) throws QueryException {
-    super(Token.norm(v), Type.NCN);
+    super(Token.norm(v), AtomType.NCN);
 
     if(v.length == 0) XPNAME.thrw(ii);
     int i = -1;

@@ -18,7 +18,7 @@ public final class Uri extends Str {
    * @param v value
    */
   Uri(final byte[] v) {
-    super(v, Type.URI);
+    super(v, AtomType.URI);
   }
 
   /**

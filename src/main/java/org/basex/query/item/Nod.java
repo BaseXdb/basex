@@ -26,8 +26,9 @@ import org.basex.util.Util;
  */
 public abstract class Nod extends Item {
   /** Node Types. */
-  private static final Type[] TYPES = {
-    Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
+  private static final NodeType[] TYPES = {
+    NodeType.DOC, NodeType.ELM, NodeType.TXT, NodeType.ATT,
+    NodeType.COM, NodeType.PI
   };
   /** Static node counter. */
   // [CG] XQuery/ID: move to query context?
@@ -44,7 +45,7 @@ public abstract class Nod extends Item {
    * Constructor.
    * @param t data type
    */
-  protected Nod(final Type t) {
+  protected Nod(final NodeType t) {
     super(t);
   }
 
@@ -54,20 +55,29 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return val;
+  }
+
+  /**
+   * Returns an atomized string.
+   * @return Returns an atomized string.
+   */
+  public final byte[] atom() {
+    return atom(null);
   }
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.unt() ? it.eq(ii, this) : Token.eq(atom(), it.atom());
+    return !it.unt() ? it.eq(ii, this) : Token.eq(atom(), it.atom(ii));
   }
 
   @Override
   public final int diff(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.unt() ? -it.diff(ii, this) : Token.diff(atom(), it.atom());
+    return !it.unt() ? -it.diff(ii, this) :
+      Token.diff(atom(), it.atom(ii));
   }
 
   @Override
@@ -144,7 +154,7 @@ public abstract class Nod extends Item {
         }
       }
       n = n.parent();
-    } while(n != null && n.type == Type.ELM);
+    } while(n != null && n.type == NodeType.ELM);
     return ns;
   }
 
@@ -281,7 +291,7 @@ public abstract class Nod extends Item {
           Nod n = Nod.this;
           Nod p = n.parent();
           while(p != null) {
-            if(n.type != Type.ATT) {
+            if(n.type != NodeType.ATT) {
               final NodIter tmp = new NodIter();
               final NodeIter i = p.child();
               Nod c;
@@ -370,7 +380,7 @@ public abstract class Nod extends Item {
    * @param t node type
    * @return node kind
    */
-  public static int kind(final Type t) {
+  public static int kind(final NodeType t) {
     switch(t) {
       case DOC: return Data.DOC;
       case ELM: return Data.ELEM;
@@ -387,13 +397,13 @@ public abstract class Nod extends Item {
    * @param k database kind
    * @return node type
    */
-  public static Type type(final int k) {
+  public static NodeType type(final int k) {
     return TYPES[k];
   }
 
   @Override
   public final BXNode toJava() {
-    switch(type) {
+    switch(ndType()) {
       case DOC: return new BXDoc(this);
       case ELM: return new BXElem(this);
       case TXT: return new BXText(this);
@@ -407,5 +417,13 @@ public abstract class Nod extends Item {
   @Override
   public final SeqType type() {
     return SeqType.NOD;
+  }
+
+  /**
+   * Returns this Node's node type.
+   * @return node type
+   */
+  public final NodeType ndType() {
+    return (NodeType) type;
   }
 }

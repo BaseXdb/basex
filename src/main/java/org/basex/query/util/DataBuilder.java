@@ -121,7 +121,7 @@ public final class DataBuilder {
   private int addNode(final Nod nd, final int pre,
       final int par, final Nod ndPar) throws QueryException {
 
-    switch(nd.type) {
+    switch(nd.ndType()) {
       case DOC: return addDoc(nd, pre);
       case ELM: return addElem(nd, pre, par, ndPar);
       case TXT: return pre + addText(nd, pre, par, ndPar);
@@ -336,7 +336,7 @@ public final class DataBuilder {
   private static int size(final Nod n, final boolean a) throws QueryException {
     if(n instanceof DBNode) {
       final DBNode dbn = (DBNode) n;
-      final int k = Nod.kind(n.type);
+      final int k = Nod.kind(n.ndType());
       return a ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
     }
 

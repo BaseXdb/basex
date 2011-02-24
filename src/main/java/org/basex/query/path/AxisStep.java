@@ -14,6 +14,7 @@ import org.basex.query.expr.Preds;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
@@ -83,7 +84,7 @@ public class AxisStep extends Preds {
     // if possible, add text() step to predicates
     final Data data = ctx.resource.data();
     ctx.leaf = false;
-    if(data != null && test.test == Name.NAME && test.type != Type.ATT) {
+    if(data != null && test.test == Name.NAME && test.type != NodeType.ATT) {
       final byte[] ln = ((NameTest) test).ln;
       ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
         data.tags.stat(data.tags.id(ln)).leaf;
@@ -92,7 +93,7 @@ public class AxisStep extends Preds {
     // as predicates will not necessarily start from the document node,
     // a document context item is temporarily set to element
     final Type ct = ctx.value != null ? ctx.value.type : null;
-    if(ct == Type.DOC) ctx.value.type = Type.ELM;
+    if(ct == NodeType.DOC) ctx.value.type = NodeType.ELM;
 
     final Expr e = super.comp(ctx);
     if(ct != null) ctx.value.type = ct;
