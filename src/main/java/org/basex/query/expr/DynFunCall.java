@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.Serializer;
@@ -50,7 +49,7 @@ public final class DynFunCall extends Arr {
     // evaluate arguments
     for(int a = 0; a < n; ++a) argv[a] = expr[a].value(ctx);
 
-    return getFun(ctx).invItem(argv, ctx, ii);
+    return getFun(ctx).invItem(ctx, ii, argv);
   }
 
   @Override
@@ -61,7 +60,7 @@ public final class DynFunCall extends Arr {
       // evaluate arguments
       for(int a = 0; a < n; ++a) argv[a] = expr[a].value(ctx);
 
-    return getFun(ctx).invIter(argv, ctx, input);
+    return getFun(ctx).invIter(ctx, input, argv);
   }
 
   /**
@@ -90,7 +89,7 @@ public final class DynFunCall extends Arr {
 
   @Override
   public String desc() {
-    return FUNC;
+    return expr[expr.length - 1].desc() + "(...)";
   }
 
   @Override
