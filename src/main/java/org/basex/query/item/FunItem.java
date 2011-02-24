@@ -46,15 +46,15 @@ public class FunItem extends Item {
 
   /**
    * Invokes this function item with the given arguments.
-   * @param args arguments
    * @param ctx query context
    * @param ii input info
+   * @param args arguments
    * @return resulting item
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public ItemIter invIter(final Value[] args, final QueryContext ctx,
-       final InputInfo ii) throws QueryException {
+  public ItemIter invIter(final QueryContext ctx, final InputInfo ii,
+      final Value... args) throws QueryException {
 
     // move variables to stack
     final int s = ctx.vars.size();
@@ -69,16 +69,16 @@ public class FunItem extends Item {
 
   /**
    * Invokes this function item with the given arguments.
-   * @param args arguments
    * @param ctx query context
    * @param ii input info
+   * @param args arguments
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Item invItem(final Value[] args, final QueryContext ctx,
-       final InputInfo ii) throws QueryException {
+  public Item invItem(final QueryContext ctx, final InputInfo ii,
+      final Value... args) throws QueryException {
 
-    final ItemIter ir = invIter(args, ctx, ii);
+    final ItemIter ir = invIter(ctx, ii, args);
 
     final Item it = ir.next();
     if(it == null || ir.size() == 1) return it;
