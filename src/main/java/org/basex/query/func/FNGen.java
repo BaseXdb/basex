@@ -97,7 +97,9 @@ final class FNGen extends Fun {
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
-        return it != null ? atom(it) : null;
+        if(it == null) return null;
+        if(it.func()) FNATM.thrw(input, FNGen.this);
+        return atom(it);
       }
     };
   }

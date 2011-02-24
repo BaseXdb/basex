@@ -1,24 +1,28 @@
 package org.basex.query.func;
 
-import static org.basex.query.util.Err.*;
-
 import java.util.Arrays;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.DynFunCall;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.PartFunApp;
+import org.basex.query.expr.VarRef;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Empty;
 import org.basex.query.item.FunItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import static org.basex.query.item.SeqType.*;
-
+import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
 /**
@@ -47,7 +51,7 @@ final class FNFunc extends Fun {
       case FOLDLEFT:  return foldLeft(ctx);
       case FOLDRIGHT: return foldRight(ctx);
       default:
-        return super.iter(ctx);
+           return super.iter(ctx);
     }
   }
 
@@ -56,13 +60,40 @@ final class FNFunc extends Fun {
       throws QueryException {
     switch(def) {
       case FUNCARITY: return Itr.get(getFun(0, FunType.ANY, ctx).arity());
-      case FUNCNAME:
-      case PARTAPP:
-        NOTIMPL.thrw(input, def.desc);
-        return null;
+      case FUNCNAME:  return getFun(0, FunType.ANY, ctx).fName();
+      case PARTAPP:   return partApp(ctx, ii);
       default:
         return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Partially applies the function to one argument.
+   * @param ctx query context
+   * @param ii input info
+   * @return function item
+   * @throws QueryException query exception
+   */
+  private FunItem partApp(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    final FunItem f = getFun(0, FunType.ANY, ctx);
+    final Value v = expr[1].value(ctx);
+    final long pos = expr.length == 2 ? 0 : checkItr(expr[2], ctx) - 1;
+
+    final int arity = f.arity();
+    if(pos < 0 || pos >= arity) INVPOS.thrw(ii, f.name(), pos + 1);
+
+    final Var[] vars = new Var[arity - 1];
+    final Expr[] vals = new Expr[arity];
+    vals[(int) pos] = v;
+    for(int i = 0, j = 0; i < arity - 1; i++, j++) {
+      if(i == pos) j++;
+      vars[i] = new Var(ii, new QNm(token(j)));
+      vals[j] = new VarRef(ii, vars[i]);
+    }
+
+    return (FunItem) new PartFunApp(ii,
+        new DynFunCall(ii, f, vals), vars).comp(ctx);
   }
 
   /**

@@ -1723,7 +1723,7 @@ public class QueryParser extends InputParser {
       final Var[] vars = partial(args);
       final Expr f = ctx.funcs.get(name, args, ctx, this);
       if(f == null) error(FUNCUNKNOWN, fn);
-      return new LitFunc(input(), f, vars);
+      return new LitFunc(input(), name, f, vars);
     }
 
     qp = pos;

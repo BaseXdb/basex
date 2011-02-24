@@ -61,6 +61,14 @@ public abstract class Value extends Expr {
   }
 
   /**
+   * Checks if this is a single function item.
+   * @return result of check
+   */
+  public final boolean func() {
+    return type.func();
+  }
+
+  /**
    * Checks if this is a single untyped item.
    * @return result of check
    */

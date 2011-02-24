@@ -170,6 +170,10 @@ public final class FNSimple extends Fun {
     Item it2 = null;
     // explicit non-short-circuit..
     while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
+
+      // check for functions
+      if(it1.func() || it2.func()) FNDEQ.thrw(ii, it1.func() ? it2 : it2);
+
       // check atomic values
       if(!it1.node() && !it2.node()) {
         if(!it1.equiv(ii, it2)) return false;
@@ -247,6 +251,11 @@ public final class FNSimple extends Fun {
         desc = true;
       } while(!chld.isEmpty());
     }
-    return it1 == it2;
+    if(it1 == null) {
+      if(it2 == null) return true;
+      if(it2.func()) FNDEQ.thrw(ii, it2);
+    } else if(it1.func()) FNDEQ.thrw(ii, it1);
+
+    return false;
   }
 }

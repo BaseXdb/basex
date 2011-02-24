@@ -227,7 +227,8 @@ public final class CmpG extends Cmp {
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
     if(a.type != b.type && !a.unt() && !b.unt() && !(a.str() && b.str()) &&
-        !(a.num() && b.num())) XPTYPECMP.thrw(input, a.type, b.type);
+        !(a.num() && b.num()) && !a.func() && !b.func())
+      XPTYPECMP.thrw(input, a.type, b.type);
     return op.op.e(input, a, b);
   }
 

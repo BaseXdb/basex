@@ -198,7 +198,16 @@ public enum Err {
   REGERR(FORX, 4, "Regular expression: '%'."),
 
   /** FOTY0012: Type exception. */
-  NOATM(FOTY, 12, "Function items can't be atomized: %"),
+  NOTYP(FOTY, 12, "Item doesn't have a typed value: %"),
+  /** FOTY0013: Type exception. */
+  FNATM(FOTY, 13, "Function items can't be atomized: %"),
+  /** FOTY0013: Type exception. */
+  FNSTR(FOTY, 14, "Function items don't have a string representation: %"),
+  /** FOTY0013: Type exception. */
+  FNDEQ(FOTY, 15, "Function items can't be compared: %"),
+
+  /** FOFU0001: Invalid value of $argNum in call to fn:partial-apply. */
+  INVPOS(FOFU, 1, "Illegal argument position for %: %"),
 
   /** FOUP0001: Evaluation exception. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
@@ -672,6 +681,7 @@ public enum Err {
     /** FOER Error type. */ FOER,
     /** FOFD Error type. */ FOFD,
     /** FOFL Error type. */ FOFL,
+    /** FOFU Error type. */ FOFU,
     /** FOHP Error type. */ FOHC,
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,

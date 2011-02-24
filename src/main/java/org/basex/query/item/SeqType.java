@@ -267,7 +267,7 @@ public final class SeqType {
   private boolean instance(final Item it, final InputInfo ii)
       throws QueryException {
     final boolean ins = it.type.instance(type);
-    if(!it.unt() && !ins &&
+    if(!it.unt() && !ins && !it.func() &&
         // implicit type promotions
         (!it.num() || type != AtomType.FLT && type != AtomType.DBL) &&
         (it.type != AtomType.URI || type != AtomType.STR))

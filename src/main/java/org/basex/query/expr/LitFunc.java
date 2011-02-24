@@ -18,17 +18,22 @@ public class LitFunc extends Func {
 
   /** Variables. */
   private final Var[] vars;
+  /** Function name. */
+  private final QNm name;
 
   /**
    * Constructor.
    * @param ii input info
+   * @param n function name
    * @param e function expression
    * @param arg arguments
    */
-  public LitFunc(final InputInfo ii, final Expr e, final Var[] arg) {
+  public LitFunc(final InputInfo ii, final QNm n, final Expr e,
+      final Var[] arg) {
     super(ii, new Var(ii, new QNm(), e.type()), arg, true);
     vars = arg;
     expr = e;
+    name = n;
   }
 
   @Override
@@ -39,7 +44,7 @@ public class LitFunc extends Func {
     for(int i = 0; i < at.length; i++)
       at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
 
-    return new FunItem(args, expr, FunType.get(at, var.type()));
+    return new FunItem(name, args, expr, FunType.get(at, var.type()));
   }
 
   @Override

@@ -23,17 +23,33 @@ public class FunItem extends Item {
   private final Var[] vars;
   /** Function expression. */
   private Expr expr;
+  /** Function name. */
+  private QNm name;
 
   /**
    * Constructor.
+   * @param n function name
    * @param arg function arguments
    * @param body function body
    * @param t function type
    */
-  public FunItem(final Var[] arg, final Expr body, final FunType t) {
+  public FunItem(final QNm n, final Var[] arg, final Expr body,
+      final FunType t) {
     super(t);
+    name = n;
     vars = arg;
     expr = body;
+  }
+
+  /**
+   * Constructor for anonymous functions.
+   * @param arg function arguments
+   * @param body function body
+   * @param t function type
+   */
+  public FunItem(final Var[] arg, final Expr body,
+      final FunType t) {
+    this(null, arg, body, t);
   }
 
   /**
@@ -42,6 +58,14 @@ public class FunItem extends Item {
    */
   public int arity() {
     return vars.length;
+  }
+
+  /**
+   * Name of this function, {@code null} means anonymous function.
+   * @return name or {@code null}
+   */
+  public QNm fName() {
+    return name;
   }
 
   /**
@@ -91,7 +115,7 @@ public class FunItem extends Item {
 
   @Override
   public byte[] atom(final InputInfo ii) throws QueryException {
-    NOATM.thrw(ii);
+    NOTYP.thrw(ii, this);
     return null;
   }
 

@@ -2,9 +2,12 @@ package org.basex.query.item;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.util.Err;
+
 import static org.basex.query.QueryTokens.*;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * XQuery 3.0 function data types.
@@ -94,14 +97,15 @@ public final class FunType implements Type {
   @Override
   public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO check types better
+    if(!it.func() || ((FunType) it.type).args.length != args.length)
+      Err.cast(ii, this, it);
+    return it;
   }
 
   @Override
-  public Item e(final Object o, final InputInfo ii) throws QueryException {
-    // TODO Auto-generated method stub
-    return null;
+  public Item e(final Object o, final InputInfo ii) {
+    throw Util.notexpected(o);
   }
 
   @Override
