@@ -1,8 +1,7 @@
 package org.basex.query.path;
 
 import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 
@@ -42,8 +41,8 @@ public final class KindTest extends Test {
   }
 
   @Override
-  public boolean eval(final Nod nod) throws QueryException {
-    return nod.type == type && (name == null || nod.qname(tmpq).eq(name));
+  public boolean eval(final ANode node) {
+    return node.type == type && (name == null || node.qname(tmpq).eq(name));
   }
 
   @Override

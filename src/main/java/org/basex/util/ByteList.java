@@ -45,10 +45,21 @@ public final class ByteList extends ElementList {
    * @return self reference
    */
   public ByteList add(final byte[] b) {
-    final int l = b.length;
-    final int ll = list.length;
-    if(size + l > ll) list = Arrays.copyOf(list, newSize(size + l));
-    System.arraycopy(b, 0, list, size, l);
+    return add(b, 0, b.length);
+  }
+
+  /**
+   * Adds a partial byte array to the token.
+   * @param b the character array to be added
+   * @param s start position
+   * @param e end position
+   * @return self reference
+   */
+  public ByteList add(final byte[] b, final int s, final int e) {
+    final int l = e - s;
+    final int cl = list.length;
+    if(size + l > cl) list = Arrays.copyOf(list, newSize(size + l));
+    System.arraycopy(b, s, list, size, l);
     size += l;
     return this;
   }

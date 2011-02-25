@@ -591,7 +591,7 @@ public enum Type {
   },
 
   /** Base64 binary type. */
-  B6B("base64Binary", AAT, XSURI, false, false, false, false, false) {
+  B64("base64Binary", AAT, XSURI, false, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -609,7 +609,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == B6B ? new Hex((B64) it) : str(it) ?
+      return it.type == B64 ? new Hex((B64) it) : str(it) ?
           new Hex(it.atom(), ii) : error(it, ii);
     }
     @Override
@@ -664,7 +664,7 @@ public enum Type {
   /** Text type. */
   TXT("text", NOD, EMPTY, false, true, false, false, false) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXText ? ((BXText) o).getNod() :
         new FTxt((Text) o, null);
     }
@@ -673,7 +673,7 @@ public enum Type {
   /** PI type. */
   PI("processing-instruction", NOD, EMPTY, false, true, false, false, false) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXPI ? ((BXPI) o).getNod() :
         new FPI((ProcessingInstruction) o, null);
     }
@@ -682,7 +682,7 @@ public enum Type {
   /** Element type. */
   ELM("element", NOD, EMPTY, false, true, false, false, false) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXElem ? ((BXElem) o).getNod() :
         new FElem((Element) o, null, new TokenMap());
     }
@@ -691,7 +691,7 @@ public enum Type {
   /** Document type. */
   DOC("document-node", NOD, EMPTY, false, true, false, false, false) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) throws QueryException {
+    public ANode e(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXDoc) return ((BXDoc) o).getNod();
 
       if(o instanceof Document) {
@@ -715,7 +715,7 @@ public enum Type {
   /** Attribute type. */
   ATT("attribute", NOD, EMPTY, false, true, false, false, false) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXAttr ? ((BXAttr) o).getNod() :
         new FAttr((Attr) o, null);
     }
@@ -724,7 +724,7 @@ public enum Type {
   /** Comment type. */
   COM("comment", NOD, EMPTY, false, true, false, false, false) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
         new FComm((Comment) o, null);
     }

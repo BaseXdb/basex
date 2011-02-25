@@ -7,9 +7,9 @@ import org.basex.query.item.FDoc;
 import org.basex.query.item.FElem;
 import org.basex.query.item.FPI;
 import org.basex.query.item.FTxt;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.util.Util;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
@@ -29,7 +29,7 @@ public final class BXDoc extends BXNode implements Document {
    * Constructor.
    * @param n node reference
    */
-  public BXDoc(final Nod n) {
+  public BXDoc(final ANode n) {
     super(n);
   }
 
@@ -68,19 +68,23 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXDocFrag createDocumentFragment() {
-    return new BXDocFrag(new FDoc(new NodIter(), node.base()));
+    return new BXDocFrag(new FDoc(new NodeCache(), node.base()));
   }
 
   @Override
   public BXElem createElement(final String nm) {
     final QNm name = new QNm(token(nm));
-    return new BXElem(new FElem(name, node.base()));
+    final FElem elm = new FElem(name, null);
+    elm.base(node.base());
+    return new BXElem(elm);
   }
 
   @Override
   public BXElem createElementNS(final String uri, final String qn) {
     final QNm name = new QNm(token(qn), token(uri));
-    return new BXElem(new FElem(name, node.base()));
+    final FElem elm = new FElem(name, null);
+    elm.base(node.base());
+    return new BXElem(elm);
   }
 
   @Override

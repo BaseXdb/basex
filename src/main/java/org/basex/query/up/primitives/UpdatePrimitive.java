@@ -4,9 +4,9 @@ import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTxt;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Type;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
  */
 public abstract class UpdatePrimitive {
   /** Target node of update expression. */
-  public final Nod node;
+  public final ANode node;
   /** Input information. */
   public final InputInfo input;
 
@@ -28,7 +28,7 @@ public abstract class UpdatePrimitive {
    * @param ii input info
    * @param n DBNode reference
    */
-  protected UpdatePrimitive(final InputInfo ii, final Nod n) {
+  protected UpdatePrimitive(final InputInfo ii, final ANode n) {
     input = ii;
     node = n;
   }
@@ -78,9 +78,9 @@ public abstract class UpdatePrimitive {
    * @param n iterator
    * @return iterator with merged text nodes
    */
-  protected static NodIter mergeText(final NodIter n) {
-    final NodIter s = new NodIter();
-    Nod i = n.next();
+  protected static NodeCache mergeText(final NodeCache n) {
+    final NodeCache s = new NodeCache();
+    ANode i = n.next();
     while(i != null) {
       if(i.type == Type.TXT) {
         final TokenBuilder tb = new TokenBuilder();

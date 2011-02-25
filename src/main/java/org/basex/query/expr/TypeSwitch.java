@@ -8,7 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -72,7 +72,7 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter seq = ItemIter.get(ctx.iter(ts));
+    final Iter seq = ItemCache.get(ctx.iter(ts));
     for(final TypeCase c : cases) {
       seq.reset();
       final Iter iter = c.iter(ctx, seq);

@@ -2,8 +2,8 @@ package org.basex.api.dom;
 
 import org.basex.data.Nodes;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
-import org.basex.query.iter.NodIter;
+import org.basex.query.item.ANode;
+import org.basex.query.iter.NodeCache;
 import org.w3c.dom.NodeList;
 
 /**
@@ -14,7 +14,7 @@ import org.w3c.dom.NodeList;
  */
 public class BXNList implements NodeList {
   /** XQuery node set. */
-  protected NodIter xquery;
+  protected NodeCache xquery;
   /** XQuery node set. */
   protected Nodes nodes;
 
@@ -22,7 +22,7 @@ public class BXNList implements NodeList {
    * Constructor.
    * @param nb nodes
    */
-  protected BXNList(final NodIter nb) {
+  protected BXNList(final NodeCache nb) {
     xquery = nb;
     xquery.sort();
   }
@@ -37,7 +37,7 @@ public class BXNList implements NodeList {
 
   @Override
   public BXNode item(final int i) {
-    Nod n = null;
+    ANode n = null;
     if(xquery != null) {
       if(i < xquery.size()) n = xquery.get(i);
     } else {

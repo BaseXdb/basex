@@ -1,7 +1,7 @@
 package org.basex.query.iter;
 
 import org.basex.query.QueryException;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 
 /**
  * Node iterator interface.
@@ -11,5 +11,5 @@ import org.basex.query.item.Nod;
  */
 public abstract class NodeIter extends Iter {
   @Override
-  public abstract Nod next() throws QueryException;
+  public abstract ANode next() throws QueryException;
 }

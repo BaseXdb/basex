@@ -3,8 +3,9 @@ package org.basex.query.path;
 import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Value;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeIter;
 
 /**
@@ -28,49 +29,49 @@ final class IterPosStep extends AxisStep {
   public NodeIter iter(final QueryContext ctx) {
     return new NodeIter() {
       boolean skip;
-      NodeIter ir;
+      AxisIter ai;
       long cpos;
 
       @Override
-      public Nod next() throws QueryException {
+      public ANode next() throws QueryException {
         if(skip) return null;
 
-        if(ir == null) {
+        if(ai == null) {
           final Value v = checkCtx(ctx);
           if(!v.node()) NODESPATH.thrw(input, IterPosStep.this, v.type);
-          ir = axis.iter((Nod) v);
+          ai = axis.iter((ANode) v);
         }
 
-        Nod lnod = null;
+        ANode lnod = null;
         while(true) {
           ctx.checkStop();
 
-          final Nod nod = ir.next();
-          if(nod == null) {
+          final ANode node = ai.next();
+          if(node == null) {
             skip = last;
             return lnod;
           }
 
           // evaluate node test
-          if(test.eval(nod)) {
+          if(test.eval(node)) {
             // set context item and position
             ctx.pos = ++cpos;
 
             // evaluate predicates
-            if(preds(nod, ctx)) {
+            if(preds(node, ctx)) {
               // check if no more results are to be expected
               skip = pos != null && pos.skip(ctx);
-              return nod.finish();
+              return node.finish();
             }
             // remember last node
-            if(last) lnod = nod.finish();
+            if(last) lnod = node.finish();
           }
         }
       }
 
       @Override
       public boolean reset() {
-        ir = null;
+        ai = null;
         skip = false;
         cpos = 0;
         return true;

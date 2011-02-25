@@ -10,8 +10,8 @@ import org.basex.api.dom.BXText;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.NodeIter;
+import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -19,12 +19,12 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
- * Node type.
+ * Abstract node type.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class Nod extends Item {
+public abstract class ANode extends Item {
   /** Node Types. */
   private static final Type[] TYPES = {
     Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
@@ -38,13 +38,13 @@ public abstract class Nod extends Item {
   /** Text value. */
   protected byte[] val;
   /** Parent node. */
-  protected Nod par;
+  protected ANode par;
 
   /**
    * Constructor.
    * @param t data type
    */
-  protected Nod(final Type t) {
+  protected ANode(final Type t) {
     super(t);
   }
 
@@ -71,7 +71,7 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public abstract Nod copy();
+  public abstract ANode copy();
 
   /**
    * Returns the node name.
@@ -101,10 +101,9 @@ public abstract class Nod extends Item {
    * Returns a temporary node name.
    * @param nm temporary qname
    * @return name
-   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public QNm qname(final QNm nm) throws QueryException {
+  public QNm qname(final QNm nm) {
     return qname();
   }
 
@@ -133,7 +132,7 @@ public abstract class Nod extends Item {
    */
   public final Atts nsScope(final boolean nsInherit) {
     final Atts ns = new Atts();
-    Nod n = this;
+    ANode n = this;
     do {
       final Atts nns = n.ns();
       if(!nsInherit) return nns;
@@ -159,7 +158,7 @@ public abstract class Nod extends Item {
     if(at != null) {
       final int i = at.get(pref);
       if(i != -1) return at.val[i];
-      final Nod n = parent();
+      final ANode n = parent();
       if(n != null) return n.uri(pref, ctx);
     }
     return pref.length == 0 ? Token.EMPTY : null;
@@ -175,25 +174,25 @@ public abstract class Nod extends Item {
 
   /**
    * Compares the identity of two nodes.
-   * @param nod node to be compared
+   * @param node node to be compared
    * @return result of check
    */
-  public abstract boolean is(final Nod nod);
+  public abstract boolean is(final ANode node);
 
   /**
    * Compares two nodes for their unique order.
-   * @param nod node to be compared
+   * @param node node to be compared
    * @return 0 if the nodes are equal or a positive/negative value
    * if the node appears after/before the argument
    */
-  public abstract int diff(final Nod nod);
+  public abstract int diff(final ANode node);
 
   /**
    * Returns a final node representation. This method is called by the
    * step expressions, before it is passed on as result.
    * @return node
    */
-  public Nod finish() {
+  public ANode finish() {
     return this;
   }
 
@@ -201,101 +200,115 @@ public abstract class Nod extends Item {
    * Returns the parent node.
    * @return parent node
    */
-  public abstract Nod parent();
+  public abstract ANode parent();
 
   /**
    * Sets the parent node.
    * @param p parent node
    */
-  public void parent(final Nod p) {
+  public void parent(final ANode p) {
     par = p;
+  }
+
+  /**
+   * Returns the value of the specified attribute, or {@code null}.
+   * @param name attribute to be found
+   * @return attribute value
+   */
+  public byte[] attribute(final QNm name) {
+    final AxisIter ai = atts();
+    while(true) {
+      final ANode node = ai.next();
+      if(node == null) return null;
+      if(node.qname().eq(name)) return node.atom();
+    }
   }
 
   /**
    * Returns an ancestor axis iterator.
    * @return iterator
    */
-  public abstract NodeIter anc();
+  public abstract AxisIter anc();
 
   /**
    * Returns an ancestor-or-self axis iterator.
    * @return iterator
    */
-  public abstract NodeIter ancOrSelf();
+  public abstract AxisIter ancOrSelf();
 
   /**
    * Returns an attribute axis iterator.
    * @return iterator
    */
-  public abstract NodeIter attr();
+  public abstract AxisIter atts();
 
   /**
    * Returns a child axis iterator.
    * @return iterator
    */
-  public abstract NodeMore child();
+  public abstract NodeMore children();
 
   /**
    * Returns a descendant axis iterator.
    * @return iterator
    */
-  public abstract NodeIter descendant();
+  public abstract AxisIter descendant();
 
   /**
    * Returns a descendant-or-self axis iterator.
    * @return iterator
    */
-  public abstract NodeIter descOrSelf();
+  public abstract AxisIter descOrSelf();
 
   /**
    * Returns a following axis iterator.
    * @return iterator
    */
-  public abstract NodeIter foll();
+  public abstract AxisIter foll();
 
   /**
    * Returns a following-sibling axis iterator.
    * @return iterator
    */
-  public abstract NodeIter follSibl();
+  public abstract AxisIter follSibl();
 
   /**
    * Returns a parent axis iterator.
    * @return iterator
    */
-  public abstract NodeIter par();
+  public abstract AxisIter par();
 
   /**
    * Returns a preceding axis iterator.
    * @return iterator
    */
-  public final NodeIter prec() {
-    return new NodeIter() {
+  public final AxisIter prec() {
+    return new AxisIter() {
       /** Iterator. */
-      private NodIter ir;
+      private NodeCache nc;
 
       @Override
-      public Nod next() throws QueryException {
-        if(ir == null) {
-          ir = new NodIter();
-          Nod n = Nod.this;
-          Nod p = n.parent();
+      public ANode next() {
+        if(nc == null) {
+          nc = new NodeCache();
+          ANode n = ANode.this;
+          ANode p = n.parent();
           while(p != null) {
             if(n.type != Type.ATT) {
-              final NodIter tmp = new NodIter();
-              final NodeIter i = p.child();
-              Nod c;
-              while((c = i.next()) != null && !c.is(n)) {
+              final NodeCache tmp = new NodeCache();
+              final AxisIter ai = p.children();
+              ANode c;
+              while((c = ai.next()) != null && !c.is(n)) {
                 tmp.add(c.finish());
-                addDesc(c.child(), tmp);
+                addDesc(c.children(), tmp);
               }
-              for(long t = tmp.size() - 1; t >= 0; t--) ir.add(tmp.get(t));
+              for(long t = tmp.size() - 1; t >= 0; t--) nc.add(tmp.get(t));
             }
             n = p;
             p = p.parent();
           }
         }
-        return ir.next();
+        return nc.next();
       }
     };
   }
@@ -304,28 +317,28 @@ public abstract class Nod extends Item {
    * Returns a preceding-sibling axis iterator.
    * @return iterator
    */
-  public final NodeIter precSibl() {
-    return new NodeIter() {
-      /** Children nodes. */
-      private NodIter ir;
+  public final AxisIter precSibl() {
+    return new AxisIter() {
+      /** Child nodes. */
+      private NodeCache nc;
       /** Counter. */
       private long c;
 
       @Override
-      public Nod next() throws QueryException {
-        if(ir == null) {
-          final Nod r = parent();
+      public ANode next() {
+        if(nc == null) {
+          final ANode r = parent();
           if(r == null) return null;
 
-          ir = new NodIter();
-          final NodeIter ni = r.child();
-          Nod n;
-          while((n = ni.next()) != null && !n.is(Nod.this)) {
-            ir.add(n.finish());
+          nc = new NodeCache();
+          final AxisIter ai = r.children();
+          ANode n;
+          while((n = ai.next()) != null && !n.is(ANode.this)) {
+            nc.add(n.finish());
           }
-          c = ir.size();
+          c = nc.size();
         }
-        return c > 0 ? ir.get(--c) : null;
+        return c > 0 ? nc.get(--c) : null;
       }
     };
   }
@@ -344,8 +357,8 @@ public abstract class Nod extends Item {
         return more;
       }
       @Override
-      public Nod next() {
-        return (more ^= true) ? null : Nod.this;
+      public ANode next() {
+        return (more ^= true) ? null : ANode.this;
       }
     };
   }
@@ -354,14 +367,13 @@ public abstract class Nod extends Item {
    * Adds children of a sub node.
    * @param children child nodes
    * @param nodes node builder
-   * @throws QueryException query exception
    */
-  protected final void addDesc(final NodeIter children, final NodIter nodes)
-      throws QueryException {
-    Nod ch;
+  protected final void addDesc(final NodeMore children,
+      final NodeCache nodes) {
+    ANode ch;
     while((ch = children.next()) != null) {
       nodes.add(ch.finish());
-      addDesc(ch.child(), nodes);
+      addDesc(ch.children(), nodes);
     }
   }
 

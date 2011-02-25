@@ -24,7 +24,7 @@ import org.basex.query.item.Jav;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
@@ -221,7 +221,7 @@ public final class FunJava extends Arr {
   private Iter iter(final Object res, final QueryContext ctx) {
     if(!res.getClass().isArray()) return new Jav(res).iter(ctx);
 
-    final ItemIter ir = new ItemIter();
+    final ItemCache ir = new ItemCache();
     if(res instanceof boolean[]) {
       for(final Object o : (boolean[]) res) ir.add(new Jav(o));
     } else if(res instanceof char[]) {

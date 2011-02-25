@@ -86,12 +86,12 @@ public final class FunTest extends QueryTest {
       { "number 3", dbl(Double.NaN), "number(xs:gYear('2005'))" },
 
       // http://www.xqueryfunctions.com/xq/fn_lang.html
-      { "lang 1", nod(3), "//desc[lang('en')]" },
-      { "lang 2", nod(3), "//desc[lang('en-US')]" },
-      { "lang 3", nod(7), "//desc[lang('fr')]" },
-      { "lang 4", nod(5), "//desc/line[lang('en')]" },
+      { "lang 1", node(3), "//desc[lang('en')]" },
+      { "lang 2", node(3), "//desc[lang('en-US')]" },
+      { "lang 3", node(7), "//desc[lang('fr')]" },
+      { "lang 4", node(5), "//desc/line[lang('en')]" },
       { "lang 5", empty(),  "/.[lang('en-US')]" },
-      { "lang 6", nod(7), "//desc[lang('FR')]" },
+      { "lang 6", node(7), "//desc[lang('FR')]" },
     };
   }
 

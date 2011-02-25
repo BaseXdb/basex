@@ -6,9 +6,9 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.query.util.DataBuilder;
 import org.basex.util.InputInfo;
@@ -21,7 +21,7 @@ import org.basex.util.InputInfo;
  */
 public abstract class NodeCopy extends UpdatePrimitive {
   /** Nodes to be inserted. */
-  protected final List<NodIter> insert = new ArrayList<NodIter>(1);
+  protected final List<NodeCache> insert = new ArrayList<NodeCache>(1);
   /** Final copy of insertion nodes. */
   public MemData md;
 
@@ -31,7 +31,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
    * @param n target node
    * @param ni nodes to be inserted
    */
-  protected NodeCopy(final InputInfo ii, final Nod n, final NodIter ni) {
+  protected NodeCopy(final InputInfo ii, final ANode n, final NodeCache ni) {
     super(ii, n);
     insert.add(ni);
   }
@@ -40,9 +40,9 @@ public abstract class NodeCopy extends UpdatePrimitive {
   public void prepare() throws QueryException {
     if(insert.size() == 0) return;
 
-    final NodIter seq = new NodIter();
-    for(final NodIter ni : insert) {
-      Nod i;
+    final NodeCache seq = new NodeCache();
+    for(final NodeCache ni : insert) {
+      ANode i;
       while((i = ni.next()) != null) seq.add(i);
     }
     // ignore fragment nodes
@@ -66,7 +66,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
       final int u = md.uri(pre, k);
       final QNm qnm = new QNm(md.name(pre, k));
       if(u != 0) qnm.uri(md.ns.uri(u));
-      pool.add(qnm, Nod.type(k));
+      pool.add(qnm, ANode.type(k));
     }
   }
 }

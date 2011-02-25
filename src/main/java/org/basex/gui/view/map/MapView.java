@@ -639,7 +639,7 @@ public final class MapView extends View implements Runnable {
       if(data.fs != null) {
         if(data.fs.isFSnode(pre)) {
           if(data.fs.isFile(pre)) {
-            final byte[] attVal = ViewData.attValue(data, data.sizeID, pre);
+            final byte[] attVal = data.attValue(data.sizeID, pre);
             if(attVal == null) continue;
             textLen[pre] = Token.toInt(attVal);
             textLen[parStack[l - 1]] += textLen[pre];

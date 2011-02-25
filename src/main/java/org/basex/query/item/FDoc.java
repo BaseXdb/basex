@@ -3,7 +3,7 @@ package org.basex.query.item;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.util.TokenMap;
 import org.basex.util.Util;
 import org.w3c.dom.DocumentFragment;
@@ -25,7 +25,7 @@ public final class FDoc extends FNode {
    * @param ch children
    * @param b base uri
    */
-  public FDoc(final NodIter ch, final byte[] b) {
+  public FDoc(final NodeCache ch, final byte[] b) {
     super(Type.DOC);
     children = ch;
     base = b;
@@ -38,7 +38,7 @@ public final class FDoc extends FNode {
    * @param b base uri
    */
   FDoc(final DocumentFragment doc, final byte[] b) {
-    this(new NodIter(), b);
+    this(new NodeCache(), b);
     final Node elem = doc.getFirstChild();
     if(elem != null && elem instanceof Element)
       children.add(new FElem((Element) elem, this, new TokenMap()));

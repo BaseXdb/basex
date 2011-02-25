@@ -6,9 +6,9 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
 
 /**
@@ -40,7 +40,7 @@ abstract class Update extends Arr {
    * @throws QueryException query exception
    * @return specified node list
    */
-  protected final NodIter checkNS(final NodIter list, final Nod targ,
+  protected final NodeCache checkNS(final NodeCache list, final ANode targ,
       final QueryContext ctx) throws QueryException {
 
     for(int a = 0; a < list.size(); ++a) {

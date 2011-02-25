@@ -363,6 +363,19 @@ public abstract class Data {
   }
 
   /**
+   * Finds the specified attribute and returns its value.
+   * @param att the attribute id of the attribute to be found
+   * @param pre pre value
+   * @return attribute value
+   */
+  public byte[] attValue(final int att, final int pre) {
+    final int a = pre + attSize(pre, kind(pre));
+    int p = pre;
+    while(++p != a) if(name(p) == att) return text(p, false);
+    return null;
+  }
+
+  /**
    * Returns a reference to the tag or attribute name id.
    * @param pre pre value
    * @return token reference

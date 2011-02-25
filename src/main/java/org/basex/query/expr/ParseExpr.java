@@ -14,7 +14,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
@@ -225,9 +225,9 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final Nod checkNode(final Item it) throws QueryException {
+  public final ANode checkNode(final Item it) throws QueryException {
     if(!it.node()) Err.type(this, Type.NOD, it);
-    return (Nod) it;
+    return (ANode) it;
   }
 
   /**
@@ -317,20 +317,6 @@ public abstract class ParseExpr extends Expr {
   public final Item checkItem(final Expr e, final QueryContext ctx)
       throws QueryException {
     return checkEmpty(e.item(ctx, input));
-  }
-
-  /**
-   * Checks the data type and throws an exception, if necessary.
-   * @param it item to be checked
-   * @param t type to be checked
-   * @return specified item
-   * @throws QueryException query exception
-   */
-  public final Item checkType(final Item it, final Type t)
-      throws QueryException {
-
-    if(checkEmpty(it).type != t) Err.type(this, t, it);
-    return it;
   }
 
   /**

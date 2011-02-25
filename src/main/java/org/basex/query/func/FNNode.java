@@ -6,7 +6,7 @@ import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
@@ -56,7 +56,7 @@ final class FNNode extends Fun {
         return it.type != Type.ELM ? null : Bln.FALSE;
       case BASEURI:
         if(empty) return null;
-        Nod n = checkNode(it);
+        ANode n = checkNode(it);
         if(n.type != Type.ELM && n.type != Type.DOC && n.parent() == null)
           return null;
         Uri base = Uri.EMPTY;
@@ -79,7 +79,7 @@ final class FNNode extends Fun {
         return qname != null ? Str.get(qname.ln()) : Str.ZERO;
       case NSURI:
         if(empty || it.type == Type.PI) return Uri.EMPTY;
-        Nod node = checkNode(it);
+        ANode node = checkNode(it);
         while(node != null) {
           qname = node.qname();
           if(qname == null) break;

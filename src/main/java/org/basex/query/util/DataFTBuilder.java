@@ -5,7 +5,7 @@ import org.basex.core.Text;
 import org.basex.data.FTPos;
 import org.basex.data.FTPosData;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.ft.FTLexer;
@@ -40,7 +40,7 @@ final class DataFTBuilder {
    * @param nd node to be added
    * @return number of added nodes
    */
-  TokenList build(final Nod nd) {
+  TokenList build(final ANode nd) {
     // check full-text mode
     if(!(nd instanceof DBNode)) return null;
 

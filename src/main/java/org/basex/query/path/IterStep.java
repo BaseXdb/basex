@@ -4,8 +4,9 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Value;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
 
@@ -30,28 +31,28 @@ final class IterStep extends AxisStep {
   @Override
   public NodeIter iter(final QueryContext ctx) {
     return new NodeIter() {
-      NodeIter ir;
+      AxisIter ai;
 
       @Override
-      public Nod next() throws QueryException {
-        if(ir == null) {
+      public ANode next() throws QueryException {
+        if(ai == null) {
           final Value v = checkCtx(ctx);
           if(!v.node()) NODESPATH.thrw(input, IterStep.this, v.type);
-          ir = axis.iter((Nod) v);
+          ai = axis.iter((ANode) v);
         }
 
         while(true) {
           ctx.checkStop();
-          final Nod nod = ir.next();
-          if(nod == null) return null;
+          final ANode node = ai.next();
+          if(node == null) return null;
           // evaluate node test and predicates
-          if(test.eval(nod) && preds(nod, ctx)) return nod.finish();
+          if(test.eval(node) && preds(node, ctx)) return node.finish();
         }
       }
 
       @Override
       public boolean reset() {
-        ir = null;
+        ai = null;
         return true;
       }
     };

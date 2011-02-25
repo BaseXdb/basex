@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.w3c.dom.DocumentFragment;
 
 /**
@@ -14,7 +14,7 @@ public final class BXDocFrag extends BXNode implements DocumentFragment {
    * Constructor.
    * @param n node reference
    */
-  public BXDocFrag(final Nod n) {
+  public BXDocFrag(final ANode n) {
     super(n);
   }
 

@@ -1,7 +1,7 @@
 package org.basex.query.iter;
 
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Value;
 import org.basex.util.Array;
@@ -12,9 +12,9 @@ import org.basex.util.Array;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class NodIter extends NodeIter {
+public final class NodeCache extends AxisIter {
   /** Node container. */
-  public Nod[] item;
+  public ANode[] item;
   /** Number of nodes. */
   private int size;
   /** Current iterator position. */
@@ -27,8 +27,8 @@ public final class NodIter extends NodeIter {
   /**
    * Constructor.
    */
-  public NodIter() {
-    item = new Nod[1];
+  public NodeCache() {
+    item = new ANode[1];
   }
 
   /**
@@ -36,7 +36,7 @@ public final class NodIter extends NodeIter {
    * @param it node array
    * @param s size
    */
-  public NodIter(final Nod[] it, final int s) {
+  public NodeCache(final ANode[] it, final int s) {
     item = it;
     size = s;
   }
@@ -46,7 +46,7 @@ public final class NodIter extends NodeIter {
    * unordered nodes might be added to this iterator.
    * @return self reference
    */
-  public NodIter random() {
+  public NodeCache random() {
     random = true;
     return this;
   }
@@ -56,7 +56,7 @@ public final class NodIter extends NodeIter {
    * @param i node offset
    * @return node
    */
-  public Nod get(final int i) {
+  public ANode get(final int i) {
     return item[i];
   }
 
@@ -72,9 +72,9 @@ public final class NodIter extends NodeIter {
    * Adds a node.
    * @param n node to be added
    */
-  public void add(final Nod n) {
+  public void add(final ANode n) {
     if(size == item.length) {
-      final Nod[] tmp = new Nod[Array.newSize(size)];
+      final ANode[] tmp = new ANode[Array.newSize(size)];
       System.arraycopy(item, 0, tmp, 0, size);
       item = tmp;
     }
@@ -89,13 +89,13 @@ public final class NodIter extends NodeIter {
   }
 
   @Override
-  public Nod next() {
+  public ANode next() {
     if(random) sort(sort);
     return ++pos < size ? item[pos] : null;
   }
 
   @Override
-  public Nod get(final long i) {
+  public ANode get(final long i) {
     return i < size ? item[(int) i] : null;
   }
 
@@ -142,7 +142,7 @@ public final class NodIter extends NodeIter {
    * @param db indicates if all nodes are sorted {@link DBNode} references
    * @return position, or {@code -1}
    */
-  public int indexOf(final Nod node, final boolean db) {
+  public int indexOf(final ANode node, final boolean db) {
     if(db) {
       // binary search
       final DBNode dbn = (DBNode) node;
@@ -167,7 +167,7 @@ public final class NodIter extends NodeIter {
    * Sorts the nodes, if necessary.
    * @return self reference
    */
-  public NodIter sort() {
+  public NodeCache sort() {
     if(random) sort(sort);
     return this;
   }
@@ -220,7 +220,7 @@ public final class NodIter extends NodeIter {
       }
       m = m(l, m, n);
     }
-    final Nod v = item[m];
+    final ANode v = item[m];
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
@@ -280,7 +280,7 @@ public final class NodIter extends NodeIter {
    * @param b second position
    */
   private void s(final int a, final int b) {
-    final Nod tmp = item[a];
+    final ANode tmp = item[a];
     item[a] = item[b];
     item[b] = tmp;
   }

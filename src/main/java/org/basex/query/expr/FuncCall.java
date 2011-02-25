@@ -9,7 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -77,7 +77,7 @@ public final class FuncCall extends Arr {
       ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
     }
     // evaluate function and reset variable scope
-    final ItemIter ir = ItemIter.get(ctx.iter(func));
+    final ItemCache ir = ItemCache.get(ctx.iter(func));
     ctx.vars.reset(s);
     return ir;
   }
