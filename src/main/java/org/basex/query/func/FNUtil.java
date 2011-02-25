@@ -92,7 +92,7 @@ final class FNUtil extends Fun {
     try {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
-      NODOC.thrw(input, ex.toString());
+      NODOC.thrw(input, ex);
       return null;
     }
   }

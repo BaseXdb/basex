@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import org.basex.core.Prop;
+import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -306,6 +307,8 @@ final class FNFile extends Fun {
         Item it;
         while((it = ir.next()) != null) it.serialize(xml);
         xml.close();
+      } catch(final SerializerException ex) {
+        throw new QueryException(input, ex);
       } finally {
         out.close();
       }

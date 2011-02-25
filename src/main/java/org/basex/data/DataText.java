@@ -109,6 +109,10 @@ public interface DataText {
   String M_CSV = "csv";
   /** Method. */
   String M_TEXT = "text";
+  /** Method. */
+  String M_BASE64 = "base64";
+  /** Method. */
+  String M_HEX = "hex";
   /** Normalization. */
   String NFC = "NFC";
   /** Normalization. */
@@ -203,28 +207,11 @@ public interface DataText {
   byte[] CHARSET = token("; charset=");
 
   /** Serialization error. */
-  String SERMAPS = "[SERE0000] Character map \"%\" is not defined.";
+  String SERVAL = "Parameter '%' must be [%";
   /** Serialization error. */
-  String SERKEY = "[SERE0000] Parameter \"%\" is unknown.";
+  String SERVAL2 = "|%";
   /** Serialization error. */
-  String SERENCODING = "[SESU0007] Unknown encoding: \"%\"";
-  /** Serialization error. */
-  String SERSTAND =
-    "[SEPM0009] Invalid combination of \"omit-xml-declaration\".";
-  /** Serialization error. */
-  String SERUNDECL = "[SEPM0010] XML 1.0: undeclaring prefixes not allowed.";
-  /** Serialization error. */
-  String SERILL = "[SERE0014] Illegal HTML character found: #x%";
-  /** Serialization error. */
-  String SERPI = "[SERE0015] Processing construction contains \">\"";
-  /** Serialization error. */
-  String SERVAL = "[SEPM0016] Parameter \"%\" must be \"%\"";
-  /** Serialization error. */
-  String SERVAL2 = " or \"%\"";
-  /** Serialization error. */
-  String SERVAL3 = "; \"%\" found.";
-  /* Serialization error.
-  String SERTAT = "[SENR0001] No top level attributes allowed"; */
+  String SERVAL3 = "]; '%' found";
 
   // TABLE SERIALIZATION ======================================================
 

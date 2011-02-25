@@ -17,6 +17,9 @@ import java.util.zip.ZipOutputStream;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
+import org.basex.data.SerializerException;
+import org.basex.data.SerializerProp;
+import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
@@ -36,6 +39,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * Functions on zip files.
@@ -46,7 +50,7 @@ import org.basex.util.InputInfo;
 final class FNZip extends Fun {
   /** Function namespace. */
   private static final Uri U_ZIP = Uri.uri(ZIPURI);
-  /** Element: zip:zip. */
+  /** Element: zip:file. */
   private static final QNm E_FILE = new QNm(token("file"), U_ZIP);
   /** Element: zip:dir. */
   private static final QNm E_DIR = new QNm(token("dir"), U_ZIP);
@@ -114,7 +118,7 @@ final class FNZip extends Fun {
    */
   private ANode entries(final QueryContext ctx) throws QueryException {
     final Uri uri = (Uri) checkType(expr[0].item(ctx, input), Type.URI);
-    final String file = IOFile.file(uri.toJava().toString());
+    final String file = IOFile.file(string(uri.atom()));
     if(!IO.get(file).exists()) ZIPNOTFOUND.thrw(input, file);
 
     // traverse all zip entries and create map (zip entries are not sorted)
@@ -193,7 +197,7 @@ final class FNZip extends Fun {
     try {
       zos = new ZipOutputStream(new BufferedOutputStream(
           new FileOutputStream(file)));
-      createFile(zos, elm);
+      createFile(zos, elm, ctx);
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
@@ -206,11 +210,12 @@ final class FNZip extends Fun {
    * Recursively fills the zip file.
    * @param zos output stream
    * @param elm element
+   * @param ctx query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void createFile(final ZipOutputStream zos, final ANode elm)
-      throws QueryException, IOException {
+  private void createFile(final ZipOutputStream zos, final ANode elm,
+      final QueryContext ctx) throws QueryException, IOException {
 
     final AxisIter ai = elm.children();
     ANode node;
@@ -224,10 +229,12 @@ final class FNZip extends Fun {
       // source: if null, the node's children are serialized
       String src = attribute(node, A_SRC, false);
       if(src != null) src = src.replaceAll("\\\\", "/");
-      if(path == null && src != null) path = src.replaceAll(".*/", "");
-      // throw exception if both attributes are null
-      if(path == null && src == null)
-        ZIPINVALID.thrw(input, node.qname(), A_SRC);
+
+      if(path == null) {
+        // throw exception if both attributes are null
+        if(src == null) ZIPINVALID.thrw(input, node.qname(), A_SRC);
+        path = src.replaceAll(".*/", "");
+      }
 
       // add slash to directories
       final boolean dir = mode.eq(E_DIR);
@@ -235,13 +242,51 @@ final class FNZip extends Fun {
 
       final ZipEntry ze = new ZipEntry(path);
       zos.putNextEntry(ze);
-      if(!dir) {
+      if(dir) continue;
+
+      if(src != null) {
+        // write file to zip archive
         final IO source = IO.get(src);
         if(!source.exists()) ZIPNOTFOUND.thrw(input, source);
         zos.write(source.content());
-        zos.closeEntry();
+      } else {
+        // serialize child nodes to zip archive
+        try {
+          final XMLSerializer xml =
+            new XMLSerializer(zos, serialPar(node, ctx));
+          ANode n;
+          final AxisIter ch = node.children();
+          while((n = ch.next()) != null) n.serialize(xml);
+          xml.close();
+        } catch(final SerializerException ex) {
+          throw new QueryException(input, ex);
+        }
       }
+      zos.closeEntry();
     }
+  }
+
+  /**
+   * Returns serialization parameters.
+   * @param node node with parameters
+   * @param ctx query context
+   * @return properties
+   * @throws SerializerException serializer exception
+   */
+  private SerializerProp serialPar(final ANode node, final QueryContext ctx)
+      throws SerializerException {
+
+    // interpret query parameters
+    final TokenBuilder tb = new TokenBuilder();
+    final AxisIter ati = node.atts();
+    ANode at;
+    while((at = ati.next()) != null) {
+      final QNm name = at.qname();
+      if(name.eq(A_NAME) || name.eq(A_SRC)) continue;
+      if(tb.size() != 0) tb.add(',');
+      tb.add(name.ln()).add('=').add(at.atom());
+    }
+    return tb.size() == 0 ? ctx.serProp() : new SerializerProp(tb.toString());
   }
 
   /**
@@ -283,7 +328,7 @@ final class FNZip extends Fun {
       final Parser p = Parser.fileParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
     } catch(final IOException ex) {
-      throw DOCWF.thrw(input, ex.toString());
+      throw SAXERR.thrw(input, ex);
     }
   }
 
@@ -297,7 +342,7 @@ final class FNZip extends Fun {
     final Uri uri = (Uri) checkType(expr[0].item(ctx, input), Type.URI);
     final String path = string(checkStr(expr[1], ctx));
 
-    final String file = IOFile.file(uri.toJava().toString());
+    final String file = IOFile.file(string(uri.atom()));
     if(!IO.get(file).exists()) ZIPNOTFOUND.thrw(input, file);
 
     ZipInputStream zis = null;
