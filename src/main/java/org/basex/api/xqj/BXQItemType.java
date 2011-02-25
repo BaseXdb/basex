@@ -6,6 +6,8 @@ import javax.xml.namespace.QName;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQSequenceType;
 import org.basex.query.QueryTokens;
+import org.basex.query.item.AtomType;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.Type;
 import org.basex.util.Token;
 
@@ -18,18 +20,23 @@ import org.basex.util.Token;
 final class BXQItemType implements XQItemType {
   /** Existing base types. */
   private static final Type[] BASE = {
-      null    , null    , null    , null    , Type.AAT, Type.ATM, Type.DTD, //0
-      Type.YMD, Type.URI, Type.B64, Type.BLN, Type.DAT, Type.INT, Type.ITR, //7
-      Type.SHR, Type.LNG, Type.DTM, Type.DEC, Type.DBL, Type.DUR, Type.FLT, //14
-      Type.DAY, Type.MON, Type.MDA, Type.YEA, Type.YMO, Type.HEX, Type.NOT, //21
-      Type.QNM, Type.STR, Type.TIM, Type.BYT, Type.NPI, Type.NNI, Type.NIN, //28
-      Type.PIN, Type.ULN, Type.UIN, Type.USH, Type.UBY, Type.NST, Type.TOK, //35
-      Type.LAN, Type.NAM, Type.NCN, Type.NMT, Type.ID , Type.IDR, Type.ENT, //42
-      null, null, null // 49
+      null        , null        , null        , null        ,
+      AtomType.AAT, AtomType.ATM, AtomType.DTD, AtomType.YMD,
+      AtomType.URI, AtomType.B64, AtomType.BLN, AtomType.DAT,
+      AtomType.INT, AtomType.ITR, AtomType.SHR, AtomType.LNG,
+      AtomType.DTM, AtomType.DEC, AtomType.DBL, AtomType.DUR,
+      AtomType.FLT, AtomType.DAY, AtomType.MON, AtomType.MDA,
+      AtomType.YEA, AtomType.YMO, AtomType.HEX, AtomType.NOT,
+      AtomType.QNM, AtomType.STR, AtomType.TIM, AtomType.BYT,
+      AtomType.NPI, AtomType.NNI, AtomType.NIN, AtomType.PIN,
+      AtomType.ULN, AtomType.UIN, AtomType.USH, AtomType.UBY,
+      AtomType.NST, AtomType.TOK, AtomType.LAN, AtomType.NAM,
+      AtomType.NCN, AtomType.NMT, AtomType.ID , AtomType.IDR,
+      AtomType.ENT, null        , null        , null
   };
   /** Default item type. */
   static final BXQItemType DEFAULT = new BXQItemType(
-      Type.ITEM, null, -1, XQSequenceType.OCC_ZERO_OR_MORE);
+      AtomType.ITEM, null, -1, XQSequenceType.OCC_ZERO_OR_MORE);
 
   /** Name. */
   private final QName name;
@@ -84,7 +91,8 @@ final class BXQItemType implements XQItemType {
 
   @Override
   public int getBaseType() throws BXQException {
-    if(type.unt) check(Type.DEL, Type.ELM, Type.ATT, Type.ATM);
+    if(type.unt()) check(NodeType.DEL, NodeType.ELM, NodeType.ATT,
+        AtomType.ATM);
 
     if(base != -1) return base;
     for(int b = 0; b < BASE.length; ++b) if(BASE[b] == type) return b;
@@ -93,18 +101,20 @@ final class BXQItemType implements XQItemType {
 
   @Override
   public int getItemKind() {
-    switch(type) {
-      case ATT : return XQITEMKIND_ATTRIBUTE;
-      case COM : return XQITEMKIND_COMMENT;
-      case DOC : return XQITEMKIND_DOCUMENT;
-      case DEL : return XQITEMKIND_DOCUMENT_ELEMENT;
-      case ELM : return XQITEMKIND_ELEMENT;
-      case ITEM: return XQITEMKIND_ITEM;
-      case NOD : return XQITEMKIND_NODE;
-      case PI  : return XQITEMKIND_PI;
-      case TXT : return XQITEMKIND_TEXT;
-      default  : return XQITEMKIND_ATOMIC;
+    if(type instanceof NodeType) {
+      switch((NodeType) type) {
+        case ATT : return XQITEMKIND_ATTRIBUTE;
+        case COM : return XQITEMKIND_COMMENT;
+        case DOC : return XQITEMKIND_DOCUMENT;
+        case DEL : return XQITEMKIND_DOCUMENT_ELEMENT;
+        case ELM : return XQITEMKIND_ELEMENT;
+        case NOD : return XQITEMKIND_NODE;
+        case PI  : return XQITEMKIND_PI;
+        case TXT : return XQITEMKIND_TEXT;
+        default  : return XQITEMKIND_ATOMIC;
+      }
     }
+    return type == AtomType.ITEM ? XQITEMKIND_ITEM : XQITEMKIND_ATOMIC;
   }
 
   @Override
@@ -114,13 +124,13 @@ final class BXQItemType implements XQItemType {
 
   @Override
   public QName getNodeName() throws BXQException {
-    check(Type.DEL, Type.ELM, Type.ATT);
+    check(NodeType.DEL, NodeType.ELM, NodeType.ATT);
     return name;
   }
 
   @Override
   public String getPIName() throws BXQException {
-    if(type != Type.PI) throw new BXQException(PI);
+    if(type != NodeType.PI) throw new BXQException(PI);
     return name == null ? null : name.getLocalPart();
   }
 
@@ -131,11 +141,12 @@ final class BXQItemType implements XQItemType {
 
   @Override
   public QName getTypeName() throws BXQException {
-    if(type.unt) check(Type.DEL, Type.ELM, Type.ATT, Type.ATM);
-    if(type == Type.ITEM) throw new BXQException(TYPE);
+    if(type.unt()) check(NodeType.DEL, NodeType.ELM, NodeType.ATT,
+        AtomType.ATM);
+    if(type == AtomType.ITEM) throw new BXQException(TYPE);
 
     final Type t = base != -1 ? BASE[base] : type;
-    return new QName(Token.string(QueryTokens.XSURI), Token.string(t.nam));
+    return new QName(Token.string(QueryTokens.XSURI), Token.string(t.nam()));
   }
 
   @Override
@@ -173,6 +184,6 @@ final class BXQItemType implements XQItemType {
 
   @Override
   public String toString() {
-    return Token.string(type.nam);
+    return Token.string(type.nam());
   }
 }

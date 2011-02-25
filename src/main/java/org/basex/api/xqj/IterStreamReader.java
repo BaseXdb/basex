@@ -16,8 +16,8 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
@@ -149,7 +149,11 @@ final class IterStreamReader implements XMLStreamReader {
     final TokenBuilder tb = new TokenBuilder();
     while(kind != END_ELEMENT) {
       if(isType(CHARACTERS, CDATA, SPACE, ENTITY_REFERENCE)) {
-        tb.add(item.atom());
+        try {
+          tb.add(item.atom(null));
+        } catch(final QueryException e) {
+          throw new XMLStreamException(e);
+        }
       } else if(isType(END_DOCUMENT)) {
         throw new XMLStreamException("Unexpected end of document.");
       } else if(isType(START_ELEMENT)) {
@@ -228,7 +232,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getPIData() {
     checkType(PROCESSING_INSTRUCTION);
-    final byte[] val = item.atom();
+    final byte[] val = ((ANode) item).atom();
     final int i = indexOf(val, ' ');
     return string(i == -1 ? EMPTY : substring(val, i + 1));
   }
@@ -236,7 +240,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getPITarget() {
     checkType(PROCESSING_INSTRUCTION);
-    final byte[] val = item.atom();
+    final byte[] val = ((ANode) item).atom();
     final int i = indexOf(val, ' ');
     return string(i == -1 ? val : substring(val, 0, i));
   }
@@ -257,7 +261,11 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getText() {
     checkType(CHARACTERS, COMMENT);
-    return string(item.atom());
+    try {
+      return string(item.atom(null));
+    } catch(final QueryException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   @Override
@@ -282,7 +290,11 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public int getTextLength() {
     checkType(CHARACTERS, COMMENT);
-    return item.atom().length;
+    try {
+      return item.atom(null).length;
+    } catch(final QueryException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   @Override
@@ -365,7 +377,11 @@ final class IterStreamReader implements XMLStreamReader {
 
   @Override
   public boolean isWhiteSpace() {
-    return isCharacters() && ws(item.atom());
+    try {
+      return isCharacters() && ws(item.atom(null));
+    } catch(QueryException e) {
+      return false;
+    }
   }
 
   @Override
@@ -375,7 +391,8 @@ final class IterStreamReader implements XMLStreamReader {
 
     next = false;
     // disallow top level attributes
-    if(item.type == Type.ATT && read == null) throw new XMLStreamException();
+    if(item.type == NodeType.ATT && read == null)
+      throw new XMLStreamException();
     return kind;
   }
 
@@ -412,14 +429,17 @@ final class IterStreamReader implements XMLStreamReader {
    * Sets the current event type.
    */
   void type() {
-    switch(item.type) {
-      case DOC: kind = START_DOCUMENT; return;
-      case ATT: kind = ATTRIBUTE; return;
-      case ELM: kind = START_ELEMENT; return;
-      case COM: kind = COMMENT; return;
-      case PI : kind = PROCESSING_INSTRUCTION; return;
-      default:  kind = CHARACTERS; return;
+    if(item.type instanceof NodeType) {
+      switch((NodeType) item.type) {
+        case DOC: kind = START_DOCUMENT; return;
+        case ATT: kind = ATTRIBUTE; return;
+        case ELM: kind = START_ELEMENT; return;
+        case COM: kind = COMMENT; return;
+        case PI : kind = PROCESSING_INSTRUCTION; return;
+        default : break;
+      }
     }
+    kind = item.type.func() ? -1 : CHARACTERS;
   }
 
   /**
