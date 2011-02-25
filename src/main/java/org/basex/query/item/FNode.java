@@ -1,9 +1,8 @@
 package org.basex.query.item;
 
 import java.util.Arrays;
-import org.basex.query.QueryException;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.NodeIter;
+import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.util.TokenBuilder;
 
@@ -13,11 +12,11 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class FNode extends Nod {
+public abstract class FNode extends ANode {
   /** Child nodes. */
-  protected NodIter children;
+  public NodeCache children;
   /** Attributes. */
-  protected NodIter atts;
+  public NodeCache atts;
 
   /**
    * Constructor.
@@ -32,7 +31,7 @@ public abstract class FNode extends Nod {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
       for(int c = 0; c < children.size(); ++c) {
-        final Nod nc = children.get(c);
+        final ANode nc = children.get(c);
         if(nc.type == Type.ELM || nc.type == Type.TXT) tb.add(nc.atom());
       }
       val = tb.finish();
@@ -41,42 +40,42 @@ public abstract class FNode extends Nod {
   }
 
   @Override
-  public final boolean is(final Nod nod) {
-    return id == nod.id;
+  public final boolean is(final ANode node) {
+    return id == node.id;
   }
 
   @Override
-  public final int diff(final Nod nod) {
-    if(id != nod.id) {
-      Nod n = this;
+  public final int diff(final ANode node) {
+    if(id != node.id) {
+      ANode n = this;
       while(n != null) {
-        final Nod p = n.parent();
-        if(p == nod) return 1;
+        final ANode p = n.parent();
+        if(p == node) return 1;
         n = p;
       }
-      n = nod;
+      n = node;
       while(n != null) {
-        final Nod p = n.parent();
+        final ANode p = n.parent();
         if(p == this) return -1;
         n = p;
       }
     }
-    return id - nod.id;
+    return id - node.id;
   }
 
   @Override
-  public final Nod parent() {
+  public final ANode parent() {
     return par;
   }
 
   @Override
-  public final NodeIter anc() {
-    return new NodeIter() {
+  public final AxisIter anc() {
+    return new AxisIter() {
       /** Temporary node. */
-      private Nod node = FNode.this;
+      private ANode node = FNode.this;
 
       @Override
-      public Nod next() {
+      public ANode next() {
         node = node.parent();
         return node;
       }
@@ -84,15 +83,15 @@ public abstract class FNode extends Nod {
   }
 
   @Override
-  public final NodeIter ancOrSelf() {
-    return new NodeIter() {
+  public final AxisIter ancOrSelf() {
+    return new AxisIter() {
       /** Temporary node. */
-      private Nod node = FNode.this;
+      private ANode node = FNode.this;
 
       @Override
-      public Nod next() {
+      public ANode next() {
         if(node == null) return null;
-        final Nod n = node;
+        final ANode n = node;
         node = n.parent();
         return n;
       }
@@ -100,12 +99,12 @@ public abstract class FNode extends Nod {
   }
 
   @Override
-  public final NodeIter attr() {
+  public final AxisIter atts() {
     return iter(atts);
   }
 
   @Override
-  public final NodeMore child() {
+  public final NodeMore children() {
     return iter(children);
   }
 
@@ -114,7 +113,7 @@ public abstract class FNode extends Nod {
    * @param iter iterator
    * @return node iterator
    */
-  private NodeMore iter(final NodIter iter) {
+  private NodeMore iter(final NodeCache iter) {
     return new NodeMore() {
       /** Child counter. */
       int c;
@@ -125,19 +124,19 @@ public abstract class FNode extends Nod {
       }
 
       @Override
-      public Nod next() {
+      public ANode next() {
         return more() ? iter.get(c++) : null;
       }
     };
   }
 
   @Override
-  public final NodeIter descendant() {
+  public final AxisIter descendant() {
     return desc(false);
   }
 
   @Override
-  public final NodeIter descOrSelf() {
+  public final AxisIter descOrSelf() {
     return desc(true);
   }
 
@@ -146,21 +145,21 @@ public abstract class FNode extends Nod {
    * @param self include self node
    * @return node iterator
    */
-  private NodeIter desc(final boolean self) {
-    return new NodeIter() {
+  private AxisIter desc(final boolean self) {
+    return new AxisIter() {
       /** Iterator. */
       private NodeMore[] nm = new NodeMore[1];
       /** Iterator Level. */
       private int l;
 
       @Override
-      public Nod next() throws QueryException {
-        if(nm[0] == null) nm[0] = self ? self() : child();
+      public ANode next() {
+        if(nm[0] == null) nm[0] = self ? self() : children();
         if(l < 0) return null;
 
-        final Nod node = nm[l].next();
+        final ANode node = nm[l].next();
         if(node != null) {
-          final NodeMore ch = node.child();
+          final NodeMore ch = node.children();
           if(ch.more()) {
             if(l + 1 == nm.length) nm = Arrays.copyOf(nm, l + 1 << 1);
             nm[++l] = ch;
@@ -174,63 +173,63 @@ public abstract class FNode extends Nod {
   }
 
   @Override
-  public final NodeIter par() {
-    return new NodeIter() {
+  public final AxisIter par() {
+    return new AxisIter() {
       /** First call. */
       private boolean more;
 
       @Override
-      public Nod next() {
+      public ANode next() {
         return (more ^= true) ? par : null;
       }
     };
   }
 
   @Override
-  public NodeIter follSibl() {
-    return new NodeIter() {
+  public AxisIter follSibl() {
+    return new AxisIter() {
       /** Iterator. */
-      private NodeIter ir;
+      private AxisIter ai;
 
       @Override
-      public Nod next() throws QueryException {
-        if(ir == null) {
-          final Nod r = parent();
+      public ANode next() {
+        if(ai == null) {
+          final ANode r = parent();
           if(r == null) return null;
-          ir = r.child();
-          Nod n;
-          while((n = ir.next()) != null && !n.is(FNode.this));
+          ai = r.children();
+          ANode n;
+          while((n = ai.next()) != null && !n.is(FNode.this));
         }
-        return ir.next();
+        return ai.next();
       }
     };
   }
 
   @Override
-  public final NodeIter foll() {
-    return new NodeIter() {
+  public final AxisIter foll() {
+    return new AxisIter() {
       /** Iterator. */
-      private NodIter ir;
+      private NodeCache nc;
 
       @Override
-      public Nod next() throws QueryException {
-        if(ir == null) {
-          ir = new NodIter();
-          Nod n = FNode.this;
-          Nod p = n.parent();
+      public ANode next() {
+        if(nc == null) {
+          nc = new NodeCache();
+          ANode n = FNode.this;
+          ANode p = n.parent();
           while(p != null) {
-            final NodeIter i = p.child();
-            Nod c;
+            final AxisIter i = p.children();
+            ANode c;
             while(n.type != Type.ATT && (c = i.next()) != null && !c.is(n));
             while((c = i.next()) != null) {
-              ir.add(c.finish());
-              addDesc(c.child(), ir);
+              nc.add(c.finish());
+              addDesc(c.children(), nc);
             }
             n = p;
             p = p.parent();
           }
         }
-        return ir.next();
+        return nc.next();
       }
     };
   }

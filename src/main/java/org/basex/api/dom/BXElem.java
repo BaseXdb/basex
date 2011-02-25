@@ -1,8 +1,7 @@
 package org.basex.api.dom;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.Nod;
-import org.basex.query.iter.NodeIter;
+import org.basex.query.item.ANode;
+import org.basex.query.iter.AxisIter;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.w3c.dom.Attr;
@@ -20,7 +19,7 @@ public final class BXElem extends BXNode implements Element {
    * Constructor.
    * @param n node reference
    */
-  public BXElem(final Nod n) {
+  public BXElem(final ANode n) {
     super(n);
   }
 
@@ -36,12 +35,12 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXNNode getAttributes() {
-    return new BXNNode(finish(node.attr()));
+    return new BXNNode(finish(node.atts()));
   }
 
   @Override
   public String getAttribute(final String name) {
-    final Nod n = attribute(name);
+    final ANode n = attribute(name);
     return n != null ? Token.string(n.atom()) : "";
   }
 
@@ -59,7 +58,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXAttr getAttributeNode(final String name) {
-    final Nod n = attribute(name);
+    final ANode n = attribute(name);
     return n != null ? (BXAttr) n.toJava() : null;
   }
 
@@ -160,18 +159,14 @@ public final class BXElem extends BXNode implements Element {
   /**
    * Returns the specified attribute.
    * @param name attribute name
-   * @return nod instance
+   * @return node, or {@code null}
    */
-  private Nod attribute(final String name) {
-    try {
-      Nod n = null;
-      final NodeIter iter = node.attr();
-      final byte[] nm = Token.token(name);
-      while((n = iter.next()) != null) {
-        if(Token.eq(nm, n.nname())) return n;
-      }
-    } catch(final QueryException ex) {
-      Util.notexpected();
+  private ANode attribute(final String name) {
+    ANode n = null;
+    final AxisIter ai = node.atts();
+    final byte[] nm = Token.token(name);
+    while((n = ai.next()) != null) {
+      if(Token.eq(nm, n.nname())) return n;
     }
     return null;
   }

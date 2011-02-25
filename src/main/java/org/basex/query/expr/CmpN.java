@@ -8,7 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -25,7 +25,7 @@ public final class CmpN extends Arr {
     /** Node comparison: same. */
     EQ("is") {
       @Override
-      public boolean e(final Nod a, final Nod b) {
+      public boolean e(final ANode a, final ANode b) {
         return a.is(b);
       }
     },
@@ -33,7 +33,7 @@ public final class CmpN extends Arr {
     /** Node comparison: before. */
     ET("<<") {
       @Override
-      public boolean e(final Nod a, final Nod b) {
+      public boolean e(final ANode a, final ANode b) {
         return a.diff(b) < 0;
       }
     },
@@ -41,7 +41,7 @@ public final class CmpN extends Arr {
     /** Node comparison: after. */
     GT(">>") {
       @Override
-      public boolean e(final Nod a, final Nod b) {
+      public boolean e(final ANode a, final ANode b) {
         return a.diff(b) > 0;
       }
     };
@@ -64,7 +64,7 @@ public final class CmpN extends Arr {
      * @return result
      * @throws QueryException query exception
      */
-    public abstract boolean e(Nod a, Nod b) throws QueryException;
+    public abstract boolean e(ANode a, ANode b) throws QueryException;
 
     @Override
     public String toString() {

@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.w3c.dom.CDATASection;
 
 /**
@@ -14,7 +14,7 @@ public final class BXCData extends BXText implements CDATASection {
    * Constructor.
    * @param n node reference
    */
-  public BXCData(final Nod n) {
+  public BXCData(final ANode n) {
     super(n);
   }
 

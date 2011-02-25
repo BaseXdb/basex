@@ -9,7 +9,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -103,7 +103,7 @@ public class Filter extends Preds {
     final long cp = ctx.pos;
 
     // cache results to support last() function
-    final ItemIter ir = new ItemIter();
+    final ItemCache ir = new ItemCache();
     Item i;
     while((i = iter.next()) != null) ir.add(i);
 

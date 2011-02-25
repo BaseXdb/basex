@@ -14,10 +14,11 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
 
@@ -60,7 +61,7 @@ public final class IndexAccess extends Single {
       iter = tmp;
       iter[s] = index(it.atom());
     }
-    return iter.length == 0 ? new NodIter() : iter.length == 1 ? iter[0] :
+    return iter.length == 0 ? new NodeCache() : iter.length == 1 ? iter[0] :
       new Union(input, expr).eval(iter);
   }
 
@@ -69,7 +70,7 @@ public final class IndexAccess extends Single {
    * @param term term to be found
    * @return iterator
    */
-  private NodeIter index(final byte[] term) {
+  private AxisIter index(final byte[] term) {
     final Data data = ictx.data;
     return term.length <= MAXLEN &&
       (ind == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex) ?
@@ -82,14 +83,14 @@ public final class IndexAccess extends Single {
    * @param val value to be found
    * @return node iterator
    */
-  private NodeIter index(final Data data, final byte[] val) {
+  private AxisIter index(final Data data, final byte[] val) {
     final byte kind = ind == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final boolean mem = data instanceof MemData;
-    return new NodeIter() {
+    return new AxisIter() {
       final IndexIterator ii = data.ids(new ValuesToken(ind, val));
 
       @Override
-      public Nod next() {
+      public ANode next() {
         while(ii.more()) {
           final int p = ii.next();
           // main memory instance: check if text is no comment, etc.
@@ -106,15 +107,15 @@ public final class IndexAccess extends Single {
    * @param val value to be found
    * @return node iterator
    */
-  private NodeIter scan(final Data data, final byte[] val) {
+  private AxisIter scan(final Data data, final byte[] val) {
     final boolean text = ind == IndexType.TEXT;
     final byte kind = text ? Data.TEXT : Data.ATTR;
-    return new NodeIter() {
+    return new AxisIter() {
       // fallback solution: parse complete data if string is too long
       int pre = -1;
 
       @Override
-      public Nod next() {
+      public ANode next() {
         while(++pre != data.meta.size) {
           if(data.kind(pre) == kind && eq(data.text(pre, text), val))
             return new DBNode(data, pre, kind);

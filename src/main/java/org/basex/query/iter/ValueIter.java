@@ -3,7 +3,7 @@ package org.basex.query.iter;
 import org.basex.query.item.Item;
 
 /**
- * Value iterator interface.
+ * Value iterator interface, throwing no exceptions.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

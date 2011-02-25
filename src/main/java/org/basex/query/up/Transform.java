@@ -13,8 +13,8 @@ import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.item.ANode;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.DataBuilder;
 import org.basex.query.util.Var;
@@ -73,7 +73,7 @@ public final class Transform extends Arr {
 
       // copy node to main memory data instance
       final MemData md = new MemData(ctx.context.prop);
-      new DataBuilder(md).context(ctx).build((Nod) i);
+      new DataBuilder(md).context(ctx).build((ANode) i);
 
       // add resulting node to variable
       ctx.vars.add(fo.var.bind(new DBNode(md, 0), ctx).copy());
@@ -87,7 +87,7 @@ public final class Transform extends Arr {
     ctx.updates.apply(ctx);
     ctx.updates = tmp;
 
-    final ItemIter ir = ItemIter.get(ctx.iter(expr[1]));
+    final ItemCache ir = ItemCache.get(ctx.iter(expr[1]));
     ctx.vars.reset(s);
     return ir;
   }

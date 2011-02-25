@@ -9,7 +9,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Simple;
 import org.basex.query.item.FTNode;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
@@ -46,7 +46,7 @@ public final class FTIndexAccess extends Simple {
 
     return new NodeIter() {
       @Override
-      public Nod next() throws QueryException {
+      public ANode next() throws QueryException {
         final FTNode it = ir.next();
         if(it != null) {
           // add entry to visualization

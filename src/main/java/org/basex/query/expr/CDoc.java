@@ -30,7 +30,7 @@ public final class CDoc extends CFrag {
       throws QueryException {
 
     final Constr con = new Constr(ctx, expr);
-    if(con.errAtt || con.ats.size() != 0) XPATT.thrw(ii);
+    if(con.errAtt || con.atts.size() != 0) XPATT.thrw(ii);
 
     final FDoc doc = new FDoc(con.children, con.base);
     for(int n = 0; n < con.children.size(); ++n)

@@ -12,7 +12,7 @@ import org.basex.query.expr.CPI;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -61,8 +61,8 @@ public final class Rename extends Update {
 
     // check namespace conflicts...
     final QNm rename = ex.item(ctx, input).qname();
-    final Nod targ = (Nod) i;
-    final Nod test = i.type == Type.ELM ? targ :
+    final ANode targ = (ANode) i;
+    final ANode test = i.type == Type.ELM ? targ :
       i.type == Type.ATT ? targ.parent() : null;
 
     if(test != null) {

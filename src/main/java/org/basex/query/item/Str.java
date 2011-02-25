@@ -65,13 +65,11 @@ public class Str extends Item {
   }
 
   @Override
-  @SuppressWarnings("unused")
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
     return Token.eq(val, it.atom());
   }
 
   @Override
-  @SuppressWarnings("unused")
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     return Token.diff(val, it.atom());
   }

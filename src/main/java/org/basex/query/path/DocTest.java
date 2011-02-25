@@ -5,7 +5,7 @@ import org.basex.data.Nodes;
 import org.basex.query.QueryContext;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Type;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.IntList;
@@ -50,11 +50,11 @@ final class DocTest extends Test {
   }
 
   @Override
-  public boolean eval(final Nod nod) {
+  public boolean eval(final ANode node) {
     // no document node, or no database instance
-    if(nod.type != type || !(nod instanceof DBNode)) return false;
+    if(node.type != type || !(node instanceof DBNode)) return false;
     // ensure that the pre value is contained in the target documents
-    final DBNode db = (DBNode) nod;
+    final DBNode db = (DBNode) node;
     return nodes.data == db.data && nodes.contains(db.pre);
   }
 

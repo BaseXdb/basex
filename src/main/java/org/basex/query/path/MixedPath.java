@@ -8,12 +8,12 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -58,7 +58,7 @@ public final class MixedPath extends Path {
     final long cs = ctx.size;
     final long cp = ctx.pos;
     ctx.value = v;
-    final ItemIter ir = eval(ctx);
+    final ItemCache ir = eval(ctx);
     ctx.value = c;
     ctx.size = cs;
     ctx.pos = cp;
@@ -71,12 +71,12 @@ public final class MixedPath extends Path {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private ItemIter eval(final QueryContext ctx) throws QueryException {
+  private ItemCache eval(final QueryContext ctx) throws QueryException {
     // simple location step traversal...
-    ItemIter res = ItemIter.get(ctx.value.iter(ctx));
+    ItemCache res = ItemCache.get(ctx.value.iter(ctx));
     for(final Expr e : expr) {
       final Iter ir = res;
-      final ItemIter ii = new ItemIter();
+      final ItemCache ii = new ItemCache();
       ctx.size = ir.size();
       ctx.pos = 1;
       Item it;
@@ -89,12 +89,12 @@ public final class MixedPath extends Path {
 
       // either nodes or atomic items are allowed in a result set, but not both
       if(ii.size() != 0 && ii.get(0).node()) {
-        final NodIter ni = new NodIter().random();
+        final NodeCache ni = new NodeCache().random();
         while((it = ii.next()) != null) {
           if(!it.node()) EVALNODESVALS.thrw(input);
-          ni.add((Nod) it);
+          ni.add((ANode) it);
         }
-        res = ItemIter.get(ni);
+        res = ItemCache.get(ni);
       } else {
         while((it = ii.next()) != null) {
           if(it.node()) EVALNODESVALS.thrw(input);

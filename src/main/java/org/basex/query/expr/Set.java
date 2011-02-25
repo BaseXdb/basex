@@ -4,10 +4,10 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -52,7 +52,7 @@ abstract class Set extends Arr {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  protected abstract NodIter eval(final Iter[] iter) throws QueryException;
+  protected abstract NodeCache eval(final Iter[] iter) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.
@@ -60,6 +60,7 @@ abstract class Set extends Arr {
    * @return resulting iterator
    */
   protected abstract NodeIter iter(final Iter[] iter);
+
   @Override
   public boolean duplicates() {
     return false;
@@ -72,7 +73,7 @@ abstract class Set extends Arr {
     /** Iterator. */
     protected final Iter[] iter;
     /** Items. */
-    protected Nod[] item;
+    protected ANode[] item;
 
     /**
      * Constructor.
@@ -83,7 +84,7 @@ abstract class Set extends Arr {
     }
 
     @Override
-    public abstract Nod next() throws QueryException;
+    public abstract ANode next() throws QueryException;
 
     /**
      * Sets the next iterator item.

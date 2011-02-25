@@ -56,14 +56,12 @@ public abstract class Item extends Value {
   }
 
   @Override
-  @SuppressWarnings("unused")
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return this;
   }
 
   @Override
-  @SuppressWarnings("unused")
   public Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return this;
