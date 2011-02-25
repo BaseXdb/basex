@@ -1,6 +1,9 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
+
+import org.basex.core.BaseXException;
+import org.basex.data.SerializerException;
 import org.basex.io.IO;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Value;
@@ -8,9 +11,7 @@ import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
 
 /**
  * This class indicates exceptions during query parsing or evaluation.
@@ -46,6 +47,16 @@ public final class QueryException extends Exception {
   }
 
   /**
+   * Default constructor.
+   * @param ii input info
+   * @param ex serializer exception
+   */
+  public QueryException(final InputInfo ii, final SerializerException ex) {
+    this(ii, (String) null, null, ex.getLocalizedMessage());
+    err = ex.err();
+  }
+
+  /**
    * Constructor, specifying the error code and message as string.
    * @param ii input info
    * @param errc error code
@@ -56,36 +67,13 @@ public final class QueryException extends Exception {
   public QueryException(final InputInfo ii, final String errc, final Value val,
       final String msg, final Object... ext) {
 
-    super(message(msg, ext));
+    super(BaseXException.message(msg, ext));
     code = errc;
     value = val;
     if(ii == null) return;
 
     file = ii.file;
     lineCol = ii.lineCol();
-  }
-
-  /**
-   * Creates the error message from the specified info and extension array.
-   * @param info info message
-   * @param ext info extensions
-   * @return argument
-   */
-  private static String message(final String info, final Object[] ext) {
-    for(int i = 0; i < ext.length; ++i) {
-      if(ext[i] instanceof byte[]) {
-        ext[i] = Token.string((byte[]) ext[i]);
-      } else if(ext[i] instanceof Throwable) {
-        final Throwable th = (Throwable) ext[i];
-        ext[i] = th.getMessage() != null ? th.getMessage() : th.toString();
-      } else if(!(ext[i] instanceof String)) {
-        ext[i] = ext[i].toString();
-      }
-      // [CG] XQuery/Exception: verify if/which strings are to be chopped
-      //final String s = t[i].toString();
-      //t[i] = s.length() > 1000 ? s.substring(0, 1000) + DOTS : s;
-    }
-    return Util.info(info, ext);
   }
 
   /**

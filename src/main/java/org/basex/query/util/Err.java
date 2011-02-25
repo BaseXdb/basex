@@ -2,6 +2,7 @@ package org.basex.query.util;
 
 import static org.basex.query.util.Err.ErrType.*;
 import org.basex.core.Text;
+import org.basex.data.SerializerException;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;
@@ -17,8 +18,6 @@ import org.basex.util.InputInfo;
  */
 public enum Err {
 
-  /** BASX0000: Error that it still to be defined by the specs. */
-  UNDEF(BASX, 0, "%."),
   /** BASX0000: Not implemented yet. */
   NOTIMPL(BASX, 0, "Not implemented yet: %."),
 
@@ -77,7 +76,7 @@ public enum Err {
   /** FODC0005: Evaluation exception. */
   INVDOC(FODC, 5, "Invalid document \"%\"."),
   /** FODC0006: Evaluation exception. */
-  DOCWF(FODC, 6, "SAX: %."),
+  SAXERR(FODC, 6, "SAX: %."),
   /** FODC0007: Evaluation exception. */
   DOCBASE(FODC, 7, "Base URI % is invalid."),
 
@@ -246,6 +245,25 @@ public enum Err {
   NOTHES(FTST, 18, "Thesaurus not found: \"%\"."),
   /** FTST0019: Parsing exception. */
   FTDUP(FTST, 19, "Match option '%' was defined twice."),
+
+  /** SESU0007: Serialization exception. */
+  SERENCODING(SESU, 7, "Unknown encoding: \"%\"."),
+  /** SEPM0009: Serialization exception. */
+  SERSTAND(SEPM, 9, "Invalid combination of \"omit-xml-declaration\"."),
+  /** SEPM0010: Serialization exception. */
+  SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
+  /** SERE0014: Serialization exception. */
+  SERILL(SERE, 14, "Illegal HTML character found: #x%."),
+  /** SERE0015: Serialization exception. */
+  SERPI(SERE, 15, "Processing construction contains \">\"."),
+  /** SEPM0016: Serialization exception. */
+  SERINVALID(SEPM, 16, "Parameter \"%\" is unknown."),
+  /** SEPM0016: Serialization exception. */
+  SERMAP(SEPM, 16, "Character map \"%\" is not defined."),
+  /** SEPM0016: Serialization exception. */
+  SERANY(SEPM, 16, "%."),
+  /** SEPM0017: Serialization exception. */
+  SERUNKNOWN(SEPM, 17, "Serialization: unknown element %."),
 
   /** XPDY0002: Parsing exception. */
   VAREMPTY(XPDY, 2, "No value defined for \"%\"."),
@@ -573,6 +591,8 @@ public enum Err {
 
   /** XTDE0030: Parsing exception. */
   WRONGINT(XTDE, 30, "Wrong integer format: \"%\"."),
+  /** XTDE1170: Parsing exception. */
+  WRONGINPUT(XTDE, 1170, "Failed to read \"%\": %."),
 
   /** XUDY0009: XQuery Update dynamic exception. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),
@@ -657,7 +677,7 @@ public enum Err {
   }
 
   /**
-   * Throws an exception.
+   * Throws a query exception.
    * @param ii input info
    * @param ext extended info
    * @return query exception (dummy)
@@ -666,6 +686,16 @@ public enum Err {
   public QueryException thrw(final InputInfo ii, final Object... ext)
       throws QueryException {
     throw new QueryException(ii, this, ext);
+  }
+
+  /**
+   * Throws a serializer exception.
+   * Might to be merged with {@link #thrw} in future.
+   * @param ext extended info
+   * @return query exception (dummy)
+   */
+  public SerializerException serial(final Object... ext) {
+    return new SerializerException(this, ext);
   }
 
   /**
@@ -701,6 +731,9 @@ public enum Err {
     /** FOZP Error type. */ FOZP,
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
+    /** SEPM Error type. */ SEPM,
+    /** SERE Error type. */ SERE,
+    /** SEPM Error type. */ SESU,
     /** XPDY Error type. */ XPDY,
     /** XPST Error type. */ XPST,
     /** XPTY Error type. */ XPTY,

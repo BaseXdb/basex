@@ -1,5 +1,6 @@
 package org.basex.query.util;
 
+import static org.basex.data.DataText.*;
 import static java.lang.Integer.*;
 import static java.net.HttpURLConnection.*;
 import static org.basex.query.util.Err.*;
@@ -310,14 +311,14 @@ public final class HttpClient {
       // Set serial parameter "method" according to MIME type
       sb.append("method=");
       if(method == null) {
-        if(eq(mediaType, APPL_XHTML)) sb.append("xhtml");
+        if(eq(mediaType, APPL_XHTML)) sb.append(M_XHTML);
         else if(eq(mediaType, APPL_XML) || eq(mediaType, APPL_EXT_XML)
             || eq(mediaType, TXT_XML) || eq(mediaType, TXT_EXT_XML)
-            || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append("xml");
-        else if(eq(mediaType, TXT_HTML)) sb.append("html");
+            || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append(M_XML);
+        else if(eq(mediaType, TXT_HTML)) sb.append(M_HTML);
         else if(startsWith(mediaType, MIME_TEXT_PREFIX))
-          sb.append("text");
-        else sb.append("xml");
+          sb.append(M_TEXT);
+        else sb.append(M_XML);
       } else {
         sb.append(method);
       }
@@ -328,7 +329,6 @@ public final class HttpClient {
       final SerializerProp serialProp = new SerializerProp(sb.toString());
       try {
         final XMLSerializer xml = new XMLSerializer(out, serialProp);
-
         final AxisIter ai = body.children();
         ANode child = null;
         while((child = ai.next()) != null) child.serialize(xml);
@@ -356,7 +356,6 @@ public final class HttpClient {
     final FElem responseElem = new FElem(new QNm(RESPONSE), null);
     setResponseChildren(conn, responseElem);
     setResponseAttrs(conn, responseElem);
-
 
     final ItemCache iter = new ItemCache();
     iter.add(responseElem);

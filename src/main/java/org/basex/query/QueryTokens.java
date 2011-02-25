@@ -396,7 +396,7 @@ public interface QueryTokens {
   /** XMLSchema Instance URI. */
   byte[] XSIURI = token(W3URI + "/2001/XMLSchema-instance");
   /** Output URI. */
-  byte[] OUTPUTURI = token(W3URI + "/2009/xquery-serialization");
+  byte[] OUTPUTURI = token(W3URI + "/2010/xslt-xquery-serialization");
   /** Error URI. */
   byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
 

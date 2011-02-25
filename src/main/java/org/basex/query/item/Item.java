@@ -57,14 +57,12 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) {
     return this;
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item ebv(final QueryContext ctx, final InputInfo ii) {
     return this;
   }
 

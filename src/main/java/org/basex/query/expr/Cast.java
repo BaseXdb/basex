@@ -10,7 +10,6 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.Util;
 
 /**
  * Cast expression.
@@ -54,7 +53,7 @@ public final class Cast extends Single {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return type.cast(expr.item(ctx, input), this, ctx, input);
+    return type.cast(expr, this, ctx);
   }
 
   @Override
@@ -65,12 +64,7 @@ public final class Cast extends Single {
   }
 
   @Override
-  public String desc() {
-    return type.type + " " + CAST;
-  }
-
-  @Override
   public String toString() {
-    return Util.info("% cast as %", expr, type);
+    return expr + " " + CAST + " " + AS + " " + type;
   }
 }
