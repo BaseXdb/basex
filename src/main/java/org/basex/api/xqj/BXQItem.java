@@ -23,9 +23,9 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Type;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.w3c.dom.Node;
@@ -100,7 +100,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
 
   @Override
   public XMLStreamReader getItemAsStream() {
-    return new IterStreamReader(new ItemIter(new Item[] { it }, 1));
+    return new IterStreamReader(new ItemCache(new Item[] { it }, 1));
   }
 
   @Override
@@ -124,14 +124,14 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   public Node getNode() throws XQException {
     opened();
     if(!it.node()) throw new BXQException(WRONG, Type.NOD, it.type);
-    return ((Nod) it).toJava();
+    return ((ANode) it).toJava();
   }
 
   @Override
   public URI getNodeUri() throws XQException {
     opened();
     if(!it.node()) throw new BXQException(NODE);
-    final Nod node = (Nod) it;
+    final ANode node = (ANode) it;
     try {
       return new URI(Token.string(node.base()));
     } catch(final URISyntaxException ex) {

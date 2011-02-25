@@ -8,12 +8,11 @@ import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.XQuery;
-import org.basex.query.QueryException;
 import org.basex.query.item.FElem;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Type;
-import org.basex.query.iter.ItemIter;
-import org.basex.query.iter.NodeIter;
+import org.basex.query.iter.AxisIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -133,7 +132,7 @@ public final class HttpClientTest {
         "href='http://localhost:8984/basex/jax-rx/books'/>)");
     get1.execute(context);
     checkResponse(get1, HttpURLConnection.HTTP_OK, 2);
-    assertTrue(((ItemIter) get1.result()).item[1].type == Type.DOC);
+    assertTrue(((ItemCache) get1.result()).item[1].type == Type.DOC);
 
     // GET2 - with override-media-type='text/plain'
     final Command get2 = new XQuery("http:send-request(" +
@@ -141,7 +140,7 @@ public final class HttpClientTest {
         "'http://localhost:8984/basex/jax-rx/books')");
     get2.execute(context);
     checkResponse(get2, HttpURLConnection.HTTP_OK, 2);
-    assertTrue(((ItemIter) get2.result()).item[1].type == Type.STR);
+    assertTrue(((ItemCache) get2.result()).item[1].type == Type.STR);
 
     // Get3 - with status-only='true'
     final Command get3 = new XQuery("http:send-request(" +
@@ -180,19 +179,18 @@ public final class HttpClientTest {
    * @param c command
    * @param expStatus expected status
    * @param itemsCount expected number of items
-   * @throws QueryException query exception
    */
   private void checkResponse(final Command c, final int expStatus,
-      final int itemsCount) throws QueryException {
-    assertTrue(c.result() instanceof ItemIter);
-    final ItemIter res = (ItemIter) c.result();
+      final int itemsCount) {
+    assertTrue(c.result() instanceof ItemCache);
+    final ItemCache res = (ItemCache) c.result();
     assertEquals(itemsCount, res.size());
     assertTrue(res.item[0] instanceof FElem);
     final FElem response = (FElem) res.item[0];
-    assertNotNull(response.attr());
-    final NodeIter resAttr = response.attr();
-    Nod attr = null;
-    while((attr = resAttr.next()) != null) {
+    assertNotNull(response.atts());
+    final AxisIter ai = response.atts();
+    ANode attr = null;
+    while((attr = ai.next()) != null) {
       if(Token.eq(attr.nname(), STATUS)) assertTrue(eq(attr.atom(),
           token(expStatus)));
     }

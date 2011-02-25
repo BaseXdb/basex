@@ -15,15 +15,14 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.NodeIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.util.Namespaces;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
 import static org.basex.util.Token.*;
 
 /**
@@ -48,7 +47,7 @@ final class IterStreamReader implements XMLStreamReader {
   /** Node iterator. */
   private NodeReader read;
   /** Attributes. */
-  private NodIter atts;
+  private NodeCache atts;
 
   /**
    * Constructor.
@@ -128,16 +127,12 @@ final class IterStreamReader implements XMLStreamReader {
   private void getAttributes() {
     if(atts != null) return;
     checkType(START_ELEMENT, ATTRIBUTE);
-    atts = new NodIter();
-    final NodeIter iter = ((Nod) item).attr();
-    try {
-      while(true) {
-        final Nod it = iter.next();
-        if(it == null) return;
-        atts.add(it);
-      }
-    } catch(final QueryException ex) {
-      Util.stack(ex);
+    atts = new NodeCache();
+    final AxisIter ai = ((ANode) item).atts();
+    while(true) {
+      final ANode it = ai.next();
+      if(it == null) return;
+      atts.add(it);
     }
   }
 
@@ -180,7 +175,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getLocalName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return string(((Nod) item).nname());
+    return string(((ANode) item).nname());
   }
 
   @Override
@@ -191,7 +186,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public QName getName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return ((Nod) item).qname().toJava();
+    return ((ANode) item).qname().toJava();
   }
 
   @Override
@@ -249,7 +244,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getPrefix() {
     checkType(START_ELEMENT, END_ELEMENT);
-    final QNm qn = ((Nod) item).qname();
+    final QNm qn = ((ANode) item).qname();
     return !qn.ns() ? null : string(qn.pref());
   }
 
@@ -534,9 +529,9 @@ final class IterStreamReader implements XMLStreamReader {
   /** Reader for traversing {@link FNode} instances. */
   private final class FNodeReader extends NodeReader {
     /** Iterator. */
-    private final NodeIter[] iter = new NodeIter[IO.MAXHEIGHT];
+    private final AxisIter[] iter = new AxisIter[IO.MAXHEIGHT];
     /** Iterator. */
-    private final Nod[] node = new Nod[IO.MAXHEIGHT];
+    private final ANode[] node = new ANode[IO.MAXHEIGHT];
     /** Iterator level. */
     private int l;
 
@@ -548,20 +543,16 @@ final class IterStreamReader implements XMLStreamReader {
 
     @Override
     boolean hasNext() {
-      try {
-        final Nod n = iter[l].next();
-        if(n != null) {
-          node[l] = n;
-          item = n;
-          type();
-          if(kind == START_ELEMENT) iter[++l] = n.child();
-        } else {
-          if(--l < 0) return false;
-          item = node[l];
-          kind = END_ELEMENT;
-        }
-      } catch(final QueryException ex) {
-        Util.notexpected();
+      final ANode n = iter[l].next();
+      if(n != null) {
+        node[l] = n;
+        item = n;
+        type();
+        if(kind == START_ELEMENT) iter[++l] = n.children();
+      } else {
+        if(--l < 0) return false;
+        item = node[l];
+        kind = END_ELEMENT;
       }
       return true;
     }
