@@ -3,12 +3,12 @@ package org.basex.query.item;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.ItemIter;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.util.Var;
+import org.basex.query.util.VarList;
 import org.basex.util.InputInfo;
 
 /**
@@ -25,6 +25,9 @@ public class FunItem extends Item {
   private Expr expr;
   /** Function name. */
   private QNm name;
+
+  /** The closure of this function item. */
+  private final VarList closure = new VarList();
 
   /**
    * Constructor.
@@ -46,10 +49,13 @@ public class FunItem extends Item {
    * @param arg function arguments
    * @param body function body
    * @param t function type
+   * @param cl variables in the closure
    */
-  public FunItem(final Var[] arg, final Expr body,
-      final FunType t) {
+  public FunItem(final Var[] arg, final Expr body, final FunType t,
+      final VarList cl) {
     this(null, arg, body, t);
+    if(cl != null)
+      for(int i = 0; i < cl.size; i++) closure.set(cl.vars[i].copy());
   }
 
   /**
@@ -84,6 +90,8 @@ public class FunItem extends Item {
     final int s = ctx.vars.size();
     for(int a = vars.length; a-- > 0;)
       ctx.vars.add(vars[a].bind(args[a], ctx).copy());
+    for(int i = closure.size; i-- > 0;)
+      ctx.vars.add(closure.vars[i].copy());
 
     // evaluate function and reset variable scope
     final ItemIter ir = ItemIter.get(ctx.iter(expr));
@@ -131,5 +139,10 @@ public class FunItem extends Item {
     for(final Var v : vars)
       sb.append(v).append(v == vars[vars.length - 1] ? "" : ", ");
     return sb.append(") { ").append(expr).append(" }").toString();
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.CTX || super.uses(u);
   }
 }

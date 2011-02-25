@@ -40,7 +40,7 @@ public abstract class Value extends Expr {
   public abstract ValueIter iter();
 
   @Override
-  public final Value value(final QueryContext ctx) {
+  public Value value(final QueryContext ctx) {
     return this;
   }
 
@@ -115,7 +115,7 @@ public abstract class Value extends Expr {
   public abstract Object toJava();
 
   @Override
-  public final boolean uses(final Use u) {
+  public boolean uses(final Use u) {
     return false;
   }
 

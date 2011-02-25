@@ -51,7 +51,7 @@ public final class PartFunApp extends Func {
     for(int i = 0; i < at.length; i++)
       at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
 
-    return new FunItem(args, expr, FunType.get(at, var.type()));
+    return new FunItem(args, expr, FunType.get(at, var.type()), null);
   }
 
   @Override

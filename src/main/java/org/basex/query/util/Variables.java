@@ -27,6 +27,14 @@ public final class Variables extends ExprInfo {
   }
 
   /**
+   * Returns the local variables.
+   * @return local variables
+   */
+  public VarList local() {
+    return local;
+  }
+
+  /**
    * Sets a global variable.
    * @param v variable to be added
    */

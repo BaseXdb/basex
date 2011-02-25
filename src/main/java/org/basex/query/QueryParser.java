@@ -111,6 +111,7 @@ import org.basex.query.util.Var;
 import org.basex.query.util.format.DecimalFormat;
 import org.basex.util.Array;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -1629,12 +1630,13 @@ public class QueryParser extends InputParser {
    * @return variables bound
    */
   private Var[] partial(final Expr[] args) {
+    final InputInfo ii = input();
     Var[] vars = {};
     for(int i = 0; i < args.length; i++) {
       if(args[i] == null) {
-        final Var v = new Var(new QNm(concat(VAR, token(vars.length + 1))));
+        final Var v = Var.unique(ii);
         vars = Array.add(vars, v);
-        args[i] = new VarRef(input(), v);
+        args[i] = new VarRef(ii, v);
       }
     }
     return vars;

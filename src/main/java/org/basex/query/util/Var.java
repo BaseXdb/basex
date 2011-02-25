@@ -36,6 +36,9 @@ public final class Var extends ParseExpr {
   /** Variable results. */
   public Value value;
 
+  /** Counter for generating unique variable names. */
+  private static int nextVar;
+
   /**
    * Constructor, specifying a global variable.
    * @param n variable name
@@ -191,6 +194,15 @@ public final class Var extends ParseExpr {
     ser.openElement(this, NAM, Token.token(toString()));
     if(expr != null) expr.plan(ser);
     ser.closeElement();
+  }
+
+  /**
+   * Creates a variable with a unique name.
+   * @param ii input info
+   * @return unique variable
+   */
+  public static Var unique(final InputInfo ii) {
+    return new Var(ii, new QNm(Token.token(nextVar++)));
   }
 
   @Override
