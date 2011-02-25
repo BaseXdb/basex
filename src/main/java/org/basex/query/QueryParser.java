@@ -1489,9 +1489,8 @@ public class QueryParser extends InputParser {
       }
     } else {
       for(final Axis a : Axis.values()) {
-        if(wdConsumeWs(a.name, COL2, NOLOCSTEP)) {
-          wsConsume(COL2);
-          alter = NOLOCSTEP;
+        if(wdConsumeWs(a.name, COLS, NOLOCSTEP)) {
+          wsConsume(COLS);
           ap = qp;
           ax = a;
           test = test(a == Axis.ATTR);
@@ -2749,8 +2748,10 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(REPLACE)) return null;
 
     final boolean v = wsConsumeWs(VALUEE);
-    if(v) wsCheck(OF);
-    if(!wsConsumeWs(NODE)) {
+    if(v) {
+      wsCheck(OF);
+      wsCheck(NODE);
+    } else if(!wsConsumeWs(NODE)) {
       qp = p;
       return null;
     }

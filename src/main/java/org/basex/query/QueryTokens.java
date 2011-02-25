@@ -345,7 +345,7 @@ public interface QueryTokens {
   /** Parser token. */
   String CDATA = "<![CDATA[";
   /** Parser token. */
-  String COL2 = "::";
+  String COLS = "::";
   /** Parser token. */
   String COMMA = ",";
   /** Parser token. */
