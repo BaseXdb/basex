@@ -98,7 +98,7 @@ public final class ServerCollection {
   private static void modify() throws BaseXException {
     session.execute(new XQuery(
         "for $doc in collection('input/book/chapters/0/')" + " return "
-            + "replace value of node doc(base-uri($doc))/text/title  "
+            + "replace value of node $doc/text/title  "
             + "with (1 to 3)"));
 
     // Validate result

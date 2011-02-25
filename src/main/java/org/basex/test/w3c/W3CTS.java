@@ -638,19 +638,19 @@ public abstract class W3CTS {
 
   /**
    * Initializes the input files, specified by the context nodes.
-   * @param nod variables
+   * @param node variables
    * @param var documents
    * @param qp query processor
    * @param first call
    * @return string with input files
    * @throws QueryException query exception
    */
-  private byte[] file(final Nodes nod, final Nodes var,
+  private byte[] file(final Nodes node, final Nodes var,
       final QueryProcessor qp, final boolean first) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int c = 0; c < nod.size(); ++c) {
-      final byte[] nm = data.atom(nod.list[c]);
+    for(int c = 0; c < node.size(); ++c) {
+      final byte[] nm = data.atom(node.list[c]);
       String src = srcs.get(string(nm));
       if(tb.size() != 0) tb.add(", ");
       tb.add(nm);
@@ -675,16 +675,16 @@ public abstract class W3CTS {
 
   /**
    * Assigns the nodes to the specified variables.
-   * @param nod nodes
+   * @param node nodes
    * @param var variables
    * @param qp query processor
    * @throws QueryException query exception
    */
-  private void var(final Nodes nod, final Nodes var, final QueryProcessor qp)
+  private void var(final Nodes node, final Nodes var, final QueryProcessor qp)
       throws QueryException {
 
-    for(int c = 0; c < nod.size(); ++c) {
-      final byte[] nm = data.atom(nod.list[c]);
+    for(int c = 0; c < node.size(); ++c) {
+      final byte[] nm = data.atom(node.list[c]);
       final String src = srcs.get(string(nm));
 
       final Item it = src == null ? coll(nm, qp) : Str.get(src);
@@ -709,17 +709,17 @@ public abstract class W3CTS {
   /**
    * Evaluates the the input files and assigns the result to the specified
    * variables.
-   * @param nod variables
+   * @param node variables
    * @param var documents
    * @param pth file path
    * @param qp query processor
    * @throws Exception exception
    */
-  private void eval(final Nodes nod, final Nodes var, final String pth,
+  private void eval(final Nodes node, final Nodes var, final String pth,
       final QueryProcessor qp) throws Exception {
 
-    for(int c = 0; c < nod.size(); ++c) {
-      final String file = pth + string(data.atom(nod.list[c])) + IO.XQSUFFIX;
+    for(int c = 0; c < node.size(); ++c) {
+      final String file = pth + string(data.atom(node.list[c])) + IO.XQSUFFIX;
       final String in = read(IO.get(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
       final Value val = xq.iter().finish();
