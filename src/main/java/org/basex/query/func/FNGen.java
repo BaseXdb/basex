@@ -327,7 +327,7 @@ final class FNGen extends Fun {
       final Item it = fun.expr[arg].item(ctx, fun.input);
       if(it != null) {
         // check root node
-        ANode node = (ANode) fun.checkType(it, Type.ELM);
+        ANode node = (ANode) fun.checkType(it, NodeType.ELM);
         if(!node.qname().eq(E_PARAM)) SERUNKNOWN.thrw(fun.input, node.qname());
 
         // interpret query parameters
