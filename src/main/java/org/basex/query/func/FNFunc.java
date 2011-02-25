@@ -20,7 +20,6 @@ import org.basex.query.item.Value;
 import static org.basex.query.item.SeqType.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -186,7 +185,7 @@ final class FNFunc extends Fun {
 
     ItemCache res = ItemCache.get(expr[1].iter(ctx));
     for(Item x; (x = xs.next()) != null;)
-      res = f.invIter(ctx, input, Seq.get(res.item, res.item.length), x);
+      res = f.invIter(ctx, input, res.finish(), x);
 
     return res;
   }
