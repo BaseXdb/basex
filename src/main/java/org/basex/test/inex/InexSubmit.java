@@ -24,7 +24,7 @@ import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.server.ClientSession;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -74,7 +74,7 @@ public final class InexSubmit {
   /** Collection for query times. */
   private final double[] qtimes;
   /** Results of the queries. */
-  private final ItemIter[] results;
+  private final ItemCache[] results;
   /** Number of queries. */
   private final int nqueries;
 
@@ -125,7 +125,7 @@ public final class InexSubmit {
     // allocate space for query times
     nqueries = queries.size();
     qtimes = new double[nqueries];
-    results = new ItemIter[nqueries];
+    results = new ItemCache[nqueries];
     qressizes = new int[10 * nqueries];
     qt = new double[10 * nqueries];
 
@@ -181,12 +181,12 @@ public final class InexSubmit {
    * @return iter for the results
    * @throws Exception exception
    */
-  private ItemIter query(final int db, final int qu) throws Exception {
+  private ItemCache query(final int db, final int qu) throws Exception {
     final int size = qressizes[db * nqueries + qu];
     final double qtime = qt[db * nqueries + qu];
     qtimes[qu] += qtime;
 
-    if(size == 0) return new ItemIter();
+    if(size == 0) return new ItemCache();
 
     // query and cache result
     final String que = XQM + "for $i score $s in " +
@@ -195,7 +195,7 @@ public final class InexSubmit {
 
     final Command cmd = new XQuery(que);
 
-    final ItemIter sq = new ItemIter();
+    final ItemCache sq = new ItemCache();
     final StringTokenizer st = new StringTokenizer(session.execute(cmd), " ");
     int z = 0;
     while(st.hasMoreTokens() && z < size) {
@@ -224,10 +224,10 @@ public final class InexSubmit {
    * @param it2 entry to be added
    * @return SeqIter with all values
    */
-  private ItemIter addSortedServer(final ItemIter it1, final ItemIter it2) {
+  private ItemCache addSortedServer(final ItemCache it1, final ItemCache it2) {
     if(it1 == null || it1.size() == 0) return it2;
 
-    final ItemIter tmp = new ItemIter();
+    final ItemCache tmp = new ItemCache();
     Item i1 = it1.next(), i2 = it2.next();
     while(i1 != null && i2 != null) {
       if(i1.score() < i2.score()) {
@@ -407,7 +407,7 @@ public final class InexSubmit {
    * @param k max number of results
    * @throws IOException IOException
    */
-  private void createQueryEntryServer(final int q, final ItemIter res,
+  private void createQueryEntryServer(final int q, final ItemCache res,
       final int k) throws IOException {
 
     xml.openElement(token("topic"), token("topic-id"), token(tid.get(q)),

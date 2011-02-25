@@ -39,7 +39,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -337,7 +337,7 @@ public abstract class W3CTS {
       context.query = IO.get(queries + pth + inname + IO.XQSUFFIX);
       final String in = read(context.query);
       String er = null;
-      ItemIter iter = null;
+      ItemCache iter = null;
       boolean doc = true;
 
       final Nodes cont = nodes("*:contextItem", state);
@@ -382,7 +382,7 @@ public abstract class W3CTS {
             DataText.YES : DataText.NO);
         final XMLSerializer xml = new XMLSerializer(ao, sp);
 
-        iter = ItemIter.get(xq.iter());
+        iter = ItemCache.get(xq.iter());
         Item it;
         while((it = iter.next()) != null) {
           doc &= it.type == Type.DOC;
@@ -481,12 +481,12 @@ public abstract class W3CTS {
             iter.reset();
 
             try {
-              final ItemIter ir = toIter(string(res).replaceAll(
+              final ItemCache ir = toIter(string(res).replaceAll(
                   "^<\\?xml.*?\\?>", "").trim(), frag);
               if(FNSimple.deep(null, iter, ir)) break;
 
               ir.reset();
-              final ItemIter ia = toIter(string(actual), frag);
+              final ItemCache ia = toIter(string(actual), frag);
               if(FNSimple.deep(null, ia, ir)) break;
 
               if(debug) {
@@ -592,8 +592,8 @@ public abstract class W3CTS {
    * @param frag fragment flag
    * @return iterator
    */
-  private ItemIter toIter(final String xml, final boolean frag) {
-    final ItemIter it = new ItemIter();
+  private ItemCache toIter(final String xml, final boolean frag) {
+    final ItemCache it = new ItemCache();
     try {
       String str = xml;
       if(frag) str = "<X>" + str + "</X>";
@@ -638,19 +638,19 @@ public abstract class W3CTS {
 
   /**
    * Initializes the input files, specified by the context nodes.
-   * @param nod variables
+   * @param node variables
    * @param var documents
    * @param qp query processor
    * @param first call
    * @return string with input files
    * @throws QueryException query exception
    */
-  private byte[] file(final Nodes nod, final Nodes var,
+  private byte[] file(final Nodes node, final Nodes var,
       final QueryProcessor qp, final boolean first) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int c = 0; c < nod.size(); ++c) {
-      final byte[] nm = data.atom(nod.list[c]);
+    for(int c = 0; c < node.size(); ++c) {
+      final byte[] nm = data.atom(node.list[c]);
       String src = srcs.get(string(nm));
       if(tb.size() != 0) tb.add(", ");
       tb.add(nm);
@@ -675,16 +675,16 @@ public abstract class W3CTS {
 
   /**
    * Assigns the nodes to the specified variables.
-   * @param nod nodes
+   * @param node nodes
    * @param var variables
    * @param qp query processor
    * @throws QueryException query exception
    */
-  private void var(final Nodes nod, final Nodes var, final QueryProcessor qp)
+  private void var(final Nodes node, final Nodes var, final QueryProcessor qp)
       throws QueryException {
 
-    for(int c = 0; c < nod.size(); ++c) {
-      final byte[] nm = data.atom(nod.list[c]);
+    for(int c = 0; c < node.size(); ++c) {
+      final byte[] nm = data.atom(node.list[c]);
       final String src = srcs.get(string(nm));
 
       final Item it = src == null ? coll(nm, qp) : Str.get(src);
@@ -709,17 +709,17 @@ public abstract class W3CTS {
   /**
    * Evaluates the the input files and assigns the result to the specified
    * variables.
-   * @param nod variables
+   * @param node variables
    * @param var documents
    * @param pth file path
    * @param qp query processor
    * @throws Exception exception
    */
-  private void eval(final Nodes nod, final Nodes var, final String pth,
+  private void eval(final Nodes node, final Nodes var, final String pth,
       final QueryProcessor qp) throws Exception {
 
-    for(int c = 0; c < nod.size(); ++c) {
-      final String file = pth + string(data.atom(nod.list[c])) + IO.XQSUFFIX;
+    for(int c = 0; c < node.size(); ++c) {
+      final String file = pth + string(data.atom(node.list[c])) + IO.XQSUFFIX;
       final String in = read(IO.get(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
       final Value val = xq.iter().finish();
