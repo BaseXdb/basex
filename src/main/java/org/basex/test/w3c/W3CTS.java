@@ -36,10 +36,10 @@ import org.basex.query.func.FunDef;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -337,7 +337,7 @@ public abstract class W3CTS {
       context.query = IO.get(queries + pth + inname + IO.XQSUFFIX);
       final String in = read(context.query);
       String er = null;
-      ItemIter iter = null;
+      ItemCache iter = null;
       boolean doc = true;
 
       final Nodes cont = nodes("*:contextItem", state);
@@ -382,10 +382,10 @@ public abstract class W3CTS {
             DataText.YES : DataText.NO);
         final XMLSerializer xml = new XMLSerializer(ao, sp);
 
-        iter = ItemIter.get(xq.iter());
+        iter = ItemCache.get(xq.iter());
         Item it;
         while((it = iter.next()) != null) {
-          doc &= it.type == Type.DOC;
+          doc &= it.type == NodeType.DOC;
           it.serialize(xml);
         }
         xml.close();
@@ -481,12 +481,12 @@ public abstract class W3CTS {
             iter.reset();
 
             try {
-              final ItemIter ir = toIter(string(res).replaceAll(
+              final ItemCache ir = toIter(string(res).replaceAll(
                   "^<\\?xml.*?\\?>", "").trim(), frag);
               if(FNSimple.deep(null, iter, ir)) break;
 
               ir.reset();
-              final ItemIter ia = toIter(string(actual), frag);
+              final ItemCache ia = toIter(string(actual), frag);
               if(FNSimple.deep(null, ia, ir)) break;
 
               if(debug) {
@@ -592,8 +592,8 @@ public abstract class W3CTS {
    * @param frag fragment flag
    * @return iterator
    */
-  private ItemIter toIter(final String xml, final boolean frag) {
-    final ItemIter it = new ItemIter();
+  private ItemCache toIter(final String xml, final boolean frag) {
+    final ItemCache it = new ItemCache();
     try {
       String str = xml;
       if(frag) str = "<X>" + str + "</X>";

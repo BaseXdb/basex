@@ -15,10 +15,10 @@ import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.func.FNSimple;
+import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -163,7 +163,7 @@ public final class NamespaceTest {
   private static Iter getIter(final String xml) {
     try {
       final Data ex = CreateDB.xml(new IOContent(token(xml)), context);
-      return new NodIter(new Nod[]{new DBNode(ex, 0)}, 1);
+      return new NodeCache(new ANode[]{new DBNode(ex, 0)}, 1);
     } catch(final IOException ex) { fail(ex.getMessage()); }
     return null;
   }
