@@ -18,12 +18,12 @@ public final class FAttr extends FNode {
   private final QNm name;
 
   /**
-   * Constructor.
+   * Constructor, specifying a parent.
    * @param n name
    * @param v value
    * @param p parent
    */
-  public FAttr(final QNm n, final byte[] v, final Nod p) {
+  public FAttr(final QNm n, final byte[] v, final ANode p) {
     super(NodeType.ATT);
     name = n;
     val = v;
@@ -36,7 +36,7 @@ public final class FAttr extends FNode {
    * @param attr DOM node
    * @param p parent reference
    */
-  FAttr(final Attr attr, final Nod p) {
+  FAttr(final Attr attr, final ANode p) {
     this(new QNm(token(attr.getName())), token(attr.getValue()), p);
   }
 

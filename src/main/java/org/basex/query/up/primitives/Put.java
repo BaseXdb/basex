@@ -8,7 +8,7 @@ import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Uri;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -33,7 +33,7 @@ public final class Put extends UpdatePrimitive {
    * @param u location uri
    * @param sp serializer properties
    */
-  public Put(final InputInfo ii, final Nod n, final Uri u,
+  public Put(final InputInfo ii, final ANode n, final Uri u,
       final SerializerProp sp) {
     super(ii, n);
     uri = u;

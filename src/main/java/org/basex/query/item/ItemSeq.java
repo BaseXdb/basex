@@ -7,7 +7,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -43,7 +43,7 @@ public final class ItemSeq extends Seq {
 
   @Override
   public ValueIter iter() {
-    return new ItemIter(val, (int) size);
+    return new ItemCache(val, (int) size);
   }
 
   @Override

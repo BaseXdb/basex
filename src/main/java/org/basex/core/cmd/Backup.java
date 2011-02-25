@@ -65,7 +65,7 @@ public final class Backup extends Command {
       // OutputStream for zipping
       final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(
           new FileOutputStream(file)));
-      zos.putNextEntry(new ZipEntry(in.getName() + "/"));
+      zos.putNextEntry(new ZipEntry(in.getName() + '/'));
       zos.closeEntry();
 
       // Process each file

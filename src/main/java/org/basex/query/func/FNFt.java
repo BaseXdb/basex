@@ -15,7 +15,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.DataBuilder;
 import org.basex.query.util.Err;
@@ -81,7 +81,7 @@ final class FNFt extends Fun {
     return new Iter() {
       final FTPosData ftd = new FTPosData();
       Iter ir;
-      ItemIter ii;
+      ItemCache ii;
 
       @Override
       public Item next() throws QueryException {

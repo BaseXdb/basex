@@ -6,12 +6,12 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.NodeIter;
+import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.AxisIter;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -24,9 +24,9 @@ import org.basex.util.TokenBuilder;
  */
 public final class Constr {
   /** Node array. */
-  public final NodIter children = new NodIter();
+  public final NodeCache children = new NodeCache();
   /** Attribute array. */
-  public final NodIter ats = new NodIter();
+  public final NodeCache atts = new NodeCache();
   /** Error: attribute position. */
   public boolean errAtt;
   /** Error: duplicate attribute. */
@@ -72,7 +72,7 @@ public final class Constr {
     if(it == null) return false;
 
     if(it.node() && it.type != NodeType.TXT) {
-      Nod node = (Nod) it;
+      ANode node = (ANode) it;
 
       if(it.type == NodeType.ATT) {
         // text has already been added - no attribute allowed anymore
@@ -89,18 +89,18 @@ public final class Constr {
 
         // check for duplicate attribute names
         final QNm qname = node.qname();
-        for(int a = 0; a < ats.size(); ++a) {
-          if(qname.eq(ats.get(a).qname())) {
+        for(int a = 0; a < atts.size(); ++a) {
+          if(qname.eq(atts.get(a).qname())) {
             duplAtt = qname.atom();
             return false;
           }
         }
         // add attribute
-        ats.add(node.copy());
+        atts.add(node.copy());
       } else if(it.type == NodeType.DOC) {
-        final NodeIter iter = node.child();
-        Nod ch;
-        while((ch = iter.next()) != null) add(ctx, ch, ii);
+        final AxisIter ai = node.children();
+        ANode ch;
+        while((ch = ai.next()) != null) add(ctx, ch, ii);
       } else {
         // add text node
         if(text.size() != 0) {
@@ -111,14 +111,14 @@ public final class Constr {
         children.add(node);
 
         // add namespaces from ancestors
-        final Atts atts = node.ns();
-        if(atts != null && atts.size != 0) {
+        final Atts ats = node.ns();
+        if(ats != null && ats.size != 0) {
           // [LK][LW] why only if there are already namespaces?
           node = node.parent();
           while(node != null && node.type == NodeType.ELM) {
             final Atts ns = node.ns();
             for(int a = 0; a < ns.size; ++a) {
-              if(!atts.contains(ns.key[a])) atts.add(ns.key[a], ns.val[a]);
+              if(!ats.contains(ns.key[a])) ats.add(ns.key[a], ns.val[a]);
             }
             node = node.parent();
           }

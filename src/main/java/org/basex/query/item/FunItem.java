@@ -4,7 +4,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.expr.Expr;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.util.Var;
@@ -83,7 +83,7 @@ public class FunItem extends Item {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public ItemIter invIter(final QueryContext ctx, final InputInfo ii,
+  public ItemCache invIter(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
     // move variables to stack
@@ -94,7 +94,7 @@ public class FunItem extends Item {
       ctx.vars.add(closure.vars[i].copy());
 
     // evaluate function and reset variable scope
-    final ItemIter ir = ItemIter.get(ctx.iter(expr));
+    final ItemCache ir = ItemCache.get(ctx.iter(expr));
     ctx.vars.reset(s);
     return ir;
   }
@@ -110,7 +110,7 @@ public class FunItem extends Item {
   public Item invItem(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
-    final ItemIter ir = invIter(ctx, ii, args);
+    final ItemCache ir = invIter(ctx, ii, args);
 
     final Item it = ir.next();
     if(it == null || ir.size() == 1) return it;

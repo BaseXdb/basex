@@ -8,7 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.iter.NodeIter;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
@@ -22,14 +22,14 @@ import org.basex.util.ft.Scoring;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class DBNode extends Nod {
+public class DBNode extends ANode {
   /** Data reference. */
   public final Data data;
   /** Pre value. */
   public int pre;
 
   /** Root node (constructor). */
-  private Nod root;
+  private ANode root;
   /** Namespaces. */
   Atts nsp;
 
@@ -59,7 +59,7 @@ public class DBNode extends Nod {
    * @param r parent reference
    * @param t node type
    */
-  protected DBNode(final Data d, final int p, final Nod r, final NodeType t) {
+  protected DBNode(final Data d, final int p, final ANode r, final NodeType t) {
     super(t);
     data = d;
     pre = p;
@@ -156,16 +156,16 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final boolean is(final Nod nod) {
-    if(nod == this) return true;
-    if(!(nod instanceof DBNode)) return false;
-    return data == ((DBNode) nod).data && pre == ((DBNode) nod).pre;
+  public final boolean is(final ANode node) {
+    if(node == this) return true;
+    if(!(node instanceof DBNode)) return false;
+    return data == ((DBNode) node).data && pre == ((DBNode) node).pre;
   }
 
   @Override
-  public final int diff(final Nod nod) {
-    return !(nod instanceof DBNode) || data != ((DBNode) nod).data ?
-      id - nod.id : pre - ((DBNode) nod).pre;
+  public final int diff(final ANode node) {
+    return !(node instanceof DBNode) || data != ((DBNode) node).data ?
+      id - node.id : pre - ((DBNode) node).pre;
   }
 
   @Override
@@ -194,21 +194,21 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final void parent(final Nod p) {
+  public final void parent(final ANode p) {
     root = p;
     par = p;
   }
 
   @Override
-  public final NodeIter anc() {
-    return new NodeIter() {
+  public final AxisIter anc() {
+    return new AxisIter() {
       private final DBNode node = copy();
       int p = pre;
       int k = data.kind(p);
       final double sc = node.score();
 
       @Override
-      public Nod next() {
+      public ANode next() {
         p = data.parent(p, k);
         if(p == -1) return null;
         k = data.kind(p);
@@ -220,15 +220,15 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final NodeIter ancOrSelf() {
-    return new NodeIter() {
+  public final AxisIter ancOrSelf() {
+    return new AxisIter() {
       private final DBNode node = copy();
       int p = pre;
       int k = data.kind(p);
       final double sc = node.score();
 
       @Override
-      public Nod next() {
+      public ANode next() {
         if(p == -1) return null;
         k = data.kind(p);
         node.set(p, k);
@@ -240,14 +240,14 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final NodeIter attr() {
-    return new NodeIter() {
+  public final AxisIter atts() {
+    return new AxisIter() {
       final DBNode node = copy();
       final int s = pre + data.attSize(pre, data.kind(pre));
       int p = pre + 1;
 
       @Override
-      public Nod next() {
+      public ANode next() {
         if(p == s) return null;
         node.set(p++, Data.ATTR);
         return node;
@@ -256,7 +256,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final NodeMore child() {
+  public final NodeMore children() {
     return new NodeMore() {
       int k = data.kind(pre);
       int p = pre + data.attSize(pre, k);
@@ -270,7 +270,7 @@ public class DBNode extends Nod {
       }
 
       @Override
-      public Nod next() {
+      public ANode next() {
         if(!more()) return null;
         k = data.kind(p);
         node.set(p, k);
@@ -282,8 +282,8 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final NodeIter descendant() {
-    return new NodeIter() {
+  public final AxisIter descendant() {
+    return new AxisIter() {
       int k = data.kind(pre);
       int p = pre + data.attSize(pre, k);
       final int s = pre + data.size(pre, k);
@@ -303,14 +303,14 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final NodeIter descOrSelf() {
-    return new NodeIter() {
+  public final AxisIter descOrSelf() {
+    return new AxisIter() {
       final DBNode node = copy();
       final int s = pre + data.size(pre, data.kind(pre));
       int p = pre;
 
       @Override
-      public Nod next() {
+      public ANode next() {
         if(p == s) return null;
         final int k = data.kind(p);
         node.set(p, k);
@@ -321,15 +321,15 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public NodeIter foll() {
-    return new NodeIter() {
+  public AxisIter foll() {
+    return new AxisIter() {
       private final DBNode node = copy();
       final int s = data.meta.size;
       int k = data.kind(pre);
       int p = pre + data.size(pre, k);
 
       @Override
-      public Nod next() {
+      public ANode next() {
         if(p == s) return null;
         k = data.kind(p);
         node.set(p, k);
@@ -340,8 +340,8 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public NodeIter follSibl() {
-    return new NodeIter() {
+  public AxisIter follSibl() {
+    return new AxisIter() {
       private final DBNode node = copy();
       int k = data.kind(pre);
       private final int pp = data.parent(pre, k);
@@ -349,7 +349,7 @@ public class DBNode extends Nod {
       int p = pre + data.size(pre, k);
 
       @Override
-      public Nod next() {
+      public ANode next() {
         if(p == s) return null;
         k = data.kind(p);
         node.set(p, k);
@@ -360,13 +360,13 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final NodeIter par() {
-    return new NodeIter() {
+  public final AxisIter par() {
+    return new AxisIter() {
       /** First call. */
       private boolean more;
 
       @Override
-      public Nod next() {
+      public ANode next() {
         if(more) return null;
         more = true;
         return parent();

@@ -18,7 +18,7 @@ public final class FTxt extends FNode {
    * @param t text value
    * @param p parent
    */
-  public FTxt(final byte[] t, final Nod p) {
+  public FTxt(final byte[] t, final ANode p) {
     super(NodeType.TXT);
     val = t;
     par = p;
@@ -30,7 +30,7 @@ public final class FTxt extends FNode {
    * @param txt DOM node
    * @param parent parent reference
    */
-  FTxt(final Text txt, final Nod parent) {
+  FTxt(final Text txt, final ANode parent) {
     this(Token.token(txt.getData()), parent);
   }
 

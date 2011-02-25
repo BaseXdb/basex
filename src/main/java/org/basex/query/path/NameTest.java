@@ -5,7 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Uri;
@@ -87,9 +87,9 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean eval(final Nod nod) throws QueryException {
+  public boolean eval(final ANode node) {
     // only elements and attributes will yield results
-    if(nod.type != type) return false;
+    if(node.type != type) return false;
 
     switch(test) {
       // wildcard - accept all nodes
@@ -97,14 +97,14 @@ public final class NameTest extends Test {
         return true;
       // namespaces wildcard - check only name
       case NAME:
-        return eq(ln, ln(nod.nname()));
+        return eq(ln, ln(node.nname()));
       // name wildcard - check only namespace
       case NS:
-        return name.uri().eq(nod.qname(tmpq).uri());
+        return name.uri().eq(node.qname(tmpq).uri());
       default:
         // check attributes, or check everything
-        return type == NodeType.ATT && !name.ns() ? eq(ln, nod.nname()) :
-          name.eq(nod.qname(tmpq));
+        return type == NodeType.ATT && !name.ns() ? eq(ln, node.nname()) :
+          name.eq(node.qname(tmpq));
     }
   }
 

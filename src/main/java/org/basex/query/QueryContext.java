@@ -27,7 +27,7 @@ import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.up.Updates;
 import org.basex.query.util.Functions;
 import org.basex.query.util.Namespaces;
@@ -226,7 +226,7 @@ public final class QueryContext extends Progress {
   protected Result eval() throws QueryException {
     // evaluates the query
     final Iter it = iter();
-    final ItemIter ir = new ItemIter();
+    final ItemCache ir = new ItemCache();
     Item i;
 
     // check if all results belong to the database of the input context

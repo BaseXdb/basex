@@ -4,12 +4,12 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
 
 /**
@@ -31,10 +31,10 @@ public final class Root extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = checkCtx(ctx).iter(ctx);
-    final NodIter ni = new NodIter().random();
+    final NodeCache ni = new NodeCache().random();
     Item i;
     while((i = iter.next()) != null) {
-      final Nod n = root(i);
+      final ANode n = root(i);
       if(n == null || n.type != NodeType.DOC) CTXNODE.thrw(input);
       ni.add(n);
     }
@@ -46,11 +46,11 @@ public final class Root extends Simple {
    * @param v input node
    * @return root node
    */
-  public Nod root(final Value v) {
+  public ANode root(final Value v) {
     if(!v.node()) return null;
-    Nod n = (Nod) v;
+    ANode n = (ANode) v;
     while(true) {
-      final Nod p = n.parent();
+      final ANode p = n.parent();
       if(p == null) return n;
       n = p;
     }

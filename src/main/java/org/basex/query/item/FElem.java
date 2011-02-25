@@ -3,7 +3,7 @@ package org.basex.query.item;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import static org.basex.util.Token.*;
@@ -30,38 +30,25 @@ public final class FElem extends FNode {
   /** Tag name. */
   private final QNm name;
   /** Base URI. */
-  private final byte[] base;
+  private byte[] base;
 
   /**
    * Constructor.
    * @param n tag name
-   * @param b base uri
-   */
-  public FElem(final QNm n, final byte[] b) {
-    this(n, new NodIter(), new NodIter(), b, null);
-  }
-
-  /**
-   * Constructor.
-   * @param n tag name
-   * @param ch children
-   * @param at attributes
-   * @param b base uri
-   * @param nsp namespaces
-   */
-  public FElem(final QNm n, final NodIter ch, final NodIter at, final byte[] b,
-      final Atts nsp) {
-    this(n, ch, at, b, nsp, null);
-  }
-
-  /**
-   * Constructor.
-   * @param n tag name
-   * @param ch children
    * @param p parent
    */
-  public FElem(final QNm n, final NodIter ch, final Nod p) {
-    this(n, ch, new NodIter(), EMPTY, new Atts(), p);
+  public FElem(final QNm n, final ANode p) {
+    this(n, null, null, null, null, p);
+  }
+
+  /**
+   * Constructor.
+   * @param n tag name
+   * @param p prefix
+   * @param u namespace uri
+   */
+  public FElem(final QNm n, final byte[] p, final byte[] u) {
+    this(n, null, null, null, new Atts().add(p, u), null);
   }
 
   /**
@@ -73,15 +60,15 @@ public final class FElem extends FNode {
    * @param nsp namespaces
    * @param p parent
    */
-  public FElem(final QNm n, final NodIter ch, final NodIter at, final byte[] b,
-      final Atts nsp, final Nod p) {
+  public FElem(final QNm n, final NodeCache ch, final NodeCache at,
+      final byte[] b, final Atts nsp, final ANode p) {
 
     super(NodeType.ELM);
     name = n;
-    children = ch;
-    atts = at;
-    base = b;
-    ns = nsp;
+    children = ch == null ? new NodeCache() : ch;
+    atts = at == null ? new NodeCache() : at;
+    base = b == null ? EMPTY : b;
+    ns = nsp == null ? new Atts() : nsp;
     par = p;
   }
 
@@ -92,7 +79,7 @@ public final class FElem extends FNode {
    * @param p parent reference
    * @param nss namespaces in scope
    */
-  FElem(final Element elem, final Nod p, final TokenMap nss) {
+  FElem(final Element elem, final ANode p, final TokenMap nss) {
     super(NodeType.ELM);
 
     // general stuff
@@ -106,7 +93,7 @@ public final class FElem extends FNode {
     ns = new Atts();
     final NamedNodeMap at = elem.getAttributes();
     final int as = at.getLength();
-    final Nod[] attArr = new Nod[as];
+    final ANode[] attArr = new ANode[as];
 
     int pos = 0;
     for(int i = 0; i < as; ++i) {
@@ -120,7 +107,7 @@ public final class FElem extends FNode {
         attArr[pos++] = new FAttr(att, this);
       }
     }
-    atts = new NodIter(attArr, pos);
+    atts = new NodeCache(attArr, pos);
 
     // add all new namespaces
     for(int i = 0; i < ns.size; ++i) nss.add(ns.key[i], ns.val[i]);
@@ -143,8 +130,8 @@ public final class FElem extends FNode {
     // children
     final NodeList ch = elem.getChildNodes();
     final int s = ch.getLength();
-    final Nod[] childArr = new Nod[s];
-    children = new NodIter(childArr, childArr.length);
+    final ANode[] childArr = new ANode[s];
+    children = new NodeCache(childArr, childArr.length);
 
     for(int i = 0; i < ch.getLength(); ++i) {
       final Node child = ch.item(i);
@@ -201,6 +188,14 @@ public final class FElem extends FNode {
     return base;
   }
 
+  /**
+   * Sets the element base.
+   * @param b base
+   */
+  public void base(final byte[] b) {
+    base = b;
+  }
+
   @Override
   public QNm qname() {
     return name;
@@ -233,12 +228,12 @@ public final class FElem extends FNode {
 
     // serialize attributes
     for(int n = 0; n < atts.size(); ++n) {
-      final Nod nod = atts.get(n);
-      final QNm atn = nod.qname();
+      final ANode node = atts.get(n);
+      final QNm atn = node.qname();
       if(atn.ns() && !NSGlobal.standard(atn.uri().atom())) {
         ser.namespace(atn.pref(), atn.uri().atom());
       }
-      ser.attribute(atn.atom(), nod.atom());
+      ser.attribute(atn.atom(), node.atom());
     }
 
     // serialize children
@@ -248,8 +243,8 @@ public final class FElem extends FNode {
 
   @Override
   public FElem copy() {
-    final NodIter ch = new NodIter();
-    final NodIter at = new NodIter();
+    final NodeCache ch = new NodeCache();
+    final NodeCache at = new NodeCache();
     final FElem node = new FElem(name, ch, at, base, ns, par);
 
     for(int c = 0; c < children.size(); ++c) {

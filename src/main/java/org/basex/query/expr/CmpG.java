@@ -16,7 +16,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.AxisStep;
@@ -201,7 +201,7 @@ public final class CmpG extends Cmp {
     // evaluate two iterators
     if(!ir2.reset()) {
       // cache items for next comparisons
-      final ItemIter ir = new ItemIter();
+      final ItemCache ir = new ItemCache();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {
           if(eval(it1, it2)) return Bln.TRUE;

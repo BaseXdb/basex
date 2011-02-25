@@ -5,10 +5,11 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
 
 /**
@@ -35,15 +36,15 @@ final class IterPath extends AxisPath {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
-    return new Iter() {
+  public NodeIter iter(final QueryContext ctx) {
+    return new NodeIter() {
       Expr[] expr;
       Iter[] iter;
-      Nod node;
+      ANode node;
       int p;
 
       @Override
-      public Nod next() throws QueryException {
+      public ANode next() throws QueryException {
         if(iter == null) {
           if(expr == null) {
             expr = step;
@@ -75,7 +76,7 @@ final class IterPath extends AxisPath {
             if(iter[p] == null || !iter[p].reset()) iter[p] = ctx.iter(expr[p]);
           } else {
             if(!item.node()) NODESPATH.thrw(input, this, item.type);
-            final Nod n = (Nod) item;
+            final ANode n = (ANode) item;
             if(node == null || !node.is(n)) {
               node = n;
               break;

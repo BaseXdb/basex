@@ -8,14 +8,14 @@ import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeIter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.AxisIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -41,7 +41,7 @@ public final class FNSimple extends Fun {
     Iter ir = ctx.iter(expr[0]);
     switch(def) {
       case ONEORMORE:
-        if(expr[0].type().mayBeZero()) ir = ItemIter.get(ir);
+        if(expr[0].type().mayBeZero()) ir = ItemCache.get(ir);
         if(ir.size() < 1) EXPECTOM.thrw(input);
         return ir;
       case UNORDER:
@@ -183,9 +183,9 @@ public final class FNSimple extends Fun {
       // node types must be equal
       if(it1.type != it2.type) return false;
 
-      Nod s1 = (Nod) it1, s2 = (Nod) it2;
-      final Stack<NodeIter[]> chld = new Stack<NodeIter[]>();
-      NodeIter[] ch = { s1.child(), s2.child() };
+      ANode s1 = (ANode) it1, s2 = (ANode) it2;
+      final Stack<AxisIter[]> chld = new Stack<AxisIter[]>();
+      AxisIter[] ch = { s1.children(), s2.children() };
       chld.push(ch);
       boolean desc = false;
       do {
@@ -221,14 +221,14 @@ public final class FNSimple extends Fun {
           // compare elements
           if(t1 == NodeType.ELM) {
             // compare number of attributes
-            if(s1.attr().finish().size() != s2.attr().finish().size())
+            if(s1.atts().finish().size() != s2.atts().finish().size())
               return false;
 
             // compare attributes names and values
-            Nod a1 = null, a2 = null;
-            final NodeIter att1 = s1.attr();
+            ANode a1 = null, a2 = null;
+            final AxisIter att1 = s1.atts();
             while((a1 = att1.next()) != null) {
-              final NodeIter att2 = s2.attr();
+              final AxisIter att2 = s2.atts();
               boolean f = false;
               while((a2 = att2.next()) != null) {
                 if(a1.qname().eq(a2.qname())) {
@@ -241,7 +241,7 @@ public final class FNSimple extends Fun {
 
             // check children
             chld.push(ch);
-            ch = new NodeIter[] { s1.child(), s2.child() };
+            ch = new AxisIter[] { s1.children(), s2.children() };
           }
         }
 

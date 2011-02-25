@@ -1,8 +1,8 @@
 package org.basex.api.dom;
 
 import org.basex.query.item.FTxt;
-import org.basex.query.item.Nod;
-import org.basex.query.iter.NodIter;
+import org.basex.query.item.ANode;
+import org.basex.query.iter.NodeCache;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.w3c.dom.Attr;
@@ -19,7 +19,7 @@ public final class BXAttr extends BXNode implements Attr {
    * Constructor.
    * @param n node reference
    */
-  public BXAttr(final Nod n) {
+  public BXAttr(final ANode n) {
     super(n);
   }
 
@@ -102,7 +102,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public BXNList getChildNodes() {
-    final NodIter nb = new NodIter();
+    final NodeCache nb = new NodeCache();
     nb.add(new FTxt(node.atom(), node));
     return new BXNList(nb);
   }

@@ -579,7 +579,7 @@ public enum AtomType implements Type {
   },
 
   /** Base64 binary type. */
-  B6B("base64Binary", AAT, XSURI, false, false, false, false, false) {
+  B64("base64Binary", AAT, XSURI, false, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -597,7 +597,7 @@ public enum AtomType implements Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == B6B ? new Hex((B64) it) : str(it) ?
+      return it.type == B64 ? new Hex((B64) it) : str(it) ?
           new Hex(it.atom(ii), ii) : error(it, ii);
     }
     @Override
@@ -740,7 +740,6 @@ public enum AtomType implements Type {
    * @return new item
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
   public Item e(final Object o, final InputInfo ii) throws QueryException {
     Util.notexpected(o);
     return null;

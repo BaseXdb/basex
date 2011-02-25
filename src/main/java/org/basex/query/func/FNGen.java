@@ -19,7 +19,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
@@ -128,7 +128,7 @@ final class FNGen extends Fun {
       public Item next() throws QueryException {
         final Item it = coll.next();
         // all items will be nodes
-        return it == null ? null : Uri.uri(((Nod) it).base());
+        return it == null ? null : Uri.uri(((ANode) it).base());
       }
     };
   }
@@ -149,7 +149,7 @@ final class FNGen extends Fun {
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.valid()) UPFOURI.thrw(input, file);
-    ctx.updates.add(new Put(input, (Nod) it, u, ctx.serProp()), ctx);
+    ctx.updates.add(new Put(input, (ANode) it, u, ctx.serProp()), ctx);
 
     return null;
   }
@@ -160,7 +160,7 @@ final class FNGen extends Fun {
    * @return resulting node
    * @throws QueryException query exception
    */
-  private Nod doc(final QueryContext ctx) throws QueryException {
+  private ANode doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, input);
     if(it == null) return null;
 
@@ -200,8 +200,7 @@ final class FNGen extends Fun {
     try {
       return Str.get(TextInput.content(io, enc).finish());
     } catch(final IOException ex) {
-      UNDEF.thrw(input, ex);
-      return null;
+      throw UNDEF.thrw(input, ex);
     }
   }
 
@@ -258,7 +257,7 @@ final class FNGen extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Nod parseXml(final QueryContext ctx) throws QueryException {
+  private ANode parseXml(final QueryContext ctx) throws QueryException {
     final byte[] cont = checkEStr(expr[0], ctx);
     Uri base = ctx.baseURI;
     if(expr.length == 2) {
@@ -272,8 +271,7 @@ final class FNGen extends Fun {
       final Parser p = Parser.fileParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
     } catch(final IOException ex) {
-      DOCWF.thrw(input, ex.toString());
-      return null;
+      throw DOCWF.thrw(input, ex.toString());
     }
   }
 
@@ -284,12 +282,12 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final Nod nod = checkNode(checkItem(expr[0], ctx));
+    final ANode node = checkNode(checkItem(expr[0], ctx));
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
       final XMLSerializer xml = new XMLSerializer(ao, serialPar(this, 1, ctx));
-      nod.serialize(xml);
+      node.serialize(xml);
       xml.close();
     } catch(final IOException ex) {
       UNDEF.thrw(input, ex.toString());
@@ -315,15 +313,14 @@ final class FNGen extends Fun {
     final Iter ir = fun.expr[arg].iter(ctx);
     Item it;
     while((it = ir.next()) != null) {
-      final Nod n = fun.checkNode(it);
+      final ANode n = fun.checkNode(it);
       if(tb.size() != 0) tb.add(',');
       tb.add(n.nname()).add('=').add(n.atom());
     }
     try {
       return new SerializerProp(tb.toString());
     } catch(final IOException ex) {
-      UNDEF.thrw(fun.input, ex.toString());
-      return null;
+      throw UNDEF.thrw(fun.input, ex.toString());
     }
   }
 

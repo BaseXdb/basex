@@ -20,7 +20,8 @@ import org.basex.query.item.Value;
 import static org.basex.query.item.SeqType.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import org.basex.query.iter.ItemIter;
+
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -183,7 +184,7 @@ final class FNFunc extends Fun {
     final FunItem f = withArity(0, 2, ctx);
     final Iter xs = expr[2].iter(ctx);
 
-    ItemIter res = ItemIter.get(expr[1].iter(ctx));
+    ItemCache res = ItemCache.get(expr[1].iter(ctx));
     for(Item x; (x = xs.next()) != null;)
       res = f.invIter(ctx, input, Seq.get(res.item, res.item.length), x);
 
@@ -198,9 +199,9 @@ final class FNFunc extends Fun {
    */
   private Iter foldRight(final QueryContext ctx) throws QueryException {
     final FunItem f = withArity(0, 2, ctx);
-    ItemIter res = ItemIter.get(expr[1].iter(ctx));
+    ItemCache res = ItemCache.get(expr[1].iter(ctx));
 
-    final Item[] xs = ItemIter.get(expr[2].iter(ctx)).item;
+    final Item[] xs = ItemCache.get(expr[2].iter(ctx)).item;
     for(int i = xs.length; i-- > 0;)
       res = f.invIter(ctx, input, xs[i], Seq.get(res.item, res.item.length));
 

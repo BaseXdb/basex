@@ -9,7 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import static org.basex.query.util.Err.*;
@@ -117,10 +117,10 @@ public final class CElem extends CFrag {
     if(c.errAtt) NOATTALL.thrw(input);
     if(c.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(input, c.duplAtt);
 
-    final FElem node = new FElem(tname, c.children, c.ats, c.base, nsc);
+    final FElem node = new FElem(tname, c.children, c.atts, c.base, nsc, null);
     for(int n = 0; n < c.children.size(); ++n) c.children.get(n).parent(node);
-    for(int n = 0; n < c.ats.size(); ++n) {
-      final Nod att = c.ats.get(n);
+    for(int n = 0; n < c.atts.size(); ++n) {
+      final ANode att = c.atts.get(n);
       final QNm name = att.qname();
       if(name.ns() && name.hasUri()) {
         final byte[] apre = name.pref(), auri = name.uri().atom();

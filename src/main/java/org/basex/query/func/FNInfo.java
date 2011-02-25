@@ -10,7 +10,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -56,7 +56,7 @@ final class FNInfo extends Fun {
         ctx.evalInfo(checkEStr(expr[1], ctx), val.toString());
         return val.iter();
       case ENVS:
-        final ItemIter ir = new ItemIter();
+        final ItemCache ir = new ItemCache();
         for(final Object k : System.getenv().keySet().toArray()) {
           ir.add(Str.get(k));
         }

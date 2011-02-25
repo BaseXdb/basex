@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.util.Token;
 import org.w3c.dom.Text;
 
@@ -15,7 +15,7 @@ public class BXText extends BXChar implements Text {
    * Constructor.
    * @param n node reference
    */
-  public BXText(final Nod n) {
+  public BXText(final ANode n) {
     super(n);
   }
 

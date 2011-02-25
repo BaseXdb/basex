@@ -25,7 +25,7 @@ public final class FComm extends FNode {
    * @param t text value
    * @param p parent
    */
-  public FComm(final byte[] t, final Nod p) {
+  public FComm(final byte[] t, final ANode p) {
     super(NodeType.COM);
     val = t;
     par = p;
@@ -37,7 +37,7 @@ public final class FComm extends FNode {
    * @param com DOM node
    * @param parent parent reference
    */
-  FComm(final Comment com, final Nod parent) {
+  FComm(final Comment com, final ANode parent) {
     this(Token.token(com.getData()), parent);
   }
 

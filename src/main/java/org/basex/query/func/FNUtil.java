@@ -20,7 +20,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.Array;
 import org.basex.util.ByteList;
@@ -110,7 +110,7 @@ final class FNUtil extends Fun {
     final QueryContext qt = new QueryContext(ctx.context);
     qt.parse(string(qu));
     qt.compile();
-    return ItemIter.get(qt.iter());
+    return ItemCache.get(qt.iter());
   }
 
   /**
@@ -121,7 +121,7 @@ final class FNUtil extends Fun {
    */
   private Iter bytes(final QueryContext ctx) throws QueryException {
     final byte[] bin = ((B64) checkType(expr[0].item(ctx, input),
-        AtomType.B6B)).toJava();
+        AtomType.B64)).toJava();
 
     return new ValueIter() {
       int pos;
@@ -155,7 +155,7 @@ final class FNUtil extends Fun {
 
     // create (and, optionally, cache) result value
     Iter ir = expr[0].iter(ctx);
-    final Value v = (c ? ItemIter.get(ir) : ir).finish();
+    final Value v = (c ? ItemCache.get(ir) : ir).finish();
 
     // measure resulting memory consumption
     Performance.gc(2);
@@ -186,7 +186,7 @@ final class FNUtil extends Fun {
     // iterate (and, optionally, cache) results
     final Iter ir = expr[0].iter(ctx);
     if(c) {
-      ItemIter.get(ir);
+      ItemCache.get(ir);
     } else {
       while(ir.next() != null);
     }

@@ -10,7 +10,6 @@ import java.io.IOException;
  * @author Josua Krause
  * @author Leo Woerteler
  */
-@SuppressWarnings("unused")
 public final class SerializerAdapter extends Serializer {
 
   @Override

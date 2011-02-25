@@ -126,6 +126,15 @@ public enum Err {
   /** FOFL0008: Evaluation exception. */
   CANNOTLIST(FOFL, 8, "Files of '%' cannot be returned."),
 
+  /** FOZP0001: Evaluation exception. */
+  ZIPFAIL(FOZP, 1, "Operation failed: %."),
+  /** FOZP0002: Evaluation exception. */
+  ZIPNOTFOUND(FOZP, 2, "Path '%' not found."),
+  /** FOZP0003: Evaluation exception. */
+  ZIPINVALID(FOZP, 3, "% element: % attribute expected."),
+  /** FOZP0003: Evaluation exception. */
+  ZIPUNKNOWN(FOZP, 3, "ZIP Definition: unknown element %."),
+
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL: \"%\"."),
   /** FOHC0002: Evaluation exception. */
@@ -651,9 +660,10 @@ public enum Err {
    * Throws an exception.
    * @param ii input info
    * @param ext extended info
+   * @return query exception (dummy)
    * @throws QueryException query exception
    */
-  public void thrw(final InputInfo ii, final Object... ext)
+  public QueryException thrw(final InputInfo ii, final Object... ext)
       throws QueryException {
     throw new QueryException(ii, this, ext);
   }
@@ -688,6 +698,7 @@ public enum Err {
     /** FORX Error type. */ FORX,
     /** FOTY Error type. */ FOTY,
     /** FOUP Error type. */ FOUP,
+    /** FOZP Error type. */ FOZP,
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
     /** XPDY Error type. */ XPDY,

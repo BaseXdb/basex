@@ -46,7 +46,7 @@ import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.util.Array;
 import org.basex.util.StringList;
@@ -379,7 +379,7 @@ public enum GUICommands implements GUICommand {
       if(!insert.ok()) return;
 
       final StringList sl = insert.result;
-      final NodeType type = Nod.type(insert.kind);
+      final NodeType type = ANode.type(insert.kind);
       String item = Token.string(type.nam) + " { " + quote(sl.get(0)) + " }";
 
       if(type == NodeType.ATT || type == NodeType.PI) {

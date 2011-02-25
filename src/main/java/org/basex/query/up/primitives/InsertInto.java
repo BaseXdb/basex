@@ -2,8 +2,8 @@ package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
-import org.basex.query.iter.NodIter;
+import org.basex.query.item.ANode;
+import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
 
 /**
@@ -25,7 +25,7 @@ public final class InsertInto extends NodeCopy {
    * @param copy copy of nodes to be inserted
    * @param l as last flag
    */
-  public InsertInto(final InputInfo ii, final Nod n, final NodIter copy,
+  public InsertInto(final InputInfo ii, final ANode n, final NodeCache copy,
       final boolean l) {
     super(ii, n, copy);
     last = l;
@@ -35,7 +35,7 @@ public final class InsertInto extends NodeCopy {
   public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
-    final int pre = n.pre + d.size(n.pre, Nod.kind(node.ndType())) + add;
+    final int pre = n.pre + d.size(n.pre, ANode.kind(node.ndType())) + add;
     d.insert(pre, n.pre, md);
     if(!mergeTexts(d, pre - 1, pre)) {
       final int s = md.meta.size;

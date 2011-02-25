@@ -29,7 +29,7 @@ public final class FPI extends FNode {
    * @param v value
    * @param p parent
    */
-  public FPI(final QNm n, final byte[] v, final Nod p) {
+  public FPI(final QNm n, final byte[] v, final ANode p) {
     super(NodeType.PI);
     name = n;
     val = v;
@@ -42,7 +42,7 @@ public final class FPI extends FNode {
    * @param pi DOM node
    * @param parent parent reference
    */
-  FPI(final ProcessingInstruction pi, final Nod parent) {
+  FPI(final ProcessingInstruction pi, final ANode parent) {
     this(new QNm(token(pi.getTarget())), token(pi.getData()), parent);
   }
 

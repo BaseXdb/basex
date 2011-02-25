@@ -7,10 +7,10 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.up.primitives.InsertAfter;
 import org.basex.query.up.primitives.InsertAttribute;
 import org.basex.query.up.primitives.InsertBefore;
@@ -59,8 +59,8 @@ public final class Insert extends Update {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Constr c = new Constr(ii, ctx, expr[1]);
-    final NodIter cList = c.children;
-    final NodIter aList = c.ats;
+    final NodeCache cList = c.children;
+    final NodeCache aList = c.atts;
     if(c.errAtt) UPNOATTRPER.thrw(input);
     if(c.duplAtt != null) UPATTDUPL.thrw(input, c.duplAtt);
 
@@ -68,11 +68,11 @@ public final class Insert extends Update {
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
     if(i == null) UPSEQEMP.thrw(input, Util.name(this));
-    if(!(i instanceof Nod) || t.next() != null)
+    if(!(i instanceof ANode) || t.next() != null)
       (before || after ? UPTRGTYP2 : UPTRGTYP).thrw(input);
 
-    final Nod n = (Nod) i;
-    final Nod par = n.parent();
+    final ANode n = (ANode) i;
+    final ANode par = n.parent();
     if(before || after) {
       if(n.type == NodeType.ATT || n.type == NodeType.DOC)
         UPTRGTYP2.thrw(input);
@@ -84,7 +84,7 @@ public final class Insert extends Update {
 
     UpdatePrimitive up = null;
     if(aList.size() > 0) {
-      final Nod targ = before || after ? par : n;
+      final ANode targ = before || after ? par : n;
       if(targ.type != NodeType.ELM)
         (before || after ? UPATTELM : UPATTELM2).thrw(input);
 

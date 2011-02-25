@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.w3c.dom.CharacterData;
@@ -17,7 +17,7 @@ abstract class BXChar extends BXNode implements CharacterData {
    * Constructor.
    * @param n node reference
    */
-  protected BXChar(final Nod n) {
+  protected BXChar(final ANode n) {
     super(n);
   }
 

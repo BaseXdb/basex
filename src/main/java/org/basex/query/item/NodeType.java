@@ -42,7 +42,7 @@ public enum NodeType implements Type {
   /** Text type. */
   TXT("text", NOD) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXText ? ((BXText) o).getNod() :
         new FTxt((Text) o, null);
     }
@@ -51,7 +51,7 @@ public enum NodeType implements Type {
   /** PI type. */
   PI("processing-instruction", NOD) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXPI ? ((BXPI) o).getNod() :
         new FPI((ProcessingInstruction) o, null);
     }
@@ -60,7 +60,7 @@ public enum NodeType implements Type {
   /** Element type. */
   ELM("element", NOD) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXElem ? ((BXElem) o).getNod() :
         new FElem((Element) o, null, new TokenMap());
     }
@@ -69,7 +69,7 @@ public enum NodeType implements Type {
   /** Document type. */
   DOC("document-node", NOD) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) throws QueryException {
+    public ANode e(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXDoc) return ((BXDoc) o).getNod();
 
       if(o instanceof Document) {
@@ -93,7 +93,7 @@ public enum NodeType implements Type {
   /** Attribute type. */
   ATT("attribute", NOD) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXAttr ? ((BXAttr) o).getNod() :
         new FAttr((Attr) o, null);
     }
@@ -102,7 +102,7 @@ public enum NodeType implements Type {
   /** Comment type. */
   COM("comment", NOD) {
     @Override
-    public Nod e(final Object o, final InputInfo ii) {
+    public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
         new FComm((Comment) o, null);
     }
@@ -182,7 +182,6 @@ public enum NodeType implements Type {
    * @return new item
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
   public Item e(final Object o, final InputInfo ii) throws QueryException {
     Util.notexpected(o);
     return null;

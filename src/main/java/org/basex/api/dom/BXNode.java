@@ -3,11 +3,10 @@ package org.basex.api.dom;
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.io.IO;
-import org.basex.query.QueryException;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.NodeIter;
+import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.AxisIter;
 import org.basex.util.Util;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -33,13 +32,13 @@ public abstract class BXNode implements Node {
     "#document-fragment"
   };
   /** Data reference. */
-  protected final Nod node;
+  protected final ANode node;
 
   /**
    * Constructor.
    * @param n node reference
    */
-  protected BXNode(final Nod n) {
+  protected BXNode(final ANode n) {
     node = n;
   }
 
@@ -58,7 +57,7 @@ public abstract class BXNode implements Node {
    * @return node kind
    */
   protected int kind() {
-    return Nod.kind(node.ndType());
+    return ANode.kind(node.ndType());
   }
 
   @Override
@@ -94,29 +93,20 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNList getChildNodes() {
-    return new BXNList(finish(node.child()));
+    return new BXNList(finish(node.children()));
   }
 
   @Override
   public BXNode getFirstChild() {
-    try {
-      return finish(node.child().next());
-    } catch(final QueryException ex) {
-      Util.notexpected();
-      return null;
-    }
+    return finish(node.children().next());
   }
 
   @Override
   public final BXNode getLastChild() {
-    Nod n = null;
-    try {
-      final NodeIter it = node.child();
-      Nod t = null;
-      while((t = it.next()) != null) n = t;
-    } catch(final QueryException ex) {
-      Util.notexpected();
-    }
+    ANode n = null;
+    final AxisIter ai = node.children();
+    ANode t = null;
+    while((t = ai.next()) != null) n = t;
     return finish(n);
   }
 
@@ -127,22 +117,12 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getNextSibling() {
-    try {
-      return finish(node.follSibl().next());
-    } catch(final QueryException ex) {
-      Util.notexpected();
-      return null;
-    }
+    return finish(node.follSibl().next());
   }
 
   @Override
   public BXNode getPreviousSibling() {
-    try {
-      return finish(node.precSibl().next());
-    } catch(final QueryException ex) {
-      Util.notexpected();
-      return null;
-    }
+    return finish(node.precSibl().next());
   }
 
   @Override
@@ -155,7 +135,7 @@ public abstract class BXNode implements Node {
    * @param n node instance
    * @return resulting node
    */
-  private BXNode finish(final Nod n) {
+  private BXNode finish(final ANode n) {
     return n != null ? n.toJava() : null;
   }
 
@@ -171,8 +151,8 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXDoc getOwnerDocument() {
-    Nod n = node;
-    Nod p;
+    ANode n = node;
+    ANode p;
     while((p = n.parent()) != null) n = p;
     return n.type == NodeType.DOC ? (BXDoc) n.toJava() : null;
   }
@@ -293,42 +273,34 @@ public abstract class BXNode implements Node {
    * @return nodes
    */
   protected final BXNList getElements(final String tag) {
-    final NodIter nb = new NodIter();
-    final NodeIter iter = node.descendant();
+    final NodeCache nb = new NodeCache();
+    final AxisIter ai = node.descendant();
     final byte[] nm = tag.equals("*") ? null : token(tag);
-    try {
-      Nod n = null;
-      while((n = iter.next()) != null) {
-        if(n.type == NodeType.ELM && (nm == null || eq(nm, n.nname())))
-          nb.add(n.copy());
-      }
-    } catch(final QueryException ex) {
-      Util.notexpected();
+    ANode n = null;
+    while((n = ai.next()) != null) {
+      if(n.type == NodeType.ELM && (nm == null || eq(nm, n.nname())))
+        nb.add(n.copy());
     }
     return new BXNList(nb);
   }
 
   /**
    * Returns a node builder with the specified nodes.
-   * @param it node iterator
+   * @param ai node iterator
    * @return node builder
    */
-  protected static final NodIter finish(final NodeIter it) {
-    final NodIter nb = new NodIter();
-    try {
-      Nod n = null;
-      while((n = it.next()) != null) nb.add(n.copy());
-    } catch(final QueryException ex) {
-      Util.notexpected();
-    }
-    return nb;
+  protected static final NodeCache finish(final AxisIter ai) {
+    final NodeCache nc = new NodeCache();
+    ANode n = null;
+    while((n = ai.next()) != null) nc.add(n.copy());
+    return nc;
   }
 
   /**
    * Returns the XQuery node.
    * @return xquery node
    */
-  public final Nod getNod() {
+  public final ANode getNod() {
     return node;
   }
 

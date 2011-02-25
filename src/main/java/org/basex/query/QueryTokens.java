@@ -345,7 +345,7 @@ public interface QueryTokens {
   /** Parser token. */
   String CDATA = "<![CDATA[";
   /** Parser token. */
-  String COL2 = "::";
+  String COLS = "::";
   /** Parser token. */
   String COMMA = ",";
   /** Parser token. */
@@ -399,6 +399,14 @@ public interface QueryTokens {
   byte[] OUTPUTURI = token(W3URI + "/2009/xquery-serialization");
   /** Error URI. */
   byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
+
+  /** EXPath URI. */
+  String EXPATH = "http://expath.org/ns";
+  /** ZIP URI.*/
+  byte[] ZIPURI = token(EXPATH + "/zip");
+  /** HTTP Client URI. */
+  byte[] HTTPURI = token(EXPATH + "/http");
+
   /** Util module URI. */
   byte[] UTILURI = token(Text.URL + "/util");
   /** DB module URI. */
@@ -407,8 +415,6 @@ public interface QueryTokens {
   byte[] FTURI = token(Text.URL + "/ft");
   /** File module URI. */
   byte[] FILEURI = token(Text.URL + "/file");
-  /** HTTP Client URI. */
-  byte[] HTTPURI = token(Text.URL + "/http");
   /** Sentiment URI.*/
   byte[] SENTURI = token(Text.URL + "/sent");
 
@@ -458,6 +464,8 @@ public interface QueryTokens {
   byte[] SENT = token("sent");
   /** Util token. */
   byte[] UTIL = token("util");
+  /** ZIP token. */
+  byte[] ZIP = token("zip");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");

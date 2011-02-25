@@ -2,7 +2,7 @@ package org.basex.query.up;
 
 import static org.basex.util.Token.*;
 import java.util.Arrays;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
@@ -37,11 +37,11 @@ public final class NamePool {
 
   /**
    * Removes an entry from the pool.
-   * @param nod node
+   * @param node node
    */
-  public void remove(final Nod nod) {
-    if(nod.type != NodeType.ATT && nod.type != NodeType.ELM) return;
-    final int i = index(nod.qname(), nod.type == NodeType.ATT);
+  public void remove(final ANode node) {
+    if(node.type != NodeType.ATT && node.type != NodeType.ELM) return;
+    final int i = index(node.qname(), node.type == NodeType.ATT);
     occ[i]--;
   }
 

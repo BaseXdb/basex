@@ -2,8 +2,8 @@ package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
-import org.basex.query.iter.NodIter;
+import org.basex.query.item.ANode;
+import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
 
 /**
@@ -19,7 +19,8 @@ public final class InsertIntoFirst extends NodeCopy {
    * @param n target node
    * @param copy copy of nodes to be inserted
    */
-  public InsertIntoFirst(final InputInfo ii, final Nod n, final NodIter copy) {
+  public InsertIntoFirst(final InputInfo ii, final ANode n,
+      final NodeCache copy) {
     super(ii, n, copy);
   }
 
@@ -30,7 +31,7 @@ public final class InsertIntoFirst extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int pre = n.pre + add;
     final Data d = n.data;
-    d.insert(pre + d.attSize(pre, Nod.kind(node.ndType())), pre, md);
+    d.insert(pre + d.attSize(pre, ANode.kind(node.ndType())), pre, md);
   }
 
   @Override

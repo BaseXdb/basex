@@ -14,7 +14,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
@@ -228,9 +228,9 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final Nod checkNode(final Item it) throws QueryException {
+  public final ANode checkNode(final Item it) throws QueryException {
     if(!it.node()) Err.type(this, NodeType.NOD, it);
-    return (Nod) it;
+    return (ANode) it;
   }
 
   /**

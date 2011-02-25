@@ -4,9 +4,9 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
 
@@ -33,18 +33,18 @@ public final class InterSect extends Set {
   }
 
   @Override
-  protected NodIter eval(final Iter[] iter) throws QueryException {
-    NodIter ni = new NodIter();
+  protected NodeCache eval(final Iter[] iter) throws QueryException {
+    NodeCache ni = new NodeCache();
 
     Item it;
     while((it = iter[0].next()) != null) ni.add(checkNode(it));
     final boolean db = ni.dbnodes();
 
     for(int e = 1; e != expr.length && ni.size() != 0; ++e) {
-      final NodIter nt = new NodIter().random();
+      final NodeCache nt = new NodeCache().random();
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
-        final Nod n = checkNode(it);
+        final ANode n = checkNode(it);
         final int i = ni.indexOf(n, db);
         if(i != -1) nt.add(n);
       }
@@ -57,8 +57,8 @@ public final class InterSect extends Set {
   protected NodeIter iter(final Iter[] iter) {
     return new SetIter(iter) {
       @Override
-      public Nod next() throws QueryException {
-        if(item == null) item = new Nod[iter.length];
+      public ANode next() throws QueryException {
+        if(item == null) item = new ANode[iter.length];
 
         for(int i = 0; i != iter.length; ++i) if(!next(i)) return null;
 

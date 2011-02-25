@@ -5,10 +5,10 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
@@ -47,8 +47,8 @@ public final class Union extends Set {
   }
 
   @Override
-  protected NodIter eval(final Iter[] iter) throws QueryException {
-    final NodIter ni = new NodIter().random();
+  protected NodeCache eval(final Iter[] iter) throws QueryException {
+    final NodeCache ni = new NodeCache().random();
     for(final Iter ir : iter) {
       Item it;
       while((it = ir.next()) != null) ni.add(checkNode(it));
@@ -60,9 +60,9 @@ public final class Union extends Set {
   protected NodeIter iter(final Iter[] iter) {
     return new SetIter(iter) {
       @Override
-      public Nod next() throws QueryException {
+      public ANode next() throws QueryException {
         if(item == null) {
-          item = new Nod[iter.length];
+          item = new ANode[iter.length];
           for(int i = 0; i != iter.length; ++i) next(i);
         }
 
@@ -78,7 +78,7 @@ public final class Union extends Set {
         }
         if(m == -1) return null;
 
-        final Nod it = item[m];
+        final ANode it = item[m];
         next(m);
         return it;
       }

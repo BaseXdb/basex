@@ -20,13 +20,13 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.Test.Name;
 import static org.basex.query.util.Err.*;
@@ -48,7 +48,7 @@ public class AxisPath extends Path {
   /** Flag for result caching. */
   private boolean cache;
   /** Cached result. */
-  private NodIter citer;
+  private NodeCache citer;
   /** Last visited item. */
   private Value lvalue;
 
@@ -395,10 +395,9 @@ public class AxisPath extends Path {
     Value r = root != null ? root.value(ctx) : c;
 
     if(!cache || citer == null || lvalue.type != NodeType.DOC ||
-        r.type != NodeType.DOC || !((Nod) lvalue).is((Nod) r)) {
-
+        r.type != NodeType.DOC || !((ANode) lvalue).is((ANode) r)) {
       lvalue = r;
-      citer = new NodIter().random();
+      citer = new NodeCache().random();
       if(r != null) {
         final Iter ir = ctx.iter(r);
         while((r = ir.next()) != null) {
@@ -423,24 +422,24 @@ public class AxisPath extends Path {
   /**
    * Recursive step iterator.
    * @param l current step
-   * @param ni node builder
+   * @param nc node builder
    * @param ctx query context
    * @throws QueryException query exception
    */
-  private void iter(final int l, final NodIter ni, final QueryContext ctx)
+  private void iter(final int l, final NodeCache nc, final QueryContext ctx)
       throws QueryException {
 
-    // cast is safe (steps will always return a node iterator)
-    final NodeIter ir = (NodeIter) ctx.iter(step[l]);
+    // cast is safe (steps will always return a {@link NodIter} instance
+    final NodeIter ni = (NodeIter) ctx.iter(step[l]);
     final boolean more = l + 1 != step.length;
-    Nod nod;
-    while((nod = ir.next()) != null) {
+    ANode node;
+    while((node = ni.next()) != null) {
       if(more) {
-        ctx.value = nod;
-        iter(l + 1, ni, ctx);
+        ctx.value = node;
+        iter(l + 1, nc, ctx);
       } else {
         ctx.checkStop();
-        ni.add(nod);
+        nc.add(node);
       }
     }
   }

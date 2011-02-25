@@ -5,7 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
@@ -74,7 +74,7 @@ public final class SeqType {
   /** Zero or one booleans. */
   public static final SeqType BLN_ZO = new SeqType(AtomType.BLN, Occ.ZO);
   /** Single Base64Binary. */
-  public static final SeqType B64 = new SeqType(AtomType.B6B);
+  public static final SeqType B64 = new SeqType(AtomType.B64);
   /** Double number. */
   public static final SeqType DBL = new SeqType(AtomType.DBL);
   /** Float number. */
@@ -248,7 +248,7 @@ public final class SeqType {
     Item n = iter.next();
     if(zeroOrOne() && n != null) Err.cast(ii, type, val);
 
-    final ItemIter ir = new ItemIter();
+    final ItemCache ir = new ItemCache();
     ir.add(it);
     while(n != null) {
       ir.add(check(instance(n, ii) ? n : type.e(n, ctx, ii), ii));
@@ -353,7 +353,7 @@ public final class SeqType {
    * @return same item
    */
   private boolean checkExtension(final Item it) {
-    return ext == null || ext.eq(((Nod) it).qname());
+    return ext == null || ext.eq(((ANode) it).qname());
   }
 
   /**

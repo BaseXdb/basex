@@ -5,13 +5,12 @@ import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.MemData;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
-import org.basex.query.iter.ItemIter;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.NodeIter;
+import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.AxisIter;
 import org.basex.util.Atts;
 import org.basex.util.TokenList;
 
@@ -68,20 +67,19 @@ public final class DataBuilder {
 
   /**
    * Marks the full-text terms in the specified node and returns the new nodes.
-   * @param nod input node
+   * @param node input node
    * @param tag tag name
    * @param len length of extract
    * @param ctx query context
    * @return resulting value
-   * @throws QueryException query exception
    */
-  public static ItemIter mark(final Nod nod, final byte[] tag,
-      final int len, final QueryContext ctx) throws QueryException {
+  public static ItemCache mark(final ANode node, final byte[] tag,
+      final int len, final QueryContext ctx) {
 
     // copy node to main memory data instance
     final MemData md = new MemData(ctx.context.prop);
-    new DataBuilder(md).ftpos(tag, ctx.ftpos, len).build(nod);
-    final ItemIter ir = new ItemIter();
+    new DataBuilder(md).ftpos(tag, ctx.ftpos, len).build(node);
+    final ItemCache ir = new ItemCache();
     for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) {
       ir.add(new DBNode(md, p));
     }
@@ -91,20 +89,18 @@ public final class DataBuilder {
   /**
    * Fills the data instance with the specified node.
    * @param n node
-   * @throws QueryException query exception
    */
-  public void build(final Nod n) throws QueryException {
-    build(new NodIter(new Nod[] { n }, 1));
+  public void build(final ANode n) {
+    build(new NodeCache(new ANode[] { n }, 1));
   }
 
   /**
    * Fills the data instance with the specified nodes.
    * @param ni node iterator
-   * @throws QueryException query exception
    */
-  public void build(final NodIter ni) throws QueryException {
+  public void build(final NodeCache ni) {
     int pre = 1;
-    Nod n;
+    ANode n;
     while((n = ni.next()) != null) pre = addNode(n, pre, 0, null);
   }
 
@@ -116,10 +112,9 @@ public final class DataBuilder {
    * @param par node parent
    * @return pre value of next node
    * @param ndPar parent of node to be added
-   * @throws QueryException query exception
    */
-  private int addNode(final Nod nd, final int pre,
-      final int par, final Nod ndPar) throws QueryException {
+  private int addNode(final ANode nd, final int pre, final int par,
+      final ANode ndPar) {
 
     switch(nd.ndType()) {
       case DOC: return addDoc(nd, pre);
@@ -137,16 +132,15 @@ public final class DataBuilder {
    * @param nd node to be added
    * @param pre pre reference
    * @return number of added nodes
-   * @throws QueryException query exception
    */
-  private int addDoc(final Nod nd, final int pre) throws QueryException {
+  private int addDoc(final ANode nd, final int pre) {
     final int ms = data.meta.size;
     data.doc(ms, size(nd, false), nd.base());
     data.insert(ms);
     int p = pre + 1;
-    final NodeIter ir = nd.child();
-    Nod ch;
-    while((ch = ir.next()) != null) p = addNode(ch, p, pre, null);
+    final AxisIter ai = nd.children();
+    ANode ch;
+    while((ch = ai.next()) != null) p = addNode(ch, p, pre, null);
     return p;
   }
 
@@ -157,7 +151,7 @@ public final class DataBuilder {
    * @param par parent reference
    * @return number of added nodes
    */
-  private int addAttr(final Nod nd, final int pre, final int par) {
+  private int addAttr(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
     final QNm q = nd.qname();
     final byte[] uri = q.uri().atom();
@@ -182,8 +176,8 @@ public final class DataBuilder {
    * @param ndPar parent node
    * @return number of added nodes
    */
-  private int addText(final Nod nd, final int pre, final int par,
-      final Nod ndPar) {
+  private int addText(final ANode nd, final int pre, final int par,
+      final ANode ndPar) {
 
     // check full-text mode
     final int dist = pre - par;
@@ -227,7 +221,7 @@ public final class DataBuilder {
    * @param par parent reference
    * @return number of added nodes
    */
-  private int addPI(final Nod nd, final int pre, final int par) {
+  private int addPI(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
     final byte[] v = trim(concat(nd.nname(), SPACE, nd.atom()));
     data.text(ms, pre - par, v, Data.PI);
@@ -242,7 +236,7 @@ public final class DataBuilder {
    * @param par parent reference
    * @return number of added nodes
    */
-  private int addComm(final Nod nd, final int pre, final int par) {
+  private int addComm(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
     data.text(ms, pre - par, nd.atom(), Data.COMM);
     data.insert(ms);
@@ -256,10 +250,9 @@ public final class DataBuilder {
    * @param par parent reference
    * @param ndPar parent node
    * @return number of added nodes
-   * @throws QueryException query exception
    */
-  private int addElem(final Nod nd, final int pre, final int par,
-      final Nod ndPar) throws QueryException {
+  private int addElem(final ANode nd, final int pre, final int par,
+      final ANode ndPar) {
 
     final int ms = data.meta.size;
     final QNm q = nd.qname();
@@ -310,15 +303,15 @@ public final class DataBuilder {
 
     final int pp = pre;
     int p = pre + 1;
-    Nod ch;
+    ANode ch;
 
     // add attributes
-    NodeIter ir = nd.attr();
-    while((ch = ir.next()) != null) p = addNode(ch, p, pre, nd);
+    AxisIter ai = nd.atts();
+    while((ch = ai.next()) != null) p = addNode(ch, p, pre, nd);
 
     // add children
-    ir = nd.child();
-    while((ch = ir.next()) != null) p = addNode(ch, p, pre, nd);
+    ai = nd.children();
+    while((ch = ai.next()) != null) p = addNode(ch, p, pre, nd);
     data.ns.close(ms);
 
     // update size if additional nodes have been added by the descendants
@@ -331,22 +324,21 @@ public final class DataBuilder {
    * @param n fragment node
    * @param a count attribute size of node
    * @return number of descendants + 1 or attribute size + 1
-   * @throws QueryException query exception
    */
-  private static int size(final Nod n, final boolean a) throws QueryException {
+  private static int size(final ANode n, final boolean a) {
     if(n instanceof DBNode) {
       final DBNode dbn = (DBNode) n;
-      final int k = Nod.kind(n.ndType());
+      final int k = ANode.kind(n.ndType());
       return a ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
     }
 
     int s = 1;
-    NodeIter ch = n.attr();
-    while(ch.next() != null) ++s;
+    AxisIter ai = n.atts();
+    while(ai.next() != null) ++s;
     if(!a) {
-      ch = n.child();
-      Nod i;
-      while((i = ch.next()) != null) s += size(i, a);
+      ai = n.children();
+      ANode i;
+      while((i = ai.next()) != null) s += size(i, a);
     }
     return s;
   }
