@@ -5,9 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.basex.core.BaseXException;
@@ -41,8 +39,7 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class ClientSession extends Session {
-  /** Socket closed message. */
-  static final String SOCKET_CLOSED = "Socket closed";
+
   /** Socket reference. */
   final Socket socket;
   /** Server output. */
@@ -52,7 +49,7 @@ public final class ClientSession extends Session {
   /** Mutex object. */
   Object mutex = new Object();
   /** Trigger notifications. */
-  Map<String, List<TriggerNotification>> tn;
+  Map<String, TriggerNotification> tn;
   /** first byte of result. */
   int first;
   /** Buffer input. */
@@ -118,7 +115,7 @@ public final class ClientSession extends Session {
     super(output);
 
     // initialize trigger notifications
-    tn = new HashMap<String, List<TriggerNotification>>();
+    tn = new HashMap<String, TriggerNotification>();
 
     // 5 seconds timeout
     socket = new Socket();
@@ -154,11 +151,7 @@ public final class ClientSession extends Session {
             if(first == 1) {
               String name = bi.readString();
               String val = bi.readString();
-              if(tn.size() > 0) for(TriggerNotification t : tn.get(name))
-                t.update(val);
-              synchronized(mutex) {
-              mutex.notifyAll();
-              }
+              tn.get(name).update(val);
             } else {
               synchronized(mutex) {
                 mutex.notifyAll();
@@ -170,9 +163,7 @@ public final class ClientSession extends Session {
               }
             }
           }
-        } catch(IOException e) {
-          if (!SOCKET_CLOSED.equals(e.getMessage())) e.printStackTrace();
-        }
+        } catch(IOException e) { }
       }
     }.start();
   }
@@ -249,11 +240,7 @@ public final class ClientSession extends Session {
   public void attachTrigger(final String name,
       final TriggerNotification notification) throws BaseXException {
     execute("attach trigger " + name);
-
-    if (tn.get(name) == null)
-      tn.put(name, new ArrayList<TriggerNotification>(1));
-
-    tn.get(name).add(notification);
+    tn.put(name, notification);
   }
 
   /**
@@ -263,8 +250,8 @@ public final class ClientSession extends Session {
    */
   public void detachTrigger(final String name) throws BaseXException {
     // remove trigger notification.
-    tn.remove(name);
     execute("detach trigger " + name);
+    tn.remove(name);
   }
 
   /**
@@ -329,13 +316,14 @@ public final class ClientSession extends Session {
         while((l = bi.read()) != 0) os.write(l);
         }
         info = bi.readString();
-        mutex.notifyAll();
         if(!ok()) {
           throw new BaseXException(info);
         }
       } catch(Exception ex) {
+        mutex.notifyAll();
         throw new BaseXException(ex);
       }
+      mutex.notifyAll();
     }
   }
 

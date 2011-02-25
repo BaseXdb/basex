@@ -24,17 +24,17 @@ import org.junit.Test;
  */
 public final class TriggerTest {
   /** Trigger count. */
-  private static final int TRIGGER_COUNT = 4;
+  private static final int TRIGGER_COUNT = 10;
   /** Trigger name. */
-  private static final String TRIGGER_NAME = "myTrigger";
+  private static final String TRIGGER_NAME = "Trigger";
   /** Return value of function util:trigger. */
-  private static final String RETURN_VALUE = "return";
+  private static final String RETURN_VALUE = "GOT TRIGGERED";
   /** Server reference. */
   private static BaseXServer server;
   /** Client session. */
   private ClientSession cs;
   /** Control client sessions. */
-  private ClientSession[] ccs = new ClientSession[4];
+  private ClientSession[] ccs = new ClientSession[10];
 
   /** Starts the server. */
   @BeforeClass
@@ -80,7 +80,7 @@ public final class TriggerTest {
   @Test
   public void create() throws BaseXException {
     for(int i = 1; i < TRIGGER_COUNT; i++) {
-      cs.execute("create trigger " + TRIGGER_NAME + i);
+      cs.createTrigger(TRIGGER_NAME + i);
     }
 
     String triggers = cs.execute("show triggers");
@@ -100,7 +100,7 @@ public final class TriggerTest {
   public void trigger() throws BaseXException {
 
     // Create a trigger.
-    cs.execute("create trigger " + TRIGGER_NAME);
+    cs.createTrigger(TRIGGER_NAME);
 
     // Attach half of the clients to the trigger.
     for(int i = ccs.length / 2; i < ccs.length; i++) {
@@ -121,7 +121,63 @@ public final class TriggerTest {
     }
 
     // Drop trigger.
-    cs.execute("drop trigger " + TRIGGER_NAME);
+    cs.dropTrigger(TRIGGER_NAME);
+  }
+
+  /**
+   * Runs queries and triggers concurrently.
+   * @throws BaseXException command exception
+   */
+  @Test
+  public void concurrent() throws BaseXException {
+
+    // Create first trigger.
+    cs.createTrigger(TRIGGER_NAME);
+    // Drop second trigger.
+    cs.dropTrigger(TRIGGER_NAME + 1);
+    // Create second trigger.
+    cs.createTrigger(TRIGGER_NAME + 1);
+
+    // Attach half of the clients to the trigger and run a query.
+    for(int i = ccs.length / 2; i < ccs.length; i++) {
+      ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
+        @Override
+        public void update(final String data) {
+          assertEquals(RETURN_VALUE, data);
+        }
+      });
+      assertEquals(ccs[i].execute("xquery 1 + 100"), "101");
+    }
+
+    // Attach half of the clients to the trigger and run a query.
+    for(int i = ccs.length / 2; i < ccs.length; i++) {
+      ccs[i].attachTrigger(TRIGGER_NAME + 1, new TriggerNotification() {
+        @Override
+        public void update(final String data) {
+          assertEquals(RETURN_VALUE, data);
+        }
+      });
+      assertEquals(ccs[i].execute("xquery 1 + 100"), "101");
+    }
+
+    // Release first trigger.
+    cs.trigger("1 to 10", TRIGGER_NAME, RETURN_VALUE);
+
+    // Run for half of the clients a query.
+    for(int i = ccs.length / 2; i < ccs.length; i++) {
+      assertEquals(ccs[i].execute("xquery 1 + 100"), "101");
+    }
+
+    // Release second trigger.
+    cs.trigger("1 to 10", TRIGGER_NAME + 1, RETURN_VALUE);
+
+    // Detach all clients attached to trigger beforehand.
+    for(int i = ccs.length / 2; i < ccs.length; i++) {
+      ccs[i].detachTrigger(TRIGGER_NAME);
+    }
+
+    // Drop trigger.
+    cs.dropTrigger(TRIGGER_NAME);
   }
 
   /**
@@ -133,7 +189,7 @@ public final class TriggerTest {
 
     // Drop triggers.
     for(int i = 1; i < TRIGGER_COUNT; i++) {
-      cs.execute("drop trigger " + TRIGGER_NAME + i);
+      cs.dropTrigger(TRIGGER_NAME + i);
     }
 
     String triggers = cs.execute("show triggers");

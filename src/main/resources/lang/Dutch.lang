@@ -603,6 +603,10 @@ ch_help1=Vraag hulp over % commando's.
 ch_help2=Als [%] is opgegeven, dan wordt informatie over het specifieke\ncommando geprint; anders worden alle commando's getoond.
 ch_exit1=Stop applicatie.
 ch_exit2=Stop %.
+ch_helpattach1=Attach client to trigger.
+ch_helpattach2=Attaches a client to a trigger [%].
+ch_helpdetach1=Detach client from trigger.
+ch_helpdetach2=Detaches a client from trigger [%].
 
 # Help Texts
 h_hist=Toon input geschiedenis.
