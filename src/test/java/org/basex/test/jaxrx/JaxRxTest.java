@@ -120,7 +120,7 @@ public final class JaxRxTest {
       get("?query=()&output=wrp=no");
       fail("Error expected.");
     } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[SERE0000]");
+      assertContains(ex.getMessage(), "[SEPM0016]");
     }
   }
 
@@ -142,7 +142,7 @@ public final class JaxRxTest {
       get("?query=()&output=wrap=no");
       fail("Error expected.");
     } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[SERE0000]");
+      assertContains(ex.getMessage(), "[SEPM0016]");
     }
   }
 
