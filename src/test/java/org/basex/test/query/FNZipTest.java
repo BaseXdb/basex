@@ -9,7 +9,7 @@ import org.junit.Test;
  * This class tests the functions of the file library.
  *
  * @author BaseX Team 2005-11, BSD License
- * @author Rositsa Shadura
+ * @author Christian Gruen
  */
 public final class FNZipTest extends AdvancedQueryTest {
   /** Test ZIP file. */

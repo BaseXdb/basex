@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
@@ -22,22 +23,21 @@ import org.basex.util.Token;
 public final class Put extends UpdatePrimitive {
   /** Put location. */
   private final Uri uri;
-
   /** Serializer properties. */
-  private final SerializerProp props;
+  private final QueryContext ctx;
 
   /**
    * Constructor.
    * @param ii input info
    * @param n node to put
    * @param u location uri
-   * @param sp serializer properties
+   * @param c query context
    */
   public Put(final InputInfo ii, final ANode n, final Uri u,
-      final SerializerProp sp) {
+      final QueryContext c) {
     super(ii, n);
     uri = u;
-    props = sp;
+    ctx = c;
   }
 
   @Override
@@ -46,13 +46,11 @@ public final class Put extends UpdatePrimitive {
     try {
       out = new PrintOutput(Token.string(path()));
 
-      SerializerProp pr = props;
+      SerializerProp pr = ctx.serProp();
       // try to reproduce non-chopped documents correctly
-      if(props == null && node instanceof DBNode) {
-        pr = new SerializerProp();
-        pr.set(SerializerProp.S_INDENT,
-            ((DBNode) node).data.meta.chop ? YES : NO);
-      }
+      if(node instanceof DBNode) pr.set(SerializerProp.S_INDENT,
+          ((DBNode) node).data.meta.chop ? YES : NO);
+
       node.serialize(new XMLSerializer(out, pr));
     } catch(final IOException ex) {
       UPPUTERR.thrw(input, path());

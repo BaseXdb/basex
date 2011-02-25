@@ -70,15 +70,11 @@ public final class Uri extends Str {
    * @return result of check
    */
   public boolean valid() {
-    return toJava() != null;
-  }
-
-  @Override
-  public URI toJava() {
     try {
-      return new URI(Token.string(Token.uri(val, true)));
+      new URI(Token.string(Token.uri(val, true)));
+      return true;
     } catch(final URISyntaxException ex) {
-      return null;
+      return false;
     }
   }
 
