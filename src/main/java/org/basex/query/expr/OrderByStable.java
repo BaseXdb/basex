@@ -27,7 +27,6 @@ public final class OrderByStable extends OrderBy {
   }
 
   @Override
-  @SuppressWarnings("unused")
   public Expr comp(final QueryContext ctx) throws QueryException {
     type = SeqType.ITEM_ZM;
     return this;

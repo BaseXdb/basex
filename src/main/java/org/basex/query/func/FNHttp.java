@@ -3,7 +3,7 @@ package org.basex.query.func;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.HttpClient;
 import org.basex.util.InputInfo;
@@ -29,7 +29,7 @@ public final class FNHttp extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
 
     // Get request node
-    final Nod request = checkNode(expr[0].item(ctx, input));
+    final ANode request = checkNode(expr[0].item(ctx, input));
 
     // Get HTTP URI
     final byte[] href = expr.length == 2 ? checkEStr(expr[1].item(ctx, input))
@@ -37,5 +37,10 @@ public final class FNHttp extends Fun {
 
     // Send the HTTP request
     return new HttpClient(request, href, input).sendHttpRequest(ctx);
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.CTX;
   }
 }

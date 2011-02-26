@@ -75,9 +75,10 @@ public final class Restore extends Command {
    * @return success flag
    */
   private boolean restore(final File file, final Prop pr) {
+    InputStream is = null;
     try {
       // count number of files
-      InputStream is = new BufferedInputStream(new FileInputStream(file));
+      is = new BufferedInputStream(new FileInputStream(file));
       ZipInputStream zis = new ZipInputStream(is);
       while(zis.getNextEntry() != null) tf++;
       zis.close();
@@ -105,6 +106,8 @@ public final class Restore extends Command {
     } catch(final IOException ex) {
       Util.debug(ex);
       return false;
+    } finally {
+      if(is != null) try { is.close(); } catch(final IOException e) { }
     }
   }
 

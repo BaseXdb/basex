@@ -1,12 +1,15 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.SerializerException;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
@@ -19,11 +22,13 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
+import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
@@ -38,6 +43,12 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 final class FNGen extends Fun {
+  /** Output namespace. */
+  private static final Uri U_ZIP = Uri.uri(OUTPUTURI);
+  /** Element: output:serialization-parameter. */
+  private static final QNm E_PARAM =
+    new QNm(token("serialization-parameters"), U_ZIP);
+
   /**
    * Constructor.
    * @param ii input info
@@ -125,7 +136,7 @@ final class FNGen extends Fun {
       public Item next() throws QueryException {
         final Item it = coll.next();
         // all items will be nodes
-        return it == null ? null : Uri.uri(((Nod) it).base());
+        return it == null ? null : Uri.uri(((ANode) it).base());
       }
     };
   }
@@ -146,7 +157,7 @@ final class FNGen extends Fun {
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.valid()) UPFOURI.thrw(input, file);
-    ctx.updates.add(new Put(input, (Nod) it, u, ctx.serProp()), ctx);
+    ctx.updates.add(new Put(input, (ANode) it, u, ctx), ctx);
 
     return null;
   }
@@ -157,7 +168,7 @@ final class FNGen extends Fun {
    * @return resulting node
    * @throws QueryException query exception
    */
-  private Nod doc(final QueryContext ctx) throws QueryException {
+  private ANode doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, input);
     if(it == null) return null;
 
@@ -193,12 +204,11 @@ final class FNGen extends Fun {
    */
   private Str unparsedText(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
-    final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
+    final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
     try {
       return Str.get(TextInput.content(io, enc).finish());
     } catch(final IOException ex) {
-      UNDEF.thrw(input, ex);
-      return null;
+      throw WRONGINPUT.thrw(input, io, ex);
     }
   }
 
@@ -255,7 +265,7 @@ final class FNGen extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Nod parseXml(final QueryContext ctx) throws QueryException {
+  private ANode parseXml(final QueryContext ctx) throws QueryException {
     final byte[] cont = checkEStr(expr[0], ctx);
     Uri base = ctx.baseURI;
     if(expr.length == 2) {
@@ -269,8 +279,7 @@ final class FNGen extends Fun {
       final Parser p = Parser.fileParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
     } catch(final IOException ex) {
-      DOCWF.thrw(input, ex.toString());
-      return null;
+      throw SAXERR.thrw(input, ex);
     }
   }
 
@@ -281,47 +290,56 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final Nod nod = checkNode(checkItem(expr[0], ctx));
+    final ANode node = checkNode(checkItem(expr[0], ctx));
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
       final XMLSerializer xml = new XMLSerializer(ao, serialPar(this, 1, ctx));
-      nod.serialize(xml);
+      node.serialize(xml);
       xml.close();
+    } catch(final SerializerException ex) {
+      throw new QueryException(input, ex);
     } catch(final IOException ex) {
-      UNDEF.thrw(input, ex.toString());
+      SERANY.thrw(input, ex);
     }
     return Str.get(ao.toArray());
   }
 
   /**
-   * Creates a serializer.
+   * Creates serializer properties.
    * @param fun calling function
    * @param arg argument with parameters
    * @param ctx query context
    * @return serialization parameters
+   * @throws SerializerException serializer exception
    * @throws QueryException query exception
    */
   static SerializerProp serialPar(final Fun fun, final int arg,
-      final QueryContext ctx) throws QueryException {
+      final QueryContext ctx) throws SerializerException, QueryException {
 
-    if(arg >= fun.expr.length) return null;
-
-    // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
-    final Iter ir = fun.expr[arg].iter(ctx);
-    Item it;
-    while((it = ir.next()) != null) {
-      final Nod n = fun.checkNode(it);
-      if(tb.size() != 0) tb.add(',');
-      tb.add(n.nname()).add('=').add(n.atom());
+
+    // check if enough arguments are available
+    if(arg < fun.expr.length) {
+      // retrieve parameters
+      final Item it = fun.expr[arg].item(ctx, fun.input);
+      if(it != null) {
+        // check root node
+        ANode node = (ANode) fun.checkType(it, Type.ELM);
+        if(!node.qname().eq(E_PARAM)) SERUNKNOWN.thrw(fun.input, node.qname());
+
+        // interpret query parameters
+        final AxisIter ai = node.children();
+        while((node = ai.next()) != null) {
+          if(tb.size() != 0) tb.add(',');
+          final QNm name = node.qname();
+          if(!name.uri().eq(U_ZIP)) SERUNKNOWN.thrw(fun.input, name);
+          tb.add(name.ln()).add('=').add(node.atom());
+        }
+      }
     }
-    try {
-      return new SerializerProp(tb.toString());
-    } catch(final IOException ex) {
-      UNDEF.thrw(fun.input, ex.toString());
-      return null;
-    }
+    // use default parameters if no parameters have been assigned
+    return tb.size() == 0 ? ctx.serProp() : new SerializerProp(tb.toString());
   }
 
   @Override

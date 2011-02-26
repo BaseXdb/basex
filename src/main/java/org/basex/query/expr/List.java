@@ -6,7 +6,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
@@ -33,7 +33,7 @@ public final class List extends Arr {
 
     if(values()) {
       // return simple sequence if all values are items or empty sequences
-      final ItemIter ir = new ItemIter(expr.length);
+      final ItemCache ir = new ItemCache(expr.length);
       for(final Expr e : expr) ir.add(ctx.iter(e));
       return ir.finish();
     }

@@ -15,6 +15,7 @@ import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
+import org.basex.data.SerializerException;
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
@@ -22,15 +23,17 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.up.Updates;
 import org.basex.query.util.Functions;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Variables;
+import org.basex.query.util.format.DecimalFormat;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -87,6 +90,9 @@ public final class QueryContext extends Progress {
   /** Current Time. */
   public Tim time;
 
+  /** Decimal-format declarations. */
+  public HashMap<QNm, DecimalFormat> decFormats =
+    new HashMap<QNm, DecimalFormat>();
   /** Default function namespace. */
   public byte[] nsFunc = FNURI;
   /** Default element namespace. */
@@ -221,7 +227,7 @@ public final class QueryContext extends Progress {
   protected Result eval() throws QueryException {
     // evaluates the query
     final Iter it = iter();
-    final ItemIter ir = new ItemIter();
+    final ItemCache ir = new ItemCache();
     Item i;
 
     // check if all results belong to the database of the input context
@@ -366,9 +372,19 @@ public final class QueryContext extends Progress {
   /**
    * Returns the serialization properties.
    * @return serialization properties
+   * @throws SerializerException serializer exception
    */
-  public SerializerProp serProp() {
-    return serProp;
+  public SerializerProp serProp() throws SerializerException {
+    // if available, use local query properties
+    if(serProp != null) return serProp;
+    // otherwise, apply global serialization option
+    final SerializerProp sp = new SerializerProp(
+        context.prop.get(Prop.SERIALIZER));
+    if(context.prop.is(Prop.WRAPOUTPUT)) {
+      sp.set(SerializerProp.S_WRAP_PREFIX, NAMELC);
+      sp.set(SerializerProp.S_WRAP_URI, URL);
+    }
+    return sp;
   }
 
   @Override

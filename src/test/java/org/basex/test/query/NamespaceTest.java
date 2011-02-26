@@ -1,6 +1,7 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -36,8 +37,135 @@ public final class NamespaceTest {
     { "d7", "<x xmlns='xx'><y/></x>" },
     { "d8", "<a><b xmlns='B'/><c/></a>" },
     { "d9", "<a xmlns='A'><b><c/><d xmlns='D'/></b><e/></a>" },
-    { "d10", "<a xmlns='A'><b><c/><d xmlns='D'><g xmlns='G'/></d></b><e/></a>" }
+    { "d10", "<a xmlns='A'><b><c/><d xmlns='D'><g xmlns='G'/></d></b><e/></a>"},
+    { "d11", "<a xmlns='A'><b xmlns:ns1='AA'><d/></b><c xmlns:ns1='AA'>" +
+    "<d/></c></a>" },
+    { "d12", "<a><b/><c xmlns='B'/></a>" },
+    { "d13", "<a><b xmlns='A'/></a>" },
+    { "d14", "<a xmlns='A'><b xmlns='B'/><c xmlns='C'/></a>" }
   };
+
+  /**
+   * Checks if namespace hierarchy structure is updated correctly on the
+   * descendant axis after a NSNode has been inserted.
+   */
+  @Test
+  public void insertIntoShiftPreValues() {
+    query("insert node <b xmlns:ns='A'/> into doc('d12')/*:a/*:b", "");
+    try {
+      new Open("d12").execute(context);
+      assertEquals("\n" +
+          "  Pre[3] xmlns:ns=\"A\" \n" +
+          "  Pre[4] xmlns=\"B\" ",
+          context.data.ns.toString());
+    } catch (final Exception ex) {
+      fail(ex.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(final BaseXException ex) { }
+    }
+  }
+
+  /**
+   * Checks if namespace hierarchy structure is updated correctly on the
+   * descendant axis after a NSNode has been inserted.
+   */
+  @Test
+  public void insertIntoShiftPreValues2() {
+    query("insert node <c/> as first into doc('d13')/a", "");
+    try {
+      new Open("d13").execute(context);
+      assertEquals("\n" +
+          "  Pre[3] xmlns=\"A\" ",
+          context.data.ns.toString());
+    } catch (final Exception ex) {
+      fail(ex.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(final BaseXException ex) { }
+    }
+  }
+
+  /**
+   * Checks if namespace hierarchy structure is updated correctly on the
+   * descendant axis after a NSNode has been inserted.
+   */
+  @Test
+  public void insertIntoShiftPreValues3() {
+    query("insert node <n xmlns='D'/> into doc('d14')/*:a/*:b", "");
+    try {
+      new Open("d14").execute(context);
+      assertEquals("\n" +
+          "  Pre[1] xmlns=\"A\" \n" +
+          "    Pre[2] xmlns=\"B\" \n" +
+          "      Pre[3] xmlns=\"D\" \n" +
+          "    Pre[4] xmlns=\"C\" ",
+          context.data.ns.toString());
+    } catch (final Exception ex) {
+      fail(ex.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(final BaseXException ex) { }
+    }
+  }
+
+  /**
+   * Checks if namespace hierarchy structure is updated correctly on the
+   * descendant axis after a NSNode has been deleted.
+   */
+  @Test
+  public void deleteShiftPreValues() {
+    query("delete node doc('d12')/a/b", "");
+    try {
+      new Open("d12").execute(context);
+      assertEquals("\n" +
+          "  Pre[2] xmlns=\"B\" ",
+          context.data.ns.toString());
+    } catch (final Exception ex) {
+      fail(ex.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(final BaseXException ex) { }
+    }
+  }
+
+  /**
+   * Checks if namespace hierarchy structure is updated correctly on the
+   * descendant axis after a NSNode has been deleted.
+   */
+  @Test
+  public void deleteShiftPreValues2() {
+    query("delete node doc('d14')/*:a/*:b", "");
+    try {
+      new Open("d14").execute(context);
+      assertEquals("\n" +
+          "  Pre[1] xmlns=\"A\" \n" +
+          "    Pre[2] xmlns=\"C\" ",
+          context.data.ns.toString());
+    } catch (final Exception ex) {
+      fail(ex.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(final BaseXException ex) { }
+    }
+  }
+
+  /**
+   * Tests for correct namespace hierarchy, esp. if namespace nodes
+   * on the following axis of an insert/delete operation are
+   * updated correctly.
+   */
+  @Test
+  public void delete1() {
+    query("delete node doc('d11')/*:a/*:b",
+        "doc('d11')/*:a",
+        "<a xmlns='A'><c xmlns:ns1='AA'><d/></c></a>");
+  }
 
   /** Test query. */
   @Test

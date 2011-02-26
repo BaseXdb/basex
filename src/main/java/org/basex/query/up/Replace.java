@@ -10,11 +10,11 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.FComm;
 import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.up.primitives.ReplaceElemContent;
 import org.basex.query.up.primitives.ReplacePrimitive;
 import org.basex.query.up.primitives.ReplaceValue;
@@ -56,13 +56,13 @@ public final class Replace extends Update {
     // check target constraints
     if(i == null) UPSEQEMP.thrw(input, Util.name(this));
     final Type tp = i.type;
-    if(!(i instanceof Nod) || tp == Type.DOC || t.next() != null)
+    if(!(i instanceof ANode) || tp == Type.DOC || t.next() != null)
       UPTRGMULT.thrw(input);
-    final Nod targ = (Nod) i;
+    final ANode targ = (ANode) i;
 
     // replace node
-    final NodIter aList = c.ats;
-    NodIter list = c.children;
+    final NodeCache aList = c.atts;
+    NodeCache list = c.children;
     if(value) {
       // replace value of node
       final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).atom();
@@ -73,7 +73,7 @@ public final class Replace extends Update {
           new ReplaceElemContent(input, targ, txt) :
           new ReplaceValue(input, targ, new QNm(txt)), ctx);
     } else {
-      final Nod par = targ.parent();
+      final ANode par = targ.parent();
       if(par == null) UPNOPAR.thrw(input, i);
       if(tp == Type.ATT) {
         // replace attribute node

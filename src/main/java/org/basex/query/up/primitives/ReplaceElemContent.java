@@ -5,7 +5,7 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.util.InputInfo;
 
 /**
@@ -24,7 +24,8 @@ public final class ReplaceElemContent extends UpdatePrimitive {
    * @param n target node
    * @param tn replacing content
    */
-  public ReplaceElemContent(final InputInfo ii, final Nod n, final byte[] tn) {
+  public ReplaceElemContent(final InputInfo ii, final ANode n,
+      final byte[] tn) {
     super(ii, n);
     txt = tn;
   }

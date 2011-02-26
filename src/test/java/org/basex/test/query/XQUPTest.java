@@ -62,13 +62,13 @@ public final class XQUPTest extends QueryTest {
     // name starts with 'xxx' is an update query.
     // The test query following q represents the actual test.
     queries = new Object[][] {
-        { "xxxxxxxxxxxxx", nod(11),
+        { "xxxxxxxxxxxxx", node(11),
         "/up/cars/good/car/wheels[text()='optional']" },
 
         // delete
         { "xxxdel1", empty(),
         "delete nodes /up/cars/good/car[1]" },
-        { "del1", nod(5, 12, 22),
+        { "del1", node(5, 12, 22),
         "//car" },
         { "xxxdel2", empty(),
         "delete nodes //car" },
@@ -94,70 +94,70 @@ public final class XQUPTest extends QueryTest {
         // rename
         { "xxxren1", empty(),
         "rename node /up/cars as 'CARS'" },
-        { "ren1", nod(2),
+        { "ren1", node(2),
         "/up/CARS" },
         { "xxxren2", empty(),
         "rename node /up/cars/good/car[1]/@id as 'ID'" },
-        { "ren2", nod(6),
+        { "ren2", node(6),
         "//car/@ID" },
         { "xxxren3", empty(),
         "rename node //processing-instruction('dohere') as 'BADVICE'" },
-        { "ren3", nod(28),
+        { "ren3", node(28),
         "//processing-instruction('BADVICE')" },
 
         // replace elem
         { "xxxrep1", empty(),
         "replace node /up/cars/good/car[1] with /up/cars/good/car[2]" },
-        { "rep1", nod(7),
+        { "rep1", node(7),
         "/up/cars/good/car[1]/@color" },
         // replace attribute
         { "xxxrep2", empty(),
         "replace node /up/cars/good/car[1]/@id with " +
         "/up/cars/good/car[2]/@color" },
-        { "rep2", nod(6),
+        { "rep2", node(6),
         "/up/cars/good/car[1]/@color, /up/cars/good/car[1]/@id" },
         // replace text
         { "xxxrep3", empty(),
         "replace node /up/cars/good/car/wheels/text() with 'snap'" },
-        { "rep3", nod(11),
+        { "rep3", node(11),
         "/up/cars/good/car/wheels[text()='snap']" },
         { "xxxrep4", empty(),
         "replace node /up/cars/good/car/wheels/text() with " + SEQ1},
-        { "rep4", nod(11),
+        { "rep4", node(11),
         "/up/cars/good/car/wheels[text()='5 fooboo']" },
         // replace attribute
         { "xxxrep5", empty(),
         "replace node /up/cars/good/car[@id='1']/@id with " + SEQ3},
-        { "rep5", nod(6, 7), "/up/cars/good/car/@n, /up/cars/good/car/@c" },
+        { "rep5", node(6, 7), "/up/cars/good/car/@n, /up/cars/good/car/@c" },
         // replace comment
         { "xxxrep6", empty(),
         "replace node /up/cars/good/car/comment() with " + SEQ1},
-        { "rep6", nod(8),
+        { "rep6", node(8),
         "/up/cars/good/car/text()" },
         // replace processing instruction
         { "xxxrep7", empty(),
         "replace node /up/cars/bad/car/processing-instruction() with " + SEQ1},
-        { "rep7", nod(18, 19),
+        { "rep7", node(18, 19),
         "/up/cars/bad/car/a, /up/cars/bad/car/text()" },
         // replace element content
         { "xxxrep8", empty(),
         "replace value of node //car[@id=1] with 'foo'"},
-        { "rep8", nod(5),
+        { "rep8", node(5),
         "//car[text()='foo']" },
         // "no man's land"
         { "xxxrep9", empty(),
         "replace value of node //car[@id=1] with \"no man's land\""},
-        { "rep9", nod(5),
+        { "rep9", node(5),
         "//car[text()=\"no man's land\"]" },
 
         // insert
         { "xxxins1", empty(),
         "insert node " + SEQ1 + "into /up/cars/good/car[@id='1']"},
-        { "ins1", nod(8, 9),
+        { "ins1", node(8, 9),
         "/up/cars/good/car/a, /up/cars/good/car/text()" },
         { "xxxins2", empty(),
         "insert node " + SEQ5 + "into /up/cars/good/car[@id=1]"},
-        { "ins2", nod(6, 9, 10),
+        { "ins2", node(6, 9, 10),
         "/up/cars/good/car/@n, /up/cars/good/car/a, " +
         "/up/cars/good/car/text()" },
         /*
@@ -171,7 +171,7 @@ public final class XQUPTest extends QueryTest {
         // merge text nodes
         { "xxxMERGEins", empty(),
           "insert node 'foo' into /up/cars/good/car/wheels"},
-          { "MERGEins", nod(11),
+          { "MERGEins", node(11),
           "/up/cars/good/car/wheels[text()='optionalfoo']" },
 
         // parser tests

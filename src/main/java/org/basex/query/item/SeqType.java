@@ -3,9 +3,10 @@ package org.basex.query.item;
 import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
@@ -40,7 +41,7 @@ public final class SeqType {
   /** Zero or one booleans. */
   public static final SeqType BLN_ZO = new SeqType(Type.BLN, Occ.ZO);
   /** Single Base64Binary. */
-  public static final SeqType B64 = new SeqType(Type.B6B);
+  public static final SeqType B64 = new SeqType(Type.B64);
   /** Double number. */
   public static final SeqType DBL = new SeqType(Type.DBL);
   /** Float number. */
@@ -80,7 +81,9 @@ public final class SeqType {
   /** Single date. */
   public static final SeqType DAT = new SeqType(Type.DAT);
   /** Zero or more dates. */
-  public static final SeqType DAT_ZM = new SeqType(Type.DAT, Occ.ZO);
+  public static final SeqType DAT_ZM = new SeqType(Type.DAT, Occ.ZM);
+  /** Zero or more dates. */
+  public static final SeqType BYT_ZM = new SeqType(Type.BYT, Occ.ZM);
 
   /** Sequence type. */
   public final Type type;
@@ -160,31 +163,32 @@ public final class SeqType {
     Item it = iter.next();
     if(it == null) return mayBeZero();
     if(zeroOrOne()) return iter.next() == null && it.type.instance(type) &&
-      checkExtension(it);
+      checkExt(it);
 
     do {
-      if(!it.type.instance(type) || !checkExtension(it)) return false;
+      if(!it.type.instance(type) || !checkExt(it)) return false;
     } while((it = iter.next()) != null);
     return true;
   }
 
   /**
    * Casts the specified item.
-   * @param it item
+   * @param cast expression to be cast
    * @param expr expression reference
    * @param ctx query context
-   * @param ii input info
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Item cast(final Item it, final ParseExpr expr, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+  public Item cast(final Expr cast, final ParseExpr expr,
+      final QueryContext ctx) throws QueryException {
 
+    final Item it = cast.item(ctx, expr.input);
     if(it == null) {
       if(occ == Occ.O) XPEMPTY.thrw(expr.input, expr.desc());
       return null;
     }
-    return it.type == type ? it : check(type.e(it, ctx, expr.input), ii);
+    return it.type == type ? it :
+      check(type.e(it, ctx, expr.input), expr.input);
   }
 
   /**
@@ -210,7 +214,7 @@ public final class SeqType {
     Item n = iter.next();
     if(zeroOrOne() && n != null) Err.cast(ii, type, val);
 
-    final ItemIter ir = new ItemIter();
+    final ItemCache ir = new ItemCache();
     ir.add(it);
     while(n != null) {
       ir.add(check(instance(n, ii) ? n : type.e(n, ctx, ii), ii));
@@ -304,7 +308,7 @@ public final class SeqType {
    * @throws QueryException query exception
    */
   private Item check(final Item it, final InputInfo ii) throws QueryException {
-    if(!checkExtension(it)) XPCAST.thrw(ii, it.type, ext);
+    if(!checkExt(it)) XPCAST.thrw(ii, it.type, ext);
     return it;
   }
 
@@ -313,8 +317,8 @@ public final class SeqType {
    * @param it item
    * @return same item
    */
-  private boolean checkExtension(final Item it) {
-    return ext == null || ext.eq(((Nod) it).qname());
+  private boolean checkExt(final Item it) {
+    return ext == null || ext.eq(((ANode) it).qname());
   }
 
   /**

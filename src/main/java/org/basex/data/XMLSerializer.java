@@ -1,11 +1,11 @@
 package org.basex.data;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import static org.basex.data.SerializerProp.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import org.basex.core.Prop;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
@@ -13,7 +13,6 @@ import org.basex.util.TokenList;
 import org.basex.util.TokenSet;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTSpan;
-import org.basex.util.Util;
 
 /**
  * This class serializes trees as XML.
@@ -102,7 +101,8 @@ public final class XMLSerializer extends Serializer {
     out = PrintOutput.get(os);
     final SerializerProp p = props == null ? PROPS : props;
 
-    final String m = p.check(S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT);
+    final String m = p.check(S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT,
+        M_HEX, M_BASE64);
     mth = m.equals(M_XML) ? M_XML : m.equals(M_XHTML) ?
         M_XHTML : m.equals(M_HTML) ? M_HTML : M_TEXT;
 
@@ -119,9 +119,9 @@ public final class XMLSerializer extends Serializer {
     p.check(S_NORMALIZATION_FORM, NFC, NONE);
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
-    if(!maps.isEmpty()) error(SERMAPS, maps);
+    if(!maps.isEmpty()) throw SERMAP.serial(maps);
 
-    enc     = code(p.get(S_ENCODING), null);
+    enc     = normEncoding(p.get(S_ENCODING), null);
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
     media   = p.get(S_MEDIA_TYPE);
@@ -143,8 +143,8 @@ public final class XMLSerializer extends Serializer {
       docpub = null;
     }
 
-    if(!Charset.isSupported(enc)) error(SERENCODING, enc);
-    if(undecl && version.equals(V10)) error(SERUNDECL);
+    if(!supported(enc)) SERENCODING.serial(enc);
+    if(undecl && version.equals(V10)) SERUNDECL.serial();
 
     // print byte-order-mark
     if(bom) {
@@ -174,7 +174,7 @@ public final class XMLSerializer extends Serializer {
         print(PI2);
         ind = indent;
       } else if(!sa.equals(OMIT) || version.equals(V11) && docsys != null) {
-        error(SERSTAND);
+        SERSTAND.serial();
       }
     }
 
@@ -184,18 +184,6 @@ public final class XMLSerializer extends Serializer {
       namespace(wPre, wUri);
       finishElement();
     }
-  }
-
-  /**
-   * Returns an I/O exception. Replaces all % characters in the input string
-   * (see {@link TokenBuilder#addExt} for details).
-   * @param str string to be extended
-   * @param ext extensions
-   * @throws IOException I/O exception
-   */
-  private static void error(final Object str, final Object... ext)
-      throws IOException {
-    throw new IOException(Util.info(str, ext));
   }
 
   /**
@@ -228,9 +216,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void attribute(final byte[] n, final byte[] v) throws IOException {
     if(mth == M_TEXT) return;
-
-    // [LW] temporarily disabled; many tests rely on serializing attributes
-    //if(!inTag) error(SERTAT);
+    //if(!inTag) SERTAT.serial();
 
     print(' ');
     print(n);
@@ -319,7 +305,7 @@ public final class XMLSerializer extends Serializer {
     if(mth == M_TEXT) return;
     finishElement();
     if(ind) indent(true);
-    if(mth == M_HTML && contains(v, '>')) error(SERPI);
+    if(mth == M_HTML && contains(v, '>')) throw SERPI.serial();
     print(PI1);
     print(n);
     print(' ');
@@ -348,7 +334,7 @@ public final class XMLSerializer extends Serializer {
         return;
       }
       if(ch < 0x20 && ch != 0x09 && ch != 0x0A && ch != 0x0D) return;
-      if(ch > 0x7F && ch < 0xA0) error(SERILL, Integer.toHexString(ch));
+      if(ch > 0x7F && ch < 0xA0) throw SERILL.serial(Integer.toHexString(ch));
       if(ch == 0xA0) {
         print(E_NBSP);
         return;

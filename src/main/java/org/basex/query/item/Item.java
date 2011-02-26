@@ -56,16 +56,12 @@ public abstract class Item extends Value {
   }
 
   @Override
-  @SuppressWarnings("unused")
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) {
     return this;
   }
 
   @Override
-  @SuppressWarnings("unused")
-  public Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item ebv(final QueryContext ctx, final InputInfo ii) {
     return this;
   }
 
@@ -258,7 +254,7 @@ public abstract class Item extends Value {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(ITM, VAL, atom(), TYPE, Token.token(name()));
+    ser.emptyElement(ITM, VAL, atom(), TYP, Token.token(name()));
   }
 
   @Override

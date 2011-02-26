@@ -1,5 +1,6 @@
 package org.basex.query.util;
 
+import static org.basex.data.DataText.*;
 import static java.lang.Integer.*;
 import static java.net.HttpURLConnection.*;
 import static org.basex.query.util.Err.*;
@@ -28,14 +29,12 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.NodeIter;
-import org.basex.util.Atts;
+import org.basex.query.iter.AxisIter;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenMap;
@@ -127,9 +126,9 @@ public final class HttpClient {
   private final TokenMap headers;
   /** Multipart. */
   @SuppressWarnings("unused")
-  private Nod multipart;
+  private ANode multipart;
   /** Body. */
-  private Nod body;
+  private ANode body;
 
   /** Input info. */
   private final InputInfo info;
@@ -141,7 +140,7 @@ public final class HttpClient {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public HttpClient(final Nod request, final byte[] href, final InputInfo ii)
+  public HttpClient(final ANode request, final byte[] href, final InputInfo ii)
       throws QueryException {
 
     info = ii;
@@ -157,11 +156,12 @@ public final class HttpClient {
    * @param request request element
    * @throws QueryException query exception
    */
-  private void readRequestAttributes(final Nod request) throws QueryException {
-    final NodeIter attrs = request.attr();
+  private void readRequestAttributes(final ANode request)
+      throws QueryException {
 
-    Nod n = null;
-    while((n = attrs.next()) != null) reqAttrs.add(n.nname(), n.atom());
+    final AxisIter ai = request.atts();
+    ANode n = null;
+    while((n = ai.next()) != null) reqAttrs.add(n.nname(), n.atom());
 
     // If authorization is to be sent, check that both user name and password
     // are provided
@@ -179,19 +179,19 @@ public final class HttpClient {
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void readRequestChildren(final Nod request, final InputInfo ii)
+  private void readRequestChildren(final ANode request, final InputInfo ii)
       throws QueryException {
 
-    final NodeIter children = request.child();
-    Nod n = null;
+    final AxisIter ai = request.children();
+    ANode n = null;
 
-    while((n = children.next()) != null) {
+    while((n = ai.next()) != null) {
 
       // Header children
       if(eq(n.nname(), HEADER)) {
 
-        final NodeIter attrs = n.attr();
-        Nod attr = null;
+        final AxisIter attrs = n.atts();
+        ANode attr = null;
         byte[] name = null;
         byte[] value = null;
 
@@ -285,20 +285,19 @@ public final class HttpClient {
   /**
    * Sets the content of the HTTP request.
    * @param conn HTTP connection
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private void setHttpRequestContent(final HttpURLConnection conn)
-      throws QueryException, IOException {
+      throws IOException {
 
-    final NodeIter attrs = body.attr();
+    final AxisIter attrs = body.atts();
     final StringBuilder sb = new StringBuilder();
 
     byte[] mediaType = null;
     String src = null;
     String method = null;
 
-    Nod attr = null;
+    ANode attr = null;
     while((attr = attrs.next()) != null) {
       if(eq(attr.nname(), MEDIATYPE)) mediaType = attr.atom();
       else if(eq(attr.nname(), SRC)) src = string(attr.atom());
@@ -313,14 +312,14 @@ public final class HttpClient {
       // Set serial parameter "method" according to MIME type
       sb.append("method=");
       if(method == null) {
-        if(eq(mediaType, APPL_XHTML)) sb.append("xhtml");
+        if(eq(mediaType, APPL_XHTML)) sb.append(M_XHTML);
         else if(eq(mediaType, APPL_XML) || eq(mediaType, APPL_EXT_XML)
             || eq(mediaType, TXT_XML) || eq(mediaType, TXT_EXT_XML)
-            || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append("xml");
-        else if(eq(mediaType, TXT_HTML)) sb.append("html");
+            || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append(M_XML);
+        else if(eq(mediaType, TXT_HTML)) sb.append(M_HTML);
         else if(startsWith(mediaType, MIME_TEXT_PREFIX))
-          sb.append("text");
-        else sb.append("xml");
+          sb.append(M_TEXT);
+        else sb.append(M_XML);
       } else {
         sb.append(method);
       }
@@ -331,10 +330,9 @@ public final class HttpClient {
       final SerializerProp serialProp = new SerializerProp(sb.toString());
       try {
         final XMLSerializer xml = new XMLSerializer(out, serialProp);
-
-        final NodeIter children = body.child();
-        Nod child = null;
-        while((child = children.next()) != null) child.serialize(xml);
+        final AxisIter ai = body.children();
+        ANode child = null;
+        while((child = ai.next()) != null) child.serialize(xml);
       } finally {
         out.close();
       }
@@ -356,10 +354,11 @@ public final class HttpClient {
       final QueryContext ctx) throws IOException, QueryException {
 
     // Construct http:response element
-    final FElem responseElem = new FElem(new QNm(RESPONSE),
-        setResponseChildren(conn), setResponseAttrs(conn), EMPTY, new Atts());
+    final FElem responseElem = new FElem(new QNm(RESPONSE), null);
+    setResponseChildren(conn, responseElem);
+    setResponseAttrs(conn, responseElem);
 
-    final ItemIter iter = new ItemIter();
+    final ItemCache iter = new ItemCache();
     iter.add(responseElem);
 
     final byte[] attrStatusOnly = reqAttrs.get(STATUSONLY);
@@ -373,55 +372,46 @@ public final class HttpClient {
   /**
    * Sets response element attributes.
    * @param conn HTTP connection
-   * @return response attributes
+   * @param par parent node
    * @throws IOException I/O exception
    */
-  private NodIter setResponseAttrs(final HttpURLConnection conn)
-      throws IOException {
-
-    final NodIter responseAttrs = new NodIter();
+  private void setResponseAttrs(final HttpURLConnection conn,
+      final FElem par) throws IOException {
 
     final FAttr attrStatus = new FAttr(new QNm(STATUS, QueryTokens.HTTPURI),
-        token(conn.getResponseCode()), null);
+        token(conn.getResponseCode()), par);
 
     final FAttr attrStatusMsg = new FAttr(new QNm(MSG, QueryTokens.HTTPURI),
-        token(conn.getResponseMessage()), null);
+        token(conn.getResponseMessage()), par);
 
-    responseAttrs.add(attrStatus);
-    responseAttrs.add(attrStatusMsg);
-
-    return responseAttrs;
+    par.atts.add(attrStatus);
+    par.atts.add(attrStatusMsg);
   }
 
   /**
    * Sets response element children.
    * @param conn HTTP connection
-   * @return response children
+   * @param par parent node
    */
-  private NodIter setResponseChildren(final HttpURLConnection conn) {
-
-    final NodIter ch = new NodIter();
+  private void setResponseChildren(final HttpURLConnection conn,
+      final FElem par) {
 
     // Set header children
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
-        final NodIter headerAttrs = new NodIter();
-        headerAttrs.add(new FAttr(new QNm(HDR_NAME), token(headerName), null));
-        headerAttrs.add(new FAttr(new QNm(HDR_VALUE),
-            token(conn.getHeaderField(headerName)), null));
-        ch.add(new FElem(new QNm(HEADER), new NodIter(), headerAttrs, EMPTY,
-            new Atts()));
+        final FElem elem = new FElem(new QNm(HEADER), par);
+        elem.atts.add(new FAttr(new QNm(HDR_NAME), token(headerName), elem));
+        elem.atts.add(new FAttr(new QNm(HDR_VALUE),
+            token(conn.getHeaderField(headerName)), elem));
+        par.children.add(elem);
       }
     }
 
     // Set body child
-    final NodIter bodyAttrs = new NodIter();
-    bodyAttrs.add(new FAttr(new QNm(MEDIATYPE), token(conn.getContentType()),
-        null));
-    ch.add(new FElem(new QNm(BODY), new NodIter(), bodyAttrs, EMPTY,
-        new Atts()));
-
-    return ch;
+    final FElem elem = new FElem(new QNm(BODY), par);
+    elem.atts.add(new FAttr(new QNm(MEDIATYPE),
+        token(conn.getContentType()), elem));
+    par.children.add(elem);
   }
 
   /**

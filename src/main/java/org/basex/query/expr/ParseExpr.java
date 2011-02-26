@@ -14,7 +14,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
@@ -140,8 +140,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final Expr checkUp(final Expr e, final QueryContext ctx)
       throws QueryException {
-    if(e != null && ctx.updating && e.uses(Use.UPD))
-      UPNOT.thrw(input, desc());
+    if(e != null && ctx.updating && e.uses(Use.UPD)) UPNOT.thrw(input, desc());
     return e;
   }
 
@@ -194,6 +193,19 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified item is no empty sequence.
+   * @param it item to be checked
+   * @param t expected type
+   * @return specified item
+   * @throws QueryException query exception
+   */
+  private Item checkEmptyType(final Item it, final Type t)
+      throws QueryException {
+    if(it == null) XPEMPTYPE.thrw(input, desc(), t);
+    return it;
+  }
+
+  /**
    * Checks if the specified item is a number.
    * Returns a token representation or an exception.
    * @param it item to be checked
@@ -212,9 +224,9 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final Nod checkNode(final Item it) throws QueryException {
+  public final ANode checkNode(final Item it) throws QueryException {
     if(!it.node()) Err.type(this, Type.NOD, it);
-    return (Nod) it;
+    return (ANode) it;
   }
 
   /**
@@ -307,20 +319,6 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks the data type and throws an exception, if necessary.
-   * @param it item to be checked
-   * @param t type to be checked
-   * @return specified item
-   * @throws QueryException query exception
-   */
-  public final Item checkType(final Item it, final Type t)
-      throws QueryException {
-
-    if(checkEmpty(it).type != t) Err.type(this, t, it);
-    return it;
-  }
-
-  /**
    * Checks if the specified item is an empty sequence; if yes, throws
    * an exception.
    * @param it item to be checked
@@ -329,19 +327,6 @@ public abstract class ParseExpr extends Expr {
    */
   public final Item checkEmpty(final Item it) throws QueryException {
     if(it == null) XPEMPTY.thrw(input, desc());
-    return it;
-  }
-
-  /**
-   * Checks if the specified item is no empty sequence.
-   * @param it item to be checked
-   * @param t expected type
-   * @return specified item
-   * @throws QueryException query exception
-   */
-  public final Item checkEmptyType(final Item it, final Type t)
-      throws QueryException {
-    if(it == null) XPEMPTYPE.thrw(input, desc(), t);
     return it;
   }
 

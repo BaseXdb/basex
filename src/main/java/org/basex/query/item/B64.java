@@ -26,7 +26,7 @@ public final class B64 extends Item {
    * @throws QueryException query exception
    */
   public B64(final byte[] d, final InputInfo ii) throws QueryException {
-    super(Type.B6B);
+    super(Type.B64);
     final ByteList bl = new ByteList();
     for(final byte c : d) if(c < 0 || c > ' ') bl.add(c);
     b2h(bl.toArray(), ii);
@@ -37,7 +37,7 @@ public final class B64 extends Item {
    * @param d binary data
    */
   public B64(final byte[] d) {
-    super(Type.B6B);
+    super(Type.B64);
     val = d;
   }
 

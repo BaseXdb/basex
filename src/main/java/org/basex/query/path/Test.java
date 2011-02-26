@@ -2,7 +2,7 @@ package org.basex.query.path;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.util.Util;
@@ -29,7 +29,7 @@ public abstract class Test {
   /** Static node test. */
   public static final Test NOD = new Test() {
     @Override
-    public boolean eval(final Nod node) { return true; }
+    public boolean eval(final ANode node) { return true; }
     @Override
     public String toString() { return Type.NOD.toString(); }
   };
@@ -83,11 +83,10 @@ public abstract class Test {
 
   /**
    * Tests the specified node.
-   * @param nod temporary node
+   * @param node temporary node
    * @return result of check
-   * @throws QueryException query exception
    */
-  public abstract boolean eval(final Nod nod) throws QueryException;
+  public abstract boolean eval(final ANode node);
 
   /**
    * Checks the current and specified test for equality.

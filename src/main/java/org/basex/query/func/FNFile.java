@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import org.basex.core.Prop;
+import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -306,6 +307,8 @@ final class FNFile extends Fun {
         Item it;
         while((it = ir.next()) != null) it.serialize(xml);
         xml.close();
+      } catch(final SerializerException ex) {
+        throw new QueryException(input, ex);
       } finally {
         out.close();
       }
@@ -325,7 +328,7 @@ final class FNFile extends Fun {
   private Item writeBinary(final File path, final QueryContext ctx)
       throws QueryException {
 
-    final B64 b64 = (B64) checkType(expr[1].item(ctx, input), Type.B6B);
+    final B64 b64 = (B64) checkType(expr[1].item(ctx, input), Type.B64);
     final boolean append = optionalBool(2, ctx);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
 

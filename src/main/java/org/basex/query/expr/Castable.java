@@ -6,7 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
-import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -42,8 +41,7 @@ public final class Castable extends Single {
   @Override
   public Bln item(final QueryContext ctx, final InputInfo ii) {
     try {
-      final Item it = expr.item(ctx, input);
-      seq.cast(it, this, ctx, input);
+      seq.cast(expr, this, ctx);
       return Bln.TRUE;
     } catch(final QueryException ex) {
       return Bln.FALSE;
@@ -52,7 +50,7 @@ public final class Castable extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(seq.toString()));
+    ser.openElement(this, TYP, Token.token(seq.toString()));
     expr.plan(ser);
     ser.closeElement();
   }

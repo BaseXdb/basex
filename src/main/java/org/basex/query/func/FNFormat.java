@@ -8,12 +8,13 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Date;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.util.Err;
 import org.basex.query.util.format.DateFormatter;
 import org.basex.query.util.format.IntFormatter;
-import org.basex.query.util.format.NumFormatter;
+import org.basex.query.util.format.DecimalFormat;
 import org.basex.util.InputInfo;
 
 /**
@@ -59,11 +60,11 @@ final class FNFormat extends Fun {
    * @throws QueryException query exception
    */
   private Str formatInteger(final QueryContext ctx) throws QueryException {
-    final String pic = string(checkEStr(expr[1], ctx));
+    final String pic = string(checkStr(expr[1], ctx));
     if(pic.isEmpty()) WRONGINT.thrw(input, pic);
     if(expr[0].empty()) return Str.ZERO;
 
-    final byte[] lang = expr.length == 2 ? EMPTY : checkEStr(expr[2], ctx);
+    final byte[] lang = expr.length == 2 ? EMPTY : checkStr(expr[2], ctx);
     final long num = checkItr(expr[0], ctx);
     final byte[] str = IntFormatter.format(num, pic, string(lang));
     if(str == null) PICDATE.thrw(input, pic);
@@ -82,9 +83,11 @@ final class FNFormat extends Fun {
     if(it == null) it = Dbl.NAN;
     else if(!it.unt() && !it.num()) Err.number(this, it);
 
-    final String pic = string(checkEStr(expr[1], ctx));
-    if(expr.length == 3) FORMNUM.thrw(input, expr[2]);
-    return Str.get(NumFormatter.format(input, it, pic));
+    final String pic = string(checkStr(expr[1], ctx));
+    final QNm frm = new QNm(expr.length == 3 ? checkStr(expr[2], ctx) : EMPTY);
+    final DecimalFormat df = ctx.decFormats.get(frm);
+    if(df == null) FORMNUM.thrw(input, frm);
+    return Str.get(df.format(input, it, pic));
   }
 
   /**

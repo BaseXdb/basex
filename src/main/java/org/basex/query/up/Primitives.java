@@ -19,7 +19,7 @@ abstract class Primitives {
   /** Atomic update operations hashed by the pre value. */
   protected final IntMap<NodePrimitives> op = new IntMap<NodePrimitives>();
   /** Pre values of the target nodes which are updated, sorted ascending. */
-  protected IntList nodes;
+  protected IntList nodes = new IntList(0);
   /** Ids of fn:put target nodes. */
   protected final IntList putIds = new IntList(1);
 

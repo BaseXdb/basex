@@ -10,7 +10,7 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.util.ItemSet;
 import org.basex.util.InputInfo;
 
@@ -276,7 +276,7 @@ final class FNSeq extends Fun {
 
     // process any other iterator...
     return new Iter() {
-      final Iter ir = iter.size() != -1 ? iter : ItemIter.get(iter);
+      final Iter ir = iter.size() != -1 ? iter : ItemCache.get(iter);
       final long s = ir.size();
       long c = s;
 

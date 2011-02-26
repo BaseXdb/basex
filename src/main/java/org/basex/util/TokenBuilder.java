@@ -77,9 +77,11 @@ public final class TokenBuilder {
 
   /**
    * Resets the token buffer.
+   * @return self reference
    */
-  public void reset() {
+  public TokenBuilder reset() {
     size = 0;
+    return this;
   }
 
   /**
@@ -139,6 +141,28 @@ public final class TokenBuilder {
       addByte((byte) (ch >>  6 & 0x3F | 0x80));
       addByte((byte) (ch >>  0 & 0x3F | 0x80));
     }
+    return this;
+  }
+
+  /**
+   * Inserts the specified UTF8 character.
+   * @param pos insertion index
+   * @param ch the character to be added
+   * @return self reference
+   */
+  public TokenBuilder insert(final int pos, final int ch) {
+    int s = size;
+    final int cl = chars.length;
+    int l = ch <= 0x7F ? 1 : ch <= 0x7FF ? 2 : ch <= 0xFFF ? 3 : 4;
+
+    if(s + l > cl) {
+      final int ns = Math.max(s + l, (int) (cl * Array.RESIZE));
+      chars = Arrays.copyOf(chars, ns);
+    }
+    Array.move(chars, pos, l, size - pos);
+    size = pos;
+    add(ch);
+    size = s + l;
     return this;
   }
 

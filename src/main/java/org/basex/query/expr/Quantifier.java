@@ -125,7 +125,7 @@ public final class Quantifier extends ParseExpr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(every ? EVERY : SOME));
+    ser.openElement(this, TYP, Token.token(every ? EVERY : SOME));
     for(final Expr f : fl) f.plan(ser);
     sat.plan(ser);
     ser.closeElement();

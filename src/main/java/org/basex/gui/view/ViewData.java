@@ -116,25 +116,10 @@ public final class ViewData {
     }
 
     if(prop.is(GUIProp.SHOWNAME) && data.nameID != 0) {
-      final byte[] att = attValue(data, data.nameID, pre);
+      final byte[] att = data.attValue(data.nameID, pre);
       if(att != null) return att;
     }
     return content(data, pre, true);
-  }
-
-  /**
-   * Finds the specified attribute and returns its value.
-   * @param data data reference
-   * @param att the attribute id of the attribute to be found
-   * @param pre pre value
-   * @return attribute value
-   */
-  public static byte[] attValue(final Data data, final int att,
-      final int pre) {
-    final int a = pre + data.attSize(pre, data.kind(pre));
-    int p = pre;
-    while(++p != a) if(data.name(p) == att) return data.text(p, false);
-    return null;
   }
 
   /**

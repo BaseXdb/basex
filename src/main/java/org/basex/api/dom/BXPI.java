@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.util.Token;
 import org.w3c.dom.ProcessingInstruction;
 
@@ -15,7 +15,7 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
    * Constructor.
    * @param n node reference
    */
-  public BXPI(final Nod n) {
+  public BXPI(final ANode n) {
     super(n);
   }
 

@@ -4,7 +4,7 @@ import static org.basex.query.util.Err.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.util.InputInfo;
 
@@ -21,7 +21,7 @@ public final class ReplaceValue extends NewValue {
    * @param n target node
    * @param newName new name
    */
-  public ReplaceValue(final InputInfo ii, final Nod n, final QNm newName) {
+  public ReplaceValue(final InputInfo ii, final ANode n, final QNm newName) {
     super(ii, n, newName);
   }
 

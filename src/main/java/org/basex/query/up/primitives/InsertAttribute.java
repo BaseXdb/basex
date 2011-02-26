@@ -1,8 +1,8 @@
 package org.basex.query.up.primitives;
 
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
-import org.basex.query.iter.NodIter;
+import org.basex.query.item.ANode;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
 
@@ -19,7 +19,8 @@ public final class InsertAttribute extends NodeCopy {
    * @param n target node
    * @param copy insertion nods
    */
-  public InsertAttribute(final InputInfo ii, final Nod n, final NodIter copy) {
+  public InsertAttribute(final InputInfo ii, final ANode n,
+      final NodeCache copy) {
     super(ii, n, copy);
   }
 

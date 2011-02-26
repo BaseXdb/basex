@@ -6,7 +6,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.DeletePrimitive;
 import org.basex.util.InputInfo;
@@ -33,8 +33,8 @@ public final class Delete extends Update {
     final Iter t = ctx.iter(expr[0]);
     Item i;
     while((i = t.next()) != null) {
-      if(!(i instanceof Nod)) UPTRGDELEMPT.thrw(input);
-      final Nod n = (Nod) i;
+      if(!(i instanceof ANode)) UPTRGDELEMPT.thrw(input);
+      final ANode n = (ANode) i;
       // nodes without parents are ignored
       if(n.parent() == null) continue;
       ctx.updates.add(new DeletePrimitive(input, n), ctx);

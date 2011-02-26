@@ -2,6 +2,7 @@ package org.basex.query.util;
 
 import static org.basex.query.util.Err.ErrType.*;
 import org.basex.core.Text;
+import org.basex.data.SerializerException;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;
@@ -17,8 +18,6 @@ import org.basex.util.InputInfo;
  */
 public enum Err {
 
-  /** BASX0000: Error that it still to be defined by the specs. */
-  UNDEF(BASX, 0, "%."),
   /** BASX0000: Not implemented yet. */
   NOTIMPL(BASX, 0, "Not implemented yet: %."),
 
@@ -77,7 +76,7 @@ public enum Err {
   /** FODC0005: Evaluation exception. */
   INVDOC(FODC, 5, "Invalid document \"%\"."),
   /** FODC0006: Evaluation exception. */
-  DOCWF(FODC, 6, "SAX: %."),
+  SAXERR(FODC, 6, "SAX: %."),
   /** FODC0007: Evaluation exception. */
   DOCBASE(FODC, 7, "Base URI % is invalid."),
 
@@ -125,6 +124,15 @@ public enum Err {
   CANNOTMOVE(FOFL, 8, "Moving '%' to '%' failed."),
   /** FOFL0008: Evaluation exception. */
   CANNOTLIST(FOFL, 8, "Files of '%' cannot be returned."),
+
+  /** FOZP0001: Evaluation exception. */
+  ZIPFAIL(FOZP, 1, "Operation failed: %."),
+  /** FOZP0002: Evaluation exception. */
+  ZIPNOTFOUND(FOZP, 2, "Path '%' not found."),
+  /** FOZP0003: Evaluation exception. */
+  ZIPINVALID(FOZP, 3, "% element: % attribute expected."),
+  /** FOZP0003: Evaluation exception. */
+  ZIPUNKNOWN(FOZP, 3, "ZIP Definition: unknown element %."),
 
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL: \"%\"."),
@@ -226,6 +234,25 @@ public enum Err {
   /** FTST0019: Parsing exception. */
   FTDUP(FTST, 19, "Match option '%' was defined twice."),
 
+  /** SESU0007: Serialization exception. */
+  SERENCODING(SESU, 7, "Unknown encoding: \"%\"."),
+  /** SEPM0009: Serialization exception. */
+  SERSTAND(SEPM, 9, "Invalid combination of \"omit-xml-declaration\"."),
+  /** SEPM0010: Serialization exception. */
+  SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
+  /** SERE0014: Serialization exception. */
+  SERILL(SERE, 14, "Illegal HTML character found: #x%."),
+  /** SERE0015: Serialization exception. */
+  SERPI(SERE, 15, "Processing construction contains \">\"."),
+  /** SEPM0016: Serialization exception. */
+  SERINVALID(SEPM, 16, "Parameter \"%\" is unknown."),
+  /** SEPM0016: Serialization exception. */
+  SERMAP(SEPM, 16, "Character map \"%\" is not defined."),
+  /** SEPM0016: Serialization exception. */
+  SERANY(SEPM, 16, "%."),
+  /** SEPM0017: Serialization exception. */
+  SERUNKNOWN(SEPM, 17, "Serialization: unknown element %."),
+
   /** XPDY0002: Parsing exception. */
   VAREMPTY(XPDY, 2, "No value defined for \"%\"."),
   /** XPDY0002: Evaluation Exception. */
@@ -304,6 +331,8 @@ public enum Err {
   FUNCMISS(XPST, 3, "Expecting closing bracket for \"%(...\"."),
   /** XPST0003: Parsing exception. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
+  /** XPST0003: Parsing exception. */
+  NODECLFORM(XPST, 3, "Expecting decimal-format property definition."),
   /** XPST0003: Parsing exception. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** XPST0003: Parsing exception. */
@@ -530,18 +559,28 @@ public enum Err {
   CIRCMODULE(XQST, 93, "Circular module definition."),
   /** XPST0094: Parsing exception. */
   GVARNOTDEFINED(XQST, 94, "Undefined grouping variable \"%\"."),
+  /** XPST0097: Parsing exception. */
+  INVDECFORM(XQST, 97, "Invalid decimal-format property: %=\"%\"."),
+  /** XPST0098: Parsing exception. */
+  DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format \"%\"."),
   /** XQST0108: Parsing exception. */
   MODOUT(XQST, 108, "No output declarations allowed in modules."),
   /** XPST0109: Parsing exception. */
   OUTWHICH(XQST, 109, "Unknown serialization parameter: \"%\"."),
   /** XPST0110: Parsing exception. */
-  OUTDUPL(XQST, 110, "Duplicate definition of \"output:%\"."),
+  OUTDUPL(XQST, 110, "Duplicate declaration of \"output:%\"."),
+  /** XPST0111: Parsing exception. */
+  DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
+  /** XPST0111: Parsing exception. */
+  DECDUPLPROP(XQST, 114, "Duplicate decimal-format property \"%\"."),
 
   /** XQTY0024: Parsing exception. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
 
   /** XTDE0030: Parsing exception. */
   WRONGINT(XTDE, 30, "Wrong integer format: \"%\"."),
+  /** XTDE1170: Parsing exception. */
+  WRONGINPUT(XTDE, 1170, "Failed to read \"%\": %."),
 
   /** XUDY0009: XQuery Update dynamic exception. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),
@@ -626,14 +665,25 @@ public enum Err {
   }
 
   /**
-   * Throws an exception.
+   * Throws a query exception.
    * @param ii input info
    * @param ext extended info
+   * @return query exception (dummy)
    * @throws QueryException query exception
    */
-  public void thrw(final InputInfo ii, final Object... ext)
+  public QueryException thrw(final InputInfo ii, final Object... ext)
       throws QueryException {
     throw new QueryException(ii, this, ext);
+  }
+
+  /**
+   * Throws a serializer exception.
+   * Might to be merged with {@link #thrw} in future.
+   * @param ext extended info
+   * @return query exception (dummy)
+   */
+  public SerializerException serial(final Object... ext) {
+    return new SerializerException(this, ext);
   }
 
   /**
@@ -664,8 +714,12 @@ public enum Err {
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,
     /** FOUP Error type. */ FOUP,
+    /** FOZP Error type. */ FOZP,
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
+    /** SEPM Error type. */ SEPM,
+    /** SERE Error type. */ SERE,
+    /** SEPM Error type. */ SESU,
     /** XPDY Error type. */ XPDY,
     /** XPST Error type. */ XPST,
     /** XPTY Error type. */ XPTY,
