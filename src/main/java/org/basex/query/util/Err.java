@@ -126,13 +126,13 @@ public enum Err {
   CANNOTLIST(FOFL, 8, "Files of '%' cannot be returned."),
 
   /** FOZP0001: Evaluation exception. */
-  ZIPFAIL(FOZP, 1, "Operation failed: %."),
+  ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
   /** FOZP0002: Evaluation exception. */
-  ZIPNOTFOUND(FOZP, 2, "Path '%' not found."),
-  /** FOZP0003: Evaluation exception. */
-  ZIPINVALID(FOZP, 3, "% element: % attribute expected."),
+  ZIPINVALID(FOZP, 2, "% element: % attribute expected."),
   /** FOZP0003: Evaluation exception. */
   ZIPUNKNOWN(FOZP, 3, "ZIP Definition: unknown element %."),
+  /** FOZP0004: Evaluation exception. */
+  ZIPFAIL(FOZP, 4, "Operation failed: %."),
 
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL: \"%\"."),

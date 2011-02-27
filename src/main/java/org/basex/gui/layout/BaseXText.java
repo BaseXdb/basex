@@ -465,7 +465,7 @@ public class BaseXText extends BaseXPanel {
           }
           text.endMark();
         }
-        if(undo != null) undo.cursor(text.cursor());
+        undo.cursor(text.cursor());
         text.delete();
       } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || DELPREV.is(e)) {
         if(nomark) {
@@ -480,7 +480,7 @@ public class BaseXText extends BaseXPanel {
           }
           text.endMark();
         }
-        if(undo != null) undo.cursor(text.cursor());
+        undo.cursor(text.cursor());
         text.delete();
         down = false;
       } else {

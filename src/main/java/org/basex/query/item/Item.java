@@ -255,7 +255,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public int hashCode() {
+  public int hash() {
     return Token.hash(atom());
   }
 

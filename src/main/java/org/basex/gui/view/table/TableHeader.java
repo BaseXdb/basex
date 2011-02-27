@@ -380,10 +380,8 @@ final class TableHeader extends BaseXPanel {
       final Nodes marked = view.gui.context.marked;
       if(marked.size() != 0) view.gui.notify.context(marked, false, null);
     } else if(TAB.is(e)) {
-      if(box != null) {
-        tdata.cols[inputCol].filter = box.text;
-        box.stop();
-      }
+      tdata.cols[inputCol].filter = box.text;
+      box.stop();
       final int in = inputCol + (e.isShiftDown() ? -1 : 1);
       if(in < 0) {
         transferFocusBackward();

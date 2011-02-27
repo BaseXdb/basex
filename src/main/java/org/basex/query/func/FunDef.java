@@ -445,7 +445,8 @@ public enum FunDef {
   /** XQuery function */
   BENTRY(ZIPURI, FNZip.class, 2, 2, "binary-entry(path, entry)", B64),
   /** XQuery function */
-  TEXTENTRY(ZIPURI, FNZip.class, 2, 2, "text-entry(path, entry)", STR),
+  TEXTENTRY(ZIPURI, FNZip.class, 2, 3,
+      "text-entry(path, entry, encoding?)", STR),
   /** XQuery function */
   HTMLENTRY(ZIPURI, FNZip.class, 2, 2, "html-entry(path, entry)", NOD),
   /** XQuery function */

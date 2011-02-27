@@ -119,7 +119,7 @@ final class GroupPartition {
     }
 
     final GroupNode gn = new GroupNode(vals);
-    final int h = gn.hashCode();
+    final int h = gn.hash();
     final IntList ps = hashes.get(h);
     int p = -1;
     if(ps != null) {

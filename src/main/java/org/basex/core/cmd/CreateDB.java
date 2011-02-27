@@ -109,8 +109,7 @@ public final class CreateDB extends ACreate {
     final InputStream is = input instanceof BufferedInputStream ||
       input instanceof BufferInput ? input : new BufferedInputStream(input);
     final SAXSource sax = new SAXSource(new InputSource(is));
-    final SAXWrapper sw = new SAXWrapper(sax, ctx.prop);
-    return xml(name, sw, ctx);
+    return xml(name, new SAXWrapper(sax, ctx.prop), ctx);
   }
 
   /**

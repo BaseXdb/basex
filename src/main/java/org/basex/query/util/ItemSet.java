@@ -35,7 +35,7 @@ public final class ItemSet {
   public boolean index(final InputInfo ii, final Item i) throws QueryException {
     if(size == next.length) rehash();
 
-    final int h = i.hashCode();
+    final int h = i.hash();
     final int p = h & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
       if(values[id].equiv(ii, i)) return false;

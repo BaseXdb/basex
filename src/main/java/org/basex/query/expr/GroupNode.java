@@ -23,7 +23,7 @@ final class GroupNode {
   GroupNode(final Value[] vl) {
     vals = vl;
     int h = 0;
-    for(final Value v : vals) h = (h << 5) - h + v.hashCode();
+    for(final Value v : vals) h = (h << 5) - h + v.hash();
     hash = h;
   }
 
@@ -43,8 +43,11 @@ final class GroupNode {
     return true;
   }
 
-  @Override
-  public int hashCode() {
+  /**
+   * Returns the hash code of this node.
+   * @return hash code
+   */
+  public int hash() {
     return hash;
   }
 }

@@ -176,7 +176,7 @@ public class BufferInput extends InputStream {
   public final int readChar() throws IOException {
     // handle different encodings
     final byte ch = readByte();
-    // comparison by references
+    // encoding can be safely compared by references...
     if(enc == UTF8) {
       final int cl = cl(ch);
       if(cl == 1) return ch & 0xFF;

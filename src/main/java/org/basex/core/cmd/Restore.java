@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.basex.core.Command;
@@ -75,16 +74,16 @@ public final class Restore extends Command {
    * @return success flag
    */
   private boolean restore(final File file, final Prop pr) {
-    InputStream is = null;
+    ZipInputStream zis = null;
     try {
       // count number of files
-      is = new BufferedInputStream(new FileInputStream(file));
-      ZipInputStream zis = new ZipInputStream(is);
+      zis = new ZipInputStream(new BufferedInputStream(
+          new FileInputStream(file)));
       while(zis.getNextEntry() != null) tf++;
       zis.close();
       // reopen zip stream
-      is = new BufferedInputStream(new FileInputStream(file));
-      zis = new ZipInputStream(is);
+      zis = new ZipInputStream(new BufferedInputStream(
+          new FileInputStream(file)));
 
       final byte[] data = new byte[IO.BLOCKSIZE];
       ZipEntry e;
@@ -94,11 +93,14 @@ public final class Restore extends Command {
         if(e.isDirectory()) {
           new File(path).mkdir();
         } else {
-          final BufferedOutputStream bos = new BufferedOutputStream(
-              new FileOutputStream(path));
-          int c;
-          while((c = zis.read(data)) != -1) bos.write(data, 0, c);
-          bos.close();
+          BufferedOutputStream bos = null;
+          try {
+            bos = new BufferedOutputStream(new FileOutputStream(path));
+            int c;
+            while((c = zis.read(data)) != -1) bos.write(data, 0, c);
+          } finally {
+            if(bos != null) try { bos.close(); } catch(final IOException ee) { }
+          }
         }
       }
       zis.close();
@@ -107,7 +109,7 @@ public final class Restore extends Command {
       Util.debug(ex);
       return false;
     } finally {
-      if(is != null) try { is.close(); } catch(final IOException e) { }
+      if(zis != null) try { zis.close(); } catch(final IOException e) { }
     }
   }
 

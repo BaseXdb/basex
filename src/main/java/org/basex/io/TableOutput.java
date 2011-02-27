@@ -69,11 +69,15 @@ public final class TableOutput extends OutputStream {
     flush();
     os.close();
 
-    final DataOutput dt = new DataOutput(meta.file(file + 'i'));
-    dt.writeNum(bcount);
-    dt.writeNum(bcount);
-    dt.writeNums(firstPres.toArray());
-    dt.writeNums(blocks.toArray());
-    dt.close();
+    DataOutput dt = null;
+    try {
+      dt = new DataOutput(meta.file(file + 'i'));
+      dt.writeNum(bcount);
+      dt.writeNum(bcount);
+      dt.writeNums(firstPres.toArray());
+      dt.writeNums(blocks.toArray());
+    } finally {
+      if(dt != null) try { dt.close(); } catch(final IOException ex) { }
+    }
   }
 }

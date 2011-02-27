@@ -52,9 +52,13 @@ public final class IOFile extends IO {
 
   @Override
   public void cache() throws IOException {
-    final BufferInput bi = new BufferInput(file);
-    cont = bi.content().toArray();
-    bi.close();
+    BufferInput bi = null;
+    try {
+      bi = new BufferInput(file);
+      cont = bi.content().toArray();
+    } finally {
+      if(bi != null) try { bi.close(); } catch(final IOException ex) { }
+    }
   }
 
   @Override
@@ -289,7 +293,7 @@ public final class IOFile extends IO {
 
     /**
      * Adds a directory/file to the path list.
-     * @param tb entry
+     * @param tb entry to be added
      */
     private void add(final TokenBuilder tb) {
       String s = tb.toString();
@@ -302,7 +306,7 @@ public final class IOFile extends IO {
         if(list[size - 1].indexOf(':') == -1) delete(size - 1);
       } else if(!s.equals(".") && !s.isEmpty()) {
         // skip self and empty steps
-        add(s.toString());
+        add(s);
       }
       tb.reset();
     }
