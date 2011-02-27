@@ -46,7 +46,7 @@ public final class Put extends UpdatePrimitive {
     try {
       out = new PrintOutput(Token.string(path()));
 
-      SerializerProp pr = ctx.serProp();
+      final SerializerProp pr = ctx.serProp();
       // try to reproduce non-chopped documents correctly
       if(node instanceof DBNode) pr.set(SerializerProp.S_INDENT,
           ((DBNode) node).data.meta.chop ? YES : NO);
