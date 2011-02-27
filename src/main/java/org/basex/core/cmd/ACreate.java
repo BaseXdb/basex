@@ -126,7 +126,7 @@ abstract class ACreate extends Command {
       case ATTRIBUTE: b = new ValueBuilder(d, false); break;
       case FULLTEXT: b = FTBuilder.get(d); break;
       case PATH: b = new PathBuilder(d); break;
-      default: Util.notexpected();
+      default: throw Util.notexpected();
     }
     d.closeIndex(i);
     d.meta.dirty = true;

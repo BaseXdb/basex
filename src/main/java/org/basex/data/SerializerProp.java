@@ -100,7 +100,7 @@ public final class SerializerProp extends AProp {
       final String[] sprop = ser.split("=", 2);
       final String key = sprop[0].trim();
       final String val = sprop.length < 2 ? "" : sprop[1].trim();
-      if(get(key) == null) throw SERINVALID.serial(key);
+      if(get(key) == null) SERINVALID.serial(key);
       set(key, val);
     }
   }
@@ -134,6 +134,10 @@ public final class SerializerProp extends AProp {
     tb.addExt(SERVAL, key, allowed[0]);
     for(int a = 1; a < allowed.length; ++a) tb.addExt(SERVAL2, allowed[a]);
     tb.addExt(SERVAL3, found);
-    return SERANY.serial(tb);
+    try {
+      return SERANY.serial(tb);
+    } catch(final SerializerException ex) {
+      return ex;
+    }
   }
 }

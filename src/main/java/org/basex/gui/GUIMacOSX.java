@@ -42,8 +42,6 @@ public final class GUIMacOSX {
   private final Class<?> appClass;
   /** Instance of the 'Application' class. */
   private final Object appObj;
-  /** Reference to the loaded 'ApplicationEvent' class. */
-  final Class<?> appEvent;
 
   /**
    * Constructor.
@@ -58,7 +56,7 @@ public final class GUIMacOSX {
     // load native java classes...
     appClass = Class.forName(C_APPLICATION);
     appObj = invoke(appClass, null, "getApplication", EC, EO);
-    appEvent = Class.forName(C_APPLICATION_EVENT);
+    Class.forName(C_APPLICATION_EVENT);
 
     if(appObj != null) {
       invoke("addAboutMenuItem");

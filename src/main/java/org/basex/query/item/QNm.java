@@ -150,8 +150,7 @@ public final class QNm extends Item {
 
   @Override
   public boolean bool(final InputInfo ii) throws QueryException {
-    CONDTYPE.thrw(ii, type, this);
-    return false;
+    throw CONDTYPE.thrw(ii, type, this);
   }
 
   @Override
@@ -171,8 +170,7 @@ public final class QNm extends Item {
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    Err.diff(ii, it, this);
-    return 0;
+    throw Err.diff(ii, it, this);
   }
 
   /**

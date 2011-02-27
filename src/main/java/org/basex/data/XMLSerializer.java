@@ -119,7 +119,7 @@ public final class XMLSerializer extends Serializer {
     p.check(S_NORMALIZATION_FORM, NFC, NONE);
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
-    if(!maps.isEmpty()) throw SERMAP.serial(maps);
+    if(!maps.isEmpty()) SERMAP.serial(maps);
 
     enc     = normEncoding(p.get(S_ENCODING), null);
     docsys  = p.get(S_DOCTYPE_SYSTEM);
@@ -305,7 +305,7 @@ public final class XMLSerializer extends Serializer {
     if(mth == M_TEXT) return;
     finishElement();
     if(ind) indent(true);
-    if(mth == M_HTML && contains(v, '>')) throw SERPI.serial();
+    if(mth == M_HTML && contains(v, '>')) SERPI.serial();
     print(PI1);
     print(n);
     print(' ');
@@ -334,7 +334,7 @@ public final class XMLSerializer extends Serializer {
         return;
       }
       if(ch < 0x20 && ch != 0x09 && ch != 0x0A && ch != 0x0D) return;
-      if(ch > 0x7F && ch < 0xA0) throw SERILL.serial(Integer.toHexString(ch));
+      if(ch > 0x7F && ch < 0xA0) SERILL.serial(Integer.toHexString(ch));
       if(ch == 0xA0) {
         print(E_NBSP);
         return;

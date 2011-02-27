@@ -166,10 +166,18 @@ public final class FNSimple extends Fun {
   public static boolean deep(final InputInfo ii, final Iter iter1,
       final Iter iter2) throws QueryException {
 
-    Item it1 = null;
-    Item it2 = null;
-    // explicit non-short-circuit..
-    while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
+    while(true) {
+      final Item it1 = iter1.next();
+      final Item it2 = iter2.next();
+      // at least one iterator is exhausted: check if both items are null
+      if(it1 == null) {
+        if(it2 == null) return true;
+        if(it2.func()) FNDEQ.thrw(ii, it2);
+        return false;
+      } else if(it2 == null) {
+        if(it1.func()) FNDEQ.thrw(ii, it1);
+        return false;
+      }
 
       // check for functions
       if(it1.func() || it2.func()) FNDEQ.thrw(ii, it1.func() ? it2 : it2);
@@ -251,11 +259,5 @@ public final class FNSimple extends Fun {
         desc = true;
       } while(!chld.isEmpty());
     }
-    if(it1 == null) {
-      if(it2 == null) return true;
-      if(it2.func()) FNDEQ.thrw(ii, it2);
-    } else if(it1.func()) FNDEQ.thrw(ii, it1);
-
-    return false;
   }
 }

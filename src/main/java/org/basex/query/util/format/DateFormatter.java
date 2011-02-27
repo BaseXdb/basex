@@ -36,7 +36,7 @@ public final class DateFormatter {
       final byte[] lng, final byte[] cal, final byte[] plc, final InputInfo ii)
       throws QueryException {
 
-    // [CG] XQuery/Formatter: calendars and places are ignored
+    // [CG] XQuery/Formatter: currently, calendars and places are ignored
     if(cal != null || plc != null);
 
     final Formatter form = Formatter.get(string(lng));
@@ -59,63 +59,64 @@ public final class DateFormatter {
         final boolean dat = date.type == AtomType.DAT;
         final boolean tim = date.type == AtomType.TIM;
         final XMLGregorianCalendar gc = date.xc;
+        boolean err = false;
         switch(spec) {
           case 'Y':
-            if(tim) PICCOMP.thrw(ii, pic);
             num = gc.getYear();
+            err = tim;
             break;
           case 'M':
-            if(tim) PICCOMP.thrw(ii, pic);
             num = gc.getMonth();
+            err = tim;
             break;
           case 'D':
-            if(tim) PICCOMP.thrw(ii, pic);
             num = gc.getDay();
+            err = tim;
             break;
           case 'd':
-            if(tim) PICCOMP.thrw(ii, pic);
             num = Date.days(0, gc.getMonth(), gc.getDay());
+            err = tim;
             break;
           case 'F':
-            if(tim) PICCOMP.thrw(ii, pic);
             num = gc.toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
             pres = "n";
+            err = tim;
             break;
           case 'W':
             num = gc.toGregorianCalendar().get(Calendar.WEEK_OF_YEAR);
-            if(tim) PICCOMP.thrw(ii, pic);
+            err = tim;
             break;
           case 'w':
             num = gc.toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
-            if(tim) PICCOMP.thrw(ii, pic);
+            err = tim;
             break;
           case 'H':
-            if(dat) PICCOMP.thrw(ii, pic);
             num = gc.getHour();
+            err = dat;
             break;
           case 'h':
             num = gc.getHour() % 12;
-            if(dat) PICCOMP.thrw(ii, pic);
+            err = dat;
             break;
           case 'P':
-            if(dat) PICCOMP.thrw(ii, pic);
             num = gc.getHour() / 12;
             pres = "n";
+            err = dat;
             break;
           case 'm':
-            if(dat) PICCOMP.thrw(ii, pic);
             num = gc.getMinute();
             pres = "01";
+            err = dat;
             break;
           case 's':
-            if(dat) PICCOMP.thrw(ii, pic);
             num = gc.getSecond();
             pres = "01";
+            err = dat;
             break;
           case 'f':
-            if(dat) PICCOMP.thrw(ii, pic);
             num = gc.getMillisecond();
             pres = "1";
+            err = dat;
             break;
           case 'Z':
             num = gc.getTimezone();
@@ -133,9 +134,10 @@ public final class DateFormatter {
             pres = "n";
             break;
           default:
-            PICDATE.thrw(ii, pic);
+            err = true;
             break;
         }
+        if(err) PICCOMP.thrw(ii, pic);
 
         final FormatParser mp = new FormatParser(m, pres, true);
         if(mp.error) PICDATE.thrw(ii, pic);

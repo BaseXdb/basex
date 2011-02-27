@@ -42,8 +42,7 @@ public abstract class Seq extends Value {
   @Override
   public final Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    XPSEQ.thrw(ii, this);
-    return null;
+    throw XPSEQ.thrw(ii, this);
   }
 
   @Override

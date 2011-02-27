@@ -143,7 +143,6 @@ final class FNZip extends Fun {
       final Iterator<String> it = map.keySet().iterator();
       createNode(map, it, root, "");
       return root;
-
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
@@ -199,7 +198,7 @@ final class FNZip extends Fun {
           new FileOutputStream(file)));
       createFile(zos, elm, ctx);
     } catch(final IOException ex) {
-      throw ZIPFAIL.thrw(input, ex.getMessage());
+      ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
       if(zos != null) try { zos.close(); } catch(final IOException e) { }
     }
@@ -232,7 +231,7 @@ final class FNZip extends Fun {
 
       if(path == null) {
         // throw exception if both attributes are null
-        if(src == null) ZIPINVALID.thrw(input, node.qname(), A_SRC);
+        if(src == null) throw ZIPINVALID.thrw(input, node.qname(), A_SRC);
         path = src.replaceAll(".*/", "");
       }
 

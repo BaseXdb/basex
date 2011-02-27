@@ -55,7 +55,7 @@ public final class Replace extends Update {
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
     // check target constraints
-    if(i == null) UPSEQEMP.thrw(input, Util.name(this));
+    if(i == null) throw UPSEQEMP.thrw(input, Util.name(this));
     final Type tp = i.type;
     if(!(i instanceof ANode) || tp == NodeType.DOC || t.next() != null)
       UPTRGMULT.thrw(input);

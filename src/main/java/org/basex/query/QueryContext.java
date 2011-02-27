@@ -277,8 +277,7 @@ public final class QueryContext extends Progress {
       return v.iter(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      XPSTACK.thrw(null);
-      return null;
+      throw XPSTACK.thrw(null);
     }
   }
 

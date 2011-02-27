@@ -182,8 +182,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode parent() {
-    if(par != null) return (DBNode) par;
+  public final ANode parent() {
+    if(par != null) return par;
     final int p = data.parent(pre, data.kind(pre));
     if(p == -1) return null;
 

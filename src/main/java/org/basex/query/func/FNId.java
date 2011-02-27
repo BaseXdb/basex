@@ -199,7 +199,7 @@ final class FNId extends Fun {
       ANode n = node;
       while(n.type != NodeType.DOC) {
         n = n.parent();
-        if(n == null) IDDOC.thrw(input);
+        if(n == null) throw IDDOC.thrw(input);
       }
     }
     return node;

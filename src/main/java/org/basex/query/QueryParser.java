@@ -3252,8 +3252,7 @@ public class QueryParser extends InputParser {
    * @param arg error arguments
    * @throws QueryException query exception
    */
-  public void error(final Err err, final Object... arg)
-      throws QueryException {
+  public void error(final Err err, final Object... arg) throws QueryException {
     err.thrw(input(), arg);
   }
 }

@@ -63,8 +63,7 @@ public final class ViewNotifier {
   public void init() {
     final Context ctx = gui.context;
     final Data data = ctx.data;
-    final boolean db = data != null;
-    if(db) {
+    if(data != null) {
       cont[0] = ctx.current;
       marked[0] = new Nodes(data);
 
@@ -91,7 +90,7 @@ public final class ViewNotifier {
     maxhist = 0;
     for(final View v : view) v.refreshInit();
     gui.layoutViews();
-    gui.setTitle(db ? data.meta.name : null);
+    gui.setTitle(data != null ? data.meta.name : null);
   }
 
   /**

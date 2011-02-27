@@ -14,7 +14,7 @@ import java.util.Iterator;
  */
 public final class TokenList extends ElementList implements Iterable<byte[]> {
   /** Element container. */
-  protected byte[][] list;
+  byte[][] list;
 
   /**
    * Default constructor.

@@ -135,7 +135,7 @@ public final class DecimalFormat {
     // find pattern separator and sub-patterns
     final TokenList tl = new TokenList();
     String pic = picture;
-    int i = pic.indexOf(pattern);
+    final int i = pic.indexOf(pattern);
     if(i == -1) {
       tl.add(pic);
     } else {
@@ -167,7 +167,7 @@ public final class DecimalFormat {
 
       // loop through all characters
       for(int i = 0; i < pt.length; i += cl(pt, i)) {
-        int ch = cp(pt, i);
+        final int ch = cp(pt, i);
         final boolean a = active.indexOf(ch) != -1;
 
         if(ch == decimal) {
@@ -234,7 +234,7 @@ public final class DecimalFormat {
 
       // loop through all characters
       for(int i = 0; i < pt.length; i += cl(pt, i)) {
-        int ch = cp(pt, i);
+        final int ch = cp(pt, i);
         final boolean a = active.indexOf(ch) != -1;
 
         if(ch == decimal) {

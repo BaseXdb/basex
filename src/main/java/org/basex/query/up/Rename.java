@@ -45,7 +45,7 @@ public final class Rename extends Update {
     final Item i = t.next();
 
     // check target constraints
-    if(i == null) UPSEQEMP.thrw(input, Util.name(this));
+    if(i == null) throw UPSEQEMP.thrw(input, Util.name(this));
     if(t.next() != null) UPWRTRGTYP.thrw(input);
 
     CFrag ex = null;
@@ -56,7 +56,7 @@ public final class Rename extends Update {
     } else if(i.type == NodeType.PI) {
       ex = new CPI(input, expr[1], Empty.SEQ);
     } else {
-      UPWRTRGTYP.thrw(input);
+      throw UPWRTRGTYP.thrw(input);
     }
 
     // check namespace conflicts...

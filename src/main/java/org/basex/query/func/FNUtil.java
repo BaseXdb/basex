@@ -92,8 +92,7 @@ final class FNUtil extends Fun {
     try {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
-      NODOC.thrw(input, ex);
-      return null;
+      throw NODOC.thrw(input, ex);
     }
   }
 
@@ -327,7 +326,7 @@ final class FNUtil extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (def == FunDef.MB || def == FunDef.MB
+    return u == Use.CTX && (def == FunDef.MB || def == FunDef.MS
         || def == FunDef.EVAL || def == FunDef.RUN) || super.uses(u);
   }
 }

@@ -155,9 +155,8 @@ final class FNAggr extends Fun {
       if(!a.num()) FUNCMP.thrw(input, this, ta, tb);
       return DBL;
     }
-    if(a.num() && !b.unt() && b.str()) {
-      FUNCMP.thrw(input, this, ta, tb);
-    }
+    if(a.num() && !b.unt() && b.str()) FUNCMP.thrw(input, this, ta, tb);
+
     if(ta == tb) return ta;
     if(ta == DBL || tb == DBL) return DBL;
     if(ta == FLT || tb == FLT) return FLT;
