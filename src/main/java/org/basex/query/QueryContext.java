@@ -15,6 +15,7 @@ import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
+import org.basex.data.SerializerException;
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
@@ -276,8 +277,7 @@ public final class QueryContext extends Progress {
       return v.iter(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      XPSTACK.thrw(null);
-      return null;
+      throw XPSTACK.thrw(null);
     }
   }
 
@@ -371,9 +371,19 @@ public final class QueryContext extends Progress {
   /**
    * Returns the serialization properties.
    * @return serialization properties
+   * @throws SerializerException serializer exception
    */
-  public SerializerProp serProp() {
-    return serProp;
+  public SerializerProp serProp() throws SerializerException {
+    // if available, use local query properties
+    if(serProp != null) return serProp;
+    // otherwise, apply global serialization option
+    final SerializerProp sp = new SerializerProp(
+        context.prop.get(Prop.SERIALIZER));
+    if(context.prop.is(Prop.WRAPOUTPUT)) {
+      sp.set(SerializerProp.S_WRAP_PREFIX, NAMELC);
+      sp.set(SerializerProp.S_WRAP_URI, URL);
+    }
+    return sp;
   }
 
   @Override

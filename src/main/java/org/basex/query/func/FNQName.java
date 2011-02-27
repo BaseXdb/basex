@@ -77,12 +77,10 @@ final class FNQName extends Fun {
         nm = (QNm) checkType(it, Type.QNM);
         return !nm.ns() ? null : new NCN(nm.pref(), input);
       case NSURIPRE: // [LW][LK] broken...
+        // [LK] find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);
-
-        // [LK] find out if inherit flag has a persistent effect - if positive,
-        // we're screwed. test case added to unresolved namespace tests.
         final ANode an = (ANode) checkType(it2, Type.ELM);
-        final Atts at = an.nsScope(copiedNod(an, ctx) ? ctx.nsInherit : true);
+        final Atts at = an.nsScope(!copiedNod(an, ctx) || ctx.nsInherit);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:

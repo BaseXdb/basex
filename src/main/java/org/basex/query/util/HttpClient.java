@@ -1,5 +1,6 @@
 package org.basex.query.util;
 
+import static org.basex.data.DataText.*;
 import static java.lang.Integer.*;
 import static java.net.HttpURLConnection.*;
 import static org.basex.query.util.Err.*;
@@ -123,7 +124,7 @@ public final class HttpClient {
   private final TokenMap reqAttrs;
   /** Headers. */
   private final TokenMap headers;
-  /** Multipart. */
+  /** Multipart; currently not used. */
   @SuppressWarnings("unused")
   private ANode multipart;
   /** Body. */
@@ -183,12 +184,9 @@ public final class HttpClient {
 
     final AxisIter ai = request.children();
     ANode n = null;
-
     while((n = ai.next()) != null) {
-
       // Header children
       if(eq(n.nname(), HEADER)) {
-
         final AxisIter attrs = n.atts();
         ANode attr = null;
         byte[] name = null;
@@ -204,10 +202,15 @@ public final class HttpClient {
             break;
           }
         }
-      } else if(eq(n.nname(), MULTIPART)) multipart = n;
-      // Body child
-      else if(eq(n.nname(), BODY)) body = n;
-      else REQINV.thrw(ii);
+      } else if(eq(n.nname(), MULTIPART)) {
+        // [RS] not supported yet
+        multipart = n;
+      } else if(eq(n.nname(), BODY)) {
+        body = n;
+      } else {
+        // Body child
+        throw REQINV.thrw(ii);
+      }
     }
   }
 
@@ -233,13 +236,12 @@ public final class HttpClient {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      URLINV.thrw(info, adr);
+      throw URLINV.thrw(info, adr);
     } catch(final ProtocolException ex) {
-      PROTINV.thrw(info);
+      throw PROTINV.thrw(info);
     } catch(final IOException ex) {
-      HTTPERR.thrw(info, ex);
+      throw HTTPERR.thrw(info, ex);
     }
-    return null;
   }
 
   /**
@@ -311,14 +313,14 @@ public final class HttpClient {
       // Set serial parameter "method" according to MIME type
       sb.append("method=");
       if(method == null) {
-        if(eq(mediaType, APPL_XHTML)) sb.append("xhtml");
+        if(eq(mediaType, APPL_XHTML)) sb.append(M_XHTML);
         else if(eq(mediaType, APPL_XML) || eq(mediaType, APPL_EXT_XML)
             || eq(mediaType, TXT_XML) || eq(mediaType, TXT_EXT_XML)
-            || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append("xml");
-        else if(eq(mediaType, TXT_HTML)) sb.append("html");
+            || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append(M_XML);
+        else if(eq(mediaType, TXT_HTML)) sb.append(M_HTML);
         else if(startsWith(mediaType, MIME_TEXT_PREFIX))
-          sb.append("text");
-        else sb.append("xml");
+          sb.append(M_TEXT);
+        else sb.append(M_XML);
       } else {
         sb.append(method);
       }
@@ -329,7 +331,6 @@ public final class HttpClient {
       final SerializerProp serialProp = new SerializerProp(sb.toString());
       try {
         final XMLSerializer xml = new XMLSerializer(out, serialProp);
-
         final AxisIter ai = body.children();
         ANode child = null;
         while((child = ai.next()) != null) child.serialize(xml);
@@ -357,7 +358,6 @@ public final class HttpClient {
     final FElem responseElem = new FElem(new QNm(RESPONSE), null);
     setResponseChildren(conn, responseElem);
     setResponseAttrs(conn, responseElem);
-
 
     final ItemCache iter = new ItemCache();
     iter.add(responseElem);
@@ -436,8 +436,8 @@ public final class HttpClient {
       return processXML(conn, ctx);
     else if(eq(contentType, TXT_HTML)) {
       // Parse HTML
-      if(HTMLParser.available()) return processHTML(conn, ctx);
-      HTMLERR.thrw(info); return null;
+      if(!HTMLParser.available()) throw HTMLERR.thrw(info);
+      return processHTML(conn, ctx);
     } else if(startsWith(contentType, MIME_TEXT_PREFIX))
       // Process text content
       return Str.get(readHttpContent(conn));

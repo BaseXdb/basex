@@ -1,11 +1,10 @@
 package org.basex.data;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.data.DataText.*;
-import java.io.IOException;
 import org.basex.core.AProp;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
 
 /**
  * This class contains serialization properties.
@@ -90,9 +89,9 @@ public final class SerializerProp extends AProp {
    * Constructor, specifying initial properties.
    * @param s property string. Properties are separated with commas ({@code ,}),
    * key/values with the equality character ({@code =}).
-   * @throws IOException I/O exception
+   * @throws SerializerException serializer exception
    */
-  public SerializerProp(final String s) throws IOException {
+  public SerializerProp(final String s) throws SerializerException {
     this();
     if(s == null) return;
 
@@ -101,8 +100,8 @@ public final class SerializerProp extends AProp {
       final String[] sprop = ser.split("=", 2);
       final String key = sprop[0].trim();
       final String val = sprop.length < 2 ? "" : sprop[1].trim();
-      if(get(key) != null) set(key, val);
-      else throw new IOException(Util.info(SERKEY, key));
+      if(get(key) == null) SERINVALID.serial(key);
+      set(key, val);
     }
   }
 
@@ -111,14 +110,14 @@ public final class SerializerProp extends AProp {
    * @param key property key
    * @param allowed allowed values
    * @return value
-   * @throws IOException I/O exception
+   * @throws SerializerException serializer exception
    */
   public String check(final Object[] key, final String... allowed)
-      throws IOException {
+      throws SerializerException {
 
     final String val = get(key);
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw new IOException(error(key[0].toString(), val, allowed));
+    throw error(key[0], val, allowed);
   }
 
   /**
@@ -126,14 +125,19 @@ public final class SerializerProp extends AProp {
    * @param key property key
    * @param found found value
    * @param allowed allowed values
-   * @return string
+   * @return exception
    */
-  public static String error(final String key, final String found,
+  public static SerializerException error(final Object key, final String found,
       final String... allowed) {
+
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt(SERVAL, key, allowed[0]);
     for(int a = 1; a < allowed.length; ++a) tb.addExt(SERVAL2, allowed[a]);
     tb.addExt(SERVAL3, found);
-    return tb.toString();
+    try {
+      return SERANY.serial(tb);
+    } catch(final SerializerException ex) {
+      return ex;
+    }
   }
 }

@@ -130,4 +130,15 @@ public abstract class AdvancedQueryTest {
     }
     return name;
   }
+
+  /**
+   * Returns serialization parameters.
+   * @param arg serialization arguments
+   * @return parameter string
+   */
+  protected static String serialParams(final String arg) {
+    return "<serialization-parameters " +
+      "xmlns='http://www.w3.org/2010/xslt-xquery-serialization'>" + arg +
+      "</serialization-parameters>";
+  }
 }

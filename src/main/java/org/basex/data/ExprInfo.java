@@ -11,9 +11,9 @@ import org.basex.util.Util;
  */
 public abstract class ExprInfo {
   /**
-   * Returns a string description of the expression. Contrary to the
-   * {@link #toString()} method, arguments are not included
-   * in the output.
+   * Returns a string description of the expression. This method is only
+   * called by error messages. Contrary to the {@link #toString()} method,
+   * arguments are not included in the output.
    * @return result of check
    */
   public String desc() {

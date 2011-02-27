@@ -38,24 +38,22 @@ final class FNNode extends Fun {
     // functions have 0 or 1 arguments...
     final Item it = (expr.length != 0 ? expr[0] :
       checkCtx(ctx)).item(ctx, input);
-    final boolean empty = it == null;
 
     switch(def) {
       case NODENAME:
-        if(empty) return null;
+        if(it == null) return null;
         QNm qname = checkNode(it).qname();
         return qname != null && qname.atom().length != 0 ? qname : null;
       case DOCURI:
-        if(empty) return null;
+        if(it == null) return null;
         final byte[] uri = checkNode(it).base();
         return uri.length == 0 ? null : Uri.uri(uri);
       case NILLED:
         // always false, as no schema information is given
-        if(empty) return null;
-        checkNode(it);
-        return it.type != Type.ELM ? null : Bln.FALSE;
+        if(it == null) return null;
+        return checkNode(it).type != Type.ELM ? null : Bln.FALSE;
       case BASEURI:
-        if(empty) return null;
+        if(it == null) return null;
         ANode n = checkNode(it);
         if(n.type != Type.ELM && n.type != Type.DOC && n.parent() == null)
           return null;
@@ -70,15 +68,15 @@ final class FNNode extends Fun {
         }
         return base;
       case NAME:
-        if(empty) return Str.ZERO;
+        if(it == null) return Str.ZERO;
         qname = checkNode(it).qname();
         return qname != null ? Str.get(qname.atom()) : Str.ZERO;
       case LOCNAME:
-        if(empty) return Str.ZERO;
+        if(it == null) return Str.ZERO;
         qname = checkNode(it).qname();
         return qname != null ? Str.get(qname.ln()) : Str.ZERO;
       case NSURI:
-        if(empty || it.type == Type.PI) return Uri.EMPTY;
+        if(it == null || it.type == Type.PI) return Uri.EMPTY;
         ANode node = checkNode(it);
         while(node != null) {
           qname = node.qname();
@@ -93,12 +91,12 @@ final class FNNode extends Fun {
         }
         return Uri.uri(ctx.nsElem);
       case ROOT:
-        if(empty) return null;
+        if(it == null) return null;
         n = checkNode(it);
         while(n.parent() != null) n = n.parent();
         return n;
       case GENID:
-        return empty ? Str.ZERO : Str.get(new TokenBuilder(
+        return it == null ? Str.ZERO : Str.get(new TokenBuilder(
             QueryTokens.ID).addLong(checkNode(it).id()).finish());
       default:
         return super.item(ctx, ii);

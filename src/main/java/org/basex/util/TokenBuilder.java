@@ -151,9 +151,9 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder insert(final int pos, final int ch) {
-    int s = size;
+    final int s = size;
     final int cl = chars.length;
-    int l = ch <= 0x7F ? 1 : ch <= 0x7FF ? 2 : ch <= 0xFFF ? 3 : 4;
+    final int l = ch <= 0x7F ? 1 : ch <= 0x7FF ? 2 : ch <= 0xFFF ? 3 : 4;
 
     if(s + l > cl) {
       final int ns = Math.max(s + l, (int) (cl * Array.RESIZE));

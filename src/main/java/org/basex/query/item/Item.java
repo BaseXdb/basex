@@ -56,14 +56,12 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) {
     return this;
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item ebv(final QueryContext ctx, final InputInfo ii) {
     return this;
   }
 
@@ -91,8 +89,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    CONDTYPE.thrw(ii, type, this);
-    return false;
+    throw CONDTYPE.thrw(ii, type, this);
   }
 
   /**
@@ -186,9 +183,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    if(this == it) TYPECMP.thrw(ii, type);
-    else XPTYPECMP.thrw(ii, type, it.type);
-    return 0;
+    throw (this == it ? TYPECMP : XPTYPECMP).thrw(ii, type, it.type);
   }
 
   @Override

@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import org.basex.core.Prop;
+import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -183,13 +184,13 @@ final class FNFile extends Fun {
     try {
       f = path.getCanonicalFile();;
     } catch(final IOException ex) {
-      PATHINVALID.thrw(input, path);
+      throw PATHINVALID.thrw(input, path);
     }
 
     // find lowest existing path
     while(!f.exists()) {
       f = f.getParentFile();
-      if(f == null) PATHINVALID.thrw(input, path);
+      if(f == null) throw PATHINVALID.thrw(input, path);
     }
     // warn if lowest path points to a file
     if(f.isFile()) FILEEXISTS.thrw(input, path);
@@ -260,8 +261,7 @@ final class FNFile extends Fun {
     try {
       return Str.get(TextInput.content(IO.get(path.getPath()), enc).finish());
     } catch(final IOException ex) {
-      FILEERROR.thrw(input, ex);
-      return null;
+      throw FILEERROR.thrw(input, ex);
     }
   }
 
@@ -278,8 +278,7 @@ final class FNFile extends Fun {
     try {
       return new B64(new IOFile(path).content());
     } catch(final IOException ex) {
-      FILEERROR.thrw(input, ex);
-      return null;
+      throw FILEERROR.thrw(input, ex);
     }
   }
 
@@ -306,6 +305,8 @@ final class FNFile extends Fun {
         Item it;
         while((it = ir.next()) != null) it.serialize(xml);
         xml.close();
+      } catch(final SerializerException ex) {
+        throw new QueryException(input, ex);
       } finally {
         out.close();
       }

@@ -340,10 +340,12 @@ public class BaseXText extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
+    /* [LW] mutes control keys on Mac OSX
     final char c = e.getKeyChar();
     // ignore single modifier keys and printable characters
-    if(modifier(e) || !Character.isISOControl(c) && Character.isDefined(c))
-      return;
+    if(modifier(e) || !Character.isISOControl(c) && Character.isDefined(c) */
+
+    if(modifier(e)) return;
 
     // operations that change the focus are put first..
     if(PREVTAB.is(e)) {

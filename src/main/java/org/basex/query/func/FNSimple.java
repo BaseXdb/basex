@@ -165,10 +165,12 @@ public final class FNSimple extends Fun {
   public static boolean deep(final InputInfo ii, final Iter iter1,
       final Iter iter2) throws QueryException {
 
-    Item it1 = null;
-    Item it2 = null;
-    // explicit non-short-circuit..
-    while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
+    while(true) {
+      final Item it1 = iter1.next();
+      final Item it2 = iter2.next();
+      // at least one iterator is exhausted: check if both items are null
+      if(it1 == null || it2 == null) return it1 == it2;
+
       // check atomic values
       if(!it1.node() && !it2.node()) {
         if(!it1.equiv(ii, it2)) return false;
@@ -245,6 +247,5 @@ public final class FNSimple extends Fun {
         desc = true;
       } while(!chld.isEmpty());
     }
-    return it1 == it2;
   }
 }
