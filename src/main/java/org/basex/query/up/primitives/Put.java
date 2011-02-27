@@ -55,7 +55,7 @@ public final class Put extends UpdatePrimitive {
     } catch(final IOException ex) {
       UPPUTERR.thrw(input, path());
     } finally {
-      try { out.close(); } catch(final Exception ex) { }
+      if(out != null) try { out.close(); } catch(final Exception ex) { }
     }
   }
 

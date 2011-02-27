@@ -645,8 +645,7 @@ public enum Type {
       try {
         return new QNm(s, ctx, ii);
       } catch(final QueryException ex) {
-        NSDECL.thrw(ii, s);
-        return null;
+        throw NSDECL.thrw(ii, s);
       }
     }
     @Override
@@ -896,8 +895,7 @@ public enum Type {
    */
   protected final Item error(final Item it, final InputInfo ii)
       throws QueryException {
-    Err.cast(ii, this, it);
-    return null;
+    throw Err.cast(ii, this, it);
   }
 
   // PUBLIC AND STATIC METHODS ================================================

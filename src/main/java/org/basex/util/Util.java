@@ -48,9 +48,9 @@ public final class Util {
   /**
    * Throws a runtime exception for an unexpected exception.
    * @param ext optional extension
-   * @return dummy object
+   * @return runtime exception (indicates that an error is raised)
    */
-  public static Object notexpected(final Object... ext) {
+  public static RuntimeException notexpected(final Object... ext) {
     final TokenBuilder tb = new TokenBuilder("Not expected");
     if(ext.length != 0) tb.addExt(" (%)", ext);
     throw new RuntimeException(tb.add('.').toString());
@@ -59,9 +59,9 @@ public final class Util {
   /**
    * Throws a runtime exception for an unimplemented method.
    * @param ext optional extension
-   * @return dummy object
+   * @return runtime exception (indicates that an error is raised)
    */
-  public static Object notimplemented(final Object... ext) {
+  public static RuntimeException notimplemented(final Object... ext) {
     final TokenBuilder tb = new TokenBuilder("Not Implemented");
     if(ext.length != 0) tb.addExt(" (%)", ext);
     throw new RuntimeException(tb.add('.').toString());

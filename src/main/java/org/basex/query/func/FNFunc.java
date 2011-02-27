@@ -33,8 +33,7 @@ final class FNFunc extends Fun {
       case MAPPAIRS:
       case FOLDLEFT:
       case FOLDRIGHT:
-        NOTIMPL.thrw(input, def.desc);
-        return null;
+        throw NOTIMPL.thrw(input, def.desc);
       default:
         return super.iter(ctx);
     }
@@ -46,8 +45,7 @@ final class FNFunc extends Fun {
     switch(def) {
       case FUNCNAME:
       case FUNCARITY:
-        NOTIMPL.thrw(input, def.desc);
-        return null;
+        throw NOTIMPL.thrw(input, def.desc);
       default:
         return super.item(ctx, ii);
     }

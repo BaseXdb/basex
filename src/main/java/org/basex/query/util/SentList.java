@@ -3,7 +3,6 @@ package org.basex.query.util;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 import javax.xml.parsers.SAXParserFactory;
-import org.basex.core.Prop;
 import org.basex.util.TokenSet;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
@@ -25,17 +24,13 @@ public final class SentList extends DefaultHandler {
   };
   /** Current parsing mode. */
   private int posMode;
-  /** Tokenizer to stem WordLists. */
-  final Prop prop;
 
   /**
    * Default constructor.
    * @param uri path to word list
-   * @param p database properties
    * @throws Exception exception
    */
-  public SentList(final String uri, final Prop p) throws Exception {
-    prop = p;
+  public SentList(final String uri) throws Exception {
     // [OE] could be extended for other XML formats
     // or plain texts
     SAXParserFactory.newInstance().newSAXParser().parse(uri, this);

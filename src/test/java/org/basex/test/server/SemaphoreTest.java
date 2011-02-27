@@ -74,9 +74,6 @@ public final class SemaphoreTest {
     sess.execute(new CreateDB(NAME, FILE));
   }
 
-  /** Number of done tests. */
-  static int tdone;
-
   /** Efficiency test.
    * @throws InterruptedException exception
    */

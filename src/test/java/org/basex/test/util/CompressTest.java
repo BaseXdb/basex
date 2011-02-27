@@ -21,9 +21,9 @@ import org.junit.Test;
  */
 public final class CompressTest {
   /** Verbose flag. */
-  private static boolean verbose;
+  private static final boolean VERBOSE = false;
   /** Number of occurrences. */
-  public static int[] occ = new int[256];
+  private static int[] occ = new int[256];
 
   /** Test. */
   @Test
@@ -130,7 +130,7 @@ public final class CompressTest {
         }
       }
     }
-    if(verbose) {
+    if(VERBOSE) {
       for(final byte[] token : tokens) {
         for(final byte t : token) occ[t & 0xFF]++;
       }

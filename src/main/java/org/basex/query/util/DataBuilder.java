@@ -273,9 +273,9 @@ public final class DataBuilder {
       ns = par == 0 ? nd.nsScope(inherit) : nd.ns();
     }
 
-    // remove duplicate namespace bindings
     if(ns != null) {
       if(ns.size > 0 && ndPar != null && preserve) {
+        // remove duplicate namespace bindings
         final Atts nsPar = ndPar.nsScope(inherit);
         for(int j = 0; j < nsPar.size; ++j) {
           final byte[] key = nsPar.key[j];
@@ -287,10 +287,11 @@ public final class DataBuilder {
         }
       }
       ne = ns.size > 0;
+
+      // add new namespaces
+      for(int a = 0; ne && a < ns.size; ++a)
+        data.ns.add(ns.key[a], ns.val[a], ms);
     }
-    // add new namespaces
-    for(int a = 0; ne && a < ns.size; ++a)
-      data.ns.add(ns.key[a], ns.val[a], ms);
 
     final byte[] uri = q.uri().atom();
     final int u = uri.length != 0 ? data.ns.addURI(uri) : 0;

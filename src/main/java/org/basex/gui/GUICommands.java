@@ -874,9 +874,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       final String tt = gui.notify.tooltip(true);
-      final boolean en = tt != null;
-      b.setEnabled(en);
-      b.setToolTipText(en && tt.isEmpty() ? GUIGOBACK : tt);
+      b.setEnabled(tt != null);
+      b.setToolTipText(tt != null && tt.isEmpty() ? GUIGOBACK : tt);
     }
   },
 
@@ -890,9 +889,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       final String tt = gui.notify.tooltip(false);
-      final boolean en = tt != null;
-      b.setEnabled(en);
-      b.setToolTipText(en && tt.isEmpty() ? GUIGOFORWARD : tt);
+      b.setEnabled(tt != null);
+      b.setToolTipText(tt != null && tt.isEmpty() ? GUIGOFORWARD : tt);
     }
   },
 
