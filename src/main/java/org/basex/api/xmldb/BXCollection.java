@@ -188,7 +188,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     try {
       final Parser p = cont instanceof Document ?
         new DOCWrapper((Document) cont, id) :
-        Parser.fileParser(new IOContent((byte[]) cont, id), ctx.prop, "");
+        Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop, "");
 
       final Data data = ctx.data;
       data.insert(data.meta.size, -1, MemBuilder.build(p, ctx.prop, id));

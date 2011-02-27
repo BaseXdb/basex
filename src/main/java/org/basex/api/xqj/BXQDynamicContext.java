@@ -256,7 +256,7 @@ abstract class BXQDynamicContext extends BXQAbstract
         new Thread() {
           @Override
           public void run() {
-            Performance.sleep(sc.timeout * 1000);
+            Performance.sleep(sc.timeout * 1000l);
             qctx.stop();
           }
         }.start();
