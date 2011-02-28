@@ -387,11 +387,11 @@ final class FNZip extends Fun {
     // open zip file
     if(!IO.get(in).exists()) ZIPNOTFOUND.thrw(input, in);
     ZipFile zf = null;
+    boolean ok = true;
     try {
       zf = new ZipFile(in);
       // write zip file
       FileOutputStream fos = null;
-      boolean ok = true;
       try {
         fos = new FileOutputStream(out.path());
         final ZipOutputStream zos =
@@ -403,22 +403,20 @@ final class FNZip extends Fun {
         ok = false;
         ZIPFAIL.thrw(input, ex.getMessage());
       } finally {
-        if(fos != null) {
-          try { fos.close(); } catch(final IOException ex) { }
-          if(ok) {
-            // rename temporary file to final target
-            target.delete();
-            out.rename(target);
-          } else {
-            // remove temporary file
-            out.delete();
-          }
-        }
+        if(fos != null) try { fos.close(); } catch(final IOException ex) { }
       }
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
       if(zf != null) try { zf.close(); } catch(final IOException e) { }
+      if(ok) {
+        // rename temporary file to final target
+        target.delete();
+        out.rename(target);
+      } else {
+        // remove temporary file
+        out.delete();
+      }
     }
     return null;
   }
