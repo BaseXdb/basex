@@ -94,7 +94,7 @@ public final class JaxRxServer extends BaseXServer {
   public boolean parseArguments(final String[] args) {
     final Args arg = new Args(args, this, JAXRXINFO, Util.info(CONSOLE, JAXRX));
     boolean daemon = false;
-    StringBuilder serial = new StringBuilder();
+    final StringBuilder serial = new StringBuilder();
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
