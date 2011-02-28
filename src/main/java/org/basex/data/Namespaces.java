@@ -233,9 +233,7 @@ public final class Namespaces {
   void delete(final int pre, final int size) {
     NSNode nd = root.find(pre);
     if(nd.pre == pre) nd = nd.par;
-    if(nd == null) root = rootDummy;
-    // [LK] nd may be null!
-    while(!nd.equals(rootDummy)) {
+    while(nd != rootDummy) {
       nd.delete(pre, size);
       nd = nd.par;
     }
