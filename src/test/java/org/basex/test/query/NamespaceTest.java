@@ -44,7 +44,8 @@ public final class NamespaceTest {
     { "d13", "<a><b xmlns='A'/></a>" },
     { "d14", "<a xmlns='A'><b xmlns='B'/><c xmlns='C'/></a>" },
     { "d15", "<a xmlns='A'><b xmlns='B'/><c xmlns='C'><d xmlns='D'/></c>" +
-    "<e xmlns='E'/></a>" }
+    "<e xmlns='E'/></a>" },
+    { "d16", "<a><b/></a>" }
   };
 
   /**
@@ -170,6 +171,26 @@ public final class NamespaceTest {
           "  Pre[1] xmlns=\"A\" \n" +
           "    Pre[2] xmlns=\"B\" \n" +
           "    Pre[3] xmlns=\"E\" ",
+          context.data.ns.toString());
+    } catch (final Exception ex) {
+      fail(ex.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(final BaseXException ex) { }
+    }
+  }
+
+  /**
+   * Checks if namespace hierarchy structure is updated correctly on the
+   * descendant axis after a NSNode has been deleted.
+   */
+  @Test
+  public void deleteShiftPreValues4() {
+    query("delete node doc('d16')/a/b", "");
+    try {
+      new Open("d16").execute(context);
+      assertEquals("",
           context.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
