@@ -567,7 +567,7 @@ public abstract class Data {
     table.delete(pre, s);
     updateDist(p, -s);
 
-    // NSNodes have to be checked for pre value shifts after insert
+    // NSNodes have to be checked for pre value shifts after delete
     ns.updatePreValues(pre, s, false, null);
 
     // restore empty document node
