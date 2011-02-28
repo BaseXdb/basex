@@ -235,7 +235,7 @@ public enum Err {
   FTDUP(FTST, 19, "Match option '%' was defined twice."),
 
   /** SESU0007: Serialization exception. */
-  SERENCODING(SESU, 7, "Unknown encoding: \"%\"."),
+  SERENCODING(SESU, 7, "Encoding not supported: \"%\"."),
   /** SEPM0009: Serialization exception. */
   SERSTAND(SEPM, 9, "Invalid combination of \"omit-xml-declaration\"."),
   /** SEPM0010: Serialization exception. */

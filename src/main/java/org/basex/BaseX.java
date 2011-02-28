@@ -123,8 +123,8 @@ public class BaseX extends Main {
 
   @Override
   protected final boolean parseArguments(final String[] args) {
-    StringBuilder serial = new StringBuilder();
-    StringBuilder bind = new StringBuilder();
+    final StringBuilder serial = new StringBuilder();
+    final StringBuilder bind = new StringBuilder();
     try {
       final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO,
           Util.info(CONSOLE, sa() ? LOCALMODE : CLIENTMODE));

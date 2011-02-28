@@ -16,7 +16,7 @@ import org.basex.util.ByteList;
 import org.basex.util.TokenBuilder;
 
 /**
- * This class serves as a buffered wrapper for input streams.
+ * This class serves as a buffered wrapper for textual input streams.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

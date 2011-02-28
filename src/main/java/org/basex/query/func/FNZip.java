@@ -9,10 +9,12 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
@@ -93,6 +95,7 @@ final class FNZip extends Fun {
   }
 
   /**
+   * Returns a xs:base64Binary item, created from a binary file.
    * Returns a binary entry.
    * @param ctx query context
    * @return binary result
@@ -103,7 +106,7 @@ final class FNZip extends Fun {
   }
 
   /**
-   * Returns a textual entry.
+   * Returns a string, created from a text file.
    * @param ctx query context
    * @return binary result
    * @throws QueryException query exception
@@ -119,57 +122,76 @@ final class FNZip extends Fun {
   }
 
   /**
-   * Returns meta data on a zip file.
+   * Returns a document node, created from an XML or HTML file.
+   * @param ctx query context
+   * @param html html flag
+   * @return binary result
+   * @throws QueryException query exception
+   */
+  private ANode xmlEntry(final QueryContext ctx, final boolean html)
+      throws QueryException {
+
+    final Prop prop = ctx.context.prop;
+    final IO io = new IOContent(entry(ctx));
+    try {
+      final Parser p = html ? new HTMLParser(io, "", prop) :
+        Parser.xmlParser(io, prop, "");
+      return new DBNode(MemBuilder.build(p, prop, ""), 0);
+    } catch(final IOException ex) {
+      throw SAXERR.thrw(input, ex);
+    }
+  }
+
+  /**
+   * Returns a zip archive description.
    * @param ctx query context
    * @return binary result
    * @throws QueryException query exception
    */
   private ANode entries(final QueryContext ctx) throws QueryException {
     //final Uri uri = (Uri) checkType(expr[0].item(ctx, input), Type.URI);
-    final String file = IOFile.file(string(checkStr(expr[0], ctx)));
+    final String file = string(checkStr(expr[0], ctx));
     if(!IO.get(file).exists()) ZIPNOTFOUND.thrw(input, file);
 
-    // traverse all zip entries and create map (zip entries are not sorted)
-    ZipInputStream zis = null;
+    // traverse all zip entries and create intermediate map,
+    // as zip entries are not sorted
+    final TreeMap<String, FElem> map = new TreeMap<String, FElem>();
+    ZipFile zf = null;
     try {
-      zis = new ZipInputStream(new BufferedInputStream(
-          new FileInputStream(file)));
-      final TreeMap<String, FElem> map = new TreeMap<String, FElem>();
-      ZipEntry ze;
-      while((ze = zis.getNextEntry()) != null) {
+      zf = new ZipFile(file);
+      final Enumeration<? extends ZipEntry> en = zf.entries();
+      // loop through all files
+      while(en.hasMoreElements()) {
+        final ZipEntry ze = en.nextElement();
+        final FElem e = new FElem(ze.isDirectory() ? E_DIR : E_ENTRY, null);
         final String name = ze.getName();
-        final boolean dir = ze.isDirectory();
-        final FElem e = new FElem(dir ? E_DIR : E_ENTRY, null);
         e.atts.add(new FAttr(A_NAME, token(name), e));
         map.put(name, e);
       }
-
-      // create result node
-      final FElem root = new FElem(E_FILE, ZIP, ZIPURI);
-      root.atts.add(new FAttr(A_HREF, token(file), root));
-
-      final Iterator<String> it = map.keySet().iterator();
-      createNode(map, it, root, "");
-      return root;
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
-      if(zis != null) try { zis.close(); } catch(final IOException e) { }
+      if(zf != null) try { zf.close(); } catch(final IOException e) { }
     }
+
+    // create result node
+    final FElem root = new FElem(E_FILE, ZIP, ZIPURI);
+    root.atts.add(new FAttr(A_HREF, token(file), root));
+    final Iterator<String> it = map.keySet().iterator();
+    createEntries(map, it, root, "");
+    return root;
   }
 
   /**
-   * Recursively creates a zip node.
+   * Creates the zip archive nodes in a recursive manner.
    * @param map map with all nodes
    * @param it iterator
    * @param par parent node
    * @param pref directory prefix
    * @return current prefix
-   * @throws IOException I/O exception
    */
-  private String createNode(final TreeMap<String, FElem> map,
-      final Iterator<String> it, final FElem par, final String pref)
-      throws IOException {
+  private String createEntries(final TreeMap<String, FElem> map,
+      final Iterator<String> it, final FElem par, final String pref) {
 
     String name = null;
     boolean dir = false;
@@ -181,7 +203,7 @@ final class FNZip extends Fun {
       e.parent(par);
       par.children.add(e);
       dir = name.endsWith("/");
-      if(dir) name = createNode(map, it, e, name);
+      if(dir) name = createEntries(map, it, e, name);
     }
     return null;
   }
@@ -208,13 +230,17 @@ final class FNZip extends Fun {
     } catch(final IOException ex) {
       ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
-      if(zos != null) try { zos.close(); } catch(final IOException e) { }
+      try {
+        if(zos != null) zos.close();
+      } catch(final IOException ex) {
+        ZIPFAIL.thrw(input, ex.getMessage());
+      }
     }
     return null;
   }
 
   /**
-   * Recursively fills the zip file.
+   * Adds a file to the specified zip output.
    * @param zos output stream
    * @param elm element
    * @param ctx query context
@@ -224,6 +250,7 @@ final class FNZip extends Fun {
   private void createFile(final ZipOutputStream zos, final ANode elm,
       final QueryContext ctx) throws QueryException, IOException {
 
+    final byte[] data = new byte[IO.BLOCKSIZE];
     final AxisIter ai = elm.children();
     ANode node;
     while((node = ai.next()) != null) {
@@ -231,7 +258,7 @@ final class FNZip extends Fun {
       final QNm mode = node.qname();
       if(!mode.eq(E_DIR) && !mode.eq(E_ENTRY)) ZIPUNKNOWN.thrw(input, mode);
 
-      // file path: if null, the zip basename is used
+      // file path: if null, the zip base name is used
       String path = attribute(node, A_NAME, false);
       // source: if null, the node's children are serialized
       String src = attribute(node, A_SRC, false);
@@ -247,15 +274,21 @@ final class FNZip extends Fun {
       final boolean dir = mode.eq(E_DIR);
       if(dir && !path.endsWith("/")) path += "/";
 
-      final ZipEntry ze = new ZipEntry(path);
-      zos.putNextEntry(ze);
+      zos.putNextEntry(new ZipEntry(path));
       if(dir) continue;
 
       if(src != null) {
         // write file to zip archive
-        final IO source = IO.get(src);
-        if(!source.exists()) ZIPNOTFOUND.thrw(input, source);
-        zos.write(source.content());
+        if(!IO.get(src).exists()) ZIPNOTFOUND.thrw(input, src);
+
+        BufferedInputStream bis = null;
+        try {
+          bis = new BufferedInputStream(new FileInputStream(src));
+          int c;
+          while((c = bis.read(data)) != -1) zos.write(data, 0, c);
+        } finally {
+          if(bis != null) try { bis.close(); } catch(final IOException e) { }
+        }
       } else {
         // serialize child nodes to zip archive
         try {
@@ -323,27 +356,6 @@ final class FNZip extends Fun {
   }
 
   /**
-   * Returns an XML entry.
-   * @param ctx query context
-   * @param html html flag
-   * @return binary result
-   * @throws QueryException query exception
-   */
-  private ANode xmlEntry(final QueryContext ctx, final boolean html)
-      throws QueryException {
-
-    final Prop prop = ctx.context.prop;
-    final IO io = new IOContent(entry(ctx));
-    try {
-      final Parser p = html ? new HTMLParser(io, "", prop) :
-        Parser.xmlParser(io, prop, "");
-      return new DBNode(MemBuilder.build(p, prop, ""), 0);
-    } catch(final IOException ex) {
-      throw SAXERR.thrw(input, ex);
-    }
-  }
-
-  /**
    * Returns an entry from a zip file.
    * @param ctx query context
    * @return binary result
@@ -351,28 +363,35 @@ final class FNZip extends Fun {
    */
   private byte[] entry(final QueryContext ctx) throws QueryException {
     //final Uri uri = (Uri) checkType(expr[0].item(ctx, input), Type.URI);
-    final String file = IOFile.file(string(checkStr(expr[0], ctx)));
+    final String file = string(checkStr(expr[0], ctx));
     final String path = string(checkStr(expr[1], ctx));
     if(!IO.get(file).exists()) ZIPNOTFOUND.thrw(input, file);
 
-    ZipInputStream zis = null;
+    ZipFile zf = null;
     try {
-      zis = new ZipInputStream(new FileInputStream(file));
-      ZipEntry ze;
-      while((ze = zis.getNextEntry()) != null) {
-        if(!ze.getName().equals(path)) continue;
-        final int s = ze.getSize() == -1 ? IO.BLOCKSIZE : (int) ze.getSize();
-        final byte[] data = new byte[Math.min(IO.BLOCKSIZE, s)];
-        final ByteList bl = new ByteList(s);
-        int c;
-        while((c = zis.read(data)) != -1) bl.add(data, 0, c);
-        return bl.toArray();
+      zf = new ZipFile(file);
+      final ZipEntry ze = zf.getEntry(path);
+      if(ze == null) throw ZIPNOTFOUND.thrw(input, file + '/' + path);
+
+      final InputStream zis = zf.getInputStream(ze);
+      final int s = (int) ze.getSize();
+      if(s >= 0) {
+        // known size: pre-allocate and fill array
+        final byte[] data = new byte[s];
+        int c, o = 0;
+        while(s - o != 0 && (c = zis.read(data, o, s - o)) != -1) o += c;
+        return data;
       }
-      throw ZIPNOTFOUND.thrw(input, file + '/' + path);
+      // unknown size: use byte list
+      final byte[] data = new byte[IO.BLOCKSIZE];
+      final ByteList bl = new ByteList();
+      int c;
+      while((c = zis.read(data)) != -1) bl.add(data, 0, c);
+      return bl.toArray();
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
-      if(zis != null) try { zis.close(); } catch(final IOException e) { }
+      if(zf != null) try { zf.close(); } catch(final IOException e) { }
     }
   }
 

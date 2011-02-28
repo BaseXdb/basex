@@ -1,5 +1,6 @@
 package org.basex.io;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -52,12 +53,13 @@ public final class IOFile extends IO {
 
   @Override
   public void cache() throws IOException {
-    BufferInput bi = null;
+    FileInputStream fis = null;
     try {
-      bi = new BufferInput(file);
-      cont = bi.content().toArray();
+      fis = new FileInputStream(file);
+      cont = new byte[(int) file.length()];
+      new DataInputStream(fis).readFully(cont);
     } finally {
-      if(bi != null) try { bi.close(); } catch(final IOException ex) { }
+      if(fis != null) try { fis.close(); } catch(final IOException ex) { }
     }
   }
 
