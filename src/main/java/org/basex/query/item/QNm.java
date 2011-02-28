@@ -8,6 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
 /**
@@ -195,19 +196,19 @@ public final class QNm extends Item {
         Token.string(pref()));
   }
 
-  @Override
-  public boolean equals(final Object o) {
-    return o instanceof QNm && eq((QNm) o);
+  /**
+   * Returns a unique representation of the QName,
+   * including its URI and local name.
+   * @return full name
+   */
+  public byte[] full() {
+    return new TokenBuilder().add('{').add(uri().atom()).add('}').
+      add(ln()).finish();
   }
 
   @Override
   public SeqType type() {
     return SeqType.QNM;
-  }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode();
   }
 
   @Override

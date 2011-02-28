@@ -9,6 +9,7 @@ import javax.swing.ButtonGroup;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
@@ -50,9 +51,6 @@ public final class DialogInsert extends Dialog {
   /** Insert kind selection buttons. */
   private final BaseXRadio[] radio;
 
-  /** Remembers the last insertion type. */
-  private static int lkind = 1;
-
   /**
    * Default constructor.
    * @param main reference to the main window
@@ -82,6 +80,7 @@ public final class DialogInsert extends Dialog {
       }
     };
 
+    final int lkind = gui.gprop.num(GUIProp.LASTINSERT);
     radio = new BaseXRadio[EDITKIND.length];
     for(int i = 1; i < EDITKIND.length; ++i) {
       radio[i] = new BaseXRadio(EDITKIND[i], false, this);
@@ -140,7 +139,7 @@ public final class DialogInsert extends Dialog {
   @Override
   public void action(final Object cmp) {
     for(int i = 1; i < EDITKIND.length; ++i) if(radio[i].isSelected()) kind = i;
-    lkind = kind;
+    gui.gprop.set(GUIProp.LASTINSERT, kind);
 
     String msg = null;
     ok = kind != Data.TEXT || input2.getText().length != 0;

@@ -15,11 +15,11 @@ import org.basex.util.ByteList;
  */
 public final class ClientQuery extends Query {
   /** Client session. */
-  protected final ClientSession cs;
+  final ClientSession cs;
   /** Query id. */
-  protected final String id;
+  final String id;
   /** Next result. */
-  protected ByteList next;
+  ByteList next;
 
   /**
    * Standard constructor.

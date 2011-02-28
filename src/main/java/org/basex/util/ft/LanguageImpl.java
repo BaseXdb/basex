@@ -12,12 +12,6 @@ import java.util.EnumSet;
 abstract class LanguageImpl extends FTIterator
     implements Comparable<LanguageImpl> {
 
-  @Override
-  public final int compareTo(final LanguageImpl o) {
-    // Higher precedence value = better
-    return o.prec() - prec();
-  }
-
   /**
    * Returns the precedence of the processor.
    * @return precedence
@@ -38,4 +32,20 @@ abstract class LanguageImpl extends FTIterator
    * @return languages
    */
   abstract EnumSet<Language> languages();
+
+  @Override
+  public final boolean equals(final Object o) {
+    return o instanceof LanguageImpl && ((LanguageImpl) o).prec() == prec();
+  }
+
+  @Override
+  public final int compareTo(final LanguageImpl o) {
+    // Higher precedence value = better
+    return o.prec() - prec();
+  }
+
+  @Override
+  public int hashCode() {
+    return prec();
+  }
 }

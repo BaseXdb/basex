@@ -49,7 +49,7 @@ public abstract class Logical extends Arr {
    * @return resulting expression
    */
   protected final Expr single() {
-    return expr[0].type().equals(SeqType.BLN) ? expr[0] :
+    return expr[0].type().eq(SeqType.BLN) ? expr[0] :
       FunDef.BOOLEAN.get(input, expr[0]);
   }
 }

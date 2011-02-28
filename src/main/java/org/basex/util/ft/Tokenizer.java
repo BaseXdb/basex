@@ -11,14 +11,13 @@ import java.util.LinkedList;
  */
 public abstract class Tokenizer extends LanguageImpl {
   /** List of available tokenizers. */
-  public static final LinkedList<Tokenizer> IMPL;
+  public static final LinkedList<Tokenizer> IMPL = new LinkedList<Tokenizer>();
 
   /** Are special characters included? */
   boolean special;
 
   /** Load tokenizer classes and order them by precedence. */
   static {
-    IMPL = new LinkedList<Tokenizer>();
     IMPL.add(new WesternTokenizer(null));
     Collections.sort(IMPL);
   }

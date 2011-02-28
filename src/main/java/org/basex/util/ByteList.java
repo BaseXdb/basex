@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public final class ByteList extends ElementList {
   /** Element container. */
-  protected byte[] list;
+  byte[] list;
 
   /**
    * Default constructor.

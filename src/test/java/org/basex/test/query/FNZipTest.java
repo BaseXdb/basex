@@ -2,7 +2,7 @@ package org.basex.test.query;
 
 import org.basex.core.BaseXException;
 import org.basex.query.func.FunDef;
-import org.basex.query.item.Uri;
+import org.basex.query.util.Err;
 import org.junit.Test;
 
 /**
@@ -30,10 +30,10 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testBinaryEntry() throws BaseXException {
-    final String fun = check(FunDef.BENTRY, Uri.class, String.class);
-    query(fun + "(xs:anyURI('" + ZIP + "'), '" + ENTRY1 + "')");
-    contains("xs:hexBinary(" + fun + "(xs:anyURI('" + ZIP + "'), '" +
-        ENTRY1 + "'))", "610A61626F");
+    final String fun = check(FunDef.BENTRY, String.class, String.class);
+    query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
+    contains("xs:hexBinary(" + fun + "('" + ZIP + "', '" + ENTRY1 + "'))",
+        "610A61626F");
   }
 
   /**
@@ -42,10 +42,14 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testTextEntry() throws BaseXException {
-    final String fun = check(FunDef.TEXTENTRY, Uri.class, String.class);
-    query(fun + "(xs:anyURI('" + ZIP + "'), '" + ENTRY1 + "')");
+    final String fun = check(FunDef.TEXTENTRY,
+        String.class, String.class, String.class);
+    query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
+    query(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'US-ASCII')");
+    error(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'xyz')",
+        Err.ZIPFAIL);
     // newlines are removed from the result..
-    contains(fun + "(xs:anyURI('" + ZIP + "'), '" + ENTRY1 + "')", "aaboutab");
+    contains(fun + "('" + ZIP + "', '" + ENTRY1 + "')", "aaboutab");
   }
 
   /**
@@ -54,10 +58,9 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testXMLEntry() throws BaseXException {
-    final String fun = check(FunDef.XMLENTRY, Uri.class, String.class);
-    query(fun + "(xs:anyURI('" + ZIP + "'), '" + ENTRY2 + "')");
-    query(fun + "(xs:anyURI('" + ZIP + "'), '" +
-        ENTRY2 + "')//title/text()", "XML");
+    final String fun = check(FunDef.XMLENTRY, String.class, String.class);
+    query(fun + "('" + ZIP + "', '" + ENTRY2 + "')");
+    query(fun + "('" + ZIP + "', '" + ENTRY2 + "')//title/text()", "XML");
   }
 
   /**
@@ -66,7 +69,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testEntries() throws BaseXException {
-    final String fun = check(FunDef.ENTRIES, Uri.class);
-    query(fun + "(xs:anyURI('" + ZIP + "'))");
+    final String fun = check(FunDef.ENTRIES, String.class);
+    query(fun + "('" + ZIP + "')");
   }
 }

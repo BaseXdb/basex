@@ -12,7 +12,7 @@ import org.basex.util.TokenList;
  */
 public final class FTTokens extends ElementList {
   /** Element container. */
-  protected TokenList[] list;
+  TokenList[] list;
 
   /**
    * Constructor.
