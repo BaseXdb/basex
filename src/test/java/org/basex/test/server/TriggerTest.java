@@ -129,7 +129,7 @@ public final class TriggerTest {
    * @throws BaseXException command exception
    */
   @Test
-  public void concurrent() throws BaseXException {
+  public void trigger2() throws BaseXException {
 
     // Create first trigger.
     cs.createTrigger(TRIGGER_NAME);
@@ -181,6 +181,48 @@ public final class TriggerTest {
   }
 
   /**
+   * Concurrent triggers.
+   * @throws BaseXException command exception
+   * @throws Exception exception
+   */
+  @Test
+  public void concurrent() throws Exception {
+    // Create first trigger.
+    cs.createTrigger(TRIGGER_NAME);
+    // Drop second trigger.
+    cs.dropTrigger(TRIGGER_NAME + 1);
+    // Create second trigger.
+    cs.createTrigger(TRIGGER_NAME + 1);
+
+    // Attach half of the clients to the triggers.
+    for(int i = ccs.length / 2; i < ccs.length; i++) {
+      ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
+        @Override
+        public void update(final String data) {
+          assertEquals(RETURN_VALUE, data);
+        }
+      });
+      ccs[i].attachTrigger(TRIGGER_NAME + 1, new TriggerNotification() {
+        @Override
+        public void update(final String data) {
+          assertEquals(RETURN_VALUE, data);
+        }
+      });
+    }
+
+    // concurrent trigger activation
+    Client c1 = new Client(true);
+    Client c2 = new Client(false);
+    c1.start();
+    c2.start();
+    c1.join();
+    c2.join();
+
+    // Drop trigger.
+    cs.dropTrigger(TRIGGER_NAME);
+  }
+
+  /**
    * Drops triggers.
    * @throws BaseXException command exception
    */
@@ -204,5 +246,40 @@ public final class TriggerTest {
    */
   static ClientSession newSession() throws IOException {
     return new ClientSession("localhost", 1984, "admin", "admin");
+  }
+
+  /** Single client. */
+  static final class Client extends Thread {
+    /** Client session. */
+    private ClientSession session;
+    /** First trigger. */
+    private boolean first;
+
+    /**
+     * Default constructor.
+     * @param f first flag
+     */
+    public Client(final boolean f) {
+      this.first = f;
+      try {
+        session = newSession();
+      } catch(final IOException ex) {
+        ex.printStackTrace();
+      }
+    }
+
+    @Override
+    public void run() {
+      try {
+        if(first) {
+          session.trigger("1 to 10", TRIGGER_NAME, RETURN_VALUE);
+        } else {
+          session.trigger("1 to 10", TRIGGER_NAME + 1, RETURN_VALUE);
+        }
+        session.close();
+      } catch(Exception e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

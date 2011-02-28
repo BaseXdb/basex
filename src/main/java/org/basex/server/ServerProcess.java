@@ -5,7 +5,9 @@ import static org.basex.util.Token.*;
 import static org.basex.server.ServerCmd.*;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+
 import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
@@ -37,6 +39,8 @@ public final class ServerProcess extends Thread {
   /** Active queries. */
   private final HashMap<String, QueryProcess> queries =
     new HashMap<String, QueryProcess>();
+  /** Active triggers. */
+  public final ArrayList<String> triggers = new ArrayList<String>();
 
   /** Database context. */
   public final Context context;
@@ -349,7 +353,8 @@ public final class ServerProcess extends Thread {
     for(final QueryProcess q : queries.values()) {
       try { q.close(true); } catch(final IOException ex) { }
     }
-
+    // remove from all triggers from pool
+    context.triggers.remove(this, triggers);
     try {
       new Close().execute(context);
       if(cmd != null) cmd.stop();

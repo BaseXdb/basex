@@ -3,6 +3,7 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.basex.server.ServerProcess;
@@ -67,6 +68,7 @@ public final class TriggerPool {
     final Sessions s = triggers.get(name);
     if(s == null) return false;
     s.add(sp);
+    sp.triggers.add(name);
     return true;
   }
 
@@ -80,6 +82,7 @@ public final class TriggerPool {
     final Sessions s = triggers.get(name);
     if(s == null) return false;
     s.delete(sp);
+    sp.triggers.remove(name);
     return true;
   }
 
@@ -96,6 +99,18 @@ public final class TriggerPool {
   }
 
   /**
+   * Removes session from all triggers.
+   * @param sp server process
+   * @param l list of triggers
+   */
+  public void remove(final ServerProcess sp, final ArrayList<String> l) {
+    for(String s : l) {
+      Sessions sess = triggers.get(s);
+      if(sess != null) sess.delete(sp);
+    }
+  }
+
+  /**
    * Notifies the attached sessions about a triggered event.
    * @param sp server process
    * @param name name
@@ -104,8 +119,7 @@ public final class TriggerPool {
   public void notify(final ServerProcess sp, final byte[] name,
       final byte[] i) {
     Sessions sessions = triggers.get(Token.string(name));
-    if (sessions == null)
-      return;
+    if (sessions == null) return;
 
     for (ServerProcess srv : sessions) {
       if(!srv.equals(sp)) {
@@ -117,7 +131,8 @@ public final class TriggerPool {
           srv.out.write(0);
           srv.out.flush();
         } catch(IOException e) {
-          sessions.delete(sp);
+          e.printStackTrace();
+          sessions.delete(srv);
         }
       }
     }
