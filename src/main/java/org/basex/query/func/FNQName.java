@@ -9,12 +9,12 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.NCN;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Atts;
@@ -43,7 +43,7 @@ final class FNQName extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
       case INSCOPE: return inscope(ctx,
-          (Nod) checkType(expr[0].item(ctx, input), Type.ELM));
+          (ANode) checkType(expr[0].item(ctx, input), Type.ELM));
       default:      return super.iter(ctx);
     }
   }
@@ -77,12 +77,10 @@ final class FNQName extends Fun {
         nm = (QNm) checkType(it, Type.QNM);
         return !nm.ns() ? null : new NCN(nm.pref(), input);
       case NSURIPRE: // [LW][LK] broken...
+        // [LK] find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);
-
-        // [LK] find out if inherit flag has a persistent effect - if positive,
-        // we're screwed. test case added to unresolved namespace tests.
-        final Nod nod = (Nod) checkType(it2, Type.ELM);
-        final Atts at = nod.nsScope(copiedNod(nod, ctx) ? ctx.nsInherit : true);
+        final ANode an = (ANode) checkType(it2, Type.ELM);
+        final Atts at = an.nsScope(!copiedNod(an, ctx) || ctx.nsInherit);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:
@@ -100,13 +98,13 @@ final class FNQName extends Fun {
   /**
    * Determines if the given node has been constructed via a transform
    * expression.
-   * @param nod node to be checked
+   * @param node node to be checked
    * @param ctx query context
    * @return true, if part of copied nodes
    */
-  private boolean copiedNod(final Nod nod, final QueryContext ctx) {
-    return nod instanceof DBNode &&
-      ctx.copiedNods.contains(((DBNode) nod).data);
+  private boolean copiedNod(final ANode node, final QueryContext ctx) {
+    return node instanceof DBNode &&
+      ctx.copiedNods.contains(((DBNode) node).data);
   }
 
   /**
@@ -125,9 +123,8 @@ final class FNQName extends Fun {
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();
-    final byte[] uri = ((Nod) checkType(it, Type.ELM)).uri(pref, ctx);
-    if(uri == null && pref.length != 0) NSDECL.thrw(input, pref);
-    // [CG] XQuery/resolve-QName: check: uri == null && pref.length == 0
+    final byte[] uri = ((ANode) checkType(it, Type.ELM)).uri(pref, ctx);
+    if(uri == null) NSDECL.thrw(input, pref);
     nm.uri(uri);
     return nm;
   }
@@ -138,12 +135,12 @@ final class FNQName extends Fun {
    * @param node node
    * @return prefix sequence
    */
-  private Iter inscope(final QueryContext ctx, final Nod node) {
+  private Iter inscope(final QueryContext ctx, final ANode node) {
     final TokenSet pref = new TokenSet();
     pref.add(XML);
 
     byte[] emp = null;
-    Nod n = node;
+    ANode n = node;
     do {
       final Atts at = n.ns();
       if(at == null) break;
@@ -165,7 +162,7 @@ final class FNQName extends Fun {
     if(emp == null) emp = ctx.nsElem;
     if(emp.length != 0) pref.add(EMPTY);
 
-    final ItemIter ir = new ItemIter(pref.size());
+    final ItemCache ir = new ItemCache(pref.size());
     for(final byte[] t : pref.keys()) ir.add(Str.get(t));
     return ir;
   }

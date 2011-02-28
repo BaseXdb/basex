@@ -46,7 +46,7 @@ import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Type;
 import org.basex.util.Array;
 import org.basex.util.StringList;
@@ -379,7 +379,7 @@ public enum GUICommands implements GUICommand {
       if(!insert.ok()) return;
 
       final StringList sl = insert.result;
-      final Type type = Nod.type(insert.kind);
+      final Type type = ANode.type(insert.kind);
       String item = Token.string(type.nam) + " { " + quote(sl.get(0)) + " }";
 
       if(type == Type.ATT || type == Type.PI) {
@@ -874,9 +874,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       final String tt = gui.notify.tooltip(true);
-      final boolean en = tt != null;
-      b.setEnabled(en);
-      b.setToolTipText(en && tt.isEmpty() ? GUIGOBACK : tt);
+      b.setEnabled(tt != null);
+      b.setToolTipText(tt != null && tt.isEmpty() ? GUIGOBACK : tt);
     }
   },
 
@@ -890,9 +889,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       final String tt = gui.notify.tooltip(false);
-      final boolean en = tt != null;
-      b.setEnabled(en);
-      b.setToolTipText(en && tt.isEmpty() ? GUIGOFORWARD : tt);
+      b.setEnabled(tt != null);
+      b.setToolTipText(tt != null && tt.isEmpty() ? GUIGOFORWARD : tt);
     }
   },
 

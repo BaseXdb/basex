@@ -7,7 +7,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -43,7 +43,7 @@ public final class ItemSeq extends Seq {
 
   @Override
   public ValueIter iter() {
-    return new ItemIter(val, (int) size);
+    return new ItemCache(val, (int) size);
   }
 
   @Override
@@ -82,6 +82,13 @@ public final class ItemSeq extends Seq {
     ser.openElement(Type.SEQ.nam, SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); ++v) val[v].plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public int hash() {
+    int h = 0;
+    for(int v = 0; v != Math.min(size, 5); ++v) h += val[v].hash();
+    return h;
   }
 
   @Override

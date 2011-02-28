@@ -17,8 +17,8 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.Atts;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
@@ -31,19 +31,21 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 final class FNPat extends Fun {
-  /** Root element for the analyze-string-result function. */
-  private static final byte[] ANALYZE = token("fn:analyze-string-result");
-  /** Element for the analyze-string-result function. */
-  private static final byte[] MATCH = token("fn:match");
-  /** Element for the analyze-string-result function. */
-  private static final byte[] NONMATCH = token("fn:non-match");
-  /** Element for the analyze-string-result function. */
-  private static final byte[] MGROUP = token("fn:group");
-  /** Attribute for the analyze-string-result function. */
-  private static final byte[] NR = token("nr");
-
   /** Function namespace. */
-  private static final Uri FNNS = Uri.uri(FNURI);
+  private static final Uri U_FN = Uri.uri(FNURI);
+
+  /** Root element for the analyze-string-result function. */
+  private static final QNm ANALYZE =
+    new QNm(token("fn:analyze-string-result"), U_FN);
+  /** Element for the analyze-string-result function. */
+  private static final QNm MATCH = new QNm(token("fn:match"), U_FN);
+  /** Element for the analyze-string-result function. */
+  private static final QNm NONMATCH = new QNm(token("fn:non-match"), U_FN);
+  /** Element for the analyze-string-result function. */
+  private static final QNm MGROUP = new QNm(token("fn:group"), U_FN);
+  /** Attribute for the analyze-string-result function. */
+  private static final QNm NR = new QNm(token("nr"));
+
   /** Classes pattern. */
   private static final Pattern CLASSES =
     Pattern.compile(".*?\\[([a-zA-Z])-([a-zA-Z]).*");
@@ -109,16 +111,16 @@ final class FNPat extends Fun {
     final String str = string(val);
     final Matcher m = p.matcher(str);
 
-    final NodIter ch = new NodIter();
-    final FElem root = new FElem(new QNm(ANALYZE, FNNS), ch, new NodIter(),
-        EMPTY, new Atts().add(FN, FNURI));
+    final NodeCache nc = new NodeCache();
+    final FElem root = new FElem(ANALYZE, nc, new NodeCache(), EMPTY,
+        new Atts().add(FN, FNURI), null);
     int s = 0;
     while(m.find()) {
-      if(s != m.start()) nonmatch(str.substring(s, m.start()), root, ch);
-      match(m, str, root, ch, 0);
+      if(s != m.start()) nonmatch(str.substring(s, m.start()), root, nc);
+      match(m, str, root, nc, 0);
       s = m.end();
     }
-    if(s != str.length()) nonmatch(str.substring(s), root, ch);
+    if(s != str.length()) nonmatch(str.substring(s), root, nc);
     return root;
   }
 
@@ -127,32 +129,32 @@ final class FNPat extends Fun {
    * @param m matcher
    * @param str string
    * @param par parent
-   * @param ch child iterator
+   * @param nc child iterator
    * @param g group number
    * @return next group number and position in string
    */
   private int[] match(final Matcher m, final String str, final FElem par,
-      final NodIter ch, final int g) {
+      final NodeCache nc, final int g) {
 
-    final NodIter sub = new NodIter(), att = new NodIter();
-    final FElem nd = new FElem(new QNm(g == 0 ? MATCH : MGROUP, FNNS),
-        sub, att, EMPTY, new Atts(), par);
-    if(g > 0) att.add(new FAttr(new QNm(NR), token(g), nd));
+    final FElem nd = new FElem(g == 0 ? MATCH : MGROUP, par);
+    if(g > 0) nd.atts.add(new FAttr(NR, token(g), nd));
 
     final int start = m.start(g), end = m.end(g), gc = m.groupCount();
     int[] pos = { g + 1, start }; // group and position in string
     while(pos[0] <= gc && m.end(pos[0]) <= end) {
       final int st = m.start(pos[0]);
       if(st >= 0) { // group matched
-        if(pos[1] < st) sub.add(new FTxt(token(str.substring(pos[1], st)), nd));
-        pos = match(m, str, nd, sub, pos[0]);
+        if(pos[1] < st) {
+          nd.children.add(new FTxt(token(str.substring(pos[1], st)), nd));
+        }
+        pos = match(m, str, nd, nd.children, pos[0]);
       } else pos[0]++; // skip it
     }
     if(pos[1] < end) {
-      sub.add(new FTxt(token(str.substring(pos[1], end)), nd));
+      nd.children.add(new FTxt(token(str.substring(pos[1], end)), nd));
       pos[1] = end;
     }
-    ch.add(nd);
+    nc.add(nd);
     return pos;
   }
 
@@ -160,13 +162,13 @@ final class FNPat extends Fun {
    * Processes a non-match.
    * @param text text
    * @param par root node
-   * @param ch child iterator
+   * @param nc child iterator
    */
-  private void nonmatch(final String text, final FElem par, final NodIter ch) {
-    final NodIter txt = new NodIter();
-    final FElem sub = new FElem(new QNm(NONMATCH, FNNS), txt, par);
-    txt.add(new FTxt(token(text), sub));
-    ch.add(sub);
+  private void nonmatch(final String text, final FElem par,
+      final NodeCache nc) {
+    final FElem sub = new FElem(NONMATCH, par);
+    sub.children.add(new FTxt(token(text), sub));
+    nc.add(sub);
   }
 
   /**
@@ -199,8 +201,7 @@ final class FNPat extends Fun {
     } catch(final Exception ex) {
       final String m = ex.getMessage();
       if(m.contains("No group")) REGROUP.thrw(input);
-      REGERR.thrw(input, m);
-      return null;
+      throw REGERR.thrw(input, m);
     }
   }
 
@@ -217,7 +218,7 @@ final class FNPat extends Fun {
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     if(p.matcher("").matches()) REGROUP.thrw(input);
 
-    final ItemIter sb = new ItemIter();
+    final ItemCache sb = new ItemCache();
     final String str = string(val);
     if(!str.isEmpty()) {
       final Matcher m = p.matcher(str);
@@ -304,8 +305,7 @@ final class FNPat extends Fun {
     try {
       return Pattern.compile(str, m);
     } catch(final Exception ex) {
-      REGINV.thrw(input, pt);
-      return null;
+      throw REGINV.thrw(input, pt);
     }
   }
 

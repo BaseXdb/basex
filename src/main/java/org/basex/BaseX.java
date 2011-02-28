@@ -114,7 +114,6 @@ public class BaseX extends Main {
     return true;
   }
 
-  @SuppressWarnings("unused")
   @Override
   protected Session session() throws IOException {
     if(session == null) session = new LocalSession(context, out);
@@ -124,8 +123,8 @@ public class BaseX extends Main {
 
   @Override
   protected final boolean parseArguments(final String[] args) {
-    String serial = "";
-    String bind = "";
+    final StringBuilder serial = new StringBuilder();
+    final StringBuilder bind = new StringBuilder();
     try {
       final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO,
           Util.info(CONSOLE, sa() ? LOCALMODE : CLIENTMODE));
@@ -133,8 +132,9 @@ public class BaseX extends Main {
         if(arg.dash()) {
           final char c = arg.next();
           if(c == 'b') {
-            // set/add serialization parameter
-            bind += "," + arg.string();
+            // set/add variable binding
+            if(bind.length() != 0) bind.append(',');
+            bind.append(arg);
             arg.check(set(Prop.BINDINGS, bind));
           } else if(c == 'c') {
             // specify command to be evaluated
@@ -169,7 +169,8 @@ public class BaseX extends Main {
             arg.check(set(Prop.RUNS, arg.string()));
           } else if(c == 's') {
             // set/add serialization parameter
-            serial += "," + arg.string();
+            if(serial.length() != 0) serial.append(',');
+            serial.append(arg);
             arg.check(set(Prop.SERIALIZER, serial));
           } else if(c == 'u') {
             // activate write-back for updates

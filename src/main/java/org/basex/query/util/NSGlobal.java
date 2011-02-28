@@ -28,6 +28,7 @@ public final class NSGlobal {
     NS.add(FILE, FILEURI);
     NS.add(HTTP, HTTPURI);
     NS.add(SENT, SENTURI);
+    NS.add(ZIP, ZIPURI);
   }
 
   /** Private constructor. */

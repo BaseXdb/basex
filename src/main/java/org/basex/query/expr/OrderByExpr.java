@@ -7,7 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import static org.basex.util.Token.token;
@@ -20,7 +20,7 @@ import static org.basex.util.Token.token;
  */
 public final class OrderByExpr extends OrderBy {
   /** Sequence to be ordered. */
-  private ItemIter seq;
+  private ItemCache seq;
   /** Order expression. */
   private Expr expr;
 
@@ -48,7 +48,7 @@ public final class OrderByExpr extends OrderBy {
 
   @Override
   void init(final int s) {
-    if(seq == null) seq = s > 0 ? new ItemIter(s) : new ItemIter();
+    if(seq == null) seq = s > 0 ? new ItemCache(s) : new ItemCache();
     else seq.size(0);
   }
 

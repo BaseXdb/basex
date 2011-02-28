@@ -12,7 +12,7 @@ import org.basex.query.expr.CPI;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -45,7 +45,7 @@ public final class Rename extends Update {
     final Item i = t.next();
 
     // check target constraints
-    if(i == null) UPSEQEMP.thrw(input, Util.name(this));
+    if(i == null) throw UPSEQEMP.thrw(input, Util.name(this));
     if(t.next() != null) UPWRTRGTYP.thrw(input);
 
     CFrag ex = null;
@@ -56,13 +56,13 @@ public final class Rename extends Update {
     } else if(i.type == Type.PI) {
       ex = new CPI(input, expr[1], Empty.SEQ);
     } else {
-      UPWRTRGTYP.thrw(input);
+      throw UPWRTRGTYP.thrw(input);
     }
 
     // check namespace conflicts...
     final QNm rename = ex.item(ctx, input).qname();
-    final Nod targ = (Nod) i;
-    final Nod test = i.type == Type.ELM ? targ :
+    final ANode targ = (ANode) i;
+    final ANode test = i.type == Type.ELM ? targ :
       i.type == Type.ATT ? targ.parent() : null;
 
     if(test != null) {

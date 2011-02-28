@@ -284,11 +284,11 @@ public final class ServerProcess extends Thread {
       } else {
         // find query process
         qp = queries.get(arg);
-        // ID has already been removed
-        if(qp == null && sc != CLOSE)
-          throw new IOException("Unknown query ID (" + arg + ")");
 
-        if(sc == BIND) {
+        // ID has already been removed
+        if(qp == null) {
+          if(sc != CLOSE) throw new IOException("Unknown Query ID: " + arg);
+        } else if(sc == BIND) {
           final String key = in.readString();
           final String val = in.readString();
           final String typ = in.readString();
@@ -302,7 +302,7 @@ public final class ServerProcess extends Thread {
           qp.execute();
         } else if(sc == INFO) {
           qp.info();
-        } else if(sc == CLOSE && qp != null) {
+        } else if(sc == CLOSE) {
           qp.close(false);
           queries.remove(arg);
         }

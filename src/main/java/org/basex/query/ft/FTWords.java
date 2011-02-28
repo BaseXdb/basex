@@ -174,18 +174,18 @@ public final class FTWords extends FTExpr {
                 }
               }
             }
+            if(iat == null) {
+              iat = ia;
+              tl = t;
+            } else if(mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS) {
+              iat = FTIndexIterator.intersect(ia, iat, 0);
+              tl += t;
+            } else {
+              iat = FTIndexIterator.union(ia, iat);
+              tl = Math.max(t, tl);
+            }
+            iat.tokenNum(++ctx.ftoknum);
           }
-          if(iat == null) {
-            iat = ia;
-            tl = t;
-          } else if(mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS) {
-            iat = FTIndexIterator.intersect(ia, iat, 0);
-            tl += t;
-          } else {
-            iat = FTIndexIterator.union(ia, iat);
-            tl = Math.max(t, tl);
-          }
-          iat.tokenNum(++ctx.ftoknum);
         }
         return iat.more() ? new FTNode(iat.matches(), data, iat.next(),
             tl, iat.indexSize(), iat.score()) : null;

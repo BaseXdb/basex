@@ -13,11 +13,12 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.Preds;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
-import org.basex.query.iter.NodIter;
+import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.Test.Name;
 import org.basex.util.Array;
@@ -115,12 +116,12 @@ public class AxisStep extends Preds {
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Value v = checkCtx(ctx);
     if(!v.node()) NODESPATH.thrw(input, AxisStep.this, v.type);
-    final NodeIter ir = axis.iter((Nod) v);
+    final AxisIter ai = axis.iter((ANode) v);
 
-    final NodIter nb = new NodIter();
-    Nod nod;
-    while((nod = ir.next()) != null) {
-      if(test.eval(nod)) nb.add(nod.finish());
+    final NodeCache nb = new NodeCache();
+    ANode node;
+    while((node = ai.next()) != null) {
+      if(test.eval(node)) nb.add(node.finish());
     }
 
     // evaluate predicates
@@ -169,7 +170,7 @@ public class AxisStep extends Preds {
     // check restrictions on node type
     int kind = -1, name = 0;
     if(test.type != null) {
-      kind = Nod.kind(test.type);
+      kind = ANode.kind(test.type);
       // skip processing instructions and attributes
       if(kind == Data.PI || kind == Data.ATTR) return null;
 

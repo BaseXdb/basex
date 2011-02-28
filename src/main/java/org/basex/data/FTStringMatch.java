@@ -40,9 +40,21 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   }
 
   @Override
+  public boolean equals(final Object o) {
+    if(!(o instanceof FTStringMatch)) return false;
+    final FTStringMatch sm = (FTStringMatch) o;
+    return s == sm.s && e == sm.e;
+  }
+
+  @Override
   public int compareTo(final FTStringMatch sm) {
     final int st = s - sm.s;
     return st != 0 ? st : e - sm.e;
+  }
+
+  @Override
+  public int hashCode() {
+    return s * e;
   }
 
   @Override

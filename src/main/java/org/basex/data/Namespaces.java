@@ -2,7 +2,11 @@ package org.basex.data;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -76,17 +80,21 @@ public final class Namespaces {
    * @param p prefix
    * @param u uri
    * @param pre pre value
+   * @return the new NSNode if a new one has been created, or null otherwise
    */
-  public void add(final byte[] p, final byte[] u, final int pre) {
+  public NSNode add(final byte[] p, final byte[] u, final int pre) {
+    NSNode newNode = null;
     // after open() -call, newns==false
     if(!newns) {
-      root = root.add(new NSNode(pre));
+      newNode = new NSNode(pre);
+      root = root.add(newNode);
       newns = true;
     }
     final int k = addPref(p);
     final int v = addURI(u);
     root.add(k, v);
     if(p.length == 0) uriStack[uriL] = v;
+    return newNode;
   }
 
   /**
@@ -225,8 +233,7 @@ public final class Namespaces {
   void delete(final int pre, final int size) {
     NSNode nd = root.find(pre);
     if(nd.pre == pre) nd = nd.par;
-    if(nd == null) root = new NSNode(-1);
-    while(nd != null) {
+    while(nd != rootDummy) {
       nd.delete(pre, size);
       nd = nd.par;
     }
@@ -395,5 +402,36 @@ public final class Namespaces {
   @Override
   public String toString() {
     return toString(0, Integer.MAX_VALUE);
+  }
+
+  /**
+   * Updates the pre values of all NSNodes on the following axis after a
+   * structural update at location pre.
+   * @param pre update location
+   * @param ms size of inserted/deleted node
+   * @param insert true if insert operation, false if delete
+   * @param newNodes new NSNodes that have been added as part of delete/insert
+   */
+  public void updatePreValues(final int pre, final int ms, final boolean insert,
+      final Set<NSNode> newNodes) {
+    updateNodePre(rootDummy, pre, ms, insert, newNodes != null ? newNodes :
+      new HashSet<NSNode>());
+  }
+
+  /**
+   * Updates the pre values of all NSNodes on the following axis after a
+   * structural update at location pre.
+   * @param n current namespace node which is updated if necessary
+   * @param pre update location
+   * @param ms size of inserted/deleted node
+   * @param insert true if insert operation, false if delete
+   * @param newNodes new NSNodes that have been added as part of delete/insert
+   */
+  private void updateNodePre(final NSNode n, final int pre, final int ms,
+      final boolean insert, final Set<NSNode> newNodes) {
+    if(!newNodes.contains(n) && n.pre >= (insert ? pre : pre + ms))
+      n.pre += insert ? ms : ms * -1;
+    for(int c = 0; c < n.size; c++) updateNodePre(n.ch[c], pre, ms, insert,
+        newNodes);
   }
 }

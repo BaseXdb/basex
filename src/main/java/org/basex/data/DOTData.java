@@ -136,7 +136,9 @@ final class DOTData {
    */
   static String color(final String s) {
     for(final Object[] o : COLORS) {
-      if(o[1] instanceof String && o[1].equals(s)) return o[0].toString();
+      if(o[1] instanceof String && s.equals(o[1].toString())) {
+        return o[0].toString();
+      }
     }
     return null;
   }

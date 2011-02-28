@@ -15,7 +15,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -86,7 +86,7 @@ public abstract class QueryTest {
         }
         if(!correct || !val.sameAs(cmp)) {
           sb.append("-- " + qu[0] + ": " + query);
-          sb.append("\n[E#" + cmp.size() + "] ");
+          sb.append("\n[E#" + (correct ? cmp.size() : "") + "] ");
           if(correct) {
             final String cp = cmp.toString();
             sb.append(cp.length() > 20 ? cp.substring(0, 20) + "..." : cp);
@@ -122,8 +122,8 @@ public abstract class QueryTest {
    * Creates a container for the specified node values.
    * @return node array
    */
-  static ItemIter empty() {
-    return new ItemIter(new Item[] {}, 0);
+  static ItemCache empty() {
+    return new ItemCache(new Item[] {}, 0);
   }
 
   /**
@@ -131,7 +131,7 @@ public abstract class QueryTest {
    * @param nodes node values
    * @return node array
    */
-  static Nodes nod(final int... nodes) {
+  static Nodes node(final int... nodes) {
     return new Nodes(nodes);
   }
 
@@ -140,8 +140,8 @@ public abstract class QueryTest {
    * @param str string
    * @return iterator
    */
-  static ItemIter str(final String... str) {
-    final ItemIter ii = new ItemIter();
+  static ItemCache str(final String... str) {
+    final ItemCache ii = new ItemCache();
     for(final String s : str) ii.add(Str.get(s));
     return ii;
   }
@@ -151,7 +151,7 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  static ItemIter dbl(final double d) {
+  static ItemCache dbl(final double d) {
     return item(Dbl.get(d));
   }
 
@@ -160,8 +160,8 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  static ItemIter itr(final long... d) {
-    final ItemIter ii = new ItemIter();
+  static ItemCache itr(final long... d) {
+    final ItemCache ii = new ItemCache();
     for(final long dd : d) ii.add(Itr.get(dd));
     return ii;
   }
@@ -171,7 +171,7 @@ public abstract class QueryTest {
    * @param b boolean value
    * @return iterator
    */
-  static ItemIter bool(final boolean b) {
+  static ItemCache bool(final boolean b) {
     return item(Bln.get(b));
   }
 
@@ -180,7 +180,7 @@ public abstract class QueryTest {
    * @param i item
    * @return iterator
    */
-  private static ItemIter item(final Item i) {
-    return new ItemIter(new Item[] { i }, 1);
+  private static ItemCache item(final Item i) {
+    return new ItemCache(new Item[] { i }, 1);
   }
 }

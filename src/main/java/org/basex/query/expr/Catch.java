@@ -6,7 +6,7 @@ import org.basex.query.QueryTokens;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -56,8 +56,7 @@ public final class Catch extends Single {
   Iter iter(final QueryContext ctx, final QueryException ex)
       throws QueryException {
 
-    final String cd = ex.code();
-    final byte[] code = cd == null ? Token.EMPTY : Token.token(cd);
+    final byte[] code = Token.token(ex.code());
     if(!find(code)) return null;
 
     final int s = ctx.vars.size();
@@ -71,7 +70,7 @@ public final class Catch extends Single {
     if(var.length > 2) {
       ctx.vars.add(var[2].bind(ex.value(), ctx).copy());
     }
-    final Iter ir = ItemIter.get(ctx.iter(expr));
+    final Iter ir = ItemCache.get(ctx.iter(expr));
     ctx.vars.reset(s);
     return ir;
   }

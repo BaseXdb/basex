@@ -48,7 +48,7 @@ public final class DecimalFormat {
   int digit = '#';
 
   /** Minus sign. */
-  String minus = "-";
+  int minus = '-';
   /** Percent sign. */
   int percent = '%';
   /** Permille sign. */
@@ -95,7 +95,7 @@ public final class DecimalFormat {
           if(key.equals(DF_DEC)) decimal = cp;
           else if(key.equals(DF_GRP)) group = cp;
           else if(key.equals(DF_PAT)) pattern = cp;
-          else if(key.equals(DF_MIN)) minus = val;
+          else if(key.equals(DF_MIN)) minus = cp;
           else if(key.equals(DF_DIG)) digit = cp;
           else if(key.equals(DF_PC)) percent = cp;
           else if(key.equals(DF_PM)) permille = cp;
@@ -135,7 +135,7 @@ public final class DecimalFormat {
     // find pattern separator and sub-patterns
     final TokenList tl = new TokenList();
     String pic = picture;
-    int i = pic.indexOf(pattern);
+    final int i = pic.indexOf(pattern);
     if(i == -1) {
       tl.add(pic);
     } else {
@@ -167,7 +167,7 @@ public final class DecimalFormat {
 
       // loop through all characters
       for(int i = 0; i < pt.length; i += cl(pt, i)) {
-        int ch = cp(pt, i);
+        final int ch = cp(pt, i);
         final boolean a = active.indexOf(ch) != -1;
 
         if(ch == decimal) {
@@ -234,7 +234,7 @@ public final class DecimalFormat {
 
       // loop through all characters
       for(int i = 0; i < pt.length; i += cl(pt, i)) {
-        int ch = cp(pt, i);
+        final int ch = cp(pt, i);
         final boolean a = active.indexOf(ch) != -1;
 
         if(ch == decimal) {
@@ -251,7 +251,7 @@ public final class DecimalFormat {
           pic.pc |= ch == percent;
           pic.pm |= ch == permille;
           // prefixes/suffixes
-          pic.fix[p == 0 && act ? p + 1 : p] += (char) ch;
+          pic.fix[p == 0 && act ? p + 1 : p].add(ch);
         }
         act |= a;
       }
@@ -278,7 +278,7 @@ public final class DecimalFormat {
 
     final double d = it.dbl(ii);
     final Picture pic = pics[d < 0 && pics.length == 2 ? 1 : 0];
-    if(d < 0 && pics.length == 1) pic.fix[0] = minus;
+    if(d < 0 && pics.length == 1) pic.fix[0].reset().add(minus);
 
     // return results for NaN and infinity
     if(Double.isNaN(d)) return nan;
@@ -322,16 +322,16 @@ public final class DecimalFormat {
       if(pos < sl) suf.insert(pos, group);
     }
 
-    final TokenBuilder res = new TokenBuilder(pic.fix[0]);
+    final TokenBuilder res = new TokenBuilder().add(pic.fix[0].finish());
     res.add(pre.finish());
     if(suf.size() != 0) res.add(decimal).add(suf.finish());
-    return res.add(pic.fix[1]).toString();
+    return res.add(pic.fix[1].finish()).toString();
   }
 
   /** Picture variables. */
   static final class Picture {
     /** prefix/suffix. */
-    String[] fix = { "", "" };
+    TokenBuilder[] fix = { new TokenBuilder(), new TokenBuilder() };
     /** integer/fractional-part-grouping-positions. */
     int[][] group = { {}, {} };
     /** minimum-integer/fractional-part-size. */

@@ -10,7 +10,7 @@ import java.util.Iterator;
  */
 public final class IntArrayList extends ElementList implements Iterable<int[]> {
   /** Elements container. */
-  protected int[][] list;
+  int[][] list;
 
   /**
    * Default constructor.

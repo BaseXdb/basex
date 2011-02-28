@@ -43,7 +43,7 @@ public final class CollectionPathTest {
     new CreateDB(DBNAME).execute(CTX);
     for(final String file : FILES) new Add(file, null, "etc/xml").execute(CTX);
     new Add(ZIP, null, "test/zipped").execute(CTX);
-    new CreateIndex(Commands.CmdIndex.FULLTEXT);
+    new CreateIndex(Commands.CmdIndex.FULLTEXT).execute(CTX);
   }
 
   /**

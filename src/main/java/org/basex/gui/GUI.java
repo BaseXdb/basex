@@ -576,13 +576,12 @@ public final class GUI extends AGUI {
     context.prop.set(Prop.XMLPLAN, inf);
 
     final Data data = context.data;
-    final boolean db = data != null;
     final int t = mode.getSelectedIndex();
-    final int s = !db ? 2 : gprop.num(GUIProp.SEARCHMODE);
+    final int s = data == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
 
     input.help(s == 0 ? data.fs != null ? HELPSEARCHFS : HELPSEARCHXML :
       s == 1 ? HELPXPATH : HELPCMD);
-    mode.setEnabled(db);
+    mode.setEnabled(data != null);
     go.setEnabled(s == 2 || !gprop.is(GUIProp.EXECRT));
 
     if(s != t) {

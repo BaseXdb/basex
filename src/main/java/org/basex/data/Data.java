@@ -3,8 +3,11 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
 import org.basex.core.cmd.InfoStorage;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
@@ -363,6 +366,19 @@ public abstract class Data {
   }
 
   /**
+   * Finds the specified attribute and returns its value.
+   * @param att the attribute id of the attribute to be found
+   * @param pre pre value
+   * @return attribute value
+   */
+  public byte[] attValue(final int att, final int pre) {
+    final int a = pre + attSize(pre, kind(pre));
+    int p = pre;
+    while(++p != a) if(name(p) == att) return text(p, false);
+    return null;
+  }
+
+  /**
    * Returns a reference to the tag or attribute name id.
    * @param pre pre value
    * @return token reference
@@ -551,6 +567,9 @@ public abstract class Data {
     table.delete(pre, s);
     updateDist(p, -s);
 
+    // NSNodes have to be checked for pre value shifts after insert
+    ns.updatePreValues(pre, s, false, null);
+
     // restore empty document node
     if(empty) {
       doc(0, 1, EMPTY);
@@ -602,6 +621,7 @@ public abstract class Data {
     // loop through all entries
     int mpre = -1;
     final NSNode t = ns.root;
+    final Set<NSNode> newNodes = new HashSet<NSNode>();
     while(++mpre != ms) {
       if(mpre != 0 && mpre % buf == 0) insert(ipre + mpre - buf);
 
@@ -671,7 +691,13 @@ public abstract class Data {
             for(int a = 0; a < at.size; ++a) {
               final byte[] old = nsScope.get(at.key[a]);
               if(old == null || !eq(old, at.val[a])) {
-                ns.add(at.key[a], at.val[a], pre);
+                // we have to keep track of all new NSNodes that are added
+                // to the Namespace structure, as their pre values must not
+                // be updated. I.e. if an NSNode N with pre value 3 existed
+                // prior to inserting and two new nodes are inserted at
+                // location pre == 3 we have to make sure N and only N gets
+                // updated.
+                newNodes.add(ns.add(at.key[a], at.val[a], pre));
                 ne = true;
               }
             }
@@ -717,6 +743,9 @@ public abstract class Data {
       p = parent(p, k);
     }
     updateDist(ipre + ms, ms);
+
+    // NSNodes have to be checked for pre value shifts after insert
+    ns.updatePreValues(ipre, ms, true, newNodes);
 
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);

@@ -238,10 +238,11 @@ public final class FNFileTest extends AdvancedQueryTest {
     query("file:delete('" + PATH1 + "')");
 
     query(fun + "('" + PATH1 + "', 'a\u00e4'," +
-      "<encoding>CP1252</encoding>)");
+      serialParams("<encoding>CP1252</encoding>") + ")");
     query("file:read('" + PATH1 + "', 'CP1252')", "a\u00e4");
 
-    query(fun + "('" + PATH1 + "', '<a/>'," + "<method>text</method>)");
+    query(fun + "('" + PATH1 + "', '<a/>'," +
+        serialParams("<method>text</method>") + ")");
     query("file:read('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
     query("file:delete('" + PATH1 + "')");
   }

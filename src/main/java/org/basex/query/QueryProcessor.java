@@ -12,7 +12,7 @@ import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
-import org.basex.data.SerializerProp;
+import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.FunJava;
@@ -128,8 +128,8 @@ public final class QueryProcessor extends Progress {
       final QNm type = new QNm(Token.token(t));
       if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
       final Type typ = Type.find(type, true);
-      if(typ == null) NOTYPE.thrw(null, type);
-      obj = typ.e(o, null);
+      if(typ != null) obj = typ.e(o, null);
+      else NOTYPE.thrw(null, type);
     }
     bind(n, obj);
   }
@@ -169,15 +169,11 @@ public final class QueryProcessor extends Progress {
       QueryException {
 
     compile();
-    SerializerProp sp = ctx.serProp;
-    if(sp == null) {
-      sp = new SerializerProp(ctx.context.prop.get(Prop.SERIALIZER));
-      if(ctx.context.prop.is(Prop.WRAPOUTPUT)) {
-        sp.set(SerializerProp.S_WRAP_PREFIX, NAMELC);
-        sp.set(SerializerProp.S_WRAP_URI, URL);
-      }
+    try {
+      return new XMLSerializer(os, ctx.serProp());
+    } catch(final SerializerException ex) {
+      throw new QueryException(null, ex);
     }
-    return new XMLSerializer(os, sp);
   }
 
   /**

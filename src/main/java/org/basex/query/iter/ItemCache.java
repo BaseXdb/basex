@@ -17,7 +17,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class ItemIter extends ValueIter implements Result {
+public final class ItemCache extends ValueIter implements Result {
   /** Item container. */
   public Item[] item;
   /** Number of items. */
@@ -28,7 +28,7 @@ public final class ItemIter extends ValueIter implements Result {
   /**
    * Constructor.
    */
-  public ItemIter() {
+  public ItemCache() {
     this(1);
   }
 
@@ -36,7 +36,7 @@ public final class ItemIter extends ValueIter implements Result {
    * Constructor.
    * @param c initial capacity
    */
-  public ItemIter(final int c) {
+  public ItemCache(final int c) {
     item = new Item[c];
   }
 
@@ -45,7 +45,7 @@ public final class ItemIter extends ValueIter implements Result {
    * @param it item array
    * @param s size
    */
-  public ItemIter(final Item[] it, final int s) {
+  public ItemCache(final Item[] it, final int s) {
     item = it;
     size = s;
   }
@@ -53,15 +53,15 @@ public final class ItemIter extends ValueIter implements Result {
   /**
    * Returns a new sequence iterator with the contents of the specified
    * iterator. The specified iterator is returned if it is already an
-   * {@link ItemIter} sequence.
+   * {@link ItemCache} sequence.
    * @param iter iterator
    * @return iterator
    * @throws QueryException query exception
    */
-  public static ItemIter get(final Iter iter) throws QueryException {
-    if(iter instanceof ItemIter) return (ItemIter) iter;
+  public static ItemCache get(final Iter iter) throws QueryException {
+    if(iter instanceof ItemCache) return (ItemCache) iter;
     // size is cast as less than 2^32 are expected
-    final ItemIter ir = new ItemIter(Math.max(1, (int) iter.size()));
+    final ItemCache ir = new ItemCache(Math.max(1, (int) iter.size()));
     ir.add(iter);
     return ir;
   }
@@ -87,9 +87,9 @@ public final class ItemIter extends ValueIter implements Result {
 
   @Override
   public boolean sameAs(final Result v) {
-    if(!(v instanceof ItemIter)) return false;
+    if(!(v instanceof ItemCache)) return false;
 
-    final ItemIter sb = (ItemIter) v;
+    final ItemCache sb = (ItemCache) v;
     if(size != sb.size) return false;
     for(int i = 0; i < size; ++i) {
       if(item[i].type != sb.item[i].type || !item[i].sameAs(sb.item[i]))

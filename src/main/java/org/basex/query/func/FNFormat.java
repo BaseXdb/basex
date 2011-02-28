@@ -84,9 +84,10 @@ final class FNFormat extends Fun {
     else if(!it.unt() && !it.num()) Err.number(this, it);
 
     final String pic = string(checkStr(expr[1], ctx));
-    final QNm frm = new QNm(expr.length == 3 ? checkStr(expr[2], ctx) : EMPTY);
+    final byte[] frm = new QNm(expr.length == 3 ?
+        checkStr(expr[2], ctx) : EMPTY).full();
     final DecimalFormat df = ctx.decFormats.get(frm);
-    if(df == null) FORMNUM.thrw(input, frm);
+    if(df == null) throw FORMNUM.thrw(input, frm);
     return Str.get(df.format(input, it, pic));
   }
 

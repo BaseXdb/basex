@@ -228,9 +228,9 @@ public class QueryParser extends InputParser {
     ctx.funcs.check();
     ctx.vars.check();
     ctx.ns.finish(ctx.nsElem);
-    final QNm empty = new QNm(EMPTY);
+    final byte[] empty = new QNm(EMPTY).full();
     if(ctx.decFormats.get(empty) == null) {
-      ctx.decFormats.put(empty, new DecimalFormat());
+      ctx.decFormats.add(empty, new DecimalFormat());
     }
     return expr;
   }
@@ -520,7 +520,7 @@ public class QueryParser extends InputParser {
     if(def && !wsConsumeWs(DECFORMAT)) return false;
 
     // use empty name for default declaration
-    final QNm name = new QNm(def ? EMPTY : qName(QNAMEINV));
+    final byte[] name = new QNm(def ? EMPTY : qName(QNAMEINV)).full();
     if(ctx.decFormats.get(name) != null) error(DECDUPL);
 
     // create new format
@@ -543,7 +543,7 @@ public class QueryParser extends InputParser {
     } while(n != sl.size());
 
     // completes the format declaration
-    ctx.decFormats.put(name, new DecimalFormat(input(), sl));
+    ctx.decFormats.add(name, new DecimalFormat(input(), sl));
     return true;
   }
 
@@ -1489,9 +1489,8 @@ public class QueryParser extends InputParser {
       }
     } else {
       for(final Axis a : Axis.values()) {
-        if(wdConsumeWs(a.name, COL2, NOLOCSTEP)) {
-          wsConsume(COL2);
-          alter = NOLOCSTEP;
+        if(wdConsumeWs(a.name, COLS, NOLOCSTEP)) {
+          wsConsume(COLS);
           ap = qp;
           ax = a;
           test = test(a == Axis.ATTR);
@@ -2749,8 +2748,10 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(REPLACE)) return null;
 
     final boolean v = wsConsumeWs(VALUEE);
-    if(v) wsCheck(OF);
-    if(!wsConsumeWs(NODE)) {
+    if(v) {
+      wsCheck(OF);
+      wsCheck(NODE);
+    } else if(!wsConsumeWs(NODE)) {
       qp = p;
       return null;
     }
@@ -3082,8 +3083,7 @@ public class QueryParser extends InputParser {
    * @param arg error arguments
    * @throws QueryException query exception
    */
-  public void error(final Err err, final Object... arg)
-      throws QueryException {
+  public void error(final Err err, final Object... arg) throws QueryException {
     err.thrw(input(), arg);
   }
 }

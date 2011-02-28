@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Value;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import static org.basex.query.util.Err.*;
 import org.basex.query.util.ValueList;
@@ -38,7 +38,7 @@ final class GroupPartition {
   /** Group partitioning. */
   private final ArrayList<GroupNode> part = new ArrayList<GroupNode>();
   /** Resulting sequence for non-grouping variables. */
-  private final ArrayList<ItemIter[]> items;
+  private final ArrayList<ItemCache[]> items;
   /** HashValue, position (with overflow bucket). */
   private final IntMap<IntList> hashes = new IntMap<IntList>();
 
@@ -68,7 +68,7 @@ final class GroupPartition {
       if(ng) ngv[i++] = v;
     }
 
-    items = ngv.length != 0 ? new ArrayList<ItemIter[]>() : null;
+    items = ngv.length != 0 ? new ArrayList<ItemCache[]>() : null;
     input = ii;
   }
 
@@ -119,7 +119,7 @@ final class GroupPartition {
     }
 
     final GroupNode gn = new GroupNode(vals);
-    final int h = gn.hashCode();
+    final int h = gn.hash();
     final IntList ps = hashes.get(h);
     int p = -1;
     if(ps != null) {
@@ -148,14 +148,14 @@ final class GroupPartition {
     if(ngl == 0) return;
 
     // Adds the current non-grouping variable bindings to the p-th partition.
-    if(p == items.size()) items.add(new ItemIter[ngl]);
-    final ItemIter[] sq = items.get(p);
+    if(p == items.size()) items.add(new ItemCache[ngl]);
+    final ItemCache[] sq = items.get(p);
 
     for(int i = 0; i < ngl; ++i) {
-      ItemIter ir = sq[i];
+      ItemCache ir = sq[i];
       final Iter iter = ngv[i].iter(ctx);
       if(ir == null) {
-        ir = new ItemIter();
+        ir = new ItemCache();
         sq[i] = ir;
       }
       ir.add(iter);
@@ -180,7 +180,7 @@ final class GroupPartition {
    * @throws QueryException query exception
    */
   Iter ret(final QueryContext ctx, final Expr ret) throws QueryException {
-    final ItemIter ir = new ItemIter();
+    final ItemCache ir = new ItemCache();
     final ValueList vl = new ValueList();
     if(pggv == null) cacheRet(ctx);
     if(order != null) order.init(vl, -1);
@@ -190,7 +190,7 @@ final class GroupPartition {
       for(int j = 0; j < pggv.length; ++j) pggv[j].bind(gn.vals[j], ctx);
 
       if(items != null) {
-        final ItemIter[] ii = items.get(i);
+        final ItemCache[] ii = items.get(i);
         for(int j = 0; j < ii.length; ++j) {
           pgngv[j].bind(ii[j].finish(), ctx);
         }

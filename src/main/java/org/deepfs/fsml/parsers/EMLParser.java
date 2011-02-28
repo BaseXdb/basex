@@ -401,14 +401,14 @@ public final class EMLParser implements IFileParser {
       if(type.equals("content-transfer-encoding")) {
         getEncoding();
       } else if(type.equals("content-type")) {
-        final String mimeString = mCurrLine.split(";")[0].toLowerCase();
+        final String ms = mCurrLine.split(";")[0].toLowerCase();
         MimeType mime = null;
-        if(mimeString.startsWith("multipart")) {
-          mContentType = mimeString;
-          if(mimeString.startsWith("multipart/related")) multipartRelated();
+        if(ms.startsWith("multipart")) {
+          mContentType = ms;
+          if(ms.startsWith("multipart/related")) multipartRelated();
           break;
         }
-        mime = MimeType.getItem(mimeString);
+        mime = MimeType.getItem(ms);
         if(mime != null) {
           for(final FileType mt : mime.getMetaTypes()) {
             contentMeta.setFileType(mt);

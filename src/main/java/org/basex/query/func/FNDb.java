@@ -20,10 +20,10 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.NameTest;
@@ -144,7 +144,7 @@ final class FNDb extends Fun {
 
       @Override
       public Item next() throws QueryException {
-        Nod n;
+        ANode n;
         while((n = ir.next()) != null && !nt.eval(n));
         return n;
       }
@@ -167,7 +167,7 @@ final class FNDb extends Fun {
    * @return iterator
    */
   private Iter list(final QueryContext ctx) {
-    final ItemIter ii = new ItemIter();
+    final ItemCache ii = new ItemCache();
     for(final String s : List.list(ctx.context)) ii.add(Str.get(s));
     return ii;
   }

@@ -11,6 +11,7 @@ import org.basex.query.item.Atm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
+import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -71,6 +72,20 @@ public abstract class Fun extends Arr {
   @Override
   public boolean isFun(final FunDef f) {
     return def == f;
+  }
+
+  /**
+   * Checks the data type and throws an exception, if necessary.
+   * @param it item to be checked
+   * @param t type to be checked
+   * @return specified item
+   * @throws QueryException query exception
+   */
+  public final Item checkType(final Item it, final Type t)
+      throws QueryException {
+
+    if(checkEmpty(it).type != t) Err.type(this, t, it);
+    return it;
   }
 
   @Override
