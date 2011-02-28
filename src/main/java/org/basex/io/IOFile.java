@@ -193,6 +193,11 @@ public final class IOFile extends IO {
   }
 
   @Override
+  public boolean rename(final IO trg) {
+    return trg instanceof IOFile && file.renameTo(((IOFile) trg).file);
+  }
+
+  @Override
   public String url() {
     String pre = FILEPREF;
     if(!path.startsWith("/")) {

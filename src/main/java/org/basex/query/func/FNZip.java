@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -12,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -25,7 +24,6 @@ import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
-import org.basex.io.IOFile;
 import org.basex.io.TextInput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -34,6 +32,7 @@ import org.basex.query.item.B64;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
+import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
@@ -43,6 +42,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
+import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -66,6 +66,12 @@ final class FNZip extends Fun {
   private static final QNm A_NAME = new QNm(token("name"));
   /** Attribute: src. */
   private static final QNm A_SRC = new QNm(token("src"));
+  /** Attribute: src. */
+  private static final QNm A_METHOD = new QNm(token("method"));
+  /** Method "basex64". */
+  private static final String M_BASE64 = "base64";
+  /** Method "hex". */
+  private static final String M_HEX = "hex";
 
   /**
    * Constructor.
@@ -89,7 +95,7 @@ final class FNZip extends Fun {
       case XMLENTRY:  return xmlEntry(ctx, false);
       case ENTRIES:   return entries(ctx);
       case ZIPFILE:   return zipFile(ctx);
-      case UPDATE:    return update();
+      case UPDATE:    return updateEntries(ctx);
       default: return super.item(ctx, ii);
     }
   }
@@ -149,61 +155,54 @@ final class FNZip extends Fun {
    * @throws QueryException query exception
    */
   private ANode entries(final QueryContext ctx) throws QueryException {
-    //final Uri uri = (Uri) checkType(expr[0].item(ctx, input), Type.URI);
     final String file = string(checkStr(expr[0], ctx));
-    if(!IO.get(file).exists()) ZIPNOTFOUND.thrw(input, file);
 
-    // traverse all zip entries and create intermediate map,
-    // as zip entries are not sorted
-    final TreeMap<String, FElem> map = new TreeMap<String, FElem>();
+    // check file path
+    final IO path = IO.get(file);
+    if(!path.exists()) ZIPNOTFOUND.thrw(input, file);
+    // loop through file
     ZipFile zf = null;
     try {
       zf = new ZipFile(file);
-      final Enumeration<? extends ZipEntry> en = zf.entries();
-      // loop through all files
-      while(en.hasMoreElements()) {
-        final ZipEntry ze = en.nextElement();
-        final FElem e = new FElem(ze.isDirectory() ? E_DIR : E_ENTRY, null);
-        final String name = ze.getName();
-        e.atts.add(new FAttr(A_NAME, token(name), e));
-        map.put(name, e);
-      }
+      // create result node
+      final FElem root = new FElem(E_FILE, ZIP, ZIPURI);
+      root.atts.add(new FAttr(A_HREF, token(path.path()), root));
+      createEntries(paths(zf).iterator(), root, "");
+      return root;
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
       if(zf != null) try { zf.close(); } catch(final IOException e) { }
     }
-
-    // create result node
-    final FElem root = new FElem(E_FILE, ZIP, ZIPURI);
-    root.atts.add(new FAttr(A_HREF, token(file), root));
-    final Iterator<String> it = map.keySet().iterator();
-    createEntries(map, it, root, "");
-    return root;
   }
 
   /**
    * Creates the zip archive nodes in a recursive manner.
-   * @param map map with all nodes
    * @param it iterator
    * @param par parent node
    * @param pref directory prefix
    * @return current prefix
    */
-  private String createEntries(final TreeMap<String, FElem> map,
-      final Iterator<String> it, final FElem par, final String pref) {
+  private String createEntries(final Iterator<String> it,
+      final FElem par, final String pref) {
 
     String name = null;
     boolean dir = false;
     while(dir || it.hasNext()) {
       if(!dir) name = it.next();
       if(name == null) break;
+      // current entry is located in a higher/other directory
       if(!name.startsWith(pref)) return name;
-      final FElem e = map.get(name);
+      // create element
+      dir = name.endsWith("/");
+      final FElem e = new FElem(dir ? E_DIR : E_ENTRY, null);
+      // creating attribute: remove trailing slash or directory path
+      name = name.replaceAll(dir ? "/$" : ".*/", "");
+      e.atts.add(new FAttr(A_NAME, token(name), e));
       e.parent(par);
       par.children.add(e);
-      dir = name.endsWith("/");
-      if(dir) name = createEntries(map, it, e, name);
+      // recursively parse other entries
+      if(dir) name = createEntries(it, e, name);
     }
     return null;
   }
@@ -218,91 +217,126 @@ final class FNZip extends Fun {
     // check argument
     final ANode elm = (ANode) checkType(expr[0].item(ctx, input), Type.ELM);
     if(!elm.qname().eq(E_FILE)) ZIPUNKNOWN.thrw(input, elm.qname());
-
     // get file
-    final String file = IOFile.file(attribute(elm, A_HREF, true));
+    final String file = attribute(elm, A_HREF, true);
+
     // write zip file
-    ZipOutputStream zos = null;
+    FileOutputStream fos = null;
+    boolean ok = true;
     try {
-      zos = new ZipOutputStream(new BufferedOutputStream(
-          new FileOutputStream(file)));
-      createFile(zos, elm, ctx);
+      fos = new FileOutputStream(file);
+      final ZipOutputStream zos =
+        new ZipOutputStream(new BufferedOutputStream(fos));
+      create(zos, elm.children(), "", null, ctx);
+      zos.close();
     } catch(final IOException ex) {
+      ok = false;
       ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
-      try {
-        if(zos != null) zos.close();
-      } catch(final IOException ex) {
-        ZIPFAIL.thrw(input, ex.getMessage());
+      if(fos != null) {
+        try { fos.close(); } catch(final IOException ex) { }
+        if(!ok) IO.get(file).delete();
       }
     }
     return null;
   }
 
   /**
-   * Adds a file to the specified zip output.
+   * Adds files to the specified zip output, or copies files from the
+   * specified file.
    * @param zos output stream
-   * @param elm element
+   * @param ai axis iterator
+   * @param root root path
    * @param ctx query context
+   * @param zf original zip file (or {@code null})
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void createFile(final ZipOutputStream zos, final ANode elm,
-      final QueryContext ctx) throws QueryException, IOException {
+  private void create(final ZipOutputStream zos, final AxisIter ai,
+      final String root, final ZipFile zf, final QueryContext ctx)
+      throws QueryException, IOException {
 
     final byte[] data = new byte[IO.BLOCKSIZE];
-    final AxisIter ai = elm.children();
+
     ANode node;
     while((node = ai.next()) != null) {
       // get entry type
       final QNm mode = node.qname();
-      if(!mode.eq(E_DIR) && !mode.eq(E_ENTRY)) ZIPUNKNOWN.thrw(input, mode);
+      final boolean dir = mode.eq(E_DIR);
+      if(!dir && !mode.eq(E_ENTRY)) ZIPUNKNOWN.thrw(input, mode);
 
       // file path: if null, the zip base name is used
-      String path = attribute(node, A_NAME, false);
+      String name = attribute(node, A_NAME, false);
       // source: if null, the node's children are serialized
       String src = attribute(node, A_SRC, false);
       if(src != null) src = src.replaceAll("\\\\", "/");
 
-      if(path == null) {
+      if(name == null) {
         // throw exception if both attributes are null
         if(src == null) throw ZIPINVALID.thrw(input, node.qname(), A_SRC);
-        path = src.replaceAll(".*/", "");
+        name = src;
       }
+      name = name.replaceAll(".*/", "");
 
       // add slash to directories
-      final boolean dir = mode.eq(E_DIR);
-      if(dir && !path.endsWith("/")) path += "/";
+      if(dir) name += '/';
+      zos.putNextEntry(new ZipEntry(root + name));
 
-      zos.putNextEntry(new ZipEntry(path));
-      if(dir) continue;
-
-      if(src != null) {
-        // write file to zip archive
-        if(!IO.get(src).exists()) ZIPNOTFOUND.thrw(input, src);
-
-        BufferedInputStream bis = null;
-        try {
-          bis = new BufferedInputStream(new FileInputStream(src));
-          int c;
-          while((c = bis.read(data)) != -1) zos.write(data, 0, c);
-        } finally {
-          if(bis != null) try { bis.close(); } catch(final IOException e) { }
-        }
+      if(dir) {
+        create(zos, node.children(), root + name, zf, ctx);
       } else {
-        // serialize child nodes to zip archive
-        try {
-          final XMLSerializer xml =
-            new XMLSerializer(zos, serialPar(node, ctx));
-          ANode n;
+        if(src != null) {
+          // write file to zip archive
+          if(!IO.get(src).exists()) ZIPNOTFOUND.thrw(input, src);
+
+          BufferedInputStream bis = null;
+          try {
+            bis = new BufferedInputStream(new FileInputStream(src));
+            int c;
+            while((c = bis.read(data)) != -1) zos.write(data, 0, c);
+          } finally {
+            if(bis != null) try { bis.close(); } catch(final IOException e) { }
+          }
+        } else {
+          // no source reference: the child nodes are treated as file contents
           final AxisIter ch = node.children();
-          while((n = ch.next()) != null) n.serialize(xml);
-          xml.close();
-        } catch(final SerializerException ex) {
-          throw new QueryException(input, ex);
+          final String m = attribute(node, A_METHOD, false);
+          // retrieve first child (might be null)
+          ANode n = ch.next();
+
+          // access original zip file if available, and if no children exist
+          ZipEntry ze = null;
+          if(zf != null && n == null) ze = zf.getEntry(root + name);
+
+          if(ze != null) {
+            // add old zip entry
+            final InputStream zis = zf.getInputStream(ze);
+            int c;
+            while((c = zis.read(data)) != -1) zos.write(data, 0, c);
+          } else if(n != null) {
+            // write new binary content to archive
+            final boolean hex = M_HEX.equals(m);
+            if(hex || M_BASE64.equals(m)) {
+              // treat children as base64/hex
+              final ByteList bl = new ByteList();
+              do bl.add(n.atom()); while((n = ch.next()) != null);
+              final byte[] bytes = bl.toArray();
+              zos.write((hex ? new Hex(bytes) : new B64(bytes)).toJava());
+            } else {
+              // serialize new nodes
+              try {
+                final XMLSerializer xml =
+                  new XMLSerializer(zos, serialPar(node, ctx));
+                do n.serialize(xml); while((n = ch.next()) != null);
+                xml.close();
+              } catch(final SerializerException ex) {
+                throw new QueryException(input, ex);
+              }
+            }
+          }
         }
+        zos.closeEntry();
       }
-      zos.closeEntry();
     }
   }
 
@@ -330,11 +364,91 @@ final class FNZip extends Fun {
   }
 
   /**
+   * Updates a zip archive.
+   * @param ctx query context
+   * @return empty result
+   * @throws QueryException query exception
+   */
+  private Item updateEntries(final QueryContext ctx) throws QueryException {
+    // check argument
+    final ANode elm = (ANode) checkType(expr[0].item(ctx, input), Type.ELM);
+    if(!elm.qname().eq(E_FILE)) ZIPUNKNOWN.thrw(input, elm.qname());
+
+    // sorted paths in original file
+    final String in = attribute(elm, A_HREF, true);
+
+    // target and temporary output file
+    final IO target = IO.get(string(checkStr(expr[1], ctx)));
+    IO out;
+    do {
+      out = IO.get(target.path() + new Random().nextInt(0x7FFFFFFF));
+    } while(out.exists());
+
+    // open zip file
+    if(!IO.get(in).exists()) ZIPNOTFOUND.thrw(input, in);
+    ZipFile zf = null;
+    try {
+      zf = new ZipFile(in);
+      // write zip file
+      FileOutputStream fos = null;
+      boolean ok = true;
+      try {
+        fos = new FileOutputStream(out.path());
+        final ZipOutputStream zos =
+          new ZipOutputStream(new BufferedOutputStream(fos));
+        // fill new zip file with entries from old file and description
+        create(zos, elm.children(), "", zf, ctx);
+        zos.close();
+      } catch(final IOException ex) {
+        ok = false;
+        ZIPFAIL.thrw(input, ex.getMessage());
+      } finally {
+        if(fos != null) {
+          try { fos.close(); } catch(final IOException ex) { }
+          if(ok) {
+            // rename temporary file to final target
+            target.delete();
+            out.rename(target);
+          } else {
+            // remove temporary file
+            out.delete();
+          }
+        }
+      }
+    } catch(final IOException ex) {
+      throw ZIPFAIL.thrw(input, ex.getMessage());
+    } finally {
+      if(zf != null) try { zf.close(); } catch(final IOException e) { }
+    }
+    return null;
+  }
+
+  /**
+   * Returns a list of all file paths.
+   * @param zf zip file file to be parsed
+   * @return binary result
+   */
+  private StringList paths(final ZipFile zf) {
+    // traverse all zip entries and create intermediate map,
+    // as zip entries are not sorted
+    final StringList paths = new StringList();
+    final Enumeration<? extends ZipEntry> en = zf.entries();
+    // loop through all files
+    while(en.hasMoreElements()) {
+      final ZipEntry ze = en.nextElement();
+      final String name = ze.getName();
+      paths.add(name);
+    }
+    paths.sort(true, true);
+    return paths;
+  }
+
+  /**
    * Returns the value of the specified attribute.
    * @param elm element node
    * @param name attribute to be found
-   * @param force force flag; if {@code true}, an exception is thrown if
-   * the attribute is not found
+   * @param force if set to {@code true}, an exception is thrown if the
+   * attribute is not found
    * @return attribute value
    * @throws QueryException query exception
    */
@@ -347,22 +461,12 @@ final class FNZip extends Fun {
   }
 
   /**
-   * Updates a zip file.
-   * @return binary result
-   * @throws QueryException query exception
-   */
-  private Item update() throws QueryException {
-    throw NOTIMPL.thrw(input, def.desc);
-  }
-
-  /**
    * Returns an entry from a zip file.
    * @param ctx query context
    * @return binary result
    * @throws QueryException query exception
    */
   private byte[] entry(final QueryContext ctx) throws QueryException {
-    //final Uri uri = (Uri) checkType(expr[0].item(ctx, input), Type.URI);
     final String file = string(checkStr(expr[0], ctx));
     final String path = string(checkStr(expr[1], ctx));
     if(!IO.get(file).exists()) ZIPNOTFOUND.thrw(input, file);
