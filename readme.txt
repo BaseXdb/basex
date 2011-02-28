@@ -49,6 +49,10 @@ ADDING CHECKSTYLE --------------------------------------------------------------
  - Enter the URL: http://eclipse-cs.sourceforge.net/update
  - Follow the installation procedure and restart Eclipse
 
+USING GIT ----------------------------------------------------------------------
+
+TODO
+
 --------------------------------------------------------------------------------
 
  Any kind of feedback is welcome; please check out the online documentation at

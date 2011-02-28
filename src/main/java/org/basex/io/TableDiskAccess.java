@@ -3,6 +3,7 @@ package org.basex.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
+
 import org.basex.data.MetaData;
 import org.basex.util.Array;
 import org.basex.util.BitArray;
@@ -211,11 +212,20 @@ public final class TableDiskAccess extends TableAccess {
       if(from == 0) {
         ++unused;
         // mark the blocks as empty; range clear cannot be used because the
-        // block may not be consecutive:
+        // blocks may not be consecutive:
         pagemap.clear(pages[index]);
       }
       nextBlock();
       from = 0;
+    }
+
+    // delete entries at beginning of current (last) block
+    copy(bf.data, last - fpre, bf.data, 0, npre - last);
+    // if the last block is empty, clear the corresponding bit:
+    if(npre == last) {
+      pagemap.clear((int) bf.pos);
+      ++unused;
+      ++index;
     }
 
     // now remove them from the index
@@ -225,9 +235,6 @@ public final class TableDiskAccess extends TableAccess {
       blocks -= unused;
       index -= unused;
     }
-
-    // delete entries at beginning of current (last) block
-    copy(bf.data, last - fpre, bf.data, 0, npre - last);
 
     // update index entry for this block
     fpres[index] = first;
@@ -466,19 +473,19 @@ public final class TableDiskAccess extends TableAccess {
     // find an empty block:
     bf.pos = pagemap.nextClearBit(0);
 
-    // if the block number is bigger than the total number of block, it's a new:
-    if(bf.pos > allBlocks) allBlocks = (int) bf.pos;
+    // if block number is bigger than the total number of blocks, it's a new:
+    if(bf.pos >= allBlocks) allBlocks = (int) bf.pos + 1;
 
     bf.dirty = true;
     pagemap.set(bf.pos);
-    blocks++;
+    ++blocks;
   }
 
   // TEST METHODS =============================================================
 
   /**
    * Returns the number of entries; needed for JUnit tests.
-   * @return number of used blocks
+   * @return number of entries
    */
   public int size() {
     return meta.size;
