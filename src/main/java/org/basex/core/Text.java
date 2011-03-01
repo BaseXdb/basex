@@ -208,18 +208,6 @@ public interface Text {
   };
 
   /** Command help. */
-  String[] HELPATTACH = {
-      "TRIGGER " + "[" + C_NAME + "]", lang("ch_helpattach1"),
-      lang("ch_helpattach2", C_NAME)
-    };
-
-  /** Command help. */
-  String[] HELPDETACH = {
-      "TRIGGER " + "[" + C_NAME + "]", lang("ch_helpdetach1"),
-      lang("ch_helpdetach2", C_NAME)
-    };
-
-  /** Command help. */
   String[] HELPADD = {
     "(" + AS + " [" + C_NAME + "]) (" + TO + " [" + C_TARGET + "]) [" +
     INPUT + "]",

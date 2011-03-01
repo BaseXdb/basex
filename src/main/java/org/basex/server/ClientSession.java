@@ -16,21 +16,22 @@ import org.basex.core.Prop;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
 import org.basex.server.trigger.TriggerNotification;
+import org.basex.util.ByteList;
 import org.basex.util.Token;
 
 /**
- * This wrapper sends commands to the server instance over a socket
- * connection. It extends the {@link Session} class:
+ * This wrapper sends commands to the server instance over a socket connection.
+ * It extends the {@link Session} class:
  *
  * <ul>
- * <li> A socket instance is created by the constructor.</li>
- * <li> The {@link #execute} method sends database commands to the server.
- * All strings are encoded as UTF8 and suffixed by a zero byte.</li>
- * <li> If the command has been successfully executed,
- * the result string is read.</li>
- * <li> Next, the command info string is read.</li>
- * <li> A last byte is next sent to indicate if command execution
- * was successful (0) or not (1).</li>
+ * <li>A socket instance is created by the constructor.</li>
+ * <li>The {@link #execute} method sends database commands to the server. All
+ * strings are encoded as UTF8 and suffixed by a zero byte.</li>
+ * <li>If the command has been successfully executed, the result string is read.
+ * </li>
+ * <li>Next, the command info string is read.</li>
+ * <li>A last byte is next sent to indicate if command execution was successful
+ * (0) or not (1).</li>
  * <li> {@link #close} closes the session by sending the {@link Cmd#EXIT}
  * command to the server.</li>
  * </ul>
@@ -54,10 +55,11 @@ public final class ClientSession extends Session {
   int first;
   /** Buffer input. */
   BufferInput bi;
+  /** State for listening. */
+  int state;
 
   /**
-   * Constructor, specifying the database context and the
-   * login and password.
+   * Constructor, specifying the database context and the login and password.
    * @param context database context
    * @param user user name
    * @param pw password
@@ -69,44 +71,43 @@ public final class ClientSession extends Session {
   }
 
   /**
-   * Constructor, specifying the database context and the
-   * login and password.
+   * Constructor, specifying the database context and the login and password.
    * @param context database context
    * @param user user name
    * @param pw password
-   * @param output client output; if set to {@code null}, results will
-   * be returned as strings.
+   * @param output client output; if set to {@code null}, results will be
+   *          returned as strings.
    * @throws IOException I/O exception
    */
   public ClientSession(final Context context, final String user,
       final String pw, final OutputStream output) throws IOException {
-    this(context.prop.get(Prop.HOST), context.prop.num(Prop.PORT),
-        user, pw, output);
+    this(context.prop.get(Prop.HOST), context.prop.num(Prop.PORT), user, pw,
+        output);
   }
 
   /**
-   * Constructor, specifying the server host:port combination and the
-   * login and password.
+   * Constructor, specifying the server host:port combination and the login and
+   * password.
    * @param host server name
    * @param port server port
    * @param user user name
    * @param pw password
    * @throws IOException I/O exception
    */
-  public ClientSession(final String host, final int port,
-      final String user, final String pw) throws IOException {
+  public ClientSession(final String host, final int port, final String user,
+      final String pw) throws IOException {
     this(host, port, user, pw, null);
   }
 
   /**
-   * Constructor, specifying the server host:port combination and the
-   * login and password.
+   * Constructor, specifying the server host:port combination and the login and
+   * password.
    * @param host server name
    * @param port server port
    * @param user user name
    * @param pw password
-   * @param output client output; if set to {@code null}, results will
-   * be returned as strings.
+   * @param output client output; if set to {@code null}, results will be
+   *          returned as strings.
    * @throws IOException I/O exception
    */
   public ClientSession(final String host, final int port, final String user,
@@ -154,12 +155,16 @@ public final class ClientSession extends Session {
               tn.get(name).update(val);
             } else {
               synchronized(mutex) {
+                try {
+                  while(state == 0)
+                    mutex.wait();
+                } catch(InterruptedException e) { }
+                state++;
                 mutex.notifyAll();
                 try {
-                  mutex.wait();
-                } catch(InterruptedException e) {
-                  e.printStackTrace();
-                }
+                  while(state != 0)
+                    mutex.wait();
+                } catch(InterruptedException e) { }
               }
             }
           }
@@ -200,17 +205,36 @@ public final class ClientSession extends Session {
    */
   private void send(final InputStream input) throws IOException {
     int l;
-    while((l = input.read()) != -1) sout.write(l);
+    while((l = input.read()) != -1)
+      sout.write(l);
     sout.write(0);
     sout.flush();
-    bi = new BufferInput(sin);
-    info = bi.readString();
-    if(!ok()) throw new IOException(info);
+    response();
   }
 
   @Override
   public ClientQuery query(final String query) throws BaseXException {
     return new ClientQuery(query, this);
+  }
+
+  /**
+   * Reads response.
+   * @throws IOException I/O exception
+   */
+  private void response() throws IOException {
+    synchronized(mutex) {
+      try {
+        state = 2;
+        mutex.notifyAll();
+        while(state != 3) mutex.wait();
+      } catch(InterruptedException e) { }
+      info = new ByteList().add(first).toString() + bi.readString();
+      if(!ok()) {
+        idle();
+        throw new IOException(info);
+      }
+      idle();
+    }
   }
 
   /**
@@ -239,7 +263,13 @@ public final class ClientSession extends Session {
    */
   public void attachTrigger(final String name,
       final TriggerNotification notification) throws BaseXException {
-    execute("attach trigger " + name);
+    try {
+      sout.write(10);
+      send(name);
+      response();
+    } catch(IOException e) {
+      throw new BaseXException(e);
+    }
     tn.put(name, notification);
   }
 
@@ -249,8 +279,13 @@ public final class ClientSession extends Session {
    * @throws BaseXException exception
    */
   public void detachTrigger(final String name) throws BaseXException {
-    // remove trigger notification.
-    execute("detach trigger " + name);
+    try {
+      sout.write(11);
+      send(name);
+      response();
+    } catch(IOException e) {
+      throw new BaseXException(e);
+    }
     tn.remove(name);
   }
 
@@ -263,8 +298,8 @@ public final class ClientSession extends Session {
    */
   public void trigger(final String query, final String name,
       final String notification) throws BaseXException {
-    execute("xquery db:trigger(" + query + ", " + name + ", '" +
-        notification + "')");
+    execute("xquery db:trigger(" + query + ", " + name + ", '" + notification
+        + "')");
   }
 
   @Override
@@ -309,22 +344,34 @@ public final class ClientSession extends Session {
     synchronized(mutex) {
       try {
         send(cmd);
-        mutex.wait();
-        int l;
+        state = 1;
+        mutex.notifyAll();
+        while(state != 2)
+          mutex.wait();
         if(first != 0) {
-        os.write(first);
-        while((l = bi.read()) != 0) os.write(l);
+          int l;
+          os.write(first);
+          while((l = bi.read()) != 0)
+            os.write(l);
         }
         info = bi.readString();
         if(!ok()) {
           throw new BaseXException(info);
         }
       } catch(Exception ex) {
-        mutex.notifyAll();
+        idle();
         throw new BaseXException(ex);
       }
-      mutex.notifyAll();
+      idle();
     }
+  }
+
+  /**
+   * Sets state and notifies.
+   */
+  public void idle() {
+    state = 0;
+    mutex.notifyAll();
   }
 
   @Override

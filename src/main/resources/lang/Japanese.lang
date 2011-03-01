@@ -608,10 +608,6 @@ ch_help1=ヘルプをオンにする % コマンド
 ch_help2=[%] が指定された場合、指定されたコマンドに関する情報が\n 表示されます。指定しなかった場合は全てのコマンドが表示されます。
 ch_exit1=アプリケーションの終了
 ch_exit2=% を終了します。
-ch_helpattach1=Attach client to trigger.
-ch_helpattach2=Attaches a client to a trigger [%].
-ch_helpdetach1=Detach client from trigger.
-ch_helpdetach2=Detaches a client from trigger [%].
 
 # Help Texts
 h_hist=入力履歴の表示

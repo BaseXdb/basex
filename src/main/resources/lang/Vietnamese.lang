@@ -606,10 +606,6 @@ ch_help1=Nhờ giúp đỡ % những câu lệnh.
 ch_help2=Nếu [%] cụ thể, thông tin trên câu lệnh\n cụ thể sẽ được in ra; nếu không, liệt kê tất cả lệnh.
 ch_exit1=Exit application.
 ch_exit2=Exits %.
-ch_helpattach1=Attach client to trigger.
-ch_helpattach2=Attaches a client to a trigger [%].
-ch_helpdetach1=Detach client from trigger.
-ch_helpdetach2=Detaches a client from trigger [%].
 
 # Help Texts
 h_hist=Hiển thị lich sử thông tin nhập.

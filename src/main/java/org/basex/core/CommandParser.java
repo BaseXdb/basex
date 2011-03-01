@@ -5,9 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
-import org.basex.core.Commands.CmdAttach;
 import org.basex.core.Commands.CmdCreate;
-import org.basex.core.Commands.CmdDetach;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdIndexInfo;
@@ -17,7 +15,6 @@ import org.basex.core.Commands.CmdShow;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.AlterUser;
-import org.basex.core.cmd.AttachTrigger;
 import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
@@ -29,7 +26,6 @@ import org.basex.core.cmd.CreateTrigger;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Cs;
 import org.basex.core.cmd.Delete;
-import org.basex.core.cmd.DetachTrigger;
 import org.basex.core.cmd.DropBackup;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
@@ -168,18 +164,6 @@ public final class CommandParser extends InputParser {
         break;
       case OPEN:
         return new Open(string(cmd));
-      case ATTACH:
-        switch (consume(CmdAttach.class, cmd)) {
-          case TRIGGER:
-            return new AttachTrigger(name(cmd));
-        }
-        break;
-      case DETACH:
-        switch (consume(CmdDetach.class, cmd)) {
-          case TRIGGER:
-            return new DetachTrigger(name(cmd));
-        }
-        break;
       case CHECK:
         return new Check(string(cmd));
       case ADD:

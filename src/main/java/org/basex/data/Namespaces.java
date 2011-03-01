@@ -32,10 +32,10 @@ public final class Namespaces {
   private final TokenSet pref;
   /** URIs. */
   private final TokenSet uri;
-  /** Root node. */
-  protected NSNode root;
-  /** Root node dummy. All namespace nodes are descendants of this dummy. */
-  protected NSNode rootDummy;
+  /** Current namespace node. */
+  protected NSNode current;
+  /** Root node dummy. All namespace nodes are descendants of this node. */
+  protected NSNode absoluteRoot;
   /** New namespace flag. */
   private boolean newns;
 
@@ -45,8 +45,8 @@ public final class Namespaces {
    * Empty constructor.
    */
   public Namespaces() {
-    root = new NSNode(-1);
-    rootDummy = root;
+    current = new NSNode(-1);
+    absoluteRoot = current;
     pref = new TokenSet();
     uri = new TokenSet();
   }
@@ -59,8 +59,8 @@ public final class Namespaces {
   Namespaces(final DataInput in) throws IOException {
     pref = new TokenSet(in);
     uri = new TokenSet(in);
-    root = new NSNode(in, null);
-    rootDummy = root;
+    current = new NSNode(in, null);
+    absoluteRoot = current;
   }
 
   /**
@@ -71,7 +71,7 @@ public final class Namespaces {
   void write(final DataOutput out) throws IOException {
     pref.write(out);
     uri.write(out);
-    root.write(out);
+    current.write(out);
   }
 
   /**
@@ -87,12 +87,12 @@ public final class Namespaces {
     // after open() -call, newns==false
     if(!newns) {
       newNode = new NSNode(pre);
-      root = root.add(newNode);
+      current = current.add(newNode);
       newns = true;
     }
     final int k = addPref(p);
     final int v = addURI(u);
-    root.add(k, v);
+    current.add(k, v);
     if(p.length == 0) uriStack[uriL] = v;
     return newNode;
   }
@@ -114,7 +114,8 @@ public final class Namespaces {
    * @param pre current pre value
    */
   public void close(final int pre) {
-    while(root.pre >= pre && root.par != null) root = root.par;
+    while(current.pre >= pre && current.par != null)
+      current = current.par;
     uriStack[--uriL] = uriL > 0 ? uriStack[uriL - 1] : 0;
   }
 
@@ -129,7 +130,7 @@ public final class Namespaces {
     if(uri.size() == 0) return 0;
     final byte[] pr = Token.pref(n);
     int u = elem ? uriStack[uriL] : 0;
-    if(pr.length != 0) u = uri(pr, root);
+    if(pr.length != 0) u = uri(pr, current);
     return u;
   }
 
@@ -150,11 +151,11 @@ public final class Namespaces {
    */
   public byte[] globalNS() {
     // no namespaces defined: default namespace is empty
-    if(root.size == 0) return Token.EMPTY;
+    if(current.size == 0) return Token.EMPTY;
     // more than one namespace defined: skip test
-    if(root.size > 1) return null;
+    if(current.size > 1) return null;
     // check namespaces of first child
-    final NSNode n = root.ch[0];
+    final NSNode n = current.ch[0];
     // namespace has more children; skip traversal
     if(n.size != 0 || n.pre != 1) return null;
     // loop through all globally defined namespaces
@@ -181,7 +182,7 @@ public final class Namespaces {
    * @return namespace URI reference or 0 if no namespace was found
    */
   public int uri(final byte[] name, final int pre) {
-    return uri(Token.pref(name), root.find(pre));
+    return uri(Token.pref(name), current.find(pre));
   }
 
   /**
@@ -199,7 +200,7 @@ public final class Namespaces {
    * @return namespace references
    */
   int[] get(final int pre) {
-    return root.find(pre).vals;
+    return current.find(pre).vals;
   }
 
   /**
@@ -231,11 +232,9 @@ public final class Namespaces {
    * @param size number of entries to be deleted
    */
   void delete(final int pre, final int size) {
-    NSNode nd = root.find(pre);
+    NSNode nd = current.find(pre);
     if(nd.pre == pre) nd = nd.par;
-    if(nd == null) root = rootDummy;
-    // [LK] nd may be null!
-    while(!nd.equals(rootDummy)) {
+    while(nd != absoluteRoot) {
       nd.delete(pre, size);
       nd = nd.par;
     }
@@ -250,7 +249,7 @@ public final class Namespaces {
    * @return uri reference
    */
   public int add(final int pre, final int par, final byte[] p, final byte[] u) {
-    final NSNode nd = root.find(par);
+    final NSNode nd = current.find(par);
     final NSNode t = new NSNode(pre);
 
     final int k = addPref(p);
@@ -299,7 +298,7 @@ public final class Namespaces {
    * @param n new root
    */
   void setRoot(final NSNode n) {
-    root = n;
+    current = n;
   }
 
   // Printing Namespaces ======================================================
@@ -311,7 +310,7 @@ public final class Namespaces {
    * @return namespaces
    */
   public byte[] table(final int s, final int e) {
-    if(root.size == 0) return Token.EMPTY;
+    if(current.size == 0) return Token.EMPTY;
 
     final Table t = new Table();
     t.header.add(TABLEID);
@@ -320,7 +319,7 @@ public final class Namespaces {
     t.header.add(TABLEPREF);
     t.header.add(TABLEURI);
     for(int i = 0; i < 3; ++i) t.align.add(true);
-    table(t, root, s, e);
+    table(t, current, s, e);
     return t.contents.size() != 0 ? t.finish() : Token.EMPTY;
   }
 
@@ -351,7 +350,7 @@ public final class Namespaces {
    */
   public byte[] info() {
     final TokenObjMap<TokenList> map = new TokenObjMap<TokenList>();
-    info(map, root);
+    info(map, current);
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] val : map.keys()) {
       tb.add("  ");
@@ -398,7 +397,7 @@ public final class Namespaces {
    * @return string
    */
   public String toString(final int s, final int e) {
-    return root.print(this, s, e);
+    return current.print(this, s, e);
   }
 
   @Override
@@ -416,7 +415,7 @@ public final class Namespaces {
    */
   public void updatePreValues(final int pre, final int ms, final boolean insert,
       final Set<NSNode> newNodes) {
-    updateNodePre(rootDummy, pre, ms, insert, newNodes != null ? newNodes :
+    updateNodePre(absoluteRoot, pre, ms, insert, newNodes != null ? newNodes :
       new HashSet<NSNode>());
   }
 

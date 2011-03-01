@@ -18,10 +18,6 @@ public interface Commands {
   enum CmdInfo { NULL, DATABASE, DB, INDEX, STORAGE }
   /** Drop commands. */
   enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP, TRIGGER }
-  /** Attach commands. */
-  enum CmdAttach { TRIGGER }
-  /** Detach commands. */
-  enum CmdDetach { TRIGGER }
   /** Show commands. */
   enum CmdShow { DATABASES, SESSIONS, USERS, BACKUPS, TRIGGERS }
   /** Permission commands. */
@@ -39,9 +35,9 @@ public interface Commands {
   /** Command definitions. */
   enum Cmd {
 
-    ADD(HELPADD), ALTER(HELPALTER), ATTACH(HELPATTACH), BACKUP(HELPBACKUP),
+    ADD(HELPADD), ALTER(HELPALTER), BACKUP(HELPBACKUP),
     CHECK(), CLOSE(HELPCLOSE), CREATE(HELPCREATE), CS(HELPCS),
-    DELETE(HELPDELETE), DETACH(HELPDETACH), DROP(HELPDROP), EXIT(HELPEXIT),
+    DELETE(HELPDELETE), DROP(HELPDROP), EXIT(HELPEXIT),
     EXPORT(HELPEXPORT), FIND(HELPFIND), GET(HELPGET), GRANT(HELPGRANT),
     HELP(HELPHELP), INFO(HELPINFO), KILL(HELPKILL), LIST(HELPLIST),
     OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), QUIT(),

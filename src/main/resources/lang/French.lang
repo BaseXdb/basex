@@ -606,10 +606,6 @@ ch_help1=Obtenir de l'aide sur les commandes %
 ch_help2=Si [%] est spécifié, l'information relative à la \ncommande est imprimée; sinon, toutes les commandes sont listées.
 ch_exit1=Quitter l'application.
 ch_exit2=Quitter %.
-ch_helpattach1=Attach client to trigger.
-ch_helpattach2=Attaches a client to a trigger [%].
-ch_helpdetach1=Detach client from trigger.
-ch_helpdetach2=Detaches a client from trigger [%].
 
 # Aide Texts
 h_hist=Afficher l'historique des saisies.

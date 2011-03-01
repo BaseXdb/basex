@@ -606,10 +606,6 @@ ch_help1=Hilfe für %-Befehle.
 ch_help2=Wenn [%] angegeben wurde, werden Informationen\nzum eingegebenen Befehl dargestellt; ansonsten werden\nalle Befehle aufgelistet.
 ch_exit1=Beenden des Programms.
 ch_exit2=Beendet %.
-ch_helpattach1=Hängt Client an Trigger.
-ch_helpattach2=Hängt einen Client an einen Trigger [%].
-ch_helpdetach1=Entfernt Client von Trigger.
-ch_helpdetach2=Entfernt einen Client von einem Trigger [%].
 
 # Help Texts
 h_hist=Auswahl der letzten Texteingaben.

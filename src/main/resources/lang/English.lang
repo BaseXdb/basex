@@ -606,10 +606,6 @@ ch_help1=Get help on % commands.
 ch_help2=If [%] is specified, information on the specific\ncommand is printed; otherwise, all commands are listed.
 ch_exit1=Exit application.
 ch_exit2=Exits %.
-ch_helpattach1=Attach client to trigger.
-ch_helpattach2=Attaches a client to a trigger [%].
-ch_helpdetach1=Detach client from trigger.
-ch_helpdetach2=Detaches a client from trigger [%].
 
 # Help Texts
 h_hist=Show input history.

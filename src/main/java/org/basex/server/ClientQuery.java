@@ -87,16 +87,19 @@ public final class ClientQuery extends Query {
       try {
         cs.sout.write(cmd.code);
         cs.send(arg);
-        cs.mutex.wait();
+        cs.state = 3;
+        cs.mutex.notifyAll();
+        while(cs.state != 4) cs.mutex.wait();
         BufferInput bi = cs.bi;
         final ByteList bl = new ByteList();
         if(cs.first != 0) {
          bl.add(cs.first).add(bi.content().toArray());
         }
-        cs.mutex.notifyAll();
         if(!cs.ok(bi)) throw new BaseXException(bi.readString());
+        cs.idle();
         return bl;
       } catch(final Exception ex) {
+        cs.idle();
         throw new BaseXException(ex);
       }
     }

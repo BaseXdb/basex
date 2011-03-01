@@ -26,7 +26,7 @@ public final class TriggerTest {
   /** Trigger count. */
   private static final int TRIGGER_COUNT = 10;
   /** Trigger name. */
-  private static final String TRIGGER_NAME = "Trigger";
+  private static final String TRIGGER_NAME = "trigger";
   /** Return value of function util:trigger. */
   private static final String RETURN_VALUE = "GOT TRIGGERED";
   /** Server reference. */
@@ -114,62 +114,6 @@ public final class TriggerTest {
 
     // Release a trigger.
     cs.trigger("1 to 10", TRIGGER_NAME, RETURN_VALUE);
-
-    // Detach all clients attached to trigger beforehand.
-    for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].detachTrigger(TRIGGER_NAME);
-    }
-
-    // Drop trigger.
-    cs.dropTrigger(TRIGGER_NAME);
-  }
-
-  /**
-   * Runs queries and triggers concurrently.
-   * @throws BaseXException command exception
-   */
-  @Test
-  public void trigger2() throws BaseXException {
-
-    // Create first trigger.
-    cs.createTrigger(TRIGGER_NAME);
-    // Drop second trigger.
-    cs.dropTrigger(TRIGGER_NAME + 1);
-    // Create second trigger.
-    cs.createTrigger(TRIGGER_NAME + 1);
-
-    // Attach half of the clients to the trigger and run a query.
-    for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
-        @Override
-        public void update(final String data) {
-          assertEquals(RETURN_VALUE, data);
-        }
-      });
-      assertEquals(ccs[i].execute("xquery 1 + 100"), "101");
-    }
-
-    // Attach half of the clients to the trigger and run a query.
-    for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].attachTrigger(TRIGGER_NAME + 1, new TriggerNotification() {
-        @Override
-        public void update(final String data) {
-          assertEquals(RETURN_VALUE, data);
-        }
-      });
-      assertEquals(ccs[i].execute("xquery 1 + 100"), "101");
-    }
-
-    // Release first trigger.
-    cs.trigger("1 to 10", TRIGGER_NAME, RETURN_VALUE);
-
-    // Run for half of the clients a query.
-    for(int i = ccs.length / 2; i < ccs.length; i++) {
-      assertEquals(ccs[i].execute("xquery 1 + 100"), "101");
-    }
-
-    // Release second trigger.
-    cs.trigger("1 to 10", TRIGGER_NAME + 1, RETURN_VALUE);
 
     // Detach all clients attached to trigger beforehand.
     for(int i = ccs.length / 2; i < ccs.length; i++) {

@@ -129,6 +129,14 @@ public final class ServerProcess extends Thread {
             add();
             continue;
           }
+          if(sc == ATTACH) {
+            attach();
+            continue;
+          }
+          if(sc == DETACH) {
+            detach();
+            continue;
+          }
           if(sc != CMD) {
             query(sc);
             continue;
@@ -264,6 +272,46 @@ public final class ServerProcess extends Thread {
   }
 
   /**
+   * Attach this server process to a trigger.
+   * @throws IOException I/O exception
+   */
+  private void attach() throws IOException {
+    final String name = in.readString();
+    if(context.triggers.attach(name, context.session)) {
+      String info = Util.info(TRIGGERATT, name);
+      out.writeString(info);
+      out.write(0);
+      log.write(this, OK + info);
+    } else {
+      String info = Util.info(TRIGGERNO, name);
+      out.writeString(info);
+      out.write(1);
+      log.write(this, INFOERROR + info);
+    }
+    out.flush();
+  }
+
+  /**
+   * Detach this server process to a trigger.
+   * @throws IOException I/O exception
+   */
+  private void detach() throws IOException {
+    final String name = in.readString();
+    if(context.triggers.detach(name, context.session)) {
+      String info = Util.info(TRIGGERDET, name);
+      out.writeString(info);
+      out.write(0);
+      log.write(this, OK + info);
+    } else {
+      String info = Util.info(TRIGGERNO, name);
+      out.writeString(info);
+      out.write(1);
+      log.write(this, INFOERROR + info);
+    }
+    out.flush();
+  }
+
+  /**
    * Processes the query iterator.
    * @param sc server command
    * @throws IOException I/O exception
@@ -353,8 +401,10 @@ public final class ServerProcess extends Thread {
     for(final QueryProcess q : queries.values()) {
       try { q.close(true); } catch(final IOException ex) { }
     }
-    // remove from all triggers from pool
-    context.triggers.remove(this, triggers);
+    // remove this from all triggers in pool
+    if(triggers.size() > 0) {
+      context.triggers.remove(this, triggers);
+    }
     try {
       new Close().execute(context);
       if(cmd != null) cmd.stop();
