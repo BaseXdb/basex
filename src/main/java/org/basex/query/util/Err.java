@@ -221,8 +221,6 @@ public enum Err {
 
   /** FTST0000: Parsing exception. */
   FTFZWC(FTST, 0, "Either wildcards or fuzzy search supported."),
-  /** FTST0000: Parsing exception. */
-  THESRNG(FTST, 0, "Constant integer expected for thesaurus level."),
   /** FTST0007: Parsing exception. */
   FTIGNORE(FTST, 7, "Ignore option not supported."),
   /** FTST0008: Parsing exception. */
@@ -395,6 +393,8 @@ public enum Err {
   FTMATCH(XPST, 3, "Unknown match option '%...'."),
   /** XPST0003: Evaluation exception. */
   INVALPI(XPST, 3, "Invalid PI name: \"%\"."),
+  /** XPST0003: Parsing exception. */
+  INTEXP(XPST, 3, "Integer expected."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will not yield any results."),
