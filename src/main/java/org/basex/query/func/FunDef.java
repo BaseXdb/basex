@@ -154,7 +154,7 @@ public enum FunDef {
   FOLDRIGHT(FNURI, FNFunc.class, 3, 3, "fold-right(function, zero, seq)",
       ITEM_ZM),
   /** XQuery function. */
-  PARTAPP(FNURI, FNFunc.class, 3, 3, "partial-apply(function, arg, pos?)",
+  PARTAPP(FNURI, FNFunc.class, 2, 3, "partial-apply(function, arg, pos?)",
       FUN_O),
 
   /* FNGen functions. */

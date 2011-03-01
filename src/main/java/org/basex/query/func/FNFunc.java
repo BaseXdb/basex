@@ -13,12 +13,10 @@ import org.basex.query.item.FunItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import static org.basex.query.item.SeqType.*;
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -87,7 +85,7 @@ final class FNFunc extends Fun {
     vals[(int) pos] = v;
     for(int i = 0, j = 0; i < arity - 1; i++, j++) {
       if(i == pos) j++;
-      vars[i] = new Var(ii, new QNm(token(j)));
+      vars[i] = Var.unique(ii);
       vals[j] = new VarRef(ii, vars[i]);
     }
 

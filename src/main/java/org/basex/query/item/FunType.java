@@ -65,7 +65,7 @@ public final class FunType implements Type {
 
   @Override
   public Type par() {
-    return null;
+    return AtomType.ITEM;
   }
 
   @Override
@@ -110,11 +110,13 @@ public final class FunType implements Type {
 
   @Override
   public boolean instance(final Type t) {
-    // takes care of FunType.ANY
-    if(this == t || t == ANY) return true;
-    if(this == ANY || !(t instanceof FunType)) return false;
-
+    // the only non-function supertype of function is item()
+    if(!(t instanceof FunType)) return t == AtomType.ITEM;
     final FunType ft = (FunType) t;
+
+    // takes care of FunType.ANY
+    if(this == ft || ft == ANY) return true;
+    if(this == ANY) return false;
     if(args.length != ft.args.length || !ret.instance(ft.ret)) return false;
     for(int i = 0; i < args.length; i++)
       if(!args[i].instance(ft.args[i])) return false;
