@@ -26,18 +26,19 @@ import org.basex.util.TokenSet;
 public final class Namespaces {
   /** Namespace stack. */
   private final int[] uriStack = new int[IO.MAXHEIGHT];
-  /** Current level. */
-  private int uriL;
   /** Prefixes. */
   private final TokenSet pref;
   /** URIs. */
   private final TokenSet uri;
-  /** Current namespace node. */
-  protected NSNode current;
-  /** Root node dummy. All namespace nodes are descendants of this node. */
-  protected NSNode absoluteRoot;
+  /** Root node. */
+  final NSNode root;
+
   /** New namespace flag. */
   private boolean newns;
+  /** Current level. */
+  private int uriL;
+  /** Current namespace node. */
+  NSNode current;
 
   // Building Namespaces ======================================================
 
@@ -46,7 +47,7 @@ public final class Namespaces {
    */
   public Namespaces() {
     current = new NSNode(-1);
-    absoluteRoot = current;
+    root = current;
     pref = new TokenSet();
     uri = new TokenSet();
   }
@@ -60,7 +61,7 @@ public final class Namespaces {
     pref = new TokenSet(in);
     uri = new TokenSet(in);
     current = new NSNode(in, null);
-    absoluteRoot = current;
+    root = current;
   }
 
   /**
@@ -234,7 +235,7 @@ public final class Namespaces {
   void delete(final int pre, final int size) {
     NSNode nd = current.find(pre);
     if(nd.pre == pre) nd = nd.par;
-    while(nd != absoluteRoot) {
+    while(nd != root) {
       nd.delete(pre, size);
       nd = nd.par;
     }
@@ -415,7 +416,7 @@ public final class Namespaces {
    */
   public void updatePreValues(final int pre, final int ms, final boolean insert,
       final Set<NSNode> newNodes) {
-    updateNodePre(absoluteRoot, pre, ms, insert, newNodes != null ? newNodes :
+    updateNodePre(root, pre, ms, insert, newNodes != null ? newNodes :
       new HashSet<NSNode>());
   }
 

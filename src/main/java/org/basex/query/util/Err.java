@@ -683,7 +683,7 @@ public enum Err {
    * @return serializer exception (indicates that an error is raised)
    * @throws SerializerException serializer exception
    */
-  public SerializerException serial(final Object... ext)
+  public SerializerException thrwSerial(final Object... ext)
       throws SerializerException {
     throw new SerializerException(this, ext);
   }

@@ -109,10 +109,6 @@ public interface DataText {
   String M_CSV = "csv";
   /** Method. */
   String M_TEXT = "text";
-  /** Method. */
-  String M_BASE64 = "base64";
-  /** Method. */
-  String M_HEX = "hex";
   /** Normalization. */
   String NFC = "NFC";
   /** Normalization. */

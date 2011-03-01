@@ -456,7 +456,7 @@ public enum FunDef {
   /** XQuery function */
   ZIPFILE(ZIPURI, FNZip.class, 1, 1, "zip-file(zip)", ITEM_Z),
   /** XQuery function */
-  UPDATE(ZIPURI, FNZip.class, 1, 1, "update-entries(zip, output)", ITEM_Z),
+  UPDATE(ZIPURI, FNZip.class, 2, 2, "update-entries(zip, output)", ITEM_Z),
 
   /* FNHttp functions */
 

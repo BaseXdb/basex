@@ -638,7 +638,7 @@ public abstract class Data {
       if(mpre == 0) {
         // collect possible candidates for namespace root
         final List<NSNode> cand = new LinkedList<NSNode>();
-        NSNode cn = ns.absoluteRoot;
+        NSNode cn = ns.root;
         cand.add(cn);
         int cI;
         while((cI = cn.fnd(par)) > -1) {
@@ -647,13 +647,13 @@ public abstract class Data {
           cand.add(0, cn);
         }
 
-        cn = ns.absoluteRoot;
+        cn = ns.root;
         if(cand.size() > 1) {
           // compare candidates to ancestors of par
           int ancPre = par;
           // take first candidate from stack
           NSNode curr = cand.remove(0);
-          while(ancPre > -1 && cn == ns.absoluteRoot) {
+          while(ancPre > -1 && cn == ns.root) {
             // this is the new root
             if(curr.pre == ancPre) cn = curr;
             // if the current candidate's pre value is lower than the current
