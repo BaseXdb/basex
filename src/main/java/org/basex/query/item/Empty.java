@@ -89,6 +89,11 @@ public final class Empty extends Value {
   }
 
   @Override
+  public int hash() {
+    return 0;
+  }
+
+  @Override
   public String toString() {
     return "()";
   }

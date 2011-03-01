@@ -448,7 +448,8 @@ public enum FunDef {
   /** XQuery function */
   BENTRY(ZIPURI, FNZip.class, 2, 2, "binary-entry(path, entry)", B64),
   /** XQuery function */
-  TEXTENTRY(ZIPURI, FNZip.class, 2, 2, "text-entry(path, entry)", STR),
+  TEXTENTRY(ZIPURI, FNZip.class, 2, 3,
+      "text-entry(path, entry, encoding?)", STR),
   /** XQuery function */
   HTMLENTRY(ZIPURI, FNZip.class, 2, 2, "html-entry(path, entry)", NOD),
   /** XQuery function */
@@ -458,7 +459,7 @@ public enum FunDef {
   /** XQuery function */
   ZIPFILE(ZIPURI, FNZip.class, 1, 1, "zip-file(zip)", ITEM_Z),
   /** XQuery function */
-  UPDATE(ZIPURI, FNZip.class, 1, 1, "update-entries(zip, output)", ITEM_Z),
+  UPDATE(ZIPURI, FNZip.class, 2, 2, "update-entries(zip, output)", ITEM_Z),
 
   /* FNHttp functions */
 

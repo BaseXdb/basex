@@ -271,7 +271,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public int hashCode() {
+  public int hash() {
     try {
       return Token.hash(atom(null));
     } catch(QueryException e) {

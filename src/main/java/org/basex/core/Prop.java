@@ -235,11 +235,10 @@ public final class Prop extends AProp {
 
   @Override
   protected void finish() {
-    // set static properties
-    if(this == root) {
-      Prop.language = get(Prop.LANG);
-      Prop.langkeys = is(Prop.LANGKEYS);
-      Util.debug = is(Prop.DEBUG);
-    }
+    if(this != root) return;
+    // set some static properties
+    Prop.language = get(Prop.LANG);
+    Prop.langkeys = is(Prop.LANGKEYS);
+    Util.debug = is(Prop.DEBUG);
   }
 }

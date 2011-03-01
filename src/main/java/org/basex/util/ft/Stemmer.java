@@ -11,11 +11,10 @@ import java.util.LinkedList;
  */
 public abstract class Stemmer extends LanguageImpl {
   /** List of available stemmers. */
-  public static final LinkedList<Stemmer> IMPL;
+  public static final LinkedList<Stemmer> IMPL = new LinkedList<Stemmer>();
 
   /** Load stemmers and order them by precedence. */
   static {
-    IMPL = new LinkedList<Stemmer>();
     // Built-in stemmers
     IMPL.add(new EnglishStemmer(null));
     IMPL.add(new GermanStemmer(null));
@@ -30,6 +29,13 @@ public abstract class Stemmer extends LanguageImpl {
 
   /** Full-text iterator. */
   private final FTIterator iter;
+
+  /**
+   * Constructor.
+   */
+  protected Stemmer() {
+    this(null);
+  }
 
   /**
    * Constructor.

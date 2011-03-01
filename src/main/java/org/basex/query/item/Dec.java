@@ -116,7 +116,7 @@ public final class Dec extends Item {
   }
 
   @Override
-  public int hashCode() {
+  public int hash() {
     return val.intValue();
   }
 

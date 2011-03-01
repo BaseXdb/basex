@@ -66,6 +66,11 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
+  public int hash() {
+    return (int) (start * size);
+  }
+
+  @Override
   public String toString() {
     return PAR1 + start + ' ' + TO + ' ' + (start + size - 1) + PAR2;
   }

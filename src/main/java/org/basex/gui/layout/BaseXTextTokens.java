@@ -283,10 +283,10 @@ public final class BaseXTextTokens {
     // decide if to use tab or spaces
     boolean tab = false;
     for(int p = 0; p < size; ++p) tab |= text[p] == '\t';
-    String add = "\t";
+    byte[] add = { '\t' };
     if(!tab) {
-      add = "";
-      for(int i = 0; i < TAB; i++) add += ' ';
+      add = new byte[TAB];
+      for(int a = 0; a < TAB; a++) add[a] = ' ';
     }
 
     // build new text
@@ -311,7 +311,7 @@ public final class BaseXTextTokens {
         } else {
           // add new indentation
           tb.add(add);
-          me += add.length();
+          me += add.length;
         }
       }
       tb.add(cp(text, p));

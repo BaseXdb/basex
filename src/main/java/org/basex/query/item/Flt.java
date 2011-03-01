@@ -92,7 +92,7 @@ public final class Flt extends Item {
   }
 
   @Override
-  public int hashCode() {
+  public int hash() {
     return (int) val;
   }
 

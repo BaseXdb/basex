@@ -16,7 +16,7 @@ import org.basex.util.ByteList;
 import org.basex.util.TokenBuilder;
 
 /**
- * This class serves as a buffered wrapper for input streams.
+ * This class serves as a buffered wrapper for textual input streams.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -176,7 +176,7 @@ public class BufferInput extends InputStream {
   public final int readChar() throws IOException {
     // handle different encodings
     final byte ch = readByte();
-    // comparison by references
+    // encoding can be safely compared by references...
     if(enc == UTF8) {
       final int cl = cl(ch);
       if(cl == 1) return ch & 0xFF;

@@ -515,6 +515,6 @@ public final class HttpClient {
    * @return encoded credentials
    */
   private String encodeCredentials(final String usrname, final String passwd) {
-    return AUTH_BASIC + string(B64.enc(token(usrname + ":" + passwd)));
+    return AUTH_BASIC + string(new B64(token(usrname + ":" + passwd)).atom());
   }
 }

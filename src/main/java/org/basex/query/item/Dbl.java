@@ -107,7 +107,7 @@ public final class Dbl extends Item {
   }
 
   @Override
-  public int hashCode() {
+  public int hash() {
     return (int) val;
   }
 

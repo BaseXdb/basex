@@ -567,7 +567,7 @@ public abstract class Data {
     table.delete(pre, s);
     updateDist(p, -s);
 
-    // NSNodes have to be checked for pre value shifts after insert
+    // NSNodes have to be checked for pre value shifts after delete
     ns.updatePreValues(pre, s, false, null);
 
     // restore empty document node
@@ -609,7 +609,7 @@ public abstract class Data {
 
     // find all namespaces in scope
     final TokenMap nsScope = new TokenMap();
-    NSNode n = ns.root;
+    NSNode n = ns.current;
     do {
       for(int i = 0; i < n.vals.length; i += 2)
         nsScope.add(ns.pref(n.vals[i]), ns.uri(n.vals[i + 1]));
@@ -620,7 +620,7 @@ public abstract class Data {
 
     // loop through all entries
     int mpre = -1;
-    final NSNode t = ns.root;
+    final NSNode t = ns.current;
     final Set<NSNode> newNodes = new HashSet<NSNode>();
     while(++mpre != ms) {
       if(mpre != 0 && mpre % buf == 0) insert(ipre + mpre - buf);
@@ -638,7 +638,7 @@ public abstract class Data {
       if(mpre == 0) {
         // collect possible candidates for namespace root
         final List<NSNode> cand = new LinkedList<NSNode>();
-        NSNode cn = ns.rootDummy;
+        NSNode cn = ns.root;
         cand.add(cn);
         int cI;
         while((cI = cn.fnd(par)) > -1) {
@@ -647,13 +647,13 @@ public abstract class Data {
           cand.add(0, cn);
         }
 
-        cn = ns.rootDummy;
+        cn = ns.root;
         if(cand.size() > 1) {
           // compare candidates to ancestors of par
           int ancPre = par;
           // take first candidate from stack
           NSNode curr = cand.remove(0);
-          while(ancPre > -1 && cn == ns.rootDummy) {
+          while(ancPre > -1 && cn == ns.root) {
             // this is the new root
             if(curr.pre == ancPre) cn = curr;
             // if the current candidate's pre value is lower than the current

@@ -106,6 +106,13 @@ public final class DBNodeSeq extends Seq {
   }
 
   @Override
+  public int hash() {
+    int h = 0;
+    for(int v = 0; v != Math.min(size, 5); ++v) h += pres[v];
+    return h;
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(PAR1);
     for(int v = 0; v != size; ++v) {

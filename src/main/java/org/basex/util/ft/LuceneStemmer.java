@@ -62,7 +62,7 @@ final class LuceneStemmer extends Stemmer {
 
   /** Empty constructor. */
   LuceneStemmer() {
-    super(null);
+    super();
   }
 
   /**

@@ -237,9 +237,9 @@ public class QueryParser extends InputParser {
     ctx.funcs.check();
     ctx.vars.check();
     ctx.ns.finish(ctx.nsElem);
-    final QNm empty = new QNm(EMPTY);
+    final byte[] empty = new QNm(EMPTY).full();
     if(ctx.decFormats.get(empty) == null) {
-      ctx.decFormats.put(empty, new DecimalFormat());
+      ctx.decFormats.add(empty, new DecimalFormat());
     }
     return expr;
   }
@@ -529,7 +529,7 @@ public class QueryParser extends InputParser {
     if(def && !wsConsumeWs(DECFORMAT)) return false;
 
     // use empty name for default declaration
-    final QNm name = new QNm(def ? EMPTY : qName(QNAMEINV));
+    final byte[] name = new QNm(def ? EMPTY : qName(QNAMEINV)).full();
     if(ctx.decFormats.get(name) != null) error(DECDUPL);
 
     // create new format
@@ -552,7 +552,7 @@ public class QueryParser extends InputParser {
     } while(n != sl.size());
 
     // completes the format declaration
-    ctx.decFormats.put(name, new DecimalFormat(input(), sl));
+    ctx.decFormats.add(name, new DecimalFormat(input(), sl));
     return true;
   }
 

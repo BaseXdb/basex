@@ -138,7 +138,7 @@ public class Itr extends Item {
   }
 
   @Override
-  public final int hashCode() {
+  public final int hash() {
     return (int) val;
   }
 

@@ -127,8 +127,7 @@ final class FNQName extends Fun {
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();
     final byte[] uri = ((ANode) checkType(it, NodeType.ELM)).uri(pref, ctx);
-    if(uri == null && pref.length != 0) NSDECL.thrw(input, pref);
-    // [CG] XQuery/resolve-QName: check: uri == null && pref.length == 0
+    if(uri == null) NSDECL.thrw(input, pref);
     nm.uri(uri);
     return nm;
   }
