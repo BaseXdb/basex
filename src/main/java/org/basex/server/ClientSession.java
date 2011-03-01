@@ -56,7 +56,7 @@ public final class ClientSession extends Session {
   /** Buffer input. */
   BufferInput bi;
   /** State for listening. */
-  int state;
+  boolean state = true;
 
   /**
    * Constructor, specifying the database context and the login and password.
@@ -156,14 +156,9 @@ public final class ClientSession extends Session {
             } else {
               synchronized(mutex) {
                 try {
-                  while(state == 0)
-                    mutex.wait();
-                } catch(InterruptedException e) { }
-                state++;
-                mutex.notifyAll();
-                try {
-                  while(state != 0)
-                    mutex.wait();
+                  while(state) mutex.wait();
+                  check(true);
+                  while(state) mutex.wait();
                 } catch(InterruptedException e) { }
               }
             }
@@ -205,8 +200,7 @@ public final class ClientSession extends Session {
    */
   private void send(final InputStream input) throws IOException {
     int l;
-    while((l = input.read()) != -1)
-      sout.write(l);
+    while((l = input.read()) != -1) sout.write(l);
     sout.write(0);
     sout.flush();
     response();
@@ -224,16 +218,15 @@ public final class ClientSession extends Session {
   private void response() throws IOException {
     synchronized(mutex) {
       try {
-        state = 2;
-        mutex.notifyAll();
-        while(state != 3) mutex.wait();
+        check(false);
+        while(!state) mutex.wait();
       } catch(InterruptedException e) { }
       info = new ByteList().add(first).toString() + bi.readString();
       if(!ok()) {
-        idle();
+        check(false);
         throw new IOException(info);
       }
-      idle();
+      check(false);
     }
   }
 
@@ -328,26 +321,14 @@ public final class ClientSession extends Session {
     return bi.read() == 0;
   }
 
-  /**
-   * Checks the next success flag.
-   * @param b buffer input
-   * @return value of check
-   * @throws IOException I/O exception
-   */
-  boolean ok(final BufferInput b) throws IOException {
-    return b.read() == 0;
-  }
-
   @Override
   protected void execute(final String cmd, final OutputStream os)
       throws BaseXException {
     synchronized(mutex) {
       try {
         send(cmd);
-        state = 1;
-        mutex.notifyAll();
-        while(state != 2)
-          mutex.wait();
+        check(false);
+        while(!state) mutex.wait();
         if(first != 0) {
           int l;
           os.write(first);
@@ -356,21 +337,22 @@ public final class ClientSession extends Session {
         }
         info = bi.readString();
         if(!ok()) {
+          check(false);
           throw new BaseXException(info);
         }
       } catch(Exception ex) {
-        idle();
         throw new BaseXException(ex);
       }
-      idle();
+      check(false);
     }
   }
 
   /**
    * Sets state and notifies.
+   * @param b flag
    */
-  public void idle() {
-    state = 0;
+  public synchronized void check(final boolean b) {
+    state = b;
     mutex.notifyAll();
   }
 

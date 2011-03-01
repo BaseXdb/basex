@@ -2,7 +2,6 @@ package org.basex.server;
 
 import java.io.IOException;
 import org.basex.core.BaseXException;
-import org.basex.io.BufferInput;
 import org.basex.util.ByteList;
 
 /**
@@ -87,19 +86,17 @@ public final class ClientQuery extends Query {
       try {
         cs.sout.write(cmd.code);
         cs.send(arg);
-        cs.state = 3;
-        cs.mutex.notifyAll();
-        while(cs.state != 4) cs.mutex.wait();
-        BufferInput bi = cs.bi;
+        cs.check(false);
+        while(!cs.state) cs.mutex.wait();
         final ByteList bl = new ByteList();
         if(cs.first != 0) {
-         bl.add(cs.first).add(bi.content().toArray());
+         bl.add(cs.first).add(cs.bi.content().toArray());
         }
-        if(!cs.ok(bi)) throw new BaseXException(bi.readString());
-        cs.idle();
+        if(!cs.ok()) throw new BaseXException(cs.bi.readString());
+        cs.check(false);
         return bl;
       } catch(final Exception ex) {
-        cs.idle();
+        cs.check(false);
         throw new BaseXException(ex);
       }
     }

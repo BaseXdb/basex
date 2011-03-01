@@ -9,9 +9,8 @@ import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
 import org.basex.server.trigger.TriggerNotification;
-import org.junit.After;
+import org.basex.util.Performance;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -32,19 +31,14 @@ public final class TriggerTest {
   /** Server reference. */
   private static BaseXServer server;
   /** Client session. */
-  private ClientSession cs;
+  private static ClientSession cs;
   /** Control client sessions. */
-  private ClientSession[] ccs = new ClientSession[10];
+  private static ClientSession[] ccs = new ClientSession[10];
 
   /** Starts the server. */
   @BeforeClass
   public static void start() {
     server = new BaseXServer();
-  }
-
-  /** Starts all sessions. */
-  @Before
-  public void startSession() {
     try {
       cs = newSession();
       for(int i = 0; i < ccs.length; i++) {
@@ -55,9 +49,9 @@ public final class TriggerTest {
     }
   }
 
-  /** Stops all sessions. */
-  @After
-  public void stopSession() {
+  /** Stops the server. */
+  @AfterClass
+  public static void stop() {
     try {
       cs.close();
       for(ClientSession s : ccs)
@@ -65,30 +59,100 @@ public final class TriggerTest {
     } catch(final IOException ex) {
       fail(ex.toString());
     }
-  }
-
-  /** Stops the server. */
-  @AfterClass
-  public static void stop() {
     server.stop();
   }
 
   /**
-   * Creates triggers.
+   * Creates and drops triggers.
    * @throws BaseXException command exception
    */
   @Test
-  public void create() throws BaseXException {
+  public void createDrop() throws BaseXException {
+
+    // create trigger
     for(int i = 1; i < TRIGGER_COUNT; i++) {
       cs.createTrigger(TRIGGER_NAME + i);
     }
-
+    // query must not contain all triggers
     String triggers = cs.execute("show triggers");
-
     String[] triggerNames = triggers.split("\n");
     Arrays.sort(triggerNames);
     for(int i = 1; i < TRIGGER_COUNT; i++) {
       assertEquals(TRIGGER_NAME + i, triggerNames[i]);
+    }
+
+    // drop trigger
+    for(int i = 1; i < TRIGGER_COUNT; i++) {
+      cs.dropTrigger(TRIGGER_NAME + i);
+    }
+    // query must not return any trigger
+    triggers = cs.execute("show triggers");
+    assertEquals("0", triggers.substring(0, 1));
+  }
+
+  /**
+   * Attaches and detaches clients.
+   */
+  @Test
+  public void attachDetach() {
+    // create trigger
+    try {
+      cs.createTrigger(TRIGGER_NAME);
+    } catch(BaseXException e) {
+      fail(e.getMessage());
+    }
+
+    // create trigger
+    try {
+      cs.createTrigger(TRIGGER_NAME);
+      fail("This was supposed to fail.");
+    } catch(BaseXException e) { }
+
+    // attach at trigger
+    try {
+      for(int i = ccs.length / 2; i < ccs.length; i++) {
+        ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
+          @Override
+          public void update(final String data) { }
+        });
+      }
+    } catch(BaseXException e) {
+      fail(e.getMessage());
+    }
+
+    // attach at trigger
+    try {
+      for(int i = ccs.length / 2; i < ccs.length; i++) {
+        ccs[i].attachTrigger(TRIGGER_NAME + 1, new TriggerNotification() {
+          @Override
+          public void update(final String data) { }
+        });
+        fail("This was supposed to fail.");
+      }
+    } catch(BaseXException e) { }
+
+    // detach from trigger
+    try {
+      for(int i = ccs.length / 2; i < ccs.length; i++) {
+        ccs[i].detachTrigger(TRIGGER_NAME);
+      }
+    } catch(BaseXException e) {
+      fail(e.getMessage());
+    }
+
+    // detach from trigger
+    try {
+      for(int i = ccs.length / 2; i < ccs.length; i++) {
+        ccs[i].detachTrigger(TRIGGER_NAME + 1);
+        fail("This was supposed to fail.");
+      }
+    } catch(BaseXException e) { }
+
+    // drop the trigger
+    try {
+      cs.dropTrigger(TRIGGER_NAME);
+    } catch(BaseXException e) {
+      fail(e.getMessage());
     }
   }
 
@@ -99,10 +163,10 @@ public final class TriggerTest {
   @Test
   public void trigger() throws BaseXException {
 
-    // Create a trigger.
+    // create the trigger
     cs.createTrigger(TRIGGER_NAME);
 
-    // Attach half of the clients to the trigger.
+    // attach half of the clients to the trigger
     for(int i = ccs.length / 2; i < ccs.length; i++) {
       ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
         @Override
@@ -112,15 +176,17 @@ public final class TriggerTest {
       });
     }
 
-    // Release a trigger.
+    // release a trigger
     cs.trigger("1 to 10", TRIGGER_NAME, RETURN_VALUE);
 
-    // Detach all clients attached to trigger beforehand.
+    Performance.sleep(200);
+
+    // detach all clients attached to trigger beforehand
     for(int i = ccs.length / 2; i < ccs.length; i++) {
       ccs[i].detachTrigger(TRIGGER_NAME);
     }
 
-    // Drop trigger.
+    // drop trigger
     cs.dropTrigger(TRIGGER_NAME);
   }
 
@@ -131,14 +197,11 @@ public final class TriggerTest {
    */
   @Test
   public void concurrent() throws Exception {
-    // Create first trigger.
+    // create trigger.
     cs.createTrigger(TRIGGER_NAME);
-    // Drop second trigger.
-    cs.dropTrigger(TRIGGER_NAME + 1);
-    // Create second trigger.
     cs.createTrigger(TRIGGER_NAME + 1);
 
-    // Attach half of the clients to the triggers.
+    // attach half of the clients to the triggers
     for(int i = ccs.length / 2; i < ccs.length; i++) {
       ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
         @Override
@@ -162,25 +225,9 @@ public final class TriggerTest {
     c1.join();
     c2.join();
 
-    // Drop trigger.
+    // drop trigger
     cs.dropTrigger(TRIGGER_NAME);
-  }
-
-  /**
-   * Drops triggers.
-   * @throws BaseXException command exception
-   */
-  @Test
-  public void drop() throws BaseXException {
-
-    // Drop triggers.
-    for(int i = 1; i < TRIGGER_COUNT; i++) {
-      cs.dropTrigger(TRIGGER_NAME + i);
-    }
-
-    String triggers = cs.execute("show triggers");
-    // Query must not return any trigger.
-    assertEquals("0", triggers.substring(0, 1));
+    cs.dropTrigger(TRIGGER_NAME + 1);
   }
 
   /**
