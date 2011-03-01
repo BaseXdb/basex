@@ -117,6 +117,11 @@ public enum NodeType implements Type {
   private SeqType seq;
 
   @Override
+  public final boolean node() {
+    return true;
+  }
+
+  @Override
   public boolean dat() {
     return false;
   }
@@ -127,18 +132,8 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public byte[] nam() {
-    return nam;
-  }
-
-  @Override
   public boolean num() {
     return false;
-  }
-
-  @Override
-  public Type par() {
-    return par;
   }
 
   @Override
@@ -297,11 +292,6 @@ public enum NodeType implements Type {
    */
   public final boolean instance(final Type t) {
     return this == t || par != null && par.instance(t);
-  }
-
-  @Override
-  public final boolean node() {
-    return true;
   }
 
   /**

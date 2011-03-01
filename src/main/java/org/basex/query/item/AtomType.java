@@ -685,18 +685,8 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public byte[] nam() {
-    return nam;
-  }
-
-  @Override
   public boolean num() {
     return num;
-  }
-
-  @Override
-  public Type par() {
-    return par;
   }
 
   @Override

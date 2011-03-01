@@ -3,7 +3,7 @@ package org.basex.query.item;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
-
+import static org.basex.util.Token.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -49,11 +49,6 @@ public final class FunType implements Type {
   }
 
   @Override
-  public byte[] nam() {
-    return null;
-  }
-
-  @Override
   public boolean node() {
     return false;
   }
@@ -61,11 +56,6 @@ public final class FunType implements Type {
   @Override
   public boolean num() {
     return false;
-  }
-
-  @Override
-  public Type par() {
-    return AtomType.ITEM;
   }
 
   @Override
@@ -86,7 +76,7 @@ public final class FunType implements Type {
 
   @Override
   public byte[] uri() {
-    return null;
+    return EMPTY;
   }
 
   @Override

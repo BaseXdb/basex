@@ -55,12 +55,6 @@ public interface Type {
   boolean node();
 
   /**
-   * String representation.
-   * @return the type's name
-   */
-  byte[] nam();
-
-  /**
    * URI representation.
    * @return the type's URI
    */
@@ -71,12 +65,6 @@ public interface Type {
    * @return result of check
    */
   boolean num();
-
-  /**
-   * Parent type.
-   * @return this type's parent
-   */
-  Type par();
 
   /**
    * Checks if the type refers to an untyped value.
