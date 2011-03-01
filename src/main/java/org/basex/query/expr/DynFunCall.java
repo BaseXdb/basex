@@ -79,6 +79,24 @@ public final class DynFunCall extends Arr {
     return (FunItem) it;
   }
 
+  /**
+   * The function expression.
+   * @return function
+   */
+  public Expr fun() {
+    return expr[expr.length - 1];
+  }
+
+  /**
+   * Argument expressions.
+   * @return arguments
+   */
+  public Expr[] args() {
+    final Expr[] args = new Expr[expr.length - 1];
+    System.arraycopy(expr, 0, args, 0, args.length);
+    return args;
+  }
+
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);

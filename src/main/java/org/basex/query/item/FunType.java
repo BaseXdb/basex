@@ -120,7 +120,7 @@ public final class FunType implements Type {
    * @return function type
    */
   public static FunType get(final SeqType[] args, final SeqType ret) {
-    if(args == null && ret == null) return ANY;
+    if(args == null || ret == null) return ANY;
     return new FunType(args, ret);
   }
 

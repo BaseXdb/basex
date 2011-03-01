@@ -143,6 +143,6 @@ public class FunItem extends Item {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX || super.uses(u);
+    return super.uses(u);
   }
 }

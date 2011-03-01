@@ -236,4 +236,9 @@ final class FNFunc extends Fun {
   public boolean uses(final Use u) {
     return u == Use.X30 || super.uses(u);
   }
+
+  @Override
+  public Expr cmp(final QueryContext ctx) throws QueryException {
+    return super.cmp(ctx);
+  }
 }
