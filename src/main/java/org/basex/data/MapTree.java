@@ -265,50 +265,54 @@ public class MapTree {
     private void deletePreTree(final MapNode node) {
         MapNode suc = node;
 
-      if(node.preRight != null) {
-            suc = preMinimumNode(node.preRight);
-
-            // copy values from successor into a new node
-            MapNode newnode = new MapNode();
-            newnode.idmin   = suc.idmin;
-            newnode.idmax   = suc.idmax;
-            newnode.d   = suc.d;
-            newnode.s       = suc.s + node.s; // successor inherits addend
-
-            // replace node with newnode in preTree
-        replacePreNode(node, newnode);
-        newnode.preLeft  = node.preLeft;
-        newnode.preRight = node.preRight;
-        newnode.preColor = node.preColor;
-        if(node.preLeft != null)
-          node.preLeft.preParent = newnode;
         if(node.preRight != null) {
-          node.preRight.preParent = newnode;
-          // adjust the addend for subtree
-          node.preRight.s        -= newnode.s;
-        }
+          suc = preMinimumNode(node.preRight);
 
-        // replace suc with newnode in idTree
-        replaceNodeIdTree(suc, newnode);
-        newnode.idLeft  = suc.idLeft;
-        newnode.idRight = suc.idRight;
-        newnode.idColor = suc.idColor;
-        if(suc.idLeft != null)
-          suc.idLeft.idParent  = newnode;
-        if(suc.idRight != null)
-          suc.idRight.idParent = newnode;
+          // copy values from successor into a new node
+          MapNode newnode = new MapNode();
+          newnode.idmin   = suc.idmin;
+          newnode.idmax   = suc.idmax;
+          newnode.d   = suc.d;
+          newnode.s       = suc.s + node.s; // successor inherits addend
+
+          // replace node with newnode in preTree
+          replacePreNode(node, newnode);
+          newnode.preLeft  = node.preLeft;
+          newnode.preRight = node.preRight;
+          newnode.preColor = node.preColor;
+          if(node.preLeft != null)
+            node.preLeft.preParent = newnode;
+          if(node.preRight != null) {
+            node.preRight.preParent = newnode;
+            // adjust the addend for subtree
+            MapNode subnode = node.preRight;
+            while(subnode != null) {
+              node.preRight.s -= newnode.s;
+              subnode = subnode.preLeft;
+            }
+          }
+
+          // replace suc with newnode in idTree
+          replaceNodeIdTree(suc, newnode);
+          newnode.idLeft  = suc.idLeft;
+          newnode.idRight = suc.idRight;
+          newnode.idColor = suc.idColor;
+          if(suc.idLeft != null)
+            suc.idLeft.idParent  = newnode;
+          if(suc.idRight != null)
+            suc.idRight.idParent = newnode;
         }
 
         assert suc.preLeft == null || suc.preRight == null;
         MapNode child = (suc.preLeft == null) ? suc.preRight : suc.preLeft;
         if(nodePreColor(suc)) {
-            suc.preColor = nodePreColor(child);
-            preDeleteCase1(suc);
+          suc.preColor = nodePreColor(child);
+          preDeleteCase1(suc);
         }
         replacePreNode(suc, child);
 
         if(!nodePreColor(preRoot))
-            preRoot.preColor = true;
+          preRoot.preColor = true;
     }
 
     /**
