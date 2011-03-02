@@ -36,8 +36,22 @@ public final class DynFunCall extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
-    return this;
+    return super.comp(ctx);
+
+    // TODO inline variables?
+//    if(!(fun() instanceof FunItem)) return this;
+//    for(int i = 0; i < expr.length - 1; i++)
+//      if(!expr[i].value()) return this;
+//
+//    final FunItem f = (FunItem) fun();
+//    final Var[] vars = f.vars();
+//    for(int i = 0; i < vars.length; i++) {
+//      ctx.compInfo(OPTBIND, vars[i]);
+//      vars[i].bind(expr[i], ctx);
+//      ctx.vars.add(vars[i]);
+//    }
+//
+//    return f.body().comp(ctx);
   }
 
   @Override

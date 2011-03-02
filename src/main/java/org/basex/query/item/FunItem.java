@@ -75,6 +75,22 @@ public class FunItem extends Item {
   }
 
   /**
+   * Variables of this function item.
+   * @return the vars
+   */
+  public Var[] vars() {
+    return vars;
+  }
+
+  /**
+   * Function body of this function item.
+   * @return the function body
+   */
+  public Expr body() {
+    return expr;
+  }
+
+  /**
    * Invokes this function item with the given arguments.
    * @param ctx query context
    * @param ii input info
