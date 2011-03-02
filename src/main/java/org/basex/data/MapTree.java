@@ -287,8 +287,8 @@ public class MapTree {
             // adjust the addend for subtree
             MapNode subnode = node.preRight;
             while(subnode != null) {
-              node.preRight.s -= newnode.s;
-              subnode = subnode.preLeft;
+              subnode.s -= newnode.s;
+              subnode    = subnode.preLeft;
             }
           }
 
