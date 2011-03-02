@@ -241,21 +241,23 @@ public class QueryParser extends InputParser {
    */
   private void versionDecl() throws QueryException {
     final int p = qp;
-    if(!wsConsumeWs(XQUERY) || !wsConsumeWs(VERSION)) {
-      qp = p;
-      return;
+    if(!wsConsumeWs(XQUERY)) return;
+
+    final boolean version = wsConsumeWs(VERSION);
+    if(version) {
+      // parse xquery version
+      final String ver = string(stringLiteral());
+      if(ver.equals(XQ10)) ctx.xquery3 = false;
+      else if(ver.equals(XQ11) || ver.equals(XQ30)) ctx.xquery3 = true;
+      else error(XQUERYVER, ver);
     }
-
-    // parse xquery version
-    final String ver = string(stringLiteral());
-    if(ver.equals(XQ10)) ctx.xquery3 = false;
-    else if(ver.equals(XQ11) || ver.equals(XQ30)) ctx.xquery3 = true;
-    else error(XQUERYVER, ver);
-
     // parse xquery encoding (ignored, as input always comes in as string)
     if(wsConsumeWs(ENCODING)) {
       final String enc = string(stringLiteral());
       if(!supported(enc)) error(XQUERYENC2, enc);
+    } else if(!version) {
+      qp = p;
+      return;
     }
     wsCheck(";");
   }
