@@ -25,7 +25,7 @@ import org.basex.util.ft.Scoring;
  */
 public final class Let extends ForLet {
   /** Scoring flag. */
-  protected final boolean score;
+  final boolean score;
 
   /**
    * Constructor.

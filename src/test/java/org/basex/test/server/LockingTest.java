@@ -168,9 +168,6 @@ public final class LockingTest {
     }
   }
 
-  /** Number of done tests. */
-  static int tdone;
-
   /** Efficiency test.
    * @throws Exception exception
    */

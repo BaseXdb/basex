@@ -340,10 +340,12 @@ public class BaseXText extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
+    /* [LW] mutes control keys on Mac OSX
     final char c = e.getKeyChar();
     // ignore single modifier keys and printable characters
-    if(modifier(e) || !Character.isISOControl(c) && Character.isDefined(c))
-      return;
+    if(modifier(e) || !Character.isISOControl(c) && Character.isDefined(c) */
+
+    if(modifier(e)) return;
 
     // operations that change the focus are put first..
     if(PREVTAB.is(e)) {
@@ -463,7 +465,7 @@ public class BaseXText extends BaseXPanel {
           }
           text.endMark();
         }
-        if(undo != null) undo.cursor(text.cursor());
+        undo.cursor(text.cursor());
         text.delete();
       } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || DELPREV.is(e)) {
         if(nomark) {
@@ -478,7 +480,7 @@ public class BaseXText extends BaseXPanel {
           }
           text.endMark();
         }
-        if(undo != null) undo.cursor(text.cursor());
+        undo.cursor(text.cursor());
         text.delete();
         down = false;
       } else {

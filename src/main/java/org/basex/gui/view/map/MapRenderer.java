@@ -294,17 +294,12 @@ final class MapRenderer {
     final int ww = r.w;
     final int ys = r.y + 3;
     int yy = ys;
-
-    int wl = 0; // word length
-    int ll = 0; // line length
+    int wl = 0, ll = 0; // word and line length
 
     final Color textc = COLORS[r.level + 4];
     g.setColor(textc);
-    int lastl = 0;
-    int count = -1;
-    int ct = 0;
-    int pp = 0;
-    int sl = 0, pl = 0;
+    int lastl = 0, count = -1;
+    int ct = 0, pp = 0, sl = 0, pl = 0;
     int psl = 0, ppl = 0;
     double error = 0;
 

@@ -178,7 +178,6 @@ public abstract class IO {
    * @return contents
    */
   public boolean md() {
-    Util.notexpected();
     return false;
   }
 
@@ -252,11 +251,20 @@ public abstract class IO {
   }
 
   /**
-   * Chops the path and the XML suffix of the specified filename.
-   * @return chopped filename
+   * Deletes the IO reference.
+   * @return success flag
    */
   public boolean delete() {
-    Util.notexpected();
+    return false;
+  }
+
+  /**
+   * Renames the specified IO reference.
+   * @param trg target reference
+   * @return success flag
+   */
+  @SuppressWarnings("unused")
+  public boolean rename(final IO trg) {
     return false;
   }
 

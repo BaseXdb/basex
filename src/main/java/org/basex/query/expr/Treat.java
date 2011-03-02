@@ -44,7 +44,7 @@ public final class Treat extends Single {
     final Item it = iter.next();
     if(it == null) {
       if(!type.mayBeZero() || type.type == Type.EMP) return Empty.ITER;
-      XPEMPTY.thrw(input, desc());
+      throw XPEMPTY.thrw(input, desc());
     }
     if(type.zeroOrOne()) {
       if(iter.next() != null) NOTREATS.thrw(input, desc(), type);

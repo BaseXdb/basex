@@ -64,7 +64,7 @@ public final class Log {
     final TokenBuilder tb = new TokenBuilder(TIME.format(now));
     for(final Object s : str) {
       tb.add('\t');
-      tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), 128));
+      tb.add(chop(token(s.toString().replaceAll("[\\r\\n ]+", " ")), 1000));
     }
     tb.add(Prop.NL);
 

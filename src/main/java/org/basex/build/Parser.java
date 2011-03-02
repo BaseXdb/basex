@@ -53,7 +53,7 @@ public abstract class Parser extends Progress {
   }
 
   /**
-   * Returns an XML parser instance.
+   * Returns a file parser instance.
    * @param io input
    * @param prop database properties
    * @param target relative path reference
@@ -68,6 +68,19 @@ public abstract class Parser extends Progress {
     if(parser.equals(DataText.M_HTML)) return new HTMLParser(io, target, prop);
     if(parser.equals(DataText.M_TEXT)) return new TextParser(io, target, prop);
     if(parser.equals(DataText.M_CSV)) return new CSVParser(io, target, prop);
+    return xmlParser(io, prop, target);
+  }
+
+  /**
+   * Returns an XML parser instance.
+   * @param io input
+   * @param prop database properties
+   * @param target relative path reference
+   * @return xml parser
+   * @throws IOException I/O exception
+   */
+  public static FileParser xmlParser(final IO io, final Prop prop,
+      final String target) throws IOException {
 
     // XML: use internal parser
     if(prop.is(Prop.INTPARSE)) return new XMLParser(io, target, prop);

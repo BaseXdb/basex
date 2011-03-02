@@ -85,7 +85,7 @@ public final class BitArray {
   /**
    * Get the value of the i<sup>th</sup> bit.
    * @param i index of the bit
-   * @return <code>true</code> if the ith bit is
+   * @return <code>true</code> if the i<sup>th</sup> bit is set
    */
   public boolean get(final int i) {
     // calculate the index of the word in the array: i div 2^6 = i >> 6

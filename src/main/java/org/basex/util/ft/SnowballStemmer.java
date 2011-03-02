@@ -57,7 +57,7 @@ final class SnowballStemmer extends Stemmer {
 
   /** Empty constructor. */
   SnowballStemmer() {
-    super(null);
+    super();
   }
 
   /**

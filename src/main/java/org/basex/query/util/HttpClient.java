@@ -124,7 +124,7 @@ public final class HttpClient {
   private final TokenMap reqAttrs;
   /** Headers. */
   private final TokenMap headers;
-  /** Multipart. */
+  /** Multipart; currently not used. */
   @SuppressWarnings("unused")
   private ANode multipart;
   /** Body. */
@@ -184,12 +184,9 @@ public final class HttpClient {
 
     final AxisIter ai = request.children();
     ANode n = null;
-
     while((n = ai.next()) != null) {
-
       // Header children
       if(eq(n.nname(), HEADER)) {
-
         final AxisIter attrs = n.atts();
         ANode attr = null;
         byte[] name = null;
@@ -205,10 +202,15 @@ public final class HttpClient {
             break;
           }
         }
-      } else if(eq(n.nname(), MULTIPART)) multipart = n;
-      // Body child
-      else if(eq(n.nname(), BODY)) body = n;
-      else REQINV.thrw(ii);
+      } else if(eq(n.nname(), MULTIPART)) {
+        // [RS] not supported yet
+        multipart = n;
+      } else if(eq(n.nname(), BODY)) {
+        body = n;
+      } else {
+        // Body child
+        throw REQINV.thrw(ii);
+      }
     }
   }
 
@@ -234,13 +236,12 @@ public final class HttpClient {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      URLINV.thrw(info, adr);
+      throw URLINV.thrw(info, adr);
     } catch(final ProtocolException ex) {
-      PROTINV.thrw(info);
+      throw PROTINV.thrw(info);
     } catch(final IOException ex) {
-      HTTPERR.thrw(info, ex);
+      throw HTTPERR.thrw(info, ex);
     }
-    return null;
   }
 
   /**
@@ -435,8 +436,8 @@ public final class HttpClient {
       return processXML(conn, ctx);
     else if(eq(contentType, TXT_HTML)) {
       // Parse HTML
-      if(HTMLParser.available()) return processHTML(conn, ctx);
-      HTMLERR.thrw(info); return null;
+      if(!HTMLParser.available()) throw HTMLERR.thrw(info);
+      return processHTML(conn, ctx);
     } else if(startsWith(contentType, MIME_TEXT_PREFIX))
       // Process text content
       return Str.get(readHttpContent(conn));

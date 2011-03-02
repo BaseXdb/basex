@@ -86,7 +86,7 @@ public abstract class QueryTest {
         }
         if(!correct || !val.sameAs(cmp)) {
           sb.append("-- " + qu[0] + ": " + query);
-          sb.append("\n[E#" + cmp.size() + "] ");
+          sb.append("\n[E#" + (correct ? cmp.size() : "") + "] ");
           if(correct) {
             final String cp = cmp.toString();
             sb.append(cp.length() > 20 ? cp.substring(0, 20) + "..." : cp);

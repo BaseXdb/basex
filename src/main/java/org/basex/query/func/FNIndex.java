@@ -42,7 +42,7 @@ public final class FNIndex extends TokenSet {
     for(final FunDef def : FunDef.values()) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = add(fullName(def.uri, ln));
+      final int i = add(full(def.uri, ln));
       if(i < 0) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
@@ -60,7 +60,7 @@ public final class FNIndex extends TokenSet {
   public Fun get(final byte[] name, final byte[] uri, final Expr[] args,
       final QueryParser qp) throws QueryException {
 
-    final int id = id(fullName(uri, name));
+    final int id = id(full(uri, name));
     if(id == 0) return null;
 
     // create function
@@ -98,12 +98,13 @@ public final class FNIndex extends TokenSet {
   }
 
   /**
-   * Returns the full function name.
+   * Returns a unique name representation of the function,
+   * including the URI and function name.
    * @param uri namespace uri
    * @param ln local name
    * @return full name
    */
-  private byte[] fullName(final byte[] uri, final byte[] ln) {
+  private byte[] full(final byte[] uri, final byte[] ln) {
     return new TokenBuilder().add('{').add(uri).add('}').add(ln).finish();
   }
 

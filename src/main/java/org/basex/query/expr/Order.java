@@ -191,10 +191,8 @@ public final class Order extends ParseExpr {
       final OrderBy or = ob[k];
       final Item m = or.get(o[a]);
       final Item n = it[k];
-      final boolean x = m == null;
-      final boolean y = n == null;
-      final int c = x ? y ? 0 : or.lst ? -1 : 1 : y ? or.lst ? 1 : -1 :
-        m.diff(input, n);
+      final int c = m == null ? n == null ? 0 : or.lst ? -1 : 1 :
+        n == null ? or.lst ? 1 : -1 : m.diff(input, n);
       if(c != 0) return or.desc ? -c : c;
     }
     return 0;
@@ -212,10 +210,8 @@ public final class Order extends ParseExpr {
     for(final OrderBy l : ob) {
       final Item m = l.get(o[a]);
       final Item n = l.get(o[b]);
-      final boolean x = m == null;
-      final boolean y = n == null;
-      final int c = x ? y ? 0 : l.lst ? -1 : 1 : y ? l.lst ? 1 : -1 :
-        m.diff(input, n);
+      final int c = m == null ? n == null ? 0 : l.lst ? -1 : 1 :
+        n == null ? l.lst ? 1 : -1 : m.diff(input, n);
       if(c != 0) return l.desc ? -c : c;
     }
     return 0;

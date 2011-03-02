@@ -46,8 +46,7 @@ public final class RangeSeq extends Seq {
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    CONDTYPE.thrw(ii, this);
-    return null;
+    throw CONDTYPE.thrw(ii, this);
   }
 
   @Override
@@ -64,6 +63,11 @@ public final class RangeSeq extends Seq {
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(Type.SEQ.nam, MIN, Token.token(start),
         MAX, Token.token(start + size - 1));
+  }
+
+  @Override
+  public int hash() {
+    return (int) (start * size);
   }
 
   @Override

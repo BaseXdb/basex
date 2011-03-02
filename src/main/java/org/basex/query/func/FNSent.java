@@ -63,10 +63,10 @@ public final class FNSent extends Fun {
     SentList list = LISTS.get(uri);
     if(list == null) {
       try {
-        list = new SentList(uri, ctx.context.prop);
+        list = new SentList(uri);
         LISTS.put(uri, list);
       } catch(final Exception ex) {
-        DOCERR.thrw(input, uri);
+        throw DOCERR.thrw(input, uri);
       }
     }
 

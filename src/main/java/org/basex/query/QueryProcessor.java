@@ -128,8 +128,8 @@ public final class QueryProcessor extends Progress {
       final QNm type = new QNm(Token.token(t));
       if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
       final Type typ = Type.find(type, true);
-      if(typ == null) NOTYPE.thrw(null, type);
-      obj = typ.e(o, null);
+      if(typ != null) obj = typ.e(o, null);
+      else NOTYPE.thrw(null, type);
     }
     bind(n, obj);
   }

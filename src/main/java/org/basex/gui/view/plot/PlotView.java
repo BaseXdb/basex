@@ -341,15 +341,14 @@ public final class PlotView extends View {
      */
     int focused = gui.context.focused;
     if(focused != -1) {
-      final Data d = gui.context.data;
-      final int itmID = d.tags.id(plotData.item);
-      int k = d.kind(focused);
-      int name = d.name(focused);
+      final int itmID = data.tags.id(plotData.item);
+      int k = data.kind(focused);
+      int name = data.name(focused);
       while(focused > 0 && itmID != name) {
-        focused = d.parent(focused, k);
+        focused = data.parent(focused, k);
         if(focused > -1) {
-          k = d.kind(focused);
-          name = d.name(focused);
+          k = data.kind(focused);
+          name = data.name(focused);
         }
       }
     }
@@ -861,22 +860,20 @@ public final class PlotView extends View {
     plotData = null;
 
     final Data data = gui.context.data;
-    if(data != null) {
-      if(!visible()) return;
+    if(data == null || !visible()) return;
 
-      plotData = new PlotData(gui.context);
+    plotData = new PlotData(gui.context);
 
-      final String[] items = plotData.getItems().toStringArray();
-      itemCombo.setModel(new DefaultComboBoxModel(items));
+    final String[] items = plotData.getItems().toStringArray();
+    itemCombo.setModel(new DefaultComboBoxModel(items));
 
-      // set first item and trigger assignment of axis assignments
-      if(items.length > 0) itemCombo.setSelectedIndex(0);
+    // set first item and trigger assignment of axis assignments
+    if(items.length > 0) itemCombo.setSelectedIndex(0);
 
-      drawSubNodes = true;
-      markingChanged = true;
-      plotChanged = true;
-      repaint();
-    }
+    drawSubNodes = true;
+    markingChanged = true;
+    plotChanged = true;
+    repaint();
   }
 
   @Override

@@ -228,9 +228,9 @@ public class QueryParser extends InputParser {
     ctx.funcs.check();
     ctx.vars.check();
     ctx.ns.finish(ctx.nsElem);
-    final QNm empty = new QNm(EMPTY);
+    final byte[] empty = new QNm(EMPTY).full();
     if(ctx.decFormats.get(empty) == null) {
-      ctx.decFormats.put(empty, new DecimalFormat());
+      ctx.decFormats.add(empty, new DecimalFormat());
     }
     return expr;
   }
@@ -520,7 +520,7 @@ public class QueryParser extends InputParser {
     if(def && !wsConsumeWs(DECFORMAT)) return false;
 
     // use empty name for default declaration
-    final QNm name = new QNm(def ? EMPTY : qName(QNAMEINV));
+    final byte[] name = new QNm(def ? EMPTY : qName(QNAMEINV)).full();
     if(ctx.decFormats.get(name) != null) error(DECDUPL);
 
     // create new format
@@ -543,7 +543,7 @@ public class QueryParser extends InputParser {
     } while(n != sl.size());
 
     // completes the format declaration
-    ctx.decFormats.put(name, new DecimalFormat(input(), sl));
+    ctx.decFormats.add(name, new DecimalFormat(input(), sl));
     return true;
   }
 
@@ -1650,7 +1650,6 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "NumericLiteral" rule.
-   * Parses the "IntegerLiteral" rule.
    * @return query expression
    * @throws QueryException query exception
    */
@@ -2343,7 +2342,7 @@ public class QueryParser extends InputParser {
       } else if(wsConsumeWs(WINDOW)) {
         expr = new FTWindow(input(), expr, additive(), ftUnit());
       } else if(wsConsumeWs(DISTANCE)) {
-        final Expr[] rng = ftRange();
+        final Expr[] rng = ftRange(false);
         if(rng == null) error(FTRANGE);
         expr = new FTDistance(input(), expr, rng, ftUnit());
       } else if(wsConsumeWs(AT)) {
@@ -2496,7 +2495,7 @@ public class QueryParser extends InputParser {
     // FTTimes
     Expr[] occ = null;
     if(wsConsumeWs(OCCURS)) {
-      occ = ftRange();
+      occ = ftRange(false);
       if(occ == null) error(FTRANGE);
       wsCheck(TIMES);
     }
@@ -2505,30 +2504,46 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FTRange" rule.
+   * @param i accept only integers ("FTLiteralRange")
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr[] ftRange() throws QueryException {
+  private Expr[] ftRange(final boolean i) throws QueryException {
     final Expr[] occ = { Itr.get(1), Itr.get(Long.MAX_VALUE) };
     if(wsConsumeWs(EXACTLY)) {
-      occ[0] = additive();
+      occ[0] = ftAdditive(i);
       occ[1] = occ[0];
     } else if(wsConsumeWs(AT)) {
       if(wsConsumeWs(LEAST)) {
-        occ[0] = additive();
+        occ[0] = ftAdditive(i);
       } else {
         wsCheck(MOST);
         occ[0] = Itr.get(0);
-        occ[1] = additive();
+        occ[1] = ftAdditive(i);
       }
     } else if(wsConsumeWs(FROM)) {
-      occ[0] = additive();
+      occ[0] = ftAdditive(i);
       wsCheck(TO);
-      occ[1] = additive();
+      occ[1] = ftAdditive(i);
     } else {
       return null;
     }
     return occ;
+  }
+
+  /**
+   * Returns an argument of the "FTRange" rule.
+   * @param i accept only integers
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr ftAdditive(final boolean i) throws QueryException {
+    if(!i) return additive();
+    skipWS();
+    tok.reset();
+    while(digit(curr())) tok.add(consume());
+    if(tok.size() == 0) error(INTEXP);
+    return Itr.get(toLong(tok.finish()));
   }
 
   /**
@@ -2655,17 +2670,14 @@ public class QueryParser extends InputParser {
 
     if(!fl.exists() && file != null) fl = file.merge(file.path());
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
-    final Expr[] range = ftRange();
+    final Expr[] range = ftRange(true);
     long min = 0;
     long max = Long.MAX_VALUE;
     if(range != null) {
       wsCheck(LEVELS);
-      if(range[0] instanceof Itr && range[1] instanceof Itr) {
-        min = ((Itr) range[0]).itr(input());
-        max = ((Itr) range[1]).itr(input());
-      } else {
-        error(THESRNG);
-      }
+      // values will always be integer instances
+      min = ((Itr) range[0]).itr(input());
+      max = ((Itr) range[1]).itr(input());
     }
     thes.add(new Thesaurus(fl, rel, min, max, ctx.context));
   }
@@ -3083,8 +3095,7 @@ public class QueryParser extends InputParser {
    * @param arg error arguments
    * @throws QueryException query exception
    */
-  public void error(final Err err, final Object... arg)
-      throws QueryException {
+  public void error(final Err err, final Object... arg) throws QueryException {
     err.thrw(input(), arg);
   }
 }
