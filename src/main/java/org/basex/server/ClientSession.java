@@ -46,8 +46,7 @@ public final class ClientSession extends Session {
   /** Server input. */
   final InputStream sin;
   /** Trigger notifications. */
-  Map<String, TriggerNotification> tn =
-    new HashMap<String, TriggerNotification>();
+  Map<String, TriggerNotification> tn;
   /** Socket trigger reference. */
   Socket trigger;
   /** Socket host name. */
@@ -116,6 +115,8 @@ public final class ClientSession extends Session {
 
     super(output);
     this.shost = host;
+    // initialize trigger notifications
+    this.tn = new HashMap<String, TriggerNotification>();
     // 5 seconds timeout
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
@@ -180,6 +181,7 @@ public final class ClientSession extends Session {
         sout2.print(id);
         sout2.write(0);
         sout2.flush();
+        startListener(trigger.getInputStream());
       }
       info = bi.readString();
       if(!ok(bi)) throw new IOException(info);
@@ -187,6 +189,26 @@ public final class ClientSession extends Session {
     } catch(IOException e) {
       throw new BaseXException(e);
     }
+  }
+
+  /**
+   * Starts the listener thread.
+   * @param in input stream
+   */
+  private void startListener(final InputStream in) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          while(true) {
+            BufferInput bi = new BufferInput(in);
+            String name = bi.readString().trim();
+            String val = bi.readString();
+            tn.get(name).update(val);
+          }
+        }catch(IOException e) { }
+       }
+    }.start();
   }
 
   /**

@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -116,17 +115,16 @@ public final class TriggerPool {
    * @param name name
    * @param i item
    */
-  public void notify(final ServerProcess sp, final byte[] name,
+  public void notify(final ServerProcess sp, final String name,
       final byte[] i) {
-    Sessions sessions = triggers.get(Token.string(name));
+    Sessions sessions = triggers.get(name);
     if (sessions == null) return;
 
     for (ServerProcess srv : sessions) {
       if(!srv.equals(sp)) {
         try {
           srv.tout.write(1);
-          srv.tout.write(name);
-          srv.tout.write(0);
+          srv.tout.writeString(name);
           srv.tout.write(i);
           srv.tout.write(0);
           srv.tout.flush();
