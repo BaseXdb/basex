@@ -156,27 +156,13 @@ public enum NodeType implements Type {
     return false;
   }
 
-  /**
-   * Constructs a new item from the specified item.
-   * @param it item to be converted
-   * @param ctx query context
-   * @param ii input info
-   * @return new item
-   * @throws QueryException query exception
-   */
+  @Override
   public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return it.type != this ? error(it, ii) : it;
   }
 
-  /**
-   * Constructs a new item from the specified Java object.
-   * The Java object is supposed to have a correct mapping type.
-   * @param o Java object
-   * @param ii input info
-   * @return new item
-   * @throws QueryException query exception
-   */
+  @Override
   public Item e(final Object o, final InputInfo ii) throws QueryException {
     Util.notexpected(o);
     return null;
@@ -192,10 +178,7 @@ public enum NodeType implements Type {
     par = pr;
   }
 
-  /**
-   * Returns the sequence type of this type.
-   * @return sequence type
-   */
+  @Override
   public SeqType seq() {
     // cannot be statically instantiated due to circular dependency
     if(seq == null) seq = new SeqType(this);
@@ -285,11 +268,7 @@ public enum NodeType implements Type {
 
   // PUBLIC AND STATIC METHODS ================================================
 
-  /**
-   * Checks if the specified type is an instance of the current type.
-   * @param t type to be checked
-   * @return result of check
-   */
+  @Override
   public final boolean instance(final Type t) {
     return this == t || par != null && par.instance(t);
   }
