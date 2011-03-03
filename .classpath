@@ -7,10 +7,19 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/basex"/>
-	<classpathentry kind="lib" path="/home/hermione/workspace/basex-api/lib/jax-rx-1.2.9.jar"/>
-	<classpathentry kind="lib" path="/home/hermione/workspace/basex-api/lib/jsr311-api-1.0.jar"/>
-	<classpathentry kind="lib" path="/home/hermione/workspace/basex-api/lib/xmldb-api-1.0.jar"/>
-	<classpathentry kind="lib" path="/home/hermione/workspace/basex-api/lib/xqj-api-1.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jax-rx-1.2.9.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-server-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-6.1.25.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-util-6.1.25.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-analyzers-3.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/resolver.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api-2.5-20081211.jar"/>
+	<classpathentry kind="lib" path="lib/snowball.jar"/>
+	<classpathentry kind="lib" path="lib/tagsoup-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/xmldb-api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/xqj-api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jersey-core-1.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

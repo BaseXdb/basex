@@ -12,7 +12,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FElem;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Type;
-import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.Token;
 import org.junit.AfterClass;
@@ -133,7 +132,7 @@ public final class HttpClientTest {
         "href='http://localhost:8984/basex/jax-rx/books'/>)");
     get1.execute(context);
     checkResponse(get1, HttpURLConnection.HTTP_OK, 2);
-    assertTrue(((AxisIter) get1.result()).get(1).type == Type.DOC);
+    assertTrue(((NodeIter) get1.result()).get(1).type == Type.DOC);
 
     // GET2 - with override-media-type='text/plain'
     final Command get2 = new XQuery("http:send-request(" +
@@ -141,7 +140,7 @@ public final class HttpClientTest {
         "'http://localhost:8984/basex/jax-rx/books')");
     get2.execute(context);
     checkResponse(get2, HttpURLConnection.HTTP_OK, 2);
-    assertTrue(((AxisIter) get2.result()).get(1).type == Type.STR);
+    assertTrue(((NodeIter) get2.result()).get(1).type == Type.STR);
 
     // Get3 - with status-only='true'
     final Command get3 = new XQuery("http:send-request(" +
@@ -189,8 +188,8 @@ public final class HttpClientTest {
    */
   private void checkResponse(final Command c, final int expStatus,
       final int itemsCount) throws QueryException {
-    assertTrue(c.result() instanceof AxisIter);
-    final AxisIter res = (AxisIter) c.result();
+    assertTrue(c.result() instanceof NodeIter);
+    final NodeIter res = (NodeIter) c.result();
     assertEquals(itemsCount, res.size());
     assertTrue(res.get(0) instanceof FElem);
     final FElem response = (FElem) res.get(0);
