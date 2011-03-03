@@ -30,7 +30,7 @@ interface BXQText {
   /** Error message. */
   String ATOM = "Atomic value expected.";
   /** Error message. */
-  String CONV = "No mapping known for '%'.";
+  String CONV = "No mapping available for '%'.";
   /** Error message. */
   String SQL = "SQL sources not supported.";
   /** Error message. */
