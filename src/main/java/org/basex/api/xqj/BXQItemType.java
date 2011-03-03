@@ -19,7 +19,7 @@ final class BXQItemType implements XQItemType {
   /** Existing base types. */
   private static final Type[] BASE = {
       null    , null    , null    , null    , Type.AAT, Type.ATM, Type.DTD, //0
-      Type.YMD, Type.URI, Type.B6B, Type.BLN, Type.DAT, Type.INT, Type.ITR, //7
+      Type.YMD, Type.URI, Type.B64, Type.BLN, Type.DAT, Type.INT, Type.ITR, //7
       Type.SHR, Type.LNG, Type.DTM, Type.DEC, Type.DBL, Type.DUR, Type.FLT, //14
       Type.DAY, Type.MON, Type.MDA, Type.YEA, Type.YMO, Type.HEX, Type.NOT, //21
       Type.QNM, Type.STR, Type.TIM, Type.BYT, Type.NPI, Type.NNI, Type.NIN, //28

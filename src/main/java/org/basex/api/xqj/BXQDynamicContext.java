@@ -35,7 +35,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Var;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -223,10 +223,10 @@ abstract class BXQDynamicContext extends BXQAbstract
       }
     }
 
-    if(var == XQConstants.CONTEXT_ITEM) {
-      qp.ctx.value = vl;
-    } else {
-      try {
+    try {
+      if(var == XQConstants.CONTEXT_ITEM) {
+        qp.context(vl);
+      } else {
         if(this instanceof BXQPreparedExpression) {
           Var vr = new Var(new QNm(Token.token(var.getLocalPart())));
           vr = qp.ctx.vars.get(vr);
@@ -235,9 +235,9 @@ abstract class BXQDynamicContext extends BXQAbstract
         } else {
           qp.bind(var.getLocalPart(), vl);
         }
-      } catch(final QueryException ex) {
-        throw new BXQException(ex);
       }
+    } catch(final QueryException ex) {
+      throw new BXQException(ex);
     }
   }
 
@@ -256,7 +256,7 @@ abstract class BXQDynamicContext extends BXQAbstract
         new Thread() {
           @Override
           public void run() {
-            Performance.sleep(sc.timeout * 1000);
+            Performance.sleep(sc.timeout * 1000l);
             qctx.stop();
           }
         }.start();
@@ -264,7 +264,7 @@ abstract class BXQDynamicContext extends BXQAbstract
       qp.parse();
       qctx.compile();
       Iter iter = qctx.iter();
-      if(sc.scrollable) iter = ItemIter.get(iter);
+      if(sc.scrollable) iter = ItemCache.get(iter);
       return new BXQSequence(iter, this, (BXQConnection) par);
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage(), new QName(ex.code()),

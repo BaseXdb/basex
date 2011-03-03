@@ -119,8 +119,8 @@ abstract class BXCode {
       ser += "," + SerializerProp.S_WRAP_PREFIX[0] + "=" + JAXRX +
              "," + SerializerProp.S_WRAP_URI[0] + "=" + URL;
     } else if(!wrap.equals(DataText.NO)) {
-      throw new JaxRxException(400, SerializerProp.error(
-          QueryParameter.WRAP.toString(), wrap, DataText.YES, DataText.NO));
+      throw new JaxRxException(400, SerializerProp.error(QueryParameter.WRAP,
+          wrap, DataText.YES, DataText.NO).getMessage());
     }
     return ser.replaceAll("^,", "");
   }

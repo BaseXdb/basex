@@ -133,7 +133,7 @@ public final class HttpClientTest {
         "href='http://localhost:8984/basex/jax-rx/books'/>)");
     get1.execute(context);
     checkResponse(get1, HttpURLConnection.HTTP_OK, 2);
-    assertTrue(((ItemIter) get1.result()).item[1].type == Type.DOC);
+    assertTrue(((AxisIter) get1.result()).get(1).type == Type.DOC);
 
     // GET2 - with override-media-type='text/plain'
     final Command get2 = new XQuery("http:send-request(" +
@@ -141,7 +141,7 @@ public final class HttpClientTest {
         "'http://localhost:8984/basex/jax-rx/books')");
     get2.execute(context);
     checkResponse(get2, HttpURLConnection.HTTP_OK, 2);
-    assertTrue(((ItemIter) get2.result()).item[1].type == Type.STR);
+    assertTrue(((AxisIter) get2.result()).get(1).type == Type.STR);
 
     // Get3 - with status-only='true'
     final Command get3 = new XQuery("http:send-request(" +
@@ -189,14 +189,14 @@ public final class HttpClientTest {
    */
   private void checkResponse(final Command c, final int expStatus,
       final int itemsCount) throws QueryException {
-    assertTrue(c.result() instanceof ItemIter);
-    final ItemIter res = (ItemIter) c.result();
+    assertTrue(c.result() instanceof AxisIter);
+    final AxisIter res = (AxisIter) c.result();
     assertEquals(itemsCount, res.size());
-    assertTrue(res.item[0] instanceof FElem);
-    final FElem response = (FElem) res.item[0];
-    assertNotNull(response.attr());
-    final NodeIter resAttr = response.attr();
-    Nod attr = null;
+    assertTrue(res.get(0) instanceof FElem);
+    final FElem response = (FElem) res.get(0);
+    assertNotNull(response.atts());
+    final NodeIter resAttr = response.atts();
+    ANode attr = null;
     while((attr = resAttr.next()) != null) {
       if(Token.eq(attr.nname(), STATUS)) assertTrue(eq(attr.atom(),
           token(expStatus)));

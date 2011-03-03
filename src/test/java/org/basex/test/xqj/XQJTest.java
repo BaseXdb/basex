@@ -42,7 +42,7 @@ import org.xml.sax.InputSource;
  */
 public final class XQJTest extends TestCase {
   /** Driver reference. */
-  protected String drv;
+  private String drv;
 
   @Before
   @Override
@@ -382,8 +382,8 @@ public final class XQJTest extends TestCase {
     final Object[] objects = {
         Boolean.valueOf(true),
         Byte.valueOf((byte) 2),
-        new Float(3f),
-        new Double(4),
+        Float.valueOf(3f),
+        Double.valueOf(4),
         Integer.valueOf(5),
         Long.valueOf(6),
         Short.valueOf((short) 7), "8",

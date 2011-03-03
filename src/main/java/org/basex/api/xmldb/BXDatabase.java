@@ -23,7 +23,8 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
   @Override
   public boolean acceptsURI(final String uri) throws XMLDBException {
-    return getCollectionName(uri) != null;
+    getCollectionName(uri);
+    return true;
   }
 
   @Override
