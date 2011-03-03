@@ -7,12 +7,12 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 
 /**
- * This example demonstrates how items can be bound to variables with
+ * This example demonstrates how items can be bound as context item of
  * the XQuery processor.
  *
  * @author BaseX Team 2005-11, BSD License
  */
-public final class BindVariables {
+public final class BindContext {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -29,10 +29,7 @@ public final class BindVariables {
 
     // ------------------------------------------------------------------------
     // Specify query to be executed
-    String query =
-      "declare variable $var1 as xs:string external; " +
-      "declare variable $var2 external; " +
-      "($var1, $var2)";
+    String query = "declare context item external; .";
 
     // ------------------------------------------------------------------------
     // Create a query processor
@@ -40,13 +37,11 @@ public final class BindVariables {
 
     // ------------------------------------------------------------------------
     // Define the items to be bound
-    String string = "Hello World!\n";
-    String number = "123";
+    String item = "Hello World!\n";
 
     // ------------------------------------------------------------------------
     // Bind the variables
-    proc.bind("var1", string);
-    proc.bind("var2", number, "xs:integer");
+    proc.context(item);
 
     // ------------------------------------------------------------------------
     // Execute the query
