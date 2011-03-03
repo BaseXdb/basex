@@ -82,7 +82,8 @@ public final class QuerySuggest extends QueryParser {
     if(attr) tb.add('@');
     if(test != null) tb.add(test.toString().replaceAll("\\*:", ""));
     tag = tb.finish();
-    checkTest(false);
+    //checkTest(false);
+    checkTest(qp < ql);
   }
 
   /**

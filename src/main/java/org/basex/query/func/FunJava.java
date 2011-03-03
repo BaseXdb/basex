@@ -214,7 +214,7 @@ public final class FunJava extends Arr {
       if(type == GMONTH) return AtomType.MON;
       if(type == GDAY) return AtomType.DAY;
     }
-    return null;
+    return AtomType.JAVA;
   }
 
   /**

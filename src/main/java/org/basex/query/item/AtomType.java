@@ -653,7 +653,16 @@ public enum AtomType implements Type {
   SEQ("sequence", null, EMPTY, false, false, false, false, false),
 
   /** Java type. */
-  JAVA("java", null, EMPTY, true, true, true, false, false);
+  JAVA("java", null, EMPTY, true, true, true, false, false) {
+    @Override
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii) {
+      return new Jav(it);
+    }
+    @Override
+    public Item e(final Object o, final InputInfo ii) {
+      return new Jav(o);
+    }
+  };
 
   /** String representation. */
   public final byte[] nam;

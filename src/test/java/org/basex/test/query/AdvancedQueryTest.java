@@ -96,7 +96,7 @@ public abstract class AdvancedQueryTest {
     final String desc = def.toString();
     final String name = pref + ":" + desc.replaceAll("\\(.*", "");
     final int max = desc.contains("()") ? 0 : desc.split(",").length;
-    final int min = max + 1 - desc.split("\\?").length;
+    final int min = max + 1 - desc.split("\\]").length;
     if(max != args.length) Util.notexpected("Check #arguments: " + def);
 
     // test too few, too many, and wrong argument types
