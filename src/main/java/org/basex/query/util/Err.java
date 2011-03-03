@@ -374,7 +374,7 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   EXPREMPTY(XPST, 3, "Unknown function or expression."),
   /** XPST0003: Parsing exception. */
-  NOTYPE(XPST, 3, "Unknown type %."),
+  NOTYPE(XPST, 3, "Unknown type \"%\"."),
   /** XPST0003: Parsing exception. */
   PIXML(XPST, 3, "Illegal PI name: %."),
   /** XPST0003: Parsing exception. */
@@ -563,6 +563,10 @@ public enum Err {
   INVDECFORM(XQST, 97, "Invalid decimal-format property: %=\"%\"."),
   /** XPST0098: Parsing exception. */
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format \"%\"."),
+  /** XQST0099: Parsing exception. */
+  DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
+  /** XQST0107: Parsing exception. */
+  CTXINIT(XQST, 107, "Context item depends on itself."),
   /** XQST0108: Parsing exception. */
   MODOUT(XQST, 108, "No output declarations allowed in modules."),
   /** XPST0109: Parsing exception. */
@@ -571,6 +575,8 @@ public enum Err {
   OUTDUPL(XQST, 110, "Duplicate declaration of \"output:%\"."),
   /** XPST0111: Parsing exception. */
   DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
+  /** XQST0113: Parsing exception. */
+  DECITEM(XQST, 113, "Context item cannot be specified in module."),
   /** XPST0111: Parsing exception. */
   DECDUPLPROP(XQST, 114, "Duplicate decimal-format property \"%\"."),
 

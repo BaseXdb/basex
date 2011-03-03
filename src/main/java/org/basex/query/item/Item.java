@@ -20,13 +20,6 @@ import org.basex.util.Token;
 public abstract class Item extends Value {
   /** Undefined item. */
   public static final int UNDEF = Integer.MIN_VALUE;
-  /** Dummy item. */
-  public static final Item DUMMY = new Item(Type.ITEM) {
-    @Override public byte[] atom() { return Token.EMPTY; }
-    @Override public boolean eq(final InputInfo ii, final Item it) {
-      return false;
-    }
-  };
   /** Score value. Will be {@code null} if not assigned. */
   protected Double score;
 

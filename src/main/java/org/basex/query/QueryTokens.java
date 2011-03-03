@@ -55,6 +55,8 @@ public interface QueryTokens {
   /** Parser token. */
   String CONTENT = "content";
   /** Parser token. */
+  String CONTEXT = "context";
+  /** Parser token. */
   String COPY = "copy";
   /** Parser token. */
   String COPYNS = "copy-namespaces";
@@ -138,6 +140,8 @@ public interface QueryTokens {
   String INTERSECT = "intersect";
   /** Parser token. */
   String INTO = "into";
+  /** Parser token. */
+  String ITEMM = "item";
   /** Parser token. */
   String LANGUAGE = "language";
   /** Parser token. */

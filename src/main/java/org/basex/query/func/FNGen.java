@@ -189,8 +189,9 @@ final class FNGen extends Fun {
     try {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
-      // catch FODC0002 and FODC0004
-      if(ex.type() == Err.ErrType.FODC) return Bln.FALSE;
+      final Err err = ex.err();
+      if(err != null && err.type == Err.ErrType.FODC &&
+          (err.num == 2 || err.num == 4)) return Bln.FALSE;
       throw ex;
     }
   }
