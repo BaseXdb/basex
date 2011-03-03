@@ -1841,8 +1841,12 @@ public class QueryParser extends InputParser {
     if(!wsConsume(PAR1)) return null;
     Expr[] args = {};
     if(!wsConsume(PAR2)) {
-      do { args = Array.add(args, wsConsume(PLHOLDER) ? null : single()); }
-      while(wsConsume(COMMA));
+      do {
+        Expr arg = null;
+        if(!wsConsume(PLHOLDER) && (arg = single()) == null)
+          error(FUNCMISS, name);
+        args = Array.add(args, arg);
+      } while(wsConsume(COMMA));
       if(!wsConsume(PAR2)) error(FUNCMISS, name);
     }
     return args;

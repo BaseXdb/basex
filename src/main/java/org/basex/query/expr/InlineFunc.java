@@ -11,6 +11,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Inline function.
@@ -31,6 +32,22 @@ public class InlineFunc extends Func {
       final Expr body) {
     super(ii, new Var(ii, null, ret), argv, true);
     expr = body;
+  }
+
+  @Override
+  public FunItem item(final QueryContext ctx, final InputInfo ii) {
+
+    final SeqType[] at = new SeqType[args.length];
+    for(int i = 0; i < at.length; i++)
+      at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
+
+    return new FunItem(args, expr, FunType.get(at, var.type()),
+        ctx.vars.local());
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) {
+    return item(ctx, input).iter();
   }
 
   @Override
@@ -56,18 +73,32 @@ public class InlineFunc extends Func {
   }
 
   @Override
-  public FunItem item(final QueryContext ctx, final InputInfo ii) {
+  public boolean uses(final Use u) {
+    return u == Use.X30 || super.uses(u);
+  }
 
-    final SeqType[] at = new SeqType[args.length];
-    for(int i = 0; i < at.length; i++)
-      at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
-
-    return new FunItem(args, expr, FunType.get(at, var.type()),
-        ctx.vars.local());
+  /**
+   * Checks if the given variable is shadowed by an argument.
+   * @param v variable
+   * @return result of check
+   */
+  private boolean shadowed(final Var v) {
+    for(final Var a : args) if(a.eq(v)) return true;
+    return false;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
-    return item(ctx, input).iter();
+  public int count(final Var v) {
+    return shadowed(v) ? 0 : expr.count(v);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    return false;
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    throw Util.notexpected(v);
   }
 }

@@ -85,10 +85,11 @@ public class GFLWOR extends ParseExpr {
     final int vs = ctx.vars.size();
 
     for(int f = 0; f < fl.length; ++f) {
-      fl[f].comp(ctx);
+      final ForLet flt = fl[f];
+      flt.comp(ctx);
       // pre-evaluate and bind variable if it is used exactly once,
       // or if it contains a value
-      if(count(fl[f].var, f) == 1 || fl[f].expr.value()) fl[f].bind(ctx);
+      if(count(flt.var, f) == 1 || flt.expr.value()) flt.bind(ctx);
     }
 
     // optimize where clause

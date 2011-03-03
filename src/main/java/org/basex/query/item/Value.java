@@ -120,7 +120,7 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public final int count(final Var v) {
+  public int count(final Var v) {
     return 0;
   }
 

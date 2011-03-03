@@ -23,6 +23,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
@@ -31,10 +32,13 @@ import org.basex.query.iter.ItemCache;
 import org.basex.query.up.Updates;
 import org.basex.query.util.Functions;
 import org.basex.query.util.Namespaces;
+import org.basex.query.util.Var;
 import org.basex.query.util.Variables;
 import org.basex.query.util.format.DecimalFormat;
+import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
@@ -149,6 +153,9 @@ public final class QueryContext extends Progress {
   SerializerProp serProp;
   /** Initial context set (default: null). */
   Nodes nodes;
+
+  /** Counter for unique variable names. */
+  private Integer uniqueVars = 0;
 
   /**
    * Constructor.
@@ -278,6 +285,17 @@ public final class QueryContext extends Progress {
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw XPSTACK.thrw(null);
+    }
+  }
+
+  /**
+   * Creates a variable with a unique name.
+   * @param ii input info
+   * @return unique variable
+   */
+  public Var unique(final InputInfo ii) {
+    synchronized(uniqueVars) {
+      return new Var(ii, new QNm(Token.token(uniqueVars++)));
     }
   }
 

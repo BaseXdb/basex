@@ -55,7 +55,11 @@ public class FunItem extends Item {
       final VarList cl) {
     this(null, arg, body, t);
     if(cl != null)
-      for(int i = 0; i < cl.size; i++) closure.set(cl.vars[i].copy());
+      for(int i = 0; i < cl.size; i++) {
+        // check for shadowing
+        for(final Var v : vars) if(cl.vars[i].eq(v)) continue;
+        closure.set(cl.vars[i].copy());
+      }
   }
 
   /**
@@ -104,10 +108,10 @@ public class FunItem extends Item {
 
     // move variables to stack
     final int s = ctx.vars.size();
-    for(int a = vars.length; a-- > 0;)
-      ctx.vars.add(vars[a].bind(args[a], ctx).copy());
     for(int i = closure.size; i-- > 0;)
       ctx.vars.add(closure.vars[i].copy());
+    for(int a = vars.length; a-- > 0;)
+      ctx.vars.add(vars[a].bind(args[a], ctx).copy());
 
     // evaluate function and reset variable scope
     final ItemCache ir = ItemCache.get(ctx.iter(expr));
@@ -160,5 +164,11 @@ public class FunItem extends Item {
   @Override
   public boolean uses(final Use u) {
     return super.uses(u);
+  }
+
+  @Override
+  public int count(final Var v) {
+    for(final Var v2 : vars) if(v.eq(v2)) return 0;
+    return expr.count(v);
   }
 }
