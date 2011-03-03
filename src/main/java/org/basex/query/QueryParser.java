@@ -450,7 +450,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void optionDecl() throws QueryException {
-    // ignore option declarations
     skipWS();
     final QNm name = new QNm(qName(QNAMEINV), ctx, input());
     final byte[] val = stringLiteral();
@@ -1045,7 +1044,7 @@ public class QueryParser extends InputParser {
       if(!cs) wsCheck(DEFAULT);
       skipWS();
       QNm name = null;
-      if(curr() == '$') {
+      if(curr('$')) {
         name = varName();
         if(cs) wsCheck(AS);
       }
@@ -1553,7 +1552,7 @@ public class QueryParser extends InputParser {
         if(type != null) {
           tok.reset();
           while(!consume(PAR2)) {
-            if(curr() == 0) error(TESTINCOMPLETE);
+            if(curr(0)) error(TESTINCOMPLETE);
             tok.add(consume());
           }
           skipWS();
@@ -1612,16 +1611,14 @@ public class QueryParser extends InputParser {
    * Parses the "PrimaryExpr" rule.
    * Parses the "VarRef" rule.
    * Parses the "ContextItem" rule.
+   * Parses the "Literal" rule.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr primary() throws QueryException {
     skipWS();
-    // literals
-    Expr e = literal();
-    if(e != null) return e;
-    // variables
     final char c = curr();
+    // variables
     if(c == '$') {
       final Var v = new Var(input(), varName());
       final Var var = ctx.vars.get(v);
@@ -1633,8 +1630,8 @@ public class QueryParser extends InputParser {
     // direct constructor
     if(c == '<') return constructor();
     // function calls and computed constructors
-    if(letter(c)) {
-      e = functionCall();
+    if(XMLToken.isNCStartChar(c)) {
+      Expr e = functionCall();
       if(e != null) return e;
       e = compConstructor();
       if(e != null) return e;
@@ -1643,25 +1640,14 @@ public class QueryParser extends InputParser {
          wdConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
         return enclosed(NOENCLEXPR);
     }
-    return null;
-  }
-
-  /**
-   * Parses the "Literal" rule.
-   * @return query expression
-   * @throws QueryException query exception
-   */
-  private Expr literal() throws QueryException {
-    final char c = curr();
-    if(digit(c)) return numericLiteral();
-    // decimal/double values or context item
-    if(c == '.' && next() != '.') {
+    // context item
+    if(c == '.' && !digit(next())) {
+      if(next() == '.') return null;
       consume('.');
-      if(!digit(curr())) return new Context(input());
-      tok.reset();
-      tok.add('.');
-      return decimalLiteral();
+      return new Context(input());
     }
+    // literals
+    if(digit(c) || c == '.') return numericLiteral();
     // strings
     return quote(c) ? Str.get(stringLiteral()) : null;
   }
@@ -1674,14 +1660,62 @@ public class QueryParser extends InputParser {
   private Expr numericLiteral() throws QueryException {
     tok.reset();
     while(digit(curr())) tok.add(consume());
-    if(letter(curr())) return checkDbl();
-    if(!consume('.')) {
-      final long l = toLong(tok.finish());
-      if(l == Long.MIN_VALUE) error(RANGE, tok);
-      return Itr.get(l);
-    }
+    if(consume('.')) return decimalLiteral();
+    if(XMLToken.isNCStartChar(curr())) return checkDbl();
+    final long l = toLong(tok.finish());
+    if(l == Long.MIN_VALUE) error(RANGE, tok);
+    return Itr.get(l);
+  }
+
+  /**
+   * Parses the "DecimalLiteral" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr decimalLiteral() throws QueryException {
     tok.add('.');
-    return decimalLiteral();
+    if(XMLToken.isNCStartChar(curr())) return checkDbl();
+    while(digit(curr())) tok.add(consume());
+    return XMLToken.isNCStartChar(curr()) ? checkDbl() : new Dec(tok.finish());
+  }
+
+  /**
+   * Parses the "DoubleLiteral" rule.
+   * Checks if a number is followed by a whitespace.
+   * @return expression
+   * @throws QueryException query exception
+   */
+  private Expr checkDbl() throws QueryException {
+    if(!consume('e') && !consume('E')) error(NUMBERWS);
+    tok.add('e');
+    if(curr('+') || curr('-')) tok.add(consume());
+    final int s = tok.size();
+    while(digit(curr())) tok.add(consume());
+    if(s == tok.size()) error(NUMBERINC);
+    if(XMLToken.isNCStartChar(curr())) error(NUMBERWS);
+    return Dbl.get(tok.finish(), input());
+  }
+
+  /**
+   * Parses the "StringLiteral" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private byte[] stringLiteral() throws QueryException {
+    skipWS();
+    final char del = curr();
+    if(!quote(del)) error(NOQUOTE, found());
+    consume();
+    tok.reset();
+    while(true) {
+      while(!consume(del)) {
+        if(curr(0)) error(NOQUOTE, found());
+        entity(tok);
+      }
+      if(!consume(del)) break;
+      tok.add(del);
+    }
+    return tok.finish();
   }
 
   /**
@@ -1963,8 +1997,7 @@ public class QueryParser extends InputParser {
   private Expr dirPI() throws QueryException {
     if(consumeWSS()) error(PIXML, EMPTY);
     final byte[] str = trim(qName(PIWRONG));
-    final Str pi = Str.get(str);
-    if(str.length == 0 || eq(lc(str), XML)) error(PIXML, pi);
+    if(str.length == 0 || eq(lc(str), XML)) error(PIXML, str);
 
     final boolean space = skipWS();
     final TokenBuilder tb = new TokenBuilder();
@@ -1976,7 +2009,7 @@ public class QueryParser extends InputParser {
       consume();
       if(consume('>')) {
         if(!XMLToken.isNCName(str)) INVALPI.thrw(input(), str);
-        return new CPI(input(), pi, Str.get(tb.finish()));
+        return new CPI(input(), Str.get(str), Str.get(tb.finish()));
       }
       tb.add('?');
     } while(true);
@@ -1995,7 +2028,7 @@ public class QueryParser extends InputParser {
         if(c != '\r') tb.add(c);
       }
       consume();
-      if(curr() == ']' && next() == '>') {
+      if(curr(']') && next() == '>') {
         qp += 2;
         return tb.finish();
       }
@@ -2167,7 +2200,7 @@ public class QueryParser extends InputParser {
     final boolean atom = !wsConsumeWs(PAR1);
     tok.reset();
     while(!atom && !wsConsumeWs(PAR2)) {
-      if(curr() == 0) error(FUNCMISS, type.atom());
+      if(curr(0)) error(FUNCMISS, type.atom());
       tok.add(consume());
     }
     skipWS();
@@ -2180,8 +2213,8 @@ public class QueryParser extends InputParser {
     if(t == Type.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
     if(t == null) {
       if(atom) error(TYPEUNKNOWN, type);
-      error(NOTYPE, new TokenBuilder(type.atom()).add(
-          type.atom()).add('(').add(tok.finish()).add(')'));
+      error(NOTYPE, new TokenBuilder(type.atom()).add('(').add(
+          tok.finish()).add(')'));
     }
 
     final KindTest kt = tok.size() == 0 ? null : kindTest(t, tok.finish());
@@ -2205,7 +2238,7 @@ public class QueryParser extends InputParser {
       final boolean s = startsWith(k, '\'') || startsWith(k, '"');
       nm = trim(delete(delete(k, '\''), '"'));
       if(!XMLToken.isNCName(nm)) {
-        if(s) error(XPINVNAME, k);
+        if(s) error(XPINVNAME, nm);
         error(TESTINVALID, t, k);
       }
       return new KindTest(t, new QNm(nm, ctx, input()), null);
@@ -2228,59 +2261,6 @@ public class QueryParser extends InputParser {
     if(nm.length == 1 && nm[0] == '*') return new KindTest(t, null, tp);
     if(!XMLToken.isQName(nm)) error(TESTINVALID, t, k);
     return new KindTest(t, new QNm(nm, ctx, input()), tp);
-  }
-
-  /**
-   * Parses the "DecimalLiteral" rule.
-   * @return query expression
-   * @throws QueryException query exception
-   */
-  private Expr decimalLiteral() throws QueryException {
-    if(letter(curr())) return checkDbl();
-    while(digit(curr())) tok.add(consume());
-    return letter(curr()) ? checkDbl() : new Dec(tok.finish());
-  }
-
-  /**
-   * Parses the "DoubleLiteral" rule.
-   * Checks if a number is followed by a whitespace.
-   * @return expression
-   * @throws QueryException query exception
-   */
-  private Expr checkDbl() throws QueryException {
-    if(!consume('e') && !consume('E')) error(NUMBERWS);
-    tok.add('e');
-    if(curr() == '+' || curr() == '-') tok.add(consume());
-    boolean dig = false;
-    while(digit(curr())) {
-      tok.add(consume());
-      dig = true;
-    }
-    if(!dig) error(NUMBERINC);
-    if(letter(curr())) error(NUMBERWS);
-    return Dbl.get(tok.finish(), input());
-  }
-
-  /**
-   * Parses the "StringLiteral" rule.
-   * @return query expression
-   * @throws QueryException query exception
-   */
-  private byte[] stringLiteral() throws QueryException {
-    skipWS();
-    final char del = curr();
-    if(!quote(del)) error(NOQUOTE, found());
-    consume();
-    tok.reset();
-    while(true) {
-      while(!consume(del)) {
-        if(curr() == 0) error(NOQUOTE, found());
-        entity(tok);
-      }
-      if(!consume(del)) break;
-      tok.add(del);
-    }
-    return tok.finish();
   }
 
   /**
@@ -2497,7 +2477,7 @@ public class QueryParser extends InputParser {
 
     skipWS();
     final Expr e = curr('{') ? enclosed(NOENCLEXPR) : quote(curr()) ?
-        literal() : null;
+        Str.get(stringLiteral()) : null;
     if(e == null) error(prg ? NOPRAGMA : NOENCLEXPR);
 
     // FTAnyAllOption
@@ -2919,7 +2899,7 @@ public class QueryParser extends InputParser {
       }
       if(cp == 0x0d) {
         cp = 0x0a;
-        if(curr() == cp) consume();
+        if(curr(cp)) consume();
       }
       tb.add(cp);
     }

@@ -376,7 +376,7 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   NOTYPE(XPST, 3, "Unknown type \"%\"."),
   /** XPST0003: Parsing exception. */
-  PIXML(XPST, 3, "Illegal PI name: %."),
+  PIXML(XPST, 3, "Illegal PI name: \"%\"."),
   /** XPST0003: Parsing exception. */
   EMPTYSEQOCC(XPST, 3, "No occurrence indicator defined for %."),
   /** XPST0003: Parsing exception. */
@@ -445,7 +445,7 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   XPTYPENUM(XPTY, 4, "%: number expected, % found."),
   /** XPTY0004: Typing exception. */
-  XPINVNAME(XPTY, 4, "Invalid name: %."),
+  XPINVNAME(XPTY, 4, "Invalid name: \"%\"."),
   /** XPTY0004: Typing exception. */
   XPNAME(XPTY, 4, "Expecting name."),
   /** XPTY0004: Typing exception. */
