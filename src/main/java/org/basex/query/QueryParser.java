@@ -642,9 +642,7 @@ public class QueryParser extends InputParser {
   private void module(final String f, final Uri u) throws QueryException {
     if(ctx.modLoaded.contains(f)) return;
     // check specified path and path relative to query file
-    IO fl = IO.get(f);
-    if(!fl.exists() && file != null) fl = file.merge(f);
-
+    final IO fl = io(f);
     String qu = null;
     try {
       qu = string(fl.content());
@@ -2626,9 +2624,7 @@ public class QueryParser extends InputParser {
             } else if(wsConsumeWs(AT)) {
               String fn = string(stringLiteral());
               if(ctx.stop != null) fn = ctx.stop.get(fn);
-
-              IO fl = IO.get(fn);
-              if(!fl.exists() && file != null) fl = file.merge(fn);
+              final IO fl = io(fn);
               if(!opt.sw.read(fl, except)) error(NOSTOPFILE, fl);
             } else if(!union && !except) {
               error(FTSTOP);
@@ -2664,9 +2660,7 @@ public class QueryParser extends InputParser {
 
     String fn = string(stringLiteral());
     if(ctx.thes != null) fn = ctx.thes.get(fn);
-    IO fl = IO.get(fn);
-
-    if(!fl.exists() && file != null) fl = file.merge(file.path());
+    final IO fl = io(fn);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true);
     long min = 0;
@@ -2916,6 +2910,20 @@ public class QueryParser extends InputParser {
     final int sc = sub.indexOf(';');
     final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
     error(c, ent);
+  }
+
+  /**
+   * Returns an IO instance for the specified file, or {@code null}.
+   * @param fn filename
+   * @return io instance
+   */
+  private IO io(final String fn) {
+    IO fl = IO.get(fn);
+    // if file does not exist, try base uri
+    if(!fl.exists()) fl = ctx.base().merge(fn);
+    // if file does not exist, try query directory
+    if(!fl.exists() && file != null) fl = file.merge(fn);
+    return fl;
   }
 
   /**
