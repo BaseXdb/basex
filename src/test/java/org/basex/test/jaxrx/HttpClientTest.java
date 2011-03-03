@@ -10,9 +10,9 @@ import org.basex.core.Prop;
 import org.basex.core.cmd.XQuery;
 import org.basex.query.QueryException;
 import org.basex.query.item.FElem;
-import org.basex.query.item.Nod;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Type;
-import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.Token;
 import org.junit.AfterClass;
@@ -163,6 +163,11 @@ public final class HttpClientTest {
         "'http://localhost:8984/basex/jax-rx/books')");
     delete.execute(context);
     checkResponse(delete, HttpURLConnection.HTTP_OK, 1);
+  }
+  
+  @Test
+  public void testMultipartPost() throws Exception {
+    
   }
 
   /*

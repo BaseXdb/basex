@@ -6,5 +6,11 @@
 	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/basex"/>
+	<classpathentry kind="lib" path="/home/hermione/workspace/basex-api/lib/jax-rx-1.2.9.jar"/>
+	<classpathentry kind="lib" path="/home/hermione/workspace/basex-api/lib/jsr311-api-1.0.jar"/>
+	<classpathentry kind="lib" path="/home/hermione/workspace/basex-api/lib/xmldb-api-1.0.jar"/>
+	<classpathentry kind="lib" path="/home/hermione/workspace/basex-api/lib/xqj-api-1.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
