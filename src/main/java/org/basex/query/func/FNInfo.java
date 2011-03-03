@@ -1,8 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
-
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -59,8 +59,12 @@ final class FNInfo extends Fun {
         val = expr[0].value(ctx);
         final TokenBuilder tb = new TokenBuilder();
         tb.add(checkEStr(expr[1], ctx)).add(' ').add(val.toString());
-        if(Prop.gui) ctx.evalInfo(tb.finish());
-        else Util.errln(tb);
+        // if GUI is used, or if user is no admin, trace info is cached
+        if(Prop.gui || !ctx.context.user.perm(User.ADMIN)) {
+          ctx.evalInfo(tb.finish());
+        } else {
+          Util.errln(tb);
+        }
         return val.iter();
       case ENVS:
         final ItemCache ir = new ItemCache();

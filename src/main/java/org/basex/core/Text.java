@@ -1039,15 +1039,22 @@ public interface Text {
   String CREATENAME = lang("dc_name") + COLS;
   /** Target path. */
   String CREATETARGET = lang("dc_target") + COLS;
+
   /** XML file description. */
-  String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
+  String CREATEXMLDESC = "XML Documents";
+  /** HTML file description. */
+  String CREATEHTMLDESC = "HTML Documents";
+  /** CSV file description. */
+  String CREATECSVDESC = "Comma-Separated Values";
+  /** TXT file description. */
+  String CREATETXTDESC = "Plain text";
   /** ZIP file description. */
-  String CREATEZIPDESC = lang("dc_zipdesc") + " (*.zip)";
+  String CREATEZIPDESC = "ZIP Archives";
   /** GZ file description. */
-  String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
+  String CREATEGZDESC = "GZIP Archives";
   /** XQuery file extensions description. */
-  String CREATEXQEXDESC = lang("dc_xqdesc") +
-    " (*.xq, *.xqm, *.xqy, *.xql, *.xquery)";
+  String CREATEXQEXDESC = "XQuery Files";
+
   /** Dialog title for database options. */
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Whitespaces information. */

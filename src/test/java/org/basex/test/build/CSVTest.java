@@ -14,6 +14,7 @@ import org.basex.io.IO;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,7 +28,7 @@ public final class CSVTest {
   /** Database context. */
   private static final Context CTX = new Context();
   /** Test database name. */
-  private static final String DBNAME = Util.name(CSVTest.class);
+  private static final String NAME = Util.name(CSVTest.class);
 
   /**
    * Creates the initial database.
@@ -43,16 +44,16 @@ public final class CSVTest {
    */
   @AfterClass
   public static void after() {
-    IO.get(Prop.TMP + DBNAME).delete();
+    IO.get(Prop.TMP + NAME).delete();
   }
 
   /**
    * Sets initial options.
    * @throws BaseXException exception
    */
-  @After
+  @Before
   public void init() throws BaseXException {
-    new Set(Prop.PARSEROPT, "").execute(CTX);
+    new Set(Prop.PARSEROPT, "header=true").execute(CTX);
   }
 
   /**
@@ -61,7 +62,7 @@ public final class CSVTest {
    */
   @After
   public void finish() throws BaseXException {
-    new DropDB(DBNAME).execute(CTX);
+    new DropDB(NAME).execute(CTX);
   }
 
   /**
@@ -71,7 +72,7 @@ public final class CSVTest {
   @Test
   public void empty() throws Exception {
     write("");
-    new CreateDB(DBNAME, Prop.TMP + DBNAME).execute(CTX);
+    new CreateDB(NAME, Prop.TMP + NAME).execute(CTX);
     assertEquals("<csv/>", new XQuery(".").execute(CTX));
   }
 
@@ -81,12 +82,12 @@ public final class CSVTest {
    */
   @Test
   public void one() throws Exception {
-    new CreateDB(DBNAME, "etc/xml/input.csv").execute(CTX);
+    new CreateDB(NAME, "etc/xml/input.csv").execute(CTX);
     assertEquals("3", new XQuery("count(//Name)").execute(CTX));
     assertEquals("2", new XQuery("count(//Email)").execute(CTX));
 
-    new Set(Prop.PARSEROPT, "format=simple").execute(CTX);
-    new CreateDB(DBNAME, "etc/xml/input.csv").execute(CTX);
+    new Set(Prop.PARSEROPT, "format=simple,header=true").execute(CTX);
+    new CreateDB(NAME, "etc/xml/input.csv").execute(CTX);
     assertEquals("3", new XQuery("count(//record)").execute(CTX));
   }
 
@@ -96,8 +97,8 @@ public final class CSVTest {
    */
   @Test
   public void simple() throws Exception {
-    new Set(Prop.PARSEROPT, "format=simple").execute(CTX);
-    new CreateDB(DBNAME, "etc/xml/input.csv").execute(CTX);
+    new Set(Prop.PARSEROPT, "format=simple,header=true").execute(CTX);
+    new CreateDB(NAME, "etc/xml/input.csv").execute(CTX);
     assertEquals("3", new XQuery("count(//record)").execute(CTX));
   }
 
@@ -107,8 +108,8 @@ public final class CSVTest {
    */
   @Test
   public void sep() throws Exception {
-    new Set(Prop.PARSEROPT, "separator=tab").execute(CTX);
-    new CreateDB(DBNAME, "etc/xml/input.csv").execute(CTX);
+    new Set(Prop.PARSEROPT, "separator=tab,header=true").execute(CTX);
+    new CreateDB(NAME, "etc/xml/input.csv").execute(CTX);
     assertEquals("0", new XQuery("count(//Name)").execute(CTX));
   }
 
@@ -118,6 +119,6 @@ public final class CSVTest {
    * @throws IOException I/O exception
    */
   private void write(final String data) throws IOException {
-    IO.get(Prop.TMP + DBNAME).write(token(data));
+    IO.get(Prop.TMP + NAME).write(token(data));
   }
 }

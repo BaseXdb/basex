@@ -90,7 +90,7 @@ final class DialogUser extends BaseXBack {
     info = new BaseXLabel(" ");
 
     add(new BaseXLabel(CREATEU + COLS, false, true));
-    BaseXBack p = new BaseXBack(new TableLayout(1, 5, 6, 0)).border(0, 0, 5, 0);
+    BaseXBack p = new BaseXBack(new TableLayout(1, 5, 8, 0)).border(0, 0, 5, 0);
     p.add(new BaseXLabel(SERVERUSER + COLS));
     p.add(user);
     p.add(new BaseXLabel(SERVERPW + COLS));
