@@ -67,7 +67,7 @@ public final class TriggeringTestGUI {
         });
     } catch(BaseXException e1) {
       try {
-        cs.createTrigger("trigger");
+        cs.execute("create trigger trigger");
         cs.attachTrigger("trigger", new TriggerNotification() {
           @Override
           public void update(final String data) {

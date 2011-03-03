@@ -7,7 +7,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.io.BufferInput;
 import org.basex.io.IO;
+import org.basex.io.PrintOutput;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Log;
@@ -21,8 +23,8 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
- * This is the starter class for running the database server.
- * It handles concurrent requests from multiple users.
+ * This is the starter class for running the database server. It handles
+ * concurrent requests from multiple users.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -41,13 +43,15 @@ public class BaseXServer extends Main implements Runnable {
   /** Server socket. */
   private ServerSocket server;
   /** Flag for server activity. */
-  private boolean running;
+  boolean running;
   /** Stop file. */
-  private IO stop;
+  IO stop;
+  /** TriggerListener. */
+  private TriggerListener tl;
 
   /**
-   * Main method, launching the server process.
-   * Command-line arguments are listed with the {@code -h} argument.
+   * Main method, launching the server process. Command-line arguments are
+   * listed with the {@code -h} argument.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
@@ -87,7 +91,8 @@ public class BaseXServer extends Main implements Runnable {
       });
 
       new Thread(this).start();
-      while(!running) Performance.sleep(100);
+      while(!running)
+        Performance.sleep(100);
 
       Util.outln(CONSOLE + (console ? CONSOLE2 : SERVERSTART), SERVERMODE);
 
@@ -104,6 +109,8 @@ public class BaseXServer extends Main implements Runnable {
   @Override
   public final void run() {
     running = true;
+    tl = new TriggerListener();
+    tl.start();
     while(running) {
       try {
         final Socket s = server.accept();
@@ -156,8 +163,8 @@ public class BaseXServer extends Main implements Runnable {
 
   @Override
   protected boolean parseArguments(final String[] args) {
-    final Args arg = new Args(args, this, SERVERINFO,
-        Util.info(CONSOLE, SERVERMODE));
+    final Args arg = new Args(args, this, SERVERINFO, Util.info(CONSOLE,
+        SERVERMODE));
     boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {
@@ -205,6 +212,7 @@ public class BaseXServer extends Main implements Runnable {
     final int port = context.prop.num(Prop.SERVERPORT);
     try {
       stop.write(Token.EMPTY);
+      new Socket(LOCALHOST, port + 1);
       new Socket(LOCALHOST, port);
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));
@@ -227,14 +235,12 @@ public class BaseXServer extends Main implements Runnable {
     if(ping(LOCALHOST, port)) return SERVERBIND;
 
     final StringList sl = new StringList();
-    final String[] largs = {
-        "java", "-Xmx" + Runtime.getRuntime().maxMemory(),
-        "-cp", System.getProperty("java.class.path"),
-        clz.getName(),
-        "-D",
-    };
-    for(final String a : largs) sl.add(a);
-    for(final String a : args) sl.add(a);
+    final String[] largs = { "java", "-Xmx" + Runtime.getRuntime().maxMemory(),
+        "-cp", System.getProperty("java.class.path"), clz.getName(), "-D", };
+    for(final String a : largs)
+      sl.add(a);
+    for(final String a : args)
+      sl.add(a);
 
     try {
       new ProcessBuilder(sl.toArray()).start();
@@ -275,12 +281,60 @@ public class BaseXServer extends Main implements Runnable {
     final IO stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
+      new Socket(LOCALHOST, port + 1);
       new Socket(LOCALHOST, port);
-      while(ping(LOCALHOST, port)) Performance.sleep(100);
+      while(ping(LOCALHOST, port))
+        Performance.sleep(100);
       Util.outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       stop.delete();
       Util.errln(Util.server(ex));
+    }
+  }
+
+  /**
+   * Inner class to listen for trigger registrations.
+   *
+   * @author BaseX Team 2005-11, BSD License
+   * @author Andreas Weiler
+   */
+  private class TriggerListener extends Thread {
+    /** Server socket. */
+    ServerSocket tserver;
+
+    /**
+     * Constructor.
+     */
+    public TriggerListener() {
+      try {
+        this.tserver = new ServerSocket(context.prop.num(Prop.SERVERPORT) + 1);
+      } catch(IOException ex) {
+        log.write(ex.getMessage());
+        Util.errln(Util.server(ex));
+      }
+    }
+
+    @Override
+    public void run() {
+      while(running) {
+        try {
+          final Socket socket = tserver.accept();
+          if(stop.exists()) {
+            tserver.close();
+            break;
+          }
+          BufferInput buf = new BufferInput(socket.getInputStream());
+          String id = buf.readString();
+          for(ServerProcess s : context.sessions) {
+            if(String.valueOf(s.getId()).equals(id)) {
+              s.tout = PrintOutput.get(socket.getOutputStream());
+            }
+          }
+        } catch(IOException e) {
+          // socket was closed..
+          break;
+        }
+      }
     }
   }
 }

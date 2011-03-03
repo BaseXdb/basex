@@ -40,7 +40,7 @@ public final class ServerProcess extends Thread {
   private final HashMap<String, QueryProcess> queries =
     new HashMap<String, QueryProcess>();
   /** Active triggers. */
-  public final ArrayList<String> triggers = new ArrayList<String>();
+  public ArrayList<String> triggers;
 
   /** Database context. */
   public final Context context;
@@ -59,6 +59,8 @@ public final class ServerProcess extends Thread {
   private int id;
   /** Running of thread. */
   private boolean running;
+  /** Output for triggering. */
+  public PrintOutput tout;
 
   /**
    * Constructor.
@@ -277,7 +279,11 @@ public final class ServerProcess extends Thread {
    */
   private void attach() throws IOException {
     final String name = in.readString();
-    if(context.triggers.attach(name, context.session)) {
+    if(triggers == null) {
+      out.writeString(String.valueOf(this.getId()));
+      triggers = new ArrayList<String>();
+    }
+    if(context.triggers.attach(name, this)) {
       String info = Util.info(TRIGGERATT, name);
       out.writeString(info);
       out.write(0);
@@ -297,7 +303,7 @@ public final class ServerProcess extends Thread {
    */
   private void detach() throws IOException {
     final String name = in.readString();
-    if(context.triggers.detach(name, context.session)) {
+    if(context.triggers.detach(name, this)) {
       String info = Util.info(TRIGGERDET, name);
       out.writeString(info);
       out.write(0);
@@ -402,7 +408,7 @@ public final class ServerProcess extends Thread {
       try { q.close(true); } catch(final IOException ex) { }
     }
     // remove this from all triggers in pool
-    if(triggers.size() > 0) {
+    if(triggers != null) {
       context.triggers.remove(this, triggers);
     }
     try {

@@ -124,14 +124,13 @@ public final class TriggerPool {
     for (ServerProcess srv : sessions) {
       if(!srv.equals(sp)) {
         try {
-          srv.out.write(1);
-          srv.out.write(name);
-          srv.out.write(0);
-          srv.out.write(i);
-          srv.out.write(0);
-          srv.out.flush();
+          srv.tout.write(1);
+          srv.tout.write(name);
+          srv.tout.write(0);
+          srv.tout.write(i);
+          srv.tout.write(0);
+          srv.tout.flush();
         } catch(IOException e) {
-          e.printStackTrace();
           sessions.delete(srv);
         }
       }
