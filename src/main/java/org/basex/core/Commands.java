@@ -34,12 +34,12 @@ public interface Commands {
 
   /** Command definitions. */
   enum Cmd {
-    ADD(HELPADD), ALTER(HELPALTER), BACKUP(HELPBACKUP), CHECK(),
+    ADD(HELPADD), ALTER(HELPALTER), BACKUP(HELPBACKUP), CHECK(HELPCHECK),
     CLOSE(HELPCLOSE), CREATE(HELPCREATE), CS(HELPCS), DELETE(HELPDELETE),
     DROP(HELPDROP), EXIT(HELPEXIT), EXPORT(HELPEXPORT), FIND(HELPFIND),
     GET(HELPGET), GRANT(HELPGRANT), HELP(HELPHELP), INFO(HELPINFO),
     KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE),
-    PASSWORD(HELPPASSWORD), QUIT(), RESTORE(HELPRESTORE), RUN(HELPRUN),
+    PASSWORD(HELPPASSWORD), RESTORE(HELPRESTORE), RUN(HELPRUN),
     SET(HELPSET), SHOW(HELPSHOW), XQUERY(HELPXQUERY);
 
     /** Help texts. */
@@ -58,14 +58,6 @@ public interface Commands {
      */
     private Cmd(final String... h) {
       help = h;
-    }
-
-    /**
-     * Tests if this is a command which will not be shown in the help.
-     * @return result of check
-     */
-    boolean hidden() {
-      return help == null;
     }
 
     /**

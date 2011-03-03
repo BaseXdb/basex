@@ -174,7 +174,7 @@ public interface Text {
   /** Command help. */
   String C_PATH = "path";
   /** Command help. */
-  String INPUT = "input";
+  String C_INPUT = "input";
   /** Command help. */
   String C_NAME = "name";
   /** Command help. */
@@ -191,8 +191,8 @@ public interface Text {
     CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
-    LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + INPUT + "]):"  + NL +
-      "  " + lang("ch_create3", C_NAME, INPUT) + NL +
+    LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + C_INPUT + "]):"  + NL +
+      "  " + lang("ch_create3", C_NAME, C_INPUT) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]:" + NL +
       "  " + lang("ch_create5") + NL +
@@ -205,10 +205,15 @@ public interface Text {
   };
 
   /** Command help. */
+  String[] HELPCHECK = {
+    "[" + C_INPUT + "]", lang("ch_check1"), lang("ch_check2")
+  };
+
+  /** Command help. */
   String[] HELPADD = {
     "(" + AS + " [" + C_NAME + "]) (" + TO + " [" + C_TARGET + "]) [" +
-    INPUT + "]",
-    lang("ch_add1"), lang("ch_add2", INPUT, C_NAME, C_TARGET)
+    C_INPUT + "]",
+    lang("ch_add1"), lang("ch_add2", C_INPUT, C_NAME, C_TARGET)
   };
 
   /** Command help. */
