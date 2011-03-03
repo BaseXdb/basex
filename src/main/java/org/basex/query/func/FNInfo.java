@@ -58,7 +58,7 @@ final class FNInfo extends Fun {
       case TRACE:
         val = expr[0].value(ctx);
         final TokenBuilder tb = new TokenBuilder();
-        tb.add(checkEStr(expr[1], ctx)).add(' ').add(val.toString());
+        tb.add(checkEStr(expr[1], ctx)).add(val.toString());
         // if GUI is used, or if user is no admin, trace info is cached
         if(Prop.gui || !ctx.context.user.perm(User.ADMIN)) {
           ctx.evalInfo(tb.finish());
