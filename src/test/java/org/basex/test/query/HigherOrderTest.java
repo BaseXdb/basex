@@ -29,6 +29,26 @@ public class HigherOrderTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test for name shadowing.
+   * @throws BaseXException exception
+   */
+  @Test
+  public void shadowingTest2() throws BaseXException {
+    query("for $a in (for $a in (1, 2, 3) return $a mod 2)" +
+        "return function(){ $a }()", "1 0 1");
+  }
+
+  /**
+   * Test for name shadowing.
+   * @throws BaseXException exception
+   */
+  @Test
+  public void shadowingTest3() throws BaseXException {
+    query("for $a in (for $a in (1, 2, 3) return $a mod 2)" +
+        "return 3 * $a", "3 0 3");
+  }
+
+  /**
    * Test for name heavy currying.
    * @throws BaseXException exception
    */
