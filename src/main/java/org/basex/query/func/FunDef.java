@@ -145,7 +145,7 @@ public enum FunDef {
   /** XQuery function. */
   MAP(FNURI, FNFunc.class, 2, 2, "map(function,seq)", ITEM_ZM),
   /** XQuery function. */
-  MAPPAIRS(FNURI, FNFunc.class, 2, 2, "map-pairs(function,seq1,seq2)", ITEM_ZM),
+  MAPPAIRS(FNURI, FNFunc.class, 3, 3, "map-pairs(function,seq1,seq2)", ITEM_ZM),
   /** XQuery function. */
   FOLDLEFT(FNURI, FNFunc.class, 3, 3, "fold-left(function,zero,seq)", ITEM_ZM),
   /** XQuery function. */
