@@ -7,5 +7,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/basex"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jax-rx"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/basex-api"/>
+	<classpathentry kind="lib" path="/basex-api/lib/xqj-api-1.0.jar"/>
+	<classpathentry kind="lib" path="/basex-api/lib/xmldb-api-1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
