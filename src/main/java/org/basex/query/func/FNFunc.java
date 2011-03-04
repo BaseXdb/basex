@@ -197,9 +197,9 @@ final class FNFunc extends Fun {
     final FunItem f = withArity(0, 2, ctx);
     Iter res = expr[1].iter(ctx);
 
-    final Item[] xs = ItemCache.get(expr[2].iter(ctx)).item;
-    for(int i = xs.length; i-- > 0;)
-      res = f.invIter(ctx, input, xs[i], res.finish());
+    final ItemCache xs = ItemCache.get(expr[2].iter(ctx));
+    for(int i = (int) xs.size(); i-- != 0;)
+      res = f.invIter(ctx, input, xs.item[i], res.finish());
 
     return res;
   }
