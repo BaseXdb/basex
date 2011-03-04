@@ -1,8 +1,7 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
-
-import org.basex.core.BaseXException;
+import org.basex.query.QueryException;
 import org.junit.Test;
 
 /**
@@ -20,40 +19,20 @@ public class HigherOrderTest extends AdvancedQueryTest {
 
   /**
    * Test for name shadowing.
-   * @throws BaseXException exception
+   * @throws QueryException exception
    */
   @Test
-  public void shadowingTest() throws BaseXException {
+  public void shadowingTest() throws QueryException {
     query("let $x := 1 to 9 return fold-left(" +
         "function($x, $y){$x * 10 + $y}, 0, $x)", "123456789");
   }
 
   /**
-   * Test for name shadowing.
-   * @throws BaseXException exception
-   */
-  @Test
-  public void shadowingTest2() throws BaseXException {
-    query("for $a in (for $a in (1, 2, 3) return $a mod 2)" +
-        "return function(){ $a }()", "1 0 1");
-  }
-
-  /**
-   * Test for name shadowing.
-   * @throws BaseXException exception
-   */
-  @Test
-  public void shadowingTest3() throws BaseXException {
-    query("for $a in (for $a in (1, 2, 3) return $a mod 2)" +
-        "return 3 * $a", "3 0 3");
-  }
-
-  /**
    * Test for name heavy currying.
-   * @throws BaseXException exception
+   * @throws QueryException exception
    */
   @Test
-  public void curryTest() throws BaseXException {
+  public void curryTest() throws QueryException {
     query("let $digits := 1 to 9," +
         "$base-cmb := function($b, $n, $d) { $b * $n + $d }," +
         "$dec-cmb := $base-cmb(10, ?, ?)," +
@@ -64,10 +43,10 @@ public class HigherOrderTest extends AdvancedQueryTest {
 
   /**
    * Test for name heavy currying.
-   * @throws BaseXException exception
+   * @throws QueryException exception
    */
   @Test
-  public void curryTest2() throws BaseXException {
+  public void curryTest2() throws QueryException {
     query("let $digits := 1 to 9," +
         "$base-cmb := function($n, $d) { 10 * $n + $d }," +
         "$from-digits := fold-left($base-cmb, 0, ?)" +
@@ -75,12 +54,31 @@ public class HigherOrderTest extends AdvancedQueryTest {
         "123456789");
   }
 
+  /**
+   * Test for name heavy currying.
+   * @throws QueryException exception
+   */
+  @Test
+  public void foldRightTest() throws QueryException {
+    query("declare function local:before-first(" +
+        "  $input as item()*," +
+        "  $pred as function(item()) as item()*" +
+        ") as item()* {" +
+        "  fold-right(" +
+        "    function($x, $xs) { if($pred($x)) then () else ($x, $xs) }," +
+        "      (), $input)" +
+        "};" +
+        "local:before-first((<h1/>, <p/>, <h1/>, <h2/>, <h3/>)," +
+        "  function($it) { name($it) = 'h2' })",
+        "<h1/><p/><h1/>");
+  }
+
   /**  Test for name heavy currying. */
   @Test
   public void placeHolderTest() {
     try {
       fail("succeeded with: " + query("string-join(('a', 'b'), )(',')"));
-    } catch(final BaseXException e) {
+    } catch(final QueryException e) {
       assertTrue(e.getMessage(), e.getMessage().contains("XPST0003"));
     }
   }

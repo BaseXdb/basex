@@ -5,6 +5,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
+import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.DBNode;
 import org.junit.AfterClass;
@@ -39,9 +40,10 @@ public final class FNFtTest extends AdvancedQueryTest {
   /**
    * Test method for the ft:search() function.
    * @throws BaseXException database exception
+   * @throws QueryException  query exception
    */
   @Test
-  public void testSearch() throws BaseXException {
+  public void testSearch() throws BaseXException, QueryException {
     // test arguments
     final String fun = check(FunDef.SEARCH, DBNode.class, String.class);
 
@@ -57,10 +59,10 @@ public final class FNFtTest extends AdvancedQueryTest {
 
   /**
    * Test method for the 'ft:mark()' function.
-   * @throws BaseXException database exception
+   * @throws QueryException query exception
    */
   @Test
-  public void testMark() throws BaseXException {
+  public void testMark() throws QueryException {
     final String fun = check(FunDef.MARK, (Class<?>) null, String.class);
 
     query(fun + "(//*[text() contains text '1'])",
@@ -79,10 +81,10 @@ public final class FNFtTest extends AdvancedQueryTest {
 
   /**
    * Test method for the ft:extract() function.
-   * @throws BaseXException database exception
+   * @throws QueryException query exception
    */
   @Test
-  public void testExtract() throws BaseXException {
+  public void testExtract() throws QueryException {
     final String fun =
       check(FunDef.EXTRACT, (Class<?>) null, String.class, Integer.class);
 
@@ -98,10 +100,10 @@ public final class FNFtTest extends AdvancedQueryTest {
 
   /**
    * Test method for the 'ft:score()' function.
-   * @throws BaseXException database exception
+   * @throws QueryException query exception
    */
   @Test
-  public void testScore() throws BaseXException {
+  public void testScore() throws QueryException {
     // test arguments
     final String fun = check(FunDef.SCORE, (Class<?>) null);
 

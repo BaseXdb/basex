@@ -1,9 +1,10 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
-import org.basex.core.BaseXException;
+import java.io.IOException;
 import org.basex.core.Context;
-import org.basex.core.cmd.XQuery;
+import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.DBNode;
 import org.basex.query.util.Err;
@@ -33,20 +34,26 @@ public abstract class AdvancedQueryTest {
    * Runs the specified query.
    * @param qu query
    * @return result
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
-  protected static String query(final String qu) throws BaseXException {
-    return new XQuery(qu).execute(CTX).replaceAll("(\\r|\\n) *", "");
+  protected static String query(final String qu) throws QueryException {
+    final QueryProcessor qp = new QueryProcessor(qu, CTX);
+    try {
+      return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
+    } finally {
+      try { qp.close();
+      } catch(IOException e) { }
+    }
   }
 
   /**
    * Checks if a query yields the specified string.
    * @param query query to be run
    * @param result query result
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   protected static void query(final String query, final String result)
-      throws BaseXException {
+      throws QueryException {
     assertEquals(result, query(query));
   }
 
@@ -54,10 +61,10 @@ public abstract class AdvancedQueryTest {
    * Checks if a query yields the specified error code.
    * @param query query to be run
    * @param result query result
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   protected static void contains(final String query, final String result)
-      throws BaseXException {
+      throws QueryException {
     assertContains(query(query), result);
   }
 
@@ -70,7 +77,7 @@ public abstract class AdvancedQueryTest {
     try {
       query(query);
       fail("[" + error + "] expected for query: " + query);
-    } catch(final BaseXException ex) {
+    } catch(final QueryException ex) {
       assertContains(ex.getMessage(), error.code());
     }
   }
