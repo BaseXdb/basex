@@ -230,6 +230,7 @@ public class QueryParser extends InputParser {
     ctx.funcs.check();
     ctx.vars.check();
     ctx.ns.finish(ctx.nsElem);
+    // set default decimal format
     final byte[] empty = new QNm(EMPTY).full();
     if(ctx.decFormats.get(empty) == null) {
       ctx.decFormats.add(empty, new DecimalFormat());
@@ -274,10 +275,6 @@ public class QueryParser extends InputParser {
   private Expr mainModule() throws QueryException {
     prolog1();
     prolog2();
-    if(declColl) {
-      final byte[] coll = ctx.baseURI.resolve(ctx.collation).atom();
-      if(!eq(URLCOLL, coll)) error(COLLWHICH, coll);
-    }
     return expr();
   }
 
@@ -557,7 +554,8 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(COLLATION)) return false;
     if(declColl) error(DUPLCOLL);
     declColl = true;
-    ctx.collation = Uri.uri(stringLiteral());
+    final byte[] coll = ctx.baseURI.resolve(Uri.uri(stringLiteral())).atom();
+    if(!eq(URLCOLL, coll)) error(COLLWHICH, coll);
     return true;
   }
 
@@ -2439,15 +2437,19 @@ public class QueryParser extends InputParser {
    */
   private FTExpr ftPrimaryWithOptions(final boolean prg) throws QueryException {
     FTExpr expr = ftPrimary(prg);
+
     final FTOpt fto = new FTOpt();
     boolean found = false;
     while(ftMatchOption(fto)) found = true;
-    // check if specified language is available
+
+    // check if specified language is not available
     if(!Language.supported(fto.ln, fto.is(ST) && fto.sd == null))
       error(Err.FTLAN, fto.ln);
+
     // consume weight option
     if(wsConsumeWs(WEIGHT))
       expr = new FTWeight(input(), expr, enclosed(NOENCLEXPR));
+
     // skip options if none were specified...
     return found ? new FTOptions(input(), expr, fto) : expr;
   }
@@ -2565,19 +2567,19 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(USING)) return false;
 
     if(wsConsumeWs(LOWERCASE)) {
-      if(opt.set(LC) || opt.set(UC) || opt.set(CS)) error(FTDUP, CASE);
+      if(opt.isSet(LC) || opt.isSet(UC) || opt.isSet(CS)) error(FTDUP, CASE);
       opt.set(CS, true);
       opt.set(LC, true);
     } else if(wsConsumeWs(UPPERCASE)) {
-      if(opt.set(LC) || opt.set(UC) || opt.set(CS)) error(FTDUP, CASE);
+      if(opt.isSet(LC) || opt.isSet(UC) || opt.isSet(CS)) error(FTDUP, CASE);
       opt.set(CS, true);
       opt.set(UC, true);
     } else if(wsConsumeWs(CASE)) {
-      if(opt.set(LC) || opt.set(UC) || opt.set(CS)) error(FTDUP, CASE);
+      if(opt.isSet(LC) || opt.isSet(UC) || opt.isSet(CS)) error(FTDUP, CASE);
       opt.set(CS, wsConsumeWs(SENSITIVE));
       if(!opt.is(CS)) wsCheck(INSENSITIVE);
     } else if(wsConsumeWs(DIACRITICS)) {
-      if(opt.set(DC)) error(FTDUP, DIACRITICS);
+      if(opt.isSet(DC)) error(FTDUP, DIACRITICS);
       opt.set(DC, wsConsumeWs(SENSITIVE));
       if(!opt.is(DC)) wsCheck(INSENSITIVE);
     } else if(wsConsumeWs(LANGUAGE)) {
@@ -2591,7 +2593,7 @@ public class QueryParser extends InputParser {
       final boolean using = !wsConsumeWs(NO);
 
       if(wsConsumeWs(STEMMING)) {
-        if(opt.set(ST)) error(FTDUP, STEMMING);
+        if(opt.isSet(ST)) error(FTDUP, STEMMING);
         opt.set(ST, using);
       } else if(wsConsumeWs(THESAURUS)) {
         if(opt.th != null) error(FTDUP, THESAURUS);
@@ -2635,11 +2637,11 @@ public class QueryParser extends InputParser {
           }
         }
       } else if(wsConsumeWs(WILDCARDS)) {
-        if(opt.set(WC)) error(FTDUP, WILDCARDS);
+        if(opt.isSet(WC)) error(FTDUP, WILDCARDS);
         if(opt.is(FZ)) error(FTFZWC);
         opt.set(WC, using);
       } else if(wsConsumeWs(FUZZY)) {
-        if(opt.set(FZ)) error(FTDUP, FUZZY);
+        if(opt.isSet(FZ)) error(FTDUP, FUZZY);
         if(opt.is(WC)) error(FTFZWC);
         opt.set(FZ, using);
       } else {
