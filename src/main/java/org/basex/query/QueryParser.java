@@ -531,7 +531,7 @@ public class QueryParser extends InputParser {
       for(final String s : DECFORMATS) {
         if(prop.equals(s)) {
           final String key = s;
-          if(sl.get(key) != null) error(DECDUPLPROP);
+          if(sl.get(key) != null) error(DECDUPLPROP, key);
           wsCheck(IS);
           sl.put(key, string(stringLiteral()));
           break;

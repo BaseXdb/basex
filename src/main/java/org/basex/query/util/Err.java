@@ -129,10 +129,10 @@ public enum Err {
   ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
   /** FOZP0002: Evaluation exception. */
   ZIPINVALID(FOZP, 2, "% element: % attribute expected."),
+  /** FOZP0002: Evaluation exception. */
+  ZIPUNKNOWN(FOZP, 2, "ZIP Definition: unknown element %."),
   /** FOZP0003: Evaluation exception. */
-  ZIPUNKNOWN(FOZP, 3, "ZIP Definition: unknown element %."),
-  /** FOZP0004: Evaluation exception. */
-  ZIPFAIL(FOZP, 4, "Operation failed: %."),
+  ZIPFAIL(FOZP, 3, "Operation failed: %."),
 
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL: \"%\"."),
