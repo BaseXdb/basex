@@ -1494,6 +1494,7 @@ public class QueryParser extends InputParser {
           ap = qp;
           ax = a;
           test = test(a == Axis.ATTR);
+          checkTest(test, a == Axis.ATTR);
           break;
         }
       }
