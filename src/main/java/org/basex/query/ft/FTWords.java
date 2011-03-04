@@ -116,7 +116,6 @@ public final class FTWords extends FTExpr {
 
       // choose fast evaluation for default settings
       fast = mode == FTMode.M_ANY && txt != null && occ == null;
-
       ftt = new FTTokenizer(this, ctx.ftopt, ctx.context.prop);
     }
     return this;
@@ -294,8 +293,8 @@ public final class FTWords extends FTExpr {
     /* If the following conditions yield true, the index is accessed:
      * - all query terms are statically available
      * - no FTTimes option is specified
-     * - case sensitivity, diacritics and stemming flags coincide with index
-     */
+     * - explicitly set case, diacritics and stemming match options do not
+     *   conflict with index options. */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ftt.opt;
 
@@ -303,10 +302,15 @@ public final class FTWords extends FTExpr {
     final boolean wc = fto.is(WC);
     if(wc && !md.wildcards) return false;
 
-    if(occ != null || md.casesens != fto.is(CS) || md.diacritics != fto.is(DC)
-        || md.stemming != fto.is(ST) || md.language != fto.ln) return false;
+    /* Index will be applied if no explicit match options have been set
+     * that conflict with the index options. As a consequence, though, index-
+     * based querying might yield other results than sequential scanning. */
+    if(fto.isSet(CS) && md.casesens != fto.is(CS) ||
+       fto.isSet(DC) && md.diacritics != fto.is(DC) ||
+       fto.isSet(ST) && md.stemming != fto.is(ST) ||
+       fto.ln != null && md.language != fto.ln || occ != null) return false;
 
-    // skip index access if text if not statically known
+    // skip index access if text is not statically known
     if(txt == null) return false;
 
     // no index results

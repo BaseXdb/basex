@@ -57,6 +57,15 @@ public final class QueryException extends Exception {
   }
 
   /**
+   * Default constructor.
+   * @param ii input info
+   * @param ex serializer exception
+   */
+  public QueryException(final InputInfo ii, final QueryException ex) {
+    this(ii, ex.code, ex.value, ex.getLocalizedMessage());
+  }
+
+  /**
    * Constructor, specifying the error code and message as string.
    * @param ii input info
    * @param errc error code
@@ -143,8 +152,8 @@ public final class QueryException extends Exception {
    * Returns the error code.
    * @return error code
    */
-  public Err.ErrType type() {
-    return err == null ? null : err.type;
+  public Err err() {
+    return err;
   }
 
   /**

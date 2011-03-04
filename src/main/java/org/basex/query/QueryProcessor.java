@@ -143,10 +143,9 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void bind(final String n, final Object o) throws QueryException {
-    // convert java to xquery type
     final Expr ex = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
     // remove optional $ prefix
-    final byte[] nm = Token.token(n.replaceAll("^\\$", ""));
+    final byte[] nm = Token.token(n.indexOf('$') == 0 ? n.substring(1) : n);
     Var var = new Var(new QNm(nm)).bind(ex, ctx);
     final Var gl = ctx.vars.global().get(var);
     if(gl != null && gl.type != null) {
@@ -154,6 +153,17 @@ public final class QueryProcessor extends Progress {
       var = gl;
     }
     ctx.vars.setGlobal(var);
+  }
+
+  /**
+   * Sets an object as context item. If the object is an {@link Expr}
+   * instance, it is directly assigned. Otherwise, it is first cast to the
+   * appropriate XQuery type.
+   * @param o object to be bound
+   * @throws QueryException query exception
+   */
+  public void context(final Object o) throws QueryException {
+    ctx.initExpr = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
   }
 
   /**

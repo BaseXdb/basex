@@ -28,6 +28,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class InfoView extends View {
+  /** Old text. */
+  private final TokenBuilder text = new TokenBuilder();
   /** Header label. */
   private final BaseXLabel header;
   /** Timer label. */
@@ -36,9 +38,6 @@ public final class InfoView extends View {
   private final BaseXBack north;
   /** Text Area. */
   private final BaseXText area;
-
-  /** Old text. */
-  private final TokenBuilder text = new TokenBuilder();
 
   /** Query statistics. */
   private IntList stat = new IntList();
@@ -177,12 +176,12 @@ public final class InfoView extends View {
       }
     } else if(sl.size() != 0) {
       text.reset();
+      add(QUERYEVAL, eval);
       add(QUERYQU, qu);
       add(QUERYCOMP, comp);
       if(comp.size() != 0) add(QUERYRESULT, res);
-      add(QUERYPLAN, plan);
-      add(QUERYEVAL, eval);
       add(QUERYTIME, sl);
+      add(QUERYPLAN, plan);
       final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
       total = Performance.getTimer(il.get(il.size() - 1) * 10000L * runs, runs);
     }

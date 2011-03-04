@@ -23,7 +23,8 @@ import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
- * Abstract parse expression, containing information on the original query.
+ * Abstract parse expression. All non-value expressions are derived from
+ * this class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
