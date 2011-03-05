@@ -124,7 +124,8 @@ public final class Prop extends AProp {
   /** Define import parser. */
   public static final Object[] PARSER = { "PARSER", "XML" };
   /** Define parser options. */
-  public static final Object[] PARSEROPT = { "PARSEROPT", "" };
+  public static final Object[] PARSEROPT = { "PARSEROPT",
+    "encoding=UTF-8,lines=true,format=verbose,header=false,separator=comma" };
 
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };
@@ -157,7 +158,7 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Language for full-text search index. */
-  public static final Object[] LANGUAGE = { "LANGUAGE", "" };
+  public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
   /** Flag for full-text scoring algorithm.
       Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] SCORING = { "SCORING", 0 };

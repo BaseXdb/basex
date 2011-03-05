@@ -244,15 +244,12 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public void insert(final int pre, final byte[] entries) {
-
-    if(entries.length <= 0) return;
-
+    if(entries.length == 0) return;
 
     // number of records to be inserted:
     final int nr = entries.length >>> IO.NODEPOWER;
     meta.size += nr;
     dirty = true;
-
 
     // go to the block and find the offset within the block where the new
     // records will be inserted:
@@ -262,7 +259,6 @@ public final class TableDiskAccess extends TableAccess {
     final int nold = npre - fpre << IO.NODEPOWER;
     // number of bytes occupied by old records which will be after the new ones:
     final int nlast = nold - split;
-
 
     // special case: all entries fit in the current block:
     if(nold + entries.length <= IO.BLOCKSIZE) {
@@ -277,20 +273,17 @@ public final class TableDiskAccess extends TableAccess {
       return;
     }
 
-
     // append old entries at the end of the new entries:
     // [DP] the following can be optimized to avoid copying arrays:
     final byte[] all = new byte[entries.length + nlast];
     System.arraycopy(entries, 0, all, 0, entries.length);
     System.arraycopy(bf.data, split, all, entries.length, nlast);
 
-
     // fill in the current block with new entries:
     // number of bytes which can fit in the first block:
     int n = bf.data.length - split;
     System.arraycopy(all, 0, bf.data, split, n);
     bf.dirty = true;
-
 
     // resize fpres and pages:
     // number of blocks needed to store the remaining entries:
@@ -308,7 +301,6 @@ public final class TableDiskAccess extends TableAccess {
     Array.move(fpres, index + 1, neededBlocks, blocks - index - 1);
     Array.move(pages, index + 1, neededBlocks, blocks - index - 1);
 
-
     // write the all remaining entries:
     while(n < all.length) {
       getFreeBlock();
@@ -319,7 +311,6 @@ public final class TableDiskAccess extends TableAccess {
 
     // increment first pre-values of blocks after the last modified block:
     for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
-
 
     // update cached variables:
     fpre = fpres[index];
@@ -370,7 +361,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Fetches the requested block and update pointers.
+   * Fetches the requested block and updates pointers.
    * @param i index number of the block to fetch
    * @param f first entry in that block
    * @param n first entry in the next block
@@ -396,7 +387,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Checks whether the current block needs to be written and write it.
+   * Writes the specified block to disk and resets the dirty flag.
    * @param buf buffer to write
    * @throws IOException I/O exception
    */
@@ -407,7 +398,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Fetches next block.
+   * Fetches the next block.
    */
   private void nextBlock() {
     readBlock(index + 1, npre, index + 2 >= blocks ? meta.size :
@@ -457,10 +448,7 @@ public final class TableDiskAccess extends TableAccess {
   /** Free the current buffer. */
   private void flushCurrentBuffer() {
     try {
-      if(bf.dirty) {
-        writeBlock(bf);
-        bf.dirty = false;
-      }
+      if(bf.dirty) writeBlock(bf);
     } catch(final IOException ex) {
       Util.stack(ex);
     }

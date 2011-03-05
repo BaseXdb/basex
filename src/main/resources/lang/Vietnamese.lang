@@ -58,10 +58,6 @@ dc_choose=Nhập vào tệp hoặc thư mục
 dc_pattern=File patterns (separated by commas)
 dc_name=Tện cơ sở dữ liệu
 dc_target=Target Path
-dc_xmldesc=Văn bản XML
-dc_zipdesc=Văn bản XML nén Zip
-dc_gzdesc=Văn bản XML nén GZip
-dc_xqdesc=Những tệp XQuery
 dc_advtitle=Tạo cơ sở dữ liệu
 dc_chop=Cắt hết khoảng trống
 dc_intparse=Sử dụng bộ phân tích XML nội bộ
@@ -100,7 +96,7 @@ dc_names=Tên
 dc_index=Indexes
 dc_meta=Metadata
 dc_ft=Nội dung
-dc_headerinfo=Switch this option on to use a header
+dc_headerinfo=Parse first line as table header
 dc_linesinfo=Splits input into lines
 dc_forminfo=XML format
 dc_separatorinfo=Separator
@@ -532,7 +528,12 @@ ch_create5=creates the specified index
 ch_create6=creates filesystem database [%] for [%]
 ch_create7=(using [%] and [%] if FUSE is activated)
 ch_create8=creates the specified user
+<<<<<<< HEAD
 ch_create9=creates the trigger
+=======
+ch_check1=Open or create database.
+ch_check2=Opens an existing database or creates a new instance.
+>>>>>>> refs/remotes/origin/master
 ch_add1=Add document to database.
 ch_add2=Adds [%] as [%] into [%].
 ch_delete1=Delete documents from database.

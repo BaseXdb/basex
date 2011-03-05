@@ -1,6 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
+import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -13,6 +15,8 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Info functions.
@@ -53,7 +57,14 @@ final class FNInfo extends Fun {
         throw ex;
       case TRACE:
         val = expr[0].value(ctx);
-        ctx.evalInfo(checkEStr(expr[1], ctx), val.toString());
+        final TokenBuilder tb = new TokenBuilder();
+        tb.add(checkEStr(expr[1], ctx)).add(val.toString());
+        // if GUI is used, or if user is no admin, trace info is cached
+        if(Prop.gui || !ctx.context.user.perm(User.ADMIN)) {
+          ctx.evalInfo(tb.finish());
+        } else {
+          Util.errln(tb);
+        }
         return val.iter();
       case ENVS:
         final ItemCache ir = new ItemCache();

@@ -59,6 +59,8 @@ public final class ServerProcess extends Thread {
   private int id;
   /** Running of thread. */
   private boolean running;
+  /** Socket for triggering. */
+  public Socket tsocket;
   /** Output for triggering. */
   public PrintOutput tout;
 
@@ -407,11 +409,12 @@ public final class ServerProcess extends Thread {
     for(final QueryProcess q : queries.values()) {
       try { q.close(true); } catch(final IOException ex) { }
     }
-    // remove this from all triggers in pool
-    if(triggers != null) {
-      context.triggers.remove(this, triggers);
-    }
     try {
+      // remove this sessions from all triggers in pool
+      if(triggers != null) {
+        tsocket.close();
+        context.triggers.remove(this, triggers);
+      }
       new Close().execute(context);
       if(cmd != null) cmd.stop();
       context.delete(this);

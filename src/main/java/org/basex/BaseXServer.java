@@ -327,6 +327,7 @@ public class BaseXServer extends Main implements Runnable {
           String id = buf.readString();
           for(ServerProcess s : context.sessions) {
             if(String.valueOf(s.getId()).equals(id)) {
+              s.tsocket = socket;
               s.tout = PrintOutput.get(socket.getOutputStream());
             }
           }

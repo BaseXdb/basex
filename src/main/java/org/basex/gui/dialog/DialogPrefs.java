@@ -58,7 +58,7 @@ public final class DialogPrefs extends Dialog {
     final BaseXBack pp = new BaseXBack(new TableLayout(11, 1));
     pp.add(new BaseXLabel(DATABASEPATH, true, true));
 
-    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.gprop;

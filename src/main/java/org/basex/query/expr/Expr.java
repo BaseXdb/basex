@@ -15,7 +15,8 @@ import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
 /**
- * Abstract expression.
+ * Abstract class for representing XQuery expressions.
+ * Expression are divided into {@link ParseExpr} and {@link Value} classes.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -41,7 +42,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Optimizes and compiles the expression.
+   * Compiles and optimizes the expression, assigns data types and
+   * cardinalities.
    * @param ctx query context
    * @return optimized Expression
    * @throws QueryException query exception
@@ -51,7 +53,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
    * If this method is not overwritten, {@link #item} must be implemented
-   * by an expression, as it will be called by this method.
+   * by an expression, as it may be called by this method.
    * @param ctx query context
    * @return resulting item
    * @throws QueryException query exception
@@ -62,7 +64,7 @@ public abstract class Expr extends ExprInfo {
    * Evaluates the expression and returns the resulting item or
    * a {@code null} reference, if the expression yields an empty sequence.
    * If this method is not overwritten, {@link #iter} must be implemented
-   * by an expression, as it will be called by this method.
+   * by an expression, as it may be called by this method.
    * @param ctx query context
    * @param ii input info
    * @return iterator

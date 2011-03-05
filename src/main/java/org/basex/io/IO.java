@@ -22,24 +22,26 @@ public abstract class IO {
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery file suffix. */
   public static final String XQSUFFIX = ".xq";
-  /** XQuery file suffix. */
-  public static final String XQUERYSUFFIX = ".xquery";
-  /** XQuery file suffix. */
-  public static final String XQMSUFFIX = ".xqm";
-  /** XQuery file suffix. */
-  public static final String XQYSUFFIX = ".xqy";
-  /** XQuery file suffix. */
-  public static final String XQLSUFFIX = ".xql";
-  /** XQuery suffixes. */
-  public static final String[] XQSUFFIXES = {
-    XQSUFFIX, XQMSUFFIX, XQYSUFFIX, XQLSUFFIX, XQUERYSUFFIX
-  };
   /** XML file suffix. */
   public static final String XMLSUFFIX = ".xml";
   /** ZIP file suffix. */
   public static final String ZIPSUFFIX = ".zip";
+  /** CSV file suffix. */
+  public static final String CSVSUFFIX = ".csv";
+  /** Text file suffix. */
+  public static final String TXTSUFFIX = ".txt";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
+
+  /** XQuery suffixes. */
+  public static final String[] XQSUFFIXES =
+    { XQSUFFIX, ".xqm", ".xqy", ".xql", ".xquery" };
+  /** ZIP suffixes. */
+  public static final String[] ZIPSUFFIXES =
+    { ZIPSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods" };
+  /** HTML suffixes. */
+  public static final String[] HTMLSUFFIXES =
+    { ".xhtml", ".html", ".htm" };
 
   /** Disk block/page size. */
   public static final int BLOCKSIZE = 1 << 12;
