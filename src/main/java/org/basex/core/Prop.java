@@ -16,13 +16,12 @@ public final class Prop extends AProp {
 
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");
-  /** File separator string. */
-  public static final String SEP = System.getProperty("file.separator");
   /** Returns the system's default encoding. */
   public static final String ENCODING = System.getProperty("file.encoding");
 
   /** System's temporary directory. */
-  public static final String TMP = System.getProperty("java.io.tmpdir") + SEP;
+  public static final String TMP =
+    (System.getProperty("java.io.tmpdir") + "/").replaceAll("[\\\\/]+", "/");
 
   /** OS flag (should be ignored whenever possible). */
   public static final String OS = System.getProperty("os.name").toUpperCase();
@@ -32,7 +31,7 @@ public final class Prop extends AProp {
   public static final boolean WIN = OS.startsWith("WIN");
 
   /** Directory for storing the property files, database directory, etc. */
-  public static final String HOME = Util.homeDir() + SEP;
+  public static final String HOME = Util.homeDir() + '/';
 
   // The following properties will be saved to disk:
 
