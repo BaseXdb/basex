@@ -1742,6 +1742,7 @@ public class QueryParser extends InputParser {
       final Var[] vars = partial(args);
       final Expr f = ctx.funcs.get(name, args, ctx, this);
       if(f == null) error(FUNCUNKNOWN, fn);
+      f.isFun(null);
       return new LitFunc(input(), name, f, vars);
     }
 
@@ -2356,8 +2357,8 @@ public class QueryParser extends InputParser {
 
     if(t == null) {
       if(atom) error(TYPEUNKNOWN, type);
-      error(NOTYPE, new TokenBuilder(type.atom()).add(
-          type.atom()).add('(').add(tok.finish()).add(')'));
+      error(NOTYPE, new TokenBuilder(type.atom()).add('(').add(
+          tok.finish()).add(')'));
     }
 
     return t;

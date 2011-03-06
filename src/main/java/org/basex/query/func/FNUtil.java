@@ -304,8 +304,7 @@ final class FNUtil extends Fun {
     try {
       return new Hex(MessageDigest.getInstance(algo).digest(str));
     } catch(final NoSuchAlgorithmException ex) {
-      Util.notexpected(ex);
-      return null;
+      throw Util.notexpected(ex);
     }
   }
 

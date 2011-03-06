@@ -14,7 +14,6 @@ import java.util.List;
 import org.basex.core.Prop;
 import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
-import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.PrintOutput;
 import org.basex.io.TextInput;
@@ -259,7 +258,7 @@ final class FNFile extends Fun {
     if(enc != null && !Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
 
     try {
-      return Str.get(TextInput.content(IO.get(path.getPath()), enc).finish());
+      return Str.get(TextInput.content(new IOFile(path), enc).finish());
     } catch(final IOException ex) {
       throw FILEERROR.thrw(input, ex);
     }

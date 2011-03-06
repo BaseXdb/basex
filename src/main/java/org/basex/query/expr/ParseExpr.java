@@ -167,11 +167,11 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a string.
-   * Returns a token representation or an exception.
+   * Checks if the specified expression yields a double.
+   * Returns the double or throws an exception.
    * @param e expression to be checked
    * @param ctx query context
-   * @return item
+   * @return double
    * @throws QueryException query exception
    */
   public final double checkDbl(final Expr e, final QueryContext ctx)

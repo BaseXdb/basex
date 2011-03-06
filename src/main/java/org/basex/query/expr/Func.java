@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.FunType;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -28,6 +30,8 @@ public class Func extends Single {
   public final boolean declared;
   /** Updating flag. */
   public boolean updating;
+  /** Function type, lazily initialized. */
+  private FunType ft;
 
   /**
    * Function constructor.
@@ -80,6 +84,17 @@ public class Func extends Single {
     final Value v = expr.value(ctx);
     ctx.value = cv;
     return (var.type != null ? var.type.cast(v, ctx, input) : v).iter(ctx);
+  }
+
+  @Override
+  public FunType funType() {
+    if(ft == null) {
+      final SeqType[] arg = new SeqType[args.length];
+      for(int i = 0; i < args.length; i++)
+        arg[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
+      ft = FunType.get(arg, var.type == null ? SeqType.ITEM_ZM : var.type);
+    }
+    return ft;
   }
 
   @Override

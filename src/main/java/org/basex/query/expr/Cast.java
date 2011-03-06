@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
@@ -54,6 +55,11 @@ public final class Cast extends Single {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return type.cast(expr, this, ctx);
+  }
+
+  @Override
+  public FunType funType() {
+    return FunType.get(new SeqType[]{ SeqType.AAT_ZO }, type);
   }
 
   @Override

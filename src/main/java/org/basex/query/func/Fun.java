@@ -8,6 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Atm;
+import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
@@ -24,6 +25,8 @@ import org.basex.util.TokenBuilder;
 public abstract class Fun extends Arr {
   /** Function definition. */
   public FunDef def;
+  /** Function type, lazily initialized. */
+  private FunType ftype;
 
   /**
    * Constructor.
@@ -44,7 +47,14 @@ public abstract class Fun extends Arr {
     // skip functions based on context or with non-values as arguments
     if(uses(Use.CTX) || !values()) return optPre(cmp(ctx), ctx);
     // pre-evaluate function
-    return optPre(def.ret.zeroOrOne() ? item(ctx, input) : value(ctx), ctx);
+    return optPre(def.ret.zeroOrOne() ?
+        item(ctx, input) : value(ctx), ctx);
+  }
+
+  @Override
+  public FunType funType() {
+    if(ftype == null) ftype = def.type(expr.length);
+    return ftype;
   }
 
   /**

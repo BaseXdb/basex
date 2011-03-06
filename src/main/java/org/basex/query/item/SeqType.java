@@ -63,25 +63,35 @@ public final class SeqType {
   /** Zero items. */
   public static final SeqType ITEM_Z = new SeqType(AtomType.ITEM, Occ.Z);
   /** Single item. */
-  public static final SeqType ITEM = new SeqType(AtomType.ITEM);
+  public static final SeqType ITEM = AtomType.ITEM.seq();
   /** Zero or one item. */
   public static final SeqType ITEM_ZO = new SeqType(AtomType.ITEM, Occ.ZO);
   /** Zero or more items. */
   public static final SeqType ITEM_ZM = new SeqType(AtomType.ITEM, Occ.ZM);
   /** One or more items. */
   public static final SeqType ITEM_OM = new SeqType(AtomType.ITEM, Occ.OM);
+  /** Zero or one xs:anyAtomicType. */
+  public static final SeqType AAT = AtomType.AAT.seq();
+  /** Zero or one xs:anyAtomicType. */
+  public static final SeqType AAT_ZO = new SeqType(AtomType.AAT, Occ.ZO);
+  /** Zero or more xs:anyAtomicType. */
+  public static final SeqType AAT_ZM = new SeqType(AtomType.AAT, Occ.ZM);
   /** Single boolean. */
-  public static final SeqType BLN = new SeqType(AtomType.BLN);
+  public static final SeqType BLN = AtomType.BLN.seq();
   /** Zero or one booleans. */
   public static final SeqType BLN_ZO = new SeqType(AtomType.BLN, Occ.ZO);
   /** Single Base64Binary. */
-  public static final SeqType B64 = new SeqType(AtomType.B64);
+  public static final SeqType B64 = AtomType.B64.seq();
   /** Double number. */
-  public static final SeqType DBL = new SeqType(AtomType.DBL);
+  public static final SeqType DBL = AtomType.DBL.seq();
   /** Float number. */
-  public static final SeqType FLT = new SeqType(AtomType.FLT);
+  public static final SeqType FLT = AtomType.FLT.seq();
+  /** Zero or one double. */
+  public static final SeqType DBL_ZO = new SeqType(AtomType.DBL, Occ.ZO);
+  /** Zero or one decimal number. */
+  public static final SeqType DEC_ZO = new SeqType(AtomType.DEC, Occ.ZO);
   /** Single number; for simplicity, numbers are summarized by this type. */
-  public static final SeqType ITR = new SeqType(AtomType.ITR);
+  public static final SeqType ITR = AtomType.ITR.seq();
   /** Zero or one number. */
   public static final SeqType ITR_ZO = new SeqType(AtomType.ITR, Occ.ZO);
   /** Zero or more numbers. */
@@ -89,7 +99,7 @@ public final class SeqType {
   /** One or more numbers. */
   public static final SeqType ITR_OM = new SeqType(AtomType.ITR, Occ.OM);
   /** Single node. */
-  public static final SeqType NOD = new SeqType(NodeType.NOD);
+  public static final SeqType NOD = NodeType.NOD.seq();
   /** Zero or one nodes. */
   public static final SeqType NOD_ZO = new SeqType(NodeType.NOD, Occ.ZO);
   /** Zero or more nodes. */
@@ -97,7 +107,7 @@ public final class SeqType {
   /** One or more nodes. */
   public static final SeqType NOD_OM = new SeqType(NodeType.NOD, Occ.OM);
   /** Single QName. */
-  public static final SeqType QNM = new SeqType(AtomType.QNM);
+  public static final SeqType QNM = AtomType.QNM.seq();
   /** Zero or one QNames. */
   public static final SeqType QNM_ZO = new SeqType(AtomType.QNM, Occ.ZO);
   /** Zero or one URIs. */
@@ -105,21 +115,53 @@ public final class SeqType {
   /** Zero or more URIs. */
   public static final SeqType URI_ZM = new SeqType(AtomType.URI, Occ.ZM);
   /** Single URI. */
-  public static final SeqType URI = new SeqType(AtomType.URI);
+  public static final SeqType URI = AtomType.URI.seq();
   /** Single string. */
-  public static final SeqType STR = new SeqType(AtomType.STR);
+  public static final SeqType STR = AtomType.STR.seq();
   /** Zero or one strings. */
   public static final SeqType STR_ZO = new SeqType(AtomType.STR, Occ.ZO);
   /** Zero or more strings. */
   public static final SeqType STR_ZM = new SeqType(AtomType.STR, Occ.ZM);
+  /** Zero or one NCName. */
+  public static final SeqType NCN_ZO = new SeqType(AtomType.NCN, Occ.ZO);
+  /** One xs:hexBinary. */
+  public static final SeqType HEX = AtomType.HEX.seq();
   /** Single date. */
-  public static final SeqType DAT = new SeqType(AtomType.DAT);
+  public static final SeqType DAT = AtomType.DAT.seq();
+  /** Zero or one date. */
+  public static final SeqType DAT_ZO = new SeqType(AtomType.DAT, Occ.ZO);
   /** Zero or more dates. */
   public static final SeqType DAT_ZM = new SeqType(AtomType.DAT, Occ.ZM);
+  /** One day-time-duration. */
+  public static final SeqType DTD = AtomType.DTD.seq();
+  /** Zero or one day-time-duration. */
+  public static final SeqType DTD_ZO = new SeqType(AtomType.DTD, Occ.ZO);
+  /** One date-time. */
+  public static final SeqType DTM = AtomType.DTM.seq();
+  /** Zero or one date-time. */
+  public static final SeqType DTM_ZO = new SeqType(AtomType.DTM, Occ.ZO);
+  /** One time. */
+  public static final SeqType TIM = AtomType.TIM.seq();
+  /** Zero or one time. */
+  public static final SeqType TIM_ZO = new SeqType(AtomType.TIM, Occ.ZO);
+  /** One duration. */
+  public static final SeqType DUR = AtomType.DUR.seq();
+  /** Zero or one duration. */
+  public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZO);
   /** Single function. */
   public static final SeqType FUN_O = new SeqType(FunType.ANY, Occ.O);
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZM);
+  /** One document node. */
+  public static final SeqType DOC_O = NodeType.DOC.seq();
+  /** Zero or one document node. */
+  public static final SeqType DOC_ZO = new SeqType(NodeType.DOC, Occ.ZO);
+  /** One element node. */
+  public static final SeqType ELM = NodeType.ELM.seq();
+  /** Zero or one element node. */
+  public static final SeqType ELM_ZO = new SeqType(NodeType.ELM, Occ.ZO);
+  /** Zero or more element nodes. */
+  public static final SeqType ELM_ZM = new SeqType(NodeType.ELM, Occ.ZM);
 
   /** Sequence type. */
   public final Type type;
@@ -138,6 +180,15 @@ public final class SeqType {
   }
 
   /**
+   * Constructor. This one is only called by {@link Type#seq} to create
+   * unique sequence type instances.
+   * @param t type
+   */
+  SeqType(final Type t) {
+    this(t, Occ.O);
+  }
+
+  /**
    * Private constructor.
    * @param t type
    * @param o occurrences
@@ -147,15 +198,6 @@ public final class SeqType {
     type = t;
     occ = t == AtomType.EMP ? Occ.Z : t == AtomType.SEQ ? Occ.OM : o;
     ext = e;
-  }
-
-  /**
-   * Constructor. This one is only called by {@link Type#seq} to create
-   * unique sequence type instances.
-   * @param t type
-   */
-  SeqType(final Type t) {
-    this(t, Occ.O);
   }
 
   /**

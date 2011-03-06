@@ -73,6 +73,20 @@ public class HigherOrderTest extends AdvancedQueryTest {
         "<h1/><p/><h1/>");
   }
 
+  /**
+   * Test for name heavy currying.
+   * @throws QueryException exception
+   */
+  @Test
+  public void typeTest() throws QueryException {
+    query("declare function local:f($x as xs:long, $y as xs:NCName)" +
+        "    as element(e) {" +
+        "  <e x='{$x}' y='{$y}'/>" +
+        "};" +
+        "local:f#2 instance of function(xs:long, xs:NCName) as element(e)",
+        "true");
+  }
+
   /**  Test for name heavy currying. */
   @Test
   public void placeHolderTest() {

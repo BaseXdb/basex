@@ -21,9 +21,9 @@ public final class FunType implements Type {
   public static final FunType ANY = new FunType(null, null);
 
   /** Argument types. */
-  private final SeqType[] args;
+  public final SeqType[] args;
   /** Return type. */
-  private final SeqType ret;
+  public final SeqType ret;
 
   /** This function type's sequence type. */
   private SeqType seq;

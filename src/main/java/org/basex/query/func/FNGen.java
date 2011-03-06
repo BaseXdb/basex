@@ -152,14 +152,14 @@ final class FNGen extends Fun {
   private Item put(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
-    final Item it = checkNode(checkEmpty(expr[0].item(ctx, input)));
+    final ANode nd = checkNode(checkEmpty(expr[0].item(ctx, input)));
 
-    if(it == null || it.type != NodeType.DOC && it.type != NodeType.ELM)
+    if(nd == null || nd.type != NodeType.DOC && nd.type != NodeType.ELM)
       UPFOTYPE.thrw(input, expr[0]);
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.valid()) UPFOURI.thrw(input, file);
-    ctx.updates.add(new Put(input, (ANode) it, u, ctx), ctx);
+    ctx.updates.add(new Put(input, nd, u, ctx), ctx);
 
     return null;
   }

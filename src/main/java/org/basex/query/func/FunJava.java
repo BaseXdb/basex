@@ -20,6 +20,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Empty;
+import org.basex.query.item.FunType;
 import org.basex.query.item.Jav;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.AtomType;
@@ -247,6 +248,12 @@ public final class FunJava extends Arr {
       for(final Object o : (Object[]) res) ir.add(new Jav(o));
     }
     return ir;
+  }
+
+  @Override
+  public FunType funType() {
+    // [LW] propagate type
+    return super.funType();
   }
 
   @Override
