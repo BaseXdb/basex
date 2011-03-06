@@ -1,11 +1,14 @@
 package org.basex.query.util;
 
-import static org.basex.data.DataText.*;
 import static java.lang.Integer.*;
 import static java.net.HttpURLConnection.*;
+import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
@@ -23,25 +27,29 @@ import org.basex.io.IOContent;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
+import org.basex.query.item.ANode;
 import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.AxisIter;
+import org.basex.query.iter.NodeMore;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
+
+import com.sun.xml.internal.bind.v2.TODO;
 
 /**
  * HTTP Client.
- *
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -76,6 +84,12 @@ public final class HttpClient {
 
   /** http:multipart element. */
   private static final byte[] MULTIPART = token("http:multipart");
+  /** boundary marker. */
+  private static final byte[] BOUNDARY = token("boundary");
+  /** Carriage return/linefeed. */
+  private static final byte[] CRLF = token("\r\n");
+  /** Default multipart boundary. */
+  private static final String DEFAULT_BOUND = "1BEF0A57BE110FD467A";
 
   /** Body element. */
   /** http:body element. */
@@ -99,13 +113,11 @@ public final class HttpClient {
   /** XML media type. */
   private static final byte[] APPL_XML = token("application/xml");
   /** XML media type. */
-  private static final byte[] APPL_EXT_XML =
-    token("application/xml-external-parsed-entity");
+  private static final byte[] APPL_EXT_XML = token("application/xml-external-parsed-entity");
   /** XML media type. */
   private static final byte[] TXT_XML = token("text/xml");
   /** XML media type. */
-  private static final byte[] TXT_EXT_XML =
-    token("text/xml-external-parsed-entity");
+  private static final byte[] TXT_EXT_XML = token("text/xml-external-parsed-entity");
   /** XML media types' suffix. */
   private static final byte[] MIME_XML_SUFFIX = token("+xml");
   /** HTML media type. */
@@ -120,72 +132,38 @@ public final class HttpClient {
   /** HTTP basic authentication. */
   private static final String AUTH_BASIC = "Basic ";
 
-  /** Attributes. */
+  /** Request attributes. */
   private final TokenMap reqAttrs;
-  /** Headers. */
+  /** Request headers. */
   private final TokenMap headers;
-  /** Multipart; currently not used. */
-  @SuppressWarnings("unused")
-  private ANode multipart;
-  /** Body. */
-  private ANode body;
-
+  /** Request content - body or multipart. */
+  private ANode content;
+  /** Body/Multipart attributes. */
+  private final TokenMap contentAttrs;
   /** Input info. */
   private final InputInfo info;
+  private boolean isMultipart;
+  //private final HttpRequestor req;
 
   /**
    * Constructor.
-   * @param request request element
-   * @param href HTTP uri
+   * @param request XQuery request element
+   * @param href request URI
    * @param ii input info
    * @throws QueryException query exception
    */
   public HttpClient(final ANode request, final byte[] href, final InputInfo ii)
       throws QueryException {
-
     info = ii;
-    reqAttrs = new TokenMap();
+    reqAttrs = getAttrs(request);
     headers = new TokenMap();
-    readRequestAttributes(request);
-    readRequestChildren(request, ii);
+    // TODO error when href is set neither in http:request, neither as a
+    // separate parameter
     if(href != null) reqAttrs.add(HREF, href);
-  }
-
-  /**
-   * Scans the attributes of the http:request element.
-   * @param request request element
-   * @throws QueryException query exception
-   */
-  private void readRequestAttributes(final ANode request)
-      throws QueryException {
-
-    final AxisIter ai = request.atts();
-    ANode n = null;
-    while((n = ai.next()) != null) reqAttrs.add(n.nname(), n.atom());
-
-    // If authorization is to be sent, check that both user name and password
-    // are provided
-    final byte[] sendAuth = reqAttrs.get(SENDAUTH);
-    if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
-      final byte[] usrname = reqAttrs.get(USRNAME);
-      final byte[] passwd = reqAttrs.get(PASSWD);
-      if(usrname == null ^ passwd != null) CREDSERR.thrw(info);
-    }
-  }
-
-  /**
-   * Reads the children of the http:request element.
-   * @param request request element
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private void readRequestChildren(final ANode request, final InputInfo ii)
-      throws QueryException {
-
     final AxisIter ai = request.children();
     ANode n = null;
     while((n = ai.next()) != null) {
-      // Header children
+      // Request headers
       if(eq(n.nname(), HEADER)) {
         final AxisIter attrs = n.atts();
         ANode attr = null;
@@ -202,16 +180,28 @@ public final class HttpClient {
             break;
           }
         }
+
       } else if(eq(n.nname(), MULTIPART)) {
-        // [RS] not supported yet
-        multipart = n;
-      } else if(eq(n.nname(), BODY)) {
-        body = n;
-      } else {
-        // Body child
-        throw REQINV.thrw(ii);
-      }
+        content = n;
+        isMultipart = true;
+      } else if(eq(n.nname(), BODY)) content = n;
+      else ELMINV.thrw(ii);
     }
+    contentAttrs = getAttrs(content);
+    checkMandatory(ii);
+  }
+
+  /**
+   * Checks mandatory attributes.
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  private void checkMandatory(final InputInfo ii) throws QueryException {
+    if(reqAttrs.get(HREF) == null) MANDATTR.thrw(ii, string(HREF),
+        "http:request");
+    // TODO: correct message
+    if(contentAttrs.get(MEDIATYPE) == null) MANDATTR.thrw(ii,
+        string(MEDIATYPE), "http:body/multipart");
   }
 
   /**
@@ -221,7 +211,16 @@ public final class HttpClient {
    * @throws QueryException query exception
    */
   public Iter sendHttpRequest(final QueryContext ctx) throws QueryException {
-    final String adr = string(reqAttrs.get(HREF));
+
+    checkAuth();
+
+    // TODO: Must check if href is provided and if not -> error msg
+    final byte[] href = reqAttrs.get(HREF);
+    final String adr = href == null ? null : string(reqAttrs.get(HREF));
+    if(adr == null) {
+      NOURL.thrw(info);
+      return null;
+    }
     try {
       final URL url = new URL(adr);
       final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -229,8 +228,11 @@ public final class HttpClient {
       try {
         setConnectionProps(conn);
         setHttpRequestHeaders(conn);
-        if(body != null) setHttpRequestContent(conn);
-        conn.getResponseCode();
+
+        if(content != null) {
+          setContentType(conn);
+          setHttpRequestContent(conn.getOutputStream());
+        }
         return getHttpResponse(conn, ctx);
       } finally {
         conn.disconnect();
@@ -245,6 +247,20 @@ public final class HttpClient {
   }
 
   /**
+   * Checks authorization.
+   * @throws QueryException query exception
+   */
+  private void checkAuth() throws QueryException {
+    final byte[] sendAuth = reqAttrs.get(SENDAUTH);
+    if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
+      final byte[] usrname = reqAttrs.get(USRNAME);
+      final byte[] passwd = reqAttrs.get(PASSWD);
+
+      if(usrname == null && passwd != null || usrname != null && passwd == null) CREDSERR.thrw(info);
+    }
+  }
+
+  /**
    * Sets the connection properties.
    * @param conn HTTP connection
    * @throws ProtocolException protocol exception
@@ -252,12 +268,31 @@ public final class HttpClient {
    */
   private void setConnectionProps(final HttpURLConnection conn)
       throws ProtocolException, QueryException {
-    if(body != null) conn.setDoOutput(true);
+    if(content != null) conn.setDoOutput(true);
     conn.setRequestMethod(string(reqAttrs.get(METHOD)).toUpperCase());
-    if(reqAttrs.get(TIMEOUT) != null)
-      conn.setConnectTimeout(parseInt(string(reqAttrs.get(TIMEOUT))));
-    if(reqAttrs.get(REDIR) != null)
-      setFollowRedirects(Bln.parse(reqAttrs.get(REDIR), info));
+    // TODO: Investigate more about timeout
+    if(reqAttrs.get(TIMEOUT) != null) conn.setConnectTimeout(parseInt(string(reqAttrs.get(TIMEOUT))));
+    // TODO: Investigate more about follow-redirects
+    if(reqAttrs.get(REDIR) != null) setFollowRedirects(Bln.parse(
+        reqAttrs.get(REDIR), info));
+  }
+
+  /**
+   * Sets content type of HTTP request.
+   * @param conn http connection
+   */
+  private void setContentType(final HttpURLConnection conn) {
+    final String mediaType = string(contentAttrs.get(MEDIATYPE));
+    if(mediaType.startsWith("multipart")) {
+      final String boundary = (contentAttrs.get(BOUNDARY) != null) ? string(contentAttrs.get(BOUNDARY))
+          : DEFAULT_BOUND;
+      StringBuilder sb = new StringBuilder();
+      sb.append(mediaType).append("; ").append("boundary=").append(boundary);
+      conn.setRequestProperty(CONT_TYPE, sb.toString());
+    } else {
+      conn.setRequestProperty(CONT_TYPE, mediaType);
+    }
+
   }
 
   /**
@@ -266,7 +301,7 @@ public final class HttpClient {
    * @throws QueryException query exception
    */
   private void setHttpRequestHeaders(final HttpURLConnection conn)
-    throws QueryException {
+      throws QueryException {
 
     final byte[][] headerNames = headers.keys();
 
@@ -275,42 +310,70 @@ public final class HttpClient {
           string(headers.get(headerName)));
     // HTTP Basic Authentication
     final byte[] sendAuth = reqAttrs.get(SENDAUTH);
-    if(sendAuth != null && Bln.parse(sendAuth, info))
-      conn.setRequestProperty(
-          AUTH,
-          encodeCredentials(
-              string(reqAttrs.get(USRNAME)),
-              string(reqAttrs.get(PASSWD))));
+    // TODO: more test cases w/o username, sendauth, pass
+    if(sendAuth != null && Bln.parse(sendAuth, info)) conn.setRequestProperty(
+        AUTH,
+        encodeCredentials(string(reqAttrs.get(USRNAME)),
+            string(reqAttrs.get(PASSWD))));
   }
 
   /**
-   * Sets the content of the HTTP request.
-   * @param conn HTTP connection
+   * @param out output stream
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void setHttpRequestContent(final HttpURLConnection conn)
-      throws IOException {
+  private void setHttpRequestContent(final OutputStream out)
+      throws QueryException, IOException {
+    if(isMultipart) {
+      writeMultipartContent(content, out);
+    } else {
+      writeBody(content, out);
+    }
+  }
 
-    final AxisIter attrs = body.atts();
+  /**
+   * Returns the attributes of an element.
+   * @param element element
+   * @return map with attributes' names and values
+   * @throws QueryException query exception
+   */
+  private static TokenMap getAttrs(final ANode element) throws QueryException {
+    final TokenMap attrsMap = new TokenMap();
+    final AxisIter attrs = element.atts();
+    ANode attr = null;
+    while((attr = attrs.next()) != null) {
+      attrsMap.add(attr.nname(), attr.atom());
+    }
+    return attrsMap;
+  }
+
+  /**
+   * Writes the content of a body element in the output stream of the URL
+   * connection.
+   * @param attrs body element attributes
+   * @param out output stream
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private static void writeBody(final ANode body, final OutputStream out)
+      throws QueryException, IOException {
+    final TokenMap attrs = getAttrs(body);
     final StringBuilder sb = new StringBuilder();
-
-    byte[] mediaType = null;
+    byte[] mediaType = attrs.get(MEDIATYPE);
     String src = null;
     String method = null;
 
-    ANode attr = null;
-    while((attr = attrs.next()) != null) {
-      if(eq(attr.nname(), MEDIATYPE)) mediaType = attr.atom();
-      else if(eq(attr.nname(), SRC)) src = string(attr.atom());
-      else if(eq(attr.nname(), METHOD)) method = string(attr.atom());
-      else sb.append(string(attr.nname())).append('=').append(
-          string(attr.atom()));
+    for(int i = 0; i < attrs.size(); i++) {
+      byte[] key = attrs.keys()[i];
+      if(eq(key, MEDIATYPE)) mediaType = attrs.get(key);
+      else if(eq(key, SRC)) src = string(attrs.get(key));
+      else if(eq(key, METHOD)) method = string(attrs.get(key));
+      sb.append(string(key)).append("=").append(string(attrs.get(key)));
     }
-
-    conn.setRequestProperty(CONT_TYPE, string(mediaType));
 
     if(src == null) {
       // Set serial parameter "method" according to MIME type
+      if(sb.length() != 0) sb.append(',');
       sb.append("method=");
       if(method == null) {
         if(eq(mediaType, APPL_XHTML)) sb.append(M_XHTML);
@@ -318,8 +381,7 @@ public final class HttpClient {
             || eq(mediaType, TXT_XML) || eq(mediaType, TXT_EXT_XML)
             || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append(M_XML);
         else if(eq(mediaType, TXT_HTML)) sb.append(M_HTML);
-        else if(startsWith(mediaType, MIME_TEXT_PREFIX))
-          sb.append(M_TEXT);
+        else if(startsWith(mediaType, MIME_TEXT_PREFIX)) sb.append(M_TEXT);
         else sb.append(M_XML);
       } else {
         sb.append(method);
@@ -327,20 +389,100 @@ public final class HttpClient {
 
       // Serialize request content according to the
       // serialization parameters
-      final OutputStream out = conn.getOutputStream();
       final SerializerProp serialProp = new SerializerProp(sb.toString());
+
+      final XMLSerializer xml = new XMLSerializer(out, serialProp);
       try {
-        final XMLSerializer xml = new XMLSerializer(out, serialProp);
         final AxisIter ai = body.children();
         ANode child = null;
-        while((child = ai.next()) != null) child.serialize(xml);
+        while((child = ai.next()) != null)
+          child.serialize(xml);
       } finally {
-        out.close();
+        xml.cls();
       }
     } else {
       // [RS] If the src attribute is present, the serialization
       // parameters shall be ignored
     }
+  }
+
+  /**
+   * Writes multipart content in the output stream of the URL connection.
+   * @param multipart multipart element
+   * @param contentAttrs content attributes
+   * @param out output stream
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private void writeMultipartContent(final ANode multipart,
+      final OutputStream out) throws QueryException, IOException {
+
+    // Get parts of http:multipart
+    final AxisIter parts = multipart.children();
+    ANode part = null;
+
+    // Get part headers and body
+    while((part = parts.next()) != null) {
+      AxisIter partChildren = part.children();
+      ANode child = null;
+      TokenMap partHeaders = new TokenMap();
+      ANode partContent = null;
+      while((child = partChildren.next()) != null) {
+        if(eq(child.nname(), HEADER)) {
+          final AxisIter attrs = child.atts();
+          ANode attr = null;
+          byte[] name = null;
+          byte[] value = null;
+
+          while((attr = attrs.next()) != null) {
+            if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
+            if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
+
+            if(name != null && name.length != 0 && value != null
+                && value.length != 0) partHeaders.add(name, value);
+          }
+        } else if(eq(child.nname(), BODY)) {
+          partContent = child;
+        }
+      }
+      writePart(partHeaders, partContent, out, contentAttrs.get(BOUNDARY));
+    }
+
+    // Write closing boundary
+    out.write(new TokenBuilder().add("--".getBytes()).add(
+        contentAttrs.get(BOUNDARY)).add("--").finish());
+  }
+
+  /**
+   * Writes a single part
+   * @param partHeaders part headers
+   * @param partContent part content
+   * @param out connection output stream
+   * @param boundary boundary
+   * @throws IOException
+   * @throws QueryException
+   */
+  private static void writePart(final TokenMap partHeaders,
+      final ANode partContent, final OutputStream out, final byte[] boundary)
+      throws IOException, QueryException {
+    // Write boundary preceded by "--"
+    TokenBuilder boundTb = new TokenBuilder();
+    boundTb.add("--").add(boundary).add(CRLF);
+    out.write(boundTb.finish());
+
+    // Write headers
+    for(final byte[] headerName : partHeaders.keys()) {
+      TokenBuilder hdrTb = new TokenBuilder();
+      hdrTb.add(headerName).add(": ".getBytes()).add(
+          partHeaders.get(headerName)).add(CRLF);
+      out.write(hdrTb.finish());
+    }
+    out.write(CRLF);
+
+    // Write content
+    writeBody(partContent, out);
+    out.write(CRLF);
+
   }
 
   /**
@@ -365,8 +507,8 @@ public final class HttpClient {
     final byte[] attrStatusOnly = reqAttrs.get(STATUSONLY);
 
     // Get response content if required
-    if(attrStatusOnly == null || !Bln.parse(attrStatusOnly, info))
-      iter.add(setResultContent(conn, ctx));
+    if(attrStatusOnly == null || !Bln.parse(attrStatusOnly, info)) iter.add(setResponseContent(
+        conn, ctx));
     return iter;
   }
 
@@ -376,8 +518,8 @@ public final class HttpClient {
    * @param par parent node
    * @throws IOException I/O exception
    */
-  private void setResponseAttrs(final HttpURLConnection conn,
-      final FElem par) throws IOException {
+  private void setResponseAttrs(final HttpURLConnection conn, final FElem par)
+      throws IOException {
 
     final FAttr attrStatus = new FAttr(new QNm(STATUS, QueryTokens.HTTPURI),
         token(conn.getResponseCode()), par);
@@ -394,8 +536,7 @@ public final class HttpClient {
    * @param conn HTTP connection
    * @param par parent node
    */
-  private void setResponseChildren(final HttpURLConnection conn,
-      final FElem par) {
+  private void setResponseChildren(final HttpURLConnection conn, final FElem par) {
 
     // Set header children
     for(final String headerName : conn.getHeaderFields().keySet()) {
@@ -410,8 +551,10 @@ public final class HttpClient {
 
     // Set body child
     final FElem elem = new FElem(new QNm(BODY), par);
-    elem.atts.add(new FAttr(new QNm(MEDIATYPE),
-        token(conn.getContentType()), elem));
+    if(conn.getContentType() != null) {
+      elem.atts.add(new FAttr(new QNm(MEDIATYPE), token(conn.getContentType()),
+          elem));
+    }
     par.children.add(elem);
   }
 
@@ -423,27 +566,27 @@ public final class HttpClient {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private Item setResultContent(final HttpURLConnection conn,
+  private Item setResponseContent(final HttpURLConnection conn,
       final QueryContext ctx) throws IOException, QueryException {
 
-    final byte[] contentType = reqAttrs.get(OVERMEDIATYPE) == null ?
-        token(conn.getContentType()) : reqAttrs.get(OVERMEDIATYPE);
+    final byte[] contentType = reqAttrs.get(OVERMEDIATYPE) == null ? token(conn.getContentType())
+        : reqAttrs.get(OVERMEDIATYPE);
 
     if(eq(contentType, TXT_XML) || eq(contentType, TXT_EXT_XML)
         || eq(contentType, APPL_XML) || eq(contentType, APPL_EXT_XML)
         || endsWith(contentType, MIME_XML_SUFFIX))
-      // Parse XML
-      return processXML(conn, ctx);
+    // Parse XML
+    return processXML(conn, ctx);
     else if(eq(contentType, TXT_HTML)) {
       // Parse HTML
       if(!HTMLParser.available()) throw HTMLERR.thrw(info);
       return processHTML(conn, ctx);
     } else if(startsWith(contentType, MIME_TEXT_PREFIX))
-      // Process text content
-      return Str.get(readHttpContent(conn));
+    // Process text content
+    return Str.get(readHttpContent(conn));
     else
-      // TODO: parse as binary type
-      return null;
+    // TODO: parse as binary type
+    return null;
   }
 
   /**
@@ -489,20 +632,21 @@ public final class HttpClient {
     final int len = conn.getContentLength();
 
     if(len != -1) {
-      final byte[] content = new byte[len];
+      final byte[] responseContent = new byte[len];
       try {
-        input.read(content);
+        input.read(responseContent);
       } finally {
         input.close();
       }
-      return content;
+      return responseContent;
     }
 
     final ByteList bl = new ByteList();
     final BufferedInputStream bis = new BufferedInputStream(input);
     int i = 0;
     try {
-      while((i = bis.read()) != -1) bl.add(i);
+      while((i = bis.read()) != -1)
+        bl.add(i);
     } finally {
       bis.close();
     }
@@ -519,4 +663,5 @@ public final class HttpClient {
     final B64 b64 = new B64(token(usrname + ":" + passwd));
     return AUTH_BASIC + string(b64.atom());
   }
+
 }
