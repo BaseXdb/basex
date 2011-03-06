@@ -1,0 +1,5 @@
+format-number(.11, '.#,#')
+format-number(.11, '.0,0')
+format-number(.11, '0,0.0,0')
+format-number(.123, '.#,##')
+format-number(.123, '.#,#,#')
