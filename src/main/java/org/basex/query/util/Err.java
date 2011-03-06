@@ -191,6 +191,8 @@ public enum Err {
   INVDIG(FORG, 6, "Invalid digit for base %: %."),
   /** FORG0006: Evaluation exception. */
   JAVAERR(FORG, 6, "Java call failed: %."),
+  /** FORG0006: Evaluation exception. */
+  ERRFORM(FORG, 6, "%: %."),
   /** FORG0008: Function exception. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
 

@@ -51,7 +51,7 @@ public final class Array {
   }
 
   /**
-   * Resizes an array and adds an entry at the end.
+   * Adds an entry to the end of an array and returns the new array.
    * @param ar array to be resized
    * @param e entry to be added
    * @param <T> array type
@@ -65,7 +65,7 @@ public final class Array {
   }
 
   /**
-   * Resizes an array and adds an entry at the end.
+   * Adds an entry to the end of an array and returns the new array.
    * @param ar array to be resized
    * @param e entry to be added
    * @return array
