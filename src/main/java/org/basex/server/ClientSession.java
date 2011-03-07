@@ -206,7 +206,7 @@ public final class ClientSession extends Session {
             String val = bi.readString();
             tn.get(name).update(val);
           }
-        }catch(IOException e) { }
+        }catch(Exception e) { }
        }
     }.start();
   }
