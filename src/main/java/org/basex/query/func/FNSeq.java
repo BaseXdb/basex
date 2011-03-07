@@ -1,9 +1,13 @@
 package org.basex.query.func;
 
+import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.ANode;
+import static org.basex.query.item.ANode.kind;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -11,8 +15,10 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.util.ItemSet;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Sequence functions.
@@ -43,15 +49,98 @@ final class FNSeq extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case INDEXOF:  return indexOf(ctx);
-      case DISTINCT: return distinctValues(ctx);
-      case INSBEF:   return insertBefore(ctx);
-      case REVERSE:  return reverse(ctx);
-      case REMOVE:   return remove(ctx);
-      case SUBSEQ:   return subsequence(ctx);
-      case TAIL:     return tail(ctx);
-      default:       return super.iter(ctx);
+      case INDEXOF:   return indexOf(ctx);
+      case DISTINCT:  return distinctValues(ctx);
+      case INSBEF:    return insertBefore(ctx);
+      case REVERSE:   return reverse(ctx);
+      case REMOVE:    return remove(ctx);
+      case SUBSEQ:    return subsequence(ctx);
+      case TAIL:      return tail(ctx);
+      case OUTERMOST: return outermost(ctx);
+      case INNERMOST: return innermost(ctx);
+      default:        return super.iter(ctx);
     }
+  }
+
+  /**
+   * Returns the innermost nodes of a node sequence, i.e. a node is only
+   * contained, if none of its descendants are.
+   * @param ctx query context
+   * @return innermost nodes
+   * @throws QueryException exception
+   */
+  private Iter innermost(final QueryContext ctx) throws QueryException {
+    final Iter iter = expr[0].iter(ctx);
+    final NodeCache nc = new NodeCache().random();
+    for(Item it; (it = iter.next()) != null;) nc.add(checkNode(it));
+    final int len = (int) nc.size();
+
+    // only go further if there's at least one node
+    if(len == 0) return Empty.ITER;
+
+    if(nc.dbnodes()) {
+      // nodes are sorted, so ancestors always come before their descendants
+      // the last node is thus always included in the output
+      final DBNode lst = (DBNode) nc.get(len - 1);
+      final Data data = lst.data;
+      final ANode[] nodes = nc.item.clone();
+      nc.item[0] = lst;
+      nc.size(1);
+
+      // skip ancestors of the last added node
+      int before = lst.pre;
+      for(int i = len - 1; i-- > 0;) {
+        final DBNode nd = (DBNode) nodes[i];
+        if(nd.pre + data.size(nd.pre, kind(nd.type)) < before) {
+          nc.add(nd);
+          before = nd.pre;
+        }
+      }
+    } else {
+      // [LW] multiple documents and/or constructed fragments
+      throw Util.notimplemented("doesn't work yet for constructed nodes");
+    }
+    return nc;
+  }
+
+  /**
+   * Returns the outermost nodes of a node sequence, i.e. a node is only
+   * contained, if none of its ancestors are.
+   * @param ctx query context
+   * @return innermost nodes
+   * @throws QueryException exception
+   */
+  private Iter outermost(final QueryContext ctx) throws QueryException {
+    final Iter iter = expr[0].iter(ctx);
+    final NodeCache nc = new NodeCache().random();
+    for(Item it; (it = iter.next()) != null;) nc.add(checkNode(it));
+    final int len = (int) nc.size();
+
+    // only go further if there's at least one node
+    if(len == 0) return Empty.ITER;
+
+    if(nc.dbnodes()) {
+      // nodes are sorted, so ancestors always come before their descendants
+      // the first node is thus always included in the output
+      final DBNode fst = (DBNode) nc.get(0);
+      final Data data = fst.data;
+      final ANode[] nodes = nc.item.clone();
+      nc.size(1);
+
+      // skip the subtree of the last added node
+      int next = fst.pre + data.size(fst.pre, kind(fst.type));
+      for(int i = 1; i < len; i++) {
+        final DBNode nd = (DBNode) nodes[i];
+        if(nd.pre >= next) {
+          nc.add(nd);
+          next = nd.pre + data.size(nd.pre, kind(nd.type));
+        }
+      }
+    } else {
+      // [LW] multiple documents and/or constructed fragments
+      throw Util.notimplemented("doesn't work yet for constructed nodes");
+    }
+    return nc;
   }
 
   @Override
