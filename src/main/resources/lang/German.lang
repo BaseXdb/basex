@@ -528,12 +528,9 @@ ch_create5=erzeugt den angegebenen Index
 ch_create6=erzeugt eine Filesystem-Datenbank [%] von [%]
 ch_create7=(mit [%] und [%], wenn FUSE aktiviert ist)
 ch_create8=erzeugt den angegebenen Benutzer
-<<<<<<< HEAD
 ch_create9=erzeugt den angegebenen Trigger
-=======
 ch_check1=Open or create database.
 ch_check2=Opens an existing database or creates a new instance.
->>>>>>> refs/remotes/origin/master
 ch_add1=Hinzufügen von Dokumenten.
 ch_add2=Fügt der aktuellen Datenbank ein Dokument [%] mit [%] und [%] hinzu.
 ch_delete1=Löschen von Dokumenten.

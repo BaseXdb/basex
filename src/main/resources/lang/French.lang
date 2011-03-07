@@ -528,12 +528,9 @@ ch_create5=crée l'index specifié
 ch_create6=crée une base de données du système de fichier [%] pour [%]
 ch_create7=(utilise [%] et [%] si FUSE est activé)
 ch_create8=crée l'utilisateur specifié
-<<<<<<< HEAD
-ch_create9=creates the trigger
-=======
+ch_create9=crée le trigger
 ch_check1=Open or create database.
 ch_check2=Opens an existing database or creates a new instance.
->>>>>>> refs/remotes/origin/master
 ch_add1=Ajouter document.
 ch_add2=Adds [%] as [%] to the database, using an optional\n[%] path.
 ch_delete1=Supprimer documents.
@@ -584,8 +581,8 @@ ch_show21=Montre les informations du serveur :
 ch_show22=montre les bases de données actullement ouvertes.
 ch_show23=montre les sessions de base de données courante.
 ch_show24=montre les utilisateurs (sur une base de données).
-ch_show25=shows backups.
-ch_show26=shows triggers. 
+ch_show25=montre les backups.
+ch_show26=montre les triggers. 
 ch_grant1=Octroyer les permissions utilisateur.
 ch_grant2=Octroie les permissions à un utilisateur (sur une base de données).
 ch_set1=Définir les options globales.
