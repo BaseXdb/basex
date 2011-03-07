@@ -122,8 +122,8 @@ public enum FunDef {
   FORMINT(FNURI, FNFormat.class, 2, 3,
       "format-integer(number,picture[,lang])", STR),
   /** XQuery function. */
-  FORMNUM(FNURI, FNFormat.class, 2, 3, "format-number(number,picture[,name])",
-      STR),
+  FORMNUM(FNURI, FNFormat.class, 2, 3,
+      "format-number(number,picture[,format])", STR),
   /** XQuery function. */
   FORMDTM(FNURI, FNFormat.class, 2, 5,
       "format-dateTime(number,picture,[lang[,cal[,place]]])", STR),
@@ -321,8 +321,8 @@ public enum FunDef {
   /** XQuery function. */
   COMPARE(FNURI, FNStr.class, 2, 3, "compare(first,second[,coll])", ITR_ZO),
   /** XQuery function. */
-  CONCAT(FNURI, FNStr.class, 2, Integer.MAX_VALUE, "concat(string,string+)",
-      STR),
+  CONCAT(FNURI, FNStr.class, 2, Integer.MAX_VALUE,
+      "concat(string,string[,...])", STR),
   /** XQuery function. */
   CONTAINS(FNURI, FNStr.class, 2, 3, "contains(string,sub[,coll])", BLN),
   /** XQuery function. */
@@ -508,6 +508,9 @@ public enum FunDef {
   EVAL(UTILURI, FNUtil.class, 1, 1, "eval(string)", ITEM_ZM),
   /** Utility function: evaluates the specified query file. */
   RUN(UTILURI, FNUtil.class, 1, 1, "run(string)", ITEM_ZM),
+  /** Utility function: formats a string using the printf syntax. */
+  FORMAT(UTILURI, FNUtil.class, 2, Integer.MAX_VALUE,
+      "format(format,item1[,...])", STR),
   /** Utility function: returns the memory consumption in mb. */
   MB(UTILURI, FNUtil.class, 1, 2, "mb(expr[,cache])", STR),
   /** Utility function: measures the execution time of an expression. */
@@ -516,13 +519,13 @@ public enum FunDef {
   TO_BASE(UTILURI, FNUtil.class, 2, 2, "integer-to-base(num,base)", STR),
   /** Utility function: decodes a number from a given base. */
   FRM_BASE(UTILURI, FNUtil.class, 2, 2, "integer-from-base(str,base)", ITR),
-  /** Utility function: calculates the MD5 hash of the given xs:string. */
+  /** Utility function: calculates the MD5 hash of the given string. */
   MD5(UTILURI, FNUtil.class, 1, 1, "md5(str)", STR),
-  /** Utility function: calculates the SHA1 hash of the given xs:string. */
+  /** Utility function: calculates the SHA1 hash of the given string. */
   SHA1(UTILURI, FNUtil.class, 1, 1, "sha1(str)", STR),
-  /** Utility function: calculates the CRC32 hash of the given xs:string. */
+  /** Utility function: calculates the CRC32 hash of the given string. */
   CRC32(UTILURI, FNUtil.class, 1, 1, "crc32(str)", STR),
-  /** Utility function: gets the bytes from the given xs:base64Binary data. */
+  /** Utility function: gets the bytes from the given base64 data. */
   TO_BYTES(UTILURI, FNUtil.class, 1, 1, "to-bytes(base64)", BYT_ZM),
 
   /* FNSent functions. */
