@@ -133,17 +133,17 @@ public final class HttpClient {
   private static final String AUTH_BASIC = "Basic ";
 
   /** Request attributes. */
-  private final TokenMap reqAttrs;
+  // private final TokenMap reqAttrs;
   /** Request headers. */
-  private final TokenMap headers;
+  // private final TokenMap headers;
   /** Request content - body or multipart. */
-  private ANode content;
+  // private ANode content;
   /** Body/Multipart attributes. */
-  private final TokenMap contentAttrs;
+  // private final TokenMap contentAttrs;
   /** Input info. */
   private final InputInfo info;
-  private boolean isMultipart;
-  //private final HttpRequestor req;
+  /** Request. */
+  private final HttpRequestor req;
 
   /**
    * Constructor.
@@ -155,53 +155,7 @@ public final class HttpClient {
   public HttpClient(final ANode request, final byte[] href, final InputInfo ii)
       throws QueryException {
     info = ii;
-    reqAttrs = getAttrs(request);
-    headers = new TokenMap();
-    // TODO error when href is set neither in http:request, neither as a
-    // separate parameter
-    if(href != null) reqAttrs.add(HREF, href);
-    final AxisIter ai = request.children();
-    ANode n = null;
-    while((n = ai.next()) != null) {
-      // Request headers
-      if(eq(n.nname(), HEADER)) {
-        final AxisIter attrs = n.atts();
-        ANode attr = null;
-        byte[] name = null;
-        byte[] value = null;
-
-        while((attr = attrs.next()) != null) {
-          if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
-          if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
-
-          if(name != null && name.length != 0 && value != null
-              && value.length != 0) {
-            headers.add(name, value);
-            break;
-          }
-        }
-
-      } else if(eq(n.nname(), MULTIPART)) {
-        content = n;
-        isMultipart = true;
-      } else if(eq(n.nname(), BODY)) content = n;
-      else ELMINV.thrw(ii);
-    }
-    contentAttrs = getAttrs(content);
-    checkMandatory(ii);
-  }
-
-  /**
-   * Checks mandatory attributes.
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private void checkMandatory(final InputInfo ii) throws QueryException {
-    if(reqAttrs.get(HREF) == null) MANDATTR.thrw(ii, string(HREF),
-        "http:request");
-    // TODO: correct message
-    if(contentAttrs.get(MEDIATYPE) == null) MANDATTR.thrw(ii,
-        string(MEDIATYPE), "http:body/multipart");
+    req = new HttpRequestor(request, href, ii);
   }
 
   /**
@@ -212,24 +166,16 @@ public final class HttpClient {
    */
   public Iter sendHttpRequest(final QueryContext ctx) throws QueryException {
 
-    checkAuth();
-
-    // TODO: Must check if href is provided and if not -> error msg
-    final byte[] href = reqAttrs.get(HREF);
-    final String adr = href == null ? null : string(reqAttrs.get(HREF));
-    if(adr == null) {
-      NOURL.thrw(info);
-      return null;
-    }
+    final String href = string(req.getAttrs().get(HREF));
     try {
-      final URL url = new URL(adr);
+      final URL url = new URL(href);
       final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
       try {
         setConnectionProps(conn);
         setHttpRequestHeaders(conn);
 
-        if(content != null) {
+        if(req.hasPayload()) {
           setContentType(conn);
           setHttpRequestContent(conn.getOutputStream());
         }
@@ -238,25 +184,11 @@ public final class HttpClient {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      throw URLINV.thrw(info, adr);
+      throw URLINV.thrw(info, href);
     } catch(final ProtocolException ex) {
       throw PROTINV.thrw(info);
     } catch(final IOException ex) {
       throw HTTPERR.thrw(info, ex);
-    }
-  }
-
-  /**
-   * Checks authorization.
-   * @throws QueryException query exception
-   */
-  private void checkAuth() throws QueryException {
-    final byte[] sendAuth = reqAttrs.get(SENDAUTH);
-    if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
-      final byte[] usrname = reqAttrs.get(USRNAME);
-      final byte[] passwd = reqAttrs.get(PASSWD);
-
-      if(usrname == null && passwd != null || usrname != null && passwd == null) CREDSERR.thrw(info);
     }
   }
 
@@ -268,13 +200,14 @@ public final class HttpClient {
    */
   private void setConnectionProps(final HttpURLConnection conn)
       throws ProtocolException, QueryException {
-    if(content != null) conn.setDoOutput(true);
-    conn.setRequestMethod(string(reqAttrs.get(METHOD)).toUpperCase());
+    if(req.hasPayload()) conn.setDoOutput(true);
+    conn.setRequestMethod(string(req.getAttrs().get(METHOD)).toUpperCase());
     // TODO: Investigate more about timeout
-    if(reqAttrs.get(TIMEOUT) != null) conn.setConnectTimeout(parseInt(string(reqAttrs.get(TIMEOUT))));
+    final byte[] timeout = req.getAttrs().get(TIMEOUT);
+    if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
     // TODO: Investigate more about follow-redirects
-    if(reqAttrs.get(REDIR) != null) setFollowRedirects(Bln.parse(
-        reqAttrs.get(REDIR), info));
+    final byte[] redirect = req.getAttrs().get(REDIR);
+    if(redirect != null) setFollowRedirects(Bln.parse(redirect, info));
   }
 
   /**
@@ -282,10 +215,10 @@ public final class HttpClient {
    * @param conn http connection
    */
   private void setContentType(final HttpURLConnection conn) {
-    final String mediaType = string(contentAttrs.get(MEDIATYPE));
+    final String mediaType = string(req.getPayloadAttrs().get(MEDIATYPE));
     if(mediaType.startsWith("multipart")) {
-      final String boundary = (contentAttrs.get(BOUNDARY) != null) ? string(contentAttrs.get(BOUNDARY))
-          : DEFAULT_BOUND;
+      final String b = string(req.getPayloadAttrs().get(BOUNDARY));
+      final String boundary = (b != null) ? b : DEFAULT_BOUND;
       StringBuilder sb = new StringBuilder();
       sb.append(mediaType).append("; ").append("boundary=").append(boundary);
       conn.setRequestProperty(CONT_TYPE, sb.toString());
@@ -303,18 +236,18 @@ public final class HttpClient {
   private void setHttpRequestHeaders(final HttpURLConnection conn)
       throws QueryException {
 
-    final byte[][] headerNames = headers.keys();
+    final byte[][] headerNames = req.getHeaders().keys();
 
     for(final byte[] headerName : headerNames)
       conn.addRequestProperty(string(headerName),
-          string(headers.get(headerName)));
+          string(req.getHeaders().get(headerName)));
     // HTTP Basic Authentication
-    final byte[] sendAuth = reqAttrs.get(SENDAUTH);
+    final byte[] sendAuth = req.getAttrs().get(SENDAUTH);
     // TODO: more test cases w/o username, sendauth, pass
     if(sendAuth != null && Bln.parse(sendAuth, info)) conn.setRequestProperty(
         AUTH,
-        encodeCredentials(string(reqAttrs.get(USRNAME)),
-            string(reqAttrs.get(PASSWD))));
+        encodeCredentials(string(req.getAttrs().get(USRNAME)),
+            string(req.getAttrs().get(PASSWD))));
   }
 
   /**
@@ -324,10 +257,11 @@ public final class HttpClient {
    */
   private void setHttpRequestContent(final OutputStream out)
       throws QueryException, IOException {
-    if(isMultipart) {
-      writeMultipartContent(content, out);
+    if(req.isMultipart()) {
+      writeMultipartContent(req.getPayload(),
+          req.getPayloadAttrs().get(BOUNDARY), info, out);
     } else {
-      writeBody(content, out);
+      writeBody(req.getPayload(), out);
     }
   }
 
@@ -350,6 +284,7 @@ public final class HttpClient {
   /**
    * Writes the content of a body element in the output stream of the URL
    * connection.
+   * @param body
    * @param attrs body element attributes
    * @param out output stream
    * @throws QueryException query exception
@@ -409,13 +344,15 @@ public final class HttpClient {
   /**
    * Writes multipart content in the output stream of the URL connection.
    * @param multipart multipart element
-   * @param contentAttrs content attributes
+   * @param boundary boundary marker
+   * @param ii input info
    * @param out output stream
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void writeMultipartContent(final ANode multipart,
-      final OutputStream out) throws QueryException, IOException {
+  public static void writeMultipartContent(final ANode multipart,
+      final byte[] boundary, final InputInfo ii, final OutputStream out)
+      throws QueryException, IOException {
 
     // Get parts of http:multipart
     final AxisIter parts = multipart.children();
@@ -423,34 +360,13 @@ public final class HttpClient {
 
     // Get part headers and body
     while((part = parts.next()) != null) {
-      AxisIter partChildren = part.children();
-      ANode child = null;
-      TokenMap partHeaders = new TokenMap();
-      ANode partContent = null;
-      while((child = partChildren.next()) != null) {
-        if(eq(child.nname(), HEADER)) {
-          final AxisIter attrs = child.atts();
-          ANode attr = null;
-          byte[] name = null;
-          byte[] value = null;
-
-          while((attr = attrs.next()) != null) {
-            if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
-            if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
-
-            if(name != null && name.length != 0 && value != null
-                && value.length != 0) partHeaders.add(name, value);
-          }
-        } else if(eq(child.nname(), BODY)) {
-          partContent = child;
-        }
-      }
-      writePart(partHeaders, partContent, out, contentAttrs.get(BOUNDARY));
+      final HttpRequestor r = new HttpRequestor(part, ii);
+      writePart(r.getHeaders(), r.getPayload(), out, boundary);
     }
 
     // Write closing boundary
-    out.write(new TokenBuilder().add("--".getBytes()).add(
-        contentAttrs.get(BOUNDARY)).add("--").finish());
+    out.write(new TokenBuilder().add("--".getBytes()).add(boundary).add("--").add(
+        CRLF).finish());
   }
 
   /**
@@ -459,8 +375,8 @@ public final class HttpClient {
    * @param partContent part content
    * @param out connection output stream
    * @param boundary boundary
-   * @throws IOException
-   * @throws QueryException
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
    */
   private static void writePart(final TokenMap partHeaders,
       final ANode partContent, final OutputStream out, final byte[] boundary)
@@ -504,7 +420,7 @@ public final class HttpClient {
     final ItemCache iter = new ItemCache();
     iter.add(responseElem);
 
-    final byte[] attrStatusOnly = reqAttrs.get(STATUSONLY);
+    final byte[] attrStatusOnly = req.getAttrs().get(STATUSONLY);
 
     // Get response content if required
     if(attrStatusOnly == null || !Bln.parse(attrStatusOnly, info)) iter.add(setResponseContent(
@@ -550,7 +466,9 @@ public final class HttpClient {
     }
 
     // Set body child
-    final FElem elem = new FElem(new QNm(BODY), par);
+    // TODO: If content is multipart also boundary has to be set as attribute
+    final byte[] content = req.isMultipart() ? MULTIPART : BODY;
+    final FElem elem = new FElem(new QNm(content), par);
     if(conn.getContentType() != null) {
       elem.atts.add(new FAttr(new QNm(MEDIATYPE), token(conn.getContentType()),
           elem));
@@ -569,8 +487,8 @@ public final class HttpClient {
   private Item setResponseContent(final HttpURLConnection conn,
       final QueryContext ctx) throws IOException, QueryException {
 
-    final byte[] contentType = reqAttrs.get(OVERMEDIATYPE) == null ? token(conn.getContentType())
-        : reqAttrs.get(OVERMEDIATYPE);
+    final byte[] contentType = req.getAttrs().get(OVERMEDIATYPE) == null ? token(conn.getContentType())
+        : req.getAttrs().get(OVERMEDIATYPE);
 
     if(eq(contentType, TXT_XML) || eq(contentType, TXT_EXT_XML)
         || eq(contentType, APPL_XML) || eq(contentType, APPL_EXT_XML)
@@ -662,6 +580,10 @@ public final class HttpClient {
   private String encodeCredentials(final String usrname, final String passwd) {
     final B64 b64 = new B64(token(usrname + ":" + passwd));
     return AUTH_BASIC + string(b64.atom());
+  }
+
+  public static void checkMultipart(final ANode multipart) {
+
   }
 
 }
