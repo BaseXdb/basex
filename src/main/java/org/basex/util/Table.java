@@ -128,7 +128,6 @@ public final class Table {
     for(int s = 0; s < sz; ++s) {
       for(final TokenList e : contents) {
         ind[s] = Math.max(ind[s], e.get(s).length);
-        System.out.println(ind[s]);
       }
       ind[s] = Math.max(ind[s], header.get(s).length);
     }

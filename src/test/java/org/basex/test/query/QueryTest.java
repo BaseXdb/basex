@@ -90,7 +90,7 @@ public abstract class QueryTest {
           sb.append("\n[E" + s + "] ");
           if(correct) {
             final String cp = cmp.toString();
-            sb.append(cp.length() > 20 ? cp.substring(0, 20) + "..." : cp);
+            sb.append(cp.length() > 1000 ? cp.substring(0, 1000) + "..." : cp);
           } else {
             sb.append("error");
           }
