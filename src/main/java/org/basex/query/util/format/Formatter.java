@@ -348,7 +348,8 @@ public abstract class Formatter extends FormatUtil {
    * @param i initial call
    */
   private static void jp(final TokenBuilder tb, final long n, final boolean i) {
-    if(n >= 0 && n <= 9) {
+    if(n == 0) {
+    } else if(n <= 9) {
       if(n != 1 || !i) tb.add(KANJI[(int) n]);
     } else if(n == 10) {
       tb.add(KANJI[10]);
