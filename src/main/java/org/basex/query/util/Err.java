@@ -129,10 +129,10 @@ public enum Err {
   ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
   /** FOZP0002: Evaluation exception. */
   ZIPINVALID(FOZP, 2, "% element: % attribute expected."),
+  /** FOZP0002: Evaluation exception. */
+  ZIPUNKNOWN(FOZP, 2, "ZIP Definition: unknown element %."),
   /** FOZP0003: Evaluation exception. */
-  ZIPUNKNOWN(FOZP, 3, "ZIP Definition: unknown element %."),
-  /** FOZP0004: Evaluation exception. */
-  ZIPFAIL(FOZP, 4, "Operation failed: %."),
+  ZIPFAIL(FOZP, 3, "Operation failed: %."),
 
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL: \"%\"."),
@@ -191,6 +191,8 @@ public enum Err {
   INVDIG(FORG, 6, "Invalid digit for base %: %."),
   /** FORG0006: Evaluation exception. */
   JAVAERR(FORG, 6, "Java call failed: %."),
+  /** FORG0006: Evaluation exception. */
+  ERRFORM(FORG, 6, "%: %."),
   /** FORG0008: Function exception. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
 
@@ -388,7 +390,7 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   NOTYPE(XPST, 3, "Unknown type \"%\"."),
   /** XPST0003: Parsing exception. */
-  PIXML(XPST, 3, "Illegal PI name: %."),
+  PIXML(XPST, 3, "Illegal PI name: \"%\"."),
   /** XPST0003: Parsing exception. */
   EMPTYSEQOCC(XPST, 3, "No occurrence indicator defined for %."),
   /** XPST0003: Parsing exception. */
@@ -457,7 +459,7 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   XPTYPENUM(XPTY, 4, "%: number expected, % found."),
   /** XPTY0004: Typing exception. */
-  XPINVNAME(XPTY, 4, "Invalid name: %."),
+  XPINVNAME(XPTY, 4, "Invalid name: \"%\"."),
   /** XPTY0004: Typing exception. */
   XPNAME(XPTY, 4, "Expecting name."),
   /** XPTY0004: Typing exception. */

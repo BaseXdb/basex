@@ -75,7 +75,7 @@ final class FNFile extends Fun {
       case ISWRITE:    return Bln.get(path.canWrite());
       case LASTMOD:    return lastModified(path);
       case SIZE:       return size(path);
-      case PATHSEP:    return Str.get(Prop.SEP);
+      case PATHSEP:    return Str.get(System.getProperty("file.separator"));
       case PATHTOFULL: return Str.get(path.getAbsolutePath());
       case PATHTOURI:  return pathToUri(path);
       case CREATEDIR:  return createDirectory(path);

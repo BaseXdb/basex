@@ -175,7 +175,7 @@ public final class QNm extends Item {
   }
 
   /**
-   * Checks if the name contains a namespace.
+   * Checks if the name contains a prefix.
    * @return result of check
    */
   public boolean ns() {

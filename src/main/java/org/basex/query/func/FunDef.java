@@ -240,6 +240,8 @@ public enum FunDef {
   BASEURI(FNURI, FNNode.class, 0, 1, "base-uri([node])", NOD_ZO, URI_ZO),
   /** XQuery function. */
   GENID(FNURI, FNNode.class, 0, 1, "generate-id([node])", NOD_ZO, STR),
+  /** XQuery function. */
+  CHILDREN(FNURI, FNNode.class, 1, 1, "has-children(node)", NOD_ZM, BLN),
 
   /* FNNum functions. */
 
@@ -326,6 +328,10 @@ public enum FunDef {
   HEAD(FNURI, FNSeq.class, 1, 1, "head(items)", ITEM_ZM, ITEM_ZO),
   /** XQuery function. */
   TAIL(FNURI, FNSeq.class, 1, 1, "tail(items)", ITEM_ZM, ITEM_ZM),
+  /** XQuery function. */
+  OUTERMOST(FNURI, FNSeq.class, 1, 1, "outermost(nodes)", NOD_ZM, NOD_ZM),
+  /** XQuery function. */
+  INNERMOST(FNURI, FNSeq.class, 1, 1, "innermost(nodes)", NOD_ZM, NOD_ZM),
 
   /* FNSimple functions. */
 
@@ -364,7 +370,7 @@ public enum FunDef {
   COMPARE(FNURI, FNStr.class, 2, 3, "compare(first,second[,coll])",
       STR_ZO, STR_ZO, STR, ITR_ZO),
   /** XQuery function. */
-  CONCAT(FNURI, FNStr.class, 2, Integer.MAX_VALUE, "concat(string,string+)",
+  CONCAT(FNURI, FNStr.class, 2, Integer.MAX_VALUE, "concat(atom,atom[,...])",
       AAT_ZO, AAT_ZO, STR),
   /** XQuery function. */
   CONTAINS(FNURI, FNStr.class, 2, 3, "contains(string,sub[,coll])",
@@ -427,15 +433,17 @@ public enum FunDef {
   ATAN(MATHURI, FNMath.class, 1, 1, "atan(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
   ATAN2(MATHURI, FNMath.class, 2, 2, "atan2(number,number)", DBL, DBL, DBL),
-
-  /** XQuery math function (project specific). */
+  /** XQuery math function. */
   POW(MATHURI, FNMath.class, 2, 2, "pow(number,number)", DBL_ZO, ITR, DBL_ZO),
-  /** XQuery math function (project specific). */
+  /** XQuery math function. */
   EXP(MATHURI, FNMath.class, 1, 1, "exp(number)", DBL_ZO, DBL_ZO),
-  /** XQuery math function (project specific). */
+  /** XQuery math function. */
+  EXP10(MATHURI, FNMath.class, 1, 1, "exp10(number)", DBL_ZO, DBL_ZO),
+  /** XQuery math function. */
   LOG(MATHURI, FNMath.class, 1, 1, "log(number)", DBL_ZO, DBL_ZO),
-  /** XQuery math function (project specific). */
+  /** XQuery math function. */
   LOG10(MATHURI, FNMath.class, 1, 1, "log10(number)", DBL_ZO, DBL_ZO),
+
   /** XQuery math function (project specific). */
   RAND(MATHURI, FNMath.class, 0, 0, "random()", DBL),
   /** XQuery math function (project specific). */
@@ -559,6 +567,9 @@ public enum FunDef {
   EVAL(UTILURI, FNUtil.class, 1, 1, "eval(string)", STR_ZO, ITEM_ZM),
   /** Utility function: evaluates the specified query file. */
   RUN(UTILURI, FNUtil.class, 1, 1, "run(string)", STR, ITEM_ZM),
+  /** Utility function: formats a string using the printf syntax. */
+  FORMAT(UTILURI, FNUtil.class, 2, Integer.MAX_VALUE,
+      "format(format,item1[,...])", STR, ITEM, STR),
   /** Utility function: returns the memory consumption in mb. */
   MB(UTILURI, FNUtil.class, 1, 2, "mb(expr[,cache])", ITEM_ZM, BLN, DBL),
   /** Utility function: measures the execution time of an expression. */

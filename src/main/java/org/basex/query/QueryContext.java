@@ -374,16 +374,11 @@ public final class QueryContext extends Progress {
   /**
    * Adds some evaluation info.
    * @param string evaluation info
-   * @param msg message
    */
-  public void evalInfo(final byte[] string, final String msg) {
+  public void evalInfo(final byte[] string) {
     if(!inf) return;
     if(firstEval) info.add(NL + QUERYEVAL + NL);
-    info.add(QUERYSEP);
-    info.add(string);
-    info.add(' ');
-    info.add(msg);
-    info.add(NL);
+    info.add(QUERYSEP).add(string).add(NL);
     firstEval = false;
   }
 

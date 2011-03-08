@@ -267,8 +267,7 @@ public enum GUICommands implements GUICommand {
         gui.context.query.path();
       final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
           fn == null ? gui.gprop.get(GUIProp.XQPATH) : fn, gui);
-      fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIX, IO.XQMSUFFIX,
-          IO.XQYSUFFIX, IO.XQLSUFFIX, IO.XQUERYSUFFIX);
+      fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
 
       final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
       if(file == null) return;

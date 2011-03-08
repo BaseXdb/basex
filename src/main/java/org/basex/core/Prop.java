@@ -16,13 +16,12 @@ public final class Prop extends AProp {
 
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");
-  /** File separator string. */
-  public static final String SEP = System.getProperty("file.separator");
   /** Returns the system's default encoding. */
   public static final String ENCODING = System.getProperty("file.encoding");
 
   /** System's temporary directory. */
-  public static final String TMP = System.getProperty("java.io.tmpdir") + SEP;
+  public static final String TMP =
+    (System.getProperty("java.io.tmpdir") + "/").replaceAll("[\\\\/]+", "/");
 
   /** OS flag (should be ignored whenever possible). */
   public static final String OS = System.getProperty("os.name").toUpperCase();
@@ -32,7 +31,7 @@ public final class Prop extends AProp {
   public static final boolean WIN = OS.startsWith("WIN");
 
   /** Directory for storing the property files, database directory, etc. */
-  public static final String HOME = Util.homeDir() + SEP;
+  public static final String HOME = Util.homeDir() + '/';
 
   // The following properties will be saved to disk:
 
@@ -124,7 +123,8 @@ public final class Prop extends AProp {
   /** Define import parser. */
   public static final Object[] PARSER = { "PARSER", "XML" };
   /** Define parser options. */
-  public static final Object[] PARSEROPT = { "PARSEROPT", "" };
+  public static final Object[] PARSEROPT = { "PARSEROPT",
+    "encoding=UTF-8,lines=true,format=verbose,header=false,separator=comma" };
 
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };
@@ -157,7 +157,7 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Language for full-text search index. */
-  public static final Object[] LANGUAGE = { "LANGUAGE", "" };
+  public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
   /** Flag for full-text scoring algorithm.
       Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] SCORING = { "SCORING", 0 };

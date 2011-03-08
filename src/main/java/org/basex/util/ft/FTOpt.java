@@ -64,7 +64,7 @@ public final class FTOpt extends ExprInfo {
    * @param f flag index
    * @return true if flag has been set
    */
-  public boolean set(final FTFlag f) {
+  public boolean isSet(final FTFlag f) {
     return map.get(f) != null;
   }
 

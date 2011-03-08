@@ -16,6 +16,7 @@ import org.basex.query.expr.CAttr;
 import org.basex.query.expr.CDoc;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Filter;
+import org.basex.query.expr.Pos;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
@@ -72,7 +73,7 @@ public class AxisPath extends Path {
    */
   public static final AxisPath get(final InputInfo ii, final Expr r,
       final AxisStep... st) {
-    return new AxisPath(ii, r, st).iterator(null);
+    return new AxisPath(ii, r, st).finish(null);
   }
 
   /**
@@ -80,22 +81,21 @@ public class AxisPath extends Path {
    * @param ctx context reference
    * @return resulting operator
    */
-  private AxisPath iterator(final QueryContext ctx) {
-    return iterable(ctx) ? new IterPath(input, root, step, type, size) : this;
-  }
-
-  /**
-   * Checks if the path is iterable.
-   * @param ctx context reference
-   * @return resulting operator
-   */
-  private boolean iterable(final QueryContext ctx) {
+  private AxisPath finish(final QueryContext ctx) {
     // evaluate number of results
     size = size(ctx);
     // set type with number of results or occurrence from last step
     type = size != -1 ? SeqType.get(NodeType.NOD, size) :
       step[step.length - 1].type();
 
+    return iterable() ? new IterPath(input, root, step, type, size) : this;
+  }
+
+  /**
+   * Checks if the path is iterable.
+   * @return resulting operator
+   */
+  private boolean iterable() {
     if(root == null || root.uses(Use.VAR) || root.duplicates()) return false;
 
     final int sl = step.length;
@@ -129,8 +129,8 @@ public class AxisPath extends Path {
         !data.single()) return -1;
 
     ArrayList<PathNode> nodes = data.pthindex.root();
-    for(final AxisStep s : step) {
-      nodes = s.size(nodes, data);
+    for(final AxisStep as : step) {
+      nodes = as.size(nodes, data);
       if(nodes == null) return -1;
     }
 
@@ -190,7 +190,11 @@ public class AxisPath extends Path {
     cache = root != null && !uses(Use.VAR);
 
     // if applicable, return iterator
-    return iterator(ctx);
+    final AxisPath path = finish(ctx);
+
+    // heuristics: use filter expression if one result is expected
+    return size() != 1 ? path :
+      new Filter(input, this, Pos.get(1, size(), input)).comp2(ctx);
   }
 
   /**

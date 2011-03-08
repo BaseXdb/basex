@@ -69,7 +69,7 @@ public final class DialogCreate extends Dialog {
     // create panels
     final BaseXBack p1 = new BaseXBack(new BorderLayout()).border(8);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(6, 2, 6, 0));
+    final BaseXBack p = new BaseXBack(new TableLayout(6, 2, 8, 0));
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
@@ -149,9 +149,12 @@ public final class DialogCreate extends Dialog {
     final GUIProp gprop = gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
         gprop.get(GUIProp.CREATEPATH), gui);
-    fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
-    fc.addFilter(CREATEZIPDESC, IO.ZIPSUFFIX);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
+    fc.addFilter(CREATEHTMLDESC, IO.HTMLSUFFIXES);
+    fc.addFilter(CREATECSVDESC, IO.CSVSUFFIX);
+    fc.addFilter(CREATETXTDESC, IO.TXTSUFFIX);
+    fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
+    fc.addFilter(CREATEZIPDESC, IO.ZIPSUFFIXES);
 
     final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
     if(file != null) {

@@ -41,11 +41,9 @@ public class Filter extends Preds {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     root = checkUp(root, ctx).comp(ctx);
-
     // convert filters to axis paths
     if(root instanceof AxisPath && !super.uses(Use.POS))
       return ((AxisPath) root).copy().addPreds(pred).comp(ctx);
-
     // return empty root
     if(root.empty()) return optPre(Empty.SEQ, ctx);
 
@@ -58,6 +56,15 @@ public class Filter extends Preds {
     // no predicates.. return root
     if(pred.length == 0) return root;
 
+    return comp2(ctx);
+  }
+
+  /**
+   * Compiles the filter expression, excluding the root node.
+   * @param ctx query context
+   * @return compiled expression
+   */
+  public final Expr comp2(final QueryContext ctx) {
     // evaluate return type
     final SeqType t = root.type();
     type = SeqType.get(t.type, t.zeroOrOne() ? SeqType.Occ.ZO : SeqType.Occ.ZM);
@@ -65,19 +72,16 @@ public class Filter extends Preds {
     // no positional predicates.. use simple iterator
     if(!super.uses(Use.POS)) return new IterFilter(this);
 
-    // iterator for simple positional predicate
-    if(iterable()) {
-      // one single position() or last() function specified:
-      if(pred.length == 1 && (last || pos != null)) {
-        // return single value
-        if(root.type().one() && (last || pos.min == 1 && pos.max == 1))
-          return optPre(root, ctx);
-
-        // pre-evaluate items
-        if(root.value()) return optPre(iter(ctx).finish(), ctx);
+    // one single position() or last() function specified:
+    if(pred.length == 1 && (last || pos != null)) {
+      // return single value
+      if(root.value() && t.one() && (last || pos.min == 1 && pos.max == 1)) {
+        return optPre(root, ctx);
       }
-      return new IterPosFilter(this);
     }
+
+    // iterator for simple positional predicate
+    if(iterable()) return new IterPosFilter(this);
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
     off = pred.length == 1 && pred[0].type().num() && !pred[0].uses(Use.CTX);
@@ -167,6 +171,6 @@ public class Filter extends Preds {
 
   @Override
   public final String toString() {
-    return new StringBuilder().append(root).append(super.toString()).toString();
+    return "(" + root + ")" + super.toString();
   }
 }

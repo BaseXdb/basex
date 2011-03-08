@@ -63,9 +63,15 @@ public final class BaseXFileChooser {
    * @param suf suffix
    */
   public void addFilter(final String dsc, final String... suf) {
-    if(fc != null) fc.addChoosableFileFilter(new Filter(suf, dsc));
-    else fd.setFile("*" + suf[0]);
-    suffix = suf[0];
+    if(fc != null) {
+      final FileFilter ff = fc.getFileFilter();
+      fc.addChoosableFileFilter(new Filter(suf, dsc));
+      fc.setFileFilter(ff);
+    } else {
+      fd.setFile("*" + suf[0]);
+    }
+    // treat first filter as default
+    if(suffix == null) suffix = suf[0];
   }
 
   /**
@@ -148,7 +154,12 @@ public final class BaseXFileChooser {
 
     @Override
     public String getDescription() {
-      return desc;
+      final StringBuilder sb = new StringBuilder();
+      for(final String s : sufs) {
+        if(sb.length() != 0) sb.append(", ");
+        sb.append('*').append(s);
+      }
+      return desc + " (" + sb + ")";
     }
   }
 }

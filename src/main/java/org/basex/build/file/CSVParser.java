@@ -60,8 +60,6 @@ public final class CSVParser extends FileParser {
   private static final byte[] ENTRY = token("entry");
   /** CSV column attribute. */
   private static final byte[] COLUMN = token("col");
-  /** Encoding. */
-  private static final String ENCODING = UTF8;
 
   /** Column separator (see {@link ParserProp#SEPARATOR}). */
   private final int separator;
@@ -69,6 +67,8 @@ public final class CSVParser extends FileParser {
   private final TokenList headers = new TokenList();
   /** Simple format. */
   private final boolean simple;
+  /** Encoding. */
+  private final String encoding;
 
   /** Current row. */
   private int row;
@@ -103,6 +103,9 @@ public final class CSVParser extends FileParser {
     simple = s.equals(FORMATS[0]);
     if(!simple && !s.equals(FORMATS[1])) throw new IOException(
         Util.info(SETVAL, ParserProp.FORMAT[0], s));
+
+    s = props.get(ParserProp.ENCODING);
+    encoding = s != null ? s : UTF8;
   }
 
   @Override
@@ -111,7 +114,7 @@ public final class CSVParser extends FileParser {
 
     final TokenBuilder tb = new TokenBuilder();
     final BufferInput bi = new BufferInput(file.path());
-    bi.encoding(ENCODING);
+    bi.encoding(encoding);
 
     boolean quoted = false, open = true;
     int ch = 0;

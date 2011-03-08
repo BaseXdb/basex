@@ -165,8 +165,8 @@ public class AxisStep extends Preds {
   final ArrayList<PathNode> size(final ArrayList<PathNode> nodes,
       final Data data) {
 
-    // skip steps with predicates
-    if(pred.length != 0) return null;
+    // skip steps with predicates or different namespaces
+    if(pred.length != 0 || data.ns.globalNS() == null) return null;
 
     // check restrictions on node type
     int kind = -1, name = 0;

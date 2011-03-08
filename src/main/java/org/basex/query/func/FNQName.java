@@ -8,7 +8,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.NCN;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -74,11 +73,12 @@ final class FNQName extends Fun {
         return nm;
       case LOCNAMEQNAME:
         if(it == null) return null;
-        return new NCN(((QNm) checkType(it, AtomType.QNM)).ln(), input);
+        nm = (QNm) checkType(it, AtomType.QNM);
+        return AtomType.NCN.e(Str.get(nm.ln()), ctx, input);
       case PREQNAME:
         if(it == null) return null;
         nm = (QNm) checkType(it, AtomType.QNM);
-        return !nm.ns() ? null : new NCN(nm.pref(), input);
+        return !nm.ns() ? null : AtomType.NCN.e(Str.get(nm.pref()), ctx, input);
       case NSURIPRE: // [LW][LK] broken...
         // [LK] find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);

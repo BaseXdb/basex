@@ -46,12 +46,13 @@ final class FNMath extends Fun {
       case ASIN:  return Dbl.get(asin(d));
       case ACOS:  return Dbl.get(acos(d));
       case ATAN:  return Dbl.get(atan(d));
-      // project-specific
-      case ATAN2: return Dbl.get(atan2(d, e));
       case EXP:   return Dbl.get(exp(d));
-      case POW:   return Dbl.get(pow(d, e));
+      case EXP10: return Dbl.get(pow(10, d));
       case LOG:   return Dbl.get(log(d));
       case LOG10: return Dbl.get(log10(d));
+      case ATAN2: return Dbl.get(atan2(d, e));
+      case POW:   return Dbl.get(pow(d, e));
+      // project-specific
       case RAND:  return Dbl.get(random());
       case SINH:  return Dbl.get(sinh(d));
       case COSH:  return Dbl.get(cosh(d));
