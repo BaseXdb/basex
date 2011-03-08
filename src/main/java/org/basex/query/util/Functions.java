@@ -27,6 +27,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
 import org.basex.util.Reflect;
+import org.basex.util.TokenBuilder;
 
 /**
  * Container for global function declarations.
@@ -83,20 +84,20 @@ public final class Functions extends ExprInfo {
     if(startsWith(uri, JAVAPRE) && ctx.context.user.perm(User.ADMIN)) {
       final String c = string(substring(uri, JAVAPRE.length));
       // convert dashes to upper-case initials
-      final StringBuilder sb = new StringBuilder(c);
-      sb.append(".");
+      final TokenBuilder tb = new TokenBuilder().add(c).add('.');
       boolean dash = false;
-      for(final char b : string(ln).toCharArray()) {
+      for(int p = 0; p < ln.length; p += cl(ln, p)) {
+        final int ch = cp(ln, p);
         if(dash) {
-          sb.append(Character.toUpperCase(b));
+          tb.add(Character.toUpperCase(ch));
           dash = false;
         } else {
-          dash = b == '-';
-          if(!dash) sb.append(b);
+          dash = ch == '-';
+          if(!dash) tb.add(ch);
         }
       }
 
-      final String java = sb.toString();
+      final String java = tb.toString();
       final int i = java.lastIndexOf(".");
       final Class<?> cls = Reflect.find(java.substring(0, i));
       if(cls == null) qp.error(FUNCJAVA, java);

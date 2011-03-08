@@ -78,8 +78,7 @@ public final class DSim extends Date {
    */
   private static int type(final Type type) {
     for(int t = 0; t < TYPES.length; ++t) if(TYPES[t] == type) return t;
-    Util.notexpected();
-    return -1;
+    throw Util.notexpected();
   }
 
   @Override

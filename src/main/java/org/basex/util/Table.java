@@ -42,14 +42,14 @@ public final class Table {
 
     // parse table header
     final Scanner scan = new Scanner(in);
-    String line = scan.nextLine();
+    byte[] line = token(scan.nextLine());
     final IntList il = new IntList();
     int i = 0;
-    while(i < line.length()) {
+    while(i < line.length) {
       il.add(i);
-      while(++i < line.length() && line.charAt(i) != ' ');
-      header.add(line.substring(il.get(il.size() - 1), i));
-      while(++i < line.length() && line.charAt(i) == ' ');
+      while(++i < line.length && line[i] != ' ');
+      header.add(substring(line, il.get(il.size() - 1), i));
+      while(++i < line.length && line[i] == ' ');
     }
     il.add(i);
 
@@ -58,10 +58,10 @@ public final class Table {
 
     // parse table entries
     final int s = il.size() - 1;
-    while(!(line = scan.nextLine()).isEmpty()) {
+    while((line = token(scan.nextLine())).length != 0) {
       final TokenList entry = new TokenList();
       for(int e = 0; e < s; ++e) {
-        entry.add(token(line.substring(il.get(e), il.get(e + 1)).trim()));
+        entry.add(trim(substring(line, il.get(e), il.get(e + 1))));
       }
       contents.add(entry);
     }
@@ -110,15 +110,12 @@ public final class Table {
    * @param top entry to be moved to the top
    */
   public void toTop(final byte[] top) {
-    TokenList tl = null;
-    int i = -1;
-    while(++i < contents.size()) {
-      tl = contents.get(i);
-      if(eq(top, lc(tl.get(0)))) break;
+    for(int i = 0; i < contents.size(); ++i) {
+      if(eq(top, contents.get(i).get(0))) {
+        contents.add(0, contents.remove(i));
+        return;
+      }
     }
-    if(i == contents.size()) return;
-    while(--i >= 0) contents.set(i + 1, contents.get(i));
-    contents.set(0, tl);
   }
 
   /**
@@ -131,6 +128,7 @@ public final class Table {
     for(int s = 0; s < sz; ++s) {
       for(final TokenList e : contents) {
         ind[s] = Math.max(ind[s], e.get(s).length);
+        System.out.println(ind[s]);
       }
       ind[s] = Math.max(ind[s], header.get(s).length);
     }

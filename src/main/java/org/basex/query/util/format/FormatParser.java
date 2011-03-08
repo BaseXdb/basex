@@ -1,91 +1,123 @@
 package org.basex.query.util.format;
 
 import static org.basex.util.Token.*;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.basex.util.TokenBuilder;
+
 /**
- * Simple format parser for integers and dates.
+ * Format parser for integers and dates.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FormatParser {
+public final class FormatParser extends FormatUtil {
   /** With pattern: ","  min-width ("-" max-width)?. */
-  private static final Pattern WIDTH =
-    Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
-
-  /** Cases. */
-  public enum Case {
-    /** Lower case. */ LOWER,
-    /** Upper case. */ UPPER,
-    /** Standard.   */ STANDARD;
-  }
+  static final Pattern WIDTH = Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
 
   /** Case. */
-  public final Case cs;
+  public Case cs;
   /** Presentation modifier in lower-case. */
-  public final String pres;
-  /** Error occurred while parsing. */
-  public boolean error;
+  public byte[] pres;
   /** Ordinal suffix; {@code null} if not specified. */
-  public String ord;
+  public byte[] ordinal;
   /** Minimum width. */
   public int min;
   /** Maximum width. */
   public int max = Integer.MAX_VALUE;
 
   /**
-   * Constructor, parsing the input string. The {@link #error} variable is
-   * set to true if the input is invalid.
+   * Parses the input string.
    * @param in marker input
    * @param p (valid) presentation modifier
-   * @param ext extended flag, allowing width modifier
+   * @param date flag flag, allowing width modifier
+   * @return success flag
    */
-  public FormatParser(final String in, final String p, final boolean ext) {
+  public boolean parse(final byte[] in, final byte[] p, final boolean date) {
     // no marker specified - use default settings
-    String pm = p;
+    byte[] pm = in.length != 0 ? mod(in, date) : p;
+    if(pm == null) return false;
 
-    final int l = in.length();
+    if(date) {
+      // extract and check width modifier
+      final int w = lastIndexOf(pm, ',');
+      if(w != -1) {
+        final byte[] wd = substring(pm, w + 1);
+        pm = substring(pm, 0, w);
+
+        final Matcher match = WIDTH.matcher(string(wd));
+        if(!match.find()) return false;
+
+        int m = toInt(match.group(1));
+        if(m != Integer.MIN_VALUE) min = m;
+        final String mc = match.group(3);
+        m = mc != null ? toInt(mc) : Integer.MIN_VALUE;
+        if(m != Integer.MIN_VALUE) max = m;
+      }
+    }
+
+    // choose first character and case
+    cs = pm.length > cl(pm, 0) ? Case.STANDARD :
+      (ch(pm, 0) & ' ') != 0 ? Case.LOWER : Case.UPPER;
+    pres = lc(pm);
+    return true;
+  }
+
+  /**
+   * Returns a presentation modifier, or {@code null} if the input was invalid.
+   * @param in input
+   * @param date flag flag, allowing width modifier
+   * @return presentation modifier
+   */
+  private byte[] mod(final byte[] in, final boolean date) {
+    final int l = in.length;
     int s = -1;
 
-    // find presentation modifier
-    if(l != 0) {
-      final int ch = cp(in, 0);
-      final int cu = ch & 0xFFFFFFDF;
-      if(cu == 'A' || cu == 'I' || cu == '\u0391') {
-        s = 1;
-      } else if(cu == 'W' || cu == 'N') {
-        s = cp(in, 1) == (ch | 0x20) ? 2 : 1;
-      } else if(ch >= '\u2460' && ch <= '\u249b') {
-        s = 1;
-      } else if(ch == '#' || ch >= '0' && ch <= '9' ||
-          ch >= '\u0660' && ch <= '\u0669') {
-        s = decimal(in, ch & 0xFFFFFFF0);
-        // invalid decimal parsing
-        error = s == -1;
-      } else {
-        error = true;
-      }
-      if(s != -1) pm = in.substring(0, s);
+    final int ch = ch(in, 0);
+    final int cu = ch | ' ';
+    if(sequence(ch) != null) {
+      // latin, greek and other alphabetics
+      s = cl(in, 0);
+    } else if(cu == 'i') {
+      // roman sequence
+      s = cl(in, 0);
+    } else if(cu == 'w' || cu == 'n' && date) {
+      // verbose, or name output
+      s = ch(in, 1) == (ch | ' ') ? 2 : 1;
+    } else if(ch >= '\u2460' && ch <= '\u249b') {
+      // circled, parenthesized or full stop digits
+      s = cl(in, 0);
+    } else if(ch >= KANJI[1]) {
+      // japanese numbering
+      s = cl(in, 0);
+    } else if(ch == '#') {
+      // optional digits
+      s = check(in, '0');
+    } else {
+      // optional digits
+      s = zeroes(ch);
+      if(s != -1) s = check(in, s);
     }
-    if(s == -1) s = l;
+    if(s == -1) return null;
+
+    byte[] pm = substring(in, 0, s);
 
     // find format modifier
     if(s < l) {
-      if(cp(in, s) == 'o') {
-        final StringBuilder sb = new StringBuilder();
-        if(cp(in, ++s) == '(') {
-          while(cp(in, ++s) != ')') {
+      if(ch(in, s) == 'o') {
+        final TokenBuilder tb = new TokenBuilder();
+        if(ch(in, ++s) == '(') {
+          while(ch(in, ++s) != ')') {
             // ordinal isn't closed by a parenthesis
-            error = s == l;
-            if(error) break;
-            sb.append((char) cp(in, s));
+            if(s == l) return null;
+            tb.add(ch(in, s));
           }
           ++s;
         }
-        ord = sb.toString();
-      } else if(cp(in, s) == 't') {
+        ordinal = tb.finish();
+      } else if(ch(in, s) == 't') {
         // traditional numbering (ignored)
         ++s;
       }
@@ -93,53 +125,25 @@ public final class FormatParser {
 
     // find remaining modifier
     if(s < l) {
-      if(cp(in, s) == ',') {
-        pm += in.substring(s);
-      } else {
-        // invalid remaining input
-        error = true;
-      }
+      // invalid remaining input
+      if(ch(in, s) != ',') return null;
+      pm = concat(pm, substring(in, s));
     }
-
-    if(ext) {
-      // extract and check width modifier
-      final int w = pm.lastIndexOf(',');
-      if(w != -1) {
-        final String wd = pm.substring(w + 1);
-        pm = pm.substring(0, w);
-
-        final Matcher match = WIDTH.matcher(wd);
-        if(match.find()) {
-          int m = toInt(match.group(1));
-          if(m != Integer.MIN_VALUE) min = m;
-          final String mc = match.group(3);
-          m = mc != null ? toInt(mc) : Integer.MIN_VALUE;
-          if(m != Integer.MIN_VALUE) max = m;
-        } else {
-          error = true;
-        }
-      }
-    }
-
-    // choose first character and case
-    cs = pm.length() > 1 ? Case.STANDARD :
-      (cp(pm, 0) & 0x20) != 0 ? Case.LOWER : Case.UPPER;
-    pres = pm.toLowerCase();
+    return pm;
   }
 
   /**
-   * Parses a decimal-digit-pattern.
-   * @param in input
-   * @param ba base char
+   * Checks a decimal-digit-pattern.
+   * @param input input
+   * @param zero zero char
    * @return end position, or {@code -1} for error
    */
-  private int decimal(final String in, final int ba) {
-    int s = -1;
-    final int l = in.length();
-    boolean d = false;
-    boolean g = false;
-    while(++s < l) {
-      final int ch = cp(in, s);
+  private static int check(final byte[] input, final int zero) {
+    int s = 0;
+    boolean d = false, g = false;
+    final int l = input.length;
+    for(; s < l; s += cl(input, s)) {
+      final int ch = ch(input, s);
       if(Character.isLetter(ch)) break;
 
       if(ch == '#') {
@@ -148,17 +152,18 @@ public final class FormatParser {
         g = false;
       } else if(ch == '*') {
         g = false;
-      } else if(ch >= ba && ch <= ba + 9) {
+      } else if(ch >= zero && ch <= zero + 9) {
         d = true;
         g = false;
+      } else if(zeroes(ch) != -1) {
+        return -1;
       } else {
         // adjacent grouping separators
         if(g) return -1;
         g = true;
       }
     }
-    // no decimal, or ending with grouping separator
-    if(!d || g) return -1;
-    return s;
+    // check if decimal was found, and if last one is no grouping separator
+    return !d || g  ? -1 : s;
   }
 }

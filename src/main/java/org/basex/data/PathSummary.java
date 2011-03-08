@@ -226,14 +226,12 @@ public final class PathSummary implements Index {
 
   @Override
   public IndexIterator ids(final IndexToken tok) {
-    Util.notexpected();
-    return null;
+    throw Util.notexpected();
   }
 
   @Override
   public int nrIDs(final IndexToken tok) {
-    Util.notexpected();
-    return 0;
+    throw Util.notexpected();
   }
 
   @Override

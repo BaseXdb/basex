@@ -37,7 +37,7 @@ import org.basex.query.util.Functions;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Var;
 import org.basex.query.util.Variables;
-import org.basex.query.util.format.DecimalFormat;
+import org.basex.query.util.format.DecFormatter;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
@@ -98,8 +98,8 @@ public final class QueryContext extends Progress {
   public Tim time;
 
   /** Decimal-format declarations. */
-  public TokenObjMap<DecimalFormat> decFormats =
-    new TokenObjMap<DecimalFormat>();
+  public TokenObjMap<DecFormatter> decFormats =
+    new TokenObjMap<DecFormatter>();
   /** Default function namespace. */
   public byte[] nsFunc = FNURI;
   /** Default element namespace. */

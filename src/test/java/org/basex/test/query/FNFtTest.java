@@ -55,6 +55,8 @@ public final class FNFtTest extends AdvancedQueryTest {
     new Set("stemming", true).execute(CTX);
     new CreateIndex("fulltext").execute(CTX);
     contains(fun + "(., 'Exercises')/..", "<li>Exercise 1</li>");
+    new Set("stemming", false).execute(CTX);
+    new CreateIndex("fulltext").execute(CTX);
   }
 
   /**

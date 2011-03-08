@@ -22,16 +22,7 @@ import org.basex.util.TokenList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DecimalFormat {
-  /** Zero digits. */
-  private static final int[] ZEROES = {
-    0x30, 0x660, 0x6F0, 0x7C0, 0x966, 0x9E6, 0xA66, 0xAE6, 0xB66, 0xBE6, 0xC66,
-    0xCE6, 0xD66, 0xE50, 0xED0, 0xF20, 0x1040, 0x1090, 0x17E0, 0x1810, 0x1946,
-    0x19D0, 0x1A80, 0x1A90, 0x1B50, 0x1BB0, 0x1C40, 0x1C50, 0xA620, 0xA8D0,
-    0xA900, 0xA9D0, 0xAA50, 0xABF0, 0xFF10, 0x104A0, 0x11066, 0x1D7CE, 0x1D7D8,
-    0x1D7E2, 0x1D7EC, 0x1D7F6
-  };
-
+public final class DecFormatter extends FormatUtil {
   /** Decimal-digit-family (mandatory-digit-sign). */
   private final String digits;
   /** Active characters. */
@@ -64,7 +55,7 @@ public final class DecimalFormat {
    * Default constructor.
    * @throws QueryException query exception
    */
-  public DecimalFormat() throws QueryException {
+  public DecFormatter() throws QueryException {
     this(null, null);
   }
 
@@ -74,7 +65,7 @@ public final class DecimalFormat {
    * @param map decimal format
    * @throws QueryException query exception
    */
-  public DecimalFormat(final InputInfo ii, final HashMap<String, String> map)
+  public DecFormatter(final InputInfo ii, final HashMap<String, String> map)
       throws QueryException {
 
     // assign map values
@@ -99,13 +90,7 @@ public final class DecimalFormat {
           else if(key.equals(DF_PC)) percent = cp;
           else if(key.equals(DF_PM)) permille = cp;
           else if(key.equals(DF_ZG)) {
-            zero = -1;
-            for(final int z : ZEROES) {
-              if(cp >= z && cp <= z + 9) {
-                zero = z;
-                break;
-              }
-            }
+            zero = zeroes(cp);
             if(zero == -1) INVDECFORM.thrw(ii, key, val);
           }
         } else {
@@ -174,7 +159,7 @@ public final class DecimalFormat {
 
       // loop through all characters
       for(int i = 0; i < pt.length; i += cl) {
-        final int ch = cp(pt, i);
+        final int ch = ch(pt, i);
         cl = cl(pt, i);
         final boolean a = active.indexOf(ch) != -1;
 
@@ -185,7 +170,7 @@ public final class DecimalFormat {
         } else if(ch == grouping) {
           // adjacent decimal sign?
           if(i == 0 && frac || ls == decimal || i + cl < pt.length ?
-              cp(pt, i + cl) == decimal : !frac) return false;
+              ch(pt, i + cl) == decimal : !frac) return false;
         } else if(ch == percent) {
           if(++pc > 1) return false;
         } else if(ch == permille) {
@@ -244,7 +229,7 @@ public final class DecimalFormat {
 
       // loop through all characters
       for(int i = 0; i < pt.length; i += cl(pt, i)) {
-        final int ch = cp(pt, i);
+        final int ch = ch(pt, i);
         final boolean a = active.indexOf(ch) != -1;
 
         if(ch == decimal) {

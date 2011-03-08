@@ -40,22 +40,7 @@ public final class Hex extends Bin {
 
   @Override
   public byte[] atom() {
-    final byte[] data = new byte[val.length << 1];
-    for(int d = 0; d < data.length; d += 2) {
-      final byte v = val[d >> 1];
-      data[d] = b2h((v & 0xF0) >> 4);
-      data[d + 1] = b2h(v & 0x0F);
-    }
-    return data;
-  }
-
-  /**
-   * Converts a byte value into a hex character.
-   * @param b byte value
-   * @return hex character
-   */
-  private static byte b2h(final int b) {
-    return (byte) (b + (b < 0x0A ? '0' : '7'));
+    return Token.hex(val, true);
   }
 
   /**
