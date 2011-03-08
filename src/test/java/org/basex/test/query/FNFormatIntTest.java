@@ -23,15 +23,20 @@ public final class FNFormatIntTest extends QueryTest {
       { "090", str("00000"), "format-integer(0, '00000')" },
       { "092", str("1"), "format-integer(1, '#,0')" },
       { "094", str("1"), "format-integer(1, '#.0')" },
+      { "096", str("1"), "format-integer(1, '#0')" },
 
-      { "100", str("abcd"),
+      //{ "100", str("0,1"), "format-integer(1, '0.0')" },
+      //{ "102", str("0.1"), "format-integer(1, '0,0')" },
+      { "104", str("1"), "format-integer(1, '#,0')" },
+
+      { "120", str("abcd"),
         "string-join(for $i in 1 to 4 return format-integer($i, 'a'))" },
-      { "110", str("ABCD"),
+      { "122", str("ABCD"),
         "string-join(for $i in 1 to 4 return format-integer($i, 'A'))" },
-      { "120", str("i|ii|iii|iv|v|vi|vii|viii|ix|x|" +
+      { "124", str("i|ii|iii|iv|v|vi|vii|viii|ix|x|" +
         "xi|xii|xiii|xiv|xv|xvi|xvii|xviii|xix|xx"),
         "string-join(for $i in 1 to 20 return format-integer($i, 'i'), '|')" },
-      { "130", str("I|II|III|IV|V|VI|VII|VIII|IX|X|" +
+      { "126", str("I|II|III|IV|V|VI|VII|VIII|IX|X|" +
         "XI|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX"),
         "string-join(for $i in 1 to 20 return format-integer($i, 'I'), '|')" },
       { "140", str("\u0661|\u0662|\u0663|\u0664|\u0665|\u0666|\u0667|\u0668|" +
@@ -117,7 +122,6 @@ public final class FNFormatIntTest extends QueryTest {
       { "err130", "format-integer(1500000, '#a')" },
       { "err140", "format-integer(1500000, ',123')" },
       { "err150", "format-integer(1500000, '0,00,,000')" },
-      { "err160", "format-integer(1, '#0')" },
     };
   }
 }

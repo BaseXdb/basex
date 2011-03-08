@@ -1,7 +1,6 @@
 package org.basex.query.util.format;
 
 import static org.basex.util.Token.*;
-import org.basex.util.Token;
 
 /**
  * This class assembles methods and variables that are used by more than one
@@ -124,6 +123,6 @@ abstract class FormatUtil {
    * @return character
    */
   protected static final int ch(final byte[] in, final int pos) {
-    return pos >= 0 && pos < in.length ? Token.cp(in, pos) : 0;
+    return pos >= 0 && pos < in.length ? cp(in, pos) : 0;
   }
 }

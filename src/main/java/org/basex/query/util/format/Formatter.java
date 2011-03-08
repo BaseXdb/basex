@@ -217,7 +217,7 @@ public abstract class Formatter extends FormatUtil {
         }
         if(err) PICCOMP.thrw(ii, pic);
 
-        final FormatParser fp = new FormatParser();
+        final FormatParser fp = new FormatParser(ii);
         if(!fp.parse(m, pres, true)) PICDATE.thrw(ii, pic);
 
         if(fp.pres[0] == 'n') {

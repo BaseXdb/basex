@@ -1,10 +1,11 @@
 package org.basex.query.util.format;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.basex.query.QueryException;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -17,16 +18,27 @@ public final class FormatParser extends FormatUtil {
   /** With pattern: ","  min-width ("-" max-width)?. */
   static final Pattern WIDTH = Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
 
+  /** Input information. */
+  public final InputInfo input;
+
   /** Case. */
-  public Case cs;
+  Case cs;
   /** Presentation modifier in lower-case. */
-  public byte[] pres;
+  byte[] pres;
   /** Ordinal suffix; {@code null} if not specified. */
-  public byte[] ordinal;
+  byte[] ordinal;
   /** Minimum width. */
-  public int min;
+  int min;
   /** Maximum width. */
-  public int max = Integer.MAX_VALUE;
+  int max = Integer.MAX_VALUE;
+
+  /**
+   * Constructor.
+   * @param ii input info
+   */
+  public FormatParser(final InputInfo ii) {
+    input = ii;
+  }
 
   /**
    * Parses the input string.
@@ -34,8 +46,11 @@ public final class FormatParser extends FormatUtil {
    * @param p (valid) presentation modifier
    * @param date flag flag, allowing width modifier
    * @return success flag
+   * @throws QueryException query exception
    */
-  public boolean parse(final byte[] in, final byte[] p, final boolean date) {
+  public boolean parse(final byte[] in, final byte[] p, final boolean date)
+      throws QueryException {
+
     // no marker specified - use default settings
     byte[] pm = in.length != 0 ? mod(in, date) : p;
     if(pm == null) return false;
@@ -66,17 +81,18 @@ public final class FormatParser extends FormatUtil {
   }
 
   /**
-   * Returns a presentation modifier, or {@code null} if the input was invalid.
+   * Returns a presentation modifier.
    * @param in input
    * @param date flag flag, allowing width modifier
    * @return presentation modifier
+   * @throws QueryException query exception
    */
-  private byte[] mod(final byte[] in, final boolean date) {
-    final int l = in.length;
-    int s = -1;
+  private byte[] mod(final byte[] in, final boolean date)
+      throws QueryException {
 
     final int ch = ch(in, 0);
     final int cu = ch | ' ';
+    int s;
     if(sequence(ch) != null) {
       // latin, greek and other alphabetics
       s = cl(in, 0);
@@ -89,29 +105,24 @@ public final class FormatParser extends FormatUtil {
     } else if(ch >= '\u2460' && ch <= '\u249b') {
       // circled, parenthesized or full stop digits
       s = cl(in, 0);
-    } else if(ch >= KANJI[1]) {
+    } else if(ch == KANJI[1]) {
       // japanese numbering
       s = cl(in, 0);
-    } else if(ch == '#') {
-      // optional digits
-      s = check(in, '0');
     } else {
-      // optional digits
-      s = zeroes(ch);
-      if(s != -1) s = check(in, s);
+      // grouping-separator, mandatory-digit, or optional-digit-sign
+      s = check(in);
     }
-    if(s == -1) return null;
-
     byte[] pm = substring(in, 0, s);
 
     // find format modifier
+    final int l = in.length;
     if(s < l) {
       if(ch(in, s) == 'o') {
         final TokenBuilder tb = new TokenBuilder();
         if(ch(in, ++s) == '(') {
           while(ch(in, ++s) != ')') {
             // ordinal isn't closed by a parenthesis
-            if(s == l) return null;
+            if(s == l) ORDCLOSED.thrw(input, in);
             tb.add(ch(in, s));
           }
           ++s;
@@ -126,44 +137,47 @@ public final class FormatParser extends FormatUtil {
     // find remaining modifier
     if(s < l) {
       // invalid remaining input
-      if(ch(in, s) != ',') return null;
+      if(ch(in, s) != ',') PICCOMP.thrw(input, in);
       pm = concat(pm, substring(in, s));
     }
     return pm;
   }
 
   /**
-   * Checks a decimal-digit-pattern.
-   * @param input input
-   * @param zero zero char
-   * @return end position, or {@code -1} for error
+   * Parses a decimal-digit-pattern.
+   * @param in input
+   * @return end position
+   * @throws QueryException query exception
    */
-  private static int check(final byte[] input, final int zero) {
+  private int check(final byte[] in) throws QueryException {
+    int z = zeroes(ch(in, 0));
+    if(z == -1) z = '0';
     int s = 0;
     boolean d = false, g = false;
-    final int l = input.length;
-    for(; s < l; s += cl(input, s)) {
-      final int ch = ch(input, s);
+    final int l = in.length;
+    for(; s < l; s += cl(in, s)) {
+      final int ch = ch(in, s);
       if(Character.isLetter(ch)) break;
 
       if(ch == '#') {
         // optional after decimal sign
-        if(d) return -1;
+        if(d) OPTAFTER.thrw(input, in);
         g = false;
       } else if(ch == '*') {
         g = false;
-      } else if(ch >= zero && ch <= zero + 9) {
+      } else if(ch >= z && ch <= z + 9) {
         d = true;
         g = false;
       } else if(zeroes(ch) != -1) {
-        return -1;
+        MANSAME.thrw(input, in);
       } else {
         // adjacent grouping separators
-        if(g) return -1;
+        if(g) GRPADJ.thrw(input, in);
         g = true;
       }
     }
-    // check if decimal was found, and if last one is no grouping separator
-    return !d || g  ? -1 : s;
+    if(!d) NODEC.thrw(input, in);
+    if(g) GRPSTART.thrw(input, in);
+    return s;
   }
 }
