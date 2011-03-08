@@ -115,8 +115,7 @@ public final class BXDoc extends BXNode implements Document {
       final BXNode n = list.item(l);
       if(n.getNodeType() == Node.ELEMENT_NODE) return (BXElem) n;
     }
-    Util.notexpected();
-    return null;
+    throw Util.notexpected();
   }
 
   @Override
