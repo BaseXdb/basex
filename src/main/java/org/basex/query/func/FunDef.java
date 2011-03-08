@@ -394,7 +394,7 @@ public enum FunDef {
   LOG10(MATHURI, FNMath.class, 1, 1, "log10(number)", ITR_ZO),
 
   /** XQuery math function (project specific). */
-  RAND(MATHURI, FNMath.class, 0, 1, "random([seed])", ITR_ZO),
+  RAND(MATHURI, FNMath.class, 0, 0, "random()", ITR),
   /** XQuery math function (project specific). */
   E(MATHURI, FNMath.class, 0, 0, "e()", ITR),
   /** XQuery math function (project specific). */

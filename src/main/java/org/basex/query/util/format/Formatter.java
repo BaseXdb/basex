@@ -112,7 +112,7 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public byte[] formatDate(final Date date, final byte[] pic,
+  public final byte[] formatDate(final Date date, final byte[] pic,
       final byte[] cal, final byte[] plc, final InputInfo ii)
       throws QueryException {
 
@@ -246,32 +246,40 @@ public abstract class Formatter extends FormatUtil {
 
   /**
    * Returns a formatted integer.
-   * @param number integer to be formatted
+   * @param num integer to be formatted
    * @param mp marker parser
    * @return string representation
    */
-  public byte[] formatInt(final long number, final FormatParser mp) {
+  public final byte[] formatInt(final long num, final FormatParser mp) {
     // choose sign
-    long num = number;
-    final boolean sign = num < 0;
-    if(sign) num = -num;
+    long n = num;
+    final boolean sign = n < 0;
+    if(sign) n = -n;
 
     final TokenBuilder tb = new TokenBuilder();
     final int ch = ch(mp.pres, 0);
     final boolean single = mp.pres.length == cl(mp.pres, 0);
-    if(ch == 'i') {
-      if(single) roman(tb, num);
-    } else if(ch == 'w') {
-      tb.add(word(num, mp.ordinal));
+
+    if(ch == 'w') {
+      tb.add(word(n, mp.ordinal));
     } else if(ch == KANJI[1]) {
-      japanese(tb, num);
+      japanese(tb, n);
+    } else if(single && ch == 'i') {
+      roman(tb, n);
     } else if(ch >= '\u2460' && ch <= '\u249b') {
-      tb.add((int) (ch + number - 1));
+      if(num < 1 || num > 20) tb.addLong(num);
+      else tb.add((int) (ch + num - 1));
     } else if(ch == '#') {
-      tb.add(number(num, mp, '0'));
-    } else if(!single || !sequence(tb, ch, num)) {
+      tb.add(number(n, mp, '0'));
+    } else {
       final int z = zeroes(ch);
-      if(z != -1) tb.add(number(num, mp, z));
+      if(z != -1) {
+        tb.add(number(n, mp, z));
+      } else if(num == 0) {
+        tb.add('0');
+      } else {
+        alpha(tb, num, sequence(ch));
+      }
     }
 
     // finalize formatted string
@@ -282,23 +290,6 @@ public abstract class Formatter extends FormatUtil {
   }
 
   /**
-   * If possible, applies a character sequence.
-   * @param tb token builder
-   * @param ch character to be checked
-   * @param num number
-   * @return success flag
-   */
-  private static boolean sequence(final TokenBuilder tb, final int ch,
-      final long num) {
-
-    final String seq = sequence(ch);
-    if(seq == null) return false;
-    if(num == 0) tb.add(ZERO);
-    else alpha(tb, num, seq);
-    return true;
-  }
-
-  /**
    * Returns a character sequence based on the specified alphabet.
    * @param tb token builder
    * @param n number to be formatted
@@ -306,6 +297,7 @@ public abstract class Formatter extends FormatUtil {
    */
   private static void alpha(final TokenBuilder tb, final long n,
       final String a) {
+
     final int al = a.length();
     if(n > al) alpha(tb, (n - 1) / al, a);
     tb.add(a.charAt((int) ((n - 1) % al)));
@@ -317,7 +309,7 @@ public abstract class Formatter extends FormatUtil {
    * @param n number to be formatted
    */
   private static void roman(final TokenBuilder tb, final long n) {
-    if(n < 4000) {
+    if(n > 0 && n < 4000) {
       final int v = (int) n;
       tb.add(ROMANM[v / 1000]);
       tb.add(ROMANC[v / 100 % 10]);
@@ -348,20 +340,21 @@ public abstract class Formatter extends FormatUtil {
    * @param i initial call
    */
   private static void jp(final TokenBuilder tb, final long n, final boolean i) {
-    if(n >= 0 && n <= 9) {
+    if(n == 0) {
+    } else if(n <= 9) {
       if(n != 1 || !i) tb.add(KANJI[(int) n]);
     } else if(n == 10) {
       tb.add(KANJI[10]);
     } else if(n <= 99) {
-      jp(tb, n, 10L, 10);
+      jp(tb, n, 10, 10);
     } else if(n <= 999) {
-      jp(tb, n, 100L, 11);
+      jp(tb, n, 100, 11);
     } else if(n <= 9999) {
-      jp(tb, n, 1000L, 12);
+      jp(tb, n, 1000, 12);
     } else if(n <= 99999999) {
-      jp(tb, n, 10000L, 13);
+      jp(tb, n, 10000, 13);
     } else if(n <= 999999999999L) {
-      jp(tb, n, 100000000L, 14);
+      jp(tb, n, 100000000, 14);
     } else if(n <= 9999999999999999L) {
       jp(tb, n, 1000000000000L, 15);
     } else {
