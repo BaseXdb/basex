@@ -100,7 +100,7 @@ import org.basex.query.up.Transform;
 import org.basex.query.util.Err;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Var;
-import org.basex.query.util.format.DecimalFormat;
+import org.basex.query.util.format.DecFormatter;
 import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.InputParser;
@@ -233,7 +233,7 @@ public class QueryParser extends InputParser {
     // set default decimal format
     final byte[] empty = new QNm(EMPTY).full();
     if(ctx.decFormats.get(empty) == null) {
-      ctx.decFormats.add(empty, new DecimalFormat());
+      ctx.decFormats.add(empty, new DecFormatter());
     }
     return expr;
   }
@@ -541,7 +541,7 @@ public class QueryParser extends InputParser {
     } while(n != sl.size());
 
     // completes the format declaration
-    ctx.decFormats.add(name, new DecimalFormat(input(), sl));
+    ctx.decFormats.add(name, new DecFormatter(input(), sl));
     return true;
   }
 

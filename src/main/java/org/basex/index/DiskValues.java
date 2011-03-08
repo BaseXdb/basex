@@ -48,15 +48,15 @@ public final class DiskValues implements Index {
    * Constructor, initializing the index structure.
    * @param d data reference
    * @param txt value type (texts/attributes)
-   * @param pre file prefix
+   * @param pref file prefix
    * @throws IOException IO Exception
    */
-  DiskValues(final Data d, final boolean txt, final String pre)
+  DiskValues(final Data d, final boolean txt, final String pref)
       throws IOException {
     data = d;
     text = txt;
-    idxl = new DataAccess(d.meta.file(pre + 'l'));
-    idxr = new DataAccess(d.meta.file(pre + 'r'));
+    idxl = new DataAccess(d.meta.file(pref + 'l'));
+    idxr = new DataAccess(d.meta.file(pref + 'r'));
     size = idxl.read4();
     ctext = new byte[size][];
   }
