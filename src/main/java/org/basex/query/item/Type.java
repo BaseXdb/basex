@@ -790,8 +790,7 @@ public enum Type {
    */
   @SuppressWarnings("unused")
   public Item e(final Object o, final InputInfo ii) throws QueryException {
-    Util.notexpected(o);
-    return null;
+    throw Util.notexpected(o);
   }
 
   /**

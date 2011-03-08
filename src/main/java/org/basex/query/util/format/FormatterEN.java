@@ -64,7 +64,7 @@ final class FormatterEN extends Formatter {
   private static final byte[][] ERAS = tokens("BC", "AD");
 
   @Override
-  public byte[] word(final long n, final String ord) {
+  public byte[] word(final long n, final byte[] ord) {
     final TokenBuilder tb = new TokenBuilder();
     if(n == 0) tb.add(ZERO);
     else word(tb, n, ord);
@@ -72,7 +72,7 @@ final class FormatterEN extends Formatter {
   }
 
   @Override
-  public byte[] ordinal(final long n, final String ord) {
+  public byte[] ordinal(final long n, final byte[] ord) {
     if(ord == null) return EMPTY;
     final int f = (int) (n % 10);
     return ORDSUFFIX[f > 0 && f < 4 && n % 100 / 10 != 1 ? f - 1 : 3];
@@ -115,7 +115,7 @@ final class FormatterEN extends Formatter {
    * @param n number to be formatted
    * @param ord ordinal suffix
    */
-  private void word(final TokenBuilder tb, final long n, final String ord) {
+  private void word(final TokenBuilder tb, final long n, final byte[] ord) {
     if(n == 0) {
       //tb.add(ZERO);
     } else if(n < 20) {
@@ -145,7 +145,7 @@ final class FormatterEN extends Formatter {
    * @return true if word was added
    */
   private boolean addWord(final TokenBuilder tb, final long n, final long f,
-      final byte[] unit, final String ord) {
+      final byte[] unit, final byte[] ord) {
 
     final boolean ge = n >= f;
     if(ge) {
