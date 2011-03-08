@@ -48,13 +48,11 @@ public final class ClientSession extends Session {
   /** Trigger notifications. */
   Map<String, TriggerNotification> tn;
   /** Socket trigger reference. */
-  Socket trigger;
+  Socket tsocket;
   /** Socket host name. */
   String shost;
   /** Trigger port. */
   int tport = 1985;
-  /** Server id. */
-  String id;
 
   /**
    * Constructor, specifying the database context and the
@@ -173,15 +171,15 @@ public final class ClientSession extends Session {
       sout.write(10);
       send(name);
       final BufferInput bi = new BufferInput(sin);
-      if(trigger == null) {
-        trigger = new Socket();
-        trigger.connect(new InetSocketAddress(shost, tport), 5000);
-        id = bi.readString();
-        PrintOutput sout2 = PrintOutput.get(trigger.getOutputStream());
-        sout2.print(id);
-        sout2.write(0);
-        sout2.flush();
-        startListener(trigger.getInputStream());
+      if(tsocket == null) {
+        tsocket = new Socket();
+        tsocket.connect(new InetSocketAddress(shost, tport), 5000);
+        String id = bi.readString();
+        PrintOutput tout = PrintOutput.get(tsocket.getOutputStream());
+        tout.print(id);
+        tout.write(0);
+        tout.flush();
+        startListener(tsocket.getInputStream());
       }
       info = bi.readString();
       if(!ok(bi)) throw new IOException(info);
@@ -202,11 +200,11 @@ public final class ClientSession extends Session {
         try {
           while(true) {
             BufferInput bi = new BufferInput(in);
-            String name = bi.readString().trim();
+            String name = bi.readString();
             String val = bi.readString();
             tn.get(name).update(val);
           }
-        }catch(Exception e) { }
+        } catch(Exception e) { }
        }
     }.start();
   }
@@ -270,6 +268,7 @@ public final class ClientSession extends Session {
   @Override
   public void close() throws IOException {
     send(Cmd.EXIT.toString());
+    if(tsocket != null) tsocket.close();
     socket.close();
   }
 

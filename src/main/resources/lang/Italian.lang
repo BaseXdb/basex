@@ -528,12 +528,9 @@ ch_create5=crea l'indice specificato
 ch_create6=Crea un sistema DeepFS [%] per [%]
 ch_create7=(usando [%] e [%] se FUSE è attivo)
 ch_create8=crea l'utente specificato
-<<<<<<< HEAD
 ch_create9=creates the trigger
-=======
 ch_check1=Open or create database.
 ch_check2=Opens an existing database or creates a new instance.
->>>>>>> refs/remotes/origin/master
 ch_add1=Aggiungi documento.
 ch_add2=Adds [%] as [%] to the database, using an optional\n[%] path.
 ch_delete1=Rimuovi documenti.

@@ -123,7 +123,6 @@ public final class TriggerPool {
     for (ServerProcess srv : sessions) {
       if(!srv.equals(sp)) {
         try {
-          srv.tout.write(1);
           srv.tout.writeString(name);
           srv.tout.write(i);
           srv.tout.write(0);

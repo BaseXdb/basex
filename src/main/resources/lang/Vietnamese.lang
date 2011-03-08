@@ -528,12 +528,9 @@ ch_create5=creates the specified index
 ch_create6=creates filesystem database [%] for [%]
 ch_create7=(using [%] and [%] if FUSE is activated)
 ch_create8=creates the specified user
-<<<<<<< HEAD
 ch_create9=creates the trigger
-=======
 ch_check1=Open or create database.
 ch_check2=Opens an existing database or creates a new instance.
->>>>>>> refs/remotes/origin/master
 ch_add1=Add document to database.
 ch_add2=Adds [%] as [%] into [%].
 ch_delete1=Delete documents from database.
