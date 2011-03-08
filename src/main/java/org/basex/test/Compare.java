@@ -7,7 +7,6 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
-
 /**
  * This class compares query results with other query processors.
  *
@@ -16,9 +15,9 @@ import org.basex.util.*;
  */
 public abstract class Compare {
   /** XSLT flag. */
-  private static final boolean XSLTMODE = true;
+  private static final boolean XSLTMODE = false;
   /** Verbose mode. */
-  private static final boolean VERBOSE = false;
+  private static final boolean VERBOSE = true;
 
   /** Database context. */
   private static final Context CONTEXT = new Context();
@@ -38,10 +37,14 @@ public abstract class Compare {
   private static final String TMP = Prop.TMP + "queries.tmp";
   /** Query processors. */
   private static final String[][] XQUERYPROCS = {
-    { "Saxon", "java", "-cp", "c:/Program Files/Saxon/saxon9he.jar",
-      "net.sf.saxon.Query", TMP, "!omit-xml-declaration=yes" },
-    { "XQSharp", "c:/Program Files (x86)/XQSharp/xquery.exe",
-      TMP, "!omit-xml-declaration=yes" }
+    { "Saxon", "java", "-cp",
+      "c:/Program Files/Saxon;c:/Program Files/Saxon/saxon9ee.jar",
+      "net.sf.saxon.Query", "-qversion:1.1", "-sa", TMP,
+      "!omit-xml-declaration=yes" },
+    /*{ "Saxon", "java", "-cp", "c:/Program Files/Saxon/saxon9he.jar",
+      "net.sf.saxon.Query", TMP, "!omit-xml-declaration=yes" }, */
+    /*{ "XQSharp", "c:/Program Files (x86)/XQSharp/xquery.exe",
+      TMP, "!omit-xml-declaration=yes" } */
   };
   /** XSLT processors. */
   private static final String[][] XSLTPROCS = {
@@ -63,7 +66,8 @@ public abstract class Compare {
     if(XSLTMODE) IO.get(TMPCTX).write(Token.token("<x/>"));
 
     // loop through all queries
-    final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
+    final BufferedReader br = new BufferedReader(
+        new InputStreamReader(new FileInputStream(QUERIES), Token.UTF8));
     while(true) {
       final String line = br.readLine();
       if(line == null) break;
@@ -88,7 +92,7 @@ public abstract class Compare {
     try {
       result = new XQuery(query).execute(CONTEXT);
     } catch(final BaseXException ex) {
-      result = ex.getMessage();
+      result = ex.getMessage().replaceAll("[\\r\\n]+", " ");
     }
 
     // write XQuery or XSLT to temporary file
@@ -135,7 +139,7 @@ public abstract class Compare {
         if(t == -1) break;
         bl.add(t);
       }
-      return bl.toString();
+      return bl.toString().replaceAll("[\\r\\n ]+", " ");
     } catch(final IOException ex) {
       return ex.getMessage();
     }
