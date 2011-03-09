@@ -28,6 +28,7 @@ public final class FNFormatIntTest extends QueryTest {
       //{ "100", str("0,1"), "format-integer(1, '0.0')" },
       //{ "102", str("0.1"), "format-integer(1, '0,0')" },
       { "104", str("1"), "format-integer(1, '#,0')" },
+      //{ "106", str("1,1"), "format-integer(11, '#,0')" },
 
       { "120", str("abcd"),
         "string-join(for $i in 1 to 4 return format-integer($i, 'a'))" },

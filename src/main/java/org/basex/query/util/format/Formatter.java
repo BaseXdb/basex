@@ -217,8 +217,8 @@ public abstract class Formatter extends FormatUtil {
         }
         if(err) PICCOMP.thrw(ii, pic);
 
-        final FormatParser fp = new FormatParser(ii);
-        if(!fp.parse(m, pres, true)) PICDATE.thrw(ii, pic);
+        final FormatParser fp = new FormatParser(ii, m, pres);
+        if(!fp.parse()) PICDATE.thrw(ii, pic);
 
         if(fp.pres[0] == 'n') {
           byte[] in = EMPTY;
@@ -272,13 +272,19 @@ public abstract class Formatter extends FormatUtil {
     } else if(ch == '#') {
       tb.add(number(n, mp, '0'));
     } else {
-      final int z = zeroes(ch);
-      if(z != -1) {
-        tb.add(number(n, mp, z));
-      } else if(num == 0) {
-        tb.add('0');
+      final String seq = sequence(ch);
+      if(seq != null) {
+        alpha(tb, num, seq);
       } else {
-        alpha(tb, num, sequence(ch));
+        final int z = zeroes(ch);
+        if(z != -1) {
+          tb.add(number(n, mp, z));
+        } else if(num == 0) {
+          tb.add('0');
+        } else {
+          System.out.println("? " + string(mp.pres));
+          alpha(tb, num, sequence(ch));
+        }
       }
     }
 

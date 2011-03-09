@@ -20,6 +20,12 @@ public final class FormatParser extends FormatUtil {
 
   /** Input information. */
   public final InputInfo input;
+  /** Input to be parsed. */
+  public final byte[] in;
+  /** Default modifier. */
+  public final byte[] def;
+  /** Date flag. */
+  public final boolean date;
 
   /** Case. */
   Case cs;
@@ -35,24 +41,25 @@ public final class FormatParser extends FormatUtil {
   /**
    * Constructor.
    * @param ii input info
+   * @param i input
+   * @param df (valid) presentation modifier.
+   * '1' is used if no default modifier is specified.
    */
-  public FormatParser(final InputInfo ii) {
+  public FormatParser(final InputInfo ii, final byte[] i, final byte[] df) {
     input = ii;
+    in = i;
+    date = df != null;
+    def = date ? df : ONE;
   }
 
   /**
    * Parses the input string.
-   * @param in marker input
-   * @param p (valid) presentation modifier
-   * @param date flag flag, allowing width modifier
    * @return success flag
    * @throws QueryException query exception
    */
-  public boolean parse(final byte[] in, final byte[] p, final boolean date)
-      throws QueryException {
-
+  public boolean parse() throws QueryException {
     // no marker specified - use default settings
-    byte[] pm = in.length != 0 ? mod(in, date) : p;
+    byte[] pm = in.length != 0 ? mod() : def;
     if(pm == null) return false;
 
     if(date) {
@@ -82,102 +89,97 @@ public final class FormatParser extends FormatUtil {
 
   /**
    * Returns a presentation modifier.
-   * @param in input
-   * @param date flag flag, allowing width modifier
    * @return presentation modifier
    * @throws QueryException query exception
    */
-  private byte[] mod(final byte[] in, final boolean date)
-      throws QueryException {
+  private byte[] mod() throws QueryException {
+    final int l = in.length;
+    // final presentation modifier
+    byte[] pm = null;
+    // current offset
+    int pos = cl(in, 0);
 
-    final int ch = ch(in, 0);
-    final int cu = ch | ' ';
-    int s;
+    // proposed presentation modifier
+    int ch = ch(in, 0);
     if(sequence(ch) != null) {
-      // latin, greek and other alphabetics
-      s = cl(in, 0);
-    } else if(cu == 'i') {
-      // roman sequence
-      s = cl(in, 0);
-    } else if(cu == 'w' || cu == 'n' && date) {
-      // verbose, or name output
-      s = ch(in, 1) == (ch | ' ') ? 2 : 1;
+      // Latin, Greek and other alphabets
     } else if(ch >= '\u2460' && ch <= '\u249b') {
       // circled, parenthesized or full stop digits
-      s = cl(in, 0);
     } else if(ch == KANJI[1]) {
-      // japanese numbering
-      s = cl(in, 0);
+      // Japanese numbering
+    } else if((ch | ' ') == 'i') {
+      // Roman sequence
+    } else if((ch | ' ') == 'w' || (ch | ' ') == 'n' && date) {
+      // word-wise output (incl. title-case check)
+      if((ch & ' ') == 0 && ch(in, pos) == (ch | ' ')) pos += cl(in, pos);
     } else {
-      // grouping-separator, mandatory-digit, or optional-digit-sign
-      s = check(in);
-    }
-    byte[] pm = substring(in, 0, s);
+      // mandatory-digit-sign
+      int z = -1;
+      boolean group = false;
+      for(pos = 0; pos < l; pos += cl(in, pos)) {
+        ch = ch(in, pos);
 
-    // find format modifier
-    final int l = in.length;
-    if(s < l) {
-      if(ch(in, s) == 'o') {
-        final TokenBuilder tb = new TokenBuilder();
-        if(ch(in, ++s) == '(') {
-          while(ch(in, ++s) != ')') {
-            // ordinal isn't closed by a parenthesis
-            if(s == l) ORDCLOSED.thrw(input, in);
-            tb.add(ch(in, s));
+        if(z == -1) {
+          z = zeroes(ch);
+          if(z != -1 || ch == '#') {
+          } else if(Character.isLetter(ch)) {
+            pm = def;
+            pos += cl(in, pos);
+            break;
+          } else if(pos == 0) {
+            GROUPSTART.thrw(input, in);
           }
-          ++s;
+        } else {
+          if(Character.isLetter(ch)) {
+            pm = substring(in, 0, pos);
+            break;
+          } else if(ch >= z && ch <= z + 9) {
+          } else if(zeroes(ch) != -1) {
+            MANSAME.thrw(input, in);
+          } else if(ch == '#') {
+            OPTAFTER.thrw(input, in);
+          } else {
+            if(group) GROUPADJ.thrw(input, in);
+            group = true;
+            continue;
+          }
+        }
+        group = false;
+      }
+      if(z == -1) NOMAND.thrw(input, in);
+      if(group) GROUPEND.thrw(input, in);
+      if(pm == null) pm = substring(in, 0, pos);
+    }
+
+    // extract primary format token from the original string if proposed
+    // is to be adopted as final character
+    if(pm == null) pm = substring(in, 0, pos);
+
+    // check for optional format modifier
+    if(pos < l) {
+      if(ch(in, pos) == 'o') {
+        final TokenBuilder tb = new TokenBuilder();
+        if(ch(in, ++pos) == '(') {
+          while(ch(in, ++pos) != ')') {
+            // ordinal isn't closed by a parenthesis
+            if(pos == l) ORDCLOSED.thrw(input, in);
+            tb.add(ch(in, pos));
+          }
+          ++pos;
         }
         ordinal = tb.finish();
-      } else if(ch(in, s) == 't') {
+      } else if(ch(in, pos) == 't') {
         // traditional numbering (ignored)
-        ++s;
+        ++pos;
       }
-    }
 
-    // find remaining modifier
-    if(s < l) {
-      // invalid remaining input
-      if(ch(in, s) != ',') PICCOMP.thrw(input, in);
-      pm = concat(pm, substring(in, s));
+      // check for optional format modifier
+      if(pos < l) {
+        // invalid remaining input
+        if(ch(in, pos) != ',') PICCOMP.thrw(input, in);
+        pm = concat(pm, substring(in, pos));
+      }
     }
     return pm;
-  }
-
-  /**
-   * Parses a decimal-digit-pattern.
-   * @param in input
-   * @return end position
-   * @throws QueryException query exception
-   */
-  private int check(final byte[] in) throws QueryException {
-    int z = zeroes(ch(in, 0));
-    if(z == -1) z = '0';
-    int s = 0;
-    boolean d = false, g = false;
-    final int l = in.length;
-    for(; s < l; s += cl(in, s)) {
-      final int ch = ch(in, s);
-      if(Character.isLetter(ch)) break;
-
-      if(ch == '#') {
-        // optional after decimal sign
-        if(d) OPTAFTER.thrw(input, in);
-        g = false;
-      } else if(ch == '*') {
-        g = false;
-      } else if(ch >= z && ch <= z + 9) {
-        d = true;
-        g = false;
-      } else if(zeroes(ch) != -1) {
-        MANSAME.thrw(input, in);
-      } else {
-        // adjacent grouping separators
-        if(g) GRPADJ.thrw(input, in);
-        g = true;
-      }
-    }
-    if(!d) NODEC.thrw(input, in);
-    if(g) GRPSTART.thrw(input, in);
-    return s;
   }
 }
