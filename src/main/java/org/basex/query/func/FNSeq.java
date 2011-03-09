@@ -88,22 +88,22 @@ final class FNSeq extends Fun {
       final DBNode fst = (DBNode) nc.get(outer ? 0 : len - 1);
       final Data data = fst.data;
       final ANode[] nodes = nc.item.clone();
-      nc.item[0] = fst;
-      nc.size(1);
 
-      // [LW] improve with NodeCache.binarySearch()
       if(outer) {
         // skip the subtree of the last added node
-        int next = fst.pre + data.size(fst.pre, kind(fst.type));
-        for(int i = 1; i < len; i++) {
-          final DBNode nd = (DBNode) nodes[i];
-          if(nd.pre >= next) {
-            nc.add(nd);
-            next = nd.pre + data.size(nd.pre, kind(nd.type));
-          }
+        nc.size(0);
+        final NodeCache src = new NodeCache(nodes, len);
+        for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
+          final DBNode nd = (DBNode) nodes[next];
+          final int n = nd.pre + data.size(nd.pre, kind(nd.type));
+          p = src.binarySearch(n, next + 1, len - next - 1);
+          nc.add(nd);
         }
       } else {
+        // [LW] improve with NodeCache.binarySearch()
         // skip ancestors of the last added node
+        nc.item[0] = fst;
+        nc.size(1);
         int before = fst.pre;
         for(int i = len - 1; i-- != 0;) {
           final DBNode nd = (DBNode) nodes[i];
