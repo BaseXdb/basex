@@ -94,7 +94,19 @@ public enum Err {
   FUNERR1(FOER, 0, "Halted on error()."),
 
   /** FOFD1340: Evaluation exception. */
+  OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  MANSAME(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GRPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GRPSTART(FOFD, 1340, "Picture starts/ends with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  NODEC(FOFD, 1340, "No mandatory digit specified: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
   PICDATE(FOFD, 1340, "Invalid picture string: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  ORDCLOSED(FOFD, 1340, "Ordinal is not closed: \"%\"."),
   /** FOFD1350: Evaluation exception. */
   PICCOMP(FOFD, 1350, "Invalid component in string: \"%\"."),
 

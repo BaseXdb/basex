@@ -67,7 +67,7 @@ final class FNFormat extends Fun {
     final long num = checkItr(expr[0], ctx);
 
     if(pic.length == 0) WRONGINT.thrw(input, pic);
-    final FormatParser fp = new FormatParser();
+    final FormatParser fp = new FormatParser(input);
     if(!fp.parse(pic, ONE, false)) PICDATE.thrw(input, pic);
     final Formatter form = Formatter.get(string(lng));
     return Str.get(form.formatInt(num, fp));

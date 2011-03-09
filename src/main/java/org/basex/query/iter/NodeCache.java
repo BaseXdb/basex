@@ -1,10 +1,13 @@
 package org.basex.query.iter;
 
+import java.util.Arrays;
+import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Value;
 import org.basex.util.Array;
+import org.basex.util.Util;
 
 /**
  * Caching node iterator, returning sorted nodes.
@@ -143,24 +146,30 @@ public final class NodeCache extends AxisIter {
    * @return position, or {@code -1}
    */
   public int indexOf(final ANode node, final boolean db) {
-    if(db) {
-      // binary search
-      final DBNode dbn = (DBNode) node;
-      int l = 0, h = size - 1;
-      while(l <= h) {
-        final int m = l + h >>> 1;
-        final DBNode n = (DBNode) item[m];
-        final int c = n.pre - dbn.pre;
-        if(c == 0) return n.data == dbn.data ? m : -1;
-        if(c < 0) l = m + 1;
-        else h = m - 1;
-      }
-    } else {
-      for(int s = 0; s < size(); ++s) {
-        if(item[s].is(node)) return s;
-      }
-    }
+    if(db) return Math.max(binarySearch(((DBNode) node).pre, 0, size), -1);
+    for(int s = 0; s < size(); ++s) if(item[s].is(node)) return s;
     return -1;
+  }
+
+  /**
+   * Performs a binary search on the given range of this sequence iterator,
+   * assuming that all nodes are {@link DBNode}s from the same {@link Data}
+   * instance (i.e., {@link #dbnodes()} returns {@code true}).
+   * @param pre PRE number to find
+   * @param start start of the search interval
+   * @param length length of the search interval
+   * @return position of the item or {@code -insertPosition - 1} if not found
+   */
+  public int binarySearch(final int pre, final int start, final int length) {
+    int l = start, r = start + length - 1;
+    while(l <= r) {
+      final int m = l + r >>> 1;
+      final int npre = ((DBNode) item[m]).pre;
+      if(npre == pre) return m;
+      if(npre < pre) l = m + 1;
+      else r = m - 1;
+    }
+    return -(l + 1);
   }
 
   /**
@@ -283,5 +292,10 @@ public final class NodeCache extends AxisIter {
     final ANode tmp = item[a];
     item[a] = item[b];
     item[b] = tmp;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + Arrays.toString(Arrays.copyOf(item, size));
   }
 }
