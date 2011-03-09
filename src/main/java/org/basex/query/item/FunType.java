@@ -87,9 +87,9 @@ public final class FunType implements Type {
   @Override
   public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    // TODO check types better
     if(!it.func() || ((FunType) it.type).args.length != args.length)
       Err.cast(ii, this, it);
+    // [LW] function item coercion
     return it;
   }
 

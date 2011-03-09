@@ -37,15 +37,13 @@ public class InlineFunc extends Func {
   @Override
   public FunItem item(final QueryContext ctx, final InputInfo ii) {
 
-    FunType ft = expr.funType();
-    if(ft == null) {
-      final SeqType[] at = new SeqType[args.length];
-      for(int i = 0; i < at.length; i++)
-        at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
-      ft = FunType.get(at, var.type());
-    }
+    // [LW] better type propagation
+    final SeqType[] at = new SeqType[args.length];
+    for(int i = 0; i < at.length; i++)
+      at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
 
-    return new FunItem(args, expr, ft, ctx.vars.local());
+    return new FunItem(args, expr, FunType.get(at, var.type()),
+        ctx.vars.local());
   }
 
   @Override

@@ -1739,7 +1739,7 @@ public class QueryParser extends InputParser {
       if(name.ns()) ctx.ns.uri(name);
       else name.uri(ctx.nsFunc);
       final long cardinal = ((Itr) numericLiteral(true)).itr(null);
-      // TODO [CG] what to do with big number of arguments? (ex: varargs)
+      // [LW] what to do with big number of arguments? (ex: varargs)
       if(cardinal < 0 || cardinal > Integer.MAX_VALUE) error(FUNCUNKNOWN, fn);
 
       final Expr[] args = new Expr[(int) cardinal];

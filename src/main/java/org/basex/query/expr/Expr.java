@@ -5,7 +5,6 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
-import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -261,15 +260,6 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public boolean isFun(final FunDef f) {
     return false;
-  }
-
-  /**
-   * If this expression is used as a function, this method returns the function
-   * type of this function.
-   * @return function type or {@code null}
-   */
-  public FunType funType() {
-    return null;
   }
 
   /**

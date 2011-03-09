@@ -40,15 +40,12 @@ public class LitFunc extends Func {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
 
-    FunType ft = expr.funType();
-    if(ft == null) {
-      final SeqType[] at = new SeqType[args.length];
-      for(int i = 0; i < at.length; i++)
-        at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
-      ft = FunType.get(at, var.type());
-    }
+    // [LW] better type propagation
+    final SeqType[] at = new SeqType[args.length];
+    for(int i = 0; i < at.length; i++)
+      at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
 
-    return new FunItem(name, args, expr, ft);
+    return new FunItem(name, args, expr, FunType.get(at, var.type()));
   }
 
   @Override

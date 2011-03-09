@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FunType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -81,11 +80,6 @@ public final class FuncCall extends Arr {
     final ItemCache ir = ItemCache.get(ctx.iter(func));
     ctx.vars.reset(s);
     return ir;
-  }
-
-  @Override
-  public FunType funType() {
-    return func.funType();
   }
 
   @Override
