@@ -192,8 +192,7 @@ public class Dur extends Item {
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    Err.diff(ii, it, this);
-    return 0;
+    throw Err.diff(ii, it, this);
   }
 
   @Override
@@ -202,7 +201,7 @@ public class Dur extends Item {
   }
 
   @Override
-  public int hashCode() {
+  public int hash() {
     return (int) ((3 + mon) * (7 + sc.doubleValue()));
   }
 

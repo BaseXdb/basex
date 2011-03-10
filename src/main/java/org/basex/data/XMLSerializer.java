@@ -101,8 +101,7 @@ public final class XMLSerializer extends Serializer {
     out = PrintOutput.get(os);
     final SerializerProp p = props == null ? PROPS : props;
 
-    final String m = p.check(S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT,
-        M_HEX, M_BASE64);
+    final String m = p.check(S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT);
     mth = m.equals(M_XML) ? M_XML : m.equals(M_XHTML) ?
         M_XHTML : m.equals(M_HTML) ? M_HTML : M_TEXT;
 
@@ -119,7 +118,7 @@ public final class XMLSerializer extends Serializer {
     p.check(S_NORMALIZATION_FORM, NFC, NONE);
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
-    if(!maps.isEmpty()) throw SERMAP.serial(maps);
+    if(!maps.isEmpty()) SERMAP.thrwSerial(maps);
 
     enc     = normEncoding(p.get(S_ENCODING), null);
     docsys  = p.get(S_DOCTYPE_SYSTEM);
@@ -143,8 +142,8 @@ public final class XMLSerializer extends Serializer {
       docpub = null;
     }
 
-    if(!supported(enc)) SERENCODING.serial(enc);
-    if(undecl && version.equals(V10)) SERUNDECL.serial();
+    if(!supported(enc)) SERENCODING.thrwSerial(enc);
+    if(undecl && version.equals(V10)) SERUNDECL.thrwSerial();
 
     // print byte-order-mark
     if(bom) {
@@ -174,7 +173,7 @@ public final class XMLSerializer extends Serializer {
         print(PI2);
         ind = indent;
       } else if(!sa.equals(OMIT) || version.equals(V11) && docsys != null) {
-        SERSTAND.serial();
+        SERSTAND.thrwSerial();
       }
     }
 
@@ -305,7 +304,7 @@ public final class XMLSerializer extends Serializer {
     if(mth == M_TEXT) return;
     finishElement();
     if(ind) indent(true);
-    if(mth == M_HTML && contains(v, '>')) throw SERPI.serial();
+    if(mth == M_HTML && contains(v, '>')) SERPI.thrwSerial();
     print(PI1);
     print(n);
     print(' ');
@@ -334,7 +333,7 @@ public final class XMLSerializer extends Serializer {
         return;
       }
       if(ch < 0x20 && ch != 0x09 && ch != 0x0A && ch != 0x0D) return;
-      if(ch > 0x7F && ch < 0xA0) throw SERILL.serial(Integer.toHexString(ch));
+      if(ch > 0x7F && ch < 0xA0) SERILL.thrwSerial(Integer.toHexString(ch));
       if(ch == 0xA0) {
         print(E_NBSP);
         return;

@@ -8,7 +8,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.NCN;
 import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
@@ -71,18 +70,17 @@ final class FNQName extends Fun {
         return nm;
       case LOCNAMEQNAME:
         if(it == null) return null;
-        return new NCN(((QNm) checkType(it, Type.QNM)).ln(), input);
+        nm = (QNm) checkType(it, Type.QNM);
+        return Type.NCN.e(Str.get(nm.ln()), ctx, input);
       case PREQNAME:
         if(it == null) return null;
         nm = (QNm) checkType(it, Type.QNM);
-        return !nm.ns() ? null : new NCN(nm.pref(), input);
+        return !nm.ns() ? null : Type.NCN.e(Str.get(nm.pref()), ctx, input);
       case NSURIPRE: // [LW][LK] broken...
+        // [LK] find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);
-
-        // [LK] find out if inherit flag has a persistent effect - if positive,
-        // we're screwed. test case added to unresolved namespace tests.
         final ANode an = (ANode) checkType(it2, Type.ELM);
-        final Atts at = an.nsScope(copiedNod(an, ctx) ? ctx.nsInherit : true);
+        final Atts at = an.nsScope(!copiedNod(an, ctx) || ctx.nsInherit);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:
@@ -126,8 +124,7 @@ final class FNQName extends Fun {
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();
     final byte[] uri = ((ANode) checkType(it, Type.ELM)).uri(pref, ctx);
-    if(uri == null && pref.length != 0) NSDECL.thrw(input, pref);
-    // [CG] XQuery/resolve-QName: check: uri == null && pref.length == 0
+    if(uri == null) NSDECL.thrw(input, pref);
     nm.uri(uri);
     return nm;
   }

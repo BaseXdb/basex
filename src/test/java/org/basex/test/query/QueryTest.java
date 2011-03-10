@@ -86,14 +86,16 @@ public abstract class QueryTest {
         }
         if(!correct || !val.sameAs(cmp)) {
           sb.append("-- " + qu[0] + ": " + query);
-          sb.append("\n[E#" + cmp.size() + "] ");
+          String s = correct && cmp.size() != 1 ? "#" + cmp.size() : "";
+          sb.append("\n[E" + s + "] ");
           if(correct) {
             final String cp = cmp.toString();
-            sb.append(cp.length() > 20 ? cp.substring(0, 20) + "..." : cp);
+            sb.append(cp.length() > 1000 ? cp.substring(0, 1000) + "..." : cp);
           } else {
             sb.append("error");
           }
-          sb.append("\n[F#" + val.size() + "] " + val + " " + details() + "\n");
+          s = val.size() != 1 ? "#" + val.size() : "";
+          sb.append("\n[F" + s + "] " + val + " " + details() + "\n");
           ++fail;
         }
       } catch(final BaseXException ex) {

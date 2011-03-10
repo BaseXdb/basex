@@ -94,7 +94,21 @@ public enum Err {
   FUNERR1(FOER, 0, "Halted on error()."),
 
   /** FOFD1340: Evaluation exception. */
+  OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPSTART(FOFD, 1340, "Picture begins with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPEND(FOFD, 1340, "Picture ends with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  NOMAND(FOFD, 1340, "No mandatory digit specified: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
   PICDATE(FOFD, 1340, "Invalid picture string: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  ORDCLOSED(FOFD, 1340, "Ordinal is not closed: \"%\"."),
   /** FOFD1350: Evaluation exception. */
   PICCOMP(FOFD, 1350, "Invalid component in string: \"%\"."),
 
@@ -126,13 +140,13 @@ public enum Err {
   CANNOTLIST(FOFL, 8, "Files of '%' cannot be returned."),
 
   /** FOZP0001: Evaluation exception. */
-  ZIPFAIL(FOZP, 1, "Operation failed: %."),
+  ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
   /** FOZP0002: Evaluation exception. */
-  ZIPNOTFOUND(FOZP, 2, "Path '%' not found."),
+  ZIPINVALID(FOZP, 2, "% element: % attribute expected."),
+  /** FOZP0002: Evaluation exception. */
+  ZIPUNKNOWN(FOZP, 2, "ZIP Definition: unknown element %."),
   /** FOZP0003: Evaluation exception. */
-  ZIPINVALID(FOZP, 3, "% element: % attribute expected."),
-  /** FOZP0003: Evaluation exception. */
-  ZIPUNKNOWN(FOZP, 3, "ZIP Definition: unknown element %."),
+  ZIPFAIL(FOZP, 3, "Operation failed: %."),
 
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL: \"%\"."),
@@ -191,6 +205,8 @@ public enum Err {
   INVDIG(FORG, 6, "Invalid digit for base %: %."),
   /** FORG0006: Evaluation exception. */
   JAVAERR(FORG, 6, "Java call failed: %."),
+  /** FORG0006: Evaluation exception. */
+  ERRFORM(FORG, 6, "%: %."),
   /** FORG0008: Function exception. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
 
@@ -221,8 +237,6 @@ public enum Err {
 
   /** FTST0000: Parsing exception. */
   FTFZWC(FTST, 0, "Either wildcards or fuzzy search supported."),
-  /** FTST0000: Parsing exception. */
-  THESRNG(FTST, 0, "Constant integer expected for thesaurus level."),
   /** FTST0007: Parsing exception. */
   FTIGNORE(FTST, 7, "Ignore option not supported."),
   /** FTST0008: Parsing exception. */
@@ -235,7 +249,7 @@ public enum Err {
   FTDUP(FTST, 19, "Match option '%' was defined twice."),
 
   /** SESU0007: Serialization exception. */
-  SERENCODING(SESU, 7, "Unknown encoding: \"%\"."),
+  SERENCODING(SESU, 7, "Encoding not supported: \"%\"."),
   /** SEPM0009: Serialization exception. */
   SERSTAND(SEPM, 9, "Invalid combination of \"omit-xml-declaration\"."),
   /** SEPM0010: Serialization exception. */
@@ -376,9 +390,9 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   EXPREMPTY(XPST, 3, "Unknown function or expression."),
   /** XPST0003: Parsing exception. */
-  NOTYPE(XPST, 3, "Unknown type %."),
+  NOTYPE(XPST, 3, "Unknown type \"%\"."),
   /** XPST0003: Parsing exception. */
-  PIXML(XPST, 3, "Illegal PI name: %."),
+  PIXML(XPST, 3, "Illegal PI name: \"%\"."),
   /** XPST0003: Parsing exception. */
   EMPTYSEQOCC(XPST, 3, "No occurrence indicator defined for %."),
   /** XPST0003: Parsing exception. */
@@ -395,6 +409,8 @@ public enum Err {
   FTMATCH(XPST, 3, "Unknown match option '%...'."),
   /** XPST0003: Evaluation exception. */
   INVALPI(XPST, 3, "Invalid PI name: \"%\"."),
+  /** XPST0003: Parsing exception. */
+  INTEXP(XPST, 3, "Integer expected."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will not yield any results."),
@@ -445,7 +461,7 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   XPTYPENUM(XPTY, 4, "%: number expected, % found."),
   /** XPTY0004: Typing exception. */
-  XPINVNAME(XPTY, 4, "Invalid name: %."),
+  XPINVNAME(XPTY, 4, "Invalid name: \"%\"."),
   /** XPTY0004: Typing exception. */
   XPNAME(XPTY, 4, "Expecting name."),
   /** XPTY0004: Typing exception. */
@@ -563,6 +579,10 @@ public enum Err {
   INVDECFORM(XQST, 97, "Invalid decimal-format property: %=\"%\"."),
   /** XPST0098: Parsing exception. */
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format \"%\"."),
+  /** XQST0099: Parsing exception. */
+  DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
+  /** XQST0107: Parsing exception. */
+  CTXINIT(XQST, 107, "Context item depends on itself."),
   /** XQST0108: Parsing exception. */
   MODOUT(XQST, 108, "No output declarations allowed in modules."),
   /** XPST0109: Parsing exception. */
@@ -571,6 +591,8 @@ public enum Err {
   OUTDUPL(XQST, 110, "Duplicate declaration of \"output:%\"."),
   /** XPST0111: Parsing exception. */
   DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
+  /** XQST0113: Parsing exception. */
+  DECITEM(XQST, 113, "Context item cannot be specified in module."),
   /** XPST0111: Parsing exception. */
   DECDUPLPROP(XQST, 114, "Duplicate decimal-format property \"%\"."),
 
@@ -668,7 +690,7 @@ public enum Err {
    * Throws a query exception.
    * @param ii input info
    * @param ext extended info
-   * @return query exception (dummy)
+   * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
   public QueryException thrw(final InputInfo ii, final Object... ext)
@@ -678,12 +700,14 @@ public enum Err {
 
   /**
    * Throws a serializer exception.
-   * Might to be merged with {@link #thrw} in future.
+   * Might be merged with {@link #thrw} in future.
    * @param ext extended info
-   * @return query exception (dummy)
+   * @return serializer exception (indicates that an error is raised)
+   * @throws SerializerException serializer exception
    */
-  public SerializerException serial(final Object... ext) {
-    return new SerializerException(this, ext);
+  public SerializerException thrwSerial(final Object... ext)
+      throws SerializerException {
+    throw new SerializerException(this, ext);
   }
 
   /**
@@ -737,12 +761,12 @@ public enum Err {
    * @param ii input info
    * @param it1 first item
    * @param it2 second item
+   * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static void diff(final InputInfo ii, final Item it1, final Item it2)
-      throws QueryException {
-    if(it1 == it2) TYPECMP.thrw(ii, it1.type);
-    else XPTYPECMP.thrw(ii, it1.type, it2.type);
+  public static QueryException diff(final InputInfo ii, final Item it1,
+      final Item it2) throws QueryException {
+    throw (it1 == it2 ? TYPECMP : XPTYPECMP).thrw(ii, it1.type, it2.type);
   }
 
   /**
@@ -750,11 +774,12 @@ public enum Err {
    * @param ii input info
    * @param t expression cast type
    * @param v value
+   * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static void cast(final InputInfo ii, final Type t, final Value v)
-      throws QueryException {
-    XPINVCAST.thrw(ii, v.type, t, v);
+  public static QueryException cast(final InputInfo ii, final Type t,
+      final Value v) throws QueryException {
+    throw XPINVCAST.thrw(ii, v.type, t, v);
   }
 
   /**
@@ -763,11 +788,12 @@ public enum Err {
    * @param inf expression info
    * @param t expected type
    * @param it found item
+   * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static void type(final InputInfo ii, final String inf, final Type t,
-      final Item it) throws QueryException {
-    XPTYPE.thrw(ii, inf, t, it.type);
+  public static QueryException type(final InputInfo ii, final String inf,
+      final Type t, final Item it) throws QueryException {
+    throw XPTYPE.thrw(ii, inf, t, it.type);
   }
 
   /**
@@ -775,22 +801,24 @@ public enum Err {
    * @param e parsing expression
    * @param t expected type
    * @param it found item
+   * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static void type(final ParseExpr e, final Type t, final Item it)
-      throws QueryException {
-    type(e.input, e.desc(), t, it);
+  public static QueryException type(final ParseExpr e, final Type t,
+      final Item it) throws QueryException {
+    throw type(e.input, e.desc(), t, it);
   }
 
   /**
    * Throws a number exception.
    * @param e parsing expression
    * @param it found item
+   * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static void number(final ParseExpr e, final Item it)
+  public static QueryException number(final ParseExpr e, final Item it)
       throws QueryException {
-    XPTYPENUM.thrw(e.input, e.desc(), it.type);
+    throw XPTYPENUM.thrw(e.input, e.desc(), it.type);
   }
 
   /**
@@ -798,11 +826,12 @@ public enum Err {
    * @param ii input info
    * @param t expected type
    * @param v value
+   * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static void value(final InputInfo ii, final Type t, final Object v)
-      throws QueryException {
-    INVALUE.thrw(ii, t, v);
+  public static QueryException value(final InputInfo ii, final Type t,
+      final Object v) throws QueryException {
+    throw INVALUE.thrw(ii, t, v);
   }
 
   @Override

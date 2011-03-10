@@ -20,13 +20,6 @@ import org.basex.util.Token;
 public abstract class Item extends Value {
   /** Undefined item. */
   public static final int UNDEF = Integer.MIN_VALUE;
-  /** Dummy item. */
-  public static final Item DUMMY = new Item(Type.ITEM) {
-    @Override public byte[] atom() { return Token.EMPTY; }
-    @Override public boolean eq(final InputInfo ii, final Item it) {
-      return false;
-    }
-  };
   /** Score value. Will be {@code null} if not assigned. */
   protected Double score;
 
@@ -89,8 +82,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    CONDTYPE.thrw(ii, type, this);
-    return false;
+    throw CONDTYPE.thrw(ii, type, this);
   }
 
   /**
@@ -184,9 +176,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    if(this == it) TYPECMP.thrw(ii, type);
-    else XPTYPECMP.thrw(ii, type, it.type);
-    return 0;
+    throw (this == it ? TYPECMP : XPTYPECMP).thrw(ii, type, it.type);
   }
 
   @Override
@@ -258,7 +248,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public int hashCode() {
+  public int hash() {
     return Token.hash(atom());
   }
 

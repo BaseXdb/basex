@@ -20,7 +20,6 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
@@ -63,7 +62,7 @@ public final class QueryResources {
   void compile(final Nodes nodes) throws QueryException {
     final Data d = nodes.data;
     if(!ctx.context.perm(User.READ, d.meta))
-      Err.PERMNO.thrw(null, CmdPerm.READ);
+      PERMNO.thrw(null, CmdPerm.READ);
 
     // assign initial context value: use empty node set if database is empty
     ctx.value = DBNodeSeq.get(d.empty() ? new int[0] : nodes.list, d);
@@ -111,8 +110,7 @@ public final class QueryResources {
       addData(d);
       return d;
     } catch(final IOException ex) {
-      NODB.thrw(ii, in);
-      return null;
+      throw NODB.thrw(ii, in);
     }
   }
 

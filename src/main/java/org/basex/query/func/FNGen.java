@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
@@ -190,8 +189,9 @@ final class FNGen extends Fun {
     try {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
-      // catch FODC0002 and FODC0004
-      if(ex.type() == Err.ErrType.FODC) return Bln.FALSE;
+      final Err err = ex.err();
+      if(err != null && err.type == Err.ErrType.FODC &&
+          (err.num == 2 || err.num == 4)) return Bln.FALSE;
       throw ex;
     }
   }
@@ -276,7 +276,7 @@ final class FNGen extends Fun {
     final Prop prop = ctx.context.prop;
     final IO io = new IOContent(cont, string(base.atom()));
     try {
-      final Parser p = Parser.fileParser(io, prop, "");
+      final Parser p = Parser.xmlParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
     } catch(final IOException ex) {
       throw SAXERR.thrw(input, ex);

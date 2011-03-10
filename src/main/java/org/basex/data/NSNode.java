@@ -128,19 +128,9 @@ final class NSNode {
     for(int i = s; i < size && ch[i].pre < upper; ++i, ++num);
     size -= num;
     if(num > 0) System.arraycopy(ch, s + num, ch, s, size - s);
-    update(s, -sz);
-  }
-
-  /**
-   * Recursively modifies the pre values by the specified offset.
-   * @param s start position
-   * @param o offset
-   */
-  private void update(final int s, final int o) {
-    for(int c = s; c < size; ++c) {
-      ch[c].pre += o;
-      ch[c].update(0, o);
-    }
+    // Calling update is not enough as only descendants of this NSNode
+    // are updated and not all nodes on the following axis
+    // update(s, -sz);
   }
 
   /**

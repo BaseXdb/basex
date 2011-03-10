@@ -12,7 +12,7 @@ import org.basex.query.util.Err;
  */
 public final class SerializerException extends IOException {
   /** Error reference. */
-  private Err err;
+  private final Err err;
 
   /**
    * Default constructor.

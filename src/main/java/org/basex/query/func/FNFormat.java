@@ -12,9 +12,9 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.util.Err;
-import org.basex.query.util.format.DateFormatter;
-import org.basex.query.util.format.IntFormatter;
-import org.basex.query.util.format.DecimalFormat;
+import org.basex.query.util.format.FormatParser;
+import org.basex.query.util.format.Formatter;
+import org.basex.query.util.format.DecFormatter;
 import org.basex.util.InputInfo;
 
 /**
@@ -60,15 +60,15 @@ final class FNFormat extends Fun {
    * @throws QueryException query exception
    */
   private Str formatInteger(final QueryContext ctx) throws QueryException {
-    final String pic = string(checkStr(expr[1], ctx));
-    if(pic.isEmpty()) WRONGINT.thrw(input, pic);
-    if(expr[0].empty()) return Str.ZERO;
+    final byte[] pic = checkStr(expr[1], ctx);
+    final byte[] lng = expr.length == 2 ? EMPTY : checkStr(expr[2], ctx);
 
-    final byte[] lang = expr.length == 2 ? EMPTY : checkStr(expr[2], ctx);
+    if(expr[0].empty()) return Str.ZERO;
     final long num = checkItr(expr[0], ctx);
-    final byte[] str = IntFormatter.format(num, pic, string(lang));
-    if(str == null) PICDATE.thrw(input, pic);
-    return Str.get(str);
+
+    if(pic.length == 0) WRONGINT.thrw(input, pic);
+    final FormatParser fp = new FormatParser(input, pic, null);
+    return Str.get(Formatter.get(string(lng)).formatInt(num, fp));
   }
 
   /**
@@ -84,9 +84,11 @@ final class FNFormat extends Fun {
     else if(!it.unt() && !it.num()) Err.number(this, it);
 
     final String pic = string(checkStr(expr[1], ctx));
-    final QNm frm = new QNm(expr.length == 3 ? checkStr(expr[2], ctx) : EMPTY);
-    final DecimalFormat df = ctx.decFormats.get(frm);
-    if(df == null) FORMNUM.thrw(input, frm);
+    final byte[] frm = new QNm(expr.length == 3 ?
+        checkStr(expr[2], ctx) : EMPTY).full();
+
+    final DecFormatter df = ctx.decFormats.get(frm);
+    if(df == null) throw FORMNUM.thrw(input, frm);
     return Str.get(df.format(input, it, pic));
   }
 
@@ -101,12 +103,14 @@ final class FNFormat extends Fun {
       throws QueryException {
 
     final Item it = expr[0].item(ctx, input);
-    if(it == null) return null;
-    final Date date = (Date) checkType(it, tp);
-    final String pic = string(checkEStr(expr[1], ctx));
+    final byte[] pic = checkEStr(expr[1], ctx);
     final byte[] lng = expr.length == 5 ? checkEStr(expr[2], ctx) : EMPTY;
     final byte[] cal = expr.length == 5 ? checkEStr(expr[3], ctx) : EMPTY;
     final byte[] plc = expr.length == 5 ? checkEStr(expr[4], ctx) : EMPTY;
-    return Str.get(DateFormatter.format(date, pic, lng, cal, plc, input));
+    if(it == null) return null;
+    final Date date = (Date) checkType(it, tp);
+
+    final Formatter form = Formatter.get(string(lng));
+    return Str.get(form.formatDate(date, pic, cal, plc, input));
   }
 }

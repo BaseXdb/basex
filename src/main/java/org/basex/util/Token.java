@@ -295,18 +295,6 @@ public final class Token {
   }
 
   /**
-   * Returns the codepoint (unicode value) at the specified position,
-   * ignoring surrogates.
-   * Returns a {@code 0} byte in the index is invalid.
-   * @param string string
-   * @param pos position
-   * @return character
-   */
-  public static int cp(final String string, final int pos) {
-    return pos >= 0 && pos < string.length() ? string.charAt(pos) : 0;
-  }
-
-  /**
    * Converts a token to a sequence of codepoints.
    * @param token token
    * @return codepoints
@@ -524,7 +512,7 @@ public final class Token {
   /**
    * Checks if the specified value equals a constant token.
    * @param dbl value to be converted
-   * @return byte array or zero
+   * @return byte array or zero, or {@code null}
    */
   private static byte[] tok(final double dbl) {
     if(dbl == 1 / 0d) return INF;
@@ -788,6 +776,17 @@ public final class Token {
   public static int indexOf(final byte[] token, final int c) {
     final int tl = token.length;
     for(int t = 0; t < tl; ++t) if(token[t] == c) return t;
+    return -1;
+  }
+
+  /**
+   * Returns the last position of the specified character or -1.
+   * @param token token
+   * @param c character to be found
+   * @return result of test
+   */
+  public static int lastIndexOf(final byte[] token, final int c) {
+    for(int t = token.length - 1; t >= 0; --t) if(token[t] == c) return t;
     return -1;
   }
 
@@ -1265,24 +1264,33 @@ public final class Token {
   /**
    * Returns an MD5 hash.
    * @param string string to be hashed
-   * @return hash
+   * @return md5 hash
    */
   public static String md5(final String string) {
     try {
       final MessageDigest md = MessageDigest.getInstance("MD5");
-      md.update(token(string));
-      final ByteList bl = new ByteList();
-      for(final byte b : md.digest()) {
-        final int h = b >> 4 & 0x0F;
-        bl.add(h + (h > 9 ? 0x57 : 0x30));
-        final int l = b & 0x0F;
-        bl.add(l + (l > 9 ? 0x57 : 0x30));
-      }
-      return string(bl.toArray());
+      return string(hex(md.digest(token(string)), false));
     } catch(final Exception ex) {
-      Util.notexpected(ex);
-      return null;
+      throw Util.notexpected(ex);
     }
+  }
+
+  /**
+   * Returns a hex representation of the specified byte array.
+   * @param val values to be mapped
+   * @param uc upper case
+   * @return hex representation
+   */
+  public static byte[] hex(final byte[] val, final boolean uc) {
+    final int u = uc ? '7' : 'W';
+    final byte[] data = new byte[val.length << 1];
+    for(int d = 0, c = 0; d < val.length; d++) {
+      int b = val[d] >> 4 & 0x0F;
+      data[c++] = (byte) (b + (b > 9 ? u : '0'));
+      b = val[d] & 0x0F;
+      data[c++] = (byte) (b + (b > 9 ? u : '0'));
+    }
+    return data;
   }
 
   /**

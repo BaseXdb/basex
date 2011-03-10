@@ -267,8 +267,7 @@ public enum GUICommands implements GUICommand {
         gui.context.query.path();
       final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
           fn == null ? gui.gprop.get(GUIProp.XQPATH) : fn, gui);
-      fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIX, IO.XQMSUFFIX,
-          IO.XQYSUFFIX, IO.XQLSUFFIX, IO.XQUERYSUFFIX);
+      fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
 
       final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
       if(file == null) return;
@@ -874,9 +873,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       final String tt = gui.notify.tooltip(true);
-      final boolean en = tt != null;
-      b.setEnabled(en);
-      b.setToolTipText(en && tt.isEmpty() ? GUIGOBACK : tt);
+      b.setEnabled(tt != null);
+      b.setToolTipText(tt != null && tt.isEmpty() ? GUIGOBACK : tt);
     }
   },
 
@@ -890,9 +888,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       final String tt = gui.notify.tooltip(false);
-      final boolean en = tt != null;
-      b.setEnabled(en);
-      b.setToolTipText(en && tt.isEmpty() ? GUIGOFORWARD : tt);
+      b.setEnabled(tt != null);
+      b.setToolTipText(tt != null && tt.isEmpty() ? GUIGOFORWARD : tt);
     }
   },
 

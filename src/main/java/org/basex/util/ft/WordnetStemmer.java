@@ -71,7 +71,7 @@ final class WordnetStemmer extends Stemmer {
 
   /** Empty constructor. */
   WordnetStemmer() {
-    super(null);
+    super();
   }
 
   /**

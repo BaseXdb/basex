@@ -1,5 +1,6 @@
 package org.basex.io;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,17 +22,17 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
-  /** Zip entry. */
-  ZipEntry zip;
-
   /** File prefix. */
   private static final String FILEPREF = "file:";
-  /** Input stream reference. */
-  private InputStream is;
   /** File reference. */
   private final File file;
+
+  /** Input stream reference. */
+  private InputStream is;
   /** File length. */
   private long len = -1;
+  /** Zip entry. */
+  ZipEntry zip;
 
   /**
    * Constructor.
@@ -52,9 +53,14 @@ public final class IOFile extends IO {
 
   @Override
   public void cache() throws IOException {
-    final BufferInput bi = new BufferInput(file);
-    cont = bi.content().toArray();
-    bi.close();
+    FileInputStream fis = null;
+    try {
+      fis = new FileInputStream(file);
+      cont = new byte[(int) file.length()];
+      new DataInputStream(fis).readFully(cont);
+    } finally {
+      if(fis != null) try { fis.close(); } catch(final IOException ex) { }
+    }
   }
 
   @Override
@@ -124,11 +130,10 @@ public final class IOFile extends IO {
    * @return result of check
    */
   private boolean zip() {
-    final String[] zips = {
-        "zip", "docx", "xslx", "pptx", "odt", "ods", "odp", "thmx"
-    };
-    final String suf = path.toLowerCase().replaceAll(".*\\.", "");
-    for(final String z : zips) if(suf.equals(z)) return true;
+    final int i = path.lastIndexOf('.');
+    if(i == -1) return false;
+    final String suf = path.substring(i).toLowerCase();
+    for(final String z : ZIPSUFFIXES) if(suf.equals(z)) return true;
     return false;
   }
 
@@ -139,14 +144,12 @@ public final class IOFile extends IO {
 
   @Override
   public BufferInput buffer() throws IOException {
-    if(is != null) {
-      if(zip == null) return new BufferInput(is);
-      final BufferInput in = new BufferInput(is);
-      in.length(zip.getSize());
-      return in;
-    }
-    // return file content
-    return new BufferInput(path);
+    // return file stream
+    if(is == null) return new BufferInput(path);
+    // return input stream
+    final BufferInput in = new BufferInput(is);
+    if(zip != null && zip.getSize() != -1) in.length(zip.getSize());
+    return in;
   }
 
   @Override
@@ -184,6 +187,11 @@ public final class IOFile extends IO {
   public boolean delete() {
     if(isDir()) for(final IO ch : children()) if(!ch.delete()) return false;
     return file.delete();
+  }
+
+  @Override
+  public boolean rename(final IO trg) {
+    return trg instanceof IOFile && file.renameTo(((IOFile) trg).file);
   }
 
   @Override
@@ -289,7 +297,7 @@ public final class IOFile extends IO {
 
     /**
      * Adds a directory/file to the path list.
-     * @param tb entry
+     * @param tb entry to be added
      */
     private void add(final TokenBuilder tb) {
       String s = tb.toString();
@@ -302,7 +310,7 @@ public final class IOFile extends IO {
         if(list[size - 1].indexOf(':') == -1) delete(size - 1);
       } else if(!s.equals(".") && !s.isEmpty()) {
         // skip self and empty steps
-        add(s.toString());
+        add(s);
       }
       tb.reset();
     }

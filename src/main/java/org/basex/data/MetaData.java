@@ -71,8 +71,6 @@ public final class MetaData {
   /** Scoring mode: see {@link Prop#SCORING}. */
   public int scoring;
 
-  /** Root paths. */
-  protected DataPaths paths = new DataPaths();
   /** Flag for removed index structures. */
   public boolean uptodate = true;
   /** Dirty flag. */
@@ -88,6 +86,9 @@ public final class MetaData {
   public String mount = "";
   /** Flag for DeepFS instance. */
   public boolean deepfs;
+
+  /** Root paths. */
+  DataPaths paths = new DataPaths();
 
   /**
    * Constructor, specifying the database name.

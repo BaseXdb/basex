@@ -1,6 +1,8 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
+
+import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -169,6 +171,16 @@ public final class BaseXListChooser extends BaseXBack {
   public void setValue(final String value) {
     list.setSelectedValue(value, true);
     text.setText(value);
+  }
+
+  /**
+   * Sets the specified font.
+   * @param font font name
+   * @param style style
+   */
+  public void setFont(final String font, final int style) {
+    final Font f = text.getFont();
+    text.setFont(new Font(font, style, f.getSize()));
   }
 
   /**

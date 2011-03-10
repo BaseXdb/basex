@@ -19,24 +19,27 @@ import org.basex.data.SerializerException;
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.up.Updates;
+import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Variables;
-import org.basex.query.util.format.DecimalFormat;
+import org.basex.query.util.format.DecFormatter;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
@@ -91,8 +94,8 @@ public final class QueryContext extends Progress {
   public Tim time;
 
   /** Decimal-format declarations. */
-  public HashMap<QNm, DecimalFormat> decFormats =
-    new HashMap<QNm, DecimalFormat>();
+  public TokenObjMap<DecFormatter> decFormats =
+    new TokenObjMap<DecFormatter>();
   /** Default function namespace. */
   public byte[] nsFunc = FNURI;
   /** Default element namespace. */
@@ -132,15 +135,6 @@ public final class QueryContext extends Progress {
   /** Compilation flag: GFLWOR clause performs grouping. */
   public boolean grouping;
 
-  /** String container for query background information. */
-  private final TokenBuilder info = new TokenBuilder();
-  /** Info flag. */
-  private final boolean inf;
-  /** Optimization flag. */
-  private boolean firstOpt = true;
-  /** Evaluation flag. */
-  private boolean firstEval = true;
-
   /** List of modules. */
   final StringList modules = new StringList();
   /** List of loaded modules. */
@@ -149,6 +143,20 @@ public final class QueryContext extends Progress {
   SerializerProp serProp;
   /** Initial context set (default: null). */
   Nodes nodes;
+
+  /** Initial context value type. */
+  SeqType initType;
+  /** Initial context value. */
+  Expr initExpr;
+
+  /** String container for query background information. */
+  private final TokenBuilder info = new TokenBuilder();
+  /** Info flag. */
+  private final boolean inf;
+  /** Optimization flag. */
+  private boolean firstOpt = true;
+  /** Evaluation flag. */
+  private boolean firstEval = true;
 
   /**
    * Constructor.
@@ -188,18 +196,30 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
-    // add full-text container reference
-    if(nodes != null && nodes.ftpos != null) ftpos = new FTPosData();
-
-    // cache the initial context nodes
-    if(nodes != null) resource.compile(nodes);
-
     // dump compilation info
     if(inf) compInfo(NL + QUERYCOMP);
 
-    // cache initial context
-    final boolean empty = value == null;
-    if(empty) value = Item.DUMMY;
+    if(initExpr != null) {
+      // evaluate initial expression
+      try {
+        value = initExpr.value(this);
+      } catch(final QueryException ex) {
+        // only {@link ParseExpr} instance will throw an exception
+        final Err err = ex.err();
+        if(err != Err.XPNOCTX) throw ex;
+        CTXINIT.thrw(((ParseExpr) initExpr).input, ex.getMessage());
+      }
+    } else if(nodes != null) {
+      // add full-text container reference
+      if(nodes.ftpos != null) ftpos = new FTPosData();
+      // cache the initial context nodes
+      resource.compile(nodes);
+    }
+
+    // if specified, convert context item to specified type
+    if(value != null && initType != null) {
+      value = initType.cast(value, this, null);
+    }
 
     try {
       // compile global functions.
@@ -211,9 +231,6 @@ public final class QueryContext extends Progress {
       Util.debug(ex);
       XPSTACK.thrw(null);
     }
-
-    // reset initial context
-    if(empty) value = null;
 
     // dump resulting query
     if(inf) info.add(NL + QUERYRESULT + funcs + root + NL);
@@ -277,8 +294,7 @@ public final class QueryContext extends Progress {
       return v.iter(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      XPSTACK.thrw(null);
-      return null;
+      throw XPSTACK.thrw(null);
     }
   }
 
@@ -340,16 +356,11 @@ public final class QueryContext extends Progress {
   /**
    * Adds some evaluation info.
    * @param string evaluation info
-   * @param msg message
    */
-  public void evalInfo(final byte[] string, final String msg) {
+  public void evalInfo(final byte[] string) {
     if(!inf) return;
     if(firstEval) info.add(NL + QUERYEVAL + NL);
-    info.add(QUERYSEP);
-    info.add(string);
-    info.add(' ');
-    info.add(msg);
-    info.add(NL);
+    info.add(QUERYSEP).add(string).add(NL);
     firstEval = false;
   }
 

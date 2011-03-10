@@ -135,4 +135,10 @@ public abstract class Value extends Expr {
   public final String name() {
     return type.toString();
   }
+
+  /**
+   * Returns a hash code for this value.
+   * @return hash code
+   */
+  public abstract int hash();
 }

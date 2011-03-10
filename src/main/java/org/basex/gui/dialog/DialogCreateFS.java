@@ -77,7 +77,7 @@ public final class DialogCreateFS extends Dialog {
 
     // create panels
     final BaseXBack p1 = new BaseXBack(new BorderLayout()).border(8);
-    BaseXBack p = new BaseXBack(new TableLayout(7, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(7, 2, 8, 0));
 
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.gprop;

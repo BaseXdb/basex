@@ -142,11 +142,12 @@ public abstract class AProp {
   public final synchronized void write() {
     final File file = new File(filename);
 
+    final StringBuilder user = new StringBuilder();
+    BufferedReader br = null;
     try {
       // caches options specified by the user
-      final StringBuilder user = new StringBuilder();
       if(file.exists()) {
-        final BufferedReader br = new BufferedReader(new FileReader(file));
+        br = new BufferedReader(new FileReader(file));
         String line = null;
         while((line = br.readLine()) != null)
           if(line.equals(PROPUSER)) break;
@@ -154,10 +155,16 @@ public abstract class AProp {
           user.append(line);
           user.append(NL);
         }
-        br.close();
       }
+    } catch(final Exception ex) {
+      Util.debug(ex);
+    } finally {
+      if(br != null) try { br.close(); } catch(final IOException e) { }
+    }
 
-      final BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+    BufferedWriter bw = null;
+    try {
+      bw = new BufferedWriter(new FileWriter(file));
       bw.write(PROPHEADER + NL);
 
       for(final Field f : getClass().getFields()) {
@@ -184,10 +191,11 @@ public abstract class AProp {
       }
       bw.write(NL + PROPUSER + NL);
       bw.write(user.toString());
-      bw.close();
     } catch(final Exception ex) {
       Util.errln("% could not be written.", filename);
       Util.debug(ex);
+    } finally {
+      if(bw != null) try { bw.close(); } catch(final IOException e) { }
     }
   }
 
@@ -345,7 +353,9 @@ public abstract class AProp {
    */
   private Object get(final Object[] key, final Class<?> c) {
     final Object entry = props.get(key[0].toString());
-    if(entry == null) Util.notexpected("Property " + key[0] + " not defined.");
+    if(entry == null)
+      throw Util.notexpected("Property " + key[0] + " not defined.");
+
     final Class<?> cc = entry.getClass();
     if(c != cc) Util.notexpected(
         "Property '" + key[0] + "' is a " + Util.name(cc));

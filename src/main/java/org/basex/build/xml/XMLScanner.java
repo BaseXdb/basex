@@ -704,7 +704,7 @@ final class XMLScanner extends Progress {
           input = new TextInput(new IOContent(cont, name));
         } catch(final IOException ex) {
           Util.debug(ex);
-          error(PARSEERR, name);
+          throw error(PARSEERR, name);
         }
 
         if(consume(XDECL)) {
@@ -739,8 +739,7 @@ final class XMLScanner extends Progress {
     final int qu = qu();
     int ch;
     while((ch = nextChar()) != qu) {
-      if(!isChar(ch) && !contains(PUBIDTOK, ch))
-        error(PUBID, (char) ch);
+      if(!isChar(ch) && !contains(PUBIDTOK, ch)) error(PUBID, (char) ch);
     }
   }
 
@@ -1014,9 +1013,11 @@ final class XMLScanner extends Progress {
    * Throws an error.
    * @param e error message
    * @param a error arguments
-   * @throws IOException I/O exception
+   * @return build exception (indicates that an error is raised)
+   * @throws BuildException build exception
    */
-  private void error(final String e, final Object... a) throws IOException {
+  private BuildException error(final String e, final Object... a)
+      throws BuildException {
     throw new BuildException(det() + ": " + e, a);
   }
 

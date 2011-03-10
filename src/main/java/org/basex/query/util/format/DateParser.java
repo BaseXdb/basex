@@ -1,8 +1,10 @@
 package org.basex.query.util.format;
 
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * Parser for formatting dates.
@@ -13,8 +15,8 @@ import org.basex.util.InputInfo;
 final class DateParser {
   /** Input information. */
   private final InputInfo input;
-  /** String. */
-  private final String pic;
+  /** Picture string. */
+  private final byte[] pic;
   /** Position. */
   private int pos;
 
@@ -23,7 +25,7 @@ final class DateParser {
    * @param ii input info
    * @param p picture
    */
-  DateParser(final InputInfo ii, final String p) {
+  DateParser(final InputInfo ii, final byte[] p) {
     input = ii;
     pic = p;
   }
@@ -33,7 +35,7 @@ final class DateParser {
    * @return result of check
    */
   boolean more() {
-    return pos < pic.length();
+    return pos < pic.length;
   }
 
   /**
@@ -41,15 +43,16 @@ final class DateParser {
    * @return character
    * @throws QueryException query exception
    */
-  char next() throws QueryException {
-    final char ch = pic.charAt(pos++);
+  int next() throws QueryException {
+    final int ch = cp(pic, pos);
+    pos += cl(pic, pos);
     if(ch == '[' || ch == ']') {
       if(!more()) PICDATE.thrw(input, pic);
-      if(pic.charAt(pos) != ch) {
+      if(cp(pic, pos) != ch) {
         if(ch == ']') PICDATE.thrw(input, pic);
         return 0;
       }
-      ++pos;
+      pos += cl(pic, pos);
     }
     return ch;
   }
@@ -59,15 +62,14 @@ final class DateParser {
    * @return marker or {@code null} reference
    * @throws QueryException query exception
    */
-  String marker() throws QueryException {
-    int p = pos;
-    while(pic.charAt(pos++) != ']')
-      if(!more()) PICDATE.thrw(input, pic);
-    final StringBuilder sb = new StringBuilder();
-    for(; p < pos - 1; ++p) {
-      final char ch = pic.charAt(p);
-      if(!Character.isWhitespace(ch)) sb.append(ch);
+  byte[] marker() throws QueryException {
+    final TokenBuilder tb = new TokenBuilder();
+    while(more()) {
+      final int ch = cp(pic, pos);
+      pos += cl(pic, pos);
+      if(ch == ']') return tb.finish();
+      if(!Character.isWhitespace(ch)) tb.add(ch);
     }
-    return sb.toString();
+    throw PICDATE.thrw(input, pic);
   }
 }

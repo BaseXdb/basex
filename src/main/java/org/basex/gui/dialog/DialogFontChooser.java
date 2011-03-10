@@ -39,7 +39,7 @@ public final class DialogFontChooser extends Dialog {
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
       getAvailableFontFamilyNames();
 
-    final BaseXBack p = new BaseXBack(new TableLayout(1, 4, 6, 6));
+    final BaseXBack p = new BaseXBack(new TableLayout(1, 4, 8, 6));
     font = new BaseXListChooser(fonts, this);
     font.setSize(150, 112);
     p.add(font);
@@ -70,6 +70,8 @@ public final class DialogFontChooser extends Dialog {
     gprop.set(GUIProp.MONOFONT, font2.getValue());
     gprop.set(GUIProp.FONTTYPE, type.getIndex());
     gprop.set(GUIProp.FONTSIZE, size.getNum());
+    font.setFont(font.getValue(), type.getIndex());
+    font2.setFont(font2.getValue(), type.getIndex());
     gui.updateLayout();
   }
 }

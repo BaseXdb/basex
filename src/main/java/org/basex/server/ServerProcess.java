@@ -5,7 +5,9 @@ import static org.basex.util.Token.*;
 import static org.basex.server.ServerCmd.*;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+
 import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
@@ -37,6 +39,8 @@ public final class ServerProcess extends Thread {
   /** Active queries. */
   private final HashMap<String, QueryProcess> queries =
     new HashMap<String, QueryProcess>();
+  /** Active triggers. */
+  public ArrayList<String> triggers;
 
   /** Database context. */
   public final Context context;
@@ -48,13 +52,17 @@ public final class ServerProcess extends Thread {
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
-  private PrintOutput out;
+  public PrintOutput out;
   /** Current command. */
   private Command cmd;
   /** Query id counter. */
   private int id;
   /** Running of thread. */
   private boolean running;
+  /** Socket for triggering. */
+  public Socket tsocket;
+  /** Output for triggering. */
+  public PrintOutput tout;
 
   /**
    * Constructor.
@@ -63,7 +71,7 @@ public final class ServerProcess extends Thread {
    * @param l log reference
    */
   public ServerProcess(final Socket s, final Context c, final Log l) {
-    context = new Context(c);
+    context = new Context(c, this);
     log = l;
     socket = s;
   }
@@ -123,6 +131,14 @@ public final class ServerProcess extends Thread {
           }
           if(sc == ADD) {
             add();
+            continue;
+          }
+          if(sc == ATTACH) {
+            attach();
+            continue;
+          }
+          if(sc == DETACH) {
+            detach();
             continue;
           }
           if(sc != CMD) {
@@ -260,6 +276,50 @@ public final class ServerProcess extends Thread {
   }
 
   /**
+   * Attach this server process to a trigger.
+   * @throws IOException I/O exception
+   */
+  private void attach() throws IOException {
+    final String name = in.readString();
+    if(triggers == null) {
+      out.writeString(String.valueOf(this.getId()));
+      triggers = new ArrayList<String>();
+    }
+    if(context.triggers.attach(name, this)) {
+      String info = Util.info(TRIGGERATT, name);
+      out.writeString(info);
+      out.write(0);
+      log.write(this, OK + info);
+    } else {
+      String info = Util.info(TRIGGERNO, name);
+      out.writeString(info);
+      out.write(1);
+      log.write(this, INFOERROR + info);
+    }
+    out.flush();
+  }
+
+  /**
+   * Detach this server process to a trigger.
+   * @throws IOException I/O exception
+   */
+  private void detach() throws IOException {
+    final String name = in.readString();
+    if(context.triggers.detach(name, this)) {
+      String info = Util.info(TRIGGERDET, name);
+      out.writeString(info);
+      out.write(0);
+      log.write(this, OK + info);
+    } else {
+      String info = Util.info(TRIGGERNO, name);
+      out.writeString(info);
+      out.write(1);
+      log.write(this, INFOERROR + info);
+    }
+    out.flush();
+  }
+
+  /**
    * Processes the query iterator.
    * @param sc server command
    * @throws IOException I/O exception
@@ -284,11 +344,11 @@ public final class ServerProcess extends Thread {
       } else {
         // find query process
         qp = queries.get(arg);
-        // ID has already been removed
-        if(qp == null && sc != CLOSE)
-          throw new IOException("Unknown query ID (" + arg + ")");
 
-        if(sc == BIND) {
+        // ID has already been removed
+        if(qp == null) {
+          if(sc != CLOSE) throw new IOException("Unknown Query ID: " + arg);
+        } else if(sc == BIND) {
           final String key = in.readString();
           final String val = in.readString();
           final String typ = in.readString();
@@ -302,7 +362,7 @@ public final class ServerProcess extends Thread {
           qp.execute();
         } else if(sc == INFO) {
           qp.info();
-        } else if(sc == CLOSE && qp != null) {
+        } else if(sc == CLOSE) {
           qp.close(false);
           queries.remove(arg);
         }
@@ -349,8 +409,12 @@ public final class ServerProcess extends Thread {
     for(final QueryProcess q : queries.values()) {
       try { q.close(true); } catch(final IOException ex) { }
     }
-
     try {
+      // remove this sessions from all triggers in pool
+      if(triggers != null) {
+        tsocket.close();
+        context.triggers.remove(this, triggers);
+      }
       new Close().execute(context);
       if(cmd != null) cmd.stop();
       context.delete(this);

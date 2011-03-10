@@ -201,8 +201,7 @@ final class FNPat extends Fun {
     } catch(final Exception ex) {
       final String m = ex.getMessage();
       if(m.contains("No group")) REGROUP.thrw(input);
-      REGERR.thrw(input, m);
-      return null;
+      throw REGERR.thrw(input, m);
     }
   }
 
@@ -306,8 +305,7 @@ final class FNPat extends Fun {
     try {
       return Pattern.compile(str, m);
     } catch(final Exception ex) {
-      REGINV.thrw(input, pt);
-      return null;
+      throw REGINV.thrw(input, pt);
     }
   }
 

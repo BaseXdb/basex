@@ -18,11 +18,13 @@ public final class ParserProp extends AProp {
   /** Parser option: column separator (0 = comma, 1 = semicolon, 2 = tab). */
   public static final Object[] SEPARATOR = { "separator", "comma" };
   /** Parser option: header line. */
-  public static final Object[] HEADER = { "header", true };
+  public static final Object[] HEADER = { "header", false };
   /** Parser option: XML format. */
   public static final Object[] FORMAT = { "format", "verbose" };
   /** Parser option: line. */
   public static final Object[] LINES = { "lines", true };
+  /** Parser option: encoding. */
+  public static final Object[] ENCODING = { "encoding", Token.UTF8 };
 
   /**
    * Constructor.

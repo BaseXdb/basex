@@ -42,14 +42,6 @@ public final class DialogParsing extends BaseXBack {
   private final BaseXCheckBox chop;
   /** Use XML Catalog. */
   private final BaseXCheckBox usecat;
-  /** Use CSV Header. */
-  private final BaseXCheckBox header;
-  /** Use TEXT Lines. */
-  private final BaseXCheckBox lines;
-  /** CSV Separator. */
-  private final BaseXCombo separator;
-  /** CSV Format. */
-  private final BaseXCombo format;
   /** Catalog file. */
   private final BaseXTextField cfile;
   /** Browse Catalog file. */
@@ -60,10 +52,25 @@ public final class DialogParsing extends BaseXBack {
   private BaseXBack parseropts;
   /** XML options panel. */
   private final BaseXBack xmlopts;
+
   /** CSV options panel. */
   private final BaseXBack csvopts;
+  /** CSV: Use header. */
+  private final BaseXCheckBox header;
+  /** CSV: Separator. */
+  private final BaseXCombo separator;
+  /** CSV: Format. */
+  private final BaseXCombo format;
+  /** CSV: encoding. */
+  private final BaseXCombo cencoding;
+
   /** Text options panel. */
   private final BaseXBack textopts;
+  /** Text: Use lines. */
+  private final BaseXCheckBox lines;
+  /** Text: encoding. */
+  private final BaseXCombo tencoding;
+
   /** Main panel. */
   private final BaseXBack main;
   /** ParserProps. */
@@ -77,8 +84,9 @@ public final class DialogParsing extends BaseXBack {
     dialog = d;
     main = new BaseXBack(new TableLayout(3, 1)).border(4);
 
+    final Prop prop = dialog.gui.context.prop;
     try {
-      props = new ParserProp(d.gui.context.prop.get(Prop.PARSEROPT));
+      props = new ParserProp(prop.get(Prop.PARSEROPT));
     } catch(final IOException ex) {
       props = new ParserProp();
     }
@@ -90,32 +98,29 @@ public final class DialogParsing extends BaseXBack {
     parsers.add(DataText.M_TEXT);
 
     parser = new BaseXCombo(d, parsers.toArray());
-    parser.setSelectedItem(dialog.gui.context.prop.get(Prop.PARSER));
+    parser.setSelectedItem(prop.get(Prop.PARSER));
 
-    intparse = new BaseXCheckBox(CREATEINTPARSE,
-        dialog.gui.context.prop.is(Prop.INTPARSE), 0, dialog);
-    entities = new BaseXCheckBox(CREATEENTITIES,
-        dialog.gui.context.prop.is(Prop.ENTITY), dialog);
-    dtd = new BaseXCheckBox(CREATEDTD,
-        dialog.gui.context.prop.is(Prop.DTD), 12, dialog);
-    chop = new BaseXCheckBox(CREATECHOP,
-        dialog.gui.context.prop.is(Prop.CHOP), 0, dialog);
+    intparse = new BaseXCheckBox(CREATEINTPARSE, prop.is(Prop.INTPARSE), 0, d);
+    entities = new BaseXCheckBox(CREATEENTITIES, prop.is(Prop.ENTITY), d);
+    dtd = new BaseXCheckBox(CREATEDTD, prop.is(Prop.DTD), 12, d);
+    chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, d);
+    cfile = new BaseXTextField(prop.get(Prop.CATFILE), d);
+    browsec = new BaseXButton(BUTTONBROWSE, d);
     usecat = new BaseXCheckBox(USECATFILE,
-        !dialog.gui.context.prop.get(Prop.CATFILE).isEmpty(), 0, dialog);
-    cfile = new BaseXTextField(
-        dialog.gui.context.prop.get(Prop.CATFILE), dialog);
-    browsec = new BaseXButton(BUTTONBROWSE, dialog);
+        !prop.get(Prop.CATFILE).isEmpty(), 0, d);
 
-    lines = new BaseXCheckBox("Lines", props.is(ParserProp.LINES), 0, dialog);
-    header = new BaseXCheckBox("Header", props.is(ParserProp.HEADER),
-        0, dialog);
+    lines = new BaseXCheckBox("Lines", props.is(ParserProp.LINES), 0, d);
+    header = new BaseXCheckBox("Header", props.is(ParserProp.HEADER), 0, d);
     separator = new BaseXCombo(d, CSVParser.SEPARATORS);
     separator.setSelectedItem(props.get(ParserProp.SEPARATOR));
     format = new BaseXCombo(d, CSVParser.FORMATS);
     format.setSelectedItem(props.get(ParserProp.FORMAT));
 
+    cencoding = DialogExport.encoding(d, props.get(ParserProp.ENCODING));
+    tencoding = DialogExport.encoding(d, props.get(ParserProp.ENCODING));
+
     xmlopts = new BaseXBack(new TableLayout(9, 1));
-    csvopts = new BaseXBack(new TableLayout(6, 1));
+    csvopts = new BaseXBack(new TableLayout(2, 1));
     textopts = new BaseXBack(new TableLayout(3, 1));
     createOptionsPanels();
 
@@ -138,7 +143,7 @@ public final class DialogParsing extends BaseXBack {
 
     // CatalogResolving
     final boolean rsen = CatalogResolverWrapper.available();
-    final BaseXBack fl = new BaseXBack(new TableLayout(2, 2, 6, 0));
+    final BaseXBack fl = new BaseXBack(new TableLayout(2, 2, 8, 0));
     usecat.setEnabled(rsen);
     fl.add(usecat);
     fl.add(new BaseXLabel());
@@ -158,19 +163,23 @@ public final class DialogParsing extends BaseXBack {
       xmlopts.add(rs);
     }
 
-    BaseXBack p = new BaseXBack(new TableLayout(2, 1, 6, 0));
-    p.add(header);
-    p.add(new BaseXLabel(HEADERINFO, true, false));
-    csvopts.add(p);
-    p = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(3, 2, 8, 4));
+    p.add(new BaseXLabel(INFOENCODING + COL, true, false));
+    p.add(cencoding);
     p.add(new BaseXLabel(SEPARATORINFO, true, false));
     p.add(separator);
-    csvopts.add(p);
-    p = new BaseXBack(new TableLayout(1, 2, 6, 0)).border(4, 0, 0, 0);
     p.add(new BaseXLabel(FORMINFO, true, false));
     p.add(format);
     csvopts.add(p);
+    p = new BaseXBack(new TableLayout(2, 1));
+    p.add(header);
+    p.add(new BaseXLabel(HEADERINFO, true, false));
+    csvopts.add(p);
 
+    p = new BaseXBack(new TableLayout(1, 2, 8, 4));
+    p.add(new BaseXLabel(INFOENCODING + COL, true, false));
+    p.add(tencoding);
+    textopts.add(p);
     textopts.add(lines);
     textopts.add(new BaseXLabel(LINESINFO, true, false));
   }
@@ -182,7 +191,7 @@ public final class DialogParsing extends BaseXBack {
   void options(final String type) {
     main.removeAll();
 
-    final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
     p.add(new BaseXLabel(CREATEFORMAT, true, true));
     p.add(parser);
     main.add(p);
@@ -239,16 +248,19 @@ public final class DialogParsing extends BaseXBack {
    * Closes the tab.
    */
   public void close() {
+    final String type = parser.getSelectedItem().toString();
+    final BaseXCombo cb = type.equals(DataText.M_TEXT) ? tencoding : cencoding;
+    props.set(ParserProp.ENCODING, cb.getSelectedItem().toString());
+    props.set(ParserProp.FORMAT, format.getSelectedItem().toString());
+    props.set(ParserProp.HEADER, header.isSelected());
+    props.set(ParserProp.SEPARATOR, separator.getSelectedItem().toString());
+    props.set(ParserProp.LINES, lines.isSelected());
+    dialog.gui.set(Prop.PARSEROPT, props.toString());
     dialog.gui.set(Prop.CHOP, chop.isSelected());
     dialog.gui.set(Prop.ENTITY, entities.isSelected());
     dialog.gui.set(Prop.DTD, dtd.isSelected());
     dialog.gui.set(Prop.INTPARSE, intparse.isSelected());
     dialog.gui.set(Prop.PARSER, parser.getSelectedItem().toString());
     dialog.gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText() : "");
-    props.set(ParserProp.FORMAT, format.getSelectedItem().toString());
-    props.set(ParserProp.HEADER, header.isSelected());
-    props.set(ParserProp.SEPARATOR, separator.getSelectedItem().toString());
-    props.set(ParserProp.LINES, lines.isSelected());
-    dialog.gui.set(Prop.PARSEROPT, props.toString());
-    }
+  }
 }

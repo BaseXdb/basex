@@ -76,7 +76,7 @@ final class FNFile extends Fun {
       case ISWRITE:    return Bln.get(path.canWrite());
       case LASTMOD:    return lastModified(path);
       case SIZE:       return size(path);
-      case PATHSEP:    return Str.get(Prop.SEP);
+      case PATHSEP:    return Str.get(System.getProperty("file.separator"));
       case PATHTOFULL: return Str.get(path.getAbsolutePath());
       case PATHTOURI:  return pathToUri(path);
       case CREATEDIR:  return createDirectory(path);
@@ -184,13 +184,13 @@ final class FNFile extends Fun {
     try {
       f = path.getCanonicalFile();;
     } catch(final IOException ex) {
-      PATHINVALID.thrw(input, path);
+      throw PATHINVALID.thrw(input, path);
     }
 
     // find lowest existing path
     while(!f.exists()) {
       f = f.getParentFile();
-      if(f == null) PATHINVALID.thrw(input, path);
+      if(f == null) throw PATHINVALID.thrw(input, path);
     }
     // warn if lowest path points to a file
     if(f.isFile()) FILEEXISTS.thrw(input, path);
@@ -261,8 +261,7 @@ final class FNFile extends Fun {
     try {
       return Str.get(TextInput.content(IO.get(path.getPath()), enc).finish());
     } catch(final IOException ex) {
-      FILEERROR.thrw(input, ex);
-      return null;
+      throw FILEERROR.thrw(input, ex);
     }
   }
 
@@ -279,8 +278,7 @@ final class FNFile extends Fun {
     try {
       return new B64(new IOFile(path).content());
     } catch(final IOException ex) {
-      FILEERROR.thrw(input, ex);
-      return null;
+      throw FILEERROR.thrw(input, ex);
     }
   }
 

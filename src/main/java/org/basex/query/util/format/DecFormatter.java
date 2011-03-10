@@ -3,7 +3,6 @@ package org.basex.query.util.format;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import org.basex.query.QueryException;
@@ -23,49 +22,40 @@ import org.basex.util.TokenList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DecimalFormat {
-  /** Zero digits. */
-  private static final int[] ZEROES = {
-    0x30, 0x660, 0x6F0, 0x7C0, 0x966, 0x9E6, 0xA66, 0xAE6, 0xB66, 0xBE6, 0xC66,
-    0xCE6, 0xD66, 0xE50, 0xED0, 0xF20, 0x1040, 0x1090, 0x17E0, 0x1810, 0x1946,
-    0x19D0, 0x1A80, 0x1A90, 0x1B50, 0x1BB0, 0x1C40, 0x1C50, 0xA620, 0xA8D0,
-    0xA900, 0xA9D0, 0xAA50, 0xABF0, 0xFF10, 0x104A0, 0x11066, 0x1D7CE, 0x1D7D8,
-    0x1D7E2, 0x1D7EC, 0x1D7F6
-  };
-
-  /** Infinity. */
-  String inf = "Infinity";
-  /** NaN. */
-  String nan = "NaN";
-  /** Pattern-separator sign. */
-  int pattern = ';';
-
-  /** Decimal-separator sign. */
-  int decimal = '.';
-  /** Grouping-separator sign. */
-  int group = ',';
-  /** Digit sign. */
-  int digit = '#';
-
-  /** Minus sign. */
-  int minus = '-';
-  /** Percent sign. */
-  int percent = '%';
-  /** Permille sign. */
-  int permille = '\u2030';
-  /** Zero-digit sign. */
-  int zero = '0';
-
-  /** Mandatory-digit-sign. */
+public final class DecFormatter extends FormatUtil {
+  /** Decimal-digit-family (mandatory-digit-sign). */
   private final String digits;
   /** Active characters. */
   private final String active;;
+
+  /** Infinity. */
+  private String inf = "Infinity";
+  /** NaN. */
+  private String nan = "NaN";
+  /** Pattern-separator sign. */
+  private int pattern = ';';
+
+  /** Decimal-separator sign. */
+  private int decimal = '.';
+  /** Grouping-separator sign. */
+  private int grouping = ',';
+  /** Optional-digit sign. */
+  private int optional = '#';
+
+  /** Minus sign. */
+  private int minus = '-';
+  /** Percent sign. */
+  private int percent = '%';
+  /** Permille sign. */
+  private int permille = '\u2030';
+  /** Zero-digit sign. */
+  private int zero = '0';
 
   /**
    * Default constructor.
    * @throws QueryException query exception
    */
-  public DecimalFormat() throws QueryException {
+  public DecFormatter() throws QueryException {
     this(null, null);
   }
 
@@ -75,7 +65,7 @@ public final class DecimalFormat {
    * @param map decimal format
    * @throws QueryException query exception
    */
-  public DecimalFormat(final InputInfo ii, final HashMap<String, String> map)
+  public DecFormatter(final InputInfo ii, final HashMap<String, String> map)
       throws QueryException {
 
     // assign map values
@@ -93,15 +83,15 @@ public final class DecimalFormat {
           nan = val;
         } else if(cp != 0) {
           if(key.equals(DF_DEC)) decimal = cp;
-          else if(key.equals(DF_GRP)) group = cp;
+          else if(key.equals(DF_GRP)) grouping = cp;
           else if(key.equals(DF_PAT)) pattern = cp;
           else if(key.equals(DF_MIN)) minus = cp;
-          else if(key.equals(DF_DIG)) digit = cp;
+          else if(key.equals(DF_DIG)) optional = cp;
           else if(key.equals(DF_PC)) percent = cp;
           else if(key.equals(DF_PM)) permille = cp;
           else if(key.equals(DF_ZG)) {
-            if(Arrays.binarySearch(ZEROES, cp) >= 0) zero = cp;
-            else INVDECFORM.thrw(ii, key, val);
+            zero = zeroes(cp);
+            if(zero == -1) INVDECFORM.thrw(ii, key, val);
           }
         } else {
           INVDECFORM.thrw(ii, key, val);
@@ -111,14 +101,16 @@ public final class DecimalFormat {
 
     // check for duplicate characters
     final IntSet is = new IntSet();
-    final int[] t = { decimal, group, percent, permille, zero, digit, pattern };
-    for(final int i : t) if(is.add(i) < 0) DUPLDECFORM.thrw(ii, (char) i);
+    for(final int i : new int[] { decimal, grouping, percent, permille,
+        zero, optional, pattern }) {
+      if(is.add(i) < 0) DUPLDECFORM.thrw(ii, (char) i);
+    }
 
     // create auxiliary strings
     final TokenBuilder tb = new TokenBuilder();
     for(int i = 0; i < 10; i++) tb.add(zero + i);
     digits = tb.toString();
-    active = tb.add(decimal).add(group).add(digit).toString();
+    active = tb.add(decimal).add(grouping).add(optional).toString();
   }
 
   /**
@@ -135,7 +127,7 @@ public final class DecimalFormat {
     // find pattern separator and sub-patterns
     final TokenList tl = new TokenList();
     String pic = picture;
-    int i = pic.indexOf(pattern);
+    final int i = pic.indexOf(pattern);
     if(i == -1) {
       tl.add(pic);
     } else {
@@ -144,11 +136,11 @@ public final class DecimalFormat {
       if(pic.indexOf(pattern) != -1) PICNUM.thrw(ii, picture);
       tl.add(pic);
     }
-    final byte[][] sub = tl.toArray();
+    final byte[][] patterns = tl.toArray();
 
     // check and analyze patterns
-    if(!check(sub)) PICNUM.thrw(ii, picture);
-    final Picture[] pics = analyze(sub);
+    if(!check(patterns)) PICNUM.thrw(ii, picture);
+    final Picture[] pics = analyze(patterns);
 
     // return formatted string
     return token(format(number, pics, ii));
@@ -161,29 +153,30 @@ public final class DecimalFormat {
    */
   private boolean check(final byte[][] patterns) {
     for(final byte[] pt : patterns) {
-      boolean frc = false, pas = false, act = false;
+      boolean frac = false, pas = false, act = false;
       boolean dg = false, opt1 = false, opt2 = false;
-      int pc = 0, pm = 0;
+      int cl = 0, pc = 0, pm = 0, ls = 0;
 
       // loop through all characters
-      for(int i = 0; i < pt.length; i += cl(pt, i)) {
-        int ch = cp(pt, i);
+      for(int i = 0; i < pt.length; i += cl) {
+        final int ch = ch(pt, i);
+        cl = cl(pt, i);
         final boolean a = active.indexOf(ch) != -1;
 
         if(ch == decimal) {
           // more than 1 decimal sign?
-          if(frc) return false;
-          frc = true;
-        } else if(ch == group) {
+          if(frac) return false;
+          frac = true;
+        } else if(ch == grouping) {
           // adjacent decimal sign?
-          if(i > 0 && cp(pt, i - 1) == decimal || i + 1 < pt.length &&
-              cp(pt, i + 1) == decimal) return false;
+          if(i == 0 && frac || ls == decimal || i + cl < pt.length ?
+              ch(pt, i + cl) == decimal : !frac) return false;
         } else if(ch == percent) {
-          ++pc;
+          if(++pc > 1) return false;
         } else if(ch == permille) {
-          ++pm;
-        } else if(ch == digit) {
-          if(!frc) {
+          if(++pm > 1) return false;
+        } else if(ch == optional) {
+          if(!frac) {
             // integer part, and optional sign after digit?
             if(dg) return false;
             opt1 = true;
@@ -192,7 +185,7 @@ public final class DecimalFormat {
           }
         } else if(digits.indexOf(ch) != -1) {
           // fractional part, and digit after optional sign?
-          if(frc && opt2) return false;
+          if(frac && opt2) return false;
           dg = true;
         }
 
@@ -201,10 +194,12 @@ public final class DecimalFormat {
         // will be assigned if active characters were found
         if(act) pas |= !a;
         act |= a;
+        // cache last character
+        ls = ch;
       }
 
       // more than 1 percent and permille sign?
-      if(pc > 1 || pm > 1 || pc + pm > 1) return false;
+      if(pc + pm > 1) return false;
       // no optional sign or digit?
       if(!opt1 && !opt2 && !dg) return false;
     }
@@ -234,16 +229,18 @@ public final class DecimalFormat {
 
       // loop through all characters
       for(int i = 0; i < pt.length; i += cl(pt, i)) {
-        int ch = cp(pt, i);
+        final int ch = ch(pt, i);
         final boolean a = active.indexOf(ch) != -1;
 
         if(ch == decimal) {
           ++p;
           act = false;
-        } else if(ch == digit) {
+        } else if(ch == optional) {
           opt[p]++;
-        } else if(ch == group) {
-          pic.group[p] = Array.add(pic.group[p], pic.min[p] + opt[p]);
+        } else if(ch == grouping) {
+          if(p == 0) {
+            pic.group[p] = Array.add(pic.group[p], pic.min[p] + opt[p]);
+          }
         } else if(digits.indexOf(ch) != -1) {
           pic.min[p]++;
         } else {
@@ -255,10 +252,20 @@ public final class DecimalFormat {
         }
         act |= a;
       }
-      // finalize group positions
-      for(int g = 0; g < pic.group[0].length; ++g) {
-        pic.group[0][g] = pic.min[0] + opt[0] - pic.group[0][g];
+      // finalize integer-part-grouping-positions
+      final int[] igp = pic.group[0];
+      final int igl = igp.length;
+      for(int g = 0; g < igl; ++g) igp[g] = pic.min[0] + opt[0] - igp[g];
+
+      // check if integer-part-grouping-positions are regular
+      // if yes, they are replaced with a single position
+      if(igl > 1) {
+        boolean reg = true;
+        final int i = igp[igl - 1];
+        for(int g = igl - 2; g >= 0; --g) reg &= i * igl == igp[g];
+        if(reg) pic.group[0] = new int[] { i };
       }
+
       pic.maxFrac = pic.min[1] + opt[1];
       pics[s] = pic;
     }
@@ -276,22 +283,26 @@ public final class DecimalFormat {
   private String format(final Item it, final Picture[] pics,
       final InputInfo ii) throws QueryException {
 
+    // return results for NaN
     final double d = it.dbl(ii);
-    final Picture pic = pics[d < 0 && pics.length == 2 ? 1 : 0];
-    if(d < 0 && pics.length == 1) pic.fix[0].reset().add(minus);
-
-    // return results for NaN and infinity
     if(Double.isNaN(d)) return nan;
-    if(Double.isInfinite(d)) return pic.fix[0] + inf + pic.fix[1];
+
+    // return infinite results
+    final Picture pic = pics[d < 0 && pics.length == 2 ? 1 : 0];
+    if(d == Double.POSITIVE_INFINITY) return pic.fix[0] + inf + pic.fix[1];
+    if(d == Double.NEGATIVE_INFINITY) return new TokenBuilder(
+        pic.fix[0].finish()).add(minus) + inf + pic.fix[1];
 
     // convert and round number
     Item num = it;
     if(pic.pc) num = Calc.MULT.ev(ii, num, Itr.get(100));
     if(pic.pm) num = Calc.MULT.ev(ii, num, Itr.get(1000));
-    num = FNNum.abs(FNNum.round(num, num.dbl(ii), pic.maxFrac, true, ii), ii);
+    num = FNNum.round(num, num.dbl(ii), pic.maxFrac, true, ii);
+    // remove sign: num = FNNum.abs(num);
 
     // convert to string representation
-    final String str = num.toString();
+    String str = num.toString();
+    if(str.startsWith("0.")) str = str.substring(1);
 
     // integer/fractional separator
     final int sp = str.indexOf(decimal);
@@ -303,10 +314,18 @@ public final class DecimalFormat {
     pre.add(str.substring(0, il));
 
     // squeeze in grouping separators
-    final int pl = pre.size();
-    for(int i = 0; i < pic.group[0].length; ++i) {
-      final int pos = pl - pic.group[0][i];
-      if(pos > 0) pre.insert(pos, group);
+    if(pic.group[0].length == 1) {
+      // regular pattern with repeating separators
+      final int pos = pic.group[0][0];
+      for(int p = pre.size() - 1; p > 0; --p) {
+        if(p % pos == 0) pre.insert(pre.size() - p, grouping);
+      }
+    } else {
+      // irregular pattern, or no separators at all
+      for(int i = 0; i < pic.group[0].length; ++i) {
+        final int pos = pre.size() - pic.group[0][i];
+        if(pos > 0) pre.insert(pos, grouping);
+      }
     }
 
     // create fractional part
@@ -319,10 +338,10 @@ public final class DecimalFormat {
     final int sl = suf.size();
     for(int i = pic.group[1].length - 1; i >= 0; i--) {
       final int pos = pic.group[1][i];
-      if(pos < sl) suf.insert(pos, group);
+      if(pos < sl) suf.insert(pos, grouping);
     }
 
-    final TokenBuilder res = new TokenBuilder().add(pic.fix[0].finish());
+    final TokenBuilder res = new TokenBuilder(pic.fix[0].finish());
     res.add(pre.finish());
     if(suf.size() != 0) res.add(decimal).add(suf.finish());
     return res.add(pic.fix[1].finish()).toString();
@@ -331,11 +350,11 @@ public final class DecimalFormat {
   /** Picture variables. */
   static final class Picture {
     /** prefix/suffix. */
-    TokenBuilder[] fix = { new TokenBuilder(), new TokenBuilder() };
+    final TokenBuilder[] fix = { new TokenBuilder(), new TokenBuilder() };
     /** integer/fractional-part-grouping-positions. */
-    int[][] group = { {}, {} };
+    final int[][] group = { {}, {} };
     /** minimum-integer/fractional-part-size. */
-    int[] min = { 0, 0 };
+    final int[] min = { 0, 0 };
     /** maximum-fractional-part-size. */
     int maxFrac;
     /** percent flag. */

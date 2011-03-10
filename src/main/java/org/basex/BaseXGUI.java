@@ -27,9 +27,9 @@ import org.basex.util.Util;
  */
 public final class BaseXGUI {
   /** Mac OS X GUI optimizations. */
-  protected GUIMacOSX osxGUI;
+  GUIMacOSX osxGUI;
   /** File, specified as argument. */
-  protected String file;
+  String file;
 
   /**
    * Main method.

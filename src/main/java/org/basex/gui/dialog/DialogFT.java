@@ -89,7 +89,7 @@ final class DialogFT extends BaseXBack {
       }
     }
 
-    final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     b1.add(check[F_LANG]);
     final StringList langs = new StringList();
     for(final Language l : FTLexer.languages()) langs.add(l.toString());
@@ -106,7 +106,7 @@ final class DialogFT extends BaseXBack {
       if(!create) add(labels[f]);
     }
 
-    final BaseXBack b2 = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    final BaseXBack b2 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     b2.add(check[F_SCORE]);
     scoring = new BaseXCombo(d, CREATESCT1, CREATESCT2);
     b2.add(scoring);
@@ -114,7 +114,7 @@ final class DialogFT extends BaseXBack {
     if(!create) add(labels[F_SCORE]);
 
     add(check[F_STOP]);
-    final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     swpath = new BaseXTextField(
         sw.isEmpty() ? d.gui.gprop.get(GUIProp.STOPPATH) : sw, d);
     b3.add(swpath);

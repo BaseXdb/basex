@@ -139,6 +139,9 @@ public final class GUIProp extends AProp {
   /** Name of new database. */
   public static final Object[] CREATENAME = { "CREATENAME", "" };
 
+  /** Last insertion type. */
+  public static final Object[] LASTINSERT = { "LASTINSERT", 1 };
+
   /** Path to mapped file hierarchy.
   public static final Object[] FSPATH = { "FSPATH", Prop.HOME };
   /** Name of the DeepFS database.

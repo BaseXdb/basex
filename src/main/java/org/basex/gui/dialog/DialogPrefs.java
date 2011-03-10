@@ -58,7 +58,7 @@ public final class DialogPrefs extends Dialog {
     final BaseXBack pp = new BaseXBack(new TableLayout(11, 1));
     pp.add(new BaseXLabel(DATABASEPATH, true, true));
 
-    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.gprop;
@@ -109,7 +109,7 @@ public final class DialogPrefs extends Dialog {
     p.add(lang);
     creds = new BaseXLabel(" ");
     p.add(creds);
-    creds.setText(TRANSLATION + creds(lang.getSelectedItem()));
+    creds.setText(TRANSLATION + creds(lang.getSelectedItem().toString()));
 
     pp.add(p);
 
@@ -123,7 +123,7 @@ public final class DialogPrefs extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    creds.setText(TRANSLATION + creds(lang.getSelectedItem()));
+    creds.setText(TRANSLATION + creds(lang.getSelectedItem().toString()));
     gui.notify.layout();
   }
 
@@ -147,9 +147,9 @@ public final class DialogPrefs extends Dialog {
    * @param lng language
    * @return credits
    */
-  static String creds(final Object lng) {
+  static String creds(final String lng) {
     for(int i = 0; i < LANGS[0].length; ++i) {
-      if(lng.equals(LANGS[0][i])) return LANGS[1][i];
+      if(LANGS[0][i].equals(lng)) return LANGS[1][i];
     }
     return "";
   }

@@ -645,8 +645,7 @@ public enum Type {
       try {
         return new QNm(s, ctx, ii);
       } catch(final QueryException ex) {
-        NSDECL.thrw(ii, s);
-        return null;
+        throw NSDECL.thrw(ii, s);
       }
     }
     @Override
@@ -737,7 +736,16 @@ public enum Type {
   SEQ("sequence", null, EMPTY, false, false, false, false, false),
 
   /** Java type. */
-  JAVA("java", null, EMPTY, true, true, true, false, false);
+  JAVA("java", null, EMPTY, true, true, true, false, false) {
+    @Override
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii) {
+      return new Jav(it);
+    }
+    @Override
+    public Item e(final Object o, final InputInfo ii) {
+      return new Jav(o);
+    }
+  };
 
   /** String representation. */
   public final byte[] nam;
@@ -782,8 +790,7 @@ public enum Type {
    */
   @SuppressWarnings("unused")
   public Item e(final Object o, final InputInfo ii) throws QueryException {
-    Util.notexpected(o);
-    return null;
+    throw Util.notexpected(o);
   }
 
   /**
@@ -896,8 +903,7 @@ public enum Type {
    */
   protected final Item error(final Item it, final InputInfo ii)
       throws QueryException {
-    Err.cast(ii, this, it);
-    return null;
+    throw Err.cast(ii, this, it);
   }
 
   // PUBLIC AND STATIC METHODS ================================================

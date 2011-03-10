@@ -49,6 +49,15 @@ ADDING CHECKSTYLE --------------------------------------------------------------
  - Enter the URL: http://eclipse-cs.sourceforge.net/update
  - Follow the installation procedure and restart Eclipse
 
+USING GIT ----------------------------------------------------------------------
+
+The code base of BaseX can be accessed via GitHub (www.github.com):
+
+Main Package » git clone git://github.com/BaseXdb/basex.git
+APIs: JAX-RX (REST), XML:DB, XQJ » git clone git://github.com/BaseXdb/basex-api.git
+Code Examples » git clone git://github.com/BaseXdb/basex-examples.git
+JAX-RX Interface » git clone git://github.com/BaseXdb/jax-rx.git
+
 --------------------------------------------------------------------------------
 
  Any kind of feedback is welcome; please check out the online documentation at

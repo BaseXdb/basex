@@ -13,7 +13,22 @@ import java.util.Iterator;
  */
 public class StringList extends ElementList implements Iterable<String> {
   /** Element container. */
-  protected String[] list = new String[CAP];
+  protected String[] list;
+
+  /**
+   * Default constructor.
+   */
+  public StringList() {
+    this(CAP);
+  }
+
+  /**
+   * Constructor, specifying an initial array capacity.
+   * @param c array capacity
+   */
+  public StringList(final int c) {
+    list = new String[c];
+  }
 
   /**
    * Adds an element to the array.
@@ -41,6 +56,16 @@ public class StringList extends ElementList implements Iterable<String> {
   public final boolean contains(final String e) {
     for(int i = 0; i < size; ++i) if(list[i].equals(e)) return true;
     return false;
+  }
+
+  /**
+   * Searches the specified element via binary search.
+   * Note that all elements must be sorted.
+   * @param e element to be found
+   * @return index of the search key, or the negative insertion point - 1
+   */
+  public final int sortedIndexOf(final String e) {
+    return Arrays.binarySearch(list, 0, size, e);
   }
 
   /**
