@@ -146,7 +146,8 @@ public final class NodeCache extends AxisIter {
    * @return position, or {@code -1}
    */
   public int indexOf(final ANode node, final boolean db) {
-    if(db) return Math.max(binarySearch((DBNode) node, 0, size), -1);
+    if(db) return node instanceof DBNode ?
+        Math.max(binarySearch((DBNode) node, 0, size), -1) : -1;
     for(int s = 0; s < size(); ++s) if(item[s].is(node)) return s;
     return -1;
   }
