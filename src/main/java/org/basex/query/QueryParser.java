@@ -4,11 +4,9 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.query.expr.And;
@@ -3014,15 +3012,23 @@ public class QueryParser extends InputParser {
     final int p = qp;
 
     tok.reset();
-    final QNm name = new QNm();
     if(curr('"') || curr('\'')) {
-      name.uri(stringLiteral());
-      if(!consume(':')) {
+      final byte[] uri = stringLiteral();
+      tok.reset();
+      if(!consume(':') || !ncName()) {
         qp = p;
         return null;
       }
+      return new QNm(tok.finish(), uri);
     }
-    return name;
+
+    if(!ncName()) {
+      qp = p;
+      return null;
+    }
+
+    if(consume(':')) ncName2();
+    return new QNm(tok.finish());
   }
 
   /**
