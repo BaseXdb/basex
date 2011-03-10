@@ -146,7 +146,7 @@ public abstract class Item extends Value {
    */
   public final boolean comparable(final Item b) {
     return type == b.type || num() && b.num() || (unt() || str()) &&
-      (b.str() || b.unt()) || dur() && b.dur();
+      (b.str() || b.unt()) || dur() && b.dur() || func();
   }
 
   /**

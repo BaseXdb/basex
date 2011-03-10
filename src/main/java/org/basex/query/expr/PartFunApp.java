@@ -9,7 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FunItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
+import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -23,14 +23,26 @@ import org.basex.util.Token;
 public final class PartFunApp extends Func {
 
   /**
-   * Function constructor for dynamic calls.
+   * Function constructor for static calls.
    * @param ii input info
-   * @param call function expression
+   * @param func typed function expression
    * @param arg arguments
    */
-  public PartFunApp(final InputInfo ii, final Expr call, final Var[] arg) {
-    super(ii, new Var(ii, new QNm(), call.type()), arg, true);
-    expr = call;
+  public PartFunApp(final InputInfo ii, final TypedFunc func, final Var[] arg) {
+    super(ii, new Var(ii, new QNm(), func.ret()), func.type.type(arg), true);
+    expr = func.fun;
+  }
+
+  /**
+   * Function constructor for dynamic calls.
+   * @param ii input info
+   * @param func function expression
+   * @param arg arguments
+   */
+  public PartFunApp(final InputInfo ii, final Expr func, final Var[] arg) {
+    // [LW] dynamic type propagation
+    super(ii, new Var(ii, new QNm(), func.type()), arg, true);
+    expr = func;
   }
 
   @Override
@@ -47,11 +59,7 @@ public final class PartFunApp extends Func {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
 
-    final SeqType[] at = new SeqType[args.length];
-    for(int i = 0; i < at.length; i++)
-      at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
-
-    return new FunItem(args, expr, FunType.get(at, var.type()), null);
+    return new FunItem(args, expr, FunType.get(this), null);
   }
 
   @Override

@@ -1,14 +1,12 @@
 package org.basex.query.expr;
 
 import java.io.IOException;
-import java.util.Arrays;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FunItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -37,21 +35,7 @@ public final class DynFunCall extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     return super.comp(ctx);
-
-    // TODO inline variables?
-//    if(!(fun() instanceof FunItem)) return this;
-//    for(int i = 0; i < expr.length - 1; i++)
-//      if(!expr[i].value()) return this;
-//
-//    final FunItem f = (FunItem) fun();
-//    final Var[] vars = f.vars();
-//    for(int i = 0; i < vars.length; i++) {
-//      ctx.compInfo(OPTBIND, vars[i]);
-//      vars[i].bind(expr[i], ctx);
-//      ctx.vars.add(vars[i]);
-//    }
-//
-//    return f.body().comp(ctx);
+    // [LW] inline variables?
   }
 
   @Override
@@ -85,11 +69,8 @@ public final class DynFunCall extends Arr {
    */
   private FunItem getFun(final QueryContext ctx) throws QueryException {
     final Item it = expr[expr.length - 1].item(ctx, input);
-    final SeqType[] at = new SeqType[expr.length - 1];
-    Arrays.fill(at, SeqType.ITEM_ZM);
-    final FunType t = FunType.get(at, SeqType.ITEM_ZM);
-
-    if(!(it instanceof FunItem) || !it.type.instance(t)) Err.type(this, t, it);
+    if(!it.func() || ((FunType) it.type).args.length != expr.length - 1)
+      Err.type(this, FunType.arity(expr.length - 1), it);
     return (FunItem) it;
   }
 

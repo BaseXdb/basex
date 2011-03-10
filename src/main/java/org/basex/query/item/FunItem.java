@@ -143,14 +143,12 @@ public class FunItem extends Item {
 
   @Override
   public byte[] atom(final InputInfo ii) throws QueryException {
-    NOTYP.thrw(ii, this);
-    return null;
+    throw NOTYP.thrw(ii, this);
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    TYPECMP.thrw(ii, FITM);
-    return false;
+    throw FNEQ.thrw(ii);
   }
 
   @Override

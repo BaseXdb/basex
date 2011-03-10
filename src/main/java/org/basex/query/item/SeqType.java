@@ -84,6 +84,8 @@ public final class SeqType {
   public static final SeqType B64 = AtomType.B64.seq();
   /** Double number. */
   public static final SeqType DBL = AtomType.DBL.seq();
+  /** Double number. */
+  public static final SeqType DBL_ZM = new SeqType(AtomType.DBL, Occ.ZM);
   /** Float number. */
   public static final SeqType FLT = AtomType.FLT.seq();
   /** Zero or one double. */

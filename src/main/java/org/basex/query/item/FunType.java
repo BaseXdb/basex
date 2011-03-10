@@ -1,8 +1,12 @@
 package org.basex.query.item;
 
+import java.util.Arrays;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Func;
 import org.basex.query.util.Err;
+import org.basex.query.util.Var;
 import static org.basex.util.Token.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.util.InputInfo;
@@ -109,7 +113,7 @@ public final class FunType implements Type {
     if(this == ANY) return false;
     if(args.length != ft.args.length || !ret.instance(ft.ret)) return false;
     for(int i = 0; i < args.length; i++)
-      if(!args[i].instance(ft.args[i])) return false;
+      if(!ft.args[i].instance(args[i])) return false;
     return true;
   }
 
@@ -124,6 +128,29 @@ public final class FunType implements Type {
     return new FunType(args, ret);
   }
 
+  /**
+   * Getter for function types with a given arity.
+   * @param a number of arguments
+   * @return function type
+   */
+  public static FunType arity(final int a) {
+    final SeqType[] args = new SeqType[a];
+    Arrays.fill(args, SeqType.ITEM_ZM);
+    return get(args, SeqType.ITEM_ZM);
+  }
+
+  /**
+   * Getter for a function's type.
+   * @param f user-defined function
+   * @return function type
+   */
+  public static FunType get(final Func f) {
+    final SeqType[] at = new SeqType[f.args.length];
+    for(int i = 0; i < at.length; i++)
+      at[i] = f.args[i].type == null ? SeqType.ITEM_ZM : f.args[i].type;
+    return new FunType(at, f.var.type == null ? SeqType.ITEM_ZM : f.var.type);
+  }
+
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
@@ -133,5 +160,15 @@ public final class FunType implements Type {
       tb.addSep(args, ", ").add(") as ").add(ret.toString());
     }
     return tb.toString();
+  }
+
+  /**
+   * Sets the types of the given variables.
+   * @param vars variables to type
+   * @return the variables for convenience
+   */
+  public Var[] type(final Var[] vars) {
+    if(this != ANY) for(int i = 0; i < vars.length; i++) vars[i].type = args[i];
+    return vars;
   }
 }

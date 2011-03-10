@@ -246,16 +246,16 @@ public enum FunDef {
   /* FNNum functions. */
 
   /** XQuery function. */
-  ABS(FNURI, FNNum.class, 1, 1, "abs(num)", ITR_ZO, ITR_ZO),
+  ABS(FNURI, FNNum.class, 1, 1, "abs(num)", AAT_ZO, AAT_ZO),
   /** XQuery function. */
-  CEIL(FNURI, FNNum.class, 1, 1, "ceiling(num)", ITR_ZO, ITR_ZO),
+  CEIL(FNURI, FNNum.class, 1, 1, "ceiling(num)", AAT_ZO, ITR_ZO),
   /** XQuery function. */
-  FLOOR(FNURI, FNNum.class, 1, 1, "floor(num)", ITR_ZO, ITR_ZO),
+  FLOOR(FNURI, FNNum.class, 1, 1, "floor(num)", AAT_ZO, ITR_ZO),
   /** XQuery function. */
-  ROUND(FNURI, FNNum.class, 1, 2, "round(num[,prec])", ITR_ZO, ITR, ITR_ZO),
+  ROUND(FNURI, FNNum.class, 1, 2, "round(num[,prec])", AAT_ZO, ITR, ITR_ZO),
   /** XQuery function. */
   RNDHLF(FNURI, FNNum.class, 1, 2, "round-half-to-even(num[,prec])",
-      ITR_ZO, ITR, ITR_ZO),
+      AAT_ZO, ITR, ITR_ZO),
 
   /* FNOut functions. */
 
@@ -556,7 +556,7 @@ public enum FunDef {
   /** Database function: marks the hits of a full-text request. */
   MARK(FTURI, FNFt.class, 1, 2, "mark(nodes[,tag])", NOD_ZM, STR, NOD_ZM),
   /** Database function: returns the full-text score. */
-  SCORE(FTURI, FNFt.class, 1, 1, "score(items)", ITEM_ZM, ITR_ZM),
+  SCORE(FTURI, FNFt.class, 1, 1, "score(items)", ITEM_ZM, DBL_ZM),
   /** Database function: extracts full-text results. */
   EXTRACT(FTURI, FNFt.class, 1, 3, "extract(items[,tag[,length]])",
       ITEM_ZM, STR, ITR, NOD_ZM),

@@ -107,6 +107,7 @@ import org.basex.query.up.Replace;
 import org.basex.query.up.Transform;
 import org.basex.query.util.Err;
 import org.basex.query.util.Namespaces;
+import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
 import org.basex.query.util.format.DecFormatter;
 import org.basex.util.Array;
@@ -1744,9 +1745,8 @@ public class QueryParser extends InputParser {
 
       final Expr[] args = new Expr[(int) cardinal];
       final Var[] vars = partial(args);
-      final Expr f = ctx.funcs.get(name, args, ctx, this);
+      final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
       if(f == null) error(FUNCUNKNOWN, fn);
-      f.isFun(null);
       return new LitFunc(input(), name, f, vars);
     }
 
@@ -1873,11 +1873,11 @@ public class QueryParser extends InputParser {
     ctx.ns.uri(name);
     name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input())
         : ctx.nsFunc);
-    final Expr func = ctx.funcs.get(name, args, ctx, this);
+    final TypedFunc func = ctx.funcs.get(name, args, ctx, this);
     if(func != null) {
       alter = null;
       final Var[] part = partial(args);
-      return part.length > 0 ? new PartFunApp(input(), func, part) : func;
+      return part.length > 0 ? new PartFunApp(input(), func, part) : func.fun;
     }
     qp = p;
     return null;
@@ -2985,7 +2985,7 @@ public class QueryParser extends InputParser {
   private byte[] ncName(final Err err) throws QueryException {
     skipWS();
     tok.reset();
-    if(ncName(true)) return tok.finish();
+    if(ncName()) return tok.finish();
     if(err != null) error(err);
     return EMPTY;
   }
@@ -2999,28 +2999,58 @@ public class QueryParser extends InputParser {
    */
   private byte[] qName(final Err err) throws QueryException {
     tok.reset();
-    final boolean ok = ncName(true);
-    if(ok && consume(':')) ncName(false);
+    final boolean ok = ncName();
+    if(ok && consume(':')) ncName2();
     if(!ok && err != null) error(err);
     return tok.finish();
   }
 
   /**
+   * Parses the "EQName" rule.
+   * @return string
+   * @throws QueryException query exception
+   */
+  private QNm eqName() throws QueryException {
+    final int p = qp;
+
+    tok.reset();
+    final QNm name = new QNm();
+    if(curr('"') || curr('\'')) {
+      name.uri(stringLiteral());
+      if(!consume(':')) {
+        qp = p;
+        return null;
+      }
+    }
+    return name;
+  }
+
+  /**
    * Helper method for parsing NCNames.
-   * @param first flag for first call
    * @return true for success
    */
-  private boolean ncName(final boolean first) {
+  private boolean ncName2() {
     char c = curr();
     if(!XMLToken.isNCStartChar(c)) {
-      if(!first) --qp;
+      --qp;
       return false;
     }
-    if(!first) tok.add(':');
+    tok.add(':');
     do {
       tok.add(consume());
       c = curr();
     } while(XMLToken.isNCChar(c));
+    return true;
+  }
+
+  /**
+   * Helper method for parsing NCNames.
+   * @return true for success
+   */
+  private boolean ncName() {
+    if(!XMLToken.isNCStartChar(curr())) return false;
+    do { tok.add(consume());
+    } while(XMLToken.isNCChar(curr()));
     return true;
   }
 

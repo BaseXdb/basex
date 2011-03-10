@@ -4,7 +4,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FunItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
+import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -16,8 +16,6 @@ import org.basex.util.InputInfo;
  */
 public class LitFunc extends Func {
 
-  /** Variables. */
-  private final Var[] vars;
   /** Function name. */
   private final QNm name;
 
@@ -25,14 +23,14 @@ public class LitFunc extends Func {
    * Constructor.
    * @param ii input info
    * @param n function name
-   * @param e function expression
+   * @param f function expression
    * @param arg arguments
    */
-  public LitFunc(final InputInfo ii, final QNm n, final Expr e,
+  public LitFunc(final InputInfo ii, final QNm n, final TypedFunc f,
       final Var[] arg) {
-    super(ii, new Var(ii, new QNm(), e.type()), arg, true);
-    vars = arg;
-    expr = e;
+    super(ii, new Var(ii, new QNm(), f.ret()), f.type.type(arg), true);
+
+    expr = f.fun;
     name = n;
   }
 
@@ -40,19 +38,14 @@ public class LitFunc extends Func {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
 
-    // [LW] better type propagation
-    final SeqType[] at = new SeqType[args.length];
-    for(int i = 0; i < at.length; i++)
-      at[i] = args[i].type == null ? SeqType.ITEM_ZM : args[i].type;
-
-    return new FunItem(name, args, expr, FunType.get(at, var.type()));
+    return new FunItem(name, args, expr, FunType.get(this));
   }
 
   @Override
   public String toString() {
     final String str = expr.toString();
     final int par = str.indexOf('(');
-    return (par > -1 ? str.substring(0, par) : str) + "#" + vars.length;
+    return (par > -1 ? str.substring(0, par) : str) + "#" + args.length;
   }
 
 }

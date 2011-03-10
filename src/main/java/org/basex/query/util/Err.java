@@ -224,9 +224,11 @@ public enum Err {
   /** FOTY0013: Type exception. */
   FNATM(FOTY, 13, "Function items can't be atomized: %"),
   /** FOTY0013: Type exception. */
+  FNEQ(FOTY, 13, "Function items don't have a defined equality: %"),
+  /** FOTY0013: Type exception. */
   FNSTR(FOTY, 14, "Function items don't have a string representation: %"),
   /** FOTY0013: Type exception. */
-  FNDEQ(FOTY, 15, "Function items can't be compared: %"),
+  FNCMP(FOTY, 15, "Function items can't be compared: %"),
 
   /** FOFU0001: Invalid value of $argNum in call to fn:partial-apply. */
   INVPOS(FOFU, 1, "Illegal argument position for %: %"),

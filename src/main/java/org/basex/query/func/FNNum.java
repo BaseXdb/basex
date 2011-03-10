@@ -82,10 +82,10 @@ public final class FNNum extends Fun {
         case FLT: return s ? it : Flt.get(Math.abs(it.flt(ii)));
         case DEC: return s ? it : Dec.get(it.dec(ii).abs());
         case ITR: return s ? it : Itr.get(Math.abs(it.itr(ii)));
-        default:  return Itr.get(Math.abs(it.itr(ii)));
+        default:  break;
       }
     }
-    return Itr.get(Math.abs(it.itr(ii)));
+    return Dbl.get(Math.abs(it.dbl(ii)));
   }
 
   /**
@@ -101,8 +101,11 @@ public final class FNNum extends Fun {
   public static Item round(final Item it, final double d, final int prec,
       final boolean h2e, final InputInfo ii) throws QueryException {
 
-    if(it.type == AtomType.DEC && prec >= 0) {
-      final BigDecimal bd = it.dec(ii);
+    // take care of untyped items
+    final Item num = it.unt() ? Dbl.get(it.dbl(ii)) : it;
+
+    if(num.type == AtomType.DEC && prec >= 0) {
+      final BigDecimal bd = num.dec(ii);
       final int m = h2e ? BigDecimal.ROUND_HALF_EVEN : bd.signum() > 0 ?
           BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN;
       return Dec.get(bd.setScale(prec, m));
@@ -141,10 +144,11 @@ public final class FNNum extends Fun {
         case DEC: return Dec.get(d);
         case DBL: return Dbl.get(d);
         case FLT: return Flt.get((float) d);
-        default:  return Itr.get((long) d);
+        case ITR: return Itr.get((long) d);
+        default:  break;
       }
     }
-    return Itr.get((long) d);
+    return Dbl.get(d);
   }
 
   @Override

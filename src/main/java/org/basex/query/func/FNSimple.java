@@ -172,15 +172,15 @@ public final class FNSimple extends Fun {
       // at least one iterator is exhausted: check if both items are null
       if(it1 == null) {
         if(it2 == null) return true;
-        if(it2.func()) FNDEQ.thrw(ii, it2);
+        if(it2.func()) FNCMP.thrw(ii, it2);
         return false;
       } else if(it2 == null) {
-        if(it1.func()) FNDEQ.thrw(ii, it1);
+        if(it1.func()) FNCMP.thrw(ii, it1);
         return false;
       }
 
       // check for functions
-      if(it1.func() || it2.func()) FNDEQ.thrw(ii, it1.func() ? it2 : it2);
+      if(it1.func() || it2.func()) FNCMP.thrw(ii, it1.func() ? it2 : it2);
 
       // check atomic values
       if(!it1.node() && !it2.node()) {
