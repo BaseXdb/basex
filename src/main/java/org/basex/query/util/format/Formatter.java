@@ -112,7 +112,7 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public byte[] formatDate(final Date date, final byte[] pic,
+  public final byte[] formatDate(final Date date, final byte[] pic,
       final byte[] cal, final byte[] plc, final InputInfo ii)
       throws QueryException {
 
@@ -193,7 +193,6 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'f':
             num = gc.getMillisecond();
-            pres = ONE;
             err = dat;
             break;
           case 'Z':
@@ -217,10 +216,8 @@ public abstract class Formatter extends FormatUtil {
         }
         if(err) PICCOMP.thrw(ii, pic);
 
-        final FormatParser fp = new FormatParser();
-        if(!fp.parse(m, pres, true)) PICDATE.thrw(ii, pic);
-
-        if(fp.pres[0] == 'n') {
+        final FormatParser fp = new FormatParser(ii, m, pres);
+        if(fp.digit == 'n') {
           byte[] in = EMPTY;
           if(spec == 'M') {
             in = month((int) num - 1, fp.min, fp.max);
@@ -246,32 +243,33 @@ public abstract class Formatter extends FormatUtil {
 
   /**
    * Returns a formatted integer.
-   * @param number integer to be formatted
+   * @param num integer to be formatted
    * @param mp marker parser
    * @return string representation
    */
-  public byte[] formatInt(final long number, final FormatParser mp) {
+  public final byte[] formatInt(final long num, final FormatParser mp) {
     // choose sign
-    long num = number;
-    final boolean sign = num < 0;
-    if(sign) num = -num;
+    long n = num;
+    final boolean sign = n < 0;
+    if(sign) n = -n;
 
     final TokenBuilder tb = new TokenBuilder();
-    final int ch = ch(mp.pres, 0);
-    final boolean single = mp.pres.length == cl(mp.pres, 0);
-    if(ch == 'i') {
-      if(single) roman(tb, num);
-    } else if(ch == 'w') {
-      tb.add(word(num, mp.ordinal));
+    final int ch = mp.digit;
+    final boolean single = mp.primary.length == cl(mp.primary, 0);
+
+    if(ch == 'w') {
+      tb.add(word(n, mp.ordinal));
     } else if(ch == KANJI[1]) {
-      japanese(tb, num);
+      japanese(tb, n);
+    } else if(single && ch == 'i') {
+      roman(tb, n);
     } else if(ch >= '\u2460' && ch <= '\u249b') {
-      tb.add((int) (ch + number - 1));
-    } else if(ch == '#') {
-      tb.add(number(num, mp, '0'));
-    } else if(!single || !sequence(tb, ch, num)) {
-      final int z = zeroes(ch);
-      if(z != -1) tb.add(number(num, mp, z));
+      if(num < 1 || num > 20) tb.addLong(num);
+      else tb.add((int) (ch + num - 1));
+    } else {
+      final String seq = sequence(ch);
+      if(seq != null) alpha(tb, num, seq);
+      else tb.add(number(n, mp, zeroes(ch)));
     }
 
     // finalize formatted string
@@ -282,23 +280,6 @@ public abstract class Formatter extends FormatUtil {
   }
 
   /**
-   * If possible, applies a character sequence.
-   * @param tb token builder
-   * @param ch character to be checked
-   * @param num number
-   * @return success flag
-   */
-  private static boolean sequence(final TokenBuilder tb, final int ch,
-      final long num) {
-
-    final String seq = sequence(ch);
-    if(seq == null) return false;
-    if(num == 0) tb.add(ZERO);
-    else alpha(tb, num, seq);
-    return true;
-  }
-
-  /**
    * Returns a character sequence based on the specified alphabet.
    * @param tb token builder
    * @param n number to be formatted
@@ -306,6 +287,7 @@ public abstract class Formatter extends FormatUtil {
    */
   private static void alpha(final TokenBuilder tb, final long n,
       final String a) {
+
     final int al = a.length();
     if(n > al) alpha(tb, (n - 1) / al, a);
     tb.add(a.charAt((int) ((n - 1) % al)));
@@ -317,7 +299,7 @@ public abstract class Formatter extends FormatUtil {
    * @param n number to be formatted
    */
   private static void roman(final TokenBuilder tb, final long n) {
-    if(n < 4000) {
+    if(n > 0 && n < 4000) {
       final int v = (int) n;
       tb.add(ROMANM[v / 1000]);
       tb.add(ROMANC[v / 100 % 10]);
@@ -348,20 +330,21 @@ public abstract class Formatter extends FormatUtil {
    * @param i initial call
    */
   private static void jp(final TokenBuilder tb, final long n, final boolean i) {
-    if(n >= 0 && n <= 9) {
+    if(n == 0) {
+    } else if(n <= 9) {
       if(n != 1 || !i) tb.add(KANJI[(int) n]);
     } else if(n == 10) {
       tb.add(KANJI[10]);
     } else if(n <= 99) {
-      jp(tb, n, 10L, 10);
+      jp(tb, n, 10, 10);
     } else if(n <= 999) {
-      jp(tb, n, 100L, 11);
+      jp(tb, n, 100, 11);
     } else if(n <= 9999) {
-      jp(tb, n, 1000L, 12);
+      jp(tb, n, 1000, 12);
     } else if(n <= 99999999) {
-      jp(tb, n, 10000L, 13);
+      jp(tb, n, 10000, 13);
     } else if(n <= 999999999999L) {
-      jp(tb, n, 100000000L, 14);
+      jp(tb, n, 100000000, 14);
     } else if(n <= 9999999999999999L) {
       jp(tb, n, 1000000000000L, 15);
     } else {
@@ -387,34 +370,52 @@ public abstract class Formatter extends FormatUtil {
    * Creates a number character sequence.
    * @param n number to be formatted
    * @param mp marker parser
-   * @param start start character
+   * @param z zero digit
    * @return number character sequence
    */
-  private byte[] number(final long n, final FormatParser mp, final int start) {
-    // count optional-digit-signs and digits and cache code points
-    int o = 0, d = 0;
-    final IntList il = new IntList(mp.pres.length);
-    for(int p = 0; p < mp.pres.length; p += cl(mp.pres, p)) {
-      final int ch = ch(mp.pres, p);
-      if(ch >= start && ch <= start + 9) ++d;
-      if(ch == '#') ++o;
-      il.add(ch);
+  private byte[] number(final long n, final FormatParser mp, final int z) {
+    // cache characters of presentation modifier
+    final IntList pr = new IntList(mp.primary.length);
+    for(int p = 0; p < mp.primary.length; p += cl(mp.primary, p)) {
+      pr.add(cp(mp.primary, p));
     }
 
-    // create string representation and build string
+    // check for a regular separator pattern
+    int rp = -1;
+    boolean reg = false;
+    for(int p = pr.size() - 1; p >= 0; --p) {
+      final int ch = pr.get(p);
+      if(ch == '#' || ch >= z && ch <= z + 9) continue;
+      if(rp == -1) rp = pr.size() - p;
+      reg = (pr.size() - p) % rp == 0;
+    }
+    int rc = reg ? pr.get(pr.size() - rp) : 0;
+    if(!reg) rp = Integer.MAX_VALUE;
+
+    // build string representation in a reverse order
+    final IntList cache = new IntList();
     final byte[] s = token(n);
-    final TokenBuilder tmp = new TokenBuilder();
-    final int r = o + d - s.length;
-    for(int i = r; i > o; --i) tmp.add(start);
-    for(final byte b : s) tmp.add(b - '0' + start);
-
-    // fill up with remaining separators
-    for(int p = il.size() - 1, t = tmp.size() - 1; p >= 0 && t >= 0; --p, --t) {
-      final int ch = il.get(p);
-      if(ch < start && ch > start + 9 && ch != '#') tmp.insert(t, ch);
+    int b = s.length - 1, p = pr.size() - 1;
+    while(p >= 0 && b >= 0) {
+      final int ch = pr.get(p--);
+      if(ch == '#' && (cache.size() % rp) == rp - 1) cache.add(rc);
+      cache.add(ch == '#' || ch >= z && ch <= z + 9 ? s[b--] - '0' + z : ch);
+    }
+    // add remaining numbers
+    while(b >= 0) {
+      if((cache.size() % rp) == rp - 1) cache.add(rc);
+      cache.add(s[b--] - '0' + z);
+    }
+    // add remaining modifiers
+    while(p >= 0) {
+      final int ch = pr.get(p--);
+      if(ch == '#') break;
+      cache.add(ch >= z && ch <= z + 9 ? z : ch);
     }
 
-    // add ordinal suffix
-    return tmp.add(ordinal(n, mp.ordinal)).finish();
+    // reverse result and add ordinal suffix
+    final TokenBuilder tb = new TokenBuilder();
+    for(int c = cache.size() - 1; c >= 0; --c) tb.add(cache.get(c));
+    return tb.add(ordinal(n, mp.ordinal)).finish();
   }
 }

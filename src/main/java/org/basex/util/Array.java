@@ -164,6 +164,28 @@ public final class Array {
   }
 
   /**
+   * Reverses the order of the elements in the given array.
+   * @param arr array
+   */
+  public static void reverse(final Object[] arr) {
+    reverse(arr, 0, arr.length);
+  }
+
+  /**
+   * Reverses the order of all elements in the given interval.
+   * @param arr array
+   * @param pos position of first element of the interval
+   * @param len length of the interval
+   */
+  public static void reverse(final Object[] arr, final int pos, final int len) {
+    for(int l = pos, r = pos + len - 1; l < r; l++, r--) {
+      final Object tmp = arr[l];
+      arr[l] = arr[r];
+      arr[r] = tmp;
+    }
+  }
+
+  /**
    * Returns a value for a new array size, which will always be larger than
    * the specified value.
    * @param old old size

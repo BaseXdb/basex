@@ -210,6 +210,8 @@ public enum FunDef {
   BASEURI(FNURI, FNNode.class, 0, 1, "base-uri([node])", URI_ZO),
   /** XQuery function. */
   GENID(FNURI, FNNode.class, 0, 1, "generate-id([node])", STR),
+  /** XQuery function. */
+  CHILDREN(FNURI, FNNode.class, 1, 1, "has-children(node)", BLN),
 
   /* FNNum functions. */
 
@@ -286,6 +288,10 @@ public enum FunDef {
   HEAD(FNURI, FNSeq.class, 1, 1, "head(items)", ITEM_ZO),
   /** XQuery function. */
   TAIL(FNURI, FNSeq.class, 1, 1, "tail(items)", ITEM_ZM),
+  /** XQuery function. */
+  OUTERMOST(FNURI, FNSeq.class, 1, 1, "outermost(nodes)", NOD_ZM),
+  /** XQuery function. */
+  INNERMOST(FNURI, FNSeq.class, 1, 1, "innermost(nodes)", NOD_ZM),
 
   /* FNSimple functions. */
 
@@ -376,17 +382,19 @@ public enum FunDef {
   ATAN(MATHURI, FNMath.class, 1, 1, "atan(number)", ITR_ZO),
   /** XQuery math function. */
   ATAN2(MATHURI, FNMath.class, 1, 1, "atan2(number,number)", ITR_ZO),
+  /** XQuery math function. */
+  POW(MATHURI, FNMath.class, 2, 2, "pow(number,nummber)", ITR_ZO),
+  /** XQuery math function. */
+  EXP(MATHURI, FNMath.class, 1, 1, "exp(number)", ITR_ZO),
+  /** XQuery math function. */
+  EXP10(MATHURI, FNMath.class, 1, 1, "exp10(number)", ITR_ZO),
+  /** XQuery math function. */
+  LOG(MATHURI, FNMath.class, 1, 1, "log(number)", ITR_ZO),
+  /** XQuery math function. */
+  LOG10(MATHURI, FNMath.class, 1, 1, "log10(number)", ITR_ZO),
 
   /** XQuery math function (project specific). */
-  POW(MATHURI, FNMath.class, 2, 2, "pow(number,nummber)", ITR_ZO),
-  /** XQuery math function (project specific). */
-  EXP(MATHURI, FNMath.class, 1, 1, "exp(number)", ITR_ZO),
-  /** XQuery math function (project specific). */
-  LOG(MATHURI, FNMath.class, 1, 1, "log(number)", ITR_ZO),
-  /** XQuery math function (project specific). */
-  LOG10(MATHURI, FNMath.class, 1, 1, "log10(number)", ITR_ZO),
-  /** XQuery math function (project specific). */
-  RAND(MATHURI, FNMath.class, 0, 1, "random([seed])", ITR_ZO),
+  RAND(MATHURI, FNMath.class, 0, 0, "random()", ITR),
   /** XQuery math function (project specific). */
   E(MATHURI, FNMath.class, 0, 0, "e()", ITR),
   /** XQuery math function (project specific). */
