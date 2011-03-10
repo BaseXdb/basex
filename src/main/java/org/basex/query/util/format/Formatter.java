@@ -380,21 +380,35 @@ public abstract class Formatter extends FormatUtil {
       pr.add(cp(mp.primary, p));
     }
 
-    // build string representation in a reverse manner
+    // check for a regular separator pattern
+    int rp = -1;
+    boolean reg = false;
+    for(int p = pr.size() - 1; p >= 0; --p) {
+      final int ch = pr.get(p);
+      if(ch == '#' || ch >= z && ch <= z + 9) continue;
+      if(rp == -1) rp = pr.size() - p;
+      reg = (pr.size() - p) % rp == 0;
+    }
+    int rc = reg ? pr.get(pr.size() - rp) : 0;
+    if(!reg) rp = Integer.MAX_VALUE;
+
+    // build string representation in a reverse order
     final IntList cache = new IntList();
     final byte[] s = token(n);
-    int b = s.length - 1, i = pr.size() - 1;
-    while(i >= 0 && b >= 0) {
-      final int ch = pr.get(i--);
-      cache.add(ch >= z && ch <= z + 9 || ch == '#' ? s[b--] - '0' + z : ch);
+    int b = s.length - 1, p = pr.size() - 1;
+    while(p >= 0 && b >= 0) {
+      final int ch = pr.get(p--);
+      if(ch == '#' && (cache.size() % rp) == rp - 1) cache.add(rc);
+      cache.add(ch == '#' || ch >= z && ch <= z + 9 ? s[b--] - '0' + z : ch);
     }
     // add remaining numbers
     while(b >= 0) {
+      if((cache.size() % rp) == rp - 1) cache.add(rc);
       cache.add(s[b--] - '0' + z);
     }
     // add remaining modifiers
-    while(i >= 0) {
-      final int ch = pr.get(i--);
+    while(p >= 0) {
+      final int ch = pr.get(p--);
       if(ch == '#') break;
       cache.add(ch >= z && ch <= z + 9 ? z : ch);
     }

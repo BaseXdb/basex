@@ -30,7 +30,7 @@ public final class FNFormatIntTest extends QueryTest {
       { "110", str("0.1"), "format-integer(1, '0.0')" },
       { "112", str("0,1"), "format-integer(1, '0,0')" },
       { "114", str("1,1"), "format-integer(11, '#,0')" },
-      //{ "116", str("1.1.1"), "format-integer(111, '##0.0')" },
+      { "116", str("1.1.1"), "format-integer(111, '##0.0')" },
 
       { "120", str("abcd"),
         "string-join(for $i in 1 to 4 return format-integer($i, 'a'))" },
@@ -60,8 +60,8 @@ public final class FNFormatIntTest extends QueryTest {
         "string-join(for $i in 1 to 10 return format-integer($i, 'W'), '|')" },
       { "180", str("one|two|three|four|five|six|seven|eight|nine|ten"),
         "string-join(for $i in 1 to 10 return format-integer($i, 'w'), '|')" },
-      /* { "210", str("1,500,000"),
-        "format-integer(1500000, '0,000')" },*/
+      { "210", str("1,500,000"),
+        "format-integer(1500000, '0,000')" },
       { "220", str("1,500,000"),
         "format-integer(1500000, '#,###,000')" },
       { "290", str("1500\ud800\udd000,00"),
@@ -69,8 +69,6 @@ public final class FNFormatIntTest extends QueryTest {
       { "300", str("(602)347-826"),
         "format-integer(602347826, '#(000)000-000')" },
       { "310", str("SECOND"), "format-integer(2, 'Wo')" },
-      /* { "320", str("Erster"),
-        "format-integer(1, 'Wwo(-er)', 'de' cast as xs:language)" }, */
       { "330", str("1st"), "format-integer(1, '1o(-en)')" },
       { "350", str("One"), "format-integer(1, 'Wwt')" },
       { "360", str(""), "format-integer((), 'Ww')" },
@@ -94,8 +92,8 @@ public final class FNFormatIntTest extends QueryTest {
         "string-join(for $i in 1 to 5 return format-integer($i, '\u03b1'))" },
       { "507", str("\u05d0\u05d1\u05d2\u05d3\u05d4"),
         "string-join(for $i in 1 to 5 return format-integer($i, '\u05d0'))" },
-      /*{ "510", str("12 345 678 901"),
-        "format-integer(12345678901,'# 000')" },*/
+      { "510", str("12 345 678 901"),
+        "format-integer(12345678901,'# 000')" },
       { "520", str("1=\u4E00|2=\u4E8C|3=\u4E09|4=\u56DB|" +
         "5=\u4E94|6=\u516D|7=\u4E03|8=\u516B|9=\u4E5D|10=\u5341|11=\u5341" +
         "\u4E00|12=\u5341\u4E8C|13=\u5341\u4E09|14=\u5341\u56DB|15=\u5341" +
