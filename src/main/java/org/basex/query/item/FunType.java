@@ -168,7 +168,11 @@ public final class FunType implements Type {
    * @return the variables for convenience
    */
   public Var[] type(final Var[] vars) {
-    if(this != ANY) for(int i = 0; i < vars.length; i++) vars[i].type = args[i];
+    if(this != ANY) {
+      for(int i = 0; i < vars.length; i++)
+        if(vars[i] != null && args[i] != SeqType.ITEM_ZM)
+          vars[i].type = args[i];
+    }
     return vars;
   }
 }

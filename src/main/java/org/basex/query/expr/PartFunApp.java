@@ -11,6 +11,7 @@ import org.basex.query.item.FunType;
 import org.basex.query.item.QNm;
 import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
+import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -25,12 +26,12 @@ public final class PartFunApp extends Func {
   /**
    * Function constructor for static calls.
    * @param ii input info
-   * @param func typed function expression
+   * @param fun typed function expression
    * @param arg arguments
    */
-  public PartFunApp(final InputInfo ii, final TypedFunc func, final Var[] arg) {
-    super(ii, new Var(ii, new QNm(), func.ret()), func.type.type(arg), true);
-    expr = func.fun;
+  public PartFunApp(final InputInfo ii, final TypedFunc fun, final Var[] arg) {
+    super(ii, new Var(ii, new QNm(), fun.ret()), nn(fun.type.type(arg)), true);
+    expr = fun.fun;
   }
 
   /**
@@ -41,7 +42,7 @@ public final class PartFunApp extends Func {
    */
   public PartFunApp(final InputInfo ii, final Expr func, final Var[] arg) {
     // [LW] dynamic type propagation
-    super(ii, new Var(ii, new QNm(), func.type()), arg, true);
+    super(ii, new Var(ii, new QNm(), func.type()), nn(arg), true);
     expr = func;
   }
 
@@ -68,6 +69,17 @@ public final class PartFunApp extends Func {
     for(final Var v : args)
       sb.append(v).append(v == args[args.length - 1] ? "" : ", ");
     return sb.append(") { ").append(expr).append(" }").toString();
+  }
+
+  /**
+   * Collects all non-{@code null} variables from the array.
+   * @param vars array of variables, can contain {@code null}s
+   * @return all non-{@code null} variables
+   */
+  private static Var[] nn(final Var[] vars) {
+    Var[] out = {};
+    for(final Var v : vars) if(v != null) out = Array.add(out, v);
+    return out;
   }
 
 }

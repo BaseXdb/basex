@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import java.util.Arrays;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.DynFunCall;
@@ -13,12 +12,11 @@ import org.basex.query.item.FunItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
-import static org.basex.query.item.SeqType.*;
 import static org.basex.query.util.Err.*;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -80,12 +78,14 @@ final class FNFunc extends Fun {
     final int arity = f.arity();
     if(pos < 0 || pos >= arity) INVPOS.thrw(ii, f.name(), pos + 1);
 
+    final FunType ft = (FunType) f.type;
     final Var[] vars = new Var[arity - 1];
     final Expr[] vals = new Expr[arity];
     vals[(int) pos] = v;
     for(int i = 0, j = 0; i < arity - 1; i++, j++) {
       if(i == pos) j++;
       vars[i] = Var.unique(ii);
+      vars[i].type = ft.args[j];
       vals[j] = new VarRef(ii, vars[i]);
     }
 
@@ -227,9 +227,11 @@ final class FNFunc extends Fun {
    */
   private FunItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
-    final SeqType[] args = new SeqType[a];
-    Arrays.fill(args, ITEM_ZM);
-    return getFun(p, FunType.get(args, ITEM_ZM), ctx);
+    final Item f = checkItem(expr[p], ctx);
+    if(!f.func() || ((FunItem) f).vars().length != a)
+      Err.type(this, FunType.arity(a), f);
+
+    return (FunItem) f;
   }
 
   @Override

@@ -148,7 +148,7 @@ public class FunItem extends Item {
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    throw FNEQ.thrw(ii);
+    throw FNEQ.thrw(ii, this);
   }
 
   @Override

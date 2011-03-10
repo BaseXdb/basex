@@ -1628,9 +1628,9 @@ public class QueryParser extends InputParser {
         final Expr[] args = argumentList(e);
         if(args == null) break;
 
-        final Var[] part = partial(args);
         e = new DynFunCall(input(), e, args);
-        if(part.length > 0) e = new PartFunApp(input(), e, part);
+        final Var[] part = new Var[args.length];
+        if(partial(args, part)) e = new PartFunApp(input(), e, part);
       }
     } while(e != old);
     return e;
@@ -1639,19 +1639,20 @@ public class QueryParser extends InputParser {
   /**
    * Fills gaps from place-holders with variable references.
    * @param args argument array
+   * @param vars variables array
    * @return variables bound
    */
-  private Var[] partial(final Expr[] args) {
+  private boolean partial(final Expr[] args, final Var[] vars) {
     final InputInfo ii = input();
-    Var[] vars = {};
+    boolean found = false;
     for(int i = 0; i < args.length; i++) {
       if(args[i] == null) {
-        final Var v = Var.unique(ii);
-        vars = Array.add(vars, v);
-        args[i] = new VarRef(ii, v);
+        vars[i] = Var.unique(ii);
+        args[i] = new VarRef(ii, vars[i]);
+        found = true;
       }
     }
-    return vars;
+    return found;
   }
 
   /**
@@ -1742,7 +1743,8 @@ public class QueryParser extends InputParser {
       if(cardinal < 0 || cardinal > Integer.MAX_VALUE) error(FUNCUNKNOWN, fn);
 
       final Expr[] args = new Expr[(int) cardinal];
-      final Var[] vars = partial(args);
+      final Var[] vars = new Var[args.length];
+      partial(args, vars);
       final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
       if(f == null) error(FUNCUNKNOWN, fn);
       return new LitFunc(input(), name, f, vars);
@@ -1871,11 +1873,11 @@ public class QueryParser extends InputParser {
     ctx.ns.uri(name);
     name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input())
         : ctx.nsFunc);
-    final TypedFunc func = ctx.funcs.get(name, args, ctx, this);
-    if(func != null) {
+    final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
+    if(f != null) {
       alter = null;
-      final Var[] part = partial(args);
-      return part.length > 0 ? new PartFunApp(input(), func, part) : func.fun;
+      final Var[] part = new Var[args.length];
+      return partial(args, part) ? new PartFunApp(input(), f, part) : f.fun;
     }
     qp = p;
     return null;
