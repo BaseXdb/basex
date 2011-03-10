@@ -21,14 +21,16 @@ public final class FNFormatIntTest extends QueryTest {
       { "070", str("0"), "format-integer(0, '0')" },
       { "080", str("000"), "format-integer(0, '000')" },
       { "090", str("00000"), "format-integer(0, '00000')" },
-      { "092", str("1"), "format-integer(1, '#,0')" },
-      { "094", str("1"), "format-integer(1, '#.0')" },
-      { "096", str("1"), "format-integer(1, '#0')" },
 
-      //{ "100", str("0,1"), "format-integer(1, '0.0')" },
-      //{ "102", str("0.1"), "format-integer(1, '0,0')" },
-      { "104", str("1"), "format-integer(1, '#,0')" },
-      //{ "106", str("1,1"), "format-integer(11, '#,0')" },
+      { "100", str(",1"), "format-integer(1, '#,0')" },
+      { "102", str(".1"), "format-integer(1, '#.0')" },
+      { "104", str(",1"), "format-integer(1, '#,#,0')" },
+      { "106", str("1"), "format-integer(1, '#0')" },
+
+      { "110", str("0.1"), "format-integer(1, '0.0')" },
+      { "112", str("0,1"), "format-integer(1, '0,0')" },
+      { "114", str("1,1"), "format-integer(11, '#,0')" },
+      //{ "116", str("1.1.1"), "format-integer(111, '##0.0')" },
 
       { "120", str("abcd"),
         "string-join(for $i in 1 to 4 return format-integer($i, 'a'))" },
@@ -59,22 +61,21 @@ public final class FNFormatIntTest extends QueryTest {
       { "180", str("one|two|three|four|five|six|seven|eight|nine|ten"),
         "string-join(for $i in 1 to 10 return format-integer($i, 'w'), '|')" },
       /* { "210", str("1,500,000"),
-        "format-integer(1500000, '0,000')" },
+        "format-integer(1500000, '0,000')" },*/
       { "220", str("1,500,000"),
         "format-integer(1500000, '#,###,000')" },
-      { "290", str("1500\ud800\udd0001000,00"),
+      { "290", str("1500\ud800\udd000,00"),
         "format-integer(1500000, '###\ud800\udd000,00')" },
       { "300", str("(602)347-826"),
-        "format-integer(602347826, '#(000)000-000')" }, */
+        "format-integer(602347826, '#(000)000-000')" },
       { "310", str("SECOND"), "format-integer(2, 'Wo')" },
       /* { "320", str("Erster"),
         "format-integer(1, 'Wwo(-er)', 'de' cast as xs:language)" }, */
       { "330", str("1st"), "format-integer(1, '1o(-en)')" },
       { "350", str("One"), "format-integer(1, 'Wwt')" },
       { "360", str(""), "format-integer((), 'Ww')" },
-       /*{ "41",
-        str("\uD801\uDCA1,\uD801\uDCA2\uD801\uDCA3\uD801\uDCA4"),
-        "format-integer(1234, '#,\uD801\uDCA0\uD801\uDCA0\uD801\uDCA0')" },*/
+      { "41", str("\uD801\uDCA1,\uD801\uDCA2\uD801\uDCA3\uD801\uDCA4"),
+        "format-integer(1234, '#,\uD801\uDCA0\uD801\uDCA0\uD801\uDCA0')" },
       { "420", str("\uD801\uDCA1"), "format-integer(1, '\uD801\uDCA0')" },
       { "430", str("-85th"), "format-integer(-85, '1o')" },
       { "440", str("-Fifth"), "format-integer(-5, 'Wwo')" },
@@ -123,6 +124,7 @@ public final class FNFormatIntTest extends QueryTest {
       { "err130", "format-integer(1500000, '#a')" },
       { "err140", "format-integer(1500000, ',123')" },
       { "err150", "format-integer(1500000, '0,00,,000')" },
+      { "err160", "format-integer(1, '#--0')" }
     };
   }
 }

@@ -19,18 +19,20 @@ public final class FormatParser extends FormatUtil {
   static final Pattern WIDTH = Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
 
   /** Input information. */
-  public final InputInfo input;
+  private final InputInfo input;
   /** Input to be parsed. */
-  public final byte[] in;
+  private final byte[] pic;
   /** Default modifier. */
-  public final byte[] def;
-  /** Date flag. */
-  public final boolean date;
+  private final byte[] def;
+  /** Extended format (used for dates). */
+  private final boolean ext;
 
   /** Case. */
   Case cs;
-  /** Presentation modifier in lower-case. */
-  byte[] pres;
+  /** Primary format token. */
+  byte[] primary;
+  /** Primary format or mandatory digit. */
+  int digit;
   /** Ordinal suffix; {@code null} if not specified. */
   byte[] ordinal;
   /** Minimum width. */
@@ -41,50 +43,41 @@ public final class FormatParser extends FormatUtil {
   /**
    * Constructor.
    * @param ii input info
-   * @param i input
-   * @param df (valid) presentation modifier.
-   * '1' is used if no default modifier is specified.
-   */
-  public FormatParser(final InputInfo ii, final byte[] i, final byte[] df) {
-    input = ii;
-    in = i;
-    date = df != null;
-    def = date ? df : ONE;
-  }
-
-  /**
-   * Parses the input string.
-   * @return success flag
+   * @param p info picture
+   * @param df default presentation modifier (may be {@code null}).
    * @throws QueryException query exception
    */
-  public boolean parse() throws QueryException {
-    // no marker specified - use default settings
-    byte[] pm = in.length != 0 ? mod() : def;
-    if(pm == null) return false;
+  public FormatParser(final InputInfo ii, final byte[] p, final byte[] df)
+      throws QueryException {
 
-    if(date) {
+    input = ii;
+    pic = p.length != 0 ? p : df;
+    ext = df != null;
+    def = ext ? df : ONE;
+
+    byte[] pm = mod();
+    if(ext) {
       // extract and check width modifier
       final int w = lastIndexOf(pm, ',');
       if(w != -1) {
         final byte[] wd = substring(pm, w + 1);
         pm = substring(pm, 0, w);
 
-        final Matcher match = WIDTH.matcher(string(wd));
-        if(!match.find()) return false;
+        final Matcher m = WIDTH.matcher(string(wd));
+        if(!m.find()) PICDATE.thrw(ii, wd);
 
-        int m = toInt(match.group(1));
-        if(m != Integer.MIN_VALUE) min = m;
-        final String mc = match.group(3);
-        m = mc != null ? toInt(mc) : Integer.MIN_VALUE;
-        if(m != Integer.MIN_VALUE) max = m;
+        int i = toInt(m.group(1));
+        if(i != Integer.MIN_VALUE) min = i;
+        final String mc = m.group(3);
+        i = mc != null ? toInt(mc) : Integer.MIN_VALUE;
+        if(i != Integer.MIN_VALUE) max = i;
       }
     }
-
     // choose first character and case
-    cs = pm.length > cl(pm, 0) ? Case.STANDARD :
-      (ch(pm, 0) & ' ') != 0 ? Case.LOWER : Case.UPPER;
-    pres = lc(pm);
-    return true;
+    cs = cl(pm, 0) < pm.length ? Case.STANDARD :
+      (ch(pm, 0) & ' ') == 0 ? Case.UPPER : Case.LOWER;
+    primary = lc(pm);
+    if(digit == 0) digit = ch(primary, 0);
   }
 
   /**
@@ -93,14 +86,14 @@ public final class FormatParser extends FormatUtil {
    * @throws QueryException query exception
    */
   private byte[] mod() throws QueryException {
-    final int l = in.length;
+    final int l = pic.length;
     // final presentation modifier
     byte[] pm = null;
     // current offset
-    int pos = cl(in, 0);
+    int pos = cl(pic, 0);
 
     // proposed presentation modifier
-    int ch = ch(in, 0);
+    int ch = ch(pic, 0);
     if(sequence(ch) != null) {
       // Latin, Greek and other alphabets
     } else if(ch >= '\u2460' && ch <= '\u249b') {
@@ -109,66 +102,66 @@ public final class FormatParser extends FormatUtil {
       // Japanese numbering
     } else if((ch | ' ') == 'i') {
       // Roman sequence
-    } else if((ch | ' ') == 'w' || (ch | ' ') == 'n' && date) {
+    } else if((ch | ' ') == 'w' || (ch | ' ') == 'n' && ext) {
       // word-wise output (incl. title-case check)
-      if((ch & ' ') == 0 && ch(in, pos) == (ch | ' ')) pos += cl(in, pos);
+      if((ch & ' ') == 0 && ch(pic, pos) == (ch | ' ')) pos += cl(pic, pos);
     } else {
       // mandatory-digit-sign
       int z = -1;
       boolean group = false;
-      for(pos = 0; pos < l; pos += cl(in, pos)) {
-        ch = ch(in, pos);
-
+      for(pos = 0; pos < l; pos += cl(pic, pos)) {
+        ch = ch(pic, pos);
         if(z == -1) {
           z = zeroes(ch);
-          if(z != -1 || ch == '#') {
+          if(z != -1) {
+            digit = z;
+            group = false;
+          } else if(ch == '#') {
+            group = false;
           } else if(Character.isLetter(ch)) {
             pm = def;
-            pos += cl(in, pos);
+            pos += cl(pic, pos);
             break;
-          } else if(pos == 0) {
-            GROUPSTART.thrw(input, in);
+          } else {
+            if(pos == 0) GROUPSTART.thrw(input, pic);
+            if(group) GROUPADJ.thrw(input, pic);
+            group = true;
           }
         } else {
           if(Character.isLetter(ch)) {
-            pm = substring(in, 0, pos);
+            pm = substring(pic, 0, pos);
             break;
           } else if(ch >= z && ch <= z + 9) {
-          } else if(zeroes(ch) != -1) {
-            MANSAME.thrw(input, in);
-          } else if(ch == '#') {
-            OPTAFTER.thrw(input, in);
+            group = false;
           } else {
-            if(group) GROUPADJ.thrw(input, in);
+            if(zeroes(ch) != -1) DIFFMAND.thrw(input, pic);
+            if(ch == '#') OPTAFTER.thrw(input, pic);
+            if(group) GROUPADJ.thrw(input, pic);
             group = true;
-            continue;
           }
         }
-        group = false;
       }
-      if(z == -1) NOMAND.thrw(input, in);
-      if(group) GROUPEND.thrw(input, in);
-      if(pm == null) pm = substring(in, 0, pos);
+      if(z == -1) NOMAND.thrw(input, pic);
+      if(group) GROUPEND.thrw(input, pic);
     }
 
-    // extract primary format token from the original string if proposed
-    // is to be adopted as final character
-    if(pm == null) pm = substring(in, 0, pos);
+    // if necessary, extract primary format token from the original string
+    if(pm == null) pm = substring(pic, 0, pos);
 
     // check for optional format modifier
     if(pos < l) {
-      if(ch(in, pos) == 'o') {
+      if(ch(pic, pos) == 'o') {
         final TokenBuilder tb = new TokenBuilder();
-        if(ch(in, ++pos) == '(') {
-          while(ch(in, ++pos) != ')') {
+        if(ch(pic, ++pos) == '(') {
+          while(ch(pic, ++pos) != ')') {
             // ordinal isn't closed by a parenthesis
-            if(pos == l) ORDCLOSED.thrw(input, in);
-            tb.add(ch(in, pos));
+            if(pos == l) ORDCLOSED.thrw(input, pic);
+            tb.add(ch(pic, pos));
           }
           ++pos;
         }
         ordinal = tb.finish();
-      } else if(ch(in, pos) == 't') {
+      } else if(ch(pic, pos) == 't') {
         // traditional numbering (ignored)
         ++pos;
       }
@@ -176,8 +169,8 @@ public final class FormatParser extends FormatUtil {
       // check for optional format modifier
       if(pos < l) {
         // invalid remaining input
-        if(ch(in, pos) != ',') PICCOMP.thrw(input, in);
-        pm = concat(pm, substring(in, pos));
+        if(ch(pic, pos) != ',') PICCOMP.thrw(input, pic);
+        pm = concat(pm, substring(pic, pos));
       }
     }
     return pm;

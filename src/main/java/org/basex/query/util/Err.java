@@ -96,7 +96,7 @@ public enum Err {
   /** FOFD1340: Evaluation exception. */
   OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  MANSAME(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
+  DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
   /** FOFD1340: Evaluation exception. */
   GROUPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
   /** FOFD1340: Evaluation exception. */
