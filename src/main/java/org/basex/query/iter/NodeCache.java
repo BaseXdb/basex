@@ -146,7 +146,7 @@ public final class NodeCache extends AxisIter {
    * @return position, or {@code -1}
    */
   public int indexOf(final ANode node, final boolean db) {
-    if(db) return Math.max(binarySearch(((DBNode) node).pre, 0, size), -1);
+    if(db) return Math.max(binarySearch((DBNode) node, 0, size), -1);
     for(int s = 0; s < size(); ++s) if(item[s].is(node)) return s;
     return -1;
   }
@@ -155,18 +155,19 @@ public final class NodeCache extends AxisIter {
    * Performs a binary search on the given range of this sequence iterator,
    * assuming that all nodes are {@link DBNode}s from the same {@link Data}
    * instance (i.e., {@link #dbnodes()} returns {@code true}).
-   * @param pre PRE number to find
+   * @param nd node to find
    * @param start start of the search interval
    * @param length length of the search interval
    * @return position of the item or {@code -insertPosition - 1} if not found
    */
-  public int binarySearch(final int pre, final int start, final int length) {
+  public int binarySearch(final DBNode nd, final int start, final int length) {
+    if(size == 0 || nd.data != ((DBNode) item[0]).data) return -start - 1;
     int l = start, r = start + length - 1;
     while(l <= r) {
       final int m = l + r >>> 1;
       final int npre = ((DBNode) item[m]).pre;
-      if(npre == pre) return m;
-      if(npre < pre) l = m + 1;
+      if(npre == nd.pre) return m;
+      if(npre < nd.pre) l = m + 1;
       else r = m - 1;
     }
     return -(l + 1);
