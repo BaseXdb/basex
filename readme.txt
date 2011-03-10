@@ -51,7 +51,12 @@ ADDING CHECKSTYLE --------------------------------------------------------------
 
 USING GIT ----------------------------------------------------------------------
 
-TODO
+The code base of BaseX can be accessed via GitHub (www.github.com):
+
+Main Package » git clone git://github.com/BaseXdb/basex.git
+APIs: JAX-RX (REST), XML:DB, XQJ » git clone git://github.com/BaseXdb/basex-api.git
+Code Examples » git clone git://github.com/BaseXdb/basex-examples.git
+JAX-RX Interface » git clone git://github.com/BaseXdb/jax-rx.git
 
 --------------------------------------------------------------------------------
 

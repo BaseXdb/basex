@@ -60,6 +60,7 @@ final class FNUtil extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
+      case FORMAT: return format(ctx);
       case MB: return mb(ctx);
       case MS: return ms(ctx);
       case FRM_BASE: return fromBase(ctx, ii);
@@ -133,6 +134,26 @@ final class FNUtil extends Fun {
       @Override
       public Item get(final long i) { return new Itr(bin[(int) i], Type.BYT); }
     };
+  }
+
+
+  /**
+   * Formats a string according to the specified format.
+   * @param ctx query context
+   * @return formatted string
+   * @throws QueryException query exception
+   */
+  private Str format(final QueryContext ctx) throws QueryException {
+    final String form = string(checkStr(expr[0], ctx));
+    final Object[] args = new Object[expr.length - 1];
+    for(int e = 1; e < expr.length; e++) {
+      args[e - 1] = expr[e].item(ctx, input).toJava();
+    }
+    try {
+      return Str.get(String.format(form, args));
+    } catch(final RuntimeException ex) {
+      throw ERRFORM.thrw(input, Util.name(ex), ex.getMessage());
+    }
   }
 
   /**
@@ -302,8 +323,7 @@ final class FNUtil extends Fun {
     try {
       return new Hex(MessageDigest.getInstance(algo).digest(str));
     } catch(final NoSuchAlgorithmException ex) {
-      Util.notexpected(ex);
-      return null;
+      throw Util.notexpected(ex);
     }
   }
 

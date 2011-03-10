@@ -83,8 +83,7 @@ public final class FNZipTest extends AdvancedQueryTest {
         String.class, String.class, String.class);
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'US-ASCII')");
-    error(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'xyz')",
-        Err.ZIPFAIL);
+    error(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'xyz')", Err.ZIPFAIL);
     // newlines are removed from the result..
     contains(fun + "('" + ZIP + "', '" + ENTRY1 + "')", "aaboutab");
   }
@@ -158,7 +157,7 @@ public final class FNZipTest extends AdvancedQueryTest {
 
     // create and compare identical zip file
     query(fun + "(" + list + ", '" + TMPZIP + "')");
-    String list2 = query("zip:entries('" + TMPZIP + "')");
+    final String list2 = query("zip:entries('" + TMPZIP + "')");
     assertEquals(list.replaceAll(" href=\\\".*?\\\"", ""),
         list2.replaceAll(" href=\\\".*?\\\"", ""));
 

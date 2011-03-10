@@ -1,17 +1,24 @@
 package org.basex.query.func;
 
+import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.ANode;
+import static org.basex.query.item.ANode.kind;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.util.ItemSet;
+import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
@@ -43,15 +50,88 @@ final class FNSeq extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case INDEXOF:  return indexOf(ctx);
-      case DISTINCT: return distinctValues(ctx);
-      case INSBEF:   return insertBefore(ctx);
-      case REVERSE:  return reverse(ctx);
-      case REMOVE:   return remove(ctx);
-      case SUBSEQ:   return subsequence(ctx);
-      case TAIL:     return tail(ctx);
-      default:       return super.iter(ctx);
+      case INDEXOF:   return indexOf(ctx);
+      case DISTINCT:  return distinctValues(ctx);
+      case INSBEF:    return insertBefore(ctx);
+      case REVERSE:   return reverse(ctx);
+      case REMOVE:    return remove(ctx);
+      case SUBSEQ:    return subsequence(ctx);
+      case TAIL:      return tail(ctx);
+      case OUTERMOST: return most(ctx, true);
+      case INNERMOST: return most(ctx, false);
+      default:        return super.iter(ctx);
     }
+  }
+
+  /**
+   * Returns the outermost/innermost nodes of a node sequence, i.e. a node is
+   * only contained, if none of its ancestors/descendants are.
+   * @param ctx query context
+   * @param outer outermost flag
+   * @return outermost/innermost nodes
+   * @throws QueryException exception
+   */
+  private Iter most(final QueryContext ctx, final boolean outer)
+      throws QueryException {
+    final Iter iter = expr[0].iter(ctx);
+    final NodeCache nc = new NodeCache().random();
+    for(Item it; (it = iter.next()) != null;) nc.add(checkNode(it));
+    final int len = (int) nc.size();
+
+    // only go further if there are at least two nodes
+    if(len < 2) return nc;
+
+    // after this, the iterator is sorted and duplicate free
+    if(nc.dbnodes()) {
+      // nodes are sorted, so ancestors always come before their descendants
+      // the first/last node is thus always included in the output
+      final DBNode fst = (DBNode) nc.get(outer ? 0 : len - 1);
+      final Data data = fst.data;
+      final ANode[] nodes = nc.item.clone();
+
+      if(outer) {
+        // skip the subtree of the last added node
+        nc.size(0);
+        final DBNode dummy = new DBNode(fst.data, 0);
+        final NodeCache src = new NodeCache(nodes, len);
+        for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
+          final DBNode nd = (DBNode) nodes[next];
+          dummy.pre = nd.pre + data.size(nd.pre, kind(nd.type));
+          p = src.binarySearch(dummy, next + 1, len - next - 1);
+          nc.add(nd);
+        }
+      } else {
+        // [LW] improve with NodeCache.binarySearch()
+        // skip ancestors of the last added node
+        nc.item[0] = fst;
+        nc.size(1);
+        int before = fst.pre;
+        for(int i = len - 1; i-- != 0;) {
+          final DBNode nd = (DBNode) nodes[i];
+          if(nd.pre + data.size(nd.pre, kind(nd.type)) <= before) {
+            nc.add(nd);
+            before = nd.pre;
+          }
+        }
+
+        // nodes were added in reverse order, correct that
+        Array.reverse(nc.item, 0, (int) nc.size());
+      }
+
+      return nc;
+    }
+
+    // multiple documents and/or constructed fragments
+    final NodeCache out = new NodeCache(new ANode[len], 0);
+    outer: for(int i = 0; i < len; i++) {
+      final ANode nd = nc.item[i];
+      final AxisIter ax = outer ? nd.anc() : nd.descendant();
+      for(ANode a; (a = ax.next()) != null;)
+        if(nc.indexOf(a, false) != -1) continue outer;
+      out.add(nc.item[i]);
+    }
+
+    return out;
   }
 
   @Override

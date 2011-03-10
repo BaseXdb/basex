@@ -174,7 +174,7 @@ public interface Text {
   /** Command help. */
   String C_PATH = "path";
   /** Command help. */
-  String INPUT = "input";
+  String C_INPUT = "input";
   /** Command help. */
   String C_NAME = "name";
   /** Command help. */
@@ -187,28 +187,36 @@ public interface Text {
 
   /** Command help. */
   String[] HELPCREATE = {
-    "[" + CmdCreate.DATABASE + "|" + CmdCreate.FS + "|" +
-    CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
+    "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
+    CmdCreate.INDEX + "|" + CmdCreate.USER + "|"
+    + CmdCreate.TRIGGER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
-    LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + INPUT + "]):"  + NL +
-      "  " + lang("ch_create3", C_NAME, INPUT) + NL +
+    LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + C_INPUT + "]):"  + NL +
+      "  " + lang("ch_create3", C_NAME, C_INPUT) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]:" + NL +
       "  " + lang("ch_create5") + NL +
     LI + CmdCreate.FS + " [" + C_NAME + "] [" + C_PATH +
       "] ([mountpoint] [store]):" + NL +
       "  " + lang("ch_create6", C_NAME, C_PATH) + NL +
-      "  " + lang("ch_create7", "mountpoint", "store") + NL +
-    LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
-      "  " + lang("ch_create8")
+      "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
+    LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]): " + NL +
+      "  " + lang("ch_create8") + NL +
+    LI + CmdCreate.TRIGGER + " [" + C_NAME + "]: " + NL +
+      "  " + lang("ch_create9")
+  };
+
+  /** Command help. */
+  String[] HELPCHECK = {
+    "[" + C_INPUT + "]", lang("ch_check1"), lang("ch_check2")
   };
 
   /** Command help. */
   String[] HELPADD = {
     "(" + AS + " [" + C_NAME + "]) (" + TO + " [" + C_TARGET + "]) [" +
-    INPUT + "]",
-    lang("ch_add1"), lang("ch_add2", INPUT, C_NAME, C_TARGET)
+    C_INPUT + "]",
+    lang("ch_add1"), lang("ch_add2", C_INPUT, C_NAME, C_TARGET)
   };
 
   /** Command help. */
@@ -242,8 +250,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.DATABASE + "|" + CmdDrop.INDEX + "|" +
-    CmdDrop.USER + "] [...]",
+    "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "|"
+    + CmdDrop.TRIGGER + "] [...]",
     lang("ch_drop1"),
     lang("ch_drop2") + NL +
     LI + CmdDrop.DATABASE + " [" + C_NAME + "]:" + NL +
@@ -254,7 +262,9 @@ public interface Text {
     LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [db]): " + NL + "  " +
       lang("ch_drop23") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
-      lang("ch_drop24", C_NAME)
+      lang("ch_drop24", C_NAME) + NL +
+    LI + CmdDrop.TRIGGER + " [" + C_NAME + "]:" + NL + "  " +
+      lang("ch_drop25", C_NAME)
   };
   /** Command help. */
   String[] HELPEXPORT = {
@@ -297,13 +307,14 @@ public interface Text {
   /** Command help. */
   String[] HELPSHOW = {
     "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
-    CmdShow.USERS + "|" + CmdShow.BACKUPS + "]",
+    CmdShow.USERS + "|" + CmdShow.BACKUPS + "|" + CmdShow.TRIGGERS + "]",
     lang("ch_show1"),
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
     LI + CmdShow.USERS + " (" + ON + " [db]): " + lang("ch_show24") + NL +
-    LI + CmdShow.BACKUPS + ": " + lang("ch_show25")
+    LI + CmdShow.BACKUPS + ": " + lang("ch_show25") + NL +
+    LI + CmdShow.TRIGGERS + ": " + lang("ch_show26")
   };
   /** Command help. */
   String[] HELPGRANT = {
@@ -596,7 +607,7 @@ public interface Text {
   String USERCREATE = lang("ad_usercreate");
   /** Password changed. */
   String USERALTER = lang("ad_useralter");
-  /** User unknown. */
+  /** User already exists. */
   String USERKNOWN = lang("ad_userknown");
   /** No password specified. */
   String PASSNO = lang("ad_passno");
@@ -606,6 +617,18 @@ public interface Text {
   String USERKILL = lang("ad_kill");
   /** User kills itself. */
   String USERKILLSELF = lang("ad_killself");
+  /** Trigger dropped. */
+  String TRIGGERDROP = lang("ad_triggerdrop");
+  /** Trigger added. */
+  String TRIGGERCREATE = lang("ad_triggercreate");
+  /** Trigger not found. */
+  String TRIGGERNO = lang("ad_triggerno");
+  /** Trigger already exists. */
+  String TRIGGERKNOWN = lang("ad_triggerknown");
+  /** Trigger attached. */
+  String TRIGGERATT = lang("ad_triggeratt");
+  /** Trigger detached. */
+  String TRIGGERDET = lang("ad_triggerdet");
 
   // GENERAL COMMANDS =========================================================
 
@@ -1039,15 +1062,22 @@ public interface Text {
   String CREATENAME = lang("dc_name") + COLS;
   /** Target path. */
   String CREATETARGET = lang("dc_target") + COLS;
+
   /** XML file description. */
-  String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
+  String CREATEXMLDESC = "XML Documents";
+  /** HTML file description. */
+  String CREATEHTMLDESC = "HTML Documents";
+  /** CSV file description. */
+  String CREATECSVDESC = "Comma-Separated Values";
+  /** TXT file description. */
+  String CREATETXTDESC = "Plain text";
   /** ZIP file description. */
-  String CREATEZIPDESC = lang("dc_zipdesc") + " (*.zip)";
+  String CREATEZIPDESC = "ZIP Archives";
   /** GZ file description. */
-  String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
+  String CREATEGZDESC = "GZIP Archives";
   /** XQuery file extensions description. */
-  String CREATEXQEXDESC = lang("dc_xqdesc") +
-    " (*.xq, *.xqm, *.xqy, *.xql, *.xquery)";
+  String CREATEXQEXDESC = "XQuery Files";
+
   /** Dialog title for database options. */
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Whitespaces information. */

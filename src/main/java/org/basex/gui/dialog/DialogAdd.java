@@ -45,7 +45,7 @@ public final class DialogAdd extends Dialog {
   public DialogAdd(final GUI main) {
     super(main, GUIADD);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(10, 2, 6, 0)).border(8);
+    final BaseXBack p = new BaseXBack(new TableLayout(10, 2, 8, 0)).border(8);
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 

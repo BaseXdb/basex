@@ -59,7 +59,7 @@ public final class Backup extends Command {
     ZipOutputStream zos = null;
     try {
       final File in = pr.dbpath(db);
-      final File file = new File(pr.get(Prop.DBPATH) + Prop.SEP + db + "-" +
+      final File file = new File(pr.get(Prop.DBPATH) + '/' + db + "-" +
           DATE.format(new Date()) + IO.ZIPSUFFIX);
       final byte[] data = new byte[IO.BLOCKSIZE];
 

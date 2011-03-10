@@ -1,164 +1,178 @@
 package org.basex.query.util.format;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.basex.query.QueryException;
+import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
- * Simple format parser for integers and dates.
+ * Format parser for integers and dates.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FormatParser {
+public final class FormatParser extends FormatUtil {
   /** With pattern: ","  min-width ("-" max-width)?. */
-  private static final Pattern WIDTH =
-    Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
+  static final Pattern WIDTH = Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
 
-  /** Cases. */
-  public enum Case {
-    /** Lower case. */ LOWER,
-    /** Upper case. */ UPPER,
-    /** Standard.   */ STANDARD;
-  }
+  /** Input information. */
+  private final InputInfo input;
+  /** Input to be parsed. */
+  private final byte[] pic;
+  /** Default modifier. */
+  private final byte[] def;
+  /** Extended format (used for dates). */
+  private final boolean ext;
 
   /** Case. */
-  public final Case cs;
-  /** Presentation modifier in lower-case. */
-  public final String pres;
-  /** Error occurred while parsing. */
-  public boolean error;
+  Case cs;
+  /** Primary format token. */
+  byte[] primary;
+  /** Primary format or mandatory digit. */
+  int digit;
   /** Ordinal suffix; {@code null} if not specified. */
-  public String ord;
+  byte[] ordinal;
   /** Minimum width. */
-  public int min;
+  int min;
   /** Maximum width. */
-  public int max = Integer.MAX_VALUE;
+  int max = Integer.MAX_VALUE;
 
   /**
-   * Constructor, parsing the input string. The {@link #error} variable is
-   * set to true if the input is invalid.
-   * @param in marker input
-   * @param p (valid) presentation modifier
-   * @param ext extended flag, allowing width modifier
+   * Constructor.
+   * @param ii input info
+   * @param p info picture
+   * @param df default presentation modifier (may be {@code null}).
+   * @throws QueryException query exception
    */
-  public FormatParser(final String in, final String p, final boolean ext) {
-    // no marker specified - use default settings
-    String pm = p;
+  public FormatParser(final InputInfo ii, final byte[] p, final byte[] df)
+      throws QueryException {
 
-    final int l = in.length();
-    int s = -1;
+    input = ii;
+    pic = p.length != 0 ? p : df;
+    ext = df != null;
+    def = ext ? df : ONE;
 
-    // find presentation modifier
-    if(l != 0) {
-      final int ch = cp(in, 0);
-      final int cu = ch & 0xFFFFFFDF;
-      if(cu == 'A' || cu == 'I' || cu == '\u0391') {
-        s = 1;
-      } else if(cu == 'W' || cu == 'N') {
-        s = cp(in, 1) == (ch | 0x20) ? 2 : 1;
-      } else if(ch >= '\u2460' && ch <= '\u249b') {
-        s = 1;
-      } else if(ch == '#' || ch >= '0' && ch <= '9' ||
-          ch >= '\u0660' && ch <= '\u0669') {
-        s = decimal(in, ch & 0xFFFFFFF0);
-        // invalid decimal parsing
-        error = s == -1;
-      } else {
-        error = true;
-      }
-      if(s != -1) pm = in.substring(0, s);
-    }
-    if(s == -1) s = l;
-
-    // find format modifier
-    if(s < l) {
-      if(cp(in, s) == 'o') {
-        final StringBuilder sb = new StringBuilder();
-        if(cp(in, ++s) == '(') {
-          while(cp(in, ++s) != ')') {
-            // ordinal isn't closed by a parenthesis
-            error = s == l;
-            if(error) break;
-            sb.append((char) cp(in, s));
-          }
-          ++s;
-        }
-        ord = sb.toString();
-      } else if(cp(in, s) == 't') {
-        // traditional numbering (ignored)
-        ++s;
-      }
-    }
-
-    // find remaining modifier
-    if(s < l) {
-      if(cp(in, s) == ',') {
-        pm += in.substring(s);
-      } else {
-        // invalid remaining input
-        error = true;
-      }
-    }
-
+    byte[] pm = mod();
     if(ext) {
       // extract and check width modifier
-      final int w = pm.lastIndexOf(',');
+      final int w = lastIndexOf(pm, ',');
       if(w != -1) {
-        final String wd = pm.substring(w + 1);
-        pm = pm.substring(0, w);
+        final byte[] wd = substring(pm, w + 1);
+        pm = substring(pm, 0, w);
 
-        final Matcher match = WIDTH.matcher(wd);
-        if(match.find()) {
-          int m = toInt(match.group(1));
-          if(m != Integer.MIN_VALUE) min = m;
-          final String mc = match.group(3);
-          m = mc != null ? toInt(mc) : Integer.MIN_VALUE;
-          if(m != Integer.MIN_VALUE) max = m;
-        } else {
-          error = true;
-        }
+        final Matcher m = WIDTH.matcher(string(wd));
+        if(!m.find()) PICDATE.thrw(ii, wd);
+
+        int i = toInt(m.group(1));
+        if(i != Integer.MIN_VALUE) min = i;
+        final String mc = m.group(3);
+        i = mc != null ? toInt(mc) : Integer.MIN_VALUE;
+        if(i != Integer.MIN_VALUE) max = i;
       }
     }
-
     // choose first character and case
-    cs = pm.length() > 1 ? Case.STANDARD :
-      (cp(pm, 0) & 0x20) != 0 ? Case.LOWER : Case.UPPER;
-    pres = pm.toLowerCase();
+    cs = cl(pm, 0) < pm.length ? Case.STANDARD :
+      (ch(pm, 0) & ' ') == 0 ? Case.UPPER : Case.LOWER;
+    primary = lc(pm);
+    if(digit == 0) digit = ch(primary, 0);
   }
 
   /**
-   * Parses a decimal-digit-pattern.
-   * @param in input
-   * @param ba base char
-   * @return end position, or {@code -1} for error
+   * Returns a presentation modifier.
+   * @return presentation modifier
+   * @throws QueryException query exception
    */
-  private int decimal(final String in, final int ba) {
-    int s = -1;
-    final int l = in.length();
-    boolean d = false;
-    boolean g = false;
-    while(++s < l) {
-      final int ch = cp(in, s);
-      if(Character.isLetter(ch)) break;
+  private byte[] mod() throws QueryException {
+    final int l = pic.length;
+    // final presentation modifier
+    byte[] pm = null;
+    // current offset
+    int pos = cl(pic, 0);
 
-      if(ch == '#') {
-        // optional after decimal sign
-        if(d) return -1;
-        g = false;
-      } else if(ch == '*') {
-        g = false;
-      } else if(ch >= ba && ch <= ba + 9) {
-        d = true;
-        g = false;
-      } else {
-        // adjacent grouping separators
-        if(g) return -1;
-        g = true;
+    // proposed presentation modifier
+    int ch = ch(pic, 0);
+    if(sequence(ch) != null) {
+      // Latin, Greek and other alphabets
+    } else if(ch >= '\u2460' && ch <= '\u249b') {
+      // circled, parenthesized or full stop digits
+    } else if(ch == KANJI[1]) {
+      // Japanese numbering
+    } else if((ch | ' ') == 'i') {
+      // Roman sequence
+    } else if((ch | ' ') == 'w' || (ch | ' ') == 'n' && ext) {
+      // word-wise output (incl. title-case check)
+      if((ch & ' ') == 0 && ch(pic, pos) == (ch | ' ')) pos += cl(pic, pos);
+    } else {
+      // mandatory-digit-sign
+      int z = -1;
+      boolean group = false;
+      for(pos = 0; pos < l; pos += cl(pic, pos)) {
+        ch = ch(pic, pos);
+        if(z == -1) {
+          z = zeroes(ch);
+          if(z != -1) {
+            digit = z;
+            group = false;
+          } else if(ch == '#') {
+            group = false;
+          } else if(Character.isLetter(ch)) {
+            pm = def;
+            pos += cl(pic, pos);
+            break;
+          } else {
+            if(pos == 0) GROUPSTART.thrw(input, pic);
+            if(group) GROUPADJ.thrw(input, pic);
+            group = true;
+          }
+        } else {
+          if(Character.isLetter(ch)) {
+            pm = substring(pic, 0, pos);
+            break;
+          } else if(ch >= z && ch <= z + 9) {
+            group = false;
+          } else {
+            if(zeroes(ch) != -1) DIFFMAND.thrw(input, pic);
+            if(ch == '#') OPTAFTER.thrw(input, pic);
+            if(group) GROUPADJ.thrw(input, pic);
+            group = true;
+          }
+        }
+      }
+      if(z == -1) NOMAND.thrw(input, pic);
+      if(group) GROUPEND.thrw(input, pic);
+    }
+
+    // if necessary, extract primary format token from the original string
+    if(pm == null) pm = substring(pic, 0, pos);
+
+    // check for optional format modifier
+    if(pos < l) {
+      if(ch(pic, pos) == 'o') {
+        final TokenBuilder tb = new TokenBuilder();
+        if(ch(pic, ++pos) == '(') {
+          while(ch(pic, ++pos) != ')') {
+            // ordinal isn't closed by a parenthesis
+            if(pos == l) ORDCLOSED.thrw(input, pic);
+            tb.add(ch(pic, pos));
+          }
+          ++pos;
+        }
+        ordinal = tb.finish();
+      } else if(ch(pic, pos) == 't') {
+        // traditional numbering (ignored)
+        ++pos;
+      }
+
+      // check for optional format modifier
+      if(pos < l) {
+        // invalid remaining input
+        if(ch(pic, pos) != ',') PICCOMP.thrw(input, pic);
+        pm = concat(pm, substring(pic, pos));
       }
     }
-    // no decimal, or ending with grouping separator
-    if(!d || g) return -1;
-    return s;
+    return pm;
   }
 }

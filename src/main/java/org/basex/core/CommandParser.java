@@ -21,12 +21,14 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateFS;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.CreateMAB;
+import org.basex.core.cmd.CreateTrigger;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Cs;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropBackup;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
+import org.basex.core.cmd.DropTrigger;
 import org.basex.core.cmd.DropUser;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Export;
@@ -50,6 +52,7 @@ import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowBackups;
 import org.basex.core.cmd.ShowDatabases;
 import org.basex.core.cmd.ShowSessions;
+import org.basex.core.cmd.ShowTriggers;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.query.QueryContext;
@@ -93,7 +96,7 @@ public final class CommandParser extends InputParser {
     final Cmd cmd = consume(Cmd.class, null);
     final Command command = parse(cmd, true);
     consumeWS();
-    if(more()) throw helpp(null, cmd);
+    if(more()) throw help(null, cmd);
     return command;
   }
 
@@ -109,7 +112,7 @@ public final class CommandParser extends InputParser {
       list = Array.add(list, parse(cmd, false));
       consumeWS();
       if(!more()) return list;
-      if(!consume(';')) throw helpp(null, cmd);
+      if(!consume(';')) throw help(null, cmd);
     }
   }
 
@@ -146,6 +149,8 @@ public final class CommandParser extends InputParser {
             return new CreateMAB(string(cmd), name(null));
           case USER:
             return new CreateUser(name(cmd), string(null));
+          case TRIGGER:
+            return new CreateTrigger(name(cmd));
         }
         break;
       case ALTER:
@@ -196,6 +201,8 @@ public final class CommandParser extends InputParser {
             return new DropUser(name(cmd), key(ON, null) ? name(cmd) : null);
           case BACKUP:
             return new DropBackup(name(cmd));
+          case TRIGGER:
+            return new DropTrigger(name(cmd));
         }
         break;
       case OPTIMIZE:
@@ -230,7 +237,7 @@ public final class CommandParser extends InputParser {
           }
         }
         return new Help(hc, form);
-      case EXIT: case QUIT:
+      case EXIT:
         return new Exit();
       case KILL:
         return new Kill(name(cmd));
@@ -248,12 +255,14 @@ public final class CommandParser extends InputParser {
             return new ShowUsers(key(ON, null) ? name(cmd) : null);
           case BACKUPS:
             return new ShowBackups();
+          case TRIGGERS:
+            return new ShowTriggers();
           default:
         }
         break;
       case GRANT:
         final CmdPerm perm = consume(CmdPerm.class, cmd);
-        if(perm == null) throw helpp(null, cmd);
+        if(perm == null) throw help(null, cmd);
         final String db = key(ON, null) ? name(cmd) : null;
         key(TO, cmd);
         return db == null ? new Grant(perm, name(cmd)) :
@@ -351,7 +360,7 @@ public final class CommandParser extends InputParser {
         consume(key.toLowerCase())) && (curr(0) || ws(curr()));
     if(!ok) {
       qp = p;
-      if(cmd != null) throw helpp(null, cmd);
+      if(cmd != null) throw help(null, cmd);
     }
     return ok;
   }
@@ -366,7 +375,7 @@ public final class CommandParser extends InputParser {
   private String finish(final Cmd cmd, final TokenBuilder s)
       throws QueryException {
     if(s != null && s.size() != 0) return s.toString();
-    if(cmd != null) throw helpp(null, cmd);
+    if(cmd != null) throw help(null, cmd);
     return null;
   }
 
@@ -417,7 +426,7 @@ public final class CommandParser extends InputParser {
     final Enum<?>[] alt = list(cmp, token);
     if(token == null) {
       // show command error or available command extensions
-      throw par == null ? errorr(list(alt), CMDNO) : helpp(list(alt), par);
+      throw par == null ? error(list(alt), CMDNO) : help(list(alt), par);
     }
 
     // output error for similar commands
@@ -426,12 +435,12 @@ public final class CommandParser extends InputParser {
     for(final Enum<?> s : list(cmp, null)) {
       final byte[] sm = lc(token(s.name().toLowerCase()));
       if(ls.similar(name, sm, 0) && Cmd.class.isInstance(s))
-        throw errorr(list(alt), CMDSIMILAR, name, sm);
+        throw error(list(alt), CMDSIMILAR, name, sm);
     }
 
     // show unknown command error or available command extensions
-    throw par == null ? errorr(list(alt), CMDWHICH, token) :
-      helpp(list(alt), par);
+    throw par == null ? error(list(alt), CMDWHICH, token) :
+      help(list(alt), par);
   }
 
   /**
@@ -441,8 +450,8 @@ public final class CommandParser extends InputParser {
    * @param cmd input completions
    * @return QueryException query exception
    */
-  private QueryException helpp(final StringList alt, final Cmd cmd) {
-    return errorr(alt, PROCSYNTAX, cmd.help(true, false));
+  private QueryException help(final StringList alt, final Cmd cmd) {
+    return error(alt, PROCSYNTAX, cmd.help(true, false));
   }
 
   /**
@@ -458,9 +467,6 @@ public final class CommandParser extends InputParser {
     Enum<?>[] list = new Enum<?>[0];
     final String t = i == null ? "" : i.toUpperCase();
     for(final Enum<?> e : en.getEnumConstants()) {
-      // ignore hidden commands
-      if(Cmd.class.isInstance(e) && Cmd.class.cast(e).hidden()) continue;
-
       if(e.name().startsWith(t)) {
         final int s = list.length;
         final Enum<?>[] tmp = new Enum<?>[s + 1];
@@ -479,7 +485,7 @@ public final class CommandParser extends InputParser {
    * @param e extension
    * @return query exception
    */
-  private QueryException errorr(final StringList comp, final String m,
+  private QueryException error(final StringList comp, final String m,
       final Object... e) {
 
     final QueryException qe = new QueryException(input(), "", null, m, e);

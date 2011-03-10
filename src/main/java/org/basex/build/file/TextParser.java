@@ -1,6 +1,7 @@
 package org.basex.build.file;
 
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.build.FileParser;
 import org.basex.build.ParserProp;
@@ -17,6 +18,8 @@ import org.basex.util.TokenBuilder;
  * <code>SET PARSEROPT ...</code>:</p>
  *
  * <ul>
+ *   <li><code>encoding</code> specifies the input encoding
+ *   (default: <code>UTF-8</code>).</li>
  *   <li><code>lines</code> specified if the resulting XML splits the input
  *   into lines. Can be set to <code>yes</code> or <code>no</code>
  *   (default: <code>yes</code>).</li>
@@ -37,6 +40,8 @@ public final class TextParser extends FileParser {
 
   /** Lines format. */
   private final boolean lines;
+  /** Encoding. */
+  private final String encoding;
 
   /**
    * Constructor.
@@ -53,6 +58,8 @@ public final class TextParser extends FileParser {
     // parser properties
     final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
     lines = props.is(ParserProp.LINES);
+    final String e = props.get(ParserProp.ENCODING);
+    encoding = e != null ? e : UTF8;
   }
 
   @Override
@@ -60,7 +67,7 @@ public final class TextParser extends FileParser {
     builder.startElem(TEXT, atts);
 
     final BufferInput bi = new BufferInput(file.path());
-    bi.encoding();
+    bi.encoding(encoding);
 
     final TokenBuilder tb = new TokenBuilder();
     while(true) {

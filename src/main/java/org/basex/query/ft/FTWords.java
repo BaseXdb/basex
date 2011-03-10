@@ -3,6 +3,7 @@ package org.basex.query.ft;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
+
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
@@ -89,7 +90,7 @@ public final class FTWords extends FTExpr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public FTWords(final InputInfo ii, final Data d, final Str str,
+  public FTWords(final InputInfo ii, final Data d, final Item str,
       final QueryContext ctx) throws QueryException {
     super(ii);
     query = str;
@@ -109,14 +110,11 @@ public final class FTWords extends FTExpr {
         txt = new TokenList();
         final Iter iter = query.iter(ctx);
         byte[] t;
-        while((t = nextToken(iter)) != null) {
-          if(t.length != 0) txt.add(t);
-        }
+        while((t = nextToken(iter)) != null) if(t.length != 0) txt.add(t);
       }
 
       // choose fast evaluation for default settings
       fast = mode == FTMode.M_ANY && txt != null && occ == null;
-
       ftt = new FTTokenizer(this, ctx.ftopt, ctx.context.prop);
     }
     return this;
@@ -294,8 +292,8 @@ public final class FTWords extends FTExpr {
     /* If the following conditions yield true, the index is accessed:
      * - all query terms are statically available
      * - no FTTimes option is specified
-     * - case sensitivity, diacritics and stemming flags coincide with index
-     */
+     * - explicitly set case, diacritics and stemming match options do not
+     *   conflict with index options. */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ftt.opt;
 
@@ -303,10 +301,15 @@ public final class FTWords extends FTExpr {
     final boolean wc = fto.is(WC);
     if(wc && !md.wildcards) return false;
 
-    if(occ != null || md.casesens != fto.is(CS) || md.diacritics != fto.is(DC)
-        || md.stemming != fto.is(ST) || md.language != fto.ln) return false;
+    /* Index will be applied if no explicit match options have been set
+     * that conflict with the index options. As a consequence, though, index-
+     * based querying might yield other results than sequential scanning. */
+    if(fto.isSet(CS) && md.casesens != fto.is(CS) ||
+       fto.isSet(DC) && md.diacritics != fto.is(DC) ||
+       fto.isSet(ST) && md.stemming != fto.is(ST) ||
+       fto.ln != null && md.language != fto.ln || occ != null) return false;
 
-    // skip index access if text if not statically known
+    // skip index access if text is not statically known
     if(txt == null) return false;
 
     // no index results
@@ -314,6 +317,12 @@ public final class FTWords extends FTExpr {
       ic.costs = 0;
       return true;
     }
+
+    // adopt database options to tokenizer
+    fto.set(CS, md.casesens);
+    fto.set(DC, md.diacritics);
+    fto.set(ST, md.stemming);
+    fto.ln = md.language;
 
     // summarize number of hits; break loop if no hits are expected
     final FTLexer ft = new FTLexer(fto);

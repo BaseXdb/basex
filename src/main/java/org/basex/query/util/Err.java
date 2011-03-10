@@ -94,7 +94,21 @@ public enum Err {
   FUNERR1(FOER, 0, "Halted on error()."),
 
   /** FOFD1340: Evaluation exception. */
+  OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPSTART(FOFD, 1340, "Picture begins with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPEND(FOFD, 1340, "Picture ends with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  NOMAND(FOFD, 1340, "No mandatory digit specified: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
   PICDATE(FOFD, 1340, "Invalid picture string: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  ORDCLOSED(FOFD, 1340, "Ordinal is not closed: \"%\"."),
   /** FOFD1350: Evaluation exception. */
   PICCOMP(FOFD, 1350, "Invalid component in string: \"%\"."),
 
@@ -129,10 +143,10 @@ public enum Err {
   ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
   /** FOZP0002: Evaluation exception. */
   ZIPINVALID(FOZP, 2, "% element: % attribute expected."),
+  /** FOZP0002: Evaluation exception. */
+  ZIPUNKNOWN(FOZP, 2, "ZIP Definition: unknown element %."),
   /** FOZP0003: Evaluation exception. */
-  ZIPUNKNOWN(FOZP, 3, "ZIP Definition: unknown element %."),
-  /** FOZP0004: Evaluation exception. */
-  ZIPFAIL(FOZP, 4, "Operation failed: %."),
+  ZIPFAIL(FOZP, 3, "Operation failed: %."),
 
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL: \"%\"."),
@@ -191,6 +205,8 @@ public enum Err {
   INVDIG(FORG, 6, "Invalid digit for base %: %."),
   /** FORG0006: Evaluation exception. */
   JAVAERR(FORG, 6, "Java call failed: %."),
+  /** FORG0006: Evaluation exception. */
+  ERRFORM(FORG, 6, "%: %."),
   /** FORG0008: Function exception. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
 
@@ -374,9 +390,9 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   EXPREMPTY(XPST, 3, "Unknown function or expression."),
   /** XPST0003: Parsing exception. */
-  NOTYPE(XPST, 3, "Unknown type %."),
+  NOTYPE(XPST, 3, "Unknown type \"%\"."),
   /** XPST0003: Parsing exception. */
-  PIXML(XPST, 3, "Illegal PI name: %."),
+  PIXML(XPST, 3, "Illegal PI name: \"%\"."),
   /** XPST0003: Parsing exception. */
   EMPTYSEQOCC(XPST, 3, "No occurrence indicator defined for %."),
   /** XPST0003: Parsing exception. */
@@ -445,7 +461,7 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   XPTYPENUM(XPTY, 4, "%: number expected, % found."),
   /** XPTY0004: Typing exception. */
-  XPINVNAME(XPTY, 4, "Invalid name: %."),
+  XPINVNAME(XPTY, 4, "Invalid name: \"%\"."),
   /** XPTY0004: Typing exception. */
   XPNAME(XPTY, 4, "Expecting name."),
   /** XPTY0004: Typing exception. */
@@ -563,6 +579,10 @@ public enum Err {
   INVDECFORM(XQST, 97, "Invalid decimal-format property: %=\"%\"."),
   /** XPST0098: Parsing exception. */
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format \"%\"."),
+  /** XQST0099: Parsing exception. */
+  DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
+  /** XQST0107: Parsing exception. */
+  CTXINIT(XQST, 107, "Context item depends on itself."),
   /** XQST0108: Parsing exception. */
   MODOUT(XQST, 108, "No output declarations allowed in modules."),
   /** XPST0109: Parsing exception. */
@@ -571,6 +591,8 @@ public enum Err {
   OUTDUPL(XQST, 110, "Duplicate declaration of \"output:%\"."),
   /** XPST0111: Parsing exception. */
   DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
+  /** XQST0113: Parsing exception. */
+  DECITEM(XQST, 113, "Context item cannot be specified in module."),
   /** XPST0111: Parsing exception. */
   DECDUPLPROP(XQST, 114, "Duplicate decimal-format property \"%\"."),
 

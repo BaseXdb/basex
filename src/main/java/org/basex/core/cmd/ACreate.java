@@ -99,14 +99,17 @@ abstract class ACreate extends Command {
       return info(DBCREATED, db, perf);
     } catch(final ProgressException ex) {
       throw ex;
+    } catch(final IOException ex) {
+      abort();
+      final String msg = ex.getMessage();
+      return error(msg != null && msg.length() != 0 ? msg :
+        Util.info(PARSEERR, p.file));
     } catch(final Exception ex) {
       // Known exceptions:
       // - IllegalArgumentException (UTF8, zip files)
       Util.debug(ex);
       abort();
-      final String msg = ex instanceof IOException ?
-          ex.getMessage() : Util.info(PARSEERR, p.file);
-      return error(msg != null ? msg : args[0]);
+      return error(Util.info(PARSEERR, p.file));
     }
   }
 

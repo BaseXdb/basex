@@ -739,8 +739,7 @@ final class XMLScanner extends Progress {
     final int qu = qu();
     int ch;
     while((ch = nextChar()) != qu) {
-      if(!isChar(ch) && !contains(PUBIDTOK, ch))
-        error(PUBID, (char) ch);
+      if(!isChar(ch) && !contains(PUBIDTOK, ch)) error(PUBID, (char) ch);
     }
   }
 

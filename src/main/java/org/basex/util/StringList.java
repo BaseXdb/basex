@@ -13,7 +13,22 @@ import java.util.Iterator;
  */
 public class StringList extends ElementList implements Iterable<String> {
   /** Element container. */
-  protected String[] list = new String[CAP];
+  protected String[] list;
+
+  /**
+   * Default constructor.
+   */
+  public StringList() {
+    this(CAP);
+  }
+
+  /**
+   * Constructor, specifying an initial array capacity.
+   * @param c array capacity
+   */
+  public StringList(final int c) {
+    list = new String[c];
+  }
 
   /**
    * Adds an element to the array.

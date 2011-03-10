@@ -86,9 +86,9 @@ public final class DialogInput extends Dialog {
     final String in = input();
     String msg = null;
     if(rename) {
-      ok = !db.contains(in) || in.equals(old);
+      ok = db.contains(in) || in.equals(old);
       if(ok) msg = Util.info(DBEXISTS, in);
-      if(ok) {
+      if(!ok) {
         ok = Command.validName(in);
         if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
       }

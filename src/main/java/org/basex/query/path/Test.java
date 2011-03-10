@@ -66,7 +66,7 @@ public abstract class Test {
       case ATT: return ATT;
       case COM: return COM;
       case NOD: return NOD;
-      default:  Util.notexpected(); return null;
+      default:  throw Util.notexpected();
     }
   }
 

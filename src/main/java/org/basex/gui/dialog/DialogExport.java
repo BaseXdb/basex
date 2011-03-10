@@ -62,7 +62,7 @@ public final class DialogExport extends Dialog {
     // create checkboxes
     final BaseXBack pp = new BaseXBack(new TableLayout(3, 1, 0, 4));
 
-    BaseXBack p = new BaseXBack(new TableLayout(2, 2, 6, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 0));
     out = new BaseXLabel(OUTDIR + COL, true, true).border(0, 0, 4, 0);
     p.add(out);
     p.add(new BaseXLabel());
@@ -122,6 +122,26 @@ public final class DialogExport extends Dialog {
 
     action(null);
     finish(null);
+  }
+
+  /**
+   * Creates an encoding combo box.
+   * @param dialog dialog reference
+   * @param encoding original encoding
+   * @return encoding combo box
+   */
+  static BaseXCombo encoding(final Dialog dialog, final String encoding) {
+    final BaseXCombo cb = new BaseXCombo(dialog, DialogExport.ENCODINGS);
+    boolean f = false;
+    String enc = encoding;
+    for(final String s : DialogExport.ENCODINGS) f |= s.equals(enc);
+    if(!f) {
+      enc = enc.toUpperCase();
+      for(final String s : DialogExport.ENCODINGS) f |= s.equals(enc);
+    }
+    cb.setSelectedItem(enc);
+    cb.addKeyListener(dialog.keys);
+    return cb;
   }
 
   /**
