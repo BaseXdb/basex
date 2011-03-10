@@ -13,13 +13,13 @@ import org.basex.core.cmd.Set;
 @SuppressWarnings("all")
 public interface Commands {
   /** Create commands. */
-  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER, TRIGGER }
+  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER }
   /** Info commands. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, STORAGE }
   /** Drop commands. */
-  enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP, TRIGGER }
+  enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP }
   /** Show commands. */
-  enum CmdShow { DATABASES, SESSIONS, USERS, BACKUPS, TRIGGERS}
+  enum CmdShow { DATABASES, SESSIONS, USERS, BACKUPS}
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Set commands. Should be synchronized with {@link Set#STRINGS}. */
