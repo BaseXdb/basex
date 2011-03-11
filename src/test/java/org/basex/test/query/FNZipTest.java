@@ -157,7 +157,7 @@ public final class FNZipTest extends AdvancedQueryTest {
 
     // create and compare identical zip file
     query(fun + "(" + list + ", '" + TMPZIP + "')");
-    String list2 = query("zip:entries('" + TMPZIP + "')");
+    final String list2 = query("zip:entries('" + TMPZIP + "')");
     assertEquals(list.replaceAll(" href=\\\".*?\\\"", ""),
         list2.replaceAll(" href=\\\".*?\\\"", ""));
 

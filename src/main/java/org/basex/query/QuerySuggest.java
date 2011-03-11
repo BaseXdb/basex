@@ -82,7 +82,7 @@ public final class QuerySuggest extends QueryParser {
     if(attr) tb.add('@');
     if(test != null) tb.add(test.toString().replaceAll("\\*:", ""));
     tag = tb.finish();
-    //checkTest(false);
+    // use inexact matching only, if the tag is at the end:
     checkTest(qp < ql);
   }
 

@@ -53,8 +53,7 @@ public final class Group extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    Util.notexpected(this);
-    return null;
+    throw Util.notexpected(this);
   }
 
   @Override

@@ -390,7 +390,7 @@ public abstract class ANode extends Item {
       case ATT: return Data.ATTR;
       case COM: return Data.COMM;
       case PI : return Data.PI;
-      default : Util.notexpected(); return -1;
+      default : throw Util.notexpected();
     }
   }
 

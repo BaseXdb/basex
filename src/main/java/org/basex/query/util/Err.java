@@ -95,7 +95,21 @@ public enum Err {
   FUNERR1(FOER, 0, "Halted on error()."),
 
   /** FOFD1340: Evaluation exception. */
+  OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPSTART(FOFD, 1340, "Picture begins with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPEND(FOFD, 1340, "Picture ends with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  NOMAND(FOFD, 1340, "No mandatory digit specified: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
   PICDATE(FOFD, 1340, "Invalid picture string: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  ORDCLOSED(FOFD, 1340, "Ordinal is not closed: \"%\"."),
   /** FOFD1350: Evaluation exception. */
   PICCOMP(FOFD, 1350, "Invalid component in string: \"%\"."),
 
@@ -130,10 +144,10 @@ public enum Err {
   ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
   /** FOZP0002: Evaluation exception. */
   ZIPINVALID(FOZP, 2, "% element: % attribute expected."),
+  /** FOZP0002: Evaluation exception. */
+  ZIPUNKNOWN(FOZP, 2, "ZIP Definition: unknown element %."),
   /** FOZP0003: Evaluation exception. */
-  ZIPUNKNOWN(FOZP, 3, "ZIP Definition: unknown element %."),
-  /** FOZP0004: Evaluation exception. */
-  ZIPFAIL(FOZP, 4, "Operation failed: %."),
+  ZIPFAIL(FOZP, 3, "Operation failed: %."),
 
   /** FOHC0001: Evaluation exception. */
   URLINV(FOHC, 1, "Invalid URL: \"%\"."),
@@ -196,6 +210,8 @@ public enum Err {
   INVDIG(FORG, 6, "Invalid digit for base %: %."),
   /** FORG0006: Evaluation exception. */
   JAVAERR(FORG, 6, "Java call failed: %."),
+  /** FORG0006: Evaluation exception. */
+  ERRFORM(FORG, 6, "%: %."),
   /** FORG0008: Function exception. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
 

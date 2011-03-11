@@ -122,8 +122,8 @@ public enum FunDef {
   FORMINT(FNURI, FNFormat.class, 2, 3,
       "format-integer(number,picture[,lang])", STR),
   /** XQuery function. */
-  FORMNUM(FNURI, FNFormat.class, 2, 3, "format-number(number,picture[,name])",
-      STR),
+  FORMNUM(FNURI, FNFormat.class, 2, 3,
+      "format-number(number,picture[,format])", STR),
   /** XQuery function. */
   FORMDTM(FNURI, FNFormat.class, 2, 5,
       "format-dateTime(number,picture,[lang[,cal[,place]]])", STR),
@@ -210,6 +210,8 @@ public enum FunDef {
   BASEURI(FNURI, FNNode.class, 0, 1, "base-uri([node])", URI_ZO),
   /** XQuery function. */
   GENID(FNURI, FNNode.class, 0, 1, "generate-id([node])", STR),
+  /** XQuery function. */
+  CHILDREN(FNURI, FNNode.class, 1, 1, "has-children(node)", BLN),
 
   /* FNNum functions. */
 
@@ -286,6 +288,10 @@ public enum FunDef {
   HEAD(FNURI, FNSeq.class, 1, 1, "head(items)", ITEM_ZO),
   /** XQuery function. */
   TAIL(FNURI, FNSeq.class, 1, 1, "tail(items)", ITEM_ZM),
+  /** XQuery function. */
+  OUTERMOST(FNURI, FNSeq.class, 1, 1, "outermost(nodes)", NOD_ZM),
+  /** XQuery function. */
+  INNERMOST(FNURI, FNSeq.class, 1, 1, "innermost(nodes)", NOD_ZM),
 
   /* FNSimple functions. */
 
@@ -321,8 +327,8 @@ public enum FunDef {
   /** XQuery function. */
   COMPARE(FNURI, FNStr.class, 2, 3, "compare(first,second[,coll])", ITR_ZO),
   /** XQuery function. */
-  CONCAT(FNURI, FNStr.class, 2, Integer.MAX_VALUE, "concat(string,string+)",
-      STR),
+  CONCAT(FNURI, FNStr.class, 2, Integer.MAX_VALUE,
+      "concat(string,string[,...])", STR),
   /** XQuery function. */
   CONTAINS(FNURI, FNStr.class, 2, 3, "contains(string,sub[,coll])", BLN),
   /** XQuery function. */
@@ -376,17 +382,19 @@ public enum FunDef {
   ATAN(MATHURI, FNMath.class, 1, 1, "atan(number)", ITR_ZO),
   /** XQuery math function. */
   ATAN2(MATHURI, FNMath.class, 1, 1, "atan2(number,number)", ITR_ZO),
+  /** XQuery math function. */
+  POW(MATHURI, FNMath.class, 2, 2, "pow(number,nummber)", ITR_ZO),
+  /** XQuery math function. */
+  EXP(MATHURI, FNMath.class, 1, 1, "exp(number)", ITR_ZO),
+  /** XQuery math function. */
+  EXP10(MATHURI, FNMath.class, 1, 1, "exp10(number)", ITR_ZO),
+  /** XQuery math function. */
+  LOG(MATHURI, FNMath.class, 1, 1, "log(number)", ITR_ZO),
+  /** XQuery math function. */
+  LOG10(MATHURI, FNMath.class, 1, 1, "log10(number)", ITR_ZO),
 
   /** XQuery math function (project specific). */
-  POW(MATHURI, FNMath.class, 2, 2, "pow(number,nummber)", ITR_ZO),
-  /** XQuery math function (project specific). */
-  EXP(MATHURI, FNMath.class, 1, 1, "exp(number)", ITR_ZO),
-  /** XQuery math function (project specific). */
-  LOG(MATHURI, FNMath.class, 1, 1, "log(number)", ITR_ZO),
-  /** XQuery math function (project specific). */
-  LOG10(MATHURI, FNMath.class, 1, 1, "log10(number)", ITR_ZO),
-  /** XQuery math function (project specific). */
-  RAND(MATHURI, FNMath.class, 0, 0, "random(number)", ITR_ZO),
+  RAND(MATHURI, FNMath.class, 0, 0, "random()", ITR),
   /** XQuery math function (project specific). */
   E(MATHURI, FNMath.class, 0, 0, "e()", ITR),
   /** XQuery math function (project specific). */
@@ -506,6 +514,9 @@ public enum FunDef {
   EVAL(UTILURI, FNUtil.class, 1, 1, "eval(string)", ITEM_ZM),
   /** Utility function: evaluates the specified query file. */
   RUN(UTILURI, FNUtil.class, 1, 1, "run(string)", ITEM_ZM),
+  /** Utility function: formats a string using the printf syntax. */
+  FORMAT(UTILURI, FNUtil.class, 2, Integer.MAX_VALUE,
+      "format(format,item1[,...])", STR),
   /** Utility function: returns the memory consumption in mb. */
   MB(UTILURI, FNUtil.class, 1, 2, "mb(expr[,cache])", STR),
   /** Utility function: measures the execution time of an expression. */
@@ -514,13 +525,13 @@ public enum FunDef {
   TO_BASE(UTILURI, FNUtil.class, 2, 2, "integer-to-base(num,base)", STR),
   /** Utility function: decodes a number from a given base. */
   FRM_BASE(UTILURI, FNUtil.class, 2, 2, "integer-from-base(str,base)", ITR),
-  /** Utility function: calculates the MD5 hash of the given xs:string. */
+  /** Utility function: calculates the MD5 hash of the given string. */
   MD5(UTILURI, FNUtil.class, 1, 1, "md5(str)", STR),
-  /** Utility function: calculates the SHA1 hash of the given xs:string. */
+  /** Utility function: calculates the SHA1 hash of the given string. */
   SHA1(UTILURI, FNUtil.class, 1, 1, "sha1(str)", STR),
-  /** Utility function: calculates the CRC32 hash of the given xs:string. */
+  /** Utility function: calculates the CRC32 hash of the given string. */
   CRC32(UTILURI, FNUtil.class, 1, 1, "crc32(str)", STR),
-  /** Utility function: gets the bytes from the given xs:base64Binary data. */
+  /** Utility function: gets the bytes from the given base64 data. */
   TO_BYTES(UTILURI, FNUtil.class, 1, 1, "to-bytes(base64)", BYT_ZM),
 
   /* FNSent functions. */

@@ -51,7 +51,7 @@ public final class Array {
   }
 
   /**
-   * Resizes an array and adds an entry at the end.
+   * Adds an entry to the end of an array and returns the new array.
    * @param ar array to be resized
    * @param e entry to be added
    * @param <T> array type
@@ -65,7 +65,7 @@ public final class Array {
   }
 
   /**
-   * Resizes an array and adds an entry at the end.
+   * Adds an entry to the end of an array and returns the new array.
    * @param ar array to be resized
    * @param e entry to be added
    * @return array
@@ -158,6 +158,28 @@ public final class Array {
   public static void reverse(final byte[] arr, final int pos, final int len) {
     for(int l = pos, r = pos + len - 1; l < r; l++, r--) {
       final byte tmp = arr[l];
+      arr[l] = arr[r];
+      arr[r] = tmp;
+    }
+  }
+
+  /**
+   * Reverses the order of the elements in the given array.
+   * @param arr array
+   */
+  public static void reverse(final Object[] arr) {
+    reverse(arr, 0, arr.length);
+  }
+
+  /**
+   * Reverses the order of all elements in the given interval.
+   * @param arr array
+   * @param pos position of first element of the interval
+   * @param len length of the interval
+   */
+  public static void reverse(final Object[] arr, final int pos, final int len) {
+    for(int l = pos, r = pos + len - 1; l < r; l++, r--) {
+      final Object tmp = arr[l];
       arr[l] = arr[r];
       arr[r] = tmp;
     }
