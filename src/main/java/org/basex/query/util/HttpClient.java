@@ -465,15 +465,17 @@ public final class HttpClient {
       }
     }
 
-    // Set body child
-    // TODO: If content is multipart also boundary has to be set as attribute
-    final byte[] content = req.isMultipart() ? MULTIPART : BODY;
-    final FElem elem = new FElem(new QNm(content), par);
-    if(conn.getContentType() != null) {
-      elem.atts.add(new FAttr(new QNm(MEDIATYPE), token(conn.getContentType()),
-          elem));
-    }
-    par.children.add(elem);
+    // TODO: http:body and http:content shall be returne only if status-only is
+    // false
+    // TODO: If content is multipart also boundary has to be set as attribute,
+    // parts with their headers and empty bodies
+    //final byte[] content = req.isMultipart() ? MULTIPART : BODY;
+    //final FElem elem = new FElem(new QNm(content), par);
+//    if(conn.getContentType() != null) {
+//      elem.atts.add(new FAttr(new QNm(MEDIATYPE), token(conn.getContentType()),
+//          elem));
+//    }
+//    par.children.add(elem);
   }
 
   /**
@@ -559,6 +561,7 @@ public final class HttpClient {
       return responseContent;
     }
 
+    // Content length unknown
     final ByteList bl = new ByteList();
     final BufferedInputStream bis = new BufferedInputStream(input);
     int i = 0;
