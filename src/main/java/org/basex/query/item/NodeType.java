@@ -292,4 +292,9 @@ public enum NodeType implements Type {
     return string(nam) + "()";
   }
 
+  @Override
+  public byte[] nam() {
+    return nam;
+  }
+
 }

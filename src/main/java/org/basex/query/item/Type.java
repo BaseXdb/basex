@@ -96,6 +96,12 @@ public interface Type {
    */
   boolean func();
 
+  /**
+   * Returns the name of this type.
+   * @return name
+   */
+  byte[] nam();
+
   @Override
   String toString();
 }

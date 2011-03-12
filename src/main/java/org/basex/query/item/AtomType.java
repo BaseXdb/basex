@@ -719,6 +719,11 @@ public enum AtomType implements Type {
   }
 
   @Override
+  public byte[] nam() {
+    return nam;
+  }
+
+  @Override
   public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return it.type != this ? error(it, ii) : it;

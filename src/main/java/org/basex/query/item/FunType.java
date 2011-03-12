@@ -10,6 +10,7 @@ import org.basex.query.util.Var;
 import static org.basex.util.Token.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -86,6 +87,11 @@ public final class FunType implements Type {
   @Override
   public boolean func() {
     return true;
+  }
+
+  @Override
+  public byte[] nam() {
+    return Token.token(FUNCTION);
   }
 
   @Override
