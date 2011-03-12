@@ -79,13 +79,14 @@ public final class FNNum extends Fun {
     if(it.type instanceof AtomType) {
       switch((AtomType) it.type) {
         case DBL: return s ? it : Dbl.get(Math.abs(it.dbl(ii)));
-        case FLT: return s ? it : Flt.get(Math.abs(it.flt(ii)));
+        case FLT: return s ? it : Flt.get(Math.abs((float) it.dbl(ii)));
         case DEC: return s ? it : Dec.get(it.dec(ii).abs());
         case ITR: return s ? it : Itr.get(Math.abs(it.itr(ii)));
         default:  break;
       }
     }
-    return Dbl.get(Math.abs(it.dbl(ii)));
+    return it.type.instance(AtomType.ITR) ?
+        Itr.get(Math.abs(it.itr(ii))) : Dec.get(it.dec(ii).abs());
   }
 
   /**

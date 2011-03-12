@@ -2332,7 +2332,8 @@ public class QueryParser extends InputParser {
 
     // use empty name test if types are different
     return SeqType.get(t, occ, kt == null ? null :
-      kt.extype == null || t == kt.extype ? kt.name : new QNm(EMPTY));
+      kt.extype == null || t == kt.extype || !kt.extype.node() ?
+          kt.name : new QNm(EMPTY));
   }
 
   /**
@@ -3004,34 +3005,6 @@ public class QueryParser extends InputParser {
     if(ok && consume(':')) ncName2();
     if(!ok && err != null) error(err);
     return tok.finish();
-  }
-
-  /**
-   * Parses the "EQName" rule.
-   * @return string
-   * @throws QueryException query exception
-   */
-  private QNm eqName() throws QueryException {
-    final int p = qp;
-
-    tok.reset();
-    if(curr('"') || curr('\'')) {
-      final byte[] uri = stringLiteral();
-      tok.reset();
-      if(!consume(':') || !ncName()) {
-        qp = p;
-        return null;
-      }
-      return new QNm(tok.finish(), uri);
-    }
-
-    if(!ncName()) {
-      qp = p;
-      return null;
-    }
-
-    if(consume(':')) ncName2();
-    return new QNm(tok.finish());
   }
 
   /**
