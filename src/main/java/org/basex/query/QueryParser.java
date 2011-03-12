@@ -1628,9 +1628,10 @@ public class QueryParser extends InputParser {
         final Expr[] args = argumentList(e);
         if(args == null) break;
 
-        e = new DynFunCall(input(), e, args);
         final Var[] part = new Var[args.length];
-        if(partial(args, part)) e = new PartFunApp(input(), e, part);
+        final boolean pt = partial(args, part);
+        e = new DynFunCall(input(), e, args);
+        if(pt) e = new PartFunApp(input(), e, part);
       }
     } while(e != old);
     return e;
