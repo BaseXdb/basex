@@ -265,7 +265,7 @@ public class MapTree {
     private void deletePreTree(final MapNode node) {
         MapNode suc = node;
 
-        if(node.preRight != null && node.preLeft != null) {
+        if(node.preRight != null) {
           suc = preMinimumNode(node.preRight);
 
           // copy values from successor into a new node
