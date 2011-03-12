@@ -39,7 +39,7 @@ final class IterStreamReader implements XMLStreamReader {
   /** Current state. */
   int kind = START_DOCUMENT;
   /** Current item. */
-  Item item;
+  ANode item;
   /** Result iterator. */
   private final Iter result;
   /** Next flag. */
@@ -128,7 +128,7 @@ final class IterStreamReader implements XMLStreamReader {
     if(atts != null) return;
     checkType(START_ELEMENT, ATTRIBUTE);
     atts = new NodeCache();
-    final AxisIter ai = ((ANode) item).atts();
+    final AxisIter ai = item.atts();
     while(true) {
       final ANode it = ai.next();
       if(it == null) return;
@@ -175,7 +175,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getLocalName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return string(((ANode) item).nname());
+    return string(item.nname());
   }
 
   @Override
@@ -186,7 +186,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public QName getName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return ((ANode) item).qname().toJava();
+    return item.qname().toJava();
   }
 
   @Override
@@ -244,7 +244,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getPrefix() {
     checkType(START_ELEMENT, END_ELEMENT);
-    final QNm qn = ((ANode) item).qname();
+    final QNm qn = item.qname();
     return !qn.ns() ? null : string(qn.pref());
   }
 
@@ -317,14 +317,11 @@ final class IterStreamReader implements XMLStreamReader {
         }
       }
       if(read == null) {
-        item = result.next();
-        if(item instanceof DBNode) {
-          read = new DNodeReader();
-        } else if(item instanceof FNode) {
-          read = new FNodeReader();
-        } else if(item != null) {
-          type();
-        }
+        final Item it = result.next();
+        if(it == null) return false;
+        if(!(it instanceof ANode)) throw new XMLStreamException();
+        item = (ANode) it;
+        read = it instanceof DBNode ? new DBNodeReader() : new FNodeReader();
       }
     } catch(final QueryException ex) {
       throw new XMLStreamException(ex);
@@ -456,7 +453,7 @@ final class IterStreamReader implements XMLStreamReader {
   }
 
   /** Reader for traversing {@link DBNode} instances. */
-  private final class DNodeReader extends NodeReader {
+  private final class DBNodeReader extends NodeReader {
     /** Node reference. */
     private final DBNode node;
     /** Data size. */
@@ -471,7 +468,7 @@ final class IterStreamReader implements XMLStreamReader {
     private int p;
 
     /** Constructor. */
-    DNodeReader() {
+    DBNodeReader() {
       node = ((DBNode) item).copy();
       item = node;
       p = node.pre;
