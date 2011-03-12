@@ -128,7 +128,7 @@ abstract class BXQAbstract {
 
     // get xquery mapping
     final Type e = FunJava.type(v);
-    if(e == null) throw new BXQException(CONV, Util.name(v));
+    if(e == Type.JAVA) throw new BXQException(CONV, Util.name(v));
 
     try {
       // return item with correct type

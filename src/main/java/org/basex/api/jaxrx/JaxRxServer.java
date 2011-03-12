@@ -94,7 +94,7 @@ public final class JaxRxServer extends BaseXServer {
   public boolean parseArguments(final String[] args) {
     final Args arg = new Args(args, this, JAXRXINFO, Util.info(CONSOLE, JAXRX));
     boolean daemon = false;
-    String serial = "";
+    final StringBuilder serial = new StringBuilder();
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
@@ -115,7 +115,8 @@ public final class JaxRxServer extends BaseXServer {
           service = !daemon;
         } else if(c == 'S') {
           // set/add serialization parameter
-          serial += "," + arg.string();
+          if(serial.length() != 0) serial.append(',');
+          serial.append(arg);
           set(BXJaxRx.SERIALIZER, serial, true);
         } else if(c == 'U') {
           // specify user name

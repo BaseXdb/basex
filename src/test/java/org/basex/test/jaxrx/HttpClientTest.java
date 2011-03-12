@@ -29,9 +29,8 @@ import org.junit.Test;
 public final class HttpClientTest {
   /** Status code. */
   private static final byte[] STATUS = token("status");
-
   /** Database context. */
-  protected static Context context;
+  private static Context context;
   /** JAX-RX server. */
   private static JaxRxServer jaxrx;
 
