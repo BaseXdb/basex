@@ -36,10 +36,6 @@ final class IterStreamReader implements XMLStreamReader {
   private static final Properties PROPS = new Properties();
   /** Namespaces references. */
   private final Namespaces ns = new Namespaces();
-  /** Current state. */
-  int kind = START_DOCUMENT;
-  /** Current item. */
-  Item item;
   /** Result iterator. */
   private final Iter result;
   /** Next flag. */
@@ -48,6 +44,11 @@ final class IterStreamReader implements XMLStreamReader {
   private NodeReader read;
   /** Attributes. */
   private NodeCache atts;
+
+  /** Current state. */
+  int kind = START_DOCUMENT;
+  /** Current node. */
+  ANode node;
 
   /**
    * Constructor.
@@ -128,7 +129,7 @@ final class IterStreamReader implements XMLStreamReader {
     if(atts != null) return;
     checkType(START_ELEMENT, ATTRIBUTE);
     atts = new NodeCache();
-    final AxisIter ai = ((ANode) item).atts();
+    final AxisIter ai = node.atts();
     while(true) {
       final ANode it = ai.next();
       if(it == null) return;
@@ -149,7 +150,7 @@ final class IterStreamReader implements XMLStreamReader {
     final TokenBuilder tb = new TokenBuilder();
     while(kind != END_ELEMENT) {
       if(isType(CHARACTERS, CDATA, SPACE, ENTITY_REFERENCE)) {
-        tb.add(item.atom());
+        tb.add(node.atom());
       } else if(isType(END_DOCUMENT)) {
         throw new XMLStreamException("Unexpected end of document.");
       } else if(isType(START_ELEMENT)) {
@@ -175,7 +176,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getLocalName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return string(((ANode) item).nname());
+    return string(node.nname());
   }
 
   @Override
@@ -186,7 +187,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public QName getName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return ((ANode) item).qname().toJava();
+    return node.qname().toJava();
   }
 
   @Override
@@ -228,7 +229,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getPIData() {
     checkType(PROCESSING_INSTRUCTION);
-    final byte[] val = item.atom();
+    final byte[] val = node.atom();
     final int i = indexOf(val, ' ');
     return string(i == -1 ? EMPTY : substring(val, i + 1));
   }
@@ -236,7 +237,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getPITarget() {
     checkType(PROCESSING_INSTRUCTION);
-    final byte[] val = item.atom();
+    final byte[] val = node.atom();
     final int i = indexOf(val, ' ');
     return string(i == -1 ? val : substring(val, 0, i));
   }
@@ -244,7 +245,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getPrefix() {
     checkType(START_ELEMENT, END_ELEMENT);
-    final QNm qn = ((ANode) item).qname();
+    final QNm qn = node.qname();
     return !qn.ns() ? null : string(qn.pref());
   }
 
@@ -257,7 +258,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getText() {
     checkType(CHARACTERS, COMMENT);
-    return string(item.atom());
+    return string(node.atom());
   }
 
   @Override
@@ -282,7 +283,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public int getTextLength() {
     checkType(CHARACTERS, COMMENT);
-    return item.atom().length;
+    return node.atom().length;
   }
 
   @Override
@@ -317,19 +318,16 @@ final class IterStreamReader implements XMLStreamReader {
         }
       }
       if(read == null) {
-        item = result.next();
-        if(item instanceof DBNode) {
-          read = new DNodeReader();
-        } else if(item instanceof FNode) {
-          read = new FNodeReader();
-        } else if(item != null) {
-          type();
-        }
+        final Item it = result.next();
+        if(it == null) return false;
+        if(!(it instanceof ANode)) throw new XMLStreamException();
+        node = (ANode) it;
+        read = it instanceof DBNode ? new DBNodeReader() : new FNodeReader();
       }
     } catch(final QueryException ex) {
       throw new XMLStreamException(ex);
     }
-    return item != null;
+    return node != null;
   }
 
   @Override
@@ -365,17 +363,17 @@ final class IterStreamReader implements XMLStreamReader {
 
   @Override
   public boolean isWhiteSpace() {
-    return isCharacters() && ws(item.atom());
+    return isCharacters() && ws(node.atom());
   }
 
   @Override
   public int next() throws XMLStreamException {
-    if(next && item == null || !next && !hasNext())
+    if(next && node == null || !next && !hasNext())
       throw new NoSuchElementException();
 
     next = false;
     // disallow top level attributes
-    if(item.type == Type.ATT && read == null) throw new XMLStreamException();
+    if(node.type == Type.ATT && read == null) throw new XMLStreamException();
     return kind;
   }
 
@@ -412,7 +410,7 @@ final class IterStreamReader implements XMLStreamReader {
    * Sets the current event type.
    */
   void type() {
-    switch(item.type) {
+    switch(node.type) {
       case DOC: kind = START_DOCUMENT; return;
       case ATT: kind = ATTRIBUTE; return;
       case ELM: kind = START_ELEMENT; return;
@@ -456,9 +454,9 @@ final class IterStreamReader implements XMLStreamReader {
   }
 
   /** Reader for traversing {@link DBNode} instances. */
-  private final class DNodeReader extends NodeReader {
+  private final class DBNodeReader extends NodeReader {
     /** Node reference. */
-    private final DBNode node;
+    private final DBNode dbnode;
     /** Data size. */
     private final int s;
     /** Parent stack. */
@@ -471,12 +469,12 @@ final class IterStreamReader implements XMLStreamReader {
     private int p;
 
     /** Constructor. */
-    DNodeReader() {
-      node = ((DBNode) item).copy();
-      item = node;
-      p = node.pre;
-      final int k = node.data.kind(p);
-      s = p + node.data.size(p, k);
+    DBNodeReader() {
+      dbnode = ((DBNode) node).copy();
+      node = dbnode;
+      p = dbnode.pre;
+      final int k = dbnode.data.kind(p);
+      s = p + dbnode.data.size(p, k);
       finish(k, 0);
     }
 
@@ -492,7 +490,7 @@ final class IterStreamReader implements XMLStreamReader {
         return;
       }
 
-      final Data data = node.data;
+      final Data data = dbnode.data;
       final int k = data.kind(p);
       final int pa = data.parent(p, k);
       if(l > 0 && parent[l - 1] >= pa) {
@@ -506,7 +504,7 @@ final class IterStreamReader implements XMLStreamReader {
      * Processes the end of an element.
      */
     private void endElem() {
-      node.set(pre[--l], Data.ELEM);
+      dbnode.set(pre[--l], Data.ELEM);
       kind = END_ELEMENT;
     }
 
@@ -516,28 +514,28 @@ final class IterStreamReader implements XMLStreamReader {
      * @param pa parent reference
      */
     private void finish(final int k, final int pa) {
-      node.set(p, k);
+      dbnode.set(p, k);
       if(k == Data.ELEM) {
         pre[l] = p;
         parent[l++] = pa;
       }
-      p += node.data.attSize(p, k);
+      p += dbnode.data.attSize(p, k);
       type();
     }
   }
 
   /** Reader for traversing {@link FNode} instances. */
   private final class FNodeReader extends NodeReader {
-    /** Iterator. */
+    /** Axis iterator. */
     private final AxisIter[] iter = new AxisIter[IO.MAXHEIGHT];
-    /** Iterator. */
-    private final ANode[] node = new ANode[IO.MAXHEIGHT];
-    /** Iterator level. */
+    /** Node stack. */
+    private final ANode[] nodes = new ANode[IO.MAXHEIGHT];
+    /** Stack level. */
     private int l;
 
     /** Constructor. */
     FNodeReader() {
-      iter[0] = ((FNode) item).self();
+      iter[0] = ((FNode) node).self();
       hasNext();
     }
 
@@ -545,13 +543,13 @@ final class IterStreamReader implements XMLStreamReader {
     boolean hasNext() {
       final ANode n = iter[l].next();
       if(n != null) {
-        node[l] = n;
-        item = n;
+        nodes[l] = n;
+        node = n;
         type();
         if(kind == START_ELEMENT) iter[++l] = n.children();
       } else {
         if(--l < 0) return false;
-        item = node[l];
+        node = nodes[l];
         kind = END_ELEMENT;
       }
       return true;
