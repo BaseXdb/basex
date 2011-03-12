@@ -421,6 +421,8 @@ public interface QueryTokens {
   byte[] FILEURI = token(Text.URL + "/file");
   /** Sentiment URI.*/
   byte[] SENTURI = token(Text.URL + "/sent");
+  /** Sentiment URI.*/
+  byte[] HOFURI = token(Text.URL + "/higher-order");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
@@ -470,6 +472,8 @@ public interface QueryTokens {
   byte[] UTIL = token("util");
   /** ZIP token. */
   byte[] ZIP = token("zip");
+  /** ZIP token. */
+  byte[] HOF = token("hof");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");

@@ -1,6 +1,10 @@
 package org.basex.query.func;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.basex.query.QueryContext;
+import org.basex.query.QueryError;
 import org.basex.query.QueryException;
 import org.basex.query.expr.DynFunCall;
 import org.basex.query.expr.Expr;
@@ -45,6 +49,7 @@ final class FNFunc extends Fun {
       case MAPPAIRS:  return zip(ctx);
       case FOLDLEFT:  return foldLeft(ctx);
       case FOLDRIGHT: return foldRight(ctx);
+      case SORTWITH:  return sortWith(ctx);
       default:
            return super.iter(ctx);
     }
@@ -202,6 +207,33 @@ final class FNFunc extends Fun {
       res = f.invIter(ctx, input, xs.item[i], res.finish());
 
     return res;
+  }
+
+  /**
+   * Sorts the input sequence according to the given relation.
+   * @param ctx query context
+   * @return sorted sequence
+   * @throws QueryException query exception
+   */
+  private Iter sortWith(final QueryContext ctx) throws QueryException {
+    final FunItem lt = withArity(0, 2, ctx);
+    final ItemCache items = ItemCache.get(expr[1].iter(ctx));
+    try {
+      Arrays.sort(items.item, 0, (int) items.size(), new Comparator<Item>(){
+        @Override
+        public int compare(final Item it1, final Item it2) {
+          try {
+            return checkType(lt.invItem(ctx, input, it1, it2),
+                AtomType.BLN).bool(input) ? -1 : 1;
+          } catch(final QueryException qe) {
+            throw new QueryError(qe);
+          }
+        }
+      });
+    } catch(final QueryError err) {
+      throw err.wrapped();
+    }
+    return items;
   }
 
   /**

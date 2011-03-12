@@ -177,6 +177,9 @@ public enum FunDef {
   /** XQuery function. */
   PARTAPP(FNURI, FNFunc.class, 2, 3, "partial-apply(function, arg[, pos])",
       FUN_O, ITEM_ZM, ITR, FUN_O),
+  /** XQuery function. */
+  SORTWITH(HOFURI, FNFunc.class, 2, 2, "sort-with(lt-fun, seq)",
+      FunType.get(new SeqType[]{ ITEM, ITEM }, BLN).seq(), ITEM_ZM, ITEM_ZM),
 
   /* FNGen functions. */
 
