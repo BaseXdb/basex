@@ -141,7 +141,7 @@ public class MapTree {
       sadd = 0;
 
       // search for MapNode to divide
-      while(!(preMin() <= pre && pre <= preMax())) {
+      while(current != null && !(preMin() <= pre && pre <= preMax())) {
         if(pre < preMin()) {
           // go left modify addend of current node
           current.s += mod;
@@ -265,7 +265,7 @@ public class MapTree {
     private void deletePreTree(final MapNode node) {
         MapNode suc = node;
 
-        if(node.preRight != null) {
+        if(node.preRight != null && node.preLeft != null) {
           suc = preMinimumNode(node.preRight);
 
           // copy values from successor into a new node
@@ -636,62 +636,94 @@ public class MapTree {
     public void insert(final int id, final int pre) {
       searchPreTree(pre, 1);
 
-      MapNode split = new MapNode();
-      split.idmin   = pre - current.d - sadd - current.s;
-      split.idmax   = current.idmax;
-      split.d       = current.d;
-      split.s       = 1;
+      if(current == null) {
+        // insert as preRoot
+        if(preRoot == null) {
+          MapNode node = new MapNode();
 
-      // 1. case: current is completely affected
-      if(pre == preMin()) {
-          // split inherits addend of current
-          split.s      += current.s;
+          node.idmin = id;
+          node.idmax = id;
+          node.d     = pre - id;
+          node.s     = 0;
 
-          // current saves new node in preTree
-          current.idmin = id;
-          current.idmax = id;
-          current.d     = pre - sadd - id;
-          current.s     = 0;
+          preRoot = node;
+          insertIdTree(node);
+        // insert as very last node
+        } else {
+          current = preRoot;
 
-          // replace current with split in idTree
-          replaceNodeIdTree(current, split);
-          split.idLeft  = current.idLeft;
-          split.idRight = current.idRight;
-          split.idColor = current.idColor;
-          if(current.idLeft != null)
-            current.idLeft.idParent = split;
-          if(current.idRight != null)
-            current.idRight.idParent = split;
+          // cycle to last node
+          // sadd is still valid including that node
+          while(current.preRight != null)
+            current = current.preRight;
 
-          // insert current newly in idTree
-          current.idParent = current.idLeft = current.idRight = null;
-          current.idColor  = false;
-          insertPreTree(split);
+          // create new node
+          MapNode node = new MapNode();
+          node.idmin   = id;
+          node.idmax   = id;
+          node.d       = pre - sadd - id;
+          node.s       = 0;
 
-          // insert split in preTree
-          insertIdTree(current);
-      // 2. case: current is divided
-      } else {
-          MapNode node  = new MapNode();
-
-          // split current
-          current.idmax = split.idmin - 1;
-
-          // create new mapnode for new node in document
-          node.idmin    = id;
-          node.idmax    = id;
-          node.d        = pre - sadd - current.s - id;
-          node.s        = 0;
-
-          // insert split
-          insertPreTree(split);
-          insertIdTree(split);
-
-          // insert new node
           insertPreTree(node);
           insertIdTree(node);
-      }
+        }
+      } else {
+        MapNode split = new MapNode();
+        split.idmin   = pre - current.d - sadd - current.s;
+        split.idmax   = current.idmax;
+        split.d       = current.d;
+        split.s       = 1;
 
+        // 1. case: current is completely affected
+        if(pre == preMin()) {
+            // split inherits addend of current
+            split.s      += current.s;
+
+            // current saves new node in preTree
+            current.idmin = id;
+            current.idmax = id;
+            current.d     = pre - sadd - id;
+            current.s     = 0;
+
+            // replace current with split in idTree
+            replaceNodeIdTree(current, split);
+            split.idLeft  = current.idLeft;
+            split.idRight = current.idRight;
+            split.idColor = current.idColor;
+            if(current.idLeft != null)
+              current.idLeft.idParent = split;
+            if(current.idRight != null)
+              current.idRight.idParent = split;
+
+            // insert current newly in idTree
+            current.idParent = current.idLeft = current.idRight = null;
+            current.idColor  = false;
+            insertPreTree(split);
+
+            // insert split in preTree
+            insertIdTree(current);
+        // 2. case: current is divided
+        } else {
+            MapNode node  = new MapNode();
+
+            // split current
+            current.idmax = split.idmin - 1;
+
+            // create new mapnode for new node in document
+            node.idmin    = id;
+            node.idmax    = id;
+            node.d        = pre - sadd - current.s - id;
+            node.s        = 0;
+
+            // insert split
+            insertPreTree(split);
+            insertIdTree(split);
+
+            // insert new node
+            insertPreTree(node);
+            insertIdTree(node);
+        }
+       }
     }
 
     /**
@@ -709,8 +741,8 @@ public class MapTree {
             current.s -= 1;
             // delete current from preTree
             deletePreTree(current);
-          // 2. case: pre-values of all nodes in current are changed
-          } else if(id == current.idmin) {
+        // 2. case: pre-values of all nodes in current are changed
+        } else if(id == current.idmin) {
             MapNode node = new MapNode();
 
             // change all values in MapNode
@@ -742,8 +774,10 @@ public class MapTree {
             node.d     = Integer.MIN_VALUE;
 
             // insert split
-            insertPreTree(split);
-            insertIdTree(split);
+            if(split.idmin <= split.idmax) {
+              insertPreTree(split);
+              insertIdTree(split);
+            }
 
             // insert new node
             insertIdTree(node);
