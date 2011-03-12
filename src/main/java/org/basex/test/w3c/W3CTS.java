@@ -186,7 +186,7 @@ public abstract class W3CTS {
         } else if(c == 'm') {
             minimum = true;
         } else if(c == 'g') {
-        	group = arg.string();
+          group = arg.string();
         } else if(c == 'p') {
           path = arg.string() + "/";
         } else if(c == 'v') {
@@ -256,8 +256,8 @@ public abstract class W3CTS {
     if(verbose) Util.outln();
     final Nodes nodes = minimum ?
       nodes("//*:test-group[starts-with(@name, 'Minim')]//*:test-case", root) :
-      group != null ? nodes("//*:test-group[@name eq '" + group
-    		  + "']//*:test-case", root) : nodes("//*:test-case", root);
+      group != null ? nodes("//*:test-group[@name eq '" + group +
+          "']//*:test-case", root) : nodes("//*:test-case", root);
 
     long total = nodes.size();
     Util.out("Parsing " + total + " Queries");
@@ -611,7 +611,7 @@ public abstract class W3CTS {
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p)))
         it.add(new DBNode(d, p));
     } catch (final IOException ex) {
-    	throw new Error(ex);
+      throw new Error(ex);
     }
     return it;
   }
@@ -857,6 +857,7 @@ public abstract class W3CTS {
    * @param root root nodes reference
    * @throws Exception exception
    */
+  @SuppressWarnings("unused")
   void init(final Nodes root) throws Exception { }
 
   /**
@@ -865,6 +866,7 @@ public abstract class W3CTS {
    * @param root root nodes reference
    * @throws Exception exception
    */
+  @SuppressWarnings("unused")
   void parse(final QueryProcessor qp, final Nodes root) throws Exception { }
 
   /**
@@ -873,6 +875,7 @@ public abstract class W3CTS {
    * @return states
    * @throws Exception exception
    */
+  @SuppressWarnings("unused")
   Nodes states(final Nodes root) throws Exception {
     return root;
   }
