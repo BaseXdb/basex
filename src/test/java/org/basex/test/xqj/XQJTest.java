@@ -221,7 +221,6 @@ public final class XQJTest extends TestCase {
 
     final XQExpression ex = conn.createExpression();
     final String query = "1,'haha',2.0e3,2";
-    //String query = "1";
     final XQResultSequence seq = ex.executeQuery(query);
     final XMLStreamReader xsr = seq.getSequenceAsStream();
 
