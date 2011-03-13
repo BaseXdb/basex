@@ -6,6 +6,7 @@ import org.basex.core.Text;
 import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
+import org.basex.query.item.QNm;
 
 /**
  * Variable stack.
@@ -36,6 +37,16 @@ public final class VarList extends ExprInfo {
   public void add(final Var v) {
     if(size == vars.length) vars = Arrays.copyOf(vars, size << 1);
     vars[size++] = v;
+  }
+
+  /**
+   * Finds and returns the specified variable.
+   * @param name variable name
+   * @return variable
+   */
+  public Var get(final QNm name) {
+    for(int i = size; i-- > 0;) if(name.eq(vars[i].name)) return vars[i];
+    return null;
   }
 
   /**

@@ -158,6 +158,9 @@ public final class QueryContext extends Progress {
   /** Evaluation flag. */
   private boolean firstEval = true;
 
+  /** Counter for variable IDs. */
+  private volatile int varIDs;
+
   /**
    * Constructor.
    * @param ctx context reference
@@ -362,6 +365,14 @@ public final class QueryContext extends Progress {
     if(firstEval) info.add(NL + QUERYEVAL + NL);
     info.add(QUERYSEP).add(string).add(NL);
     firstEval = false;
+  }
+
+  /**
+   * Generates the next unique variable ID.
+   * @return variable ID
+   */
+  public int nextVarID() {
+    return varIDs++;
   }
 
   /**

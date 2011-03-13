@@ -36,33 +36,46 @@ public final class Var extends ParseExpr {
   /** Variable results. */
   public Value value;
 
-  /**
-   * Constructor, specifying a global variable.
-   * @param n variable name
-   */
-  public Var(final QNm n) {
-    this(null, n, null);
-  }
+  /** Variable ID. */
+  public final int id;
 
   /**
-   * Constructor, specifying a local variable.
-   * @param ii input info
-   * @param n variable name
-   */
-  public Var(final InputInfo ii, final QNm n) {
-    this(ii, n, null);
-  }
-
-  /**
-   * Constructor, specifying a local variable.
+   * Constructor.
    * @param ii input info
    * @param n variable name
    * @param t data type
+   * @param i variable ID
    */
-  public Var(final InputInfo ii, final QNm n, final SeqType t) {
+  private Var(final InputInfo ii, final QNm n, final SeqType t, final int i) {
     super(ii);
     name = n;
     type = t;
+    id = i;
+  }
+
+  /**
+   * Creates a new variable.
+   * @param ctx query context
+   * @param ii input info
+   * @param n variable name
+   * @param t type
+   * @return variable
+   */
+  public static Var create(final QueryContext ctx, final InputInfo ii,
+      final QNm n, final SeqType t) {
+    return new Var(ii, n, t, ctx.nextVarID());
+  }
+
+  /**
+   * Creates a new variable.
+   * @param ctx query context
+   * @param ii input info
+   * @param n variable name
+   * @return variable
+   */
+  public static Var create(final QueryContext ctx, final InputInfo ii,
+      final QNm n) {
+    return new Var(ii, n, null, ctx.nextVarID());
   }
 
   /**
@@ -153,7 +166,7 @@ public final class Var extends ParseExpr {
 
   @Override
   public Var copy() {
-    final Var v = new Var(input, name, type);
+    final Var v = new Var(input, name, type, id);
     v.global = global;
     v.value = value;
     v.expr = expr;
