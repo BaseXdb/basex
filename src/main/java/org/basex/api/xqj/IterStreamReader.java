@@ -373,7 +373,7 @@ final class IterStreamReader implements XMLStreamReader {
 
     next = false;
     // disallow top level attributes
-    if(item.type == NodeType.ATT && read == null)
+    if(node.type == NodeType.ATT && read == null)
       throw new XMLStreamException();
     return kind;
   }
