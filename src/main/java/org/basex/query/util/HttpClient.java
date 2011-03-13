@@ -7,8 +7,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,17 +37,13 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeMore;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 
-import com.sun.xml.internal.bind.v2.TODO;
-
 /**
  * HTTP Client.
- * 
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -469,13 +463,13 @@ public final class HttpClient {
     // false
     // TODO: If content is multipart also boundary has to be set as attribute,
     // parts with their headers and empty bodies
-    //final byte[] content = req.isMultipart() ? MULTIPART : BODY;
-    //final FElem elem = new FElem(new QNm(content), par);
-//    if(conn.getContentType() != null) {
-//      elem.atts.add(new FAttr(new QNm(MEDIATYPE), token(conn.getContentType()),
-//          elem));
-//    }
-//    par.children.add(elem);
+    // final byte[] content = req.isMultipart() ? MULTIPART : BODY;
+    // final FElem elem = new FElem(new QNm(content), par);
+    // if(conn.getContentType() != null) {
+    // elem.atts.add(new FAttr(new QNm(MEDIATYPE), token(conn.getContentType()),
+    // elem));
+    // }
+    // par.children.add(elem);
   }
 
   /**
