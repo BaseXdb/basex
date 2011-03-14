@@ -192,8 +192,7 @@ public final class Var extends ParseExpr {
 
   @Override
   public int count(final Var v) {
-    // only VarRefs are counted
-    return 0;
+    return is(v) ? 1 : 0;
   }
 
   @Override
