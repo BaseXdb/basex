@@ -35,7 +35,7 @@ public final class FLWR extends GFLWOR {
     // simplify basic GFLWOR expression (for $i in A return $i -> A)
     if(fl.length == 1 && where == null && ret instanceof VarRef) {
       final Var v = ((VarRef) ret).var;
-      if(v.type == null && fl[0].var.eq(v)) {
+      if(v.type == null && fl[0].var.namedLike(v)) {
         ctx.compInfo(OPTFLWOR);
         return fl[0].expr;
       }

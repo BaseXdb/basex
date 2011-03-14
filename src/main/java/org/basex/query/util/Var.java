@@ -144,12 +144,24 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Compares the variables for reference or name equality.
+   * Compares the variables for reference or name equality, this should only be
+   * used while parsing because it ignores variable IDs.
    * @param v variable
    * @return result of check
    */
-  public boolean eq(final Var v) {
+  @Deprecated
+  public boolean namedLike(final Var v) {
     return v == this || v.name.eq(name);
+  }
+
+  /**
+   * Checks whether the given variable is identical to this one, i.e. hast the
+   * same ID.
+   * @param v variable to check
+   * @return {@code true}, if the IDs are equal, {@code false} otherwise
+   */
+  public boolean is(final Var v) {
+    return id == v.id;
   }
 
   /**
@@ -181,12 +193,14 @@ public final class Var extends ParseExpr {
 
   @Override
   public int count(final Var v) {
-    return eq(v) ? 1 : 0;
+    // only VarRefs are counted
+    return 0;
   }
 
   @Override
   public boolean removable(final Var v) {
-    return true;
+    // only VarRefs can be removed
+    return false;
   }
 
   @Override
@@ -210,8 +224,7 @@ public final class Var extends ParseExpr {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) {
-      tb.add(DOLLAR);
-      tb.add(name.atom());
+      tb.add(DOLLAR).add(name.atom()).addExt("{%}", id);
       if(type != null) tb.add(" " + AS);
     }
     if(type != null) tb.add(" " + type);

@@ -59,6 +59,7 @@ public abstract class ForLet extends Single {
    * @param v variable to be checked
    * @return result of check
    */
+  @Deprecated
   abstract boolean shadows(final Var v);
 
   @Override

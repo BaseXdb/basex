@@ -749,7 +749,7 @@ public class QueryParser extends InputParser {
       }
       final Var var = typedVar();
       ctx.vars.add(var);
-      for(final Var v : args) if(v.eq(var)) error(FUNCDUPL, var);
+      for(final Var v : args) if(v.name.eq(var.name)) error(FUNCDUPL, var);
 
       args = Array.add(args, var);
       if(!consume(',')) break;

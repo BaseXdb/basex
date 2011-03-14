@@ -64,7 +64,7 @@ final class GroupPartition {
     int i = 0;
     for(final Var v : fls) {
       boolean ng = true;
-      for(final Var g : gv) ng &= !v.eq(g);
+      for(final Var g : gv) ng &= !v.namedLike(g);
       if(ng) ngv[i++] = v;
     }
 
@@ -83,6 +83,7 @@ final class GroupPartition {
    * @throws QueryException var not found.
    */
   private int ngvSize(final Var[] gvs, final Var[] fls) throws QueryException {
+    // [LW] how do we handle this?
     final TokenSet fc = new TokenSet();
     final TokenSet gc = new TokenSet();
 
@@ -90,7 +91,7 @@ final class GroupPartition {
     for(final Var g : gvs) gc.add(g.name.atom());
     for(final Var g : gvs) {
       boolean f = false;
-      for(final Var v : fls) f |= v.eq(g);
+      for(final Var v : fls) f |= v.namedLike(g);
       if(!f) GVARNOTDEFINED.thrw(null, g);
     }
     return fc.size() - gc.size();
@@ -209,6 +210,7 @@ final class GroupPartition {
    */
   private void cacheRet(final QueryContext ctx) {
     // [MS] the references differ... so you better make new ones!
+    // [LW] check variables
     pggv = new Var[gv.length];
     pgngv = new Var[ngv.length];
     for(int j = 0; j < gv.length; ++j) pggv[j] = ctx.vars.get(gv[j]);

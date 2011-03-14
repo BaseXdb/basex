@@ -184,6 +184,7 @@ public class GFLWOR extends ParseExpr {
       // loop through all outer clauses
       for(int g = f - 1; g >= 0; --g) {
         // stop if variable is shadowed or used by the current clause
+        // [LW] check shadowing
         if(fl[g].shadows(t.var) || t.count(fl[g].var) != 0) break;
         // ignore let clauses and fragment constructors
         if(fl[g] instanceof Let) continue;
