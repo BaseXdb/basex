@@ -41,7 +41,7 @@ import org.basex.util.TokenMap;
 
 /**
  * HTTP Client.
- *
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -99,13 +99,11 @@ public final class HttpClient {
   /** XML media type. */
   private static final byte[] APPL_XML = token("application/xml");
   /** XML media type. */
-  private static final byte[] APPL_EXT_XML =
-    token("application/xml-external-parsed-entity");
+  private static final byte[] APPL_EXT_XML = token("application/xml-external-parsed-entity");
   /** XML media type. */
   private static final byte[] TXT_XML = token("text/xml");
   /** XML media type. */
-  private static final byte[] TXT_EXT_XML =
-    token("text/xml-external-parsed-entity");
+  private static final byte[] TXT_EXT_XML = token("text/xml-external-parsed-entity");
   /** XML media types' suffix. */
   private static final byte[] MIME_XML_SUFFIX = token("+xml");
   /** HTML media type. */
@@ -156,12 +154,12 @@ public final class HttpClient {
    * @param request request element
    * @throws QueryException query exception
    */
-  private void readRequestAttributes(final ANode request)
-      throws QueryException {
+  private void readRequestAttributes(final ANode request) throws QueryException {
 
     final AxisIter ai = request.atts();
     ANode n = null;
-    while((n = ai.next()) != null) reqAttrs.add(n.nname(), n.atom());
+    while((n = ai.next()) != null)
+      reqAttrs.add(n.nname(), n.atom());
 
     // If authorization is to be sent, check that both user name and password
     // are provided
@@ -240,6 +238,7 @@ public final class HttpClient {
     } catch(final ProtocolException ex) {
       throw PROTINV.thrw(info);
     } catch(final IOException ex) {
+      ex.printStackTrace();
       throw HTTPERR.thrw(info, ex);
     }
   }
@@ -254,10 +253,9 @@ public final class HttpClient {
       throws ProtocolException, QueryException {
     if(body != null) conn.setDoOutput(true);
     conn.setRequestMethod(string(reqAttrs.get(METHOD)).toUpperCase());
-    if(reqAttrs.get(TIMEOUT) != null)
-      conn.setConnectTimeout(parseInt(string(reqAttrs.get(TIMEOUT))));
-    if(reqAttrs.get(REDIR) != null)
-      setFollowRedirects(Bln.parse(reqAttrs.get(REDIR), info));
+    if(reqAttrs.get(TIMEOUT) != null) conn.setConnectTimeout(parseInt(string(reqAttrs.get(TIMEOUT))));
+    if(reqAttrs.get(REDIR) != null) setFollowRedirects(Bln.parse(
+        reqAttrs.get(REDIR), info));
   }
 
   /**
@@ -266,7 +264,7 @@ public final class HttpClient {
    * @throws QueryException query exception
    */
   private void setHttpRequestHeaders(final HttpURLConnection conn)
-    throws QueryException {
+      throws QueryException {
 
     final byte[][] headerNames = headers.keys();
 
@@ -275,12 +273,10 @@ public final class HttpClient {
           string(headers.get(headerName)));
     // HTTP Basic Authentication
     final byte[] sendAuth = reqAttrs.get(SENDAUTH);
-    if(sendAuth != null && Bln.parse(sendAuth, info))
-      conn.setRequestProperty(
-          AUTH,
-          encodeCredentials(
-              string(reqAttrs.get(USRNAME)),
-              string(reqAttrs.get(PASSWD))));
+    if(sendAuth != null && Bln.parse(sendAuth, info)) conn.setRequestProperty(
+        AUTH,
+        encodeCredentials(string(reqAttrs.get(USRNAME)),
+            string(reqAttrs.get(PASSWD))));
   }
 
   /**
@@ -318,8 +314,7 @@ public final class HttpClient {
             || eq(mediaType, TXT_XML) || eq(mediaType, TXT_EXT_XML)
             || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append(M_XML);
         else if(eq(mediaType, TXT_HTML)) sb.append(M_HTML);
-        else if(startsWith(mediaType, MIME_TEXT_PREFIX))
-          sb.append(M_TEXT);
+        else if(startsWith(mediaType, MIME_TEXT_PREFIX)) sb.append(M_TEXT);
         else sb.append(M_XML);
       } else {
         sb.append(method);
@@ -333,7 +328,8 @@ public final class HttpClient {
         final XMLSerializer xml = new XMLSerializer(out, serialProp);
         final AxisIter ai = body.children();
         ANode child = null;
-        while((child = ai.next()) != null) child.serialize(xml);
+        while((child = ai.next()) != null)
+          child.serialize(xml);
       } finally {
         out.close();
       }
@@ -365,8 +361,8 @@ public final class HttpClient {
     final byte[] attrStatusOnly = reqAttrs.get(STATUSONLY);
 
     // Get response content if required
-    if(attrStatusOnly == null || !Bln.parse(attrStatusOnly, info))
-      iter.add(setResultContent(conn, ctx));
+    if(attrStatusOnly == null || !Bln.parse(attrStatusOnly, info)) iter.add(setResultContent(
+        conn, ctx));
     return iter;
   }
 
@@ -376,8 +372,8 @@ public final class HttpClient {
    * @param par parent node
    * @throws IOException I/O exception
    */
-  private void setResponseAttrs(final HttpURLConnection conn,
-      final FElem par) throws IOException {
+  private void setResponseAttrs(final HttpURLConnection conn, final FElem par)
+      throws IOException {
 
     final FAttr attrStatus = new FAttr(new QNm(STATUS, QueryTokens.HTTPURI),
         token(conn.getResponseCode()), par);
@@ -394,8 +390,7 @@ public final class HttpClient {
    * @param conn HTTP connection
    * @param par parent node
    */
-  private void setResponseChildren(final HttpURLConnection conn,
-      final FElem par) {
+  private void setResponseChildren(final HttpURLConnection conn, final FElem par) {
 
     // Set header children
     for(final String headerName : conn.getHeaderFields().keySet()) {
@@ -410,8 +405,8 @@ public final class HttpClient {
 
     // Set body child
     final FElem elem = new FElem(new QNm(BODY), par);
-    elem.atts.add(new FAttr(new QNm(MEDIATYPE),
-        token(conn.getContentType()), elem));
+    elem.atts.add(new FAttr(new QNm(MEDIATYPE), token(conn.getContentType()),
+        elem));
     par.children.add(elem);
   }
 
@@ -426,24 +421,24 @@ public final class HttpClient {
   private Item setResultContent(final HttpURLConnection conn,
       final QueryContext ctx) throws IOException, QueryException {
 
-    final byte[] contentType = reqAttrs.get(OVERMEDIATYPE) == null ?
-        token(conn.getContentType()) : reqAttrs.get(OVERMEDIATYPE);
+    final byte[] contentType = reqAttrs.get(OVERMEDIATYPE) == null ? token(conn.getContentType())
+        : reqAttrs.get(OVERMEDIATYPE);
 
     if(eq(contentType, TXT_XML) || eq(contentType, TXT_EXT_XML)
         || eq(contentType, APPL_XML) || eq(contentType, APPL_EXT_XML)
         || endsWith(contentType, MIME_XML_SUFFIX))
-      // Parse XML
-      return processXML(conn, ctx);
+    // Parse XML
+    return processXML(conn, ctx);
     else if(eq(contentType, TXT_HTML)) {
       // Parse HTML
       if(!HTMLParser.available()) throw HTMLERR.thrw(info);
       return processHTML(conn, ctx);
     } else if(startsWith(contentType, MIME_TEXT_PREFIX))
-      // Process text content
-      return Str.get(readHttpContent(conn));
+    // Process text content
+    return Str.get(readHttpContent(conn));
     else
-      // TODO: parse as binary type
-      return null;
+    // TODO: parse as binary type
+    return null;
   }
 
   /**
@@ -455,9 +450,11 @@ public final class HttpClient {
    */
   private Item processXML(final HttpURLConnection conn, final QueryContext ctx)
       throws IOException {
-
+    System.out.println("Process XML...");
     final IOContent io = new IOContent(readHttpContent(conn));
+    System.out.println("IOContent created...");
     final Parser parser = new XMLParser(io, null, ctx.context.prop);
+    System.out.println("XML parser created....");
     return new DBNode(MemBuilder.build(parser, ctx.context.prop, ""), 0);
   }
 
@@ -486,23 +483,13 @@ public final class HttpClient {
       throws IOException {
 
     final InputStream input = conn.getInputStream();
-    final int len = conn.getContentLength();
-
-    if(len != -1) {
-      final byte[] content = new byte[len];
-      try {
-        input.read(content);
-      } finally {
-        input.close();
-      }
-      return content;
-    }
 
     final ByteList bl = new ByteList();
     final BufferedInputStream bis = new BufferedInputStream(input);
     int i = 0;
     try {
-      while((i = bis.read()) != -1) bl.add(i);
+      while((i = bis.read()) != -1)
+        bl.add(i);
     } finally {
       bis.close();
     }
