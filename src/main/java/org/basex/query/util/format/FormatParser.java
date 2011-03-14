@@ -19,12 +19,20 @@ public final class FormatParser extends FormatUtil {
   static final Pattern WIDTH = Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
 
   /** Input information. */
-  public final InputInfo input;
+  private final InputInfo input;
+  /** Input to be parsed. */
+  private final byte[] pic;
+  /** Default modifier. */
+  private final byte[] def;
+  /** Extended format (used for dates). */
+  private final boolean ext;
 
   /** Case. */
   Case cs;
-  /** Presentation modifier in lower-case. */
-  byte[] pres;
+  /** Primary format token. */
+  byte[] primary;
+  /** Primary format or mandatory digit. */
+  int digit;
   /** Ordinal suffix; {@code null} if not specified. */
   byte[] ordinal;
   /** Minimum width. */
@@ -35,149 +43,136 @@ public final class FormatParser extends FormatUtil {
   /**
    * Constructor.
    * @param ii input info
-   */
-  public FormatParser(final InputInfo ii) {
-    input = ii;
-  }
-
-  /**
-   * Parses the input string.
-   * @param in marker input
-   * @param p (valid) presentation modifier
-   * @param date flag flag, allowing width modifier
-   * @return success flag
+   * @param p info picture
+   * @param df default presentation modifier (may be {@code null}).
    * @throws QueryException query exception
    */
-  public boolean parse(final byte[] in, final byte[] p, final boolean date)
+  public FormatParser(final InputInfo ii, final byte[] p, final byte[] df)
       throws QueryException {
 
-    // no marker specified - use default settings
-    byte[] pm = in.length != 0 ? mod(in, date) : p;
-    if(pm == null) return false;
+    input = ii;
+    pic = p.length != 0 ? p : df;
+    ext = df != null;
+    def = ext ? df : ONE;
 
-    if(date) {
+    byte[] pm = mod();
+    if(ext) {
       // extract and check width modifier
       final int w = lastIndexOf(pm, ',');
       if(w != -1) {
         final byte[] wd = substring(pm, w + 1);
         pm = substring(pm, 0, w);
 
-        final Matcher match = WIDTH.matcher(string(wd));
-        if(!match.find()) return false;
+        final Matcher m = WIDTH.matcher(string(wd));
+        if(!m.find()) PICDATE.thrw(ii, wd);
 
-        int m = toInt(match.group(1));
-        if(m != Integer.MIN_VALUE) min = m;
-        final String mc = match.group(3);
-        m = mc != null ? toInt(mc) : Integer.MIN_VALUE;
-        if(m != Integer.MIN_VALUE) max = m;
+        int i = toInt(m.group(1));
+        if(i != Integer.MIN_VALUE) min = i;
+        final String mc = m.group(3);
+        i = mc != null ? toInt(mc) : Integer.MIN_VALUE;
+        if(i != Integer.MIN_VALUE) max = i;
       }
     }
-
     // choose first character and case
-    cs = pm.length > cl(pm, 0) ? Case.STANDARD :
-      (ch(pm, 0) & ' ') != 0 ? Case.LOWER : Case.UPPER;
-    pres = lc(pm);
-    return true;
+    cs = cl(pm, 0) < pm.length ? Case.STANDARD :
+      (ch(pm, 0) & ' ') == 0 ? Case.UPPER : Case.LOWER;
+    primary = lc(pm);
+    if(digit == 0) digit = ch(primary, 0);
   }
 
   /**
    * Returns a presentation modifier.
-   * @param in input
-   * @param date flag flag, allowing width modifier
    * @return presentation modifier
    * @throws QueryException query exception
    */
-  private byte[] mod(final byte[] in, final boolean date)
-      throws QueryException {
+  private byte[] mod() throws QueryException {
+    final int l = pic.length;
+    // final presentation modifier
+    byte[] pm = null;
+    // current offset
+    int pos = cl(pic, 0);
 
-    final int ch = ch(in, 0);
-    final int cu = ch | ' ';
-    int s;
+    // proposed presentation modifier
+    int ch = ch(pic, 0);
     if(sequence(ch) != null) {
-      // latin, greek and other alphabetics
-      s = cl(in, 0);
-    } else if(cu == 'i') {
-      // roman sequence
-      s = cl(in, 0);
-    } else if(cu == 'w' || cu == 'n' && date) {
-      // verbose, or name output
-      s = ch(in, 1) == (ch | ' ') ? 2 : 1;
+      // Latin, Greek and other alphabets
     } else if(ch >= '\u2460' && ch <= '\u249b') {
       // circled, parenthesized or full stop digits
-      s = cl(in, 0);
     } else if(ch == KANJI[1]) {
-      // japanese numbering
-      s = cl(in, 0);
+      // Japanese numbering
+    } else if((ch | ' ') == 'i') {
+      // Roman sequence
+    } else if((ch | ' ') == 'w' || (ch | ' ') == 'n' && ext) {
+      // word-wise output (incl. title-case check)
+      if((ch & ' ') == 0 && ch(pic, pos) == (ch | ' ')) pos += cl(pic, pos);
     } else {
-      // grouping-separator, mandatory-digit, or optional-digit-sign
-      s = check(in);
-    }
-    byte[] pm = substring(in, 0, s);
-
-    // find format modifier
-    final int l = in.length;
-    if(s < l) {
-      if(ch(in, s) == 'o') {
-        final TokenBuilder tb = new TokenBuilder();
-        if(ch(in, ++s) == '(') {
-          while(ch(in, ++s) != ')') {
-            // ordinal isn't closed by a parenthesis
-            if(s == l) ORDCLOSED.thrw(input, in);
-            tb.add(ch(in, s));
+      // mandatory-digit-sign
+      int z = -1;
+      boolean group = false;
+      for(pos = 0; pos < l; pos += cl(pic, pos)) {
+        ch = ch(pic, pos);
+        if(z == -1) {
+          z = zeroes(ch);
+          if(z != -1) {
+            digit = z;
+            group = false;
+          } else if(ch == '#') {
+            group = false;
+          } else if(Character.isLetter(ch)) {
+            pm = def;
+            pos += cl(pic, pos);
+            break;
+          } else {
+            if(pos == 0) GROUPSTART.thrw(input, pic);
+            if(group) GROUPADJ.thrw(input, pic);
+            group = true;
           }
-          ++s;
+        } else {
+          if(Character.isLetter(ch)) {
+            pm = substring(pic, 0, pos);
+            break;
+          } else if(ch >= z && ch <= z + 9) {
+            group = false;
+          } else {
+            if(zeroes(ch) != -1) DIFFMAND.thrw(input, pic);
+            if(ch == '#') OPTAFTER.thrw(input, pic);
+            if(group) GROUPADJ.thrw(input, pic);
+            group = true;
+          }
+        }
+      }
+      if(z == -1) NOMAND.thrw(input, pic);
+      if(group) GROUPEND.thrw(input, pic);
+    }
+
+    // if necessary, extract primary format token from the original string
+    if(pm == null) pm = substring(pic, 0, pos);
+
+    // check for optional format modifier
+    if(pos < l) {
+      if(ch(pic, pos) == 'o') {
+        final TokenBuilder tb = new TokenBuilder();
+        if(ch(pic, ++pos) == '(') {
+          while(ch(pic, ++pos) != ')') {
+            // ordinal isn't closed by a parenthesis
+            if(pos == l) ORDCLOSED.thrw(input, pic);
+            tb.add(ch(pic, pos));
+          }
+          ++pos;
         }
         ordinal = tb.finish();
-      } else if(ch(in, s) == 't') {
+      } else if(ch(pic, pos) == 't') {
         // traditional numbering (ignored)
-        ++s;
+        ++pos;
       }
-    }
 
-    // find remaining modifier
-    if(s < l) {
-      // invalid remaining input
-      if(ch(in, s) != ',') PICCOMP.thrw(input, in);
-      pm = concat(pm, substring(in, s));
+      // check for optional format modifier
+      if(pos < l) {
+        // invalid remaining input
+        if(ch(pic, pos) != ',') PICCOMP.thrw(input, pic);
+        pm = concat(pm, substring(pic, pos));
+      }
     }
     return pm;
-  }
-
-  /**
-   * Parses a decimal-digit-pattern.
-   * @param in input
-   * @return end position
-   * @throws QueryException query exception
-   */
-  private int check(final byte[] in) throws QueryException {
-    int z = zeroes(ch(in, 0));
-    if(z == -1) z = '0';
-    int s = 0;
-    boolean d = false, g = false;
-    final int l = in.length;
-    for(; s < l; s += cl(in, s)) {
-      final int ch = ch(in, s);
-      if(Character.isLetter(ch)) break;
-
-      if(ch == '#') {
-        // optional after decimal sign
-        if(d) OPTAFTER.thrw(input, in);
-        g = false;
-      } else if(ch == '*') {
-        g = false;
-      } else if(ch >= z && ch <= z + 9) {
-        d = true;
-        g = false;
-      } else if(zeroes(ch) != -1) {
-        MANSAME.thrw(input, in);
-      } else {
-        // adjacent grouping separators
-        if(g) GRPADJ.thrw(input, in);
-        g = true;
-      }
-    }
-    if(!d) NODEC.thrw(input, in);
-    if(g) GRPSTART.thrw(input, in);
-    return s;
   }
 }

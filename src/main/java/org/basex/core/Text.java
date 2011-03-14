@@ -187,9 +187,8 @@ public interface Text {
 
   /** Command help. */
   String[] HELPCREATE = {
-    "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
-    CmdCreate.INDEX + "|" + CmdCreate.USER + "|"
-    + CmdCreate.TRIGGER + "] [...]",
+    "[" + CmdCreate.DATABASE + "|" + CmdCreate.FS + "|" +
+    CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
     LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + C_INPUT + "]):"  + NL +
@@ -200,11 +199,9 @@ public interface Text {
     LI + CmdCreate.FS + " [" + C_NAME + "] [" + C_PATH +
       "] ([mountpoint] [store]):" + NL +
       "  " + lang("ch_create6", C_NAME, C_PATH) + NL +
-      "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
-    LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]): " + NL +
-      "  " + lang("ch_create8") + NL +
-    LI + CmdCreate.TRIGGER + " [" + C_NAME + "]: " + NL +
-      "  " + lang("ch_create9")
+      "  " + lang("ch_create7", "mountpoint", "store") + NL +
+    LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
+      "  " + lang("ch_create8")
   };
 
   /** Command help. */
@@ -250,8 +247,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "|"
-    + CmdDrop.TRIGGER + "] [...]",
+    "[" + CmdDrop.DATABASE + "|" + CmdDrop.INDEX + "|" +
+    CmdDrop.USER + "] [...]",
     lang("ch_drop1"),
     lang("ch_drop2") + NL +
     LI + CmdDrop.DATABASE + " [" + C_NAME + "]:" + NL +
@@ -262,9 +259,7 @@ public interface Text {
     LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [db]): " + NL + "  " +
       lang("ch_drop23") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
-      lang("ch_drop24", C_NAME) + NL +
-    LI + CmdDrop.TRIGGER + " [" + C_NAME + "]:" + NL + "  " +
-      lang("ch_drop25", C_NAME)
+      lang("ch_drop24", C_NAME)
   };
   /** Command help. */
   String[] HELPEXPORT = {
@@ -307,14 +302,13 @@ public interface Text {
   /** Command help. */
   String[] HELPSHOW = {
     "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
-    CmdShow.USERS + "|" + CmdShow.BACKUPS + "|" + CmdShow.TRIGGERS + "]",
+    CmdShow.USERS + "|" + CmdShow.BACKUPS + "]",
     lang("ch_show1"),
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
     LI + CmdShow.USERS + " (" + ON + " [db]): " + lang("ch_show24") + NL +
-    LI + CmdShow.BACKUPS + ": " + lang("ch_show25") + NL +
-    LI + CmdShow.TRIGGERS + ": " + lang("ch_show26")
+    LI + CmdShow.BACKUPS + ": " + lang("ch_show25")
   };
   /** Command help. */
   String[] HELPGRANT = {
@@ -607,7 +601,7 @@ public interface Text {
   String USERCREATE = lang("ad_usercreate");
   /** Password changed. */
   String USERALTER = lang("ad_useralter");
-  /** User already exists. */
+  /** User unknown. */
   String USERKNOWN = lang("ad_userknown");
   /** No password specified. */
   String PASSNO = lang("ad_passno");
@@ -617,18 +611,6 @@ public interface Text {
   String USERKILL = lang("ad_kill");
   /** User kills itself. */
   String USERKILLSELF = lang("ad_killself");
-  /** Trigger dropped. */
-  String TRIGGERDROP = lang("ad_triggerdrop");
-  /** Trigger added. */
-  String TRIGGERCREATE = lang("ad_triggercreate");
-  /** Trigger not found. */
-  String TRIGGERNO = lang("ad_triggerno");
-  /** Trigger already exists. */
-  String TRIGGERKNOWN = lang("ad_triggerknown");
-  /** Trigger attached. */
-  String TRIGGERATT = lang("ad_triggeratt");
-  /** Trigger detached. */
-  String TRIGGERDET = lang("ad_triggerdet");
 
   // GENERAL COMMANDS =========================================================
 

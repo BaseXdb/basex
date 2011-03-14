@@ -171,7 +171,7 @@ public final class DiskBuilder extends Builder {
   private long textOff(final byte[] val, final boolean txt) throws IOException {
     // inline integer values...
     long v = Token.toSimpleInt(val);
-    if(v != Integer.MIN_VALUE) return v | IO.NUMOFF;
+    if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
 
     // compress text
     final byte[] cpr = comp.pack(val);
@@ -182,6 +182,6 @@ public final class DiskBuilder extends Builder {
       v = vallen;
       vallen += vout.writeToken(cpr);
     }
-    return cpr != val ? v | IO.CPROFF : v;
+    return cpr != val ? v | IO.OFFCOMP : v;
   }
 }

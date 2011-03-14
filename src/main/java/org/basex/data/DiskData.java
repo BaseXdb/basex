@@ -177,13 +177,13 @@ public final class DiskData extends Data {
   @Override
   public long textItr(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? o & IO.NUMOFF - 1 : Token.toLong(txt(o, text));
+    return num(o) ? o & IO.OFFNUM - 1 : Token.toLong(txt(o, text));
   }
 
   @Override
   public double textDbl(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? o & IO.NUMOFF - 1 : Token.toDouble(txt(o, text));
+    return num(o) ? o & IO.OFFNUM - 1 : Token.toDouble(txt(o, text));
   }
 
   @Override
@@ -191,7 +191,7 @@ public final class DiskData extends Data {
     final long o = textOff(pre);
     if(num(o)) return Token.numDigits((int) o);
     final DataAccess da = text ? texts : values;
-    final int l = da.readNum(o & IO.CPROFF - 1);
+    final int l = da.readNum(o & IO.OFFCOMP - 1);
     // compressed: next number contains number of compressed bytes
     return cpr(o) ? da.readNum() : l;
   }
@@ -203,7 +203,7 @@ public final class DiskData extends Data {
    * @return text
    */
   private byte[] txt(final long o, final boolean text) {
-    final byte[] txt = (text ? texts : values).readToken(o & IO.CPROFF - 1);
+    final byte[] txt = (text ? texts : values).readToken(o & IO.OFFCOMP - 1);
     return cpr(o) ? comp.unpack(txt) : txt;
   }
 
@@ -213,7 +213,7 @@ public final class DiskData extends Data {
    * @return result of check
    */
   private static boolean num(final long o) {
-    return (o & IO.NUMOFF) != 0;
+    return (o & IO.OFFNUM) != 0;
   }
 
   /**
@@ -222,7 +222,7 @@ public final class DiskData extends Data {
    * @return result of check
    */
   private static boolean cpr(final long o) {
-    return (o & IO.CPROFF) != 0;
+    return (o & IO.OFFCOMP) != 0;
   }
 
   // UPDATE OPERATIONS ========================================================
@@ -231,21 +231,19 @@ public final class DiskData extends Data {
   protected void text(final int pre, final byte[] val, final boolean txt) {
     final long v = Token.toSimpleInt(val);
     if(v != Integer.MIN_VALUE) {
-      textOff(pre, v | IO.NUMOFF);
+      textOff(pre, v | IO.OFFNUM);
     } else {
       final DataAccess da = txt ? texts : values;
-      long o = textOff(pre) & IO.CPROFF - 1;
-
       final byte[] cpr = comp.pack(val);
-      final boolean cp = cpr != val;
 
       // if old text is numeric or longer than the old text and not placed last,
       // append text at the end
-      if(num(o) || cpr.length > da.readNum(o) &&
-          da.readNum(o) + da.pos() != da.length()) o = da.length();
+      long o = textOff(pre) & IO.OFFCOMP - 1;
+      if(num(textOff(pre)) || cpr.length > da.readNum(o) &&
+          da.pos() + da.readNum(o) != da.length()) o = da.length();
 
       da.writeBytes(o, cpr);
-      textOff(pre, o | (cp ? IO.CPROFF : 0));
+      textOff(pre, o | (cpr == val ? 0 : IO.OFFCOMP));
     }
   }
 

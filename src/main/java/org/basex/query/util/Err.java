@@ -96,13 +96,15 @@ public enum Err {
   /** FOFD1340: Evaluation exception. */
   OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  MANSAME(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
+  DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  GRPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
+  GROUPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  GRPSTART(FOFD, 1340, "Picture starts/ends with grouping separator: \"%\"."),
+  GROUPSTART(FOFD, 1340, "Picture begins with grouping separator: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  NODEC(FOFD, 1340, "No mandatory digit specified: \"%\"."),
+  GROUPEND(FOFD, 1340, "Picture ends with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  NOMAND(FOFD, 1340, "No mandatory digit specified: \"%\"."),
   /** FOFD1340: Evaluation exception. */
   PICDATE(FOFD, 1340, "Invalid picture string: \"%\"."),
   /** FOFD1340: Evaluation exception. */

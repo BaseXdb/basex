@@ -92,11 +92,12 @@ final class FNSeq extends Fun {
       if(outer) {
         // skip the subtree of the last added node
         nc.size(0);
+        final DBNode dummy = new DBNode(fst.data, 0);
         final NodeCache src = new NodeCache(nodes, len);
         for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
           final DBNode nd = (DBNode) nodes[next];
-          final int n = nd.pre + data.size(nd.pre, kind(nd.type));
-          p = src.binarySearch(n, next + 1, len - next - 1);
+          dummy.pre = nd.pre + data.size(nd.pre, kind(nd.type));
+          p = src.binarySearch(dummy, next + 1, len - next - 1);
           nc.add(nd);
         }
       } else {
