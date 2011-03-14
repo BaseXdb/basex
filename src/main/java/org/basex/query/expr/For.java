@@ -150,7 +150,6 @@ public final class For extends ForLet {
     return pos == null && score == null && (!one || type.one());
   }
 
-  @Deprecated
   @Override
   public boolean shadows(final Var v) {
     return var.namedLike(v) || pos != null && pos.namedLike(v) ||

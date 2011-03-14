@@ -129,7 +129,6 @@ public final class Let extends ForLet {
     return !score;
   }
 
-  @Deprecated
   @Override
   public boolean shadows(final Var v) {
     return var.namedLike(v);

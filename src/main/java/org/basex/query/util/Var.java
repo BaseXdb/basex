@@ -149,7 +149,6 @@ public final class Var extends ParseExpr {
    * @param v variable
    * @return result of check
    */
-  @Deprecated
   public boolean namedLike(final Var v) {
     return v == this || v.name.eq(name);
   }
