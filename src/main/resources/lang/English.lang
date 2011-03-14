@@ -464,6 +464,12 @@ ad_passno=No password specified.
 ad_admin=Admin user cannot be modified.
 ad_kill=% sessions killed.
 ad_killself='%' cannot kill itself.
+ad_triggerdrop=Trigger '%' dropped.
+ad_triggercreate=Trigger '%' created.
+ad_triggerknown=Trigger '%' exists already.
+ad_triggerno=Trigger '%' is unknown.
+ad_triggeratt=Attached to trigger '%'.
+ad_triggerdet=Detached from trigger '%'.
 
 # General Commands
 gc_setwhich=Unknown option '%'
@@ -522,6 +528,7 @@ ch_create5=creates the specified index
 ch_create6=creates filesystem database [%] for [%]
 ch_create7=(using [%] and [%] if FUSE is activated)
 ch_create8=creates the specified user
+ch_create9=creates the trigger
 ch_check1=Open or create database.
 ch_check2=Opens an existing database or creates a new instance.
 ch_add1=Add document to database.
@@ -546,6 +553,7 @@ ch_drop21=drops the database
 ch_drop22=drops the specified index
 ch_drop23=drops the specified user (on a database).
 ch_drop24=drops the database backup
+ch_drop25=drops the trigger
 ch_alter1=Alter user password or database name.
 ch_alter2=Alters user password or database name:
 ch_alterpw=alters the password of a user.
@@ -574,6 +582,7 @@ ch_show22=shows currently opened databases.
 ch_show23=shows current database sessions.
 ch_show24=shows users (on a database).
 ch_show25=shows backups.
+ch_show26=shows triggers.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions (on a database) to a user.
 ch_set1=Set global options.
@@ -594,7 +603,7 @@ ch_password2=Changes the user's password.
 ch_help1=Get help on % commands.
 ch_help2=If [%] is specified, information on the specific\ncommand is printed; otherwise, all commands are listed.
 ch_exit1=Exit application.
-ch_exit2=Exits the % console.
+ch_exit2=Exits %.
 
 # Help Texts
 h_hist=Show input history.

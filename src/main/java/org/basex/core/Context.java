@@ -37,6 +37,9 @@ public final class Context {
   /** Node context. */
   public Nodes current;
 
+  /** Session reference. */
+  public ServerProcess session;
+
   // GUI references
   /** Marked nodes. */
   public Nodes marked;
@@ -64,12 +67,14 @@ public final class Context {
   /**
    * Constructor. {@link #user} reference must be set after calling this.
    * @param ctx parent context
+   * @param s server process
    */
-  public Context(final Context ctx) {
+  public Context(final Context ctx, final ServerProcess s) {
     prop = new Prop(true);
     datas = ctx.datas;
     triggers = ctx.triggers;
     sessions = ctx.sessions;
+    session = s;
     lock = ctx.lock;
     users = ctx.users;
   }

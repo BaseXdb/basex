@@ -21,12 +21,14 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateFS;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.CreateMAB;
+import org.basex.core.cmd.CreateTrigger;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Cs;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropBackup;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
+import org.basex.core.cmd.DropTrigger;
 import org.basex.core.cmd.DropUser;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Export;
@@ -50,6 +52,7 @@ import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowBackups;
 import org.basex.core.cmd.ShowDatabases;
 import org.basex.core.cmd.ShowSessions;
+import org.basex.core.cmd.ShowTriggers;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.query.QueryContext;
@@ -146,6 +149,8 @@ public final class CommandParser extends InputParser {
             return new CreateMAB(string(cmd), name(null));
           case USER:
             return new CreateUser(name(cmd), string(null));
+          case TRIGGER:
+            return new CreateTrigger(name(cmd));
         }
         break;
       case ALTER:
@@ -196,6 +201,8 @@ public final class CommandParser extends InputParser {
             return new DropUser(name(cmd), key(ON, null) ? name(cmd) : null);
           case BACKUP:
             return new DropBackup(name(cmd));
+          case TRIGGER:
+            return new DropTrigger(name(cmd));
         }
         break;
       case OPTIMIZE:
@@ -248,6 +255,8 @@ public final class CommandParser extends InputParser {
             return new ShowUsers(key(ON, null) ? name(cmd) : null);
           case BACKUPS:
             return new ShowBackups();
+          case TRIGGERS:
+            return new ShowTriggers();
           default:
         }
         break;

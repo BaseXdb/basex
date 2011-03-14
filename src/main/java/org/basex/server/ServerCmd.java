@@ -25,7 +25,11 @@ public enum ServerCmd {
   CREATE(8),
   /** Code for adding a document to a database: {name}0{path}0{input}0. */
   ADD(9),
-  /** Code for running a database command: {command} \0. */
+  /** Code for attaching to a trigger: {name}0. */
+  ATTACH(10),
+  /** Code for detaching from a trigger: {name}0. */
+  DETACH(11),
+  /** Code for running a database command: {command}0. */
   CMD(-1);
 
   /** Control code (soon obsolete). */
