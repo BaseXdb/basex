@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -205,11 +206,6 @@ final class FNZip extends Fun {
       if(name.isEmpty()) {
         // path ends with slash: create directory
         path = createEntries(it, createDir(par, dir), dir);
-      } else if(i != -1 && pref.isEmpty()) {
-        // path contains new directory: create file
-        final FElem e = createDir(par, dir);
-        createFile(e, name);
-        path = createEntries(it, e, dir);
       } else {
         // create file
         createFile(par, name);
@@ -465,16 +461,25 @@ final class FNZip extends Fun {
   private StringList paths(final ZipFile zf) {
     // traverse all zip entries and create intermediate map,
     // as zip entries are not sorted
-    final StringList paths = new StringList();
+    //final StringList paths = new StringList();
+    final TreeSet<String> paths = new TreeSet<String>();
+
     final Enumeration<? extends ZipEntry> en = zf.entries();
     // loop through all files
     while(en.hasMoreElements()) {
       final ZipEntry ze = en.nextElement();
       final String name = ze.getName();
+      int i = name.lastIndexOf('/');
+      // add directory
+      if(i > -1 && i + 1 < name.length()) paths.add(name.substring(0, i + 1));
       paths.add(name);
     }
-    paths.sort(true, true);
-    return paths;
+    final StringList sl = new StringList();
+    final Iterator<String> it = paths.iterator();
+    while(it.hasNext()) sl.add(it.next());
+
+    //paths.sort(true, true);
+    return sl;
   }
 
   /**

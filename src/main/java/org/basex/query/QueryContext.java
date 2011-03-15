@@ -368,7 +368,7 @@ public final class QueryContext extends Progress {
    * Returns an IO representation of the base uri.
    * @return IO reference
    */
-  IO base() {
+  public IO base() {
     return baseURI != Uri.EMPTY ? IO.get(string(baseURI.atom())) : null;
   }
 
