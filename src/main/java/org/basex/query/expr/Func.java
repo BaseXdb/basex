@@ -86,7 +86,7 @@ public final class Func extends Single {
     ctx.value = null;
     final Value v = expr.value(ctx);
     ctx.value = cv;
-    return (ret != null ? type.cast(v, ctx, input) : v).iter(ctx);
+    return (ret != null ? ret.cast(v, ctx, input) : v).iter(ctx);
   }
 
   @Override

@@ -2970,7 +2970,7 @@ public class QueryParser extends InputParser {
   private Var checkVar(final QNm name, final Err err)
       throws QueryException {
     final Var v = ctx.vars.get(name);
-    if(v == null) error(err, name);
+    if(v == null) error(err, '$' + string(name.atom()));
     return v;
   }
 
