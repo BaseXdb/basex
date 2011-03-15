@@ -92,7 +92,7 @@ public final class FunJava extends Arr {
     } catch(final InvocationTargetException ex) {
       JAVAERR.thrw(input, ex.getCause());
     } catch(final Exception ex) {
-      FUNJAVA.thrw(input, desc());
+      FUNJAVA.thrw(input, desc(), arg);
     }
     return result == null ? Empty.ITER : iter(result, ctx);
   }
