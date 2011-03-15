@@ -164,7 +164,8 @@ public class BaseXText extends BaseXPanel {
     final byte[] tt = text.text;
     boolean eq = true;
     for(int r = 0; r < s; ++r) {
-      if(t[r] != 0x0D) t[ns++] = t[r];
+      final byte b = t[r];
+      if(b < 0 || b >= ' ' || ws(b)) t[ns++] = t[r];
       eq &= ns < ts && ns < s && t[ns] == tt[ns];
     }
     eq &= ns == ts;

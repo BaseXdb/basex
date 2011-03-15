@@ -157,11 +157,12 @@ public final class HttpClient {
    * @throws QueryException query exception
    */
   private void readRequestAttributes(final ANode request)
-      throws QueryException {
+  throws QueryException {
 
     final AxisIter ai = request.atts();
     ANode n = null;
-    while((n = ai.next()) != null) reqAttrs.add(n.nname(), n.atom());
+    while((n = ai.next()) != null)
+      reqAttrs.add(n.nname(), n.atom());
 
     // If authorization is to be sent, check that both user name and password
     // are provided
@@ -256,8 +257,8 @@ public final class HttpClient {
     conn.setRequestMethod(string(reqAttrs.get(METHOD)).toUpperCase());
     if(reqAttrs.get(TIMEOUT) != null)
       conn.setConnectTimeout(parseInt(string(reqAttrs.get(TIMEOUT))));
-    if(reqAttrs.get(REDIR) != null)
-      setFollowRedirects(Bln.parse(reqAttrs.get(REDIR), info));
+    if(reqAttrs.get(REDIR) != null) setFollowRedirects(Bln.parse(
+        reqAttrs.get(REDIR), info));
   }
 
   /**
@@ -266,7 +267,7 @@ public final class HttpClient {
    * @throws QueryException query exception
    */
   private void setHttpRequestHeaders(final HttpURLConnection conn)
-    throws QueryException {
+      throws QueryException {
 
     final byte[][] headerNames = headers.keys();
 
@@ -275,12 +276,10 @@ public final class HttpClient {
           string(headers.get(headerName)));
     // HTTP Basic Authentication
     final byte[] sendAuth = reqAttrs.get(SENDAUTH);
-    if(sendAuth != null && Bln.parse(sendAuth, info))
-      conn.setRequestProperty(
-          AUTH,
-          encodeCredentials(
-              string(reqAttrs.get(USRNAME)),
-              string(reqAttrs.get(PASSWD))));
+    if(sendAuth != null && Bln.parse(sendAuth, info)) conn.setRequestProperty(
+        AUTH,
+        encodeCredentials(string(reqAttrs.get(USRNAME)),
+            string(reqAttrs.get(PASSWD))));
   }
 
   /**
@@ -318,8 +317,7 @@ public final class HttpClient {
             || eq(mediaType, TXT_XML) || eq(mediaType, TXT_EXT_XML)
             || endsWith(mediaType, MIME_XML_SUFFIX)) sb.append(M_XML);
         else if(eq(mediaType, TXT_HTML)) sb.append(M_HTML);
-        else if(startsWith(mediaType, MIME_TEXT_PREFIX))
-          sb.append(M_TEXT);
+        else if(startsWith(mediaType, MIME_TEXT_PREFIX)) sb.append(M_TEXT);
         else sb.append(M_XML);
       } else {
         sb.append(method);
@@ -333,7 +331,8 @@ public final class HttpClient {
         final XMLSerializer xml = new XMLSerializer(out, serialProp);
         final AxisIter ai = body.children();
         ANode child = null;
-        while((child = ai.next()) != null) child.serialize(xml);
+        while((child = ai.next()) != null)
+          child.serialize(xml);
       } finally {
         out.close();
       }
@@ -366,7 +365,8 @@ public final class HttpClient {
 
     // Get response content if required
     if(attrStatusOnly == null || !Bln.parse(attrStatusOnly, info))
-      iter.add(setResultContent(conn, ctx));
+      iter.add(setResultContent(
+        conn, ctx));
     return iter;
   }
 
@@ -376,8 +376,8 @@ public final class HttpClient {
    * @param par parent node
    * @throws IOException I/O exception
    */
-  private void setResponseAttrs(final HttpURLConnection conn,
-      final FElem par) throws IOException {
+  private void setResponseAttrs(final HttpURLConnection conn, final FElem par)
+      throws IOException {
 
     final FAttr attrStatus = new FAttr(new QNm(STATUS, QueryTokens.HTTPURI),
         token(conn.getResponseCode()), par);
@@ -410,8 +410,8 @@ public final class HttpClient {
 
     // Set body child
     final FElem elem = new FElem(new QNm(BODY), par);
-    elem.atts.add(new FAttr(new QNm(MEDIATYPE),
-        token(conn.getContentType()), elem));
+    elem.atts.add(new FAttr(new QNm(MEDIATYPE), token(conn.getContentType()),
+        elem));
     par.children.add(elem);
   }
 
@@ -427,23 +427,25 @@ public final class HttpClient {
       final QueryContext ctx) throws IOException, QueryException {
 
     final byte[] contentType = reqAttrs.get(OVERMEDIATYPE) == null ?
-        token(conn.getContentType()) : reqAttrs.get(OVERMEDIATYPE);
+        token(conn.getContentType())
+        : reqAttrs.get(OVERMEDIATYPE);
 
-    if(eq(contentType, TXT_XML) || eq(contentType, TXT_EXT_XML)
-        || eq(contentType, APPL_XML) || eq(contentType, APPL_EXT_XML)
+    if(startsWith(contentType, TXT_XML) || startsWith(contentType, TXT_EXT_XML)
+        || startsWith(contentType, APPL_XML)
+        || startsWith(contentType, APPL_EXT_XML)
         || endsWith(contentType, MIME_XML_SUFFIX))
-      // Parse XML
-      return processXML(conn, ctx);
-    else if(eq(contentType, TXT_HTML)) {
+    // Parse XML
+    return processXML(conn, ctx);
+    else if(startsWith(contentType, TXT_HTML)) {
       // Parse HTML
       if(!HTMLParser.available()) throw HTMLERR.thrw(info);
       return processHTML(conn, ctx);
     } else if(startsWith(contentType, MIME_TEXT_PREFIX))
-      // Process text content
-      return Str.get(readHttpContent(conn));
+    // Process text content
+    return Str.get(readHttpContent(conn));
     else
-      // TODO: parse as binary type
-      return null;
+    // TODO: parse as binary type
+    return null;
   }
 
   /**
@@ -486,23 +488,12 @@ public final class HttpClient {
       throws IOException {
 
     final InputStream input = conn.getInputStream();
-    final int len = conn.getContentLength();
-
-    if(len != -1) {
-      final byte[] content = new byte[len];
-      try {
-        input.read(content);
-      } finally {
-        input.close();
-      }
-      return content;
-    }
-
     final ByteList bl = new ByteList();
     final BufferedInputStream bis = new BufferedInputStream(input);
     int i = 0;
     try {
-      while((i = bis.read()) != -1) bl.add(i);
+      while((i = bis.read()) != -1)
+        bl.add(i);
     } finally {
       bis.close();
     }

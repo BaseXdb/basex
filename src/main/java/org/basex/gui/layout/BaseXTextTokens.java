@@ -252,11 +252,12 @@ public final class BaseXTextTokens {
     int cc = 0;
     final int cl = str.length();
     for(int c = 0; c < cl; ++c) {
-      final int ch = str.charAt(c);
-      if(ch != '\r') {
-        tb.add(ch);
-        ++cc;
-      }
+      // ignore invalid characters
+      int ch = str.charAt(c);
+      if(ch == '\r') continue;
+      if(ch < ' ' && !ws(ch)) ch = '\n';
+      tb.add(ch);
+      ++cc;
     }
     tb.add(text, ps, size);
     text = tb.finish();
