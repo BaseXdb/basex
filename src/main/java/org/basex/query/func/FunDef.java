@@ -163,7 +163,7 @@ public enum FunDef {
   MAP(FNURI, FNFunc.class, 2, 2, "map(function,seq)",
       FunType.get(new SeqType[]{ ITEM }, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  MAPPAIRS(FNURI, FNFunc.class, 3, 3, "map-pairs(function, seq1, seq2)",
+  MAPPAIRS(FNURI, FNFunc.class, 3, 3, "map-pairs(function,seq1,seq2)",
       FunType.get(new SeqType[]{ ITEM, ITEM }, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM,
       ITEM_ZM),
   /** XQuery function. */
@@ -175,11 +175,20 @@ public enum FunDef {
       FunType.get(new SeqType[]{ ITEM, ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM,
       ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  PARTAPP(FNURI, FNFunc.class, 2, 3, "partial-apply(function, arg[, pos])",
+  PARTAPP(FNURI, FNFunc.class, 2, 3, "partial-apply(function,arg[,pos])",
       FUN_O, ITEM_ZM, ITR, FUN_O),
   /** XQuery function. */
-  SORTWITH(HOFURI, FNFunc.class, 2, 2, "sort-with(lt-fun, seq)",
+  SORTWITH(HOFURI, FNFunc.class, 2, 2, "sort-with(lt-fun,seq)",
       FunType.get(new SeqType[]{ ITEM, ITEM }, BLN).seq(), ITEM_ZM, ITEM_ZM),
+  /** XQuery function. */
+  HOFID(HOFURI, FNFunc.class, 1, 1, "id(expr)", ITEM_ZM, ITEM_ZM),
+  /** XQuery function. */
+  CONST(HOFURI, FNFunc.class, 2, 2, "const(return,ignore)", ITEM_ZM, ITEM_ZM,
+      ITEM_ZM),
+  /** XQuery function. */
+  UNTIL(HOFURI, FNFunc.class, 3, 3, "until(pred,func,start)",
+      FunType.get(new SeqType[]{ ITEM_ZM }, BLN).seq(),
+      FunType.get(new SeqType[]{ ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM),
 
   /* FNGen functions. */
 

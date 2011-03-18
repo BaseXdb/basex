@@ -50,6 +50,9 @@ final class FNFunc extends Fun {
       case FOLDLEFT:  return foldLeft(ctx);
       case FOLDRIGHT: return foldRight(ctx);
       case SORTWITH:  return sortWith(ctx);
+      case HOFID:     return expr[0].iter(ctx);
+      case CONST:     return expr[0].iter(ctx);
+      case UNTIL:     return until(ctx);
       default:
            return super.iter(ctx);
     }
@@ -62,6 +65,8 @@ final class FNFunc extends Fun {
       case FUNCARITY: return Itr.get(getFun(0, FunType.ANY, ctx).arity());
       case FUNCNAME:  return getFun(0, FunType.ANY, ctx).fName();
       case PARTAPP:   return partApp(ctx, ii);
+      case HOFID:     return expr[0].item(ctx, ii);
+      case CONST:     return expr[0].item(ctx, ii);
       default:
         return super.item(ctx, ii);
     }
@@ -234,6 +239,22 @@ final class FNFunc extends Fun {
       throw err.wrapped();
     }
     return items;
+  }
+
+  /**
+   * Applies a function to a start value until the given predicate holds.
+   * @param ctx query context
+   * @return accepted value
+   * @throws QueryException exception
+   */
+  private Iter until(final QueryContext ctx) throws QueryException {
+    final FunItem pred = withArity(0, 1, ctx);
+    final FunItem fun = withArity(1, 1, ctx);
+    Value v = expr[2].value(ctx);
+    while(!checkType(pred.invItem(ctx, input, v), AtomType.BLN).bool(input)) {
+      v = fun.invIter(ctx, input, v).finish();
+    }
+    return v.iter();
   }
 
   /**
