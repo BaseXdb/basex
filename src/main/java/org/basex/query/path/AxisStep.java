@@ -91,12 +91,20 @@ public class AxisStep extends Preds {
     }
 
     // as predicates will not necessarily start from the document node,
-    // a document context item is temporarily set to element
-    final Type ct = ctx.value != null ? ctx.value.type : null;
-    if(ct == Type.DOC) ctx.value.type = Type.ELM;
-
+    // a context item is temporarily treated as element, or set to null
+    final Value cv = ctx.value;
+    final Type ct = cv != null ? cv.type : null;
+    if(ct == Type.DOC) {
+      cv.type = Type.ELM;
+    } else if(ct == Type.SEQ) {
+      ctx.value = null;
+    }
     final Expr e = super.comp(ctx);
-    if(ct != null) ctx.value.type = ct;
+    if(ct != null) {
+      cv.type = ct;
+    } else {
+      ctx.value = cv;
+    }
     ctx.leaf = false;
 
     // return optimized step / don't re-optimize step

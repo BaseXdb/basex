@@ -115,7 +115,7 @@ public final class Var extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter(ctx);
+    return value(ctx).iter();
   }
 
   @Override

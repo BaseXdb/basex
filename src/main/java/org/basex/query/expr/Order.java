@@ -65,7 +65,7 @@ public final class Order extends ParseExpr {
             ir = null;
           } else {
             if(++p == e) return null;
-            ir = vl.get(order[p]).iter(ctx);
+            ir = vl.get(order[p]).iter();
           }
         }
       }

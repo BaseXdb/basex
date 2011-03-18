@@ -291,7 +291,7 @@ public final class QueryContext extends Progress {
       final Value v = iter.finish();
       updates.apply(this);
       if(context.data != null) context.update();
-      return v.iter(this);
+      return v.iter();
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw XPSTACK.thrw(null);
