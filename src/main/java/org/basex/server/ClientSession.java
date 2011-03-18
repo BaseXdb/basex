@@ -50,7 +50,7 @@ public final class ClientSession extends Session {
   /** Socket trigger reference. */
   Socket tsocket;
   /** Socket host name. */
-  String shost;
+  String thost;
   /** Trigger port. */
   int tport = 1985;
 
@@ -112,9 +112,7 @@ public final class ClientSession extends Session {
       final String pw, final OutputStream output) throws IOException {
 
     super(output);
-    this.shost = host;
-    // initialize trigger notifications
-    this.tn = new HashMap<String, TriggerNotification>();
+    thost = host;
     // 5 seconds timeout
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
@@ -172,8 +170,10 @@ public final class ClientSession extends Session {
       send(name);
       final BufferInput bi = new BufferInput(sin);
       if(tsocket == null) {
+        // initialize trigger notifications
+        this.tn = new HashMap<String, TriggerNotification>();
         tsocket = new Socket();
-        tsocket.connect(new InetSocketAddress(shost, tport), 5000);
+        tsocket.connect(new InetSocketAddress(thost, tport), 5000);
         String id = bi.readString();
         PrintOutput tout = PrintOutput.get(tsocket.getOutputStream());
         tout.print(id);
@@ -218,7 +218,9 @@ public final class ClientSession extends Session {
     try {
       sout.write(11);
       send(name);
-      read();
+      final BufferInput bi = new BufferInput(sin);
+      info = bi.readString();
+      if(!ok(bi)) throw new IOException(info);
       tn.remove(name);
     } catch(IOException e) {
       throw new BaseXException(e);
@@ -248,13 +250,6 @@ public final class ClientSession extends Session {
     while((l = input.read()) != -1) sout.write(l);
     sout.write(0);
     sout.flush();
-  }
-
-  /**
-   * Reads input.
-   * @throws IOException I/O exception
-   */
-  private void read() throws IOException {
     final BufferInput bi = new BufferInput(sin);
     info = bi.readString();
     if(!ok(bi)) throw new IOException(info);
