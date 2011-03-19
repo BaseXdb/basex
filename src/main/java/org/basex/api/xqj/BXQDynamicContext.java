@@ -228,8 +228,7 @@ abstract class BXQDynamicContext extends BXQAbstract
         qp.context(vl);
       } else {
         if(this instanceof BXQPreparedExpression) {
-          Var vr = new Var(new QNm(Token.token(var.getLocalPart())));
-          vr = qp.ctx.vars.get(vr);
+          final Var vr = qp.ctx.vars.get(new QNm(var));
           if(vr == null) throw new BXQException(VAR, var);
           vr.bind(vl, null);
         } else {
