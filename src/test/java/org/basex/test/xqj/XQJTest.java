@@ -556,4 +556,29 @@ public final class XQJTest extends TestCase {
     } catch(final XQException ex) { /* ignored */
     }
   }
+
+  /**
+   * Bind variable before parsing the query, using a wrong type.
+   * @throws Exception exception
+   */
+  @Test
+  public void testBindTwice() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+    XQResultSequence xqs;
+
+    try {
+      expr.bindInt(new QName("v"), 1, null);
+      xqs = expr.executeQuery("declare variable $v external; $v");
+      xqs.next();
+      assertTrue(xqs.getInt() == 1);
+
+      expr.bindInt(new QName("v"), 2, null);
+      xqs = expr.executeQuery("declare variable $v external; $v");
+      xqs.next();
+      assertTrue(xqs.getInt() == 2);
+    } catch(final XQException ex) { /* ignored */
+      fail(ex.toString());
+    }
+  }
 }
