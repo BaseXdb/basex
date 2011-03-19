@@ -7,6 +7,8 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Replace element content primitive.
@@ -55,5 +57,10 @@ public final class ReplaceElemContent extends UpdatePrimitive {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.REPLACEELEMCONT;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + Token.string(txt) + "]";
   }
 }

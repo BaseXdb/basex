@@ -677,22 +677,20 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void varDecl() throws QueryException {
-    final QNm name = varName();
-    if(module != null && !name.uri().eq(module.uri())) error(MODNS, name);
+    final Var v = typedVar();
+    if(module != null && !v.name.uri().eq(module.uri())) error(MODNS, v);
 
-    final SeqType t = wsConsumeWs(AS) ? sequenceType() : null;
-    final Var v = new Var(input(), name, t);
-
+    // [LW] check uniqueness of variables
     // check if variable has already been declared
-    final Var o = ctx.vars.get(v);
+    final Var o = ctx.vars.get(v.name);
     // throw no error if a variable has been externally bound
     if(o != null && o.declared) error(VARDEFINE, o);
     (o != null ? o : v).declared = true;
 
     if(wsConsumeWs(EXTERNAL)) {
-      if(o != null && t != null) {
+      if(o != null && v.type != null) {
         // bind value with new type
-        o.type = t;
+        o.type = v.type;
         o.value = null;
       }
       // bind default value
@@ -706,6 +704,16 @@ public class QueryParser extends InputParser {
 
     // bind variable if not done yet
     if(o == null) ctx.vars.setGlobal(v);
+  }
+
+  /**
+   * Parses a variable declaration with optional type.
+   * @return parsed variable
+   * @throws QueryException query exception
+   */
+  private Var typedVar() throws QueryException {
+    return Var.create(ctx, input(), varName(),
+        wsConsumeWs(AS) ? sequenceType() : null);
   }
 
   /**
@@ -739,11 +747,9 @@ public class QueryParser extends InputParser {
         if(args.length == 0) break;
         check('$');
       }
-      final QNm arg = varName();
-      final SeqType argType = wsConsumeWs(AS) ? sequenceType() : null;
-      final Var var = new Var(input(), arg, argType);
+      final Var var = typedVar();
       ctx.vars.add(var);
-      for(final Var v : args) if(v.name.eq(arg)) error(FUNCDUPL, arg.atom());
+      for(final Var v : args) if(v.name.eq(var.name)) error(FUNCDUPL, var);
 
       args = Array.add(args, var);
       if(!consume(',')) break;
@@ -752,8 +758,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAR2);
 
     final SeqType type = wsConsumeWs(AS) ? sequenceType() : null;
-    final Func func = new Func(input(),
-        new Var(input(), name, type), args, true);
+    final Func func = new Func(input(), name, args, type, true);
     func.updating = up;
 
     ctx.funcs.add(func, this);
@@ -889,12 +894,12 @@ public class QueryParser extends InputParser {
         final QNm name = varName();
         final SeqType type = score ? SeqType.DBL :
           wsConsumeWs(AS) ? sequenceType() : null;
-        final Var var = new Var(input(), name, type);
+        final Var var = Var.create(ctx, input(), name, type);
 
         final Var ps = fr && wsConsumeWs(AT) ?
-            new Var(input(), varName(), SeqType.ITR) : null;
+            Var.create(ctx, input(), varName(), SeqType.ITR) : null;
         final Var sc = fr && wsConsumeWs(SCORE) ?
-            new Var(input(), varName(), SeqType.DBL) : null;
+            Var.create(ctx, input(), varName(), SeqType.DBL) : null;
 
         wsCheck(fr ? IN : ASSIGN);
         final Expr e = check(single(), NOVARDECL);
@@ -954,8 +959,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Var[] groupSpec(final Var[] group) throws QueryException {
-    final Var v = new Var(input(), varName());
-    if(null == ctx.vars.get(v)) error(GVARNOTDEFINED, v);
+    final Var v = checkVar(varName(), GVARNOTDEFINED);
     if(wsConsumeWs(COLLATION)) {
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
@@ -975,8 +979,7 @@ public class QueryParser extends InputParser {
     final int s = ctx.vars.size();
     For[] fl = {};
     do {
-      final Var var = new Var(input(), varName(), wsConsumeWs(AS) ?
-          sequenceType() : null);
+      final Var var = typedVar();
       wsCheck(IN);
       final Expr e = check(single(), NOSOME);
       ctx.vars.add(var);
@@ -1044,11 +1047,11 @@ public class QueryParser extends InputParser {
         name = varName();
         if(cs) wsCheck(AS);
       }
-      final Var var = new Var(input(), name, cs ? sequenceType() : null);
-      if(name != null) ctx.vars.add(var);
+      final Var v = Var.create(ctx, input(), name, cs ? sequenceType() : null);
+      if(name != null) ctx.vars.add(v);
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
-      cases = Array.add(cases, new TypeCase(input(), var, ret));
+      cases = Array.add(cases, new TypeCase(input(), v, ret));
       ctx.vars.reset(s);
     } while(cs);
     if(cases.length == 1) error(NOTYPESWITCH);
@@ -1616,12 +1619,7 @@ public class QueryParser extends InputParser {
     skipWS();
     final char c = curr();
     // variables
-    if(c == '$') {
-      final Var v = new Var(input(), varName());
-      final Var var = ctx.vars.get(v);
-      if(var == null) error(VARUNDEF, v);
-      return new VarRef(input(), var);
-    }
+    if(c == '$') return new VarRef(input(), checkVar(varName(), VARUNDEF));
     // parentheses
     if(c == '(' && next() != '#') return parenthesized();
     // direct constructor
@@ -2311,7 +2309,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Var[] addVar(final Var[] vars) throws QueryException {
-    final Var v = new Var(input(), varName());
+    final Var v = Var.create(ctx, input(), varName());
     for(final Var vr : vars) if(v.name.eq(vr.name)) error(VARDEFINED, v);
     ctx.vars.add(v);
     final Var[] var = Array.add(vars, v);
@@ -2782,7 +2780,7 @@ public class QueryParser extends InputParser {
 
     Let[] fl = {};
     do {
-      final Var v = new Var(input(), varName());
+      final Var v = Var.create(ctx, input(), varName());
       wsCheck(ASSIGN);
       final Expr e = check(single(), INCOMPLETE);
       ctx.vars.add(v);
@@ -2959,6 +2957,21 @@ public class QueryParser extends InputParser {
    */
   private void wsCheck(final String s) throws QueryException {
     if(!wsConsume(s)) error(WRONGCHAR, s, found());
+  }
+
+  /**
+   * Checks if a referenced variable is defined and throws the specified error
+   * if not.
+   * @param name variable name
+   * @param err error to throw
+   * @return referenced variable
+   * @throws QueryException if the variable isn't defined
+   */
+  private Var checkVar(final QNm name, final Err err)
+      throws QueryException {
+    final Var v = ctx.vars.get(name);
+    if(v == null) error(err, '$' + string(name.atom()));
+    return v;
   }
 
   /**

@@ -56,7 +56,7 @@ public final class FuncCall extends Arr {
     if(func.expr.value() && values()) {
       // evaluate arguments to catch cast exceptions
       for(int a = 0; a < expr.length; ++a) func.args[a].bind(expr[a], ctx);
-      ctx.compInfo(OPTINLINE, func.var.name.atom());
+      ctx.compInfo(OPTINLINE, func.name.atom());
       return func.value(ctx);
     }
     // User-defined functions are not pre-evaluated to avoid various issues
