@@ -24,18 +24,19 @@ import org.basex.util.InputInfo;
 public abstract class Expr extends ExprInfo {
   /** Flags that influence query compilation. */
   public enum Use {
-    /** Expression depends on context and cannot be rewritten in all cases
-     *  (e.g.: context node, or non-deterministic expression). */
+    /** Expression depends on context and cannot be rewritten in all cases.
+     * Examples: context node, non-deterministic expressions such as
+     *  math:random(). */
     CTX,
     /** Fragment constructors, which will create unique fragments and
      *  thus cannot be pre-evaluated.  */
     CNS,
-    /** Expression evaluates context position (e.g.: position() and last()
-     *  functions). */
+    /** Expression evaluates context position.
+     * Examples: position() and last() functions. */
     POS,
     /** Expression performs updates. */
     UPD,
-    /** Expression references a variable (e.g. {@link VarRef}). */
+    /** Expression references a variable. Example: {@link VarRef} instance. */
     VAR,
     /** XQuery 3.0 expression. */
     X30,

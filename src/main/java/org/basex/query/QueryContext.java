@@ -76,7 +76,7 @@ public final class QueryContext extends Progress {
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
 
-  /** Reference to the root expression. */
+  /** Root expression of the query. */
   public Expr root;
   /** Current context value. */
   public Value value;
@@ -139,6 +139,9 @@ public final class QueryContext extends Progress {
   /** Compilation flag: GFLWOR clause performs grouping. */
   public boolean grouping;
 
+  /** Counter for variable IDs. */
+  public volatile int varIDs;
+
   /** List of modules. */
   final StringList modules = new StringList();
   /** List of loaded modules. */
@@ -147,9 +150,6 @@ public final class QueryContext extends Progress {
   SerializerProp serProp;
   /** Initial context set (default: null). */
   Nodes nodes;
-
-  /** Counter for unique variable names. */
-  private Integer uniqueVars = 0;
 
   /** Initial context value type. */
   SeqType initType;
@@ -298,21 +298,10 @@ public final class QueryContext extends Progress {
       final Value v = iter.finish();
       updates.apply(this);
       if(context.data != null) context.update();
-      return v.iter(this);
+      return v.iter();
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw XPSTACK.thrw(null);
-    }
-  }
-
-  /**
-   * Creates a variable with a unique name.
-   * @param ii input info
-   * @return unique variable
-   */
-  public Var unique(final InputInfo ii) {
-    synchronized(uniqueVars) {
-      return new Var(ii, new QNm(Token.token(uniqueVars++)));
     }
   }
 
@@ -339,6 +328,16 @@ public final class QueryContext extends Progress {
   public Iter iter(final Expr e) throws QueryException {
     checkStop();
     return e.iter(this);
+  }
+
+  /**
+   * Creates a variable with a unique, non-clashing variable name.
+   * @param ii input info
+   * @param t type
+   * @return variable
+   */
+  public Var uniqueVar(final InputInfo ii, final SeqType t) {
+    return Var.create(this, ii, new QNm(Token.token(varIDs)), t);
   }
 
   /**
@@ -386,7 +385,7 @@ public final class QueryContext extends Progress {
    * Returns an IO representation of the base uri.
    * @return IO reference
    */
-  IO base() {
+  public IO base() {
     return baseURI != Uri.EMPTY ? IO.get(string(baseURI.atom())) : null;
   }
 

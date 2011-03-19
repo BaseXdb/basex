@@ -26,7 +26,7 @@ public final class GUIProp extends AProp {
   /** Font TYPE = plain, bold, italics). */
   public static final Object[] FONTTYPE = { "FONTTYPE", 0 };
   /** Font size. */
-  public static final Object[] FONTSIZE = { "FONTSIZE", 12 };
+  public static final Object[] FONTSIZE = { "FONTSIZE", 13 };
 
   /** Red GUI color factor. */
   public static final Object[] COLORRED = { "COLORRED", 18 };

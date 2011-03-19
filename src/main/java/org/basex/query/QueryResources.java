@@ -210,7 +210,7 @@ public final class QueryResources {
     // collection reference are equal, and if first item is a document node
     final Value val = ctx.value;
     return globalData && val.sameAs(coll[0]) && val.size() != 0 &&
-      (val.item() ? (Item) val : val.iter(ctx).next()).type == NodeType.DOC;
+      (val.item() ? (Item) val : val.iter().next()).type == NodeType.DOC;
   }
 
   /**

@@ -55,11 +55,7 @@ public class FunItem extends Item {
       final VarList cl) {
     this(null, arg, body, t);
     if(cl != null)
-      for(int i = 0; i < cl.size; i++) {
-        // check for shadowing
-        for(final Var v : vars) if(cl.vars[i].eq(v)) continue;
-        closure.set(cl.vars[i].copy());
-      }
+      for(int i = 0; i < cl.size; i++) closure.set(cl.vars[i].copy());
   }
 
   /**
@@ -166,7 +162,6 @@ public class FunItem extends Item {
 
   @Override
   public int count(final Var v) {
-    for(final Var v2 : vars) if(v.eq(v2)) return 0;
     return expr.count(v);
   }
 }

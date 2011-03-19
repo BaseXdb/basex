@@ -117,4 +117,7 @@ public abstract class UpdatePrimitive {
     d.delete(b);
     return true;
   }
+
+  @Override
+  public abstract String toString();
 }

@@ -94,8 +94,7 @@ final class FNFunc extends Fun {
     vals[(int) pos] = v;
     for(int i = 0, j = 0; i < arity - 1; i++, j++) {
       if(i == pos) j++;
-      vars[i] = Var.unique(ii);
-      vars[i].type = ft.args[j];
+      vars[i] = ctx.uniqueVar(ii, ft.args[j]);
       vals[j] = new VarRef(ii, vars[i]);
     }
 

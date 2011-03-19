@@ -24,13 +24,13 @@ public class InlineFunc extends Func {
   /**
    * Constructor.
    * @param ii input info
-   * @param ret return type
+   * @param r return type
    * @param argv arguments
    * @param body function body
    */
-  public InlineFunc(final InputInfo ii, final SeqType ret, final Var[] argv,
+  public InlineFunc(final InputInfo ii, final SeqType r, final Var[] argv,
       final Expr body) {
-    super(ii, new Var(ii, null, ret), argv, true);
+    super(ii, null, argv, r, true);
     expr = body;
   }
 
@@ -69,21 +69,6 @@ public class InlineFunc extends Func {
   @Override
   public boolean uses(final Use u) {
     return u == Use.X30 || super.uses(u);
-  }
-
-  /**
-   * Checks if the given variable is shadowed by an argument.
-   * @param v variable
-   * @return result of check
-   */
-  private boolean shadowed(final Var v) {
-    for(final Var a : args) if(a.eq(v)) return true;
-    return false;
-  }
-
-  @Override
-  public int count(final Var v) {
-    return shadowed(v) ? 0 : expr.count(v);
   }
 
   @Override

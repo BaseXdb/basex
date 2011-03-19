@@ -5,6 +5,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert into as last primitive.
@@ -52,5 +53,10 @@ public final class InsertInto extends NodeCopy {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.INSERTINTO;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }

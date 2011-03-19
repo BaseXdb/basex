@@ -16,9 +16,6 @@ import org.basex.util.InputInfo;
  */
 public class LitFunc extends Func {
 
-  /** Function name. */
-  private final QNm name;
-
   /**
    * Constructor.
    * @param ii input info
@@ -28,10 +25,9 @@ public class LitFunc extends Func {
    */
   public LitFunc(final InputInfo ii, final QNm n, final TypedFunc f,
       final Var[] arg) {
-    super(ii, new Var(ii, new QNm(), f.ret()), f.type.type(arg), true);
+    super(ii, n, f.type.type(arg), f.ret(), true);
 
     expr = f.fun;
-    name = n;
   }
 
   @Override

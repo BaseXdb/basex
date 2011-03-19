@@ -60,9 +60,9 @@ final class DBPrimitives extends Primitives {
           --p;
         }
         if(par != -1) il.add(par);
-        checkNames(ctx, il.toArray());
+        checkNames(il.toArray());
       } else {
-        if(k == Data.ELEM) checkNames(ctx, pre);
+        if(k == Data.ELEM) checkNames(pre);
         --p;
       }
     }
@@ -70,12 +70,10 @@ final class DBPrimitives extends Primitives {
 
   /**
    * Checks nodes for duplicate attributes and namespace conflicts.
-   * @param ctx query context reference
    * @param pres pre values of nodes to check (in descending order)
    * @throws QueryException query exception
    */
-  private void checkNames(final QueryContext ctx, final int... pres)
-    throws QueryException {
+  private void checkNames(final int... pres) throws QueryException {
     final NamePool pool = new NamePool();
     final IntList il = new IntList();
 
@@ -91,7 +89,12 @@ final class DBPrimitives extends Primitives {
         final int ps = pre + d.attSize(pre, Data.ELEM);
         for(int p = pre + 1; p < ps; ++p) {
           final byte[] nm = d.name(p, Data.ATTR);
-          if(!il.contains(p)) pool.add(new QNm(nm, ctx, null), NodeType.ATT);
+          if(!il.contains(p)) {
+            final QNm name = new QNm(nm);
+            final byte[] uri = d.ns.uri(d.ns.uri(nm, p));
+            if(uri != null) name.uri(uri);
+            pool.add(name, NodeType.ATT);
+          }
         }
       }
     }

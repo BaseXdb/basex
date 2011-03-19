@@ -97,9 +97,9 @@ public final class FunJava extends Arr {
     } catch(final InvocationTargetException ex) {
       JAVAERR.thrw(input, ex.getCause());
     } catch(final Exception ex) {
-      FUNJAVA.thrw(input, desc());
+      FUNJAVA.thrw(input, desc(), arg);
     }
-    return result == null ? Empty.ITER : iter(result, ctx);
+    return result == null ? Empty.ITER : iter(result);
   }
 
   /**
@@ -220,11 +220,10 @@ public final class FunJava extends Arr {
   /**
    * Converts the specified object to an iterator.
    * @param res object
-   * @param ctx query context
    * @return iterator
    */
-  private Iter iter(final Object res, final QueryContext ctx) {
-    if(!res.getClass().isArray()) return new Jav(res).iter(ctx);
+  private Iter iter(final Object res) {
+    if(!res.getClass().isArray()) return new Jav(res).iter();
 
     final ItemCache ir = new ItemCache();
     if(res instanceof boolean[]) {

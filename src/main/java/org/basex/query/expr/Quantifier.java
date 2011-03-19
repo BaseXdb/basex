@@ -97,28 +97,19 @@ public final class Quantifier extends ParseExpr {
   @Override
   public int count(final Var v) {
     int c = 0;
-    for(final ForLet f : fl) {
-      c += f.count(v);
-      if(f.shadows(v)) return c;
-    }
+    for(final ForLet f : fl) c += f.count(v);
     return c + sat.count(v);
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final ForLet f : fl) {
-      if(!f.removable(v)) return false;
-      if(f.shadows(v)) return true;
-    }
+    for(final ForLet f : fl) if(!f.removable(v)) return false;
     return sat.removable(v);
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(final ForLet f : fl) {
-      f.remove(v);
-      if(f.shadows(v)) return this;
-    }
+    for(final ForLet f : fl) f.remove(v);
     sat = sat.remove(v);
     return this;
   }

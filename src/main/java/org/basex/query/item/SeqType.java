@@ -282,7 +282,7 @@ public final class SeqType {
   public Value cast(final Value val, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
-    final Iter iter = val.iter(ctx);
+    final Iter iter = val.iter();
     Item it = iter.next();
     if(it == null) {
       if(mayBeZero()) return Empty.SEQ;

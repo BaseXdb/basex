@@ -389,7 +389,7 @@ public abstract class Formatter extends FormatUtil {
       if(rp == -1) rp = pr.size() - p;
       reg = (pr.size() - p) % rp == 0;
     }
-    int rc = reg ? pr.get(pr.size() - rp) : 0;
+    final int rc = reg ? pr.get(pr.size() - rp) : 0;
     if(!reg) rp = Integer.MAX_VALUE;
 
     // build string representation in a reverse order
@@ -398,12 +398,12 @@ public abstract class Formatter extends FormatUtil {
     int b = s.length - 1, p = pr.size() - 1;
     while(p >= 0 && b >= 0) {
       final int ch = pr.get(p--);
-      if(ch == '#' && (cache.size() % rp) == rp - 1) cache.add(rc);
+      if(ch == '#' && cache.size() % rp == rp - 1) cache.add(rc);
       cache.add(ch == '#' || ch >= z && ch <= z + 9 ? s[b--] - '0' + z : ch);
     }
     // add remaining numbers
     while(b >= 0) {
-      if((cache.size() % rp) == rp - 1) cache.add(rc);
+      if(cache.size() % rp == rp - 1) cache.add(rc);
       cache.add(s[b--] - '0' + z);
     }
     // add remaining modifiers

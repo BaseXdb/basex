@@ -30,7 +30,7 @@ public final class PartFunApp extends Func {
    * @param arg arguments
    */
   public PartFunApp(final InputInfo ii, final TypedFunc fun, final Var[] arg) {
-    super(ii, new Var(ii, new QNm(), fun.ret()), nn(fun.type.type(arg)), true);
+    super(ii, new QNm(), nn(fun.type.type(arg)), fun.ret(), true);
     expr = fun.fun;
   }
 
@@ -42,7 +42,7 @@ public final class PartFunApp extends Func {
    */
   public PartFunApp(final InputInfo ii, final Expr func, final Var[] arg) {
     // [LW] dynamic type propagation
-    super(ii, new Var(ii, new QNm(), func.type()), nn(arg), true);
+    super(ii, new QNm(), nn(arg), func.type(), true);
     expr = func;
   }
 

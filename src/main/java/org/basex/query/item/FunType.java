@@ -151,15 +151,11 @@ public final class FunType implements Type {
    * @return function type
    */
   public static FunType get(final Func f) {
-    try {
-      final SeqType[] at = new SeqType[f.args.length];
-      for(int i = 0; i < at.length; i++)
-        at[i] = f.args[i] == null || f.args[i].type == null ?
-            SeqType.ITEM_ZM : f.args[i].type;
-      return new FunType(at, f.var.type == null ? SeqType.ITEM_ZM : f.var.type);
-    } catch(final NullPointerException npe) {
-      throw npe;
-    }
+    final SeqType[] at = new SeqType[f.args.length];
+    for(int i = 0; i < at.length; i++)
+      at[i] = f.args[i] == null || f.args[i].type == null ?
+          SeqType.ITEM_ZM : f.args[i].type;
+    return new FunType(at, f.ret == null ? SeqType.ITEM_ZM : f.ret);
   }
 
   @Override

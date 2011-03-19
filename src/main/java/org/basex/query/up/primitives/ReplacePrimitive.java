@@ -9,6 +9,7 @@ import org.basex.query.item.NodeType;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Replace primitive.
@@ -57,5 +58,10 @@ public final class ReplacePrimitive extends NodeCopy {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.REPLACENODE;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }

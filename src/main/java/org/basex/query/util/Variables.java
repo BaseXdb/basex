@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
+import org.basex.query.item.QNm;
 
 /**
  * Container for all global and local variables that are specified in the
@@ -56,9 +57,19 @@ public final class Variables extends ExprInfo {
    * @param var variable
    * @return variable
    */
-  public Var get(final Var var) {
+  public Var get(final QNm var) {
     final Var v = local.get(var);
     return v != null ? v : global.get(var);
+  }
+
+  /**
+   * Finds the variable with the specified name.
+   * @param name variable name
+   * @return variable
+   */
+  public Var get(final Var name) {
+    final Var v = local.get(name);
+    return v != null ? v : global.get(name);
   }
 
   /**

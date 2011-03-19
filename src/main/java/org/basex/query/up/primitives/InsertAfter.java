@@ -5,6 +5,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert after primitive.
@@ -42,5 +43,10 @@ public final class InsertAfter extends NodeCopy {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.INSERTAFTER;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }
