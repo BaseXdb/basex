@@ -20,7 +20,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
-import org.basex.util.Token;
+import static org.basex.util.Token.*;
 
 /**
  * This class is an entry point for evaluating XQuery implementations.
@@ -125,7 +125,7 @@ public final class QueryProcessor extends Progress {
 
     Object obj = o;
     if(t != null && !t.isEmpty()) {
-      final QNm type = new QNm(Token.token(t));
+      final QNm type = new QNm(token(t));
       if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
       final Type typ = Type.find(type, true);
       if(typ != null) obj = typ.e(o, null);
@@ -145,14 +145,16 @@ public final class QueryProcessor extends Progress {
   public void bind(final String n, final Object o) throws QueryException {
     final Expr ex = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
     // remove optional $ prefix
-    final byte[] nm = Token.token(n.indexOf('$') == 0 ? n.substring(1) : n);
-    Var var = new Var(new QNm(nm)).bind(ex, ctx);
-    final Var gl = ctx.vars.global().get(var);
-    if(gl != null && gl.type != null) {
-      gl.bind(gl.type.type.e(var.item(ctx, null), ctx, null), ctx);
-      var = gl;
+    final QNm nm = new QNm(token(n.indexOf('$') == 0 ? n.substring(1) : n));
+    ctx.ns.uri(nm);
+    final Var gl = ctx.vars.global().get(nm);
+    if(gl == null) {
+      final Var v = Var.create(ctx, null, nm).bind(ex, ctx);
+      ctx.vars.setGlobal(v);
+    } else {
+      gl.bind(gl.type != null ? gl.type.type.e(ex.item(ctx, null),
+          ctx, null) : ex, ctx);
     }
-    ctx.vars.setGlobal(var);
   }
 
   /**

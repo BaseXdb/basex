@@ -64,21 +64,6 @@ public final class TypeCase extends Single {
     return u == Use.VAR || super.uses(u);
   }
 
-  @Override
-  public int count(final Var v) {
-    return var.name == null || !var.eq(v) ? super.count(v) : 0;
-  }
-
-  @Override
-  public boolean removable(final Var v) {
-    return var.name != null && var.eq(v) || super.removable(v);
-  }
-
-  @Override
-  public Expr remove(final Var v) {
-    return var.name != null && var.eq(v) ? this : super.remove(v);
-  }
-
   /**
    * Evaluates the expression.
    * @param ctx query context
