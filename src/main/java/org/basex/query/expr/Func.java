@@ -79,7 +79,7 @@ public final class Func extends Single {
     ctx.value = null;
     final Value v = expr.value(ctx);
     ctx.value = cv;
-    return (var.type != null ? var.type.cast(v, ctx, input) : v).iter(ctx);
+    return (var.type != null ? var.type.cast(v, ctx, input) : v).iter();
   }
 
   @Override
