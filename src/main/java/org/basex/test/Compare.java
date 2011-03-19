@@ -14,8 +14,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Compare {
-  /** XSLT flag. */
-  private static final boolean XSLTMODE = false;
+  /** XSLT flag, not final to prevent dead-code warnings. */
+  private static boolean xsltMode;
   /** Verbose mode. */
   private static final boolean VERBOSE = true;
 
@@ -54,7 +54,7 @@ public abstract class Compare {
       "-s", TMPCTX, TMP, "!omit-xml-declaration=yes" }
   };
   /** Selected processors. */
-  private static final String[][] PROCS = XSLTMODE ? XSLTPROCS : XQUERYPROCS;
+  private static final String[][] PROCS = xsltMode ? XSLTPROCS : XQUERYPROCS;
 
   /**
    * Main method of the test class.
@@ -63,7 +63,7 @@ public abstract class Compare {
    */
   public static void main(final String[] args) throws Exception {
     // write temporary XSLT query context to disk
-    if(XSLTMODE) IO.get(TMPCTX).write(Token.token("<x/>"));
+    if(xsltMode) IO.get(TMPCTX).write(Token.token("<x/>"));
 
     // loop through all queries
     final BufferedReader br = new BufferedReader(
@@ -96,7 +96,7 @@ public abstract class Compare {
     }
 
     // write XQuery or XSLT to temporary file
-    IO.get(TMP).write(XSLTMODE ? Util.inf(XSLT, query) : Token.token(query));
+    IO.get(TMP).write(xsltMode ? Util.inf(XSLT, query) : Token.token(query));
 
     boolean same = true;
     for(final String[] proc : PROCS) {
