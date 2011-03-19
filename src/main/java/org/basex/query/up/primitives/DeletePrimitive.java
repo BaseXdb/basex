@@ -4,6 +4,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Delete primitive.
@@ -35,5 +36,10 @@ public final class DeletePrimitive extends UpdatePrimitive {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.DELETE;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + "]";
   }
 }

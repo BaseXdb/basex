@@ -8,6 +8,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Rename primitive.
@@ -48,5 +49,10 @@ public final class RenamePrimitive extends NewValue {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.RENAME;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + name + "]";
   }
 }
