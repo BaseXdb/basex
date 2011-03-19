@@ -99,28 +99,19 @@ public final class Transform extends Arr {
   @Override
   public int count(final Var v) {
     int c = 0;
-    for(final Let l : copies) {
-      c += l.count(v);
-      if(l.shadows(v)) return c;
-    }
+    for(final Let l : copies) c += l.count(v);
     return c + super.count(v);
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final Let c : copies) {
-      if(!c.removable(v)) return false;
-      if(c.shadows(v)) return true;
-    }
+    for(final Let c : copies) if(!c.removable(v)) return false;
     return super.removable(v);
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(final Let c : copies) {
-      c.remove(v);
-      if(c.shadows(v)) return this;
-    }
+    for(final Let c : copies) c.remove(v);
     return super.remove(v);
   }
 

@@ -31,13 +31,13 @@ public final class Var extends ParseExpr {
   public boolean global;
   /** Declaration flag. */
   public boolean declared;
-  /** Variable expressions. */
-  private Expr expr;
-  /** Variable results. */
-  public Value value;
 
   /** Variable ID. */
-  public final int id;
+  private final int id;
+  /** Bound value. */
+  private Value value;
+  /** Bound expression. */
+  private Expr expr;
 
   /**
    * Constructor.
@@ -63,7 +63,7 @@ public final class Var extends ParseExpr {
    */
   public static Var create(final QueryContext ctx, final InputInfo ii,
       final QNm n, final SeqType t) {
-    return new Var(ii, n, t, ctx.nextVarID());
+    return new Var(ii, n, t, ctx.varIDs++);
   }
 
   /**
@@ -75,7 +75,7 @@ public final class Var extends ParseExpr {
    */
   public static Var create(final QueryContext ctx, final InputInfo ii,
       final QNm n) {
-    return new Var(ii, n, null, ctx.nextVarID());
+    return create(ctx, ii, n, null);
   }
 
   /**
@@ -91,6 +91,15 @@ public final class Var extends ParseExpr {
   public Var comp(final QueryContext ctx) throws QueryException {
     if(expr != null) bind(checkUp(expr, ctx).comp(ctx), ctx);
     return this;
+  }
+
+  /**
+   * Sets the specified variable type and resets its value.
+   * @param t type
+   */
+  public void reset(final SeqType t) {
+    type = t;
+    value = null;
   }
 
   /**
@@ -144,17 +153,7 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Compares the variables for reference or name equality, this should only be
-   * used while parsing because it ignores variable IDs.
-   * @param v variable
-   * @return result of check
-   */
-  public boolean namedLike(final Var v) {
-    return v == this || v.name.eq(name);
-  }
-
-  /**
-   * Checks whether the given variable is identical to this one, i.e. hast the
+   * Checks whether the given variable is identical to this one, i.e. has the
    * same ID.
    * @param v variable to check
    * @return {@code true}, if the IDs are equal, {@code false} otherwise
@@ -222,7 +221,7 @@ public final class Var extends ParseExpr {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) {
-      tb.add(DOLLAR).add(name.atom()).addExt("{%}", id);
+      tb.add(DOLLAR).add(name.atom());
       if(type != null) tb.add(" " + AS);
     }
     if(type != null) tb.add(" " + type);

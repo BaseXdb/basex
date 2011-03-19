@@ -680,19 +680,15 @@ public class QueryParser extends InputParser {
     final Var v = typedVar();
     if(module != null && !v.name.uri().eq(module.uri())) error(MODNS, v);
 
-    // [LW] check uniqueness of variables
     // check if variable has already been declared
-    final Var o = ctx.vars.get(v.name);
+    final Var old = ctx.vars.get(v.name);
     // throw no error if a variable has been externally bound
-    if(o != null && o.declared) error(VARDEFINE, o);
-    (o != null ? o : v).declared = true;
+    if(old != null && old.declared) error(VARDEFINE, old);
+    (old != null ? old : v).declared = true;
 
     if(wsConsumeWs(EXTERNAL)) {
-      if(o != null && v.type != null) {
-        // bind value with new type
-        o.type = v.type;
-        o.value = null;
-      }
+      // bind value with new type
+      if(old != null && v.type != null) old.reset(v.type);
       // bind default value
       if(ctx.xquery3 && wsConsumeWs(ASSIGN)) {
         v.bind(check(single(), NOVARDECL), ctx);
@@ -703,7 +699,7 @@ public class QueryParser extends InputParser {
     }
 
     // bind variable if not done yet
-    if(o == null) ctx.vars.setGlobal(v);
+    if(old == null) ctx.vars.setGlobal(v);
   }
 
   /**

@@ -72,7 +72,7 @@ public final class QueryContext extends Progress {
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
 
-  /** Reference to the root expression. */
+  /** Root expression of the query. */
   public Expr root;
   /** Current context value. */
   public Value value;
@@ -135,6 +135,9 @@ public final class QueryContext extends Progress {
   /** Compilation flag: GFLWOR clause performs grouping. */
   public boolean grouping;
 
+  /** Counter for variable IDs. */
+  public volatile int varIDs;
+
   /** List of modules. */
   final StringList modules = new StringList();
   /** List of loaded modules. */
@@ -157,9 +160,6 @@ public final class QueryContext extends Progress {
   private boolean firstOpt = true;
   /** Evaluation flag. */
   private boolean firstEval = true;
-
-  /** Counter for variable IDs. */
-  private volatile int varIDs;
 
   /**
    * Constructor.
@@ -365,14 +365,6 @@ public final class QueryContext extends Progress {
     if(firstEval) info.add(NL + QUERYEVAL + NL);
     info.add(QUERYSEP).add(string).add(NL);
     firstEval = false;
-  }
-
-  /**
-   * Generates the next unique variable ID.
-   * @return variable ID
-   */
-  public int nextVarID() {
-    return varIDs++;
   }
 
   /**

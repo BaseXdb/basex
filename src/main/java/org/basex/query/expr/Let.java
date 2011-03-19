@@ -130,11 +130,6 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public boolean shadows(final Var v) {
-    return var.namedLike(v);
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, score ? Token.token(SCORE) : VAR,
         token(var.toString()));

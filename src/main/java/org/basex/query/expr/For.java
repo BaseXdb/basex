@@ -151,12 +151,6 @@ public final class For extends ForLet {
   }
 
   @Override
-  public boolean shadows(final Var v) {
-    return var.namedLike(v) || pos != null && pos.namedLike(v) ||
-      score != null && score.namedLike(v);
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, VAR, token(var.toString()));
     if(pos != null) ser.attribute(POS, token(pos.toString()));

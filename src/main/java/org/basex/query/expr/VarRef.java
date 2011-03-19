@@ -99,7 +99,6 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(DOLLAR).add(var.name.atom()).addExt("{%}",
-        var.id).toString();
+    return new TokenBuilder(DOLLAR).add(var.name.atom()).toString();
   }
 }
