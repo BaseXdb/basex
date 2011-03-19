@@ -66,37 +66,31 @@ final class IterStreamReader implements XMLStreamReader {
 
   @Override
   public int getAttributeCount() {
-    getAttributes();
-    return (int) atts.size();
+    return (int) attributes().size();
   }
 
   @Override
   public String getAttributeLocalName(final int i) {
-    getAttributes();
-    return string(atts.get(i).nname());
+    return string(attributes().get(i).nname());
   }
 
   @Override
   public QName getAttributeName(final int i) {
-    getAttributes();
-    return atts.get(i).qname().toJava();
+    return attributes().get(i).qname().toJava();
   }
 
   @Override
   public String getAttributeNamespace(final int i) {
-    getAttributes();
-    return string(atts.get(i).qname().uri().atom());
+    return string(attributes().get(i).qname().uri().atom());
   }
 
   @Override
   public String getAttributePrefix(final int i) {
-    getAttributes();
-    return string(atts.get(i).qname().pref());
+    return string(attributes().get(i).qname().pref());
   }
 
   @Override
   public String getAttributeType(final int i) {
-    getAttributes();
     final String name = getAttributeLocalName(i);
     for(final String a : ATTYPES) if(name.equals(a)) return name;
     return "CDATA";
@@ -109,13 +103,11 @@ final class IterStreamReader implements XMLStreamReader {
 
   @Override
   public String getAttributeValue(final int i) {
-    getAttributes();
-    return string(atts.get(i).atom());
+    return string(attributes().get(i).atom());
   }
 
   @Override
   public String getAttributeValue(final String s, final String s1) {
-    getAttributes();
     for(int a = 0; a < atts.size(); ++a) {
       if(!s1.equals(getAttributeLocalName(a))) continue;
       if(s == null || s.equals(getAttributeNamespace(a)))
@@ -124,17 +116,18 @@ final class IterStreamReader implements XMLStreamReader {
     return null;
   }
 
-  /** Retrieves the attributes for the current element. */
-  private void getAttributes() {
-    if(atts != null) return;
-    checkType(START_ELEMENT, ATTRIBUTE);
-    atts = new NodeCache();
-    final AxisIter ai = node.atts();
-    while(true) {
-      final ANode it = ai.next();
-      if(it == null) return;
-      atts.add(it);
+  /**
+   * Caches and returns the attributes for the current element.
+   * @return node cache
+   */
+  private NodeCache attributes() {
+    if(atts == null) {
+      checkType(START_ELEMENT, ATTRIBUTE);
+      atts = new NodeCache();
+      final AxisIter ai = node.atts();
+      for(ANode n; (n = ai.next()) != null;) atts.add(n);
     }
+    return atts;
   }
 
   @Override
