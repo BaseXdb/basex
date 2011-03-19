@@ -199,7 +199,7 @@ final class FNZip extends Fun {
       if(!path.startsWith(pref)) return path;
 
       // current file starts with new directory
-      int i = path.lastIndexOf('/');
+      final int i = path.lastIndexOf('/');
       final String dir = i == -1 ? path : path.substring(0, i);
       final String name = path.substring(i + 1);
 
@@ -469,7 +469,7 @@ final class FNZip extends Fun {
     while(en.hasMoreElements()) {
       final ZipEntry ze = en.nextElement();
       final String name = ze.getName();
-      int i = name.lastIndexOf('/');
+      final int i = name.lastIndexOf('/');
       // add directory
       if(i > -1 && i + 1 < name.length()) paths.add(name.substring(0, i + 1));
       paths.add(name);

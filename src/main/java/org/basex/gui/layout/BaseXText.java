@@ -158,14 +158,14 @@ public class BaseXText extends BaseXPanel {
    * @param s text size
    */
   public final void setText(final byte[] t, final int s) {
-    // remove 0x0Ds (carriage return) and compare old with new string
+    // remove invalid characters and compare old with new string
     int ns = 0;
     final int ts = text.size();
     final byte[] tt = text.text;
     boolean eq = true;
     for(int r = 0; r < s; ++r) {
       final byte b = t[r];
-      if(b < 0 || b >= ' ' || ws(b)) t[ns++] = t[r];
+      if(b < 0 || b >= ' ' || b == 0x09 || b == 0x0A) t[ns++] = t[r];
       eq &= ns < ts && ns < s && t[ns] == tt[ns];
     }
     eq &= ns == ts;
