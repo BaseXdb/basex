@@ -672,7 +672,7 @@ public class QueryParser extends InputParser {
     if(declItem) error(DUPLITEM);
     declItem = true;
 
-    final SeqType st = wsConsumeWs(AS) ? sequenceType() : null;
+    final SeqType st = optAsType();
     if(st != null && st.type == AtomType.EMP) error(NOTYPE, st);
     ctx.initType = st;
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
@@ -716,8 +716,16 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Var typedVar() throws QueryException {
-    return Var.create(ctx, input(), varName(),
-        wsConsumeWs(AS) ? sequenceType() : null);
+    return Var.create(ctx, input(), varName(), optAsType());
+  }
+
+  /**
+   * Parses an optional SeqType declaration.
+   * @return type if preceded by {@code as}, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  private SeqType optAsType() throws QueryException {
+    return wsConsumeWs(AS) ? sequenceType() : null;
   }
 
   /**
@@ -748,8 +756,7 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAR2);
 
-    final SeqType type = wsConsumeWs(AS) ? sequenceType() : null;
-    final Func func = new Func(input(), name, args, type, true);
+    final Func func = new Func(input(), name, args, optAsType(), true);
     func.updating = up;
 
     ctx.funcs.add(func, this);
@@ -907,8 +914,7 @@ public class QueryParser extends InputParser {
         if(comma && !fr) score = wsConsumeWs(SCORE);
 
         final QNm name = varName();
-        final SeqType type = score ? SeqType.DBL :
-          wsConsumeWs(AS) ? sequenceType() : null;
+        final SeqType type = score ? SeqType.DBL : optAsType();
         final Var var = Var.create(ctx, input(), name, type);
 
         final Var ps = fr && wsConsumeWs(AT) ?
@@ -1716,7 +1722,7 @@ public class QueryParser extends InputParser {
       final Var[] args = paramList();
       wsCheck(PAR2);
 
-      final SeqType type = wsConsume(AS) ? sequenceType() : null;
+      final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
       ctx.vars.reset(s);
 
@@ -1733,7 +1739,6 @@ public class QueryParser extends InputParser {
       if(name.ns()) ctx.ns.uri(name);
       else name.uri(ctx.nsFunc);
       final long cardinal = ((Itr) numericLiteral(true)).itr(null);
-      // [LW] what to do with big number of arguments? (ex: varargs)
       if(cardinal < 0 || cardinal > Integer.MAX_VALUE) error(FUNCUNKNOWN, fn);
 
       final Expr[] args = new Expr[(int) cardinal];
