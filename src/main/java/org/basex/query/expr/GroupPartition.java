@@ -92,7 +92,7 @@ final class GroupPartition {
     for(final Var g : gvs) {
       boolean f = false;
       for(final Var v : fls) f |= v.is(g);
-      if(!f) GVARNOTDEFINED.thrw(null, g);
+      if(!f) GVARNOTDEFINED.thrw(g.input, g);
     }
     return fc.size() - gc.size();
   }

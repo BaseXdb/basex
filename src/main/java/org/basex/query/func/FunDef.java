@@ -272,14 +272,14 @@ public enum FunDef {
   /** XQuery function. */
   ABS(FNURI, FNNum.class, 1, 1, "abs(num)", AAT_ZO, AAT_ZO),
   /** XQuery function. */
-  CEIL(FNURI, FNNum.class, 1, 1, "ceiling(num)", AAT_ZO, ITR_ZO),
+  CEIL(FNURI, FNNum.class, 1, 1, "ceiling(num)", AAT_ZO, AAT_ZO),
   /** XQuery function. */
-  FLOOR(FNURI, FNNum.class, 1, 1, "floor(num)", AAT_ZO, ITR_ZO),
+  FLOOR(FNURI, FNNum.class, 1, 1, "floor(num)", AAT_ZO, AAT_ZO),
   /** XQuery function. */
-  ROUND(FNURI, FNNum.class, 1, 2, "round(num[,prec])", AAT_ZO, ITR, ITR_ZO),
+  ROUND(FNURI, FNNum.class, 1, 2, "round(num[,prec])", AAT_ZO, ITR, AAT_ZO),
   /** XQuery function. */
   RNDHLF(FNURI, FNNum.class, 1, 2, "round-half-to-even(num[,prec])",
-      AAT_ZO, ITR, ITR_ZO),
+      AAT_ZO, ITR, AAT_ZO),
 
   /* FNPat functions. */
 

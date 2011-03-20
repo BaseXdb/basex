@@ -33,12 +33,6 @@ public final class DynFunCall extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    return super.comp(ctx);
-    // [LW] inline variables?
-  }
-
-  @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final int n = expr.length - 1;

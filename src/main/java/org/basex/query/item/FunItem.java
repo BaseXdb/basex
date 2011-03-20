@@ -3,10 +3,11 @@ package org.basex.query.item;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import static org.basex.query.QueryTokens.*;
+import org.basex.query.expr.DynFunCall;
 import org.basex.query.expr.Expr;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.expr.VarRef;
+import org.basex.query.iter.ValueIter;
 import static org.basex.query.util.Err.*;
-
 import org.basex.query.util.Var;
 import org.basex.query.util.VarList;
 import org.basex.util.InputInfo;
@@ -96,11 +97,10 @@ public class FunItem extends Item {
    * @param ctx query context
    * @param ii input info
    * @param args arguments
-   * @return resulting item
+   * @return resulting iterator
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public ItemCache invIter(final QueryContext ctx, final InputInfo ii,
+  public ValueIter invIter(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
     // move variables to stack
@@ -110,10 +110,18 @@ public class FunItem extends Item {
     for(int a = vars.length; a-- > 0;)
       ctx.vars.add(vars[a].bind(args[a], ctx).copy());
 
-    // evaluate function and reset variable scope
-    final ItemCache ir = ItemCache.get(ctx.iter(expr));
+    // evaluate function
+    final Value cv = ctx.value;
+    ctx.value = null;
+    final Value v = expr.value(ctx);
+    ctx.value = cv;
+
+    // reset variable scope
     ctx.vars.reset(s);
-    return ir;
+
+    // optionally cast return value to target type
+    final SeqType ret = ((FunType) type).ret;
+    return (ret != null ? ret.cast(v, ctx, ii) : v).iter();
   }
 
   /**
@@ -127,7 +135,7 @@ public class FunItem extends Item {
   public Item invItem(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
-    final ItemCache ir = invIter(ctx, ii, args);
+    final ValueIter ir = invIter(ctx, ii, args);
 
     final Item it = ir.next();
     if(it == null || ir.size() == 1) return it;
@@ -150,10 +158,12 @@ public class FunItem extends Item {
 
   @Override
   public String toString() {
+    final FunType ft = (FunType) type;
     final StringBuilder sb = new StringBuilder(FUNCTION).append('(');
     for(final Var v : vars)
       sb.append(v).append(v == vars[vars.length - 1] ? "" : ", ");
-    return sb.append(") { ").append(expr).append(" }").toString();
+    return sb.append(")").append(ft.ret != null ? " as " + ft.ret :
+      "").append(" { ").append(expr).append(" }").toString();
   }
 
   @Override
@@ -169,5 +179,24 @@ public class FunItem extends Item {
   @Override
   public Object toJava() {
     throw Util.notexpected();
+  }
+
+  /**
+   * Coerces a function item to the given type.
+   * @param ctx query context
+   * @param ii input info
+   * @param fun function item to coerce
+   * @param t type to coerce to
+   * @return coerced function item
+   */
+  public static FunItem coerce(final QueryContext ctx, final InputInfo ii,
+      final FunItem fun, final FunType t) {
+    final Var[] vars = new Var[fun.vars.length];
+    final Expr[] refs = new Expr[vars.length];
+    for(int i = vars.length; i-- > 0;) {
+      vars[i] = ctx.uniqueVar(ii, t.args[i]);
+      refs[i] = new VarRef(ii, vars[i]);
+    }
+    return new FunItem(fun.name, vars, new DynFunCall(ii, fun, refs), t);
   }
 }

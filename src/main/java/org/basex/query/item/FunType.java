@@ -99,8 +99,8 @@ public final class FunType implements Type {
       throws QueryException {
     if(!it.func() || ((FunType) it.type).args.length != args.length)
       Err.cast(ii, this, it);
-    // [LW] function item coercion
-    return it;
+    return it.type.instance(this) ? it :
+      FunItem.coerce(ctx, ii, (FunItem) it, this);
   }
 
   @Override
