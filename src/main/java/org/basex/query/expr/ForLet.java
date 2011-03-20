@@ -54,13 +54,6 @@ public abstract class ForLet extends Single {
    */
   abstract boolean simple(final boolean one);
 
-  /**
-   * Checks if the clause will shadow the specified variable.
-   * @param v variable to be checked
-   * @return result of check
-   */
-  abstract boolean shadows(final Var v);
-
   @Override
   public final boolean uses(final Use u) {
     return u == Use.VAR || super.uses(u);

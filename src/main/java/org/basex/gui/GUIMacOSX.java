@@ -32,9 +32,9 @@ public final class GUIMacOSX {
     "apple.laf.useScreenMenuBar";
 
   /** Empty class array. */
-  private static final Class<?>[] EC = new Class[0];
+  private static final Class<?>[] EC = {};
   /** Empty object array. */
-  private static final Object[] EO = new Object[0];
+  private static final Object[] EO = {};
 
   /** Reference to the main gui. */
   GUI main;
@@ -59,10 +59,10 @@ public final class GUIMacOSX {
     Class.forName(C_APPLICATION_EVENT);
 
     if(appObj != null) {
-      invoke("addAboutMenuItem");
-      invoke("setEnabledAboutMenu", true);
-      invoke("addPreferencesMenuItem");
-      invoke("setEnabledPreferencesMenu", true);
+      invoke(appObj, "addAboutMenuItem");
+      invoke(appObj, "setEnabledAboutMenu", true);
+      invoke(appObj, "addPreferencesMenuItem");
+      invoke(appObj, "setEnabledPreferencesMenu", true);
 
       addDockIcon();
 
@@ -70,7 +70,7 @@ public final class GUIMacOSX {
       final Object listener = Proxy.newProxyInstance(
           getClass().getClassLoader(), new Class[] { alc},
           new AppInvocationHandler());
-      invoke("addApplicationListener", alc, listener);
+      invoke(appObj, "addApplicationListener", alc, listener);
     }
   }
 
@@ -88,7 +88,7 @@ public final class GUIMacOSX {
    * @throws Exception if any error occurs.
    */
   private void addDockIcon() throws Exception {
-    invoke("setDockIconImage", Image.class, BaseXLayout.image("logo"));
+    invoke(appObj, "setDockIconImage", Image.class, BaseXLayout.image("logo"));
   }
 
   /**
@@ -97,7 +97,7 @@ public final class GUIMacOSX {
    * @throws Exception if any error occurs
    */
   public void setBadge(final String value) throws Exception {
-    invoke("setDockIconBadge", String.class, value);
+    invoke(appObj, "setDockIconBadge", String.class, value);
   }
 
   /**
@@ -179,43 +179,6 @@ public final class GUIMacOSX {
   // ---------------------------------------------------------------------------
 
   /**
-   * Invokes a method without arguments on the application object.
-   * @param method name of the method to invoke
-   * @return return value of the method
-   * @throws Exception if any error occurs.
-   */
-  private Object invoke(final String method) throws Exception {
-    return invoke(appObj, method);
-  }
-
-  /**
-   * Invokes a method on the application object that expects a single boolean
-   * value as argument.
-   * @param method name of the method to invoke
-   * @param arg boolean value that is passed as argument
-   * @return return value of the method
-   * @throws Exception if any error occurs.
-   */
-  private Object invoke(final String method, final boolean arg)
-      throws Exception {
-    return invoke(appObj, method, arg);
-  }
-
-  /**
-   * Invokes a method on the application object that expects a single object as
-   * argument.
-   * @param method name of the method to invoke
-   * @param argClass "type" of the argument
-   * @param argObject argument value
-   * @return return value of the method
-   * @throws Exception if any error occurs.
-   */
-  private Object invoke(final String method, final Class<?> argClass,
-      final Object argObject) throws Exception {
-    return invoke(appObj, method, argClass, argObject);
-  }
-
-  /**
    * Invokes a method without arguments on the given object.
    * @param obj object on which the method should be invoked
    * @param method name of the method to invoke
@@ -250,9 +213,8 @@ public final class GUIMacOSX {
    * @return return value of the method
    * @throws Exception if any error occurs
    */
-  static Object invoke(final Object obj,
-      final String method, final Class<?> argClass, final Object argObject)
-      throws Exception {
+  static Object invoke(final Object obj, final String method,
+      final Class<?> argClass, final Object argObject) throws Exception {
     final Class<?>[] argClasses = { argClass };
     final Object[] argObjects = { argObject };
     return invoke(obj.getClass(), obj, method, argClasses, argObjects);

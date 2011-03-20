@@ -521,7 +521,7 @@ public enum Err {
   /** XQST0076: Parsing exception. */
   COLLWHICH(XQST, 38, "Unknown collation \"%\"."),
   /** XQST0039: Parsing exception. */
-  FUNCDUPL(XQST, 39, "Duplicate function argument $%."),
+  FUNCDUPL(XQST, 39, "Duplicate function argument %."),
   /** XQST0040: Parsing exception. */
   ATTDUPL(XQST, 40, "Duplicate attribute \"%\"."),
   /** XQST0045: Parsing exception. */

@@ -6,6 +6,7 @@ import org.basex.core.Text;
 import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
+import org.basex.query.item.QNm;
 
 /**
  * Variable stack.
@@ -39,6 +40,17 @@ public final class VarList extends ExprInfo {
   }
 
   /**
+   * Finds and returns the variable with the specified name, this should only be
+   * used while parsing because it ignores variable IDs.
+   * @param name variable name
+   * @return variable
+   */
+  public Var get(final QNm name) {
+    for(int i = size; i-- > 0;) if(name.eq(vars[i].name)) return vars[i];
+    return null;
+  }
+
+  /**
    * Finds and returns the specified variable.
    * @param v variable
    * @return variable
@@ -54,7 +66,7 @@ public final class VarList extends ExprInfo {
    * @return index
    */
   private int indexOf(final Var v) {
-    for(int s = size - 1; s >= 0; s--) if(v.eq(vars[s])) return s;
+    for(int s = size - 1; s >= 0; s--) if(v.is(vars[s])) return s;
     return -1;
   }
 

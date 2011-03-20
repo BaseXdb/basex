@@ -41,4 +41,14 @@ public final class IntMap<E> extends IntSet {
     super.rehash();
     values = Arrays.copyOf(values, size << 1);
   }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(Util.name(this)).add('[');
+    for(int i = 1; i < size; i++) {
+      tb.add(Integer.toString(keys[i])).add(": ").add(get(keys[i]).toString());
+      if(i < size - 1) tb.add(",\n\t");
+    }
+    return tb.add(']').toString();
+  }
 }

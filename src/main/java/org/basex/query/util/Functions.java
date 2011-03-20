@@ -112,15 +112,15 @@ public final class Functions extends ExprInfo {
 
     // find local function
     for(int l = 0; l < func.length; ++l) {
-      final QNm qn = func[l].var.name;
+      final QNm qn = func[l].name;
       if(eq(ln, qn.ln()) && eq(uri, qn.uri().atom()) && args.length ==
         func[l].args.length) return add(qp.input(), qn, l, args);
     }
 
     // add function call for function that has not been defined yet
     if(Type.find(name, false) == null) {
-      return add(qp.input(), name, add(new Func(qp.input(),
-          new Var(name), new Var[args.length], false), qp), args);
+      return add(qp.input(), name, add(new Func(qp.input(), name,
+          new Var[args.length], null, false), qp), args);
     }
     return null;
   }
@@ -148,7 +148,7 @@ public final class Functions extends ExprInfo {
    * @throws QueryException query exception
    */
   public int add(final Func fun, final QueryParser qp) throws QueryException {
-    final QNm name = fun.var.name;
+    final QNm name = fun.name;
 
     final byte[] uri = name.uri().atom();
     if(uri.length == 0) qp.error(FUNNONS, name.atom());
@@ -160,7 +160,7 @@ public final class Functions extends ExprInfo {
 
     final byte[] ln = name.ln();
     for(int l = 0; l < func.length; ++l) {
-      final QNm qn = func[l].var.name;
+      final QNm qn = func[l].name;
       final byte[] u = qn.uri().atom();
       final byte[] nm = qn.ln();
 
@@ -221,8 +221,8 @@ public final class Functions extends ExprInfo {
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.ln());
     for(int n = 0; n < func.length; ++n) {
-      if(ls.similar(nm, lc(func[n].var.name.ln()), 0)) {
-        qp.error(FUNSIMILAR, name, func[n].var.name.atom());
+      if(ls.similar(nm, lc(func[n].name.ln()), 0)) {
+        qp.error(FUNSIMILAR, name, func[n].name.atom());
       }
     }
   }

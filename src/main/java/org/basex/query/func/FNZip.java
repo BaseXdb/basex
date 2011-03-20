@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -186,25 +187,56 @@ final class FNZip extends Fun {
   private String createEntries(final Iterator<String> it,
       final FElem par, final String pref) {
 
-    String name = null;
-    boolean dir = false;
-    while(dir || it.hasNext()) {
-      if(!dir) name = it.next();
-      if(name == null) break;
+    String path = null;
+    boolean curr = false;
+    while(curr || it.hasNext()) {
+      if(!curr) {
+        path = it.next();
+        curr = true;
+      }
+      if(path == null) break;
       // current entry is located in a higher/other directory
-      if(!name.startsWith(pref)) return name;
-      // create element
-      dir = name.endsWith("/");
-      final FElem e = new FElem(dir ? E_DIR : E_ENTRY, null);
-      // creating attribute: remove trailing slash or directory path
-      name = name.replaceAll(dir ? "/$" : ".*/", "");
-      e.atts.add(new FAttr(A_NAME, token(name), e));
-      e.parent(par);
-      par.children.add(e);
-      // recursively parse other entries
-      if(dir) name = createEntries(it, e, name);
+      if(!path.startsWith(pref)) return path;
+
+      // current file starts with new directory
+      final int i = path.lastIndexOf('/');
+      final String dir = i == -1 ? path : path.substring(0, i);
+      final String name = path.substring(i + 1);
+
+      if(name.isEmpty()) {
+        // path ends with slash: create directory
+        path = createEntries(it, createDir(par, dir), dir);
+      } else {
+        // create file
+        createFile(par, name);
+        curr = false;
+      }
     }
     return null;
+  }
+
+  /**
+   * Creates a directory element.
+   * @param par parent node
+   * @param name name of directory
+   * @return element
+   */
+  private FElem createDir(final FElem par, final String name) {
+    final FElem e = new FElem(E_DIR, par);
+    e.atts.add(new FAttr(A_NAME, token(name), e));
+    par.children.add(e);
+    return e;
+  }
+
+  /**
+   * Creates a file element.
+   * @param par parent node
+   * @param name name of directory
+   */
+  private void createFile(final FElem par, final String name) {
+    final FElem e = new FElem(E_ENTRY, par);
+    e.atts.add(new FAttr(A_NAME, token(name), e));
+    par.children.add(e);
   }
 
   /**
@@ -429,16 +461,25 @@ final class FNZip extends Fun {
   private StringList paths(final ZipFile zf) {
     // traverse all zip entries and create intermediate map,
     // as zip entries are not sorted
-    final StringList paths = new StringList();
+    //final StringList paths = new StringList();
+    final TreeSet<String> paths = new TreeSet<String>();
+
     final Enumeration<? extends ZipEntry> en = zf.entries();
     // loop through all files
     while(en.hasMoreElements()) {
       final ZipEntry ze = en.nextElement();
       final String name = ze.getName();
+      final int i = name.lastIndexOf('/');
+      // add directory
+      if(i > -1 && i + 1 < name.length()) paths.add(name.substring(0, i + 1));
       paths.add(name);
     }
-    paths.sort(true, true);
-    return paths;
+    final StringList sl = new StringList();
+    final Iterator<String> it = paths.iterator();
+    while(it.hasNext()) sl.add(it.next());
+
+    //paths.sort(true, true);
+    return sl;
   }
 
   /**
