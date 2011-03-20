@@ -13,7 +13,6 @@
 	<classpathentry kind="lib" path="lib/jersey-server-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-6.1.25.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-util-6.1.25.jar"/>
-	<classpathentry kind="lib" path="lib/lucene-analyzers-3.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/resolver.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.5-20081211.jar"/>
 	<classpathentry kind="lib" path="lib/snowball.jar"/>
