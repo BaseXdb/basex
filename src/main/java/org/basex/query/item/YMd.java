@@ -103,7 +103,7 @@ public final class YMd extends Dur {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return mon;
   }
 }

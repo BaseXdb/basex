@@ -746,6 +746,7 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final boolean up) throws QueryException {
     skipWS();
+    final InputInfo ii = input();
     final QNm name = new QNm(qName(FUNCNAME));
     name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
     if(module != null && !name.uri().eq(module.uri())) error(MODNS, name);
@@ -756,7 +757,7 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAR2);
 
-    final Func func = new Func(input(), name, args, optAsType(), true);
+    final Func func = new Func(ii, name, args, optAsType(), true);
     func.updating = up;
 
     ctx.funcs.add(func, this);

@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
@@ -116,7 +117,7 @@ public final class Dec extends Item {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return val.intValue();
   }
 
@@ -150,8 +151,12 @@ public final class Dec extends Item {
     try {
       return new BigDecimal(Token.string(val).trim());
     } catch(final NumberFormatException ex) {
-      ZERO.castErr(val, ii);
-      return null;
+      throw ZERO.castErr(val, ii);
     }
+  }
+
+  @Override
+  public String toString() {
+    return string(atom(null));
   }
 }

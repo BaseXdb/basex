@@ -66,7 +66,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return (int) (start * size);
   }
 

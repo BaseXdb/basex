@@ -5,6 +5,8 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+
+import static org.basex.util.Token.*;
 import static java.lang.Double.isNaN;
 
 /**
@@ -56,7 +58,7 @@ public final class Dbl extends Item {
 
   @Override
   public byte[] atom(final InputInfo ii) {
-    return Token.token(val);
+    return token(val);
   }
 
   @Override
@@ -107,7 +109,7 @@ public final class Dbl extends Item {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return (int) val;
   }
 
@@ -128,12 +130,16 @@ public final class Dbl extends Item {
       throws QueryException {
 
     try {
-      return Double.parseDouble(Token.string(val));
+      return Double.parseDouble(string(val));
     } catch(final NumberFormatException ex) {
-      if(Token.eq(Token.trim(val), Token.INF)) return Double.POSITIVE_INFINITY;
-      if(Token.eq(Token.trim(val), Token.NINF)) return Double.NEGATIVE_INFINITY;
-      ZERO.castErr(val, ii);
-      return 0;
+      if(Token.eq(trim(val), INF)) return Double.POSITIVE_INFINITY;
+      if(Token.eq(trim(val), NINF)) return Double.NEGATIVE_INFINITY;
+      throw ZERO.castErr(val, ii);
     }
+  }
+
+  @Override
+  public String toString() {
+    return string(atom(null));
   }
 }

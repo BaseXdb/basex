@@ -201,7 +201,7 @@ public class Dur extends Item {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return (int) ((3 + mon) * (7 + sc.doubleValue()));
   }
 

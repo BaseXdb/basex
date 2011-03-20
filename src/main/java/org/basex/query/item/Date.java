@@ -67,7 +67,7 @@ public abstract class Date extends Item {
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());
       if(xc.getHour() == 24) xc.add(df.newDuration(0));
     } catch(final IllegalArgumentException ex) {
-      dateErr(d, e, ii);
+      throw dateErr(d, e, ii);
     }
   }
 

@@ -1,9 +1,11 @@
 package org.basex.query.item;
 
 import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Abstract value.
@@ -146,7 +148,9 @@ public abstract class Value extends Expr {
 
   /**
    * Returns a hash code for this value.
+   * @param ii input info
    * @return hash code
+   * @throws QueryException if atomization can't be applied (e.g. function item)
    */
-  public abstract int hash();
+  public abstract int hash(final InputInfo ii) throws QueryException;
 }

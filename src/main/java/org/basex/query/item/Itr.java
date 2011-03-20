@@ -1,5 +1,7 @@
 package org.basex.query.item;
 
+import static org.basex.util.Token.*;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
@@ -138,7 +140,7 @@ public class Itr extends Item {
   }
 
   @Override
-  public final int hash() {
+  public final int hash(final InputInfo ii) {
     return (int) val;
   }
 
@@ -160,15 +162,19 @@ public class Itr extends Item {
       throws QueryException {
 
     // try fast conversion
-    final long l = Token.toLong(val);
+    final long l = toLong(val);
     if(l != Long.MIN_VALUE) return l;
 
     try {
-      final String v = Token.string(Token.trim(val));
+      final String v = string(Token.trim(val));
       return Long.parseLong(v.startsWith("+") ? v.substring(1) : v);
     } catch(final NumberFormatException ex) {
-      NUMS[0].castErr(val, ii);
-      return 0;
+      throw NUMS[0].castErr(val, ii);
     }
+  }
+
+  @Override
+  public String toString() {
+    return string(atom(null));
   }
 }

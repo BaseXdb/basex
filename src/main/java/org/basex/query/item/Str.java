@@ -98,4 +98,9 @@ public class Str extends Item {
   public final String toString() {
     return Util.info("\"%\"", val);
   }
+
+  @Override
+  public String toJava() {
+    return Token.string(val);
+  }
 }

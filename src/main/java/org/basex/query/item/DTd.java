@@ -138,7 +138,7 @@ public final class DTd extends Dur {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return sc.intValue();
   }
 }

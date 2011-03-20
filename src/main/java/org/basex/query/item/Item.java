@@ -128,16 +128,6 @@ public abstract class Item extends Value {
     return Dbl.parse(atom(ii), ii);
   }
 
-  @Override
-  public Object toJava() {
-    try {
-      return Token.string(atom(null));
-    } catch(final QueryException e) {
-      // TODO [LW] is that OK?
-      throw Util.notexpected(e);
-    }
-  }
-
   /**
    * Checks if the items can be compared.
    * Items are comparable
@@ -235,11 +225,12 @@ public abstract class Item extends Value {
    * Throws a cast error.
    * @param val cast value
    * @param ii input info
+   * @return never
    * @throws QueryException query exception
    */
-  protected final void castErr(final Object val, final InputInfo ii)
+  protected final QueryException castErr(final Object val, final InputInfo ii)
       throws QueryException {
-    FUNCAST.thrw(ii, type, val);
+    return FUNCAST.thrw(ii, type, val);
   }
 
   /**
@@ -247,11 +238,12 @@ public abstract class Item extends Value {
    * @param i input
    * @param ex example format
    * @param ii input info
+   * @return never
    * @throws QueryException query exception
    */
-  public void dateErr(final byte[] i, final String ex, final InputInfo ii)
-      throws QueryException {
-    DATEFORMAT.thrw(ii, type, i, ex);
+  public QueryException dateErr(final byte[] i, final String ex,
+      final InputInfo ii) throws QueryException {
+    throw DATEFORMAT.thrw(ii, type, i, ex);
   }
 
   @Override
@@ -259,27 +251,14 @@ public abstract class Item extends Value {
     try {
       ser.emptyElement(ITM, VAL, atom(null), TYP, Token.token(name()));
     } catch(QueryException e) {
-      throw new IOException(e.getMessage(), e);
-    }
-  }
-
-  @Override
-  public int hash() {
-    try {
-      return Token.hash(atom(null));
-    } catch(QueryException e) {
-      // TODO [LW] check this
+      // only function items throw exceptions in atomization, and they should
+      // override plan(Serializer) sensibly
       throw Util.notexpected(e);
     }
   }
 
   @Override
-  public String toString() {
-    try {
-      return Token.string(atom(null));
-    } catch(QueryException e) {
-      // TODO [LW] check this
-      throw Util.notexpected(e);
-    }
+  public int hash(final InputInfo ii) throws QueryException {
+    return Token.hash(atom(ii));
   }
 }

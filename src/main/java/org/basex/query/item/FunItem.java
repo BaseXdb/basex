@@ -10,6 +10,7 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.util.Var;
 import org.basex.query.util.VarList;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Function item.
@@ -163,5 +164,10 @@ public class FunItem extends Item {
   @Override
   public int count(final Var v) {
     return expr.count(v);
+  }
+
+  @Override
+  public Object toJava() {
+    throw Util.notexpected();
   }
 }

@@ -85,9 +85,9 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) throws QueryException {
     int h = 0;
-    for(int v = 0; v != Math.min(size, 5); ++v) h += val[v].hash();
+    for(int v = 0; v != Math.min(size, 5); ++v) h += val[v].hash(ii);
     return h;
   }
 

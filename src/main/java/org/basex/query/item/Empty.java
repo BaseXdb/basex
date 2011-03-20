@@ -89,7 +89,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return 0;
   }
 
