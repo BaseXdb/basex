@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.QNm;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -20,8 +22,10 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class Func extends Single {
-  /** Function name, including return type. */
-  public final Var var;
+  /** Function name. */
+  public final QNm name;
+  /** Return type. */
+  public SeqType ret;
   /** Arguments. */
   public final Var[] args;
   /** Declaration flag. */
@@ -32,13 +36,16 @@ public final class Func extends Single {
   /**
    * Function constructor.
    * @param ii input info
-   * @param v function name
+   * @param n function name
    * @param a arguments
+   * @param r return type
    * @param d declaration flag
    */
-  public Func(final InputInfo ii, final Var v, final Var[] a, final boolean d) {
+  public Func(final InputInfo ii, final QNm n, final Var[] a, final SeqType r,
+      final boolean d) {
     super(ii, null);
-    var = v;
+    name = n;
+    ret = r;
     args = a;
     declared = d;
   }
@@ -48,12 +55,12 @@ public final class Func extends Single {
    * @throws QueryException query exception
    */
   public void check() throws QueryException {
-    if(!declared || expr == null) FUNCUNKNOWN.thrw(input, var.name.atom());
+    if(!declared || expr == null) FUNCUNKNOWN.thrw(input, name.atom());
 
     final boolean u = expr.uses(Use.UPD);
     if(updating) {
       // updating function
-      if(var.type != null) UPFUNCTYPE.thrw(input);
+      if(ret != null) UPFUNCTYPE.thrw(input);
       if(!u && !expr.vacuous()) UPEXPECTF.thrw(input);
     } else if(u) {
       // uses updates, but is not declared as such
@@ -79,13 +86,13 @@ public final class Func extends Single {
     ctx.value = null;
     final Value v = expr.value(ctx);
     ctx.value = cv;
-    return (var.type != null ? var.type.cast(v, ctx, input) : v).iter(ctx);
+    return (ret != null ? ret.cast(v, ctx, input) : v).iter();
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.attribute(NAM, var.name.atom());
+    ser.attribute(NAM, name.atom());
     for(int i = 0; i < args.length; ++i) {
       ser.attribute(Token.token(ARG + i), args[i].name.atom());
     }
@@ -95,9 +102,9 @@ public final class Func extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(var.name.atom());
+    final TokenBuilder tb = new TokenBuilder(name.atom());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);
-    if(var.type != null) tb.add(' ' + AS + ' ' + var.type);
+    if(ret != null) tb.add(' ' + AS + ' ' + ret);
     if(expr != null) tb.add(" { " + expr + " }; ");
     return tb.toString();
   }

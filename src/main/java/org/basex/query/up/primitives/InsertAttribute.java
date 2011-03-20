@@ -5,6 +5,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert attribute primitive.
@@ -44,5 +45,10 @@ public final class InsertAttribute extends NodeCopy {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.INSERTATTR;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }

@@ -168,7 +168,7 @@ public class AxisPath extends Path {
     if(data != null) {
       boolean doc = ctx.resource.docNodes();
       if(!doc) {
-        final Iter iter = ctx.value.iter(ctx);
+        final Iter iter = ctx.value.iter();
         Item it;
         while((it = iter.next()) != null) {
           doc = it.type == Type.DOC;

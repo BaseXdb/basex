@@ -151,12 +151,6 @@ public final class For extends ForLet {
   }
 
   @Override
-  public boolean shadows(final Var v) {
-    return var.eq(v) || pos != null && pos.eq(v) ||
-      score != null && score.eq(v);
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, VAR, token(var.toString()));
     if(pos != null) ser.attribute(POS, token(pos.toString()));

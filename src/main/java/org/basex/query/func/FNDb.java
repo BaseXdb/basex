@@ -23,7 +23,6 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
@@ -57,7 +56,6 @@ final class FNDb extends Fun {
       case LIST:     return list(ctx);
       case NODEID:   return node(ctx, true);
       case NODEPRE:  return node(ctx, false);
-      case TRIGGER:  return trigger(ctx);
       default:       return super.iter(ctx);
     }
   }
@@ -230,19 +228,5 @@ final class FNDb extends Fun {
   public boolean uses(final Use u) {
     return u == Use.CTX && (def == FunDef.TEXT || def == FunDef.ATTR ||
         def == FunDef.FULLTEXT) || super.uses(u);
-  }
-
-  /**
-   * Triggers an event on registered sessions.
-   * @param ctx query context
-   * @return The trigger result
-   * @throws QueryException query exception
-   */
-  private Iter trigger(final QueryContext ctx) throws QueryException {
-    ctx.updating = true;
-    Value v = expr[0].value(ctx);
-    ctx.context.triggers.notify(ctx.context.session, expr[1].toString(),
-        checkStr(expr[2], ctx));
-    return v.iter();
   }
 }

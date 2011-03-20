@@ -153,9 +153,7 @@ public class BufferInput extends InputStream {
   public final ByteList content() throws IOException {
     final ByteList bl = new ByteList();
     byte l;
-    while((l = readByte()) != 0) {
-      bl.add(l);
-    }
+    while((l = readByte()) != 0) bl.add(l);
     return bl;
   }
 

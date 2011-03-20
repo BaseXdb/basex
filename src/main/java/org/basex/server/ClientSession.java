@@ -5,9 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Command;
@@ -15,7 +12,6 @@ import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
-import org.basex.server.trigger.TriggerNotification;
 import org.basex.util.Token;
 
 /**
@@ -45,14 +41,6 @@ public final class ClientSession extends Session {
   final PrintOutput sout;
   /** Server input. */
   final InputStream sin;
-  /** Trigger notifications. */
-  Map<String, TriggerNotification> tn;
-  /** Socket trigger reference. */
-  Socket tsocket;
-  /** Socket host name. */
-  String shost;
-  /** Trigger port. */
-  int tport = 1985;
 
   /**
    * Constructor, specifying the database context and the
@@ -112,9 +100,7 @@ public final class ClientSession extends Session {
       final String pw, final OutputStream output) throws IOException {
 
     super(output);
-    this.shost = host;
-    // initialize trigger notifications
-    this.tn = new HashMap<String, TriggerNotification>();
+
     // 5 seconds timeout
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
@@ -160,85 +146,6 @@ public final class ClientSession extends Session {
   }
 
   /**
-   * Attaches to a trigger.
-   * @param name trigger name
-   * @param notification trigger notification
-   * @throws BaseXException exception
-   */
-  public void attachTrigger(final String name,
-      final TriggerNotification notification) throws BaseXException {
-    try {
-      sout.write(10);
-      send(name);
-      final BufferInput bi = new BufferInput(sin);
-      if(tsocket == null) {
-        tsocket = new Socket();
-        tsocket.connect(new InetSocketAddress(shost, tport), 5000);
-        String id = bi.readString();
-        PrintOutput tout = PrintOutput.get(tsocket.getOutputStream());
-        tout.print(id);
-        tout.write(0);
-        tout.flush();
-        startListener(tsocket.getInputStream());
-      }
-      info = bi.readString();
-      if(!ok(bi)) throw new IOException(info);
-      tn.put(name, notification);
-    } catch(IOException e) {
-      throw new BaseXException(e);
-    }
-  }
-
-  /**
-   * Starts the listener thread.
-   * @param in input stream
-   */
-  private void startListener(final InputStream in) {
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          while(true) {
-            BufferInput bi = new BufferInput(in);
-            String name = bi.readString();
-            String val = bi.readString();
-            tn.get(name).update(val);
-          }
-        } catch(Exception e) { }
-       }
-    }.start();
-  }
-
-  /**
-   * Detaches from a trigger.
-   * @param name trigger name
-   * @throws BaseXException exception
-   */
-  public void detachTrigger(final String name) throws BaseXException {
-    try {
-      sout.write(11);
-      send(name);
-      read();
-      tn.remove(name);
-    } catch(IOException e) {
-      throw new BaseXException(e);
-    }
-  }
-
-  /**
-   * Executes a trigger.
-   * @param query query string
-   * @param name trigger name
-   * @param notification trigger notification
-   * @throws BaseXException exception
-   */
-  public void trigger(final String query, final String name,
-      final String notification) throws BaseXException {
-    execute("xquery db:trigger(" + query + ", " + name + ", '" + notification
-        + "')");
-  }
-
-  /**
    * Sends the specified stream to the server.
    * @param input input stream
    * @throws IOException I/O exception
@@ -248,13 +155,6 @@ public final class ClientSession extends Session {
     while((l = input.read()) != -1) sout.write(l);
     sout.write(0);
     sout.flush();
-  }
-
-  /**
-   * Reads input.
-   * @throws IOException I/O exception
-   */
-  private void read() throws IOException {
     final BufferInput bi = new BufferInput(sin);
     info = bi.readString();
     if(!ok(bi)) throw new IOException(info);
@@ -268,7 +168,6 @@ public final class ClientSession extends Session {
   @Override
   public void close() throws IOException {
     send(Cmd.EXIT.toString());
-    if(tsocket != null) tsocket.close();
     socket.close();
   }
 

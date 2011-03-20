@@ -37,7 +37,7 @@ public final class Context extends Simple {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return checkCtx(ctx).iter(ctx);
+    return checkCtx(ctx).iter();
   }
 
   @Override

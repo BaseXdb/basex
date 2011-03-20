@@ -157,13 +157,13 @@ public enum FunDef {
   /** XQuery function. */
   DATA(FNURI, FNGen.class, 0, 1, "data([item])", ITEM_ZM),
   /** XQuery function. */
-  COLL(FNURI, FNGen.class, 0, 1, "collection([string])", NOD_ZM),
+  COLL(FNURI, FNGen.class, 0, 1, "collection([uri])", NOD_ZM),
   /** XQuery function. */
-  DOC(FNURI, FNGen.class, 1, 1, "doc(string)", NOD_ZO),
+  DOC(FNURI, FNGen.class, 1, 1, "doc(uri)", NOD_ZO),
   /** XQuery function. */
-  DOCAVL(FNURI, FNGen.class, 1, 1, "doc-available(string)", BLN),
+  DOCAVL(FNURI, FNGen.class, 1, 1, "doc-available(uri)", BLN),
   /** XQuery function. */
-  PUT(FNURI, FNGen.class, 2, 2, "put(node,string)", ITEM_ZM),
+  PUT(FNURI, FNGen.class, 2, 2, "put(node,path)", ITEM_ZM),
   /** XQuery function. */
   PARSETXT(FNURI, FNGen.class, 1, 2, "unparsed-text(uri[,encoding])", STR_ZO),
   /** XQuery function. */
@@ -175,7 +175,7 @@ public enum FunDef {
   /** XQuery function. */
   PARSEXML(FNURI, FNGen.class, 1, 2, "parse-xml(string[,base])", NOD),
   /** XQuery function. */
-  URICOLL(FNURI, FNGen.class, 0, 1, "uri-collection([string])", URI_ZM),
+  URICOLL(FNURI, FNGen.class, 0, 1, "uri-collection([uri])", URI_ZM),
   /** XQuery function. */
   SERIALIZE(FNURI, FNGen.class, 1, 2, "serialize(node[,params])", NOD),
 
@@ -189,6 +189,17 @@ public enum FunDef {
   LANG(FNURI, FNId.class, 1, 2, "lang(string[,item])", BLN),
   /** XQuery function. */
   ELID(FNURI, FNId.class, 1, 2, "element-with-id(string[,item])", NOD_ZM),
+
+  /* FNInfo functions. */
+
+  /** XQuery function. */
+  ERROR(FNURI, FNInfo.class, 0, 3, "error([code[,desc[,object]]])", ITEM_ZM),
+  /** XQuery function. */
+  TRACE(FNURI, FNInfo.class, 2, 2, "trace(item,message)", ITEM_ZM),
+  /** XQuery function. */
+  ENV(FNURI, FNInfo.class, 1, 1, "environment-variable(string)", STR_ZO),
+  /** XQuery function. */
+  ENVS(FNURI, FNInfo.class, 0, 0, "available-environment-variables()", STR_ZM),
 
   /* FNNode functions. */
 
@@ -225,17 +236,6 @@ public enum FunDef {
   ROUND(FNURI, FNNum.class, 1, 2, "round(num[,prec])", ITR_ZO),
   /** XQuery function. */
   RNDHLF(FNURI, FNNum.class, 1, 2, "round-half-to-even(num[,prec])", ITR_ZO),
-
-  /* FNOut functions. */
-
-  /** XQuery function. */
-  ERROR(FNURI, FNInfo.class, 0, 3, "error([code[,desc[,object]]])", ITEM_ZM),
-  /** XQuery function. */
-  TRACE(FNURI, FNInfo.class, 2, 2, "trace(item,message)", ITEM_ZM),
-  /** XQuery function. */
-  ENV(FNURI, FNInfo.class, 1, 1, "environment-variable(string)", STR_ZO),
-  /** XQuery function. */
-  ENVS(FNURI, FNInfo.class, 0, 0, "available-environment-variables()", STR_ZM),
 
   /* FNPat functions. */
 
@@ -496,8 +496,6 @@ public enum FunDef {
   NODEID(DBURI, FNDb.class, 1, 1, "node-id(nodes)", ITR_ZM),
   /** Database function: returns the pre values of database nodes. */
   NODEPRE(DBURI, FNDb.class, 1, 1, "node-pre(nodes)", ITR_ZM),
-  /** Database function: triggers result to connected clients. */
-  TRIGGER(DBURI, FNDb.class, 1, 3, "trigger(xquery, string, string", ITR),
 
   /* FNFt functions */
 
