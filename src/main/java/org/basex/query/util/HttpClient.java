@@ -35,7 +35,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
@@ -84,6 +83,7 @@ public final class HttpClient {
   private static final byte[] CRLF = token("\r\n");
   /** Default multipart boundary. */
   private static final String DEFAULT_BOUND = "1BEF0A57BE110FD467A";
+  private static final byte[] PART = token("part");
 
   /** Body element. */
   /** http:body element. */
@@ -137,7 +137,7 @@ public final class HttpClient {
   /** Input info. */
   private final InputInfo info;
   /** Request. */
-  private final HttpRequestor req;
+  private final RequestHandler req;
 
   /**
    * Constructor.
@@ -149,7 +149,7 @@ public final class HttpClient {
   public HttpClient(final ANode request, final byte[] href, final InputInfo ii)
       throws QueryException {
     info = ii;
-    req = new HttpRequestor(request, href, ii);
+    req = new RequestHandler(request, href, ii);
   }
 
   /**
@@ -354,7 +354,7 @@ public final class HttpClient {
 
     // Get part headers and body
     while((part = parts.next()) != null) {
-      final HttpRequestor r = new HttpRequestor(part, ii);
+      final RequestHandler r = new RequestHandler(part, ii);
       writePart(r.getHeaders(), r.getPayload(), out, boundary);
     }
 
@@ -406,20 +406,15 @@ public final class HttpClient {
   private Iter getHttpResponse(final HttpURLConnection conn,
       final QueryContext ctx) throws IOException, QueryException {
 
-    // Construct http:response element
-    final FElem responseElem = new FElem(new QNm(RESPONSE), null);
-    setResponseChildren(conn, responseElem);
-    setResponseAttrs(conn, responseElem);
+    // Is content required?
+    byte[] statusOnly = req.getAttrs().get(STATUSONLY);
+    boolean s = (statusOnly == null || !Bln.parse(statusOnly, info)) ? false
+        : true;
 
-    final ItemCache iter = new ItemCache();
-    iter.add(responseElem);
+    // Create an HTTP response
+    return ResponseHandler.getResponse(conn, s,
+        req.getAttrs().get(OVERMEDIATYPE), ctx.context.prop, info);
 
-    final byte[] attrStatusOnly = req.getAttrs().get(STATUSONLY);
-
-    // Get response content if required
-    if(attrStatusOnly == null || !Bln.parse(attrStatusOnly, info)) iter.add(setResponseContent(
-        conn, ctx));
-    return iter;
   }
 
   /**
@@ -543,19 +538,7 @@ public final class HttpClient {
       throws IOException {
 
     final InputStream input = conn.getInputStream();
-    final int len = conn.getContentLength();
 
-    if(len != -1) {
-      final byte[] responseContent = new byte[len];
-      try {
-        input.read(responseContent);
-      } finally {
-        input.close();
-      }
-      return responseContent;
-    }
-
-    // Content length unknown
     final ByteList bl = new ByteList();
     final BufferedInputStream bis = new BufferedInputStream(input);
     int i = 0;
