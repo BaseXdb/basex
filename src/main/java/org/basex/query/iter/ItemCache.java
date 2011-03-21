@@ -147,6 +147,15 @@ public final class ItemCache extends ValueIter implements Result {
     return item[(int) i];
   }
 
+  /**
+   * Sets an item to the specified position.
+   * @param i item to be set
+   * @param p position
+   */
+  public void set(final Item i, final int p) {
+    item[p] = i;
+  }
+
   @Override
   public Value finish() {
     return Seq.get(item, size);

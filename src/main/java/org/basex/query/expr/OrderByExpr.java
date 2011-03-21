@@ -48,7 +48,7 @@ public final class OrderByExpr extends OrderBy {
 
   @Override
   void init(final int s) {
-    if(seq == null) seq = s > 0 ? new ItemCache(s) : new ItemCache();
+    if(seq == null) seq = new ItemCache(Math.max(s, 1));
     else seq.size(0);
   }
 
