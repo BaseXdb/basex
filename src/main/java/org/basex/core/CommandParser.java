@@ -17,6 +17,7 @@ import org.basex.core.cmd.AlterUser;
 import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateFS;
 import org.basex.core.cmd.CreateIndex;
@@ -148,6 +149,8 @@ public final class CommandParser extends InputParser {
             return new CreateUser(name(cmd), string(null));
         }
         break;
+      case COPY:
+        return new Copy(name(cmd), name(cmd));
       case ALTER:
         switch(consume(CmdAlter.class, cmd)) {
           case DATABASE: case DB:
