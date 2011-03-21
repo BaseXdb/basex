@@ -7,12 +7,13 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -40,17 +41,18 @@ public final class Constr {
 
   /**
    * Creates the children of the constructor.
+   * @param ii input info
    * @param ctx query context
    * @param expr input expressions
    * @throws QueryException query exception
    */
-  public Constr(final QueryContext ctx, final Expr... expr)
+  public Constr(final InputInfo ii, final QueryContext ctx, final Expr... expr)
       throws QueryException {
 
     for(final Expr e : expr) {
       more = false;
       final Iter iter = ctx.iter(e);
-      while(add(ctx, iter.next()));
+      while(add(ctx, iter.next(), ii));
     }
     if(text.size() != 0) children.add(new FTxt(text.finish(), null));
   }
@@ -60,18 +62,19 @@ public final class Constr {
    * as documents are resolved to their child nodes.
    * @param ctx query context
    * @param it current item
+   * @param ii input info
    * @return true if item was added
    * @throws QueryException query exception
    */
-  private boolean add(final QueryContext ctx, final Item it)
+  private boolean add(final QueryContext ctx, final Item it, final InputInfo ii)
       throws QueryException {
 
     if(it == null) return false;
 
-    if(it.node() && it.type != Type.TXT) {
+    if(it.node() && it.type != NodeType.TXT) {
       ANode node = (ANode) it;
 
-      if(it.type == Type.ATT) {
+      if(it.type == NodeType.ATT) {
         // text has already been added - no attribute allowed anymore
         if(text.size() != 0 || children.size() != 0) {
           errAtt = true;
@@ -82,7 +85,7 @@ public final class Constr {
         final QNm name = node.qname();
         final byte[] ln = name.ln();
         final byte[] pre = name.pref();
-        if(eq(pre, XML) && eq(ln, BASE)) base = it.atom();
+        if(eq(pre, XML) && eq(ln, BASE)) base = it.atom(ii);
 
         // check for duplicate attribute names
         final QNm qname = node.qname();
@@ -94,10 +97,10 @@ public final class Constr {
         }
         // add attribute
         atts.add(node.copy());
-      } else if(it.type == Type.DOC) {
+      } else if(it.type == NodeType.DOC) {
         final AxisIter ai = node.children();
         ANode ch;
-        while((ch = ai.next()) != null) add(ctx, ch);
+        while((ch = ai.next()) != null) add(ctx, ch, ii);
       } else {
         // add text node
         if(text.size() != 0) {
@@ -112,7 +115,7 @@ public final class Constr {
         if(ats != null && ats.size != 0) {
           // [LK][LW] why only if there are already namespaces?
           node = node.parent();
-          while(node != null && node.type == Type.ELM) {
+          while(node != null && node.type == NodeType.ELM) {
             final Atts ns = node.ns();
             for(int a = 0; a < ns.size; ++a) {
               if(!ats.contains(ns.key[a])) ats.add(ns.key[a], ns.val[a]);
@@ -123,9 +126,9 @@ public final class Constr {
       }
       more = false;
     } else {
-      if(more && it.type != Type.TXT) text.add(' ');
-      text.add(it.atom());
-      more = it.type != Type.TXT;
+      if(more && it.type != NodeType.TXT) text.add(' ');
+      text.add(it.atom(ii));
+      more = it.type != NodeType.TXT;
     }
     return true;
   }

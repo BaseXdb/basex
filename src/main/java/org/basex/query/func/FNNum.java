@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Type;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
@@ -76,13 +76,17 @@ public final class FNNum extends Fun {
     final double d = it.dbl(ii);
     final boolean s = d > 0d || 1 / d > 0;
 
-    switch(it.type) {
-      case DBL: return s ? it : Dbl.get(Math.abs(it.dbl(ii)));
-      case FLT: return s ? it : Flt.get(Math.abs(it.flt(ii)));
-      case DEC: return s ? it : Dec.get(it.dec(ii).abs());
-      case ITR: return s ? it : Itr.get(Math.abs(it.itr(ii)));
-      default:  return Itr.get(Math.abs(it.itr(ii)));
+    if(it.type instanceof AtomType) {
+      switch((AtomType) it.type) {
+        case DBL: return s ? it : Dbl.get(Math.abs(it.dbl(ii)));
+        case FLT: return s ? it : Flt.get(Math.abs((float) it.dbl(ii)));
+        case DEC: return s ? it : Dec.get(it.dec(ii).abs());
+        case ITR: return s ? it : Itr.get(Math.abs(it.itr(ii)));
+        default:  break;
+      }
     }
+    return it.type.instance(AtomType.ITR) ?
+        Itr.get(Math.abs(it.itr(ii))) : Dec.get(it.dec(ii).abs());
   }
 
   /**
@@ -98,8 +102,11 @@ public final class FNNum extends Fun {
   public static Item round(final Item it, final double d, final int prec,
       final boolean h2e, final InputInfo ii) throws QueryException {
 
-    if(it.type == Type.DEC && prec >= 0) {
-      final BigDecimal bd = it.dec(ii);
+    // take care of untyped items
+    final Item num = it.unt() ? Dbl.get(it.dbl(ii)) : it;
+
+    if(num.type == AtomType.DEC && prec >= 0) {
+      final BigDecimal bd = num.dec(ii);
       final int m = h2e ? BigDecimal.ROUND_HALF_EVEN : bd.signum() > 0 ?
           BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN;
       return Dec.get(bd.setScale(prec, m));
@@ -133,12 +140,16 @@ public final class FNNum extends Fun {
     final Item i = it.unt() ? Dbl.get(n) : it;
     if(n == d) return i;
 
-    switch(it.type) {
-      case DEC: return Dec.get(d);
-      case DBL: return Dbl.get(d);
-      case FLT: return Flt.get((float) d);
-      default:  return Itr.get((long) d);
+    if(it.type instanceof AtomType) {
+      switch((AtomType) it.type) {
+        case DEC: return Dec.get(d);
+        case DBL: return Dbl.get(d);
+        case FLT: return Flt.get((float) d);
+        case ITR: return Itr.get((long) d);
+        default:  break;
+      }
     }
+    return Dbl.get(d);
   }
 
   @Override

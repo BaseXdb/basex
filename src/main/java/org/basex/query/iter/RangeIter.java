@@ -56,4 +56,9 @@ public final class RangeIter extends ValueIter {
   public Value finish() {
     return new RangeSeq(min, max - min);
   }
+
+  @Override
+  public String toString() {
+    return "(" + min + " to " + max + ")";
+  }
 }

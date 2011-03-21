@@ -26,7 +26,7 @@ public final class YMd extends Dur {
    * @param it duration item
    */
   YMd(final Dur it) {
-    super(Type.YMD);
+    super(AtomType.YMD);
     mon = it.mon;
   }
 
@@ -65,7 +65,7 @@ public final class YMd extends Dur {
    * @throws QueryException query exception
    */
   YMd(final byte[] v, final InputInfo ii) throws QueryException {
-    super(Type.YMD);
+    super(AtomType.YMD);
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P")) dateErr(v, XYMD, ii);
@@ -86,7 +86,7 @@ public final class YMd extends Dur {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
     if(mon < 0) tb.add('-');
     tb.add('P');
@@ -103,7 +103,7 @@ public final class YMd extends Dur {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return mon;
   }
 }

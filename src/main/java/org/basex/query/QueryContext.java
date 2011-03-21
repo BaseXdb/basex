@@ -24,6 +24,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
+import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
@@ -34,10 +35,13 @@ import org.basex.query.up.Updates;
 import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.Namespaces;
+import org.basex.query.util.Var;
 import org.basex.query.util.Variables;
 import org.basex.query.util.format.DecFormatter;
+import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
@@ -72,7 +76,7 @@ public final class QueryContext extends Progress {
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
 
-  /** Reference to the root expression. */
+  /** Root expression of the query. */
   public Expr root;
   /** Current context value. */
   public Value value;
@@ -134,6 +138,9 @@ public final class QueryContext extends Progress {
   public boolean leaf;
   /** Compilation flag: GFLWOR clause performs grouping. */
   public boolean grouping;
+
+  /** Counter for variable IDs. */
+  public volatile int varIDs;
 
   /** List of modules. */
   final StringList modules = new StringList();
@@ -324,6 +331,16 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Creates a variable with a unique, non-clashing variable name.
+   * @param ii input info
+   * @param t type
+   * @return variable
+   */
+  public Var uniqueVar(final InputInfo ii, final SeqType t) {
+    return Var.create(this, ii, new QNm(Token.token(varIDs)), t);
+  }
+
+  /**
    * Copies properties of the specified context.
    * @param ctx context
    */
@@ -376,7 +393,7 @@ public final class QueryContext extends Progress {
    * Returns info on query compilation and evaluation.
    * @return query info
    */
-  String info() {
+  public String info() {
     return info.toString();
   }
 

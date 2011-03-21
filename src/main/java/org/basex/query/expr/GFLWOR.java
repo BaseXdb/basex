@@ -85,10 +85,11 @@ public class GFLWOR extends ParseExpr {
     final int vs = ctx.vars.size();
 
     for(int f = 0; f < fl.length; ++f) {
-      fl[f].comp(ctx);
+      final ForLet flt = fl[f];
+      flt.comp(ctx);
       // pre-evaluate and bind variable if it is used exactly once,
       // or if it contains a value
-      if(count(fl[f].var, f) == 1 || fl[f].expr.value()) fl[f].bind(ctx);
+      if(count(flt.var, f) == 1 || flt.expr.value()) flt.bind(ctx);
     }
 
     // optimize where clause
@@ -179,15 +180,15 @@ public class GFLWOR extends ParseExpr {
     // loop through all clauses
     for(int f = fl.length - 1; f >= 0; --f) {
       ForLet t = fl[f];
-      // ignore for clauses, context expressions and constructors
-      if(t instanceof For || t.uses(Use.CTX) || t.uses(Use.CNS)) continue;
+      // ignore for clauses and constructors
+      if(t instanceof For || t.uses(Use.CNS)) continue;
       // loop through all outer clauses
       for(int g = f - 1; g >= 0; --g) {
-        // stop if variable is shadowed or used by the current clause
-        if(fl[g].shadows(t.var) || t.count(fl[g].var) != 0) break;
-        // ignore let clauses and fragment constructors
+        // stop if variable used by the current clause
+        if(t.count(fl[g].var) != 0) break;
+        // ignore let clauses
         if(fl[g] instanceof Let) continue;
-        // stop if variable is used by as position or score
+        // stop if variable is used as position or score
         final For fr = (For) fl[g];
         if(fr.pos != null && t.count(fr.pos) != 0 ||
            fr.score != null && t.count(fr.score) != 0) break;
@@ -318,7 +319,7 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public final int count(final Var v) {
-    return count(v, -1);
+    return count(v, 0);
   }
 
   /**
@@ -330,10 +331,7 @@ public class GFLWOR extends ParseExpr {
    */
   public final int count(final Var v, final int i) {
     int c = 0;
-    for(int f = Math.max(0, i); f < fl.length; f++) {
-      c += fl[f].count(v);
-      if((i == -1 || f > i) && fl[f].shadows(v)) return c;
-    }
+    for(int f = i; f < fl.length; f++) c += fl[f].count(v);
     if(where != null) c += where.count(v);
     if(order != null) c += order.count(v);
     if(group != null) c += group.count(v);
@@ -342,10 +340,7 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public final boolean removable(final Var v) {
-    for(final ForLet f : fl) {
-      if(!f.removable(v)) return false;
-      if(f.shadows(v)) return true;
-    }
+    for(final ForLet f : fl) if(!f.removable(v)) return false;
     return (where == null || where.removable(v))
         && (order == null || order.removable(v))
         && (group == null || group.removable(v)) && ret.removable(v);
@@ -353,10 +348,7 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public final Expr remove(final Var v) {
-    for(final ForLet f : fl) {
-      f.remove(v);
-      if(f.shadows(v)) return this;
-    }
+    for(final ForLet f : fl) f.remove(v);
     if(where != null) where = where.remove(v);
     if(order != null) order = order.remove(v);
     ret = ret.remove(v);

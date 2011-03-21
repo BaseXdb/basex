@@ -5,6 +5,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert into as first primitive.
@@ -31,7 +32,7 @@ public final class InsertIntoFirst extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int pre = n.pre + add;
     final Data d = n.data;
-    d.insert(pre + d.attSize(pre, ANode.kind(node.type)), pre, md);
+    d.insert(pre + d.attSize(pre, ANode.kind(node.ndType())), pre, md);
   }
 
   @Override
@@ -42,5 +43,10 @@ public final class InsertIntoFirst extends NodeCopy {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.INSERTINTOFI;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }

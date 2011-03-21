@@ -147,7 +147,7 @@ public final class HttpClient {
     reqAttrs = new TokenMap();
     headers = new TokenMap();
     readRequestAttributes(request);
-    readRequestChildren(request, ii);
+    readRequestChildren(request);
     if(href != null) reqAttrs.add(HREF, href);
   }
 
@@ -177,11 +177,9 @@ public final class HttpClient {
   /**
    * Reads the children of the http:request element.
    * @param request request element
-   * @param ii input info
    * @throws QueryException query exception
    */
-  private void readRequestChildren(final ANode request, final InputInfo ii)
-      throws QueryException {
+  private void readRequestChildren(final ANode request) throws QueryException {
 
     final AxisIter ai = request.children();
     ANode n = null;
@@ -210,7 +208,7 @@ public final class HttpClient {
         body = n;
       } else {
         // Body child
-        throw REQINV.thrw(ii);
+        throw REQINV.thrw(info);
       }
     }
   }
@@ -221,7 +219,8 @@ public final class HttpClient {
    * @return result
    * @throws QueryException query exception
    */
-  public Iter sendHttpRequest(final QueryContext ctx) throws QueryException {
+  public Iter sendHttpRequest(final QueryContext ctx)
+      throws QueryException {
     final String adr = string(reqAttrs.get(HREF));
     try {
       final URL url = new URL(adr);
@@ -507,7 +506,6 @@ public final class HttpClient {
    * @return encoded credentials
    */
   private String encodeCredentials(final String usrname, final String passwd) {
-    final B64 b64 = new B64(token(usrname + ":" + passwd));
-    return AUTH_BASIC + string(b64.atom());
+    return AUTH_BASIC + string(new B64(token(usrname + ":" + passwd)).atom());
   }
 }

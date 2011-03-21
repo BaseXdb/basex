@@ -5,10 +5,11 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Replace primitive.
@@ -33,14 +34,14 @@ public final class ReplacePrimitive extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int pre = n.pre + add;
     final Data d = n.data;
-    final int par = d.parent(pre, ANode.kind(n.type));
+    final int par = d.parent(pre, ANode.kind(n.ndType()));
 
     //new
     d.delete(pre);
 
-    if(n.type == Type.ATT) d.insertAttr(pre, par, md);
+    if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
     else d.insert(pre, par, md);
-    if(ANode.kind(n.type) == Data.TEXT) mergeTexts(d, pre, pre + 1);
+    if(ANode.kind(n.ndType()) == Data.TEXT) mergeTexts(d, pre, pre + 1);
   }
 
   @Override
@@ -57,5 +58,10 @@ public final class ReplacePrimitive extends NodeCopy {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.REPLACENODE;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }

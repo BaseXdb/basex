@@ -27,7 +27,7 @@ public final class DTd extends Dur {
    * @param d duration item
    */
   DTd(final Dur d) {
-    super(Type.DTD);
+    super(AtomType.DTD);
     sc = d.sc == null ? BigDecimal.valueOf(0) : d.sc;
   }
 
@@ -36,7 +36,7 @@ public final class DTd extends Dur {
    * @param shift shift value
    */
   public DTd(final int shift) {
-    super(Type.DTD);
+    super(AtomType.DTD);
     sc = BigDecimal.valueOf(shift * 60L);
   }
 
@@ -75,7 +75,7 @@ public final class DTd extends Dur {
    * @param sub date to be subtracted
    */
   public DTd(final Date dat, final Date sub) {
-    super(Type.DTD);
+    super(AtomType.DTD);
     final long d1 = dat.days();
     final BigDecimal s1 = dat.seconds();
     final long d2 = sub.days();
@@ -90,7 +90,7 @@ public final class DTd extends Dur {
    * @throws QueryException query exception
    */
   DTd(final byte[] v, final InputInfo ii) throws QueryException {
-    super(Type.DTD);
+    super(AtomType.DTD);
 
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
@@ -116,7 +116,7 @@ public final class DTd extends Dur {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
     if(sc.signum() < 0) tb.add('-');
     tb.add('P');
@@ -138,7 +138,7 @@ public final class DTd extends Dur {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return sc.intValue();
   }
 }

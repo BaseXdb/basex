@@ -304,6 +304,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         tb.add("//" + DeepFS.S_FILE);
       }
       if(attr) {
+        key = "descendant-or-self::node()/" + key;
         if(tb.size() == 0) tb.add("//*");
         if(pattern.isEmpty()) pattern = PATSIMPLE;
       } else {

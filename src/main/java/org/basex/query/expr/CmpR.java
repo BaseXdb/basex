@@ -14,8 +14,8 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
@@ -139,8 +139,8 @@ public final class CmpR extends Single {
     if(s == null || ic.data instanceof MemData) return false;
 
     // check which index applies
-    final boolean text = s.test.type == Type.TXT && ic.data.meta.textindex;
-    final boolean attr = s.test.type == Type.ATT && ic.data.meta.attrindex;
+    final boolean text = s.test.type == NodeType.TXT && ic.data.meta.textindex;
+    final boolean attr = s.test.type == NodeType.ATT && ic.data.meta.attrindex;
     if(!text && !attr || !mni || !mxi) return false;
 
     final StatsKey key = key(ic, text);

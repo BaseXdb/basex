@@ -221,6 +221,20 @@ public enum Err {
   /** FORX0004: Evaluation exception. */
   REGERR(FORX, 4, "Regular expression: '%'."),
 
+  /** FOTY0012: Type exception. */
+  NOTYP(FOTY, 12, "Item doesn't have a typed value: %"),
+  /** FOTY0013: Type exception. */
+  FNATM(FOTY, 13, "Function items can't be atomized: %"),
+  /** FOTY0013: Type exception. */
+  FNEQ(FOTY, 13, "Function items don't have a defined equality: %"),
+  /** FOTY0013: Type exception. */
+  FNSTR(FOTY, 14, "Function items don't have a string representation: %"),
+  /** FOTY0013: Type exception. */
+  FNCMP(FOTY, 15, "Function items can't be compared: %"),
+
+  /** FOFU0001: Invalid value of $argNum in call to fn:partial-apply. */
+  INVPOS(FOFU, 1, "Illegal argument position for %: %"),
+
   /** FOUP0001: Evaluation exception. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
   /** FOUP0002: Evaluation exception. */
@@ -514,7 +528,7 @@ public enum Err {
   /** XQST0076: Parsing exception. */
   COLLWHICH(XQST, 38, "Unknown collation \"%\"."),
   /** XQST0039: Parsing exception. */
-  FUNCDUPL(XQST, 39, "Duplicate function argument $%."),
+  FUNCDUPL(XQST, 39, "Duplicate function argument %."),
   /** XQST0040: Parsing exception. */
   ATTDUPL(XQST, 40, "Duplicate attribute \"%\"."),
   /** XQST0045: Parsing exception. */
@@ -733,10 +747,12 @@ public enum Err {
     /** FOER Error type. */ FOER,
     /** FOFD Error type. */ FOFD,
     /** FOFL Error type. */ FOFL,
+    /** FOFU Error type. */ FOFU,
     /** FOHP Error type. */ FOHC,
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,
+    /** FOTY Error type. */ FOTY,
     /** FOUP Error type. */ FOUP,
     /** FOZP Error type. */ FOZP,
     /** FTDY Error type. */ FTDY,

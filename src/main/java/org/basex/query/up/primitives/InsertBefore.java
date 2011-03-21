@@ -5,6 +5,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert before primitive.
@@ -30,7 +31,7 @@ public final class InsertBefore extends NodeCopy {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pre = n.pre;
-    d.insert(pre, d.parent(pre, ANode.kind(node.type)), md);
+    d.insert(pre, d.parent(pre, ANode.kind(node.ndType())), md);
   }
 
   @Override
@@ -41,5 +42,10 @@ public final class InsertBefore extends NodeCopy {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.INSERTBEFORE;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }

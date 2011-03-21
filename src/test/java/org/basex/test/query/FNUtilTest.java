@@ -1,6 +1,6 @@
 package org.basex.test.query;
 
-import org.basex.core.BaseXException;
+import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
 import org.basex.query.util.Err;
 import org.junit.Test;
@@ -19,10 +19,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
 
   /**
    * Test method for the util:eval() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testEval() throws BaseXException {
+  public void testEval() throws QueryException {
     final String fun = check(FunDef.EVAL, String.class);
     query(fun + "('1')", "1");
     query(fun + "('1 + 2')", "3");
@@ -33,10 +33,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
 
   /**
    * Test method for the util:run() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testRun() throws BaseXException {
+  public void testRun() throws QueryException {
     final String fun = check(FunDef.RUN, String.class);
     query(fun + "('etc/xml/input.xq')", "XML");
     error(fun + "('etc/xml/xxx.xq')", Err.UNDOC);
@@ -44,10 +44,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
 
   /**
    * Test method for the util:mb() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testMB() throws BaseXException {
+  public void testMB() throws QueryException {
     final String fun = check(FunDef.MB, null, Boolean.class);
     query(fun + "(())");
     query(fun + "(1 to 1000, false())");
@@ -56,10 +56,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
 
   /**
    * Test method for the util:ms() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testMS() throws BaseXException {
+  public void testMS() throws QueryException {
     final String fun = check(FunDef.MS, null, Boolean.class);
     query(fun + "(())");
     query(fun + "(1 to 1000, false())");
@@ -68,10 +68,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
 
   /**
    * Test method for the util:integer-to-base() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testToBase() throws BaseXException {
+  public void testToBase() throws QueryException {
     final String fun = check(FunDef.TO_BASE, Integer.class, Integer.class);
     query(fun + "(4, 2)", "100");
     query(fun + "(65535, 2)", "1111111111111111");
@@ -89,10 +89,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
 
   /**
    * Test method for the util:integer-from-base() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testFromBase() throws BaseXException {
+  public void testFromBase() throws QueryException {
     final String fun = check(FunDef.FRM_BASE, String.class, Integer.class);
     query(fun + "('100', 2)", "4");
     query(fun + "('1111111111111111', 2)", "65535");
@@ -112,10 +112,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
 
   /**
    * Test method for the util:{md5, sha1}() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testHashing() throws BaseXException {
+  public void testHashing() throws QueryException {
     final String md5 = check(FunDef.MD5, String.class);
     final String sha1 = check(FunDef.SHA1, String.class);
     query(md5 + "('')", "D41D8CD98F00B204E9800998ECF8427E");
@@ -130,10 +130,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
 
   /**
    * Test method for the util:crc32() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testCRC32() throws BaseXException {
+  public void testCRC32() throws QueryException {
     final String fun = check(FunDef.CRC32, String.class);
     query(fun + "('')", "00000000");
     query(fun + "('BaseX')", "4C06FC7F");
@@ -141,10 +141,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
 
   /**
    * Test method for the util:to-bytes() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testToBytes() throws BaseXException {
+  public void testToBytes() throws QueryException {
     final String fun = check(FunDef.TO_BYTES, String.class);
     query(fun + "(xs:base64Binary('QmFzZVggaXMgY29vbA=='))",
       "66 97 115 101 88 32 105 115 32 99 111 111 108");

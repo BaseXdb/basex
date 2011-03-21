@@ -22,8 +22,7 @@ public final class FLWR extends GFLWOR {
    * @param r return expression
    * @param ii input info
    */
-  FLWR(final ForLet[] f, final Expr w, final Expr r,
-      final InputInfo ii) {
+  FLWR(final ForLet[] f, final Expr w, final Expr r, final InputInfo ii) {
     super(f, w, null, null, r, ii);
   }
 
@@ -35,7 +34,7 @@ public final class FLWR extends GFLWOR {
     // simplify basic GFLWOR expression (for $i in A return $i -> A)
     if(fl.length == 1 && where == null && ret instanceof VarRef) {
       final Var v = ((VarRef) ret).var;
-      if(v.type == null && fl[0].var.eq(v)) {
+      if(v.type == null && fl[0].var.is(v)) {
         ctx.compInfo(OPTFLWOR);
         return fl[0].expr;
       }

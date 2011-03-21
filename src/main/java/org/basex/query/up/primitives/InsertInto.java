@@ -5,6 +5,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert into as last primitive.
@@ -35,7 +36,7 @@ public final class InsertInto extends NodeCopy {
   public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
-    final int pre = n.pre + d.size(n.pre, ANode.kind(node.type)) + add;
+    final int pre = n.pre + d.size(n.pre, ANode.kind(node.ndType())) + add;
     d.insert(pre, n.pre, md);
     if(!mergeTexts(d, pre - 1, pre)) {
       final int s = md.meta.size;
@@ -52,5 +53,10 @@ public final class InsertInto extends NodeCopy {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.INSERTINTO;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }

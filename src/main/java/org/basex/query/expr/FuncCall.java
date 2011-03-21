@@ -53,10 +53,10 @@ public final class FuncCall extends Arr {
     // Currently, only functions with values as
     // return expressions are supported; otherwise, recursive functions
     // might not be correctly evaluated
-    if(func.expr.value() && values()) {
+    if(func.expr.value() && values() && !func.uses(Use.CTX)) {
       // evaluate arguments to catch cast exceptions
       for(int a = 0; a < expr.length; ++a) func.args[a].bind(expr[a], ctx);
-      ctx.compInfo(OPTINLINE, func.var.name.atom());
+      ctx.compInfo(OPTINLINE, func.name.atom());
       return func.value(ctx);
     }
     // User-defined functions are not pre-evaluated to avoid various issues

@@ -7,6 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;
 import static org.basex.query.up.primitives.PrimitiveType.*;
 import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.util.Util;
 
 /**
  * Container that holds all update primitives for a specific database node.
@@ -100,5 +101,10 @@ final class NodePrimitivesContainer implements NodePrimitives {
   @Override
   public boolean textAdjacency() {
     return adj;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + prim;
   }
 }
