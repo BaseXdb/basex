@@ -15,8 +15,7 @@ try {
   // create session
   $session = new Session("localhost", 1984, "admin", "admin");
   
-  echo "<table border='0' cellspacing='2' cellpadding='4' width='20%'>
-  <tbody><tr style='text-align:center;'><tbody><tr style='text-align:center;'>";
+  echo "<table border='0' cellspacing='2' cellpadding='4' width='20%'><tbody><tr style='text-align:center;'>";
   echo "<td style='text-align:center;background-color:#D7D7D7;border:#ffffff 1px solid;font-size:12pt;'></td>";
   echo "<td style='text-align:center;background-color:#D7D7D7;border:#ffffff 1px solid;font-size:12pt;'>Country</td>";
   echo "<td style='text-align:center;background-color:#D7D7D7;border:#ffffff 1px solid;font-size:12pt;'>Population</td>";
@@ -47,7 +46,7 @@ try {
     // print exception
     print $e->getMessage();
   }  
-  echo "</table>";
+  echo "</tbody></table>";
   $query->close();
   // close session
   $session->close();

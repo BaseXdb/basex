@@ -221,7 +221,6 @@ public final class XQJTest extends TestCase {
 
     final XQExpression ex = conn.createExpression();
     final String query = "1,'haha',2.0e3,2";
-    //String query = "1";
     final XQResultSequence seq = ex.executeQuery(query);
     final XMLStreamReader xsr = seq.getSequenceAsStream();
 
@@ -555,6 +554,31 @@ public final class XQJTest extends TestCase {
       expr.executeQuery("declare variable $x as xs:string external; $x");
       fail("Error expected: bound value has wrong type.");
     } catch(final XQException ex) { /* ignored */
+    }
+  }
+
+  /**
+   * Bind variable before parsing the query, using a wrong type.
+   * @throws Exception exception
+   */
+  @Test
+  public void testBindTwice() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+    XQResultSequence xqs;
+
+    try {
+      expr.bindInt(new QName("v"), 1, null);
+      xqs = expr.executeQuery("declare variable $v external; $v");
+      xqs.next();
+      assertTrue(xqs.getInt() == 1);
+
+      expr.bindInt(new QName("v"), 2, null);
+      xqs = expr.executeQuery("declare variable $v external; $v");
+      xqs.next();
+      assertTrue(xqs.getInt() == 2);
+    } catch(final XQException ex) { /* ignored */
+      fail(ex.toString());
     }
   }
 }

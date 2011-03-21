@@ -20,7 +20,7 @@ DESCRIPTION --------------------------------------------------------------------
  an exception with the received error message.
 
  To speedup execution, an output stream can be specified by some bindings; this
- way, all results will be directred to that output stream.
+ way, all results will be directed to that output stream.
 
  The query() method creates a query object. Variables can be bound to that
  object, and the result can either be requested by execute(), or by the
