@@ -5,8 +5,8 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 
 import org.basex.core.Command;
 import org.basex.core.Prop;
@@ -55,24 +55,24 @@ public class Copy extends Command {
    */
   private boolean copy(final String db, final String newdb, final Prop pr) {
     final File src = pr.dbpath(db);
-    final File dest = new File(src.getParent() + '/' + newdb);
-    dest.mkdir();
+    final File trg = new File(src.getParent() + '/' + newdb);
+    trg.mkdir();
     String[] files = src.list();
     for (String file : files) {
-      File srcFile = new File(src, file);
-      File destFile = new File(dest, file);
+      FileChannel sc = null;
+      FileChannel dc = null;
       try {
-      InputStream is = new FileInputStream(srcFile);
-      OutputStream os = new FileOutputStream(destFile);
-      byte[] buffer = new byte[1024];
-      int length;
-      while ((length = is.read(buffer)) > 0) {
-        os.write(buffer, 0, length);
-      }
-      is.close();
-      os.close();
-      } catch (Exception ex) {
+        sc = new FileInputStream(new File(src.getAbsolutePath() + '/'
+            + file)).getChannel();
+        dc = new FileOutputStream(new File(trg.getAbsolutePath() + '/'
+            + file)).getChannel();
+        dc.transferFrom(sc, 0, sc.size());
+      } catch(final IOException ex) {
+        trg.delete();
         return false;
+      } finally {
+        if(sc != null) try { sc.close(); } catch(final IOException ex) { }
+        if(dc != null) try { dc.close(); } catch(final IOException ex) { }
       }
    }
     return true;
