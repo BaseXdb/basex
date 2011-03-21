@@ -42,7 +42,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.6 \u03BB";
+  String VERSION = "6.6 beta";
   /** Company info. */
   String COMPANY = "BaseX Team";
   /** Version information. */
