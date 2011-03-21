@@ -21,6 +21,8 @@ import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Jav;
+import org.basex.query.item.NodeType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -46,18 +48,21 @@ public final class FunJava extends Arr {
   private static final String NEW = "new";
   /** Input Java types. */
   private static final Class<?>[] JAVA = {
-    String.class, boolean.class, Boolean.class, byte.class, Byte.class,
-    short.class, Short.class, int.class, Integer.class, long.class, Long.class,
-    float.class, Float.class, double.class, Double.class, BigDecimal.class,
-    BigInteger.class, QName.class, CharSequence.class, byte[].class,
+    String.class,     boolean.class, Boolean.class,      byte.class,
+    Byte.class,       short.class,   Short.class,        int.class,
+    Integer.class,    long.class,    Long.class,         float.class,
+    Float.class,      double.class,  Double.class,       BigDecimal.class,
+    BigInteger.class, QName.class,   CharSequence.class, byte[].class,
     Object[].class,
   };
   /** Resulting XQuery types. */
   private static final Type[] XQUERY = {
-    Type.STR, Type.BLN, Type.BLN, Type.BYT, Type.BYT,
-    Type.SHR, Type.SHR, Type.INT, Type.INT, Type.LNG, Type.LNG,
-    Type.FLT, Type.FLT, Type.DBL, Type.DBL, Type.DEC,
-    Type.ITR, Type.QNM, Type.STR, Type.HEX, Type.SEQ
+    AtomType.STR, AtomType.BLN, AtomType.BLN, AtomType.BYT,
+    AtomType.BYT, AtomType.SHR, AtomType.SHR, AtomType.INT,
+    AtomType.INT, AtomType.LNG, AtomType.LNG, AtomType.FLT,
+    AtomType.FLT, AtomType.DBL, AtomType.DBL, AtomType.DEC,
+    AtomType.ITR, AtomType.QNM, AtomType.STR, AtomType.HEX,
+    AtomType.SEQ
   };
   /** Java class. */
   private final Class<?> cls;
@@ -172,7 +177,7 @@ public final class FunJava extends Arr {
    */
   private static Type type(final Class<?> par) {
     for(int j = 0; j < JAVA.length; ++j) if(par == JAVA[j]) return XQUERY[j];
-    return Type.JAVA;
+    return AtomType.JAVA;
   }
 
   /**
@@ -182,34 +187,34 @@ public final class FunJava extends Arr {
    */
   public static Type type(final Object o) {
     final Type t = type(o.getClass());
-    if(t != Type.JAVA) return t;
+    if(t != AtomType.JAVA) return t;
 
-    if(o instanceof Element) return Type.ELM;
-    if(o instanceof Document) return Type.DOC;
-    if(o instanceof DocumentFragment) return Type.DOC;
-    if(o instanceof Attr) return Type.ATT;
-    if(o instanceof Comment) return Type.COM;
-    if(o instanceof ProcessingInstruction) return Type.PI;
-    if(o instanceof Text) return Type.TXT;
+    if(o instanceof Element) return NodeType.ELM;
+    if(o instanceof Document) return NodeType.DOC;
+    if(o instanceof DocumentFragment) return NodeType.DOC;
+    if(o instanceof Attr) return NodeType.ATT;
+    if(o instanceof Comment) return NodeType.COM;
+    if(o instanceof ProcessingInstruction) return NodeType.PI;
+    if(o instanceof Text) return NodeType.TXT;
 
     if(o instanceof Duration) {
       final Duration d = (Duration) o;
-      return !d.isSet(YEARS) && !d.isSet(MONTHS) ? Type.DTD :
-        !d.isSet(HOURS) && !d.isSet(MINUTES) && !d.isSet(SECONDS) ? Type.YMD :
-          Type.DUR;
+      return !d.isSet(YEARS) && !d.isSet(MONTHS) ? AtomType.DTD :
+        !d.isSet(HOURS) && !d.isSet(MINUTES) && !d.isSet(SECONDS) ?
+          AtomType.YMD : AtomType.DUR;
     }
     if(o instanceof XMLGregorianCalendar) {
       final QName type = ((XMLGregorianCalendar) o).getXMLSchemaType();
-      if(type == DATE) return Type.DAT;
-      if(type == DATETIME) return Type.DTM;
-      if(type == TIME) return Type.TIM;
-      if(type == GYEARMONTH) return Type.YMO;
-      if(type == GMONTHDAY) return Type.MDA;
-      if(type == GYEAR) return Type.YEA;
-      if(type == GMONTH) return Type.MON;
-      if(type == GDAY) return Type.DAY;
+      if(type == DATE) return AtomType.DAT;
+      if(type == DATETIME) return AtomType.DTM;
+      if(type == TIME) return AtomType.TIM;
+      if(type == GYEARMONTH) return AtomType.YMO;
+      if(type == GMONTHDAY) return AtomType.MDA;
+      if(type == GYEAR) return AtomType.YEA;
+      if(type == GMONTH) return AtomType.MON;
+      if(type == GDAY) return AtomType.DAY;
     }
-    return Type.JAVA;
+    return AtomType.JAVA;
   }
 
   /**

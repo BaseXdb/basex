@@ -9,6 +9,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
@@ -150,7 +151,7 @@ public final class FNSimple extends Fun {
    * @throws QueryException query exception
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
-    if(expr.length == 3) checkColl(expr[2], ctx);
+    if(expr.length == 3) checkColl(expr[2], ctx, input);
     return deep(input, ctx.iter(expr[0]), ctx.iter(expr[1]));
   }
 
@@ -169,7 +170,17 @@ public final class FNSimple extends Fun {
       final Item it1 = iter1.next();
       final Item it2 = iter2.next();
       // at least one iterator is exhausted: check if both items are null
-      if(it1 == null || it2 == null) return it1 == it2;
+      if(it1 == null) {
+        if(it2 == null) return true;
+        if(it2.func()) FNCMP.thrw(ii, it2);
+        return false;
+      } else if(it2 == null) {
+        if(it1.func()) FNCMP.thrw(ii, it1);
+        return false;
+      }
+
+      // check for functions
+      if(it1.func() || it2.func()) FNCMP.thrw(ii, it1.func() ? it2 : it2);
 
       // check atomic values
       if(!it1.node() && !it2.node()) {
@@ -191,11 +202,11 @@ public final class FNSimple extends Fun {
 
         if(desc) {
           // skip descendant comments and processing instructions
-          if(t1 == Type.PI || t1 == Type.COM) {
+          if(t1 == NodeType.PI || t1 == NodeType.COM) {
             s1 = ch[0].next();
             continue;
           }
-          if(t2 == Type.PI || t2 == Type.COM) {
+          if(t2 == NodeType.PI || t2 == NodeType.COM) {
             s2 = ch[1].next();
             continue;
           }
@@ -211,11 +222,12 @@ public final class FNSimple extends Fun {
             return false;
 
           // compare string values
-          if((t1 == Type.TXT || t1 == Type.ATT || t1 == Type.COM ||
-              t1 == Type.PI) && !Token.eq(s1.atom(), s2.atom())) return false;
+          if((t1 == NodeType.TXT || t1 == NodeType.ATT ||
+              t1 == NodeType.COM || t1 == NodeType.PI) &&
+              !Token.eq(s1.atom(), s2.atom())) return false;
 
           // compare elements
-          if(t1 == Type.ELM) {
+          if(t1 == NodeType.ELM) {
             // compare number of attributes
             if(s1.atts().finish().size() != s2.atts().finish().size())
               return false;

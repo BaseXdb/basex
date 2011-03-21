@@ -96,7 +96,7 @@ final class FNSeq extends Fun {
         final NodeCache src = new NodeCache(nodes, len);
         for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
           final DBNode nd = (DBNode) nodes[next];
-          dummy.pre = nd.pre + data.size(nd.pre, kind(nd.type));
+          dummy.pre = nd.pre + data.size(nd.pre, kind(nd.ndType()));
           p = src.binarySearch(dummy, next + 1, len - next - 1);
           nc.add(nd);
         }
@@ -108,7 +108,7 @@ final class FNSeq extends Fun {
         int before = fst.pre;
         for(int i = len - 1; i-- != 0;) {
           final DBNode nd = (DBNode) nodes[i];
-          if(nd.pre + data.size(nd.pre, kind(nd.type)) <= before) {
+          if(nd.pre + data.size(nd.pre, kind(nd.ndType())) <= before) {
             nc.add(nd);
             before = nd.pre;
           }
@@ -194,7 +194,7 @@ final class FNSeq extends Fun {
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[1], ctx);
-    if(expr.length == 3) checkColl(expr[2], ctx);
+    if(expr.length == 3) checkColl(expr[2], ctx, input);
 
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
@@ -219,7 +219,7 @@ final class FNSeq extends Fun {
    * @throws QueryException query exception
    */
   private Iter distinctValues(final QueryContext ctx) throws QueryException {
-    if(expr.length == 2) checkColl(expr[1], ctx);
+    if(expr.length == 2) checkColl(expr[1], ctx, input);
 
     return new Iter() {
       final ItemSet map = new ItemSet();

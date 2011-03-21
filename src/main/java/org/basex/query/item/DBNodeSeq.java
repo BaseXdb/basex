@@ -100,13 +100,13 @@ public final class DBNodeSeq extends Seq {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Type.SEQ.nam, SIZE, Token.token(size));
+    ser.openElement(AtomType.SEQ.nam, SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); ++v) node(v).plan(ser);
     ser.closeElement();
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     int h = 0;
     for(int v = 0; v != Math.min(size, 5); ++v) h += pres[v];
     return h;

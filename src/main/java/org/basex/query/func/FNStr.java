@@ -55,7 +55,7 @@ final class FNStr extends Fun {
       case CODESTR:
         return cp2str(e.iter(ctx));
       case COMPARE:
-        if(expr.length == 3) checkColl(expr[2], ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx, input);
         Item it1 = e.item(ctx, input);
         Item it2 = expr[1].item(ctx, input);
         if(it1 == null || it2 == null) return null;
@@ -87,29 +87,29 @@ final class FNStr extends Fun {
       case CONCAT:
         return concat(ctx);
       case CONTAINS:
-        if(expr.length == 3) checkColl(expr[2], ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx, input);
         Item it = expr[1].item(ctx, input);
         if(it == null) return Bln.TRUE;
         return Bln.get(contains(checkEStr(e, ctx), checkEStr(it)));
       case STARTS:
-        if(expr.length == 3) checkColl(expr[2], ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx, input);
         it = expr[1].item(ctx, input);
         if(it == null) return Bln.TRUE;
         return Bln.get(startsWith(checkEStr(e, ctx), checkEStr(it)));
       case ENDS:
-        if(expr.length == 3) checkColl(expr[2], ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx, input);
         it = expr[1].item(ctx, input);
         if(it == null) return Bln.TRUE;
         return Bln.get(endsWith(checkEStr(e, ctx), checkEStr(it)));
       case SUBAFTER:
-        if(expr.length == 3) checkColl(expr[2], ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx, input);
         final byte[] str = checkEStr(e, ctx);
         final byte[] sa = checkEStr(expr[1], ctx);
         final int pa = indexOf(str, sa);
         return pa != -1 ? Str.get(substring(str, pa + sa.length)) :
           Str.ZERO;
       case SUBBEFORE:
-        if(expr.length == 3) checkColl(expr[2], ctx);
+        if(expr.length == 3) checkColl(expr[2], ctx, input);
         final byte[] sb = checkEStr(e, ctx);
         final int pb = indexOf(sb, checkEStr(expr[1], ctx));
         return pb > 0 ? Str.get(substring(sb, 0, pb)) : Str.ZERO;
@@ -282,7 +282,7 @@ final class FNStr extends Fun {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : expr) {
       final Item it = a.item(ctx, input);
-      if(it != null) tb.add(it.atom());
+      if(it != null) tb.add(it.atom(input));
     }
     return Str.get(tb.finish());
   }

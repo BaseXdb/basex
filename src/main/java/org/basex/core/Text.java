@@ -42,7 +42,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.5.2 beta";
+  String VERSION = "6.6 beta";
   /** Company info. */
   String COMPANY = "BaseX Team";
   /** Version information. */
@@ -202,6 +202,11 @@ public interface Text {
       "  " + lang("ch_create7", "mountpoint", "store") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
       "  " + lang("ch_create8")
+  };
+
+  /** Command help. */
+  String[] HELPCOPY = {
+    "[" + C_NAME + "] [new" + C_NAME + "]", lang("ch_copy1"), lang("ch_copy2")
   };
 
   /** Command help. */
@@ -464,6 +469,10 @@ public interface Text {
   String DBBACKUP = lang("db_backup");
   /** Backup of database not created. */
   String DBNOBACKUP = lang("db_nobackup");
+  /** Copy of database created. */
+  String DBCOPY = lang("db_copy");
+  /** Copy of database not created. */
+  String DBNOCOPY = lang("db_nocopy");
   /** Database restored. */
   String DBRESTORE = lang("db_restore");
   /** Database not restored. */

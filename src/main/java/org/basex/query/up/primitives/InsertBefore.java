@@ -31,7 +31,7 @@ public final class InsertBefore extends NodeCopy {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pre = n.pre;
-    d.insert(pre, d.parent(pre, ANode.kind(node.type)), md);
+    d.insert(pre, d.parent(pre, ANode.kind(node.ndType())), md);
   }
 
   @Override

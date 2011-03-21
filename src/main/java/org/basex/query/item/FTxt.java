@@ -19,7 +19,7 @@ public final class FTxt extends FNode {
    * @param p parent
    */
   public FTxt(final byte[] t, final ANode p) {
-    super(Type.TXT);
+    super(NodeType.TXT);
     val = t;
     par = p;
   }

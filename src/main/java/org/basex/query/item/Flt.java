@@ -1,6 +1,8 @@
 package org.basex.query.item;
 
 import static java.lang.Double.isNaN;
+import static org.basex.util.Token.*;
+
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -26,7 +28,7 @@ public final class Flt extends Item {
    * @param v value
    */
   private Flt(final float v) {
-    super(Type.FLT);
+    super(AtomType.FLT);
     val = v;
   }
 
@@ -40,7 +42,7 @@ public final class Flt extends Item {
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return Token.token(val);
   }
 
@@ -71,7 +73,7 @@ public final class Flt extends Item {
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it.type == Type.DBL ? it.eq(ii, this) : val == it.flt(ii);
+    return it.type == AtomType.DBL ? it.eq(ii, this) : val == it.flt(ii);
   }
 
   @Override
@@ -92,7 +94,7 @@ public final class Flt extends Item {
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return (int) val;
   }
 
@@ -117,8 +119,12 @@ public final class Flt extends Item {
     } catch(final NumberFormatException ex) {
       if(Token.eq(Token.trim(val), Token.INF)) return Float.POSITIVE_INFINITY;
       if(Token.eq(Token.trim(val), Token.NINF)) return Float.NEGATIVE_INFINITY;
-      ZERO.castErr(val, ii);
-      return 0f;
+      throw ZERO.castErr(val, ii);
     }
+  }
+
+  @Override
+  public String toString() {
+    return string(atom(null));
   }
 }

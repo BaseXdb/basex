@@ -84,7 +84,8 @@ public final class TableDiskAccess extends TableAccess {
 
   @Override
   public synchronized void flush() throws IOException {
-    for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
+    for(final Buffer b : bm.all())
+      if(b.dirty) writeBlock(b);
 
     if(!dirty) return;
     final DataOutput out = new DataOutput(meta.file(pref + 'i'));
@@ -219,13 +220,15 @@ public final class TableDiskAccess extends TableAccess {
       from = 0;
     }
 
-    // delete entries at beginning of current (last) block
-    copy(bf.data, last - fpre, bf.data, 0, npre - last);
     // if the last block is empty, clear the corresponding bit:
     if(npre == last) {
       pagemap.clear((int) bf.pos);
       ++unused;
-      ++index;
+      if(index < blocks - 1) nextBlock();
+      else ++index;
+    } else {
+      // delete entries at beginning of current (last) block
+      copy(bf.data, last - fpre, bf.data, 0, npre - last);
     }
 
     // now remove them from the index
@@ -282,8 +285,10 @@ public final class TableDiskAccess extends TableAccess {
     // fill in the current block with new entries:
     // number of bytes which can fit in the first block:
     int n = bf.data.length - split;
-    System.arraycopy(all, 0, bf.data, split, n);
-    bf.dirty = true;
+    if(n > 0) {
+      System.arraycopy(all, 0, bf.data, split, n);
+      bf.dirty = true;
+    }
 
     // resize fpres and pages:
     // number of blocks needed to store the remaining entries:

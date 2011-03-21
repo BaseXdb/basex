@@ -181,4 +181,10 @@ public class TokenSet implements Iterable<byte[]> {
       public void remove() { Util.notexpected(); }
     };
   }
+
+  @Override
+  public String toString() {
+    return new TokenBuilder(Util.name(this)).add('[').addSep(keys(),
+        ", ").add(']').toString();
+  }
 }

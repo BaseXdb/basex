@@ -29,6 +29,7 @@ public final class NSGlobal {
     NS.add(HTTP, HTTPURI);
     NS.add(SENT, SENTURI);
     NS.add(ZIP, ZIPURI);
+    NS.add(HOF, HOFURI);
   }
 
   /** Private constructor. */

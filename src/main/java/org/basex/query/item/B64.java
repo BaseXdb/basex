@@ -23,7 +23,7 @@ public final class B64 extends Bin {
    * @throws QueryException query exception
    */
   public B64(final byte[] d, final InputInfo ii) throws QueryException {
-    super(init(d, ii), Type.B64);
+    super(init(d, ii), AtomType.B64);
   }
 
   /**
@@ -31,7 +31,7 @@ public final class B64 extends Bin {
    * @param d binary data
    */
   public B64(final byte[] d) {
-    super(d, Type.B64);
+    super(d, AtomType.B64);
   }
 
   /**
@@ -98,7 +98,7 @@ public final class B64 extends Bin {
     final ByteList bl = new ByteList();
     for(final byte c : d) if(c < 0 || c > ' ') bl.add(c);
     final byte[] s = bl.toArray();
-    if((s.length & 3) != 0) FUNCAST.thrw(ii, Type.B64, s);
+    if((s.length & 3) != 0) FUNCAST.thrw(ii, AtomType.B64, s);
 
     final int l = s.length;
     final int g = l >>> 2;
@@ -110,7 +110,7 @@ public final class B64 extends Bin {
       }
       if(s[l - 2] == '=') ++m;
       if(m == 2 && !Token.contains(ENDING, s[l - 3]))
-        FUNCAST.thrw(ii, Type.B64, Token.substring(s, l - 3));
+        FUNCAST.thrw(ii, AtomType.B64, Token.substring(s, l - 3));
     }
 
     final byte[] val = new byte[3 * g - m];
@@ -144,9 +144,9 @@ public final class B64 extends Bin {
   private static int b2h(final byte c, final InputInfo ii)
       throws QueryException {
 
-    if(c < 0 || c >= B2H.length) FUNCAST.thrw(ii, Type.B64, (char) c);
+    if(c < 0 || c >= B2H.length) FUNCAST.thrw(ii, AtomType.B64, (char) c);
     final int result = B2H[c];
-    if(result < 0) FUNCAST.thrw(ii, Type.B64, (char) c);
+    if(result < 0) FUNCAST.thrw(ii, AtomType.B64, (char) c);
     return result;
   }
 

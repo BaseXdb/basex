@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.util.Token.*;
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -8,8 +9,8 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
@@ -43,8 +44,9 @@ final class FNAcc extends Fun {
         return Itr.get(ctx.size);
       case STRING:
         Item it = e.item(ctx, input);
-        return it == null ? Str.ZERO : it.str() && !it.unt() ? it :
-          Str.get(it.atom());
+        if(it == null) return Str.ZERO;
+        if(it.func()) FNSTR.thrw(ii, this);
+        return it.str() && !it.unt() ? it : Str.get(it.atom(ii));
       case NUMBER:
         return number(ctx.iter(e), ctx);
       case STRLEN:
@@ -54,7 +56,7 @@ final class FNAcc extends Fun {
       case URIQNAME:
         it = e.item(ctx, input);
         if(it == null) return null;
-        final QNm qn = (QNm) checkType(it, Type.QNM);
+        final QNm qn = (QNm) checkType(it, AtomType.QNM);
         return qn.hasUri() ? qn.uri() :
           Uri.uri(ctx.ns.uri(qn.pref(), true, ii));
       default:
@@ -75,8 +77,10 @@ final class FNAcc extends Fun {
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
 
+    if(it.func()) FNATM.thrw(input, this);
+
     try {
-      return it.type == Type.DBL ? it : Type.DBL.e(it, ctx, input);
+      return it.type == AtomType.DBL ? it : AtomType.DBL.e(it, ctx, input);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     }

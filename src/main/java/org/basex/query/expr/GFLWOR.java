@@ -85,10 +85,11 @@ public class GFLWOR extends ParseExpr {
     final int vs = ctx.vars.size();
 
     for(int f = 0; f < fl.length; ++f) {
-      fl[f].comp(ctx);
+      final ForLet flt = fl[f];
+      flt.comp(ctx);
       // pre-evaluate and bind variable if it is used exactly once,
       // or if it contains a value
-      if(count(fl[f].var, f) == 1 || fl[f].expr.value()) fl[f].bind(ctx);
+      if(count(flt.var, f) == 1 || flt.expr.value()) flt.bind(ctx);
     }
 
     // optimize where clause
@@ -270,13 +271,13 @@ public class GFLWOR extends ParseExpr {
 
     // evaluate pre grouping tuples
     final int s = (int) size();
-    final ValueList vl = s >= 0 ? new ValueList(s) : new ValueList();
+    final ValueList vl = new ValueList(Math.max(1, s));
     if(order != null) order.init(vl, s);
     if(group != null) group.init(fl, order);
     iter(ctx, vl, iter, 0);
     ctx.vars.reset(vs);
 
-    for(final ForLet aFl : fl) ctx.vars.add(aFl.var);
+    for(final ForLet f : fl) ctx.vars.add(f.var);
 
     // order != null, otherwise it would have been handled in group
     final Iter ir = group != null ? group.gp.ret(ctx, ret) : ctx.iter(order);

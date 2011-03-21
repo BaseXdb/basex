@@ -14,7 +14,6 @@ import java.util.List;
 import org.basex.core.Prop;
 import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
-import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.PrintOutput;
 import org.basex.io.TextInput;
@@ -26,8 +25,8 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
@@ -259,7 +258,7 @@ final class FNFile extends Fun {
     if(enc != null && !Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
 
     try {
-      return Str.get(TextInput.content(IO.get(path.getPath()), enc).finish());
+      return Str.get(TextInput.content(new IOFile(path), enc).finish());
     } catch(final IOException ex) {
       throw FILEERROR.thrw(input, ex);
     }
@@ -326,7 +325,7 @@ final class FNFile extends Fun {
   private Item writeBinary(final File path, final QueryContext ctx)
       throws QueryException {
 
-    final B64 b64 = (B64) checkType(expr[1].item(ctx, input), Type.B64);
+    final B64 b64 = (B64) checkType(expr[1].item(ctx, input), AtomType.B64);
     final boolean append = optionalBool(2, ctx);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
 
@@ -425,7 +424,7 @@ final class FNFile extends Fun {
   private boolean optionalBool(final int i, final QueryContext ctx)
       throws QueryException {
     return expr.length > i &&
-      checkType(expr[i].item(ctx, input), Type.BLN).bool(input);
+      checkType(expr[i].item(ctx, input), AtomType.BLN).bool(input);
   }
 
   @Override

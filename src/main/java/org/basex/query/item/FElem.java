@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.iter.NodeCache;
@@ -64,7 +63,7 @@ public final class FElem extends FNode {
   public FElem(final QNm n, final NodeCache ch, final NodeCache at,
       final byte[] b, final Atts nsp, final ANode p) {
 
-    super(Type.ELM);
+    super(NodeType.ELM);
     name = n;
     children = ch == null ? new NodeCache() : ch;
     atts = at == null ? new NodeCache() : at;
@@ -81,7 +80,7 @@ public final class FElem extends FNode {
    * @param nss namespaces in scope
    */
   FElem(final Element elem, final ANode p, final TokenMap nss) {
-    super(Type.ELM);
+    super(NodeType.ELM);
 
     // general stuff
     final String nu = elem.getNamespaceURI();

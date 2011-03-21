@@ -48,7 +48,7 @@ public final class OrderByExpr extends OrderBy {
 
   @Override
   void init(final int s) {
-    if(seq == null) seq = s > 0 ? new ItemCache(s) : new ItemCache();
+    if(seq == null) seq = new ItemCache(Math.max(s, 1));
     else seq.size(0);
   }
 
@@ -56,7 +56,7 @@ public final class OrderByExpr extends OrderBy {
   void add(final QueryContext ctx) throws QueryException {
     Item it = expr.item(ctx, input);
     if(it != null) {
-      if(it.node()) it = Str.get(it.atom());
+      if(it.node()) it = Str.get(it.atom(input));
       else if(it.num() && Double.isNaN(it.dbl(input))) it = null;
     }
     seq.add(it);

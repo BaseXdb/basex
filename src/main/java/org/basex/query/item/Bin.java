@@ -32,6 +32,17 @@ public abstract class Bin extends Item {
   }
 
   @Override
+  public byte[] atom(final InputInfo ii) {
+    return atom();
+  }
+
+  /**
+   * Returns an atomized string.
+   * @return string representation
+   */
+  public abstract byte[] atom();
+
+  @Override
   public final byte[] toJava() {
     return val;
   }

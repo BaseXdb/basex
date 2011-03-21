@@ -9,9 +9,10 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
@@ -42,7 +43,7 @@ final class FNQName extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
       case INSCOPE: return inscope(ctx,
-          (ANode) checkType(expr[0].item(ctx, input), Type.ELM));
+          (ANode) checkType(expr[0].item(ctx, input), NodeType.ELM));
       default:      return super.iter(ctx);
     }
   }
@@ -59,27 +60,29 @@ final class FNQName extends Fun {
         return it == null ? null : resolve(ctx, it, checkEmpty(it2));
       case QNAME:
         final byte[] uri = it == null ? EMPTY :
-          checkType(it, Type.STR).atom();
-        final Item it3 = it2 == null ? Str.ZERO : checkType(it2, Type.STR);
-        final byte[] atm = it3.atom();
+          checkType(it, AtomType.STR).atom(input);
+        final Item it3 = it2 == null ? Str.ZERO :
+          checkType(it2, AtomType.STR);
+        final byte[] atm = it3.atom(input);
         final byte[] str = !contains(atm, ':') && eq(uri, XMLURI)
             ? concat(XMLC, atm) : atm;
-        if(!XMLToken.isQName(str)) Err.value(input, Type.QNM, it3);
+        if(!XMLToken.isQName(str)) Err.value(input, AtomType.QNM, it3);
         QNm nm = new QNm(str, uri);
-        if(nm.ns() && uri.length == 0) Err.value(input, Type.URI, nm.uri());
+        if(nm.ns() && uri.length == 0)
+          Err.value(input, AtomType.URI, nm.uri());
         return nm;
       case LOCNAMEQNAME:
         if(it == null) return null;
-        nm = (QNm) checkType(it, Type.QNM);
-        return Type.NCN.e(Str.get(nm.ln()), ctx, input);
+        nm = (QNm) checkType(it, AtomType.QNM);
+        return AtomType.NCN.e(Str.get(nm.ln()), ctx, input);
       case PREQNAME:
         if(it == null) return null;
-        nm = (QNm) checkType(it, Type.QNM);
-        return !nm.ns() ? null : Type.NCN.e(Str.get(nm.pref()), ctx, input);
+        nm = (QNm) checkType(it, AtomType.QNM);
+        return !nm.ns() ? null : AtomType.NCN.e(Str.get(nm.pref()), ctx, input);
       case NSURIPRE: // [LW][LK] broken...
         // [LK] find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);
-        final ANode an = (ANode) checkType(it2, Type.ELM);
+        final ANode an = (ANode) checkType(it2, NodeType.ELM);
         final Atts at = an.nsScope(!copiedNod(an, ctx) || ctx.nsInherit);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
@@ -119,11 +122,11 @@ final class FNQName extends Fun {
       throws QueryException {
 
     final byte[] name = trim(checkEStr(q));
-    if(!XMLToken.isQName(name)) Err.value(input, Type.QNM, q);
+    if(!XMLToken.isQName(name)) Err.value(input, AtomType.QNM, q);
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();
-    final byte[] uri = ((ANode) checkType(it, Type.ELM)).uri(pref, ctx);
+    final byte[] uri = ((ANode) checkType(it, NodeType.ELM)).uri(pref, ctx);
     if(uri == null) NSDECL.thrw(input, pref);
     nm.uri(uri);
     return nm;

@@ -3,6 +3,7 @@ package org.basex.query.up;
 import static org.basex.util.Token.*;
 import java.util.Arrays;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.util.Atts;
@@ -29,8 +30,8 @@ public final class NamePool {
    * @param type node type
    */
   public void add(final QNm name, final Type type) {
-    if(type != Type.ATT && type != Type.ELM) return;
-    final int i = index(name, type == Type.ATT);
+    if(type != NodeType.ATT && type != NodeType.ELM) return;
+    final int i = index(name, type == NodeType.ATT);
     occ[i]++;
   }
 
@@ -39,8 +40,8 @@ public final class NamePool {
    * @param node node
    */
   public void remove(final ANode node) {
-    if(node.type != Type.ATT && node.type != Type.ELM) return;
-    final int i = index(node.qname(), node.type == Type.ATT);
+    if(node.type != NodeType.ATT && node.type != NodeType.ELM) return;
+    final int i = index(node.qname(), node.type == NodeType.ATT);
     occ[i]--;
   }
 

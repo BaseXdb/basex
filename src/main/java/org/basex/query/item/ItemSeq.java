@@ -20,45 +20,45 @@ import org.basex.util.Token;
  */
 public final class ItemSeq extends Seq {
   /** Item array. */
-  private final Item[] val;
+  private final Item[] item;
   /** Sequence type. */
   private SeqType seq;
 
   /**
    * Constructor.
-   * @param v value
+   * @param it items
    * @param s size
    */
-  protected ItemSeq(final Item[] v, final int s) {
+  protected ItemSeq(final Item[] it, final int s) {
     super(s);
-    val = v;
+    item = it;
   }
 
   @Override
   public Object toJava() {
     final Object[] obj = new Object[(int) size];
-    for(int s = 0; s != size; ++s) obj[s] = val[s].toJava();
+    for(int s = 0; s != size; ++s) obj[s] = item[s].toJava();
     return obj;
   }
 
   @Override
   public ValueIter iter() {
-    return new ItemCache(val, (int) size);
+    return new ItemCache(item, (int) size);
   }
 
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(!val[0].node()) CONDTYPE.thrw(ii, this);
-    return val[0];
+    if(!item[0].node()) CONDTYPE.thrw(ii, this);
+    return item[0];
   }
 
   @Override
   public SeqType type() {
     if(seq == null) {
-      Type t = val[0].type;
-      for(int s = 1; s != size && t != Type.ITEM; ++s) {
-        if(t != val[s].type) t = Type.ITEM;
+      Type t = item[0].type;
+      for(int s = 1; s != size && t != AtomType.ITEM; ++s) {
+        if(t != item[s].type) t = AtomType.ITEM;
       }
       seq = SeqType.get(t, SeqType.Occ.OM);
     }
@@ -73,30 +73,30 @@ public final class ItemSeq extends Seq {
   @Override
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof ItemSeq)) return false;
-    final ItemSeq i = (ItemSeq) cmp;
-    return val == i.val && size == i.size;
+    final ItemSeq is = (ItemSeq) cmp;
+    return item == is.item && size == is.size;
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Type.SEQ.nam, SIZE, Token.token(size));
-    for(int v = 0; v != Math.min(size, 5); ++v) val[v].plan(ser);
+    ser.openElement(AtomType.SEQ.nam, SIZE, Token.token(size));
+    for(int v = 0; v != Math.min(size, 5); ++v) item[v].plan(ser);
     ser.closeElement();
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) throws QueryException {
     int h = 0;
-    for(int v = 0; v != Math.min(size, 5); ++v) h += val[v].hash();
+    for(int v = 0; v != Math.min(size, 5); ++v) h += item[v].hash(ii);
     return h;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(PAR1);
-    for(int v = 0; v != size; ++v) {
-      sb.append((v != 0 ? SEP : "") + val[v]);
-      if(sb.length() > 32 && v + 1 != size) {
+    for(int i = 0; i < size; ++i) {
+      sb.append((i != 0 ? SEP : "") + item[i]);
+      if(sb.length() > 32 && i + 1 != size) {
         sb.append(SEP + DOTS);
         break;
       }

@@ -22,9 +22,9 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
@@ -85,7 +85,7 @@ public class AxisPath extends Path {
     // evaluate number of results
     size = size(ctx);
     // set type with number of results or occurrence from last step
-    type = size != -1 ? SeqType.get(Type.NOD, size) :
+    type = size != -1 ? SeqType.get(NodeType.NOD, size) :
       step[step.length - 1].type();
 
     return iterable() ? new IterPath(input, root, step, type, size) : this;
@@ -122,7 +122,7 @@ public class AxisPath extends Path {
    */
   private long size(final QueryContext ctx) {
     final Value rt = root(ctx);
-    final Data data = rt != null && rt.type == Type.DOC &&
+    final Data data = rt != null && rt.type == NodeType.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
 
     if(data == null || !data.meta.pathindex || !data.meta.uptodate ||
@@ -171,7 +171,7 @@ public class AxisPath extends Path {
         final Iter iter = ctx.value.iter();
         Item it;
         while((it = iter.next()) != null) {
-          doc = it.type == Type.DOC;
+          doc = it.type == NodeType.DOC;
           if(!doc) break;
         }
       }
@@ -398,9 +398,8 @@ public class AxisPath extends Path {
     final long cp = ctx.pos;
     Value r = root != null ? root.value(ctx) : c;
 
-    if(!cache || citer == null || lvalue.type != Type.DOC ||
-        r.type != Type.DOC || !((ANode) lvalue).is((ANode) r)) {
-
+    if(!cache || citer == null || lvalue.type != NodeType.DOC ||
+        r.type != NodeType.DOC || !((ANode) lvalue).is((ANode) r)) {
       lvalue = r;
       citer = new NodeCache().random();
       if(r != null) {
@@ -489,8 +488,8 @@ public class AxisPath extends Path {
       if(l == 0) {
         if(root instanceof CAttr) {
           if(sa == CHILD || sa == DESC) return s;
-        } else if(root instanceof DBNode && ((DBNode) root).type == Type.DOC ||
-            root instanceof CDoc) {
+        } else if(root instanceof DBNode &&
+            ((DBNode) root).type == NodeType.DOC || root instanceof CDoc) {
           if(sa != CHILD && sa != DESC && sa != DESCORSELF &&
             (sa != SELF && sa != ANCORSELF ||
              s.test != Test.NOD && s.test != Test.DOC)) return s;
@@ -502,7 +501,7 @@ public class AxisPath extends Path {
           // .../self:: / .../descendant-or-self::
           if(s.test == Test.NOD) continue;
           // @.../...
-          if(lsa == ATTR && s.test.type != Type.ATT) return s;
+          if(lsa == ATTR && s.test.type != NodeType.ATT) return s;
           // text()/...
           if(ls.test == Test.TXT && s.test != Test.TXT) return s;
           if(sa == DESCORSELF) continue;
@@ -573,7 +572,7 @@ public class AxisPath extends Path {
   public final Expr addText(final QueryContext ctx) throws QueryException {
     final AxisStep s = step[step.length - 1];
 
-    if(s.pred.length != 0 || !s.axis.down || s.test.type == Type.ATT ||
+    if(s.pred.length != 0 || !s.axis.down || s.test.type == NodeType.ATT ||
         s.test.test != Name.NAME && s.test.test != Name.STD) return this;
 
     final Data data = ctx.resource.data();

@@ -26,7 +26,7 @@ public final class FComm extends FNode {
    * @param p parent
    */
   public FComm(final byte[] t, final ANode p) {
-    super(Type.COM);
+    super(NodeType.COM);
     val = t;
     par = p;
   }
