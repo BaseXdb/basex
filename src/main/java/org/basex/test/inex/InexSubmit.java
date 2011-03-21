@@ -405,10 +405,10 @@ public final class InexSubmit {
    * @param q query
    * @param res result of the query
    * @param k max number of results
-   * @throws IOException IOException
+   * @throws Exception Exception
    */
   private void createQueryEntryServer(final int q, final ItemCache res,
-      final int k) throws IOException {
+      final int k) throws Exception {
 
     xml.openElement(token("topic"), token("topic-id"), token(tid.get(q)),
         token("total_time_ms"), token(qtimes[q])
@@ -417,7 +417,7 @@ public final class InexSubmit {
     Item a;
     int r = 1;
     while(res != null && (a = res.next()) != null && r <= k) {
-      final byte[] s = a.atom();
+      final byte[] s = a.atom(null);
       final int i = indexOf(s, ';');
       xml.openElement(token("result"));
       xml.openElement(token("file"));

@@ -35,8 +35,8 @@ import org.basex.query.func.FNSimple;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
@@ -110,6 +110,8 @@ public abstract class W3CTS {
   private boolean minimum;
   /** Print compilation steps. */
   private boolean compile;
+  /** test-group to use. */
+  private String group;
 
   /** Cached source files. */
   private final HashMap<String, String> srcs = new HashMap<String, String>();
@@ -163,6 +165,8 @@ public abstract class W3CTS {
         " -d show debugging info" + NL +
         " -h show this help" + NL +
         " -m minimum conformance" + NL +
+        " -g <test-group> test group to test" + NL +
+        " -C include tests that depend on the current time" + NL +
         " -p change path" + NL +
         " -r create report" + NL +
         " -v verbose output");
@@ -173,12 +177,16 @@ public abstract class W3CTS {
         if(c == 'r') {
           reporting = true;
           currTime = true;
+        } else if(c == 'C') {
+          currTime = true;
         } else if(c == 'c') {
           compile = true;
         } else if(c == 'd') {
           debug = true;
         } else if(c == 'm') {
-          minimum = true;
+            minimum = true;
+        } else if(c == 'g') {
+          group = arg.string();
         } else if(c == 'p') {
           path = arg.string() + "/";
         } else if(c == 'v') {
@@ -248,7 +256,8 @@ public abstract class W3CTS {
     if(verbose) Util.outln();
     final Nodes nodes = minimum ?
       nodes("//*:test-group[starts-with(@name, 'Minim')]//*:test-case", root) :
-      nodes("//*:test-case", root);
+      group != null ? nodes("//*:test-group[@name eq '" + group +
+          "']//*:test-case", root) : nodes("//*:test-case", root);
 
     long total = nodes.size();
     Util.out("Parsing " + total + " Queries");
@@ -385,7 +394,7 @@ public abstract class W3CTS {
         iter = ItemCache.get(xq.iter());
         Item it;
         while((it = iter.next()) != null) {
-          doc &= it.type == Type.DOC;
+          doc &= it.type == NodeType.DOC;
           it.serialize(xml);
         }
         xml.close();
@@ -502,6 +511,7 @@ public abstract class W3CTS {
               }
             } catch(final IOException ex) {
             } catch(final Throwable ex) {
+              System.err.println("\n" + outname + ":");
               ex.printStackTrace();
             }
           }
@@ -595,13 +605,14 @@ public abstract class W3CTS {
   private ItemCache toIter(final String xml, final boolean frag) {
     final ItemCache it = new ItemCache();
     try {
-      String str = xml;
-      if(frag) str = "<X>" + str + "</X>";
+      String str = frag ? "<X>" + xml + "</X>" : xml;
       final Data d = CreateDB.xml(IO.get(str), context);
 
-      for(int p = !frag ? 0 : 2; p < d.meta.size; p += d.size(p, d.kind(p)))
+      for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p)))
         it.add(new DBNode(d, p));
-    } catch (final IOException ex) { /* never happens */ }
+    } catch (final IOException ex) {
+      throw new Error(ex);
+    }
     return it;
   }
 
@@ -638,19 +649,19 @@ public abstract class W3CTS {
 
   /**
    * Initializes the input files, specified by the context nodes.
-   * @param node variables
+   * @param nod variables
    * @param var documents
    * @param qp query processor
    * @param first call
    * @return string with input files
    * @throws QueryException query exception
    */
-  private byte[] file(final Nodes node, final Nodes var,
+  private byte[] file(final Nodes nod, final Nodes var,
       final QueryProcessor qp, final boolean first) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int c = 0; c < node.size(); ++c) {
-      final byte[] nm = data.atom(node.list[c]);
+    for(int c = 0; c < nod.size(); ++c) {
+      final byte[] nm = data.atom(nod.list[c]);
       String src = srcs.get(string(nm));
       if(tb.size() != 0) tb.add(", ");
       tb.add(nm);
@@ -675,16 +686,16 @@ public abstract class W3CTS {
 
   /**
    * Assigns the nodes to the specified variables.
-   * @param node nodes
+   * @param nod nodes
    * @param var variables
    * @param qp query processor
    * @throws QueryException query exception
    */
-  private void var(final Nodes node, final Nodes var, final QueryProcessor qp)
+  private void var(final Nodes nod, final Nodes var, final QueryProcessor qp)
       throws QueryException {
 
-    for(int c = 0; c < node.size(); ++c) {
-      final byte[] nm = data.atom(node.list[c]);
+    for(int c = 0; c < nod.size(); ++c) {
+      final byte[] nm = data.atom(nod.list[c]);
       final String src = srcs.get(string(nm));
 
       final Item it = src == null ? coll(nm, qp) : Str.get(src);
@@ -709,17 +720,17 @@ public abstract class W3CTS {
   /**
    * Evaluates the the input files and assigns the result to the specified
    * variables.
-   * @param node variables
+   * @param nod variables
    * @param var documents
    * @param pth file path
    * @param qp query processor
    * @throws Exception exception
    */
-  private void eval(final Nodes node, final Nodes var, final String pth,
+  private void eval(final Nodes nod, final Nodes var, final String pth,
       final QueryProcessor qp) throws Exception {
 
-    for(int c = 0; c < node.size(); ++c) {
-      final String file = pth + string(data.atom(node.list[c])) + IO.XQSUFFIX;
+    for(int c = 0; c < nod.size(); ++c) {
+      final String file = pth + string(data.atom(nod.list[c])) + IO.XQSUFFIX;
       final String in = read(IO.get(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
       final Value val = xq.iter().finish();
