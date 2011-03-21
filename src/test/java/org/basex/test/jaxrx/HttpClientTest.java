@@ -6,16 +6,15 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.basex.api.jaxrx.JaxRxServer;
+import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -23,28 +22,22 @@ import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.XMLSerializer;
+import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
-import org.basex.query.item.Bln;
-import org.basex.query.item.FAttr;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.FElem;
-import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
-import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
-import org.basex.query.util.ResponseHandler;
+import org.basex.query.util.Request;
+import org.basex.query.util.RequestParser;
 import org.basex.util.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.sun.org.apache.xerces.internal.parsers.XMLParser;
 
 /**
  * This class tests the HTTP Client.
@@ -68,6 +61,8 @@ public final class HttpClientTest {
   private static final byte[] MULTIPART = token("http:multipart");
   /** http:body element. */
   private static final byte[] BODY = token("http:body");
+  /** Body attribute: media-type. */
+  private static final byte[] MEDIATYPE = token("media-type");
   /** Request attribute: HTTP method. */
   private static final byte[] METHOD = token("method");
   /** Request attribute: href. */
@@ -186,7 +181,7 @@ public final class HttpClientTest {
         + "href='http://localhost:8984/basex/jax-rx/books'/>)");
     get1.execute(context);
     checkResponse(get1, HttpURLConnection.HTTP_OK, 2);
-    assertTrue(((ItemCache) get1.result()).get(1).type == Type.DOC);
+    // assertTrue(((ItemCache) get1.result()).get(1).type == Type.DOC);
 
     // GET2 - with override-media-type='text/plain'
     final Command get2 = new XQuery("http:send-request("
@@ -194,7 +189,7 @@ public final class HttpClientTest {
         + "'http://localhost:8984/basex/jax-rx/books')");
     get2.execute(context);
     checkResponse(get2, HttpURLConnection.HTTP_OK, 2);
-    assertTrue(((ItemCache) get2.result()).get(1).type == Type.STR);
+    // assertTrue(((ItemCache) get2.result()).get(1).type == Type.STR);
 
     // Get3 - with status-only='true'
     final Command get3 = new XQuery("http:send-request("
@@ -233,29 +228,76 @@ public final class HttpClientTest {
     }
   }
 
+  /**
+   * Tests RequestParser.parse() with normal(not multipart) request.
+   * @throws IOException IO exception
+   * @throws QueryException query exception
+   */
   @Test
-  public void testRequestParser() {
+  public void testParseRequest() throws IOException, QueryException {
 
-    // Request attributes
-    final NodeCache reqAttrs = new NodeCache();
-    reqAttrs.add(new FAttr(new QNm(METHOD), token("POST"), null));
-    reqAttrs.add(new FAttr(new QNm(HREF), token("http://www/test.com"), null));
+    // Simple HTTP request with no errors
+    final byte[] req = token("<http:request xmlns:http=\"http://expath.org/ns/http\" "
+        + "method='POST' href='http://www.basex.org'>"
+        + "<http:header name='hdr1' value='hdr1val'/>"
+        + "<http:header name='hdr2' value='hdr2val'/>"
+        + "<http:body media-type='text/xml'>"
+        + "Test body content"
+        + "</http:body>" + "</http:request>");
+    final IO io = new IOContent(req);
+    final Parser reqParser = Parser.xmlParser(io, context.prop, "");
+    final DBNode dbNode = new DBNode(MemBuilder.build(reqParser, context.prop,
+        ""), 0);
+    final Request r = RequestParser.parse(dbNode.children().next(), null);
 
-    // Request children
-    // 1) Headers + body
-    final NodeCache resCh = new NodeCache();
-    //Headers
-    final NodeCache hdr1Attrs = new NodeCache();
-    hdr1Attrs.add(new FAttr(new QNm(HDR_NAME), token("hdr1"), null));
-    hdr1Attrs.add(new FAttr(new QNm(HDR_VALUE), token("hdr1val"), null));
-    resCh.add(new FElem(new QNm(HDR), null, hdr1Attrs, null, null, null));
-    final NodeCache hdr2Attrs = new NodeCache();
-    hdr2Attrs.add(new FAttr(new QNm(HDR_NAME), token("hdr2"), null));
-    hdr2Attrs.add(new FAttr(new QNm(HDR_VALUE), token("hdr2val"), null));
-    resCh.add(new FElem(new QNm(HDR), null, hdr2Attrs, null, null, null));
-    //Body
-    
+    assertTrue(r.attrs.size() == 2);
+    assertTrue(r.headers.size() == 2);
+    assertTrue(r.bodyContent.size() != 0);
+    assertTrue(r.payloadAttrs.size() == 1);
+  }
 
+  /**
+   * Tests RequestParser.parse() with multipart request.
+   * @throws IOException IO exception
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testParseMultipartReq() throws IOException, QueryException {
+    final byte[] multiReq = token("<http:request xmlns:http=\"http://expath.org/ns/http\" "
+        + "method='POST' href='http://www.basex.org'>"
+        + "<http:header name='hdr1' value='hdr1val'/>"
+        + "<http:header name='hdr2' value='hdr2val'/>"
+        + "<http:multipart media-type='multipart/mixed' boundary='xxxx'>"
+        + "<part>"
+        + "<http:header name='p1hdr1' value='p1hdr1val'/>"
+        + "<http:header name='p1hdr2' value='p1hdr2val'/>"
+        + "<http:body media-type='text/plain'>"
+        + "Part1"
+        + "</http:body>"
+        + "</part>"
+        + "<part>"
+        + "<http:header name='p2hdr1' value='p2hdr1val'/>"
+        + "<http:body media-type='text/plain'>"
+        + "Part2"
+        + "</http:body>"
+        + "</part>"
+        + "<part>"
+        + "<http:body media-type='text/plain'>"
+        + "Part3"
+        + "</http:body>"
+        + "</part>"
+        + "</http:multipart>"
+        + "</http:request>");
+
+    final IO io = new IOContent(multiReq);
+    final Parser p = Parser.xmlParser(io, context.prop, "");
+    final DBNode dbNode = new DBNode(MemBuilder.build(p, context.prop, ""), 0);
+    final Request r = RequestParser.parse(dbNode.children().next(), null);
+
+    assertTrue(r.attrs.size() == 2);
+    assertTrue(r.headers.size() == 2);
+    assertTrue(r.isMultipart);
+    assertTrue(r.parts.size() == 3);
   }
 
   /**
@@ -288,13 +330,13 @@ public final class HttpClientTest {
     conn.headers = hdrs;
     conn.contentType = "multipart/alternative; boundary=\"boundary42\"";
     conn.content = token(multipart);
-    Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(), null,
-        context.prop, null);
+    // Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(), null,
+    // context.prop, null);
     XMLSerializer ser = new XMLSerializer(System.out);
     Item it;
-    while((it = i.next()) != null) {
-      it.serialize(ser);
-    }
+    // while((it = i.next()) != null) {
+    // it.serialize(ser);
+    // }
     ser.close();
 
   }
@@ -330,13 +372,13 @@ public final class HttpClientTest {
     conn.headers = hdrs;
     conn.contentType = "multipart/mixed; boundary=\"simple boundary\"";
     conn.content = token(multipart_preamble);
-    Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(), null,
-        context.prop, null);
+    // Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(), null,
+    // context.prop, null);
     XMLSerializer ser = new XMLSerializer(System.out);
     Item it;
-    while((it = i.next()) != null) {
-      it.serialize(ser);
-    }
+    // while((it = i.next()) != null) {
+    // it.serialize(ser);
+    // }
     ser.close();
 
   }
