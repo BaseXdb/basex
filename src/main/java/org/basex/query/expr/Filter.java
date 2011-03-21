@@ -142,7 +142,7 @@ public class Filter extends Preds {
 
   @Override
   public final boolean uses(final Use u) {
-    return root.uses(u) || super.uses(u);
+    return root.uses(u) || u != Use.CTX && super.uses(u);
   }
 
   @Override

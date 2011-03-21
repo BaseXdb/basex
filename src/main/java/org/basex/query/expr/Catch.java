@@ -91,24 +91,6 @@ public final class Catch extends Single {
   }
 
   @Override
-  public int count(final Var v) {
-    for(final Var vr : var) if(vr.eq(v)) return 0;
-    return super.count(v);
-  }
-
-  @Override
-  public boolean removable(final Var v) {
-    for(final Var vr : var) if(vr.eq(v)) return true;
-    return super.removable(v);
-  }
-
-  @Override
-  public Expr remove(final Var v) {
-    for(final Var vr : var) if(vr.eq(v)) return this;
-    return super.remove(v);
-  }
-
-  @Override
   public String toString() {
     return "catch { " + expr + "}";
   }

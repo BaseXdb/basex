@@ -326,9 +326,9 @@ public final class FTWords extends FTExpr {
 
     // summarize number of hits; break loop if no hits are expected
     final FTLexer ft = new FTLexer(fto);
+    ic.costs = 0;
     for(byte[] t : txt) {
       ft.init(t);
-      ic.costs = 0;
       while(ft.hasNext()) {
         final byte[] tok = ft.nextToken();
         if(tok.length > MAXLEN) return false;
@@ -344,11 +344,8 @@ public final class FTWords extends FTExpr {
             if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
           }
         }
-
         // reduce number of expected results to favor full-text index requests
-        final int s = ic.data.nrIDs(ft) + 3 >> 2;
-        if(ic.costs > s || ic.costs == 0) ic.costs = s;
-        if(s == 0) break;
+        ic.costs += ic.data.nrIDs(ft) + 3 >> 2;
       }
     }
     return true;

@@ -7,6 +7,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Replace value primitive.
@@ -47,5 +48,10 @@ public final class ReplaceValue extends NewValue {
   @Override
   public PrimitiveType type() {
     return PrimitiveType.REPLACEVALUE;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + node + ", " + name + "]";
   }
 }

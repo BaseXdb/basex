@@ -73,7 +73,7 @@ public final class MixedPath extends Path {
    */
   private ItemCache eval(final QueryContext ctx) throws QueryException {
     // simple location step traversal...
-    ItemCache res = ItemCache.get(ctx.value.iter(ctx));
+    ItemCache res = ItemCache.get(ctx.value.iter());
     for(final Expr e : expr) {
       final Iter ir = res;
       final ItemCache ii = new ItemCache();

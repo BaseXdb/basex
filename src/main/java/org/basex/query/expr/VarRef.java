@@ -74,7 +74,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public int count(final Var v) {
-    return var.eq(v) ? 1 : 0;
+    return var.is(v) ? 1 : 0;
   }
 
   @Override
@@ -84,7 +84,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr remove(final Var v) {
-    return var.eq(v) ? new Context(input) : this;
+    return var.is(v) ? new Context(input) : this;
   }
 
   @Override
