@@ -92,7 +92,7 @@ final class GroupPartition {
     for(final Var g : gvs) {
       boolean f = false;
       for(final Var v : fls) f |= v.is(g);
-      if(!f) GVARNOTDEFINED.thrw(null, g);
+      if(!f) GVARNOTDEFINED.thrw(g.input, g);
     }
     return fc.size() - gc.size();
   }
@@ -119,7 +119,7 @@ final class GroupPartition {
       vals[i] = val;
     }
 
-    final GroupNode gn = new GroupNode(vals);
+    final GroupNode gn = new GroupNode(input, vals);
     final int h = gn.hash();
     final IntList ps = hashes.get(h);
     int p = -1;

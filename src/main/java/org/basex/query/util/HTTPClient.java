@@ -72,11 +72,13 @@ public final class HTTPClient {
   /** XML media type. */
   private static final byte[] APPL_XML = token("application/xml");
   /** XML media type. */
-  private static final byte[] APPL_EXT_XML = token("application/xml-external-parsed-entity");
+  private static final byte[] APPL_EXT_XML =
+    token("application/xml-external-parsed-entity");
   /** XML media type. */
   private static final byte[] TXT_XML = token("text/xml");
   /** XML media type. */
-  private static final byte[] TXT_EXT_XML = token("text/xml-external-parsed-entity");
+  private static final byte[] TXT_EXT_XML =
+    token("text/xml-external-parsed-entity");
   /** XML media types' suffix. */
   private static final byte[] MIME_XML_SUFFIX = token("+xml");
   /** HTML media type. */
@@ -153,10 +155,8 @@ public final class HTTPClient {
       QueryException {
     if(r.bodyContent != null || r.parts.size() != 0) conn.setDoOutput(true);
     conn.setRequestMethod(string(r.attrs.get(METHOD)).toUpperCase());
-    // TODO: Investigate more about timeout
     final byte[] timeout = r.attrs.get(TIMEOUT);
     if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
-    // TODO: Investigate more about follow-redirects
     final byte[] redirect = r.attrs.get(REDIR);
     if(redirect != null) setFollowRedirects(Bln.parse(redirect, ii));
   }
@@ -197,7 +197,6 @@ public final class HTTPClient {
           string(r.headers.get(headerName)));
     // HTTP Basic Authentication
     final byte[] sendAuth = r.attrs.get(SENDAUTH);
-    // TODO: more test cases w/o username, sendauth, pass
     if(sendAuth != null && Bln.parse(sendAuth, ii)) conn.setRequestProperty(
         AUTH,
         encodeCredentials(string(r.attrs.get(USRNAME)),
@@ -283,7 +282,7 @@ public final class HTTPClient {
         xml.cls();
       }
     } else {
-      // [RS] If the src attribute is present, the serialization
+      // If the src attribute is present, the serialization
       // parameters shall be ignored
     }
   }
@@ -302,7 +301,8 @@ public final class HTTPClient {
     final Iterator<Part> i = r.parts.iterator();
     while(i.hasNext())
       writePart(i.next(), out, boundary);
-    out.write(new TokenBuilder().add("--").add(boundary).add("--").add(CRLF).finish());
+    out.write(new TokenBuilder().add("--").
+        add(boundary).add("--").add(CRLF).finish());
   }
 
   /**

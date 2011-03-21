@@ -1,6 +1,6 @@
 package org.basex.test.query;
 
-import org.basex.core.BaseXException;
+import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
 import org.basex.query.util.Err;
 import org.junit.Test;
@@ -22,10 +22,10 @@ public final class FNGenTest extends AdvancedQueryTest {
 
   /**
    * Test method for the fn:unparsed-text() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testUnparsedText() throws BaseXException {
+  public void testUnparsedText() throws QueryException {
     final String fun = check(FunDef.PARSETXT, String.class, String.class);
     contains(fun + "('" + TEXT + "')", "aboutabove");
     contains(fun + "('" + TEXT + "', 'US-ASCII')", "aboutabove");
@@ -34,20 +34,20 @@ public final class FNGenTest extends AdvancedQueryTest {
 
   /**
    * Test method for the fn:parse-xml() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testParseXML() throws BaseXException {
+  public void testParseXML() throws QueryException {
     final String fun = check(FunDef.PARSEXML, String.class, String.class);
     contains(fun + "('<x>a</x>')//text()", "a");
   }
 
   /**
    * Test method for the fn:serialize() functions.
-   * @throws BaseXException database exception
+   * @throws QueryException database exception
    */
   @Test
-  public void testSerialize() throws BaseXException {
+  public void testSerialize() throws QueryException {
     final String fun = check(FunDef.SERIALIZE, Object.class, Object.class);
     contains(fun + "(<x/>)", "&lt;x/&gt;");
     contains(fun + "(<x/>, " + serialParams("") + ")", "&lt;x/&gt;");

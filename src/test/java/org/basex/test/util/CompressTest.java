@@ -98,7 +98,7 @@ public final class CompressTest {
     final Iter ir = qp.iter();
     Item it = null;
     while((it = ir.next()) != null) {
-      final byte[] token = it.atom();
+      final byte[] token = it.atom(null);
       tl.add(token);
       tb.add(token);
       tb.add(' ');

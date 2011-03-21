@@ -43,9 +43,9 @@ public final class ResponseHandler {
 
   /** Response element. */
   /** http:response element. */
-  private static final byte[] RESPONSE = token("response");
+  private static final byte[] RESPONSE = token("http:response");
   /** http:multipart element. */
-  private static final byte[] MULTIPART = token("multipart");
+  private static final byte[] MULTIPART = token("http:multipart");
   /** part element. */
   private static final byte[] PART = token("part");
   /** boundary marker. */
@@ -53,7 +53,7 @@ public final class ResponseHandler {
 
   /** Header element. */
   /** http:header element. */
-  private static final byte[] HEADER = token("header");
+  private static final byte[] HEADER = token("http:header");
   /** Header attribute: name. */
   private static final byte[] HDR_NAME = token("name");
   /** Header attribute: value. */
@@ -270,7 +270,7 @@ public final class ResponseHandler {
    * @throws IOException IO exception
    * @throws QueryException query exception
    */
-  public static NodeCache extractParts(final InputStream io,
+  private static NodeCache extractParts(final InputStream io,
       final boolean statusOnly, final ItemCache payloads, final byte[] sep,
       final Prop prop, final InputInfo ii) throws IOException, QueryException {
 
@@ -368,7 +368,7 @@ public final class ResponseHandler {
   }
 
   /**
-   * Reads a line of HTTP content.
+   * Reads a line of HTTP multipart content.
    * @param in connection input stream
    * @return line
    * @throws IOException IO exception

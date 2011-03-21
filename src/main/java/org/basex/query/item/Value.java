@@ -1,9 +1,11 @@
 package org.basex.query.item;
 
 import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Abstract value.
@@ -40,7 +42,7 @@ public abstract class Value extends Expr {
   public abstract ValueIter iter();
 
   @Override
-  public final Value value(final QueryContext ctx) {
+  public Value value(final QueryContext ctx) {
     return this;
   }
 
@@ -57,7 +59,15 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean num() {
-    return type.num;
+    return type.num();
+  }
+
+  /**
+   * Checks if this is a single function item.
+   * @return result of check
+   */
+  public final boolean func() {
+    return type.func();
   }
 
   /**
@@ -65,7 +75,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean unt() {
-    return type.unt;
+    return type.unt();
   }
 
   /**
@@ -73,7 +83,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean str() {
-    return type.str;
+    return type.str();
   }
 
   /**
@@ -81,7 +91,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean dur() {
-    return type.dur;
+    return type.dur();
   }
 
   /**
@@ -89,7 +99,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean date() {
-    return type.dat;
+    return type.dat();
   }
 
   /**
@@ -107,12 +117,12 @@ public abstract class Value extends Expr {
   public abstract Object toJava();
 
   @Override
-  public final boolean uses(final Use u) {
+  public boolean uses(final Use u) {
     return false;
   }
 
   @Override
-  public final int count(final Var v) {
+  public int count(final Var v) {
     return 0;
   }
 
@@ -138,7 +148,9 @@ public abstract class Value extends Expr {
 
   /**
    * Returns a hash code for this value.
+   * @param ii input info
    * @return hash code
+   * @throws QueryException if atomization can't be applied (e.g. function item)
    */
-  public abstract int hash();
+  public abstract int hash(final InputInfo ii) throws QueryException;
 }

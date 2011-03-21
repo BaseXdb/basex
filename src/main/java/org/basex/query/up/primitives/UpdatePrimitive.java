@@ -5,7 +5,7 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.ANode;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
@@ -82,9 +82,9 @@ public abstract class UpdatePrimitive {
     final NodeCache s = new NodeCache();
     ANode i = n.next();
     while(i != null) {
-      if(i.type == Type.TXT) {
+      if(i.type == NodeType.TXT) {
         final TokenBuilder tb = new TokenBuilder();
-        while(i != null && i.type == Type.TXT) {
+        while(i != null && i.type == NodeType.TXT) {
           tb.add(i.atom());
           i = n.next();
         }

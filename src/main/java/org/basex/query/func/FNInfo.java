@@ -8,8 +8,8 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
@@ -49,7 +49,7 @@ final class FNInfo extends Fun {
         if(it == null) {
           if(al == 1) XPEMPTY.thrw(input, desc());
         } else {
-          code = Token.string(((QNm) checkType(it, Type.QNM)).ln());
+          code = Token.string(((QNm) checkType(it, AtomType.QNM)).ln());
         }
         if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
         Value val = al > 2 ? expr[2].value(ctx) : null;

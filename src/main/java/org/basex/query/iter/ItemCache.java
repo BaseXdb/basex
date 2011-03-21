@@ -158,6 +158,7 @@ public final class ItemCache extends ValueIter implements Result {
     try {
       serialize(new XMLSerializer(ao));
     } catch(final IOException ex) {
+      // [LW] is that OK? Example: (1, 2, upper-case#1)
       Util.notexpected(ex);
     }
     return ao.toString();

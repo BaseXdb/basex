@@ -47,7 +47,7 @@ import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.query.item.ANode;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.util.Array;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -378,12 +378,12 @@ public enum GUICommands implements GUICommand {
       if(!insert.ok()) return;
 
       final StringList sl = insert.result;
-      final Type type = ANode.type(insert.kind);
+      final NodeType type = ANode.type(insert.kind);
       String item = Token.string(type.nam) + " { " + quote(sl.get(0)) + " }";
 
-      if(type == Type.ATT || type == Type.PI) {
+      if(type == NodeType.ATT || type == NodeType.PI) {
         item += " { " + quote(sl.get(1)) + " }";
-      } else if(type == Type.ELM) {
+      } else if(type == NodeType.ELM) {
         item += " { () }";
       }
 

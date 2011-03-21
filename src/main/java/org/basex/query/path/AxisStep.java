@@ -11,9 +11,11 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Preds;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
@@ -84,7 +86,7 @@ public class AxisStep extends Preds {
     // if possible, add text() step to predicates
     final Data data = ctx.resource.data();
     ctx.leaf = false;
-    if(data != null && test.test == Name.NAME && test.type != Type.ATT) {
+    if(data != null && test.test == Name.NAME && test.type != NodeType.ATT) {
       final byte[] ln = ((NameTest) test).ln;
       ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
         data.tags.stat(data.tags.id(ln)).leaf;
@@ -94,9 +96,9 @@ public class AxisStep extends Preds {
     // a context item is temporarily treated as element, or set to null
     final Value cv = ctx.value;
     final Type ct = cv != null ? cv.type : null;
-    if(ct == Type.DOC) {
-      cv.type = Type.ELM;
-    } else if(ct == Type.SEQ) {
+    if(ct == NodeType.DOC) {
+      cv.type = NodeType.ELM;
+    } else if(ct == AtomType.SEQ) {
       ctx.value = null;
     }
     final Expr e = super.comp(ctx);

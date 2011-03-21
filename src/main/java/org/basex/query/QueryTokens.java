@@ -355,6 +355,8 @@ public interface QueryTokens {
   /** Parser token. */
   String DOLLAR = "$";
   /** Parser token. */
+  String HASH = "#";
+  /** Parser token. */
   String DOT2 = "..";
   /** Parser token. */
   String IS = "=";
@@ -374,6 +376,10 @@ public interface QueryTokens {
   String PRAGMA = "(#";
   /** Parser token. */
   String PRAGMA2 = "#)";
+  /** Parser Token. */
+  String PLHOLDER = "?";
+  /** Parser Token. */
+  String ASTERISK = "*";
 
   // URIS =====================================================================
 
@@ -415,6 +421,8 @@ public interface QueryTokens {
   byte[] FILEURI = token(Text.URL + "/file");
   /** Sentiment URI.*/
   byte[] SENTURI = token(Text.URL + "/sent");
+  /** Sentiment URI.*/
+  byte[] HOFURI = token(Text.URL + "/higher-order");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
@@ -464,6 +472,8 @@ public interface QueryTokens {
   byte[] UTIL = token("util");
   /** ZIP token. */
   byte[] ZIP = token("zip");
+  /** ZIP token. */
+  byte[] HOF = token("hof");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
@@ -478,6 +488,8 @@ public interface QueryTokens {
   String ARG = "arg";
   /** Query Plan. */
   String FUNC = "Function";
+  /** Query Plan. */
+  String FITM = "Function item";
   /** Query Plan. */
   String VARBL = "Variable";
   /** Query Info: Plan. */

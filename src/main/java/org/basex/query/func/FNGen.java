@@ -22,10 +22,11 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
@@ -88,7 +89,7 @@ final class FNGen extends Fun {
   public Expr cmp(final QueryContext ctx) {
     if(def == FunDef.DATA &&  expr.length == 1) {
       final SeqType t = expr[0].type();
-      type = t.type.node() ? SeqType.get(Type.ATM, t.occ) : t;
+      type = t.type.node() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
     return this;
   }
@@ -106,7 +107,9 @@ final class FNGen extends Fun {
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
-        return it != null ? atom(it) : null;
+        if(it == null) return null;
+        if(it.func()) FNATM.thrw(input, FNGen.this);
+        return atom(it);
       }
     };
   }
@@ -149,14 +152,14 @@ final class FNGen extends Fun {
   private Item put(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
-    final Item it = checkNode(checkEmpty(expr[0].item(ctx, input)));
+    final ANode nd = checkNode(checkEmpty(expr[0].item(ctx, input)));
 
-    if(it == null || it.type != Type.DOC && it.type != Type.ELM)
+    if(nd == null || nd.type != NodeType.DOC && nd.type != NodeType.ELM)
       UPFOTYPE.thrw(input, expr[0]);
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.valid()) UPFOURI.thrw(input, file);
-    ctx.updates.add(new Put(input, (ANode) it, u, ctx), ctx);
+    ctx.updates.add(new Put(input, nd, u, ctx), ctx);
 
     return null;
   }
@@ -325,7 +328,7 @@ final class FNGen extends Fun {
       final Item it = fun.expr[arg].item(ctx, fun.input);
       if(it != null) {
         // check root node
-        ANode node = (ANode) fun.checkType(it, Type.ELM);
+        ANode node = (ANode) fun.checkType(it, NodeType.ELM);
         if(!node.qname().eq(E_PARAM)) SERUNKNOWN.thrw(fun.input, node.qname());
 
         // interpret query parameters

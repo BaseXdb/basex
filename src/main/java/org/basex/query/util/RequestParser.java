@@ -170,6 +170,8 @@ public final class RequestParser {
    */
   private static void check(final Request r, final InputInfo ii)
       throws QueryException {
+    
+    // Check request mandatory attributes
     if(r.attrs.get(METHOD) == null) {
       MANDATTR.thrw(ii, string(METHOD));
     }
@@ -182,6 +184,7 @@ public final class RequestParser {
         CREDSERR.thrw(ii);
     }
 
+    // Check body and multipart attributes
     if(r.isMultipart) {
       // Check body of each part
       final Iterator<Part> i = r.parts.iterator();
