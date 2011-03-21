@@ -48,6 +48,7 @@ final class FNFunc extends Fun {
       case FILTER:    return filter(ctx);
       case MAPPAIRS:  return zip(ctx);
       case FOLDLEFT:  return foldLeft(ctx);
+      case FOLDLEFT1: return foldLeft1(ctx);
       case FOLDRIGHT: return foldRight(ctx);
       case SORTWITH:  return sortWith(ctx);
       case HOFID:     return expr[0].iter(ctx);
@@ -190,6 +191,24 @@ final class FNFunc extends Fun {
     final Iter xs = expr[2].iter(ctx);
 
     Iter res = expr[1].iter(ctx);
+    for(Item x; (x = xs.next()) != null;)
+      res = f.invIter(ctx, input, res.finish(), x);
+
+    return res;
+  }
+
+  /**
+   * Folds a sequence into a return value, starting from the left and using the
+   * leftmost item as start value.
+   * @param ctx query context
+   * @return resulting sequence
+   * @throws QueryException query exception
+   */
+  private Iter foldLeft1(final QueryContext ctx) throws QueryException {
+    final FunItem f = withArity(0, 2, ctx);
+    final Iter xs = expr[1].iter(ctx);
+
+    Iter res = checkEmpty(xs.next()).iter();
     for(Item x; (x = xs.next()) != null;)
       res = f.invIter(ctx, input, res.finish(), x);
 

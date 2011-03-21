@@ -177,6 +177,7 @@ public enum FunDef {
   /** XQuery function. */
   PARTAPP(FNURI, FNFunc.class, 2, 3, "partial-apply(function,arg[,pos])",
       FUN_O, ITEM_ZM, ITR, FUN_O),
+
   /** XQuery function. */
   SORTWITH(HOFURI, FNFunc.class, 2, 2, "sort-with(lt-fun,seq)",
       FunType.get(new SeqType[]{ ITEM, ITEM }, BLN).seq(), ITEM_ZM, ITEM_ZM),
@@ -189,6 +190,10 @@ public enum FunDef {
   UNTIL(HOFURI, FNFunc.class, 3, 3, "until(pred,func,start)",
       FunType.get(new SeqType[]{ ITEM_ZM }, BLN).seq(),
       FunType.get(new SeqType[]{ ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM),
+  /** XQuery function. */
+  FOLDLEFT1(FNURI, FNFunc.class, 3, 3, "fold-left1(function,non-empty-seq)",
+      FunType.get(new SeqType[]{ ITEM_ZM, ITEM }, ITEM_ZM).seq(), ITEM_OM,
+      ITEM_ZM),
 
   /* FNGen functions. */
 
