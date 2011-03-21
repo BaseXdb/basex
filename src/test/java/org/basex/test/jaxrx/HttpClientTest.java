@@ -4,14 +4,20 @@ import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.basex.api.jaxrx.JaxRxServer;
+import org.basex.build.Parser;
+import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -19,7 +25,11 @@ import org.basex.core.cmd.XQuery;
 import org.basex.data.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
+import org.basex.query.item.Bln;
+import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
+import org.basex.query.item.FTxt;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.ItemCache;
@@ -27,11 +37,14 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
+import org.basex.query.util.Err;
 import org.basex.query.util.ResponseHandler;
 import org.basex.util.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.sun.org.apache.xerces.internal.parsers.XMLParser;
 
 /**
  * This class tests the HTTP Client.
@@ -44,19 +57,47 @@ public final class HttpClientTest {
   /** Status code. */
   private static final byte[] STATUS = token("status");
 
+  private static final byte[] REQ = token("http:request");
+  /** http:header element. */
+  private static final byte[] HDR = token("http:header");
+  /** Header attribute: name. */
+  private static final byte[] HDR_NAME = token("name");
+  /** Header attribute: value. */
+  private static final byte[] HDR_VALUE = token("value");
+  /** http:multipart element. */
+  private static final byte[] MULTIPART = token("http:multipart");
+  /** http:body element. */
+  private static final byte[] BODY = token("http:body");
+  /** Request attribute: HTTP method. */
+  private static final byte[] METHOD = token("method");
+  /** Request attribute: href. */
+  private static final byte[] HREF = token("href");
+
   /** Database context. */
   protected static Context context;
   /** JAX-RX server. */
   private static JaxRxServer jaxrx;
 
-  private static String multipart = "This is the preamble.  It is to be ignored, though it\r\n"
+  /** Multipart response. */
+  private static final String multipart = "--boundary42\r\n"
+      + "Content-Type: text/plain; charset=us-ascii\r\n\r\n"
+      + "...plain text version of message goes here....'\r\n\r\n"
+      + "--boundary42\r\n" + "Content-Type: text/richtext\r\n\r\n"
+
+      + ".... richtext version of same message goes here ...\r\n"
+      + "--boundary42\r\n" + "Content-Type: text/x-whatever\r\n\r\n"
+      + ".... fanciest formatted version of same  message  goes  here\r\n"
+      + "...\r\n" + "--boundary42--";
+
+  /** Multipart response with preamble and epilogue. */
+  private static final String multipart_preamble = "This is the preamble.  It is to be ignored, though it\r\n"
       + "is a handy place for mail composers to include an\r\n"
       + "explanatory note to non-MIME compliant readers.\r\n"
       + "--simple boundary\r\n\r\n"
       + "This is implicitly typed plain ASCII text.\r\n"
       + "It does NOT end with a linebreak.\r\n"
       + "--simple boundary\r\n"
-      + "Content-type: text/xml; charset=us-ascii\r\n\r\n"
+      + "Content-type: text/plain; charset=us-ascii\r\n\r\n"
       + "This is explicitly typed plain ASCII text.\r\n"
       + "It DOES end with a linebreak.\r\n\r\n"
       + "--simple boundary--\r\n"
@@ -133,29 +174,6 @@ public final class HttpClientTest {
     checkResponse(postAdd, HttpURLConnection.HTTP_CREATED, 1);
   }
 
-  // @Test
-  // public void testMultipartPost() throws BaseXException, QueryException {
-  // final Command multipartPost = new XQuery("http:send-request("
-  // + "<http:request method='post' status-only='true'>"
-  // + "<http:multipart media-type='multipart/mixed' boundary='AaB03x'>"
-  // + "<part>"
-  // + "<http:header name='Content-Disposition' value='form-data'/>"
-  // + "<http:body media-type='text/xml'>" + "<book id='35'>"
-  // + "<name>The Celebrated Jumping Frog of Calaveras County</name>"
-  // + "<author>Twain</author>" + "</book>" + "</http:body>" + "</part>"
-  // + "<part>"
-  // + "<http:header name='Content-Disposition' value='form-data'/>"
-  // + "<http:header name='Content-Type' value='text/plain'/>"
-  // + "<http:body media-type='text/xml'>" + "<book id='100'>"
-  // + "<name>The Celebrated Jumping Frog of Calaveras County</name>"
-  // + "<author>Twain</author>" + "</book>" + "</http:body>" + "</part>"
-  // + "</http:multipart>"
-  // + "</http:request>, 'http://localhost:8984/basex/jax-rx/books')");
-  // multipartPost.execute(context);
-  // //checkResponse(multipartPost, HttpURLConnection.HTTP_CREATED, 1);
-  // System.out.println();
-  // }
-
   /**
    * Test sending of HTTP GET requests.
    * @throws Exception exception
@@ -200,116 +218,125 @@ public final class HttpClientTest {
     checkResponse(delete, HttpURLConnection.HTTP_OK, 1);
   }
 
-  // @Test
-  // public void testMultipart() throws Exception {
-  // final IOContent io = new IOContent(
-  // token("<http:multipart media-type='multipart/form-data' boundary='AaB03x'>"
-  // + "<part>"
-  // + "<http:header name='Content-Disposition' value='form-data'/>"
-  // + "<http:body media-type='text/plain'>"
-  // + "Larry"
-  // + "</http:body>"
-  // + "</part>"
-  // + "<part>"
-  // + "<http:header name='Content-Disposition' value='form-data'/>"
-  // + "<http:header name='Content-Type' value='text/plain'/>"
-  // + "<http:body media-type='text/plain'>"
-  // + "...file contents"
-  // + "</http:body>" + "</part>" + "</http:multipart>"));
-
-  // Request element
-  // FElem req = new FElem(new QNm(token("http:request")), null);
-  // req.atts.add(new FAttr(new QNm(token("method")), token("GET"), req));
-  // req.atts.add(new FAttr(new QNm(token("href")), token("www.basex.org"),
-  // req));
-  //
-  // // Multipart element
-  // FElem multipart = new FElem(new QNm(token("http:multipart")), req);
-  // multipart.atts.add(new FAttr(new QNm(token("media-type")),
-  // token("multipart/form-data"), multipart));
-  // multipart.atts.add(new FAttr(new QNm(token("boundary")), token("AaB03x"),
-  // multipart));
-  // req.children.add(multipart);
-  // // Parts
-  // // ---------
-  // // Part 1
-  // FElem part1 = new FElem(new QNm(token("part")), multipart);
-  // FElem part1hdr1 = new FElem(new QNm(token("http:header")), part1);
-  // part1hdr1.atts.add(new FAttr(new QNm(token("name")),
-  // token("Content-Disposition"), part1hdr1));
-  // part1hdr1.atts.add(new FAttr(new QNm(token("value")), token("form-data"),
-  // part1hdr1));
-  // FElem part1body = new FElem(new QNm(token("http:body")), part1);
-  // part1body.atts.add(new FAttr(new QNm(token("media-type")),
-  // token("text/plain"), part1body));
-  // FTxt part1bodyCont = new FTxt(token("Larry"), part1body);
-  // part1body.children.add(part1bodyCont);
-  // part1.children.add(part1hdr1);
-  // part1.children.add(part1body);
-  // multipart.children.add(part1);
-  // // Part 2
-  // FElem part2 = new FElem(new QNm(token("part")), multipart);
-  // FElem part2hdr1 = new FElem(new QNm(token("http:header")), part2);
-  // part2hdr1.atts.add(new FAttr(new QNm(token("name")),
-  // token("Content-Disposition"), part2hdr1));
-  // part2hdr1.atts.add(new FAttr(new QNm(token("value")), token("form-data"),
-  // part2hdr1));
-  // FElem part2hdr2 = new FElem(new QNm(token("http:header")), part2);
-  // part2hdr2.atts.add(new FAttr(new QNm(token("name")),
-  // token("Content-Type"),
-  // part2hdr2));
-  // part2hdr2.atts.add(new FAttr(new QNm(token("value")),
-  // token("text/plain"),
-  // part2hdr2));
-  // FElem part2body = new FElem(new QNm(token("http:body")), part2);
-  // part2body.atts.add(new FAttr(new QNm(token("media-type")),
-  // token("text/plain"), part2body));
-  // part2body.children.add(new FTxt(token("...file contents"), part2body));
-  // part2.children.add(part2hdr1);
-  // part2.children.add(part2hdr2);
-  // part2.children.add(part2body);
-  // multipart.children.add(part2);
-  //
-  // final Parser parser = new XMLParser(io, null, context.prop);
-  // ANode multipart = new DBNode(MemBuilder.build(parser, context.prop, ""),
-  // 0);
-  // HttpClient.writeMultipartContent(multipart.children().next(),
-  // token("AaB03x"), null, System.out);
-  //
-  // }
-
-  /*
-   * Test sending of HTTP requests.
-   * @throws Exception exception
-   * @Test public void sendSimple() throws Exception { // causes a runtime
-   * exception new
-   * XQuery("http:send-request(<http:request/>)").execute(context); }
+  /**
+   * Test sending of HTTP request without any attributes - error shall be thrown
+   * that mandatory attributes are missing.
    */
   @Test
-  public void testMultipartParser() throws IOException, QueryException {
-    final FileInputStream io = new FileInputStream(
-        "/home/hermione/workspace/HTTPModuleTests/multipart_preamle.txt");
-    final ItemCache payloads = new ItemCache();
-    final NodeCache result = ResponseHandler.extractParts(io, false, payloads,
-        token("--simple boundary"), context.prop, null);
-    final FElem el = new FElem(new QNm(token("multipart")), result, null,
-        EMPTY, null, null);
-    XMLSerializer ser = new XMLSerializer(System.out);
-    el.serialize(ser);
-    ser.close();
+  public void sendSimple() {
+    final Command c = new XQuery("http:send-request(<http:request/>)");
+    try {
+      c.execute(context);
+    } catch(BaseXException ex) {
+      assertTrue(indexOf(token(ex.getMessage()),
+          token(Err.ErrType.FOHC.toString())) != -1);
+    }
   }
 
   @Test
-  public void testGetResponse() throws IOException, QueryException {
+  public void testRequestParser() {
+
+    // Request attributes
+    final NodeCache reqAttrs = new NodeCache();
+    reqAttrs.add(new FAttr(new QNm(METHOD), token("POST"), null));
+    reqAttrs.add(new FAttr(new QNm(HREF), token("http://www/test.com"), null));
+
+    // Request children
+    // 1) Headers + body
+    final NodeCache resCh = new NodeCache();
+    //Headers
+    final NodeCache hdr1Attrs = new NodeCache();
+    hdr1Attrs.add(new FAttr(new QNm(HDR_NAME), token("hdr1"), null));
+    hdr1Attrs.add(new FAttr(new QNm(HDR_VALUE), token("hdr1val"), null));
+    resCh.add(new FElem(new QNm(HDR), null, hdr1Attrs, null, null, null));
+    final NodeCache hdr2Attrs = new NodeCache();
+    hdr2Attrs.add(new FAttr(new QNm(HDR_NAME), token("hdr2"), null));
+    hdr2Attrs.add(new FAttr(new QNm(HDR_VALUE), token("hdr2val"), null));
+    resCh.add(new FElem(new QNm(HDR), null, hdr2Attrs, null, null, null));
+    //Body
+    
+
+  }
+
+  /**
+   * Tests parsing of multipart response with headers and content.
+   * @throws IOException IO Exception
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testMultipartRespWithHdrs() throws IOException, QueryException {
     MyHttpConnection conn = new MyHttpConnection(new URL("http://www.test.com"));
-    Map<String, String> hdrs = new HashMap<String, String>();
-    hdrs.put("Content-type", "multipart/mixed");
+    final Map<String, List<String>> hdrs = new HashMap<String, List<String>>();
+    final List<String> fromVal = new ArrayList<String>();
+    fromVal.add("Nathaniel Borenstein <nsb@bellcore.com>");
+    // From: Nathaniel Borenstein <nsb@bellcore.com>
+    hdrs.put("From", fromVal);
+    final List<String> mimeVal = new ArrayList<String>();
+    mimeVal.add("1.0");
+    // MIME-Version: 1.0
+    hdrs.put("MIME-version", mimeVal);
+    final List<String> subjVal = new ArrayList<String>();
+    subjVal.add("Formatted text mail");
+    // Subject: Formatted text mail
+    hdrs.put("Subject", subjVal);
+    final List<String> contTypeVal = new ArrayList<String>();
+    contTypeVal.add("multipart/alternative");
+    contTypeVal.add("boundary=\"boundary42\"");
+    // Content-Type: multipart/alternative; boundary=boundary42
+    hdrs.put("Content-Type", contTypeVal);
+
+    conn.headers = hdrs;
+    conn.contentType = "multipart/alternative; boundary=\"boundary42\"";
+    conn.content = token(multipart);
+    Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(), null,
+        context.prop, null);
+    XMLSerializer ser = new XMLSerializer(System.out);
+    Item it;
+    while((it = i.next()) != null) {
+      it.serialize(ser);
+    }
+    ser.close();
+
+  }
+
+  @Test
+  public void testMutipartPreamble() throws IOException, QueryException {
+
+    MyHttpConnection conn = new MyHttpConnection(new URL("http://www.test.com"));
+
+    final Map<String, List<String>> hdrs = new HashMap<String, List<String>>();
+    final List<String> fromVal = new ArrayList<String>();
+    fromVal.add("Nathaniel Borenstein <nsb@bellcore.com>");
+    // From: Nathaniel Borenstein <nsb@bellcore.com>
+    hdrs.put("From", fromVal);
+    final List<String> mimeVal = new ArrayList<String>();
+    mimeVal.add("1.0");
+    final List<String> toVal = new ArrayList<String>();
+    toVal.add("Ned Freed <ned@innosoft.com>");
+    // To: Ned Freed <ned@innosoft.com>
+    hdrs.put("To", toVal);
+    // MIME-Version: 1.0
+    hdrs.put("MIME-version", mimeVal);
+    final List<String> subjVal = new ArrayList<String>();
+    subjVal.add("Formatted text mail");
+    // Subject: Formatted text mail
+    hdrs.put("Subject", subjVal);
+    final List<String> contTypeVal = new ArrayList<String>();
+    contTypeVal.add("multipart/mixed");
+    contTypeVal.add("boundary=\"simple boundary\"");
+    // Content-Type: multipart/alternative; boundary=boundary42
+    hdrs.put("Content-Type", contTypeVal);
+
     conn.headers = hdrs;
     conn.contentType = "multipart/mixed; boundary=\"simple boundary\"";
-    conn.in = new ByteArrayInputStream(token(multipart));
-    Iter i = ResponseHandler.getResponse(conn, true, null, context.prop, null);
+    conn.content = token(multipart_preamble);
+    Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(), null,
+        context.prop, null);
     XMLSerializer ser = new XMLSerializer(System.out);
-    i.next().serialize(ser);
+    Item it;
+    while((it = i.next()) != null) {
+      it.serialize(ser);
+    }
     ser.close();
 
   }
@@ -345,16 +372,16 @@ public final class HttpClientTest {
  */
 class MyHttpConnection extends HttpURLConnection {
 
-  public Map<String, String> headers;
+  public Map<String, List<String>> headers;
   public String contentType;
-  public ByteArrayInputStream in;
+  public byte[] content;
 
   public MyHttpConnection(final URL u) {
     super(u);
   }
 
   public ByteArrayInputStream getInputStream() {
-    return in;
+    return new ByteArrayInputStream(content);
   }
 
   public String getContentType() {
@@ -369,8 +396,18 @@ class MyHttpConnection extends HttpURLConnection {
     return "OK";
   }
 
+  public Map<String, List<String>> getHeaderFields() {
+    return headers;
+  }
+
   public String getHeaderField(final String field) {
-    return headers.get(field);
+    final List<String> values = headers.get(field);
+    final StringBuilder sb = new StringBuilder();
+    final Iterator<String> i = values.iterator();
+    while(i.hasNext()) {
+      sb.append(i.next()).append(';');
+    }
+    return sb.substring(0, sb.length() - 1);
   }
 
   @Override
