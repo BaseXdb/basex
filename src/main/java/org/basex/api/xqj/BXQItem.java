@@ -19,11 +19,13 @@ import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.Token;
@@ -70,32 +72,37 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   public String getAtomicValue() throws XQException {
     opened();
     if(it.node()) throw new BXQException(ATOM);
-    return Token.string(it.atom());
+    try {
+      return Token.string(it.atom(null));
+    } catch(final QueryException e) {
+      // function item
+      throw new BXQException(ATOM);
+    }
   }
 
   @Override
   public boolean getBoolean() throws XQException {
-    return ((Bln) check(Type.BLN)).bool(null);
+    return ((Bln) check(AtomType.BLN)).bool(null);
   }
 
   @Override
   public byte getByte() throws XQException {
-    return (byte) castItr(Type.BYT);
+    return (byte) castItr(AtomType.BYT);
   }
 
   @Override
   public double getDouble() throws XQException {
-    return ((Dbl) check(Type.DBL)).dbl(null);
+    return ((Dbl) check(AtomType.DBL)).dbl(null);
   }
 
   @Override
   public float getFloat() throws XQException {
-    return ((Flt) check(Type.FLT)).flt(null);
+    return ((Flt) check(AtomType.FLT)).flt(null);
   }
 
   @Override
   public int getInt() throws XQException {
-    return (int) castItr(Type.INT);
+    return (int) castItr(AtomType.INT);
   }
 
   @Override
@@ -105,8 +112,12 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
 
   @Override
   public String getItemAsString(final Properties props) throws XQException {
-    return it.node() && it.type != Type.TXT ? serialize() :
-      Token.string(it.atom());
+    try {
+      return it.node() && it.type != NodeType.TXT ? serialize() :
+        Token.string(it.atom(null));
+    } catch(QueryException e) {
+      throw new XQException(e.getMessage(), e.code());
+    }
   }
 
   @Override
@@ -117,13 +128,13 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
 
   @Override
   public long getLong() throws XQException {
-    return castItr(Type.LNG);
+    return castItr(AtomType.LNG);
   }
 
   @Override
   public Node getNode() throws XQException {
     opened();
-    if(!it.node()) throw new BXQException(WRONG, Type.NOD, it.type);
+    if(!it.node()) throw new BXQException(WRONG, NodeType.NOD, it.type);
     return ((ANode) it).toJava();
   }
 
@@ -147,7 +158,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
 
   @Override
   public short getShort() throws XQException {
-    return (short) castItr(Type.SHR);
+    return (short) castItr(AtomType.SHR);
   }
 
   @Override

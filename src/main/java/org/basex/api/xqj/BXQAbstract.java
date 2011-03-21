@@ -19,8 +19,10 @@ import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.func.FunJava;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.Type;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -103,7 +105,7 @@ abstract class BXQAbstract {
     if(tar == null) return e;
 
     final Type t = ((BXQItemType) tar).getType();
-    if(e != t && e != Type.ATM && (e.node() || t.node()))
+    if(e != t && e != AtomType.ATM && (e.node() || t.node()))
       throw new BXQException(WRONG, tar, e);
     return t;
   }
@@ -126,7 +128,7 @@ abstract class BXQAbstract {
 
     // get xquery mapping
     final Type e = FunJava.type(v);
-    if(e == Type.JAVA) throw new BXQException(CONV, Util.name(v));
+    if(e == AtomType.JAVA) throw new BXQException(CONV, Util.name(v));
 
     try {
       // return item with correct type
@@ -187,7 +189,7 @@ abstract class BXQAbstract {
       throws XQException {
 
     valid(s, Source.class);
-    check(Type.DOC, it);
+    check(NodeType.DOC, it);
     if(s instanceof SAXSource) {
       return createNode((SAXSource) s);
     } else if(s instanceof StreamSource) {
@@ -280,7 +282,7 @@ abstract class BXQAbstract {
       throws XQException {
     opened();
     try {
-      if(it.type == Type.ATT) throw new BXQException(ATTR);
+      if(it.type == NodeType.ATT) throw new BXQException(ATTR);
       it.serialize(ser);
     } catch(final IOException ex) {
       throw new BXQException(ex);

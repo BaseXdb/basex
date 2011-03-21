@@ -16,8 +16,8 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
@@ -366,7 +366,8 @@ final class IterStreamReader implements XMLStreamReader {
 
     next = false;
     // disallow top level attributes
-    if(node.type == Type.ATT && read == null) throw new XMLStreamException();
+    if(node.type == NodeType.ATT && read == null)
+      throw new XMLStreamException();
     return kind;
   }
 
@@ -403,7 +404,7 @@ final class IterStreamReader implements XMLStreamReader {
    * Sets the current event type.
    */
   void type() {
-    switch(node.type) {
+    switch(node.ndType()) {
       case DOC: kind = START_DOCUMENT; return;
       case ATT: kind = ATTRIBUTE; return;
       case ELM: kind = START_ELEMENT; return;

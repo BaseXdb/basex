@@ -17,10 +17,12 @@ import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQSequenceType;
 import org.basex.io.IOContent;
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Itr;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.ItemCache;
@@ -73,13 +75,13 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throws XQException {
     opened();
     checkAttr(it);
-    return new BXQItemType(Type.ATT, qn, it);
+    return new BXQItemType(NodeType.ATT, qn, it);
   }
 
   @Override
   public BXQItemType createCommentType() throws XQException {
     opened();
-    return new BXQItemType(Type.COM);
+    return new BXQItemType(NodeType.COM);
   }
 
   @Override
@@ -90,7 +92,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     if(it.getItemKind() != XQItemType.XQITEMKIND_ELEMENT)
       throw new BXQException(ELM);
 
-    return new BXQItemType(Type.DEL, it.getNodeName(), it.getBaseType());
+    return new BXQItemType(NodeType.DEL, it.getNodeName(), it.getBaseType());
   }
 
   @Override
@@ -101,20 +103,20 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     if(it.getItemKind() != XQItemType.XQITEMKIND_SCHEMA_ELEMENT)
       throw new BXQException(ELM);
 
-    return new BXQItemType(Type.DEL, it.getNodeName(), it.getBaseType());
+    return new BXQItemType(NodeType.DEL, it.getNodeName(), it.getBaseType());
   }
 
   @Override
   public BXQItemType createDocumentType() throws XQException {
     opened();
-    return new BXQItemType(Type.DOC);
+    return new BXQItemType(NodeType.DOC);
   }
 
   @Override
   public BXQItemType createElementType(final QName qn, final int it,
       final QName qn2, final URI uri, final boolean n) throws XQException {
     opened();
-    return new BXQItemType(Type.ELM, qn, it);
+    return new BXQItemType(NodeType.ELM, qn, it);
   }
 
   @Override
@@ -141,7 +143,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(it, XQItemType.class);
     try {
       final Str val = Str.get(valid(v, String.class));
-      return new BXQItem(check(Type.STR, it).e(val, ctx.ctx, null));
+      return new BXQItem(check(AtomType.STR, it).e(val, ctx.ctx, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -150,27 +152,27 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   @Override
   public BXQItem createItemFromBoolean(final boolean v, final XQItemType it)
       throws XQException {
-    check(Type.BLN, it);
+    check(AtomType.BLN, it);
     return new BXQItem(Bln.get(v));
   }
 
   @Override
   public BXQItem createItemFromByte(final byte v, final XQItemType it)
       throws XQException {
-    return itr(v, Type.BYT, it);
+    return itr(v, AtomType.BYT, it);
   }
 
   @Override
   public BXQItem createItemFromDocument(final InputStream is,
       final String base, final XQItemType it) throws XQException {
-    check(Type.DOC, it);
+    check(NodeType.DOC, it);
     return new BXQItem(createNode(is));
   }
 
   @Override
   public BXQItem createItemFromDocument(final Reader r, final String base,
       final XQItemType it) throws XQException {
-    check(Type.DOC, it);
+    check(NodeType.DOC, it);
     return new BXQItem(createNode(r));
   }
 
@@ -184,48 +186,48 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQItem createItemFromDocument(final String v, final String base,
       final XQItemType it) throws XQException {
     valid(v, String.class);
-    check(Type.DOC, it);
+    check(NodeType.DOC, it);
     return new BXQItem(createNode(new IOContent(Token.token(v))));
   }
 
   @Override
   public BXQItem createItemFromDocument(final XMLStreamReader sr,
       final XQItemType it) throws XQException {
-    check(Type.DOC, it);
+    check(NodeType.DOC, it);
     return new BXQItem(createNode(sr));
   }
 
   @Override
   public BXQItem createItemFromDouble(final double v, final XQItemType it)
       throws XQException {
-    check(Type.DBL, it);
+    check(AtomType.DBL, it);
     return new BXQItem(Dbl.get(v));
   }
 
   @Override
   public BXQItem createItemFromFloat(final float v, final XQItemType it)
       throws XQException {
-    check(Type.FLT, it);
+    check(AtomType.FLT, it);
     return new BXQItem(Flt.get(v));
   }
 
   @Override
   public BXQItem createItemFromInt(final int v, final XQItemType it)
       throws XQException {
-    return itr(v, Type.INT, it);
+    return itr(v, AtomType.INT, it);
   }
 
   @Override
   public BXQItem createItemFromLong(final long v, final XQItemType it)
       throws XQException {
-    return itr(v, Type.LNG, it);
+    return itr(v, AtomType.LNG, it);
   }
 
   @Override
   public BXQItem createItemFromNode(final Node v, final XQItemType it)
       throws XQException {
     opened();
-    check(Type.DOC, it);
+    check(NodeType.DOC, it);
     valid(v, Node.class);
 
     final ByteArrayOutputStream ba = new ByteArrayOutputStream();
@@ -252,7 +254,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   @Override
   public BXQItem createItemFromShort(final short v, final XQItemType it)
       throws XQException {
-    return itr(v, Type.SHR, it);
+    return itr(v, AtomType.SHR, it);
   }
 
   @Override
@@ -260,7 +262,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throws XQException {
     try {
       final Str val = Str.get(valid(v, String.class));
-      return new BXQItem(check(Type.STR, it).e(val, ctx.ctx, null));
+      return new BXQItem(check(AtomType.STR, it).e(val, ctx.ctx, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -269,13 +271,13 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   @Override
   public BXQItemType createItemType() throws XQException {
     opened();
-    return new BXQItemType(Type.ITEM);
+    return new BXQItemType(AtomType.ITEM);
   }
 
   @Override
   public BXQItemType createNodeType() throws XQException {
     opened();
-    return new BXQItemType(Type.NOD);
+    return new BXQItemType(NodeType.NOD);
   }
 
   @Override
@@ -283,7 +285,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throws XQException {
     opened();
     final QName name = nm == null ? null : new QName(nm);
-    return new BXQItemType(Type.PI, name, -1);
+    return new BXQItemType(NodeType.PI, name, -1);
   }
 
   @Override
@@ -291,14 +293,14 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       final URI uri) throws XQException {
     opened();
     checkAttr(it);
-    return new BXQItemType(Type.ATT, qn, it);
+    return new BXQItemType(NodeType.ATT, qn, it);
   }
 
   @Override
   public BXQItemType createSchemaElementType(final QName qn, final int it,
       final URI uri) throws XQException {
     opened();
-    return new BXQItemType(Type.ELM, qn, it);
+    return new BXQItemType(NodeType.ELM, qn, it);
   }
 
   @Override
@@ -343,7 +345,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   @Override
   public BXQItemType createTextType() throws XQException {
     opened();
-    return new BXQItemType(Type.TXT);
+    return new BXQItemType(NodeType.TXT);
   }
 
   /**

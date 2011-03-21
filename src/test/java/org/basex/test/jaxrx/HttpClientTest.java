@@ -26,9 +26,12 @@ import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
@@ -181,7 +184,8 @@ public final class HttpClientTest {
         + "href='http://localhost:8984/basex/jax-rx/books'/>)");
     get1.execute(context);
     checkResponse(get1, HttpURLConnection.HTTP_OK, 2);
-    // assertTrue(((ItemCache) get1.result()).get(1).type == Type.DOC);
+
+    assertTrue(((ItemCache) get1.result()).item[1].type == NodeType.DOC);
 
     // GET2 - with override-media-type='text/plain'
     final Command get2 = new XQuery("http:send-request("
@@ -189,7 +193,8 @@ public final class HttpClientTest {
         + "'http://localhost:8984/basex/jax-rx/books')");
     get2.execute(context);
     checkResponse(get2, HttpURLConnection.HTTP_OK, 2);
-    // assertTrue(((ItemCache) get2.result()).get(1).type == Type.STR);
+
+    assertTrue(((ItemCache) get2.result()).item[1].type == AtomType.STR);
 
     // Get3 - with status-only='true'
     final Command get3 = new XQuery("http:send-request("
