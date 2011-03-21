@@ -140,7 +140,7 @@ public final class QueryContext extends Progress {
   public boolean grouping;
 
   /** Counter for variable IDs. */
-  public volatile int varIDs;
+  public int varIDs;
 
   /** List of modules. */
   final StringList modules = new StringList();

@@ -118,8 +118,8 @@ public class Filter extends Preds {
       ctx.pos = 1;
       int c = 0;
       for(int s = 0; s < is; ++s) {
-        ctx.value = ir.item[s];
-        if(p.test(ctx, input) != null) ir.item[c++] = ir.item[s];
+        ctx.value = ir.get(s);
+        if(p.test(ctx, input) != null) ir.set(ir.get(s), c++);
         ctx.pos++;
       }
       ir.size(c);

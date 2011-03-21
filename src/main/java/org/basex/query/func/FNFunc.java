@@ -227,7 +227,7 @@ final class FNFunc extends Fun {
 
     final ItemCache xs = ItemCache.get(expr[2].iter(ctx));
     for(int i = (int) xs.size(); i-- != 0;)
-      res = f.invIter(ctx, input, xs.item[i], res.finish());
+      res = f.invIter(ctx, input, xs.get(i), res.finish());
 
     return res;
   }

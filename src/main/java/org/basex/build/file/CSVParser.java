@@ -174,7 +174,7 @@ public final class CSVParser extends FileParser {
       throws IOException {
 
     boolean close = !open;
-    if(open) {
+    if(open && tb.size() != 0) {
       open();
       close = true;
     }
