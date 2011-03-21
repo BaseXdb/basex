@@ -205,6 +205,11 @@ public interface Text {
   };
 
   /** Command help. */
+  String[] HELPCOPY = {
+    "[" + C_NAME + "] [new" + C_NAME + "]", lang("ch_copy1"), lang("ch_copy2")
+  };
+
+  /** Command help. */
   String[] HELPCHECK = {
     "[" + C_INPUT + "]", lang("ch_check1"), lang("ch_check2")
   };
@@ -464,6 +469,10 @@ public interface Text {
   String DBBACKUP = lang("db_backup");
   /** Backup of database not created. */
   String DBNOBACKUP = lang("db_nobackup");
+  /** Copy of database created. */
+  String DBCOPY = lang("db_copy");
+  /** Copy of database not created. */
+  String DBNOCOPY = lang("db_nocopy");
   /** Database restored. */
   String DBRESTORE = lang("db_restore");
   /** Database not restored. */
