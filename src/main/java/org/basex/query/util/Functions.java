@@ -18,9 +18,12 @@ import org.basex.query.func.FNIndex;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.func.FunJava;
+import org.basex.query.item.FunType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
+import org.basex.query.item.Types;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
@@ -56,8 +59,8 @@ public final class Functions extends ExprInfo {
    * @param qp query parser
    * @throws QueryException query exception
    */
-  public Expr get(final QNm name, final Expr[] args, final QueryContext ctx,
-      final QueryParser qp) throws QueryException {
+  public TypedFunc get(final QNm name, final Expr[] args,
+      final QueryContext ctx, final QueryParser qp) throws QueryException {
 
     // find function
     final byte[] uri = name.uri().atom();
@@ -65,17 +68,18 @@ public final class Functions extends ExprInfo {
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
-      final Type type = Type.find(name, true);
-      if(type == null || type == Type.NOT || type == Type.AAT) {
+      final Type type = AtomType.find(name, true);
+      if(type == null || type == AtomType.NOT || type == AtomType.AAT) {
         final Levenshtein ls = new Levenshtein();
-        for(final Type t : Type.values()) {
+        for(final AtomType t : AtomType.values()) {
           if(t.par != null && ls.similar(lc(ln), lc(t.nam), 0))
             qp.error(FUNSIMILAR, name, t.nam);
         }
         qp.error(FUNCUNKNOWN, name.atom());
       }
       if(args.length != 1) qp.error(FUNCTYPE, name.atom());
-      return new Cast(qp.input(), args[0], SeqType.get(type, SeqType.Occ.ZO));
+      final SeqType to = SeqType.get(type, SeqType.Occ.ZO);
+      return TypedFunc.constr(new Cast(qp.input(), args[0], to), to);
     }
 
     // check Java functions - only allowed with administrator permissions
@@ -100,27 +104,29 @@ public final class Functions extends ExprInfo {
       final Class<?> cls = Reflect.find(java.substring(0, i));
       if(cls == null) qp.error(FUNCJAVA, java);
       final String mth = java.substring(i + 1);
-      return new FunJava(qp.input(), cls, mth, args);
+      return TypedFunc.java(new FunJava(qp.input(), cls, mth, args));
     }
 
     // check predefined functions
     final Fun fun = FNIndex.get().get(ln, uri, args, qp);
     if(fun != null) {
       ctx.updating |= fun.def == FunDef.PUT;
-      return fun;
+      return new TypedFunc(fun, fun.def.type(args.length));
     }
 
     // find local function
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].name;
       if(eq(ln, qn.ln()) && eq(uri, qn.uri().atom()) && args.length ==
-        func[l].args.length) return add(qp.input(), qn, l, args);
+        func[l].args.length) return new TypedFunc(add(qp.input(), qn, l, args),
+            FunType.get(func[l]));
     }
 
     // add function call for function that has not been defined yet
-    if(Type.find(name, false) == null) {
-      return add(qp.input(), name, add(new Func(qp.input(), name,
-          new Var[args.length], null, false), qp), args);
+    if(Types.find(name, false) == null) {
+      return new TypedFunc(add(qp.input(), name, add(new Func(qp.input(), name,
+          new Var[args.length], null, false), qp), args),
+          FunType.arity(args.length));
     }
     return null;
   }
@@ -155,7 +161,7 @@ public final class Functions extends ExprInfo {
 
     if(NSGlobal.standard(uri)) {
       if(fun.declared) qp.error(NAMERES, name.atom());
-      else funError(name, qp);
+      funError(name, qp);
     }
 
     final byte[] ln = name.ln();

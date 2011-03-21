@@ -1,5 +1,6 @@
 package org.basex.query.item;
 
+import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -18,28 +19,28 @@ public final class Jav extends Item {
    * @param v value
    */
   public Jav(final Object v) {
-    super(Type.JAVA);
+    super(AtomType.JAVA);
     val = v;
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return Token.token(val.toString());
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return atom().length != 0;
+    return atom(ii).length != 0;
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it) {
-    return Token.eq(atom(), it.atom());
+  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+    return Token.eq(atom(ii), it.atom(ii));
   }
 
   @Override
-  public int diff(final InputInfo ii, final Item it) {
-    return Token.diff(atom(), it.atom());
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
+    return Token.diff(atom(ii), it.atom(ii));
   }
 
   @Override

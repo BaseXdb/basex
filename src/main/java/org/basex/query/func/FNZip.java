@@ -36,9 +36,9 @@ import org.basex.query.item.FElem;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.ByteList;
@@ -247,7 +247,7 @@ final class FNZip extends Fun {
    */
   private Item zipFile(final QueryContext ctx) throws QueryException {
     // check argument
-    final ANode elm = (ANode) checkType(expr[0].item(ctx, input), Type.ELM);
+    final ANode elm = (ANode) checkType(expr[0].item(ctx, input), NodeType.ELM);
     if(!elm.qname().eq(E_FILE)) ZIPUNKNOWN.thrw(input, elm.qname());
     // get file
     final String file = attribute(elm, A_HREF, true);
@@ -403,7 +403,7 @@ final class FNZip extends Fun {
    */
   private Item updateEntries(final QueryContext ctx) throws QueryException {
     // check argument
-    final ANode elm = (ANode) checkType(expr[0].item(ctx, input), Type.ELM);
+    final ANode elm = (ANode) checkType(expr[0].item(ctx, input), NodeType.ELM);
     if(!elm.qname().eq(E_FILE)) ZIPUNKNOWN.thrw(input, elm.qname());
 
     // sorted paths in original file

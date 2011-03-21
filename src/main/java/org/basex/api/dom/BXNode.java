@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.query.item.ANode;
-import org.basex.query.item.Type;
+import org.basex.query.item.NodeType;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.Util;
@@ -57,7 +57,7 @@ public abstract class BXNode implements Node {
    * @return node kind
    */
   protected int kind() {
-    return ANode.kind(node.type);
+    return ANode.kind(node.ndType());
   }
 
   @Override
@@ -154,7 +154,7 @@ public abstract class BXNode implements Node {
     ANode n = node;
     ANode p;
     while((p = n.parent()) != null) n = p;
-    return n.type == Type.DOC ? (BXDoc) n.toJava() : null;
+    return n.type == NodeType.DOC ? (BXDoc) n.toJava() : null;
   }
 
   @Override
@@ -278,7 +278,7 @@ public abstract class BXNode implements Node {
     final byte[] nm = tag.equals("*") ? null : token(tag);
     ANode n = null;
     while((n = ai.next()) != null) {
-      if(n.type == Type.ELM && (nm == null || eq(nm, n.nname())))
+      if(n.type == NodeType.ELM && (nm == null || eq(nm, n.nname())))
         nb.add(n.copy());
     }
     return new BXNList(nb);

@@ -2,6 +2,7 @@ package org.basex.query.path;
 
 import org.basex.query.QueryContext;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 
@@ -19,7 +20,7 @@ public final class KindTest extends Test {
    * Constructor.
    * @param t node type
    */
-  KindTest(final Type t) {
+  KindTest(final NodeType t) {
     this(t, null, null);
   }
 
@@ -29,7 +30,7 @@ public final class KindTest extends Test {
    * @param ext type extension
    * @param et type name extension
    */
-  public KindTest(final Type t, final QNm ext, final Type et) {
+  public KindTest(final NodeType t, final QNm ext, final Type et) {
     type = t;
     name = ext;
     extype = et;

@@ -16,8 +16,8 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
@@ -121,7 +121,7 @@ final class FNUtil extends Fun {
    */
   private Iter bytes(final QueryContext ctx) throws QueryException {
     final byte[] bin = ((B64) checkType(expr[0].item(ctx, input),
-        Type.B64)).toJava();
+        AtomType.B64)).toJava();
 
     return new ValueIter() {
       int pos;
@@ -132,7 +132,9 @@ final class FNUtil extends Fun {
       @Override
       public boolean reset() { pos = 0; return true; }
       @Override
-      public Item get(final long i) { return new Itr(bin[(int) i], Type.BYT); }
+      public Item get(final long i) {
+        return new Itr(bin[(int) i], AtomType.BYT);
+      }
     };
   }
 
@@ -165,7 +167,7 @@ final class FNUtil extends Fun {
   private Dbl mb(final QueryContext ctx) throws QueryException {
     // check caching flag
     final boolean c = expr.length == 2 &&
-      checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
+      checkType(expr[1].item(ctx, input), AtomType.BLN).bool(input);
 
     // measure initial memory consumption
     Performance.gc(3);
@@ -196,7 +198,7 @@ final class FNUtil extends Fun {
   private Dbl ms(final QueryContext ctx) throws QueryException {
     // check caching flag
     final boolean c = expr.length == 2 &&
-      checkType(expr[1].item(ctx, input), Type.BLN).bool(input);
+      checkType(expr[1].item(ctx, input), AtomType.BLN).bool(input);
 
     // create timer
     final Performance p = new Performance();

@@ -10,6 +10,7 @@ import org.basex.query.QueryException;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Abstract item.
@@ -71,9 +72,11 @@ public abstract class Item extends Value {
 
   /**
    * Returns an atomized string.
+   * @param ii input info, use {@code null} if none is available
    * @return string representation
+   * @throws QueryException if the item can't be atomized
    */
-  public abstract byte[] atom();
+  public abstract byte[] atom(final InputInfo ii) throws QueryException;
 
   /**
    * Returns a boolean representation of the value.
@@ -92,7 +95,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(atom(), ii);
+    return Dec.parse(atom(ii), ii);
   }
 
   /**
@@ -102,7 +105,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public long itr(final InputInfo ii) throws QueryException {
-    return Itr.parse(atom(), ii);
+    return Itr.parse(atom(ii), ii);
   }
 
   /**
@@ -112,7 +115,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public float flt(final InputInfo ii) throws QueryException {
-    return Flt.parse(atom(), ii);
+    return Flt.parse(atom(ii), ii);
   }
 
   /**
@@ -122,12 +125,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public double dbl(final InputInfo ii) throws QueryException {
-    return Dbl.parse(atom(), ii);
-  }
-
-  @Override
-  public Object toJava() {
-    return Token.string(atom());
+    return Dbl.parse(atom(ii), ii);
   }
 
   /**
@@ -138,7 +136,7 @@ public abstract class Item extends Value {
    */
   public final boolean comparable(final Item b) {
     return type == b.type || num() && b.num() || (unt() || str()) &&
-      (b.str() || b.unt()) || dur() && b.dur();
+      (b.str() || b.unt()) || dur() && b.dur() || func();
   }
 
   /**
@@ -216,18 +214,23 @@ public abstract class Item extends Value {
    * @throws IOException I/O exception
    */
   public void serialize(final Serializer ser) throws IOException {
-    ser.item(atom());
+    try {
+      ser.item(atom(null));
+    } catch(QueryException e) {
+      throw new IOException(e.getMessage(), e);
+    }
   }
 
   /**
    * Throws a cast error.
    * @param val cast value
    * @param ii input info
+   * @return never
    * @throws QueryException query exception
    */
-  protected final void castErr(final Object val, final InputInfo ii)
+  protected final QueryException castErr(final Object val, final InputInfo ii)
       throws QueryException {
-    FUNCAST.thrw(ii, type, val);
+    return FUNCAST.thrw(ii, type, val);
   }
 
   /**
@@ -235,25 +238,27 @@ public abstract class Item extends Value {
    * @param i input
    * @param ex example format
    * @param ii input info
+   * @return never
    * @throws QueryException query exception
    */
-  public void dateErr(final byte[] i, final String ex, final InputInfo ii)
-      throws QueryException {
-    DATEFORMAT.thrw(ii, type, i, ex);
+  public QueryException dateErr(final byte[] i, final String ex,
+      final InputInfo ii) throws QueryException {
+    throw DATEFORMAT.thrw(ii, type, i, ex);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(ITM, VAL, atom(), TYP, Token.token(name()));
+    try {
+      ser.emptyElement(ITM, VAL, atom(null), TYP, Token.token(name()));
+    } catch(QueryException e) {
+      // only function items throw exceptions in atomization, and they should
+      // override plan(Serializer) sensibly
+      throw Util.notexpected(e);
+    }
   }
 
   @Override
-  public int hash() {
-    return Token.hash(atom());
-  }
-
-  @Override
-  public String toString() {
-    return Token.string(atom());
+  public int hash(final InputInfo ii) throws QueryException {
+    return Token.hash(atom(ii));
   }
 }

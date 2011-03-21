@@ -9,7 +9,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
+import org.basex.query.item.AtomType;
 import org.basex.util.InputInfo;
 import org.basex.util.XMLToken;
 
@@ -39,17 +39,18 @@ public abstract class CFrag extends Arr {
    * @param ctx query context
    * @param it item
    * @param att attribute flag
+   * @param ii input info
    * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final QueryContext ctx, final Item it, final boolean att)
-      throws QueryException {
+  final QNm qname(final QueryContext ctx, final Item it, final boolean att,
+      final InputInfo ii) throws QueryException {
 
     QNm n = null;
-    if(it.type == Type.QNM) {
+    if(it.type == AtomType.QNM) {
       n = (QNm) it;
     } else {
-      final byte[] nm = it.atom();
+      final byte[] nm = it.atom(ii);
       if(!XMLToken.isQName(nm)) {
         (it.str() || it.unt() ? INVNAME : INVQNAME).thrw(input, nm);
       }

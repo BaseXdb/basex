@@ -17,7 +17,7 @@ public final class Hex extends Bin {
    * @param v value
    */
   public Hex(final byte[] v) {
-    super(v, Type.HEX);
+    super(v, AtomType.HEX);
   }
 
   /**
@@ -27,7 +27,7 @@ public final class Hex extends Bin {
    * @throws QueryException query exception
    */
   public Hex(final byte[] v, final InputInfo ii) throws QueryException {
-    super(h2b(Token.trim(v), ii), Type.HEX);
+    super(h2b(Token.trim(v), ii), AtomType.HEX);
   }
 
   /**
@@ -53,7 +53,7 @@ public final class Hex extends Bin {
   private static byte[] h2b(final byte[] h, final InputInfo ii)
       throws QueryException {
 
-    if((h.length & 1) != 0) throw FUNCAST.thrw(ii, Type.HEX, (char) h[0]);
+    if((h.length & 1) != 0) throw FUNCAST.thrw(ii, AtomType.HEX, (char) h[0]);
     final int l = h.length >>> 1;
     final byte[] val = new byte[l];
 
@@ -74,6 +74,6 @@ public final class Hex extends Bin {
       throws QueryException {
     if(b >= '0' && b <= '9') return b - '0';
     if(b >= 'a' && b <= 'f' || b >= 'A' && b <= 'F') return (b & 15) + 9;
-    throw FUNCAST.thrw(ii, Type.HEX, (char) b);
+    throw FUNCAST.thrw(ii, AtomType.HEX, (char) b);
   }
 }

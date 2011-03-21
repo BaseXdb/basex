@@ -5,8 +5,8 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
@@ -35,7 +35,7 @@ public final class Root extends Simple {
     Item i;
     while((i = iter.next()) != null) {
       final ANode n = root(i);
-      if(n == null || n.type != Type.DOC) CTXNODE.thrw(input);
+      if(n == null || n.type != NodeType.DOC) CTXNODE.thrw(input);
       ni.add(n);
     }
     return ni;

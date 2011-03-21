@@ -16,16 +16,16 @@ public final class Atm extends Str {
    * @param v value
    */
   public Atm(final byte[] v) {
-    super(v, Type.ATM);
+    super(v, AtomType.ATM);
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return !it.unt() ? it.eq(ii, this) : Token.eq(val, it.atom());
+    return !it.unt() ? it.eq(ii, this) : Token.eq(val, it.atom(ii));
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    return !it.unt() ? -it.diff(ii, this) : Token.diff(val, it.atom());
+    return !it.unt() ? -it.diff(ii, this) : Token.diff(val, it.atom(ii));
   }
 }

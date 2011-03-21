@@ -6,8 +6,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Date;
-import org.basex.query.item.Type;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.Reflect;
@@ -134,8 +134,8 @@ public abstract class Formatter extends FormatUtil {
         byte[] pres = ONE;
         long num = 0;
 
-        final boolean dat = date.type == Type.DAT;
-        final boolean tim = date.type == Type.TIM;
+        final boolean dat = date.type == AtomType.DAT;
+        final boolean tim = date.type == AtomType.TIM;
         final XMLGregorianCalendar gc = date.xc;
         boolean err = false;
         switch(spec) {

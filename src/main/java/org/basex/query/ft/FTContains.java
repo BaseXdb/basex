@@ -14,8 +14,8 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTNode;
 import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.AxisStep;
@@ -71,7 +71,7 @@ public class FTContains extends ParseExpr {
 
     ctx.fttoken = lex;
     while((it = iter.next()) != null) {
-      lex.init(it.atom());
+      lex.init(it.atom(input));
       final FTNode item = ftexpr.item(ctx, input);
       double d = 0;
       if(item.all.matches()) {
@@ -98,7 +98,7 @@ public class FTContains extends ParseExpr {
     // return if step is no text node, or if no index is available
     final AxisStep s = CmpG.indexStep(expr);
     final boolean ok = s != null && ic.data.meta.ftindex &&
-      s.test.type == Type.TXT && ftexpr.indexAccessible(ic);
+      s.test.type == NodeType.TXT && ftexpr.indexAccessible(ic);
     ic.seq |= ic.not;
     return ok;
   }

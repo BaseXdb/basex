@@ -30,7 +30,7 @@ public final class Empty extends Value {
    * Private constructor.
    */
   private Empty() {
-    super(Type.EMP);
+    super(AtomType.EMP);
   }
 
   @Override
@@ -85,11 +85,11 @@ public final class Empty extends Value {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(Type.SEQ.nam, SIZE, Token.ZERO);
+    ser.emptyElement(AtomType.SEQ.nam, SIZE, Token.ZERO);
   }
 
   @Override
-  public int hash() {
+  public int hash(final InputInfo ii) {
     return 0;
   }
 

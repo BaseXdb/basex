@@ -67,7 +67,7 @@ public abstract class Date extends Item {
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());
       if(xc.getHour() == 24) xc.add(df.newDuration(0));
     } catch(final IllegalArgumentException ex) {
-      dateErr(d, e, ii);
+      throw dateErr(d, e, ii);
     }
   }
 
@@ -134,12 +134,12 @@ public abstract class Date extends Item {
   protected final void calc(final Dur a, final boolean p, final InputInfo ii)
       throws QueryException {
 
-    if(xc.getYear() + a.mon / 12 > 9999) DATERANGE.thrw(ii, type, a.atom());
+    if(xc.getYear() + a.mon / 12 > 9999) DATERANGE.thrw(ii, type, a.atom(ii));
     xc.add(p ? a.toJava() : a.toJava().negate());
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] atom(final InputInfo ii) {
     String str = xc.toXMLFormat();
     str = str.replaceAll("\\.0+(Z|-.*|\\+.*)?$", "$1");
     str = str.replaceAll("(\\.\\d+?)0+(Z|-.*|\\+.*)?$", "$1$2");
@@ -237,6 +237,6 @@ public abstract class Date extends Item {
 
   @Override
   public final String toString() {
-    return Util.info("\"%\"", atom());
+    return Util.info("\"%\"", atom(null));
   }
 }
