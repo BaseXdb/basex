@@ -6,7 +6,7 @@ import java.util.List;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;
 import static org.basex.query.up.primitives.PrimitiveType.*;
-import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.up.primitives.Primitive;
 import org.basex.util.Util;
 
 /**
@@ -17,7 +17,7 @@ import org.basex.util.Util;
  */
 final class NodePrimitivesContainer implements NodePrimitives {
   /** Container for update primitives. */
-  private List<UpdatePrimitive> prim = new ArrayList<UpdatePrimitive>(1);
+  private List<Primitive> prim = new ArrayList<Primitive>(1);
   /** The corresponding node is target of a delete primitive. */
   private boolean del;
   /** The corresponding node is target of a replace primitive. */
@@ -26,7 +26,7 @@ final class NodePrimitivesContainer implements NodePrimitives {
   private boolean adj;
 
   @Override
-  public void add(final UpdatePrimitive p) throws QueryException {
+  public void add(final Primitive p) throws QueryException {
     add(findPos(p), p);
   }
 
@@ -36,15 +36,15 @@ final class NodePrimitivesContainer implements NodePrimitives {
    * @param p Update Primitive to add
    * @throws QueryException query exception
    */
-  private void add(final int i, final UpdatePrimitive p) throws QueryException {
+  private void add(final int i, final Primitive p) throws QueryException {
     final PrimitiveType pt = p.type();
-    del |= pt == DELETE;
+    del |= pt == DELETENODE;
     rep |= pt == REPLACENODE;
     // text node adjacency cannot be instantly fixed if updates that affect
     // the sibling axis are still held pending
     adj = del || rep || pt == INSERTBEFORE || pt == INSERTAFTER;
     if(i < prim.size()) {
-      final UpdatePrimitive a = prim.get(i);
+      final Primitive a = prim.get(i);
       if(a != null && a.type() == p.type()) a.merge(p);
       else prim.add(i, p);
     } else {
@@ -57,7 +57,7 @@ final class NodePrimitivesContainer implements NodePrimitives {
    * @param p update primitive
    * @return position
    */
-  private int findPos(final UpdatePrimitive p) {
+  private int findPos(final Primitive p) {
     int i = -1;
     final int to = p.type().ordinal();
     while(++i < prim.size()) {
@@ -67,13 +67,13 @@ final class NodePrimitivesContainer implements NodePrimitives {
   }
 
   @Override
-  public Iterator<UpdatePrimitive> iterator() {
+  public Iterator<Primitive> iterator() {
     return prim.iterator();
   }
 
   @Override
-  public UpdatePrimitive find(final PrimitiveType t) {
-    for(final UpdatePrimitive p : prim) if(p.type() == t) return p;
+  public Primitive find(final PrimitiveType t) {
+    for(final Primitive p : prim) if(p.type() == t) return p;
     return null;
   }
 
@@ -84,13 +84,13 @@ final class NodePrimitivesContainer implements NodePrimitives {
     if(rep || del) {
       // if a node is replaced, an eventual delete operation
       // is removed, as the actual node identity has been replaced.
-      final PrimitiveType dominantOp = rep ? REPLACENODE : DELETE;
-      final List<UpdatePrimitive> up = new ArrayList<UpdatePrimitive>(1);
+      final PrimitiveType dominantOp = rep ? REPLACENODE : DELETENODE;
+      final List<Primitive> up = new ArrayList<Primitive>(1);
       // if a node is deleted or replaced, all other operations performing on
       // the corresponding node identity are without effect in the end.
       // insert before/after form the only exceptions, as they do not affect
       // the actual target node, but the sibling axis.
-      for(final UpdatePrimitive p : prim) {
+      for(final Primitive p : prim) {
         final PrimitiveType t = p.type();
         if(t == INSERTBEFORE || t == INSERTAFTER || t == dominantOp) up.add(p);
       }

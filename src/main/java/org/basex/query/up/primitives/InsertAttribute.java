@@ -26,14 +26,16 @@ public final class InsertAttribute extends NodeCopy {
   }
 
   @Override
-  public void apply(final int add) {
-    if(md == null) return;
-    final DBNode n = (DBNode) node;
-    n.data.insertAttr(n.pre + 1, n.pre, md);
+  public int apply(final int add) {
+    if(md != null) {
+      final DBNode n = (DBNode) node;
+      n.data.insertAttr(n.pre + 1, n.pre, md);
+    }
+    return 0;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
+  public void merge(final Primitive p) {
     insert.add(((NodeCopy) p).insert.get(0));
   }
 

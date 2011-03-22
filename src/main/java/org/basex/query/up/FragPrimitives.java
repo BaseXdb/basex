@@ -5,7 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
-import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.up.primitives.Primitive;
 import org.basex.util.TokenSet;
 
 /**
@@ -16,7 +16,7 @@ import org.basex.util.TokenSet;
  */
 final class FragPrimitives extends Primitives {
   @Override
-  protected void add(final UpdatePrimitive p) throws QueryException {
+  protected void add(final Primitive p) throws QueryException {
     add(p.node.id(), p);
   }
 

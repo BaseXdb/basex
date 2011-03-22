@@ -108,8 +108,7 @@ public class Filter extends Preds {
 
     // cache results to support last() function
     final ItemCache ir = new ItemCache();
-    Item i;
-    while((i = iter.next()) != null) ir.add(i);
+    for(Item i; (i = iter.next()) != null;) ir.add(i);
 
     // evaluate predicates
     for(final Expr p : pred) {

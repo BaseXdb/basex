@@ -72,8 +72,7 @@ final class FNId extends Fun {
   private Iter elid(final Iter it, final ANode node) throws QueryException {
     final NodeCache nc = id(it, node);
     final NodeCache res = new NodeCache().random();
-    ANode n;
-    while((n = nc.next()) != null) res.add(n.parent());
+    for(ANode n; (n = nc.next()) != null;) res.add(n.parent());
     return res;
   }
 
@@ -113,8 +112,7 @@ final class FNId extends Fun {
   private Bln lang(final byte[] lang, final ANode node) throws QueryException {
     for(ANode n = node; n != null; n = n.parent()) {
       final AxisIter atts = n.atts();
-      ANode at;
-      while((at = atts.next()) != null) {
+      for(ANode at; (at = atts.next()) != null;) {
         if(eq(at.qname().atom(), LANG)) {
           final byte[] ln = lc(norm(checkEStr(at)));
           return Bln.get(startsWith(ln, lang)
@@ -133,8 +131,7 @@ final class FNId extends Fun {
    */
   private byte[][] ids(final Iter iter) throws QueryException {
     final TokenList tl = new TokenList();
-    Item id;
-    while((id = iter.next()) != null) {
+    for(Item id; (id = iter.next()) != null;) {
       for(final byte[] i : split(norm(checkEStr(id)), ' ')) tl.add(i);
     }
     return tl.toArray();
@@ -151,8 +148,7 @@ final class FNId extends Fun {
       final ANode node) throws QueryException {
 
     AxisIter ai = node.atts();
-    ANode att;
-    while((att = ai.next()) != null) {
+    for(ANode att; (att = ai.next()) != null;) {
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
         if(!eq(checkEStr(att), id)) continue;
@@ -161,7 +157,7 @@ final class FNId extends Fun {
       }
     }
     ai = node.children();
-    while((att = ai.next()) != null) add(ids, nc, att.finish());
+    for(ANode att; (att = ai.next()) != null;) add(ids, nc, att.finish());
   }
 
   /**
@@ -175,8 +171,7 @@ final class FNId extends Fun {
       final ANode node) throws QueryException {
 
     AxisIter ai = node.atts();
-    ANode att;
-    while((att = ai.next()) != null) {
+    for(ANode att; (att = ai.next()) != null;) {
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
         if(!eq(checkEStr(att), id)) continue;
@@ -185,7 +180,7 @@ final class FNId extends Fun {
       }
     }
     ai = node.children();
-    while((att = ai.next()) != null) addRef(ids, nc, att.finish());
+    for(ANode att; (att = ai.next()) != null;) addRef(ids, nc, att.finish());
   }
 
   /**

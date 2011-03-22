@@ -5,7 +5,7 @@ import static org.basex.query.up.primitives.PrimitiveType.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.Put;
-import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.up.primitives.Primitive;
 import org.basex.util.IntList;
 import org.basex.util.IntMap;
 
@@ -28,7 +28,7 @@ abstract class Primitives {
    * @param p update primitive
    * @throws QueryException query exception
    */
-  protected abstract void add(final UpdatePrimitive p) throws QueryException;
+  protected abstract void add(final Primitive p) throws QueryException;
 
   /**
    * Adds the primitive to the set.
@@ -36,7 +36,7 @@ abstract class Primitives {
    * @param up update primitive
    * @throws QueryException query exception
    */
-  protected final void add(final int id, final UpdatePrimitive up)
+  protected final void add(final int id, final Primitive up)
       throws QueryException {
 
     if(up instanceof Put) putIds.add(id);
@@ -60,7 +60,7 @@ abstract class Primitives {
     nodes.sort();
 
     for(int i = 0; i < s; ++i) {
-      for(final UpdatePrimitive p : op.get(nodes.get(i))) {
+      for(final Primitive p : op.get(nodes.get(i))) {
         p.prepare();
         // check if the identity of all target nodes of fn:put operations is
         // still available after the execution of updates. that includes parent

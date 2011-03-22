@@ -233,12 +233,11 @@ public final class FNSimple extends Fun {
               return false;
 
             // compare attributes names and values
-            ANode a1 = null, a2 = null;
             final AxisIter att1 = s1.atts();
-            while((a1 = att1.next()) != null) {
+            for(ANode a1; (a1 = att1.next()) != null;) {
               final AxisIter att2 = s2.atts();
               boolean f = false;
-              while((a2 = att2.next()) != null) {
+              for(ANode a2; (a2 = att2.next()) != null;) {
                 if(a1.qname().eq(a2.qname())) {
                   f = Token.eq(a1.atom(), a2.atom());
                   break;

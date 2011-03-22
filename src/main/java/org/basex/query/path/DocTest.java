@@ -44,8 +44,7 @@ final class DocTest extends Test {
     // not more than 2^31 documents supported
     final IntList il = new IntList((int) ctx.value.size());
     final ValueIter ir = ctx.value.iter();
-    Item it;
-    while((it = ir.next()) != null) il.add(((DBNode) it).pre);
+    for(Item it; (it = ir.next()) != null;) il.add(((DBNode) it).pre);
     return new DocTest(new Nodes(il.toArray(), data));
   }
 

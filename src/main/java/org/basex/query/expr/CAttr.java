@@ -91,9 +91,8 @@ public final class CAttr extends CFrag {
    */
   static void add(final TokenBuilder tb, final Iter ir, final InputInfo ii)
       throws QueryException {
-    Item it = null;
     boolean m = false;
-    while((it = ir.next()) != null) {
+    for(Item it; (it = ir.next()) != null;) {
       if(m) tb.add(' ');
       tb.add(it.atom(ii));
       m = true;

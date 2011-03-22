@@ -26,23 +26,25 @@ public final class InsertIntoFirst extends NodeCopy {
   }
 
   @Override
-  public void apply(final int add) {
+  public int apply(final int add) {
     // source nodes may be empty, thus insert has no effect at all
-    if(md == null) return;
-    final DBNode n = (DBNode) node;
-    final int pre = n.pre + add;
-    final Data d = n.data;
-    d.insert(pre + d.attSize(pre, ANode.kind(node.ndType())), pre, md);
+    if(md != null) {
+      final DBNode n = (DBNode) node;
+      final int pre = n.pre + add;
+      final Data d = n.data;
+      d.insert(pre + d.attSize(pre, d.kind(pre)), pre, md);
+    }
+    return 0;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
+  public void merge(final Primitive p) {
     insert.add(((NodeCopy) p).insert.get(0));
   }
 
   @Override
   public PrimitiveType type() {
-    return PrimitiveType.INSERTINTOFI;
+    return PrimitiveType.INSERTINTOFIRST;
   }
 
   @Override
