@@ -19,7 +19,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public abstract class NodeCopy extends UpdatePrimitive {
+public abstract class NodeCopy extends Primitive {
   /** Nodes to be inserted. */
   protected final List<NodeCache> insert = new ArrayList<NodeCache>(1);
   /** Final copy of insertion nodes. */
@@ -29,11 +29,11 @@ public abstract class NodeCopy extends UpdatePrimitive {
    * Constructor.
    * @param ii input info
    * @param n target node
-   * @param ni nodes to be inserted
+   * @param nc nodes to be inserted
    */
-  protected NodeCopy(final InputInfo ii, final ANode n, final NodeCache ni) {
+  protected NodeCopy(final InputInfo ii, final ANode n, final NodeCache nc) {
     super(ii, n);
-    insert.add(ni);
+    insert.add(nc);
   }
 
   @Override
@@ -41,17 +41,16 @@ public abstract class NodeCopy extends UpdatePrimitive {
     if(insert.size() == 0) return;
 
     final NodeCache seq = new NodeCache();
-    for(final NodeCache ni : insert) {
-      ANode i;
-      while((i = ni.next()) != null) seq.add(i);
+    for(final NodeCache nc : insert) {
+      for(ANode i; (i = nc.next()) != null;) seq.add(i);
     }
     // ignore fragment nodes
-    if(!(node instanceof DBNode)) return;
-
-    // text nodes still need to be merged. two adjacent iterators may
-    // lead to two adjacent text nodes
-    md = new MemData(((DBNode) node).data);
-    new DataBuilder(md).build(mergeText(seq));
+    if(node instanceof DBNode) {
+      // text nodes still need to be merged. two adjacent iterators may
+      // lead to two adjacent text nodes
+      md = new MemData(((DBNode) node).data);
+      new DataBuilder(md).build(mergeText(seq));
+    }
   }
 
   /**

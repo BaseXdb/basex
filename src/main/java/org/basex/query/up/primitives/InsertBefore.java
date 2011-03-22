@@ -25,17 +25,20 @@ public final class InsertBefore extends NodeCopy {
   }
 
   @Override
-  public void apply(final int add) {
+  public int apply(final int add) {
     // source nodes may be empty, thus insert has no effect at all
-    if(md == null) return;
-    final DBNode n = (DBNode) node;
-    final Data d = n.data;
-    final int pre = n.pre;
-    d.insert(pre, d.parent(pre, ANode.kind(node.ndType())), md);
+    if(md != null) {
+      final DBNode n = (DBNode) node;
+      final Data d = n.data;
+      final int pre = n.pre;
+      d.insert(pre, d.parent(pre, d.kind(pre)), md);
+      return md.meta.size;
+    }
+    return 0;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
+  public void merge(final Primitive p) {
     insert.add(((NodeCopy) p).insert.get(0));
   }
 

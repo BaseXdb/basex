@@ -191,7 +191,7 @@ public enum FunDef {
       FunType.get(new SeqType[]{ ITEM_ZM }, BLN).seq(),
       FunType.get(new SeqType[]{ ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  FOLDLEFT1(FNURI, FNFunc.class, 3, 3, "fold-left1(function,non-empty-seq)",
+  FOLDLEFT1(FNURI, FNFunc.class, 2, 2, "fold-left1(function,non-empty-seq)",
       FunType.get(new SeqType[]{ ITEM_ZM, ITEM }, ITEM_ZM).seq(), ITEM_OM,
       ITEM_ZM),
 

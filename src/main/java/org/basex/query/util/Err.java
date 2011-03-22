@@ -669,7 +669,7 @@ public enum Err {
   UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected" +
       " as replace target."),
   /** XUTY0010: XQuery Update type exception. */
-  UPWRELM(XUTY, 10, "Replacing nodes must not be attribute nodes."),
+  UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
   /** XUTY0011: XQuery Update type exception. */
   UPWRATTR(XUTY, 11, "Replacing nodes must be attribute nodes."),
   /** XUTY0012: XQuery Update type exception. */

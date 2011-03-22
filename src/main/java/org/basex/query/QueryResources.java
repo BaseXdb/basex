@@ -191,8 +191,7 @@ public final class QueryResources {
 
     final Iter iter = ctx.value.iter();
     Data db = null;
-    Item it;
-    while((it = iter.next()) != null) {
+    for(Item it; (it = iter.next()) != null;) {
       if(!(it instanceof DBNode)) return null;
       final Data d = ((DBNode) it).data;
       if(db == null) db = d;

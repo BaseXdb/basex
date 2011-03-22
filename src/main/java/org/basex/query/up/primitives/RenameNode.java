@@ -16,27 +16,32 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class RenamePrimitive extends NewValue {
+public final class RenameNode extends Primitive {
+  /** New name. */
+  final QNm name;
+
   /**
    * Constructor.
    * @param ii input info
    * @param n target node
    * @param nm new name
    */
-  public RenamePrimitive(final InputInfo ii, final ANode n, final QNm nm) {
-    super(ii, n, nm);
+  public RenameNode(final InputInfo ii, final ANode n, final QNm nm) {
+    super(ii, n);
+    name = nm;
   }
 
   @Override
-  public void apply(final int add) {
+  public int apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data data = n.data;
     final int pre = n.pre;
     data.rename(pre, data.kind(pre), name.atom(), name.uri().atom());
+    return 0;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final Primitive p) throws QueryException {
     UPMULTREN.thrw(input, node);
   }
 
@@ -48,7 +53,7 @@ public final class RenamePrimitive extends NewValue {
 
   @Override
   public PrimitiveType type() {
-    return PrimitiveType.RENAME;
+    return PrimitiveType.RENAMENODE;
   }
 
   @Override

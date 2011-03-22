@@ -12,12 +12,11 @@ import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.primitives.ReplaceElemContent;
-import org.basex.query.up.primitives.ReplacePrimitive;
+import org.basex.query.up.primitives.ReplaceNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -72,7 +71,7 @@ public final class Replace extends Update {
 
       ctx.updates.add(tp == NodeType.ELM ?
           new ReplaceElemContent(input, targ, txt) :
-          new ReplaceValue(input, targ, new QNm(txt)), ctx);
+          new ReplaceValue(input, targ, txt), ctx);
     } else {
       final ANode par = targ.parent();
       if(par == null) UPNOPAR.thrw(input, i);
@@ -84,7 +83,7 @@ public final class Replace extends Update {
         // replace non-attribute node
         if(aList.size() > 0) UPWRELM.thrw(input);
       }
-      ctx.updates.add(new ReplacePrimitive(input, targ, list), ctx);
+      ctx.updates.add(new ReplaceNode(input, targ, list), ctx);
     }
     return null;
   }

@@ -83,7 +83,6 @@ final class GroupPartition {
    * @throws QueryException var not found.
    */
   private int ngvSize(final Var[] gvs, final Var[] fls) throws QueryException {
-    // [LW] how do we handle this?
     final TokenSet fc = new TokenSet();
     final TokenSet gc = new TokenSet();
 
@@ -209,7 +208,6 @@ final class GroupPartition {
    * @param ctx query context.
    */
   private void cacheRet(final QueryContext ctx) {
-    // [MS] the references differ... so you better make new ones!
     pggv = new Var[gv.length];
     pgngv = new Var[ngv.length];
     for(int j = 0; j < gv.length; ++j) pggv[j] = ctx.vars.get(gv[j]);

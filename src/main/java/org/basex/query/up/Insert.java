@@ -16,7 +16,7 @@ import org.basex.query.up.primitives.InsertAttribute;
 import org.basex.query.up.primitives.InsertBefore;
 import org.basex.query.up.primitives.InsertInto;
 import org.basex.query.up.primitives.InsertIntoFirst;
-import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.up.primitives.Primitive;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 
@@ -82,7 +82,7 @@ public final class Insert extends Update {
         UPTRGTYP.thrw(input);
     }
 
-    UpdatePrimitive up = null;
+    Primitive up = null;
     if(aList.size() > 0) {
       final ANode targ = before || after ? par : n;
       if(targ.type != NodeType.ELM)

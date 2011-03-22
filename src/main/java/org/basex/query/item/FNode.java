@@ -199,8 +199,7 @@ public abstract class FNode extends ANode {
           final ANode r = parent();
           if(r == null) return null;
           ai = r.children();
-          ANode n;
-          while((n = ai.next()) != null && !n.is(FNode.this));
+          for(ANode n; (n = ai.next()) != null && !n.is(FNode.this););
         }
         return ai.next();
       }
@@ -221,9 +220,9 @@ public abstract class FNode extends ANode {
           ANode p = n.parent();
           while(p != null) {
             final AxisIter i = p.children();
-            ANode c;
-            while(n.type != NodeType.ATT && (c = i.next()) != null && !c.is(n));
-            while((c = i.next()) != null) {
+            for(ANode c; n.type != NodeType.ATT &&
+              (c = i.next()) != null && !c.is(n););
+            for(ANode c; (c = i.next()) != null;) {
               nc.add(c.finish());
               addDesc(c.children(), nc);
             }

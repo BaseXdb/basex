@@ -25,18 +25,20 @@ public final class InsertAfter extends NodeCopy {
   }
 
   @Override
-  public void apply(final int add) {
+  public int apply(final int add) {
     // source nodes may be empty, thus insert has no effect at all
-    if(md == null) return;
-    final DBNode n = (DBNode) node;
-    final int p = n.pre + add;
-    final Data d = n.data;
-    final int k = ANode.kind(node.ndType());
-    d.insert(p + d.size(p, k), d.parent(p, k), md);
+    if(md != null) {
+      final DBNode n = (DBNode) node;
+      final Data d = n.data;
+      final int pre = n.pre + add;
+      final int k = d.kind(pre);
+      d.insert(pre + d.size(pre, k), d.parent(pre, k), md);
+    }
+    return 0;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
+  public void merge(final Primitive p) {
     insert.add(((NodeCopy) p).insert.get(0));
   }
 

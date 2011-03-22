@@ -7,7 +7,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -16,41 +15,46 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class ReplaceElemContent extends UpdatePrimitive {
-  /** Replacing text node. */
-  private final byte[] txt;
+public final class ReplaceElemContent extends Primitive {
+  /** New value. */
+  private final byte[] value;
 
   /**
    * Constructor.
    * @param ii input info
    * @param n target node
-   * @param tn replacing content
+   * @param val new value
    */
   public ReplaceElemContent(final InputInfo ii, final ANode n,
-      final byte[] tn) {
+      final byte[] val) {
     super(ii, n);
-    txt = tn;
+    value = val;
   }
 
   @Override
-  public void apply(final int add) {
+  public int apply(final int add) {
     final DBNode n = (DBNode) node;
-    final int par = n.pre + add;
     final Data d = n.data;
+    final int par = n.pre + add;
     final int pre = par + d.attSize(par, Data.ELEM);
-    while(par + d.size(par, Data.ELEM) > pre) {
-      d.delete(pre);
+
+    if(par + d.size(par, Data.ELEM) == pre + 1 && d.kind(pre) == Data.TEXT) {
+      // overwrite existing text node
+      d.replace(pre, Data.TEXT, value);
+    } else {
+      while(par + d.size(par, Data.ELEM) > pre) d.delete(pre);
+      if(value.length > 0) {
+        final MemData md = new MemData(n.data);
+        md.text(0, pre - par, value, Data.TEXT);
+        md.insert(0);
+        d.insert(pre, par, md);
+      }
     }
-    if(txt.length > 0) {
-      final MemData md = new MemData(n.data);
-      md.text(0, pre - par, txt, Data.TEXT);
-      md.insert(0);
-      d.insert(pre, par, md);
-    }
+    return 0;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final Primitive p) throws QueryException {
     UPMULTREPV.thrw(input, node);
   }
 
@@ -61,6 +65,6 @@ public final class ReplaceElemContent extends UpdatePrimitive {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + node + ", " + Token.string(txt) + "]";
+    return Util.info("%[%, %]", Util.name(this), node, value);
   }
 }

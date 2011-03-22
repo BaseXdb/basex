@@ -79,8 +79,8 @@ final class FNQName extends Fun {
         if(it == null) return null;
         nm = (QNm) checkType(it, AtomType.QNM);
         return !nm.ns() ? null : AtomType.NCN.e(Str.get(nm.pref()), ctx, input);
-      case NSURIPRE: // [LW][LK] broken...
-        // [LK] find out if inherit flag has a persistent effect
+      case NSURIPRE:
+        // [LK] Namespaces: find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);
         final ANode an = (ANode) checkType(it2, NodeType.ELM);
         final Atts at = an.nsScope(!copiedNod(an, ctx) || ctx.nsInherit);
