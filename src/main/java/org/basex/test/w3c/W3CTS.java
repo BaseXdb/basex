@@ -184,7 +184,7 @@ public abstract class W3CTS {
         } else if(c == 'd') {
           debug = true;
         } else if(c == 'm') {
-            minimum = true;
+          minimum = true;
         } else if(c == 'g') {
           group = arg.string();
         } else if(c == 'p') {
@@ -392,8 +392,7 @@ public abstract class W3CTS {
         final XMLSerializer xml = new XMLSerializer(ao, sp);
 
         iter = ItemCache.get(xq.iter());
-        Item it;
-        while((it = iter.next()) != null) {
+        for(Item it; (it = iter.next()) != null;) {
           doc &= it.type == NodeType.DOC;
           it.serialize(xml);
         }
@@ -502,11 +501,10 @@ public abstract class W3CTS {
                 iter.reset();
                 ir.reset();
                 final XMLSerializer ser = new XMLSerializer(System.out);
-                Item it;
                 Util.outln(NL + "=== " + testid + " ===");
-                while((it = ir.next()) != null) it.serialize(ser);
+                for(Item it; (it = ir.next()) != null;) it.serialize(ser);
                 Util.outln(NL + "=== " + NAME + " ===");
-                while((it = iter.next()) != null) it.serialize(ser);
+                for(Item it; (it = iter.next()) != null;) it.serialize(ser);
                 Util.outln();
               }
             } catch(final IOException ex) {
@@ -610,8 +608,9 @@ public abstract class W3CTS {
 
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p)))
         it.add(new DBNode(d, p));
-    } catch (final IOException ex) {
-      throw new Error(ex);
+    } catch(final IOException ex) {
+      return new ItemCache(new Item[] {
+          Str.get(Long.toString(System.nanoTime())) }, 1);
     }
     return it;
   }
