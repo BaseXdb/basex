@@ -708,7 +708,7 @@ public interface Text {
   /** Info on wildcard indexing. */
   String INFOWCINDEX = lang("info_wcindex");
   /** Info on index. */
-  String INFOOUTOFDATED = lang("info_outofdated");
+  String INFOOUTOFDATED = lang("info_outofdate");
 
   /** Info on database. */
   String INFODB = lang("info_db");
