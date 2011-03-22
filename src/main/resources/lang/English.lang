@@ -108,7 +108,6 @@ dr_title=Rename Database
 dr_title2=Delete documents
 dr_over=Old database will be overwritten
 dr_empty=An empty database will be created
-dr_overbacking=Old database and store will be overwritten
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
@@ -465,7 +464,6 @@ info_height=Height
 info_encoding=Encoding
 info_dbpath=Database Path
 info_nodb=No database found
-info_nodeepfs=No DeepFS database found
 info_dberror=could not be opened.
 info_query=Query Info
 info_debug=Debug Mode

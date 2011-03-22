@@ -108,7 +108,6 @@ dr_title=Rinomina la base di dati
 dr_title2=Delete documents
 dr_over=La vecchia base di dati verrà sovrascritta
 dr_empty=An empty database will be created
-dr_overbacking=La vecchia base di dati e la memoria di appoggio verranno sovrascritti
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
@@ -465,7 +464,6 @@ info_height=Altezza
 info_encoding=Codifica
 info_dbpath=Cammino della base di dati
 info_nodb=Nessuna base di dati trovata.
-info_nodeepfs=Nessuna base di dati DeepFS trovata
 info_dberror=non può essere aperto.
 info_query=Query Info
 info_debug=Modalità messa a punto

@@ -142,13 +142,6 @@ public final class GUIProp extends AProp {
   /** Last insertion type. */
   public static final Object[] LASTINSERT = { "LASTINSERT", 1 };
 
-  /** Path to mapped file hierarchy.
-  public static final Object[] FSPATH = { "FSPATH", Prop.HOME };
-  /** Name of the DeepFS database.
-  public static final Object[] FSNAME = { "FSNAME", "DeepFS" };
-  /** Flag indicating the mapping of the complete disk.
-  public static final Object[] FSALL = { "FSALL", false };*/
-
   /** Last command inputs. */
   public static final Object[] COMMANDS = { "COMMANDS", new String[0] };
   /** Last keyword inputs. */
@@ -171,7 +164,8 @@ public final class GUIProp extends AProp {
   /** Server user. */
   public static final Object[] SERVERUSER = { "SERVERUSER", "admin" };
 
-  /** Shows real file contents in the treemap. */
+  /** Shows real file contents in the treemap.
+   * [CG] AH asks if this shall be removed as well? */
   public static final Object[] MAPFS = { "MAPFS", true };
   /** Maximum text size to be displayed. */
   public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };

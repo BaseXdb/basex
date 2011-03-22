@@ -32,9 +32,8 @@ public final class ViewData {
       final int pre) {
     final int kind = d.kind(pre);
     if(kind == Data.ATTR) return true;
-    if(d.fs != null && d.fs.isFile(pre)) return true;
 
-    final boolean atts = prop.is(GUIProp.MAPATTS) && d.fs == null;
+    final boolean atts = prop.is(GUIProp.MAPATTS);
     final int last = pre + (atts ? 1 : d.attSize(pre, kind));
     return last == d.meta.size || d.parent(pre, kind) >=
       d.parent(last, d.kind(last));
@@ -48,7 +47,6 @@ public final class ViewData {
    */
   public static byte[] path(final Data data, final int pre) {
     if(data == null) return Token.EMPTY;
-    if(data.fs != null) return data.fs.path(pre);
 
     int p = pre;
     int k = data.kind(p);
@@ -109,11 +107,6 @@ public final class ViewData {
    */
   public static byte[] tag(final GUIProp prop, final Data data,
       final int pre) {
-
-    if(data.fs != null) {
-      final byte[] name = data.fs.name(pre);
-      if(name.length != 0) return name;
-    }
 
     if(prop.is(GUIProp.SHOWNAME) && data.nameID != 0) {
       final byte[] att = data.attValue(data.nameID, pre);

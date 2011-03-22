@@ -55,8 +55,6 @@ public final class DialogOpen extends Dialog {
   private final BaseXButton backup;
   /** Restore button. */
   private final BaseXButton restore;
-  /** File system flag. */
-  private final boolean fsInstance;
   /** Manage flag. */
   private final boolean manage;
 
@@ -64,15 +62,12 @@ public final class DialogOpen extends Dialog {
    * Default constructor.
    * @param main reference to the main window
    * @param m show manage dialog
-   * @param fs file system flag
    */
-  public DialogOpen(final GUI main, final boolean m, final boolean fs) {
+  public DialogOpen(final GUI main, final boolean m) {
     super(main, m ? MANAGETITLE : OPENTITLE);
     manage = m;
     // create database chooser
-    final StringList db = fs ? List.listFS(main.context) :
-      List.list(main.context);
-    fsInstance = fs;
+    final StringList db = List.list(main.context);
 
     choice = new BaseXListChooser(db.toArray(), this);
     set(choice, BorderLayout.CENTER);
@@ -143,8 +138,7 @@ public final class DialogOpen extends Dialog {
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
-      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui,
-          fsInstance, true);
+      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, true);
       if(!dr.ok() || dr.input().equals(db)) return;
       final AlterDB cmd = new AlterDB(db, dr.input());
       if(cmd.run(ctx)) {
@@ -152,8 +146,7 @@ public final class DialogOpen extends Dialog {
       } else {
         Dialog.error(gui, cmd.info());
       }
-      choice.setData(fsInstance ? List.listFS(ctx).toArray() :
-        List.list(ctx).toArray());
+      choice.setData(List.list(ctx).toArray());
       action(null);
     } else if(cmp == drop) {
       if(db.isEmpty() || !Dialog.confirm(gui, Util.info(DROPCONF, db))) return;

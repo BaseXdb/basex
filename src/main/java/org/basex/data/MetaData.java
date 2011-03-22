@@ -82,9 +82,6 @@ public final class MetaData {
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
 
-  /** Flag for DeepFS instance. */
-  public boolean deepfs;
-
   /** Root paths. */
   DataPaths paths = new DataPaths();
 
@@ -232,7 +229,6 @@ public final class MetaData {
       else if(k.equals(DBTIME))   time       = toLong(v);
       else if(k.equals(DBUTD))    uptodate   = toBool(v);
       else if(k.equals(DBLID))    lastid     = toInt(v);
-      else if(k.equals(DBDEEPFS)) deepfs     = toBool(v);
     }
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
     if(!istorage.equals(ISTORAGE)) {
@@ -281,7 +277,6 @@ public final class MetaData {
     writeInfo(out, DBTIME,   time);
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);
-    writeInfo(out, DBDEEPFS, deepfs);
     out.writeString(DBPERM);
     users.write(out);
     out.write(0);

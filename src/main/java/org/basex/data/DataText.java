@@ -69,8 +69,6 @@ public interface DataText {
   String DBLID = "LASTID";
   /** Permissions. */
   String DBPERM = "PERM";
-  /** DeepFS instance. */
-  String DBDEEPFS = "DEEPFS";
 
   /** Tags. */
   String DBTAGS = "TAGS";

@@ -108,7 +108,6 @@ dr_title=Đổi tên cơ sở dữ liệu
 dr_title2=Delete documents
 dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè
 dr_empty=An empty database will be created
-dr_overbacking=Cơ sở dữ liệu cũ và dự phòng sẽ bị ghi đè
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
@@ -465,7 +464,6 @@ info_height=Chiều cao
 info_encoding=Đang mã hóa
 info_dbpath=Đường dẫn cơ sở dữ liệu
 info_nodb=Không có cơ sở dữ liệu nào được tìm thấy.
-info_nodeepfs=No DeepFS database found
 info_dberror=không mở được.
 info_query=Query Info
 info_debug=Chế độ chỉnh lỗi

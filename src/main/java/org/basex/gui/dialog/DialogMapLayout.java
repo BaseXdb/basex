@@ -80,7 +80,6 @@ public final class DialogMapLayout extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    final boolean fs = gui.context.data.fs != null;
     final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.MAPOFFSETS, border.getSelectedIndex());
     gprop.set(GUIProp.MAPALGO, algo.getIndex());
@@ -88,7 +87,7 @@ public final class DialogMapLayout extends Dialog {
     final int sizeprp = sizeSlider.value();
     gprop.set(GUIProp.MAPWEIGHT, sizeprp);
     sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ?
-      MAPBOTH : sizeprp < 45 ?  MAPCHILDREN : fs ? MAPFSSIZE : MAPTEXTSIZE));
+      MAPBOTH : sizeprp < 45 ?  MAPCHILDREN : MAPTEXTSIZE));
 
     gui.notify.layout();
   }

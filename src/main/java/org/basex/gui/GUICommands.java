@@ -85,7 +85,7 @@ public enum GUICommands implements GUICommand {
   OPEN(GUIOPEN + DOTS, "% O", GUIOPENTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogOpen dialog = new DialogOpen(gui, false, false);
+      final DialogOpen dialog = new DialogOpen(gui, false);
       if(dialog.ok()) {
         new Close().run(gui.context);
         gui.notify.init();
@@ -100,7 +100,7 @@ public enum GUICommands implements GUICommand {
   MANAGE(GUIMANAGE + DOTS, "% M", GUIMANAGETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogOpen(gui, true, false).nodb()) Dialog.warn(gui, INFONODB);
+      if(new DialogOpen(gui, true).nodb()) Dialog.warn(gui, INFONODB);
     }
   },
 
@@ -117,7 +117,7 @@ public enum GUICommands implements GUICommand {
   DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogInput d = new DialogInput("", DROPTITLE, gui, false, false);
+      final DialogInput d = new DialogInput("", DROPTITLE, gui, false);
       if(d.ok()) DialogProgress.execute(gui, "", new Delete(d.input()));
     }
   },

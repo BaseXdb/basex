@@ -33,7 +33,6 @@ import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
 import org.basex.util.IntList;
-import org.deepfs.fs.DeepFS;
 
 /**
  * A scatter plot visualization of the database.
@@ -185,20 +184,8 @@ public final class PlotView extends View {
           if(keys.length > 0) {
             // choose size category as default for vertical axis
             int y = 0;
-            for(int k = 0; k < keys.length; ++k) {
-              if(keys[k].endsWith(DeepFS.S_SIZE)) {
-                y = k;
-                break;
-              }
-            }
             // choose name category as default for horizontal axis
             int x = y == 0 ? Math.min(1, keys.length) : 0;
-            for(int k = 0; k < keys.length; ++k) {
-              if(keys[k].endsWith(DeepFS.S_NAME)) {
-                x = k;
-                break;
-              }
-            }
             xCombo.setSelectedIndex(x);
             yCombo.setSelectedIndex(y);
           }
@@ -1023,11 +1010,13 @@ public final class PlotView extends View {
    * @return formatted string
    */
   private String formatString(final double value, final boolean drawX) {
-    final String attr = (String) (drawX ? xCombo : yCombo).getSelectedItem();
-    return BaseXLayout.value(value, attr.equals("@" + DeepFS.S_SIZE),
-        attr.equals("@" + DeepFS.S_MTIME) ||
-        attr.equals("@" + DeepFS.S_CTIME) ||
-        attr.equals("@" + DeepFS.S_ATIME));
+//    [CG] AH means: We can probably get rid of drawX and further simplify?
+//    final String attr = (String) (drawX ? xCombo : yCombo).getSelectedItem();
+    return BaseXLayout.value(value, false, false);
+//    return BaseXLayout.value(value, attr.equals("@" + DeepFS.S_SIZE),
+//        attr.equals("@" + DeepFS.S_MTIME) ||
+//        attr.equals("@" + DeepFS.S_CTIME) ||
+//        attr.equals("@" + DeepFS.S_ATIME));
   }
 
   @Override

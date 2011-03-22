@@ -740,8 +740,6 @@ public interface Text {
   /** Menu entry. */
   String MENUOPTIONS = lang("m_options");
   /** Menu entry. */
-  String MENUDEEPFS = "DeepFS";
-  /** Menu entry. */
   String MENUHELP = lang("m_help");
 
   // GUI COMMANDS =============================================================
@@ -1147,9 +1145,6 @@ public interface Text {
   String OPENLARGE = lang("do_large") + NL + " ";
   /** Dialog asking if a new database should be be created. */
   String NODBQUESTION = INFONODB + NL + lang("do_nodbquestion") + NL + " ";
-  /** Dialog asking if a new deepfs database should be be created. */
-  String NODEEPFSQUESTION = lang("info_nodeepfs") + DOT + NL +
-    lang("do_nodbquestion") + NL + " ";
 
   /** File dialog error. */
   String NOTOPENED = lang("c_notopened");
@@ -1211,8 +1206,6 @@ public interface Text {
   String RENAMEOVER = lang("dr_over") + DOT;
   /** Info for creating an empty database. */
   String EMPTYDATABASE = lang("dr_empty") + DOT;
-  /** Info for overwriting a database and deleting store. */
-  String RENAMEOVERBACKING = lang("dr_overbacking") + DOT;
   /** % documents will be deleted. */
   String DELETEPATH = lang("dr_delete") + DOT;
 

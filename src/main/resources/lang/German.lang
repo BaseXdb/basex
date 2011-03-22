@@ -108,7 +108,6 @@ dr_title=Datenbank umbenennen
 dr_title2=Dokumente löschen
 dr_over=Alte Datenbank wird überschrieben
 dr_empty=Eine leere Datenbank wird erstellt
-dr_overbacking=Alte Datenbank, sowie DeepFS Hilfsspeicher werden überschrieben
 dr_delete=% Dokumente werden gelöscht
 
 dd_title=Datenbankmanagement
@@ -465,7 +464,6 @@ info_height=Höhe
 info_encoding=Kodierung
 info_dbpath=Datenbankpfad
 info_nodb=Keine Datenbank gefunden.
-info_nodeepfs=Keine DeepFS Datenbank gefunden
 info_dberror=konnte nicht geöffnet werden.
 info_query=Anfrage-Info
 info_debug=Debug-Modus

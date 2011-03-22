@@ -10,7 +10,7 @@ import org.basex.util.Util;
 
 /**
  * This class organizes icons and data types for common file types.
- *
+ * [CG] AH aks if this class shall also be removed? .. and resources/img/...
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */

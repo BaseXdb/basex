@@ -29,7 +29,6 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.Util;
-import org.deepfs.fs.DeepFS;
 
 /**
  * This is a simple user search panel.
@@ -137,19 +136,15 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   private void addKeys(final Data data) {
     final TokenList tl = new TokenList();
     final int cs = panel.getComponentCount();
-    final boolean fs = data.fs != null;
-    if(fs) {
-      tl.add(Token.token(DeepFS.S_FILE));
-    } else {
-      for(int c = 0; c < cs; c += 2) {
-        final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
-        if(combo.getSelectedIndex() == 0) continue;
-        final String elem = combo.getSelectedItem().toString();
-        if(!elem.startsWith("@")) tl.add(Token.token(elem));
-      }
+
+    for(int c = 0; c < cs; c += 2) {
+      final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
+      if(combo.getSelectedIndex() == 0) continue;
+      final String elem = combo.getSelectedItem().toString();
+      if(!elem.startsWith("@")) tl.add(Token.token(elem));
     }
 
-    final TokenList tmp = data.pthindex.desc(tl, data, !fs, false);
+    final TokenList tmp = data.pthindex.desc(tl, data, true, false);
     final String[] keys = entries(tmp.toArray());
     final BaseXCombo cm = new BaseXCombo(gui, keys);
     cm.addActionListener(this);
@@ -217,11 +212,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
           final StatsKey stat = names.stat(names.id(key));
           switch(stat.kind) {
             case INT:
-              addSlider(stat.min, stat.max, cp + 1,
-                  item.equals("@" + DeepFS.S_SIZE),
-                  item.equals("@" + DeepFS.S_MTIME) ||
-                  item.equals("@" + DeepFS.S_CTIME) ||
-                  item.equals("@" + DeepFS.S_ATIME), true);
+              addSlider(stat.min, stat.max, cp + 1, false, false, true);
               break;
             case DBL:
               addSlider(stat.min, stat.max, cp + 1, false, false, false);
@@ -300,20 +291,15 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         }
       }
 
-      if(data.fs != null && tb.size() == 0) {
-        tb.add("//" + DeepFS.S_FILE);
-      }
       if(attr) {
         key = "descendant-or-self::node()/" + key;
         if(tb.size() == 0) tb.add("//*");
         if(pattern.isEmpty()) pattern = PATSIMPLE;
       } else {
-        if(data.fs != null) tb.add("[" + key);
-        else tb.add("//" + key);
+        tb.add("//" + key);
         key = "text()";
       }
       tb.addExt(pattern, key, val1, key, val2);
-      if(data.fs != null && !attr) tb.add("]");
     }
 
     String qu = tb.toString();

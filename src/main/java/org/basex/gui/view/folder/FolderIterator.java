@@ -110,12 +110,11 @@ final class FolderIterator {
   private boolean moreData(final Data data) {
     level = ll;
     int kind = data.kind(pre);
-    final boolean fs = data.fs != null;
 
     final boolean[] open = view.opened;
     if(open == null) return false;
 
-    pre += open[pre] ? fs ? data.attSize(pre, kind) : 1 : data.size(pre, kind);
+    pre += open[pre] ? 1 : data.size(pre, kind);
     while(pre < data.meta.size) {
       kind = data.kind(pre);
       final int p = data.parent(pre, kind);
@@ -136,7 +135,7 @@ final class FolderIterator {
         mode = 2;
         return true;
       }
-      pre += fs ? data.attSize(pre, kind) : 1;
+      pre += 1;
     }
     return moreCS();
   }

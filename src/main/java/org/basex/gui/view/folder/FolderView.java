@@ -22,7 +22,6 @@ import javax.swing.SwingUtilities;
 
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
@@ -30,8 +29,6 @@ import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.util.Performance;
-import org.basex.util.Token;
 
 /**
  * This view offers a folder visualization of the database contents.
@@ -236,11 +233,7 @@ public final class FolderView extends View {
     g.setColor(color2);
     g.drawLine(2, y + boxMargin - 1, totalW - 5, y + boxMargin - 1);
 
-    final boolean fs = data.fs != null;
-    final boolean file = fs && data.fs.isFile(pre);
-    final boolean dir = fs && data.fs.isDir(pre);
-    final byte[] name = file || dir ? ViewData.tag(gui.gprop, data, pre) :
-      ViewData.content(data, pre, false);
+    final byte[] name = ViewData.content(data, pre, false);
 
     int p = gui.context.focused;
     while(p > pre) p = ViewData.parent(data, p);
@@ -252,17 +245,9 @@ public final class FolderView extends View {
 
     if(elem) {
       final boolean large = gui.gprop.num(GUIProp.FONTSIZE) > 20;
-      final int off = large ? 1 : 0;
       final int yy = y - boxW - (large ? 6 : 3);
       Image box = opened[pre] ? openedBox : closedBox;
-      // print file icon
-      if(file) {
-        box = GUIFS.get().images(name, off);
-      } else if(dir) {
-        box = opened[pre] ? GUIFS.get().folder2[off] : GUIFS.get().folder1[off];
-      }
       g.drawImage(box, xx - lineH, yy, this);
-      if(fs && (file || dir)) xx += large ? 12 : 6;
     }
 
     g.setFont(fnt);
@@ -270,12 +255,6 @@ public final class FolderView extends View {
 
     final int yy = y;
     int tw = totalW + 6;
-    if(file && tw - xx > 140) {
-      final long size = Token.toLong(data.fs.size(pre));
-      final String text = Performance.format(size, false);
-      tw -= BaseXLayout.width(g, text) + 10;
-      g.drawString(text, tw, yy);
-    }
     final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
     BaseXLayout.chopString(g, name, xx, yy - fsz, tw - xx - 10, fsz);
 
@@ -427,7 +406,7 @@ public final class FolderView extends View {
     }
   }
 
-  // [AH] Remove
+  // [CG] AH asks if this method can be removed?
   @Override
   public void mouseClicked(final MouseEvent e) {
     if(!SwingUtilities.isLeftMouseButton(e) || gui.updating || opened == null)
@@ -472,7 +451,6 @@ public final class FolderView extends View {
     final Data data = gui.context.data;
     int kind = data.kind(focusPre);
 
-    final boolean fs = data.fs != null;
     final boolean right = NEXT.is(e);
     boolean down = NEXTLINE.is(e);
     boolean up = PREVLINE.is(e);
@@ -481,9 +459,9 @@ public final class FolderView extends View {
       if(e.isShiftDown()) {
         opened[focusPre] = right;
         final int s = data.meta.size;
-        for(int pre = focusPre + (fs ? data.attSize(focusPre, kind) : 1);
+        for(int pre = focusPre + 1;
           pre != s && data.parent(pre, data.kind(pre)) >= focusPre;
-          pre += fs ? data.attSize(pre, kind) : 1) {
+          pre += 1) {
           opened[pre] = right;
           kind = data.kind(pre);
         }

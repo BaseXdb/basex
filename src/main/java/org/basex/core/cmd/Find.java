@@ -13,7 +13,6 @@ import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
-import org.deepfs.fs.DeepFS;
 
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
@@ -56,7 +55,6 @@ public final class Find extends AQuery {
 
     // file system instance
     final Data data = ctx.data;
-    if(data.fs != null) return findFS(query, ctx, root);
 
     // parse user input
     final String qu = query.replaceAll(" \\+", " ");
@@ -112,90 +110,6 @@ public final class Find extends AQuery {
     if(opt.size() != 0) tb.add("declare ft-option" + opt + "; ");
     tb.add(pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + tag + preds);
     return tb.toString();
-  }
-
-  /**
-   * Creates an XQuery representation for the specified file system query.
-   * @param term query terms
-   * @param context context
-   * @param root root flag
-   * @return query
-   */
-  private static String findFS(final String term, final Context context,
-      final boolean root) {
-
-    final String query = term.replaceAll("\\*|\\?|\\&|\"", " ") + ' ';
-    String qu = query;
-
-    final TokenBuilder xquery = new TokenBuilder();
-    final boolean r = root || context.root();
-
-    if(r) xquery.add("/");
-    xquery.add(Axis.DESCORSELF + "::");
-    String name = "*";
-
-    do {
-      boolean exact = true;
-      String pred = "";
-
-      // check prefix
-      char op = qu.charAt(0);
-      if(op == '>') {
-        pred = DeepFS.S_SIZE;
-      } else if(op == '<') {
-        pred = DeepFS.S_SIZE;
-      } else if(op == '.') {
-        pred = DeepFS.S_SUFFIX;
-        op = '=';
-      } else {
-        pred = DeepFS.S_NAME;
-        exact = op == '=';
-      }
-
-      int off = exact ? 1 : 0;
-      while(off < qu.length() && qu.charAt(off) == ' ') ++off;
-      qu = qu.substring(off);
-      if(qu.isEmpty()) continue;
-
-      final int i = qu.indexOf(' ');
-      String t = qu.substring(0, i);
-
-      if(!name.isEmpty()) name = "file";
-      if(pred == DeepFS.S_SIZE) {
-        t = Long.toString(calcNum(token(t)));
-      } else {
-        // if dot is found inside the current term, add suffix check
-        final int d = t.lastIndexOf(".");
-        if(d != -1) {
-          xquery.add(name + "[@" + DeepFS.S_SUFFIX + " = \"" +
-              t.substring(d + 1) + "\"]");
-          t = t.substring(0, d);
-          name = "";
-        }
-        t = "\"" + t + "\"";
-      }
-      // add predicate
-      xquery.add(name + "[@" + pred + (exact ? op : " " + CT + " ") +
-          t + "]");
-
-      qu = qu.substring(i + 1);
-      name = "";
-    } while(qu.indexOf(' ') > -1);
-
-    final TokenBuilder ft = new TokenBuilder();
-    for(final String t : split(query)) {
-      if(XMLToken.isChar(t.charAt(0))) {
-        if(ft.size() != 0) ft.add(" ftand");
-        ft.add(" \"" + t + "\"");
-      }
-    }
-    if(ft.size() != 0) {
-      xquery.add(" | " + (r ? "/" : "") + Axis.DESCORSELF + "::file");
-      xquery.add("[" + Axis.DESC + "::text() " + CT);
-      xquery.add(ft.finish());
-      xquery.add("]");
-    }
-    return xquery.toString();
   }
 
   /**

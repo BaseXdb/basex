@@ -13,7 +13,6 @@ import org.basex.io.IO;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
-import org.basex.util.Util;
 
 /**
  * Evaluates the 'list' command and shows all available databases.
@@ -89,28 +88,5 @@ public final class List extends Command {
     }
     db.sort(false, true);
     return db;
-  }
-
-  /**
-   * Returns a list of all DeepFS databases.
-   * @param ctx context reference
-   * @return available databases
-   */
-  public static StringList listFS(final Context ctx) {
-    final StringList dbl = new StringList();
-    for(final String name : list(ctx)) {
-      DataInput in = null;
-      final MetaData meta = new MetaData(name, ctx.prop);
-      try {
-        in = new DataInput(meta.file(DATAINFO));
-        meta.read(in);
-        if(meta.deepfs) dbl.add(name);
-      } catch(final IOException ex) {
-        Util.debug(ex.getMessage());
-      } finally {
-        if(in != null) try { in.close(); } catch(final IOException ex) { }
-      }
-    }
-    return dbl;
   }
 }
