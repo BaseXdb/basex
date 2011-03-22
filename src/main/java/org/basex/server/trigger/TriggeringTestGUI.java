@@ -137,7 +137,7 @@ public final class TriggeringTestGUI {
    */
   void action(final String c) {
     try {
-      cs.trigger("()", "trigger", c, "q");
+      cs.trigger("()", "trigger", c, "m");
     } catch(BaseXException e) {
       e.printStackTrace();
     }

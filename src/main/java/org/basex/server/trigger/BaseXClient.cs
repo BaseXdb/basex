@@ -162,7 +162,7 @@ namespace BaseXClient
 	/** see readme.txt */
 	public void Trigger(string query, string name, string msg, string mode)
 	{
-	  Execute("xquery db:trigger(" + query + ", " + name + ", " + notification + "," + mode")");
+	  Execute("xquery db:trigger(" + query + ", " + name + ", " + msg + "," + mode + ")");
 	}
 	
 	/** see readme.txt */
