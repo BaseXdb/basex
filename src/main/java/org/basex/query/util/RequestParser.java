@@ -11,6 +11,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.NodeMore;
+import org.basex.query.util.Request.Part;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenMap;
 
@@ -104,7 +105,7 @@ public final class RequestParser {
       byte[] value = null;
 
       while((attr = hdrAttrs.next()) != null) {
-        if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
+        if(eq(attr.nname(), HDR_NAME)) name = lc(attr.atom());
         if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
 
         if(name != null && name.length != 0 && value != null
@@ -170,7 +171,7 @@ public final class RequestParser {
    */
   private static void check(final Request r, final InputInfo ii)
       throws QueryException {
-    
+
     // Check request mandatory attributes
     if(r.attrs.get(METHOD) == null) {
       MANDATTR.thrw(ii, string(METHOD));
@@ -189,7 +190,8 @@ public final class RequestParser {
       // Check body of each part
       final Iterator<Part> i = r.parts.iterator();
       Part p = null;
-      while((p = i.next()) != null) {
+      while(i.hasNext()) {
+        p = i.next();
         if(p.bodyContent.size() != 0 && p.bodyAttrs.get(MEDIATYPE) == null)
           MANDATTR.thrw(ii, string(MEDIATYPE));
       }

@@ -31,18 +31,18 @@ public final class Request {
   /** Query context. */
   public QueryContext ctx;
 
-}
+  /**
+   * Container for parsed data from <part/> element.
+   * @author BaseX Team 2005-11, BSD License
+   * @author Rositsa Shadura
+   */
+  public static class Part {
+    /** Part headers. */
+    public final TokenMap headers = new TokenMap();
+    /** Attributes of part body. */
+    public final TokenMap bodyAttrs = new TokenMap();
+    /** Content of part body. */
+    public final ItemCache bodyContent = new ItemCache();
+  }
 
-/**
- * Container for parsed data from <part/> element.
- * @author BaseX Team 2005-11, BSD License
- * @author Rositsa Shadura
- */
-class Part {
-  /** Part headers. */
-  public final TokenMap headers = new TokenMap();
-  /** Attributes of part body. */
-  public final TokenMap bodyAttrs = new TokenMap();
-  /** Content of part body. */
-  public final ItemCache bodyContent = new ItemCache();
 }

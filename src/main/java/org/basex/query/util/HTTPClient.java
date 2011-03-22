@@ -23,6 +23,7 @@ import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Request.Part;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
@@ -58,7 +59,7 @@ public final class HTTPClient {
 
   /** boundary marker. */
   private static final byte[] BOUNDARY = token("boundary");
-  /** Carriage return/linefeed. */
+  /** Carriage return/line feed. */
   private static final byte[] CRLF = token("\r\n");
   /** Default multipart boundary. */
   private static final String DEFAULT_BOUND = "1BEF0A57BE110FD467A";
@@ -168,15 +169,21 @@ public final class HTTPClient {
    */
   private static void setContentType(final HttpURLConnection conn,
       final Request r) {
-    final String mediaType = string(r.payloadAttrs.get(MEDIATYPE));
-    if(r.isMultipart) {
-      final String b = string(r.payloadAttrs.get(BOUNDARY));
-      final String boundary = (b != null) ? b : DEFAULT_BOUND;
-      StringBuilder sb = new StringBuilder();
-      sb.append(mediaType).append("; ").append("boundary=").append(boundary);
-      conn.setRequestProperty(CONT_TYPE, sb.toString());
+    final byte[] contTypeHdr = r.headers.get(lc(token(CONT_TYPE)));
+    // If header "Content-Type" is set explicitly by the user, it is used
+    if(contTypeHdr != null) {
+      conn.setRequestProperty(CONT_TYPE, string(contTypeHdr));
     } else {
-      conn.setRequestProperty(CONT_TYPE, mediaType);
+      final String mediaType = string(r.payloadAttrs.get(MEDIATYPE));
+      if(r.isMultipart) {
+        final String b = string(r.payloadAttrs.get(BOUNDARY));
+        final String boundary = (b != null) ? b : DEFAULT_BOUND;
+        StringBuilder sb = new StringBuilder();
+        sb.append(mediaType).append("; ").append("boundary=").append(boundary);
+        conn.setRequestProperty(CONT_TYPE, sb.toString());
+      } else {
+        conn.setRequestProperty(CONT_TYPE, mediaType);
+      }
     }
   }
 
@@ -209,7 +216,7 @@ public final class HTTPClient {
    * @param r request data
    * @throws IOException I/O exception
    */
-  private static void setRequestContent(final OutputStream out, final Request r)
+  public static void setRequestContent(final OutputStream out, final Request r)
       throws IOException {
     if(r.isMultipart) {
       writeMultipart(r, out);
@@ -230,7 +237,7 @@ public final class HTTPClient {
   }
 
   /**
-   * Writes the payload(content) of a body or part in the output stream of the
+   * Writes the payload of a body or part in the output stream of the
    * connection.
    * @param payload body/part payload
    * @param payloadAtts payload attributes
