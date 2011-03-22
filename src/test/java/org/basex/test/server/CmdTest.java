@@ -57,6 +57,7 @@ public class CmdTest {
   public final void setUp() {
     try {
       session.execute(new DropDB(NAME));
+      session.execute(new DropDB(USER));
       session.execute(new DropUser(USER));
     } catch(final BaseXException ex) {
     }

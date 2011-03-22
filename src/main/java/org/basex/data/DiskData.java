@@ -149,11 +149,18 @@ public final class DiskData extends Data {
   @Override
   public synchronized void closeIndex(final IndexType type) throws IOException {
     switch(type) {
-      case TEXT:      if(txtindex != null) txtindex.close(); break;
-      case ATTRIBUTE: if(atvindex != null) atvindex.close(); break;
-      case FULLTEXT:  if(ftxindex != null) ftxindex.close(); break;
-      case PATH:      if(ftxindex != null) pthindex.close(); break;
-      default: break;
+      case TEXT:
+        if(txtindex != null) { txtindex.close(); txtindex = null; }
+        break;
+      case ATTRIBUTE:
+        if(atvindex != null) { atvindex.close(); atvindex = null; }
+        break;
+      case FULLTEXT:
+        if(ftxindex != null) { ftxindex.close(); ftxindex = null; }
+        break;
+      default:
+        // path index will not be closed
+        break;
     }
   }
 
@@ -226,7 +233,6 @@ public final class DiskData extends Data {
   }
 
   // UPDATE OPERATIONS ========================================================
-
   @Override
   protected void text(final int pre, final byte[] val, final boolean txt) {
     final long v = Token.toSimpleInt(val);
@@ -234,16 +240,30 @@ public final class DiskData extends Data {
       textOff(pre, v | IO.OFFNUM);
     } else {
       final DataAccess da = txt ? texts : values;
-      final byte[] cpr = comp.pack(val);
+      final byte[] pack = comp.pack(val);
 
-      // if old text is numeric or longer than the old text and not placed last,
-      // append text at the end
-      long o = textOff(pre) & IO.OFFCOMP - 1;
-      if(num(textOff(pre)) || cpr.length > da.readNum(o) &&
-          da.pos() + da.readNum(o) != da.length()) o = da.length();
+      // old entry
+      final long old = textOff(pre);
+      // old offset
+      long o = old & IO.OFFCOMP - 1;
 
-      da.writeBytes(o, cpr);
-      textOff(pre, o | (cpr == val ? 0 : IO.OFFCOMP));
+      if(!num(old)) {
+        // handle non-numeric entry
+        final int len = da.readNum(o);
+        if(da.pos() + len == da.length()) {
+          // set new file length if entry is placed last
+          da.length(da.pos() + pack.length);
+        } else if(pack.length > len) {
+          // otherwise, if new text is longer than the old, append text
+          o = da.length();
+        }
+      } else {
+        // text is numeric: append text at the end
+        o = da.length();
+      }
+
+      da.writeBytes(o, pack);
+      textOff(pre, o | (pack == val ? 0 : IO.OFFCOMP));
     }
   }
 
