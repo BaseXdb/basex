@@ -168,7 +168,7 @@ public enum Err {
   /** FOHC009: Evaluation exception. */
   MANDATTR(FOHC, 9, "Attribute '%' is mandatory."),
   /** FOHC0010: Evaluation exception. */
-  NOBOUND(FOHC, 10, "No separation boundary is specified."),
+  NOBOUND(FOHC, 10, "No separation boundary specified."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

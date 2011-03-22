@@ -279,9 +279,8 @@ public final class ResponseHandler {
       // RFC 1341:Preamble shall be ignored -> read till 1st boundary
       while(next != null && !eq(sep, next))
         next = readLine(io);
-      // TODO: think what shall happen in such a case
       if(next == null) {
-        // return;
+        ELMINV.thrw(ii);
       }
       final byte[] end = concat(sep, token("--"));
       FElem nextPart = extractNextPart(io, statusOnly, payloads, sep, end,
@@ -411,7 +410,7 @@ public final class ResponseHandler {
     while(true) {
       final byte[] next = readLine(io);
       if(next == null) {
-        // TODO: throw ex
+        // TODO: Is a part allowed to not have any content?
         return bl.toArray();
       }
       if(eq(next, sep)) return bl.toArray();
