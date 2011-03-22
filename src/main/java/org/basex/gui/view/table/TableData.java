@@ -1,6 +1,7 @@
 package org.basex.gui.view.table;
 
 import static org.basex.util.Token.*;
+
 import org.basex.core.Context;
 import org.basex.core.cmd.Find;
 import org.basex.data.Data;
@@ -14,7 +15,6 @@ import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenList;
 import org.deepfs.fs.DeepFS;
-import org.deepfs.fsml.MetaElem;
 
 /**
  * This is a container for the table data.
@@ -126,13 +126,6 @@ final class TableData {
       addCol(DeepFS.NAME, false);
       addCol(DeepFS.SIZE, false);
       addCol(DeepFS.MTIME, false);
-      addCol(MetaElem.TITLE.tok(), true);
-      addCol(MetaElem.SENDER_NAME.tok(), true);
-      addCol(MetaElem.RECEIVER_NAME.tok(), true);
-      addCol(MetaElem.ARTIST.tok(), true);
-      addCol(MetaElem.PIXEL_WIDTH.tok(), true);
-      addCol(MetaElem.PIXEL_HEIGHT.tok(), true);
-      addCol(MetaElem.ALBUM.tok(), true);
     } else {
       if(r == -1 && roots.size() == 0) return;
       if(root == -1) root = data.tags.id(roots.get(0));

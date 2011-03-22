@@ -19,9 +19,6 @@ import org.basex.gui.view.ViewData;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
-import org.deepfs.fsml.FileType;
-import org.deepfs.fsml.MetaElem;
-import org.deepfs.fsml.MimeType;
 
 /**
  * Paint filesystem specific TreeMap rectangles.
@@ -226,20 +223,23 @@ final class MapFS extends MapPainter {
         String type = "";
         String format = "";
         final int nodeSize = data.size(pre, Data.ELEM) + pre;
-        final byte[] typeElem = MetaElem.TYPE.tok();
-        final byte[] formatElem = MetaElem.FORMAT.tok();
+// [AH] Non-destructive removal?
+//        final byte[] typeElem = MetaElem.TYPE.tok();
+//        final byte[] formatElem = MetaElem.FORMAT.tok();
         for(int node = pre; node < nodeSize; ++node) {
           final int k = data.kind(node);
           if(k != Data.ELEM) continue;
-          final byte[] nodeName = data.name(node, k);
-          if(eq(nodeName, typeElem))
-            type = string(ViewData.content(data, node + 1, false));
-          else if(eq(nodeName, formatElem))
-            format = string(ViewData.content(data, node + 1, false));
+// [AH] Non-destructive removal?
+//          final byte[] nodeName = data.name(node, k);
+//          if(eq(nodeName, typeElem))
+//            type = string(ViewData.content(data, node + 1, false));
+//          else if(eq(nodeName, formatElem))
+//            format = string(ViewData.content(data, node + 1, false));
           if(!type.isEmpty() && !format.isEmpty()) break;
         }
-        if(type.isEmpty()) type = FileType.UNKNOWN_TYPE.toString();
-        if(format.isEmpty()) format = MimeType.UNKNOWN.toString();
+// [AH] Non-destructive removal?
+//        if(type.isEmpty()) type = FileType.UNKNOWN_TYPE.toString();
+//        if(format.isEmpty()) format = MimeType.UNKNOWN.toString();
 
         final String info = type + " (" + format + ")" + ", "
             + Performance.format(size, true);

@@ -18,7 +18,6 @@ import org.basex.util.Atts;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
-import org.deepfs.fsml.DeepNS;
 
 /**
  * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.
@@ -30,19 +29,19 @@ public final class DeepFS implements DataText {
   // DEEPFS STRINGS ===========================================================
 
   /** Name of the root node for a fsml document. */
-  public static final String S_FSML = DeepNS.DEEPURL.tag("fsml");
+  public static final String S_FSML = "fsml";
   /** Name of the root node for a file system. */
-  public static final String S_DEEPFS = DeepNS.DEEPURL.tag("deepfs");
+  public static final String S_DEEPFS = "deepfs";
   /** File tag in fs namespace. */
-  public static final String S_FILE = DeepNS.DEEPURL.tag("file");
+  public static final String S_FILE = "file";
   /** Directory tag in fs namespace. */
-  public static final String S_DIR = DeepNS.DEEPURL.tag("dir");
+  public static final String S_DIR = "dir";
   /** XML content tag in fs namespace. */
-  public static final String S_XML_CONTENT = DeepNS.DEEPURL.tag("xml");
+  public static final String S_XML_CONTENT = "xml";
   /** Text content tag in fs namespace. */
-  public static final String S_TEXT_CONTENT = DeepNS.DEEPURL.tag("text");
+  public static final String S_TEXT_CONTENT = "text";
   /** Content tag in fs namespace. */
-  public static final String S_CONTENT = DeepNS.DEEPURL.tag("content");
+  public static final String S_CONTENT = "content";
 
   /** file/dir name. */
   public static final String S_NAME = "name";
