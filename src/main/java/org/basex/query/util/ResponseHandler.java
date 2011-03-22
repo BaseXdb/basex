@@ -410,7 +410,7 @@ public final class ResponseHandler {
     while(true) {
       final byte[] next = readLine(io);
       if(next == null) {
-        // TODO: Is a part allowed to not have any content?
+        // TODO: what shall happen if a part has no content?
         return bl.toArray();
       }
       if(eq(next, sep)) return bl.toArray();
