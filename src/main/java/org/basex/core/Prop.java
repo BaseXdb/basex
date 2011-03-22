@@ -187,12 +187,6 @@ public final class Prop extends AProp {
   /** Fuse support. */
   public static final Object[] FUSE = { "FUSE", false };
 
-  /**
-   * Spotlight integration. If true, on mac platforms spotlight index is used
-   * instead of the internal parser implementations.
-   */
-  public static final Object[] SPOTLIGHT = { "SPOTLIGHT", false };
-
   // STATIC PROPERTIES ========================================================
 
   /** Root properties. */

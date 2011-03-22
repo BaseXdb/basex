@@ -1,9 +1,11 @@
 package org.deepfs.util;
 
 import static org.deepfs.fs.DeepFS.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
@@ -14,9 +16,7 @@ import org.basex.util.Util;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
-import org.deepfs.fsml.ParserException;
 import org.deepfs.fsml.ParserRegistry;
-import org.deepfs.fsml.plugin.SpotlightExtractor;
 import org.deepfs.fsml.ser.FSMLSerializer;
 
 /**
@@ -40,8 +40,6 @@ public final class FSImporter implements FSTraversal {
 
   /** The name of the current file. */
   private String currentFile;
-  /** The spotlight extractor. */
-  private final SpotlightExtractor spotlight;
 
   /**
    * Constructor.
@@ -53,19 +51,6 @@ public final class FSImporter implements FSTraversal {
     prop.set(Prop.INTPARSE, true);
     prop.set(Prop.ENTITY, false);
     prop.set(Prop.DTD, false);
-
-    if(prop.is(Prop.FSMETA) && prop.is(Prop.SPOTLIGHT) && Prop.MAC) {
-      SpotlightExtractor spot;
-      try {
-        spot = new SpotlightExtractor();
-      } catch(final ParserException ex) {
-        Util.debug("Failed to load spotex library (%).", ex);
-        spot = null;
-      }
-      spotlight = spot;
-      return;
-    }
-    spotlight = null;
   }
 
   /**
@@ -117,10 +102,6 @@ public final class FSImporter implements FSTraversal {
         final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
         try {
           final DeepFile deepFile = new DeepFile(parserRegistry, bfc, ctx);
-          if(spotlight != null) {
-            spotlight.extract(deepFile);
-            deepFile.finishMetaExtraction();
-          }
           deepFile.extract();
           xmlFragment = FSMLSerializer.serialize(deepFile);
         } catch(final Exception ex) {

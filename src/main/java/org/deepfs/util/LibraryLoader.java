@@ -10,8 +10,6 @@ import org.basex.util.Util;
  * @author Alexander Holupirek
  */
 public final class LibraryLoader {
-  /** Name of spotlight extractor library. */
-  public static final String SPOTEXLIBNAME = "deepfs_spotex";
   /** Name of FUSE java bindings library. */
   public static final String JFUSELIBNAME = "jfuse";
   /** Name of DeepFUSE library. */
