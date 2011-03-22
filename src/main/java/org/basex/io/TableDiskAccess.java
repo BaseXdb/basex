@@ -310,8 +310,8 @@ public final class TableDiskAccess extends TableAccess {
     while(n < all.length) {
       getFreeBlock();
       n += write(all, n);
-      fpres[index + 1] = fpres[index] + ENTRIES;
-      pages[++index] = (int) bf.pos;
+      fpres[index] = fpres[index - 1] + ENTRIES;
+      pages[index] = (int) bf.pos;
     }
 
     // increment first pre-values of blocks after the last modified block:
@@ -319,7 +319,8 @@ public final class TableDiskAccess extends TableAccess {
 
     // update cached variables:
     fpre = fpres[index];
-    npre = index + 1 >= blocks ? meta.size : fpres[index + 1];
+    npre = index + 1 < blocks && fpres[index + 1] < meta.size ? fpres[index + 1]
+        : meta.size;
   }
 
   @Override
@@ -374,7 +375,7 @@ public final class TableDiskAccess extends TableAccess {
   private void readBlock(final int i, final int f, final int n) {
     index = i;
     fpre = f;
-    npre = n;
+    npre = n > meta.size ? meta.size : n;
 
     final int b = pages[i];
     final boolean ch = bm.cursor(b);
@@ -418,7 +419,8 @@ public final class TableDiskAccess extends TableAccess {
     // update index entries for all following blocks and reduce counter
     for(int i = index + 1; i < blocks; ++i) fpres[i] -= nr;
     meta.size -= nr;
-    npre = index + 1 >= blocks ? meta.size : fpres[index + 1];
+    npre = index + 1 < blocks && fpres[index + 1] < meta.size ? fpres[index + 1]
+        : meta.size;
   }
 
   /**
@@ -472,6 +474,7 @@ public final class TableDiskAccess extends TableAccess {
     bf.dirty = true;
     pagemap.set(bf.pos);
     ++blocks;
+    ++index;
   }
 
   // TEST METHODS =============================================================
