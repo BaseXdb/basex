@@ -231,14 +231,14 @@ public final class ClientSession extends Session {
    * Executes a trigger.
    * @param query query string
    * @param name trigger name
-   * @param notification trigger notification
-   * @param flag kind of trigger
+   * @param msg trigger notification
+   * @param mode kind of trigger
    * @throws BaseXException exception
    */
   public void trigger(final String query, final String name,
-      final String notification, final String flag) throws BaseXException {
-    execute("xquery db:trigger(" + query + ", " + name + ", " + notification
-        + ", " + flag + ")");
+      final String msg, final String mode) throws BaseXException {
+    execute("xquery db:trigger(" + query + ", " + name + ", " + msg
+        + ", " + mode + ")");
   }
 
   /**
