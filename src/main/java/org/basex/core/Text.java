@@ -1,8 +1,15 @@
 package org.basex.core;
 
-import static org.basex.core.Commands.*;
 import static org.basex.core.Lang.*;
 import static org.basex.util.Token.*;
+
+import org.basex.core.Commands.CmdCreate;
+import org.basex.core.Commands.CmdDrop;
+import org.basex.core.Commands.CmdIndex;
+import org.basex.core.Commands.CmdInfo;
+import org.basex.core.Commands.CmdPerm;
+import org.basex.core.Commands.CmdSet;
+import org.basex.core.Commands.CmdShow;
 
 /**
  * This class contains internationalized text strings, which are used
@@ -187,7 +194,7 @@ public interface Text {
 
   /** Command help. */
   String[] HELPCREATE = {
-    "[" + CmdCreate.DATABASE + "|" + CmdCreate.FS + "|" +
+    "[" + CmdCreate.DATABASE + "|" +
     CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
@@ -196,10 +203,6 @@ public interface Text {
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]:" + NL +
       "  " + lang("ch_create5") + NL +
-    LI + CmdCreate.FS + " [" + C_NAME + "] [" + C_PATH +
-      "] ([mountpoint] [store]):" + NL +
-      "  " + lang("ch_create6", C_NAME, C_PATH) + NL +
-      "  " + lang("ch_create7", "mountpoint", "store") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
       "  " + lang("ch_create8")
   };
@@ -812,18 +815,6 @@ public interface Text {
   /** Command info. */
   String GUIGOUPTT = lang("c_gouptt");
   /** Command info. */
-  String GUICREATEFS = lang("c_createfs");
-  /** Command info. */
-  String GUICREATEFSTT = lang("c_createfstt");
-  /** Command info. */
-  String GUIDQE = lang("c_dqe");
-  /** Command info. */
-  String GUIDQETT = lang("c_dqett") + DOT;
-  /** Command info. */
-  String GUIMOUNTFS = lang("c_mountfs");
-  /** Command info. */
-  String GUIMOUNTFSTT = lang("c_mountfstt") + DOT;
-  /** Command info. */
   String GUIPROPS = lang("c_props");
   /** Command info. */
   String GUIPROPSTT = lang("c_propstt");
@@ -978,8 +969,6 @@ public interface Text {
   String BUTTONRESTORE = lang("b_restore");
   /** Button text for opening files. */
   String BUTTONOPEN = lang("b_open");
-  /** Button text for mounting database. */
-  String BUTTONMOUNT = lang("b_mount");
   /** Button text for canceling actions. */
   String BUTTONCANCEL = lang("b_cancel");
   /** Button text for deleting files. */
@@ -1213,43 +1202,6 @@ public interface Text {
   String SERVERINFO1 = lang("ds_info1");
   /** Server information. */
   String SERVERINFO2 = lang("ds_info2");
-
-  /** Progress text for filesystem import. */
-  String CREATEFSPROG = "Traversing filesystem...";
-  /** Dialog title for import options. */
-  String CREATEFSTITLE = lang("dfs_newtitle");
-  /** Import options. */
-  String IMPORTALL = lang("dfs_all");
-  /** Import options. */
-  String IMPORTALLINFO = lang("dfs_allinfo") + DOT;
-  /** Import options. */
-  String IMPORTFSTEXT = lang("dfs_text") + COL;
-  /** Import options. */
-  String IMPORTFSTEXT1 = lang("dfs_text1") + COL;
-  /** Import options. */
-  String IMPORTFSTEXT2 = lang("dfs_text2") + COL;
-  /** Import options. */
-  String IMPORTCONT = lang("dfs_cont");
-  /** Import options. */
-  String IMPORTXML = lang("dfs_xml");
-  /** Import options. */
-  String IMPORTMETA = lang("dfs_meta") + " (MP3, JPG, TIF, PNG, GIF, ...)";
-  /** Import options. */
-  String[] IMPORTFSMAX = {
-      "Max. 1KB", "Max. 10KB", "Max. 100KB", "Max. 1MB", "Max. 10MB"
-  };
-  /** Import options. */
-  int[] IMPORTFSMAXSIZE = { 1024, 10240, 102400, 1048576, 10485760 };
-
-  /** Dialog title for opening a database as desktop query engine. */
-  String OPENDQETITLE = lang("dqe_title") + DOTS;
-  /** Dialog title for mounting a DeepFS database. */
-  String OPENMOUNTTITLE = lang("dmnt_title") + DOTS;
-  /** No valid path to mount point. */
-  String NOVALIDMOUNT = lang("dmnt_nomountpath") + DOT;
-
-  /** No default application registered to open file type.*/
-  String NODEFAULTAPP = lang("dfs_nodefaultapp") + DOT;
 
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");

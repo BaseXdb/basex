@@ -184,9 +184,6 @@ public final class Prop extends AProp {
   /** Verbose debug informations for FSTraversal. */
   public static final Object[] FSVERBOSE = { "FSVERBOSE", false };
 
-  /** Fuse support. */
-  public static final Object[] FUSE = { "FUSE", false };
-
   // STATIC PROPERTIES ========================================================
 
   /** Root properties. */

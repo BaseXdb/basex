@@ -115,7 +115,7 @@ final class MapFSImages extends Thread {
         }
 
         // load image and wait until it's done
-        final File f = new File(Token.string(data.fs.path(id, false)));
+        final File f = new File(Token.string(data.fs.path(id)));
         BufferedImage image = null;
         try {
           image = ImageIO.read(f);

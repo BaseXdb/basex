@@ -48,7 +48,7 @@ public final class ViewData {
    */
   public static byte[] path(final Data data, final int pre) {
     if(data == null) return Token.EMPTY;
-    if(data.fs != null) return data.fs.path(pre, false);
+    if(data.fs != null) return data.fs.path(pre);
 
     int p = pre;
     int k = data.kind(p);

@@ -2,6 +2,7 @@ package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
+
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -10,7 +11,6 @@ import org.basex.core.Commands.CmdSet;
 import org.basex.core.cmd.AlterUser;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateFS;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.DropDB;
@@ -98,7 +98,6 @@ public final class PermissionTest {
     no(new XQuery("for $item in doc('" + NAME + "')//xml return rename" +
       " node $item as 'null'"), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
-    no(new CreateFS(NAME, "c:/whatever"), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -128,7 +127,6 @@ public final class PermissionTest {
       " node $item as 'null'"), testSession);
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
-    no(new CreateFS(NAME, "c:/whatever"), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -159,7 +157,6 @@ public final class PermissionTest {
       ok(new DropIndex(cmd), testSession);
     }
     no(new CreateDB(NAME, "<xml/>"), testSession);
-    no(new CreateFS(NAME, "c:/whatever"), testSession);
     no(new DropDB(NAME), testSession);
     no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);

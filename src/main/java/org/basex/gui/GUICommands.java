@@ -754,57 +754,6 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /* DEEPFS MENU */
-
-  /* Opens a dialog to import given directory as DeepFS instance.
-  CREATEFS(GUICREATEFS + DOTS, null, GUICREATEFSTT, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      if(!new DialogCreateFS(gui).ok()) return;
-      final GUIProp gprop = gui.gprop;
-      final String p = gprop.is(GUIProp.FSALL) ? "/" :
-        gprop.get(GUIProp.FSPATH).replace('\\', '/');
-      final String n = gprop.get(GUIProp.FSNAME);
-      DialogProgress.execute(gui, CREATEFSTITLE, new CreateFS(n, p));
-    }
-  },
-
-  /** Opens a dialog to use DeepFS instance as Desktop Query Engine.
-  DQE(GUIDQE + DOTS, null, GUIDQETT, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogOpen dialog = new DialogOpen(gui, false, true);
-      if(dialog.ok()) {
-        new Close().run(gui.context);
-        gui.notify.init();
-        gui.execute(new Open(dialog.db()));
-      } else if(dialog.nodb()) {
-        if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
-      }
-    }
-  },
-
-  /** Opens a dialog to mount DeepFS instance as Filesystem in USErspace.
-  MOUNTFS(GUIMOUNTFS + DOTS, null, GUIMOUNTFSTT, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogMountFS dialog = new DialogMountFS(gui);
-      if(dialog.ok()) {
-        new Close().run(gui.context);
-        gui.notify.init();
-        gui.execute(new Mount(dialog.db(), dialog.mp()));
-      } else if(dialog.nodb()) {
-        if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
-      }
-    }
-
-    @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      // disable mount button, if native library is not available
-      b.setEnabled(LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
-    }
-  }, */
-
   /* HELP MENU */
 
   /** Shows the help window. */

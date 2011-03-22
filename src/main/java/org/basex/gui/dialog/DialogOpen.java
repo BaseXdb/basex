@@ -67,7 +67,7 @@ public final class DialogOpen extends Dialog {
    * @param fs file system flag
    */
   public DialogOpen(final GUI main, final boolean m, final boolean fs) {
-    super(main, m ? MANAGETITLE : fs ? OPENDQETITLE : OPENTITLE);
+    super(main, m ? MANAGETITLE : OPENTITLE);
     manage = m;
     // create database chooser
     final StringList db = fs ? List.listFS(main.context) :

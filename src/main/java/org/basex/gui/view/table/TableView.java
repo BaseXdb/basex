@@ -3,19 +3,21 @@ package org.basex.gui.view.table;
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.IOException;
+
 import javax.swing.SwingUtilities;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
@@ -299,7 +301,7 @@ public final class TableView extends View implements Runnable {
       try {
         data.fs.launch(ViewData.parent(data, gui.context.focused));
       } catch (final IOException ex) {
-        Dialog.warn(gui, NODEFAULTAPP);
+//        Dialog.warn(gui, NODEFAULTAPP);
       }
     }
   }

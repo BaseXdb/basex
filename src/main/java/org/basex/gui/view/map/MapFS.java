@@ -3,16 +3,17 @@ package org.basex.gui.view.map;
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.IOException;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
-import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
 import org.basex.util.Performance;
@@ -314,7 +315,7 @@ final class MapFS extends MapPainter {
       try {
         fs.launch(view.gui.context.focused);
       } catch (final IOException ex) {
-        Dialog.warn(view.gui, NODEFAULTAPP);
+//        Dialog.warn(view.gui, NODEFAULTAPP);
       }
     }
     return active;

@@ -10,10 +10,7 @@ import org.basex.util.Util;
  * @author Alexander Holupirek
  */
 public final class LibraryLoader {
-  /** Name of FUSE java bindings library. */
-  public static final String JFUSELIBNAME = "jfuse";
-  /** Name of DeepFUSE library. */
-  public static final String DEEPFUSELIBNAME = "deepfuse";
+
   /** Name of joint storage library.
   public static final String JSDBFSLIBNAME = "deepfs_jsdbfs"; */
 

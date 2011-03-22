@@ -122,7 +122,6 @@ public abstract class Data {
    * @throws IOException I/O exception
    */
   public final synchronized void close() throws IOException {
-    if(fs != null) fs.close();
     cls();
   }
 

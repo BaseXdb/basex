@@ -2,15 +2,12 @@ package org.deepfs.fs;
 
 import static org.basex.util.Token.*;
 import static org.deepfs.fs.DeepStat.*;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import org.basex.core.BaseXException;
+
 import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.Text;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Open;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.MemData;
@@ -19,10 +16,8 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Atts;
 import org.basex.util.IntList;
-import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
-import org.deepfs.DeepShell;
 import org.deepfs.fsml.DeepNS;
 
 /**
@@ -163,36 +158,6 @@ public final class DeepFS implements DataText {
   public DeepFS(final Context c) {
     this(c.data);
     ctx = c;
-  }
-
-  /**
-   * Constructor for {@link DeepShell} and java only test cases (no mount).
-   * @param name name of (initially empty) database
-   * @param mp of DeepFS database
-   */
-  public DeepFS(final String name, final String mp) {
-    this(initData(name, mp));
-  }
-
-  /**
-   * Initializes the data.
-   * @param name name of (initially empty) database
-   * @param mp of DeepFS database
-   * @return context
-   */
-  private static Context initData(final String name, final String mp) {
-    final Context ctx = new Context();
-    try {
-      new Open(name).execute(ctx);
-    } catch(final BaseXException ex) {
-      try {
-        new CreateDB(name, "<" + S_DEEPFS + " " + "mountpoint=\""
-            + mp + "\"/>").execute(ctx);
-      } catch(final BaseXException exx) {
-        Util.notexpected(exx);
-      }
-    }
-    return ctx;
   }
 
   /**
@@ -417,15 +382,6 @@ public final class DeepFS implements DataText {
    */
   private byte[] mountpoint(final int pre) {
     return attr(pre, data.fs.mountpointID);
-  }
-
-  /**
-   * Returns backing store attribute value.
-   * @param pre pre value
-   * @return path mountpoint
-   */
-  private byte[] backingstore(final int pre) {
-    return attr(pre, data.fs.backingstoreID);
   }
 
   /**
@@ -665,41 +621,11 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Closes the fuse instance.
-   * @throws IOException I/O exception
-   */
-  public synchronized void close() throws IOException {
-    if(data.meta.prop.is(Prop.FUSE)) {
-      final String method = "[" + Text.NAME + ".close] ";
-      Util.debug(method + "Initiating DeepFS shutdown sequence ");
-      // -- unmount running fuse
-      for(int i = 3; i > 0; i--) {
-        Performance.sleep(1000);
-        Util.error(i + " .. ");
-      }
-      Util.debug("GO.");
-      final String cmd = "umount -f " + data.meta.mount;
-      Util.errln(method + "Trying to unmount deepfs: " + cmd);
-      final Runtime r = Runtime.getRuntime();
-      final java.lang.Process p = r.exec(cmd);
-      try {
-        p.waitFor();
-      } catch(final InterruptedException ex) {
-        Util.stack(ex);
-      }
-      final int rc = p.exitValue();
-      Util.debug(method + "Unmount " + data.meta.mount + (rc == 0 ?
-          " ... OK." : " ... FAILED(" + rc + ") (Please unmount manually)"));
-    }
-  }
-
-  /**
    * Returns the absolute file path.
    * @param pre pre value
-   * @param backing whether to return backing path or mountpath
    * @return file path
    */
-  public byte[] path(final int pre, final boolean backing) {
+  public byte[] path(final int pre) {
     int p = pre;
     int k = data.kind(p);
 
@@ -720,8 +646,7 @@ public final class DeepFS implements DataText {
     final TokenBuilder tb = new TokenBuilder();
     final int s = il.size();
     if(s > 1) {
-      final byte[] b = data.meta.prop.is(Prop.FUSE) && !backing ?
-          mountpoint(il.get(s - 2)) : backingstore(il.get(s - 2));
+      final byte[] b = mountpoint(il.get(s - 2));
       if(b.length != 0) {
         tb.add(b);
         if(!endsWith(b, '/')) tb.add('/');
@@ -761,7 +686,7 @@ public final class DeepFS implements DataText {
    */
   public void launch(final int pre) throws IOException {
     if(pre == -1 || !isFile(pre)) return;
-    Desktop.getDesktop().open(new File(string(path(pre, false))));
+    Desktop.getDesktop().open(new File(string(path(pre))));
   }
 
   /**

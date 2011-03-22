@@ -146,8 +146,6 @@ public final class GUIProp extends AProp {
   public static final Object[] FSPATH = { "FSPATH", Prop.HOME };
   /** Name of the DeepFS database.
   public static final Object[] FSNAME = { "FSNAME", "DeepFS" };
-  /** Name of the mountpoint.
-  public static final Object[] FSMOUNT = { "FSMOUNT", "/mnt/deepfs" };
   /** Flag indicating the mapping of the complete disk.
   public static final Object[] FSALL = { "FSALL", false };*/
 
