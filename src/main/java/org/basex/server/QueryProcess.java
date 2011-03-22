@@ -111,8 +111,7 @@ final class QueryProcess extends Progress {
    */
   void execute() throws IOException, QueryException {
     if(xml == null) init();
-    Item it;
-    while((it = iter.next()) != null) next(it);
+    for(Item it; (it = iter.next()) != null;) next(it);
     close(false);
   }
 

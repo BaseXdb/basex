@@ -9,15 +9,24 @@ package org.basex.query.up.primitives;
 public enum PrimitiveType {
   // Order is essential - don't change..
 
-  /** Type Insert attribute. */ INSERTATTR,
-  /** Type Replace value. */ REPLACEVALUE,
-  /** Type Rename. */ RENAME,
-  /** Type Insert after. */ INSERTAFTER,
-  /** Type Insert into as first. */ INSERTINTOFI,
-  /** Type Insert into AND insert into as last. */ INSERTINTO,
-  /** Type Replace element content. */ REPLACEELEMCONT,
-  /** Type Puts. */ PUT, // put here to reflect updates of descendant-or-self
-  /** Type Insert before. */ INSERTBEFORE,
-  /** Type Replace node. */ REPLACENODE,
-  /** Type Delete. */ DELETE
+  /* [LK] XQuery/Update: why does it differ from the specification?
+   * - INSERTATTR, REPLACEVALUE, RENAMENODE
+   * - INSERTBEFORE, INSERTAFTER, INSERTINTOFIRST, INSERTINTO
+   * - REPLACENODE
+   * - REPLACEELEMCONT
+   * - DELETE
+   * - PUT
+   */
+
+  /** Insert attribute.        */ INSERTATTR,
+  /** Replace value.           */ REPLACEVALUE,
+  /** Rename.                  */ RENAMENODE,
+  /** Insert after.            */ INSERTAFTER,
+  /** Insert into as first.    */ INSERTINTOFIRST,
+  /** Insert into (as last).   */ INSERTINTO,
+  /** Replace element content. */ REPLACEELEMCONT,
+  /** Put.                     */ PUT,
+  /** Insert before.           */ INSERTBEFORE,
+  /** Replace node.            */ REPLACENODE,
+  /** Delete.                  */ DELETENODE
 }

@@ -99,8 +99,7 @@ public final class Constr {
         atts.add(node.copy());
       } else if(it.type == NodeType.DOC) {
         final AxisIter ai = node.children();
-        ANode ch;
-        while((ch = ai.next()) != null) add(ctx, ch, ii);
+        for(ANode ch; (ch = ai.next()) != null;) add(ctx, ch, ii);
       } else {
         // add text node
         if(text.size() != 0) {
@@ -113,7 +112,7 @@ public final class Constr {
         // add namespaces from ancestors
         final Atts ats = node.ns();
         if(ats != null && ats.size != 0) {
-          // [LK][LW] why only if there are already namespaces?
+          // [LK][LW] Namespaces: why only if there are already namespaces?
           node = node.parent();
           while(node != null && node.type == NodeType.ELM) {
             final Atts ns = node.ns();

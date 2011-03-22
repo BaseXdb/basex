@@ -86,8 +86,7 @@ final class FNAggr extends Fun {
     final boolean n = res.num();
 
     int c = 1;
-    Item i;
-    while((i = iter.next()) != null) {
+    for(Item i; (i = iter.next()) != null;) {
       final boolean un = i.unt() || i.num();
       if(n && !un) FUNNUM.thrw(input, this, i.type);
       if(!n && un) FUNDUR.thrw(input, this, i.type);
@@ -118,8 +117,7 @@ final class FNAggr extends Fun {
 
     // strings or dates
     if(!res.unt() && res.str() || res.date()) {
-      Item it;
-      while((it = iter.next()) != null) {
+      for(Item it; (it = iter.next()) != null;) {
         if(it.type != res.type) {
           FUNCMP.thrw(input, desc(), res.type, it.type);
         }
@@ -132,8 +130,7 @@ final class FNAggr extends Fun {
     Type t = res.unt() ? DBL : res.type;
     if(res.type != t) res = t.e(res, ctx, input);
 
-    Item it;
-    while((it = iter.next()) != null) {
+    for(Item it; (it = iter.next()) != null;) {
       t = type(res, it);
       if(!it.dur() && Double.isNaN(it.dbl(input)) || cmp.e(input, res, it))
         res = it;

@@ -16,10 +16,9 @@ import org.basex.core.User;
  * Evaluates the 'copy' command and creates a copy of a database.
  *
  * @author BaseX Team 2005-11, BSD License
- * @author Christian Gruen
+ * @author Andreas Weiler
  */
 public class Copy extends Command {
-
   /**
    * Default constructor.
    * @param db db name
@@ -55,26 +54,29 @@ public class Copy extends Command {
    */
   private boolean copy(final String db, final String newdb, final Prop pr) {
     final File src = pr.dbpath(db);
-    final File trg = new File(src.getParent() + '/' + newdb);
-    trg.mkdir();
-    String[] files = src.list();
-    for (String file : files) {
+    final File trg = pr.dbpath(newdb);
+
+    // return false if source cannot be opened, or target cannot be created
+    final String[] files = src.list();
+    if(files == null || !trg.mkdir()) return false;
+
+    boolean ok = true;
+    for(final String file : files) {
       FileChannel sc = null;
       FileChannel dc = null;
       try {
-        sc = new FileInputStream(new File(src.getAbsolutePath() + '/'
-            + file)).getChannel();
-        dc = new FileOutputStream(new File(trg.getAbsolutePath() + '/'
-            + file)).getChannel();
+        sc = new FileInputStream(new File(src, file)).getChannel();
+        dc = new FileOutputStream(new File(trg, file)).getChannel();
         dc.transferFrom(sc, 0, sc.size());
       } catch(final IOException ex) {
-        trg.delete();
-        return false;
+        ok = false;
       } finally {
         if(sc != null) try { sc.close(); } catch(final IOException ex) { }
         if(dc != null) try { dc.close(); } catch(final IOException ex) { }
       }
-   }
-    return true;
+    }
+    // drop new database if error occurred
+    if(!ok) DropDB.drop(newdb, pr);
+    return ok;
   }
 }

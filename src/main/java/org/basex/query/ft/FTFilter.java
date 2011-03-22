@@ -49,8 +49,8 @@ public abstract class FTFilter extends FTExpr {
       public FTNode next() throws QueryException {
         FTNode it;
         while((it = ir.next()) != null) {
-          if(filter(ctx, it,
-              content() ? new FTLexer().init(it.atom(input)) : null)) break;
+          if(filter(ctx, it, content() ?
+              new FTLexer().init(it.atom(input)) : null)) break;
         }
         return it;
       }

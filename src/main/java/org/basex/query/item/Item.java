@@ -216,7 +216,7 @@ public abstract class Item extends Value {
   public void serialize(final Serializer ser) throws IOException {
     try {
       ser.item(atom(null));
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       throw new IOException(e.getMessage(), e);
     }
   }
@@ -250,7 +250,7 @@ public abstract class Item extends Value {
   public void plan(final Serializer ser) throws IOException {
     try {
       ser.emptyElement(ITM, VAL, atom(null), TYP, Token.token(name()));
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly
       throw Util.notexpected(e);

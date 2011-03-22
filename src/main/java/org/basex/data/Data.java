@@ -491,6 +491,7 @@ public abstract class Data {
    */
   public final void rename(final int pre, final int k, final byte[] nm,
       final byte[] uri) {
+
     meta.update();
     if(k == PI) {
       text(pre, trim(concat(nm, SPACE, atom(pre))), true);

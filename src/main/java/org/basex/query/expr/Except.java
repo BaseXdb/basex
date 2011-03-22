@@ -46,20 +46,19 @@ public final class Except extends Set {
 
   @Override
   protected NodeCache eval(final Iter[] iter) throws QueryException {
-    final NodeCache ni = new NodeCache().random();
+    final NodeCache nc = new NodeCache().random();
 
-    Item it;
-    while((it = iter[0].next()) != null) ni.add(checkNode(it));
-    final boolean db = ni.dbnodes();
+    for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
+    final boolean db = nc.dbnodes();
 
-    for(int e = 1; e != expr.length && ni.size() != 0; ++e) {
+    for(int e = 1; e != expr.length && nc.size() != 0; ++e) {
       final Iter ir = iter[e];
-      while((it = ir.next()) != null) {
-        final int i = ni.indexOf(checkNode(it), db);
-        if(i != -1) ni.delete(i);
+      for(Item it; (it = ir.next()) != null;) {
+        final int i = nc.indexOf(checkNode(it), db);
+        if(i != -1) nc.delete(i);
       }
     }
-    return ni;
+    return nc;
   }
 
   @Override

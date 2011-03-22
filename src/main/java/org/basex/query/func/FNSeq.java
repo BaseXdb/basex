@@ -6,7 +6,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
-import static org.basex.query.item.ANode.kind;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
@@ -96,19 +95,18 @@ final class FNSeq extends Fun {
         final NodeCache src = new NodeCache(nodes, len);
         for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
           final DBNode nd = (DBNode) nodes[next];
-          dummy.pre = nd.pre + data.size(nd.pre, kind(nd.ndType()));
+          dummy.pre = nd.pre + data.size(nd.pre, data.kind(nd.pre));
           p = src.binarySearch(dummy, next + 1, len - next - 1);
           nc.add(nd);
         }
       } else {
-        // [LW] improve with NodeCache.binarySearch()
         // skip ancestors of the last added node
         nc.item[0] = fst;
         nc.size(1);
         int before = fst.pre;
         for(int i = len - 1; i-- != 0;) {
           final DBNode nd = (DBNode) nodes[i];
-          if(nd.pre + data.size(nd.pre, kind(nd.ndType())) <= before) {
+          if(nd.pre + data.size(nd.pre, data.kind(nd.pre)) <= before) {
             nc.add(nd);
             before = nd.pre;
           }

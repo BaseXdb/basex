@@ -48,12 +48,11 @@ public final class Union extends Set {
 
   @Override
   protected NodeCache eval(final Iter[] iter) throws QueryException {
-    final NodeCache ni = new NodeCache().random();
+    final NodeCache nc = new NodeCache().random();
     for(final Iter ir : iter) {
-      Item it;
-      while((it = ir.next()) != null) ni.add(checkNode(it));
+      for(Item it; (it = ir.next()) != null;) nc.add(checkNode(it));
     }
-    return ni;
+    return nc;
   }
 
   @Override

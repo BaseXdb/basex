@@ -96,12 +96,11 @@ public final class DataBuilder {
 
   /**
    * Fills the data instance with the specified nodes.
-   * @param ni node iterator
+   * @param nc node iterator
    */
-  public void build(final NodeCache ni) {
+  public void build(final NodeCache nc) {
     int pre = 1;
-    ANode n;
-    while((n = ni.next()) != null) pre = addNode(n, pre, 0, null);
+    for(ANode n; (n = nc.next()) != null;) pre = addNode(n, pre, 0, null);
   }
 
   /**
@@ -139,8 +138,7 @@ public final class DataBuilder {
     data.insert(ms);
     int p = pre + 1;
     final AxisIter ai = nd.children();
-    ANode ch;
-    while((ch = ai.next()) != null) p = addNode(ch, p, pre, null);
+    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, null);
     return p;
   }
 
@@ -304,15 +302,14 @@ public final class DataBuilder {
 
     final int pp = pre;
     int p = pre + 1;
-    ANode ch;
 
     // add attributes
     AxisIter ai = nd.atts();
-    while((ch = ai.next()) != null) p = addNode(ch, p, pre, nd);
+    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
 
     // add children
     ai = nd.children();
-    while((ch = ai.next()) != null) p = addNode(ch, p, pre, nd);
+    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
     data.ns.close(ms);
 
     // update size if additional nodes have been added by the descendants
@@ -338,8 +335,7 @@ public final class DataBuilder {
     while(ai.next() != null) ++s;
     if(!a) {
       ai = n.children();
-      ANode i;
-      while((i = ai.next()) != null) s += size(i, a);
+      for(ANode i; (i = ai.next()) != null;) s += size(i, a);
     }
     return s;
   }

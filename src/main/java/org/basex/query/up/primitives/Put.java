@@ -20,7 +20,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class Put extends UpdatePrimitive {
+public final class Put extends Primitive {
   /** Put location. */
   private final Uri uri;
   /** Serializer properties. */
@@ -41,7 +41,7 @@ public final class Put extends UpdatePrimitive {
   }
 
   @Override
-  public void apply(final int add) throws QueryException {
+  public int apply(final int add) throws QueryException {
     PrintOutput out = null;
     try {
       out = new PrintOutput(Token.string(path()));
@@ -57,6 +57,7 @@ public final class Put extends UpdatePrimitive {
     } finally {
       if(out != null) try { out.close(); } catch(final Exception ex) { }
     }
+    return 0;
   }
 
   /**

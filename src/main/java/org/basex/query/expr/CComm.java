@@ -34,8 +34,7 @@ public final class CComm extends CFrag {
 
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
-    Item it;
-    while((it = iter.next()) != null) {
+    for(Item it; (it = iter.next()) != null;) {
       if(more) tb.add(' ');
       tb.add(it.atom(ii));
       more = true;
