@@ -584,7 +584,6 @@ h_recent=Recently opened files
 h_qclose=Closes the query and clears the textfield
 h_cmd=Here you can enter BaseX commands. Try 'help' to get a survey on all available commands.\n\nYou can retrieve previous inputs with the cursor keys UP and DOWN.
 h_searchxml=Just type something in the text field to search in your XML document. The following syntax is supported:\n...      Find tags and texts\n=...   Find exact text nodes\n@ ...  Find attributes and attribute values\n@=   Find exact attribute values\n/...     Evaluate input as XQuery
-h_searchfs=Just type something in the text field to search in your filesystem. The following syntax is supported:\n...      Find any files or directories\n= ...  Find exact names\n. ..     Find file extensions\n< ...  Find files smaller than the specified size\n> ...  Find files larger than the specified size\n\nYou can enter BaseX commands by preceding your input with an exclamation mark.
 h_xpath=The XQuery mode allows the input of simple XQuery requests.
 h_map=This visualization is called TreeMap. All nodes of the XML document are represented as rectangles, filling the complete area. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
 h_tree=This visualization is called TreeView. It shows the XML document as tree, drawing the nodes in their hierarchical order. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.

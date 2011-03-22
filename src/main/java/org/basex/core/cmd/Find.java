@@ -1,7 +1,8 @@
 package org.basex.core.cmd;
 
-import static org.basex.util.Token.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -13,7 +14,6 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
 import org.deepfs.fs.DeepFS;
-import org.deepfs.util.FSImporter;
 
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
@@ -205,18 +205,15 @@ public final class Find extends AQuery {
    * @param elem element flag
    * @param tag root tag
    * @param root root flag
-   * @param fs file system flag
    * @return query
    */
   public static String findTable(final StringList filter, final TokenList cols,
-      final BoolList elem, final byte[] tag, final boolean root,
-      final boolean fs) {
+      final BoolList elem, final byte[] tag, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();
     for(int i = 0; i < is; ++i) {
-      final String[] spl = fs ? new String[] {
-          FSImporter.escape(filter.get(i)) } : split(filter.get(i));
+      final String[] spl = split(filter.get(i));
       for(final String s : spl) {
         byte[] term = token(s);
         if(contains(term, '"')) term = replace(term, '\"', ' ');

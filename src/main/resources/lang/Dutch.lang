@@ -584,7 +584,6 @@ h_recent=Recent geopende bestanden
 h_qclose=Sluit de query en schoont het tekstveld op
 h_cmd=Hier kun je BaseX commando's invoeren. Probeer 'help' voor een overzicht van beschikbare commando's.\n\nJe kunt eerdere invoer terughalen met de UP en DOWN cursor keys.
 h_searchxml=Type iets in het tekstveld om in je XML document te zoeken. De volgende syntax wordt ondersteund:\n...      Vind tags en tekst\n=...   Vind exacte tekst nodes\n@ ...  Vind attributen en attribute waarden\n@=   Vind exacte attribute waarden\n/...     Evalueer input als XQuery
-h_searchfs=Type iets in het tekstveld om in je filesystem te zoeken. De volgende syntax wordt ondersteund:\n...      Vind bestanden of folders\n= ...  Vind exacte namen\n. ..     Vind bestandsextensies\n< ...  Vind bestanden kleiner dan de opgegeven grootte\n> ...  Vind bestanden groter dan de opgegeven grootte\n\nJe kunt BaseX commando's gebruiken door ze vooraf te laten gaan door een uitroepteken.
 h_xpath=In de XQuery mode kun je simpele XQuery requests opgeven.
 h_map=Deze visualisatie heet TreeMap. Alle nodes van het XML document worden als vierkanten getoond, het hele vlak wordt gevuld. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.
 h_tree=Deze visualizatie heet TreeView. Zij toont het XML document als boom en tekent de nodes in een hierarchie. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.

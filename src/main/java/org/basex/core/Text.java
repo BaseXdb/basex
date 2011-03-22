@@ -1362,8 +1362,6 @@ public interface Text {
   /** Help dialog. */
   byte[] HELPSEARCHXML = token(lang("h_searchxml"));
   /** Help dialog. */
-  byte[] HELPSEARCHFS = token(lang("h_searchfs"));
-  /** Help dialog. */
   byte[] HELPXPATH = token(lang("h_xpath"));
   /** Help string. */
   byte[] HELPMAP = token(lang("h_map"));

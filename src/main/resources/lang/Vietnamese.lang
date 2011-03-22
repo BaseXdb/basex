@@ -584,7 +584,6 @@ h_recent=Những tệp vừa được mở
 h_qclose=Closes the query and clears the textfield
 h_cmd=Bạn có thể nhập lệnh BaseX vào đây. Thử 'Giúp đỡ' để xem tất cả các câu lệnh.\n\nBạn có thể lấy lại các thông tin nhập với phím LÊN hoặc XUỐNG.
 h_searchxml=Gõ cái gì đó vào miền văn bản để tìm nó trong cơ sở dữ liệu. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tags và văn bản\n=...   Tìm thấy chính xác nút văn bản\n@ ...  Tìm thấy thuộc tính và giá trị thuộc tính\n@=   Tìm thấy chính xác giá trị thuộc tính\n/...     Đánh giá dữ liệu nhập theo XQuery
-h_searchfs=Gõ cái gì đó vào miền văn bản để tìm nó trong hệ thống tệp. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tệp hay thư mục\n= ...  Tìm thấy chính xác tên\n. ..     Tìm thấy đuôi tệp\n< ...  Tìm thấy tệp kích cỡ nhỏ hơn tệp trên\n> ...  Tìm thấy tệp kích cỡ lớn hơn tệp trên\n\nbạn có thể nhập câu lệnh BaseX bằng cách thêm vào trước dữ liệu nhập 1 dấu chấm than.
 h_xpath=Chế độ XQuery cho phép dữ liệu nhập là những câu hỏi XQuery đơn giản.
 h_map=Cách vẽ này được gọi là bản đồ cây (TreeMap). Tất cả nút của văn bản XML được vẽ thành một hình chữ nhật, lấp đầy diện tích. Những nút sẽ nổi lên khi được nhấp đơn (single clicks) và được lọc khi nhấp đôi (double clicks). Thực đơn xòe ra khi nhấp chuột phải lên phần tử.
 h_tree=This visualization is called TreeView. It shows the XML document as tree, drawing the nodes in their hierarchical order. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
