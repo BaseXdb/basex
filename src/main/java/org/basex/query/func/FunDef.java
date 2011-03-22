@@ -566,8 +566,8 @@ public enum FunDef {
   /** Database function: returns the pre values of database nodes. */
   NODEPRE(DBURI, FNDb.class, 1, 1, "node-pre(nodes)", NOD_ZM, ITR_ZM),
   /** Database function: triggers result to connected clients. */
-  TRIGGER(DBURI, FNDb.class, 3, 3, "trigger(query,name,msg)", STR, STR, STR,
-      ITEM_ZM),
+  TRIGGER(DBURI, FNDb.class, 4, 4, "trigger(query,name,msg,flag)", STR, STR,
+      STR, STR, ITEM_ZM),
 
   /* FNFt functions */
 

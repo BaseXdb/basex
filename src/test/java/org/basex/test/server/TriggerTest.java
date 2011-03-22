@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
-import org.basex.server.trigger.TriggerNotification;
+import org.basex.server.trigger.TriggerEvent;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -123,7 +123,7 @@ public final class TriggerTest {
     // attach at trigger
     try {
       for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
+        ccs[i].attachTrigger(TRIGGER_NAME, new TriggerEvent() {
           @Override
           public void update(final String data) { }
         });
@@ -135,7 +135,7 @@ public final class TriggerTest {
     // attach at trigger
     try {
       for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].attachTrigger(TRIGGER_NAME + 1, new TriggerNotification() {
+        ccs[i].attachTrigger(TRIGGER_NAME + 1, new TriggerEvent() {
           @Override
           public void update(final String data) { }
         });
@@ -179,7 +179,7 @@ public final class TriggerTest {
     cs.execute("create trigger " + TRIGGER_NAME);
     // attach half of the clients to the trigger
     for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
+      ccs[i].attachTrigger(TRIGGER_NAME, new TriggerEvent() {
         @Override
         public void update(final String data) {
           assertEquals(RETURN_VALUE, data);
@@ -188,7 +188,7 @@ public final class TriggerTest {
     }
 
     // release a trigger
-    cs.trigger("1 to 10", TRIGGER_NAME, RETURN_VALUE);
+    cs.trigger("1 to 10", TRIGGER_NAME, RETURN_VALUE, "m");
 
     // detach all clients attached to trigger beforehand
     for(int i = ccs.length / 2; i < ccs.length; i++) {
@@ -212,13 +212,13 @@ public final class TriggerTest {
 
     // attach half of the clients to the triggers
     for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].attachTrigger(TRIGGER_NAME, new TriggerNotification() {
+      ccs[i].attachTrigger(TRIGGER_NAME, new TriggerEvent() {
         @Override
         public void update(final String data) {
           assertEquals(RETURN_VALUE, data);
         }
       });
-      ccs[i].attachTrigger(TRIGGER_NAME + 1, new TriggerNotification() {
+      ccs[i].attachTrigger(TRIGGER_NAME + 1, new TriggerEvent() {
         @Override
         public void update(final String data) {
           assertEquals(RETURN_VALUE, data);
@@ -272,9 +272,9 @@ public final class TriggerTest {
     public void run() {
       try {
         if(first) {
-          session.trigger("1 to 10", TRIGGER_NAME, RETURN_VALUE);
+          session.trigger("1 to 10", TRIGGER_NAME, RETURN_VALUE, "m");
         } else {
-          session.trigger("1 to 10", TRIGGER_NAME + 1, RETURN_VALUE);
+          session.trigger("1 to 10", TRIGGER_NAME + 1, RETURN_VALUE, "m");
         }
         session.close();
       } catch(Exception e) {

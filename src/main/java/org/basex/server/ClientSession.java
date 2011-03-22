@@ -15,7 +15,7 @@ import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
-import org.basex.server.trigger.TriggerNotification;
+import org.basex.server.trigger.TriggerEvent;
 import org.basex.util.Token;
 
 /**
@@ -46,7 +46,7 @@ public final class ClientSession extends Session {
   /** Server input. */
   final InputStream sin;
   /** Trigger notifications. */
-  Map<String, TriggerNotification> tn;
+  Map<String, TriggerEvent> tn;
   /** Socket trigger reference. */
   Socket tsocket;
   /** Socket host name. */
@@ -164,14 +164,14 @@ public final class ClientSession extends Session {
    * @throws BaseXException exception
    */
   public void attachTrigger(final String name,
-      final TriggerNotification notification) throws BaseXException {
+      final TriggerEvent notification) throws BaseXException {
     try {
       sout.write(10);
       send(name);
       final BufferInput bi = new BufferInput(sin);
       if(tsocket == null) {
         // initialize trigger notifications
-        this.tn = new HashMap<String, TriggerNotification>();
+        this.tn = new HashMap<String, TriggerEvent>();
         tsocket = new Socket();
         tsocket.connect(new InetSocketAddress(thost, tport), 5000);
         String id = bi.readString();
@@ -232,12 +232,13 @@ public final class ClientSession extends Session {
    * @param query query string
    * @param name trigger name
    * @param notification trigger notification
+   * @param flag kind of trigger
    * @throws BaseXException exception
    */
   public void trigger(final String query, final String name,
-      final String notification) throws BaseXException {
-    execute("xquery db:trigger(" + query + ", " + name + ", '" + notification
-        + "')");
+      final String notification, final String flag) throws BaseXException {
+    execute("xquery db:trigger(" + query + ", " + name + ", " + notification
+        + ", " + flag + ")");
   }
 
   /**

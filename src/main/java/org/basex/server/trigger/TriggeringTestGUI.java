@@ -50,7 +50,7 @@ public final class TriggeringTestGUI {
     cs = new ClientSession("localhost", 1984, "admin", "admin");
 
     try {
-      cs.attachTrigger("trigger", new TriggerNotification() {
+      cs.attachTrigger("trigger", new TriggerEvent() {
           @Override
           public void update(final String data) {
             Color c = Color.WHITE;
@@ -68,7 +68,7 @@ public final class TriggeringTestGUI {
     } catch(BaseXException e1) {
       try {
         cs.execute("create trigger trigger");
-        cs.attachTrigger("trigger", new TriggerNotification() {
+        cs.attachTrigger("trigger", new TriggerEvent() {
           @Override
           public void update(final String data) {
             Color c = Color.WHITE;
@@ -137,7 +137,7 @@ public final class TriggeringTestGUI {
    */
   void action(final String c) {
     try {
-      cs.trigger("()", "trigger", c);
+      cs.trigger("()", "trigger", c, "q");
     } catch(BaseXException e) {
       e.printStackTrace();
     }

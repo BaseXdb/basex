@@ -113,18 +113,19 @@ public final class TriggerPool {
    * Notifies the attached sessions about a triggered event.
    * @param sp server process
    * @param name name
-   * @param i item
+   * @param msg message
    */
   public void notify(final ServerProcess sp, final String name,
-      final byte[] i) {
+      final String msg) {
     Sessions sessions = triggers.get(name);
     if (sessions == null) return;
 
     for (ServerProcess srv : sessions) {
       if(!srv.equals(sp)) {
         try {
-          srv.tout.writeString(name);
-          srv.tout.write(i);
+          srv.tout.print(name);
+          srv.tout.write(0);
+          srv.tout.print(msg);
           srv.tout.write(0);
           srv.tout.flush();
         } catch(IOException e) {
