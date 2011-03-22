@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public abstract class UpdatePrimitive {
+public abstract class Primitive {
   /** Target node of update expression. */
   public final ANode node;
   /** Input information. */
@@ -28,7 +28,7 @@ public abstract class UpdatePrimitive {
    * @param ii input info
    * @param n DBNode reference
    */
-  protected UpdatePrimitive(final InputInfo ii, final ANode n) {
+  protected Primitive(final InputInfo ii, final ANode n) {
     input = ii;
     node = n;
   }
@@ -45,9 +45,10 @@ public abstract class UpdatePrimitive {
    * the pre value of t changes. Thus the number of inserted nodes is added to
    * the pre value of t for all following update operations.
    * @param add size to add
+   * @return value to be added to current pre value
    * @throws QueryException query exception
    */
-  public abstract void apply(final int add) throws QueryException;
+  public abstract int apply(final int add) throws QueryException;
 
   /**
    * Prepares the update.
@@ -63,7 +64,7 @@ public abstract class UpdatePrimitive {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public void merge(final UpdatePrimitive p) throws QueryException { }
+  public void merge(final Primitive p) throws QueryException { }
 
   /**
    * Updates the name pool, which is used for finding duplicate attributes

@@ -12,20 +12,21 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class DeletePrimitive extends UpdatePrimitive {
+public final class DeleteNode extends Primitive {
   /**
    * Constructor.
    * @param ii input info
    * @param n expression target node
    */
-  public DeletePrimitive(final InputInfo ii, final ANode n) {
+  public DeleteNode(final InputInfo ii, final ANode n) {
     super(ii, n);
   }
 
   @Override
-  public void apply(final int add) {
+  public int apply(final int add) {
     final DBNode n = (DBNode) node;
     n.data.delete(n.pre + add);
+    return 0;
   }
 
   @Override
@@ -35,11 +36,11 @@ public final class DeletePrimitive extends UpdatePrimitive {
 
   @Override
   public PrimitiveType type() {
-    return PrimitiveType.DELETE;
+    return PrimitiveType.DELETENODE;
   }
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + node + "]";
+    return Util.info("%[%]", Util.name(this), node);
   }
 }

@@ -169,8 +169,7 @@ public class AxisPath extends Path {
       boolean doc = ctx.resource.docNodes();
       if(!doc) {
         final Iter iter = ctx.value.iter();
-        Item it;
-        while((it = iter.next()) != null) {
+        for(Item it; (it = iter.next()) != null;) {
           doc = it.type == NodeType.DOC;
           if(!doc) break;
         }
@@ -436,8 +435,7 @@ public class AxisPath extends Path {
     // cast is safe (steps will always return a {@link NodIter} instance
     final NodeIter ni = (NodeIter) ctx.iter(step[l]);
     final boolean more = l + 1 != step.length;
-    ANode node;
-    while((node = ni.next()) != null) {
+    for(ANode node; (node = ni.next()) != null;) {
       if(more) {
         ctx.value = node;
         iter(l + 1, nc, ctx);

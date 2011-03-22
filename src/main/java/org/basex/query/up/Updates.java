@@ -13,7 +13,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
-import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.up.primitives.Primitive;
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks
@@ -65,7 +65,7 @@ public final class Updates {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public void add(final UpdatePrimitive p, final QueryContext ctx)
+  public void add(final Primitive p, final QueryContext ctx)
       throws QueryException {
 
     final boolean frag = p.node instanceof FNode;

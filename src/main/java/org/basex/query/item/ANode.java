@@ -128,7 +128,7 @@ public abstract class ANode extends Item {
   /**
    * Returns the namespace hierarchy.
    * @return namespaces
-   * [LW][LK] this isn't enough
+   * [LW][LK] Namespaces: this isn't enough
    */
   public final Atts nsScope() {
     return nsScope(true);
@@ -138,7 +138,7 @@ public abstract class ANode extends Item {
    * Returns the namespace hierarchy.
    * @param nsInherit copy-namespaces inherit
    * @return namespaces
-   * [LW][LK] this isn't enough
+   * [LW][LK] Namespaces: this isn't enough
    */
   public final Atts nsScope(final boolean nsInherit) {
     final Atts ns = new Atts();
@@ -307,8 +307,7 @@ public abstract class ANode extends Item {
             if(n.type != NodeType.ATT) {
               final NodeCache tmp = new NodeCache();
               final AxisIter ai = p.children();
-              ANode c;
-              while((c = ai.next()) != null && !c.is(n)) {
+              for(ANode c; (c = ai.next()) != null && !c.is(n);) {
                 tmp.add(c.finish());
                 addDesc(c.children(), tmp);
               }
@@ -342,8 +341,7 @@ public abstract class ANode extends Item {
 
           nc = new NodeCache();
           final AxisIter ai = r.children();
-          ANode n;
-          while((n = ai.next()) != null && !n.is(ANode.this)) {
+          for(ANode n; (n = ai.next()) != null && !n.is(ANode.this);) {
             nc.add(n.finish());
           }
           c = nc.size();
@@ -378,10 +376,8 @@ public abstract class ANode extends Item {
    * @param children child nodes
    * @param nodes node builder
    */
-  protected final void addDesc(final NodeMore children,
-      final NodeCache nodes) {
-    ANode ch;
-    while((ch = children.next()) != null) {
+  protected final void addDesc(final NodeMore children, final NodeCache nodes) {
+    for(ANode ch; (ch = children.next()) != null;) {
       nodes.add(ch.finish());
       addDesc(ch.children(), nodes);
     }

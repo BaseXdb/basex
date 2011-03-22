@@ -289,9 +289,7 @@ final class FNZip extends Fun {
       throws QueryException, IOException {
 
     final byte[] data = new byte[IO.BLOCKSIZE];
-
-    ANode node;
-    while((node = ai.next()) != null) {
+    for(ANode node; (node = ai.next()) != null;) {
       // get entry type
       final QNm mode = node.qname();
       final boolean dir = mode.eq(E_DIR);
@@ -385,8 +383,7 @@ final class FNZip extends Fun {
     // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
     final AxisIter ati = node.atts();
-    ANode at;
-    while((at = ati.next()) != null) {
+    for(ANode at; (at = ati.next()) != null;) {
       final QNm name = at.qname();
       if(name.eq(A_NAME) || name.eq(A_SRC)) continue;
       if(tb.size() != 0) tb.add(',');

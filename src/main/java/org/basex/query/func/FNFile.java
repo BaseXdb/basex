@@ -301,8 +301,7 @@ final class FNFile extends Fun {
       try {
         final XMLSerializer xml = new XMLSerializer(out,
             FNGen.serialPar(this, 2, ctx));
-        Item it;
-        while((it = ir.next()) != null) it.serialize(xml);
+        for(Item it; (it = ir.next()) != null;) it.serialize(xml);
         xml.close();
       } catch(final SerializerException ex) {
         throw new QueryException(input, ex);

@@ -17,35 +17,42 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class ReplacePrimitive extends NodeCopy {
+public final class ReplaceNode extends NodeCopy {
   /**
    * Constructor.
    * @param ii input info
    * @param n target node
    * @param rep replace nodes
    */
-  public ReplacePrimitive(final InputInfo ii, final ANode n,
+  public ReplaceNode(final InputInfo ii, final ANode n,
       final NodeCache rep) {
     super(ii, n, rep);
   }
 
   @Override
-  public void apply(final int add) {
+  public int apply(final int add) {
     final DBNode n = (DBNode) node;
-    final int pre = n.pre + add;
     final Data d = n.data;
-    final int par = d.parent(pre, ANode.kind(n.ndType()));
+    int pre = n.pre + add;
+    final int par = d.parent(pre, d.kind(pre));
 
-    //new
-    d.delete(pre);
-
-    if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
-    else d.insert(pre, par, md);
-    if(ANode.kind(n.ndType()) == Data.TEXT) mergeTexts(d, pre, pre + 1);
+    if(n.type == NodeType.TXT && md.meta.size == 1 && md.kind(0) == Data.TEXT) {
+      // overwrite existing text node
+      d.replace(pre, Data.TEXT, md.text(0, true));
+    } else {
+      d.delete(pre);
+      if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
+      else d.insert(pre, par, md);
+      if(!mergeTexts(d, pre - 1, pre)) {
+        pre += md.meta.size;
+        mergeTexts(d, pre - 1, pre);
+      }
+    }
+    return 0;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final Primitive p) throws QueryException {
     UPMULTREPL.thrw(input, node);
   }
 
