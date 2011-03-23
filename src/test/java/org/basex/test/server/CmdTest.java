@@ -133,14 +133,6 @@ public class CmdTest {
 
   /** Command test. */
   @Test
-  public final void createFS() {
-    no(new CreateFS("test", ".s"));
-    ok(new CreateFS("test", ".settings"));
-    ok(new DropDB("test"));
-  }
-
-  /** Command test. */
-  @Test
   public final void createIndex() {
     no(new CreateIndex(null));
     for(final CmdIndex cmd : CmdIndex.values()) no(new CreateIndex(cmd));

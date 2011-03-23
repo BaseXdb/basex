@@ -207,16 +207,6 @@ final class PlotAxis {
     // 1. the minimum value is smaller 0, hence the axis is 'mirrored' at 0.
     // 2. both extreme values are smaller 0; axis is also 'mirrored' and
     //    values above the max value are not displayed.
-
-    // special case: deepfs @mtime. trying to get a better distribution for
-    // newer files. the newest file gets the lowest value (max - d + min) but is
-    // still displayed on the right end of the plot.
-    final Data data = plotData.context.data;
-    if(data.fs != null && !tag && attrID == data.fs.mtimeID) {
-      range = ln(max - min);
-      return 1 - 1 / range * ln(max - d);
-    }
-
     range = logMax - logMin;
     // case 1
     if(min < 0 && max >= 0) {

@@ -33,7 +33,6 @@ import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
 import org.basex.util.IntList;
-import org.deepfs.fs.DeepFS;
 
 /**
  * A scatter plot visualization of the database.
@@ -185,20 +184,8 @@ public final class PlotView extends View {
           if(keys.length > 0) {
             // choose size category as default for vertical axis
             int y = 0;
-            for(int k = 0; k < keys.length; ++k) {
-              if(keys[k].endsWith(DeepFS.S_SIZE)) {
-                y = k;
-                break;
-              }
-            }
             // choose name category as default for horizontal axis
             int x = y == 0 ? Math.min(1, keys.length) : 0;
-            for(int k = 0; k < keys.length; ++k) {
-              if(keys[k].endsWith(DeepFS.S_NAME)) {
-                x = k;
-                break;
-              }
-            }
             xCombo.setSelectedIndex(x);
             yCombo.setSelectedIndex(y);
           }
@@ -601,7 +588,7 @@ public final class PlotView extends View {
 
       // if min equal max, draw min in plot middle
       if(noRange) {
-        drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), .5d);
+        drawCaptionAndGrid(g, drawX, BaseXLayout.value(axis.min), .5d);
         return;
       }
 
@@ -619,7 +606,7 @@ public final class PlotView extends View {
           a = -1;
           while(a >= axis.min) {
             if(a <= axis.max && adequateDistance(drawX, a, 0)) {
-              drawCaptionAndGrid(g, drawX, formatString(a, drawX),
+              drawCaptionAndGrid(g, drawX, BaseXLayout.value(a),
                   axis.calcPosition(a));
             }
             final int lim = (int) (-1 * Math.pow(10, l + 1));
@@ -630,7 +617,7 @@ public final class PlotView extends View {
                   adequateDistance(drawX, lim, b) &&
                   b < axis.max) {
                 drawIntermediateGridLine(g, drawX, axis.calcPosition(b),
-                    formatString(b, drawX));
+                    BaseXLayout.value(b));
                 last = b;
               }
               b += a;
@@ -643,7 +630,7 @@ public final class PlotView extends View {
 
         // draw 0 label if necessary
         if(0 >= axis.min && 0 <= axis.max)
-          drawCaptionAndGrid(g, drawX, formatString(0, drawX),
+          drawCaptionAndGrid(g, drawX, BaseXLayout.value(0),
               axis.calcPosition(0));
 
         // draw labels > 0
@@ -652,7 +639,7 @@ public final class PlotView extends View {
           a = 1;
           while(a <= axis.max) {
             if(a >= axis.min && adequateDistance(drawX, a, 0)) {
-              drawCaptionAndGrid(g, drawX, formatString(a, drawX),
+              drawCaptionAndGrid(g, drawX, BaseXLayout.value(a),
                   axis.calcPosition(a));
             }
             final int lim = (int) Math.pow(10, l + 1);
@@ -663,7 +650,7 @@ public final class PlotView extends View {
                   adequateDistance(drawX, lim, b) &&
                   b > axis.min) {
                 drawIntermediateGridLine(g, drawX, axis.calcPosition(b),
-                    formatString(b, drawX));
+                    BaseXLayout.value(b));
                 last = b;
               }
               b += a;
@@ -680,14 +667,14 @@ public final class PlotView extends View {
         double f = axis.startvalue;
         while(d < 1.0d - .25d / nrCaptions) {
           ++c;
-          drawCaptionAndGrid(g, drawX, formatString(f, drawX), d);
+          drawCaptionAndGrid(g, drawX, BaseXLayout.value(f), d);
           f += step;
           d = axis.calcPosition(f);
         }
         // draw min/max labels if little space available
         if(c < 2) {
-          drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0.0);
-          drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1.0);
+          drawCaptionAndGrid(g, drawX, BaseXLayout.value(axis.min), 0.0);
+          drawCaptionAndGrid(g, drawX, BaseXLayout.value(axis.max), 1.0);
         }
       }
     }
@@ -1013,21 +1000,7 @@ public final class PlotView extends View {
     final byte[] val = axis.getValue(focused);
     if(val.length == 0) return "";
     return axis.type == Kind.TEXT || axis.type == Kind.CAT ? string(val) :
-      formatString(toDouble(val), drawX);
-  }
-
-  /**
-   * Formats a string.
-   * @param value double value
-   * @param drawX formatted string is x axis value
-   * @return formatted string
-   */
-  private String formatString(final double value, final boolean drawX) {
-    final String attr = (String) (drawX ? xCombo : yCombo).getSelectedItem();
-    return BaseXLayout.value(value, attr.equals("@" + DeepFS.S_SIZE),
-        attr.equals("@" + DeepFS.S_MTIME) ||
-        attr.equals("@" + DeepFS.S_CTIME) ||
-        attr.equals("@" + DeepFS.S_ATIME));
+      BaseXLayout.value(toDouble(val));
   }
 
   @Override

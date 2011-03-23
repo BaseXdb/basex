@@ -579,8 +579,7 @@ public final class GUI extends AGUI {
     final int t = mode.getSelectedIndex();
     final int s = data == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
 
-    input.help(s == 0 ? data.fs != null ? HELPSEARCHFS : HELPSEARCHXML :
-      s == 1 ? HELPXPATH : HELPCMD);
+    input.help(s == 0 ? HELPSEARCHXML : s == 1 ? HELPXPATH : HELPCMD);
     mode.setEnabled(data != null);
     go.setEnabled(s == 2 || !gprop.is(GUIProp.EXECRT));
 
