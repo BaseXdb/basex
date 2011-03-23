@@ -221,7 +221,7 @@ public final class TableView extends View implements Runnable {
     content.repaint();
 
     final String str = content.focusedString;
-    gui.cursor(valid && (str != null && str.length() <= Token.MAXLEN) ?
+    gui.cursor(valid && str != null && str.length() <= Token.MAXLEN ?
       GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 

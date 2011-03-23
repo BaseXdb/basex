@@ -317,7 +317,7 @@ public final class ResponseHandler {
     // Content type of part payload - if not defined by header 'Content-Type',
     // it equal to 'text/plain' (RFC 1341)
     byte[] partContType = TXT_PLAIN;
-    byte[] firstLine = readLine(io);
+    final byte[] firstLine = readLine(io);
     // Last line is reached:
     if(firstLine == null || eq(firstLine, end)) return null;
 
@@ -370,13 +370,13 @@ public final class ResponseHandler {
    * @throws IOException IO exception
    */
   private static byte[] readLine(final InputStream in) throws IOException {
-    TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     int b;
     while((b = in.read()) != -1) {
       // RFC 1341: a line ends with CRLF
       if(b == '\r') {
         while(true) {
-          int b2 = in.read();
+          final int b2 = in.read();
           if(b2 == '\n') {
             return tb.finish();
           } else if(b2 == -1) {
@@ -430,7 +430,7 @@ public final class ResponseHandler {
    * @return result
    */
   private static byte[] extractContentType(final String c) {
-    int end = c.indexOf(';');
+    final int end = c.indexOf(';');
     return end == -1 ? token(c) : token(c.substring(0, end));
   }
 

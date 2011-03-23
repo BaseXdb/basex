@@ -121,12 +121,7 @@ final class TableContent extends BaseXBack {
         // add content to column (skip too long contents)...
         if(tb[c].size() < 100) {
           if(tb[c].size() != 0) tb[c].add("; ");
-          if(ti.text) {
-            tb[c].add(data.text(ti.pre, true));
-          } else {
-            byte[] txt = data.text(ti.pre, false);
-            tb[c].add(txt);
-          }
+          tb[c].add(data.text(ti.pre, ti.text));
         }
       }
 
@@ -139,7 +134,7 @@ final class TableContent extends BaseXBack {
       double x = 1;
       for(int c = 0; c < nCols; ++c) {
         // draw single column
-        double cw = w * tdata.cols[c].width;
+        final double cw = w * tdata.cols[c].width;
         final double ce = x + cw;
 
         if(ce != 0) {

@@ -241,12 +241,12 @@ public final class FolderView extends View {
       g.setColor(color3);
       g.fillRect(0, y - boxW - boxMargin, totalW, lineH + 1);
     }
-    int xx = x;
+    final int xx = x;
 
     if(elem) {
       final boolean large = gui.gprop.num(GUIProp.FONTSIZE) > 20;
       final int yy = y - boxW - (large ? 6 : 3);
-      Image box = opened[pre] ? openedBox : closedBox;
+      final Image box = opened[pre] ? openedBox : closedBox;
       g.drawImage(box, xx - lineH, yy, this);
     }
 
@@ -254,7 +254,7 @@ public final class FolderView extends View {
     g.setColor(col);
 
     final int yy = y;
-    int tw = totalW + 6;
+    final int tw = totalW + 6;
     final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
     BaseXLayout.chopString(g, name, xx, yy - fsz, tw - xx - 10, fsz);
 

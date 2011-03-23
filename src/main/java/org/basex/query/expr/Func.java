@@ -87,24 +87,18 @@ public class Func extends Single {
       ctx.compInfo(OPTCAST, ret);
       cast = false;
     }
-
     // returned expression will be ignored
     return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
-  }
-
-  @Override
-  public Value value(final QueryContext ctx) throws QueryException {
     // evaluate function and reset variable scope
     final Value cv = ctx.value;
     ctx.value = null;
     final Value v = expr.value(ctx);
     ctx.value = cv;
-    return cast ? ret.cast(v, ctx, input) : v;
+    return (cast ? ret.cast(v, ctx, input) : v).iter(ctx);
   }
 
   @Override
