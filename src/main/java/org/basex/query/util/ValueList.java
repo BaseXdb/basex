@@ -1,7 +1,9 @@
 package org.basex.query.util;
 
+import java.util.Arrays;
 import org.basex.query.item.Value;
 import org.basex.util.ElementList;
+import org.basex.util.Util;
 
 /**
  * This is a simple container for values.
@@ -48,5 +50,10 @@ public final class ValueList extends ElementList {
    */
   public Value get(final int i) {
     return list[i];
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + Arrays.toString(Arrays.copyOf(list, size));
   }
 }
