@@ -33,10 +33,6 @@ public final class BaseXDSlider extends BaseXPanel {
   public double min;
   /** Current slider value. */
   public double max;
-  /** Size representation in kilobytes. */
-  public boolean kb;
-  /** Size representation as date. */
-  public boolean date;
   /** Integer flag. */
   public boolean itr;
 
@@ -102,7 +98,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @return formatted size value
    */
   private String value(final double size) {
-    return BaseXLayout.value(size, kb, date);
+    return BaseXLayout.value(size);
   }
 
   @Override

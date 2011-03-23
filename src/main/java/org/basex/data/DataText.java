@@ -67,12 +67,8 @@ public interface DataText {
   String DBUTD = "UPTODATE";
   /** Last (highest) id. */
   String DBLID = "LASTID";
-  /** FS mount point. */
-  String DBMNT = "MOUNT";
   /** Permissions. */
   String DBPERM = "PERM";
-  /** DeepFS instance. */
-  String DBDEEPFS = "DEEPFS";
 
   /** Tags. */
   String DBTAGS = "TAGS";

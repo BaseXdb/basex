@@ -1,6 +1,7 @@
 package org.basex.query.util;
 
 import static org.basex.query.util.Err.ErrType.*;
+
 import org.basex.core.Text;
 import org.basex.data.SerializerException;
 import org.basex.query.QueryException;
@@ -155,13 +156,19 @@ public enum Err {
   /* FOHC0003: Evaluation exception (not used yet).
   CONNERR(FOHC, 3, "Connection to \"%\" cannot be opened."), */
   /** FOHC0004: Evaluation exception. */
-  REQINV(FOHC, 4, "The request element is not valid."),
+  ELMINV(FOHC, 4, "Invalid element syntax."),
   /** FOHC0005: Evaluation exception. */
   HTTPERR(FOHC, 5, "An HTTP error occurred: %."),
   /** FOHC0006: Evaluation exception. */
   CREDSERR(FOHC, 6, "Provided credentials are invalid."),
   /** FOHC0007: Evaluation exception. */
   HTMLERR(FOHC, 7, "Error parsing HTML input."),
+  /** FOHC008: Evaluation exception. */
+  NOURL(FOHC, 8, "No URL specified."),
+  /** FOHC009: Evaluation exception. */
+  MANDATTR(FOHC, 9, "Attribute '%' is mandatory."),
+  /** FOHC0010: Evaluation exception. */
+  NOBOUND(FOHC, 10, "No separation boundary specified."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

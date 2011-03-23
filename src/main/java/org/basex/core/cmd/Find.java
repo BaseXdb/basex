@@ -1,9 +1,8 @@
 package org.basex.core.cmd;
 
-import static org.basex.util.Token.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
 import org.basex.core.Context;
-import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.query.path.Axis;
 import org.basex.util.Array;
@@ -12,8 +11,6 @@ import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
-import org.deepfs.fs.DeepFS;
-import org.deepfs.util.FSImporter;
 
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
@@ -22,9 +19,6 @@ import org.deepfs.util.FSImporter;
  * @author Christian Gruen
  */
 public final class Find extends AQuery {
-  /** Contains text token. */
-  private static final String CT = "contains text";
-
   /**
    * Default constructor.
    * @param query simplified query
@@ -54,10 +48,6 @@ public final class Find extends AQuery {
     final boolean r = root || ctx.root();
     if(query.isEmpty()) return r ? "/" : ".";
 
-    // file system instance
-    final Data data = ctx.data;
-    if(data.fs != null) return findFS(query, ctx, root);
-
     // parse user input
     final String qu = query.replaceAll(" \\+", " ");
     final String[] terms = split(qu);
@@ -75,28 +65,28 @@ public final class Find extends AQuery {
           "\" using fuzzy]";
       } else if(term.startsWith("@")) {
         if(term.length() == 1) continue;
-        preds += "[@* " + CT + " \"" + term.substring(1) + "\"]";
+        preds += "[@* contains text \"" + term.substring(1) + "\"]";
         term = term.substring(1);
         // add valid name tests
         if(XMLToken.isName(token(term))) {
           pre += (r ? "" : ".") + "//@" + term + " | ";
         }
       } else {
-        preds += "[text() " + CT + " \"" + term + "\"]";
+        preds += "[text() contains text \"" + term + "\"]";
         // add valid name tests
         if(XMLToken.isName(token(term))) {
           pre += (r ? "/" : "") + Axis.DESC + "::*:" + term + " | ";
         }
         // add name test...
         pre += (r ? "/" : "") + Axis.DESCORSELF +
-          "::*[@name " + CT + " \"" + term + "\"] | ";
+          "::*[@name contains text \"" + term + "\"] | ";
       }
     }
     if(pre.isEmpty() && preds.isEmpty()) return root ? "/" : ".";
 
     // apply full-text specific options
     final TokenBuilder opt = new TokenBuilder();
-    final MetaData md = data.meta;
+    final MetaData md = ctx.data.meta;
     if(md.ftindex) {
       if(md.wildcards) opt.add(' ' + USING + ' ' + WILDCARDS);
       if(md.stemming) opt.add(' ' + USING + ' ' + STEMMING);
@@ -115,108 +105,21 @@ public final class Find extends AQuery {
   }
 
   /**
-   * Creates an XQuery representation for the specified file system query.
-   * @param term query terms
-   * @param context context
-   * @param root root flag
-   * @return query
-   */
-  private static String findFS(final String term, final Context context,
-      final boolean root) {
-
-    final String query = term.replaceAll("\\*|\\?|\\&|\"", " ") + ' ';
-    String qu = query;
-
-    final TokenBuilder xquery = new TokenBuilder();
-    final boolean r = root || context.root();
-
-    if(r) xquery.add("/");
-    xquery.add(Axis.DESCORSELF + "::");
-    String name = "*";
-
-    do {
-      boolean exact = true;
-      String pred = "";
-
-      // check prefix
-      char op = qu.charAt(0);
-      if(op == '>') {
-        pred = DeepFS.S_SIZE;
-      } else if(op == '<') {
-        pred = DeepFS.S_SIZE;
-      } else if(op == '.') {
-        pred = DeepFS.S_SUFFIX;
-        op = '=';
-      } else {
-        pred = DeepFS.S_NAME;
-        exact = op == '=';
-      }
-
-      int off = exact ? 1 : 0;
-      while(off < qu.length() && qu.charAt(off) == ' ') ++off;
-      qu = qu.substring(off);
-      if(qu.isEmpty()) continue;
-
-      final int i = qu.indexOf(' ');
-      String t = qu.substring(0, i);
-
-      if(!name.isEmpty()) name = "file";
-      if(pred == DeepFS.S_SIZE) {
-        t = Long.toString(calcNum(token(t)));
-      } else {
-        // if dot is found inside the current term, add suffix check
-        final int d = t.lastIndexOf(".");
-        if(d != -1) {
-          xquery.add(name + "[@" + DeepFS.S_SUFFIX + " = \"" +
-              t.substring(d + 1) + "\"]");
-          t = t.substring(0, d);
-          name = "";
-        }
-        t = "\"" + t + "\"";
-      }
-      // add predicate
-      xquery.add(name + "[@" + pred + (exact ? op : " " + CT + " ") +
-          t + "]");
-
-      qu = qu.substring(i + 1);
-      name = "";
-    } while(qu.indexOf(' ') > -1);
-
-    final TokenBuilder ft = new TokenBuilder();
-    for(final String t : split(query)) {
-      if(XMLToken.isChar(t.charAt(0))) {
-        if(ft.size() != 0) ft.add(" ftand");
-        ft.add(" \"" + t + "\"");
-      }
-    }
-    if(ft.size() != 0) {
-      xquery.add(" | " + (r ? "/" : "") + Axis.DESCORSELF + "::file");
-      xquery.add("[" + Axis.DESC + "::text() " + CT);
-      xquery.add(ft.finish());
-      xquery.add("]");
-    }
-    return xquery.toString();
-  }
-
-  /**
    * Creates an XQuery representation for the specified table query.
    * @param filter filter terms
    * @param cols filter columns
    * @param elem element flag
    * @param tag root tag
    * @param root root flag
-   * @param fs file system flag
    * @return query
    */
   public static String findTable(final StringList filter, final TokenList cols,
-      final BoolList elem, final byte[] tag, final boolean root,
-      final boolean fs) {
+      final BoolList elem, final byte[] tag, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();
     for(int i = 0; i < is; ++i) {
-      final String[] spl = fs ? new String[] {
-          FSImporter.escape(filter.get(i)) } : split(filter.get(i));
+      final String[] spl = split(filter.get(i));
       for(final String s : spl) {
         byte[] term = token(s);
         if(contains(term, '"')) term = replace(term, '\"', ' ');
@@ -233,7 +136,7 @@ public final class Find extends AQuery {
           tb.add(term[0]);
           tb.addLong(calcNum(substring(term, 1)));
         } else {
-          tb.add(" " + CT + " \"");
+          tb.add(" contains text \"");
           tb.add(term);
           tb.add('"');
         }

@@ -136,7 +136,6 @@ public class FunItem extends Item {
       final Value... args) throws QueryException {
 
     final ValueIter ir = invIter(ctx, ii, args);
-
     final Item it = ir.next();
     if(it == null || ir.size() == 1) return it;
 
