@@ -255,8 +255,6 @@ public final class TableDiskAccess extends TableAccess {
 
     // number of records to be inserted:
     final int nr = entries.length >>> IO.NODEPOWER;
-    meta.size += nr;
-    dirty = true;
 
     // number of bytes occupied by old records in the current block:
     final int nold = npre - fpre << IO.NODEPOWER;
@@ -273,6 +271,8 @@ public final class TableDiskAccess extends TableAccess {
       for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
       // update cached variables (fpre is not changed):
       npre += nr;
+      meta.size += nr;
+      dirty = true;
       return;
     }
 
@@ -290,9 +290,34 @@ public final class TableDiskAccess extends TableAccess {
       bf.dirty = true;
     }
 
-    // resize fpres and pages:
-    // number of blocks needed to store the remaining entries:
-    final int neededBlocks = (all.length - n + IO.BLOCKSIZE - 1) / IO.BLOCKSIZE;
+    int neededBlocks = (all.length - n) / IO.BLOCKSIZE;
+    // number of bytes which don't fill one block completely:
+    final int remain = (all.length - n) % IO.BLOCKSIZE;
+
+    if(remain > 0) {
+      // check if the last entries can fit in the block after the current one:
+      if(index + 1 < blocks) {
+        final int o = occupiedSpace(index + 1) << IO.NODEPOWER;
+        if(remain <= IO.BLOCKSIZE - o) {
+          // copy the last records:
+          readBlock(index + 1);
+          System.arraycopy(bf.data, 0, bf.data, remain, o);
+          System.arraycopy(all, all.length - remain, bf.data, 0, remain);
+          bf.dirty = true;
+          // reduce the pre value, since it will be later incremented with nr:
+          fpres[index] -= remain >>> IO.NODEPOWER;
+          // go back to the previous block
+          readBlock(index - 1);
+        } else {
+          // there is not enough space in the block - allocate a new one:
+          ++neededBlocks;
+        }
+      } else {
+        // this is the last block - allocate a new one:
+        ++neededBlocks;
+      }
+    }
+
     // number of new blocks (number of needed block - number of empty blocks):
     final int newBlocks = neededBlocks - (allBlocks - blocks);
 
@@ -307,7 +332,7 @@ public final class TableDiskAccess extends TableAccess {
     Array.move(pages, index + 1, neededBlocks, blocks - index - 1);
 
     // write the all remaining entries:
-    while(n < all.length) {
+    while(neededBlocks-- > 0) {
       getFreeBlock();
       n += write(all, n);
       fpres[index] = fpres[index - 1] + ENTRIES;
@@ -316,6 +341,9 @@ public final class TableDiskAccess extends TableAccess {
 
     // increment first pre-values of blocks after the last modified block:
     for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
+
+    meta.size += nr;
+    dirty = true;
 
     // update cached variables:
     fpre = fpres[index];
@@ -465,6 +493,15 @@ public final class TableDiskAccess extends TableAccess {
     pagemap.set(bf.pos);
     ++blocks;
     ++index;
+  }
+
+  /**
+   * Calculate the occupied space in a block.
+   * @param i index of the block
+   * @return occupied space in number of records
+   */
+  private int occupiedSpace(final int i) {
+    return (i + 1 < blocks ? fpres[i + 1] : meta.size) - fpres[i];
   }
 
   // TEST METHODS =============================================================
