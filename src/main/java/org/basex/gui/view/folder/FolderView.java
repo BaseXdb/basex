@@ -406,23 +406,6 @@ public final class FolderView extends View {
     }
   }
 
-  // [CG] AH asks if this method can be removed?
-  @Override
-  public void mouseClicked(final MouseEvent e) {
-    if(!SwingUtilities.isLeftMouseButton(e) || gui.updating || opened == null)
-      return;
-
-//    // launch a program
-//    final Data data = gui.context.data;
-//    if(getCursor() == CURSORHAND && data.fs != null) {
-//      try {
-//        data.fs.launch(gui.context.focused);
-//      } catch (final IOException ex) {
-//        Dialog.warn(gui, NODEFAULTAPP);
-//      }
-//    }
-  }
-
   @Override
   public void mouseDragged(final MouseEvent e) {
     final boolean left = SwingUtilities.isLeftMouseButton(e);

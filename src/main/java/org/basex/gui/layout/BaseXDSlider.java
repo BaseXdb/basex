@@ -92,15 +92,6 @@ public final class BaseXDSlider extends BaseXPanel {
     setToolTip();
   }
 
-  /**
-   * Formats a number according to the binary size orders (KB, MB, ...).
-   * @param size value to be formatted
-   * @return formatted size value
-   */
-  private String value(final double size) {
-    return BaseXLayout.value(size);
-  }
-
   @Override
   public void mouseMoved(final MouseEvent e) {
     mouX = e.getX();
@@ -147,7 +138,7 @@ public final class BaseXDSlider extends BaseXPanel {
   private void setToolTip() {
     final double mn = (long) (min * 100) / 100.0;
     final double mx = (long) (max * 100) / 100.0;
-    setToolTipText(value(mn) + " - " + value(mx));
+    setToolTipText(BaseXLayout.value(mn) + " - " + BaseXLayout.value(mx));
   }
 
   @Override
@@ -265,8 +256,8 @@ public final class BaseXDSlider extends BaseXPanel {
     final double mn = (long) (min * 100) / 100.0;
     final double mx = (long) (max * 100) / 100.0;
 
-    g.drawString(value(mn) + " - " + value(mx), w + 15,
-        h - (h - getFont().getSize()) / 2);
+    g.drawString(BaseXLayout.value(mn) + " - " + BaseXLayout.value(mx),
+        w + 15, h - (h - getFont().getSize()) / 2);
   }
 
   /**
