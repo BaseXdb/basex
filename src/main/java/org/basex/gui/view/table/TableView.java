@@ -282,20 +282,6 @@ public final class TableView extends View implements Runnable {
   }
 
   @Override
-  public void mouseClicked(final MouseEvent e) {
-    if(gui.context.focused == -1) return;
-//    [CG] AH asks if this method can be removed now?
-//    final Data data = gui.context.data;
-//    if(data.fs != null && tdata.mouseX < 20) {
-//      try {
-//        data.fs.launch(ViewData.parent(data, gui.context.focused));
-//      } catch (final IOException ex) {
-////        Dialog.warn(gui, NODEFAULTAPP);
-//      }
-//    }
-  }
-
-  @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(tdata.rows == null) return;
 

@@ -164,9 +164,6 @@ public final class GUIProp extends AProp {
   /** Server user. */
   public static final Object[] SERVERUSER = { "SERVERUSER", "admin" };
 
-  /** Shows real file contents in the treemap.
-   * [CG] AH asks if this shall be removed as well? */
-  public static final Object[] MAPFS = { "MAPFS", true };
   /** Maximum text size to be displayed. */
   public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
 
