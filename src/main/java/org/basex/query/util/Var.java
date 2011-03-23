@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -133,6 +134,12 @@ public final class Var extends ParseExpr {
     expr = v;
     value = cast(v, ctx);
     return this;
+  }
+
+  @Override
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return value(ctx).item(ctx, ii);
   }
 
   @Override
