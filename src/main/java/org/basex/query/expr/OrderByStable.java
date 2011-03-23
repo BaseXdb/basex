@@ -33,13 +33,7 @@ public final class OrderByStable extends OrderBy {
   }
 
   @Override
-  void init(final int s) { }
-
-  @Override
-  void add(final QueryContext ctx) { }
-
-  @Override
-  Item get(final int i) {
+  Item key(final QueryContext ctx, final int i) {
     return Itr.get(i);
   }
 

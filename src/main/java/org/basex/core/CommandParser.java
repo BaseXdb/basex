@@ -2,6 +2,7 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
+
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
 import org.basex.core.Commands.CmdCreate;
@@ -17,8 +18,8 @@ import org.basex.core.cmd.AlterUser;
 import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateFS;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.CreateMAB;
 import org.basex.core.cmd.CreateUser;
@@ -140,14 +141,14 @@ public final class CommandParser extends InputParser {
             return new CreateDB(name(cmd), s ? remaining(null) : string(null));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
-          case FS:
-            return new CreateFS(name(cmd), string(cmd));
           case MAB:
             return new CreateMAB(string(cmd), name(null));
           case USER:
             return new CreateUser(name(cmd), string(null));
         }
         break;
+      case COPY:
+        return new Copy(name(cmd), name(cmd));
       case ALTER:
         switch(consume(CmdAlter.class, cmd)) {
           case DATABASE: case DB:

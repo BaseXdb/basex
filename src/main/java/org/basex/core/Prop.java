@@ -171,28 +171,6 @@ public final class Prop extends AProp {
   /** Maximum number of index occurrences to print. */
   public static final Object[] MAXSTAT = { "MAXSTAT", 15 };
 
-  // DEEPFS OPTIONS ===========================================================
-
-  /** Flag for importing file metadata. */
-  public static final Object[] FSMETA = { "FSMETA", true };
-  /** Flag for importing file contents. */
-  public static final Object[] FSCONT = { "FSCONT", false };
-  /** Flag for importing xml contents. */
-  public static final Object[] FSXML = { "FSXML", false };
-  /** Maximum size for textual imports. */
-  public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 10240 };
-  /** Verbose debug informations for FSTraversal. */
-  public static final Object[] FSVERBOSE = { "FSVERBOSE", false };
-
-  /** Fuse support. */
-  public static final Object[] FUSE = { "FUSE", false };
-
-  /**
-   * Spotlight integration. If true, on mac platforms spotlight index is used
-   * instead of the internal parser implementations.
-   */
-  public static final Object[] SPOTLIGHT = { "SPOTLIGHT", false };
-
   // STATIC PROPERTIES ========================================================
 
   /** Root properties. */

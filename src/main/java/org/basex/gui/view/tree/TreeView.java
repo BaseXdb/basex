@@ -186,7 +186,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(paintType == PAINT_NEW_INIT) {
       sub = new TreeSubtree(data, showAtts);
-      tr = new TreeRects(gui.gprop);
+      tr = new TreeRects();
     }
 
     if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT)

@@ -3,11 +3,13 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
+import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
@@ -270,17 +272,21 @@ public class GFLWOR extends ParseExpr {
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
 
     // evaluate pre grouping tuples
-    final int s = (int) size();
-    final ValueList vl = s >= 0 ? new ValueList(s) : new ValueList();
-    if(order != null) order.init(vl, s);
+    ArrayList<Item[]> keys = null;
+    ValueList vals = null;
+    if(order != null) {
+      keys = new ArrayList<Item[]>();
+      vals = new ValueList();
+    }
     if(group != null) group.init(fl, order);
-    iter(ctx, vl, iter, 0);
+    iter(ctx, iter, 0, keys, vals);
     ctx.vars.reset(vs);
 
-    for(final ForLet aFl : fl) ctx.vars.add(aFl.var);
+    for(final ForLet f : fl) ctx.vars.add(f.var);
 
     // order != null, otherwise it would have been handled in group
-    final Iter ir = group != null ? group.gp.ret(ctx, ret) : ctx.iter(order);
+    final Iter ir = group != null ?
+        group.gp.ret(ctx, ret, keys, vals) : ctx.iter(order.set(keys, vals));
     ctx.vars.reset(vs);
     return ir;
   }
@@ -288,25 +294,24 @@ public class GFLWOR extends ParseExpr {
   /**
    * Performs a recursive iteration on the specified variable position.
    * @param ctx root reference
-   * @param vl value lists
    * @param it iterator
    * @param p variable position
+   * @param ks sort keys
+   * @param vs values to sort
    * @throws QueryException query exception
    */
-  private void iter(final QueryContext ctx, final ValueList vl,
-      final Iter[] it, final int p) throws QueryException {
-
+  private void iter(final QueryContext ctx, final Iter[] it, final int p,
+      final ArrayList<Item[]> ks, final ValueList vs) throws QueryException {
     final boolean more = p + 1 != fl.length;
     while(it[p].next() != null) {
       if(more) {
-        iter(ctx, vl, it, p + 1);
+        iter(ctx, it, p + 1, ks, vs);
       } else if(where == null || where.ebv(ctx, input).bool(input)) {
         if(group != null) {
           group.gp.add(ctx);
         } else if(order != null) {
           // order by will be handled in group by otherwise
-          order.add(ctx);
-          vl.add(ret.value(ctx));
+          order.add(ctx, ret, ks, vs);
         }
       }
     }

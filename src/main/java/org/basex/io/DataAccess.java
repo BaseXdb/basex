@@ -47,6 +47,7 @@ public final class DataAccess {
    */
   public synchronized void close() throws IOException {
     flush();
+    file.setLength(len);
     file.close();
   }
 
@@ -59,7 +60,15 @@ public final class DataAccess {
   }
 
   /**
-   * Returns file length.
+   * Sets the file length.
+   * @param l file length
+   */
+  public void length(final long l) {
+    len = l;
+  }
+
+  /**
+   * Returns the file length.
    * @return file length
    */
   public long length() {

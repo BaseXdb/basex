@@ -42,7 +42,7 @@ public abstract class AdvancedQueryTest {
       return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
     } finally {
       try { qp.close();
-      } catch(IOException e) { }
+      } catch(final IOException e) { }
     }
   }
 

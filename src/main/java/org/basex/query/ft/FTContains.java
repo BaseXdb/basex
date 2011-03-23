@@ -67,10 +67,9 @@ public class FTContains extends ParseExpr {
     final Iter iter = expr.iter(ctx);
     final FTLexer tmp = ctx.fttoken;
     double s = 0;
-    Item it;
 
     ctx.fttoken = lex;
-    while((it = iter.next()) != null) {
+    for(Item it; (it = iter.next()) != null;) {
       lex.init(it.atom(input));
       final FTNode item = ftexpr.item(ctx, input);
       double d = 0;

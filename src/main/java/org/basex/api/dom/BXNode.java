@@ -105,8 +105,7 @@ public abstract class BXNode implements Node {
   public final BXNode getLastChild() {
     ANode n = null;
     final AxisIter ai = node.children();
-    ANode t = null;
-    while((t = ai.next()) != null) n = t;
+    for(ANode t; (t = ai.next()) != null;) n = t;
     return finish(n);
   }
 
@@ -276,8 +275,7 @@ public abstract class BXNode implements Node {
     final NodeCache nb = new NodeCache();
     final AxisIter ai = node.descendant();
     final byte[] nm = tag.equals("*") ? null : token(tag);
-    ANode n = null;
-    while((n = ai.next()) != null) {
+    for(ANode n; (n = ai.next()) != null;) {
       if(n.type == NodeType.ELM && (nm == null || eq(nm, n.nname())))
         nb.add(n.copy());
     }
@@ -291,8 +289,7 @@ public abstract class BXNode implements Node {
    */
   protected static final NodeCache finish(final AxisIter ai) {
     final NodeCache nc = new NodeCache();
-    ANode n = null;
-    while((n = ai.next()) != null) nc.add(n.copy());
+    for(ANode n; (n = ai.next()) != null;) nc.add(n.copy());
     return nc;
   }
 

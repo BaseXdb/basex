@@ -5,12 +5,11 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.HttpClient;
+import org.basex.query.util.HTTPClient;
 import org.basex.util.InputInfo;
 
 /**
  * HTTP Client Module.
- *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -35,8 +34,8 @@ public final class FNHttp extends Fun {
     final byte[] href = expr.length == 2 ? checkEStr(expr[1].item(ctx, input))
         : null;
 
-    // Send the HTTP request
-    return new HttpClient(request, href, input).sendHttpRequest(ctx);
+    // Send HTTP request
+    return HTTPClient.sendRequest(href, request, input, ctx.context.prop);
   }
 
   @Override

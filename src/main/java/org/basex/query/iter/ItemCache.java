@@ -72,8 +72,7 @@ public final class ItemCache extends ValueIter implements Result {
    * @throws QueryException query exception
    */
   public void add(final Iter iter) throws QueryException {
-    Item i;
-    while((i = iter.next()) != null) add(i);
+    for(Item i; (i = iter.next()) != null;) add(i);
   }
 
   /**
@@ -145,6 +144,15 @@ public final class ItemCache extends ValueIter implements Result {
   @Override
   public Item get(final long i) {
     return item[(int) i];
+  }
+
+  /**
+   * Sets an item to the specified position.
+   * @param i item to be set
+   * @param p position
+   */
+  public void set(final Item i, final int p) {
+    item[p] = i;
   }
 
   @Override

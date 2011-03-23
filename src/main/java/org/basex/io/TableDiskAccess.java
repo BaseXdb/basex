@@ -79,7 +79,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // initialize data file
     data = new RandomAccessFile(meta.file(pf), "rw");
-    readBlock(0, 0, blocks > 1 ? fpres[1] : md.size);
+    readBlock(0);
   }
 
   @Override
@@ -199,8 +199,8 @@ public final class TableDiskAccess extends TableAccess {
         Array.move(fpres, index + 1, -1, blocks - index - 1);
         Array.move(pages, index + 1, -1, blocks - index - 1);
 
-        readBlock(index, fpre, index + 2 > --blocks ? meta.size :
-          fpres[index + 1]);
+        --blocks;
+        readBlock(index);
       }
       return;
     }
@@ -216,7 +216,7 @@ public final class TableDiskAccess extends TableAccess {
         // blocks may not be consecutive:
         pagemap.clear(pages[index]);
       }
-      nextBlock();
+      readBlock(index + 1);
       from = 0;
     }
 
@@ -224,7 +224,7 @@ public final class TableDiskAccess extends TableAccess {
     if(npre == last) {
       pagemap.clear((int) bf.pos);
       ++unused;
-      if(index < blocks - 1) nextBlock();
+      if(index < blocks - 1) readBlock(index + 1);
       else ++index;
     } else {
       // delete entries at beginning of current (last) block
@@ -249,14 +249,14 @@ public final class TableDiskAccess extends TableAccess {
   public void insert(final int pre, final byte[] entries) {
     if(entries.length == 0) return;
 
+    // go to the block and find the offset within the block where the new
+    // records will be inserted:
+    final int split = cursor(pre - 1) + (1 << IO.NODEPOWER);
+
     // number of records to be inserted:
     final int nr = entries.length >>> IO.NODEPOWER;
     meta.size += nr;
     dirty = true;
-
-    // go to the block and find the offset within the block where the new
-    // records will be inserted:
-    final int split = cursor(pre - 1) + (1 << IO.NODEPOWER);
 
     // number of bytes occupied by old records in the current block:
     final int nold = npre - fpre << IO.NODEPOWER;
@@ -356,26 +356,24 @@ public final class TableDiskAccess extends TableAccess {
         else break;
         m = h + l >>> 1;
         fp = fpres[m];
-        np = m == last ? fp + ENTRIES : fpres[m + 1];
+        np = m == last ? meta.size : fpres[m + 1];
       }
       if(l > h) Util.notexpected("Data Access out of bounds [pre:" + pre +
           ", indexSize:" + blocks + ", access:" + l + " > " + h + "]");
 
-      readBlock(m, fp, np);
+      readBlock(m);
     }
     return pre - fpre << IO.NODEPOWER;
   }
 
   /**
-   * Fetches the requested block and updates pointers.
+   * Updates the pre pointers and fetches the requested block.
    * @param i index number of the block to fetch
-   * @param f first entry in that block
-   * @param n first entry in the next block
    */
-  private void readBlock(final int i, final int f, final int n) {
+  private void readBlock(final int i) {
     index = i;
-    fpre = f;
-    npre = n > meta.size ? meta.size : n;
+    fpre = fpres[i];
+    npre = i + 1 >= blocks ? meta.size : fpres[i + 1];
 
     final int b = pages[i];
     final boolean ch = bm.cursor(b);
@@ -401,14 +399,6 @@ public final class TableDiskAccess extends TableAccess {
     data.seek(buf.pos * IO.BLOCKSIZE);
     data.write(buf.data);
     buf.dirty = false;
-  }
-
-  /**
-   * Fetches the next block.
-   */
-  private void nextBlock() {
-    readBlock(index + 1, npre, index + 2 >= blocks ? meta.size :
-      fpres[index + 2]);
   }
 
   /**

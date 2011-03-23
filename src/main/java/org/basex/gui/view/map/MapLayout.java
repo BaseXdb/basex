@@ -77,7 +77,7 @@ final class MapLayout {
   private MapList children(final int par) {
     final MapList list = new MapList();
     final int last = par + ViewData.size(data, par);
-    final boolean atts = prop.is(GUIProp.MAPATTS) && data.fs == null;
+    final boolean atts = prop.is(GUIProp.MAPATTS);
     int p = par + (atts ? 1 : data.attSize(par, data.kind(par)));
     while(p < last) {
       list.add(p);

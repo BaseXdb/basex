@@ -126,8 +126,7 @@ final class FNStr extends Fun {
    */
   private Item cp2str(final Iter iter) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    Item i;
-    while((i = iter.next()) != null) {
+    for(Item i; (i = iter.next()) != null;) {
       final long n = checkItr(i);
       if(!XMLToken.valid((int) n)) INVCODE.thrw(input, i);
       tb.add((int) n);
@@ -238,8 +237,7 @@ final class FNStr extends Fun {
     final TokenBuilder tb = new TokenBuilder();
     final Iter iter = expr[0].iter(ctx);
     int c = 0;
-    Item i;
-    while((i = iter.next()) != null) {
+    for(Item i; (i = iter.next()) != null;) {
       tb.add(checkEStr(i));
       tb.add(sep);
       ++c;

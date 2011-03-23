@@ -33,19 +33,20 @@ public final class InsertInto extends NodeCopy {
   }
 
   @Override
-  public void apply(final int add) {
+  public int apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
-    final int pre = n.pre + d.size(n.pre, ANode.kind(node.ndType())) + add;
+    int pre = n.pre + d.size(n.pre, d.kind(n.pre)) + add;
     d.insert(pre, n.pre, md);
     if(!mergeTexts(d, pre - 1, pre)) {
-      final int s = md.meta.size;
-      mergeTexts(d, pre + s - 1, pre + s);
+      pre += md.meta.size;
+      mergeTexts(d, pre - 1, pre);
     }
+    return 0;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
+  public void merge(final Primitive p) {
     if(((InsertInto) p).last) insert.add(((NodeCopy) p).insert.get(0));
     else insert.add(i++, ((NodeCopy) p).insert.get(0));
   }

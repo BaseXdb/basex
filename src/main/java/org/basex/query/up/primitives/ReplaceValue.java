@@ -5,7 +5,7 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
-import org.basex.query.item.QNm;
+import org.basex.query.item.NodeType;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 
@@ -15,33 +15,37 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class ReplaceValue extends NewValue {
+public final class ReplaceValue extends Primitive {
+  /** New value. */
+  private final byte[] value;
+
   /**
    * Constructor.
    * @param ii input info
    * @param n target node
-   * @param newName new name
+   * @param val new value
    */
-  public ReplaceValue(final InputInfo ii, final ANode n, final QNm newName) {
-    super(ii, n, newName);
+  public ReplaceValue(final InputInfo ii, final ANode n, final byte[] val) {
+    super(ii, n);
+    value = val;
   }
 
   @Override
-  public void apply(final int add) {
+  public int apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
-    final int k = d.kind(n.pre);
-    final byte[] nn = name.atom();
 
-    if(k == Data.TEXT && nn.length == 0) {
+    if(n.type == NodeType.TXT && value.length == 0) {
+      // empty text nodes must be removed
       d.delete(n.pre);
     } else {
-      d.replace(n.pre, k, nn);
+      d.replace(n.pre, d.kind(n.pre), value);
     }
+    return 0;
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
+  public void merge(final Primitive p) throws QueryException {
     UPMULTREPV.thrw(input, node);
   }
 
@@ -52,6 +56,6 @@ public final class ReplaceValue extends NewValue {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + node + ", " + name + "]";
+    return Util.info("%[%, %]", Util.name(this), node, value);
   }
 }

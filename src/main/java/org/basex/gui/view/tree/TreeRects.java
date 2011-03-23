@@ -1,9 +1,9 @@
 package org.basex.gui.view.tree;
 
 import java.awt.Graphics;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
 
@@ -16,16 +16,6 @@ import org.basex.gui.view.ViewData;
 final class TreeRects implements TreeViewOptions {
   /** Saved rectangles. */
   private TreeRect[][][] rects;
-  /** Window properties. */
-  private final GUIProp prop;
-
-  /**
-   * Creates new TreeRects instance.
-   * @param gp window properties
-   */
-  public TreeRects(final GUIProp gp) {
-    prop = gp;
-  }
 
   /**
    * Create new rectangles and set subtree borders.
@@ -173,9 +163,6 @@ final class TreeRects implements TreeViewOptions {
   byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data;
     if(pre == c.current.list[rn]) return ViewData.path(d, pre);
-    if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM)
-      return ViewData.tag(
-        prop, d, pre);
     return ViewData.content(d, pre, false);
   }
 

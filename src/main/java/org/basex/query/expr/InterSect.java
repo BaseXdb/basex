@@ -34,23 +34,22 @@ public final class InterSect extends Set {
 
   @Override
   protected NodeCache eval(final Iter[] iter) throws QueryException {
-    NodeCache ni = new NodeCache();
+    NodeCache nc = new NodeCache();
 
-    Item it;
-    while((it = iter[0].next()) != null) ni.add(checkNode(it));
-    final boolean db = ni.dbnodes();
+    for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
+    final boolean db = nc.dbnodes();
 
-    for(int e = 1; e != expr.length && ni.size() != 0; ++e) {
+    for(int e = 1; e != expr.length && nc.size() != 0; ++e) {
       final NodeCache nt = new NodeCache().random();
       final Iter ir = iter[e];
-      while((it = ir.next()) != null) {
+      for(Item it; (it = ir.next()) != null;) {
         final ANode n = checkNode(it);
-        final int i = ni.indexOf(n, db);
+        final int i = nc.indexOf(n, db);
         if(i != -1) nt.add(n);
       }
-      ni = nt;
+      nc = nt;
     }
-    return ni;
+    return nc;
   }
 
   @Override

@@ -79,8 +79,7 @@ public final class MixedPath extends Path {
       final ItemCache ii = new ItemCache();
       ctx.size = ir.size();
       ctx.pos = 1;
-      Item it;
-      while((it = ir.next()) != null) {
+      for(Item it; (it = ir.next()) != null;) {
         if(!it.node()) NODESPATH.thrw(input, this, it.type);
         ctx.value = it;
         ii.add(ctx.iter(e));
@@ -89,14 +88,14 @@ public final class MixedPath extends Path {
 
       // either nodes or atomic items are allowed in a result set, but not both
       if(ii.size() != 0 && ii.get(0).node()) {
-        final NodeCache ni = new NodeCache().random();
-        while((it = ii.next()) != null) {
+        final NodeCache nc = new NodeCache().random();
+        for(Item it; (it = ii.next()) != null;) {
           if(!it.node()) EVALNODESVALS.thrw(input);
-          ni.add((ANode) it);
+          nc.add((ANode) it);
         }
-        res = ItemCache.get(ni);
+        res = ItemCache.get(nc);
       } else {
-        while((it = ii.next()) != null) {
+        for(Item it; (it = ii.next()) != null;) {
           if(it.node()) EVALNODESVALS.thrw(input);
         }
         res = ii;

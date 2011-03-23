@@ -2,17 +2,18 @@ package org.basex.gui.view.table;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIFS;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
@@ -124,13 +125,6 @@ final class TableContent extends BaseXBack {
             tb[c].add(data.text(ti.pre, true));
           } else {
             byte[] txt = data.text(ti.pre, false);
-            if(data.fs != null) {
-              final boolean size = tdata.cols[c].id == data.sizeID;
-              final boolean time = tdata.cols[c].id == data.fs.mtimeID;
-              if(size || time) {
-                txt = token(BaseXLayout.value(toDouble(txt), size, time));
-              }
-            }
             tb[c].add(txt);
           }
         }
@@ -151,13 +145,6 @@ final class TableContent extends BaseXBack {
         if(ce != 0) {
           final byte[] str = tb[c].size() != 0 ? tb[c].finish() : null;
           if(str != null) {
-            if(data.fs != null && data.fs.isFile(pre) &&
-                tdata.cols[c].id == data.fs.suffixID) {
-              g.drawImage(GUIFS.get().images(str, false), (int) x + 2,
-                  posY - 8 + rowH / 2, this);
-              x += 22;
-              cw -= 22;
-            }
             if(tdata.mouseX > x && tdata.mouseX < ce || fcol == c) {
               fx = (int) x;
               focusStr = str;
