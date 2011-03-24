@@ -3,29 +3,27 @@ package org.basex.gui.view.table;
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.io.IOException;
+
 import javax.swing.SwingUtilities;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
-import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.gui.view.table.TableData.TableCol;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
-import org.deepfs.fs.DeepFS;
 
 /**
  * This view creates a flat table view on the database contents.
@@ -223,9 +221,7 @@ public final class TableView extends View implements Runnable {
     content.repaint();
 
     final String str = content.focusedString;
-    gui.cursor(valid && (str != null &&
-        str.length() <= Token.MAXLEN ||
-        gui.context.data.fs != null && tdata.mouseX < 20) ?
+    gui.cursor(valid && str != null && str.length() <= Token.MAXLEN ?
       GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 
@@ -241,21 +237,15 @@ public final class TableView extends View implements Runnable {
     if(pre == -1) return;
     super.mousePressed(e);
     final Context context = gui.context;
-    final Data data = context.data;
-    final boolean fs = data.fs != null;
-    if(tdata.rows == null || fs && tdata.mouseX < 20) return;
+
+    if(tdata.rows == null) return;
 
     if(e.getY() < header.getHeight()) return;
 
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(e.getClickCount() == 1) {
         final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
-        final TableCol col = tdata.cols[c];
-        final String str;
-        if(fs && (Token.eq(col.name, DeepFS.SIZE) ||
-            Token.eq(col.name, DeepFS.MTIME)))
-          str = Token.string(data.text(pre, false));
-        else str = content.focusedString;
+        final String str = content.focusedString;
         if(str == null || str.length() > Token.MAXLEN) return;
         if(!e.isShiftDown()) tdata.resetFilter();
         tdata.cols[c].filter = str;
@@ -289,19 +279,6 @@ public final class TableView extends View implements Runnable {
   void query() {
     final String query = tdata.find();
     if(query != null) gui.xquery(query, false);
-  }
-
-  @Override
-  public void mouseClicked(final MouseEvent e) {
-    if(gui.context.focused == -1) return;
-    final Data data = gui.context.data;
-    if(data.fs != null && tdata.mouseX < 20) {
-      try {
-        data.fs.launch(ViewData.parent(data, gui.context.focused));
-      } catch (final IOException ex) {
-        Dialog.warn(gui, NODEFAULTAPP);
-      }
-    }
   }
 
   @Override

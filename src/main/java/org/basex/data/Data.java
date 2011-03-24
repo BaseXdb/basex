@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,14 +13,13 @@ import org.basex.core.cmd.InfoStorage;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
-import org.basex.index.Names;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.index.Names;
 import org.basex.io.IO;
 import org.basex.io.TableAccess;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
-import org.deepfs.fs.DeepFS;
 
 /**
  * This class provides access to the database storage.
@@ -90,8 +90,6 @@ public abstract class Data {
   /** Path summary. */
   public PathSummary pthindex;
 
-  /** DeepFS reference. */
-  public DeepFS fs;
   /** Index reference for a name attribute. */
   public int nameID;
   /** Index reference for a size attribute. */
@@ -112,7 +110,6 @@ public abstract class Data {
    */
   @SuppressWarnings("unused")
   public void init() throws IOException {
-    if(meta.deepfs) fs = new DeepFS(this);
     nameID = atts.id(DataText.NAME);
     sizeID = atts.id(DataText.SIZE);
   }
@@ -122,7 +119,6 @@ public abstract class Data {
    * @throws IOException I/O exception
    */
   public final synchronized void close() throws IOException {
-    if(fs != null) fs.close();
     cls();
   }
 

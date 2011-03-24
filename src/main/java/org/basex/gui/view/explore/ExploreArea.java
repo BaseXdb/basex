@@ -29,7 +29,6 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.Util;
-import org.deepfs.fs.DeepFS;
 
 /**
  * This is a simple user search panel.
@@ -105,7 +104,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     }
     if(!pi) return;
 
-    all.help(data.fs != null ? HELPSEARCHFS : HELPSEARCHXML);
+    all.help(HELPSEARCHXML);
     addKeys(gui.context.data);
     panel.revalidate();
     panel.repaint();
@@ -137,19 +136,15 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   private void addKeys(final Data data) {
     final TokenList tl = new TokenList();
     final int cs = panel.getComponentCount();
-    final boolean fs = data.fs != null;
-    if(fs) {
-      tl.add(Token.token(DeepFS.S_FILE));
-    } else {
-      for(int c = 0; c < cs; c += 2) {
-        final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
-        if(combo.getSelectedIndex() == 0) continue;
-        final String elem = combo.getSelectedItem().toString();
-        if(!elem.startsWith("@")) tl.add(Token.token(elem));
-      }
+
+    for(int c = 0; c < cs; c += 2) {
+      final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
+      if(combo.getSelectedIndex() == 0) continue;
+      final String elem = combo.getSelectedItem().toString();
+      if(!elem.startsWith("@")) tl.add(Token.token(elem));
     }
 
-    final TokenList tmp = data.pthindex.desc(tl, data, !fs, false);
+    final TokenList tmp = data.pthindex.desc(tl, data, true, false);
     final String[] keys = entries(tmp.toArray());
     final BaseXCombo cm = new BaseXCombo(gui, keys);
     cm.addActionListener(this);
@@ -177,16 +172,12 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param min minimum value
    * @param max maximum value
    * @param pos position
-   * @param kb kilobyte flag
-   * @param date date flag
    * @param itr integer flag
    */
   private void addSlider(final double min, final double max, final int pos,
-      final boolean kb, final boolean date, final boolean itr) {
+      final boolean itr) {
     final BaseXDSlider sl = new BaseXDSlider(gui, min, max, this);
     BaseXLayout.setWidth(sl, COMPW + BaseXDSlider.LABELW);
-    sl.kb = kb;
-    sl.date = date;
     sl.itr = itr;
     sl.addKeyListener(main);
     panel.add(sl, pos);
@@ -217,14 +208,10 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
           final StatsKey stat = names.stat(names.id(key));
           switch(stat.kind) {
             case INT:
-              addSlider(stat.min, stat.max, cp + 1,
-                  item.equals("@" + DeepFS.S_SIZE),
-                  item.equals("@" + DeepFS.S_MTIME) ||
-                  item.equals("@" + DeepFS.S_CTIME) ||
-                  item.equals("@" + DeepFS.S_ATIME), true);
+              addSlider(stat.min, stat.max, cp + 1, true);
               break;
             case DBL:
-              addSlider(stat.min, stat.max, cp + 1, false, false, false);
+              addSlider(stat.min, stat.max, cp + 1, false);
               break;
             case CAT:
               addCombo(entries(stat.cats.keys()), cp + 1);
@@ -300,20 +287,15 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         }
       }
 
-      if(data.fs != null && tb.size() == 0) {
-        tb.add("//" + DeepFS.S_FILE);
-      }
       if(attr) {
         key = "descendant-or-self::node()/" + key;
         if(tb.size() == 0) tb.add("//*");
         if(pattern.isEmpty()) pattern = PATSIMPLE;
       } else {
-        if(data.fs != null) tb.add("[" + key);
-        else tb.add("//" + key);
+        tb.add("//" + key);
         key = "text()";
       }
       tb.addExt(pattern, key, val1, key, val2);
-      if(data.fs != null && !attr) tb.add("]");
     }
 
     String qu = tb.toString();

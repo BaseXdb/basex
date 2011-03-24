@@ -27,24 +27,13 @@ public abstract class OrderBy extends ParseExpr {
   }
 
   /**
-   * Initializes the sequence builder.
-   * @param s expected number of entries
-   */
-  abstract void init(final int s);
-
-  /**
-   * Adds an item to be sorted.
+   * Returns the sort key in the given context.
    * @param ctx query context
+   * @param i current position
+   * @return sort key
    * @throws QueryException query exception
    */
-  abstract void add(final QueryContext ctx) throws QueryException;
-
-  /**
-   * Returns the specified item.
-   * @param i item index
-   * @return item
-   */
-  abstract Item get(final int i);
+  abstract Item key(final QueryContext ctx, final int i) throws QueryException;
 
   @Override
   public OrderBy remove(final Var v) {

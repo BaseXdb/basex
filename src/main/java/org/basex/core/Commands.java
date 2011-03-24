@@ -13,7 +13,7 @@ import org.basex.core.cmd.Set;
 @SuppressWarnings("all")
 public interface Commands {
   /** Create commands. */
-  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER, TRIGGER }
+  enum CmdCreate { DATABASE, DB, MAB, INDEX, USER, TRIGGER }
   /** Info commands. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, STORAGE }
   /** Drop commands. */

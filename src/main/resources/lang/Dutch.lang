@@ -23,7 +23,6 @@ b_rename=Hernoem
 b_backup=Backup
 b_restore=Restore
 b_open=Open
-b_mount=Mount
 b_cancel=Annuleer
 b_drop=Verwijder
 b_cmd=Commando
@@ -105,27 +104,10 @@ do_title=Open Database
 do_large=De database is % groot. Wil je enkele visualisaties\nsluiten om sneller te kunnen werken?
 do_nodbquestion=Wil je een nieuwe maken?
 
-dqe_title=Open DeepFS instantie
-
-dmnt_title=Mount DeepFS instantie
-dmnt_nomountpath=Geen goed mount point
-
-dfs_newtitle=Maak een nieuwe DeepFS Database
-dfs_all=Complete
-dfs_allinfo=Maak een complete (C:, D: etc. op Windows, '/' op UNIX) afbeelding van het bestandssysteem
-dfs_text=Beeldt folder op DeepFS XML af
-dfs_text1=Bestandsinformatie & Metadata
-dfs_text2=Bestandsinhoud
-dfs_cont=Inclusief tekstuele inhoud
-dfs_xml=Inclusief xml inhoud
-dfs_meta=Inclusief metadata
-dfs_nodefaultapp=Er is geen standaardapplicatie om dit bestandstype te openen
-
 dr_title=Hernoem Database
 dr_title2=Verwijder documenten
 dr_over=Oude database wordt overschreven
 dr_empty=Een lege database wordt gemaakt
-dr_overbacking=Oude database en 'backing store' worden overschreven
 dr_delete=% documenten worden verwijderd
 
 dd_title=Manage Databases
@@ -260,12 +242,6 @@ c_goback=Ga terug
 c_goforward=Ga vooruit
 c_goup=Ga omhoog
 c_gouptt=Ga een niveau omhoog.
-c_createfs=Creëer DeepFS mapping
-c_createfstt=Creëert een DeepFS filesysteem representatie vanaf een gegeven folder. De resulterende database kan later gebruikt worden om BaseX te starten als 'Desktop Query Engine' of als 'filesystem in gebruikerspace'.
-c_dqe=Desktop Query Engine
-c_dqett=Open DeepFS database en gebruik het als Desktop Search/Query Engine
-c_mountfs=Gebruik DB als FUSE
-c_mountfstt=Gebruik DeepFS database instantie als filesystem in gebruikerspace (alleen als je operating system het ondersteunt).
 c_props=Eigenschappen
 c_propstt=Toon informatie over de geopende database.
 c_add=Voegt documenten toe
@@ -494,7 +470,6 @@ info_height=Hoogte
 info_encoding=Encoding
 info_dbpath=Database Pad
 info_nodb=Geen database gevonden
-info_nodeepfs=Geen DeepFS database gevonden
 info_dberror=kon niet worden geopend.
 info_query=Query Info
 info_debug=Debug Mode
@@ -510,7 +485,7 @@ info_txtindex=Tekst Index
 info_atvindex=Attribuut Index
 info_ftindex=Full-Text Index
 info_wcindex=jokers
-info_outofdated=out-of-dated
+info_outofdate=out-of-date
 info_db=Database Eigenschappen
 info_create=Database Creatie
 info_general=Algemene Informatie
@@ -524,11 +499,9 @@ info_browsererror=Kon geen browser openen.\nOpen zelf de URL:\n\n%
 # Command Help
 ch_nohelp=Sorry, geen help beschikbaar.
 ch_create1=Maak database, index van gebruiker.
-ch_create2=Maakt een nieuwe database, index van gebruiker:
+ch_create2=Creates a new database, index, user or trigger:
 ch_create3=maakt de database [%] met een optionele [%]
 ch_create5=maakt de opgegeven index
-ch_create6=maakt filesystem database [%] voor [%]
-ch_create7=(gebruik makend van [%] en [%] als FUSE geactiveerd is)
 ch_create8=creëert de opgegeven gebruiker
 ch_create9=creëert de trigger
 ch_check1=Open or create database.
@@ -618,7 +591,6 @@ h_recent=Recent geopende bestanden
 h_qclose=Sluit de query en schoont het tekstveld op
 h_cmd=Hier kun je BaseX commando's invoeren. Probeer 'help' voor een overzicht van beschikbare commando's.\n\nJe kunt eerdere invoer terughalen met de UP en DOWN cursor keys.
 h_searchxml=Type iets in het tekstveld om in je XML document te zoeken. De volgende syntax wordt ondersteund:\n...      Vind tags en tekst\n=...   Vind exacte tekst nodes\n@ ...  Vind attributen en attribute waarden\n@=   Vind exacte attribute waarden\n/...     Evalueer input als XQuery
-h_searchfs=Type iets in het tekstveld om in je filesystem te zoeken. De volgende syntax wordt ondersteund:\n...      Vind bestanden of folders\n= ...  Vind exacte namen\n. ..     Vind bestandsextensies\n< ...  Vind bestanden kleiner dan de opgegeven grootte\n> ...  Vind bestanden groter dan de opgegeven grootte\n\nJe kunt BaseX commando's gebruiken door ze vooraf te laten gaan door een uitroepteken.
 h_xpath=In de XQuery mode kun je simpele XQuery requests opgeven.
 h_map=Deze visualisatie heet TreeMap. Alle nodes van het XML document worden als vierkanten getoond, het hele vlak wordt gevuld. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.
 h_tree=Deze visualizatie heet TreeView. Zij toont het XML document als boom en tekent de nodes in een hierarchie. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.

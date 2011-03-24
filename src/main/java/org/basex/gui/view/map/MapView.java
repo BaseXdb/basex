@@ -112,8 +112,7 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data;
     final GUIProp gprop = gui.gprop;
     if(data != null && visible()) {
-      painter = data.fs != null ? new MapFS(this, data.fs, gprop) :
-        new MapDefault(this, gprop);
+      painter = new MapDefault(this, gprop);
       mainMap = createImage();
       zoomMap = createImage();
       refreshLayout();
@@ -636,24 +635,10 @@ public final class MapView extends View implements Runnable {
       if(l > 0 && ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
       parStack[l] = pre;
 
-      if(data.fs != null) {
-        if(data.fs.isFSnode(pre)) {
-          if(data.fs.isFile(pre)) {
-            final byte[] attVal = data.attValue(data.sizeID, pre);
-            if(attVal == null) continue;
-            textLen[pre] = Token.toInt(attVal);
-            textLen[parStack[l - 1]] += textLen[pre];
-            pre += data.size(pre, kind) - 1; // skip file content
-          } else {
-            parStack[++l] = 0;
-          }
-        }
+      if(kind == Data.DOC || kind == Data.ELEM) {
+        parStack[++l] = 0;
       } else {
-        if(kind == Data.DOC || kind == Data.ELEM) {
-          parStack[++l] = 0;
-        } else {
-          textLen[pre] = data.textLen(pre, kind != Data.ATTR);
-        }
+        textLen[pre] = data.textLen(pre, kind != Data.ATTR);
       }
     }
     while(--l >= 0) textLen[parStack[l]] += textLen[parStack[l + 1]];
