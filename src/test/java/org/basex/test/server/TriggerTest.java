@@ -28,7 +28,7 @@ public final class TriggerTest {
   /** Trigger name. */
   private static final String TRIGGER_NAME = "trigger";
   /** Return value of function util:trigger. */
-  private static final String RETURN_VALUE = "GOT TRIGGERED";
+  private static final String RETURN_VALUE = "TRIGGERED";
   /** Server reference. */
   private static BaseXServer server;
   /** Client session. */
@@ -87,7 +87,7 @@ public final class TriggerTest {
     }
     // query must not contain all triggers
     String triggers = cs.execute("show triggers");
-    String[] triggerNames = triggers.split("\n");
+    String[] triggerNames = triggers.split("\\r?\\n");
     Arrays.sort(triggerNames);
     for(int i = 1; i < TRIGGER_COUNT; i++) {
       assertEquals(TRIGGER_NAME + i, triggerNames[i]);
