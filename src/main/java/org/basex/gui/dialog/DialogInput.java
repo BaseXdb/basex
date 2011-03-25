@@ -40,14 +40,13 @@ public final class DialogInput extends Dialog {
    * @param o old input
    * @param tit title string
    * @param main reference to the main window
-   * @param fs file system flag
    * @param ren type of dialog (rename database/drop documents)
    */
   public DialogInput(final String o, final String tit, final GUI main,
-      final boolean fs, final boolean ren) {
+       final boolean ren) {
     super(main, tit);
     old = o;
-    db = fs ? List.listFS(main.context) : List.list(main.context);
+    db = List.list(main.context);
     rename = ren;
 
     set(new BaseXLabel(rename ? CREATENAME : CREATETARGET, false, true).border(

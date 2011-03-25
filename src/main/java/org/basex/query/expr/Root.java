@@ -31,14 +31,13 @@ public final class Root extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = checkCtx(ctx).iter();
-    final NodeCache ni = new NodeCache().random();
-    Item i;
-    while((i = iter.next()) != null) {
+    final NodeCache nc = new NodeCache().random();
+    for(Item i; (i = iter.next()) != null;) {
       final ANode n = root(i);
       if(n == null || n.type != NodeType.DOC) CTXNODE.thrw(input);
-      ni.add(n);
+      nc.add(n);
     }
-    return ni;
+    return nc;
   }
 
   /**

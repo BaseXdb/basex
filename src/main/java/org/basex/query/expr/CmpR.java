@@ -109,8 +109,7 @@ public final class CmpR extends Single {
 
     // iterative evaluation
     final Iter ir = ctx.iter(expr);
-    Item it;
-    while((it = ir.next()) != null) {
+    for(Item it; (it = ir.next()) != null;) {
       final double d = it.dbl(input);
       if((mni ? d >= min : d > min) && (mxi ? d <= max : d < max))
         return Bln.TRUE;

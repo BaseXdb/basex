@@ -53,8 +53,7 @@ public final class IndexAccess extends Single {
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     NodeIter[] iter = {};
     final Iter ir = ctx.iter(expr);
-    Item it;
-    while((it = ir.next()) != null) {
+    for(Item it; (it = ir.next()) != null;) {
       final int s = iter.length;
       final NodeIter[] tmp = new NodeIter[s + 1];
       System.arraycopy(iter, 0, tmp, 0, s);

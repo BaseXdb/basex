@@ -16,7 +16,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.Iter;
-import org.basex.query.up.primitives.RenamePrimitive;
+import org.basex.query.up.primitives.RenameNode;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -69,7 +69,7 @@ public final class Rename extends Update {
       final byte[] uri = test.uri(rename.pref(), ctx);
       if(uri != null && !eq(rename.uri().atom(), uri)) UPNSCONFL.thrw(input);
     }
-    ctx.updates.add(new RenamePrimitive(input, targ, rename), ctx);
+    ctx.updates.add(new RenameNode(input, targ, rename), ctx);
     return null;
   }
 

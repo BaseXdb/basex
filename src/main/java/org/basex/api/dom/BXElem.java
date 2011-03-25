@@ -162,10 +162,9 @@ public final class BXElem extends BXNode implements Element {
    * @return node, or {@code null}
    */
   private ANode attribute(final String name) {
-    ANode n = null;
     final AxisIter ai = node.atts();
     final byte[] nm = Token.token(name);
-    while((n = ai.next()) != null) {
+    for(ANode n; (n = ai.next()) != null;) {
       if(Token.eq(nm, n.nname())) return n;
     }
     return null;

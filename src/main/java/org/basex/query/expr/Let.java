@@ -84,9 +84,8 @@ public final class Let extends ForLet {
             // assign average score value
             double s = 0;
             int c = 0;
-            Item it;
             final Iter ir = ctx.iter(expr);
-            while((it = ir.next()) != null) {
+            for(Item it; (it = ir.next()) != null;) {
               s += it.score();
               ++c;
             }

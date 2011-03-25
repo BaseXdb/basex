@@ -57,6 +57,7 @@ public class CmdTest {
   public final void setUp() {
     try {
       session.execute(new DropDB(NAME));
+      session.execute(new DropDB(USER));
       session.execute(new DropUser(USER));
     } catch(final BaseXException ex) {
     }
@@ -128,14 +129,6 @@ public class CmdTest {
     no(new CreateDB(" "));
     no(new CreateDB(":"));
     no(new CreateDB("/"));
-  }
-
-  /** Command test. */
-  @Test
-  public final void createFS() {
-    no(new CreateFS("test", ".s"));
-    ok(new CreateFS("test", ".settings"));
-    ok(new DropDB("test"));
   }
 
   /** Command test. */

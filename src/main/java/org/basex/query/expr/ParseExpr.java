@@ -62,7 +62,7 @@ public abstract class ParseExpr extends Expr {
     if(it == null || ir.size() == 1) return it;
 
     final Item n = ir.next();
-    if(n != null) XPSEQ.thrw(input, PAR1 + it + SEP + n +
+    if(n != null) XPSEQ.thrw(ii, PAR1 + it + SEP + n +
         (ir.next() != null ? SEP + DOTS : "") + PAR2);
     return it;
   }

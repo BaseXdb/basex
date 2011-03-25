@@ -16,6 +16,7 @@ import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.FunJava;
+import org.basex.query.item.Atm;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
@@ -72,7 +73,7 @@ public final class QueryProcessor extends Progress {
       sc.useDelimiter(",");
       while(sc.hasNext()) {
         final String[] sp = sc.next().split("=", 2);
-        bind(sp[0], sp.length > 1 ? sp[1] : "", "");
+        bind(sp[0], new Atm(token(sp.length > 1 ? sp[1] : "")));
       }
       // parse query
       ctx.parse(query);

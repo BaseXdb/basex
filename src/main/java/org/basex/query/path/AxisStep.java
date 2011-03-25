@@ -128,30 +128,27 @@ public class AxisStep extends Preds {
     if(!v.node()) NODESPATH.thrw(input, AxisStep.this, v.type);
     final AxisIter ai = axis.iter((ANode) v);
 
-    final NodeCache nb = new NodeCache();
-    ANode node;
-    while((node = ai.next()) != null) {
-      if(test.eval(node)) nb.add(node.finish());
-    }
+    final NodeCache nc = new NodeCache();
+    for(ANode n; (n = ai.next()) != null;) if(test.eval(n)) nc.add(n.finish());
 
     // evaluate predicates
     for(final Expr p : pred) {
-      ctx.size = nb.size();
+      ctx.size = nc.size();
       ctx.pos = 1;
       int c = 0;
-      for(int n = 0; n < nb.size(); ++n) {
-        ctx.value = nb.get(n);
+      for(int n = 0; n < nc.size(); ++n) {
+        ctx.value = nc.get(n);
         final Item i = p.test(ctx, input);
         if(i != null) {
           // assign score value
-          nb.get(n).score(i.score());
-          nb.item[c++] = nb.get(n);
+          nc.get(n).score(i.score());
+          nc.item[c++] = nc.get(n);
         }
         ctx.pos++;
       }
-      nb.size(c);
+      nc.size(c);
     }
-    return nb;
+    return nc;
   }
 
   /**

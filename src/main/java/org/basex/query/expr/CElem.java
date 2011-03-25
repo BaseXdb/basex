@@ -128,7 +128,7 @@ public final class CElem extends CFrag {
         if(pos  == -1) {
           nsc.add(apre, auri);
         } else if(!eq(nsc.val[pos], auri)) {
-          // [LK][CG] XQuery/namespaces: create new prefix
+          // [LK][CG] XQuery/Namespaces: create new prefix
         }
       }
       att.parent(node);

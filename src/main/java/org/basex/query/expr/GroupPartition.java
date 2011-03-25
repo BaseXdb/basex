@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import java.util.ArrayList;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
@@ -83,7 +84,6 @@ final class GroupPartition {
    * @throws QueryException var not found.
    */
   private int ngvSize(final Var[] gvs, final Var[] fls) throws QueryException {
-    // [LW] how do we handle this?
     final TokenSet fc = new TokenSet();
     final TokenSet gc = new TokenSet();
 
@@ -177,14 +177,15 @@ final class GroupPartition {
    * Returns grouped variables.
    * @param ctx context
    * @param ret return expression
+   * @param ks key list
+   * @param vs value list
    * @return iterator on the result set
    * @throws QueryException query exception
    */
-  Iter ret(final QueryContext ctx, final Expr ret) throws QueryException {
+  Iter ret(final QueryContext ctx, final Expr ret, final ArrayList<Item[]> ks,
+      final ValueList vs) throws QueryException {
     final ItemCache ir = new ItemCache();
-    final ValueList vl = new ValueList();
     if(pggv == null) cacheRet(ctx);
-    if(order != null) order.init(vl, -1);
 
     for(int i = 0; i < part.size(); ++i) {
       final GroupNode gn = part.get(i);
@@ -197,11 +198,10 @@ final class GroupPartition {
         }
       }
       if(order != null) {
-        order.add(ctx);
-        vl.add(ret.value(ctx));
+        order.add(ctx, ret, ks, vs);
       } else ir.add(ctx.iter(ret));
     }
-    return order != null ? ctx.iter(order) : ir;
+    return order != null ? ctx.iter(order.set(ks, vs)) : ir;
   }
 
   /**
@@ -209,7 +209,6 @@ final class GroupPartition {
    * @param ctx query context.
    */
   private void cacheRet(final QueryContext ctx) {
-    // [MS] the references differ... so you better make new ones!
     pggv = new Var[gv.length];
     pgngv = new Var[ngv.length];
     for(int j = 0; j < gv.length; ++j) pggv[j] = ctx.vars.get(gv[j]);

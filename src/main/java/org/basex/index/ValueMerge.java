@@ -25,7 +25,7 @@ final class ValueMerge {
 
   /** Current token. */
   byte[] token;
-  /** Current pre values. */
+  /** Current id values. */
   byte[] pre;
 
   /**

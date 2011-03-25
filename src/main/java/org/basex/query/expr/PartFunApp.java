@@ -41,7 +41,7 @@ public final class PartFunApp extends Func {
    * @param arg arguments
    */
   public PartFunApp(final InputInfo ii, final Expr func, final Var[] arg) {
-    // [LW] dynamic type propagation
+    // [LW] XQuery/HOF: dynamic type propagation
     super(ii, new QNm(), nn(arg), func.type(), true);
     expr = func;
   }

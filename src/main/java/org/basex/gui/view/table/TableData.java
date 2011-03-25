@@ -1,6 +1,7 @@
 package org.basex.gui.view.table;
 
 import static org.basex.util.Token.*;
+
 import org.basex.core.Context;
 import org.basex.core.cmd.Find;
 import org.basex.data.Data;
@@ -13,8 +14,6 @@ import org.basex.util.BoolList;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenList;
-import org.deepfs.fs.DeepFS;
-import org.deepfs.fsml.MetaElem;
 
 /**
  * This is a container for the table data.
@@ -92,18 +91,15 @@ final class TableData {
    */
   void init(final Data data) {
     roots = new TokenList();
-    if(data.fs != null) roots.add(DeepFS.FILE);
-    else {
-      // sort keys by occurrence
-      for(final byte[] k : data.pthindex.desc(EMPTY, data, true, true)) {
-        int c = 0;
-        for(final byte[] kk : data.pthindex.desc(k, data, true, false)) {
-          final Names nm = startsWith(kk, '@') ? data.atts : data.tags;
-          if(nm.stat(nm.id(delete(kk, '@'))).leaf) ++c;
-        }
-        // add keys with a minimum of three columns
-        if(c > 2) roots.add(k);
+    // sort keys by occurrence
+    for(final byte[] k : data.pthindex.desc(EMPTY, data, true, true)) {
+      int c = 0;
+      for(final byte[] kk : data.pthindex.desc(k, data, true, false)) {
+        final Names nm = startsWith(kk, '@') ? data.atts : data.tags;
+        if(nm.stat(nm.id(delete(kk, '@'))).leaf) ++c;
       }
+      // add keys with a minimum of three columns
+      if(c > 2) roots.add(k);
     }
     init(data, -1);
   }
@@ -120,30 +116,16 @@ final class TableData {
     last = "";
     rowH = 1;
 
-    if(data.fs != null) {
-      root = data.fs.fileID;
-      addCol(DeepFS.SUFFIX, false);
-      addCol(DeepFS.NAME, false);
-      addCol(DeepFS.SIZE, false);
-      addCol(DeepFS.MTIME, false);
-      addCol(MetaElem.TITLE.tok(), true);
-      addCol(MetaElem.SENDER_NAME.tok(), true);
-      addCol(MetaElem.RECEIVER_NAME.tok(), true);
-      addCol(MetaElem.ARTIST.tok(), true);
-      addCol(MetaElem.PIXEL_WIDTH.tok(), true);
-      addCol(MetaElem.PIXEL_HEIGHT.tok(), true);
-      addCol(MetaElem.ALBUM.tok(), true);
-    } else {
-      if(r == -1 && roots.size() == 0) return;
-      if(root == -1) root = data.tags.id(roots.get(0));
-      for(final byte[] k : data.pthindex.desc(
-          data.tags.key(root), data, true, true)) {
-        final boolean elem = !startsWith(k, '@');
-        final byte[] key = delete(k, '@');
-        final Names index = elem ? data.tags : data.atts;
-        if(index.stat(index.id(key)).leaf) addCol(key, elem);
-      }
+    if(r == -1 && roots.size() == 0) return;
+    if(root == -1) root = data.tags.id(roots.get(0));
+    for(final byte[] k : data.pthindex.desc(
+        data.tags.key(root), data, true, true)) {
+      final boolean elem = !startsWith(k, '@');
+      final byte[] key = delete(k, '@');
+      final Names index = elem ? data.tags : data.atts;
+      if(index.stat(index.id(key)).leaf) addCol(key, elem);
     }
+
     context(true);
   }
 
@@ -187,11 +169,9 @@ final class TableData {
   private void createRows() {
     final Data data = context.data;
     final int[] n = context.current.list;
-    final boolean fs = data.fs != null;
 
     rows = new IntList();
     for(int p : n) {
-      final int pre = p;
       final int s = p + data.size(p, data.kind(p));
       // find first root tag
       do {
@@ -201,13 +181,7 @@ final class TableData {
       // parse whole document and collect root tags
       while(p < s) {
         final int k = data.kind(p);
-        if(fs) {
-          if(data.fs.isFile(p) || pre == p) {
-            rows.add(p);
-            p += data.size(p, k); // file nodes must not be nested
-            continue;
-          }
-        } else if(k == Data.ELEM && data.name(p) == root) rows.add(p);
+        if(k == Data.ELEM && data.name(p) == root) rows.add(p);
         p += data.attSize(p, k);
       }
     }
@@ -235,15 +209,14 @@ final class TableData {
     }
 
     // sort columns by string lengths
-    if(data.fs == null) {
-      final double[] widths = new double[cs];
-      for(int c = 0; c < cs; ++c) widths[c] = cols[c].width;
-      final int[] il = Array.createOrder(widths, false);
+    final double[] widths = new double[cs];
+    for(int c = 0; c < cs; ++c) widths[c] = cols[c].width;
+    final int[] il = Array.createOrder(widths, false);
 
-      final TableCol[] cl = new TableCol[cs];
-      for(int c = 0; c < cs; ++c) cl[c] = cols[il[c]];
-      cols = cl;
-    }
+    final TableCol[] cl = new TableCol[cs];
+    for(int c = 0; c < cs; ++c) cl[c] = cols[il[c]];
+    cols = cl;
+
     setWidths(false);
   }
 
@@ -357,7 +330,7 @@ final class TableData {
       elems.add(col.elem);
     }
     final String query = Find.findTable(filters, names, elems,
-        data.tags.key(root), gprop.is(GUIProp.FILTERRT) || r, data.fs != null);
+        data.tags.key(root), gprop.is(GUIProp.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;
     return query;

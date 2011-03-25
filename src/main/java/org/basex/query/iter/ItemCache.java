@@ -72,8 +72,7 @@ public final class ItemCache extends ValueIter implements Result {
    * @throws QueryException query exception
    */
   public void add(final Iter iter) throws QueryException {
-    Item i;
-    while((i = iter.next()) != null) add(i);
+    for(Item i; (i = iter.next()) != null;) add(i);
   }
 
   /**

@@ -24,9 +24,9 @@ public class FunItem extends Item {
   /** Variables. */
   private final Var[] vars;
   /** Function expression. */
-  private Expr expr;
+  private final Expr expr;
   /** Function name. */
-  private QNm name;
+  private final QNm name;
 
   /** The closure of this function item. */
   private final VarList closure = new VarList();
@@ -136,7 +136,6 @@ public class FunItem extends Item {
       final Value... args) throws QueryException {
 
     final ValueIter ir = invIter(ctx, ii, args);
-
     final Item it = ir.next();
     if(it == null || ir.size() == 1) return it;
 

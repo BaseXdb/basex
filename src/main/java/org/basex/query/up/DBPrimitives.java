@@ -11,9 +11,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.up.primitives.NodeCopy;
-import org.basex.query.up.primitives.PrimitiveType;
-import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.up.primitives.Primitive;
 import org.basex.util.IntList;
 
 /**
@@ -35,7 +33,7 @@ final class DBPrimitives extends Primitives {
   }
 
   @Override
-  protected void add(final UpdatePrimitive p) throws QueryException {
+  protected void add(final Primitive p) throws QueryException {
     add(((DBNode) p.node).pre, p);
   }
 
@@ -80,7 +78,7 @@ final class DBPrimitives extends Primitives {
     for(final int pre : pres) {
       final NodePrimitives ups = op.get(pre);
       if(ups != null)
-        for(final UpdatePrimitive up : ups) up.update(pool);
+        for(final Primitive up : ups) up.update(pool);
 
       // pre values consist exclusively of element and attribute nodes
       if(d.kind(pre) == Data.ATTR) {
@@ -119,13 +117,13 @@ final class DBPrimitives extends Primitives {
       final int pre = nodes.get(i);
       final int parT = d.parent(pre, d.kind(pre));
       if(parT != par) {
-        // adjacent text nodes are merged. merges can only be applied directly
-        // after the update if no lower pre values or the same pre value
-        // are effected. this is not
-        // the case for 'replace node', 'delete', 'insert before' and
-        // 'insert after' operations. a node, being target of 'insert before'
-        // or 'insert after', can still be replaced, or deleted. merging texts
-        // would result in the second node also being deleted/replaced.
+        /* adjacent text nodes are merged. merges can only be applied directly
+         * after the update if no lower pre values or the same pre value
+         * are effected. this is not the case for 'replace node', 'delete',
+         * 'insert before' and 'insert after' operations. a node that is target
+         * of 'insert before' or 'insert after' can still be replaced, or
+         * deleted. merging texts would result in the second node also being
+         * deleted/replaced. */
         if(first > -1) mergeTexts(par, first);
         first = -1;
         par = parT;
@@ -134,11 +132,7 @@ final class DBPrimitives extends Primitives {
       final NodePrimitives prim = op.get(pre);
       prim.optimize();
       if(prim.textAdjacency()) first = pre;
-      for(final UpdatePrimitive p : prim) {
-        final PrimitiveType t = p.type();
-        p.apply(add);
-        if(t == INSERTBEFORE) add = ((NodeCopy) p).md.meta.size;
-      }
+      for(final Primitive up : prim) add += up.apply(add);
     }
     if(first > -1) mergeTexts(par, first);
     d.flush();
@@ -166,7 +160,7 @@ final class DBPrimitives extends Primitives {
       final int k = d.kind(p);
       if(k == Data.ELEM) p += d.size(p, k);
       else if(p < l - 1 && k == Data.TEXT &&
-          UpdatePrimitive.mergeTexts(d, p, p + 1)) --l;
+          Primitive.mergeTexts(d, p, p + 1)) --l;
       else ++p;
     }
   }
@@ -176,8 +170,8 @@ final class DBPrimitives extends Primitives {
     final NodePrimitives up = op.get(n);
 
     if(up != null)
-      for(final UpdatePrimitive pr : up) if(pr.type() == REPLACENODE ||
-        pr.type() == DELETE) return true;
+      for(final Primitive pr : up) if(pr.type() == REPLACENODE ||
+        pr.type() == DELETENODE) return true;
 
     final int p = d.parent(n, d.kind(n));
     if(p == -1) return false;

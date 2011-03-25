@@ -2,24 +2,24 @@ package org.basex.query.up;
 
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;
-import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.up.primitives.Primitive;
 
 /**
  * Interface for a container that holds all update primitives for a specific
- * database node. The {@link UpdatePrimitive} are ordered after their
- * {@link PrimitiveType}. There is at most one {@link UpdatePrimitive} for each
- * type. Duplicate {@link UpdatePrimitive} are merged.
+ * database node. The {@link Primitive} are ordered after their
+ * {@link PrimitiveType}. There is at most one {@link Primitive} for each
+ * type. Duplicate {@link Primitive} are merged.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-interface NodePrimitives extends Iterable<UpdatePrimitive> {
+interface NodePrimitives extends Iterable<Primitive> {
   /**
    * Adds a primitive to the container.
    * @param p primitive to be added
    * @throws QueryException query exception
    */
-  void add(final UpdatePrimitive p) throws QueryException;
+  void add(final Primitive p) throws QueryException;
 
   /**
    * Finds a primitive with the given type. {@code null} is returned if there
@@ -27,7 +27,7 @@ interface NodePrimitives extends Iterable<UpdatePrimitive> {
    * @param t type of the primitive to find
    * @return primitive of type t or {@code null} if not found
    */
-  UpdatePrimitive find(final PrimitiveType t);
+  Primitive find(final PrimitiveType t);
 
   /**
    * Optimizes accumulated update operations for the specific target node.
