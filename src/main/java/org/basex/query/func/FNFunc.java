@@ -80,7 +80,7 @@ final class FNFunc extends Fun {
    * @return function item
    * @throws QueryException query exception
    */
-  private FunItem partApp(final QueryContext ctx, final InputInfo ii)
+  private Item partApp(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final FunItem f = getFun(0, FunType.ANY, ctx);
     final Value v = expr[1].value(ctx);
@@ -99,8 +99,8 @@ final class FNFunc extends Fun {
       vals[j] = new VarRef(ii, vars[i]);
     }
 
-    return (FunItem) new PartFunApp(ii,
-        new DynFunCall(ii, f, vals), vars).comp(ctx);
+    return new PartFunApp(ii, new DynFunCall(ii, f, vals),
+        vars).comp(ctx).item(ctx, ii);
   }
 
   /**
@@ -307,7 +307,8 @@ final class FNFunc extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 || super.uses(u);
+    return def == FunDef.PARTAPP && u == Use.CTX || u == Use.X30 ||
+        super.uses(u);
   }
 
   @Override
