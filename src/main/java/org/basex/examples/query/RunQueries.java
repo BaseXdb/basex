@@ -124,8 +124,7 @@ public final class RunQueries {
 
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize
-    Item item;
-    while((item = iter.next()) != null) {
+    for(Item item; (item = iter.next()) != null;) {
       System.out.println(item.toJava());
     }
 
@@ -158,8 +157,7 @@ public final class RunQueries {
 
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents
-    Item item;
-    while((item = iter.next()) != null) {
+    for(Item item; (item = iter.next()) != null;) {
       item.serialize(xml);
     }
 

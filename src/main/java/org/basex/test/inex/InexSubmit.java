@@ -414,9 +414,8 @@ public final class InexSubmit {
         token("total_time_ms"), token(qtimes[q])
     );
 
-    Item a;
     int r = 1;
-    while(res != null && (a = res.next()) != null && r <= k) {
+    for(Item a; res != null && (a = res.next()) != null && r <= k;) {
       final byte[] s = a.atom(null);
       final int i = indexOf(s, ';');
       xml.openElement(token("result"));
