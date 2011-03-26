@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Namespaces;
@@ -58,6 +59,13 @@ public final class VarRef extends ParseExpr {
 
     ctx.ns = ns;
     return e;
+  }
+
+  @Override
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    var = ctx.vars.get(var);
+    return var.item(ctx, ii);
   }
 
   @Override

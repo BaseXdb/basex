@@ -182,12 +182,9 @@ public final class PlotView extends View {
           xCombo.setModel(new DefaultComboBoxModel(keys));
           yCombo.setModel(new DefaultComboBoxModel(keys));
           if(keys.length > 0) {
-            // choose size category as default for vertical axis
-            int y = 0;
             // choose name category as default for horizontal axis
-            int x = y == 0 ? Math.min(1, keys.length) : 0;
-            xCombo.setSelectedIndex(x);
-            yCombo.setSelectedIndex(y);
+            xCombo.setSelectedIndex(Math.min(1, keys.length));
+            yCombo.setSelectedIndex(0);
           }
         }
         drawSubNodes = true;
@@ -269,10 +266,6 @@ public final class PlotView extends View {
         Transparency.BITMASK);
     final Graphics g = plotImg.getGraphics();
     smooth(g);
-
-    // overdraw plot background
-    /*g.setColor(color1);
-    g.fillRect(MARGIN[1] + sz, MARGIN[0], plotWidth - sz, plotHeight - sz);*/
 
     // draw axis and grid
     drawAxis(g, true);

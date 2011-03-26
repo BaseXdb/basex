@@ -26,6 +26,8 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class BaseXGUI {
+  /** Database context. */
+  final Context context = new Context();
   /** Mac OS X GUI optimizations. */
   GUIMacOSX osxGUI;
   /** File, specified as argument. */
@@ -57,8 +59,7 @@ public final class BaseXGUI {
     }
 
     // read properties
-    final Context ctx = new Context();
-    ctx.prop.set(Prop.CACHEQUERY, true);
+    context.prop.set(Prop.CACHEQUERY, true);
     Prop.gui = true;
     final GUIProp gprop = new GUIProp();
 
@@ -70,7 +71,7 @@ public final class BaseXGUI {
         // initialize look and feel
         init(gprop);
         // open main window
-        final GUI gui = new GUI(ctx, gprop);
+        final GUI gui = new GUI(context, gprop);
         if(osxGUI != null) osxGUI.init(gui);
 
         // open specified document or database

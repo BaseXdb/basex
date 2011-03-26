@@ -177,8 +177,8 @@ public final class HTTPClient {
       final String mediaType = string(r.payloadAttrs.get(MEDIATYPE));
       if(r.isMultipart) {
         final String b = string(r.payloadAttrs.get(BOUNDARY));
-        final String boundary = (b != null) ? b : DEFAULT_BOUND;
-        StringBuilder sb = new StringBuilder();
+        final String boundary = b != null ? b : DEFAULT_BOUND;
+        final StringBuilder sb = new StringBuilder();
         sb.append(mediaType).append("; ").append("boundary=").append(boundary);
         conn.setRequestProperty(CONT_TYPE, sb.toString());
       } else {
@@ -252,7 +252,7 @@ public final class HTTPClient {
     String method = null;
 
     for(int i = 0; i < payloadAtts.size(); i++) {
-      byte[] key = payloadAtts.keys()[i];
+      final byte[] key = payloadAtts.keys()[i];
       if(eq(key, MEDIATYPE)) mediaType = payloadAtts.get(key);
       else if(eq(key, SRC)) src = string(payloadAtts.get(key));
       else if(eq(key, METHOD)) method = string(payloadAtts.get(key));
@@ -322,13 +322,13 @@ public final class HTTPClient {
   private static void writePart(final Part part, final OutputStream out,
       final byte[] boundary) throws IOException {
     // Write boundary preceded by "--"
-    TokenBuilder boundTb = new TokenBuilder();
+    final TokenBuilder boundTb = new TokenBuilder();
     boundTb.add("--").add(boundary).add(CRLF);
     out.write(boundTb.finish());
 
     // Write headers
     for(final byte[] headerName : part.headers.keys()) {
-      TokenBuilder hdrTb = new TokenBuilder();
+      final TokenBuilder hdrTb = new TokenBuilder();
       hdrTb.add(headerName).add(": ".getBytes()).add(
           part.headers.get(headerName)).add(CRLF);
       out.write(hdrTb.finish());
