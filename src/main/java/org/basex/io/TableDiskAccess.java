@@ -258,12 +258,12 @@ public final class TableDiskAccess extends TableAccess {
 
     // number of bytes occupied by old records in the current block:
     final int nold = npre - fpre << IO.NODEPOWER;
-    // number of bytes occupied by old records which will be after the new ones:
-    final int nlast = nold - split;
+    // number of bytes occupied by old records which will be moved at the end:
+    final int moved = nold - split;
 
     // special case: all entries fit in the current block:
     if(nold + entries.length <= IO.BLOCKSIZE) {
-      System.arraycopy(bf.data, split, bf.data, split + entries.length, nlast);
+      System.arraycopy(bf.data, split, bf.data, split + entries.length, moved);
       System.arraycopy(entries, 0, bf.data, split, entries.length);
       bf.dirty = true;
 
@@ -278,9 +278,9 @@ public final class TableDiskAccess extends TableAccess {
 
     // append old entries at the end of the new entries:
     // [DP] the following can be optimized to avoid copying arrays:
-    final byte[] all = new byte[entries.length + nlast];
+    final byte[] all = new byte[entries.length + moved];
     System.arraycopy(entries, 0, all, 0, entries.length);
-    System.arraycopy(bf.data, split, all, entries.length, nlast);
+    System.arraycopy(bf.data, split, all, entries.length, moved);
 
     // fill in the current block with new entries:
     // number of bytes which can fit in the first block:
