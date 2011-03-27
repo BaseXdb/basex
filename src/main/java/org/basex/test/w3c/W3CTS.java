@@ -489,20 +489,20 @@ public abstract class W3CTS {
             iter.reset();
 
             try {
-              final ItemCache ir = toIter(string(res).replaceAll(
+              final ItemCache ic = toIter(string(res).replaceAll(
                   "^<\\?xml.*?\\?>", "").trim(), frag);
-              if(FNSimple.deep(null, iter, ir)) break;
+              if(FNSimple.deep(null, iter, ic)) break;
 
-              ir.reset();
+              ic.reset();
               final ItemCache ia = toIter(string(actual), frag);
-              if(FNSimple.deep(null, ia, ir)) break;
+              if(FNSimple.deep(null, ia, ic)) break;
 
               if(debug) {
                 iter.reset();
-                ir.reset();
+                ic.reset();
                 final XMLSerializer ser = new XMLSerializer(System.out);
                 Util.outln(NL + "=== " + testid + " ===");
-                for(Item it; (it = ir.next()) != null;) it.serialize(ser);
+                for(Item it; (it = ic.next()) != null;) it.serialize(ser);
                 Util.outln(NL + "=== " + NAME + " ===");
                 for(Item it; (it = iter.next()) != null;) it.serialize(ser);
                 Util.outln();
@@ -846,7 +846,7 @@ public abstract class W3CTS {
     try {
       return TextInput.content(f).toString().replaceAll("\r\n?", "\n");
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      Util.errln(ex);
       return "";
     }
   }
