@@ -83,7 +83,6 @@ final class FNFunc extends Fun {
   private Item partApp(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final FunItem f = getFun(0, FunType.ANY, ctx);
-    final Value v = expr[1].value(ctx);
     final long pos = expr.length == 2 ? 0 : checkItr(expr[2], ctx) - 1;
 
     final int arity = f.arity();
@@ -92,7 +91,7 @@ final class FNFunc extends Fun {
     final FunType ft = (FunType) f.type;
     final Var[] vars = new Var[arity - 1];
     final Expr[] vals = new Expr[arity];
-    vals[(int) pos] = v;
+    vals[(int) pos] = expr[1];
     for(int i = 0, j = 0; i < arity - 1; i++, j++) {
       if(i == pos) j++;
       vars[i] = ctx.uniqueVar(ii, ft.args[j]);
