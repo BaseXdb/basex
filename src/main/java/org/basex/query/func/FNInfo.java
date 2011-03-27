@@ -67,11 +67,11 @@ final class FNInfo extends Fun {
         }
         return val.iter();
       case ENVS:
-        final ItemCache ir = new ItemCache();
+        final ItemCache ic = new ItemCache();
         for(final Object k : System.getenv().keySet().toArray()) {
-          ir.add(Str.get(k));
+          ic.add(Str.get(k));
         }
-        return ir;
+        return ic;
       default:
         return super.iter(ctx);
     }

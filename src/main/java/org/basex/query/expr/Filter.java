@@ -107,26 +107,26 @@ public class Filter extends Preds {
     final long cp = ctx.pos;
 
     // cache results to support last() function
-    final ItemCache ir = new ItemCache();
-    for(Item i; (i = iter.next()) != null;) ir.add(i);
+    final ItemCache ic = new ItemCache();
+    for(Item i; (i = iter.next()) != null;) ic.add(i);
 
     // evaluate predicates
     for(final Expr p : pred) {
-      final long is = ir.size();
+      final long is = ic.size();
       ctx.size = is;
       ctx.pos = 1;
       int c = 0;
       for(int s = 0; s < is; ++s) {
-        ctx.value = ir.get(s);
-        if(p.test(ctx, input) != null) ir.set(ir.get(s), c++);
+        ctx.value = ic.get(s);
+        if(p.test(ctx, input) != null) ic.set(ic.get(s), c++);
         ctx.pos++;
       }
-      ir.size(c);
+      ic.size(c);
     }
     ctx.value = cv;
     ctx.size = cs;
     ctx.pos = cp;
-    return ir;
+    return ic;
   }
 
   /**

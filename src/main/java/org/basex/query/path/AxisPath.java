@@ -20,7 +20,6 @@ import org.basex.query.expr.Pos;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -122,8 +121,7 @@ public class AxisPath extends Path {
    */
   private long size(final QueryContext ctx) {
     final Value rt = root(ctx);
-    final Data data = rt != null && rt.type == NodeType.DOC &&
-      rt instanceof DBNode ? ((DBNode) rt).data : null;
+    final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
 
     if(data == null || !data.meta.pathindex || !data.meta.uptodate ||
         !data.single()) return -1;
@@ -165,24 +163,14 @@ public class AxisPath extends Path {
 
     // check if all context nodes reference document nodes
     final Data data = ctx.resource.data();
-    if(data != null) {
-      boolean doc = ctx.resource.docNodes();
-      if(!doc) {
-        final Iter iter = ctx.value.iter();
-        for(Item it; (it = iter.next()) != null;) {
-          doc = it.type == NodeType.DOC;
-          if(!doc) break;
-        }
-      }
-      if(doc && data.meta.uptodate) {
-        Expr e = this;
-        // check index access
-        if(root != null && !uses(Use.POS)) e = index(ctx, data);
-        // check children path rewriting
-        if(e == this) e = children(ctx, data);
-        // return optimized expression
-        if(e != this) return e.comp(ctx);
-      }
+    if(data != null && data.meta.uptodate) {
+      Expr e = this;
+      // check index access
+      if(root != null && !uses(Use.POS)) e = index(ctx, data);
+      // check children path rewriting
+      if(e == this) e = children(ctx, data);
+      // return optimized expression
+      if(e != this) return e.comp(ctx);
     }
 
     // analyze if result set can be cached - no predicates/variables...
@@ -487,7 +475,7 @@ public class AxisPath extends Path {
         if(root instanceof CAttr) {
           if(sa == CHILD || sa == DESC) return s;
         } else if(root instanceof DBNode &&
-            ((DBNode) root).type == NodeType.DOC || root instanceof CDoc) {
+            ((Value) root).type == NodeType.DOC || root instanceof CDoc) {
           if(sa != CHILD && sa != DESC && sa != DESCORSELF &&
             (sa != SELF && sa != ANCORSELF ||
              s.test != Test.NOD && s.test != Test.DOC)) return s;

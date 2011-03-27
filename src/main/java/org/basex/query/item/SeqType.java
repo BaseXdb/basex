@@ -294,13 +294,13 @@ public final class SeqType {
     Item n = iter.next();
     if(zeroOrOne() && n != null) Err.cast(ii, type, val);
 
-    final ItemCache ir = new ItemCache();
-    ir.add(it);
+    final ItemCache ic = new ItemCache();
+    ic.add(it);
     while(n != null) {
-      ir.add(check(instance(n, ii) ? n : type.e(n, ctx, ii), ii));
+      ic.add(check(instance(n, ii) ? n : type.e(n, ctx, ii), ii));
       n = iter.next();
     }
-    return ir.finish();
+    return ic.finish();
   }
 
   /**

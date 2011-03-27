@@ -1,5 +1,6 @@
 package org.basex.query.item;
 
+import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -44,6 +45,14 @@ public abstract class Value extends Expr {
   @Override
   public Value value(final QueryContext ctx) {
     return this;
+  }
+
+  /**
+   * Returns the data reference (if) attached to this value.
+   * @return data reference
+   */
+  public Data data() {
+    return null;
   }
 
   @Override

@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -84,6 +86,8 @@ public final class QueryContext extends Progress {
   public long pos;
   /** Current context size. */
   public long size;
+  /** Optional initial context set. */
+  Nodes nodes;
 
   /** Current full-text options. */
   public FTOpt ftopt;
@@ -148,8 +152,6 @@ public final class QueryContext extends Progress {
   final StringList modLoaded = new StringList();
   /** Serializer options. */
   SerializerProp serProp;
-  /** Initial context set (default: null). */
-  Nodes nodes;
 
   /** Initial context value type. */
   SeqType initType;
@@ -211,9 +213,8 @@ public final class QueryContext extends Progress {
       try {
         value = initExpr.value(this);
       } catch(final QueryException ex) {
-        // only {@link ParseExpr} instance will throw an exception
-        final Err err = ex.err();
-        if(err != Err.XPNOCTX) throw ex;
+        if(ex.err() != Err.XPNOCTX) throw ex;
+        // only {@link ParseExpr} instances may cause this error
         CTXINIT.thrw(((ParseExpr) initExpr).input, ex.getMessage());
       }
     } else if(nodes != null) {
@@ -250,39 +251,37 @@ public final class QueryContext extends Progress {
    */
   protected Result eval() throws QueryException {
     // evaluates the query
-    final Iter it = iter();
-    final ItemCache ir = new ItemCache();
-    Item i;
+    final Iter ir = iter();
+    final ItemCache ic = new ItemCache();
+    Item it;
 
     // check if all results belong to the database of the input context
     if(nodes != null) {
-      final Data data = nodes.data;
       final IntList pre = new IntList();
 
-      while((i = it.next()) != null) {
+      while((it = ir.next()) != null) {
         checkStop();
-        if(!(i instanceof DBNode)) break;
-        final DBNode n = (DBNode) i;
-        if(n.data != data) break;
-        pre.add(((DBNode) i).pre);
+        if(!(it instanceof DBNode)) break;
+        if(it.data() != nodes.data) break;
+        pre.add(((DBNode) it).pre);
       }
 
       // completed... return standard nodeset with full-text positions
       final int ps = pre.size();
-      if(i == null) return ps == 0 ? ir :
-          new Nodes(pre.toArray(), data, ftpos).checkRoot();
+      if(it == null) return ps == 0 ? ic :
+          new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
 
       // otherwise, add nodes to standard iterator
-      for(int p = 0; p < ps; ++p) ir.add(new DBNode(data, pre.get(p)));
-      ir.add(i);
+      for(int p = 0; p < ps; ++p) ic.add(new DBNode(nodes.data, pre.get(p)));
+      ic.add(it);
     }
 
     // use standard iterator
-    while((i = it.next()) != null) {
+    while((it = ir.next()) != null) {
       checkStop();
-      ir.add(i);
+      ic.add(it);
     }
-    return ir;
+    return ic;
   }
 
   /**
@@ -308,9 +307,9 @@ public final class QueryContext extends Progress {
   /**
    * Recursively serializes the query plan.
    * @param ser serializer
-   * @throws Exception exception
+   * @throws IOException I/O exception
    */
-  protected void plan(final Serializer ser) throws Exception {
+  protected void plan(final Serializer ser) throws IOException {
     // only show root node if functions or variables exist
     final boolean r = funcs.size() != 0 || vars.global().size != 0;
     if(r) ser.openElement(PLAN);

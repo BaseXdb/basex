@@ -266,7 +266,7 @@ final class FNSeq extends Fun {
   /**
    * Removes an item at a specified position in a sequence.
    * @param ctx query context
-   * @return iterator without Item
+   * @return iterator without item
    * @throws QueryException query exception
    */
   private Iter remove(final QueryContext ctx) throws QueryException {

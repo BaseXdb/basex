@@ -50,8 +50,8 @@ public abstract class Bin extends Item {
   @Override
   public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Bin)) return false;
-    final Bin i = (Bin) cmp;
-    return type == i.type && Token.eq(val, i.val);
+    final Bin b = (Bin) cmp;
+    return type == b.type && Token.eq(val, b.val);
   }
 
   @Override

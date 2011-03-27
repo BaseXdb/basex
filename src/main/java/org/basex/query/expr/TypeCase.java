@@ -77,9 +77,9 @@ public final class TypeCase extends Single {
 
     final int s = ctx.vars.size();
     ctx.vars.add(var.bind(seq.finish(), ctx).copy());
-    final ItemCache ir = ItemCache.get(ctx.iter(expr));
+    final ItemCache ic = ItemCache.get(ctx.iter(expr));
     ctx.vars.reset(s);
-    return ir;
+    return ic;
   }
 
   @Override

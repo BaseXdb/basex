@@ -240,9 +240,9 @@ final class FNFunc extends Fun {
    */
   private Iter sortWith(final QueryContext ctx) throws QueryException {
     final FunItem lt = withArity(0, 2, ctx);
-    final ItemCache items = ItemCache.get(expr[1].iter(ctx));
+    final ItemCache ic = ItemCache.get(expr[1].iter(ctx));
     try {
-      Arrays.sort(items.item, 0, (int) items.size(), new Comparator<Item>(){
+      Arrays.sort(ic.item, 0, (int) ic.size(), new Comparator<Item>(){
         @Override
         public int compare(final Item it1, final Item it2) {
           try {
@@ -256,7 +256,7 @@ final class FNFunc extends Fun {
     } catch(final QueryError err) {
       throw err.wrapped();
     }
-    return items;
+    return ic;
   }
 
   /**

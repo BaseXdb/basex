@@ -153,13 +153,13 @@ final class GroupPartition {
     final ItemCache[] sq = items.get(p);
 
     for(int i = 0; i < ngl; ++i) {
-      ItemCache ir = sq[i];
+      ItemCache ic = sq[i];
       final Iter iter = ngv[i].iter(ctx);
-      if(ir == null) {
-        ir = new ItemCache();
-        sq[i] = ir;
+      if(ic == null) {
+        ic = new ItemCache();
+        sq[i] = ic;
       }
-      ir.add(iter);
+      ic.add(iter);
     }
   }
 
@@ -184,7 +184,7 @@ final class GroupPartition {
    */
   Iter ret(final QueryContext ctx, final Expr ret, final ArrayList<Item[]> ks,
       final ValueList vs) throws QueryException {
-    final ItemCache ir = new ItemCache();
+    final ItemCache ic = new ItemCache();
     if(pggv == null) cacheRet(ctx);
 
     for(int i = 0; i < part.size(); ++i) {
@@ -199,9 +199,9 @@ final class GroupPartition {
       }
       if(order != null) {
         order.add(ctx, ret, ks, vs);
-      } else ir.add(ctx.iter(ret));
+      } else ic.add(ctx.iter(ret));
     }
-    return order != null ? ctx.iter(order.set(ks, vs)) : ir;
+    return order != null ? ctx.iter(order.set(ks, vs)) : ic;
   }
 
   /**

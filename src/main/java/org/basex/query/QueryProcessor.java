@@ -278,9 +278,9 @@ public final class QueryProcessor extends Progress {
   /**
    * Returns the query plan in the dot notation.
    * @param ser serializer
-   * @throws Exception exception
+   * @throws IOException I/O exception
    */
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ctx.plan(ser);
   }
 

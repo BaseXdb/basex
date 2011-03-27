@@ -201,14 +201,14 @@ public final class CmpG extends Cmp {
     // evaluate two iterators
     if(!ir2.reset()) {
       // cache items for next comparisons
-      final ItemCache ir = new ItemCache();
+      final ItemCache ic = new ItemCache();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {
           if(eval(it1, it2)) return Bln.TRUE;
-          ir.add(it2);
+          ic.add(it2);
         }
       }
-      ir2 = ir;
+      ir2 = ic;
     }
 
     while((it1 = ir1.next()) != null) {

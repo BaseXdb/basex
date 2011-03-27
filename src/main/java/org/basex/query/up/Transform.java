@@ -86,9 +86,9 @@ public final class Transform extends Arr {
     ctx.updates.apply(ctx);
     ctx.updates = tmp;
 
-    final ItemCache ir = ItemCache.get(ctx.iter(expr[1]));
+    final ItemCache ic = ItemCache.get(ctx.iter(expr[1]));
     ctx.vars.reset(s);
-    return ir;
+    return ic;
   }
 
   @Override
