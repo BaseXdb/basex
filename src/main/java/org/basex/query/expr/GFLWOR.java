@@ -177,32 +177,37 @@ public class GFLWOR extends ParseExpr {
    * @param ctx query context
    */
   private void compForLet(final QueryContext ctx) {
-    // check if all clauses are simple, and if variables are removable
+    // modification flag
     boolean m = false;
-    // loop through all clauses
-    for(int f = fl.length - 1; f >= 0; --f) {
-      ForLet t = fl[f];
-      // ignore for clauses and constructors
-      if(t instanceof For || t.uses(Use.CTX) || t.uses(Use.CNS)) continue;
-      // loop through all outer clauses
-      for(int g = f - 1; g >= 0; --g) {
-        // stop if variable used by the current clause
-        if(t.count(fl[g].var) != 0) break;
-        // ignore let clauses
-        if(fl[g] instanceof Let) continue;
-        // stop if variable is used as position or score
-        final For fr = (For) fl[g];
-        if(fr.pos != null && t.count(fr.pos) != 0 ||
-           fr.score != null && t.count(fr.score) != 0) break;
 
-        // move let clause to outer position
-        System.arraycopy(fl, g, fl, g + 1, f - g);
-        fl[g] = t;
-        t = fl[f];
-        if(!m) ctx.compInfo(OPTFORLET);
-        m = true;
+    for(int i = 1; i < fl.length; i++) {
+      final ForLet cls = fl[i];
+      // move let clauses upwards if possible
+      // expressions that depend on the current context (e.g. math:random())
+      // or fragment constructors creating unique nodes are left alone
+      if(cls instanceof Let && !cls.uses(Use.CTX) && !cls.uses(Use.CNS)) {
+        final Let let = (Let) cls;
+
+        // find highest for clause that can be skipped
+        int fpos = -1;
+        for(int j = i; j-- != 0;) {
+          final ForLet o = fl[j];
+          if(let.count(o.var) != 0) break;
+          if(o instanceof For) {
+            final For fr = (For) o;
+            if(fr.pos != null && let.count(fr.pos) != 0 ||
+                fr.score != null && let.count(fr.score) != 0) break;
+            fpos = j;
+          }
+        }
+        if(fpos != -1) {
+          Array.move(fl, fpos, 1, i - fpos);
+          fl[fpos] = let;
+          m = true;
+        }
       }
     }
+    if(m) ctx.compInfo(OPTFORLET);
   }
 
   /**
