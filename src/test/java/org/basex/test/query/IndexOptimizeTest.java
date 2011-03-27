@@ -101,7 +101,22 @@ public final class IndexOptimizeTest {
     createColl();
     final String doc = "db:open('" + NAME + "')";
     check(doc + "//*[text() = '1']");
-    check(doc + "//*[text() contains text '2']");
+    check(doc + "//*[text() <- '2']");
+  }
+
+  /**
+   * Checks full-text requests.
+   * @throws Exception unexpected exception
+   */
+  @Test
+  public void ftTest() throws Exception {
+    createDoc();
+    new Open(NAME).execute(CTX);
+    check("//*[text() <- '1']", "<a>1</a>");
+    check("//*[text() <- '1 2' any word]", "<a>1</a><a>2 3</a>");
+    check("//*[text() <- {'2','4'} all]", "");
+    check("//*[text() <- {'2','3'} all words]", "<a>2 3</a>");
+    check("//*[text() <- {'2','4'} all words]", "");
   }
 
   /**
@@ -130,25 +145,39 @@ public final class IndexOptimizeTest {
    * @param query query to be tested
    */
   private void check(final String query) {
+    check(query, null);
+  }
+
+  /**
+   * Checks if specified query was rewritten for index access, and checks the
+   * query result.
+   * @param query query to be tested
+   * @param result expected query result
+   */
+  private void check(final String query, final String result) {
     // compile query
     ArrayOutput plan = null;
     QueryProcessor qp = new QueryProcessor(query, CTX);
     try {
-      qp.compile();
+      ArrayOutput ao = new ArrayOutput();
+      XMLSerializer xml = qp.getSerializer(ao);
+      qp.execute().serialize(xml);
       qp.close();
+      if(result != null)
+        assertEquals(result, ao.toString().replaceAll("\\r?\\n", ""));
 
       // fetch query plan
       plan = new ArrayOutput();
       qp.plan(new XMLSerializer(plan));
 
       qp = new QueryProcessor(plan + "//(IndexAccess|FTIndexAccess)", CTX);
-      final ArrayOutput result = new ArrayOutput();
-      final XMLSerializer xml = qp.getSerializer(result);
+      ao = new ArrayOutput();
+      xml = qp.getSerializer(ao);
       qp.execute().serialize(xml);
 
       // check if IndexAccess is used
       assertTrue("No index used:\nQuery: " + query + "\nPlan: " + plan,
-          !result.toString().isEmpty());
+          !ao.toString().isEmpty());
     } catch(final QueryException ex) {
       fail(ex.getMessage() + "\nQuery: " + query + "\nPlan: " + plan);
     } catch(final IOException ex) {

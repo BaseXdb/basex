@@ -183,7 +183,6 @@ public class GFLWOR extends ParseExpr {
     for(int f = fl.length - 1; f >= 0; --f) {
       ForLet t = fl[f];
       // ignore for clauses and constructors
-      // [LW] why is the CTX check needed (it actually is), can it be replaced?
       if(t instanceof For || t.uses(Use.CTX) || t.uses(Use.CNS)) continue;
       // loop through all outer clauses
       for(int g = f - 1; g >= 0; --g) {

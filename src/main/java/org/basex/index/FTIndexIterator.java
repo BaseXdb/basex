@@ -99,6 +99,11 @@ public abstract class FTIndexIterator extends IndexIterator {
       public double score() {
         return Scoring.union(i1.score(), i2.score());
       }
+
+      @Override
+      public String toString() {
+        return "(" + i1 + " | " + i2 + ")";
+      }
     };
   }
 
@@ -152,6 +157,11 @@ public abstract class FTIndexIterator extends IndexIterator {
       @Override
       public double score() {
         return Scoring.intersect(i1.score(), i2.score());
+      }
+
+      @Override
+      public String toString() {
+        return "(" + i1 + " & " + i2 + ")";
       }
     };
   }

@@ -221,7 +221,7 @@ final class FNDb extends Fun {
       throws QueryException {
 
     return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
+      final Iter ir = ctx.iter(expr[0]);
 
       @Override
       public Item next() throws QueryException {
