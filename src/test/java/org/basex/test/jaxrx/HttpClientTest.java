@@ -388,7 +388,6 @@ public final class HttpClientTest {
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
     HTTPClient.setRequestContent(fakeConn.getOutputStream(), req);
-    System.out.println(fakeConn.out.toString());
   }
 
   /**
@@ -590,22 +589,21 @@ public final class HttpClientTest {
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-class FakeHttpConnection extends HttpURLConnection {
-
+final class FakeHttpConnection extends HttpURLConnection {
   /** Request headers. */
-  public Map<String, List<String>> headers;
+  Map<String, List<String>> headers;
   /** Content-type. */
-  public String contentType;
+  String contentType;
   /** Content. */
-  public byte[] content;
+  byte[] content;
   /** Connection output stream. */
-  public ByteArrayOutputStream out;
+  ByteArrayOutputStream out;
 
   /**
    * Constructor.
    * @param u uri
    */
-  public FakeHttpConnection(final URL u) {
+  FakeHttpConnection(final URL u) {
     super(u);
     out = new ByteArrayOutputStream();
   }
@@ -653,20 +651,14 @@ class FakeHttpConnection extends HttpURLConnection {
 
   @Override
   public void disconnect() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public boolean usingProxy() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public void connect() {
-    // TODO Auto-generated method stub
-
   }
-
 }
