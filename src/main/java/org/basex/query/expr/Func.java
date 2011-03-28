@@ -8,6 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -92,13 +93,29 @@ public class Func extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    // evaluate function and reset variable scope
+    final Value cv = ctx.value;
+    ctx.value = null;
+    final Item it = expr.item(ctx, ii);
+    ctx.value = cv;
+    return cast ? ret.cast(it, this, ctx, input) : it;
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
     // evaluate function and reset variable scope
     final Value cv = ctx.value;
     ctx.value = null;
     final Value v = expr.value(ctx);
     ctx.value = cv;
-    return (cast ? ret.cast(v, ctx, input) : v).iter(ctx);
+    return cast ? ret.cast(v, this, ctx, input) : v;
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    return value(ctx).iter();
   }
 
   @Override

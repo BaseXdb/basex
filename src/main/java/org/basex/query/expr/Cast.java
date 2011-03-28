@@ -53,7 +53,7 @@ public final class Cast extends Single {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return type.cast(expr, this, ctx);
+    return type.cast(expr.item(ctx, ii), this, ctx, ii);
   }
 
   @Override

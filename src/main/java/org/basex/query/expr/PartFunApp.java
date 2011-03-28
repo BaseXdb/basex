@@ -13,7 +13,7 @@ import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
- * Function call.
+ * Partial function application.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

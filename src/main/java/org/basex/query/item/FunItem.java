@@ -6,7 +6,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.expr.DynFunCall;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.VarRef;
-import org.basex.query.iter.ValueIter;
+import org.basex.query.iter.Iter;
 import static org.basex.query.util.Err.*;
 import org.basex.query.util.Var;
 import org.basex.query.util.VarList;
@@ -27,6 +27,8 @@ public class FunItem extends Item {
   private final Expr expr;
   /** Function name. */
   private final QNm name;
+  /** Optional type to cast to. */
+  private final SeqType cast;
 
   /** The closure of this function item. */
   private final VarList closure = new VarList();
@@ -37,13 +39,15 @@ public class FunItem extends Item {
    * @param arg function arguments
    * @param body function body
    * @param t function type
+   * @param cst cast flag
    */
   public FunItem(final QNm n, final Var[] arg, final Expr body,
-      final FunType t) {
+      final FunType t, final boolean cst) {
     super(t);
     name = n;
     vars = arg;
     expr = body;
+    cast = cst && t.ret != null ? t.ret : null;
   }
 
   /**
@@ -52,10 +56,11 @@ public class FunItem extends Item {
    * @param body function body
    * @param t function type
    * @param cl variables in the closure
+   * @param cst cast flag
    */
   public FunItem(final Var[] arg, final Expr body, final FunType t,
-      final VarList cl) {
-    this(null, arg, body, t);
+      final VarList cl, final boolean cst) {
+    this(null, arg, body, t, cst);
     if(cl != null)
       for(int i = 0; i < cl.size; i++) closure.set(cl.vars[i].copy());
   }
@@ -100,7 +105,7 @@ public class FunItem extends Item {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  public ValueIter invIter(final QueryContext ctx, final InputInfo ii,
+  public Value invValue(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
     // move variables to stack
@@ -120,8 +125,22 @@ public class FunItem extends Item {
     ctx.vars.reset(s);
 
     // optionally cast return value to target type
-    final SeqType ret = ((FunType) type).ret;
-    return (ret != null ? ret.cast(v, ctx, ii) : v).iter();
+    return cast != null ? cast.cast(v, this, ctx, ii) : v;
+  }
+
+  /**
+   * Invokes this function item with the given arguments.
+   * @param ctx query context
+   * @param ii input info
+   * @param args arguments
+   * @return resulting iterator
+   * @throws QueryException query exception
+   */
+  public Iter invIter(final QueryContext ctx, final InputInfo ii,
+      final Value... args) throws QueryException {
+
+    // [LW] make result streamable
+    return invValue(ctx, ii, args).iter();
   }
 
   /**
@@ -135,24 +154,34 @@ public class FunItem extends Item {
   public Item invItem(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
-    final ValueIter ir = invIter(ctx, ii, args);
-    final Item it = ir.next();
-    if(it == null || ir.size() == 1) return it;
+    // move variables to stack
+    final int s = ctx.vars.size();
+    for(int i = closure.size; i-- > 0;)
+      ctx.vars.add(closure.vars[i].copy());
+    for(int a = vars.length; a-- > 0;)
+      ctx.vars.add(vars[a].bind(args[a], ctx).copy());
 
-    final Item n = ir.next();
-    if(n != null) XPSEQ.thrw(ii, PAR1 + it + SEP + n +
-        (ir.next() != null ? SEP + DOTS : "") + PAR2);
-    return it;
+    // evaluate function
+    final Value cv = ctx.value;
+    ctx.value = null;
+    final Item it = expr.item(ctx, ii);
+    ctx.value = cv;
+
+    // reset variable scope
+    ctx.vars.reset(s);
+
+    // optionally cast return value to target type
+    return cast != null ? cast.cast(it, expr, ctx, ii) : it;
   }
 
   @Override
   public byte[] atom(final InputInfo ii) throws QueryException {
-    throw NOTYP.thrw(ii, this);
+    throw NOTYP.thrw(ii, desc());
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    throw FNEQ.thrw(ii, this);
+    throw FNEQ.thrw(ii, desc());
   }
 
   @Override
@@ -196,6 +225,7 @@ public class FunItem extends Item {
       vars[i] = ctx.uniqueVar(ii, t.args[i]);
       refs[i] = new VarRef(ii, vars[i]);
     }
-    return new FunItem(fun.name, vars, new DynFunCall(ii, fun, refs), t);
+    return new FunItem(fun.name, vars, new DynFunCall(ii, fun, refs), t,
+        fun.cast != null);
   }
 }

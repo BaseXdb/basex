@@ -6,10 +6,10 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -66,7 +66,8 @@ public final class FuncCall extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final int al = expr.length;
     final Value[] args = new Value[al];
     // evaluate arguments
@@ -77,9 +78,32 @@ public final class FuncCall extends Arr {
       ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
     }
     // evaluate function and reset variable scope
-    final ItemCache ic = ItemCache.get(ctx.iter(func));
+    final Item it = func.item(ctx, ii);
     ctx.vars.reset(s);
-    return ic;
+    return it;
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    final int al = expr.length;
+    final Value[] args = new Value[al];
+    // evaluate arguments
+    for(int a = 0; a < al; ++a) args[a] = expr[a].value(ctx);
+    // move variables to stack
+    final int s = ctx.vars.size();
+    for(int a = 0; a < al; ++a) {
+      ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
+    }
+    // evaluate function and reset variable scope
+    final Value v = func.value(ctx);
+    ctx.vars.reset(s);
+    return v;
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    // [LW] make result streamable
+    return value(ctx).iter();
   }
 
   @Override

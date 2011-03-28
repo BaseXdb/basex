@@ -159,7 +159,7 @@ public enum NodeType implements Type {
   @Override
   public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return it.type != this ? error(it, ii) : it;
+    return !it.type.instance(this) ? error(it, ii) : it;
   }
 
   @Override

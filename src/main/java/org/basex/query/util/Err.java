@@ -793,7 +793,7 @@ public enum Err {
   }
 
   /**
-   * Throws a numeric type exception.
+   * Throws a type cast exception.
    * @param ii input info
    * @param t expression cast type
    * @param v value
