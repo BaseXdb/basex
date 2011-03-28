@@ -10,6 +10,7 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -66,6 +67,33 @@ public final class Treat extends Single {
         return ii;
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    final Value val = ctx.value(expr);
+
+    final long len = val.size();
+    if(len == 0) {
+      if(type.mayBeZero() || type.type == AtomType.EMP) return val;
+      throw XPEMPTY.thrw(input, desc());
+    }
+
+    if(type.zeroOrOne()) {
+      if(len > 1) throw NOTREATS.thrw(input, desc(), type);
+      final Item it = val.itemAt(0);
+      if(!it.type.instance(type.type))
+        NOTREAT.thrw(input, desc(), type, it.type);
+      return it;
+    }
+
+    for(long i = 0; i < len; i++) {
+      final Item it = val.itemAt(i);
+      if(!it.type.instance(type.type))
+        NOTREAT.thrw(input, desc(), type, it.type);
+    }
+
+    return val;
   }
 
   @Override
