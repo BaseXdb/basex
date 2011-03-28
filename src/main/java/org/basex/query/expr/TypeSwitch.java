@@ -47,7 +47,7 @@ public final class TypeSwitch extends ParseExpr {
     // static condition: return branch in question
     if(ts.value()) {
       for(final TypeCase c : cases) {
-        if(c.var.type == null || c.var.type.instance(ts.iter(ctx)))
+        if(c.var.type == null || c.var.type.instance(ts.value(ctx)))
           return optPre(c.comp(ctx, (Value) ts).expr, ctx);
       }
     }
@@ -73,9 +73,8 @@ public final class TypeSwitch extends ParseExpr {
   // [LW] check strictness
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter seq = ctx.value(ts).cache();
+    final Value seq = ctx.value(ts);
     for(final TypeCase c : cases) {
-      seq.reset();
       final Iter iter = c.iter(ctx, seq);
       if(iter != null) return iter;
     }

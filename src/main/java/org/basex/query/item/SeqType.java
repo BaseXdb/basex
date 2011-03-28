@@ -233,20 +233,19 @@ public final class SeqType {
   }
 
   /**
-   * Checks the instance of the specified iterator.
-   * @param iter iteration to be checked
+   * Matches a value against this sequence type.
+   * @param val value to be checked
    * @return result of check
-   * @throws QueryException query exception
    */
-  public boolean instance(final Iter iter) throws QueryException {
-    Item it = iter.next();
-    if(it == null) return mayBeZero();
-    if(zeroOrOne()) return iter.next() == null && it.type.instance(type) &&
-      checkExt(it);
+  public boolean instance(final Value val) {
+    final long size = val.size();
+    if(size < occ.min || size > occ.max) return false;
 
-    do {
+    for(long i = 0; i < size; i++) {
+      final Item it = val.itemAt(i);
       if(!it.type.instance(type) || !checkExt(it)) return false;
-    } while((it = iter.next()) != null);
+    }
+
     return true;
   }
 
