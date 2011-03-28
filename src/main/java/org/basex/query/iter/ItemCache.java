@@ -61,9 +61,9 @@ public final class ItemCache extends ValueIter implements Result {
   public static ItemCache get(final Iter iter) throws QueryException {
     if(iter instanceof ItemCache) return (ItemCache) iter;
     // size is cast as less than 2^32 are expected
-    final ItemCache ir = new ItemCache(Math.max(1, (int) iter.size()));
-    ir.add(iter);
-    return ir;
+    final ItemCache ic = new ItemCache(Math.max(1, (int) iter.size()));
+    ic.add(iter);
+    return ic;
   }
 
   /**

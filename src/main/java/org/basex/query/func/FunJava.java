@@ -225,27 +225,27 @@ public final class FunJava extends Arr {
   private Iter iter(final Object res) {
     if(!res.getClass().isArray()) return new Jav(res).iter();
 
-    final ItemCache ir = new ItemCache();
+    final ItemCache ic = new ItemCache();
     if(res instanceof boolean[]) {
-      for(final Object o : (boolean[]) res) ir.add(new Jav(o));
+      for(final Object o : (boolean[]) res) ic.add(new Jav(o));
     } else if(res instanceof char[]) {
-      for(final Object o : (char[]) res) ir.add(new Jav(o));
+      for(final Object o : (char[]) res) ic.add(new Jav(o));
     } else if(res instanceof byte[]) {
-      for(final Object o : (byte[]) res) ir.add(new Jav(o));
+      for(final Object o : (byte[]) res) ic.add(new Jav(o));
     } else if(res instanceof short[]) {
-      for(final Object o : (short[]) res) ir.add(new Jav(o));
+      for(final Object o : (short[]) res) ic.add(new Jav(o));
     } else if(res instanceof int[]) {
-      for(final Object o : (int[]) res) ir.add(new Jav(o));
+      for(final Object o : (int[]) res) ic.add(new Jav(o));
     } else if(res instanceof long[]) {
-      for(final Object o : (long[]) res) ir.add(new Jav(o));
+      for(final Object o : (long[]) res) ic.add(new Jav(o));
     } else if(res instanceof float[]) {
-      for(final Object o : (float[]) res) ir.add(new Jav(o));
+      for(final Object o : (float[]) res) ic.add(new Jav(o));
     } else if(res instanceof double[]) {
-      for(final Object o : (double[]) res) ir.add(new Jav(o));
+      for(final Object o : (double[]) res) ic.add(new Jav(o));
     } else {
-      for(final Object o : (Object[]) res) ir.add(new Jav(o));
+      for(final Object o : (Object[]) res) ic.add(new Jav(o));
     }
-    return ir;
+    return ic;
   }
 
   @Override

@@ -58,11 +58,11 @@ public final class MixedPath extends Path {
     final long cs = ctx.size;
     final long cp = ctx.pos;
     ctx.value = v;
-    final ItemCache ir = eval(ctx);
+    final ItemCache ic = eval(ctx);
     ctx.value = c;
     ctx.size = cs;
     ctx.pos = cp;
-    return ir;
+    return ic;
   }
 
   /**

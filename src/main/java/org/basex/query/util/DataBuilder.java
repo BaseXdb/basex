@@ -79,11 +79,11 @@ public final class DataBuilder {
     // copy node to main memory data instance
     final MemData md = new MemData(ctx.context.prop);
     new DataBuilder(md).ftpos(tag, ctx.ftpos, len).build(node);
-    final ItemCache ir = new ItemCache();
+    final ItemCache ic = new ItemCache();
     for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) {
-      ir.add(new DBNode(md, p));
+      ic.add(new DBNode(md, p));
     }
-    return ir;
+    return ic;
   }
 
   /**

@@ -11,6 +11,7 @@ import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Sequence, containing at least two items.
@@ -79,7 +80,7 @@ public final class ItemSeq extends Seq {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(AtomType.SEQ.nam, SIZE, Token.token(size));
+    ser.openElement(Token.token(Util.name(this)), SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); ++v) item[v].plan(ser);
     ser.closeElement();
   }

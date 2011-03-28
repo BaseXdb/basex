@@ -1,13 +1,10 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FunItem;
-import org.basex.query.item.FunType;
 import org.basex.query.item.QNm;
 import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
@@ -59,8 +56,9 @@ public final class PartFunApp extends Func {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-
-    return new FunItem(args, expr, FunType.get(this), null);
+    // defer creation of function item because of closure
+    // [LW] can we skip this if closure is empty?
+    return new InlineFunc(input, ret, args, expr);
   }
 
   @Override

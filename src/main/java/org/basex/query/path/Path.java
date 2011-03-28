@@ -40,18 +40,17 @@ public abstract class Path extends ParseExpr {
       if(root instanceof Context) root = null;
     }
 
-    final Value vi = ctx.value;
+    final Value v = ctx.value;
     ctx.value = root(ctx);
     final Expr e = compPath(ctx);
-    ctx.value = vi;
-    if(root instanceof Context) root = null;
+    ctx.value = v;
     return e;
   }
 
   /**
    * Compiles the location path.
    * @param ctx query context
-   * @return optimized Expression
+   * @return optimized expression
    * @throws QueryException query exception
    */
   protected abstract Expr compPath(final QueryContext ctx)

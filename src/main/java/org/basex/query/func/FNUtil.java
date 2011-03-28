@@ -174,7 +174,7 @@ final class FNUtil extends Fun {
     final long l = Performance.mem();
 
     // create (and, optionally, cache) result value
-    Iter ir = expr[0].iter(ctx);
+    Iter ir = ctx.iter(expr[0]);
     final Value v = (c ? ItemCache.get(ir) : ir).finish();
 
     // measure resulting memory consumption
@@ -204,7 +204,7 @@ final class FNUtil extends Fun {
     final Performance p = new Performance();
 
     // iterate (and, optionally, cache) results
-    final Iter ir = expr[0].iter(ctx);
+    final Iter ir = ctx.iter(expr[0]);
     if(c) {
       ItemCache.get(ir);
     } else {

@@ -77,9 +77,9 @@ public final class FuncCall extends Arr {
       ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
     }
     // evaluate function and reset variable scope
-    final ItemCache ir = ItemCache.get(ctx.iter(func));
+    final ItemCache ic = ItemCache.get(ctx.iter(func));
     ctx.vars.reset(s);
-    return ir;
+    return ic;
   }
 
   @Override

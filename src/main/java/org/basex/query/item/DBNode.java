@@ -14,6 +14,7 @@ import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.basex.util.ft.Scoring;
 
 /**
@@ -77,6 +78,11 @@ public class DBNode extends ANode {
     val = null;
     nsp = null;
     pre = p;
+  }
+
+  @Override
+  public Data data() {
+    return data;
   }
 
   @Override
@@ -159,12 +165,12 @@ public class DBNode extends ANode {
   public final boolean is(final ANode node) {
     if(node == this) return true;
     if(!(node instanceof DBNode)) return false;
-    return data == ((DBNode) node).data && pre == ((DBNode) node).pre;
+    return data == node.data() && pre == ((DBNode) node).pre;
   }
 
   @Override
   public final int diff(final ANode node) {
-    return !(node instanceof DBNode) || data != ((DBNode) node).data ?
+    return !(node instanceof DBNode) || data != node.data() ?
       id - node.id : pre - ((DBNode) node).pre;
   }
 
@@ -376,13 +382,13 @@ public class DBNode extends ANode {
 
   @Override
   public final boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof DBNode)) return false;
-    return data == ((DBNode) cmp).data && pre == ((DBNode) cmp).pre;
+    return cmp instanceof DBNode && data == ((DBNode) cmp).data &&
+      pre == ((DBNode) cmp).pre;
   }
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, token(data.meta.name));
+    ser.openElement(token(Util.name(this)), NAM, token(data.meta.name));
     if(pre != 0) ser.attribute(PRE, token(pre));
     ser.closeElement();
   }
