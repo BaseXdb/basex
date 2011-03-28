@@ -34,7 +34,7 @@ public final class Var extends ParseExpr {
   public boolean declared;
 
   /** Variable ID. */
-  private final int id;
+  public final int id;
   /** Bound value. */
   private Value value;
   /** Bound expression. */
@@ -178,7 +178,7 @@ public final class Var extends ParseExpr {
    */
   private Value cast(final Value v, final QueryContext ctx)
       throws QueryException {
-    return type == null ? v : type.cast(v, this, ctx, input);
+    return type == null ? v : type.promote(v, this, ctx, input);
   }
 
   @Override

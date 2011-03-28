@@ -125,7 +125,7 @@ public class FunItem extends Item {
     ctx.vars.reset(s);
 
     // optionally cast return value to target type
-    return cast != null ? cast.cast(v, this, ctx, ii) : v;
+    return cast != null ? cast.promote(v, this, ctx, ii) : v;
   }
 
   /**
@@ -170,8 +170,8 @@ public class FunItem extends Item {
     // reset variable scope
     ctx.vars.reset(s);
 
-    // optionally cast return value to target type
-    return cast != null ? cast.cast(it, expr, ctx, ii) : it;
+    // optionally promote return value to target type
+    return cast != null ? cast.cast(it, expr, false, ctx, ii) : it;
   }
 
   @Override

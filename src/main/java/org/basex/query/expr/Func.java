@@ -100,7 +100,9 @@ public class Func extends Single {
     ctx.value = null;
     final Item it = expr.item(ctx, ii);
     ctx.value = cv;
-    return cast ? ret.cast(it, this, ctx, input) : it;
+
+    // optionally promote return value to target type
+    return cast ? ret.cast(it, this, false, ctx, input) : it;
   }
 
   @Override
@@ -110,7 +112,7 @@ public class Func extends Single {
     ctx.value = null;
     final Value v = expr.value(ctx);
     ctx.value = cv;
-    return cast ? ret.cast(v, this, ctx, input) : v;
+    return cast ? ret.promote(v, this, ctx, input) : v;
   }
 
   @Override

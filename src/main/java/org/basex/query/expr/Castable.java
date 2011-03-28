@@ -41,7 +41,7 @@ public final class Castable extends Single {
   @Override
   public Bln item(final QueryContext ctx, final InputInfo ii) {
     try {
-      seq.cast(expr.item(ctx, ii), this, ctx, ii);
+      seq.cast(expr.item(ctx, ii), this, true, ctx, ii);
       return Bln.TRUE;
     } catch(final QueryException ex) {
       return Bln.FALSE;

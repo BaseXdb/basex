@@ -259,14 +259,35 @@ public final class SeqType {
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Item cast(final Item it, final Expr e, final QueryContext ctx,
+  public Item promote(final Item it, final Expr e, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
     if(it == null) {
       if(occ == Occ.O) XPEMPTY.thrw(ii, e.desc());
       return null;
     }
-    return it.type == type ? it : check(type.e(it, ctx, ii), ii);
+    return check(it.type == type ? it : type.e(it, ctx, ii), ii);
+  }
+
+  /**
+   * Tries to promote the given item to this sequence type.
+   * @param it item to promote
+   * @param e producing expression
+   * @param cast explicit cast flag
+   * @param ctx query context
+   * @param ii input info
+   * @return promoted item
+   * @throws QueryException query exception
+   */
+  public Item cast(final Item it, final Expr e, final boolean cast,
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
+
+    if(it == null) {
+      if(occ == Occ.O) XPEMPTY.thrw(ii, e.desc());
+      return null;
+    }
+    final boolean correct = cast ? it.type == type : instance(it, ii);
+    return check(correct ? it : type.e(it, ctx, ii), ii);
   }
 
   /**
@@ -278,11 +299,11 @@ public final class SeqType {
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Value cast(final Value val, final Expr e, final QueryContext ctx,
+  public Value promote(final Value val, final Expr e, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
     // take shortcut if it's a single item
-    if(val.item()) return cast((Item) val, e, ctx, ii);
+    if(val.item()) return cast((Item) val, e, false, ctx, ii);
 
     final Iter iter = val.iter();
     Item it = iter.next();
@@ -306,7 +327,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns if item has already correct type.
+   * Returns whether item has already correct type.
    * @param it input item
    * @param ii input info
    * @return result of check
@@ -314,12 +335,18 @@ public final class SeqType {
    */
   private boolean instance(final Item it, final InputInfo ii)
       throws QueryException {
+    final Type t = it.type;
     final boolean ins = it.type.instance(type);
-    if(!ins && !it.unt() && !it.func() &&
-        // implicit type promotions
-        (!it.num() || type != AtomType.FLT && type != AtomType.DBL) &&
-        (it.type != AtomType.URI || type != AtomType.STR))
-      Err.cast(ii, type, it);
+    if(!ins && !t.unt() && !t.func() &&
+        // implicit type promotions:
+        // xs:float -> xs:double
+        (t != AtomType.FLT || type != AtomType.DBL) &&
+        // xs:anyUri -> xs:string
+        (t != AtomType.URI || type != AtomType.STR) &&
+        // xs:decimal -> xs:float/xs:double
+        (type != AtomType.FLT && type != AtomType.DBL ||
+            !t.instance(AtomType.DEC)))
+      Err.promote(ii, type, it);
     return ins;
   }
 
