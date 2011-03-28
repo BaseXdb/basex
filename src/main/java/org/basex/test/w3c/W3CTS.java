@@ -391,7 +391,7 @@ public abstract class W3CTS {
             DataText.YES : DataText.NO);
         final XMLSerializer xml = new XMLSerializer(ao, sp);
 
-        iter = ItemCache.get(xq.iter());
+        iter = xq.iter().finish().cache();
         for(Item it; (it = iter.next()) != null;) {
           doc &= it.type == NodeType.DOC;
           it.serialize(xml);
