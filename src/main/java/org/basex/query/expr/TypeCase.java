@@ -71,13 +71,14 @@ public final class TypeCase extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
+  // [LW] check strictness
   Iter iter(final QueryContext ctx, final Iter seq) throws QueryException {
     if(var.type != null && !var.type.instance(seq)) return null;
     if(var.name == null) return ctx.iter(expr);
 
     final int s = ctx.vars.size();
     ctx.vars.add(var.bind(seq.finish(), ctx).copy());
-    final ItemCache ic = ItemCache.get(ctx.iter(expr));
+    final ItemCache ic = ctx.value(expr).cache();
     ctx.vars.reset(s);
     return ic;
   }

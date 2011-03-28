@@ -118,7 +118,7 @@ public class FunItem extends Item {
     // evaluate function
     final Value cv = ctx.value;
     ctx.value = null;
-    final Value v = expr.value(ctx);
+    final Value v = ctx.value(expr);
     ctx.value = cv;
 
     // reset variable scope

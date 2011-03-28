@@ -14,8 +14,8 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.ValueIter;
 import org.basex.query.util.ItemSet;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
@@ -347,24 +347,21 @@ final class FNSeq extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter reverse(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(expr[0]);
-    // only one item found; no reversion necessary
-    if(iter.size() == 1) return iter;
-
-    // process any other iterator...
-    return new Iter() {
-      final Iter ir = iter.size() != -1 ? iter : ItemCache.get(iter);
-      final long s = ir.size();
+  private ValueIter reverse(final QueryContext ctx) throws QueryException {
+    // has to be strictly evaluated
+    final ValueIter iter = ctx.value(expr[0]).iter();
+    // if only one item found: no reversion necessary
+    return iter.size() == 1 ? iter : new ValueIter() {
+      final long s = iter.size();
       long c = s;
 
       @Override
-      public Item next() throws QueryException {
-        return --c >= 0 ? ir.get(c) : null;
+      public Item next() {
+        return --c >= 0 ? iter.get(c) : null;
       }
       @Override
-      public Item get(final long i) throws QueryException {
-        return ir.get(s - i - 1);
+      public Item get(final long i) {
+        return iter.get(s - i - 1);
       }
       @Override
       public long size() {

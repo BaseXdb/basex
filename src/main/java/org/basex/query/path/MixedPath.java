@@ -73,7 +73,7 @@ public final class MixedPath extends Path {
    */
   private ItemCache eval(final QueryContext ctx) throws QueryException {
     // simple location step traversal...
-    ItemCache res = ItemCache.get(ctx.value.iter());
+    ItemCache res = ctx.value.cache();
     for(final Expr e : expr) {
       final Iter ir = res;
       final ItemCache ii = new ItemCache();
@@ -82,18 +82,19 @@ public final class MixedPath extends Path {
       for(Item it; (it = ir.next()) != null;) {
         if(!it.node()) NODESPATH.thrw(input, this, it.type);
         ctx.value = it;
-        ii.add(ctx.iter(e));
+        ii.add(ctx.value(e));
         ctx.pos++;
       }
 
       // either nodes or atomic items are allowed in a result set, but not both
       if(ii.size() != 0 && ii.get(0).node()) {
+        // [LW] why another iterator?
         final NodeCache nc = new NodeCache().random();
         for(Item it; (it = ii.next()) != null;) {
           if(!it.node()) EVALNODESVALS.thrw(input);
           nc.add((ANode) it);
         }
-        res = ItemCache.get(nc);
+        res = nc.finish().cache();
       } else {
         for(Item it; (it = ii.next()) != null;) {
           if(it.node()) EVALNODESVALS.thrw(input);

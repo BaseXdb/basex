@@ -226,13 +226,15 @@ final class FNFunc extends Fun {
    */
   private Iter foldRight(final QueryContext ctx) throws QueryException {
     final FunItem f = withArity(0, 2, ctx);
-    Iter res = expr[1].iter(ctx);
+    final Value xs = expr[2].value(ctx);
+    // evaluate start value lazily if it's passed straight through
+    if(xs.size() == 0) return expr[1].iter(ctx);
 
-    final ItemCache xs = ItemCache.get(expr[2].iter(ctx));
-    for(int i = (int) xs.size(); i-- != 0;)
-      res = f.invIter(ctx, input, xs.get(i), res.finish());
+    Value res = expr[1].value(ctx);
+    for(long i = xs.size(); i-- != 0;)
+      res = f.invValue(ctx, input, xs.itemAt(i), res);
 
-    return res;
+    return res.iter();
   }
 
   /**
@@ -241,9 +243,9 @@ final class FNFunc extends Fun {
    * @return sorted sequence
    * @throws QueryException query exception
    */
-  private Iter sortWith(final QueryContext ctx) throws QueryException {
+  private ItemCache sortWith(final QueryContext ctx) throws QueryException {
     final FunItem lt = withArity(0, 2, ctx);
-    final ItemCache ic = ItemCache.get(expr[1].iter(ctx));
+    final ItemCache ic = expr[1].value(ctx).cache();
     try {
       Arrays.sort(ic.item, 0, (int) ic.size(), new Comparator<Item>(){
         @Override

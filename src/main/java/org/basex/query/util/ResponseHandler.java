@@ -149,7 +149,7 @@ public final class ResponseHandler {
     // Result
     final ItemCache result = new ItemCache();
     result.add(responseEl);
-    result.add(payloads);
+    result.add(payloads.finish());
     return result;
   }
 

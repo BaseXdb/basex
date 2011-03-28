@@ -330,6 +330,17 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Evaluates the specified expression and returns an iterator.
+   * @param e expression to be evaluated
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  public Value value(final Expr e) throws QueryException {
+    checkStop();
+    return e.value(this);
+  }
+
+  /**
    * Creates a variable with a unique, non-clashing variable name.
    * @param ii input info
    * @param t type

@@ -15,7 +15,6 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -38,14 +37,15 @@ public final class FNSimple extends Fun {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    Iter ir = ctx.iter(expr[0]);
     switch(def) {
       case ONEORMORE:
-        if(expr[0].type().mayBeZero()) ir = ItemCache.get(ir);
+        // [LW] make more lazy
+        final Iter ir = expr[0].type().mayBeZero() ?
+            expr[0].value(ctx).cache() : expr[0].iter(ctx);
         if(ir.size() < 1) EXPECTOM.thrw(input);
         return ir;
       case UNORDER:
-        return ir;
+        return ctx.iter(expr[0]);
       default:
         return super.iter(ctx);
     }
