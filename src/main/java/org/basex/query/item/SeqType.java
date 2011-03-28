@@ -239,13 +239,12 @@ public final class SeqType {
    */
   public boolean instance(final Value val) {
     final long size = val.size();
-    if(size < occ.min || size > occ.max) return false;
+    if(occ.min > size || size > occ.max) return false;
 
     for(long i = 0; i < size; i++) {
       final Item it = val.itemAt(i);
       if(!it.type.instance(type) || !checkExt(it)) return false;
     }
-
     return true;
   }
 

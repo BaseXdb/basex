@@ -7,7 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -71,14 +71,14 @@ public final class TypeCase extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
-  // [LW] check strictness
-  Iter iter(final QueryContext ctx, final Value seq) throws QueryException {
+  Iter iter(final QueryContext ctx, final Value seq)
+      throws QueryException {
     if(var.type != null && !var.type.instance(seq)) return null;
     if(var.name == null) return ctx.iter(expr);
 
     final int s = ctx.vars.size();
     ctx.vars.add(var.bind(seq, ctx).copy());
-    final ItemCache ic = ctx.value(expr).cache();
+    final ValueIter ic = ctx.value(expr).iter();
     ctx.vars.reset(s);
     return ic;
   }

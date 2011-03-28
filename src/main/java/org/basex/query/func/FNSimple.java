@@ -39,11 +39,22 @@ public final class FNSimple extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
       case ONEORMORE:
-        // [LW] make more lazy
-        final Iter ir = expr[0].type().mayBeZero() ?
-            expr[0].value(ctx).cache() : expr[0].iter(ctx);
-        if(ir.size() < 1) EXPECTOM.thrw(input);
-        return ir;
+        final Iter ir = expr[0].iter(ctx);
+        final long len = ir.size();
+        if(len == 0) throw EXPECTOM.thrw(input);
+        if(len > 0) return ir;
+        return new Iter() {
+          private boolean first = true;
+          @Override
+          public Item next() throws QueryException {
+            final Item it = ir.next();
+            if(first) {
+              if(it == null) throw EXPECTOM.thrw(input);
+              first = false;
+            }
+            return it;
+          }
+        };
       case UNORDER:
         return ctx.iter(expr[0]);
       default:

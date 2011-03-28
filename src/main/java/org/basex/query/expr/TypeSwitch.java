@@ -70,7 +70,6 @@ public final class TypeSwitch extends ParseExpr {
     return this;
   }
 
-  // [LW] check strictness
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Value seq = ctx.value(ts);
