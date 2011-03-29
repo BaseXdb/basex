@@ -26,7 +26,7 @@ import org.basex.util.InputInfo;
  */
 public final class MixedPath extends Path {
   /** Expression list. */
-  private final Expr[] expr;
+  private Expr[] expr;
 
   /**
    * Constructor.
@@ -47,6 +47,8 @@ public final class MixedPath extends Path {
       expr[e] = expr[e].comp(ctx);
       if(expr[e].empty()) return Empty.SEQ;
     }
+    expr = optSteps(expr, ctx);
+
     type = SeqType.get(expr[expr.length - 1].type().type, SeqType.Occ.ZM);
     return this;
   }

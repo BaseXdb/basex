@@ -1,6 +1,10 @@
 package org.basex.query.path;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.query.path.Axis.*;
+
 import java.io.IOException;
+import java.util.Arrays;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -9,8 +13,11 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.expr.Root;
 import org.basex.query.item.NodeType;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
+import org.basex.query.path.Test.Name;
 import org.basex.query.util.Var;
+import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
@@ -85,6 +92,45 @@ public abstract class Path extends ParseExpr {
     if(use == Use.CTX) return root == null || root.uses(use);
     for(final Expr s : step) if(s.uses(use)) return true;
     return root != null && root.uses(use);
+  }
+  /**
+   * Optimizes descendant-or-self steps and static types.
+   * @param steps step array
+   * @param ctx query context
+   * @return optimized steps
+   */
+  protected Expr[] optSteps(final Expr[] steps, final QueryContext ctx) {
+    boolean opt = false;
+    Expr[] step = steps;
+    for(int l = 1; l < step.length; ++l) {
+      if(!(step[l - 1] instanceof AxisStep &&
+           step[l] instanceof AxisStep)) continue;
+
+      final AxisStep last = (AxisStep) step[l - 1];
+      final AxisStep curr = (AxisStep) step[l];
+      if(!last.simple(DESCORSELF, false)) continue;
+
+      if(curr.axis == CHILD && !curr.uses(Use.POS)) {
+        // descendant-or-self::node()/child::X -> descendant::X
+        Array.move(step, l, -1, step.length - l);
+        step = Arrays.copyOf(step, step.length - 1);
+        curr.axis = DESC;
+        opt = true;
+      } else if(curr.axis == ATTR && !curr.uses(Use.POS)) {
+        // descendant-or-self::node()/@X -> descendant-or-self::*/@X
+        last.test = new NameTest(false, last.input);
+        opt = true;
+      }
+    }
+    if(opt) ctx.compInfo(OPTDESC);
+
+    // set atomic type for single attribute steps to speedup predicate tests
+    if(root == null && step.length == 1 && step[0] instanceof AxisPath) {
+      final AxisStep curr = (AxisStep) step[0];
+      if(curr.axis == ATTR && curr.test.test == Name.STD)
+        curr.type = SeqType.NOD_ZO;
+    }
+    return step;
   }
 
   @Override

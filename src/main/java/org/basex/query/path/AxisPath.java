@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.path.Axis.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.PathNode;
@@ -159,7 +158,7 @@ public class AxisPath extends Path {
       if(!(e instanceof AxisStep)) return e;
       step[i] = (AxisStep) e;
     }
-    optSteps(ctx);
+    step = (AxisStep[]) optSteps(step, ctx);
 
     // check if all context nodes reference document nodes
     final Data data = ctx.resource.data();
@@ -432,35 +431,6 @@ public class AxisPath extends Path {
         nc.add(node);
       }
     }
-  }
-
-  /**
-   * Optimizes descendant-or-self steps and static types.
-   * @param ctx query context
-   */
-  private void optSteps(final QueryContext ctx) {
-    boolean opt = false;
-    for(int l = 1; l < step.length; ++l) {
-      if(!step[l - 1].simple(DESCORSELF, false)) continue;
-
-      final AxisStep next = step[l];
-      if(next.axis == CHILD && !next.uses(Use.POS)) {
-        // descendant-or-self::node()/child::X -> descendant::X
-        Array.move(step, l, -1, step.length - l);
-        step = Arrays.copyOf(step, step.length - 1);
-        next.axis = DESC;
-        opt = true;
-      } else if(next.axis == ATTR && !next.uses(Use.POS)) {
-        // descendant-or-self::node()/@X -> descendant-or-self::*/@X
-        step[l - 1].test = new NameTest(false, step[l - 1].input);
-        opt = true;
-      }
-    }
-    if(opt) ctx.compInfo(OPTDESC);
-
-    // set atomic type for single attribute steps to speedup predicate tests
-    if(root == null && step.length == 1 && step[0].axis == ATTR &&
-        step[0].test.test == Name.STD) step[0].type = SeqType.NOD_ZO;
   }
 
   /**
