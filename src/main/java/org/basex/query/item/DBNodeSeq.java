@@ -134,4 +134,16 @@ public final class DBNodeSeq extends Seq {
     }
     return sb.append(PAR2).toString();
   }
+
+  @Override
+  public int writeTo(final Item[] arr, final int start) {
+    for(int i = 0; i < pres.length; i++)
+      arr[i + start] = new DBNode(data, pres[i]);
+    return pres.length;
+  }
+
+  @Override
+  public Item itemAt(final long pos) {
+    return new DBNode(data, pres[(int) pos]);
+  }
 }

@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
@@ -38,6 +39,11 @@ public final class Context extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     return checkCtx(ctx).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    return checkCtx(ctx);
   }
 
   @Override

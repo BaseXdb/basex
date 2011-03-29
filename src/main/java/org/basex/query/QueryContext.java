@@ -226,7 +226,7 @@ public final class QueryContext extends Progress {
 
     // if specified, convert context item to specified type
     if(value != null && initType != null) {
-      value = initType.cast(value, this, null);
+      value = initType.promote(value, initExpr, this, null);
     }
 
     try {
@@ -327,6 +327,17 @@ public final class QueryContext extends Progress {
   public Iter iter(final Expr e) throws QueryException {
     checkStop();
     return e.iter(this);
+  }
+
+  /**
+   * Evaluates the specified expression and returns an iterator.
+   * @param e expression to be evaluated
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  public Value value(final Expr e) throws QueryException {
+    checkStop();
+    return e.value(this);
   }
 
   /**

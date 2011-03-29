@@ -154,12 +154,12 @@ final class GroupPartition {
 
     for(int i = 0; i < ngl; ++i) {
       ItemCache ic = sq[i];
-      final Iter iter = ngv[i].iter(ctx);
+      final Value result = ngv[i].value(ctx);
       if(ic == null) {
         ic = new ItemCache();
         sq[i] = ic;
       }
-      ic.add(iter);
+      ic.add(result);
     }
   }
 
@@ -199,7 +199,7 @@ final class GroupPartition {
       }
       if(order != null) {
         order.add(ctx, ret, ks, vs);
-      } else ic.add(ctx.iter(ret));
+      } else ic.add(ctx.value(ret));
     }
     return order != null ? ctx.iter(order.set(ks, vs)) : ic;
   }

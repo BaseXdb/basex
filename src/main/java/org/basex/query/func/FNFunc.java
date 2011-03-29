@@ -188,12 +188,16 @@ final class FNFunc extends Fun {
   private Iter foldLeft(final QueryContext ctx) throws QueryException {
     final FunItem f = withArity(0, 2, ctx);
     final Iter xs = expr[2].iter(ctx);
+    Item x = xs.next();
 
-    Iter res = expr[1].iter(ctx);
-    for(Item x; (x = xs.next()) != null;)
-      res = f.invIter(ctx, input, res.finish(), x);
+    // don't convert to a value if not necessary
+    if(x == null) return expr[1].iter(ctx);
 
-    return res;
+    Value sum = expr[1].value(ctx);
+    do sum = f.invValue(ctx, input, sum, x);
+    while((x = xs.next()) != null);
+
+    return sum.iter();
   }
 
   /**
@@ -207,11 +211,11 @@ final class FNFunc extends Fun {
     final FunItem f = withArity(0, 2, ctx);
     final Iter xs = expr[1].iter(ctx);
 
-    Iter res = checkEmpty(xs.next()).iter();
+    Value sum = checkEmpty(xs.next());
     for(Item x; (x = xs.next()) != null;)
-      res = f.invIter(ctx, input, res.finish(), x);
+      sum = f.invValue(ctx, input, sum, x);
 
-    return res;
+    return sum.iter();
   }
 
   /**
@@ -222,13 +226,15 @@ final class FNFunc extends Fun {
    */
   private Iter foldRight(final QueryContext ctx) throws QueryException {
     final FunItem f = withArity(0, 2, ctx);
-    Iter res = expr[1].iter(ctx);
+    final Value xs = expr[2].value(ctx);
+    // evaluate start value lazily if it's passed straight through
+    if(xs.size() == 0) return expr[1].iter(ctx);
 
-    final ItemCache xs = ItemCache.get(expr[2].iter(ctx));
-    for(int i = (int) xs.size(); i-- != 0;)
-      res = f.invIter(ctx, input, xs.get(i), res.finish());
+    Value res = expr[1].value(ctx);
+    for(long i = xs.size(); i-- != 0;)
+      res = f.invValue(ctx, input, xs.itemAt(i), res);
 
-    return res;
+    return res.iter();
   }
 
   /**
@@ -237,9 +243,9 @@ final class FNFunc extends Fun {
    * @return sorted sequence
    * @throws QueryException query exception
    */
-  private Iter sortWith(final QueryContext ctx) throws QueryException {
+  private ItemCache sortWith(final QueryContext ctx) throws QueryException {
     final FunItem lt = withArity(0, 2, ctx);
-    final ItemCache ic = ItemCache.get(expr[1].iter(ctx));
+    final ItemCache ic = expr[1].value(ctx).cache();
     try {
       Arrays.sort(ic.item, 0, (int) ic.size(), new Comparator<Item>(){
         @Override
@@ -269,7 +275,7 @@ final class FNFunc extends Fun {
     final FunItem fun = withArity(1, 1, ctx);
     Value v = expr[2].value(ctx);
     while(!checkType(pred.invItem(ctx, input, v), AtomType.BLN).bool(input)) {
-      v = fun.invIter(ctx, input, v).finish();
+      v = fun.invValue(ctx, input, v);
     }
     return v.iter();
   }

@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Err;
@@ -151,7 +150,7 @@ public final class SeqType {
   /** Zero or one duration. */
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZO);
   /** Single function. */
-  public static final SeqType FUN_O = new SeqType(FunType.ANY, Occ.O);
+  public static final SeqType FUN_O = FunType.ANY.seq();
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZM);
   /** One document node. */
@@ -234,53 +233,75 @@ public final class SeqType {
   }
 
   /**
-   * Checks the instance of the specified iterator.
-   * @param iter iteration to be checked
+   * Matches a value against this sequence type.
+   * @param val value to be checked
    * @return result of check
-   * @throws QueryException query exception
    */
-  public boolean instance(final Iter iter) throws QueryException {
-    Item it = iter.next();
-    if(it == null) return mayBeZero();
-    if(zeroOrOne()) return iter.next() == null && it.type.instance(type) &&
-      checkExt(it);
+  public boolean instance(final Value val) {
+    final long size = val.size();
+    if(occ.min > size || size > occ.max) return false;
 
-    do {
+    for(long i = 0; i < size; i++) {
+      final Item it = val.itemAt(i);
       if(!it.type.instance(type) || !checkExt(it)) return false;
-    } while((it = iter.next()) != null);
+    }
     return true;
   }
 
   /**
    * Casts the specified item.
-   * @param cast expression to be cast
-   * @param expr expression reference
-   * @param ctx query context
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  public Item cast(final Expr cast, final ParseExpr expr,
-      final QueryContext ctx) throws QueryException {
-
-    final Item it = cast.item(ctx, expr.input);
-    if(it == null) {
-      if(occ == Occ.O) XPEMPTY.thrw(expr.input, expr.desc());
-      return null;
-    }
-    return it.type == type ? it :
-      check(type.e(it, ctx, expr.input), expr.input);
-  }
-
-  /**
-   * Casts the specified value.
-   * @param val value to be cast
+   * @param it description of expression to be cast
+   * @param e producing expression
    * @param ctx query context
    * @param ii input info
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Value cast(final Value val, final QueryContext ctx,
+  public Item promote(final Item it, final Expr e, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
+
+    if(it == null) {
+      if(occ == Occ.O) XPEMPTY.thrw(ii, e.desc());
+      return null;
+    }
+    return check(it.type == type ? it : type.e(it, ctx, ii), ii);
+  }
+
+  /**
+   * Tries to promote the given item to this sequence type.
+   * @param it item to promote
+   * @param e producing expression
+   * @param cast explicit cast flag
+   * @param ctx query context
+   * @param ii input info
+   * @return promoted item
+   * @throws QueryException query exception
+   */
+  public Item cast(final Item it, final Expr e, final boolean cast,
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
+
+    if(it == null) {
+      if(occ == Occ.O) XPEMPTY.thrw(ii, e.desc());
+      return null;
+    }
+    final boolean correct = cast ? it.type == type : instance(it, ii);
+    return check(correct ? it : type.e(it, ctx, ii), ii);
+  }
+
+  /**
+   * Casts the specified value.
+   * @param val value to be cast
+   * @param e producing expression, used for error reports
+   * @param ctx query context
+   * @param ii input info
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  public Value promote(final Value val, final Expr e, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
+
+    // take shortcut if it's a single item
+    if(val.item()) return cast((Item) val, e, false, ctx, ii);
 
     final Iter iter = val.iter();
     Item it = iter.next();
@@ -304,7 +325,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns if item has already correct type.
+   * Returns whether item has already correct type.
    * @param it input item
    * @param ii input info
    * @return result of check
@@ -312,12 +333,18 @@ public final class SeqType {
    */
   private boolean instance(final Item it, final InputInfo ii)
       throws QueryException {
+    final Type t = it.type;
     final boolean ins = it.type.instance(type);
-    if(!it.unt() && !ins && !it.func() &&
-        // implicit type promotions
-        (!it.num() || type != AtomType.FLT && type != AtomType.DBL) &&
-        (it.type != AtomType.URI || type != AtomType.STR))
-      Err.cast(ii, type, it);
+    if(!ins && !t.unt() && !t.func() &&
+        // implicit type promotions:
+        // xs:float -> xs:double
+        (t != AtomType.FLT || type != AtomType.DBL) &&
+        // xs:anyUri -> xs:string
+        (t != AtomType.URI || type != AtomType.STR) &&
+        // xs:decimal -> xs:float/xs:double
+        (type != AtomType.FLT && type != AtomType.DBL ||
+            !t.instance(AtomType.DEC)))
+      Err.promote(ii, type, it);
     return ins;
   }
 

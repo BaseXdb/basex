@@ -251,7 +251,7 @@ final class FNDb extends Fun {
     Value v = expr[0].value(ctx);
     if(msg == null) {
       ctx.updating = true;
-      msg = ItemCache.get(v.iter()).toString();
+      msg = ctx.value(expr[0]).toString();
     }
     ctx.context.triggers.notify(ctx.context.session, expr[1].toString(), msg);
     return v.iter();

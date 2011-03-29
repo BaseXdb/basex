@@ -75,4 +75,15 @@ public final class RangeSeq extends Seq {
   public String toString() {
     return PAR1 + start + ' ' + TO + ' ' + (start + size - 1) + PAR2;
   }
+
+  @Override
+  public int writeTo(final Item[] arr, final int pos) {
+    for(int i = 0; i < size; i++) arr[pos + i] = itemAt(i);
+    return (int) size;
+  }
+
+  @Override
+  public Item itemAt(final long pos) {
+    return Itr.get(start + pos);
+  }
 }

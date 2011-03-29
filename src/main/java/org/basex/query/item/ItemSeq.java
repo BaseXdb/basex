@@ -8,7 +8,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -43,7 +42,7 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public ValueIter iter() {
+  public ItemCache iter() {
     return new ItemCache(item, (int) size);
   }
 
@@ -103,5 +102,21 @@ public final class ItemSeq extends Seq {
       }
     }
     return sb.append(PAR2).toString();
+  }
+
+  @Override
+  public int writeTo(final Item[] arr, final int start) {
+    System.arraycopy(item, 0, arr, start, (int) size);
+    return (int) size;
+  }
+
+  @Override
+  public Item itemAt(final long pos) {
+    return item[(int) pos];
+  }
+
+  @Override
+  public ItemCache cache() {
+    return iter();
   }
 }

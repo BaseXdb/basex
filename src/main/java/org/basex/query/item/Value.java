@@ -4,6 +4,7 @@ import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -162,4 +163,29 @@ public abstract class Value extends Expr {
    * @throws QueryException if atomization can't be applied (e.g. function item)
    */
   public abstract int hash(final InputInfo ii) throws QueryException;
+
+  /**
+   * Writes this value's items out to the given array.
+   * @param arr array to write to
+   * @param start start position
+   * @return number of written items
+   */
+  public abstract int writeTo(final Item[] arr, final int start);
+
+  /**
+   * Creates an ItemCache containing all items of this value.
+   * @return cached items
+   */
+  public ItemCache cache() {
+    final ItemCache ic = new ItemCache((int) size());
+    ic.size(writeTo(ic.item, 0));
+    return ic;
+  }
+
+  /**
+   * Gets the item at the given position in the value.
+   * @param pos position
+   * @return item
+   */
+  public abstract Item itemAt(final long pos);
 }

@@ -55,6 +55,11 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public Item itemAt(final long pos) {
+    return this;
+  }
+
+  @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) {
     return this;
   }
@@ -260,5 +265,11 @@ public abstract class Item extends Value {
   @Override
   public int hash(final InputInfo ii) throws QueryException {
     return Token.hash(atom(ii));
+  }
+
+  @Override
+  public int writeTo(final Item[] arr, final int start) {
+    arr[start] = this;
+    return 1;
   }
 }

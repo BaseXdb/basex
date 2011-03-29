@@ -34,7 +34,7 @@ public final class List extends Arr {
     if(values()) {
       // return simple sequence if all values are items or empty sequences
       final ItemCache ic = new ItemCache(expr.length);
-      for(final Expr e : expr) ic.add(ctx.iter(e));
+      for(final Expr e : expr) ic.add(ctx.value(e));
       return ic.finish();
     }
 
