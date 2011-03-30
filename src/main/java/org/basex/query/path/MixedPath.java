@@ -26,7 +26,7 @@ import org.basex.util.InputInfo;
  */
 public final class MixedPath extends Path {
   /** Expression list. */
-  private final Expr[] expr;
+  private Expr[] expr;
 
   /**
    * Constructor.
@@ -47,6 +47,8 @@ public final class MixedPath extends Path {
       expr[e] = expr[e].comp(ctx);
       if(expr[e].empty()) return Empty.SEQ;
     }
+    expr = optSteps(expr, ctx);
+
     type = SeqType.get(expr[expr.length - 1].type().type, SeqType.Occ.ZM);
     return this;
   }
@@ -58,11 +60,11 @@ public final class MixedPath extends Path {
     final long cs = ctx.size;
     final long cp = ctx.pos;
     ctx.value = v;
-    final ItemCache ir = eval(ctx);
+    final ItemCache ic = eval(ctx);
     ctx.value = c;
     ctx.size = cs;
     ctx.pos = cp;
-    return ir;
+    return ic;
   }
 
   /**
@@ -73,7 +75,7 @@ public final class MixedPath extends Path {
    */
   private ItemCache eval(final QueryContext ctx) throws QueryException {
     // simple location step traversal...
-    ItemCache res = ItemCache.get(ctx.value.iter());
+    ItemCache res = ctx.value.cache();
     for(final Expr e : expr) {
       final Iter ir = res;
       final ItemCache ii = new ItemCache();
@@ -82,18 +84,19 @@ public final class MixedPath extends Path {
       for(Item it; (it = ir.next()) != null;) {
         if(!it.node()) NODESPATH.thrw(input, this, it.type);
         ctx.value = it;
-        ii.add(ctx.iter(e));
+        ii.add(ctx.value(e));
         ctx.pos++;
       }
 
       // either nodes or atomic items are allowed in a result set, but not both
       if(ii.size() != 0 && ii.get(0).node()) {
+        // [LW] why another iterator?
         final NodeCache nc = new NodeCache().random();
         for(Item it; (it = ii.next()) != null;) {
           if(!it.node()) EVALNODESVALS.thrw(input);
           nc.add((ANode) it);
         }
-        res = ItemCache.get(nc);
+        res = nc.finish().cache();
       } else {
         for(Item it; (it = ii.next()) != null;) {
           if(it.node()) EVALNODESVALS.thrw(input);

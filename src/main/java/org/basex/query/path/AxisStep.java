@@ -11,7 +11,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Preds;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
@@ -97,8 +96,8 @@ public class AxisStep extends Preds {
     final Value cv = ctx.value;
     final Type ct = cv != null ? cv.type : null;
     if(ct == NodeType.DOC) {
-      cv.type = NodeType.ELM;
-    } else if(ct == AtomType.SEQ) {
+      cv.type = NodeType.NOD;
+    } else {
       ctx.value = null;
     }
     final Expr e = super.comp(ctx);

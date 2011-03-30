@@ -5,7 +5,6 @@ import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
-import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Value;
@@ -51,28 +50,12 @@ public final class ItemCache extends ValueIter implements Result {
   }
 
   /**
-   * Returns a new sequence iterator with the contents of the specified
-   * iterator. The specified iterator is returned if it is already an
-   * {@link ItemCache} sequence.
-   * @param iter iterator
-   * @return iterator
-   * @throws QueryException query exception
+   * Adds the contents of a value.
+   * @param val value to be added
    */
-  public static ItemCache get(final Iter iter) throws QueryException {
-    if(iter instanceof ItemCache) return (ItemCache) iter;
-    // size is cast as less than 2^32 are expected
-    final ItemCache ir = new ItemCache(Math.max(1, (int) iter.size()));
-    ir.add(iter);
-    return ir;
-  }
-
-  /**
-   * Adds the contents of an iterator.
-   * @param iter entry to be added
-   * @throws QueryException query exception
-   */
-  public void add(final Iter iter) throws QueryException {
-    for(Item i; (i = iter.next()) != null;) add(i);
+  public void add(final Value val) {
+    for(long sz = val.size(); item.length - size < sz;) item = extend(item);
+    size += val.writeTo(item, size);
   }
 
   /**

@@ -10,6 +10,8 @@ import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 
@@ -53,9 +55,10 @@ public final class If extends Arr {
     }
 
     // if A then false() else true() -> not(A)
-    if(expr[1] == Bln.FALSE && expr[2] == Bln.TRUE) {
+    if(expr[1].type().eq(SeqType.BLN) && expr[2] == Bln.TRUE) {
       ctx.compInfo(OPTWRITE, this);
-      return FunDef.NOT.get(input, expr[0]);
+      final Expr e = FunDef.NOT.get(input, expr[0]);
+      return expr[1] == Bln.FALSE ? e : new Or(input, e, expr[1]);
     }
 
     // if not(A) then B else C -> if A then C else B
@@ -74,6 +77,11 @@ public final class If extends Arr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     return ctx.iter(eval(ctx));
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    return ctx.value(eval(ctx));
   }
 
   @Override

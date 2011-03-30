@@ -7,6 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Empty sequence.
@@ -96,5 +97,15 @@ public final class Empty extends Value {
   @Override
   public String toString() {
     return "()";
+  }
+
+  @Override
+  public int writeTo(final Item[] arr, final int start) {
+    return 0;
+  }
+
+  @Override
+  public Item itemAt(final long pos) {
+    throw Util.notexpected();
   }
 }

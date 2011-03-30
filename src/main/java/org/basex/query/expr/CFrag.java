@@ -80,6 +80,6 @@ public abstract class CFrag extends Arr {
 
   @Override
   protected final String toString(final String pref) {
-    return pref + " { " + super.toString(SEP) + " }";
+    return pref + " { (" + super.toString(SEP) + ") }";
   }
 }

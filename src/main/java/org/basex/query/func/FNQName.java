@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
@@ -64,8 +63,8 @@ final class FNQName extends Fun {
         final Item it3 = it2 == null ? Str.ZERO :
           checkType(it2, AtomType.STR);
         final byte[] atm = it3.atom(input);
-        final byte[] str = !contains(atm, ':') && eq(uri, XMLURI)
-            ? concat(XMLC, atm) : atm;
+        final byte[] str = !contains(atm, ':') && eq(uri, XMLURI) ?
+            concat(XMLC, atm) : atm;
         if(!XMLToken.isQName(str)) Err.value(input, AtomType.QNM, it3);
         QNm nm = new QNm(str, uri);
         if(nm.ns() && uri.length == 0)
@@ -83,7 +82,8 @@ final class FNQName extends Fun {
         // [LK] Namespaces: find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);
         final ANode an = (ANode) checkType(it2, NodeType.ELM);
-        final Atts at = an.nsScope(!copiedNod(an, ctx) || ctx.nsInherit);
+        final boolean copied = ctx.copiedNods.contains(an.data());
+        final Atts at = an.nsScope(!copied || ctx.nsInherit);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:
@@ -96,18 +96,6 @@ final class FNQName extends Fun {
       default:
         return super.item(ctx, ii);
     }
-  }
-
-  /**
-   * Determines if the given node has been constructed via a transform
-   * expression.
-   * @param node node to be checked
-   * @param ctx query context
-   * @return true, if part of copied nodes
-   */
-  private boolean copiedNod(final ANode node, final QueryContext ctx) {
-    return node instanceof DBNode &&
-      ctx.copiedNods.contains(((DBNode) node).data);
   }
 
   /**
@@ -165,9 +153,9 @@ final class FNQName extends Fun {
     if(emp == null) emp = ctx.nsElem;
     if(emp.length != 0) pref.add(EMPTY);
 
-    final ItemCache ir = new ItemCache(pref.size());
-    for(final byte[] t : pref.keys()) ir.add(Str.get(t));
-    return ir;
+    final ItemCache ic = new ItemCache(pref.size());
+    for(final byte[] t : pref.keys()) ic.add(Str.get(t));
+    return ic;
   }
 
   @Override

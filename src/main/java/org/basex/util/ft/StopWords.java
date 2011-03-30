@@ -43,8 +43,8 @@ public final class StopWords extends TokenSet {
    * @param data data reference
    */
   public void comp(final Data data) {
-    // stop words have already been defined..
-    if(size() != 0) return;
+    // no data reference, or stop words have already been defined..
+    if(data == null || size() != 0) return;
     // try to parse the stop words file of the current database
     try {
       final File file = data.meta.file(DATASWL);

@@ -468,6 +468,8 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
   /** XPTY0004: Typing exception. */
+  XPINVPROM(XPTY, 4, "Can't promote type % to %: %."),
+  /** XPTY0004: Typing exception. */
   XPCAST(XPTY, 4, "Invalid %(%) cast."),
   /** XPTY0004: Typing Exception. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
@@ -793,7 +795,7 @@ public enum Err {
   }
 
   /**
-   * Throws a numeric type exception.
+   * Throws a type cast exception.
    * @param ii input info
    * @param t expression cast type
    * @param v value
@@ -803,6 +805,19 @@ public enum Err {
   public static QueryException cast(final InputInfo ii, final Type t,
       final Value v) throws QueryException {
     throw XPINVCAST.thrw(ii, v.type, t, v);
+  }
+
+  /**
+   * Throws a type cast exception.
+   * @param ii input info
+   * @param t expression cast type
+   * @param v value
+   * @return query exception (indicates that an error is raised)
+   * @throws QueryException query exception
+   */
+  public static QueryException promote(final InputInfo ii, final Type t,
+      final Value v) throws QueryException {
+    throw XPINVPROM.thrw(ii, v.type, t, v);
   }
 
   /**

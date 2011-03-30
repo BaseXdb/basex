@@ -129,12 +129,9 @@ public final class NodeCache extends AxisIter {
   public boolean dbnodes() {
     if(random) sort(sort);
 
-    if(size == 0 || !(item[0] instanceof DBNode)) return false;
-    final DBNode n = (DBNode) item[0];
-    for(int s = 1; s < size; ++s) {
-      if(!(item[s] instanceof DBNode) || n.data != ((DBNode) item[s]).data)
-        return false;
-    }
+    final Data data = size > 0 ? item[0].data() : null;
+    if(data == null) return false;
+    for(int s = 1; s < size; ++s) if(data != item[s].data()) return false;
     return true;
   }
 
@@ -162,7 +159,7 @@ public final class NodeCache extends AxisIter {
    * @return position of the item or {@code -insertPosition - 1} if not found
    */
   public int binarySearch(final DBNode nd, final int start, final int length) {
-    if(size == 0 || nd.data != ((DBNode) item[0]).data) return -start - 1;
+    if(size == 0 || nd.data != item[0].data()) return -start - 1;
     int l = start, r = start + length - 1;
     while(l <= r) {
       final int m = l + r >>> 1;
