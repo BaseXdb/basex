@@ -302,6 +302,8 @@ c_showxquerytt=Zeigt den Anfrage-Editor an.
 c_undo=Rückgängig
 c_xqopen=öffnen
 c_xqopentt=Öffnet eine XQuery-Datei
+c_xqclose=Schließen
+c_xqclosett=Schließt die Abfrage und löscht das Textfeld
 c_save=Speichern
 c_savett=Speichert die Datei
 c_saveas=Speichern unter
@@ -579,7 +581,6 @@ h_save=Speichert das Ergebnis.
 h_go=Führt die Anfrage aus.
 h_stop=Stoppt den aktuellen Prozess.
 h_recent=Zuletzt geöffnete Dateien
-h_qclose=Schließt die Abfrage und löscht das Textfeld
 h_cmd=Hier können BaseX Befehle eingegeben werden. Versuche 'help' um eine Übersicht über alle Befehle zu bekommen.\n\nVorherige Eingaben können durch die Cursortasten Hoch und Runter angezeigt werden.
 h_searchxml=Hier kann ein beliebiger Suchbegriff für die Suche im XML Dokument eingegeben werden. Die folgende Syntax wird unterstützt:\n...      Finde Tags und Texte\n=...   Finde die exakten Textknoten\n@ ...  Finde Attribute und Attributwerte\n@=   Finde die exakten Attributwerte\n/...     Führe die Eingabe als XQuery aus
 h_xpath=Der XQuery-Modus erlaubt die Eingabe und Ausführung von XQuery-Anfragen.

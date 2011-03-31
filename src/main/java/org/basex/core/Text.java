@@ -936,6 +936,10 @@ public interface Text {
   String GUIXQOPEN = lang("c_xqopen");
   /** Command info. */
   String GUIXQOPENTT = lang("c_xqopentt");
+  /** Help string. */
+  String GUIXQCLOSE = lang("c_xqclose");
+  /** Help string. */
+  String GUIXQCLOSETT = lang("c_xqclosett");
   /** Command info. */
   String GUISAVE = lang("c_save");
   /** Command info. */
@@ -1348,8 +1352,6 @@ public interface Text {
   byte[] HELPSAVE = token(lang("h_save"));
   /** Help string. */
   byte[] HELPRECENT = token(lang("h_recent"));
-  /** Help string. */
-  byte[] HELPQCLOSE = token(lang("h_qclose"));
   /** Help dialog. */
   byte[] HELPCMD = token(lang("h_cmd"));
   /** Help dialog. */

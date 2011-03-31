@@ -302,6 +302,8 @@ c_showxquerytt=Show the Query editor.
 c_undo=Undo
 c_xqopen=Open
 c_xqopentt=Opens an XQuery file
+c_xqclose=Close
+c_xqclosett=Closes the query and clears the textfield
 c_save=Save
 c_savett=Saves the XQuery file
 c_saveas=Save as
@@ -579,7 +581,6 @@ h_save=Saves the result.
 h_go=Executes the query.
 h_stop=Stops the current process.
 h_recent=Recently opened files
-h_qclose=Closes the query and clears the textfield
 h_cmd=Here you can enter BaseX commands. Try 'help' to get a survey on all available commands.\n\nYou can retrieve previous inputs with the cursor keys UP and DOWN.
 h_searchxml=Just type something in the text field to search in your XML document. The following syntax is supported:\n...      Find tags and texts\n=...   Find exact text nodes\n@ ...  Find attributes and attribute values\n@=   Find exact attribute values\n/...     Evaluate input as XQuery
 h_xpath=The XQuery mode allows the input of simple XQuery requests.

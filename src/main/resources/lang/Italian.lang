@@ -302,6 +302,8 @@ c_showxquerytt=Mostra il pannello dell'interrogazione.
 c_undo=Annulla
 c_xqopen=Apri
 c_xqopentt=Apre un documento interrogazione
+c_xqclose=Chiudi
+c_xqclosett=Closes the query and clears the textfield
 c_save=Salva
 c_savett=Salva il documento
 c_saveas=Salva come
@@ -579,7 +581,6 @@ h_save=Salva i risultati.
 h_go=Esegue l'interrogazione.
 h_stop=Ferma il processo in corso.
 h_recent=File aperti recentemente
-h_qclose=Closes the query and clears the textfield
 h_cmd=Qui puoi inserire i comandi BaseX. Usa 'aiuto' per avere una panoramica di tutti i comandi disponibili.\n\nPuoi recuperare inserimenti precedenti con i tasti SU e GIU'.
 h_searchxml=Digita qualcosa nel campo di testo per cercarlo nel tuo documento XML. La seguente sintassi è supportata:\n...      Trova tag e testi\n=...   Trova nodi testo esatti\n@ ...  Trova attributi e loro valori\n@=   Trova valori di attributi esatti\n/...     Esegui input come XQuery
 h_xpath=La modalità XQuery permette l'inserimento di semplici richieste XQuery.

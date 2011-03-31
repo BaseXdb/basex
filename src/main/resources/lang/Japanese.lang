@@ -305,6 +305,8 @@ c_xqopentt=XQueryファイルを開きます。
 c_save=保存
 c_savett=ファイルを保存します。
 c_saveas=別名で保存
+c_xqclose=閉じる
+c_xqclose=Closes the query and clears the textfield
 c_notopened=ファイルが開けませんでした。
 c_notsaved=ファイルを保存できませんでした。
 c_replace=ファイル "%" は既に存在します。\n置換してよろしいですか。
@@ -581,7 +583,6 @@ h_save=検索結果を保存します。
 h_go=クエリーを実行します。
 h_stop=現在の操作を中止します。
 h_recent=最近オープンしたファイル
-h_qclose=Closes the query and clears the textfield
 h_cmd=ここにBaseXのコマンドを入力できます。'help' と入力すると全てのコマンドが表示されます。\n\n以前の入力したコマンドを呼び出すには↑↓ボタンを使います。
 h_searchxml=テキストフィールドに何か入力してXML文書を検索します。以下の文法が使えます。\n...      タグとテキストを検索します。\n=...   入力と完全に一致するテキストノードを検索します。\n@ ...  属性と属性値を検索します。\n@=   入力と完全に一致する属性値を検索します。\n/...     入力をXQueryとして評価します。
 h_xpath=XQueryモードでは簡単なXQueryを入力できます。
