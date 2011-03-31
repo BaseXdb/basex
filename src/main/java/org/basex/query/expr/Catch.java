@@ -91,6 +91,6 @@ public final class Catch extends Single {
 
   @Override
   public String toString() {
-    return "catch { " + expr + "}";
+    return "catch { " + expr + " }";
   }
 }

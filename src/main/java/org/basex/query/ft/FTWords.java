@@ -173,14 +173,14 @@ public final class FTWords extends FTExpr {
               }
             }
             if(iat == null) {
-              iat = ia;
               tl = t;
+              iat = ia;
             } else if(mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS) {
-              iat = FTIndexIterator.intersect(ia, iat, 0);
               tl += t;
+              iat = FTIndexIterator.intersect(ia, iat, 0);
             } else {
-              iat = FTIndexIterator.union(ia, iat);
               tl = Math.max(t, tl);
+              iat = FTIndexIterator.union(ia, iat);
             }
             iat.tokenNum(++ctx.ftoknum);
           }

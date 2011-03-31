@@ -28,11 +28,6 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test path. */
   private static final String PATH4 = Prop.TMP + NAME + "/x/x";
 
-  /** Constructor. */
-  public FNFileTest() {
-    super("file");
-  }
-
   /** Initializes the test. */
   @BeforeClass
   public static void init() {

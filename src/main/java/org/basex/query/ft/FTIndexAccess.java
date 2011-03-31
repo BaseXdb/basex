@@ -10,9 +10,11 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Simple;
 import org.basex.query.item.FTNode;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * FTContains expression with index access.
@@ -75,7 +77,8 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    return name() + PAR1 + "\"" + ictx.data.meta.name + "\"" +
-      SEP + ftexpr + PAR2;
+    return new TokenBuilder(NodeType.DOC.nam).add(" { \"").
+        add(ictx.data.meta.name).add("\" }/fulltext").add(PAR1).
+        add(ftexpr.toString()).add(PAR2).toString();
   }
 }

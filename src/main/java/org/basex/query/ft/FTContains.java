@@ -8,6 +8,7 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpG;
+import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Bln;
@@ -95,7 +96,7 @@ public class FTContains extends ParseExpr {
   public final boolean indexAccessible(final IndexContext ic)
       throws QueryException {
     // return if step is no text node, or if no index is available
-    final AxisStep s = CmpG.indexStep(expr);
+    final AxisStep s = expr instanceof Context ? ic.step : CmpG.indexStep(expr);
     final boolean ok = s != null && ic.data.meta.ftindex &&
       s.test.type == NodeType.TXT && ftexpr.indexAccessible(ic);
     ic.seq |= ic.not;
@@ -105,16 +106,17 @@ public class FTContains extends ParseExpr {
   @Override
   public final Expr indexEquivalent(final IndexContext ic)
       throws QueryException {
+
     ic.ctx.compInfo(OPTFTXINDEX);
 
-    final FTExpr ie = ftexpr.indexEquivalent(ic);
-
     // sequential evaluation with index access
+    final FTExpr ie = ftexpr.indexEquivalent(ic);
     if(ic.seq) return new FTContainsIndex(input, expr, ie, ic);
 
     // standard index evaluation; first expression will always be an axis path
-    final FTIndexAccess ia = new FTIndexAccess(input, ie, ic);
-    return ((AxisPath) expr).invertPath(ia, ic.step);
+    final FTIndexAccess root = new FTIndexAccess(input, ie, ic);
+    return expr instanceof Context ? root :
+      ((AxisPath) expr).invertPath(root, ic.step);
   }
 
   @Override

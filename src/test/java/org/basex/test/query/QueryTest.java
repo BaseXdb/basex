@@ -99,7 +99,7 @@ public abstract class QueryTest {
           ++fail;
         }
       } catch(final BaseXException ex) {
-        if(correct) {
+        if(correct || ex.getMessage().contains("mailman")) {
           final String cp = correct && (!(cmp instanceof Nodes) ||
               ((Nodes) cmp).data != null) ? cmp.toString() : "()";
           sb.append("-- " + qu[0] + ": " + query + "\n[E] " +

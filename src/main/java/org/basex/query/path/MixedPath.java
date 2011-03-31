@@ -1,14 +1,14 @@
 package org.basex.query.path;
 
 import static org.basex.query.util.Err.*;
-import java.io.IOException;
-import org.basex.data.Serializer;
+import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -22,34 +22,40 @@ import org.basex.util.InputInfo;
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
- * @author Sebastian Gath
  */
 public final class MixedPath extends Path {
-  /** Expression list. */
-  private Expr[] expr;
-
   /**
    * Constructor.
    * @param ii input info
-   * @param r root expression; can be null
-   * @param s location steps; will at least have one entry
+   * @param r root expression; can be a {@code null} reference
+   * @param s axis steps
    */
   public MixedPath(final InputInfo ii, final Expr r, final Expr... s) {
-    super(ii, r);
-    expr = s;
+    super(ii, r, s);
   }
 
   @Override
   protected Expr compPath(final QueryContext ctx) throws QueryException {
-    for(final Expr e : expr) checkUp(e, ctx);
+    for(final Expr e : step) checkUp(e, ctx);
+    final AxisStep s = voidStep(step);
+    if(s != null) COMPSELF.thrw(input, s);
 
-    for(int e = 0; e != expr.length; ++e) {
-      expr[e] = expr[e].comp(ctx);
-      if(expr[e].empty()) return Empty.SEQ;
+    for(int e = 0; e != step.length; ++e) {
+      step[e] = step[e].comp(ctx);
+      if(step[e].empty()) return Empty.SEQ;
     }
-    expr = optSteps(expr, ctx);
+    optSteps(ctx);
 
-    type = SeqType.get(expr[expr.length - 1].type().type, SeqType.Occ.ZM);
+    // rewrite to child steps
+    final Data data = ctx.data();
+    if(data != null && data.meta.uptodate && ctx.value.type == NodeType.DOC) {
+      final Expr e = children(ctx, data);
+      // return optimized expression
+      if(e != this) return e.comp(ctx);
+    }
+
+    size = size(ctx);
+    type = SeqType.get(step[step.length - 1].type().type, size);
     return this;
   }
 
@@ -60,85 +66,75 @@ public final class MixedPath extends Path {
     final long cs = ctx.size;
     final long cp = ctx.pos;
     ctx.value = v;
-    final ItemCache ic = eval(ctx);
+    final Iter ir = eval(ctx);
     ctx.value = c;
     ctx.size = cs;
     ctx.pos = cp;
-    return ic;
+    return ir;
   }
 
   /**
-   * Evaluates the location path.
+   * Evaluates the mixed path expression.
    * @param ctx query context
    * @return resulting item
    * @throws QueryException query exception
    */
-  private ItemCache eval(final QueryContext ctx) throws QueryException {
-    // simple location step traversal...
-    ItemCache res = ctx.value.cache();
-    for(final Expr e : expr) {
-      final Iter ir = res;
+  private Iter eval(final QueryContext ctx) throws QueryException {
+    // creates an initial item cache
+    Iter res = ctx.value.iter();
+    // loop through all expressions
+    final int el = step.length;
+    for(int ex = 0; ex < el; ex++) {
+      final Expr e = step[ex];
+      final boolean last = ex + 1 == el;
       final ItemCache ii = new ItemCache();
-      ctx.size = ir.size();
+      ctx.size = res.size();
       ctx.pos = 1;
-      for(Item it; (it = ir.next()) != null;) {
+      // this flag indicates if the resulting items contain nodes
+      boolean nodes = false;
+      // loop through all input items
+      for(Item it; (it = res.next()) != null;) {
         if(!it.node()) NODESPATH.thrw(input, this, it.type);
         ctx.value = it;
-        ii.add(ctx.value(e));
+        // loop through all resulting items
+        final Iter ir = ctx.iter(e);
+        for(Item i; (i = ir.next()) != null;) {
+          // set node flag
+          if(ii.size() == 0) nodes = i.node();
+          // check if both nodes and atomic values occur in last result
+          else if(last && nodes != i.node()) EVALNODESVALS.thrw(input);
+          ii.add(i);
+        }
         ctx.pos++;
       }
-
-      // either nodes or atomic items are allowed in a result set, but not both
-      if(ii.size() != 0 && ii.get(0).node()) {
-        // [LW] why another iterator?
+      if(nodes) {
+        // remove potential duplicates from node sets
         final NodeCache nc = new NodeCache().random();
-        for(Item it; (it = ii.next()) != null;) {
-          if(!it.node()) EVALNODESVALS.thrw(input);
-          nc.add((ANode) it);
-        }
+        for(Item it; (it = ii.next()) != null;) nc.add((ANode) it);
         res = nc.finish().cache();
       } else {
-        for(Item it; (it = ii.next()) != null;) {
-          if(it.node()) EVALNODESVALS.thrw(input);
-        }
         res = ii;
       }
     }
-    res.reset();
     return res;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return uses(expr, u);
   }
 
   @Override
   public int count(final Var v) {
     int c = 0;
-    for(final Expr e : expr) c += e.count(v);
+    for(final Expr e : step) c += e.count(v);
     return c + super.count(v);
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final Expr e : expr) if(e.uses(Use.VAR)) return false;
+    for(final Expr e : step) if(e.uses(Use.VAR)) return false;
     return true;
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].remove(v);
+    for(int e = 0; e != step.length; ++e) step[e] = step[e].remove(v);
     return super.remove(v);
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    super.plan(ser, expr);
-  }
-
-  @Override
-  public String toString() {
-    return toString(expr);
   }
 }

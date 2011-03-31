@@ -4,15 +4,15 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Function item.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Leonard Woerteler
+ * @author Leo Woerteler
  */
 public abstract class Fun extends Item {
-
   /**
    * Constructor.
    */
@@ -22,12 +22,12 @@ public abstract class Fun extends Item {
 
   @Override
   public final byte[] atom(final InputInfo ii) {
-    throw new RuntimeException("Functions don't habe atomic values.");
+    throw Util.notexpected("Functions don't habe atomic values.");
   }
 
   @Override
   public final ValueIter iter() {
-    throw new RuntimeException("Functions can't be evaluated");
+    throw Util.notexpected("Functions can't be evaluated");
   }
 
   /**

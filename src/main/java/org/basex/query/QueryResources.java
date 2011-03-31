@@ -15,12 +15,9 @@ import org.basex.io.IO;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
@@ -176,33 +173,6 @@ public final class QueryResources {
       }
     }
     return coll[c];
-  }
-
-  /**
-   * Returns the common data reference of all context items, or {@code null}.
-   * @return data reference
-   * @throws QueryException query exception
-   */
-  public Data data() throws QueryException {
-    final Value v = ctx.value;
-    if(v == null) return null;
-    if(v instanceof DBNodeSeq && v.type == NodeType.DOC)
-      return ((DBNodeSeq) v).data;
-
-    // check if a global data reference exists, if context value and first
-    // collection reference are equal, and if first item is a document node
-    if(ctx.nodes != null && v.sameAs(coll[0]) && v.size() != 0 &&
-      (v.item() ? (Item) v : v.iter().next()).type == NodeType.DOC)
-      return data[0];
-
-    final Iter iter = v.iter();
-    Data db = null;
-    for(Item it; (it = iter.next()) != null;) {
-      if(!(it instanceof DBNode)) return null;
-      if(db == null) db = it.data();
-      else if(db != it.data()) return null;
-    }
-    return db;
   }
 
   /**

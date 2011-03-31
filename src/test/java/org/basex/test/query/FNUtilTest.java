@@ -12,11 +12,6 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class FNUtilTest extends AdvancedQueryTest {
-  /** Constructor. */
-  public FNUtilTest() {
-    super("util");
-  }
-
   /**
    * Test method for the util:eval() functions.
    * @throws QueryException database exception

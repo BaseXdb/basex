@@ -22,7 +22,6 @@ import org.basex.query.path.AxisPath;
 import org.basex.query.path.NameTest;
 import org.basex.query.path.AxisStep;
 import org.basex.query.path.Test.Name;
-import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -156,21 +155,10 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public AxisPath indexEquivalent(final IndexContext ic) {
-    final Expr root = new RangeAccess(input, rt, ic);
-
-    final AxisPath orig = (AxisPath) expr;
-    final AxisPath path = orig.invertPath(root, ic.step);
-
+  public Expr indexEquivalent(final IndexContext ic) {
+    final boolean text = rt.type() == IndexType.TEXT;
     ic.ctx.compInfo(OPTRNGINDEX);
-    if(rt.type() == IndexType.ATTRIBUTE) {
-      // add attribute step
-      final AxisStep step = orig.step[0];
-      AxisStep[] steps = { AxisStep.get(input, Axis.SELF, step.test) };
-      for(final AxisStep s : path.step) steps = Array.add(steps, s);
-      path.step = steps;
-    }
-    return path;
+    return ic.invert(expr, new RangeAccess(input, rt, ic), text);
   }
 
   /**
@@ -188,10 +176,10 @@ public final class CmpR extends Single {
 
     AxisStep step = null;
     if(text) {
-      step = st == 1 ? ic.step : path.step[st - 2];
+      step = st == 1 ? ic.step : path.step(st - 2);
       if(!(step.test.test == Name.NAME)) return null;
     } else {
-      step = path.step[st - 1];
+      step = path.step(st - 1);
       if(!step.simple(Axis.ATTR, true)) return null;
     }
 
