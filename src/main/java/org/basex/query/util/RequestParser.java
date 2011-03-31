@@ -132,10 +132,12 @@ public final class RequestParser {
       final ItemCache bodyContent, final InputInfo ii) throws QueryException {
     parseAttrs(body, attrs);
     checkBody(body, attrs, ii);
-    ANode n;
-    final NodeMore i = body.children();
-    while((n = i.next()) != null) {
-      bodyContent.add(n);
+    if(attrs.get(SRC) == null) {
+      ANode n;
+      final NodeMore i = body.children();
+      while((n = i.next()) != null) {
+        bodyContent.add(n);
+      }
     }
   }
 
@@ -192,8 +194,8 @@ public final class RequestParser {
       final byte[] usrname = r.attrs.get(USRNAME);
       final byte[] passwd = r.attrs.get(PASSWD);
 
-      if(usrname == null && passwd != null ||
-          usrname != null && passwd == null) CREDSERR.thrw(ii);
+      if(usrname == null && passwd != null || usrname != null && passwd == null)
+        CREDSERR.thrw(ii);
     }
   }
 
