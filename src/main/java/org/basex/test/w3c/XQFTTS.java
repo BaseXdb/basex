@@ -42,7 +42,7 @@ public final class XQFTTS extends W3CTS {
    * Constructor.
    */
   public XQFTTS() {
-    super("XQFTTS");
+    super(Util.name(XQFTTS.class));
   }
 
   @Override
