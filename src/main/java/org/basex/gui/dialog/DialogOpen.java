@@ -12,6 +12,7 @@ import org.basex.core.Context;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.List;
@@ -55,6 +56,8 @@ public final class DialogOpen extends Dialog {
   private final BaseXButton backup;
   /** Restore button. */
   private final BaseXButton restore;
+  /** Copy button. */
+  private final BaseXButton copy;
   /** Manage flag. */
   private final boolean manage;
 
@@ -96,11 +99,12 @@ public final class DialogOpen extends Dialog {
 
     backup = new BaseXButton(BUTTONBACKUP, this);
     restore = new BaseXButton(BUTTONRESTORE, this);
+    copy = new BaseXButton(BUTTONCOPY, this);
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
     drop = new BaseXButton(BUTTONDROP, this);
     buttons = manage ?
-        newButtons(this, backup, restore, rename, drop, BUTTONOK) :
+        newButtons(this, backup, restore, copy, rename, drop, BUTTONOK) :
         newButtons(this, open, BUTTONCANCEL);
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
@@ -138,9 +142,20 @@ public final class DialogOpen extends Dialog {
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
-      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, true);
+      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, 1);
       if(!dr.ok() || dr.input().equals(db)) return;
       final AlterDB cmd = new AlterDB(db, dr.input());
+      if(cmd.run(ctx)) {
+        gui.notify.init();
+      } else {
+        Dialog.error(gui, cmd.info());
+      }
+      choice.setData(List.list(ctx).toArray());
+      action(null);
+    } else if(cmp == copy) {
+      final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
+      if(!dc.ok() || dc.input().equals(db)) return;
+      final Copy cmd = new Copy(db, dc.input());
       if(cmd.run(ctx)) {
         gui.notify.init();
       } else {
@@ -193,6 +208,7 @@ public final class DialogOpen extends Dialog {
       enableOK(buttons, BUTTONOPEN, ok);
       enableOK(buttons, BUTTONRENAME, ok);
       enableOK(buttons, BUTTONBACKUP, ok);
+      enableOK(buttons, BUTTONCOPY, ok);
       enableOK(buttons, BUTTONRESTORE, ok && Restore.list(db, ctx).size() != 0);
     }
   }
