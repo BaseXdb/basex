@@ -118,16 +118,7 @@ public final class XQueryView extends View {
       }
     });
 
-    final BaseXButton close = new BaseXButton(gui, "close", HELPQCLOSE);
-    close.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        confirm();
-        text.setText(Token.EMPTY);
-        gui.context.query = null;
-        modified(false, true);
-      }
-    });
+    final BaseXButton close = BaseXButton.command(GUICommands.XQCLOSE, gui);
 
     BaseXBack sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 9));
     sp.add(find);
@@ -256,7 +247,7 @@ public final class XQueryView extends View {
   public void setQuery(final IO file) {
     if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
     try {
-      text.setText(file.content());
+      text.setText(file != null ? file.content() : Token.EMPTY);
       gui.context.query = file;
       gui.gprop.files(file);
       modified(false, true);

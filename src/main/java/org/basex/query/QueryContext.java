@@ -341,6 +341,14 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Returns the current data reference of the context value, or {@code null}.
+   * @return data reference
+   */
+  public Data data() {
+    return value != null ? value.data() : null;
+  }
+
+  /**
    * Creates a variable with a unique, non-clashing variable name.
    * @param ii input info
    * @param t type

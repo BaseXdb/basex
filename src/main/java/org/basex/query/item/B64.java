@@ -23,7 +23,7 @@ public final class B64 extends Bin {
    * @throws QueryException query exception
    */
   public B64(final byte[] d, final InputInfo ii) throws QueryException {
-    super(init(d, ii), AtomType.B64);
+    super(b64(d, ii), AtomType.B64);
   }
 
   /**
@@ -40,6 +40,14 @@ public final class B64 extends Bin {
    */
   B64(final Hex h) {
     this(h.val);
+  }
+
+  @Override
+  public boolean eq(final InputInfo ii, final Item it)
+      throws QueryException {
+    // at this stage, item will always be of the same type
+    return Token.eq(val, it instanceof Bin ? ((Bin) it).val :
+      b64(it.atom(ii), ii));
   }
 
   @Override
@@ -92,7 +100,7 @@ public final class B64 extends Bin {
    * @return binary data
    * @throws QueryException query exception
    */
-  private static byte[] init(final byte[] d, final InputInfo ii)
+  private static byte[] b64(final byte[] d, final InputInfo ii)
       throws QueryException {
 
     final ByteList bl = new ByteList();

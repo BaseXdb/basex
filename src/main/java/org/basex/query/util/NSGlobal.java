@@ -52,7 +52,7 @@ public final class NSGlobal {
    * @param uri URI
    * @return prefix
    */
-  static byte[] prefix(final byte[] uri) {
+  public static byte[] prefix(final byte[] uri) {
     for(int s = NS.size - 1; s >= 0; s--) {
       if(eq(NS.val[s], uri)) return NS.key[s];
     }

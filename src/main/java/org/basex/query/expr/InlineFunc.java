@@ -19,7 +19,7 @@ import org.basex.util.Util;
  * Inline function.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Leonard Woerteler
+ * @author Leo Woerteler
  */
 public class InlineFunc extends Func {
 

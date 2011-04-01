@@ -13,15 +13,20 @@ import org.basex.query.iter.Iter;
  * @author Christian Gruen
  */
 final class IterPosFilter extends Filter {
+  /** Offset flag. */
+  boolean off;
+
   /**
    * Constructor.
    * @param f original filter
+   * @param o offset flag
    */
-  IterPosFilter(final Filter f) {
+  IterPosFilter(final Filter f, final boolean o) {
     super(f.input, f.root, f.pred);
     type = f.type;
     last = f.last;
     pos = f.pos;
+    off = o;
   }
 
   @Override
@@ -42,6 +47,16 @@ final class IterPosFilter extends Filter {
 
         // first call - initialize iterator
         if(iter == null) {
+          if(off) {
+            // evaluate offset and create position expression
+            final Item it = pred[0].ebv(ctx, input);
+            final long l = it.itr(input);
+            final Expr e = Pos.get(l, l, input);
+            // don't accept fractional numbers
+            if(l != it.dbl(input) || !(e instanceof Pos)) return null;
+            pos = (Pos) e;
+          }
+
           iter = ctx.iter(root);
           cpos = 1;
 

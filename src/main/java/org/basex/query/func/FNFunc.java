@@ -28,7 +28,7 @@ import org.basex.util.InputInfo;
  * Functions on functions.
  *
  * @author BaseX Team 2005-11, BSD License
- * @author Christian Gruen
+ * @author Leo Woerteler
  */
 final class FNFunc extends Fun {
   /**

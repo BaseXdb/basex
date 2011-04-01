@@ -80,6 +80,8 @@ public abstract class CFrag extends Arr {
 
   @Override
   protected final String toString(final String pref) {
-    return pref + " { (" + super.toString(SEP) + ") }";
+    final StringBuilder sb = new StringBuilder(pref).append(" { ");
+    sb.append(expr.length == 0 ? "()" : super.toString(SEP));
+    return sb.append(" }").toString();
   }
 }

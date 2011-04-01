@@ -15,12 +15,14 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * This index class retrieves texts and attribute values from the index.
@@ -139,7 +141,9 @@ public final class IndexAccess extends Single {
 
   @Override
   public String toString() {
-    return name() + PAR1 + "\"" + ictx.data.meta.name + "\"" + SEP +
-      expr + SEP + ind + PAR2;
+    return new TokenBuilder(NodeType.DOC.nam).add(" { \"").
+      add(ictx.data.meta.name).add("\" }/").add(DB).add(':').
+      add(ind.toString().toLowerCase()).
+      add(PAR1).add(expr.toString()).add(PAR2).toString();
   }
 }

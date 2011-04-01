@@ -137,8 +137,7 @@ public final class DBNodeSeq extends Seq {
 
   @Override
   public int writeTo(final Item[] arr, final int start) {
-    for(int i = 0; i < pres.length; i++)
-      arr[i + start] = new DBNode(data, pres[i]);
+    for(int i = 0; i < pres.length; i++) arr[i + start] = itemAt(i);
     return pres.length;
   }
 

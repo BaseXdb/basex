@@ -306,7 +306,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Data checkData(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.resource.data();
+    final Data data = ctx.data();
     if(data == null) NODBCTX.thrw(input, this);
     return data;
   }

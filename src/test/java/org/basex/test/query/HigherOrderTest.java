@@ -11,12 +11,6 @@ import org.junit.Test;
  * @author Leo Woerteler
  */
 public class HigherOrderTest extends AdvancedQueryTest {
-
-  /** Constructor. */
-  public HigherOrderTest() {
-    super("fn");
-  }
-
   /**
    * Test for name shadowing.
    * @throws QueryException exception

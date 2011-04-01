@@ -96,6 +96,13 @@ public final class Try extends Single {
   }
 
   @Override
+  public int count(final Var v) {
+    int c = super.count(v);
+    for(final Catch ct : ctch) c += ct.count(v);
+    return c;
+  }
+
+  @Override
   public boolean uses(final Use u) {
     for(final Catch c : ctch) if(c.uses(u)) return true;
     return super.uses(u);
@@ -123,7 +130,7 @@ public final class Try extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("try { " + expr + "}");
+    final StringBuilder sb = new StringBuilder("try { " + expr + " }");
     for(final Catch c : ctch) sb.append(" " + c);
     return sb.toString();
   }

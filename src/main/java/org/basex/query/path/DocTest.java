@@ -4,6 +4,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.query.QueryContext;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
@@ -40,6 +41,10 @@ final class DocTest extends Test {
     // use simple test if database contains only one node
     if(data.single()) return Test.DOC;
 
+    // adopt nodes from existing sequence
+    if(ctx.value instanceof DBNodeSeq)
+      return new DocTest(new Nodes(((DBNodeSeq) ctx.value).pres, data));
+
     // loop through all documents and add pre values of documents
     // not more than 2^31 documents supported
     final IntList il = new IntList((int) ctx.value.size());
@@ -59,6 +64,6 @@ final class DocTest extends Test {
 
   @Override
   public String toString() {
-    return type.toString();
+    return type + " { " + nodes.size() + " }";
   }
 }
