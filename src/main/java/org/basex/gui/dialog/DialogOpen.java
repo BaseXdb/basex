@@ -12,6 +12,7 @@ import org.basex.core.Context;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.List;
@@ -55,8 +56,12 @@ public final class DialogOpen extends Dialog {
   private final BaseXButton backup;
   /** Restore button. */
   private final BaseXButton restore;
+  /** Copy button. */
+  private final BaseXButton copy;
   /** Manage flag. */
   private final boolean manage;
+  /** Refresh. */
+  private boolean refresh;
 
   /**
    * Default constructor.
@@ -96,11 +101,12 @@ public final class DialogOpen extends Dialog {
 
     backup = new BaseXButton(BUTTONBACKUP, this);
     restore = new BaseXButton(BUTTONRESTORE, this);
+    copy = new BaseXButton(BUTTONCOPY, this);
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
     drop = new BaseXButton(BUTTONDROP, this);
     buttons = manage ?
-        newButtons(this, backup, restore, rename, drop, BUTTONOK) :
+        newButtons(this, backup, restore, copy, rename, drop, BUTTONOK) :
         newButtons(this, open, BUTTONCANCEL);
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
@@ -134,11 +140,12 @@ public final class DialogOpen extends Dialog {
     final String db = choice.getValue().trim();
     final String opendb = ctx.data != null ? ctx.data.meta.name : null;
     ok = true;
-
+    if(refresh) choice.setData(List.list(ctx).toArray());
+    refresh = false;
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
-      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, true);
+      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, 1);
       if(!dr.ok() || dr.input().equals(db)) return;
       final AlterDB cmd = new AlterDB(db, dr.input());
       if(cmd.run(ctx)) {
@@ -148,6 +155,13 @@ public final class DialogOpen extends Dialog {
       }
       choice.setData(List.list(ctx).toArray());
       action(null);
+    } else if(cmp == copy) {
+      final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
+      if(!dc.ok() || dc.input().equals(db)) return;
+      setCursor(GUIConstants.CURSORWAIT);
+      DialogProgress.execute(this, "", new Copy(db, dc.input()));
+      setCursor(GUIConstants.CURSORARROW);
+      refresh = true;
     } else if(cmp == drop) {
       if(db.isEmpty() || !Dialog.confirm(gui, Util.info(DROPCONF, db))) return;
       if(db.equals(opendb)) {
@@ -193,6 +207,7 @@ public final class DialogOpen extends Dialog {
       enableOK(buttons, BUTTONOPEN, ok);
       enableOK(buttons, BUTTONRENAME, ok);
       enableOK(buttons, BUTTONBACKUP, ok);
+      enableOK(buttons, BUTTONCOPY, ok);
       enableOK(buttons, BUTTONRESTORE, ok && Restore.list(db, ctx).size() != 0);
     }
   }

@@ -117,7 +117,7 @@ public enum GUICommands implements GUICommand {
   DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogInput d = new DialogInput("", DROPTITLE, gui, false);
+      final DialogInput d = new DialogInput("", DROPTITLE, gui, 0);
       if(d.ok()) DialogProgress.execute(gui, "", new Delete(d.input()));
     }
   },
