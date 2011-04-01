@@ -60,6 +60,8 @@ public final class DialogOpen extends Dialog {
   private final BaseXButton copy;
   /** Manage flag. */
   private final boolean manage;
+  /** Refresh. */
+  private boolean refresh;
 
   /**
    * Default constructor.
@@ -138,7 +140,8 @@ public final class DialogOpen extends Dialog {
     final String db = choice.getValue().trim();
     final String opendb = ctx.data != null ? ctx.data.meta.name : null;
     ok = true;
-
+    if(refresh) choice.setData(List.list(ctx).toArray());
+    refresh = false;
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
@@ -155,14 +158,10 @@ public final class DialogOpen extends Dialog {
     } else if(cmp == copy) {
       final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
       if(!dc.ok() || dc.input().equals(db)) return;
-      final Copy cmd = new Copy(db, dc.input());
-      if(cmd.run(ctx)) {
-        gui.notify.init();
-      } else {
-        Dialog.error(gui, cmd.info());
-      }
-      choice.setData(List.list(ctx).toArray());
-      action(null);
+      setCursor(GUIConstants.CURSORWAIT);
+      DialogProgress.execute(this, "", new Copy(db, dc.input()));
+      setCursor(GUIConstants.CURSORARROW);
+      refresh = true;
     } else if(cmp == drop) {
       if(db.isEmpty() || !Dialog.confirm(gui, Util.info(DROPCONF, db))) return;
       if(db.equals(opendb)) {

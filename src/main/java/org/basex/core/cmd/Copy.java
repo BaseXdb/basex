@@ -19,6 +19,12 @@ import org.basex.core.User;
  * @author Andreas Weiler
  */
 public class Copy extends Command {
+
+  /** Counter for outstanding files. */
+  private int of;
+  /** Counter of total files. */
+  private int tf;
+
   /**
    * Default constructor.
    * @param db db name
@@ -59,9 +65,10 @@ public class Copy extends Command {
     // return false if source cannot be opened, or target cannot be created
     final String[] files = src.list();
     if(files == null || !trg.mkdir()) return false;
-
+    tf = files.length;
     boolean ok = true;
     for(final String file : files) {
+      of++;
       FileChannel sc = null;
       FileChannel dc = null;
       try {
@@ -78,5 +85,20 @@ public class Copy extends Command {
     // drop new database if error occurred
     if(!ok) DropDB.drop(newdb, pr);
     return ok;
+  }
+
+  @Override
+  protected String tit() {
+    return BUTTONCOPY;
+  }
+
+  @Override
+  public boolean supportsProg() {
+    return true;
+  }
+
+  @Override
+  protected double prog() {
+    return (double) of / tf;
   }
 }
