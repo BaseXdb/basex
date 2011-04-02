@@ -5,9 +5,12 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,13 +32,18 @@ import org.basex.query.QueryException;
 import org.basex.query.func.FNSimple;
 import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FElem;
+import org.basex.query.item.FTxt;
+import org.basex.query.item.Hex;
 import org.basex.query.item.NodeType;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
@@ -44,7 +52,9 @@ import org.basex.query.util.Request;
 import org.basex.query.util.Request.Part;
 import org.basex.query.util.RequestParser;
 import org.basex.query.util.ResponseHandler;
+import org.basex.test.query.FNFileTest;
 import org.basex.util.Token;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -57,6 +67,10 @@ import org.junit.Test;
 public final class HttpClientTest {
   /** Status code. */
   private static final byte[] STATUS = token("status");
+  /** Body attribute media-type. */
+  private static final byte[] MEDIATYPE = token("media-type");
+  /** Body attribute method. */
+  private static final byte[] METHOD = token("method");
 
   /** Database context. */
   protected static Context context;
@@ -352,9 +366,10 @@ public final class HttpClientTest {
   /**
    * Tests method setRequestContent of HttpClient.
    * @throws IOException IO exception
+   * @throws QueryException query exception
    */
   @Test
-  public void testWriteMultipartMessage() throws IOException {
+  public void testWriteMultipartMessage() throws IOException, QueryException {
     final Request req = new Request();
     req.isMultipart = true;
     req.payloadAttrs.add(token("media-type"), token("multipart/alternative"));
@@ -387,8 +402,151 @@ public final class HttpClientTest {
 
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient.setRequestContent(fakeConn.getOutputStream(), req);
+    HTTPClient.setRequestContent(fakeConn.getOutputStream(), req, null);
     System.out.println(fakeConn.out.toString());
+  }
+
+  /**
+   * Tests writing of request content with different combinations of the body
+   * attributes media-type and method.
+   * @throws IOException IO execption
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testWriteMessage() throws IOException, QueryException {
+
+    // Case 1: No method, media-type='text/xml'
+    final Request req1 = new Request();
+    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
+        "http://www.test.com"));
+    req1.payloadAttrs.add(MEDIATYPE, token("text/xml"));
+    // Node child
+    final NodeCache ch1 = new NodeCache();
+    ch1.add(new FTxt(token("a"), null));
+    final FElem e1 = new FElem(new QNm(token("a")), ch1, null, null, null, null);
+    req1.bodyContent.add(e1);
+    // String item child
+    req1.bodyContent.add(Str.get("<b>b</b>"));
+    HTTPClient.setRequestContent(fakeConn1.getOutputStream(), req1, null);
+    assertTrue(eq(fakeConn1.out.toByteArray(),
+        token("<a>a</a> &lt;b&gt;b&lt;/b&gt;")));
+
+    // Case 2: No method, media-type='text/plain'
+    final Request req2 = new Request();
+    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
+        "http://www.test.com"));
+    req2.payloadAttrs.add(MEDIATYPE, token("text/plain"));
+    // Node child
+    final NodeCache ch2 = new NodeCache();
+    ch2.add(new FTxt(token("a"), null));
+    final FElem e2 = new FElem(new QNm(token("a")), ch2, null, null, null, null);
+    req2.bodyContent.add(e2);
+    // String item child
+    req2.bodyContent.add(Str.get("<b>b</b>"));
+    HTTPClient.setRequestContent(fakeConn2.getOutputStream(), req2, null);
+    assertTrue(eq(fakeConn2.out.toByteArray(), token("a&lt;b&gt;b&lt;/b&gt;")));
+
+    // Case 3: method='text', media-type='text/xml'
+    final Request req3 = new Request();
+    final FakeHttpConnection fakeConn3 = new FakeHttpConnection(new URL(
+        "http://www.test.com"));
+    req3.payloadAttrs.add(MEDIATYPE, token("text/xml"));
+    req3.payloadAttrs.add(token("method"), token("text"));
+    // Node child
+    final NodeCache ch3 = new NodeCache();
+    ch3.add(new FTxt(token("a"), null));
+    final FElem e3 = new FElem(new QNm(token("a")), ch3, null, null, null, null);
+    req3.bodyContent.add(e3);
+    // String item child
+    req3.bodyContent.add(Str.get("<b>b</b>"));
+    HTTPClient.setRequestContent(fakeConn3.getOutputStream(), req3, null);
+    assertTrue(eq(fakeConn3.out.toByteArray(), token("a&lt;b&gt;b&lt;/b&gt;")));
+  }
+
+  /**
+   * Tests writing of body content when @method is http:base64Binary.
+   * @throws QueryException query exception
+   * @throws IOException IO exception
+   */
+  @Test
+  public void testWriteBase64() throws IOException, QueryException {
+    // Case 1: content is xs:base64Binary
+    final Request req1 = new Request();
+    req1.payloadAttrs.add(METHOD, token("http:base64Binary"));
+    req1.bodyContent.add(new B64(token("dGVzdA==")));
+    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
+        "http://www.test.com"));
+    HTTPClient.setRequestContent(fakeConn1.getOutputStream(), req1, null);
+    assertTrue(eq(token("dGVzdA=="), fakeConn1.out.toByteArray()));
+
+    // Case 2: content is a node
+    final Request req2 = new Request();
+    req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
+    final NodeCache ch = new NodeCache();
+    ch.add(new FTxt(token("dGVzdA=="), null));
+    final FElem e3 = new FElem(new QNm(token("a")), ch, null, null, null, null);
+    req2.bodyContent.add(e3);
+    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
+        "http://www.test.com"));
+    HTTPClient.setRequestContent(fakeConn2.getOutputStream(), req2, null);
+    assertTrue(eq(token("dGVzdA=="), fakeConn2.out.toByteArray()));
+  }
+
+  /**
+   * Tests writing of body content when @method is http:hexBinary.
+   * @throws IOException IO exception
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testWriteHex() throws IOException, QueryException {
+    // Case 1: content is xs:hexBinary
+    final Request req1 = new Request();
+    req1.payloadAttrs.add(METHOD, token("http:hexBinary"));
+    req1.bodyContent.add(new Hex(token("74657374")));
+    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
+        "http://www.test.com"));
+    HTTPClient.setRequestContent(fakeConn1.getOutputStream(), req1, null);
+    assertTrue(eq(token("74657374"), fakeConn1.out.toByteArray()));
+
+    // Case 2: content is a node
+    final Request req2 = new Request();
+    req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
+    final NodeCache ch = new NodeCache();
+    ch.add(new FTxt(token("74657374"), null));
+    final FElem e3 = new FElem(new QNm(token("a")), ch, null, null, null, null);
+    req2.bodyContent.add(e3);
+    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
+        "http://www.test.com"));
+    HTTPClient.setRequestContent(fakeConn2.getOutputStream(), req2, null);
+    assertTrue(eq(token("74657374"), fakeConn2.out.toByteArray()));
+  }
+
+  /**
+   * Tests writing of request content when @src is set.
+   * @throws QueryException query exception
+   * @throws IOException IO exception
+   */
+  @Test
+  public void testWriteFromResource() throws IOException, QueryException {
+    // Create a file form which will be read
+    final File f = new File(Prop.TMP + Util.name(HttpClientTest.class));
+    final FileOutputStream out = new FileOutputStream(f);
+    out.write(token("test"));
+    out.close();
+
+    // Request
+    final Request req = new Request();
+    req.payloadAttrs.add(token("src"), token("file:" + f.getPath()));
+    // HTTP connection
+    final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
+        "http://www.test.com"));
+    HTTPClient.setRequestContent(fakeConn.getOutputStream(), req, null);
+
+    // Delete file
+    f.delete();
+
+    assertTrue(eq(token("test"), fakeConn.out.toByteArray()));
+
   }
 
   /**
