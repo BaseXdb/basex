@@ -5,16 +5,14 @@ import static java.net.HttpURLConnection.*;
 import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
-import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Iterator;
-
 import org.basex.core.Prop;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
@@ -27,13 +25,12 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Request.Part;
-import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 
 /**
- * HTTP requestor - either request or part in case of multipart message.
+ * HTTP Client.
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -200,7 +197,7 @@ public final class HTTPClient {
   /**
    * Sets HTTP request headers.
    * @param conn HTTP connection
-   * @param r requets data
+   * @param r request data
    * @param ii input info
    * @throws QueryException query exception
    */
@@ -262,18 +259,6 @@ public final class HTTPClient {
   private static void writePayload(final ItemCache payload,
       final TokenMap payloadAtts, final OutputStream out, final InputInfo ii)
       throws IOException, QueryException {
-    // final StringBuilder sb = new StringBuilder();
-    // byte[] mediaType = payloadAtts.get(MEDIATYPE);
-    // String src = null;
-    // byte[] method = null;
-
-    // for(int i = 0; i < payloadAtts.size(); i++) {
-    // byte[] key = payloadAtts.keys()[i];
-    // if(eq(key, MEDIATYPE)) mediaType = payloadAtts.get(key);
-    // else if(eq(key, SRC)) src = string(payloadAtts.get(key));
-    // else if(eq(key, METHOD)) method = payloadAtts.get(key);
-    // sb.append(string(key)).append("=").append(string(payloadAtts.get(key)));
-    // }
 
     final byte[] mediaType = payloadAtts.get(MEDIATYPE);
     byte[] method = payloadAtts.get(METHOD);
@@ -302,7 +287,7 @@ public final class HTTPClient {
     } else {
       // If the src attribute is present, the content is set as the content of
       // the linked resource
-      out.write(readResource(src));
+      writeResource(src, out);
     }
   }
 
@@ -365,7 +350,7 @@ public final class HTTPClient {
     tb.add(token("method=")).add(method);
     final byte[][] keys = payloadAttrs.keys();
     for(final byte[] key : keys) {
-      if(!eq(key, SRC) && !eq(key, MEDIATYPE))
+      if(!eq(key, SRC) && !eq(key, MEDIATYPE) && !eq(key, METHOD))
         tb.add(',').add(key).add('=').add(payloadAttrs.get(key));
     }
 
@@ -384,18 +369,19 @@ public final class HTTPClient {
   /**
    * Reads the content of the linked resource.
    * @param src resource link
-   * @return content
+   * @param out output stream
    * @throws IOException IO exception
    */
-  private static byte[] readResource(final byte[] src) throws IOException {
-    final BufferedInputStream bis = new BufferedInputStream(
-        new URL(string(src)).openStream());
+  private static void writeResource(final byte[] src, final OutputStream out)
+      throws IOException {
+    final InputStream bis = new URL(string(src)).openStream();
     try {
-      final ByteList bl = new ByteList();
-      int i = 0;
-      while((i = bis.read()) != -1)
-        bl.add(i);
-      return bl.toArray();
+      final byte[] buf = new byte[256];
+      while(true) {
+        int len = bis.read(buf, 0, buf.length);
+        if(len <= 0) break;
+        out.write(buf, 0, len);
+      }
     } finally {
       bis.close();
     }
@@ -417,8 +403,7 @@ public final class HTTPClient {
     final Iterator<Part> i = r.parts.iterator();
     while(i.hasNext())
       writePart(i.next(), out, boundary, ii);
-    out.write(new TokenBuilder().add("--").
-        add(boundary).add("--").add(CRLF).finish());
+    out.write(new TokenBuilder().add("--").add(boundary).add("--").add(CRLF).finish());
   }
 
   /**
