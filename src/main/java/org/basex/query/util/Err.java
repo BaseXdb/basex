@@ -13,7 +13,7 @@ import org.basex.util.InputInfo;
 
 /**
  * This class assembles common error messages.
- *
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
@@ -153,8 +153,10 @@ public enum Err {
   URLINV(FOHC, 1, "Invalid URL: \"%\"."),
   /** FOHC0002: Evaluation exception. */
   PROTINV(FOHC, 2, "The requested method is not valid for HTTP."),
-  /* FOHC0003: Evaluation exception (not used yet).
-  CONNERR(FOHC, 3, "Connection to \"%\" cannot be opened."), */
+  /*
+   * FOHC0003: Evaluation exception (not used yet). CONNERR(FOHC, 3,
+   * "Connection to \"%\" cannot be opened."),
+   */
   /** FOHC0004: Evaluation exception. */
   ELMINV(FOHC, 4, "Invalid element syntax."),
   /** FOHC0005: Evaluation exception. */
@@ -169,6 +171,9 @@ public enum Err {
   MANDATTR(FOHC, 9, "Attribute '%' is mandatory."),
   /** FOHC0010: Evaluation exception. */
   NOBOUND(FOHC, 10, "No separation boundary specified."),
+  /** FOHC0011: Evaluation exception. */
+  SRCATTR(FOHC, 11, "The src attribute on the body element is mutually" +
+  "exclusive with all other attributes (except the media-type)"),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
@@ -338,8 +343,8 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   PATHMISS(XPST, 3, "Expecting location path."),
   /** XPST0003: Parsing exception. */
-  DECLINCOMPLETE(XPST, 3, "Incomplete declaration; expecting " +
-      "'function', 'variable', ..."),
+  DECLINCOMPLETE(XPST, 3, "Incomplete declaration; expecting "
+      + "'function', 'variable', ..."),
   /** XPST0003: Parsing exception. */
   FUNCNAME(XPST, 3, "Expecting function name."),
   /** XPST0003: Parsing exception. */
@@ -673,8 +678,8 @@ public enum Err {
   /** XUTY0007: XQuery Update type exception. */
   UPTRGDELEMPT(XUTY, 7, "Only nodes can be deleted."),
   /** XUTY0008: XQuery Update type exception. */
-  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected" +
-      " as replace target."),
+  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected"
+      + " as replace target."),
   /** XUTY0010: XQuery Update type exception. */
   UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
   /** XUTY0011: XQuery Update type exception. */
@@ -720,8 +725,8 @@ public enum Err {
   }
 
   /**
-   * Throws a serializer exception.
-   * Might be merged with {@link #thrw} in future.
+   * Throws a serializer exception. Might be merged with {@link #thrw} in
+   * future.
    * @param ext extended info
    * @return serializer exception (indicates that an error is raised)
    * @throws SerializerException serializer exception
@@ -744,39 +749,72 @@ public enum Err {
    * @author Leo Woerteler
    */
   public static enum ErrType {
-    /** BASX Error type. */ BASX,
-    /** FOAR Error type. */ FOAR,
-    /** FOCA Error type. */ FOCA,
-    /** FOCH Error type. */ FOCH,
-    /** FODC Error type. */ FODC,
-    /** FODF Error type. */ FODF,
-    /** FODT Error type. */ FODT,
-    /** FOER Error type. */ FOER,
-    /** FOFD Error type. */ FOFD,
-    /** FOFL Error type. */ FOFL,
-    /** FOFU Error type. */ FOFU,
-    /** FOHP Error type. */ FOHC,
-    /** FONS Error type. */ FONS,
-    /** FORG Error type. */ FORG,
-    /** FORX Error type. */ FORX,
-    /** FOTY Error type. */ FOTY,
-    /** FOUP Error type. */ FOUP,
-    /** FOZP Error type. */ FOZP,
-    /** FTDY Error type. */ FTDY,
-    /** FTST Error type. */ FTST,
-    /** SEPM Error type. */ SEPM,
-    /** SERE Error type. */ SERE,
-    /** SEPM Error type. */ SESU,
-    /** XPDY Error type. */ XPDY,
-    /** XPST Error type. */ XPST,
-    /** XPTY Error type. */ XPTY,
-    /** XQDY Error type. */ XQDY,
-    /** XQST Error type. */ XQST,
-    /** XQTY Error type. */ XQTY,
-    /** XQTD Error type. */ XTDE,
-    /** XUDY Error type. */ XUDY,
-    /** XUST Error type. */ XUST,
-    /** XUTY Error type. */ XUTY;
+    /** BASX Error type. */
+    BASX,
+    /** FOAR Error type. */
+    FOAR,
+    /** FOCA Error type. */
+    FOCA,
+    /** FOCH Error type. */
+    FOCH,
+    /** FODC Error type. */
+    FODC,
+    /** FODF Error type. */
+    FODF,
+    /** FODT Error type. */
+    FODT,
+    /** FOER Error type. */
+    FOER,
+    /** FOFD Error type. */
+    FOFD,
+    /** FOFL Error type. */
+    FOFL,
+    /** FOFU Error type. */
+    FOFU,
+    /** FOHP Error type. */
+    FOHC,
+    /** FONS Error type. */
+    FONS,
+    /** FORG Error type. */
+    FORG,
+    /** FORX Error type. */
+    FORX,
+    /** FOTY Error type. */
+    FOTY,
+    /** FOUP Error type. */
+    FOUP,
+    /** FOZP Error type. */
+    FOZP,
+    /** FTDY Error type. */
+    FTDY,
+    /** FTST Error type. */
+    FTST,
+    /** SEPM Error type. */
+    SEPM,
+    /** SERE Error type. */
+    SERE,
+    /** SEPM Error type. */
+    SESU,
+    /** XPDY Error type. */
+    XPDY,
+    /** XPST Error type. */
+    XPST,
+    /** XPTY Error type. */
+    XPTY,
+    /** XQDY Error type. */
+    XQDY,
+    /** XQST Error type. */
+    XQST,
+    /** XQTY Error type. */
+    XQTY,
+    /** XQTD Error type. */
+    XTDE,
+    /** XUDY Error type. */
+    XUDY,
+    /** XUST Error type. */
+    XUST,
+    /** XUTY Error type. */
+    XUTY;
   }
 
   /**

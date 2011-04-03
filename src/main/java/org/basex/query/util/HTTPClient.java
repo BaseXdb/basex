@@ -308,7 +308,7 @@ public final class HTTPClient {
       if(item instanceof B64) {
         out.write(((B64) item).toJava());
       } else {
-        out.write(new B64(item.atom(ii), ii).toJava());
+        out.write(new B64(item.atom(ii)).toJava());
       }
     }
   }
@@ -328,7 +328,7 @@ public final class HTTPClient {
       if(item instanceof Hex) {
         out.write(((Hex) item).toJava());
       } else {
-        out.write(new Hex(item.atom(ii), ii).toJava());
+        out.write(new Hex(item.atom(ii)).toJava());
       }
     }
   }
@@ -339,7 +339,7 @@ public final class HTTPClient {
    * @param payloadAttrs payload attributes
    * @param method serialization method
    * @param out connection output stream
-   * @throws IOException IO execption
+   * @throws IOException IO exception
    */
   private static void write(final ItemCache payload,
       final TokenMap payloadAttrs, final byte[] method, final OutputStream out)
