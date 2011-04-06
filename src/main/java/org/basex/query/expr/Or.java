@@ -23,7 +23,7 @@ public final class Or extends Logical {
    * @param ii input info
    * @param e expression list
    */
-  public Or(final InputInfo ii, final Expr[] e) {
+  public Or(final InputInfo ii, final Expr... e) {
     super(ii, e);
   }
 

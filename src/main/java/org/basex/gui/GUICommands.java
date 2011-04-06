@@ -117,7 +117,7 @@ public enum GUICommands implements GUICommand {
   DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogInput d = new DialogInput("", DROPTITLE, gui, false);
+      final DialogInput d = new DialogInput("", DROPTITLE, gui, 0);
       if(d.ok()) DialogProgress.execute(gui, "", new Delete(d.input()));
     }
   },
@@ -220,7 +220,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens an XQuery file. */
+  /** Opens a query file. */
   XQOPEN(GUIXQOPEN + DOTS, "% R", GUIXQOPENTT, false, false) {
     @Override
     public void execute(final GUI gui) {
@@ -235,7 +235,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Saves the current XQuery. */
+  /** Saves the current query. */
   XQSAVE(GUISAVE, "% S", GUISAVETT, false, false) {
     @Override
     public void execute(final GUI gui) {
@@ -258,7 +258,7 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Saves the current XQuery. */
+  /** Saves the current query file under a new name. */
   XQSAVEAS(GUISAVEAS + DOTS, "% shift S", GUISAVETT, false, false) {
     @Override
     public void execute(final GUI gui) {
@@ -273,6 +273,15 @@ public enum GUICommands implements GUICommand {
       if(file == null) return;
       gui.context.query = file;
       XQSAVE.execute(gui);
+    }
+  },
+
+  /** Closes the current query file. */
+  XQCLOSE(GUIXQCLOSE, "% shift W", GUIXQCLOSETT, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.query.confirm();
+      gui.query.setQuery(null);
     }
   },
 

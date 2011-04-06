@@ -46,7 +46,7 @@ public final class Pos extends Simple {
    * @return expression
    */
   public static Expr get(final long mn, final long mx, final InputInfo ii) {
-    // suppose that positions always fit in int values..
+    // suppose that positions always fit in long values..
     return mn > mx || mx < 1 ? Bln.FALSE : mn <= 1 && mx == Long.MAX_VALUE ?
       Bln.TRUE : new Pos(mn, mx, ii);
   }

@@ -20,7 +20,16 @@ public abstract class Seq extends Value {
    * @param s size
    */
   protected Seq(final long s) {
-    super(AtomType.SEQ);
+    this(s, AtomType.SEQ);
+  }
+
+  /**
+   * Constructor, specifying a type.
+   * @param s size
+   * @param t type
+   */
+  protected Seq(final long s, final Type t) {
+    super(t);
     size = s;
   }
 

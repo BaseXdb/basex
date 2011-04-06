@@ -23,6 +23,7 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
+import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
@@ -49,7 +50,7 @@ final class FNDb extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case OPEN:     return open(ctx);
+      case OPEN:     return open(ctx).iter();
       case TEXT:     return text(ctx);
       case ATTR:     return attribute(ctx);
       case FULLTEXT: return fulltext(ctx);
@@ -72,27 +73,35 @@ final class FNDb extends Fun {
     }
   }
 
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    switch(def) {
+      case OPEN:     return open(ctx);
+      default:       return super.value(ctx);
+    }
+  }
+
   /**
    * Performs the open function.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter open(final QueryContext ctx) throws QueryException {
+  private Value open(final QueryContext ctx) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
     final int s = indexOf(str, '/');
     final byte[] db = s == -1 ? str : substring(str, 0, s);
     final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
 
     final Data data = ctx.resource.data(db, input);
-    return DBNodeSeq.get(data.doc(string(path)), data).iter();
+    return DBNodeSeq.get(data.doc(string(path)), data, true);
   }
 
   /**
    * Performs the open-id and open-pre function.
    * @param ctx query context
    * @param id id flag
-   * @return iterator
+   * @return result
    * @throws QueryException query exception
    */
   private DBNode open(final QueryContext ctx, final boolean id)
@@ -212,7 +221,7 @@ final class FNDb extends Fun {
       throws QueryException {
 
     return new Iter() {
-      final Iter ir = expr[0].iter(ctx);
+      final Iter ir = ctx.iter(expr[0]);
 
       @Override
       public Item next() throws QueryException {

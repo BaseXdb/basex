@@ -20,7 +20,6 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.Array;
 import org.basex.util.ByteList;
@@ -110,7 +109,7 @@ final class FNUtil extends Fun {
     final QueryContext qt = new QueryContext(ctx.context);
     qt.parse(string(qu));
     qt.compile();
-    return ItemCache.get(qt.iter());
+    return qt.iter().finish().cache();
   }
 
   /**
@@ -174,15 +173,16 @@ final class FNUtil extends Fun {
     final long l = Performance.mem();
 
     // create (and, optionally, cache) result value
-    Iter ir = expr[0].iter(ctx);
-    final Value v = (c ? ItemCache.get(ir) : ir).finish();
+    Value val = ctx.value(expr[0]);
+    if(c) val = val.cache().finish();
 
     // measure resulting memory consumption
     Performance.gc(2);
     final double d = Performance.mem() - l;
 
+    // [LW] (why) is that necessary?
     // loop through all results to avoid premature result disposal
-    ir = v.iter();
+    final Iter ir = val.iter();
     while(ir.next() != null);
 
     // return memory consumption in megabytes
@@ -204,10 +204,10 @@ final class FNUtil extends Fun {
     final Performance p = new Performance();
 
     // iterate (and, optionally, cache) results
-    final Iter ir = expr[0].iter(ctx);
     if(c) {
-      ItemCache.get(ir);
+      ctx.value(expr[0]).cache();
     } else {
+      final Iter ir = ctx.iter(expr[0]);
       while(ir.next() != null);
     }
 

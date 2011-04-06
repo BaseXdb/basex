@@ -11,7 +11,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Preds;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
@@ -83,30 +82,19 @@ public class AxisStep extends Preds {
   public Expr comp(final QueryContext ctx) throws QueryException {
     if(!test.comp(ctx)) return Empty.SEQ;
 
-    // if possible, add text() step to predicates
-    final Data data = ctx.resource.data();
-    ctx.leaf = false;
-    if(data != null && test.test == Name.NAME && test.type != NodeType.ATT) {
-      final byte[] ln = ((NameTest) test).ln;
-      ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
-        data.tags.stat(data.tags.id(ln)).leaf;
-    }
+    // leaf flag indicates that a context node can be replaced by a text() step
+    final Data data = ctx.data();
+    ctx.leaf = data != null &&
+      test.test == Name.NAME && test.type != NodeType.ATT && axis.down &&
+      data.meta.uptodate && data.ns.size() == 0 &&
+      data.tags.stat(data.tags.id(((NameTest) test).ln)).leaf;
 
     // as predicates will not necessarily start from the document node,
-    // a context item is temporarily treated as element, or set to null
-    final Value cv = ctx.value;
-    final Type ct = cv != null ? cv.type : null;
-    if(ct == NodeType.DOC) {
-      cv.type = NodeType.ELM;
-    } else if(ct == AtomType.SEQ) {
-      ctx.value = null;
-    }
+    // the context item type is temporarily generalized
+    final Type ct = ctx.value != null ? ctx.value.type : null;
+    if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
     final Expr e = super.comp(ctx);
-    if(ct != null) {
-      cv.type = ct;
-    } else {
-      ctx.value = cv;
-    }
+    if(ct == NodeType.DOC) ctx.value.type = ct;
     ctx.leaf = false;
 
     // return optimized step / don't re-optimize step

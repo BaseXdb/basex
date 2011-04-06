@@ -1,6 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
+
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
@@ -9,6 +10,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Sequence, containing at least two ordered database nodes.
@@ -18,17 +20,18 @@ import org.basex.util.Token;
  */
 public final class DBNodeSeq extends Seq {
   /** Data reference. */
-  private final Data data;
+  public final Data data;
   /** Pre values. */
-  private final int[] pres;
+  public final int[] pres;
 
   /**
    * Constructor.
    * @param p pre values
    * @param d data reference
+   * @param t node type
    */
-  private DBNodeSeq(final int[] p, final Data d) {
-    super(p.length);
+  private DBNodeSeq(final int[] p, final Data d, final Type t) {
+    super(p.length, t);
     pres = p;
     data = d;
   }
@@ -37,12 +40,18 @@ public final class DBNodeSeq extends Seq {
    * Returns a value for the specified items.
    * @param v value
    * @param d data reference
+   * @param r root flag
    * @return resulting item or sequence
    */
-  public static Value get(final int[] v, final Data d) {
+  public static Value get(final int[] v, final Data d, final boolean r) {
     final int s = v.length;
     return s == 0 ? Empty.SEQ : s == 1 ? new DBNode(d, v[0]) :
-      new DBNodeSeq(v, d);
+      new DBNodeSeq(v, d, r ? NodeType.DOC : NodeType.NOD);
+  }
+
+  @Override
+  public Data data() {
+    return data;
   }
 
   /***
@@ -50,7 +59,7 @@ public final class DBNodeSeq extends Seq {
    * @param i index
    * @return node
    */
-  protected DBNode node(final int i) {
+  DBNode node(final int i) {
     return new DBNode(data, pres[i]);
   }
 
@@ -100,7 +109,7 @@ public final class DBNodeSeq extends Seq {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(AtomType.SEQ.nam, SIZE, Token.token(size));
+    ser.openElement(Token.token(Util.name(this)), SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); ++v) node(v).plan(ser);
     ser.closeElement();
   }
@@ -124,5 +133,16 @@ public final class DBNodeSeq extends Seq {
       }
     }
     return sb.append(PAR2).toString();
+  }
+
+  @Override
+  public int writeTo(final Item[] arr, final int start) {
+    for(int i = 0; i < pres.length; i++) arr[i + start] = itemAt(i);
+    return pres.length;
+  }
+
+  @Override
+  public Item itemAt(final long pos) {
+    return new DBNode(data, pres[(int) pos]);
   }
 }

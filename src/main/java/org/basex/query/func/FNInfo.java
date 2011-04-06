@@ -52,26 +52,36 @@ final class FNInfo extends Fun {
           code = Token.string(((QNm) checkType(it, AtomType.QNM)).ln());
         }
         if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
-        Value val = al > 2 ? expr[2].value(ctx) : null;
+        final Value val = al > 2 ? expr[2].value(ctx) : null;
         final QueryException ex = new QueryException(input, code, val, msg);
         throw ex;
       case TRACE:
-        val = expr[0].value(ctx);
-        final TokenBuilder tb = new TokenBuilder();
-        tb.add(checkEStr(expr[1], ctx)).add(val.toString());
-        // if GUI is used, or if user is no admin, trace info is cached
-        if(Prop.gui || !ctx.context.user.perm(User.ADMIN)) {
-          ctx.evalInfo(tb.finish());
-        } else {
-          Util.errln(tb);
-        }
-        return val.iter();
+        return new Iter() {
+          final Iter ir = expr[0].iter(ctx);
+          final byte[] s = checkEStr(expr[1], ctx);
+          @Override
+          public Item next() throws QueryException {
+            final Item i = ir.next();
+            if(i != null) {
+              final TokenBuilder tb = new TokenBuilder(s);
+              if(s.length != 0) tb.add(": ");
+              tb.add(i.toString());
+              // if GUI is used, or if user is no admin, trace info is cached
+              if(Prop.gui || !ctx.context.user.perm(User.ADMIN)) {
+                ctx.evalInfo(tb.finish());
+              } else {
+                Util.errln(tb);
+              }
+            }
+            return i;
+          }
+        };
       case ENVS:
-        final ItemCache ir = new ItemCache();
+        final ItemCache ic = new ItemCache();
         for(final Object k : System.getenv().keySet().toArray()) {
-          ir.add(Str.get(k));
+          ic.add(Str.get(k));
         }
-        return ir;
+        return ic;
       default:
         return super.iter(ctx);
     }
@@ -87,6 +97,12 @@ final class FNInfo extends Fun {
       default:
         return super.item(ctx, ii);
     }
+  }
+
+  @Override
+  public Expr cmp(final QueryContext ctx) {
+    if(def == FunDef.TRACE) type = expr[0].type();
+    return this;
   }
 
   @Override

@@ -11,7 +11,6 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public interface Type {
-
   /**
    * Constructs a new item from the specified item.
    * @param it item to be converted

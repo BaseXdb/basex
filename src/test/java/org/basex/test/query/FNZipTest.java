@@ -36,11 +36,6 @@ public final class FNZipTest extends AdvancedQueryTest {
   /** Test ZIP entry. */
   private static final String ENTRY2 = "test/input.xml";
 
-  /** Constructor. */
-  public FNZipTest() {
-    super("zip");
-  }
-
   /** Initializes the test.
    * @throws Exception exception */
   @BeforeClass

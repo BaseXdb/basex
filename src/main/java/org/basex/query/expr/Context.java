@@ -4,10 +4,11 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.Axis;
-import org.basex.query.path.AxisPath;
 import org.basex.query.path.AxisStep;
+import org.basex.query.path.Path;
 import org.basex.query.path.Test;
 import org.basex.util.InputInfo;
 
@@ -41,6 +42,11 @@ public final class Context extends Simple {
   }
 
   @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    return checkCtx(ctx);
+  }
+
+  @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return checkCtx(ctx).item(ctx, input);
@@ -48,10 +54,10 @@ public final class Context extends Simple {
 
   @Override
   public Expr addText(final QueryContext ctx) {
-    // replacing . with text() for possible index integration
+    // replacing context node with text() node to facilitate index rewritings
     if(!ctx.leaf) return this;
     ctx.compInfo(OPTTEXT);
-    return AxisPath.get(input, null, AxisStep.get(input, Axis.CHILD, Test.TXT));
+    return Path.get(input, null, AxisStep.get(input, Axis.CHILD, Test.TXT));
   }
 
   @Override

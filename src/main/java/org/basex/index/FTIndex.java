@@ -121,6 +121,11 @@ public abstract class FTIndex implements Index {
       public synchronized double score() {
         return sc;
       }
+
+      @Override
+      public String toString() {
+        return Integer.toString(s);
+      }
     };
   }
 }

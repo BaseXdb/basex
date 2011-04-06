@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Var;
@@ -72,6 +73,12 @@ public final class VarRef extends ParseExpr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     var = ctx.vars.get(var);
     return ctx.iter(var);
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    var = ctx.vars.get(var);
+    return ctx.value(var);
   }
 
   @Override

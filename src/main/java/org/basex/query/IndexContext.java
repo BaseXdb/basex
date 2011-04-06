@@ -1,7 +1,14 @@
 package org.basex.query;
 
 import org.basex.data.Data;
+import org.basex.query.expr.Context;
+import org.basex.query.expr.Expr;
+import org.basex.query.expr.ParseExpr;
+import org.basex.query.path.Axis;
+import org.basex.query.path.AxisPath;
 import org.basex.query.path.AxisStep;
+import org.basex.query.path.Path;
+import org.basex.util.Array;
 
 /**
  * Container for all information needed to determine whether an index is
@@ -40,5 +47,36 @@ public final class IndexContext {
     data = d;
     step = s;
     dupl = l;
+  }
+
+  /**
+   * Rewrites the specified expression for index access.
+   * @param ex expression to be rewritten
+   * @param root new root expression
+   * @param text text flag
+   * @return index access
+   */
+  public Expr invert(final Expr ex, final ParseExpr root, final boolean text) {
+    // handle context node
+    if(ex instanceof Context) {
+      if(text) return root;
+      // add attribute step
+      if(step.test.name == null) return root;
+      return Path.get(root.input, root,
+          AxisStep.get(step.input, Axis.SELF, step.test));
+    }
+
+    final AxisPath orig = (AxisPath) ex;
+    final AxisPath path = orig.invertPath(root, step);
+    if(!text) {
+      // add attribute step
+      final AxisStep s = orig.step(orig.step.length - 1);
+      if(s.test.name != null) {
+        Expr[] steps = { AxisStep.get(s.input, Axis.SELF, s.test) };
+        for(final Expr e : path.step) steps = Array.add(steps, e);
+        path.step = steps;
+      }
+    }
+    return path;
   }
 }

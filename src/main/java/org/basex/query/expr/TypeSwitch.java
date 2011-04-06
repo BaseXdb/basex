@@ -8,10 +8,10 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Typeswitch expression.
@@ -47,7 +47,7 @@ public final class TypeSwitch extends ParseExpr {
     // static condition: return branch in question
     if(ts.value()) {
       for(final TypeCase c : cases) {
-        if(c.var.type == null || c.var.type.instance(ts.iter(ctx)))
+        if(c.var.type == null || c.var.type.instance(ts.value(ctx)))
           return optPre(c.comp(ctx, (Value) ts).expr, ctx);
       }
     }
@@ -72,14 +72,13 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter seq = ItemCache.get(ctx.iter(ts));
+    final Value seq = ctx.value(ts);
     for(final TypeCase c : cases) {
-      seq.reset();
       final Iter iter = c.iter(ctx, seq);
       if(iter != null) return iter;
     }
     // will never happen
-    return null;
+    throw Util.notexpected();
   }
 
   @Override

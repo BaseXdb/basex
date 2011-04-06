@@ -55,6 +55,11 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public Item itemAt(final long pos) {
+    return this;
+  }
+
+  @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) {
     return this;
   }
@@ -159,8 +164,6 @@ public abstract class Item extends Value {
   public final boolean equiv(final InputInfo ii, final Item it)
       throws QueryException {
 
-    // [CG] XQuery: check when/if comparable items may lead to exceptions
-
     // check if both values are NaN, or if values are equal..
     return (this == Dbl.NAN || this == Flt.NAN) && it.num() &&
         Double.isNaN(it.dbl(ii)) || comparable(it) && eq(ii, it);
@@ -260,5 +263,11 @@ public abstract class Item extends Value {
   @Override
   public int hash(final InputInfo ii) throws QueryException {
     return Token.hash(atom(ii));
+  }
+
+  @Override
+  public int writeTo(final Item[] arr, final int start) {
+    arr[start] = this;
+    return 1;
   }
 }
