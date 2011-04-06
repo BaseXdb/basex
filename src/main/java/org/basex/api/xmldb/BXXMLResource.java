@@ -275,7 +275,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         for(int i = 0; i < attributes.getLength(); ++i) xml.attribute(
             token(attributes.getQName(i)), token(attributes.getValue(i)));
         for(final String k : ns.keySet()) xml.attribute(
-            concat(XMLNS, token(k)), token(ns.get(k)));
+            concat(XMLNSC, token(k)), token(ns.get(k)));
       } catch(final IOException ex)  {
         throw new SAXException(ex);
       }
