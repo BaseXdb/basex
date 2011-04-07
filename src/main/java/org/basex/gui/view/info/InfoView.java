@@ -125,6 +125,7 @@ public final class InfoView extends View {
     final StringList comp = new StringList();
     final StringList plan = new StringList();
     final StringList sl = new StringList();
+    final StringList stats = new StringList();
     final IntList il = new IntList();
     String err = "";
     String qu = "";
@@ -154,6 +155,9 @@ public final class InfoView extends View {
         --i;
       } else if(!ok) {
         err += line + NL;
+      } else {
+        if(line.startsWith(QUERYHITS) || line.startsWith(QUERYUPDATED))
+          stats.add("- " + line);
       }
     }
 
@@ -181,6 +185,7 @@ public final class InfoView extends View {
       add(QUERYCOMP, comp);
       if(comp.size() != 0) add(QUERYRESULT, res);
       add(QUERYTIME, sl);
+      add(QUERYRESULT, stats);
       add(QUERYPLAN, plan);
       final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
       total = Performance.getTimer(il.get(il.size() - 1) * 10000L * runs, runs);
