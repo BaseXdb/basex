@@ -2,6 +2,7 @@ package org.basex.test.w3c;
 
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
+import org.basex.util.Util;
 
 /**
  * XQuery Update Test Suite wrapper.
@@ -23,7 +24,7 @@ public final class XQUTS extends W3CTS {
    * Constructor.
    */
   public XQUTS() {
-    super("XQUTS");
+    super(Util.name(XQUTS.class));
     context.prop.set(Prop.FORCECREATE, true);
   }
 

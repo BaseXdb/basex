@@ -94,7 +94,7 @@ public abstract class W3CTS {
   private String sources;
 
   /** Maximum length of result output. */
-  private static int maxout = 500;
+  private int maxout = 500;
 
   /** Query filter string. */
   private String single;
@@ -391,7 +391,7 @@ public abstract class W3CTS {
             DataText.YES : DataText.NO);
         final XMLSerializer xml = new XMLSerializer(ao, sp);
 
-        iter = ItemCache.get(xq.iter());
+        iter = xq.iter().finish().cache();
         for(Item it; (it = iter.next()) != null;) {
           doc &= it.type == NodeType.DOC;
           it.serialize(xml);
@@ -616,34 +616,12 @@ public abstract class W3CTS {
   }
 
   /**
-   * Normalizes the specified string.
+   * Removes comments from the specified string.
    * @param in input string
    * @return result
    */
   private String norm(final String in) {
-    final StringBuilder sb = new StringBuilder();
-    int m = 0;
-    boolean s = false;
-    final int cl = in.length();
-    for(int c = 0; c < cl && sb.length() < maxout; ++c) {
-      final char ch = in.charAt(c);
-      if(ch == '(' && c + 1 < cl && in.charAt(c + 1) == ':') {
-        if(m == 0 && !s) {
-          sb.append(' ');
-          s = true;
-        }
-        ++m;
-        ++c;
-      } else if(m != 0 && ch == ':' && c + 1 < cl && in.charAt(c + 1) == ')') {
-        --m;
-        ++c;
-      } else if(m == 0) {
-        if(!s || ch > ' ') sb.append(ch);
-        s = ch <= ' ';
-      }
-    }
-    if(sb.length() >= maxout) sb.append("...");
-    return sb.toString().replaceAll("(\r|\n)+", " ").trim();
+    return QueryProcessor.removeComments(in, maxout);
   }
 
   /**
