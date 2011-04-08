@@ -20,10 +20,11 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.XMLSyntax;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.ArrayOutput;
@@ -33,7 +34,7 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
- * This class offers a fast text view, using the {@link BaseXText} class.
+ * This class offers a fast text view, using the {@link BaseXEditor} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -46,7 +47,7 @@ public final class TextView extends View implements ActionListener {
   /** Home button. */
   private final BaseXButton home;
   /** Text Area. */
-  private final BaseXText area;
+  private final BaseXEditor area;
   /** Result command. */
   private Command cmd;
   /** Result nodes. */
@@ -88,9 +89,9 @@ public final class TextView extends View implements ActionListener {
     b.add(sp, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
-    area = new BaseXText(false, gui);
+    area = new BaseXEditor(false, gui);
     area.setSyntax(new XMLSyntax());
-    area.addSearch(find);
+    area.setSearch(find);
     add(area, BorderLayout.CENTER);
 
     refreshLayout();

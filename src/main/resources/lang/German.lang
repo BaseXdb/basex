@@ -49,6 +49,8 @@ info_title=Query-Info
 help_title=Hilfe
 text_title=Text
 explore_title=Explore
+editor_title=Editor
+editor_file=Datei
 
 # Dialog Windows
 d_info=Information
@@ -303,10 +305,12 @@ c_showtexttt=Zeigt die Textansicht an.
 c_showxquery=Anfrage-Editor
 c_showxquerytt=Zeigt den Anfrage-Editor an.
 c_undo=Rückgängig
-c_xqopen=öffnen
-c_xqopentt=Öffnet eine XQuery-Datei
+c_xqnew=Neu
+c_xqnewtt=Erzeugt eine neue Datei
+c_xqopen=Öffnen
+c_xqopentt=Öffnet eine XQuery- order Text-Datei
 c_xqclose=Schließen
-c_xqclosett=Schließt die Abfrage und löscht das Textfeld
+c_xqclosett=Schließt die gerade geöffnete Datei
 c_save=Speichern
 c_savett=Speichert die Datei
 c_saveas=Speichern unter

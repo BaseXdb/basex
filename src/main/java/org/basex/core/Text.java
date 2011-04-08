@@ -933,6 +933,10 @@ public interface Text {
   /** Command info. */
   String GUIUNDO = lang("c_undo");
   /** Command info. */
+  String GUIXQNEW = lang("c_xqnew");
+  /** Command info. */
+  String GUIXQNEWTT = lang("c_xqnewtt");
+  /** Command info. */
   String GUIXQOPEN = lang("c_xqopen");
   /** Command info. */
   String GUIXQOPENTT = lang("c_xqopentt");
@@ -1016,8 +1020,10 @@ public interface Text {
   String HELPTIT = lang("help_title");
   /** Text title. */
   String TEXTTIT = lang("text_title");
-  /** Query title. */
-  String XQUERYTIT = "XQuery";
+  /** Editor title. */
+  String EDITORTIT = lang("editor_title");
+  /** Editor: new file. */
+  String EDITORFILE = lang("editor_file");
 
   /** Plot visualization. */
   String PLOTLOG = "log";

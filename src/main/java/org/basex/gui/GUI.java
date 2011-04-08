@@ -40,6 +40,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.ViewContainer;
 import org.basex.gui.view.ViewNotifier;
+import org.basex.gui.view.editor.EditorView;
 import org.basex.gui.view.explore.ExploreView;
 import org.basex.gui.view.folder.FolderView;
 import org.basex.gui.view.info.InfoView;
@@ -48,7 +49,6 @@ import org.basex.gui.view.plot.PlotView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
-import org.basex.gui.view.xquery.XQueryView;
 import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
@@ -73,7 +73,7 @@ public final class GUI extends AGUI {
   /** Filter button. */
   public final BaseXButton filter;
   /** Search view. */
-  public final XQueryView query;
+  public final EditorView query;
   /** Info view. */
   public final InfoView info;
 
@@ -238,7 +238,7 @@ public final class GUI extends AGUI {
     // create views
     notify = new ViewNotifier(this);
     text = new TextView(notify);
-    query = new XQueryView(notify);
+    query = new EditorView(notify);
     info = new InfoView(notify);
 
     // create panels for closed and opened database mode

@@ -1,16 +1,16 @@
-package org.basex.gui.view.xquery;
+package org.basex.gui.view.editor;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.basex.core.cmd.XQuery;
 import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXEditor;
+import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -20,29 +20,38 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class XQueryText extends BaseXText {
-  /** Error pattern. */
-  private static final Pattern ERRPATTERN = Pattern.compile((".* " + LINEINFO +
-      ", " + COLINFO + ".*").replaceAll("%", "([0-9]+)"), Pattern.DOTALL);
+final class EditorArea extends BaseXEditor {
+  /** File label. */
+  final BaseXLabel label;
+  /** View reference. */
+  private final EditorView view;
+
+  /** File in tab. */
+  IO file;
+  /** Flag for modified content. */
+  boolean mod;
+  /** Opened flag; states if file was opened from disk. */
+  boolean opened;
 
   /** Last error position. */
   int error = -1;
   /** Thread counter. */
   int threadID;
 
-  /** View reference. */
-  private final XQueryView view;
   /** Last Query. */
-  private byte[] last = Token.EMPTY;
+  byte[] last = Token.EMPTY;
 
   /**
    * Constructor.
    * @param v view reference
+   * @param f file reference
    */
-  XQueryText(final XQueryView v) {
+  EditorArea(final EditorView v, final IO f) {
     super(true, v.gui);
     view = v;
-    setSyntax(new XQuerySyntax());
+    file = f;
+    label = new BaseXLabel(f.name());
+    setSyntax(f);
   }
 
   @Override
@@ -76,13 +85,14 @@ final class XQueryText extends BaseXText {
   @Override
   protected void release(final boolean force) {
     final byte[] qu = getText();
-    final boolean module = module(qu);
     final boolean eq = Token.eq(qu, last);
     if(eq && !force) return;
-    view.modified(view.modified || !eq, false);
+    view.refresh(mod || !eq, false);
     view.pos.setText(pos());
+    if(file.name().endsWith(IO.XMLSUFFIX)) return;
 
-    if(force || gui.gprop.is(GUIProp.EXECRT) && !module) {
+    final boolean module = module(qu);
+    if(!module && (force || gui.gprop.is(GUIProp.EXECRT))) {
       view.waitInfo();
       query(qu, true);
     } else {
@@ -100,6 +110,14 @@ final class XQueryText extends BaseXText {
   }
 
   /**
+   * Checks if the query is to be evaluated in realtime.
+   * @return result of check
+   */
+  boolean executable() {
+    return !module(last) && !file.name().endsWith(IO.XMLSUFFIX);
+  }
+
+  /**
    * Performs the current query.
    */
   void query() {
@@ -107,70 +125,9 @@ final class XQueryText extends BaseXText {
   }
 
   /**
-   * Performs the specified query.
-   * @param query to be processed
-   * @param force perform query, even if it has not changed
-   */
-  private void query(final byte[] query, final boolean force) {
-    if(force) {
-      last = query;
-      if(module(query)) return;
-      view.stop.setEnabled(true);
-      final String qu = Token.string(query);
-      gui.execute(new XQuery(qu.trim().isEmpty() ? "()" : qu), false);
-    } else {
-      markError();
-    }
-  }
-
-  /**
-   * Returns true if the specified query is a module.
-   * @param qu query to check
-   * @return result of check
-   */
-  private boolean module(final byte[] qu) {
-    return Token.string(qu).trim().startsWith("module namespace ");
-  }
-
-  /**
-   * Handles info messages resulting from a query execution.
-   * @param inf info message
-   * @param ok true if query was successful
-   * @return error position in text
-   */
-  int error(final String inf, final boolean ok) {
-    error = -1;
-    if(!ok) {
-      final Matcher m = ERRPATTERN.matcher(inf);
-      int el = 0;
-      int ec = 0;
-      if(m.matches()) {
-        el = Integer.parseInt(m.group(1));
-        ec = Integer.parseInt(m.group(2));
-        error = last.length;
-
-        // find approximate error position
-        final int ll = error;
-        for(int e = 0, l = 1, c = 1; e < ll; ++c, ++e) {
-          if(l > el || l == el && c == ec) {
-            error = e;
-            break;
-          }
-          if(last[e] == '\n') {
-            ++l;
-            c = 0;
-          }
-        }
-      }
-    }
-    markError();
-    return error;
-  }
-
-  /**
    * Highlights the error.
    */
-  private void markError() {
+  void markError() {
     final int thread = ++threadID;
     final int sleep = error == -1 ? 0 : 500;
     new Thread() {
@@ -180,5 +137,33 @@ final class XQueryText extends BaseXText {
         if(thread == threadID) error(error);
       }
     }.start();
+  }
+
+  /**
+   * Performs the specified query.
+   * @param query to be processed
+   * @param force perform query, even if it has not changed
+   */
+  private void query(final byte[] query, final boolean force) {
+    gui.context.query = file;
+    if(force) {
+      last = query;
+      if(!executable()) return;
+      view.stop.setEnabled(true);
+      final String qu = Token.string(query);
+      gui.execute(new XQuery(qu.trim().isEmpty() ? "()" : qu), false);
+    } else {
+      markError();
+    }
+  }
+
+  /**
+   * Verifies if the specified query is a module.
+   * @param qu query to check
+   * @return result of check
+   */
+  private boolean module(final byte[] qu) {
+    return QueryProcessor.removeComments(Token.string(qu), 20).startsWith(
+        "module namespace ");
   }
 }

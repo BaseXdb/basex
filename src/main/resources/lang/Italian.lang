@@ -49,6 +49,8 @@ info_title=Info sull'interrogazione
 help_title=Aiuto
 text_title=Testo
 explore_title=Esplora
+editor_title=Editor
+editor_file=file
 
 # Dialog Windows
 d_info=Informazione
@@ -303,10 +305,12 @@ c_showtexttt=Mostra la visualizzazione tipo testo.
 c_showxquery=Pannello Interrogazione
 c_showxquerytt=Mostra il pannello dell'interrogazione.
 c_undo=Annulla
+c_xqnew=New
+c_xqnewtt=Creates a new file
 c_xqopen=Apri
 c_xqopentt=Apre un documento interrogazione
 c_xqclose=Chiudi
-c_xqclosett=Closes the query and clears the textfield
+c_xqclosett=Closes the currently opened file
 c_save=Salva
 c_savett=Salva il documento
 c_saveas=Salva come

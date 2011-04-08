@@ -25,7 +25,7 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
-import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXEditor;
 import org.basex.io.DataInput;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -43,7 +43,7 @@ public final class DialogOpen extends Dialog {
   /** Information panel. */
   private final BaseXLabel doc;
   /** Information panel. */
-  private final BaseXText detail;
+  private final BaseXEditor detail;
   /** Buttons. */
   private final BaseXBack buttons;
   /** Rename button. */
@@ -87,7 +87,7 @@ public final class DialogOpen extends Dialog {
     doc.setFont(f.deriveFont(f.getSize2D() + 7f));
     info.add(doc, BorderLayout.NORTH);
 
-    detail = new BaseXText(false, this);
+    detail = new BaseXEditor(false, this);
     detail.border(5, 5, 5, 5).setFont(f);
 
     BaseXLayout.setWidth(detail, 400);

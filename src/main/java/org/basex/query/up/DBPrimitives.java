@@ -114,7 +114,7 @@ final class DBPrimitives extends Primitives {
     /* Tree Aware Updates: Unnecessary updates on the descendant axis of a
      * deleted or replaced node are identified and removed from the pending
      * update list. */
-    int l = nodes.size();
+    final int l = nodes.size();
     int ni = 0;
     int c = 0;
     while(ni < l - 1) {

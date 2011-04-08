@@ -15,7 +15,7 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXRadio;
-import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.util.StringList;
@@ -43,7 +43,7 @@ public final class DialogInsert extends Dialog {
   /** Text area. */
   private final BaseXTextField input1;
   /** Text area. */
-  private final BaseXText input2;
+  private final BaseXEditor input2;
   /** First label. */
   private final BaseXLabel label1;
   /** Second label. */
@@ -65,7 +65,7 @@ public final class DialogInsert extends Dialog {
     input1.addKeyListener(keys);
     BaseXLayout.setWidth(input1, 320);
 
-    input2 = new BaseXText(true, this);
+    input2 = new BaseXEditor(true, this);
     input2.setFont(GUIConstants.mfont);
     input2.addKeyListener(keys);
     BaseXLayout.setWidth(input2, 320);

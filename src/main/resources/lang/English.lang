@@ -49,6 +49,8 @@ info_title=Query Info
 help_title=Help
 text_title=Text
 explore_title=Explore
+editor_title=Editor
+editor_file=file
 
 # Dialog Windows
 d_info=Information
@@ -303,12 +305,14 @@ c_showtexttt=Show the text view.
 c_showxquery=Query Editor
 c_showxquerytt=Show the Query editor.
 c_undo=Undo
+c_xqnew=New
+c_xqnewtt=Creates a new file
 c_xqopen=Open
-c_xqopentt=Opens an XQuery file
+c_xqopentt=Opens a query or text file
 c_xqclose=Close
-c_xqclosett=Closes the query and clears the textfield
+c_xqclosett=Closes the currently opened file
 c_save=Save
-c_savett=Saves the XQuery file
+c_savett=Saves the file
 c_saveas=Save as
 c_notopened=File could not be opened.
 c_notsaved=File could not be saved.

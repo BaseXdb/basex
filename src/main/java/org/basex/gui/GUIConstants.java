@@ -70,8 +70,8 @@ public final class GUIConstants {
   public static final String PLOTVIEW = "plot";
   /** Internal name of the Tree View. */
   public static final String TREEVIEW = "tree";
-  /** Internal name of the XQuery View. */
-  public static final String XQUERYVIEW = "xquery";
+  /** Internal name of the Editor View. */
+  public static final String EDITORVIEW = "editor";
 
   /**
    * Default GUI Layout. The layout is formatted as follows:
@@ -80,7 +80,7 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String VIEWS = "V H " + XQUERYVIEW + ' ' + FOLDERVIEW +
+  public static final String VIEWS = "V H " + EDITORVIEW + ' ' + FOLDERVIEW +
     ' ' + MAPVIEW + ' ' + PLOTVIEW + ' ' + " - H " + TEXTVIEW + ' ' + INFOVIEW +
     ' ' + TABLEVIEW + ' ' + TREEVIEW + ' ' + EXPLOREVIEW + " - -";
 
@@ -118,7 +118,7 @@ public final class GUIConstants {
     SHOWEXPLORE, EMPTY, FULL
   }, {
     SHOWXQUERY, SHOWINFO, EMPTY,
-    XQOPEN, XQSAVE, XQSAVEAS, XQCLOSE
+    EDITNEW, EDITOPEN, EDITSAVE, EDITSAVEAS, EDITCLOSE
   }, {
     RTEXEC, RTFILTER, EMPTY,
     COLOR, FONTS, MAPLAYOUT, TREEOPTIONS, Prop.MAC ? null : EMPTY,

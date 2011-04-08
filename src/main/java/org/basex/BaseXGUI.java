@@ -35,7 +35,7 @@ public final class BaseXGUI {
 
   /**
    * Main method.
-   * @param args command-line arguments
+   * @param args command-line arguments.
    * An XML document or query file can be specified as argument
    */
   public static void main(final String[] args) {
@@ -81,7 +81,7 @@ public final class BaseXGUI {
           boolean xq = false;
           for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
           if(xq) {
-            gui.query.setQuery(io);
+            gui.query.open(io);
           } else {
             gui.execute(new Check(input));
             gprop.set(GUIProp.CREATEPATH, io.path());

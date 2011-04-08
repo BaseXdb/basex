@@ -25,7 +25,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPassword;
 import org.basex.gui.layout.BaseXTabs;
-import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
@@ -88,11 +88,11 @@ public final class DialogServer extends Dialog {
   /** Server port. */
   private final BaseXTextField portc;
   /** Current databases. */
-  private final BaseXText sese;
+  private final BaseXEditor sese;
   /** Current sessions. */
-  private final BaseXText sedb;
+  private final BaseXEditor sedb;
   /** Log text. */
-  private final BaseXText logt;
+  private final BaseXEditor logt;
   /** Info label. */
   private final BaseXLabel infoC;
   /** Info label. */
@@ -192,9 +192,9 @@ public final class DialogServer extends Dialog {
 
     // Session Tab
     sess.border(8).layout(new BorderLayout());
-    sese = new BaseXText(false, this);
+    sese = new BaseXEditor(false, this);
     sese.setFont(start.getFont());
-    sedb = new BaseXText(false, this);
+    sedb = new BaseXEditor(false, this);
     sedb.setFont(start.getFont());
     refreshSess = new BaseXButton(BUTTONREFRESH, this);
 
@@ -220,7 +220,7 @@ public final class DialogServer extends Dialog {
     delete = new BaseXButton(BUTTONDELETE, this);
     deleteAll = new BaseXButton(BUTTONDELALL, this);
     logc = new BaseXCombo(this);
-    logt = new BaseXText(false, this);
+    logt = new BaseXEditor(false, this);
     logt.setFont(start.getFont());
     BaseXLayout.setHeight(logt, 100);
 
