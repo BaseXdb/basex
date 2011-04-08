@@ -10,7 +10,6 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.ProgressException;
 import org.basex.util.Atts;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -57,16 +56,15 @@ final class XMLStreamWrapper extends Parser {
             builder.endElem(token(reader.getLocalName()));
             break;
           case XMLStreamConstants.CHARACTERS:
-            builder.text(new TokenBuilder(reader.getText()));
+            builder.text(token(reader.getText()));
             ++nodes;
             break;
           case XMLStreamConstants.PROCESSING_INSTRUCTION:
-            builder.pi(new TokenBuilder(reader.getPITarget() + ' ' +
-                reader.getPIData()));
+            builder.pi(token(reader.getPITarget() + ' ' + reader.getPIData()));
             ++nodes;
             break;
           case XMLStreamConstants.COMMENT:
-            builder.comment(new TokenBuilder(reader.getText()));
+            builder.comment(token(reader.getText()));
             ++nodes;
             break;
           case XMLStreamConstants.END_DOCUMENT:

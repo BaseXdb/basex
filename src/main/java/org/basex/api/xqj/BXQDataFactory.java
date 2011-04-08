@@ -308,9 +308,9 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQSequence createSequence(final Iterator it) throws XQException {
     opened();
     valid(it, Iterator.class);
-    final ItemCache iter = new ItemCache();
-    while(it.hasNext()) iter.add(create(it.next(), null));
-    return new BXQSequence(iter, this);
+    final ItemCache ic = new ItemCache();
+    while(it.hasNext()) ic.add(create(it.next(), null));
+    return new BXQSequence(ic, this);
   }
 
   @Override
@@ -320,7 +320,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     final BXQSequence s = (BXQSequence) seq;
     s.opened();
     try {
-      return new BXQSequence(ItemCache.get(s.result), this);
+      return new BXQSequence(s.result.finish().cache(), this);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

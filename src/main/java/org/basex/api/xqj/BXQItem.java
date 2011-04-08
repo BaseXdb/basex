@@ -115,7 +115,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     try {
       return it.node() && it.type != NodeType.TXT ? serialize() :
         Token.string(it.atom(null));
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       throw new XQException(e.getMessage(), e.code());
     }
   }

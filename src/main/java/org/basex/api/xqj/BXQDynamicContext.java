@@ -36,7 +36,6 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Var;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -264,7 +263,7 @@ abstract class BXQDynamicContext extends BXQAbstract
       qp.parse();
       qctx.compile();
       Iter iter = qctx.iter();
-      if(sc.scrollable) iter = ItemCache.get(iter);
+      if(sc.scrollable) iter = iter.finish().cache();
       return new BXQSequence(iter, this, (BXQConnection) par);
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage(), new QName(ex.code()),

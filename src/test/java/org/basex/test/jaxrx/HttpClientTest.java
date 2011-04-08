@@ -213,7 +213,7 @@ public final class HttpClientTest {
     final Command c = new XQuery("http:send-request(<http:request/>)");
     try {
       c.execute(context);
-    } catch(BaseXException ex) {
+    } catch(final BaseXException ex) {
       assertTrue(indexOf(token(ex.getMessage()),
           token(Err.ErrType.FOHC.toString())) != -1);
     }
@@ -340,7 +340,7 @@ public final class HttpClientTest {
     assertTrue(r.parts.size() == 3);
 
     // check parts
-    Iterator<Part> i = r.parts.iterator();
+    final Iterator<Part> i = r.parts.iterator();
     Part part = null;
     part = i.next();
     assertTrue(part.headers.size() == 2);
@@ -707,7 +707,7 @@ public final class HttpClientTest {
         + "--boundary42\r\n" + "Content-Type: text/x-whatever\r\n\r\n"
         + ".... fanciest formatted version of same  "
         + "message  goes  here\n...\r\n" + "--boundary42--");
-    Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
+    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
         context.prop, null);
 
     // Construct expected result
@@ -798,7 +798,7 @@ public final class HttpClientTest {
         + "It DOES end with a linebreak.\r\n\r\n" + "--simple boundary--\r\n"
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
+    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
         context.prop, null);
 
     // Construct expected result
@@ -865,22 +865,21 @@ public final class HttpClientTest {
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-class FakeHttpConnection extends HttpURLConnection {
-
+final class FakeHttpConnection extends HttpURLConnection {
   /** Request headers. */
-  public Map<String, List<String>> headers;
+  Map<String, List<String>> headers;
   /** Content-type. */
-  public String contentType;
+  String contentType;
   /** Content. */
-  public byte[] content;
+  byte[] content;
   /** Connection output stream. */
-  public ByteArrayOutputStream out;
+  ByteArrayOutputStream out;
 
   /**
    * Constructor.
    * @param u uri
    */
-  public FakeHttpConnection(final URL u) {
+  FakeHttpConnection(final URL u) {
     super(u);
     out = new ByteArrayOutputStream();
     headers = new HashMap<String, List<String>>();
@@ -929,20 +928,14 @@ class FakeHttpConnection extends HttpURLConnection {
 
   @Override
   public void disconnect() {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public boolean usingProxy() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public void connect() {
-    // TODO Auto-generated method stub
-
   }
-
 }
