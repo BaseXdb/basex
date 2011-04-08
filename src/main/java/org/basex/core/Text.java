@@ -168,6 +168,8 @@ public interface Text {
   /** Command keyword. */
   String AS = "AS";
   /** Command keyword. */
+  String ALL = "ALL";
+  /** Command keyword. */
   String TO = "TO";
   /** Command keyword. */
   String ON = "ON";
@@ -563,6 +565,8 @@ public interface Text {
   String QUERYPRINTED = lang("qu_tabprinted") + COLS;
   /** Query info: memory. */
   String QUERYMEM = lang("qu_tabmem") + ": %";
+  /** Query info: memory. */
+  String QUERYMEM2 = lang("qu_tabmem") + COLS;
   /** Query hits. */
   String HITS = lang("qu_hits");
   /** Insert query info. */

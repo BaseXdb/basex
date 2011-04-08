@@ -66,8 +66,7 @@ abstract class AQuery extends Command {
       for(int i = 0; i < runs; ++i) {
         final Performance per = new Performance();
 
-        qp = new QueryProcessor(query, context);
-        progress(qp);
+        qp = progress(new QueryProcessor(query, context));
 
         qp.parse();
         pars += per.getTime();
