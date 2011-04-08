@@ -155,8 +155,8 @@ public final class InfoView extends View {
         --i;
       } else if(!ok) {
         err += line + NL;
-      } else {
-        if(line.startsWith(QUERYHITS) || line.startsWith(QUERYUPDATED))
+      } else if (line.startsWith(QUERYHITS) || line.startsWith(QUERYUPDATED)
+          || line.startsWith(QUERYPRINTED) || line.startsWith(QUERYMEM2)) {
           stats.add("- " + line);
       }
     }
