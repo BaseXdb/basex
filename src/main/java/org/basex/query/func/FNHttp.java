@@ -36,16 +36,13 @@ public final class FNHttp extends Fun {
     final byte[] href = expr.length >= 2 ? checkEStr(expr[1].item(ctx, input))
         : null;
 
-    // Get bodies node sequence
-    final Iter bodies = expr.length != 3 ? null : expr[2].iter(ctx);
-
+    // Get parameter $bodies
     ItemCache cache = null;
-    if(bodies != null) {
+    if(expr.length == 3) {
+      final Iter bodies = expr[2].iter(ctx);
       cache = new ItemCache();
       Item i;
-      while((i = bodies.next()) != null) {
-        cache.add(i);
-      }
+      while((i = bodies.next()) != null) cache.add(i);
     }
 
     // Send HTTP request

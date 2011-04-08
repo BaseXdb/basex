@@ -13,7 +13,7 @@ import org.basex.util.InputInfo;
 
 /**
  * This class assembles common error messages.
- * 
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
@@ -150,35 +150,16 @@ public enum Err {
   ZIPFAIL(FOZP, 3, "Operation failed: %."),
 
   /** FOHC0001: Evaluation exception. */
-  URLINV(FOHC, 1, "Invalid URL: \"%\"."),
+  HTTPERR(FOHC, 1, "An HTTP error occurred: %."),
   /** FOHC0002: Evaluation exception. */
-  PROTINV(FOHC, 2, "The requested method is not valid for HTTP."),
-  /*
-   * FOHC0003: Evaluation exception (not used yet). CONNERR(FOHC, 3,
-   * "Connection to \"%\" cannot be opened."),
-   */
-  /** FOHC0004: Evaluation exception. */
-  ELMINV(FOHC, 4, "Invalid element syntax."),
-  /** FOHC0005: Evaluation exception. */
-  HTTPERR(FOHC, 5, "An HTTP error occurred: %."),
-  /** FOHC0006: Evaluation exception. */
-  CREDSERR(FOHC, 6, "Provided credentials are invalid."),
-  /** FOHC0007: Evaluation exception. */
-  HTMLERR(FOHC, 7, "Error parsing HTML input."),
-  /** FOHC008: Evaluation exception. */
-  NOURL(FOHC, 8, "No URL specified."),
-  /** FOHC009: Evaluation exception. */
-  MANDATTR(FOHC, 9, "Attribute '%' is mandatory."),
-  /** FOHC0010: Evaluation exception. */
-  NOBOUND(FOHC, 10, "No separation boundary specified."),
-  /** FOHC0011: Evaluation exception. */
-  SRCATTR(FOHC, 11, "The src attribute on the body element is mutually"
+  HTMLERR(FOHC, 2, "Error parsing entity as XML or HTML."),
+  /** FOHC003: Evaluation exception. */
+  SRCATTR(FOHC, 3, "The src attribute on the body element is mutually"
       + "exclusive with all other attributes (except the media-type)"),
-  /** FOHC0012: Evaluation exception. */
-  BODYNUMERR(FOHC, 12, "Number of items with request body content differs " +
-  "from number of body descriptors."),
-  /** FOHC0013: Evaluation exception. */
-  BODYNOTEXP(FOHC, 13, "Body not expected for method '%'."),
+  /** FOHC0004: Evaluation exception. */
+  REQINV(FOHC, 4, "The request element is not valid: %"),
+  /** FOHC005: Evaluation exception. */
+  NOURL(FOHC, 5, "No URL specified."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

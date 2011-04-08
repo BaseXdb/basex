@@ -60,6 +60,7 @@ public final class RequestParser {
   /**
    * Parses an <http:request/> element.
    * @param request request element
+   * @param bodies content items
    * @param ii input info
    * @return parsed request
    * @throws QueryException query exception
@@ -71,20 +72,24 @@ public final class RequestParser {
     checkRequest(r, ii);
     final ANode payload = parseHdrs(request.children(), r.headers);
     final byte[] httpMethod = lc(r.attrs.get(METHOD));
-    // It is an error if payload is set for HTTP verbs which must be empty
+    // It is an error if content is set for HTTP verbs which must be empty
     if((eq(TRACE, httpMethod) || eq(DELETE, httpMethod))
-        && (payload != null || bodies != null)) BODYNOTEXP.thrw(ii, httpMethod);
+        && (payload != null || bodies != null)) REQINV.thrw(ii,
+        "Body not expected for method " + string(httpMethod));
     if(payload != null) {
+      // Single part request
       if(eq(payload.nname(), BODY)) {
         Item it = null;
         if(bodies != null) {
-          // In case of single part request, $bodies must contain exactly one
-          // item
-          if(bodies.size() != 1) BODYNUMERR.thrw(ii);
+          // $bodies must contain exactly one item
+          if(bodies.size() != 1) REQINV.thrw(ii,
+              "Number of items with request body content differs "
+                  + "from number of body descriptors.");
           it = bodies.next();
         }
         parseBody(payload, it, r.payloadAttrs, r.bodyContent, ii);
         r.isMultipart = false;
+        // Multipart request
       } else if(eq(payload.nname(), MULTIPART)) {
         int i = 0;
         final NodeMore ch = payload.children();
@@ -92,12 +97,13 @@ public final class RequestParser {
           i++;
         // Number of items in $bodies must be equal to number of body
         // descriptors
-        if(bodies != null && bodies.size() != i) BODYNUMERR.thrw(ii);
+        if(bodies != null && bodies.size() != i) REQINV.thrw(ii,
+            "Number of items with request body content differs "
+                + "from number of body descriptors.");
         parseMultipart(payload, bodies, r.payloadAttrs, r.parts, ii);
         r.isMultipart = true;
-      } else ELMINV.thrw(ii);
+      } else REQINV.thrw(ii);
     }
-
     return r;
   }
 
@@ -129,7 +135,7 @@ public final class RequestParser {
       byte[] value = null;
 
       while((attr = hdrAttrs.next()) != null) {
-        if(eq(attr.nname(), HDR_NAME)) name = lc(attr.atom());
+        if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
         if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
 
         if(name != null && name.length != 0 && value != null
@@ -157,20 +163,22 @@ public final class RequestParser {
     parseAttrs(body, attrs);
     checkBody(body, attrs, ii);
     if(attrs.get(SRC) == null) {
-      if(contItem != null) {
-        bodyContent.add(contItem);
-      } else {
+      // No linked resource for setting request content
+      if(contItem == null) {
+        // Content is set from <http:body/> children
         ANode n;
         final NodeMore i = body.children();
-        while((n = i.next()) != null) {
+        while((n = i.next()) != null)
           bodyContent.add(n);
-        }
+      } else {
+        // Content is set from $bodies parameter
+        bodyContent.add(contItem);
       }
     }
   }
 
   /**
-   * Parses <http:multipart/> element.
+   * Parses a <http:multipart/> element.
    * @param multipart multipart element
    * @param contItems content items
    * @param attrs map for multipart attributes
@@ -182,17 +190,18 @@ public final class RequestParser {
       final ItemCache contItems, final TokenMap attrs, final List<Part> parts,
       final InputInfo ii) throws QueryException {
     parseAttrs(multipart, attrs);
+    if(attrs.get(METHOD) == null) REQINV.thrw(ii,
+        "Attribute media-type of http:multipart is mandatory");
     ANode n;
     final NodeMore i = multipart.children();
-    if(contItems != null) {
-      while((n = i.next()) != null) {
-        parts.add(parsePart(n, contItems.next(), ii));
-      }
-    } else {
-
-      while((n = i.next()) != null) {
+    if(contItems == null) {
+      // Content is set from <http:body/> children of <http:part/> elements
+      while((n = i.next()) != null)
         parts.add(parsePart(n, null, ii));
-      }
+    } else {
+      // Content is set from $bodies parameter
+      while((n = i.next()) != null)
+        parts.add(parsePart(n, contItems.next(), ii));
     }
   }
 
@@ -220,18 +229,18 @@ public final class RequestParser {
    */
   private static void checkRequest(final Request r, final InputInfo ii)
       throws QueryException {
-    // Check if HTTP method is provided
-    if(r.attrs.get(METHOD) == null) {
-      MANDATTR.thrw(ii, string(METHOD));
-    }
-
+    // @method denotes the HTTP verb and is mandatory
+    if(r.attrs.get(METHOD) == null) REQINV.thrw(ii,
+        "Attribute method is mandatory");
     // Check parameters needed in case of authorization
     final byte[] sendAuth = r.attrs.get(SENDAUTH);
     if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
       final byte[] usrname = r.attrs.get(USRNAME);
       final byte[] passwd = r.attrs.get(PASSWD);
 
-      if(usrname == null && passwd != null || usrname != null && passwd == null) CREDSERR.thrw(ii);
+      if(usrname == null && passwd != null || usrname != null && passwd == null
+          || usrname == null && passwd == null) REQINV.thrw(ii,
+          "Provided credentials are invalid");
     }
   }
 
@@ -245,8 +254,9 @@ public final class RequestParser {
   private static void checkBody(final ANode body, final TokenMap bodyAttrs,
       final InputInfo ii) throws QueryException {
 
-    // First check if media-type is specified
-    if(bodyAttrs.get(MEDIATYPE) == null) MANDATTR.thrw(ii);
+    // @media-type is mandatory
+    if(bodyAttrs.get(MEDIATYPE) == null) REQINV.thrw(ii,
+        "Attribute media-type of http:body is mandatory");
 
     // If src attribute is used to set the content of the body, no
     // other attributes must be specified and no content must be present

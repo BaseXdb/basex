@@ -74,11 +74,13 @@ public final class HTTPClient {
   /** XML media type. */
   private static final byte[] APPL_XML = token("application/xml");
   /** XML media type. */
-  private static final byte[] APPL_EXT_XML = token("application/xml-external-parsed-entity");
+  private static final byte[] APPL_EXT_XML =
+    token("application/xml-external-parsed-entity");
   /** XML media type. */
   private static final byte[] TXT_XML = token("text/xml");
   /** XML media type. */
-  private static final byte[] TXT_EXT_XML = token("text/xml-external-parsed-entity");
+  private static final byte[] TXT_EXT_XML =
+    token("text/xml-external-parsed-entity");
   /** XML media types' suffix. */
   private static final byte[] MIME_XML_SUFFIX = token("+xml");
   /** HTML media type. */
@@ -122,11 +124,12 @@ public final class HTTPClient {
 
     final Request r = RequestParser.parse(request, bodies, ii);
 
-    final byte[] dest = href != null ? href : r.attrs.get(HREF);
+    final byte[] dest = href == null ? r.attrs.get(HREF) : href;
     if(dest == null) NOURL.thrw(ii);
-
     try {
       final URL url = new URL(string(dest));
+      if(!url.getProtocol().equalsIgnoreCase("HTTP"))
+        HTTPERR.thrw(ii, "Invalid URL");
       final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       try {
         setConnectionProps(conn, r, ii);
@@ -142,9 +145,9 @@ public final class HTTPClient {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      throw URLINV.thrw(ii, href);
+      throw HTTPERR.thrw(ii, "Invalid URL");
     } catch(final ProtocolException ex) {
-      throw PROTINV.thrw(ii);
+      throw HTTPERR.thrw(ii, "Invalid HTTP method");
     } catch(final IOException ex) {
       throw HTTPERR.thrw(ii, ex);
     }
@@ -171,15 +174,16 @@ public final class HTTPClient {
 
   /**
    * Sets content type of HTTP request.
-   * @param conn http connection
+   * @param conn HTTP connection
    * @param r request data
    */
   private static void setContentType(final HttpURLConnection conn,
       final Request r) {
     final byte[] contTypeHdr = r.headers.get(lc(token(CONT_TYPE)));
-    // If header "Content-Type" is set explicitly by the user, it is used
+    // If header "Content-Type" is set explicitly by the user, its value is used
     if(contTypeHdr != null) {
       conn.setRequestProperty(CONT_TYPE, string(contTypeHdr));
+    //Otherwise @media-type of <http:body/> is considered
     } else {
       final String mediaType = string(r.payloadAttrs.get(MEDIATYPE));
       if(r.isMultipart) {
@@ -263,9 +267,9 @@ public final class HTTPClient {
     final byte[] mediaType = payloadAtts.get(MEDIATYPE);
     byte[] method = payloadAtts.get(METHOD);
     final byte[] src = payloadAtts.get(SRC);
-
+    // No resource to set the content from
     if(src == null) {
-      // Default value of "method" is determined by the media-type attribute
+      // Default value @method is determined by @media-type
       if(method == null) {
         if(eq(mediaType, APPL_XHTML)) method = token(M_XHTML);
         else if(eq(mediaType, APPL_XML) || eq(mediaType, APPL_EXT_XML)
@@ -273,7 +277,7 @@ public final class HTTPClient {
             || endsWith(mediaType, MIME_XML_SUFFIX)) method = token(M_XML);
         else if(eq(mediaType, TXT_HTML)) method = token(M_HTML);
         else if(startsWith(mediaType, MIME_TEXT_PREFIX)) method = token(M_TEXT);
-        // In EXPath spec - binary, but according to Issue 4 - xml
+        // Default serialization method is XML
         else method = token(M_XML);
       }
       // Write content depending on the method
@@ -302,7 +306,6 @@ public final class HTTPClient {
   private static void writeBase64(final ItemCache payload,
       final OutputStream out, final InputInfo ii) throws IOException,
       QueryException {
-
     for(int i = 0; i < payload.size(); i++) {
       Item item = payload.get(i);
       if(item instanceof B64) {
@@ -344,19 +347,17 @@ public final class HTTPClient {
   private static void write(final ItemCache payload,
       final TokenMap payloadAttrs, final byte[] method, final OutputStream out)
       throws IOException {
-
     // Extract serialization parameters
     final TokenBuilder tb = new TokenBuilder();
     tb.add(token("method=")).add(method);
     final byte[][] keys = payloadAttrs.keys();
     for(final byte[] key : keys) {
-      if(!eq(key, SRC) && !eq(key, MEDIATYPE) && !eq(key, METHOD)) tb.add(',').add(
-          key).add('=').add(payloadAttrs.get(key));
+      if(!eq(key, SRC) && !eq(key, MEDIATYPE) && !eq(key, METHOD))
+        tb.add(',').add(key).add('=').add(payloadAttrs.get(key));
     }
-
     final SerializerProp prop = new SerializerProp(tb.toString());
-
     final XMLSerializer xml = new XMLSerializer(out, prop);
+    // Serialize each item according to the parameters
     try {
       for(int i = 0; i < payload.size(); i++) {
         payload.get(i).serialize(xml);
@@ -388,7 +389,7 @@ public final class HTTPClient {
   }
 
   /**
-   * Writes the parts of multipart message in the output stream of the URL
+   * Writes parts of multipart message in the output stream of the HTTP
    * connection.
    * @param r request data
    * @param out output stream
@@ -403,7 +404,8 @@ public final class HTTPClient {
     final Iterator<Part> i = r.parts.iterator();
     while(i.hasNext())
       writePart(i.next(), out, boundary, ii);
-    out.write(new TokenBuilder().add("--").add(boundary).add("--").add(CRLF).finish());
+    out.write(new TokenBuilder().add("--").
+        add(boundary).add("--").add(CRLF).finish());
   }
 
   /**
