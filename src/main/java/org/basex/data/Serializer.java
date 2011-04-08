@@ -117,6 +117,21 @@ public abstract class Serializer {
   protected abstract void close(final byte[] t) throws IOException;
 
   /**
+   * Opens a document.
+   * @param name name
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void openDoc(final byte[] name) throws IOException { };
+
+  /**
+   * Closes a document.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void closeDoc() throws IOException { };
+
+  /**
    * Closes the serializer.
    * @throws IOException I/O exception
    */
@@ -270,6 +285,7 @@ public abstract class Serializer {
   final int node(final Data data, final int pre, final FTPosData ft)
       throws IOException {
 
+    boolean doc = false;
     final TokenList nsp = data.ns.size() != 0 ? new TokenList() : null;
     final int[] parStack = new int[IO.MAXHEIGHT];
     final byte[][] names = new byte[IO.MAXHEIGHT][];
@@ -291,7 +307,9 @@ public abstract class Serializer {
       }
 
       if(k == Data.DOC) {
-        ++p;
+        if(doc) closeDoc();
+        openDoc(data.text(p++, true));
+        doc = true;
       } else if(k == Data.TEXT) {
         final FTPos ftd = ft != null ? ft.get(data, p) : null;
         if(ftd != null) text(data.text(p++, true), ftd);
@@ -354,6 +372,7 @@ public abstract class Serializer {
 
     // process remaining elements...
     while(--l >= 0) closeElement();
+    if(doc) closeDoc();
     return s;
   }
 

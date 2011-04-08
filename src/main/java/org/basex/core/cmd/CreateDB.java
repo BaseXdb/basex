@@ -126,16 +126,15 @@ public final class CreateDB extends ACreate {
     if(!ctx.user.perm(User.CREATE))
       throw new BaseXException(PERMNO, CmdPerm.CREATE);
 
-    BaseXException bxex = null;
     final Performance p = new Performance();
     ctx.register(true);
     try {
       ctx.openDB(xml(parser, name, ctx));
     } catch(final IOException ex) {
-      bxex = new BaseXException(ex);
+      throw new BaseXException(ex);
+    } finally {
+      ctx.unregister(true);
     }
-    ctx.unregister(true);
-    if(bxex != null) throw bxex;
     return Util.info(DBCREATED, name, p);
   }
 
@@ -168,13 +167,12 @@ public final class CreateDB extends ACreate {
       if(data.meta.ftindex) data.setIndex(IndexType.FULLTEXT,
         FTBuilder.get(data).build());
       data.close();
-    } catch(final IOException ex) {
+    } finally {
       try {
         builder.close();
       } catch(final IOException exx) {
         Util.debug(exx);
       }
-      throw ex;
     }
     return Open.open(name, ctx);
   }

@@ -168,6 +168,8 @@ public interface Text {
   /** Command keyword. */
   String AS = "AS";
   /** Command keyword. */
+  String ALL = "ALL";
+  /** Command keyword. */
   String TO = "TO";
   /** Command keyword. */
   String ON = "ON";

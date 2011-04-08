@@ -208,7 +208,7 @@ public final class CSVParser extends FileParser {
 
     if(tb.size() != 0 || simple) {
       builder.startElem(tag, atts);
-      builder.text(tb);
+      builder.text(tb.finish());
       builder.endElem(tag);
       tb.reset();
     }
