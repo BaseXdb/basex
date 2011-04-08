@@ -8,6 +8,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.Map;
 
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
@@ -118,9 +120,10 @@ public final class ResponseHandler {
       final InputInfo ii) throws IOException, QueryException {
 
     final NodeCache attrs = extractAttrs(conn);
-    final NodeCache hdrs = extractHdrs(conn);
+    final NodeCache hdrs = conn.getHeaderFields() == null ? null
+        : extractHdrs(conn);
     final byte[] contentType = extractContentType(mediaTypeOvr,
-        token(conn.getContentType()));
+        conn.getContentType());
 
     final ItemCache payloads = new ItemCache();
     final ANode body;
@@ -315,8 +318,9 @@ public final class ResponseHandler {
       final byte[] end, final Prop prop, final InputInfo ii)
       throws IOException, QueryException {
     // Content type of part payload - if not defined by header 'Content-Type',
-    // it equal to 'text/plain' (RFC 1341)
+    // it is equal to 'text/plain' (RFC 1341)
     byte[] partContType = TXT_PLAIN;
+    String charset = null;
     byte[] firstLine = readLine(io);
     // Last line is reached:
     if(firstLine == null || eq(firstLine, end)) return null;
@@ -325,12 +329,14 @@ public final class ResponseHandler {
 
     if(firstLine.length == 0) {
       // Part has no headers
-      final byte[] p = extractPartPayload(io, sep, end);
+      final byte[] p = extractPartPayload(io, sep, end, null);
       if(!statusOnly) payloads.add(interpretPayload(p, partContType, prop, ii));
     } else {
       // extract headers:
       byte[] nextHdr = firstLine;
       while(nextHdr != null && nextHdr.length > 0) {
+        // Extract charset from header 'Content-Type'
+        if(startsWith(lc(nextHdr), CONT_TYPE_LC)) charset = extractCharset(string(nextHdr));
         // parse header:
         final int pos = indexOf(nextHdr, ':');
         if(pos > 0) {
@@ -352,7 +358,7 @@ public final class ResponseHandler {
         nextHdr = readLine(io);
       }
 
-      final byte[] p = extractPartPayload(io, sep, end);
+      final byte[] p = extractPartPayload(io, sep, end, charset);
       if(!statusOnly) {
         payloads.add(interpretPayload(p, partContType, prop, ii));
       }
@@ -405,7 +411,8 @@ public final class ResponseHandler {
    * @throws IOException IO exception
    */
   private static byte[] extractPartPayload(final InputStream io,
-      final byte[] sep, final byte[] end) throws IOException {
+      final byte[] sep, final byte[] end, final String charset)
+      throws IOException {
     final ByteList bl = new ByteList();
     while(true) {
       final byte[] next = readLine(io);
@@ -421,7 +428,7 @@ public final class ResponseHandler {
     // RFC 1341: Epilogue shall be ignored
     while(readLine(io) != null)
       ;
-    return bl.toArray();
+    return TextInput.content(new IOContent(bl.toArray()), charset).finish();
   }
 
   /**
@@ -429,12 +436,12 @@ public final class ResponseHandler {
    * @param c value for "Content-type" header
    * @return result
    */
-  private static byte[] extractContentType(final byte[] ovr, final byte[] c) {
+  private static byte[] extractContentType(final byte[] ovr, final String c) {
 
     if(ovr != null) return ovr;
     else if(c != null) {
-      int end = indexOf(c, ';');
-      return end == -1 ? c : subtoken(c, 0, end);
+      int end = c.indexOf(';');
+      return end == -1 ? token(c) : subtoken(token(c), 0, end);
     } else {
       return OCT_STREAM;
     }
@@ -475,8 +482,7 @@ public final class ResponseHandler {
     if(index == -1) {
       return null;
     }
-    String ch = c.substring(index, 8); // 8 for "charset="
-    // TODO: try with charset enclosed in qoutes
+    String ch = c.substring(index + 8); // 8 for "charset="
     return ch;
   }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
+import org.basex.query.item.Item;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.NodeMore;
@@ -44,6 +45,10 @@ public final class RequestParser {
   private static final byte[] MEDIATYPE = token("media-type");
   /** Body attribute: media-type. */
   private static final byte[] SRC = token("src");
+  /** HTTP method TRACE. */
+  private static final byte[] TRACE = token("trace");
+  /** HTTP method DELETE. */
+  private static final byte[] DELETE = token("delete");
 
   /**
    * Constructor.
@@ -59,23 +64,40 @@ public final class RequestParser {
    * @return parsed request
    * @throws QueryException query exception
    */
-  public static Request parse(final ANode request, final InputInfo ii)
-      throws QueryException {
+  public static Request parse(final ANode request, final ItemCache bodies,
+      final InputInfo ii) throws QueryException {
     final Request r = new Request();
     parseAttrs(request, r.attrs);
     checkRequest(r, ii);
     final ANode payload = parseHdrs(request.children(), r.headers);
+    final byte[] httpMethod = lc(r.attrs.get(METHOD));
+    // It is an error if payload is set for HTTP verbs which must be empty
+    if((eq(TRACE, httpMethod) || eq(DELETE, httpMethod))
+        && (payload != null || bodies != null)) BODYNOTEXP.thrw(ii, httpMethod);
     if(payload != null) {
       if(eq(payload.nname(), BODY)) {
-        parseBody(payload, r.payloadAttrs, r.bodyContent, ii);
+        Item it = null;
+        if(bodies != null) {
+          // In case of single part request, $bodies must contain exactly one
+          // item
+          if(bodies.size() != 1) BODYNUMERR.thrw(ii);
+          it = bodies.next();
+        }
+        parseBody(payload, it, r.payloadAttrs, r.bodyContent, ii);
         r.isMultipart = false;
       } else if(eq(payload.nname(), MULTIPART)) {
-        parseMultipart(payload, r.payloadAttrs, r.parts, ii);
+        int i = 0;
+        final NodeMore ch = payload.children();
+        while(ch.next() != null)
+          i++;
+        // Number of items in $bodies must be equal to number of body
+        // descriptors
+        if(bodies != null && bodies.size() != i) BODYNUMERR.thrw(ii);
+        parseMultipart(payload, bodies, r.payloadAttrs, r.parts, ii);
         r.isMultipart = true;
       } else ELMINV.thrw(ii);
     }
 
-    // check(r, ii);
     return r;
   }
 
@@ -123,20 +145,26 @@ public final class RequestParser {
   /**
    * Parses <http:body/> element.
    * @param body body element
+   * @param contItem content item
    * @param attrs map for parsed body attributes
    * @param bodyContent item cache for parsed body content
    * @param ii input info
    * @throws QueryException query exception
    */
-  private static void parseBody(final ANode body, final TokenMap attrs,
-      final ItemCache bodyContent, final InputInfo ii) throws QueryException {
+  private static void parseBody(final ANode body, final Item contItem,
+      final TokenMap attrs, final ItemCache bodyContent, final InputInfo ii)
+      throws QueryException {
     parseAttrs(body, attrs);
     checkBody(body, attrs, ii);
     if(attrs.get(SRC) == null) {
-      ANode n;
-      final NodeMore i = body.children();
-      while((n = i.next()) != null) {
-        bodyContent.add(n);
+      if(contItem != null) {
+        bodyContent.add(contItem);
+      } else {
+        ANode n;
+        final NodeMore i = body.children();
+        while((n = i.next()) != null) {
+          bodyContent.add(n);
+        }
       }
     }
   }
@@ -144,34 +172,43 @@ public final class RequestParser {
   /**
    * Parses <http:multipart/> element.
    * @param multipart multipart element
+   * @param contItems content items
    * @param attrs map for multipart attributes
    * @param parts list for multipart parts
    * @param ii input info
    * @throws QueryException query exception
    */
   private static void parseMultipart(final ANode multipart,
-      final TokenMap attrs, final List<Part> parts, final InputInfo ii)
-      throws QueryException {
+      final ItemCache contItems, final TokenMap attrs, final List<Part> parts,
+      final InputInfo ii) throws QueryException {
     parseAttrs(multipart, attrs);
     ANode n;
     final NodeMore i = multipart.children();
-    while((n = i.next()) != null) {
-      parts.add(parsePart(n, ii));
+    if(contItems != null) {
+      while((n = i.next()) != null) {
+        parts.add(parsePart(n, contItems.next(), ii));
+      }
+    } else {
+
+      while((n = i.next()) != null) {
+        parts.add(parsePart(n, null, ii));
+      }
     }
   }
 
   /**
    * Parses a part from a <http:multipart/> element.
    * @param part part element
+   * @param contItem content item
    * @param ii input info
    * @return structure representing the part
    * @throws QueryException query exception
    */
-  private static Part parsePart(final ANode part, final InputInfo ii)
-      throws QueryException {
+  private static Part parsePart(final ANode part, final Item contItem,
+      final InputInfo ii) throws QueryException {
     final Part p = new Part();
     final ANode partBody = parseHdrs(part.children(), p.headers);
-    parseBody(partBody, p.bodyAttrs, p.bodyContent, ii);
+    parseBody(partBody, contItem, p.bodyAttrs, p.bodyContent, ii);
     return p;
   }
 
@@ -194,8 +231,7 @@ public final class RequestParser {
       final byte[] usrname = r.attrs.get(USRNAME);
       final byte[] passwd = r.attrs.get(PASSWD);
 
-      if(usrname == null && passwd != null || usrname != null && passwd == null)
-        CREDSERR.thrw(ii);
+      if(usrname == null && passwd != null || usrname != null && passwd == null) CREDSERR.thrw(ii);
     }
   }
 

@@ -172,8 +172,13 @@ public enum Err {
   /** FOHC0010: Evaluation exception. */
   NOBOUND(FOHC, 10, "No separation boundary specified."),
   /** FOHC0011: Evaluation exception. */
-  SRCATTR(FOHC, 11, "The src attribute on the body element is mutually" +
-  "exclusive with all other attributes (except the media-type)"),
+  SRCATTR(FOHC, 11, "The src attribute on the body element is mutually"
+      + "exclusive with all other attributes (except the media-type)"),
+  /** FOHC0012: Evaluation exception. */
+  BODYNUMERR(FOHC, 12, "Number of items with request body content differs " +
+  "from number of body descriptors."),
+  /** FOHC0013: Evaluation exception. */
+  BODYNOTEXP(FOHC, 13, "Body not expected for method '%'."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

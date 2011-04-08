@@ -74,13 +74,11 @@ public final class HTTPClient {
   /** XML media type. */
   private static final byte[] APPL_XML = token("application/xml");
   /** XML media type. */
-  private static final byte[] APPL_EXT_XML =
-    token("application/xml-external-parsed-entity");
+  private static final byte[] APPL_EXT_XML = token("application/xml-external-parsed-entity");
   /** XML media type. */
   private static final byte[] TXT_XML = token("text/xml");
   /** XML media type. */
-  private static final byte[] TXT_EXT_XML =
-    token("text/xml-external-parsed-entity");
+  private static final byte[] TXT_EXT_XML = token("text/xml-external-parsed-entity");
   /** XML media types' suffix. */
   private static final byte[] MIME_XML_SUFFIX = token("+xml");
   /** HTML media type. */
@@ -112,15 +110,17 @@ public final class HTTPClient {
    * Sends an HTTP request.
    * @param href URL to send the request to
    * @param request request data
+   * @param bodies content items
    * @param ii input info
    * @param prop query context properties
    * @return HTTP response
    * @throws QueryException query exception
    */
   public static Iter sendRequest(final byte[] href, final ANode request,
-      final InputInfo ii, final Prop prop) throws QueryException {
+      final ItemCache bodies, final InputInfo ii, final Prop prop)
+      throws QueryException {
 
-    final Request r = RequestParser.parse(request, ii);
+    final Request r = RequestParser.parse(request, bodies, ii);
 
     final byte[] dest = href != null ? href : r.attrs.get(HREF);
     if(dest == null) NOURL.thrw(ii);
@@ -350,8 +350,8 @@ public final class HTTPClient {
     tb.add(token("method=")).add(method);
     final byte[][] keys = payloadAttrs.keys();
     for(final byte[] key : keys) {
-      if(!eq(key, SRC) && !eq(key, MEDIATYPE) && !eq(key, METHOD))
-        tb.add(',').add(key).add('=').add(payloadAttrs.get(key));
+      if(!eq(key, SRC) && !eq(key, MEDIATYPE) && !eq(key, METHOD)) tb.add(',').add(
+          key).add('=').add(payloadAttrs.get(key));
     }
 
     final SerializerProp prop = new SerializerProp(tb.toString());
