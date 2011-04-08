@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.Map.Entry;
+
 import javax.xml.parsers.SAXParserFactory;
 import org.basex.api.dom.BXDoc;
 import org.basex.data.Data;
@@ -268,14 +270,14 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
     @Override
     public void startElement(final String s, final String s1, final String s2,
-        final Attributes attributes) throws SAXException {
+        final Attributes atts) throws SAXException {
 
       try {
         xml.openElement(token(s2));
-        for(int i = 0; i < attributes.getLength(); ++i) xml.attribute(
-            token(attributes.getQName(i)), token(attributes.getValue(i)));
-        for(final String k : ns.keySet()) xml.attribute(
-            concat(XMLNSC, token(k)), token(ns.get(k)));
+        for(int i = 0; i < atts.getLength(); ++i)
+          xml.attribute(token(atts.getQName(i)), token(atts.getValue(i)));
+        for(final Entry<String, String> e : ns.entrySet())
+          xml.attribute(concat(XMLNSC, token(e.getKey())), token(e.getValue()));
       } catch(final IOException ex)  {
         throw new SAXException(ex);
       }
