@@ -9,6 +9,8 @@ import org.basex.util.InputInfo;
 
 /**
  * A single binding of a {@link HashTrie}.
+ *
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 final class Leaf extends TrieNode {

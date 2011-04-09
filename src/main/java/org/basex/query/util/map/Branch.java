@@ -9,6 +9,7 @@ import org.basex.util.InputInfo;
 /**
  * Inner node of a {@link HashTrie}.
  *
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 final class Branch extends TrieNode {

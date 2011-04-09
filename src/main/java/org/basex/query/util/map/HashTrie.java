@@ -9,6 +9,7 @@ import org.basex.util.InputInfo;
 /**
  * A persistent hash map based on a Trie.
  *
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public final class HashTrie {

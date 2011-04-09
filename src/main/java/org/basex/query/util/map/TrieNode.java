@@ -8,6 +8,8 @@ import org.basex.util.InputInfo;
 
 /**
  * Abstract superclass of all trie nodes.
+ *
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 abstract class TrieNode {
