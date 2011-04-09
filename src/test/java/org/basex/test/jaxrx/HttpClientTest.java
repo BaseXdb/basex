@@ -209,8 +209,22 @@ public final class HttpClientTest {
    * that mandatory attributes are missing.
    */
   @Test
-  public void sendSimple() {
+  public void sendEmptyReq() {
     final Command c = new XQuery("http:send-request(<http:request/>)");
+    try {
+      c.execute(context);
+    } catch(final BaseXException ex) {
+      assertTrue(indexOf(token(ex.getMessage()),
+          token(Err.ErrType.FOHC.toString())) != -1);
+    }
+  }
+
+  /**
+   * Tests http:send-request((),()).
+   */
+  @Test
+  public void testSendReqNoParams() {
+    final Command c = new XQuery("http:send-request(())");
     try {
       c.execute(context);
     } catch(final BaseXException ex) {
@@ -440,7 +454,7 @@ public final class HttpClientTest {
       dbNode = new DBNode(MemBuilder.build(p, context.prop, ""), 0);
       try {
         RequestParser.parse(dbNode.children().next(), null, null);
-        fail("exception not thrown");
+        fail("Exception not thrown");
       } catch(QueryException ex) {
         assertTrue(indexOf(token(ex.getMessage()),
             token(Err.ErrType.FOHC.toString())) != -1);
