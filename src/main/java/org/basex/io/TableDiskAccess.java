@@ -79,7 +79,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // initialize data file
     data = new RandomAccessFile(meta.file(pf), "rw");
-    readBlock(0, 0, blocks > 1 ? fpres[1] : md.size);
+    readBlock(0);
   }
 
   @Override
@@ -199,8 +199,8 @@ public final class TableDiskAccess extends TableAccess {
         Array.move(fpres, index + 1, -1, blocks - index - 1);
         Array.move(pages, index + 1, -1, blocks - index - 1);
 
-        readBlock(index, fpre, index + 2 > --blocks ? meta.size :
-          fpres[index + 1]);
+        --blocks;
+        readBlock(index);
       }
       return;
     }
@@ -216,7 +216,7 @@ public final class TableDiskAccess extends TableAccess {
         // blocks may not be consecutive:
         pagemap.clear(pages[index]);
       }
-      nextBlock();
+      readBlock(index + 1);
       from = 0;
     }
 
@@ -224,7 +224,7 @@ public final class TableDiskAccess extends TableAccess {
     if(npre == last) {
       pagemap.clear((int) bf.pos);
       ++unused;
-      if(index < blocks - 1) nextBlock();
+      if(index < blocks - 1) readBlock(index + 1);
       else ++index;
     } else {
       // delete entries at beginning of current (last) block
@@ -249,23 +249,21 @@ public final class TableDiskAccess extends TableAccess {
   public void insert(final int pre, final byte[] entries) {
     if(entries.length == 0) return;
 
-    // number of records to be inserted:
-    final int nr = entries.length >>> IO.NODEPOWER;
-    meta.size += nr;
-    dirty = true;
-
     // go to the block and find the offset within the block where the new
     // records will be inserted:
     final int split = cursor(pre - 1) + (1 << IO.NODEPOWER);
 
+    // number of records to be inserted:
+    final int nr = entries.length >>> IO.NODEPOWER;
+
     // number of bytes occupied by old records in the current block:
     final int nold = npre - fpre << IO.NODEPOWER;
-    // number of bytes occupied by old records which will be after the new ones:
-    final int nlast = nold - split;
+    // number of bytes occupied by old records which will be moved at the end:
+    final int moved = nold - split;
 
     // special case: all entries fit in the current block:
     if(nold + entries.length <= IO.BLOCKSIZE) {
-      System.arraycopy(bf.data, split, bf.data, split + entries.length, nlast);
+      System.arraycopy(bf.data, split, bf.data, split + entries.length, moved);
       System.arraycopy(entries, 0, bf.data, split, entries.length);
       bf.dirty = true;
 
@@ -273,14 +271,16 @@ public final class TableDiskAccess extends TableAccess {
       for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
       // update cached variables (fpre is not changed):
       npre += nr;
+      meta.size += nr;
+      dirty = true;
       return;
     }
 
     // append old entries at the end of the new entries:
     // [DP] the following can be optimized to avoid copying arrays:
-    final byte[] all = new byte[entries.length + nlast];
+    final byte[] all = new byte[entries.length + moved];
     System.arraycopy(entries, 0, all, 0, entries.length);
-    System.arraycopy(bf.data, split, all, entries.length, nlast);
+    System.arraycopy(bf.data, split, all, entries.length, moved);
 
     // fill in the current block with new entries:
     // number of bytes which can fit in the first block:
@@ -290,9 +290,34 @@ public final class TableDiskAccess extends TableAccess {
       bf.dirty = true;
     }
 
-    // resize fpres and pages:
-    // number of blocks needed to store the remaining entries:
-    final int neededBlocks = (all.length - n + IO.BLOCKSIZE - 1) / IO.BLOCKSIZE;
+    int neededBlocks = (all.length - n) / IO.BLOCKSIZE;
+    // number of bytes which don't fill one block completely:
+    final int remain = (all.length - n) % IO.BLOCKSIZE;
+
+    if(remain > 0) {
+      // check if the last entries can fit in the block after the current one:
+      if(index + 1 < blocks) {
+        final int o = occupiedSpace(index + 1) << IO.NODEPOWER;
+        if(remain <= IO.BLOCKSIZE - o) {
+          // copy the last records:
+          readBlock(index + 1);
+          System.arraycopy(bf.data, 0, bf.data, remain, o);
+          System.arraycopy(all, all.length - remain, bf.data, 0, remain);
+          bf.dirty = true;
+          // reduce the pre value, since it will be later incremented with nr:
+          fpres[index] -= remain >>> IO.NODEPOWER;
+          // go back to the previous block
+          readBlock(index - 1);
+        } else {
+          // there is not enough space in the block - allocate a new one:
+          ++neededBlocks;
+        }
+      } else {
+        // this is the last block - allocate a new one:
+        ++neededBlocks;
+      }
+    }
+
     // number of new blocks (number of needed block - number of empty blocks):
     final int newBlocks = neededBlocks - (allBlocks - blocks);
 
@@ -307,19 +332,23 @@ public final class TableDiskAccess extends TableAccess {
     Array.move(pages, index + 1, neededBlocks, blocks - index - 1);
 
     // write the all remaining entries:
-    while(n < all.length) {
+    while(neededBlocks-- > 0) {
       getFreeBlock();
       n += write(all, n);
-      fpres[index + 1] = fpres[index] + ENTRIES;
-      pages[++index] = (int) bf.pos;
+      fpres[index] = fpres[index - 1] + ENTRIES;
+      pages[index] = (int) bf.pos;
     }
 
     // increment first pre-values of blocks after the last modified block:
     for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
 
+    meta.size += nr;
+    dirty = true;
+
     // update cached variables:
     fpre = fpres[index];
-    npre = index + 1 >= blocks ? meta.size : fpres[index + 1];
+    npre = index + 1 < blocks && fpres[index + 1] < meta.size ? fpres[index + 1]
+        : meta.size;
   }
 
   @Override
@@ -355,26 +384,24 @@ public final class TableDiskAccess extends TableAccess {
         else break;
         m = h + l >>> 1;
         fp = fpres[m];
-        np = m == last ? fp + ENTRIES : fpres[m + 1];
+        np = m == last ? meta.size : fpres[m + 1];
       }
       if(l > h) Util.notexpected("Data Access out of bounds [pre:" + pre +
           ", indexSize:" + blocks + ", access:" + l + " > " + h + "]");
 
-      readBlock(m, fp, np);
+      readBlock(m);
     }
     return pre - fpre << IO.NODEPOWER;
   }
 
   /**
-   * Fetches the requested block and updates pointers.
+   * Updates the pre pointers and fetches the requested block.
    * @param i index number of the block to fetch
-   * @param f first entry in that block
-   * @param n first entry in the next block
    */
-  private void readBlock(final int i, final int f, final int n) {
+  private void readBlock(final int i) {
     index = i;
-    fpre = f;
-    npre = n;
+    fpre = fpres[i];
+    npre = i + 1 >= blocks ? meta.size : fpres[i + 1];
 
     final int b = pages[i];
     final boolean ch = bm.cursor(b);
@@ -403,14 +430,6 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Fetches the next block.
-   */
-  private void nextBlock() {
-    readBlock(index + 1, npre, index + 2 >= blocks ? meta.size :
-      fpres[index + 2]);
-  }
-
-  /**
    * Updates the firstPre index entries.
    * @param nr number of entries to move
    */
@@ -418,7 +437,8 @@ public final class TableDiskAccess extends TableAccess {
     // update index entries for all following blocks and reduce counter
     for(int i = index + 1; i < blocks; ++i) fpres[i] -= nr;
     meta.size -= nr;
-    npre = index + 1 >= blocks ? meta.size : fpres[index + 1];
+    npre = index + 1 < blocks && fpres[index + 1] < meta.size ? fpres[index + 1]
+        : meta.size;
   }
 
   /**
@@ -472,6 +492,16 @@ public final class TableDiskAccess extends TableAccess {
     bf.dirty = true;
     pagemap.set(bf.pos);
     ++blocks;
+    ++index;
+  }
+
+  /**
+   * Calculate the occupied space in a block.
+   * @param i index of the block
+   * @return occupied space in number of records
+   */
+  private int occupiedSpace(final int i) {
+    return (i + 1 < blocks ? fpres[i + 1] : meta.size) - fpres[i];
   }
 
   // TEST METHODS =============================================================

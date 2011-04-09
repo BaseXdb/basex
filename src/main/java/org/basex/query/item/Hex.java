@@ -27,7 +27,7 @@ public final class Hex extends Bin {
    * @throws QueryException query exception
    */
   public Hex(final byte[] v, final InputInfo ii) throws QueryException {
-    super(h2b(Token.trim(v), ii), AtomType.HEX);
+    super(hex(Token.trim(v), ii), AtomType.HEX);
   }
 
   /**
@@ -36,6 +36,14 @@ public final class Hex extends Bin {
    */
   Hex(final B64 b) {
     this(b.val);
+  }
+
+  @Override
+  public boolean eq(final InputInfo ii, final Item it)
+      throws QueryException {
+    // at this stage, item will always be of the same type
+    return Token.eq(val, it instanceof Bin ? ((Bin) it).val :
+      hex(Token.trim(it.atom(ii)), ii));
   }
 
   @Override
@@ -50,7 +58,7 @@ public final class Hex extends Bin {
    * @return byte array
    * @throws QueryException query exception
    */
-  private static byte[] h2b(final byte[] h, final InputInfo ii)
+  private static byte[] hex(final byte[] h, final InputInfo ii)
       throws QueryException {
 
     if((h.length & 1) != 0) throw FUNCAST.thrw(ii, AtomType.HEX, (char) h[0]);
@@ -58,7 +66,7 @@ public final class Hex extends Bin {
     final byte[] val = new byte[l];
 
     for(int i = 0; i < l; ++i) {
-      val[i] = (byte) ((h2b(h[i << 1], ii) << 4) + h2b(h[(i << 1) + 1], ii));
+      val[i] = (byte) ((hex(h[i << 1], ii) << 4) + hex(h[(i << 1) + 1], ii));
     }
     return val;
   }
@@ -70,7 +78,7 @@ public final class Hex extends Bin {
    * @return byte value
    * @throws QueryException query exception
    */
-  private static int h2b(final byte b, final InputInfo ii)
+  private static int hex(final byte b, final InputInfo ii)
       throws QueryException {
     if(b >= '0' && b <= '9') return b - '0';
     if(b >= 'a' && b <= 'f' || b >= 'A' && b <= 'F') return (b & 15) + 9;

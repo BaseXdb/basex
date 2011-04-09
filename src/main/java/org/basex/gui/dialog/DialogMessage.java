@@ -9,7 +9,7 @@ import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXEditor;
 import org.basex.util.Token;
 
 /**
@@ -38,7 +38,7 @@ final class DialogMessage extends Dialog {
     p.add(b, BorderLayout.NORTH);
     set(p, BorderLayout.WEST);
 
-    final BaseXText text = new BaseXText(false, this);
+    final BaseXEditor text = new BaseXEditor(false, this);
     text.setFont(p.getFont());
     text.setText(Token.token(txt));
     text.setFocusable(false);

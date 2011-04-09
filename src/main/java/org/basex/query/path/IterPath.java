@@ -24,12 +24,12 @@ final class IterPath extends AxisPath {
    * Constructor.
    * @param ii input info
    * @param r root expression
-   * @param s location steps
+   * @param s axis steps
    * @param t return type
    * @param c cardinality
    */
-  IterPath(final InputInfo ii, final Expr r, final AxisStep[] s,
-      final SeqType t, final long c) {
+  IterPath(final InputInfo ii, final Expr r, final Expr[] s, final SeqType t,
+      final long c) {
     super(ii, r, s);
     type = t;
     size = c;

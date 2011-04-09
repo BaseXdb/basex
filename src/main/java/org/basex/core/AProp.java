@@ -383,4 +383,9 @@ public abstract class AProp {
   protected void finish() {
     // nothing to do; if necessary, is overwritten.
   }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + props;
+  }
 }

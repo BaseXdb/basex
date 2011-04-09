@@ -7,7 +7,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import static org.basex.util.Token.token;
@@ -19,8 +18,6 @@ import static org.basex.util.Token.token;
  * @author Christian Gruen
  */
 public final class OrderByExpr extends OrderBy {
-  /** Sequence to be ordered. */
-  private ItemCache seq;
   /** Order expression. */
   private Expr expr;
 
@@ -47,24 +44,13 @@ public final class OrderByExpr extends OrderBy {
   }
 
   @Override
-  void init(final int s) {
-    if(seq == null) seq = new ItemCache(Math.max(s, 1));
-    else seq.size(0);
-  }
-
-  @Override
-  void add(final QueryContext ctx) throws QueryException {
+  Item key(final QueryContext ctx, final int i) throws QueryException {
     Item it = expr.item(ctx, input);
     if(it != null) {
       if(it.node()) it = Str.get(it.atom(input));
       else if(it.num() && Double.isNaN(it.dbl(input))) it = null;
     }
-    seq.add(it);
-  }
-
-  @Override
-  Item get(final int i) {
-    return seq.get(i);
+    return it;
   }
 
   @Override

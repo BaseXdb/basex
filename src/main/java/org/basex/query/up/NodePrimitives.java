@@ -44,4 +44,11 @@ interface NodePrimitives extends Iterable<Primitive> {
    * @return true if text node adjacency possible
    */
   boolean textAdjacency();
+
+  /**
+   * Returns wether the target's identity is destroyed as a result of delete or
+   * replace operations.
+   * @return true if identity lost
+   */
+  boolean updatesDestroyIdentity();
 }

@@ -12,6 +12,7 @@ import org.basex.core.Context;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.List;
@@ -24,7 +25,7 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
-import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXEditor;
 import org.basex.io.DataInput;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -42,7 +43,7 @@ public final class DialogOpen extends Dialog {
   /** Information panel. */
   private final BaseXLabel doc;
   /** Information panel. */
-  private final BaseXText detail;
+  private final BaseXEditor detail;
   /** Buttons. */
   private final BaseXBack buttons;
   /** Rename button. */
@@ -55,24 +56,23 @@ public final class DialogOpen extends Dialog {
   private final BaseXButton backup;
   /** Restore button. */
   private final BaseXButton restore;
-  /** File system flag. */
-  private final boolean fsInstance;
+  /** Copy button. */
+  private final BaseXButton copy;
   /** Manage flag. */
   private final boolean manage;
+  /** Refresh. */
+  private boolean refresh;
 
   /**
    * Default constructor.
    * @param main reference to the main window
    * @param m show manage dialog
-   * @param fs file system flag
    */
-  public DialogOpen(final GUI main, final boolean m, final boolean fs) {
-    super(main, m ? MANAGETITLE : fs ? OPENDQETITLE : OPENTITLE);
+  public DialogOpen(final GUI main, final boolean m) {
+    super(main, m ? MANAGETITLE : OPENTITLE);
     manage = m;
     // create database chooser
-    final StringList db = fs ? List.listFS(main.context) :
-      List.list(main.context);
-    fsInstance = fs;
+    final StringList db = List.list(main.context);
 
     choice = new BaseXListChooser(db.toArray(), this);
     set(choice, BorderLayout.CENTER);
@@ -87,7 +87,7 @@ public final class DialogOpen extends Dialog {
     doc.setFont(f.deriveFont(f.getSize2D() + 7f));
     info.add(doc, BorderLayout.NORTH);
 
-    detail = new BaseXText(false, this);
+    detail = new BaseXEditor(false, this);
     detail.border(5, 5, 5, 5).setFont(f);
 
     BaseXLayout.setWidth(detail, 400);
@@ -101,11 +101,12 @@ public final class DialogOpen extends Dialog {
 
     backup = new BaseXButton(BUTTONBACKUP, this);
     restore = new BaseXButton(BUTTONRESTORE, this);
+    copy = new BaseXButton(BUTTONCOPY, this);
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
     drop = new BaseXButton(BUTTONDROP, this);
     buttons = manage ?
-        newButtons(this, backup, restore, rename, drop, BUTTONOK) :
+        newButtons(this, backup, restore, copy, rename, drop, BUTTONOK) :
         newButtons(this, open, BUTTONCANCEL);
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
@@ -139,12 +140,12 @@ public final class DialogOpen extends Dialog {
     final String db = choice.getValue().trim();
     final String opendb = ctx.data != null ? ctx.data.meta.name : null;
     ok = true;
-
+    if(refresh) choice.setData(List.list(ctx).toArray());
+    refresh = false;
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
-      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui,
-          fsInstance, true);
+      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, 1);
       if(!dr.ok() || dr.input().equals(db)) return;
       final AlterDB cmd = new AlterDB(db, dr.input());
       if(cmd.run(ctx)) {
@@ -152,9 +153,15 @@ public final class DialogOpen extends Dialog {
       } else {
         Dialog.error(gui, cmd.info());
       }
-      choice.setData(fsInstance ? List.listFS(ctx).toArray() :
-        List.list(ctx).toArray());
+      choice.setData(List.list(ctx).toArray());
       action(null);
+    } else if(cmp == copy) {
+      final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
+      if(!dc.ok() || dc.input().equals(db)) return;
+      setCursor(GUIConstants.CURSORWAIT);
+      DialogProgress.execute(this, "", new Copy(db, dc.input()));
+      setCursor(GUIConstants.CURSORARROW);
+      refresh = true;
     } else if(cmp == drop) {
       if(db.isEmpty() || !Dialog.confirm(gui, Util.info(DROPCONF, db))) return;
       if(db.equals(opendb)) {
@@ -200,6 +207,7 @@ public final class DialogOpen extends Dialog {
       enableOK(buttons, BUTTONOPEN, ok);
       enableOK(buttons, BUTTONRENAME, ok);
       enableOK(buttons, BUTTONBACKUP, ok);
+      enableOK(buttons, BUTTONCOPY, ok);
       enableOK(buttons, BUTTONRESTORE, ok && Restore.list(db, ctx).size() != 0);
     }
   }

@@ -105,7 +105,7 @@ public final class XQUPTest extends QueryTest {
         { "ren3", node(28),
         "//processing-instruction('BADVICE')" },
 
-        // replace elem
+        // replace element
         { "xxxrep1", empty(),
         "replace node /up/cars/good/car[1] with /up/cars/good/car[2]" },
         { "rep1", node(7),
@@ -174,7 +174,18 @@ public final class XQUPTest extends QueryTest {
           { "MERGEins", node(11),
           "/up/cars/good/car/wheels[text()='optionalfoo']" },
 
-        // parser tests
+        // tree aware updates - mainly tests to avoid IOOB exceptions
+        { "xxxTREEAWARE1", empty(), "delete node /up, delete node /up/cars"},
+        { "TREEAWARE1", empty(), "/up"},
+        { "xxxTREEAWARE2", empty(), "delete node /up/cars, insert node " +
+          "<test/> before /up/cars"},
+          {"TREEAWARE2", node(2), "/up/test"},
+          { "xxxTREEAWARE3", empty(), "delete node /up/cars/bad, " +
+            "insert node <test/> into /up/cars/bad/car, " +
+            "insert node <test/> into //good, " +
+            "insert node <test/> into //car[@id='4']"},
+          { "TREEAWARE3", node(13, 18),
+              "//good/test, //bad, //ugly/descendant::test"}
     };
   }
 

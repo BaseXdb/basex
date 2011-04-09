@@ -16,8 +16,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import javax.swing.ImageIcon;
 import org.basex.gui.GUI;
@@ -25,7 +23,6 @@ import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
-import org.basex.util.Performance;
 import org.basex.util.Util;
 
 /**
@@ -39,9 +36,6 @@ public final class BaseXLayout {
   /** Cached images. */
   private static final HashMap<String, ImageIcon> IMAGES =
     new HashMap<String, ImageIcon>();
-  /** Date format. */
-  private static final SimpleDateFormat DATE =
-    new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
   /** Private constructor. */
   private BaseXLayout() { }
@@ -138,7 +132,8 @@ public final class BaseXLayout {
           // process key events
           if(ENTER.is(e)) {
             final Object s = e.getSource();
-            if(!(s instanceof BaseXButton || s instanceof BaseXText)) d.close();
+            if(!(s instanceof BaseXButton || s instanceof BaseXEditor))
+              d.close();
           } else if(ESCAPE.is(e)) {
             d.cancel();
           }
@@ -222,15 +217,9 @@ public final class BaseXLayout {
   /**
    * Returns the value of the specified pre value and attribute.
    * @param val value to be evaluated
-   * @param size size flag
-   * @param date date flag
    * @return value as string
    */
-  public static String value(final double val, final boolean size,
-      final boolean date) {
-
-    if(size) return Performance.format((long) val, true);
-    if(date) return DATE.format(new Date((long) val));
+  public static String value(final double val) {
     return string(chopNumber(token(val)));
   }
 

@@ -46,7 +46,7 @@ public abstract class Expr extends ExprInfo {
    * Compiles and optimizes the expression, assigns data types and
    * cardinalities.
    * @param ctx query context
-   * @return optimized Expression
+   * @return optimized expression
    * @throws QueryException query exception
    */
   public abstract Expr comp(final QueryContext ctx) throws QueryException;

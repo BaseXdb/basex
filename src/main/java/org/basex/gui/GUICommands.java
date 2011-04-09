@@ -6,7 +6,6 @@ import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.io.IOException;
 import java.net.URI;
 import javax.swing.AbstractButton;
 import org.basex.core.Context;
@@ -43,7 +42,6 @@ import org.basex.gui.dialog.DialogProgress;
 import org.basex.gui.dialog.DialogInput;
 import org.basex.gui.dialog.DialogServer;
 import org.basex.gui.dialog.DialogTreeOptions;
-import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.query.item.ANode;
@@ -85,7 +83,7 @@ public enum GUICommands implements GUICommand {
   OPEN(GUIOPEN + DOTS, "% O", GUIOPENTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogOpen dialog = new DialogOpen(gui, false, false);
+      final DialogOpen dialog = new DialogOpen(gui, false);
       if(dialog.ok()) {
         new Close().run(gui.context);
         gui.notify.init();
@@ -100,7 +98,7 @@ public enum GUICommands implements GUICommand {
   MANAGE(GUIMANAGE + DOTS, "% M", GUIMANAGETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogOpen(gui, true, false).nodb()) Dialog.warn(gui, INFONODB);
+      if(new DialogOpen(gui, true).nodb()) Dialog.warn(gui, INFONODB);
     }
   },
 
@@ -117,7 +115,7 @@ public enum GUICommands implements GUICommand {
   DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogInput d = new DialogInput("", DROPTITLE, gui, false, false);
+      final DialogInput d = new DialogInput("", DROPTITLE, gui, 0);
       if(d.ok()) DialogProgress.execute(gui, "", new Delete(d.input()));
     }
   },
@@ -220,59 +218,48 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens an XQuery file. */
-  XQOPEN(GUIXQOPEN + DOTS, "% R", GUIXQOPENTT, false, false) {
+  /** Opens a query file. */
+  EDITNEW(GUIXQNEW + DOTS, "% shift N", GUIXQNEWTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.query.confirm();
-
-      // open file chooser for XML creation
-      final BaseXFileChooser fc = new BaseXFileChooser(GUIOPEN,
-          gui.gprop.get(GUIProp.XQPATH), gui);
-      fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
-      final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
-      if(file != null) gui.query.setQuery(file);
+      gui.query.newFile();
     }
   },
 
-  /** Saves the current XQuery. */
-  XQSAVE(GUISAVE, "% S", GUISAVETT, false, false) {
+  /** Opens a new editor file. */
+  EDITOPEN(GUIXQOPEN + DOTS, "% R", GUIXQOPENTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      final IO file = gui.context.query;
-      if(file == null) {
-        XQSAVEAS.execute(gui);
-      } else {
-        try {
-          file.write(gui.query.getQuery());
-          gui.gprop.files(file);
-        } catch(final IOException ex) {
-          Dialog.error(gui, NOTSAVED);
-        }
-      }
+      gui.query.open();
+    }
+  },
+
+  /** Saves the current editor file. */
+  EDITSAVE(GUISAVE, "% S", GUISAVETT, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.query.save();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.query.modified());
+      b.setEnabled(gui.query != null && gui.query.modified());
     }
   },
 
-  /** Saves the current XQuery. */
-  XQSAVEAS(GUISAVEAS + DOTS, "% shift S", GUISAVETT, false, false) {
+  /** Saves the current editor file under a new name. */
+  EDITSAVEAS(GUISAVEAS + DOTS, "% shift S", GUISAVETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      // open file chooser for XML creation
-      final String fn = gui.context.query == null ? null :
-        gui.context.query.path();
-      final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
-          fn == null ? gui.gprop.get(GUIProp.XQPATH) : fn, gui);
-      fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
+      gui.query.saveAs();
+    }
+  },
 
-      final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
-      if(file == null) return;
-      gui.context.query = file;
-      XQSAVE.execute(gui);
+  /** Closes the current editor file. */
+  EDITCLOSE(GUIXQCLOSE, "% shift W", GUIXQCLOSETT, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.query.close();
     }
   },
 
@@ -753,57 +740,6 @@ public enum GUICommands implements GUICommand {
       new DialogPrefs(gui);
     }
   },
-
-  /* DEEPFS MENU */
-
-  /* Opens a dialog to import given directory as DeepFS instance.
-  CREATEFS(GUICREATEFS + DOTS, null, GUICREATEFSTT, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      if(!new DialogCreateFS(gui).ok()) return;
-      final GUIProp gprop = gui.gprop;
-      final String p = gprop.is(GUIProp.FSALL) ? "/" :
-        gprop.get(GUIProp.FSPATH).replace('\\', '/');
-      final String n = gprop.get(GUIProp.FSNAME);
-      DialogProgress.execute(gui, CREATEFSTITLE, new CreateFS(n, p));
-    }
-  },
-
-  /** Opens a dialog to use DeepFS instance as Desktop Query Engine.
-  DQE(GUIDQE + DOTS, null, GUIDQETT, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogOpen dialog = new DialogOpen(gui, false, true);
-      if(dialog.ok()) {
-        new Close().run(gui.context);
-        gui.notify.init();
-        gui.execute(new Open(dialog.db()));
-      } else if(dialog.nodb()) {
-        if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
-      }
-    }
-  },
-
-  /** Opens a dialog to mount DeepFS instance as Filesystem in USErspace.
-  MOUNTFS(GUIMOUNTFS + DOTS, null, GUIMOUNTFSTT, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogMountFS dialog = new DialogMountFS(gui);
-      if(dialog.ok()) {
-        new Close().run(gui.context);
-        gui.notify.init();
-        gui.execute(new Mount(dialog.db(), dialog.mp()));
-      } else if(dialog.nodb()) {
-        if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
-      }
-    }
-
-    @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      // disable mount button, if native library is not available
-      b.setEnabled(LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
-    }
-  }, */
 
   /* HELP MENU */
 

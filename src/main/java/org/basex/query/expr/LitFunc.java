@@ -12,7 +12,7 @@ import org.basex.util.InputInfo;
  * Literal function item.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Leonard Woerteler
+ * @author Leo Woerteler
  */
 public class LitFunc extends Func {
 
@@ -26,7 +26,6 @@ public class LitFunc extends Func {
   public LitFunc(final InputInfo ii, final QNm n, final TypedFunc f,
       final Var[] arg) {
     super(ii, n, f.type.type(arg), f.ret(), true);
-
     expr = f.fun;
   }
 
@@ -34,7 +33,9 @@ public class LitFunc extends Func {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
 
-    return new FunItem(name, args, expr, FunType.get(this));
+    final FunType ft = FunType.get(this);
+    for(final Var v : args) v.type = null;
+    return new FunItem(name, args, expr, ft, false);
   }
 
   @Override

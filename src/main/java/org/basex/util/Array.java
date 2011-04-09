@@ -205,4 +205,28 @@ public final class Array {
   public static int newSize(final int old, final double factor) {
     return (int) (old * factor) + 1;
   }
+
+  /**
+   * Swaps two entries of the given int array.
+   * @param arr array
+   * @param a first position
+   * @param b second position
+   */
+  public static void swap(final int[] arr, final int a, final int b) {
+    final int c = arr[a];
+    arr[a] = arr[b];
+    arr[b] = c;
+  }
+
+  /**
+   * Swaps arr[a .. (a+n-1)] with arr[b .. (b+n-1)].
+   * @param arr order array
+   * @param a first offset
+   * @param b second offset
+   * @param n number of values
+   */
+  public static void swap(final int[] arr, final int a, final int b,
+      final int n) {
+    for(int i = 0; i < n; ++i) swap(arr, a + i, b + i);
+  }
 }

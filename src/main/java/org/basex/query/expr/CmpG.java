@@ -11,13 +11,13 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
-import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.AxisStep;
 import org.basex.util.Array;
@@ -201,14 +201,14 @@ public final class CmpG extends Cmp {
     // evaluate two iterators
     if(!ir2.reset()) {
       // cache items for next comparisons
-      final ItemCache ir = new ItemCache();
+      final ItemCache ic = new ItemCache();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {
           if(eval(it1, it2)) return Bln.TRUE;
-          ir.add(it2);
+          ic.add(it2);
         }
       }
-      ir2 = ir;
+      ir2 = ic;
     }
 
     while((it1 = ir1.next()) != null) {
@@ -226,8 +226,9 @@ public final class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
-    if(a.type != b.type && !a.unt() && !b.unt() && !(a.str() && b.str()) &&
-        !(a.num() && b.num()) && !a.func() && !b.func())
+    if(a.type != b.type && (!a.unt() && !b.unt() && !(a.str() && b.str()) &&
+        !(a.num() && b.num()) && !a.func() && !b.func() ||
+        a.type == AtomType.QNM || b.type == AtomType.QNM))
       XPTYPECMP.thrw(input, a.type, b.type);
     return op.op.e(input, a, b);
   }
@@ -249,8 +250,10 @@ public final class CmpG extends Cmp {
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // accept only location path, string and equality expressions
-    final AxisStep s = indexStep(expr[0]);
-    if(s == null || op != Op.EQ) return false;
+    if(op != Op.EQ) return false;
+    final AxisStep s = expr[0] instanceof Context ?
+        ic.step : indexStep(expr[0]);
+    if(s == null) return false;
 
     // check which index applies
     final boolean text = s.test.type == NodeType.TXT && ic.data.meta.textindex;
@@ -289,25 +292,11 @@ public final class CmpG extends Cmp {
 
   @Override
   public Expr indexEquivalent(final IndexContext ic) {
+    final boolean text = iacc[0].ind == IndexType.TEXT;
+    ic.ctx.compInfo(text ? OPTTXTINDEX : OPTATVINDEX);
     // more than one string - merge index results
-    final Expr root = iacc.length == 1 ? iacc[0] : new Union(input, iacc);
-
-    final AxisPath orig = (AxisPath) expr[0];
-    final AxisPath path = orig.invertPath(root, ic.step);
-
-    if(iacc[0].ind == IndexType.TEXT) {
-      ic.ctx.compInfo(OPTTXTINDEX);
-    } else {
-      ic.ctx.compInfo(OPTATVINDEX);
-      // add attribute step
-      final AxisStep step = orig.step[orig.step.length - 1];
-      if(step.test.name != null) {
-        AxisStep[] steps = { AxisStep.get(input, Axis.SELF, step.test) };
-        for(final AxisStep s : path.step) steps = Array.add(steps, s);
-        path.step = steps;
-      }
-    }
-    return path;
+    final ParseExpr root = iacc.length == 1 ? iacc[0] : new Union(input, iacc);
+    return ic.invert(expr[0], root, text);
   }
 
   /**
@@ -321,7 +310,7 @@ public final class CmpG extends Cmp {
     // accept only single axis steps as first expression
     final AxisPath path = (AxisPath) expr;
     // path must contain no root node
-    return path.root != null ? null : path.step[path.step.length - 1];
+    return path.root != null ? null : path.step(path.step.length - 1);
   }
 
   @Override

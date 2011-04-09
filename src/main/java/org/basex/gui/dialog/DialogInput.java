@@ -32,25 +32,33 @@ public final class DialogInput extends Dialog {
   private final BaseXLabel info;
   /** Available databases. */
   private final StringList db;
-  /** Rename or delete dialog. */
-  private final boolean rename;
+  /** Rename/copy/delete dialog. */
+  private final int type;
 
   /**
    * Default constructor.
    * @param o old input
    * @param tit title string
    * @param main reference to the main window
-   * @param fs file system flag
-   * @param ren type of dialog (rename database/drop documents)
+   * @param t type of dialog (rename database/copy database/drop documents)
    */
   public DialogInput(final String o, final String tit, final GUI main,
-      final boolean fs, final boolean ren) {
+       final int t) {
     super(main, tit);
     old = o;
-    db = fs ? List.listFS(main.context) : List.list(main.context);
-    rename = ren;
+    db = List.list(main.context);
+    type = t;
 
-    set(new BaseXLabel(rename ? CREATENAME : CREATETARGET, false, true).border(
+    String title = "";
+    if(type == 0) {
+      title = CREATETARGET;
+    } else if(type == 1) {
+      title = CREATENAME;
+    } else if(type == 2) {
+      title = CREATENAMEC;
+    }
+
+    set(new BaseXLabel(title, false, true).border(
         0, 0, 4, 0), BorderLayout.NORTH);
 
     input = new BaseXTextField(o, this);
@@ -85,7 +93,7 @@ public final class DialogInput extends Dialog {
   public void action(final Object cmp) {
     final String in = input();
     String msg = null;
-    if(rename) {
+    if(type > 0) {
       ok = db.contains(in) || in.equals(old);
       if(ok) msg = Util.info(DBEXISTS, in);
       if(!ok) {
@@ -97,7 +105,7 @@ public final class DialogInput extends Dialog {
       msg = Util.info(DELETEPATH, docs);
       ok = docs != 0;
     }
-    info.setText(msg, rename ? Msg.ERROR : Msg.WARN);
+    info.setText(msg, type == 1 || type == 2 ? Msg.ERROR : Msg.WARN);
     enableOK(buttons, BUTTONOK, ok);
   }
 

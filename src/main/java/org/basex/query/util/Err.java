@@ -37,7 +37,7 @@ public enum Err {
   /** BASX0007: Evaluation exception. */
   QUERYNODES(BASX, 7, Text.QUERYNODESERR),
   /** BASX0008: Evaluation exception. */
-  EXPSINGLE(BASX, 8, "Database contains more than one document."),
+  EXPSINGLE(BASX, 8, "Database '%' contains more than one document."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -93,25 +93,6 @@ public enum Err {
 
   /** FOER0000: Evaluation exception. */
   FUNERR1(FOER, 0, "Halted on error()."),
-
-  /** FOFD1340: Evaluation exception. */
-  OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  GROUPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  GROUPSTART(FOFD, 1340, "Picture begins with grouping separator: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  GROUPEND(FOFD, 1340, "Picture ends with grouping separator: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  NOMAND(FOFD, 1340, "No mandatory digit specified: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  PICDATE(FOFD, 1340, "Invalid picture string: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  ORDCLOSED(FOFD, 1340, "Ordinal is not closed: \"%\"."),
-  /** FOFD1350: Evaluation exception. */
-  PICCOMP(FOFD, 1350, "Invalid component in string: \"%\"."),
 
   /** FOFL0001: Evaluation exception. */
   PATHNOTEXISTS(FOFL, 1, "Path '%' does not exist."),
@@ -459,6 +440,8 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
   /** XPTY0004: Typing exception. */
+  XPINVPROM(XPTY, 4, "Can't promote type % to %: %."),
+  /** XPTY0004: Typing exception. */
   XPCAST(XPTY, 4, "Invalid %(%) cast."),
   /** XPTY0004: Typing Exception. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
@@ -611,8 +594,26 @@ public enum Err {
   /** XQTY0024: Parsing exception. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
 
-  /** XTDE0030: Parsing exception. */
+  /** FOFD1340: Parsing exception. */
   WRONGINT(XTDE, 30, "Wrong integer format: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  OPTAFTER(XTDE, 30, "Optional digit follows mandatory digits: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  DIFFMAND(XTDE, 30, "Mandatory digits must be of the same group: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPADJ(XTDE, 30, "Adjacent grouping separators: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPSTART(XTDE, 30, "Picture begins with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPEND(XTDE, 30, "Picture ends with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  NOMAND(XTDE, 30, "No mandatory digit specified: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  PICDATE(XTDE, 30, "Invalid picture string: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  ORDCLOSED(XTDE, 30, "Ordinal is not closed: \"%\"."),
+  /** FOFD1350: Evaluation exception. */
+  PICCOMP(XTDE, 30, "Invalid component in string: \"%\"."),
   /** XTDE1170: Parsing exception. */
   WRONGINPUT(XTDE, 1170, "Failed to read \"%\": %."),
 
@@ -817,7 +818,7 @@ public enum Err {
   }
 
   /**
-   * Throws a numeric type exception.
+   * Throws a type cast exception.
    * @param ii input info
    * @param t expression cast type
    * @param v value
@@ -827,6 +828,19 @@ public enum Err {
   public static QueryException cast(final InputInfo ii, final Type t,
       final Value v) throws QueryException {
     throw XPINVCAST.thrw(ii, v.type, t, v);
+  }
+
+  /**
+   * Throws a type cast exception.
+   * @param ii input info
+   * @param t expression cast type
+   * @param v value
+   * @return query exception (indicates that an error is raised)
+   * @throws QueryException query exception
+   */
+  public static QueryException promote(final InputInfo ii, final Type t,
+      final Value v) throws QueryException {
+    throw XPINVPROM.thrw(ii, v.type, t, v);
   }
 
   /**

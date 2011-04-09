@@ -15,11 +15,6 @@ public final class FNGenTest extends AdvancedQueryTest {
   /** Text file. */
   private static final String TEXT = "etc/xml/stopWords";
 
-  /** Constructor. */
-  public FNGenTest() {
-    super("fn");
-  }
-
   /**
    * Test method for the fn:unparsed-text() functions.
    * @throws QueryException database exception

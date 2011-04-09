@@ -9,9 +9,11 @@ package org.basex.test.query;
 public final class FunTest extends QueryTest {
   /** Constructor. */
   static {
-    doc = "<desclist xml:lang='en'><desc xml:lang='en-US'>" +
-        "<line>A line of text.</line></desc><desc xml:lang='fr'>" +
-        "<line>Une ligne de texte.</line></desc></desclist>";
+    doc =
+      "<desclist xml:lang='en'>" +
+      "<desc xml:lang='en-US'><line>A line of text.</line></desc>" +
+      "<desc xml:lang='fr'><line>Une ligne de texte.</line></desc>" +
+      "</desclist>";
 
     queries = new Object[][] {
       { "false 1", bool(false), "false()" },
@@ -59,6 +61,8 @@ public final class FunTest extends QueryTest {
         "count((for $a in (1,2) for $b in <b/> return $b)/.)" },
       { "count 37", itr(2),
         "count((for $a in (1,2) let $b := <b/> return $b)/.)" },
+      { "count 38", itr(2), "count(//desc/1)" },
+      { "count 39", itr(4), "count(//desc/(1,2))" },
 
       { "contains 1", "contains(.)" },
       { "contains 2", "contains(. .)" },

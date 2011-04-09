@@ -14,12 +14,10 @@ import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
@@ -36,8 +34,6 @@ public final class QueryResources {
   private Data[] data = new Data[1];
   /** Number of databases. */
   private int datas;
-  /** Flag for global data reference. */
-  private boolean globalData;
 
   /** Collections: single nodes and sequences. */
   private Value[] coll = new Value[1];
@@ -65,15 +61,14 @@ public final class QueryResources {
       PERMNO.thrw(null, CmdPerm.READ);
 
     // assign initial context value: use empty node set if database is empty
-    ctx.value = DBNodeSeq.get(d.empty() ? new int[0] : nodes.list, d);
+    ctx.value = d.empty() ? Empty.SEQ :
+      DBNodeSeq.get(nodes.list, d, nodes.root);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
     addCollection(nodes.root ? ctx.value :
-        DBNodeSeq.get(d.doc(), d), token(d.meta.name));
+        DBNodeSeq.get(d.doc(), d, true), token(d.meta.name));
 
-    // add global data reference has been added, set indicator to true
-    globalData = true;
     addData(d);
   }
 
@@ -82,7 +77,7 @@ public final class QueryResources {
    * @throws IOException I/O exception
    */
   void close() throws IOException {
-    for(int d = globalData ? 1 : 0; d < datas; ++d) {
+    for(int d = ctx.nodes != null ? 1 : 0; d < datas; ++d) {
       Close.close(data[d], ctx.context);
     }
     datas = 0;
@@ -149,10 +144,10 @@ public final class QueryResources {
    * Adds a collection instance or returns an existing one.
    * @param input name of the collection to be returned
    * @param ii input info
-   * @return collection iterator
+   * @return collection
    * @throws QueryException query exception
    */
-  public Iter collection(final byte[] input, final InputInfo ii)
+  public Value collection(final byte[] input, final InputInfo ii)
       throws QueryException {
 
     // no collection specified.. return default collection/current context set
@@ -177,39 +172,7 @@ public final class QueryResources {
         }
       }
     }
-    return coll[c].iter();
-  }
-
-  /**
-   * Returns the common data reference of all context items, or {@code null}.
-   * @return data reference
-   * @throws QueryException query exception
-   */
-  public Data data() throws QueryException {
-    if(ctx.value == null) return null;
-    if(docNodes()) return data[0];
-
-    final Iter iter = ctx.value.iter();
-    Data db = null;
-    for(Item it; (it = iter.next()) != null;) {
-      if(!(it instanceof DBNode)) return null;
-      final Data d = ((DBNode) it).data;
-      if(db == null) db = d;
-      else if(db != d) return null;
-    }
-    return db;
-  }
-
-  /**
-   * Returns true if the current context item contains all root document nodes.
-   * @return result of check
-   */
-  public boolean docNodes() {
-    // check if a global data reference exists, if context value and first
-    // collection reference are equal, and if first item is a document node
-    final Value val = ctx.value;
-    return globalData && val.sameAs(coll[0]) && val.size() != 0 &&
-      (val.item() ? (Item) val : val.iter().next()).type == NodeType.DOC;
+    return coll[c];
   }
 
   /**
@@ -237,7 +200,8 @@ public final class QueryResources {
    * @param path inner collection path
    */
   private void addCollection(final Data d, final byte[] path) {
-    addCollection(DBNodeSeq.get(d.doc(string(path)), d), token(d.meta.name));
+    addCollection(DBNodeSeq.get(d.doc(string(path)), d, true),
+        token(d.meta.name));
   }
 
   /**

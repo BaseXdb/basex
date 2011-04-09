@@ -75,7 +75,7 @@ public final class TextParser extends FileParser {
       if(ch == 0) break;
       if(ch == 0x0A && lines) {
         builder.startElem(LINE, atts);
-        builder.text(tb);
+        builder.text(tb.finish());
         builder.endElem(LINE);
         tb.reset();
       } else if(ch != 0x0D) {
@@ -83,7 +83,7 @@ public final class TextParser extends FileParser {
       }
     }
     bi.close();
-    if(!lines) builder.text(tb);
+    if(!lines) builder.text(tb.finish());
     builder.endElem(TEXT);
   }
 }

@@ -4,9 +4,11 @@ import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
 import org.basex.query.item.FunItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -17,7 +19,7 @@ import org.basex.util.Util;
  * Inline function.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Leonard Woerteler
+ * @author Leo Woerteler
  */
 public class InlineFunc extends Func {
 
@@ -35,13 +37,26 @@ public class InlineFunc extends Func {
   }
 
   @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+    return this;
+  }
+
+  @Override
   public FunItem item(final QueryContext ctx, final InputInfo ii) {
-    return new FunItem(args, expr, FunType.get(this), ctx.vars.local());
+    final FunType ft = FunType.get(this);
+    final boolean c = ft.ret != null && !expr.type().instance(ft.ret);
+    return new FunItem(args, expr, ft, ctx.vars.local(), c);
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) {
+    return item(ctx, input);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    return item(ctx, input).iter();
+    return value(ctx).iter();
   }
 
   @Override
@@ -62,7 +77,7 @@ public class InlineFunc extends Func {
       tb.append(args[i].toString());
     }
     tb.append(PAR2).append(' ');
-    if(type != null) tb.append(type.toString()).append(' ');
+    if(ret != null) tb.append("as ").append(ret.toString()).append(' ');
     return tb.append("{ ").append(expr).append(" }").toString();
   }
 

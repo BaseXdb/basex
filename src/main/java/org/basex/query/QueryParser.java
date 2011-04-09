@@ -92,11 +92,10 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.path.Axis;
-import org.basex.query.path.AxisPath;
 import org.basex.query.path.AxisStep;
 import org.basex.query.path.KindTest;
-import org.basex.query.path.MixedPath;
 import org.basex.query.path.NameTest;
+import org.basex.query.path.Path;
 import org.basex.query.path.Test;
 import org.basex.query.up.Delete;
 import org.basex.query.up.Insert;
@@ -1440,22 +1439,16 @@ public class QueryParser extends InputParser {
 
         final Expr st = step();
         if(st == null) error(PATHMISS);
+        // skip context nodes
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
-    if(list.length == 0)
-      return new MixedPath(input(), root, new Context(input()));
-
-    // check if all steps are axis steps
-    boolean axes = true;
-    final AxisStep[] tmp = new AxisStep[list.length];
-    for(int l = 0; l < list.length; ++l) {
-      axes &= list[l] instanceof AxisStep;
-      if(axes) tmp[l] = (AxisStep) list[l];
+    // if no location steps have been added, add trailing self::node() step as
+    // replacement for context node to bring results in order
+    if(list.length == 0) {
+      list = add(list, AxisStep.get(input(), Axis.SELF, Test.NOD));
     }
-
-    return axes ? AxisPath.get(input(), root, tmp) :
-      new MixedPath(input(), root, list);
+    return Path.get(input(), root, list);
   }
 
   /**

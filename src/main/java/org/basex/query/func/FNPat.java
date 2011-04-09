@@ -218,18 +218,18 @@ final class FNPat extends Fun {
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     if(p.matcher("").matches()) REGROUP.thrw(input);
 
-    final ItemCache sb = new ItemCache();
+    final ItemCache ic = new ItemCache();
     final String str = string(val);
     if(!str.isEmpty()) {
       final Matcher m = p.matcher(str);
       int s = 0;
       while(m.find()) {
-        sb.add(Str.get(str.substring(s, m.start())));
+        ic.add(Str.get(str.substring(s, m.start())));
         s = m.end();
       }
-      sb.add(Str.get(str.substring(s, str.length())));
+      ic.add(Str.get(str.substring(s, str.length())));
     }
-    return sb;
+    return ic;
   }
 
   /**

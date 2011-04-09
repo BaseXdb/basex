@@ -152,7 +152,7 @@ public final class ResponseHandler {
     // Result
     final ItemCache result = new ItemCache();
     result.add(responseEl);
-    result.add(payloads);
+    result.add(payloads.finish());
     return result;
   }
 
@@ -370,13 +370,13 @@ public final class ResponseHandler {
    * @throws IOException IO exception
    */
   private static byte[] readLine(final InputStream in) throws IOException {
-    TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     int b;
     while((b = in.read()) != -1) {
       // RFC 1341: a line ends with CRLF
       if(b == '\r') {
         while(true) {
-          int b2 = in.read();
+          final int b2 = in.read();
           if(b2 == '\n') {
             return tb.finish();
           } else if(b2 == -1) {

@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import java.util.ArrayList;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
@@ -152,13 +153,13 @@ final class GroupPartition {
     final ItemCache[] sq = items.get(p);
 
     for(int i = 0; i < ngl; ++i) {
-      ItemCache ir = sq[i];
-      final Iter iter = ngv[i].iter(ctx);
-      if(ir == null) {
-        ir = new ItemCache();
-        sq[i] = ir;
+      ItemCache ic = sq[i];
+      final Value result = ngv[i].value(ctx);
+      if(ic == null) {
+        ic = new ItemCache();
+        sq[i] = ic;
       }
-      ir.add(iter);
+      ic.add(result);
     }
   }
 
@@ -176,14 +177,15 @@ final class GroupPartition {
    * Returns grouped variables.
    * @param ctx context
    * @param ret return expression
+   * @param ks key list
+   * @param vs value list
    * @return iterator on the result set
    * @throws QueryException query exception
    */
-  Iter ret(final QueryContext ctx, final Expr ret) throws QueryException {
-    final ItemCache ir = new ItemCache();
-    final ValueList vl = new ValueList();
+  Iter ret(final QueryContext ctx, final Expr ret, final ArrayList<Item[]> ks,
+      final ValueList vs) throws QueryException {
+    final ItemCache ic = new ItemCache();
     if(pggv == null) cacheRet(ctx);
-    if(order != null) order.init(vl, -1);
 
     for(int i = 0; i < part.size(); ++i) {
       final GroupNode gn = part.get(i);
@@ -196,11 +198,10 @@ final class GroupPartition {
         }
       }
       if(order != null) {
-        order.add(ctx);
-        vl.add(ret.value(ctx));
-      } else ir.add(ctx.iter(ret));
+        order.add(ctx, ret, ks, vs);
+      } else ic.add(ctx.value(ret));
     }
-    return order != null ? ctx.iter(order) : ir;
+    return order != null ? ctx.iter(order.set(ks, vs)) : ic;
   }
 
   /**

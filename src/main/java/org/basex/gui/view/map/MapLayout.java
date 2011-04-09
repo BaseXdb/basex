@@ -77,7 +77,7 @@ final class MapLayout {
   private MapList children(final int par) {
     final MapList list = new MapList();
     final int last = par + ViewData.size(data, par);
-    final boolean atts = prop.is(GUIProp.MAPATTS) && data.fs == null;
+    final boolean atts = prop.is(GUIProp.MAPATTS);
     int p = par + (atts ? 1 : data.attSize(par, data.kind(par)));
     while(p < last) {
       list.add(p);
@@ -129,8 +129,7 @@ final class MapLayout {
     final int h = r.h - layout.h;
 
     // skip too small rectangles and meta data in file systems
-    if(w < off && h < off || w <= 2 || h <= 2 || prop.is(GUIProp.MAPFS) &&
-        ViewData.leaf(prop, data, r.pre)) {
+    if(w < off && h < off || w <= 2 || h <= 2) {
       r.leaf = true;
       rectangles.add(r);
       return;

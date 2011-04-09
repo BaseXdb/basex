@@ -22,11 +22,6 @@ public final class FNFtTest extends AdvancedQueryTest {
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
 
-  /** Constructor. */
-  public FNFtTest() {
-    super("ft");
-  }
-
   /**
    * Initializes a test.
    * @throws BaseXException database exception

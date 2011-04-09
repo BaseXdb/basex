@@ -3,11 +3,13 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
+import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
@@ -175,32 +177,37 @@ public class GFLWOR extends ParseExpr {
    * @param ctx query context
    */
   private void compForLet(final QueryContext ctx) {
-    // check if all clauses are simple, and if variables are removable
+    // modification flag
     boolean m = false;
-    // loop through all clauses
-    for(int f = fl.length - 1; f >= 0; --f) {
-      ForLet t = fl[f];
-      // ignore for clauses and constructors
-      if(t instanceof For || t.uses(Use.CNS)) continue;
-      // loop through all outer clauses
-      for(int g = f - 1; g >= 0; --g) {
-        // stop if variable used by the current clause
-        if(t.count(fl[g].var) != 0) break;
-        // ignore let clauses
-        if(fl[g] instanceof Let) continue;
-        // stop if variable is used as position or score
-        final For fr = (For) fl[g];
-        if(fr.pos != null && t.count(fr.pos) != 0 ||
-           fr.score != null && t.count(fr.score) != 0) break;
 
-        // move let clause to outer position
-        System.arraycopy(fl, g, fl, g + 1, f - g);
-        fl[g] = t;
-        t = fl[f];
-        if(!m) ctx.compInfo(OPTFORLET);
-        m = true;
+    for(int i = 1; i < fl.length; i++) {
+      final ForLet cls = fl[i];
+      // move let clauses upwards if possible
+      // expressions that depend on the current context (e.g. math:random())
+      // or fragment constructors creating unique nodes are left alone
+      if(cls instanceof Let && !cls.uses(Use.CTX) && !cls.uses(Use.CNS)) {
+        final Let let = (Let) cls;
+
+        // find highest for clause that can be skipped
+        int fpos = -1;
+        for(int j = i; j-- != 0;) {
+          final ForLet o = fl[j];
+          if(let.count(o.var) != 0) break;
+          if(o instanceof For) {
+            final For fr = (For) o;
+            if(fr.pos != null && let.count(fr.pos) != 0 ||
+                fr.score != null && let.count(fr.score) != 0) break;
+            fpos = j;
+          }
+        }
+        if(fpos != -1) {
+          Array.move(fl, fpos, 1, i - fpos);
+          fl[fpos] = let;
+          m = true;
+        }
       }
     }
+    if(m) ctx.compInfo(OPTFORLET);
   }
 
   /**
@@ -270,17 +277,21 @@ public class GFLWOR extends ParseExpr {
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
 
     // evaluate pre grouping tuples
-    final int s = (int) size();
-    final ValueList vl = new ValueList(Math.max(1, s));
-    if(order != null) order.init(vl, s);
+    ArrayList<Item[]> keys = null;
+    ValueList vals = null;
+    if(order != null) {
+      keys = new ArrayList<Item[]>();
+      vals = new ValueList();
+    }
     if(group != null) group.init(fl, order);
-    iter(ctx, vl, iter, 0);
+    iter(ctx, iter, 0, keys, vals);
     ctx.vars.reset(vs);
 
     for(final ForLet f : fl) ctx.vars.add(f.var);
 
     // order != null, otherwise it would have been handled in group
-    final Iter ir = group != null ? group.gp.ret(ctx, ret) : ctx.iter(order);
+    final Iter ir = group != null ?
+        group.gp.ret(ctx, ret, keys, vals) : ctx.iter(order.set(keys, vals));
     ctx.vars.reset(vs);
     return ir;
   }
@@ -288,25 +299,24 @@ public class GFLWOR extends ParseExpr {
   /**
    * Performs a recursive iteration on the specified variable position.
    * @param ctx root reference
-   * @param vl value lists
    * @param it iterator
    * @param p variable position
+   * @param ks sort keys
+   * @param vs values to sort
    * @throws QueryException query exception
    */
-  private void iter(final QueryContext ctx, final ValueList vl,
-      final Iter[] it, final int p) throws QueryException {
-
+  private void iter(final QueryContext ctx, final Iter[] it, final int p,
+      final ArrayList<Item[]> ks, final ValueList vs) throws QueryException {
     final boolean more = p + 1 != fl.length;
     while(it[p].next() != null) {
       if(more) {
-        iter(ctx, vl, it, p + 1);
+        iter(ctx, it, p + 1, ks, vs);
       } else if(where == null || where.ebv(ctx, input).bool(input)) {
         if(group != null) {
           group.gp.add(ctx);
         } else if(order != null) {
           // order by will be handled in group by otherwise
-          order.add(ctx);
-          vl.add(ret.value(ctx));
+          order.add(ctx, ret, ks, vs);
         }
       }
     }

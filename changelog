@@ -1,0 +1,16 @@
+Version 6.6.1 (Mar 30, 2011):
+
+  XQuery:
+  
+  [ADD] index rewritings added for .../text()[. = ..] syntax
+  [ADD] optimizations of mixed axis path expressions, e.g.: //x/name()
+  [MOD] index rewritings on collections fixed and generalized
+  [MOD] faster evaluation of filters with pos. predicates, e.g.: $x[5]
+  [FIX] fixed relocation of let clauses in GFLWOR expressions
+  [FIX] trace function returned wrong original results
+  [FIX] variables in catch clauses were discarded
+  [FIX] HOF optimizations and fixes
+   
+  GUI:
+  
+  [FIX] language option (for Japanese, German, etc. interface) fixed

@@ -62,7 +62,7 @@ public abstract class ParseExpr extends Expr {
     if(it == null || ir.size() == 1) return it;
 
     final Item n = ir.next();
-    if(n != null) XPSEQ.thrw(input, PAR1 + it + SEP + n +
+    if(n != null) XPSEQ.thrw(ii, PAR1 + it + SEP + n +
         (ir.next() != null ? SEP + DOTS : "") + PAR2);
     return it;
   }
@@ -306,7 +306,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Data checkData(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.resource.data();
+    final Data data = ctx.data();
     if(data == null) NODBCTX.thrw(input, this);
     return data;
   }

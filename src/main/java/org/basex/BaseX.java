@@ -134,7 +134,7 @@ public class BaseX extends Main {
           if(c == 'b') {
             // set/add variable binding
             if(bind.length() != 0) bind.append(',');
-            bind.append(arg);
+            bind.append(arg.string());
             arg.check(set(Prop.BINDINGS, bind));
           } else if(c == 'c') {
             // specify command to be evaluated
@@ -170,7 +170,7 @@ public class BaseX extends Main {
           } else if(c == 's') {
             // set/add serialization parameter
             if(serial.length() != 0) serial.append(',');
-            serial.append(arg);
+            serial.append(arg.string());
             arg.check(set(Prop.SERIALIZER, serial));
           } else if(c == 'u') {
             // activate write-back for updates

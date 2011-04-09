@@ -28,7 +28,7 @@ import org.basex.util.InputInfo;
  * Functions on functions.
  *
  * @author BaseX Team 2005-11, BSD License
- * @author Christian Gruen
+ * @author Leo Woerteler
  */
 final class FNFunc extends Fun {
   /**
@@ -80,10 +80,9 @@ final class FNFunc extends Fun {
    * @return function item
    * @throws QueryException query exception
    */
-  private FunItem partApp(final QueryContext ctx, final InputInfo ii)
+  private Item partApp(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final FunItem f = getFun(0, FunType.ANY, ctx);
-    final Value v = expr[1].value(ctx);
     final long pos = expr.length == 2 ? 0 : checkItr(expr[2], ctx) - 1;
 
     final int arity = f.arity();
@@ -92,15 +91,15 @@ final class FNFunc extends Fun {
     final FunType ft = (FunType) f.type;
     final Var[] vars = new Var[arity - 1];
     final Expr[] vals = new Expr[arity];
-    vals[(int) pos] = v;
+    vals[(int) pos] = expr[1];
     for(int i = 0, j = 0; i < arity - 1; i++, j++) {
       if(i == pos) j++;
       vars[i] = ctx.uniqueVar(ii, ft.args[j]);
       vals[j] = new VarRef(ii, vars[i]);
     }
 
-    return (FunItem) new PartFunApp(ii,
-        new DynFunCall(ii, f, vals), vars).comp(ctx);
+    return new PartFunApp(ii, new DynFunCall(ii, f, vals),
+        vars).comp(ctx).item(ctx, ii);
   }
 
   /**
@@ -189,12 +188,16 @@ final class FNFunc extends Fun {
   private Iter foldLeft(final QueryContext ctx) throws QueryException {
     final FunItem f = withArity(0, 2, ctx);
     final Iter xs = expr[2].iter(ctx);
+    Item x = xs.next();
 
-    Iter res = expr[1].iter(ctx);
-    for(Item x; (x = xs.next()) != null;)
-      res = f.invIter(ctx, input, res.finish(), x);
+    // don't convert to a value if not necessary
+    if(x == null) return expr[1].iter(ctx);
 
-    return res;
+    Value sum = expr[1].value(ctx);
+    do sum = f.invValue(ctx, input, sum, x);
+    while((x = xs.next()) != null);
+
+    return sum.iter();
   }
 
   /**
@@ -208,11 +211,11 @@ final class FNFunc extends Fun {
     final FunItem f = withArity(0, 2, ctx);
     final Iter xs = expr[1].iter(ctx);
 
-    Iter res = checkEmpty(xs.next()).iter();
+    Value sum = checkEmpty(xs.next());
     for(Item x; (x = xs.next()) != null;)
-      res = f.invIter(ctx, input, res.finish(), x);
+      sum = f.invValue(ctx, input, sum, x);
 
-    return res;
+    return sum.iter();
   }
 
   /**
@@ -223,13 +226,15 @@ final class FNFunc extends Fun {
    */
   private Iter foldRight(final QueryContext ctx) throws QueryException {
     final FunItem f = withArity(0, 2, ctx);
-    Iter res = expr[1].iter(ctx);
+    final Value xs = expr[2].value(ctx);
+    // evaluate start value lazily if it's passed straight through
+    if(xs.size() == 0) return expr[1].iter(ctx);
 
-    final ItemCache xs = ItemCache.get(expr[2].iter(ctx));
-    for(int i = (int) xs.size(); i-- != 0;)
-      res = f.invIter(ctx, input, xs.get(i), res.finish());
+    Value res = expr[1].value(ctx);
+    for(long i = xs.size(); i-- != 0;)
+      res = f.invValue(ctx, input, xs.itemAt(i), res);
 
-    return res;
+    return res.iter();
   }
 
   /**
@@ -238,11 +243,11 @@ final class FNFunc extends Fun {
    * @return sorted sequence
    * @throws QueryException query exception
    */
-  private Iter sortWith(final QueryContext ctx) throws QueryException {
+  private ItemCache sortWith(final QueryContext ctx) throws QueryException {
     final FunItem lt = withArity(0, 2, ctx);
-    final ItemCache items = ItemCache.get(expr[1].iter(ctx));
+    final ItemCache ic = expr[1].value(ctx).cache();
     try {
-      Arrays.sort(items.item, 0, (int) items.size(), new Comparator<Item>(){
+      Arrays.sort(ic.item, 0, (int) ic.size(), new Comparator<Item>(){
         @Override
         public int compare(final Item it1, final Item it2) {
           try {
@@ -256,7 +261,7 @@ final class FNFunc extends Fun {
     } catch(final QueryError err) {
       throw err.wrapped();
     }
-    return items;
+    return ic;
   }
 
   /**
@@ -270,7 +275,7 @@ final class FNFunc extends Fun {
     final FunItem fun = withArity(1, 1, ctx);
     Value v = expr[2].value(ctx);
     while(!checkType(pred.invItem(ctx, input, v), AtomType.BLN).bool(input)) {
-      v = fun.invIter(ctx, input, v).finish();
+      v = fun.invValue(ctx, input, v);
     }
     return v.iter();
   }
@@ -307,7 +312,8 @@ final class FNFunc extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 || super.uses(u);
+    return def == FunDef.PARTAPP && u == Use.CTX || u == Use.X30 ||
+        super.uses(u);
   }
 
   @Override

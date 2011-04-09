@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -22,6 +21,8 @@ public class BaseXTextField extends JTextField {
   public static final int DWIDTH = 260;
   /** Last input. */
   String last = "";
+  /** Text area to search in. */
+  BaseXEditor area;
   /** Button help. */
   byte[] help;
 
@@ -46,12 +47,21 @@ public class BaseXTextField extends JTextField {
       setText(txt);
       selectAll();
     }
+
+    addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(final FocusEvent e) {
+        if(area != null) selectAll();
+      }
+    });
+
     addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
         BaseXLayout.focus(e.getComponent(), help);
       }
     });
+
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -60,30 +70,7 @@ public class BaseXTextField extends JTextField {
           setText(last);
           last = t;
         }
-      }
-    });
-  }
-
-  /**
-   * Adds search functionality to the text field.
-   * @param area text area to search
-   */
-  final void addSearch(final BaseXText area) {
-    final Font f = getFont();
-    setFont(f.deriveFont((float) f.getSize() + 2));
-    BaseXLayout.setWidth(this, 80);
-
-    addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        selectAll();
-      }
-    }
-    );
-
-    addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
+        if(area == null) return;
         final String text = getText();
         final boolean enter = ENTER.is(e);
         if(ESCAPE.is(e) || enter && text.isEmpty()) {
@@ -95,6 +82,7 @@ public class BaseXTextField extends JTextField {
       }
       @Override
       public void keyReleased(final KeyEvent e) {
+        if(area == null) return;
         final String text = getText();
         final char ch = e.getKeyChar();
         if(!control(e) && Character.isDefined(ch) && !ENTER.is(e))
@@ -102,7 +90,15 @@ public class BaseXTextField extends JTextField {
         repaint();
       }
     });
-    repaint();
+  }
+
+  /**
+   * Activates search functionality to the text field.
+   * @param a text area to search
+   */
+  public final void setSearch(final BaseXEditor a) {
+    area = a;
+    BaseXLayout.setWidth(this, 120);
   }
 
   @Override
