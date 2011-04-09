@@ -122,15 +122,22 @@ public final class HTTPClient {
       final ItemCache bodies, final InputInfo ii, final Prop prop)
       throws QueryException {
 
-    final Request r = RequestParser.parse(request, bodies, ii);
-
-    final byte[] dest = href == null ? r.attrs.get(HREF) : href;
-    if(dest == null) NOURL.thrw(ii);
     try {
-      final URL url = new URL(string(dest));
-      if(!url.getProtocol().equalsIgnoreCase("HTTP"))
-        HTTPERR.thrw(ii, "Invalid URL");
-      final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      if(request == null) {
+        if(href == null || href.length == 0) NOPARAMS.thrw(ii);
+        final HttpURLConnection conn = openConnection(string(href), ii);
+        try {
+          return ResponseHandler.getResponse(conn, Bln.FALSE.atom(ii),
+              Bln.FALSE.atom(ii), prop, ii);
+        } finally {
+          conn.disconnect();
+        }
+      }
+      final Request r = RequestParser.parse(request, bodies, ii);
+      final byte[] dest = href == null ? r.attrs.get(HREF) : href;
+      if(dest == null) NOURL.thrw(ii);
+
+      final HttpURLConnection conn = openConnection(string(dest), ii);
       try {
         setConnectionProps(conn, r, ii);
         setRequestHeaders(conn, r, ii);
@@ -154,6 +161,23 @@ public final class HTTPClient {
   }
 
   /**
+   * Opens an HTTP connection.
+   * @param dest HTTP URI to open connection to
+   * @param ii input info
+   * @return HHTP connection
+   * @throws QueryException query exception
+   * @throws IOException IO exception
+   * @throws MalformedURLException incorrect url
+   */
+  private static HttpURLConnection openConnection(final String dest,
+      final InputInfo ii) throws QueryException, IOException {
+    final URL url = new URL(dest);
+    if(!url.getProtocol().equalsIgnoreCase("HTTP")) HTTPERR.thrw(ii,
+        "Invalid URL");
+    return (HttpURLConnection) url.openConnection();
+  }
+
+  /**
    * Sets the connection properties.
    * @param conn HTTP connection
    * @param r request data
@@ -164,7 +188,8 @@ public final class HTTPClient {
   private static void setConnectionProps(final HttpURLConnection conn,
       final Request r, final InputInfo ii) throws ProtocolException,
       QueryException {
-    if(r.bodyContent != null || r.parts.size() != 0) conn.setDoOutput(true);
+    if(r != null && (r.bodyContent != null ||
+        r.parts.size() != 0)) conn.setDoOutput(true);
     conn.setRequestMethod(string(r.attrs.get(METHOD)).toUpperCase());
     final byte[] timeout = r.attrs.get(TIMEOUT);
     if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
@@ -183,7 +208,7 @@ public final class HTTPClient {
     // If header "Content-Type" is set explicitly by the user, its value is used
     if(contTypeHdr != null) {
       conn.setRequestProperty(CONT_TYPE, string(contTypeHdr));
-    //Otherwise @media-type of <http:body/> is considered
+      // Otherwise @media-type of <http:body/> is considered
     } else {
       final String mediaType = string(r.payloadAttrs.get(MEDIATYPE));
       if(r.isMultipart) {
@@ -352,8 +377,9 @@ public final class HTTPClient {
     tb.add(token("method=")).add(method);
     final byte[][] keys = payloadAttrs.keys();
     for(final byte[] key : keys) {
-      if(!eq(key, SRC) && !eq(key, MEDIATYPE) && !eq(key, METHOD))
-        tb.add(',').add(key).add('=').add(payloadAttrs.get(key));
+      if(!eq(key, SRC) && !eq(key, MEDIATYPE)
+          && !eq(key, METHOD)) tb.add(',').
+          add(key).add('=').add(payloadAttrs.get(key));
     }
     final SerializerProp prop = new SerializerProp(tb.toString());
     final XMLSerializer xml = new XMLSerializer(out, prop);

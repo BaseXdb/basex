@@ -540,8 +540,8 @@ public enum FunDef {
   /* FNHttp functions */
 
   /** XQuery function */
-  SENDREQUEST(HTTPURI, FNHttp.class, 1, 3, "send-request(request[,href,[bodies]])",
-      NOD, STR_ZO, ITEM_ZM, ITEM_ZM),
+  SENDREQUEST(HTTPURI, FNHttp.class, 1, 3,
+      "send-request(request[,href,[bodies]])", NOD, STR_ZO, ITEM_ZM, ITEM_ZM),
 
   /* FNDb functions */
 

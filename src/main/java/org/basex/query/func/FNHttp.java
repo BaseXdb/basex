@@ -30,7 +30,8 @@ public final class FNHttp extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
 
     // Get request node
-    final ANode request = checkNode(expr[0].item(ctx, input));
+     final ANode request = expr[0].item(ctx, input) == null ? null
+     : checkNode(expr[0].item(ctx, input));
 
     // Get HTTP URI
     final byte[] href = expr.length >= 2 ? checkEStr(expr[1].item(ctx, input))
@@ -42,12 +43,13 @@ public final class FNHttp extends Fun {
       final Iter bodies = expr[2].iter(ctx);
       cache = new ItemCache();
       Item i;
-      while((i = bodies.next()) != null) cache.add(i);
+      while((i = bodies.next()) != null)
+        cache.add(i);
     }
 
     // Send HTTP request
-    return HTTPClient.
-    sendRequest(href, request, cache, input, ctx.context.prop);
+    return HTTPClient.sendRequest(href, request,
+        cache, input, ctx.context.prop);
   }
 
   @Override

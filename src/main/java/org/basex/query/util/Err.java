@@ -141,6 +141,8 @@ public enum Err {
   REQINV(FOHC, 4, "The request element is not valid: %"),
   /** FOHC005: Evaluation exception. */
   NOURL(FOHC, 5, "No URL specified."),
+  /** FOHC006: Evaluation exception. */
+  NOPARAMS(FOHC, 6, "Specify request element or HTTP URI."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
