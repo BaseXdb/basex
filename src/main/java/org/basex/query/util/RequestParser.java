@@ -190,7 +190,7 @@ public final class RequestParser {
       final ItemCache contItems, final TokenMap attrs, final List<Part> parts,
       final InputInfo ii) throws QueryException {
     parseAttrs(multipart, attrs);
-    if(attrs.get(METHOD) == null) REQINV.thrw(ii,
+    if(attrs.get(MEDIATYPE) == null) REQINV.thrw(ii,
         "Attribute media-type of http:multipart is mandatory");
     ANode n;
     final NodeMore i = multipart.children();
