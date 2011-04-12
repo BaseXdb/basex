@@ -371,7 +371,7 @@ public final class EditorView extends View {
    */
   public void close() {
     // close file
-    EditorArea edit = getEditor();
+    final EditorArea edit = getEditor();
     confirm(edit);
     tabs.remove(edit);
     final int t = tabs.getTabCount();

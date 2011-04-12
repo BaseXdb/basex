@@ -332,7 +332,7 @@ public final class HTTPClient {
       final OutputStream out, final InputInfo ii) throws IOException,
       QueryException {
     for(int i = 0; i < payload.size(); i++) {
-      Item item = payload.get(i);
+      final Item item = payload.get(i);
       if(item instanceof B64) {
         out.write(((B64) item).toJava());
       } else {
@@ -352,7 +352,7 @@ public final class HTTPClient {
   private static void writeHex(final ItemCache payload, final OutputStream out,
       final InputInfo ii) throws IOException, QueryException {
     for(int i = 0; i < payload.size(); i++) {
-      Item item = payload.get(i);
+      final Item item = payload.get(i);
       if(item instanceof Hex) {
         out.write(((Hex) item).toJava());
       } else {
@@ -405,7 +405,7 @@ public final class HTTPClient {
     try {
       final byte[] buf = new byte[256];
       while(true) {
-        int len = bis.read(buf, 0, buf.length);
+        final int len = bis.read(buf, 0, buf.length);
         if(len <= 0) break;
         out.write(buf, 0, len);
       }

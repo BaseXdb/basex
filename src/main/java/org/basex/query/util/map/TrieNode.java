@@ -177,7 +177,7 @@ abstract class TrieNode {
    * @return hash key
    */
   static final int key(final int hash, final int lvl) {
-    return (hash >>> (lvl * HashTrie.BITS)) & MASK;
+    return hash >>> lvl * HashTrie.BITS & MASK;
   }
 
   @Override

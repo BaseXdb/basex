@@ -38,7 +38,7 @@ final class EditorArea extends BaseXEditor {
   /** Thread counter. */
   int threadID;
 
-  /** Last Query. */
+  /** Last input. */
   byte[] last = Token.EMPTY;
 
   /**
@@ -89,7 +89,11 @@ final class EditorArea extends BaseXEditor {
     if(eq && !force) return;
     view.refresh(mod || !eq, false);
     view.pos.setText(pos());
-    if(file.name().endsWith(IO.XMLSUFFIX)) return;
+    if(file.name().endsWith(IO.XMLSUFFIX)) {
+      last = qu;
+      view.info("", true);
+      return;
+    }
 
     final boolean module = module(qu);
     if(!module && (force || gui.gprop.is(GUIProp.EXECRT))) {

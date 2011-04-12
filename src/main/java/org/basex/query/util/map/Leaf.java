@@ -160,7 +160,7 @@ final class Leaf extends TrieNode {
   boolean verify() {
     try {
       return key.hash(null) == hash;
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       return false;
     }
   }
