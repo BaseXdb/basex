@@ -49,7 +49,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.6.1";
+  String VERSION = "6.6.2 beta";
   /** Company info. */
   String COMPANY = "BaseX Team";
   /** Version information. */
@@ -167,6 +167,8 @@ public interface Text {
 
   /** Command keyword. */
   String AS = "AS";
+  /** Command keyword. */
+  String ALL = "ALL";
   /** Command keyword. */
   String TO = "TO";
   /** Command keyword. */
@@ -569,6 +571,8 @@ public interface Text {
   String QUERYPRINTED = lang("qu_tabprinted") + COLS;
   /** Query info: memory. */
   String QUERYMEM = lang("qu_tabmem") + ": %";
+  /** Query info: memory. */
+  String QUERYMEM2 = lang("qu_tabmem") + COLS;
   /** Query hits. */
   String HITS = lang("qu_hits");
   /** Insert query info. */
@@ -951,6 +955,10 @@ public interface Text {
   /** Command info. */
   String GUIUNDO = lang("c_undo");
   /** Command info. */
+  String GUIXQNEW = lang("c_xqnew");
+  /** Command info. */
+  String GUIXQNEWTT = lang("c_xqnewtt");
+  /** Command info. */
   String GUIXQOPEN = lang("c_xqopen");
   /** Command info. */
   String GUIXQOPENTT = lang("c_xqopentt");
@@ -1034,8 +1042,10 @@ public interface Text {
   String HELPTIT = lang("help_title");
   /** Text title. */
   String TEXTTIT = lang("text_title");
-  /** Query title. */
-  String XQUERYTIT = "XQuery";
+  /** Editor title. */
+  String EDITORTIT = lang("editor_title");
+  /** Editor: new file. */
+  String EDITORFILE = lang("editor_file");
 
   /** Plot visualization. */
   String PLOTLOG = "log";

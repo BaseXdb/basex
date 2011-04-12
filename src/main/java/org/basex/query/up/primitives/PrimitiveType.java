@@ -7,15 +7,28 @@ package org.basex.query.up.primitives;
  * @author Lukas Kircher
  */
 public enum PrimitiveType {
-  // Order is essential - don't change..
 
-  /* [LK] XQuery/Update: why does it differ from the specification?
-   * - INSERTATTR, REPLACEVALUE, RENAMENODE
-   * - INSERTBEFORE, INSERTAFTER, INSERTINTOFIRST, INSERTINTO
+  /*
+   * XQuery/Update
+   *
+   * The type order corresponds to the order updates are carried out node-wise.
+   * The XQuery Update Facility specification proposes the following order:
+   *
+   * - INSERTINTO, INSERTATTR, REPLACEVALUE, RENAMENODE
+   * - INSERTBEFORE, INSERTAFTER, INSERTINTOFIRST, INSERTINTOLAST
    * - REPLACENODE
    * - REPLACEELEMCONT
    * - DELETE
    * - PUT
+   *
+   * Why does it differ from the specification?
+   *
+   * We apply the order to each single target node instead of a document (like
+   * stated in the specification). The result stays the same. Several
+   * adjustments to the proposed order simplify the implementation. In general,
+   * updates that shift pre values on the descendant/following axis are moved
+   * to the back to avoid further calculation expenses to determine target
+   * pre values.
    */
 
   /** Insert attribute.        */ INSERTATTR,

@@ -49,6 +49,8 @@ info_title=Info requête
 help_title=Aide
 text_title=Texte
 explore_title=Explorer
+editor_title=Editor
+editor_file=file
 
 # Fenêtres de dialogue
 d_info=Information
@@ -303,10 +305,12 @@ c_showtexttt=Afficher la visualisation par texte
 c_showxquery=Editeur de requêtes
 c_showxquerytt=Afficher l'éditeur de requêtes
 c_undo=Annuler
+c_xqnew=New
+c_xqnewtt=Creates a new file
 c_xqopen=Ouvrir
 c_xqopentt=Ouvre un fichier XQuery
 c_xqclose=Fermer
-c_xqclosett=Closes the query and clears the textfield
+c_xqclosett=Closes the currently opened file
 c_save=Enregistrer
 c_savett=Enregistre le fichier
 c_saveas=Enregistrer sous

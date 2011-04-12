@@ -107,4 +107,9 @@ final class NodePrimitivesContainer implements NodePrimitives {
   public String toString() {
     return Util.name(this) + prim;
   }
+
+  @Override
+  public boolean updatesDestroyIdentity() {
+    return del || rep;
+  }
 }

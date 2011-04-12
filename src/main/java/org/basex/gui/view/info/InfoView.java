@@ -13,7 +13,7 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.util.IntList;
@@ -37,7 +37,7 @@ public final class InfoView extends View {
   /** North label. */
   private final BaseXBack north;
   /** Text Area. */
-  private final BaseXText area;
+  private final BaseXEditor area;
 
   /** Query statistics. */
   private IntList stat = new IntList();
@@ -70,7 +70,7 @@ public final class InfoView extends View {
     north.add(timer, BorderLayout.SOUTH);
     add(north, BorderLayout.NORTH);
 
-    area = new BaseXText(false, gui);
+    area = new BaseXEditor(false, gui);
     add(area, BorderLayout.CENTER);
     refreshLayout();
   }
@@ -125,6 +125,7 @@ public final class InfoView extends View {
     final StringList comp = new StringList();
     final StringList plan = new StringList();
     final StringList sl = new StringList();
+    final StringList stats = new StringList();
     final IntList il = new IntList();
     String err = "";
     String qu = "";
@@ -154,6 +155,9 @@ public final class InfoView extends View {
         --i;
       } else if(!ok) {
         err += line + NL;
+      } else if (line.startsWith(QUERYHITS) || line.startsWith(QUERYUPDATED)
+          || line.startsWith(QUERYPRINTED) || line.startsWith(QUERYMEM2)) {
+          stats.add("- " + line);
       }
     }
 
@@ -181,6 +185,7 @@ public final class InfoView extends View {
       add(QUERYCOMP, comp);
       if(comp.size() != 0) add(QUERYRESULT, res);
       add(QUERYTIME, sl);
+      add(QUERYRESULT, stats);
       add(QUERYPLAN, plan);
       final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
       total = Performance.getTimer(il.get(il.size() - 1) * 10000L * runs, runs);

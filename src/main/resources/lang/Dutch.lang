@@ -49,6 +49,8 @@ info_title=Query Info
 help_title=Help
 text_title=Tekst
 explore_title=Verken
+editor_title=Editor
+editor_file=file
 
 # Dialog Windows
 d_info=Informatie
@@ -303,13 +305,15 @@ c_showtexttt=Toon de tekst view.
 c_showxquery=Query Editor
 c_showxquerytt=Toon de Query Editor.
 c_undo=Herstel
+c_xqnew=New
+c_xqnewtt=Creates a new file
 c_xqopen=Open
 c_xqopentt=Opent een XQuery bestand
 c_save=Opslaan
 c_savett=Slaat het bestand op
 c_saveas=Opslaan als
 c_xqclose=Sluit
-c_xqclosett=Sluit de query en schoont het tekstveld op
+c_xqclosett=Closes the currently opened file
 c_notopened=Bestand kon niet geopend worden.
 c_notsaved=Bestand kon niet opgeslagen worden.
 c_replace=% bestaat al.\nWil je het vervangen?

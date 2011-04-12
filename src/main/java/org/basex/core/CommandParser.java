@@ -46,6 +46,7 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.ListDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
+import org.basex.core.cmd.OptimizeAll;
 import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Restore;
 import org.basex.core.cmd.Run;
@@ -207,7 +208,7 @@ public final class CommandParser extends InputParser {
         }
         break;
       case OPTIMIZE:
-        return new Optimize();
+        return key(ALL, null) ? new OptimizeAll() : new Optimize();
       case EXPORT:
         return new Export(string(cmd));
       case XQUERY:

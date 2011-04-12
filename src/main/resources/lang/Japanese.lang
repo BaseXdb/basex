@@ -49,6 +49,8 @@ info_title=クエリー情報
 help_title=ヘルプ
 text_title=テキスト
 explore_title=Explore
+editor_title=Editor
+editor_file=file
 
 # Dialog Windows
 d_info=情報
@@ -303,13 +305,15 @@ c_showtexttt=テキストビューを表示します。
 c_showxquery=クエリーパネル
 c_showxquerytt=クエリーパネルを表示します。
 c_undo=アンドゥ
+c_xqnew=New
+c_xqnewtt=Creates a new file
 c_xqopen=開く
 c_xqopentt=XQueryファイルを開きます。
 c_save=保存
 c_savett=ファイルを保存します。
 c_saveas=別名で保存
 c_xqclose=閉じる
-c_xqclose=Closes the query and clears the textfield
+c_xqclosett=Closes the currently opened file
 c_notopened=ファイルが開けませんでした。
 c_notsaved=ファイルを保存できませんでした。
 c_replace=ファイル "%" は既に存在します。\n置換してよろしいですか。

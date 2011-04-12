@@ -62,9 +62,9 @@ abstract class Primitives {
     for(int i = 0; i < s; ++i) {
       for(final Primitive p : op.get(nodes.get(i))) {
         p.prepare();
-        // check if the identity of all target nodes of fn:put operations is
-        // still available after the execution of updates. that includes parent
-        // nodes
+        /* check if the identity of all target nodes of fn:put operations is
+           still available after the execution of updates. that includes parent
+           nodes as well */
         if(p.type() == PUT && parentDeleted(nodes.get(i))) {
           UPFOTYPE.thrw(p.input, p);
         }

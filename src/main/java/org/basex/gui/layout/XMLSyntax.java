@@ -1,9 +1,7 @@
-package org.basex.gui.view.text;
+package org.basex.gui.layout;
 
 import java.awt.Color;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.layout.BaseXSyntax;
-import org.basex.gui.layout.BaseXTextTokens;
 
 /**
  * This abstract class defines syntax highlighting of text panels.

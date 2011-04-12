@@ -4,6 +4,8 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
+import org.basex.query.item.Item;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.HTTPClient;
 import org.basex.util.InputInfo;
@@ -28,14 +30,26 @@ public final class FNHttp extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
 
     // Get request node
-    final ANode request = checkNode(expr[0].item(ctx, input));
+     final ANode request = expr[0].item(ctx, input) == null ? null
+     : checkNode(expr[0].item(ctx, input));
 
     // Get HTTP URI
-    final byte[] href = expr.length == 2 ? checkEStr(expr[1].item(ctx, input))
+    final byte[] href = expr.length >= 2 ? checkEStr(expr[1].item(ctx, input))
         : null;
 
+    // Get parameter $bodies
+    ItemCache cache = null;
+    if(expr.length == 3) {
+      final Iter bodies = expr[2].iter(ctx);
+      cache = new ItemCache();
+      Item i;
+      while((i = bodies.next()) != null)
+        cache.add(i);
+    }
+
     // Send HTTP request
-    return HTTPClient.sendRequest(href, request, input, ctx.context.prop);
+    return HTTPClient.sendRequest(href, request,
+        cache, input, ctx.context.prop);
   }
 
   @Override

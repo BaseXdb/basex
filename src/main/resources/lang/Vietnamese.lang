@@ -49,6 +49,8 @@ info_title=Thông tin câu hỏi
 help_title=Giúp đỡ
 text_title=Văn bản
 explore_title=Khảo sát
+editor_title=Editor
+editor_file=file
 
 # Dialog Windows
 d_info=Thông tin
@@ -303,10 +305,12 @@ c_showtexttt=Hiển thị xem văn bản.
 c_showxquery=Soạn thảo lệnh hỏi
 c_showxquerytt=Hiển thị soạn thảo lệnh hỏi.
 c_undo=Làm lại
+c_xqnew=New
+c_xqnewtt=Creates a new file
 c_xqopen=Mở
 c_xqopentt=Mở tệp lệnh hỏi
 c_xqclose=Đóng
-c_xqclosett=Closes the query and clears the textfield
+c_xqclosett=Closes the currently opened file
 c_save=Lưu
 c_savett=Lưu tệp lệnh hỏi
 c_saveas=Save as

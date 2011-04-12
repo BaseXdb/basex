@@ -172,14 +172,14 @@ public final class GUIProp extends AProp {
    */
   public GUIProp() {
     super("gui");
-    files(null);
+    recent(null);
   }
 
   /**
-   * Refreshes the list of recent query files.
+   * Refreshes the list of recent query files and updates the query path.
    * @param file new file
    */
-  public void files(final IO file) {
+  public void recent(final IO file) {
     final StringList sl = new StringList();
 
     String path = null;

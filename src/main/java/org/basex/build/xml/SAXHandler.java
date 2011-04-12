@@ -92,7 +92,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
     if(dtd) return;
     try {
       finishText();
-      builder.pi(new TokenBuilder(nm + ' ' + cont));
+      builder.pi(token(nm + ' ' + cont));
     } catch(final IOException ex) {
       error(ex);
     }
@@ -105,7 +105,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
     if(dtd) return;
     try {
       finishText();
-      builder.comment(new TokenBuilder(new String(ch, s, l)));
+      builder.comment(token(new String(ch, s, l)));
     } catch(final IOException ex) {
       error(ex);
     }
@@ -130,7 +130,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
         tb.add(token(sb.toString()));
         sb.setLength(0);
       }
-      builder.text(tb);
+      builder.text(tb.finish());
       tb.reset();
     }
     for(int i = 0; i < ns.size; ++i) builder.startNS(ns.key[i], ns.val[i]);

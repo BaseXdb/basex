@@ -176,10 +176,10 @@ public final class QueryException extends Exception {
       tb.add(STOPPED + ' ').addExt(LINEINFO, lineCol[0]);
       if(lineCol[1] != 0) tb.add(QueryTokens.SEP).addExt(COLINFO, lineCol[1]);
       if(file != null) tb.add(' ').addExt(FILEINFO, file);
-      tb.add(": \n");
+      tb.add(COL).add(NL);
     }
     final String c = code();
-    if(!c.isEmpty()) tb.add("[" + c + "] ");
+    if(!c.isEmpty()) tb.add("[").add(c).add("] ");
     return tb.add(getLocalizedMessage()).toString();
   }
 }
