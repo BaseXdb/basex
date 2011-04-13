@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.query.advanced;
 
 import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;

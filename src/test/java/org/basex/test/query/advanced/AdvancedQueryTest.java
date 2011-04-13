@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.query.advanced;
 
 import static org.junit.Assert.*;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class AdvancedQueryTest {
+abstract class AdvancedQueryTest {
   /** Database context. */
   protected static final Context CTX = new Context();
 

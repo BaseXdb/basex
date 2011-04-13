@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.query.advanced;
 
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.CreateDB;
