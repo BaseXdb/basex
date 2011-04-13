@@ -100,7 +100,7 @@ final class EditorArea extends BaseXEditor {
       exec = false;
     } else {
       final String qu = in.length == 0 ? "()" : string(in);
-      exec = module(in);
+      exec = !module(in);
       if(exec && (force || gui.gprop.is(GUIProp.EXECRT))) {
         view.startWait();
         view.stop.setEnabled(true);

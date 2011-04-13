@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.query.simple;
 
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class QueryTest {
+abstract class QueryTest {
   /** Document. */
   protected static String doc;
   /** Queries. */

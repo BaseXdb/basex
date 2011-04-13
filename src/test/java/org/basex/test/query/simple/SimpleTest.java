@@ -1,4 +1,5 @@
-package org.basex.test.query;
+package org.basex.test.query.simple;
+
 
 /**
  * Simple XQuery tests.
