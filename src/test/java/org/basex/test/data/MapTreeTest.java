@@ -18,9 +18,9 @@ import org.junit.Test;
  */
 public class MapTreeTest {
   /** Number of update operations to execute in each test. */
-  private static final int ITERATIONS = 3000;
+  private static final int ITERATIONS = 300;
   /** Initial number of records. */
-  private static final int BASEID = 7000;
+  private static final int BASEID = 700;
   /** Random number generator. */
   private static final Random RANDOM = new Random();
   /** ID -> PRE map to compare to. */
