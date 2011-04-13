@@ -13,4 +13,7 @@
 /target
 
 # /.settings/
-/.settings/org.maven.ide.eclipse.prefs
+.settings/org.maven.ide.eclipse.prefs
+.project
+.classpath
+.settings
