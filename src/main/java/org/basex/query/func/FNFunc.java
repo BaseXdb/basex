@@ -54,6 +54,7 @@ public final class FNFunc extends Fun {
       case HOFID:     return expr[0].iter(ctx);
       case CONST:     return expr[0].iter(ctx);
       case UNTIL:     return until(ctx);
+      case ITERATE:   return iterate(ctx);
       default:
            return super.iter(ctx);
     }
@@ -278,6 +279,31 @@ public final class FNFunc extends Fun {
       v = fun.invValue(ctx, input, v);
     }
     return v.iter();
+  }
+
+  /**
+   * Repeatedly applies a function to an argument, lazily returning all results.
+   * @param ctx query context
+   * @return result iterator
+   * @throws QueryException query context
+   */
+  private Iter iterate(final QueryContext ctx) throws QueryException {
+    final FunItem f = withArity(0, 1, ctx);
+    return new Iter() {
+      /** Current value. */
+      Value v = expr[1].value(ctx);
+      long i, len = v.size();
+
+      @Override
+      public Item next() throws QueryException {
+        while(i >= len) {
+          v = f.invValue(ctx, input, v);
+          i = 0;
+          len = v.size();
+        }
+        return v.itemAt(i++);
+      }
+    };
   }
 
   /**

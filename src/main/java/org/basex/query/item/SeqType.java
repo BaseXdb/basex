@@ -60,7 +60,7 @@ public final class SeqType {
   }
 
   /** Zero items. */
-  public static final SeqType ITEM_Z = new SeqType(AtomType.ITEM, Occ.Z);
+  public static final SeqType EMP = new SeqType(AtomType.EMP, Occ.Z);
   /** Single item. */
   public static final SeqType ITEM = AtomType.ITEM.seq();
   /** Zero or one item. */

@@ -193,9 +193,12 @@ public enum FunDef {
       FunType.get(new SeqType[]{ ITEM_ZM }, BLN).seq(),
       FunType.get(new SeqType[]{ ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  FOLDLEFT1(FNURI, FNFunc.class, 2, 2, "fold-left1(function,non-empty-seq)",
+  FOLDLEFT1(HOFURI, FNFunc.class, 2, 2, "fold-left1(function,non-empty-seq)",
       FunType.get(new SeqType[]{ ITEM_ZM, ITEM }, ITEM_ZM).seq(), ITEM_OM,
       ITEM_ZM),
+  /** XQuery Function. */
+  ITERATE(HOFURI, FNFunc.class, 2, 2, "iterate(fun, seq)",
+      FunType.arity(1).seq(), ITEM_ZM, ITEM_ZM),
 
   /* FNGen functions. */
 
@@ -208,7 +211,7 @@ public enum FunDef {
   /** XQuery function. */
   DOCAVL(FNURI, FNGen.class, 1, 1, "doc-available(uri)", STR_ZO, BLN),
   /** XQuery function. */
-  PUT(FNURI, FNGen.class, 2, 2, "put(node,path)", NOD, STR_ZO, ITEM_Z),
+  PUT(FNURI, FNGen.class, 2, 2, "put(node,path)", NOD, STR_ZO, EMP),
   /** XQuery function. */
   PARSETXT(FNURI, FNGen.class, 1, 2, "unparsed-text(uri[,encoding])",
       STR_ZO, STR, STR_ZO),
@@ -243,7 +246,7 @@ public enum FunDef {
 
   /** XQuery function. */
   ERROR(FNURI, FNInfo.class, 0, 3, "error([code[,desc[,object]]])",
-      QNM_ZO, STR, ITEM_ZM, ITEM_Z),
+      QNM_ZO, STR, ITEM_ZM, EMP),
   /** XQuery function. */
   TRACE(FNURI, FNInfo.class, 2, 2, "trace(item,msg)", ITEM_ZM, STR, ITEM_ZM),
   /** XQuery function. */
@@ -500,23 +503,23 @@ public enum FunDef {
   /** XQuery function */
   PATHTOURI(FILEURI, FNFile.class, 1, 1, "path-to-uri(path)", STR, URI),
   /** XQuery function */
-  CREATEDIR(FILEURI, FNFile.class, 1, 1, "create-directory(path)", STR, ITEM_Z),
+  CREATEDIR(FILEURI, FNFile.class, 1, 1, "create-directory(path)", STR, EMP),
   /** XQuery function */
-  DELETE(FILEURI, FNFile.class, 1, 2, "delete(path[,rec])", STR, BLN, ITEM_Z),
+  DELETE(FILEURI, FNFile.class, 1, 2, "delete(path[,rec])", STR, BLN, EMP),
   /** XQuery function */
   READ(FILEURI, FNFile.class, 1, 2, "read(path[,encoding])", STR, STR, STR),
   /** XQuery function */
   READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(path)", STR, B64),
   /** XQuery function */
   WRITE(FILEURI, FNFile.class, 2, 4, "write(path,data[,params[,append]])",
-      STR, ITEM_ZM, NOD, BLN, ITEM_Z),
+      STR, ITEM_ZM, NOD, BLN, EMP),
   /** XQuery function */
   WRITEBIN(FILEURI, FNFile.class, 2, 3, "write-binary(path,base64[,append])",
-      STR, B64, BLN, ITEM_Z),
+      STR, B64, BLN, EMP),
   /** XQuery function */
-  COPY(FILEURI, FNFile.class, 2, 2, "copy(source,target)", STR, STR, ITEM_Z),
+  COPY(FILEURI, FNFile.class, 2, 2, "copy(source,target)", STR, STR, EMP),
   /** XQuery function */
-  MOVE(FILEURI, FNFile.class, 2, 2, "move(source,target)", STR, STR, ITEM_Z),
+  MOVE(FILEURI, FNFile.class, 2, 2, "move(source,target)", STR, STR, EMP),
 
   /* FNZIP functions */
 
@@ -532,10 +535,10 @@ public enum FunDef {
   /** XQuery function */
   ENTRIES(ZIPURI, FNZip.class, 1, 1, "entries(path)", STR, ELM),
   /** XQuery function */
-  ZIPFILE(ZIPURI, FNZip.class, 1, 1, "zip-file(zip)", ELM, ITEM_Z),
+  ZIPFILE(ZIPURI, FNZip.class, 1, 1, "zip-file(zip)", ELM, EMP),
   /** XQuery function */
   UPDATE(ZIPURI, FNZip.class, 2, 2, "update-entries(zip,output)",
-      ELM, STR, ITEM_Z),
+      ELM, STR, EMP),
 
   /* FNHttp functions */
 
@@ -623,9 +626,9 @@ public enum FunDef {
   /** Descriptions. */
   final String desc;
   /** Minimum number of arguments. */
-  final int min;
+  public final int min;
   /** Maximum number of arguments. */
-  final int max;
+  public final int max;
   /** Return type. */
   final SeqType ret;
   /** Argument types. */
