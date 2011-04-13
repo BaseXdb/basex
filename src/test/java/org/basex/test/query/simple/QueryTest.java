@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-abstract class QueryTest {
+public abstract class QueryTest {
   /** Document. */
   protected static String doc;
   /** Queries. */

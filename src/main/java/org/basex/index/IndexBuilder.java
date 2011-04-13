@@ -44,7 +44,7 @@ public abstract class IndexBuilder extends Progress {
    */
   protected final void check() {
     checkStop();
-    if(Util.debug && (pre & 0x1FFFFF) == 0) Util.error(".");
+    if(Util.debug && (pre & 0x1FFFFF) == 0) Util.err(".");
   }
 
   /**
@@ -56,7 +56,7 @@ public abstract class IndexBuilder extends Progress {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
       if(cc >= 0) throw new IOException(PROCMEM + PROCMEMCREATE);
-      if(Util.debug) Util.error("!");
+      if(Util.debug) Util.err("!");
       merge = true;
       cc = 30;
     } else {
