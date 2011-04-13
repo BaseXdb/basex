@@ -259,7 +259,7 @@ public enum GUICommands implements GUICommand {
   EDITCLOSE(GUIXQCLOSE, "% shift W", GUIXQCLOSETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.query.close();
+      gui.query.close(null);
     }
   },
 

@@ -368,13 +368,16 @@ public final class EditorView extends View {
   }
 
   /**
-   * Closes a file.
+   * Closes an editor.
+   * @param edit editor to be closed. {@code null} closes the currently
+   * opened editor.
+   * opened editor is to be closed
    */
-  public void close() {
-    // close file
-    final EditorArea edit = getEditor();
-    if(!confirm(edit)) return;
-    tabs.remove(edit);
+  public void close(final EditorArea edit) {
+    final EditorArea ea = edit != null ? edit : getEditor();
+    if(!confirm(ea)) return;
+
+    tabs.remove(ea);
     final int t = tabs.getTabCount();
     final int i = tabs.getSelectedIndex();
     if(t == 1) {
@@ -536,8 +539,7 @@ public final class EditorView extends View {
     close.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        tabs.setSelectedComponent(edit);
-        close();
+        close(edit);
       }
     });
     tab.add(close, BorderLayout.EAST);
