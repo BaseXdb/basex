@@ -5,7 +5,9 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -82,14 +84,22 @@ public final class Try extends Single {
    * @return result iterator
    * @throws QueryException query exception
    */
-  Iter err(final QueryContext ctx, final QueryException ex)
+  ValueIter err(final QueryContext ctx, final QueryException ex)
       throws QueryException {
 
     for(final Catch c : ctch) {
-      final Iter it = c.iter(ctx, ex);
-      if(it != null) return it;
+      final Value val = c.value(ctx, ex);
+      // [LW] check strictness
+      if(val != null) return val.iter();
     }
     throw ex;
+  }
+
+  @Override
+  public int count(final Var v) {
+    int c = super.count(v);
+    for(final Catch ct : ctch) c += ct.count(v);
+    return c;
   }
 
   @Override
@@ -120,7 +130,7 @@ public final class Try extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("try { " + expr + "}");
+    final StringBuilder sb = new StringBuilder("try { " + expr + " }");
     for(final Catch c : ctch) sb.append(" " + c);
     return sb.toString();
   }

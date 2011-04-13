@@ -66,15 +66,14 @@ abstract class AQuery extends Command {
       for(int i = 0; i < runs; ++i) {
         final Performance per = new Performance();
 
-        qp = new QueryProcessor(query, context);
-        progress(qp);
+        qp = progress(new QueryProcessor(query, context));
 
         qp.parse();
         pars += per.getTime();
-        if(i == 0) plan(qp, false);
+        if(i == 0) plan(false);
         qp.compile();
         comp += per.getTime();
-        if(i == 0) plan(qp, true);
+        if(i == 0) plan(true);
 
         final PrintOutput po = i == 0 && ser ? out : new NullOutput(!ser);
         XMLSerializer xml;
@@ -183,10 +182,9 @@ abstract class AQuery extends Command {
 
   /**
    * Creates query plans.
-   * @param qu query reference
    * @param c compiled flag
    */
-  private void plan(final QueryProcessor qu, final boolean c) {
+  private void plan(final boolean c) {
     if(c != prop.is(Prop.COMPPLAN)) return;
 
     // show dot plan
@@ -194,7 +192,7 @@ abstract class AQuery extends Command {
       if(prop.is(Prop.DOTPLAN)) {
         final ArrayOutput ao = new ArrayOutput();
         final DOTSerializer d = new DOTSerializer(ao, prop.is(Prop.DOTCOMPACT));
-        qu.plan(d);
+        qp.plan(d);
         d.close();
 
         final String dot = context.query == null ? "plan.dot" :
@@ -207,7 +205,7 @@ abstract class AQuery extends Command {
       // show XML plan
       if(prop.is(Prop.XMLPLAN)) {
         final ArrayOutput ao = new ArrayOutput();
-        qu.plan(new XMLSerializer(ao));
+        qp.plan(new XMLSerializer(ao));
         info(NL + QUERYPLAN);
         info(ao.toString());
       }

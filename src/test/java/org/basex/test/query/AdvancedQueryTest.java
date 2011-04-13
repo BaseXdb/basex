@@ -19,16 +19,6 @@ import org.basex.util.Util;
 public abstract class AdvancedQueryTest {
   /** Database context. */
   protected static final Context CTX = new Context();
-  /** Function prefix. */
-  protected final String pref;
-
-  /**
-   * Constructor.
-   * @param pr prefix of tested functions.
-   */
-  public AdvancedQueryTest(final String pr) {
-    pref = pr;
-  }
 
   /**
    * Runs the specified query.
@@ -101,7 +91,7 @@ public abstract class AdvancedQueryTest {
    */
   protected String check(final FunDef def, final Class<?>... args) {
     final String desc = def.toString();
-    final String name = pref + ":" + desc.replaceAll("\\(.*", "");
+    final String name = desc.replaceAll("\\(.*", "");
     final int max = desc.contains("()") ? 0 : desc.split(",").length;
     final int min = max + 1 - desc.split("\\]").length;
     if(max != args.length) Util.notexpected("Check #arguments: " + def);

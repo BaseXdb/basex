@@ -93,6 +93,7 @@ public final class BaseXFileChooser {
       return IO.get(mode == Mode.DOPEN || mode == Mode.DSAVE ? dir :
         dir + "/" + fd.getFile());
     }
+
     int state = 0;
     switch(mode) {
       case FOPEN:

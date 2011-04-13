@@ -164,9 +164,6 @@ public final class GUIProp extends AProp {
   /** Server user. */
   public static final Object[] SERVERUSER = { "SERVERUSER", "admin" };
 
-  /** Shows real file contents in the treemap.
-   * [CG] AH asks if this shall be removed as well? */
-  public static final Object[] MAPFS = { "MAPFS", true };
   /** Maximum text size to be displayed. */
   public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
 
@@ -175,14 +172,14 @@ public final class GUIProp extends AProp {
    */
   public GUIProp() {
     super("gui");
-    files(null);
+    recent(null);
   }
 
   /**
-   * Refreshes the list of recent query files.
+   * Refreshes the list of recent query files and updates the query path.
    * @param file new file
    */
-  public void files(final IO file) {
+  public void recent(final IO file) {
     final StringList sl = new StringList();
 
     String path = null;

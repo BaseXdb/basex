@@ -106,6 +106,7 @@ public final class DialogParsing extends BaseXBack {
     chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, d);
     cfile = new BaseXTextField(prop.get(Prop.CATFILE), d);
     browsec = new BaseXButton(BUTTONBROWSE, d);
+    browsec.setMnemonic();
     usecat = new BaseXCheckBox(USECATFILE,
         !prop.get(Prop.CATFILE).isEmpty(), 0, d);
 

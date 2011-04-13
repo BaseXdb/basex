@@ -1,11 +1,9 @@
-package org.basex.gui.view.xquery;
+package org.basex.gui.layout;
 
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.layout.BaseXSyntax;
-import org.basex.gui.layout.BaseXTextTokens;
 import org.basex.query.QueryTokens;
 import org.basex.query.func.FunDef;
 import org.basex.util.Util;
@@ -17,7 +15,7 @@ import org.basex.util.XMLToken;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class XQuerySyntax extends BaseXSyntax {
+public final class XQuerySyntax extends BaseXSyntax {
   /** Error color. */
   private static final HashSet<String> KEYS = new HashSet<String>();
   /** Error color. */

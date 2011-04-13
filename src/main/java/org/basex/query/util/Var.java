@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -33,7 +34,7 @@ public final class Var extends ParseExpr {
   public boolean declared;
 
   /** Variable ID. */
-  private final int id;
+  public final int id;
   /** Bound value. */
   private Value value;
   /** Bound expression. */
@@ -136,6 +137,12 @@ public final class Var extends ParseExpr {
   }
 
   @Override
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return value(ctx).item(ctx, ii);
+  }
+
+  @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     return value(ctx).iter();
   }
@@ -171,7 +178,7 @@ public final class Var extends ParseExpr {
    */
   private Value cast(final Value v, final QueryContext ctx)
       throws QueryException {
-    return type == null ? v : type.cast(v, ctx, input);
+    return type == null ? v : type.promote(v, this, ctx, input);
   }
 
   @Override

@@ -1,11 +1,14 @@
 package org.basex.query.expr;
 
 import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -32,6 +35,8 @@ public class Func extends Single {
   public final boolean declared;
   /** Updating flag. */
   public boolean updating;
+  /** Cast flag. */
+  public boolean cast;
 
   /**
    * Function constructor.
@@ -48,6 +53,7 @@ public class Func extends Single {
     ret = r;
     args = a;
     declared = d;
+    cast = r != null;
   }
 
   /**
@@ -75,18 +81,43 @@ public class Func extends Single {
     expr = expr.comp(ctx);
     ctx.vars.reset(s);
 
+    // remove redundant cast
+    if(ret != null && (ret.type == AtomType.BLN || ret.type == AtomType.FLT ||
+        ret.type == AtomType.DBL || ret.type == AtomType.QNM ||
+        ret.type == AtomType.URI) && ret.eq(expr.type())) {
+      ctx.compInfo(OPTCAST, ret);
+      cast = false;
+    }
     // returned expression will be ignored
     return this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    // evaluate function and reset variable scope
+    final Value cv = ctx.value;
+    ctx.value = null;
+    final Item it = expr.item(ctx, ii);
+    ctx.value = cv;
+
+    // optionally promote return value to target type
+    return cast ? ret.cast(it, this, false, ctx, input) : it;
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
     // evaluate function and reset variable scope
     final Value cv = ctx.value;
     ctx.value = null;
     final Value v = expr.value(ctx);
     ctx.value = cv;
-    return (ret != null ? ret.cast(v, ctx, input) : v).iter();
+    return cast ? ret.promote(v, this, ctx, input) : v;
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    return value(ctx).iter();
   }
 
   @Override

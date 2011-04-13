@@ -35,8 +35,9 @@ public final class Namespaces {
 
   /** New namespace flag. */
   private boolean newns;
-  /** Current level. */
-  private int uriL;
+  /** Current level. Index starts at 1 to reserve an additional level for
+   * XQUP insert operations. */
+  private int uriL = 1;
   /** Current namespace node. */
   NSNode current;
 
@@ -117,7 +118,7 @@ public final class Namespaces {
   public void close(final int pre) {
     while(current.pre >= pre && current.par != null)
       current = current.par;
-    uriStack[--uriL] = uriL > 0 ? uriStack[uriL - 1] : 0;
+    uriStack[--uriL] = uriStack[uriL - 1];
   }
 
   /**
@@ -290,7 +291,11 @@ public final class Namespaces {
    * @param pre pre value to find nearest namespace node for
    */
   void setNearestRoot(final NSNode n, final int pre) {
-    uriStack[uriL] = uri(Token.EMPTY, pre);
+    final int uriI = uri(Token.EMPTY, pre);
+    uriStack[uriL] = uriI;
+    // remind uri before insert of first node n to connect siblings of n to
+    // according namespace
+    uriStack[uriL - 1] = uriI;
     setRoot(n);
   }
 

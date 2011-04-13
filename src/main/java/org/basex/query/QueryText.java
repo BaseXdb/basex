@@ -56,6 +56,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTWHERE = "rewriting where clause to predicate(s)";
   /** Optimization info. */
+  String OPTCAST = "removing redundant % cast.";
+  /** Optimization info. */
   String OPTVAR = "removing variable %";
   /** Optimization info. */
   String OPTPREF = "skipping namespace test for \"%\"";

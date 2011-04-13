@@ -14,7 +14,6 @@ import org.basex.index.Names;
 import org.basex.io.IO;
 import org.basex.util.Atts;
 import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -177,19 +176,19 @@ public abstract class Builder extends Progress {
 
   /**
    * Stores a text node.
-   * @param t text value
+   * @param txt text value
    * @throws IOException I/O exception
    */
-  public final void text(final TokenBuilder t) throws IOException {
+  public final void text(final byte[] txt) throws IOException {
     // chop whitespaces in text nodes
-    if(meta.chop) t.trim();
+    final byte[] t = meta.chop ? trim(txt) : txt;
 
     // check if text appears before or after root node
     final boolean ignore = !inDoc || lvl == 1;
-    if((meta.chop && t.size() != 0 || !t.wsp()) && ignore)
+    if((meta.chop && t.length != 0 || !ws(t)) && ignore)
       error(inDoc ? AFTERROOT : BEFOREROOT, parser.detail());
 
-    if(t.size() != 0 && !ignore) addText(t, Data.TEXT);
+    if(t.length != 0 && !ignore) addText(t, Data.TEXT);
   }
 
   /**
@@ -197,7 +196,7 @@ public abstract class Builder extends Progress {
    * @param com comment text
    * @throws IOException I/O exception
    */
-  public final void comment(final TokenBuilder com) throws IOException {
+  public final void comment(final byte[] com) throws IOException {
     addText(com, Data.COMM);
   }
 
@@ -206,7 +205,7 @@ public abstract class Builder extends Progress {
    * @param pi processing instruction name and value
    * @throws IOException I/O exception
    */
-  public final void pi(final TokenBuilder pi) throws IOException {
+  public final void pi(final byte[] pi) throws IOException {
     addText(pi, Data.PI);
   }
 
@@ -377,14 +376,13 @@ public abstract class Builder extends Progress {
    * @param kind the node type
    * @throws IOException I/O exception
    */
-  private void addText(final TokenBuilder txt, final byte kind)
+  private void addText(final byte[] txt, final byte kind)
       throws IOException {
 
-    final byte[] t = txt.finish();
     // text node processing for statistics
-    if(kind == Data.TEXT) tags.index(tagStack[lvl - 1], t);
+    if(kind == Data.TEXT) tags.index(tagStack[lvl - 1], txt);
     if(meta.pathindex) path.add(0, lvl, kind);
-    addText(t, lvl == 0 ? 1 : meta.size - preStack[lvl - 1], kind);
+    addText(txt, lvl == 0 ? 1 : meta.size - preStack[lvl - 1], kind);
   }
 
   /**

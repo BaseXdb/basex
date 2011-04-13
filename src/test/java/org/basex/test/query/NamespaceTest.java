@@ -415,6 +415,18 @@ public final class NamespaceTest {
   }
 
   /** Test query.
+   * Detects general problems with namespace references.
+   */
+  @Test
+  public void insertTransform1() {
+    query(
+        "declare default element namespace 'xyz';" +
+        "copy $foo := <foo/> modify insert nodes (<bar/>, <baz/>)" +
+        "into $foo return $foo",
+        "<foo xmlns='xyz'><bar/><baz/></foo>");
+  }
+
+  /** Test query.
    * Detects wrong namespace references.
    */
   @Test

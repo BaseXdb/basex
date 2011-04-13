@@ -10,6 +10,7 @@ import org.basex.query.iter.RangeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Range sequence, containing at least two integers.
@@ -61,8 +62,8 @@ public final class RangeSeq extends Seq {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(AtomType.SEQ.nam, MIN, Token.token(start),
-        MAX, Token.token(start + size - 1));
+    ser.emptyElement(Token.token(Util.name(this)),
+        MIN, Token.token(start), MAX, Token.token(start + size - 1));
   }
 
   @Override
@@ -73,5 +74,16 @@ public final class RangeSeq extends Seq {
   @Override
   public String toString() {
     return PAR1 + start + ' ' + TO + ' ' + (start + size - 1) + PAR2;
+  }
+
+  @Override
+  public int writeTo(final Item[] arr, final int pos) {
+    for(int i = 0; i < size; i++) arr[pos + i] = itemAt(i);
+    return (int) size;
+  }
+
+  @Override
+  public Item itemAt(final long pos) {
+    return Itr.get(start + pos);
   }
 }

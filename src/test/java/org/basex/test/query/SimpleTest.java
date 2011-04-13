@@ -31,6 +31,8 @@ public final class SimpleTest extends QueryTest {
       "</html>";
 
     queries = new Object[][] {
+      { "Compare 1", "xs:QName('a') = attribute a { 'b' }" },
+
       { "Root 1", node(0), "/" },
       { "Root 2", node(0), "/." },
       { "Root 3", empty(), "/.." },
@@ -75,6 +77,14 @@ public final class SimpleTest extends QueryTest {
       { "Pred A", node(5, 17), "//*[text() = ('XML', 'Assignments')]" },
       { "Pred B", node(5), "//title[text() = .]" },
       { "Pred C", itr(1), "1[.]" },
+
+      { "PredIndex 1", node(21), "//text()[. = 'Exercise 1']" },
+      { "PredIndex 2", node(20), "//text()[. = 'Exercise 1']/.." },
+      { "PredIndex 3", node(9), "//@*[. = '1']" },
+      { "PredIndex 4", node(9), "//@id[. = '1']" },
+      { "PredIndex 5", node(8), "//@id[. = '1']/.." },
+      { "PredIndex 6", node(11), "//@*[. = '#000000']" },
+      { "PredIndex 7", empty(), "//@id[. = '#000000']" },
 
       { "Pred Error 1", "/[/]" },
       { "Pred Error 2", "/*[]" },
@@ -142,6 +152,7 @@ public final class SimpleTest extends QueryTest {
 
       { "RangeIndex 1", node(8), "//*[@id = 1]" },
       { "RangeIndex 2", node(3, 8), "//*[@id >= 0 and @id <= 1]" },
+      { "RangeIndex 3", node(9), "//@id[. = 1]" },
 
       { "ExtVar 1", itr(1), "declare variable $a external; 1" },
       { "ExtVar 2", "declare variable $a external; $a" },

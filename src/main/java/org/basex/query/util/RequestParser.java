@@ -3,11 +3,11 @@ package org.basex.query.util;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
+import org.basex.query.item.Item;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.NodeMore;
@@ -43,6 +43,12 @@ public final class RequestParser {
   private static final byte[] SENDAUTH = token("send-authorization");
   /** Body attribute: media-type. */
   private static final byte[] MEDIATYPE = token("media-type");
+  /** Body attribute: media-type. */
+  private static final byte[] SRC = token("src");
+  /** HTTP method TRACE. */
+  private static final byte[] TRACE = token("trace");
+  /** HTTP method DELETE. */
+  private static final byte[] DELETE = token("delete");
 
   /**
    * Constructor.
@@ -54,26 +60,50 @@ public final class RequestParser {
   /**
    * Parses an <http:request/> element.
    * @param request request element
+   * @param bodies content items
    * @param ii input info
    * @return parsed request
    * @throws QueryException query exception
    */
-  public static Request parse(final ANode request, final InputInfo ii)
-      throws QueryException {
+  public static Request parse(final ANode request, final ItemCache bodies,
+      final InputInfo ii) throws QueryException {
     final Request r = new Request();
     parseAttrs(request, r.attrs);
+    checkRequest(r, ii);
     final ANode payload = parseHdrs(request.children(), r.headers);
+    final byte[] httpMethod = lc(r.attrs.get(METHOD));
+    // It is an error if content is set for HTTP verbs which must be empty
+    if((eq(TRACE, httpMethod) || eq(DELETE, httpMethod))
+        && (payload != null || bodies != null)) REQINV.thrw(ii,
+        "Body not expected for method " + string(httpMethod));
     if(payload != null) {
+      // Single part request
       if(eq(payload.nname(), BODY)) {
-        parseBody(payload, r.payloadAttrs, r.bodyContent);
+        Item it = null;
+        if(bodies != null) {
+          // $bodies must contain exactly one item
+          if(bodies.size() != 1) REQINV.thrw(ii,
+              "Number of items with request body content differs "
+                  + "from number of body descriptors.");
+          it = bodies.next();
+        }
+        parseBody(payload, it, r.payloadAttrs, r.bodyContent, ii);
         r.isMultipart = false;
+        // Multipart request
       } else if(eq(payload.nname(), MULTIPART)) {
-        parseMultipart(payload, r.payloadAttrs, r.parts);
+        int i = 0;
+        final NodeMore ch = payload.children();
+        while(ch.next() != null)
+          i++;
+        // Number of items in $bodies must be equal to number of body
+        // descriptors
+        if(bodies != null && bodies.size() != i) REQINV.thrw(ii,
+            "Number of items with request body content differs "
+                + "from number of body descriptors.");
+        parseMultipart(payload, bodies, r.payloadAttrs, r.parts, ii);
         r.isMultipart = true;
-      } else ELMINV.thrw(ii);
+      } else REQINV.thrw(ii);
     }
-
-    check(r, ii);
     return r;
   }
 
@@ -105,7 +135,7 @@ public final class RequestParser {
       byte[] value = null;
 
       while((attr = hdrAttrs.next()) != null) {
-        if(eq(attr.nname(), HDR_NAME)) name = lc(attr.atom());
+        if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
         if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
 
         if(name != null && name.length != 0 && value != null
@@ -121,83 +151,117 @@ public final class RequestParser {
   /**
    * Parses <http:body/> element.
    * @param body body element
+   * @param contItem content item
    * @param attrs map for parsed body attributes
    * @param bodyContent item cache for parsed body content
+   * @param ii input info
+   * @throws QueryException query exception
    */
-  private static void parseBody(final ANode body, final TokenMap attrs,
-      final ItemCache bodyContent) {
+  private static void parseBody(final ANode body, final Item contItem,
+      final TokenMap attrs, final ItemCache bodyContent, final InputInfo ii)
+      throws QueryException {
     parseAttrs(body, attrs);
-    ANode n;
-    final NodeMore i = body.children();
-    while((n = i.next()) != null) {
-      bodyContent.add(n);
+    checkBody(body, attrs, ii);
+    if(attrs.get(SRC) == null) {
+      // No linked resource for setting request content
+      if(contItem == null) {
+        // Content is set from <http:body/> children
+        ANode n;
+        final NodeMore i = body.children();
+        while((n = i.next()) != null)
+          bodyContent.add(n);
+      } else {
+        // Content is set from $bodies parameter
+        bodyContent.add(contItem);
+      }
     }
   }
 
   /**
-   * Parses <http:multipart/> element.
+   * Parses a <http:multipart/> element.
    * @param multipart multipart element
+   * @param contItems content items
    * @param attrs map for multipart attributes
    * @param parts list for multipart parts
+   * @param ii input info
+   * @throws QueryException query exception
    */
   private static void parseMultipart(final ANode multipart,
-      final TokenMap attrs, final List<Part> parts) {
+      final ItemCache contItems, final TokenMap attrs, final List<Part> parts,
+      final InputInfo ii) throws QueryException {
     parseAttrs(multipart, attrs);
+    if(attrs.get(MEDIATYPE) == null) REQINV.thrw(ii,
+        "Attribute media-type of http:multipart is mandatory");
     ANode n;
     final NodeMore i = multipart.children();
-    while((n = i.next()) != null) {
-      parts.add(parsePart(n));
+    if(contItems == null) {
+      // Content is set from <http:body/> children of <http:part/> elements
+      while((n = i.next()) != null)
+        parts.add(parsePart(n, null, ii));
+    } else {
+      // Content is set from $bodies parameter
+      while((n = i.next()) != null)
+        parts.add(parsePart(n, contItems.next(), ii));
     }
   }
 
   /**
    * Parses a part from a <http:multipart/> element.
    * @param part part element
+   * @param contItem content item
+   * @param ii input info
    * @return structure representing the part
+   * @throws QueryException query exception
    */
-  private static Part parsePart(final ANode part) {
+  private static Part parsePart(final ANode part, final Item contItem,
+      final InputInfo ii) throws QueryException {
     final Part p = new Part();
     final ANode partBody = parseHdrs(part.children(), p.headers);
-    parseBody(partBody, p.bodyAttrs, p.bodyContent);
+    parseBody(partBody, contItem, p.bodyAttrs, p.bodyContent, ii);
     return p;
   }
 
   /**
-   * Checks some mandatory attributes in <http:request/> and <http:body/>
-   * elements.
-   * @param r request representation
+   * Checks consistency of attributes for <http:request/>.
+   * @param r request
    * @param ii input info
    * @throws QueryException query exception
    */
-  private static void check(final Request r, final InputInfo ii)
+  private static void checkRequest(final Request r, final InputInfo ii)
       throws QueryException {
-
-    // Check request mandatory attributes
-    if(r.attrs.get(METHOD) == null) {
-      MANDATTR.thrw(ii, string(METHOD));
-    }
+    // @method denotes the HTTP verb and is mandatory
+    if(r.attrs.get(METHOD) == null) REQINV.thrw(ii,
+        "Attribute method is mandatory");
+    // Check parameters needed in case of authorization
     final byte[] sendAuth = r.attrs.get(SENDAUTH);
     if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
       final byte[] usrname = r.attrs.get(USRNAME);
       final byte[] passwd = r.attrs.get(PASSWD);
 
-      if(usrname == null && passwd != null || usrname != null && passwd == null)
-        CREDSERR.thrw(ii);
+      if(usrname == null && passwd != null || usrname != null && passwd == null
+          || usrname == null && passwd == null) REQINV.thrw(ii,
+          "Provided credentials are invalid");
     }
+  }
 
-    // Check body and multipart attributes
-    if(r.isMultipart) {
-      // Check body of each part
-      final Iterator<Part> i = r.parts.iterator();
-      Part p = null;
-      while(i.hasNext()) {
-        p = i.next();
-        if(p.bodyContent.size() != 0 && p.bodyAttrs.get(MEDIATYPE) == null)
-          MANDATTR.thrw(ii, string(MEDIATYPE));
-      }
-    } else {
-      if(r.bodyContent.size() != 0 && r.payloadAttrs.get(MEDIATYPE) == null)
-        MANDATTR.thrw(ii, string(MEDIATYPE));
-    }
+  /**
+   * Checks consistency of attributes for <http:body/>.
+   * @param body body
+   * @param bodyAttrs body attributes
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  private static void checkBody(final ANode body, final TokenMap bodyAttrs,
+      final InputInfo ii) throws QueryException {
+
+    // @media-type is mandatory
+    if(bodyAttrs.get(MEDIATYPE) == null) REQINV.thrw(ii,
+        "Attribute media-type of http:body is mandatory");
+
+    // If src attribute is used to set the content of the body, no
+    // other attributes must be specified and no content must be present
+    if(bodyAttrs.get(SRC) != null
+        && (bodyAttrs.size() > 2 || body.children().more())) SRCATTR.thrw(ii);
+
   }
 }

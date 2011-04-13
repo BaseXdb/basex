@@ -132,7 +132,8 @@ public final class BaseXLayout {
           // process key events
           if(ENTER.is(e)) {
             final Object s = e.getSource();
-            if(!(s instanceof BaseXButton || s instanceof BaseXText)) d.close();
+            if(!(s instanceof BaseXButton || s instanceof BaseXEditor))
+              d.close();
           } else if(ESCAPE.is(e)) {
             d.cancel();
           }

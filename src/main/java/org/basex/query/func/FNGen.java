@@ -28,6 +28,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
+import org.basex.query.item.Value;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.Put;
@@ -63,7 +64,7 @@ final class FNGen extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
       case DATA:        return data(ctx);
-      case COLL:        return collection(ctx);
+      case COLL:        return collection(ctx).iter();
       case URICOLL:     return uriCollection(ctx);
       case PARSETXTLIN: return unparsedTextLines(ctx);
       default:          return super.iter(ctx);
@@ -83,6 +84,11 @@ final class FNGen extends Fun {
       case SERIALIZE:   return serialize(ctx);
       default:          return super.item(ctx, ii);
     }
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    return def == FunDef.COLL ? collection(ctx) : super.value(ctx);
   }
 
   @Override
@@ -117,10 +123,10 @@ final class FNGen extends Fun {
   /**
    * Performs the collection function.
    * @param ctx query context
-   * @return resulting iterator
+   * @return result
    * @throws QueryException query exception
    */
-  private Iter collection(final QueryContext ctx) throws QueryException {
+  private Value collection(final QueryContext ctx) throws QueryException {
     return ctx.resource.collection(expr.length != 0 ? checkStr(expr[0], ctx) :
       null, input);
   }
@@ -128,11 +134,11 @@ final class FNGen extends Fun {
   /**
    * Performs the uri-collection function.
    * @param ctx query context
-   * @return resulting iterator
+   * @return result
    * @throws QueryException query exception
    */
   private Iter uriCollection(final QueryContext ctx) throws QueryException {
-    final Iter coll = collection(ctx);
+    final Iter coll = collection(ctx).iter();
     return new Iter() {
       @Override
       public Item next() throws QueryException {
@@ -146,7 +152,7 @@ final class FNGen extends Fun {
   /**
    * Performs the put function.
    * @param ctx query context
-   * @return resulting iterator
+   * @return result
    * @throws QueryException query exception
    */
   private Item put(final QueryContext ctx) throws QueryException {
@@ -167,7 +173,7 @@ final class FNGen extends Fun {
   /**
    * Performs the doc function.
    * @param ctx query context
-   * @return resulting node
+   * @return result
    * @throws QueryException query exception
    */
   private ANode doc(final QueryContext ctx) throws QueryException {
@@ -178,14 +184,14 @@ final class FNGen extends Fun {
     if(contains(in, '<') || contains(in, '>')) INVDOC.thrw(input, in);
 
     final Data d = ctx.resource.data(in, false, input);
-    if(!d.single()) EXPSINGLE.thrw(input);
+    if(!d.single()) EXPSINGLE.thrw(input, in);
     return new DBNode(d, 0, Data.DOC);
   }
 
   /**
    * Performs the doc-available function.
    * @param ctx query context
-   * @return resulting item
+   * @return result
    * @throws QueryException query exception
    */
   private Bln docAvailable(final QueryContext ctx) throws QueryException {
@@ -202,7 +208,7 @@ final class FNGen extends Fun {
   /**
    * Performs the unparsed-text function.
    * @param ctx query context
-   * @return resulting item
+   * @return result
    * @throws QueryException query exception
    */
   private Str unparsedText(final QueryContext ctx) throws QueryException {
@@ -218,7 +224,7 @@ final class FNGen extends Fun {
   /**
    * Performs the unparsed-text-lines function.
    * @param ctx query context
-   * @return resulting item
+   * @return result
    * @throws QueryException query exception
    */
   private Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
@@ -246,7 +252,7 @@ final class FNGen extends Fun {
   /**
    * Performs the unparsed-text-available function.
    * @param ctx query context
-   * @return resulting item
+   * @return result
    * @throws QueryException query exception
    */
   private Bln unparsedTextAvailable(final QueryContext ctx)
@@ -265,7 +271,7 @@ final class FNGen extends Fun {
   /**
    * Performs the parse-xml function.
    * @param ctx query context
-   * @return resulting item
+   * @return result
    * @throws QueryException query exception
    */
   private ANode parseXml(final QueryContext ctx) throws QueryException {
@@ -289,7 +295,7 @@ final class FNGen extends Fun {
   /**
    * Performs the serialize function.
    * @param ctx query context
-   * @return resulting item
+   * @return result
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {

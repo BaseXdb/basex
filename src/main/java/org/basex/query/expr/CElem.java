@@ -105,7 +105,7 @@ public final class CElem extends CFrag {
         if(uri == null || !eq(uri, muri)) {
           ctx.ns.add(new QNm(tname.pref(), tname.uri()), ii);
           nsc.add(pref, muri);
-        } else if(!eq(pref, EMPTY) && !eq(pref, XML) && !nsc.contains(pref)) {
+        } else if(!nsc.contains(pref) && !(eq(pref, EMPTY) && eq(uri, EMPTY))) {
           nsc.add(pref, uri);
         }
       } else if(uri != null) {

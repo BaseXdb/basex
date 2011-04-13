@@ -43,8 +43,8 @@ public final class Cast extends Single {
         type.type == AtomType.URI) {
       // skip cast if specified and return types are equal
       final SeqType t = expr.type();
-      if(t.eq(type)) e = expr;
-      else if(t.type == type.type && t.one() && type.zeroOrOne()) e = expr;
+      if(t.eq(type) || t.type == type.type && t.one() && type.zeroOrOne())
+        e = expr;
       if(e != this) optPre(e, ctx);
     }
     return e;
@@ -53,7 +53,7 @@ public final class Cast extends Single {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return type.cast(expr, this, ctx);
+    return type.cast(expr.item(ctx, ii), this, true, ctx, ii);
   }
 
   @Override

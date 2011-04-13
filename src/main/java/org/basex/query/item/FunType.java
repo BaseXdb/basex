@@ -95,12 +95,14 @@ public final class FunType implements Type {
   }
 
   @Override
-  public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+  public FunItem e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(!it.func() || ((FunType) it.type).args.length != args.length)
-      Err.cast(ii, this, it);
-    return it.type.instance(this) ? it :
-      FunItem.coerce(ctx, ii, (FunItem) it, this);
+    if(!it.func()) throw Err.cast(ii, this, it);
+    final FunItem f = (FunItem) it;
+    if(this == ANY) return f;
+    if(f.arity() != args.length) throw Err.cast(ii, this, it);
+
+    return f.type.instance(this) ? f : FunItem.coerce(ctx, ii, f, this);
   }
 
   @Override

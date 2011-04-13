@@ -41,11 +41,11 @@ public class XMLParser extends FileParser {
     scanner.more();
     while(true) {
       if(scanner.type == Type.TEXT) {
-        builder.text(scanner.token);
+        builder.text(scanner.token.finish());
       } else if(scanner.type == Type.COMMENT) {
-        builder.comment(scanner.token);
+        builder.comment(scanner.token.finish());
       } else if(scanner.type == Type.PI) {
-        builder.pi(scanner.token);
+        builder.pi(scanner.token.finish());
       } else if(scanner.type == Type.EOF) {
         break;
       } else if(scanner.type != Type.DTD) {

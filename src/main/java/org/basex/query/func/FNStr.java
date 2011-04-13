@@ -53,7 +53,7 @@ final class FNStr extends Fun {
 
     switch(def) {
       case CODESTR:
-        return cp2str(e.iter(ctx));
+        return cp2str(ctx.iter(e));
       case COMPARE:
         if(expr.length == 3) checkColl(expr[2], ctx, input);
         Item it1 = e.item(ctx, input);
@@ -235,7 +235,7 @@ final class FNStr extends Fun {
   private Item strjoin(final QueryContext ctx) throws QueryException {
     final byte[] sep = expr.length == 2 ? checkStr(expr[1], ctx) : EMPTY;
     final TokenBuilder tb = new TokenBuilder();
-    final Iter iter = expr[0].iter(ctx);
+    final Iter iter = ctx.iter(expr[0]);
     int c = 0;
     for(Item i; (i = iter.next()) != null;) {
       tb.add(checkEStr(i));

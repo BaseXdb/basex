@@ -5,8 +5,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.item.Value;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -47,13 +46,13 @@ public final class Catch extends Single {
   }
 
   /**
-   * Catch iterator.
+   * Catch value.
    * @param ctx query context
    * @param ex thrown exception
    * @return resulting item
    * @throws QueryException query exception
    */
-  Iter iter(final QueryContext ctx, final QueryException ex)
+  Value value(final QueryContext ctx, final QueryException ex)
       throws QueryException {
 
     final byte[] code = Token.token(ex.code());
@@ -70,7 +69,7 @@ public final class Catch extends Single {
     if(var.length > 2) {
       ctx.vars.add(var[2].bind(ex.value(), ctx).copy());
     }
-    final Iter ir = ItemCache.get(ctx.iter(expr));
+    final Value ir = ctx.value(expr);
     ctx.vars.reset(s);
     return ir;
   }
@@ -92,6 +91,6 @@ public final class Catch extends Single {
 
   @Override
   public String toString() {
-    return "catch { " + expr + "}";
+    return "catch { " + expr + " }";
   }
 }

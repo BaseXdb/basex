@@ -28,18 +28,19 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.io.IO;
 import org.basex.util.Undo;
 import org.basex.util.Util;
 import static org.basex.util.Token.*;
 
 /**
- * This class offers a fast text input, using the {@link BaseXTextRenderer}
- * class.
+ * This class provides a text viewer and editor, using the
+ * {@link BaseXTextRenderer} class to render the text.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class BaseXText extends BaseXPanel {
+public class BaseXEditor extends BaseXPanel {
   /** Text array to be written. */
   protected transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
   /** Renderer reference. */
@@ -56,7 +57,7 @@ public class BaseXText extends BaseXPanel {
    * @param edit editable flag
    * @param win parent window
    */
-  public BaseXText(final boolean edit, final Window win) {
+  public BaseXEditor(final boolean edit, final Window win) {
     super(win);
     setFocusable(true);
     setFocusTraversalKeysEnabled(!edit);
@@ -91,7 +92,7 @@ public class BaseXText extends BaseXPanel {
     Undo un = null;
     if(edit) {
       setBackground(Color.white);
-      setBorder(new MatteBorder(1, 1, 1, 1, GUIConstants.COLORS[6]));
+      setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.COLORS[6]));
       un = new Undo();
     } else {
       mode(Fill.NONE);
@@ -117,8 +118,8 @@ public class BaseXText extends BaseXPanel {
    * Adds a search dialog.
    * @param f search field
    */
-  public final void addSearch(final BaseXTextField f) {
-    f.addSearch(this);
+  public final void setSearch(final BaseXTextField f) {
+    f.setSearch(this);
     find = f;
   }
 
@@ -181,6 +182,16 @@ public class BaseXText extends BaseXPanel {
   }
 
   /**
+   * Sets a syntax highlighter, based on the file format.
+   * @param file file reference
+   */
+  public final void setSyntax(final IO file) {
+    // choose XML or XQuery highlighter
+    setSyntax(file.name().endsWith(IO.XMLSUFFIX) ? new XMLSyntax() :
+      new XQuerySyntax());
+  }
+
+  /**
    * Sets a syntax highlighter.
    * @param s syntax reference
    */
@@ -222,6 +233,7 @@ public class BaseXText extends BaseXPanel {
 
   @Override
   public final void setFont(final Font f) {
+    super.setFont(f);
     if(rend != null) {
       rend.setFont(f);
       rend.repaint();
@@ -766,7 +778,7 @@ public class BaseXText extends BaseXPanel {
       text.setCaret();
       rend.calc();
       showCursor(2);
-      release(true);
+      release(false);
     }
   }
 

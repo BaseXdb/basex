@@ -26,6 +26,8 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class BaseXGUI {
+  /** Database context. */
+  final Context context = new Context();
   /** Mac OS X GUI optimizations. */
   GUIMacOSX osxGUI;
   /** File, specified as argument. */
@@ -33,7 +35,7 @@ public final class BaseXGUI {
 
   /**
    * Main method.
-   * @param args command-line arguments
+   * @param args command-line arguments.
    * An XML document or query file can be specified as argument
    */
   public static void main(final String[] args) {
@@ -57,8 +59,7 @@ public final class BaseXGUI {
     }
 
     // read properties
-    final Context ctx = new Context();
-    ctx.prop.set(Prop.CACHEQUERY, true);
+    context.prop.set(Prop.CACHEQUERY, true);
     Prop.gui = true;
     final GUIProp gprop = new GUIProp();
 
@@ -70,7 +71,7 @@ public final class BaseXGUI {
         // initialize look and feel
         init(gprop);
         // open main window
-        final GUI gui = new GUI(ctx, gprop);
+        final GUI gui = new GUI(context, gprop);
         if(osxGUI != null) osxGUI.init(gui);
 
         // open specified document or database
@@ -80,7 +81,7 @@ public final class BaseXGUI {
           boolean xq = false;
           for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
           if(xq) {
-            gui.query.setQuery(io);
+            gui.query.open(io);
           } else {
             gui.execute(new Check(input));
             gprop.set(GUIProp.CREATEPATH, io.path());

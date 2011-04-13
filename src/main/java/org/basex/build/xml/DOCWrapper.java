@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Stack;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -74,12 +73,11 @@ public final class DOCWrapper extends Parser {
           }
           builder.startElem(token(n.getNodeName()), atts);
         } else if(n instanceof Text) {
-          builder.text(new TokenBuilder(n.getNodeValue()));
+          builder.text(token(n.getNodeValue()));
         } else if(n instanceof Comment) {
-          builder.comment(new TokenBuilder(n.getNodeValue()));
+          builder.comment(token(n.getNodeValue()));
         } else if(n instanceof ProcessingInstruction) {
-          builder.pi(new TokenBuilder(n.getNodeName() + ' ' +
-              n.getNodeValue()));
+          builder.pi(token(n.getNodeName() + ' ' + n.getNodeValue()));
         }
         ++nodes;
       } else {

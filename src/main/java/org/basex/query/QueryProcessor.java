@@ -16,6 +16,7 @@ import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.FunJava;
+import org.basex.query.item.Atm;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
@@ -72,7 +73,7 @@ public final class QueryProcessor extends Progress {
       sc.useDelimiter(",");
       while(sc.hasNext()) {
         final String[] sp = sc.next().split("=", 2);
-        bind(sp[0], sp.length > 1 ? sp[1] : "", "");
+        bind(sp[0], new Atm(token(sp.length > 1 ? sp[1] : "")));
       }
       // parse query
       ctx.parse(query);
@@ -254,7 +255,7 @@ public final class QueryProcessor extends Progress {
   /**
    * Checks if the specified query performs updates.
    * @param ctx context reference
-   * @param qu query
+   * @param qu query string
    * @return result of check
    */
   public static boolean updating(final Context ctx, final String qu) {
@@ -275,11 +276,45 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
+   * Removes comments from the specified string.
+   * @param qu query string
+   * @param max maximum string length
+   * @return result
+   */
+  public static String removeComments(final String qu, final int max) {
+    final StringBuilder sb = new StringBuilder();
+    int m = 0;
+    boolean s = false;
+    final int cl = qu.length();
+    for(int c = 0; c < cl && sb.length() < max; ++c) {
+      final char ch = qu.charAt(c);
+      if(ch == 0x0d) continue;
+      if(ch == '(' && c + 1 < cl && qu.charAt(c + 1) == ':') {
+        if(m == 0 && !s) {
+          sb.append(' ');
+          s = true;
+        }
+        ++m;
+        ++c;
+      } else if(m != 0 && ch == ':' && c + 1 < cl && qu.charAt(c + 1) == ')') {
+        --m;
+        ++c;
+      } else if(m == 0) {
+        if(ch > ' ') sb.append(ch);
+        else if(!s) sb.append(' ');
+        s = ch <= ' ';
+      }
+    }
+    if(sb.length() >= max) sb.append("...");
+    return sb.toString().trim();
+  }
+
+  /**
    * Returns the query plan in the dot notation.
    * @param ser serializer
-   * @throws Exception exception
+   * @throws IOException I/O exception
    */
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ctx.plan(ser);
   }
 

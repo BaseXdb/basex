@@ -7,6 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.FunItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
+import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -18,10 +19,9 @@ import org.basex.util.TokenBuilder;
  * Function call.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Christian Gruen
+ * @author Leo Woerteler
  */
 public final class DynFunCall extends Arr {
-
   /**
    * Function constructor.
    * @param ii input info
@@ -30,6 +30,17 @@ public final class DynFunCall extends Arr {
    */
   public DynFunCall(final InputInfo ii, final Expr fun, final Expr[] arg) {
     super(ii, Array.add(arg, fun));
+  }
+
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+    final Type t = fun().type().type;
+    if(t instanceof FunType) {
+      final FunType ft = (FunType) t;
+      if(ft.ret != null) type = ft.ret;
+    }
+    return this;
   }
 
   @Override
@@ -42,6 +53,17 @@ public final class DynFunCall extends Arr {
     for(int a = 0; a < n; ++a) argv[a] = expr[a].value(ctx);
 
     return getFun(ctx).invItem(ctx, ii, argv);
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    final int n = expr.length - 1;
+
+    final Value[] argv = new Value[n];
+    // evaluate arguments
+    for(int a = 0; a < n; ++a) argv[a] = expr[a].value(ctx);
+
+    return getFun(ctx).invValue(ctx, input, argv);
   }
 
   @Override
