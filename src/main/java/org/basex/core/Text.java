@@ -1349,9 +1349,10 @@ public interface Text {
   /** Developer info. */
   String DEVELOPER = lang("da_dev") + ": Christian Gr\u00FCn";
   /** Contributors info. */
-  String CONTRIBUTE1 = lang("da_cont1") + ": Andreas Weiler, Michael Seiferle,";
+  String CONTRIBUTE1 = lang("da_cont1") +
+  ": Andreas Weiler, Michael Seiferle, Lukas Kircher,";
   /** Developer names. */
-  String CONTRIBUTE2 = "Lukas Kircher, Alexander Holupirek " +
+  String CONTRIBUTE2 = "Leo W\u00F6rteler, Alexander Holupirek, " +
     lang("da_cont2");
   /** Translation. */
   String TRANSLATION = lang("da_translation") + COLS;

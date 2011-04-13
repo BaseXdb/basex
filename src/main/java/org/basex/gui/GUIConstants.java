@@ -153,14 +153,16 @@ public final class GUIConstants {
 
   /** Icon type. */
   public enum Msg {
-    /** Warning icon. */
+    /** Warning message. */
     WARN("warn", "warning"),
-    /** Error icon. */
+    /** Error message. */
     ERROR("error", "error"),
-    /** Success icon. */
+    /** Success message. */
     SUCCESS("ok", "information"),
-    /** Question icon. */
-    QUESTION("warn", "question");
+    /** Question message. */
+    QUESTION("warn", "question"),
+    /** Yes/no/cancel message. */
+    YESNOCANCEL("warn", "question");
 
     /** Small icon. */
     public final Icon small;

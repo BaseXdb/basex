@@ -129,6 +129,8 @@ public final class DialogServer extends Dialog {
     stop = new BaseXButton(BUTTONSTOP, this);
     connect = new BaseXButton(BUTTONCONNECT, this);
     disconnect = new BaseXButton(BUTTONDISCONNECT, this);
+    BaseXButton.setMnemonics(start, stop, connect, disconnect);
+
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), this);
     host.addKeyListener(keys);
     ports = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.SERVERPORT)),
@@ -197,6 +199,7 @@ public final class DialogServer extends Dialog {
     sedb = new BaseXEditor(false, this);
     sedb.setFont(start.getFont());
     refreshSess = new BaseXButton(BUTTONREFRESH, this);
+    refreshSess.setMnemonic();
 
     p = new BaseXBack(new GridLayout(2, 1, 0, 2));
 
@@ -219,6 +222,8 @@ public final class DialogServer extends Dialog {
     logs.border(8).layout(new BorderLayout());
     delete = new BaseXButton(BUTTONDELETE, this);
     deleteAll = new BaseXButton(BUTTONDELALL, this);
+    BaseXButton.setMnemonics(delete, deleteAll);
+
     logc = new BaseXCombo(this);
     logt = new BaseXEditor(false, this);
     logt.setFont(start.getFont());
@@ -227,6 +232,7 @@ public final class DialogServer extends Dialog {
     logt.border(5, 5, 5, 5);
     infoL = new BaseXLabel(" ").border(8, 0, 0, 0);
     refreshLog = new BaseXButton(BUTTONREFRESH, this);
+    refreshLog.setMnemonic();
 
     p = new BaseXBack(new BorderLayout());
     pp = new BaseXBack();
@@ -341,13 +347,14 @@ public final class DialogServer extends Dialog {
           icon = Msg.ERROR;
         }
       } else if(cmp == deleteAll) {
+        File file = null;
         for(int i = 0; i < logc.getItemCount(); ++i) {
           final File f = new File(logdir + logc.getItemAt(i).toString());
-          if(!f.delete()) {
-            msg2 = Util.info(DBNOTDELETED, f.getName());
-            icon = Msg.ERROR;
-            break;
-          }
+          if(!f.delete()) file = f;
+        }
+        if(file != null) {
+          msg2 = Util.info(DBNOTDELETED, file.getName());
+          icon = Msg.ERROR;
         }
         logc.setSelectedIndex(-1);
         refreshLog();

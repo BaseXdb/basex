@@ -274,7 +274,9 @@ public final class GUI extends AGUI {
 
   @Override
   public void dispose() {
-    query.confirm();
+    // close opened queries
+    if(!query.confirm()) return;
+
     final boolean max = getExtendedState() == MAXIMIZED_BOTH;
     gprop.set(GUIProp.MAXSTATE, max);
     if(!max) {

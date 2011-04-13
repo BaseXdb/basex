@@ -1,6 +1,7 @@
 package org.basex.gui.view.editor;
 
 import static org.basex.gui.layout.BaseXKeys.*;
+import static org.basex.util.Token.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import org.basex.core.cmd.XQuery;
@@ -12,7 +13,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 
 /**
  * This class extends the text editor by XQuery features.
@@ -39,7 +39,10 @@ final class EditorArea extends BaseXEditor {
   int threadID;
 
   /** Last input. */
-  byte[] last = Token.EMPTY;
+  byte[] last = EMPTY;
+  /** This flag indicates if the current input is executable, i.e.,
+   *  no XML file and no XQuery module. */
+  boolean exec = true;
 
   /**
    * Constructor.
@@ -84,48 +87,42 @@ final class EditorArea extends BaseXEditor {
 
   @Override
   protected void release(final boolean force) {
-    final byte[] qu = getText();
-    final boolean eq = Token.eq(qu, last);
+    final byte[] in = getText();
+    final boolean eq = eq(in, last);
     if(eq && !force) return;
     view.refresh(mod || !eq, false);
     view.pos.setText(pos());
-    if(file.name().endsWith(IO.XMLSUFFIX)) {
-      last = qu;
-      view.info("", true);
-      return;
-    }
+    gui.context.query = file;
+    last = in;
 
-    final boolean module = module(qu);
-    if(!module && (force || gui.gprop.is(GUIProp.EXECRT))) {
-      view.waitInfo();
-      query(qu, true);
+    if(file.name().endsWith(IO.XMLSUFFIX)) {
+      view.info("", true);
+      exec = false;
     } else {
-      try {
-        last = qu;
-        final String xq = qu.length == 0 ? "." : Token.string(qu);
+      final String qu = in.length == 0 ? "()" : string(in);
+      exec = module(in);
+      if(exec && (force || gui.gprop.is(GUIProp.EXECRT))) {
+        view.startWait();
+        view.stop.setEnabled(true);
+        gui.execute(new XQuery(qu), false);
+      } else {
         final QueryContext ctx = new QueryContext(gui.context);
-        if(module) ctx.module(xq);
-        else ctx.parse(xq);
-        view.info("", true);
-      } catch(final QueryException ex) {
-        view.info(ex.getMessage(), false);
+        try {
+          if(!exec) ctx.module(qu);
+          else ctx.parse(qu);
+          view.info("", true);
+        } catch(final QueryException ex) {
+          view.info(ex.getMessage(), false);
+        }
       }
     }
-  }
-
-  /**
-   * Checks if the query is to be evaluated in realtime.
-   * @return result of check
-   */
-  boolean executable() {
-    return !module(last) && !file.name().endsWith(IO.XMLSUFFIX);
   }
 
   /**
    * Performs the current query.
    */
   void query() {
-    query(getText(), true);
+    release(true);
   }
 
   /**
@@ -144,30 +141,12 @@ final class EditorArea extends BaseXEditor {
   }
 
   /**
-   * Performs the specified query.
-   * @param query to be processed
-   * @param force perform query, even if it has not changed
-   */
-  private void query(final byte[] query, final boolean force) {
-    gui.context.query = file;
-    if(force) {
-      last = query;
-      if(!executable()) return;
-      view.stop.setEnabled(true);
-      final String qu = Token.string(query);
-      gui.execute(new XQuery(qu.trim().isEmpty() ? "()" : qu), false);
-    } else {
-      markError();
-    }
-  }
-
-  /**
    * Verifies if the specified query is a module.
    * @param qu query to check
    * @return result of check
    */
   private boolean module(final byte[] qu) {
-    return QueryProcessor.removeComments(Token.string(qu), 20).startsWith(
+    return QueryProcessor.removeComments(string(qu), 20).startsWith(
         "module namespace ");
   }
 }
