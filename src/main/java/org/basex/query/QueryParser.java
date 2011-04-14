@@ -3105,7 +3105,10 @@ public class QueryParser extends InputParser {
   private IO io(final String fn) {
     IO fl = IO.get(fn);
     // if file does not exist, try base uri
-    if(!fl.exists()) fl = ctx.base().merge(fn);
+    if(!fl.exists()) {
+      final IO base = ctx.base();
+      if(base != null) fl = base.merge(fn);
+    }
     // if file does not exist, try query directory
     if(!fl.exists() && file != null) fl = file.merge(fn);
     return fl;

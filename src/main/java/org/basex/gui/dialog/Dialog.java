@@ -167,9 +167,16 @@ public abstract class Dialog extends JDialog {
     final BaseXBack panel = new BaseXBack(Fill.NONE).
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
 
-    for(final Object b : buttons) {
-      panel.add(b instanceof Component ?
-        (Component) b : new BaseXButton(b.toString(), dialog));
+    final StringBuilder mnem = new StringBuilder();
+    for(final Object obj : buttons) {
+      BaseXButton b = null;
+      if(obj instanceof BaseXButton) {
+        b = (BaseXButton) obj;
+      } else {
+        b = new BaseXButton(obj.toString(), dialog);
+      }
+      BaseXButton.setMnemonics(mnem, b);
+      panel.add(b);
     }
 
     final BaseXBack but = new BaseXBack(Fill.NONE).layout(new BorderLayout());
@@ -195,6 +202,19 @@ public abstract class Dialog extends JDialog {
         enableOK((JComponent) c, label, enabled);
       }
     }
+  }
+
+  /**
+   * Static yes/no dialog. Returns a {@code null} reference if the dialog
+   * was canceled.
+   * @param gui parent reference
+   * @param text text
+   * @return true if dialog was confirmed
+   */
+  public static Boolean yesNoCancel(final GUI gui, final String text) {
+    final DialogMessage msg =
+      new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL);
+    return msg.canceled() ? null : msg.ok();
   }
 
   /**

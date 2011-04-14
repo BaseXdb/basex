@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.query.advanced;
 
 import static org.basex.core.Text.*;
 

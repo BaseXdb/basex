@@ -89,7 +89,7 @@ public final class DirParser extends Parser {
         parser = Parser.fileParser(io, prop, targ);
         parser.parse(b);
 
-        if(Util.debug && (++c & 0x3FF) == 0) Util.error(";");
+        if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
       }
     }
   }

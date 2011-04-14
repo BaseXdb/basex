@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.query.simple;
 
 import org.basex.core.AProp;
 import org.basex.core.BaseXException;

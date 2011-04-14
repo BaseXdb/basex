@@ -176,9 +176,11 @@ public final class FTWords extends FTExpr {
               tl = t;
               iat = ia;
             } else if(mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS) {
+              if(ia.indexSize() == 0) return null;
               tl += t;
               iat = FTIndexIterator.intersect(ia, iat, 0);
             } else {
+              if(ia.indexSize() == 0) continue;
               tl = Math.max(t, tl);
               iat = FTIndexIterator.union(ia, iat);
             }

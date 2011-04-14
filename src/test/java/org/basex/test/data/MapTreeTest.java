@@ -7,6 +7,7 @@ import java.util.Random;
 import org.basex.data.MapTree;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
+import org.basex.util.Util;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,10 +18,12 @@ import org.junit.Test;
  * @author Dimitar Popov
  */
 public class MapTreeTest {
+  /** Verbose flag. */
+  private static final boolean VERBOSE = false;
   /** Number of update operations to execute in each test. */
-  private static final int ITERATIONS = 3000;
+  private static final int ITERATIONS = 300;
   /** Initial number of records. */
-  private static final int BASEID = 7000;
+  private static final int BASEID = 700;
   /** Random number generator. */
   private static final Random RANDOM = new Random();
   /** ID -> PRE map to compare to. */
@@ -89,42 +92,42 @@ public class MapTreeTest {
   /** Insert performance: insert at random positions. */
   @Test
   public void testInsertPerformance() {
-    System.err.print("Tested mapping: ");
+    if(VERBOSE) Util.err("Tested mapping: ");
     testInsertPerformance(testedmap);
   }
 
   /** Delete performance: delete at random positions. */
   @Test
   public void testDeletePerformance() {
-    System.err.print("Tested mapping: ");
+    if(VERBOSE) Util.err("Tested mapping: ");
     testDeletePerformance(testedmap, basemap);
   }
 
   /** Search performance: insert at random positions and the search. */
   @Test
   public void testSearchPerformance() {
-    System.err.print("Tested mapping: ");
+    if(VERBOSE) Util.err("Tested mapping: ");
     testSearchPerformance(testedmap);
   }
 
   /** Dummy insert performance: insert at random positions. */
   @Test
   public void testInsertPerformanceDummy() {
-    System.err.print("Dummy mapping: ");
+    if(VERBOSE) Util.err("Dummy mapping: ");
     testInsertPerformance(basemap);
   }
 
   /** Dummy delete performance: delete at random positions. */
   @Test
   public void testDeletePerformanceDummy() {
-    System.err.print("Dummy mapping: ");
+    if(VERBOSE) Util.err("Dummy mapping: ");
     testDeletePerformance(basemap, basemap.copy());
   }
 
   /** Dummy search performance: insert at random positions and the search. */
   @Test
   public void testSearchPerformanceDummy() {
-    System.err.print("Dummy mapping: ");
+    if(VERBOSE) Util.err("Dummy mapping: ");
     testSearchPerformance(basemap);
   }
 
@@ -142,7 +145,7 @@ public class MapTreeTest {
     // perform the actual test:
     final Performance p = new Performance();
     for(int i = 0; i < d.length; ++i) m.insert(d[i][1], d[i][0]);
-    System.err.println(d.length + " records inserted in: " + p);
+    if(VERBOSE) Util.errln(d.length + " records inserted in: " + p);
   }
 
   /**
@@ -162,7 +165,7 @@ public class MapTreeTest {
     // perform the test:
     final Performance p = new Performance();
     for(int i = 0; i < d.length; i++) m.delete(d[i][1], d[i][0]);
-    System.err.println(d.length + " records deleted in: " + p);
+    if(VERBOSE) Util.errln(d.length + " records deleted in: " + p);
   }
 
   /**
@@ -176,7 +179,7 @@ public class MapTreeTest {
 
     final Performance p = new Performance();
     for(int i = 0; i < n; ++i) m.pre(i);
-    System.err.println(n + " records found in: " + p);
+    if(VERBOSE) Util.errln(n + " records found in: " + p);
   }
 
   /**
@@ -186,9 +189,9 @@ public class MapTreeTest {
    */
   private void insert(final int pre, final int id) {
     insertedpres.add(pre);
-    // System.err.println("insert(" + pre + ", " + id + ")");
+    // if(VERBOSE) Util.errln("insert(" + pre + ", " + id + ")");
     testedmap.insert(id, pre);
-    // System.err.println(testedmap);
+    // if(VERBOSE) Util.errln(testedmap);
     basemap.insert(id, pre);
   }
 
@@ -198,9 +201,9 @@ public class MapTreeTest {
    */
   private void delete(final int pre) {
     deletedpres.add(pre);
-    // System.err.println("delete(" + pre + ", " + basemap.id(pre) + ")");
+    // if(VERBOSE) Util.errln("delete(" + pre + ", " + basemap.id(pre) + ")");
     testedmap.delete(basemap.id(pre), pre);
-    // System.err.println(testedmap);
+    // if(VERBOSE) Util.errln(testedmap);
     basemap.delete(basemap.id(pre), pre);
   }
 

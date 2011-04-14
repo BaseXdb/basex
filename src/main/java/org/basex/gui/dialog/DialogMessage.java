@@ -19,8 +19,14 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 final class DialogMessage extends Dialog {
-  /** Button. */
-  final BaseXButton button;
+  /** This flag indicates if the dialog was canceled. */
+  boolean canceled = true;
+  /** Ok/yes button. */
+  BaseXButton yes;
+  /** No button. */
+  BaseXButton no;
+  /** Cancel button. */
+  BaseXButton cancel;
 
   /**
    * Default constructor.
@@ -41,20 +47,29 @@ final class DialogMessage extends Dialog {
     final BaseXEditor text = new BaseXEditor(false, this);
     text.setFont(p.getFont());
     text.setText(Token.token(txt));
-    text.setFocusable(false);
+    text.setFocusable(true);
     set(text, BorderLayout.CENTER);
 
-    final boolean simple = ic != Msg.QUESTION;
-    button = new BaseXButton(simple ? BUTTONOK : BUTTONYES, this);
-    final BaseXBack buttons = simple ? newButtons(this, button) :
-        newButtons(this, button, new BaseXButton(BUTTONNO, this));
+    BaseXBack buttons;
+    if(ic == Msg.QUESTION || ic == Msg.YESNOCANCEL) {
+      yes = new BaseXButton(BUTTONYES, this);
+      no = new BaseXButton(BUTTONNO, this);
+      if(ic == Msg.QUESTION) {
+        buttons = newButtons(this, yes, no);
+      } else {
+        cancel = new BaseXButton(BUTTONCANCEL, this);
+        buttons = newButtons(this, yes, no, cancel);
+      }
+    } else {
+      yes = new BaseXButton(BUTTONOK, this);
+      buttons = newButtons(this, yes);
+    }
     set(buttons, BorderLayout.SOUTH);
 
     SwingUtilities.invokeLater(new Thread() {
       @Override
       public void run() {
-        button.requestFocusInWindow();
-        text.setFocusable(true);
+        yes.requestFocusInWindow();
       }
     });
     finish(null);
@@ -62,7 +77,16 @@ final class DialogMessage extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    if(cmp == button) close();
+    canceled = cmp != yes && cmp != no;
+    if(cmp == yes) close();
     else cancel();
+  }
+
+  /**
+   * States if the dialog window was canceled.
+   * @return true when dialog was confirmed
+   */
+  public boolean canceled() {
+    return canceled;
   }
 }

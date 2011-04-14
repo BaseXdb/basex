@@ -2,6 +2,7 @@ package org.basex.gui.view.editor;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.util.Token.*;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -40,7 +41,6 @@ import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
 import org.basex.util.BoolList;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -97,7 +97,7 @@ public final class EditorView extends View {
 
     final BaseXButton openB = BaseXButton.command(GUICommands.EDITOPEN, gui);
     final BaseXButton saveB = new BaseXButton(gui, "editsave",
-        Token.token(GUISAVETT));
+        token(GUISAVETT));
     final BaseXButton hist = new BaseXButton(gui, "hist", HELPRECENT);
 
     find = new BaseXTextField(gui);
@@ -247,7 +247,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    go.setEnabled(getEditor().executable() && !gui.gprop.is(GUIProp.EXECRT));
+    go.setEnabled(getEditor().exec && !gui.gprop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked;
     filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
@@ -298,20 +298,20 @@ public final class EditorView extends View {
 
   /**
    * Saves the contents of the currently opened editor.
+   * @return {@code false} if operation was canceled
    */
-  public void save() {
+  public boolean save() {
     final EditorArea edit = getEditor();
-    if(edit.opened) {
-      save(edit);
-    } else {
-      saveAs();
-    }
+    if(!edit.opened) return saveAs();
+    save(edit);
+    return true;
   }
 
   /**
    * Saves the contents of the currently opened editor under a new name.
+   * @return {@code false} if operation was canceled
    */
-  public void saveAs() {
+  public boolean saveAs() {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
     final BaseXFileChooser fc =
@@ -319,10 +319,11 @@ public final class EditorView extends View {
     fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
 
     final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
-    if(file == null) return;
+    if(file == null) return false;
     edit.file = file;
     edit.setSyntax(file);
     save(edit);
+    return true;
   }
 
   /**
@@ -367,13 +368,16 @@ public final class EditorView extends View {
   }
 
   /**
-   * Closes a file.
+   * Closes an editor.
+   * @param edit editor to be closed. {@code null} closes the currently
+   * opened editor.
+   * opened editor is to be closed
    */
-  public void close() {
-    // close file
-    EditorArea edit = getEditor();
-    confirm(edit);
-    tabs.remove(edit);
+  public void close(final EditorArea edit) {
+    final EditorArea ea = edit != null ? edit : getEditor();
+    if(!confirm(ea)) return;
+
+    tabs.remove(ea);
     final int t = tabs.getTabCount();
     final int i = tabs.getSelectedIndex();
     if(t == 1) {
@@ -397,9 +401,9 @@ public final class EditorView extends View {
   }
 
   /**
-   * Displays a waiting status.
+   * Starts a waiting thread, which shows a waiting info after a short timeout.
    */
-  public void waitInfo() {
+  void startWait() {
     final int thread = ++threadID;
     new Thread() {
       @Override
@@ -427,9 +431,13 @@ public final class EditorView extends View {
 
   /**
    * Shows a quit dialog for all modified query files.
+   * @return {@code false} if confirmation was canceled
    */
-  public void confirm() {
-    for(final EditorArea edit : editors()) confirm(edit);
+  public boolean confirm() {
+    for(final EditorArea edit : editors()) {
+      if(!confirm(edit)) return false;
+    }
+    return true;
   }
 
   /**
@@ -531,8 +539,7 @@ public final class EditorView extends View {
     close.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        tabs.setSelectedComponent(edit);
-        close();
+        close(edit);
       }
     });
     tab.add(close, BorderLayout.EAST);
@@ -573,10 +580,15 @@ public final class EditorView extends View {
   /**
    * Shows a quit dialog the specified editor.
    * @param edit editor to be saved
+   * @return {@code false} if confirmation was canceled
    */
-  private void confirm(final EditorArea edit) {
-    if(edit.mod && Dialog.confirm(gui,
-        Util.info(XQUERYCONF, edit.file.name()))) save();
+  private boolean confirm(final EditorArea edit) {
+    if(edit.mod) {
+      final Boolean ok = Dialog.yesNoCancel(gui,
+          Util.info(XQUERYCONF, edit.file.name()));
+      if(ok == null || ok && !save()) return false;
+    }
+    return true;
   }
 
   /**
@@ -615,7 +627,7 @@ public final class EditorView extends View {
       errPos = edit.last.length;
       // find approximate error position
       final int ll = errPos;
-      for(int e = 0, l = 1, c = 1; e < ll; ++c, ++e) {
+      for(int e = 0, l = 1, c = 1; e < ll; ++c, e += cl(edit.last, e)) {
         if(l > el || l == el && c == ec) {
           errPos = e;
           break;

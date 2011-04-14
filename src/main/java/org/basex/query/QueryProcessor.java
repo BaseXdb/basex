@@ -287,7 +287,7 @@ public final class QueryProcessor extends Progress {
     boolean s = false;
     final int cl = qu.length();
     for(int c = 0; c < cl && sb.length() < max; ++c) {
-      char ch = qu.charAt(c);
+      final char ch = qu.charAt(c);
       if(ch == 0x0d) continue;
       if(ch == '(' && c + 1 < cl && qu.charAt(c + 1) == ':') {
         if(m == 0 && !s) {

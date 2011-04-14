@@ -77,6 +77,7 @@ public final class OptimizeAll extends ACreate {
 
     // move the new one into place
     final File f = context.prop.dbpath(name);
+    // [LW] externalize text (DBNOTOPTIMIZED)
     if(!f.renameTo(path)) return error("Rebuilt database '%' couldn't be " +
         "renamed back to '%'.", name, m.name);
 

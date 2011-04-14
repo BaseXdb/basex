@@ -319,7 +319,7 @@ public final class ResponseHandler {
     // it is equal to 'text/plain' (RFC 1341)
     byte[] partContType = TXT_PLAIN;
     String charset = null;
-    byte[] firstLine = readLine(io);
+    final byte[] firstLine = readLine(io);
     // Last line is reached:
     if(firstLine == null || eq(firstLine, end)) return null;
     final NodeCache partCh = new NodeCache();
@@ -428,7 +428,7 @@ public final class ResponseHandler {
    */
   private static byte[] extractContentType(final String c) {
     if(c == null) return OCT_STREAM;
-    int end = c.indexOf(';');
+    final int end = c.indexOf(';');
     return end == -1 ? token(c) : subtoken(token(c), 0, end);
   }
 
