@@ -522,6 +522,54 @@ public abstract class Data {
   }
 
   /**
+   * Fast replace.
+   * @param replacePre pre value to be replaced
+   * @param d replace data
+   */
+  public final void fastReplace(final int replacePre, final Data d) {
+    final int dsize = d.meta.size;
+    final int buf = Math.min(dsize, IO.BLOCKSIZE >> IO.NODEPOWER);
+    buffer(buf);
+    int dpre = -1;
+    while(++dpre != dsize) {
+      final int dkind = d.kind(dpre);
+      final int dpar = d.parent(dpre, dkind);
+      final int pre = replacePre + dpre;
+      final int dis = dpar >= 0 ? dpre - dpar : pre -
+          parent(replacePre, kind(replacePre));
+
+      switch(dkind) {
+        case DOC:
+          // add document
+          doc(pre, d.size(dpre, dkind), d.text(dpre, true));
+          meta.ndocs++;
+          break;
+        case ELEM:
+          // add element
+          byte[] nm = d.name(dpre, dkind);
+          elem(dis, tags.index(nm, null, false), d.attSize(dpre, dkind),
+              d.size(dpre, dkind), ns.uri(nm, true), false);
+          break;
+        case TEXT:
+        case COMM:
+        case PI:
+          // add text
+          text(pre, dis, d.text(dpre, true), dkind);
+          break;
+        case ATTR:
+          // add attribute
+          nm = d.name(dpre, dkind);
+          attr(pre, dis, atts.index(nm, null, false), d.text(dpre, false),
+              ns.uri(nm, false), false);
+          break;
+      }
+    }
+
+    table.replace(replacePre, buffer());
+    buffer(1);
+  }
+
+  /**
    * Deletes a node and its descendants.
    * @param pre pre value of the node to delete
    */

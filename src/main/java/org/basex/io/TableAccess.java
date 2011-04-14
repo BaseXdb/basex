@@ -1,6 +1,7 @@
 package org.basex.io;
 
 import java.io.IOException;
+
 import org.basex.data.MetaData;
 
 /**
@@ -103,6 +104,13 @@ public abstract class TableAccess {
    * @param v value to be written
    */
   public abstract void write5(int p, int o, long v);
+
+  /**
+   * Efficient replace method.
+   * @param pre node to be replaced
+   * @param entries new entries
+   */
+  public abstract void replace(int pre, byte[] entries);
 
   /**
    * Deletes the specified number of entries from the database.

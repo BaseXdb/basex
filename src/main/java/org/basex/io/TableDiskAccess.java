@@ -175,7 +175,6 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /* Note to delete method: Freed blocks are currently ignored. */
-
   @Override
   public void delete(final int first, final int nr) {
     // mark index as dirty and get first block
@@ -243,6 +242,47 @@ public final class TableDiskAccess extends TableAccess {
     fpres[index] = first;
     fpre = first;
     updatePre(nr);
+  }
+
+  @Override
+  public void replace(final int pre, final byte[] entries) {
+    if(entries.length == 0) return;
+
+    // alternative correct? cursor(pre)
+    int blockOffset = cursor(pre - 1) + (1 << IO.NODEPOWER);
+    final int numberOfRecords = entries.length >>> IO.NODEPOWER;
+    final int rightSiblingPre = pre + numberOfRecords;
+
+    // entries to be replaced are within a block
+    if(rightSiblingPre <= npre) {
+      System.arraycopy(entries, 0, bf.data, blockOffset, entries.length);
+      bf.dirty = true;
+      dirty = true;
+      // entries to be replaced are distributed over more than one block
+    } else {
+      final int lastToOwPre = pre + numberOfRecords - 1;
+      int currentSourcePos = 0;
+      while(lastToOwPre >= npre) {
+        // on the first block we start at pre, the following blocks at fpre
+        final int firstOwPreCurrentBlock = Math.max(fpre, pre);
+        final int lastOwPreCurrentBlock = npre > lastToOwPre ? lastToOwPre :
+          npre - 1;
+        final int nrOfNodesToOw = lastOwPreCurrentBlock -
+          firstOwPreCurrentBlock + 1;
+        final int nrOfEntriesToOw = nrOfNodesToOw << IO.NODEPOWER;
+        System.arraycopy(entries, currentSourcePos, bf.data, blockOffset,
+            nrOfEntriesToOw);
+        bf.dirty = true;
+        dirty = true;
+
+        // last step - fetch next block
+        readBlock(index + 1);
+        blockOffset = 0;
+        currentSourcePos += nrOfEntriesToOw;
+      }
+      bf.dirty = true;
+      dirty = true;
+    }
   }
 
   @Override

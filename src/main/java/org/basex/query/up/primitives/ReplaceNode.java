@@ -2,6 +2,7 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
 import org.basex.data.Data;
+import org.basex.data.DiskData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
@@ -34,11 +35,16 @@ public final class ReplaceNode extends NodeCopy {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     int pre = n.pre + add;
-    final int par = d.parent(pre, d.kind(pre));
+    final int kind = d.kind(pre);
+    final int par = d.parent(pre, kind);
 
     if(n.type == NodeType.TXT && md.meta.size == 1 && md.kind(0) == Data.TEXT) {
       // overwrite existing text node
       d.replace(pre, Data.TEXT, md.text(0, true));
+      // check if simple, fast replace is possible
+    } else if(md.meta.size > 0 && d instanceof DiskData && d.ns.size() == 0
+        && md.ns.size() == 0 && d.size(pre, kind) == md.meta.size) {
+      d.fastReplace(pre, md);
     } else {
       d.delete(pre);
       if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
