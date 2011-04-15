@@ -52,30 +52,32 @@ public class BaseX extends Main {
    */
   protected BaseX(final String... args) {
     super(args);
-    if(success) run();
+    check(success);
+    run();
   }
 
   @Override
   public void run() {
-    boolean ok = true;
     try {
       session();
 
       boolean u = false;
-      if(input != null) ok = execute(new Check(input), verbose);
+      if(input != null) {
+        check(execute(new Check(input), verbose));
+      }
 
       if(file != null) {
         // query file contents
         context.query = IO.get(file);
         final String qu = content();
-        if(qu != null) ok = execute(new XQuery(qu), verbose);
+        check(qu != null && execute(new XQuery(qu), verbose));
       } else if(query != null) {
         // query file contents
-        ok = execute(new XQuery(query), verbose);
+        check(execute(new XQuery(query), verbose));
       } else if(commands != null) {
         // execute command-line arguments
         final Boolean b = execute(commands);
-        ok = b == null || b;
+        check(b == null || b);
       } else {
         // enter interactive mode
         Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
@@ -85,9 +87,8 @@ public class BaseX extends Main {
       quit(u);
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));
-      ok = false;
+      check(false);
     }
-    if(!ok) System.exit(1);
   }
 
   /**
@@ -97,7 +98,7 @@ public class BaseX extends Main {
   private String content() {
     final IO io = IO.get(file);
     if(!io.exists()) {
-      Util.errln(FILEWHICH, file);
+      Util.errln(INFOERROR + FILEWHICH, file);
     } else {
       try {
         return TextInput.content(io).toString().trim();

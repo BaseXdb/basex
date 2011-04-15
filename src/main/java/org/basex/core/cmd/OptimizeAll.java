@@ -50,9 +50,7 @@ public final class OptimizeAll extends ACreate {
     size = m.size;
 
     // find unique temporary database name
-    String name;
-    do name = String.format("%08x", (int) (Math.random() * Integer.MAX_VALUE));
-    while(prop.dbexists(name = m.name + '_'  + name));
+    final String name = m.random();
 
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(new DBParser(), m.prop);

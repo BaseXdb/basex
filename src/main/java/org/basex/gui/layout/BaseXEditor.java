@@ -166,7 +166,8 @@ public class BaseXEditor extends BaseXPanel {
     boolean eq = true;
     for(int r = 0; r < s; ++r) {
       final byte b = t[r];
-      if(b < 0 || b >= ' ' || b == 0x09 || b == 0x0A) t[ns++] = t[r];
+      // support characters, highlighting codes, tabs and newlines
+      if(b < 4 || b >= ' ' || b == 0x09 || b == 0x0A) t[ns++] = t[r];
       eq &= ns < ts && ns < s && t[ns] == tt[ns];
     }
     eq &= ns == ts;
