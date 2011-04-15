@@ -1,5 +1,5 @@
-@setlocal
 @echo off
+setlocal
 
 REM Path to this script
 set PWD=%~dp0
