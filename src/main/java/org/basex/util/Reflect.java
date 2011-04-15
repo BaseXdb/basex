@@ -50,7 +50,7 @@ public final class Reflect {
 
     try {
       try {
-        return clazz.getMethod(name, types);
+        return clazz != null ? clazz.getMethod(name, types) : null;
       } catch(final Exception ex) {
         final Method m = clazz.getDeclaredMethod(name, types);
         m.setAccessible(true);
@@ -70,10 +70,12 @@ public final class Reflect {
    */
   public static Constructor<?> find(final Class<?> clazz,
       final Class<?>... types) {
+
     try {
       try {
-        return clazz.getConstructor(types);
+        return clazz != null ? clazz.getConstructor(types) : null;
       } catch(final Exception ex) {
+        System.out.println(clazz);
         final Constructor<?> m = clazz.getDeclaredConstructor(types);
         m.setAccessible(true);
         return m;
@@ -91,7 +93,7 @@ public final class Reflect {
    */
   public static Object get(final Class<?> clazz) {
     try {
-      return clazz.newInstance();
+      return clazz != null ? clazz.newInstance() : null;
     } catch(final Exception ex) {
       Util.debug(ex);
       return null;
@@ -106,7 +108,7 @@ public final class Reflect {
    */
   public static Object get(final Constructor<?> clazz, final Object... args) {
     try {
-      return clazz.newInstance(args);
+      return clazz != null ? clazz.newInstance(args) : null;
     } catch(final Exception ex) {
       Util.debug(ex);
       return null;
@@ -122,8 +124,9 @@ public final class Reflect {
    */
   public static Object invoke(final Method method, final Object object,
       final Object... args) {
+
     try {
-      return method.invoke(object, args);
+      return method != null ? method.invoke(object, args) : null;
     } catch(final Exception ex) {
       Util.debug(ex);
       return null;

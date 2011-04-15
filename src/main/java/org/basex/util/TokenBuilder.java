@@ -11,14 +11,14 @@ import java.util.Arrays;
  * @author Christian Gruen
  */
 public final class TokenBuilder {
+  /** Half new line. */
+  public static final byte HL = 0x01;
   /** Highlighting flag. */
   public static final byte HIGH = 0x02;
   /** Standard flag. */
   public static final byte NORM = 0x03;
-  /** new line. */
+  /** New line. */
   public static final byte NL = 0x0a;
-  /** Half new line. */
-  public static final byte HL = 0x0b;
 
   /** Character array. */
   private byte[] chars;

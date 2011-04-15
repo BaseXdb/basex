@@ -31,7 +31,7 @@ public final class FNSimple extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  protected FNSimple(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNSimple(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

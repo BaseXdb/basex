@@ -334,7 +334,7 @@ public interface QueryTokens {
     DF_DEC, DF_DIG, DF_GRP, DF_INF, DF_MIN, DF_NAN, DF_PAT, DF_PC, DF_PM, DF_ZG
   };
   /** Updating tokens. */
-  String[] UPDATES = { INSERT, DELETE, RENAME, REPLACE };
+  String[] UPDATES = { INSERT, DELETE, RENAME, REPLACE, MODULE };
 
   /** Parser token. */
   String ASSIGN = ":=";

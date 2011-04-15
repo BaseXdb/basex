@@ -21,14 +21,14 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNNode extends Fun {
+public final class FNNode extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNNode(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNNode(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

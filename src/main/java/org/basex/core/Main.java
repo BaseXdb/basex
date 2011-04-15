@@ -47,8 +47,8 @@ public abstract class Main implements Runnable {
    */
   protected Main(final String[] args) {
     success = parseArguments(args);
+    check(success);
     verbose |= console;
-    if(!success) return;
 
     // guarantee correct shutdown...
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -105,6 +105,7 @@ public abstract class Main implements Runnable {
         final int i = cmd instanceof Password && cmd.args[0] == null ? 0 :
           (cmd instanceof CreateUser || cmd instanceof AlterUser) &&
           cmd.args[1] == null ? 1 : -1;
+
         if(i != -1) {
           Util.out(SERVERPW + COLS);
           cmd.args[i] = password();
@@ -112,7 +113,7 @@ public abstract class Main implements Runnable {
         if(!execute(cmd, verbose)) return false;
       }
     } catch(final QueryException ex) {
-      error(ex, ex.getMessage());
+      return error(ex, ex.getMessage());
     }
     return true;
   }
@@ -132,11 +133,9 @@ public abstract class Main implements Runnable {
     try {
       ss.execute(cmd);
       if(info) Util.out(ss.info());
-      if(cmd instanceof Exit) return true;
       return true;
     } catch(final BaseXException ex) {
-      error(null, ex.getMessage());
-      return false;
+      return error(null, ex.getMessage());
     }
   }
 
@@ -156,10 +155,12 @@ public abstract class Main implements Runnable {
    * Prints an error message.
    * @param ex exception reference
    * @param msg message
+   * @return success flag
    */
-  protected final void error(final Exception ex, final String msg) {
+  protected final boolean error(final Exception ex, final String msg) {
     Util.errln((console ? "" : INFOERROR) + msg.trim());
     Util.debug(ex);
+    return false;
   }
 
   /**
@@ -199,6 +200,14 @@ public abstract class Main implements Runnable {
     // hide password
     final char[] pw = System.console().readPassword();
     return pw != null ? new String(pw) : "";
+  }
+
+  /**
+   * Leaves with 1 as exit code if the specified flag is {@code false}.
+   * @param ok ok flag
+   */
+  protected static void check(final boolean ok) {
+    if(!ok) System.exit(1);
   }
 
   /**

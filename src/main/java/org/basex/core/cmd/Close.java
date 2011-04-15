@@ -23,15 +23,16 @@ public final class Close extends Command {
 
   @Override
   protected boolean run() {
+    final Data data = context.data;
+    if(data == null) return true;
+
     try {
-      final Data data = context.data;
-      if(data == null) return true;
       close(data, context);
       context.closeDB();
       return info(DBCLOSED, data.meta.name);
     } catch(final IOException ex) {
       Util.debug(ex);
-      return error(DBCLOSEERR);
+      return error(DBCLOSEERR, data.meta.name);
     }
   }
 

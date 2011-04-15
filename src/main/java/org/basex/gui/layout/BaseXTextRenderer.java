@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import org.basex.gui.GUIConstants;
+import org.basex.util.TokenBuilder;
 
 /**
  * Efficient Text Editor and Renderer, supporting syntax highlighting and
@@ -297,9 +298,9 @@ final class BaseXTextRenderer extends BaseXBack {
    */
   private boolean next() {
     final int ch = text.curr();
-    if(ch == 0x0A || ch == 0x0B) {
+    if(ch == TokenBuilder.NL || ch == TokenBuilder.HL) {
       x = off;
-      y += fontH >> (ch == 0x0A ? 0 : 1);
+      y += fontH >> (ch == TokenBuilder.NL ? 0 : 1);
       return true;
     }
     x += wordW;

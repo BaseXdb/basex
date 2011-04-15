@@ -60,7 +60,7 @@ public class BaseXServer extends Main {
    */
   public BaseXServer(final String... args) {
     super(args);
-    if(!success) return;
+    check(success);
 
     final int port = context.prop.num(Prop.SERVERPORT);
     if(service) {
@@ -73,7 +73,6 @@ public class BaseXServer extends Main {
     log.write(SERVERSTART);
     stop = stopFile(port);
 
-    boolean ok = true;
     try {
       server = new ServerSocket(port);
 
@@ -95,15 +94,14 @@ public class BaseXServer extends Main {
       // execute command-line arguments
       if(commands != null) {
         final Boolean b = execute(commands);
-        ok = b == null || b;
+        check(b == null || b);
       }
       if(console) quit(console());
     } catch(final Exception ex) {
       log.write(ex.getMessage());
       Util.errln(Util.server(ex));
-      ok = false;
+      check(false);
     }
-    if(!ok) System.exit(1);
   }
 
   @Override

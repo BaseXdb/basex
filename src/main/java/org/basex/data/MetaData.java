@@ -5,6 +5,8 @@ import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
+
 import org.basex.build.BuildException;
 import org.basex.core.Prop;
 import org.basex.core.Users;
@@ -161,6 +163,18 @@ public final class MetaData {
    */
   public File file(final String fn) {
     return file(name, fn, prop);
+  }
+
+  /**
+   * Adds the a random temporary name for the current database.
+   * @return random name
+   */
+  public String random() {
+    String nm;
+    do {
+      nm = name + '_' + new Random().nextInt(0x7FFFFFFF);
+    } while(prop.dbexists(nm));
+    return nm;
   }
 
   /**

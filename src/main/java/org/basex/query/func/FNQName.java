@@ -27,14 +27,14 @@ import org.basex.util.XMLToken;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNQName extends Fun {
+public final class FNQName extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNQName(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNQName(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

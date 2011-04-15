@@ -20,14 +20,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNAggr extends Fun {
+public final class FNAggr extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNAggr(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNAggr(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

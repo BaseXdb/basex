@@ -26,14 +26,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNDate extends Fun {
+public final class FNDate extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNDate(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNDate(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

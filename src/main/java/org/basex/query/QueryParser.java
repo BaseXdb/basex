@@ -905,10 +905,10 @@ public class QueryParser extends InputParser {
     boolean comma = false;
 
     do {
-      final boolean fr = wdConsumeWs(FOR, DOLLAR, NOFOR);
-      boolean score = !fr && wdConsumeWs(LET, SCORE, NOLET);
+      final boolean fr = wsConsumeWs(FOR, DOLLAR, NOFOR);
+      boolean score = !fr && wsConsumeWs(LET, SCORE, NOLET);
       if(score) wsCheck(SCORE);
-      else if(!fr && !wdConsumeWs(LET, DOLLAR, NOLET)) return fl;
+      else if(!fr && !wsConsumeWs(LET, DOLLAR, NOLET)) return fl;
 
       do {
         if(comma && !fr) score = wsConsumeWs(SCORE);
@@ -994,8 +994,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr quantified() throws QueryException {
-    final boolean some = wdConsumeWs(SOME, DOLLAR, NOSOME);
-    if(!some && !wdConsumeWs(EVERY, DOLLAR, NOSOME)) return null;
+    final boolean some = wsConsumeWs(SOME, DOLLAR, NOSOME);
+    if(!some && !wsConsumeWs(EVERY, DOLLAR, NOSOME)) return null;
 
     final int s = ctx.vars.size();
     For[] fl = {};
@@ -1019,7 +1019,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
-    if(!wdConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
+    if(!wsConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
     wsCheck(PAR1);
     Expr[] exprs = { check(expr(), NOSWITCH) };
     wsCheck(PAR2);
@@ -1051,7 +1051,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr typeswitch() throws QueryException {
-    if(!wdConsumeWs(TYPESWITCH, PAR1, TYPEPAR)) return null;
+    if(!wsConsumeWs(TYPESWITCH, PAR1, TYPEPAR)) return null;
     wsCheck(PAR1);
     final Expr ts = check(expr(), NOTYPESWITCH);
     wsCheck(PAR2);
@@ -1085,7 +1085,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr iff() throws QueryException {
-    if(!wdConsumeWs(IF, PAR1, IFPAR)) return null;
+    if(!wsConsumeWs(IF, PAR1, IFPAR)) return null;
     wsCheck(PAR1);
     final Expr e = check(expr(), NOIF);
     wsCheck(PAR2);
@@ -1520,7 +1520,7 @@ public class QueryParser extends InputParser {
       }
     } else {
       for(final Axis a : Axis.values()) {
-        if(wdConsumeWs(a.name, COLS, NOLOCSTEP)) {
+        if(wsConsumeWs(a.name, COLS, NOLOCSTEP)) {
           wsConsume(COLS);
           ap = qp;
           ax = a;
@@ -1683,8 +1683,8 @@ public class QueryParser extends InputParser {
       e = compConstructor();
       if(e != null) return e;
       // ordered expression
-      if(wdConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
-         wdConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
+      if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
+         wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
         return enclosed(NOENCLEXPR);
     }
     // context item
@@ -2948,7 +2948,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr transform() throws QueryException {
-    if(!wdConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
+    if(!wsConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
     final boolean u = ctx.updating;
     ctx.updating = false;
 
@@ -3198,7 +3198,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean wdConsumeWs(final String s1, final String s2,
+  private boolean wsConsumeWs(final String s1, final String s2,
       final Err expr) throws QueryException {
     final int p = qp;
     if(!wsConsumeWs(s1)) return false;

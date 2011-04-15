@@ -26,14 +26,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNSeq extends Fun {
+public final class FNSeq extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNSeq(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNSeq(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 
