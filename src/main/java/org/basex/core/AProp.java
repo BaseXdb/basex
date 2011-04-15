@@ -131,7 +131,7 @@ public abstract class AProp {
     }
 
     if(err.size() != 0) {
-      Util.error(err.toString());
+      Util.err(err.toString());
       write();
     }
   }
@@ -382,5 +382,10 @@ public abstract class AProp {
    */
   protected void finish() {
     // nothing to do; if necessary, is overwritten.
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + props;
   }
 }

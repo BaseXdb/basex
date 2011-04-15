@@ -12,7 +12,7 @@ import org.basex.util.InputInfo;
  * Literal function item.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Leonard Woerteler
+ * @author Leo Woerteler
  */
 public class LitFunc extends Func {
 

@@ -66,6 +66,7 @@ public final class DialogPrefs extends Dialog {
     path.addKeyListener(keys);
 
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, this);
+    button.setMnemonic();
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

@@ -81,9 +81,8 @@ abstract class ACreate extends Command {
 
       final boolean mem = prop.is(Prop.MAINMEM);
       builder = mem ? new MemBuilder(p, prop) : new DiskBuilder(p, prop);
-      progress(builder);
 
-      final Data d = builder.build(db);
+      final Data d = progress(builder).build(db);
       if(mem) {
         context.openDB(d);
         context.pin(d);
@@ -133,8 +132,7 @@ abstract class ACreate extends Command {
     }
     d.closeIndex(i);
     d.meta.dirty = true;
-    progress(b);
-    d.setIndex(i, b.build());
+    d.setIndex(i, progress(b).build());
   }
 
   /**

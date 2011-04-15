@@ -49,7 +49,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.6.1 beta";
+  String VERSION = "6.6.2 beta";
   /** Company info. */
   String COMPANY = "BaseX Team";
   /** Version information. */
@@ -167,6 +167,8 @@ public interface Text {
 
   /** Command keyword. */
   String AS = "AS";
+  /** Command keyword. */
+  String ALL = "ALL";
   /** Command keyword. */
   String TO = "TO";
   /** Command keyword. */
@@ -563,6 +565,8 @@ public interface Text {
   String QUERYPRINTED = lang("qu_tabprinted") + COLS;
   /** Query info: memory. */
   String QUERYMEM = lang("qu_tabmem") + ": %";
+  /** Query info: memory. */
+  String QUERYMEM2 = lang("qu_tabmem") + COLS;
   /** Query hits. */
   String HITS = lang("qu_hits");
   /** Insert query info. */
@@ -933,9 +937,17 @@ public interface Text {
   /** Command info. */
   String GUIUNDO = lang("c_undo");
   /** Command info. */
+  String GUIXQNEW = lang("c_xqnew");
+  /** Command info. */
+  String GUIXQNEWTT = lang("c_xqnewtt");
+  /** Command info. */
   String GUIXQOPEN = lang("c_xqopen");
   /** Command info. */
   String GUIXQOPENTT = lang("c_xqopentt");
+  /** Help string. */
+  String GUIXQCLOSE = lang("c_xqclose");
+  /** Help string. */
+  String GUIXQCLOSETT = lang("c_xqclosett");
   /** Command info. */
   String GUISAVE = lang("c_save");
   /** Command info. */
@@ -965,6 +977,8 @@ public interface Text {
   String BUTTONBACKUP = lang("b_backup");
   /** Button text for restoring databases. */
   String BUTTONRESTORE = lang("b_restore");
+  /** Button text for copying databases. */
+  String BUTTONCOPY = lang("b_copy");
   /** Button text for opening files. */
   String BUTTONOPEN = lang("b_open");
   /** Button text for canceling actions. */
@@ -1010,8 +1024,10 @@ public interface Text {
   String HELPTIT = lang("help_title");
   /** Text title. */
   String TEXTTIT = lang("text_title");
-  /** Query title. */
-  String XQUERYTIT = "XQuery";
+  /** Editor title. */
+  String EDITORTIT = lang("editor_title");
+  /** Editor: new file. */
+  String EDITORFILE = lang("editor_file");
 
   /** Plot visualization. */
   String PLOTLOG = "log";
@@ -1038,6 +1054,8 @@ public interface Text {
   String CREATEPATTERN = lang("dc_pattern");
   /** Name of database. */
   String CREATENAME = lang("dc_name") + COLS;
+  /** Name of database copy. */
+  String CREATENAMEC = lang("dc_namec") + COLS;
   /** Target path. */
   String CREATETARGET = lang("dc_target") + COLS;
 
@@ -1202,6 +1220,8 @@ public interface Text {
   String RENAMETITLE = lang("dr_title");
   /** Dialog title for dropping documents. */
   String DROPTITLE = lang("dr_title2");
+  /** Dialog title for copying a database. */
+  String COPYTITLE = lang("dr_title3");
   /** Info for overwriting a database. */
   String RENAMEOVER = lang("dr_over") + DOT;
   /** Info for creating an empty database. */
@@ -1329,9 +1349,10 @@ public interface Text {
   /** Developer info. */
   String DEVELOPER = lang("da_dev") + ": Christian Gr\u00FCn";
   /** Contributors info. */
-  String CONTRIBUTE1 = lang("da_cont1") + ": Andreas Weiler, Michael Seiferle,";
+  String CONTRIBUTE1 = lang("da_cont1") +
+  ": Andreas Weiler, Michael Seiferle, Lukas Kircher,";
   /** Developer names. */
-  String CONTRIBUTE2 = "Lukas Kircher, Alexander Holupirek " +
+  String CONTRIBUTE2 = "Leo W\u00F6rteler, Alexander Holupirek, " +
     lang("da_cont2");
   /** Translation. */
   String TRANSLATION = lang("da_translation") + COLS;
@@ -1348,8 +1369,6 @@ public interface Text {
   byte[] HELPSAVE = token(lang("h_save"));
   /** Help string. */
   byte[] HELPRECENT = token(lang("h_recent"));
-  /** Help string. */
-  byte[] HELPQCLOSE = token(lang("h_qclose"));
   /** Help dialog. */
   byte[] HELPCMD = token(lang("h_cmd"));
   /** Help dialog. */

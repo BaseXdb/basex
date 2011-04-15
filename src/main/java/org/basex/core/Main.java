@@ -24,7 +24,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class Main {
+public abstract class Main implements Runnable {
   /** Flag for using default standard input. */
   private static final boolean NOCONSOLE = System.console() == null;
   /** Database context. */
@@ -68,7 +68,9 @@ public abstract class Main {
     while(console) {
       Util.out("> ");
       for(final String in : inputs()) {
-        if(!in.isEmpty() && !execute(in)) return true;
+        if(in.isEmpty()) continue;
+        final Boolean b = execute(in);
+        if(b == null) return true;
       }
     }
     return false;
@@ -91,13 +93,13 @@ public abstract class Main {
   /**
    * Parses and executes the input string.
    * @param in input commands
-   * @return false if exit command was sent
+   * @return success flag, or {@code null} if the exit command was dispatched
    * @throws IOException database exception
    */
-  protected final boolean execute(final String in) throws IOException {
+  protected final Boolean execute(final String in) throws IOException {
     try {
       for(final Command cmd : new CommandParser(in, context).parse()) {
-        if(cmd instanceof Exit) return false;
+        if(cmd instanceof Exit) return null;
 
         // offer optional password input
         final int i = cmd instanceof Password && cmd.args[0] == null ? 0 :
@@ -107,7 +109,7 @@ public abstract class Main {
           Util.out(SERVERPW + COLS);
           cmd.args[i] = password();
         }
-        if(!execute(cmd, verbose)) break;
+        if(!execute(cmd, verbose)) return false;
       }
     } catch(final QueryException ex) {
       error(ex, ex.getMessage());

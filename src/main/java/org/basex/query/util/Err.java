@@ -37,7 +37,7 @@ public enum Err {
   /** BASX0007: Evaluation exception. */
   QUERYNODES(BASX, 7, Text.QUERYNODESERR),
   /** BASX0008: Evaluation exception. */
-  EXPSINGLE(BASX, 8, "Database contains more than one document."),
+  EXPSINGLE(BASX, 8, "Database '%' contains more than one document."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -94,25 +94,6 @@ public enum Err {
   /** FOER0000: Evaluation exception. */
   FUNERR1(FOER, 0, "Halted on error()."),
 
-  /** FOFD1340: Evaluation exception. */
-  OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  GROUPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  GROUPSTART(FOFD, 1340, "Picture begins with grouping separator: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  GROUPEND(FOFD, 1340, "Picture ends with grouping separator: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  NOMAND(FOFD, 1340, "No mandatory digit specified: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  PICDATE(FOFD, 1340, "Invalid picture string: \"%\"."),
-  /** FOFD1340: Evaluation exception. */
-  ORDCLOSED(FOFD, 1340, "Ordinal is not closed: \"%\"."),
-  /** FOFD1350: Evaluation exception. */
-  PICCOMP(FOFD, 1350, "Invalid component in string: \"%\"."),
-
   /** FOFL0001: Evaluation exception. */
   PATHNOTEXISTS(FOFL, 1, "Path '%' does not exist."),
   /** FOFL0002: Evaluation exception. */
@@ -150,25 +131,18 @@ public enum Err {
   ZIPFAIL(FOZP, 3, "Operation failed: %."),
 
   /** FOHC0001: Evaluation exception. */
-  URLINV(FOHC, 1, "Invalid URL: \"%\"."),
+  HTTPERR(FOHC, 1, "An HTTP error occurred: %."),
   /** FOHC0002: Evaluation exception. */
-  PROTINV(FOHC, 2, "The requested method is not valid for HTTP."),
-  /* FOHC0003: Evaluation exception (not used yet).
-  CONNERR(FOHC, 3, "Connection to \"%\" cannot be opened."), */
+  HTMLERR(FOHC, 2, "Error parsing entity as XML or HTML."),
+  /** FOHC003: Evaluation exception. */
+  SRCATTR(FOHC, 3, "The src attribute on the body element is mutually"
+      + "exclusive with all other attributes (except the media-type)"),
   /** FOHC0004: Evaluation exception. */
-  ELMINV(FOHC, 4, "Invalid element syntax."),
-  /** FOHC0005: Evaluation exception. */
-  HTTPERR(FOHC, 5, "An HTTP error occurred: %."),
-  /** FOHC0006: Evaluation exception. */
-  CREDSERR(FOHC, 6, "Provided credentials are invalid."),
-  /** FOHC0007: Evaluation exception. */
-  HTMLERR(FOHC, 7, "Error parsing HTML input."),
-  /** FOHC008: Evaluation exception. */
-  NOURL(FOHC, 8, "No URL specified."),
-  /** FOHC009: Evaluation exception. */
-  MANDATTR(FOHC, 9, "Attribute '%' is mandatory."),
-  /** FOHC0010: Evaluation exception. */
-  NOBOUND(FOHC, 10, "No separation boundary specified."),
+  REQINV(FOHC, 4, "The request element is not valid: %"),
+  /** FOHC005: Evaluation exception. */
+  NOURL(FOHC, 5, "No URL specified."),
+  /** FOHC006: Evaluation exception. */
+  NOPARAMS(FOHC, 6, "Specify request element or HTTP URI."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
@@ -338,8 +312,8 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   PATHMISS(XPST, 3, "Expecting location path."),
   /** XPST0003: Parsing exception. */
-  DECLINCOMPLETE(XPST, 3, "Incomplete declaration; expecting " +
-      "'function', 'variable', ..."),
+  DECLINCOMPLETE(XPST, 3, "Incomplete declaration; expecting "
+      + "'function', 'variable', ..."),
   /** XPST0003: Parsing exception. */
   FUNCNAME(XPST, 3, "Expecting function name."),
   /** XPST0003: Parsing exception. */
@@ -622,8 +596,26 @@ public enum Err {
   /** XQTY0024: Parsing exception. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
 
-  /** XTDE0030: Parsing exception. */
+  /** FOFD1340: Parsing exception. */
   WRONGINT(XTDE, 30, "Wrong integer format: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  OPTAFTER(XTDE, 30, "Optional digit follows mandatory digits: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  DIFFMAND(XTDE, 30, "Mandatory digits must be of the same group: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPADJ(XTDE, 30, "Adjacent grouping separators: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPSTART(XTDE, 30, "Picture begins with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  GROUPEND(XTDE, 30, "Picture ends with grouping separator: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  NOMAND(XTDE, 30, "No mandatory digit specified: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  PICDATE(XTDE, 30, "Invalid picture string: \"%\"."),
+  /** FOFD1340: Evaluation exception. */
+  ORDCLOSED(XTDE, 30, "Ordinal is not closed: \"%\"."),
+  /** FOFD1350: Evaluation exception. */
+  PICCOMP(XTDE, 30, "Invalid component in string: \"%\"."),
   /** XTDE1170: Parsing exception. */
   WRONGINPUT(XTDE, 1170, "Failed to read \"%\": %."),
 
@@ -675,8 +667,8 @@ public enum Err {
   /** XUTY0007: XQuery Update type exception. */
   UPTRGDELEMPT(XUTY, 7, "Only nodes can be deleted."),
   /** XUTY0008: XQuery Update type exception. */
-  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected" +
-      " as replace target."),
+  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected"
+      + " as replace target."),
   /** XUTY0010: XQuery Update type exception. */
   UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
   /** XUTY0011: XQuery Update type exception. */
@@ -722,8 +714,8 @@ public enum Err {
   }
 
   /**
-   * Throws a serializer exception.
-   * Might be merged with {@link #thrw} in future.
+   * Throws a serializer exception. Might be merged with {@link #thrw} in
+   * future.
    * @param ext extended info
    * @return serializer exception (indicates that an error is raised)
    * @throws SerializerException serializer exception
@@ -746,39 +738,72 @@ public enum Err {
    * @author Leo Woerteler
    */
   public static enum ErrType {
-    /** BASX Error type. */ BASX,
-    /** FOAR Error type. */ FOAR,
-    /** FOCA Error type. */ FOCA,
-    /** FOCH Error type. */ FOCH,
-    /** FODC Error type. */ FODC,
-    /** FODF Error type. */ FODF,
-    /** FODT Error type. */ FODT,
-    /** FOER Error type. */ FOER,
-    /** FOFD Error type. */ FOFD,
-    /** FOFL Error type. */ FOFL,
-    /** FOFU Error type. */ FOFU,
-    /** FOHP Error type. */ FOHC,
-    /** FONS Error type. */ FONS,
-    /** FORG Error type. */ FORG,
-    /** FORX Error type. */ FORX,
-    /** FOTY Error type. */ FOTY,
-    /** FOUP Error type. */ FOUP,
-    /** FOZP Error type. */ FOZP,
-    /** FTDY Error type. */ FTDY,
-    /** FTST Error type. */ FTST,
-    /** SEPM Error type. */ SEPM,
-    /** SERE Error type. */ SERE,
-    /** SEPM Error type. */ SESU,
-    /** XPDY Error type. */ XPDY,
-    /** XPST Error type. */ XPST,
-    /** XPTY Error type. */ XPTY,
-    /** XQDY Error type. */ XQDY,
-    /** XQST Error type. */ XQST,
-    /** XQTY Error type. */ XQTY,
-    /** XQTD Error type. */ XTDE,
-    /** XUDY Error type. */ XUDY,
-    /** XUST Error type. */ XUST,
-    /** XUTY Error type. */ XUTY;
+    /** BASX Error type. */
+    BASX,
+    /** FOAR Error type. */
+    FOAR,
+    /** FOCA Error type. */
+    FOCA,
+    /** FOCH Error type. */
+    FOCH,
+    /** FODC Error type. */
+    FODC,
+    /** FODF Error type. */
+    FODF,
+    /** FODT Error type. */
+    FODT,
+    /** FOER Error type. */
+    FOER,
+    /** FOFD Error type. */
+    FOFD,
+    /** FOFL Error type. */
+    FOFL,
+    /** FOFU Error type. */
+    FOFU,
+    /** FOHP Error type. */
+    FOHC,
+    /** FONS Error type. */
+    FONS,
+    /** FORG Error type. */
+    FORG,
+    /** FORX Error type. */
+    FORX,
+    /** FOTY Error type. */
+    FOTY,
+    /** FOUP Error type. */
+    FOUP,
+    /** FOZP Error type. */
+    FOZP,
+    /** FTDY Error type. */
+    FTDY,
+    /** FTST Error type. */
+    FTST,
+    /** SEPM Error type. */
+    SEPM,
+    /** SERE Error type. */
+    SERE,
+    /** SEPM Error type. */
+    SESU,
+    /** XPDY Error type. */
+    XPDY,
+    /** XPST Error type. */
+    XPST,
+    /** XPTY Error type. */
+    XPTY,
+    /** XQDY Error type. */
+    XQDY,
+    /** XQST Error type. */
+    XQST,
+    /** XQTY Error type. */
+    XQTY,
+    /** XQTD Error type. */
+    XTDE,
+    /** XUDY Error type. */
+    XUDY,
+    /** XUST Error type. */
+    XUST,
+    /** XUTY Error type. */
+    XUTY;
   }
 
   /**

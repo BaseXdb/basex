@@ -164,8 +164,6 @@ public abstract class Item extends Value {
   public final boolean equiv(final InputInfo ii, final Item it)
       throws QueryException {
 
-    // [CG] XQuery: check when/if comparable items may lead to exceptions
-
     // check if both values are NaN, or if values are equal..
     return (this == Dbl.NAN || this == Flt.NAN) && it.num() &&
         Double.isNaN(it.dbl(ii)) || comparable(it) && eq(ii, it);

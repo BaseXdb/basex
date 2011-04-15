@@ -20,11 +20,11 @@ import org.junit.Test;
  * This class tests namespaces.
  *
  * @author BaseX Team 2005-11, BSD License
- * @author Christian Gruen
+ * @author Lukas Kircher
  */
 public final class NamespaceTest {
   /** Database context. */
-  private static Context context;
+  private static final Context CONTEXT = new Context();
 
   /** Test documents. */
   private static String[][] docs = {
@@ -56,16 +56,16 @@ public final class NamespaceTest {
   public void insertIntoShiftPreValues() {
     query("insert node <b xmlns:ns='A'/> into doc('d12')/*:a/*:b", "");
     try {
-      new Open("d12").execute(context);
+      new Open("d12").execute(CONTEXT);
       assertEquals("\n" +
           "  Pre[3] xmlns:ns=\"A\" \n" +
           "  Pre[4] xmlns=\"B\" ",
-          context.data.ns.toString());
+          CONTEXT.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
     } finally {
       try {
-        new Close().execute(context);
+        new Close().execute(CONTEXT);
       } catch(final BaseXException ex) { }
     }
   }
@@ -78,15 +78,15 @@ public final class NamespaceTest {
   public void insertIntoShiftPreValues2() {
     query("insert node <c/> as first into doc('d13')/a", "");
     try {
-      new Open("d13").execute(context);
+      new Open("d13").execute(CONTEXT);
       assertEquals("\n" +
           "  Pre[3] xmlns=\"A\" ",
-          context.data.ns.toString());
+          CONTEXT.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
     } finally {
       try {
-        new Close().execute(context);
+        new Close().execute(CONTEXT);
       } catch(final BaseXException ex) { }
     }
   }
@@ -99,18 +99,18 @@ public final class NamespaceTest {
   public void insertIntoShiftPreValues3() {
     query("insert node <n xmlns='D'/> into doc('d14')/*:a/*:b", "");
     try {
-      new Open("d14").execute(context);
+      new Open("d14").execute(CONTEXT);
       assertEquals("\n" +
           "  Pre[1] xmlns=\"A\" \n" +
           "    Pre[2] xmlns=\"B\" \n" +
           "      Pre[3] xmlns=\"D\" \n" +
           "    Pre[4] xmlns=\"C\" ",
-          context.data.ns.toString());
+          CONTEXT.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
     } finally {
       try {
-        new Close().execute(context);
+        new Close().execute(CONTEXT);
       } catch(final BaseXException ex) { }
     }
   }
@@ -123,15 +123,15 @@ public final class NamespaceTest {
   public void deleteShiftPreValues() {
     query("delete node doc('d12')/a/b", "");
     try {
-      new Open("d12").execute(context);
+      new Open("d12").execute(CONTEXT);
       assertEquals("\n" +
           "  Pre[2] xmlns=\"B\" ",
-          context.data.ns.toString());
+          CONTEXT.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
     } finally {
       try {
-        new Close().execute(context);
+        new Close().execute(CONTEXT);
       } catch(final BaseXException ex) { }
     }
   }
@@ -144,16 +144,16 @@ public final class NamespaceTest {
   public void deleteShiftPreValues2() {
     query("delete node doc('d14')/*:a/*:b", "");
     try {
-      new Open("d14").execute(context);
+      new Open("d14").execute(CONTEXT);
       assertEquals("\n" +
           "  Pre[1] xmlns=\"A\" \n" +
           "    Pre[2] xmlns=\"C\" ",
-          context.data.ns.toString());
+          CONTEXT.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
     } finally {
       try {
-        new Close().execute(context);
+        new Close().execute(CONTEXT);
       } catch(final BaseXException ex) { }
     }
   }
@@ -166,17 +166,17 @@ public final class NamespaceTest {
   public void deleteShiftPreValues3() {
     query("delete node doc('d15')/*:a/*:c", "");
     try {
-      new Open("d15").execute(context);
+      new Open("d15").execute(CONTEXT);
       assertEquals("\n" +
           "  Pre[1] xmlns=\"A\" \n" +
           "    Pre[2] xmlns=\"B\" \n" +
           "    Pre[3] xmlns=\"E\" ",
-          context.data.ns.toString());
+          CONTEXT.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
     } finally {
       try {
-        new Close().execute(context);
+        new Close().execute(CONTEXT);
       } catch(final BaseXException ex) { }
     }
   }
@@ -189,14 +189,14 @@ public final class NamespaceTest {
   public void deleteShiftPreValues4() {
     query("delete node doc('d16')/a/b", "");
     try {
-      new Open("d16").execute(context);
+      new Open("d16").execute(CONTEXT);
       assertEquals("",
-          context.data.ns.toString());
+          CONTEXT.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
     } finally {
       try {
-        new Close().execute(context);
+        new Close().execute(CONTEXT);
       } catch(final BaseXException ex) { }
     }
   }
@@ -290,17 +290,17 @@ public final class NamespaceTest {
   public void nsHierarchy() {
     query("insert node <f xmlns='F'/> into doc('d9')//*:e", "");
     try {
-      new Open("d9").execute(context);
+      new Open("d9").execute(CONTEXT);
       assertEquals("\n" +
           "  Pre[1] xmlns=\"A\" \n" +
           "    Pre[4] xmlns=\"D\" \n" +
           "    Pre[6] xmlns=\"F\" ",
-          context.data.ns.toString());
+          CONTEXT.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
     } finally {
       try {
-        new Close().execute(context);
+        new Close().execute(CONTEXT);
       } catch(final BaseXException ex) { }
     }
   }
@@ -313,18 +313,18 @@ public final class NamespaceTest {
   public void nsHierarchy2() {
     query("insert node <f xmlns='F'/> into doc('d10')//*:e", "");
     try {
-      new Open("d10").execute(context);
+      new Open("d10").execute(CONTEXT);
       assertEquals("\n" +
           "  Pre[1] xmlns=\"A\" \n" +
           "    Pre[4] xmlns=\"D\" \n" +
           "      Pre[5] xmlns=\"G\" \n" +
           "    Pre[7] xmlns=\"F\" ",
-          context.data.ns.toString());
+          CONTEXT.data.ns.toString());
     } catch (final Exception ex) {
       fail(ex.getMessage());
     } finally {
       try {
-        new Close().execute(context);
+        new Close().execute(CONTEXT);
       } catch(final BaseXException ex) { }
     }
   }
@@ -415,6 +415,18 @@ public final class NamespaceTest {
   }
 
   /** Test query.
+   * Detects general problems with namespace references.
+   */
+  @Test
+  public void insertTransform1() {
+    query(
+        "declare default element namespace 'xyz';" +
+        "copy $foo := <foo/> modify insert nodes (<bar/>, <baz/>)" +
+        "into $foo return $foo",
+        "<foo xmlns='xyz'><bar/><baz/></foo>");
+  }
+
+  /** Test query.
    * Detects wrong namespace references.
    */
   @Test
@@ -430,9 +442,8 @@ public final class NamespaceTest {
    */
   @BeforeClass
   public static void start() throws BaseXException {
-    context = new Context();
     // turn off pretty printing
-    new Set(Prop.SERIALIZER, "indent=no").execute(context);
+    new Set(Prop.SERIALIZER, "indent=no").execute(CONTEXT);
   }
 
   /**
@@ -443,7 +454,7 @@ public final class NamespaceTest {
   public void startTest() throws BaseXException {
     // create all test databases
     for(final String[] doc : docs) {
-      new CreateDB(doc[0], doc[1]).execute(context);
+      new CreateDB(doc[0], doc[1]).execute(CONTEXT);
     }
   }
   /**
@@ -454,9 +465,9 @@ public final class NamespaceTest {
   public static void finish() throws BaseXException {
     // drop all test databases
     for(final String[] doc : docs) {
-      new DropDB(doc[0]).execute(context);
+      new DropDB(doc[0]).execute(CONTEXT);
     }
-    context.close();
+    CONTEXT.close();
   }
 
   /**
@@ -479,8 +490,8 @@ public final class NamespaceTest {
       final String expected) {
 
     try {
-      if(first != null) new XQuery(first).execute(context);
-      final String result = new XQuery(second).execute(context);
+      if(first != null) new XQuery(first).execute(CONTEXT);
+      final String result = new XQuery(second).execute(CONTEXT);
 
       // quotes are replaced by apostrophes to simplify comparison
       final String res = result.replaceAll("\\\"", "'");

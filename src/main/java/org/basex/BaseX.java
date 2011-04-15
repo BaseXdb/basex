@@ -55,27 +55,27 @@ public class BaseX extends Main {
     if(success) run();
   }
 
-  /**
-   * Constructor.
-   */
-  private void run() {
+  @Override
+  public void run() {
+    boolean ok = true;
     try {
       session();
 
       boolean u = false;
-      if(input != null) execute(new Check(input), verbose);
+      if(input != null) ok = execute(new Check(input), verbose);
 
       if(file != null) {
         // query file contents
         context.query = IO.get(file);
         final String qu = content();
-        if(qu != null) execute(new XQuery(qu), verbose);
+        if(qu != null) ok = execute(new XQuery(qu), verbose);
       } else if(query != null) {
         // query file contents
-        execute(new XQuery(query), verbose);
+        ok = execute(new XQuery(query), verbose);
       } else if(commands != null) {
         // execute command-line arguments
-        execute(commands);
+        final Boolean b = execute(commands);
+        ok = b == null || b;
       } else {
         // enter interactive mode
         Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
@@ -85,7 +85,9 @@ public class BaseX extends Main {
       quit(u);
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));
+      ok = false;
     }
+    if(!ok) System.exit(1);
   }
 
   /**

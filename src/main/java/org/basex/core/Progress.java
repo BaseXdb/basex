@@ -37,7 +37,7 @@ public abstract class Progress {
   }
 
   /**
-   * Returns a progress value (0 - 1).
+   * Returns a progress value from the interval {@code [0, 1]}.
    * @return header information
    */
   public final double progress() {
@@ -46,11 +46,14 @@ public abstract class Progress {
 
   /**
    * Sets a new sub progress.
+   * @param <P> progress type
    * @param prog progress
+   * @return the progress for convenience
    */
-  public final void progress(final Progress prog) {
+  public final <P extends Progress> P progress(final P prog) {
     sub = prog;
     if(stopped) sub.stop();
+    return prog;
   }
 
   /**

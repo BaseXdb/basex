@@ -1,8 +1,9 @@
 package org.basex.query.up;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.query.up.primitives.PrimitiveType.*;
+
 import java.io.IOException;
+
 import org.basex.core.Prop;
 import org.basex.core.cmd.Export;
 import org.basex.data.Data;
@@ -105,10 +106,48 @@ final class DBPrimitives extends Primitives {
     if(!pool.nsOK()) UPNSCONFL2.thrw(null);
   }
 
+  /**
+   * Identifies unnecessary update operations and removes them from the pending
+   * update list.
+   */
+  private void treeAwareUpdates() {
+    /* Tree Aware Updates: Unnecessary updates on the descendant axis of a
+     * deleted or replaced node are identified and removed from the pending
+     * update list. */
+    final int l = nodes.size();
+    int ni = 0;
+    int c = 0;
+    while(ni < l - 1) {
+      final int pre = nodes.get(ni++);
+      // If a node is deleted or replaced ...
+      if(op.get(pre).updatesDestroyIdentity()) {
+        final int followingAxisPre = pre + d.size(pre, d.kind(pre));
+        // mark obsolete target nodes on the descendant axis.
+        while(ni < l && nodes.get(ni) < followingAxisPre) {
+          nodes.set(-1, ni++);
+          c++;
+        }
+      }
+    }
+    // in case nothing changed on the pending update list, return
+    if(c == 0) return;
+    // Create a new list that contains necessary targets only
+    final IntList newNodes = new IntList(nodes.size() - c);
+    for(int i = 0; i < nodes.size(); i++) {
+      final int pre = nodes.get(i);
+      if(pre != -1) newNodes.add(pre);
+    }
+    nodes = newNodes;
+  }
+
   @Override
   protected void apply(final QueryContext ctx) throws QueryException {
-    // apply updates backwards, starting with the highest pre value -> no id's
-    // and less table alterations needed
+    // apply optimization
+    treeAwareUpdates();
+
+    /* Apply updates backwards starting with the highest pre value ->
+     * no id's and less table alterations needed.
+     */
     int par = -2;
     // first is the first node of par which is updated. so 'first-1' is the
     // lowest pre value where adjacent text nodes can exist.
@@ -169,9 +208,8 @@ final class DBPrimitives extends Primitives {
   protected boolean parentDeleted(final int n) {
     final NodePrimitives up = op.get(n);
 
-    if(up != null)
-      for(final Primitive pr : up) if(pr.type() == REPLACENODE ||
-        pr.type() == DELETENODE) return true;
+    if(up != null && up.updatesDestroyIdentity())
+      return true;
 
     final int p = d.parent(n, d.kind(n));
     if(p == -1) return false;

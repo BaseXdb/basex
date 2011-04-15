@@ -105,6 +105,18 @@ public final class IndexOptimizeTest {
   }
 
   /**
+   * Checks the XQuery db:open() function, using a specific path.
+   * @throws Exception unexpected exception
+   */
+  @Test
+  public void dbOpenExtTest() throws Exception {
+    createColl();
+    final String doc = "db:open('" + NAME + "/two')";
+    check(doc + "//*[text() = '1']", "");
+    check(doc + "//*[text() = '4']", "<a>4</a>");
+  }
+
+  /**
    * Checks full-text requests.
    * @throws Exception unexpected exception
    */
@@ -134,8 +146,8 @@ public final class IndexOptimizeTest {
    */
   private void createColl() throws Exception {
     new CreateDB(NAME).execute(CTX);
-    new Add("<xml><a>1</a><a>2 3</a></xml>").execute(CTX);
-    new Add("<xml><a>4</a><a>5 6</a></xml>").execute(CTX);
+    new Add("<xml><a>1</a><a>2 3</a></xml>", "one").execute(CTX);
+    new Add("<xml><a>4</a><a>5 6</a></xml>", "two").execute(CTX);
     new Optimize().execute(CTX);
     new Close().execute(CTX);
   }

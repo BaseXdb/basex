@@ -255,7 +255,7 @@ public final class QueryProcessor extends Progress {
   /**
    * Checks if the specified query performs updates.
    * @param ctx context reference
-   * @param qu query
+   * @param qu query string
    * @return result of check
    */
   public static boolean updating(final Context ctx, final String qu) {
@@ -273,6 +273,40 @@ public final class QueryProcessor extends Progress {
       }
     }
     return false;
+  }
+
+  /**
+   * Removes comments from the specified string.
+   * @param qu query string
+   * @param max maximum string length
+   * @return result
+   */
+  public static String removeComments(final String qu, final int max) {
+    final StringBuilder sb = new StringBuilder();
+    int m = 0;
+    boolean s = false;
+    final int cl = qu.length();
+    for(int c = 0; c < cl && sb.length() < max; ++c) {
+      final char ch = qu.charAt(c);
+      if(ch == 0x0d) continue;
+      if(ch == '(' && c + 1 < cl && qu.charAt(c + 1) == ':') {
+        if(m == 0 && !s) {
+          sb.append(' ');
+          s = true;
+        }
+        ++m;
+        ++c;
+      } else if(m != 0 && ch == ':' && c + 1 < cl && qu.charAt(c + 1) == ')') {
+        --m;
+        ++c;
+      } else if(m == 0) {
+        if(ch > ' ') sb.append(ch);
+        else if(!s) sb.append(' ');
+        s = ch <= ' ';
+      }
+    }
+    if(sb.length() >= max) sb.append("...");
+    return sb.toString().trim();
   }
 
   /**

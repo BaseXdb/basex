@@ -13,7 +13,6 @@ import org.basex.core.Text;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
@@ -62,7 +61,7 @@ public final class DialogAbout extends Dialog {
     add(p, BorderLayout.NORTH);
 
     p = new BaseXBack();
-    p.add(new BaseXButton(BUTTONOK, this), BorderLayout.EAST);
+    p.add(newButtons(this, BUTTONOK));
     add(p, BorderLayout.EAST);
 
     finish(null);

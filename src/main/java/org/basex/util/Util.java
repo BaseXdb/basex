@@ -116,7 +116,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void errln(final Object obj, final Object... ext) {
-    error(obj + NL, ext);
+    err(obj + NL, ext);
   }
 
   /**
@@ -124,7 +124,7 @@ public final class Util {
    * @param string debug string
    * @param ext text optional extensions
    */
-  public static void error(final String string, final Object... ext) {
+  public static void err(final String string, final Object... ext) {
     System.err.print(info(string, ext));
   }
 
@@ -199,10 +199,11 @@ public final class Util {
 
   /**
    * Prints the current stack trace to System.err.
+   * @param i number of steps to print
    */
-  public static void stack() {
+  public static void stack(final int i) {
     errln("You're here:");
-    stack(new Throwable());
+    stack(new Throwable(), i);
   }
 
   /**
@@ -210,7 +211,19 @@ public final class Util {
    * @param th error/exception instance
    */
   public static void stack(final Throwable th) {
-    for(final String s : toArray(th)) errln(s);
+    stack(th, 0);
+  }
+
+  /**
+   * Prints the stack of the specified error to standard error.
+   * @param th error/exception instance
+   * @param i number of steps to print
+   */
+  private static void stack(final Throwable th, final int i) {
+    final String[] stack = toArray(th);
+    int l = stack.length;
+    if(i > 0 && i < l) l = i;
+    for(int s = 0; s < l; ++s) errln(stack[s]);
   }
 
   /**

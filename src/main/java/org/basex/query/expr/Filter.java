@@ -24,8 +24,6 @@ import org.basex.util.InputInfo;
 public class Filter extends Preds {
   /** Expression. */
   Expr root;
-  /** Offset flag. */
-  private boolean off;
 
   /**
    * Constructor.
@@ -41,11 +39,11 @@ public class Filter extends Preds {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     root = checkUp(root, ctx).comp(ctx);
-    // convert filters to axis paths
-    if(root instanceof AxisPath && !super.uses(Use.POS))
-      return ((AxisPath) root).copy().addPreds(pred).comp(ctx);
     // return empty root
     if(root.empty()) return optPre(Empty.SEQ, ctx);
+    // convert filters without position predicates to axis paths
+    if(root instanceof AxisPath && !super.uses(Use.POS))
+      return ((AxisPath) root).copy().addPreds(pred).comp(ctx);
 
     final Value cv = ctx.value;
     ctx.value = null;
@@ -53,10 +51,8 @@ public class Filter extends Preds {
     ctx.value = cv;
     if(e != this) return e;
 
-    // no predicates.. return root
-    if(pred.length == 0) return root;
-
-    return comp2(ctx);
+    // no predicates.. return root; otherwise, do some advanced compilations
+    return pred.length == 0 ? root : comp2(ctx);
   }
 
   /**
@@ -80,27 +76,16 @@ public class Filter extends Preds {
       }
     }
 
-    // iterator for simple positional predicate
-    if(iterable()) return new IterPosFilter(this);
-
     // faster runtime evaluation of variable counters (array[$pos] ...)
-    off = pred.length == 1 && pred[0].type().num() && !pred[0].uses(Use.CTX);
-    return this;
+    final boolean off = pred.length == 1 && pred[0].type().num() &&
+      !pred[0].uses(Use.CTX);
+
+    // iterator for simple positional predicate
+    return off || iterable() ? new IterPosFilter(this, off) : this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    if(off) {
-      // evaluate offset and create position expression
-      final Item it = pred[0].ebv(ctx, input);
-      final long l = it.itr(input);
-      final Expr e = Pos.get(l, l, input);
-      // don't accept fractional numbers
-      if(l != it.dbl(input) || !(e instanceof Pos)) return Empty.ITER;
-      pos = (Pos) e;
-      return new IterPosFilter(this).iter(ctx);
-    }
-
     final Iter iter = ctx.iter(root);
     final Value cv = ctx.value;
     final long cs = ctx.size;

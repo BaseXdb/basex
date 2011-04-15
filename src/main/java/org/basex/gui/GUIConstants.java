@@ -70,8 +70,8 @@ public final class GUIConstants {
   public static final String PLOTVIEW = "plot";
   /** Internal name of the Tree View. */
   public static final String TREEVIEW = "tree";
-  /** Internal name of the XQuery View. */
-  public static final String XQUERYVIEW = "xquery";
+  /** Internal name of the Editor View. */
+  public static final String EDITORVIEW = "editor";
 
   /**
    * Default GUI Layout. The layout is formatted as follows:
@@ -80,7 +80,7 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String VIEWS = "V H " + XQUERYVIEW + ' ' + FOLDERVIEW +
+  public static final String VIEWS = "V H " + EDITORVIEW + ' ' + FOLDERVIEW +
     ' ' + MAPVIEW + ' ' + PLOTVIEW + ' ' + " - H " + TEXTVIEW + ' ' + INFOVIEW +
     ' ' + TABLEVIEW + ' ' + TREEVIEW + ' ' + EXPLOREVIEW + " - -";
 
@@ -118,7 +118,7 @@ public final class GUIConstants {
     SHOWEXPLORE, EMPTY, FULL
   }, {
     SHOWXQUERY, SHOWINFO, EMPTY,
-    XQOPEN, XQSAVE, XQSAVEAS
+    EDITNEW, EDITOPEN, EDITSAVE, EDITSAVEAS, EDITCLOSE
   }, {
     RTEXEC, RTFILTER, EMPTY,
     COLOR, FONTS, MAPLAYOUT, TREEOPTIONS, Prop.MAC ? null : EMPTY,
@@ -153,14 +153,16 @@ public final class GUIConstants {
 
   /** Icon type. */
   public enum Msg {
-    /** Warning icon. */
+    /** Warning message. */
     WARN("warn", "warning"),
-    /** Error icon. */
+    /** Error message. */
     ERROR("error", "error"),
-    /** Success icon. */
+    /** Success message. */
     SUCCESS("ok", "information"),
-    /** Question icon. */
-    QUESTION("warn", "question");
+    /** Question message. */
+    QUESTION("warn", "question"),
+    /** Yes/no/cancel message. */
+    YESNOCANCEL("warn", "question");
 
     /** Small icon. */
     public final Icon small;

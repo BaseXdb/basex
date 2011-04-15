@@ -26,12 +26,6 @@ public abstract class Bin extends Item {
   }
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it) {
-    // at this stage, item will always be of the same type
-    return Token.eq(val, ((Bin) it).val);
-  }
-
-  @Override
   public byte[] atom(final InputInfo ii) {
     return atom();
   }

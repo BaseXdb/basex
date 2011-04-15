@@ -616,23 +616,23 @@ public abstract class Data {
     } while(n.pre <= ipar && ipar < n.pre + size(n.pre, ELEM));
 
     // loop through all entries
-    int mpre = -1;
+    int mdpre = -1;
     final NSNode t = ns.current;
     final Set<NSNode> newNodes = new HashSet<NSNode>();
-    while(++mpre != ms) {
-      if(mpre != 0 && mpre % buf == 0) insert(ipre + mpre - buf);
+    while(++mdpre != ms) {
+      if(mdpre != 0 && mdpre % buf == 0) insert(ipre + mdpre - buf);
 
-      final int mk = md.kind(mpre);
-      final int mpar = md.parent(mpre, mk);
-      final int pre = ipre + mpre;
-      final int dis = mpar >= 0 ? mpre - mpar : pre - ipar;
+      final int mdk = md.kind(mdpre);
+      final int mdpar = md.parent(mdpre, mdk);
+      final int pre = ipre + mdpre;
+      final int dis = mdpar >= 0 ? mdpre - mdpar : pre - ipar;
       final int par = pre - dis;
 
       // find nearest namespace node on the ancestor axis of the insert
       // location. possible candidates for this node are collected and
       // the match with the highest pre value between ancestors and candidates
       // is determined.
-      if(mpre == 0) {
+      if(mdpre == 0) {
         // collect possible candidates for namespace root
         final List<NSNode> cand = new LinkedList<NSNode>();
         NSNode cn = ns.root;
@@ -672,10 +672,10 @@ public abstract class Data {
 
       while(l > 0 && preStack[l - 1] > par) ns.close(preStack[--l]);
 
-      switch(mk) {
+      switch(mdk) {
         case DOC:
           // add document
-          doc(pre, md.size(mpre, mk), md.text(mpre, true));
+          doc(pre, md.size(mdpre, mdk), md.text(mdpre, true));
           meta.ndocs++;
           ns.open();
           preStack[l++] = pre;
@@ -683,8 +683,8 @@ public abstract class Data {
         case ELEM:
           // add element
           boolean ne = false;
-          if(md.nsFlag(mpre)) {
-            final Atts at = md.ns(mpre);
+          if(md.nsFlag(mdpre)) {
+            final Atts at = md.ns(mdpre);
             for(int a = 0; a < at.size; ++a) {
               final byte[] old = nsScope.get(at.key[a]);
               if(old == null || !eq(old, at.val[a])) {
@@ -700,26 +700,26 @@ public abstract class Data {
             }
           }
           ns.open();
-          byte[] nm = md.name(mpre, mk);
-          elem(dis, tags.index(nm, null, false), md.attSize(mpre, mk),
-              md.size(mpre, mk), ns.uri(nm, true), ne);
+          byte[] nm = md.name(mdpre, mdk);
+          elem(dis, tags.index(nm, null, false), md.attSize(mdpre, mdk),
+              md.size(mdpre, mdk), ns.uri(nm, true), ne);
           preStack[l++] = pre;
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          text(pre, dis, md.text(mpre, true), mk);
+          text(pre, dis, md.text(mdpre, true), mdk);
           break;
         case ATTR:
           // add attribute
-          nm = md.name(mpre, mk);
-          if(md.nsFlag(mpre)) {
+          nm = md.name(mdpre, mdk);
+          if(md.nsFlag(mdpre)) {
             ns.add(par, l == 0 ? ipar : preStack[l - 1], pref(nm),
-                md.ns.uri(md.uri(mpre, mk)));
+                md.ns.uri(md.uri(mdpre, mdk)));
             table.write2(ipar, 1, 1 << 15 | name(ipar));
           }
-          attr(pre, dis, atts.index(nm, null, false), md.text(mpre, false),
+          attr(pre, dis, atts.index(nm, null, false), md.text(mdpre, false),
               ns.uri(nm, false), false);
           break;
       }
@@ -728,7 +728,7 @@ public abstract class Data {
     while(l > 0) ns.close(preStack[--l]);
     ns.setRoot(t);
 
-    if(bp != 0) insert(ipre + mpre - 1 - (mpre - 1) % buf);
+    if(bp != 0) insert(ipre + mdpre - 1 - (mdpre - 1) % buf);
     // reset buffer to old size
     buffer(1);
 

@@ -58,7 +58,7 @@ public final class NameTest extends Test {
     }
 
     // retrieve current data reference
-    final Data data = ctx.resource.data();
+    final Data data = ctx.data();
     if(data == null) return true;
 
     // skip optimizations if several namespaces are defined in the database

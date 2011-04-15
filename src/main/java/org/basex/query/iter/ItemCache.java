@@ -54,7 +54,9 @@ public final class ItemCache extends ValueIter implements Result {
    * @param val value to be added
    */
   public void add(final Value val) {
-    for(long sz = val.size(); item.length - size < sz;) item = extend(item);
+    for(final long sz = val.size(); item.length - size < sz;) {
+      item = extend(item);
+    }
     size += val.writeTo(item, size);
   }
 
@@ -71,10 +73,10 @@ public final class ItemCache extends ValueIter implements Result {
   public boolean sameAs(final Result v) {
     if(!(v instanceof ItemCache)) return false;
 
-    final ItemCache sb = (ItemCache) v;
-    if(size != sb.size) return false;
+    final ItemCache ic = (ItemCache) v;
+    if(size != ic.size) return false;
     for(int i = 0; i < size; ++i) {
-      if(item[i].type != sb.item[i].type || !item[i].sameAs(sb.item[i]))
+      if(item[i].type != ic.item[i].type || !item[i].sameAs(ic.item[i]))
         return false;
     }
     return true;

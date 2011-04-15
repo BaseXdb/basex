@@ -7,8 +7,8 @@ import java.awt.Dimension;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXText;
-import org.basex.gui.view.text.XMLSyntax;
+import org.basex.gui.layout.BaseXEditor;
+import org.basex.gui.layout.XMLSyntax;
 
 /**
  * Dialog window for displaying information about the project.
@@ -18,7 +18,7 @@ import org.basex.gui.view.text.XMLSyntax;
  */
 public final class DialogHelp extends Dialog {
   /** Text area. */
-  private final BaseXText area;
+  private final BaseXEditor area;
 
   /**
    * Default constructor.
@@ -29,7 +29,7 @@ public final class DialogHelp extends Dialog {
     panel.border(5, 5, 5, 5);
     panel.setBackground(Color.white);
 
-    area = new BaseXText(false, gui);
+    area = new BaseXEditor(false, gui);
     area.setSyntax(new XMLSyntax());
     set(area, BorderLayout.CENTER);
 

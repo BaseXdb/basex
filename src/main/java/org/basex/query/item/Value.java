@@ -173,7 +173,7 @@ public abstract class Value extends Expr {
   public abstract int writeTo(final Item[] arr, final int start);
 
   /**
-   * Creates an ItemCache containing all items of this value.
+   * Creates an {@link ItemCache}, containing all items of this value.
    * @return cached items
    */
   public ItemCache cache() {

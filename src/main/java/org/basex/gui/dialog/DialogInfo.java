@@ -26,7 +26,7 @@ import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTabs;
-import org.basex.gui.layout.BaseXText;
+import org.basex.gui.layout.BaseXEditor;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
@@ -77,7 +77,7 @@ public final class DialogInfo extends Dialog {
       info.high().add(NL + INFONS + NL).norm().add(data.ns.info());
     }
 
-    final BaseXText text = text(info.finish());
+    final BaseXEditor text = text(info.finish());
     text.setFont(f);
     tab1.add(text, BorderLayout.CENTER);
 
@@ -105,6 +105,7 @@ public final class DialogInfo extends Dialog {
       north = new BaseXBack(new BorderLayout());
       north.add(indexes[0], BorderLayout.WEST);
       final BaseXButton export = new BaseXButton(GUIEXPORT, this);
+      export.setMnemonic();
       export.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent e) {
@@ -209,8 +210,8 @@ public final class DialogInfo extends Dialog {
    * @param txt contents
    * @return text box
    */
-  private BaseXText text(final byte[] txt) {
-    final BaseXText text = new BaseXText(false, this);
+  private BaseXEditor text(final byte[] txt) {
+    final BaseXEditor text = new BaseXEditor(false, this);
     text.setText(txt);
     text.setPreferredSize(new Dimension(550, 160));
     return text;

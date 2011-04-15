@@ -5,8 +5,10 @@ import static org.basex.query.item.SeqType.*;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FunType;
 import org.basex.query.item.SeqType;
+import org.basex.query.util.NSGlobal;
 import org.basex.util.InputInfo;
 import org.basex.util.Reflect;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -538,8 +540,8 @@ public enum FunDef {
   /* FNHttp functions */
 
   /** XQuery function */
-  SENDREQUEST(HTTPURI, FNHttp.class, 1, 2, "send-request(request[,href])",
-      NOD, STR_ZO, ITEM_ZM),
+  SENDREQUEST(HTTPURI, FNHttp.class, 1, 3,
+      "send-request(request[,href,[bodies]])", NOD, STR_ZO, ITEM_ZM, ITEM_ZM),
 
   /* FNDb functions */
 
@@ -682,6 +684,6 @@ public enum FunDef {
 
   @Override
   public final String toString() {
-    return desc;
+    return new TokenBuilder(NSGlobal.prefix(uri)).add(':').add(desc).toString();
   }
 }

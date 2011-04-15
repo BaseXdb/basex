@@ -16,9 +16,9 @@ import org.basex.util.Reflect;
  * @author Christian Gruen
  */
 final class LuceneStemmer extends Stemmer {
-  /** Name of the package with all Snowball stemmers. */
+  /** Name of the package with all Lucene stemmers. */
   private static final String PKG = "org.apache.lucene.analysis";
-  /** Stemmer classes which the Snowball library provides. */
+  /** Stemmer classes which the Lucene library provides. */
   private static final EnumMap<Language, StemmerClass> CLASSES =
       new EnumMap<Language, StemmerClass>(Language.class);
 
