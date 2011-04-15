@@ -157,6 +157,8 @@ public interface QueryTokens {
   /** Parser token. */
   String LOWERCASE = "lowercase";
   /** Parser token. */
+  String MAP = "map";
+  /** Parser token. */
   String MOD = "mod";
   /** Parser token. */
   String MODIFY = "modify";

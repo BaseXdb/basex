@@ -18,9 +18,9 @@ import org.basex.util.Util;
  * XQuery 3.0 function data types.
  *
  * @author BaseX Team 2005-11, BSD License
- * @author Christian Gruen
+ * @author Leo Woerteler
  */
-public final class FunType implements Type {
+public class FunType implements Type {
 
   /** Any function type. */
   public static final FunType ANY = new FunType(null, null);
@@ -38,7 +38,7 @@ public final class FunType implements Type {
    * @param arg argument types
    * @param rt return type
    */
-  private FunType(final SeqType[] arg, final SeqType rt) {
+  FunType(final SeqType[] arg, final SeqType rt) {
     args = arg;
     ret = rt;
   }
@@ -95,14 +95,13 @@ public final class FunType implements Type {
   }
 
   @Override
-  public FunItem e(final Item it, final QueryContext ctx, final InputInfo ii)
+  public Fun e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     if(!it.func()) throw Err.cast(ii, this, it);
-    final FunItem f = (FunItem) it;
+    final Fun f = (Fun) it;
     if(this == ANY) return f;
-    if(f.arity() != args.length) throw Err.cast(ii, this, it);
 
-    return f.type.instance(this) ? f : FunItem.coerce(ctx, ii, f, this);
+    return f.coerceTo(this, ctx, ii);
   }
 
   @Override

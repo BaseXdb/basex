@@ -7,11 +7,10 @@ import org.basex.query.expr.DynFunCall;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.VarRef;
 import org.basex.query.iter.Iter;
-import static org.basex.query.util.Err.*;
+import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.query.util.VarList;
 import org.basex.util.InputInfo;
-import org.basex.util.Util;
 
 /**
  * Function item.
@@ -19,7 +18,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class FunItem extends Item {
+public class FunItem extends Fun {
 
   /** Variables. */
   private final Var[] vars;
@@ -65,46 +64,17 @@ public class FunItem extends Item {
       for(int i = 0; i < cl.size; i++) closure.set(cl.vars[i].copy());
   }
 
-  /**
-   * Number of arguments this function item takes.
-   * @return function arity
-   */
+  @Override
   public int arity() {
     return vars.length;
   }
 
-  /**
-   * Name of this function, {@code null} means anonymous function.
-   * @return name or {@code null}
-   */
+  @Override
   public QNm fName() {
     return name;
   }
 
-  /**
-   * Variables of this function item.
-   * @return the vars
-   */
-  public Var[] vars() {
-    return vars;
-  }
-
-  /**
-   * Function body of this function item.
-   * @return the function body
-   */
-  public Expr body() {
-    return expr;
-  }
-
-  /**
-   * Invokes this function item with the given arguments.
-   * @param ctx query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
+  @Override
   public Value invValue(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
@@ -128,14 +98,7 @@ public class FunItem extends Item {
     return cast != null ? cast.promote(v, this, ctx, ii) : v;
   }
 
-  /**
-   * Invokes this function item with the given arguments.
-   * @param ctx query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
+  @Override
   public Iter invIter(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
@@ -143,14 +106,7 @@ public class FunItem extends Item {
     return invValue(ctx, ii, args).iter();
   }
 
-  /**
-   * Invokes this function item with the given arguments.
-   * @param ctx query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting item
-   * @throws QueryException query exception
-   */
+  @Override
   public Item invItem(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
@@ -175,16 +131,6 @@ public class FunItem extends Item {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) throws QueryException {
-    throw NOTYP.thrw(ii, desc());
-  }
-
-  @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    throw FNEQ.thrw(ii, desc());
-  }
-
-  @Override
   public String toString() {
     final FunType ft = (FunType) type;
     final StringBuilder sb = new StringBuilder(FUNCTION).append('(');
@@ -202,11 +148,6 @@ public class FunItem extends Item {
   @Override
   public int count(final Var v) {
     return expr.count(v);
-  }
-
-  @Override
-  public Object toJava() {
-    throw Util.notexpected();
   }
 
   /**
@@ -227,5 +168,13 @@ public class FunItem extends Item {
     }
     return new FunItem(fun.name, vars, new DynFunCall(ii, fun, refs), t,
         fun.cast != null);
+  }
+
+  @Override
+  Fun coerceTo(final FunType ft, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+
+    if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
+    return type.instance(ft) ? this : FunItem.coerce(ctx, ii, this, ft);
   }
 }

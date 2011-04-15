@@ -330,7 +330,7 @@ public final class FNFunc extends Fun {
   private FunItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
-    if(!f.func() || ((FunItem) f).vars().length != a)
+    if(!f.func() || ((FunItem) f).arity() != a)
       Err.type(this, FunType.arity(a), f);
 
     return (FunItem) f;
