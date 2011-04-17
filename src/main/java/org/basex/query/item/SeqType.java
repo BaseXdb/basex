@@ -150,7 +150,11 @@ public final class SeqType {
   /** Zero or one duration. */
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZO);
   /** Single function. */
-  public static final SeqType FUN_O = FunType.ANY.seq();
+  public static final SeqType FUN_O = FunType.ANY_FUN.seq();
+  /** Single function. */
+  public static final SeqType MAP_O = MapType.ANY_MAP.seq();
+  /** Single function. */
+  public static final SeqType MAP_ZM = new SeqType(MapType.ANY_MAP, Occ.ZM);
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZM);
   /** One document node. */

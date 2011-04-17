@@ -23,7 +23,7 @@ import org.basex.util.Util;
 public class FunType implements Type {
 
   /** Any function type. */
-  public static final FunType ANY = new FunType(null, null);
+  public static final FunType ANY_FUN = new FunType(null, null);
 
   /** Argument types. */
   public final SeqType[] args;
@@ -95,11 +95,11 @@ public class FunType implements Type {
   }
 
   @Override
-  public Fun e(final Item it, final QueryContext ctx, final InputInfo ii)
+  public FItem e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     if(!it.func()) throw Err.cast(ii, this, it);
-    final Fun f = (Fun) it;
-    if(this == ANY) return f;
+    final FItem f = (FItem) it;
+    if(this == ANY_FUN) return f;
 
     return f.coerceTo(this, ctx, ii);
   }
@@ -116,8 +116,8 @@ public class FunType implements Type {
     final FunType ft = (FunType) t;
 
     // takes care of FunType.ANY
-    if(this == ft || ft == ANY) return true;
-    if(this == ANY) return false;
+    if(this == ft || ft == ANY_FUN) return true;
+    if(this == ANY_FUN) return false;
     if(args.length != ft.args.length || !ret.instance(ft.ret)) return false;
     for(int i = 0; i < args.length; i++)
       if(!ft.args[i].instance(args[i])) return false;
@@ -131,7 +131,7 @@ public class FunType implements Type {
    * @return function type
    */
   public static FunType get(final SeqType[] args, final SeqType ret) {
-    if(args == null || ret == null) return ANY;
+    if(args == null || ret == null) return ANY_FUN;
     return new FunType(args, ret);
   }
 
@@ -162,7 +162,7 @@ public class FunType implements Type {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
-    if(this == ANY) {
+    if(this == ANY_FUN) {
       tb.add('*').add(')');
     } else {
       tb.addSep(args, ", ").add(") as ").add(ret.toString());
@@ -176,7 +176,7 @@ public class FunType implements Type {
    * @return the variables for convenience
    */
   public Var[] type(final Var[] vars) {
-    if(this != ANY) {
+    if(this != ANY_FUN) {
       for(int i = 0; i < vars.length; i++)
         if(vars[i] != null && args[i] != SeqType.ITEM_ZM)
           vars[i].type = args[i];

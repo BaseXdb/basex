@@ -13,13 +13,13 @@ import org.basex.util.Util;
  *
  * @author Leo Woerteler
  */
-public abstract class Fun extends Item {
+public abstract class FItem extends Item {
 
   /**
    * Constructor.
    * @param t type
    */
-  protected Fun(final Type t) {
+  protected FItem(final Type t) {
     super(t);
   }
 
@@ -80,7 +80,7 @@ public abstract class Fun extends Item {
    * @return coerced item
    * @throws QueryException query exception
    */
-  abstract Fun coerceTo(final FunType ft, final QueryContext ctx,
+  public abstract FItem coerceTo(final FunType ft, final QueryContext ctx,
       final InputInfo ii) throws QueryException;
 
   @Override

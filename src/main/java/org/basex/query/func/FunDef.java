@@ -157,10 +157,10 @@ public enum FunDef {
       FunType.get(new SeqType[]{ ITEM }, BLN).seq(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   FUNCNAME(FNURI, FNFunc.class, 1, 1, "function-name(function)",
-      FunType.ANY.seq(), QNM_ZO),
+      FunType.ANY_FUN.seq(), QNM_ZO),
   /** XQuery function. */
   FUNCARITY(FNURI, FNFunc.class, 1, 1, "function-arity(function)",
-      FunType.ANY.seq(), ITR),
+      FunType.ANY_FUN.seq(), ITR),
   /** XQuery function. */
   MAP(FNURI, FNFunc.class, 2, 2, "map(function,seq)",
       FunType.get(new SeqType[]{ ITEM }, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM),
@@ -199,6 +199,25 @@ public enum FunDef {
   /** XQuery Function. */
   ITERATE(HOFURI, FNFunc.class, 2, 2, "iterate(fun, seq)",
       FunType.arity(1).seq(), ITEM_ZM, ITEM_ZM),
+
+  /* FNMap functions. */
+
+  /** XQuery Function. */
+  MAPNEW(MAPURI, FNMap.class, 0, 2, "new([maps[,coll]])", MAP_ZM, STR, MAP_O),
+  /** XQuery Function. */
+  ENTRY(MAPURI, FNMap.class, 2, 2, "entry(key,value)", ITEM, ITEM_ZM, MAP_O),
+  /** XQuery Function. */
+  MAPGET(MAPURI, FNMap.class, 2, 2, "get(map,key)", MAP_O, ITEM, ITEM_ZM),
+  /** XQuery Function. */
+  MAPCONT(MAPURI, FNMap.class, 2, 2, "contains(map,key)", MAP_O, ITEM, BLN),
+  /** XQuery Function. */
+  MAPREM(MAPURI, FNMap.class, 2, 2, "remove(map,key)", MAP_O, ITEM, MAP_O),
+  /** XQuery Function. */
+  MAPSIZE(MAPURI, FNMap.class, 1, 1, "size(map)", MAP_O, ITR),
+  /** XQuery Function. */
+  MAPKEYS(MAPURI, FNMap.class, 1, 1, "keys(map)", MAP_O, AAT_ZM),
+  /** XQuery Function. */
+  MAPCOLL(MAPURI, FNMap.class, 1, 1, "collation(map)", MAP_O, STR),
 
   /* FNGen functions. */
 
@@ -652,7 +671,7 @@ public enum FunDef {
     min = mn;
     max = mx;
     desc = dsc;
-    args = new SeqType[max == Integer.MAX_VALUE ? min : max];
+    args = new SeqType[max != Integer.MAX_VALUE ? max : Math.max(min, 1)];
     System.arraycopy(type, 0, args, 0, args.length);
     ret = type[args.length];
   }
@@ -675,7 +694,7 @@ public enum FunDef {
    */
   public FunType type(final int arity) {
     final SeqType[] arg = new SeqType[arity];
-    if(max == Integer.MAX_VALUE) {
+    if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);
       final SeqType var = args[args.length - 1];
       for(int i = args.length; i < arg.length; i++) arg[i] = var;

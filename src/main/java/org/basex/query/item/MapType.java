@@ -4,9 +4,9 @@ import static org.basex.query.QueryTokens.*;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.map.Map;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * Type for maps.
@@ -16,7 +16,10 @@ import org.basex.util.Token;
  */
 public final class MapType extends FunType {
   /** Key type of the map. */
-  final AtomType keyType;
+  public final AtomType keyType;
+  /** The general map type. */
+  public static final MapType ANY_MAP = new MapType(AtomType.AAT,
+      SeqType.ITEM_ZM);
 
   /**
    * Constructor.
@@ -30,11 +33,11 @@ public final class MapType extends FunType {
 
   @Override
   public byte[] nam() {
-    return Token.token(MAP);
+    return MAP;
   }
 
   @Override
-  public Fun e(final Item it, final QueryContext ctx, final InputInfo ii)
+  public FItem e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     if(!it.type.instance(this)) throw Err.cast(ii, this, it);
 
@@ -44,5 +47,15 @@ public final class MapType extends FunType {
   @Override
   public boolean instance(final Type t) {
     return t instanceof MapType && super.instance(t);
+  }
+
+  /**
+   * Creates a new map type.
+   * @param key key type
+   * @param val value type
+   * @return map type
+   */
+  public static MapType get(final AtomType key, final SeqType val) {
+    return new MapType(key, val);
   }
 }

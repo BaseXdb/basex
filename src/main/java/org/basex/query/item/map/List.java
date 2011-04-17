@@ -1,7 +1,9 @@
-package org.basex.query.util.map;
+package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.Array;
@@ -56,7 +58,7 @@ final class List extends TrieNode {
     // same hash, replace or merge
     if(h == hash) {
       for(int i = keys.length; i-- > 0;) {
-        if(k.eq(ii, keys[i])) {
+        if(eq(k, keys[i], ii)) {
           // replace value
           final Value[] vs = values.clone();
           vs[i] = v;
@@ -87,7 +89,7 @@ final class List extends TrieNode {
       final InputInfo ii) throws QueryException {
     if(h == hash) {
       for(int i = size; i-- > 0;) {
-        if(k.eq(ii, keys[i])) {
+        if(eq(k, keys[i], ii)) {
           // found entry
           if(size == 2) {
             // single leaf remains
@@ -106,7 +108,7 @@ final class List extends TrieNode {
   Value get(final int h, final Item k, final int l, final InputInfo ii)
       throws QueryException {
     if(h == hash) for(int i = keys.length; i-- != 0;)
-      if(keys[i].eq(ii, k)) return values[i];
+      if(eq(k, keys[i], ii)) return values[i];
     return null;
   }
 
@@ -114,7 +116,7 @@ final class List extends TrieNode {
   boolean contains(final int h, final Item k, final int u, final InputInfo ii)
       throws QueryException {
     if(h == hash) for(int i = keys.length; i-- != 0;)
-      if(keys[i].eq(ii, k)) return true;
+      if(eq(k, keys[i], ii)) return true;
     return false;
   }
 
@@ -139,7 +141,7 @@ final class List extends TrieNode {
   TrieNode add(final Leaf o, final int l, final InputInfo ii)
       throws QueryException {
     if(hash == o.hash) {
-      for(final Item k : keys) if(k.eq(ii, o.key)) return this;
+      for(final Item k : keys) if(eq(k, o.key, ii)) return this;
       return new List(hash, Array.add(keys, o.key), Array.add(values, o.value));
     }
 
@@ -170,7 +172,7 @@ final class List extends TrieNode {
       outer: for(int i = 0; i < size; i++) {
         final Item ok = o.keys[i];
         // skip all entries that are overridden
-        for(final Item k : keys) if(ok.eq(ii, k)) continue outer;
+        for(final Item k : keys) if(eq(k, ok, ii)) continue outer;
         // key is not in this list, add it
         ks = Array.add(ks, ok);
         vs = Array.add(vs, o.values[i]);
@@ -211,7 +213,7 @@ final class List extends TrieNode {
     try {
       for(int i = 1; i < size; i++) {
         for(int j = i; j-- > 0;) {
-          if(keys[i].eq(null, keys[j])) return false;
+          if(eq(keys[i], keys[j], null)) return false;
         }
       }
     } catch(final QueryException e) {
@@ -223,5 +225,15 @@ final class List extends TrieNode {
   @Override
   void keys(final ItemCache ks) {
     for(final Item k : keys) ks.add(k);
+  }
+
+  @Override
+  boolean hasType(final AtomType kt, final SeqType vt) {
+    if(kt != null)
+      for(final Item k : keys) if(!k.type.instance(kt)) return false;
+    if(vt != null)
+      for(final Value v : values) if(!vt.instance(v)) return false;
+
+    return true;
   }
 }

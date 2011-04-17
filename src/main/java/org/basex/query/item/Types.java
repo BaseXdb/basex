@@ -32,6 +32,6 @@ public final class Types {
     }
 
     return !atom && type.uri() == Uri.EMPTY && eq(type.ln(), token(FUNCTION)) ?
-        FunType.ANY : null;
+        FunType.ANY_FUN : null;
   }
 }

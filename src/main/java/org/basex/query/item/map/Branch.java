@@ -1,13 +1,15 @@
-package org.basex.query.util.map;
+package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 
 /**
- * Inner node of a {@link HashTrie}.
+ * Inner node of a {@link Map}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
@@ -190,5 +192,12 @@ final class Branch extends TrieNode {
   @Override
   void keys(final ItemCache ks) {
     for(final TrieNode nd : kids) if(nd != null) nd.keys(ks);
+  }
+
+  @Override
+  boolean hasType(final AtomType kt, final SeqType vt) {
+    for(final TrieNode ch : kids)
+      if(ch != null && !ch.hasType(kt, vt)) return false;
+    return true;
   }
 }

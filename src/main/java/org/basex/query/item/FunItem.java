@@ -18,7 +18,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class FunItem extends Fun {
+public class FunItem extends FItem {
 
   /** Variables. */
   private final Var[] vars;
@@ -171,8 +171,8 @@ public class FunItem extends Fun {
   }
 
   @Override
-  Fun coerceTo(final FunType ft, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public FItem coerceTo(final FunType ft, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
 
     if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
     return type.instance(ft) ? this : FunItem.coerce(ctx, ii, this, ft);

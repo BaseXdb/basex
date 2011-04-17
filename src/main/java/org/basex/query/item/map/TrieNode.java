@@ -1,7 +1,9 @@
-package org.basex.query.util.map;
+package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
@@ -14,7 +16,7 @@ import org.basex.util.InputInfo;
  */
 abstract class TrieNode {
   /** Number of children on each level. */
-  static final int KIDS = 1 << HashTrie.BITS;
+  static final int KIDS = 1 << Map.BITS;
   /** Mask for the bits used on the current level. */
   static final int MASK = KIDS - 1;
 
@@ -48,6 +50,8 @@ abstract class TrieNode {
     boolean verify() { return true; }
     @Override
     void keys(final ItemCache ks) { }
+    @Override
+    public boolean hasType(final AtomType kt, final SeqType vt) { return true; }
   };
 
   /** Size of this node. */
@@ -177,7 +181,7 @@ abstract class TrieNode {
    * @return hash key
    */
   static final int key(final int hash, final int lvl) {
-    return hash >>> lvl * HashTrie.BITS & MASK;
+    return hash >>> lvl * Map.BITS & MASK;
   }
 
   @Override
@@ -193,4 +197,25 @@ abstract class TrieNode {
    * @return string builder for convenience
    */
   abstract StringBuilder toString(final StringBuilder sb, final String ind);
+
+  /**
+   * Checks if the map has the specified key and value type.
+   * @param kt key type
+   * @param vt value type
+   * @return {@code true} if the type fits, {@code false} otherwise
+   */
+  abstract boolean hasType(final AtomType kt, final SeqType vt);
+
+  /**
+   * Compares two items.
+   * @param a first item
+   * @param b second item
+   * @param ii input info
+   * @return {@code true} if both items are equal, {@code false} otherwise
+   * @throws QueryException query exception
+   */
+  static final boolean eq(final Item a, final Item b, final InputInfo ii)
+      throws QueryException {
+    return a.comparable(b) && a.eq(ii, b);
+  }
 }
