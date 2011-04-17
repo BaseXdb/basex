@@ -37,9 +37,14 @@ public final class MapType extends FunType {
   }
 
   @Override
+  public boolean map() {
+    return true;
+  }
+
+  @Override
   public FItem e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(!it.type.instance(this)) throw Err.cast(ii, this, it);
+    if(!it.map() || !((Map) it).hasType(this)) throw Err.cast(ii, this, it);
 
     return (Map) it;
   }
@@ -56,6 +61,13 @@ public final class MapType extends FunType {
    * @return map type
    */
   public static MapType get(final AtomType key, final SeqType val) {
+    if(key == AtomType.AAT && val.eq(SeqType.ITEM_ZM)) return ANY_MAP;
     return new MapType(key, val);
+  }
+
+  @Override
+  public String toString() {
+    return keyType == AtomType.AAT && ret.eq(SeqType.ITEM_ZM) ? "map(*)"
+        : "map(" + keyType + ", " + ret + ")";
   }
 }

@@ -157,6 +157,8 @@ public interface QueryTokens {
   /** Parser token. */
   String LOWERCASE = "lowercase";
   /** Parser token. */
+  String MAPSTR = "map";
+  /** Parser token. */
   String MOD = "mod";
   /** Parser token. */
   String MODIFY = "modify";
@@ -477,7 +479,7 @@ public interface QueryTokens {
   /** HOF token. */
   byte[] HOF = token("hof");
   /** MAP token. */
-  byte[] MAP = token("map");
+  byte[] MAP = token(MAPSTR);
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");

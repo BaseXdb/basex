@@ -1,6 +1,7 @@
 package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
+import org.basex.query.func.FNSimple;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -27,7 +28,7 @@ abstract class TrieNode {
         final InputInfo i) { return new Leaf(h, k, v); }
     @Override
     StringBuilder toString(final StringBuilder sb, final String ind) {
-      return sb.append("EMPTY"); }
+      return sb.append("map{}"); }
     @Override
     TrieNode delete(final int h, final Item k, final int l, final InputInfo i) {
       return this; }
@@ -52,6 +53,11 @@ abstract class TrieNode {
     void keys(final ItemCache ks) { }
     @Override
     public boolean hasType(final AtomType kt, final SeqType vt) { return true; }
+    @Override
+    public int hash(final InputInfo ii) throws QueryException { return 0; }
+    @Override
+    public boolean eq(final InputInfo ii, final TrieNode o) {
+      return this == o; }
   };
 
   /** Size of this node. */
@@ -207,6 +213,19 @@ abstract class TrieNode {
   abstract boolean hasType(final AtomType kt, final SeqType vt);
 
   /**
+   * Compares two values.
+   * @param a first value
+   * @param b second value
+   * @param ii input info
+   * @return {@code true} if both values are deep equal, {@code false} otherwise
+   * @throws QueryException query exception
+   */
+  static final boolean eq(final Value a, final Value b, final InputInfo ii)
+      throws QueryException {
+    return a.size() == b.size() && FNSimple.deep(ii, a.iter(), b.iter());
+  }
+
+  /**
    * Compares two items.
    * @param a first item
    * @param b second item
@@ -218,4 +237,22 @@ abstract class TrieNode {
       throws QueryException {
     return a.comparable(b) && a.eq(ii, b);
   }
+
+  /**
+   * Calculates the hash code of this node.
+   * @param ii input info
+   * @return hash value
+   * @throws QueryException query exception
+   */
+  abstract int hash(InputInfo ii) throws QueryException;
+
+  /**
+   * Checks if this node is indistinguishable from the given node.
+   * @param ii input info
+   * @param o other node
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  abstract boolean eq(final InputInfo ii, final TrieNode o)
+      throws QueryException;
 }

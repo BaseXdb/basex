@@ -31,7 +31,12 @@ public final class Types {
       if(nt != null) return nt;
     }
 
-    return !atom && type.uri() == Uri.EMPTY && eq(type.ln(), token(FUNCTION)) ?
-        FunType.ANY_FUN : null;
+    if(!atom && type.uri() == Uri.EMPTY) {
+      final byte[] ln = type.ln();
+      if(eq(ln, token(FUNCTION))) return FunType.ANY_FUN;
+      if(eq(ln, MAP)) return MapType.ANY_MAP;
+    }
+
+    return null;
   }
 }

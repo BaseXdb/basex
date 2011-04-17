@@ -152,7 +152,8 @@ public final class SeqType {
   /** Single function. */
   public static final SeqType FUN_O = FunType.ANY_FUN.seq();
   /** Single function. */
-  public static final SeqType MAP_O = MapType.ANY_MAP.seq();
+  public static final SeqType MAP_O = new SeqType(
+      MapType.get(AtomType.AAT, ITEM_ZM));
   /** Single function. */
   public static final SeqType MAP_ZM = new SeqType(MapType.ANY_MAP, Occ.ZM);
   /** Zero or more bytes. */

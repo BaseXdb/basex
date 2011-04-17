@@ -236,4 +236,35 @@ final class List extends TrieNode {
 
     return true;
   }
+
+  @Override
+  int hash(final InputInfo ii) throws QueryException {
+    int h = hash;
+    // order isn't important, operation has to be commutative
+    for(int i = size; --i >= 0;) h ^= values[i].hash(ii);
+    return h;
+  }
+
+  @Override
+  boolean eq(final InputInfo ii, final TrieNode o) throws QueryException {
+    if(!(o instanceof List) || size != o.size) return false;
+    final List ol = (List) o;
+
+    // do the evil nested-loop thing
+    outer: for(int i = 0; i < size; i++) {
+      final Item k = keys[i];
+      for(int j = 0; j < size; j++) {
+        if(eq(k, ol.keys[i], ii)) {
+          // check bound value, too
+          if(!eq(values[i], ol.values[j], ii)) return false;
+          // value matched, continue with next key
+          continue outer;
+        }
+      }
+      // all keys of the other list were checked, none matched
+      return false;
+    }
+    // all entries were found
+    return true;
+  }
 }

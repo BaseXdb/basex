@@ -183,4 +183,9 @@ public class FunType implements Type {
     }
     return vars;
   }
+
+  @Override
+  public boolean map() {
+    return false;
+  }
 }

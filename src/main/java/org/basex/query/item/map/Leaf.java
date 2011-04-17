@@ -1,6 +1,7 @@
 package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
+import org.basex.query.func.FNSimple;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -176,5 +177,16 @@ final class Leaf extends TrieNode {
   boolean hasType(final AtomType kt, final SeqType vt) {
     return (kt == null || key.type.instance(kt))
         && (vt == null || vt.instance(value));
+  }
+
+  @Override
+  boolean eq(final InputInfo ii, final TrieNode o) throws QueryException {
+    return o instanceof Leaf && eq(key, ((Leaf) o).key, ii)
+        && FNSimple.deep(ii, value.iter(), ((Leaf) o).value.iter());
+  }
+
+  @Override
+  int hash(final InputInfo ii) throws QueryException {
+    return 31 * hash + value.hash(ii);
   }
 }

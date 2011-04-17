@@ -82,6 +82,7 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.Empty;
 import org.basex.query.item.FunType;
 import org.basex.query.item.Itr;
+import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
@@ -2355,17 +2356,27 @@ public class QueryParser extends InputParser {
       if(t != null && t.func()) {
         // function type
         if(!wsConsume(ASTERISK)) {
-          SeqType[] args = {};
-          if(!wsConsume(PAR2)) {
-            // function has got arguments
-            do {
-              args = Array.add(args, sequenceType());
-            } while(wsConsume(COMMA));
-
+          if(t.map()) {
+            final Type keyType = itemType();
+            if(keyType == null) throw error(MAPTKV, type.atom());
+            if(!keyType.instance(AtomType.AAT)) throw error(MAPTAAT, keyType);
+            wsCheck(COMMA);
+            t = MapType.get((AtomType) keyType, sequenceType());
             if(!wsConsume(PAR2)) error(FUNCMISS, type.atom());
+          } else {
+            // function type
+            SeqType[] args = {};
+            if(!wsConsume(PAR2)) {
+              // function has got arguments
+              do {
+                args = Array.add(args, sequenceType());
+              } while(wsConsume(COMMA));
+
+              if(!wsConsume(PAR2)) error(FUNCMISS, type.atom());
+            }
+            wsCheck(AS);
+            t = FunType.get(args, sequenceType());
           }
-          wsCheck(AS);
-          t = FunType.get(args, sequenceType());
         } else if(!wsConsume(PAR2)) {
           error(FUNCMISS, type.atom());
         }
@@ -3273,13 +3284,14 @@ public class QueryParser extends InputParser {
 
   /**
    * Throws the alternative error message.
+   * @return never
    * @throws QueryException query exception
    */
-  private void error() throws QueryException {
+  private QueryException error() throws QueryException {
     qp = ap;
-    if(alter != FUNCUNKNOWN) error(alter);
+    if(alter != FUNCUNKNOWN) throw error(alter);
     ctx.funcs.funError(alterFunc, this);
-    error(alter, alterFunc.atom());
+    throw error(alter, alterFunc.atom());
   }
 
   /**
@@ -3302,9 +3314,11 @@ public class QueryParser extends InputParser {
    * Throws the specified error.
    * @param err error to be thrown
    * @param arg error arguments
+   * @return never
    * @throws QueryException query exception
    */
-  public void error(final Err err, final Object... arg) throws QueryException {
-    err.thrw(input(), arg);
+  public QueryException error(final Err err, final Object... arg)
+      throws QueryException {
+    throw err.thrw(input(), arg);
   }
 }

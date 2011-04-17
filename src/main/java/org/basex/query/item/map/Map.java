@@ -183,14 +183,14 @@ public class Map extends FItem {
   @Override
   public String toString() {
     try {
-      final TokenBuilder tb = new TokenBuilder("map{");
+      final TokenBuilder tb = new TokenBuilder("map { ");
       final Value ks = keys();
       for(long i = 0, len = ks.size(); i < len; i++) {
         final Item k = ks.itemAt(i);
-        if(tb.size() > 4) tb.add(", ");
+        if(tb.size() > 6) tb.add(", ");
         tb.add(k.toString()).add(":=").add(get(k, null).toString());
       }
-      return tb.add("}").toString();
+      return tb.add(" }").toString();
     } catch(final QueryException e) {
       throw Util.notexpected(e);
     }
@@ -246,5 +246,15 @@ public class Map extends FItem {
    */
   public Str collation() {
     return Str.get(QueryTokens.URLCOLL);
+  }
+
+  @Override
+  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+    return it instanceof Map && root.eq(ii, ((Map) it).root);
+  }
+
+  @Override
+  public int hash(final InputInfo ii) throws QueryException {
+    return root.hash(ii);
   }
 }

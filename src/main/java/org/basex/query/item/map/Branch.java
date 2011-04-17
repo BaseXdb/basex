@@ -200,4 +200,27 @@ final class Branch extends TrieNode {
       if(ch != null && !ch.hasType(kt, vt)) return false;
     return true;
   }
+
+  @Override
+  int hash(final InputInfo ii) throws QueryException {
+    int hash = 0;
+    for(final TrieNode ch : kids) if(ch != null) hash = 31 * hash + ch.hash(ii);
+    return hash;
+  }
+
+  @Override
+  boolean eq(final InputInfo ii, final TrieNode o) throws QueryException {
+    if(!(o instanceof Branch)) return false;
+    final Branch ob = (Branch) o;
+
+    // check bin usage first
+    if(used != ob.used) return false;
+
+    // recursively compare children
+    for(int i = 0; i < KIDS; i++)
+      if(kids[i] != null && !kids[i].eq(ii, ob.kids[i])) return false;
+
+    // everything OK
+    return true;
+  }
 }
