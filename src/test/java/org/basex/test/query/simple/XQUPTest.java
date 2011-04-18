@@ -161,13 +161,6 @@ public final class XQUPTest extends QueryTest {
         { "ins2", node(6, 9, 10),
         "/up/cars/good/car/@n, /up/cars/good/car/a, " +
         "/up/cars/good/car/text()" },
-        /*
-        { "xxxins3", nodes(),
-        "insert node" + SEQ6 + " into /up/cars/good/car[@id=1]"},
-        { "ins3", nodes(5, 5),
-        "/up/cars/good/car[text()='fooboo5'], " +
-        "/up/cars/good/car[text()='foobooaaa']" },
-        */
 
         // merge text nodes
         { "xxxMERGEins", empty(),
