@@ -95,7 +95,7 @@ public class FunItem extends FItem {
     ctx.vars.reset(s);
 
     // optionally cast return value to target type
-    return cast != null ? cast.promote(v, this, ctx, ii) : v;
+    return cast != null ? cast.promote(v, ctx, ii) : v;
   }
 
   @Override

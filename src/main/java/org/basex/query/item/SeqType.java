@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -21,15 +20,15 @@ public final class SeqType {
     /** Zero.         */  Z(0, 0, ""),
     /** Zero or one.  */ ZO(0, 1, "?"),
     /** Exactly one.  */  O(1, 1, ""),
-    /** One or more.  */ OM(1, Integer.MAX_VALUE, "+"),
-    /** Zero or more. */ ZM(0, Integer.MAX_VALUE, "*");
+    /** One or more.  */ OM(1, Long.MAX_VALUE, "+"),
+    /** Zero or more. */ ZM(0, Long.MAX_VALUE, "*");
 
     /** String representation. */
     private final String str;
     /** Minimal number of occurrences. */
-    public final int min;
+    public final long min;
     /** Maximal number of occurrences. */
-    public final int max;
+    public final long max;
 
     /**
      * Constructor.
@@ -37,7 +36,7 @@ public final class SeqType {
      * @param mx maximal number of occurrences
      * @param s string representation
      */
-    Occ(final int mn, final int mx, final String s) {
+    Occ(final long mn, final long mx, final String s) {
       min = mn;
       max = mx;
       str = s;
@@ -51,6 +50,15 @@ public final class SeqType {
      */
     public boolean instance(final Occ o) {
       return min >= o.min && max <= o.max;
+    }
+
+    /**
+     * Checks if the given cardinality is supported by this type.
+     * @param c cardinality
+     * @return result of check
+     */
+    public boolean check(final long c) {
+      return min <= c && c <= max;
     }
 
     @Override
@@ -296,36 +304,35 @@ public final class SeqType {
   /**
    * Casts the specified value.
    * @param val value to be cast
-   * @param e producing expression, used for error reports
    * @param ctx query context
    * @param ii input info
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Value promote(final Value val, final Expr e, final QueryContext ctx,
+  public Value promote(final Value val, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
+    final long size = val.size();
+    if(!occ.check(size)) Err.promote(ii, type, val);
+
+    // empty sequence has all types
+    if(size == 0) return val;
+
+    final Item f = val.itemAt(0);
+
     // take shortcut if it's a single item
-    if(val.item()) return cast((Item) val, e, false, ctx, ii);
+    if(size == 1) return check(instance(f, ii) ? f : type.e(f, ctx, ii), ii);
 
-    final Iter iter = val.iter();
-    Item it = iter.next();
-    if(it == null) {
-      if(mayBeZero()) return Empty.SEQ;
-      Err.cast(ii, type, val);
-    }
-    if(type == AtomType.EMP) Err.cast(ii, type, val);
+    // only cache if absolutely necessary
+    if(val.homogenous() && instance(f, ii) && checkExt(f)) return val;
 
-    it = check(instance(it, ii) ? it : type.e(it, ctx, ii), ii);
-    Item n = iter.next();
-    if(zeroOrOne() && n != null) Err.cast(ii, type, val);
-
-    final ItemCache ic = new ItemCache();
-    ic.add(it);
-    while(n != null) {
+    // no way around it...
+    final ItemCache ic = new ItemCache((int) size);
+    for(long i = 0; i < size; i++) {
+      final Item n = val.itemAt(i);
       ic.add(check(instance(n, ii) ? n : type.e(n, ctx, ii), ii));
-      n = iter.next();
     }
+
     return ic.finish();
   }
 

@@ -52,12 +52,11 @@ abstract class TrieNode {
     @Override
     void keys(final ItemCache ks) { }
     @Override
-    public boolean hasType(final AtomType kt, final SeqType vt) { return true; }
+    boolean hasType(final AtomType kt, final SeqType vt) { return true; }
     @Override
-    public int hash(final InputInfo ii) throws QueryException { return 0; }
+    int hash(final InputInfo ii) throws QueryException { return 0; }
     @Override
-    public boolean eq(final InputInfo ii, final TrieNode o) {
-      return this == o; }
+    boolean eq(final InputInfo ii, final TrieNode o) { return this == o; }
   };
 
   /** Size of this node. */

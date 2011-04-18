@@ -108,4 +108,9 @@ public final class Empty extends Value {
   public Item itemAt(final long pos) {
     throw Util.notexpected();
   }
+
+  @Override
+  public boolean homogenous() {
+    return true;
+  }
 }

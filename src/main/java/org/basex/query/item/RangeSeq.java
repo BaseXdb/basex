@@ -86,4 +86,9 @@ public final class RangeSeq extends Seq {
   public Item itemAt(final long pos) {
     return Itr.get(start + pos);
   }
+
+  @Override
+  public boolean homogenous() {
+    return true;
+  }
 }

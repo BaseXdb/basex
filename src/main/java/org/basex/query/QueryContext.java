@@ -226,7 +226,7 @@ public final class QueryContext extends Progress {
 
     // if specified, convert context item to specified type
     if(value != null && initType != null) {
-      value = initType.promote(value, initExpr, this, null);
+      value = initType.promote(value, this, null);
     }
 
     try {

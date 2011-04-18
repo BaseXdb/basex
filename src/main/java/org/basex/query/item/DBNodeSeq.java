@@ -145,4 +145,9 @@ public final class DBNodeSeq extends Seq {
   public Item itemAt(final long pos) {
     return new DBNode(data, pres[(int) pos]);
   }
+
+  @Override
+  public boolean homogenous() {
+    return false;
+  }
 }

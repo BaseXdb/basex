@@ -196,4 +196,10 @@ public abstract class Value extends Expr {
    * @return item
    */
   public abstract Item itemAt(final long pos);
+
+  /**
+   * Checks if all items of this value share the same type.
+   * @return result of check
+   */
+  public abstract boolean homogenous();
 }
