@@ -13,7 +13,7 @@ import org.basex.gui.view.ViewData;
  * @author BaseX Team 2005-11, BSD License
  * @author Wolfgang Miller
  */
-final class TreeRects implements TreeViewOptions {
+final class TreeRects implements TreeConstants {
   /** Saved rectangles. */
   private TreeRect[][][] rects;
 

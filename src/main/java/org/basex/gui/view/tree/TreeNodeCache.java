@@ -10,7 +10,7 @@ import org.basex.util.IntList;
  * @author BaseX Team 2005-11, BSD License
  * @author Wolfgang Miller
  */
-final class TreeNodeCache implements TreeViewOptions {
+final class TreeNodeCache implements TreeConstants {
   /** Document depth. */
   private int maxLevel;
   /** All nodes document nodes per level. */

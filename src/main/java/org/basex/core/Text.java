@@ -1007,6 +1007,8 @@ public interface Text {
   String BUTTONDELALL = lang("b_delall");
   /** Button for adding. */
   String BUTTONADD = lang("b_add");
+  /** Button for resetting options. */
+  String BUTTONRESET = lang("b_reset");
 
   // VISUALIZATIONS ===========================================================
 
