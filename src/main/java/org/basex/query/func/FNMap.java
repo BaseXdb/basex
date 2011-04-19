@@ -98,7 +98,7 @@ public final class FNMap extends Fun {
   private Map newMap(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     if(expr.length == 0) return Map.EMPTY;
-    if(expr.length == 2) checkColl(expr[1], ctx, ii);
+    if(expr.length == 2) checkColl(expr[1], ctx);
 
     Map map = Map.EMPTY;
     final Iter maps = expr[0].iter(ctx);

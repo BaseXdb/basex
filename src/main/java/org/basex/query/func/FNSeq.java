@@ -192,7 +192,7 @@ public final class FNSeq extends Fun {
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[1], ctx);
-    if(expr.length == 3) checkColl(expr[2], ctx, input);
+    if(expr.length == 3) checkColl(expr[2], ctx);
 
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
@@ -217,7 +217,7 @@ public final class FNSeq extends Fun {
    * @throws QueryException query exception
    */
   private Iter distinctValues(final QueryContext ctx) throws QueryException {
-    if(expr.length == 2) checkColl(expr[1], ctx, input);
+    if(expr.length == 2) checkColl(expr[1], ctx);
 
     return new Iter() {
       final ItemSet map = new ItemSet();
