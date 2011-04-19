@@ -75,7 +75,6 @@ public final class Reflect {
       try {
         return clazz != null ? clazz.getConstructor(types) : null;
       } catch(final Exception ex) {
-        System.out.println(clazz);
         final Constructor<?> m = clazz.getDeclaredConstructor(types);
         m.setAccessible(true);
         return m;

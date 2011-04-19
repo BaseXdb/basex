@@ -40,6 +40,7 @@ b_refresh=Refresh
 b_delete=Delete
 b_delall=Delete All
 b_add=Add
+b_reset=Reset
 
 # Visualizations
 no_data=No data available

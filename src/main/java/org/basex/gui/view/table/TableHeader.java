@@ -100,7 +100,7 @@ final class TableHeader extends BaseXPanel {
     int w = getWidth();
     final int h = getHeight();
     final int hh = h >> 1;
-    g.setColor(color1);
+    g.setColor(color3);
     g.drawLine(0, h - 1, w, h - 1);
 
     w -= bs;

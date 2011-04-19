@@ -40,6 +40,7 @@ b_refresh=更新
 b_delete=削除
 b_delall=全て削除
 b_add=追加
+b_reset=Reset
 
 # Visualizations
 no_data=データがありません

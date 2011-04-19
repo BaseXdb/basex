@@ -40,6 +40,7 @@ b_refresh=Ververs
 b_delete=Verwijder
 b_delall=Verwijder Alles
 b_add=Toevoegen
+b_reset=Reset
 
 # Visualizations
 no_data=Geen gegevens beschikbaar
