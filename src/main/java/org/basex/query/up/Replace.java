@@ -83,6 +83,7 @@ public final class Replace extends Update {
         // replace non-attribute node
         if(aList.size() > 0) UPWRELM.thrw(input);
       }
+      // conforms to specification: insertion sequence may be empty
       ctx.updates.add(new ReplaceNode(input, targ, list), ctx);
     }
     return null;

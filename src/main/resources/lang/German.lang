@@ -40,6 +40,7 @@ b_refresh=Aktualisieren
 b_delete=Löschen
 b_delall=Alles löschen
 b_add=Hinzufügen
+b_reset=Zurücksetzen
 
 # Visualizations
 no_data=Keine Daten verfügbar
@@ -365,11 +366,11 @@ db_no=Die Datenbank '%' wurde nicht gefunden.
 db_invalid=Der Name '%' ist ungültig.
 db_locked=Die Datenbank '%' ist gerade gesperrt.
 db_closed=Datenbank '%' wurde geschlossen.
-db_closeerr=Die Datenbank konnte nicht geschlossen werden.
-db_optimized=Datenbank optimiert (%).
+db_closeerr=Die Datenbank '%' konnte nicht geschlossen werden.
+db_optimized=Datenbank '%' optimiert (%).
 db_dropped=Die Datenbank '%' wurde gelöscht.
 db_notdropped=Keine database wurde gelöscht.
-db_droperror=Die Datenbank konnte nicht gelöscht werden.
+db_droperror=Die Datenbank '%' konnte nicht gelöscht werden.
 db_altered=Die Datenbank '%' wurde in '%' umbenannt.
 db_notaltered=Die Datenbank '%' konnte nicht umbenannt werden.
 db_backup=Backup für '%' erstellt (%).

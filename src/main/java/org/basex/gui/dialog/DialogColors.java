@@ -1,10 +1,12 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXSlider;
@@ -49,6 +51,8 @@ public final class DialogColors extends Dialog {
     p.add(sliderBlue);
 
     set(p, BorderLayout.CENTER);
+    set(newButtons(this, BUTTONRESET), BorderLayout.SOUTH);
+
     finish(gprop.nums(GUIProp.COLORSLOC));
   }
 
@@ -66,6 +70,12 @@ public final class DialogColors extends Dialog {
   @Override
   public void action(final Object comp) {
     final GUIProp gprop = gui.gprop;
+    if(comp instanceof BaseXButton) {
+      sliderRed.value(MAXCOLOR - (Integer) GUIProp.COLORRED[1]);
+      sliderGreen.value(MAXCOLOR - (Integer) GUIProp.COLORGREEN[1]);
+      sliderBlue.value(MAXCOLOR - (Integer) GUIProp.COLORBLUE[1]);
+    }
+
     gprop.set(GUIProp.COLORRED, MAXCOLOR - sliderRed.value());
     gprop.set(GUIProp.COLORGREEN, MAXCOLOR - sliderGreen.value());
     gprop.set(GUIProp.COLORBLUE, MAXCOLOR - sliderBlue.value());

@@ -24,14 +24,14 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNInfo extends Fun {
+public final class FNInfo extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNInfo(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNInfo(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

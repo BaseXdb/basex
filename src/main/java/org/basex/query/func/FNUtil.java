@@ -34,14 +34,14 @@ import org.basex.util.Util;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-final class FNUtil extends Fun {
+public final class FNUtil extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNUtil(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNUtil(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

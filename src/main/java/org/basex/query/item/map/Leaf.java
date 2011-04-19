@@ -1,14 +1,17 @@
-package org.basex.query.util.map;
+package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
+import org.basex.query.func.FNSimple;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
- * A single binding of a {@link HashTrie}.
+ * A single binding of a {@link Map}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
@@ -39,7 +42,7 @@ final class Leaf extends TrieNode {
   TrieNode insert(final int h, final Item k, final Value v, final int l,
       final InputInfo ii) throws QueryException {
     // same hash, replace or merge
-    if(h == hash) return k.eq(ii, key) ?
+    if(h == hash) return eq(k, key, ii) ?
         new Leaf(h, k, v) : new List(hash, key, value, k, v);
 
     // different hash, branch
@@ -60,19 +63,19 @@ final class Leaf extends TrieNode {
   @Override
   TrieNode delete(final int h, final Item k, final int l, final InputInfo ii)
       throws QueryException {
-    return h == hash && key.eq(ii, k) ? null : this;
+    return h == hash && eq(key, k, ii) ? null : this;
   }
 
   @Override
   Value get(final int h, final Item k, final int l, final InputInfo ii)
       throws QueryException {
-    return h == hash && key.eq(ii, k) ? value : null;
+    return h == hash && eq(key, k, ii) ? value : null;
   }
 
   @Override
   boolean contains(final int h, final Item k, final int l,
       final InputInfo ii) throws QueryException {
-    return h == hash && key.eq(ii, k);
+    return h == hash && eq(key, k, ii);
   }
 
   @Override
@@ -90,7 +93,7 @@ final class Leaf extends TrieNode {
   @Override
   TrieNode add(final Leaf o, final int l, final InputInfo ii)
       throws QueryException {
-    if(hash == o.hash) return key.eq(ii, o.key) ?
+    if(hash == o.hash) return eq(key, o.key, ii) ?
         this : new List(hash, key, value, o.key, o.value);
 
     final TrieNode[] ch = new TrieNode[KIDS];
@@ -117,7 +120,7 @@ final class Leaf extends TrieNode {
     // same hash? insert binding
     if(hash == o.hash) {
       for(int i = 0; i < o.size; i++) {
-        if(key.eq(ii, o.keys[i])) {
+        if(eq(key, o.keys[i], ii)) {
           final Item[] ks = o.keys.clone();
           final Value[] vs = o.values.clone();
           ks[i] = key;
@@ -168,5 +171,22 @@ final class Leaf extends TrieNode {
   @Override
   void keys(final ItemCache ks) {
     ks.add(key);
+  }
+
+  @Override
+  boolean hasType(final AtomType kt, final SeqType vt) {
+    return (kt == null || key.type.instance(kt))
+        && (vt == null || vt.instance(value));
+  }
+
+  @Override
+  boolean eq(final InputInfo ii, final TrieNode o) throws QueryException {
+    return o instanceof Leaf && eq(key, ((Leaf) o).key, ii)
+        && FNSimple.deep(ii, value.iter(), ((Leaf) o).value.iter());
+  }
+
+  @Override
+  int hash(final InputInfo ii) throws QueryException {
+    return 31 * hash + value.hash(ii);
   }
 }

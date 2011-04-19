@@ -36,14 +36,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNDb extends Fun {
+public final class FNDb extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNDb(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNDb(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

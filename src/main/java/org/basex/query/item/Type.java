@@ -96,6 +96,12 @@ public interface Type {
   boolean func();
 
   /**
+   * Checks if the type refers to a function item.
+   * @return result of check
+   */
+  boolean map();
+
+  /**
    * Returns the name of this type.
    * @return name
    */

@@ -23,14 +23,14 @@ import org.basex.util.XMLToken;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNStr extends Fun {
+public final class FNStr extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNStr(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNStr(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

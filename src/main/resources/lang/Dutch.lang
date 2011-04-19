@@ -40,6 +40,7 @@ b_refresh=Ververs
 b_delete=Verwijder
 b_delall=Verwijder Alles
 b_add=Toevoegen
+b_reset=Reset
 
 # Visualizations
 no_data=Geen gegevens beschikbaar
@@ -365,11 +366,11 @@ db_no=Database '%' is niet gevonden.
 db_invalid=Naam '%' is ongeldig.
 db_locked=Database '%' is momenteel gelockt.
 db_closed=Database '%' is gesloten.
-db_closeerr=Database kon niet gesloten worden.
-db_optimized=Database geoptimaliseerd in %.
+db_closeerr=Database '%' kon niet gesloten worden.
+db_optimized=Database '%' geoptimaliseerd in %.
 db_dropped=Database '%' is verwijderd.
 db_notdropped=Geen database verwijderd.
-db_droperror=Database kon niet verwijderd worden.
+db_droperror=Database '%' kon niet verwijderd worden.
 db_altered=Database '%' is hernoemd naar '%'.
 db_notaltered=Database '%' kon niet hernoemd worden.
 db_backup=Backup voor '%' gemaakt in %.

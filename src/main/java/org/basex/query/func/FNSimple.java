@@ -31,7 +31,7 @@ public final class FNSimple extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  protected FNSimple(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNSimple(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -191,7 +191,8 @@ public final class FNSimple extends Fun {
       }
 
       // check for functions
-      if(it1.func() || it2.func()) FNCMP.thrw(ii, it1.func() ? it2 : it2);
+      if(it1.func() && !it1.map() || it2.func() && !it2.map())
+        FNCMP.thrw(ii, it1.func() ? it1 : it2);
 
       // check atomic values
       if(!it1.node() && !it2.node()) {

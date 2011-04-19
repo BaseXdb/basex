@@ -157,6 +157,8 @@ public interface QueryTokens {
   /** Parser token. */
   String LOWERCASE = "lowercase";
   /** Parser token. */
+  String MAPSTR = "map";
+  /** Parser token. */
   String MOD = "mod";
   /** Parser token. */
   String MODIFY = "modify";
@@ -334,7 +336,7 @@ public interface QueryTokens {
     DF_DEC, DF_DIG, DF_GRP, DF_INF, DF_MIN, DF_NAN, DF_PAT, DF_PC, DF_PM, DF_ZG
   };
   /** Updating tokens. */
-  String[] UPDATES = { INSERT, DELETE, RENAME, REPLACE };
+  String[] UPDATES = { INSERT, DELETE, RENAME, REPLACE, MODULE };
 
   /** Parser token. */
   String ASSIGN = ":=";
@@ -403,6 +405,8 @@ public interface QueryTokens {
   byte[] OUTPUTURI = token(W3URI + "/2010/xslt-xquery-serialization");
   /** Error URI. */
   byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
+  /** Map URI. */
+  byte[] MAPURI = token(W3URI + "/2005/xpath-functions/map");
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns";
@@ -472,8 +476,10 @@ public interface QueryTokens {
   byte[] UTIL = token("util");
   /** ZIP token. */
   byte[] ZIP = token("zip");
-  /** ZIP token. */
+  /** HOF token. */
   byte[] HOF = token("hof");
+  /** MAP token. */
+  byte[] MAP = token(MAPSTR);
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");

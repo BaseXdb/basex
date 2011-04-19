@@ -29,11 +29,13 @@ public final class GUIProp extends AProp {
   public static final Object[] FONTSIZE = { "FONTSIZE", 13 };
 
   /** Red GUI color factor. */
-  public static final Object[] COLORRED = { "COLORRED", 18 };
+  public static final Object[] COLORRED = { "COLORRED", 20 };
   /** Green GUI color factor. */
-  public static final Object[] COLORGREEN = { "COLORGREEN", 16 };
+  public static final Object[] COLORGREEN = { "COLORGREEN", 17 };
   /** Blue GUI color factor. */
   public static final Object[] COLORBLUE = { "COLORBLUE", 7 };
+  /** Paint gradients as background. */
+  public static final Object[] GRADIENT = { "GRADIENT", true };
 
   // MAIN WINDOW OPTIONS ======================================================
 

@@ -1,13 +1,14 @@
 package org.basex.query.up;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
@@ -16,6 +17,7 @@ import org.basex.query.up.primitives.InsertAttribute;
 import org.basex.query.up.primitives.InsertBefore;
 import org.basex.query.up.primitives.InsertInto;
 import org.basex.query.up.primitives.InsertIntoFirst;
+import org.basex.query.up.primitives.InsertIntoLast;
 import org.basex.query.up.primitives.Primitive;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -92,16 +94,14 @@ public final class Insert extends Update {
       ctx.updates.add(up, ctx);
     }
 
+    // conforms to specification: if cList empty, no update primitive is created
     if(cList.size() > 0) {
-      if(before) {
-        up = new InsertBefore(input, n, cList);
-      } else if(after) {
-        up = new InsertAfter(input, n, cList);
-      } else if(first) {
-        up = new InsertIntoFirst(input, n, cList);
-      } else {
-        up = new InsertInto(input, n, cList, last);
-      }
+      if(before) up = new InsertBefore(input, n, cList);
+      else if(after) up = new InsertAfter(input, n, cList);
+      else if(first) up = new InsertIntoFirst(input, n, cList);
+      else if(last) up = new InsertIntoLast(input, n, cList);
+      else up = new InsertInto(input, n, cList);
+
       ctx.updates.add(up, ctx);
     }
     return null;

@@ -12,7 +12,7 @@ import org.basex.query.expr.PartFunApp;
 import org.basex.query.expr.VarRef;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Empty;
-import org.basex.query.item.FunItem;
+import org.basex.query.item.FItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -30,14 +30,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-final class FNFunc extends Fun {
+public final class FNFunc extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNFunc(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNFunc(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -54,6 +54,7 @@ final class FNFunc extends Fun {
       case HOFID:     return expr[0].iter(ctx);
       case CONST:     return expr[0].iter(ctx);
       case UNTIL:     return until(ctx);
+      case ITERATE:   return iterate(ctx);
       default:
            return super.iter(ctx);
     }
@@ -63,8 +64,8 @@ final class FNFunc extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case FUNCARITY: return Itr.get(getFun(0, FunType.ANY, ctx).arity());
-      case FUNCNAME:  return getFun(0, FunType.ANY, ctx).fName();
+      case FUNCARITY: return Itr.get(getFun(0, FunType.ANY_FUN, ctx).arity());
+      case FUNCNAME:  return getFun(0, FunType.ANY_FUN, ctx).fName();
       case PARTAPP:   return partApp(ctx, ii);
       case HOFID:     return expr[0].item(ctx, ii);
       case CONST:     return expr[0].item(ctx, ii);
@@ -82,7 +83,7 @@ final class FNFunc extends Fun {
    */
   private Item partApp(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final FunItem f = getFun(0, FunType.ANY, ctx);
+    final FItem f = getFun(0, FunType.ANY_FUN, ctx);
     final long pos = expr.length == 2 ? 0 : checkItr(expr[2], ctx) - 1;
 
     final int arity = f.arity();
@@ -109,7 +110,7 @@ final class FNFunc extends Fun {
    * @throws QueryException exception
    */
   private Iter map(final QueryContext ctx) throws QueryException {
-    final FunItem f = withArity(0, 1, ctx);
+    final FItem f = withArity(0, 1, ctx);
     final Iter xs = expr[1].iter(ctx);
     return new Iter() {
 
@@ -136,7 +137,7 @@ final class FNFunc extends Fun {
    * @throws QueryException query exception
    */
   private Iter filter(final QueryContext ctx) throws QueryException {
-    final FunItem f = withArity(0, 1, ctx);
+    final FItem f = withArity(0, 1, ctx);
     final Iter xs = expr[1].iter(ctx);
     return new Iter() {
       @Override
@@ -158,7 +159,7 @@ final class FNFunc extends Fun {
    * @throws QueryException query exception
    */
   private Iter zip(final QueryContext ctx) throws QueryException {
-    final FunItem zipper = withArity(0, 2, ctx);
+    final FItem zipper = withArity(0, 2, ctx);
     final Iter xs = expr[1].iter(ctx);
     final Iter ys = expr[2].iter(ctx);
     return new Iter() {
@@ -186,7 +187,7 @@ final class FNFunc extends Fun {
    * @throws QueryException query exception
    */
   private Iter foldLeft(final QueryContext ctx) throws QueryException {
-    final FunItem f = withArity(0, 2, ctx);
+    final FItem f = withArity(0, 2, ctx);
     final Iter xs = expr[2].iter(ctx);
     Item x = xs.next();
 
@@ -208,7 +209,7 @@ final class FNFunc extends Fun {
    * @throws QueryException query exception
    */
   private Iter foldLeft1(final QueryContext ctx) throws QueryException {
-    final FunItem f = withArity(0, 2, ctx);
+    final FItem f = withArity(0, 2, ctx);
     final Iter xs = expr[1].iter(ctx);
 
     Value sum = checkEmpty(xs.next());
@@ -225,7 +226,7 @@ final class FNFunc extends Fun {
    * @throws QueryException query exception
    */
   private Iter foldRight(final QueryContext ctx) throws QueryException {
-    final FunItem f = withArity(0, 2, ctx);
+    final FItem f = withArity(0, 2, ctx);
     final Value xs = expr[2].value(ctx);
     // evaluate start value lazily if it's passed straight through
     if(xs.size() == 0) return expr[1].iter(ctx);
@@ -244,7 +245,7 @@ final class FNFunc extends Fun {
    * @throws QueryException query exception
    */
   private ItemCache sortWith(final QueryContext ctx) throws QueryException {
-    final FunItem lt = withArity(0, 2, ctx);
+    final FItem lt = withArity(0, 2, ctx);
     final ItemCache ic = expr[1].value(ctx).cache();
     try {
       Arrays.sort(ic.item, 0, (int) ic.size(), new Comparator<Item>(){
@@ -271,13 +272,38 @@ final class FNFunc extends Fun {
    * @throws QueryException exception
    */
   private Iter until(final QueryContext ctx) throws QueryException {
-    final FunItem pred = withArity(0, 1, ctx);
-    final FunItem fun = withArity(1, 1, ctx);
+    final FItem pred = withArity(0, 1, ctx);
+    final FItem fun = withArity(1, 1, ctx);
     Value v = expr[2].value(ctx);
     while(!checkType(pred.invItem(ctx, input, v), AtomType.BLN).bool(input)) {
       v = fun.invValue(ctx, input, v);
     }
     return v.iter();
+  }
+
+  /**
+   * Repeatedly applies a function to an argument, lazily returning all results.
+   * @param ctx query context
+   * @return result iterator
+   * @throws QueryException query context
+   */
+  private Iter iterate(final QueryContext ctx) throws QueryException {
+    final FItem f = withArity(0, 1, ctx);
+    return new Iter() {
+      /** Current value. */
+      Value v = expr[1].value(ctx);
+      long i, len = v.size();
+
+      @Override
+      public Item next() throws QueryException {
+        while(i >= len) {
+          v = f.invValue(ctx, input, v);
+          i = 0;
+          len = v.size();
+        }
+        return v.itemAt(i++);
+      }
+    };
   }
 
   /**
@@ -288,9 +314,9 @@ final class FNFunc extends Fun {
    * @return function item
    * @throws QueryException query exception
    */
-  private FunItem getFun(final int p, final FunType t, final QueryContext ctx)
+  private FItem getFun(final int p, final FunType t, final QueryContext ctx)
       throws QueryException {
-    return (FunItem) checkType(checkItem(expr[p], ctx), t);
+    return (FItem) checkType(checkItem(expr[p], ctx), t);
   }
 
   /**
@@ -301,13 +327,13 @@ final class FNFunc extends Fun {
    * @return function item
    * @throws QueryException query exception
    */
-  private FunItem withArity(final int p, final int a, final QueryContext ctx)
+  private FItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
-    if(!f.func() || ((FunItem) f).vars().length != a)
+    if(!f.func() || ((FItem) f).arity() != a)
       Err.type(this, FunType.arity(a), f);
 
-    return (FunItem) f;
+    return (FItem) f;
   }
 
   @Override

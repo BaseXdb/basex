@@ -277,7 +277,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPOPTIMIZE = {
-    "", lang("ch_optimize1"), lang("ch_optimize2")
+    "(" + ALL + ")", lang("ch_optimize1"), lang("ch_optimize2")
   };
 
   /** Command help. */
@@ -1007,6 +1007,8 @@ public interface Text {
   String BUTTONDELALL = lang("b_delall");
   /** Button for adding. */
   String BUTTONADD = lang("b_add");
+  /** Button for resetting options. */
+  String BUTTONRESET = lang("b_reset");
 
   // VISUALIZATIONS ===========================================================
 

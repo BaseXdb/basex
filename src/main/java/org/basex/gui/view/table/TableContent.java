@@ -42,10 +42,11 @@ final class TableContent extends BaseXBack {
    */
   TableContent(final TableData d, final BaseXBar scr) {
     scroll = scr;
-    layout(new BorderLayout()).mode(Fill.GRADIENT);
-    add(scroll, BorderLayout.EAST);
     tdata = d;
     gui = scr.gui;
+    layout(new BorderLayout());
+    mode(gui.gprop.is(GUIProp.GRADIENT) ? Fill.GRADIENT : Fill.NONE);
+    add(scroll, BorderLayout.EAST);
   }
 
   @Override

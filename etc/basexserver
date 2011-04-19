@@ -7,7 +7,7 @@ PWD=`dirname $0`
 BASEX=$PWD/../target/classes
 
 # Options for virtual machine
-VM=-Xmx512m
+VM=-Xmx512m -server
 
 # Classpath
 LIB=$PWD/../lib

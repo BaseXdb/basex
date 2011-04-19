@@ -40,6 +40,7 @@ b_refresh=Aggiorna
 b_delete=Cancella
 b_delall=Cancella tutto
 b_add=Aggiungi
+b_reset=Reset
 
 # Visualizations
 no_data=Nessun dato disponibile
@@ -366,10 +367,11 @@ db_invalid=Name '%' is invalid.
 db_locked=Base di dati '%' correntemente bloccata.
 db_closed=Base di dati '%' chiusa.
 db_closeerr=Impossibile chiudere la base di dati.
-db_optimized=Base di dati ottimizzata in %.
+db_optimized=Base di dati '%' ottimizzata in %.
+db_notoptimized=Impossibile ottimizzare la base di dati '%'.
 db_dropped=Base di dati '%' cancellata.
 db_notdropped=No database was dropped.
-db_droperror=Impossibile cancellare la base di dati.
+db_droperror=Impossibile cancellare la base di dati '%'.
 db_altered=Database '%' was renamed to '%'.
 db_notaltered=Database '%' could not be renamed.
 db_backup=Backup for '%' created in %.

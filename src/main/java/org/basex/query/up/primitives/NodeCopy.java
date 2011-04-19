@@ -38,13 +38,14 @@ public abstract class NodeCopy extends Primitive {
 
   @Override
   public void prepare() throws QueryException {
-    if(insert.size() == 0) return;
+    if(insert.get(0).get(0) == null) return;
+    // ignore fragment nodes
+    if(!(node instanceof DBNode)) return;
 
     final NodeCache seq = new NodeCache();
     for(final NodeCache nc : insert) {
       for(ANode i; (i = nc.next()) != null;) seq.add(i);
     }
-    // ignore fragment nodes
     if(node instanceof DBNode) {
       // text nodes still need to be merged. two adjacent iterators may
       // lead to two adjacent text nodes

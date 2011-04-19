@@ -1,13 +1,15 @@
-package org.basex.query.util.map;
+package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 
 /**
- * Inner node of a {@link HashTrie}.
+ * Inner node of a {@link Map}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
@@ -190,5 +192,35 @@ final class Branch extends TrieNode {
   @Override
   void keys(final ItemCache ks) {
     for(final TrieNode nd : kids) if(nd != null) nd.keys(ks);
+  }
+
+  @Override
+  boolean hasType(final AtomType kt, final SeqType vt) {
+    for(final TrieNode ch : kids)
+      if(ch != null && !ch.hasType(kt, vt)) return false;
+    return true;
+  }
+
+  @Override
+  int hash(final InputInfo ii) throws QueryException {
+    int hash = 0;
+    for(final TrieNode ch : kids) if(ch != null) hash = 31 * hash + ch.hash(ii);
+    return hash;
+  }
+
+  @Override
+  boolean eq(final InputInfo ii, final TrieNode o) throws QueryException {
+    if(!(o instanceof Branch)) return false;
+    final Branch ob = (Branch) o;
+
+    // check bin usage first
+    if(used != ob.used) return false;
+
+    // recursively compare children
+    for(int i = 0; i < KIDS; i++)
+      if(kids[i] != null && !kids[i].eq(ii, ob.kids[i])) return false;
+
+    // everything OK
+    return true;
   }
 }

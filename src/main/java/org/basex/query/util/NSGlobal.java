@@ -30,6 +30,7 @@ public final class NSGlobal {
     NS.add(SENT, SENTURI);
     NS.add(ZIP, ZIPURI);
     NS.add(HOF, HOFURI);
+    NS.add(MAP, MAPURI);
   }
 
   /** Private constructor. */

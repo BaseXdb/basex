@@ -29,7 +29,7 @@ import org.basex.util.ft.FTOpt;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNFt extends Fun {
+public final class FNFt extends Fun {
   /** Marker element. */
   private static final byte[] MARK = token("mark");
 
@@ -39,7 +39,7 @@ final class FNFt extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  protected FNFt(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNFt(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

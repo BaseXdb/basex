@@ -52,7 +52,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNZip extends Fun {
+public final class FNZip extends Fun {
   /** Function namespace. */
   private static final Uri U_ZIP = Uri.uri(ZIPURI);
   /** Element: zip:file. */
@@ -80,7 +80,7 @@ final class FNZip extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  protected FNZip(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNZip(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

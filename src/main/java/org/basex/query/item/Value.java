@@ -81,6 +81,14 @@ public abstract class Value extends Expr {
   }
 
   /**
+   * Checks if this is a single function item.
+   * @return result of check
+   */
+  public final boolean map() {
+    return type.map();
+  }
+
+  /**
    * Checks if this is a single untyped item.
    * @return result of check
    */
@@ -188,4 +196,10 @@ public abstract class Value extends Expr {
    * @return item
    */
   public abstract Item itemAt(final long pos);
+
+  /**
+   * Checks if all items of this value share the same type.
+   * @return result of check
+   */
+  public abstract boolean homogenous();
 }
