@@ -1,11 +1,10 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
+import org.basex.query.item.DBNode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
-import org.basex.util.Util;
 
 /**
  * Insert into as first primitive.
@@ -13,7 +12,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class InsertIntoFirst extends NodeCopy {
+public final class InsertIntoFirst extends InsertBase {
   /**
    * Constructor.
    * @param ii input info
@@ -27,28 +26,15 @@ public final class InsertIntoFirst extends NodeCopy {
 
   @Override
   public int apply(final int add) {
-    // source nodes may be empty, thus insert has no effect at all
-    if(md != null) {
-      final DBNode n = (DBNode) node;
-      final int pre = n.pre + add;
-      final Data d = n.data;
-      d.insert(pre + d.attSize(pre, d.kind(pre)), pre, md);
-    }
+    final DBNode n = (DBNode) node;
+    final int pre = n.pre + add;
+    final Data d = n.data;
+    d.insert(pre + d.attSize(pre, d.kind(pre)), pre, md);
     return 0;
-  }
-
-  @Override
-  public void merge(final Primitive p) {
-    insert.add(((NodeCopy) p).insert.get(0));
   }
 
   @Override
   public PrimitiveType type() {
     return PrimitiveType.INSERTINTOFIRST;
-  }
-
-  @Override
-  public String toString() {
-    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }

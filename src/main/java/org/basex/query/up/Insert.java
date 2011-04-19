@@ -94,6 +94,7 @@ public final class Insert extends Update {
       ctx.updates.add(up, ctx);
     }
 
+    // conforms to specification: if cList empty, no update primitive is created
     if(cList.size() > 0) {
       if(before) up = new InsertBefore(input, n, cList);
       else if(after) up = new InsertAfter(input, n, cList);

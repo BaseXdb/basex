@@ -1,11 +1,10 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
+import org.basex.query.item.DBNode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
-import org.basex.util.Util;
 
 /**
  * Insert before primitive.
@@ -13,7 +12,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class InsertBefore extends NodeCopy {
+public final class InsertBefore extends InsertBase {
   /**
    * Constructor.
    * @param ii input info
@@ -38,17 +37,7 @@ public final class InsertBefore extends NodeCopy {
   }
 
   @Override
-  public void merge(final Primitive p) {
-    insert.add(((NodeCopy) p).insert.get(0));
-  }
-
-  @Override
   public PrimitiveType type() {
     return PrimitiveType.INSERTBEFORE;
-  }
-
-  @Override
-  public String toString() {
-    return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }
