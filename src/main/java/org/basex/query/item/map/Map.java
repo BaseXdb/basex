@@ -89,23 +89,6 @@ public class Map extends FItem {
   }
 
   /**
-   * Inserts the given value into this map.
-   * @param k key to insert
-   * @param v value to insert
-   * @param ii input info
-   * @return updated map if changed, {@code this} otherwise
-   * @throws QueryException query exception
-   */
-  public Map insert(final Item k, final Value v, final InputInfo ii)
-      throws QueryException {
-    final Item key = key(k, ii);
-    if(key == null) return this;
-
-    final TrieNode ins = root.insert(key.hash(ii), key, v, 0, ii);
-    return ins == root ? this : new Map(ins);
-  }
-
-  /**
    * Deletes a key from this map.
    * @param key key to delete
    * @param ii input info
@@ -207,15 +190,18 @@ public class Map extends FItem {
 
   /**
    * Creates a new singleton map, containing one binding.
-   * @param key key to store
-   * @param val value bound to the key
+   * @param k key to store
+   * @param v value bound to the key
    * @param ii input info
    * @return singleton map
    * @throws QueryException query exception
    */
-  public static Map singleton(final Item key, final Value val,
-      final InputInfo ii) throws QueryException {
-    return EMPTY.insert(key, val, ii);
+  public static Map entry(final Item k, final Value v, final InputInfo ii)
+      throws QueryException {
+    final Item key = EMPTY.key(k, ii);
+    if(key == null) return EMPTY;
+
+    return new Map(new Leaf(key.hash(ii), k, v));
   }
 
   /**
@@ -248,9 +234,15 @@ public class Map extends FItem {
     return Str.get(QueryTokens.URLCOLL);
   }
 
-  @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it instanceof Map && root.eq(ii, ((Map) it).root);
+  /**
+   * Checks if the this map is deep-equal to the given one.
+   * @param ii input info
+   * @param o other map
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean deep(final InputInfo ii, final Map o) throws QueryException {
+    return root.deep(ii, o.root);
   }
 
   @Override

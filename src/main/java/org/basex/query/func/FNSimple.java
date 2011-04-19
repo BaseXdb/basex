@@ -13,6 +13,7 @@ import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
+import org.basex.query.item.map.Map;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.InputInfo;
@@ -191,8 +192,15 @@ public final class FNSimple extends Fun {
       }
 
       // check for functions
-      if(it1.func() && !it1.map() || it2.func() && !it2.map())
+      if(it1.func() || it2.func()) {
+        // maps are functions but have a defined deep-equality
+        if(it1.map() && it2.map()) {
+          final Map map1 = (Map) it1, map2 = (Map) it2;
+          if(!map1.deep(ii, map2)) return false;
+          continue;
+        }
         FNCMP.thrw(ii, it1.func() ? it1 : it2);
+      }
 
       // check atomic values
       if(!it1.node() && !it2.node()) {
