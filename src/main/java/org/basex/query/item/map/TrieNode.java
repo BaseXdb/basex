@@ -54,6 +54,10 @@ abstract class TrieNode {
     int hash(final InputInfo ii) throws QueryException { return 0; }
     @Override
     boolean deep(final InputInfo ii, final TrieNode o) { return this == o; }
+    @Override
+    public TrieNode insert(final int h, final Item k, final Value v,
+        final int l, final InputInfo i) throws QueryException {
+      return new Leaf(h, k, v); }
   };
 
   /** Size of this node. */
@@ -66,6 +70,19 @@ abstract class TrieNode {
     assert s != 0 || EMPTY == null;
     size = s;
   }
+
+  /**
+   * Inserts the given value into this map.
+   * @param hash hash code used as key
+   * @param key key to insert
+   * @param val value to insert
+   * @param lvl level
+   * @param ii input info
+   * @return updated map if changed, {@code this} otherwise
+   * @throws QueryException query exception
+   */
+  abstract TrieNode insert(final int hash, final Item key, final Value val,
+      final int lvl, final InputInfo ii) throws QueryException;
 
   /**
    * Deletes a key from this map.

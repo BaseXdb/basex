@@ -155,14 +155,6 @@ public class Map extends FItem {
         t.ret.eq(SeqType.ITEM_ZM) ? null : t.ret);
   }
 
-  /**
-   * Verifies the data structure.
-   * @return result of sanity checks
-   */
-  public boolean verify() {
-    return root.verify();
-  }
-
   @Override
   public String toString() {
     try {
@@ -189,6 +181,23 @@ public class Map extends FItem {
   }
 
   /**
+   * Inserts the given value into this map.
+   * @param k key to insert
+   * @param v value to insert
+   * @param ii input info
+   * @return updated map if changed, {@code this} otherwise
+   * @throws QueryException query exception
+   */
+  public Map insert(final Item k, final Value v, final InputInfo ii)
+      throws QueryException {
+    final Item key = key(k, ii);
+    if(key == null) return this;
+
+    final TrieNode ins = root.insert(key.hash(ii), key, v, 0, ii);
+    return ins == root ? this : new Map(ins);
+  }
+
+  /**
    * Creates a new singleton map, containing one binding.
    * @param k key to store
    * @param val value bound to the key
@@ -198,10 +207,7 @@ public class Map extends FItem {
    */
   public static Map entry(final Item k, final Value val, final InputInfo ii)
       throws QueryException {
-    final Item key = EMPTY.key(k, ii);
-    if(key == null) return EMPTY;
-
-    return new Map(new Leaf(key.hash(ii), key, val));
+    return EMPTY.insert(k, val, ii);
   }
 
   /**

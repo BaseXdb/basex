@@ -39,6 +39,28 @@ final class Leaf extends TrieNode {
   }
 
   @Override
+  TrieNode insert(final int h, final Item k, final Value v, final int l,
+      final InputInfo ii) throws QueryException {
+    // same hash, replace or merge
+    if(h == hash) return eq(k, key, ii) ?
+        new Leaf(h, k, v) : new List(hash, key, value, k, v);
+
+    // different hash, branch
+    final TrieNode[] ch = new TrieNode[KIDS];
+    final int a = key(h, l), b = key(hash, l);
+    final int used;
+    if(a != b) {
+      ch[a] = new Leaf(h, k, v);
+      ch[b] = this;
+      used = 1 << a | 1 << b;
+    } else {
+      ch[a] = insert(h, k, v, l + 1, ii);
+      used = 1 << a;
+    }
+    return new Branch(ch, used, 2);
+  }
+
+  @Override
   TrieNode delete(final int h, final Item k, final int l, final InputInfo ii)
       throws QueryException {
     return h == hash && eq(key, k, ii) ? null : this;
