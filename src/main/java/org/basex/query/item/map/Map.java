@@ -191,17 +191,17 @@ public class Map extends FItem {
   /**
    * Creates a new singleton map, containing one binding.
    * @param k key to store
-   * @param v value bound to the key
+   * @param val value bound to the key
    * @param ii input info
    * @return singleton map
    * @throws QueryException query exception
    */
-  public static Map entry(final Item k, final Value v, final InputInfo ii)
+  public static Map entry(final Item k, final Value val, final InputInfo ii)
       throws QueryException {
     final Item key = EMPTY.key(k, ii);
     if(key == null) return EMPTY;
 
-    return new Map(new Leaf(key.hash(ii), k, v));
+    return new Map(new Leaf(key.hash(ii), key, val));
   }
 
   /**

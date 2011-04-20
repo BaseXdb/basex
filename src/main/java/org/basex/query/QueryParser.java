@@ -20,6 +20,7 @@ import org.basex.query.expr.CTxt;
 import org.basex.query.expr.DynFunCall;
 import org.basex.query.expr.InlineFunc;
 import org.basex.query.expr.LitFunc;
+import org.basex.query.expr.LitMap;
 import org.basex.query.expr.OrderByExpr;
 import org.basex.query.expr.OrderByStable;
 import org.basex.query.expr.PartFunApp;
@@ -1687,6 +1688,8 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
          wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
         return enclosed(NOENCLEXPR);
+
+      if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE)) return mapLiteral();
     }
     // context item
     if(c == '.' && !digit(next())) {
@@ -1698,6 +1701,28 @@ public class QueryParser extends InputParser {
     if(digit(c) || c == '.') return numericLiteral(false);
     // strings
     return quote(c) ? Str.get(stringLiteral()) : null;
+  }
+
+  /**
+   * Parses a literal map.
+   * TODO adapt to actual spec when available.
+   * @return map literal
+   * @throws QueryException query exception
+   */
+  private Expr mapLiteral() throws QueryException {
+    wsCheck(BRACE1);
+    Expr[] args = {};
+
+    if(!wsConsume(BRACE2)) {
+      do {
+        args = Array.add(args, check(single(), XPEMPTY));
+        wsCheck(ASSIGN);
+        args = Array.add(args, check(single(), XPEMPTY));
+      } while(wsConsume(COMMA));
+      wsCheck(BRACE2);
+    }
+
+    return new LitMap(input(), args);
   }
 
   /**
@@ -3127,12 +3152,13 @@ public class QueryParser extends InputParser {
 
   /**
    * Raises an error if the specified expression is empty.
+   * @param <E> expression type
    * @param expr expression
    * @param err error message
    * @return expression
    * @throws QueryException query exception
    */
-  private Expr check(final Expr expr, final Err err)
+  private <E extends Expr> E check(final E expr, final Err err)
       throws QueryException {
     if(expr == null) error(err);
     return expr;
