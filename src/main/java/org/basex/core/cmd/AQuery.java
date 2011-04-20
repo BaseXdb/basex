@@ -166,6 +166,7 @@ abstract class AQuery extends Command {
   private void evalInfo(final String query, final long hits, final long updates,
       final int runs) {
 
+    final long total = pars + comp + eval + prnt;
     info(NL);
     info(QUERYSTRING + query);
     info(qp.info());
@@ -173,11 +174,10 @@ abstract class AQuery extends Command {
     info(QUERYCOMPILE + Performance.getTimer(comp, runs));
     info(QUERYEVALUATE + Performance.getTimer(eval, runs));
     info(QUERYPRINT + Performance.getTimer(prnt, runs));
-    info(QUERYTOTAL + Performance.getTimer(pars + comp + eval + prnt, runs));
+    info(QUERYTOTAL + Performance.getTimer(total, runs) + NL);
     info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS));
     info(QUERYUPDATED + updates + " " + (updates == 1 ? VALHIT : VALHITS));
     info(QUERYPRINTED + Performance.format(out.size()));
-    info(QUERYMEM, Performance.getMem());
   }
 
   /**

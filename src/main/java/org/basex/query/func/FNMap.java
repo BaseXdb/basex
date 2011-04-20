@@ -34,8 +34,7 @@ public final class FNMap extends Fun {
     switch(def) {
       case MAPGET:  return get(ctx).iter();
       case MAPKEYS: return getMap(ctx).keys().iter();
-      default:
-           return super.iter(ctx);
+      default:      return super.iter(ctx);
     }
   }
 
@@ -44,8 +43,7 @@ public final class FNMap extends Fun {
     switch(def) {
       case MAPGET:  return get(ctx);
       case MAPKEYS: return getMap(ctx).keys();
-      default:
-           return super.value(ctx);
+      default:      return super.value(ctx);
     }
   }
 
@@ -53,14 +51,13 @@ public final class FNMap extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case MAPNEW:  return newMap(ctx, ii);
-      case MAPENTRY:   return entry(ctx, ii);
-      case MAPCONT: return contains(ctx, ii);
-      case MAPSIZE: return getMap(ctx).mapSize();
-      case MAPREM:  return remove(ctx, ii);
-      case MAPCOLL: return getMap(ctx).collation();
-      default:
-        return super.item(ctx, ii);
+      case MAPNEW:   return newMap(ctx, ii);
+      case MAPENTRY: return entry(ctx, ii);
+      case MAPCONT:  return contains(ctx, ii);
+      case MAPSIZE:  return getMap(ctx).mapSize();
+      case MAPREM:   return remove(ctx, ii);
+      case MAPCOLL:  return getMap(ctx).collation();
+      default:       return super.item(ctx, ii);
     }
   }
 

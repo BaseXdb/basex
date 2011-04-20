@@ -427,7 +427,6 @@ qu_tabcomp=コンパイル中
 qu_tabeval=計算中　　　
 qu_tabprint=印刷中　　　
 qu_tabtotal=合計時間　　
-qu_tabmem=メモリー　　
 qu_tabupdated=Updated
 qu_tabprinted=印刷しました
 qu_tabhits=結果　　　　

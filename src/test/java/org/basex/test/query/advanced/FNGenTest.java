@@ -16,7 +16,7 @@ public final class FNGenTest extends AdvancedQueryTest {
   private static final String TEXT = "etc/xml/stopWords";
 
   /**
-   * Test method for the fn:unparsed-text() functions.
+   * Test method for the fn:unparsed-text() function.
    * @throws QueryException database exception
    */
   @Test
@@ -28,7 +28,7 @@ public final class FNGenTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the fn:parse-xml() functions.
+   * Test method for the fn:parse-xml() function.
    * @throws QueryException database exception
    */
   @Test
@@ -38,7 +38,7 @@ public final class FNGenTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the fn:serialize() functions.
+   * Test method for the fn:serialize() function.
    * @throws QueryException database exception
    */
   @Test

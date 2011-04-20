@@ -38,7 +38,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:exists() functions.
+   * Test method for the file:exists() function.
    * @throws QueryException database exception
    */
   @Test
@@ -51,7 +51,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-directory() functions.
+   * Test method for the file:is-directory() function.
    * @throws QueryException database exception
    */
   @Test
@@ -68,7 +68,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-file() functions.
+   * Test method for the file:is-file() function.
    * @throws QueryException database exception
    */
   @Test
@@ -84,7 +84,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-readable() functions.
+   * Test method for the file:is-readable() function.
    * @throws QueryException database exception
    */
   @Test
@@ -96,7 +96,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-writable() functions.
+   * Test method for the file:is-writable() function.
    * @throws QueryException database exception
    */
   @Test
@@ -108,7 +108,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:last-modified() functions.
+   * Test method for the file:last-modified() function.
    * @throws QueryException database exception
    */
   @Test
@@ -118,7 +118,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:size() functions.
+   * Test method for the file:size() function.
    * @throws QueryException database exception
    */
   @Test
@@ -130,7 +130,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:list() functions.
+   * Test method for the file:list() function.
    * @throws QueryException database exception
    */
   @Test
@@ -148,7 +148,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:create-directory() functions.
+   * Test method for the file:create-directory() function.
    * @throws QueryException database exception
    */
   @Test
@@ -165,7 +165,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:delete() functions.
+   * Test method for the file:delete() function.
    * @throws QueryException database exception
    */
   @Test
@@ -180,7 +180,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:read() functions.
+   * Test method for the file:read() function.
    * @throws QueryException database exception
    */
   @Test
@@ -196,7 +196,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:read-binary() functions.
+   * Test method for the file:read-binary() function.
    * @throws QueryException database exception
    */
   @Test
@@ -210,7 +210,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:write() functions.
+   * Test method for the file:write() function.
    * @throws QueryException database exception
    */
   @Test
@@ -241,7 +241,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:write-binary() functions.
+   * Test method for the file:write-binary() function.
    * @throws QueryException database exception
    */
   @Test
@@ -260,7 +260,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:copy() functions.
+   * Test method for the file:copy() function.
    * @throws QueryException database exception
    */
   @Test
@@ -280,7 +280,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:move() functions.
+   * Test method for the file:move() function.
    * @throws QueryException database exception
    */
   @Test
@@ -300,7 +300,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:path-separator() functions.
+   * Test method for the file:path-separator() function.
    * @throws QueryException database exception
    */
   @Test
@@ -311,7 +311,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:path-to-full-path() functions.
+   * Test method for the file:path-to-full-path() function.
    * @throws Exception exception
    */
   @Test
@@ -323,7 +323,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:path-to-full-path() functions.
+   * Test method for the file:path-to-full-path() function.
    * @throws Exception exception
    */
   @Test

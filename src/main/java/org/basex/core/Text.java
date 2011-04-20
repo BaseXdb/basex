@@ -563,10 +563,6 @@ public interface Text {
   String QUERYUPDATED = lang("qu_tabupdated") + COLS;
   /** Query info: printed data. */
   String QUERYPRINTED = lang("qu_tabprinted") + COLS;
-  /** Query info: memory. */
-  String QUERYMEM = lang("qu_tabmem") + ": %";
-  /** Query info: memory. */
-  String QUERYMEM2 = lang("qu_tabmem") + COLS;
   /** Query hits. */
   String HITS = lang("qu_hits");
   /** Insert query info. */

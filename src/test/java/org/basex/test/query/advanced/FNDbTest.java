@@ -35,7 +35,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:open() functions.
+   * Test method for the db:open() function.
    * @throws QueryException query exception
    * @throws BaseXException database exception
    */
@@ -57,7 +57,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:open-pre() functions.
+   * Test method for the db:open-pre() function.
    * @throws QueryException database exception
    */
   @Test
@@ -68,7 +68,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:open-id() functions.
+   * Test method for the db:open-id() function.
    * @throws QueryException database exception
    */
   @Test
@@ -164,7 +164,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for db:node-pre() functions.
+   * Test method for db:node-pre() function.
    * @throws QueryException database exception
    */
   @Test
@@ -175,7 +175,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for db:node-id() and db:node-pre() functions.
+   * Test method for db:node-id() and db:node-pre() function.
    * @throws QueryException database exception
    */
   @Test
