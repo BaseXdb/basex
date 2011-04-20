@@ -112,10 +112,19 @@ public final class NamespaceTest {
           "  $target := $input-context/works[1]/employee[1]" +
           "return insert nodes $source into $target", context).execute();
     } catch(QueryException ex) {
-      ex.printStackTrace();
       assertEquals("XUTY0004", ex.code());
     }
     fail("should throw XUTY0004");
+  }
+
+  /**
+   * Test query.
+   */
+  @Test
+  public void defaultElementNamespaceTest() {
+    query("declare default element namespace 'a';" +
+        "let $x as element(a) := <a/> return $x",
+        "<a xmlns=\"a\"/>");
   }
 
   /**
