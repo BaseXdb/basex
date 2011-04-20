@@ -17,7 +17,7 @@ public final class FNMapTest extends AdvancedQueryTest {
    */
   @Test
   public void testNew() throws QueryException {
-    final String fun = check(FunDef.MAPNEW, Object.class, String.class);
+    final String fun = check(FunDef.MAPNEW);
     query("map:size(" + fun + "())", "0");
     query("count(" + fun + "())", "1");
     query("map:size(" + fun + "(" + fun + "()))", "0");
@@ -26,10 +26,10 @@ public final class FNMapTest extends AdvancedQueryTest {
   /**
    * Test method for the map:entry() functions.
    * @throws QueryException database exception
+   */
   @Test
   public void testEntry() throws QueryException {
-    final String fun = check(FunDef.ENTRY, Object.class, Object.class);
-    query("map:size(" + fun + "('a','b'))", "0");
+    final String fun = check(FunDef.MAPENTRY);
+    query("map:size(" + fun + "('a','b'))", "1");
   }
-   */
 }

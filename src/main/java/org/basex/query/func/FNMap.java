@@ -54,7 +54,7 @@ public final class FNMap extends Fun {
       throws QueryException {
     switch(def) {
       case MAPNEW:  return newMap(ctx, ii);
-      case ENTRY:   return entry(ctx, ii);
+      case MAPENTRY:   return entry(ctx, ii);
       case MAPCONT: return contains(ctx, ii);
       case MAPSIZE: return getMap(0, ctx, ii).mapSize();
       case MAPREM:  return remove(ctx, ii);

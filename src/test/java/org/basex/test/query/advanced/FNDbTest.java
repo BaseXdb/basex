@@ -10,7 +10,6 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
 import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
-import org.basex.query.item.DBNode;
 import org.basex.query.util.Err;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -42,7 +41,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testOpen() throws QueryException, BaseXException {
-    final String fun = check(FunDef.OPEN, String.class);
+    final String fun = check(FunDef.OPEN);
     query("count(" + fun + "('db'))", "1");
     query("count(" + fun + "('db/'))", "1");
 
@@ -63,7 +62,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testOpenPre() throws QueryException {
-    final String fun = check(FunDef.OPENPRE, String.class, Integer.class);
+    final String fun = check(FunDef.OPENPRE);
     query(fun + "('db', 0)//title/text()", "XML");
     error(fun + "('db', -1)", Err.IDINVALID);
   }
@@ -74,7 +73,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testOpenId() throws QueryException {
-    final String fun = check(FunDef.OPENID, String.class, Integer.class);
+    final String fun = check(FunDef.OPENID);
     query(fun + "('db', 0)//title/text()", "XML");
     error(fun + "('db', -1)", Err.IDINVALID);
   }
@@ -86,7 +85,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testText() throws QueryException, BaseXException {
-    final String fun = check(FunDef.TEXT, (Class<?>) null);
+    final String fun = check(FunDef.TEXT);
 
     // run function without and with index
     new DropIndex("text").execute(CTX);
@@ -108,7 +107,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testAttribute() throws QueryException, BaseXException {
-    final String fun = check(FunDef.ATTR, (Class<?>) null, String.class);
+    final String fun = check(FunDef.ATTR);
 
     // run function without and with index
     new DropIndex("attribute").execute(CTX);
@@ -132,7 +131,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testIndex() throws QueryException, BaseXException {
-    final String fun = check(FunDef.FULLTEXT, String.class);
+    final String fun = check(FunDef.FULLTEXT);
 
     // run function without and with index
     new DropIndex("fulltext").execute(CTX);
@@ -170,7 +169,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testNodePre() throws QueryException {
-    final String fun = check(FunDef.NODEPRE, DBNode.class);
+    final String fun = check(FunDef.NODEPRE);
     query(fun + "(/html)", "1");
     query(fun + "(/ | /html)", "0 1");
   }
@@ -181,7 +180,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testNode() throws QueryException {
-    final String fun = check(FunDef.NODEID, DBNode.class);
+    final String fun = check(FunDef.NODEID);
     query(fun + "(/html)", "1");
     query(fun + "(/ | /html)", "0 1");
   }
@@ -205,7 +204,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void testInfo() throws QueryException, BaseXException {
     // wrong arguments
-    final String fun = check(FunDef.INFO, String.class);
+    final String fun = check(FunDef.INFO);
 
     // standard test
     contains(fun + "()", INFOON);

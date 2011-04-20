@@ -18,7 +18,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testEval() throws QueryException {
-    final String fun = check(FunDef.EVAL, String.class);
+    final String fun = check(FunDef.EVAL);
     query(fun + "('1')", "1");
     query(fun + "('1 + 2')", "3");
     error(fun + "('1+')", Err.INCOMPLETE);
@@ -32,7 +32,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testRun() throws QueryException {
-    final String fun = check(FunDef.RUN, String.class);
+    final String fun = check(FunDef.RUN);
     query(fun + "('etc/xml/input.xq')", "XML");
     error(fun + "('etc/xml/xxx.xq')", Err.UNDOC);
   }
@@ -43,7 +43,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testMB() throws QueryException {
-    final String fun = check(FunDef.MB, null, Boolean.class);
+    final String fun = check(FunDef.MB);
     query(fun + "(())");
     query(fun + "(1 to 1000, false())");
     query(fun + "(1 to 1000, true())");
@@ -55,7 +55,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testMS() throws QueryException {
-    final String fun = check(FunDef.MS, null, Boolean.class);
+    final String fun = check(FunDef.MS);
     query(fun + "(())");
     query(fun + "(1 to 1000, false())");
     query(fun + "(1 to 1000, true())");
@@ -67,7 +67,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testToBase() throws QueryException {
-    final String fun = check(FunDef.TO_BASE, Integer.class, Integer.class);
+    final String fun = check(FunDef.TO_BASE);
     query(fun + "(4, 2)", "100");
     query(fun + "(65535, 2)", "1111111111111111");
     query(fun + "(65536, 2)", "10000000000000000");
@@ -88,7 +88,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testFromBase() throws QueryException {
-    final String fun = check(FunDef.FRM_BASE, String.class, Integer.class);
+    final String fun = check(FunDef.FRM_BASE);
     query(fun + "('100', 2)", "4");
     query(fun + "('1111111111111111', 2)", "65535");
     query(fun + "('10000000000000000', 2)", "65536");
@@ -111,8 +111,8 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testHashing() throws QueryException {
-    final String md5 = check(FunDef.MD5, String.class);
-    final String sha1 = check(FunDef.SHA1, String.class);
+    final String md5 = check(FunDef.MD5);
+    final String sha1 = check(FunDef.SHA1);
     query(md5 + "('')", "D41D8CD98F00B204E9800998ECF8427E");
     query(sha1 + "('')", "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709");
 
@@ -129,7 +129,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testCRC32() throws QueryException {
-    final String fun = check(FunDef.CRC32, String.class);
+    final String fun = check(FunDef.CRC32);
     query(fun + "('')", "00000000");
     query(fun + "('BaseX')", "4C06FC7F");
   }
@@ -140,7 +140,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void testToBytes() throws QueryException {
-    final String fun = check(FunDef.TO_BYTES, String.class);
+    final String fun = check(FunDef.TO_BYTES);
     query(fun + "(xs:base64Binary('QmFzZVggaXMgY29vbA=='))",
       "66 97 115 101 88 32 105 115 32 99 111 111 108");
     query(fun + "(xs:base64Binary(xs:hexBinary('4261736558')))",
