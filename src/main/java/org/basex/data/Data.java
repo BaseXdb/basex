@@ -528,7 +528,7 @@ public abstract class Data {
    */
   public final void fastReplace(final int replacePre, final Data d) {
     final int dsize = d.meta.size;
-    final int buf = Math.min(dsize, IO.BLOCKSIZE >> IO.NODEPOWER);
+    final int buf = dsize;
     buffer(buf);
     int dpre = -1;
     while(++dpre != dsize) {

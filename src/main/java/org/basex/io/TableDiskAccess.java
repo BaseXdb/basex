@@ -262,6 +262,7 @@ public final class TableDiskAccess extends TableAccess {
     } else {
       final int lastToOwPre = pre + numberOfRecords - 1;
       int currentSourcePos = 0;
+      // lasttoowpre must be >= npre+nr pre on this block
       while(lastToOwPre >= npre) {
         // on the first block we start at pre, the following blocks at fpre
         final int firstOwPreCurrentBlock = Math.max(fpre, pre);
