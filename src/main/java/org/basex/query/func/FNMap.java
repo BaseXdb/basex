@@ -54,7 +54,7 @@ public final class FNMap extends Fun {
       throws QueryException {
     switch(def) {
       case MAPNEW:  return newMap(ctx, ii);
-      case ENTRY:   return entry(ctx, ii);
+      case MAPENTRY:   return entry(ctx, ii);
       case MAPCONT: return contains(ctx, ii);
       case MAPSIZE: return getMap(0, ctx, ii).mapSize();
       case MAPREM:  return remove(ctx, ii);
@@ -85,7 +85,7 @@ public final class FNMap extends Fun {
    */
   private Map entry(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return Map.EMPTY.insert(expr[0].item(ctx, ii), expr[1].value(ctx), ii);
+    return Map.entry(expr[0].item(ctx, ii), expr[1].value(ctx), ii);
   }
 
   /**
@@ -98,7 +98,7 @@ public final class FNMap extends Fun {
   private Map newMap(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     if(expr.length == 0) return Map.EMPTY;
-    if(expr.length == 2) checkColl(expr[1], ctx, ii);
+    if(expr.length == 2) checkColl(expr[1], ctx);
 
     Map map = Map.EMPTY;
     final Iter maps = expr[0].iter(ctx);

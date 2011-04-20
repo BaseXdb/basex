@@ -17,7 +17,7 @@ import org.basex.util.InputInfo;
 final class Branch extends TrieNode {
 
   /** Child array. */
-  final TrieNode[] kids;
+  private final TrieNode[] kids;
   /** Bit array with a bit set for every used slot. */
   final int used;
 
@@ -34,25 +34,17 @@ final class Branch extends TrieNode {
     assert verify();
   }
 
-  @Override
-  TrieNode insert(final int h, final Item k, final Value v, final int l,
-      final InputInfo ii) throws QueryException {
-    final int key = key(h, l);
-    final TrieNode sub = kids[key], nsub;
-    final int bs, rem;
-    if(sub != null) {
-      nsub = sub.insert(h, k, v, l + 1, ii);
-      if(nsub == sub) return this;
-      bs = used;
-      rem = sub.size;
-    } else {
-      nsub = new Leaf(h, k, v);
-      bs = used | 1 << key;
-      rem = 0;
-    }
-    final TrieNode[] ks = kids.clone();
-    ks[key] = nsub;
-    return new Branch(ks, bs, size - rem + nsub.size);
+  /**
+   * Copies the children array.
+   * This is faster than {@code kids.clone()} according to <a
+   * href="http://www.javaspecialists.eu/archive/Issue124.html">Heinz M.
+   * Kabutz</a>.
+   * @return copy of the child array
+   */
+  TrieNode[] copyKids() {
+    final TrieNode[] copy = new TrieNode[KIDS];
+    System.arraycopy(kids, 0, copy, 0, KIDS);
+    return copy;
   }
 
   @Override
@@ -74,7 +66,7 @@ final class Branch extends TrieNode {
       }
     } else nu = used;
 
-    final TrieNode[] ks = kids.clone();
+    final TrieNode[] ks = copyKids();
     ks[key] = nsub;
     return new Branch(ks, nu, size - 1);
   }
@@ -128,7 +120,7 @@ final class Branch extends TrieNode {
       nw = ins;
     } else nw = o;
 
-    final TrieNode[] ks = kids.clone();
+    final TrieNode[] ks = copyKids();
     ks[k] = nw;
 
     // we don't replace here, so the size must increase
@@ -148,7 +140,7 @@ final class Branch extends TrieNode {
       nw = ins;
     } else nw = o;
 
-    final TrieNode[] ks = kids.clone();
+    final TrieNode[] ks = copyKids();
     ks[k] = nw;
 
     // we don't replace here, so the size must increase
@@ -165,7 +157,7 @@ final class Branch extends TrieNode {
       if(ok != null) {
         final TrieNode nw = k == null ? ok : ok.addAll(k, l + 1, ii);
         if(nw != k) {
-          if(ch == null) ch = kids.clone();
+          if(ch == null) ch = copyKids();
           ch[i] = nw;
           nu |= 1 << i;
           ns += nw.size - (k == null ? 0 : k.size);
@@ -209,7 +201,7 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  boolean eq(final InputInfo ii, final TrieNode o) throws QueryException {
+  boolean deep(final InputInfo ii, final TrieNode o) throws QueryException {
     if(!(o instanceof Branch)) return false;
     final Branch ob = (Branch) o;
 
@@ -218,7 +210,7 @@ final class Branch extends TrieNode {
 
     // recursively compare children
     for(int i = 0; i < KIDS; i++)
-      if(kids[i] != null && !kids[i].eq(ii, ob.kids[i])) return false;
+      if(kids[i] != null && !kids[i].deep(ii, ob.kids[i])) return false;
 
     // everything OK
     return true;

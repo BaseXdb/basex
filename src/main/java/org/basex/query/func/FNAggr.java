@@ -107,7 +107,7 @@ public final class FNAggr extends Fun {
   private Item minmax(final Iter iter, final CmpV.Op cmp,
       final QueryContext ctx) throws QueryException {
 
-    if(expr.length == 2) checkColl(expr[1], ctx, input);
+    if(expr.length == 2) checkColl(expr[1], ctx);
 
     Item res = iter.next();
     if(res == null) return null;

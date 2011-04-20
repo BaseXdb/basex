@@ -21,7 +21,7 @@ public final class FNGenTest extends AdvancedQueryTest {
    */
   @Test
   public void testUnparsedText() throws QueryException {
-    final String fun = check(FunDef.PARSETXT, String.class, String.class);
+    final String fun = check(FunDef.PARSETXT);
     contains(fun + "('" + TEXT + "')", "aboutabove");
     contains(fun + "('" + TEXT + "', 'US-ASCII')", "aboutabove");
     error(fun + "('" + TEXT + "', 'xyz')", Err.WRONGINPUT);
@@ -33,7 +33,7 @@ public final class FNGenTest extends AdvancedQueryTest {
    */
   @Test
   public void testParseXML() throws QueryException {
-    final String fun = check(FunDef.PARSEXML, String.class, String.class);
+    final String fun = check(FunDef.PARSEXML);
     contains(fun + "('<x>a</x>')//text()", "a");
   }
 
@@ -43,7 +43,7 @@ public final class FNGenTest extends AdvancedQueryTest {
    */
   @Test
   public void testSerialize() throws QueryException {
-    final String fun = check(FunDef.SERIALIZE, Object.class, Object.class);
+    final String fun = check(FunDef.SERIALIZE);
     contains(fun + "(<x/>)", "&lt;x/&gt;");
     contains(fun + "(<x/>, " + serialParams("") + ")", "&lt;x/&gt;");
     contains(fun + "(<x>a</x>, " +

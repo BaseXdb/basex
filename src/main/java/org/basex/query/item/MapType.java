@@ -51,7 +51,11 @@ public final class MapType extends FunType {
 
   @Override
   public boolean instance(final Type t) {
-    return t instanceof MapType && super.instance(t);
+//    if(t instanceof MapType) {
+//      final MapType mt = (MapType) t;
+//      return mt.keyType.instance(keyType) && ret.instance(mt.ret);
+//    }
+    return super.instance(t);
   }
 
   /**

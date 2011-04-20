@@ -205,7 +205,7 @@ public enum FunDef {
   /** XQuery Function. */
   MAPNEW(MAPURI, FNMap.class, 0, 2, "new([maps[,coll]])", MAP_ZM, STR, MAP_O),
   /** XQuery Function. */
-  ENTRY(MAPURI, FNMap.class, 2, 2, "entry(key,value)", ITEM, ITEM_ZM, MAP_O),
+  MAPENTRY(MAPURI, FNMap.class, 2, 2, "entry(key,value)", ITEM, ITEM_ZM, MAP_O),
   /** XQuery Function. */
   MAPGET(MAPURI, FNMap.class, 2, 2, "get(map,key)", MAP_O, ITEM, ITEM_ZM),
   /** XQuery Function. */
@@ -574,9 +574,9 @@ public enum FunDef {
   /** Database function: opens a specific database node. */
   OPENID(DBURI, FNDb.class, 2, 2, "open-id(string,id)", STR, ITR, NOD_ZM),
   /** Database function: searches the text index. */
-  TEXT(DBURI, FNDb.class, 1, 1, "text(string)", STR, NOD_ZM),
+  TEXT(DBURI, FNDb.class, 1, 1, "text(string)", ITEM, NOD_ZM),
   /** Database function: searches the attribute index. */
-  ATTR(DBURI, FNDb.class, 1, 2, "attribute(string[,name])", STR, STR, NOD_ZM),
+  ATTR(DBURI, FNDb.class, 1, 2, "attribute(string[,name])", ITEM, STR, NOD_ZM),
   /** Database function: searches the full-text index. */
   FULLTEXT(DBURI, FNDb.class, 1, 1, "fulltext(string)", STR, NOD_ZM),
   /** Database function: lists all database. */
@@ -596,11 +596,11 @@ public enum FunDef {
   SEARCH(FTURI, FNFt.class, 2, 2, "search(node,string)", NOD, STR, NOD_ZM),
   /** Database function: marks the hits of a full-text request. */
   MARK(FTURI, FNFt.class, 1, 2, "mark(nodes[,tag])", NOD_ZM, STR, NOD_ZM),
+  /** Database function: extracts full-text results. */
+  EXTRACT(FTURI, FNFt.class, 1, 3, "extract(nodes[,tag[,length]])",
+      ITEM_ZM, STR, ITR, NOD_ZM),
   /** Database function: returns the full-text score. */
   SCORE(FTURI, FNFt.class, 1, 1, "score(items)", ITEM_ZM, DBL_ZM),
-  /** Database function: extracts full-text results. */
-  EXTRACT(FTURI, FNFt.class, 1, 3, "extract(items[,tag[,length]])",
-      ITEM_ZM, STR, ITR, NOD_ZM),
 
   /* FNUtil functions. */
 
@@ -648,10 +648,10 @@ public enum FunDef {
   public final int min;
   /** Maximum number of arguments. */
   public final int max;
+  /** Argument types. */
+  public final SeqType[] args;
   /** Return type. */
   final SeqType ret;
-  /** Argument types. */
-  final SeqType[] args;
 
   /**
    * Constructor.

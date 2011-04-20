@@ -6,9 +6,8 @@ import org.basex.core.Context;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.func.FunDef;
-import org.basex.query.item.DBNode;
+import org.basex.query.item.AtomType;
 import org.basex.query.util.Err;
-import org.basex.util.Util;
 
 /**
  * This class contains some methods for performing advanced query tests.
@@ -63,12 +62,17 @@ abstract class AdvancedQueryTest {
    * @param query query to be run
    * @param error expected error
    */
-  protected static void error(final String query, final Err error) {
+  protected static void error(final String query, final Err... error) {
     try {
       query(query);
       fail("[" + error + "] expected for query: " + query);
     } catch(final QueryException ex) {
-      assertContains(ex.getMessage(), error.code());
+      final String msg = ex.getMessage();
+      boolean found = false;
+      for(final Err e : error) found |= msg.contains(e.code());
+      if(!found) {
+        fail("'" + error[0].code() + "' not contained in '" + msg + "'.");
+      }
     }
   }
 
@@ -84,36 +88,30 @@ abstract class AdvancedQueryTest {
   }
 
   /**
-   * Checks the arguments of a function and returns the function name.
+   * Checks if the specified function correctly handles its argument types,
+   * and returns the function name.
    * @param def function definition
-   * @param args arguments
+   * types are supported.
    * @return function name
    */
-  protected String check(final FunDef def, final Class<?>... args) {
+  protected String check(final FunDef def) {
     final String desc = def.toString();
     final String name = desc.replaceAll("\\(.*", "");
-    final int max = desc.contains("()") ? 0 : desc.split(",").length;
-    final int min = max + 1 - desc.split("\\]").length;
-    if(max != args.length) Util.notexpected("Check #arguments: " + def);
 
     // test too few, too many, and wrong argument types
-    for(int al = Math.max(min - 1, 0); al <= max + 1; al++) {
-      final boolean in = al >= min && al <= max;
+    for(int al = Math.max(def.min - 1, 0); al <= def.max + 1; al++) {
+      final boolean in = al >= def.min && al <= def.max;
       final StringBuilder qu = new StringBuilder(name + "(");
       int any = 0;
-      boolean db = false;
       for(int a = 0; a < al; a++) {
         if(a != 0) qu.append(", ");
         if(in) {
           // test arguments
-          if(args[a] == String.class) {
+          if(def.args[a].type == AtomType.STR) {
             qu.append("1");
-          } else if(args[a] == null) { // any type (skip test)
+          } else { // any type (skip test)
             qu.append("'X'");
-            any++;
-          } else {
-            qu.append("'X'");
-            db |= args[a] == DBNode.class;
+            if(def.args[a].type == AtomType.ITEM) any++;
           }
         } else {
           // test wrong number of arguments
@@ -121,8 +119,10 @@ abstract class AdvancedQueryTest {
         }
       }
       // skip test if all types are arbitrary
-      if((al != 0 || min > 0) && (any == 0 || any != al)) {
-        error(qu + ")", db ? Err.NODBCTX : in ? Err.XPTYPE : Err.XPARGS);
+      if((def.min > 0 || al != 0) && (any == 0 || any != al)) {
+        final String query = qu.append(")").toString();
+        if(in) error(query, Err.XPTYPE, Err.NODBCTX);
+        else error(query, Err.XPARGS);
       }
     }
     return name;

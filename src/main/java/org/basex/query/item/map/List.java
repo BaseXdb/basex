@@ -53,38 +53,6 @@ final class List extends TrieNode {
   }
 
   @Override
-  TrieNode insert(final int h, final Item k, final Value v, final int l,
-      final InputInfo ii) throws QueryException {
-    // same hash, replace or merge
-    if(h == hash) {
-      for(int i = keys.length; i-- > 0;) {
-        if(eq(k, keys[i], ii)) {
-          // replace value
-          final Value[] vs = values.clone();
-          vs[i] = v;
-          return new List(h, keys.clone(), vs);
-        }
-      }
-      return new List(hash, Array.add(keys, k), Array.add(values, v));
-    }
-
-    // different hash, branch
-    final TrieNode[] ch = new TrieNode[KIDS];
-    final int a = key(h, l), b = key(hash, l);
-    final int used;
-    if(a != b) {
-      ch[a] = new Leaf(h, k, v);
-      ch[b] = this;
-      used = 1 << a | 1 << b;
-    } else {
-      ch[a] = insert(h, k, v, l + 1, ii);
-      used = 1 << a;
-    }
-    // we definitely inserted one value
-    return new Branch(ch, used, size + 1);
-  }
-
-  @Override
   TrieNode delete(final int h, final Item k, final int l,
       final InputInfo ii) throws QueryException {
     if(h == hash) {
@@ -201,7 +169,7 @@ final class List extends TrieNode {
   TrieNode add(final Branch o, final int l, final InputInfo ii)
       throws QueryException {
     final int k = key(hash, l);
-    final TrieNode[] ch = o.kids.clone();
+    final TrieNode[] ch = o.copyKids();
     final TrieNode old = ch[k];
     ch[k] = old == null ? this : old.addAll(this, l + 1, ii);
     return new Branch(ch, o.used | 1 << k,
@@ -246,7 +214,7 @@ final class List extends TrieNode {
   }
 
   @Override
-  boolean eq(final InputInfo ii, final TrieNode o) throws QueryException {
+  boolean deep(final InputInfo ii, final TrieNode o) throws QueryException {
     if(!(o instanceof List) || size != o.size) return false;
     final List ol = (List) o;
 
