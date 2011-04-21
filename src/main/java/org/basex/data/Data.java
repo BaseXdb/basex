@@ -523,20 +523,21 @@ public abstract class Data {
 
   /**
    * Fast replace.
-   * @param replacePre pre value to be replaced
+   * @param replacedPre pre value to be replaced
    * @param d replace data
    */
-  public final void fastReplace(final int replacePre, final Data d) {
+  public final void fastReplace(final int replacedPre, final Data d) {
     final int dsize = d.meta.size;
     final int buf = dsize;
     buffer(buf);
     int dpre = -1;
+    final int rKind = kind(replacedPre);
     while(++dpre != dsize) {
       final int dkind = d.kind(dpre);
       final int dpar = d.parent(dpre, dkind);
-      final int pre = replacePre + dpre;
+      final int pre = replacedPre + dpre;
       final int dis = dpar >= 0 ? dpre - dpar : pre -
-          parent(replacePre, kind(replacePre));
+          parent(replacedPre, rKind);
 
       switch(dkind) {
         case DOC:
@@ -565,9 +566,25 @@ public abstract class Data {
       }
     }
 
-//    table.replace(replacePre, buffer());
-    table.replace2(replacePre, buffer());
+    final int oldSubTreeSize = size(replacedPre, rKind);
+    table.replace2(replacedPre, buffer(), oldSubTreeSize);
     buffer(1);
+
+    // increase/decrease size of ancestors, adjust distances of siblings
+    final int replacedPreParent = parent(replacedPre, rKind);
+    final int diff = oldSubTreeSize - dsize;
+    // new subtree bigger than old one
+    if(diff <= -1) {
+      int p = replacedPreParent;
+      while(p >= 0) {
+        final int k = kind(p);
+        size(p, k, size(p, k) + Math.abs(diff));
+        p = parent(p, k);
+      }
+      updateDist(replacedPre + dsize, diff);
+    } else if(oldSubTreeSize > dsize) {
+      // TODO combine with the upper
+    }
   }
 
   /**

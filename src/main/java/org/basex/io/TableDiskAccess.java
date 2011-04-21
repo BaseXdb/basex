@@ -287,19 +287,37 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public void replace2(final int pre, final byte[] entries) {
+  public void replace2(final int pre, final byte[] entries,
+      final int oldSubtreeSize) {
     if(entries.length == 0) return;
 
-    // alternative correct? cursor(pre)
-    final int numberOfRecords = entries.length >>> IO.NODEPOWER;
-    final int rightSiblingPre = pre + numberOfRecords;
+    final int newSubtreeSize = entries.length >>> IO.NODEPOWER;
+    final int rightSiblingPre = pre + newSubtreeSize;
     int entriesOffset = 0;
-    for(int i = pre; i < rightSiblingPre; i++) {
+    final int diff = oldSubtreeSize - newSubtreeSize;
+    for(int i = pre; i < rightSiblingPre - Math.abs(diff); i++) {
       int offset = -1;
       do {
         write1(i, ++offset, entries[entriesOffset]);
         entriesOffset++;
       } while(entriesOffset % 16 != 0);
+    }
+
+    // now handle the remaining entries if the two subtrees are of different
+    // size
+
+    // case1: new subtree bigger than old one, insert remaining new nodes
+    if(diff <= -1) {
+      byte[] remainingEntries = new byte[entries.length - entriesOffset];
+      System.arraycopy(entries, entriesOffset, remainingEntries, 0,
+          remainingEntries.length);
+      insert(rightSiblingPre + diff, remainingEntries);
+      return;
+    }
+
+    // case2: old subtree bigger then new one, delete remaining old nodes
+    if(diff >= 1) {
+      delete(rightSiblingPre - diff, diff);
     }
   }
 

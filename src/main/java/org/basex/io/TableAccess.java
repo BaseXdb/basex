@@ -111,13 +111,15 @@ public abstract class TableAccess {
    * @param entries new entries
    */
   public abstract void replace(int pre, byte[] entries);
-  
+
   /**
    * More efficient replace method which exploits block management.
    * @param pre node to be replaced
    * @param entries new entries
+   * @param replacedSubtreeSize size of the subtree that is replaced
    */
-  public abstract void replace2(int pre, byte[] entries);
+  public abstract void replace2(int pre, byte[] entries,
+      final int replacedSubtreeSize);
 
   /**
    * Deletes the specified number of entries from the database.

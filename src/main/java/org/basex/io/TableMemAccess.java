@@ -173,13 +173,9 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void replace2(final int pre, final byte[] entries) {
-    try {
-      throw new OperationNotSupportedException();
-    } catch(OperationNotSupportedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+  public void replace2(final int pre, final byte[] entries,
+      final int replacedSubtreeSize) {
+    // TODO Auto-generated method stub
   }
 
   @Override

@@ -43,7 +43,7 @@ public final class ReplaceNode extends NodeCopy {
       d.replace(pre, Data.TEXT, md.text(0, true));
       // check if simple, fast replace is possible
     } else if(md.meta.size > 0 && d instanceof DiskData && d.ns.size() == 0
-        && md.ns.size() == 0 && d.size(pre, kind) == md.meta.size) {
+        && md.ns.size() == 0 /*&& d.size(pre, kind) == md.meta.size*/) {
       d.fastReplace(pre, md);
     } else {
       d.delete(pre);
