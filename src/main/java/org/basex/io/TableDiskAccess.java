@@ -287,6 +287,23 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
+  public void replace2(final int pre, final byte[] entries) {
+    if(entries.length == 0) return;
+
+    // alternative correct? cursor(pre)
+    final int numberOfRecords = entries.length >>> IO.NODEPOWER;
+    final int rightSiblingPre = pre + numberOfRecords;
+    int entriesOffset = 0;
+    for(int i = pre; i < rightSiblingPre; i++) {
+      int offset = -1;
+      do {
+        write1(i, ++offset, entries[entriesOffset]);
+        entriesOffset++;
+      } while(entriesOffset % 16 != 0);
+    }
+  }
+
+  @Override
   public void insert(final int pre, final byte[] entries) {
     if(entries.length == 0) return;
 

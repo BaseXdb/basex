@@ -565,7 +565,8 @@ public abstract class Data {
       }
     }
 
-    table.replace(replacePre, buffer());
+//    table.replace(replacePre, buffer());
+    table.replace2(replacePre, buffer());
     buffer(1);
   }
 

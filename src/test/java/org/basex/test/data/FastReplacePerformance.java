@@ -7,7 +7,7 @@ import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 
 public class FastReplacePerformance {
-  
+
   final String INPUTPATH;
   static final String DBNAME = "Xmark11MBfastreplace";
   static final String QUERY1 = "let $regionscopy := " +
@@ -23,7 +23,26 @@ public class FastReplacePerformance {
 	public FastReplacePerformance(final String path) {
 	  INPUTPATH = path;
 	}
-	
+
+	public void replaceBlockPlusOne() {
+	  System.out.println("blockplusone:");
+	  final String dbname = "replaceTest";
+    final Context ctx = new Context();
+    try {
+      new CreateDB(dbname, "<xml/>").execute(ctx);
+      final XQuery xq = new XQuery("for $i in 1 to 128 return insert " +
+      		"node <n>{$i}</n> into /xml");
+      xq.execute(ctx);
+      new XQuery("for $i in //n return replace node $i with " +
+      		"<node>{$i/text()}</node>").execute(ctx);
+      System.out.println("finished.");
+    } catch (BaseXException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    System.out.println("\n\n");
+	}
+
 	public void fastReplace() {
 		System.out.println("fast replace:");
 		final Context ctx = new Context();
@@ -39,7 +58,7 @@ public class FastReplacePerformance {
 		}
 		System.out.println("\n\n");
 	}
-	
+
 	public void normalReplace() {
 		System.out.println("simple replace:");
 		final Context ctx = new Context();
@@ -55,7 +74,7 @@ public class FastReplacePerformance {
 		}
 		System.out.println("\n\n");
 	}
-	
+
 	public static void main(final String[] args) {
 		new FastReplacePerformance("/Users/lukas/Dropbox/basex/xml/11MB.xml")
 		.fastReplace();

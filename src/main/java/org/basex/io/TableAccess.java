@@ -106,11 +106,18 @@ public abstract class TableAccess {
   public abstract void write5(int p, int o, long v);
 
   /**
-   * Efficient replace method.
+   * More efficient replace method which exploits block management.
    * @param pre node to be replaced
    * @param entries new entries
    */
   public abstract void replace(int pre, byte[] entries);
+  
+  /**
+   * More efficient replace method which exploits block management.
+   * @param pre node to be replaced
+   * @param entries new entries
+   */
+  public abstract void replace2(int pre, byte[] entries);
 
   /**
    * Deletes the specified number of entries from the database.

@@ -173,6 +173,16 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
+  public void replace2(final int pre, final byte[] entries) {
+    try {
+      throw new OperationNotSupportedException();
+    } catch(OperationNotSupportedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  @Override
   public void insert(final int pre, final byte[] entries) {
     final int nr = entries.length >>> IO.NODEPOWER;
     move(pre, pre + nr);
