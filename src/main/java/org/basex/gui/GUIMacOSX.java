@@ -130,7 +130,8 @@ public final class GUIMacOSX {
 
     /** Called when the user selects the About item in the application menu. */
     public void handleAbout() {
-      GUICommands.ABOUT.execute(main);
+      // explicit cast to circumvent Java compiler bug
+      ((GUICommand) GUICommands.ABOUT).execute(main);
     }
 
     /**
@@ -151,7 +152,8 @@ public final class GUIMacOSX {
 
     /** Called when the Preference item in the application menu is selected. */
     public void handlePreferences() {
-      GUICommands.PREFS.execute(main);
+      // explicit cast to circumvent Java compiler bug
+      ((GUICommand) GUICommands.PREFS).execute(main);
     }
 
     /**
@@ -162,7 +164,8 @@ public final class GUIMacOSX {
 
     /** Called when the application is sent the Quit event. */
     public void handleQuit() {
-      GUICommands.EXIT.execute(main);
+      // explicit cast to circumvent Java compiler bug
+      ((GUICommand) GUICommands.EXIT).execute(main);
     }
 
     /**

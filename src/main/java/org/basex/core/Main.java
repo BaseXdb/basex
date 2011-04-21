@@ -24,7 +24,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class Main {
+public abstract class Main implements Runnable {
   /** Flag for using default standard input. */
   private static final boolean NOCONSOLE = System.console() == null;
   /** Database context. */
@@ -47,8 +47,8 @@ public abstract class Main {
    */
   protected Main(final String[] args) {
     success = parseArguments(args);
+    check(success);
     verbose |= console;
-    if(!success) return;
 
     // guarantee correct shutdown...
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -68,7 +68,9 @@ public abstract class Main {
     while(console) {
       Util.out("> ");
       for(final String in : inputs()) {
-        if(!in.isEmpty() && !execute(in)) return true;
+        if(in.isEmpty()) continue;
+        final Boolean b = execute(in);
+        if(b == null) return true;
       }
     }
     return false;
@@ -91,26 +93,27 @@ public abstract class Main {
   /**
    * Parses and executes the input string.
    * @param in input commands
-   * @return false if exit command was sent
+   * @return success flag, or {@code null} if the exit command was dispatched
    * @throws IOException database exception
    */
-  protected final boolean execute(final String in) throws IOException {
+  protected final Boolean execute(final String in) throws IOException {
     try {
       for(final Command cmd : new CommandParser(in, context).parse()) {
-        if(cmd instanceof Exit) return false;
+        if(cmd instanceof Exit) return null;
 
         // offer optional password input
         final int i = cmd instanceof Password && cmd.args[0] == null ? 0 :
           (cmd instanceof CreateUser || cmd instanceof AlterUser) &&
           cmd.args[1] == null ? 1 : -1;
+
         if(i != -1) {
           Util.out(SERVERPW + COLS);
           cmd.args[i] = password();
         }
-        if(!execute(cmd, verbose)) break;
+        if(!execute(cmd, verbose)) return false;
       }
     } catch(final QueryException ex) {
-      error(ex, ex.getMessage());
+      return error(ex, ex.getMessage());
     }
     return true;
   }
@@ -130,11 +133,9 @@ public abstract class Main {
     try {
       ss.execute(cmd);
       if(info) Util.out(ss.info());
-      if(cmd instanceof Exit) return true;
       return true;
     } catch(final BaseXException ex) {
-      error(null, ex.getMessage());
-      return false;
+      return error(null, ex.getMessage());
     }
   }
 
@@ -154,10 +155,12 @@ public abstract class Main {
    * Prints an error message.
    * @param ex exception reference
    * @param msg message
+   * @return success flag
    */
-  protected final void error(final Exception ex, final String msg) {
+  protected final boolean error(final Exception ex, final String msg) {
     Util.errln((console ? "" : INFOERROR) + msg.trim());
     Util.debug(ex);
+    return false;
   }
 
   /**
@@ -197,6 +200,14 @@ public abstract class Main {
     // hide password
     final char[] pw = System.console().readPassword();
     return pw != null ? new String(pw) : "";
+  }
+
+  /**
+   * Leaves with 1 as exit code if the specified flag is {@code false}.
+   * @param ok ok flag
+   */
+  protected static void check(final boolean ok) {
+    if(!ok) System.exit(1);
   }
 
   /**

@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FunItem;
+import org.basex.query.item.FItem;
 import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
@@ -83,11 +83,11 @@ public final class DynFunCall extends Arr {
    * @return function item
    * @throws QueryException query exception
    */
-  private FunItem getFun(final QueryContext ctx) throws QueryException {
+  private FItem getFun(final QueryContext ctx) throws QueryException {
     final Item it = expr[expr.length - 1].item(ctx, input);
-    if(!it.func() || ((FunType) it.type).args.length != expr.length - 1)
+    if(!it.func() || ((FItem) it).arity() != expr.length - 1)
       Err.type(this, FunType.arity(expr.length - 1), it);
-    return (FunItem) it;
+    return (FItem) it;
   }
 
   /**

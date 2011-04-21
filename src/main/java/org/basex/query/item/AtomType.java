@@ -714,13 +714,18 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public boolean func() {
+  public final boolean func() {
     return false;
   }
 
   @Override
   public byte[] nam() {
     return nam;
+  }
+
+  @Override
+  public final boolean map() {
+    return false;
   }
 
   @Override

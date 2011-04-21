@@ -30,9 +30,9 @@ public final class GUIStatus extends BaseXPanel {
     addMouseListener(this);
     addMouseMotionListener(this);
 
-    layout(new BorderLayout());
-    label = new BaseXLabel(OK).border(0, 6, 0, 0);
-    add(label, BorderLayout.WEST);
+    layout(new BorderLayout(4, 0));
+    label = new BaseXLabel(OK).border(0, 4, 0, 0);
+    add(label, BorderLayout.CENTER);
     mem = new BaseXMem(main, true);
     add(mem, BorderLayout.EAST);
   }
@@ -45,23 +45,4 @@ public final class GUIStatus extends BaseXPanel {
     label.setText(txt);
     repaint();
   }
-
-  /*@Override
-  public void paintComponent(final Graphics g) {
-    super.paintComponent(g);
-
-    // chop and print status text
-    final FontMetrics fm = g.getFontMetrics();
-    int fw = getWidth() - mem.getWidth() - 30;
-    final StringBuilder sb = new StringBuilder(status);
-    if(fm.stringWidth(status) > fw) {
-      sb.setLength(0);
-      for(int s = 0; s < status.length() && fw > 0; ++s) {
-        sb.append(status.charAt(s));
-        fw -= fm.charWidth(sb.charAt(s));
-      }
-      sb.append(DOTS);
-    }
-    g.drawString(sb.toString(), 4, getFont().getSize());
-  }*/
 }

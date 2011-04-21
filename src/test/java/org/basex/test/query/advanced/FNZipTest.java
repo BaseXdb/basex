@@ -54,12 +54,12 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:binary-entry() functions.
+   * Test method for the zip:binary-entry() function.
    * @throws Exception database exception
    */
   @Test
   public void testBinaryEntry() throws Exception {
-    final String fun = check(FunDef.BENTRY, String.class, String.class);
+    final String fun = check(FunDef.BENTRY);
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
     contains("xs:hexBinary(" + fun + "('" + ZIP + "', '" + ENTRY1 + "'))",
         "610A61626F");
@@ -69,13 +69,12 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:binary-entry() functions.
+   * Test method for the zip:binary-entry() function.
    * @throws Exception database exception
    */
   @Test
   public void testTextEntry() throws Exception {
-    final String fun = check(FunDef.TEXTENTRY,
-        String.class, String.class, String.class);
+    final String fun = check(FunDef.TEXTENTRY);
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'US-ASCII')");
     error(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'xyz')", Err.ZIPFAIL);
@@ -84,33 +83,33 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:binary-entry() functions.
+   * Test method for the zip:binary-entry() function.
    * @throws Exception database exception
    */
   @Test
   public void testXMLEntry() throws Exception {
-    final String fun = check(FunDef.XMLENTRY, String.class, String.class);
+    final String fun = check(FunDef.XMLENTRY);
     query(fun + "('" + ZIP + "', '" + ENTRY2 + "')");
     query(fun + "('" + ZIP + "', '" + ENTRY2 + "')//title/text()", "XML");
   }
 
   /**
-   * Test method for the zip:entries() functions.
+   * Test method for the zip:entries() function.
    * @throws Exception database exception
    */
   @Test
   public void testEntries() throws Exception {
-    final String fun = check(FunDef.ENTRIES, String.class);
+    final String fun = check(FunDef.ENTRIES);
     query(fun + "('" + ZIP + "')");
   }
 
   /**
-   * Test method for the zip:zip-file() functions.
+   * Test method for the zip:zip-file() function.
    * @throws Exception database exception
    */
   @Test
   public void testZipFile() throws Exception {
-    final String fun = check(FunDef.ZIPFILE, Object.class);
+    final String fun = check(FunDef.ZIPFILE);
     // check first file
     query(fun + "(" + zipParams("<entry name='one'/>") + ")");
     checkZipEntry("one", new byte[0]);
@@ -141,13 +140,13 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:update-entries() functions.
+   * Test method for the zip:update-entries() function.
    * @throws Exception database exception
    * @throws IOException I/O exception
    */
   @Test
   public void testUpdateEntries() throws Exception {
-    final String fun = check(FunDef.UPDATE, Object.class, String.class);
+    final String fun = check(FunDef.UPDATE);
     String list = query("zip:entries('" + ZIP + "')");
 
     // create and compare identical zip file

@@ -178,7 +178,7 @@ public final class Var extends ParseExpr {
    */
   private Value cast(final Value v, final QueryContext ctx)
       throws QueryException {
-    return type == null ? v : type.promote(v, this, ctx, input);
+    return type == null ? v : type.promote(v, ctx, input);
   }
 
   @Override

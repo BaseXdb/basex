@@ -1,5 +1,6 @@
 package org.basex.query.util;
 
+import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.FunJava;
 import org.basex.query.item.FunType;
@@ -61,7 +62,7 @@ public class TypedFunc {
    * @param to type to cast to
    * @return typed function
    */
-  public static TypedFunc constr(final Expr cast, final SeqType to) {
+  public static TypedFunc constr(final Cast cast, final SeqType to) {
     return new TypedFunc(cast, to, SeqType.AAT_ZO);
   }
 

@@ -5,7 +5,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Random;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
@@ -162,13 +161,7 @@ public final class Add extends ACreate {
     }
 
     // create random database name
-    String dbname = path;
-    if(large) {
-      do {
-        dbname = Integer.toString(new Random().nextInt(0x7FFFFFFF));
-      } while(ctx.prop.dbexists(dbname));
-    }
-
+    final String dbname = large ? ctx.data.meta.random() : path;
     final Builder build = large ? new DiskBuilder(parser, ctx.prop) :
       new MemBuilder(parser, ctx.prop);
     if(cmd != null) cmd.build = build;

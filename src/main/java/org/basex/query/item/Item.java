@@ -270,4 +270,9 @@ public abstract class Item extends Value {
     arr[start] = this;
     return 1;
   }
+
+  @Override
+  public boolean homogenous() {
+    return true;
+  }
 }

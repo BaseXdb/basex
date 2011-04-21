@@ -31,7 +31,7 @@ public final class DropDB extends Command {
     if(!validName(db)) return error(NAMEINVALID, db);
 
     // database does not exist; return true
-    if(!prop.dbexists(db)) return info(DBNOTDROPPED);
+    if(!prop.dbexists(db)) return info(DBNOTDROPPED, db);
 
     // close database if it's currently opened and not opened by others
     close(db);
@@ -40,7 +40,7 @@ public final class DropDB extends Command {
     if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to drop database
-    return drop(db, prop) ? info(DBDROPPED, db) : error(DBDROPERROR);
+    return drop(db, prop) ? info(DBDROPPED, db) : error(DBDROPERROR, db);
   }
 
   /**

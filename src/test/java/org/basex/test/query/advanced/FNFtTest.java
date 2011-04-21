@@ -7,7 +7,6 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
-import org.basex.query.item.DBNode;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   @Test
   public void testSearch() throws BaseXException, QueryException {
     // test arguments
-    final String fun = check(FunDef.SEARCH, DBNode.class, String.class);
+    final String fun = check(FunDef.SEARCH);
 
     // check index results
     query(fun + "(., 'assignments')", "Assignments");
@@ -60,7 +59,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void testMark() throws QueryException {
-    final String fun = check(FunDef.MARK, (Class<?>) null, String.class);
+    final String fun = check(FunDef.MARK);
 
     query(fun + "(//*[text() contains text '1'])",
       "<li>Exercise <mark>1</mark></li>");
@@ -82,9 +81,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void testExtract() throws QueryException {
-    final String fun =
-      check(FunDef.EXTRACT, (Class<?>) null, String.class, Integer.class);
-
+    final String fun = check(FunDef.EXTRACT);
     query(fun + "(//*[text() contains text '1'])",
       "<li>Exercise <mark>1</mark></li>");
     query(fun + "(//*[text() contains text '2'], 'b', 20)",
@@ -102,8 +99,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   @Test
   public void testScore() throws QueryException {
     // test arguments
-    final String fun = check(FunDef.SCORE, (Class<?>) null);
-
+    final String fun = check(FunDef.SCORE);
     query(fun + "(ft:search(., '2'))", "1");
     query(fun + "(ft:search(., 'XML'))", "1 0.5");
   }

@@ -38,12 +38,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:exists() functions.
+   * Test method for the file:exists() function.
    * @throws QueryException database exception
    */
   @Test
   public void testExists() throws QueryException {
-    final String fun = check(FunDef.FEXISTS, String.class);
+    final String fun = check(FunDef.FEXISTS);
     query("file:write('" + PATH1 + "', ())");
     query(fun + "('" + PATH1 + "')", "true");
     query("file:delete('" + PATH1 + "')");
@@ -51,12 +51,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-directory() functions.
+   * Test method for the file:is-directory() function.
    * @throws QueryException database exception
    */
   @Test
   public void testIsDirectory() throws QueryException {
-    final String fun = check(FunDef.ISDIR, String.class);
+    final String fun = check(FunDef.ISDIR);
     query(fun + "('" + Prop.TMP + "')", "true");
     query(fun + "('" + Prop.TMP + "')", "true");
     query("file:write('" + PATH1 + "', ())");
@@ -68,12 +68,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-file() functions.
+   * Test method for the file:is-file() function.
    * @throws QueryException database exception
    */
   @Test
   public void testIsFile() throws QueryException {
-    final String fun = check(FunDef.ISFILE, String.class);
+    final String fun = check(FunDef.ISFILE);
     query(fun + "('" + Prop.TMP + "')", "false");
     query("file:write('" + PATH1 + "', ())");
     query(fun + "('" + PATH1 + "')", "true");
@@ -84,59 +84,58 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-readable() functions.
+   * Test method for the file:is-readable() function.
    * @throws QueryException database exception
    */
   @Test
   public void testIsReadable() throws QueryException {
-    final String fun = check(FunDef.ISREAD, String.class);
+    final String fun = check(FunDef.ISREAD);
     query("file:write('" + PATH1 + "', ())");
     query(fun + "('" + PATH1 + "')", "true");
     query("file:delete('" + PATH1 + "')");
   }
 
   /**
-   * Test method for the file:is-writable() functions.
+   * Test method for the file:is-writable() function.
    * @throws QueryException database exception
    */
   @Test
   public void testIsWritable() throws QueryException {
-    final String fun = check(FunDef.ISWRITE, String.class);
+    final String fun = check(FunDef.ISWRITE);
     query("file:write('" + PATH1 + "', ())");
     query(fun + "('" + PATH1 + "')", "true");
     query("file:delete('" + PATH1 + "')");
   }
 
   /**
-   * Test method for the file:last-modified() functions.
+   * Test method for the file:last-modified() function.
    * @throws QueryException database exception
    */
   @Test
   public void testLastModified() throws QueryException {
-    final String fun = check(FunDef.LASTMOD, String.class);
+    final String fun = check(FunDef.LASTMOD);
     assertTrue(!query(fun + "('" + Prop.TMP + "')").isEmpty());
   }
 
   /**
-   * Test method for the file:size() functions.
+   * Test method for the file:size() function.
    * @throws QueryException database exception
    */
   @Test
   public void testSize() throws QueryException {
-    final String fun = check(FunDef.SIZE, String.class);
+    final String fun = check(FunDef.SIZE);
     query("file:write('" + PATH1 + "', 'abcd')");
     query(fun + "('" + PATH1 + "')", "4");
     query("file:delete('" + PATH1 + "')");
   }
 
   /**
-   * Test method for the file:list() functions.
+   * Test method for the file:list() function.
    * @throws QueryException database exception
    */
   @Test
   public void testList() throws QueryException {
-    final String fun =
-      check(FunDef.FLIST, String.class, Boolean.class, String.class);
+    final String fun = check(FunDef.FLIST);
     error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
     query("file:write('" + PATH1 + "', ())");
     error(fun + "('" + PATH1 + "')", Err.NOTDIR);
@@ -149,12 +148,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:create-directory() functions.
+   * Test method for the file:create-directory() function.
    * @throws QueryException database exception
    */
   @Test
   public void testCreateDirectory() throws QueryException {
-    final String fun = check(FunDef.CREATEDIR, String.class);
+    final String fun = check(FunDef.CREATEDIR);
     query(fun + "('" + PATH1 + "')");
     query(fun + "('" + PATH1 + "')");
     query(fun + "('" + PATH3 + "')");
@@ -166,12 +165,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:delete() functions.
+   * Test method for the file:delete() function.
    * @throws QueryException database exception
    */
   @Test
   public void testDelete() throws QueryException {
-    final String fun = check(FunDef.DELETE, String.class, Boolean.class);
+    final String fun = check(FunDef.DELETE);
     query("file:create-directory('" + PATH3 + "')");
     error(fun + "('" + PATH1 + "')", Err.DIRNOTEMPTY);
     query(fun + "('" + PATH3 + "')");
@@ -181,12 +180,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:read() functions.
+   * Test method for the file:read() function.
    * @throws QueryException database exception
    */
   @Test
   public void testRead() throws QueryException {
-    final String fun = check(FunDef.READ, String.class, String.class);
+    final String fun = check(FunDef.READ);
     error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
     error(fun + "('" + Prop.TMP + "')", Err.PATHISDIR);
     query("file:write('" + PATH1 + "', 'a\u00e4')");
@@ -197,12 +196,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:read-binary() functions.
+   * Test method for the file:read-binary() function.
    * @throws QueryException database exception
    */
   @Test
   public void testReadBinary() throws QueryException {
-    final String fun = check(FunDef.READBIN, String.class);
+    final String fun = check(FunDef.READBIN);
     error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
     error(fun + "('" + Prop.TMP + "')", Err.PATHISDIR);
     query("file:write('" + PATH1 + "', '0')");
@@ -211,13 +210,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:write() functions.
+   * Test method for the file:write() function.
    * @throws QueryException database exception
    */
   @Test
   public void testWrite() throws QueryException {
-    final String fun = check(FunDef.WRITE, String.class,
-        (Class<?>) null, String.class, Boolean.class);
+    final String fun = check(FunDef.WRITE);
 
     error(fun + "('" + Prop.TMP + "', ())", Err.PATHISDIR);
 
@@ -243,13 +241,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:write-binary() functions.
+   * Test method for the file:write-binary() function.
    * @throws QueryException database exception
    */
   @Test
   public void testWriteBinary() throws QueryException {
-    final String fun =
-      check(FunDef.WRITEBIN, String.class, (Class<?>) null, Boolean.class);
+    final String fun = check(FunDef.WRITEBIN);
 
     final String a = "xs:base64Binary('MA==')";
     error(fun + "('" + Prop.TMP + "', " + a + ")", Err.PATHISDIR);
@@ -263,12 +260,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:copy() functions.
+   * Test method for the file:copy() function.
    * @throws QueryException database exception
    */
   @Test
   public void testCopy() throws QueryException {
-    final String fun = check(FunDef.COPY, String.class, String.class);
+    final String fun = check(FunDef.COPY);
 
     query("file:write('" + PATH1 + "', 'a')");
     query(fun + "('" + PATH1 + "', '" + PATH2 + "')");
@@ -283,12 +280,12 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:move() functions.
+   * Test method for the file:move() function.
    * @throws QueryException database exception
    */
   @Test
   public void testMove() throws QueryException {
-    final String fun = check(FunDef.MOVE, String.class, String.class);
+    final String fun = check(FunDef.MOVE);
 
     error(fun + "('" + PATH1 + "', '" + PATH2 + "')", Err.PATHNOTEXISTS);
     query("file:write('" + PATH1 + "', 'a')");
@@ -303,7 +300,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:path-separator() functions.
+   * Test method for the file:path-separator() function.
    * @throws QueryException database exception
    */
   @Test
@@ -314,24 +311,24 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:path-to-full-path() functions.
+   * Test method for the file:path-to-full-path() function.
    * @throws Exception exception
    */
   @Test
   public void testPathToFullPath() throws Exception {
-    final String fun = check(FunDef.PATHTOFULL, String.class);
+    final String fun = check(FunDef.PATHTOFULL);
     final String path = query(fun + "('" + PATH1 + "')");
     final String can = new File(PATH1).getAbsolutePath();
     assertEquals(path.toLowerCase(), can.toLowerCase());
   }
 
   /**
-   * Test method for the file:path-to-full-path() functions.
+   * Test method for the file:path-to-full-path() function.
    * @throws Exception exception
    */
   @Test
   public void testPathToURI() throws Exception {
-    final String fun = check(FunDef.PATHTOURI, String.class);
+    final String fun = check(FunDef.PATHTOURI);
     final String path = query(fun + "('" + PATH1 + "')");
     final String uri = new File(PATH1).toURI().toString();
     assertEquals(path.toLowerCase(), uri.toLowerCase());

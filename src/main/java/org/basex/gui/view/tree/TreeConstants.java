@@ -3,13 +3,12 @@ package org.basex.gui.view.tree;
 import java.awt.Color;
 
 /**
- * This interface contains options for the tree view.
+ * This interface contains tree view constants.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Wolfgang Miller
  */
-interface TreeViewOptions {
-  // Options
+interface TreeConstants {
   /** Use ChildIterator to cache nodes. */
   boolean USE_CHILDITERATOR = false;
   /** Draw only element nodes. */
@@ -20,14 +19,11 @@ interface TreeViewOptions {
   boolean BORDER_RECTANGLES = true;
   /** Fill rectangles. */
   boolean FILL_RECTANGLES = true;
-  /** Show extra node information. */
-  boolean SHOW_EXTRA_INFO = false;
   /** Draw node text. */
   boolean DRAW_NODE_TEXT = true;
-  /** Show 3d descendant connection. */
-  boolean SHOW_3D_CONN = false;
   /** Show connections in main image. **/
   boolean SHOW_CONN_MI = true;
+
   /** Border padding value. */
   int BORDER_PADDING = 2;
   /** Margin to top. */
@@ -46,7 +42,7 @@ interface TreeViewOptions {
   /** Minimum space between the levels. */
   int MIN_LEVEL_DISTANCE = 2;
   /** Optimal space between the levels. */
-  int BEST_LEVEL_DISTANCE = 26;
+  int BEST_LEVEL_DISTANCE = 16;
   /** Maximum level distance. */
   int MAX_LEVEL_DISTANCE = 100;
   /** Best node height. */
@@ -54,27 +50,28 @@ interface TreeViewOptions {
   /** Minimum node height. */
   int MIN_NODE_HEIGHT = 1;
   /** Maximum node height. */
-  int MAX_NODE_HEIGHT = 24;
+  int MAX_NODE_HEIGHT = 26;
   /** Minimum node distance to draw node connections. */
-  int MIN_NODE_DIST_CONN = 10;
-  /** New initialization. */
-  byte PAINT_NEW_INIT = 0;
-  /** New context. */
-  byte PAINT_NEW_CONTEXT = 1;
-  /** New window-size. */
-  byte PAINT_NEW_WINDOW_SIZE = 2;
-  /** Draw kind rectangle. */
-  byte DRAW_RECTANGLE = 0;
-  /** Draw kind highlighting. */
-  byte DRAW_HIGHLIGHT = 1;
-  /** Draw mark. */
-  byte DRAW_MARK = 2;
-  /** Draw kind descendants highlighting. */
-  byte DRAW_DESCENDANTS = 3;
-  /** Draw kind parent highlighting. */
-  byte DRAW_PARENT = 4;
-  /** Draw kind connection. */
-  byte DRAW_CONN = 5;
+  int MIN_NODE_DIST_CONN = 5;
+
+  /** Refresh mode. */
+  enum Refresh {
+    /** New initialization. */ INIT,
+    /** New context. */        CONTEXT,
+    /** New window-size. */    RESIZE,
+    /** Void. */ VOID
+  };
+
+  /** Draw kinds. */
+  enum Draw {
+    /** Rectangle. */    RECTANGLE,
+    /** Highlighting. */ HIGHLIGHT,
+    /** Mark. */         MARK,
+    /** Descendants. */  DESCENDANTS,
+    /** Parents. */      PARENT,
+    /** Connections. */  CONNECTION
+  }
+
   /** Show not enough space text. */
   byte NOT_ENOUGH_SPACE = 0;
   /** Show no attributes text. */

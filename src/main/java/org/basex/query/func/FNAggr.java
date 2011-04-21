@@ -20,14 +20,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNAggr extends Fun {
+public final class FNAggr extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNAggr(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNAggr(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -107,7 +107,7 @@ final class FNAggr extends Fun {
   private Item minmax(final Iter iter, final CmpV.Op cmp,
       final QueryContext ctx) throws QueryException {
 
-    if(expr.length == 2) checkColl(expr[1], ctx, input);
+    if(expr.length == 2) checkColl(expr[1], ctx);
 
     Item res = iter.next();
     if(res == null) return null;

@@ -42,9 +42,9 @@ public final class ReplaceNode extends NodeCopy {
     } else {
       d.delete(pre);
       if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
-      else d.insert(pre, par, md);
+      else if(md != null) d.insert(pre, par, md);
       if(!mergeTexts(d, pre - 1, pre)) {
-        pre += md.meta.size;
+        pre += md != null ? md.meta.size : 1;
         mergeTexts(d, pre - 1, pre);
       }
     }
@@ -58,6 +58,7 @@ public final class ReplaceNode extends NodeCopy {
 
   @Override
   public void update(final NamePool pool) {
+    if(md == null) return;
     add(pool);
     pool.remove(node);
   }

@@ -4,7 +4,8 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map.Entry;
+
 import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;
 import org.basex.query.func.FNNum;
@@ -70,10 +71,8 @@ public final class DecFormatter extends FormatUtil {
 
     // assign map values
     if(map != null) {
-      final Iterator<String> it = map.keySet().iterator();
-      while(it.hasNext()) {
-        final String key = it.next();
-        final String val = map.get(key);
+      for(final Entry<String, String> e : map.entrySet()) {
+        final String key = e.getKey(), val = e.getValue();
         int cp = val.length() == 0 ? 0 : val.codePointAt(0);
         if(Character.charCount(cp) != val.length()) cp = 0;
 

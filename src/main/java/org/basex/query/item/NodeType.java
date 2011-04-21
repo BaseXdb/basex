@@ -152,7 +152,12 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public boolean func() {
+  public final boolean func() {
+    return false;
+  }
+
+  @Override
+  public final boolean map() {
     return false;
   }
 

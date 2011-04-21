@@ -97,6 +97,11 @@ public final class FunTest extends QueryTest {
       { "lang 4", node(5), "//desc/line[lang('en')]" },
       { "lang 5", empty(),  "/.[lang('en-US')]" },
       { "lang 6", node(7), "//desc[lang('FR')]" },
+
+      { "uri 1", str("U"), "string(<x a='{ " +
+        "namespace-uri-for-prefix('n', <n:x/>) }' xmlns:n='U'/>/@a)" },
+      { "uri 2", str("U"), "string(<x a='{ " +
+        "namespace-uri-for-prefix('n', <n:x/>) }' xmlns:n='U'/>/@a)" },
     };
   }
 

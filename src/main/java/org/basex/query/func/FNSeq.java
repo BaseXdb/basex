@@ -26,14 +26,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNSeq extends Fun {
+public final class FNSeq extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNSeq(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNSeq(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -192,7 +192,7 @@ final class FNSeq extends Fun {
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[1], ctx);
-    if(expr.length == 3) checkColl(expr[2], ctx, input);
+    if(expr.length == 3) checkColl(expr[2], ctx);
 
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
@@ -217,7 +217,7 @@ final class FNSeq extends Fun {
    * @throws QueryException query exception
    */
   private Iter distinctValues(final QueryContext ctx) throws QueryException {
-    if(expr.length == 2) checkColl(expr[1], ctx, input);
+    if(expr.length == 2) checkColl(expr[1], ctx);
 
     return new Iter() {
       final ItemSet map = new ItemSet();

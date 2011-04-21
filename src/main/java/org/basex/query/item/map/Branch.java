@@ -1,13 +1,15 @@
-package org.basex.query.util.map;
+package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 
 /**
- * Inner node of a {@link HashTrie}.
+ * Inner node of a {@link Map}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
@@ -15,7 +17,7 @@ import org.basex.util.InputInfo;
 final class Branch extends TrieNode {
 
   /** Child array. */
-  final TrieNode[] kids;
+  private final TrieNode[] kids;
   /** Bit array with a bit set for every used slot. */
   final int used;
 
@@ -30,6 +32,19 @@ final class Branch extends TrieNode {
     kids = ch;
     used = u;
     assert verify();
+  }
+
+  /**
+   * Copies the children array.
+   * This is faster than {@code kids.clone()} according to <a
+   * href="http://www.javaspecialists.eu/archive/Issue124.html">Heinz M.
+   * Kabutz</a>.
+   * @return copy of the child array
+   */
+  TrieNode[] copyKids() {
+    final TrieNode[] copy = new TrieNode[KIDS];
+    System.arraycopy(kids, 0, copy, 0, KIDS);
+    return copy;
   }
 
   @Override
@@ -48,7 +63,7 @@ final class Branch extends TrieNode {
       bs = used | 1 << key;
       rem = 0;
     }
-    final TrieNode[] ks = kids.clone();
+    final TrieNode[] ks = copyKids();
     ks[key] = nsub;
     return new Branch(ks, bs, size - rem + nsub.size);
   }
@@ -72,7 +87,7 @@ final class Branch extends TrieNode {
       }
     } else nu = used;
 
-    final TrieNode[] ks = kids.clone();
+    final TrieNode[] ks = copyKids();
     ks[key] = nsub;
     return new Branch(ks, nu, size - 1);
   }
@@ -126,7 +141,7 @@ final class Branch extends TrieNode {
       nw = ins;
     } else nw = o;
 
-    final TrieNode[] ks = kids.clone();
+    final TrieNode[] ks = copyKids();
     ks[k] = nw;
 
     // we don't replace here, so the size must increase
@@ -146,7 +161,7 @@ final class Branch extends TrieNode {
       nw = ins;
     } else nw = o;
 
-    final TrieNode[] ks = kids.clone();
+    final TrieNode[] ks = copyKids();
     ks[k] = nw;
 
     // we don't replace here, so the size must increase
@@ -163,7 +178,7 @@ final class Branch extends TrieNode {
       if(ok != null) {
         final TrieNode nw = k == null ? ok : ok.addAll(k, l + 1, ii);
         if(nw != k) {
-          if(ch == null) ch = kids.clone();
+          if(ch == null) ch = copyKids();
           ch[i] = nw;
           nu |= 1 << i;
           ns += nw.size - (k == null ? 0 : k.size);
@@ -190,5 +205,35 @@ final class Branch extends TrieNode {
   @Override
   void keys(final ItemCache ks) {
     for(final TrieNode nd : kids) if(nd != null) nd.keys(ks);
+  }
+
+  @Override
+  boolean hasType(final AtomType kt, final SeqType vt) {
+    for(final TrieNode ch : kids)
+      if(ch != null && !ch.hasType(kt, vt)) return false;
+    return true;
+  }
+
+  @Override
+  int hash(final InputInfo ii) throws QueryException {
+    int hash = 0;
+    for(final TrieNode ch : kids) if(ch != null) hash = 31 * hash + ch.hash(ii);
+    return hash;
+  }
+
+  @Override
+  boolean deep(final InputInfo ii, final TrieNode o) throws QueryException {
+    if(!(o instanceof Branch)) return false;
+    final Branch ob = (Branch) o;
+
+    // check bin usage first
+    if(used != ob.used) return false;
+
+    // recursively compare children
+    for(int i = 0; i < KIDS; i++)
+      if(kids[i] != null && !kids[i].deep(ii, ob.kids[i])) return false;
+
+    // everything OK
+    return true;
   }
 }
