@@ -220,7 +220,7 @@ abstract class TrieNode {
    * @return {@code true} if both values are deep equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  static final boolean eq(final Value a, final Value b, final InputInfo ii)
+  static final boolean deep(final Value a, final Value b, final InputInfo ii)
       throws QueryException {
     return a.size() == b.size() && FNSimple.deep(ii, a.iter(), b.iter());
   }
