@@ -21,14 +21,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNAcc extends Fun {
+public final class FNAcc extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNAcc(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNAcc(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

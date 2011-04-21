@@ -15,7 +15,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class WesternTokenizer extends Tokenizer {
+public final class WesternTokenizer extends Tokenizer {
   /** Cached sentence positions. */
   private final IntList sen = new IntList();
   /** Cached paragraph positions. */
@@ -35,7 +35,7 @@ final class WesternTokenizer extends Tokenizer {
   private boolean pa;
 
   /** Text. */
-  private byte[] text = Token.EMPTY;;
+  private byte[] text = Token.EMPTY;
   /** Current sentence. */
   private int sent;
   /** Current paragraph. */
@@ -60,7 +60,7 @@ final class WesternTokenizer extends Tokenizer {
    * Constructor.
    * @param f (optional) full-text options
    */
-  WesternTokenizer(final FTOpt f) {
+  public WesternTokenizer(final FTOpt f) {
     if(f == null) return;
     lc = f.is(LC);
     uc = f.is(UC);
@@ -142,7 +142,11 @@ final class WesternTokenizer extends Tokenizer {
         pa = true;
         ++para;
       } else if(ftChar(c)) {
-        if(bs) --cpos;
+        if(bs) {
+          // backslash (bs) followed by any character is the character itself:
+          --cpos;
+          bs = false;
+        }
         break;
       }
       bs = false;
@@ -163,8 +167,7 @@ final class WesternTokenizer extends Tokenizer {
           if(c == '?' || c == '*' || c == '+') {
             ++cpos;
           } else if(c == '{') {
-            while(++cpos < l && text[cpos] != '}')
-              ;
+            while(++cpos < l && text[cpos] != '}');
             if(cpos == l) break;
           }
           continue;

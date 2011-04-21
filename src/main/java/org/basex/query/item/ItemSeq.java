@@ -119,4 +119,10 @@ public final class ItemSeq extends Seq {
   public ItemCache cache() {
     return iter();
   }
+
+  @Override
+  public boolean homogenous() {
+    // [LW] really check it?
+    return false;
+  }
 }

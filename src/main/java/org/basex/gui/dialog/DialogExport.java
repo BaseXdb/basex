@@ -74,6 +74,7 @@ public final class DialogExport extends Dialog {
     p.add(path);
 
     final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
+    browse.setMnemonic();
     browse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) { choose(); }

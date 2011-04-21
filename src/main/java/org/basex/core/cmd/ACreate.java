@@ -88,8 +88,8 @@ abstract class ACreate extends Command {
         context.pin(d);
       } else {
         d.close();
-        final Open open = new Open(db);
-        if(!open.run(context)) return error(open.info());
+        if(!run(new Open(db))) return false;
+
         final Data data = context.data;
         if(prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT, data);
         if(prop.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, data);
@@ -110,6 +110,17 @@ abstract class ACreate extends Command {
       abort();
       return error(Util.info(PARSEERR, p.file));
     }
+  }
+
+  /**
+   * Runs the specified command and adopts its info message.
+   * @param cmd command
+   * @return success flag
+   */
+  protected boolean run(final Command cmd) {
+    final boolean ok = cmd.run(context);
+    error(cmd.info());
+    return ok;
   }
 
   /**

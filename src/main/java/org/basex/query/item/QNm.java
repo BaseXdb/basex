@@ -215,6 +215,11 @@ public final class QNm extends Item {
   }
 
   @Override
+  public int hash(final InputInfo ii) throws QueryException {
+    return Token.hash(ln());
+  }
+
+  @Override
   public SeqType type() {
     return SeqType.QNM;
   }

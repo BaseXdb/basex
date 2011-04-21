@@ -30,7 +30,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNPat extends Fun {
+public final class FNPat extends Fun {
   /** Function namespace. */
   private static final Uri U_FN = Uri.uri(FNURI);
 
@@ -59,7 +59,7 @@ final class FNPat extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  protected FNPat(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNPat(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

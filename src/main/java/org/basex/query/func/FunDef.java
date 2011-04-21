@@ -157,10 +157,10 @@ public enum FunDef {
       FunType.get(new SeqType[]{ ITEM }, BLN).seq(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   FUNCNAME(FNURI, FNFunc.class, 1, 1, "function-name(function)",
-      FunType.ANY.seq(), QNM_ZO),
+      FunType.ANY_FUN.seq(), QNM_ZO),
   /** XQuery function. */
   FUNCARITY(FNURI, FNFunc.class, 1, 1, "function-arity(function)",
-      FunType.ANY.seq(), ITR),
+      FunType.ANY_FUN.seq(), ITR),
   /** XQuery function. */
   MAP(FNURI, FNFunc.class, 2, 2, "map(function,seq)",
       FunType.get(new SeqType[]{ ITEM }, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM),
@@ -193,9 +193,31 @@ public enum FunDef {
       FunType.get(new SeqType[]{ ITEM_ZM }, BLN).seq(),
       FunType.get(new SeqType[]{ ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  FOLDLEFT1(FNURI, FNFunc.class, 2, 2, "fold-left1(function,non-empty-seq)",
+  FOLDLEFT1(HOFURI, FNFunc.class, 2, 2, "fold-left1(function,non-empty-seq)",
       FunType.get(new SeqType[]{ ITEM_ZM, ITEM }, ITEM_ZM).seq(), ITEM_OM,
       ITEM_ZM),
+  /** XQuery Function. */
+  ITERATE(HOFURI, FNFunc.class, 2, 2, "iterate(fun, seq)",
+      FunType.arity(1).seq(), ITEM_ZM, ITEM_ZM),
+
+  /* FNMap functions. */
+
+  /** XQuery Function. */
+  MAPNEW(MAPURI, FNMap.class, 0, 2, "new([maps[,coll]])", MAP_ZM, STR, MAP_O),
+  /** XQuery Function. */
+  MAPENTRY(MAPURI, FNMap.class, 2, 2, "entry(key,value)", ITEM, ITEM_ZM, MAP_O),
+  /** XQuery Function. */
+  MAPGET(MAPURI, FNMap.class, 2, 2, "get(map,key)", MAP_O, ITEM, ITEM_ZM),
+  /** XQuery Function. */
+  MAPCONT(MAPURI, FNMap.class, 2, 2, "contains(map,key)", MAP_O, ITEM, BLN),
+  /** XQuery Function. */
+  MAPREM(MAPURI, FNMap.class, 2, 2, "remove(map,key)", MAP_O, ITEM, MAP_O),
+  /** XQuery Function. */
+  MAPSIZE(MAPURI, FNMap.class, 1, 1, "size(map)", MAP_O, ITR),
+  /** XQuery Function. */
+  MAPKEYS(MAPURI, FNMap.class, 1, 1, "keys(map)", MAP_O, AAT_ZM),
+  /** XQuery Function. */
+  MAPCOLL(MAPURI, FNMap.class, 1, 1, "collation(map)", MAP_O, STR),
 
   /* FNGen functions. */
 
@@ -208,7 +230,7 @@ public enum FunDef {
   /** XQuery function. */
   DOCAVL(FNURI, FNGen.class, 1, 1, "doc-available(uri)", STR_ZO, BLN),
   /** XQuery function. */
-  PUT(FNURI, FNGen.class, 2, 2, "put(node,path)", NOD, STR_ZO, ITEM_Z),
+  PUT(FNURI, FNGen.class, 2, 2, "put(node,path)", NOD, STR_ZO, EMP),
   /** XQuery function. */
   PARSETXT(FNURI, FNGen.class, 1, 2, "unparsed-text(uri[,encoding])",
       STR_ZO, STR, STR_ZO),
@@ -243,7 +265,7 @@ public enum FunDef {
 
   /** XQuery function. */
   ERROR(FNURI, FNInfo.class, 0, 3, "error([code[,desc[,object]]])",
-      QNM_ZO, STR, ITEM_ZM, ITEM_Z),
+      QNM_ZO, STR, ITEM_ZM, EMP),
   /** XQuery function. */
   TRACE(FNURI, FNInfo.class, 2, 2, "trace(item,msg)", ITEM_ZM, STR, ITEM_ZM),
   /** XQuery function. */
@@ -500,23 +522,23 @@ public enum FunDef {
   /** XQuery function */
   PATHTOURI(FILEURI, FNFile.class, 1, 1, "path-to-uri(path)", STR, URI),
   /** XQuery function */
-  CREATEDIR(FILEURI, FNFile.class, 1, 1, "create-directory(path)", STR, ITEM_Z),
+  CREATEDIR(FILEURI, FNFile.class, 1, 1, "create-directory(path)", STR, EMP),
   /** XQuery function */
-  DELETE(FILEURI, FNFile.class, 1, 2, "delete(path[,rec])", STR, BLN, ITEM_Z),
+  DELETE(FILEURI, FNFile.class, 1, 2, "delete(path[,rec])", STR, BLN, EMP),
   /** XQuery function */
   READ(FILEURI, FNFile.class, 1, 2, "read(path[,encoding])", STR, STR, STR),
   /** XQuery function */
   READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(path)", STR, B64),
   /** XQuery function */
   WRITE(FILEURI, FNFile.class, 2, 4, "write(path,data[,params[,append]])",
-      STR, ITEM_ZM, NOD, BLN, ITEM_Z),
+      STR, ITEM_ZM, NOD, BLN, EMP),
   /** XQuery function */
   WRITEBIN(FILEURI, FNFile.class, 2, 3, "write-binary(path,base64[,append])",
-      STR, B64, BLN, ITEM_Z),
+      STR, B64, BLN, EMP),
   /** XQuery function */
-  COPY(FILEURI, FNFile.class, 2, 2, "copy(source,target)", STR, STR, ITEM_Z),
+  COPY(FILEURI, FNFile.class, 2, 2, "copy(source,target)", STR, STR, EMP),
   /** XQuery function */
-  MOVE(FILEURI, FNFile.class, 2, 2, "move(source,target)", STR, STR, ITEM_Z),
+  MOVE(FILEURI, FNFile.class, 2, 2, "move(source,target)", STR, STR, EMP),
 
   /* FNZIP functions */
 
@@ -532,10 +554,10 @@ public enum FunDef {
   /** XQuery function */
   ENTRIES(ZIPURI, FNZip.class, 1, 1, "entries(path)", STR, ELM),
   /** XQuery function */
-  ZIPFILE(ZIPURI, FNZip.class, 1, 1, "zip-file(zip)", ELM, ITEM_Z),
+  ZIPFILE(ZIPURI, FNZip.class, 1, 1, "zip-file(zip)", ELM, EMP),
   /** XQuery function */
   UPDATE(ZIPURI, FNZip.class, 2, 2, "update-entries(zip,output)",
-      ELM, STR, ITEM_Z),
+      ELM, STR, EMP),
 
   /* FNHttp functions */
 
@@ -552,9 +574,9 @@ public enum FunDef {
   /** Database function: opens a specific database node. */
   OPENID(DBURI, FNDb.class, 2, 2, "open-id(string,id)", STR, ITR, NOD_ZM),
   /** Database function: searches the text index. */
-  TEXT(DBURI, FNDb.class, 1, 1, "text(string)", STR, NOD_ZM),
+  TEXT(DBURI, FNDb.class, 1, 1, "text(string)", ITEM, NOD_ZM),
   /** Database function: searches the attribute index. */
-  ATTR(DBURI, FNDb.class, 1, 2, "attribute(string[,name])", STR, STR, NOD_ZM),
+  ATTR(DBURI, FNDb.class, 1, 2, "attribute(string[,name])", ITEM, STR, NOD_ZM),
   /** Database function: searches the full-text index. */
   FULLTEXT(DBURI, FNDb.class, 1, 1, "fulltext(string)", STR, NOD_ZM),
   /** Database function: lists all database. */
@@ -577,11 +599,11 @@ public enum FunDef {
   SEARCH(FTURI, FNFt.class, 2, 2, "search(node,string)", NOD, STR, NOD_ZM),
   /** Database function: marks the hits of a full-text request. */
   MARK(FTURI, FNFt.class, 1, 2, "mark(nodes[,tag])", NOD_ZM, STR, NOD_ZM),
+  /** Database function: extracts full-text results. */
+  EXTRACT(FTURI, FNFt.class, 1, 3, "extract(nodes[,tag[,length]])",
+      ITEM_ZM, STR, ITR, NOD_ZM),
   /** Database function: returns the full-text score. */
   SCORE(FTURI, FNFt.class, 1, 1, "score(items)", ITEM_ZM, DBL_ZM),
-  /** Database function: extracts full-text results. */
-  EXTRACT(FTURI, FNFt.class, 1, 3, "extract(items[,tag[,length]])",
-      ITEM_ZM, STR, ITR, NOD_ZM),
 
   /* FNUtil functions. */
 
@@ -626,13 +648,13 @@ public enum FunDef {
   /** Descriptions. */
   final String desc;
   /** Minimum number of arguments. */
-  final int min;
+  public final int min;
   /** Maximum number of arguments. */
-  final int max;
+  public final int max;
+  /** Argument types. */
+  public final SeqType[] args;
   /** Return type. */
   final SeqType ret;
-  /** Argument types. */
-  final SeqType[] args;
 
   /**
    * Constructor.
@@ -652,7 +674,7 @@ public enum FunDef {
     min = mn;
     max = mx;
     desc = dsc;
-    args = new SeqType[max == Integer.MAX_VALUE ? min : max];
+    args = new SeqType[max != Integer.MAX_VALUE ? max : Math.max(min, 1)];
     System.arraycopy(type, 0, args, 0, args.length);
     ret = type[args.length];
   }
@@ -675,7 +697,7 @@ public enum FunDef {
    */
   public FunType type(final int arity) {
     final SeqType[] arg = new SeqType[arity];
-    if(max == Integer.MAX_VALUE) {
+    if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);
       final SeqType var = args[args.length - 1];
       for(int i = args.length; i < arg.length; i++) arg[i] = var;

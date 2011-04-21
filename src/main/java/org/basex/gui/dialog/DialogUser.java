@@ -136,6 +136,9 @@ final class DialogUser extends BaseXBack {
     tablePanel.add(info, BorderLayout.SOUTH);
     add(tablePanel);
 
+    BaseXButton.setMnemonics(global ? new BaseXButton[] { create, alter, drop }
+      : new BaseXButton[] { add, drop });
+
     action(null);
   }
 

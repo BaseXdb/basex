@@ -24,14 +24,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNFormat extends Fun {
+public final class FNFormat extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNFormat(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNFormat(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

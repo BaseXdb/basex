@@ -4,11 +4,14 @@ import java.awt.Event;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+
+import org.basex.gui.layout.BaseXButton;
 import org.basex.util.Util;
 import static org.basex.gui.GUIConstants.*;
 
@@ -47,7 +50,7 @@ public final class GUIMenu extends JMenuBar {
     final StringBuilder gmnem = new StringBuilder();
     for(int b = 0; b < MENUBAR.length; ++b) {
       final JMenu menu = new JMenu(MENUBAR[b]);
-      setMnemonic(menu, MENUBAR[b], gmnem);
+      BaseXButton.setMnemonics(gmnem, menu);
 
       // create menu point for each sub menu entry
       final StringBuilder mnem = new StringBuilder();
@@ -91,29 +94,9 @@ public final class GUIMenu extends JMenuBar {
         cmd.execute(gui);
       }
     });
-
-    setMnemonic(item, desc, mnem);
+    BaseXButton.setMnemonics(mnem, item);
     item.setToolTipText(cmd.help());
     return item;
-  }
-
-  /**
-   * Sets a mnemomic.
-   * @param item menu item
-   * @param label menu label
-   * @param mnem assigned mnemonics
-   */
-  private static void setMnemonic(final JMenuItem item, final String label,
-      final StringBuilder mnem) {
-    // find and assign unused mnemomic
-    for(int d = 0; d < label.length(); d++) {
-      final char ch = Character.toLowerCase(label.charAt(d));
-      if(mnem.indexOf(Character.toString(ch)) == -1) {
-        item.setMnemonic(ch);
-        mnem.append(ch);
-        break;
-      }
-    }
   }
 
   /**

@@ -22,7 +22,7 @@ public final class FNHttp extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  protected FNHttp(final InputInfo ii, final FunDef f, final Expr[] e) {
+  public FNHttp(final InputInfo ii, final FunDef f, final Expr[] e) {
     super(ii, f, e);
   }
 

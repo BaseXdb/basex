@@ -53,13 +53,12 @@ public final class IOFile extends IO {
 
   @Override
   public void cache() throws IOException {
-    FileInputStream fis = null;
+    final DataInputStream dis = new DataInputStream(new FileInputStream(file));
+    cont = new byte[(int) file.length()];
     try {
-      fis = new FileInputStream(file);
-      cont = new byte[(int) file.length()];
-      new DataInputStream(fis).readFully(cont);
+      dis.readFully(cont);
     } finally {
-      if(fis != null) try { fis.close(); } catch(final IOException ex) { }
+      dis.close();
     }
   }
 

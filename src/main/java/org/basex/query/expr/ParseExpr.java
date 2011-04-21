@@ -249,14 +249,11 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified collation is supported.
    * @param e expression to be checked
    * @param ctx query context
-   * @param ii input info
    * @throws QueryException query exception
    */
-  public final void checkColl(final Expr e, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
-
-    final Item it = e instanceof Item ? (Item) e : checkItem(e, ctx);
-    if(!it.str() || !eq(URLCOLL, it.atom(ii))) IMPLCOL.thrw(input, e);
+  public final void checkColl(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    if(!eq(URLCOLL, checkStr(e, ctx))) IMPLCOL.thrw(input, e);
   }
 
   /**

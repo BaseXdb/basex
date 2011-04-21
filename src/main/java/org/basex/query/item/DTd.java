@@ -136,9 +136,4 @@ public final class DTd extends Dur {
     if(it.type != type) Err.diff(ii, it, this);
     return sc.subtract(((Dur) it).sc).signum();
   }
-
-  @Override
-  public int hash(final InputInfo ii) {
-    return sc.intValue();
-  }
 }

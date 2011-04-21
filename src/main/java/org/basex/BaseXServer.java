@@ -30,7 +30,7 @@ import org.basex.util.Util;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-public class BaseXServer extends Main implements Runnable {
+public class BaseXServer extends Main {
   /** Quiet mode (no logging). */
   protected boolean quiet;
   /** Start as daemon. */
@@ -64,7 +64,7 @@ public class BaseXServer extends Main implements Runnable {
    */
   public BaseXServer(final String... args) {
     super(args);
-    if(!success) return;
+    check(success);
 
     final int port = context.prop.num(Prop.SERVERPORT);
     if(service) {
@@ -97,12 +97,15 @@ public class BaseXServer extends Main implements Runnable {
       Util.outln(CONSOLE + (console ? CONSOLE2 : SERVERSTART), SERVERMODE);
 
       // execute command-line arguments
-      if(commands != null) execute(commands);
-
+      if(commands != null) {
+        final Boolean b = execute(commands);
+        check(b == null || b);
+      }
       if(console) quit(console());
     } catch(final Exception ex) {
       log.write(ex.getMessage());
       Util.errln(Util.server(ex));
+      check(false);
     }
   }
 

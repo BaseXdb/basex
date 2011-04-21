@@ -7,6 +7,7 @@ import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.Set;
@@ -15,6 +16,7 @@ import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Util;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -37,9 +39,17 @@ public final class IndexOptimizeTest {
   @BeforeClass
   public static void start() throws Exception {
     new Set(Prop.FTINDEX, true).execute(CTX);
-    new CreateDB(NAME,
-        "<xml><a>1</a><a>1 2</a></xml>").execute(CTX);
+    new CreateDB(NAME, "<xml><a>1</a><a>1 2</a></xml>").execute(CTX);
     new Close().execute(CTX);
+  }
+
+  /**
+   * Drops the test database.
+   * @throws Exception exception
+   */
+  @AfterClass
+  public static void stop() throws Exception {
+    new DropDB(NAME).execute(CTX);
   }
 
   /**

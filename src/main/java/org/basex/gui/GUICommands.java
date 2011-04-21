@@ -259,7 +259,7 @@ public enum GUICommands implements GUICommand {
   EDITCLOSE(GUIXQCLOSE, "% shift W", GUIXQCLOSETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.query.close();
+      gui.query.close(null);
     }
   },
 
@@ -335,18 +335,17 @@ public enum GUICommands implements GUICommand {
   DELETE(GUIDELETE + DOTS, "", GUIDELETETT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      if(Dialog.confirm(gui, DELETECONF)) {
-        final StringBuilder sb = new StringBuilder();
-        final Nodes n = gui.context.marked;
-        for(int i = 0; i < n.size(); ++i) {
-          if(i > 0) sb.append(',');
-          sb.append(openPre(n, i));
-        }
-        gui.context.marked = new Nodes(n.data);
-        gui.context.copied = null;
-        gui.context.focused = -1;
-        gui.execute(new XQuery("delete nodes (" + sb + ")"));
+      if(!Dialog.confirm(gui, DELETECONF)) return;
+      final StringBuilder sb = new StringBuilder();
+      final Nodes n = gui.context.marked;
+      for(int i = 0; i < n.size(); ++i) {
+        if(i > 0) sb.append(',');
+        sb.append(openPre(n, i));
       }
+      gui.context.marked = new Nodes(n.data);
+      gui.context.copied = null;
+      gui.context.focused = -1;
+      gui.execute(new XQuery("delete nodes (" + sb + ")"));
     }
 
     @Override

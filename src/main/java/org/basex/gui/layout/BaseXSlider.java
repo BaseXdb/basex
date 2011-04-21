@@ -92,6 +92,15 @@ public final class BaseXSlider extends BaseXPanel {
     return curr;
   }
 
+  /**
+   * Sets a slider value.
+   * @param v new value
+   */
+  public void value(final int v) {
+    curr = v;
+    repaint();
+  }
+
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);

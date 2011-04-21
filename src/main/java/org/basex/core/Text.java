@@ -282,7 +282,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPOPTIMIZE = {
-    "", lang("ch_optimize1"), lang("ch_optimize2")
+    "(" + ALL + ")", lang("ch_optimize1"), lang("ch_optimize2")
   };
 
   /** Command help. */
@@ -569,10 +569,6 @@ public interface Text {
   String QUERYUPDATED = lang("qu_tabupdated") + COLS;
   /** Query info: printed data. */
   String QUERYPRINTED = lang("qu_tabprinted") + COLS;
-  /** Query info: memory. */
-  String QUERYMEM = lang("qu_tabmem") + ": %";
-  /** Query info: memory. */
-  String QUERYMEM2 = lang("qu_tabmem") + COLS;
   /** Query hits. */
   String HITS = lang("qu_hits");
   /** Insert query info. */
@@ -1025,6 +1021,8 @@ public interface Text {
   String BUTTONDELALL = lang("b_delall");
   /** Button for adding. */
   String BUTTONADD = lang("b_add");
+  /** Button for resetting options. */
+  String BUTTONRESET = lang("b_reset");
 
   // VISUALIZATIONS ===========================================================
 
@@ -1367,9 +1365,10 @@ public interface Text {
   /** Developer info. */
   String DEVELOPER = lang("da_dev") + ": Christian Gr\u00FCn";
   /** Contributors info. */
-  String CONTRIBUTE1 = lang("da_cont1") + ": Andreas Weiler, Michael Seiferle,";
+  String CONTRIBUTE1 = lang("da_cont1") +
+  ": Andreas Weiler, Michael Seiferle, Lukas Kircher,";
   /** Developer names. */
-  String CONTRIBUTE2 = "Lukas Kircher, Alexander Holupirek " +
+  String CONTRIBUTE2 = "Leo W\u00F6rteler, Alexander Holupirek, " +
     lang("da_cont2");
   /** Translation. */
   String TRANSLATION = lang("da_translation") + COLS;

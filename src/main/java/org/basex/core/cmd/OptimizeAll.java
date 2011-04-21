@@ -2,13 +2,14 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-import java.io.File;
 import java.io.IOException;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.Parser;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Prop;
 import org.basex.core.User;
+import org.basex.core.Commands.Cmd;
 import org.basex.data.DiskData;
 import org.basex.data.FTPos;
 import org.basex.data.MetaData;
@@ -46,18 +47,15 @@ public final class OptimizeAll extends ACreate {
 
     old = (DiskData) context.data;
     final MetaData m = old.meta;
-    final File path = prop.dbpath(m.name);
     size = m.size;
 
     // find unique temporary database name
-    String name;
-    do name = String.format("%08x", (int) (Math.random() * Integer.MAX_VALUE));
-    while(prop.dbexists(name = m.name + '_'  + name));
+    final String tname = m.random();
 
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(new DBParser(), m.prop);
     try {
-      final DiskData d = builder.build(name);
+      final DiskData d = builder.build(tname);
       if(m.textindex || prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT,      d);
       if(m.attrindex || prop.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, d);
       if(m.ftindex   || prop.is(Prop.FTINDEX))   index(IndexType.FULLTEXT,  d);
@@ -72,18 +70,10 @@ public final class OptimizeAll extends ACreate {
         Util.debug(ex);
       }
     }
-    // delete the old database
-    if(!progress(new DropDB(m.name)).run(context)) return false;
 
-    // move the new one into place
-    final File f = context.prop.dbpath(name);
-    if(!f.renameTo(path)) return error("Rebuilt database '%' couldn't be " +
-        "renamed back to '%'.", name, m.name);
-
-    // reopen it
-    if(!progress(new Open(m.name)).run(context)) return false;
-
-    return info(DBOPTIMIZED, perf);
+    // delete the old database, move the new one into place and reopen it
+    return run(new DropDB(m.name)) && run(new AlterDB(tname, m.name)) &&
+        run(new Open(m.name)) && info(DBOPTIMIZED, m.name, perf);
   }
 
   @Override
@@ -101,13 +91,18 @@ public final class OptimizeAll extends ACreate {
     return INFOSTATS;
   }
 
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.OPTIMIZE + " " + ALL);
+  }
+
   /**
    * Parser for rebuilding existing databases.
    *
+   * @author BaseX Team 2005-11, BSD License
    * @author Leo Woerteler
    */
-  private final class DBParser extends Parser {
-
+  public final class DBParser extends Parser {
     /** Constructor. */
     protected DBParser() {
       super(old.meta.path, "");
@@ -228,5 +223,4 @@ public final class OptimizeAll extends ACreate {
       }
     }
   }
-
 }
