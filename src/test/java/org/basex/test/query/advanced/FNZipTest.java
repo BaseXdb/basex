@@ -54,7 +54,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:binary-entry() functions.
+   * Test method for the zip:binary-entry() function.
    * @throws Exception database exception
    */
   @Test
@@ -69,7 +69,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:binary-entry() functions.
+   * Test method for the zip:binary-entry() function.
    * @throws Exception database exception
    */
   @Test
@@ -83,7 +83,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:binary-entry() functions.
+   * Test method for the zip:binary-entry() function.
    * @throws Exception database exception
    */
   @Test
@@ -94,7 +94,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:entries() functions.
+   * Test method for the zip:entries() function.
    * @throws Exception database exception
    */
   @Test
@@ -104,7 +104,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:zip-file() functions.
+   * Test method for the zip:zip-file() function.
    * @throws Exception database exception
    */
   @Test
@@ -140,7 +140,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:update-entries() functions.
+   * Test method for the zip:update-entries() function.
    * @throws Exception database exception
    * @throws IOException I/O exception
    */

@@ -48,15 +48,27 @@ public final class FNFunc extends Fun {
       case FILTER:    return filter(ctx);
       case MAPPAIRS:  return zip(ctx);
       case FOLDLEFT:  return foldLeft(ctx);
-      case FOLDLEFT1: return foldLeft1(ctx);
+      case FOLDLEFT1: return foldLeft1(ctx).iter();
       case FOLDRIGHT: return foldRight(ctx);
       case SORTWITH:  return sortWith(ctx);
       case HOFID:     return expr[0].iter(ctx);
       case CONST:     return expr[0].iter(ctx);
-      case UNTIL:     return until(ctx);
+      case UNTIL:     return until(ctx).iter();
       case ITERATE:   return iterate(ctx);
       default:
            return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    switch(def) {
+      case FOLDLEFT1: return foldLeft1(ctx);
+      case UNTIL:     return until(ctx);
+      case HOFID:     return expr[0].value(ctx);
+      case CONST:     return expr[0].value(ctx);
+      default:
+           return super.value(ctx);
     }
   }
 
@@ -208,7 +220,7 @@ public final class FNFunc extends Fun {
    * @return resulting sequence
    * @throws QueryException query exception
    */
-  private Iter foldLeft1(final QueryContext ctx) throws QueryException {
+  private Value foldLeft1(final QueryContext ctx) throws QueryException {
     final FItem f = withArity(0, 2, ctx);
     final Iter xs = expr[1].iter(ctx);
 
@@ -216,7 +228,7 @@ public final class FNFunc extends Fun {
     for(Item x; (x = xs.next()) != null;)
       sum = f.invValue(ctx, input, sum, x);
 
-    return sum.iter();
+    return sum;
   }
 
   /**
@@ -232,7 +244,7 @@ public final class FNFunc extends Fun {
     if(xs.size() == 0) return expr[1].iter(ctx);
 
     Value res = expr[1].value(ctx);
-    for(long i = xs.size(); i-- != 0;)
+    for(long i = xs.size(); --i >= 0;)
       res = f.invValue(ctx, input, xs.itemAt(i), res);
 
     return res.iter();
@@ -271,14 +283,14 @@ public final class FNFunc extends Fun {
    * @return accepted value
    * @throws QueryException exception
    */
-  private Iter until(final QueryContext ctx) throws QueryException {
+  private Value until(final QueryContext ctx) throws QueryException {
     final FItem pred = withArity(0, 1, ctx);
     final FItem fun = withArity(1, 1, ctx);
     Value v = expr[2].value(ctx);
     while(!checkType(pred.invItem(ctx, input, v), AtomType.BLN).bool(input)) {
       v = fun.invValue(ctx, input, v);
     }
-    return v.iter();
+    return v;
   }
 
   /**

@@ -101,9 +101,4 @@ public final class YMd extends Dur {
     if(it.type != type) Err.diff(ii, it, this);
     return mon - ((Dur) it).mon;
   }
-
-  @Override
-  public int hash(final InputInfo ii) {
-    return mon;
-  }
 }

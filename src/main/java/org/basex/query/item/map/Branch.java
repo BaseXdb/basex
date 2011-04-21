@@ -48,6 +48,27 @@ final class Branch extends TrieNode {
   }
 
   @Override
+  TrieNode insert(final int h, final Item k, final Value v, final int l,
+      final InputInfo ii) throws QueryException {
+    final int key = key(h, l);
+    final TrieNode sub = kids[key], nsub;
+    final int bs, rem;
+    if(sub != null) {
+      nsub = sub.insert(h, k, v, l + 1, ii);
+      if(nsub == sub) return this;
+      bs = used;
+      rem = sub.size;
+    } else {
+      nsub = new Leaf(h, k, v);
+      bs = used | 1 << key;
+      rem = 0;
+    }
+    final TrieNode[] ks = copyKids();
+    ks[key] = nsub;
+    return new Branch(ks, bs, size - rem + nsub.size);
+  }
+
+  @Override
   TrieNode delete(final int h, final Item k, final int l,
       final InputInfo ii) throws QueryException {
     final int key = key(h, l);

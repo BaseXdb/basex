@@ -13,7 +13,7 @@ import org.junit.Test;
  */
 public final class FNUtilTest extends AdvancedQueryTest {
   /**
-   * Test method for the util:eval() functions.
+   * Test method for the util:eval() function.
    * @throws QueryException database exception
    */
   @Test
@@ -27,7 +27,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:run() functions.
+   * Test method for the util:run() function.
    * @throws QueryException database exception
    */
   @Test
@@ -38,7 +38,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:mb() functions.
+   * Test method for the util:mb() function.
    * @throws QueryException database exception
    */
   @Test
@@ -50,7 +50,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:ms() functions.
+   * Test method for the util:ms() function.
    * @throws QueryException database exception
    */
   @Test
@@ -62,7 +62,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:integer-to-base() functions.
+   * Test method for the util:integer-to-base() function.
    * @throws QueryException database exception
    */
   @Test
@@ -83,7 +83,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:integer-from-base() functions.
+   * Test method for the util:integer-from-base() function.
    * @throws QueryException database exception
    */
   @Test
@@ -106,7 +106,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:{md5, sha1}() functions.
+   * Test method for the util:{md5, sha1}() function.
    * @throws QueryException database exception
    */
   @Test
@@ -124,7 +124,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:crc32() functions.
+   * Test method for the util:crc32() function.
    * @throws QueryException database exception
    */
   @Test
@@ -135,7 +135,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:to-bytes() functions.
+   * Test method for the util:to-bytes() function.
    * @throws QueryException database exception
    */
   @Test
