@@ -1,10 +1,7 @@
 package org.basex.query.func;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryError;
 import org.basex.query.QueryException;
 import org.basex.query.expr.DynFunCall;
 import org.basex.query.expr.Expr;
@@ -17,8 +14,6 @@ import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Value;
-import static org.basex.query.util.Err.*;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
@@ -48,27 +43,8 @@ public final class FNFunc extends Fun {
       case FILTER:    return filter(ctx);
       case MAPPAIRS:  return zip(ctx);
       case FOLDLEFT:  return foldLeft(ctx);
-      case FOLDLEFT1: return foldLeft1(ctx).iter();
       case FOLDRIGHT: return foldRight(ctx);
-      case SORTWITH:  return sortWith(ctx);
-      case HOFID:     return expr[0].iter(ctx);
-      case CONST:     return expr[0].iter(ctx);
-      case UNTIL:     return until(ctx).iter();
-      case ITERATE:   return iterate(ctx);
-      default:
-           return super.iter(ctx);
-    }
-  }
-
-  @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    switch(def) {
-      case FOLDLEFT1: return foldLeft1(ctx);
-      case UNTIL:     return until(ctx);
-      case HOFID:     return expr[0].value(ctx);
-      case CONST:     return expr[0].value(ctx);
-      default:
-           return super.value(ctx);
+      default:        return super.iter(ctx);
     }
   }
 
@@ -79,10 +55,7 @@ public final class FNFunc extends Fun {
       case FUNCARITY: return Itr.get(getFun(0, FunType.ANY_FUN, ctx).arity());
       case FUNCNAME:  return getFun(0, FunType.ANY_FUN, ctx).fName();
       case PARTAPP:   return partApp(ctx, ii);
-      case HOFID:     return expr[0].item(ctx, ii);
-      case CONST:     return expr[0].item(ctx, ii);
-      default:
-        return super.item(ctx, ii);
+      default:        return super.item(ctx, ii);
     }
   }
 
@@ -214,24 +187,6 @@ public final class FNFunc extends Fun {
   }
 
   /**
-   * Folds a sequence into a return value, starting from the left and using the
-   * leftmost item as start value.
-   * @param ctx query context
-   * @return resulting sequence
-   * @throws QueryException query exception
-   */
-  private Value foldLeft1(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(0, 2, ctx);
-    final Iter xs = expr[1].iter(ctx);
-
-    Value sum = checkEmpty(xs.next());
-    for(Item x; (x = xs.next()) != null;)
-      sum = f.invValue(ctx, input, sum, x);
-
-    return sum;
-  }
-
-  /**
    * Folds a sequence into a return value, starting from the left.
    * @param ctx query context
    * @return resulting sequence
@@ -248,74 +203,6 @@ public final class FNFunc extends Fun {
       res = f.invValue(ctx, input, xs.itemAt(i), res);
 
     return res.iter();
-  }
-
-  /**
-   * Sorts the input sequence according to the given relation.
-   * @param ctx query context
-   * @return sorted sequence
-   * @throws QueryException query exception
-   */
-  private ItemCache sortWith(final QueryContext ctx) throws QueryException {
-    final FItem lt = withArity(0, 2, ctx);
-    final ItemCache ic = expr[1].value(ctx).cache();
-    try {
-      Arrays.sort(ic.item, 0, (int) ic.size(), new Comparator<Item>(){
-        @Override
-        public int compare(final Item it1, final Item it2) {
-          try {
-            return checkType(lt.invItem(ctx, input, it1, it2),
-                AtomType.BLN).bool(input) ? -1 : 1;
-          } catch(final QueryException qe) {
-            throw new QueryError(qe);
-          }
-        }
-      });
-    } catch(final QueryError err) {
-      throw err.wrapped();
-    }
-    return ic;
-  }
-
-  /**
-   * Applies a function to a start value until the given predicate holds.
-   * @param ctx query context
-   * @return accepted value
-   * @throws QueryException exception
-   */
-  private Value until(final QueryContext ctx) throws QueryException {
-    final FItem pred = withArity(0, 1, ctx);
-    final FItem fun = withArity(1, 1, ctx);
-    Value v = expr[2].value(ctx);
-    while(!checkType(pred.invItem(ctx, input, v), AtomType.BLN).bool(input)) {
-      v = fun.invValue(ctx, input, v);
-    }
-    return v;
-  }
-
-  /**
-   * Repeatedly applies a function to an argument, lazily returning all results.
-   * @param ctx query context
-   * @return result iterator
-   * @throws QueryException query context
-   */
-  private Iter iterate(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(0, 1, ctx);
-    return new Iter() {
-      /** Current value. */
-      Value v = expr[1].value(ctx);
-      long i, len = v.size();
-
-      @Override
-      public Item next() throws QueryException {
-        while(i >= len) {
-          v = f.invValue(ctx, input, v);
-          i = 0;
-          len = v.size();
-        }
-        return v.itemAt(i++);
-      }
-    };
   }
 
   /**

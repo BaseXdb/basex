@@ -67,18 +67,21 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void parse() throws QueryException {
-    if(!parsed) {
-      // parse pre-defined external variables
-      final Scanner sc = new Scanner(ctx.context.prop.get(Prop.BINDINGS));
+    if(parsed) return;
+    parsed = true;
+
+    // parse pre-defined external variables
+    final String bind = ctx.context.prop.get(Prop.BINDINGS);
+    if(!bind.isEmpty()) {
+      final Scanner sc = new Scanner(bind);
       sc.useDelimiter(",");
       while(sc.hasNext()) {
         final String[] sp = sc.next().split("=", 2);
         bind(sp[0], new Atm(token(sp.length > 1 ? sp[1] : "")));
       }
-      // parse query
-      ctx.parse(query);
-      parsed = true;
     }
+    // parse query
+    ctx.parse(query);
   }
 
   /**
@@ -87,10 +90,9 @@ public final class QueryProcessor extends Progress {
    */
   public void compile() throws QueryException {
     parse();
-    if(!compiled) {
-      ctx.compile();
-      compiled = true;
-    }
+    if(compiled) return;
+    compiled = true;
+    ctx.compile();
   }
 
   /**
@@ -186,7 +188,7 @@ public final class QueryProcessor extends Progress {
 
     compile();
     try {
-      return new XMLSerializer(os, ctx.serProp());
+      return new XMLSerializer(os, ctx.serProp(true));
     } catch(final SerializerException ex) {
       throw new QueryException(null, ex);
     }

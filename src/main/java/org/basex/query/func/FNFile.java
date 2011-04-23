@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,13 +29,13 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * Functions on files and directories.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
+ * @author Christian Gruen
  */
 public final class FNFile extends Fun {
   /**
@@ -54,39 +53,45 @@ public final class FNFile extends Fun {
     checkAdmin(ctx);
 
     switch(def) {
-      case FLIST: return list(ctx);
-      default:    return super.iter(ctx);
+      case FLIST:
+        return list(ctx);
+      case READLINES:
+        return readTextLines(new File(string(checkStr(expr[0], ctx))), ctx);
+      default:
+        return super.iter(ctx);
     }
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    checkAdmin(ctx);
 
+    checkAdmin(ctx);
     final File path = expr.length == 0 ? null : new File(
         string(checkStr(expr[0], ctx)));
 
     switch(def) {
-      case FEXISTS:    return Bln.get(path.exists());
-      case ISDIR:      return Bln.get(path.isDirectory());
-      case ISFILE:     return Bln.get(path.isFile());
-      case ISREAD:     return Bln.get(path.canRead());
-      case ISWRITE:    return Bln.get(path.canWrite());
-      case LASTMOD:    return lastModified(path);
-      case SIZE:       return size(path);
-      case PATHSEP:    return Str.get(System.getProperty("file.separator"));
-      case PATHTOFULL: return Str.get(path.getAbsolutePath());
-      case PATHTOURI:  return pathToUri(path);
-      case CREATEDIR:  return createDirectory(path);
-      case DELETE:     return delete(path, ctx);
-      case READ:       return read(path, ctx);
-      case READBIN:    return readBinary(path);
-      case WRITE:      return write(path, ctx);
-      case WRITEBIN:   return writeBinary(path, ctx);
-      case COPY:       return copy(path, ctx);
-      case MOVE:       return move(path, ctx);
-      default:         return super.item(ctx, ii);
+      case APPEND:      return write(path, ctx, true);
+      case APPENDBIN:   return writeBinary(path, ctx, true);
+      case COPY:        return transfer(path, ctx, true);
+      case CREATEDIR:   return createDirectory(path);
+      case DELETE:      return del(path);
+      case MOVE:        return transfer(path, ctx, false);
+      case READBIN:     return readBinary(path);
+      case READTEXT:    return readText(path, ctx);
+      case WRITE:       return write(path, ctx, false);
+      case WRITEBIN:    return writeBinary(path, ctx, false);
+      case FEXISTS:     return Bln.get(path.exists());
+      case ISDIR:       return Bln.get(path.isDirectory());
+      case ISFILE:      return Bln.get(path.isFile());
+      case LASTMOD:     return lastModified(path);
+      case SIZE:        return size(path);
+      case BASENAME:    return baseName(path, ctx);
+      case DIRNAME:     return dirName(path);
+      case PATHNATIVE:  return pathToNative(path);
+      case RESOLVEPATH: return Str.get(path.getAbsolutePath());
+      case PATHTOURI:   return pathToUri(path);
+      default:          return super.item(ctx, ii);
     }
   }
 
@@ -109,7 +114,58 @@ public final class FNFile extends Fun {
    */
   private Item size(final File path) throws QueryException {
     if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
+    if(path.isDirectory()) PATHISDIR.thrw(input, path);
     return Itr.get(path.length());
+  }
+
+  /**
+   * Returns the base name of the specified path.
+   * @param path file path
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Str baseName(final File path, final QueryContext ctx)
+      throws QueryException {
+
+    final String suf = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
+    String pth = path.getName();
+    if(suf != null && pth.endsWith(suf))
+      pth = pth.substring(0, pth.length() - suf.length());
+    return Str.get(pth);
+  }
+
+  /**
+   * Returns the dir name of the specified path.
+   * @param path file path
+   * @return result
+   */
+  private Str dirName(final File path) {
+    final String pth = path.getParent();
+    return Str.get(pth == null ? "." : pth);
+  }
+
+  /**
+   * Returns the native name of the specified path.
+   * @param path file path
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Str pathToNative(final File path) throws QueryException {
+    try {
+      return Str.get(path.getCanonicalFile());
+    } catch(final IOException ex) {
+      throw PATHINVALID.thrw(input, path);
+    }
+  }
+
+  /**
+   * Transforms a file system path into a URI with the file:// scheme.
+   * @param path file path
+   * @return result
+   */
+  private Uri pathToUri(final File path) {
+    return Uri.uri(token(path.toURI().toString()));
   }
 
   /**
@@ -122,8 +178,6 @@ public final class FNFile extends Fun {
     final String path = string(checkStr(expr[0], ctx));
     final File dir = new File(path);
 
-    // Check if directory exists
-    if(!dir.exists()) PATHNOTEXISTS.thrw(input, path);
     // Check if not a directory
     if(!dir.isDirectory()) NOTDIR.thrw(input, path);
 
@@ -181,7 +235,7 @@ public final class FNFile extends Fun {
     // resolve symbolic links
     File f = null;
     try {
-      f = path.getCanonicalFile();;
+      f = path.getCanonicalFile();
     } catch(final IOException ex) {
       throw PATHINVALID.thrw(input, path);
     }
@@ -202,66 +256,24 @@ public final class FNFile extends Fun {
   /**
    * Deletes a file or directory.
    * @param path file to be deleted
-   * @param ctx query context
    * @return result
    * @throws QueryException query exception
    */
-  private Item delete(final File path, final QueryContext ctx)
-      throws QueryException {
-
-    final boolean rec = optionalBool(1, ctx);
-    if(path.exists()) {
-      if(rec) recDelete(path);
-      else delete(path);
-    }
+  private Item del(final File path) throws QueryException {
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
+    deleteRec(path);
     return null;
   }
 
   /**
-   * Deletes a single file or directory.
-   * @param path file/directory to be deleted
+   * Recursively deletes a file path.
+   * @param path path to be deleted
    * @throws QueryException query exception
    */
-  private void delete(final File path) throws QueryException {
-    if(path.isDirectory()) {
-      final File[] ch = path.listFiles();
-      if(ch != null && ch.length != 0) DIRNOTEMPTY.thrw(input, path);
-    }
-    if(!path.delete()) CANNOTDEL.thrw(input, path);
-  }
-
-  /**
-   * Deletes a directory recursively.
-   * @param path directory to be deleted
-   * @throws QueryException query exception
-   */
-  private void recDelete(final File path) throws QueryException {
+  private void deleteRec(final File path) throws QueryException {
     final File[] ch = path.listFiles();
-    if(ch != null) for(final File f : ch) recDelete(f);
+    if(ch != null) for(final File f : ch) deleteRec(f);
     if(!path.delete()) CANNOTDEL.thrw(input, path);
-  }
-
-  /**
-   * Reads the contents of a file.
-   * @param path input path
-   * @param ctx query context
-   * @return string
-   * @throws QueryException query exception
-   */
-  private Str read(final File path, final QueryContext ctx)
-      throws QueryException {
-
-    final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
-    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
-    if(path.isDirectory()) PATHISDIR.thrw(input, path);
-
-    if(enc != null && !Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
-
-    try {
-      return Str.get(TextInput.content(new IOFile(path), enc).finish());
-    } catch(final IOException ex) {
-      throw FILEERROR.thrw(input, ex);
-    }
   }
 
   /**
@@ -282,22 +294,59 @@ public final class FNFile extends Fun {
   }
 
   /**
+   * Reads the contents of a file.
+   * @param path input path
+   * @param ctx query context
+   * @return string
+   * @throws QueryException query exception
+   */
+  private Str readText(final File path, final QueryContext ctx)
+      throws QueryException {
+
+    final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
+    if(path.isDirectory()) PATHISDIR.thrw(input, path);
+    if(enc != null && !Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
+
+    try {
+      byte[] txt = TextInput.content(new IOFile(path), enc).finish();
+      if(contains(txt, '\r')) txt = contains(txt, '\n') ?
+          delete(txt, '\r') : replace(txt, '\r', '\n');
+      return Str.get(txt);
+    } catch(final IOException ex) {
+      throw FILEERROR.thrw(input, ex);
+    }
+  }
+
+  /**
+   * Returns the contents of a file line by line.
+   * @param path input path
+   * @param ctx query context
+   * @return string
+   * @throws QueryException query exception
+   */
+  private Iter readTextLines(final File path, final QueryContext ctx)
+      throws QueryException {
+    return FNGen.textIter(readText(path, ctx).atom());
+  }
+
+  /**
    * Writes a sequence of items to a file.
    * @param path file to be written
    * @param ctx query context
+   * @param append append flag
    * @return true if file was successfully written
    * @throws QueryException query exception
    */
-  private Item write(final File path, final QueryContext ctx)
-      throws QueryException {
+  private Item write(final File path, final QueryContext ctx,
+      final boolean append) throws QueryException {
 
-    final boolean append = optionalBool(3, ctx);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
 
     final Iter ir = expr[1].iter(ctx);
     try {
-      final PrintOutput out = new PrintOutput(
-          new BufferedOutputStream(new FileOutputStream(path, append)));
+      final PrintOutput out = PrintOutput.get(
+          new FileOutputStream(path, append));
       try {
         final XMLSerializer xml = new XMLSerializer(out,
             FNGen.serialPar(this, 2, ctx));
@@ -318,20 +367,22 @@ public final class FNFile extends Fun {
    * Writes the content of a binary file.
    * @param path file to be written
    * @param ctx query context
+   * @param append append flag
    * @return result
    * @throws QueryException query exception
    */
-  private Item writeBinary(final File path, final QueryContext ctx)
-      throws QueryException {
+  private Item writeBinary(final File path, final QueryContext ctx,
+      final boolean append) throws QueryException {
 
-    final B64 b64 = (B64) checkType(expr[1].item(ctx, input), AtomType.B64);
-    final boolean append = optionalBool(2, ctx);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
 
     try {
       final FileOutputStream out = new FileOutputStream(path, append);
       try {
-        out.write(b64.toJava());
+        final Iter ir = expr[1].iter(ctx);
+        for(Item it; (it = ir.next()) != null;) {
+          out.write(((B64) checkType(it, AtomType.B64)).toJava());
+        }
       } finally {
         out.close();
       }
@@ -342,75 +393,64 @@ public final class FNFile extends Fun {
   }
 
   /**
-   * Copies a file given a source and a target.
+   * Transfers a file path, given a source and a target.
    * @param src source file to be copied
    * @param ctx query context
+   * @param copy copy flag (no move)
    * @return result
    * @throws QueryException query exception
    */
-  private Item copy(final File src, final QueryContext ctx)
-      throws QueryException {
+  private Item transfer(final File src, final QueryContext ctx,
+      final boolean copy) throws QueryException {
 
-    File trg = new File(string(checkStr(expr[1], ctx)));
-    // attach file name if target is a directory
+    File trg = new File(string(checkStr(expr[1], ctx))).getAbsoluteFile();
+    if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
+
     if(trg.isDirectory()) {
+      // target is a directory: attach file name
       trg = new File(trg, src.getName());
     } else if(!trg.isFile()) {
-      final File par = trg.getParentFile();
-      if(!par.exists() || !par.isDirectory()) PATHINVALID.thrw(input, trg);
+      // target does not exist: ensure that parent exists
+      if(!trg.getParentFile().isDirectory()) NOTDIR.thrw(input, trg);
+    } else if(src.isDirectory()) {
+      // if target is file, source cannot be a directory
+      PATHISDIR.thrw(input, src);
     }
 
-    if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
-    if(src.isDirectory()) PATHISDIR.thrw(input, src);
-
+    // ignore operations on same source and target path
     if(!src.equals(trg)) {
+      if(copy) copy(src, trg);
+      else if(!src.renameTo(trg)) CANNOTMOVE.thrw(input, src, trg);
+    }
+    return null;
+  }
+
+  /**
+   * Recursively copies files.
+   * @param src source path
+   * @param trg target path
+   * @throws QueryException query exception
+   */
+  private void copy(final File src, final File trg) throws QueryException {
+    if(src.isDirectory()) {
+      if(!trg.mkdir()) CANNOTCREATE.thrw(input, trg);
+      final File[] files = src.listFiles();
+      if(files == null) CANNOTLIST.thrw(input, src);
+      for(final File f : files) copy(f, new File(trg, f.getName()));
+    } else {
       FileChannel sc = null;
-      FileChannel dc = null;
+      FileChannel tc = null;
       try {
         sc = new FileInputStream(src).getChannel();
-        dc = new FileOutputStream(trg).getChannel();
-        dc.transferFrom(sc, 0, sc.size());
+        tc = new FileOutputStream(trg).getChannel();
+        tc.transferFrom(sc, 0, sc.size());
       } catch(final IOException ex) {
         FILEERROR.thrw(input, ex);
       } finally {
         if(sc != null) try { sc.close(); } catch(final IOException ex) { }
-        if(dc != null) try { dc.close(); } catch(final IOException ex) { }
+        if(tc != null) try { tc.close(); } catch(final IOException ex) { }
       }
     }
-    return null;
-  }
-
-  /**
-   * Moves a file or directory.
-   * @param src source file/dir to be moved
-   * @param ctx query context
-   * @return result
-   * @throws QueryException query exception
-   */
-  private Item move(final File src, final QueryContext ctx)
-      throws QueryException {
-
-    File trg = new File(string(checkStr(expr[1], ctx)));
-    // attach file name if target is a directory
-    if(trg.isDirectory()) {
-      trg = new File(trg, src.getName());
-    } else if(!trg.isFile()) {
-      final File par = trg.getParentFile();
-      if(!par.exists() || !par.isDirectory()) PATHINVALID.thrw(input, trg);
-    }
-
-    if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
-    if(!src.renameTo(trg)) CANNOTMOVE.thrw(input, src, trg);
-    return null;
-  }
-
-  /**
-   * Transforms a file system path into a URI with the file:// scheme.
-   * @param path file path
-   * @return result
-   */
-  private Uri pathToUri(final File path) {
-    return Uri.uri(Token.token(path.toURI().toString()));
   }
 
   /**

@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
@@ -215,7 +216,10 @@ public final class FNGen extends Fun {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
     try {
-      return Str.get(TextInput.content(io, enc).finish());
+      byte[] txt = TextInput.content(io, enc).finish();
+      if(contains(txt, '\r')) txt = contains(txt, '\n') ?
+          delete(txt, '\r') : replace(txt, '\r', '\n');
+      return Str.get(txt);
     } catch(final IOException ex) {
       throw WRONGINPUT.thrw(input, io, ex);
     }
@@ -227,22 +231,22 @@ public final class FNGen extends Fun {
    * @return result
    * @throws QueryException query exception
    */
-  private Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
-    final byte[] str = unparsedText(ctx).atom();
+  Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
+    return textIter(unparsedText(ctx).atom());
+  }
 
+  /**
+   * Returns the specified text as lines.
+   * @param str input text
+   * @return result
+   */
+  public static Iter textIter(final byte[] str) {
     return new Iter() {
       int p = -1;
       @Override
       public Item next() {
         final ByteList bl = new ByteList();
-        while(++p < str.length) {
-          if(str[p] == 0x0a) break;
-          if(str[p] == 0x0d) {
-            if(p + 1 < str.length && str[p + 1] == 0x0a) p++;
-            break;
-          }
-          bl.add(str[p]);
-        }
+        while(++p < str.length && str[p] != 0x0a) bl.add(str[p]);
         return p + 1 < str.length || bl.size() != 0 ?
             Str.get(bl.toArray()) : null;
       }
@@ -348,7 +352,8 @@ public final class FNGen extends Fun {
       }
     }
     // use default parameters if no parameters have been assigned
-    return tb.size() == 0 ? ctx.serProp() : new SerializerProp(tb.toString());
+    return tb.size() == 0 ? ctx.serProp(true) :
+      new SerializerProp(tb.toString());
   }
 
   @Override

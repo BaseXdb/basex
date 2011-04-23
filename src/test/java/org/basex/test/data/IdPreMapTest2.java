@@ -164,7 +164,7 @@ public class IdPreMapTest2 {
     }
     // perform the test:
     final Performance p = new Performance();
-    for(int i = 0; i < d.length; i++) m.delete(d[i][0], d[i][1], -1);
+    for(final int[] dd : d) m.delete(dd[0], dd[1], -1);
     if(VERBOSE) Util.errln(d.length + " records deleted in: " + p);
   }
 
@@ -233,7 +233,8 @@ class DummyIdPreMap extends IdPreMap {
   public DummyIdPreMap(final int[] i) {
     super(i.length - 1);
     ids = new ArrayList<Integer>(i.length);
-    for(int k = 0; k < i.length; k++) ids.add(i[k]);
+    for(final int element : i)
+      ids.add(element);
   }
 
   @Override

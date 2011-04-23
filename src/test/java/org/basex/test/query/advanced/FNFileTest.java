@@ -84,30 +84,6 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:is-readable() function.
-   * @throws QueryException database exception
-   */
-  @Test
-  public void testIsReadable() throws QueryException {
-    final String fun = check(FunDef.ISREAD);
-    query("file:write('" + PATH1 + "', ())");
-    query(fun + "('" + PATH1 + "')", "true");
-    query("file:delete('" + PATH1 + "')");
-  }
-
-  /**
-   * Test method for the file:is-writable() function.
-   * @throws QueryException database exception
-   */
-  @Test
-  public void testIsWritable() throws QueryException {
-    final String fun = check(FunDef.ISWRITE);
-    query("file:write('" + PATH1 + "', ())");
-    query(fun + "('" + PATH1 + "')", "true");
-    query("file:delete('" + PATH1 + "')");
-  }
-
-  /**
    * Test method for the file:last-modified() function.
    * @throws QueryException database exception
    */
@@ -136,7 +112,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void testList() throws QueryException {
     final String fun = check(FunDef.FLIST);
-    error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
+    error(fun + "('" + PATH1 + "')", Err.NOTDIR);
     query("file:write('" + PATH1 + "', ())");
     error(fun + "('" + PATH1 + "')", Err.NOTDIR);
     contains(fun + "('" + Prop.TMP + "')", NAME);
@@ -157,7 +133,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(fun + "('" + PATH1 + "')");
     query(fun + "('" + PATH1 + "')");
     query(fun + "('" + PATH3 + "')");
-    query("file:delete('" + PATH1 + "', true())");
+    query("file:delete('" + PATH1 + "')");
     query("file:write('" + PATH1 + "', ())");
     error(fun + "('" + PATH1 + "')", Err.FILEEXISTS);
     error(fun + "('" + PATH3 + "')", Err.FILEEXISTS);
@@ -172,20 +148,20 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void testDelete() throws QueryException {
     final String fun = check(FunDef.DELETE);
     query("file:create-directory('" + PATH3 + "')");
-    error(fun + "('" + PATH1 + "')", Err.DIRNOTEMPTY);
     query(fun + "('" + PATH3 + "')");
     query("file:create-directory('" + PATH3 + "')");
     query("file:write('" + PATH4 + "', ())");
-    query(fun + "('" + PATH1 + "', true())");
+    query(fun + "('" + PATH1 + "')");
+    error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
   }
 
   /**
-   * Test method for the file:read() function.
+   * Test method for the file:read-text() function.
    * @throws QueryException database exception
    */
   @Test
   public void testRead() throws QueryException {
-    final String fun = check(FunDef.READ);
+    final String fun = check(FunDef.READTEXT);
     error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
     error(fun + "('" + Prop.TMP + "')", Err.PATHISDIR);
     query("file:write('" + PATH1 + "', 'a\u00e4')");
@@ -223,20 +199,42 @@ public final class FNFileTest extends AdvancedQueryTest {
     query("file:size('" + PATH1 + "')", "1");
     query(fun + "('" + PATH1 + "', '0')");
     query("file:size('" + PATH1 + "')", "1");
-    query(fun + "('" + PATH1 + "', '0', (), true())");
-    query("file:size('" + PATH1 + "')", "2");
-    query("file:delete('" + PATH1 + "')");
-    query(fun + "('" + PATH1 + "', '0', (), true())");
-    query("file:size('" + PATH1 + "')", "1");
     query("file:delete('" + PATH1 + "')");
 
     query(fun + "('" + PATH1 + "', 'a\u00e4'," +
       serialParams("<encoding>CP1252</encoding>") + ")");
-    query("file:read('" + PATH1 + "', 'CP1252')", "a\u00e4");
+    query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
 
     query(fun + "('" + PATH1 + "', '<a/>'," +
         serialParams("<method>text</method>") + ")");
-    query("file:read('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
+    query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:append() function.
+   * @throws QueryException database exception
+   */
+  @Test
+  public void testAppend() throws QueryException {
+    final String fun = check(FunDef.APPEND);
+
+    error(fun + "('" + Prop.TMP + "', ())", Err.PATHISDIR);
+
+    query(fun + "('" + PATH1 + "', '0')");
+    query("file:size('" + PATH1 + "')", "1");
+    query(fun + "('" + PATH1 + "', '0', ())");
+    query("file:size('" + PATH1 + "')", "2");
+    query("file:delete('" + PATH1 + "')");
+
+    query(fun + "('" + PATH1 + "', 'a\u00e4'," +
+      serialParams("<encoding>CP1252</encoding>") + ")");
+    query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
+    query("file:delete('" + PATH1 + "')");
+
+    query(fun + "('" + PATH1 + "', '<a/>'," +
+        serialParams("<method>text</method>") + ")");
+    query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
     query("file:delete('" + PATH1 + "')");
   }
 
@@ -254,8 +252,23 @@ public final class FNFileTest extends AdvancedQueryTest {
     query("file:size('" + PATH1 + "')", "1");
     query(fun + "('" + PATH1 + "', " + a + ")");
     query("file:size('" + PATH1 + "')", "1");
-    query(fun + "('" + PATH1 + "', " + a + ", true())");
-    query("file:read('" + PATH1 + "')", "00");
+    query("file:delete('" + PATH1 + "')");
+  }
+
+  /**
+   * Test method for the file:append-binary() function.
+   * @throws QueryException database exception
+   */
+  @Test
+  public void testAppendBinary() throws QueryException {
+    final String fun = check(FunDef.APPENDBIN);
+
+    final String a = "xs:base64Binary('MA==')";
+    error(fun + "('" + Prop.TMP + "', " + a + ")", Err.PATHISDIR);
+    query(fun + "('" + PATH1 + "', " + a + ")");
+    query("file:size('" + PATH1 + "')", "1");
+    query(fun + "('" + PATH1 + "', " + a + ")");
+    query("file:read-text('" + PATH1 + "')", "00");
     query("file:delete('" + PATH1 + "')");
   }
 
@@ -273,7 +286,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(fun + "('" + PATH2 + "', '" + PATH2 + "')");
     query("file:size('" + PATH1 + "')", "1");
     query("file:size('" + PATH2 + "')", "1");
-    error(fun + "('" + PATH1 + "', '" + PATH3 + "')", Err.PATHINVALID);
+    error(fun + "('" + PATH1 + "', '" + PATH3 + "')", Err.NOTDIR);
 
     query("file:delete('" + PATH1 + "')");
     query("file:delete('" + PATH2 + "')");
@@ -292,31 +305,19 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(fun + "('" + PATH1 + "', '" + PATH2 + "')");
     query(fun + "('" + PATH2 + "', '" + PATH1 + "')");
     query(fun + "('" + PATH1 + "', '" + PATH1 + "')");
-    error(fun + "('" + PATH1 + "', '" + PATH4 + "')", Err.PATHINVALID);
+    error(fun + "('" + PATH1 + "', '" + PATH4 + "')", Err.NOTDIR);
     query("file:size('" + PATH1 + "')", "1");
     query("file:exists('" + PATH2 + "')", "false");
-
     query("file:delete('" + PATH1 + "')");
   }
 
   /**
-   * Test method for the file:path-separator() function.
-   * @throws QueryException database exception
-   */
-  @Test
-  public void testPathSeparator() throws QueryException {
-    final String fun = check(FunDef.PATHSEP);
-    final String sep = query(fun + "()");
-    assertTrue(sep.equals("/") || sep.equals("\\"));
-  }
-
-  /**
-   * Test method for the file:path-to-full-path() function.
+   * Test method for the file:resolve-path() function.
    * @throws Exception exception
    */
   @Test
-  public void testPathToFullPath() throws Exception {
-    final String fun = check(FunDef.PATHTOFULL);
+  public void testResolvePath() throws Exception {
+    final String fun = check(FunDef.RESOLVEPATH);
     final String path = query(fun + "('" + PATH1 + "')");
     final String can = new File(PATH1).getAbsolutePath();
     assertEquals(path.toLowerCase(), can.toLowerCase());

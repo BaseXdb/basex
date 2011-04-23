@@ -389,7 +389,8 @@ public final class FNZip extends Fun {
       if(tb.size() != 0) tb.add(',');
       tb.add(name.ln()).add('=').add(at.atom());
     }
-    return tb.size() == 0 ? ctx.serProp() : new SerializerProp(tb.toString());
+    return tb.size() == 0 ? ctx.serProp(true) :
+      new SerializerProp(tb.toString());
   }
 
   /**

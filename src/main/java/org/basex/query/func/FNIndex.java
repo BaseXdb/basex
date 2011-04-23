@@ -9,6 +9,7 @@ import org.basex.query.QueryParser;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Expr.Use;
 import org.basex.query.item.QNm;
+import org.basex.query.util.NSGlobal;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenSet;
@@ -42,7 +43,7 @@ public final class FNIndex extends TokenSet {
     for(final FunDef def : FunDef.values()) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = add(full(def.uri, ln));
+      final int i = add(full(def.uri(), ln));
       if(i < 0) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
@@ -65,7 +66,7 @@ public final class FNIndex extends TokenSet {
 
     // create function
     final FunDef fl = funcs[id];
-    if(!eq(fl.uri, uri)) return null;
+    if(!eq(fl.uri(), uri)) return null;
 
     final Fun f = fl.get(qp.input(), args);
     if(!qp.ctx.xquery3 && f.uses(Use.X30)) qp.error(FEATURE11);
@@ -88,9 +89,11 @@ public final class FNIndex extends TokenSet {
     final byte[] nm = name.ln();
     final Levenshtein ls = new Levenshtein();
     for(int k = 1; k < size; ++k) {
-      final byte[] ln = substring(keys[k], indexOf(keys[k], '}') + 1);
+      final int i = indexOf(keys[k], '}');
+      final byte[] uri = substring(keys[k], 1, i);
+      final byte[] ln = substring(keys[k], i + 1);
       if(eq(nm, ln)) {
-        qp.error(FUNSIMILAR, name, keys[k]);
+        qp.error(FUNSIMILAR, name, NSGlobal.prefix(uri));
       } else if(ls.similar(nm, ln, 0)) {
         qp.error(FUNSIMILAR, name, ln);
       }

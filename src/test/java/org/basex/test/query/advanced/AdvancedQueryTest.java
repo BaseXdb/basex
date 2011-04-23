@@ -65,7 +65,7 @@ abstract class AdvancedQueryTest {
   protected static void error(final String query, final Err... error) {
     try {
       query(query);
-      fail("[" + error + "] expected for query: " + query);
+      fail("[" + error[0] + "] expected for query: " + query);
     } catch(final QueryException ex) {
       final String msg = ex.getMessage();
       boolean found = false;
