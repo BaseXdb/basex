@@ -54,10 +54,10 @@ public class PrintOutput extends OutputStream {
   public static PrintOutput get(final OutputStream out) {
     return out instanceof PrintOutput ? (PrintOutput) out :
       new PrintOutput(
-          out instanceof ByteArrayOutputStream ||
-          out instanceof BufferedOutputStream ||
-          out instanceof BufferedOutput ||
-          out instanceof ArrayOutput ? out : new BufferedOutput(out));
+        out instanceof ByteArrayOutputStream ||
+        out instanceof BufferedOutputStream ||
+        out instanceof BufferedOutput ||
+        out instanceof ArrayOutput ? out : new BufferedOutput(out));
   }
 
   @Override

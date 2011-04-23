@@ -44,8 +44,7 @@ public abstract class Fun extends Arr {
     // skip functions based on context or with non-values as arguments
     if(uses(Use.CTX) || !values()) return optPre(cmp(ctx), ctx);
     // pre-evaluate function
-    return optPre(def.ret.zeroOrOne() ?
-        item(ctx, input) : value(ctx), ctx);
+    return optPre(def.ret.zeroOrOne() ? item(ctx, input) : value(ctx), ctx);
   }
 
   /**
@@ -89,7 +88,8 @@ public abstract class Fun extends Arr {
 
   @Override
   public final String toString() {
-    return new TokenBuilder().add(def.toString().replaceAll("\\(.*\\)", "")).
-      add(PAR1).addSep(expr, SEP).add(PAR2).toString();
+    final String desc = def.toString();
+    return new TokenBuilder().add(desc.substring(0,
+        desc.indexOf('(') + 1)).addSep(expr, SEP).add(PAR2).toString();
   }
 }

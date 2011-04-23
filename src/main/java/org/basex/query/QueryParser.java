@@ -78,6 +78,7 @@ import org.basex.query.ft.FTWords;
 import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
+import org.basex.query.func.VarDef;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Empty;
@@ -170,6 +171,9 @@ public class QueryParser extends InputParser {
   private boolean declBase;
   /** Declaration flag. */
   private boolean declItem;
+  /** Declaration flag. */
+  private boolean declVars;
+
 
   /***
    * Constructor.
@@ -224,7 +228,6 @@ public class QueryParser extends InputParser {
       } else {
         moduleDecl(u);
       }
-
       if(c && more()) {
         if(alter != null) error();
         error(QUERYEND, rest());
@@ -3193,7 +3196,14 @@ public class QueryParser extends InputParser {
    */
   private Var checkVar(final QNm name, final Err err)
       throws QueryException {
-    final Var v = ctx.vars.get(name);
+
+    Var v = ctx.vars.get(name);
+    // dynamically assign variables from function modules
+    if(v == null && !declVars) {
+      declVars = true;
+      VarDef.init(ctx);
+      v = ctx.vars.get(name);
+    }
     if(v == null) error(err, '$' + string(name.atom()));
     return v;
   }

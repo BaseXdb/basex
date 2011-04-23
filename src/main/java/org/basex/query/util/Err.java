@@ -102,24 +102,21 @@ public enum Err {
   NOTDIR(FOFL, 3, "Path '%' is not a directory."),
   /** FOFL0004: Evaluation exception. */
   PATHISDIR(FOFL, 4, "Path '%' is a directory."),
-
-  /** FOFL0005: Evaluation exception. */
-  DIRNOTEMPTY(FOFL, 5, "Directory '%' is not empty."),
-  /** FOFL0006: Evaluation exception. */
-  PATHINVALID(FOFL, 6, "Invalid file path '%'."),
   /** FOFL0007: Evaluation exception. */
-  ENCNOTEXISTS(FOFL, 7, "Encoding '%' is not supported."),
+  ENCNOTEXISTS(FOFL, 5, "Encoding '%' is not supported."),
 
-  /** FOFL0008: Evaluation exception. */
-  FILEERROR(FOFL, 8, "Operation failed: %."),
-  /** FOFL0008: Evaluation exception. */
-  CANNOTCREATE(FOFL, 8, "Directory '%' cannot be created."),
-  /** FOFL0008: Evaluation exception. */
-  CANNOTDEL(FOFL, 8, "Path '%' cannot be deleted."),
-  /** FOFL0008: Evaluation exception. */
-  CANNOTMOVE(FOFL, 8, "Moving '%' to '%' failed."),
-  /** FOFL0008: Evaluation exception. */
-  CANNOTLIST(FOFL, 8, "Files of '%' cannot be returned."),
+  /** FOFL0000: Evaluation exception. */
+  FILEERROR(FOFL, 0, "Operation failed: %."),
+  /** FOFL0000: Evaluation exception. */
+  CANNOTCREATE(FOFL, 0, "Directory '%' cannot be created."),
+  /** FOFL0000: Evaluation exception. */
+  CANNOTDEL(FOFL, 0, "Path '%' cannot be deleted."),
+  /** FOFL0000: Evaluation exception. */
+  CANNOTMOVE(FOFL, 0, "Moving '%' to '%' failed."),
+  /** FOFL0000: Evaluation exception. */
+  CANNOTLIST(FOFL, 0, "Files of '%' cannot be accessed."),
+  /** FOFL0000: Evaluation exception. */
+  PATHINVALID(FOFL, 0, "Invalid file path: '%'."),
 
   /** FOZP0001: Evaluation exception. */
   ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),

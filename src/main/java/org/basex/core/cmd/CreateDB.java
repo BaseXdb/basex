@@ -39,7 +39,7 @@ import org.xml.sax.InputSource;
  */
 public final class CreateDB extends ACreate {
   /** Optionally defined parser. */
-  private Parser parser;
+  private final Parser parser;
 
   /**
    * Default constructor.

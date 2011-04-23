@@ -83,12 +83,14 @@ public final class SeqType {
   public static final SeqType AAT_ZO = new SeqType(AtomType.AAT, Occ.ZO);
   /** Zero or more xs:anyAtomicType. */
   public static final SeqType AAT_ZM = new SeqType(AtomType.AAT, Occ.ZM);
-  /** Single boolean. */
+  /** Single xs:boolean. */
   public static final SeqType BLN = AtomType.BLN.seq();
-  /** Zero or one booleans. */
+  /** Zero or one xs:boolean. */
   public static final SeqType BLN_ZO = new SeqType(AtomType.BLN, Occ.ZO);
-  /** Single Base64Binary. */
+  /** Single xs:base64Binary. */
   public static final SeqType B64 = AtomType.B64.seq();
+  /** Zero or more xs:base64Binary. */
+  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZM);
   /** Double number. */
   public static final SeqType DBL = AtomType.DBL.seq();
   /** Double number. */

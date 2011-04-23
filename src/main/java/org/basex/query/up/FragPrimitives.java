@@ -35,8 +35,7 @@ final class FragPrimitives extends Primitives {
   @Override
   protected void apply(final QueryContext ctx) throws QueryException {
     for(final int i : putIds.toArray()) {
-      final Put put = (Put) op.get(i).find(PrimitiveType.PUT);
-      put.apply(0);
+      ((Put) op.get(i).find(PrimitiveType.PUT)).apply(0);
     }
   }
 

@@ -9,6 +9,7 @@ import org.basex.query.QueryParser;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Expr.Use;
 import org.basex.query.item.QNm;
+import org.basex.query.util.NSGlobal;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenSet;
@@ -88,9 +89,11 @@ public final class FNIndex extends TokenSet {
     final byte[] nm = name.ln();
     final Levenshtein ls = new Levenshtein();
     for(int k = 1; k < size; ++k) {
-      final byte[] ln = substring(keys[k], indexOf(keys[k], '}') + 1);
+      final int i = indexOf(keys[k], '}');
+      final byte[] uri = substring(keys[k], 1, i);
+      final byte[] ln = substring(keys[k], i + 1);
       if(eq(nm, ln)) {
-        qp.error(FUNSIMILAR, name, keys[k]);
+        qp.error(FUNSIMILAR, name, NSGlobal.prefix(uri));
       } else if(ls.similar(nm, ln, 0)) {
         qp.error(FUNSIMILAR, name, ln);
       }

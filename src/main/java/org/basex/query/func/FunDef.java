@@ -505,36 +505,47 @@ public enum FunDef {
   /** XQuery function */
   ISFILE(FILEURI, FNFile.class, 1, 1, "is-file(path)", STR, BLN),
   /** XQuery function */
-  ISREAD(FILEURI, FNFile.class, 1, 1, "is-readable(path)", STR, BLN),
-  /** XQuery function */
-  ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writable(path)", STR, BLN),
-  /** XQuery function */
   LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", STR, DTM),
   /** XQuery function */
   SIZE(FILEURI, FNFile.class, 1, 1, "size(path)", STR, ITR),
   /** XQuery function */
-  FLIST(FILEURI, FNFile.class, 1, 3, "list(path[,recursive[,pattern]])",
-      STR, BLN, STR, STR_ZM),
+  BASENAME(FILEURI, FNFile.class, 1, 2, "base-name(path[,suffix])",
+      STR, STR, STR),
   /** XQuery function */
-  PATHSEP(FILEURI, FNFile.class, 0, 0, "path-separator()", STR),
+  DIRNAME(FILEURI, FNFile.class, 1, 1, "dir-name(path)", STR, STR),
   /** XQuery function */
-  PATHTOFULL(FILEURI, FNFile.class, 1, 1, "path-to-full-path(path)", STR, STR),
+  PATHNATIVE(FILEURI, FNFile.class, 1, 1, "path-to-native(path)", STR, STR),
   /** XQuery function */
   PATHTOURI(FILEURI, FNFile.class, 1, 1, "path-to-uri(path)", STR, URI),
   /** XQuery function */
+  RESOLVEPATH(FILEURI, FNFile.class, 1, 1, "resolve-path(path)", STR, STR),
+  /** XQuery function */
+  FLIST(FILEURI, FNFile.class, 1, 3, "list(path[,recursive[,pattern]])",
+      STR, BLN, STR, STR_ZM),
+  /** XQuery function */
   CREATEDIR(FILEURI, FNFile.class, 1, 1, "create-directory(path)", STR, EMP),
   /** XQuery function */
-  DELETE(FILEURI, FNFile.class, 1, 2, "delete(path[,rec])", STR, BLN, EMP),
+  DELETE(FILEURI, FNFile.class, 1, 1, "delete(path)", STR, EMP),
   /** XQuery function */
-  READ(FILEURI, FNFile.class, 1, 2, "read(path[,encoding])", STR, STR, STR),
+  READTEXT(FILEURI, FNFile.class, 1, 2, "read-text(path[,encoding])",
+      STR, STR, STR),
+  /** XQuery function */
+  READLINES(FILEURI, FNFile.class, 1, 2, "read-text-lines(path[,encoding])",
+      STR, STR, STR_ZM),
   /** XQuery function */
   READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(path)", STR, B64),
   /** XQuery function */
-  WRITE(FILEURI, FNFile.class, 2, 4, "write(path,data[,params[,append]])",
-      STR, ITEM_ZM, NOD, BLN, EMP),
+  WRITE(FILEURI, FNFile.class, 2, 3, "write(path,data[,params])",
+      STR, ITEM_ZM, NOD, EMP),
   /** XQuery function */
-  WRITEBIN(FILEURI, FNFile.class, 2, 3, "write-binary(path,base64[,append])",
-      STR, B64, BLN, EMP),
+  WRITEBIN(FILEURI, FNFile.class, 2, 2, "write-binary(path,base64)",
+      STR, B64_ZM, EMP),
+  /** XQuery function */
+  APPEND(FILEURI, FNFile.class, 2, 3, "append(path,data[,params])",
+      STR, ITEM_ZM, NOD, EMP),
+  /** XQuery function */
+  APPENDBIN(FILEURI, FNFile.class, 2, 2, "append-binary(path,base64)",
+      STR, B64_ZM, EMP),
   /** XQuery function */
   COPY(FILEURI, FNFile.class, 2, 2, "copy(source,target)", STR, STR, EMP),
   /** XQuery function */
@@ -664,8 +675,9 @@ public enum FunDef {
    */
   private FunDef(final byte[] ur, final Class<? extends Fun> fun, final int mn,
       final int mx, final String dsc, final SeqType... type) {
+
     if(mx != Integer.MAX_VALUE && type.length != mx + 1)
-      Util.notexpected("FunDef for " + dsc + " is incomplete.");
+      Util.notexpected("Incorrent function signature: " + dsc);
     uri = ur;
     func = fun;
     min = mn;
