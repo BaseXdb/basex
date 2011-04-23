@@ -1715,9 +1715,9 @@ public class QueryParser extends InputParser {
 
     if(!wsConsume(BRACE2)) {
       do {
-        args = Array.add(args, check(single(), XPEMPTY));
+        args = Array.add(args, check(single(), INVMAPKEY));
         wsCheck(ASSIGN);
-        args = Array.add(args, check(single(), XPEMPTY));
+        args = Array.add(args, check(single(), INVMAPVAL));
       } while(wsConsume(COMMA));
       wsCheck(BRACE2);
     }

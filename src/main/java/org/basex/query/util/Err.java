@@ -359,6 +359,10 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   CALCEXPR(XPST, 3, "Calculation is incomplete."),
   /** XPST0003: Parsing exception. */
+  INVMAPKEY(XPST, 3, "Invalid key, simple expression expected."),
+  /** XPST0003: Parsing exception. */
+  INVMAPVAL(XPST, 3, "Invalid value, simple expression expected."),
+  /** XPST0003: Parsing exception. */
   NORETURN(XPST, 3, "Expecting return value."),
   /** XPST0003: Parsing exception. */
   NOWHERE(XPST, 3, "Expecting valid expression after 'where'."),
