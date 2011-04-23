@@ -43,7 +43,7 @@ public final class FNIndex extends TokenSet {
     for(final FunDef def : FunDef.values()) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = add(full(def.uri, ln));
+      final int i = add(full(def.uri(), ln));
       if(i < 0) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
@@ -66,7 +66,7 @@ public final class FNIndex extends TokenSet {
 
     // create function
     final FunDef fl = funcs[id];
-    if(!eq(fl.uri, uri)) return null;
+    if(!eq(fl.uri(), uri)) return null;
 
     final Fun f = fl.get(qp.input(), args);
     if(!qp.ctx.xquery3 && f.uses(Use.X30)) qp.error(FEATURE11);

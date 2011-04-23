@@ -157,7 +157,7 @@ public final class CmpV extends Cmp {
       e = optPre(Empty.SEQ, ctx);
     } else if(values()) {
       e = preEval(ctx);
-    } else if(e1.isFun(FunDef.COUNT)) {
+    } else if(e1.isFun(FunDef.CNT)) {
       e = count(op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFun(FunDef.POS)) {

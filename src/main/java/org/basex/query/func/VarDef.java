@@ -20,27 +20,24 @@ public enum VarDef {
   /* FNFile variables. */
 
   /** XQuery function */
-  FILEDIRSEP(FILEURI, "file:directory-separator", Str.get(File.separator)),
+  FILEDIRSEP(FILEURI, "directory-separator", Str.get(File.separator)),
   /** XQuery function */
-  FILEPATHSEP(FILEURI, "file:path-separator", Str.get(File.pathSeparator));
+  FILEPATHSEP(FILEURI, "path-separator", Str.get(File.pathSeparator));
 
-  /** Function uri. */
-  final byte[] uri;
   /** Variable name. */
-  final byte[] name;
+  final QNm qname;
   /** Variable value. */
-  final Value val;
+  final Value value;
 
   /**
    * Constructor.
-   * @param ur uri
-   * @param n name
-   * @param v item value
+   * @param uri uri
+   * @param name name
+   * @param val item value
    */
-  private VarDef(final byte[] ur, final String n, final Value v) {
-    uri = ur;
-    name = token(n);
-    val = v;
+  private VarDef(final byte[] uri, final String name, final Value val) {
+    qname = new QNm(token(name), uri);
+    value = val;
   }
 
   /**
@@ -49,7 +46,7 @@ public enum VarDef {
    */
   public static void init(final QueryContext ctx) {
     for(final VarDef v : values()) {
-      ctx.vars.setGlobal(Var.create(ctx, null, new QNm(v.name, v.uri), v.val));
+      ctx.vars.setGlobal(Var.create(ctx, null, v.qname, v.value));
     }
   }
 }

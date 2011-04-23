@@ -99,9 +99,7 @@ public class FunType implements Type {
       throws QueryException {
     if(!it.func()) throw Err.cast(ii, this, it);
     final FItem f = (FItem) it;
-    if(this == ANY_FUN) return f;
-
-    return f.coerceTo(this, ctx, ii);
+    return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii);
   }
 
   @Override
@@ -111,16 +109,17 @@ public class FunType implements Type {
 
   @Override
   public boolean instance(final Type t) {
-    // the only non-function supertype of function is item()
+    // the only non-function super-type of function is item()
     if(!(t instanceof FunType)) return t == AtomType.ITEM;
     final FunType ft = (FunType) t;
 
     // takes care of FunType.ANY
     if(this == ft || ft == ANY_FUN) return true;
-    if(this == ANY_FUN) return false;
-    if(args.length != ft.args.length || !ret.instance(ft.ret)) return false;
-    for(int i = 0; i < args.length; i++)
-      if(!ft.args[i].instance(args[i])) return false;
+    if(this == ANY_FUN || args.length != ft.args.length ||
+        !ret.instance(ft.ret)) return false;
+    for(int a = 0; a < args.length; a++) {
+      if(!ft.args[a].instance(args[a])) return false;
+    }
     return true;
   }
 
@@ -153,9 +152,10 @@ public class FunType implements Type {
    */
   public static FunType get(final Func f) {
     final SeqType[] at = new SeqType[f.args.length];
-    for(int i = 0; i < at.length; i++)
-      at[i] = f.args[i] == null || f.args[i].type == null ?
-          SeqType.ITEM_ZM : f.args[i].type;
+    for(int a = 0; a < at.length; a++) {
+      at[a] = f.args[a] == null || f.args[a].type == null ?
+          SeqType.ITEM_ZM : f.args[a].type;
+    }
     return new FunType(at, f.ret == null ? SeqType.ITEM_ZM : f.ret);
   }
 
@@ -177,9 +177,9 @@ public class FunType implements Type {
    */
   public Var[] type(final Var[] vars) {
     if(this != ANY_FUN) {
-      for(int i = 0; i < vars.length; i++)
-        if(vars[i] != null && args[i] != SeqType.ITEM_ZM)
-          vars[i].type = args[i];
+      for(int v = 0; v < vars.length; v++)
+        if(vars[v] != null && args[v] != SeqType.ITEM_ZM)
+          vars[v].type = args[v];
     }
     return vars;
   }
