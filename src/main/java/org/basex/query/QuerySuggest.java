@@ -123,7 +123,7 @@ public final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  public void error(final Err err, final Object... arg)
+  public QueryException error(final Err err, final Object... arg)
       throws QueryException {
 
     final QueryException qe = new QueryException(input(), err, arg);

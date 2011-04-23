@@ -43,7 +43,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNGen extends Fun {
+public final class FNGen extends Fun {
   /** Output namespace. */
   private static final Uri U_ZIP = Uri.uri(OUTPUTURI);
   /** Element: output:serialization-parameter. */
@@ -56,7 +56,7 @@ final class FNGen extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  protected FNGen(final InputInfo ii, final FunDef f, final Expr[] e) {
+  public FNGen(final InputInfo ii, final FunDef f, final Expr[] e) {
     super(ii, f, e);
   }
 

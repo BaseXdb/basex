@@ -76,7 +76,7 @@ public final class Empty extends Value {
 
   @Override
   public SeqType type() {
-    return SeqType.ITEM_Z;
+    return SeqType.EMP;
   }
 
   @Override
@@ -107,5 +107,10 @@ public final class Empty extends Value {
   @Override
   public Item itemAt(final long pos) {
     throw Util.notexpected();
+  }
+
+  @Override
+  public boolean homogenous() {
+    return true;
   }
 }

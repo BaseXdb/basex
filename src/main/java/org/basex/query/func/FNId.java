@@ -23,14 +23,14 @@ import org.basex.util.TokenList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNId extends Fun {
+public final class FNId extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNId(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNId(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

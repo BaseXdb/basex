@@ -1,5 +1,5 @@
-@setlocal
 @echo off
+setlocal
 
 REM Path to this script
 set PWD=%~dp0
@@ -12,5 +12,3 @@ set VM=-Xmx512m
 
 REM Run code
 java -cp "%BASEX%" %VM% org.basex.BaseXGUI %*
-
-@endlocal

@@ -112,7 +112,7 @@ public class Func extends Single {
     ctx.value = null;
     final Value v = expr.value(ctx);
     ctx.value = cv;
-    return cast ? ret.promote(v, this, ctx, input) : v;
+    return cast ? ret.promote(v, ctx, input) : v;
   }
 
   @Override

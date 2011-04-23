@@ -128,7 +128,7 @@ public final class FunJava extends Arr {
       final Field f = cls.getField(mth);
       final boolean st = Modifier.isStatic(f.getModifiers());
       if(ar.length == (st ? 0 : 1)) {
-        return f.get(st ? null : ((Jav) ar[0]).val);
+        return f.get(st ? null : instObj(ar[0]));
       }
     } catch(final NoSuchFieldException ex) { /* ignored */ }
 
@@ -136,9 +136,20 @@ public final class FunJava extends Arr {
       if(!meth.getName().equals(mth)) continue;
       final boolean st = Modifier.isStatic(meth.getModifiers());
       final Object[] arg = args(meth.getParameterTypes(), ar, st);
-      if(arg != null) return meth.invoke(st ? null : ((Jav) ar[0]).val, arg);
+      if(arg != null) return meth.invoke(st ? null : instObj(ar[0]), arg);
     }
     throw new Exception();
+  }
+
+  /**
+   * Creates the instance on which a non-static field getter or method is
+   * invoked.
+   * @param v XQuery value
+   * @return Java object
+   */
+  private Object instObj(final Value v) {
+    return cls.isInstance(v) ? v :
+      v instanceof Jav ? ((Jav) v).val : v.toJava();
   }
 
   /**
@@ -160,12 +171,18 @@ public final class FunJava extends Arr {
     int a = 0;
 
     for(final Class<?> par : params) {
-      final Type jtype = type(par);
-      if(jtype == null) return null;
-
       final Value arg = args[s + a];
-      if(!arg.type.instance(jtype) && !jtype.instance(arg.type)) return null;
-      val[a++] = arg.toJava();
+
+      final Object next;
+      if(par.isInstance(arg)) {
+        next = arg;
+      } else {
+        final Type jtype = type(par);
+        if(jtype == null || !arg.type.instance(jtype)
+            && !jtype.instance(arg.type)) return null;
+        next = arg.toJava();
+      }
+      val[a++] = next;
     }
     return val;
   }

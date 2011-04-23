@@ -31,7 +31,7 @@ public final class FNSent extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  protected FNSent(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNSent(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

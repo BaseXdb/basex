@@ -1,5 +1,5 @@
-@setlocal
 @echo off
+setlocal
 
 REM Path to this script
 set PWD=%~dp0
@@ -16,5 +16,3 @@ set CP=%BASEX%;%LIB%/lucene-analyzers-3.0.2.jar;%LIB%/tagsoup-1.2.jar;%LIB%/snow
 
 REM Run code
 java -cp "%CP%" %VM% org.basex.BaseX %*
-
-@endlocal

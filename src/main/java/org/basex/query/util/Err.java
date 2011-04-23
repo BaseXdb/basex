@@ -339,6 +339,10 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   FUNCMISS(XPST, 3, "Expecting closing bracket for \"%(...\"."),
   /** XPST0003: Parsing exception. */
+  MAPTKV(XPST, 3, "Expecting '*' or key and value type for \"%(...\"."),
+  /** XPST0003: Parsing exception. */
+  MAPTAAT(XPST, 3, "Expecting atomic key type for map(...), found \"%\"."),
+  /** XPST0003: Parsing exception. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
   /** XPST0003: Parsing exception. */
   NODECLFORM(XPST, 3, "Expecting decimal-format property definition."),

@@ -78,6 +78,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   public ViewContainer(final AGUI main, final View... v) {
     layout(new BorderLayout()).mode(Fill.PLAIN);
     logo = BaseXLayout.image("logo");
+    setBackground(Color.white);
 
     views = new ViewPanel[v.length];
     for(int i = 0; i < v.length; ++i) views[i] = new ViewPanel(v[i]);
@@ -118,8 +119,11 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     final int h = getHeight();
     final int hh = Math.max(220, Math.min(700, h));
     final Insets i = getInsets();
-    BaseXLayout.fill(g, color1, color2,
-        i.left, i.top, w - i.right, h - i.bottom);
+
+    if(gui.gprop.is(GUIProp.GRADIENT)) {
+      BaseXLayout.fill(g, color1, color2,
+          i.left, i.top, w - i.right, h - i.bottom);
+    }
     if(w < 150 || h < 160) return;
 
     final int lh = logo.getHeight(this);

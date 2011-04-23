@@ -16,34 +16,34 @@ public final class FNGenTest extends AdvancedQueryTest {
   private static final String TEXT = "etc/xml/stopWords";
 
   /**
-   * Test method for the fn:unparsed-text() functions.
+   * Test method for the fn:unparsed-text() function.
    * @throws QueryException database exception
    */
   @Test
   public void testUnparsedText() throws QueryException {
-    final String fun = check(FunDef.PARSETXT, String.class, String.class);
+    final String fun = check(FunDef.PARSETXT);
     contains(fun + "('" + TEXT + "')", "aboutabove");
     contains(fun + "('" + TEXT + "', 'US-ASCII')", "aboutabove");
     error(fun + "('" + TEXT + "', 'xyz')", Err.WRONGINPUT);
   }
 
   /**
-   * Test method for the fn:parse-xml() functions.
+   * Test method for the fn:parse-xml() function.
    * @throws QueryException database exception
    */
   @Test
   public void testParseXML() throws QueryException {
-    final String fun = check(FunDef.PARSEXML, String.class, String.class);
+    final String fun = check(FunDef.PARSEXML);
     contains(fun + "('<x>a</x>')//text()", "a");
   }
 
   /**
-   * Test method for the fn:serialize() functions.
+   * Test method for the fn:serialize() function.
    * @throws QueryException database exception
    */
   @Test
   public void testSerialize() throws QueryException {
-    final String fun = check(FunDef.SERIALIZE, Object.class, Object.class);
+    final String fun = check(FunDef.SERIALIZE);
     contains(fun + "(<x/>)", "&lt;x/&gt;");
     contains(fun + "(<x/>, " + serialParams("") + ")", "&lt;x/&gt;");
     contains(fun + "(<x>a</x>, " +

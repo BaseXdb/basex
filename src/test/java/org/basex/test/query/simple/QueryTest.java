@@ -90,12 +90,14 @@ public abstract class QueryTest {
           sb.append("\n[E" + s + "] ");
           if(correct) {
             final String cp = cmp.toString();
+            sb.append('\'');
             sb.append(cp.length() > 1000 ? cp.substring(0, 1000) + "..." : cp);
+            sb.append('\'');
           } else {
             sb.append("error");
           }
           s = val.size() != 1 ? "#" + val.size() : "";
-          sb.append("\n[F" + s + "] " + val + " " + details() + "\n");
+          sb.append("\n[F" + s + "] '" + val + "' " + details() + "\n");
           ++fail;
         }
       } catch(final BaseXException ex) {

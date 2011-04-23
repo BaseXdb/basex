@@ -38,14 +38,14 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-final class FNFile extends Fun {
+public final class FNFile extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNFile(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNFile(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 

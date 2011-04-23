@@ -20,6 +20,7 @@ import org.basex.query.expr.CTxt;
 import org.basex.query.expr.DynFunCall;
 import org.basex.query.expr.InlineFunc;
 import org.basex.query.expr.LitFunc;
+import org.basex.query.expr.LitMap;
 import org.basex.query.expr.OrderByExpr;
 import org.basex.query.expr.OrderByStable;
 import org.basex.query.expr.PartFunApp;
@@ -82,6 +83,7 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.Empty;
 import org.basex.query.item.FunType;
 import org.basex.query.item.Itr;
+import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
@@ -905,10 +907,10 @@ public class QueryParser extends InputParser {
     boolean comma = false;
 
     do {
-      final boolean fr = wdConsumeWs(FOR, DOLLAR, NOFOR);
-      boolean score = !fr && wdConsumeWs(LET, SCORE, NOLET);
+      final boolean fr = wsConsumeWs(FOR, DOLLAR, NOFOR);
+      boolean score = !fr && wsConsumeWs(LET, SCORE, NOLET);
       if(score) wsCheck(SCORE);
-      else if(!fr && !wdConsumeWs(LET, DOLLAR, NOLET)) return fl;
+      else if(!fr && !wsConsumeWs(LET, DOLLAR, NOLET)) return fl;
 
       do {
         if(comma && !fr) score = wsConsumeWs(SCORE);
@@ -994,8 +996,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr quantified() throws QueryException {
-    final boolean some = wdConsumeWs(SOME, DOLLAR, NOSOME);
-    if(!some && !wdConsumeWs(EVERY, DOLLAR, NOSOME)) return null;
+    final boolean some = wsConsumeWs(SOME, DOLLAR, NOSOME);
+    if(!some && !wsConsumeWs(EVERY, DOLLAR, NOSOME)) return null;
 
     final int s = ctx.vars.size();
     For[] fl = {};
@@ -1019,7 +1021,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
-    if(!wdConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
+    if(!wsConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
     wsCheck(PAR1);
     Expr[] exprs = { check(expr(), NOSWITCH) };
     wsCheck(PAR2);
@@ -1051,7 +1053,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr typeswitch() throws QueryException {
-    if(!wdConsumeWs(TYPESWITCH, PAR1, TYPEPAR)) return null;
+    if(!wsConsumeWs(TYPESWITCH, PAR1, TYPEPAR)) return null;
     wsCheck(PAR1);
     final Expr ts = check(expr(), NOTYPESWITCH);
     wsCheck(PAR2);
@@ -1085,7 +1087,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr iff() throws QueryException {
-    if(!wdConsumeWs(IF, PAR1, IFPAR)) return null;
+    if(!wsConsumeWs(IF, PAR1, IFPAR)) return null;
     wsCheck(PAR1);
     final Expr e = check(expr(), NOIF);
     wsCheck(PAR2);
@@ -1520,7 +1522,7 @@ public class QueryParser extends InputParser {
       }
     } else {
       for(final Axis a : Axis.values()) {
-        if(wdConsumeWs(a.name, COLS, NOLOCSTEP)) {
+        if(wsConsumeWs(a.name, COLS, NOLOCSTEP)) {
           wsConsume(COLS);
           ap = qp;
           ax = a;
@@ -1683,9 +1685,11 @@ public class QueryParser extends InputParser {
       e = compConstructor();
       if(e != null) return e;
       // ordered expression
-      if(wdConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
-         wdConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
+      if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
+         wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
         return enclosed(NOENCLEXPR);
+
+      if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE)) return mapLiteral();
     }
     // context item
     if(c == '.' && !digit(next())) {
@@ -1697,6 +1701,28 @@ public class QueryParser extends InputParser {
     if(digit(c) || c == '.') return numericLiteral(false);
     // strings
     return quote(c) ? Str.get(stringLiteral()) : null;
+  }
+
+  /**
+   * Parses a literal map.
+   * TODO adapt to actual spec when available.
+   * @return map literal
+   * @throws QueryException query exception
+   */
+  private Expr mapLiteral() throws QueryException {
+    wsCheck(BRACE1);
+    Expr[] args = {};
+
+    if(!wsConsume(BRACE2)) {
+      do {
+        args = Array.add(args, check(single(), XPEMPTY));
+        wsCheck(ASSIGN);
+        args = Array.add(args, check(single(), XPEMPTY));
+      } while(wsConsume(COMMA));
+      wsCheck(BRACE2);
+    }
+
+    return new LitMap(input(), args);
   }
 
   /**
@@ -2355,17 +2381,27 @@ public class QueryParser extends InputParser {
       if(t != null && t.func()) {
         // function type
         if(!wsConsume(ASTERISK)) {
-          SeqType[] args = {};
-          if(!wsConsume(PAR2)) {
-            // function has got arguments
-            do {
-              args = Array.add(args, sequenceType());
-            } while(wsConsume(COMMA));
-
+          if(t.map()) {
+            final Type keyType = itemType();
+            if(keyType == null) throw error(MAPTKV, type.atom());
+            if(!keyType.instance(AtomType.AAT)) throw error(MAPTAAT, keyType);
+            wsCheck(COMMA);
+            t = MapType.get((AtomType) keyType, sequenceType());
             if(!wsConsume(PAR2)) error(FUNCMISS, type.atom());
+          } else {
+            // function type
+            SeqType[] args = {};
+            if(!wsConsume(PAR2)) {
+              // function has got arguments
+              do {
+                args = Array.add(args, sequenceType());
+              } while(wsConsume(COMMA));
+
+              if(!wsConsume(PAR2)) error(FUNCMISS, type.atom());
+            }
+            wsCheck(AS);
+            t = FunType.get(args, sequenceType());
           }
-          wsCheck(AS);
-          t = FunType.get(args, sequenceType());
         } else if(!wsConsume(PAR2)) {
           error(FUNCMISS, type.atom());
         }
@@ -2948,7 +2984,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr transform() throws QueryException {
-    if(!wdConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
+    if(!wsConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
     final boolean u = ctx.updating;
     ctx.updating = false;
 
@@ -3116,12 +3152,13 @@ public class QueryParser extends InputParser {
 
   /**
    * Raises an error if the specified expression is empty.
+   * @param <E> expression type
    * @param expr expression
    * @param err error message
    * @return expression
    * @throws QueryException query exception
    */
-  private Expr check(final Expr expr, final Err err)
+  private <E extends Expr> E check(final E expr, final Err err)
       throws QueryException {
     if(expr == null) error(err);
     return expr;
@@ -3198,7 +3235,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean wdConsumeWs(final String s1, final String s2,
+  private boolean wsConsumeWs(final String s1, final String s2,
       final Err expr) throws QueryException {
     final int p = qp;
     if(!wsConsumeWs(s1)) return false;
@@ -3273,13 +3310,14 @@ public class QueryParser extends InputParser {
 
   /**
    * Throws the alternative error message.
+   * @return never
    * @throws QueryException query exception
    */
-  private void error() throws QueryException {
+  private QueryException error() throws QueryException {
     qp = ap;
-    if(alter != FUNCUNKNOWN) error(alter);
+    if(alter != FUNCUNKNOWN) throw error(alter);
     ctx.funcs.funError(alterFunc, this);
-    error(alter, alterFunc.atom());
+    throw error(alter, alterFunc.atom());
   }
 
   /**
@@ -3302,9 +3340,11 @@ public class QueryParser extends InputParser {
    * Throws the specified error.
    * @param err error to be thrown
    * @param arg error arguments
+   * @return never
    * @throws QueryException query exception
    */
-  public void error(final Err err, final Object... arg) throws QueryException {
-    err.thrw(input(), arg);
+  public QueryException error(final Err err, final Object... arg)
+      throws QueryException {
+    throw err.thrw(input(), arg);
   }
 }

@@ -22,14 +22,14 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class FNContext extends Fun {
+public final class FNContext extends Fun {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNContext(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNContext(final InputInfo ii, final FunDef f, final Expr... e) {
     super(ii, f, e);
   }
 
