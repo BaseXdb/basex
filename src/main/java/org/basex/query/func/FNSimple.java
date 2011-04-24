@@ -13,6 +13,7 @@ import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.AxisIter;
@@ -60,6 +61,20 @@ public final class FNSimple extends Fun {
         return ctx.iter(expr[0]);
       default:
         return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    switch(def) {
+      case ONEORMORE:
+        final Value val = ctx.value(expr[0]);
+        if(val.size() == 0) throw EXPECTOM.thrw(input);
+        return val;
+      case UNORDER:
+        return ctx.value(expr[0]);
+      default:
+        return super.value(ctx);
     }
   }
 
