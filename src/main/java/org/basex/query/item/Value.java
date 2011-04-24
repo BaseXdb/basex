@@ -155,7 +155,7 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public final String desc() {
+  public String desc() {
     return name();
   }
 

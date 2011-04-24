@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.map.Map;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -256,9 +257,18 @@ public final class SeqType {
     final long size = val.size();
     if(occ.min > size || size > occ.max) return false;
 
+    // the empty sequence has every type
+    if(size == 0) return true;
+
+    final MapType mt = type.map() ? (MapType) type : null;
     for(long i = 0; i < size; i++) {
       final Item it = val.itemAt(i);
-      if(!it.type.instance(type) || !checkExt(it)) return false;
+
+      // maps don't have type information attached to them, you have to look...
+      if(!(mt != null ? it.map() && ((Map) it).hasType(mt) :
+          it.type.instance(type) && checkExt(it))) return false;
+
+      if(i == 0 && val.homogenous()) return true;
     }
     return true;
   }
