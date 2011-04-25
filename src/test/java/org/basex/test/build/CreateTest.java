@@ -20,7 +20,7 @@ import org.junit.Test;
  */
 public final class CreateTest {
   /** Database context. */
-  private static final Context CTX = new Context();
+  private static final Context CONTEXT = new Context();
 
   /** Test database name. */
   private static final String DBNAME = Util.name(CreateTest.class);
@@ -64,7 +64,7 @@ public final class CreateTest {
    */
   @After
   public void tearDown() throws BaseXException {
-    new DropDB(DBNAME).execute(CTX);
+    new DropDB(DBNAME).execute(CONTEXT);
   }
 
   /**
@@ -73,7 +73,7 @@ public final class CreateTest {
    */
   @Test
   public void createDB() throws BaseXException {
-    new CreateDB(DBNAME).execute(CTX);
+    new CreateDB(DBNAME).execute(CONTEXT);
     // check if database name equals argument of create command
     assertEquals(dbName(), DBNAME);
   }
@@ -85,7 +85,7 @@ public final class CreateTest {
   @Test
   public void createDBWithInput() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
-      new CreateDB(DBNAME, INPUTS[i]).execute(CTX);
+      new CreateDB(DBNAME, INPUTS[i]).execute(CONTEXT);
       // check name of database
       assertEquals(DBNAME, dbName());
       // check name of document
@@ -100,8 +100,8 @@ public final class CreateTest {
   @Test
   public void createDBandAdd() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
-      new CreateDB(DBNAME).execute(CTX);
-      new Add(INPUTS[i]).execute(CTX);
+      new CreateDB(DBNAME).execute(CONTEXT);
+      new Add(INPUTS[i]).execute(CONTEXT);
       // check name of document
       assertEquals(NAMES[i], docName());
     }
@@ -114,8 +114,8 @@ public final class CreateTest {
   @Test
   public void createDBandAddAs() throws BaseXException {
     for(final String in : INPUTS) {
-      new CreateDB(DBNAME).execute(CTX);
-      new Add(in, DOCNAME).execute(CTX);
+      new CreateDB(DBNAME).execute(CONTEXT);
+      new Add(in, DOCNAME).execute(CONTEXT);
       // check name of document (first file in folder or specified name)
       assertEquals(in == FOLDER ? FOLDERFILE : DOCNAME, docName());
     }
@@ -128,8 +128,8 @@ public final class CreateTest {
   @Test
   public void createDBandAddTo() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
-      new CreateDB(DBNAME).execute(CTX);
-      new Add(INPUTS[i], null, TARGET).execute(CTX);
+      new CreateDB(DBNAME).execute(CONTEXT);
+      new Add(INPUTS[i], null, TARGET).execute(CONTEXT);
       // check name of document
       assertEquals(TARGET + NAMES[i], docName());
     }
@@ -142,8 +142,8 @@ public final class CreateTest {
   @Test
   public void createDBandAddAsTO() throws BaseXException {
     for(final String in : INPUTS) {
-      new CreateDB(DBNAME).execute(CTX);
-      new Add(in, DOCNAME, TARGET).execute(CTX);
+      new CreateDB(DBNAME).execute(CONTEXT);
+      new Add(in, DOCNAME, TARGET).execute(CONTEXT);
       // check name of document (first file in folder or specified name)
       assertEquals(TARGET + (in == FOLDER ? FOLDERFILE : DOCNAME), docName());
     }
@@ -154,7 +154,7 @@ public final class CreateTest {
    * @return database name
    */
   private String dbName() {
-    return CTX.data.meta.name;
+    return CONTEXT.data.meta.name;
   }
 
   /**
@@ -162,6 +162,6 @@ public final class CreateTest {
    * @return first document name
    */
   private String docName() {
-    return Token.string(CTX.data.text(CTX.current.list[0], true));
+    return Token.string(CONTEXT.data.text(CONTEXT.current.list[0], true));
   }
 }

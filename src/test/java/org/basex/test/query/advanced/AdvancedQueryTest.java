@@ -17,7 +17,7 @@ import org.basex.query.util.Err;
  */
 abstract class AdvancedQueryTest {
   /** Database context. */
-  protected static final Context CTX = new Context();
+  protected static final Context CONTEXT = new Context();
 
   /**
    * Runs the specified query.
@@ -26,7 +26,7 @@ abstract class AdvancedQueryTest {
    * @throws QueryException database exception
    */
   protected static String query(final String qu) throws QueryException {
-    final QueryProcessor qp = new QueryProcessor(qu, CTX);
+    final QueryProcessor qp = new QueryProcessor(qu, CONTEXT);
     try {
       return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
     } finally {
