@@ -7,6 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.SeqType;
 import org.basex.query.util.Err;
 
 /**
@@ -111,7 +112,7 @@ abstract class AdvancedQueryTest {
             qu.append("1");
           } else { // any type (skip test)
             qu.append("'X'");
-            if(def.args[a].type == AtomType.ITEM) any++;
+            if(SeqType.STR.instance(def.args[a])) any++;
           }
         } else {
           // test wrong number of arguments
