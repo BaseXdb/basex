@@ -5,6 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
@@ -28,15 +29,11 @@ public final class List extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
+    for(int e = expr.length; --e >= 0;) expr[e] = expr[e].comp(ctx);
     checkUp(ctx, expr);
 
-    if(values()) {
-      // return simple sequence if all values are items or empty sequences
-      final ItemCache ic = new ItemCache(expr.length);
-      for(final Expr e : expr) ic.add(ctx.value(e));
-      return ic.finish();
-    }
+    // return simple sequence if all values are items or empty sequences
+    if(values()) return value(ctx);
 
     // evaluate sequence type
     type = expr[0].type();
@@ -76,6 +73,13 @@ public final class List extends Arr {
         }
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    final ItemCache ic = new ItemCache(Math.max(expr.length, 2));
+    for(final Expr e : expr) ic.add(ctx.value(e));
+    return ic.finish();
   }
 
   @Override
