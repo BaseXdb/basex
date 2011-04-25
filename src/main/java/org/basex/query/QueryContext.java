@@ -291,10 +291,9 @@ public final class QueryContext extends Progress {
    */
   public Iter iter() throws QueryException {
     try {
-      final Iter iter = iter(root);
-      if(!updating) return iter;
+      if(!updating) return iter(root);
 
-      final Value v = iter.finish();
+      final Value v = value(root);
       updates.apply(this);
       if(context.data != null) context.update();
       return v.iter();

@@ -17,6 +17,7 @@ import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -133,6 +134,12 @@ public final class FNUtil extends Fun {
       @Override
       public Item get(final long i) {
         return new Itr(bin[(int) i], AtomType.BYT);
+      }
+      @Override
+      public Value finish() {
+        final Item[] bs = new Item[bin.length];
+        for(int i = bs.length; --i >= 0;) bs[i] = new Itr(bin[i], AtomType.BYT);
+        return Seq.get(bs, bs.length);
       }
     };
   }

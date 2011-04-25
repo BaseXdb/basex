@@ -82,6 +82,8 @@ public final class DBNodeSeq extends Seq {
       public long size() { return size; }
       @Override
       public boolean reset() { c = -1; return true; }
+      @Override
+      public Value finish() { return DBNodeSeq.this; }
     };
   }
 
