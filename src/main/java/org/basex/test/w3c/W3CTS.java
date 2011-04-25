@@ -391,7 +391,7 @@ public abstract class W3CTS {
             DataText.YES : DataText.NO);
         final XMLSerializer xml = new XMLSerializer(ao, sp);
 
-        iter = xq.iter().finish().cache();
+        iter = xq.value().cache();
         for(Item it; (it = iter.next()) != null;) {
           doc &= it.type == NodeType.DOC;
           it.serialize(xml);
@@ -710,7 +710,7 @@ public abstract class W3CTS {
       final String file = pth + string(data.atom(nod.list[c])) + IO.XQSUFFIX;
       final String in = read(IO.get(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
-      final Value val = xq.iter().finish();
+      final Value val = xq.value();
       qp.bind(string(data.atom(var.list[c])), val);
       xq.close();
     }
