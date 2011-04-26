@@ -151,6 +151,8 @@ public enum Err {
   /** FORG0001: Evaluation exception. */
   DATERANGE(FORG, 1, "%(\"%\") out of range."),
   /** FORG0001: Evaluation exception. */
+  DATEINV(FORG, 1, "%(\"%\") is no valid ISO 8601 date."),
+  /** FORG0001: Evaluation exception. */
   DATEFORMAT(FORG, 1, "Wrong % format: \"%\" (try: \"%\")."),
   /** FORG0001: Evaluation exception. */
   QNMINV(FORG, 1, "Invalid QName: \"%\"."),
@@ -452,6 +454,8 @@ public enum Err {
   XPCAST(XPTY, 4, "Invalid %(%) cast."),
   /** XPTY0004: Typing Exception. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
+  /** XPTY0004: Typing Exception. */
+  SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
   /** XPTY0004: Typing exception. */
   XPEMPTY(XPTY, 4, "%: no empty sequence allowed."),
   /** XPTY0004: Typing Exception. */
