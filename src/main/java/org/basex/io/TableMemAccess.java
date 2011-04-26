@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 
-import javax.naming.OperationNotSupportedException;
-
 import org.basex.data.MetaData;
 
 /**
@@ -185,22 +183,6 @@ public final class TableMemAccess extends TableAccess {
   @Override
   public void delete(final int pre, final int nr) {
     move(pre + nr, pre);
-  }
-
-  @Override
-  public void replace(final int pre, final byte[] entries) {
-    try {
-      throw new OperationNotSupportedException();
-    } catch(OperationNotSupportedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
-
-  @Override
-  public void replace2(final int pre, final byte[] entries,
-      final int replacedSubtreeSize) {
-    // TODO Auto-generated method stub
   }
 
   @Override

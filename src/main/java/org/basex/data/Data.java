@@ -532,8 +532,7 @@ public abstract class Data {
     // able to speed up the copy process even more
 
     final int dsize = d.meta.size;
-    final int buf = dsize;
-    buffer(buf);
+    buffer(dsize);
     int dpre = -1;
     final int rkind = kind(rpre);
     while(++dpre != dsize) {
@@ -575,20 +574,19 @@ public abstract class Data {
 
     // increase/decrease size of ancestors, adjust distances of siblings
     final int rpar = parent(rpre, rkind);
+    // diff > 0 if old subtree is bigger than new one, v.v.
     final int diff = rsize - dsize;
+    // don't have to update distances/sizes if the two subtrees have the same
+    // number of nodes
+    if(diff == 0) return;
 
-    // new subtree bigger than old one
-    if(diff < 0) {
-      int p = rpar;
-      while(p >= 0) {
-        final int k = kind(p);
-        size(p, k, size(p, k) + Math.abs(diff));
-        p = parent(p, k);
-      }
-      updateDist(rpre + dsize, diff);
-    } else if(rsize > dsize) {
-      // TODO combine with the upper
+    int p = rpar;
+    while(p >= 0) {
+      final int k = kind(p);
+      size(p, k, size(p, k) + diff);
+      p = parent(p, k);
     }
+    updateDist(rpre + dsize, diff);
   }
 
   /**
