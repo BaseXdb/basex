@@ -42,13 +42,16 @@ public final class ReplaceNode extends NodeCopy {
       // overwrite existing text node
       d.replace(pre, Data.TEXT, md.text(0, true));
       // check if simple, fast replace is possible
-    } else if(md.meta.size > 0 && d instanceof DiskData && d.ns.size() == 0
-        && md.ns.size() == 0 /*&& d.size(pre, kind) == md.meta.size*/) {
-      d.fastReplace(pre, md);
+    /*} else if(md.meta.size > 0 && d.ns.size() == 0 && md.ns.size() == 0) {
+        */
+        //&& d.size(pre, kind) == md.meta.size*/) {
+      d.replace(pre, md);
     } else {
       d.delete(pre);
-      if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
-      else if(md != null) d.insert(pre, par, md);
+      if(md != null) {
+        if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
+        else d.insert(pre, par, md);
+      }
       if(!mergeTexts(d, pre - 1, pre)) {
         pre += md != null ? md.meta.size : 1;
         mergeTexts(d, pre - 1, pre);

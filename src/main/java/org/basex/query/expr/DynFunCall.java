@@ -35,7 +35,7 @@ public final class DynFunCall extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    final Type t = fun().type().type;
+    final Type t = expr[expr.length - 1].type().type;
     if(t instanceof FunType) {
       final FunType ft = (FunType) t;
       if(ft.ret != null) type = ft.ret;
@@ -46,35 +46,29 @@ public final class DynFunCall extends Arr {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final int n = expr.length - 1;
-
-    final Value[] argv = new Value[n];
-    // evaluate arguments
-    for(int a = 0; a < n; ++a) argv[a] = expr[a].value(ctx);
-
-    return getFun(ctx).invItem(ctx, ii, argv);
+    return getFun(ctx).invItem(ctx, ii, argv(ctx));
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final int n = expr.length - 1;
-
-    final Value[] argv = new Value[n];
-    // evaluate arguments
-    for(int a = 0; a < n; ++a) argv[a] = expr[a].value(ctx);
-
-    return getFun(ctx).invValue(ctx, input, argv);
+    return getFun(ctx).invValue(ctx, input, argv(ctx));
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-      final int n = expr.length - 1;
+    return getFun(ctx).invIter(ctx, input, argv(ctx));
+  }
 
-      final Value[] argv = new Value[n];
-      // evaluate arguments
-      for(int a = 0; a < n; ++a) argv[a] = expr[a].value(ctx);
-
-    return getFun(ctx).invIter(ctx, input, argv);
+  /**
+   * Evaluates all arguments.
+   * @param ctx query context
+   * @return array of argument values
+   * @throws QueryException query exception
+   */
+  private Value[] argv(final QueryContext ctx) throws QueryException {
+    final Value[] argv = new Value[expr.length - 1];
+    for(int i = argv.length; --i >= 0;) argv[i] = expr[i].value(ctx);
+    return argv;
   }
 
   /**
@@ -88,24 +82,6 @@ public final class DynFunCall extends Arr {
     if(!it.func() || ((FItem) it).arity() != expr.length - 1)
       Err.type(this, FunType.arity(expr.length - 1), it);
     return (FItem) it;
-  }
-
-  /**
-   * The function expression.
-   * @return function
-   */
-  public Expr fun() {
-    return expr[expr.length - 1];
-  }
-
-  /**
-   * Argument expressions.
-   * @return arguments
-   */
-  public Expr[] args() {
-    final Expr[] args = new Expr[expr.length - 1];
-    System.arraycopy(expr, 0, args, 0, args.length);
-    return args;
   }
 
   @Override

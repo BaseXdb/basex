@@ -17,10 +17,10 @@ import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.ItrSeq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ValueIter;
 import org.basex.util.Array;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
@@ -48,10 +48,20 @@ public final class FNUtil extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
+      case EVAL: return eval(ctx).iter();
+      case RUN: return run(ctx).iter();
+      case TO_BYTES: return bytes(ctx).iter();
+      default: return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    switch(def) {
       case EVAL: return eval(ctx);
-      case RUN:  return run(ctx);
+      case RUN: return run(ctx);
       case TO_BYTES: return bytes(ctx);
-      default:   return super.iter(ctx);
+      default: return super.value(ctx);
     }
   }
 
@@ -77,7 +87,7 @@ public final class FNUtil extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter eval(final QueryContext ctx) throws QueryException {
+  private Value eval(final QueryContext ctx) throws QueryException {
     return eval(ctx, checkEStr(expr[0], ctx));
   }
 
@@ -87,7 +97,7 @@ public final class FNUtil extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter run(final QueryContext ctx) throws QueryException {
+  private Value run(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     try {
       return eval(ctx, io.content());
@@ -103,13 +113,13 @@ public final class FNUtil extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter eval(final QueryContext ctx, final byte[] qu)
+  private Value eval(final QueryContext ctx, final byte[] qu)
       throws QueryException {
 
     final QueryContext qt = new QueryContext(ctx.context);
     qt.parse(string(qu));
     qt.compile();
-    return qt.iter().finish().cache();
+    return qt.value();
   }
 
   /**
@@ -118,23 +128,9 @@ public final class FNUtil extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter bytes(final QueryContext ctx) throws QueryException {
-    final byte[] bin = ((B64) checkType(expr[0].item(ctx, input),
-        AtomType.B64)).toJava();
-
-    return new ValueIter() {
-      int pos;
-      @Override
-      public Item next() { return pos < bin.length ? get(pos++) : null; }
-      @Override
-      public long size() { return bin.length; }
-      @Override
-      public boolean reset() { pos = 0; return true; }
-      @Override
-      public Item get(final long i) {
-        return new Itr(bin[(int) i], AtomType.BYT);
-      }
-    };
+  private Value bytes(final QueryContext ctx) throws QueryException {
+    return ItrSeq.get(((B64) checkType(expr[0].item(ctx, input),
+        AtomType.B64)).toJava(), AtomType.BYT);
   }
 
 
@@ -180,7 +176,7 @@ public final class FNUtil extends Fun {
     Performance.gc(2);
     final double d = Performance.mem() - l;
 
-    // [LW] (why) is that necessary?
+    // [LW][CG] (why) is that necessary?
     // loop through all results to avoid premature result disposal
     final Iter ir = val.iter();
     while(ir.next() != null);

@@ -25,15 +25,11 @@ public final class InsertBefore extends InsertBase {
 
   @Override
   public int apply(final int add) {
-    // source nodes may be empty, thus insert has no effect at all
-    if(md != null) {
-      final DBNode n = (DBNode) node;
-      final Data d = n.data;
-      final int pre = n.pre;
-      d.insert(pre, d.parent(pre, d.kind(pre)), md);
-      return md.meta.size;
-    }
-    return 0;
+    final DBNode n = (DBNode) node;
+    final Data d = n.data;
+    final int pre = n.pre;
+    d.insert(pre, d.parent(pre, d.kind(pre)), md);
+    return md.meta.size;
   }
 
   @Override

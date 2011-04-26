@@ -51,9 +51,9 @@ public final class FNAcc extends Fun {
         return number(ctx.iter(e), ctx);
       case STRLEN:
         return Itr.get(len(checkEStr(e, ctx)));
-      case NORM:
+      case NRMSTR:
         return Str.get(norm(checkEStr(e, ctx)));
-      case URIQNAME:
+      case URIQNM:
         it = e.item(ctx, input);
         if(it == null) return null;
         final QNm qn = (QNm) checkType(it, AtomType.QNM);

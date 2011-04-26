@@ -38,6 +38,9 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {
+  /** Optionally defined parser. */
+  private final Parser parser;
+
   /**
    * Default constructor.
    * @param name name of database
@@ -52,7 +55,18 @@ public final class CreateDB extends ACreate {
    * @param input input file path or XML string
    */
   public CreateDB(final String name, final String input) {
+    this(name, input, null);
+  }
+
+  /**
+   * Constructor, specifying an input.
+   * @param name name of database
+   * @param input input file path or XML string
+   * @param p parser reference
+   */
+  public CreateDB(final String name, final String input, final Parser p) {
     super(name, input);
+    parser = p;
   }
 
   @Override
@@ -62,8 +76,8 @@ public final class CreateDB extends ACreate {
     if(input == null) return build(Parser.emptyParser(name), name);
     final IO io = IO.get(input);
     if(io instanceof IOContent) io.name(name + IO.XMLSUFFIX);
-    return io.exists() ? build(new DirParser(io, prop), name) :
-      error(FILEWHICH, io);
+    final Parser p = parser != null ? parser : new DirParser(io, prop);
+    return io.exists() ? build(p, name) : error(FILEWHICH, io);
   }
 
   /**

@@ -1,7 +1,6 @@
 package org.basex.io;
 
 import java.io.IOException;
-
 import org.basex.data.MetaData;
 
 /**
@@ -106,20 +105,12 @@ public abstract class TableAccess {
   public abstract void write5(int p, int o, long v);
 
   /**
-   * More efficient replace method which exploits block management.
+   * Replaces entries in the database.
    * @param pre node to be replaced
    * @param entries new entries
+   * @param sub size of the subtree that is replaced
    */
-  public abstract void replace(int pre, byte[] entries);
-
-  /**
-   * More efficient replace method which exploits block management.
-   * @param pre node to be replaced
-   * @param entries new entries
-   * @param replacedSubtreeSize size of the subtree that is replaced
-   */
-  public abstract void replace2(int pre, byte[] entries,
-      final int replacedSubtreeSize);
+  public abstract void replace(int pre, byte[] entries, final int sub);
 
   /**
    * Deletes the specified number of entries from the database.

@@ -1,6 +1,7 @@
 package org.basex.query.iter;
 
 import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 
 /**
  * Value iterator interface, throwing no exceptions.
@@ -17,4 +18,6 @@ public abstract class ValueIter extends Iter {
   public abstract long size();
   @Override
   public abstract boolean reset();
+  @Override
+  public abstract Value finish();
 }

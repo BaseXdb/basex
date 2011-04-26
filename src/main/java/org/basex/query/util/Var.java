@@ -76,7 +76,23 @@ public final class Var extends ParseExpr {
    */
   public static Var create(final QueryContext ctx, final InputInfo ii,
       final QNm n) {
-    return create(ctx, ii, n, null);
+    return create(ctx, ii, n, (SeqType) null);
+  }
+
+  /**
+   * Creates a new variable.
+   * @param ctx query context
+   * @param ii input info
+   * @param n variable name
+   * @param v variable to be bound
+   * @return variable
+   */
+  public static Var create(final QueryContext ctx, final InputInfo ii,
+      final QNm n, final Value v) {
+    final Var var = create(ctx, ii, n, v.type());
+    var.expr = v;
+    var.value = v;
+    return var;
   }
 
   /**

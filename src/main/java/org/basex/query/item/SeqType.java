@@ -4,7 +4,9 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.map.Map;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
@@ -20,15 +22,15 @@ public final class SeqType {
     /** Zero.         */  Z(0, 0, ""),
     /** Zero or one.  */ ZO(0, 1, "?"),
     /** Exactly one.  */  O(1, 1, ""),
-    /** One or more.  */ OM(1, Long.MAX_VALUE, "+"),
-    /** Zero or more. */ ZM(0, Long.MAX_VALUE, "*");
+    /** One or more.  */ OM(1, Integer.MAX_VALUE, "+"),
+    /** Zero or more. */ ZM(0, Integer.MAX_VALUE, "*");
 
     /** String representation. */
     private final String str;
     /** Minimal number of occurrences. */
-    public final long min;
+    public final int min;
     /** Maximal number of occurrences. */
-    public final long max;
+    public final int max;
 
     /**
      * Constructor.
@@ -36,7 +38,7 @@ public final class SeqType {
      * @param mx maximal number of occurrences
      * @param s string representation
      */
-    Occ(final long mn, final long mx, final String s) {
+    Occ(final int mn, final int mx, final String s) {
       min = mn;
       max = mx;
       str = s;
@@ -83,12 +85,14 @@ public final class SeqType {
   public static final SeqType AAT_ZO = new SeqType(AtomType.AAT, Occ.ZO);
   /** Zero or more xs:anyAtomicType. */
   public static final SeqType AAT_ZM = new SeqType(AtomType.AAT, Occ.ZM);
-  /** Single boolean. */
+  /** Single xs:boolean. */
   public static final SeqType BLN = AtomType.BLN.seq();
-  /** Zero or one booleans. */
+  /** Zero or one xs:boolean. */
   public static final SeqType BLN_ZO = new SeqType(AtomType.BLN, Occ.ZO);
-  /** Single Base64Binary. */
+  /** Single xs:base64Binary. */
   public static final SeqType B64 = AtomType.B64.seq();
+  /** Zero or more xs:base64Binary. */
+  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZM);
   /** Double number. */
   public static final SeqType DBL = AtomType.DBL.seq();
   /** Double number. */
@@ -252,13 +256,55 @@ public final class SeqType {
    */
   public boolean instance(final Value val) {
     final long size = val.size();
-    if(occ.min > size || size > occ.max) return false;
+    if(!occ.check(size)) return false;
 
+    // the empty sequence has every type
+    if(size == 0) return true;
+
+    final MapType mt = type.map() ? (MapType) type : null;
     for(long i = 0; i < size; i++) {
-      final Item it = val.itemAt(i);
-      if(!it.type.instance(type) || !checkExt(it)) return false;
+      if(!check(val.itemAt(i), mt)) return false;
+      if(i == 0 && val.homogenous()) break;
     }
     return true;
+  }
+
+  /**
+   * Matches an iterator against this sequence type.
+   * @param iter iterator to be checked
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean instance(final Iter iter) throws QueryException {
+    final MapType mt = type.map() ? (MapType) type : null;
+
+    Item it = iter.next();
+    if(it == null) return occ.check(0);
+    if(occ.max == 0 || !check(it, mt)) return false;
+
+    it = iter.next();
+    // occ.max >= 1 because of the check above
+    if(it == null) return true;
+    if(occ.max == 1) return false;
+
+    do {
+      if(!check(it, mt)) return false;
+      it = iter.next();
+    } while(it != null);
+
+    return true;
+  }
+
+  /**
+   * Checks if the given item is of this SeqType's type.
+   * @param it item to check
+   * @param mt map type of this type, {@code null} if it's something else
+   * @return result of check
+   */
+  private boolean check(final Item it, final MapType mt) {
+    // maps don't have type information attached to them, you have to look...
+    return mt != null ? it.map() && ((Map) it).hasType(mt) :
+        it.type.instance(type) && checkExt(it);
   }
 
   /**

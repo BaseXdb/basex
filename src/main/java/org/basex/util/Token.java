@@ -980,12 +980,13 @@ public final class Token {
   public static byte[] replace(final byte[] token, final int search,
       final int replace) {
 
+    final TokenBuilder tb = new TokenBuilder(token.length);
     final int tl = token.length;
-    final byte[] tok = new byte[tl];
-    for(int i = 0; i < tl; ++i) {
-      tok[i] = token[i] == search ? (byte) replace : token[i];
+    for(int i = 0; i < tl; i += cl(token, i)) {
+      final int c = cp(token, i);
+      tb.add(c == search ? replace : c);
     }
-    return tok;
+    return tb.finish();
   }
 
   /**

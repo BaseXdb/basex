@@ -27,8 +27,8 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Before
   public void initTest() throws BaseXException {
-    new CreateDB("db", FILE).execute(CTX);
-    new CreateIndex("fulltext").execute(CTX);
+    new CreateDB("db", FILE).execute(CONTEXT);
+    new CreateIndex("fulltext").execute(CONTEXT);
   }
 
   /**
@@ -46,11 +46,11 @@ public final class FNFtTest extends AdvancedQueryTest {
     query(fun + "(., 'XXX')", "");
 
     // apply index options to query term
-    new Set("stemming", true).execute(CTX);
-    new CreateIndex("fulltext").execute(CTX);
+    new Set("stemming", true).execute(CONTEXT);
+    new CreateIndex("fulltext").execute(CONTEXT);
     contains(fun + "(., 'Exercises')/..", "<li>Exercise 1</li>");
-    new Set("stemming", false).execute(CTX);
-    new CreateIndex("fulltext").execute(CTX);
+    new Set("stemming", false).execute(CONTEXT);
+    new CreateIndex("fulltext").execute(CONTEXT);
   }
 
   /**
@@ -110,6 +110,6 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @AfterClass
   public static void finish() throws BaseXException {
-    new DropDB("db").execute(CTX);
+    new DropDB("db").execute(CONTEXT);
   }
 }

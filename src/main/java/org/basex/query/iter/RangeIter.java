@@ -59,6 +59,6 @@ public final class RangeIter extends ValueIter {
 
   @Override
   public String toString() {
-    return "(" + min + " to " + max + ")";
+    return "(" + min + " to " + (max - 1) + ")";
   }
 }

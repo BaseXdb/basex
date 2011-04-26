@@ -510,8 +510,8 @@ public abstract class Data {
   }
 
   /**
-   * Replaces (updates) a text, comment, pi or attribute value.
-   * @param pre pre value
+   * Replaces the value of a single text, comment, pi or attribute node.
+   * @param pre pre value to be replaced
    * @param k node kind
    * @param val value to be updated (tag name, text, comment, pi)
    */
@@ -522,22 +522,25 @@ public abstract class Data {
   }
 
   /**
-   * Fast replace.
-   * @param replacedPre pre value to be replaced
+   * Replaces parts of the database with the specified data instance.
+   * @param rpre pre value to be replaced
    * @param d replace data
    */
-  public final void fastReplace(final int replacedPre, final Data d) {
+  public final void replace(final int rpre, final Data d) {
+    // [LK] if we know that both data references will use the same tag and
+    // attribute indexes (..which should be the default case..) we might be
+    // able to speed up the copy process even more
+
     final int dsize = d.meta.size;
     final int buf = dsize;
     buffer(buf);
     int dpre = -1;
-    final int rKind = kind(replacedPre);
+    final int rkind = kind(rpre);
     while(++dpre != dsize) {
       final int dkind = d.kind(dpre);
       final int dpar = d.parent(dpre, dkind);
-      final int pre = replacedPre + dpre;
-      final int dis = dpar >= 0 ? dpre - dpar : pre -
-          parent(replacedPre, rKind);
+      final int pre = rpre + dpre;
+      final int dis = dpar >= 0 ? dpre - dpar : pre - parent(rpre, rkind);
 
       switch(dkind) {
         case DOC:
@@ -566,23 +569,24 @@ public abstract class Data {
       }
     }
 
-    final int oldSubTreeSize = size(replacedPre, rKind);
-    table.replace2(replacedPre, buffer(), oldSubTreeSize);
+    final int rsize = size(rpre, rkind);
+    table.replace(rpre, buffer(), rsize);
     buffer(1);
 
     // increase/decrease size of ancestors, adjust distances of siblings
-    final int replacedPreParent = parent(replacedPre, rKind);
-    final int diff = oldSubTreeSize - dsize;
+    final int rpar = parent(rpre, rkind);
+    final int diff = rsize - dsize;
+
     // new subtree bigger than old one
-    if(diff <= -1) {
-      int p = replacedPreParent;
+    if(diff < 0) {
+      int p = rpar;
       while(p >= 0) {
         final int k = kind(p);
         size(p, k, size(p, k) + Math.abs(diff));
         p = parent(p, k);
       }
-      updateDist(replacedPre + dsize, diff);
-    } else if(oldSubTreeSize > dsize) {
+      updateDist(rpre + dsize, diff);
+    } else if(rsize > dsize) {
       // TODO combine with the upper
     }
   }
@@ -816,7 +820,7 @@ public abstract class Data {
 
   /**
    * This method updates the distance values of the specified pre value
-   * and the following siblings.
+   * and the following siblings of all ancestor-or-self nodes.
    * @param pre root node
    * @param s size to be added/removed
    */

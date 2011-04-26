@@ -194,10 +194,7 @@ final class Branch extends TrieNode {
     for(int i = 0; i < KIDS; i++) {
       final boolean bit = (used & 1 << i) != 0, act = kids[i] != null;
       if(bit ^ act) return false;
-      if(act) {
-        if(!kids[i].verify()) return false;
-        c += kids[i].size;
-      }
+      if(act) c += kids[i].size;
     }
     return c == size;
   }
@@ -209,8 +206,8 @@ final class Branch extends TrieNode {
 
   @Override
   boolean hasType(final AtomType kt, final SeqType vt) {
-    for(final TrieNode ch : kids)
-      if(ch != null && !ch.hasType(kt, vt)) return false;
+    for(final TrieNode k : kids)
+      if(!(k == null || k.hasType(kt, vt))) return false;
     return true;
   }
 

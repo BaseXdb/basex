@@ -245,79 +245,28 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public void replace(final int pre, final byte[] entries) {
-    if(entries.length == 0) return;
-
-    // alternative correct? cursor(pre)
-    int blockOffset = cursor(pre - 1) + (1 << IO.NODEPOWER);
-    final int numberOfRecords = entries.length >>> IO.NODEPOWER;
-    final int rightSiblingPre = pre + numberOfRecords;
-
-    // entries to be replaced are within a block
-    if(rightSiblingPre <= npre) {
-      System.arraycopy(entries, 0, bf.data, blockOffset, entries.length);
-      bf.dirty = true;
-      dirty = true;
-      // entries to be replaced are distributed over more than one block
-    } else {
-      final int lastToOwPre = pre + numberOfRecords - 1;
-      int currentSourcePos = 0;
-      // lasttoowpre must be >= npre+nr pre on this block
-      while(lastToOwPre >= npre) {
-        // on the first block we start at pre, the following blocks at fpre
-        final int firstOwPreCurrentBlock = Math.max(fpre, pre);
-        final int lastOwPreCurrentBlock = npre > lastToOwPre ? lastToOwPre :
-          npre - 1;
-        final int nrOfNodesToOw = lastOwPreCurrentBlock -
-          firstOwPreCurrentBlock + 1;
-        final int nrOfEntriesToOw = nrOfNodesToOw << IO.NODEPOWER;
-        System.arraycopy(entries, currentSourcePos, bf.data, blockOffset,
-            nrOfEntriesToOw);
-        bf.dirty = true;
-        dirty = true;
-
-        // last step - fetch next block
-        readBlock(index + 1);
-        blockOffset = 0;
-        currentSourcePos += nrOfEntriesToOw;
-      }
-      bf.dirty = true;
-      dirty = true;
+  public void replace(final int pre, final byte[] entries, final int sub) {
+    final int nsize = entries.length >>> IO.NODEPOWER;
+    final int rpre = pre + nsize;
+    int off = 0;
+    final int diff = sub - nsize;
+    final int max = rpre - Math.abs(diff);
+    for(int i = pre; i < max; i++) {
+      final int o = cursor(pre);
+      final byte[] b = bf.data;
+      for(int j = 0; j < 16; j++) b[o + j] = entries[off++];
     }
-  }
+    bf.dirty = true;
 
-  @Override
-  public void replace2(final int pre, final byte[] entries,
-      final int oldSubtreeSize) {
-    if(entries.length == 0) return;
-
-    final int newSubtreeSize = entries.length >>> IO.NODEPOWER;
-    final int rightSiblingPre = pre + newSubtreeSize;
-    int entriesOffset = 0;
-    final int diff = oldSubtreeSize - newSubtreeSize;
-    for(int i = pre; i < rightSiblingPre - Math.abs(diff); i++) {
-      int offset = -1;
-      do {
-        write1(i, ++offset, entries[entriesOffset]);
-        entriesOffset++;
-      } while(entriesOffset % 16 != 0);
-    }
-
-    // now handle the remaining entries if the two subtrees are of different
-    // size
-
+    // handle the remaining entries if the two subtrees are of different size
     // case1: new subtree bigger than old one, insert remaining new nodes
-    if(diff <= -1) {
-      byte[] remainingEntries = new byte[entries.length - entriesOffset];
-      System.arraycopy(entries, entriesOffset, remainingEntries, 0,
-          remainingEntries.length);
-      insert(rightSiblingPre + diff, remainingEntries);
-      return;
-    }
-
-    // case2: old subtree bigger then new one, delete remaining old nodes
-    if(diff >= 1) {
-      delete(rightSiblingPre - diff, diff);
+    if(diff < 0) {
+      final byte[] tmp = new byte[entries.length - off];
+      System.arraycopy(entries, off, tmp, 0, tmp.length);
+      insert(rpre + diff, tmp);
+    } else if(diff > 0) {
+      // case2: old subtree bigger than new one, delete remaining old nodes
+      delete(rpre - diff, diff);
     }
   }
 

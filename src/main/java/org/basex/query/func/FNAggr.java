@@ -37,7 +37,7 @@ public final class FNAggr extends Fun {
 
     final Iter iter = ctx.iter(expr[0]);
     switch(def) {
-      case COUNT:
+      case CNT:
         long c = iter.size();
         if(c == -1) do ++c; while(iter.next() != null);
         return Itr.get(c);
@@ -61,7 +61,7 @@ public final class FNAggr extends Fun {
   public Expr cmp(final QueryContext ctx) {
     final Expr e = expr[0];
     switch(def) {
-      case COUNT:
+      case CNT:
         final long c = e.size();
         return c >= 0 && !ctx.grouping ? Itr.get(c) : this;
       default:

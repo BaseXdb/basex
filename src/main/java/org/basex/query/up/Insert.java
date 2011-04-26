@@ -85,6 +85,7 @@ public final class Insert extends Update {
     }
 
     Primitive up = null;
+    // no update primitive is created if node list is empty
     if(aList.size() > 0) {
       final ANode targ = before || after ? par : n;
       if(targ.type != NodeType.ELM)
@@ -94,14 +95,13 @@ public final class Insert extends Update {
       ctx.updates.add(up, ctx);
     }
 
-    // conforms to specification: if cList empty, no update primitive is created
+    // no update primitive is created if node list is empty
     if(cList.size() > 0) {
       if(before) up = new InsertBefore(input, n, cList);
       else if(after) up = new InsertAfter(input, n, cList);
       else if(first) up = new InsertIntoFirst(input, n, cList);
       else if(last) up = new InsertIntoLast(input, n, cList);
       else up = new InsertInto(input, n, cList);
-
       ctx.updates.add(up, ctx);
     }
     return null;
