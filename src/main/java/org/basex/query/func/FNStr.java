@@ -7,11 +7,14 @@ import java.util.Arrays;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.ItrSeq;
 import org.basex.query.item.Str;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -43,6 +46,16 @@ public final class FNStr extends Fun {
         return str2cp(e.item(ctx, input));
       default:
         return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    switch(def) {
+      case STCODE:
+        return ItrSeq.get(cps(checkEStr(expr[0], ctx)), AtomType.ITR);
+      default:
+        return super.value(ctx);
     }
   }
 
@@ -128,14 +141,16 @@ public final class FNStr extends Fun {
     final TokenBuilder tb = new TokenBuilder();
     for(Item i; (i = iter.next()) != null;) {
       final long n = checkItr(i);
-      if(!XMLToken.valid((int) n)) INVCODE.thrw(input, i);
+      // check int boundaries before casting
+      if(n < Integer.MIN_VALUE || n > Integer.MAX_VALUE
+          || !XMLToken.valid((int) n)) INVCODE.thrw(input, i);
       tb.add((int) n);
     }
     return Str.get(tb.finish());
   }
 
   /**
-   * Converts a string to codepoints.
+   * Converts a string to code points, lazily.
    * @param it item
    * @return iterator
    * @throws QueryException query exception

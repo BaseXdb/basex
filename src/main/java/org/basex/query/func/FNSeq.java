@@ -10,8 +10,10 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
@@ -349,9 +351,10 @@ public final class FNSeq extends Fun {
    */
   private ValueIter reverse(final QueryContext ctx) throws QueryException {
     // has to be strictly evaluated
-    final ValueIter iter = ctx.value(expr[0]).iter();
+    final Value val = ctx.value(expr[0]);
+    final ValueIter iter = val.iter();
     // if only one item found: no reversion necessary
-    return iter.size() == 1 ? iter : new ValueIter() {
+    return val.size() == 1 ? iter : new ValueIter() {
       final long s = iter.size();
       long c = s;
 
@@ -371,6 +374,13 @@ public final class FNSeq extends Fun {
       public boolean reset() {
         c = s;
         return true;
+      }
+      @Override
+      public Value finish() {
+        final Item[] arr = new Item[(int) val.size()];
+        final int written = val.writeTo(arr, 0);
+        Array.reverse(arr, 0, written);
+        return Seq.get(arr, written);
       }
     };
   }
