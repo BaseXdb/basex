@@ -137,7 +137,7 @@ public final class NamespaceTest {
    * The resulting fragment is inserted into a database. The
    * namespaces in scope with prefix 'ns' are finally checked for the
    * inserted <new/> tag. If the result is non-empty we may have a problem -
-   * being not able popagate the no-inherit flag to our table.
+   * being not able propagate the no-inherit flag to our table.
    */
   @Test
   public void copyPreserveNoInheritPersistent() {
