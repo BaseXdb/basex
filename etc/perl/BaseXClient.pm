@@ -162,7 +162,7 @@ sub bind {
 # see readme.txt
 sub more {
   $next = execu(chr(1), $id);
-  return $next;
+  return length($next);
 }
 
 # see readme.txt
