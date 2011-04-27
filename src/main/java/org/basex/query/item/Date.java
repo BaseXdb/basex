@@ -136,6 +136,7 @@ public abstract class Date extends Item {
 
     if(xc.getYear() + a.mon / 12 > 9999) DATERANGE.thrw(ii, type, a.atom(ii));
     xc.add(p ? a.toJava() : a.toJava().negate());
+    if(!xc.isValid()) throw DATEINV.thrw(ii, type, xc);
   }
 
   @Override

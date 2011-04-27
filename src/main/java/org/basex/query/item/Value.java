@@ -185,7 +185,7 @@ public abstract class Value extends Expr {
    * Use with care, as compressed Values are expanded, creating many objects.
    * @return cached items
    */
-  public ItemCache cache() {
+  public final ItemCache cache() {
     final ItemCache ic = new ItemCache((int) size());
     ic.size(writeTo(ic.item, 0));
     return ic;

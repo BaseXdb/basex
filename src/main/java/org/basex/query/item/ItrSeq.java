@@ -35,13 +35,6 @@ public final class ItrSeq extends Seq {
   }
 
   @Override
-  public int hash(final InputInfo ii) throws QueryException {
-    long hash = 0;
-    for(final long i : vals) hash = 31 * hash + i;
-    return (int) hash;
-  }
-
-  @Override
   public boolean homogenous() {
     return true;
   }
