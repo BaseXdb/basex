@@ -263,10 +263,10 @@ public final class TableDiskAccess extends TableAccess {
     if(diff < 0) {
       final byte[] tmp = new byte[entries.length - off];
       System.arraycopy(entries, off, tmp, 0, tmp.length);
-      insert(rpre + diff, tmp);
+      insert(max, tmp);
     } else if(diff > 0) {
       // case2: old subtree bigger than new one, delete remaining old nodes
-      delete(rpre - diff, diff);
+      delete(max, diff);
     }
   }
 

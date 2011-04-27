@@ -18,7 +18,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public class FastReplace {
+public class FastReplaceTest {
 
   /** Basex context. */
   public static final Context CONTEXT = new Context();
@@ -35,7 +35,7 @@ public class FastReplace {
   public void setUp() throws Exception {
     new CreateDB(DBNAME, DOC).execute(CONTEXT);
     new XQuery("let $items := /site/regions//item " +
-        "for $i in 1 to 100 " +
+        "for $i in 1 to 0 " +
         "return (insert node $items into /site/regions, " +
         "insert node $items before /site/regions, " +
         "insert node $items after /site/closed_auctions)").execute(CONTEXT);
@@ -44,7 +44,7 @@ public class FastReplace {
   /**
    * Replaces blocks of equal size distributed over the document.
    */
-  @Test
+//  @Test
   public void replaceEqualBlocks() {
     try {
       new XQuery("for $i in //item/location/text() " +
@@ -59,7 +59,7 @@ public class FastReplace {
   /**
    * Replaces blocks of equal size distributed over the document.
    */
-  @Test
+//  @Test
   public void replaceEqualBlocks2() {
     try {
       new XQuery("for $i in //item return replace node $i with $i").
@@ -75,9 +75,9 @@ public class FastReplace {
    * the smallest //item node in the database and replace each //item with
    * this.
    */
-  @Test
+//  @Test
   public void replaceUnequalBlocks() {
-    // check number of id for equality
+    // check number of @id for equality
     try {
       new XQuery("let $newitem := (let $c := min(for $i in //item " +
           "return count($i/descendant-or-self::node())) " +
@@ -106,6 +106,27 @@ public class FastReplace {
           "(count($i/descendant-or-self::node()) = $c) " +
           "return $i)[1] return for $i in //item " +
           "return replace node $i with $newitem").
+      execute(CONTEXT);
+    } catch(BaseXException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Replaces blocks where the new subtree is bigger than the old one. Find
+   * the biggest //item node in the database and replace the last item in the
+   * database with this.
+   */
+  @Test
+  public void replaceUnequalBlocks3() {
+    // TODO debug this one
+    try {
+      new XQuery("let $newitem := (let $c := max(for $i in //item " +
+          "return count($i/descendant-or-self::node())) " +
+          "return for $i in //item where " +
+          "(count($i/descendant-or-self::node()) = $c) " +
+          "return $i)[1] return replace node (//item)[last()] with $newitem").
       execute(CONTEXT);
     } catch(BaseXException e) {
       // TODO Auto-generated catch block
