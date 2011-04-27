@@ -105,18 +105,18 @@ public enum Err {
   /** FOFL0007: Evaluation exception. */
   ENCNOTEXISTS(FOFL, 5, "Encoding '%' is not supported."),
 
-  /** FOFL0000: Evaluation exception. */
-  FILEERROR(FOFL, 0, "Operation failed: %."),
-  /** FOFL0000: Evaluation exception. */
-  CANNOTCREATE(FOFL, 0, "Directory '%' cannot be created."),
-  /** FOFL0000: Evaluation exception. */
-  CANNOTDEL(FOFL, 0, "Path '%' cannot be deleted."),
-  /** FOFL0000: Evaluation exception. */
-  CANNOTMOVE(FOFL, 0, "Moving '%' to '%' failed."),
-  /** FOFL0000: Evaluation exception. */
-  CANNOTLIST(FOFL, 0, "Files of '%' cannot be accessed."),
-  /** FOFL0000: Evaluation exception. */
-  PATHINVALID(FOFL, 0, "Invalid file path: '%'."),
+  /** FOFL9999: Evaluation exception. */
+  FILEERROR(FOFL, 9999, "Operation failed: %."),
+  /** FOFL9999: Evaluation exception. */
+  CANNOTCREATE(FOFL, 9999, "Directory '%' cannot be created."),
+  /** FOFL9999: Evaluation exception. */
+  CANNOTDEL(FOFL, 9999, "Path '%' cannot be deleted."),
+  /** FOFL9999: Evaluation exception. */
+  CANNOTMOVE(FOFL, 9999, "Moving '%' to '%' failed."),
+  /** FOFL9999: Evaluation exception. */
+  CANNOTLIST(FOFL, 9999, "Files of '%' cannot be accessed."),
+  /** FOFL9999: Evaluation exception. */
+  PATHINVALID(FOFL, 9999, "Invalid file path: '%'."),
 
   /** FOZP0001: Evaluation exception. */
   ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
