@@ -167,11 +167,11 @@ public final class InfoView extends View {
 
     final boolean q = cmd instanceof XQuery;
     if(!ok || !q) {
-      text.high();
+      text.bold();
       if(q) {
         add(QUERYQU, cmd.toString().replaceAll("^.*? ", "").trim());
       } else if(cmd != null) {
-        text.high().add(BUTTONCMD + COLS).norm().addExt(cmd).nl();
+        text.bold().add(BUTTONCMD + COLS).norm().addExt(cmd).nl();
       }
       if(ok) {
         text.add(info).nl();
@@ -211,7 +211,7 @@ public final class InfoView extends View {
   private void add(final String head, final StringList list) {
     final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     if(list.size() == 0) return;
-    text.high().add(head).norm().nl();
+    text.bold().add(head).norm().nl();
     final int is = list.size();
     for(int i = 0; i < is; ++i) {
       String line = list.get(i);
@@ -229,7 +229,7 @@ public final class InfoView extends View {
    */
   private void add(final String head, final String txt) {
     if(txt.isEmpty()) return;
-    text.high().add(head).norm().add(txt).nl().hl();
+    text.bold().add(head).norm().add(txt).nl().hl();
   }
 
   @Override
