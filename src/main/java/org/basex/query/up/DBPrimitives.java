@@ -146,8 +146,7 @@ final class DBPrimitives extends Primitives {
     treeAwareUpdates();
 
     /* Apply updates backwards starting with the highest pre value ->
-     * no id's and less table alterations needed.
-     */
+     * no id's and less table alterations needed. */
     int par = -2;
     // first is the first node of par which is updated. so 'first-1' is the
     // lowest pre value where adjacent text nodes can exist.

@@ -105,6 +105,14 @@ public abstract class TableAccess {
   public abstract void write5(int p, int o, long v);
 
   /**
+   * Replaces entries in the database.
+   * @param pre node to be replaced
+   * @param entries new entries
+   * @param sub size of the subtree that is replaced
+   */
+  public abstract void replace(int pre, byte[] entries, final int sub);
+
+  /**
    * Deletes the specified number of entries from the database.
    * @param pre pre value of the first node to delete
    * @param nr number of entries to be deleted

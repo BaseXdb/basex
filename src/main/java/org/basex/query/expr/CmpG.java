@@ -131,7 +131,7 @@ public final class CmpG extends Cmp {
       e = optPre(Bln.FALSE, ctx);
     } else if(values()) {
       e = preEval(ctx);
-    } else if(e1.isFun(FunDef.COUNT)) {
+    } else if(e1.isFun(FunDef.CNT)) {
       e = count(op.op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFun(FunDef.POS)) {

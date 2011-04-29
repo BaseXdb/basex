@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -179,6 +178,7 @@ public final class QueryContext extends Progress {
     xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO);
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
+
   }
 
   /**
@@ -291,13 +291,29 @@ public final class QueryContext extends Progress {
    */
   public Iter iter() throws QueryException {
     try {
-      final Iter iter = iter(root);
-      if(!updating) return iter;
+      // evaluate lazily if no updates are possible
+      return updating ? value().iter() : iter(root);
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
+      throw XPSTACK.thrw(null);
+    }
+  }
 
-      final Value v = iter.finish();
-      updates.apply(this);
-      if(context.data != null) context.update();
-      return v.iter();
+  /**
+   * Returns the result value.
+   * @return result value
+   * @throws QueryException query exception
+   */
+  public Value value() throws QueryException {
+    try {
+      final Value v = value(root);
+
+      if(updating) {
+        updates.apply(this);
+        if(context.data != null) context.update();
+      }
+      return v;
+
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw XPSTACK.thrw(null);
@@ -417,16 +433,21 @@ public final class QueryContext extends Progress {
 
   /**
    * Returns the serialization properties.
+   * @param opt return {@code null} reference if no properties are specified
    * @return serialization properties
    * @throws SerializerException serializer exception
    */
-  public SerializerProp serProp() throws SerializerException {
+  public SerializerProp serProp(final boolean opt) throws SerializerException {
     // if available, use local query properties
     if(serProp != null) return serProp;
+
+    final String serial = context.prop.get(Prop.SERIALIZER);
+    final boolean wrap = context.prop.is(Prop.WRAPOUTPUT);
+    if(opt && serial.isEmpty() && !wrap) return null;
+
     // otherwise, apply global serialization option
-    final SerializerProp sp = new SerializerProp(
-        context.prop.get(Prop.SERIALIZER));
-    if(context.prop.is(Prop.WRAPOUTPUT)) {
+    final SerializerProp sp = new SerializerProp(serial);
+    if(wrap) {
       sp.set(SerializerProp.S_WRAP_PREFIX, NAMELC);
       sp.set(SerializerProp.S_WRAP_URI, URL);
     }

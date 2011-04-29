@@ -15,7 +15,6 @@ import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
-import org.basex.server.trigger.TriggerEvent;
 import org.basex.util.Token;
 
 /**

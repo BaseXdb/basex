@@ -8,7 +8,7 @@ import java.util.Arrays;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
-import org.basex.server.trigger.TriggerEvent;
+import org.basex.server.TriggerEvent;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

@@ -43,7 +43,7 @@ public abstract class Item extends Value {
       @Override
       public Item get(final long i) { return Item.this; }
       @Override
-      public boolean reset() { more = false; return true; }
+      public boolean reset() { return !(more = false); }
       @Override
       public Value finish() { return Item.this; }
     };

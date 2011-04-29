@@ -42,7 +42,7 @@ public final class XMLSerializer extends Serializer {
   /** Indentation flag. */
   private final boolean indent;
   /** Format items. */
-  private final boolean items;
+  private final boolean format;
   /** URI escape flag. */
   private final boolean escape;
   /** Include content type flag. */
@@ -109,8 +109,12 @@ public final class XMLSerializer extends Serializer {
       mth == M_HTML ? p.check(S_VERSION, V40, V401) :
       mth != M_TEXT ? p.check(S_VERSION, V10, V11) : p.get(S_VERSION);
 
-    for(final String c : p.get(S_CDATA_SECTION_ELEMENTS).split("\\s+"))
-      if(!c.isEmpty()) cdata.add(token(c));
+    final String cdse = p.get(S_CDATA_SECTION_ELEMENTS);
+    if(!cdse.isEmpty()) {
+      for(final String c : cdse.split("\\s+")) {
+        if(!c.isEmpty()) cdata.add(token(c));
+      }
+    }
 
     final boolean decl = p.check(S_OMIT_XML_DECLARATION, YES, NO).equals(NO);
     final boolean bom  = p.check(S_BYTE_ORDER_MARK, YES, NO).equals(YES);
@@ -124,8 +128,8 @@ public final class XMLSerializer extends Serializer {
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
     media   = p.get(S_MEDIA_TYPE);
-    items   = p.check(S_FORMAT, YES, NO).equals(YES);
-    indent  = p.check(S_INDENT, YES, NO).equals(YES) && items;
+    format  = p.check(S_FORMAT, YES, NO).equals(YES);
+    indent  = p.check(S_INDENT, YES, NO).equals(YES) && format;
     undecl  = p.check(S_UNDECLARE_PREFIXES, YES, NO).equals(YES);
     escape  = p.check(S_ESCAPE_URI_ATTRIBUTES, YES, NO).equals(YES);
     content = p.check(S_INCLUDE_CONTENT_TYPE, YES, NO).equals(YES);
@@ -232,7 +236,7 @@ public final class XMLSerializer extends Serializer {
     print(ATT1);
     for(int k = 0; k < val.length; k += cl(val, k)) {
       final int ch = cp(val, k);
-      if(mth == M_HTML && (ch == '<' || ch == '&' &&
+      if(!format || mth == M_HTML && (ch == '<' || ch == '&' &&
           val[Math.min(k + 1, val.length - 1)] == '{')) {
         print(ch);
       } else {
@@ -282,7 +286,8 @@ public final class XMLSerializer extends Serializer {
     final FTLexer lex = new FTLexer().sc().init(b);
     while(lex.hasNext()) {
       final FTSpan span = lex.next();
-      if(!span.special && ftp.contains(span.pos)) print((char) 0x10);
+      if(!span.special && ftp.contains(span.pos))
+        print((char) TokenBuilder.MARK);
       final byte[] t = span.text;
       for(int k = 0; k < t.length; k += cl(t, k)) ch(cp(t, k));
     }
@@ -317,7 +322,7 @@ public final class XMLSerializer extends Serializer {
     finishElement();
     if(ind) print(' ');
     for(int k = 0; k < b.length; k += cl(b, k)) ch(cp(b, k));
-    ind = items;
+    ind = format;
     item = true;
   }
 
@@ -340,14 +345,18 @@ public final class XMLSerializer extends Serializer {
       }
     }
 
-    if(ch < 0x20 && ch != 0x09 && ch != 0x0A || ch > 0x7F && ch < 0xA0) {
-      hex(ch);
+    if(!format) {
+      print(ch);
     } else {
-      switch(ch) {
-        case '&': print(E_AMP); break;
-        case '>': print(E_GT); break;
-        case '<': print(E_LT); break;
-        default : print(ch);
+      if(ch < 0x20 && ch != 0x09 && ch != 0x0A || ch > 0x7F && ch < 0xA0) {
+        hex(ch);
+      } else {
+        switch(ch) {
+          case '&': print(E_AMP); break;
+          case '>': print(E_GT); break;
+          case '<': print(E_LT); break;
+          default : print(ch);
+        }
       }
     }
   }

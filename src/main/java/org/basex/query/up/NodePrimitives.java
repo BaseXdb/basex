@@ -39,14 +39,14 @@ interface NodePrimitives extends Iterable<Primitive> {
   /**
    * Returns true if text node adjacency is possible as a result of the
    * aggregated updates. This is only the case if updates actually affect the
-   * sibling axis of the target node and not the descendent-or-self axis.
+   * sibling axis of the target node and not the descendant-or-self axis.
    *
    * @return true if text node adjacency possible
    */
   boolean textAdjacency();
 
   /**
-   * Returns wether the target's identity is destroyed as a result of delete or
+   * Returns whether the target's identity is destroyed as a result of delete or
    * replace operations.
    * @return true if identity lost
    */

@@ -27,8 +27,8 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
+import org.basex.query.iter.ValueIter;
 import org.basex.util.Atts;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
@@ -115,7 +115,7 @@ public final class ResponseHandler {
    * @throws IOException IO exception
    * @throws QueryException query exception
    */
-  public static Iter getResponse(final HttpURLConnection conn,
+  public static ValueIter getResponse(final HttpURLConnection conn,
       final byte[] statusOnly, final byte[] mediaTypeOvr, final Prop prop,
       final InputInfo ii) throws IOException, QueryException {
     final NodeCache attrs = extractAttrs(conn);

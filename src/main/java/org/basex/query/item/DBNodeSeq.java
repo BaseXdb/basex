@@ -82,6 +82,8 @@ public final class DBNodeSeq extends Seq {
       public long size() { return size; }
       @Override
       public boolean reset() { c = -1; return true; }
+      @Override
+      public Value finish() { return DBNodeSeq.this; }
     };
   }
 
@@ -112,13 +114,6 @@ public final class DBNodeSeq extends Seq {
     ser.openElement(Token.token(Util.name(this)), SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); ++v) node(v).plan(ser);
     ser.closeElement();
-  }
-
-  @Override
-  public int hash(final InputInfo ii) {
-    int h = 0;
-    for(int v = 0; v != Math.min(size, 5); ++v) h += pres[v];
-    return h;
   }
 
   @Override

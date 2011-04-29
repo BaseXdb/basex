@@ -102,24 +102,21 @@ public enum Err {
   NOTDIR(FOFL, 3, "Path '%' is not a directory."),
   /** FOFL0004: Evaluation exception. */
   PATHISDIR(FOFL, 4, "Path '%' is a directory."),
-
-  /** FOFL0005: Evaluation exception. */
-  DIRNOTEMPTY(FOFL, 5, "Directory '%' is not empty."),
-  /** FOFL0006: Evaluation exception. */
-  PATHINVALID(FOFL, 6, "Invalid file path '%'."),
   /** FOFL0007: Evaluation exception. */
-  ENCNOTEXISTS(FOFL, 7, "Encoding '%' is not supported."),
+  ENCNOTEXISTS(FOFL, 5, "Encoding '%' is not supported."),
 
-  /** FOFL0008: Evaluation exception. */
-  FILEERROR(FOFL, 8, "Operation failed: %."),
-  /** FOFL0008: Evaluation exception. */
-  CANNOTCREATE(FOFL, 8, "Directory '%' cannot be created."),
-  /** FOFL0008: Evaluation exception. */
-  CANNOTDEL(FOFL, 8, "Path '%' cannot be deleted."),
-  /** FOFL0008: Evaluation exception. */
-  CANNOTMOVE(FOFL, 8, "Moving '%' to '%' failed."),
-  /** FOFL0008: Evaluation exception. */
-  CANNOTLIST(FOFL, 8, "Files of '%' cannot be returned."),
+  /** FOFL9999: Evaluation exception. */
+  FILEERROR(FOFL, 9999, "Operation failed: %."),
+  /** FOFL9999: Evaluation exception. */
+  CANNOTCREATE(FOFL, 9999, "Directory '%' cannot be created."),
+  /** FOFL9999: Evaluation exception. */
+  CANNOTDEL(FOFL, 9999, "Path '%' cannot be deleted."),
+  /** FOFL9999: Evaluation exception. */
+  CANNOTMOVE(FOFL, 9999, "Moving '%' to '%' failed."),
+  /** FOFL9999: Evaluation exception. */
+  CANNOTLIST(FOFL, 9999, "Files of '%' cannot be accessed."),
+  /** FOFL9999: Evaluation exception. */
+  PATHINVALID(FOFL, 9999, "Invalid file path: '%'."),
 
   /** FOZP0001: Evaluation exception. */
   ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
@@ -153,6 +150,8 @@ public enum Err {
   FUNCAST(FORG, 1, "Invalid % cast: %."),
   /** FORG0001: Evaluation exception. */
   DATERANGE(FORG, 1, "%(\"%\") out of range."),
+  /** FORG0001: Evaluation exception. */
+  DATEINV(FORG, 1, "%(\"%\") is no valid ISO 8601 date."),
   /** FORG0001: Evaluation exception. */
   DATEFORMAT(FORG, 1, "Wrong % format: \"%\" (try: \"%\")."),
   /** FORG0001: Evaluation exception. */
@@ -359,6 +358,10 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   CALCEXPR(XPST, 3, "Calculation is incomplete."),
   /** XPST0003: Parsing exception. */
+  INVMAPKEY(XPST, 3, "Invalid key, simple expression expected."),
+  /** XPST0003: Parsing exception. */
+  INVMAPVAL(XPST, 3, "Invalid value, simple expression expected."),
+  /** XPST0003: Parsing exception. */
   NORETURN(XPST, 3, "Expecting return value."),
   /** XPST0003: Parsing exception. */
   NOWHERE(XPST, 3, "Expecting valid expression after 'where'."),
@@ -451,6 +454,8 @@ public enum Err {
   XPCAST(XPTY, 4, "Invalid %(%) cast."),
   /** XPTY0004: Typing Exception. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
+  /** XPTY0004: Typing Exception. */
+  SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
   /** XPTY0004: Typing exception. */
   XPEMPTY(XPTY, 4, "%: no empty sequence allowed."),
   /** XPTY0004: Typing Exception. */

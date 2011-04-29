@@ -510,8 +510,8 @@ public abstract class Data {
   }
 
   /**
-   * Replaces (updates) a text, comment, pi or attribute value.
-   * @param pre pre value
+   * Replaces the value of a single text, comment, pi or attribute node.
+   * @param pre pre value to be replaced
    * @param k node kind
    * @param val value to be updated (tag name, text, comment, pi)
    */
@@ -519,6 +519,76 @@ public abstract class Data {
     meta.update();
     final byte[] v = k == PI ? trim(concat(name(pre, k), SPACE, val)) : val;
     text(pre, v, k != ATTR);
+  }
+
+  /**
+   * Replaces parts of the database with the specified data instance.
+   * @param rpre pre value to be replaced
+   * @param d replace data
+   */
+  public final void replace(final int rpre, final Data d) {
+    // [LK] if we know that both data references will use the same tag and
+    // attribute indexes (..which should be the default case..) we might be
+    // able to speed up the copy process even more
+
+    final int dsize = d.meta.size;
+    final int buf = dsize;
+    buffer(buf);
+    int dpre = -1;
+    final int rkind = kind(rpre);
+    while(++dpre != dsize) {
+      final int dkind = d.kind(dpre);
+      final int dpar = d.parent(dpre, dkind);
+      final int pre = rpre + dpre;
+      final int dis = dpar >= 0 ? dpre - dpar : pre - parent(rpre, rkind);
+
+      switch(dkind) {
+        case DOC:
+          // add document
+          doc(pre, d.size(dpre, dkind), d.text(dpre, true));
+          meta.ndocs++;
+          break;
+        case ELEM:
+          // add element
+          byte[] nm = d.name(dpre, dkind);
+          elem(dis, tags.index(nm, null, false), d.attSize(dpre, dkind),
+              d.size(dpre, dkind), ns.uri(nm, true), false);
+          break;
+        case TEXT:
+        case COMM:
+        case PI:
+          // add text
+          text(pre, dis, d.text(dpre, true), dkind);
+          break;
+        case ATTR:
+          // add attribute
+          nm = d.name(dpre, dkind);
+          attr(pre, dis, atts.index(nm, null, false), d.text(dpre, false),
+              ns.uri(nm, false), false);
+          break;
+      }
+    }
+
+    final int rsize = size(rpre, rkind);
+    table.replace(rpre, buffer(), rsize);
+    buffer(1);
+
+    // increase/decrease size of ancestors, adjust distances of siblings
+    final int rpar = parent(rpre, rkind);
+    final int diff = rsize - dsize;
+
+    // new subtree bigger than old one
+    if(diff < 0) {
+      int p = rpar;
+      while(p >= 0) {
+        final int k = kind(p);
+        size(p, k, size(p, k) + Math.abs(diff));
+        p = parent(p, k);
+      }
+      updateDist(rpre + dsize, diff);
+    } else if(rsize > dsize) {
+      // TODO combine with the upper
+    }
   }
 
   /**
@@ -750,7 +820,7 @@ public abstract class Data {
 
   /**
    * This method updates the distance values of the specified pre value
-   * and the following siblings.
+   * and the following siblings of all ancestor-or-self nodes.
    * @param pre root node
    * @param s size to be added/removed
    */

@@ -256,7 +256,7 @@ final class List extends TrieNode {
       for(int j = 0; j < size; j++) {
         if(eq(k, ol.keys[i], ii)) {
           // check bound value, too
-          if(!eq(values[i], ol.values[j], ii)) return false;
+          if(!deep(values[i], ol.values[j], ii)) return false;
           // value matched, continue with next key
           continue outer;
         }

@@ -383,56 +383,6 @@ public interface QueryTokens {
   /** Parser Token. */
   String ASTERISK = "*";
 
-  // URIS =====================================================================
-
-  /** W3 URI. */
-  String W3URI = "http://www.w3.org";
-  /** XML URI. */
-  byte[] XMLURI = token(W3URI + "/XML/1998/namespace");
-  /** Functions URI. */
-  byte[] FNURI = token(W3URI + "/2005/xpath-functions");
-  /** Math URI. */
-  byte[] MATHURI = token(W3URI + "/2005/xpath-functions/math");
-  /** XMLNS URI. */
-  byte[] XMLNSURI = token(W3URI + "/2000/xmlns/");
-  /** Local Functions URI. */
-  byte[] LOCALURI = token(W3URI + "/2005/xquery-local-functions");
-  /** XMLSchema URI. */
-  byte[] XSURI = token(W3URI + "/2001/XMLSchema");
-  /** XMLSchema Instance URI. */
-  byte[] XSIURI = token(W3URI + "/2001/XMLSchema-instance");
-  /** Output URI. */
-  byte[] OUTPUTURI = token(W3URI + "/2010/xslt-xquery-serialization");
-  /** Error URI. */
-  byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
-  /** Map URI. */
-  byte[] MAPURI = token(W3URI + "/2005/xpath-functions/map");
-
-  /** EXPath URI. */
-  String EXPATH = "http://expath.org/ns";
-  /** ZIP URI.*/
-  byte[] ZIPURI = token(EXPATH + "/zip");
-  /** HTTP Client URI. */
-  byte[] HTTPURI = token(EXPATH + "/http");
-
-  /** Util module URI. */
-  byte[] UTILURI = token(Text.URL + "/util");
-  /** DB module URI. */
-  byte[] DBURI = token(Text.URL + "/db");
-  /** FT module URI. */
-  byte[] FTURI = token(Text.URL + "/ft");
-  /** File module URI. */
-  byte[] FILEURI = token(Text.URL + "/file");
-  /** Sentiment URI.*/
-  byte[] SENTURI = token(Text.URL + "/sent");
-  /** Sentiment URI.*/
-  byte[] HOFURI = token(Text.URL + "/higher-order");
-
-  /** Java prefix. */
-  byte[] JAVAPRE = token("java:");
-  /** Default collation. */
-  byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
-
   // TYPES ====================================================================
 
   /** AnyType. */
@@ -483,6 +433,61 @@ public interface QueryTokens {
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
+
+  // URIS =====================================================================
+
+  /** W3 URI. */
+  String W3URI = "http://www.w3.org";
+  /** XML URI. */
+  byte[] XMLURI = token(W3URI + "/XML/1998/namespace");
+  /** Functions URI. */
+  byte[] FNURI = token(W3URI + "/2005/xpath-functions");
+  /** Math URI. */
+  byte[] MATHURI = token(W3URI + "/2005/xpath-functions/math");
+  /** XMLNS URI. */
+  byte[] XMLNSURI = token(W3URI + "/2000/xmlns/");
+  /** Local Functions URI. */
+  byte[] LOCALURI = token(W3URI + "/2005/xquery-local-functions");
+  /** XMLSchema URI. */
+  byte[] XSURI = token(W3URI + "/2001/XMLSchema");
+  /** XMLSchema Instance URI. */
+  byte[] XSIURI = token(W3URI + "/2001/XMLSchema-instance");
+  /** Output URI. */
+  byte[] OUTPUTURI = token(W3URI + "/2010/xslt-xquery-serialization");
+  /** Error URI. */
+  byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
+  /** Map URI. */
+  byte[] MAPURI = token(W3URI + "/2005/xpath-functions/map");
+
+  /** EXPath URI. */
+  String EXPATH = "http://expath.org/ns";
+  /** ZIP URI.*/
+  byte[] ZIPURI = token(EXPATH + "/zip");
+  /** HTTP Client URI. */
+  byte[] HTTPURI = token(EXPATH + "/http");
+  /** File module URI. */
+  byte[] FILEURI = token(EXPATH + "/file");
+
+  /** Util module URI. */
+  byte[] UTILURI = token(Text.URL + "/util");
+  /** DB module URI. */
+  byte[] DBURI = token(Text.URL + "/db");
+  /** FT module URI. */
+  byte[] FTURI = token(Text.URL + "/ft");
+  /** Sentiment URI.*/
+  byte[] SENTURI = token(Text.URL + "/sent");
+  /** Sentiment URI.*/
+  byte[] HOFURI = token(Text.URL + "/higher-order");
+
+  /** Java prefix. */
+  byte[] JAVAPRE = token("java:");
+  /** Default collation. */
+  byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
+
+  /** External variable.*/
+  byte[] FILEDIRSEP = concat(FILE, token(":directory-separator"));
+  /** External variable.*/
+  byte[] FILEPATHSEP = concat(FILE, token(":path-separator"));
 
   // QUERY PLAN ===============================================================
 

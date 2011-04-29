@@ -177,7 +177,7 @@ public abstract class ParseExpr extends Expr {
   public final double checkDbl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = checkEmptyType(e.item(ctx, input), AtomType.DBL);
+    final Item it = checkNoEmpty(e.item(ctx, input), AtomType.DBL);
     if(!it.unt() && !it.num()) Err.number(this, it);
     return it.dbl(input);
   }
@@ -192,7 +192,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final long checkItr(final Expr e, final QueryContext ctx)
       throws QueryException {
-    return checkItr(checkEmptyType(e.item(ctx, input), AtomType.ITR));
+    return checkItr(checkNoEmpty(e.item(ctx, input), AtomType.ITR));
   }
 
   /**
@@ -202,7 +202,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified item
    * @throws QueryException query exception
    */
-  private Item checkEmptyType(final Item it, final Type t)
+  private Item checkNoEmpty(final Item it, final Type t)
       throws QueryException {
     if(it == null) XPEMPTYPE.thrw(input, desc(), t);
     return it;
