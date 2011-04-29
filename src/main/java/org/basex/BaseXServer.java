@@ -42,6 +42,8 @@ public class BaseXServer extends Main {
   private String commands;
   /** Server socket. */
   private ServerSocket server;
+  /** Server socket. */
+  ServerSocket tserver;
   /** Flag for server activity. */
   boolean running;
   /** Stop file. */
@@ -149,6 +151,7 @@ public class BaseXServer extends Main {
     try {
       // close interactive input if server was stopped by another process
       if(console) System.in.close();
+      tserver.close();
       server.close();
     } catch(final IOException ex) {
       log.write(ex.getMessage());
@@ -303,15 +306,13 @@ public class BaseXServer extends Main {
    * @author Andreas Weiler
    */
   private class TriggerListener extends Thread {
-    /** Server socket. */
-    ServerSocket tserver;
 
     /**
      * Constructor.
      */
     public TriggerListener() {
       try {
-        this.tserver = new ServerSocket(context.prop.num(Prop.TRIGGERPORT));
+        tserver = new ServerSocket(context.prop.num(Prop.TRIGGERPORT));
       } catch(IOException ex) {
         log.write(ex.getMessage());
         Util.errln(Util.server(ex));
