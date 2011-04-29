@@ -123,7 +123,7 @@ public final class SAXWrapper extends FileParser {
         final InputStream in = is.getByteStream();
         if(in != null) in.close();
         final Reader r = is.getCharacterStream();
-        if(r != null) in.close();
+        if(r != null) r.close();
       } catch(final IOException ex) {
         Util.debug(ex);
       }
