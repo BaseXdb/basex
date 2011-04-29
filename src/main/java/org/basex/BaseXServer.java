@@ -199,7 +199,8 @@ public class BaseXServer extends Main {
       } else {
         arg.check(false);
         if(arg.string().equalsIgnoreCase("stop")) {
-          stop(context.prop.num(Prop.SERVERPORT));
+          stop(context.prop.num(Prop.SERVERPORT),
+              context.prop.num(Prop.TRIGGERPORT));
           Performance.sleep(1000);
           return false;
         }
@@ -212,11 +213,10 @@ public class BaseXServer extends Main {
    * Stops the server of this instance.
    */
   public final void stop() {
-    final int port = context.prop.num(Prop.SERVERPORT);
     try {
       stop.write(Token.EMPTY);
-      new Socket(LOCALHOST, port + 1);
-      new Socket(LOCALHOST, port);
+      new Socket(LOCALHOST, context.prop.num(Prop.TRIGGERPORT));
+      new Socket(LOCALHOST, context.prop.num(Prop.SERVERPORT));
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));
     }
@@ -279,12 +279,13 @@ public class BaseXServer extends Main {
   /**
    * Stops the server.
    * @param port server port
+   * @param tport trigger port
    */
-  public static void stop(final int port) {
+  public static void stop(final int port, final int tport) {
     final IO stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
-      new Socket(LOCALHOST, port + 1);
+      new Socket(LOCALHOST, tport);
       new Socket(LOCALHOST, port);
       while(ping(LOCALHOST, port))
         Performance.sleep(100);
@@ -334,10 +335,7 @@ public class BaseXServer extends Main {
               s.tout = PrintOutput.get(socket.getOutputStream());
             }
           }
-        } catch(IOException e) {
-          // socket was closed..
-          break;
-        }
+        } catch(IOException e) { break; }
       }
     }
   }

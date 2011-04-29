@@ -61,6 +61,8 @@ public final class Prop extends AProp {
   public static final Object[] PORT = { "PORT", 1984 };
   /** Client/server communication: port, used for starting the server. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
+  /** Client/server communication: port, used for sending trigger events. */
+  public static final Object[] TRIGGERPORT = { "TRIGGERPORT", 1985 };
   /** Client/server communication: port, used for starting the JAX-RX server. */
   public static final Object[] JAXRXPORT = { "JAXRXPORT", 8984 };
 

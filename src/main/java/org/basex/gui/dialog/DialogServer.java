@@ -302,7 +302,8 @@ public final class DialogServer extends Dialog {
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {
-        if(running) BaseXServer.stop(ctx.prop.num(Prop.SERVERPORT));
+        if(running) BaseXServer.stop(ctx.prop.num(Prop.SERVERPORT),
+            ctx.prop.num(Prop.TRIGGERPORT));
         running = ping(true);
         connected = connected && ping(false);
         if(!connected) msg = SERVERSTOPPED;
