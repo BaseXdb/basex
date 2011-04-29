@@ -311,7 +311,7 @@ public class BaseXServer extends Main {
      */
     public TriggerListener() {
       try {
-        this.tserver = new ServerSocket(context.prop.num(Prop.SERVERPORT) + 1);
+        this.tserver = new ServerSocket(context.prop.num(Prop.TRIGGERPORT));
       } catch(IOException ex) {
         log.write(ex.getMessage());
         Util.errln(Util.server(ex));
