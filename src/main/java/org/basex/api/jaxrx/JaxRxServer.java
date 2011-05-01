@@ -1,6 +1,7 @@
 package org.basex.api.jaxrx;
 
 import static org.basex.core.Text.*;
+
 import org.basex.BaseXServer;
 import org.basex.core.Prop;
 import org.basex.core.Text;
@@ -9,17 +10,19 @@ import org.basex.util.Util;
 import org.jaxrx.JettyServer;
 
 /**
- * This is the starter class for running the JAX-RX server,
- * based on the JAX-RX interface.
- * A database server and the Jetty server is launched by the constructor.
- * The Jetty server listens for HTTP requests, which are then sent to JAX-RX.
- *
+ * This is the starter class for running the JAX-RX server, based on the JAX-RX
+ * interface. A database server and the Jetty server is launched by the
+ * constructor. The Jetty server listens for HTTP requests, which are then sent
+ * to JAX-RX.
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class JaxRxServer extends BaseXServer {
   /** JAX-RX String. */
   private static final String JAXRX = "JAX-RX";
+  /** Shiro .ini config file. */
+  private static final String INI = "shiro.ini";
   /** Jetty server. */
   private JettyServer jetty;
 
@@ -65,9 +68,28 @@ public final class JaxRxServer extends BaseXServer {
 
     // start Jetty server (if not done yet)
     try {
-      jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT));
+      if(context.prop.is(Prop.AUTH)) {
+        System.out.println("Server will start with authentication");
+
+        // Read existing INI file from resources folder.
+        IniBuilder iniBuilder = new IniBuilder(INI);
+
+        // Alternativ to generate an INI file on the fly.
+        // final IniBuilder iniBuilder = new IniBuilder();
+        // iniBuilder.setAuthenticationMethod("org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter");
+        // iniBuilder.setCustomRealm("org.basex.api.jaxrx.Realm");
+        // iniBuilder.setURL("/basex/jax-rx/*");
+
+        jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT),
+            iniBuilder.buildIni());
+
+      } else {
+        System.out.println("Server without authentication");
+        jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT));
+      }
       Util.outln(JAXRX + ' ' + SERVERSTART);
     } catch(final Exception ex) {
+      ex.printStackTrace();
       Util.server(ex);
     }
   }
@@ -98,7 +120,10 @@ public final class JaxRxServer extends BaseXServer {
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
-        if(c == 'D') {
+        if(c == 'a') {
+          // authentication will be performed for HTTP REST requests
+          context.prop.set(Prop.AUTH, true);
+        } else if(c == 'D') {
           // hidden flag: daemon mode
           daemon = true;
         } else if(c == 'j') {
