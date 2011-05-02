@@ -3,11 +3,13 @@ package org.basex.test.build;
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
+import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
 import org.basex.io.IO;
+import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +23,7 @@ import org.junit.Test;
  */
 public final class AddDeleteTest {
   /** Database context. */
-  private static final Context CTX = new Context();
+  private static final Context CONTEXT = new Context();
 
   /** Test database name. */
   private static final String DBNAME = Util.name(AddDeleteTest.class);
@@ -53,7 +55,7 @@ public final class AddDeleteTest {
    */
   @Before
   public void setUp() throws BaseXException {
-    new CreateDB(DBNAME).execute(CTX);
+    new CreateDB(DBNAME).execute(CONTEXT);
   }
 
   /**
@@ -62,7 +64,7 @@ public final class AddDeleteTest {
    */
   @After
   public void tearDown() throws BaseXException {
-    new DropDB(DBNAME).execute(CTX);
+    new DropDB(DBNAME).execute(CONTEXT);
   }
 
   /**
@@ -74,12 +76,12 @@ public final class AddDeleteTest {
    */
   @Test
   public void testAddXMLString() throws BaseXException {
-    new Add(XMLFRAG, "index.xml").execute(CTX);
-    assertEquals(1, CTX.doc().length);
-    new Add(XMLFRAG, "index2.xml", "a/b/c").execute(CTX);
-    assertEquals(2, CTX.doc().length);
-    new Add(XMLFRAG, null, "a/d/c").execute(CTX);
-    assertEquals(3, CTX.doc().length);
+    new Add(XMLFRAG, "index.xml").execute(CONTEXT);
+    assertEquals(1, CONTEXT.doc().length);
+    new Add(XMLFRAG, "index2.xml", "a/b/c").execute(CONTEXT);
+    assertEquals(2, CONTEXT.doc().length);
+    new Add(XMLFRAG, null, "a/d/c").execute(CONTEXT);
+    assertEquals(3, CONTEXT.doc().length);
   }
 
   /**
@@ -88,8 +90,8 @@ public final class AddDeleteTest {
    */
   @Test
   public void testAddFile() throws BaseXException {
-    new Add(FILE).execute(CTX);
-    assertEquals(1, CTX.doc().length);
+    new Add(FILE).execute(CONTEXT);
+    assertEquals(1, CONTEXT.doc().length);
   }
 
   /**
@@ -98,8 +100,8 @@ public final class AddDeleteTest {
    */
   @Test
   public void testAddZip() throws BaseXException {
-    new Add(ZIPFILE, null, "target").execute(CTX);
-    assertEquals(4, CTX.doc().length);
+    new Add(ZIPFILE, null, "target").execute(CONTEXT);
+    assertEquals(4, CONTEXT.doc().length);
   }
 
   /**
@@ -108,10 +110,10 @@ public final class AddDeleteTest {
    */
   @Test
   public void testAddGzip() throws BaseXException {
-    new Add(GZIPFILE).execute(CTX);
-    new Add(GZIPFILE, null, "bar").execute(CTX);
-    new Delete("bar").execute(CTX);
-    assertEquals(1, CTX.doc().length);
+    new Add(GZIPFILE).execute(CONTEXT);
+    new Add(GZIPFILE, null, "bar").execute(CONTEXT);
+    new Delete("bar").execute(CONTEXT);
+    assertEquals(1, CONTEXT.doc().length);
   }
 
   /**
@@ -120,8 +122,8 @@ public final class AddDeleteTest {
    */
   @Test
   public void testAddFolder() throws BaseXException {
-    new Add(FLDR).execute(CTX);
-    assertEquals(FCNT, CTX.doc().length);
+    new Add(FLDR).execute(CONTEXT);
+    assertEquals(FCNT, CONTEXT.doc().length);
   }
 
   /**
@@ -130,11 +132,11 @@ public final class AddDeleteTest {
    */
   @Test
   public void deletePath() throws BaseXException {
-    new Add(FLDR, null, "foo/pub").execute(CTX);
-    new Add(FILE, null, "/foo///bar////").execute(CTX);
-    new Add(FLDR, null, "foobar").execute(CTX);
-    new Delete("foo").execute(CTX);
-    assertEquals(FCNT, CTX.doc().length);
+    new Add(FLDR, null, "foo/pub").execute(CONTEXT);
+    new Add(FILE, null, "/foo///bar////").execute(CONTEXT);
+    new Add(FLDR, null, "foobar").execute(CONTEXT);
+    new Delete("foo").execute(CONTEXT);
+    assertEquals(FCNT, CONTEXT.doc().length);
   }
 
   /**
@@ -143,11 +145,11 @@ public final class AddDeleteTest {
    */
   @Test
   public void addFoldersDeleteFiles() throws BaseXException {
-    new Add(FLDR, null, "folder").execute(CTX);
-    new Add(FILE).execute(CTX);
-    new Delete("input.xml").execute(CTX);
-    new Delete("folder/input.xml").execute(CTX);
-    assertEquals(FCNT - 1, CTX.doc().length);
+    new Add(FLDR, null, "folder").execute(CONTEXT);
+    new Add(FILE).execute(CONTEXT);
+    new Delete("input.xml").execute(CONTEXT);
+    new Delete("folder/input.xml").execute(CONTEXT);
+    assertEquals(FCNT - 1, CONTEXT.doc().length);
   }
 
   /**
@@ -156,6 +158,38 @@ public final class AddDeleteTest {
    */
   @Test(expected = BaseXException.class)
   public void testAddFileFail() throws BaseXException {
-    new Add(FILE + "/doesnotexist").execute(CTX);
+    new Add(FILE + "/doesnotexist").execute(CONTEXT);
+  }
+
+  /**
+   * Adds a broken input file to the database and checks if the file can be
+   * deleted afterwards.
+   * @throws Exception exception
+   */
+  @Test
+  public void testBrokenAdd() throws Exception {
+    final IO io = IO.get(Prop.TMP + DBNAME);
+    io.write(Token.token("<x"));
+    try {
+      new Add(io.path()).execute(CONTEXT);
+      fail("Broken file was added to the database.");
+    } catch(final Exception ex) { }
+    assertTrue(io.delete());
+  }
+
+  /**
+   * Creates a database from a broken input file and checks if the file can be
+   * deleted afterwards.
+   * @throws Exception exception
+   */
+  @Test
+  public void testBrokenCreate() throws Exception {
+    final IO io = IO.get(Prop.TMP + DBNAME);
+    io.write(Token.token("<x"));
+    try {
+      new CreateDB(DBNAME, io.path()).execute(CONTEXT);
+      fail("Broken file was added to the database.");
+    } catch(final Exception ex) { }
+    assertTrue(io.delete());
   }
 }

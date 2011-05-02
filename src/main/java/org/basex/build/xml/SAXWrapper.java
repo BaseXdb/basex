@@ -3,6 +3,9 @@ package org.basex.build.xml;
 import static org.basex.core.Text.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.FileParser;
@@ -115,6 +118,15 @@ public final class SAXWrapper extends FileParser {
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
+    } finally {
+      try {
+        final InputStream in = is.getByteStream();
+        if(in != null) in.close();
+        final Reader r = is.getCharacterStream();
+        if(r != null) r.close();
+      } catch(final IOException ex) {
+        Util.debug(ex);
+      }
     }
   }
 

@@ -395,13 +395,13 @@ public enum FunDef {
   /** XQuery Function. */
   MAPNEW(FNMap.class, "new([maps[,coll]])", MAP_O, 0, MAP_ZM, STR),
   /** XQuery Function. */
-  MAPENTRY(FNMap.class, "entry(key,value)", MAP_O, ITEM, ITEM_ZM),
+  MAPENTRY(FNMap.class, "entry(key,value)", MAP_O, AAT, ITEM_ZM),
   /** XQuery Function. */
-  MAPGET(FNMap.class, "get(map,key)", ITEM_ZM, MAP_O, ITEM),
+  MAPGET(FNMap.class, "get(map,key)", ITEM_ZM, MAP_O, AAT),
   /** XQuery Function. */
-  MAPCONT(FNMap.class, "contains(map,key)", BLN, MAP_O, ITEM),
+  MAPCONT(FNMap.class, "contains(map,key)", BLN, MAP_O, AAT),
   /** XQuery Function. */
-  MAPREM(FNMap.class, "remove(map,key)", MAP_O, MAP_O, ITEM),
+  MAPREM(FNMap.class, "remove(map,key)", MAP_O, MAP_O, AAT),
   /** XQuery Function. */
   MAPSIZE(FNMap.class, "size(map)", ITR, MAP_O),
   /** XQuery Function. */

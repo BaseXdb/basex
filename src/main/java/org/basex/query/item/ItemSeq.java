@@ -85,13 +85,6 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public int hash(final InputInfo ii) throws QueryException {
-    int h = 0;
-    for(int v = 0; v != Math.min(size, 5); ++v) h += item[v].hash(ii);
-    return h;
-  }
-
-  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(PAR1);
     for(int i = 0; i < size; ++i) {
@@ -113,11 +106,6 @@ public final class ItemSeq extends Seq {
   @Override
   public Item itemAt(final long pos) {
     return item[(int) pos];
-  }
-
-  @Override
-  public ItemCache cache() {
-    return iter();
   }
 
   @Override

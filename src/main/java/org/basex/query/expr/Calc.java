@@ -309,6 +309,7 @@ public enum Calc {
    */
   final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
     if(!it.dur()) XPDUR.thrw(ii, info(), it.type);
+    if(it.type == DUR) throw SIMPLDUR.thrw(ii, info(), it);
     return (Dur) it;
   }
 

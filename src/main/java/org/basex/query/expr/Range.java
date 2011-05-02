@@ -6,7 +6,9 @@ import org.basex.query.QueryTokens;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.RangeSeq;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.RangeIter;
 import org.basex.util.InputInfo;
@@ -52,6 +54,13 @@ public final class Range extends Arr {
     final long[] v = rng(ctx);
     return v == null || v[0] > v[1] ? Empty.ITER :
       v[0] == v[1] ? Itr.get(v[0]).iter() : new RangeIter(v[0], v[1]);
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    final long[] v = rng(ctx);
+    return v == null || v[0] > v[1] ? Empty.SEQ :
+      v[0] == v[1] ? Itr.get(v[0]) : new RangeSeq(v[0], v[1] - v[0] + 1);
   }
 
   /**

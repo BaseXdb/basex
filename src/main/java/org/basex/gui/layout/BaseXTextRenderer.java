@@ -320,7 +320,7 @@ final class BaseXTextRenderer extends BaseXBack {
 
     final int ch = text.curr();
     if(y > 0 && y < h) {
-      if(ch == 0x10) {
+      if(ch == TokenBuilder.MARK) {
         color = GUIConstants.COLORFT;
         high = true;
       }
@@ -359,7 +359,7 @@ final class BaseXTextRenderer extends BaseXBack {
       if(ch > ' ') {
         g.setColor(color);
         g.drawString(text.nextWord(), x, y);
-      } else if(ch < 0x04) {
+      } else if(ch <= TokenBuilder.MARK) {
         g.setFont(font);
       }
 

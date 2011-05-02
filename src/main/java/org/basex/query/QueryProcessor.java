@@ -20,6 +20,7 @@ import org.basex.query.item.Atm;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import static org.basex.util.Token.*;
@@ -103,6 +104,16 @@ public final class QueryProcessor extends Progress {
   public Iter iter() throws QueryException {
     compile();
     return ctx.iter();
+  }
+
+  /**
+   * Returns a result value.
+   * @return result value
+   * @throws QueryException query exception
+   */
+  public Value value() throws QueryException {
+    compile();
+    return ctx.value();
   }
 
   /**

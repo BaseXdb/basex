@@ -51,7 +51,7 @@ public final class InfoDB extends AInfo {
 
     final TokenBuilder tb = new TokenBuilder();
     final String header = (bold ?
-        new TokenBuilder().high().add("%").norm().toString() : "%") + NL;
+        new TokenBuilder().bold().add("%").norm().toString() : "%") + NL;
     tb.addExt(header, INFODB);
     format(tb, INFODBNAME, meta.name);
     format(tb, INFODBSIZE, Performance.format(meta.dbsize()));

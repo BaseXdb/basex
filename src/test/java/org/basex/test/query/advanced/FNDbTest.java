@@ -31,7 +31,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Before
   public void initTest() throws BaseXException {
-    new CreateDB("db", FILE).execute(CTX);
+    new CreateDB("db", FILE).execute(CONTEXT);
   }
 
   /**
@@ -46,13 +46,13 @@ public final class FNDbTest extends AdvancedQueryTest {
     query("count(" + fun + "('db/'))", "1");
 
     // close database instance
-    new Close().execute(CTX);
+    new Close().execute(CONTEXT);
     query("count(" + fun + "(<a>db</a>))", "1");
     query("count(" + fun + "('db/x'))", "0");
     query(fun + "('db')//title/text()", "XML");
 
     // run function on non-existing database
-    new DropDB("db").execute(CTX);
+    new DropDB("db").execute(CONTEXT);
     error(fun + "('db')", Err.NODB);
   }
 
@@ -88,14 +88,14 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(FunDef.TEXT);
 
     // run function without and with index
-    new DropIndex("text").execute(CTX);
+    new DropIndex("text").execute(CONTEXT);
     query(fun + "('XML')", "XML");
-    new CreateIndex("text").execute(CTX);
+    new CreateIndex("text").execute(CONTEXT);
     query(fun + "('XML')", "XML");
     query(fun + "('XXX')", "");
 
     // run function on closed database
-    new Close().execute(CTX);
+    new Close().execute(CONTEXT);
     query("db:open('db')/" + fun + "('XML')", "XML");
     error(fun + "('XXX')", Err.NODBCTX);
   }
@@ -110,16 +110,16 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(FunDef.ATTR);
 
     // run function without and with index
-    new DropIndex("attribute").execute(CTX);
+    new DropIndex("attribute").execute(CONTEXT);
     query("data(" + fun + "('0'))", "0");
-    new CreateIndex("attribute").execute(CTX);
+    new CreateIndex("attribute").execute(CONTEXT);
     query("data(" + fun + "('0'))", "0");
     query("data(" + fun + "('0', 'id'))", "0");
     query("data(" + fun + "('0', 'XXX'))", "");
     query(fun + "('XXX')", "");
 
     // run function on closed database
-    new Close().execute(CTX);
+    new Close().execute(CONTEXT);
     query("data(db:open('db')/" + fun + "('0'))", "0");
     error("data(" + fun + "('XXX'))", Err.NODBCTX);
   }
@@ -134,14 +134,14 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(FunDef.FULLTEXT);
 
     // run function without and with index
-    new DropIndex("fulltext").execute(CTX);
+    new DropIndex("fulltext").execute(CONTEXT);
     error(fun + "('assignments')", Err.NOIDX);
-    new CreateIndex("fulltext").execute(CTX);
+    new CreateIndex("fulltext").execute(CONTEXT);
     query(fun + "('assignments')", "Assignments");
     query(fun + "('XXX')", "");
 
     // run function on closed database
-    new Close().execute(CTX);
+    new Close().execute(CONTEXT);
     query("db:open('db')/" + fun + "('assignments')", "Assignments");
     error(fun + "('XXX')", Err.NODBCTX);
   }
@@ -156,11 +156,11 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(FunDef.LIST);
 
     // create two other database and compare substring
-    new CreateDB("daz").execute(CTX);
-    new CreateDB("dba").execute(CTX);
+    new CreateDB("daz").execute(CONTEXT);
+    new CreateDB("dba").execute(CONTEXT);
     contains(fun + "()", "daz db dba");
-    new DropDB("daz").execute(CTX);
-    new DropDB("dba").execute(CTX);
+    new DropDB("daz").execute(CONTEXT);
+    new DropDB("dba").execute(CONTEXT);
   }
 
   /**
@@ -211,17 +211,17 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // drop indexes and check index queries
     final String[] types = { "text", "attribute", "fulltext" };
-    for(final String type : types) new DropIndex(type).execute(CTX);
+    for(final String type : types) new DropIndex(type).execute(CONTEXT);
     for(final String type : types) query(fun + "('" + type + "')");
     // create indexes and check index queries
-    for(final String type : types) new CreateIndex(type).execute(CTX);
+    for(final String type : types) new CreateIndex(type).execute(CONTEXT);
     for(final String type : types) query(fun + "('" + type + "')");
     // check name indexes
     query(fun + "('tag')");
     query(fun + "('attname')");
 
     // run function on closed database
-    new Close().execute(CTX);
+    new Close().execute(CONTEXT);
     contains("db:open('db')/" + fun + "()", INFOON);
     contains("db:open('db')/" + fun + "('tag')", ":");
     error(fun + "('tag')", Err.NODBCTX);
@@ -233,6 +233,6 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @AfterClass
   public static void finish() throws BaseXException {
-    new DropDB("db").execute(CTX);
+    new DropDB("db").execute(CONTEXT);
   }
 }

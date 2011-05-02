@@ -286,7 +286,8 @@ public final class XMLSerializer extends Serializer {
     final FTLexer lex = new FTLexer().sc().init(b);
     while(lex.hasNext()) {
       final FTSpan span = lex.next();
-      if(!span.special && ftp.contains(span.pos)) print((char) 0x10);
+      if(!span.special && ftp.contains(span.pos))
+        print((char) TokenBuilder.MARK);
       final byte[] t = span.text;
       for(int k = 0; k < t.length; k += cl(t, k)) ch(cp(t, k));
     }

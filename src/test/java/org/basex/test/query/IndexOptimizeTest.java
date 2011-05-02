@@ -28,7 +28,7 @@ import org.junit.Test;
  */
 public final class IndexOptimizeTest {
   /** Database context. */
-  private static final Context CTX = new Context();
+  private static final Context CONTEXT = new Context();
   /** Test database name. */
   private static final String NAME = Util.name(IndexOptimizeTest.class);
 
@@ -38,9 +38,9 @@ public final class IndexOptimizeTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    new Set(Prop.FTINDEX, true).execute(CTX);
-    new CreateDB(NAME, "<xml><a>1</a><a>1 2</a></xml>").execute(CTX);
-    new Close().execute(CTX);
+    new Set(Prop.FTINDEX, true).execute(CONTEXT);
+    new CreateDB(NAME, "<xml><a>1</a><a>1 2</a></xml>").execute(CONTEXT);
+    new Close().execute(CONTEXT);
   }
 
   /**
@@ -49,7 +49,7 @@ public final class IndexOptimizeTest {
    */
   @AfterClass
   public static void stop() throws Exception {
-    new DropDB(NAME).execute(CTX);
+    new DropDB(NAME).execute(CONTEXT);
   }
 
   /**
@@ -60,7 +60,7 @@ public final class IndexOptimizeTest {
   @Test
   public void openDocTest() throws Exception {
     createDoc();
-    new Open(NAME).execute(CTX);
+    new Open(NAME).execute(CONTEXT);
     check("//*[text() = '1']");
     check("//*[text() contains text '1']");
   }
@@ -73,7 +73,7 @@ public final class IndexOptimizeTest {
   @Test
   public void openCollTest() throws Exception {
     createColl();
-    new Open(NAME).execute(CTX);
+    new Open(NAME).execute(CONTEXT);
     check("//*[text() = '1']");
     check("//*[text() contains text '1']");
   }
@@ -133,7 +133,7 @@ public final class IndexOptimizeTest {
   @Test
   public void ftTest() throws Exception {
     createDoc();
-    new Open(NAME).execute(CTX);
+    new Open(NAME).execute(CONTEXT);
     check("//*[text() <- '1']", "<a>1</a>");
     check("//*[text() <- '1 2' any word]", "<a>1</a><a>2 3</a>");
     check("//*[text() <- {'2','4'} all]", "");
@@ -146,8 +146,8 @@ public final class IndexOptimizeTest {
    * @throws Exception exception
    */
   private void createDoc() throws Exception {
-    new CreateDB(NAME, "<xml><a>1</a><a>2 3</a></xml>").execute(CTX);
-    new Close().execute(CTX);
+    new CreateDB(NAME, "<xml><a>1</a><a>2 3</a></xml>").execute(CONTEXT);
+    new Close().execute(CONTEXT);
   }
 
   /**
@@ -155,11 +155,11 @@ public final class IndexOptimizeTest {
    * @throws Exception exception
    */
   private void createColl() throws Exception {
-    new CreateDB(NAME).execute(CTX);
-    new Add("<xml><a>1</a><a>2 3</a></xml>", "one").execute(CTX);
-    new Add("<xml><a>4</a><a>5 6</a></xml>", "two").execute(CTX);
-    new Optimize().execute(CTX);
-    new Close().execute(CTX);
+    new CreateDB(NAME).execute(CONTEXT);
+    new Add("<xml><a>1</a><a>2 3</a></xml>", "one").execute(CONTEXT);
+    new Add("<xml><a>4</a><a>5 6</a></xml>", "two").execute(CONTEXT);
+    new Optimize().execute(CONTEXT);
+    new Close().execute(CONTEXT);
   }
 
   /**
@@ -179,7 +179,7 @@ public final class IndexOptimizeTest {
   private void check(final String query, final String result) {
     // compile query
     ArrayOutput plan = null;
-    QueryProcessor qp = new QueryProcessor(query, CTX);
+    QueryProcessor qp = new QueryProcessor(query, CONTEXT);
     try {
       ArrayOutput ao = new ArrayOutput();
       XMLSerializer xml = qp.getSerializer(ao);
@@ -192,7 +192,7 @@ public final class IndexOptimizeTest {
       plan = new ArrayOutput();
       qp.plan(new XMLSerializer(plan));
 
-      qp = new QueryProcessor(plan + "//(IndexAccess|FTIndexAccess)", CTX);
+      qp = new QueryProcessor(plan + "//(IndexAccess|FTIndexAccess)", CONTEXT);
       ao = new ArrayOutput();
       xml = qp.getSerializer(ao);
       qp.execute().serialize(xml);

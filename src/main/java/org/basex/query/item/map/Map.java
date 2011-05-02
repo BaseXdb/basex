@@ -3,7 +3,7 @@ package org.basex.query.item.map;
 import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import static org.basex.query.QueryTokens.*;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
@@ -237,7 +237,7 @@ public class Map extends FItem {
    * @return collation
    */
   public Str collation() {
-    return Str.get(QueryTokens.URLCOLL);
+    return Str.get(URLCOLL);
   }
 
   /**
@@ -254,5 +254,10 @@ public class Map extends FItem {
   @Override
   public int hash(final InputInfo ii) throws QueryException {
     return root.hash(ii);
+  }
+
+  @Override
+  public String desc() {
+    return MAPSTR + BRACE1 + DOTS + BRACE2;
   }
 }

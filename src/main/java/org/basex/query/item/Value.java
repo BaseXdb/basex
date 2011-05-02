@@ -155,7 +155,7 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public final String desc() {
+  public String desc() {
     return name();
   }
 
@@ -182,9 +182,10 @@ public abstract class Value extends Expr {
 
   /**
    * Creates an {@link ItemCache}, containing all items of this value.
+   * Use with care, as compressed Values are expanded, creating many objects.
    * @return cached items
    */
-  public ItemCache cache() {
+  public final ItemCache cache() {
     final ItemCache ic = new ItemCache((int) size());
     ic.size(writeTo(ic.item, 0));
     return ic;
