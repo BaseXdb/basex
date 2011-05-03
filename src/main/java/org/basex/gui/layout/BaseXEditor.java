@@ -29,6 +29,7 @@ import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.io.IO;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Undo;
 import org.basex.util.Util;
 import static org.basex.util.Token.*;
@@ -167,7 +168,9 @@ public class BaseXEditor extends BaseXPanel {
     for(int r = 0; r < s; ++r) {
       final byte b = t[r];
       // support characters, highlighting codes, tabs and newlines
-      if(b < 4 || b >= ' ' || b == 0x09 || b == 0x0A) t[ns++] = t[r];
+      if(b >= ' ' || b <= TokenBuilder.MARK || b == 0x09 || b == 0x0A) {
+        t[ns++] = t[r];
+      }
       eq &= ns < ts && ns < s && t[ns] == tt[ns];
     }
     eq &= ns == ts;
