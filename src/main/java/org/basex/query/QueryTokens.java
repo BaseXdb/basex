@@ -545,4 +545,8 @@ public interface QueryTokens {
   byte[] MAX = token("max");
   /** Minimum . */
   byte[] INF = token("inf");
+  /** Query Plan. */
+  byte[] ENTRY = token("entry");
+  /** Query Plan. */
+  byte[] KEY = token("key");
 }

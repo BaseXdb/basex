@@ -2,6 +2,9 @@ package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
 
+import java.io.IOException;
+
+import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.Iter;
@@ -97,4 +100,7 @@ public abstract class FItem extends Item {
   public Object toJava() {
     throw Util.notexpected();
   }
+
+  @Override
+  public abstract void plan(Serializer ser) throws IOException;
 }

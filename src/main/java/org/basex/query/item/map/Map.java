@@ -1,6 +1,10 @@
 package org.basex.query.item.map;
 
 import static org.basex.query.util.Err.*;
+
+import java.io.IOException;
+
+import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import static org.basex.query.QueryTokens.*;
@@ -21,6 +25,7 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -259,5 +264,24 @@ public class Map extends FItem {
   @Override
   public String desc() {
     return MAPSTR + BRACE1 + DOTS + BRACE2;
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    final long s = mapSize().itr(null);
+    ser.openElement(MAP, SIZE, Token.token(s));
+    final Value ks = keys();
+    try {
+      for(long i = 0, max = Math.min(s, 5); i < max; i++) {
+        final Item key = ks.itemAt(i);
+        final Value val = get(key, null);
+        ser.openElement(ENTRY, KEY, key.atom(null));
+        val.plan(ser);
+        ser.closeElement();
+      }
+    } catch(final QueryException e) {
+      Util.debug(e);
+    }
+    ser.closeElement();
   }
 }
