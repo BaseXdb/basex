@@ -128,8 +128,8 @@ public final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Value collection(final QueryContext ctx) throws QueryException {
-    return ctx.resource.collection(expr.length != 0 ? checkStr(expr[0], ctx) :
-      null, input);
+    final Item it = expr.length != 0 ? expr[0].item(ctx, input) : null;
+    return ctx.resource.collection(it != null ? checkEStr(it) : null, input);
   }
 
   /**

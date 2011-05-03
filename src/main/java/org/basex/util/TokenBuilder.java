@@ -13,10 +13,12 @@ import java.util.Arrays;
 public final class TokenBuilder {
   /** Half new line. */
   public static final byte HL = 0x01;
-  /** Highlighting flag. */
-  public static final byte HIGH = 0x02;
+  /** Bold flag. */
+  public static final byte BOLD = 0x02;
   /** Standard flag. */
   public static final byte NORM = 0x03;
+  /** Mark flag. */
+  public static final byte MARK = 0x04;
   /** New line. */
   public static final byte NL = 0x0a;
 
@@ -85,12 +87,12 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a highlight flag.
+   * Adds a bold flag.
    * This flag is evaluated by the text renderer in the frontend.
    * @return self reference
    */
-  public TokenBuilder high() {
-    return addByte(HIGH);
+  public TokenBuilder bold() {
+    return addByte(BOLD);
   }
 
   /**
