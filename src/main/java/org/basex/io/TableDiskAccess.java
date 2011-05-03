@@ -252,11 +252,11 @@ public final class TableDiskAccess extends TableAccess {
     final int diff = sub - nsize;
     final int max = rpre - Math.abs(diff);
     for(int i = pre; i < max; i++) {
-      final int o = cursor(pre);
+      final int o = cursor(i);
       final byte[] b = bf.data;
       for(int j = 0; j < 16; j++) b[o + j] = entries[off++];
+      bf.dirty = true;
     }
-    bf.dirty = true;
 
     // handle the remaining entries if the two subtrees are of different size
     // case1: new subtree bigger than old one, insert remaining new nodes
@@ -268,6 +268,8 @@ public final class TableDiskAccess extends TableAccess {
       // case2: old subtree bigger than new one, delete remaining old nodes
       delete(max, diff);
     }
+    bf.dirty = true;
+    dirty = true;
   }
 
   @Override
