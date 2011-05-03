@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.item.SeqType.*;
+
 import java.util.HashMap;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FunType;
@@ -524,6 +525,10 @@ public enum FunDef {
   COPY(FNFile.class, "copy(source,target)", EMP, STR, STR),
   /** XQuery function */
   MOVE(FNFile.class, "move(source,target)", EMP, STR, STR),
+  /** XQuery function */
+  DIRSEP(FNFile.class, "directory-separator()", STR),
+  /** XQuery function */
+  PATHSEP(FNFile.class, "path-separator()", STR),
 
   /* FNFt functions. */
 

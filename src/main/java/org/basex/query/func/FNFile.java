@@ -91,6 +91,8 @@ public final class FNFile extends Fun {
       case PATHNATIVE:  return pathToNative(path);
       case RESOLVEPATH: return Str.get(path.getAbsolutePath());
       case PATHTOURI:   return pathToUri(path);
+      case DIRSEP:      return dirSep();
+      case PATHSEP:     return pathSep();
       default:          return super.item(ctx, ii);
     }
   }
@@ -128,6 +130,7 @@ public final class FNFile extends Fun {
   private Str baseName(final File path, final QueryContext ctx)
       throws QueryException {
 
+    if(path.getPath().length() == 0) return Str.get(".");
     final String suf = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
     String pth = path.getName();
     if(suf != null && pth.endsWith(suf))
@@ -451,6 +454,22 @@ public final class FNFile extends Fun {
         if(tc != null) try { tc.close(); } catch(final IOException ex) { }
       }
     }
+  }
+
+  /**
+   * Returns the directory separator used by the operating system.
+   * @return directory separator
+   */
+  private Str dirSep() {
+    return Str.get(System.getProperty("file.separator"));
+  }
+
+  /**
+   * Returns the path separator used by the operating system.
+   * @return path separator
+   */
+  private Str pathSep() {
+    return Str.get(System.getProperty("path.separator"));
   }
 
   /**
