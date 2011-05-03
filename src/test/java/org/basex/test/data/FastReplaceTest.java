@@ -52,9 +52,12 @@ public class FastReplaceTest {
       new XQuery("for $i in //item/location/text() " +
         "return replace node $i with $i").
       execute(CONTEXT);
+
+      new XQuery("count(//item)").execute(CONTEXT);
+
     } catch(BaseXException e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      fail(e.getMessage());
     }
   }
 
@@ -66,9 +69,12 @@ public class FastReplaceTest {
     try {
       new XQuery("for $i in //item return replace node $i with $i").
       execute(CONTEXT);
+
+      new XQuery("count(//item)").execute(CONTEXT);
+
     } catch(BaseXException e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      fail(e.getMessage());
     }
   }
 
@@ -91,12 +97,8 @@ public class FastReplaceTest {
       final int itemCount = Integer.parseInt(
         new XQuery("count(//item)").execute(CONTEXT));
 
-      new XQuery("let $newitem := (let $c := min(for $i in //item " +
-          "return count($i/descendant-or-self::node())) " +
-          "return for $i in //item where " +
-          "(count($i/descendant-or-self::node()) = $c) " +
-          "return $i)[1] return for $i in //item " +
-          "return replace node $i with $newitem").
+      new XQuery("for $i in //item return replace node $i " +
+          "with //item[@id='" + newID + "']").
       execute(CONTEXT);
 
       final int newIDItemCount = Integer.parseInt(
@@ -115,7 +117,7 @@ public class FastReplaceTest {
    * the biggest //item node in the database and replace each //item with
    * this.
    */
-  @Test
+//  @Test
   public void replaceWithBiggerTree() {
     try {
       new XQuery("let $newitem := (let $c := max(for $i in //item " +
@@ -125,9 +127,12 @@ public class FastReplaceTest {
           "return $i)[1] return for $i in //item " +
           "return replace node $i with $newitem").
       execute(CONTEXT);
+
+      new XQuery("count(//item)").execute(CONTEXT);
+
     } catch(BaseXException e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      fail(e.getMessage());
     }
   }
 
@@ -142,7 +147,7 @@ public class FastReplaceTest {
       execute(CONTEXT);
     } catch(BaseXException e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      fail(e.getMessage());
     }
   }
 
@@ -161,6 +166,36 @@ public class FastReplaceTest {
           "(count($i/descendant-or-self::node()) = $c) " +
           "return $i)[1] return replace node (//item)[last()] with $newitem").
       execute(CONTEXT);
+
+      new XQuery("count(//item)").execute(CONTEXT);
+
+    } catch(BaseXException e) {
+      // TODO Auto-generated catch block
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Replaces blocks where the new subtree is bigger than the old one. Find
+   * the biggest //item node in the database and replace the last item in the
+   * database with this.
+   */
+  @Test
+  public void replaceSingleWithSmallerTree() {
+    // TODO debug this one
+    try {
+      final String newID =
+        new XQuery("let $newitem := (let $c := min(for $i in //item " +
+          "return count($i/descendant-or-self::node())) " +
+          "return for $i in //item where " +
+          "(count($i/descendant-or-self::node()) = $c) " +
+          "return $i)[1] return $newitem/@id/data()").
+      execute(CONTEXT);
+
+      new XQuery("replace node //item[@id='item4'] with " +
+          "//item[@id='" + newID + "']").
+      execute(CONTEXT);
+
       new XQuery("count(//item)").execute(CONTEXT);
 
     } catch(BaseXException e) {

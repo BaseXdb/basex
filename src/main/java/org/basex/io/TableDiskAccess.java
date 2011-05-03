@@ -250,7 +250,7 @@ public final class TableDiskAccess extends TableAccess {
     final int rpre = pre + nsize;
     int off = 0;
     final int diff = sub - nsize;
-    final int max = rpre - Math.abs(diff);
+    final int max = diff <= 0 ? rpre - Math.abs(diff) : pre + nsize;
     for(int i = pre; i < max; i++) {
       final int o = cursor(i);
       final byte[] b = bf.data;
