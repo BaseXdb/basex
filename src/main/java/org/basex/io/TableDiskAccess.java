@@ -174,32 +174,7 @@ public final class TableDiskAccess extends TableAccess {
     bf.dirty = true;
   }
 
-  @Override
-  public void replace(final int pre, final byte[] entries, final int sub) {
-    final int nsize = entries.length >>> IO.NODEPOWER;
-    final int rpre = pre + nsize;
-    int off = 0;
-    final int diff = sub - nsize;
-    final int max = rpre - Math.abs(diff);
-    for(int i = pre; i < max; i++) {
-      final int o = cursor(pre);
-      final byte[] b = bf.data;
-      for(int j = 0; j < 16; j++) b[o + j] = entries[off++];
-    }
-    bf.dirty = true;
-
-    // handle the remaining entries if the two subtrees are of different size
-    // case1: new subtree bigger than old one, insert remaining new nodes
-    if(diff < 0) {
-      final byte[] tmp = new byte[entries.length - off];
-      System.arraycopy(entries, off, tmp, 0, tmp.length);
-      insert(rpre + diff, tmp);
-    } else if(diff > 0) {
-      // case2: old subtree bigger than new one, delete remaining old nodes
-      delete(rpre - diff, diff);
-    }
-  }
-
+  /* Note to delete method: Freed blocks are currently ignored. */
   @Override
   public void delete(final int first, final int nr) {
     // mark index as dirty and get first block
@@ -267,6 +242,32 @@ public final class TableDiskAccess extends TableAccess {
     fpres[index] = first;
     fpre = first;
     updatePre(nr);
+  }
+
+  @Override
+  public void replace(final int pre, final byte[] entries, final int sub) {
+    final int nsize = entries.length >>> IO.NODEPOWER;
+    final int rpre = pre + nsize;
+    int off = 0;
+    final int diff = sub - nsize;
+    final int max = diff <= 0 ? rpre - Math.abs(diff) : pre + nsize;
+    for(int i = pre; i < max; i++) {
+      final int o = cursor(i);
+      final byte[] b = bf.data;
+      for(int j = 0; j < 16; j++) b[o + j] = entries[off++];
+      bf.dirty = true;
+    }
+
+    // handle the remaining entries if the two subtrees are of different size
+    // case1: new subtree bigger than old one, insert remaining new nodes
+    if(diff < 0) {
+      final byte[] tmp = new byte[entries.length - off];
+      System.arraycopy(entries, off, tmp, 0, tmp.length);
+      insert(max, tmp);
+    } else if(diff > 0) {
+      // case2: old subtree bigger than new one, delete remaining old nodes
+      delete(max, diff);
+    }
   }
 
   @Override
