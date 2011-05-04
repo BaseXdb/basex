@@ -634,7 +634,7 @@ public abstract class Data {
     updateDist(p, -s);
 
     // NSNodes have to be checked for pre value shifts after delete
-    ns.updatePreValues(pre, s, false, null);
+    ns.update(pre, s, false, null);
 
     // restore empty document node
     if(empty) {
@@ -811,7 +811,7 @@ public abstract class Data {
     updateDist(ipre + ms, ms);
 
     // NSNodes have to be checked for pre value shifts after insert
-    ns.updatePreValues(ipre, ms, true, newNodes);
+    ns.update(ipre, ms, true, newNodes);
 
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
