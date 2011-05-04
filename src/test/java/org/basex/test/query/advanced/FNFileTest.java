@@ -21,7 +21,6 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Directory separator. */
   private static final String DIRSEP = System.getProperty("file.separator");
   /** Path separator. */
-  private static final String PATHSEP = System.getProperty("path.separator");
   /** Test name. */
   private static final String NAME = Util.name(FNFileTest.class);
   /** Test path. */
@@ -399,27 +398,5 @@ public final class FNFileTest extends AdvancedQueryTest {
     final String path2 = query(fun + "('" + PATH1 + DIRSEP + ".." + DIRSEP
         + "test.xml" + "')");
     assertEquals(path2, Prop.TMP + "test.xml");
-  }
-
-  /**
-   * Tests method for file:directory-separator() function.
-   * @throws Exception exception
-   */
-  @Test
-  public void testDirSep() throws Exception {
-    final String fun = check(FunDef.DIRSEP);
-    final String sep = query(fun + "()");
-    assertEquals(sep, DIRSEP);
-  }
-
-  /**
-   * Tests method for file:path-separator() function.
-   * @throws Exception exception
-   */
-  @Test
-  public void testPathSep() throws Exception {
-    final String fun = check(FunDef.PATHSEP);
-    final String sep = query(fun + "()");
-    assertEquals(sep, PATHSEP);
   }
 }
