@@ -259,8 +259,8 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // handle the remaining entries if the two subtrees are of different size
-    // case1: new subtree bigger than old one, insert remaining new nodes
     if(diff < 0) {
+      // case1: new subtree bigger than old one, insert remaining new nodes
       final byte[] tmp = new byte[entries.length - off];
       System.arraycopy(entries, off, tmp, 0, tmp.length);
       insert(max, tmp);
