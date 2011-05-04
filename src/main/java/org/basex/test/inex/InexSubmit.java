@@ -53,12 +53,12 @@ public final class InexSubmit {
 
   /** Kind of task. */
   private static final String[] TASK = new String[] {"adhoc",
-    "budget10", "budget100", "budget1000", "budget10000"};
+    "budget10", "budget100", "budget1000", "budget10000" };
   /** Kind of type. */
   private static final String[] TYPE =
-    new String[] {"focused", "thorough", "article"};
+    new String[] {"focused", "thorough", "article" };
   /** Kind of query. */
-  private static final String[] QUERY = new String[] {"automatic", "manual"};
+  private static final String[] QUERY = new String[] {"automatic", "manual" };
 
   /** Database context. */
   private final Context ctx = new Context();
