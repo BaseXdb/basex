@@ -1,6 +1,7 @@
 package org.basex.test.jaxrx;
 
 import static org.junit.Assert.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -19,6 +20,8 @@ import org.basex.util.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import sun.misc.BASE64Encoder;
 
 /**
  * This class provides a framework for JAX-RX tests.
@@ -371,6 +374,13 @@ public final class JaxRxTest {
     conn.setDoOutput(true);
     conn.setRequestMethod("POST");
     conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "application/query+xml");
+    // basic authentication example
+    BASE64Encoder enc = new BASE64Encoder();
+    String user = "admin";
+    String pw ="admin";
+    String userpw = user+":"+pw;
+    String encoded = enc.encode(userpw.getBytes());
+    conn.setRequestProperty("Authorization", "Basic "+encoded);
     // send query
     final OutputStream out = conn.getOutputStream();
     out.write(Token.token(query));
