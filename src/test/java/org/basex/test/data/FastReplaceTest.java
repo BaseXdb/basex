@@ -7,6 +7,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -37,7 +38,7 @@ public class FastReplaceTest {
   public void setUp() throws Exception {
     new CreateDB(DBNAME, DOC).execute(CONTEXT);
     new XQuery("let $items := /site/regions//item " +
-        "for $i in 1 to 0 " +
+        "for $i in 1 to 100 " +
         "return (insert node $items into /site/regions, " +
         "insert node $items before /site/regions, " +
         "insert node $items after /site/closed_auctions)").execute(CONTEXT);
@@ -56,7 +57,6 @@ public class FastReplaceTest {
       new XQuery("count(//item)").execute(CONTEXT);
 
     } catch(BaseXException e) {
-      // TODO Auto-generated catch block
       fail(e.getMessage());
     }
   }
@@ -73,7 +73,6 @@ public class FastReplaceTest {
       new XQuery("count(//item)").execute(CONTEXT);
 
     } catch(BaseXException e) {
-      // TODO Auto-generated catch block
       fail(e.getMessage());
     }
   }
@@ -85,7 +84,6 @@ public class FastReplaceTest {
    */
   @Test
   public void replaceWithSmallerTree() {
-    // check number of @id for equality
     try {
       final String newID =
         new XQuery("let $newitem := (let $c := min(for $i in //item " +
@@ -98,7 +96,7 @@ public class FastReplaceTest {
         new XQuery("count(//item)").execute(CONTEXT));
 
       new XQuery("for $i in //item return replace node $i " +
-          "with //item[@id='" + newID + "']").
+          "with (//item[@id='" + newID + "'])[1]").
       execute(CONTEXT);
 
       final int newIDItemCount = Integer.parseInt(
@@ -107,7 +105,6 @@ public class FastReplaceTest {
       assertEquals(itemCount, newIDItemCount);
 
     } catch(BaseXException e) {
-      // TODO Auto-generated catch block
       fail(e.getMessage());
     }
   }
@@ -117,7 +114,7 @@ public class FastReplaceTest {
    * the biggest //item node in the database and replace each //item with
    * this.
    */
-//  @Test
+  @Test
   public void replaceWithBiggerTree() {
     try {
       new XQuery("let $newitem := (let $c := max(for $i in //item " +
@@ -131,7 +128,6 @@ public class FastReplaceTest {
       new XQuery("count(//item)").execute(CONTEXT);
 
     } catch(BaseXException e) {
-      // TODO Auto-generated catch block
       fail(e.getMessage());
     }
   }
@@ -141,12 +137,10 @@ public class FastReplaceTest {
    */
   @Test
   public void createTestDatabase() {
-    // TODO debug this one
     try {
       new XQuery("/").
       execute(CONTEXT);
     } catch(BaseXException e) {
-      // TODO Auto-generated catch block
       fail(e.getMessage());
     }
   }
@@ -158,7 +152,6 @@ public class FastReplaceTest {
    */
   @Test
   public void replaceSingleWithBiggerTree() {
-    // TODO debug this one
     try {
       new XQuery("let $newitem := (let $c := max(for $i in //item " +
           "return count($i/descendant-or-self::node())) " +
@@ -170,7 +163,6 @@ public class FastReplaceTest {
       new XQuery("count(//item)").execute(CONTEXT);
 
     } catch(BaseXException e) {
-      // TODO Auto-generated catch block
       fail(e.getMessage());
     }
   }
@@ -182,7 +174,6 @@ public class FastReplaceTest {
    */
   @Test
   public void replaceSingleWithSmallerTree() {
-    // TODO debug this one
     try {
       final String newID =
         new XQuery("let $newitem := (let $c := min(for $i in //item " +
@@ -192,14 +183,13 @@ public class FastReplaceTest {
           "return $i)[1] return $newitem/@id/data()").
       execute(CONTEXT);
 
-      new XQuery("replace node //item[@id='item4'] with " +
-          "//item[@id='" + newID + "']").
+      new XQuery("replace node (//item)[last()] with " +
+          "(//item[@id='" + newID + "'])[1]").
       execute(CONTEXT);
 
       new XQuery("count(//item)").execute(CONTEXT);
 
     } catch(BaseXException e) {
-      // TODO Auto-generated catch block
       fail(e.getMessage());
     }
   }
@@ -219,12 +209,11 @@ public class FastReplaceTest {
    */
   @AfterClass
   public static void end() {
-//    try {
-//      new DropDB(DBNAME).execute(CONTEXT);
-//    } catch(BaseXException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    }
+    try {
+      new DropDB(DBNAME).execute(CONTEXT);
+    } catch(BaseXException e) {
+      e.printStackTrace();
+    }
     CONTEXT.close();
   }
 }

@@ -568,8 +568,8 @@ public abstract class Data {
       }
     }
 
-    final int rsize = size(rpre, rkind);
     // increase/decrease size of ancestors, adjust distances of siblings
+    final int rsize = size(rpre, rkind);
     final int rpar = parent(rpre, rkind);
     // diff > 0 if new subtree is bigger than old one, v.v.
     final int diff = dsize - rsize;
