@@ -89,6 +89,7 @@ abstract class ACreate extends Command {
       } else {
         d.close();
         if(!run(new Open(db))) return false;
+        info.reset();
 
         final Data data = context.data;
         if(prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT, data);

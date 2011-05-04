@@ -29,7 +29,7 @@ public abstract class Command extends Progress {
   public static final int DATAREF = 512;
 
   /** Container for query information. */
-  private final TokenBuilder info = new TokenBuilder();
+  protected final TokenBuilder info = new TokenBuilder();
   /** Command arguments. */
   protected final String[] args;
 

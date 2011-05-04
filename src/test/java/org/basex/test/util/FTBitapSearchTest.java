@@ -98,7 +98,7 @@ public final class FTBitapSearchTest {
           new String[][] { { "token1" } },
           new int[] { 0 }),
       new TestData(
-          new String[] { "token1"},
+          new String[] { "token1" },
           new String[][] { { "token2" } },
           new int[] { }),
       new TestData(
@@ -115,7 +115,7 @@ public final class FTBitapSearchTest {
           new int[] { 0, 1}),
       new TestData(
           new String[] { },
-          new String[][] { { "token", "token"} },
+          new String[][] { { "token", "token" } },
           new int[] { }),
       new TestData(
           new String[] { },
@@ -127,7 +127,7 @@ public final class FTBitapSearchTest {
           new int[] { }),
       new TestData(
           new String[] { "token1", "token2", "token3" },
-          new String[][] { { "token2", "token3"}, { "token2" } },
+          new String[][] { { "token2", "token3" }, { "token2" } },
           new int[] { 1, 1}),
       new TestData(
           new String[] { "token1", "token2", "token3" },
