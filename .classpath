@@ -19,6 +19,5 @@
 	<classpathentry kind="lib" path="lib/xqj-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/jersey-core-1.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/basex"/>
-	<classpathentry kind="lib" path="/home/lukas/workspace/jax-rx/target/jax-rx-1.3.0-SNAPSHOT-jar-with-dependencies.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -21,10 +21,12 @@ import org.jaxrx.JettyServer;
 public final class JaxRxServer extends BaseXServer {
   /** JAX-RX String. */
   private static final String JAXRX = "JAX-RX";
-  /** Shiro .ini config file. */
-  private static final String INI = "shiro.ini";
   /** Jetty server. */
   private JettyServer jetty;
+  /** Optional user. */
+  private String user;
+  /** Optional password. */
+  private String pass;
 
   /**
    * Main method, launching the JAX-RX implementation.
@@ -50,17 +52,13 @@ public final class JaxRxServer extends BaseXServer {
     // store configuration in system properties
     // if a property has already been set, the new settings will be ignored
 
-    // set user (use 'admin' as default)
-    final boolean user = System.getProperty(BXJaxRx.USER) != null;
-    if(!user) set(BXJaxRx.USER, Text.ADMIN, false);
-    // set password (use 'admin' as default, or request on command line)
-    final String pass = System.getProperty(BXJaxRx.PASSWORD);
-    String p = pass != null ? pass : user ? null : Text.ADMIN;
+    String p = pass != null ? pass : user != null ? null : Text.ADMIN;
     while(p == null) {
       Util.out(SERVERPW + COLS);
-      p = password();
+      pass = password();
     }
-    set(BXJaxRx.PASSWORD, p, false);
+    set(BXJaxRx.USER, user == null ? "" : user, user != null);
+    set(BXJaxRx.PASSWORD, pass == null ? "" : pass, pass != null);
 
     // define path and name of the JAX-RX implementation.
     set("org.jaxrx.systemName", Text.NAMELC, false);
@@ -68,25 +66,7 @@ public final class JaxRxServer extends BaseXServer {
 
     // start Jetty server (if not done yet)
     try {
-      if(context.prop.is(Prop.AUTH)) {
-        System.out.println("Server will start with authentication");
-
-        // Read existing INI file from resources folder.
-        IniBuilder iniBuilder = new IniBuilder(INI);
-
-        // Alternativ to generate an INI file on the fly.
-        // final IniBuilder iniBuilder = new IniBuilder();
-        // iniBuilder.setAuthenticationMethod("org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter");
-        // iniBuilder.setCustomRealm("org.basex.api.jaxrx.Realm");
-        // iniBuilder.setURL("/basex/jax-rx/*");
-
-        jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT),
-            iniBuilder.buildIni());
-
-      } else {
-        System.out.println("Server without authentication");
-        jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT));
-      }
+      jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT));
       Util.outln(JAXRX + ' ' + SERVERSTART);
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -95,8 +75,8 @@ public final class JaxRxServer extends BaseXServer {
   }
 
   @Override
-  public void quit(final boolean user) {
-    super.quit(user);
+  public void quit(final boolean u) {
+    super.quit(u);
     if(jetty != null) jetty.stop();
   }
 
@@ -120,10 +100,7 @@ public final class JaxRxServer extends BaseXServer {
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
-        if(c == 'a') {
-          // authentication will be performed for HTTP REST requests
-          context.prop.set(Prop.AUTH, true);
-        } else if(c == 'D') {
+        if(c == 'D') {
           // hidden flag: daemon mode
           daemon = true;
         } else if(c == 'j') {
@@ -134,7 +111,7 @@ public final class JaxRxServer extends BaseXServer {
           set(BXJaxRx.SERVERPORT, arg.num(), true);
         } else if(c == 'P') {
           // specify password
-          set(BXJaxRx.PASSWORD, arg.string(), true);
+          pass = arg.string();
         } else if(c == 's') {
           // set service flag
           service = !daemon;
@@ -145,7 +122,7 @@ public final class JaxRxServer extends BaseXServer {
           set(BXJaxRx.SERIALIZER, serial, true);
         } else if(c == 'U') {
           // specify user name
-          set(BXJaxRx.USER, arg.string(), true);
+          user = arg.string();
         } else if(c == 'z') {
           // suppress logging
           quiet = true;
