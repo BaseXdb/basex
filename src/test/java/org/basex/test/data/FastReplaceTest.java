@@ -9,30 +9,30 @@ import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Stress Testing the fast replace feature where blocks on diks are directly
+ * Stress Testing the fast replace feature where blocks on disks are directly
  * overwritten.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public class FastReplaceTest {
-
-  /** Basex context. */
+public final class FastReplaceTest {
+  /** Database context. */
   public static final Context CONTEXT = new Context();
   /** Test document. */
   public static final String DOC = "etc/xml/xmark.xml";
   /** Test database name. */
-  public static final String DBNAME = "XQUPStressTest";
+  public static final String DBNAME = Util.name(FastReplaceTest.class);
 
   /**
    * Creates the db based on xmark.xml.
-   * @throws Exception excp
+   * @throws Exception exception
    */
   @Before
   public void setUp() throws Exception {
@@ -56,7 +56,7 @@ public class FastReplaceTest {
 
       new XQuery("count(//item)").execute(CONTEXT);
 
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       fail(e.getMessage());
     }
   }
@@ -72,7 +72,7 @@ public class FastReplaceTest {
 
       new XQuery("count(//item)").execute(CONTEXT);
 
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       fail(e.getMessage());
     }
   }
@@ -104,7 +104,7 @@ public class FastReplaceTest {
 
       assertEquals(itemCount, newIDItemCount);
 
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       fail(e.getMessage());
     }
   }
@@ -127,7 +127,7 @@ public class FastReplaceTest {
 
       new XQuery("count(//item)").execute(CONTEXT);
 
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       fail(e.getMessage());
     }
   }
@@ -140,7 +140,7 @@ public class FastReplaceTest {
     try {
       new XQuery("/").
       execute(CONTEXT);
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       fail(e.getMessage());
     }
   }
@@ -162,7 +162,7 @@ public class FastReplaceTest {
 
       new XQuery("count(//item)").execute(CONTEXT);
 
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       fail(e.getMessage());
     }
   }
@@ -189,7 +189,7 @@ public class FastReplaceTest {
 
       new XQuery("count(//item)").execute(CONTEXT);
 
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       fail(e.getMessage());
     }
   }
@@ -211,7 +211,7 @@ public class FastReplaceTest {
   public static void end() {
     try {
       new DropDB(DBNAME).execute(CONTEXT);
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       e.printStackTrace();
     }
     CONTEXT.close();

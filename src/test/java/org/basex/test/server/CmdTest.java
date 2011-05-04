@@ -143,13 +143,6 @@ public class CmdTest {
 
   /** Command test. */
   @Test
-  public final void createMAB() {
-    // no test file available
-    no(new CreateMAB("abcde", "abcde"));
-  }
-
-  /** Command test. */
-  @Test
   public final void createUser() {
     ok(new CreateUser(USER, "test"));
     no(new CreateUser(USER, "test"));

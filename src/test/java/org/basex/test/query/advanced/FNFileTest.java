@@ -18,9 +18,6 @@ import org.junit.Test;
  * @author Rositsa Shadura
  */
 public final class FNFileTest extends AdvancedQueryTest {
-  /** Directory separator. */
-  private static final String DIRSEP = System.getProperty("file.separator");
-  /** Path separator. */
   /** Test name. */
   private static final String NAME = Util.name(FNFileTest.class);
   /** Test path. */
@@ -351,16 +348,16 @@ public final class FNFileTest extends AdvancedQueryTest {
     final String name1 = query(fun + "('" + PATH1 + "')");
     assertEquals(name1, NAME);
     // Check with a path ending with a directory separator
-    final String name2 = query(fun + "('" + PATH1 + DIRSEP + "')");
+    final String name2 = query(fun + "('" + PATH1 + Prop.DIRSEP + "')");
     assertEquals(name2, NAME);
     // Check with a path consisting only of directory separators
-    final String name3 = query(fun + "('" + DIRSEP + DIRSEP + "')");
+    final String name3 = query(fun + "('" + Prop.DIRSEP + Prop.DIRSEP + "')");
     assertEquals(name3, "");
     // Check with empty string path
     final String name4 = query(fun + "('" + "" + "')");
     assertEquals(name4, ".");
     // Check using a suffix
-    final String name5 = query(fun + "('" + PATH1 + DIRSEP + "test.xml"
+    final String name5 = query(fun + "('" + PATH1 + Prop.DIRSEP + "test.xml"
         + "', '.xml')");
     assertEquals(name5, "test");
   }
@@ -373,16 +370,11 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void testDirName() throws Exception {
     final String fun = check(FunDef.DIRNAME);
     // Check with a simple path
-    final String dir1 = query(fun + "('" + PATH1 + "')");
-    final String exp = Prop.TMP.endsWith(DIRSEP) ? Prop.TMP.substring(0,
-        Prop.TMP.length() - 1) : Prop.TMP;
-    assertEquals(dir1.toLowerCase(), exp);
+    assertEquals(norm(query(fun + "('" + PATH1 + "')")), norm(Prop.TMP));
     // Check with an empty path
-    final String dir2 = query(fun + "('" + "" + "')");
-    assertEquals(dir2, ".");
+    assertEquals(query(fun + "('')"), ".");
     // Check with a path without directory separators
-    final String dir3 = query(fun + "('" + NAME + "')");
-    assertEquals(dir3, ".");
+    assertEquals(query(fun + "('" + NAME + "')"), ".");
   }
 
   /**
@@ -393,10 +385,19 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void testPathToNative() throws Exception {
     final String fun = check(FunDef.PATHNATIVE);
     final String path1 = query(fun + "('" + PATH1 + "')");
-    assertEquals(path1, PATH1);
+    assertEquals(norm(path1), norm(PATH1));
 
-    final String path2 = query(fun + "('" + PATH1 + DIRSEP + ".." + DIRSEP
-        + "test.xml" + "')");
-    assertEquals(path2, Prop.TMP + "test.xml");
+    final String path2 = query(fun + "('" + PATH1 + Prop.DIRSEP + ".." +
+        Prop.DIRSEP + "test.xml" + "')");
+    assertEquals(norm(path2), norm(Prop.TMP + "test.xml"));
+  }
+
+  /**
+   * Normalize slashes of specified path to reduce OS dependent bugs.
+   * @param path input path
+   * @return normalized path
+   */
+  private static String norm(final String path) {
+    return (path + '/').replaceAll("[\\\\/]+", "/").toLowerCase();
   }
 }

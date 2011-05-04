@@ -4,6 +4,7 @@ import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.file.CSVParser;
 import org.basex.build.file.HTMLParser;
+import org.basex.build.file.MAB2Parser;
 import org.basex.build.file.TextParser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
@@ -68,6 +69,7 @@ public abstract class Parser extends Progress {
     if(parser.equals(DataText.M_HTML)) return new HTMLParser(io, target, prop);
     if(parser.equals(DataText.M_TEXT)) return new TextParser(io, target, prop);
     if(parser.equals(DataText.M_CSV)) return new CSVParser(io, target, prop);
+    if(parser.equals(DataText.M_MAB2)) return new MAB2Parser(io, target, prop);
     return xmlParser(io, prop, target);
   }
 
