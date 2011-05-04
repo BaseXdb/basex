@@ -268,8 +268,6 @@ public final class TableDiskAccess extends TableAccess {
       // case2: old subtree bigger than new one, delete remaining old nodes
       delete(max, diff);
     }
-    bf.dirty = true;
-    dirty = true;
   }
 
   @Override

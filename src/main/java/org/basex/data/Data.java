@@ -569,13 +569,14 @@ public abstract class Data {
     }
 
     final int rsize = size(rpre, rkind);
+    // increase/decrease size of ancestors, adjust distances of siblings
+    final int rpar = parent(rpre, rkind);
+    // diff > 0 if new subtree is bigger than old one, v.v.
+    final int diff = dsize - rsize;
+
     table.replace(rpre, buffer(), rsize);
     buffer(1);
 
-    // increase/decrease size of ancestors, adjust distances of siblings
-    final int rpar = parent(rpre, rkind);
-    // diff > 0 if old subtree is bigger than new one, v.v.
-    final int diff = rsize - dsize;
     // don't have to update distances/sizes if the two subtrees have the same
     // number of nodes
     if(diff == 0) return;
