@@ -153,6 +153,8 @@ public final class ViewNotifier {
    * @param forward move forward or backward
    */
   public void hist(final boolean forward) {
+    final Context context = gui.context;
+
     // browse back/forward
     String query = "";
     if(forward) {
@@ -160,11 +162,10 @@ public final class ViewNotifier {
       query = queries[++hist];
     } else {
       if(hist == 0) return;
-      marked[hist] = gui.context.marked;
+      marked[hist] = context.marked;
       query = queries[--hist];
     }
-
-    init(gui.context, cont[hist], marked[hist]);
+    context.set(cont[hist], marked[hist]);
 
     gui.input.setText(query);
     for(final View v : view) if(v.visible()) v.refreshContext(forward, false);
@@ -200,7 +201,7 @@ public final class ViewNotifier {
       }
       maxhist = hist;
     }
-    init(context, nodes, n);
+    context.set(nodes, n);
 
     for(final View v : view) if(v != vw && v.visible())
       v.refreshContext(true, quick);
@@ -239,18 +240,6 @@ public final class ViewNotifier {
   }
 
   // PRIVATE METHODS ==========================================================
-
-  /**
-   * Initializes the current context and marked node set.
-   * @param ctx context reference
-   * @param curr context set
-   * @param mark marked nodes
-   */
-  private void init(final Context ctx, final Nodes curr, final Nodes mark) {
-    ctx.current = curr;
-    ctx.marked = mark;
-    ctx.focused = -1;
-  }
 
   /**
    * Checks the history data arrays.

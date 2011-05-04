@@ -310,8 +310,8 @@ public final class GUI extends AGUI {
     } else if(gprop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
       xquery(in, true);
     } else {
-      execute(new XQuery(Find.find(in, context, gprop.is(GUIProp.FILTERRT))),
-          true);
+      final String qu = Find.find(in, context, gprop.is(GUIProp.FILTERRT));
+      execute(new XQuery(qu), true);
     }
   }
 
@@ -372,8 +372,15 @@ public final class GUI extends AGUI {
 
     cursor(CURSORWAIT);
     try {
-      // cache some variables before executing the command
       final Performance perf = new Performance();
+
+      // reset current context if realtime filter is activated
+      if(gprop.is(GUIProp.FILTERRT) && context.current != null &&
+          !context.root()) {
+          context.current = new Nodes(context.data.doc(), context.data);
+      }
+
+      // cache some variables before executing the command
       final Nodes current = context.current;
       final Data data = context.data;
       command = c;
@@ -443,11 +450,10 @@ public final class GUI extends AGUI {
           notify.update();
         } else if(result != null) {
           final Nodes nd = context.current;
-          if(nd != null && !nd.sameAs(current) || gprop.is(GUIProp.FILTERRT)) {
+          final boolean flt = gprop.is(GUIProp.FILTERRT);
+          if(flt || nd != null && !nd.sameAs(current)) {
             // refresh context if at least one node was found
-            if(nodes != null) {
-              notify.context((Nodes) result, gprop.is(GUIProp.FILTERRT), null);
-            }
+            if(nodes != null) notify.context((Nodes) result, flt, null);
           } else if(marked != null) {
             // refresh highlight
             if(nodes != null) {
