@@ -532,8 +532,7 @@ public abstract class Data {
     // able to speed up the copy process even more
 
     final int dsize = d.meta.size;
-    final int buf = dsize;
-    buffer(buf);
+    buffer(dsize);
     int dpre = -1;
     final int rkind = kind(rpre);
     while(++dpre != dsize) {
@@ -569,26 +568,26 @@ public abstract class Data {
       }
     }
 
+    // increase/decrease size of ancestors, adjust distances of siblings
     final int rsize = size(rpre, rkind);
+    final int rpar = parent(rpre, rkind);
+    // diff > 0 if new subtree is bigger than old one, v.v.
+    final int diff = dsize - rsize;
+
     table.replace(rpre, buffer(), rsize);
     buffer(1);
 
-    // increase/decrease size of ancestors, adjust distances of siblings
-    final int rpar = parent(rpre, rkind);
-    final int diff = rsize - dsize;
+    // don't have to update distances/sizes if the two subtrees have the same
+    // number of nodes
+    if(diff == 0) return;
 
-    // new subtree bigger than old one
-    if(diff < 0) {
-      int p = rpar;
-      while(p >= 0) {
-        final int k = kind(p);
-        size(p, k, size(p, k) + Math.abs(diff));
-        p = parent(p, k);
-      }
-      updateDist(rpre + dsize, diff);
-    } else if(rsize > dsize) {
-      // TODO combine with the upper
+    int p = rpar;
+    while(p >= 0) {
+      final int k = kind(p);
+      size(p, k, size(p, k) + diff);
+      p = parent(p, k);
     }
+    updateDist(rpre + dsize, diff);
   }
 
   /**
@@ -635,7 +634,7 @@ public abstract class Data {
     updateDist(p, -s);
 
     // NSNodes have to be checked for pre value shifts after delete
-    ns.updatePreValues(pre, s, false, null);
+    ns.update(pre, s, false, null);
 
     // restore empty document node
     if(empty) {
@@ -812,7 +811,7 @@ public abstract class Data {
     updateDist(ipre + ms, ms);
 
     // NSNodes have to be checked for pre value shifts after insert
-    ns.updatePreValues(ipre, ms, true, newNodes);
+    ns.update(ipre, ms, true, newNodes);
 
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
