@@ -10,7 +10,6 @@ import java.io.IOException;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
-import org.basex.io.IO;
 
 /**
  * Evaluates the 'copy' command and creates a copy of a database.
@@ -90,7 +89,8 @@ public class Copy extends Command {
   public static synchronized void copy(final File src, final File trg)
       throws IOException {
 
-    final byte[] buf = new byte[IO.BLOCKSIZE];
+    // optimize buffer size
+    final byte[] buf = new byte[(int) Math.min(src.length(), 1 << 22)];
     FileInputStream fis = null;
     FileOutputStream fos = null;
     try {
