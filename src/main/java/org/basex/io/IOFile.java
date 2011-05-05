@@ -234,30 +234,33 @@ public final class IOFile extends IO {
    * Converts a file filter (glob) to a regular expression. A filter may
    * contain asterisks (*) and question marks (?); commas (,) are used to
    * separate multiple filters.
-   * @param filter filter
+   * @param glob filter
    * @return regular expression
    */
-  public static String regex(final String filter) {
+  public static String regex(final String glob) {
     final StringBuilder sb = new StringBuilder();
-    for(final String g : filter.split(",")) {
+    for(final String g : glob.split(",")) {
       boolean suf = false;
-      final String glob = g.trim();
+      final String gl = g.trim();
       if(sb.length() != 0) {
         if(!suf) sb.append(".*");
         suf = false;
         sb.append('|');
       }
-      for(int f = 0; f < glob.length(); f++) {
-        char ch = glob.charAt(f);
+      // loop through single pattern
+      for(int f = 0; f < gl.length(); f++) {
+        char ch = gl.charAt(f);
         if(ch == '*') {
-          sb.append("[^.]");
+          // don't allow other dots if pattern ends with a dot
+          sb.append(gl.endsWith(".") ? "[^.]" : ".");
         } else if(ch == '?') {
           ch = '.';
           suf = true;
         } else if(!Character.isLetterOrDigit(ch)) {
           if(ch == '.') {
             suf = true;
-            if(f + 1 == glob.length()) break;
+            // last character is dot: disallow file suffix
+            if(f + 1 == gl.length()) break;
           }
           sb.append('\\');
         }
