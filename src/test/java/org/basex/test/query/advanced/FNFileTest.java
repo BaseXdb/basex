@@ -386,7 +386,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void testPathToNative() throws Exception {
     final String fun = check(FunDef.PATHNATIVE);
     final String path1 = query(fun + "('" + PATH1 + "')");
-    assertEquals(norm(path1), norm(PATH1));
+    assertEquals(norm(path1), norm(new File(PATH1).getCanonicalPath()));
     final String path2 = query(fun + "('" + Prop.TMP + ".." + "/test.xml"
         + "')");
     assertEquals(path2, "/test.xml");
