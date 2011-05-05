@@ -3,14 +3,13 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import org.basex.core.Prop;
+import org.basex.core.cmd.Copy;
 import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IOFile;
@@ -439,17 +438,10 @@ public final class FNFile extends Fun {
       if(files == null) CANNOTLIST.thrw(input, src);
       for(final File f : files) copy(f, new File(trg, f.getName()));
     } else {
-      FileChannel sc = null;
-      FileChannel tc = null;
       try {
-        sc = new FileInputStream(src).getChannel();
-        tc = new FileOutputStream(trg).getChannel();
-        tc.transferFrom(sc, 0, sc.size());
+        Copy.copy(src, trg);
       } catch(final IOException ex) {
         FILEERROR.thrw(input, ex);
-      } finally {
-        if(sc != null) try { sc.close(); } catch(final IOException ex) { }
-        if(tc != null) try { tc.close(); } catch(final IOException ex) { }
       }
     }
   }
