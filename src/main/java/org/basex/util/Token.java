@@ -48,17 +48,6 @@ public final class Token {
   /** One token. */
   public static final byte[] ONE = { '1' };
 
-  /** Quote entity. */
-  public static final byte[] QU = { '"' };
-  /** Ampersand entity. */
-  public static final byte[] AMP = { '&' };
-  /** Apostrophe entity. */
-  public static final byte[] APOS = { '\'' };
-  /** GreaterThan entity. */
-  public static final byte[] GT = { '>' };
-  /** LessThan entity. */
-  public static final byte[] LT = { '<' };
-
   /** Hex codes. */
   public static final byte[] HEX = token("0123456789ABCDEF");
   /** Reserved characters. */

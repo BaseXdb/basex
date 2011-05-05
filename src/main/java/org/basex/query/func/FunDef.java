@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.item.SeqType.*;
+
 import java.util.HashMap;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FunType;

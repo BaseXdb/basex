@@ -3,6 +3,7 @@ package org.basex.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
+
 import org.basex.data.MetaData;
 
 /**

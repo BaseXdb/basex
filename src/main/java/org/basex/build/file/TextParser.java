@@ -54,8 +54,7 @@ public final class TextParser extends FileParser {
       throws IOException {
 
     super(path, ta);
-
-    // parser properties
+    // set parser properties
     final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
     lines = props.is(ParserProp.LINES);
     final String e = props.get(ParserProp.ENCODING);

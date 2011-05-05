@@ -120,8 +120,7 @@ public final class Context {
   public void openDB(final Data d, final String path) {
     data = d;
     copied = null;
-    marked = new Nodes(d);
-    current = new Nodes(path == null ? data.doc() : data.doc(path), data);
+    set(new Nodes(path == null ? d.doc() : d.doc(path), d), new Nodes(d));
     current.root = path == null;
   }
 
@@ -130,9 +129,18 @@ public final class Context {
    */
   public void closeDB() {
     data = null;
-    current = null;
-    marked = null;
+    set(null, null);
     copied = null;
+  }
+
+  /**
+   * Sets the current context and marked node set and resets the focus.
+   * @param curr context set
+   * @param mark marked nodes
+   */
+  public void set(final Nodes curr, final Nodes mark) {
+    current = curr;
+    marked = mark;
     focused = -1;
   }
 
