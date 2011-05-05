@@ -1,7 +1,7 @@
 # This example shows how queries can be executed in an iterative manner.
 # Documentation: http://basex.org/api
 #
-# (C) BaseX Team 2005-11, ISC License
+# (C) BaseX Team 2005-11, BSD License
 
 import BaseXClient, time
 

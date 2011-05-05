@@ -12,16 +12,15 @@ import org.basex.data.DataText;
 import org.basex.data.SerializerProp;
 import org.basex.server.ClientSession;
 import org.basex.server.LoginException;
+import org.basex.util.Base64;
 import org.basex.util.Util;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
 import org.jaxrx.core.ResourcePath;
 
-import com.sun.jersey.core.util.Base64;
-
 /**
  * Wrapper class for running JAX-RX code.
- * 
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
@@ -154,7 +153,7 @@ abstract class BXCode {
 
   /**
    * The user name from user request if existing.
-   * 
+   *
    * @return user name from user request or <code>null</code> if not existing.
    */
   public String getUsername() {
@@ -163,7 +162,7 @@ abstract class BXCode {
 
   /**
    * The password from user request if existing.
-   * 
+   *
    * @return password from user request or <code>null</code> if not existing.
    */
   public String getPassword() {
@@ -178,12 +177,13 @@ abstract class BXCode {
    */
   private String[] updateIdentity(final ResourcePath path) {
     final HttpHeaders headers = path.getHttpHeaders();
-    final List<String> authorization = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
+    final List<String> authorization =
+      headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
     if(authorization != null) {
       for(String value : authorization) {
         String[] values = value.split(" ");
         if(values[0].equalsIgnoreCase("basic")) {
-          String decoded = new String(Base64.decode(values[1]));
+          String decoded = Base64.decode(values[1]);
           String[] credentials = decoded.split(":", 2);
           if(credentials.length < 2) {
             throw new JaxRxException(401, "Password missing.");

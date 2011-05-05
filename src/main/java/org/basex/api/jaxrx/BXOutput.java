@@ -15,7 +15,7 @@ import org.jaxrx.core.ResourcePath;
 
 /**
  * Wrapper class for running JAX-RX code which creates output.
- * 
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
@@ -97,7 +97,8 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
           final String v = sc.next();
           String[] sp = v.split("\2", 3);
           if(sp.length < 2) sp = v.split("=", 2);
-          cq.bind(sp[0], sp.length > 1 ? sp[1] : "", sp.length > 2 ? sp[2] : "");
+          cq.bind(sp[0], sp.length > 1 ? sp[1] : "",
+              sp.length > 2 ? sp[2] : "");
         }
       }
       // loop through all results
@@ -112,7 +113,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       // close query instance
       if(cq != null) try {
         cq.close();
-      } catch(final BaseXException ex) {}
+      } catch(final BaseXException ex) { }
     }
   }
 
@@ -124,9 +125,8 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
   private int status(final Exception ex) {
     int status = 404;
     String message = ex.getMessage();
-    if(message != null
-        && (message.contains(Text.PERMNO.substring(2)) || message.contains(Text.PERMINV))) status = 403;
+    if(message != null && (message.contains(Text.PERMNO.substring(2)) ||
+        message.contains(Text.PERMINV))) status = 403;
     return status;
   }
-
 }

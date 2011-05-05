@@ -4,7 +4,7 @@
  * Works with BaseX 6.3.1 and later
  * Documentation: http://basex.org/api
  * 
- * (C) BaseX Team 2005-11, ISC License
+ * (C) BaseX Team 2005-11, BSD License
  */
 class Session {
   /* Class variables.*/

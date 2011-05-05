@@ -2,7 +2,7 @@
 -- |
 -- Module      : Example
 -- Copyright   : (C) BaseX Team 2005-11
--- License     : ISC
+-- License     : BSD
 --
 -- Maintainer  : leo@woerteler.de
 -- Stability   : experimental

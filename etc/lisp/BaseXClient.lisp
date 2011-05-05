@@ -2,7 +2,7 @@
 ; Works with BaseX 6.1
 ; Documentation: http://basex.org/api
 ; 
-; (C) Andy Chambers, Formedix Ltd 2010, ISC License
+; (C) Andy Chambers, Formedix Ltd 2010, BSD License
 
 (defpackage :basex
  (:use :cl :usocket)

@@ -3,7 +3,7 @@
  * This example shows how database commands can be executed.
  * Documentation: http://basex.org/api
  *
- * (C) BaseX Team 2005-11, ISC License
+ * (C) BaseX Team 2005-11, BSD License
  */
 include("BaseXClient.php");
 

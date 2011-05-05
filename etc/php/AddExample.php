@@ -3,7 +3,7 @@
  * This example shows how new documents can be added.
  * Documentation: http://basex.org/api
  *
- * (C) BaseX Team 2005-11, ISC License
+ * (C) BaseX Team 2005-11, BSD License
  */
 include("BaseXClient.php");
 

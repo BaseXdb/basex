@@ -16,19 +16,20 @@ import java.net.URL;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.basex.api.jaxrx.JaxRxServer;
+import org.basex.core.Text;
+import org.basex.util.Base64;
 import org.basex.util.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import sun.misc.BASE64Encoder;
-
 /**
  * This class provides a framework for JAX-RX tests.
- * 
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
+@SuppressWarnings("all")
 public final class JaxRxTest {
   /** Opening result. */
   private static final String WRAP1 = "<jax-rx:results xmlns:jax-rx="
@@ -45,7 +46,7 @@ public final class JaxRxTest {
   /** Start server. */
   @BeforeClass
   public static void start() {
-    jaxrx = new JaxRxServer("-Uadmin -Padmin -z");
+    jaxrx = new JaxRxServer("-U" + Text.ADMIN + " -P" + Text.ADMIN + " -z");
   }
 
   /** Stop server. */
@@ -160,7 +161,7 @@ public final class JaxRxTest {
     assertEquals(
         "123",
         postQuery("",
-            "<query><text>123</text><parameter name='wrap' value='no'/></query>"));
+        "<query><text>123</text><parameter name='wrap' value='no'/></query>"));
   }
 
   /**
@@ -172,7 +173,7 @@ public final class JaxRxTest {
     assertEquals(
         "",
         postQuery("",
-            "<query><text>()</text><parameter name='wrap' value='no'/></query>"));
+        "<query><text>()</text><parameter name='wrap' value='no'/></query>"));
   }
 
   /**
@@ -186,7 +187,7 @@ public final class JaxRxTest {
         postQuery(
             "",
             "<query><text>123</text><parameter name='wrap' value='no'/>"
-                + "<parameter name='output' value='omit-xml-declaration=no'/></query>"));
+       + "<parameter name='output' value='omit-xml-declaration=no'/></query>"));
   }
 
   /**
@@ -375,12 +376,11 @@ public final class JaxRxTest {
     conn.setRequestMethod("POST");
     conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "application/query+xml");
     // basic authentication example
-    BASE64Encoder enc = new BASE64Encoder();
-    String user = "admin";
-    String pw ="admin";
-    String userpw = user+":"+pw;
-    String encoded = enc.encode(userpw.getBytes());
-    conn.setRequestProperty("Authorization", "Basic "+encoded);
+    String user = Text.ADMIN;
+    String pw = Text.ADMIN;
+    String userpw = user + ":" + pw;
+    String encoded = Base64.encode(userpw);
+    conn.setRequestProperty("Authorization", "Basic " + encoded);
     // send query
     final OutputStream out = conn.getOutputStream();
     out.write(Token.token(query));

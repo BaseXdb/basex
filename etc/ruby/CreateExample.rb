@@ -1,7 +1,7 @@
 # This example shows how new databases can be created.
 # Documentation: http://basex.org/api
 #
-# (C) BaseX Team 2005-11, ISC License
+# (C) BaseX Team 2005-11, BSD License
 
 require 'BaseXClient.rb'
 

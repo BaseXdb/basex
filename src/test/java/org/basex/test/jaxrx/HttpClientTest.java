@@ -25,6 +25,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
@@ -83,7 +84,7 @@ public final class HttpClientTest {
   public static void setUpBeforeClass() {
     context = new Context();
     context.prop.set(Prop.CACHEQUERY, true);
-    jaxrx = new JaxRxServer("-Uadmin -Padmin -z");
+    jaxrx = new JaxRxServer("-U" + Text.ADMIN + " -P" + Text.ADMIN + " -z");
   }
 
   /**

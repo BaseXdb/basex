@@ -1,7 +1,7 @@
 ; This example shows how database commands can be executed.
 ; Documentation: http://basex.org/api
 ;
-; (C) Andy Chambers, Formedix Ltd 2010, ISC License
+; (C) Andy Chambers, Formedix Ltd 2010, BSD License
 
 (defpackage :basex-user
  (:use :cl :basex))
