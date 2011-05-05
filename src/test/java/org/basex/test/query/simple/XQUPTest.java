@@ -63,123 +63,124 @@ public final class XQUPTest extends QueryTest {
     // name starts with 'xxx' is an update query.
     // The test query following q represents the actual test.
     queries = new Object[][] {
-        { "xxxxxxxxxxxxx", node(11),
+      { "xxxxxxxxxxxxx", node(11),
         "/up/cars/good/car/wheels[text()='optional']" },
 
-        // delete
-        { "xxxdel1", empty(),
+      // delete
+      { "xxxdel1", empty(),
         "delete nodes /up/cars/good/car[1]" },
-        { "del1", node(5, 12, 22),
+      { "del1", node(5, 12, 22),
         "//car" },
-        { "xxxdel2", empty(),
+      { "xxxdel2", empty(),
         "delete nodes //car" },
-        { "del2", empty(),
+      { "del2", empty(),
         "//car" },
-        { "xxxdel3", empty(),
+      { "xxxdel3", empty(),
         "delete node /up/cars/good/car[1]/@id" },
-        { "del3", empty(),
+      { "del3", empty(),
         "/up/cars/good/car[1]/@id" },
-        { "xxxdel4", empty(),
+      { "xxxdel4", empty(),
         "delete node //wheels/text()" },
-        { "del4", empty(),
+      { "del4", empty(),
         "//wheels/text()" },
-        { "xxxdel5", empty(),
+      { "xxxdel5", empty(),
         "delete node //comment()" },
-        { "del5", empty(),
+      { "del5", empty(),
         "//comment()" },
-        { "xxxdel6", empty(),
+      { "xxxdel6", empty(),
         "delete node //processing-instruction()" },
-        { "del6", empty(),
+      { "del6", empty(),
         "//processing-instruction()" },
 
-        // rename
-        { "xxxren1", empty(),
+      // rename
+      { "xxxren1", empty(),
         "rename node /up/cars as 'CARS'" },
-        { "ren1", node(2),
+      { "ren1", node(2),
         "/up/CARS" },
-        { "xxxren2", empty(),
+      { "xxxren2", empty(),
         "rename node /up/cars/good/car[1]/@id as 'ID'" },
-        { "ren2", node(6),
+      { "ren2", node(6),
         "//car/@ID" },
-        { "xxxren3", empty(),
+      { "xxxren3", empty(),
         "rename node //processing-instruction('dohere') as 'BADVICE'" },
-        { "ren3", node(28),
+      { "ren3", node(28),
         "//processing-instruction('BADVICE')" },
 
-        // replace element
-        { "xxxrep1", empty(),
+      // replace element
+      { "xxxrep1", empty(),
         "replace node /up/cars/good/car[1] with /up/cars/good/car[2]" },
-        { "rep1", node(7),
+      { "rep1", node(7),
         "/up/cars/good/car[1]/@color" },
-        // replace attribute
-        { "xxxrep2", empty(),
+      // replace attribute
+      { "xxxrep2", empty(),
         "replace node /up/cars/good/car[1]/@id with " +
         "/up/cars/good/car[2]/@color" },
-        { "rep2", node(6),
+      { "rep2", node(6),
         "/up/cars/good/car[1]/@color, /up/cars/good/car[1]/@id" },
-        // replace text
-        { "xxxrep3", empty(),
+      // replace text
+      { "xxxrep3", empty(),
         "replace node /up/cars/good/car/wheels/text() with 'snap'" },
-        { "rep3", node(11),
+      { "rep3", node(11),
         "/up/cars/good/car/wheels[text()='snap']" },
-        { "xxxrep4", empty(),
+      { "xxxrep4", empty(),
         "replace node /up/cars/good/car/wheels/text() with " + SEQ1},
-        { "rep4", node(11),
+      { "rep4", node(11),
         "/up/cars/good/car/wheels[text()='5 fooboo']" },
-        // replace attribute
-        { "xxxrep5", empty(),
+      // replace attribute
+      { "xxxrep5", empty(),
         "replace node /up/cars/good/car[@id='1']/@id with " + SEQ3},
-        { "rep5", node(6, 7), "/up/cars/good/car/@n, /up/cars/good/car/@c" },
-        // replace comment
-        { "xxxrep6", empty(),
+      { "rep5", node(6, 7), "/up/cars/good/car/@n, /up/cars/good/car/@c" },
+      // replace comment
+      { "xxxrep6", empty(),
         "replace node /up/cars/good/car/comment() with " + SEQ1},
-        { "rep6", node(8),
+      { "rep6", node(8),
         "/up/cars/good/car/text()" },
-        // replace processing instruction
-        { "xxxrep7", empty(),
-        "replace node /up/cars/bad/car/processing-instruction() with " + SEQ1},
-        { "rep7", node(18, 19),
+      // replace processing instruction
+      { "xxxrep7", empty(),
+        "replace node /up/cars/bad/car/processing-instruction() with " +
+        SEQ1},
+      { "rep7", node(18, 19),
         "/up/cars/bad/car/a, /up/cars/bad/car/text()" },
-        // replace element content
-        { "xxxrep8", empty(),
-        "replace value of node //car[@id=1] with 'foo'"},
-        { "rep8", node(5),
+      // replace element content
+      { "xxxrep8", empty(),
+        "replace value of node //car[@id=1] with 'foo'" },
+      { "rep8", node(5),
         "//car[text()='foo']" },
-        // "no man's land"
-        { "xxxrep9", empty(),
-        "replace value of node //car[@id=1] with \"no man's land\""},
-        { "rep9", node(5),
+      // "no man's land"
+      { "xxxrep9", empty(),
+        "replace value of node //car[@id=1] with \"no man's land\"" },
+      { "rep9", node(5),
         "//car[text()=\"no man's land\"]" },
 
-        // insert
-        { "xxxins1", empty(),
-        "insert node " + SEQ1 + "into /up/cars/good/car[@id='1']"},
-        { "ins1", node(8, 9),
+      // insert
+      { "xxxins1", empty(),
+        "insert node " + SEQ1 + "into /up/cars/good/car[@id='1']" },
+      { "ins1", node(8, 9),
         "/up/cars/good/car/a, /up/cars/good/car/text()" },
-        { "xxxins2", empty(),
-        "insert node " + SEQ5 + "into /up/cars/good/car[@id=1]"},
-        { "ins2", node(6, 9, 10),
+      { "xxxins2", empty(),
+        "insert node " + SEQ5 + "into /up/cars/good/car[@id=1]" },
+      { "ins2", node(6, 9, 10),
         "/up/cars/good/car/@n, /up/cars/good/car/a, " +
         "/up/cars/good/car/text()" },
 
-        // merge text nodes
-        { "xxxMERGEins", empty(),
-          "insert node 'foo' into /up/cars/good/car/wheels"},
-          { "MERGEins", node(11),
-          "/up/cars/good/car/wheels[text()='optionalfoo']" },
+      // merge text nodes
+      { "xxxMERGEins", empty(),
+        "insert node 'foo' into /up/cars/good/car/wheels" },
+      { "MERGEins", node(11),
+        "/up/cars/good/car/wheels[text()='optionalfoo']" },
 
-        // tree aware updates - mainly tests to avoid IOOB exceptions
-        { "xxxTREEAWARE1", empty(), "delete node /up, delete node /up/cars"},
-        { "TREEAWARE1", empty(), "/up"},
-        { "xxxTREEAWARE2", empty(), "delete node /up/cars, insert node " +
-          "<test/> before /up/cars"},
-          {"TREEAWARE2", node(2), "/up/test"},
-          { "xxxTREEAWARE3", empty(), "delete node /up/cars/bad, " +
-            "insert node <test/> into /up/cars/bad/car, " +
-            "insert node <test/> into //good, " +
-            "insert node <test/> into //car[@id='4']"},
-          { "TREEAWARE3", node(13, 18),
-              "//good/test, //bad, //ugly/descendant::test"}
+      // tree aware updates - mainly tests to avoid IOOB exceptions
+      { "xxxTREEAWARE1", empty(), "delete node /up, delete node /up/cars" },
+      { "TREEAWARE1", empty(), "/up" },
+      { "xxxTREEAWARE2", empty(), "delete node /up/cars, insert node " +
+        "<test/> before /up/cars" },
+      { "TREEAWARE2", node(2), "/up/test" },
+      { "xxxTREEAWARE3", empty(), "delete node /up/cars/bad, " +
+        "insert node <test/> into /up/cars/bad/car, " +
+        "insert node <test/> into //good, " +
+        "insert node <test/> into //car[@id='4']" },
+      { "TREEAWARE3", node(13, 18),
+        "//good/test, //bad, //ugly/descendant::test" }
     };
   }
 

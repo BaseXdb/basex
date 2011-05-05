@@ -47,7 +47,7 @@ public final class Switch extends Arr {
     if(e == this) {
       final int el = expr.length;
       type = expr[el - 1].type();
-      for(int i = 1; i < el - 1; i += 2) type = type.intersect(expr[i].type());
+      for(int i = 2; i < el; i += 2) type = type.intersect(expr[i].type());
     }
     return optPre(e, ctx);
   }
