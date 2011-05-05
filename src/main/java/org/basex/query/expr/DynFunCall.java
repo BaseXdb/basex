@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Function call.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public final class DynFunCall extends Arr {

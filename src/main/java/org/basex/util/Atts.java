@@ -72,10 +72,8 @@ public final class Atts {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(Util.name(this) + "[");
     for(int i = 0; i < size; ++i) {
-      tb.add(key[i]);
-      tb.add("=\"");
-      tb.add(val[i]);
-      tb.add("\"");
+      if(i > 0) tb.add(", ");
+      tb.add(key[i]).add("=\"").add(val[i]).add("\"");
     }
     return tb.add("]").toString();
   }
