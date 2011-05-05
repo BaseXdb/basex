@@ -83,7 +83,7 @@ public final class HttpClientTest {
   public static void setUpBeforeClass() {
     context = new Context();
     context.prop.set(Prop.CACHEQUERY, true);
-    jaxrx = new JaxRxServer("-z");
+    jaxrx = new JaxRxServer("-Uadmin -Padmin -z");
   }
 
   /**

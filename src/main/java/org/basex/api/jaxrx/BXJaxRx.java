@@ -155,7 +155,7 @@ public final class BXJaxRx implements JaxRx {
 
   @Override
   public String add(final InputStream input, final ResourcePath rp) {
-    return new BXCode() {
+    return new BXCode(rp) {
       @Override
       String code() {
         // open database
@@ -194,7 +194,7 @@ public final class BXJaxRx implements JaxRx {
 
   @Override
   public String update(final InputStream input, final ResourcePath rp) {
-    return new BXCode() {
+    return new BXCode(rp) {
       @Override
       String code() {
         try {
@@ -223,7 +223,7 @@ public final class BXJaxRx implements JaxRx {
 
   @Override
   public String delete(final ResourcePath rp) {
-    return new BXCode() {
+    return new BXCode(rp) {
       @Override
       String code() {
         final boolean root = rp.getDepth() == 1;

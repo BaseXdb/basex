@@ -1,6 +1,7 @@
 package org.basex.api.jaxrx;
 
 import static org.basex.core.Text.*;
+
 import org.basex.BaseXServer;
 import org.basex.core.Prop;
 import org.basex.core.Text;
@@ -9,11 +10,11 @@ import org.basex.util.Util;
 import org.jaxrx.JettyServer;
 
 /**
- * This is the starter class for running the JAX-RX server,
- * based on the JAX-RX interface.
- * A database server and the Jetty server is launched by the constructor.
- * The Jetty server listens for HTTP requests, which are then sent to JAX-RX.
- *
+ * This is the starter class for running the JAX-RX server, based on the JAX-RX
+ * interface. A database server and the Jetty server is launched by the
+ * constructor. The Jetty server listens for HTTP requests, which are then sent
+ * to JAX-RX.
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
@@ -22,6 +23,10 @@ public final class JaxRxServer extends BaseXServer {
   private static final String JAXRX = "JAX-RX";
   /** Jetty server. */
   private JettyServer jetty;
+  /** Optional user. */
+  private String user;
+  /** Optional password. */
+  private String pass;
 
   /**
    * Main method, launching the JAX-RX implementation.
@@ -47,17 +52,13 @@ public final class JaxRxServer extends BaseXServer {
     // store configuration in system properties
     // if a property has already been set, the new settings will be ignored
 
-    // set user (use 'admin' as default)
-    final boolean user = System.getProperty(BXJaxRx.USER) != null;
-    if(!user) set(BXJaxRx.USER, Text.ADMIN, false);
-    // set password (use 'admin' as default, or request on command line)
-    final String pass = System.getProperty(BXJaxRx.PASSWORD);
-    String p = pass != null ? pass : user ? null : Text.ADMIN;
+    String p = pass != null ? pass : user != null ? null : Text.ADMIN;
     while(p == null) {
       Util.out(SERVERPW + COLS);
-      p = password();
+      pass = password();
     }
-    set(BXJaxRx.PASSWORD, p, false);
+    set(BXJaxRx.USER, user == null ? "" : user, user != null);
+    set(BXJaxRx.PASSWORD, pass == null ? "" : pass, pass != null);
 
     // define path and name of the JAX-RX implementation.
     set("org.jaxrx.systemName", Text.NAMELC, false);
@@ -68,13 +69,14 @@ public final class JaxRxServer extends BaseXServer {
       jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT));
       Util.outln(JAXRX + ' ' + SERVERSTART);
     } catch(final Exception ex) {
+      ex.printStackTrace();
       Util.server(ex);
     }
   }
 
   @Override
-  public void quit(final boolean user) {
-    super.quit(user);
+  public void quit(final boolean u) {
+    super.quit(u);
     if(jetty != null) jetty.stop();
   }
 
@@ -109,7 +111,7 @@ public final class JaxRxServer extends BaseXServer {
           set(BXJaxRx.SERVERPORT, arg.num(), true);
         } else if(c == 'P') {
           // specify password
-          set(BXJaxRx.PASSWORD, arg.string(), true);
+          pass = arg.string();
         } else if(c == 's') {
           // set service flag
           service = !daemon;
@@ -120,7 +122,7 @@ public final class JaxRxServer extends BaseXServer {
           set(BXJaxRx.SERIALIZER, serial, true);
         } else if(c == 'U') {
           // specify user name
-          set(BXJaxRx.USER, arg.string(), true);
+          user = arg.string();
         } else if(c == 'z') {
           // suppress logging
           quiet = true;
