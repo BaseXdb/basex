@@ -254,7 +254,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final void checkColl(final Expr e, final QueryContext ctx)
       throws QueryException {
-    final byte[] u = checkEStr(e, ctx);
+    final byte[] u = checkStr(e, ctx);
     if(eq(URLCOLL, u)) return;
     final Uri uri = Uri.uri(u);
     if(uri.absolute() || !ctx.baseURI.resolve(uri).eq(Uri.COLL))
