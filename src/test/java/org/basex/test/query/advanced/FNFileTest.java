@@ -370,7 +370,8 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void testDirName() throws Exception {
     final String fun = check(FunDef.DIRNAME);
     // Check with a simple path
-    assertEquals(norm(query(fun + "('" + PATH1 + "')")), norm(Prop.TMP));
+    assertEquals(norm(query(fun + "('" + PATH1 + "')")).toLowerCase(),
+        norm(Prop.TMP));
     // Check with an empty path
     assertEquals(query(fun + "('')"), ".");
     // Check with a path without directory separators
@@ -386,8 +387,8 @@ public final class FNFileTest extends AdvancedQueryTest {
     final String fun = check(FunDef.PATHNATIVE);
     final String path1 = query(fun + "('" + PATH1 + "')");
     assertEquals(norm(path1), norm(PATH1));
-    final String path2 = query(
-        fun + "('" + Prop.TMP + ".." + "/test.xml" + "')");
+    final String path2 = query(fun + "('" + Prop.TMP + ".." + "/test.xml"
+        + "')");
     assertEquals(path2, "/test.xml");
   }
 
