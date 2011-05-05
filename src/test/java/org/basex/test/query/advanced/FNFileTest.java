@@ -13,7 +13,7 @@ import org.junit.Test;
 
 /**
  * This class tests the functions of the file library.
- *
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -205,12 +205,12 @@ public final class FNFileTest extends AdvancedQueryTest {
     query("file:size('" + PATH1 + "')", "1");
     query("file:delete('" + PATH1 + "')");
 
-    query(fun + "('" + PATH1 + "', 'a\u00e4'," +
-      serialParams("<encoding>CP1252</encoding>") + ")");
+    query(fun + "('" + PATH1 + "', 'a\u00e4',"
+        + serialParams("<encoding>CP1252</encoding>") + ")");
     query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
 
-    query(fun + "('" + PATH1 + "', '<a/>'," +
-        serialParams("<method>text</method>") + ")");
+    query(fun + "('" + PATH1 + "', '<a/>',"
+        + serialParams("<method>text</method>") + ")");
     query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
     query("file:delete('" + PATH1 + "')");
   }
@@ -231,13 +231,13 @@ public final class FNFileTest extends AdvancedQueryTest {
     query("file:size('" + PATH1 + "')", "2");
     query("file:delete('" + PATH1 + "')");
 
-    query(fun + "('" + PATH1 + "', 'a\u00e4'," +
-      serialParams("<encoding>CP1252</encoding>") + ")");
+    query(fun + "('" + PATH1 + "', 'a\u00e4',"
+        + serialParams("<encoding>CP1252</encoding>") + ")");
     query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
     query("file:delete('" + PATH1 + "')");
 
-    query(fun + "('" + PATH1 + "', '<a/>'," +
-        serialParams("<method>text</method>") + ")");
+    query(fun + "('" + PATH1 + "', '<a/>',"
+        + serialParams("<method>text</method>") + ")");
     query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
     query("file:delete('" + PATH1 + "')");
   }
@@ -395,8 +395,8 @@ public final class FNFileTest extends AdvancedQueryTest {
     final String path1 = query(fun + "('" + PATH1 + "')");
     assertEquals(path1, PATH1);
 
-    final String path2 = query(fun + "('" + PATH1 + DIRSEP + ".." + DIRSEP
-        + "test.xml" + "')");
-    assertEquals(path2, Prop.TMP + "test.xml");
+    final String path2 = query(
+        fun + "('" + Prop.TMP + ".." + "/test.xml" + "')");
+    assertEquals(path2, "/test.xml");
   }
 }
