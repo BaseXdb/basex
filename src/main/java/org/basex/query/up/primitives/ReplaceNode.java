@@ -1,10 +1,11 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
+
 import org.basex.data.Data;
 import org.basex.query.QueryException;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.NodeType;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
@@ -40,11 +41,14 @@ public final class ReplaceNode extends NodeCopy {
     if(n.type == NodeType.TXT && md.meta.size == 1 && md.kind(0) == Data.TEXT) {
       // overwrite existing text node
       d.replace(pre, Data.TEXT, md.text(0, true));
+
       // check if simple, fast replace is possible
-    /*} else if(md.meta.size > 0 && d.ns.size() == 0 && md.ns.size() == 0) {
-        */
-        //&& d.size(pre, kind) == md.meta.size*/) {
-      d.replace(pre, md);
+      // TODO adjust attribute size of parent if attributes inserted
+      // TODO text merging?
+//    } else if(md != null && md.meta.size > 0 && d.ns.size() == 0
+//        && md.ns.size() == 0 && md.kind(0) != Data.ATTR) {
+//      d.replace(pre, md);
+
     } else {
       d.delete(pre);
       if(md != null) {

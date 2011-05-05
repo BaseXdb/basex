@@ -307,6 +307,36 @@ public final class Namespaces {
     current = n;
   }
 
+  /**
+   * Updates the pre values of all NSNodes on the following axis after a
+   * structural update at location pre.
+   * @param pre update location
+   * @param ms size of inserted/deleted node
+   * @param insert true if insert operation, false if delete
+   * @param nodes new nodes that have been added as part of delete/insert
+   */
+  void update(final int pre, final int ms, final boolean insert,
+      final Set<NSNode> nodes) {
+    update(root, pre, ms, insert, nodes != null ? nodes :
+      new HashSet<NSNode>());
+  }
+
+  /**
+   * Updates the pre values of all NSNodes on the following axis after a
+   * structural update at location pre.
+   * @param n current namespace node which is updated if necessary
+   * @param pre update location
+   * @param ms size of inserted/deleted node
+   * @param insert true if insert operation, false if delete
+   * @param nodes new nodes that have been added as part of delete/insert
+   */
+  private void update(final NSNode n, final int pre, final int ms,
+      final boolean insert, final Set<NSNode> nodes) {
+    if(!nodes.contains(n) && n.pre >= (insert ? pre : pre + ms))
+      n.pre += insert ? ms : ms * -1;
+    for(int c = 0; c < n.size; c++) update(n.ch[c], pre, ms, insert, nodes);
+  }
+
   // Printing Namespaces ======================================================
 
   /**
@@ -409,36 +439,5 @@ public final class Namespaces {
   @Override
   public String toString() {
     return toString(0, Integer.MAX_VALUE);
-  }
-
-  /**
-   * Updates the pre values of all NSNodes on the following axis after a
-   * structural update at location pre.
-   * @param pre update location
-   * @param ms size of inserted/deleted node
-   * @param insert true if insert operation, false if delete
-   * @param newNodes new NSNodes that have been added as part of delete/insert
-   */
-  public void updatePreValues(final int pre, final int ms, final boolean insert,
-      final Set<NSNode> newNodes) {
-    updateNodePre(root, pre, ms, insert, newNodes != null ? newNodes :
-      new HashSet<NSNode>());
-  }
-
-  /**
-   * Updates the pre values of all NSNodes on the following axis after a
-   * structural update at location pre.
-   * @param n current namespace node which is updated if necessary
-   * @param pre update location
-   * @param ms size of inserted/deleted node
-   * @param insert true if insert operation, false if delete
-   * @param newNodes new NSNodes that have been added as part of delete/insert
-   */
-  private void updateNodePre(final NSNode n, final int pre, final int ms,
-      final boolean insert, final Set<NSNode> newNodes) {
-    if(!newNodes.contains(n) && n.pre >= (insert ? pre : pre + ms))
-      n.pre += insert ? ms : ms * -1;
-    for(int c = 0; c < n.size; c++) updateNodePre(n.ch[c], pre, ms, insert,
-        newNodes);
   }
 }

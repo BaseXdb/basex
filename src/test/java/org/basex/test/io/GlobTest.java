@@ -13,28 +13,28 @@ import org.junit.Test;
 public final class GlobTest {
   /** Input strings. */
   private static final String[] STRINGS = {
-    "ab", "ab.cd", "ef.cd"
+    "ab", "ab.cd", "ef.cd", "ab.ef.cd"
   };
 
   /** Tests. */
   enum TEST {
-    /** Test. */ FILE1("a", true, true, false),
-    /** Test. */ FILE2("ab", true, true, false),
-    /** Test. */ FULL("ab.cd", false, true, false),
-    /** Test. */ SUFFIX("*.cd", false, true, true),
-    /** Test. */ ALL("*", true, true, true),
+    /** Test. */ FILE1("a", true, true, false, true),
+    /** Test. */ FILE2("ab", true, true, false, true),
+    /** Test. */ FULL("ab.cd", false, true, false, false),
+    /** Test. */ SUFFIX("*.cd", false, true, true, true),
+    /** Test. */ ALL("*", true, true, true, true),
 
-    /** Test. */ ABC("ab.c", false, false, false),
-    /** Test. */ ABCDE("ab.cde", false, false, false),
-    /** Test. */ MULTIPLE("ab,ef", true, true, true),
-    /** Test. */ SPACES1("ab ,ef", true, true, true),
-    /** Test. */ SPACES2("ab, ef", true, true, true),
-    /** Test. */ AST2("a*.cd", false, true, false),
-    /** Test. */ QUESTION("?", false, false, false),
-    /** Test. */ QUESTIONS("??", true, false, false),
-    /** Test. */ NOSUFFIX("*.", true, false, false),
-    /** Test. */ NOSUFFIX2("*..", false, false, false),
-    /** Test. */ BACK("\\", false, false, false);
+    /** Test. */ ABC("ab.c", false, false, false, false),
+    /** Test. */ ABCDE("ab.cde", false, false, false, false),
+    /** Test. */ MULTIPLE("ab,ef", true, true, true, true),
+    /** Test. */ SPACES1("ab ,ef", true, true, true, true),
+    /** Test. */ SPACES2("ab, ef", true, true, true, true),
+    /** Test. */ AST2("a*.cd", false, true, false, true),
+    /** Test. */ QUESTION("?", false, false, false, false),
+    /** Test. */ QUESTIONS("??", true, false, false, false),
+    /** Test. */ NOSUFFIX("*.", true, false, false, false),
+    /** Test. */ NOSUFFIX2("*..", false, false, false, false),
+    /** Test. */ BACK("\\", false, false, false, false);
 
     /** Glob syntax. */
     final String glob;

@@ -87,7 +87,7 @@ public final class CSVParser extends FileParser {
 
     super(path, ta);
 
-    // parser properties
+    // set parser properties
     final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
     row = props.is(ParserProp.HEADER) ? 0 : 1;
 

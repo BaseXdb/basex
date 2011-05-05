@@ -42,9 +42,9 @@ public final class InfoIndex extends AInfo {
     if(args[0] != null) {
       final CmdIndexInfo ci = getOption(CmdIndexInfo.class);
       if(ci == null) return error(CMDUNKNOWN, this);
-      final byte[] info = info(ci, data);
-      out.print(info);
-      return info.length != 0;
+      final byte[] inf = info(ci, data);
+      out.print(inf);
+      return inf.length != 0;
     }
 
     final TokenBuilder tb = new TokenBuilder();
