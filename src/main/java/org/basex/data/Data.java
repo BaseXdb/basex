@@ -582,6 +582,9 @@ public abstract class Data {
     if(diff == 0) return;
 
     int p = rpar;
+
+    // TODO adjust attribute size of parent if attributes inserted
+
     while(p >= 0) {
       final int k = kind(p);
       size(p, k, size(p, k) + diff);
