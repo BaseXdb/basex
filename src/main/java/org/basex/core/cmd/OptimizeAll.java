@@ -72,8 +72,10 @@ public final class OptimizeAll extends ACreate {
     }
 
     // delete the old database, move the new one into place and reopen it
-    return run(new DropDB(m.name)) && run(new AlterDB(tname, m.name)) &&
-        run(new Open(m.name)) && info(DBOPTIMIZED, m.name, perf);
+    if(!run(new DropDB(m.name)) || !run(new AlterDB(tname, m.name)) ||
+        !run(new Open(m.name))) return false;
+    error("");
+    return info(DBOPTIMIZED, m.name, perf);
   }
 
   @Override

@@ -69,7 +69,7 @@ public final class ItrSeq extends Seq {
 
   @Override
   public int writeTo(final Item[] arr, final int start) {
-    int w = Math.min(vals.length, arr.length - start);
+    final int w = Math.min(vals.length, arr.length - start);
     for(int i = 0; i < w; i++) arr[start + i] = itemAt(i);
     return w;
   }

@@ -156,6 +156,8 @@ public enum Err {
   DATEFORMAT(FORG, 1, "Wrong % format: \"%\" (try: \"%\")."),
   /** FORG0001: Evaluation exception. */
   QNMINV(FORG, 1, "Invalid QName: \"%\"."),
+  /** FORG0001: Evaluation exception. */
+  FUNERR(FORG, 1, "%"),
   /** FORG0002: Evaluation exception. */
   URIINV(FORG, 2, "Invalid URI: %."),
 

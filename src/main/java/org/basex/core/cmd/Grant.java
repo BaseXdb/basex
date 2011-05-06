@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
@@ -40,6 +41,7 @@ public final class Grant extends Command {
     final String name = args[1];
     final String db = args[2];
     if(name.equals(ADMIN)) return error(USERADMIN);
+    if(!validName(name)) return error(NAMEINVALID, name);
 
     // find permission
     final CmdPerm cmd = getOption(CmdPerm.class);

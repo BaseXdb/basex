@@ -22,7 +22,6 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
-import org.basex.core.cmd.CreateMAB;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Cs;
 import org.basex.core.cmd.Delete;
@@ -144,8 +143,6 @@ public final class CommandParser extends InputParser {
             return new CreateDB(name(cmd), s ? remaining(null) : string(null));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
-          case MAB:
-            return new CreateMAB(string(cmd), name(null));
           case USER:
             return new CreateUser(name(cmd), string(null));
         }

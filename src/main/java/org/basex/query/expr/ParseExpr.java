@@ -19,6 +19,7 @@ import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
+import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -253,8 +254,12 @@ public abstract class ParseExpr extends Expr {
    */
   public final void checkColl(final Expr e, final QueryContext ctx)
       throws QueryException {
-    if(!eq(URLCOLL, checkStr(e, ctx))) IMPLCOL.thrw(input, e);
-  }
+    final byte[] u = checkStr(e, ctx);
+    if(eq(URLCOLL, u)) return;
+    final Uri uri = Uri.uri(u);
+    if(uri.absolute() || !ctx.baseURI.resolve(uri).eq(Uri.COLL))
+      IMPLCOL.thrw(input, e);
+    }
 
   /**
    * Checks if the specified expression yields a string.

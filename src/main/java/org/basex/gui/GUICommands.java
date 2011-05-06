@@ -243,7 +243,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.query != null && gui.query.modified());
+      b.setEnabled(gui.query != null && gui.query.saveable());
     }
   },
 
@@ -832,13 +832,18 @@ public enum GUICommands implements GUICommand {
   GOUP(GUIGOUP, "alt UP", GUIGOUPTT, true, false) {
     @Override
     public void execute(final GUI gui) {
+      // skip operation for root context
       final Context ctx = gui.context;
-      if(!ctx.root()) {
-        boolean root = true;
-        for(final int pre : ctx.current.list) {
-          root &= ctx.data.kind(pre) == Data.DOC;
-        }
-        gui.execute(new Cs(root ? "/" : ".."));
+      if(ctx.root()) return;
+      // check if all nodes are document nodes
+      boolean r = true;
+      for(final int pre : ctx.current.list) r &= ctx.data.kind(pre) == Data.DOC;
+      if(r) {
+        // if yes, jump to database root
+        gui.notify.context(new Nodes(ctx.data.doc(), ctx.data), false, null);
+      } else {
+        // otherwise, jump to parent nodes
+        gui.execute(new Cs(".."));
       }
     }
 
@@ -852,7 +857,11 @@ public enum GUICommands implements GUICommand {
   GOHOME(GUIROOT, "alt HOME", GUIROOTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      if(!gui.context.root()) gui.execute(new Cs("/"));
+      // skip operation for root context
+      final Context ctx = gui.context;
+      if(ctx.root()) return;
+      // if yes, jump to database root
+      gui.notify.context(new Nodes(ctx.data.doc(), ctx.data), false, null);
     }
 
     @Override

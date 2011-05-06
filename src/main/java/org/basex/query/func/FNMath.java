@@ -51,7 +51,7 @@ public final class FNMath extends Fun {
       case LOG:   return Dbl.get(log(d));
       case LOG10: return Dbl.get(log10(d));
       case ATAN2: return Dbl.get(atan2(d, e));
-      case POW:   return Dbl.get(pow(d, e));
+      case POW:   return Dbl.get(d == 1 ? 1 : pow(d, e));
       // project-specific
       case RAND:  return Dbl.get(random());
       case SINH:  return Dbl.get(sinh(d));

@@ -18,6 +18,8 @@ public final class Prop extends AProp {
   public static final String NL = System.getProperty("line.separator");
   /** Returns the system's default encoding. */
   public static final String ENCODING = System.getProperty("file.encoding");
+  /** Directory separator. */
+  public static final String DIRSEP = System.getProperty("file.separator");
 
   /** System's temporary directory. */
   public static final String TMP =
@@ -120,7 +122,7 @@ public final class Prop extends AProp {
   /** Flag for parsing DTDs in internal parser. */
   public static final Object[] DTD = { "DTD", false };
   /** Path to XML Catalog file. */
-  public static final Object[] CATFILE = { "CATFILE", ""};
+  public static final Object[] CATFILE = { "CATFILE", "" };
   /** Flag for entity parsing in internal parser. */
   public static final Object[] ENTITY = { "ENTITY", false };
   /** Define import parser. */
@@ -169,8 +171,6 @@ public final class Prop extends AProp {
   /** Levenshtein default error. */
   public static final Object[] LSERROR = { "LSERROR", 0 };
 
-  /** Flag for creating flat MAB2 data. */
-  public static final Object[] MAB2FLAT = { "MAB2flat", false };
   /** Maximum number of index occurrences to print. */
   public static final Object[] MAXSTAT = { "MAXSTAT", 15 };
 

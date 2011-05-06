@@ -18,9 +18,6 @@ public final class Reflect {
   /** Cached classes. */
   private static HashMap<String, Class<?>> classes =
     new HashMap<String, Class<?>>();
-  /** Cached methods. */
-  private static HashMap<String, Method> methods =
-    new HashMap<String, Method>();
 
   /** Hidden constructor. */
   private Reflect() { }
@@ -66,23 +63,17 @@ public final class Reflect {
 
     if(clazz == null) return null;
 
-    final StringBuilder sb = new StringBuilder(clazz.getName());
-    for(final Class<?> c : types) sb.append(c.getName());
-    final String key = sb.toString();
-
-    Method m = methods.get(key);
-    if(m == null) {
+    Method m = null;
+    try {
       try {
-        try {
-          m = clazz.getMethod(name, types);
-        } catch(final Exception ex) {
-          m = clazz.getDeclaredMethod(name, types);
-          m.setAccessible(true);
-        }
-        methods.put(key, m);
+        m = clazz.getMethod(name, types);
       } catch(final Exception ex) {
-        Util.debug(ex);
+        m = clazz.getDeclaredMethod(name, types);
+        m.setAccessible(true);
       }
+      //methods.put(key, m);
+    } catch(final Exception ex) {
+      Util.debug(ex);
     }
     return m;
   }

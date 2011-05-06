@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 
 import org.basex.core.Command;
 import org.basex.core.Prop;
@@ -38,17 +37,17 @@ public class Copy extends Command {
   protected boolean run() {
     final String db = args[0];
     final String newdb = args[1];
-
     // check if names are valid
     if(!validName(db)) return error(NAMEINVALID, db);
     if(!validName(newdb)) return error(NAMEINVALID, newdb);
 
-    // check if new database already exists
+    // database does not exist
+    if(!prop.dbexists(db)) return error(DBNOTFOUND, db);
+    // target database exists already
     if(prop.dbexists(newdb)) return error(DBEXISTS, newdb);
 
     // try to copy database
-    return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
-      copy(db, newdb, prop) ? info(DBCOPY, db, perf) : error(DBNOCOPY, db);
+    return copy(db, newdb, prop) ? info(DBCOPY, db, perf) : error(DBNOCOPY, db);
   }
 
   /**
@@ -69,22 +68,39 @@ public class Copy extends Command {
     boolean ok = true;
     for(final String file : files) {
       of++;
-      FileChannel sc = null;
-      FileChannel dc = null;
       try {
-        sc = new FileInputStream(new File(src, file)).getChannel();
-        dc = new FileOutputStream(new File(trg, file)).getChannel();
-        dc.transferFrom(sc, 0, sc.size());
+        copy(new File(src, file), new File(trg, file));
       } catch(final IOException ex) {
         ok = false;
-      } finally {
-        if(sc != null) try { sc.close(); } catch(final IOException ex) { }
-        if(dc != null) try { dc.close(); } catch(final IOException ex) { }
+        break;
       }
     }
     // drop new database if error occurred
     if(!ok) DropDB.drop(newdb, pr);
     return ok;
+  }
+
+  /**
+   * Copies the specified file.
+   * @param src source file
+   * @param trg target file
+   * @throws IOException I/O exception
+   */
+  public static synchronized void copy(final File src, final File trg)
+      throws IOException {
+
+    // optimize buffer size
+    final byte[] buf = new byte[(int) Math.min(src.length(), 1 << 22)];
+    FileInputStream fis = null;
+    FileOutputStream fos = null;
+    try {
+      fis = new FileInputStream(src);
+      fos = new FileOutputStream(trg);
+      for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
+    } finally {
+      if(fis != null) try { fis.close(); } catch(final IOException ex) { }
+      if(fos != null) try { fos.close(); } catch(final IOException ex) { }
+    }
   }
 
   @Override

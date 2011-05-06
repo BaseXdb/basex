@@ -1,4 +1,4 @@
-package org.basex.build.mediovis;
+package org.basex.build.file;
 
 import static org.basex.util.Token.token;
 

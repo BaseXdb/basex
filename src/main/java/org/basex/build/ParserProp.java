@@ -23,6 +23,8 @@ public final class ParserProp extends AProp {
   public static final Object[] FORMAT = { "format", "verbose" };
   /** Parser option: line. */
   public static final Object[] LINES = { "lines", true };
+  /** Parser option: flat. */
+  public static final Object[] FLAT = { "flat", false };
   /** Parser option: encoding. */
   public static final Object[] ENCODING = { "encoding", Token.UTF8 };
 

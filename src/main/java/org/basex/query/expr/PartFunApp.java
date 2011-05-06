@@ -15,7 +15,7 @@ import org.basex.util.Token;
 /**
  * Partial function application.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public final class PartFunApp extends Func {
