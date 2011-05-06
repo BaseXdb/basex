@@ -17,6 +17,10 @@ import org.junit.Test;
  * @author Rositsa Shadura
  */
 public final class FNFileTest extends AdvancedQueryTest {
+  /** Directory separator. */
+  private static final String DIRSEP = System.getProperty("file.separator");
+  /** Path separator. */
+  private static final String PATHSEP = System.getProperty("path.separator");
   /** Test name. */
   private static final String NAME = Util.name(FNFileTest.class);
   /** Test path. */
@@ -160,7 +164,7 @@ public final class FNFileTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testRead() throws QueryException {
+  public void testReadText() throws QueryException {
     final String fun = check(FunDef.READTEXT);
     error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
     error(fun + "('" + Prop.TMP + "')", Err.PATHISDIR);
@@ -201,12 +205,12 @@ public final class FNFileTest extends AdvancedQueryTest {
     query("file:size('" + PATH1 + "')", "1");
     query("file:delete('" + PATH1 + "')");
 
-    query(fun + "('" + PATH1 + "', 'a\u00e4'," +
-      serialParams("<encoding>CP1252</encoding>") + ")");
+    query(fun + "('" + PATH1 + "', 'a\u00e4',"
+        + serialParams("<encoding>CP1252</encoding>") + ")");
     query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
 
-    query(fun + "('" + PATH1 + "', '<a/>'," +
-        serialParams("<method>text</method>") + ")");
+    query(fun + "('" + PATH1 + "', '<a/>',"
+        + serialParams("<method>text</method>") + ")");
     query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
     query("file:delete('" + PATH1 + "')");
   }
@@ -227,13 +231,13 @@ public final class FNFileTest extends AdvancedQueryTest {
     query("file:size('" + PATH1 + "')", "2");
     query("file:delete('" + PATH1 + "')");
 
-    query(fun + "('" + PATH1 + "', 'a\u00e4'," +
-      serialParams("<encoding>CP1252</encoding>") + ")");
+    query(fun + "('" + PATH1 + "', 'a\u00e4',"
+        + serialParams("<encoding>CP1252</encoding>") + ")");
     query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
     query("file:delete('" + PATH1 + "')");
 
-    query(fun + "('" + PATH1 + "', '<a/>'," +
-        serialParams("<method>text</method>") + ")");
+    query(fun + "('" + PATH1 + "', '<a/>',"
+        + serialParams("<method>text</method>") + ")");
     query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
     query("file:delete('" + PATH1 + "')");
   }
@@ -324,7 +328,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:path-to-full-path() function.
+   * Test method for the file:path-to-uri() function.
    * @throws Exception exception
    */
   @Test
@@ -333,5 +337,88 @@ public final class FNFileTest extends AdvancedQueryTest {
     final String path = query(fun + "('" + PATH1 + "')");
     final String uri = new File(PATH1).toURI().toString();
     assertEquals(path.toLowerCase(), uri.toLowerCase());
+  }
+
+  /**
+   * Tests method for file:base-name() function.
+   * @throws Exception exception
+   */
+  @Test
+  public void testBaseName() throws Exception {
+    final String fun = check(FunDef.BASENAME);
+
+    // Check with a simple path
+    final String name1 = query(fun + "('" + PATH1 + "')");
+    assertEquals(name1, NAME);
+    // Check with a path ending with a directory separator
+    final String name2 = query(fun + "('" + PATH1 + DIRSEP + "')");
+    assertEquals(name2, NAME);
+    // Check with a path consisting only of directory separators
+    final String name3 = query(fun + "('" + DIRSEP + DIRSEP + "')");
+    assertEquals(name3, "");
+    // Check with empty string path
+    final String name4 = query(fun + "('" + "" + "')");
+    assertEquals(name4, ".");
+    // Check using a suffix
+    final String name5 = query(fun + "('" + PATH1 + DIRSEP + "test.xml"
+        + "', '.xml')");
+    assertEquals(name5, "test");
+  }
+
+  /**
+   * Tests method for file:dir-name() function.
+   * @throws Exception exception
+   */
+  @Test
+  public void testDirName() throws Exception {
+    final String fun = check(FunDef.DIRNAME);
+    // Check with a simple path
+    final String dir1 = query(fun + "('" + PATH1 + "')");
+    final String exp = Prop.TMP.endsWith(DIRSEP) ? Prop.TMP.substring(0,
+        Prop.TMP.length() - 1) : Prop.TMP;
+    assertEquals(dir1.toLowerCase(), exp);
+    // Check with an empty path
+    final String dir2 = query(fun + "('" + "" + "')");
+    assertEquals(dir2, ".");
+    // Check with a path without directory separators
+    final String dir3 = query(fun + "('" + NAME + "')");
+    assertEquals(dir3, ".");
+  }
+
+  /**
+   * Tests method for file:path-to-native() function.
+   * @throws Exception exception
+   */
+  @Test
+  public void testPathToNative() throws Exception {
+    final String fun = check(FunDef.PATHNATIVE);
+    final String path1 = query(fun + "('" + PATH1 + "')");
+    assertEquals(path1, PATH1);
+
+    final String path2 = query(fun + "('" + PATH1 + DIRSEP + ".." + DIRSEP
+        + "test.xml" + "')");
+    assertEquals(path2, Prop.TMP + "test.xml");
+  }
+
+  /**
+   * Tests method for file:directory-separator() function.
+   * @throws Exception exception
+   */
+  @Test
+  public void testDirSep() throws Exception {
+    final String fun = check(FunDef.DIRSEP);
+    final String sep = query(fun + "()");
+    assertEquals(sep, DIRSEP);
+  }
+
+  /**
+   * Tests method for file:path-separator() function.
+   * @throws Exception exception
+   */
+  @Test
+  public void testPathSep() throws Exception {
+    final String fun = check(FunDef.PATHSEP);
+    final String sep = query(fun + "()");
+    assertEquals(sep, PATHSEP);
   }
 }

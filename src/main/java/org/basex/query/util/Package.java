@@ -34,7 +34,7 @@ public final class Package {
    * @return result
    */
   public byte[] getName() {
-    return new TokenBuilder().add(name).add(version).finish();
+    return new TokenBuilder().add(name).add('-').add(version).finish();
   }
 
   /**

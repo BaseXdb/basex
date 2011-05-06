@@ -11,6 +11,7 @@ import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.core.Commands.CmdRepo;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.AlterDB;
@@ -39,6 +40,7 @@ import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.InfoStorage;
+import org.basex.core.cmd.InstallPkg;
 import org.basex.core.cmd.Kill;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.ListDB;
@@ -260,6 +262,14 @@ public final class CommandParser extends InputParser {
         key(TO, cmd);
         return db == null ? new Grant(perm, name(cmd)) :
           new Grant(perm, name(cmd), db);
+      case REPO:
+        switch(consume(CmdRepo.class, cmd)) {
+          case INSTALL:
+            return new InstallPkg(name(cmd));
+          case REMOVE:
+          case LIST:  
+        }
+        
       default:
     }
     return null;
