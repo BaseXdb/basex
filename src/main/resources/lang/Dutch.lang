@@ -543,7 +543,7 @@ ch_export2=Exporteert de database naar [%].
 ch_xquery1=Evalueer XQuery.
 ch_xquery2=Evalueert de opgegeven query en print het resultaat.
 ch_run1=Evalueer bestand als XQuery.
-ch_run2=Evalueert een query van [%] en print het resultaat.
+ch_run2=Evalueert de query [%] en print het resultaat.
 ch_find1=Evalueer een keyword query.
 ch_find2=De volgende modifiers kunnen gebruikt worden:\n =  : zoekt naar exacte tekst nodes"\n @= : zoekt naar exacte attributen\n @  : zoekt naar attributen
 ch_cs1=Evalueer XQuery en neem resultaat als nieuwe context set.
@@ -553,7 +553,7 @@ ch_kill2=Stopt alle sessies van de opgegeven gebruiker.
 ch_backup1=Backup database.
 ch_backup2=Maakt een backup van de opgegeven database.
 ch_restore1=Herstel database.
-ch_restore2=Zet een backup van de gegeven database terug mbv de laatste of met datum gespecificeerde ("yyyy-MM-dd-HH-mm-ss") backup file.
+ch_restore2=Zet een backup van de gegeven database terug mbv\nde laatste of met datum gespecificeerde backup file.
 ch_show1=Toon server informatie.
 ch_show21=Toont server informatie:
 ch_show22=toont momenteel geopende databases.

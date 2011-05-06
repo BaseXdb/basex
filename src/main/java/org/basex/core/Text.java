@@ -228,7 +228,7 @@ public interface Text {
 
   /** Command help. */
   String[] HELPDELETE = {
-    "[" + C_NAME  + "]", lang("ch_delete1"), lang("ch_delete2")
+    "[" + C_PATH  + "]", lang("ch_delete1"), lang("ch_delete2")
   };
 
   /** Command help. */
@@ -266,8 +266,8 @@ public interface Text {
     LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
-    LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [db]): " + NL + "  " +
-      lang("ch_drop23") + NL +
+    LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [database]): " + NL +
+      "  " + lang("ch_drop23") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
       lang("ch_drop24", C_NAME)
   };
@@ -286,7 +286,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPFIND = {
-    "[" + C_QUERY + "]", lang("ch_find1"), lang("ch_find2")
+    "[keywords]", lang("ch_find1"), lang("ch_find2")
   };
   /** Command help. */
   String[] HELPRUN = {
@@ -317,26 +317,26 @@ public interface Text {
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
-    LI + CmdShow.USERS + " (" + ON + " [db]): " + lang("ch_show24") + NL +
+    LI + CmdShow.USERS + " (" + ON + " [database]): " + lang("ch_show24") + NL +
     LI + CmdShow.BACKUPS + ": " + lang("ch_show25")
   };
   /** Command help. */
   String[] HELPGRANT = {
     "[" + CmdPerm.NONE + "|" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
-    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [db]) " + TO +
+    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [database]) " + TO +
     " [user]",
     lang("ch_grant1"),
     lang("ch_grant2")
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + CmdCreate.USER + "|" + CmdCreate.DATABASE + "] [...]",
+    "[" + CmdCreate.DATABASE + "|" + CmdCreate.USER + "] [...]",
     lang("ch_alter1"),
     lang("ch_alter2") + NL  +
-    LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
-    "  " + lang("ch_alterpw") + NL +
     LI + CmdCreate.DATABASE + " [" + C_NAME + "] [newname]" + NL +
-    "  " + lang("ch_alterdb")
+    "  " + lang("ch_alterdb") + NL +
+    LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
+    "  " + lang("ch_alterpw")
   };
 
   /** Command help. */

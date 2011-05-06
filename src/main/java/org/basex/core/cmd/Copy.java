@@ -37,17 +37,17 @@ public class Copy extends Command {
   protected boolean run() {
     final String db = args[0];
     final String newdb = args[1];
-
     // check if names are valid
     if(!validName(db)) return error(NAMEINVALID, db);
     if(!validName(newdb)) return error(NAMEINVALID, newdb);
 
-    // check if new database already exists
+    // database does not exist
+    if(!prop.dbexists(db)) return error(DBNOTFOUND, db);
+    // target database exists already
     if(prop.dbexists(newdb)) return error(DBEXISTS, newdb);
 
     // try to copy database
-    return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
-      copy(db, newdb, prop) ? info(DBCOPY, db, perf) : error(DBNOCOPY, db);
+    return copy(db, newdb, prop) ? info(DBCOPY, db, perf) : error(DBNOCOPY, db);
   }
 
   /**
