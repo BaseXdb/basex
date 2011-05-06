@@ -58,7 +58,7 @@ public final class Check extends Command {
     // check if database is already opened
     final Data data = ctx.pin(name);
     if(data != null) {
-      final IO in = data.meta.path;
+      final IO in = IO.get(data.meta.path);
       final boolean found = in.eq(io) && io.date() == in.date();
       if(found && ctx.perm(User.READ, data.meta)) return data;
       Close.close(data, ctx);

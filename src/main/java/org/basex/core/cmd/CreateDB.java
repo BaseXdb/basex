@@ -73,7 +73,7 @@ public final class CreateDB extends ACreate {
   protected boolean run() {
     final String name = args[0];
     final String input = args[1];
-    if(input == null) return build(Parser.emptyParser(name), name);
+    if(input == null) return build(Parser.emptyParser(), name);
     final IO io = IO.get(input);
     if(io instanceof IOContent) io.name(name + IO.XMLSUFFIX);
     final Parser p = parser != null ? parser : new DirParser(io, prop);
@@ -89,7 +89,7 @@ public final class CreateDB extends ACreate {
    */
   public static Data empty(final String name, final Context ctx)
       throws IOException {
-    return xml(Parser.emptyParser(name), name, ctx);
+    return xml(Parser.emptyParser(), name, ctx);
   }
 
   /**

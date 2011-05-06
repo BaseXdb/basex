@@ -67,9 +67,8 @@ public final class DialogExport extends Dialog {
     p.add(out);
     p.add(new BaseXLabel());
 
-    final IO io = gui.context.data.meta.path;
-    final String fn = io.dir();
-    path = new BaseXTextField(fn, this);
+    final String dir = IO.get(gui.context.data.meta.path).dir();
+    path = new BaseXTextField(dir, this);
     path.addKeyListener(keys);
     p.add(path);
 

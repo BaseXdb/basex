@@ -151,8 +151,6 @@ public enum Err {
   /** FORG0001: Evaluation exception. */
   DATERANGE(FORG, 1, "%(\"%\") out of range."),
   /** FORG0001: Evaluation exception. */
-  DATEINV(FORG, 1, "%(\"%\") is no valid ISO 8601 date."),
-  /** FORG0001: Evaluation exception. */
   DATEFORMAT(FORG, 1, "Wrong % format: \"%\" (try: \"%\")."),
   /** FORG0001: Evaluation exception. */
   QNMINV(FORG, 1, "Invalid QName: \"%\"."),

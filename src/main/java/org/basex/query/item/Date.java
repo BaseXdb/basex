@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
@@ -135,8 +136,9 @@ public abstract class Date extends Item {
       throws QueryException {
 
     if(xc.getYear() + a.mon / 12 > 9999) DATERANGE.thrw(ii, type, a.atom(ii));
-    xc.add(p ? a.toJava() : a.toJava().negate());
-    if(!xc.isValid()) throw DATEINV.thrw(ii, type, xc);
+    final Duration dur = a.toJava();
+    xc.add(p ? dur : dur.negate());
+    if(xc.getYear() == 0) xc.setYear(p ^ dur.getSign() < 0 ? 1 : -1);
   }
 
   @Override
