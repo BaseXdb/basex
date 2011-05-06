@@ -108,7 +108,7 @@ public final class OptimizeAll extends ACreate {
   public final class DBParser extends Parser {
     /** Constructor. */
     protected DBParser() {
-      super(IO.get(old.meta.path), "");
+      super(old.meta.path.isEmpty() ? null : IO.get(old.meta.path), "");
     }
 
     @Override
