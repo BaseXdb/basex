@@ -79,9 +79,22 @@ public class Filter extends Preds {
     // faster runtime evaluation of variable counters (array[$pos] ...)
     final boolean off = pred.length == 1 && pred[0].type().num() &&
       !pred[0].uses(Use.CTX);
+    final boolean iter = !off && iterable();
+
+    // determine number of results
+    final long s = root.size();
+    if(s != -1) {
+      if(pos != null) {
+        size = Math.max(0, s + 1 - pos.min) - Math.max(0, s - pos.max);
+      } else if(last) {
+        size = s > 0 ? 1 : 0;
+      }
+      // no results will remain: return empty sequence
+      if(size == 0) return optPre(null, ctx);
+    }
 
     // iterator for simple positional predicate
-    return off || iterable() ? new IterPosFilter(this, off) : this;
+    return off || iter ? new IterPosFilter(this, off) : this;
   }
 
   @Override

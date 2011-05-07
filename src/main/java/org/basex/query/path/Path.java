@@ -251,7 +251,7 @@ public abstract class Path extends ParseExpr {
   protected Path children(final QueryContext ctx, final Data data) {
     for(int s = 0; s < step.length; ++s) {
       // don't allow predicates in preceding location steps
-      final AxisStep prev = checkStep(s - 1);
+      final AxisStep prev = s > 0 ? checkStep(s - 1) : null;
       if(prev != null && prev.pred.length != 0) break;
 
       // ignore axes other than descendant, or position predicates
@@ -299,7 +299,7 @@ public abstract class Path extends ParseExpr {
    * @return step
    */
   public AxisStep checkStep(final int i) {
-    return i >= 0 && step[i] instanceof AxisStep ? (AxisStep) step[i] : null;
+    return step[i] instanceof AxisStep ? (AxisStep) step[i] : null;
   }
 
   /**
