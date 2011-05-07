@@ -47,7 +47,8 @@ public final class DataAccess {
    */
   public synchronized void close() throws IOException {
     flush();
-    file.setLength(len);
+    // set new length only if it has been changed (much faster)
+    if(file.length() != len) file.setLength(len);
     file.close();
   }
 
