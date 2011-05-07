@@ -123,10 +123,8 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
    * @return status code.
    */
   private int status(final Exception ex) {
-    int status = 404;
-    String message = ex.getMessage();
-    if(message != null && (message.contains(Text.PERMNO.substring(2)) ||
-        message.contains(Text.PERMINV))) status = 403;
-    return status;
+    final String msg = ex.getMessage();
+    return msg != null && (msg.contains(Text.PERMNO.substring(2)) ||
+        msg.contains(Text.PERMINV)) ? 403 : 404;
   }
 }

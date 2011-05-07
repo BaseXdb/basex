@@ -297,7 +297,7 @@ public final class HttpClientTest {
     assertTrue(r.parts.size() == 3);
 
     // check parts
-    Iterator<Part> i = r.parts.iterator();
+    final Iterator<Part> i = r.parts.iterator();
     Part part = null;
     part = i.next();
     assertTrue(part.headers.size() == 2);
@@ -456,7 +456,7 @@ public final class HttpClientTest {
       try {
         RequestParser.parse(dbNode.children().next(), null, null);
         fail("Exception not thrown");
-      } catch(QueryException ex) {
+      } catch(final QueryException ex) {
         assertTrue(indexOf(token(ex.getMessage()),
             token(Err.ErrType.FOHC.toString())) != -1);
       }
@@ -675,7 +675,7 @@ public final class HttpClientTest {
     conn.contentType = "text/plain; charset=CP1251";
     // set content encoded in CP1251
     conn.content = Charset.forName("CP1251").encode("тест").array();
-    Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
+    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
         context.prop, null);
     // compare results
     assertTrue(eq(i.get(1).atom(null), token("тест")));

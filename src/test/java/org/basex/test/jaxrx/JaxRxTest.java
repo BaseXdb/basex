@@ -376,10 +376,10 @@ public final class JaxRxTest {
     conn.setRequestMethod("POST");
     conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "application/query+xml");
     // basic authentication example
-    String user = Text.ADMIN;
-    String pw = Text.ADMIN;
-    String userpw = user + ":" + pw;
-    String encoded = Base64.encode(userpw);
+    final String user = Text.ADMIN;
+    final String pw = Text.ADMIN;
+    final String userpw = user + ":" + pw;
+    final String encoded = Base64.encode(userpw);
     conn.setRequestProperty("Authorization", "Basic " + encoded);
     // send query
     final OutputStream out = conn.getOutputStream();

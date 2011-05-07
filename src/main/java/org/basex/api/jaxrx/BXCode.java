@@ -3,16 +3,10 @@ package org.basex.api.jaxrx;
 import static org.jaxrx.core.JaxRxConstants.*;
 
 import java.io.IOException;
-import java.util.List;
-
-import javax.ws.rs.core.HttpHeaders;
-
-import org.basex.core.Text;
 import org.basex.data.DataText;
 import org.basex.data.SerializerProp;
 import org.basex.server.ClientSession;
 import org.basex.server.LoginException;
-import org.basex.util.Base64;
 import org.basex.util.Util;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
@@ -27,10 +21,6 @@ import org.jaxrx.core.ResourcePath;
 abstract class BXCode {
   /** Client session. */
   final ClientSession cs;
-  /** user name from HTTP request. */
-  private final String username;
-  /** password from HTTP request. */
-  private final String password;
 
   /**
    * Constructor, creating a new client session instance with user name and
@@ -39,20 +29,8 @@ abstract class BXCode {
    *          credentials.
    */
   BXCode(final ResourcePath path) {
-    final String[] cred = updateIdentity(path);
-
-    if(cred == null) {
-      username = System.getProperty("org.basex.user");
-      password = System.getProperty("org.basex.password");
-    } else {
-      username = cred[0];
-      password = cred[1];
-    }
-
     try {
-      cs = new ClientSession(Text.LOCALHOST,
-          Integer.parseInt(System.getProperty("org.basex.serverport")),
-          username, password);
+      cs = JaxRxServer.login(path);
     } catch(final LoginException ex) {
       throw new JaxRxException(401, "Username/Password is false.");
     } catch(final Exception ex) {
@@ -113,8 +91,8 @@ abstract class BXCode {
     } catch(final NumberFormatException ex) {
       /* exception follows for both branches. */
     }
-    throw new JaxRxException(400, "Parameter '" + qp
-        + "' is no valid integer: " + val);
+    throw new JaxRxException(400,
+        "Parameter '" + qp + "' is no valid integer: " + val);
   }
 
   /**
@@ -149,50 +127,5 @@ abstract class BXCode {
           wrap, DataText.YES, DataText.NO).getMessage());
     }
     return ser.replaceAll("^,", "");
-  }
-
-  /**
-   * The user name from user request if existing.
-   *
-   * @return user name from user request or <code>null</code> if not existing.
-   */
-  public String getUsername() {
-    return username;
-  }
-
-  /**
-   * The password from user request if existing.
-   *
-   * @return password from user request or <code>null</code> if not existing.
-   */
-  public String getPassword() {
-    return password;
-  }
-
-  /**
-   * Reads user identity and user credentials from HTTP header.
-   * @param path {@link ResourcePath} instance.
-   * @return login/password combination or {@code null} if no user was
-   *         specified.
-   */
-  private String[] updateIdentity(final ResourcePath path) {
-    final HttpHeaders headers = path.getHttpHeaders();
-    final List<String> authorization =
-      headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
-    if(authorization != null) {
-      for(String value : authorization) {
-        String[] values = value.split(" ");
-        if(values[0].equalsIgnoreCase("basic")) {
-          String decoded = Base64.decode(values[1]);
-          String[] credentials = decoded.split(":", 2);
-          if(credentials.length < 2) {
-            throw new JaxRxException(401, "Password missing.");
-          }
-          return credentials;
-        }
-        throw new JaxRxException(500, "Unknown authorization mode.");
-      }
-    }
-    return null;
   }
 }

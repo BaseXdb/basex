@@ -36,17 +36,6 @@ import org.jaxrx.core.ResourcePath;
  * @author Lukas Lewandowski
  */
 public final class BXJaxRx implements JaxRx {
-  /** Configuration: User. */
-  public static final String USER = "org.basex.user";
-  /** Configuration: Password. */
-  public static final String PASSWORD = "org.basex.password";
-  /** Configuration: Server port. */
-  public static final String SERVERPORT = "org.basex.serverport";
-  /** Configuration: JAX-RX path. */
-  public static final String JAXRXPATH = "org.basex.jaxrxpath";
-  /** Configuration: serializer options. */
-  public static final String SERIALIZER = "org.jaxrx.parameter.output";
-
   @Override
   public HashSet<QueryParameter> getParameters() {
     final HashSet<QueryParameter> p = new HashSet<QueryParameter>();
