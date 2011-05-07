@@ -169,7 +169,7 @@ public class GFLWOR extends ParseExpr {
         }
       }
     }
-    type = SeqType.get(ret.type().type, SeqType.Occ.ZM);
+    type = SeqType.get(ret.type().type, size);
 
     compForLet(ctx);
     return this;

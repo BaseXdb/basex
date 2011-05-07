@@ -63,7 +63,22 @@ public class Filter extends Preds {
   public final Expr comp2(final QueryContext ctx) {
     // evaluate return type
     final SeqType t = root.type();
-    type = SeqType.get(t.type, t.zeroOrOne() ? SeqType.Occ.ZO : SeqType.Occ.ZM);
+
+    // determine number of results and type
+    final long s = root.size();
+    if(s != -1) {
+      if(pos != null) {
+        size = Math.max(0, s + 1 - pos.min) - Math.max(0, s - pos.max);
+      } else if(last) {
+        size = s > 0 ? 1 : 0;
+      }
+      // no results will remain: return empty sequence
+      if(size == 0) return optPre(null, ctx);
+      type = SeqType.get(t.type, size);
+    } else {
+      type = SeqType.get(t.type,
+          t.zeroOrOne() ? SeqType.Occ.ZO : SeqType.Occ.ZM);
+    }
 
     // no positional predicates.. use simple iterator
     if(!super.uses(Use.POS)) return new IterFilter(this);
@@ -80,18 +95,6 @@ public class Filter extends Preds {
     final boolean off = pred.length == 1 && pred[0].type().num() &&
       !pred[0].uses(Use.CTX);
     final boolean iter = !off && iterable();
-
-    // determine number of results
-    final long s = root.size();
-    if(s != -1) {
-      if(pos != null) {
-        size = Math.max(0, s + 1 - pos.min) - Math.max(0, s - pos.max);
-      } else if(last) {
-        size = s > 0 ? 1 : 0;
-      }
-      // no results will remain: return empty sequence
-      if(size == 0) return optPre(null, ctx);
-    }
 
     // iterator for simple positional predicate
     return off || iter ? new IterPosFilter(this, off) : this;
