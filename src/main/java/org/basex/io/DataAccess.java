@@ -19,6 +19,8 @@ public final class DataAccess {
   private final RandomAccessFile file;
   /** File length. */
   private long len;
+  /** Changed flag. */
+  private boolean changed;
   /** Offset. */
   private int off;
 
@@ -47,8 +49,7 @@ public final class DataAccess {
    */
   public synchronized void close() throws IOException {
     flush();
-    // set new length only if it has been changed (much faster)
-    if(file.length() != len) file.setLength(len);
+    if(changed) file.setLength(len);
     file.close();
   }
 
@@ -65,6 +66,7 @@ public final class DataAccess {
    * @param l file length
    */
   public void length(final long l) {
+    changed |= l != len;
     len = l;
   }
 
@@ -292,7 +294,7 @@ public final class DataAccess {
   private void write(final int b) {
     final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.current();
     bf.data[off++] = (byte) b;
-    len = Math.max(len, bf.pos + off);
+    length(Math.max(len, bf.pos + off));
     bf.dirty = true;
   }
 
