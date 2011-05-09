@@ -223,8 +223,6 @@ public interface QueryTokens {
   /** Parser token. */
   String SCORE = "score";
   /** Parser token. */
-  String SCORED = "scored";
-  /** Parser token. */
   String SENSITIVE = "sensitive";
   /** Parser token. */
   String SENTENCE = "sentence";
