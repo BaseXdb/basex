@@ -157,8 +157,9 @@ public class DBNode extends ANode {
   @Override
   public final byte[] base() {
     if(type != NodeType.DOC) return EMPTY;
-    final IO dir = IO.get(data.meta.path.path());
-    return token(dir.merge(string(data.text(pre, true))).url());
+    final String dir = data.meta.path;
+    final String name = string(data.text(pre, true));
+    return token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
   }
 
   @Override

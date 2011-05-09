@@ -176,7 +176,7 @@ public final class QueryContext extends Progress {
     nodes = ctx.current;
     ftopt = new FTOpt();
     xquery3 = ctx.prop.is(Prop.XQUERY3);
-    inf = ctx.prop.is(Prop.QUERYINFO);
+    inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
 
   }

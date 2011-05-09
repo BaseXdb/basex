@@ -441,11 +441,13 @@ public final class EditorView extends View {
   }
 
   /**
-   * Returns the modified flag.
-   * @return modified flag
+   * Checks if the current text can be saved. The check returns {@code true}
+   * if the text has not been opened from disk, or if it has been modified.
+   * @return result of check
    */
-  public boolean modified() {
-    return getEditor().mod;
+  public boolean saveable() {
+    final EditorArea area = getEditor();
+    return !area.opened || area.mod;
   }
 
   /**

@@ -243,7 +243,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.query != null && gui.query.modified());
+      b.setEnabled(gui.query != null && gui.query.saveable());
     }
   },
 

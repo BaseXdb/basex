@@ -42,13 +42,13 @@ public final class ReplaceNode extends NodeCopy {
       // overwrite existing text node
       d.replace(pre, Data.TEXT, md.text(0, true));
 
-      // check if simple, fast replace is possible
-      // TODO adjust attribute size of parent if attributes inserted
-      // TODO text merging?
-//    } else if(md != null && md.meta.size > 0 && d.ns.size() == 0
-//        && md.ns.size() == 0 && md.kind(0) != Data.ATTR) {
-//      d.replace(pre, md);
-
+      /* [LK] XQuery/Update: check if simple, fast replace is possible
+       adjust attribute size of parent if attributes inserted
+       text merging?
+    } else if(md != null && md.meta.size > 0 && d.ns.size() == 0
+        && md.ns.size() == 0 && md.kind(0) != Data.ATTR) {
+      d.replace(pre, md);
+      */
     } else {
       d.delete(pre);
       if(md != null) {

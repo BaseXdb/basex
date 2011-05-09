@@ -40,7 +40,7 @@ public abstract class Parser extends Progress {
    * @param io parser input
    */
   protected Parser(final String io) {
-    this(IO.get(io), "");
+    this(io == null ? null : IO.get(io), "");
   }
 
   /**
@@ -93,11 +93,10 @@ public abstract class Parser extends Progress {
 
   /**
    * Returns a parser instance for creating empty databases.
-   * @param f file reference
    * @return parser
    */
-  public static Parser emptyParser(final String f) {
-    return new Parser(f) {
+  public static Parser emptyParser() {
+    return new Parser(null) {
       @Override
       public void parse(final Builder build) { /* empty */ }
     };

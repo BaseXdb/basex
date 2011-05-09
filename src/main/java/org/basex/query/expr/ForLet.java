@@ -30,17 +30,17 @@ public abstract class ForLet extends Single {
   /**
    * If possible, binds the variable at compile time.
    * @param ctx query context
-   * @return true if expression was bound to variable
    * @throws QueryException query exception
    */
-  protected boolean bind(final QueryContext ctx) throws QueryException {
+  protected final void bind(final QueryContext ctx) throws QueryException {
+    if(!simple(true)) return;
+
     // don't bind variable if expression uses variables, context, or fragments
     if(expr.uses(Use.VAR) || expr.uses(Use.CTX) || expr.uses(Use.CNS) ||
-        ctx.grouping) return false;
+        ctx.grouping) return;
 
     ctx.compInfo(OPTBIND, var);
     var.bind(expr, ctx);
-    return true;
   }
 
   @Override
@@ -49,7 +49,7 @@ public abstract class ForLet extends Single {
   /**
    * Checks if the clause contains a simple variable declaration, using
    * no scoring and no positioning.
-   * @param one clause returns only one item
+   * @param one clause must not return more than one value
    * @return result of check
    */
   abstract boolean simple(final boolean one);

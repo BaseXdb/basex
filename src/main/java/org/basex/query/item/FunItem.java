@@ -1,5 +1,8 @@
 package org.basex.query.item;
 
+import java.io.IOException;
+
+import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import static org.basex.query.QueryTokens.*;
@@ -11,6 +14,7 @@ import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.query.util.VarList;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 
 /**
  * Function item.
@@ -176,5 +180,15 @@ public class FunItem extends FItem {
 
     if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
     return type.instance(ft) ? this : FunItem.coerce(ctx, ii, this, ft);
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(Token.token(FUNC));
+    ser.openElement(VAR);
+    for(final Var v : vars) v.plan(ser);
+    ser.closeElement();
+    expr.plan(ser);
+    ser.closeElement();
   }
 }

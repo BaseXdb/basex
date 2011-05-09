@@ -33,8 +33,8 @@ public final class MetaData {
 
   /** Encoding of XML document. */
   public String encoding = UTF8;
-  /** Path to original documents. */
-  public IO path;
+  /** Path to original input documents. */
+  public String path;
   /** Size of original documents. */
   public long filesize;
   /** Number of XML documents. */
@@ -220,7 +220,7 @@ public final class MetaData {
       if(k.equals(DBSTR))         storage    = v;
       else if(k.equals(IDBSTR))   istorage   = v;
       else if(k.equals(DBSIZE))   size       = toInt(v);
-      else if(k.equals(DBFNAME))  path       = IO.get(v);
+      else if(k.equals(DBFNAME))  path       = v;
       else if(k.equals(DBFSIZE))  filesize   = toLong(v);
       else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
       else if(k.equals(DBFTDC))   diacritics = toBool(v);
@@ -268,7 +268,7 @@ public final class MetaData {
   void write(final DataOutput out) throws IOException {
     writeInfo(out, DBSTR,    STORAGE);
     writeInfo(out, IDBSTR,   ISTORAGE);
-    writeInfo(out, DBFNAME,  path.path());
+    writeInfo(out, DBFNAME,  path);
     writeInfo(out, DBFSIZE,  filesize);
     writeInfo(out, DBNDOCS,  ndocs);
     writeInfo(out, DBENC,    encoding);

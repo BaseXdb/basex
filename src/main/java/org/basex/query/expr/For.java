@@ -68,11 +68,6 @@ public final class For extends ForLet {
   }
 
   @Override
-  protected boolean bind(final QueryContext ctx) throws QueryException {
-    return simple(true) && super.bind(ctx);
-  }
-
-  @Override
   public Iter iter(final QueryContext ctx) {
     final Var v = var.copy();
     final Var p = pos != null ? pos.copy() : null;
@@ -147,7 +142,7 @@ public final class For extends ForLet {
 
   @Override
   boolean simple(final boolean one) {
-    return pos == null && score == null && (!one || type.one());
+    return pos == null && score == null && (!one || type.one() || size == 1);
   }
 
   @Override

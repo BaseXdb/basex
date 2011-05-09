@@ -4,6 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 
@@ -54,16 +55,37 @@ public final class Switch extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
+    return ctx.iter(getCase(ctx));
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    return ctx.value(getCase(ctx));
+  }
+
+  @Override
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return getCase(ctx).item(ctx, ii);
+  }
+
+  /**
+   * Chooses the selected {@code case} expression.
+   * @param ctx query context
+   * @return case expression
+   * @throws QueryException query exception
+   */
+  private Expr getCase(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, input);
     final int el = expr.length;
     for(int i = 1; i < el - 1; i += 2) {
       final Item cs = expr[i].item(ctx, input);
       // includes check for empty sequence (null reference)
       if(it == cs || it != null && cs != null && it.equiv(input, cs))
-        return ctx.iter(expr[i + 1]);
+        return expr[i + 1];
     }
     // choose default expression
-    return ctx.iter(expr[el - 1]);
+    return expr[el - 1];
   }
 
   @Override

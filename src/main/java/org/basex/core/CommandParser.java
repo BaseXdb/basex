@@ -10,6 +10,7 @@ import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
+import org.basex.core.Commands.CmdOptimize;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.cmd.Add;
@@ -198,7 +199,13 @@ public final class CommandParser extends InputParser {
         }
         break;
       case OPTIMIZE:
-        return key(ALL, null) ? new OptimizeAll() : new Optimize();
+        switch(consume(CmdOptimize.class, cmd)) {
+          case NULL:
+            return new Optimize();
+          case ALL:
+            return new OptimizeAll();
+        }
+        break;
       case EXPORT:
         return new Export(string(cmd));
       case XQUERY:
