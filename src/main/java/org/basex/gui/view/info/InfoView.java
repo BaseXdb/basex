@@ -176,6 +176,8 @@ public final class InfoView extends View {
       if(ok) {
         text.add(info).nl();
       } else {
+        add(QUERYCOMP, comp);
+        add(QUERYPLAN, plan);
         add(INFOERROR, err.replaceAll(STOPPED + ".*\\r?\\n", ""));
       }
     } else if(sl.size() != 0) {

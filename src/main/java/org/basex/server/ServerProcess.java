@@ -178,7 +178,7 @@ public final class ServerProcess extends Thread {
         } catch(final BaseXException ex) {
           ok = false;
           info = ex.getMessage();
-          if(info.equals(PROGERR)) info = SERVERTIMEOUT;
+          if(info.startsWith(PROGERR)) info = SERVERTIMEOUT;
         }
         // stop timeout
         cmd.stopTimeout();

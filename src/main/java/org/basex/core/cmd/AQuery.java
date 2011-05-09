@@ -59,6 +59,7 @@ abstract class AQuery extends Command {
   protected final boolean query(final String query) {
     final int runs = Math.max(1, prop.num(Prop.RUNS));
     String err = null;
+    String inf = "";
     try {
       final boolean ser = prop.is(Prop.SERIALIZE);
       long hits = 0;
@@ -116,15 +117,18 @@ abstract class AQuery extends Command {
       err = ex.getMessage();
     } catch(final ProgressException ex) {
       err = PROGERR;
+      // store any useful info (e.g. query plan):
+      inf = info();
     }
     // close processor after exceptions
     if(qp != null) try { qp.close(); } catch(final IOException ex) { }
 
     error(err);
-    if(Util.debug) {
+    if(Util.debug || err.startsWith(PROGERR)) {
       info(NL);
       info(QUERYSTRING + query);
       info(qp.info());
+      info(inf);
     }
     return false;
   }
