@@ -531,6 +531,9 @@ public abstract class Data {
     // attribute indexes (..which should be the default case..) we might be
     // able to speed up the copy process even more
 
+    // check if attribute size of parent must be updated
+    final boolean rAtt = kind(rpre) == ATTR;
+
     final int dsize = d.meta.size;
     buffer(dsize);
     int dpre = -1;
@@ -577,20 +580,24 @@ public abstract class Data {
     table.replace(rpre, buffer(), rsize);
     buffer(1);
 
-    // don't have to update distances/sizes if the two subtrees have the same
-    // number of nodes
+    // don't have to update distances/sizes if the two subtrees are of equal
+    // size
     if(diff == 0) return;
 
     int p = rpar;
-
-    // TODO adjust attribute size of parent if attributes inserted
-
     while(p >= 0) {
       final int k = kind(p);
       size(p, k, size(p, k) + diff);
       p = parent(p, k);
     }
     updateDist(rpre + dsize, diff);
+    if(!rAtt) return;
+    // adjust attribute size of parent if attributes inserted. attribute size
+    // of parent cannot be reduced via a replace expression.
+    int dAtt = 0;
+    int i = 0;
+    while(i < dsize && d.kind(i++) == ATTR) dAtt++;
+    if(dAtt > 1) attSize(rpar, kind(rpar), dAtt + 1);
   }
 
   /**

@@ -42,19 +42,21 @@ public final class ReplaceNode extends NodeCopy {
       // overwrite existing text node
       d.replace(pre, Data.TEXT, md.text(0, true));
 
-      /* [LK] XQuery/Update: check if simple, fast replace is possible
-       adjust attribute size of parent if attributes inserted
-       text merging?
-    } else if(md != null && md.meta.size > 0 && d.ns.size() == 0
-        && md.ns.size() == 0 && md.kind(0) != Data.ATTR) {
-      d.replace(pre, md);
-      */
     } else {
-      d.delete(pre);
-      if(md != null) {
-        if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
-        else d.insert(pre, par, md);
-      }
+      /* [LK] XQuery/Update: check if simple, fast replace is possible
+       adjust attribute size of parent if attributes inserted */
+//      if(md != null && md.meta.size > 0 && d.ns.size() == 0
+//        && md.ns.size() == 0) {
+//        d.replace(pre, md);
+//      } else {
+        d.delete(pre);
+        if(md != null) {
+          if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
+          else d.insert(pre, par, md);
+        }
+//      }
+
+      // text merging applies for both replace methods
       if(!mergeTexts(d, pre - 1, pre)) {
         pre += md != null ? md.meta.size : 1;
         mergeTexts(d, pre - 1, pre);
