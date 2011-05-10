@@ -157,7 +157,8 @@ public final class FTWords extends FTExpr {
             lex.init(k);
             ia = null;
             int d = 0;
-            while(lex.hasNext()) {
+            if(!lex.hasNext()) return null;
+            do {
               final byte[] token = lex.nextToken();
               t += token.length;
               if(ftt.opt.sw != null && ftt.opt.sw.id(token) != 0) {
@@ -171,7 +172,7 @@ public final class FTWords extends FTExpr {
                   d = 0;
                 }
               }
-            }
+            } while(lex.hasNext());
             if(iat == null) {
               tl = t;
               iat = ia;
