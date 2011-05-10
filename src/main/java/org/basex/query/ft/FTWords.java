@@ -187,8 +187,8 @@ public final class FTWords extends FTExpr {
             iat.tokenNum(++ctx.ftoknum);
           }
         }
-        return iat.more() ? new FTNode(iat.matches(), data, iat.next(),
-            tl, iat.indexSize(), iat.score()) : null;
+        return iat != null && iat.more() ? new FTNode(iat.matches(), data,
+            iat.next(), tl, iat.indexSize(), iat.score()) : null;
       }
     };
   }
