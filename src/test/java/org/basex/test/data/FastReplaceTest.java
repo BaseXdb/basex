@@ -38,7 +38,7 @@ public final class FastReplaceTest {
   public void setUp() throws Exception {
     new CreateDB(DBNAME, DOC).execute(CONTEXT);
     new XQuery("let $items := /site/regions//item " +
-        "for $i in 1 to 100 " +
+        "for $i in 1 to 5 " +
         "return (insert node $items into /site/regions, " +
         "insert node $items before /site/regions, " +
         "insert node $items after /site/closed_auctions)").execute(CONTEXT);
@@ -133,19 +133,6 @@ public final class FastReplaceTest {
   }
 
   /**
-   * Dummy which creates the database.
-   */
-  @Test
-  public void createTestDatabase() {
-    try {
-      new XQuery("/").
-      execute(CONTEXT);
-    } catch(final BaseXException e) {
-      fail(e.getMessage());
-    }
-  }
-
-  /**
    * Replaces blocks where the new subtree is bigger than the old one. Find
    * the biggest //item node in the database and replace the last item in the
    * database with this.
@@ -188,6 +175,42 @@ public final class FastReplaceTest {
       execute(CONTEXT);
 
       new XQuery("count(//item)").execute(CONTEXT);
+
+    } catch(final BaseXException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Replaces a single attribute with two attributes. Checks for correct
+   * updating of the parent's attribute size.
+   */
+  @Test
+  public void replaceAttributes() {
+    try {
+      new XQuery("replace node (//item)[1]/attribute() with " +
+      "(attribute att1 {'0'}, attribute att2 {'1'})").
+      execute(CONTEXT);
+      final String r = new XQuery("(//item)[1]/attribute()").execute(CONTEXT);
+
+      assertEquals(r.trim(), "att1=\"0\" att2=\"1\"");
+
+    } catch(final BaseXException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Replaces a single attribute with two attributes for each item. Checks for
+   * correct updating of the parent's attribute size.
+   */
+  @Test
+  public void replaceAttributes2() {
+    try {
+      new XQuery("for $i in //item return replace node $i/attribute() with " +
+      "(attribute att1 {'0'}, attribute att2 {'1'})").
+      execute(CONTEXT);
+      new XQuery("//item/attribute()").execute(CONTEXT);
 
     } catch(final BaseXException e) {
       fail(e.getMessage());
