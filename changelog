@@ -1,7 +1,35 @@
-Version 6.6.1 (Mar 30, 2011):
+Version 6.6.2 (May 13, 2011) Linuxtag release:
+
+  API:
+  [ADD] JAX-RX API now supports basic user authentication:
+        http://docs.basex.org/wiki/JAX-RX_API
+  [ADD] The COPY creates identical database copies:
+        http://docs.basex.org/wiki/Commands#COPY
+  [ADD] The OPTIMIZE ALL command minimizes all database structures:
+        http://docs.basex.org/wiki/Commands#OPTIMIZE
 
   XQuery:
-  
+  [ADD] map expressions and functions added:
+        http://docs.basex.org/wiki/Map_Functions
+  [MOD] File module aligned with latest EXPath specification:
+        http://docs.basex.org/wiki/File_Functions
+  [MOD] Speedup of full-text queries with keyword lists.
+        Example: $x contains text { 'a', 'b', 'c', ...}
+  [MOD] XQuery Update optimizations for replacing nodes;
+        tree-aware updates.
+  [MOD] XQuery optimizations to avoid materialization of sequences.
+  GUI:
+  [ADD] Multiple editor tabs added
+  [ADD] Database management: copy databases
+
+  Core:
+  [ADD] Internal XML parser: HTML entities added
+  [FIX] Glob syntax: support for multiple file suffixes
+
+
+Version 6.6.1 (Mar 30, 2011) XML Prague release:
+
+  XQuery:
   [ADD] index rewritings added for .../text()[. = ..] syntax
   [ADD] optimizations of mixed axis path expressions, e.g.: //x/name()
   [MOD] index rewritings on collections fixed and generalized
@@ -12,5 +40,4 @@ Version 6.6.1 (Mar 30, 2011):
   [FIX] HOF optimizations and fixes
    
   GUI:
-  
   [FIX] language option (for Japanese, German, etc. interface) fixed
