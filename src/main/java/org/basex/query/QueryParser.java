@@ -173,7 +173,6 @@ public class QueryParser extends InputParser {
   /** Declaration flag. */
   private boolean declVars;
 
-
   /***
    * Constructor.
    * @param q query

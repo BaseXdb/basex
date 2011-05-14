@@ -62,6 +62,6 @@ public final class CPI extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.PI.nam));
+    return toString(Token.string(NodeType.PI.nam()));
   }
 }

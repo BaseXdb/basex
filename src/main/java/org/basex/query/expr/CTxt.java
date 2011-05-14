@@ -55,6 +55,6 @@ public final class CTxt extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.TXT.nam));
+    return toString(Token.string(NodeType.TXT.nam()));
   }
 }

@@ -391,7 +391,7 @@ public interface Text {
   /** Out of memory error due to database creation. */
   String PROCMEMCREATE = lang("proc_memcreate");
   /** Progress exception. */
-  String PROGERR = "Interrupted";
+  String PROGERR = "Interrupted" + DOT;
 
   /** Unknown command error. */
   String CMDNO = lang("cmd_no");

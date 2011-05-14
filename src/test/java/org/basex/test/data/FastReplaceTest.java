@@ -1,6 +1,5 @@
 package org.basex.test.data;
 
-
 import static org.junit.Assert.*;
 
 import org.basex.core.BaseXException;

@@ -1,6 +1,5 @@
 package org.basex.test.query.simple;
 
-
 /**
  * XPathMark functional tests.
  *

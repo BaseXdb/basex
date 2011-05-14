@@ -79,5 +79,4 @@ public final class PartFunApp extends Func {
     for(final Var v : vars) if(v != null) out = Array.add(out, v);
     return out;
   }
-
 }

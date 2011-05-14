@@ -109,10 +109,9 @@ public enum NodeType implements Type {
   };
 
   /** String representation. */
-  public final byte[] nam;
+  private final byte[] nam;
   /** Parent type. */
-  public final Type par;
-
+  private final Type par;
   /** Sequence type. */
   private SeqType seq;
 
@@ -301,5 +300,4 @@ public enum NodeType implements Type {
   public byte[] nam() {
     return nam;
   }
-
 }

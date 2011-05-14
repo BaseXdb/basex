@@ -605,7 +605,6 @@ public final class EditorView extends View {
     return edits.toArray(new EditorArea[edits.size()]);
   }
 
-
   /**
    * Handles info messages resulting from a query execution.
    * @param message info message

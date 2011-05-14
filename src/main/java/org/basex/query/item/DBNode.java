@@ -397,7 +397,7 @@ public class DBNode extends ANode {
   @Override
   public String toString() {
     final NodeType nt = (NodeType) type;
-    final TokenBuilder tb = new TokenBuilder(nt.nam).add(' ');
+    final TokenBuilder tb = new TokenBuilder(nt.nam()).add(' ');
     switch(nt) {
       case ATT:
       case PI:

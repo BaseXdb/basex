@@ -44,5 +44,4 @@ public final class Request {
     /** Content of part body. */
     public final ItemCache bodyContent = new ItemCache();
   }
-
 }

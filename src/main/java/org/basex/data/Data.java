@@ -124,7 +124,7 @@ public abstract class Data {
 
   /**
    * Checks if the database contains no documents.
-   * Empty databases exclusively contain a single document node.
+   * Empty databases can be recognized by a single document node.
    * @return result of check
    */
   public final boolean empty() {

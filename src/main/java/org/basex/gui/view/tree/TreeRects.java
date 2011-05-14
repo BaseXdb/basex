@@ -218,5 +218,4 @@ final class TreeRects implements TreeConstants {
     return i < 0 ? null : bigRect(sub, rn, lv) ? rects[rn][lv][0]
         : rects[rn][lv][i];
   }
-
 }
