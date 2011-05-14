@@ -371,6 +371,8 @@ public final class GUI extends AGUI {
     }
 
     cursor(CURSORWAIT);
+
+    boolean ok = true;
     try {
       final Performance perf = new Performance();
 
@@ -393,7 +395,6 @@ public final class GUI extends AGUI {
       // resets the query editor
       if(main && query.visible()) query.reset();
 
-      boolean ok = true;
       String inf = null;
       try {
         c.execute(context, ao);
@@ -401,11 +402,6 @@ public final class GUI extends AGUI {
       } catch(final BaseXException ex) {
         ok = false;
         inf = ex.getMessage();
-        if(!ok && inf.equals(PROGERR)) {
-          // command was interrupted..
-          command = null;
-          return false;
-        }
       } finally {
         updating = false;
       }
@@ -418,7 +414,7 @@ public final class GUI extends AGUI {
       // show feedback in query editor
       boolean feedback = main;
       if(!main && query.visible() && c instanceof XQuery) {
-        query.info(inf, ok);
+        query.info(inf.startsWith(PROGERR) ? PROGERR : inf, ok);
         feedback = true;
       }
 
@@ -433,7 +429,7 @@ public final class GUI extends AGUI {
           ((Nodes) result).size() != 0 ? (Nodes) result : null;
 
         // treat text view different to other views
-        if(ok && nodes == null) {
+        if(nodes == null) {
           // display text view
           if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
           text.setText(ao, c);
@@ -487,7 +483,7 @@ public final class GUI extends AGUI {
 
     cursor(CURSORARROW, true);
     command = null;
-    return true;
+    return ok;
   }
 
  /**
