@@ -533,6 +533,7 @@ public final class GUI extends AGUI {
   public void updateLayout() {
     init(gprop);
     notify.layout();
+    views.repaint();
   }
 
   /**
