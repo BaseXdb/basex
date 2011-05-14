@@ -145,6 +145,9 @@ public final class FTWords extends FTExpr {
       @Override
       public FTNode next() {
         if(iat == null) {
+          // return if txt is empty.
+          // s/o pls check that this is the right location to return.
+          if(0 == txt.size()) return null;
           final FTLexer lex = new FTLexer(ftt.opt);
 
           // index iterator tree
