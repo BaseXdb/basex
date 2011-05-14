@@ -298,5 +298,4 @@ public final class BXCollection implements Collection, BXXMLDBText {
     }
     return (BXXMLResource) res;
   }
-
 }
