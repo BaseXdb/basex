@@ -105,7 +105,7 @@ public final class BaseXClient {
 
   /**
    * Adds a database.
-   * @param name name of database
+   * @param name name of document
    * @param target target path
    * @param input xml input
    * @throws IOException I/O exception
