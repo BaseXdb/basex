@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -40,7 +39,7 @@ public class Filter extends Preds {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     root = checkUp(root, ctx).comp(ctx);
     // return empty root
-    if(root.empty()) return optPre(Empty.SEQ, ctx);
+    if(root.empty()) return optPre(null, ctx);
     // convert filters without position predicates to axis paths
     if(root instanceof AxisPath && !super.uses(Use.POS))
       return ((AxisPath) root).copy().addPreds(pred).comp(ctx);

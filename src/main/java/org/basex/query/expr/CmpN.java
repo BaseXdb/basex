@@ -6,7 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
@@ -91,8 +90,7 @@ public final class CmpN extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return optPre(oneEmpty() ? Empty.SEQ : values() ?
-        item(ctx, input) : this, ctx);
+    return optPre(oneEmpty() ? null : values() ? item(ctx, input) : this, ctx);
   }
 
   @Override

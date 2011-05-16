@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
@@ -32,7 +31,7 @@ public final class Except extends Set {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(expr[0].empty()) return optPre(Empty.SEQ, ctx);
+    if(expr[0].empty()) return optPre(null, ctx);
 
     for(int e = 1; e < expr.length; ++e) {
       if(expr[e].empty()) {

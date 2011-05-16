@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.iter.Iter;
@@ -29,7 +28,7 @@ public final class InterSect extends Set {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return oneEmpty() ? optPre(Empty.SEQ, ctx) : this;
+    return oneEmpty() ? optPre(null, ctx) : this;
   }
 
   @Override

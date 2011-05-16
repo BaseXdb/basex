@@ -9,7 +9,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.util.InputInfo;
@@ -154,7 +153,7 @@ public final class CmpV extends Cmp {
     final Expr e2 = expr[1];
     Expr e = this;
     if(oneEmpty()) {
-      e = optPre(Empty.SEQ, ctx);
+      e = optPre(null, ctx);
     } else if(values()) {
       e = preEval(ctx);
     } else if(e1.isFun(FunDef.CNT)) {
