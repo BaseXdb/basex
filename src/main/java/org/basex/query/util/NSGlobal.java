@@ -31,6 +31,7 @@ public final class NSGlobal {
     NS.add(ZIP, ZIPURI);
     NS.add(HOF, HOFURI);
     NS.add(MAP, MAPURI);
+    NS.add(PKG, PKGURI);
   }
 
   /** Private constructor. */

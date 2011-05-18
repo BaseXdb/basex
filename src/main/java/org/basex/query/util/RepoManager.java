@@ -53,8 +53,9 @@ public final class RepoManager {
    * Installs a new package.
    * @param path path to .xar file
    * @throws IOException IO exeception
+   * @throws QueryException 
    */
-  public void installPackage(final String path) throws IOException {
+  public void installPackage(final String path) throws IOException, QueryException {
     checkPkgName(path);
     final File pkgFile = new File(path);
     if(!pkgFile.exists()) {
@@ -136,7 +137,7 @@ public final class RepoManager {
   }
 
   /**
-   * Checks a package dependency.
+   * : Checks a package dependency.
    * @param dep dependency
    */
   private void checkDep(final Dependency dep) {
@@ -145,30 +146,74 @@ public final class RepoManager {
       // TODO: Error: "Missing name of secondary package."
     }
 
-    // Check version attributes (?)
+    // Check version attributes, semver is mutually exclusive with semverMin and
+    // semverMax
 
+  }
+
+  private void checkVersions(final Dependency dep) {
+    // Get installed versions of secondary package
+    final List<byte[]> instVers = getInstalledVersions(dep.pkg);
+
+    if(instVers.size() == 0) {
+      // TODO: error: "Secondary package % not installed"
+    }
+    final Iterator<byte[]> instIt = instVers.iterator();
+    boolean found = false;
     if(dep.versions != null) {
       final List<byte[]> accept = getAcceptVersions(dep.versions);
       final Iterator<byte[]> acceptIt = accept.iterator();
       byte[] v;
-      // Get installed versions of secondary package
-      final List<byte[]> instVers = getInstalledVersions(dep.pkg);
       // Check if any acceptable version is already installed
       while(acceptIt.hasNext()) {
         v = acceptIt.next();
         if(instVers.contains(v)) {
+          found = true;
           break;
         }
       }
     } else if(dep.semver != null) {
-      byte[][] versions = split(dep.semver, '.');
+      while(instIt.hasNext()) {
+        if(new Version(instIt.next()).isCompatible(new Version(dep.semver))) {
+          found = true;
+          break;
+        }
+      }
+    } else if(dep.semverMin != null && dep.semverMax == null) {
+      final Version semVer = new Version(dep.semverMin);
+      Version v;
+      while(instIt.hasNext()) {
+        v = new Version(instIt.next());
+        if(v.isCompatible(semVer) || v.compareTo(semVer) >= 0) {
+          found = true;
+          break;
+        }
+      }
+    } else if(dep.semverMin == null && dep.semverMax != null) {
+      final Version semVer = new Version(dep.semverMax);
+      Version v;
+      while(instIt.hasNext()) {
+        v = new Version(instIt.next());
+        if(v.isCompatible(semVer) || v.compareTo(semVer) <= 0) {
+          found = true;
+          break;
+        }
+      }
+    } else if(dep.semverMin != null && dep.semverMax != null) {
+      final Version min = new Version(dep.semverMin);
+      final Version max = new Version(dep.semverMax);
+      Version v;
+      while(instIt.hasNext()) {
+        v = new Version(instIt.next());
+        if(v.compareTo(min) >= 0 && v.compareTo(max) < 0) {
+          found = true;
+          break;
+        }
+      }
     }
-  }
-  
-  private void checkSemVer(final byte[] semver) {
-    final byte[][] vers = split(semver, '.');
-    final byte[] major = vers[0];
-    
+    if(!found) {
+      // TODO: error}
+    }
   }
 
   /**
