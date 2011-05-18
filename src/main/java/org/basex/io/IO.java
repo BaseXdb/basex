@@ -238,7 +238,17 @@ public abstract class IO {
    * Returns the children of a path.
    * @return children
    */
-  public IO[] children() {
+  public final IO[] children() {
+    return children(".*");
+  }
+
+  /**
+   * Returns the children of a path that match the specified regular expression.
+   * @param pattern pattern
+   * @return children
+   */
+  @SuppressWarnings("unused")
+  public IO[] children(final String pattern) {
     return new IO[] {};
   }
 

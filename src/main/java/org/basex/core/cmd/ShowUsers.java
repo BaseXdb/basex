@@ -36,7 +36,7 @@ public final class ShowUsers extends Command {
   @Override
   protected boolean run() throws IOException {
     final String name = args[0];
-    if(name != null && !validName(name)) return error(NAMEINVALID, name);
+    if(name != null && !validName(name, false)) return error(NAMEINVALID, name);
 
     if(name == null) {
       out.println(context.users.info());

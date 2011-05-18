@@ -1,10 +1,9 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Command;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.data.Data;
@@ -17,7 +16,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DropUser extends Command {
+public final class DropUser extends AUser {
   /**
    * Default constructor.
    * @param name name of user
@@ -32,38 +31,42 @@ public final class DropUser extends Command {
    * @param db database
    */
   public DropUser(final String name, final String db) {
-    super(User.ADMIN, name, db);
+    super(name, db);
   }
 
   @Override
   protected boolean run() {
-    final String name = args[0];
-    if(name.equals(ADMIN)) return error(USERADMIN);
-    if(!validName(name)) return error(NAMEINVALID, name);
+    return run(0, true);
+  }
 
-    final User user = context.users.get(name);
-    if(user == null) return error(USERNO, name);
+  @Override
+  protected boolean run(final String user, final String db) {
+    // admin cannot be dropped
+    if(user.equals(ADMIN)) return !info(USERADMIN);
 
-    final String db = args[1];
-    if(db != null && !validName(db)) return error(NAMEINVALID, db);
+    // drop global user
     if(db == null) {
       for(final ServerProcess s : context.sessions) {
-        if(s.context.user.name.equals(name)) return error(USERLOG, name);
+        if(s.context.user.name.equals(user)) return !info(USERLOG, user);
       }
-      context.users.drop(user);
-    } else {
-      try {
-        final Data data = Open.open(db, context);
-        data.meta.users.remove(data.meta.users.get(args[0]));
-        data.flush();
-        Close.close(data, context);
-      } catch(final IOException ex) {
-        Util.debug(ex);
-        final String msg = ex.getMessage();
-        return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
-      }
+      context.users.drop(context.users.get(user));
+      return info(USERDROP, user);
     }
-    return info(USERDROP, name);
+
+    // drop local user
+    try {
+      final Data data = Open.open(db, context);
+      if(data.meta.users.remove(data.meta.users.get(user))) {
+        info(USERDROPON, user, db);
+      }
+      data.flush();
+      Close.close(data, context);
+      return true;
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      final String msg = ex.getMessage();
+      return !info(msg.isEmpty() ? DBOPENERR : msg, db);
+    }
   }
 
   @Override

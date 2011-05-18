@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -41,12 +42,25 @@ public final class Backup extends Command {
 
   @Override
   protected boolean run() {
-    final String db = args[0];
-    if(!validName(db)) return error(NAMEINVALID, db);
+    if(!validName(args[0], true)) return error(NAMEINVALID, args[0]);
 
-    // try to backup database
-    return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
-      backup(db, prop) ? info(DBBACKUP, db, perf) : error(DBNOBACKUP, db);
+    // retrieve all databases
+    final String[] dbs = databases(args[0]);
+    if(dbs.length == 0) return error(DBNOTFOUND, args[0]);
+
+    // loop through all databases
+    boolean ok = true;
+    for(final String db : dbs) {
+      if(!prop.dbpath(db).isDirectory()) continue;
+      if(backup(db, prop)) {
+        // backup was successful
+        info(DBBACKUP, db, perf);
+      } else {
+        info(DBNOBACKUP, db);
+        ok = false;
+      }
+    }
+    return ok;
   }
 
   /**

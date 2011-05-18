@@ -601,12 +601,16 @@ public interface Text {
   String PERMNO = lang("ad_permno");
   /** Invalid permissions. */
   String PERMINV = lang("ad_perminv");
-  /** Permission updated. */
-  String PERMUP = lang("ad_permup");
+  /** Permission granted. */
+  String GRANT = lang("ad_grant");
+  /** Permission granted on database. */
+  String GRANTON = lang("ad_granton");
   /** User not found. */
   String USERNO = lang("ad_userno");
   /** User dropped. */
   String USERDROP = lang("ad_userdrop");
+  /** User dropped from database. */
+  String USERDROPON = lang("ad_userdropon");
   /** User is logged in. */
   String USERLOG = lang("ad_userlog");
   /** User added. */

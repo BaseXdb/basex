@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -162,12 +164,17 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public IO[] children() {
+  public IOFile[] children(final String pattern) {
     final File[] ch = file.listFiles();
-    final int l = ch != null ? ch.length : 0;
-    final IO[] io = new IO[l];
-    for(int i = 0; i < l; ++i) io[i] = new IOFile(ch[i]);
-    return io;
+    if(ch == null) return new IOFile[] {};
+
+    final ArrayList<IOFile> io = new ArrayList<IOFile>(ch.length);
+    final Pattern p = Pattern.compile(pattern,
+        Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
+    for(final File f : ch) {
+      if(p.matcher(f.getName()).matches()) io.add(new IOFile(f));
+    }
+    return io.toArray(new IOFile[io.size()]);
   }
 
   @Override
@@ -252,16 +259,17 @@ public final class IOFile extends IO {
         char ch = gl.charAt(f);
         if(ch == '*') {
           // don't allow other dots if pattern ends with a dot
+          suf = true;
           sb.append(gl.endsWith(".") ? "[^.]" : ".");
         } else if(ch == '?') {
           ch = '.';
           suf = true;
+        } else if(ch == '.') {
+          suf = true;
+          // last character is dot: disallow file suffix
+          if(f + 1 == gl.length()) break;
+          sb.append('\\');
         } else if(!Character.isLetterOrDigit(ch)) {
-          if(ch == '.') {
-            suf = true;
-            // last character is dot: disallow file suffix
-            if(f + 1 == gl.length()) break;
-          }
           sb.append('\\');
         }
         sb.append(ch);

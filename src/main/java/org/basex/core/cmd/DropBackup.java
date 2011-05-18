@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
+
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
@@ -27,13 +28,13 @@ public final class DropBackup extends Command {
 
   @Override
   protected boolean run() {
-    // name of database
-    String db = args[0];
-    if(!validName(db)) return error(NAMEINVALID, db);
-    // drop backups
-    if(!db.contains("-")) db += "-";
-    drop(db, context);
-    return info(DBBACKDROP, db + "*" + IO.ZIPSUFFIX);
+    if(!validName(args[0], true)) return error(NAMEINVALID, args[0]);
+
+    // loop through all databases and drop backups
+    for(final String db : databases(args[0])) {
+      drop(db.contains("-") ? db : db + '-', context);
+    }
+    return info(DBBACKDROP, args[0] + "*" + IO.ZIPSUFFIX);
   }
 
   /**

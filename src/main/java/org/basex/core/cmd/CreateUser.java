@@ -27,7 +27,7 @@ public final class CreateUser extends Command {
   protected boolean run() {
     final String user = args[0];
     final String pass = args[1];
-    if(!validName(user)) return error(NAMEINVALID, user);
+    if(!validName(user, false)) return error(NAMEINVALID, user);
 
     return pass == null || pass.isEmpty() ? error(PASSNO, user) :
       context.users.create(user, pass) ?

@@ -29,8 +29,8 @@ public final class AlterDB extends Command {
     final String db = args[0];
     final String name = args[1];
     // check if names are valid
-    if(!validName(db)) return error(NAMEINVALID, db);
-    if(!validName(name)) return error(NAMEINVALID, name);
+    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!validName(name, false)) return error(NAMEINVALID, name);
 
     // database does not exist
     if(!prop.dbexists(db)) return error(DBNOTFOUND, db);
