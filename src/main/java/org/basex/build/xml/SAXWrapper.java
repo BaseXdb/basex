@@ -87,6 +87,7 @@ public final class SAXWrapper extends FileParser {
         final SAXParserFactory f = SAXParserFactory.newInstance();
         f.setNamespaceAware(true);
         f.setValidating(false);
+        f.setXIncludeAware(true);
         r = f.newSAXParser().getXMLReader();
       }
 
