@@ -206,7 +206,9 @@ public interface Text {
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]:" + NL +
       "  " + lang("ch_create5") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
-      "  " + lang("ch_create8")
+      "  " + lang("ch_create8") + NL +
+    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL +
+      "  " + lang("ch_create4", C_NAME)
   };
 
   /** Command help. */
@@ -300,10 +302,6 @@ public interface Text {
   /** Command help. */
   String[] HELPKILL = {
     "[" + C_NAME + "]", lang("ch_kill1"), lang("ch_kill2")
-  };
-  /** Command help. */
-  String[] HELPBACKUP = {
-    "[" + C_NAME + "]", lang("ch_backup1"), lang("ch_backup2")
   };
   /** Command help. */
   String[] HELPRESTORE = {

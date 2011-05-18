@@ -16,10 +16,10 @@ import org.basex.core.Commands.CmdShow;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.AlterUser;
-import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Copy;
+import org.basex.core.cmd.CreateBackup;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.CreateUser;
@@ -139,6 +139,8 @@ public final class CommandParser extends InputParser {
     switch(cmd) {
       case CREATE:
         switch(consume(CmdCreate.class, cmd)) {
+          case BACKUP:
+            return new CreateBackup(glob(cmd));
           case DATABASE: case DB:
             return new CreateDB(name(cmd), s ? remaining(null) : string(null));
           case INDEX:
@@ -241,8 +243,6 @@ public final class CommandParser extends InputParser {
         return new Exit();
       case KILL:
         return new Kill(glob(cmd));
-      case BACKUP:
-        return new Backup(glob(cmd));
       case RESTORE:
         return new Restore(name(cmd));
       case SHOW:

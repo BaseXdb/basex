@@ -13,8 +13,11 @@ import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.basex.core.Command;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Prop;
 import org.basex.core.User;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
 
 /**
@@ -23,7 +26,7 @@ import org.basex.io.IO;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Backup extends Command {
+public final class CreateBackup extends Command {
   /** Date format. */
   private static final SimpleDateFormat DATE = new SimpleDateFormat(
       "yyyy-MM-dd-HH-mm-ss");
@@ -36,7 +39,7 @@ public final class Backup extends Command {
    * Default constructor.
    * @param arg optional argument
    */
-  public Backup(final String arg) {
+  public CreateBackup(final String arg) {
     super(User.CREATE, arg);
   }
 
@@ -121,5 +124,10 @@ public final class Backup extends Command {
   @Override
   protected double prog() {
     return (double) of / tf;
+  }
+
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.CREATE + " " + CmdCreate.BACKUP).args();
   }
 }

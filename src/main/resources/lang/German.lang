@@ -503,11 +503,12 @@ info_browsererror=Browser konnte nicht geöffnet werden. Bitte die URL von Hand 
 
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.
-ch_create1=Erzeugung einer Datenbank, eines Index oder Benutzers.
-ch_create2=Erzeugt eine neue Datenbank, einen Index oder Benutzer:
-ch_create3=erzeugt die Datenbank [%] mit optionalem [%]
-ch_create5=erzeugt den angegebenen Index
-ch_create8=erzeugt den angegebenen Benutzer
+ch_create1=Erstellung einer Datenbank, eines Index oder Benutzers.
+ch_create2=Erstellt eine neue Datenbank, einen Index oder Benutzer:
+ch_create3=erstellt die Datenbank [%] mit optionalem [%]
+ch_create4=erstellt ein Backup der Datenbank [%]
+ch_create5=erstellt den angegebenen Index
+ch_create8=erstellt den angegebenen Benutzer
 ch_check1=Öffnet oder erzeugt eine Datenbank.
 ch_check2=Öffnet eine existierende Datenbank oder erstellt eine neue Instanz.
 ch_copy1=Kopiert Datenbank.
@@ -552,8 +553,6 @@ ch_cs1=Ausführung einer Anfrage und Wechsel zu neuer Kontextmenge.
 ch_cs2=Führt die angegebene XQuery aus und setzt das\nErgebnis als neue Kontextmenge.
 ch_kill1=Beendung der Verbindungen.
 ch_kill2=Beendet alle Verbindungen des angegebenen Benutzers.
-ch_backup1=Erstellt ein Backup der Datenbank.
-ch_backup2=Erstellt ein Backup der angegebenen Datenbank.
 ch_restore1=Wiederherstellung der Datenbank.
 ch_restore2=Stellt eine Datenbank wieder her. Das Argument\nkann den Zeitstempel des Backup-Files beinhalten.
 ch_show1=Anzeige von Server-Information.

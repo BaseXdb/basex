@@ -98,15 +98,15 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void backup() {
-    no(new Backup(NAME));
+    no(new CreateBackup(NAME));
     ok(new CreateDB(NAME));
     ok(new CreateDB(NAME2));
-    ok(new Backup(NAME));
+    ok(new CreateBackup(NAME));
     ok(new Close());
     ok(new Restore(NAME));
-    ok(new Backup(NAME));
+    ok(new CreateBackup(NAME));
     ok(new DropBackup(NAME));
-    ok(new Backup(NAME + "*"));
+    ok(new CreateBackup(NAME + "*"));
     ok(new Restore(NAME2));
     ok(new DropBackup(NAME + "*"));
     no(new Restore(":"));
@@ -350,7 +350,7 @@ public class CmdTest {
   public final void restore() {
     no(new Restore(NAME));
     ok(new CreateDB(NAME));
-    ok(new Backup(NAME));
+    ok(new CreateBackup(NAME));
     ok(new Restore(NAME));
     no(new Restore(":"));
     ok(new DropBackup(NAME));
@@ -359,7 +359,7 @@ public class CmdTest {
     no(new Restore(NAME));
     ok(new XQuery("."));
     ok(new CreateDB("test-1"));
-    ok(new Backup("test-1"));
+    ok(new CreateBackup("test-1"));
     ok(new Restore("test-1"));
     ok(new DropBackup("test"));
     no(new Restore("test"));
