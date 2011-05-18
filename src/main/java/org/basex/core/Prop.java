@@ -143,8 +143,6 @@ public final class Prop extends AProp {
   /** Maximum number of name categories. */
   public static final Object[] CATEGORIES = { "CATEGORIES", 50 };
 
-  /** Flag for creating a main memory database table. */
-  public static final Object[] TABLEMEM = { "TABLEMEM", false };
   /** Flag for creating a main memory database. */
   public static final Object[] MAINMEM = { "MAINMEM", false };
   /** Path for filtering XML Documents. */
