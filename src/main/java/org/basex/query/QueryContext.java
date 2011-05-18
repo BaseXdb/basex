@@ -442,16 +442,10 @@ public final class QueryContext extends Progress {
     if(serProp != null) return serProp;
 
     final String serial = context.prop.get(Prop.SERIALIZER);
-    final boolean wrap = context.prop.is(Prop.WRAPOUTPUT);
-    if(opt && serial.isEmpty() && !wrap) return null;
+    if(opt && serial.isEmpty()) return null;
 
     // otherwise, apply global serialization option
-    final SerializerProp sp = new SerializerProp(serial);
-    if(wrap) {
-      sp.set(SerializerProp.S_WRAP_PREFIX, NAMELC);
-      sp.set(SerializerProp.S_WRAP_URI, URL);
-    }
-    return sp;
+    return new SerializerProp(serial);
   }
 
   @Override

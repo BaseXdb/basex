@@ -81,8 +81,6 @@ public final class Prop extends AProp {
   public static final Object[] QUERYINFO = { "QUERYINFO", false };
   /** Flag for serializing query results. */
   public static final Object[] SERIALIZE = { "SERIALIZE", true };
-  /** Flag for wrapping result nodes. */
-  public static final Object[] WRAPOUTPUT = { "WRAPOUTPUT", false };
   /** External variables, separated by commas. */
   public static final Object[] BINDINGS = { "BINDINGS", "" };
   /** Serialization parameters, separated by commas. */

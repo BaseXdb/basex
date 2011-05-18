@@ -137,7 +137,7 @@ public final class XMLSerializer extends Serializer {
     tab     = p.check(S_TABULATOR, YES, NO).equals(YES) ? '\t' : ' ';
     wPre = token(p.get(S_WRAP_PREFIX));
     wUri = token(p.get(S_WRAP_URI));
-    wrap    = wPre.length != 0 || wUri.length != 0;
+    wrap    = wPre.length != 0;
 
     if(docsys.isEmpty()) {
       docsys = null;
