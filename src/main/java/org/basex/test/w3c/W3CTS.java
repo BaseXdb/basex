@@ -20,6 +20,7 @@ import org.basex.core.Prop;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.Nodes;
@@ -631,10 +632,10 @@ public abstract class W3CTS {
    * @param qp query processor
    * @param first call
    * @return string with input files
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   private byte[] file(final Nodes nod, final Nodes var,
-      final QueryProcessor qp, final boolean first) throws QueryException {
+      final QueryProcessor qp, final boolean first) throws Exception {
 
     final TokenBuilder tb = new TokenBuilder();
     for(int c = 0; c < nod.size(); ++c) {
@@ -649,10 +650,16 @@ public abstract class W3CTS {
         expr = coll(nm, qp);
       } else {
         // assign document
+        final String dbname = IO.get(src).dbname();
         FunDef def = FunDef.DOC;
-        if(!first) {
-          def = FunDef.OPEN;
-          src = IO.get(src).dbname();
+        // updates: drop updated document or open updated database
+        if(updating()) {
+          if(first) {
+            new DropDB(dbname).execute(context);
+          } else {
+            def = FunDef.OPEN;
+            src = dbname;
+          }
         }
         expr = def.get(null, Str.get(src));
       }
@@ -835,7 +842,7 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   @SuppressWarnings("unused")
-  void init(final Nodes root) throws Exception { }
+  protected void init(final Nodes root) throws Exception { }
 
   /**
    * Performs test specific parsings.
@@ -844,7 +851,8 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   @SuppressWarnings("unused")
-  void parse(final QueryProcessor qp, final Nodes root) throws Exception { }
+  protected void parse(final QueryProcessor qp, final Nodes root)
+    throws Exception { }
 
   /**
    * Returns all query states.
@@ -853,7 +861,15 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   @SuppressWarnings("unused")
-  Nodes states(final Nodes root) throws Exception {
+  protected Nodes states(final Nodes root) throws Exception {
     return root;
+  }
+
+  /**
+   * Updating flag.
+   * @return flag
+   */
+  protected boolean updating() {
+    return false;
   }
 }

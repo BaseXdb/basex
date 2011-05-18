@@ -29,7 +29,12 @@ public final class XQUTS extends W3CTS {
   }
 
   @Override
-  Nodes states(final Nodes root) throws Exception {
+  protected Nodes states(final Nodes root) throws Exception {
     return nodes("*:state", root);
+  }
+
+  @Override
+  protected boolean updating() {
+    return true;
   }
 }

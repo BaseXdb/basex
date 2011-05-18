@@ -46,7 +46,7 @@ public final class XQFTTS extends W3CTS {
   }
 
   @Override
-  void init(final Nodes root) throws Exception {
+  protected void init(final Nodes root) throws Exception {
     Util.outln("Caching Full-text Structures...");
     for(final int s : nodes("//*:stopwords", root).list) {
       final Nodes srcRoot = new Nodes(s, data);
@@ -68,7 +68,9 @@ public final class XQFTTS extends W3CTS {
   }
 
   @Override
-  void parse(final QueryProcessor qp, final Nodes root) throws Exception {
+  protected void parse(final QueryProcessor qp, final Nodes root)
+      throws Exception {
+
     final QueryContext ctx = qp.ctx;
     ctx.stop = stop;
     ctx.thes = thes;
