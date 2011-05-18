@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
@@ -16,75 +15,79 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Grant extends Command {
+public final class Grant extends AUser {
+  /** Permission. */
+  private int prm = -1;
+
   /**
    * Default constructor.
    * @param perm permission
-   * @param name user name
+   * @param user user name
    */
-  public Grant(final Object perm, final String name) {
-    this(perm, name, null);
+  public Grant(final Object perm, final String user) {
+    this(perm, user, null);
   }
 
   /**
    * Constructor, specifying a certain database.
    * @param perm permission
-   * @param name user name
+   * @param user user name
    * @param db database
    */
-  public Grant(final Object perm, final String name, final String db) {
-    super(User.ADMIN, perm.toString(), name, db);
+  public Grant(final Object perm, final String user, final String db) {
+    super(perm.toString(), user, db);
   }
 
   @Override
   protected boolean run() {
-    final String name = args[1];
-    final String db = args[2];
-    if(name.equals(ADMIN)) return error(USERADMIN);
-    if(!validName(name)) return error(NAMEINVALID, name);
-
     // find permission
     final CmdPerm cmd = getOption(CmdPerm.class);
-    int perm = -1;
     if(cmd == CmdPerm.NONE) {
-      perm = User.NONE;
+      prm = User.NONE;
     } else if(cmd == CmdPerm.READ) {
-      perm = User.READ;
+      prm = User.READ;
     } else if(cmd == CmdPerm.WRITE) {
-      perm = User.WRITE;
-    } else if(cmd == CmdPerm.CREATE && db == null) {
-      perm = User.CREATE;
-    } else if(cmd == CmdPerm.ADMIN && db == null) {
-      perm = User.ADMIN;
+      prm = User.WRITE;
+    } else if(cmd == CmdPerm.CREATE && args[2] == null) {
+      prm = User.CREATE;
+    } else if(cmd == CmdPerm.ADMIN && args[2] == null) {
+      prm = User.ADMIN;
     }
-    if(perm == -1) return error(PERMINV);
+    if(prm == -1) return error(PERMINV, args[0]);
 
-    final User user = context.users.get(name);
-    if(user == null) return error(USERNO, name);
+    return run(1, false);
+  }
 
+  @Override
+  protected boolean run(final String user, final String db) {
+    // admin cannot be modified
+    if(user.equals(ADMIN)) return !info(USERADMIN);
+
+    // set global permissions
     if(db == null) {
-      // global permissions
-      user.perm = perm;
+      context.users.get(user).perm = prm;
       context.users.write();
-    } else {
-      try {
-        final Data data = Open.open(db, context);
-        User u = data.meta.users.get(name);
-        // add local user reference
-        if(u == null) {
-          u = user.copy();
-          data.meta.users.add(u);
-        }
-        u.perm = perm;
-        data.flush();
-        Close.close(data, context);
-      } catch(final IOException ex) {
-        Util.debug(ex);
-        final String msg = ex.getMessage();
-        return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
-      }
+      return info(GRANT, args[0], user);
     }
-    return info(PERMUP);
+
+    // set local permissions
+    try {
+      final Data data = Open.open(db, context);
+      User u = data.meta.users.get(user);
+      // add local user reference
+      if(u == null) {
+        u = context.users.get(user).copy();
+        data.meta.users.add(u);
+      }
+      u.perm = prm;
+      data.flush();
+      Close.close(data, context);
+      return info(GRANTON, args[0], user, db);
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      final String msg = ex.getMessage();
+      return !info(msg.isEmpty() ? DBOPENERR : msg, db);
+    }
   }
 
   @Override

@@ -10,6 +10,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.IntList;
+import org.basex.util.TokenBuilder;
 
 /**
  * Document test for database nodes.
@@ -42,8 +43,11 @@ final class DocTest extends Test {
     if(data.single()) return Test.DOC;
 
     // adopt nodes from existing sequence
-    if(ctx.value instanceof DBNodeSeq)
-      return new DocTest(new Nodes(((DBNodeSeq) ctx.value).pres, data));
+    if(ctx.value instanceof DBNodeSeq) {
+      final DBNodeSeq seq = (DBNodeSeq) ctx.value;
+      if(seq.complete) return Test.DOC;
+      return new DocTest(new Nodes(seq.pres, data));
+    }
 
     // loop through all documents and add pre values of documents
     // not more than 2^31 documents supported
@@ -64,6 +68,6 @@ final class DocTest extends Test {
 
   @Override
   public String toString() {
-    return type + " { " + nodes.size() + " }";
+    return new TokenBuilder(NodeType.DOC.nam()).add("(...)").toString();
   }
 }

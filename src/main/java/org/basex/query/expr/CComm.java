@@ -49,6 +49,6 @@ public final class CComm extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.COM.nam));
+    return toString(Token.string(NodeType.COM.nam()));
   }
 }

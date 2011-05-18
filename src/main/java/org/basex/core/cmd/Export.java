@@ -2,7 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-import org.basex.core.Context;
+import java.util.HashSet;
+
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -44,25 +45,14 @@ public final class Export extends Command {
   }
 
   /**
-   * Exports the specified database.
-   * @param context context
-   * @param data data reference
-   * @throws IOException I/O exception
-   */
-  public static void export(final Context context, final Data data)
-      throws IOException {
-    export(context.prop, data, data.meta.path.path());
-  }
-
-  /**
    * Exports the current database to the specified path.
    * Files and Folders contained in {@code path} will be possibly overwritten.
    * @param prop property
    * @param data data reference
-   * @param target file path
+   * @param target directory
    * @throws IOException I/O exception
    */
-  private static void export(final Prop prop, final Data data,
+  public static void export(final Prop prop, final Data data,
       final String target) throws IOException {
 
     final SerializerProp sp = new SerializerProp(prop.get(Prop.EXPORTER));
@@ -72,6 +62,7 @@ public final class Export extends Command {
 
     if(!root.exists()) root.md();
 
+    final HashSet<String> exported = new HashSet<String>();
     for(final int pre : data.doc()) {
       // create file path
       final IO file = root.merge(Token.string(data.text(pre, true)));
@@ -79,9 +70,18 @@ public final class Export extends Command {
       final IO dir = IO.get(file.dir());
       if(!dir.exists()) dir.md();
 
-      // existing files are overwritten
-      // (including files inside a collection that have the same name)
-      final PrintOutput po = new PrintOutput(file.path());
+      // attach counter to duplicate file names
+      final String fp = file.path();
+      String path = fp;
+      int c = 1;
+      while(exported.contains(path)) {
+        path = fp.indexOf('.') == -1 ? fp + '(' + ++c + ')' :
+             fp.replaceAll("(.*)\\.(.*)", "$1(" + ++c + ").$2");
+      }
+      exported.add(fp);
+
+      // serialize file
+      final PrintOutput po = new PrintOutput(path);
       final XMLSerializer xml = new XMLSerializer(po, sp);
       xml.node(data, pre);
       xml.close();

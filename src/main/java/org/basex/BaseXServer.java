@@ -69,12 +69,17 @@ public class BaseXServer extends Main {
       return;
     }
 
-    log = new Log(context, quiet);
-    log.write(SERVERSTART);
-    stop = stopFile(port);
-
     try {
+      // execute command-line arguments
+      if(commands != null) {
+        final Boolean b = execute(commands);
+        check(b == null || b);
+      }
+
+      log = new Log(context, quiet);
+      log.write(SERVERSTART);
       server = new ServerSocket(port);
+      stop = stopFile(port);
 
       // guarantee correct shutdown...
       Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -91,14 +96,9 @@ public class BaseXServer extends Main {
 
       Util.outln(CONSOLE + (console ? CONSOLE2 : SERVERSTART), SERVERMODE);
 
-      // execute command-line arguments
-      if(commands != null) {
-        final Boolean b = execute(commands);
-        check(b == null || b);
-      }
       if(console) quit(console());
     } catch(final Exception ex) {
-      log.write(ex.getMessage());
+      if(log != null) log.write(ex.getMessage());
       Util.errln(Util.server(ex));
       check(false);
     }

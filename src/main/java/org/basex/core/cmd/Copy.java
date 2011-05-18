@@ -38,8 +38,8 @@ public class Copy extends Command {
     final String db = args[0];
     final String newdb = args[1];
     // check if names are valid
-    if(!validName(db)) return error(NAMEINVALID, db);
-    if(!validName(newdb)) return error(NAMEINVALID, newdb);
+    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!validName(newdb, false)) return error(NAMEINVALID, newdb);
 
     // database does not exist
     if(!prop.dbexists(db)) return error(DBNOTFOUND, db);

@@ -10,7 +10,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import org.basex.core.Context;
 import org.basex.core.cmd.AlterDB;
-import org.basex.core.cmd.Backup;
+import org.basex.core.cmd.CreateBackup;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
@@ -178,7 +178,7 @@ public final class DialogOpen extends Dialog {
       action(null);
     } else if(cmp == backup) {
       setCursor(GUIConstants.CURSORWAIT);
-      DialogProgress.execute(this, "", new Backup(db));
+      DialogProgress.execute(this, "", new CreateBackup(db));
       setCursor(GUIConstants.CURSORARROW);
     } else if(cmp == restore) {
       setCursor(GUIConstants.CURSORWAIT);

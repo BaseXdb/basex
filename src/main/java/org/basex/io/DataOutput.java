@@ -151,7 +151,6 @@ public final class DataOutput extends OutputStream {
     return 1;
   }
 
-
   /**
    * Writes the specified longs to the output stream.
    * NOTE: the long values are not compressed!

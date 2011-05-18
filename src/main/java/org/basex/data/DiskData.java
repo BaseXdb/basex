@@ -13,7 +13,6 @@ import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;
-import org.basex.io.TableMemAccess;
 import org.basex.util.Compress;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -95,9 +94,7 @@ public final class DiskData extends Data {
 
   @Override
   public void init() throws IOException {
-    // table main memory mode..
-    table = meta.prop.is(Prop.TABLEMEM) ? new TableMemAccess(meta, DATATBL) :
-      new TableDiskAccess(meta, DATATBL);
+    table = new TableDiskAccess(meta, DATATBL);
     texts = new DataAccess(meta.file(DATATXT));
     values = new DataAccess(meta.file(DATAATV));
     super.init();

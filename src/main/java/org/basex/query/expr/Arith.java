@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.util.InputInfo;
@@ -42,8 +41,7 @@ public final class Arith extends Arr {
     type = s0.num() && s1.num() ? SeqType.ITR :
       s0.one() && s1.one() ? SeqType.ITEM : SeqType.ITEM_ZO;
 
-    return optPre(oneEmpty() ? Empty.SEQ : values() ?
-        item(ctx, input) : this, ctx);
+    return optPre(oneEmpty() ? null : values() ? item(ctx, input) : this, ctx);
   }
 
   @Override

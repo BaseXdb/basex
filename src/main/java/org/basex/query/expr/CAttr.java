@@ -130,6 +130,6 @@ public final class CAttr extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.ATT.nam) + " { " + atn + " }");
+    return toString(Token.string(NodeType.ATT.nam()) + " { " + atn + " }");
   }
 }

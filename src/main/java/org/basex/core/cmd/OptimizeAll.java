@@ -15,6 +15,7 @@ import org.basex.data.FTPos;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.io.IO;
 import org.basex.util.Atts;
 import org.basex.util.Util;
 
@@ -107,7 +108,7 @@ public final class OptimizeAll extends ACreate {
   public final class DBParser extends Parser {
     /** Constructor. */
     protected DBParser() {
-      super(old.meta.path, "");
+      super(old.meta.path.isEmpty() ? null : IO.get(old.meta.path), "");
     }
 
     @Override

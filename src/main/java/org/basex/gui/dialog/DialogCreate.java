@@ -182,7 +182,7 @@ public final class DialogCreate extends Dialog {
     String inf = !valid ? PATHWHICH : !ok ? DBWHICH : null;
     Msg icon = Msg.ERROR;
     if(ok) {
-      ok = Command.validName(nm);
+      ok = Command.validName(nm, false);
       if(!ok) {
         inf = Util.info(INVALID, EDITNAME);
       } else if(pth.isEmpty()) {

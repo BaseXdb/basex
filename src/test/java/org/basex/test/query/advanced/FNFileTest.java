@@ -18,10 +18,6 @@ import org.junit.Test;
  * @author Rositsa Shadura
  */
 public final class FNFileTest extends AdvancedQueryTest {
-  /** Directory separator. */
-  private static final String DIRSEP = System.getProperty("file.separator");
-  /** Path separator. */
-  private static final String PATHSEP = System.getProperty("path.separator");
   /** Test name. */
   private static final String NAME = Util.name(FNFileTest.class);
   /** Test path. */

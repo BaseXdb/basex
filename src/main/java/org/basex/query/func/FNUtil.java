@@ -133,7 +133,6 @@ public final class FNUtil extends Fun {
         AtomType.B64)).toJava(), AtomType.BYT);
   }
 
-
   /**
    * Formats a string according to the specified format.
    * @param ctx query context

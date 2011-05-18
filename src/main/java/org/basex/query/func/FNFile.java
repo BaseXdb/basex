@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import org.basex.core.Prop;
 import org.basex.core.cmd.Copy;
 import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
+import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.PrintOutput;
 import org.basex.io.TextInput;
@@ -178,37 +178,31 @@ public final class FNFile extends Fun {
    */
   private Iter list(final QueryContext ctx) throws QueryException {
     final String path = string(checkStr(expr[0], ctx));
-    final File dir = new File(path);
+    final IO dir = new IOFile(path);
 
     // Check if not a directory
-    if(!dir.isDirectory()) NOTDIR.thrw(input, path);
+    if(!dir.isDir()) NOTDIR.thrw(input, path);
 
     final boolean rec = optionalBool(1, ctx);
-    final String pat = expr.length != 3 ? null :
+    final String pat = expr.length != 3 ? ".*" :
       IOFile.regex(string(checkStr(expr[2], ctx)));
 
-    File[] fl;
+    IO[] fl;
     if(rec) {
-      final List<File> list = new ArrayList<File>();
-      recList(dir, list);
-      fl = list.toArray(new File[list.size()]);
+      final List<IO> list = new ArrayList<IO>();
+      recList(dir, list, pat);
+      fl = list.toArray(new IO[list.size()]);
     } else {
-      fl = dir.listFiles();
-      if(fl == null) CANNOTLIST.thrw(input, path);
+      fl = dir.children(pat);
     }
-    final File[] files = fl;
+    final IO[] files = fl;
 
     return new Iter() {
       int c = -1;
 
       @Override
       public Item next() {
-        while(++c < files.length) {
-          final File f = files[c];
-          final String n = Prop.WIN ? f.getName().toLowerCase() : f.getName();
-          if(pat == null || n.matches(pat)) return Str.get(f.getPath());
-        }
-        return null;
+        return ++c < files.length ? Str.get(files[c].path()) : null;
       }
     };
   }
@@ -217,14 +211,11 @@ public final class FNFile extends Fun {
    * Lists the files in a directory recursively.
    * @param dir current directory
    * @param list file list
+   * @param pat file name pattern
    */
-  private void recList(final File dir, final List<File> list) {
-    final File[] files = dir.listFiles();
-    if(files == null) return;
-    for(final File f : files) {
-      list.add(f);
-      if(f.isDirectory()) recList(f, list);
-    }
+  private void recList(final IO dir, final List<IO> list, final String pat) {
+    for(final IO f : dir.children()) if(f.isDir()) recList(f, list, pat);
+    for(final IO f : dir.children(pat)) list.add(f);
   }
 
   /**

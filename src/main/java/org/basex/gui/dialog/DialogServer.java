@@ -120,7 +120,7 @@ public final class DialogServer extends Dialog {
     tabs.add(USERS, user);
     tabs.add(DATABASES, databases);
     tabs.add(SESSIONS, sess);
-    tabs.add(LOGS, logs);
+    tabs.add(LOCALLOGS, logs);
 
     // Server Tab
     conn.border(8).layout(new BorderLayout(0, 32));

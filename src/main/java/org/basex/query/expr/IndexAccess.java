@@ -15,7 +15,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
@@ -141,9 +140,8 @@ public final class IndexAccess extends Single {
 
   @Override
   public String toString() {
-    return new TokenBuilder(NodeType.DOC.nam).add(" { \"").
-      add(ictx.data.meta.name).add("\" }/").add(DB).add(':').
-      add(ind.toString().toLowerCase()).
-      add(PAR1).add(expr.toString()).add(PAR2).toString();
+    return new TokenBuilder("db:open(\"").add(ictx.data.meta.name).
+    add("\")/db:").addExt(ind.toString().toLowerCase()).
+      add('(').addExt(expr).add(')').toString();
   }
 }

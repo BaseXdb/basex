@@ -92,6 +92,7 @@ public class GFLWOR extends ParseExpr {
       // pre-evaluate and bind variable if it is used exactly once,
       // or if it contains a value
       if(count(flt.var, f) == 1 || flt.expr.value()) flt.bind(ctx);
+      // use let instead of for clause for iterator with one result
     }
 
     // optimize where clause
@@ -147,7 +148,7 @@ public class GFLWOR extends ParseExpr {
 
     // remove FLWOR expression if a FOR clause yields an empty sequence
     for(final ForLet f : fl) {
-      if(f instanceof For && (f.empty() || f.size() == 0)) {
+      if(f instanceof For && f.size() == 0) {
         ctx.compInfo(OPTFLWOR);
         return Empty.SEQ;
       }
@@ -168,50 +169,48 @@ public class GFLWOR extends ParseExpr {
         }
       }
     }
-    type = SeqType.get(ret.type().type, SeqType.Occ.ZM);
+    type = SeqType.get(ret.type().type, size);
+
+    compForLet(ctx);
     return this;
   }
 
   /**
-   * Optimizes for/let clauses. Avoids repeated calls to static let clauses.
+   * Relocates for/let clauses. Avoids repeated calls to clauses that only
+   * return a single value. This method is called before and after the
+   * optimizations.
    * @param ctx query context
    */
   private void compForLet(final QueryContext ctx) {
-    // modification flag
-    boolean m = false;
-
+    // modification counter
+    int m = 0;
     for(int i = 1; i < fl.length; i++) {
-      final ForLet cls = fl[i];
-      // move let clauses upwards if possible
+      final ForLet out = fl[i];
+      // move clauses upwards that contain a single value.
       // expressions that depend on the current context (e.g. math:random())
       // or fragment constructors creating unique nodes are left alone
-      if(cls instanceof Let && !cls.uses(Use.CTX) && !cls.uses(Use.CNS)) {
-        final Let let = (Let) cls;
+      if(out.size() != 1 || out.uses(Use.CTX) || out.uses(Use.CNS)) continue;
 
-        // find highest for clause that can be skipped
-        int fpos = -1;
-        for(int j = i; j-- != 0;) {
-          final ForLet o = fl[j];
-          if(let.count(o.var) != 0) break;
-          if(o instanceof For) {
-            final For fr = (For) o;
-            if(fr.pos != null && let.count(fr.pos) != 0 ||
-                fr.score != null && let.count(fr.score) != 0) break;
-            fpos = j;
-          }
-        }
-        if(fpos != -1) {
-          Array.move(fl, fpos, 1, i - fpos);
-          fl[fpos] = let;
-          m = true;
-        }
+      // find most outer clause that can be skipped
+      int p = -1;
+      for(int j = i; j-- != 0;) {
+        final ForLet in = fl[j];
+        if(out.count(in.var) != 0) break;
+        if(in.size() <= 1) continue;
+        if(!in.simple(false)) break;
+        p = j;
       }
+      if(p == -1) continue;
+
+      // move clauses
+      Array.move(fl, p, 1, i - p);
+      fl[p] = out;
+      if(m++ == 0) ctx.compInfo(OPTFORLET);
     }
-    if(m) ctx.compInfo(OPTFORLET);
   }
 
   /**
-   * Optimizes a where clause.
+   * Rewrites a where clause to predicates.
    * @param ctx query context
    */
   private void compWhere(final QueryContext ctx) {

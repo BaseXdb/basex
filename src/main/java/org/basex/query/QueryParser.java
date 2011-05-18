@@ -52,7 +52,6 @@ import org.basex.query.expr.Pragma;
 import org.basex.query.expr.Quantifier;
 import org.basex.query.expr.Range;
 import org.basex.query.expr.Root;
-import org.basex.query.expr.Scored;
 import org.basex.query.expr.Switch;
 import org.basex.query.expr.Treat;
 import org.basex.query.expr.Try;
@@ -173,7 +172,6 @@ public class QueryParser extends InputParser {
   private boolean declItem;
   /** Declaration flag. */
   private boolean declVars;
-
 
   /***
    * Constructor.
@@ -1228,7 +1226,7 @@ public class QueryParser extends InputParser {
    */
   private Expr union() throws QueryException {
     final Expr e = intersect();
-    if(!wsConsumeWs(UNION) && !wsConsume(PIPE)) return e;
+    if(e == null || (!wsConsumeWs(UNION) && !wsConsume(PIPE))) return e;
 
     Expr[] list = { e };
     do list = add(list, intersect());
@@ -1299,23 +1297,10 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
-    final Expr e = scored();
+    final Expr e = unary();
     if(!wsConsumeWs(CAST)) return e;
     wsCheck(AS);
     return new Cast(input(), e, simpleType());
-  }
-
-  /**
-   * Parses the "ScoredExpr" rule.
-   * This is a proprietary extension to XQuery FT for adding full-text scores
-   * to non-FT expressions.
-   * @return query expression
-   * @throws QueryException query exception
-   */
-  private Expr scored() throws QueryException {
-    final Expr e = unary();
-    if(!wsConsumeWs(SCORED)) return e;
-    return new Scored(input(), e, single());
   }
 
   /**

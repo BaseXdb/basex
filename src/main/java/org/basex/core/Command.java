@@ -1,16 +1,20 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
+
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.Close;
 import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.io.ArrayOutput;
+import org.basex.io.IOFile;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
+import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -29,7 +33,7 @@ public abstract class Command extends Progress {
   public static final int DATAREF = 512;
 
   /** Container for query information. */
-  private final TokenBuilder info = new TokenBuilder();
+  protected final TokenBuilder info = new TokenBuilder();
   /** Command arguments. */
   protected final String[] args;
 
@@ -163,10 +167,11 @@ public abstract class Command extends Progress {
    * Checks if the specified filename is valid; allows only letters,
    * digits, the underscore, and dash.
    * @param name name to be checked
+   * @param glob allow glob syntax
    * @return result of check
    */
-  public static final boolean validName(final String name) {
-    return name != null && name.matches("[\\w-]+");
+  public static final boolean validName(final String name, final boolean glob) {
+    return name != null && name.matches(glob ? "[-\\w*?,]+" : "[-\\w]+");
   }
 
   // PROTECTED METHODS ========================================================
@@ -200,6 +205,23 @@ public abstract class Command extends Progress {
     info.addExt(str, ext);
     info.add(NL);
     return true;
+  }
+
+  /**
+   * Returns all databases matching the specified glob pattern.
+   * If the specified pattern does not contain any special characters,
+   * it is treated as literal.
+   * @param name database name pattern
+   * @return array with database names
+   */
+  protected final String[] databases(final String name) {
+    final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) : name;
+    final StringList sl = new StringList();
+    for(final IOFile f : new IOFile(prop.get(Prop.DBPATH)).children(pat)) {
+      final String n = f.name();
+      if(!n.startsWith(".")) sl.add(n);
+    }
+    return sl.toArray();
   }
 
   /**

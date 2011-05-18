@@ -157,7 +157,8 @@ public final class FTWords extends FTExpr {
             lex.init(k);
             ia = null;
             int d = 0;
-            while(lex.hasNext()) {
+            if(!lex.hasNext()) return null;
+            do {
               final byte[] token = lex.nextToken();
               t += token.length;
               if(ftt.opt.sw != null && ftt.opt.sw.id(token) != 0) {
@@ -171,7 +172,7 @@ public final class FTWords extends FTExpr {
                   d = 0;
                 }
               }
-            }
+            } while(lex.hasNext());
             if(iat == null) {
               tl = t;
               iat = ia;
@@ -187,8 +188,8 @@ public final class FTWords extends FTExpr {
             iat.tokenNum(++ctx.ftoknum);
           }
         }
-        return iat.more() ? new FTNode(iat.matches(), data, iat.next(),
-            tl, iat.indexSize(), iat.score()) : null;
+        return iat != null && iat.more() ? new FTNode(iat.matches(), data,
+            iat.next(), tl, iat.indexSize(), iat.score()) : null;
       }
     };
   }

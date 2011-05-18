@@ -1,6 +1,5 @@
 package org.basex.test.query.simple;
 
-
 /**
  * XQuery functions tests.
  *

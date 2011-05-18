@@ -61,11 +61,6 @@ public final class Let extends ForLet {
   }
 
   @Override
-  protected boolean bind(final QueryContext ctx) throws QueryException {
-    return simple(true) && super.bind(ctx);
-  }
-
-  @Override
   public Iter iter(final QueryContext ctx) {
     final Var vr = var.copy();
 

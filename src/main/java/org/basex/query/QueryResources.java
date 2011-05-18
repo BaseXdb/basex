@@ -57,17 +57,16 @@ public final class QueryResources {
    */
   void compile(final Nodes nodes) throws QueryException {
     final Data d = nodes.data;
-    if(!ctx.context.perm(User.READ, d.meta))
-      PERMNO.thrw(null, CmdPerm.READ);
+    if(!ctx.context.perm(User.READ, d.meta)) PERMNO.thrw(null, CmdPerm.READ);
 
-    // assign initial context value: use empty node set if database is empty
+    // assign initial context value
     ctx.value = d.empty() ? Empty.SEQ :
-      DBNodeSeq.get(nodes.list, d, nodes.root);
+      DBNodeSeq.get(nodes.list, d, nodes.root, nodes.root);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
     addCollection(nodes.root ? ctx.value :
-        DBNodeSeq.get(d.doc(), d, true), token(d.meta.name));
+        DBNodeSeq.get(d.doc(), d, true, true), token(d.meta.name));
 
     addData(d);
   }
@@ -130,7 +129,7 @@ public final class QueryResources {
     // check if a database with the same file path has already been opened
     final IO io = IO.get(in);
     for(int d = 0; d < datas; ++d) {
-      if(data[d].meta.path.eq(io)) return data[d];
+      if(IO.get(data[d].meta.path).eq(io)) return data[d];
     }
 
     // retrieve and add new data reference
@@ -200,8 +199,8 @@ public final class QueryResources {
    * @param path inner collection path
    */
   private void addCollection(final Data d, final byte[] path) {
-    addCollection(DBNodeSeq.get(d.doc(string(path)), d, true),
-        token(d.meta.name));
+    addCollection(DBNodeSeq.get(d.doc(string(path)), d, true,
+        path.length == 0), token(d.meta.name));
   }
 
   /**

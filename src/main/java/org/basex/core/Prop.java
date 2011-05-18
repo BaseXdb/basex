@@ -84,8 +84,6 @@ public final class Prop extends AProp {
   public static final Object[] QUERYINFO = { "QUERYINFO", false };
   /** Flag for serializing query results. */
   public static final Object[] SERIALIZE = { "SERIALIZE", true };
-  /** Flag for wrapping result nodes. */
-  public static final Object[] WRAPOUTPUT = { "WRAPOUTPUT", false };
   /** External variables, separated by commas. */
   public static final Object[] BINDINGS = { "BINDINGS", "" };
   /** Serialization parameters, separated by commas. */
@@ -146,8 +144,6 @@ public final class Prop extends AProp {
   /** Maximum number of name categories. */
   public static final Object[] CATEGORIES = { "CATEGORIES", 50 };
 
-  /** Flag for creating a main memory database table. */
-  public static final Object[] TABLEMEM = { "TABLEMEM", false };
   /** Flag for creating a main memory database. */
   public static final Object[] MAINMEM = { "MAINMEM", false };
   /** Path for filtering XML Documents. */

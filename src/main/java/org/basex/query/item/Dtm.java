@@ -16,7 +16,7 @@ import org.basex.util.Token;
 public final class Dtm extends Date {
   /** Date format. */
   private static final SimpleDateFormat DATE = new SimpleDateFormat(
-      "yyyy-MM-dd'T'hh:mm:ss.S");
+      "yyyy-MM-dd'T'HH:mm:ss.S");
 
   /**
    * Constructor.

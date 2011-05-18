@@ -10,7 +10,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Simple;
 import org.basex.query.item.FTNode;
 import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
@@ -77,8 +76,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    return new TokenBuilder(NodeType.DOC.nam).add(" { \"").
-        add(ictx.data.meta.name).add("\" }/fulltext").add(PAR1).
-        add(ftexpr.toString()).add(PAR2).toString();
+    return new TokenBuilder("db:open(\"").add(ictx.data.meta.name).
+      add("\")/db:fulltext(").addExt(ftexpr).add(')').toString();
   }
 }

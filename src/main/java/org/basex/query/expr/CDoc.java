@@ -45,6 +45,6 @@ public final class CDoc extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.DOC.nam));
+    return toString(Token.string(NodeType.DOC.nam()));
   }
 }

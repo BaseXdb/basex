@@ -157,6 +157,7 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public void replace(final int pre, final byte[] entries, final int sub) {
+    // [LK] Replace nodes in main memory: check..
     final int nsize = entries.length >>> IO.NODEPOWER;
     final int rpre = pre + nsize;
     int off = 0;
