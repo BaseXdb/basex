@@ -27,6 +27,13 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 public final class SAXWrapper extends FileParser {
+  /** External DTD parsing. */
+  private static final String EXTDTD =
+    "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+  /** Lexical handler. */
+  private static final String LEXHANDLER =
+    "http://xml.org/sax/properties/lexical-handler";
+
   /** File counter. */
   long counter;
   /** Current line. */
@@ -85,6 +92,8 @@ public final class SAXWrapper extends FileParser {
       XMLReader r = src.getXMLReader();
       if(r == null) {
         final SAXParserFactory f = SAXParserFactory.newInstance();
+        f.setFeature(EXTDTD, prop.is(Prop.DTD));
+        f.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
         f.setNamespaceAware(true);
         f.setValidating(false);
         f.setXIncludeAware(true);
@@ -97,7 +106,7 @@ public final class SAXWrapper extends FileParser {
 
       r.setDTDHandler(sax);
       r.setContentHandler(sax);
-      r.setProperty("http://xml.org/sax/properties/lexical-handler", sax);
+      r.setProperty(LEXHANDLER, sax);
       r.setErrorHandler(sax);
 
       if(is != null) r.parse(is);
