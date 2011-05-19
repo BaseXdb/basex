@@ -133,7 +133,6 @@ public final class JaxRxServer extends BaseXServer {
    */
   static ClientSession login(final ResourcePath path) throws Exception {
     String[] id = updateIdentity(path);
-    System.out.println("[1] " + id);
     if(id == null) id = new String[] {
         System.getProperty(JaxRxServer.USER),
         System.getProperty(JaxRxServer.PASSWORD)
