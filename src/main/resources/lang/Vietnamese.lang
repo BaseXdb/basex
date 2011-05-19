@@ -4,7 +4,7 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-version=Phiên bản %
+version=Phiên bản
 
 # Menu Commands
 m_db=Cơ sở dữ liệu

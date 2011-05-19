@@ -4,7 +4,7 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-version=Versie %
+version=Versie
 
 # Menu Commands
 m_db=Database

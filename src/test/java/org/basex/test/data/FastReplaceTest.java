@@ -37,7 +37,7 @@ public final class FastReplaceTest {
   public void setUp() throws Exception {
     new CreateDB(DBNAME, DOC).execute(CONTEXT);
     new XQuery("let $items := /site/regions//item " +
-        "for $i in 1 to 5 " +
+        "for $i in 1 to 10 " +
         "return (insert node $items into /site/regions, " +
         "insert node $items before /site/regions, " +
         "insert node $items after /site/closed_auctions)").execute(CONTEXT);
@@ -224,6 +224,10 @@ public final class FastReplaceTest {
     final Prop p = CONTEXT.prop;
     p.set(Prop.TEXTINDEX, false);
     p.set(Prop.ATTRINDEX, false);
+    /* Running this junit test in main memory doesn't make that much sense as
+     * updates in main memory are non persistent - assertions will fail.
+       Just for debugging purposes. */
+//    p.set(Prop.MAINMEM, true);
   }
 
   /**

@@ -4,7 +4,7 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Lancement
-version=Version %
+version=Version
 
 # Commandes menu
 m_db=Base de données

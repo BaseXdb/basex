@@ -37,6 +37,7 @@ public final class Info extends AInfo {
     final Prop prop = context.prop;
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INFOGENERAL + NL);
+    format(tb, VERSINFO, VERSION);
     if(context.user.perm(User.CREATE)) {
       Performance.gc(3);
       format(tb, INFODBPATH, prop.get(Prop.DBPATH));
