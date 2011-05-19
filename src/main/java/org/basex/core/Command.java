@@ -217,7 +217,7 @@ public abstract class Command extends Progress {
   protected final String[] databases(final String name) {
     final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) : name;
     final StringList sl = new StringList();
-    for(final IOFile f : new IOFile(prop.get(Prop.DBPATH)).children(pat)) {
+    for(final IOFile f : prop.dbpath().children(pat)) {
       final String n = f.name();
       if(!n.startsWith(".")) sl.add(n);
     }

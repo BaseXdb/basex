@@ -97,7 +97,16 @@ public class CmdTest {
 
   /** Command test. */
   @Test
-  public final void backup() {
+  public final void close() {
+    // close is successful, even if no database is opened
+    ok(new Close());
+    ok(new CreateDB(NAME, FILE));
+    ok(new Close());
+  }
+
+  /** Command test. */
+  @Test
+  public final void createBackup() {
     no(new CreateBackup(NAME));
     ok(new CreateDB(NAME));
     ok(new CreateDB(NAME2));
@@ -110,15 +119,6 @@ public class CmdTest {
     ok(new Restore(NAME2));
     ok(new DropBackup(NAME + "*"));
     no(new Restore(":"));
-  }
-
-  /** Command test. */
-  @Test
-  public final void close() {
-    // close is successful, even if no database is opened
-    ok(new Close());
-    ok(new CreateDB(NAME, FILE));
-    ok(new Close());
   }
 
   /** Command test. */

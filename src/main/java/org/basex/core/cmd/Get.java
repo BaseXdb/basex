@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import java.io.IOException;
 
+import org.basex.core.User;
+
 /**
  * Evaluates the 'get' command and return the value of a database property.
  *
@@ -14,7 +16,8 @@ public final class Get extends AGet {
    * @param key property
    */
   public Get(final Object key) {
-    super((key instanceof Object[] ? ((Object[]) key)[0] : key).toString());
+    super(User.READ, (key instanceof Object[] ?
+        ((Object[]) key)[0] : key).toString());
   }
 
   @Override

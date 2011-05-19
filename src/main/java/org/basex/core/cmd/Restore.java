@@ -47,7 +47,7 @@ public final class Restore extends Command {
     if(!validName(db, false)) return error(NAMEINVALID, db);
 
     // find backup file with or without date suffix
-    File file = new File(prop.get(Prop.DBPATH) + '/' + db + IO.ZIPSUFFIX);
+    File file = prop.dbpath(db + IO.ZIPSUFFIX);
     if(!file.exists()) {
       final StringList list = list(db, context);
       if(list.size() != 0) file = new File(list.get(0));
@@ -89,9 +89,9 @@ public final class Restore extends Command {
       ZipEntry e;
       while((e = zis.getNextEntry()) != null) {
         of++;
-        final String path = pr.get(Prop.DBPATH) + '/' + e.getName();
+        final File path = pr.dbpath(e.getName());
         if(e.isDirectory()) {
-          new File(path).mkdir();
+          path.mkdir();
         } else {
           BufferedOutputStream bos = null;
           try {
@@ -122,7 +122,7 @@ public final class Restore extends Command {
   public static StringList list(final String db, final Context ctx) {
     final StringList list = new StringList();
 
-    final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
+    final IO dir = ctx.prop.dbpath();
     if(!dir.exists()) return list;
 
     for(final IO f : dir.children()) {

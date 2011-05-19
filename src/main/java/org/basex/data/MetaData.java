@@ -185,7 +185,7 @@ public final class MetaData {
    * @return database filename
    */
   private static File file(final String db, final String fn, final Prop pr) {
-    return new File(pr.get(Prop.DBPATH) + '/' + db + '/' + fn + IO.BASEXSUFFIX);
+    return new File(pr.dbpath(db), fn + IO.BASEXSUFFIX);
   }
 
   /**

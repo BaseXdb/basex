@@ -76,8 +76,8 @@ public final class CreateBackup extends Command {
     ZipOutputStream zos = null;
     try {
       final File in = pr.dbpath(db);
-      final File file = new File(pr.get(Prop.DBPATH) + '/' + db + "-" +
-          DATE.format(new Date()) + IO.ZIPSUFFIX);
+      final File file = pr.dbpath(db + "-" + DATE.format(new Date()) +
+          IO.ZIPSUFFIX);
       final byte[] data = new byte[IO.BLOCKSIZE];
 
       // OutputStream for zipping

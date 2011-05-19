@@ -6,7 +6,6 @@ import static org.basex.core.Text.*;
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.IO;
@@ -44,7 +43,7 @@ public final class DropBackup extends Command {
    * @return number of dropped backups
    */
   public static int drop(final String db, final Context ctx) {
-    final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
+    final IO dir = ctx.prop.dbpath();
     int c = 0;
     for(final IO f : dir.children()) {
       final String n = f.name();

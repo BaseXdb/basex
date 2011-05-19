@@ -1,6 +1,8 @@
 package org.basex.core;
 
 import java.io.File;
+
+import org.basex.io.IOFile;
 import org.basex.util.Util;
 
 /**
@@ -195,7 +197,15 @@ public final class Prop extends AProp {
    * @return database filename
    */
   public File dbpath(final String db) {
-    return new File(get(DBPATH) + '/' + db);
+    return new File(get(DBPATH), db);
+  }
+
+  /**
+   * Returns the current database path.
+   * @return database filename
+   */
+  public IOFile dbpath() {
+    return new IOFile(get(DBPATH));
   }
 
   /**

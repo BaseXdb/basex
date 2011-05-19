@@ -12,10 +12,11 @@ import org.basex.core.Command;
 abstract class AGet extends Command {
   /**
    * Default constructor.
+   * @param f command flags
    * @param a arguments
    */
-  protected AGet(final String... a) {
-    super(STANDARD, a);
+  protected AGet(final int f, final String... a) {
+    super(f, a);
   }
 
   /**
