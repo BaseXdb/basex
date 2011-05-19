@@ -3,6 +3,10 @@ package org.basex.api.jaxrx;
 import static org.jaxrx.core.JaxRxConstants.*;
 
 import java.io.IOException;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
 import org.basex.data.DataText;
 import org.basex.data.SerializerProp;
 import org.basex.server.ClientSession;
@@ -11,6 +15,8 @@ import org.basex.util.Util;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
 import org.jaxrx.core.ResourcePath;
+
+import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 
 /**
  * Wrapper class for running JAX-RX code.
@@ -32,7 +38,11 @@ abstract class BXCode {
     try {
       cs = JaxRxServer.login(path);
     } catch(final LoginException ex) {
-      throw new JaxRxException(401, "Username/Password is false.");
+      final ResponseBuilder rb = new ResponseBuilderImpl();
+      rb.header(HttpHeaders.WWW_AUTHENTICATE, "Basic ");
+      rb.status(401);
+      rb.entity("Username/password is wrong.");
+      throw new JaxRxException(rb.build());
     } catch(final Exception ex) {
       Util.stack(ex);
       throw new JaxRxException(ex);

@@ -124,7 +124,6 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
    */
   private int status(final Exception ex) {
     final String msg = ex.getMessage();
-    return msg != null && (msg.contains(Text.PERMNO.substring(2)) ||
-        msg.contains(Text.PERMINV)) ? 403 : 404;
+    return msg != null && (msg.contains(Text.PERMNO.substring(2))) ? 403 : 404;
   }
 }

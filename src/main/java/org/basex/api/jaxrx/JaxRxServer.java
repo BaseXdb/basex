@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.util.List;
 
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.basex.BaseXServer;
 import org.basex.core.Prop;
@@ -17,6 +18,8 @@ import org.jaxrx.JettyServer;
 import org.jaxrx.core.JaxRxConstants;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.ResourcePath;
+
+import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 
 /**
  * This is the starter class for running the JAX-RX server, based on the JAX-RX
@@ -130,6 +133,7 @@ public final class JaxRxServer extends BaseXServer {
    */
   static ClientSession login(final ResourcePath path) throws Exception {
     String[] id = updateIdentity(path);
+    System.out.println("[1] " + id);
     if(id == null) id = new String[] {
         System.getProperty(JaxRxServer.USER),
         System.getProperty(JaxRxServer.PASSWORD)
@@ -155,7 +159,11 @@ public final class JaxRxServer extends BaseXServer {
         if(values[0].equalsIgnoreCase("basic")) {
           final String[] cred = Base64.decode(values[1]).split(":", 2);
           if(cred.length < 2) {
-            throw new JaxRxException(401, "No password specified.");
+            final ResponseBuilder rb = new ResponseBuilderImpl();
+            rb.header(HttpHeaders.WWW_AUTHENTICATE, "Basic ");
+            rb.status(401);
+            rb.entity("No password specified.");
+            throw new JaxRxException(rb.build());
           }
           return cred;
         }
