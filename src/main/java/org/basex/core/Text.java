@@ -51,12 +51,12 @@ public interface Text {
   /** Code version. */
   String VERSION = "6.6.3 beta";
   /** Company info. */
-  String COMPANY = "BaseX Team";
-  /** Version information. */
-  String VERSINFO = lang("version", VERSION);
+  String COMPANY = NAME + " Team";
 
+  /** Version information. */
+  String VERSINFO = lang("version");
   /** Title and version. */
-  String TITLE = NAME + " " + VERSION;
+  String TITLE = NAME + ' ' + VERSINFO + ' ' + VERSION;
 
   // CONSOLE INFO =============================================================
 

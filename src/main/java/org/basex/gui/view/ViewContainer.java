@@ -133,7 +133,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
     g.setColor(new Color(0, 0, 0, 255 - STEPS[count]));
     g.setFont(getFont().deriveFont(22f));
-    BaseXLayout.drawCenter(g, VERSINFO, w, y + 30 + lh);
+    BaseXLayout.drawCenter(g, VERSINFO + ' ' + VERSION, w, y + 30 + lh);
   }
 
   /**
@@ -260,6 +260,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   private Point absLoc(final Component comp) {
     Component c = comp;
     final Point p = c.getLocation();
+
     do {
       c = c.getParent();
       p.x += c.getX();
