@@ -21,8 +21,8 @@ public final class Context {
   public final Sessions sessions;
   /** Database pool. */
   public final DataPool datas;
-  /** Trigger pool. */
-  public final TriggerPool triggers;
+  /** Event pool. */
+  public final EventPool events;
   /** Users. */
   public final Users users;
   /** Database properties. */
@@ -57,7 +57,7 @@ public final class Context {
   public Context() {
     prop = new Prop(true);
     datas = new DataPool();
-    triggers = new TriggerPool();
+    events = new EventPool();
     sessions = new Sessions();
     lock = new Lock(this);
     users = new Users(true);
@@ -72,7 +72,7 @@ public final class Context {
   public Context(final Context ctx, final ServerProcess s) {
     prop = new Prop(true);
     datas = ctx.datas;
-    triggers = ctx.triggers;
+    events = ctx.events;
     sessions = ctx.sessions;
     session = s;
     lock = ctx.lock;

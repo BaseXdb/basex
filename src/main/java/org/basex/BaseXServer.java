@@ -48,8 +48,8 @@ public class BaseXServer extends Main {
   boolean running;
   /** Stop file. */
   IO stop;
-  /** TriggerListener. */
-  private TriggerListener tl;
+  /** EventsListener. */
+  private EventListener el;
 
   /**
    * Main method, launching the server process. Command-line arguments are
@@ -114,8 +114,8 @@ public class BaseXServer extends Main {
   @Override
   public final void run() {
     running = true;
-    tl = new TriggerListener();
-    tl.start();
+    el = new EventListener();
+    el.start();
     while(running) {
       try {
         final Socket s = server.accept();
@@ -203,7 +203,7 @@ public class BaseXServer extends Main {
         arg.check(false);
         if(arg.string().equalsIgnoreCase("stop")) {
           stop(context.prop.num(Prop.SERVERPORT),
-              context.prop.num(Prop.TRIGGERPORT));
+              context.prop.num(Prop.EVENTPORT));
           Performance.sleep(1000);
           return false;
         }
@@ -218,7 +218,7 @@ public class BaseXServer extends Main {
   public final void stop() {
     try {
       stop.write(Token.EMPTY);
-      new Socket(LOCALHOST, context.prop.num(Prop.TRIGGERPORT));
+      new Socket(LOCALHOST, context.prop.num(Prop.EVENTPORT));
       new Socket(LOCALHOST, context.prop.num(Prop.SERVERPORT));
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));
@@ -282,7 +282,7 @@ public class BaseXServer extends Main {
   /**
    * Stops the server.
    * @param port server port
-   * @param tport trigger port
+   * @param tport event port
    */
   public static void stop(final int port, final int tport) {
     final IO stop = stopFile(port);
@@ -300,19 +300,19 @@ public class BaseXServer extends Main {
   }
 
   /**
-   * Inner class to listen for trigger registrations.
+   * Inner class to listen for event registrations.
    *
    * @author BaseX Team 2005-11, BSD License
    * @author Andreas Weiler
    */
-  private class TriggerListener extends Thread {
+  private class EventListener extends Thread {
 
     /**
      * Constructor.
      */
-    public TriggerListener() {
+    public EventListener() {
       try {
-        tserver = new ServerSocket(context.prop.num(Prop.TRIGGERPORT));
+        tserver = new ServerSocket(context.prop.num(Prop.EVENTPORT));
       } catch(IOException ex) {
         log.write(ex.getMessage());
         Util.errln(Util.server(ex));

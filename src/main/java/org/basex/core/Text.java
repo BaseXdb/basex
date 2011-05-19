@@ -197,7 +197,8 @@ public interface Text {
   /** Command help. */
   String[] HELPCREATE = {
     "[" + CmdCreate.DATABASE + "|" + CmdCreate.INDEX + "|" +
-    CmdCreate.USER + "|" + CmdCreate.BACKUP + CmdCreate.TRIGGER + "] [...]",
+    CmdCreate.USER + "|" + CmdCreate.BACKUP +
+    CmdCreate.EVENT + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL +
@@ -209,7 +210,7 @@ public interface Text {
       "  " + lang("ch_create5") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
       "  " + lang("ch_create8") + NL +
-    LI + CmdCreate.TRIGGER + " [" + C_NAME + "]: " + NL +
+    LI + CmdCreate.EVENT + " [" + C_NAME + "]: " + NL +
       "  " + lang("ch_create9")
   };
 
@@ -261,8 +262,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.BACKUP + "|" + CmdDrop.DATABASE + "|" +
-    CmdDrop.INDEX + "|" + CmdDrop.USER + CmdDrop.TRIGGER + "] [...]",
+    "[" + CmdDrop.DATABASE + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "|"
+    + CmdDrop.EVENT + "] [...]",
     lang("ch_drop1"),
     lang("ch_drop2") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
@@ -272,9 +273,12 @@ public interface Text {
     LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
-    LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [database]): " + NL +
-      "  " + lang("ch_drop23") +
-    LI + CmdDrop.TRIGGER + " [" + C_NAME + "]:" + NL + "  " +
+    LI + CmdDrop.USER + " [" + C_NAME + "] (" +
+    ON + " [databases]): " + NL + "  " +
+      lang("ch_drop23") + NL +
+    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
+      lang("ch_drop24", C_NAME) + NL +
+    LI + CmdDrop.EVENT + " [" + C_NAME + "]:" + NL + "  " +
       lang("ch_drop25", C_NAME)
   };
   /** Command help. */
@@ -314,14 +318,14 @@ public interface Text {
   /** Command help. */
   String[] HELPSHOW = {
     "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
-    CmdShow.USERS + "|" + CmdShow.BACKUPS + "|" + CmdShow.TRIGGERS + "]",
+    CmdShow.USERS + "|" + CmdShow.BACKUPS + "|" + CmdShow.EVENTS + "]",
     lang("ch_show1"),
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
     LI + CmdShow.USERS + " (" + ON + " [database]): " + lang("ch_show24") + NL +
     LI + CmdShow.BACKUPS + ": " + lang("ch_show25") + NL +
-    LI + CmdShow.TRIGGERS + ": " + lang("ch_show26")
+    LI + CmdShow.EVENTS + ": " + lang("ch_show26")
   };
   /** Command help. */
   String[] HELPGRANT = {
@@ -630,18 +634,18 @@ public interface Text {
   String USERKILL = lang("ad_kill");
   /** User kills itself. */
   String USERKILLSELF = lang("ad_killself");
-  /** Trigger dropped. */
-  String TRIGGERDROP = lang("ad_triggerdrop");
-  /** Trigger added. */
-  String TRIGGERCREATE = lang("ad_triggercreate");
-  /** Trigger not found. */
-  String TRIGGERNO = lang("ad_triggerno");
-  /** Trigger already exists. */
-  String TRIGGERKNOWN = lang("ad_triggerknown");
-  /** Trigger attached. */
-  String TRIGGERATT = lang("ad_triggeratt");
-  /** Trigger detached. */
-  String TRIGGERDET = lang("ad_triggerdet");
+  /** Event dropped. */
+  String EVENTDROP = lang("ad_eventdrop");
+  /** Event added. */
+  String EVENTCREATE = lang("ad_eventcreate");
+  /** Event not found. */
+  String EVENTNO = lang("ad_eventno");
+  /** Event already exists. */
+  String EVENTKNOWN = lang("ad_eventknown");
+  /** Watch Event. */
+  String EVENTWAT = lang("ad_eventatt");
+  /** Unwatch Event. */
+  String EVENTUNWAT = lang("ad_eventdet");
 
   // GENERAL COMMANDS =========================================================
 

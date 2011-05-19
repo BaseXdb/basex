@@ -303,7 +303,7 @@ public final class DialogServer extends Dialog {
         }
       } else if(cmp == stop) {
         if(running) BaseXServer.stop(ctx.prop.num(Prop.SERVERPORT),
-            ctx.prop.num(Prop.TRIGGERPORT));
+            ctx.prop.num(Prop.EVENTPORT));
         running = ping(true);
         connected = connected && ping(false);
         if(!connected) msg = SERVERSTOPPED;

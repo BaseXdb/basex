@@ -39,8 +39,8 @@ public final class ServerProcess extends Thread {
   /** Active queries. */
   private final HashMap<String, QueryProcess> queries =
     new HashMap<String, QueryProcess>();
-  /** Active triggers. */
-  public ArrayList<String> triggers;
+  /** Active events. */
+  public ArrayList<String> events;
 
   /** Database context. */
   public final Context context;
@@ -59,9 +59,9 @@ public final class ServerProcess extends Thread {
   private int id;
   /** Running of thread. */
   private boolean running;
-  /** Socket for triggering. */
+  /** Socket for events. */
   public Socket tsocket;
-  /** Output for triggering. */
+  /** Output for events. */
   public PrintOutput tout;
 
   /**
@@ -133,12 +133,12 @@ public final class ServerProcess extends Thread {
             add();
             continue;
           }
-          if(sc == ATTACH) {
-            attach();
+          if(sc == WATCH) {
+            watch();
             continue;
           }
-          if(sc == DETACH) {
-            detach();
+          if(sc == UNWATCH) {
+            unwatch();
             continue;
           }
           if(sc != CMD) {
@@ -276,22 +276,22 @@ public final class ServerProcess extends Thread {
   }
 
   /**
-   * Attach this server process to a trigger.
+   * Watch an event.
    * @throws IOException I/O exception
    */
-  private void attach() throws IOException {
+  private void watch() throws IOException {
     final String name = in.readString();
-    if(triggers == null) {
+    if(events == null) {
       out.writeString((new Long(this.getId())).toString());
-      triggers = new ArrayList<String>();
+      events = new ArrayList<String>();
     }
-    if(context.triggers.attach(name, this)) {
-      String info = Util.info(TRIGGERATT, name);
+    if(context.events.watch(name, this)) {
+      String info = Util.info(EVENTWAT, name);
       out.writeString(info);
       out.write(0);
       log.write(this, OK + info);
     } else {
-      String info = Util.info(TRIGGERNO, name);
+      String info = Util.info(EVENTNO, name);
       out.writeString(info);
       out.write(1);
       log.write(this, INFOERROR + info);
@@ -300,18 +300,18 @@ public final class ServerProcess extends Thread {
   }
 
   /**
-   * Detach this server process to a trigger.
+   * Unwatch an event.
    * @throws IOException I/O exception
    */
-  private void detach() throws IOException {
+  private void unwatch() throws IOException {
     final String name = in.readString();
-    if(context.triggers.detach(name, this)) {
-      String info = Util.info(TRIGGERDET, name);
+    if(context.events.unwatch(name, this)) {
+      String info = Util.info(EVENTUNWAT, name);
       out.writeString(info);
       out.write(0);
       log.write(this, OK + info);
     } else {
-      String info = Util.info(TRIGGERNO, name);
+      String info = Util.info(EVENTNO, name);
       out.writeString(info);
       out.write(1);
       log.write(this, INFOERROR + info);
@@ -410,10 +410,10 @@ public final class ServerProcess extends Thread {
       try { q.close(true); } catch(final IOException ex) { }
     }
     try {
-      // remove this sessions from all triggers in pool
-      if(triggers != null) {
+      // remove this sessions from all events in pool
+      if(events != null) {
         tsocket.close();
-        context.triggers.remove(this, triggers);
+        context.events.remove(this, events);
       }
       new Close().execute(context);
       if(cmd != null) cmd.stop();

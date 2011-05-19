@@ -57,7 +57,7 @@ public final class FNDb extends Fun {
       case LIST:     return list(ctx);
       case NODEID:   return node(ctx, true);
       case NODEPRE:  return node(ctx, false);
-      case TRIGGER:  return trigger(ctx);
+      case EVENT:  return event(ctx);
       default:       return super.iter(ctx);
     }
   }
@@ -241,19 +241,19 @@ public final class FNDb extends Fun {
   }
 
   /**
-   * Triggers an event on registered sessions.
+   * Sends an event on registered sessions.
    * @param ctx query context
-   * @return The trigger result
+   * @return event result
    * @throws QueryException query exception
    */
-  private Iter trigger(final QueryContext ctx) throws QueryException {
+  private Iter event(final QueryContext ctx) throws QueryException {
     String msg = expr[3].toString().equals("m") ? expr[2].toString() : null;
     Value v = expr[0].value(ctx);
     if(msg == null) {
       ctx.updating = true;
       msg = ctx.value(expr[0]).toString();
     }
-    ctx.context.triggers.notify(ctx.context.session, expr[1].toString(), msg);
+    ctx.context.events.notify(ctx.context.session, expr[1].toString(), msg);
     return v.iter();
   }
 }

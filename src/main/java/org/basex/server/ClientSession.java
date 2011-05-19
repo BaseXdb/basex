@@ -44,13 +44,13 @@ public final class ClientSession extends Session {
   final PrintOutput sout;
   /** Server input. */
   final InputStream sin;
-  /** Trigger notifications. */
-  Map<String, TriggerEvent> tn;
-  /** Socket trigger reference. */
+  /** Event notifications. */
+  Map<String, EventNotification> tn;
+  /** Socket event reference. */
   Socket tsocket;
   /** Socket host name. */
   String thost;
-  /** Trigger port. */
+  /** Event port. */
   int tport = 1985;
 
   /**
@@ -157,20 +157,20 @@ public final class ClientSession extends Session {
   }
 
   /**
-   * Attaches to a trigger.
-   * @param name trigger name
-   * @param notification trigger notification
+   * Watches an event.
+   * @param name event name
+   * @param notification event notification
    * @throws BaseXException exception
    */
-  public void attachTrigger(final String name,
-      final TriggerEvent notification) throws BaseXException {
+  public void watchEvent(final String name,
+      final EventNotification notification) throws BaseXException {
     try {
       sout.write(10);
       send(name);
       final BufferInput bi = new BufferInput(sin);
       if(tsocket == null) {
-        // initialize trigger notifications
-        this.tn = new HashMap<String, TriggerEvent>();
+        // initialize event notifications
+        this.tn = new HashMap<String, EventNotification>();
         tsocket = new Socket();
         tsocket.connect(new InetSocketAddress(thost, tport), 5000);
         String id = bi.readString();
@@ -209,11 +209,11 @@ public final class ClientSession extends Session {
   }
 
   /**
-   * Detaches from a trigger.
-   * @param name trigger name
+   * Unwatch an event.
+   * @param name event name
    * @throws BaseXException exception
    */
-  public void detachTrigger(final String name) throws BaseXException {
+  public void unwatchEvent(final String name) throws BaseXException {
     try {
       sout.write(11);
       send(name);
@@ -227,17 +227,15 @@ public final class ClientSession extends Session {
   }
 
   /**
-   * Executes a trigger.
+   * Executes an event.
    * @param query query string
-   * @param name trigger name
-   * @param msg trigger notification
-   * @param mode kind of trigger
+   * @param name event name
+   * @param msg event notification
    * @throws BaseXException exception
    */
-  public void trigger(final String query, final String name,
-      final String msg, final String mode) throws BaseXException {
-    execute("xquery db:trigger(" + query + ", " + name + ", " + msg
-        + ", " + mode + ")");
+  public void event(final String query, final String name,
+      final String msg) throws BaseXException {
+    execute("xquery db:event(" + query + ", " + name + ", " + msg + ")");
   }
 
   /**
