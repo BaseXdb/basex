@@ -52,11 +52,8 @@ public interface Text {
   String VERSION = "6.6.3 beta";
   /** Company info. */
   String COMPANY = NAME + " Team";
-
-  /** Version information. */
-  String VERSINFO = lang("version");
   /** Title and version. */
-  String TITLE = NAME + ' ' + VERSINFO + ' ' + VERSION;
+  String TITLE = NAME + ' ' + VERSION;
 
   // CONSOLE INFO =============================================================
 
@@ -64,6 +61,8 @@ public interface Text {
   String CONSOLE = TITLE + " [%]" + NL;
   /** Console text. */
   String CONSOLE2 = lang("help_intro", "help") + NL;
+  /** Version information. */
+  String VERSINFO = lang("version");
 
   /** Goodbye information. */
   String[] CLIENTBYE = {
