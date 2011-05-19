@@ -1,4 +1,4 @@
-; Language Binding for BaseX.
+; Lisp client for BaseX.
 ; Works with BaseX 6.1
 ; Documentation: http://basex.org/api
 ; 

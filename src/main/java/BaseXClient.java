@@ -10,7 +10,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Language Binding for BaseX.
+ * Java client for BaseX.
  * Works with BaseX 6.3.1 and later
  * Documentation: http://basex.org/api
  *

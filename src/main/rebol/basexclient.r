@@ -1,5 +1,5 @@
 Rebol [ 
- Title: "Client for BaseX XML Database"
+ Title: "Rebol client for BaseX"
  Author: "Sabu Francis"
  Date: "March 10, 2010"
  LastUpdated: "June 5, 2010"
@@ -8,7 +8,7 @@ Rebol [
  License: "Perl Artistic License 2.0"
  LicenseTextUrl: http://www.perlfoundation.org/artistic_license_2_0
  
- Purpose: {"BaseX Native XML binding; works with BaseX 6.1"} 
+ Purpose: {"BaseX Rebol client; works with BaseX 6.1"} 
 
  ;following data are for www.rebol.org library 
  ;you can find a lot of rebol script there 

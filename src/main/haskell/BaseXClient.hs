@@ -8,7 +8,7 @@
 -- Stability   : experimental
 -- Portability : portable
 --
--- Language Binding for BaseX.
+-- Haskell client for BaseX.
 -- Works with BaseX 6.1
 --
 -- It requires the PureMD5 package fom Hackage: 'cabal install PureMD5'.

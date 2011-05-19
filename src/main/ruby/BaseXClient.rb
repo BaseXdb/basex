@@ -1,4 +1,4 @@
-# Language Binding for BaseX.
+# Ruby client for BaseX.
 # Works with BaseX 6.3.1 and later
 # Documentation: http://basex.org/api
 #

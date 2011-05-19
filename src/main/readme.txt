@@ -1,9 +1,9 @@
-BASEX LANGUAGE BINDINGS ========================================================
+BASEX CLIENTS ==================================================================
 
- In this directory, you find bindings to communicate with the database server
+ In this directory, you find clients to communicate with the database server
  in different programming languages. If your projects are based on other
- languages, or if you feel that the existing bindings could be improved:
- Feedback is welcome.
+ languages, or if you feel that the existing code could be improved: your
+ feedback is welcome!
 
  BaseX Team, 2011
 
@@ -19,17 +19,17 @@ DESCRIPTION --------------------------------------------------------------------
  database command as argument. The method returns the result or throws
  an exception with the received error message.
 
- To speedup execution, an output stream can be specified by some bindings; this
+ To speedup execution, an output stream can be specified by some clients; this
  way, all results will be directed to that output stream.
 
  The query() method creates a query object. Variables can be bound to that
  object, and the result can either be requested by execute(), or by the
  more() and next() methods. If an error occurs, an exception will be thrown.
 
- Next, some bindings contain the create() and add() method to create new
+ Next, some clients contain the create() and add() method to create new
  database instances or add documents to existing databases.
 
- Most bindings are accompanied by some example files, demonstrating how
+ Most clients are accompanied by some example files, demonstrating how
  database commands can be executed and how the query iterator can be used.
 
 CLASS STRUCTURE ----------------------------------------------------------------
