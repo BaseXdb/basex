@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
@@ -8,7 +9,8 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
 import org.basex.io.IO;
-import org.basex.util.TokenBuilder;
+import org.basex.util.Table;
+import org.basex.util.TokenList;
 
 /**
  * Evaluates the 'show backups' command and shows available backups.
@@ -26,24 +28,20 @@ public final class ShowBackups extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    final IO file = prop.dbpath();
-    final IO[] files = file.children();
-    int size = 0;
-    final TokenBuilder tmp = new TokenBuilder();
-    for(final IO f : files) {
-      if(f.name().endsWith(IO.ZIPSUFFIX)) {
-        tmp.add(NL + LI + f.name());
-        ++size;
-      }
+    final Table table = new Table();
+    table.desc = BACKUPS;
+    table.header.add(INFODBNAME);
+    table.header.add(INFODBSIZE);
+
+    for(final IO f : prop.dbpath().children()) {
+      if(!f.name().endsWith(IO.ZIPSUFFIX)) continue;
+      final TokenList tl = new TokenList();
+      tl.add(f.name());
+      tl.add(f.length());
+      table.contents.add(tl);
     }
-    final TokenBuilder tb = new TokenBuilder();
-    if(size == 0) {
-      tb.add(size + " Backup(s)" + DOT);
-    } else {
-      tb.add(size + " Backup(s)" + COL);
-      tb.add(tmp.toString());
-    }
-    out.println(tb.toString());
+    table.sort();
+    out.println(table.finish());
     return true;
   }
 

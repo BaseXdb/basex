@@ -205,6 +205,7 @@ ds_alterpw=Modifica parola chiave
 ds_invalid=% non valido
 ds_adlogin=Accesso dell'amministratore (locale o remoto)
 ds_databases=Basi di dati
+ds_backups=Backups
 ds_sessions=Sessioni
 ds_locallogs=Diari locali
 ds_connected=Connesso a %:%.

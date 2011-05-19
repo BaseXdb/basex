@@ -23,7 +23,7 @@ public abstract class NodeCopy extends Primitive {
   /** Nodes to be inserted. */
   protected final List<NodeCache> insert = new ArrayList<NodeCache>(1);
   /** Final copy of insertion nodes. */
-  public MemData md;
+  protected MemData md;
 
   /**
    * Constructor.
@@ -38,7 +38,8 @@ public abstract class NodeCopy extends Primitive {
 
   @Override
   public void prepare() throws QueryException {
-    if(insert.get(0).get(0) == null) return;
+    md = new MemData(((DBNode) node).data);
+
     // ignore fragment nodes
     if(!(node instanceof DBNode)) return;
 
@@ -46,12 +47,9 @@ public abstract class NodeCopy extends Primitive {
     for(final NodeCache nc : insert) {
       for(ANode i; (i = nc.next()) != null;) seq.add(i);
     }
-    if(node instanceof DBNode) {
-      // text nodes still need to be merged. two adjacent iterators may
-      // lead to two adjacent text nodes
-      md = new MemData(((DBNode) node).data);
-      new DataBuilder(md).build(mergeText(seq));
-    }
+    // text nodes still need to be merged. two adjacent iterators may
+    // lead to two adjacent text nodes
+    new DataBuilder(md).build(mergeText(seq));
   }
 
   /**
