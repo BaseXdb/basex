@@ -50,6 +50,9 @@ public final class OptimizeAll extends ACreate {
     final MetaData m = old.meta;
     size = m.size;
 
+    // check if database is also pinned by other users
+    if(context.datas.pins(m.name) > 1) return error(DBLOCKED, m.name);
+
     // find unique temporary database name
     final String tname = m.random();
 
@@ -74,7 +77,7 @@ public final class OptimizeAll extends ACreate {
 
     // delete the old database, move the new one into place and reopen it
     if(!run(new DropDB(m.name)) || !run(new AlterDB(tname, m.name)) ||
-        !run(new Open(m.name))) return false;
+       !run(new Open(m.name))) return false;
     error("");
     return info(DBOPTIMIZED, m.name, perf);
   }

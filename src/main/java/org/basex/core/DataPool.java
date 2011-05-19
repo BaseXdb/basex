@@ -58,8 +58,7 @@ public final class DataPool {
    * @return result of check
    */
   synchronized boolean pinned(final String db) {
-    for(final PData d : list)
-      if(d.data.meta.name.equals(db)) return true;
+    for(final PData d : list) if(d.data.meta.name.equals(db)) return true;
     return false;
   }
 
