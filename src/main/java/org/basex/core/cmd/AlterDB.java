@@ -28,18 +28,18 @@ public final class AlterDB extends Command {
   protected boolean run() {
     final String db = args[0];
     final String name = args[1];
-    if(!validName(db)) return error(NAMEINVALID, db);
-    if(!validName(name)) return error(NAMEINVALID, name);
+    // check if names are valid
+    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!validName(name, false)) return error(NAMEINVALID, name);
 
-    // DB does not exist
+    // database does not exist
     if(!prop.dbexists(db)) return error(DBNOTFOUND, db);
-    // Target DB exists already
+    // target database exists already
     if(prop.dbexists(name)) return error(DBEXISTS, name);
 
     // close database if it's currently opened and not opened by others
     final boolean closed = close(db);
-
-    // DB is currently locked
+    // database is currently locked
     if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to alter database

@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -12,8 +13,11 @@ import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.basex.core.Command;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Prop;
 import org.basex.core.User;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
 
 /**
@@ -22,7 +26,7 @@ import org.basex.io.IO;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Backup extends Command {
+public final class CreateBackup extends Command {
   /** Date format. */
   private static final SimpleDateFormat DATE = new SimpleDateFormat(
       "yyyy-MM-dd-HH-mm-ss");
@@ -35,18 +39,31 @@ public final class Backup extends Command {
    * Default constructor.
    * @param arg optional argument
    */
-  public Backup(final String arg) {
+  public CreateBackup(final String arg) {
     super(User.CREATE, arg);
   }
 
   @Override
   protected boolean run() {
-    final String db = args[0];
-    if(!validName(db)) return error(NAMEINVALID, db);
+    if(!validName(args[0], true)) return error(NAMEINVALID, args[0]);
 
-    // try to backup database
-    return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
-      backup(db, prop) ? info(DBBACKUP, db, perf) : error(DBNOBACKUP, db);
+    // retrieve all databases
+    final String[] dbs = databases(args[0]);
+    if(dbs.length == 0) return error(DBNOTFOUND, args[0]);
+
+    // loop through all databases
+    boolean ok = true;
+    for(final String db : dbs) {
+      if(!prop.dbpath(db).isDirectory()) continue;
+      if(backup(db, prop)) {
+        // backup was successful
+        info(DBBACKUP, db, perf);
+      } else {
+        info(DBNOBACKUP, db);
+        ok = false;
+      }
+    }
+    return ok;
   }
 
   /**
@@ -59,8 +76,8 @@ public final class Backup extends Command {
     ZipOutputStream zos = null;
     try {
       final File in = pr.dbpath(db);
-      final File file = new File(pr.get(Prop.DBPATH) + '/' + db + "-" +
-          DATE.format(new Date()) + IO.ZIPSUFFIX);
+      final File file = pr.dbpath(db + "-" + DATE.format(new Date()) +
+          IO.ZIPSUFFIX);
       final byte[] data = new byte[IO.BLOCKSIZE];
 
       // OutputStream for zipping
@@ -107,5 +124,10 @@ public final class Backup extends Command {
   @Override
   protected double prog() {
     return (double) of / tf;
+  }
+
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.CREATE + " " + CmdCreate.BACKUP).args();
   }
 }

@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -60,7 +59,7 @@ public final class TypeSwitch extends ParseExpr {
     for(int i = 1; i < cases.length; ++i) {
       eq &= cases[i - 1].expr.sameAs(cases[i].expr);
     }
-    if(eq) return optPre(Empty.SEQ, ctx);
+    if(eq) return optPre(null, ctx);
 
     // evaluate return type
     type = cases[0].type();

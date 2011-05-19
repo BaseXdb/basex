@@ -28,7 +28,7 @@ import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -100,7 +100,7 @@ public final class DialogServer extends Dialog {
   /** Combobox for log files. */
   private final BaseXCombo logc;
   /** String for log dir. */
-  private final String logdir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
+  private final File logdir = ctx.prop.dbpath(".logs");
   /** ClientSession. */
   private ClientSession cs;
   /** Boolean for check is server is running. */
@@ -120,7 +120,7 @@ public final class DialogServer extends Dialog {
     tabs.add(USERS, user);
     tabs.add(DATABASES, databases);
     tabs.add(SESSIONS, sess);
-    tabs.add(LOGS, logs);
+    tabs.add(LOCALLOGS, logs);
 
     // Server Tab
     conn.border(8).layout(new BorderLayout(0, 32));
@@ -334,12 +334,13 @@ public final class DialogServer extends Dialog {
       } else if(cmp == refreshLog || cmp == logc) {
         byte[] cont = Token.EMPTY;
         if(logc.getSelectedIndex() != -1) {
-          cont = IO.get(logdir + logc.getSelectedItem().toString()).content();
+          final File f = new File(logdir, logc.getSelectedItem().toString());
+          cont = new IOFile(f).content();
         }
         logt.setText(cont);
         logt.scrollToEnd();
       } else if(cmp == delete) {
-        final File f = new File(logdir + logc.getSelectedItem().toString());
+        final File f = new File(logdir, logc.getSelectedItem().toString());
         if(f.delete()) {
           logc.setSelectedIndex(-1);
           refreshLog();
@@ -350,7 +351,7 @@ public final class DialogServer extends Dialog {
       } else if(cmp == deleteAll) {
         File file = null;
         for(int i = 0; i < logc.getItemCount(); ++i) {
-          final File f = new File(logdir + logc.getItemAt(i).toString());
+          final File f = new File(logdir, logc.getItemAt(i).toString());
           if(!f.delete()) file = f;
         }
         if(file != null) {
@@ -431,8 +432,7 @@ public final class DialogServer extends Dialog {
    */
   void refreshLog() {
     logc.removeAllItems();
-    final File f = new File(logdir);
-    final String[] files = f.list();
+    final String[] files = logdir.list();
     final StringList sl = new StringList();
     if(files != null) {
       for(final String s : files) if(s.endsWith(".log")) sl.add(s);

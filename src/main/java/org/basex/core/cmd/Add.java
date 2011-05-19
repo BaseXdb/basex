@@ -132,7 +132,7 @@ public final class Add extends ACreate {
   }
 
   /**
-   * Adds a document to the database.
+   * Adds the specified input to the database.
    * @param parser parser instance
    * @param ctx database context
    * @param target target

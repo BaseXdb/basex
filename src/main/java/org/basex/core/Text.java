@@ -49,7 +49,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "";
+  String VERSION = "6.6.3 beta";
   /** Company info. */
   String COMPANY = "BaseX Team";
   /** Version information. */
@@ -196,11 +196,12 @@ public interface Text {
 
   /** Command help. */
   String[] HELPCREATE = {
-    "[" + CmdCreate.DATABASE + "|" +
-    CmdCreate.INDEX + "|" + CmdCreate.USER + "|" +
-    CmdCreate.TRIGGER + "] [...]",
+    "[" + CmdCreate.DATABASE + "|" + CmdCreate.INDEX + "|" +
+    CmdCreate.USER + "|" + CmdCreate.BACKUP + CmdCreate.TRIGGER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
+    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL +
+      "  " + lang("ch_create4", C_NAME) + NL +
     LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + C_INPUT + "]):"  + NL +
       "  " + lang("ch_create3", C_NAME, C_INPUT) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
@@ -231,7 +232,7 @@ public interface Text {
 
   /** Command help. */
   String[] HELPDELETE = {
-    "[" + C_NAME  + "]", lang("ch_delete1"), lang("ch_delete2")
+    "[" + C_PATH  + "]", lang("ch_delete1"), lang("ch_delete2")
   };
 
   /** Command help. */
@@ -260,19 +261,19 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "|"
-    + CmdDrop.TRIGGER + "] [...]",
+    "[" + CmdDrop.BACKUP + "|" + CmdDrop.DATABASE + "|" +
+    CmdDrop.INDEX + "|" + CmdDrop.USER + CmdDrop.TRIGGER + "] [...]",
     lang("ch_drop1"),
     lang("ch_drop2") + NL +
+    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
+      lang("ch_drop24", C_NAME) + NL +
     LI + CmdDrop.DATABASE + " [" + C_NAME + "]:" + NL +
       "  " + lang("ch_drop21") + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
-    LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [db]): " + NL + "  " +
-      lang("ch_drop23") + NL +
-    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
-      lang("ch_drop24", C_NAME) + NL +
+    LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [database]): " + NL +
+      "  " + lang("ch_drop23") +
     LI + CmdDrop.TRIGGER + " [" + C_NAME + "]:" + NL + "  " +
       lang("ch_drop25", C_NAME)
   };
@@ -291,7 +292,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPFIND = {
-    "[" + C_QUERY + "]", lang("ch_find1"), lang("ch_find2")
+    "[keywords]", lang("ch_find1"), lang("ch_find2")
   };
   /** Command help. */
   String[] HELPRUN = {
@@ -307,10 +308,6 @@ public interface Text {
     "[" + C_NAME + "]", lang("ch_kill1"), lang("ch_kill2")
   };
   /** Command help. */
-  String[] HELPBACKUP = {
-    "[" + C_NAME + "]", lang("ch_backup1"), lang("ch_backup2")
-  };
-  /** Command help. */
   String[] HELPRESTORE = {
     "[" + C_NAME + "-(date)]", lang("ch_restore1"), lang("ch_restore2")
   };
@@ -322,27 +319,27 @@ public interface Text {
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
-    LI + CmdShow.USERS + " (" + ON + " [db]): " + lang("ch_show24") + NL +
+    LI + CmdShow.USERS + " (" + ON + " [database]): " + lang("ch_show24") + NL +
     LI + CmdShow.BACKUPS + ": " + lang("ch_show25") + NL +
     LI + CmdShow.TRIGGERS + ": " + lang("ch_show26")
   };
   /** Command help. */
   String[] HELPGRANT = {
     "[" + CmdPerm.NONE + "|" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
-    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [db]) " + TO +
+    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [database]) " + TO +
     " [user]",
     lang("ch_grant1"),
     lang("ch_grant2")
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + CmdCreate.USER + "|" + CmdCreate.DATABASE + "] [...]",
+    "[" + CmdCreate.DATABASE + "|" + CmdCreate.USER + "] [...]",
     lang("ch_alter1"),
     lang("ch_alter2") + NL  +
-    LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
-    "  " + lang("ch_alterpw") + NL +
     LI + CmdCreate.DATABASE + " [" + C_NAME + "] [newname]" + NL +
-    "  " + lang("ch_alterdb")
+    "  " + lang("ch_alterdb") + NL +
+    LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
+    "  " + lang("ch_alterpw")
   };
 
   /** Command help. */
@@ -397,7 +394,7 @@ public interface Text {
   /** Out of memory error due to database creation. */
   String PROCMEMCREATE = lang("proc_memcreate");
   /** Progress exception. */
-  String PROGERR = "Interrupted";
+  String PROGERR = "Interrupted" + DOT;
 
   /** Unknown command error. */
   String CMDNO = lang("cmd_no");
@@ -607,12 +604,16 @@ public interface Text {
   String PERMNO = lang("ad_permno");
   /** Invalid permissions. */
   String PERMINV = lang("ad_perminv");
-  /** Permission updated. */
-  String PERMUP = lang("ad_permup");
+  /** Permission granted. */
+  String GRANT = lang("ad_grant");
+  /** Permission granted on database. */
+  String GRANTON = lang("ad_granton");
   /** User not found. */
   String USERNO = lang("ad_userno");
   /** User dropped. */
   String USERDROP = lang("ad_userdrop");
+  /** User dropped from database. */
+  String USERDROPON = lang("ad_userdropon");
   /** User is logged in. */
   String USERLOG = lang("ad_userlog");
   /** User added. */
@@ -1222,7 +1223,7 @@ public interface Text {
   /** Sessions. */
   String SESSIONS = lang("ds_sessions");
   /** Logs. */
-  String LOGS = lang("ds_logs");
+  String LOCALLOGS = lang("ds_locallogs");
   /** Connected. */
   String CONNECTED = lang("ds_connected");
   /** Disconnected. */

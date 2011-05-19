@@ -10,15 +10,16 @@ import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
+import org.basex.core.Commands.CmdOptimize;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.AlterUser;
-import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Copy;
+import org.basex.core.cmd.CreateBackup;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.CreateTrigger;
@@ -56,6 +57,7 @@ import org.basex.core.cmd.ShowSessions;
 import org.basex.core.cmd.ShowTriggers;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
+import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
@@ -140,6 +142,8 @@ public final class CommandParser extends InputParser {
     switch(cmd) {
       case CREATE:
         switch(consume(CmdCreate.class, cmd)) {
+          case BACKUP:
+            return new CreateBackup(glob(cmd));
           case DATABASE: case DB:
             return new CreateDB(name(cmd), s ? remaining(null) : string(null));
           case INDEX:
@@ -193,19 +197,25 @@ public final class CommandParser extends InputParser {
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:
-            return new DropDB(name(cmd));
+            return new DropDB(glob(cmd));
           case INDEX:
             return new DropIndex(consume(CmdIndex.class, cmd));
           case USER:
-            return new DropUser(name(cmd), key(ON, null) ? name(cmd) : null);
+            return new DropUser(glob(cmd), key(ON, null) ? glob(cmd) : null);
           case BACKUP:
-            return new DropBackup(name(cmd));
+            return new DropBackup(glob(cmd));
           case TRIGGER:
             return new DropTrigger(name(cmd));
         }
         break;
       case OPTIMIZE:
-        return key(ALL, null) ? new OptimizeAll() : new Optimize();
+        switch(consume(CmdOptimize.class, cmd)) {
+          case NULL:
+            return new Optimize();
+          case ALL:
+            return new OptimizeAll();
+        }
+        break;
       case EXPORT:
         return new Export(string(cmd));
       case XQUERY:
@@ -239,9 +249,7 @@ public final class CommandParser extends InputParser {
       case EXIT:
         return new Exit();
       case KILL:
-        return new Kill(name(cmd));
-      case BACKUP:
-        return new Backup(name(cmd));
+        return new Kill(glob(cmd));
       case RESTORE:
         return new Restore(name(cmd));
       case SHOW:
@@ -262,10 +270,9 @@ public final class CommandParser extends InputParser {
       case GRANT:
         final CmdPerm perm = consume(CmdPerm.class, cmd);
         if(perm == null) throw help(null, cmd);
-        final String db = key(ON, null) ? name(cmd) : null;
+        final String db = key(ON, null) ? glob(cmd) : null;
         key(TO, cmd);
-        return db == null ? new Grant(perm, name(cmd)) :
-          new Grant(perm, name(cmd), db);
+        return new Grant(perm, glob(cmd), db);
       default:
     }
     return null;
@@ -343,6 +350,26 @@ public final class CommandParser extends InputParser {
     final TokenBuilder tb = new TokenBuilder();
     while(letterOrDigit(curr()) || curr('-')) tb.add(consume());
     return finish(cmd, !more() || curr(';') || ws(curr()) ? tb : null);
+  }
+
+  /**
+   * Parses and returns a glob expression, which extends the {@link #name}
+   * with asterisks, question marks and commands. See {@link IOFile#regex}
+   * for more details.
+   * @param cmd referring command; if specified, the result must not be empty
+   * @return glob expression
+   * @throws QueryException query exception
+   */
+  private String glob(final Cmd cmd) throws QueryException {
+    consumeWS();
+    final TokenBuilder tb = new TokenBuilder();
+    while(true) {
+      final char c = curr();
+      if(!letterOrDigit(c) && c != '-' && c != '*' && c != '?' && c != ',') {
+        return finish(cmd, !more() || curr(';') || ws(curr()) ? tb : null);
+      }
+      tb.add(consume());
+    }
   }
 
   /**

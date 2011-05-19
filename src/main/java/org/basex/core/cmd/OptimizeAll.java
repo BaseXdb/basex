@@ -15,6 +15,7 @@ import org.basex.data.FTPos;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.io.IO;
 import org.basex.util.Atts;
 import org.basex.util.Util;
 
@@ -72,8 +73,10 @@ public final class OptimizeAll extends ACreate {
     }
 
     // delete the old database, move the new one into place and reopen it
-    return run(new DropDB(m.name)) && run(new AlterDB(tname, m.name)) &&
-        run(new Open(m.name)) && info(DBOPTIMIZED, m.name, perf);
+    if(!run(new DropDB(m.name)) || !run(new AlterDB(tname, m.name)) ||
+        !run(new Open(m.name))) return false;
+    error("");
+    return info(DBOPTIMIZED, m.name, perf);
   }
 
   @Override
@@ -105,7 +108,7 @@ public final class OptimizeAll extends ACreate {
   public final class DBParser extends Parser {
     /** Constructor. */
     protected DBParser() {
-      super(old.meta.path, "");
+      super(old.meta.path.isEmpty() ? null : IO.get(old.meta.path), "");
     }
 
     @Override

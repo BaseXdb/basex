@@ -243,7 +243,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.query != null && gui.query.modified());
+      b.setEnabled(gui.query != null && gui.query.saveable());
     }
   },
 
@@ -365,7 +365,7 @@ public enum GUICommands implements GUICommand {
 
       final StringList sl = insert.result;
       final NodeType type = ANode.type(insert.kind);
-      String item = Token.string(type.nam) + " { " + quote(sl.get(0)) + " }";
+      String item = Token.string(type.nam()) + " { " + quote(sl.get(0)) + " }";
 
       if(type == NodeType.ATT || type == NodeType.PI) {
         item += " { " + quote(sl.get(1)) + " }";

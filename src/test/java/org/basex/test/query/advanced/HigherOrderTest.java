@@ -90,5 +90,4 @@ public class HigherOrderTest extends AdvancedQueryTest {
       assertTrue(e.getMessage(), e.getMessage().contains("XPST0003"));
     }
   }
-
 }

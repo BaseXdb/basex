@@ -11,7 +11,7 @@ import org.basex.util.InputInfo;
 /**
  * Literal function item.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public class LitFunc extends Func {
@@ -44,5 +44,4 @@ public class LitFunc extends Func {
     final int par = str.indexOf('(');
     return (par > -1 ? str.substring(0, par) : str) + "#" + args.length;
   }
-
 }

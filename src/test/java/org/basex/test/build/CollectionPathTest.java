@@ -7,7 +7,6 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.query.QueryProcessor;
-import org.basex.query.item.Item;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -91,10 +90,7 @@ public final class CollectionPathTest {
       "for $x in collection('" + DBNAME + "/etc/xml/xmark.xml') " +
       "return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
-    final Item it = qp.iter().next();
-    final String expath = '"' + CONTEXT.data.meta.path.url().replace(DBNAME, "")
-        + FILES[1] + '"';
-    assertEquals(expath, it.toString());
+    assertEquals(FILES[1], qp.iter().next().toJava());
     qp.close();
   }
 }

@@ -223,8 +223,6 @@ public interface QueryTokens {
   /** Parser token. */
   String SCORE = "score";
   /** Parser token. */
-  String SCORED = "scored";
-  /** Parser token. */
   String SENSITIVE = "sensitive";
   /** Parser token. */
   String SENTENCE = "sentence";
@@ -545,4 +543,8 @@ public interface QueryTokens {
   byte[] MAX = token("max");
   /** Minimum . */
   byte[] INF = token("inf");
+  /** Query Plan. */
+  byte[] ENTRY = token("entry");
+  /** Query Plan. */
+  byte[] KEY = token("key");
 }

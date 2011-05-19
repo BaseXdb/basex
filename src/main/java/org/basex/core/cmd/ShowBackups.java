@@ -1,14 +1,13 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.File;
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
+import org.basex.io.IO;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -27,13 +26,13 @@ public final class ShowBackups extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    final File file = new File(prop.get(Prop.DBPATH));
-    final File[] files = file.listFiles();
+    final IO file = prop.dbpath();
+    final IO[] files = file.children();
     int size = 0;
     final TokenBuilder tmp = new TokenBuilder();
-    for(final File f : files) {
-      if(f.getName().endsWith(".zip")) {
-        tmp.add(NL + LI + f.getName());
+    for(final IO f : files) {
+      if(f.name().endsWith(IO.ZIPSUFFIX)) {
+        tmp.add(NL + LI + f.name());
         ++size;
       }
     }

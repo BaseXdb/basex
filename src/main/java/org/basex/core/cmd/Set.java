@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
+
+import org.basex.core.User;
 import org.basex.util.Util;
 
 /**
@@ -23,7 +25,8 @@ public final class Set extends AGet {
    * @param value value to set (optional, depending on the property)
    */
   public Set(final Object key, final Object value) {
-    super((key instanceof Object[] ? ((Object[]) key)[0] : key).toString(),
+    super(User.WRITE, (key instanceof Object[] ?
+        ((Object[]) key)[0] : key).toString(),
         value == null ? null : value.toString());
   }
 

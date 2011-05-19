@@ -176,7 +176,7 @@ public final class QueryContext extends Progress {
     nodes = ctx.current;
     ftopt = new FTOpt();
     xquery3 = ctx.prop.is(Prop.XQUERY3);
-    inf = ctx.prop.is(Prop.QUERYINFO);
+    inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
 
   }
@@ -442,16 +442,10 @@ public final class QueryContext extends Progress {
     if(serProp != null) return serProp;
 
     final String serial = context.prop.get(Prop.SERIALIZER);
-    final boolean wrap = context.prop.is(Prop.WRAPOUTPUT);
-    if(opt && serial.isEmpty() && !wrap) return null;
+    if(opt && serial.isEmpty()) return null;
 
     // otherwise, apply global serialization option
-    final SerializerProp sp = new SerializerProp(serial);
-    if(wrap) {
-      sp.set(SerializerProp.S_WRAP_PREFIX, NAMELC);
-      sp.set(SerializerProp.S_WRAP_URI, URL);
-    }
-    return sp;
+    return new SerializerProp(serial);
   }
 
   @Override

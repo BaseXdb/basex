@@ -34,7 +34,7 @@ public final class ListDB extends Command {
       path = db.substring(i + 1);
       db = db.substring(0, i);
     }
-    if(!validName(db)) return error(NAMEINVALID, db);
+    if(!validName(db, false)) return error(NAMEINVALID, db);
 
     final Table table = new Table();
     table.desc = INFONDOCS;

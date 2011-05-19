@@ -23,30 +23,37 @@ public final class DBNodeSeq extends Seq {
   public final Data data;
   /** Pre values. */
   public final int[] pres;
+  /** Complete. */
+  public boolean complete;
 
   /**
    * Constructor.
    * @param p pre values
    * @param d data reference
    * @param t node type
+   * @param c indicates if pre values include all document nodes
    */
-  private DBNodeSeq(final int[] p, final Data d, final Type t) {
+  private DBNodeSeq(final int[] p, final Data d, final Type t,
+      final boolean c) {
     super(p.length, t);
     pres = p;
     data = d;
+    complete = c;
   }
 
   /**
-   * Returns a value for the specified items.
-   * @param v value
+   * Creates a node sequence with the given data reference and pre values.
+   * @param v pre values
    * @param d data reference
-   * @param r root flag
+   * @param docs indicates if all values reference document nodes
+   * @param c indicates if values include all document nodes
    * @return resulting item or sequence
    */
-  public static Value get(final int[] v, final Data d, final boolean r) {
+  public static Value get(final int[] v, final Data d, final boolean docs,
+      final boolean c) {
     final int s = v.length;
     return s == 0 ? Empty.SEQ : s == 1 ? new DBNode(d, v[0]) :
-      new DBNodeSeq(v, d, r ? NodeType.DOC : NodeType.NOD);
+      new DBNodeSeq(v, d, docs ? NodeType.DOC : NodeType.NOD, c);
   }
 
   @Override

@@ -28,7 +28,7 @@ public final class Log {
   /** Quiet flag. */
   private final boolean quiet;
   /** Logging directory. */
-  private final String dir;
+  private final File dir;
 
   /** Start date of log. */
   private String start;
@@ -41,7 +41,7 @@ public final class Log {
    * @param q quiet flag (no logging)
    */
   public Log(final Context ctx, final boolean q) {
-    dir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
+    dir = ctx.prop.dbpath(".logs");
     quiet = q;
     if(!q) create(new Date());
   }
@@ -82,10 +82,10 @@ public final class Log {
    * @param d date, used for file name
    */
   private synchronized void create(final Date d) {
-    new File(dir).mkdirs();
+    dir.mkdirs();
     start = DATE.format(d);
     try {
-      fos = new FileOutputStream(dir + start + ".log", true);
+      fos = new FileOutputStream(new File(dir, start + ".log"), true);
     } catch(final IOException ex) {
       Util.stack(ex);
     }

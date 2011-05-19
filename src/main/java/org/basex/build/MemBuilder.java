@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.io.IO;
 
 /**
  * This class creates a memory based database instance.
@@ -58,7 +59,10 @@ public final class MemBuilder extends Builder {
     meta.textindex = true;
     meta.attrindex = true;
     meta.ftindex = false;
-    meta.path = parser.file;
+    final IO file = parser.file;
+    meta.path = file != null ? file.path() : "";
+    meta.filesize = file != null ? file.length() : 0;
+    meta.time = file != null ? file.date() : System.currentTimeMillis();
 
     parse(name);
     data.init();

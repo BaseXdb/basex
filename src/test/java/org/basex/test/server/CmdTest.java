@@ -34,7 +34,7 @@ public class CmdTest {
   /** Test name. */
   private static final String NAME = Util.name(CmdTest.class);
   /** Test name. */
-  private static final String USER = NAME + "2";
+  private static final String NAME2 = NAME + "2";
   /** Socket reference. */
   static Session session;
 
@@ -57,8 +57,8 @@ public class CmdTest {
   public final void setUp() {
     try {
       session.execute(new DropDB(NAME));
-      session.execute(new DropDB(USER));
-      session.execute(new DropUser(USER));
+      session.execute(new DropDB(NAME2));
+      session.execute(new DropUser(NAME2));
     } catch(final BaseXException ex) {
     }
   }
@@ -80,31 +80,19 @@ public class CmdTest {
   @Test
   public final void alterDB() {
     ok(new CreateDB(NAME));
-    ok(new AlterDB(NAME, USER));
+    ok(new AlterDB(NAME, NAME2));
     ok(new Close());
-    no(new AlterDB(NAME, USER));
-    no(new AlterDB(USER, "!"));
-    no(new AlterDB("!", USER));
+    no(new AlterDB(NAME, NAME2));
+    no(new AlterDB(NAME2, "!"));
+    no(new AlterDB("!", NAME2));
   }
 
   /** Command test. */
   @Test
   public final void alterUser() {
-    ok(new CreateUser(USER, USER));
-    ok(new AlterUser(USER, "test"));
-    no(new AlterUser(":", USER));
-  }
-
-  /** Command test. */
-  @Test
-  public final void backup() {
-    no(new Backup(NAME));
-    ok(new CreateDB(NAME));
-    ok(new Backup(NAME));
-    ok(new Close());
-    ok(new Backup(NAME));
-    ok(new DropBackup(NAME));
-    no(new Restore(":"));
+    ok(new CreateUser(NAME2, NAME2));
+    ok(new AlterUser(NAME2, "test"));
+    no(new AlterUser(":", NAME2));
   }
 
   /** Command test. */
@@ -114,6 +102,23 @@ public class CmdTest {
     ok(new Close());
     ok(new CreateDB(NAME, FILE));
     ok(new Close());
+  }
+
+  /** Command test. */
+  @Test
+  public final void createBackup() {
+    no(new CreateBackup(NAME));
+    ok(new CreateDB(NAME));
+    ok(new CreateDB(NAME2));
+    ok(new CreateBackup(NAME));
+    ok(new Close());
+    ok(new Restore(NAME));
+    ok(new CreateBackup(NAME));
+    ok(new DropBackup(NAME));
+    ok(new CreateBackup(NAME + "*"));
+    ok(new Restore(NAME2));
+    ok(new DropBackup(NAME + "*"));
+    no(new Restore(":"));
   }
 
   /** Command test. */
@@ -144,9 +149,9 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void createUser() {
-    ok(new CreateUser(USER, "test"));
-    no(new CreateUser(USER, "test"));
-    ok(new DropUser(USER));
+    ok(new CreateUser(NAME2, "test"));
+    no(new CreateUser(NAME2, "test"));
+    ok(new DropUser(NAME2));
     no(new CreateUser("", ""));
     no(new CreateUser(":", ""));
   }
@@ -183,9 +188,13 @@ public class CmdTest {
   public final void dropDB() {
     ok(new DropDB(NAME));
     ok(new CreateDB(NAME, FILE));
-    ok(new DropDB(USER));
+    ok(new DropDB(NAME2));
     ok(new DropDB(NAME));
     ok(new DropDB(NAME));
+    ok(new CreateDB(NAME));
+    ok(new CreateDB(NAME2));
+    ok(new DropDB(NAME + "*"));
+    no(new Open(NAME2));
     no(new DropDB(":"));
     no(new DropDB(""));
   }
@@ -202,11 +211,12 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void dropUser() {
-    ok(new CreateUser(USER, "test"));
-    no(new DropUser(USER, ":"));
-    ok(new DropUser(USER));
-    no(new DropUser(USER));
+    ok(new CreateUser(NAME, "test"));
+    ok(new CreateUser(NAME2, "test"));
+    ok(new DropUser(NAME));
+    ok(new DropUser(NAME + "*"));
     no(new DropUser(""));
+    no(new DropUser(NAME2, ":"));
   }
 
   /** Command test. */
@@ -232,17 +242,17 @@ public class CmdTest {
   @Test
   public final void get() {
     ok(new Get(CmdSet.CHOP));
-    no(new Get(USER));
+    no(new Get(NAME2));
   }
 
   /** Command test. */
   @Test
   public final void grant() {
-    ok(new CreateUser(USER, "test"));
-    no(new Grant("something", USER));
-    ok(new Grant("none", USER));
-    no(new Grant("all", USER));
-    ok(new DropUser(USER));
+    ok(new CreateUser(NAME2, "test"));
+    no(new Grant("something", NAME2));
+    ok(new Grant("none", NAME2));
+    no(new Grant("all", NAME2));
+    ok(new DropUser(NAME2));
   }
 
   /** Command test. */
@@ -288,8 +298,8 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void kill() {
-    ok(new Kill("hans"));
     no(new Kill("admin"));
+    no(new Kill("hans"));
   }
 
   /** Command test. */
@@ -340,7 +350,7 @@ public class CmdTest {
   public final void restore() {
     no(new Restore(NAME));
     ok(new CreateDB(NAME));
-    ok(new Backup(NAME));
+    ok(new CreateBackup(NAME));
     ok(new Restore(NAME));
     no(new Restore(":"));
     ok(new DropBackup(NAME));
@@ -349,7 +359,7 @@ public class CmdTest {
     no(new Restore(NAME));
     ok(new XQuery("."));
     ok(new CreateDB("test-1"));
-    ok(new Backup("test-1"));
+    ok(new CreateBackup("test-1"));
     ok(new Restore("test-1"));
     ok(new DropBackup("test"));
     no(new Restore("test"));
@@ -383,7 +393,7 @@ public class CmdTest {
     ok(new Set("chop", true));
     ok(new Set("runs", 1));
     no(new Set("runs", true));
-    no(new Set(USER, USER));
+    no(new Set(NAME2, NAME2));
   }
 
   /** Command test. */

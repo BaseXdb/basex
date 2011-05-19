@@ -9,6 +9,7 @@ import org.basex.query.item.FunType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
+import org.basex.query.item.map.Map;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Array;
@@ -18,7 +19,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Function call.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public final class DynFunCall extends Arr {
@@ -40,6 +41,10 @@ public final class DynFunCall extends Arr {
       final FunType ft = (FunType) t;
       if(ft.ret != null) type = ft.ret;
     }
+
+    if(values() && expr[expr.length - 1] instanceof Map)
+      return optPre(value(ctx), ctx);
+
     return this;
   }
 

@@ -71,7 +71,7 @@ abstract class ACreate extends Command {
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
-    if(!validName(db)) return error(NAMEINVALID, db);
+    if(!validName(db, false)) return error(NAMEINVALID, db);
 
     // close open database
     new Close().run(context);

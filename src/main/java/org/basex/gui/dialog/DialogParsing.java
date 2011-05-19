@@ -101,8 +101,8 @@ public final class DialogParsing extends BaseXBack {
     parser.setSelectedItem(prop.get(Prop.PARSER));
 
     intparse = new BaseXCheckBox(CREATEINTPARSE, prop.is(Prop.INTPARSE), 0, d);
-    entities = new BaseXCheckBox(CREATEENTITIES, prop.is(Prop.ENTITY), d);
-    dtd = new BaseXCheckBox(CREATEDTD, prop.is(Prop.DTD), 12, d);
+    dtd = new BaseXCheckBox(CREATEDTD, prop.is(Prop.DTD), d);
+    entities = new BaseXCheckBox(CREATEENTITIES, prop.is(Prop.ENTITY), 12, d);
     chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, d);
     cfile = new BaseXTextField(prop.get(Prop.CATFILE), d);
     browsec = new BaseXButton(BUTTONBROWSE, d);
@@ -136,8 +136,8 @@ public final class DialogParsing extends BaseXBack {
   void createOptionsPanels() {
     xmlopts.add(intparse);
     xmlopts.add(new BaseXLabel(INTPARSEINFO, true, false));
-    xmlopts.add(entities);
     xmlopts.add(dtd);
+    xmlopts.add(entities);
     xmlopts.add(chop);
     xmlopts.add(new BaseXLabel(CHOPPINGINFO, false, false).border(0, 0, 8, 0));
     xmlopts.add(new BaseXLabel());
@@ -237,7 +237,6 @@ public final class DialogParsing extends BaseXBack {
       final boolean uc = usecat.isSelected();
       intparse.setEnabled(!uc);
       entities.setEnabled(ip);
-      dtd.setEnabled(ip);
       usecat.setEnabled(!ip && CatalogResolverWrapper.available());
       cfile.setEnabled(uc);
       browsec.setEnabled(uc);

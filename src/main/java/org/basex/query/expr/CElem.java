@@ -168,6 +168,6 @@ public final class CElem extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.ELM.nam) + " { " + tag + " }");
+    return toString(Token.string(NodeType.ELM.nam()) + " { " + tag + " }");
   }
 }

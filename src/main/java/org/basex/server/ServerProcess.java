@@ -194,7 +194,7 @@ public final class ServerProcess extends Thread {
         } catch(final BaseXException ex) {
           ok = false;
           info = ex.getMessage();
-          if(info.equals(PROGERR)) info = SERVERTIMEOUT;
+          if(info.startsWith(PROGERR)) info = SERVERTIMEOUT;
         }
         // stop timeout
         cmd.stopTimeout();
@@ -230,7 +230,7 @@ public final class ServerProcess extends Thread {
     try {
       final WrapInputStream is = new WrapInputStream(in);
       final String info = is.curr() == -1 ?
-        CreateDB.xml(name, Parser.emptyParser(name), context) :
+        CreateDB.xml(name, Parser.emptyParser(), context) :
         CreateDB.xml(name, is, context);
       // send {MSG}0 and 0 as success flag
       out.writeString(info);
@@ -282,7 +282,7 @@ public final class ServerProcess extends Thread {
   private void attach() throws IOException {
     final String name = in.readString();
     if(triggers == null) {
-      out.writeString(String.valueOf(this.getId()));
+      out.writeString((new Long(this.getId())).toString());
       triggers = new ArrayList<String>();
     }
     if(context.triggers.attach(name, this)) {

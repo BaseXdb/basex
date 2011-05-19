@@ -169,7 +169,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   }
 
   /**
-   * Re-adds the dragged view.
+   * Adds the dragged view after if it has been removed.
    * @param lay layout instance
    * @return true if component was successfully added
    */

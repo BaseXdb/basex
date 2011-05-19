@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
 public final class InfoDB extends AInfo {
   /** Date format. */
   private static final SimpleDateFormat DATE =
-    new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+    new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
   /**
    * Default constructor.
@@ -60,9 +60,10 @@ public final class InfoDB extends AInfo {
 
     tb.add(NL);
     tb.addExt(header, INFOCREATE);
-    if(create) format(tb, INFOPATH, meta.path.path());
     format(tb, INFOTIME, DATE.format(new Date(meta.time)));
-    format(tb, INFODOCSIZE, Performance.format(meta.filesize));
+    if(create && !meta.path.isEmpty()) format(tb, INFOPATH, meta.path);
+    if(meta.filesize != 0)
+      format(tb, INFODOCSIZE, Performance.format(meta.filesize));
     format(tb, INFOENCODING, meta.encoding);
     format(tb, INFONDOCS, Integer.toString(meta.ndocs));
     format(tb, INFOCHOP, flag(meta.chop));

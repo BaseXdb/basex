@@ -80,7 +80,6 @@ public final class PermissionTest {
     ok(new Close(), adminSession);
     ok(new Grant("none", NAME), adminSession);
 
-    ok(new Set(CmdSet.QUERYINFO, false), testSession);
     ok(new Password(NAME), testSession);
     ok(new Help("list"), testSession);
     ok(new Close(), testSession);
@@ -146,6 +145,7 @@ public final class PermissionTest {
     ok(new Grant("write", NAME), adminSession);
 
     // XQuery Update
+    ok(new Set(CmdSet.QUERYINFO, false), testSession);
     ok(new XQuery("for $item in doc('" + NAME + "')//xml return rename" +
         " node $item as 'null'"), testSession);
     ok(new Optimize(), testSession);

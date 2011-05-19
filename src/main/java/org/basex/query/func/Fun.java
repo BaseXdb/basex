@@ -16,7 +16,7 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * Skeleton for pre-defined functions.
+ * Pre-defined functions.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

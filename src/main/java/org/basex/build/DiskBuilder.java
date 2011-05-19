@@ -58,10 +58,10 @@ public final class DiskBuilder extends Builder {
     prop.dbpath(name).mkdirs();
 
     meta = new MetaData(name, prop);
-    meta.path = parser.file;
-    meta.filesize = meta.path.length();
-    meta.time = meta.path.date();
-    if(meta.time == 0) meta.time = System.currentTimeMillis();
+    final IO file = parser.file;
+    meta.path = file != null ? file.path() : "";
+    meta.filesize = file != null ? file.length() : 0;
+    meta.time = file != null ? file.date() : System.currentTimeMillis();
 
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final Runtime rt = Runtime.getRuntime();

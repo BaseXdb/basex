@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 
 import java.io.IOException;
 
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Export;
 import org.basex.data.Data;
@@ -175,9 +176,10 @@ final class DBPrimitives extends Primitives {
     if(first > -1) mergeTexts(par, first);
     d.flush();
 
-    if(d.meta.prop.is(Prop.WRITEBACK)) {
+    if(d.meta.prop.is(Prop.WRITEBACK) && !d.meta.path.isEmpty()) {
       try {
-        Export.export(ctx.context, d);
+        final Context c = ctx.context;
+        Export.export(c.prop, d, d.meta.path);
       } catch(final IOException ex) {
         UPPUTERR.thrw(null, d.meta.path);
       }
