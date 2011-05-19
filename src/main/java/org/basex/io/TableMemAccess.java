@@ -156,6 +156,11 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
+  public void delete(final int pre, final int nr) {
+    move(pre + nr, pre);
+  }
+
+  @Override
   public void replace(final int pre, final byte[] entries, final int sub) {
     final int nsize = entries.length >>> IO.NODEPOWER;
     final int rpre = pre + nsize;
@@ -170,8 +175,8 @@ public final class TableMemAccess extends TableAccess {
     dirty = true;
 
     // handle the remaining entries if the two subtrees are of different size
-    // case1: new subtree bigger than old one, insert remaining new nodes
     if(diff < 0) {
+      // case1: new subtree bigger than old one, insert remaining new nodes
       final byte[] tmp = new byte[entries.length - off];
       System.arraycopy(entries, off, tmp, 0, tmp.length);
       insert(max, tmp);
@@ -179,11 +184,6 @@ public final class TableMemAccess extends TableAccess {
       // case2: old subtree bigger than new one, delete remaining old nodes
       delete(max, diff);
     }
-  }
-
-  @Override
-  public void delete(final int pre, final int nr) {
-    move(pre + nr, pre);
   }
 
   @Override
