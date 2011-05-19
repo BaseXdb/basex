@@ -6,7 +6,6 @@ import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -37,7 +36,7 @@ public final class FastReplaceTest {
   public void setUp() throws Exception {
     new CreateDB(DBNAME, DOC).execute(CONTEXT);
     new XQuery("let $items := /site/regions//item " +
-        "for $i in 1 to 5 " +
+        "for $i in 1 to 0 " +
         "return (insert node $items into /site/regions, " +
         "insert node $items before /site/regions, " +
         "insert node $items after /site/closed_auctions)").execute(CONTEXT);
@@ -224,6 +223,10 @@ public final class FastReplaceTest {
     final Prop p = CONTEXT.prop;
     p.set(Prop.TEXTINDEX, false);
     p.set(Prop.ATTRINDEX, false);
+    /* Running this junit test in main memory doesn't make that much sense as
+     * updates in main memory are non persistent - assertions will fail.
+       Just for debugging purposes. */
+//    p.set(Prop.MAINMEM, true);
   }
 
   /**
@@ -231,11 +234,11 @@ public final class FastReplaceTest {
    */
   @AfterClass
   public static void end() {
-    try {
-      new DropDB(DBNAME).execute(CONTEXT);
-    } catch(final BaseXException e) {
-      e.printStackTrace();
-    }
+//    try {
+//      new DropDB(DBNAME).execute(CONTEXT);
+//    } catch(final BaseXException e) {
+//      e.printStackTrace();
+//    }
     CONTEXT.close();
   }
 }
