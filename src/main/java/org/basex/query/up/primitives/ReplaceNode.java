@@ -44,13 +44,13 @@ public final class ReplaceNode extends NodeCopy {
     } else {
       /* Checks if fast replace is possible - documents containing namespaces
        * are not supported so far. */
-//      if(d.ns.size() == 0 && md.ns.size() == 0) {
-//        d.replace(pre, md);
-//      } else {
+      if(d.ns.size() == 0 && md.ns.size() == 0) {
+        d.replace(pre, md);
+      } else {
         d.delete(pre);
         if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
         else d.insert(pre, par, md);
-//      }
+      }
 
       // text merging applies for both replace methods
       if(!mergeTexts(d, pre - 1, pre)) {

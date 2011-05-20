@@ -531,6 +531,8 @@ public abstract class Data {
     // attribute indexes (..which should be the default case..) we might be
     // able to speed up the copy process even more
 
+    meta.update();
+
     // check if attribute size of parent must be updated
     final boolean rAtt = kind(rpre) == ATTR;
 
