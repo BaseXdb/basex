@@ -1,6 +1,8 @@
 package org.basex.test.w3c;
 
 import java.util.HashMap;
+
+import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
@@ -43,6 +45,8 @@ public final class XQFTTS extends W3CTS {
    */
   public XQFTTS() {
     super(Util.name(XQFTTS.class));
+    context.prop.set(Prop.FTINDEX, true);
+    context.prop.set(Prop.FORCECREATE, true);
   }
 
   @Override
