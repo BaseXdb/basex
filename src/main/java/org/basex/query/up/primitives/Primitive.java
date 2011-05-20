@@ -99,8 +99,8 @@ public abstract class Primitive {
 
   /**
    * Merges two adjacent text nodes in a database. The two node arguments must
-   * be ordered ascending, otherwise the text of the two nodes is concatenated
-   * in the wrong order.
+   * be sorted in ascending order, otherwise the text of the two nodes is
+   * concatenated in the wrong order.
    * @param d data reference
    * @param a node pre value
    * @param b node pre value

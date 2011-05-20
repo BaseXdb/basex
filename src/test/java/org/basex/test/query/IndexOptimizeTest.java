@@ -39,8 +39,7 @@ public final class IndexOptimizeTest {
   @BeforeClass
   public static void start() throws Exception {
     new Set(Prop.FTINDEX, true).execute(CONTEXT);
-    new CreateDB(NAME, "<xml><a>1</a><a>1 2</a></xml>").execute(CONTEXT);
-    new Close().execute(CONTEXT);
+    new Set(Prop.QUERYINFO, true).execute(CONTEXT);
   }
 
   /**
@@ -62,6 +61,8 @@ public final class IndexOptimizeTest {
     createDoc();
     new Open(NAME).execute(CONTEXT);
     check("//*[text() = '1']");
+    check("data(//*[@* = 'y'])", "1");
+    check("data(//@*[. = 'y'])", "y");
     check("//*[text() contains text '1']");
   }
 
@@ -134,11 +135,31 @@ public final class IndexOptimizeTest {
   public void ftTest() throws Exception {
     createDoc();
     new Open(NAME).execute(CONTEXT);
-    check("//*[text() <- '1']", "<a>1</a>");
-    check("//*[text() <- '1 2' any word]", "<a>1</a><a>2 3</a>");
+    check("data(//*[text() <- '1'])", "1");
+    check("data(//*[text() <- '1 2' any word])", "1 2 3");
     check("//*[text() <- {'2','4'} all]", "");
     check("//*[text() <- {'2','3'} all words]", "<a>2 3</a>");
     check("//*[text() <- {'2','4'} all words]", "");
+  }
+
+  /**
+   * Checks index optimizations inside functions.
+   * @throws Exception unexpected exception
+   */
+  @Test
+  public void functionTest() throws Exception {
+    createColl();
+    final String doc = "db:open('" + NAME + "')";
+    // text: search term must be string
+    check("declare function local:x() {" + doc +
+        "//text()[. = '1'] }; local:x()", "1");
+    check("declare function local:x($x as xs:string) {" + doc +
+        "//text()[. = $x] }; local:x('1')", "1");
+    // full-text: search term may can have any type
+    check("declare function local:x() {" + doc +
+        "//text()[. contains text '1'] }; local:x()", "1");
+    check("declare function local:x($x) {" + doc +
+        "//text()[. contains text { $x }] }; local:x('1')", "1");
   }
 
   /**
@@ -146,7 +167,7 @@ public final class IndexOptimizeTest {
    * @throws Exception exception
    */
   private void createDoc() throws Exception {
-    new CreateDB(NAME, "<xml><a>1</a><a>2 3</a></xml>").execute(CONTEXT);
+    new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a></xml>").execute(CONTEXT);
     new Close().execute(CONTEXT);
   }
 
@@ -185,6 +206,7 @@ public final class IndexOptimizeTest {
       XMLSerializer xml = qp.getSerializer(ao);
       qp.execute().serialize(xml);
       qp.close();
+      final String info = qp.info();
       if(result != null)
         assertEquals(result, ao.toString().replaceAll("\\r?\\n", ""));
 
@@ -192,14 +214,15 @@ public final class IndexOptimizeTest {
       plan = new ArrayOutput();
       qp.plan(new XMLSerializer(plan));
 
-      qp = new QueryProcessor(plan + "//(IndexAccess|FTIndexAccess)", CONTEXT);
+      qp = new QueryProcessor(plan + "/descendant-or-self::*" +
+          "[self::IndexAccess|self::FTIndexAccess]", CONTEXT);
       ao = new ArrayOutput();
       xml = qp.getSerializer(ao);
       qp.execute().serialize(xml);
 
       // check if IndexAccess is used
-      assertTrue("No index used:\nQuery: " + query + "\nPlan: " + plan,
-          !ao.toString().isEmpty());
+      assertTrue("No index used:\nQuery: " + query + "\nInfo: " + info +
+          "\nPlan: " + plan, !ao.toString().isEmpty());
     } catch(final QueryException ex) {
       fail(ex.getMessage() + "\nQuery: " + query + "\nPlan: " + plan);
     } catch(final IOException ex) {

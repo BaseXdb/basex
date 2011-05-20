@@ -52,11 +52,11 @@ public final class ReplaceNode extends NodeCopy {
         else d.insert(pre, par, md);
       }
 
-      // text merging applies for both replace methods
+      /* text merging applies for both replace methods
       if(!mergeTexts(d, pre - 1, pre)) {
         pre += md.meta.size;
         mergeTexts(d, pre - 1, pre);
-      }
+      }*/
     }
     return 0;
   }
