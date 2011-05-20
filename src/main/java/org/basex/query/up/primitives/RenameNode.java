@@ -27,7 +27,7 @@ public final class RenameNode extends Primitive {
    * @param nm new name
    */
   public RenameNode(final InputInfo ii, final ANode n, final QNm nm) {
-    super(ii, n);
+    super(PrimitiveType.RENAMENODE, ii, n);
     name = nm;
   }
 
@@ -49,11 +49,6 @@ public final class RenameNode extends Primitive {
   public void update(final NamePool pool) {
     pool.add(name, node.type);
     pool.remove(node);
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.RENAMENODE;
   }
 
   @Override

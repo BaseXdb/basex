@@ -17,7 +17,6 @@ import org.basex.query.up.primitives.InsertAttribute;
 import org.basex.query.up.primitives.InsertBefore;
 import org.basex.query.up.primitives.InsertInto;
 import org.basex.query.up.primitives.InsertIntoFirst;
-import org.basex.query.up.primitives.InsertIntoLast;
 import org.basex.query.up.primitives.Primitive;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -100,8 +99,7 @@ public final class Insert extends Update {
       if(before) up = new InsertBefore(input, n, cList);
       else if(after) up = new InsertAfter(input, n, cList);
       else if(first) up = new InsertIntoFirst(input, n, cList);
-      else if(last) up = new InsertIntoLast(input, n, cList);
-      else up = new InsertInto(input, n, cList);
+      else up = new InsertInto(input, n, cList, last);
       ctx.updates.add(up, ctx);
     }
     return null;

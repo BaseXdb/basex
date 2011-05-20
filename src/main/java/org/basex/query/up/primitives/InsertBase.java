@@ -12,24 +12,25 @@ import org.basex.util.Util;
  * @author Lukas Kircher
  */
 public abstract class InsertBase extends NodeCopy {
-
   /**
    * Constructor.
+   * @param pt update type
    * @param ii input info
    * @param n target node
    * @param nc insertion sequence
    */
-  protected InsertBase(final InputInfo ii, final ANode n, final NodeCache nc) {
-    super(ii, n, nc);
+  protected InsertBase(final PrimitiveType pt, final InputInfo ii,
+      final ANode n, final NodeCache nc) {
+    super(pt, ii, n, nc);
   }
 
   @Override
-  public void merge(final Primitive p) {
+  public final void merge(final Primitive p) {
     insert.add(((NodeCopy) p).insert.get(0));
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return Util.name(this) + "[" + node + ", " + insert + "]";
   }
 }

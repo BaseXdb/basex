@@ -19,7 +19,7 @@ public final class DeleteNode extends Primitive {
    * @param n expression target node
    */
   public DeleteNode(final InputInfo ii, final ANode n) {
-    super(ii, n);
+    super(PrimitiveType.DELETENODE, ii, n);
   }
 
   @Override
@@ -32,11 +32,6 @@ public final class DeleteNode extends Primitive {
   @Override
   public void update(final NamePool pool) {
     pool.remove(node);
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.DELETENODE;
   }
 
   @Override

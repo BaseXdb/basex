@@ -20,7 +20,7 @@ public final class InsertBefore extends InsertBase {
    * @param copy copy of nodes to be inserted
    */
   public InsertBefore(final InputInfo ii, final ANode n, final NodeCache copy) {
-    super(ii, n, copy);
+    super(PrimitiveType.INSERTBEFORE, ii, n, copy);
   }
 
   @Override
@@ -30,10 +30,5 @@ public final class InsertBefore extends InsertBase {
     final int pre = n.pre;
     d.insert(pre, d.parent(pre, d.kind(pre)), md);
     return md.meta.size;
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.INSERTBEFORE;
   }
 }

@@ -21,7 +21,7 @@ public final class InsertIntoFirst extends InsertBase {
    */
   public InsertIntoFirst(final InputInfo ii, final ANode n,
       final NodeCache copy) {
-    super(ii, n, copy);
+    super(PrimitiveType.INSERTINTOFIRST, ii, n, copy);
   }
 
   @Override
@@ -31,10 +31,5 @@ public final class InsertIntoFirst extends InsertBase {
     final Data d = n.data;
     d.insert(pre + d.attSize(pre, d.kind(pre)), pre, md);
     return 0;
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.INSERTINTOFIRST;
   }
 }

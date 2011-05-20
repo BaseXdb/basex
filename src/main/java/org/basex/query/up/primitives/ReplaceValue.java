@@ -26,7 +26,7 @@ public final class ReplaceValue extends Primitive {
    * @param val new value
    */
   public ReplaceValue(final InputInfo ii, final ANode n, final byte[] val) {
-    super(ii, n);
+    super(PrimitiveType.REPLACEVALUE, ii, n);
     value = val;
   }
 
@@ -47,11 +47,6 @@ public final class ReplaceValue extends Primitive {
   @Override
   public void merge(final Primitive p) throws QueryException {
     UPMULTREPV.thrw(input, node);
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.REPLACEVALUE;
   }
 
   @Override
