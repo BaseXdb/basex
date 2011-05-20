@@ -79,14 +79,14 @@ public final class Or extends Logical {
     for(final Expr e : expr) {
       if(e.indexAccessible(ic) && !ic.seq) {
         // skip expressions without results
-        if(ic.costs == 0) continue;
-        is += ic.costs;
+        if(ic.costs() == 0) continue;
+        is += ic.costs();
       } else {
         ia = false;
       }
       exprs = Array.add(exprs, e);
     }
-    ic.costs = is;
+    ic.costs(is);
     expr = exprs;
     return ia;
   }

@@ -269,7 +269,7 @@ public final class CmpG extends Cmp {
       // and if expression depends on context
       if(arg.uses(Use.CTX) || !(t.type.str() || t.type.node())) return false;
 
-      ic.costs += Math.max(1, ic.data.meta.size / 10);
+      ic.addCosts(ic.data.meta.size / 10);
       iacc = Array.add(iacc, new IndexAccess(input, arg, ind, ic));
       return true;
     }
@@ -277,7 +277,7 @@ public final class CmpG extends Cmp {
     // loop through all items
     final Iter ir = arg.iter(ic.ctx);
     Item it;
-    ic.costs = 0;
+    ic.costs(0);
     while((it = ir.next()) != null) {
       final SeqType t = it.type();
       if(!(t.type.str() || t.type.node())) return false;
@@ -285,7 +285,7 @@ public final class CmpG extends Cmp {
       final int is = ic.data.nrIDs(new ValuesToken(ind, it.atom(input)));
       // add only expressions that yield results
       if(is != 0) iacc = Array.add(iacc, new IndexAccess(input, it, ind, ic));
-      ic.costs += is;
+      ic.addCosts(is);
     }
     return true;
   }

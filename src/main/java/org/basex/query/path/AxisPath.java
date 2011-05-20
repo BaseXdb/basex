@@ -163,7 +163,7 @@ public class AxisPath extends Path {
         final IndexContext ic = new IndexContext(ctx, data, stp, d);
         if(!stp.pred[p].indexAccessible(ic)) continue;
 
-        if(ic.costs == 0) {
+        if(ic.costs() == 0) {
           if(ic.not) {
             // not operator... accept all results
             stp.pred[p] = Bln.TRUE;
@@ -173,7 +173,7 @@ public class AxisPath extends Path {
           ctx.compInfo(OPTNOINDEX, this);
           return Empty.SEQ;
         }
-        if(ics == null || ics.costs > ic.costs) {
+        if(ics == null || ics.costs() > ic.costs()) {
           ics = ic;
           pmin = p;
           smin = s;
@@ -181,8 +181,14 @@ public class AxisPath extends Path {
       }
     }
 
-    // no index access possible...
-    if(ics == null) return this;
+    // no index access is possible, or it is estimated to be too expensive...
+    if(ics == null || ics.costs() > data.meta.size) {
+      if(ics == null) return this;
+      System.out.println(ics.costs() + "\n" + ctx.query);
+      System.out.println();
+      System.out.println();
+      return this;
+    }
 
     // replace expressions for index access
     final AxisStep stp = step(smin);
