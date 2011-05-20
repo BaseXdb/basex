@@ -54,11 +54,12 @@ public final class EventTestGUI {
           @Override
           public void update(final String data) {
             Color c = Color.WHITE;
-            if(data.equals("RED")) {
+            String tmp = data.replaceAll("\"", "");
+            if(tmp.equals("RED")) {
               c = Color.RED;
-            } else if(data.equals("BLUE")) {
+            } else if(tmp.equals("BLUE")) {
               c = Color.BLUE;
-            } else if(data.equals("YELLOW")) {
+            } else if(tmp.equals("YELLOW")) {
               c = Color.YELLOW;
             }
             main.setBackground(c);
@@ -72,11 +73,12 @@ public final class EventTestGUI {
           @Override
           public void update(final String data) {
             Color c = Color.WHITE;
-            if(data.equals("RED")) {
+            String tmp = data.replaceAll("\"", "");
+            if(tmp.equals("RED")) {
               c = Color.RED;
-            } else if(data.equals("BLUE")) {
+            } else if(tmp.equals("BLUE")) {
               c = Color.BLUE;
-            } else if(data.equals("YELLOW")) {
+            } else if(tmp.equals("YELLOW")) {
               c = Color.YELLOW;
             }
             main.setBackground(c);
@@ -137,7 +139,7 @@ public final class EventTestGUI {
    */
   void action(final String c) {
     try {
-      cs.event("event", "()", "'" + c + "'");
+      cs.event("event", "()", "\"" + c + "\"");
     } catch(BaseXException e) {
       e.printStackTrace();
     }
