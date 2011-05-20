@@ -27,7 +27,7 @@ public final class ReplaceNode extends NodeCopy {
    */
   public ReplaceNode(final InputInfo ii, final ANode n,
       final NodeCache rep) {
-    super(ii, n, rep);
+    super(PrimitiveType.REPLACENODE, ii, n, rep);
   }
 
   @Override
@@ -71,11 +71,6 @@ public final class ReplaceNode extends NodeCopy {
     if(md == null) return;
     add(pool);
     pool.remove(node);
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.REPLACENODE;
   }
 
   @Override

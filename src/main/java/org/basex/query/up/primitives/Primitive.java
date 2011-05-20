@@ -18,6 +18,8 @@ import org.basex.util.TokenBuilder;
  * @author Lukas Kircher
  */
 public abstract class Primitive {
+  /** Type. */
+  private final PrimitiveType type;
   /** Target node of update expression. */
   public final ANode node;
   /** Input information. */
@@ -25,19 +27,16 @@ public abstract class Primitive {
 
   /**
    * Constructor.
+   * @param pt update type
    * @param ii input info
    * @param n DBNode reference
    */
-  protected Primitive(final InputInfo ii, final ANode n) {
+  protected Primitive(final PrimitiveType pt, final InputInfo ii,
+      final ANode n) {
+    type = pt;
     input = ii;
     node = n;
   }
-
-  /**
-   * Returns the type of the update primitive.
-   * @return type
-   */
-  public abstract PrimitiveType type();
 
   /**
    * Applies the update operation represented by this primitive to the
@@ -117,6 +116,14 @@ public abstract class Primitive {
     d.replace(a, Data.TEXT, concat(d.text(a, true), d.text(b, true)));
     d.delete(b);
     return true;
+  }
+
+  /**
+   * Returns the type of the update primitive.
+   * @return type
+   */
+  public final PrimitiveType type() {
+    return type;
   }
 
   @Override

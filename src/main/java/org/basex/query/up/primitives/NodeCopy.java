@@ -27,12 +27,14 @@ public abstract class NodeCopy extends Primitive {
 
   /**
    * Constructor.
+   * @param pt update type
    * @param ii input info
    * @param n target node
    * @param nc nodes to be inserted
    */
-  protected NodeCopy(final InputInfo ii, final ANode n, final NodeCache nc) {
-    super(ii, n);
+  protected NodeCopy(final PrimitiveType pt, final InputInfo ii, final ANode n,
+      final NodeCache nc) {
+    super(pt, ii, n);
     insert.add(nc);
   }
 
