@@ -42,9 +42,10 @@ public final class Try extends Single {
     checkUp(expr, ctx);
 
     // compile expression
-    Expr e = this;
     try {
-      e = super.comp(ctx);
+      super.comp(ctx);
+      // return value, which will never throw an error
+      if(expr.value()) return expr;
     } catch(final QueryException ex) {
       // catch exception for evaluation if expression fails at compile time
       qe = ex;
@@ -53,7 +54,7 @@ public final class Try extends Single {
     // evaluate result type
     type = expr.type();
     for(final Catch c : ctch) type = type.intersect(c.type());
-    return e;
+    return this;
   }
 
   @Override
