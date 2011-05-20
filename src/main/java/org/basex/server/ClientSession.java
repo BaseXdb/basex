@@ -45,13 +45,13 @@ public final class ClientSession extends Session {
   /** Server input. */
   final InputStream sin;
   /** Event notifications. */
-  Map<String, EventNotification> tn;
+  Map<String, EventNotification> en;
   /** Socket event reference. */
-  Socket tsocket;
+  Socket esocket;
   /** Socket host name. */
-  String thost;
+  String ehost;
   /** Event port. */
-  int tport = 1985;
+  int eport = 1985;
 
   /**
    * Constructor, specifying the database context and the
@@ -111,7 +111,7 @@ public final class ClientSession extends Session {
       final String pw, final OutputStream output) throws IOException {
 
     super(output);
-    thost = host;
+    ehost = host;
     // 5 seconds timeout
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
@@ -162,27 +162,27 @@ public final class ClientSession extends Session {
    * @param notification event notification
    * @throws BaseXException exception
    */
-  public void watchEvent(final String name,
+  public void watch(final String name,
       final EventNotification notification) throws BaseXException {
     try {
       sout.write(10);
       send(name);
       final BufferInput bi = new BufferInput(sin);
-      if(tsocket == null) {
+      if(esocket == null) {
         // initialize event notifications
-        this.tn = new HashMap<String, EventNotification>();
-        tsocket = new Socket();
-        tsocket.connect(new InetSocketAddress(thost, tport), 5000);
+        this.en = new HashMap<String, EventNotification>();
+        esocket = new Socket();
+        esocket.connect(new InetSocketAddress(ehost, eport), 5000);
         String id = bi.readString();
-        PrintOutput tout = PrintOutput.get(tsocket.getOutputStream());
+        PrintOutput tout = PrintOutput.get(esocket.getOutputStream());
         tout.print(id);
         tout.write(0);
         tout.flush();
-        startListener(tsocket.getInputStream());
+        startListener(esocket.getInputStream());
       }
       info = bi.readString();
       if(!ok(bi)) throw new IOException(info);
-      tn.put(name, notification);
+      en.put(name, notification);
     } catch(IOException e) {
       throw new BaseXException(e);
     }
@@ -201,7 +201,7 @@ public final class ClientSession extends Session {
             BufferInput bi = new BufferInput(in);
             String name = bi.readString();
             String val = bi.readString();
-            tn.get(name).update(val);
+            en.get(name).update(val);
           }
         } catch(Exception e) { }
        }
@@ -213,14 +213,14 @@ public final class ClientSession extends Session {
    * @param name event name
    * @throws BaseXException exception
    */
-  public void unwatchEvent(final String name) throws BaseXException {
+  public void unwatch(final String name) throws BaseXException {
     try {
       sout.write(11);
       send(name);
       final BufferInput bi = new BufferInput(sin);
       info = bi.readString();
       if(!ok(bi)) throw new IOException(info);
-      tn.remove(name);
+      en.remove(name);
     } catch(IOException e) {
       throw new BaseXException(e);
     }
@@ -228,14 +228,14 @@ public final class ClientSession extends Session {
 
   /**
    * Executes an event.
-   * @param query query string
    * @param name event name
-   * @param msg event notification
+   * @param q1 query string
+   * @param q2 query string
    * @throws BaseXException exception
    */
-  public void event(final String query, final String name,
-      final String msg) throws BaseXException {
-    execute("xquery db:event(" + query + ", " + name + ", " + msg + ")");
+  public void event(final String name, final String q1,
+      final String q2) throws BaseXException {
+    execute("xquery db:event(" + name + ", " + q1 + ", " + q2 + ")");
   }
 
   /**
@@ -261,7 +261,7 @@ public final class ClientSession extends Session {
   @Override
   public void close() throws IOException {
     send(Cmd.EXIT.toString());
-    if(tsocket != null) tsocket.close();
+    if(esocket != null) esocket.close();
     socket.close();
   }
 
