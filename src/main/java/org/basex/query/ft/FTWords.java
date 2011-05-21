@@ -52,7 +52,7 @@ public final class FTWords extends FTExpr {
   TokenList txt;
 
   /** All matches. */
-  FTMatches all = new FTMatches((byte) 0);
+  FTMatches matches = new FTMatches((byte) 0);
   /** Flag for first evaluation. */
   boolean first;
   /** Search mode; default: {@link FTMode#M_ANY}. */
@@ -120,13 +120,14 @@ public final class FTWords extends FTExpr {
       throws QueryException {
 
     if(tokNum == 0) tokNum = ++ctx.ftoknum;
-    all.reset(tokNum);
+    matches.reset(tokNum);
 
     final int c = contains(ctx);
-    if(c == 0) all.size = 0;
+    if(c == 0) matches.size = 0;
 
     // scoring: include number of tokens for calculations
-    return new FTNode(all, c == 0 ? 0 : Scoring.word(c, ctx.fttoken.count()));
+    return new FTNode(matches, c == 0 ? 0 :
+      Scoring.word(c, ctx.fttoken.count()));
   }
 
   @Override
@@ -154,9 +155,9 @@ public final class FTWords extends FTExpr {
             int d = 0;
             if(!lex.hasNext()) return null;
             do {
-              final byte[] token = lex.nextToken();
-              t += token.length;
-              if(ftt.opt.sw != null && ftt.opt.sw.id(token) != 0) {
+              final byte[] tok = lex.nextToken();
+              t += tok.length;
+              if(ftt.opt.sw != null && ftt.opt.sw.id(tok) != 0) {
                 ++d;
               } else {
                 final FTIndexIterator ir = lex.get().length > MAXLEN ?
@@ -169,6 +170,7 @@ public final class FTWords extends FTExpr {
                 }
               }
             } while(lex.hasNext());
+            // create or combine iterator
             if(iat == null) {
               len = t;
               iat = ia;
@@ -201,12 +203,7 @@ public final class FTWords extends FTExpr {
     final FTTokens qtok = ftt.cache(lex.get());
     return new FTIndexIterator() {
       int pre = -1;
-      int s;
 
-      @Override
-      public double score() {
-        return -1;
-      }
       @Override
       public int next() {
         return pre;
@@ -216,10 +213,9 @@ public final class FTWords extends FTExpr {
         while(++pre < data.meta.size) {
           if(data.kind(pre) != Data.TEXT) continue;
           intok.init(data.text(pre, true));
-          all.reset(0);
+          matches.reset(0);
           try {
-            s = ftt.contains(qtok, intok);
-            if(s != 0) return true;
+            if(ftt.contains(qtok, intok) != 0) return true;
           } catch(final QueryException ex) {
             // ignore exceptions
           }
@@ -227,12 +223,16 @@ public final class FTWords extends FTExpr {
         return false;
       }
       @Override
+      public double score() {
+        return -1;
+      }
+      @Override
       public FTMatches matches() {
-        return all;
+        return matches;
       }
       @Override
       public int indexSize() {
-        return s;
+        return 1;
       }
     };
   }
@@ -277,12 +277,12 @@ public final class FTWords extends FTExpr {
     // find and count all occurrences
     final TokenList tl = tokens(ctx);
     final TokenSet ts = tokens(tl, intok.ftOpt());
-    final boolean a = mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS;
+    final boolean all = mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS;
     int oc = 0;
     for(final byte[] k : ts) {
       final FTTokens qtok = ftt.cache(k);
       final int o = ftt.contains(qtok, intok);
-      if(a && o == 0) return 0;
+      if(all && o == 0) return 0;
       num = Math.max(num, o * qtok.length());
       oc += o;
     }
@@ -290,7 +290,7 @@ public final class FTWords extends FTExpr {
     // check if occurrences are in valid range. if yes, return number of tokens
     final long mn = occ != null ? checkItr(occ[0], ctx) : 1;
     final long mx = occ != null ? checkItr(occ[1], ctx) : Long.MAX_VALUE;
-    if(mn == 0 && oc == 0) all = FTNot.not(all);
+    if(mn == 0 && oc == 0) matches = FTNot.not(matches);
     return oc >= mn && oc <= mx ? Math.max(1, num) : 0;
   }
 
@@ -342,8 +342,8 @@ public final class FTWords extends FTExpr {
    */
   void add(final int s, final int e) {
     if(!first && (mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS))
-      all.and(s, e);
-    else all.or(s, e);
+      matches.and(s, e);
+    else matches.or(s, e);
   }
 
   @Override

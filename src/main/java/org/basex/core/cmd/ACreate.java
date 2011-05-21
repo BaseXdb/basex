@@ -127,34 +127,34 @@ abstract class ACreate extends Command {
 
   /**
    * Builds the specified index.
-   * @param i index to be built
-   * @param d data reference
+   * @param type index to be built
+   * @param data data reference
    * @throws IOException I/O exception
    */
-  protected final void index(final IndexType i, final Data d)
+  protected final void index(final IndexType type, final Data data)
       throws IOException {
 
-    if(d instanceof MemData) return;
-    IndexBuilder b = null;
-    switch(i) {
-      case TEXT: b = new ValueBuilder(d, true); break;
-      case ATTRIBUTE: b = new ValueBuilder(d, false); break;
-      case FULLTEXT: b = FTBuilder.get(d); break;
-      case PATH: b = new PathBuilder(d); break;
-      default: throw Util.notexpected();
+    if(data instanceof MemData) return;
+    IndexBuilder ib = null;
+    switch(type) {
+      case TEXT:      ib = new ValueBuilder(data, true); break;
+      case ATTRIBUTE: ib = new ValueBuilder(data, false); break;
+      case FULLTEXT:  ib = FTBuilder.get(data); break;
+      case PATH:      ib = new PathBuilder(data); break;
+      default:        throw Util.notexpected();
     }
-    d.closeIndex(i);
-    d.meta.dirty = true;
-    d.setIndex(i, progress(b).build());
+    data.closeIndex(type);
+    data.meta.dirty = true;
+    data.setIndex(type, progress(ib).build());
   }
 
   /**
    * Normalizes the database path.
    * Removes duplicate, leading and trailing slashes
-   * @param p input path
+   * @param path input path
    * @return normalized path
    */
-  protected static final String path(final String p) {
-    return p.replaceAll("[\\\\//]+", "/").replaceAll("^/|/$", "");
+  protected static final String path(final String path) {
+    return path.replaceAll("[\\\\//]+", "/").replaceAll("^/|/$", "");
   }
 }

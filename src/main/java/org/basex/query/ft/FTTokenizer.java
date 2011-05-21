@@ -141,7 +141,7 @@ public final class FTTokenizer {
       ++c;
     }
 
-    words.all.sTokenNum++;
+    words.matches.sTokenNum++;
     words.first = false;
     return c;
   }
