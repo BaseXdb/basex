@@ -21,7 +21,7 @@ public final class InsertAttribute extends InsertBase {
    */
   public InsertAttribute(final InputInfo ii, final ANode n,
       final NodeCache copy) {
-    super(ii, n, copy);
+    super(PrimitiveType.INSERTATTR, ii, n, copy);
   }
 
   @Override
@@ -35,10 +35,5 @@ public final class InsertAttribute extends InsertBase {
   public void update(final NamePool pool) {
     if(md == null) return;
     add(pool);
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.INSERTATTR;
   }
 }

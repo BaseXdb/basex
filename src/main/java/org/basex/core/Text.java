@@ -1223,6 +1223,8 @@ public interface Text {
   String ADMINLOGIN = lang("ds_adlogin");
   /** Databases. */
   String DATABASES = lang("ds_databases");
+  /** Backups. */
+  String BACKUPS = lang("ds_backups");
   /** Sessions. */
   String SESSIONS = lang("ds_sessions");
   /** Logs. */

@@ -27,7 +27,7 @@ public final class ReplaceElemContent extends Primitive {
    */
   public ReplaceElemContent(final InputInfo ii, final ANode n,
       final byte[] val) {
-    super(ii, n);
+    super(PrimitiveType.REPLACEELEMCONT, ii, n);
     value = val;
   }
 
@@ -56,11 +56,6 @@ public final class ReplaceElemContent extends Primitive {
   @Override
   public void merge(final Primitive p) throws QueryException {
     UPMULTREPV.thrw(input, node);
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.REPLACEELEMCONT;
   }
 
   @Override

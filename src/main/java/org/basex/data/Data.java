@@ -184,13 +184,11 @@ public abstract class Data {
    * @return id array
    */
   public final synchronized int nrIDs(final IndexToken token) {
-    // token too long.. no results can be expected
-    if(token.get().length > MAXLEN) return Integer.MAX_VALUE;
     switch(token.type()) {
       case TEXT:      return txtindex.nrIDs(token);
       case ATTRIBUTE: return atvindex.nrIDs(token);
       case FULLTEXT:  return ftxindex.nrIDs(token);
-      default:  return Integer.MAX_VALUE;
+      default:        return Integer.MAX_VALUE;
     }
   }
 
@@ -530,6 +528,8 @@ public abstract class Data {
     // [LK] if we know that both data references will use the same tag and
     // attribute indexes (..which should be the default case..) we might be
     // able to speed up the copy process even more
+
+    meta.update();
 
     // check if attribute size of parent must be updated
     final boolean rAtt = kind(rpre) == ATTR;

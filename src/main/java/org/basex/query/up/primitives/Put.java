@@ -35,7 +35,7 @@ public final class Put extends Primitive {
    */
   public Put(final InputInfo ii, final ANode n, final Uri u,
       final QueryContext c) {
-    super(ii, n);
+    super(PrimitiveType.PUT, ii, n);
     uri = u;
     ctx = c;
   }
@@ -66,11 +66,6 @@ public final class Put extends Primitive {
    */
   public byte[] path() {
     return uri.atom();
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.PUT;
   }
 
   @Override

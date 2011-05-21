@@ -83,22 +83,24 @@ public final class And extends Logical {
     for(int e = 0; e < expr.length; ++e) {
       if(expr[e].indexAccessible(ic) && !ic.seq) {
         // skip queries with no results
-        if(ic.costs == 0) return true;
+        if(ic.costs() == 0) return true;
         // summarize costs
-        ics[e] = ic.costs;
-        is += ic.costs;
+        ics[e] = ic.costs();
+        if(is == 0 || ic.costs() < is) is = ic.costs();
       } else {
         ia = false;
       }
     }
 
     if(ia) {
-      // index access is possible: reorder arguments to speedup intersection
-      final int[] ord = Array.createOrder(ics, false);
+      // evaluate arguments with high selectivity first
+      final int[] ord = Array.createOrder(ics, true);
       final Expr[] ex = new Expr[ics.length];
       for(int e = 0; e < expr.length; ++e) ex[e] = expr[ord[e]];
       expr = ex;
     }
+
+    ic.costs(is);
     return ia;
   }
 

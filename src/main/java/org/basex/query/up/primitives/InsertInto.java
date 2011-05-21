@@ -7,21 +7,23 @@ import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
 
 /**
- * Insert into|into as first|into as last primitive.
+ * Insert into (as last) primitive.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class InsertInto extends InsertBase {
-
   /**
    * Constructor.
    * @param ii input info
    * @param n target node
    * @param copy copy of nodes to be inserted
+   * @param last explicit last flag
    */
-  public InsertInto(final InputInfo ii, final ANode n, final NodeCache copy) {
-    super(ii, n, copy);
+  public InsertInto(final InputInfo ii, final ANode n, final NodeCache copy,
+      final boolean last) {
+    super(last ? PrimitiveType.INSERTINTOLAST : PrimitiveType.INSERTINTO,
+        ii, n, copy);
   }
 
   @Override
@@ -35,10 +37,5 @@ public final class InsertInto extends InsertBase {
       mergeTexts(d, pre - 1, pre);
     }
     return 0;
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.INSERTINTO;
   }
 }

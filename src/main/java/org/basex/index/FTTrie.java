@@ -70,7 +70,9 @@ final class FTTrie extends FTIndex {
 
   @Override
   public synchronized int nrIDs(final IndexToken ind) {
-    // skip result count for queries which stretch over multiple index entries
+    if(ind.get().length > MAXLEN) return Integer.MAX_VALUE;
+
+    // estimate costs for queries which stretch over multiple index entries
     final FTLexer lex = (FTLexer) ind;
     if(lex.ftOpt().is(FZ) || lex.ftOpt().is(WC))
       return Math.max(1, data.meta.size / 10);
