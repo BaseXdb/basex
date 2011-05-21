@@ -85,14 +85,19 @@ public class GFLWOR extends ParseExpr {
 
     // optimize for/let clauses
     final int vs = ctx.vars.size();
-
     for(int f = 0; f < fl.length; ++f) {
       final ForLet flt = fl[f];
       flt.comp(ctx);
-      // pre-evaluate and bind variable if it is used exactly once,
-      // or if it contains a value
-      if(count(flt.var, f) == 1 || flt.expr.value()) flt.bind(ctx);
-      // use let instead of for clause for iterator with one result
+      // bind variable if it contains a value or occurs only once
+      if(flt.expr.value() || count(flt.var, f) == 1) flt.bind(ctx);
+
+      /* ...or if all inner clauses are LET clauses. This rewriting would
+       * disallow repeated evaluations of the same expression, but it prevents
+       * index-based rewritings (e.g. for XMark 9)
+      boolean let = true;
+      for(int g = f + 1; g < fl.length; g++) let &= fl[g] instanceof Let;
+      if(flt.expr.value() || count(flt.var, f) == 1 && let) flt.bind(ctx);
+      */
     }
 
     // optimize where clause

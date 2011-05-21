@@ -85,7 +85,7 @@ public final class IndexContext {
    * @param c cost to be added
    */
   public void addCosts(final int c) {
-    costs = Math.max(0, costs + c);
+    costs = Math.max(1, costs + c);
   }
 
   /**

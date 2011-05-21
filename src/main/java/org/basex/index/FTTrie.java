@@ -94,10 +94,10 @@ final class FTTrie extends FTIndex {
 
   @Override
   public synchronized IndexIterator ids(final IndexToken ind) {
-    final FTLexer lex = (FTLexer) ind;
-    final byte[] token = lex.get();
+    final byte[] token = ind.get();
 
     // support fuzzy search
+    final FTLexer lex = (FTLexer) ind;
     if(lex.ftOpt().is(FZ)) {
       int k = data.meta.prop.num(Prop.LSERROR);
       if(k == 0) k = token.length >> 2;

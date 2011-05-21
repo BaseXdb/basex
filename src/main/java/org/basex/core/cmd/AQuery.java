@@ -119,6 +119,9 @@ abstract class AQuery extends Command {
       err = PROGERR;
       // store any useful info (e.g. query plan):
       inf = info();
+    } catch(final RuntimeException ex) {
+      Util.debug(qp.info());
+      throw ex;
     }
     // close processor after exceptions
     if(qp != null) try { qp.close(); } catch(final IOException ex) { }

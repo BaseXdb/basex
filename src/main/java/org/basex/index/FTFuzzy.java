@@ -106,11 +106,10 @@ final class FTFuzzy extends FTIndex {
 
   @Override
   public synchronized IndexIterator ids(final IndexToken ind) {
-    final FTLexer lex = (FTLexer) ind;
-    final byte[] tok = lex.get();
+    final byte[] tok = ind.get();
 
     // support fuzzy search
-    if(lex.ftOpt().is(FZ)) {
+    if(((FTLexer) ind).ftOpt().is(FZ)) {
       int k = data.meta.prop.num(Prop.LSERROR);
       if(k == 0) k = tok.length >> 2;
       return fuzzy(tok, k, false);

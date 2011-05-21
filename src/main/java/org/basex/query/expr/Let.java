@@ -56,7 +56,6 @@ public final class Let extends ForLet {
     size = 1;
     var.ret = score ? SeqType.DBL : expr.type();
     ctx.vars.add(var);
-
     return this;
   }
 

@@ -292,7 +292,7 @@ public final class CmpG extends Cmp {
 
   @Override
   public Expr indexEquivalent(final IndexContext ic) {
-    final boolean text = iacc[0].ind == IndexType.TEXT;
+    final boolean text = iacc[0].itype == IndexType.TEXT;
     ic.ctx.compInfo(text ? OPTTXTINDEX : OPTATVINDEX);
     // more than one string - merge index results
     final ParseExpr root = iacc.length == 1 ? iacc[0] : new Union(input, iacc);

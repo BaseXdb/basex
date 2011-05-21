@@ -1,6 +1,7 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.IOException;
@@ -158,7 +159,8 @@ public final class FTWords extends FTExpr {
               if(ftt.opt.sw != null && ftt.opt.sw.id(token) != 0) {
                 ++d;
               } else {
-                final FTIndexIterator ir = (FTIndexIterator) data.ids(lex);
+                final FTIndexIterator ir = lex.get().length > MAXLEN ?
+                    scan(lex) : (FTIndexIterator) data.ids(lex);
                 if(ia == null) {
                   ia = ir;
                 } else {
@@ -184,6 +186,53 @@ public final class FTWords extends FTExpr {
         }
         return iat != null && iat.more() ? new FTNode(iat.matches(), data,
             iat.next(), len, iat.indexSize(), iat.score()) : null;
+      }
+    };
+  }
+
+  /**
+   * Returns scan-based iterator.
+   * @param lex lexer, including the queried value
+   * @return node iterator
+   * @throws QueryException query exception
+   */
+  FTIndexIterator scan(final FTLexer lex) throws QueryException {
+    final FTLexer intok = new FTLexer(ftt.opt);
+    final FTTokens qtok = ftt.cache(lex.get());
+    return new FTIndexIterator() {
+      int pre = -1;
+      int s;
+
+      @Override
+      public double score() {
+        return -1;
+      }
+      @Override
+      public int next() {
+        return pre;
+      }
+      @Override
+      public boolean more() {
+        while(++pre < data.meta.size) {
+          if(data.kind(pre) != Data.TEXT) continue;
+          intok.init(data.text(pre, true));
+          all.reset(0);
+          try {
+            s = ftt.contains(qtok, intok);
+            if(s != 0) return true;
+          } catch(final QueryException ex) {
+            // ignore exceptions
+          }
+        }
+        return false;
+      }
+      @Override
+      public FTMatches matches() {
+        return all;
+      }
+      @Override
+      public int indexSize() {
+        return s;
       }
     };
   }
