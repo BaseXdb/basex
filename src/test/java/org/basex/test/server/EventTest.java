@@ -27,8 +27,10 @@ public final class EventTest {
   private static final int EVENT_COUNT = 10;
   /** Event name. */
   private static final String EVENT_NAME = "event";
-  /** Return value of function util:event. */
-  private static final String RETURN_VALUE = "event received";
+  /** Return value of function db:event. */
+  private static final String RETURN_VALUE1 = "\"event\"";
+  /** Return value of function db:event. */
+  private static final String RETURN_VALUE2 = "\" \"";
   /** Server reference. */
   private static BaseXServer server;
   /** Client session. */
@@ -123,7 +125,7 @@ public final class EventTest {
     // watch an event
     try {
       for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].watchEvent(EVENT_NAME, new EventNotification() {
+        ccs[i].watch(EVENT_NAME, new EventNotification() {
           @Override
           public void update(final String data) { }
         });
@@ -135,7 +137,7 @@ public final class EventTest {
     // watch an event
     try {
       for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].watchEvent(EVENT_NAME + 1, new EventNotification() {
+        ccs[i].watch(EVENT_NAME + 1, new EventNotification() {
           @Override
           public void update(final String data) { }
         });
@@ -146,7 +148,7 @@ public final class EventTest {
     // unwatch event
     try {
       for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].unwatchEvent(EVENT_NAME);
+        ccs[i].unwatch(EVENT_NAME);
       }
     } catch(BaseXException e) {
       fail(e.getMessage());
@@ -155,7 +157,7 @@ public final class EventTest {
     // unwatch event
     try {
       for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].unwatchEvent(EVENT_NAME + 1);
+        ccs[i].unwatch(EVENT_NAME + 1);
         fail("This was supposed to fail.");
       }
     } catch(BaseXException e) { }
@@ -169,34 +171,13 @@ public final class EventTest {
   }
 
   /**
-   * Runs a query command and retrieves the result as string.
+   * Runs event test with specified second query and without.
    * @throws BaseXException command exception
    */
   @Test
   public void event() throws BaseXException {
-
-    // create the event
-    cs.execute("create event " + EVENT_NAME);
-    // watch event with half of the clients
-    for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].watchEvent(EVENT_NAME, new EventNotification() {
-        @Override
-        public void update(final String data) {
-          assertEquals(RETURN_VALUE, data);
-        }
-      });
-    }
-
-    // release an event
-    cs.event("1 to 10", EVENT_NAME, RETURN_VALUE);
-
-    // all clients unwatch the events
-    for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].unwatchEvent(EVENT_NAME);
-    }
-
-    // drop event
-    cs.execute("drop event " + EVENT_NAME);
+    event(RETURN_VALUE1, true);
+    event(RETURN_VALUE2, false);
   }
 
   /**
@@ -206,29 +187,84 @@ public final class EventTest {
    */
   @Test
   public void concurrent() throws Exception {
+    concurrent(RETURN_VALUE1, true);
+    concurrent(RETURN_VALUE2, false);
+  }
+
+  /**
+   * Runs a query command and retrieves the result as string.
+   * @param value return value of event
+   * @param f flag for result type
+   * @throws BaseXException command exception
+   */
+  public void event(final String value, final boolean f) throws BaseXException {
+
+    // create the event
+    cs.execute("create event " + EVENT_NAME);
+    // watch event with half of the clients
+    for(int i = ccs.length / 2; i < ccs.length; i++) {
+      ccs[i].watch(EVENT_NAME, new EventNotification() {
+        @Override
+        public void update(final String data) {
+          if(f) {
+            assertEquals(value, data);
+          } else {
+            assertEquals("1", data);
+          }
+        }
+      });
+    }
+
+    // release an event
+    cs.event(EVENT_NAME, "1", value);
+
+    // all clients unwatch the events
+    for(int i = ccs.length / 2; i < ccs.length; i++) {
+      ccs[i].unwatch(EVENT_NAME);
+    }
+
+    // drop event
+    cs.execute("drop event " + EVENT_NAME);
+  }
+
+  /**
+   * Concurrent events.
+   * @param value return value of event
+   * @param f flag for result type
+   * @throws Exception exception
+   */
+  public void concurrent(final String value, final boolean f) throws Exception {
     // create event.
     cs.execute("create event " + EVENT_NAME);
     cs.execute("create event " + EVENT_NAME + 1);
 
     // watch event with half of the clients
     for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].watchEvent(EVENT_NAME, new EventNotification() {
+      ccs[i].watch(EVENT_NAME, new EventNotification() {
         @Override
         public void update(final String data) {
-          assertEquals(RETURN_VALUE, data);
+          if(f) {
+            assertEquals(value, data);
+          } else {
+            assertEquals("1", data);
+          }
         }
       });
-      ccs[i].watchEvent(EVENT_NAME + 1, new EventNotification() {
+      ccs[i].watch(EVENT_NAME + 1, new EventNotification() {
         @Override
         public void update(final String data) {
-          assertEquals(RETURN_VALUE, data);
+          if(f) {
+            assertEquals(value, data);
+          } else {
+            assertEquals("1", data);
+          }
         }
       });
     }
 
     // concurrent event activation
-    Client c1 = new Client(true);
-    Client c2 = new Client(false);
+    Client c1 = new Client(true, value);
+    Client c2 = new Client(false, value);
     c1.start();
     c2.start();
     c1.join();
@@ -254,13 +290,17 @@ public final class EventTest {
     private ClientSession session;
     /** First event. */
     private boolean first;
+    /** Event value. */
+    private String value;
 
     /**
      * Default constructor.
      * @param f first flag
+     * @param v value
      */
-    public Client(final boolean f) {
+    public Client(final boolean f, final String v) {
       this.first = f;
+      this.value = v;
       try {
         session = newSession();
       } catch(final IOException ex) {
@@ -272,9 +312,9 @@ public final class EventTest {
     public void run() {
       try {
         if(first) {
-          session.event("1 to 10", EVENT_NAME, RETURN_VALUE);
+          session.event(EVENT_NAME, "1", value);
         } else {
-          session.event("1 to 10", EVENT_NAME + 1, RETURN_VALUE);
+          session.event(EVENT_NAME + 1, "1", value);
         }
         session.close();
       } catch(Exception e) {

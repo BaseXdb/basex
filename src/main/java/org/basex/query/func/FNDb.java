@@ -247,13 +247,17 @@ public final class FNDb extends Fun {
    * @throws QueryException query exception
    */
   private Iter event(final QueryContext ctx) throws QueryException {
-    String msg = expr[3].toString().equals("m") ? expr[2].toString() : null;
-    Value v = expr[0].value(ctx);
-    if(msg == null) {
+    String name = expr[0].toString();
+    String q2 = expr[2].toString();
+    String msg = "";
+    Value v = expr[1].value(ctx);
+    if(q2.replaceAll("\"", "").trim().isEmpty()) {
       ctx.updating = true;
-      msg = ctx.value(expr[0]).toString();
+      msg = ctx.value(expr[1]).toString();
+    } else {
+      msg = ctx.value(expr[2]).toString();
     }
-    ctx.context.events.notify(ctx.context.session, expr[1].toString(), msg);
+    ctx.context.events.notify(ctx.context.session, name, msg);
     return v.iter();
   }
 }

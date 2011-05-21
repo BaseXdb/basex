@@ -19,7 +19,6 @@ import org.basex.server.EventNotification;
 
 /**
  * This class tests the event mechanism with a gui.
- *
  * @author BaseX Team 2005-11, BSD License
  */
 public final class EventTestGUI {
@@ -51,15 +50,16 @@ public final class EventTestGUI {
     cs = new ClientSession("localhost", 1984, "admin", "admin");
 
     try {
-      cs.watchEvent("event", new EventNotification() {
+      cs.watch("event", new EventNotification() {
           @Override
           public void update(final String data) {
             Color c = Color.WHITE;
-            if(data.equals("RED")) {
+            String tmp = data.replaceAll("\"", "");
+            if(tmp.equals("RED")) {
               c = Color.RED;
-            } else if(data.equals("BLUE")) {
+            } else if(tmp.equals("BLUE")) {
               c = Color.BLUE;
-            } else if(data.equals("YELLOW")) {
+            } else if(tmp.equals("YELLOW")) {
               c = Color.YELLOW;
             }
             main.setBackground(c);
@@ -69,15 +69,16 @@ public final class EventTestGUI {
     } catch(BaseXException e1) {
       try {
         cs.execute("create event event");
-        cs.watchEvent("event", new EventNotification() {
+        cs.watch("event", new EventNotification() {
           @Override
           public void update(final String data) {
             Color c = Color.WHITE;
-            if(data.equals("RED")) {
+            String tmp = data.replaceAll("\"", "");
+            if(tmp.equals("RED")) {
               c = Color.RED;
-            } else if(data.equals("BLUE")) {
+            } else if(tmp.equals("BLUE")) {
               c = Color.BLUE;
-            } else if(data.equals("YELLOW")) {
+            } else if(tmp.equals("YELLOW")) {
               c = Color.YELLOW;
             }
             main.setBackground(c);
@@ -138,7 +139,7 @@ public final class EventTestGUI {
    */
   void action(final String c) {
     try {
-      cs.event("()", "event", c);
+      cs.event("event", "()", "\"" + c + "\"");
     } catch(BaseXException e) {
       e.printStackTrace();
     }

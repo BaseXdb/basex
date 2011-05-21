@@ -299,7 +299,7 @@ public class CmdTest {
   @Test
   public final void kill() {
     no(new Kill("admin"));
-    no(new Kill("hans"));
+    ok(new Kill("hans"));
   }
 
   /** Command test. */
