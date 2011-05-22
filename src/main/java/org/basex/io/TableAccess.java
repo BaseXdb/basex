@@ -110,7 +110,46 @@ public abstract class TableAccess {
    * @param entries new entries
    * @param sub size of the subtree that is replaced
    */
-  public abstract void replace(int pre, byte[] entries, final int sub);
+  public final void replace(final int pre, final byte[] entries,
+      final int sub) {
+
+    dirty = true;
+    final int nsize = entries.length >>> IO.NODEPOWER;
+    final int diff = sub - nsize;
+    final int last = diff <= 0 ? pre + nsize - Math.abs(diff) : pre + nsize;
+    copy(entries, pre, last);
+    final int off = last - pre << IO.NODEPOWER;
+
+    // handle the remaining entries if the two subtrees are of different size
+    if(diff < 0) {
+      // case1: new subtree bigger than old one, insert remaining new nodes
+      final byte[] tmp = new byte[entries.length - off];
+      System.arraycopy(entries, off, tmp, 0, tmp.length);
+      insert(last, tmp);
+    } else if(diff > 0) {
+      // case2: old subtree bigger than new one, delete remaining old nodes
+      delete(last, diff);
+    }
+  }
+
+  /**
+   * Copies the specified entries into the database.
+   * @param pre pre value
+   * @param entries array of bytes containing the entries to insert
+   */
+  public final void set(final int pre, final byte[] entries) {
+    dirty = true;
+    copy(entries, pre, pre + (entries.length >>> IO.NODEPOWER));
+  }
+
+  /**
+   * Copies the specified values into the database.
+   * @param entries entries to copy
+   * @param pre first target pre value
+   * @param last last pre value
+   */
+  protected abstract void copy(final byte[] entries, final int pre,
+      final int last);
 
   /**
    * Deletes the specified number of entries from the database.
@@ -125,11 +164,4 @@ public abstract class TableAccess {
    * @param entries array of bytes containing the entries to insert
    */
   public abstract void insert(int pre, byte[] entries);
-
-  /**
-   * Copies the specified entry into the database.
-   * @param pre pre value
-   * @param entries array of bytes containing the entries to insert
-   */
-  public abstract void set(int pre, byte[] entries);
 }

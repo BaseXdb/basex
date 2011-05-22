@@ -170,7 +170,10 @@ final class DBPrimitives extends Primitives {
       final NodePrimitives prim = op.get(pre);
       prim.optimize();
       if(prim.textAdjacency()) first = pre;
-      for(final Primitive up : prim) add += up.apply(add);
+      for(final Primitive up : prim) {
+        up.apply(add);
+        add += up.addend();
+      }
     }
     if(first > -1) mergeTexts(par, first);
     d.flush();

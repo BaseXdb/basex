@@ -7,12 +7,12 @@ package org.basex.io;
  * @author Christian Gruen
  */
 final class Buffers {
-  /** Number of buffers (must be 2 ^ n). */
-  private static final int BUFFERS = 4;
+  /** Number of buffers (must be 1 << n). */
+  private static final int BUFFERS = 1 << 3;
   /** Buffers. */
   private final Buffer[] buf = new Buffer[BUFFERS];
   /** Current buffer offset. */
-  private int c;
+  private int off;
 
   /**
    * Constructor.
@@ -34,7 +34,7 @@ final class Buffers {
    * @return current buffer
    */
   Buffer current() {
-    return buf[c];
+    return buf[off];
   }
 
   /**
@@ -43,11 +43,11 @@ final class Buffers {
    * @return true if cursor has changed
    */
   boolean cursor(final long p) {
-    final int o = c;
+    final int o = off;
     do {
-      if(buf[c].pos == p) return false;
-    } while((c = c + 1 & BUFFERS - 1) != o);
-    c = o + 1 & BUFFERS - 1;
+      if(buf[off].pos == p) return false;
+    } while((off = off + 1 & BUFFERS - 1) != o);
+    off = o + 1 & BUFFERS - 1;
     return true;
   }
 }

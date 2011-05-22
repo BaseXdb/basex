@@ -25,10 +25,9 @@ public final class InsertAttribute extends InsertBase {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     n.data.insertAttr(n.pre + 1, n.pre, md);
-    return 0;
   }
 
   @Override

@@ -24,11 +24,15 @@ public final class InsertBefore extends InsertBase {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pre = n.pre;
     d.insert(pre, d.parent(pre, d.kind(pre)), md);
+  }
+
+  @Override
+  public int addend() {
     return md.meta.size;
   }
 }

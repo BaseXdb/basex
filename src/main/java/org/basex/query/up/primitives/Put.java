@@ -41,11 +41,10 @@ public final class Put extends Primitive {
   }
 
   @Override
-  public int apply(final int add) throws QueryException {
+  public void apply(final int add) throws QueryException {
     PrintOutput out = null;
     try {
       out = new PrintOutput(Token.string(path()));
-
       final SerializerProp pr = ctx.serProp(false);
       // try to reproduce non-chopped documents correctly
       if(node instanceof DBNode) pr.set(SerializerProp.S_INDENT,
@@ -57,7 +56,6 @@ public final class Put extends Primitive {
     } finally {
       if(out != null) try { out.close(); } catch(final Exception ex) { }
     }
-    return 0;
   }
 
   /**

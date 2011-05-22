@@ -58,7 +58,7 @@ public final class DataAccess {
    * @return text as byte array
    */
   public long pos() {
-    return bm.current().pos + off;
+    return buffer(false).pos + off;
   }
 
   /**
@@ -159,19 +159,16 @@ public final class DataAccess {
     int l = readNum();
     int ll = IO.BLOCKSIZE - off;
     final byte[] b = new byte[l];
-    Buffer bf = bm.current();
 
-    System.arraycopy(bf.data, off, b, 0, Math.min(l, ll));
+    System.arraycopy(buffer(false).data, off, b, 0, Math.min(l, ll));
     if(l > ll) {
       l -= ll;
       while(l > IO.BLOCKSIZE) {
-        bf = next();
-        System.arraycopy(bf.data, 0, b, ll, IO.BLOCKSIZE);
+        System.arraycopy(buffer(true).data, 0, b, ll, IO.BLOCKSIZE);
         ll += IO.BLOCKSIZE;
         l -= IO.BLOCKSIZE;
       }
-      bf = next();
-      System.arraycopy(bf.data, 0, b, ll, l);
+      System.arraycopy(buffer(true).data, 0, b, ll, l);
     }
     off += l;
     return b;
@@ -200,37 +197,23 @@ public final class DataAccess {
   }
 
   /**
-   * Appends a value to the file and return it's offset.
-   * @param p write position
-   * @param v byte array to be appended
-   */
-  public void writeBytes(final long p, final byte[] v) {
-    cursor(p);
-    writeNum(v.length);
-    for(final byte b : v) write(b);
-  }
-
-  /**
    * Sets the disk cursor.
    * @param p read position
-   * @return buffer
    */
-  public Buffer cursor(final long p) {
+  public void cursor(final long p) {
     off = (int) (p & IO.BLOCKSIZE - 1);
+    final long b = p - off;
+    if(!bm.cursor(b)) return;
 
-    final boolean ch = bm.cursor(p - off);
     final Buffer bf = bm.current();
-    if(ch) {
-      try {
-        if(bf.dirty) writeBlock(bf);
-        bf.pos = p - off;
-        file.seek(bf.pos);
-        file.readFully(bf.data, 0, (int) Math.min(len - bf.pos, IO.BLOCKSIZE));
-      } catch(final IOException ex) {
-        Util.stack(ex);
-      }
+    try {
+      if(bf.dirty) writeBlock(bf);
+      file.seek(b);
+      file.readFully(bf.data, 0, (int) Math.min(len - b, IO.BLOCKSIZE));
+      bf.pos = b;
+    } catch(final IOException ex) {
+      Util.stack(ex);
     }
-    return bf;
   }
 
   /**
@@ -252,6 +235,40 @@ public final class DataAccess {
   }
 
   /**
+   * Appends a value to the file and return it's offset.
+   * @param p write position
+   * @param v byte array to be appended
+   */
+  public void writeBytes(final long p, final byte[] v) {
+    cursor(p);
+    writeNum(v.length);
+    for(final byte b : v) write(b);
+  }
+
+  /**
+   * Writes an integer value to the specified output stream.
+   * @param p write position
+   * @param v byte array to be appended
+   */
+  public void writeInt(final long p, final int v) {
+    cursor(p);
+    writeInt(v);
+  }
+
+  /**
+   * Writes an integer value to the specified output stream.
+   * @param v value to be written
+   */
+  public void writeInt(final int v) {
+    write(v >>> 24);
+    write(v >>> 16);
+    write(v >>>  8);
+    write(v);
+  }
+
+  // PRIVATE METHODS ==========================================================
+
+  /**
    * Writes the specified block to disk.
    * @param bf buffer to write
    * @throws IOException I/O exception
@@ -259,6 +276,7 @@ public final class DataAccess {
   private void writeBlock(final Buffer bf) throws IOException {
     file.seek(bf.pos);
     file.write(bf.data);
+    bf.dirty = false;
   }
 
   /**
@@ -283,7 +301,7 @@ public final class DataAccess {
    * @return next byte
    */
   private int read() {
-    final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.current();
+    final Buffer bf = buffer(off == IO.BLOCKSIZE);
     return bf.data[off++] & 0xFF;
   }
 
@@ -292,29 +310,22 @@ public final class DataAccess {
    * @param b byte to be written
    */
   private void write(final int b) {
-    final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.current();
+    final Buffer bf = buffer(off == IO.BLOCKSIZE);
     bf.data[off++] = (byte) b;
     length(Math.max(len, bf.pos + off));
     bf.dirty = true;
   }
 
   /**
-   * Writes an integer value to the specified output stream.
-   * @param v value to be written
-   */
-  public void writeInt(final int v) {
-    write(v >>> 24);
-    write(v >>> 16);
-    write(v >>>  8);
-    write(v);
-  }
-
-  /**
-   * Returns the next block.
+   * Returns the current or next buffer.
+   * @param next next block
    * @return buffer
    */
-  private Buffer next() {
-    off = 0;
-    return cursor(bm.current().pos + IO.BLOCKSIZE);
+  private Buffer buffer(final boolean next) {
+    if(next) {
+      off = 0;
+      cursor(bm.current().pos + IO.BLOCKSIZE);
+    }
+    return bm.current();
   }
 }

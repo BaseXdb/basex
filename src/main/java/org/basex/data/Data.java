@@ -525,20 +525,16 @@ public abstract class Data {
    * @param data replace data
    */
   public final void replace(final int rpre, final Data data) {
-    // [LK] if we know that both data references will use the same tag and
-    // attribute indexes (..which should be the default case..) we might be
-    // able to speed up the copy process even more
-
     meta.update();
 
     // check if attribute size of parent must be updated
-    final boolean rAtt = kind(rpre) == ATTR;
-
     final int dsize = data.meta.size;
     buffer(dsize);
-    int dpre = -1;
+
     final int rkind = kind(rpre);
-    while(++dpre != dsize) {
+    final int rsize = size(rpre, rkind);
+    final int rpar = parent(rpre, rkind);
+    for(int dpre = 0; dpre < dsize; dpre++) {
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
       final int pre = rpre + dpre;
@@ -570,20 +566,14 @@ public abstract class Data {
           break;
       }
     }
-
-    // increase/decrease size of ancestors, adjust distances of siblings
-    final int rsize = size(rpre, rkind);
-    final int rpar = parent(rpre, rkind);
-    // diff > 0 if new subtree is bigger than old one, v.v.
-    final int diff = dsize - rsize;
-
     table.replace(rpre, buffer(), rsize);
     buffer(1);
 
-    // don't have to update distances/sizes if the two subtrees are of equal
-    // size
+    // no distance/size update if the two subtrees are of equal size
+    final int diff = dsize - rsize;
     if(diff == 0) return;
 
+    // increase/decrease size of ancestors, adjust distances of siblings
     int p = rpar;
     while(p >= 0) {
       final int k = kind(p);
@@ -591,13 +581,14 @@ public abstract class Data {
       p = parent(p, k);
     }
     updateDist(rpre + dsize, diff);
-    if(!rAtt) return;
+
     // adjust attribute size of parent if attributes inserted. attribute size
     // of parent cannot be reduced via a replace expression.
-    int dAtt = 0;
-    int i = 0;
-    while(i < dsize && data.kind(i++) == ATTR) dAtt++;
-    if(dAtt > 1) attSize(rpar, kind(rpar), dAtt + 1);
+    if(data.kind(0) == ATTR) {
+      int d = 0, i = 0;
+      while(i < dsize && data.kind(i++) == ATTR) d++;
+      if(d > 1) attSize(rpar, kind(rpar), d + 1);
+    }
   }
 
   /**
@@ -894,7 +885,7 @@ public abstract class Data {
   // INSERTS WITHOUT TABLE UPDATES ============================================
 
   /** Buffer for caching new table entries. */
-  private byte[] b = new byte[1 << IO.NODEPOWER];
+  private byte[] b = new byte[IO.NODESIZE];
   /** Buffer position. */
   private int bp;
 

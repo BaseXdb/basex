@@ -3,9 +3,9 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.io.DataAccess;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -185,9 +185,10 @@ final class FTTrieBuilder extends FTBuilder {
    * @throws IOException I/O exception
    */
   private void writeSplitTrie(final IntList roots) throws IOException {
-    final DataOutput outA = new DataOutput(data.meta.file(DATAFTX + 'a'));
-    final DataOutput outC = new DataOutput(data.meta.file(DATAFTX + 'c'));
-    final DataAccess outT = new DataAccess(data.meta.file(DATAFTX + 't'));
+    final MetaData md = data.meta;
+    final DataOutput outA = new DataOutput(md.file(DATAFTX + 'a'));
+    final DataOutput outC = new DataOutput(md.file(DATAFTX + 'c'));
+    final DataAccess outT = new DataAccess(md.file(DATAFTX + 't'));
     final int[] root = new int[roots.size()];
     int rp = 0;
 
@@ -232,17 +233,14 @@ final class FTTrieBuilder extends FTBuilder {
     outC.write4(0);
     outC.close();
 
-    // finally update root node
-    final RandomAccessFile tmp =
-      new RandomAccessFile(data.meta.file(DATAFTX + 'a'), "rw");
-    tmp.seek(2);
+    final DataAccess tmp = new DataAccess(md.file(DATAFTX + 'a'));
+    long c = 2;
     for(final int r : root) {
-      tmp.writeInt(r);
-      tmp.seek(tmp.getFilePointer() + 1);
+      tmp.writeInt(c, r);
+      c += 5;
     }
     tmp.close();
-    DropDB.drop(data.meta.name, DATAFTX + 't' + IO.BASEXSUFFIX,
-        data.meta.prop);
+    DropDB.drop(md.name, DATAFTX + 't' + IO.BASEXSUFFIX, md.prop);
   }
 
   /**

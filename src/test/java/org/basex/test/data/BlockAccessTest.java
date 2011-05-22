@@ -1,6 +1,8 @@
 package org.basex.test.data;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -10,6 +12,7 @@ import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;
 import org.basex.util.Util;
@@ -66,9 +69,9 @@ public final class BlockAccessTest {
       Util.stack(ex);
     }
 
-    final int bytecount = size * (1 << IO.NODEPOWER);
-    storage = new byte[bytecount];
-    for(int i = 0; i < bytecount; ++i) {
+    final int bc = size * (1 << IO.NODEPOWER);
+    storage = new byte[bc];
+    for(int i = 0; i < bc; ++i) {
       storage[i] = (byte) tda.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
     }
     nodes = IO.BLOCKSIZE >>> IO.NODEPOWER;
@@ -129,13 +132,43 @@ public final class BlockAccessTest {
    */
   @Test
   public void testSize() {
-    assertEquals("Testfile size changed!", size, tda.size());
+    assertEquals("Testfile size changed!", size, tdaSize());
     assertTrue("Need at least 3 blocks for testing!", blocks > 2);
-    assertEquals("Unexpected number of blocks!", blocks, tda.blocks());
+    assertEquals("Unexpected number of blocks!", blocks, tdaBlocks());
     closeAndReload();
-    assertEquals("Testfile size changed!", size, tda.size());
+    assertEquals("Testfile size changed!", size, tdaSize());
     assertTrue("Need at least 3 blocks for testing!", blocks > 2);
-    assertEquals("Unexpected number of blocks!", blocks, tda.blocks());
+    assertEquals("Unexpected number of blocks!", blocks, tdaBlocks());
+  }
+
+  /**
+   * Returns the number of block entries.
+   * @return number of entries
+   */
+  private int tdaSize() {
+    try {
+      final Field f = tda.getClass().getSuperclass().getDeclaredField("meta");
+      f.setAccessible(true);
+      return ((MetaData) f.get(tda)).size;
+    } catch(final Exception ex) {
+      Util.stack(ex);
+      return 0;
+    }
+  }
+
+  /**
+   * Returns the number of blocks.
+   * @return number of blocks
+   */
+  private int tdaBlocks() {
+    try {
+      final Field f = tda.getClass().getDeclaredField("blocks");
+      f.setAccessible(true);
+      return f.getInt(tda);
+    } catch(final Exception ex) {
+      Util.stack(ex);
+      return 0;
+    }
   }
 
   /**
@@ -144,11 +177,11 @@ public final class BlockAccessTest {
   @Test
   public void testDeleteOneNode() {
     tda.delete(3, 1);
-    assertEquals("One node deleted => size-1", size - 1, tda.size());
+    assertEquals("One node deleted => size-1", size - 1, tdaSize());
     assertEntrysEqual(0, 0, 3);
     assertEntrysEqual(4, 3, size - 4);
     closeAndReload();
-    assertEquals("One node deleted => size-1", size - 1, tda.size());
+    assertEquals("One node deleted => size-1", size - 1, tdaSize());
     assertEntrysEqual(0, 0, 3);
     assertEntrysEqual(4, 3, size - 4);
   }
@@ -159,10 +192,10 @@ public final class BlockAccessTest {
   @Test
   public void testDeleteAtBeginning() {
     tda.delete(0, 3);
-    assertEquals("Three nodes deleted => size-3", size - 3, tda.size());
+    assertEquals("Three nodes deleted => size-3", size - 3, tdaSize());
     assertEntrysEqual(3, 0, size - 3);
     closeAndReload();
-    assertEquals("Three nodes deleted => size-3", size - 3, tda.size());
+    assertEquals("Three nodes deleted => size-3", size - 3, tdaSize());
     assertEntrysEqual(3, 0, size - 3);
   }
 
@@ -172,10 +205,10 @@ public final class BlockAccessTest {
   @Test
   public void testDeleteAtEnd() {
     tda.delete(size - 3, 3);
-    assertEquals("Three nodes deleted => size-3", size - 3, tda.size());
+    assertEquals("Three nodes deleted => size-3", size - 3, tdaSize());
     assertEntrysEqual(0, 0, size - 3);
     closeAndReload();
-    assertEquals("Three nodes deleted => size-3", size - 3, tda.size());
+    assertEquals("Three nodes deleted => size-3", size - 3, tdaSize());
     assertEntrysEqual(0, 0, size - 3);
   }
 
@@ -185,10 +218,10 @@ public final class BlockAccessTest {
   @Test
   public void testDeleteFirstBlock() {
     tda.delete(0, nodes);
-    assertEquals(blocks - 1, tda.blocks());
+    assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(nodes, 0, size - nodes);
     closeAndReload();
-    assertEquals(blocks - 1, tda.blocks());
+    assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(nodes, 0, size - nodes);
   }
 
@@ -198,11 +231,11 @@ public final class BlockAccessTest {
   @Test
   public void testDeleteSecondBlock() {
     tda.delete(nodes, nodes);
-    assertEquals(blocks - 1, tda.blocks());
+    assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes);
     assertEntrysEqual(2 * nodes, nodes, size - 2 * nodes);
     closeAndReload();
-    assertEquals(blocks - 1, tda.blocks());
+    assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes);
     assertEntrysEqual(2 * nodes, nodes, size - 2 * nodes);
   }
@@ -213,10 +246,10 @@ public final class BlockAccessTest {
   @Test
   public void testDeleteLastBlock() {
     tda.delete(size / nodes * nodes, size % nodes);
-    assertEquals(blocks - 1, tda.blocks());
+    assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes - size % nodes);
     closeAndReload();
-    assertEquals(blocks - 1, tda.blocks());
+    assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes - size % nodes);
   }
 
@@ -226,13 +259,13 @@ public final class BlockAccessTest {
   @Test
   public void testDeleteSecondBlockAndSurroundingNodes() {
     tda.delete(nodes - 1, nodes + 2);
-    assertEquals(size - 2 - nodes, tda.size());
-    assertEquals(blocks - 1, tda.blocks());
+    assertEquals(size - 2 - nodes, tdaSize());
+    assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes - 1);
     assertEntrysEqual(2 * nodes + 1, nodes - 1, size - 2 * nodes - 1);
     closeAndReload();
-    assertEquals(size - 2 - nodes, tda.size());
-    assertEquals(blocks - 1, tda.blocks());
+    assertEquals(size - 2 - nodes, tdaSize());
+    assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes - 1);
     assertEntrysEqual(2 * nodes + 1, nodes - 1, size - 2 * nodes - 1);
   }
@@ -243,12 +276,12 @@ public final class BlockAccessTest {
   @Test
   public void testSimpleInsert() {
     tda.insert(4, getTestEntries(1));
-    assertEquals(size + 1, tda.size());
+    assertEquals(size + 1, tdaSize());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 1);
     assertEntrysEqual(4, 5, size - 4);
     closeAndReload();
-    assertEquals(size + 1, tda.size());
+    assertEquals(size + 1, tdaSize());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 1);
     assertEntrysEqual(4, 5, size - 4);
@@ -260,12 +293,12 @@ public final class BlockAccessTest {
   @Test
   public void testInsertMultiple() {
     tda.insert(4, getTestEntries(3));
-    assertEquals(size + 3, tda.size());
+    assertEquals(size + 3, tdaSize());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 3);
     assertEntrysEqual(4, 7, size - 4);
     closeAndReload();
-    assertEquals(size + 3, tda.size());
+    assertEquals(size + 3, tdaSize());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 3);
     assertEntrysEqual(4, 7, size - 4);
@@ -277,12 +310,12 @@ public final class BlockAccessTest {
   @Test
   public void testInsertMany() {
     tda.insert(4, getTestEntries(nodes - 1));
-    assertEquals(size + nodes - 1, tda.size());
+    assertEquals(size + nodes - 1, tdaSize());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, nodes - 1);
     assertEntrysEqual(4, 4 + nodes - 1, size - 4);
     closeAndReload();
-    assertEquals(size + nodes - 1, tda.size());
+    assertEquals(size + nodes - 1, tdaSize());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, nodes - 1);
     assertEntrysEqual(4, 4 + nodes - 1, size - 4);
@@ -294,14 +327,14 @@ public final class BlockAccessTest {
   @Test
   public void testInsertAtBlockBoundary() {
     tda.insert(nodes, getTestEntries(nodes));
-    assertEquals(size + nodes, tda.size());
-    assertEquals(blocks + 1, tda.blocks());
+    assertEquals(size + nodes, tdaSize());
+    assertEquals(blocks + 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes);
     assertAreInserted(nodes, nodes);
     assertEntrysEqual(nodes, 2 * nodes, size - nodes);
     closeAndReload();
-    assertEquals(size + nodes, tda.size());
-    assertEquals(blocks + 1, tda.blocks());
+    assertEquals(size + nodes, tdaSize());
+    assertEquals(blocks + 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes);
     assertAreInserted(nodes, nodes);
     assertEntrysEqual(nodes, 2 * nodes, size - nodes);
