@@ -21,7 +21,8 @@ import com.bradmcevoy.http.ServletResponse;
  * and the Jetty server is launched by the constructor. The Jetty server listens
  * for HTTP requests, which are then processed by the WebDAV implementation.
  * @author BaseX Team 2005-11, BSD License
- * @author Rositsa Shadura, Dimitar Popov
+ * @author Rositsa Shadura
+ * @author Dimitar Popov
  */
 public class WebDAVServer extends BaseXServer {
   /** HTTP server. */
