@@ -57,7 +57,7 @@ public class BXAllDatabasesResource extends BXResource implements
 
   @Override
   public Resource child(final String childName) {
-    return new BXDocumentResource(ctx, childName);
+    return new BXDocumentDatabase(ctx, childName);
   }
 
   @Override
@@ -69,9 +69,9 @@ public class BXAllDatabasesResource extends BXResource implements
       try {
         new Open(db).execute(ctx);
         if(ctx.data.meta.ndocs > 1) {
-          dbs.add(new BXDatabaseCollection(db, ctx));
+          dbs.add(new BXCollectionDatabase(db, ctx));
         } else if (ctx.data.meta.ndocs == 1) {
-          dbs.add(new BXDocumentResource(ctx, db));
+          dbs.add(new BXDocumentDatabase(ctx, db));
         }
       } catch(BaseXException e) {
         try {
@@ -106,7 +106,7 @@ public class BXAllDatabasesResource extends BXResource implements
     if(!Command.validName(dbname, false)) return null;
     try {
       CreateDB.xml(dbname, inputStream, ctx);
-      return new BXDocumentResource(ctx, dbname);
+      return new BXDocumentDatabase(ctx, dbname);
     } catch(BaseXException e) {
       // [DP] WebDAV: error handling
       e.printStackTrace();

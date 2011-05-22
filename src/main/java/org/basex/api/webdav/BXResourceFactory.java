@@ -1,10 +1,14 @@
 package org.basex.api.webdav;
 
+import static org.basex.util.Token.*;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
+import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Open;
+import org.basex.util.IntList;
 import org.basex.util.StringList;
+import org.basex.util.TokenObjMap;
 
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Resource;
@@ -44,16 +48,13 @@ public class BXResourceFactory implements ResourceFactory {
 
     if(steps.length == 1) {
       final String db = steps[0];
-      return isCollection(ctx, db) ? new BXCollectionDatabaseResource(ctx, db)
-          : new BXDocumentResource(ctx, db);
+      return isCollection(ctx, db) ? new BXCollectionDatabase(db, ctx)
+          : new BXDocumentDatabase(ctx, db);
     }
-
-    // TODO collection
-    return null;
-
+    return getBXResource(steps[0], p);
   }
 
-  /*
+  /**
    * List all databases.
    * @param ctx context
    * @return a list of database names
@@ -89,5 +90,32 @@ public class BXResourceFactory implements ResourceFactory {
   static String dbname(final String n) {
     final int i = n.lastIndexOf(".");
     return (i != -1 ? n.substring(0, i) : n).replaceAll("[^\\w-]", "");
+  }
+
+  private BXResource getBXResource(final String root, final String path) {
+    final String prefix = path.substring(root.length() + 2, path.length());
+    try {
+      new Open(root).execute(ctx);
+      final IntList pres = new IntList();
+      String doc;
+      for(int pre : ctx.data.doc()) {
+        doc = string(ctx.data.text(pre, true));
+        if(doc.startsWith(prefix)) {
+          if(doc.equals(prefix)) {
+            String db = doc.substring(doc.lastIndexOf(Prop.DIRSEP) + 1,
+                doc.length());
+            new Close().execute(ctx);
+            return new BXDocument(db, prefix, ctx);
+          }
+          pres.add(pre);
+        }
+      }
+      new Close().execute(ctx);
+      return new BXFolder(root, pres.toArray(), prefix, ctx);
+    } catch(BaseXException e) {
+      // TODO: handle exception
+      e.printStackTrace();
+      return null;
+    }
   }
 }

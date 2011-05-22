@@ -23,12 +23,12 @@ import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
- * WebDAV resource representing a single-document.
+ * WebDAV resource representing a document database.
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXDocumentResource extends BXResource implements FileResource {
+public class BXDocumentDatabase extends BXResource implements FileResource {
   /** Default content type. */
   private static final String MIMETYPEXML = "text/xml";
   /** Database name. */
@@ -39,7 +39,7 @@ public class BXDocumentResource extends BXResource implements FileResource {
    * @param c database context
    * @param n database name
    */
-  public BXDocumentResource(final Context c, final String n) {
+  public BXDocumentDatabase(final Context c, final String n) {
     ctx = c;
     dbname = n;
   }

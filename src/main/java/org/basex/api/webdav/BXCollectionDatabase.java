@@ -1,6 +1,7 @@
 package org.basex.api.webdav;
 
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,33 +14,32 @@ import java.util.Map;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Open;
 import org.basex.util.IntList;
-import org.basex.util.TokenList;
 import org.basex.util.TokenObjMap;
 
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
-import com.bradmcevoy.http.Request;
-import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
- * Database collection as WebDAV resource.
+ * WebDAV resource representing a collection database.
  * @author BaseX Team 2005-11, BSD License
- * @author Rositsa Shadura, Dimitar Popov
+ * @author Rositsa Shadura
+ * @author Dimitar Popov
  */
-public class BXDatabaseCollection extends BXResource implements FolderResource {
+public class BXCollectionDatabase extends BXResource implements FolderResource {
 
   /** Collection name. */
   private final String collname;
 
-  public BXDatabaseCollection(final String n, final Context c) {
+  public BXCollectionDatabase(final String n, final Context c) {
     collname = n;
     ctx = c;
   }
@@ -81,7 +81,7 @@ public class BXDatabaseCollection extends BXResource implements FolderResource {
           }
         } else {
           // XML file
-          dbs.add(new BXDocumentResource(ctx, string(doc)));
+          dbs.add(new BXDocument(collname, string(doc), ctx));
         }
       }
       final Iterator<byte[]> dirsIt = dirs.iterator();
@@ -89,19 +89,14 @@ public class BXDatabaseCollection extends BXResource implements FolderResource {
       while(dirsIt.hasNext()) {
         dirName = dirsIt.next();
         dbs.add(new BXFolder(collname, dirs.get(dirName).toArray(),
-            string(dirName)));
+            string(dirName), ctx));
       }
+      new Close().execute(ctx);
     } catch(BaseXException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return dbs;
-  }
-
-  @Override
-  public String getUniqueId() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override

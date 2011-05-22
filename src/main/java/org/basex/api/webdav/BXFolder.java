@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.core.BaseXException;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Open;
@@ -38,10 +39,12 @@ public final class BXFolder extends BXResource implements FolderResource {
   /** Path to folder. */
   private final String dirpath;
 
-  public BXFolder(final String db, final int[] pres, final String p) {
+  public BXFolder(final String db, final int[] pres, final String p,
+      final Context c) {
     dbname = db;
     prevals = pres;
     dirpath = p;
+    ctx = c;
   }
 
   @Override
@@ -68,8 +71,8 @@ public final class BXFolder extends BXResource implements FolderResource {
         doc = string(ctx.data.text(pre, true));
         String s = doc.substring(dirpath.length(), doc.length());
         int idx = s.lastIndexOf(Prop.DIRSEP);
-        if(idx == 0) dbs.add(new BXDocumentResource(ctx, dirpath.substring(1,
-            dirpath.length())));
+        if(idx == 0) dbs.add(new BXDocument(dbname, dirpath.substring(1,
+            dirpath.length()), ctx));
         else if(idx > 0) {
           String[] parts = s.split(Prop.DIRSEP);
           byte[] dir = token(dirpath + Prop.DIRSEP + parts[0]);
@@ -87,24 +90,13 @@ public final class BXFolder extends BXResource implements FolderResource {
       while(dirsIt.hasNext()) {
         dirName = dirsIt.next();
         dbs.add(new BXFolder(dbname, dirs.get(dirName).toArray(),
-            string(dirName)));
+            string(dirName), ctx));
       }
+      new Close().execute(ctx);
     } catch(BaseXException e) {
-      try {
-        new Close().execute(ctx);
-      } catch(BaseXException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }
       e.printStackTrace();
     }
     return dbs;
-  }
-
-  @Override
-  public String getUniqueId() {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
@@ -114,31 +106,7 @@ public final class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public Object authenticate(String user, String password) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public boolean authorise(Request request, Method method, Auth auth) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public String getRealm() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public Date getModifiedDate() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String checkRedirect(Request request) {
     // TODO Auto-generated method stub
     return null;
   }
