@@ -4,7 +4,7 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-version=Version %
+version=Version
 
 # Menu Commands
 m_db=データベース
@@ -205,6 +205,7 @@ ds_alterpw=パスワードの変更
 ds_invalid=% は不正です
 ds_adlogin=管理者ログイン (ローカルあるいはリモート)
 ds_databases=データベース
+ds_backups=Backups
 ds_sessions=セッション
 ds_locallogs=ログ
 ds_connected=%:% に接続されました。

@@ -4,7 +4,7 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-version=Phiên bản %
+version=Phiên bản
 
 # Menu Commands
 m_db=Cơ sở dữ liệu
@@ -205,6 +205,7 @@ ds_alterpw=Alter Password
 ds_invalid=% is invalid
 ds_adlogin=Administrator Login (local or remote)
 ds_databases=Databases
+ds_backups=Backups
 ds_sessions=Sessions
 ds_locallogs=Local Logs
 ds_connected=Connected to %:%.

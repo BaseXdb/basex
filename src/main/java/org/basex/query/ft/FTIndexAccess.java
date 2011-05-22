@@ -7,11 +7,13 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.expr.Simple;
 import org.basex.query.item.FTNode;
 import org.basex.query.item.ANode;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.NodeIter;
+import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
@@ -60,6 +62,27 @@ public final class FTIndexAccess extends Simple {
         return it;
       }
     };
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return ftexpr.uses(u);
+  }
+
+  @Override
+  public int count(final Var v) {
+    return ftexpr.count(v);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    return ftexpr.removable(v);
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    ftexpr.remove(v);
+    return this;
   }
 
   @Override

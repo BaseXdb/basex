@@ -27,7 +27,7 @@ public final class ReplaceNode extends NodeCopy {
    */
   public ReplaceNode(final InputInfo ii, final ANode n,
       final NodeCache rep) {
-    super(ii, n, rep);
+    super(PrimitiveType.REPLACENODE, ii, n, rep);
   }
 
   @Override
@@ -41,26 +41,22 @@ public final class ReplaceNode extends NodeCopy {
     if(n.type == NodeType.TXT && md.meta.size == 1 && md.kind(0) == Data.TEXT) {
       // overwrite existing text node
       d.replace(pre, Data.TEXT, md.text(0, true));
-
     } else {
-      /* [LK] XQuery/Update: check if simple, fast replace is possible
-       adjust attribute size of parent if attributes inserted */
-//      if(md != null && md.meta.size > 0 && d.ns.size() == 0
-//        && md.ns.size() == 0) {
-//        d.replace(pre, md);
-//      } else {
+      /* Checks if fast replace is possible - documents containing namespaces
+       * are not supported so far. */
+      if(d.ns.size() == 0 && md.ns.size() == 0) {
+        d.replace(pre, md);
+      } else {
         d.delete(pre);
-        if(md != null) {
-          if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
-          else d.insert(pre, par, md);
-        }
-//      }
-
-      // text merging applies for both replace methods
-      if(!mergeTexts(d, pre - 1, pre)) {
-        pre += md != null ? md.meta.size : 1;
-        mergeTexts(d, pre - 1, pre);
+        if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
+        else d.insert(pre, par, md);
       }
+
+      /* text merging applies for both replace methods
+      if(!mergeTexts(d, pre - 1, pre)) {
+        pre += md.meta.size;
+        mergeTexts(d, pre - 1, pre);
+      }*/
     }
     return 0;
   }
@@ -75,11 +71,6 @@ public final class ReplaceNode extends NodeCopy {
     if(md == null) return;
     add(pool);
     pool.remove(node);
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.REPLACENODE;
   }
 
   @Override

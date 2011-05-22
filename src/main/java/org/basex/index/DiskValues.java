@@ -90,6 +90,8 @@ public final class DiskValues implements Index {
   @Override
   public int nrIDs(final IndexToken it) {
     if(it instanceof RangeToken) return idRange((RangeToken) it).size();
+    if(it.get().length > MAXLEN) return Integer.MAX_VALUE;
+
     final byte[] tok = it.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.size(id);

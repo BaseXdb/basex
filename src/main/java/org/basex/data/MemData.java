@@ -61,10 +61,10 @@ public final class MemData extends Data {
   protected void cls() { }
 
   @Override
-  public void closeIndex(final IndexType index) { }
+  public void closeIndex(final IndexType type) { }
 
   @Override
-  public void setIndex(final IndexType type, final Index ind) { }
+  public void setIndex(final IndexType type, final Index index) { }
 
   @Override
   public byte[] text(final int pre, final boolean text) {

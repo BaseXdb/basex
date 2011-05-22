@@ -8,23 +8,23 @@ package org.basex.index;
  */
 public final class ValuesToken implements IndexToken {
   /** Index type. */
-  private final IndexType ind;
+  private final IndexType type;
   /** Text. */
   private final byte[] text;
 
   /**
    * Constructor.
-   * @param i index type
+   * @param it index type
    * @param tok token
    */
-  public ValuesToken(final IndexType i, final byte[] tok) {
-    ind = i;
+  public ValuesToken(final IndexType it, final byte[] tok) {
+    type = it;
     text = tok;
   }
 
   @Override
   public IndexType type() {
-    return ind;
+    return type;
   }
 
   @Override

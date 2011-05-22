@@ -51,12 +51,9 @@ public interface Text {
   /** Code version. */
   String VERSION = "6.6.3 beta";
   /** Company info. */
-  String COMPANY = "BaseX Team";
-  /** Version information. */
-  String VERSINFO = lang("version", VERSION);
-
+  String COMPANY = NAME + " Team";
   /** Title and version. */
-  String TITLE = NAME + " " + VERSION;
+  String TITLE = NAME + ' ' + VERSION;
 
   // CONSOLE INFO =============================================================
 
@@ -64,6 +61,8 @@ public interface Text {
   String CONSOLE = TITLE + " [%]" + NL;
   /** Console text. */
   String CONSOLE2 = lang("help_intro", "help") + NL;
+  /** Version information. */
+  String VERSINFO = lang("version");
 
   /** Goodbye information. */
   String[] CLIENTBYE = {
@@ -1203,6 +1202,8 @@ public interface Text {
   String ADMINLOGIN = lang("ds_adlogin");
   /** Databases. */
   String DATABASES = lang("ds_databases");
+  /** Backups. */
+  String BACKUPS = lang("ds_backups");
   /** Sessions. */
   String SESSIONS = lang("ds_sessions");
   /** Logs. */

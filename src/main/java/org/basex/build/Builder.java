@@ -99,13 +99,13 @@ public abstract class Builder extends Progress {
 
   /**
    * Opens a document node.
-   * @param doc document name
+   * @param value document name
    * @throws IOException I/O exception
    */
-  public final void startDoc(final byte[] doc) throws IOException {
+  public final void startDoc(final byte[] value) throws IOException {
     preStack[lvl++] = meta.size;
     if(meta.pathindex) path.add(0, lvl, Data.DOC);
-    addDoc(doc);
+    addDoc(value);
     ns.open();
   }
 
@@ -132,42 +132,42 @@ public abstract class Builder extends Progress {
 
   /**
    * Opens a new element node.
-   * @param tag tag name
+   * @param name tag name
    * @param att attributes
    * @return preValue of the created node
    * @throws IOException I/O exception
    */
-  public final int startElem(final byte[] tag, final Atts att)
+  public final int startElem(final byte[] name, final Atts att)
       throws IOException {
 
-    final int pre = addElem(tag, att);
+    final int pre = addElem(name, att);
     if(meta.height < ++lvl) meta.height = lvl;
     return pre;
   }
 
   /**
    * Stores an empty element.
-   * @param tag tag name
+   * @param name tag name
    * @param att attributes
    * @throws IOException I/O exception
    */
-  public final void emptyElem(final byte[] tag, final Atts att)
+  public final void emptyElem(final byte[] name, final Atts att)
       throws IOException {
 
-    addElem(tag, att);
+    addElem(name, att);
     ns.close(preStack[lvl]);
   }
 
   /**
    * Closes an element.
-   * @param tag tag name
+   * @param name tag name
    * @throws IOException I/O exception
    */
-  public final void endElem(final byte[] tag) throws IOException {
+  public final void endElem(final byte[] name) throws IOException {
     checkStop();
 
-    if(--lvl == 0 || tags.id(tag) != tagStack[lvl])
-      error(CLOSINGTAG, parser.detail(), tag, tags.key(tagStack[lvl]));
+    if(--lvl == 0 || tags.id(name) != tagStack[lvl])
+      error(CLOSINGTAG, parser.detail(), name, tags.key(tagStack[lvl]));
 
     final int pre = preStack[lvl];
     setSize(pre, meta.size - pre);
@@ -176,12 +176,12 @@ public abstract class Builder extends Progress {
 
   /**
    * Stores a text node.
-   * @param txt text value
+   * @param value text value
    * @throws IOException I/O exception
    */
-  public final void text(final byte[] txt) throws IOException {
+  public final void text(final byte[] value) throws IOException {
     // chop whitespaces in text nodes
-    final byte[] t = meta.chop ? trim(txt) : txt;
+    final byte[] t = meta.chop ? trim(value) : value;
 
     // check if text appears before or after root node
     final boolean ignore = !inDoc || lvl == 1;
@@ -193,11 +193,11 @@ public abstract class Builder extends Progress {
 
   /**
    * Stores a comment.
-   * @param com comment text
+   * @param value comment text
    * @throws IOException I/O exception
    */
-  public final void comment(final byte[] com) throws IOException {
-    addText(com, Data.COMM);
+  public final void comment(final byte[] value) throws IOException {
+    addText(value, Data.COMM);
   }
 
   /**
@@ -238,7 +238,7 @@ public abstract class Builder extends Progress {
 
   /**
    * Builds the database by running the specified parser.
-   * @param db name of database
+   * @param db name of the database
    * @return data database instance
    * @throws IOException I/O exception
    */
@@ -252,66 +252,66 @@ public abstract class Builder extends Progress {
 
   /**
    * Adds a document node to the database.
-   * @param txt name of the document
+   * @param value name of the document
    * @throws IOException I/O exception
    */
-  protected abstract void addDoc(byte[] txt) throws IOException;
+  protected abstract void addDoc(byte[] value) throws IOException;
 
   /**
    * Adds an element node to the database. This method stores a preliminary
    * size value; if this node has further descendants, {@link #setSize} must
    * be called to set the final size value.
-   * @param n the tag name reference
-   * @param u namespace uri reference
-   * @param dis distance to parent
-   * @param as number of attributes
+   * @param name the tag name reference
+   * @param uri namespace uri reference
+   * @param dist distance to parent
+   * @param asize number of attributes
    * @param ne namespace flag
    * @throws IOException I/O exception
    */
-  protected abstract void addElem(int n, int u, int dis, int as, boolean ne)
-    throws IOException;
+  protected abstract void addElem(int name, int uri, int dist, int asize,
+      boolean ne) throws IOException;
 
   /**
    * Adds an attribute to the database.
-   * @param n attribute name
-   * @param v attribute value
-   * @param dis distance to parent
-   * @param u namespace uri reference
+   * @param name attribute name
+   * @param value attribute value
+   * @param dist distance to parent
+   * @param uri namespace uri reference
    * @throws IOException I/O exception
    */
-  protected abstract void addAttr(int n, byte[] v, int dis, int u)
+  protected abstract void addAttr(int name, byte[] value, int dist, int uri)
     throws IOException;
 
   /**
    * Adds a text node to the database.
-   * @param tok the token to be added (tag name or content)
-   * @param dis distance to parent
+   * @param value the token to be added (tag name or content)
+   * @param dist distance to parent
    * @param kind the node kind
    * @throws IOException I/O exception
    */
-  protected abstract void addText(byte[] tok, int dis, byte kind)
+  protected abstract void addText(byte[] value, int dist, byte kind)
     throws IOException;
 
   /**
    * Stores a size value to the specified table position.
    * @param pre pre reference
-   * @param val value to be stored
+   * @param size value to be stored
    * @throws IOException I/O exception
    */
-  protected abstract void setSize(int pre, int val) throws IOException;
+  protected abstract void setSize(int pre, int size) throws IOException;
 
   // PRIVATE METHODS ==========================================================
 
   /**
    * Adds an element node to the storage.
-   * @param tag tag name
+   * @param name tag name
    * @param att attributes
    * @return pre value of the created node
    * @throws IOException I/O exception
    */
-  private int addElem(final byte[] tag, final Atts att) throws IOException {
+  private int addElem(final byte[] name, final Atts att) throws IOException {
     // get tag reference
-    int n = tags.index(tag, null, true);
+    int n = tags.index(name, null, true);
 
     if(meta.pathindex) path.add(n, lvl, Data.ELEM);
 
@@ -325,7 +325,7 @@ public abstract class Builder extends Progress {
     final int dis = lvl != 0 ? pre - preStack[lvl - 1] : 1;
     final int as = att.size;
     final boolean ne = ns.open();
-    int u = ns.uri(tag, true);
+    int u = ns.uri(name, true);
     addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, ne);
 
     // get and store attribute references
@@ -342,7 +342,7 @@ public abstract class Builder extends Progress {
         tags.stat(tagStack[lvl - 1]).leaf = false;
       } else if(inDoc) {
         // don't allow more than one root node
-        error(MOREROOTS, parser.detail(), tag);
+        error(MOREROOTS, parser.detail(), name);
       }
     }
     if(meta.size != 1) inDoc = true;
@@ -360,39 +360,39 @@ public abstract class Builder extends Progress {
 
   /**
    * Checks a value limit and optionally throws an exception.
-   * @param v value
-   * @param l limit
-   * @param m message
+   * @param value value
+   * @param limit limit
+   * @param msg message
    * @throws BuildException build exception
    */
-  private void limit(final int v, final int l, final String m)
+  private void limit(final int value, final int limit, final String msg)
       throws BuildException {
-    if(v >= l) error(m, parser.detail(), l);
+    if(value >= limit) error(msg, parser.detail(), limit);
   }
 
   /**
    * Adds a simple text, comment or processing instruction to the database.
-   * @param txt the value to be added
+   * @param value the value to be added
    * @param kind the node type
    * @throws IOException I/O exception
    */
-  private void addText(final byte[] txt, final byte kind)
+  private void addText(final byte[] value, final byte kind)
       throws IOException {
 
     // text node processing for statistics
-    if(kind == Data.TEXT) tags.index(tagStack[lvl - 1], txt);
+    if(kind == Data.TEXT) tags.index(tagStack[lvl - 1], value);
     if(meta.pathindex) path.add(0, lvl, kind);
-    addText(txt, lvl == 0 ? 1 : meta.size - preStack[lvl - 1], kind);
+    addText(value, lvl == 0 ? 1 : meta.size - preStack[lvl - 1], kind);
   }
 
   /**
    * Throws an error message.
-   * @param m message
-   * @param e message extension
+   * @param msg message
+   * @param ext message extension
    * @throws BuildException build exception
    */
-  private static void error(final String m, final Object... e)
+  private static void error(final String msg, final Object... ext)
       throws BuildException {
-    throw new BuildException(m, e);
+    throw new BuildException(msg, ext);
   }
 }

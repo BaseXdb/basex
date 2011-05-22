@@ -20,7 +20,7 @@ public final class InsertAfter extends InsertBase {
    * @param copy copy of nodes to be inserted
    */
   public InsertAfter(final InputInfo ii, final ANode n, final NodeCache copy) {
-    super(ii, n, copy);
+    super(PrimitiveType.INSERTAFTER, ii, n, copy);
   }
 
   @Override
@@ -31,10 +31,5 @@ public final class InsertAfter extends InsertBase {
     final int k = d.kind(pre);
     d.insert(pre + d.size(pre, k), d.parent(pre, k), md);
     return 0;
-  }
-
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.INSERTAFTER;
   }
 }

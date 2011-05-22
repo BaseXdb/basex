@@ -28,7 +28,7 @@ public final class IndexContext {
   public final boolean dupl;
 
   /** Costs of index access: smaller is better, 0 means no results. */
-  public int costs = Integer.MAX_VALUE;
+  private int costs;
   /** Flag for ftnot expressions. */
   public boolean not;
   /** Flag for sequential processing. */
@@ -78,5 +78,29 @@ public final class IndexContext {
       }
     }
     return path;
+  }
+
+  /**
+   * Adds the estimated costs.
+   * @param c cost to be added
+   */
+  public void addCosts(final int c) {
+    costs = Math.max(1, costs + c);
+  }
+
+  /**
+   * Sets the estimated costs.
+   * @param c cost to be added
+   */
+  public void costs(final int c) {
+    costs = c;
+  }
+
+  /**
+   * Returns the estimated costs.
+   * @return costs
+   */
+  public int costs() {
+    return costs;
   }
 }

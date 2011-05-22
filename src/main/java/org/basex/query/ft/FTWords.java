@@ -52,14 +52,14 @@ public final class FTWords extends FTExpr {
   TokenList txt;
 
   /** All matches. */
-  FTMatches all = new FTMatches((byte) 0);
+  FTMatches matches = new FTMatches((byte) 0);
   /** Flag for first evaluation. */
   boolean first;
   /** Search mode; default: {@link FTMode#M_ANY}. */
   FTMode mode = FTMode.M_ANY;
-
   /** Query expression. */
-  private Expr query;
+  Expr query;
+
   /** Minimum and maximum occurrences. */
   private Expr[] occ;
   /** Current token number. */
@@ -106,12 +106,7 @@ public final class FTWords extends FTExpr {
         for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].comp(ctx);
       }
       query = query.comp(ctx);
-      if(query.value()) {
-        txt = new TokenList();
-        final Iter iter = query.iter(ctx);
-        byte[] t;
-        while((t = nextToken(iter)) != null) if(t.length != 0) txt.add(t);
-      }
+      if(query.value()) txt = tokens(ctx);
 
       // choose fast evaluation for default settings
       fast = mode == FTMode.M_ANY && txt != null && occ == null;
@@ -125,13 +120,14 @@ public final class FTWords extends FTExpr {
       throws QueryException {
 
     if(tokNum == 0) tokNum = ++ctx.ftoknum;
-    all.reset(tokNum);
+    matches.reset(tokNum);
 
     final int c = contains(ctx);
-    if(c == 0) all.size = 0;
+    if(c == 0) matches.size = 0;
 
     // scoring: include number of tokens for calculations
-    return new FTNode(all, c == 0 ? 0 : Scoring.word(c, ctx.fttoken.count()));
+    return new FTNode(matches, c == 0 ? 0 :
+      Scoring.word(c, ctx.fttoken.count()));
   }
 
   @Override
@@ -140,10 +136,10 @@ public final class FTWords extends FTExpr {
       /** Index iterator. */
       FTIndexIterator iat;
       /** Text length. */
-      int tl;
+      int len;
 
       @Override
-      public FTNode next() {
+      public FTNode next() throws QueryException {
         if(iat == null) {
           final FTLexer lex = new FTLexer(ftt.opt);
 
@@ -152,19 +148,20 @@ public final class FTWords extends FTExpr {
           // number of distinct tokens
           int t  = 0;
           // loop through all tokens
-          final TokenSet ts = tokens(txt, ftt.opt);
+          final TokenSet ts = tokens(txt != null ? txt : tokens(ctx), ftt.opt);
           for(final byte[] k : ts) {
             lex.init(k);
             ia = null;
             int d = 0;
             if(!lex.hasNext()) return null;
             do {
-              final byte[] token = lex.nextToken();
-              t += token.length;
-              if(ftt.opt.sw != null && ftt.opt.sw.id(token) != 0) {
+              final byte[] tok = lex.nextToken();
+              t += tok.length;
+              if(ftt.opt.sw != null && ftt.opt.sw.id(tok) != 0) {
                 ++d;
               } else {
-                final FTIndexIterator ir = (FTIndexIterator) data.ids(lex);
+                final FTIndexIterator ir = lex.get().length > MAXLEN ?
+                    scan(lex) : (FTIndexIterator) data.ids(lex);
                 if(ia == null) {
                   ia = ir;
                 } else {
@@ -173,25 +170,88 @@ public final class FTWords extends FTExpr {
                 }
               }
             } while(lex.hasNext());
+            // create or combine iterator
             if(iat == null) {
-              tl = t;
+              len = t;
               iat = ia;
             } else if(mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS) {
               if(ia.indexSize() == 0) return null;
-              tl += t;
+              len += t;
               iat = FTIndexIterator.intersect(ia, iat, 0);
             } else {
               if(ia.indexSize() == 0) continue;
-              tl = Math.max(t, tl);
+              len = Math.max(t, len);
               iat = FTIndexIterator.union(ia, iat);
             }
             iat.tokenNum(++ctx.ftoknum);
           }
         }
         return iat != null && iat.more() ? new FTNode(iat.matches(), data,
-            iat.next(), tl, iat.indexSize(), iat.score()) : null;
+            iat.next(), len, iat.indexSize(), iat.score()) : null;
       }
     };
+  }
+
+  /**
+   * Returns scan-based iterator.
+   * @param lex lexer, including the queried value
+   * @return node iterator
+   * @throws QueryException query exception
+   */
+  FTIndexIterator scan(final FTLexer lex) throws QueryException {
+    final FTLexer intok = new FTLexer(ftt.opt);
+    final FTTokens qtok = ftt.cache(lex.get());
+    return new FTIndexIterator() {
+      int pre = -1;
+
+      @Override
+      public int next() {
+        return pre;
+      }
+      @Override
+      public boolean more() {
+        while(++pre < data.meta.size) {
+          if(data.kind(pre) != Data.TEXT) continue;
+          intok.init(data.text(pre, true));
+          matches.reset(0);
+          try {
+            if(ftt.contains(qtok, intok) != 0) return true;
+          } catch(final QueryException ex) {
+            // ignore exceptions
+          }
+        }
+        return false;
+      }
+      @Override
+      public double score() {
+        return -1;
+      }
+      @Override
+      public FTMatches matches() {
+        return matches;
+      }
+      @Override
+      public int indexSize() {
+        return 1;
+      }
+    };
+  }
+
+  /**
+   * Returns all tokens of the query.
+   * @param ctx query context
+   * @return token list
+   * @throws QueryException query exception
+   */
+  TokenList tokens(final QueryContext ctx) throws QueryException {
+    final TokenList tl = new TokenList();
+    final Iter ir = ctx.iter(query);
+    for(byte[] qu; (qu = nextToken(ir)) != null;) {
+      // skip empty tokens if not all results are needed
+      if(qu.length != 0 || mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS)
+      tl.add(qu);
+    }
+    return tl;
   }
 
   /**
@@ -214,19 +274,15 @@ public final class FTWords extends FTExpr {
       return num;
     }
 
-    final TokenList tl = new TokenList();
-    final Iter ir = ctx.iter(query);
-    byte[] qu;
-    while((qu = nextToken(ir)) != null) tl.add(qu);
-
     // find and count all occurrences
+    final TokenList tl = tokens(ctx);
     final TokenSet ts = tokens(tl, intok.ftOpt());
-    final boolean a = mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS;
+    final boolean all = mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS;
     int oc = 0;
     for(final byte[] k : ts) {
       final FTTokens qtok = ftt.cache(k);
       final int o = ftt.contains(qtok, intok);
-      if(a && o == 0) return 0;
+      if(all && o == 0) return 0;
       num = Math.max(num, o * qtok.length());
       oc += o;
     }
@@ -234,7 +290,7 @@ public final class FTWords extends FTExpr {
     // check if occurrences are in valid range. if yes, return number of tokens
     final long mn = occ != null ? checkItr(occ[0], ctx) : 1;
     final long mx = occ != null ? checkItr(occ[1], ctx) : Long.MAX_VALUE;
-    if(mn == 0 && oc == 0) all = FTNot.not(all);
+    if(mn == 0 && oc == 0) matches = FTNot.not(matches);
     return oc >= mn && oc <= mx ? Math.max(1, num) : 0;
   }
 
@@ -274,7 +330,7 @@ public final class FTWords extends FTExpr {
    * @return item
    * @throws QueryException query exception
    */
-  private byte[] nextToken(final Iter iter) throws QueryException {
+  byte[] nextToken(final Iter iter) throws QueryException {
     final Item it = iter.next();
     return it == null ? null : checkEStr(it);
   }
@@ -286,8 +342,8 @@ public final class FTWords extends FTExpr {
    */
   void add(final int s, final int e) {
     if(!first && (mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS))
-      all.and(s, e);
-    else all.or(s, e);
+      matches.and(s, e);
+    else matches.or(s, e);
   }
 
   @Override
@@ -312,12 +368,9 @@ public final class FTWords extends FTExpr {
        fto.isSet(ST) && md.stemming != fto.is(ST) ||
        fto.ln != null && md.language != fto.ln || occ != null) return false;
 
-    // skip index access if text is not statically known
-    if(txt == null) return false;
-
-    // no index results
-    if(txt.size() == 0) {
-      ic.costs = 0;
+    // estimate costs if text is not statically known
+    if(txt == null) {
+      ic.costs(Math.max(1, ic.data.meta.size / 20));
       return true;
     }
 
@@ -329,26 +382,25 @@ public final class FTWords extends FTExpr {
 
     // summarize number of hits; break loop if no hits are expected
     final FTLexer ft = new FTLexer(fto);
-    ic.costs = 0;
+    ic.costs(0);
     for(byte[] t : txt) {
       ft.init(t);
       while(ft.hasNext()) {
         final byte[] tok = ft.nextToken();
-        if(tok.length > MAXLEN) return false;
         if(fto.sw != null && fto.sw.id(tok) != 0) continue;
 
         if(wc) {
           // don't use index if one of the terms starts with a wildcard
           t = ft.get();
           if(t[0] == '.') return false;
-          // don't use index if certain characters, or more than 1 dot are found
+          // don't use index if certain characters or more than 1 dot are found
           int d = 0;
           for(final byte w : t) {
             if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
           }
         }
         // reduce number of expected results to favor full-text index requests
-        ic.costs += ic.data.nrIDs(ft) + 3 >> 2;
+        ic.addCosts(Math.max(1, ic.data.nrIDs(ft) >> 2));
       }
     }
     return true;

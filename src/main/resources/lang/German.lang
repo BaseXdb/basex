@@ -4,7 +4,7 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-version=Version %
+version=Version
 
 # Menu Commands
 m_db=Datenbank
@@ -205,6 +205,7 @@ ds_alterpw=Passwort ändern
 ds_invalid=% ist ungültig
 ds_adlogin=Administrator-Login (lokal oder remote)
 ds_databases=Datenbanken
+ds_backups=Backups
 ds_sessions=Verbindungen
 ds_locallogs=Lokale Logs
 ds_connected=Verbunden mit %:%.
@@ -436,7 +437,7 @@ qu_file=in %
 qu_exec=Anfrage ausgeführt (%).
 
 # Admin Commands
-ad_databases=% geöffnete Datenbanken
+ad_databases=% geöffnete Datenbank(en)
 ad_sessions=% Verbindung(en)
 ad_permno=%-Recht benötigt.
 ad_perminv=%-Recht ist unbekannt.

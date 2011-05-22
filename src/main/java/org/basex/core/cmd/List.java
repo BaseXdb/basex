@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Command;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.MetaData;
 import org.basex.io.DataInput;
@@ -76,13 +75,8 @@ public final class List extends Command {
    * @return available databases
    */
   public static StringList list(final Context ctx) {
-    // create database list
     final StringList db = new StringList();
-
-    final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
-    if(!dir.exists()) return db;
-
-    for(final IO f : dir.children()) {
+    for(final IO f : ctx.prop.dbpath().children()) {
       if(f.name().startsWith(".")) continue;
       if(f.isDir()) db.add(f.name());
     }

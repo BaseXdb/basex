@@ -156,13 +156,18 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
+  public void delete(final int pre, final int nr) {
+    move(pre + nr, pre);
+  }
+
+  @Override
   public void replace(final int pre, final byte[] entries, final int sub) {
-    // [LK] Replace nodes in main memory: check..
     final int nsize = entries.length >>> IO.NODEPOWER;
     final int rpre = pre + nsize;
     int off = 0;
     final int diff = sub - nsize;
-    final int max = rpre - Math.abs(diff);
+    // diff > 0 if the old subtree is bigger then the new one
+    final int max = diff <= 0 ? rpre - Math.abs(diff) : pre + nsize;
     for(int i = pre; i < max; ++i, off += 16) {
       buf1[i] = getLong(entries, off);
       buf2[i] = getLong(entries, off + 8);
@@ -170,20 +175,15 @@ public final class TableMemAccess extends TableAccess {
     dirty = true;
 
     // handle the remaining entries if the two subtrees are of different size
-    // case1: new subtree bigger than old one, insert remaining new nodes
     if(diff < 0) {
+      // case1: new subtree bigger than old one, insert remaining new nodes
       final byte[] tmp = new byte[entries.length - off];
       System.arraycopy(entries, off, tmp, 0, tmp.length);
-      insert(rpre + diff, tmp);
+      insert(max, tmp);
     } else if(diff > 0) {
       // case2: old subtree bigger than new one, delete remaining old nodes
-      delete(rpre - diff, diff);
+      delete(max, diff);
     }
-  }
-
-  @Override
-  public void delete(final int pre, final int nr) {
-    move(pre + nr, pre);
   }
 
   @Override

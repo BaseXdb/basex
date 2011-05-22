@@ -18,17 +18,17 @@ public interface Index {
 
   /**
    * Returns an iterator for the index results.
-   * @param tok token to be found
+   * @param token token to be found
    * @return ids
    */
-  IndexIterator ids(final IndexToken tok);
+  IndexIterator ids(final IndexToken token);
 
   /**
    * Returns the (approximate/estimated) number of ids for the specified token.
-   * @param tok token to be found
+   * @param token token to be found
    * @return number of ids
    */
-  int nrIDs(final IndexToken tok);
+  int nrIDs(final IndexToken token);
 
   /**
    * Closes the index.

@@ -4,7 +4,7 @@
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
-version=Versie %
+version=Versie
 
 # Menu Commands
 m_db=Database
@@ -205,6 +205,7 @@ ds_alterpw=Verander wachtwoord
 ds_invalid=% is ongeldig
 ds_adlogin=Administrator login (local of remote)
 ds_databases=Databases
+ds_backups=Backups
 ds_sessions=Sessies
 ds_locallogs=Local Logs
 ds_connected=Verbonden met %:%.

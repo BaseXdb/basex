@@ -164,29 +164,25 @@ public final class CreateDB extends ACreate {
       final Context ctx) throws IOException {
 
     // create main memory database instance
-    if(ctx.prop.is(Prop.MAINMEM))
-      return MemBuilder.build(parser, ctx.prop, name);
+    final Prop prop = ctx.prop;
+    if(prop.is(Prop.MAINMEM)) return MemBuilder.build(parser, prop, name);
 
     // database is currently locked by another process
     if(ctx.pinned(name)) throw new IOException(Util.info(DBLOCKED, name));
 
     // build database and index structures
-    final Builder builder = new DiskBuilder(parser, ctx.prop);
+    final Builder builder = new DiskBuilder(parser, prop);
     try {
       final Data data = builder.build(name);
-      if(data.meta.textindex) data.setIndex(IndexType.TEXT,
+      if(prop.is(Prop.TEXTINDEX)) data.setIndex(IndexType.TEXT,
         new ValueBuilder(data, true).build());
-      if(data.meta.attrindex) data.setIndex(IndexType.ATTRIBUTE,
+      if(prop.is(Prop.ATTRINDEX)) data.setIndex(IndexType.ATTRIBUTE,
         new ValueBuilder(data, false).build());
-      if(data.meta.ftindex) data.setIndex(IndexType.FULLTEXT,
+      if(prop.is(Prop.FTINDEX))   data.setIndex(IndexType.FULLTEXT,
         FTBuilder.get(data).build());
       data.close();
     } finally {
-      try {
-        builder.close();
-      } catch(final IOException exx) {
-        Util.debug(exx);
-      }
+      try { builder.close(); } catch(final IOException exx) { Util.debug(exx); }
     }
     return Open.open(name, ctx);
   }
