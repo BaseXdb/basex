@@ -15,6 +15,8 @@ import com.bradmcevoy.http.Resource;
  * @author Dimitar Popov
  */
 public abstract class BXResource implements Resource {
+  /** Default content type. */
+  protected static final String MIMETYPEXML = "text/xml";
   /** Database context. */
   protected Context ctx;
   /** Resource factory. */

@@ -17,7 +17,6 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
-
 /**
  * WebDAV resource representing a document in a collection database.
  * @author BaseX Team 2005-11, BSD License
@@ -25,9 +24,6 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
  * @author Dimitar Popov
  */
 public final class BXDocument extends BXResource implements FileResource {
-
-  /** Default content type. */
-  private static final String MIMETYPEXML = "text/xml";
   /** Database containing the document. */
   private final String dbname;
   /** Path to document in database. */

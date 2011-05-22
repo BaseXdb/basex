@@ -2,12 +2,10 @@ package org.basex.api.webdav;
 
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,22 +21,29 @@ import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
-import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
-import com.bradmcevoy.http.Request.Method;
-import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
+/**
+ * WebDAV resource representing a folder in a collection database.
+ * @author BaseX Team 2005-11, BSD License
+ * @author Rositsa Shadura
+ * @author Dimitar Popov
+ */
 public final class BXFolder extends BXResource implements FolderResource {
-
   /** Database collection in which the folder resides. */
   private final String dbname;
-  /** Pre values of document nodes in which this folder is found. */
+  /** PRE values of documents contained in the directory. */
   private final int[] prevals;
   /** Path to folder. */
   private final String dirpath;
 
+  /**
+   * Constructor.
+   * @param db database containing the document
+   * @param pres PRE values of documents contained in the directory
+   * @param p directory path
+   * @param c context
+   */
   public BXFolder(final String db, final int[] pres, final String p,
       final Context c) {
     dbname = db;
@@ -48,14 +53,13 @@ public final class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public CollectionResource createCollection(String newName)
-      throws NotAuthorizedException, ConflictException, BadRequestException {
+  public CollectionResource createCollection(final String newName) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Resource child(String childName) {
+  public Resource child(final String childName) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -63,37 +67,28 @@ public final class BXFolder extends BXResource implements FolderResource {
   @Override
   public List<? extends Resource> getChildren() {
     final List<BXResource> dbs = new ArrayList<BXResource>();
+    final TokenObjMap<IntList> dirs = new TokenObjMap<IntList>();
     try {
       new Open(dbname).execute(ctx);
-      String doc;
-      final TokenObjMap<IntList> dirs = new TokenObjMap<IntList>();
-      for(int pre : prevals) {
-        doc = string(ctx.data.text(pre, true));
-        String s = doc.substring(dirpath.length(), doc.length());
-        int idx = s.lastIndexOf(Prop.DIRSEP);
-        if(idx == 0) dbs.add(new BXDocument(dbname, s.substring(1, s.length()),
-            ctx));
+      for(final int pre : prevals) {
+        final String doc = string(ctx.data.text(pre, true));
+        final String s = doc.substring(dirpath.length(), doc.length());
+        final int idx = s.lastIndexOf(Prop.DIRSEP);
+        if(idx == 0) dbs.add(new BXDocument(dbname, s.substring(1,
+            s.length()), ctx));
         else if(idx > 0) {
-          String[] parts = s.split(Prop.DIRSEP);
-          byte[] dir = token(dirpath + Prop.DIRSEP + parts[1]);
-          if(dirs.get(dir) == null) {
-            IntList l = new IntList();
-            l.add(pre);
-            dirs.add(dir, l);
-          } else {
-            dirs.get(dir).add(pre);
-          }
+          final String[] parts = s.split(Prop.DIRSEP);
+          final byte[] dir = token(dirpath + Prop.DIRSEP + parts[1]);
+          if(dirs.get(dir) == null) dirs.add(dir, new IntList());
+          dirs.get(dir).add(pre);
         }
       }
-      final Iterator<byte[]> dirsIt = dirs.iterator();
-      byte[] dirName;
-      while(dirsIt.hasNext()) {
-        dirName = dirsIt.next();
-        dbs.add(new BXFolder(dbname, dirs.get(dirName).toArray(),
-            string(dirName), ctx));
-      }
+      for(final byte[] d : dirs)
+        dbs.add(new BXFolder(dbname, dirs.get(d).toArray(), string(d), ctx));
+
       new Close().execute(ctx);
     } catch(BaseXException e) {
+      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return dbs;
@@ -112,58 +107,46 @@ public final class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource createNew(String newName, InputStream inputStream,
-      Long length, String contentType) throws IOException, ConflictException,
-      NotAuthorizedException, BadRequestException {
+  public Resource createNew(final String newName, final InputStream inputStream,
+      final Long length, final String contentType) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void copyTo(CollectionResource toCollection, String name)
-      throws NotAuthorizedException, BadRequestException, ConflictException {
+  public void copyTo(final CollectionResource toCollection, final String name) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public void delete() throws NotAuthorizedException, ConflictException,
-      BadRequestException {
+  public void delete() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public void sendContent(OutputStream out, Range range,
-      Map<String, String> params, String contentType) throws IOException,
-      NotAuthorizedException, BadRequestException {
+  public void sendContent(final OutputStream out, final Range range,
+      final Map<String, String> params, final String contentType) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public Long getMaxAgeSeconds(Auth auth) {
-    // TODO Auto-generated method stub
+  public Long getMaxAgeSeconds(final Auth auth) {
     return null;
   }
 
   @Override
-  public String getContentType(String accepts) {
-    // TODO Auto-generated method stub
+  public String getContentType(final String accepts) {
     return null;
   }
 
   @Override
   public Long getContentLength() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void moveTo(CollectionResource rDest, String name)
-      throws ConflictException, NotAuthorizedException, BadRequestException {
+  public void moveTo(final CollectionResource rDest, final String name) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
@@ -171,5 +154,4 @@ public final class BXFolder extends BXResource implements FolderResource {
     // TODO Auto-generated method stub
     return null;
   }
-
 }
