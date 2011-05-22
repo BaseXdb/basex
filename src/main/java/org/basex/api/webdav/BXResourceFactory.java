@@ -100,17 +100,17 @@ public class BXResourceFactory implements ResourceFactory {
    * @return resource
    */
   private BXResource getBXResource(final String db, final String path) {
-    final String prefix = path.substring(db.length() + 2, path.length());
+    String prefix = path.substring(db.length() + 2, path.length());
+    if(prefix.endsWith(Prop.DIRSEP)) prefix = prefix.substring(0,
+        prefix.length() - 1);
     try {
       new Open(db).execute(ctx);
       try {
         final IntList pres = new IntList();
         for(final int pre : ctx.data.doc()) {
           final String doc = string(ctx.data.text(pre, true));
-          if(doc.equals(prefix))
-            return new BXDocument(
-                doc.substring(doc.lastIndexOf(Prop.DIRSEP) + 1, doc.length()),
-                prefix, ctx);
+          if(doc.equals(prefix)) return new BXDocument(doc.substring(
+              doc.lastIndexOf(Prop.DIRSEP) + 1, doc.length()), prefix, ctx);
           if(doc.startsWith(prefix)) pres.add(pre);
         }
         return new BXFolder(db, pres.toArray(), prefix, ctx);

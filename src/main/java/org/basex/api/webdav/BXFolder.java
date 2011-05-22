@@ -71,11 +71,11 @@ public final class BXFolder extends BXResource implements FolderResource {
         doc = string(ctx.data.text(pre, true));
         String s = doc.substring(dirpath.length(), doc.length());
         int idx = s.lastIndexOf(Prop.DIRSEP);
-        if(idx == 0) dbs.add(new BXDocument(dbname, dirpath.substring(1,
-            dirpath.length()), ctx));
+        if(idx == 0) dbs.add(new BXDocument(dbname, s.substring(1, s.length()),
+            ctx));
         else if(idx > 0) {
           String[] parts = s.split(Prop.DIRSEP);
-          byte[] dir = token(dirpath + Prop.DIRSEP + parts[0]);
+          byte[] dir = token(dirpath + Prop.DIRSEP + parts[1]);
           if(dirs.get(dir) == null) {
             IntList l = new IntList();
             l.add(pre);
