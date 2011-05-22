@@ -18,9 +18,6 @@ import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FileItem;
 import com.bradmcevoy.http.FileResource;
 import com.bradmcevoy.http.Range;
-import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing a document database.
@@ -29,8 +26,6 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
  * @author Dimitar Popov
  */
 public class BXDocumentDatabase extends BXResource implements FileResource {
-  /** Default content type. */
-  private static final String MIMETYPEXML = "text/xml";
   /** Database name. */
   private final String dbname;
 
@@ -118,16 +113,13 @@ public class BXDocumentDatabase extends BXResource implements FileResource {
   }
 
   @Override
-  public void moveTo(final CollectionResource rDest, final String name)
-      throws ConflictException, NotAuthorizedException, BadRequestException {
+  public void moveTo(final CollectionResource rDest, final String name) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public String processForm(final Map<String, String> parameters,
-      final Map<String, FileItem> files)
-      throws BadRequestException, NotAuthorizedException, ConflictException {
+      final Map<String, FileItem> files) {
     // TODO Auto-generated method stub
     return null;
   }

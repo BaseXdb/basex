@@ -2,12 +2,10 @@ package org.basex.api.webdav;
 
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,9 +22,6 @@ import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Resource;
-import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing a collection database.
@@ -35,18 +30,21 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
  * @author Dimitar Popov
  */
 public class BXCollectionDatabase extends BXResource implements FolderResource {
-
   /** Collection name. */
-  private final String collname;
+  private final String dbname;
 
-  public BXCollectionDatabase(final String n, final Context c) {
-    collname = n;
+  /**
+   * Constructor.
+   * @param db database containing the document
+   * @param c context
+   */
+  public BXCollectionDatabase(final String db, final Context c) {
+    dbname = db;
     ctx = c;
   }
 
   @Override
-  public CollectionResource createCollection(String newName)
-      throws NotAuthorizedException, ConflictException, BadRequestException {
+  public CollectionResource createCollection(final String newName) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -60,37 +58,24 @@ public class BXCollectionDatabase extends BXResource implements FolderResource {
   @Override
   public List<? extends Resource> getChildren() {
     final List<BXResource> dbs = new ArrayList<BXResource>();
+    final TokenObjMap<IntList> dirs = new TokenObjMap<IntList>();
     try {
-      // Open database
-      new Open(collname).execute(ctx);
-      // Get all document nodes
-      final TokenObjMap<IntList> dirs = new TokenObjMap<IntList>();
-      byte[] doc;
-      for(int pre : ctx.doc()) {
-        doc = ctx.data.text(pre, true);
-        int idx = indexOf(doc, token(Prop.DIRSEP));
-        if(idx > 0) {
+      new Open(dbname).execute(ctx);
+      for(final int pre : ctx.doc()) {
+        final byte[] doc = ctx.data.text(pre, true);
+        final int idx = indexOf(doc, token(Prop.DIRSEP));
+        if(idx <= 0)
+          dbs.add(new BXDocument(dbname, string(doc), ctx));
+        else {
           // Folder
-          byte[] dir = substring(doc, 0, idx);
-          if(dirs.get(dir) == null) {
-            IntList l = new IntList();
-            l.add(pre);
-            dirs.add(dir, l);
-          } else {
-            dirs.get(dir).add(pre);
-          }
-        } else {
-          // XML file
-          dbs.add(new BXDocument(collname, string(doc), ctx));
+          final byte[] dir = substring(doc, 0, idx);
+          if(dirs.get(dir) == null) dirs.add(dir, new IntList());
+          dirs.get(dir).add(pre);
         }
       }
-      final Iterator<byte[]> dirsIt = dirs.iterator();
-      byte[] dirName;
-      while(dirsIt.hasNext()) {
-        dirName = dirsIt.next();
-        dbs.add(new BXFolder(collname, dirs.get(dirName).toArray(),
-            string(dirName), ctx));
-      }
+      for(final byte[] d : dirs)
+        dbs.add(new BXFolder(dbname, dirs.get(d).toArray(), string(d), ctx));
+
       new Close().execute(ctx);
     } catch(BaseXException e) {
       // TODO Auto-generated catch block
@@ -102,7 +87,7 @@ public class BXCollectionDatabase extends BXResource implements FolderResource {
   @Override
   public String getName() {
     // TODO Auto-generated method stub
-    return collname;
+    return dbname;
   }
 
   @Override
@@ -112,58 +97,47 @@ public class BXCollectionDatabase extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource createNew(String newName, InputStream inputStream,
-      Long length, String contentType) throws IOException, ConflictException,
-      NotAuthorizedException, BadRequestException {
+  public Resource createNew(final String newName, final InputStream inputStream,
+      final Long length, final String contentType) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void copyTo(CollectionResource toCollection, String name)
-      throws NotAuthorizedException, BadRequestException, ConflictException {
+  public void copyTo(final CollectionResource toCollection, final String name) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public void delete() throws NotAuthorizedException, ConflictException,
-      BadRequestException {
+  public void delete() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public void sendContent(OutputStream out, Range range,
-      Map<String, String> params, String contentType) throws IOException,
-      NotAuthorizedException, BadRequestException {
+  public void sendContent(final OutputStream out, final Range range,
+      final Map<String, String> params, final String contentType) {
     // TODO Auto-generated method stub
-    int i = 0;
   }
 
   @Override
-  public Long getMaxAgeSeconds(Auth auth) {
-    // TODO Auto-generated method stub
+  public Long getMaxAgeSeconds(final Auth auth) {
     return null;
   }
 
   @Override
-  public String getContentType(String accepts) {
+  public String getContentType(final String accepts) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Long getContentLength() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void moveTo(CollectionResource rDest, String name)
-      throws ConflictException, NotAuthorizedException, BadRequestException {
+  public void moveTo(final CollectionResource rDest, final String name) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
@@ -171,5 +145,4 @@ public class BXCollectionDatabase extends BXResource implements FolderResource {
     // TODO Auto-generated method stub
     return null;
   }
-
 }
