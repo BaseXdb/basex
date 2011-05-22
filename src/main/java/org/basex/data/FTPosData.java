@@ -65,6 +65,16 @@ public final class FTPosData {
   }
 
   /**
+   * Returns the number of entries.
+   * @return size
+   */
+  public int size() {
+    int c = 0;
+    for(int i = 0; i < size; ++i) c += pos[i].size();
+    return c;
+  }
+
+  /**
    * Compares full-text data for equality.
    * @param ft reference to compare to
    * @return boolean same()

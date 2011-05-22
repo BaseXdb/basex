@@ -14,6 +14,7 @@ import org.basex.query.ft.FTWords;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
@@ -44,6 +45,15 @@ public final class FNFt extends Fun {
   }
 
   @Override
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    switch(def) {
+      case COUNT: return count(ctx);
+      default:    return super.item(ctx, ii);
+    }
+  }
+
+  @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
       case SEARCH:  return search(ctx);
@@ -52,6 +62,22 @@ public final class FNFt extends Fun {
       case EXTRACT: return mark(ctx, true);
       default:      return super.iter(ctx);
     }
+  }
+
+  /**
+   * Performs the count function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Item count(final QueryContext ctx) throws QueryException {
+    final FTPosData tmp = ctx.ftpos;
+    ctx.ftpos = new FTPosData();
+    final Iter ir = ctx.iter(expr[0]);
+    for(Item it; (it = ir.next()) != null;) checkDBNode(it);
+    final int s = ctx.ftpos.size();
+    ctx.ftpos = tmp;
+    return Itr.get(s);
   }
 
   /**

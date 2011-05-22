@@ -530,6 +530,8 @@ public enum FunDef {
 
   /** Database function: searches the full-text index. */
   SEARCH(FNFt.class, "search(node,string)", NOD_ZM, NOD, STR),
+  /** Database function: counts the hits of a full-text request. */
+  COUNT(FNFt.class, "count(nodes)", ITR, NOD_ZM),
   /** Database function: marks the hits of a full-text request. */
   MARK(FNFt.class, "mark(nodes[,tag])", NOD_ZM, 1, NOD_ZM, STR),
   /** Database function: extracts full-text results. */
