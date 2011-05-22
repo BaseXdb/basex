@@ -18,6 +18,8 @@ import com.bradmcevoy.http.Request.Method;
 public abstract class BXResource implements Resource {
   /** Database context. */
   protected Context ctx;
+  /** Resource factory. */
+  protected BXResourceFactory fact;
 
   @Override
   public Object authenticate(final String user, final String password) {

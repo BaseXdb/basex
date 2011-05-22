@@ -1,13 +1,24 @@
 package org.basex.api.webdav;
 
+import static org.basex.data.DataText.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
+import org.basex.core.Prop;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Open;
+import org.basex.data.MetaData;
+import org.basex.io.DataInput;
+import org.basex.io.IO;
 import org.basex.util.StringList;
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
@@ -52,9 +63,33 @@ public class BXAllDatabasesResource extends BXResource implements
 
   @Override
   public List<? extends Resource> getChildren() {
-    final List<BXDatabaseResource> dbs = new ArrayList<BXDatabaseResource>();
+    final List<BXResource> dbs = new ArrayList<BXResource>();
+    // Get all databases
     final StringList list = org.basex.core.cmd.List.list(ctx);
-    for(final String d : list) dbs.add(new BXDatabaseResource(d));
+    for(final String db : list) {
+      try {
+        new Open(db).execute(ctx);
+        if(ctx.data.meta.ndocs > 1) {
+          dbs.add(new BXDatabaseCollection(db, ctx));
+        } else if (ctx.data.meta.ndocs == 1) {
+          dbs.add(new BXDatabaseResource(db));
+        }
+      } catch(BaseXException e) {
+        try {
+          new Close().execute(ctx);
+        } catch(BaseXException e1) {
+          // TODO Auto-generated catch block
+          e1.printStackTrace();
+        }
+        e.printStackTrace();
+      }
+    }
+    try {
+      new Close().execute(ctx);
+    } catch(BaseXException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
     return dbs;
   }
 
