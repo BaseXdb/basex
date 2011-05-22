@@ -1,17 +1,9 @@
 package org.basex.api.webdav;
 
-import static org.basex.data.DataText.*;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.data.MetaData;
-import org.basex.io.DataInput;
-import org.basex.io.IO;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Open;
 import org.basex.util.StringList;
 
 import com.bradmcevoy.common.Path;
@@ -21,7 +13,8 @@ import com.bradmcevoy.http.ResourceFactory;
 /**
  * WebDAV resource factory. Main class for generating WebDAV resources.
  * @author BaseX Team 2005-11, BSD License
- * @author Rositsa Shadura, Dimitar Popov
+ * @author Rositsa Shadura
+ * @author Dimitar Popov
  */
 public class BXResourceFactory implements ResourceFactory {
   /** Database context. */
@@ -38,55 +31,63 @@ public class BXResourceFactory implements ResourceFactory {
   @Override
   public Resource getResource(final String host, final String p) {
     final Path path = Path.path(p);
+    // root
     if(path.isRoot()) return new BXAllDatabasesResource(ctx);
-    else if(path.getLength() == 1) {
-      return new BXDatabaseCollection(path.getFirst(), ctx);
+
+    final String[] steps = path.getParts();
+
+    // database
+    final boolean dbexists = listDatabases(ctx).contains(steps[0]);
+    if(!dbexists) return null;
+
+    // open db
+
+    if(steps.length == 1) {
+      final String db = steps[0];
+      return isCollection(ctx, db) ? new BXCollectionDatabaseResource(ctx, db)
+          : new BXDocumentResource(ctx, db);
     }
+
+    // TODO collection
     return null;
 
   }
 
-  /**
-   * Finds all databases.
+  /*
+   * List all databases.
    * @param ctx context
-   * @return list with databases
-   * @throws IOException
+   * @return a list of database names
    */
-  // public List<BXResource> findAllDatabases(final String name)
-  // throws IOException {
-  // final List<BXResource> dbs = new ArrayList<BXResource>();
-  // final IO dir = IO.get(name);
-  // for(final IO f : dir.children()) {
-  // if(f.name().startsWith(".")) continue;
-  // if(f.isDir()) {
-  // final MetaData meta = new MetaData(f.name(), ctx.prop);
-  // DataInput in = new DataInput(meta.file(DATAINFO));
-  // meta.read(in);
-  // if(meta.ndocs == 1) {
-  // dbs.add(new BXDatabaseResource(f.name()));
-  // } else if(meta.ndocs > 1) {
-  // dbs.add(new BXDatabaseCollection(f.name()));
-  // }
-  // }
-  // }
-  // return dbs;
-  // }
-  //
-  // private BXResource findDatabase(final String path) throws IOException {
-  // final IO io = IO.get(ctx.prop.get(Prop.DBPATH) + path);
-  // // TODO: path does not exist
-  // if(io.isDir() && !io.name().startsWith(".")) {
-  // final MetaData meta = new MetaData(io.name(), ctx.prop);
-  // DataInput in = new DataInput(meta.file(DATAINFO));
-  // meta.read(in);
-  // if(meta.ndocs == 1) {
-  // return new BXDatabaseResource(io.name());
-  // } else if(meta.ndocs > 1) {
-  // return new BXDatabaseCollection(io.name());
-  // } else {
-  // return null;
-  // }
-  // }
-  // return null;
-  // }
+  static StringList listDatabases(final Context ctx) {
+    return org.basex.core.cmd.List.list(ctx);
+  }
+
+  /**
+   * Is the specified database a collection of documents?
+   * @param ctx context
+   * @param db database name
+   * @return <code>true</code> if the database has more than one document
+   */
+  static boolean isCollection(final Context ctx, final String db) {
+    try {
+      new Open(db).execute(ctx);
+      final boolean result = ctx.data.meta.ndocs > 1;
+      new Close().execute(ctx);
+      return result;
+    } catch(BaseXException e) {
+      // [DP] WebDAV: error handling
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  /**
+   * Get a valid database name from a general file name.
+   * @param n name
+   * @return valid database name
+   */
+  static String dbname(final String n) {
+    final int i = n.lastIndexOf(".");
+    return (i != -1 ? n.substring(0, i) : n).replaceAll("[^\\w-]", "");
+  }
 }

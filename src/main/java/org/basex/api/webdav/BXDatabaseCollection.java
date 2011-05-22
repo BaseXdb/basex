@@ -81,7 +81,7 @@ public class BXDatabaseCollection extends BXResource implements FolderResource {
           }
         } else {
           // XML file
-          dbs.add(new BXDatabaseResource(string(doc)));
+          dbs.add(new BXDocumentResource(ctx, string(doc)));
         }
       }
       final Iterator<byte[]> dirsIt = dirs.iterator();

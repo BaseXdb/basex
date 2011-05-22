@@ -68,7 +68,7 @@ public final class BXFolder extends BXResource implements FolderResource {
         doc = string(ctx.data.text(pre, true));
         String s = doc.substring(dirpath.length(), doc.length());
         int idx = s.lastIndexOf(Prop.DIRSEP);
-        if(idx == 0) dbs.add(new BXDatabaseResource(dirpath.substring(1,
+        if(idx == 0) dbs.add(new BXDocumentResource(ctx, dirpath.substring(1,
             dirpath.length())));
         else if(idx > 0) {
           String[] parts = s.split(Prop.DIRSEP);

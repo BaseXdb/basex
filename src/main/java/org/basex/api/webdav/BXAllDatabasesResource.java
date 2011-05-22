@@ -1,25 +1,22 @@
 package org.basex.api.webdav;
 
-import static org.basex.data.DataText.*;
+import static org.basex.api.webdav.BXResourceFactory.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.basex.core.BaseXException;
+import org.basex.core.Command;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
-import org.basex.data.MetaData;
-import org.basex.io.DataInput;
-import org.basex.io.IO;
 import org.basex.util.StringList;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
@@ -30,11 +27,13 @@ import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
- * The list of all databases as WebDAV resource.
+ * WebDAV resource representing the list of all databases.
  * @author BaseX Team 2005-11, BSD License
- * @author Rositsa Shadura, Dimitar Popov
+ * @author Rositsa Shadura
+ * @author Dimitar Popov
  */
 public class BXAllDatabasesResource extends BXResource implements
+    //MakeCollectionableResource, PutableResource, GetableResource, PropFindableResource {
     FolderResource {
 
   /**
@@ -58,7 +57,7 @@ public class BXAllDatabasesResource extends BXResource implements
 
   @Override
   public Resource child(final String childName) {
-    return new BXDatabaseResource(childName);
+    return new BXDocumentResource(ctx, childName);
   }
 
   @Override
@@ -72,7 +71,7 @@ public class BXAllDatabasesResource extends BXResource implements
         if(ctx.data.meta.ndocs > 1) {
           dbs.add(new BXDatabaseCollection(db, ctx));
         } else if (ctx.data.meta.ndocs == 1) {
-          dbs.add(new BXDatabaseResource(db));
+          dbs.add(new BXDocumentResource(ctx, db));
         }
       } catch(BaseXException e) {
         try {
@@ -94,22 +93,53 @@ public class BXAllDatabasesResource extends BXResource implements
   }
 
   @Override
-  public CollectionResource createCollection(String arg0)
+  public CollectionResource createCollection(final String newName)
       throws NotAuthorizedException, ConflictException, BadRequestException {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Resource createNew(String arg0, InputStream arg1, Long arg2,
-      String arg3) throws IOException, ConflictException,
-      NotAuthorizedException, BadRequestException {
-    // TODO Auto-generated method stub
+  public Resource createNew(final String newName, final InputStream inputStream,
+      final Long length, final String contentType) {
+    final String dbname = dbname(newName);
+    if(!Command.validName(dbname, false)) return null;
+    try {
+      CreateDB.xml(dbname, inputStream, ctx);
+      return new BXDocumentResource(ctx, dbname);
+    } catch(BaseXException e) {
+      // [DP] WebDAV: error handling
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  @Override
+  public void sendContent(final OutputStream out, final Range range,
+      final Map<String, String> params, final String contentType) { }
+
+  @Override
+  public Long getMaxAgeSeconds(final Auth auth) {
     return null;
   }
 
   @Override
-  public void copyTo(final CollectionResource arg0, final String arg1)
+  public String getContentType(final String accepts) {
+    return null;
+  }
+
+  @Override
+  public Long getContentLength() {
+    return null;
+  }
+
+  @Override
+  public Date getCreateDate() {
+    return null;
+  }
+
+  @Override
+  public void copyTo(final CollectionResource toCollection, final String name)
       throws NotAuthorizedException, BadRequestException, ConflictException {
     // TODO Auto-generated method stub
 
@@ -123,41 +153,9 @@ public class BXAllDatabasesResource extends BXResource implements
   }
 
   @Override
-  public Long getContentLength() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getContentType(final String arg0) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Long getMaxAgeSeconds(final Auth arg0) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void sendContent(final OutputStream arg0, final Range arg1,
-      final Map<String, String> arg2, final String arg3) throws IOException,
-      NotAuthorizedException, BadRequestException {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void moveTo(final CollectionResource arg0, final String arg1)
+  public void moveTo(final CollectionResource rDest, final String name)
       throws ConflictException, NotAuthorizedException, BadRequestException {
     // TODO Auto-generated method stub
 
-  }
-
-  @Override
-  public Date getCreateDate() {
-    // TODO Auto-generated method stub
-    return null;
   }
 }
