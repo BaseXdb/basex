@@ -1,6 +1,7 @@
 package org.basex.api.webdav;
 
 import static org.basex.util.Token.*;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -8,7 +9,6 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Open;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
-import org.basex.util.TokenObjMap;
 
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Resource;
@@ -51,6 +51,7 @@ public class BXResourceFactory implements ResourceFactory {
       return isCollection(ctx, db) ? new BXCollectionDatabase(db, ctx)
           : new BXDocumentDatabase(ctx, db);
     }
+
     return getBXResource(steps[0], p);
   }
 
@@ -92,26 +93,30 @@ public class BXResourceFactory implements ResourceFactory {
     return (i != -1 ? n.substring(0, i) : n).replaceAll("[^\\w-]", "");
   }
 
-  private BXResource getBXResource(final String root, final String path) {
-    final String prefix = path.substring(root.length() + 2, path.length());
+  /**
+   * Get resource represented by a path.
+   * @param db database name
+   * @param path path
+   * @return resource
+   */
+  private BXResource getBXResource(final String db, final String path) {
+    final String prefix = path.substring(db.length() + 2, path.length());
     try {
-      new Open(root).execute(ctx);
-      final IntList pres = new IntList();
-      String doc;
-      for(int pre : ctx.data.doc()) {
-        doc = string(ctx.data.text(pre, true));
-        if(doc.startsWith(prefix)) {
-          if(doc.equals(prefix)) {
-            String db = doc.substring(doc.lastIndexOf(Prop.DIRSEP) + 1,
-                doc.length());
-            new Close().execute(ctx);
-            return new BXDocument(db, prefix, ctx);
-          }
-          pres.add(pre);
+      new Open(db).execute(ctx);
+      try {
+        final IntList pres = new IntList();
+        for(final int pre : ctx.data.doc()) {
+          final String doc = string(ctx.data.text(pre, true));
+          if(doc.equals(prefix))
+            return new BXDocument(
+                doc.substring(doc.lastIndexOf(Prop.DIRSEP) + 1, doc.length()),
+                prefix, ctx);
+          if(doc.startsWith(prefix)) pres.add(pre);
         }
+        return new BXFolder(db, pres.toArray(), prefix, ctx);
+      } finally {
+        new Close().execute(ctx);
       }
-      new Close().execute(ctx);
-      return new BXFolder(root, pres.toArray(), prefix, ctx);
     } catch(BaseXException e) {
       // TODO: handle exception
       e.printStackTrace();

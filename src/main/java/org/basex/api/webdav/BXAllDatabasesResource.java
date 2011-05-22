@@ -12,9 +12,7 @@ import java.util.Map;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Context;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Open;
 import org.basex.util.StringList;
 
 import com.bradmcevoy.http.Auth;
@@ -22,9 +20,6 @@ import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Resource;
-import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing the list of all databases.
@@ -64,37 +59,16 @@ public class BXAllDatabasesResource extends BXResource implements
   public List<? extends Resource> getChildren() {
     final List<BXResource> dbs = new ArrayList<BXResource>();
     // Get all databases
-    final StringList list = org.basex.core.cmd.List.list(ctx);
-    for(final String db : list) {
-      try {
-        new Open(db).execute(ctx);
-        if(ctx.data.meta.ndocs > 1) {
-          dbs.add(new BXCollectionDatabase(db, ctx));
-        } else if (ctx.data.meta.ndocs == 1) {
-          dbs.add(new BXDocumentDatabase(ctx, db));
-        }
-      } catch(BaseXException e) {
-        try {
-          new Close().execute(ctx);
-        } catch(BaseXException e1) {
-          // TODO Auto-generated catch block
-          e1.printStackTrace();
-        }
-        e.printStackTrace();
-      }
-    }
-    try {
-      new Close().execute(ctx);
-    } catch(BaseXException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    final StringList list = listDatabases(ctx);
+    for(final String db : list)
+      dbs.add(isCollection(ctx, db) ?
+          new BXCollectionDatabase(db, ctx) :
+          new BXDocumentDatabase(ctx, db));
     return dbs;
   }
 
   @Override
-  public CollectionResource createCollection(final String newName)
-      throws NotAuthorizedException, ConflictException, BadRequestException {
+  public CollectionResource createCollection(final String newName) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -139,23 +113,12 @@ public class BXAllDatabasesResource extends BXResource implements
   }
 
   @Override
-  public void copyTo(final CollectionResource toCollection, final String name)
-      throws NotAuthorizedException, BadRequestException, ConflictException {
-    // TODO Auto-generated method stub
-
+  public void copyTo(final CollectionResource toCollection, final String name) {
   }
 
   @Override
-  public void delete() throws NotAuthorizedException, ConflictException,
-      BadRequestException {
-    // TODO Auto-generated method stub
-
-  }
+  public void delete() { }
 
   @Override
-  public void moveTo(final CollectionResource rDest, final String name)
-      throws ConflictException, NotAuthorizedException, BadRequestException {
-    // TODO Auto-generated method stub
-
-  }
+  public void moveTo(final CollectionResource rDest, final String name) { }
 }
