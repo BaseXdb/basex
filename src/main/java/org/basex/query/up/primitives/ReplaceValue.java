@@ -31,7 +31,7 @@ public final class ReplaceValue extends Primitive {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
 
@@ -41,7 +41,6 @@ public final class ReplaceValue extends Primitive {
     } else {
       d.replace(n.pre, d.kind(n.pre), value);
     }
-    return 0;
   }
 
   @Override

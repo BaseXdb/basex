@@ -71,15 +71,13 @@ public final class TableMemAccess extends TableAccess {
     if(dirty && pref != null) {
       DataOutput out = new DataOutput(meta.file(pref + 'i'));
 
-      final int ent = TableDiskAccess.ENTRIES;
-      final int blocks = (meta.size + ent - 1) / ent;
-
+      final int blocks = (meta.size + IO.ENTRIES - 1) / IO.ENTRIES;
       out.writeNum(blocks);
       out.writeNum(blocks);
       out.writeNum(meta.size);
 
       final int[] array = new int[blocks];
-      for(int b = 0, c = 0; b < blocks; ++b, c += ent) array[b] = c;
+      for(int b = 0, c = 0; b < blocks; ++b, c += IO.ENTRIES) array[b] = c;
       out.writeNums(array);
       for(int b = 0; b < blocks; ++b) array[b] = b;
       out.writeNums(array);
@@ -156,53 +154,25 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
+  protected void copy(final byte[] entries, final int pre, final int last) {
+    for(int o = 0, i = pre; i < last; ++i, o += IO.NODESIZE) {
+      buf1[i] = getLong(entries, o);
+      buf2[i] = getLong(entries, o + 8);
+    }
+    dirty = true;
+  }
+
+  @Override
   public void delete(final int pre, final int nr) {
+    if(nr == 0) return;
     move(pre + nr, pre);
   }
 
   @Override
-  public void replace(final int pre, final byte[] entries, final int sub) {
-    final int nsize = entries.length >>> IO.NODEPOWER;
-    final int rpre = pre + nsize;
-    int off = 0;
-    final int diff = sub - nsize;
-    // diff > 0 if the old subtree is bigger then the new one
-    final int max = diff <= 0 ? rpre - Math.abs(diff) : pre + nsize;
-    for(int i = pre; i < max; ++i, off += 16) {
-      buf1[i] = getLong(entries, off);
-      buf2[i] = getLong(entries, off + 8);
-    }
-    dirty = true;
-
-    // handle the remaining entries if the two subtrees are of different size
-    if(diff < 0) {
-      // case1: new subtree bigger than old one, insert remaining new nodes
-      final byte[] tmp = new byte[entries.length - off];
-      System.arraycopy(entries, off, tmp, 0, tmp.length);
-      insert(max, tmp);
-    } else if(diff > 0) {
-      // case2: old subtree bigger than new one, delete remaining old nodes
-      delete(max, diff);
-    }
-  }
-
-  @Override
   public void insert(final int pre, final byte[] entries) {
-    final int nr = entries.length >>> IO.NODEPOWER;
-    move(pre, pre + nr);
-    for(int l = 0, i = pre; i < pre + nr; ++i, l += 16) {
-      buf1[i] = getLong(entries, l);
-      buf2[i] = getLong(entries, l + 8);
-    }
-  }
-
-  @Override
-  public void set(final int pre, final byte[] entries) {
-    final int nr = entries.length >>> IO.NODEPOWER;
-    for(int l = 0, i = pre; i < pre + nr; ++i, l += 1 << IO.NODEPOWER) {
-      buf1[i] = getLong(entries, l);
-      buf2[i] = getLong(entries, l + 8);
-    }
+    if(entries.length == 0) return;
+    move(pre, pre + (entries.length >>> IO.NODEPOWER));
+    set(pre, entries);
   }
 
   // PRIVATE METHODS ==========================================================

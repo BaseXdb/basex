@@ -32,7 +32,7 @@ public final class ReplaceElemContent extends Primitive {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int par = n.pre + add;
@@ -50,7 +50,6 @@ public final class ReplaceElemContent extends Primitive {
         d.insert(pre, par, md);
       }
     }
-    return 0;
   }
 
   @Override

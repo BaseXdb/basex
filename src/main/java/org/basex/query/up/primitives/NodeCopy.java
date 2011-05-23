@@ -40,11 +40,11 @@ public abstract class NodeCopy extends Primitive {
 
   @Override
   public void prepare() throws QueryException {
-    md = new MemData(((DBNode) node).data);
-
     // ignore fragment nodes
     if(!(node instanceof DBNode)) return;
 
+    // build main memory representation of nodes to be copied
+    md = new MemData(((DBNode) node).data);
     final NodeCache seq = new NodeCache();
     for(final NodeCache nc : insert) {
       for(ANode i; (i = nc.next()) != null;) seq.add(i);

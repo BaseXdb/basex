@@ -54,6 +54,20 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for the 'ft:count()' function.
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testCount() throws QueryException {
+    final String fun = check(FunDef.COUNT);
+    query(fun + "(())", "0");
+    query(fun + "(//*[text() contains text '1'])", "1");
+    query(fun + "(//li[text() contains text 'exercise'])", "2");
+    query("for $i in //li[text() contains text 'exercise'] " +
+        "return " + fun + "($i[text() contains text 'exercise'])", "1 1");
+  }
+
+  /**
    * Test method for the 'ft:mark()' function.
    * @throws QueryException query exception
    */

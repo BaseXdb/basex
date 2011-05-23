@@ -32,12 +32,11 @@ public final class RenameNode extends Primitive {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data data = n.data;
     final int pre = n.pre;
     data.rename(pre, data.kind(pre), name.atom(), name.uri().atom());
-    return 0;
   }
 
   @Override

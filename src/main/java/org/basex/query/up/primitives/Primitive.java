@@ -44,10 +44,18 @@ public abstract class Primitive {
    * the pre value of t changes. Thus the number of inserted nodes is added to
    * the pre value of t for all following update operations.
    * @param add size to add
-   * @return value to be added to current pre value
    * @throws QueryException query exception
    */
-  public abstract int apply(final int add) throws QueryException;
+  public abstract void apply(final int add) throws QueryException;
+
+  /**
+   * Returns the value to be added to the current pre value after the
+   * update operation.
+   * @return value to be added
+   */
+  public int addend() {
+    return 0;
+  }
 
   /**
    * Prepares the update.

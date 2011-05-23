@@ -85,7 +85,7 @@ final class NodePrimitivesContainer implements NodePrimitives {
       // if a node is replaced, an eventual delete operation
       // is removed, as the actual node identity has been replaced.
       final PrimitiveType dominantOp = rep ? REPLACENODE : DELETENODE;
-      final List<Primitive> up = new ArrayList<Primitive>(1);
+      final List<Primitive> up = new ArrayList<Primitive>(prim.size());
       // if a node is deleted or replaced, all other operations performing on
       // the corresponding node identity are without effect in the end.
       // insert before/after form the only exceptions, as they do not affect
@@ -104,12 +104,12 @@ final class NodePrimitivesContainer implements NodePrimitives {
   }
 
   @Override
-  public String toString() {
-    return Util.name(this) + prim;
+  public boolean updatesDestroyIdentity() {
+    return del || rep;
   }
 
   @Override
-  public boolean updatesDestroyIdentity() {
-    return del || rep;
+  public String toString() {
+    return Util.name(this) + prim;
   }
 }

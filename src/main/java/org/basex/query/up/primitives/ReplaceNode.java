@@ -31,7 +31,7 @@ public final class ReplaceNode extends NodeCopy {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     int pre = n.pre + add;
@@ -42,9 +42,8 @@ public final class ReplaceNode extends NodeCopy {
       // overwrite existing text node
       d.replace(pre, Data.TEXT, md.text(0, true));
     } else {
-      /* Checks if fast replace is possible - documents containing namespaces
-       * are not supported so far. */
       if(d.ns.size() == 0 && md.ns.size() == 0) {
+        // replaces table nodes directly if no namespaces are specified
         d.replace(pre, md);
       } else {
         d.delete(pre);
@@ -52,13 +51,13 @@ public final class ReplaceNode extends NodeCopy {
         else d.insert(pre, par, md);
       }
 
-      /* text merging applies for both replace methods
+      // text merging applies for both replace methods
+      // [LK] if necessary, please add an example in XQUPTest to check this code
       if(!mergeTexts(d, pre - 1, pre)) {
         pre += md.meta.size;
         mergeTexts(d, pre - 1, pre);
-      }*/
+      }
     }
-    return 0;
   }
 
   @Override

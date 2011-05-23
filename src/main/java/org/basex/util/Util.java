@@ -33,9 +33,9 @@ public final class Util {
    */
   public static String bug(final String[] ext) {
     final TokenBuilder tb = new TokenBuilder(
-        "Possible bug? Your feedback is welcome:");
+      "Potential bug? Improper use? Your feedback is welcome:");
     tb.add(NL).add("Contact: ").add(MAIL);
-    tb.add(NL).add("Version: ").add(NAME).add(' ').add(VERSION);
+    tb.add(NL).add("Version: ").add(TITLE);
     tb.add(NL).add("Java: ").add(System.getProperty("java.vendor"));
     tb.add(", ").add(System.getProperty("java.version"));
     tb.add(NL).add("OS: ").add(System.getProperty("os.name"));

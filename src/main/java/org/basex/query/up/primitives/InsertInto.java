@@ -27,7 +27,7 @@ public final class InsertInto extends InsertBase {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     int pre = n.pre + d.size(n.pre, d.kind(n.pre)) + add;
@@ -36,6 +36,5 @@ public final class InsertInto extends InsertBase {
       pre += md.meta.size;
       mergeTexts(d, pre - 1, pre);
     }
-    return 0;
   }
 }

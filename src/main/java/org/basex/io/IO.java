@@ -43,10 +43,15 @@ public abstract class IO {
   public static final String[] HTMLSUFFIXES =
     { ".xhtml", ".html", ".htm" };
 
-  /** Disk block/page size. */
+  /** Disk block/page size (default: 4096). */
   public static final int BLOCKSIZE = 1 << 12;
-  /** Table node size power. */
+  /** Table node size power (default: 4). */
   public static final int NODEPOWER = 4;
+  /** Table node size power (default: 4). */
+  public static final int NODESIZE = 1 << NODEPOWER;
+  /** Entries per block (default: 256). */
+  public static final int ENTRIES = BLOCKSIZE >>> NODEPOWER;
+
   /** Maximum supported tree height. */
   public static final int MAXHEIGHT = 1 << 8;
   /** Maximum number of attributes (see bit layout in {@link Data} class). */

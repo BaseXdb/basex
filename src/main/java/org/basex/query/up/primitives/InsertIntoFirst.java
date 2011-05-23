@@ -25,11 +25,10 @@ public final class InsertIntoFirst extends InsertBase {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final int pre = n.pre + add;
     final Data d = n.data;
     d.insert(pre + d.attSize(pre, d.kind(pre)), pre, md);
-    return 0;
   }
 }
