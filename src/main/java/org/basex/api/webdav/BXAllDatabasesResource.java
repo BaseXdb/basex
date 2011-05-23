@@ -28,8 +28,9 @@ import com.bradmcevoy.http.Resource;
  * @author Dimitar Popov
  */
 public class BXAllDatabasesResource extends BXResource implements
-    //MakeCollectionableResource, PutableResource, GetableResource, PropFindableResource {
-    FolderResource {
+  FolderResource {
+    // MakeCollectionableResource, PutableResource, GetableResource,
+    // PropFindableResource {
 
   /**
    * Constructor.

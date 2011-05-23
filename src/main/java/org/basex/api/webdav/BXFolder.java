@@ -107,8 +107,8 @@ public final class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource createNew(final String newName,
-      final InputStream inputStream, final Long length, final String contentType) {
+  public Resource createNew(final String newName, final InputStream inputStream,
+      final Long length, final String contentType) {
     // TODO Auto-generated method stub
     return null;
   }

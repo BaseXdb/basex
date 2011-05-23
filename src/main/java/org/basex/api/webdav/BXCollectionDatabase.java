@@ -50,7 +50,7 @@ public class BXCollectionDatabase extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource child(String childName) {
+  public Resource child(final String childName) {
     // TODO Auto-generated method stub
     return null;
   }

@@ -18,9 +18,6 @@ import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FileItem;
 import com.bradmcevoy.http.FileResource;
 import com.bradmcevoy.http.Range;
-import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing a document in a collection database.
@@ -33,27 +30,27 @@ public final class BXDocument extends BXResource implements FileResource {
   private final String dbname;
   /** Path to document in database. */
   private final String docpath;
-  /** Document pre value. */
+  /** PRE value of the document. */
   private final int preval;
 
   /**
    * Constructor.
    * @param db database containing the document
-   * @param doc path to document in databse
+   * @param doc path to document in database
+   * @param pre PRE value of the document
    * @param c context
    */
-  public BXDocument(final String db, final String doc, final int pre, final Context c) {
+  public BXDocument(final String db, final String doc, final int pre,
+      final Context c) {
     dbname = db;
     docpath = doc;
     preval = pre;
     ctx = c;
   }
-  
-  @Override
-  public void copyTo(CollectionResource toCollection, String name)
-      throws NotAuthorizedException, BadRequestException, ConflictException {
-    // TODO Auto-generated method stub
 
+  @Override
+  public void copyTo(final CollectionResource toCollection, final String name) {
+    // TODO Auto-generated method stub
   }
 
   @Override
@@ -69,16 +66,14 @@ public final class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public void delete() throws NotAuthorizedException, ConflictException,
-      BadRequestException {
+  public void delete() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public void sendContent(OutputStream out, Range range,
-      Map<String, String> params, String contentType) throws IOException,
-      NotAuthorizedException, BadRequestException {
+  public void sendContent(final OutputStream out, final Range range,
+      final Map<String, String> params, final String contentType)
+      throws IOException {
     try {
       new Open(dbname).execute(ctx);
       final XMLSerializer ser = new XMLSerializer(out);
@@ -92,13 +87,13 @@ public final class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public Long getMaxAgeSeconds(Auth auth) {
+  public Long getMaxAgeSeconds(final Auth auth) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public String getContentType(String accepts) {
+  public String getContentType(final String accepts) {
     return MIMETYPEXML;
   }
 
@@ -109,16 +104,13 @@ public final class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public void moveTo(CollectionResource rDest, String name)
-      throws ConflictException, NotAuthorizedException, BadRequestException {
+  public void moveTo(final CollectionResource rDest, final String name) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public String processForm(Map<String, String> parameters,
-      Map<String, FileItem> files) throws BadRequestException,
-      NotAuthorizedException, ConflictException {
+  public String processForm(final Map<String, String> parameters,
+      final Map<String, FileItem> files) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -128,5 +120,4 @@ public final class BXDocument extends BXResource implements FileResource {
     // TODO Auto-generated method stub
     return null;
   }
-
 }
