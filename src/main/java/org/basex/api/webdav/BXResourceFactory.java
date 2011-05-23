@@ -109,8 +109,7 @@ public class BXResourceFactory implements ResourceFactory {
         final IntList pres = new IntList();
         for(final int pre : ctx.data.doc()) {
           final String doc = string(ctx.data.text(pre, true));
-          if(doc.equals(prefix)) return new BXDocument(doc.substring(
-              doc.lastIndexOf(Prop.DIRSEP) + 1, doc.length()), prefix, ctx);
+          if(doc.equals(prefix)) return new BXDocument(db, prefix, pre, ctx);
           if(doc.startsWith(prefix)) pres.add(pre);
         }
         return new BXFolder(db, pres.toArray(), prefix, ctx);

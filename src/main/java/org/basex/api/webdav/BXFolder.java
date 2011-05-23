@@ -74,8 +74,8 @@ public final class BXFolder extends BXResource implements FolderResource {
         final String doc = string(ctx.data.text(pre, true));
         final String s = doc.substring(dirpath.length(), doc.length());
         final int idx = s.lastIndexOf(Prop.DIRSEP);
-        if(idx == 0) dbs.add(new BXDocument(dbname, s.substring(1,
-            s.length()), ctx));
+        if(idx == 0) dbs.add(new BXDocument(dbname, s.substring(1, s.length()),
+            pre, ctx));
         else if(idx > 0) {
           final String[] parts = s.split(Prop.DIRSEP);
           final byte[] dir = token(dirpath + Prop.DIRSEP + parts[1]);
@@ -107,8 +107,8 @@ public final class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) {
+  public Resource createNew(final String newName,
+      final InputStream inputStream, final Long length, final String contentType) {
     // TODO Auto-generated method stub
     return null;
   }

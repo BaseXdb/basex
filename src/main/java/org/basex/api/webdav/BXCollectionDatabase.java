@@ -65,7 +65,7 @@ public class BXCollectionDatabase extends BXResource implements FolderResource {
         final byte[] doc = ctx.data.text(pre, true);
         final int idx = indexOf(doc, token(Prop.DIRSEP));
         if(idx <= 0)
-          dbs.add(new BXDocument(dbname, string(doc), ctx));
+          dbs.add(new BXDocument(dbname, string(doc), pre, ctx));
         else {
           // Folder
           final byte[] dir = substring(doc, 0, idx);

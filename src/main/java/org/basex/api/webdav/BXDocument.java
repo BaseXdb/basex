@@ -5,8 +5,13 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
 
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Open;
+import org.basex.data.Nodes;
+import org.basex.data.XMLSerializer;
 
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
@@ -28,6 +33,8 @@ public final class BXDocument extends BXResource implements FileResource {
   private final String dbname;
   /** Path to document in database. */
   private final String docpath;
+  /** Document pre value. */
+  private final int preval;
 
   /**
    * Constructor.
@@ -35,9 +42,10 @@ public final class BXDocument extends BXResource implements FileResource {
    * @param doc path to document in databse
    * @param c context
    */
-  public BXDocument(final String db, final String doc, final Context c) {
+  public BXDocument(final String db, final String doc, final int pre, final Context c) {
     dbname = db;
     docpath = doc;
+    preval = pre;
     ctx = c;
   }
   
@@ -71,8 +79,16 @@ public final class BXDocument extends BXResource implements FileResource {
   public void sendContent(OutputStream out, Range range,
       Map<String, String> params, String contentType) throws IOException,
       NotAuthorizedException, BadRequestException {
-    // TODO Auto-generated method stub
-
+    try {
+      new Open(dbname).execute(ctx);
+      final XMLSerializer ser = new XMLSerializer(out);
+      new Nodes(preval, ctx.data).serialize(ser);
+      ser.close();
+      new Close().execute(ctx);
+    } catch(BaseXException e) {
+      // [DP] WebDAV: error handling
+      e.printStackTrace();
+    }
   }
 
   @Override
