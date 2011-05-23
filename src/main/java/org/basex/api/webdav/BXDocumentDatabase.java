@@ -25,10 +25,7 @@ import com.bradmcevoy.http.Range;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXDocumentDatabase extends BXResource implements FileResource {
-  /** Database name. */
-  private final String dbname;
-
+public class BXDocumentDatabase extends BXDatabase implements FileResource {
   /**
    * Constructor.
    * @param c database context
@@ -37,25 +34,6 @@ public class BXDocumentDatabase extends BXResource implements FileResource {
   public BXDocumentDatabase(final Context c, final String n) {
     ctx = c;
     dbname = n;
-  }
-
-  @Override
-  public Date getModifiedDate() {
-    try {
-      new Open(dbname).execute(ctx);
-      final Date d = new Date(ctx.data.meta.time);
-      new Close().execute(ctx);
-      return d;
-    } catch(BaseXException e) {
-      // [DP] WebDAV: error handling
-      e.printStackTrace();
-      return null;
-    }
-  }
-
-  @Override
-  public String getName() {
-    return dbname;
   }
 
   @Override

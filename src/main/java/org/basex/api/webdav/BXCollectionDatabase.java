@@ -29,10 +29,7 @@ import com.bradmcevoy.http.Resource;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXCollectionDatabase extends BXResource implements FolderResource {
-  /** Collection name. */
-  private final String dbname;
-
+public class BXCollectionDatabase extends BXDatabase implements FolderResource {
   /**
    * Constructor.
    * @param db database containing the document
@@ -85,18 +82,6 @@ public class BXCollectionDatabase extends BXResource implements FolderResource {
   }
 
   @Override
-  public String getName() {
-    // TODO Auto-generated method stub
-    return dbname;
-  }
-
-  @Override
-  public Date getModifiedDate() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public Resource createNew(final String newName, final InputStream inputStream,
       final Long length, final String contentType) {
     // TODO Auto-generated method stub
@@ -110,7 +95,7 @@ public class BXCollectionDatabase extends BXResource implements FolderResource {
 
   @Override
   public void delete() {
-    // TODO Auto-generated method stub
+    // TODO
   }
 
   @Override
