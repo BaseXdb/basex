@@ -233,14 +233,4 @@ class IntListExt extends IntList {
   public void inc(final int i, final int c) {
     list[i] += c;
   }
-
-  /**
-   * Increment the values within an interval.
-   * @param from start index (inclusive)
-   * @param to end index (exclusive)
-   * @param c increment value
-   */
-  public void inc(final int from, final int to, final int c) {
-    for(int i = from; i < to; ++i) list[i] += c;
-  }
 }

@@ -45,7 +45,6 @@ b_reset=Reset
 # Visualizations
 no_data=Nessun dato disponibile
 no_space=Spazio insufficiente
-map_binary=File binario
 info_title=Info sull'interrogazione
 help_title=Aiuto
 text_title=Testo
@@ -98,7 +97,6 @@ dc_general=Generale
 dc_parse=Parsing
 dc_names=Nomi
 dc_index=Indici
-dc_meta=Meta-dati
 dc_ft=Full-Text
 dc_headerinfo=Parse first line as table header
 dc_linesinfo=Splits input into lines
@@ -170,7 +168,6 @@ dm_choice5=Titolo, Bordo grande
 dm_offset=Offset
 dm_size=Rapporto:
 dm_size_children=figli
-dm_size_fssize=dimensione documento
 dm_size_textsize=lunghezza testo
 dm_size_both=figli/lunghezza testo
 

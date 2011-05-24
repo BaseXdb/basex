@@ -108,18 +108,6 @@ public final class BitArray {
   }
 
   /**
-   * Set the i<sup>th</sup> bit to 1.
-   * @param i index of the bit
-   */
-  public void set(final long i) {
-    // calculate the index of the word in the array: i div 2^6 = i >> 6
-    final int wordIndex = (int) (i >>> WORD_POWER);
-    if(wordIndex >= words.length) expandTo(wordIndex + 1);
-    words[wordIndex] |= 1L << i;
-    if(i >= length) length = i + 1L;
-  }
-
-  /**
    * Set the i<sup>th</sup> bit to 0.
    * @param i index of the bit
    */

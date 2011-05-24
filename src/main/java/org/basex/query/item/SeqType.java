@@ -6,7 +6,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
@@ -270,32 +269,6 @@ public final class SeqType {
   }
 
   /**
-   * Matches an iterator against this sequence type.
-   * @param iter iterator to be checked
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public boolean instance(final Iter iter) throws QueryException {
-    final MapType mt = type.map() ? (MapType) type : null;
-
-    Item it = iter.next();
-    if(it == null) return occ.check(0);
-    if(occ.max == 0 || !check(it, mt)) return false;
-
-    it = iter.next();
-    // occ.max >= 1 because of the check above
-    if(it == null) return true;
-    if(occ.max == 1) return false;
-
-    do {
-      if(!check(it, mt)) return false;
-      it = iter.next();
-    } while(it != null);
-
-    return true;
-  }
-
-  /**
    * Checks if the given item is of this SeqType's type.
    * @param it item to check
    * @param mt map type of this type, {@code null} if it's something else
@@ -305,25 +278,6 @@ public final class SeqType {
     // maps don't have type information attached to them, you have to look...
     return mt != null ? it.map() && ((Map) it).hasType(mt) :
         it.type.instance(type) && checkExt(it);
-  }
-
-  /**
-   * Casts the specified item.
-   * @param it description of expression to be cast
-   * @param e producing expression
-   * @param ctx query context
-   * @param ii input info
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  public Item promote(final Item it, final Expr e, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
-
-    if(it == null) {
-      if(occ == Occ.O) XPEMPTY.thrw(ii, e.desc());
-      return null;
-    }
-    return check(it.type == type ? it : type.e(it, ctx, ii), ii);
   }
 
   /**

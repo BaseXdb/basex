@@ -273,13 +273,4 @@ public abstract class Expr extends ExprInfo {
   public Expr addText(final QueryContext ctx) throws QueryException {
     return this;
   }
-
-  /**
-   * Returns a copy of the expression. {@code null} is returned if the
-   * expression cannot be copied.
-   * @return copy, or {@code null}
-   */
-  public Expr copy() {
-    return null;
-  }
 }

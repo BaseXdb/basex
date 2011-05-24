@@ -45,7 +45,6 @@ b_reset=Reset
 # Visualizations
 no_data=Geen gegevens beschikbaar
 no_space=Niet genoeg ruimte
-map_binary=Binair bestand
 info_title=Query info
 help_title=Help
 text_title=Tekst
@@ -98,7 +97,6 @@ dc_general=Algemeen
 dc_parse=Parsing
 dc_names=Namen
 dc_index=Indexen
-dc_meta=Metadata
 dc_ft=Full-Text
 dc_headerinfo=Schakel deze optie in om een header te gebruiken
 dc_linesinfo=Splits input op in regels
@@ -170,7 +168,6 @@ dm_choice5=Titel, grote rand
 dm_offset=Offsets
 dm_size=Verhouding:
 dm_size_children=aantal children
-dm_size_fssize=bestandsgrootte
 dm_size_textsize=tekst lengte
 dm_size_both=children/tekst lengte
 

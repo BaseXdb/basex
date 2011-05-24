@@ -14,7 +14,7 @@ import org.basex.data.MemData;
 import org.basex.io.IOContent;
 
 /** Test index updates when using memory storage ({@link MemData}). */
-public class MemDataTest {
+public final class MemDataTest {
   /** XML document. */
   private static final byte[] XML = "<a><b>test</b><c/></a>".getBytes();
   /** Database context. */

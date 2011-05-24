@@ -18,10 +18,6 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public enum Err {
-
-  /** BASX0000: Not implemented yet. */
-  NOTIMPL(BASX, 0, "Not implemented yet: %."),
-
   /** BASX0001: Evaluation exception. */
   NOIDX(BASX, 1, "Unknown index '%'."),
   /** BASX0002: Evaluation exception. */
@@ -154,8 +150,6 @@ public enum Err {
   DATEFORMAT(FORG, 1, "Wrong % format: \"%\" (try: \"%\")."),
   /** FORG0001: Evaluation exception. */
   QNMINV(FORG, 1, "Invalid QName: \"%\"."),
-  /** FORG0001: Evaluation exception. */
-  FUNERR(FORG, 1, "%"),
   /** FORG0002: Evaluation exception. */
   URIINV(FORG, 2, "Invalid URI: %."),
 
@@ -763,8 +757,6 @@ public enum Err {
     FODT,
     /** FOER Error type. */
     FOER,
-    /** FOFD Error type. */
-    FOFD,
     /** FOFL Error type. */
     FOFL,
     /** FOFU Error type. */

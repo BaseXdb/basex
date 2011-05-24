@@ -10,7 +10,7 @@ import org.basex.build.Parser;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class Create extends ACreate {
+public final class Create extends ACreate {
   /** Parser instance. */
   protected final Parser parser;
 

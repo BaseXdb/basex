@@ -36,19 +36,6 @@ public abstract class InputParser {
   }
 
   /**
-   * Checks if the input is valid.
-   * @return -1 if everything's OK, position of codepoint otherwise
-   */
-  protected final int valid() {
-    int cp;
-    for(int p = 0; p < ql; p += Character.charCount(cp)) {
-      cp = query.codePointAt(p);
-      if(!XMLToken.valid(cp)) return p;
-    }
-    return -1;
-  }
-
-  /**
    * Checks if more characters are found.
    * @return current character
    */

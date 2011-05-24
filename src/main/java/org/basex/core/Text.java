@@ -1011,8 +1011,6 @@ public interface Text {
   String NODATA = lang("no_data") + DOT;
   /** Help string. */
   String NOSPACE = lang("no_space");
-  /** Binary file. */
-  byte[] MAPBINARY = token(lang("map_binary"));
   /** Query info title. */
   String INFOTIT = lang("info_title");
   /** Query title. */
@@ -1149,8 +1147,6 @@ public interface Text {
   String NAMESINFO = lang("dc_names");
   /** Indexing info. */
   String INDEXINFO = lang("dc_index");
-  /** General info. */
-  String METAINFO = lang("dc_meta");
   /** Indexing info. */
   String FTINFO = lang("dc_ft");
 
@@ -1325,8 +1321,6 @@ public interface Text {
   String MAPBOTH = lang("dm_size_both");
   /** Size depending on... */
   String MAPCHILDREN = lang("dm_size_children");
-  /** Size depending on... */
-  String MAPFSSIZE = lang("dm_size_fssize");
   /** Size depending on... */
   String MAPTEXTSIZE = lang("dm_size_textsize");
 

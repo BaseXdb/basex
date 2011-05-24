@@ -360,7 +360,10 @@ public class AxisPath extends Path {
     return (AxisStep) step[i];
   }
 
-  @Override
+  /**
+   * Returns a copy of the path expression.
+   * @return copy
+   */
   public final Path copy() {
     final Expr[] steps = new Expr[step.length];
     for(int s = 0; s < step.length; ++s) steps[s] = AxisStep.get(step(s));

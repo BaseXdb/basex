@@ -45,7 +45,6 @@ b_reset=Reset
 # Visualizations
 no_data=データがありません
 no_space=十分なスペースがありません
-map_binary=バイナリーファイル
 info_title=クエリー情報
 help_title=ヘルプ
 text_title=テキスト
@@ -98,7 +97,6 @@ dc_general=一般
 dc_parse=パース
 dc_names=名前
 dc_index=インデックス
-dc_meta=メタデータ
 dc_ft=全文
 dc_headerinfo=Parse first line as table header
 dc_linesinfo=Splits input into lines
@@ -170,7 +168,6 @@ dm_choice5=タイトル有り、枠線細
 dm_offset=オフセット
 dm_size=比率:
 dm_size_children=子の数
-dm_size_fssize=ファイルサイズ
 dm_size_textsize=テキスト長
 dm_size_both=子/テキスト長
 

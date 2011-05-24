@@ -9,7 +9,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class BaseXException extends Exception {
+public final class BaseXException extends Exception {
   /**
    * Constructs an exception with the specified message and extension.
    * @param s message

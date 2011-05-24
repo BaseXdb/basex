@@ -23,8 +23,6 @@ public interface DataText {
   String IDBSTR = "ISTORAGE";
   /** Last modification time. */
   String DBTIME = "TIME";
-  /** Tree height. */
-  String DBHGHT = "HEIGHT";
   /** Number of XML nodes. */
   String DBSIZE = "SIZE";
   /** File name. */
