@@ -24,12 +24,11 @@ public final class InsertAfter extends InsertBase {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pre = n.pre + add;
     final int k = d.kind(pre);
     d.insert(pre + d.size(pre, k), d.parent(pre, k), md);
-    return 0;
   }
 }

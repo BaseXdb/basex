@@ -146,11 +146,11 @@ public final class CmpR extends Single {
 
     // estimate costs for range access; all values out of range: no results
     rt = new RangeToken(text, Math.max(min, key.min), Math.min(max, key.max));
-    ic.costs = rt.min > rt.max || rt.max < key.min || rt.min > key.max ? 0 :
-      Math.max(1, ic.data.meta.size / 5);
+    ic.costs(rt.min > rt.max || rt.max < key.min || rt.min > key.max ? 0 :
+      Math.max(1, ic.data.meta.size / 5));
 
     // use index if costs are zero, or if min/max is not infinite
-    return ic.costs == 0 || min != Double.NEGATIVE_INFINITY &&
+    return ic.costs() == 0 || min != Double.NEGATIVE_INFINITY &&
       max != Double.POSITIVE_INFINITY;
   }
 

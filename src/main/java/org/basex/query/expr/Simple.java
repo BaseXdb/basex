@@ -32,7 +32,7 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public final int count(final Var v) {
+  public int count(final Var v) {
     return 0;
   }
 

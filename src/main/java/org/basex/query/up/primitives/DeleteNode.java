@@ -23,10 +23,9 @@ public final class DeleteNode extends Primitive {
   }
 
   @Override
-  public int apply(final int add) {
+  public void apply(final int add) {
     final DBNode n = (DBNode) node;
     n.data.delete(n.pre + add);
-    return 0;
   }
 
   @Override

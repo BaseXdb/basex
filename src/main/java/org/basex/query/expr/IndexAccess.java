@@ -31,9 +31,9 @@ import org.basex.util.TokenBuilder;
  */
 public final class IndexAccess extends Single {
   /** Index context. */
-  private final IndexContext ictx;
+  final IndexContext ictx;
   /** Index type. */
-  final IndexType ind;
+  final IndexType itype;
 
   /**
    * Constructor.
@@ -45,7 +45,7 @@ public final class IndexAccess extends Single {
   public IndexAccess(final InputInfo ii, final Expr e, final IndexType t,
       final IndexContext ic) {
     super(ii, e);
-    ind = t;
+    itype = t;
     ictx = ic;
     type = SeqType.NOD_ZM;
   }
@@ -72,22 +72,16 @@ public final class IndexAccess extends Single {
    */
   private AxisIter index(final byte[] term) {
     final Data data = ictx.data;
-    return term.length <= MAXLEN &&
-      (ind == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex) ?
-      index(data, term) : scan(data, term);
-  }
 
-  /**
-   * Returns index-based results.
-   * @param data data reference
-   * @param val value to be found
-   * @return node iterator
-   */
-  private AxisIter index(final Data data, final byte[] val) {
-    final byte kind = ind == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-    final boolean mem = data instanceof MemData;
+    // access index if term is not too long, and if index exists.
+    // otherwise, scan data sequentially
+    final IndexIterator ii = term.length <= MAXLEN &&
+      (itype == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex) ?
+      data.ids(new ValuesToken(itype, term)) : scan(term);
+
     return new AxisIter() {
-      final IndexIterator ii = data.ids(new ValuesToken(ind, val));
+      final byte kind = itype == IndexType.TEXT ? Data.TEXT : Data.ATTR;
+      final boolean mem = data instanceof MemData;
 
       @Override
       public ANode next() {
@@ -102,25 +96,32 @@ public final class IndexAccess extends Single {
   }
 
   /**
-   * Returns scan-based results.
-   * @param data data reference
+   * Returns scan-based iterator.
    * @param val value to be found
    * @return node iterator
    */
-  private AxisIter scan(final Data data, final byte[] val) {
-    final boolean text = ind == IndexType.TEXT;
-    final byte kind = text ? Data.TEXT : Data.ATTR;
-    return new AxisIter() {
-      // fallback solution: parse complete data if string is too long
+  private IndexIterator scan(final byte[] val) {
+    return new IndexIterator() {
+      final byte kind = itype == IndexType.TEXT ? Data.TEXT : Data.ATTR;
+      final boolean text = itype == IndexType.TEXT;
+      final Data data = ictx.data;
       int pre = -1;
 
       @Override
-      public ANode next() {
-        while(++pre != data.meta.size) {
+      public double score() {
+        return -1;
+      }
+      @Override
+      public int next() {
+        return pre;
+      }
+      @Override
+      public boolean more() {
+        while(++pre < data.meta.size) {
           if(data.kind(pre) == kind && eq(data.text(pre, text), val))
-            return new DBNode(data, pre, kind);
+            return true;
         }
-        return null;
+        return false;
       }
     };
   }
@@ -133,7 +134,7 @@ public final class IndexAccess extends Single {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, DATA, token(ictx.data.meta.name),
-        TYP, token(ind.toString()));
+        TYP, token(itype.toString()));
     expr.plan(ser);
     ser.closeElement();
   }
@@ -141,7 +142,7 @@ public final class IndexAccess extends Single {
   @Override
   public String toString() {
     return new TokenBuilder("db:open(\"").add(ictx.data.meta.name).
-    add("\")/db:").addExt(ind.toString().toLowerCase()).
+    add("\")/db:").addExt(itype.toString().toLowerCase()).
       add('(').addExt(expr).add(')').toString();
   }
 }

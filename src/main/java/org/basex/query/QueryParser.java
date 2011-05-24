@@ -1226,7 +1226,7 @@ public class QueryParser extends InputParser {
    */
   private Expr union() throws QueryException {
     final Expr e = intersect();
-    if(e == null || (!wsConsumeWs(UNION) && !wsConsume(PIPE))) return e;
+    if(e == null || !wsConsumeWs(UNION) && !wsConsume(PIPE)) return e;
 
     Expr[] list = { e };
     do list = add(list, intersect());

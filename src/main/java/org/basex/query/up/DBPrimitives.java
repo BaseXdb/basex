@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 
 import java.io.IOException;
 
-import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Export;
 import org.basex.data.Data;
@@ -147,7 +146,7 @@ final class DBPrimitives extends Primitives {
     treeAwareUpdates();
 
     /* Apply updates backwards starting with the highest pre value ->
-     * no id's and less table alterations needed. */
+     * no ids and less table alterations needed. */
     int par = -2;
     // first is the first node of par which is updated. so 'first-1' is the
     // lowest pre value where adjacent text nodes can exist.
@@ -171,15 +170,17 @@ final class DBPrimitives extends Primitives {
       final NodePrimitives prim = op.get(pre);
       prim.optimize();
       if(prim.textAdjacency()) first = pre;
-      for(final Primitive up : prim) add += up.apply(add);
+      for(final Primitive up : prim) {
+        up.apply(add);
+        add += up.addend();
+      }
     }
     if(first > -1) mergeTexts(par, first);
     d.flush();
 
     if(d.meta.prop.is(Prop.WRITEBACK) && !d.meta.path.isEmpty()) {
       try {
-        final Context c = ctx.context;
-        Export.export(c.prop, d, d.meta.path);
+        Export.export(ctx.context.prop, d, d.meta.path);
       } catch(final IOException ex) {
         UPPUTERR.thrw(null, d.meta.path);
       }
@@ -208,12 +209,9 @@ final class DBPrimitives extends Primitives {
   @Override
   protected boolean parentDeleted(final int n) {
     final NodePrimitives up = op.get(n);
-
-    if(up != null && up.updatesDestroyIdentity())
-      return true;
+    if(up != null && up.updatesDestroyIdentity()) return true;
 
     final int p = d.parent(n, d.kind(n));
-    if(p == -1) return false;
-    return parentDeleted(p);
+    return p != -1 && parentDeleted(p);
   }
 }

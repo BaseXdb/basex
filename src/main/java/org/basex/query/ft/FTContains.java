@@ -95,6 +95,7 @@ public class FTContains extends ParseExpr {
   @Override
   public final boolean indexAccessible(final IndexContext ic)
       throws QueryException {
+
     // return if step is no text node, or if no index is available
     final AxisStep s = expr instanceof Context ? ic.step : CmpG.indexStep(expr);
     final boolean ok = s != null && ic.data.meta.ftindex &&

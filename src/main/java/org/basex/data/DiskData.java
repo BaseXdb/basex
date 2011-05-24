@@ -239,7 +239,7 @@ public final class DiskData extends Data {
       final DataAccess da = txt ? texts : values;
       final byte[] pack = comp.pack(val);
 
-      // old entry
+      // old text
       final long old = textOff(pre);
       // old offset
       long o = old & IO.OFFCOMP - 1;
@@ -255,7 +255,7 @@ public final class DiskData extends Data {
           o = da.length();
         }
       } else {
-        // text is numeric: append text at the end
+        // if old text was numeric, append text at the end
         o = da.length();
       }
 

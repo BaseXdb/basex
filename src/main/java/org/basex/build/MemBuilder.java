@@ -7,7 +7,8 @@ import org.basex.data.MemData;
 import org.basex.io.IO;
 
 /**
- * This class creates a memory based database instance.
+ * This class creates a database instance in main-memory.
+ * The storage layout is described in the {@link Data} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -74,33 +75,33 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addDoc(final byte[] txt) {
-    data.doc(meta.size, 0, txt);
+  protected void addDoc(final byte[] value) {
+    data.doc(meta.size, 0, value);
     data.insert(meta.size);
   }
 
   @Override
-  protected void addElem(final int dis, final int n, final int as, final int u,
-      final boolean ne) {
-    data.elem(dis, n, as, as, u, ne);
+  protected void addElem(final int dist, final int name, final int asize,
+      final int uri, final boolean ne) {
+    data.elem(dist, name, asize, asize, uri, ne);
     data.insert(meta.size);
   }
 
   @Override
-  protected void addAttr(final int n, final byte[] v, final int d,
-      final int u) {
-    data.attr(meta.size, d, n, v, u, false);
+  protected void addAttr(final int name, final byte[] value, final int dist,
+      final int uri) {
+    data.attr(meta.size, dist, name, value, uri, false);
     data.insert(meta.size);
   }
 
   @Override
-  protected void addText(final byte[] tok, final int dis, final byte kind) {
-    data.text(meta.size, dis, tok, kind);
+  protected void addText(final byte[] value, final int dist, final byte kind) {
+    data.text(meta.size, dist, value, kind);
     data.insert(meta.size);
   }
 
   @Override
-  protected void setSize(final int pre, final int val) {
-    data.size(pre, Data.ELEM, val);
+  protected void setSize(final int pre, final int size) {
+    data.size(pre, Data.ELEM, size);
   }
 }

@@ -18,8 +18,8 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
- * This class creates a disk based database instance. The storage layout is
- * described in the {@link Data} class.
+ * This class creates a database instance on disk.
+ * The storage layout is described in the {@link Data} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -112,76 +112,78 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  protected void addDoc(final byte[] txt) throws IOException {
+  protected void addDoc(final byte[] value) throws IOException {
     tout.write1(Data.DOC);
     tout.write2(0);
-    tout.write5(textOff(txt, true));
+    tout.write5(textOff(value, true));
     tout.write4(0);
     tout.write4(meta.size++);
   }
 
   @Override
-  protected void addElem(final int dis, final int n, final int as, final int u,
-      final boolean ne) throws IOException {
+  protected void addElem(final int dist, final int name, final int asize,
+      final int uri, final boolean ne) throws IOException {
 
-    tout.write1(as << 3 | Data.ELEM);
-    tout.write2((ne ? 1 << 15 : 0) | n);
-    tout.write1(u);
-    tout.write4(dis);
-    tout.write4(as);
+    tout.write1(asize << 3 | Data.ELEM);
+    tout.write2((ne ? 1 << 15 : 0) | name);
+    tout.write1(uri);
+    tout.write4(dist);
+    tout.write4(asize);
     tout.write4(meta.size++);
   }
 
   @Override
-  protected void addAttr(final int n, final byte[] v, final int dis,
-      final int u) throws IOException {
+  protected void addAttr(final int name, final byte[] value, final int dist,
+      final int uri) throws IOException {
 
-    tout.write1(dis << 3 | Data.ATTR);
-    tout.write2(n);
-    tout.write5(textOff(v, false));
-    tout.write4(u);
+    tout.write1(dist << 3 | Data.ATTR);
+    tout.write2(name);
+    tout.write5(textOff(value, false));
+    tout.write4(uri);
     tout.write4(meta.size++);
   }
 
   @Override
-  protected void addText(final byte[] txt, final int dis, final byte kind)
+  protected void addText(final byte[] value, final int dist, final byte kind)
       throws IOException {
 
     tout.write1(kind);
     tout.write2(0);
-    tout.write5(textOff(txt, true));
-    tout.write4(dis);
+    tout.write5(textOff(value, true));
+    tout.write4(dist);
     tout.write4(meta.size++);
   }
 
   @Override
-  protected void setSize(final int pre, final int val) throws IOException {
+  protected void setSize(final int pre, final int size) throws IOException {
     sout.writeNum(pre);
-    sout.writeNum(val);
+    sout.writeNum(size);
     ++ssize;
   }
 
   /**
    * Calculates the text offset and writes the text value.
-   * @param val value to be inlined
-   * @param txt text/attribute flag
+   * @param value value to be inlined
+   * @param text text/attribute flag
    * @return inline value or text position
    * @throws IOException I/O exception
    */
-  private long textOff(final byte[] val, final boolean txt) throws IOException {
+  private long textOff(final byte[] value, final boolean text)
+      throws IOException {
+
     // inline integer values...
-    long v = Token.toSimpleInt(val);
+    long v = Token.toSimpleInt(value);
     if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
 
     // compress text
-    final byte[] cpr = comp.pack(val);
-    if(txt) {
+    final byte[] cpr = comp.pack(value);
+    if(text) {
       v = txtlen;
       txtlen += xout.writeToken(cpr);
     } else {
       v = vallen;
       vallen += vout.writeToken(cpr);
     }
-    return cpr != val ? v | IO.OFFCOMP : v;
+    return cpr != value ? v | IO.OFFCOMP : v;
   }
 }
