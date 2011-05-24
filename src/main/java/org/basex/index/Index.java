@@ -19,7 +19,7 @@ public interface Index {
   /**
    * Returns an iterator for the index results.
    * @param token token to be found
-   * @return ids
+   * @return sorted pre values for the token
    */
   IndexIterator ids(final IndexToken token);
 
