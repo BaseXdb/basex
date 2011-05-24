@@ -61,8 +61,6 @@ public final class MetaStats extends Statistics {
     //add(tl, "sum(for $d in //@* return string-length($d) + 1)");
     // database size
     tl.add(format(data.meta.dbsize()));
-    // document height
-    tl.add(data.meta.height);
     // number of documents
     tl.add(data.meta.ndocs);
   }
