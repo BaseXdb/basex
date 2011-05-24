@@ -88,6 +88,7 @@ public final class BitArray {
    * @return <code>true</code> if the i<sup>th</sup> bit is set
    */
   public boolean get(final int i) {
+    if(i >= length) return false;
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     final int wordIndex = i >>> WORD_POWER;
     // check if the ith bit is 1
