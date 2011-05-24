@@ -218,9 +218,9 @@ public enum Err {
   /** FOUP0001: Evaluation exception. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
   /** FOUP0002: Evaluation exception. */
-  UPFOURI(FOUP, 2, "No valid URI: '%'."),
+  UPFOURI(FOUP, 2, "No valid URI: \"%\"."),
   /** FOUP0002: Evaluation exception. */
-  UPPUTERR(FOUP, 2, "'%' could not be written."),
+  UPPUTERR(FOUP, 2, "\"%\" could not be written."),
 
   /** FTDY0016: Evaluation exception. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),
