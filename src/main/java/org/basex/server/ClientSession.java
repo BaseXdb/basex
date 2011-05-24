@@ -50,8 +50,6 @@ public final class ClientSession extends Session {
   Socket esocket;
   /** Socket host name. */
   String ehost;
-  /** Event port. */
-  int eport = 1985;
 
   /**
    * Constructor, specifying the database context and the
@@ -169,11 +167,12 @@ public final class ClientSession extends Session {
       send(name);
       final BufferInput bi = new BufferInput(sin);
       if(esocket == null) {
+        String id = bi.readString();
+        int eport = new Integer(bi.readString()).intValue();
         // initialize event notifications
         this.en = new HashMap<String, EventNotification>();
         esocket = new Socket();
         esocket.connect(new InetSocketAddress(ehost, eport), 5000);
-        String id = bi.readString();
         PrintOutput tout = PrintOutput.get(esocket.getOutputStream());
         tout.print(id);
         tout.write(0);
@@ -227,7 +226,7 @@ public final class ClientSession extends Session {
   }
 
   /**
-   * Executes an event.
+   * Executes queries q1 and q2 and sends result of query q2 to other clients.
    * @param name event name
    * @param q1 query string
    * @param q2 query string
@@ -235,7 +234,21 @@ public final class ClientSession extends Session {
    */
   public void event(final String name, final String q1,
       final String q2) throws BaseXException {
-    execute("xquery db:event(" + name + ", " + q1 + ", " + q2 + ")");
+    if(q2 != null) {
+      execute("xquery db:event(" + name + ", " + q1 + ", " + q2 + ")");
+    } else {
+      execute("xquery db:event(" + name + ", " + q1 + ")");
+    }
+  }
+
+  /**
+   * Executes a query and sends result of it to other clients.
+   * @param name event name
+   * @param q1 query to execute
+   * @throws BaseXException exception
+   */
+  public void event(final String name, final String q1) throws BaseXException {
+    event(name, q1, null);
   }
 
   /**
