@@ -673,6 +673,7 @@ public class QueryParser extends InputParser {
     wsCheck(ITEMM);
     if(declItem) error(DUPLITEM);
     declItem = true;
+    if(module != null) error(DECITEM);
 
     final SeqType st = optAsType();
     if(st != null && st.type == AtomType.EMP) error(NOTYPE, st);

@@ -164,14 +164,6 @@ public final class Array {
   }
 
   /**
-   * Reverses the order of the elements in the given array.
-   * @param arr array
-   */
-  public static void reverse(final Object[] arr) {
-    reverse(arr, 0, arr.length);
-  }
-
-  /**
    * Reverses the order of all elements in the given interval.
    * @param arr array
    * @param pos position of first element of the interval

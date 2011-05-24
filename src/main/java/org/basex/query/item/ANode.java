@@ -80,7 +80,10 @@ public abstract class ANode extends Item {
       Token.diff(atom(), it.atom(ii));
   }
 
-  @Override
+  /**
+   * Returns a copy of the node.
+   * @return copy
+   */
   public abstract ANode copy();
 
   /**

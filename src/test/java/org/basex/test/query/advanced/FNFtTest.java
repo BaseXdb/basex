@@ -32,7 +32,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the ft:search() function.
+   * Test method for the 'ft:search()' function.
    * @throws BaseXException database exception
    * @throws QueryException  query exception
    */
@@ -90,7 +90,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the ft:extract() function.
+   * Test method for the 'ft:extract()' function.
    * @throws QueryException query exception
    */
   @Test

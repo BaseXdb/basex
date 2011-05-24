@@ -22,8 +22,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class FunItem extends FItem {
-
+public final class FunItem extends FItem {
   /** Variables. */
   private final Var[] vars;
   /** Function expression. */

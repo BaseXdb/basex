@@ -14,8 +14,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class LitFunc extends Func {
-
+public final class LitFunc extends Func {
   /**
    * Constructor.
    * @param ii input info

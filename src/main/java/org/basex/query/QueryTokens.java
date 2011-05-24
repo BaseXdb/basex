@@ -326,7 +326,7 @@ public interface QueryTokens {
 
   // ERROR INFORMATION =======================================================
 
-  /** Skip flag for the syntax highlighter. */
+  /** Skip flag for the syntax highlighter (don't remove!). */
   String IGNORE = null;
 
   /** Decimal declarations. */
@@ -482,11 +482,6 @@ public interface QueryTokens {
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
 
-  /** External variable.*/
-  byte[] FILEDIRSEP = concat(FILE, token(":directory-separator"));
-  /** External variable.*/
-  byte[] FILEPATHSEP = concat(FILE, token(":path-separator"));
-
   // QUERY PLAN ===============================================================
 
   /** Separator. */
@@ -497,8 +492,6 @@ public interface QueryTokens {
   String ARG = "arg";
   /** Query Plan. */
   String FUNC = "Function";
-  /** Query Plan. */
-  String FITM = "Function item";
   /** Query Plan. */
   String VARBL = "Variable";
   /** Query Info: Plan. */

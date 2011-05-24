@@ -1,9 +1,7 @@
 package org.basex.io;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.Arrays;
-
 import org.basex.data.MetaData;
 
 /**
@@ -28,39 +26,6 @@ public final class TableMemAccess extends TableAccess {
     super(md, pf);
     buf1 = new long[s];
     buf2 = new long[s];
-  }
-
-  /**
-   * Stores the table in long arrays.
-   * @param md meta data
-   * @param pf filename
-   * @throws IOException IO Exception
-   */
-  public TableMemAccess(final MetaData md, final String pf) throws IOException {
-    this(md, pf, md.size);
-
-    // read index info
-    final DataInput in = new DataInput(md.file(pf + 'i'));
-    in.readNum(); in.readNum();
-    final int[] firstPres = in.readNums();
-    final int[] blocks = in.readNums();
-    in.close();
-
-    // read blocks
-    final RandomAccessFile f = new RandomAccessFile(md.file(pf), "r");
-    final byte[] array = new byte[IO.BLOCKSIZE];
-    int np = 0, c = 0, l = 0;
-    for(int i = 0; i != md.size; ++i) {
-      while(i == np) {
-        f.seek((long) blocks[c++] * IO.BLOCKSIZE);
-        f.readFully(array);
-        np = c == firstPres.length ? Integer.MAX_VALUE : firstPres[c];
-        l = 0;
-      }
-      buf1[i] = getLong(array, l++ << 3);
-      buf2[i] = getLong(array, l++ << 3);
-    }
-    f.close();
   }
 
   @Override

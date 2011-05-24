@@ -106,15 +106,6 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads an array of longs from the input stream.
-   * @return array of longs
-   * @throws IOException IO Exception
-   */
-  public long[] readLongs() throws IOException {
-    return readLongs(readNum());
-  }
-
-  /**
    * Reads an array of longs with the specified size from the input stream.
    * @param s array size
    * @return array of longs

@@ -75,7 +75,6 @@ public final class Optimize extends ACreate {
       }
       if(h < level) h = level;
     }
-    m.height = h;
     m.ndocs = n;
     m.pathindex = path;
     m.uptodate = true;

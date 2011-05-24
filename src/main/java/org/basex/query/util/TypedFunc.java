@@ -12,10 +12,9 @@ import org.basex.query.item.SeqType;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class TypedFunc {
+public final class TypedFunc {
   /** Function expression. */
   public final Expr fun;
-
   /** Function type. */
   public final FunType type;
 
@@ -37,15 +36,6 @@ public class TypedFunc {
   public TypedFunc(final Expr f, final FunType ft) {
     fun = f;
     type = ft;
-  }
-
-  /**
-   * Gets the type of the {@code i}-th argument.
-   * @param i argument index
-   * @return argument type
-   */
-  public SeqType arg(final int i) {
-    return type.args[i];
   }
 
   /**

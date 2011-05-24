@@ -39,8 +39,6 @@ public final class MetaData {
   public long filesize;
   /** Number of XML documents. */
   public int ndocs;
-  /** Maximum document height. */
-  public int height;
   /** Modification time. */
   public long time;
   /** Flag for whitespace chopping. */
@@ -225,7 +223,6 @@ public final class MetaData {
       else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
       else if(k.equals(DBFTDC))   diacritics = toBool(v);
       else if(k.equals(DBENC))    encoding   = v;
-      else if(k.equals(DBHGHT))   height     = toInt(v);
       else if(k.equals(DBCHOP))   chop       = toBool(v);
       else if(k.equals(DBENTITY)) entity     = toBool(v);
       else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
@@ -272,7 +269,6 @@ public final class MetaData {
     writeInfo(out, DBFSIZE,  filesize);
     writeInfo(out, DBNDOCS,  ndocs);
     writeInfo(out, DBENC,    encoding);
-    writeInfo(out, DBHGHT,   height);
     writeInfo(out, DBSIZE,   size);
     writeInfo(out, DBCHOP,   chop);
     writeInfo(out, DBENTITY, entity);

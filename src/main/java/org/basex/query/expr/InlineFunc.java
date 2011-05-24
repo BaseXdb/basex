@@ -21,8 +21,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class InlineFunc extends Func {
-
+public final class InlineFunc extends Func {
   /**
    * Constructor.
    * @param ii input info

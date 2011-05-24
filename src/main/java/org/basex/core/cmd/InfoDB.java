@@ -56,7 +56,6 @@ public final class InfoDB extends AInfo {
     format(tb, INFODBNAME, meta.name);
     format(tb, INFODBSIZE, Performance.format(meta.dbsize()));
     format(tb, INFONODES, Integer.toString(meta.size));
-    format(tb, INFOHEIGHT, Integer.toString(meta.height));
 
     tb.add(NL);
     tb.addExt(header, INFOCREATE);

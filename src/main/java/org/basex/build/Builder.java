@@ -141,7 +141,7 @@ public abstract class Builder extends Progress {
       throws IOException {
 
     final int pre = addElem(name, att);
-    if(meta.height < ++lvl) meta.height = lvl;
+    ++lvl;
     return pre;
   }
 

@@ -284,14 +284,17 @@ public final class CmpG extends Cmp {
 
       final int is = ic.data.nrIDs(new ValuesToken(ind, it.atom(input)));
       // add only expressions that yield results
-      if(is != 0) iacc = Array.add(iacc, new IndexAccess(input, it, ind, ic));
-      ic.addCosts(is);
+      if(is != 0) {
+        iacc = Array.add(iacc, new IndexAccess(input, it, ind, ic));
+        ic.addCosts(is);
+      }
     }
     return true;
   }
 
   @Override
   public Expr indexEquivalent(final IndexContext ic) {
+    // will only be called for costs != 0
     final boolean text = iacc[0].itype == IndexType.TEXT;
     ic.ctx.compInfo(text ? OPTTXTINDEX : OPTATVINDEX);
     // more than one string - merge index results

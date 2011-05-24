@@ -54,12 +54,6 @@ public interface Type {
   boolean node();
 
   /**
-   * URI representation.
-   * @return the type's URI
-   */
-  byte[] uri();
-
-  /**
    * Checks if the type refers to a number.
    * @return result of check
    */
