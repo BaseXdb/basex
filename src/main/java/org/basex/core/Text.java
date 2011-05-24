@@ -661,8 +661,6 @@ public interface Text {
   String INFOENCODING = lang("info_encoding");
   /** Info on number of nodes. */
   String INFONODES = lang("info_nodes");
-  /** Maximum tree height. */
-  String INFOHEIGHT = lang("info_height");
 
   /** Info on used main memory. */
   String INFOMEM = lang("info_mem");

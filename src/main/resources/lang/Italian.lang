@@ -472,7 +472,6 @@ info_path=Cammino dell'input
 info_time=Data
 info_mem=Memoria principale usata
 info_nodes=Nodi
-info_height=Altezza
 info_encoding=Codifica
 info_dbpath=Cammino della base di dati
 info_nodb=Nessuna base di dati trovata.

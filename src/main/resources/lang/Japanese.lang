@@ -474,7 +474,6 @@ info_path=文書のパス
 info_time=タイムスタンプ
 info_mem=メインメモリの使用量
 info_nodes=テーブルノード
-info_height=ツリーの高さ
 info_encoding=文字コード
 info_dbpath=データベースパス
 info_nodb=データベースが見付かりません。

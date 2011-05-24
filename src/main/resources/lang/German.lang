@@ -472,7 +472,6 @@ info_path=Dokumentpfad
 info_time=Zeitstempel
 info_mem=Hauptspeicher
 info_nodes=Knoten
-info_height=Höhe
 info_encoding=Kodierung
 info_dbpath=Datenbankpfad
 info_nodb=Keine Datenbank gefunden.

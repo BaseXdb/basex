@@ -472,7 +472,6 @@ info_path=Input Pad
 info_time=Time stamp
 info_mem=Gebruikt hoofdgeheugen
 info_nodes=Nodes
-info_height=Hoogte
 info_encoding=Encoding
 info_dbpath=Database pad
 info_nodb=Geen database gevonden

@@ -472,7 +472,6 @@ info_path=Input Path
 info_time=Time Stamp
 info_mem=Used Main Memory
 info_nodes=Nodes
-info_height=Height
 info_encoding=Encoding
 info_dbpath=Database Path
 info_nodb=No database found

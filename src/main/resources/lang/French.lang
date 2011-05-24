@@ -472,7 +472,6 @@ info_path=Chemin en entrée
 info_time=Horodateur
 info_mem=Mémoire principale utilisée
 info_nodes=Noeuds
-info_height=Hauteur
 info_encoding=Encodage
 info_dbpath=Chemin de la base de données
 info_nodb=Aucune base de données trouvée
