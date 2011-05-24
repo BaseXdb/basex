@@ -181,7 +181,7 @@ public abstract class Data {
   /**
    * Returns the number of indexed id references for the specified token.
    * @param token text to be found
-   * @return id array
+   * @return number of hits
    */
   public final synchronized int nrIDs(final IndexToken token) {
     switch(token.type()) {
@@ -914,7 +914,7 @@ public abstract class Data {
    * @param value document name
    */
   public final void doc(final int pre, final int size, final byte[] value) {
-    final int i = ++meta.lastid;
+    final int i = newID();
     final long v = index(value, pre, true);
     s(DOC); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
@@ -935,7 +935,7 @@ public abstract class Data {
       final int size, final int uri, final boolean ne) {
 
     // build and insert new entry
-    final int i = ++meta.lastid;
+    final int i = newID();
     final int n = ne ? 1 << 7 : 0;
     s(Math.min(IO.MAXATTS, asize) << 3 | ELEM);
     s(n | (byte) (name >> 8)); s(name); s(uri);
@@ -976,8 +976,8 @@ public abstract class Data {
       final byte[] value, final int uri, final boolean ne) {
 
     // add attribute to text storage
-    final long v = index(value, pre, false);
     final int i = newID();
+    final long v = index(value, pre, false);
     final int n = ne ? 1 << 7 : 0;
     s(Math.min(IO.MAXATTS, dist) << 3 | ATTR);
     s(n | (byte) (name >> 8)); s(name); s(v >> 32);

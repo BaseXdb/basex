@@ -30,9 +30,9 @@ final class IndexCache extends TokenSet {
   }
 
   /**
-   * Returns the value for the specified key.
+   * Returns the size for the specified key.
    * @param id key to be found
-   * @return sized
+   * @return size
    */
   int size(final int id) {
     return sizes[id];
