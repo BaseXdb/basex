@@ -1,4 +1,5 @@
 package org.basex.examples.create;
+
 import org.basex.build.Parser;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;

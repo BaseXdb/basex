@@ -1,4 +1,5 @@
 package org.basex.examples.create;
+
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
