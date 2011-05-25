@@ -8,6 +8,7 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Set;
 import org.basex.io.IO;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -101,6 +102,10 @@ public final class AddDeleteTest {
   @Test
   public void testAddZip() throws BaseXException {
     new Add(ZIPFILE, null, "target").execute(CONTEXT);
+    assertEquals(4, CONTEXT.doc().length);
+    // do not add archives
+    new Set(Prop.ADDARCHIVES, false).execute(CONTEXT);
+    new Add(ZIPFILE).execute(CONTEXT);
     assertEquals(4, CONTEXT.doc().length);
   }
 

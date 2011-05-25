@@ -147,6 +147,8 @@ public final class Prop extends AProp {
   public static final Object[] MAINMEM = { "MAINMEM", false };
   /** Path for filtering XML Documents. */
   public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
+  /** Flag for adding archives to a database. */
+  public static final Object[] ADDARCHIVES = { "ADDARCHIVES", true };
 
   /** Flag for creating a wildcard index. */
   public static final Object[] WILDCARDS = { "WILDCARDS", false };

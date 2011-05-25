@@ -169,9 +169,12 @@ public final class Add extends ACreate {
     Data tmp = null;
     try {
       tmp = build.build(dbname);
-      data.insert(data.meta.size, -1, tmp);
-      ctx.update();
-      data.flush();
+      // ignore empty fragments
+      if(tmp.meta.size > 1) {
+        data.insert(data.meta.size, -1, tmp);
+        ctx.update();
+        data.flush();
+      }
       return Util.info(PATHADDED, path, p);
     } catch(final IOException ex) {
       Util.debug(ex);
