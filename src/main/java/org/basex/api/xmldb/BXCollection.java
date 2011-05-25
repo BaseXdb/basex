@@ -12,6 +12,7 @@ import org.basex.build.Parser;
 import org.basex.build.xml.DOCWrapper;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -159,8 +160,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
     // find correct value and remove the node
-    data.delete(getResource(del.getId()).pre);
-    data.flush();
+    Delete.delete(ctx, getResource(del.getId()).pre);
   }
 
   @Override
@@ -192,8 +192,8 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
       final Data data = ctx.data;
       data.insert(data.meta.size, -1, MemBuilder.build(p, ctx.prop, id));
-      data.flush();
       ctx.update();
+      data.flush();
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ex.getMessage());
     }
