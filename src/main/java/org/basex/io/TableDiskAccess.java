@@ -79,7 +79,6 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
-
     if(!dirty) return;
     final DataOutput out = new DataOutput(meta.file(pref + 'i'));
     out.writeNum(allBlocks);

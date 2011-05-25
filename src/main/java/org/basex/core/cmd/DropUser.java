@@ -59,6 +59,7 @@ public final class DropUser extends AUser {
       if(data.meta.users.remove(data.meta.users.get(user))) {
         info(USERDROPON, user, db);
       }
+      data.meta.dirty = true;
       data.flush();
       Close.close(data, context);
       return true;

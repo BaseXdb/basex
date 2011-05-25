@@ -151,8 +151,6 @@ public abstract class FTBuilder extends IndexBuilder {
       data.meta.minscore = min;
     }
     data.meta.ftindex = true;
-    data.meta.dirty = true;
-
     Util.gc(perf);
   }
 

@@ -60,7 +60,6 @@ public final class CreateIndex extends ACreate {
         default:
           return false;
       }
-
       index(index, data);
       data.flush();
 

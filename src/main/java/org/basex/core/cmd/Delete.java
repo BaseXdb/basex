@@ -1,7 +1,8 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
+
+import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 
@@ -22,28 +23,25 @@ public final class Delete extends ACreate {
 
   @Override
   protected boolean run() {
-    final String target = path(args[0]);
-    final byte[] exact = token(target);
-    final byte[] pref = token(target + "/");
-
-    int c = 0;
     final Data data = context.data;
-    final int[] docs = context.doc();
+    final int[] docs = data.doc(args[0]);
+    delete(context, docs);
+    return info(PATHDELETED, docs.length, perf);
+  }
+
+  /**
+   * Deletes the specified nodes.
+   * @param ctx query context
+   * @param docs documents to be deleted
+   */
+  public static void delete(final Context ctx, final int... docs) {
+    // data was changed: update context
+    if(docs.length == 0) return;
 
     // loop through all documents in reverse order
-    for(int d = docs.length - 1; d >= 0; d--) {
-      final int pre = docs[d];
-      final byte[] name = context.data.text(pre, true);
-      // delete all exact matches and all sub directories
-      if(!eq(name, exact) && !startsWith(name, pref)) continue;
-      data.delete(pre);
-      ++c;
-    }
-    // data was changed: update context
-    if(c != 0) {
-      data.flush();
-      context.update();
-    }
-    return info(PATHDELETED, c, perf);
+    final Data data = ctx.data;
+    for(int d = docs.length - 1; d >= 0; d--) data.delete(docs[d]);
+    ctx.update();
+    data.flush();
   }
 }

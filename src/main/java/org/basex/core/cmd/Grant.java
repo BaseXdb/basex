@@ -80,6 +80,7 @@ public final class Grant extends AUser {
         data.meta.users.add(u);
       }
       u.perm = prm;
+      data.meta.dirty = true;
       data.flush();
       Close.close(data, context);
       return info(GRANTON, args[0], user, db);

@@ -82,19 +82,20 @@ abstract class ACreate extends Command {
       final boolean mem = prop.is(Prop.MAINMEM);
       builder = mem ? new MemBuilder(p, prop) : new DiskBuilder(p, prop);
 
-      final Data d = progress(builder).build(db);
+      Data data = progress(builder).build(db);
       if(mem) {
-        context.openDB(d);
-        context.pin(d);
+        context.openDB(data);
+        context.pin(data);
       } else {
-        d.close();
+        data.close();
         final Open open = new Open(db);
         if(!open.run(context)) return error(open.info());
 
-        final Data data = context.data;
-        if(prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT, data);
+        data = context.data;
+        if(prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT,      data);
         if(prop.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, data);
-        if(prop.is(Prop.FTINDEX))   index(IndexType.FULLTEXT, data);
+        if(prop.is(Prop.FTINDEX))   index(IndexType.FULLTEXT,  data);
+        data.flush();
       }
       return info(DBCREATED, db, perf);
     } catch(final ProgressException ex) {
@@ -144,7 +145,6 @@ abstract class ACreate extends Command {
       default:        throw Util.notexpected();
     }
     data.closeIndex(type);
-    data.meta.dirty = true;
     data.setIndex(type, progress(ib).build());
   }
 

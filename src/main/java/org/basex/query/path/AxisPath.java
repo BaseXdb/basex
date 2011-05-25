@@ -343,7 +343,8 @@ public class AxisPath extends Path {
     final Data data = ctx.data();
     if(data == null || !data.meta.uptodate) return this;
 
-    final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
+    final StatsKey stats = data.tagindex.stat(
+        data.tagindex.id(s.test.name.ln()));
     if(stats != null && stats.leaf) {
       step = Array.add(step, AxisStep.get(input, Axis.CHILD, Test.TXT));
       ctx.compInfo(OPTTEXT, this);

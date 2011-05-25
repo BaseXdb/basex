@@ -37,8 +37,8 @@ public final class Optimize extends ACreate {
 
     // refresh indexes
     d.pthindex.init();
-    d.tags.init();
-    d.atts.init();
+    d.tagindex.init();
+    d.atnindex.init();
     final MetaData m = d.meta;
     m.dirty = true;
 
@@ -56,22 +56,22 @@ public final class Optimize extends ACreate {
 
       if(kind == Data.DOC) {
         parStack[level++] = pre;
-        if(path) d.pthindex.add(0, level, kind);
+        if(path) d.pthindex.index(0, kind, level);
         ++n;
       } else if(kind == Data.ELEM) {
         final int id = d.name(pre);
-        d.tags.index(d.tags.key(id), null, true);
-        if(path) d.pthindex.add(id, level, kind);
+        d.tagindex.index(d.tagindex.key(id), null, true);
+        if(path) d.pthindex.index(id, kind, level);
         tagStack[level] = id;
         parStack[level++] = pre;
       } else if(kind == Data.ATTR) {
         final int id = d.name(pre);
-        d.atts.index(d.atts.key(id), d.text(pre, false), true);
-        if(path) d.pthindex.add(id, level, kind);
+        d.atnindex.index(d.atnindex.key(id), d.text(pre, false), true);
+        if(path) d.pthindex.index(id, kind, level);
       } else {
         final byte[] txt = d.text(pre, true);
-        if(kind == Data.TEXT) d.tags.index(tagStack[level - 1], txt);
-        if(path) d.pthindex.add(0, level, kind);
+        if(kind == Data.TEXT) d.tagindex.index(tagStack[level - 1], txt);
+        if(path) d.pthindex.index(0, kind, level);
       }
       if(h < level) h = level;
     }

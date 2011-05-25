@@ -1,7 +1,10 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
+
+import org.basex.build.DiskBuilder;
 import org.basex.core.Prop;
 import org.basex.index.FTIndex;
 import org.basex.index.Index;
@@ -27,12 +30,12 @@ import org.basex.util.Util;
  * @author Tim Petrowsky
  */
 public final class DiskData extends Data {
+  /** Text compressor. */
+  private final Compress comp = new Compress();
   /** Texts access file. */
   private DataAccess texts;
   /** Values access file. */
   private DataAccess values;
-  /** Text compressor. */
-  private final Compress comp;
 
   /**
    * Default constructor.
@@ -42,7 +45,6 @@ public final class DiskData extends Data {
    */
   public DiskData(final String db, final Prop pr) throws IOException {
     meta = new MetaData(db, pr);
-    comp = new Compress();
 
     final int cats = pr.num(Prop.CATEGORIES);
     final DataInput in = new DataInput(meta.file(DATAINFO));
@@ -52,13 +54,13 @@ public final class DiskData extends Data {
       while(true) {
         final String k = Token.string(in.readBytes());
         if(k.isEmpty()) break;
-        if(k.equals(DBTAGS))      tags = new Names(in, cats);
-        else if(k.equals(DBATTS)) atts = new Names(in, cats);
+        if(k.equals(DBTAGS))      tagindex = new Names(in, cats);
+        else if(k.equals(DBATTS)) atnindex = new Names(in, cats);
         else if(k.equals(DBPATH)) pthindex = new PathSummary(in);
-        else if(k.equals(DBNS))   ns   = new Namespaces(in);
+        else if(k.equals(DBNS))   ns = new Namespaces(in);
+        else if(k.equals(DBDOCS)) meta.docindex = docindex.read(in);
       }
-
-      // open data and indexes..
+      // open data and indexes
       init();
       if(meta.textindex) txtindex = new DiskValues(this, true);
       if(meta.attrindex) atvindex = new DiskValues(this, false);
@@ -71,7 +73,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Internal constructor, specifying all meta data.
+   * Internal database constructor, called from {@link DiskBuilder#build}.
    * @param md meta data
    * @param nm tags
    * @param at attributes
@@ -82,14 +84,13 @@ public final class DiskData extends Data {
   public DiskData(final MetaData md, final Names nm, final Names at,
       final PathSummary ps, final Namespaces n) throws IOException {
 
-    comp = new Compress();
     meta = md;
-    tags = nm;
-    atts = at;
+    tagindex = nm;
+    atnindex = at;
     pthindex = ps;
     ns = n;
     init();
-    write();
+    flush();
   }
 
   @Override
@@ -108,13 +109,15 @@ public final class DiskData extends Data {
     final DataOutput out = new DataOutput(meta.file(DATAINFO));
     meta.write(out);
     out.writeString(DBTAGS);
-    tags.write(out);
+    tagindex.write(out);
     out.writeString(DBATTS);
-    atts.write(out);
+    atnindex.write(out);
     out.writeString(DBPATH);
     pthindex.write(out);
     out.writeString(DBNS);
     ns.write(out);
+    out.writeString(DBDOCS);
+    docindex.write(this, out);
     out.write(0);
     out.close();
   }
@@ -122,10 +125,10 @@ public final class DiskData extends Data {
   @Override
   public synchronized void flush() {
     try {
+      if(meta.dirty) write();
       table.flush();
       texts.flush();
       values.flush();
-      write();
       meta.dirty = false;
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -133,8 +136,8 @@ public final class DiskData extends Data {
   }
 
   @Override
-  protected synchronized void cls() throws IOException {
-    if(meta.dirty) flush();
+  public synchronized void close() throws IOException {
+    flush();
     table.close();
     texts.close();
     values.close();
@@ -163,11 +166,12 @@ public final class DiskData extends Data {
 
   @Override
   public void setIndex(final IndexType type, final Index index) {
+    meta.dirty = true;
     switch(type) {
-      case TEXT:      if(meta.textindex) txtindex = index; break;
-      case ATTRIBUTE: if(meta.attrindex) atvindex = index; break;
-      case FULLTEXT:  if(meta.ftindex)   ftxindex = index; break;
-      case PATH:      if(meta.pathindex) pthindex = (PathSummary) index; break;
+      case TEXT:      txtindex = index; break;
+      case ATTRIBUTE: atvindex = index; break;
+      case FULLTEXT:  ftxindex = index; break;
+      case PATH:      pthindex = (PathSummary) index; break;
       default: break;
     }
   }

@@ -33,7 +33,7 @@ public final class PathNode {
    * @param k node kind
    * @param p parent node
    */
-  PathNode(final int t, final byte k, final PathNode p) {
+  public PathNode(final int t, final byte k, final PathNode p) {
     ch = new PathNode[0];
     size = 1;
     name = (short) t;
@@ -47,7 +47,7 @@ public final class PathNode {
    * @param p parent node
    * @throws IOException I/O exception
    */
-  PathNode(final DataInput in, final PathNode p) throws IOException {
+  public PathNode(final DataInput in, final PathNode p) throws IOException {
     name = (short) in.readNum();
     kind = in.readByte();
     size = in.readNum();
@@ -58,39 +58,39 @@ public final class PathNode {
   }
 
   /**
-   * Returns a node reference for the specified tag.
-   * @param t tag
+   * Indexes the specified name along with its kind.
+   * @param n name reference
    * @param k node kind
    * @return node reference
    */
-  PathNode get(final int t, final byte k) {
+  public PathNode index(final int n, final byte k) {
     for(final PathNode c : ch) {
-      if(c.kind == k && c.name == t) {
+      if(c.kind == k && c.name == n) {
         c.size++;
         return c;
       }
     }
-    final PathNode n = new PathNode(t, k, this);
+    final PathNode pn = new PathNode(n, k, this);
     final int cs = ch.length;
     final PathNode[] tmp = new PathNode[cs + 1];
     System.arraycopy(ch, 0, tmp, 0, cs);
-    tmp[cs] = n;
+    tmp[cs] = pn;
     ch = tmp;
-    return n;
+    return pn;
   }
 
   /**
-   * Finishes the tree structure.
+   * Writes the node to the specified output.
    * @param out output stream
    * @throws IOException I/O exception
    */
-  void finish(final DataOutput out) throws IOException {
+  void write(final DataOutput out) throws IOException {
     out.writeNum(name);
     out.write1(kind);
     out.writeNum(size);
     out.writeNum(ch.length);
     out.writeDouble(0);
-    for(final PathNode c : ch) c.finish(out);
+    for(final PathNode c : ch) c.write(out);
   }
 
   /**
@@ -111,8 +111,8 @@ public final class PathNode {
    */
   public byte[] token(final Data data) {
     switch(kind) {
-      case Data.ELEM: return data.tags.key(name);
-      case Data.ATTR: return Token.concat(ATT, data.atts.key(name));
+      case Data.ELEM: return data.tagindex.key(name);
+      case Data.ATTR: return Token.concat(ATT, data.atnindex.key(name));
       case Data.TEXT: return TEXT;
       case Data.COMM: return COMM;
       case Data.PI:   return PI;
@@ -146,9 +146,9 @@ public final class PathNode {
     for(int i = 0; i < l << 1; ++i) tb.add(' ');
     switch(kind) {
       case Data.DOC:  tb.add(DOC); break;
-      case Data.ELEM: tb.add(data.tags.key(name)); break;
+      case Data.ELEM: tb.add(data.tagindex.key(name)); break;
       case Data.TEXT: tb.add(TEXT); break;
-      case Data.ATTR: tb.add(ATT); tb.add(data.atts.key(name)); break;
+      case Data.ATTR: tb.add(ATT); tb.add(data.atnindex.key(name)); break;
       case Data.COMM: tb.add(COMM); break;
       case Data.PI:   tb.add(PI); break;
     }
@@ -166,9 +166,9 @@ public final class PathNode {
   void plan(final Data data, final Serializer ser) throws IOException {
     ser.openElement(NODE, KIND, TABLEKINDS[kind]);
     if(kind == Data.ELEM) {
-      ser.attribute(NAME, data.tags.key(name));
+      ser.attribute(NAME, data.tagindex.key(name));
     } else if(kind == Data.ATTR) {
-      ser.attribute(NAME, Token.concat(ATT, data.atts.key(name)));
+      ser.attribute(NAME, Token.concat(ATT, data.atnindex.key(name)));
     }
     ser.text(Token.token(size));
     for(final PathNode p : ch) p.plan(data, ser);

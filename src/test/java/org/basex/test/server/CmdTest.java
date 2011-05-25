@@ -13,6 +13,7 @@ import org.basex.server.Session;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -52,16 +53,23 @@ public class CmdTest {
 
   /**
    * Creates the database.
+   * @throws BaseXException database exception
+   */
+  @Before
+  public final void before() throws BaseXException {
+    session.execute(new DropDB(NAME));
+    session.execute(new DropDB(NAME2));
+    session.execute(new DropUser(NAME));
+    session.execute(new DropUser(NAME2));
+  }
+
+  /**
+   * Creates the database.
+   * @throws BaseXException database exception
    */
   @After
-  public final void setUp() {
-    try {
-      session.execute(new DropDB(NAME));
-      session.execute(new DropDB(NAME2));
-      session.execute(new DropUser(NAME));
-      session.execute(new DropUser(NAME2));
-    } catch(final BaseXException ex) {
-    }
+  public final void after() throws BaseXException {
+    before();
   }
 
   /** Command test. */

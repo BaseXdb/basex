@@ -23,25 +23,14 @@ import org.basex.util.Util;
  */
 public final class PathSummary implements Index {
   /** Parent stack for building the summary. */
-  private PathNode[] stack;
+  private final PathNode[] stack = new PathNode[IO.MAXHEIGHT];
   /** Root node. */
-  public PathNode root;
+  private PathNode root;
 
   /**
    * Default constructor.
    */
-  public PathSummary() {
-    init();
-  }
-
-  /**
-   * Initializes the data structures. This method is called if a new path
-   * summary is built.
-   */
-  public void init() {
-    stack = new PathNode[IO.MAXHEIGHT];
-    root = null;
-  }
+  public PathSummary() { }
 
   /**
    * Constructor, specifying an input file.
@@ -52,21 +41,12 @@ public final class PathSummary implements Index {
     if(in.readBool()) root = new PathNode(in, null);
   }
 
-  // Path Summary creation ====================================================
-
   /**
-   * Opens an element.
-   * @param n name reference
-   * @param l current level
-   * @param k node kind
+   * Initializes the data structures. This method is called if a new path
+   * summary is built.
    */
-  public void add(final int n, final int l, final byte k) {
-    if(root == null) {
-      root = new PathNode(n, k, null);
-      stack[0] = root;
-    } else {
-      stack[l] = stack[l - 1].get(n, k);
-    }
+  public void init() {
+    root = null;
   }
 
   /**
@@ -76,7 +56,24 @@ public final class PathSummary implements Index {
    */
   void write(final DataOutput out) throws IOException {
     out.writeBool(root != null);
-    if(root != null) root.finish(out);
+    if(root != null) root.write(out);
+  }
+
+  // Path Summary creation ====================================================
+
+  /**
+   * Adds an entry.
+   * @param n name reference
+   * @param k node kind
+   * @param l current level
+   */
+  public void index(final int n, final byte k, final int l) {
+    if(root == null) {
+      root = new PathNode(n, k, null);
+      stack[0] = root;
+    } else {
+      stack[l] = stack[l - 1].index(n, k);
+    }
   }
 
   // Path Summary traversal ===================================================
@@ -172,7 +169,8 @@ public final class PathSummary implements Index {
     for(final byte[] i : tl) {
       final boolean att = startsWith(i, '@');
       final byte kind = att ? Data.ATTR : Data.ELEM;
-      final int id = att ? data.atts.id(substring(i, 1)) : data.tags.id(i);
+      final int id = att ? data.atnindex.id(substring(i, 1)) :
+        data.tagindex.id(i);
 
       final ArrayList<PathNode> out = new ArrayList<PathNode>();
       for(final PathNode n : in) {

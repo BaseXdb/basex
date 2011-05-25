@@ -294,9 +294,9 @@ final class TableHeader extends BaseXPanel {
 
     final Data data = view.gui.context.data;
     final JPopupMenu popup = new JPopupMenu();
-    final byte[] root = data.tags.key(tdata.root);
+    final byte[] root = data.tagindex.key(tdata.root);
     for(final byte[] en : tdata.roots) {
-      final int id = data.tags.id(en);
+      final int id = data.tagindex.id(en);
       final JMenuItem mi = new JRadioButtonMenuItem(string(en), eq(root, en));
       mi.addActionListener(new ActionListener() {
         @Override
