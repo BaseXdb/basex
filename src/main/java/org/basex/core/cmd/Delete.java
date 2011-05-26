@@ -7,7 +7,7 @@ import org.basex.core.User;
 import org.basex.data.Data;
 
 /**
- * Evaluates the 'delete' command and deletes a document from a collection.
+ * Evaluates the 'delete' command and deletes documents from a collection.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

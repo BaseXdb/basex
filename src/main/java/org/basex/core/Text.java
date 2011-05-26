@@ -209,7 +209,6 @@ public interface Text {
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
       "  " + lang("ch_create8")
   };
-
   /** Command help. */
   String[] HELPCOPY = {
     "[" + C_NAME + "] [new" + C_NAME + "]", lang("ch_copy1"), lang("ch_copy2")
@@ -219,19 +218,16 @@ public interface Text {
   String[] HELPCHECK = {
     "[" + C_INPUT + "]", lang("ch_check1"), lang("ch_check2")
   };
-
   /** Command help. */
   String[] HELPADD = {
     "(" + AS + " [" + C_NAME + "]) (" + TO + " [" + C_TARGET + "]) [" +
     C_INPUT + "]",
     lang("ch_add1"), lang("ch_add2", C_INPUT, C_NAME, C_TARGET)
   };
-
   /** Command help. */
   String[] HELPDELETE = {
     "[" + C_PATH  + "]", lang("ch_delete1"), lang("ch_delete2")
   };
-
   /** Command help. */
   String[] HELPOPEN = {
     "[" + C_PATH + "]", lang("ch_open1"), lang("ch_open2", C_PATH)
@@ -297,10 +293,13 @@ public interface Text {
   String[] HELPCS = {
     "[" + C_QUERY + "]", lang("ch_cs1"), lang("ch_cs2")
   };
-
   /** Command help. */
   String[] HELPKILL = {
     "[" + C_NAME + "]", lang("ch_kill1"), lang("ch_kill2")
+  };
+  /** Command help. */
+  String[] HELPRENAME = {
+    "[" + C_PATH  + "] [newpath]", lang("ch_rename1"), lang("ch_rename2")
   };
   /** Command help. */
   String[] HELPRESTORE = {
@@ -335,7 +334,6 @@ public interface Text {
     LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
     "  " + lang("ch_alterpw")
   };
-
   /** Command help. */
   String[] HELPSET = {
     "[option] ([value])",
@@ -351,12 +349,10 @@ public interface Text {
     LI + CmdSet.FTINDEX   + COLS + lang("ch_set31") + NL +
     LI + CmdSet.PATHINDEX + COLS + lang("ch_set32")
   };
-
   /** Command help. */
   String[] HELPGET = {
       "[option]", lang("ch_get1", "info"), lang("ch_get2", "option")
   };
-
   /** Command help. */
   String[] HELPPASSWORD = {
     "([" + C_PW + "])", lang("ch_password1"), lang("ch_password2")
@@ -433,6 +429,8 @@ public interface Text {
   String PATHADDED = lang("pc_added");
   /** Path deleted. */
   String PATHDELETED = lang("pc_deleted");
+  /** Path renamed. */
+  String PATHRENAMED = lang("pc_renamed");
   /** Parse error. */
   String PARSEERR = lang("pc_err");
 

@@ -29,24 +29,26 @@ public final class Token {
   public static final byte[] XMLNS = token("xmlns");
   /** XMLNS token with colon. */
   public static final byte[] XMLNSC = token("xmlns:");
-  /** True token. */
+  /** Token 'true'. */
   public static final byte[] TRUE = token("true");
-  /** False token. */
+  /** Token 'false'. */
   public static final byte[] FALSE = token("false");
-  /** Not available number. */
+  /** Token 'NaN'. */
   public static final byte[] NAN = token("NaN");
-  /** Positive infinity. */
+  /** Token 'INF'. */
   public static final byte[] INF = token("INF");
-  /** Negative infinity. */
+  /** Token '-INF'. */
   public static final byte[] NINF = token("-INF");
-  /** Space token. */
+  /** Space. */
   public static final byte[] SPACE = { ' ' };
-  /** Zero token. */
+  /** Digit '0'. */
   public static final byte[] ZERO = { '0' };
-  /** Zero token. */
+  /** Digit '-0'. */
   public static final byte[] MZERO = { '-', '0' };
-  /** One token. */
+  /** Digit '1'. */
   public static final byte[] ONE = { '1' };
+  /** Slash. */
+  public static final byte[] SLASH = { '/' };
 
   /** Hex codes. */
   public static final byte[] HEX = token("0123456789ABCDEF");

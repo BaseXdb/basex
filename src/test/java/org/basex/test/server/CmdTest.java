@@ -356,6 +356,17 @@ public class CmdTest {
 
   /** Command test. */
   @Test
+  public final void rename() {
+    // database must be opened to rename paths
+    no(new Rename(FILE, "xxx"));
+    ok(new CreateDB(NAME));
+    ok(new Rename(FILE, "xxx"));
+    // target need not exist
+    ok(new Rename(FILE, "xxx"));
+  }
+
+  /** Command test. */
+  @Test
   public final void restore() {
     no(new Restore(NAME));
     ok(new CreateDB(NAME));

@@ -46,6 +46,7 @@ import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.OptimizeAll;
 import org.basex.core.cmd.Password;
+import org.basex.core.cmd.Rename;
 import org.basex.core.cmd.Restore;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
@@ -169,6 +170,8 @@ public final class CommandParser extends InputParser {
         return new Add(s ? remaining(cmd) : string(cmd), arg1, arg2);
       case DELETE:
         return new Delete(string(cmd));
+      case RENAME:
+        return new Rename(string(cmd), string(cmd));
       case INFO:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:

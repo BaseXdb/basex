@@ -83,26 +83,25 @@ final class DocIndex {
 
     // initialize and sort document paths
     final int ds = docs.length;
-    final byte[] slash = token("/");
     if(paths == null) {
       paths = new byte[ds][];
       for(int d = 0; d < ds; d++) {
         final byte[] txt = data.text(docs[d], true);
-        paths[d] = concat(slash, Prop.WIN ? lc(txt) : txt);
+        paths[d] = concat(SLASH, Prop.WIN ? lc(txt) : txt);
       }
       order = Array.createOrder(paths, false, true);
     }
 
     // normalize paths
     final String np = path.replaceAll("[\\\\//]+", "/").replaceAll("^/|/$", "");
-    final byte[] exact = lc(concat(slash, token(np)));
-    final byte[] start = endsWith(exact, slash) ? exact : concat(exact, slash);
+    final byte[] exact = lc(concat(SLASH, token(np)));
+    final byte[] start = endsWith(exact, SLASH) ? exact : concat(exact, SLASH);
 
     // relevant paths: start from the first hit and return all subsequent hits
     final IntList il = new IntList();
     for(int p = find(exact); p < paths.length; p++) {
-      if(!eq(paths[p], exact) && !startsWith(paths[p], start)) break;
-      il.add(docs[order[p]]);
+      if(eq(paths[p], exact) || startsWith(paths[p], start))
+        il.add(docs[order[p]]);
     }
     return il.sort().toArray();
   }
