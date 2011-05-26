@@ -26,11 +26,12 @@ public final class Rename extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data;
-    final int[] docs = data.doc(args[0]);
     final byte[] src = token(path(args[0]));
     final byte[] trg = token(path(args[1]));
 
-    for(final int doc : docs) {
+    boolean ok = true;
+    int c = 0;
+    for(final int doc : data.doc(args[0])) {
       final byte[] path = data.text(doc, true);
       byte[] target = trg;
       byte[] name = substring(path, src.length);
@@ -39,11 +40,18 @@ public final class Rename extends ACreate {
         if(startsWith(name, '/')) name = substring(name, 1);
         target = trg.length != 0 ? concat(trg, SLASH, name) : name;
       }
-      data.replace(doc, Data.DOC, target);
+      if(target.length == 0) {
+        info(NAMEINVALID, target);
+        ok = false;
+      } else {
+        data.replace(doc, Data.DOC, target);
+        c++;
+      }
     }
-
     // data was changed: update context
-    if(docs.length != 0) data.flush();
-    return info(PATHRENAMED, docs.length, perf);
+    if(c != 0) data.flush();
+
+    info(PATHRENAMED, c, perf);
+    return ok;
   }
 }

@@ -155,6 +155,6 @@ abstract class ACreate extends Command {
    * @return normalized path
    */
   protected static final String path(final String path) {
-    return path.replaceAll("[\\\\//]+", "/").replaceAll("^/|/$", "");
+    return path.replaceAll("[\\\\/]+", "/").replaceAll("^/|/$", "");
   }
 }
