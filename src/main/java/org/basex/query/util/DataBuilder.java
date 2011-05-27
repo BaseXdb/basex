@@ -61,7 +61,7 @@ public final class DataBuilder {
   private DataBuilder ftpos(final byte[] tag, final FTPosData pos,
       final int len) {
     ftbuilder = new DataFTBuilder(pos, len);
-    marker = data.tags.index(tag, null, false);
+    marker = data.tagindex.index(tag, null, false);
     return this;
   }
 
@@ -159,7 +159,7 @@ public final class DataBuilder {
       if(par == 0) data.ns.add(ms, pre - par, q.pref(), uri);
       u = data.ns.addURI(uri);
     }
-    final int n = data.atts.index(q.atom(), null, false);
+    final int n = data.atnindex.index(q.atom(), null, false);
     // attribute namespace flag is only set in main memory instance
     data.attr(ms, pre - par, n, nd.atom(), u, ne);
     data.insert(ms);
@@ -293,7 +293,7 @@ public final class DataBuilder {
 
     final byte[] uri = q.uri().atom();
     final int u = uri.length != 0 ? data.ns.addURI(uri) : 0;
-    final int tn = data.tags.index(q.atom(), null, false);
+    final int tn = data.tagindex.index(q.atom(), null, false);
     final int s = size(nd, false);
 
     // add element node

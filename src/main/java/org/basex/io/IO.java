@@ -38,7 +38,7 @@ public abstract class IO {
     { XQSUFFIX, ".xqm", ".xqy", ".xql", ".xquery" };
   /** ZIP suffixes. */
   public static final String[] ZIPSUFFIXES =
-    { ZIPSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods" };
+    { ZIPSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods", ".gz" };
   /** HTML suffixes. */
   public static final String[] HTMLSUFFIXES =
     { ".xhtml", ".html", ".htm" };
@@ -179,6 +179,14 @@ public abstract class IO {
    * @return contents
    */
   public abstract IO merge(final String fn);
+
+  /**
+   * Checks if this file is an archive.
+   * @return result of check
+   */
+  public boolean archive() {
+    return false;
+  }
 
   /**
    * Creates the directory.

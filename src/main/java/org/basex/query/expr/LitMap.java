@@ -15,8 +15,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class LitMap extends Arr {
-
+public final class LitMap extends Arr {
   /**
    * Constructor.
    * @param ii input info

@@ -47,11 +47,10 @@ public final class DropIndex extends ACreate {
         data.meta.ftindex = false;
         return drop(IndexType.FULLTEXT, DATAFTX);
       case PATH:
-        if(data.meta.pathindex) {
-          data.meta.pathindex = false;
-          data.pthindex.root = null;
-          data.flush();
-        }
+        data.meta.pathindex = false;
+        data.pthindex.init();
+        data.meta.dirty = true;
+        data.flush();
         return info(INDDROP, perf);
       default:
         return false;
@@ -67,8 +66,9 @@ public final class DropIndex extends ACreate {
   private boolean drop(final IndexType index, final String pat) {
     try {
       final Data data = context.data;
-      data.flush();
       data.closeIndex(index);
+      data.meta.dirty = true;
+      data.flush();
       return DropDB.drop(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
           info(INDDROP, index, perf) : error(INDDROPERROR, index);
     } catch(final IOException ex) {

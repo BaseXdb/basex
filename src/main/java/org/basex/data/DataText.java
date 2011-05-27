@@ -23,15 +23,13 @@ public interface DataText {
   String IDBSTR = "ISTORAGE";
   /** Last modification time. */
   String DBTIME = "TIME";
-  /** Tree height. */
-  String DBHGHT = "HEIGHT";
-  /** Number of XML nodes. */
+  /** Number of nodes. */
   String DBSIZE = "SIZE";
   /** File name. */
   String DBFNAME = "FNAME";
   /** File size. */
   String DBFSIZE = "FSIZE";
-  /** Number of XML documents. */
+  /** Number of documents. */
   String DBNDOCS = "NDOCS";
   /** Encoding. */
   String DBENC = "ENCODING";
@@ -69,6 +67,8 @@ public interface DataText {
   String DBLID = "LASTID";
   /** Permissions. */
   String DBPERM = "PERM";
+  /** Documents. */
+  String DBDOCS = "DOCS";
 
   /** Tags. */
   String DBTAGS = "TAGS";

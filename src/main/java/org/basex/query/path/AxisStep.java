@@ -87,7 +87,7 @@ public class AxisStep extends Preds {
     ctx.leaf = data != null &&
       test.test == Name.NAME && test.type != NodeType.ATT && axis.down &&
       data.meta.uptodate && data.ns.size() == 0 &&
-      data.tags.stat(data.tags.id(((NameTest) test).ln)).leaf;
+      data.tagindex.stat(data.tagindex.id(((NameTest) test).ln)).leaf;
 
     // as predicates will not necessarily start from the document node,
     // the context item type is temporarily generalized
@@ -171,7 +171,7 @@ public class AxisStep extends Preds {
 
       if(test.test == Name.NAME) {
         // element test (*:ln)
-        name = data.tags.id(((NameTest) test).ln);
+        name = data.tagindex.id(((NameTest) test).ln);
       } else if(test.test != null && test.test != Name.ALL) {
         // skip namespace and standard tests
         return null;

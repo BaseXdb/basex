@@ -46,10 +46,12 @@ public final class ShowUsers extends Command {
         final ArrayList<User> loc = data.meta.users;
         for(int i = 0; i < loc.size(); ++i) {
           final User us = context.users.get(loc.get(i).name);
-          if(us == null) loc.remove(loc.get(i--));
+          if(us == null) {
+            loc.remove(loc.get(i--));
+            data.meta.dirty = true;
+          }
         }
         out.println(data.meta.users.info());
-        data.flush();
         Close.close(data, context);
         return true;
       } catch(final IOException ex) {

@@ -70,7 +70,7 @@ public class TokenSet implements Iterable<byte[]> {
 
   /**
    * Indexes the specified key and returns the offset of the added key.
-   * If the key exists already, a negative offset is returned.
+   * If the key already exists, a negative offset is returned.
    * @param key key
    * @return offset of added key, negative offset otherwise
    */

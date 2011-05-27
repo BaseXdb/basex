@@ -26,31 +26,49 @@ public final class Users extends ArrayList<User> {
    * @param global global flag
    */
   public Users(final boolean global) {
-    if(global) {
-      file = new File(Prop.HOME + ".basexperm");
-      try {
-        if(file.exists()) {
-          final DataInput in = new DataInput(file);
-          read(in);
-          in.close();
-        } else {
-          // create initial admin user with all rights
-          add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
-          write();
-        }
-      } catch(final IOException ex) {
-        Util.debug(ex);
+    if(!global) return;
+
+    file = new File(Prop.HOME + ".basexperm");
+    try {
+      if(file.exists()) {
+        final DataInput in = new DataInput(file);
+        read(in);
+        in.close();
+      } else {
+        // create initial admin user with all rights
+        add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
+        write();
       }
+    } catch(final IOException ex) {
+      Util.debug(ex);
     }
   }
 
   /**
-   * Constructor for local users.
+   * Reads users from disk.
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public Users(final DataInput in) throws IOException {
-    read(in);
+  public void read(final DataInput in) throws IOException {
+    final int s = in.readNum();
+    for(int u = 0; u < s; ++u) {
+      final User user = new User(string(in.readBytes()),
+        in.readBytes(), in.readNum());
+      add(user);
+    }
+  }
+
+  /**
+   * Writes global permissions to disk.
+   */
+  public void write() {
+    try {
+      final DataOutput out = new DataOutput(file);
+      write(out);
+      out.close();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
   }
 
   /**
@@ -102,33 +120,6 @@ public final class Users extends ArrayList<User> {
   public User get(final String usern) {
     for(final User user : this) if(user.name.equals(usern)) return user;
     return null;
-  }
-
-  /**
-   * Reads users from disk.
-   * @param in input stream
-   * @throws IOException I/O exception
-   */
-  private void read(final DataInput in) throws IOException {
-    final int s = in.readNum();
-    for(int u = 0; u < s; ++u) {
-      final User user = new User(string(in.readBytes()),
-        in.readBytes(), in.readNum());
-      add(user);
-    }
-  }
-
-  /**
-   * Writes global permissions to disk.
-   */
-  public void write() {
-    try {
-      final DataOutput out = new DataOutput(file);
-      write(out);
-      out.close();
-    } catch(final IOException ex) {
-      Util.debug(ex);
-    }
   }
 
   /**

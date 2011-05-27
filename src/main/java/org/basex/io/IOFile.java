@@ -87,8 +87,19 @@ public final class IOFile extends IO {
 
   @Override
   public boolean more() throws IOException {
+    // process gzip files
+    if(path.toLowerCase().endsWith(GZSUFFIX)) {
+      if(is == null) {
+        is = new GZIPInputStream(new FileInputStream(file));
+      } else {
+        is.close();
+        is = null;
+      }
+      return is != null;
+    }
+
     // process zip files
-    if(is instanceof ZipInputStream || zip()) {
+    if(is instanceof ZipInputStream || archive()) {
       if(is == null) {
         // keep stream open until last file was parsed...
         is = new ZipInputStream(new FileInputStream(file)) {
@@ -111,26 +122,12 @@ public final class IOFile extends IO {
       return false;
     }
 
-    // process gzip files
-    if(path.endsWith(GZSUFFIX)) {
-      if(is == null) {
-        is = new GZIPInputStream(new FileInputStream(file));
-      } else {
-        is.close();
-        is = null;
-      }
-      return is != null;
-    }
-
     // work on normal files
     return more ^= true;
   }
 
-  /**
-   * Matches the current file against various file suffixes.
-   * @return result of check
-   */
-  private boolean zip() {
+  @Override
+  public boolean archive() {
     final int i = path.lastIndexOf('.');
     if(i == -1) return false;
     final String suf = path.substring(i).toLowerCase();

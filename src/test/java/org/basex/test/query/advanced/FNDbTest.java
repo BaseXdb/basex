@@ -35,6 +35,15 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
+   * Finishes the code.
+   * @throws BaseXException database exception
+   */
+  @AfterClass
+  public static void finish() throws BaseXException {
+    new DropDB("db").execute(CONTEXT);
+  }
+
+  /**
    * Test method for the db:open() function.
    * @throws QueryException query exception
    * @throws BaseXException database exception
@@ -225,14 +234,5 @@ public final class FNDbTest extends AdvancedQueryTest {
     contains("db:open('db')/" + fun + "()", INFOON);
     contains("db:open('db')/" + fun + "('tag')", ":");
     error(fun + "('tag')", Err.NODBCTX);
-  }
-
-  /**
-   * Finishes the code.
-   * @throws BaseXException database exception
-   */
-  @AfterClass
-  public static void finish() throws BaseXException {
-    new DropDB("db").execute(CONTEXT);
   }
 }

@@ -709,11 +709,6 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public byte[] uri() {
-    return uri;
-  }
-
-  @Override
   public final boolean func() {
     return false;
   }

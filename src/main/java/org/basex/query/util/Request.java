@@ -3,9 +3,7 @@ package org.basex.query.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.basex.query.QueryContext;
 import org.basex.query.iter.ItemCache;
-import org.basex.util.InputInfo;
 import org.basex.util.TokenMap;
 
 /**
@@ -26,10 +24,6 @@ public final class Request {
   public final List<Part> parts = new ArrayList<Part>();
   /** Indicator for multipart request. */
   public boolean isMultipart;
-  /** Input info. */
-  public InputInfo info;
-  /** Query context. */
-  public QueryContext ctx;
 
   /**
    * Container for parsed data from <part/> element.

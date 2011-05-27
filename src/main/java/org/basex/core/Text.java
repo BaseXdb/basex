@@ -212,7 +212,6 @@ public interface Text {
     LI + CmdCreate.EVENT + " [" + C_NAME + "]: " + NL +
       "  " + lang("ch_create9")
   };
-
   /** Command help. */
   String[] HELPCOPY = {
     "[" + C_NAME + "] [new" + C_NAME + "]", lang("ch_copy1"), lang("ch_copy2")
@@ -222,19 +221,16 @@ public interface Text {
   String[] HELPCHECK = {
     "[" + C_INPUT + "]", lang("ch_check1"), lang("ch_check2")
   };
-
   /** Command help. */
   String[] HELPADD = {
     "(" + AS + " [" + C_NAME + "]) (" + TO + " [" + C_TARGET + "]) [" +
     C_INPUT + "]",
     lang("ch_add1"), lang("ch_add2", C_INPUT, C_NAME, C_TARGET)
   };
-
   /** Command help. */
   String[] HELPDELETE = {
     "[" + C_PATH  + "]", lang("ch_delete1"), lang("ch_delete2")
   };
-
   /** Command help. */
   String[] HELPOPEN = {
     "[" + C_PATH + "]", lang("ch_open1"), lang("ch_open2", C_PATH)
@@ -305,10 +301,18 @@ public interface Text {
   String[] HELPCS = {
     "[" + C_QUERY + "]", lang("ch_cs1"), lang("ch_cs2")
   };
-
   /** Command help. */
   String[] HELPKILL = {
     "[" + C_NAME + "]", lang("ch_kill1"), lang("ch_kill2")
+  };
+  /** Command help. */
+  String[] HELPRENAME = {
+    "[" + C_PATH  + "] [newpath]", lang("ch_rename1"), lang("ch_rename2")
+  };
+  /** Command help. */
+  String[] HELPREPLACE = {
+    "[" + C_PATH  + "] [" + C_INPUT + "]",
+    lang("ch_replace1"), lang("ch_replace2")
   };
   /** Command help. */
   String[] HELPRESTORE = {
@@ -344,7 +348,6 @@ public interface Text {
     LI + CmdCreate.USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
     "  " + lang("ch_alterpw")
   };
-
   /** Command help. */
   String[] HELPSET = {
     "[option] ([value])",
@@ -360,12 +363,10 @@ public interface Text {
     LI + CmdSet.FTINDEX   + COLS + lang("ch_set31") + NL +
     LI + CmdSet.PATHINDEX + COLS + lang("ch_set32")
   };
-
   /** Command help. */
   String[] HELPGET = {
       "[option]", lang("ch_get1", "info"), lang("ch_get2", "option")
   };
-
   /** Command help. */
   String[] HELPPASSWORD = {
     "([" + C_PW + "])", lang("ch_password1"), lang("ch_password2")
@@ -442,6 +443,10 @@ public interface Text {
   String PATHADDED = lang("pc_added");
   /** Path deleted. */
   String PATHDELETED = lang("pc_deleted");
+  /** Path renamed. */
+  String PATHRENAMED = lang("pc_renamed");
+  /** Path replaced. */
+  String PATHREPLACED = lang("pc_replaced");
   /** Parse error. */
   String PARSEERR = lang("pc_err");
 
@@ -453,6 +458,8 @@ public interface Text {
   String DBWHICH = lang("pc_dbnf");
   /** Language not supported. */
   String LANGWHICH = lang("pc_langnf");
+  /** Points to a directory. */
+  String DIRERR = lang("pc_direrr");
 
   // DATABASE COMMANDS ========================================================
 
@@ -682,8 +689,6 @@ public interface Text {
   String INFOENCODING = lang("info_encoding");
   /** Info on number of nodes. */
   String INFONODES = lang("info_nodes");
-  /** Maximum tree height. */
-  String INFOHEIGHT = lang("info_height");
 
   /** Info on used main memory. */
   String INFOMEM = lang("info_mem");
@@ -1034,8 +1039,6 @@ public interface Text {
   String NODATA = lang("no_data") + DOT;
   /** Help string. */
   String NOSPACE = lang("no_space");
-  /** Binary file. */
-  byte[] MAPBINARY = token(lang("map_binary"));
   /** Query info title. */
   String INFOTIT = lang("info_title");
   /** Query title. */
@@ -1172,8 +1175,6 @@ public interface Text {
   String NAMESINFO = lang("dc_names");
   /** Indexing info. */
   String INDEXINFO = lang("dc_index");
-  /** General info. */
-  String METAINFO = lang("dc_meta");
   /** Indexing info. */
   String FTINFO = lang("dc_ft");
 
@@ -1348,8 +1349,6 @@ public interface Text {
   String MAPBOTH = lang("dm_size_both");
   /** Size depending on... */
   String MAPCHILDREN = lang("dm_size_children");
-  /** Size depending on... */
-  String MAPFSSIZE = lang("dm_size_fssize");
   /** Size depending on... */
   String MAPTEXTSIZE = lang("dm_size_textsize");
 

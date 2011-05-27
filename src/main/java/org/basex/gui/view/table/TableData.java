@@ -95,7 +95,7 @@ final class TableData {
     for(final byte[] k : data.pthindex.desc(EMPTY, data, true, true)) {
       int c = 0;
       for(final byte[] kk : data.pthindex.desc(k, data, true, false)) {
-        final Names nm = startsWith(kk, '@') ? data.atts : data.tags;
+        final Names nm = startsWith(kk, '@') ? data.atnindex : data.tagindex;
         if(nm.stat(nm.id(delete(kk, '@'))).leaf) ++c;
       }
       // add keys with a minimum of three columns
@@ -117,12 +117,12 @@ final class TableData {
     rowH = 1;
 
     if(r == -1 && roots.size() == 0) return;
-    if(root == -1) root = data.tags.id(roots.get(0));
+    if(root == -1) root = data.tagindex.id(roots.get(0));
     for(final byte[] k : data.pthindex.desc(
-        data.tags.key(root), data, true, true)) {
+        data.tagindex.key(root), data, true, true)) {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
-      final Names index = elem ? data.tags : data.atts;
+      final Names index = elem ? data.tagindex : data.atnindex;
       if(index.stat(index.id(key)).leaf) addCol(key, elem);
     }
 
@@ -154,7 +154,7 @@ final class TableData {
    */
   private void addCol(final byte[] name, final boolean elem) {
     final Data data = context.data;
-    final int id = (elem ? data.tags : data.atts).id(name);
+    final int id = (elem ? data.tagindex : data.atnindex).id(name);
     if(id == 0) return;
     final TableCol col = new TableCol();
     col.id = id;
@@ -249,7 +249,7 @@ final class TableData {
     final boolean e = cols[sortCol].elem;
 
     final Data data = context.data;
-    final Names index = e ? data.tags : data.atts;
+    final Names index = e ? data.tagindex : data.atnindex;
     final Kind kind = index.stat(c).kind;
     final boolean num = kind == Kind.INT || kind == Kind.DBL;
 
@@ -330,7 +330,7 @@ final class TableData {
       elems.add(col.elem);
     }
     final String query = Find.findTable(filters, names, elems,
-        data.tags.key(root), gprop.is(GUIProp.FILTERRT) || r);
+        data.tagindex.key(root), gprop.is(GUIProp.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;
     return query;

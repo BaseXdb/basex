@@ -17,8 +17,7 @@ import org.basex.core.User;
  * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
-public class Copy extends Command {
-
+public final class Copy extends Command {
   /** Counter for outstanding files. */
   private int of;
   /** Counter of total files. */

@@ -71,6 +71,8 @@ public final class DirParser extends Parser {
       for(final IO f : io.children()) parse(b, f);
     } else {
       file = io;
+      if(!b.meta.prop.is(Prop.ADDARCHIVES) && file.archive()) return;
+
       while(io.more()) {
         final String nm = Prop.WIN ? io.name().toLowerCase() : io.name();
         if(filter != null && !filter.matcher(nm).matches()) continue;

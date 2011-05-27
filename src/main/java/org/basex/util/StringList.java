@@ -59,16 +59,6 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
-   * Searches the specified element via binary search.
-   * Note that all elements must be sorted.
-   * @param e element to be found
-   * @return index of the search key, or the negative insertion point - 1
-   */
-  public final int sortedIndexOf(final String e) {
-    return Arrays.binarySearch(list, 0, size, e);
-  }
-
-  /**
    * Deletes the specified element.
    * @param i element to be deleted
    */
