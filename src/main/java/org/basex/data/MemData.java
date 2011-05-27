@@ -32,8 +32,8 @@ public final class MemData extends Data {
     table = new TableMemAccess(meta, null, 16);
     txtindex = new MemValues();
     atvindex = new MemValues();
-    tags = tag;
-    atts = att;
+    tagindex = tag;
+    atnindex = att;
     ns = n;
     pthindex = s;
   }
@@ -43,7 +43,8 @@ public final class MemData extends Data {
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tags, data.atts, new Namespaces(), data.pthindex, data.meta.prop);
+    this(data.tagindex, data.atnindex, new Namespaces(),
+         data.pthindex, data.meta.prop);
   }
 
   /**
@@ -58,7 +59,7 @@ public final class MemData extends Data {
   public void flush() { }
 
   @Override
-  protected void cls() { }
+  public void close() { }
 
   @Override
   public void closeIndex(final IndexType type) { }

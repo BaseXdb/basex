@@ -29,24 +29,26 @@ public final class Token {
   public static final byte[] XMLNS = token("xmlns");
   /** XMLNS token with colon. */
   public static final byte[] XMLNSC = token("xmlns:");
-  /** True token. */
+  /** Token 'true'. */
   public static final byte[] TRUE = token("true");
-  /** False token. */
+  /** Token 'false'. */
   public static final byte[] FALSE = token("false");
-  /** Not available number. */
+  /** Token 'NaN'. */
   public static final byte[] NAN = token("NaN");
-  /** Positive infinity. */
+  /** Token 'INF'. */
   public static final byte[] INF = token("INF");
-  /** Negative infinity. */
+  /** Token '-INF'. */
   public static final byte[] NINF = token("-INF");
-  /** Space token. */
+  /** Space. */
   public static final byte[] SPACE = { ' ' };
-  /** Zero token. */
+  /** Digit '0'. */
   public static final byte[] ZERO = { '0' };
-  /** Zero token. */
+  /** Digit '-0'. */
   public static final byte[] MZERO = { '-', '0' };
-  /** One token. */
+  /** Digit '1'. */
   public static final byte[] ONE = { '1' };
+  /** Slash. */
+  public static final byte[] SLASH = { '/' };
 
   /** Hex codes. */
   public static final byte[] HEX = token("0123456789ABCDEF");
@@ -295,80 +297,6 @@ public final class Token {
     for(int i = 0; i < len; i += cl(token, i)) cp[pos++] = cp(token, i);
     return pos < len ? Arrays.copyOf(cp, pos) : cp;
   }
-
-  /**
-   * Checks if the specified UTF-8 characters are valid.
-   * @param token UTF-8 characters
-   * @return result of check
-   */
-  public static boolean valid(final byte[] token) {
-    final int l = token.length;
-    int i = 0;
-    while(i < l) {
-      int cl = cl2(token[i]);
-      if(cl <= 0 || cl > l - i++) return false;
-      if(l == i) return true;
-      final byte b = token[i];
-      if(b >= 0 && b < ' ' && !ws(b)) return false; // control character
-      while(--cl > 0) if(cl2(token[i++]) != 0) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Removes invalid characters from the UTF-8 sequence.
-   * @param token the UTF-8 sequence to remove the invalid chars from
-   * @param chop if true, all leading and trailing whitespaces are removed
-   * @return the cleaned UTF-8 sequence
-   */
-  public static byte[] clean(final byte[] token, final boolean chop) {
-    final int l = token.length;
-    if(l == 0) return EMPTY;
-    final byte[] t = new byte[l];
-    int i = 0, p = 0;
-    if(chop) while(i < l && ws(token[i])) ++i;
-    if(i == l) return EMPTY;
-    out: while(i < l) {
-      final int cl = cl2(token[i]);
-      if(cl <= 0) { ++i; continue; } // invalid ... ignore this one
-      if(cl > l - i) break; // not enough bytes left, ignore everything behind
-      final byte b = token[i];
-      if(b >= 0 && b < ' ' && !ws(b)) { ++i; continue; } // ignore control chars
-      t[p++] = token[i++]; // byte is valid .. copy to new array
-      for(int j = 1; j < cl; ++j) { // process all following bytes
-        // all following bytes must have a codepoint length of zero
-        if(cl2(token[i]) != 0) {
-          --p; // drop the already added first byte
-          i += cl - j; // skip all bytes of this sequence
-          continue out; // continue with the next UTF-8 character
-        }
-      }
-      // all bytes are valid .. add them to the array
-      for(int j = 1; j < cl; ++j) t[p++] = token[i++];
-    }
-    if(chop) while(p > 0 && ws(t[p - 1])) --p;
-    return p == 0 ? EMPTY : Arrays.copyOf(t, p);
-  }
-
-  /**
-   * Checks if the byte is part of a valid UTF-8 character. Returns the expected
-   * codepoint length of the specified byte, if it is the first byte of the
-   * sequence. If the given byte is the second, third or fourth byte of the
-   * sequence, zero is returned. A return value of -1 indicates an invalid UTF-8
-   * character.
-   * @param first first character byte
-   * @return character length, if the byte is the first byte;
-   *          zero if not; -1 if invalid
-   */
-  private static int cl2(final byte first) {
-    final int i = first & 0xFF;
-    return i == 0xC0 || i == 0xC1 || i > 0xF4 ? -1 : CHLEN2[i >> 4];
-  }
-
-  /*** Character lengths. */
-  private static final int[] CHLEN2 = {
-    1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 3, 4
-  };
 
   /**
    * Returns the token length.

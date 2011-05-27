@@ -1,6 +1,5 @@
 package org.basex.query.item;
 
-import static java.lang.Double.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
@@ -19,7 +18,6 @@ import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenMap;
 import org.basex.util.Util;
-import org.basex.util.XMLToken;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -146,11 +144,6 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public byte[] uri() {
-    return EMPTY;
-  }
-
-  @Override
   public final boolean func() {
     return false;
   }
@@ -200,61 +193,6 @@ public enum NodeType implements Type {
       throws QueryException {
     return it.type == AtomType.URI || !it.str() && !it.num() && !it.unt() &&
       it.type != AtomType.BLN ? error(it, ii) : it;
-  }
-
-  /**
-   * Checks the validity of the specified object and returns its long value.
-   * @param o value to be checked
-   * @param min minimum value
-   * @param max maximum value
-   * @param ii input info
-   * @return integer value
-   * @throws QueryException query exception
-   */
-  long checkLong(final Object o, final long min,
-      final long max, final InputInfo ii) throws QueryException {
-
-    final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
-    checkNum(it, ii);
-
-    if(it.type == AtomType.DBL || it.type == AtomType.FLT) {
-      final double d = it.dbl(ii);
-      if(isNaN(d) || d == 1 / 0d || d == -1 / 0d) Err.value(ii, this, it);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) INTRANGE.thrw(ii, d);
-      if(min != max && (d < min || d > max)) FUNCAST.thrw(ii, this, it);
-      return (long) d;
-    }
-    final long l = it.itr(ii);
-    if(min == max) {
-      final double d = it.dbl(ii);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE)
-        FUNCAST.thrw(ii, this, it);
-    }
-    if(min != max && (l < min || l > max)) FUNCAST.thrw(ii, this, it);
-    return l;
-  }
-
-  /**
-   * Checks if the specified item is a string.
-   * @param it item
-   * @return item argument
-   */
-  static boolean str(final Item it) {
-    return (it.str() || it.unt()) && it.type != AtomType.URI;
-  }
-
-  /**
-   * Checks the validity of the specified name.
-   * @param it value to be checked
-   * @param ii input info
-   * @throws QueryException query exception
-   * @return name
-   */
-  byte[] checkName(final Item it, final InputInfo ii)
-      throws QueryException {
-    final byte[] v = norm(it.atom(ii));
-    if(!XMLToken.isNCName(v)) error(it, ii);
-    return v;
   }
 
   /**

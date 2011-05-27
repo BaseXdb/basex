@@ -93,25 +93,6 @@ public final class ItrSeq extends Seq {
     ser.closeElement();
   }
 
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder(QueryTokens.PAR1);
-    for(int i = 0; i < vals.length; i++)
-      tb.add(i > 0 ? ", " : "").addLong(vals[i]);
-    return tb.add(QueryTokens.PAR2).toString();
-  }
-
-  /**
-   * Creates a value containing the given longs in the given order.
-   * @param val longs
-   * @param t type
-   * @return value
-   */
-  public static Value get(final long[] val, final Type t) {
-    return val.length == 0 ? Empty.SEQ : val.length == 1
-        ? Itr.get(val[0], t) : new ItrSeq(val, t);
-  }
-
   /**
    * Creates a value containing the given integers in the given order.
    * @param val integers
@@ -136,5 +117,13 @@ public final class ItrSeq extends Seq {
     final long[] nv = new long[val.length];
     for(int i = 0; i < nv.length; i++) nv[i] = val[i];
     return new ItrSeq(nv, t);
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(QueryTokens.PAR1);
+    for(int i = 0; i < vals.length; i++)
+      tb.add(i > 0 ? ", " : "").addLong(vals[i]);
+    return tb.add(QueryTokens.PAR2).toString();
   }
 }

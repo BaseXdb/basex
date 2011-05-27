@@ -7,7 +7,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Func;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
-import static org.basex.util.Token.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -21,7 +20,6 @@ import org.basex.util.Util;
  * @author Leo Woerteler
  */
 public class FunType implements Type {
-
   /** Any function type. */
   public static final FunType ANY_FUN = new FunType(null, null);
 
@@ -77,11 +75,6 @@ public class FunType implements Type {
   @Override
   public boolean unt() {
     return false;
-  }
-
-  @Override
-  public byte[] uri() {
-    return EMPTY;
   }
 
   @Override

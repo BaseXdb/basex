@@ -65,7 +65,7 @@ final class PlotData {
     final TokenList tl = new TokenList();
     if(data.meta.pathindex) {
       for(final byte[] k : data.pthindex.desc(it, data, true, false)) {
-        final Names index = startsWith(k, '@') ? data.atts : data.tags;
+        final Names index = startsWith(k, '@') ? data.atnindex : data.tagindex;
         if(index.stat(index.id(delete(k, '@'))).kind != Kind.NONE) tl.add(k);
       }
     }
@@ -97,7 +97,7 @@ final class PlotData {
   void refreshItems(final Nodes ctx, final boolean sub) {
     final Data data = context.data;
     final IntList tmpPres = new IntList();
-    final int itmID = data.tags.id(item);
+    final int itmID = data.tagindex.id(item);
 
     if(!sub) {
       pres = ctx.list;

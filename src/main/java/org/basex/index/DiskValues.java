@@ -27,7 +27,7 @@ public final class DiskValues implements Index {
   private final DataAccess idxl;
   /** Value type (texts/attributes). */
   private final boolean text;
-  /** Values file. */
+  /** Data reference. */
   private final Data data;
   /** Cache tokens. */
   private final IndexCache cache = new IndexCache();

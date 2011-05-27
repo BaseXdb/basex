@@ -24,29 +24,28 @@ public final class PathBuilder extends IndexBuilder {
   public Index build() {
     abort();
 
-    final int[] parStack = new int[IO.MAXHEIGHT];
+    final int[] stack = new int[IO.MAXHEIGHT];
     final PathSummary path = new PathSummary();
     int h = 0, l = 0;
     for(pre = 0; pre < size; ++pre) {
       final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);
-      while(l > 0 && parStack[l - 1] > par) --l;
+      while(l > 0 && stack[l - 1] > par) --l;
 
       if(kind == Data.DOC) {
-        parStack[l++] = pre;
-        path.add(0, l, kind);
+        stack[l++] = pre;
+        path.index(0, kind, l);
       } else if(kind == Data.ELEM) {
-        path.add(data.name(pre), l, kind);
-        parStack[l++] = pre;
+        path.index(data.name(pre), kind, l);
+        stack[l++] = pre;
       } else if(kind == Data.ATTR) {
-        path.add(data.name(pre), l, kind);
+        path.index(data.name(pre), kind, l);
       } else {
-        path.add(0, l, kind);
+        path.index(0, kind, l);
       }
       if(h < l) h = l;
     }
     data.meta.pathindex = true;
-    data.flush();
     return path;
   }
 

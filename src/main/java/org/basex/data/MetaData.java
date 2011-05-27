@@ -39,22 +39,22 @@ public final class MetaData {
   public long filesize;
   /** Number of XML documents. */
   public int ndocs;
-  /** Maximum document height. */
-  public int height;
-  /** Modification time. */
+  /** Database timestamp. */
   public long time;
   /** Flag for whitespace chopping. */
   public boolean chop;
   /** Flag for entity parsing. */
   public boolean entity;
-  /** Flag for creating a text index. */
+  /** Flag for activated text index. */
   public boolean textindex;
-  /** Flag for creating a attribute value index. */
+  /** Flag for activated attribute value index. */
   public boolean attrindex;
-  /** Flag for creating a full-text index. */
+  /** Flag for activated full-text index. */
   public boolean ftindex;
-  /** Flag for creating a path summary. */
+  /** Flag for activated path summary. */
   public boolean pathindex = true;
+  /** Flag for up-to-date document index. */
+  public boolean docindex;
 
   /** Flag for wildcard indexing. */
   public boolean wildcards;
@@ -83,9 +83,6 @@ public final class MetaData {
   public int size;
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
-
-  /** Root paths. */
-  DataPaths paths = new DataPaths();
 
   /**
    * Constructor, specifying the database name.
@@ -166,7 +163,7 @@ public final class MetaData {
   }
 
   /**
-   * Adds the a random temporary name for the current database.
+   * Returns a random temporary name for the current database.
    * @return random name
    */
   public String random() {
@@ -192,18 +189,19 @@ public final class MetaData {
    * Notifies the meta structures of an update and invalidates the indexes.
    */
   void update() {
+    // update database timestamp
     time = System.currentTimeMillis();
     uptodate = false;
     dirty = true;
-    // reset of flags should be skipped as soon as id/pre mapping is supported
+    // reset of flags might be skipped if id/pre mapping is supported
     textindex = false;
     attrindex = false;
     ftindex = false;
-    paths.update();
+    docindex = false;
   }
 
   /**
-   * Opens the metadata for the current database and returns the table size.
+   * Reads in meta data from the specified stream.
    * @param in input stream
    * @throws IOException I/O exception
    */
@@ -213,36 +211,35 @@ public final class MetaData {
       final String k = string(in.readBytes());
       if(k.isEmpty()) break;
       if(k.equals(DBPERM)) {
-        users = new Users(in);
-        continue;
+        users.read(in);
+      } else {
+        final String v = string(in.readBytes());
+        if(k.equals(DBSTR))         storage    = v;
+        else if(k.equals(IDBSTR))   istorage   = v;
+        else if(k.equals(DBSIZE))   size       = toInt(v);
+        else if(k.equals(DBFNAME))  path       = v;
+        else if(k.equals(DBFSIZE))  filesize   = toLong(v);
+        else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
+        else if(k.equals(DBFTDC))   diacritics = toBool(v);
+        else if(k.equals(DBENC))    encoding   = v;
+        else if(k.equals(DBCHOP))   chop       = toBool(v);
+        else if(k.equals(DBENTITY)) entity     = toBool(v);
+        else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
+        else if(k.equals(DBTXTIDX)) textindex  = toBool(v);
+        else if(k.equals(DBATVIDX)) attrindex  = toBool(v);
+        else if(k.equals(DBFTXIDX)) ftindex    = toBool(v);
+        else if(k.equals(DBWCIDX))  wildcards  = toBool(v);
+        else if(k.equals(DBFTST))   stemming   = toBool(v);
+        else if(k.equals(DBFTCS))   casesens   = toBool(v);
+        else if(k.equals(DBFTDC))   diacritics = toBool(v);
+        else if(k.equals(DBFTLN))   language   = Language.get(v);
+        else if(k.equals(DBSCMAX))  maxscore   = toInt(v);
+        else if(k.equals(DBSCMIN))  minscore   = toInt(v);
+        else if(k.equals(DBSCTYPE)) scoring    = toInt(v);
+        else if(k.equals(DBTIME))   time       = toLong(v);
+        else if(k.equals(DBUTD))    uptodate   = toBool(v);
+        else if(k.equals(DBLID))    lastid     = toInt(v);
       }
-      final String v = string(in.readBytes());
-      if(k.equals(DBSTR))         storage    = v;
-      else if(k.equals(IDBSTR))   istorage   = v;
-      else if(k.equals(DBSIZE))   size       = toInt(v);
-      else if(k.equals(DBFNAME))  path       = v;
-      else if(k.equals(DBFSIZE))  filesize   = toLong(v);
-      else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
-      else if(k.equals(DBFTDC))   diacritics = toBool(v);
-      else if(k.equals(DBENC))    encoding   = v;
-      else if(k.equals(DBHGHT))   height     = toInt(v);
-      else if(k.equals(DBCHOP))   chop       = toBool(v);
-      else if(k.equals(DBENTITY)) entity     = toBool(v);
-      else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
-      else if(k.equals(DBTXTIDX)) textindex  = toBool(v);
-      else if(k.equals(DBATVIDX)) attrindex  = toBool(v);
-      else if(k.equals(DBFTXIDX)) ftindex    = toBool(v);
-      else if(k.equals(DBWCIDX))  wildcards  = toBool(v);
-      else if(k.equals(DBFTST))   stemming   = toBool(v);
-      else if(k.equals(DBFTCS))   casesens   = toBool(v);
-      else if(k.equals(DBFTDC))   diacritics = toBool(v);
-      else if(k.equals(DBFTLN))   language   = Language.get(v);
-      else if(k.equals(DBSCMAX))  maxscore   = toInt(v);
-      else if(k.equals(DBSCMIN))  minscore   = toInt(v);
-      else if(k.equals(DBSCTYPE)) scoring    = toInt(v);
-      else if(k.equals(DBTIME))   time       = toLong(v);
-      else if(k.equals(DBUTD))    uptodate   = toBool(v);
-      else if(k.equals(DBLID))    lastid     = toInt(v);
     }
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
     if(!istorage.equals(ISTORAGE)) {
@@ -272,7 +269,6 @@ public final class MetaData {
     writeInfo(out, DBFSIZE,  filesize);
     writeInfo(out, DBNDOCS,  ndocs);
     writeInfo(out, DBENC,    encoding);
-    writeInfo(out, DBHGHT,   height);
     writeInfo(out, DBSIZE,   size);
     writeInfo(out, DBCHOP,   chop);
     writeInfo(out, DBENTITY, entity);

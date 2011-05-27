@@ -267,7 +267,7 @@ public abstract class Path extends ParseExpr {
       // cache child steps
       final TokenList tl = new TokenList();
       while(nodes.get(0).par != null) {
-        byte[] tag = data.tags.key(nodes.get(0).name);
+        byte[] tag = data.tagindex.key(nodes.get(0).name);
         for(int j = 0; j < nodes.size(); ++j) {
           if(nodes.get(0).name != nodes.get(j).name) tag = null;
         }
@@ -321,7 +321,7 @@ public abstract class Path extends ParseExpr {
       if(!desc && curr.axis != Axis.CHILD || curr.test.test != Name.NAME)
         return null;
 
-      final int name = data.tags.id(curr.test.name.ln());
+      final int name = data.tagindex.id(curr.test.name.ln());
 
       final ArrayList<PathNode> out = new ArrayList<PathNode>();
       for(final PathNode pn : data.pthindex.desc(in, desc)) {

@@ -13,7 +13,6 @@ import java.nio.charset.CharsetDecoder;
 import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 import org.basex.util.ByteList;
-import org.basex.util.TokenBuilder;
 
 /**
  * This class serves as a buffered wrapper for textual input streams.
@@ -203,23 +202,6 @@ public class BufferInput extends InputStream {
         // tolerate erroneous characters
         return ch & 0xFF;
       }
-    }
-  }
-
-  /**
-   * Reads a string.
-   * @param tb token builder
-   * @return true if more lines are found
-   * @throws IOException IO Exception
-   */
-  public final boolean readLine(final TokenBuilder tb) throws IOException {
-    tb.reset();
-    while(true) {
-      final int ch = readChar();
-      if(ch == 0x0D) continue;
-      if(ch == 0x00) return tb.size() != 0;
-      if(ch == 0x0A) return true;
-      tb.add(ch);
     }
   }
 

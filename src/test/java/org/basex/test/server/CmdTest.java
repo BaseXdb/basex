@@ -13,6 +13,7 @@ import org.basex.server.Session;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -27,10 +28,12 @@ import static org.basex.util.Token.*;
 public class CmdTest {
   /** Database context. */
   protected static final Context CONTEXT = new Context();
-  /** Test file. */
-  private static final String FILE = "etc/xml/input.xml";
+  /** Test file name. */
+  private static final String FN = "input.xml";
   /** Test folder. */
   private static final String FLDR = "etc/xml";
+  /** Test file. */
+  private static final String FILE = FLDR + '/' + FN;
   /** Test name. */
   private static final String NAME = Util.name(CmdTest.class);
   /** Test name. */
@@ -52,16 +55,23 @@ public class CmdTest {
 
   /**
    * Creates the database.
+   * @throws BaseXException database exception
+   */
+  @Before
+  public final void before() throws BaseXException {
+    session.execute(new DropDB(NAME));
+    session.execute(new DropDB(NAME2));
+    session.execute(new DropUser(NAME));
+    session.execute(new DropUser(NAME2));
+  }
+
+  /**
+   * Creates the database.
+   * @throws BaseXException database exception
    */
   @After
-  public final void setUp() {
-    try {
-      session.execute(new DropDB(NAME));
-      session.execute(new DropDB(NAME2));
-      session.execute(new DropUser(NAME));
-      session.execute(new DropUser(NAME2));
-    } catch(final BaseXException ex) {
-    }
+  public final void after() throws BaseXException {
+    before();
   }
 
   /** Command test. */
@@ -70,8 +80,8 @@ public class CmdTest {
     // database must be opened to add files
     no(new Add(FILE));
     ok(new CreateDB(NAME));
-    ok(new Add(FILE, "input"));
-    ok(new Add(FILE, "input", "target"));
+    ok(new Add(FILE, FN));
+    ok(new Add(FILE, FN, "target"));
     ok(new Add(FLDR, "xml"));
     no(new Add(FILE, "\\"));
     no(new Add(FILE, "/"));
@@ -223,7 +233,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void export() {
-    final IO io = IO.get("input.xml");
+    final IO io = IO.get(FN);
     no(new Export(io.path()));
     ok(new CreateDB(NAME, FILE));
     ok(new Export("."));
@@ -344,6 +354,31 @@ public class CmdTest {
   public final void password() {
     ok(new Password("admin"));
     no(new Password(""));
+  }
+
+  /** Command test. */
+  @Test
+  public final void rename() {
+    // database must be opened to rename paths
+    no(new Rename(FILE, "xxx"));
+    ok(new CreateDB(NAME, FILE));
+    // target path must not be empty
+    no(new Rename(FN, "/"));
+    no(new Rename(FN, ""));
+    ok(new Rename(FILE, "xxx"));
+    // target need not exist
+    ok(new Rename(FILE, "xxx"));
+  }
+
+  /** Command test. */
+  @Test
+  public final void replace() {
+    // database must be opened to rename paths
+    no(new Replace(FILE, "xxx"));
+    ok(new CreateDB(NAME, FILE));
+    ok(new Replace(FN, "<a/>"));
+    ok(new Replace(FN, "<a/>"));
+    no(new Replace(FN, ""));
   }
 
   /** Command test. */

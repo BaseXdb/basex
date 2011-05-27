@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.transform.sax.SAXSource;
@@ -35,7 +34,7 @@ public final class Add extends ACreate {
 
   /**
    * Default constructor.
-   * @param input input XML file or XML string
+   * @param input input file or XML string
    */
   public Add(final String input) {
     this(input, null);
@@ -43,7 +42,7 @@ public final class Add extends ACreate {
 
   /**
    * Constructor, specifying a document name.
-   * @param input input XML file or XML string
+   * @param input input file or XML string
    * @param name name of document
    */
   public Add(final String input, final String name) {
@@ -69,16 +68,10 @@ public final class Add extends ACreate {
 
     String name = args[1];
     if(name != null && !name.isEmpty()) {
+      // assure that name contains no slashes
+      if(name.matches(".*[\\\\/].*")) return error(NAMEINVALID, args[1]);
       // set specified document name
       io.name(name);
-      try {
-        // try to resolve name (platform dependent)
-        new File(name).getCanonicalFile();
-      } catch(final IOException ex) {
-        name = null;
-      }
-      if(name == null || name.matches(".*[\\\\/].*"))
-        return error(NAMEINVALID, args[1]);
     } else if(io instanceof IOContent) {
       // if no name exists, set database name as document name
       name = context.data.meta.name + IO.XMLSUFFIX;
@@ -141,12 +134,11 @@ public final class Add extends ACreate {
    * @return info string
    * @throws BaseXException database exception
    */
-  private static String add(final Parser parser, final Context ctx,
+  public static String add(final Parser parser, final Context ctx,
       final String target, final String name, final Add cmd)
       throws BaseXException {
 
     final Performance p = new Performance();
-
     final String path = target + (target.isEmpty() ? "/" : "") +
         (name == null ? parser.file.name() : name);
 
@@ -161,24 +153,28 @@ public final class Add extends ACreate {
     }
 
     // create random database name
-    final String dbname = large ? ctx.data.meta.random() : path;
+    final Data data = ctx.data;
+    final String dbname = large ? data.meta.random() : path;
     final Builder build = large ? new DiskBuilder(parser, ctx.prop) :
       new MemBuilder(parser, ctx.prop);
     if(cmd != null) cmd.build = build;
 
-    Data data = null;
+    Data tmp = null;
     try {
-      data = build.build(dbname);
-      ctx.data.insert(ctx.data.meta.size, -1, data);
-      ctx.data.flush();
-      ctx.update();
+      tmp = build.build(dbname);
+      // ignore empty fragments
+      if(tmp.meta.size > 1) {
+        data.insert(data.meta.size, -1, tmp);
+        ctx.update();
+        data.flush();
+      }
       return Util.info(PATHADDED, path, p);
     } catch(final IOException ex) {
       Util.debug(ex);
       throw new BaseXException(ex);
     } finally {
       // close and drop intermediary database instance
-      if(data != null) try { data.close(); } catch(final IOException e) { }
+      if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
       if(large) DropDB.drop(dbname, ctx.prop);
     }
   }

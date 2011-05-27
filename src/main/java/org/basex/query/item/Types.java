@@ -10,7 +10,6 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public final class Types {
-
   /** Hidden default constructor. */
   private Types() { }
 

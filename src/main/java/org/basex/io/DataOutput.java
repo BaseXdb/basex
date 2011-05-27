@@ -118,6 +118,20 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
+   * Writes the specified array as distances to the output stream.
+   * @param array array to be written
+   * @throws IOException I/O exception
+   */
+  public void writeDiffs(final int[] array) throws IOException {
+    writeNum(array.length);
+    int c = 0;
+    for(final int a : array) {
+      writeNum(a - c);
+      c = a;
+    }
+  }
+
+  /**
    * Writes the specified nums to the output stream.
    * @param array array to be written
    * @throws IOException I/O exception

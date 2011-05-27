@@ -54,6 +54,19 @@ public final class DataInput extends BufferInput {
   }
 
   /**
+   * Reads an distance-mapped integer array from the input stream.
+   * @return integer array
+   * @throws IOException IO Exception
+   */
+  public int[] readDiffs() throws IOException {
+    final int[] array = new int[readNum()];
+    for(int a = 0; a < array.length; ++a) {
+      array[a] = (a == 0 ? 0 : array[a - 1]) + readNum();
+    }
+    return array;
+  }
+
+  /**
    * Reads an integer array from the input stream.
    * @return integer array
    * @throws IOException IO Exception
@@ -103,15 +116,6 @@ public final class DataInput extends BufferInput {
       default:
         return (read() << 24) + (read() << 16) + (read() << 8) + read();
     }
-  }
-
-  /**
-   * Reads an array of longs from the input stream.
-   * @return array of longs
-   * @throws IOException IO Exception
-   */
-  public long[] readLongs() throws IOException {
-    return readLongs(readNum());
   }
 
   /**

@@ -35,7 +35,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class Map extends FItem {
+public final class Map extends FItem {
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
 

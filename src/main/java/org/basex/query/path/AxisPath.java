@@ -343,7 +343,8 @@ public class AxisPath extends Path {
     final Data data = ctx.data();
     if(data == null || !data.meta.uptodate) return this;
 
-    final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
+    final StatsKey stats = data.tagindex.stat(
+        data.tagindex.id(s.test.name.ln()));
     if(stats != null && stats.leaf) {
       step = Array.add(step, AxisStep.get(input, Axis.CHILD, Test.TXT));
       ctx.compInfo(OPTTEXT, this);
@@ -360,7 +361,10 @@ public class AxisPath extends Path {
     return (AxisStep) step[i];
   }
 
-  @Override
+  /**
+   * Returns a copy of the path expression.
+   * @return copy
+   */
   public final Path copy() {
     final Expr[] steps = new Expr[step.length];
     for(int s = 0; s < step.length; ++s) steps[s] = AxisStep.get(step(s));

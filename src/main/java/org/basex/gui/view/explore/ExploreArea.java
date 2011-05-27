@@ -203,7 +203,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         if(selected) {
           final String item = combo.getSelectedItem().toString();
           final boolean att = item.startsWith("@");
-          final Names names = att ? data.atts : data.tags;
+          final Names names = att ? data.atnindex : data.tagindex;
           final byte[] key = Token.token(att ? item.substring(1) : item);
           final StatsKey stat = names.stat(names.id(key));
           switch(stat.kind) {

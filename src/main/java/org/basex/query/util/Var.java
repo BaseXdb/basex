@@ -197,7 +197,10 @@ public final class Var extends ParseExpr {
     return type == null ? v : type.promote(v, ctx, input);
   }
 
-  @Override
+  /**
+   * Returns a copy of the variable.
+   * @return copy
+   */
   public Var copy() {
     final Var v = new Var(input, name, type, id);
     v.global = global;

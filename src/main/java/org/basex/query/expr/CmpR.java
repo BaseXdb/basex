@@ -183,7 +183,7 @@ public final class CmpR extends Single {
       if(!step.simple(Axis.ATTR, true)) return null;
     }
 
-    final Names names = text ? ic.data.tags : ic.data.atts;
+    final Names names = text ? ic.data.tagindex : ic.data.atnindex;
     final StatsKey key = names.stat(names.id(((NameTest) step.test).ln));
     return key == null || key.kind == StatsKey.Kind.INT ||
       key.kind == StatsKey.Kind.DBL ? key : null;

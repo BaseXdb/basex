@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
+import org.basex.io.IOFile;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -12,7 +13,6 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Uri;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * Put primitive.
@@ -44,7 +44,7 @@ public final class Put extends Primitive {
   public void apply(final int add) throws QueryException {
     PrintOutput out = null;
     try {
-      out = new PrintOutput(Token.string(path()));
+      out = new PrintOutput(path());
       final SerializerProp pr = ctx.serProp(false);
       // try to reproduce non-chopped documents correctly
       if(node instanceof DBNode) pr.set(SerializerProp.S_INDENT,
@@ -62,8 +62,8 @@ public final class Put extends Primitive {
    * Returns uri as string.
    * @return string uri
    */
-  public byte[] path() {
-    return uri.atom();
+  public String path() {
+    return new IOFile(uri.toJava()).path();
   }
 
   @Override
