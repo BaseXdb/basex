@@ -62,7 +62,7 @@ public final class Context {
     lock = new Lock(this);
     users = new Users(true);
     user = users.get(ADMIN);
-    repo = new Repo(prop);
+    repo = new Repo(this);
   }
 
   /**

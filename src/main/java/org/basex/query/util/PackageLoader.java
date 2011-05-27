@@ -10,6 +10,7 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Context;
 import org.basex.io.IOFile;
+import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.util.Package.Component;
@@ -34,10 +35,11 @@ public final class PackageLoader {
    * @param pkgsLoaded loaded packages
    * @param ctx context
    * @throws IOException IO exception
+   * @throws QueryException 
    */
   public static void loadPackage(final TokenMap pkgsInst, final byte[] pkgName,
       final TokenList uris, final StringList modules,
-      final TokenList pkgsLoaded, final Context ctx) throws IOException {
+      final TokenList pkgsLoaded, final Context ctx) throws IOException, QueryException {
     // TODO: here use later pkg name + version
     if(!pkgsLoaded.contains(pkgName)) {
       // Package is still not loaded
@@ -55,7 +57,7 @@ public final class PackageLoader {
         final Parser parse = Parser.xmlParser(io, ctx.prop, "");
         final ANode pkgNode = new DBNode(MemBuilder.build(parse, ctx.prop, ""),
             0).children().next();
-        final Package pkg = PackageParser.parse(pkgNode);
+        final Package pkg = PackageParser.parse(io, ctx, null);
         // Load package components
         final Iterator<Component> c = pkg.comps.iterator();
         Component comp;

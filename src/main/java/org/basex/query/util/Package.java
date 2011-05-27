@@ -12,8 +12,8 @@ import org.basex.util.TokenBuilder;
  */
 public final class Package {
 
-  /** Package name - unique URI. */
-  public byte[] name;
+  /** Package uri. */
+  public byte[] uri;
   /** Package short name. */
   public byte[] abbrev;
   /** Package version. */
@@ -34,7 +34,7 @@ public final class Package {
    * @return result
    */
   public byte[] getName() {
-    return new TokenBuilder().add(name).add('-').add(version).finish();
+    return new TokenBuilder().add(uri).add('-').add(version).finish();
   }
 
   /**

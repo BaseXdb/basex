@@ -1,11 +1,26 @@
 package org.basex.query.util;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import org.basex.build.MemBuilder;
+import org.basex.build.Parser;
+import org.basex.core.Context;
+import org.basex.io.IO;
+import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
+import org.basex.query.item.DBNode;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.query.util.Package.Component;
 import org.basex.query.util.Package.Dependency;
+import org.basex.util.ByteList;
+import org.basex.util.InputInfo;
 
 /**
  * Parser for package descriptors.
@@ -13,6 +28,9 @@ import org.basex.query.util.Package.Dependency;
  * @author Rositsa Shadura
  */
 public final class PackageParser {
+
+  /** Package descriptor. */
+  private static final String PKGDESC = "expath-pkg.xml";
 
   /** <package/> attributes. */
   /** Attribute name. */
@@ -49,7 +67,7 @@ public final class PackageParser {
   private static final byte[] SEMVERMAX = token("semver-max");
 
   /** <xquery/> attributes. */
-  /** Attribute  import-uri. */
+  /** Attribute import-uri. */
   private static final byte[] IMPURI = token("import-uri");
   /** Attribute namespace. */
   private static final byte[] NSPC = token("namespace");
@@ -62,15 +80,64 @@ public final class PackageParser {
   }
 
   /**
-   * Parses a package descriptor.
-   * @param pkgNode <package/>
-   * @return package
+   * Parses package descriptor.
+   * @param io IO
+   * @param ctx context
+   * @param ii input info
+   * @return package container
+   * @throws QueryException query exception
    */
-  public static Package parse(final ANode pkgNode) {
+  public static Package parse(
+      final IO io, final Context ctx, final InputInfo ii)
+      throws QueryException {
     final Package pkg = new Package();
-    parseAttrs(pkgNode, pkg);
-    parseChildren(pkgNode, pkg);
-    return pkg;
+    try {
+      final Parser p = Parser.xmlParser(io, ctx.prop, "");
+      final ANode pkgNode =
+        new DBNode(MemBuilder.build(p, ctx.prop, ""), 0).children().next();
+      parseAttrs(pkgNode, pkg);
+      parseChildren(pkgNode, pkg);
+      return pkg;
+    } catch(IOException ex) {
+      throw PKGREADFAIL.thrw(ii);
+    }
+  }
+
+  /**
+   * Reads package descriptor directly from .xar archive. Logic is copied from
+   * method entry() in org.basex.query.func.FNZip
+   * @param zf package archive
+   * @param ii input info
+   * @return contents of package descriptor
+   * @throws QueryException query exception
+   */
+  protected static byte[] readPkgDesc(final ZipFile zf, final InputInfo ii)
+      throws QueryException {
+
+    try {
+      final ZipEntry ze = zf.getEntry(PKGDESC);
+      if(ze == null) PKGDESCMISS.thrw(ii);
+      final InputStream zis = zf.getInputStream(ze);
+      final int s = (int) ze.getSize();
+      if(s >= 0) {
+        // known size: pre-allocate and fill array
+        final byte[] data = new byte[s];
+        int c, o = 0;
+        while(s - o != 0 && (c = zis.read(data, o, s - o)) != -1)
+          o += c;
+        return data;
+      }
+      // unknown size: use byte list
+      final byte[] data = new byte[IO.BLOCKSIZE];
+      final ByteList bl = new ByteList();
+      int c;
+      while((c = zis.read(data)) != -1)
+        bl.add(data, 0, c);
+      return bl.toArray();
+
+    } catch(IOException ex) {
+      throw PKGREADFAIL.thrw(ii);
+    }
   }
 
   /**
@@ -84,7 +151,7 @@ public final class PackageParser {
     byte[] nextName;
     while((next = atts.next()) != null) {
       nextName = next.nname();
-      if(eq(NAME, nextName)) p.name = next.atom();
+      if(eq(NAME, nextName)) p.uri = next.atom();
       else if(eq(ABBREV, nextName)) p.abbrev = next.atom();
       else if(eq(VERSION, nextName)) p.version = next.atom();
       else if(eq(SPEC, nextName)) p.spec = next.atom();
@@ -109,10 +176,10 @@ public final class PackageParser {
       else if(eq(HOME, nextName)) p.home = next.atom();
       else if(eq(DEPEND, nextName)) p.dep.add(parseDependency(next));
       else if(eq(XQUERY, nextName)) p.comps.add(parseComp(next));
-      else { //?
-        }
+      else { // ?
       }
     }
+  }
 
   /**
    * Parses <dependency/>.
@@ -153,12 +220,13 @@ public final class PackageParser {
     while((next = ch.next()) != null) {
       nextName = next.nname();
       if(eq(IMPURI, nextName)) c.importUri = next.atom();
-      else if (eq(NSPC, nextName)) c.namespace = next.atom();
-      else if (eq(FILE, nextName)) c.file = next.atom();
+      else if(eq(NSPC, nextName)) c.namespace = next.atom();
+      else if(eq(FILE, nextName)) c.file = next.atom();
       else {
         // Error?
       }
     }
     return c;
   }
+
 }

@@ -151,6 +151,13 @@ public enum Err {
   PKGNOTINSTALLED(PACK, 4, "Necessary package % is not installed. "),
   /** PACK0005: Evaluation exception. */
   PKGDESCINV(PACK, 5, "Invalid package descriptor: %. "),
+  /** PACK0006: Evaluation exception. */
+  INVPKGNAME(PACK, 6, "Package must be a .xar file. "),
+  /** PACK0007: Evaluation exception. */
+  MODISTALLED(PACK, 7,
+      "Module % is already installed within another package. "),
+  /** PACK0008: Evaluation exception. */
+  PKGREADFAIL(PACK, 8, "Reading package descriptor failed. "),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

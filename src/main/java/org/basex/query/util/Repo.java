@@ -1,24 +1,17 @@
 package org.basex.query.util;
 
-import static org.basex.util.Token.*;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.QNm;
-import org.basex.query.iter.NodeMore;
+import org.basex.query.QueryException;
 import org.basex.query.util.Package.Component;
-import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenObjMap;
+import org.basex.util.Util;
 
 /**
  * Repository.
@@ -29,75 +22,74 @@ public final class Repo {
 
   /** Package descriptor. */
   private static final String PKGDESC = "expath-pkg.xml";
-  /** Platform dependent file separator. */
-  private static final String SEP = System.getProperty("file.separator");
-
   /**
-   * Map containing namespaces available in the repository and the packages in
-   * which they are found.
+   * Namespace-dictionary - contains all namespaces available in the repository
+   * and the packages in which they are found.
    */
   public final TokenObjMap<TokenList> nsDict;
-  /** Map containing installed packages and their directories. */
+  /**
+   * Package dictionary - contains all installed packages and their directories.
+   */
   public final TokenMap pkgDict;
-  /** Context properties. */
-  private final Prop prop;
+  /** Context. */
+  private final Context ctx;
 
   /**
    * Constructor.
-   * @param p context properties
+   * @param c context
    */
-  public Repo(final Prop p) {
+  public Repo(final Context c) {
     nsDict = new TokenObjMap<TokenList>();
     pkgDict = new TokenMap();
-    this.prop = p;
-    try {
-      readRepo();
-    } catch(IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    ctx = c;
+    final File repoDir = new File(ctx.prop.get(Prop.REPOPATH));
+    if(repoDir.exists()) {
+      final File[] pkgDirs = repoDir.listFiles();
+      File pkgDir = null;
+      for(int i = 0; i < pkgDirs.length; i++) {
+        pkgDir = pkgDirs[i];
+        if(pkgDir.isDirectory()) {
+          final File pkgDesc = new File(pkgDir.getPath() + Prop.DIRSEP
+              + PKGDESC);
+          if(!pkgDesc.exists()) {
+            Util.notexpected("Missing package descriptor for package "
+                + pkgDir.getName());
+          } else readPkg(pkgDesc);
+        }
+      }
     }
   }
 
   /**
-   * Reads the contents of the package repository.
-   * @throws IOException IO exception
+   * Reads a package descriptor and adds components' namespaces to
+   * namespace-dictionary and package - to package dictionary.
+   * @param pkgDesc package descriptor
    */
-  private void readRepo() throws IOException {
-    final File repoDir = new File(prop.get(Prop.REPOPATH));
-    if(repoDir.exists()) {
-      final File[] pkgDirs = repoDir.listFiles();
-      for(int i = 0; i < pkgDirs.length; i++) {
-        if(pkgDirs[i].isDirectory()) {
-          final File pkgDesc = new File(pkgDirs[i].getPath() + SEP + PKGDESC);
-          if(!pkgDesc.exists()) {
-            // TODO: Error: Missing package descriptor.
-          } else {
-            final IOFile io = new IOFile(pkgDesc);
-            final Parser p = Parser.xmlParser(io, prop, "");
-            final ANode pkgNode =
-              new DBNode(MemBuilder.build(p, prop, ""), 0).children().next();
-            final Package pkg = PackageParser.parse(pkgNode);
-            // Read package components
-            final Iterator<Component> compIt = pkg.comps.iterator();
-            Component comp;
-            byte[] compNs;
-            while(compIt.hasNext()) {
-              comp = compIt.next();
-              compNs = comp.namespace;
-              if(compNs != null) {
-                if(nsDict.get(compNs) != null) {
-                  nsDict.get(compNs).add(pkg.name);
-                } else {
-                  final TokenList vals = new TokenList();
-                  vals.add(pkg.name);
-                  nsDict.add(compNs, vals);
-                }
-              }
-            }
-            pkgDict.add(pkg.getName(), pkg.abbrev);
+  private void readPkg(final File pkgDesc) {
+    try {
+      final IOFile io = new IOFile(pkgDesc);
+      final Package pkg = PackageParser.parse(io, ctx, null);
+      // Read package components
+      final Iterator<Component> compIt = pkg.comps.iterator();
+      Component comp;
+      byte[] compNs;
+      while(compIt.hasNext()) {
+        comp = compIt.next();
+        compNs = comp.namespace;
+        // Add component's namespace to namespace dictionary
+        if(compNs != null) {
+          if(nsDict.get(compNs) != null) nsDict.get(compNs).add(pkg.getName());
+          else {
+            final TokenList vals = new TokenList();
+            vals.add(pkg.getName());
+            nsDict.add(compNs, vals);
           }
         }
       }
+      // Add package to package dictionary
+      pkgDict.add(pkg.getName(), pkg.abbrev);
+    } catch(QueryException ex) {
+      Util.debug(ex);
     }
   }
 }
