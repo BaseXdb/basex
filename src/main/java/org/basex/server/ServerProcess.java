@@ -283,6 +283,7 @@ public final class ServerProcess extends Thread {
     final String name = in.readString();
     if(events == null) {
       out.writeString((new Long(this.getId())).toString());
+      out.writeString(new Integer(context.prop.num(Prop.EVENTPORT)).toString());
       events = new ArrayList<String>();
     }
     if(context.events.watch(name, this)) {

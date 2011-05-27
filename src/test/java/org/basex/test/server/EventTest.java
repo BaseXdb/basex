@@ -28,9 +28,7 @@ public final class EventTest {
   /** Event name. */
   private static final String EVENT_NAME = "event";
   /** Return value of function db:event. */
-  private static final String RETURN_VALUE1 = "\"event\"";
-  /** Return value of function db:event. */
-  private static final String RETURN_VALUE2 = "\" \"";
+  private static final String RETURN_VALUE = "\"event\"";
   /** Server reference. */
   private static BaseXServer server;
   /** Client session. */
@@ -176,8 +174,8 @@ public final class EventTest {
    */
   @Test
   public void event() throws BaseXException {
-    event(RETURN_VALUE1, true);
-    event(RETURN_VALUE2, false);
+    event(RETURN_VALUE, true);
+    event(null, false);
   }
 
   /**
@@ -187,8 +185,8 @@ public final class EventTest {
    */
   @Test
   public void concurrent() throws Exception {
-    concurrent(RETURN_VALUE1, true);
-    concurrent(RETURN_VALUE2, false);
+    concurrent(RETURN_VALUE, true);
+    concurrent(null, false);
   }
 
   /**

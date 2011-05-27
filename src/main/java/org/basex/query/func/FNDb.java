@@ -57,7 +57,7 @@ public final class FNDb extends Fun {
       case LIST:     return list(ctx);
       case NODEID:   return node(ctx, true);
       case NODEPRE:  return node(ctx, false);
-      case EVENT:  return event(ctx);
+      case EVENT:    return event(ctx);
       default:       return super.iter(ctx);
     }
   }
@@ -248,10 +248,9 @@ public final class FNDb extends Fun {
    */
   private Iter event(final QueryContext ctx) throws QueryException {
     String name = expr[0].toString();
-    String q2 = expr[2].toString();
     String msg = "";
     Value v = expr[1].value(ctx);
-    if(q2.replaceAll("\"", "").trim().isEmpty()) {
+    if(expr.length < 3) {
       ctx.updating = true;
       msg = ctx.value(expr[1]).toString();
     } else {
