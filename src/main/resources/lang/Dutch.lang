@@ -353,12 +353,14 @@ pc_created=Database '%' gecreëerd in %.
 pc_added=Pad '%' toegevoegd in %.
 pc_deleted=% documenten verwijderd in %.
 pc_renamed=% document(s) renamed in %.
+pc_replaced=% document(s) replaced in %.
 pc_filenf=Bestand of folder "%" niet gevonden.
 pc_pathnf=Bestand of folder niet gevonden.
 pc_dbnf=Geef de database een naam.
 pc_langnf=Taal '%' wordt niet ondersteund.
 pc_err="%" voldoet niet aan de grammatica.
 pc_pos="%" (Regel %)
+pc_direrr="%" points to a directory.
 
 # Database commands
 db_no=Database '%' is niet gevonden.
@@ -553,6 +555,8 @@ ch_kill1=Stop gebruiker sessions.
 ch_kill2=Stopt alle sessies van de opgegeven gebruiker.
 ch_rename1=Rename document paths in database.
 ch_rename2=Renames document paths in the current database.
+ch_replace1=Replace documents in database.
+ch_replace2=Replaces documents in the current database.
 ch_restore1=Herstel database.
 ch_restore2=Zet een backup van de gegeven database terug mbv\nde laatste of met datum gespecificeerde backup file.
 ch_show1=Toon server informatie.

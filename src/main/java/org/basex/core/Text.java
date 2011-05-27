@@ -302,6 +302,11 @@ public interface Text {
     "[" + C_PATH  + "] [newpath]", lang("ch_rename1"), lang("ch_rename2")
   };
   /** Command help. */
+  String[] HELPREPLACE = {
+    "[" + C_PATH  + "] [" + C_INPUT + "]",
+    lang("ch_replace1"), lang("ch_replace2")
+  };
+  /** Command help. */
   String[] HELPRESTORE = {
     "[" + C_NAME + "-(date)]", lang("ch_restore1"), lang("ch_restore2")
   };
@@ -431,6 +436,8 @@ public interface Text {
   String PATHDELETED = lang("pc_deleted");
   /** Path renamed. */
   String PATHRENAMED = lang("pc_renamed");
+  /** Path replaced. */
+  String PATHREPLACED = lang("pc_replaced");
   /** Parse error. */
   String PARSEERR = lang("pc_err");
 
@@ -442,6 +449,8 @@ public interface Text {
   String DBWHICH = lang("pc_dbnf");
   /** Language not supported. */
   String LANGWHICH = lang("pc_langnf");
+  /** Points to a directory. */
+  String DIRERR = lang("pc_direrr");
 
   // DATABASE COMMANDS ========================================================
 

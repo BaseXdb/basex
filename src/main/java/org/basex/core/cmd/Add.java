@@ -34,7 +34,7 @@ public final class Add extends ACreate {
 
   /**
    * Default constructor.
-   * @param input input XML file or XML string
+   * @param input input file or XML string
    */
   public Add(final String input) {
     this(input, null);
@@ -42,7 +42,7 @@ public final class Add extends ACreate {
 
   /**
    * Constructor, specifying a document name.
-   * @param input input XML file or XML string
+   * @param input input file or XML string
    * @param name name of document
    */
   public Add(final String input, final String name) {

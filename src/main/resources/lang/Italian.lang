@@ -353,12 +353,14 @@ pc_created=Base di dati '%' creata in %.
 pc_added=Dimensione '%' aggiunto in %.
 pc_deleted=% document(o/i) cancellato in %.
 pc_renamed=% document(s) renamed in %.
+pc_replaced=% document(s) replaced in %.
 pc_filenf=Documento o cartella "%" non trovati.
 pc_pathnf=Documento o cartella non trovati.
 pc_dbnf=Inserisci un nome per la base di dati.
 pc_langnf=Language '%' not supported.
 pc_err="%" non può essere analizzato.
 pc_pos="%" (Linea %)
+pc_direrr="%" points to a directory.
 
 # Database commands
 db_no=Base di dati '%' non trovata.
@@ -553,6 +555,8 @@ ch_kill1=Chiudi la sessione utente.
 ch_kill2=Chiudi tutte le sessioni dell'utente.
 ch_rename1=Rename document paths in database.
 ch_rename2=Renames document paths in the current database.
+ch_replace1=Replace document in database.
+ch_replace2=Replaces documents in the current database.
 ch_restore1=Restore database.
 ch_restore2=Restores a database. The argument may include\nthe timestamp of the backup file.
 ch_show1=Mostra l'informazione sul server.

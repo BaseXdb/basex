@@ -353,12 +353,14 @@ pc_created=% にデータベースが作成されました。
 pc_added=Path '%' added in %.
 pc_deleted=% document(s) deleted in %.
 pc_renamed=% document(s) renamed in %.
+pc_replaced=% document(s) replaced in %.
 pc_filenf=ファイル "%" が見付かりませんでした。
 pc_pathnf=ファイル又はディレクトリが見付かりませんでした。
 pc_dbnf=データベース名を入力してください。
 pc_langnf=Language '%' not supported.
 pc_err="%" をパースできませんでした。
 pc_pos=% (%行、)
+pc_direrr="%" points to a directory.
 
 # Database commands
 db_no=データベース '%' が見付かりませんでした。
@@ -553,6 +555,8 @@ ch_kill1=ユーザーセッションの強制切断
 ch_kill2=指定されたユーザーの全てのセッションを切断します。
 ch_rename1=Rename document paths in database.
 ch_rename2=Renames document paths in the current database.
+ch_replace1=Replace documents in database.
+ch_replace2=Replaces documents in the current database.
 ch_restore1=Restore database.
 ch_restore2=Restores a database. The argument may include\nthe timestamp of the backup file.
 ch_show1=サーバー情報の表示

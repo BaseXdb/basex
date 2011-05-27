@@ -353,12 +353,14 @@ pc_created=Cơ sở dữ liệu '%' đã được tạo trong %.
 pc_added=Path '%' added in %.
 pc_deleted=% document(s) deleted in %.
 pc_renamed=% document(s) renamed in %.
+pc_replaced=% document(s) replaced in %.
 pc_filenf=Tệp và thư mục "%" không tìm thấy.
 pc_pathnf=Tệp hay thư mục không tìm thấy.
 pc_dbnf=Xin nhập vào tên cơ sở dữ liệu.
 pc_langnf=Language '%' not supported.
 pc_err="%" không thể phân tích.
 pc_pos="%" (Dòng %)
+pc_direrr="%" points to a directory.
 
 # Database commands
 db_no=Cơ sở dữ liệu '%' không tìm thấy.
@@ -553,6 +555,8 @@ ch_kill1=Kill user sessions.
 ch_kill2=Kills all sessions of the specified user.
 ch_rename1=Rename document paths in database.
 ch_rename2=Renames document paths in the current database.
+ch_replace1=Replace documents in database.
+ch_replace2=Replaces documents in the current database.
 ch_restore1=Restore database.
 ch_restore2=Restores a database. The argument may include\nthe timestamp of the backup file.
 ch_show1=Show server information.

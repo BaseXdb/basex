@@ -353,12 +353,14 @@ pc_created=Base de données '%' créée dans %.
 pc_added=Taille '%' ajouté dans %.
 pc_deleted=% document(s) supprimé dans %.
 pc_renamed=% document(s) renamed in %.
+pc_replaced=% document(s) replaced in %.
 pc_filenf=Fichier ou dossier "%" introuvable.
 pc_pathnf=Fichier ou dossier introuvable.
 pc_dbnf=Entrer un nom de base de données.
 pc_langnf=Language '%' not supported.
 pc_err="%" n'a pu être parsé.
 pc_pos="%" (ligne %)
+pc_direrr="%" points to a directory.
 
 # Commandes Database (Base de données)
 db_no=La base de données '%' est introuvable.
@@ -553,6 +555,8 @@ ch_kill1=Terminer les sessions de l'utilisateur.
 ch_kill2=Termine toutes les sessions de l'utilisateur spécifié.
 ch_rename1=Rename document paths in database.
 ch_rename2=Renames document paths in the current database.
+ch_replace1=Replace documents in database.
+ch_replace2=Replaces documents in the current database.
 ch_restore1=Restore database.
 ch_restore2=Restores a database. The argument may include\nthe timestamp of the backup file.
 ch_show1=Montrer les informations du serveur.

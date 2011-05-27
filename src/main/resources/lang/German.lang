@@ -352,13 +352,15 @@ pc_parse="%" (% Knoten eingelesen)
 pc_created=Datenbank '%' erzeugt (%).
 pc_added=Pfad '%' hinzugefügt (%).
 pc_deleted=% Dokument(e) gelöscht (%).
-pc_renamed=% document(s) renamed in %.
+pc_renamed=% Dokumentpfad(e) umbenannt (%).
+pc_replaced=% Dokument(e) ersetzt (%).
 pc_filenf="%" wurde nicht gefunden.
 pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
 pc_langnf=Sprache '%' wird nicht unterstützt.
 pc_err="%" konnte nicht eingelesen werden.
 pc_pos="%" (Zeile %)
+pc_direrr="%" verweist auf ein Verzeichnis.
 
 # Database commands
 db_no=Die Datenbank '%' wurde nicht gefunden.
@@ -553,6 +555,8 @@ ch_kill1=Beendung der Verbindungen.
 ch_kill2=Beendet alle Verbindungen des angegebenen Benutzers.
 ch_rename1=Umbenennung von Dokumentpfaden.
 ch_rename2=Benennt Dokumentpfade in der geöffneten Datenbank um.
+ch_replace1=Ersetzung von Datenbank-Dokumenten.
+ch_replace2=Ersetzt Dokumente in der geöffneten Datenbank.
 ch_restore1=Wiederherstellung der Datenbank.
 ch_restore2=Stellt eine Datenbank wieder her. Das Argument\nkann den Zeitstempel des Backup-Files beinhalten.
 ch_show1=Anzeige von Server-Information.
