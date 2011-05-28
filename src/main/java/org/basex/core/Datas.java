@@ -15,7 +15,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
-public final class DataPool {
+public final class Datas {
   /** List for data and pins. */
   private final List<PData> list =
     Collections.synchronizedList(new ArrayList<PData>());

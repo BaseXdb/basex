@@ -439,6 +439,7 @@ qu_exec=Query executed in %.
 # Admin Commands
 ad_databases=% opened database(s)
 ad_sessions=% session(s)
+ad_events=% event(s)
 ad_permno=% permission needed.
 ad_perminv=% permission is unknown.
 ad_grant=% granted to '%'.
@@ -454,6 +455,12 @@ ad_passno=No password specified.
 ad_admin=Admin user cannot be modified.
 ad_kill=% sessions killed.
 ad_killself='%' cannot kill itself.
+ad_eventdrop=Event '%' was dropped.
+ad_eventcreate=Event '%' was created.
+ad_eventknown=Event '%' already exists.
+ad_eventno=Event '%' is unknown.
+ad_eventatt=Watching event '%'.
+ad_eventdet=Event '%' unwatched.
 
 # General Commands
 gc_setwhich=Unknown option '%'
@@ -504,11 +511,12 @@ info_browsererror=Failed to open a browser.\nPlease manually open the URL:\n\n%
 # Command Help
 ch_nohelp=Sorry, no help available.
 ch_create1=Create database, index or user.
-ch_create2=Creates a new database, index or user:
+ch_create2=Creates a new database, index, user or event:
 ch_create3=creates the database [%] with an optional [%]
 ch_create4=creates a backup of the database [%]
 ch_create5=creates the specified index
 ch_create8=creates the specified user
+ch_create9=creates the event
 ch_check1=Open or create database.
 ch_check2=Opens an existing database or creates a new instance.
 ch_copy1=Copy database.
@@ -535,6 +543,7 @@ ch_drop21=drops the database
 ch_drop22=drops the specified index
 ch_drop23=drops the specified user (on a database).
 ch_drop24=drops the database backup
+ch_drop25=drops the event
 ch_alter1=Alter database name or user password.
 ch_alter2=Alters the name of a database or the user password:
 ch_alterpw=alters the password of a user.
@@ -565,6 +574,7 @@ ch_show22=shows currently opened databases.
 ch_show23=shows current database sessions.
 ch_show24=shows users (on a database).
 ch_show25=shows backups.
+ch_show26=shows events.
 ch_grant1=Grant user permissions.
 ch_grant2=Grants permissions (on a database) to a user.
 ch_set1=Set global options.
@@ -585,7 +595,7 @@ ch_password2=Changes the user's password.
 ch_help1=Get help on % commands.
 ch_help2=If [%] is specified, information on the specific\ncommand is printed; otherwise, all commands are listed.
 ch_exit1=Exit application.
-ch_exit2=Exits the % console.
+ch_exit2=Exits %.
 
 # Help Texts
 h_hist=Show input history.

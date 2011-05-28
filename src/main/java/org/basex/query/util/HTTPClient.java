@@ -383,11 +383,9 @@ public final class HTTPClient {
     }
     final SerializerProp prop = new SerializerProp(tb.toString());
     final XMLSerializer xml = new XMLSerializer(out, prop);
-    // Serialize each item according to the parameters
+    // Serialize items according to the parameters
     try {
-      for(int i = 0; i < payload.size(); i++) {
-        payload.get(i).serialize(xml);
-      }
+      payload.serialize(xml);
     } finally {
       xml.cls();
     }

@@ -171,8 +171,8 @@ public final class Map extends FItem {
         tb.add(k.toString()).add(":=").add(get(k, null).toString());
       }
       return tb.add(" }").toString();
-    } catch(final QueryException e) {
-      throw Util.notexpected(e);
+    } catch(final QueryException ex) {
+      throw Util.notexpected(ex);
     }
   }
 
@@ -279,8 +279,8 @@ public final class Map extends FItem {
         val.plan(ser);
         ser.closeElement();
       }
-    } catch(final QueryException e) {
-      Util.debug(e);
+    } catch(final QueryException ex) {
+      Util.notexpected(ex);
     }
     ser.closeElement();
   }

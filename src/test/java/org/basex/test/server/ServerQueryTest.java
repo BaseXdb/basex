@@ -345,7 +345,7 @@ public final class ServerQueryTest {
   public void query8() throws BaseXException {
     final int size = 8;
     final ClientQuery[] cqs = new ClientQuery[size];
-    for(int q = 0; q < size; q++) cqs[q] = cs.query(String.valueOf(q));
+    for(int q = 0; q < size; q++) cqs[q] = cs.query(Integer.toString(q));
     for(int q = 0; q < size; q++)
       assertEquals(q, Integer.parseInt(cqs[q].next()));
     for(final ClientQuery cq : cqs) cq.close();

@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Command;
@@ -35,12 +38,19 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class ClientSession extends Session {
+  /** Event notifications. */
+  final Map<String, EventNotifier> notifiers =
+    new HashMap<String, EventNotifier>();
   /** Socket reference. */
   final Socket socket;
   /** Server output. */
   final PrintOutput sout;
   /** Server input. */
   final InputStream sin;
+  /** Socket event reference. */
+  Socket esocket;
+  /** Socket host name. */
+  String ehost;
 
   /**
    * Constructor, specifying the database context and the
@@ -100,7 +110,7 @@ public final class ClientSession extends Session {
       final String pw, final OutputStream output) throws IOException {
 
     super(output);
-
+    ehost = host;
     // 5 seconds timeout
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
@@ -124,7 +134,7 @@ public final class ClientSession extends Session {
   public void create(final String name, final InputStream input)
       throws BaseXException {
     try {
-      sout.write(8);
+      sout.write(ServerCmd.CREATE.code);
       send(name);
       send(input);
     } catch(final IOException ex) {
@@ -136,10 +146,78 @@ public final class ClientSession extends Session {
   public void add(final String name, final String target,
       final InputStream input) throws BaseXException {
     try {
-      sout.write(9);
+      sout.write(ServerCmd.ADD.code);
       send(name);
       send(target);
       send(input);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  /**
+   * Watches an event.
+   * @param name event name
+   * @param notifier event notification
+   * @throws BaseXException exception
+   */
+  public void watch(final String name, final EventNotifier notifier)
+      throws BaseXException {
+
+    try {
+      sout.write(ServerCmd.WATCH.code);
+      send(name);
+      final BufferInput bi = new BufferInput(sin);
+      if(esocket == null) {
+        final int eport = Integer.parseInt(bi.readString());
+        // initialize event socket
+        esocket = new Socket();
+        esocket.connect(new InetSocketAddress(ehost, eport), 5000);
+        final PrintOutput po = PrintOutput.get(esocket.getOutputStream());
+        po.print(bi.readString());
+        po.write(0);
+        po.flush();
+        listen(esocket.getInputStream());
+      }
+      info = bi.readString();
+      if(!ok(bi)) throw new IOException(info);
+      notifiers.put(name, notifier);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  /**
+   * Starts the listener thread.
+   * @param in input stream
+   */
+  private void listen(final InputStream in) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          while(true) {
+            final BufferInput bi = new BufferInput(in);
+            notifiers.get(bi.readString()).notify(bi.readString());
+          }
+        } catch(final Exception ex) { }
+      }
+    }.start();
+  }
+
+  /**
+   * Unwatches an event.
+   * @param name event name
+   * @throws BaseXException exception
+   */
+  public void unwatch(final String name) throws BaseXException {
+    try {
+      sout.write(ServerCmd.UNWATCH.code);
+      send(name);
+      final BufferInput bi = new BufferInput(sin);
+      info = bi.readString();
+      if(!ok(bi)) throw new IOException(info);
+      notifiers.remove(name);
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
@@ -168,6 +246,7 @@ public final class ClientSession extends Session {
   @Override
   public void close() throws IOException {
     send(Cmd.EXIT.toString());
+    if(esocket != null) esocket.close();
     socket.close();
   }
 

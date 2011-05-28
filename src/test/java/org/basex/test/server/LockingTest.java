@@ -1,5 +1,6 @@
 package org.basex.test.server;
 
+import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 import java.io.IOException;
 import org.basex.BaseXServer;
@@ -222,7 +223,7 @@ public final class LockingTest {
    * @throws IOException exception
    */
   static ClientSession newSession() throws IOException {
-    return new ClientSession("localhost", 1984, "admin", "admin");
+    return new ClientSession(server.context, ADMIN, ADMIN);
   }
 
   /**
