@@ -83,7 +83,7 @@ public final class DynFunCall extends Arr {
    * @throws QueryException query exception
    */
   private FItem getFun(final QueryContext ctx) throws QueryException {
-    final Item it = expr[expr.length - 1].item(ctx, input);
+    final Item it = checkItem(expr[expr.length - 1], ctx);
     if(!it.func() || ((FItem) it).arity() != expr.length - 1)
       Err.type(this, FunType.arity(expr.length - 1), it);
     return (FItem) it;

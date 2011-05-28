@@ -476,6 +476,8 @@ public enum FunDef {
   NODEID(FNDb.class, "node-id(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: returns the pre values of database nodes. */
   NODEPRE(FNDb.class, "node-pre(nodes)", ITR_ZM, NOD_ZM),
+  /** Database function: sends result to connected clients. */
+  EVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
 
   /* FNFile functions (EXPath). */
 

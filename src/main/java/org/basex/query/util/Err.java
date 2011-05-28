@@ -34,6 +34,8 @@ public enum Err {
   QUERYNODES(BASX, 7, Text.QUERYNODESERR),
   /** BASX0008: Evaluation exception. */
   EXPSINGLE(BASX, 8, "Database '%' contains more than one document."),
+  /** BASX0009: Evaluation exception. */
+  NOEVENT(BASX, 9, "Event '%' is unknown."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -671,6 +673,8 @@ public enum Err {
   UPEXPECTT(XUST, 2, "Updating expression expected in modify clause."),
   /** XUST0002: Parsing exception. */
   UPEXPECTF(XUST, 2, "Updating expression expected in function declaration."),
+  /** XUST0002: Parsing exception. */
+  UPEXPFUN(XUST, 2, "Updating expression expected in %."),
   /** XUST0003: Parsing exception. */
   DUPLREVAL(XUST, 3, "Duplicate 'revalidation' declaration."),
   /** XUST0026: Parsing exception. */

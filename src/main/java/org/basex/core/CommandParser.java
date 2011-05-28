@@ -23,12 +23,14 @@ import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.CreateBackup;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
+import org.basex.core.cmd.CreateEvent;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Cs;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropBackup;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
+import org.basex.core.cmd.DropEvent;
 import org.basex.core.cmd.DropUser;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Export;
@@ -56,6 +58,7 @@ import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowBackups;
 import org.basex.core.cmd.ShowDatabases;
 import org.basex.core.cmd.ShowSessions;
+import org.basex.core.cmd.ShowEvents;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IOFile;
@@ -152,6 +155,8 @@ public final class CommandParser extends InputParser {
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case USER:
             return new CreateUser(name(cmd), string(null));
+          case EVENT:
+            return new CreateEvent(name(cmd));
         }
         break;
       case COPY:
@@ -208,6 +213,8 @@ public final class CommandParser extends InputParser {
             return new DropUser(glob(cmd), key(ON, null) ? glob(cmd) : null);
           case BACKUP:
             return new DropBackup(glob(cmd));
+          case EVENT:
+            return new DropEvent(name(cmd));
         }
         break;
       case OPTIMIZE:
@@ -264,6 +271,8 @@ public final class CommandParser extends InputParser {
             return new ShowUsers(key(ON, null) ? name(cmd) : null);
           case BACKUPS:
             return new ShowBackups();
+          case EVENTS:
+            return new ShowEvents();
           default:
         }
         break;

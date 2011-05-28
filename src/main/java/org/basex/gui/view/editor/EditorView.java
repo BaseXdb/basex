@@ -118,7 +118,7 @@ public final class EditorView extends View {
     b.add(sp, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
-    tabs = new BaseXTabs(this.gui);
+    tabs = new BaseXTabs(gui);
     tabs.setFocusable(false);
 
     addCreateTab();
