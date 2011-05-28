@@ -279,7 +279,9 @@ public final class CommandParser extends InputParser {
             return new InstallPkg(string(cmd), ctx, new InputInfo(this));
           case REMOVE:
           case LIST:
+          default:
         }
+        break;
       default:
     }
     return null;

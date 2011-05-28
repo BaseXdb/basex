@@ -2,11 +2,9 @@ package org.basex.query.util;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+import static org.basex.query.util.Package.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -25,14 +23,11 @@ import org.basex.util.TokenSet;
  * @author Rositsa Shadura
  */
 public final class PkgValidator {
-
   /** Package descriptor. */
   private static final String PKGDESC = "expath-pkg.xml";
 
   /** Constructor. */
-  private PkgValidator() {
-
-  }
+  private PkgValidator() { }
 
   /**
    * Checks package descriptor and if packages involved in dependencies are
@@ -72,10 +67,7 @@ public final class PkgValidator {
    */
   private static void checkDepends(final Package pkg, final Context ctx,
       final InputInfo ii) throws QueryException {
-    final Iterator<Dependency> depIt = pkg.dep.iterator();
-    Dependency dep;
-    while(depIt.hasNext()) {
-      dep = depIt.next();
+    for(final Dependency dep : pkg.dep) {
       // First check of dependency elements are consistently defined in the
       // descriptor
       if(dep.pkg == null) PKGDESCINV.thrw(ii,
@@ -97,32 +89,25 @@ public final class PkgValidator {
     // Get installed versions of secondary package
     final TokenSet instVers = getInstalledVersions(dep.pkg, ctx);
     if(instVers.size() == 0) return false;
-    final Iterator<byte[]> instIt = instVers.iterator();
     if(dep.versions != null) {
       // Get acceptable versions for secondary package
       final TokenSet accept = getAcceptVersions(dep.versions);
-      final Iterator<byte[]> acceptIt = accept.iterator();
       // Check if any acceptable version is already installed
-      byte[] nextVer = null;
-      while(acceptIt.hasNext()) {
-        nextVer = acceptIt.next();
+      for(final byte[] nextVer : accept)
         if(instVers.id(nextVer) != 0) return true;
-      }
     } else if(dep.semver != null) {
       // Version template - if secondary package is installed, its version must
       // be compatible with the defined template
       final Version semVer = new Version(dep.semver);
-      while(instIt.hasNext()) {
-        if(new Version(instIt.next()).isCompatible(semVer)) return true;
-      }
+      for(final byte[] v : instVers)
+        if(new Version(v).isCompatible(semVer)) return true;
     } else if(dep.semverMin != null && dep.semverMax == null) {
       // Version template for minimal acceptable version - if secondary package
       // is installed, its version must be either compatible with this template
       // or greater than it
       final Version semVer = new Version(dep.semverMin);
-      Version v;
-      while(instIt.hasNext()) {
-        v = new Version(instIt.next());
+      for(final byte[] nextVer : instVers) {
+        final Version v = new Version(nextVer);
         if(v.isCompatible(semVer) || v.compareTo(semVer) >= 0) return true;
       }
     } else if(dep.semverMin == null && dep.semverMax != null) {
@@ -130,9 +115,8 @@ public final class PkgValidator {
       // is installed, its version must be either compatible with this template
       // or smaller than it
       final Version semVer = new Version(dep.semverMax);
-      Version v;
-      while(instIt.hasNext()) {
-        v = new Version(instIt.next());
+      for(final byte[] nextVer : instVers) {
+        final Version v = new Version(nextVer);
         if(v.isCompatible(semVer) || v.compareTo(semVer) <= 0) return true;
       }
     } else if(dep.semverMin != null && dep.semverMax != null) {
@@ -141,9 +125,8 @@ public final class PkgValidator {
       // minimal and strictly below the maximal
       final Version min = new Version(dep.semverMin);
       final Version max = new Version(dep.semverMax);
-      Version v;
-      while(instIt.hasNext()) {
-        v = new Version(instIt.next());
+      for(final byte[] nextVer : instVers) {
+        final Version v = new Version(nextVer);
         if(v.compareTo(min) >= 0 && v.compareTo(max) < 0) return true;
       }
     } else if(dep.versions == null && dep.semver == null
@@ -164,12 +147,8 @@ public final class PkgValidator {
   private static TokenSet getInstalledVersions(final byte[] pkgName,
       final Context ctx) {
     final TokenSet versions = new TokenSet();
-    final Iterator<byte[]> pkgIt = ctx.repo.pkgDict.iterator();
-    byte[] nextPkg;
-    while(pkgIt.hasNext()) {
-      nextPkg = pkgIt.next();
+    for(final byte[] nextPkg : ctx.repo.pkgDict)
       if(startsWith(nextPkg, pkgName)) versions.add(getPkgVersion(nextPkg));
-    }
     return versions;
   }
 
@@ -180,9 +159,8 @@ public final class PkgValidator {
    */
   private static TokenSet getAcceptVersions(final byte[] versions) {
     final TokenSet versList = new TokenSet();
-    for(final byte[] v : split(versions, ' ')) {
+    for(final byte[] v : split(versions, ' '))
       versList.add(v);
-    }
     return versList;
   }
 
@@ -196,16 +174,13 @@ public final class PkgValidator {
    */
   private static void checkComps(final Package pkg, final Context ctx,
       final InputInfo ii) throws QueryException {
-    final Iterator<Component> compIt = pkg.comps.iterator();
-    Component comp;
-    while(compIt.hasNext()) {
-      comp = compIt.next();
+    for(final Component comp : pkg.comps) {
       if(comp.namespace == null) PKGDESCINV.thrw(ii,
           "Component namespace is not specified.");
       else if(comp.file == null) PKGDESCINV.thrw(ii,
           "Component file is not specified");
       if(isInstalled(comp, pkg.uri, ctx, ii)) MODISTALLED.thrw(ii,
-          getCompName(string(comp.file)));
+          comp.getName());
     }
   }
 
@@ -224,61 +199,20 @@ public final class PkgValidator {
       throws QueryException {
     // Get packages in which the module's namespace is found
     final TokenList pkgs = ctx.repo.nsDict.get(comp.namespace);
-    if(pkgs != null) {
-      Iterator<byte[]> pkgsIt = pkgs.iterator();
-      byte[] nextPkg;
-      while(pkgsIt.hasNext()) {
-        nextPkg = pkgsIt.next();
-        if(!eq(getPkgName(nextPkg), pkgName)) {
-          // Installed package is a different one, not just a different version
-          // of the current one
-          byte[] pkgDir = ctx.repo.pkgDict.get(nextPkg);
-          File pkgDesc = new File(ctx.prop.get(Prop.REPOPATH) + Prop.DIRSEP
-              + string(pkgDir) + Prop.DIRSEP + PKGDESC);
-          final IOFile io = new IOFile(pkgDesc);
-          final Package pkg = PackageParser.parse(io, ctx, ii);
-          final Iterator<Component> compIt = pkg.comps.iterator();
-          Component nextComp;
-          while(compIt.hasNext()) {
-            nextComp = compIt.next();
-            if(getCompName(string(nextComp.file)).equals(
-                getCompName(string(comp.file)))) return true;
-          }
-        }
+    if(pkgs == null) return false;
+    for(final byte[] nextPkg : pkgs) {
+      if(!eq(getPkgName(nextPkg), pkgName)) {
+        // Installed package is a different one, not just a different version
+        // of the current one
+        final byte[] pkgDir = ctx.repo.pkgDict.get(nextPkg);
+        final File pkgDesc = new File(ctx.prop.get(Prop.REPOPATH) + Prop.DIRSEP
+            + string(pkgDir) + Prop.DIRSEP + PKGDESC);
+        final IOFile io = new IOFile(pkgDesc);
+        final Package pkg = PackageParser.parse(io, ctx, ii);
+        for(final Component nextComp : pkg.comps)
+          if(nextComp.getName().equals(comp.getName())) return true;
       }
     }
     return false;
-  }
-
-  /**
-   * Extracts package version from unique package name.
-   * @param pkgName unique package name: name-version
-   * @return package version
-   */
-  private static byte[] getPkgVersion(final byte[] pkgName) {
-    final int idx = lastIndexOf(pkgName, '-');
-    if(idx == -1) return null;
-    return subtoken(pkgName, idx + 1, pkgName.length);
-  }
-
-  /**
-   * Extracts package name form unique package name.
-   * @param pkgName unique package name: name-version
-   * @return package name
-   */
-  private static byte[] getPkgName(final byte[] pkgName) {
-    final int idx = lastIndexOf(pkgName, '-');
-    return idx == -1 ? pkgName : subtoken(pkgName, 0, idx);
-  }
-
-  /**
-   * Extracts component's file name from component's path.
-   * @param compPath component's path
-   * @return component's name
-   */
-  private static String getCompName(final String compPath) {
-    final int idx = compPath.lastIndexOf(Prop.DIRSEP);
-    return idx == -1 ? compPath
-        : compPath.substring(idx, compPath.length() - 1);
   }
 }

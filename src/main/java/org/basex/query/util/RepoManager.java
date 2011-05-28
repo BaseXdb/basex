@@ -24,28 +24,20 @@ import org.basex.util.InputInfo;
  * @author Rositsa Shadura
  */
 public final class RepoManager {
-
-  /** Context. */
-  private Context ctx;
-  /** Input info. */
-  private InputInfo ii;
-
-  /**
-   * Constructor.
-   * @param c context
-   * @param input input info
-   */
-  public RepoManager(final Context c, final InputInfo input) {
-    ctx = c;
-    ii = input;
-  }
+  /** Constructor. */
+  private RepoManager() { }
 
   /**
    * Installs a new package.
    * @param path package path
+   * @param ctx context
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public void installPackage(final String path) throws QueryException {
+  public static void installPackage(final String path, final Context ctx,
+      final InputInfo ii) throws QueryException {
+    // Check repository
+    checkRepo(ctx);
     // Check package existence
     final File pkgFile = new File(path);
     if(!pkgFile.exists()) PKGNOTEXIST.thrw(ii);
@@ -56,7 +48,7 @@ public final class RepoManager {
       final Package pkg = PackageParser.parse(
           new IOContent(PackageParser.readPkgDesc(xar, ii)), ctx, ii);
       PkgValidator.check(pkg, ctx, ii);
-      unzip(xar);
+      unzip(xar, ctx);
     } catch(IOException e) {
       throw PKGREADFAIL.thrw(ii);
     }
@@ -65,7 +57,16 @@ public final class RepoManager {
   /**
    * Uninstalls a package.
    */
-  public static void removePackage() {}
+  public static void removePackage() { }
+
+  /**
+   * Checks if repository already exists and if not creates it.
+   * @param ctx context
+   */
+  private static void checkRepo(final Context ctx) {
+    final File repo = new File(ctx.prop.get(Prop.REPOPATH));
+    if(!repo.exists()) repo.mkdir();
+  }
 
   /**
    * Checks if package to be installed is a .xar archive.
@@ -81,35 +82,35 @@ public final class RepoManager {
   /**
    * Unzips a package in the package repository.
    * @param xar package archive
+   * @param ctx context
    */
-  private void unzip(final ZipFile xar) {
+  private static void unzip(final ZipFile xar, final Context ctx) {
     try {
-      String dirPath = ctx.prop.get(Prop.REPOPATH) + Prop.DIRSEP
+      final String dirPath = ctx.prop.get(Prop.REPOPATH) + Prop.DIRSEP
           + extractPkgName(xar.getName());
       new File(dirPath).mkdir();
-      BufferedOutputStream out = null;
-      BufferedInputStream in = null;
-      ZipEntry entry;
-      @SuppressWarnings("rawtypes")
-      Enumeration e = xar.entries();
+      final Enumeration<? extends ZipEntry> e = xar.entries();
       while(e.hasMoreElements()) {
-        entry = (ZipEntry) e.nextElement();
+        final ZipEntry entry = e.nextElement();
         if(entry.isDirectory()) {
           new File(dirPath + Prop.DIRSEP + entry.getName()).mkdir();
         } else {
-          in = new BufferedInputStream(xar.getInputStream(entry));
-          int c;
-          byte[] data = new byte[IO.BLOCKSIZE];
-          File f = new File(dirPath + Prop.DIRSEP + entry.getName());
-          out = new BufferedOutputStream(new FileOutputStream(f), IO.BLOCKSIZE);
-          while((c = in.read(data)) != -1) {
-            out.write(data, 0, c);
+          final BufferedInputStream in = new BufferedInputStream(
+              xar.getInputStream(entry));
+          final File f = new File(dirPath + Prop.DIRSEP + entry.getName());
+          final BufferedOutputStream out = new BufferedOutputStream(
+              new FileOutputStream(f), IO.BLOCKSIZE);
+          try {
+            int c;
+            final byte[] data = new byte[IO.BLOCKSIZE];
+            while((c = in.read(data)) != -1)
+              out.write(data, 0, c);
+          } finally {
+            out.close();
+            in.close();
           }
         }
       }
-      out.flush();
-      out.close();
-      in.close();
     } catch(Exception e) {
       e.printStackTrace();
     }
@@ -120,7 +121,7 @@ public final class RepoManager {
    * @param pkgPath package path
    * @return package name
    */
-  private String extractPkgName(final String pkgPath) {
+  private static String extractPkgName(final String pkgPath) {
     final int idx = pkgPath.lastIndexOf(Prop.DIRSEP);
     return idx == -1 ? pkgPath : pkgPath.substring(idx + 1,
         pkgPath.length() - 4); // 4 for .xar

@@ -10,7 +10,6 @@ import org.basex.util.Token;
  * @author Rositsa Shadura
  */
 public final class Version implements Comparable<Version> {
-
   /** Major version. */
   public int major;
   /** Minor version. */

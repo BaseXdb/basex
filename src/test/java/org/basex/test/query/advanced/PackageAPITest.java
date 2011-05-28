@@ -26,19 +26,15 @@ import org.junit.Test;
  * @author Rositsa Shadura
  */
 public class PackageAPITest {
-
   /** Context. */
   protected static Context ctx;
 
-  /**
-   * Prepare test.
-   */
+  /** Prepare test. */
   @BeforeClass
   public static void setUpBeforeClass() {
     ctx = new Context();
     ctx.prop.set(Prop.REPOPATH, "etc/repo");
-    final Repo repo = new Repo(ctx);
-    ctx.repo = repo;
+    ctx.repo = new Repo(ctx);
   }
 
   /** Tests repository initialization. */
@@ -252,7 +248,7 @@ public class PackageAPITest {
   public void testRepoInstall() throws BaseXException {
     // Try to install non-existing package
     try {
-      new RepoManager(ctx, null).installPackage("etc/pkg");
+      RepoManager.installPackage("etc/pkg", ctx, null);
       fail("Not existing package not detected.");
     } catch(QueryException ex) {
       assertTrue(indexOf(token(ex.getMessage()), token("PACK0001")) != -1);

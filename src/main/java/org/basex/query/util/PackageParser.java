@@ -87,9 +87,8 @@ public final class PackageParser {
    * @return package container
    * @throws QueryException query exception
    */
-  public static Package parse(
-      final IO io, final Context ctx, final InputInfo ii)
-      throws QueryException {
+  public static Package parse(final IO io, final Context ctx,
+      final InputInfo ii) throws QueryException {
     final Package pkg = new Package();
     try {
       final Parser p = Parser.xmlParser(io, ctx.prop, "");
@@ -113,7 +112,6 @@ public final class PackageParser {
    */
   protected static byte[] readPkgDesc(final ZipFile zf, final InputInfo ii)
       throws QueryException {
-
     try {
       final ZipEntry ze = zf.getEntry(PKGDESC);
       if(ze == null) PKGDESCMISS.thrw(ii);
@@ -123,18 +121,15 @@ public final class PackageParser {
         // known size: pre-allocate and fill array
         final byte[] data = new byte[s];
         int c, o = 0;
-        while(s - o != 0 && (c = zis.read(data, o, s - o)) != -1)
-          o += c;
+        while(s - o != 0 && (c = zis.read(data, o, s - o)) != -1) o += c;
         return data;
       }
       // unknown size: use byte list
       final byte[] data = new byte[IO.BLOCKSIZE];
       final ByteList bl = new ByteList();
       int c;
-      while((c = zis.read(data)) != -1)
-        bl.add(data, 0, c);
+      while((c = zis.read(data)) != -1) bl.add(data, 0, c);
       return bl.toArray();
-
     } catch(IOException ex) {
       throw PKGREADFAIL.thrw(ii);
     }
@@ -155,9 +150,6 @@ public final class PackageParser {
       else if(eq(ABBREV, nextName)) p.abbrev = next.atom();
       else if(eq(VERSION, nextName)) p.version = next.atom();
       else if(eq(SPEC, nextName)) p.spec = next.atom();
-      else { // Error?
-      }
-      ;
     }
   }
 
@@ -176,8 +168,6 @@ public final class PackageParser {
       else if(eq(HOME, nextName)) p.home = next.atom();
       else if(eq(DEPEND, nextName)) p.dep.add(parseDependency(next));
       else if(eq(XQUERY, nextName)) p.comps.add(parseComp(next));
-      else { // ?
-      }
     }
   }
 
@@ -199,9 +189,6 @@ public final class PackageParser {
       else if(eq(SEMVER, nextName)) dep.semver = next.atom();
       else if(eq(SEMVERMIN, nextName)) dep.semverMin = next.atom();
       else if(eq(SEMVERMAX, nextName)) dep.semverMax = next.atom();
-      else {
-        // Error?
-      }
     }
     return dep;
   }
@@ -222,11 +209,7 @@ public final class PackageParser {
       if(eq(IMPURI, nextName)) c.importUri = next.atom();
       else if(eq(NSPC, nextName)) c.namespace = next.atom();
       else if(eq(FILE, nextName)) c.file = next.atom();
-      else {
-        // Error?
-      }
     }
     return c;
   }
-
 }

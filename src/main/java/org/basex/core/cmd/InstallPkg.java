@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.basex.core.Command;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.query.QueryException;
 import org.basex.query.util.RepoManager;
 import org.basex.util.InputInfo;
@@ -16,7 +15,6 @@ import org.basex.util.InputInfo;
  * @author Rositsa Shadura
  */
 public final class InstallPkg extends Command {
-
   /** Package to be installed. */
   private String pkg;
   /** Context. */
@@ -39,15 +37,12 @@ public final class InstallPkg extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    RepoManager rm = new RepoManager(ctx, ii);
     try {
-      rm.installPackage(pkg);
+      RepoManager.installPackage(pkg, ctx, ii);
+      return true;
     } catch(QueryException e) {
       error(e.getMessage());
-      e.printStackTrace();
       return false;
     }
-    return true;
   }
-
 }

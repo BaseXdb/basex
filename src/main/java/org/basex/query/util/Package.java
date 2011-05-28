@@ -1,8 +1,11 @@
 package org.basex.query.util;
 
+import static org.basex.util.Token.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.basex.core.Prop;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -11,7 +14,8 @@ import org.basex.util.TokenBuilder;
  * @author Rositsa Shadura
  */
 public final class Package {
-
+  /** Separator between name and version in unique package name. */
+  private static final char NAMESEP = '-';
   /** Package uri. */
   public byte[] uri;
   /** Package short name. */
@@ -34,7 +38,27 @@ public final class Package {
    * @return result
    */
   public byte[] getName() {
-    return new TokenBuilder().add(uri).add('-').add(version).finish();
+    return new TokenBuilder().add(uri).add(NAMESEP).add(version).finish();
+  }
+
+  /**
+   * Extracts package name form unique package name.
+   * @param pkgName unique package name: name-version
+   * @return package name
+   */
+  public static byte[] getPkgName(final byte[] pkgName) {
+    final int idx = lastIndexOf(pkgName, NAMESEP);
+    return idx == -1 ? pkgName : subtoken(pkgName, 0, idx);
+  }
+
+  /**
+   * Extracts package version from unique package name.
+   * @param pkgName unique package name: name-version
+   * @return package version
+   */
+  public static byte[] getPkgVersion(final byte[] pkgName) {
+    final int idx = lastIndexOf(pkgName, NAMESEP);
+    return subtoken(pkgName, idx + 1, pkgName.length);
   }
 
   /**
@@ -71,6 +95,16 @@ public final class Package {
     public byte[] importUri;
     /** Component file. */
     public byte[] file;
-  }
 
+    /**
+     * Extracts component's file name from component's path.
+     * @return component's name
+     */
+    public String getName() {
+      final String compPath = string(file);
+      final int idx = compPath.lastIndexOf(Prop.DIRSEP);
+      return idx == -1 ? compPath : compPath.substring(idx,
+          compPath.length() - 1);
+    }
+  }
 }
