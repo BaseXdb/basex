@@ -212,7 +212,8 @@ public final class JaxRxServer extends BaseXServer {
       } else {
         arg.check(false);
         if(arg.string().equalsIgnoreCase("stop")) {
-          stop(context.prop.num(Prop.SERVERPORT));
+          stop(context.prop.num(Prop.SERVERPORT),
+               context.prop.num(Prop.EVENTPORT));
           return false;
         }
       }
