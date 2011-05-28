@@ -2,6 +2,9 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
+import java.io.IOException;
+
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.cmd.Info;
@@ -9,7 +12,10 @@ import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
 import org.basex.data.Data;
+import org.basex.data.SerializerException;
+import org.basex.data.XMLSerializer;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.io.ArrayOutput;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -27,6 +33,7 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
+import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
 import org.basex.util.InputInfo;
 
@@ -57,7 +64,6 @@ public final class FNDb extends Fun {
       case LIST:     return list(ctx);
       case NODEID:   return node(ctx, true);
       case NODEPRE:  return node(ctx, false);
-      case EVENT:    return event(ctx);
       default:       return super.iter(ctx);
     }
   }
@@ -66,6 +72,7 @@ public final class FNDb extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
+      case EVENT:   return event(ctx);
       case OPENID:  return open(ctx, true);
       case OPENPRE: return open(ctx, false);
       case SYSTEM:  return system(ctx);
@@ -234,29 +241,43 @@ public final class FNDb extends Fun {
     };
   }
 
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.CTX && (def == FunDef.TEXT || def == FunDef.ATTR ||
-        def == FunDef.FULLTEXT) || super.uses(u);
-  }
-
   /**
-   * Sends an event on registered sessions.
+   * Sends an event to the registered sessions.
    * @param ctx query context
    * @return event result
    * @throws QueryException query exception
    */
-  private Iter event(final QueryContext ctx) throws QueryException {
-    String name = expr[0].toString();
-    String msg = "";
-    Value v = expr[1].value(ctx);
-    if(expr.length < 3) {
-      ctx.updating = true;
-      msg = ctx.value(expr[1]).toString();
-    } else {
-      msg = ctx.value(expr[2]).toString();
+  private Item event(final QueryContext ctx) throws QueryException {
+    final byte[] name = checkStr(expr[0], ctx);
+    if(expr.length == 3) expr[2].value(ctx);
+
+    final ArrayOutput ao = new ArrayOutput();
+    try {
+      // run serialization
+      final XMLSerializer xml = new XMLSerializer(ao);
+      final ValueIter ir = expr[1].value(ctx).iter();
+      for(Item it; (it = ir.next()) != null;) it.serialize(xml);
+      xml.close();
+    } catch(final SerializerException ex) {
+      throw new QueryException(input, ex);
+    } catch(final IOException ex) {
+      SERANY.thrw(input, ex);
     }
-    ctx.context.events.notify(ctx.context.session, name, msg);
-    return v.iter();
+    // throw exception if event is unknown
+    if(!ctx.context.events.notify(ctx.context, name, ao.toArray())) {
+      NOEVENT.thrw(input, name);
+    }
+    return null;
+  }
+
+  @Override
+  public boolean vacuous() {
+    return def == FunDef.EVENT;
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.CTX && (def == FunDef.TEXT || def == FunDef.ATTR ||
+        def == FunDef.FULLTEXT || def == FunDef.EVENT) || super.uses(u);
   }
 }

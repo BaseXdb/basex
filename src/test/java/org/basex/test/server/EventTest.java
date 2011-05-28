@@ -1,5 +1,6 @@
 package org.basex.test.server;
 
+import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -8,7 +9,7 @@ import java.util.Arrays;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
-import org.basex.server.EventNotification;
+import org.basex.server.EventNotifier;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -23,49 +24,51 @@ import org.junit.Test;
  * @author Andreas Weiler
  */
 public final class EventTest {
-  /** Event count. */
-  private static final int EVENT_COUNT = 10;
-  /** Event name. */
-  private static final String EVENT_NAME = "event";
   /** Return value of function db:event. */
-  private static final String RETURN_VALUE = "\"event\"";
+  private static final String RETURN = "ABCDEFGHIJKLMNOP";
+  /** Event name. */
+  private static final String NAME = "event";
+  /** Event count. */
+  private static final int EVENT_COUNT = 50;
+  /** Client count. */
+  private static final int CLIENTS = 50;
+
   /** Server reference. */
   private static BaseXServer server;
-  /** Client session. */
-  private static ClientSession cs;
+  /** Admin session. */
+  private static ClientSession session;
   /** Control client sessions. */
-  private static ClientSession[] ccs = new ClientSession[10];
+  private static ClientSession[] sessions = new ClientSession[CLIENTS];
 
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    server = new BaseXServer();
+    server = new BaseXServer("-z");
   }
 
-  /** Starts the server. */
+  /**
+   * Starts the sessions.
+   * @throws Exception exception
+   */
   @Before
-  public void startSessions() {
+  public void startSessions() throws Exception {
+    session = newSession();
+    // drop event, if not done yet
     try {
-      cs = newSession();
-      for(int i = 0; i < ccs.length; i++) {
-        ccs[i] = newSession();
-      }
-    } catch(final IOException ex) {
-      fail(ex.toString());
-    }
+      session.execute("drop event " + NAME);
+    } catch(final BaseXException e) { }
+
+    for(int i = 0; i < sessions.length; i++) sessions[i] = newSession();
   }
 
-  /** Starts the server. */
+  /**
+   * Stops the sessions.
+   * @throws Exception exception
+   */
   @After
-  public void stopSessions() {
-    try {
-      for(int i = 0; i < ccs.length; i++) {
-        ccs[i].close();
-      }
-      cs.close();
-    } catch(final IOException ex) {
-      fail(ex.toString());
-    }
+  public void stopSessions() throws Exception {
+    for(final ClientSession cs : sessions) cs.close();
+    session.close();
   }
 
   /** Stops the server. */
@@ -80,92 +83,81 @@ public final class EventTest {
    */
   @Test
   public void createDrop() throws BaseXException {
+    final String[] events = new String[EVENT_COUNT];
+    for(int i = 0; i < EVENT_COUNT; i++) events[i] = NAME + i;
+    Arrays.sort(events);
 
     // create event
-    for(int i = 1; i < EVENT_COUNT; i++) {
-      cs.execute("create event " + EVENT_NAME + i);
-    }
-    // query must not contain all events
-    String events = cs.execute("show events");
-    String[] eventNames = events.split("\\r?\\n");
-    Arrays.sort(eventNames);
-    for(int i = 1; i < EVENT_COUNT; i++) {
-      assertEquals(EVENT_NAME + i, eventNames[i]);
-    }
+    for(final String e : events) session.execute("create event " + e);
 
-    // drop event
-    for(int i = 1; i < EVENT_COUNT; i++) {
-      cs.execute("drop event " + EVENT_NAME + i);
-    }
+    // query must return all events
+    String result = session.execute("show events");
+    result = result.substring(result.indexOf('\n') + 1);
+    result = result.replaceAll("- ", "");
+
+    // compare events
+    final String[] names = result.split("\\r?\\n");
+    Arrays.sort(names);
+    assertTrue(Arrays.equals(events, names));
+
+    // drop events
+    for(final String e : events) session.execute("drop event " + e);
+
     // query must not return any event
-    events = cs.execute("show events");
-    assertEquals("0", events.substring(0, 1));
+    assertEquals("0 ", session.execute("show events").substring(0, 2));
   }
 
   /**
    * Watches and unwatches events.
+   * @throws Exception exception
    */
   @Test
-  public void watchUnwatch() {
+  public void watchUnwatch() throws Exception {
+    // create event
+    session.execute("create event " + NAME);
     // create event
     try {
-      cs.execute("create event " + EVENT_NAME);
-    } catch(BaseXException e) {
-      fail(e.getMessage());
-    }
-
-    // create event
-    try {
-      cs.execute("create event " + EVENT_NAME);
+      session.execute("create event " + NAME);
       fail("This was supposed to fail.");
-    } catch(BaseXException e) { }
+    } catch(final BaseXException e) { }
 
     // watch an event
-    try {
-      for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].watch(EVENT_NAME, new EventNotification() {
-          @Override
-          public void update(final String data) { }
-        });
-      }
-    } catch(BaseXException e) {
-      fail(e.getMessage());
+    for(final ClientSession cs : sessions) {
+      cs.watch(NAME, new EventNotifier() {
+        @Override
+        public void notify(final String data) { }
+      });
     }
-
-    // watch an event
+    // watch an unknown event
     try {
-      for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].watch(EVENT_NAME + 1, new EventNotification() {
+      for(final ClientSession cs : sessions) {
+        cs.watch(NAME + 1, new EventNotifier() {
           @Override
-          public void update(final String data) { }
+          public void notify(final String data) { }
         });
         fail("This was supposed to fail.");
       }
-    } catch(BaseXException e) { }
+    } catch(final BaseXException e) { }
 
     // unwatch event
-    try {
-      for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].unwatch(EVENT_NAME);
-      }
-    } catch(BaseXException e) {
-      fail(e.getMessage());
+    for(final ClientSession cs : sessions) {
+      cs.unwatch(NAME);
     }
-
-    // unwatch event
+    // unwatch unknown event
     try {
-      for(int i = ccs.length / 2; i < ccs.length; i++) {
-        ccs[i].unwatch(EVENT_NAME + 1);
+      for(final ClientSession cs : sessions) {
+        cs.unwatch(NAME + 1);
         fail("This was supposed to fail.");
       }
-    } catch(BaseXException e) { }
+    } catch(final BaseXException e) { }
 
     // drop the event
+    session.execute("drop event " + NAME);
+    // drop event
     try {
-      cs.execute("drop event " + EVENT_NAME);
-    } catch(BaseXException e) {
-      fail(e.getMessage());
-    }
+      session.execute("drop event " + NAME);
+      fail("This was supposed to fail.");
+    } catch(final BaseXException e) { }
   }
 
   /**
@@ -174,8 +166,25 @@ public final class EventTest {
    */
   @Test
   public void event() throws BaseXException {
-    event(RETURN_VALUE, true);
-    event(null, false);
+    // create the event
+    session.execute("create event " + NAME);
+    // watch event
+    for(final ClientSession cs : sessions) {
+      cs.watch(NAME, new EventNotifier() {
+        @Override
+        public void notify(final String data) {
+          assertEquals(RETURN, data);
+        }
+      });
+    }
+    // fire an event
+    session.query("db:event('" + NAME + "', '" + RETURN + "')").execute();
+
+    // all clients unwatch the events
+    for(final ClientSession cs : sessions) cs.unwatch(NAME);
+
+    // drop event
+    session.execute("drop event " + NAME);
   }
 
   /**
@@ -185,92 +194,43 @@ public final class EventTest {
    */
   @Test
   public void concurrent() throws Exception {
-    concurrent(RETURN_VALUE, true);
-    concurrent(null, false);
-  }
+    // create events
+    session.execute("create event " + NAME);
+    session.execute("create event " + NAME + 1);
 
-  /**
-   * Runs a query command and retrieves the result as string.
-   * @param value return value of event
-   * @param f flag for result type
-   * @throws BaseXException command exception
-   */
-  public void event(final String value, final boolean f) throws BaseXException {
-
-    // create the event
-    cs.execute("create event " + EVENT_NAME);
-    // watch event with half of the clients
-    for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].watch(EVENT_NAME, new EventNotification() {
+    // watch events on all clients
+    for(final ClientSession cs : sessions) {
+      cs.watch(NAME, new EventNotifier() {
         @Override
-        public void update(final String data) {
-          if(f) {
-            assertEquals(value, data);
-          } else {
-            assertEquals("1", data);
-          }
+        public void notify(final String data) {
+          assertEquals(RETURN, data);
+        }
+      });
+      cs.watch(NAME + 1, new EventNotifier() {
+        @Override
+        public void notify(final String data) {
+          assertEquals(RETURN, data);
         }
       });
     }
 
-    // release an event
-    cs.event(EVENT_NAME, "1", value);
+    // fire events
+    final Client[] clients = new Client[CLIENTS];
+    for(int i = 0; i < sessions.length; i++) {
+      clients[i] = new Client(i % 2 == 0, RETURN);
+    }
+    for(final Client c : clients) c.start();
+    for(final Client c : clients) c.join();
 
-    // all clients unwatch the events
-    for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].unwatch(EVENT_NAME);
+    // unwatch events
+    for(final ClientSession cs : sessions) {
+      cs.unwatch(NAME);
+      cs.unwatch(NAME + 1);
     }
 
     // drop event
-    cs.execute("drop event " + EVENT_NAME);
-  }
-
-  /**
-   * Concurrent events.
-   * @param value return value of event
-   * @param f flag for result type
-   * @throws Exception exception
-   */
-  public void concurrent(final String value, final boolean f) throws Exception {
-    // create event.
-    cs.execute("create event " + EVENT_NAME);
-    cs.execute("create event " + EVENT_NAME + 1);
-
-    // watch event with half of the clients
-    for(int i = ccs.length / 2; i < ccs.length; i++) {
-      ccs[i].watch(EVENT_NAME, new EventNotification() {
-        @Override
-        public void update(final String data) {
-          if(f) {
-            assertEquals(value, data);
-          } else {
-            assertEquals("1", data);
-          }
-        }
-      });
-      ccs[i].watch(EVENT_NAME + 1, new EventNotification() {
-        @Override
-        public void update(final String data) {
-          if(f) {
-            assertEquals(value, data);
-          } else {
-            assertEquals("1", data);
-          }
-        }
-      });
-    }
-
-    // concurrent event activation
-    Client c1 = new Client(true, value);
-    Client c2 = new Client(false, value);
-    c1.start();
-    c2.start();
-    c1.join();
-    c2.join();
-
-    // drop event
-    cs.execute("drop event " + EVENT_NAME);
-    cs.execute("drop event " + EVENT_NAME + 1);
+    session.execute("drop event " + NAME);
+    session.execute("drop event " + NAME + 1);
   }
 
   /**
@@ -279,43 +239,38 @@ public final class EventTest {
    * @throws IOException exception
    */
   static ClientSession newSession() throws IOException {
-    return new ClientSession("localhost", 1984, "admin", "admin");
+    return new ClientSession(server.context, ADMIN, ADMIN);
   }
 
   /** Single client. */
-  static final class Client extends Thread {
+  private static final class Client extends Thread {
     /** Client session. */
-    private ClientSession session;
+    private final ClientSession cs;
     /** First event. */
-    private boolean first;
+    private final boolean first;
     /** Event value. */
-    private String value;
+    private final String value;
 
     /**
      * Default constructor.
      * @param f first flag
      * @param v value
+     * @throws IOException I/O exception
      */
-    public Client(final boolean f, final String v) {
-      this.first = f;
-      this.value = v;
-      try {
-        session = newSession();
-      } catch(final IOException ex) {
-        ex.printStackTrace();
-      }
+    public Client(final boolean f, final String v) throws IOException {
+      cs = newSession();
+      first = f;
+      value = v;
     }
 
     @Override
     public void run() {
       try {
-        if(first) {
-          session.event(EVENT_NAME, "1", value);
-        } else {
-          session.event(EVENT_NAME + 1, "1", value);
-        }
-        session.close();
-      } catch(Exception e) {
+        String name = NAME;
+        if(!first) name += 1;
+        cs.query("db:event('" + name + "', '" + value + "')").execute();
+        cs.close();
+      } catch(final Exception e) {
         e.printStackTrace();
       }
     }

@@ -21,7 +21,7 @@ public interface Commands {
   /** Optimize commands. */
   enum CmdOptimize { NULL, ALL }
   /** Show commands. */
-  enum CmdShow { DATABASES, SESSIONS, USERS, BACKUPS, EVENTS}
+  enum CmdShow { DATABASES, SESSIONS, USERS, BACKUPS, EVENTS }
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Set commands. Should be synchronized with {@link Set#STRINGS}. */

@@ -310,7 +310,7 @@ public class CmdTest {
   @Test
   public final void kill() {
     no(new Kill("admin"));
-    ok(new Kill("hans"));
+    no(new Kill("hans"));
   }
 
   /** Command test. */

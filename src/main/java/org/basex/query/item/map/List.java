@@ -216,7 +216,7 @@ final class List extends TrieNode {
           if(eq(keys[i], keys[j], null)) return false;
         }
       }
-    } catch(final QueryException e) {
+    } catch(final QueryException ex) {
       return false;
     }
     return true;

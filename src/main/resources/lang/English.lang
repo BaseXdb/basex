@@ -439,6 +439,7 @@ qu_exec=Query executed in %.
 # Admin Commands
 ad_databases=% opened database(s)
 ad_sessions=% session(s)
+ad_events=% event(s)
 ad_permno=% permission needed.
 ad_perminv=% permission is unknown.
 ad_grant=% granted to '%'.
@@ -454,12 +455,12 @@ ad_passno=No password specified.
 ad_admin=Admin user cannot be modified.
 ad_kill=% sessions killed.
 ad_killself='%' cannot kill itself.
-ad_eventdrop=event '%' dropped.
-ad_eventcreate=event '%' created.
-ad_eventknown=event '%' exists already.
-ad_eventno=event '%' is unknown.
-ad_eventatt=Watch event '%'.
-ad_eventdet=Unwatch event '%'.
+ad_eventdrop=Event '%' was dropped.
+ad_eventcreate=Event '%' was created.
+ad_eventknown=Event '%' already exists.
+ad_eventno=Event '%' is unknown.
+ad_eventatt=Watching event '%'.
+ad_eventdet=Event '%' unwatched.
 
 # General Commands
 gc_setwhich=Unknown option '%'

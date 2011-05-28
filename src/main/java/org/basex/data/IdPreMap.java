@@ -207,7 +207,7 @@ class IntListExt extends IntList {
    * @return index of the found hit or where the key ought to be inserted
    */
   public int sortedLastIndexOf(final int e) {
-    int i = this.sortedIndexOf(e);
+    int i = sortedIndexOf(e);
     if(i >= 0) {
       while(++i < size && list[i] == e);
       return i - 1;

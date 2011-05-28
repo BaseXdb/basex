@@ -195,22 +195,21 @@ public interface Text {
 
   /** Command help. */
   String[] HELPCREATE = {
-    "[" + CmdCreate.DATABASE + "|" + CmdCreate.INDEX + "|" +
-    CmdCreate.USER + "|" + CmdCreate.BACKUP +
-    CmdCreate.EVENT + "] [...]",
+    "[" + CmdCreate.BACKUP + "|" + CmdCreate.DATABASE + "|" + CmdCreate.EVENT +
+    "|" + CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL +
       "  " + lang("ch_create4", C_NAME) + NL +
     LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + C_INPUT + "]):"  + NL +
       "  " + lang("ch_create3", C_NAME, C_INPUT) + NL +
+    LI + CmdCreate.EVENT + " [" + C_NAME + "]: " + NL +
+      "  " + lang("ch_create9") + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]:" + NL +
       "  " + lang("ch_create5") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
-      "  " + lang("ch_create8") + NL +
-    LI + CmdCreate.EVENT + " [" + C_NAME + "]: " + NL +
-      "  " + lang("ch_create9")
+      "  " + lang("ch_create8")
   };
   /** Command help. */
   String[] HELPCOPY = {
@@ -257,24 +256,21 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.DATABASE + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "|"
-    + CmdDrop.EVENT + "] [...]",
+    "[" + CmdDrop.BACKUP + "|" + CmdDrop.DATABASE + "|" + "|" + CmdDrop.EVENT +
+      CmdDrop.INDEX + "|" + CmdDrop.USER + "] [...]",
     lang("ch_drop1"),
     lang("ch_drop2") + NL +
-    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
-      lang("ch_drop24", C_NAME) + NL +
+    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL +
+      "  " + lang("ch_drop24", C_NAME) + NL +
     LI + CmdDrop.DATABASE + " [" + C_NAME + "]:" + NL +
       "  " + lang("ch_drop21") + NL +
+    LI + CmdDrop.EVENT + " [" + C_NAME + "]:" + NL +
+      "  " + lang("ch_drop25", C_NAME) + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
-    LI + CmdDrop.USER + " [" + C_NAME + "] (" +
-    ON + " [databases]): " + NL + "  " +
-      lang("ch_drop23") + NL +
-    LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL + "  " +
-      lang("ch_drop24", C_NAME) + NL +
-    LI + CmdDrop.EVENT + " [" + C_NAME + "]:" + NL + "  " +
-      lang("ch_drop25", C_NAME)
+    LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [database]): " + NL +
+      "  " + lang("ch_drop23")
   };
   /** Command help. */
   String[] HELPEXPORT = {
@@ -320,15 +316,15 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPSHOW = {
-    "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
-    CmdShow.USERS + "|" + CmdShow.BACKUPS + "|" + CmdShow.EVENTS + "]",
+    "[" + CmdShow.BACKUPS + "|" + CmdShow.DATABASES + "|" + CmdShow.EVENTS +
+    "|" + CmdShow.SESSIONS + "|" + CmdShow.USERS + "|" + "]",
     lang("ch_show1"),
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
+    LI + CmdShow.EVENTS + ": " + lang("ch_show26") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
     LI + CmdShow.USERS + " (" + ON + " [database]): " + lang("ch_show24") + NL +
-    LI + CmdShow.BACKUPS + ": " + lang("ch_show25") + NL +
-    LI + CmdShow.EVENTS + ": " + lang("ch_show26")
+    LI + CmdShow.BACKUPS + ": " + lang("ch_show25")
   };
   /** Command help. */
   String[] HELPGRANT = {
@@ -610,6 +606,8 @@ public interface Text {
   String SRVDATABASES = lang("ad_databases");
   /** Show sessions. */
   String SRVSESSIONS = lang("ad_sessions");
+  /** Show events. */
+  String SRVEVENTS = lang("ad_events");
   /** Permission needed. */
   String PERMNO = lang("ad_permno");
   /** Invalid permissions. */
@@ -630,7 +628,7 @@ public interface Text {
   String USERCREATE = lang("ad_usercreate");
   /** Password changed. */
   String USERALTER = lang("ad_useralter");
-  /** User already exists. */
+  /** User unknown. */
   String USERKNOWN = lang("ad_userknown");
   /** No password specified. */
   String PASSNO = lang("ad_passno");

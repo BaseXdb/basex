@@ -172,9 +172,4 @@ public final class FNHof extends Fun {
     return def == FunDef.PARTAPP && u == Use.CTX || u == Use.X30 ||
         super.uses(u);
   }
-
-  @Override
-  public Expr cmp(final QueryContext ctx) throws QueryException {
-    return super.cmp(ctx);
-  }
 }

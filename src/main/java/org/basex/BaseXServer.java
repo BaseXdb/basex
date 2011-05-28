@@ -9,7 +9,6 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Log;
@@ -38,18 +37,19 @@ public class BaseXServer extends Main {
   /** Log. */
   protected Log log;
 
-  /** User query. */
-  private String commands;
-  /** Server socket. */
-  private ServerSocket server;
-  /** Server socket. */
-  ServerSocket tserver;
+  /** Event server socket. */
+  ServerSocket esocket;
   /** Flag for server activity. */
   boolean running;
   /** Stop file. */
   IO stop;
+
   /** EventsListener. */
-  private EventListener el;
+  private final EventListener events = new EventListener();
+  /** Server socket. */
+  private ServerSocket socket;
+  /** User query. */
+  private String commands;
 
   /**
    * Main method, launching the server process. Command-line arguments are
@@ -84,7 +84,8 @@ public class BaseXServer extends Main {
 
       log = new Log(context, quiet);
       log.write(SERVERSTART);
-      server = new ServerSocket(port);
+      socket = new ServerSocket(port);
+      esocket = new ServerSocket(context.prop.num(Prop.EVENTPORT));
       stop = stopFile(port);
 
       // guarantee correct shutdown...
@@ -98,8 +99,7 @@ public class BaseXServer extends Main {
       });
 
       new Thread(this).start();
-      while(!running)
-        Performance.sleep(100);
+      while(!running) Performance.sleep(100);
 
       Util.outln(CONSOLE + (console ? CONSOLE2 : SERVERSTART), SERVERMODE);
 
@@ -112,13 +112,12 @@ public class BaseXServer extends Main {
   }
 
   @Override
-  public final void run() {
+  public void run() {
+    events.start();
     running = true;
-    el = new EventListener();
-    el.start();
     while(running) {
       try {
-        final Socket s = server.accept();
+        final Socket s = socket.accept();
         final ServerProcess sp = new ServerProcess(s, context, log);
         if(stop.exists()) {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
@@ -151,8 +150,8 @@ public class BaseXServer extends Main {
     try {
       // close interactive input if server was stopped by another process
       if(console) System.in.close();
-      tserver.close();
-      server.close();
+      esocket.close();
+      socket.close();
     } catch(final IOException ex) {
       log.write(ex.getMessage());
       Util.stack(ex);
@@ -162,7 +161,7 @@ public class BaseXServer extends Main {
   }
 
   @Override
-  protected final Session session() {
+  protected Session session() {
     if(session == null) session = new LocalSession(context, out);
     return session;
   }
@@ -215,7 +214,7 @@ public class BaseXServer extends Main {
   /**
    * Stops the server of this instance.
    */
-  public final void stop() {
+  public void stop() {
     try {
       stop.write(Token.EMPTY);
       new Socket(LOCALHOST, context.prop.num(Prop.EVENTPORT));
@@ -282,16 +281,15 @@ public class BaseXServer extends Main {
   /**
    * Stops the server.
    * @param port server port
-   * @param tport event port
+   * @param eport event port
    */
-  public static void stop(final int port, final int tport) {
+  public static void stop(final int port, final int eport) {
     final IO stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
-      new Socket(LOCALHOST, tport);
+      new Socket(LOCALHOST, eport);
       new Socket(LOCALHOST, port);
-      while(ping(LOCALHOST, port))
-        Performance.sleep(100);
+      while(ping(LOCALHOST, port)) Performance.sleep(100);
       Util.outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       stop.delete();
@@ -305,38 +303,24 @@ public class BaseXServer extends Main {
    * @author BaseX Team 2005-11, BSD License
    * @author Andreas Weiler
    */
-  private class EventListener extends Thread {
-
-    /**
-     * Constructor.
-     */
-    public EventListener() {
-      try {
-        tserver = new ServerSocket(context.prop.num(Prop.EVENTPORT));
-      } catch(IOException ex) {
-        log.write(ex.getMessage());
-        Util.errln(Util.server(ex));
-      }
-    }
-
+  final class EventListener extends Thread {
     @Override
     public void run() {
       while(running) {
         try {
-          final Socket socket = tserver.accept();
+          final Socket es = esocket.accept();
           if(stop.exists()) {
-            tserver.close();
+            esocket.close();
             break;
           }
-          BufferInput buf = new BufferInput(socket.getInputStream());
-          String id = buf.readString();
-          for(ServerProcess s : context.sessions) {
-            if(String.valueOf(s.getId()).equals(id)) {
-              s.tsocket = socket;
-              s.tout = PrintOutput.get(socket.getOutputStream());
-            }
+          final BufferInput bi = new BufferInput(es.getInputStream());
+          final long id = Long.parseLong(bi.readString());
+          for(final ServerProcess s : context.sessions) {
+            if(s.getId() == id) s.register(es);
           }
-        } catch(IOException e) { break; }
+        } catch(final IOException ex) {
+          break;
+        }
       }
     }
   }

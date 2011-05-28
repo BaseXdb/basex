@@ -38,14 +38,15 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class ClientSession extends Session {
+  /** Event notifications. */
+  final Map<String, EventNotifier> notifiers =
+    new HashMap<String, EventNotifier>();
   /** Socket reference. */
   final Socket socket;
   /** Server output. */
   final PrintOutput sout;
   /** Server input. */
   final InputStream sin;
-  /** Event notifications. */
-  Map<String, EventNotification> en;
   /** Socket event reference. */
   Socket esocket;
   /** Socket host name. */
@@ -133,7 +134,7 @@ public final class ClientSession extends Session {
   public void create(final String name, final InputStream input)
       throws BaseXException {
     try {
-      sout.write(8);
+      sout.write(ServerCmd.CREATE.code);
       send(name);
       send(input);
     } catch(final IOException ex) {
@@ -145,7 +146,7 @@ public final class ClientSession extends Session {
   public void add(final String name, final String target,
       final InputStream input) throws BaseXException {
     try {
-      sout.write(9);
+      sout.write(ServerCmd.ADD.code);
       send(name);
       send(target);
       send(input);
@@ -157,33 +158,32 @@ public final class ClientSession extends Session {
   /**
    * Watches an event.
    * @param name event name
-   * @param notification event notification
+   * @param notifier event notification
    * @throws BaseXException exception
    */
-  public void watch(final String name,
-      final EventNotification notification) throws BaseXException {
+  public void watch(final String name, final EventNotifier notifier)
+      throws BaseXException {
+
     try {
-      sout.write(10);
+      sout.write(ServerCmd.WATCH.code);
       send(name);
       final BufferInput bi = new BufferInput(sin);
       if(esocket == null) {
-        String id = bi.readString();
-        int eport = new Integer(bi.readString()).intValue();
-        // initialize event notifications
-        this.en = new HashMap<String, EventNotification>();
+        final int eport = Integer.parseInt(bi.readString());
+        // initialize event socket
         esocket = new Socket();
         esocket.connect(new InetSocketAddress(ehost, eport), 5000);
-        PrintOutput tout = PrintOutput.get(esocket.getOutputStream());
-        tout.print(id);
-        tout.write(0);
-        tout.flush();
-        startListener(esocket.getInputStream());
+        final PrintOutput po = PrintOutput.get(esocket.getOutputStream());
+        po.print(bi.readString());
+        po.write(0);
+        po.flush();
+        listen(esocket.getInputStream());
       }
       info = bi.readString();
       if(!ok(bi)) throw new IOException(info);
-      en.put(name, notification);
-    } catch(IOException e) {
-      throw new BaseXException(e);
+      notifiers.put(name, notifier);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
     }
   }
 
@@ -191,64 +191,36 @@ public final class ClientSession extends Session {
    * Starts the listener thread.
    * @param in input stream
    */
-  private void startListener(final InputStream in) {
+  private void listen(final InputStream in) {
     new Thread() {
       @Override
       public void run() {
         try {
           while(true) {
-            BufferInput bi = new BufferInput(in);
-            String name = bi.readString();
-            String val = bi.readString();
-            en.get(name).update(val);
+            final BufferInput bi = new BufferInput(in);
+            notifiers.get(bi.readString()).notify(bi.readString());
           }
-        } catch(Exception e) { }
-       }
+        } catch(final Exception ex) { }
+      }
     }.start();
   }
 
   /**
-   * Unwatch an event.
+   * Unwatches an event.
    * @param name event name
    * @throws BaseXException exception
    */
   public void unwatch(final String name) throws BaseXException {
     try {
-      sout.write(11);
+      sout.write(ServerCmd.UNWATCH.code);
       send(name);
       final BufferInput bi = new BufferInput(sin);
       info = bi.readString();
       if(!ok(bi)) throw new IOException(info);
-      en.remove(name);
-    } catch(IOException e) {
-      throw new BaseXException(e);
+      notifiers.remove(name);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
     }
-  }
-
-  /**
-   * Executes queries q1 and q2 and sends result of query q2 to other clients.
-   * @param name event name
-   * @param q1 query string
-   * @param q2 query string
-   * @throws BaseXException exception
-   */
-  public void event(final String name, final String q1,
-      final String q2) throws BaseXException {
-    if(q2 != null) {
-      execute("xquery db:event(" + name + ", " + q1 + ", " + q2 + ")");
-    } else {
-      execute("xquery db:event(" + name + ", " + q1 + ")");
-    }
-  }
-
-  /**
-   * Executes a query and sends result of it to other clients.
-   * @param name event name
-   * @param q1 query to execute
-   * @throws BaseXException exception
-   */
-  public void event(final String name, final String q1) throws BaseXException {
-    event(name, q1, null);
   }
 
   /**

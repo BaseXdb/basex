@@ -31,8 +31,7 @@ abstract class AdvancedQueryTest {
     try {
       return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
     } finally {
-      try { qp.close();
-      } catch(final IOException e) { }
+      try { qp.close(); } catch(final IOException e) { }
     }
   }
 

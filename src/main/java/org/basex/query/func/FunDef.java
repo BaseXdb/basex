@@ -477,7 +477,7 @@ public enum FunDef {
   /** Database function: returns the pre values of database nodes. */
   NODEPRE(FNDb.class, "node-pre(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: sends result to connected clients. */
-  EVENT(FNDb.class, "event(name,string[,string])", ITEM_ZM, 2, STR, STR, STR),
+  EVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
 
   /* FNFile functions (EXPath). */
 
