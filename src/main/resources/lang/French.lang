@@ -454,12 +454,12 @@ ad_passno=Aucun mot de passe specifié.
 ad_admin=L'utilisateur Admin ne peut être modifié.
 ad_kill=% sessions interrompues.
 ad_killself='%' ne peut pas s'auto-interrompre.
-ad_eventdrop=event '%' dropped.
-ad_eventcreate=event '%' created.
-ad_eventknown=event '%' exists already.
-ad_eventno=event '%' is unknown.
-ad_eventatt=Watch event '%'.
-ad_eventdet=Unwatch event '%'.
+ad_eventdrop=Event '%' was dropped.
+ad_eventcreate=Event '%' was created.
+ad_eventknown=Event '%' already exists.
+ad_eventno=Event '%' is unknown.
+ad_eventatt=Watching event '%'.
+ad_eventdet=Event '%' unwatched.
 
 # Commandes générales
 gc_setwhich=Unknown option '%'

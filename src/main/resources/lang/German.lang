@@ -458,8 +458,8 @@ ad_Eventdrop=Event '%' entfernt.
 ad_Eventcreate=Event '%' erzeugt.
 ad_Eventknown=Event '%' existiert schon.
 ad_Eventno=Unbekannter Event '%'.
-ad_Eventatt=Angehängt an Event '%'.
-ad_Eventdet=Getrennt von Event '%'.
+ad_Eventatt=Beobachte Event '%'.
+ad_Eventdet=Von Event '%' abgemeldet.
 
 # General Commands
 gc_setwhich=Unbekannte Option '%'

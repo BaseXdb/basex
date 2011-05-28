@@ -454,12 +454,12 @@ ad_passno=Geen wachtwoord opgegeven.
 ad_admin=Admin gebruiker kan niet gewijzigd worden.
 ad_kill=% sessies gestopt.
 ad_killself='%' kan zichzelf niet stoppen.
-ad_eventdrop=event '%' dropped.
-ad_eventcreate=event '%' created.
-ad_eventknown=event '%' exists already.
-ad_eventno=event '%' is unknown.
-ad_eventatt=Watch event '%'.
-ad_eventdet=Unwatch event '%'.
+ad_eventdrop=Event '%' was dropped.
+ad_eventcreate=Event '%' was created.
+ad_eventknown=Event '%' already exists.
+ad_eventno=Event '%' is unknown.
+ad_eventatt=Watching event '%'.
+ad_eventdet=Event '%' unwatched.
 
 # General Commands
 gc_setwhich=Onbekende optie '%'
