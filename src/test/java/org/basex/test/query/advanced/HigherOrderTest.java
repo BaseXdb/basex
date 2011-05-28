@@ -90,4 +90,14 @@ public class HigherOrderTest extends AdvancedQueryTest {
       assertTrue(e.getMessage(), e.getMessage().contains("XPST0003"));
     }
   }
+
+  /**  Test for empty-sequence() as function item. */
+  @Test
+  public void emptyFunTest() {
+    try {
+      fail("succeeded with: " + query("()()"));
+    } catch(final QueryException e) {
+      assertTrue(e.getMessage(), e.getMessage().contains("XPTY0004"));
+    }
+  }
 }
