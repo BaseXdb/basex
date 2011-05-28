@@ -19,14 +19,17 @@ import org.basex.server.Sessions;
 public final class Context {
   /** Client connections. */
   public final Sessions sessions;
+  /** Event pool. */
+  public final Events events;
   /** Database pool. */
-  public final DataPool datas;
-  /** Trigger pool. */
-  public final TriggerPool triggers;
+  public final Datas datas;
   /** Users. */
   public final Users users;
   /** Database properties. */
   public final Prop prop;
+
+  /** Session reference. */
+  public ServerProcess session;
   /** User reference. */
   public User user;
   /** Current query file. */
@@ -53,8 +56,8 @@ public final class Context {
    */
   public Context() {
     prop = new Prop(true);
-    datas = new DataPool();
-    triggers = new TriggerPool();
+    datas = new Datas();
+    events = new Events();
     sessions = new Sessions();
     lock = new Lock(this);
     users = new Users(true);
@@ -64,12 +67,14 @@ public final class Context {
   /**
    * Constructor. {@link #user} reference must be set after calling this.
    * @param ctx parent context
+   * @param s server process
    */
-  public Context(final Context ctx) {
+  public Context(final Context ctx, final ServerProcess s) {
     prop = new Prop(true);
     datas = ctx.datas;
-    triggers = ctx.triggers;
+    events = ctx.events;
     sessions = ctx.sessions;
+    session = s;
     lock = ctx.lock;
     users = ctx.users;
   }
@@ -211,7 +216,7 @@ public final class Context {
    * @param s session to be removed
    */
   public synchronized void delete(final ServerProcess s) {
-    sessions.delete(s);
+    sessions.remove(s);
   }
 
   /**

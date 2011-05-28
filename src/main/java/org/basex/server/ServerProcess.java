@@ -5,7 +5,9 @@ import static org.basex.util.Token.*;
 import static org.basex.server.ServerCmd.*;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+
 import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
@@ -13,17 +15,18 @@ import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdCreate;
+import org.basex.core.User;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
-import org.basex.data.Data;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
 import org.basex.io.WrapInputStream;
 import org.basex.query.QueryException;
 import org.basex.util.ByteList;
 import org.basex.util.Performance;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -34,17 +37,22 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class ServerProcess extends Thread {
-  /** Active queries. */
+  /** Active query processes. */
   private final HashMap<String, QueryProcess> queries =
     new HashMap<String, QueryProcess>();
-
   /** Database context. */
-  public final Context context;
+  private final Context context;
   /** Socket reference. */
   private final Socket socket;
   /** Log reference. */
   private final Log log;
 
+  /** Socket for events. */
+  private Socket esocket;
+  /** Output for events. */
+  private PrintOutput eout;
+  /** Active events. */
+  private ArrayList<String> events;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
@@ -63,7 +71,7 @@ public final class ServerProcess extends Thread {
    * @param l log reference
    */
   public ServerProcess(final Socket s, final Context c, final Log l) {
-    context = new Context(c);
+    context = new Context(c, this);
     log = l;
     socket = s;
   }
@@ -123,6 +131,14 @@ public final class ServerProcess extends Thread {
           }
           if(sc == ADD) {
             add();
+            continue;
+          }
+          if(sc == WATCH) {
+            watch();
+            continue;
+          }
+          if(sc == UNWATCH) {
+            unwatch();
             continue;
           }
           if(sc != CMD) {
@@ -185,12 +201,8 @@ public final class ServerProcess extends Thread {
 
         // send 0 to mark end of result
         out.write(0);
-        // send {INFO}0
-        out.writeString(info);
-        // send {OK}
-        send(ok);
-
-        log.write(this, ok ? OK : INFOERROR + info, perf);
+        // send info
+        info(ok, info, perf);
       }
       if(!running) log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final IOException ex) {
@@ -201,32 +213,114 @@ public final class ServerProcess extends Thread {
   }
 
   /**
+   * Exits the session.
+   */
+  public void exit() {
+    // close remaining query processes
+    for(final QueryProcess q : queries.values()) {
+      try { q.close(true); } catch(final IOException ex) { }
+    }
+
+    try {
+      // remove this session from all events in pool
+      if(events != null) {
+        esocket.close();
+        for(final String e : events) {
+          final Sessions sess = context.events.get(e);
+          if(sess != null) sess.remove(this);
+        }
+      }
+      new Close().execute(context);
+      if(cmd != null) cmd.stop();
+      context.delete(this);
+      socket.close();
+    } catch(final Exception ex) {
+      log.write(ex.getMessage());
+      Util.stack(ex);
+    }
+  }
+
+  /**
+   * Returns the user of the current process.
+   * @return user reference
+   */
+  public User user() {
+    return context.user;
+  }
+
+  /**
+   * Registers the event socket.
+   * @param s socket
+   * @throws IOException I/O exception
+   */
+  public synchronized void register(final Socket s) throws IOException {
+    esocket = s;
+    eout = PrintOutput.get(s.getOutputStream());
+  }
+
+  /**
+   * Sends a notification.
+   * @param name event name
+   * @param msg event message
+   * @throws IOException I/O exception
+   */
+  public synchronized void notify(final byte[] name, final byte[] msg)
+      throws IOException {
+
+    eout.print(name);
+    eout.write(0);
+    eout.print(msg);
+    eout.write(0);
+    eout.flush();
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder("[");
+    tb.add(socket.getInetAddress().getHostAddress()).add(':');
+    tb.add(socket.getPort());
+    if(context.data != null) tb.add(": ").add(context.data.meta.name);
+    return tb.toString();
+  }
+
+  // PRIVATE METHODS ==========================================================
+
+  /**
    * Creates a database.
    * @throws IOException I/O exception
    */
   private void create() throws IOException {
     final Performance perf = new Performance();
     final String name = in.readString();
-    final String str = ServerCmd.CREATE + " " +
-      CmdCreate.DATABASE + " " + name + " [...]";
-    log.write(this, str);
+    log.write(this, ServerCmd.CREATE + " " +
+        CmdCreate.DATABASE + " " + name + " [...]");
 
     try {
       final WrapInputStream is = new WrapInputStream(in);
       final String info = is.curr() == -1 ?
         CreateDB.xml(name, Parser.emptyParser(), context) :
         CreateDB.xml(name, is, context);
-      // send {MSG}0 and 0 as success flag
-      out.writeString(info);
-      out.write(0);
-      log.write(this, OK, perf);
+      info(true, info, perf);
     } catch(final BaseXException ex) {
-      // send {MSG}0 and 1 as error flag
-      out.writeString(ex.getMessage());
-      out.write(1);
-      log.write(this, INFOERROR + ex.getMessage(), perf);
+      info(false, ex.getMessage(), perf);
     }
-    out.flush();
+  }
+
+  /**
+   * Returns user feedback.
+   * @param ok success flag
+   * @param info information string
+   * @param perf performance reference
+   * @throws IOException I/O exception
+   */
+  private void info(final boolean ok, final String info,
+      final Performance perf) throws IOException {
+
+    // write feedback to log file
+    log.write(this, ok ? OK : INFOERROR + info, perf);
+    // send {MSG}0 and (0|1) as (success|error) flag
+    out.writeString(info);
+    send(ok);
   }
 
   /**
@@ -240,22 +334,56 @@ public final class ServerProcess extends Thread {
     final StringBuilder sb = new StringBuilder(ServerCmd.ADD + " ");
     if(!name.isEmpty()) sb.append(AS + ' ' + name + ' ');
     if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
-    final String str = sb.append("[...]").toString();
-    log.write(this, str);
+    log.write(this, sb.append("[...]"));
 
     try {
       final WrapInputStream is = new WrapInputStream(in);
-      final String info = Add.add(name, path, is, context, null);
-      // send {MSG}0 and 0 as success flag
-      out.writeString(info);
-      out.write(0);
-      log.write(this, OK, perf);
+      info(true, Add.add(name, path, is, context, null), perf);
     } catch(final BaseXException ex) {
-      // send {MSG}0 and 1 as error flag
-      out.writeString(ex.getMessage());
-      out.write(1);
-      log.write(this, INFOERROR + ex.getMessage(), perf);
+      info(false, ex.getMessage(), perf);
     }
+    out.flush();
+  }
+
+  /**
+   * Watch an event.
+   * @throws IOException I/O exception
+   */
+  private void watch() throws IOException {
+    final Performance perf = new Performance();
+    final String name = in.readString();
+
+    // initialize server-based event handling
+    if(events == null) {
+      out.writeString(Integer.toString(context.prop.num(Prop.EVENTPORT)));
+      out.writeString(Long.toString(getId()));
+      events = new ArrayList<String>();
+    }
+
+    final Sessions s = context.events.get(name);
+    final boolean ok = s != null;
+    if(ok) {
+      s.add(this);
+      events.add(name);
+    }
+    info(ok, Util.info(ok ? EVENTWAT : EVENTNO, name), perf);
+  }
+
+  /**
+   * Unwatch an event.
+   * @throws IOException I/O exception
+   */
+  private void unwatch() throws IOException {
+    final Performance perf = new Performance();
+    final String name = in.readString();
+
+    final Sessions s = context.events.get(name);
+    final boolean ok = s != null;
+    if(ok) {
+      s.remove(this);
+      events.remove(name);
+    }
+    info(ok, Util.info(ok ? EVENTUNWAT : EVENTNO, name), perf);
     out.flush();
   }
 
@@ -339,41 +467,5 @@ public final class ServerProcess extends Thread {
   private void send(final boolean ok) throws IOException {
     out.write(ok ? 0 : 1);
     out.flush();
-  }
-
-  /**
-   * Exits the session.
-   */
-  public void exit() {
-    // close remaining query processes
-    for(final QueryProcess q : queries.values()) {
-      try { q.close(true); } catch(final IOException ex) { }
-    }
-
-    try {
-      new Close().execute(context);
-      if(cmd != null) cmd.stop();
-      context.delete(this);
-      socket.close();
-    } catch(final Exception ex) {
-      log.write(ex.getMessage());
-      Util.stack(ex);
-    }
-  }
-
-  /**
-   * Returns session information.
-   * @return database information
-   */
-  String info() {
-    final Data data = context.data;
-    return this + (data != null ? ": " + data.meta.name : "");
-  }
-
-  @Override
-  public String toString() {
-    final String host = socket.getInetAddress().getHostAddress();
-    final int port = socket.getPort();
-    return Util.info("[%:%]", host, port);
   }
 }
