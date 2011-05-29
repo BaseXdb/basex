@@ -381,6 +381,9 @@ public abstract class Builder extends Progress {
 
     // text node processing for statistics
     if(kind == Data.TEXT) tags.index(tagStack[lvl - 1], value);
+    // set leaf node information in index
+    else if(lvl > 1) tags.stat(tagStack[lvl - 1]).leaf = false;
+
     if(meta.pathindex) path.index(0, kind, lvl);
     addText(value, lvl == 0 ? 1 : meta.size - preStack[lvl - 1], kind);
   }

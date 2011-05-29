@@ -83,15 +83,10 @@ public final class ValueBuilder extends IndexBuilder {
     if(csize == 0) {
       write(f, true);
     } else {
-      write(f + csize, false);
+      write(f + csize++, false);
       index = null;
       Performance.gc(1);
-      ++csize;
-
-      final int sz = merge();
-      final DataAccess outL = new DataAccess(data.meta.file(f + 'l'));
-      outL.writeInt(sz);
-      outL.close();
+      merge();
     }
 
     if(text) data.meta.textindex = true;
@@ -103,15 +98,15 @@ public final class ValueBuilder extends IndexBuilder {
 
   /**
    * Merges cached index files.
-   * @return returns number of indexed values
    * @throws IOException I/O exception
    */
-  private int merge() throws IOException {
+  private void merge() throws IOException {
     final String f = text ? DATATXT : DATAATV;
     final DataOutput outL = new DataOutput(data.meta.file(f + 'l'));
     final DataOutput outR = new DataOutput(data.meta.file(f + 'r'));
     outL.write4(0);
 
+    // initialize cached index iterators
     final IntList ml = new IntList();
     final ValueMerger[] vm = new ValueMerger[csize];
     for(int i = 0; i < csize; ++i) vm[i] = new ValueMerger(data, text, i);
@@ -139,7 +134,7 @@ public final class ValueBuilder extends IndexBuilder {
         ml.add(i);
       }
 
-      // parse through all index lists and cache id distances
+      // parse through all indexes and cache id distances
       final int ms = ml.size();
       final ByteList tmp = new ByteList();
       int c = 0;
@@ -169,10 +164,14 @@ public final class ValueBuilder extends IndexBuilder {
       ++sz;
     }
 
-    // close files and return number of entries
+    // close index files
     outR.close();
     outL.close();
-    return sz;
+
+    // write number of entries to first position
+    final DataAccess da = new DataAccess(data.meta.file(f + 'l'));
+    da.writeInt(sz);
+    da.close();
   }
 
   /**
@@ -182,7 +181,7 @@ public final class ValueBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   private void write(final String name, final boolean all) throws IOException {
-    // write positions and references
+    // write id arrays and references
     final DataOutput outL = new DataOutput(data.meta.file(name + 'l'));
     final DataOutput outR = new DataOutput(data.meta.file(name + 'r'));
     outL.write4(index.size());
