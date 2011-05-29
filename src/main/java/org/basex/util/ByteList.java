@@ -29,6 +29,15 @@ public final class ByteList extends ElementList {
   }
 
   /**
+   * Returns the entry at the specified position.
+   * @param p position
+   * @return entry
+   */
+  public byte get(final int p) {
+    return list[p];
+  }
+
+  /**
    * Adds an entry to the array.
    * @param e entry to be added
    * @return self reference
@@ -40,8 +49,8 @@ public final class ByteList extends ElementList {
   }
 
   /**
-   * Adds a byte array to the token.
-   * @param b the character array to be added
+   * Adds a byte array to the container.
+   * @param b the entries to be added
    * @return self reference
    */
   public ByteList add(final byte[] b) {
@@ -49,8 +58,8 @@ public final class ByteList extends ElementList {
   }
 
   /**
-   * Adds a partial byte array to the token.
-   * @param b the character array to be added
+   * Adds a partial byte array to the container.
+   * @param b the entries to be added
    * @param s start position
    * @param e end position
    * @return self reference

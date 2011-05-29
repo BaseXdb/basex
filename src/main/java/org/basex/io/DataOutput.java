@@ -97,7 +97,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified double to the output stream.
+   * Writes the specified double value to the output stream.
    * @param num array to be written
    * @return number of written bytes
    * @throws IOException I/O exception

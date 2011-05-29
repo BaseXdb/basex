@@ -9,10 +9,10 @@ import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
+import org.basex.util.ByteList;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -75,9 +75,9 @@ public final class ValueBuilder extends IndexBuilder {
           Performance.gc(2);
         }
       }
-      // skip too long tokens
-      if(data.kind(pre) == k && data.textLen(pre, text) <= MAXLEN)
-        index.index(data.text(pre, text), pre);
+      // skip too long values
+      if(data.kind(pre) != k || data.textLen(pre, text) > MAXLEN) continue;
+      index.index(data.text(pre, text), pre);
     }
 
     if(csize == 0) {
@@ -103,7 +103,7 @@ public final class ValueBuilder extends IndexBuilder {
 
   /**
    * Merges cached index files.
-   * @return returns number of indexed tokens
+   * @return returns number of indexed values
    * @throws IOException I/O exception
    */
   private int merge() throws IOException {
@@ -112,98 +112,67 @@ public final class ValueBuilder extends IndexBuilder {
     final DataOutput outR = new DataOutput(data.meta.file(f + 'r'));
     outL.write4(0);
 
-    final ValueMerge[] vm = new ValueMerge[csize];
-    for(int i = 0; i < csize; ++i) vm[i] = new ValueMerge(data, text, i);
-
-    int min;
-    int sz = 0;
     final IntList ml = new IntList();
-    while(check(vm)) {
+    final ValueMerger[] vm = new ValueMerger[csize];
+    for(int i = 0; i < csize; ++i) vm[i] = new ValueMerger(data, text, i);
+    int sz = 0;
+
+    // parse through all values
+    while(true) {
       checkStop();
 
-      ++sz;
-      outR.write5(outL.size());
-      min = 0;
+      // find first index with valid entries
+      int min = -1;
+      while(++min < csize && vm[min].pre.length == 0);
+      if(min == csize) break;
+
+      // find index entry with smallest value
       ml.reset();
-      for(int i = 0; i < csize; ++i) {
-        if(min == i || vm[i].pre.length == 0) continue;
-        final int d = diff(vm[min].token, vm[i].token);
-        if(d > 0 || vm[min].pre.length == 0) {
+      for(int i = min; i < csize; ++i) {
+        if(vm[i].pre.length == 0) continue;
+        final int d = diff(vm[min].value, vm[i].value);
+        if(d < 0) continue;
+        if(d > 0) {
           min = i;
           ml.reset();
-        } else if(d == 0 && vm[i].pre.length != 0) {
-          if(ml.size() == 0) ml.add(min);
-          ml.add(i);
         }
+        ml.add(i);
       }
 
+      // parse through all index lists and cache id distances
       final int ms = ml.size();
-      if(ms == 0) {
-        write(outL, vm[min].pre);
-        vm[min].next();
-      } else {
-        final TokenBuilder tb = new TokenBuilder();
-        tb.add(new byte[4]);
-        int opre = 0, npre = 0;
-        for(int j = 0; j < ms; ++j) {
-          final int m = ml.get(j);
-          if(j == 0) {
-            int l = 4;
-            while(l < vm[m].pre.length) {
-              final int diff = Num.read(vm[m].pre, l);
-              opre += diff;
-              l += Num.len(diff);
-            }
-            tb.add(substring(vm[m].pre, 4));
-          } else {
-            npre = Num.read(vm[m].pre, 4);
-            tb.add(Num.num(npre - opre));
-            int l = 4 + Num.len(npre);
-            tb.add(substring(vm[m].pre, l));
-            opre = npre;
-            while(l < vm[m].pre.length) {
-              final int diff = Num.read(vm[m].pre, l);
-              opre += diff;
-              l += Num.len(diff);
-            }
-          }
-          vm[m].next();
+      final ByteList tmp = new ByteList();
+      int c = 0;
+      for(int m = 0, o = 0; m < ms; ++m) {
+        final ValueMerger v = vm[ml.get(m)];
+        final int p = Num.read(v.pre, 4);
+        tmp.add(Num.num(p - o));
+        int l = 4 + Num.len(p);
+        o = p;
+        c++;
+        final int vl = v.pre.length;
+        for(int i = l; i < vl; i++) tmp.add(v.pre[i]);
+        while(l < vl) {
+          final int d = Num.read(v.pre, l);
+          l += Num.len(d);
+          o += d;
+          c++;
         }
-        final byte[] tmp = tb.finish();
-        Num.size(tmp, tmp.length);
-        write(outL, tmp);
+        v.next();
       }
+
+      // write id offset and ids to disk
+      outR.write5(outL.size());
+      outL.writeNum(c);
+      final int is = tmp.size();
+      for(int i = 0; i < is; i++) outL.write(tmp.get(i));
+      ++sz;
     }
+
+    // close files and return number of entries
     outR.close();
     outL.close();
     return sz;
-  }
-
-  /**
-   * Writes the compressed pre value array to disk, preceded by the compressed
-   * number of bytes.
-   * @param outL data output
-   * @param pres pre values
-   * @throws IOException I/O exception
-   */
-  private void write(final DataOutput outL, final byte[] pres)
-      throws IOException {
-
-    final int is = Num.size(pres);
-    int v = 0;
-    for(int ip = 4; ip < is; ip += Num.len(pres, ip)) ++v;
-    outL.writeNum(v);
-    outL.write(pres, 4, is - 4);
-  }
-
-  /**
-   * Checks if any unprocessed pre values are remaining.
-   * @param vm merge value array
-   * @return boolean
-   */
-  private boolean check(final ValueMerge[] vm) {
-    for(final ValueMerge m : vm) if(m.pre.length != 0) return true;
-    return false;
   }
 
   /**
@@ -226,7 +195,8 @@ public final class ValueBuilder extends IndexBuilder {
       final int is = Num.size(pres);
 
       if(all) {
-        // write final structure to disk
+        // write final structure to disk:
+        // number of entries, followed by id distances
         int v = 0;
         for(int ip = 4; ip < is; ip += Num.len(pres, ip)) ++v;
         outL.writeNum(v);
@@ -237,7 +207,8 @@ public final class ValueBuilder extends IndexBuilder {
           o = p;
         }
       } else {
-        // write integer with number of bytes and compressed pre values to disk
+        // write temporary structure to disk as {@link Num} instance
+        // (number of bytes, followed by id distances)
         final byte[] tmp = new byte[4 + is];
         Num.size(tmp, 4);
         for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {

@@ -127,7 +127,7 @@ public final class Compress {
       if((bl.list[cc] & 1 << oo) != 0) x |= 1 << i;
       if(++oo == 8) {
         oo = 0;
-        cc++;
+        ++cc;
       }
     }
     o = oo;
@@ -143,7 +143,7 @@ public final class Compress {
     final boolean b = (bl.list[c] & 1 << o) != 0;
     if(++o == 8) {
       o = 0;
-      c++;
+      ++c;
     }
     return b;
   }

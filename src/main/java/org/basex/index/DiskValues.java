@@ -100,19 +100,16 @@ public final class DiskValues implements Index {
     if(pos == 0) return 0;
     final int numPre =  idxl.readNum(pos);
     cache.add(it.get(), numPre, pos + Num.len(numPre));
-
     return numPre;
   }
 
   /**
-   * Returns next pre values.
+   * Returns next pre values. Called by the {@link ValueBuilder}.
    * @return compressed pre values
    */
   byte[] nextPres() {
-    if(idxr.pos() >= idxr.length()) return EMPTY;
-    final int s = idxl.read4();
-    final long v = idxr.read5(idxr.pos());
-    return idxl.readBytes(v, s);
+    return idxr.pos() >= idxr.length() ? EMPTY :
+      idxl.readBytes(idxr.read5(), idxl.read4());
   }
 
   /**

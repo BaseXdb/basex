@@ -13,7 +13,7 @@ import org.basex.io.IO;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class ValueMerge {
+final class ValueMerger {
   /** Data input reference. */
   private final DataInput di;
   /** File prefix. */
@@ -23,8 +23,8 @@ final class ValueMerge {
   /** Index instance. */
   private final DiskValues v;
 
-  /** Current token. */
-  byte[] token;
+  /** Current value. */
+  byte[] value;
   /** Current id values. */
   byte[] pre;
 
@@ -35,7 +35,7 @@ final class ValueMerge {
    * @param i merge id
    * @throws IOException I/O exception
    */
-  ValueMerge(final Data d, final boolean txt, final int i) throws IOException {
+  ValueMerger(final Data d, final boolean txt, final int i) throws IOException {
     pref = (txt ? DATATXT : DATAATV) + i;
     di = new DataInput(d.meta.file(pref + 't'));
     v = new DiskValues(d, txt, pref);
@@ -44,13 +44,13 @@ final class ValueMerge {
   }
 
   /**
-   * Jumps to the next text.
+   * Jumps to the next value.
    * @throws IOException I/O exception
    */
   void next() throws IOException {
     pre = v.nextPres();
     if(pre.length != 0) {
-      token = di.readBytes();
+      value = di.readBytes();
     } else {
       v.close();
       di.close();

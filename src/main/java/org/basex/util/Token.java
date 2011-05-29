@@ -645,12 +645,14 @@ public final class Token {
    *   positive if first token is bigger
    */
   public static int diff(final byte[] token, final byte[] compare) {
-    final int l = Math.min(token.length, compare.length);
-    for(int i = 0; i != l; ++i) {
+    final int tl = token.length;
+    final int cl = compare.length;
+    final int l = Math.min(tl, cl);
+    for(int i = 0; i < l; ++i) {
       final int c = (token[i] & 0xFF) - (compare[i] & 0xFF);
       if(c != 0) return c;
     }
-    return token.length - compare.length;
+    return tl - cl;
   }
 
   /**
