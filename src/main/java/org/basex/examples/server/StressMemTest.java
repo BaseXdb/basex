@@ -14,12 +14,12 @@ import org.basex.util.Performance;
  */
 public final class StressMemTest {
   /** Number of clients. */
-  private static final int NCLIENTS = 10;
+  private static final int NCLIENTS = 100;
   /** Number of parallel readers. */
-  private static final int PARALLEL = 1;
+  private static final int PARALLEL = 100;
   /** Query to be run ("%" serves as placeholder for dynamic content). */
   private static final String QUERY =
-    "(for $i in 1 to 2000000 order by $i return $i)[1]";
+    "(for $i in 1 to 50000 order by $i return $i)[1]";
 
   /** Server reference. */
   static BaseXServer server;
