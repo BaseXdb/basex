@@ -8,13 +8,13 @@ import org.basex.io.DataOutput;
 import org.basex.util.IntList;
 
 /**
- * This class builds an index for text contents, optimized for fuzzy search,
- * in an ordered table:
+ * <p>This class builds an index for text contents, optimized for fuzzy search,
+ * in an ordered table:</p>
  *
  * <ol>
- * <li> the tokens are collected in main memory (red-black tree)</li>
- * <li> if main memory, the data is written to disk</li>
- * <li> merge disk data</li>
+ * <li> The tokens are indexed in a main-memory tree structure.</li>
+ * <li> If main memory is full, the index is written to disk.</li>
+ * <li> The temporary index instances are merged.</li>
  * </ol>
  *
  * <p>The file format is described in the {@link FTFuzzy} class.</p>
@@ -24,8 +24,8 @@ import org.basex.util.IntList;
  * @author Christian Gruen
  */
 final class FTFuzzyBuilder extends FTBuilder {
-  /** Word parser. */
-  private final ValueFTTrees tree = new ValueFTTrees();
+  /** Value trees. */
+  private final FTIndexTrees tree = new FTIndexTrees();
 
   /**
    * Constructor.
@@ -50,7 +50,7 @@ final class FTFuzzyBuilder extends FTBuilder {
   @Override
   int nrTokens() {
     int l = 0;
-    for(final ValueFTTree t : tree.trees) if(t != null) l += t.size();
+    for(final FTIndexTree t : tree.trees) if(t != null) l += t.size();
     return l;
   }
 
@@ -58,7 +58,7 @@ final class FTFuzzyBuilder extends FTBuilder {
   void calcFreq() {
     tree.init();
     while(tree.more(0)) {
-      final ValueFTTree t = tree.nextTree();
+      final FTIndexTree t = tree.nextTree();
       t.next();
       calcFreq(t.nextPres());
     }
@@ -151,7 +151,7 @@ final class FTFuzzyBuilder extends FTBuilder {
     int j = 0;
     tree.init();
     while(tree.more(cs)) {
-      final ValueFTTree t = tree.nextTree();
+      final FTIndexTree t = tree.nextTree();
       t.next();
       final byte[] key = t.nextTok();
 

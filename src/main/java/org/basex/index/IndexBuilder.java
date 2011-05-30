@@ -23,6 +23,8 @@ public abstract class IndexBuilder extends Progress {
   protected int pre;
   /** Merge flag. */
   protected boolean merge;
+  /** Number of cached index structures. */
+  protected int csize;
 
   /** Runtime for memory consumption. */
   private final Runtime rt = Runtime.getRuntime();

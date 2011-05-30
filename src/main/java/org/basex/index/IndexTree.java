@@ -15,7 +15,7 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-class ValueTree {
+class IndexTree {
   /** Factor for resize. */
   static final double FACTOR = 1.2;
   /** Keys saved in the tree. */

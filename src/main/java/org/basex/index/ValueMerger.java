@@ -14,18 +14,18 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 final class ValueMerger {
-  /** Data input reference. */
-  private final DataInput di;
+  /** Index instance. */
+  private final DiskValues dv;
+  /** Index keys. */
+  private final DataInput dk;
   /** File prefix. */
   private final String pref;
   /** Data reference. */
   private final Data data;
-  /** Index instance. */
-  private final DiskValues v;
 
-  /** Current index key. */
+  /** Current key. */
   byte[] key;
-  /** Current id values. */
+  /** Current values. */
   byte[] values;
 
   /**
@@ -37,8 +37,8 @@ final class ValueMerger {
    */
   ValueMerger(final Data d, final boolean txt, final int i) throws IOException {
     pref = (txt ? DATATXT : DATAATV) + i;
-    di = new DataInput(d.meta.file(pref + 't'));
-    v = new DiskValues(d, txt, pref);
+    dk = new DataInput(d.meta.file(pref + 't'));
+    dv = new DiskValues(d, txt, pref);
     data = d;
     next();
   }
@@ -49,12 +49,12 @@ final class ValueMerger {
    * @throws IOException I/O exception
    */
   void next() throws IOException {
-    values = v.nextValues();
+    values = dv.nextValues();
     if(values.length != 0) {
-      key = di.readBytes();
+      key = dk.readBytes();
     } else {
-      v.close();
-      di.close();
+      dv.close();
+      dk.close();
       DropDB.drop(data.meta.name, pref + '.' + IO.BASEXSUFFIX, data.meta.prop);
     }
   }

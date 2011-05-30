@@ -14,16 +14,15 @@ import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
 /**
- * This class builds an index for text contents in a compressed trie:
+ * <p>This class builds an index for text contents in a compressed trie:</p>
+ *
  * <ol>
- * <li> the tokens are collected in main memory (hash map)</li>
- * <li> if main memory is full, data is written as sorted list to disk</li>
- * <li> merge disk data trough reading sorted lists</li>
- * <li> write sorted list (merged) to disk</li>
- * <li> create final trie structure</li>
+ * <li> The tokens are indexed in a main-memory tree structure.</li>
+ * <li> If main memory is full, data is written as sorted list to disk.</li>
+ * <li> The temporary index instances are merged and written to disk.</li>
  * </ol>
  *
- * The file structure is specified in the {@link FTTrie} class.
+ * <p>The file structure is specified in the {@link FTTrie} class.</p>
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Sebastian Gath

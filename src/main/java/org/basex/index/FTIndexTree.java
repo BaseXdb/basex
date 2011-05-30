@@ -14,7 +14,7 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-final class ValueFTTree extends ValueTree {
+final class FTIndexTree extends IndexTree {
   /** Compressed pre values. */
   private TokenList poss = new TokenList(FACTOR);
   /** Tree structure [left, right, parent]. */

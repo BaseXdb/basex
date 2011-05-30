@@ -15,11 +15,10 @@ import org.basex.util.Performance;
 import org.basex.util.Util;
 
 /**
- * This class builds an index for attribute values and text contents in a
- * tree structure and stores the result to disk.<br/>
+ * <p>This class builds an index for attribute values and text contents in a
+ * tree structure and stores the result to disk.</p>
  *
- * The data is stored on disk in the following format:<br/>
- *
+ * <p>The data is stored on disk in the following format:</p>
  * <ul>
  * <li> {@code DATATXT/ATV + 'l'}: contains the index values, which are dense id
  *   lists to all text nodes/attribute values, stored in the {@link Num} format:
@@ -37,11 +36,9 @@ import org.basex.util.Util;
  */
 public final class ValueBuilder extends IndexBuilder {
   /** Temporary value tree. */
-  private ValueTree index = new ValueTree();
+  private IndexTree index = new IndexTree();
   /** Index type (attributes/texts). */
   private final boolean text;
-  /** Number of cached index structures. */
-  private int csize;
 
   /**
    * Constructor.
@@ -70,7 +67,7 @@ public final class ValueBuilder extends IndexBuilder {
         // check if main memory is exhausted
         if(memFull()) {
           write(f + csize++, false);
-          index = new ValueTree();
+          index = new IndexTree();
           Performance.gc(2);
         }
       }
@@ -79,13 +76,13 @@ public final class ValueBuilder extends IndexBuilder {
       index.index(data.text(pre, text), pre);
     }
 
-    if(csize == 0) {
-      write(f, true);
-    } else {
+    if(merge) {
       write(f + csize++, false);
       index = null;
       Performance.gc(1);
       merge();
+    } else {
+      write(f, true);
     }
 
     if(text) data.meta.textindex = true;

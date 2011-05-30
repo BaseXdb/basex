@@ -45,7 +45,7 @@ public final class Replace extends ACreate {
     for(int d = docs.length - 1; d >= 0; d--) data.delete(docs[d]);
 
     String target = "";
-    int i = path.lastIndexOf('/');
+    final int i = path.lastIndexOf('/');
     if(i != -1) {
       target = path.substring(0, i);
       path = path.substring(i + 1);

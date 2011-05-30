@@ -36,8 +36,6 @@ public abstract class FTBuilder extends IndexBuilder {
   protected final int scm;
   /** Number of indexed tokens. */
   protected long ntok;
-  /** Number of cached index structures. */
-  protected int csize;
 
   /** Document units (all document or text nodes in a document). */
   private final IntList unit = new IntList();
@@ -124,7 +122,7 @@ public abstract class FTBuilder extends IndexBuilder {
         if(tok.length <= MAXLEN && (sw.size() == 0 || sw.id(tok) == 0)) {
           // check if main memory is exhausted
           if((ntok++ & 0xFFF) == 0 && scm == 0 && memFull()) {
-            // currently no frequency support for tfidf based scoring
+            // currently no frequency support for tf/idf based scoring
             writeIndex(csize++);
             Performance.gc(2);
           }
