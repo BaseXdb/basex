@@ -414,13 +414,13 @@ public final class TableDiskAccess extends TableAccess {
     final Buffer bf = bm.current();
     try {
       if(bf.dirty) writeBlock(bf);
+      bf.pos = b;
       if(b >= allBlocks) {
         allBlocks = b + 1;
       } else {
-        file.seek(b * IO.BLOCKSIZE);
+        file.seek(bf.pos * IO.BLOCKSIZE);
         file.readFully(bf.data);
       }
-      bf.pos = b;
     } catch(final IOException ex) {
       Util.stack(ex);
     }

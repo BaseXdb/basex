@@ -208,9 +208,9 @@ public final class DataAccess {
     final Buffer bf = bm.current();
     try {
       if(bf.dirty) writeBlock(bf);
-      file.seek(b);
-      file.readFully(bf.data, 0, (int) Math.min(len - b, IO.BLOCKSIZE));
       bf.pos = b;
+      file.seek(bf.pos);
+      file.readFully(bf.data, 0, (int) Math.min(len - b, IO.BLOCKSIZE));
     } catch(final IOException ex) {
       Util.stack(ex);
     }
