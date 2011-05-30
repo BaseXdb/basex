@@ -34,9 +34,9 @@ final class ValueFTTree extends ValueTree {
    * @param cf current file id
    */
   void index(final byte[] tok, final int pre, final int pos, final int cf) {
-    final int os = tokens.size();
+    final int os = keys.size();
     final int n = index(tok, pre, cf == 0);
-    if(os == tokens.size()) {
+    if(os == keys.size()) {
       final int i = cf > 0 ? maps.get(Num.num(n)) : n;
       if(poss.size() > i && poss.get(i) != null) {
         poss.set(Num.add(poss.get(i), pos), i);
@@ -53,7 +53,7 @@ final class ValueFTTree extends ValueTree {
    */
   void initFT() {
     poss = new TokenList(FACTOR);
-    pres = new TokenList(FACTOR);
+    values = new TokenList(FACTOR);
     numpre = new IntList(FACTOR);
     maps = new TokenIntMap();
   }
@@ -78,7 +78,7 @@ final class ValueFTTree extends ValueTree {
    * @return byte[] next token
    */
   byte[] nextTok() {
-    return tokens.get(lcn);
+    return keys.get(lcn);
   }
 
   /**
@@ -86,7 +86,7 @@ final class ValueFTTree extends ValueTree {
    * @return byte[] compressed pre values
    */
   byte[] nextPres() {
-    return pres.get(pft);
+    return values.get(pft);
   }
 
   /**

@@ -23,10 +23,10 @@ final class ValueMerger {
   /** Index instance. */
   private final DiskValues v;
 
-  /** Current value. */
-  byte[] value;
+  /** Current index key. */
+  byte[] key;
   /** Current id values. */
-  byte[] pre;
+  byte[] values;
 
   /**
    * Constructor.
@@ -44,13 +44,14 @@ final class ValueMerger {
   }
 
   /**
-   * Jumps to the next value.
+   * Jumps to the next value. {@link #values} will have 0 entries if the
+   * end of file is reached.
    * @throws IOException I/O exception
    */
   void next() throws IOException {
-    pre = v.nextPres();
-    if(pre.length != 0) {
-      value = di.readBytes();
+    values = v.nextValues();
+    if(values.length != 0) {
+      key = di.readBytes();
     } else {
       v.close();
       di.close();

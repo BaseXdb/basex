@@ -9,7 +9,6 @@ import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.util.ByteList;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
@@ -24,7 +23,7 @@ import org.basex.util.Util;
  * <ul>
  * <li> {@code DATATXT/ATV + 'l'}: contains the index values, which are dense id
  *   lists to all text nodes/attribute values, stored in the {@link Num} format:
- *   [size0, pre1, pre2, ...]. The number of index keys is stored in the first 4
+ *   [size0, id1, id2, ...]. The number of index keys is stored in the first 4
  *   bytes of the file.</li>
  * <li> {@code DATATXT/ATV + 'r'}: contains 5-byte references to the id lists
  *   for all keys. To save space, the keys itself are not stored in the index
@@ -108,6 +107,7 @@ public final class ValueBuilder extends IndexBuilder {
 
     // initialize cached index iterators
     final IntList ml = new IntList();
+    final IntList il = new IntList();
     final ValueMerger[] vm = new ValueMerger[csize];
     for(int i = 0; i < csize; ++i) vm[i] = new ValueMerger(data, text, i);
     int sz = 0;
@@ -116,16 +116,16 @@ public final class ValueBuilder extends IndexBuilder {
     while(true) {
       checkStop();
 
-      // find first index with valid entries
+      // find first index which is not completely parsed yet
       int min = -1;
-      while(++min < csize && vm[min].pre.length == 0);
+      while(++min < csize && vm[min].values.length == 0);
       if(min == csize) break;
 
-      // find index entry with smallest value
+      // find index entry with smallest key
       ml.reset();
       for(int i = min; i < csize; ++i) {
-        if(vm[i].pre.length == 0) continue;
-        final int d = diff(vm[min].value, vm[i].value);
+        if(vm[i].values.length == 0) continue;
+        final int d = diff(vm[min].key, vm[i].key);
         if(d < 0) continue;
         if(d > 0) {
           min = i;
@@ -134,33 +134,19 @@ public final class ValueBuilder extends IndexBuilder {
         ml.add(i);
       }
 
-      // parse through all indexes and cache id distances
+      // parse through all values, cache and sort id values
       final int ms = ml.size();
-      final ByteList tmp = new ByteList();
-      int c = 0;
-      for(int m = 0, o = 0; m < ms; ++m) {
-        final ValueMerger v = vm[ml.get(m)];
-        final int p = Num.read(v.pre, 4);
-        tmp.add(Num.num(p - o));
-        int l = 4 + Num.len(p);
-        o = p;
-        c++;
-        final int vl = v.pre.length;
-        for(int i = l; i < vl; i++) tmp.add(v.pre[i]);
-        while(l < vl) {
-          final int d = Num.read(v.pre, l);
-          l += Num.len(d);
-          o += d;
-          c++;
+      for(int m = 0; m < ms; ++m) {
+        final ValueMerger t = vm[ml.get(m)];
+        final int vl = t.values.length;
+        for(int l = 4, v; l < vl; l += Num.length(v)) {
+          v = Num.get(t.values, l);
+          il.add(v);
         }
-        v.next();
+        t.next();
       }
-
-      // write id offset and ids to disk
-      outR.write5(outL.size());
-      outL.writeNum(c);
-      final int is = tmp.size();
-      for(int i = 0; i < is; i++) outL.write(tmp.get(i));
+      // write final structure to disk
+      write(outL, outR, il);
       ++sz;
     }
 
@@ -186,36 +172,23 @@ public final class ValueBuilder extends IndexBuilder {
     final DataOutput outR = new DataOutput(data.meta.file(name + 'r'));
     outL.write4(index.size());
 
+    final IntList il = new IntList();
     index.init();
     while(index.more()) {
-      outR.write5(outL.size());
-      final int i = index.next();
-      final byte[] pres = index.pres.get(i);
-      final int is = Num.size(pres);
+      final byte[] values = index.values.get(index.next());
+      final int vs = Num.size(values);
 
       if(all) {
-        // write final structure to disk:
-        // number of entries, followed by id distances
-        int v = 0;
-        for(int ip = 4; ip < is; ip += Num.len(pres, ip)) ++v;
-        outL.writeNum(v);
-
-        for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {
-          final int p = Num.read(pres, ip);
-          outL.writeNum(p - o);
-          o = p;
+        // cache and sort all values
+        for(int ip = 4; ip < vs; ip += Num.length(values, ip)) {
+          il.add(Num.get(values, ip));
         }
+        // write final structure to disk
+        write(outL, outR, il);
       } else {
-        // write temporary structure to disk as {@link Num} instance
-        // (number of bytes, followed by id distances)
-        final byte[] tmp = new byte[4 + is];
-        Num.size(tmp, 4);
-        for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {
-          final int p = Num.read(pres, ip);
-          Num.add(tmp, p - o);
-          o = p;
-        }
-        outL.write(tmp, 0, Num.size(tmp));
+        // write temporary structure to disk: number of entries, absolute values
+        outR.write5(outL.size());
+        outL.write(values, 0, vs);
       }
     }
     outL.close();
@@ -225,9 +198,32 @@ public final class ValueBuilder extends IndexBuilder {
     if(!all) {
       final DataOutput outT = new DataOutput(data.meta.file(name + 't'));
       index.init();
-      while(index.more()) outT.writeToken(index.tokens.get(index.next()));
+      while(index.more()) outT.writeToken(index.keys.get(index.next()));
       outT.close();
     }
+  }
+
+  /**
+   * Writes the final value structure to disk.
+   * @param outL index values
+   * @param outR references
+   * @param il values
+   * @throws IOException I/O exception
+   */
+  private void write(final DataOutput outL, final DataOutput outR,
+      final IntList il) throws IOException {
+
+    // sort values before writing
+    il.sort();
+    final int is = il.size();
+    outR.write5(outL.size());
+    outL.writeNum(is);
+    for(int i = 0, o = 0; i < is; i++) {
+      final int v = il.get(i);
+      outL.writeNum(v - o);
+      o = v;
+    }
+    il.reset();
   }
 
   @Override

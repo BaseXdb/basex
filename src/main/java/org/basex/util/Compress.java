@@ -24,8 +24,8 @@ public final class Compress {
     // initialize compression
     final int tl = txt.length;
     bl.reset();
-    Num.write(bl.list, tl, 0);
-    bl.size = Num.len(tl);
+    Num.set(bl.list, tl, 0);
+    bl.size = Num.length(tl);
     c = 0;
     o = 0;
 
@@ -87,7 +87,7 @@ public final class Compress {
     // initialize decompression
     bl.list = txt;
     bl.size = txt.length;
-    c = Num.len(txt, 0);
+    c = Num.length(txt, 0);
     o = 0;
 
     // read packer bit
@@ -96,7 +96,7 @@ public final class Compress {
     final byte[] unpack = pull() ? UNPACK1 : UNPACK2;
 
     // decompress all characters
-    final int l = Num.read(txt, 0);
+    final int l = Num.get(txt, 0);
     final byte[] res = new byte[l];
     for(int r = 0; r < l; r++) {
       int b = 0;

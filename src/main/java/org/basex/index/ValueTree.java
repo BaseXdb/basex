@@ -8,8 +8,8 @@ import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
- * This class indexes tokens in a balanced binary tree, including their pre
- * values. An iterator returns all compressed pre values in a sorted manner.
+ * This class indexes keys in a balanced binary tree, including their id
+ * values. Iterator methods are available to traverse through the tree.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -18,11 +18,11 @@ import org.basex.util.TokenList;
 class ValueTree {
   /** Factor for resize. */
   static final double FACTOR = 1.2;
-  /** Tokens saved in the tree. */
-  final TokenList tokens = new TokenList(FACTOR);
-  /** Compressed pre values. */
-  TokenList pres = new TokenList(FACTOR);
-  /** Mapping for usage of existing tree. */
+  /** Keys saved in the tree. */
+  final TokenList keys = new TokenList(FACTOR);
+  /** Compressed id values. */
+  TokenList values = new TokenList(FACTOR);
+  /** Mapping for using existing tree. */
   TokenIntMap maps = new TokenIntMap();
   /** Current iterator node. */
   int cn;
@@ -37,44 +37,44 @@ class ValueTree {
   private int ln;
 
   /**
-   * Indexes the specified token and pre value.
-   * @param tok token to be indexed
-   * @param pre pre value for the token
+   * Indexes the specified key and value.
+   * @param key key to be indexed
+   * @param value value to be indexes
    * @return int node
    */
-  final int index(final byte[] tok, final int pre) {
-    return index(tok, pre, true);
+  final int index(final byte[] key, final int value) {
+    return index(key, value, true);
   }
 
   /**
-   * Indexes the specified token and pre value. If the token has already been
-   * indexed, its pre value is added to the existing value array.
+   * Indexes the specified key and value. If the key has already been
+   * indexed, its value is added to the existing value array.
    * Otherwise, a new index entry is created.
-   * @param tok token to be indexed
-   * @param pre pre value for the token
-   * @param f flag for usage of existing index
+   * @param key key to be indexed
+   * @param value value to be indexed
+   * @param exist flag for using existing index
    * @return int node
    */
-  final int index(final byte[] tok, final int pre, final boolean f) {
+  final int index(final byte[] key, final int value, final boolean exist) {
     // index is empty.. create root node
     if(root == -1) {
-      root = n(tok, pre, -1, f);
+      root = n(key, value, -1, exist);
       return root;
     }
 
     int n = root;
     while(true) {
-      final int c = Token.diff(tok, tokens.get(n));
+      final int c = Token.diff(key, keys.get(n));
       if(c == 0) {
-        if(f) {
-          pres.set(Num.add(pres.get(n), pre), n);
+        if(exist) {
+          values.set(Num.add(values.get(n), value), n);
         } else {
           final int i = maps.get(Num.num(n));
           if(i < 0) {
-            maps.add(Num.num(n), pres.size());
-            pres.add(Num.newNum(pre));
+            maps.add(Num.num(n), values.size());
+            values.add(Num.newNum(value));
           } else {
-            pres.set(Num.add(pres.get(i), pre), i);
+            values.set(Num.add(values.get(i), value), i);
           }
         }
         return n;
@@ -83,7 +83,7 @@ class ValueTree {
       if(ch != -1) {
         n = ch;
       } else {
-        ch = n(tok, pre, n, f);
+        ch = n(key, value, n, exist);
         if(c < 0) {
           l(n, ch);
           a(l(n));
@@ -101,7 +101,7 @@ class ValueTree {
    * @return number of entries
    */
   final int size() {
-    return pres.size();
+    return values.size();
   }
 
   /**
@@ -114,8 +114,8 @@ class ValueTree {
   }
 
   /**
-   * Checks if the iterator returns more tokens.
-   * @return true if more tokens exist
+   * Checks if the iterator returns more keys.
+   * @return true if more keys exist
    */
   final boolean more() {
     return cn != -1;
@@ -123,7 +123,7 @@ class ValueTree {
 
   /**
    * Returns the next pointer.
-   * @return next iterator token
+   * @return next pointer
    */
   final int next() {
     ln = cn;
@@ -145,21 +145,21 @@ class ValueTree {
 
   /**
    * Creates a new node.
-   * @param tok token of the node
-   * @param pre pre value of the node
-   * @param pa pointer on parent node
-   * @param f flag for usage of existing tree
+   * @param key node key
+   * @param value node value
+   * @param par pointer on parent node
+   * @param exist flag for reusing existing tree
    * @return pointer of the new node
    */
-  private int n(final byte[] tok, final int pre, final int pa,
-      final boolean f) {
+  private int n(final byte[] key, final int value, final int par,
+      final boolean exist) {
     tree.add(-1); // left node
     tree.add(-1); // right node
-    tree.add(pa); // parent node
+    tree.add(par); // parent node
     mod.add(false);
-    tokens.add(tok);
-    pres.add(Num.newNum(pre));
-    if(!f) maps.add(Num.num(tokens.size() - 1), pres.size() - 1);
+    keys.add(key);
+    values.add(Num.newNum(value));
+    if(!exist) maps.add(Num.num(keys.size() - 1), values.size() - 1);
     return mod.size() - 1;
   }
 

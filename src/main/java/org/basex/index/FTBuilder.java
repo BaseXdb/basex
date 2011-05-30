@@ -160,8 +160,8 @@ public abstract class FTBuilder extends IndexBuilder {
    */
   protected final void calcFreq(final byte[] vpre) {
     int np = 4;
-    int nl = Num.len(vpre, np);
-    int p = Num.read(vpre, np);
+    int nl = Num.length(vpre, np);
+    int p = Num.get(vpre, np);
     final int ns = Num.size(vpre);
     while(np < ns) {
       int u = unit.sortedIndexOf(p);
@@ -172,8 +172,8 @@ public abstract class FTBuilder extends IndexBuilder {
         ++fr;
         np += nl;
         if(np >= ns) break;
-        p = Num.read(vpre, np);
-        nl = Num.len(vpre, np);
+        p = Num.get(vpre, np);
+        nl = Num.length(vpre, np);
       } while(scm == 1 && (u == unit.size() || p < unit.get(u)) ||
           scm == 2 && p == unit.get(u));
 
@@ -241,7 +241,7 @@ public abstract class FTBuilder extends IndexBuilder {
     final int ns = Num.size(vpre);
     while(np < ns) {
       if(scm > 0) {
-        final int p = Num.read(vpre, np);
+        final int p = Num.get(vpre, np);
         if(lp != p) {
           // new pre value: find document root
           int u = unit.sortedIndexOf(p);
@@ -262,9 +262,9 @@ public abstract class FTBuilder extends IndexBuilder {
 
       // full-text data is stored here, with -scoreU, pre1, pos1, ...,
       // -scoreU, preU, posU
-      for(final int l = np + Num.len(vpre, np); np < l; ++np)
+      for(final int l = np + Num.length(vpre, np); np < l; ++np)
         out.write(vpre[np]);
-      for(final int l = pp + Num.len(vpos, pp); pp < l; ++pp)
+      for(final int l = pp + Num.length(vpos, pp); pp < l; ++pp)
         out.write(vpos[pp]);
     }
     ++token;

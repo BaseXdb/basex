@@ -13,7 +13,8 @@ import org.basex.util.TokenBuilder;
 
 /**
  * This class provides access to attribute values and text contents
- * stored on disk.
+ * stored on disk. The data structure is described in the {@link ValueBuilder}
+ * class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -98,23 +99,23 @@ public final class DiskValues implements Index {
 
     final long pos = get(tok);
     if(pos == 0) return 0;
-    final int numPre =  idxl.readNum(pos);
-    cache.add(it.get(), numPre, pos + Num.len(numPre));
-    return numPre;
+    final int nr =  idxl.readNum(pos);
+    cache.add(it.get(), nr, pos + Num.length(nr));
+    return nr;
   }
 
   /**
-   * Returns next pre values. Called by the {@link ValueBuilder}.
-   * @return compressed pre values
+   * Returns next values. Called by the {@link ValueBuilder}.
+   * @return compressed values
    */
-  byte[] nextPres() {
+  byte[] nextValues() {
     return idxr.pos() >= idxr.length() ? EMPTY :
       idxl.readBytes(idxr.read5(), idxl.read4());
   }
 
   /**
    * Iterator method.
-   * @param s number of pre values
+   * @param s number of values
    * @param ps offset
    * @return iterator
    */

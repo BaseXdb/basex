@@ -3,11 +3,12 @@ package org.basex.util;
 import java.util.Arrays;
 
 /**
- * This class provides operations to compress and decompress 4-byte integer
- * values in byte arrays to save memory.<br/>
+ * <p>This class provides operations to compress and decompress 4-byte integer
+ * values in byte arrays in order to save memory.</p>
  *
- * The first two bits of a {@code Num} array indicate the range of the
- * compressed number:
+ * <p>The first two bits of a {@code Num} array indicate the range of the
+ * compressed number:</p>
+ *
  * <ul>
  * <li>{@code 00}: the number (0x00-0x3F) is encoded in the remaining 6 bits of
  * the current byte</li>
@@ -30,53 +31,53 @@ public final class Num {
 
   /**
    * Creates a new number array, in which the first four bytes contain
-   * the array size.
-   * @param val initial value to be stored
+   * the number of occupied bytes.
+   * @param value initial value to be compressed and stored
    * @return new number array
    */
-  public static byte[] newNum(final int val) {
-    final int len = len(val);
+  public static byte[] newNum(final int value) {
+    final int len = length(value);
     final byte[] array = new byte[4 + len];
-    write(array, val, 4, len);
+    set(array, value, 4, len);
     size(array, 4 + len);
     return array;
   }
 
   /**
-   * Creates an array with the specified number.
-   * @param val initial value to be stored
+   * Creates a compressed representation of the specified value.
+   * @param value value to be compressed
    * @return new number array
    */
-  public static byte[] num(final int val) {
-    final int len = len(val);
+  public static byte[] num(final int value) {
+    final int len = length(value);
     final byte[] array = new byte[len];
-    write(array, val, 0, len);
+    set(array, value, 0, len);
     return array;
   }
 
   /**
-   * Compresses and writes an integer value to the specified array and
-   * returns the array.
-   * @param array array
-   * @param val value to be written
-   * @return new array
+   * Compresses and adds a value to the specified array and
+   * returns the resulting array.
+   * @param array input array
+   * @param value value to be added
+   * @return resulting array (may be the same as input array)
    */
-  public static byte[] add(final byte[] array, final int val) {
-    final int len = len(val);
+  public static byte[] add(final byte[] array, final int value) {
+    final int len = length(value);
     final int pos = size(array);
     final byte[] tmp = check(array, pos, len);
-    write(tmp, val, pos, len);
+    set(tmp, value, pos, len);
     size(tmp, pos + len);
     return tmp;
   }
 
   /**
-   * Reads and decompresses an integer value from the specified byte array.
+   * Decompresses and returns a value from the specified byte array.
    * @param array array
-   * @param pos position to parse
+   * @param pos position where the value is found
    * @return decompressed value
    */
-  public static int read(final byte[] array, final int pos) {
+  public static int get(final byte[] array, final int pos) {
     int p = pos;
     final int v = array[p++] & 0xFF;
     switch((v & 0xC0) >>> 6) {
@@ -90,18 +91,19 @@ public final class Num {
   }
 
   /**
-   * Compresses and writes an integer value to the specified byte array.
+   * Compresses and stores an integer value to the specified byte array.
    * @param array array
-   * @param v value to be written
-   * @param p position
+   * @param value value to be stored
+   * @param pos position where the value is to be stored
    */
-  public static void write(final byte[] array, final int v, final int p) {
-    write(array, v, p, len(v));
+  public static void set(final byte[] array, final int value, final int pos) {
+    set(array, value, pos, length(value));
   }
 
   /**
-   * Returns the length of the specified array, stored in the first four bytes.
-   * @param array array to be evaluated
+   * Returns the length value of the specified array, stored in the first
+   * four bytes.
+   * @param array input array
    * @return array length
    */
   public static int size(final byte[] array) {
@@ -110,25 +112,26 @@ public final class Num {
   }
 
   /**
-   * Writes the specified length in the first bytes of the specified array.
-   * @param array array
-   * @param len length to be written
+   * Stores the specified length value in the first bytes of the
+   * specified array.
+   * @param array input array
+   * @param length length to be stored
    */
-  public static void size(final byte[] array, final int len) {
-    array[0] = (byte) (len >>> 24);
-    array[1] = (byte) (len >>> 16);
-    array[2] = (byte) (len >>> 8);
-    array[3] = (byte) len;
+  public static void size(final byte[] array, final int length) {
+    array[0] = (byte) (length >>> 24);
+    array[1] = (byte) (length >>> 16);
+    array[2] = (byte) (length >>> 8);
+    array[3] = (byte) length;
   }
 
   /**
-   * Returns integer length.
+   * Returns the compressed length of the value at the specified position.
    * @param array array
-   * @param val integer value
+   * @param pos position where the value is found
    * @return value length
    */
-  public static int len(final byte[] array, final int val) {
-    final int v = (array[val] & 0xFF) >>> 6;
+  public static int length(final byte[] array, final int pos) {
+    final int v = (array[pos] & 0xFF) >>> 6;
     return v == 0 ? 1 : v == 1 ? 2 : v == 2 ? 4 : 5;
   }
 
@@ -137,46 +140,47 @@ public final class Num {
    * @param v integer value
    * @return value length
    */
-  public static int len(final int v) {
+  public static int length(final int v) {
     return v < 0 || v > 0x3FFFFFFF ? 5 : v > 0x3FFF ? 4 : v > 0x3F ? 2 : 1;
   }
 
   // PRIVATE STATIC METHODS ===================================================
 
   /**
-   * Resizes the specified array by 12,5%.
-   * @param tmp array to be resized
-   * @param pos current array position
-   * @param len length of new entry
+   * Resizes the specified array if no space is left.
+   * @param a array to be resized
+   * @param p current array position
+   * @param l length of new entry
    * @return new array
    */
-  private static byte[] check(final byte[] tmp, final int pos, final int len) {
-    final int s = tmp.length;
-    return pos + len < s ? tmp : Arrays.copyOf(tmp, s + Math.max(len, s >> 3));
+  private static byte[] check(final byte[] a, final int p, final int l) {
+    final int s = a.length;
+    return p + l < s ? a : Arrays.copyOf(a, s + Math.max(l, s >> 3));
   }
 
   /**
    * Compresses and writes an integer value to the specified byte array.
-   * @param array array
+   * @param a array
    * @param v value to be written
    * @param p position
    * @param l value length
    */
-  private static void write(final byte[] array, final int v, final int p,
+  private static void set(final byte[] a, final int v, final int p,
       final int l) {
+
     int i = p;
     if(l == 5) {
-      array[i++] = (byte) 0xC0;
-      array[i++] = (byte) (v >>> 24);
-      array[i++] = (byte) (v >>> 16);
-      array[i++] = (byte) (v >>> 8);
+      a[i++] = (byte) 0xC0;
+      a[i++] = (byte) (v >>> 24);
+      a[i++] = (byte) (v >>> 16);
+      a[i++] = (byte) (v >>> 8);
     } else if(l == 4) {
-      array[i++] = (byte) (v >>> 24 | 0x80);
-      array[i++] = (byte) (v >>> 16);
-      array[i++] = (byte) (v >>> 8);
+      a[i++] = (byte) (v >>> 24 | 0x80);
+      a[i++] = (byte) (v >>> 16);
+      a[i++] = (byte) (v >>> 8);
     } else if(l == 2) {
-      array[i++] = (byte) (v >>> 8 | 0x40);
+      a[i++] = (byte) (v >>> 8 | 0x40);
     }
-    array[i++] = (byte) v;
+    a[i++] = (byte) v;
   }
 }
