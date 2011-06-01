@@ -94,7 +94,7 @@ public final class RepoManager {
         final OutputStream out = new FileOutputStream(f);
         try {
           final byte[] data = new byte[IO.BLOCKSIZE];
-          for(int c; (c = in.read()) != -1;) out.write(data, 0, c);
+          for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
         } finally {
           out.close();
           in.close();
@@ -129,8 +129,7 @@ public final class RepoManager {
    * @return package name
    */
   private static String extractPkgName(final String path) {
-    final int idx = path.lastIndexOf(File.separator);
-    return idx == -1 ? path : path.substring(idx + 1,
-        path.length() - IO.XARSUFFIX.length());
+    final int i = path.lastIndexOf(File.separator);
+    return path.substring(i + 1, path.length() - IO.XARSUFFIX.length());
   }
 }
