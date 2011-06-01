@@ -55,11 +55,11 @@ interface PkgText {
   byte[] FILE = token("file");
 
   /** Not expected initialization error. */
-  String NOTEXP = "Missing package descriptor for package '%'.";
+  String NOTEXP = "Missing package descriptor for package '%'";
   /** Attribute missing. */
-  String MISSATTR = "Mandatory attribute '%' is missing.";
+  String MISSATTR = "'%' attribute missing in 'package' element";
   /** Secondary package missing. */
-  String MISSSECOND = "Name of secondary package is missing";
+  String MISSSECOND = "Name of secondary package missing";
   /** Component missing. */
-  String MISSCOMP = "Component '%' is not specified.";
+  String MISSCOMP = "Component '%' not specified";
 }

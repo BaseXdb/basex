@@ -7,7 +7,6 @@ import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.IndexIterator;
-import org.basex.index.IndexToken;
 import org.basex.index.RangeToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -17,6 +16,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This index class retrieves range values from the index.
@@ -26,7 +26,7 @@ import org.basex.util.Token;
  */
 public final class RangeAccess extends Simple {
   /** Index type. */
-  final IndexToken ind;
+  final RangeToken ind;
   /** Index context. */
   final IndexContext ictx;
 
@@ -36,7 +36,7 @@ public final class RangeAccess extends Simple {
    * @param t index reference
    * @param ic index context
    */
-  RangeAccess(final InputInfo ii, final IndexToken t, final IndexContext ic) {
+  RangeAccess(final InputInfo ii, final RangeToken t, final IndexContext ic) {
     super(ii);
     ind = t;
     ictx = ic;
@@ -64,16 +64,15 @@ public final class RangeAccess extends Simple {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    final RangeToken rt = (RangeToken) ind;
     ser.emptyElement(this, DATA, token(ictx.data.meta.name),
-        MIN, Token.token(rt.min), MAX, Token.token(rt.max),
-        TYP, Token.token(rt.ind.toString()));
+        MIN, Token.token(ind.min), MAX, Token.token(ind.max),
+        TYP, Token.token(ind.ind.toString()));
   }
 
   @Override
   public String toString() {
-    final RangeToken rt = (RangeToken) ind;
-    return name() + PAR1 + "\"" + ictx.data.meta.name + "\"" + SEP +
-      rt.min + "-" + rt.max + SEP + rt.ind + PAR2;
+    return new TokenBuilder("db:open(\"").add(ictx.data.meta.name).
+      add("\")/db:range(").addExt(ind.min).add(SEP).addExt(ind.max).
+      add(SEP).addExt(ind.ind).add(')').toString();
   }
 }

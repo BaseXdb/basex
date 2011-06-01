@@ -146,7 +146,7 @@ public enum Err {
   /** PACK0003: Evaluation exception. */
   PKGNOTINSTALLED(PACK, 3, "Necessary package % is not installed. "),
   /** PACK0004: Evaluation exception. */
-  PKGDESCINV(PACK, 4, "Invalid package descriptor: %. "),
+  PKGDESCINV(PACK, 4, "Package descriptor: %. "),
   /** PACK0005: Evaluation exception. */
   INVPKGNAME(PACK, 5, "Package must be a .xar file. "),
   /** PACK0006: Evaluation exception. */

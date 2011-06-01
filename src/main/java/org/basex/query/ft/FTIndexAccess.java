@@ -99,7 +99,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    return new TokenBuilder("db:open(\"").add(ictx.data.meta.name).
-      add("\")/db:fulltext(").addExt(ftexpr).add(')').toString();
+    return new TokenBuilder("db:open('").add(ictx.data.meta.name).
+      add("')/db:fulltext(").addExt(ftexpr).add(')').toString();
   }
 }

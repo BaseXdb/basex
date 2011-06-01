@@ -141,8 +141,8 @@ public final class IndexAccess extends Single {
 
   @Override
   public String toString() {
-    return new TokenBuilder("db:open(\"").add(ictx.data.meta.name).
-    add("\")/db:").addExt(itype.toString().toLowerCase()).
-      add('(').addExt(expr).add(')').toString();
+    return new TokenBuilder("db:open('").add(ictx.data.meta.name).
+      add("')/db:").addExt(itype.toString().toLowerCase()).
+      add(PAR1).addExt(expr).add(PAR2).toString();
   }
 }

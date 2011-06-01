@@ -16,6 +16,7 @@ import org.basex.query.util.repo.Package.Dependency;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenList;
 import org.basex.util.TokenSet;
+import org.basex.util.Util;
 
 /**
  * Package validator. This class executes some essential checks before
@@ -47,10 +48,14 @@ public final class PkgValidator {
       throws QueryException {
 
     // Check mandatory attributes
-    if(pkg.uri == null) PKGDESCINV.thrw(ii, MISSATTR, "name");
-    else if(pkg.abbrev == null) PKGDESCINV.thrw(ii, MISSATTR, "abbrev");
-    else if(pkg.version == null) PKGDESCINV.thrw(ii, MISSATTR, "version");
-    else if(pkg.spec == null) PKGDESCINV.thrw(ii, MISSATTR, "spec");
+    if(pkg.uri == null)
+      PKGDESCINV.thrw(ii, Util.info(MISSATTR, "name"));
+    else if(pkg.abbrev == null)
+      PKGDESCINV.thrw(ii, Util.info(MISSATTR, "abbrev"));
+    else if(pkg.version == null)
+      PKGDESCINV.thrw(ii, Util.info(MISSATTR, "version"));
+    else if(pkg.spec == null)
+      PKGDESCINV.thrw(ii, Util.info(MISSATTR, "spec"));
 
     // Check if package is already installed
     if(context.repo.pkgDict.get(pkg.getName()) != null) PKGINSTALLED.thrw(ii);
@@ -173,9 +178,12 @@ public final class PkgValidator {
       throws QueryException {
 
     for(final Component comp : pkg.comps) {
-      if(comp.namespace == null) PKGDESCINV.thrw(ii, MISSCOMP, "namespace");
-      else if(comp.file == null) PKGDESCINV.thrw(ii, MISSCOMP, "file");
-      if(isInstalled(comp, pkg.uri, ii)) MODISTALLED.thrw(ii, comp.getName());
+      if(comp.namespace == null)
+        PKGDESCINV.thrw(ii, Util.info(MISSCOMP, "namespace"));
+      else if(comp.file == null)
+        PKGDESCINV.thrw(ii, Util.info(MISSCOMP, "file"));
+      if(isInstalled(comp, pkg.uri, ii))
+        MODISTALLED.thrw(ii, comp.getName());
     }
   }
 
