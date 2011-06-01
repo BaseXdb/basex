@@ -720,6 +720,18 @@ public final class Token {
   }
 
   /**
+   * Returns the last position of the specified character or -1.
+   * @param token token
+   * @param sub token to be found
+   * @return result of test
+   */
+  public static int lastIndexOf(final byte[] token, final byte[] sub) {
+    for(int t = token.length - 1, s = sub.length - 1; t >= 0 && s >= 0;
+      --t, --s) if(token[t] == sub[s]) return t;
+    return -1;
+  }
+
+  /**
    * Returns the position of the specified token or -1.
    * @param token token
    * @param sub token to be found

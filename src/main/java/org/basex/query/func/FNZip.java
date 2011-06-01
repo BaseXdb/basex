@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -511,29 +512,44 @@ public final class FNZip extends Fun {
     ZipFile zf = null;
     try {
       zf = new ZipFile(file);
-      final ZipEntry ze = zf.getEntry(path);
-      if(ze == null) throw ZIPNOTFOUND.thrw(input, file + '/' + path);
-
-      final InputStream zis = zf.getInputStream(ze);
-      final int s = (int) ze.getSize();
-      if(s >= 0) {
-        // known size: pre-allocate and fill array
-        final byte[] data = new byte[s];
-        int c, o = 0;
-        while(s - o != 0 && (c = zis.read(data, o, s - o)) != -1) o += c;
-        return data;
-      }
-      // unknown size: use byte list
-      final byte[] data = new byte[IO.BLOCKSIZE];
-      final ByteList bl = new ByteList();
-      int c;
-      while((c = zis.read(data)) != -1) bl.add(data, 0, c);
-      return bl.toArray();
+      return read(zf, path);
+    } catch(final FileNotFoundException ex) {
+      throw ZIPNOTFOUND.thrw(input, file + '/' + path);
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     } finally {
       if(zf != null) try { zf.close(); } catch(final IOException e) { }
     }
+  }
+
+  /**
+   * Reads and returns a zip file entry.
+   * @param zf zip file
+   * @param path file to be read
+   * @return resulting byte array
+   * @throws IOException I/O exception
+   */
+  public static byte[] read(final ZipFile zf, final String path)
+      throws IOException {
+
+    final ZipEntry ze = zf.getEntry(path);
+    if(ze == null) throw new FileNotFoundException(path);
+
+    final InputStream zis = zf.getInputStream(ze);
+    final int s = (int) ze.getSize();
+    if(s >= 0) {
+      // known size: pre-allocate and fill array
+      final byte[] data = new byte[s];
+      int c, o = 0;
+      while(s - o != 0 && (c = zis.read(data, o, s - o)) != -1) o += c;
+      return data;
+    }
+    // unknown size: use byte list
+    final byte[] data = new byte[IO.BLOCKSIZE];
+    final ByteList bl = new ByteList();
+    int c;
+    while((c = zis.read(data)) != -1) bl.add(data, 0, c);
+    return bl.toArray();
   }
 
   @Override

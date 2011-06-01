@@ -142,20 +142,18 @@ public enum Err {
   /** PACK0001: Evaluation exception. */
   PKGNOTEXIST(PACK, 1, "Package does not exist."),
   /** PACK0002: Evaluation exception. */
-  PKGDESCMISS(PACK, 2, "Missing package descriptor. "),
+  PKGINSTALLED(PACK, 2, "Package is already installed. "),
   /** PACK0003: Evaluation exception. */
-  PKGINSTALLED(PACK, 3, "Package is already installed. "),
+  PKGNOTINSTALLED(PACK, 3, "Necessary package % is not installed. "),
   /** PACK0004: Evaluation exception. */
-  PKGNOTINSTALLED(PACK, 4, "Necessary package % is not installed. "),
+  PKGDESCINV(PACK, 4, "Invalid package descriptor: %. "),
   /** PACK0005: Evaluation exception. */
-  PKGDESCINV(PACK, 5, "Invalid package descriptor: %. "),
+  INVPKGNAME(PACK, 5, "Package must be a .xar file. "),
   /** PACK0006: Evaluation exception. */
-  INVPKGNAME(PACK, 6, "Package must be a .xar file. "),
-  /** PACK0007: Evaluation exception. */
-  MODISTALLED(PACK, 7,
+  MODISTALLED(PACK, 6,
       "Module % is already installed within another package. "),
-  /** PACK0008: Evaluation exception. */
-  PKGREADFAIL(PACK, 8, "Reading package descriptor failed. "),
+  /** PACK0007: Evaluation exception. */
+  PKGREADFAIL(PACK, 7, "Reading package descriptor failed. "),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

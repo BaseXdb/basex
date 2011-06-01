@@ -67,12 +67,21 @@ abstract class AdvancedQueryTest {
       query(query);
       fail("[" + error[0] + "] expected for query: " + query);
     } catch(final QueryException ex) {
-      final String msg = ex.getMessage();
-      boolean found = false;
-      for(final Err e : error) found |= msg.contains(e.code());
-      if(!found) {
-        fail("'" + error[0].code() + "' not contained in '" + msg + "'.");
-      }
+      check(ex, error);
+    }
+  }
+
+  /**
+   * Checks if an exception yields one of the specified error codes.
+   * @param ex exception
+   * @param error expected errors
+   */
+  protected static void check(final QueryException ex, final Err... error) {
+    final String msg = ex.getMessage();
+    boolean found = false;
+    for(final Err e : error) found |= msg.contains(e.code());
+    if(!found) {
+      fail("'" + error[0].code() + "' not contained in '" + msg + "'.");
     }
   }
 

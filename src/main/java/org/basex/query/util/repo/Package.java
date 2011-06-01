@@ -1,52 +1,54 @@
-package org.basex.query.util;
+package org.basex.query.util.repo;
 
 import static org.basex.util.Token.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.basex.core.Prop;
 import org.basex.util.TokenBuilder;
 
 /**
  * Package.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public final class Package {
+final class Package {
   /** Separator between name and version in unique package name. */
   private static final char NAMESEP = '-';
-  /** Package uri. */
-  public byte[] uri;
-  /** Package short name. */
-  public byte[] abbrev;
-  /** Package version. */
-  public byte[] version;
-  /** Version of packaging specification the package conforms to. */
-  public byte[] spec;
-  /** Package description. */
-  public byte[] title;
-  /** URI to find more information about the package. */
-  public byte[] home;
+
   /** List of dependencies. */
-  public final List<Dependency> dep = new ArrayList<Package.Dependency>();
+  final List<Dependency> dep = new ArrayList<Dependency>();
   /** Package components. */
-  public final List<Component> comps = new ArrayList<Package.Component>();
+  final List<Component> comps = new ArrayList<Component>();
+  /** Package uri. */
+  byte[] uri;
+  /** Package short name. */
+  byte[] abbrev;
+  /** Package version. */
+  byte[] version;
+  /** Version of packaging specification the package conforms to. */
+  byte[] spec;
+  /** Package description. */
+  byte[] title;
+  /** URI to find more information about the package. */
+  byte[] home;
 
   /**
    * Returns unique package name consisting of package uri and package version.
    * @return result
    */
-  public byte[] getName() {
+  byte[] getName() {
     return new TokenBuilder().add(uri).add(NAMESEP).add(version).finish();
   }
 
   /**
-   * Extracts package name form unique package name.
+   * Extracts package name from unique package name.
    * @param pkgName unique package name: name-version
    * @return package name
    */
-  public static byte[] getPkgName(final byte[] pkgName) {
+  static byte[] getName(final byte[] pkgName) {
     final int idx = lastIndexOf(pkgName, NAMESEP);
     return idx == -1 ? pkgName : subtoken(pkgName, 0, idx);
   }
@@ -56,7 +58,7 @@ public final class Package {
    * @param pkgName unique package name: name-version
    * @return package version
    */
-  public static byte[] getPkgVersion(final byte[] pkgName) {
+  static byte[] getVersion(final byte[] pkgName) {
     final int idx = lastIndexOf(pkgName, NAMESEP);
     return subtoken(pkgName, idx + 1, pkgName.length);
   }
@@ -66,19 +68,19 @@ public final class Package {
    * @author BaseX Team 2005-11, BSD License
    * @author Rositsa Shadura
    */
-  public static class Dependency {
+  static final class Dependency {
     /** Name of package a package depends on. */
-    public byte[] pkg;
+    byte[] pkg;
     /** Name of processor a package depends on. */
-    public byte[] processor;
+    byte[] processor;
     /** Package version. */
-    public byte[] versions;
+    byte[] versions;
     /** SemVer template. */
-    public byte[] semver;
+    byte[] semver;
     /** Minimum acceptable version. */
-    public byte[] semverMin;
+    byte[] semverMin;
     /** Maximum acceptable version. */
-    public byte[] semverMax;
+    byte[] semverMax;
   }
 
   /**
@@ -86,25 +88,24 @@ public final class Package {
    * @author BaseX Team 2005-11, BSD License
    * @author Rositsa Shadura
    */
-  public static class Component {
+  static final class Component {
     /** Component type. */
-    public byte[] type;
+    byte[] type;
     /** Namespace URI. */
-    public byte[] namespace;
+    byte[] namespace;
     /** Public import URI. */
-    public byte[] importUri;
+    byte[] importUri;
     /** Component file. */
-    public byte[] file;
+    byte[] file;
 
     /**
      * Extracts component's file name from component's path.
      * @return component's name
      */
-    public String getName() {
-      final String compPath = string(file);
-      final int idx = compPath.lastIndexOf(Prop.DIRSEP);
-      return idx == -1 ? compPath : compPath.substring(idx,
-          compPath.length() - 1);
+    String getName() {
+      final String path = string(file);
+      final int i = path.lastIndexOf(File.separator);
+      return i == -1 ? path : path.substring(i + 1, path.length());
     }
   }
 }

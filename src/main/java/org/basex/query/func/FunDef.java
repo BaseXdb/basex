@@ -527,10 +527,6 @@ public enum FunDef {
   COPY(FNFile.class, "copy(source,target)", EMP, STR, STR),
   /** XQuery function */
   MOVE(FNFile.class, "move(source,target)", EMP, STR, STR),
-  /** XQuery function */
-  DIRSEP(FNFile.class, "directory-separator()", STR),
-  /** XQuery function */
-  PATHSEP(FNFile.class, "path-separator()", STR),
 
   /* FNFt functions. */
 

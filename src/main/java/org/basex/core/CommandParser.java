@@ -42,7 +42,7 @@ import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.InfoStorage;
-import org.basex.core.cmd.InstallPkg;
+import org.basex.core.cmd.RepoInstall;
 import org.basex.core.cmd.Kill;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.ListDB;
@@ -285,7 +285,7 @@ public final class CommandParser extends InputParser {
       case REPO:
         switch(consume(CmdRepo.class, cmd)) {
           case INSTALL:
-            return new InstallPkg(string(cmd), ctx, new InputInfo(this));
+            return new RepoInstall(string(cmd), new InputInfo(this));
           case REMOVE:
           case LIST:
           default:
