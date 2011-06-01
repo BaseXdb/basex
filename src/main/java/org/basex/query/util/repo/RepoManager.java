@@ -28,7 +28,7 @@ import org.basex.util.InputInfo;
  */
 public final class RepoManager {
   /** Database context. */
-  final Context context;
+  private final Context context;
 
   /**
    * Constructor.

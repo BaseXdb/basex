@@ -32,15 +32,15 @@ public final class Repo {
    */
   public final TokenMap pkgDict = new TokenMap();
   /** Context. */
-  private final Context ctx;
+  private final Context context;
 
   /**
    * Constructor.
-   * @param c context
+   * @param ctx context
    */
-  public Repo(final Context c) {
-    ctx = c;
-    final File repoDir = new File(ctx.prop.get(Prop.REPOPATH));
+  public Repo(final Context ctx) {
+    context = ctx;
+    final File repoDir = new File(context.prop.get(Prop.REPOPATH));
     final File[] dirs = repoDir.listFiles();
     if(dirs == null) return;
     for(final File dir : dirs) if(dir.isDirectory()) readPkg(dir);
@@ -56,7 +56,7 @@ public final class Repo {
       final File pkgDesc = new File(dir.getPath(), DESCRIPTOR);
       if(pkgDesc.exists()) {
         final IOFile io = new IOFile(pkgDesc);
-        final Package pkg = new PkgParser(ctx).parse(io, null);
+        final Package pkg = new PkgParser(context).parse(io, null);
         // Read package components
         for(final Component comp : pkg.comps) {
           // Add component's namespace to namespace dictionary

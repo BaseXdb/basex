@@ -283,9 +283,9 @@ public abstract class BXNode implements Node {
   }
 
   /**
-   * Returns a node builder with the specified nodes.
-   * @param ai node iterator
-   * @return node builder
+   * Returns a node cache with the specified nodes.
+   * @param ai axis iterator
+   * @return node cache
    */
   protected static final NodeCache finish(final AxisIter ai) {
     final NodeCache nc = new NodeCache();

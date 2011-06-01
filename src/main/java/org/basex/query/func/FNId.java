@@ -111,7 +111,7 @@ public final class FNId extends Fun {
    */
   private Bln lang(final byte[] lang, final ANode node) throws QueryException {
     for(ANode n = node; n != null; n = n.parent()) {
-      final AxisIter atts = n.atts();
+      final AxisIter atts = n.attributes();
       for(ANode at; (at = atts.next()) != null;) {
         if(eq(at.qname().atom(), LANG)) {
           final byte[] ln = lc(norm(checkEStr(at)));
@@ -140,14 +140,14 @@ public final class FNId extends Fun {
   /**
    * Adds nodes with the specified id.
    * @param ids ids to be found
-   * @param nc node builder
+   * @param nc node cache
    * @param node node
    * @throws QueryException query exception
    */
   private void add(final byte[][] ids, final NodeCache nc,
       final ANode node) throws QueryException {
 
-    AxisIter ai = node.atts();
+    AxisIter ai = node.attributes();
     for(ANode att; (att = ai.next()) != null;) {
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
@@ -163,14 +163,14 @@ public final class FNId extends Fun {
   /**
    * Adds nodes with the specified id.
    * @param ids ids to be found
-   * @param nc node builder
+   * @param nc node cache
    * @param node node
    * @throws QueryException query exception
    */
   private void addRef(final byte[][] ids, final NodeCache nc,
       final ANode node) throws QueryException {
 
-    AxisIter ai = node.atts();
+    AxisIter ai = node.attributes();
     for(ANode att; (att = ai.next()) != null;) {
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {

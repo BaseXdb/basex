@@ -14,7 +14,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.NodeMore;
 import org.basex.query.util.repo.Package.Component;
 import org.basex.query.util.repo.Package.Dependency;
 import org.basex.util.InputInfo;
@@ -27,14 +26,14 @@ import org.basex.util.InputInfo;
  */
 public final class PkgParser {
   /** Context. */
-  private final Context ctx;
+  private final Context context;
 
   /**
    * Constructor.
-   * @param c context
+   * @param ctx context
    */
-  public PkgParser(final Context c) {
-    ctx = c;
+  public PkgParser(final Context ctx) {
+    context = ctx;
   }
 
   /**
@@ -47,9 +46,9 @@ public final class PkgParser {
   public Package parse(final IO io, final InputInfo ii) throws QueryException {
     final Package pkg = new Package();
     try {
-      final Parser p = Parser.xmlParser(io, ctx.prop, "");
+      final Parser p = Parser.xmlParser(io, context.prop, "");
       final ANode node =
-        new DBNode(MemBuilder.build(p, ctx.prop, ""), 0).children().next();
+        new DBNode(MemBuilder.build(p, context.prop, ""), 0).children().next();
       parseAttrs(node, pkg);
       parseChildren(node, pkg);
       return pkg;
@@ -64,7 +63,7 @@ public final class PkgParser {
    * @param p package container
    */
   private void parseAttrs(final ANode pkgNode, final Package p) {
-    final AxisIter atts = pkgNode.atts();
+    final AxisIter atts = pkgNode.attributes();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] nextName = next.nname();
       if(eq(NAME, nextName)) p.uri = next.atom();
@@ -80,7 +79,7 @@ public final class PkgParser {
    * @param p package container
    */
   private void parseChildren(final ANode pkgNode, final Package p) {
-    final NodeMore ch = pkgNode.children();
+    final AxisIter ch = pkgNode.children();
     for(ANode next; (next = ch.next()) != null;) {
       final byte[] nextName = next.nname();
       if(eq(TITLE, nextName)) p.title = next.atom();
@@ -96,7 +95,7 @@ public final class PkgParser {
    * @return dependency container
    */
   private Dependency parseDependency(final ANode depNode) {
-    final AxisIter attrs = depNode.atts();
+    final AxisIter attrs = depNode.attributes();
     final Dependency dep = new Dependency();
     for(ANode next; (next = attrs.next()) != null;) {
       final byte[] nextName = next.nname();
@@ -116,7 +115,7 @@ public final class PkgParser {
    * @return component container
    */
   private Component parseComp(final ANode comp) {
-    final NodeMore ch = comp.children();
+    final AxisIter ch = comp.children();
     final Component c = new Component();
     c.type = XQUERY;
     for(ANode next; (next = ch.next()) != null;) {

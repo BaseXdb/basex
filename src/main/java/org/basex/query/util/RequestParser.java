@@ -10,7 +10,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.NodeMore;
+import org.basex.query.iter.AxisMoreIter;
 import org.basex.query.util.Request.Part;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenMap;
@@ -92,7 +92,7 @@ public final class RequestParser {
         // Multipart request
       } else if(eq(payload.nname(), MULTIPART)) {
         int i = 0;
-        final NodeMore ch = payload.children();
+        final AxisMoreIter ch = payload.children();
         while(ch.next() != null)
           i++;
         // Number of items in $bodies must be equal to number of body
@@ -113,7 +113,7 @@ public final class RequestParser {
    * @param attrs map for parsed attributes
    */
   private static void parseAttrs(final ANode element, final TokenMap attrs) {
-    final AxisIter elAttrs = element.atts();
+    final AxisIter elAttrs = element.attributes();
     ANode attr = null;
     while((attr = elAttrs.next()) != null) {
       attrs.add(attr.nname(), attr.atom());
@@ -126,10 +126,10 @@ public final class RequestParser {
    * @param hdrs map for parsed headers
    * @return body or multipart
    */
-  private static ANode parseHdrs(final NodeMore i, final TokenMap hdrs) {
+  private static ANode parseHdrs(final AxisMoreIter i, final TokenMap hdrs) {
     ANode n = null;
     while((n = i.next()) != null && eq(n.nname(), HDR)) {
-      final AxisIter hdrAttrs = n.atts();
+      final AxisIter hdrAttrs = n.attributes();
       ANode attr = null;
       byte[] name = null;
       byte[] value = null;
@@ -167,7 +167,7 @@ public final class RequestParser {
       if(contItem == null) {
         // Content is set from <http:body/> children
         ANode n;
-        final NodeMore i = body.children();
+        final AxisMoreIter i = body.children();
         while((n = i.next()) != null)
           bodyContent.add(n);
       } else {
@@ -193,7 +193,7 @@ public final class RequestParser {
     if(attrs.get(MEDIATYPE) == null) REQINV.thrw(ii,
         "Attribute media-type of http:multipart is mandatory");
     ANode n;
-    final NodeMore i = multipart.children();
+    final AxisMoreIter i = multipart.children();
     if(contItems == null) {
       // Content is set from <http:body/> children of <http:part/> elements
       while((n = i.next()) != null)

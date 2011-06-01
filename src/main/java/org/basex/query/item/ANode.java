@@ -12,7 +12,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.NodeMore;
+import org.basex.query.iter.AxisMoreIter;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -229,7 +229,7 @@ public abstract class ANode extends Item {
    * @return attribute value
    */
   public byte[] attribute(final QNm name) {
-    final AxisIter ai = atts();
+    final AxisIter ai = attributes();
     while(true) {
       final ANode node = ai.next();
       if(node == null) return null;
@@ -253,13 +253,13 @@ public abstract class ANode extends Item {
    * Returns an attribute axis iterator.
    * @return iterator
    */
-  public abstract AxisIter atts();
+  public abstract AxisIter attributes();
 
   /**
    * Returns a child axis iterator.
    * @return iterator
    */
-  public abstract NodeMore children();
+  public abstract AxisMoreIter children();
 
   /**
    * Returns a descendant axis iterator.
@@ -358,8 +358,8 @@ public abstract class ANode extends Item {
    * Returns an self axis iterator.
    * @return iterator
    */
-  public final NodeMore self() {
-    return new NodeMore() {
+  public final AxisMoreIter self() {
+    return new AxisMoreIter() {
       /** First call. */
       private boolean more = true;
 
@@ -376,13 +376,13 @@ public abstract class ANode extends Item {
 
   /**
    * Adds children of a sub node.
-   * @param children child nodes
-   * @param nodes node builder
+   * @param ch child nodes
+   * @param nc node cache
    */
-  protected final void addDesc(final NodeMore children, final NodeCache nodes) {
-    for(ANode ch; (ch = children.next()) != null;) {
-      nodes.add(ch.finish());
-      addDesc(ch.children(), nodes);
+  protected final void addDesc(final AxisMoreIter ch, final NodeCache nc) {
+    for(ANode n; (n = ch.next()) != null;) {
+      nc.add(n.finish());
+      addDesc(n.children(), nc);
     }
   }
 

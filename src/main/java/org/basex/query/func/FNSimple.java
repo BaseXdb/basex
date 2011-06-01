@@ -264,13 +264,13 @@ public final class FNSimple extends Fun {
           // compare elements
           if(t1 == NodeType.ELM) {
             // compare number of attributes
-            if(s1.atts().finish().size() != s2.atts().finish().size())
-              return false;
+            if(s1.attributes().finish().size() !=
+              s2.attributes().finish().size()) return false;
 
             // compare attributes names and values
-            final AxisIter att1 = s1.atts();
+            final AxisIter att1 = s1.attributes();
             for(ANode a1; (a1 = att1.next()) != null;) {
-              final AxisIter att2 = s2.atts();
+              final AxisIter att2 = s2.attributes();
               boolean f = false;
               for(ANode a2; (a2 = att2.next()) != null;) {
                 if(a1.qname().eq(a2.qname())) {

@@ -288,7 +288,7 @@ public class AxisPath extends Path {
   /**
    * Recursive step iterator.
    * @param l current step
-   * @param nc node builder
+   * @param nc node cache
    * @param ctx query context
    * @throws QueryException query exception
    */

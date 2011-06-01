@@ -7,7 +7,7 @@ package org.basex.query.iter;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class NodeMore extends AxisIter {
+public abstract class AxisMoreIter extends AxisIter {
   /**
    * Checks if more nodes are found.
    * @return temporary node

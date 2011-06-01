@@ -3,7 +3,7 @@ package org.basex.query.item;
 import java.util.Arrays;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.NodeMore;
+import org.basex.query.iter.AxisMoreIter;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
@@ -101,12 +101,12 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter atts() {
+  public final AxisIter attributes() {
     return iter(atts);
   }
 
   @Override
-  public final NodeMore children() {
+  public final AxisMoreIter children() {
     return iter(children);
   }
 
@@ -115,8 +115,8 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  private NodeMore iter(final NodeCache iter) {
-    return new NodeMore() {
+  private AxisMoreIter iter(final NodeCache iter) {
+    return new AxisMoreIter() {
       /** Child counter. */
       int c;
 
@@ -150,7 +150,7 @@ public abstract class FNode extends ANode {
   private AxisIter desc(final boolean self) {
     return new AxisIter() {
       /** Iterator. */
-      private NodeMore[] nm = new NodeMore[1];
+      private AxisMoreIter[] nm = new AxisMoreIter[1];
       /** Iterator Level. */
       private int l;
 
@@ -161,7 +161,7 @@ public abstract class FNode extends ANode {
 
         final ANode node = nm[l].next();
         if(node != null) {
-          final NodeMore ch = node.children();
+          final AxisMoreIter ch = node.children();
           if(ch.more()) {
             if(l + 1 == nm.length) nm = Arrays.copyOf(nm, l + 1 << 1);
             nm[++l] = ch;

@@ -26,7 +26,7 @@ import org.basex.util.TokenSet;
  */
 public final class PkgValidator {
   /** Database context. */
-  final Context context;
+  private final Context context;
 
   /**
    * Constructor.

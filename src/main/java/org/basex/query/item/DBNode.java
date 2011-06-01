@@ -9,7 +9,7 @@ import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.NodeMore;
+import org.basex.query.iter.AxisMoreIter;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -247,7 +247,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter atts() {
+  public final AxisIter attributes() {
     return new AxisIter() {
       final DBNode node = copy();
       final int s = pre + data.attSize(pre, data.kind(pre));
@@ -263,8 +263,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final NodeMore children() {
-    return new NodeMore() {
+  public final AxisMoreIter children() {
+    return new AxisMoreIter() {
       int k = data.kind(pre);
       int p = pre + data.attSize(pre, k);
       final int s = pre + data.size(pre, k);

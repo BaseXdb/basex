@@ -304,7 +304,7 @@ public final class DataBuilder {
     int p = pre + 1;
 
     // add attributes
-    AxisIter ai = nd.atts();
+    AxisIter ai = nd.attributes();
     for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
 
     // add children
@@ -331,7 +331,7 @@ public final class DataBuilder {
     }
 
     int s = 1;
-    AxisIter ai = n.atts();
+    AxisIter ai = n.attributes();
     while(ai.next() != null) ++s;
     if(!a) {
       ai = n.children();

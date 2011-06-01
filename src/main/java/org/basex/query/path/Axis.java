@@ -33,7 +33,7 @@ public enum Axis {
   ATTR("attribute", true) {
     @Override
     AxisIter iter(final ANode n) {
-      return n.atts();
+      return n.attributes();
     }
   },
 

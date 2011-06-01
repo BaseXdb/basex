@@ -383,7 +383,7 @@ public final class FNZip extends Fun {
 
     // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
-    final AxisIter ati = node.atts();
+    final AxisIter ati = node.attributes();
     for(ANode at; (at = ati.next()) != null;) {
       final QNm name = at.qname();
       if(name.eq(A_NAME) || name.eq(A_SRC)) continue;
