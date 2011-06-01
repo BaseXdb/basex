@@ -865,8 +865,8 @@ public final class HttpClientTest {
     assertEquals(itemsCount, res.size());
     assertTrue(res.get(0) instanceof FElem);
     final FElem response = (FElem) res.get(0);
-    assertNotNull(response.atts());
-    final NodeIter resAttr = response.atts();
+    assertNotNull(response.attributes());
+    final NodeIter resAttr = response.attributes();
     ANode attr = null;
     while((attr = resAttr.next()) != null) {
       if(Token.eq(attr.nname(), STATUS)) assertTrue(eq(attr.atom(),
