@@ -39,7 +39,7 @@ final class Package {
    * Returns unique package name consisting of package uri and package version.
    * @return result
    */
-  byte[] getName() {
+  byte[] getUniqueName() {
     return new TokenBuilder(name).add(NAMESEP).add(version).finish();
   }
 
@@ -73,7 +73,7 @@ final class Package {
     byte[] pkg;
     /** Name of processor a package depends on. */
     byte[] processor;
-    /** Package version. */
+    /** Set of acceptable version. */
     byte[] versions;
     /** SemVer template. */
     byte[] semver;
@@ -81,6 +81,17 @@ final class Package {
     byte[] semverMin;
     /** Maximum acceptable version. */
     byte[] semverMax;
+
+    /**
+     * Returns unique package name for secondary package using the given
+     * version.
+     * @param version version
+     * @return unique name
+     */
+    public byte[] getName(final byte[] version) {
+      final TokenBuilder tb = new TokenBuilder();
+      return tb.add(pkg).add(NAMESEP).add(version).finish();
+    }
   }
 
   /**
