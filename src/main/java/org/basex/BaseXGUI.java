@@ -54,7 +54,7 @@ public final class BaseXGUI {
       try {
         osxGUI = new GUIMacOSX();
       } catch(final Exception ex) {
-        Util.notexpected("Failed to initialize native Mac OS X interface", ex);
+        Util.errln("Failed to initialize native Mac OS X interface", ex);
       }
     }
 

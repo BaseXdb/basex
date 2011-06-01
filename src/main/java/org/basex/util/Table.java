@@ -47,7 +47,8 @@ public final class Table {
     int i = 0;
     while(i < line.length) {
       il.add(i);
-      while(++i < line.length && line[i] != ' ');
+      // find next two spaces
+      while(++i + 1 < line.length && (line[i] != ' ' || line[i + 1] != ' '));
       header.add(substring(line, il.get(il.size() - 1), i));
       while(++i < line.length && line[i] == ' ');
     }
