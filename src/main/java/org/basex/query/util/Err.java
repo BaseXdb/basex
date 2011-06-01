@@ -139,6 +139,24 @@ public enum Err {
   /** FOHC006: Evaluation exception. */
   NOPARAMS(FOHC, 6, "Specify request element or HTTP URI."),
 
+  /** PACK0001: Evaluation exception. */
+  PKGNOTEXIST(PACK, 1, "Package does not exist."),
+  /** PACK0002: Evaluation exception. */
+  PKGDESCMISS(PACK, 2, "Missing package descriptor. "),
+  /** PACK0003: Evaluation exception. */
+  PKGINSTALLED(PACK, 3, "Package is already installed. "),
+  /** PACK0004: Evaluation exception. */
+  PKGNOTINSTALLED(PACK, 4, "Necessary package % is not installed. "),
+  /** PACK0005: Evaluation exception. */
+  PKGDESCINV(PACK, 5, "Invalid package descriptor: %. "),
+  /** PACK0006: Evaluation exception. */
+  INVPKGNAME(PACK, 6, "Package must be a .xar file. "),
+  /** PACK0007: Evaluation exception. */
+  MODISTALLED(PACK, 7,
+      "Module % is already installed within another package. "),
+  /** PACK0008: Evaluation exception. */
+  PKGREADFAIL(PACK, 8, "Reading package descriptor failed. "),
+
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
 
@@ -783,6 +801,8 @@ public enum Err {
     FTDY,
     /** FTST Error type. */
     FTST,
+    /** PACK Error type. */
+    PACK,
     /** SEPM Error type. */
     SEPM,
     /** SERE Error type. */

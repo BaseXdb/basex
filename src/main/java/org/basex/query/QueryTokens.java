@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.util.Token.*;
+
 import org.basex.core.Text;
 
 /**
@@ -428,6 +429,8 @@ public interface QueryTokens {
   byte[] HOF = token("hof");
   /** MAP token. */
   byte[] MAP = token(MAPSTR);
+  /** Package token. */
+  byte[] PKG = token("pkg");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
@@ -465,6 +468,8 @@ public interface QueryTokens {
   byte[] HTTPURI = token(EXPATH + "/http");
   /** File module URI. */
   byte[] FILEURI = token(EXPATH + "/file");
+  /** Package API URI. */
+  byte[] PKGURI = token(EXPATH + "/pkg");
 
   /** Util module URI. */
   byte[] UTILURI = token(Text.URL + "/util");

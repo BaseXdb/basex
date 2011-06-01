@@ -53,6 +53,9 @@ public final class Prop extends AProp {
   /** Web path. */
   public static final Object[] JAXRXPATH =
     { "JAXRXPATH", HOME + Text.NAME + "Web" };
+  /** Package repository path. */
+  public static final Object[] REPOPATH =
+  { "REPOPATH", HOME + Text.NAME + "Repo"};
 
   /** Language name. */
   public static final Object[] LANG = { "LANG", "English" };
