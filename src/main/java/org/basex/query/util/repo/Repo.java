@@ -26,13 +26,13 @@ public final class Repo {
    * Namespace-dictionary - contains all namespaces available in the repository
    * and the packages in which they are found.
    */
-  public final TokenObjMap<TokenList> nsDict = new TokenObjMap<TokenList>();
-  /**
-   * Package dictionary - contains all installed packages and their directories.
-   */
-  public final TokenMap pkgDict = new TokenMap();
+  private final TokenObjMap<TokenList> nsDict = new TokenObjMap<TokenList>();
+  /** Package dictionary with installed packages and their directories. */
+  private final TokenMap pkgDict = new TokenMap();
   /** Context. */
   private final Context context;
+  /** Initialization flag (the repository can only be initialized once). */
+  private boolean init;
 
   /**
    * Constructor.
@@ -40,6 +40,37 @@ public final class Repo {
    */
   public Repo(final Context ctx) {
     context = ctx;
+  }
+
+  /**
+   * Returns the namespace dictionary.
+   * Initializes the repository if not done yet.
+   * @return dictionary
+   */
+  public TokenObjMap<TokenList> nsDict() {
+    init(null);
+    return nsDict;
+  }
+
+  /**
+   * Returns the package dictionary.
+   * Initializes the repository if not done yet.
+   * @return dictionary
+   */
+  public TokenMap pkgDict() {
+    init(null);
+    return pkgDict;
+  }
+
+  /**
+   * Initializes the package repository.
+   * @param repo repository. The default path is used if set to {@code null}
+   */
+  public void init(final String repo) {
+    if(init) return;
+    init = true;
+
+    if(repo != null) context.prop.set(Prop.REPOPATH, repo);
     final File repoDir = new File(context.prop.get(Prop.REPOPATH));
     final File[] dirs = repoDir.listFiles();
     if(dirs == null) return;
@@ -47,15 +78,15 @@ public final class Repo {
   }
 
   /**
-   * Reads a package descriptor and adds components' namespaces to
+   * Reads a package descriptor and adds components namespaces to
    * namespace-dictionary and packages - to package dictionary.
    * @param dir package directory
    */
   private void readPkg(final File dir) {
-    try {
-      final File pkgDesc = new File(dir.getPath(), DESCRIPTOR);
-      if(pkgDesc.exists()) {
-        final IOFile io = new IOFile(pkgDesc);
+    final File pkgDesc = new File(dir, DESCRIPTOR);
+    if(pkgDesc.exists()) {
+      final IOFile io = new IOFile(pkgDesc);
+      try {
         final Package pkg = new PkgParser(context).parse(io, null);
         // Read package components
         for(final Component comp : pkg.comps) {
@@ -72,11 +103,11 @@ public final class Repo {
         }
         // Add package to package dictionary
         pkgDict.add(pkg.getName(), token(dir.getName()));
-      } else {
-        Util.errln(NOTEXP, dir);
+      } catch(final QueryException ex) {
+        Util.errln(ex.getMessage());
       }
-    } catch(final QueryException ex) {
-      Util.errln(ex);
+    } else {
+      Util.errln(NOTEXP, dir);
     }
   }
 }

@@ -28,9 +28,9 @@ public final class Context {
   public final Datas datas;
   /** Users. */
   public final Users users;
-
   /** Package repository. */
-  public Repo repo;
+  public final Repo repo;
+
   /** Session reference. */
   public ServerProcess session;
   /** User reference. */

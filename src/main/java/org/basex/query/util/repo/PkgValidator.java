@@ -58,7 +58,7 @@ public final class PkgValidator {
       PKGDESCINV.thrw(ii, Util.info(MISSATTR, "spec"));
 
     // Check if package is already installed
-    if(context.repo.pkgDict.get(pkg.getName()) != null) PKGINSTALLED.thrw(ii);
+    if(context.repo.pkgDict().get(pkg.getName()) != null) PKGINSTALLED.thrw(ii);
     // Check package dependencies
     checkDepends(pkg, ii);
     // Check package components - currently only xquery modules are taken into
@@ -151,7 +151,7 @@ public final class PkgValidator {
    */
   private TokenSet installedVersions(final byte[] pkgName) {
     final TokenSet versions = new TokenSet();
-    for(final byte[] nextPkg : context.repo.pkgDict)
+    for(final byte[] nextPkg : context.repo.pkgDict())
       if(startsWith(nextPkg, pkgName)) versions.add(getVersion(nextPkg));
     return versions;
   }
@@ -200,14 +200,14 @@ public final class PkgValidator {
       final InputInfo ii) throws QueryException {
 
     // Get packages in which the module's namespace is found
-    final TokenList pkgs = context.repo.nsDict.get(comp.namespace);
+    final TokenList pkgs = context.repo.nsDict().get(comp.namespace);
     if(pkgs == null) return false;
 
     for(final byte[] nextPkg : pkgs) {
       if(!eq(getName(nextPkg), name)) {
         // Installed package is a different one, not just a different version
         // of the current one
-        final byte[] pkgDir = context.repo.pkgDict.get(nextPkg);
+        final byte[] pkgDir = context.repo.pkgDict().get(nextPkg);
         final File pkgDesc = new File(new File(
             context.prop.get(Prop.REPOPATH), string(pkgDir)), DESCRIPTOR);
         final IOFile io = new IOFile(pkgDesc);
