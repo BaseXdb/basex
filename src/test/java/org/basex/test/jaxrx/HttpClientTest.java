@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.api.jaxrx.JaxRxServer;
-import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -252,8 +251,7 @@ public final class HttpClientTest {
         + "</http:body>" + "</http:request>");
     final IO io = new IOContent(req);
     final Parser reqParser = Parser.xmlParser(io, context.prop, "");
-    final DBNode dbNode = new DBNode(MemBuilder.build(reqParser, context.prop,
-        ""), 0);
+    final DBNode dbNode = new DBNode(reqParser, context.prop);
     final Request r = RequestParser.parse(dbNode.children().next(), null, null);
 
     assertTrue(r.attrs.size() == 2);
@@ -287,7 +285,7 @@ public final class HttpClientTest {
 
     final IO io = new IOContent(multiReq);
     final Parser p = Parser.xmlParser(io, context.prop, "");
-    final DBNode dbNode1 = new DBNode(MemBuilder.build(p, context.prop, ""), 0);
+    final DBNode dbNode1 = new DBNode(p, context.prop);
     final Request r =
       RequestParser.parse(dbNode1.children().next(), null, null);
 
@@ -339,7 +337,7 @@ public final class HttpClientTest {
 
     final IO io = new IOContent(multiReq);
     final Parser p = Parser.xmlParser(io, context.prop, "");
-    final DBNode dbNode1 = new DBNode(MemBuilder.build(p, context.prop, ""), 0);
+    final DBNode dbNode1 = new DBNode(p, context.prop);
 
     final ItemCache bodies = new ItemCache();
     bodies.add(Str.get("Part1"));
@@ -452,7 +450,7 @@ public final class HttpClientTest {
       it = i.next();
       io = new IOContent(it);
       p = Parser.xmlParser(io, context.prop, "");
-      dbNode = new DBNode(MemBuilder.build(p, context.prop, ""), 0);
+      dbNode = new DBNode(p, context.prop);
       try {
         RequestParser.parse(dbNode.children().next(), null, null);
         fail("Exception not thrown");
@@ -750,8 +748,7 @@ public final class HttpClientTest {
 
     final IO io = new IOContent(reqItem);
     final Parser reqParser = Parser.xmlParser(io, context.prop, "");
-    final DBNode dbNode = new DBNode(MemBuilder.build(reqParser, context.prop,
-        ""), 0);
+    final DBNode dbNode = new DBNode(reqParser, context.prop);
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get(token("...plain text version of message "
         + "goes here....\n\n")));
@@ -839,8 +836,7 @@ public final class HttpClientTest {
 
     final IO io = new IOContent(reqItem);
     final Parser reqParser = Parser.xmlParser(io, context.prop, "");
-    final DBNode dbNode = new DBNode(MemBuilder.build(reqParser, context.prop,
-        ""), 0);
+    final DBNode dbNode = new DBNode(reqParser, context.prop);
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get(token("This is implicitly typed plain ASCII text.\n"
         + "It does NOT end with a linebreak.\n")));
