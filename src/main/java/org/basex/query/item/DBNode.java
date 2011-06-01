@@ -3,6 +3,10 @@ package org.basex.query.item;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.build.MemBuilder;
+import org.basex.build.Parser;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
@@ -65,6 +69,26 @@ public class DBNode extends ANode {
     data = d;
     pre = p;
     par = r;
+  }
+
+  /**
+   * Constructor, specifying an XML input reference.
+   * @param input input reference
+   * @param prop database properties
+   * @throws IOException I/O exception
+   */
+  public DBNode(final IO input, final Prop prop) throws IOException {
+    this(Parser.xmlParser(input, prop, ""), prop);
+  }
+
+  /**
+   * Constructor, specifying a parser reference.
+   * @param parser parser
+   * @param prop database properties
+   * @throws IOException I/O exception
+   */
+  public DBNode(final Parser parser, final Prop prop) throws IOException {
+    this(MemBuilder.build(parser, prop, ""), 0);
   }
 
   /**

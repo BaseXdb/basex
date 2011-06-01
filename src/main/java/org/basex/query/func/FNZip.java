@@ -17,7 +17,6 @@ import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
 import org.basex.core.Prop;
@@ -142,9 +141,8 @@ public final class FNZip extends Fun {
     final Prop prop = ctx.context.prop;
     final IO io = new IOContent(entry(ctx));
     try {
-      final Parser p = html ? new HTMLParser(io, "", prop) :
-        Parser.xmlParser(io, prop, "");
-      return new DBNode(MemBuilder.build(p, prop, ""), 0);
+      return new DBNode(html ? new HTMLParser(io, "", prop) :
+        Parser.xmlParser(io, prop, ""), prop);
     } catch(final IOException ex) {
       throw SAXERR.thrw(input, ex);
     }

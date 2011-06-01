@@ -6,8 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
 import org.basex.core.Context;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
@@ -46,14 +44,12 @@ public final class PkgParser {
   public Package parse(final IO io, final InputInfo ii) throws QueryException {
     final Package pkg = new Package();
     try {
-      final Parser p = Parser.xmlParser(io, context.prop, "");
-      final ANode node =
-        new DBNode(MemBuilder.build(p, context.prop, ""), 0).children().next();
+      final ANode node = new DBNode(io, context.prop).children().next();
       parseAttrs(node, pkg);
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
-      throw PKGREADFAIL.thrw(ii);
+      throw PKGREADFAIL.thrw(ii, ex.getMessage());
     }
   }
 
@@ -65,11 +61,11 @@ public final class PkgParser {
   private void parseAttrs(final ANode pkgNode, final Package p) {
     final AxisIter atts = pkgNode.attributes();
     for(ANode next; (next = atts.next()) != null;) {
-      final byte[] nextName = next.nname();
-      if(eq(NAME, nextName)) p.uri = next.atom();
-      else if(eq(ABBREV, nextName)) p.abbrev = next.atom();
-      else if(eq(VERSION, nextName)) p.version = next.atom();
-      else if(eq(SPEC, nextName)) p.spec = next.atom();
+      final byte[] name = next.nname();
+      if(eq(NAME, name)) p.uri = next.atom();
+      else if(eq(ABBREV, name)) p.abbrev = next.atom();
+      else if(eq(VERSION, name)) p.version = next.atom();
+      else if(eq(SPEC, name)) p.spec = next.atom();
     }
   }
 
@@ -81,11 +77,11 @@ public final class PkgParser {
   private void parseChildren(final ANode pkgNode, final Package p) {
     final AxisIter ch = pkgNode.children();
     for(ANode next; (next = ch.next()) != null;) {
-      final byte[] nextName = next.nname();
-      if(eq(TITLE, nextName)) p.title = next.atom();
-      else if(eq(HOME, nextName)) p.home = next.atom();
-      else if(eq(DEPEND, nextName)) p.dep.add(parseDependency(next));
-      else if(eq(XQUERY, nextName)) p.comps.add(parseComp(next));
+      final byte[] name = next.nname();
+      if(eq(TITLE, name)) p.title = next.atom();
+      else if(eq(HOME, name)) p.home = next.atom();
+      else if(eq(DEPEND, name)) p.dep.add(parseDependency(next));
+      else if(eq(XQUERY, name)) p.comps.add(parseComp(next));
     }
   }
 
@@ -98,13 +94,13 @@ public final class PkgParser {
     final AxisIter attrs = depNode.attributes();
     final Dependency dep = new Dependency();
     for(ANode next; (next = attrs.next()) != null;) {
-      final byte[] nextName = next.nname();
-      if(eq(PKG, nextName)) dep.pkg = next.atom();
-      else if(eq(PROC, nextName)) dep.processor = next.atom();
-      else if(eq(VERS, nextName)) dep.versions = next.atom();
-      else if(eq(SEMVER, nextName)) dep.semver = next.atom();
-      else if(eq(SEMVERMIN, nextName)) dep.semverMin = next.atom();
-      else if(eq(SEMVERMAX, nextName)) dep.semverMax = next.atom();
+      final byte[] name = next.nname();
+      if(eq(PKG, name)) dep.pkg = next.atom();
+      else if(eq(PROC, name)) dep.processor = next.atom();
+      else if(eq(VERS, name)) dep.versions = next.atom();
+      else if(eq(SEMVER, name)) dep.semver = next.atom();
+      else if(eq(SEMVERMIN, name)) dep.semverMin = next.atom();
+      else if(eq(SEMVERMAX, name)) dep.semverMax = next.atom();
     }
     return dep;
   }
@@ -119,10 +115,10 @@ public final class PkgParser {
     final Component c = new Component();
     c.type = XQUERY;
     for(ANode next; (next = ch.next()) != null;) {
-      final byte[] nextName = next.nname();
-      if(eq(IMPURI, nextName)) c.importUri = next.atom();
-      else if(eq(NSPC, nextName)) c.namespace = next.atom();
-      else if(eq(FILE, nextName)) c.file = next.atom();
+      final byte[] name = next.nname();
+      if(eq(IMPURI, name)) c.importUri = next.atom();
+      else if(eq(NSPC, name)) c.namespace = next.atom();
+      else if(eq(FILE, name)) c.file = next.atom();
     }
     return c;
   }

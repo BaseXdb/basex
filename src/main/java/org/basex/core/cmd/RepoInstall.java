@@ -3,9 +3,11 @@ package org.basex.core.cmd;
 import java.io.IOException;
 
 import org.basex.core.Command;
+import org.basex.core.User;
 import org.basex.query.QueryException;
 import org.basex.query.util.repo.RepoManager;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'repo install' command.
@@ -23,7 +25,7 @@ public final class RepoInstall extends Command {
    * @param i input info
    */
   public RepoInstall(final String p, final InputInfo i) {
-    super(STANDARD, p);
+    super(User.ADMIN, p);
     ii = i;
   }
 
@@ -33,6 +35,7 @@ public final class RepoInstall extends Command {
       new RepoManager(context).install(args[0], ii);
       return true;
     } catch(final QueryException ex) {
+      Util.debug(ex);
       return error(ex.getMessage());
     }
   }

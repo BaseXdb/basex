@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
@@ -245,17 +243,15 @@ public final class ResponseHandler {
   private static Item interpretPayload(final byte[] p, final byte[] c,
       final Prop prop, final InputInfo ii) throws IOException, QueryException {
 
-    final Parser parser;
-    if(eq(c, TXT_XML) || eq(c, TXT_EXT_XML) || eq(c, APPL_XML)
-        || eq(c, APPL_EXT_XML) || endsWith(c, MIME_XML_SUFFIX)) {
-      parser = new XMLParser(new IOContent(p), null, prop);
-    } else if(eq(c, TXT_HTML)) {
+    if(eq(c, TXT_XML) || eq(c, TXT_EXT_XML) || eq(c, APPL_XML) ||
+        eq(c, APPL_EXT_XML) || endsWith(c, MIME_XML_SUFFIX)) {
+      return new DBNode(new XMLParser(new IOContent(p), null, prop), prop);
+    }
+    if(eq(c, TXT_HTML)) {
       if(!HTMLParser.available()) throw HTMLERR.thrw(ii);
-      parser = new HTMLParser(new IOContent(p), null, prop);
-    } else if(startsWith(c, MIME_TEXT_PREFIX)) {
-      return Str.get(p);
-    } else return new B64(p);
-    return new DBNode(MemBuilder.build(parser, prop, ""), 0);
+      return new DBNode(new HTMLParser(new IOContent(p), null, prop), prop);
+    }
+    return startsWith(c, MIME_TEXT_PREFIX) ? Str.get(p) : new B64(p);
   }
 
   /**

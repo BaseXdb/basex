@@ -153,7 +153,7 @@ public enum Err {
   MODISTALLED(PACK, 6,
       "Module % is already installed within another package. "),
   /** PACK0007: Evaluation exception. */
-  PKGREADFAIL(PACK, 7, "Reading package descriptor failed. "),
+  PKGREADFAIL(PACK, 7, "Reading package descriptor failed: %"),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

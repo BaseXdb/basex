@@ -19,6 +19,7 @@ import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.func.FNZip;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Repository manager.
@@ -62,8 +63,9 @@ public final class RepoManager {
           new IOContent(cont), ii);
       new PkgValidator(context).check(pkg, ii);
       unzip(xar);
-    } catch(final IOException e) {
-      throw PKGREADFAIL.thrw(ii);
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      throw PKGREADFAIL.thrw(ii, ex.getMessage());
     }
   }
 
@@ -83,21 +85,22 @@ public final class RepoManager {
     final File dir = new File(repoPath(), extractPkgName(xar.getName()));
     dir.mkdir();
 
-    final Enumeration<? extends ZipEntry> e = xar.entries();
-    while(e.hasMoreElements()) {
-      final ZipEntry entry = e.nextElement();
+    final Enumeration<? extends ZipEntry> en = xar.entries();
+    while(en.hasMoreElements()) {
+      final ZipEntry entry = en.nextElement();
+      final File f = new File(dir, entry.getName());
       if(entry.isDirectory()) {
-        new File(dir, entry.getName()).mkdir();
+        f.mkdirs();
       } else {
-        final File f = new File(dir, entry.getName());
-        final InputStream in = xar.getInputStream(entry);
+        f.getParentFile().mkdirs();
         final OutputStream out = new FileOutputStream(f);
+        final InputStream in = xar.getInputStream(entry);
         try {
           final byte[] data = new byte[IO.BLOCKSIZE];
           for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
         } finally {
-          out.close();
-          in.close();
+          try { out.close(); } catch(final IOException e) { }
+          try { in.close();  } catch(final IOException e) { }
         }
       }
     }

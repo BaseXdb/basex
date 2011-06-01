@@ -5,9 +5,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.SerializerException;
 import org.basex.data.SerializerProp;
@@ -286,11 +283,9 @@ public final class FNGen extends Fun {
       if(!base.valid()) DOCBASE.thrw(input, base);
     }
 
-    final Prop prop = ctx.context.prop;
     final IO io = new IOContent(cont, string(base.atom()));
     try {
-      final Parser p = Parser.xmlParser(io, prop, "");
-      return new DBNode(MemBuilder.build(p, prop, ""), 0);
+      return new DBNode(io, ctx.context.prop);
     } catch(final IOException ex) {
       throw SAXERR.thrw(input, ex);
     }
