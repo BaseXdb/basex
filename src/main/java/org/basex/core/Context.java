@@ -5,6 +5,7 @@ import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
+import org.basex.query.util.Repo;
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
 
@@ -34,6 +35,8 @@ public final class Context {
   public User user;
   /** Current query file. */
   public IO query;
+  /** Package repository. */
+  public Repo repo;
 
   /** Data reference. */
   public Data data;
@@ -62,6 +65,7 @@ public final class Context {
     lock = new Lock(this);
     users = new Users(true);
     user = users.get(ADMIN);
+    repo = new Repo(this);
   }
 
   /**

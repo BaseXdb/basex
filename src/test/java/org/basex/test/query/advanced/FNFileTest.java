@@ -161,7 +161,7 @@ public final class FNFileTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testRead() throws QueryException {
+  public void testReadText() throws QueryException {
     final String fun = check(FunDef.READTEXT);
     error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
     error(fun + "('" + Prop.TMP + "')", Err.PATHISDIR);
@@ -325,7 +325,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the file:path-to-full-path() function.
+   * Test method for the file:path-to-uri() function.
    * @throws Exception exception
    */
   @Test

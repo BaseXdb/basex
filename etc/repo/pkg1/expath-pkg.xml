@@ -1,0 +1,15 @@
+<package xmlns="http://expath.org/ns/pkg"
+         spec="1.0"
+         name="http://www.pkg1.com"
+         abbrev="pkg1"
+         version="12.0">
+   <title>Test package 1</title>
+   <xquery>
+      <namespace>ns1</namespace>
+      <file>pkg1mod1.xql</file>
+   </xquery>
+   <xquery>
+      <namespace>ns2</namespace>
+      <file>pkg1mod2.xql</file>
+   </xquery>
+</package>
