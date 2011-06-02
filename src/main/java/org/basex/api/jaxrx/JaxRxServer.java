@@ -1,27 +1,55 @@
 package org.basex.api.jaxrx;
 
 import static org.basex.core.Text.*;
+
+import java.util.List;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
 import org.basex.BaseXServer;
 import org.basex.core.Prop;
 import org.basex.core.Text;
+import org.basex.server.ClientSession;
 import org.basex.util.Args;
+import org.basex.util.Base64;
 import org.basex.util.Util;
 import org.jaxrx.JettyServer;
+import org.jaxrx.core.JaxRxConstants;
+import org.jaxrx.core.JaxRxException;
+import org.jaxrx.core.ResourcePath;
+
+import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 
 /**
- * This is the starter class for running the JAX-RX server,
- * based on the JAX-RX interface.
- * A database server and the Jetty server is launched by the constructor.
- * The Jetty server listens for HTTP requests, which are then sent to JAX-RX.
+ * This is the starter class for running the JAX-RX server, based on the JAX-RX
+ * interface. A database server and the Jetty server is launched by the
+ * constructor. The Jetty server listens for HTTP requests, which are then sent
+ * to JAX-RX.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class JaxRxServer extends BaseXServer {
+  /** Configuration: User. */
+  static final String USER = "org.basex.user";
+  /** Configuration: Password. */
+  static final String PASSWORD = "org.basex.password";
+  /** Configuration: Server port. */
+  static final String SERVERPORT = "org.basex.serverport";
+  /** Configuration: JAX-RX path. */
+  static final String JAXRXPATH = "org.basex.jaxrxpath";
+  /** Configuration: serializer options. */
+  static final String SERIALIZER = "org.jaxrx.parameter.output";
   /** JAX-RX String. */
-  private static final String JAXRX = "JAX-RX";
+  static final String JAXRX = "JAX-RX";
+
   /** Jetty server. */
   private JettyServer jetty;
+  /** Optional user. */
+  private String user;
+  /** Optional password. */
+  private String pass;
 
   /**
    * Main method, launching the JAX-RX implementation.
@@ -40,41 +68,48 @@ public final class JaxRxServer extends BaseXServer {
     if(!success || service) return;
 
     // set default ports and paths
-    set(BXJaxRx.JAXRXPATH, context.prop.get(Prop.JAXRXPATH), false);
-    set(BXJaxRx.SERVERPORT, context.prop.num(Prop.SERVERPORT), false);
-    set(BXJaxRx.SERIALIZER, context.prop.get(Prop.SERIALIZER), false);
+    set(JAXRXPATH, context.prop.get(Prop.JAXRXPATH), false);
+    set(SERVERPORT, context.prop.num(Prop.SERVERPORT), false);
+    set(SERIALIZER, context.prop.get(Prop.SERIALIZER), false);
 
-    // store configuration in system properties
-    // if a property has already been set, the new settings will be ignored
-
-    // set user (use 'admin' as default)
-    final boolean user = System.getProperty(BXJaxRx.USER) != null;
-    if(!user) set(BXJaxRx.USER, Text.ADMIN, false);
-    // set password (use 'admin' as default, or request on command line)
-    final String pass = System.getProperty(BXJaxRx.PASSWORD);
-    String p = pass != null ? pass : user ? null : Text.ADMIN;
-    while(p == null) {
-      Util.out(SERVERPW + COLS);
-      p = password();
+    // retrieve password on command-line if only the user was specified
+    String p = pass;
+    if(user != null) {
+      while(p == null) {
+        Util.out(SERVERPW + COLS);
+        p = password();
+      }
     }
-    set(BXJaxRx.PASSWORD, p, false);
+    // set data as system properties
+    set(USER, user == null ? "" : user, user != null);
+    set(PASSWORD, p == null ? "" : p, p != null);
+
+    // try to login with specified data
+    try {
+      if(!System.getProperty(USER).isEmpty()) login(null).close();
+    } catch(final Exception ex) {
+      Util.errln(ex.getMessage());
+      quit(false);
+      return;
+    }
 
     // define path and name of the JAX-RX implementation.
-    set("org.jaxrx.systemName", Text.NAMELC, false);
-    set("org.jaxrx.systemPath", BXJaxRx.class.getName(), false);
+    set(JaxRxConstants.NAMEPROP, Text.NAMELC, false);
+    set(JaxRxConstants.PATHPROP, BXJaxRx.class.getName(), false);
 
     // start Jetty server (if not done yet)
     try {
       jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT));
       Util.outln(JAXRX + ' ' + SERVERSTART);
     } catch(final Exception ex) {
+      ex.printStackTrace();
       Util.server(ex);
     }
   }
 
   @Override
-  public void quit(final boolean user) {
-    super.quit(user);
+  public void quit(final boolean u) {
+    super.quit(u);
     if(jetty != null) jetty.stop();
   }
 
@@ -88,6 +123,53 @@ public final class JaxRxServer extends BaseXServer {
     if(force || System.getProperty(key) == null) {
       System.setProperty(key, value.toString());
     }
+  }
+
+  /**
+   * Logs in and returns a client session.
+   * @param path resource path; may be {@code null}
+   * @return client session
+   * @throws Exception exception
+   */
+  static ClientSession login(final ResourcePath path) throws Exception {
+    String[] id = updateIdentity(path);
+    if(id == null) id = new String[] {
+        System.getProperty(JaxRxServer.USER),
+        System.getProperty(JaxRxServer.PASSWORD)
+    };
+    final int p = Integer.parseInt(System.getProperty(JaxRxServer.SERVERPORT));
+    return new ClientSession(Text.LOCALHOST, p, id[0], id[1]);
+  }
+
+  /**
+   * Reads user identity and user credentials from HTTP header.
+   * @param path {@link ResourcePath} instance.
+   * @return login/password combination or {@code null} if no user was
+   *         specified.
+   */
+  private static String[] updateIdentity(final ResourcePath path) {
+    if(path == null) return null;
+    final HttpHeaders headers = path.getHttpHeaders();
+    final List<String> authorization =
+      headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
+    if(authorization != null) {
+      for(final String value : authorization) {
+        final String[] values = value.split(" ");
+        if(values[0].equalsIgnoreCase("basic")) {
+          final String[] cred = Base64.decode(values[1]).split(":", 2);
+          if(cred.length < 2) {
+            final ResponseBuilder rb = new ResponseBuilderImpl();
+            rb.header(HttpHeaders.WWW_AUTHENTICATE, "Basic ");
+            rb.status(401);
+            rb.entity("No password specified.");
+            throw new JaxRxException(rb.build());
+          }
+          return cred;
+        }
+        throw new JaxRxException(500, "Unsupported authorization mode.");
+      }
+    }
+    return null;
   }
 
   @Override
@@ -106,10 +188,10 @@ public final class JaxRxServer extends BaseXServer {
           context.prop.set(Prop.JAXRXPORT, arg.num());
         } else if(c == 'p') {
           // parse server port
-          set(BXJaxRx.SERVERPORT, arg.num(), true);
+          set(SERVERPORT, arg.num(), true);
         } else if(c == 'P') {
           // specify password
-          set(BXJaxRx.PASSWORD, arg.string(), true);
+          pass = arg.string();
         } else if(c == 's') {
           // set service flag
           service = !daemon;
@@ -117,10 +199,10 @@ public final class JaxRxServer extends BaseXServer {
           // set/add serialization parameter
           if(serial.length() != 0) serial.append(',');
           serial.append(arg);
-          set(BXJaxRx.SERIALIZER, serial, true);
+          set(SERIALIZER, serial, true);
         } else if(c == 'U') {
           // specify user name
-          set(BXJaxRx.USER, arg.string(), true);
+          user = arg.string();
         } else if(c == 'z') {
           // suppress logging
           quiet = true;
@@ -130,7 +212,8 @@ public final class JaxRxServer extends BaseXServer {
       } else {
         arg.check(false);
         if(arg.string().equalsIgnoreCase("stop")) {
-          stop(context.prop.num(Prop.SERVERPORT));
+          stop(context.prop.num(Prop.SERVERPORT),
+               context.prop.num(Prop.EVENTPORT));
           return false;
         }
       }

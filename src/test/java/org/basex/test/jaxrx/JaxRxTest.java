@@ -1,6 +1,7 @@
 package org.basex.test.jaxrx;
 
 import static org.junit.Assert.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -11,7 +12,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import javax.ws.rs.core.HttpHeaders;
+
 import org.basex.api.jaxrx.JaxRxServer;
+import org.basex.core.Text;
+import org.basex.util.Base64;
 import org.basex.util.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -23,10 +29,11 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
+@SuppressWarnings("all")
 public final class JaxRxTest {
   /** Opening result. */
-  private static final String WRAP1 = "<jax-rx:results xmlns:jax-rx=" +
-    "\"http://jax-rx.sourceforge.net\">";
+  private static final String WRAP1 = "<jax-rx:results xmlns:jax-rx="
+      + "\"http://jax-rx.sourceforge.net\">";
   /** Closing result. */
   private static final String WRAP2 = "</jax-rx:results>";
   /** Root path. */
@@ -39,7 +46,7 @@ public final class JaxRxTest {
   /** Start server. */
   @BeforeClass
   public static void start() {
-    jaxrx = new JaxRxServer("-z");
+    jaxrx = new JaxRxServer("-U" + Text.ADMIN + " -P" + Text.ADMIN + " -z");
   }
 
   /** Stop server. */
@@ -74,8 +81,8 @@ public final class JaxRxTest {
    */
   @Test
   public void getBind() throws IOException {
-    assertEquals("123", get("?wrap=no&" +
-      "query=declare+variable+$x+as+xs:integer+external;$x&var=$x=123"));
+    assertEquals("123", get("?wrap=no&"
+        + "query=declare+variable+$x+as+xs:integer+external;$x&var=$x=123"));
   }
 
   /**
@@ -84,8 +91,8 @@ public final class JaxRxTest {
    */
   @Test
   public void getBind2() throws IOException {
-    assertEquals("124", get("?wrap=no&var=x=123&" +
-      "query=declare+variable+$x+as+xs:integer+external;$x%2b1"));
+    assertEquals("124", get("?wrap=no&var=x=123&"
+        + "query=declare+variable+$x+as+xs:integer+external;$x%2b1"));
   }
 
   /**
@@ -94,12 +101,11 @@ public final class JaxRxTest {
    */
   @Test
   public void getBind3() throws IOException {
-    assertEquals("6", get("?wrap=no&" +
-      "query=declare+variable+$a++as+xs:integer+external;" +
-      "declare+variable+$b+as+xs:integer+external;" +
-      "declare+variable+$c+as+xs:integer+external;" +
-      "$a*$b*$c&" +
-      "var=a=1&var=b=2&var=c=3"));
+    assertEquals("6", get("?wrap=no&"
+        + "query=declare+variable+$a++as+xs:integer+external;"
+        + "declare+variable+$b+as+xs:integer+external;"
+        + "declare+variable+$c+as+xs:integer+external;" + "$a*$b*$c&"
+        + "var=a=1&var=b=2&var=c=3"));
   }
 
   /** GET Test. */
@@ -152,8 +158,10 @@ public final class JaxRxTest {
    */
   @Test
   public void postQuery1() throws IOException {
-    assertEquals("123", postQuery("",
-      "<query><text>123</text><parameter name='wrap' value='no'/></query>"));
+    assertEquals(
+        "123",
+        postQuery("",
+        "<query><text>123</text><parameter name='wrap' value='no'/></query>"));
   }
 
   /**
@@ -162,8 +170,10 @@ public final class JaxRxTest {
    */
   @Test
   public void postQuery2() throws IOException {
-    assertEquals("", postQuery("",
-      "<query><text>()</text><parameter name='wrap' value='no'/></query>"));
+    assertEquals(
+        "",
+        postQuery("",
+        "<query><text>()</text><parameter name='wrap' value='no'/></query>"));
   }
 
   /**
@@ -172,9 +182,12 @@ public final class JaxRxTest {
    */
   @Test
   public void postQuery3() throws IOException {
-    assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>123", postQuery("",
-      "<query><text>123</text><parameter name='wrap' value='no'/>" +
-      "<parameter name='output' value='omit-xml-declaration=no'/></query>"));
+    assertEquals(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>123",
+        postQuery(
+            "",
+            "<query><text>123</text><parameter name='wrap' value='no'/>"
+       + "<parameter name='output' value='omit-xml-declaration=no'/></query>"));
   }
 
   /**
@@ -183,17 +196,15 @@ public final class JaxRxTest {
    */
   @Test
   public void postQuery4() throws IOException {
-    assertEquals("<html></html>", postQuery("",
-      "<query>" +
-      "<text><![CDATA[<html/>]]></text>" +
-      "<parameter name='wrap' value='no'/>" +
-      "<parameter name='wrap' value='yes'/>" +
-      "<parameter name='output' value='omit-xml-declaration=no'/>" +
-      "<parameter name='output' value='omit-xml-declaration=yes'/>" +
-      "<output name='omit-xml-declaration' value='no'/>" +
-      "<output name='omit-xml-declaration' value='yes'/>" +
-      "<output name='method' value='xhtml'/>" +
-      "</query>"));
+    assertEquals("<html></html>", postQuery("", "<query>"
+        + "<text><![CDATA[<html/>]]></text>"
+        + "<parameter name='wrap' value='no'/>"
+        + "<parameter name='wrap' value='yes'/>"
+        + "<parameter name='output' value='omit-xml-declaration=no'/>"
+        + "<parameter name='output' value='omit-xml-declaration=yes'/>"
+        + "<output name='omit-xml-declaration' value='no'/>"
+        + "<output name='omit-xml-declaration' value='yes'/>"
+        + "<output name='method' value='xhtml'/>" + "</query>"));
   }
 
   /**
@@ -202,13 +213,11 @@ public final class JaxRxTest {
    */
   @Test
   public void postQuery5() throws IOException {
-    assertEquals("123", postQuery("",
-      "<query>" +
-      "<text>123</text>" +
-      "<parameter name='wrap' value='no'/>" +
-      "<parameter name='output' value='omit-xml-declaration=no'/>" +
-      "<parameter name='output' value='omit-xml-declaration=yes'/>" +
-      "</query>"));
+    assertEquals("123", postQuery("", "<query>" + "<text>123</text>"
+        + "<parameter name='wrap' value='no'/>"
+        + "<parameter name='output' value='omit-xml-declaration=no'/>"
+        + "<parameter name='output' value='omit-xml-declaration=yes'/>"
+        + "</query>"));
   }
 
   /** POST Test: execute buggy query. */
@@ -365,8 +374,13 @@ public final class JaxRxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod("POST");
-    conn.setRequestProperty("Content-Type", "application/query+xml");
-
+    conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "application/query+xml");
+    // basic authentication example
+    final String user = Text.ADMIN;
+    final String pw = Text.ADMIN;
+    final String userpw = user + ":" + pw;
+    final String encoded = Base64.encode(userpw);
+    conn.setRequestProperty("Authorization", "Basic " + encoded);
     // send query
     final OutputStream out = conn.getOutputStream();
     out.write(Token.token(query));
@@ -400,7 +414,8 @@ public final class JaxRxTest {
       // send input stream if it not empty
       final BufferedInputStream bis = new BufferedInputStream(is);
       int i;
-      while((i = bis.read()) != -1) bos.write(i);
+      while((i = bis.read()) != -1)
+        bos.write(i);
       bis.close();
       bos.close();
     }
@@ -431,7 +446,8 @@ public final class JaxRxTest {
     final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
     final BufferedInputStream bis = new BufferedInputStream(is);
     int i;
-    while((i = bis.read()) != -1) bos.write(i);
+    while((i = bis.read()) != -1)
+      bos.write(i);
     bis.close();
     bos.close();
     try {
@@ -470,7 +486,8 @@ public final class JaxRxTest {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     final BufferedInputStream bis = new BufferedInputStream(is);
     int i;
-    while((i = bis.read()) != -1) baos.write(i);
+    while((i = bis.read()) != -1)
+      baos.write(i);
     bis.close();
     return baos.toString();
   }

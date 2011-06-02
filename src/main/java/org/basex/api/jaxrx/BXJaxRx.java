@@ -36,17 +36,6 @@ import org.jaxrx.core.ResourcePath;
  * @author Lukas Lewandowski
  */
 public final class BXJaxRx implements JaxRx {
-  /** Configuration: User. */
-  public static final String USER = "org.basex.user";
-  /** Configuration: Password. */
-  public static final String PASSWORD = "org.basex.password";
-  /** Configuration: Server port. */
-  public static final String SERVERPORT = "org.basex.serverport";
-  /** Configuration: JAX-RX path. */
-  public static final String JAXRXPATH = "org.basex.jaxrxpath";
-  /** Configuration: serializer options. */
-  public static final String SERIALIZER = "org.jaxrx.parameter.output";
-
   @Override
   public HashSet<QueryParameter> getParameters() {
     final HashSet<QueryParameter> p = new HashSet<QueryParameter>();
@@ -115,7 +104,7 @@ public final class BXJaxRx implements JaxRx {
       @Override
       String code() {
         // get root directory for files
-        final String root = System.getProperty(JAXRXPATH) + "/";
+        final String root = System.getProperty(JaxRxServer.JAXRXPATH) + "/";
         final IO io = IO.get(root + file);
 
         // file not found...
@@ -155,7 +144,7 @@ public final class BXJaxRx implements JaxRx {
 
   @Override
   public String add(final InputStream input, final ResourcePath rp) {
-    return new BXCode() {
+    return new BXCode(rp) {
       @Override
       String code() {
         // open database
@@ -194,7 +183,7 @@ public final class BXJaxRx implements JaxRx {
 
   @Override
   public String update(final InputStream input, final ResourcePath rp) {
-    return new BXCode() {
+    return new BXCode(rp) {
       @Override
       String code() {
         try {
@@ -223,7 +212,7 @@ public final class BXJaxRx implements JaxRx {
 
   @Override
   public String delete(final ResourcePath rp) {
-    return new BXCode() {
+    return new BXCode(rp) {
       @Override
       String code() {
         final boolean root = rp.getDepth() == 1;

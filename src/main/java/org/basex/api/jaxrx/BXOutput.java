@@ -5,6 +5,7 @@ import java.util.Scanner;
 import javax.ws.rs.core.StreamingOutput;
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.server.ClientQuery;
@@ -29,6 +30,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
    * @param pt optional path info
    */
   BXOutput(final ResourcePath pt) {
+    super(pt);
     path = pt;
   }
 
@@ -41,7 +43,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
         // open database if a resource path was specified
         if(path.getDepth() != 0) cs.execute(new Open(path.getResourcePath()));
       } catch(final BaseXException ex) {
-        throw new JaxRxException(404, ex.getMessage());
+        throw new JaxRxException(status(ex), ex.getMessage());
       }
       try {
         // set serialization parameters
@@ -54,8 +56,8 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
   }
 
   /**
-   * Executes the specified command.
-   * If command execution fails, an exception is thrown.
+   * Executes the specified command. If command execution fails, an exception is
+   * thrown.
    * @param command command to be executed
    * @param os output stream, or {@code null}
    * @return result, or {@code null} if output stream was specified
@@ -102,13 +104,26 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       // loop through all results
       int c = 0;
       cq.init();
-      while(++c < s + m && cq.more()) if(c >= s) cq.next();
+      while(++c < s + m && cq.more())
+        if(c >= s) cq.next();
       return null;
     } catch(final BaseXException ex) {
-      throw new JaxRxException(400, ex.getMessage());
+      throw new JaxRxException(status(ex), ex.getMessage());
     } finally {
       // close query instance
-      if(cq != null) try { cq.close(); } catch(final BaseXException ex) { }
+      if(cq != null) try {
+        cq.close();
+      } catch(final BaseXException ex) { }
     }
+  }
+
+  /**
+   * Returns status code when an exception occurs.
+   * @param ex Exception occurred.
+   * @return status code.
+   */
+  private int status(final Exception ex) {
+    final String msg = ex.getMessage();
+    return msg != null && (msg.contains(Text.PERMNO.substring(2))) ? 403 : 404;
   }
 }

@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# Copyright (c) 2011 Alexander Holupirek <alex@holupirek.de>
+# Copyright (c) 2009 Nicholas Marriott <nicm@users.sourceforge.net>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF MIND, USE, DATA OR PROFITS, WHETHER
+# IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+# OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+
+DBC_PLATFORM=${DBC_PLATFORM:-`uname -s`}
+
+CONFIG_H=config.h
+rm -f $CONFIG_H
+echo "/* $DBC_PLATFORM */" >$CONFIG_H
+
+CONFIG_MK=config.mk
+rm -f $CONFIG_MK
+echo "# $DBC_PLATFORM" >$CONFIG_MK
+
+case $DBC_PLATFORM in
+# ------------------------------------------------------------------------------
+    Linux)
+	cat <<EOF >>$CONFIG_MK
+LIBSFX=so
+LIBS+= -lssl
+EOF
+	;;
+# ------------------------------------------------------------------------------
+    Darwin)
+	cat <<EOF >>$CONFIG_MK
+LIBSFX=dylib
+LIBS+= -lcrypto
+EOF
+	;;
+# ------------------------------------------------------------------------------
+    *)
+	echo Unable to configure for $DBC_PLATFORM
+	exit 1
+esac
+
+echo Configured for $DBC_PLATFORM
+exit 0
