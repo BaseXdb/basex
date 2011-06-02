@@ -190,26 +190,21 @@ public class GFLWOR extends ParseExpr {
     // modification counter
     int m = 0;
     for(int i = 1; i < fl.length; i++) {
-      final ForLet out = fl[i];
+      final ForLet in = fl[i];
       // move clauses upwards that contain a single value.
       // expressions that depend on the current context (e.g. math:random())
       // or fragment constructors creating unique nodes are left alone
-      if(out.size() != 1 || out.uses(Use.CTX) || out.uses(Use.CNS)) continue;
+      if(in.size() != 1 || in.uses(Use.CTX) || in.uses(Use.CNS)) continue;
 
-      // find most outer clause that can be skipped
+      // find most outer clause that has no variables which are used
+      // in the clause to be moved
       int p = -1;
-      for(int j = i; j-- != 0;) {
-        final ForLet in = fl[j];
-        if(out.count(in.var) != 0) break;
-        if(in.size() == 1) continue;
-        if(!in.simple(false)) break;
-        p = j;
-      }
+      for(int o = i; o-- != 0 && in.count(fl[o]) == 0; p = o);
       if(p == -1) continue;
 
-      // move clauses
+      // move clause
       Array.move(fl, p, 1, i - p);
-      fl[p] = out;
+      fl[p] = in;
       if(m++ == 0) ctx.compInfo(OPTFORLET);
     }
   }

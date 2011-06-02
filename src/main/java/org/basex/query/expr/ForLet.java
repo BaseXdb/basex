@@ -32,7 +32,7 @@ public abstract class ForLet extends Single {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  protected final void bind(final QueryContext ctx) throws QueryException {
+  final void bind(final QueryContext ctx) throws QueryException {
     if(!simple(true)) return;
 
     // don't bind variable if expression uses variables, context, or fragments
@@ -53,6 +53,22 @@ public abstract class ForLet extends Single {
    * @return result of check
    */
   abstract boolean simple(final boolean one);
+
+  /**
+   * Returns the total number of occurrences of all variables that are
+   * defined in the specified clause.
+   * @param fl clause to be checked
+   * @return total number of occurrences
+   */
+  final int count(final ForLet fl) {
+    int c = expr.count(fl.var);
+    if(fl instanceof For) {
+      final For f = (For) fl;
+      if(f.pos != null) c += expr.count(f.pos);
+      if(f.score != null) c += expr.count(f.score);
+    }
+    return c;
+  }
 
   @Override
   public final boolean uses(final Use u) {
