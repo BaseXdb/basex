@@ -9,15 +9,18 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
+import org.basex.query.QueryTokens;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.QNm;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.util.repo.Package.Component;
 import org.basex.query.util.repo.Package.Dependency;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
- * Parser for package descriptors.
+ * Parses the package descriptors and performs schema checcks.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
@@ -25,101 +28,169 @@ import org.basex.util.InputInfo;
 public final class PkgParser {
   /** Context. */
   private final Context context;
+  /** Input info. */
+  private final InputInfo input;
 
   /**
    * Constructor.
    * @param ctx context
+   * @param ii input info
    */
-  public PkgParser(final Context ctx) {
+  public PkgParser(final Context ctx, final InputInfo ii) {
     context = ctx;
+    input = ii;
   }
 
   /**
    * Parses package descriptor.
-   * @param io IO
-   * @param ii input info
+   * @param io XML input
    * @return package container
    * @throws QueryException query exception
    */
-  public Package parse(final IO io, final InputInfo ii) throws QueryException {
+  public Package parse(final IO io) throws QueryException {
     final Package pkg = new Package();
     try {
-      final ANode node = new DBNode(io, context.prop).children().next();
-      parseAttrs(node, pkg);
+      ANode node = new DBNode(io, context.prop).children().next();
+
+      // tries to guess if the package is based on an obsolete packaging API
+      final boolean legacy = legacy(node);
+      // if yes, retrieves child node
+      if(legacy) node = node.children().next();
+
+      // checks root node
+      final byte[] root = legacy ? MODULE : PACKAGE;
+      if(!eqNS(root, node.qname()))
+        PKGDESCINV.thrw(input, Util.info(WHICHELEM, node.qname()));
+
+      parseAttributes(node, pkg, root);
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
-      throw PKGREADFAIL.thrw(ii, ex.getMessage());
+      throw PKGREADFAIL.thrw(input, ex.getMessage());
     }
   }
 
   /**
-   * Parses the attributes of <package/>.
-   * @param pkgNode package node
-   * @param p package container
+   * Tries to guess if the package is based on an obsolete packaging API.
+   * This check will be removed in future versions.
+   * @param node root node
+   * @return result of check
    */
-  private void parseAttrs(final ANode pkgNode, final Package p) {
-    final AxisIter atts = pkgNode.attributes();
+  private boolean legacy(final ANode node) {
+    final AxisIter ch = node.children();
+    for(ANode next; (next = ch.next()) != null;) {
+      if(eqNS(MODULE, next.qname())) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Parses the attributes of <package/> or <module/>.
+   * @param node package node
+   * @param p package container
+   * @param root root node
+   * @throws QueryException query exception
+   */
+  private void parseAttributes(final ANode node, final Package p,
+      final byte[] root) throws QueryException {
+
+    final AxisIter atts = node.attributes();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.nname();
-      if(eq(NAME, name)) p.uri = next.atom();
-      else if(eq(ABBREV, name)) p.abbrev = next.atom();
+      if(eq(NAME, name))         p.name = next.atom();
+      else if(eq(ABBREV, name))  p.abbrev = next.atom();
       else if(eq(VERSION, name)) p.version = next.atom();
-      else if(eq(SPEC, name)) p.spec = next.atom();
+      else if(eq(SPEC, name))    p.spec = next.atom();
+      else PKGDESCINV.thrw(input, Util.info(WHICHATTR, name));
     }
+
+    // Check mandatory attributes
+    if(p.name == null)
+      PKGDESCINV.thrw(input, Util.info(MISSATTR, NAME, root));
+    if(p.version == null)
+      PKGDESCINV.thrw(input, Util.info(MISSATTR, VERSION, root));
+    if(eq(root, MODULE)) return;
+
+    // Check mandatory attributes in version 1.0
+    if(p.abbrev == null)
+      PKGDESCINV.thrw(input, Util.info(MISSATTR, ABBREV, root));
+    if(p.spec == null)
+      PKGDESCINV.thrw(input, Util.info(MISSATTR, SPEC, root));
   }
 
   /**
    * Parses the children of <package/>.
-   * @param pkgNode package node
+   * @param node package node
    * @param p package container
+   * @throws QueryException query exception
    */
-  private void parseChildren(final ANode pkgNode, final Package p) {
-    final AxisIter ch = pkgNode.children();
+  private void parseChildren(final ANode node, final Package p)
+      throws QueryException {
+
+    final AxisIter ch = node.children();
     for(ANode next; (next = ch.next()) != null;) {
-      final byte[] name = next.nname();
-      if(eq(TITLE, name)) p.title = next.atom();
-      else if(eq(HOME, name)) p.home = next.atom();
-      else if(eq(DEPEND, name)) p.dep.add(parseDependency(next));
-      else if(eq(XQUERY, name)) p.comps.add(parseComp(next));
+      final QNm name = next.qname();
+      if(eqNS(TITLE, name))       p.title = next.atom();
+      else if(eqNS(HOME, name))   p.home = next.atom();
+      else if(eqNS(DEPEND, name)) p.dep.add(parseDependency(next));
+      else if(eqNS(XQUERY, name)) p.comps.add(parseComp(next));
     }
   }
 
   /**
    * Parses <dependency/>.
-   * @param depNode node <dependency/> to be parsed
+   * @param node node <dependency/> to be parsed
    * @return dependency container
+   * @throws QueryException query exception
    */
-  private Dependency parseDependency(final ANode depNode) {
-    final AxisIter attrs = depNode.attributes();
-    final Dependency dep = new Dependency();
-    for(ANode next; (next = attrs.next()) != null;) {
+  private Dependency parseDependency(final ANode node) throws QueryException {
+    final AxisIter atts = node.attributes();
+    final Dependency d = new Dependency();
+    for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.nname();
-      if(eq(PKG, name)) dep.pkg = next.atom();
-      else if(eq(PROC, name)) dep.processor = next.atom();
-      else if(eq(VERS, name)) dep.versions = next.atom();
-      else if(eq(SEMVER, name)) dep.semver = next.atom();
-      else if(eq(SEMVERMIN, name)) dep.semverMin = next.atom();
-      else if(eq(SEMVERMAX, name)) dep.semverMax = next.atom();
+      if(eq(PKG, name))            d.pkg = next.atom();
+      else if(eq(PROC, name))      d.processor = next.atom();
+      else if(eq(VERS, name))      d.versions = next.atom();
+      else if(eq(SEMVER, name))    d.semver = next.atom();
+      else if(eq(SEMVERMIN, name)) d.semverMin = next.atom();
+      else if(eq(SEMVERMAX, name)) d.semverMax = next.atom();
+      else PKGDESCINV.thrw(input, Util.info(WHICHATTR, name));
     }
-    return dep;
+    return d;
   }
 
   /**
    * Parses <xquery/>.
-   * @param comp xquery component
+   * @param node xquery component
    * @return component container
+   * @throws QueryException query exception
    */
-  private Component parseComp(final ANode comp) {
-    final AxisIter ch = comp.children();
+  private Component parseComp(final ANode node) throws QueryException {
+    final AxisIter ch = node.children();
     final Component c = new Component();
     c.type = XQUERY;
     for(ANode next; (next = ch.next()) != null;) {
-      final byte[] name = next.nname();
-      if(eq(IMPURI, name)) c.importUri = next.atom();
-      else if(eq(NSPC, name)) c.namespace = next.atom();
-      else if(eq(FILE, name)) c.file = next.atom();
+      final QNm name = next.qname();
+      if(eqNS(IMPURI, name))    c.importUri = next.atom();
+      else if(eqNS(NSPC, name)) c.namespace = next.atom();
+      else if(eqNS(FILE, name)) c.file = next.atom();
+      else PKGDESCINV.thrw(input, Util.info(WHICHELEM, name));
     }
+
+    // Check mandatory children
+    if(c.namespace == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, NSPC));
+    if(c.file == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, FILE));
     return c;
+  }
+
+  /**
+   * Checks if the specified name equals the qname and if it uses the packaging
+   * namespace.
+   * @param cmp input
+   * @param name name to be compared
+   * @return result of check
+   */
+  private static boolean eqNS(final byte[] cmp, final QNm name) {
+    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryTokens.PKGURI);
   }
 }

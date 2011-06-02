@@ -23,7 +23,7 @@ final class Package {
   /** Package components. */
   final List<Component> comps = new ArrayList<Component>();
   /** Package uri. */
-  byte[] uri;
+  byte[] name;
   /** Package short name. */
   byte[] abbrev;
   /** Package version. */
@@ -40,7 +40,7 @@ final class Package {
    * @return result
    */
   byte[] getName() {
-    return new TokenBuilder().add(uri).add(NAMESEP).add(version).finish();
+    return new TokenBuilder(name).add(NAMESEP).add(version).finish();
   }
 
   /**

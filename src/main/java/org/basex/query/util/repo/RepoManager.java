@@ -52,16 +52,15 @@ public final class RepoManager {
     createRepo();
     // Check package existence
     final File pkgFile = new File(path);
-    if(!pkgFile.exists()) PKGNOTEXIST.thrw(ii);
+    if(!pkgFile.exists()) PKGNOTEXIST.thrw(ii, path);
     // Check package name - must be a .xar file
     checkPkgName(path, ii);
 
     try {
       final ZipFile xar = new ZipFile(pkgFile);
       final byte[] cont = FNZip.read(xar, DESCRIPTOR);
-      final Package pkg = new PkgParser(context).parse(
-          new IOContent(cont), ii);
-      new PkgValidator(context).check(pkg, ii);
+      final Package pkg = new PkgParser(context, ii).parse(new IOContent(cont));
+      new PkgValidator(context, ii).check(pkg);
       unzip(xar);
     } catch(final IOException ex) {
       Util.debug(ex);

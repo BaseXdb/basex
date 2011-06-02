@@ -371,7 +371,7 @@ public final class CommandParser extends InputParser {
   }
 
   /**
-   * Parses and returns a glob expression, which extends the {@link #uri}
+   * Parses and returns a glob expression, which extends the {@link #name}
    * with asterisks, question marks and commands. See {@link IOFile#regex}
    * for more details.
    * @param cmd referring command; if specified, the result must not be empty

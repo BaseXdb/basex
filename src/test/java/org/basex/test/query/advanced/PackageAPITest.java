@@ -71,74 +71,119 @@ public class PackageAPITest extends AdvancedQueryTest {
         string(pkgDict.get(token("http://www.pkg2.com-10.0"))));
   }
 
+  /** Test for missing mandatory attributes. */
+  @Test
+  public void mandatoryAttr() {
+    error(new IOContent(token("<package " +
+      "xmlns:http='http://expath.org/ns/pkg' spec='1.0'/>")),
+      Err.PKGDESCINV, "Missing mandatory attribute not detected.");
+  }
+
+  /** Test for already installed package. */
+  @Test
+  public void alreadyInstalled() {
+    error(desc("http://www.pkg1.com", "pkg1", "12.0", ""),
+      Err.PKGINSTALLED, "Installed package not detected.");
+  }
+
   /**
-   * Tests validation of packages.
+   * Tests package with not installed dependencies - dependency is defined with
+   * no specific versions.
    */
   @Test
-  public void testPkgCheck() {
-    // Missing mandatory attributes
-    error(new IOContent(token("<package " +
-        "xmlns:http='http://expath.org/ns/pkg' spec='1.0'/>")),
-        Err.PKGDESCINV, "Missing mandatory attribute not detected.");
-
-    // Already installed package
-    error(desc("http://www.pkg1.com", "pkg1", "12.0", ""),
-        Err.PKGINSTALLED, "Installed package not detected.");
-
-    // Package with not installed dependencies - dependency is defined with no
-    // specific versions
+  public void notInstalledDeps() {
     error(desc("http://www.pkg5.com", "pkg5", "12.0",
-        "<dependency package='http://www.pkg4.com'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+      "<dependency package='http://www.pkg4.com'/>"),
+      Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+  }
 
-    // Package with not installed dependencies - dependency is defined with
-    // version set
+  /**
+   * Tests package with not installed dependencies - dependency is defined with
+   * version set.
+   */
+  @Test
+  public void notInstalledDepVersion() {
     error(desc("http://www.pkg5.com", "pkg5", "12.0",
-        "<dependency package='http://www.pkg1.com' versions='1.0 7.0'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+      "<dependency package='http://www.pkg1.com' versions='1.0 7.0'/>"),
+      Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+  }
 
-    // Package with not installed dependencies - dependency is defined with
-    // version template
+  /**
+   * Tests package with not installed dependencies - dependency is defined with
+   * version template.
+   */
+  @Test
+  public void notInstalledDepTemp() {
     error(desc("http://www.pkg5.com", "pkg5", "12.0",
-        "<dependency package='http://www.pkg1.com' versions='12.7'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+      "<dependency package='http://www.pkg1.com' versions='12.7'/>"),
+      Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+  }
 
-    // Package with not installed dependencies - dependency is defined with
-    // version template for minimal acceptable version
+  /**
+   * Tests package with not installed dependencies - dependency is defined with
+   * version template for minimal acceptable version.
+   */
+  @Test
+  public void notInstalledMin() {
     error(desc("http://www.pkg5.com", "pkg5", "12.0",
-        "<dependency package='http://www.pkg1.com' versions='12.7'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+      "<dependency package='http://www.pkg1.com' versions='12.7'/>"),
+      Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+  }
 
-    // Package with not installed dependencies - dependency is defined with
-    // version template for maximal acceptable version
+  /**
+   * Tests package with not installed dependencies - dependency is defined with
+   * version template for maximal acceptable version.
+   */
+  @Test
+  public void notInstalledMax() {
     error(desc("http://www.pkg5.com", "pkg5", "12.0",
-        "<dependency package='http://www.pkg1.com' semver-max='11'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+      "<dependency package='http://www.pkg1.com' semver-max='11'/>"),
+      Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+  }
 
-    // Package with not installed dependencies - dependency is defined with
-    // version templates for minimal and maximal acceptable version
+  /**
+   * Tests package with not installed dependencies - dependency is defined with
+   * version templates for minimal and maximal acceptable version.
+   */
+  @Test
+  public void notInstalledMinMax() {
     error(desc("http://www.pkg5.com", "pkg5", "12.0",
-        "<dependency package='http://www.pkg1.com' semver-min='5.7' " +
-        "semver-max='11'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+      "<dependency package='http://www.pkg1.com' semver-min='5.7' " +
+      "semver-max='11'/>"),
+      Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+  }
 
-    // Package with component which is already installed as part of another
-    // package
+  /**
+   * Tests package with component which is already installed as part of another
+   * package.
+   */
+  @Test
+  public void alreadyAnotherInstalled() {
     error(desc("http://www.pkg5.com", "pkg5", "12.0",
-        "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"),
-        Err.MODISTALLED, "Already installed component not detected.");
+      "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"),
+      Err.MODISTALLED, "Already installed component not detected.");
+  }
 
-    // Package with component which is already installed as part of another
-    // version of the same package
+  /**
+   * Tests package with component which is already installed as part of another
+   * version of the same package.
+   */
+  @Test
+  public void alreadyAnotherSame() {
     ok(desc("http://www.pkg1.com", "pkg1", "10.0",
         "<xquery><namespace>ns1</namespace>" +
         "<file>pkg1mod1.xql</file></xquery>"));
+  }
 
-    // Valid package
+  /**
+   * Tests valid package.
+   */
+  @Test
+  public void valid() {
     ok(desc("http://www.pkg1.com", "pkg1", "10.0",
-        "<dependency package='http://www.pkg1.com' semver-min='11'/>" +
-        "<xquery><namespace>ns3</namespace>" +
-        "<file>pkg5mod1.xql</file></xquery>"));
+      "<dependency package='http://www.pkg1.com' semver-min='11'/>" +
+      "<xquery><namespace>ns3</namespace>" +
+      "<file>pkg5mod1.xql</file></xquery>"));
   }
 
   /**
@@ -147,7 +192,7 @@ public class PackageAPITest extends AdvancedQueryTest {
    */
   private static void ok(final IO desc) {
     try {
-      new PkgValidator(ctx).check(new PkgParser(ctx).parse(desc, null), null);
+      new PkgValidator(ctx, null).check(new PkgParser(ctx, null).parse(desc));
     } catch(final QueryException ex) {
       fail("Unexpected exception thrown: " + ex);
     }
@@ -161,7 +206,7 @@ public class PackageAPITest extends AdvancedQueryTest {
    */
   private static void error(final IO desc, final Err err, final String exp) {
     try {
-      new PkgValidator(ctx).check(new PkgParser(ctx).parse(desc, null), null);
+      new PkgValidator(ctx, null).check(new PkgParser(ctx, null).parse(desc));
       fail(exp);
     } catch(final QueryException ex) {
       check(ex, err);
@@ -170,7 +215,7 @@ public class PackageAPITest extends AdvancedQueryTest {
 
   /** Header string. */
   private static final byte[] HEADER = token("<package "
-      + "xmlns:http='http://expath.org/ns/pkg' "
+      + "xmlns='http://expath.org/ns/pkg' "
       + "spec='1.0' name='%' abbrev='%' version='%'>");
   /** Footer string. */
   private static final byte[] FOOTER = token("</package>");
@@ -186,6 +231,7 @@ public class PackageAPITest extends AdvancedQueryTest {
    */
   private static IOContent desc(final String name, final String abbrev,
       final String version, final String cont) {
+
     return new IOContent(concat(Util.inf(HEADER, name, abbrev, version),
         token(cont), FOOTER));
   }

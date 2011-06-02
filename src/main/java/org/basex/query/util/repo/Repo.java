@@ -87,7 +87,7 @@ public final class Repo {
     if(pkgDesc.exists()) {
       final IOFile io = new IOFile(pkgDesc);
       try {
-        final Package pkg = new PkgParser(context).parse(io, null);
+        final Package pkg = new PkgParser(context, null).parse(io);
         // Read package components
         for(final Component comp : pkg.comps) {
           // Add component's namespace to namespace dictionary

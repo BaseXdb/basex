@@ -12,6 +12,12 @@ interface PkgText {
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg.xml";
 
+  /** <package/> root element. */
+  /** Element package. */
+  byte[] PACKAGE = token("package");
+  /** Element module. */
+  byte[] MODULE = token("module");
+
   /** <package/> attributes. */
   /** Attribute name. */
   byte[] NAME = token("name");
@@ -21,15 +27,15 @@ interface PkgText {
   byte[] VERSION = token("version");
   /** Attribute spec. */
   byte[] SPEC = token("spec");
-  /** Attribute title. */
-  byte[] TITLE = token("title");
-  /** Attribute home. */
-  byte[] HOME = token("home");
 
   /** <package/> children. */
-  /** Dependency. */
+  /** Element title. */
+  byte[] TITLE = token("title");
+  /** Element home. */
+  byte[] HOME = token("home");
+  /** Element dependency. */
   byte[] DEPEND = token("dependency");
-  /** XQuery module. */
+  /** Element xquery. */
   byte[] XQUERY = token("xquery");
 
   /** <dependency/> attributes. */
@@ -37,7 +43,7 @@ interface PkgText {
   byte[] PKG = token("package");
   /** Attribute processor. */
   byte[] PROC = token("processor");
-  /** Attribute vesrions. */
+  /** Attribute versions. */
   byte[] VERS = token("versions");
   /** Attribute semver. */
   byte[] SEMVER = token("semver");
@@ -46,7 +52,7 @@ interface PkgText {
   /** Attribute semver-max. */
   byte[] SEMVERMAX = token("semver-max");
 
-  /** <xquery/> attributes. */
+  /** <xquery/> children. */
   /** Attribute import-uri. */
   byte[] IMPURI = token("import-uri");
   /** Attribute namespace. */
@@ -57,7 +63,11 @@ interface PkgText {
   /** Not expected initialization error. */
   String NOTEXP = "Missing package descriptor for package '%'";
   /** Attribute missing. */
-  String MISSATTR = "'%' attribute missing in 'package' element";
+  String MISSATTR = "'%' attribute missing in '%' element";
+  /** Invalid attribute. */
+  String WHICHATTR = "Invalid attribute '%'";
+  /** Invalid element. */
+  String WHICHELEM = "Invalid element %";
   /** Secondary package missing. */
   String MISSSECOND = "Name of secondary package missing";
   /** Component missing. */
