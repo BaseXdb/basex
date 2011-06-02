@@ -201,7 +201,7 @@ public class GFLWOR extends ParseExpr {
       for(int j = i; j-- != 0;) {
         final ForLet in = fl[j];
         if(out.count(in.var) != 0) break;
-        if(in.size() <= 1) continue;
+        if(in.size() == 1) continue;
         if(!in.simple(false)) break;
         p = j;
       }
