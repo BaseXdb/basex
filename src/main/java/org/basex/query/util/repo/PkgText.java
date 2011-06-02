@@ -8,7 +8,7 @@ import static org.basex.util.Token.*;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-interface PkgText {
+public interface PkgText {
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg.xml";
 

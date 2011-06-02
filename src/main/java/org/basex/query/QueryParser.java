@@ -111,11 +111,11 @@ import org.basex.query.up.Replace;
 import org.basex.query.up.Transform;
 import org.basex.query.util.Err;
 import org.basex.query.util.Namespaces;
-import org.basex.query.util.Package;
-import org.basex.query.util.Package.Component;
-import org.basex.query.util.Package.Dependency;
-import org.basex.query.util.PackageParser;
-import org.basex.query.util.PkgValidator;
+import org.basex.query.util.repo.Package;
+import org.basex.query.util.repo.Package.Component;
+import org.basex.query.util.repo.Package.Dependency;
+import org.basex.query.util.repo.PkgParser;
+import org.basex.query.util.repo.PkgValidator;
 import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
 import org.basex.query.util.format.DecFormatter;
@@ -127,15 +127,17 @@ import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.TokenSet;
+import org.basex.util.Util;
 import org.basex.util.XMLToken;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.FTUnit;
 import org.basex.util.ft.Language;
 import org.basex.util.ft.StopWords;
+import org.basex.query.util.repo.PkgText;
 
 /**
  * Simple query parser; can be overwritten to support more complex parsings.
- *
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
@@ -226,7 +228,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the specified query and starts with the "Module" rule. If a URI is
    * specified, the query is treated as a module.
-   *
+   * 
    * @param u module uri
    * @param c if true, input must be completely evaluated
    * @return resulting expression
@@ -335,8 +337,8 @@ public class QueryParser extends InputParser {
       final int p = qp;
       if(wsConsumeWs(DECLARE)) {
         if(wsConsumeWs(DEFAULT)) {
-          if(!defaultNamespaceDecl() && !defaultCollationDecl() &&
-              !emptyOrderDecl() && !decFormatDecl(true)) error(DECLINCOMPLETE);
+          if(!defaultNamespaceDecl() && !defaultCollationDecl()
+              && !emptyOrderDecl() && !decFormatDecl(true)) error(DECLINCOMPLETE);
         } else if(wsConsumeWs(BOUNDARY)) {
           boundarySpaceDecl();
         } else if(wsConsumeWs(BASEURI)) {
@@ -640,7 +642,7 @@ public class QueryParser extends InputParser {
       while(wsConsumeWs(COMMA));
     } else {
       // Search for uri in namespace dictionary
-      pkgs = ctx.context.repo.nsDict.get(uri);
+      pkgs = ctx.context.repo.nsDict().get(uri);
     }
     if(pkgs == null) {
       // No installed packages having modules with this uri
@@ -703,21 +705,21 @@ public class QueryParser extends InputParser {
    */
   private void loadPackage(final byte[] pkgName) throws QueryException {
     // Find package in package dictionary
-    final byte[] pkgDir = ctx.context.repo.pkgDict.get(pkgName);
+    final byte[] pkgDir = ctx.context.repo.pkgDict().get(pkgName);
     if(pkgDir == null) error(PKGNOTINSTALLED);
     // Parse package descriptor
-    final File pkgDesc = new File(ctx.context.prop.get(Prop.REPOPATH)
-        + Prop.DIRSEP + string(pkgDir) + Prop.DIRSEP + PKGDESC);
-    if(!pkgDesc.exists()) error(PKGDESCMISS, string(pkgName));
+    final File pkgDesc = new File(new File(ctx.context.prop.get(Prop.REPOPATH),
+        string(pkgDir)), PKGDESC);
+    if(!pkgDesc.exists()) Util.errln(PkgText.NOTEXP, string(pkgName));
     final IOFile io = new IOFile(pkgDesc);
-    final Package pkg = PackageParser.parse(io, ctx.context, input());
+    final Package pkg = new PkgParser(ctx.context, input()).parse(io);
     // Package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
     if(pkg.dep.size() != 0) pkgsToLoad.add(pkgName);
-    for(final Dependency dep : pkg.dep) {
-      final byte[] depPkg = PkgValidator.getDepPkg(dep, ctx.context);
+    for(final Dependency d : pkg.dep) {
+      final byte[] depPkg = new PkgValidator(ctx.context, input()).getDepPkg(d);
       if(depPkg == null) {
-        error(PKGNOTINSTALLED, string(dep.pkg));
+        error(PKGNOTINSTALLED, string(d.pkg));
       } else {
         if(pkgsToLoad.id(depPkg) != 0) error(CIRCMODULE);
         loadPackage(depPkg);
@@ -725,12 +727,17 @@ public class QueryParser extends InputParser {
     }
     for(final Component comp : pkg.comps) {
       // Load package components
-      final String moduleFile = ctx.context.prop.get(Prop.REPOPATH)
-          + Prop.DIRSEP + string(pkgDir) + Prop.DIRSEP + string(pkg.abbrev)
-          + Prop.DIRSEP + string(comp.file);
-      if(!modules.contains(comp.namespace)
-          && !ctx.modLoaded.contains(moduleFile)) module(moduleFile,
-          Uri.uri(comp.namespace));
+      String modFile;
+      try {
+        modFile = new File(new File(new File(
+            ctx.context.prop.get(Prop.REPOPATH), string(pkgDir)),
+            string(pkg.abbrev)), string(comp.file)).getCanonicalPath();
+        if(!(modules.contains(comp.namespace) || ctx.modLoaded.contains(modFile))) module(
+            modFile, Uri.uri(comp.namespace));
+      } catch(IOException e) {
+        // TODO Report some error
+        e.printStackTrace();
+      }
     }
     if(pkgsToLoad.id(pkgName) != 0) pkgsToLoad.delete(pkgName);
   }
@@ -1540,14 +1547,14 @@ public class QueryParser extends InputParser {
   /**
    * Performs an optional check init.
    */
-  protected void checkInit() { }
+  protected void checkInit() {}
 
   /**
    * Performs an optional axis check.
    * @param axis axis
    */
   @SuppressWarnings("unused")
-  protected void checkAxis(final Axis axis) { }
+  protected void checkAxis(final Axis axis) {}
 
   /**
    * Performs an optional test check.
@@ -1555,14 +1562,14 @@ public class QueryParser extends InputParser {
    * @param attr attribute flag
    */
   @SuppressWarnings("unused")
-  protected void checkTest(final Test test, final boolean attr) { }
+  protected void checkTest(final Test test, final boolean attr) {}
 
   /**
    * Checks a predicate.
    * @param open open flag
    */
   @SuppressWarnings("unused")
-  protected void checkPred(final boolean open) { }
+  protected void checkPred(final boolean open) {}
 
   /**
    * Parses the "StepExpr" rule.
@@ -1759,8 +1766,7 @@ public class QueryParser extends InputParser {
       if(e != null) return e;
       // ordered expression
       if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE)
-          || wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
-        return enclosed(NOENCLEXPR);
+          || wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE)) return enclosed(NOENCLEXPR);
 
       if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE)) return mapLiteral();
     }
@@ -2507,8 +2513,7 @@ public class QueryParser extends InputParser {
    * @return arguments
    * @throws QueryException query exception
    */
-  private KindTest kindTest(final Type t, final byte[] k)
-    throws QueryException {
+  private KindTest kindTest(final Type t, final byte[] k) throws QueryException {
 
     byte[] nm = trim(k);
     if(t == NodeType.PI) {

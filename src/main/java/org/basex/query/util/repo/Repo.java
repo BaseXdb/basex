@@ -93,16 +93,16 @@ public final class Repo {
           // Add component's namespace to namespace dictionary
           if(comp.namespace != null) {
             if(nsDict.get(comp.namespace) != null) {
-              nsDict.get(comp.namespace).add(pkg.getName());
+              nsDict.get(comp.namespace).add(pkg.getUniqueName());
             } else {
               final TokenList vals = new TokenList();
-              vals.add(pkg.getName());
+              vals.add(pkg.getUniqueName());
               nsDict.add(comp.namespace, vals);
             }
           }
         }
         // Add package to package dictionary
-        pkgDict.add(pkg.getName(), token(dir.getName()));
+        pkgDict.add(pkg.getUniqueName(), token(dir.getName()));
       } catch(final QueryException ex) {
         Util.errln(ex.getMessage());
       }
