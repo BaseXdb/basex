@@ -7,7 +7,6 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
-import org.basex.server.Sessions;
 
 /**
  * Evaluates the 'create event' command and creates a new event.
@@ -30,7 +29,7 @@ public final class CreateEvent extends Command {
     final String name = args[0];
     if(context.events.containsKey(name)) return error(EVENTKNOWN, name);
 
-    context.events.put(name, new Sessions());
+    context.events.put(name);
     return info(EVENTCREATE, name);
   }
 

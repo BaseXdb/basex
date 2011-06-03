@@ -27,7 +27,7 @@ public final class DropEvent extends Command {
   @Override
   protected boolean run() {
     final String name = args[0];
-    return context.events.remove(name) != null ?
+    return context.events.delete(name) ?
         info(EVENTDROP, name) : error(EVENTNO, name);
   }
 

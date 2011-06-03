@@ -1,15 +1,20 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.basex.io.DataInput;
+import org.basex.io.DataOutput;
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class organizes all known events.
@@ -20,6 +25,77 @@ import org.basex.util.TokenBuilder;
  * @author Andreas Weiler
  */
 public final class Events extends HashMap<String, Sessions> {
+
+  /** Eventfile. */
+  private File file;
+
+  /**
+   * Constructor.
+   */
+  public Events() {
+    file = new File(Prop.HOME + ".basexevents");
+    try {
+      if(file.exists()) {
+        final DataInput in = new DataInput(file);
+        read(in);
+        in.close();
+      } else {
+        write();
+      }
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
+  }
+
+  /**
+   * Adds an event.
+   * @param name event name
+   */
+  public void put(final String name) {
+    this.put(name, new Sessions());
+    write();
+  }
+
+  /**
+   * Deletes an event.
+   * @param name event name
+   * @return success flag
+   */
+  public boolean delete(final String name) {
+    boolean b = this.remove(name) != null;
+    if(b) write();
+    return b;
+  }
+
+  /**
+   * Reads events from disk.
+   * @param in input stream
+   * @throws IOException I/O exception
+   */
+  public void read(final DataInput in) throws IOException {
+    final int s = in.readNum();
+    for(int u = 0; u < s; ++u) {
+      final String name = string(in.readBytes());
+      put(name, new Sessions());
+    }
+  }
+
+  /**
+   * Writes global permissions to disk.
+   */
+  public void write() {
+    try {
+      final DataOutput out = new DataOutput(file);
+      out.writeNum(size());
+      for(final String name : this.keySet()) {
+        out.writeString(name);
+      }
+      out.close();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
+  }
+
   /**
    * Returns information on all events.
    * @return information on all events.
