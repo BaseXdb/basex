@@ -1,6 +1,5 @@
 import java.io.IOException;
 
-
 /**
  * This example shows how to use the event feature.
  * The database server must be started first to make this example work.

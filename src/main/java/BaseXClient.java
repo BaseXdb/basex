@@ -219,6 +219,7 @@ public final class BaseXClient {
   public void close() throws IOException {
     send("exit");
     out.flush();
+    if(esocket != null) esocket.close();
     socket.close();
   }
 
