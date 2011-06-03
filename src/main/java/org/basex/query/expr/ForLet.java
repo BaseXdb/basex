@@ -36,7 +36,7 @@ public abstract class ForLet extends Single {
     if(!simple(true)) return;
 
     // don't bind variable if expression uses variables, context, or fragments
-    if(expr.uses(Use.VAR) || expr.uses(Use.CTX) || expr.uses(Use.CNS) ||
+    if(expr.hasFreeVars(ctx) || expr.uses(Use.CTX) || expr.uses(Use.CNS) ||
         ctx.grouping) return;
 
     ctx.compInfo(OPTBIND, var);

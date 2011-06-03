@@ -42,6 +42,7 @@ public final class DynFuncCall extends Arr {
       if(ft.ret != null) type = ft.ret;
     }
 
+    // maps can only contain fully evaluated Values, so this is safe
     if(values() && expr[expr.length - 1] instanceof Map)
       return optPre(value(ctx), ctx);
 
