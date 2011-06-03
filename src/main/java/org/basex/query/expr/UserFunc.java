@@ -38,6 +38,9 @@ public class UserFunc extends Single {
   /** Cast flag. */
   private boolean cast;
 
+  /** Compilation flag. */
+  private boolean compiled;
+
   /**
    * Function constructor.
    * @param ii input info
@@ -76,6 +79,9 @@ public class UserFunc extends Single {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    if(compiled) return this;
+    compiled = true;
+
     final int s = ctx.vars.size();
     for(final Var v : args) ctx.vars.add(v);
     expr = expr.comp(ctx);
