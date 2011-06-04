@@ -4,7 +4,8 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -18,7 +19,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
-public final class Users extends ArrayList<User> {
+public final class Users extends CopyOnWriteArrayList<User> {
   /** Filename; set to {@code null} if the instance handles local users. */
   private File file;
 
