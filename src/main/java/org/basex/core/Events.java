@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
+import org.basex.io.IO;
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
 import org.basex.util.Token;
@@ -25,35 +26,36 @@ import org.basex.util.Util;
  * @author Andreas Weiler
  */
 public final class Events extends HashMap<String, Sessions> {
-
-  /** Eventfile. */
-  private File file;
+  /** Event file. */
+  private final File file = new File(Prop.HOME + IO.BASEXSUFFIX + "events");
 
   /**
    * Constructor.
    */
   public Events() {
-    file = new File(Prop.HOME + ".basexevents");
+    if(!file.exists()) return;
+
+    DataInput in = null;
     try {
-      if(file.exists()) {
-        final DataInput in = new DataInput(file);
-        read(in);
-        in.close();
-      } else {
-        write();
-      }
+      in = new DataInput(file);
+      final int s = in.readNum();
+      for(int u = 0; u < s; ++u) put(string(in.readBytes()), new Sessions());
     } catch(final IOException ex) {
-      Util.debug(ex);
+      Util.errln(ex);
+    } finally {
+      if(in != null) try { in.close(); } catch(final IOException ex) { }
     }
   }
 
   /**
-   * Adds an event.
+   * Creates an event.
    * @param name event name
+   * @return success flag
    */
-  public void put(final String name) {
-    this.put(name, new Sessions());
-    write();
+  public boolean create(final String name) {
+    final boolean b = put(name, new Sessions()) == null;
+    if(b) write();
+    return b;
   }
 
   /**
@@ -61,35 +63,20 @@ public final class Events extends HashMap<String, Sessions> {
    * @param name event name
    * @return success flag
    */
-  public boolean delete(final String name) {
-    boolean b = this.remove(name) != null;
+  public boolean drop(final String name) {
+    final boolean b = remove(name) != null;
     if(b) write();
     return b;
   }
 
   /**
-   * Reads events from disk.
-   * @param in input stream
-   * @throws IOException I/O exception
-   */
-  public void read(final DataInput in) throws IOException {
-    final int s = in.readNum();
-    for(int u = 0; u < s; ++u) {
-      final String name = string(in.readBytes());
-      put(name, new Sessions());
-    }
-  }
-
-  /**
    * Writes global permissions to disk.
    */
-  public void write() {
+  private void write() {
     try {
       final DataOutput out = new DataOutput(file);
       out.writeNum(size());
-      for(final String name : this.keySet()) {
-        out.writeString(name);
-      }
+      for(final String name : keySet()) out.writeString(name);
       out.close();
     } catch(final IOException ex) {
       Util.debug(ex);

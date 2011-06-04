@@ -27,10 +27,8 @@ public final class CreateEvent extends Command {
   @Override
   protected boolean run() {
     final String name = args[0];
-    if(context.events.containsKey(name)) return error(EVENTKNOWN, name);
-
-    context.events.put(name);
-    return info(EVENTCREATE, name);
+    return context.events.create(name) ?
+        info(EVENTCREATE, name) : error(EVENTKNOWN, name);
   }
 
   @Override

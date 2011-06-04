@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
+import org.basex.io.IO;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
 import org.basex.util.Util;
@@ -18,7 +19,7 @@ import org.basex.util.Util;
  * @author Andreas Weiler
  */
 public final class Users extends ArrayList<User> {
-  /** Filename; will be {@code null} for local user permissions. */
+  /** Filename; set to {@code null} if the instance handles local users. */
   private File file;
 
   /**
@@ -28,19 +29,20 @@ public final class Users extends ArrayList<User> {
   public Users(final boolean global) {
     if(!global) return;
 
-    file = new File(Prop.HOME + ".basexperm");
-    try {
-      if(file.exists()) {
-        final DataInput in = new DataInput(file);
+    file = new File(Prop.HOME + IO.BASEXSUFFIX + "perm");
+    if(!file.exists()) {
+      // create default admin user with all rights
+      add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
+    } else {
+      DataInput in = null;
+      try {
+        in = new DataInput(file);
         read(in);
-        in.close();
-      } else {
-        // create initial admin user with all rights
-        add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
-        write();
+      } catch(final IOException ex) {
+        Util.errln(ex);
+      } finally {
+        if(in != null) try { in.close(); } catch(final IOException ex) { }
       }
-    } catch(final IOException ex) {
-      Util.debug(ex);
     }
   }
 
