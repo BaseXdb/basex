@@ -72,4 +72,6 @@ public interface PkgText {
   String MISSSECOND = "Name of secondary package missing";
   /** Component missing. */
   String MISSCOMP = "Component '%' not specified";
+  /** Package participates in a dependency. */
+  String ISSEC = "Package '%' depends on package '%'";
 }

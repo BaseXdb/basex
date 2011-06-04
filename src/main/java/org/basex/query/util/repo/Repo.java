@@ -10,9 +10,9 @@ import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.util.repo.Package.Component;
-import org.basex.util.TokenList;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenObjMap;
+import org.basex.util.TokenSet;
 import org.basex.util.Util;
 
 /**
@@ -26,7 +26,7 @@ public final class Repo {
    * Namespace-dictionary - contains all namespaces available in the repository
    * and the packages in which they are found.
    */
-  private final TokenObjMap<TokenList> nsDict = new TokenObjMap<TokenList>();
+  private final TokenObjMap<TokenSet> nsDict = new TokenObjMap<TokenSet>();
   /** Package dictionary with installed packages and their directories. */
   private final TokenMap pkgDict = new TokenMap();
   /** Context. */
@@ -47,7 +47,7 @@ public final class Repo {
    * Initializes the repository if not done yet.
    * @return dictionary
    */
-  public TokenObjMap<TokenList> nsDict() {
+  public TokenObjMap<TokenSet> nsDict() {
     init(null);
     return nsDict;
   }
@@ -95,7 +95,7 @@ public final class Repo {
             if(nsDict.get(comp.namespace) != null) {
               nsDict.get(comp.namespace).add(pkg.getUniqueName());
             } else {
-              final TokenList vals = new TokenList();
+              final TokenSet vals = new TokenSet();
               vals.add(pkg.getUniqueName());
               nsDict.add(comp.namespace, vals);
             }

@@ -34,7 +34,7 @@ public interface Commands {
   /** Alter types. */
   enum CmdAlter { DATABASE, DB, USER }
   /** Repo types. */
-  enum CmdRepo { INSTALL, REMOVE, LIST }
+  enum CmdRepo { INSTALL, DELETE, LIST }
 
   /** Command definitions. */
   enum Cmd {

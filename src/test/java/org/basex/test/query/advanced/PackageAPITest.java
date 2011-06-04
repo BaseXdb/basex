@@ -15,9 +15,9 @@ import org.basex.query.util.Err;
 import org.basex.query.util.repo.PkgParser;
 import org.basex.query.util.repo.PkgValidator;
 import org.basex.query.util.repo.RepoManager;
-import org.basex.util.TokenList;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenObjMap;
+import org.basex.util.TokenSet;
 import org.basex.util.Util;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,24 +43,24 @@ public class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void testRepoInit() {
     // Check namespace dictionary
-    final TokenObjMap<TokenList> nsDict = ctx.repo.nsDict();
+    final TokenObjMap<TokenSet> nsDict = ctx.repo.nsDict();
     final TokenMap pkgDict = ctx.repo.pkgDict();
 
     assertEquals(3, nsDict.keys().length);
     assertNotNull(nsDict.get(token("ns1")));
     assertNotNull(nsDict.get(token("ns2")));
     assertNotNull(nsDict.get(token("ns3")));
-    TokenList tl = new TokenList();
-    tl = nsDict.get(token("ns1"));
-    assertEquals(tl.size(), 2);
-    assertTrue(tl.contains(token("http://www.pkg1.com-12.0")));
-    assertTrue(tl.contains(token("http://www.pkg2.com-10.0")));
-    tl = nsDict.get(token("ns2"));
-    assertEquals(tl.size(), 1);
-    assertTrue(tl.contains(token("http://www.pkg1.com-12.0")));
-    tl = nsDict.get(token("ns3"));
-    assertEquals(tl.size(), 1);
-    assertTrue(tl.contains(token("http://www.pkg2.com-10.0")));
+    TokenSet ts = new TokenSet();
+    ts = nsDict.get(token("ns1"));
+    assertEquals(ts.size(), 2);
+    assertTrue(ts.id(token("http://www.pkg1.com-12.0")) != 0);
+    assertTrue(ts.id(token("http://www.pkg2.com-10.0")) != 0);
+    ts = nsDict.get(token("ns2"));
+    assertEquals(ts.size(), 1);
+    assertTrue(ts.id(token("http://www.pkg1.com-12.0")) != 0);
+    ts = nsDict.get(token("ns3"));
+    assertEquals(ts.size(), 1);
+    assertTrue(ts.id(token("http://www.pkg2.com-10.0")) != 0);
     // Check package dictionary
     assertEquals(pkgDict.keys().length, 2);
     assertNotNull(pkgDict.get(token("http://www.pkg1.com-12.0")));

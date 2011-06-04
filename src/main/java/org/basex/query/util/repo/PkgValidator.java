@@ -14,7 +14,6 @@ import org.basex.query.QueryException;
 import org.basex.query.util.repo.Package.Component;
 import org.basex.query.util.repo.Package.Dependency;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenList;
 import org.basex.util.TokenSet;
 
 /**
@@ -163,7 +162,7 @@ public final class PkgValidator {
       throws QueryException {
 
     // Get packages in which the module's namespace is found
-    final TokenList pkgs = context.repo.nsDict().get(comp.namespace);
+    final TokenSet pkgs = context.repo.nsDict().get(comp.namespace);
     if(pkgs == null) return false;
 
     for(final byte[] nextPkg : pkgs) {

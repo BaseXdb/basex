@@ -622,7 +622,7 @@ public class QueryParser extends InputParser {
    */
   private void moduleImport() throws QueryException {
     QNm name = null;
-    TokenList pkgs = null;
+    TokenSet pkgs = null;
     if(wsConsumeWs(NSPACE)) {
       name = new QNm(ncName(XPNAME));
       wsCheck(IS);
