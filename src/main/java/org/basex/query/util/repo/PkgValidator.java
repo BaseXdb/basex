@@ -17,8 +17,8 @@ import org.basex.util.InputInfo;
 import org.basex.util.TokenSet;
 
 /**
- * Package validator. This class executes some essential checks before
- * the installation of a package.
+ * Package validator. This class executes some essential checks before the
+ * installation of a package.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
@@ -81,14 +81,16 @@ public final class PkgValidator {
   public byte[] getDepPkg(final Dependency dep) {
     // Get installed versions of secondary package
     final TokenSet instVers = new TokenSet();
-    for(final byte[] nextPkg : context.repo.pkgDict())
-      if(startsWith(nextPkg, dep.pkg)) instVers.add(getVersion(nextPkg));
+    for(final byte[] nextPkg : context.repo.pkgDict().keys())
+      if(nextPkg != null && startsWith(nextPkg, dep.pkg))
+        instVers.add(getVersion(nextPkg));
 
     if(instVers.size() == 0) return null;
     if(dep.versions != null) {
       // Get acceptable versions for secondary package
       final TokenSet versList = new TokenSet();
-      for(final byte[] v : split(dep.versions, ' ')) versList.add(v);
+      for(final byte[] v : split(dep.versions, ' '))
+        versList.add(v);
       // Check if any acceptable version is already installed
       for(final byte[] v : versList)
         if(instVers.id(v) != 0) return dep.getName(v);
@@ -170,8 +172,8 @@ public final class PkgValidator {
         // Installed package is a different one, not just a different version
         // of the current one
         final byte[] pkgDir = context.repo.pkgDict().get(nextPkg);
-        final File pkgDesc = new File(new File(
-            context.prop.get(Prop.REPOPATH), string(pkgDir)), DESCRIPTOR);
+        final File pkgDesc = new File(new File(context.prop.get(Prop.REPOPATH),
+            string(pkgDir)), DESCRIPTOR);
         final IOFile io = new IOFile(pkgDesc);
         final Package pkg = new PkgParser(context, input).parse(io);
         for(final Component nextComp : pkg.comps) {
@@ -251,8 +253,9 @@ public final class PkgValidator {
    */
   public TokenSet getInstalledVersions(final byte[] pkgName) {
     final TokenSet versions = new TokenSet();
-    for(final byte[] nextPkg : context.repo.pkgDict())
-      if(startsWith(nextPkg, pkgName)) versions.add(getVersion(nextPkg));
+    for(final byte[] nextPkg : context.repo.pkgDict().keys())
+      if(nextPkg != null && startsWith(nextPkg, pkgName))
+        versions.add(getVersion(nextPkg));
     return versions;
   }
 
@@ -263,7 +266,8 @@ public final class PkgValidator {
    */
   public static TokenSet getAcceptVersions(final byte[] versions) {
     final TokenSet versList = new TokenSet();
-    for(final byte[] v : split(versions, ' ')) versList.add(v);
+    for(final byte[] v : split(versions, ' '))
+      versList.add(v);
     return versList;
   }
 }

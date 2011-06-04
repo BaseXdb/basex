@@ -48,7 +48,7 @@ public final class Package {
    * @param pkgName unique package name: name-version
    * @return package name
    */
-  static byte[] getName(final byte[] pkgName) {
+  public static byte[] getName(final byte[] pkgName) {
     final int idx = lastIndexOf(pkgName, NAMESEP);
     return idx == -1 ? pkgName : subtoken(pkgName, 0, idx);
   }
@@ -58,7 +58,7 @@ public final class Package {
    * @param pkgName unique package name: name-version
    * @return package version
    */
-  static byte[] getVersion(final byte[] pkgName) {
+  public static byte[] getVersion(final byte[] pkgName) {
     final int idx = lastIndexOf(pkgName, NAMESEP);
     return subtoken(pkgName, idx + 1, pkgName.length);
   }

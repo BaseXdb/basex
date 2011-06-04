@@ -732,7 +732,8 @@ public class QueryParser extends InputParser {
         modFile = new File(new File(new File(
             ctx.context.prop.get(Prop.REPOPATH), string(pkgDir)),
             string(pkg.abbrev)), string(comp.file)).getCanonicalPath();
-        if(!(modules.contains(comp.namespace) || ctx.modLoaded.contains(modFile))) module(
+        if(!(modules.contains(comp.namespace)
+            || ctx.modLoaded.contains(modFile))) module(
             modFile, Uri.uri(comp.namespace));
       } catch(IOException e) {
         // TODO Report some error

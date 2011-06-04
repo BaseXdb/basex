@@ -155,7 +155,9 @@ public enum Err {
   PKGREADFAIL(PACK, 7, "Reading package descriptor failed: %"),
   /** PACK0008: Evaluation exception. */
   CANNOTDELPKG(PACK, 8, "Package cannot be deleted. "),
-
+  /** PACK0009: Evaluation exception. */
+  PKGDEP(PACK, 9, "Package % depends on package %"),
+  
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
 
