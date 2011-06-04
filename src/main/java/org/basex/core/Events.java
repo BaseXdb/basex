@@ -52,18 +52,18 @@ public final class Events extends HashMap<String, Sessions> {
    * @param name event name
    * @return success flag
    */
-  public boolean create(final String name) {
+  public synchronized boolean create(final String name) {
     final boolean b = put(name, new Sessions()) == null;
     if(b) write();
     return b;
   }
 
   /**
-   * Deletes an event.
+   * Drops an event.
    * @param name event name
    * @return success flag
    */
-  public boolean drop(final String name) {
+  public synchronized boolean drop(final String name) {
     final boolean b = remove(name) != null;
     if(b) write();
     return b;
@@ -72,7 +72,7 @@ public final class Events extends HashMap<String, Sessions> {
   /**
    * Writes global permissions to disk.
    */
-  private void write() {
+  private synchronized void write() {
     try {
       final DataOutput out = new DataOutput(file);
       out.writeNum(size());
@@ -87,7 +87,7 @@ public final class Events extends HashMap<String, Sessions> {
    * Returns information on all events.
    * @return information on all events.
    */
-  public String info() {
+  public synchronized String info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt(SRVEVENTS, size()).add(size() != 0 ? COL : DOT);
 

@@ -51,7 +51,7 @@ public final class Users extends ArrayList<User> {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public void read(final DataInput in) throws IOException {
+  public synchronized void read(final DataInput in) throws IOException {
     final int s = in.readNum();
     for(int u = 0; u < s; ++u) {
       final User user = new User(string(in.readBytes()),
@@ -63,7 +63,7 @@ public final class Users extends ArrayList<User> {
   /**
    * Writes global permissions to disk.
    */
-  public void write() {
+  public synchronized void write() {
     try {
       final DataOutput out = new DataOutput(file);
       write(out);
@@ -79,7 +79,7 @@ public final class Users extends ArrayList<User> {
    * @param pass password
    * @return success of operation
    */
-  public boolean create(final String usern, final String pass) {
+  public synchronized boolean create(final String usern, final String pass) {
     // check if user exists already
     if(get(usern) != null) return false;
 
@@ -95,7 +95,7 @@ public final class Users extends ArrayList<User> {
    * @param pass password
    * @return success of operation
    */
-  public boolean alter(final String usern, final String pass) {
+  public synchronized boolean alter(final String usern, final String pass) {
     // check if user exists already
     final User user = get(usern);
     if(user == null) return false;
@@ -109,7 +109,7 @@ public final class Users extends ArrayList<User> {
    * Drops a user from the list.
    * @param user user reference
    */
-  public void drop(final User user) {
+  public synchronized void drop(final User user) {
     remove(user);
     write();
   }
@@ -119,7 +119,7 @@ public final class Users extends ArrayList<User> {
    * @param usern user name
    * @return success of operation
    */
-  public User get(final String usern) {
+  public synchronized User get(final String usern) {
     for(final User user : this) if(user.name.equals(usern)) return user;
     return null;
   }
@@ -129,7 +129,7 @@ public final class Users extends ArrayList<User> {
    * @param out output stream; if set to null, the global rights are written
    * @throws IOException I/O exception
    */
-  public void write(final DataOutput out) throws IOException {
+  public synchronized void write(final DataOutput out) throws IOException {
     // skip writing of local rights
     out.writeNum(size());
     for(final User user : this) {
@@ -143,7 +143,7 @@ public final class Users extends ArrayList<User> {
    * Returns information on all users.
    * @return user information
    */
-  public byte[] info() {
+  public synchronized byte[] info() {
     final Table table = new Table();
     table.desc = USERS;
 
