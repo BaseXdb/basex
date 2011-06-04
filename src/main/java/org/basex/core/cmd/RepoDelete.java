@@ -1,5 +1,6 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
 import java.io.IOException;
 
 import org.basex.core.Command;
@@ -33,8 +34,7 @@ public class RepoDelete extends Command {
   protected boolean run() throws IOException {
     try {
       new RepoManager(context).delete(args[0], ii);
-      // [RS] to be externalized to {@link Text} and .lang files
-      return info("Package '%' deleted in %.", args[0], perf);
+      return info(REPODEL, args[0]);
     } catch(QueryException ex) {
       Util.debug(ex);
       return error(ex.getMessage());

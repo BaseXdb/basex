@@ -1,5 +1,6 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
 import java.io.IOException;
 
 import org.basex.core.Command;
@@ -33,8 +34,7 @@ public final class RepoInstall extends Command {
   protected boolean run() throws IOException {
     try {
       new RepoManager(context).install(args[0], ii);
-      // [RS] to be externalized to {@link Text} and .lang files
-      return info("Package '%' installed in %.", args[0], perf);
+      return info(REPOINST, args[0], perf);
     } catch(final QueryException ex) {
       Util.debug(ex);
       return error(ex.getMessage());
