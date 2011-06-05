@@ -7,6 +7,8 @@ import static org.basex.util.ft.FTFlag.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+
+import org.basex.core.cmd.Set;
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.query.expr.And;
@@ -462,8 +464,8 @@ public class QueryParser extends InputParser {
     final byte[] val = stringLiteral();
     if(!name.ns()) error(NSMISS, name);
 
-    // output declaration
     if(ctx.xquery3 && eq(name.pref(), OUTPUT)) {
+      // output declaration
       final String key = string(name.ln());
       if(module != null) error(MODOUT);
 
@@ -473,6 +475,16 @@ public class QueryParser extends InputParser {
 
       ctx.serProp.set(key, string(val));
       serial.add(key);
+    } else if(eq(name.pref(), DB)) {
+      // project-specific declaration
+      final String key = string(uc(name.ln()));
+      final Object obj = ctx.context.prop.get(key);
+      if(obj == null) error(NOOPTION, key);
+      // cache old value (to be reset after query evaluation)
+      if(ctx.props == null) ctx.props = new HashMap<String, Object>();
+      ctx.props.put(key, obj);
+      // set value
+      Set.set(key, string(val), ctx.context.prop);
     }
   }
 

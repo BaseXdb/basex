@@ -78,6 +78,8 @@ public final class QueryContext extends Progress {
   public HashMap<String, String> stop;
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
+  /** Modified properties. */
+  public HashMap<String, Object> props;
 
   /** Root expression of the query. */
   public Expr root;
@@ -103,8 +105,7 @@ public final class QueryContext extends Progress {
   public Tim time;
 
   /** Decimal-format declarations. */
-  public TokenObjMap<DecFormatter> decFormats =
-    new TokenObjMap<DecFormatter>();
+  public TokenObjMap<DecFormatter> decFormats = new TokenObjMap<DecFormatter>();
   /** Default function namespace. */
   public byte[] nsFunc = FNURI;
   /** Default element namespace. */

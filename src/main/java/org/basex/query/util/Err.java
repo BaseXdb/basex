@@ -36,6 +36,10 @@ public enum Err {
   EXPSINGLE(BASX, 8, "Database '%' contains more than one document."),
   /** BASX0009: Evaluation exception. */
   NOEVENT(BASX, 9, "Event '%' is unknown."),
+  /** BASX0010: Parsing exception. */
+  NOOPTION(BASX, 10, "Unknown database option '%'."),
+  /** BASX0011: Parsing exception. */
+  INVOPTION(BASX, 11, "Invalid value for database option '%'."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),

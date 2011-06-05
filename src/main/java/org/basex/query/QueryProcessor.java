@@ -3,9 +3,13 @@ package org.basex.query;
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map.Entry;
 import java.util.Scanner;
+
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -23,7 +27,6 @@ import org.basex.query.item.Types;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
-import static org.basex.util.Token.*;
 
 /**
  * This class is an entry point for evaluating XQuery implementations.
@@ -247,6 +250,12 @@ public final class QueryProcessor extends Progress {
    */
   public void close() throws IOException {
     ctx.resource.close();
+    // reset database properties to initial value
+    if(ctx.props != null) {
+      for(final Entry<String, Object> e : ctx.props.entrySet()) {
+        ctx.context.prop.set(e.getKey(), e.getValue());
+      }
+    }
   }
 
   /**

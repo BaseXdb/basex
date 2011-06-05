@@ -471,16 +471,16 @@ public interface QueryTokens {
   /** Package API URI. */
   byte[] PKGURI = token(EXPATH + "/pkg");
 
-  /** Util module URI. */
+  /** Utility module URI. */
   byte[] UTILURI = token(Text.URL + "/util");
-  /** DB module URI. */
+  /** Database module URI. */
   byte[] DBURI = token(Text.URL + "/db");
-  /** FT module URI. */
+  /** Full-text module URI. */
   byte[] FTURI = token(Text.URL + "/ft");
-  /** Sentiment URI.*/
+  /** Sentiment URI. */
   byte[] SENTURI = token(Text.URL + "/sent");
-  /** Sentiment URI.*/
-  byte[] HOFURI = token(Text.URL + "/higher-order");
+  /** Higher-order URI. */
+  byte[] HOFURI = token(Text.URL + "/hof");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
