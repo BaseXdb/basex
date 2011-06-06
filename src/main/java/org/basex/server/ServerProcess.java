@@ -361,12 +361,18 @@ public final class ServerProcess extends Thread {
     }
 
     final Sessions s = context.events.get(name);
-    final boolean ok = s != null;
+    final boolean ok = s != null && !s.contains(this);
+    String message = "";
     if(ok) {
       s.add(this);
       events.add(name);
+      message = EVENTWAT;
+    } else if(s == null) {
+      message = EVENTNO;
+    } else {
+      message = EVENTALR;
     }
-    info(ok, Util.info(ok ? EVENTWAT : EVENTNO, name), perf);
+    info(ok, Util.info(message, name), perf);
   }
 
   /**
@@ -378,12 +384,18 @@ public final class ServerProcess extends Thread {
     final String name = in.readString();
 
     final Sessions s = context.events.get(name);
-    final boolean ok = s != null;
+    final boolean ok = s != null && s.contains(this);
+    String message = "";
     if(ok) {
       s.remove(this);
       events.remove(name);
+      message = EVENTUNWAT;
+    } else if(s == null) {
+      message = EVENTNO;
+    } else {
+      message = EVENTNOUW;
     }
-    info(ok, Util.info(ok ? EVENTUNWAT : EVENTNO, name), perf);
+    info(ok, Util.info(message, name), perf);
     out.flush();
   }
 
