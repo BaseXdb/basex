@@ -439,6 +439,7 @@ qu_exec=Query uitgevoerd in % seconden.
 # Admin Commands
 ad_databases=% geopende database(s)
 ad_sessions=% sessie(s)
+ad_events=% event(s)
 ad_permno=% toegang geweigerd.
 ad_perminv=% permission is unknown.
 ad_grant=% granted to '%'.

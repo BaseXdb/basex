@@ -439,6 +439,7 @@ qu_exec=Anfrage ausgeführt (%).
 # Admin Commands
 ad_databases=% geöffnete Datenbank(en)
 ad_sessions=% Verbindung(en)
+ad_events=% Event(s)
 ad_permno=%-Recht benötigt.
 ad_perminv=%-Recht ist unbekannt.
 ad_grant=% zugewiesen an '%'.
@@ -454,14 +455,14 @@ ad_passno=Kein Passwort angegeben.
 ad_admin=Admin-Benutzer kann nicht modifiziert werden.
 ad_kill=% Verbindungen beendet.
 ad_killself='%' kann sich nicht selbst beenden.
-ad_Eventdrop=Event '%' entfernt.
-ad_Eventcreate=Event '%' erzeugt.
-ad_Eventknown=Event '%' existiert schon.
-ad_Eventno=Unbekannter Event '%'.
+ad_eventdrop=Event '%' entfernt.
+ad_eventcreate=Event '%' erzeugt.
+ad_eventknown=Event '%' existiert schon.
+ad_eventno=Unbekannter Event '%'.
 ad_eventalr=Event '%' wird schon beobachtet.
 ad_eventnouw=Event '%' wurde nicht beobachtet.
-ad_Eventatt=Beobachte Event '%'.
-ad_Eventdet=Von Event '%' abgemeldet.
+ad_eventatt=Beobachte Event '%'.
+ad_eventdet=Von Event '%' abgemeldet.
 
 # General Commands
 gc_setwhich=Unbekannte Option '%'

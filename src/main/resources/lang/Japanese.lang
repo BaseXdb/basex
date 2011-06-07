@@ -439,6 +439,7 @@ qu_exec=Query executed in %.
 # Admin Commands
 ad_databases=% 個のデータベースが開かれています。
 ad_sessions=% セッション
+ad_events=% event(s)
 ad_permno=% パーミッションが必要です。
 ad_perminv=% permission is unknown.
 ad_grant=% granted to '%'.
