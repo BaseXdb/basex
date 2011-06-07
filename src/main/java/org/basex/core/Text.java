@@ -644,6 +644,10 @@ public interface Text {
   String EVENTCREATE = lang("ad_eventcreate");
   /** Event not found. */
   String EVENTNO = lang("ad_eventno");
+  /** Already watching the event. */
+  String EVENTALR = lang("ad_eventalr");
+  /** Nothing to unwatch. */
+  String EVENTNOUW = lang("ad_eventnouw");
   /** Event already exists. */
   String EVENTKNOWN = lang("ad_eventknown");
   /** Watch Event. */
