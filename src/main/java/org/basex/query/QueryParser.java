@@ -4,13 +4,17 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.basex.core.Prop;
 import org.basex.core.cmd.Set;
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.query.expr.And;
 import org.basex.query.expr.Arith;
 import org.basex.query.expr.CAttr;
@@ -111,6 +115,12 @@ import org.basex.query.util.Namespaces;
 import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
 import org.basex.query.util.format.DecFormatter;
+import org.basex.query.util.repo.Package;
+import org.basex.query.util.repo.PkgParser;
+import org.basex.query.util.repo.PkgText;
+import org.basex.query.util.repo.PkgValidator;
+import org.basex.query.util.repo.Package.Component;
+import org.basex.query.util.repo.Package.Dependency;
 import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -118,6 +128,8 @@ import org.basex.util.InputParser;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.basex.util.TokenSet;
+import org.basex.util.Util;
 import org.basex.util.XMLToken;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.FTUnit;
@@ -616,6 +628,7 @@ public class QueryParser extends InputParser {
    */
   private void moduleImport() throws QueryException {
     QNm name = null;
+    TokenSet pkgs = null;
     if(wsConsumeWs(NSPACE)) {
       name = new QNm(ncName(XPNAME));
       wsCheck(IS);
@@ -628,28 +641,43 @@ public class QueryParser extends InputParser {
     ctx.ns.add(name, input());
 
     final TokenList fl = new TokenList();
-    if(wsConsumeWs(AT)) do fl.add(stringLiteral()); while(wsConsumeWs(COMMA));
-
     if(modules.contains(uri)) error(DUPLMODULE, name.uri());
-    try {
-      if(fl.size() == 0) {
-        boolean found = false;
-        final int ns = ctx.modules.size();
-        for(int n = 0; n < ns; n += 2) {
-          if(ctx.modules.get(n).equals(string(uri))) {
-            module(ctx.modules.get(n + 1), name.uri());
-            modules.add(uri);
-            found = true;
+    if(wsConsumeWs(AT)) {
+      do
+        fl.add(stringLiteral());
+      while(wsConsumeWs(COMMA));
+    } else {
+      // Search for uri in namespace dictionary
+      pkgs = ctx.context.repo.nsDict().get(uri);
+    }
+    if(pkgs == null) {
+      // No installed packages having modules with this uri
+      try {
+        if(fl.size() == 0) {
+          boolean found = false;
+          final int ns = ctx.modules.size();
+          for(int n = 0; n < ns; n += 2) {
+            if(ctx.modules.get(n).equals(string(uri))) {
+              module(ctx.modules.get(n + 1), name.uri());
+              modules.add(uri);
+              found = true;
+            }
           }
+          if(!found) error(NOMODULE, uri);
         }
-        if(!found) error(NOMODULE, uri);
+        for(int n = 0; n < fl.size(); ++n) {
+          module(string(fl.get(n)), name.uri());
+          modules.add(uri);
+        }
+      } catch(final StackOverflowError ex) {
+        error(CIRCMODULE);
       }
-      for(int n = 0; n < fl.size(); ++n) {
-        module(string(fl.get(n)), name.uri());
-        modules.add(uri);
+    } else {
+      // Load packages with modules having the given uri
+      for(final byte[] pkgName : pkgs) {
+        if(pkgName != null)
+          loadPackage(pkgName, new TokenSet(), new TokenSet());
       }
-    } catch(final StackOverflowError ex) {
-      error(CIRCMODULE);
     }
   }
 
@@ -675,6 +703,54 @@ public class QueryParser extends InputParser {
     new QueryParser(qu, ctx).parse(fl, u);
     ctx.ns = ns;
     ctx.modLoaded.add(f);
+  }
+
+  /**
+   * Loads a package from package repository.
+   * @param pkgName package name
+   * @param pkgsToLoad list with packages to be loaded
+   * @param pkgsLoaded already loaded packages
+   * @throws QueryException query exception
+   */
+  private void loadPackage(final byte[] pkgName, final TokenSet pkgsToLoad,
+      final TokenSet pkgsLoaded) throws QueryException {
+    // Return if package is already loaded
+    if(pkgsLoaded.id(pkgName) != 0) return;
+    // Find package in package dictionary
+    final byte[] pkgDir = ctx.context.repo.pkgDict().get(pkgName);
+    if(pkgDir == null) error(PKGNOTINSTALLED);
+    // Parse package descriptor
+    final File pkgDesc = new File(new File(ctx.context.prop.get(Prop.REPOPATH),
+        string(pkgDir)), PkgText.DESCRIPTOR);
+    if(!pkgDesc.exists()) Util.errln(PkgText.NOTEXP, string(pkgName));
+    final Package pkg = new PkgParser(ctx.context, input()).parse(new IOFile(
+        pkgDesc));
+    // Package has dependencies -> they have to be loaded first => put package
+    // in list with packages to be loaded
+    if(pkg.dep.size() != 0) pkgsToLoad.add(pkgName);
+    for(final Dependency d : pkg.dep) {
+      final byte[] depPkg = new PkgValidator(ctx.context, input()).getDepPkg(d);
+      if(depPkg == null) {
+        error(PKGNOTINSTALLED, string(d.pkg));
+      } else {
+        if(pkgsToLoad.id(depPkg) != 0) error(CIRCMODULE);
+        loadPackage(depPkg, pkgsToLoad, pkgsLoaded);
+      }
+    }
+    for(final Component comp : pkg.comps) {
+      try {
+        final String f = new File(new File(new File(
+            ctx.context.prop.get(Prop.REPOPATH), string(pkgDir)),
+            string(pkg.abbrev)), string(comp.file)).getCanonicalPath();
+        if(!(modules.contains(comp.namespace) || ctx.modLoaded.contains(f)))
+          module(f, Uri.uri(comp.namespace));
+      } catch(IOException ex) {
+        Util.debug(ex);
+        error(PKGREADFAIL, ex.getMessage());
+      }
+    }
+    if(pkgsToLoad.id(pkgName) != 0) pkgsToLoad.delete(pkgName);
+    pkgsLoaded.add(pkgName);
   }
 
   /**

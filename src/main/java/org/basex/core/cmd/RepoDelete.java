@@ -11,12 +11,12 @@ import org.basex.util.InputInfo;
 import org.basex.util.Util;
 
 /**
- * Evaluates the 'repo install' command.
+ * Evaluates the 'repo delete' command.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public final class RepoInstall extends Command {
+public class RepoDelete extends Command {
   /** Input info. */
   private final InputInfo ii;
 
@@ -25,7 +25,7 @@ public final class RepoInstall extends Command {
    * @param p package
    * @param i input info
    */
-  public RepoInstall(final String p, final InputInfo i) {
+  public RepoDelete(final String p, final InputInfo i) {
     super(User.ADMIN, p);
     ii = i;
   }
@@ -33,9 +33,9 @@ public final class RepoInstall extends Command {
   @Override
   protected boolean run() throws IOException {
     try {
-      new RepoManager(context).install(args[0], ii);
-      return info(REPOINST, args[0], perf);
-    } catch(final QueryException ex) {
+      new RepoManager(context).delete(args[0], ii);
+      return info(REPODEL, args[0]);
+    } catch(QueryException ex) {
       Util.debug(ex);
       return error(ex.getMessage());
     }
