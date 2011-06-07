@@ -34,7 +34,7 @@ public final class MetaData {
   /** Encoding of XML document. */
   public String encoding = UTF8;
   /** Path to original input documents. */
-  public String path;
+  public String path = "";
   /** Size of original documents. */
   public long filesize;
   /** Number of XML documents. */

@@ -440,7 +440,7 @@ public enum Err {
   /** XPST0017: Parsing Exception. */
   XPARGS(XPST, 17, "Wrong arguments: % expected."),
   /** XPST0017: Parsing exception. */
-  FUNSIMILAR(XPST, 17, "Unknown function name %; similar: \"%\"."),
+  FUNSIMILAR(XPST, 17, "Unknown function \"%\"; similar: \"%\"."),
   /** XPST0017: Parsing Exception. */
   FUNCTYPE(XPST, 17, "Wrong arguments: %(value) expected."),
   /** XPST0003: Parsing exception. */

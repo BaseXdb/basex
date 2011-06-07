@@ -189,7 +189,7 @@ public interface BuildText {
     /** Tag name.               */ TAGNAME("Tag name"),
     /** Attribute name.         */ ATTNAME("Attribute name"),
     /** Closing bracket.        */ R_BR("'>'"),
-    /** Whitespace.             */ WS("whitespace"),
+    /** Whitespace.             */ WS("Whitespace"),
     /** Attribute value.        */ ATTVALUE("Attribute value"),
     /** Empty bracket.          */ L_BR_CLOSE("'</'"),
     /** Closing end bracket.    */ CLOSE_R_BR("'/>'"),

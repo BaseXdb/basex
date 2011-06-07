@@ -255,6 +255,7 @@ public final class QueryProcessor extends Progress {
       for(final Entry<String, Object> e : ctx.props.entrySet()) {
         ctx.context.prop.set(e.getKey(), e.getValue());
       }
+      ctx.props = null;
     }
   }
 

@@ -1103,13 +1103,13 @@ public class QueryParser extends InputParser {
   private Expr iff() throws QueryException {
     if(!wsConsumeWs(IF, PAR1, IFPAR)) return null;
     wsCheck(PAR1);
-    final Expr e = check(expr(), NOIF);
+    final Expr iff = check(expr(), NOIF);
     wsCheck(PAR2);
     if(!wsConsumeWs(THEN)) error(NOIF);
     final Expr thn = check(single(), NOIF);
     if(!wsConsumeWs(ELSE)) error(NOIF);
     final Expr els = check(single(), NOIF);
-    return new If(input(), e, thn, els);
+    return new If(input(), iff, thn, els);
   }
 
   /**

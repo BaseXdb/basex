@@ -146,7 +146,7 @@ public final class QNm extends Item {
    * @return Returns an atomized string.
    */
   public byte[] atom() {
-    return atom(null);
+    return val;
   }
 
   @Override
