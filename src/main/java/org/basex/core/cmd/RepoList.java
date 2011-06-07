@@ -1,5 +1,6 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
@@ -27,8 +28,9 @@ public class RepoList extends Command {
   @Override
   protected boolean run() throws IOException {
     final Table t = new Table();
-    t.header.add("Package");
-    t.header.add("Version");
+    t.description = PACKAGES;
+    t.header.add(INFODBNAME);
+    t.header.add(VERSINFO);
 
     for(final byte[] p : context.repo.pkgDict()) {
       if(p != null) {

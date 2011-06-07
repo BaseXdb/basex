@@ -440,6 +440,7 @@ qu_exec=Query executed in %.
 ad_databases=% opened database(s)
 ad_sessions=% session(s)
 ad_events=% event(s)
+ad_packages=package(s)
 ad_permno=% permission needed.
 ad_perminv=% permission is unknown.
 ad_grant=% granted to '%'.
@@ -603,10 +604,10 @@ ch_help2=If [%] is specified, information on the specific\ncommand is printed; o
 ch_exit1=Exit application.
 ch_exit2=Exits %.
 ch_repo1=Install, delete or list packages.
-ch_repo2=Installs, deletes or lists packages from package repository.
-ch_repo3=Deletes the package with name [%] or with directory [%].
-ch_repo4=Installs package with path [%].
-ch_repo5=Lists all installed packages.
+ch_repo2=installs, deletes or lists packages from the repository
+ch_repo3=deletes the package with name [%] or directory [%]
+ch_repo4=installs package with path [%]
+ch_repo5=lists all installed packages
 
 # Help Texts
 h_hist=Show input history.

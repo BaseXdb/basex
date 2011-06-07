@@ -1,6 +1,5 @@
 package org.basex.core.cmd;
 
-import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
@@ -82,12 +81,7 @@ public final class InfoStorage extends AQuery {
     tb.add(table.finish());
 
     final byte[] ns = data.ns.table(ps, pe);
-    if(ns.length != 0) {
-      tb.add(NL);
-      tb.add(ns);
-      tb.add(data.ns.toString(ps, pe));
-      tb.add(NL);
-    }
+    if(ns.length != 0) tb.nl().add(ns).add(data.ns.toString(ps, pe)).nl();
     return tb.finish();
   }
 

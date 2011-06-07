@@ -146,7 +146,7 @@ public final class Users extends CopyOnWriteArrayList<User> {
    */
   public synchronized byte[] info() {
     final Table table = new Table();
-    table.desc = USERS;
+    table.description = USERS;
 
     final int sz = file == null ? 3 : 5;
     for(int u = 0; u < sz; ++u) table.header.add(USERHEAD[u]);

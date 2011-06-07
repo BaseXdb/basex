@@ -161,9 +161,7 @@ public class WesternTokenizerTest {
     tok.init(input);
     int i = -1;
     while(tok.hasNext()) {
-      final byte[] t = tok.nextToken();
-      // System.out.println(string(t));
-      assertTrue(eq(t, token(tokens[++i])));
+      assertTrue(eq(tok.nextToken(), token(tokens[++i])));
     }
   }
 
@@ -177,7 +175,5 @@ public class WesternTokenizerTest {
     if((flags & FTLC) != 0) opt.set(FTFlag.LC, true);
     if((flags & FTUC) != 0) opt.set(FTFlag.UC, true);
     if((flags & FTWC) != 0) opt.set(FTFlag.WC, true);
-    // if((flags & FTFZ) != 0) opt.set(FTFlag.FZ, true);
-    // if((flags & FTST) != 0) opt.set(FTFlag.ST, true);
   }
 }

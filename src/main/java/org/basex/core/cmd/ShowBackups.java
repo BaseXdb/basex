@@ -29,7 +29,7 @@ public final class ShowBackups extends Command {
   @Override
   protected boolean run() throws IOException {
     final Table table = new Table();
-    table.desc = BACKUPS;
+    table.description = BACKUPS;
     table.header.add(INFODBNAME);
     table.header.add(INFODBSIZE);
 

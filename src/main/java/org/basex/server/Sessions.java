@@ -25,7 +25,7 @@ public final class Sessions extends CopyOnWriteArrayList<ServerProcess> {
     final StringList sl = new StringList();
     for(final ServerProcess sp : this) sl.add(sp.user().name + ' ' + sp);
     sl.sort(true, true);
-    for(final String sp : sl) tb.add(NL).add(LI).add(sp);
+    for(final String sp : sl) tb.nl().add(LI).add(sp);
     return tb.toString();
   }
 }

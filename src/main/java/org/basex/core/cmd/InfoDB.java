@@ -57,8 +57,7 @@ public final class InfoDB extends AInfo {
     format(tb, INFODBSIZE, Performance.format(meta.dbsize()));
     format(tb, INFONODES, Integer.toString(meta.size));
 
-    tb.add(NL);
-    tb.addExt(header, INFOCREATE);
+    tb.nl().addExt(header, INFOCREATE);
     format(tb, INFOTIME, DATE.format(new Date(meta.time)));
     if(create && !meta.path.isEmpty()) format(tb, INFOPATH, meta.path);
     if(meta.filesize != 0)
@@ -69,8 +68,7 @@ public final class InfoDB extends AInfo {
     format(tb, INFOENTITY, flag(meta.entity));
 
     if(index) {
-      tb.add(NL);
-      tb.addExt(header, INFOINDEX);
+      tb.nl().addExt(header, INFOINDEX);
       if(meta.oldindex) {
         tb.add(" " + INDUPDATE + NL);
       } else {

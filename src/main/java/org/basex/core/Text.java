@@ -390,11 +390,11 @@ public interface Text {
       lang("ch_repo1"),
       lang("ch_repo2") + NL +
       LI + CmdRepo.DELETE + " [" + C_PKGNAME + "|" + C_PKGDIR + "]:" +  NL +
-      lang("ch_repo3", C_PKGNAME, C_PKGDIR) + NL +
+      "  " + lang("ch_repo3", C_PKGNAME, C_PKGDIR) + NL +
       LI + CmdRepo.INSTALL + " [" + C_PKGPATH + "]:" + NL +
-      lang("ch_repo4", C_PKGPATH) + NL +
+      "  " + lang("ch_repo4", C_PKGPATH) + NL +
       LI + CmdRepo.LIST + ":" + NL +
-      lang("ch_repo5")
+      "  " + lang("ch_repo5")
   };
 
   // COMMAND INFOS ============================================================
@@ -628,7 +628,9 @@ public interface Text {
   /** Show sessions. */
   String SRVSESSIONS = lang("ad_sessions");
   /** Show events. */
-  String SRVEVENTS = lang("ad_events");
+  String EVENTS = lang("ad_events");
+  /** Show packages. */
+  String PACKAGES = lang("ad_packages");
   /** Permission needed. */
   String PERMNO = lang("ad_permno");
   /** Invalid permissions. */

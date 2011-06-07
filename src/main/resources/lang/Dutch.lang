@@ -440,6 +440,7 @@ qu_exec=Query uitgevoerd in % seconden.
 ad_databases=% geopende database(s)
 ad_sessions=% sessie(s)
 ad_events=% event(s)
+ad_packages=package(s)
 ad_permno=% toegang geweigerd.
 ad_perminv=% permission is unknown.
 ad_grant=% granted to '%'.
@@ -599,6 +600,11 @@ ch_help1=Vraag hulp over % commando's.
 ch_help2=Als [%] is opgegeven, dan wordt informatie over het specifieke\ncommando geprint; anders worden alle commando's getoond.
 ch_exit1=Stop applicatie.
 ch_exit2=Stop %.
+ch_repo1=Install, delete or list packages.
+ch_repo2=installs, deletes or lists packages from the repository
+ch_repo3=deletes the package with name [%] or directory [%]
+ch_repo4=installs package with path [%]
+ch_repo5=lists all installed packages
 
 # Help Texts
 h_hist=Toon input geschiedenis.

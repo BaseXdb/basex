@@ -286,18 +286,15 @@ public class PackageAPITest extends AdvancedQueryTest {
    */
   @Test
   public void testImport() throws QueryException {
-
     // Try with a package without dependencies
     final QueryProcessor qp1 = new QueryProcessor(
         "import module namespace ns3='ns3';\nns3:test()", ctx);
-    System.out.println(qp1.execute().toString());
     assertEquals(qp1.execute().toString(), "pkg2mod2");
     qp1.execute();
 
     // Try with a package with dependencies
     final QueryProcessor qp2 = new QueryProcessor(
         "import module namespace ns2='ns2';\nns2:test()", ctx);
-    System.out.println(qp2.execute().toString());
     assertEquals(qp2.execute().toString(), "pkg2mod2");
     qp2.execute();
   }

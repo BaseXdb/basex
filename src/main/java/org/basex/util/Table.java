@@ -25,8 +25,8 @@ public final class Table {
   public final BoolList align = new BoolList();
   /** Table contents. */
   public final ArrayList<TokenList> contents = new ArrayList<TokenList>();
-  /** Data description. */
-  public String desc;
+  /** Data description; if available, will be added as footer. */
+  public String description;
 
   /**
    * Default constructor.
@@ -140,11 +140,11 @@ public final class Table {
       tb.add(s);
       for(int i = 0; i < is; ++i) tb.add(' ');
     }
-    tb.add(NL);
+    tb.nl();
     for(int u = 0; u < sz; ++u) {
       for(int i = 0; i < ind[u] + (u + 1 == sz ? 0 : DIST); ++i) tb.add('-');
     }
-    tb.add(NL);
+    tb.nl();
     for(final TokenList e : contents) {
       for(int u = 0; u < sz; ++u) {
         final byte[] s = e.get(u);
@@ -158,9 +158,11 @@ public final class Table {
         }
         for(int i = 0; i < DIST; ++i) tb.add(' ');
       }
-      tb.add(NL);
+      tb.nl();
     }
-    if(desc != null) tb.add(NL + contents.size() + ' ' + desc + DOT);
+    if(description != null) {
+      tb.nl().add(contents.size() + " " + description + DOT);
+    }
     return tb.finish();
   }
 
@@ -171,7 +173,7 @@ public final class Table {
       tb.add(b);
       tb.add('\t');
     }
-    tb.add(NL);
+    tb.nl();
     for(final TokenList e : contents) {
       for(final byte[] b : e) {
         tb.add(b);

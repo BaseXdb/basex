@@ -440,6 +440,7 @@ qu_exec=Query executed in %.
 ad_databases=% base di dati aperta
 ad_sessions=% sessione
 ad_events=% event(s)
+ad_packages=package(s)
 ad_permno=% permessi richiesti.
 ad_perminv=% permission is unknown.
 ad_grant=% granted to '%'.
@@ -598,6 +599,11 @@ ch_help1=Ottieni aiuto su % comandi.
 ch_help2=Se è specificato [%], l'informazione sullo specifico\n comando viene mostrata; altrimenti, vengono mostrati tutti i comandi.
 ch_exit1=Esci dall'applicazione.
 ch_exit2=Esci da %.
+ch_repo1=Install, delete or list packages.
+ch_repo2=installs, deletes or lists packages from the repository
+ch_repo3=deletes the package with name [%] or directory [%]
+ch_repo4=installs package with path [%]
+ch_repo5=lists all installed packages
 
 # Help Texts
 h_hist=Mostra la cronologia degli inserimenti.

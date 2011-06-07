@@ -37,7 +37,7 @@ public final class ListDB extends Command {
     if(!validName(db, false)) return error(NAMEINVALID, db);
 
     final Table table = new Table();
-    table.desc = INFONDOCS;
+    table.description = INFONDOCS;
     table.header.add(INFOPATH);
     table.header.add(INFONODES);
 

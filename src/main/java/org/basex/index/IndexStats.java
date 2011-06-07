@@ -108,12 +108,9 @@ final class IndexStats {
       final int len) {
     for(int o = 0; o < ocs.length; ++o) {
       if(txt[o].length == 0) continue;
-      tb.add("  ");
-      tb.add(txt[o]);
+      tb.add("  ").add(txt[o]);
       for(int j = 0; j < len - txt[o].length; ++j) tb.add(' ');
-      tb.addLong(ocs[o]);
-      tb.add('x');
-      tb.add(NL);
+      tb.addLong(ocs[o]).add('x').nl();
     }
   }
 }

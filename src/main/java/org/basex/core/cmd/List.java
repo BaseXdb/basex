@@ -30,7 +30,7 @@ public final class List extends Command {
   @Override
   protected boolean run() throws IOException {
     final Table table = new Table();
-    table.desc = DATABASES;
+    table.description = DATABASES;
 
     final boolean create = context.user.perm(User.CREATE);
     table.header.add(INFODBNAME);
