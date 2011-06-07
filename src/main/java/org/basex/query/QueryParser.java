@@ -137,7 +137,7 @@ import org.basex.query.util.repo.PkgText;
 
 /**
  * Simple query parser; can be overwritten to support more complex parsings.
- * 
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
@@ -150,8 +150,6 @@ public class QueryParser extends InputParser {
 
   /** Temporary token builder. */
   private final TokenBuilder tok = new TokenBuilder();
-  /** List with packages to be loaded. */
-  private final TokenSet pkgsToLoad = new TokenSet();
   /** List of loaded modules. */
   private final TokenList modules = new TokenList();
   /** Name of current module. */
@@ -228,7 +226,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the specified query and starts with the "Module" rule. If a URI is
    * specified, the query is treated as a module.
-   * 
+   *
    * @param u module uri
    * @param c if true, input must be completely evaluated
    * @return resulting expression
@@ -338,7 +336,8 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(DECLARE)) {
         if(wsConsumeWs(DEFAULT)) {
           if(!defaultNamespaceDecl() && !defaultCollationDecl()
-              && !emptyOrderDecl() && !decFormatDecl(true)) error(DECLINCOMPLETE);
+              && !emptyOrderDecl() && !decFormatDecl(true))
+            error(DECLINCOMPLETE);
         } else if(wsConsumeWs(BOUNDARY)) {
           boundarySpaceDecl();
         } else if(wsConsumeWs(BASEURI)) {
@@ -669,7 +668,8 @@ public class QueryParser extends InputParser {
     } else {
       // Load packages with modules having the given uri
       for(final byte[] pkgName : pkgs) {
-        loadPackage(pkgName);
+        if(pkgName != null)
+          loadPackage(pkgName, new TokenSet(), new TokenSet());
       }
     }
   }
@@ -701,9 +701,14 @@ public class QueryParser extends InputParser {
   /**
    * Loads a package from package repository.
    * @param pkgName package name
+   * @param pkgsToLoad list with packages to be loaded
+   * @param pkgsLoaded already loaded packages
    * @throws QueryException query exception
    */
-  private void loadPackage(final byte[] pkgName) throws QueryException {
+  private void loadPackage(final byte[] pkgName, final TokenSet pkgsToLoad,
+      final TokenSet pkgsLoaded) throws QueryException {
+    // Return if package is already loaded
+    if(pkgsLoaded.id(pkgName) != 0) return;
     // Find package in package dictionary
     final byte[] pkgDir = ctx.context.repo.pkgDict().get(pkgName);
     if(pkgDir == null) error(PKGNOTINSTALLED);
@@ -711,8 +716,8 @@ public class QueryParser extends InputParser {
     final File pkgDesc = new File(new File(ctx.context.prop.get(Prop.REPOPATH),
         string(pkgDir)), PKGDESC);
     if(!pkgDesc.exists()) Util.errln(PkgText.NOTEXP, string(pkgName));
-    final IOFile io = new IOFile(pkgDesc);
-    final Package pkg = new PkgParser(ctx.context, input()).parse(io);
+    final Package pkg = new PkgParser(ctx.context, input()).parse(new IOFile(
+        pkgDesc));
     // Package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
     if(pkg.dep.size() != 0) pkgsToLoad.add(pkgName);
@@ -722,25 +727,23 @@ public class QueryParser extends InputParser {
         error(PKGNOTINSTALLED, string(d.pkg));
       } else {
         if(pkgsToLoad.id(depPkg) != 0) error(CIRCMODULE);
-        loadPackage(depPkg);
+        loadPackage(depPkg, pkgsToLoad, pkgsLoaded);
       }
     }
     for(final Component comp : pkg.comps) {
-      // Load package components
-      String modFile;
       try {
-        modFile = new File(new File(new File(
+        final String f = new File(new File(new File(
             ctx.context.prop.get(Prop.REPOPATH), string(pkgDir)),
             string(pkg.abbrev)), string(comp.file)).getCanonicalPath();
-        if(!(modules.contains(comp.namespace)
-            || ctx.modLoaded.contains(modFile))) module(
-            modFile, Uri.uri(comp.namespace));
-      } catch(IOException e) {
-        // TODO Report some error
-        e.printStackTrace();
+        if(!(modules.contains(comp.namespace) || ctx.modLoaded.contains(f)))
+          module(f, Uri.uri(comp.namespace));
+      } catch(IOException ex) {
+        Util.debug(ex);
+        error(PKGREADFAIL, ex.getMessage());
       }
     }
     if(pkgsToLoad.id(pkgName) != 0) pkgsToLoad.delete(pkgName);
+    pkgsLoaded.add(pkgName);
   }
 
   /**

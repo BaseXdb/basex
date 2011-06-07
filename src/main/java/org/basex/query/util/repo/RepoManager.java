@@ -80,7 +80,7 @@ public final class RepoManager {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void delete(final String pkg, final InputInfo ii)
+  public synchronized void delete(final String pkg, final InputInfo ii)
       throws QueryException {
     for(final byte[] nextPkg : context.repo.pkgDict().keys()) {
       if(nextPkg != null) {
@@ -185,7 +185,7 @@ public final class RepoManager {
   private byte[] getPrimary(final byte[] pkgName, final InputInfo ii)
       throws QueryException {
     for(final byte[] nextPkg : context.repo.pkgDict().keys()) {
-      if(nextPkg != null && !eq(Package.getName(nextPkg), pkgName)) {
+      if(nextPkg != null && !eq(nextPkg, pkgName)) {
         // Check only packages different from the current one
         final File pkgDesc = new File(new File(context.prop.get(Prop.REPOPATH),
             string(context.repo.pkgDict().get(nextPkg))), DESCRIPTOR);
@@ -205,7 +205,7 @@ public final class RepoManager {
    * @param ii input info
    * @throws QueryException query exception
    */
-  private synchronized void deletePkg(final File dir, final InputInfo ii)
+  private void deletePkg(final File dir, final InputInfo ii)
       throws QueryException {
     final File[] files = dir.listFiles();
     if(files != null) for(final File f : files)
