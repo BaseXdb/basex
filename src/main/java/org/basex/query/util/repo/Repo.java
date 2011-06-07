@@ -17,7 +17,6 @@ import org.basex.util.Util;
 
 /**
  * Repository.
- *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -43,8 +42,8 @@ public final class Repo {
   }
 
   /**
-   * Returns the namespace dictionary.
-   * Initializes the repository if not done yet.
+   * Returns the namespace dictionary. Initializes the repository if not done
+   * yet.
    * @return dictionary
    */
   public TokenObjMap<TokenSet> nsDict() {
@@ -53,8 +52,7 @@ public final class Repo {
   }
 
   /**
-   * Returns the package dictionary.
-   * Initializes the repository if not done yet.
+   * Returns the package dictionary. Initializes the repository if not done yet.
    * @return dictionary
    */
   public TokenMap pkgDict() {
@@ -74,7 +72,48 @@ public final class Repo {
     final File repoDir = new File(context.prop.get(Prop.REPOPATH));
     final File[] dirs = repoDir.listFiles();
     if(dirs == null) return;
-    for(final File dir : dirs) if(dir.isDirectory()) readPkg(dir);
+    for(final File dir : dirs)
+      if(dir.isDirectory()) readPkg(dir);
+  }
+
+  /**
+   * Removes a package from the namespace and package dictionaries when it is
+   * deleted.
+   * @param pkg deleted package
+   */
+  public synchronized void remove(final Package pkg) {
+    // Delete package from namespace dictionary
+    for(final Component comp : pkg.comps) {
+      final byte[] ns = comp.namespace;
+      final TokenSet pkgs = nsDict.get(ns);
+      if(pkgs.size() > 1) {
+        pkgs.delete(pkg.getUniqueName());
+      } else {
+        nsDict.delete(ns);
+      }
+    }
+    // Delete package from package dictionary
+    pkgDict.delete(pkg.getUniqueName());
+  }
+
+  /**
+   * Adds a newly installed package to the namespace and package dictionaries.
+   * @param pkg new package
+   * @param dir new package directory
+   */
+  public synchronized void add(final Package pkg, final String dir) {
+    // Update namespace dictionary
+    for(final Component comp : pkg.comps) {
+      if(nsDict.id(comp.namespace) == 0) {
+        final TokenSet vals = new TokenSet();
+        vals.add(pkg.getUniqueName());
+        nsDict.add(comp.namespace, vals);
+      } else {
+        nsDict.get(comp.namespace).add(pkg.getUniqueName());
+      }
+    }
+    // Update package dictionary
+    pkgDict.add(pkg.getUniqueName(), token(dir));
   }
 
   /**

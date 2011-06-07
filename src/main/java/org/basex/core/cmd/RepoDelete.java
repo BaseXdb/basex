@@ -39,7 +39,5 @@ public class RepoDelete extends Command {
       Util.debug(ex);
       return error(ex.getMessage());
     }
-
   }
-
 }

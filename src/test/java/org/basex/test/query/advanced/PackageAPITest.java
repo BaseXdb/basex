@@ -21,12 +21,11 @@ import org.basex.util.TokenMap;
 import org.basex.util.TokenObjMap;
 import org.basex.util.TokenSet;
 import org.basex.util.Util;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * This class tests the EXPath package API.
- *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -35,8 +34,8 @@ public class PackageAPITest extends AdvancedQueryTest {
   protected static Context ctx;
 
   /** Prepare test. */
-  @BeforeClass
-  public static void setUpBeforeClass() {
+  @Before
+  public void setUpBeforeClass() {
     ctx = new Context();
     ctx.repo.init("etc/repo");
   }
@@ -168,7 +167,7 @@ public class PackageAPITest extends AdvancedQueryTest {
   public void alreadyAnotherInstalled() {
     error(
         desc("http://www.pkg5.com", "pkg5", "12.0",
-      "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"),
+        "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"),
         Err.MODISTALLED, "Already installed component not detected.");
   }
 
@@ -272,12 +271,13 @@ public class PackageAPITest extends AdvancedQueryTest {
     final File modFile = new File("etc/repo/pkg3/pkg3/mod/pkg3mod1.xql");
     assertTrue(modFile.exists());
 
-    // Delete pkg3
-    new RepoDelete("pkg3", null).execute(ctx);
-    // Assert that pkg3 was unregistered from repo
-    assertTrue(ctx.repo.pkgDict().id(token("pkg3-10.0")) == 0);
-    // Assert that directory for pkg3 was deleted
-    assertTrue(!pkgDir.exists());
+    // Delete package
+    modFile.delete();
+    modDir2.delete();
+    modDir1.delete();
+    pkgDesc.delete();
+    pkgDir.delete();
+
   }
 
   /**

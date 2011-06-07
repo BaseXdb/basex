@@ -20,10 +20,8 @@ import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.func.FNZip;
-import org.basex.query.util.repo.Package.Component;
 import org.basex.query.util.repo.Package.Dependency;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenSet;
 import org.basex.util.Util;
 
 /**
@@ -34,14 +32,14 @@ import org.basex.util.Util;
  */
 public final class RepoManager {
   /** Database context. */
-  private final Context context;
+  private final Context ctx;
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param c database context
    */
-  public RepoManager(final Context ctx) {
-    context = ctx;
+  public RepoManager(final Context c) {
+    ctx = c;
   }
 
   /**
@@ -50,7 +48,7 @@ public final class RepoManager {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public synchronized void install(final String path, final InputInfo ii)
+  public void install(final String path, final InputInfo ii)
       throws QueryException {
 
     // Check repository
@@ -64,10 +62,10 @@ public final class RepoManager {
     try {
       final ZipFile xar = new ZipFile(pkgFile);
       final byte[] cont = FNZip.read(xar, DESCRIPTOR);
-      final Package pkg = new PkgParser(context, ii).parse(new IOContent(cont));
-      new PkgValidator(context, ii).check(pkg);
+      final Package pkg = new PkgParser(ctx, ii).parse(new IOContent(cont));
+      new PkgValidator(ctx, ii).check(pkg);
       unzip(xar);
-      updateRepo(pkg, extractPkgName(xar.getName()));
+      ctx.repo.add(pkg, extractPkgName(xar.getName()));
     } catch(final IOException ex) {
       Util.debug(ex);
       throw PKGREADFAIL.thrw(ii, ex.getMessage());
@@ -80,21 +78,22 @@ public final class RepoManager {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public synchronized void delete(final String pkg, final InputInfo ii)
+  public void delete(final String pkg, final InputInfo ii)
       throws QueryException {
-    for(final byte[] nextPkg : context.repo.pkgDict().keys()) {
+    for(final byte[] nextPkg : ctx.repo.pkgDict()) {
       if(nextPkg != null) {
-        final byte[] dir = context.repo.pkgDict().get(nextPkg);
+        final byte[] dir = ctx.repo.pkgDict().get(nextPkg);
         if(eq(Package.getName(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
           // A package can be deleted either by its name or by its directory
           // name
           final byte[] primPkg = getPrimary(nextPkg, ii);
           if(primPkg == null) {
             // Clean package repository
-            cleanRepo(nextPkg, dir, ii);
+            final File f = new File(ctx.prop.get(Prop.REPOPATH), string(dir));
+            final File desc = new File(f, DESCRIPTOR);
+            ctx.repo.remove(new PkgParser(ctx, ii).parse(new IOFile(desc)));
             // Package does not participate in a dependency => delete it
-            deletePkg(new File(context.prop.get(Prop.REPOPATH), string(dir)),
-                ii);
+            deleteFromDisc(f, ii);
           } else {
             PKGDEP.thrw(ii, string(primPkg), pkg);
           }
@@ -150,7 +149,7 @@ public final class RepoManager {
    * @return repository path
    */
   private File repoPath() {
-    return new File(context.prop.get(Prop.REPOPATH));
+    return new File(ctx.prop.get(Prop.REPOPATH));
   }
 
   /**
@@ -184,13 +183,12 @@ public final class RepoManager {
    */
   private byte[] getPrimary(final byte[] pkgName, final InputInfo ii)
       throws QueryException {
-    for(final byte[] nextPkg : context.repo.pkgDict().keys()) {
+    for(final byte[] nextPkg : ctx.repo.pkgDict()) {
       if(nextPkg != null && !eq(nextPkg, pkgName)) {
         // Check only packages different from the current one
-        final File pkgDesc = new File(new File(context.prop.get(Prop.REPOPATH),
-            string(context.repo.pkgDict().get(nextPkg))), DESCRIPTOR);
-        final IOFile io = new IOFile(pkgDesc);
-        final Package pkg = new PkgParser(context, ii).parse(io);
+        final File desc = new File(new File(ctx.prop.get(Prop.REPOPATH),
+            string(ctx.repo.pkgDict().get(nextPkg))), DESCRIPTOR);
+        final Package pkg = new PkgParser(ctx, ii).parse(new IOFile(desc));
         for(final Dependency dep : pkg.dep)
           if(eq(dep.pkg, Package.getName(pkgName)))
             return Package.getName(nextPkg);
@@ -205,58 +203,12 @@ public final class RepoManager {
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void deletePkg(final File dir, final InputInfo ii)
+  private void deleteFromDisc(final File dir, final InputInfo ii)
       throws QueryException {
     final File[] files = dir.listFiles();
-    if(files != null) for(final File f : files)
-      deletePkg(f, ii);
+    if(files != null) for(final File f : files) deleteFromDisc(f, ii);
     if(!dir.delete()) CANNOTDELPKG.thrw(ii);
   }
 
-  /**
-   * Updates package repository after a new package has been installed.
-   * @param pkg new package
-   * @param dir new package directory
-   */
-  private void updateRepo(final Package pkg, final String dir) {
-    // Update namespace dictionary
-    for(final Component comp : pkg.comps) {
-      if(context.repo.nsDict().id(comp.namespace) == 0) {
-        final TokenSet vals = new TokenSet();
-        vals.add(pkg.getUniqueName());
-        context.repo.nsDict().add(comp.namespace, vals);
-      } else {
-        context.repo.nsDict().get(comp.namespace).add(pkg.getUniqueName());
-      }
-    }
-    // Update package dictionary
-    context.repo.pkgDict().add(pkg.getUniqueName(), token(dir));
-  }
 
-  /**
-   * Cleans package repository after a package has been deleted.
-   * @param pkgName package
-   * @param dir package directory
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private void cleanRepo(final byte[] pkgName, final byte[] dir,
-      final InputInfo ii) throws QueryException {
-    final File pkgDesc = new File(new File(context.prop.get(Prop.REPOPATH),
-        string(dir)), DESCRIPTOR);
-    final IOFile io = new IOFile(pkgDesc);
-    final Package pkg = new PkgParser(context, ii).parse(io);
-    // Delete package from namespace dictionary
-    for(final Component comp : pkg.comps) {
-      final byte[] ns = comp.namespace;
-      final TokenSet pkgs = context.repo.nsDict().get(ns);
-      if(pkgs.size() > 1) {
-        pkgs.delete(pkgName);
-      } else {
-        context.repo.nsDict().delete(ns);
-      }
-    }
-    // Delete package from package dictionary
-    context.repo.pkgDict().delete(pkgName);
-  }
 }

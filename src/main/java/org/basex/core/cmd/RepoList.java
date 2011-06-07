@@ -12,7 +12,6 @@ import org.basex.util.TokenList;
 
 /**
  * Evaluates the 'repo list' command.
- *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -31,7 +30,7 @@ public class RepoList extends Command {
     t.header.add("Package");
     t.header.add("Version");
 
-    for(final byte[] p : context.repo.pkgDict().keys()) {
+    for(final byte[] p : context.repo.pkgDict()) {
       if(p != null) {
         final TokenList tl = new TokenList();
         tl.add(string(Package.getName(p)));
