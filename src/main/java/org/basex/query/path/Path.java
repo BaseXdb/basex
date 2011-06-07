@@ -310,7 +310,7 @@ public abstract class Path extends ParseExpr {
    * @return path nodes
    */
   protected ArrayList<PathNode> pathNodes(final Data data, final int l) {
-    // convert single descendant step to child steps
+    // skip request if no path index exists or might be out-of-date
     if(!data.meta.pathindex || !data.meta.uptodate) return null;
 
     ArrayList<PathNode> in = data.pthindex.root();

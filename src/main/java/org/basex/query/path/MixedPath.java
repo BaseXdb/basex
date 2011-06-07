@@ -48,7 +48,7 @@ public final class MixedPath extends Path {
 
     // rewrite to child steps
     final Data data = ctx.data();
-    if(data != null && data.meta.uptodate && ctx.value.type == NodeType.DOC) {
+    if(data != null && ctx.value.type == NodeType.DOC) {
       final Expr e = children(ctx, data);
       // return optimized expression
       if(e != this) return e.comp(ctx);

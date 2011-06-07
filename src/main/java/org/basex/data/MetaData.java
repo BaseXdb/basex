@@ -73,12 +73,13 @@ public final class MetaData {
   /** Scoring mode: see {@link Prop#SCORING}. */
   public int scoring;
 
-  /** Flag for removed index structures. */
+  /** Flag for out-of-date index structures.
+   *  Will be removed as soon as all indexes support updates. */
   public boolean uptodate = true;
+  /** Flag for out-of-date indexes. */
+  public boolean oldindex;
   /** Dirty flag. */
   public boolean dirty;
-  /** Flag for out-of-dates indexes. */
-  public boolean oldindex;
   /** Table size. */
   public int size;
   /** Last (highest) id assigned to a node. */
