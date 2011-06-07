@@ -42,6 +42,7 @@ import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.InfoStorage;
+import org.basex.core.cmd.RepoDelete;
 import org.basex.core.cmd.RepoInstall;
 import org.basex.core.cmd.Kill;
 import org.basex.core.cmd.List;
@@ -52,6 +53,7 @@ import org.basex.core.cmd.OptimizeAll;
 import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Rename;
 import org.basex.core.cmd.Replace;
+import org.basex.core.cmd.RepoList;
 import org.basex.core.cmd.Restore;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
@@ -286,8 +288,10 @@ public final class CommandParser extends InputParser {
         switch(consume(CmdRepo.class, cmd)) {
           case INSTALL:
             return new RepoInstall(string(cmd), new InputInfo(this));
-          case REMOVE:
+          case DELETE:
+            return new RepoDelete(string(cmd), new InputInfo(this));
           case LIST:
+            return new RepoList();
           default:
         }
         break;

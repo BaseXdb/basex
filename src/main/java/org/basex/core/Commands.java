@@ -34,7 +34,7 @@ public interface Commands {
   /** Alter types. */
   enum CmdAlter { DATABASE, DB, USER }
   /** Repo types. */
-  enum CmdRepo { INSTALL, REMOVE, LIST }
+  enum CmdRepo { INSTALL, DELETE, LIST }
 
   /** Command definitions. */
   enum Cmd {
@@ -45,7 +45,7 @@ public interface Commands {
     KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE),
     PASSWORD(HELPPASSWORD), RENAME(HELPRENAME), REPLACE(HELPREPLACE),
     // [RS] to be added: texts for REPO command
-    REPO, RESTORE(HELPRESTORE), RUN(HELPRUN), SET(HELPSET),
+    REPO(HELPREPO), RESTORE(HELPRESTORE), RUN(HELPRUN), SET(HELPSET),
     SHOW(HELPSHOW), XQUERY(HELPXQUERY);
 
     /** Help texts. */

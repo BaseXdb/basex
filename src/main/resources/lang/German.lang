@@ -510,6 +510,10 @@ info_error=Fehler
 info_entries=% Einträge
 info_browsererror=Browser konnte nicht geöffnet werden. Bitte die URL von Hand im Browser öffnen:\n\n%
 
+#Repo commands
+repo_delete=Paket '%' wurde gelöscht.
+repo_install=Paket '%' wurde in % installiert.
+
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.
 ch_create1=Erstellung einer Datenbank, eines Index oder Benutzers.
@@ -598,6 +602,11 @@ ch_help1=Hilfe für %-Befehle.
 ch_help2=Wenn [%] angegeben wurde, werden Informationen\nzum eingegebenen Befehl dargestellt; ansonsten werden\nalle Befehle aufgelistet.
 ch_exit1=Beenden des Programms.
 ch_exit2=Beendet %.
+ch_repo1=Installiere, lösche oder liste Pakete.
+ch_repo2=Installiert, löscht oder listet Pakete aus dem Paketdepot.
+ch_repo3=Löscht das Paket mit dem Namen [%] oder mit dem Verzeichnis [%].
+ch_repo4=Installiert das Paket mit dem Pfad [%].
+ch_repo5=Listet alle installierte Pakete.
 
 # Help Texts
 h_hist=Auswahl der letzten Texteingaben.

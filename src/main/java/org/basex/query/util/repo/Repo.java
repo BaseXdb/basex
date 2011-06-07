@@ -10,14 +10,13 @@ import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.util.repo.Package.Component;
-import org.basex.util.TokenList;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenObjMap;
+import org.basex.util.TokenSet;
 import org.basex.util.Util;
 
 /**
  * Repository.
- *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -26,7 +25,7 @@ public final class Repo {
    * Namespace-dictionary - contains all namespaces available in the repository
    * and the packages in which they are found.
    */
-  private final TokenObjMap<TokenList> nsDict = new TokenObjMap<TokenList>();
+  private final TokenObjMap<TokenSet> nsDict = new TokenObjMap<TokenSet>();
   /** Package dictionary with installed packages and their directories. */
   private final TokenMap pkgDict = new TokenMap();
   /** Context. */
@@ -43,18 +42,17 @@ public final class Repo {
   }
 
   /**
-   * Returns the namespace dictionary.
-   * Initializes the repository if not done yet.
+   * Returns the namespace dictionary. Initializes the repository if not done
+   * yet.
    * @return dictionary
    */
-  public TokenObjMap<TokenList> nsDict() {
+  public TokenObjMap<TokenSet> nsDict() {
     init(null);
     return nsDict;
   }
 
   /**
-   * Returns the package dictionary.
-   * Initializes the repository if not done yet.
+   * Returns the package dictionary. Initializes the repository if not done yet.
    * @return dictionary
    */
   public TokenMap pkgDict() {
@@ -74,7 +72,48 @@ public final class Repo {
     final File repoDir = new File(context.prop.get(Prop.REPOPATH));
     final File[] dirs = repoDir.listFiles();
     if(dirs == null) return;
-    for(final File dir : dirs) if(dir.isDirectory()) readPkg(dir);
+    for(final File dir : dirs)
+      if(dir.isDirectory()) readPkg(dir);
+  }
+
+  /**
+   * Removes a package from the namespace and package dictionaries when it is
+   * deleted.
+   * @param pkg deleted package
+   */
+  public synchronized void remove(final Package pkg) {
+    // Delete package from namespace dictionary
+    for(final Component comp : pkg.comps) {
+      final byte[] ns = comp.namespace;
+      final TokenSet pkgs = nsDict.get(ns);
+      if(pkgs.size() > 1) {
+        pkgs.delete(pkg.getUniqueName());
+      } else {
+        nsDict.delete(ns);
+      }
+    }
+    // Delete package from package dictionary
+    pkgDict.delete(pkg.getUniqueName());
+  }
+
+  /**
+   * Adds a newly installed package to the namespace and package dictionaries.
+   * @param pkg new package
+   * @param dir new package directory
+   */
+  public synchronized void add(final Package pkg, final String dir) {
+    // Update namespace dictionary
+    for(final Component comp : pkg.comps) {
+      if(nsDict.id(comp.namespace) == 0) {
+        final TokenSet vals = new TokenSet();
+        vals.add(pkg.getUniqueName());
+        nsDict.add(comp.namespace, vals);
+      } else {
+        nsDict.get(comp.namespace).add(pkg.getUniqueName());
+      }
+    }
+    // Update package dictionary
+    pkgDict.add(pkg.getUniqueName(), token(dir));
   }
 
   /**
@@ -93,16 +132,16 @@ public final class Repo {
           // Add component's namespace to namespace dictionary
           if(comp.namespace != null) {
             if(nsDict.get(comp.namespace) != null) {
-              nsDict.get(comp.namespace).add(pkg.getName());
+              nsDict.get(comp.namespace).add(pkg.getUniqueName());
             } else {
-              final TokenList vals = new TokenList();
-              vals.add(pkg.getName());
+              final TokenSet vals = new TokenSet();
+              vals.add(pkg.getUniqueName());
               nsDict.add(comp.namespace, vals);
             }
           }
         }
         // Add package to package dictionary
-        pkgDict.add(pkg.getName(), token(dir.getName()));
+        pkgDict.add(pkg.getUniqueName(), token(dir.getName()));
       } catch(final QueryException ex) {
         Util.errln(ex.getMessage());
       }

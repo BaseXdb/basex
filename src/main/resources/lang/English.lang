@@ -510,6 +510,10 @@ info_error=Error
 info_entries=% entries
 info_browsererror=Failed to open a browser.\nPlease manually open the URL:\n\n%
 
+#Repo commands
+repo_delete=Package '%' deleted.
+repo_install=Package '%' installed in %.
+
 # Command Help
 ch_nohelp=Sorry, no help available.
 ch_create1=Create database, index or user.
@@ -598,6 +602,11 @@ ch_help1=Get help on % commands.
 ch_help2=If [%] is specified, information on the specific\ncommand is printed; otherwise, all commands are listed.
 ch_exit1=Exit application.
 ch_exit2=Exits %.
+ch_repo1=Install, delete or list packages.
+ch_repo2=Installs, deletes or lists packages from package repository.
+ch_repo3=Deletes the package with name [%] or with directory [%].
+ch_repo4=Installs package with path [%].
+ch_repo5=Lists all installed packages.
 
 # Help Texts
 h_hist=Show input history.

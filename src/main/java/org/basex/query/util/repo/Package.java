@@ -14,18 +14,18 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-final class Package {
+public final class Package {
   /** Separator between name and version in unique package name. */
   private static final char NAMESEP = '-';
 
   /** List of dependencies. */
-  final List<Dependency> dep = new ArrayList<Dependency>();
+  public final List<Dependency> dep = new ArrayList<Dependency>();
   /** Package components. */
-  final List<Component> comps = new ArrayList<Component>();
+  public final List<Component> comps = new ArrayList<Component>();
   /** Package uri. */
   byte[] name;
   /** Package short name. */
-  byte[] abbrev;
+  public byte[] abbrev;
   /** Package version. */
   byte[] version;
   /** Version of packaging specification the package conforms to. */
@@ -39,7 +39,7 @@ final class Package {
    * Returns unique package name consisting of package uri and package version.
    * @return result
    */
-  byte[] getName() {
+  byte[] getUniqueName() {
     return new TokenBuilder(name).add(NAMESEP).add(version).finish();
   }
 
@@ -48,7 +48,7 @@ final class Package {
    * @param pkgName unique package name: name-version
    * @return package name
    */
-  static byte[] getName(final byte[] pkgName) {
+  public static byte[] getName(final byte[] pkgName) {
     final int idx = lastIndexOf(pkgName, NAMESEP);
     return idx == -1 ? pkgName : subtoken(pkgName, 0, idx);
   }
@@ -58,7 +58,7 @@ final class Package {
    * @param pkgName unique package name: name-version
    * @return package version
    */
-  static byte[] getVersion(final byte[] pkgName) {
+  public static byte[] getVersion(final byte[] pkgName) {
     final int idx = lastIndexOf(pkgName, NAMESEP);
     return subtoken(pkgName, idx + 1, pkgName.length);
   }
@@ -68,12 +68,12 @@ final class Package {
    * @author BaseX Team 2005-11, BSD License
    * @author Rositsa Shadura
    */
-  static final class Dependency {
+  public static final class Dependency {
     /** Name of package a package depends on. */
-    byte[] pkg;
+    public byte[] pkg;
     /** Name of processor a package depends on. */
     byte[] processor;
-    /** Package version. */
+    /** Set of acceptable version. */
     byte[] versions;
     /** SemVer template. */
     byte[] semver;
@@ -81,6 +81,17 @@ final class Package {
     byte[] semverMin;
     /** Maximum acceptable version. */
     byte[] semverMax;
+
+    /**
+     * Returns unique package name for secondary package using the given
+     * version.
+     * @param version version
+     * @return unique name
+     */
+    public byte[] getName(final byte[] version) {
+      final TokenBuilder tb = new TokenBuilder();
+      return tb.add(pkg).add(NAMESEP).add(version).finish();
+    }
   }
 
   /**
@@ -88,15 +99,15 @@ final class Package {
    * @author BaseX Team 2005-11, BSD License
    * @author Rositsa Shadura
    */
-  static final class Component {
+  public static final class Component {
     /** Component type. */
     byte[] type;
     /** Namespace URI. */
-    byte[] namespace;
+    public byte[] namespace;
     /** Public import URI. */
     byte[] importUri;
     /** Component file. */
-    byte[] file;
+    public byte[] file;
 
     /**
      * Extracts component's file name from component's path.
