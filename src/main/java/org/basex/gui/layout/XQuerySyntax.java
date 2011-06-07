@@ -63,6 +63,12 @@ public final class XQuerySyntax extends BaseXSyntax {
   public Color getColor(final BaseXTextTokens text) {
     final int ch = text.curr();
 
+    // opened quote
+    if(quote != 0) {
+      if(ch == quote) quote = 0;
+      return GUIConstants.COLORERROR;
+    }
+
     // comment
     if(comment == 0 && ch == '(') {
       comment++;
@@ -78,10 +84,6 @@ public final class XQuerySyntax extends BaseXSyntax {
     // quotes
     if(quote == 0 && (ch == '"' || ch == '\'')) {
       quote = ch;
-      return GUIConstants.COLORERROR;
-    }
-    if(quote != 0) {
-      if(ch == quote) quote = 0;
       return GUIConstants.COLORERROR;
     }
 

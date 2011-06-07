@@ -2,7 +2,7 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -13,7 +13,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Sessions extends ArrayList<ServerProcess> {
+public final class Sessions extends CopyOnWriteArrayList<ServerProcess> {
   /**
    * Returns information on the opened sessions.
    * @return data reference

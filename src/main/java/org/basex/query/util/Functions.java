@@ -73,7 +73,7 @@ public final class Functions extends ExprInfo {
         final Levenshtein ls = new Levenshtein();
         for(final AtomType t : AtomType.values()) {
           if(t.par != null && ls.similar(lc(ln), lc(t.nam), 0))
-            qp.error(FUNSIMILAR, name, t.nam);
+            qp.error(FUNSIMILAR, name.atom(), t.nam);
         }
         qp.error(FUNCUNKNOWN, name.atom());
       }
@@ -228,7 +228,7 @@ public final class Functions extends ExprInfo {
     final byte[] nm = lc(name.ln());
     for(int n = 0; n < func.length; ++n) {
       if(ls.similar(nm, lc(func[n].name.ln()), 0)) {
-        qp.error(FUNSIMILAR, name, func[n].name.atom());
+        qp.error(FUNSIMILAR, name.atom(), func[n].name.atom());
       }
     }
   }

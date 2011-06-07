@@ -110,7 +110,7 @@ public class AxisPath extends Path {
 
     // retrieve data reference
     final Data data = ctx.data();
-    if(data != null && data.meta.uptodate && ctx.value.type == NodeType.DOC) {
+    if(data != null && ctx.value.type == NodeType.DOC) {
       Expr e = this;
       // check index access
       if(root != null && !uses(Use.POS)) e = index(ctx, data);
@@ -182,13 +182,7 @@ public class AxisPath extends Path {
     }
 
     // no index access is possible, or it is estimated to be too expensive...
-    if(ics == null || ics.costs() > data.meta.size) {
-      if(ics == null) return this;
-      System.out.println(ics.costs() + "\n" + ctx.query);
-      System.out.println();
-      System.out.println();
-      return this;
-    }
+    if(ics == null || ics.costs() > data.meta.size) return this;
 
     // replace expressions for index access
     final AxisStep stp = step(smin);

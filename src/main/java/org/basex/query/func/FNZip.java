@@ -69,7 +69,7 @@ public final class FNZip extends Fun {
   private static final QNm A_SRC = new QNm(token("src"));
   /** Attribute: src. */
   private static final QNm A_METHOD = new QNm(token("method"));
-  /** Method "basex64". */
+  /** Method "base64". */
   private static final String M_BASE64 = "base64";
   /** Method "hex". */
   private static final String M_HEX = "hex";

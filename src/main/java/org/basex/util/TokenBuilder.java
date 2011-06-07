@@ -328,6 +328,15 @@ public final class TokenBuilder {
   }
 
   /**
+   * Returns true if the token only contains whitespaces.
+   * @return result of check
+   */
+  public boolean wsp() {
+    for(int i = 0; i < size; ++i) if(!ws(chars[i])) return false;
+    return true;
+  }
+
+  /**
    * Returns the token as byte array.
    * @return character array
    */

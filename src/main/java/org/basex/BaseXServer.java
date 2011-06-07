@@ -316,7 +316,10 @@ public class BaseXServer extends Main {
           final BufferInput bi = new BufferInput(es.getInputStream());
           final long id = Long.parseLong(bi.readString());
           for(final ServerProcess s : context.sessions) {
-            if(s.getId() == id) s.register(es);
+            if(s.getId() == id) {
+              s.register(es);
+              break;
+            }
           }
         } catch(final IOException ex) {
           break;

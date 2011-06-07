@@ -6,12 +6,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.regex.Pattern;
+
+import org.basex.core.Prop;
 import org.basex.core.cmd.Copy;
 import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
-import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.PrintOutput;
 import org.basex.io.TextInput;
@@ -28,6 +28,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
+import org.basex.util.StringList;
 
 /**
  * Functions on files and directories.
@@ -176,44 +177,52 @@ public final class FNFile extends Fun {
    */
   private Iter list(final QueryContext ctx) throws QueryException {
     final String path = string(checkStr(expr[0], ctx));
-    final IO dir = new IOFile(path);
+    final File dir = new File(path);
 
     // Check if not a directory
-    if(!dir.isDir()) NOTDIR.thrw(input, path);
+    if(!dir.isDirectory()) NOTDIR.thrw(input, path);
 
     final boolean rec = optionalBool(1, ctx);
-    final String pat = expr.length != 3 ? ".*" :
-      IOFile.regex(string(checkStr(expr[2], ctx)));
+    final Pattern pat = expr.length != 3 ? null :
+      Pattern.compile(IOFile.regex(string(checkStr(expr[2], ctx))),
+        Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
 
-    IO[] fl;
-    if(rec) {
-      final List<IO> list = new ArrayList<IO>();
-      recList(dir, list, pat);
-      fl = list.toArray(new IO[list.size()]);
-    } else {
-      fl = dir.children(pat);
-    }
-    final IO[] files = fl;
+    final StringList list = new StringList();
+    list(dir, list, rec, pat);
 
     return new Iter() {
       int c = -1;
 
       @Override
       public Item next() {
-        return ++c < files.length ? Str.get(files[c].path()) : null;
+        return ++c < list.size() ? Str.get(list.get(c)) : null;
       }
     };
   }
 
   /**
-   * Lists the files in a directory recursively.
-   * @param dir current directory
+   * Collects the sub-directories and files of the specified directory.
+   * @param dir root directory
    * @param list file list
-   * @param pat file name pattern
+   * @param rec recursive flag
+   * @param pat file name pattern; ignored if {@code null}
    */
-  private void recList(final IO dir, final List<IO> list, final String pat) {
-    for(final IO f : dir.children()) if(f.isDir()) recList(f, list, pat);
-    for(final IO f : dir.children(pat)) list.add(f);
+  private void list(final File dir, final StringList list,
+      final boolean rec, final Pattern pat) {
+
+    // skip invalid directories
+    final File[] ch = dir.listFiles();
+    if(ch == null) return;
+
+    // parse directories
+    if(rec) for(final File f : ch) {
+      if(f.isDirectory()) list(f, list, rec, pat);
+    }
+    // parse files. ignore directories if a pattern is specified
+    for(final File f : ch) {
+      if(pat == null || pat.matcher(f.getName()).matches() &&
+          !f.isDirectory()) list.add(f.getPath());
+    }
   }
 
   /**

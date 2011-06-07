@@ -2,7 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
 import org.basex.core.User;
@@ -43,7 +44,7 @@ public final class ShowUsers extends Command {
     } else {
       try {
         final Data data = Open.open(name, context);
-        final ArrayList<User> loc = data.meta.users;
+        final CopyOnWriteArrayList<User> loc = data.meta.users;
         for(int i = 0; i < loc.size(); ++i) {
           final User us = context.users.get(loc.get(i).name);
           if(us == null) {

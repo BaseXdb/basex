@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import org.basex.core.Prop;
+import org.basex.core.cmd.Set;
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -479,8 +480,8 @@ public class QueryParser extends InputParser {
     final byte[] val = stringLiteral();
     if(!name.ns()) error(NSMISS, name);
 
-    // output declaration
     if(ctx.xquery3 && eq(name.pref(), OUTPUT)) {
+      // output declaration
       final String key = string(name.ln());
       if(module != null) error(MODOUT);
 
@@ -490,6 +491,16 @@ public class QueryParser extends InputParser {
 
       ctx.serProp.set(key, string(val));
       serial.add(key);
+    } else if(eq(name.pref(), DB)) {
+      // project-specific declaration
+      final String key = string(uc(name.ln()));
+      final Object obj = ctx.context.prop.get(key);
+      if(obj == null) error(NOOPTION, key);
+      // cache old value (to be reset after query evaluation)
+      if(ctx.props == null) ctx.props = new HashMap<String, Object>();
+      ctx.props.put(key, obj);
+      // set value
+      Set.set(key, string(val), ctx.context.prop);
     }
   }
 
@@ -1177,13 +1188,13 @@ public class QueryParser extends InputParser {
   private Expr iff() throws QueryException {
     if(!wsConsumeWs(IF, PAR1, IFPAR)) return null;
     wsCheck(PAR1);
-    final Expr e = check(expr(), NOIF);
+    final Expr iff = check(expr(), NOIF);
     wsCheck(PAR2);
     if(!wsConsumeWs(THEN)) error(NOIF);
     final Expr thn = check(single(), NOIF);
     if(!wsConsumeWs(ELSE)) error(NOIF);
     final Expr els = check(single(), NOIF);
-    return new If(input(), e, thn, els);
+    return new If(input(), iff, thn, els);
   }
 
   /**

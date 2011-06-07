@@ -458,6 +458,8 @@ ad_Eventdrop=Event '%' entfernt.
 ad_Eventcreate=Event '%' erzeugt.
 ad_Eventknown=Event '%' existiert schon.
 ad_Eventno=Unbekannter Event '%'.
+ad_eventalr=Event '%' wird schon beobachtet.
+ad_eventnouw=Event '%' wurde nicht beobachtet.
 ad_Eventatt=Beobachte Event '%'.
 ad_Eventdet=Von Event '%' abgemeldet.
 

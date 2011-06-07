@@ -86,16 +86,19 @@ public final class FNIndex extends TokenSet {
       throws QueryException {
 
     // compare specified name with names of predefined functions
-    final byte[] nm = name.ln();
+    final byte[] ln = name.ln();
     final Levenshtein ls = new Levenshtein();
     for(int k = 1; k < size; ++k) {
       final int i = indexOf(keys[k], '}');
-      final byte[] uri = substring(keys[k], 1, i);
-      final byte[] ln = substring(keys[k], i + 1);
-      if(eq(nm, ln)) {
-        qp.error(FUNSIMILAR, name, NSGlobal.prefix(uri));
-      } else if(ls.similar(nm, ln, 0)) {
-        qp.error(FUNSIMILAR, name, ln);
+      final byte[] u = substring(keys[k], 1, i);
+      final byte[] l = substring(keys[k], i + 1);
+      if(eq(ln, l)) {
+        final byte[] ur = name.uri().atom();
+        qp.error(FUNSIMILAR,
+            new TokenBuilder(NSGlobal.prefix(ur)).add(':').add(l),
+            new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
+      } else if(ls.similar(ln, l, 0)) {
+        qp.error(FUNSIMILAR, name.atom(), l);
       }
     }
   }

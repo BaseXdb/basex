@@ -34,7 +34,7 @@ public final class MetaData {
   /** Encoding of XML document. */
   public String encoding = UTF8;
   /** Path to original input documents. */
-  public String path;
+  public String path = "";
   /** Size of original documents. */
   public long filesize;
   /** Number of XML documents. */
@@ -73,12 +73,13 @@ public final class MetaData {
   /** Scoring mode: see {@link Prop#SCORING}. */
   public int scoring;
 
-  /** Flag for removed index structures. */
+  /** Flag for out-of-date index structures.
+   *  Will be removed as soon as all indexes support updates. */
   public boolean uptodate = true;
+  /** Flag for out-of-date indexes. */
+  public boolean oldindex;
   /** Dirty flag. */
   public boolean dirty;
-  /** Flag for out-of-dates indexes. */
-  public boolean oldindex;
   /** Table size. */
   public int size;
   /** Last (highest) id assigned to a node. */

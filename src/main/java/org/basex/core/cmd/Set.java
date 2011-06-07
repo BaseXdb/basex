@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 
+import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.util.Util;
 
@@ -39,23 +40,9 @@ public final class Set extends AGet {
     try { s = Enum.valueOf(CmdSet.class, key); } catch(final Exception ex) { }
 
     try {
-      final Object type = prop.get(key);
-      if(type == null) return whichKey();
+      val = set(key, val, prop);
+      if(val == null) return whichKey();
 
-      if(type instanceof Boolean) {
-        final boolean b = val == null ? !((Boolean) type).booleanValue() :
-          val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
-        prop.set(key, b);
-        val = AInfo.flag(b);
-      } else if(type instanceof Integer) {
-        if(val == null) val = "0";
-        prop.set(key, Integer.parseInt(val));
-      } else if(type instanceof String) {
-        if(val == null) val = "";
-        prop.set(key, val);
-      } else {
-        Util.notexpected();
-      }
       final CmdSet[] cs = CmdSet.values();
       for(int c = 0; c < cs.length; ++c) if(cs[c] == s) key = STRINGS[c];
       return info(key + ": " + val);
@@ -63,5 +50,36 @@ public final class Set extends AGet {
       Util.debug(ex);
       return error(SETVAL, key, val);
     }
+  }
+
+  /**
+   * Sets the specified value.
+   * @param key key
+   * @param val value
+   * @param prop property
+   * @return final value
+   */
+  public static String set(final String key, final String val,
+      final Prop prop) {
+
+    final Object type = prop.get(key);
+    if(type == null) return null;
+
+    String v = val;
+    if(type instanceof Boolean) {
+      final boolean b = val == null ? !((Boolean) type).booleanValue() :
+        val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
+      prop.set(key, b);
+      v = AInfo.flag(b);
+    } else if(type instanceof Integer) {
+      if(val == null) v = "0";
+      prop.set(key, Integer.parseInt(val));
+    } else if(type instanceof String) {
+      if(val == null) v = "";
+      prop.set(key, val);
+    } else {
+      Util.notexpected();
+    }
+    return v;
   }
 }

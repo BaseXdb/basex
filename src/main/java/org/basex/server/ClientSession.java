@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ import org.basex.util.Token;
 public final class ClientSession extends Session {
   /** Event notifications. */
   final Map<String, EventNotifier> notifiers =
-    new HashMap<String, EventNotifier>();
+    Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Socket reference. */
   final Socket socket;
   /** Server output. */
