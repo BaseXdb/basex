@@ -5,6 +5,7 @@ import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
+import org.basex.util.Util;
 
 /**
  * Performs bulk updates with BaseX standalone version.
@@ -87,7 +88,7 @@ public final class XQUFStressTest {
    * @param s String to be printed
    */
   private static void p(final String s) {
-    if(VERBOSE) System.out.println(s);
+    if(VERBOSE) Util.outln(s);
   }
 
   /**

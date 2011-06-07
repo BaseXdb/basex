@@ -8,6 +8,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
+import org.basex.util.Util;
 
 /**
  * Testing concurrent XQUF statements on a single database.
@@ -109,7 +110,7 @@ public final class XQUFStressTestClientServer {
    * @param s message string
    */
   private static void p(final String s) {
-    if(VERBOSE) System.out.println(s);
+    if(VERBOSE) Util.outln(s);
   }
 
   /**
