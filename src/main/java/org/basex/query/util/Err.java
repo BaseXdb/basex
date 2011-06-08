@@ -259,7 +259,7 @@ public enum Err {
   /** FTST0018: Parsing exception. */
   NOTHES(FTST, 18, "Thesaurus not found: \"%\"."),
   /** FTST0019: Parsing exception. */
-  FTDUP(FTST, 19, "Match option '%' was defined twice."),
+  FTDUP(FTST, 19, "Match option '%' was declared twice."),
 
   /** SESU0007: Serialization exception. */
   SERENCODING(SESU, 7, "Encoding not supported: \"%\"."),
@@ -281,7 +281,7 @@ public enum Err {
   SERUNKNOWN(SEPM, 17, "Serialization: unknown element %."),
 
   /** XPDY0002: Parsing exception. */
-  VAREMPTY(XPDY, 2, "No value defined for \"%\"."),
+  VAREMPTY(XPDY, 2, "No value assigned to \"%\"."),
   /** XPDY0002: Evaluation Exception. */
   XPNOCTX(XPDY, 2, "No context item set for '%'."),
   /** XPDY0050: Evaluation exception. */
@@ -363,7 +363,7 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
   /** XPST0003: Parsing exception. */
-  NODECLFORM(XPST, 3, "Expecting decimal-format property definition."),
+  NODECLFORM(XPST, 3, "Expecting decimal-format property declaration."),
   /** XPST0003: Parsing exception. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** XPST0003: Parsing exception. */
@@ -545,13 +545,13 @@ public enum Err {
   /** XQST0045: Parsing exception. */
   NAMERES(XQST, 45, "Function %(...) uses reserved namespace."),
   /** XQST0047: Parsing exception. */
-  DUPLMODULE(XQST, 47, "Module is defined twice: %."),
+  DUPLMODULE(XQST, 47, "Module is declared twice: \"%\"."),
   /** XQST0047: Parsing exception. */
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049: Parsing exception. */
-  VARDEFINE(XQST, 49, "Duplicate definition of %."),
+  VARDEFINE(XQST, 49, "Duplicate declaration of %."),
   /** XQST0054: Parsing exception. */
-  XPSTACK(XQST, 54, "Circular variable definition?"),
+  XPSTACK(XQST, 54, "Circular variable declaration?"),
   /** XQST0055: Parsing exception. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057: Parsing exception. */
@@ -593,13 +593,13 @@ public enum Err {
   /** XQST0088: Parsing exception. */
   NSMODURI(XQST, 88, "Module namespace cannot be empty."),
   /** XQST0089: Parsing exception. */
-  VARDEFINED(XQST, 89, "Duplicate definition of %."),
+  DUPLVAR(XQST, 89, "Duplicate declaration of %."),
   /** XQST0090: Parsing exception. */
   INVCHARREF(XQST, 90, "Invalid character reference \"%\"."),
   /** XQST0093: Parsing exception. */
-  CIRCMODULE(XQST, 93, "Circular module definition."),
+  CIRCMODULE(XQST, 93, "Circular module declaration."),
   /** XPST0094: Parsing exception. */
-  GVARNOTDEFINED(XQST, 94, "Undefined grouping variable \"%\"."),
+  GVARNOTDEFINED(XQST, 94, "Undeclared grouping variable \"%\"."),
   /** XPST0097: Parsing exception. */
   INVDECFORM(XQST, 97, "Invalid decimal-format property: %=\"%\"."),
   /** XPST0098: Parsing exception. */

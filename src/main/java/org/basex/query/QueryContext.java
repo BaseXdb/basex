@@ -45,7 +45,6 @@ import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
@@ -153,8 +152,6 @@ public final class QueryContext extends Progress {
   final TokenMap modDeclared = new TokenMap();
   /** Parsed modules, containing the file path and module uri. */
   final TokenMap modParsed = new TokenMap();
-  /** Module stack. */
-  final TokenList modStack = new TokenList();
 
   /** Serializer options. */
   SerializerProp serProp;

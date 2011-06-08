@@ -678,16 +678,12 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void module(final byte[] path, final Uri uri) throws QueryException {
-    // modules on stack will be ignored.
-    // circular dependencies are not resolved yet.
-    if(ctx.modStack.contains(path)) return;
-    ctx.modStack.push(path);
-
     final byte[] u = ctx.modParsed.get(path);
     if(u != null) {
       if(!eq(uri.atom(), u)) error(WRONGMODULE, uri, path);
       return;
     }
+    ctx.modParsed.add(path, uri.atom());
 
     // check specified path and path relative to query file
     final IO io = io(string(path));
@@ -702,10 +698,7 @@ public class QueryParser extends InputParser {
     ctx.ns = new NSLocal();
     new QueryParser(qu, ctx).parse(io, uri);
     ctx.ns = ns;
-    ctx.modParsed.add(path, uri.atom());
     modules.add(uri.atom());
-
-    ctx.modStack.pop();
   }
 
   /**
@@ -1019,11 +1012,11 @@ public class QueryParser extends InputParser {
         else fl = Arrays.copyOf(fl, fl.length + 1);
         if(sc != null) {
           if(sc.name.eq(name) || ps != null && sc.name.eq(ps.name))
-            error(VARDEFINED, sc);
+            error(DUPLVAR, sc);
           ctx.vars.add(sc);
         }
         if(ps != null) {
-          if(name.eq(ps.name)) error(VARDEFINED, ps);
+          if(name.eq(ps.name)) error(DUPLVAR, name);
           ctx.vars.add(ps);
         }
         fl[fl.length - 1] = fr ? new For(input(), e, var, ps, sc) :
@@ -2594,7 +2587,7 @@ public class QueryParser extends InputParser {
    */
   private Var[] addVar(final Var[] vars) throws QueryException {
     final Var v = Var.create(ctx, input(), varName());
-    for(final Var vr : vars) if(v.name.eq(vr.name)) error(VARDEFINED, v);
+    for(final Var vr : vars) if(v.name.eq(vr.name)) error(DUPLVAR, v);
     ctx.vars.add(v);
     final Var[] var = Array.add(vars, v);
     return var;
