@@ -8,7 +8,6 @@ import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IOFile;
-import org.basex.util.StringList;
 
 /**
  * Abstract class for user commands.
@@ -34,13 +33,8 @@ abstract class AUser extends Command {
    */
   protected final String[] users(final String name) {
     final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) : name;
-    final Pattern p = Pattern.compile(pat,
-        Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
-    final StringList sl = new StringList();
-    for(final User u : context.users) {
-      if(p.matcher(u.name).matches()) sl.add(u.name);
-    }
-    return sl.toArray();
+    return context.users.find(Pattern.compile(pat,
+        Prop.WIN ? Pattern.CASE_INSENSITIVE : 0));
   }
 
   /**

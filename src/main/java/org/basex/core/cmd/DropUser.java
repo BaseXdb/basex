@@ -56,11 +56,11 @@ public final class DropUser extends AUser {
     // drop local user
     try {
       final Data data = Open.open(db, context);
-      if(data.meta.users.remove(data.meta.users.get(user))) {
+      if(data.meta.users.drop(data.meta.users.get(user))) {
         info(USERDROPON, user, db);
+        data.meta.dirty = true;
+        data.flush();
       }
-      data.meta.dirty = true;
-      data.flush();
       Close.close(data, context);
       return true;
     } catch(final IOException ex) {

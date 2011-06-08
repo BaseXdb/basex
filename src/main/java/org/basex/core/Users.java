@@ -4,11 +4,15 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
 import org.basex.util.Util;
@@ -19,7 +23,9 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
-public final class Users extends CopyOnWriteArrayList<User> {
+public final class Users {
+  /** User array. */
+  private List<User> list = Collections.synchronizedList(new ArrayList<User>());
   /** Filename; set to {@code null} if the instance handles local users. */
   private File file;
 
@@ -33,7 +39,7 @@ public final class Users extends CopyOnWriteArrayList<User> {
     file = new File(Prop.HOME + IO.BASEXSUFFIX + "perm");
     if(!file.exists()) {
       // create default admin user with all rights
-      add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
+      list.add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
     } else {
       DataInput in = null;
       try {
@@ -57,7 +63,7 @@ public final class Users extends CopyOnWriteArrayList<User> {
     for(int u = 0; u < s; ++u) {
       final User user = new User(string(in.readBytes()),
         in.readBytes(), in.readNum());
-      add(user);
+      list.add(user);
     }
   }
 
@@ -65,6 +71,7 @@ public final class Users extends CopyOnWriteArrayList<User> {
    * Writes global permissions to disk.
    */
   public synchronized void write() {
+    if(file == null) return;
     try {
       final DataOutput out = new DataOutput(file);
       write(out);
@@ -82,13 +89,21 @@ public final class Users extends CopyOnWriteArrayList<User> {
    */
   public synchronized boolean create(final String usern, final String pass) {
     // check if user exists already
-    if(get(usern) != null) return false;
+    return get(usern) == null &&
+      create(new User(usern, token(md5(pass)), User.WRITE));
+  }
 
-    final User user = new User(usern, token(md5(pass)), User.WRITE);
-    add(user);
+  /**
+   * Adds the specified user.
+   * @param user user to be added
+   * @return success of operation
+   */
+  public synchronized boolean create(final User user) {
+    list.add(user);
     write();
     return true;
   }
+
 
   /**
    * Changes the password of a user.
@@ -109,10 +124,12 @@ public final class Users extends CopyOnWriteArrayList<User> {
   /**
    * Drops a user from the list.
    * @param user user reference
+   * @return success flag
    */
-  public synchronized void drop(final User user) {
-    remove(user);
+  public synchronized boolean drop(final User user) {
+    if(!list.remove(user)) return false;
     write();
+    return true;
   }
 
   /**
@@ -121,8 +138,21 @@ public final class Users extends CopyOnWriteArrayList<User> {
    * @return success of operation
    */
   public synchronized User get(final String usern) {
-    for(final User user : this) if(user.name.equals(usern)) return user;
+    for(final User user : list) if(user.name.equals(usern)) return user;
     return null;
+  }
+
+  /**
+   * Returns all users that match the specified pattern.
+   * @param pattern user pattern
+   * @return user list
+   */
+  public synchronized String[] find(final Pattern pattern) {
+    final StringList sl = new StringList();
+    for(final User u : list) {
+      if(pattern.matcher(u.name).matches()) sl.add(u.name);
+    }
+    return sl.toArray();
   }
 
   /**
@@ -132,8 +162,8 @@ public final class Users extends CopyOnWriteArrayList<User> {
    */
   public synchronized void write(final DataOutput out) throws IOException {
     // skip writing of local rights
-    out.writeNum(size());
-    for(final User user : this) {
+    out.writeNum(list.size());
+    for(final User user : list) {
       out.writeString(user.name);
       out.writeToken(user.password);
       out.writeNum(user.perm);
@@ -142,16 +172,19 @@ public final class Users extends CopyOnWriteArrayList<User> {
 
   /**
    * Returns information on all users.
+   * @param users optional second list
    * @return user information
    */
-  public synchronized byte[] info() {
+  public synchronized byte[] info(final Users users) {
     final Table table = new Table();
     table.description = USERS;
 
     final int sz = file == null ? 3 : 5;
     for(int u = 0; u < sz; ++u) table.header.add(USERHEAD[u]);
 
-    for(final User user : this) {
+    for(final User user : list) {
+      if(users != null) if(users.get(user.name) == null) continue;
+
       final TokenList entry = new TokenList();
       entry.add(user.name);
       entry.add(user.perm(User.READ) ? "X" : "");

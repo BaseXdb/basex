@@ -116,6 +116,7 @@ public interface Text {
     "  stop     Stop existing server" + NL +
     "  -c<cmd>  Execute initial database command(s)" + NL +
     "  -d       Activate debugging mode" + NL +
+    "  -e<num>  Set event port" + NL +
     "  -i       Enter interactive mode" + NL +
     "  -p<num>  Set server port" + NL +
     "  -s       Start as service" + NL +
@@ -147,6 +148,8 @@ public interface Text {
   String SERVERSTOPPED = lang("srv_stop");
   /** Server is running or permission was denied. */
   String SERVERBIND = lang("srv_bind");
+  /** Same ports specified. */
+  String SERVERPORTS = lang("srv_ports");
   /** Unknown host. */
   String SERVERUNKNOWN = lang("srv_unknown");
   /** Timeout exceeded. */

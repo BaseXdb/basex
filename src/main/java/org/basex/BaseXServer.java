@@ -183,6 +183,9 @@ public class BaseXServer extends Main {
         } else if(c == 'D') {
           // hidden flag: daemon mode
           daemon = true;
+        } else if(c == 'e') {
+          // parse event port
+          context.prop.set(Prop.EVENTPORT, arg.num());
         } else if(c == 'i') {
           // activate interactive mode
           console = true;
@@ -207,6 +210,9 @@ public class BaseXServer extends Main {
           return false;
         }
       }
+    }
+    if(context.prop.num(Prop.SERVERPORT) == context.prop.num(Prop.EVENTPORT)) {
+      arg.check(error(null, SERVERPORTS));
     }
     return arg.finish();
   }

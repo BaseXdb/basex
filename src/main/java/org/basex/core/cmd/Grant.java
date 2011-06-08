@@ -77,7 +77,7 @@ public final class Grant extends AUser {
       // add local user reference
       if(u == null) {
         u = context.users.get(user).copy();
-        data.meta.users.add(u);
+        data.meta.users.create(u);
       }
       u.perm = prm;
       data.meta.dirty = true;

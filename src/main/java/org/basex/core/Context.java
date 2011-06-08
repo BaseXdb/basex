@@ -159,7 +159,7 @@ public final class Context {
    * Adds the specified data reference to the pool.
    * @param d data reference
    */
-  public synchronized void pin(final Data d) {
+  public void pin(final Data d) {
     datas.add(d);
   }
 
@@ -168,7 +168,7 @@ public final class Context {
    * @param name name of database
    * @return data reference
    */
-  public synchronized Data pin(final String name) {
+  public Data pin(final String name) {
     return datas.pin(name);
   }
 
@@ -177,7 +177,7 @@ public final class Context {
    * @param d data reference
    * @return true if reference was removed from the pool
    */
-  public synchronized boolean unpin(final Data d) {
+  public boolean unpin(final Data d) {
     return datas.unpin(d);
   }
 
@@ -186,7 +186,7 @@ public final class Context {
    * @param db name of database
    * @return int use-status
    */
-  public synchronized boolean pinned(final String db) {
+  public boolean pinned(final String db) {
     return datas.pinned(db);
   }
 
@@ -210,7 +210,7 @@ public final class Context {
    * Adds the specified session.
    * @param s session to be added
    */
-  public synchronized void add(final ServerProcess s) {
+  public void add(final ServerProcess s) {
     sessions.add(s);
   }
 
@@ -218,7 +218,7 @@ public final class Context {
    * Removes the specified session.
    * @param s session to be removed
    */
-  public synchronized void delete(final ServerProcess s) {
+  public void delete(final ServerProcess s) {
     sessions.remove(s);
   }
 

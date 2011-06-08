@@ -400,6 +400,7 @@ srv_login=Zugriff wurde verweigert.
 srv_connect=Server ist nicht erreichbar.
 srv_timeout=Prozess hat Time-Out überschritten.
 srv_bind=Server läuft, oder der Zugriff wurde untersagt.
+srv_ports=Identischer Server- und Event-Port.
 srv_unknown=Unbekannter Host '%'.
 srv_start=Server wurde gestartet.
 srv_stop=Server wurde gestoppt.
