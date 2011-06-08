@@ -678,6 +678,11 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void module(final byte[] path, final Uri uri) throws QueryException {
+    // modules on stack will be ignored.
+    // circular dependencies are not resolved yet.
+    if(ctx.modStack.contains(path)) return;
+    ctx.modStack.push(path);
+
     final byte[] u = ctx.modParsed.get(path);
     if(u != null) {
       if(!eq(uri.atom(), u)) error(WRONGMODULE, uri, path);
@@ -699,6 +704,8 @@ public class QueryParser extends InputParser {
     ctx.ns = ns;
     ctx.modParsed.add(path, uri.atom());
     modules.add(uri.atom());
+
+    ctx.modStack.pop();
   }
 
   /**
