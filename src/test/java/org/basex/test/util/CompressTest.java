@@ -72,14 +72,14 @@ public final class CompressTest {
    * @throws Exception exception */
   @Test
   public void test7() throws Exception {
-    testTexts("etc/xml/xmark.xml");
+    testTexts("etc/test/xmark.xml");
   }
 
   /** Test.
    * @throws Exception exception */
   @Test
   public void test8() throws Exception {
-    testTexts("etc/xml/factbook.zip");
+    testTexts("etc/test/factbook.zip");
   }
 
   /**
@@ -99,8 +99,7 @@ public final class CompressTest {
     for(Item it; (it = ir.next()) != null;) {
       final byte[] token = it.atom(null);
       tl.add(token);
-      tb.add(token);
-      tb.add(' ');
+      tb.add(token).add(' ');
     }
     qp.close();
 

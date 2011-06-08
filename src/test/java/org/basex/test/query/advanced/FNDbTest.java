@@ -23,7 +23,7 @@ import org.junit.Test;
  */
 public final class FNDbTest extends AdvancedQueryTest {
   /** Test file. */
-  private static final String FILE = "etc/xml/input.xml";
+  private static final String FILE = "etc/test/input.xml";
 
   /**
    * Initializes a test.

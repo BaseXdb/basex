@@ -3,13 +3,13 @@ package org.basex.query.ft;
 import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
+import org.basex.query.util.IndexContext;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 

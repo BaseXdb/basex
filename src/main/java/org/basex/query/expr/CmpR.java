@@ -9,7 +9,6 @@ import org.basex.data.StatsKey;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.Names;
 import org.basex.index.RangeToken;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
@@ -22,6 +21,7 @@ import org.basex.query.path.AxisPath;
 import org.basex.query.path.NameTest;
 import org.basex.query.path.AxisStep;
 import org.basex.query.path.Test.Name;
+import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 

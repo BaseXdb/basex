@@ -10,7 +10,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class HigherOrderTest extends AdvancedQueryTest {
+public final class HigherOrderTest extends AdvancedQueryTest {
   /**
    * Test for name shadowing.
    * @throws QueryException exception

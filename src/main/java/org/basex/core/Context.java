@@ -5,7 +5,7 @@ import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
-import org.basex.query.util.repo.Repo;
+import org.basex.query.util.pkg.Repo;
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
 

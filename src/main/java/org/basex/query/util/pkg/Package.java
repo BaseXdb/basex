@@ -1,4 +1,4 @@
-package org.basex.query.util.repo;
+package org.basex.query.util.pkg;
 
 import static org.basex.util.Token.*;
 
@@ -100,14 +100,14 @@ public final class Package {
    * @author Rositsa Shadura
    */
   public static final class Component {
-    /** Component type. */
-    byte[] type;
     /** Namespace URI. */
-    public byte[] namespace;
-    /** Public import URI. */
-    byte[] importUri;
+    public byte[] uri;
     /** Component file. */
     public byte[] file;
+    /** Component type. */
+    byte[] type;
+    /** Public import URI. */
+    byte[] importUri;
 
     /**
      * Extracts component's file name from component's path.

@@ -23,7 +23,7 @@ import org.junit.Test;
  */
 public final class PoolTest {
   /** Test file. */
-  private static final String FILE = "etc/xml/input.xml";
+  private static final String FILE = "etc/test/input.xml";
   /** Test database name. */
   private static final String NAME = "input";
 

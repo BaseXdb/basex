@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
  * Tests for rewritings of FLWOR-expressions.
  * @author Leo Woerteler
  */
-public class FlworOptimizeTest {
+public final class FlworOptimizeTest {
   /** Database context. */
   private static final Context CTX = new Context();
 

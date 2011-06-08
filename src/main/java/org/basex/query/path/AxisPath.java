@@ -3,7 +3,6 @@ package org.basex.query.path;
 import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -20,6 +19,8 @@ import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.Test.Name;
 import static org.basex.query.util.Err.*;
+
+import org.basex.query.util.IndexContext;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;

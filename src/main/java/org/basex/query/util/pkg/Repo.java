@@ -1,6 +1,6 @@
-package org.basex.query.util.repo;
+package org.basex.query.util.pkg;
 
-import static org.basex.query.util.repo.PkgText.*;
+import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
 import java.io.File;
@@ -9,7 +9,7 @@ import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
-import org.basex.query.util.repo.Package.Component;
+import org.basex.query.util.pkg.Package.Component;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenObjMap;
 import org.basex.util.TokenSet;
@@ -72,8 +72,7 @@ public final class Repo {
     final File repoDir = new File(context.prop.get(Prop.REPOPATH));
     final File[] dirs = repoDir.listFiles();
     if(dirs == null) return;
-    for(final File dir : dirs)
-      if(dir.isDirectory()) readPkg(dir);
+    for(final File dir : dirs) if(dir.isDirectory()) readPkg(dir);
   }
 
   /**
@@ -84,7 +83,7 @@ public final class Repo {
   public synchronized void remove(final Package pkg) {
     // Delete package from namespace dictionary
     for(final Component comp : pkg.comps) {
-      final byte[] ns = comp.namespace;
+      final byte[] ns = comp.uri;
       final TokenSet pkgs = nsDict.get(ns);
       if(pkgs.size() > 1) {
         pkgs.delete(pkg.getUniqueName());
@@ -104,12 +103,12 @@ public final class Repo {
   public synchronized void add(final Package pkg, final String dir) {
     // Update namespace dictionary
     for(final Component comp : pkg.comps) {
-      if(nsDict.id(comp.namespace) == 0) {
+      if(nsDict.id(comp.uri) == 0) {
         final TokenSet vals = new TokenSet();
         vals.add(pkg.getUniqueName());
-        nsDict.add(comp.namespace, vals);
+        nsDict.add(comp.uri, vals);
       } else {
-        nsDict.get(comp.namespace).add(pkg.getUniqueName());
+        nsDict.get(comp.uri).add(pkg.getUniqueName());
       }
     }
     // Update package dictionary
@@ -122,21 +121,21 @@ public final class Repo {
    * @param dir package directory
    */
   private void readPkg(final File dir) {
-    final File pkgDesc = new File(dir, DESCRIPTOR);
-    if(pkgDesc.exists()) {
-      final IOFile io = new IOFile(pkgDesc);
+    final File desc = new File(dir, DESCRIPTOR);
+    if(desc.exists()) {
+      final IOFile io = new IOFile(desc);
       try {
         final Package pkg = new PkgParser(context, null).parse(io);
         // Read package components
         for(final Component comp : pkg.comps) {
           // Add component's namespace to namespace dictionary
-          if(comp.namespace != null) {
-            if(nsDict.get(comp.namespace) != null) {
-              nsDict.get(comp.namespace).add(pkg.getUniqueName());
+          if(comp.uri != null) {
+            if(nsDict.get(comp.uri) != null) {
+              nsDict.get(comp.uri).add(pkg.getUniqueName());
             } else {
               final TokenSet vals = new TokenSet();
               vals.add(pkg.getUniqueName());
-              nsDict.add(comp.namespace, vals);
+              nsDict.add(comp.uri, vals);
             }
           }
         }

@@ -28,7 +28,7 @@ public final class Set extends AGet {
   public Set(final Object key, final Object value) {
     super(User.READ, (key instanceof Object[] ?
         ((Object[]) key)[0] : key).toString(),
-        value == null ? null : value.toString());
+        value == null ? "" : value.toString());
   }
 
   @Override
@@ -72,10 +72,9 @@ public final class Set extends AGet {
       prop.set(key, b);
       v = AInfo.flag(b);
     } else if(type instanceof Integer) {
-      if(val == null) v = "0";
+      v = "0";
       prop.set(key, Integer.parseInt(val));
     } else if(type instanceof String) {
-      if(val == null) v = "";
       prop.set(key, val);
     } else {
       Util.notexpected();

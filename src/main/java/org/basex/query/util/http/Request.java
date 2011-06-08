@@ -1,4 +1,4 @@
-package org.basex.query.util;
+package org.basex.query.util.http;
 
 import java.util.ArrayList;
 import java.util.List;

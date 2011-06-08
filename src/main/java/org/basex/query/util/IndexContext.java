@@ -1,6 +1,7 @@
-package org.basex.query;
+package org.basex.query.util;
 
 import org.basex.data.Data;
+import org.basex.query.QueryContext;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;

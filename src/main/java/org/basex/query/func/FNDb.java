@@ -16,7 +16,6 @@ import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.ArrayOutput;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -35,6 +34,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
+import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 
 /**

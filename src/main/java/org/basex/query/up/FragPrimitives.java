@@ -18,7 +18,7 @@ import org.basex.util.TokenSet;
 final class FragPrimitives extends Primitives {
   @Override
   protected void add(final Primitive p) throws QueryException {
-    add(p.node.id(), p);
+    add(p.node.id, p);
   }
 
   @Override

@@ -97,7 +97,7 @@ public final class FNNode extends Fun {
         return n;
       case GENID:
         return it == null ? Str.ZERO : Str.get(new TokenBuilder(
-            QueryTokens.ID).addLong(checkNode(it).id()).finish());
+            QueryTokens.ID).addLong(checkNode(it).id).finish());
       case CHILDREN:
         return Bln.get(it != null && checkNode(it).children().next() != null);
       default:

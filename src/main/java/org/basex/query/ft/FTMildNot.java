@@ -4,11 +4,11 @@ import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNode;
 import org.basex.query.iter.FTIter;
+import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 
 /**

@@ -1,8 +1,8 @@
-package org.basex.query.util.repo;
+package org.basex.query.util.pkg;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.query.util.repo.Package.*;
-import static org.basex.query.util.repo.PkgText.*;
+import static org.basex.query.util.pkg.Package.*;
+import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
 import java.io.File;
@@ -11,8 +11,8 @@ import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
-import org.basex.query.util.repo.Package.Component;
-import org.basex.query.util.repo.Package.Dependency;
+import org.basex.query.util.pkg.Package.Component;
+import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenSet;
 
@@ -164,7 +164,7 @@ public final class PkgValidator {
       throws QueryException {
 
     // Get packages in which the module's namespace is found
-    final TokenSet pkgs = context.repo.nsDict().get(comp.namespace);
+    final TokenSet pkgs = context.repo.nsDict().get(comp.uri);
     if(pkgs == null) return false;
 
     for(final byte[] nextPkg : pkgs) {

@@ -26,7 +26,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   /** Temporary file. */
   private static final String NAME = Util.name(FNZipTest.class);
   /** Test ZIP file. */
-  private static final String ZIP = "etc/xml/xml.zip";
+  private static final String ZIP = "etc/test/xml.zip";
   /** Temporary ZIP file. */
   private static final String TMPZIP = Prop.TMP + NAME + ".zip";
   /** Temporary file. */

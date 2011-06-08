@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Namespaces {
+public final class NSLocal {
   /** Namespaces. */
   public final Atts ns = new Atts();
   /** Number of default namespaces. */
@@ -112,8 +112,8 @@ public final class Namespaces {
    * Creates a copy with the default namespaces.
    * @return copy
    */
-  public Namespaces copy() {
-    final Namespaces local = new Namespaces();
+  public NSLocal copy() {
+    final NSLocal local = new NSLocal();
     for(int i = 0; i < def; ++i) local.ns.add(ns.key[i], ns.val[i]);
     return local;
   }

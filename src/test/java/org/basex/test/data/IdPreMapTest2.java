@@ -18,7 +18,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
-public class IdPreMapTest2 {
+public final class IdPreMapTest2 {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Number of update operations to execute in each test. */

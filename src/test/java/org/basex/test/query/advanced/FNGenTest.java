@@ -13,7 +13,7 @@ import org.junit.Test;
  */
 public final class FNGenTest extends AdvancedQueryTest {
   /** Text file. */
-  private static final String TEXT = "etc/xml/stopWords";
+  private static final String TEXT = "etc/test/input.xml";
 
   /**
    * Test method for the fn:unparsed-text() function.
@@ -22,8 +22,8 @@ public final class FNGenTest extends AdvancedQueryTest {
   @Test
   public void testUnparsedText() throws QueryException {
     final String fun = check(FunDef.PARSETXT);
-    contains(fun + "('" + TEXT + "')", "aboutabove");
-    contains(fun + "('" + TEXT + "', 'US-ASCII')", "aboutabove");
+    contains(fun + "('" + TEXT + "')", "?&gt;&lt;html");
+    contains(fun + "('" + TEXT + "', 'US-ASCII')", "?&gt;&lt;html");
     error(fun + "('" + TEXT + "', 'xyz')", Err.WRONGINPUT);
   }
 

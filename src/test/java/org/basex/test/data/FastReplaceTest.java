@@ -25,7 +25,7 @@ public final class FastReplaceTest {
   /** Database context. */
   public static final Context CONTEXT = new Context();
   /** Test document. */
-  public static final String DOC = "etc/xml/xmark.xml";
+  public static final String DOC = "etc/test/xmark.xml";
   /** Test database name. */
   public static final String DBNAME = Util.name(FastReplaceTest.class);
 

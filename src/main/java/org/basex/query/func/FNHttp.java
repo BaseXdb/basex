@@ -7,7 +7,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.HTTPClient;
+import org.basex.query.util.http.HTTPClient;
 import org.basex.util.InputInfo;
 
 /**

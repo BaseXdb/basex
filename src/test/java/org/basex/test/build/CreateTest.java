@@ -30,9 +30,9 @@ public final class CreateTest {
   private static final String TARGET = "target/";
 
   /** Path to test file. */
-  private static final String PATH = "etc/xml/input.xml";
+  private static final String PATH = "etc/test/input.xml";
   /** Test folder. */
-  private static final String FOLDER = "etc/xml/dir";
+  private static final String FOLDER = "etc/test/dir";
   /** Test XML fragment. */
   private static final String FRAG = "<xml/>";
 

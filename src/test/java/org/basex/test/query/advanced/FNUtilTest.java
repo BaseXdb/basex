@@ -33,8 +33,8 @@ public final class FNUtilTest extends AdvancedQueryTest {
   @Test
   public void testRun() throws QueryException {
     final String fun = check(FunDef.RUN);
-    query(fun + "('etc/xml/input.xq')", "XML");
-    error(fun + "('etc/xml/xxx.xq')", Err.UNDOC);
+    query(fun + "('etc/test/input.xq')", "XML");
+    error(fun + "('etc/test/xxx.xq')", Err.UNDOC);
   }
 
   /**

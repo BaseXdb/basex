@@ -25,7 +25,7 @@ import org.junit.Test;
  */
 public final class LockingTest {
   /** Test file. */
-  private static final String FILE = "etc/xml/factbook.zip";
+  private static final String FILE = "etc/test/factbook.zip";
   /** Test name. */
   private static final String NAME = "factbook";
   /** Test query. */

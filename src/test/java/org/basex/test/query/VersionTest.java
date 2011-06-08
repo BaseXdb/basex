@@ -1,6 +1,6 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query;
 
-import org.basex.query.util.repo.PkgVersion;
+import org.basex.query.util.pkg.PkgVersion;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
@@ -13,7 +13,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public class VersionTest {
+public final class VersionTest {
   /**
    * Tests method isCompatible.
    */

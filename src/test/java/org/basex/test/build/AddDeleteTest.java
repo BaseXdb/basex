@@ -29,13 +29,13 @@ public final class AddDeleteTest {
   /** Test database name. */
   private static final String DBNAME = Util.name(AddDeleteTest.class);
   /** Test file. */
-  private static final String FILE = "etc/xml/input.xml";
+  private static final String FILE = "etc/test/input.xml";
   /** Test folder. */
-  private static final String FLDR = "etc/xml/dir";
-  /** Test ZIP file, same as etc/xml. */
-  private static final String ZIPFILE = "etc/xml/xml.zip";
+  private static final String FLDR = "etc/test/dir";
+  /** Test ZIP file. */
+  private static final String ZIPFILE = "etc/test/xml.zip";
   /** Test GZIP file. */
-  private static final String GZIPFILE = "etc/xml/xml.gz";
+  private static final String GZIPFILE = "etc/test/xml.gz";
   /** Test XML fragment. */
   private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
 
@@ -122,7 +122,7 @@ public final class AddDeleteTest {
   }
 
   /**
-   * Adds a folder. As etc/xml contains a zip file, it is added as well.
+   * Adds a folder. The contained a zip file is added as well.
    * @throws BaseXException exception
    */
   @Test

@@ -12,7 +12,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class FLWORTest {
+public final class FLWORTest {
   /** Database context. */
   private static Context context = new Context();
 

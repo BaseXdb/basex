@@ -1,4 +1,4 @@
-package org.basex.query.util;
+package org.basex.query.util.http;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -11,7 +11,7 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.AxisMoreIter;
-import org.basex.query.util.Request.Part;
+import org.basex.query.util.http.Request.Part;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenMap;
 

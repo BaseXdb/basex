@@ -1,4 +1,4 @@
-package org.basex.query.util;
+package org.basex.query.util.http;
 
 import static java.lang.Integer.*;
 import static java.net.HttpURLConnection.*;
@@ -24,7 +24,7 @@ import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Request.Part;
+import org.basex.query.util.http.Request.Part;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;

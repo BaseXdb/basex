@@ -1,4 +1,4 @@
-package org.basex.query.util.repo;
+package org.basex.query.util.pkg;
 
 import static org.basex.util.Token.*;
 

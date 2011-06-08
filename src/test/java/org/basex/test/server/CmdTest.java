@@ -31,7 +31,7 @@ public class CmdTest {
   /** Test file name. */
   private static final String FN = "input.xml";
   /** Test folder. */
-  private static final String FLDR = "etc/xml";
+  private static final String FLDR = "etc/test";
   /** Test file. */
   private static final String FILE = FLDR + '/' + FN;
   /** Test name. */

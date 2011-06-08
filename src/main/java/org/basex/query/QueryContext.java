@@ -37,15 +37,15 @@ import org.basex.query.iter.Iter;
 import org.basex.query.up.Updates;
 import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
-import org.basex.query.util.Namespaces;
+import org.basex.query.util.NSLocal;
 import org.basex.query.util.Var;
 import org.basex.query.util.Variables;
 import org.basex.query.util.format.DecFormatter;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenMap;
 import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
 import org.basex.util.ft.FTLexer;
@@ -63,7 +63,7 @@ public final class QueryContext extends Progress {
   /** Variables. */
   public final Variables vars = new Variables();
   /** Namespaces. */
-  public Namespaces ns = new Namespaces();
+  public NSLocal ns = new NSLocal();
 
   /** Query resources. */
   public final QueryResources resource;
@@ -93,7 +93,7 @@ public final class QueryContext extends Progress {
   Nodes nodes;
 
   /** Current full-text options. */
-  public FTOpt ftopt;
+  public FTOpt ftopt = new FTOpt();
   /** Current full-text token. */
   public FTLexer fttoken;
 
@@ -148,13 +148,13 @@ public final class QueryContext extends Progress {
   /** Counter for variable IDs. */
   public int varIDs;
 
-  /** List of modules. */
-  final StringList modules = new StringList();
-  /** List of loaded modules. */
-  final StringList modLoaded = new StringList();
+  /** Pre-declared modules, containing the file path and module uri. */
+  final TokenMap modDeclared = new TokenMap();
+  /** Parsed modules, containing the file path and module uri. */
+  final TokenMap modParsed = new TokenMap();
+
   /** Serializer options. */
   SerializerProp serProp;
-
   /** Initial context value type. */
   SeqType initType;
   /** Initial context value. */
@@ -177,11 +177,9 @@ public final class QueryContext extends Progress {
     resource = new QueryResources(this);
     context = ctx;
     nodes = ctx.current;
-    ftopt = new FTOpt();
     xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
-
   }
 
   /**

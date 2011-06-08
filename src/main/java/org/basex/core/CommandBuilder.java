@@ -59,8 +59,7 @@ public final class CommandBuilder {
    * @return self instance
    */
   public CommandBuilder xquery(final int arg) {
-    tb.add(' ');
-    tb.add(cmd.args[arg]);
+    tb.add(' ').add(cmd.args[arg]);
     return this;
   }
 
@@ -83,10 +82,7 @@ public final class CommandBuilder {
   public CommandBuilder arg(final String key, final int arg) {
     final String a = cmd.args.length > arg ? cmd.args[arg] : null;
     if(a != null && !a.isEmpty()) {
-      if(key != null) {
-        tb.add(' ');
-        tb.add(key);
-      }
+      if(key != null) tb.add(' ').add(key);
       tb.add(' ');
       final boolean s = a.indexOf(' ') != -1;
       if(s) tb.add('"');

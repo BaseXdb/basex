@@ -111,16 +111,16 @@ import org.basex.query.up.Rename;
 import org.basex.query.up.Replace;
 import org.basex.query.up.Transform;
 import org.basex.query.util.Err;
-import org.basex.query.util.Namespaces;
+import org.basex.query.util.NSLocal;
 import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
 import org.basex.query.util.format.DecFormatter;
-import org.basex.query.util.repo.Package;
-import org.basex.query.util.repo.PkgParser;
-import org.basex.query.util.repo.PkgText;
-import org.basex.query.util.repo.PkgValidator;
-import org.basex.query.util.repo.Package.Component;
-import org.basex.query.util.repo.Package.Dependency;
+import org.basex.query.util.pkg.Package;
+import org.basex.query.util.pkg.PkgParser;
+import org.basex.query.util.pkg.PkgText;
+import org.basex.query.util.pkg.PkgValidator;
+import org.basex.query.util.pkg.Package.Component;
+import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -148,8 +148,9 @@ public class QueryParser extends InputParser {
 
   /** Temporary token builder. */
   private final TokenBuilder tok = new TokenBuilder();
-  /** List of loaded modules. */
+  /** Modules loaded by the current file. */
   private final TokenList modules = new TokenList();
+
   /** Name of current module. */
   private QNm module;
 
@@ -199,10 +200,9 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the specified query.
-   * If {@code u != null}, the query is treated as a module
+   * Parses the specified query or module.
    * @param f optional input file
-   * @param u module uri
+   * @param u module uri. If {@code u != null}, the input is treated as a module
    * @return resulting expression
    * @throws QueryException query exception
    */
@@ -314,14 +314,15 @@ public class QueryParser extends InputParser {
     wsCheck(IS);
     module.uri(stringLiteral());
     if(module.uri() == Uri.EMPTY) error(NSMODURI);
-    // skip uri check for empty input uri...
-    if(u != Uri.EMPTY && !u.eq(module.uri()))
-      error(WRONGMODULE, module.uri(), file);
+
     ctx.ns.add(module, input());
     skipWS();
     check(';');
     prolog1();
     prolog2();
+    // check if import and declaration uri match
+    if(u != Uri.EMPTY && !u.eq(module.uri()))
+      error(WRONGMODULE, module.uri(), file);
   }
 
   /**
@@ -628,7 +629,6 @@ public class QueryParser extends InputParser {
    */
   private void moduleImport() throws QueryException {
     QNm name = null;
-    TokenSet pkgs = null;
     if(wsConsumeWs(NSPACE)) {
       name = new QNm(ncName(XPNAME));
       wsCheck(IS);
@@ -637,72 +637,68 @@ public class QueryParser extends InputParser {
     }
     final byte[] uri = stringLiteral();
     if(uri.length == 0) error(NSMODURI);
+    if(modules.contains(uri)) error(DUPLMODULE, uri);
     name.uri(uri);
     ctx.ns.add(name, input());
 
-    final TokenList fl = new TokenList();
-    if(modules.contains(uri)) error(DUPLMODULE, name.uri());
-    if(wsConsumeWs(AT)) {
-      do
-        fl.add(stringLiteral());
-      while(wsConsumeWs(COMMA));
-    } else {
-      // Search for uri in namespace dictionary
-      pkgs = ctx.context.repo.nsDict().get(uri);
-    }
-    if(pkgs == null) {
-      // No installed packages having modules with this uri
-      try {
-        if(fl.size() == 0) {
+    try {
+      if(wsConsumeWs(AT)) {
+        do {
+          module(stringLiteral(), name.uri());
+        } while(wsConsumeWs(COMMA));
+      } else {
+        // search for uri in namespace dictionary
+        final TokenSet pkgs = ctx.context.repo.nsDict().get(uri);
+        if(pkgs != null) {
+          // load packages with modules having the given uri
+          for(final byte[] pkg : pkgs) {
+            if(pkg != null) loadPackage(pkg, new TokenSet(), new TokenSet());
+          }
+        } else {
+          // check if pre-declared modules can be parsed
           boolean found = false;
-          final int ns = ctx.modules.size();
-          for(int n = 0; n < ns; n += 2) {
-            if(ctx.modules.get(n).equals(string(uri))) {
-              module(ctx.modules.get(n + 1), name.uri());
-              modules.add(uri);
+          for(final byte[] path : ctx.modDeclared) {
+            if(eq(ctx.modDeclared.get(path), uri)) {
+              module(path, name.uri());
               found = true;
             }
           }
           if(!found) error(NOMODULE, uri);
         }
-        for(int n = 0; n < fl.size(); ++n) {
-          module(string(fl.get(n)), name.uri());
-          modules.add(uri);
-        }
-      } catch(final StackOverflowError ex) {
-        error(CIRCMODULE);
       }
-    } else {
-      // Load packages with modules having the given uri
-      for(final byte[] pkgName : pkgs) {
-        if(pkgName != null)
-          loadPackage(pkgName, new TokenSet(), new TokenSet());
-      }
+    } catch(final StackOverflowError ex) {
+      error(CIRCMODULE);
     }
   }
 
   /**
    * Parses the specified module.
-   * @param f file name
-   * @param u module uri
+   * @param path file path
+   * @param uri module uri
    * @throws QueryException query exception
    */
-  private void module(final String f, final Uri u) throws QueryException {
-    if(ctx.modLoaded.contains(f)) return;
-    // check specified path and path relative to query file
-    final IO fl = io(f);
-    String qu = null;
-    try {
-      qu = string(fl.content());
-    } catch(final IOException ex) {
-      error(NOMODULEFILE, fl);
+  private void module(final byte[] path, final Uri uri) throws QueryException {
+    final byte[] u = ctx.modParsed.get(path);
+    if(u != null) {
+      if(!eq(uri.atom(), u)) error(WRONGMODULE, uri, path);
+      return;
     }
 
-    final Namespaces ns = ctx.ns;
-    ctx.ns = new Namespaces();
-    new QueryParser(qu, ctx).parse(fl, u);
+    // check specified path and path relative to query file
+    final IO io = io(string(path));
+    String qu = null;
+    try {
+      qu = string(io.content());
+    } catch(final IOException ex) {
+      error(NOMODULEFILE, io);
+    }
+
+    final NSLocal ns = ctx.ns;
+    ctx.ns = new NSLocal();
+    new QueryParser(qu, ctx).parse(io, uri);
     ctx.ns = ns;
-    ctx.modLoaded.add(f);
+    ctx.modParsed.add(path, uri.atom());
+    modules.add(uri.atom());
   }
 
   /**
@@ -738,16 +734,10 @@ public class QueryParser extends InputParser {
       }
     }
     for(final Component comp : pkg.comps) {
-      try {
-        final String f = new File(new File(new File(
-            ctx.context.prop.get(Prop.REPOPATH), string(pkgDir)),
-            string(pkg.abbrev)), string(comp.file)).getCanonicalPath();
-        if(!(modules.contains(comp.namespace) || ctx.modLoaded.contains(f)))
-          module(f, Uri.uri(comp.namespace));
-      } catch(IOException ex) {
-        Util.debug(ex);
-        error(PKGREADFAIL, ex.getMessage());
-      }
+      final byte[] path = token(new File(new File(new File(
+          ctx.context.prop.get(Prop.REPOPATH), string(pkgDir)),
+          string(pkg.abbrev)), string(comp.file)).toString());
+     module(path, Uri.uri(comp.uri));
     }
     if(pkgsToLoad.id(pkgName) != 0) pkgsToLoad.delete(pkgName);
     pkgsLoaded.add(pkgName);

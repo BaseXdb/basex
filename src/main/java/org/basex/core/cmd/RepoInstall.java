@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.query.QueryException;
-import org.basex.query.util.repo.RepoManager;
+import org.basex.query.util.pkg.RepoManager;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 

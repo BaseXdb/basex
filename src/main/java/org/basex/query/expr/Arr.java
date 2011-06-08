@@ -2,9 +2,9 @@ package org.basex.query.expr;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.util.IndexContext;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;

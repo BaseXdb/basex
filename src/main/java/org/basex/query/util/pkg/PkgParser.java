@@ -1,7 +1,7 @@
-package org.basex.query.util.repo;
+package org.basex.query.util.pkg;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.query.util.repo.PkgText.*;
+import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
@@ -12,10 +12,11 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.AxisIter;
-import org.basex.query.util.repo.Package.Component;
-import org.basex.query.util.repo.Package.Dependency;
+import org.basex.query.util.pkg.Package.Component;
+import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 
@@ -50,12 +51,12 @@ public final class PkgParser {
   public Package parse(final IO io) throws QueryException {
     final Package pkg = new Package();
     try {
-      ANode node = new DBNode(io, context.prop).children().next();
+      ANode node = childElements(new DBNode(io, context.prop)).next();
 
       // tries to guess if the package is based on an obsolete packaging API
       final boolean legacy = legacy(node);
       // if yes, retrieves child node
-      if(legacy) node = node.children().next();
+      if(legacy) node = childElements(node).next();
 
       // checks root node
       final byte[] root = legacy ? MODULE : PACKAGE;
@@ -77,7 +78,7 @@ public final class PkgParser {
    * @return result of check
    */
   private boolean legacy(final ANode node) {
-    final AxisIter ch = node.children();
+    final AxisIter ch = childElements(node);
     for(ANode next; (next = ch.next()) != null;) {
       if(eqNS(MODULE, next.qname())) return true;
     }
@@ -127,7 +128,7 @@ public final class PkgParser {
   private void parseChildren(final ANode node, final Package p)
       throws QueryException {
 
-    final AxisIter ch = node.children();
+    final AxisIter ch = childElements(node);
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
       if(eqNS(TITLE, name))       p.title = next.atom();
@@ -166,21 +167,42 @@ public final class PkgParser {
    * @throws QueryException query exception
    */
   private Component parseComp(final ANode node) throws QueryException {
-    final AxisIter ch = node.children();
+    final AxisIter ch = childElements(node);
     final Component c = new Component();
     c.type = XQUERY;
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
       if(eqNS(IMPURI, name))    c.importUri = next.atom();
-      else if(eqNS(NSPC, name)) c.namespace = next.atom();
+      else if(eqNS(NSPC, name)) c.uri = next.atom();
       else if(eqNS(FILE, name)) c.file = next.atom();
       else PKGDESCINV.thrw(input, Util.info(WHICHELEM, name));
     }
 
     // Check mandatory children
-    if(c.namespace == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, NSPC));
+    if(c.uri == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, NSPC));
     if(c.file == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, FILE));
     return c;
+  }
+
+  /**
+   * Returns an iterator on all child elements
+   * (text and other nodes will be skipped).
+   * @param node root node
+   * @return child element iterator
+   */
+  private AxisIter childElements(final ANode node) {
+    return new AxisIter() {
+      /** Child iterator. */
+      final AxisIter ch = node.children();
+
+      @Override
+      public ANode next() {
+        while(true) {
+          final ANode n = ch.next();
+          if(n == null || n.type == NodeType.ELM) return n;
+        }
+      }
+    };
   }
 
   /**

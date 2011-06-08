@@ -10,12 +10,16 @@ import org.basex.util.ft.WesternTokenizer;
 import org.junit.Before;
 import org.junit.Test;
 
-/** Tests for {@link WesternTokenizer}. */
-public class WesternTokenizerTest {
-
+/**
+ * Tests for {@link WesternTokenizer}.
+ *
+ * @author BaseX Team 2005-11, BSD License
+ * @author Dimitar Popov
+ */
+public final class WesternTokenizerTest {
   /** Case sensitive. */
   private static final int FTCS = 1;
-  /** Diactrics. */
+  /** Diacritics. */
   private static final int FTDC = 2;
   /** Lower case. */
   private static final int FTLC = 4;
@@ -23,10 +27,6 @@ public class WesternTokenizerTest {
   private static final int FTUC = 8;
   /** Wild cards. */
   private static final int FTWC = 16;
-  /** Fuzzy (not used by {@link WesternTokenizer}). */
-  // private static final int FTFZ = 32;
-  /** Stemming (not used by {@link WesternTokenizer}). */
-  // private static final int FTST = 64;
 
   /** Full-text options to use. */
   private FTOpt opt;

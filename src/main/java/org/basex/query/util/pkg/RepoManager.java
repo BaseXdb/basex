@@ -1,7 +1,7 @@
-package org.basex.query.util.repo;
+package org.basex.query.util.pkg;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.query.util.repo.PkgText.*;
+import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
 import java.io.File;
@@ -20,7 +20,7 @@ import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.func.FNZip;
-import org.basex.query.util.repo.Package.Dependency;
+import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 

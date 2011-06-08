@@ -3,7 +3,7 @@ package org.basex.api.jaxp;
 import static org.basex.util.Token.*;
 import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
-import org.basex.query.util.Namespaces;
+import org.basex.query.util.NSLocal;
 import org.basex.util.StringList;
 
 /**
@@ -14,13 +14,13 @@ import org.basex.util.StringList;
  */
 public final class BXNamespaceContext implements NamespaceContext {
   /** Namespaces references. */
-  private final Namespaces ns;
+  private final NSLocal ns;
 
   /**
    * Constructor.
    * @param n namespace references
    */
-  public BXNamespaceContext(final Namespaces n) {
+  public BXNamespaceContext(final NSLocal n) {
     ns = n;
   }
 

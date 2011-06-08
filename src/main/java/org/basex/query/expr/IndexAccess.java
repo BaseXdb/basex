@@ -9,7 +9,6 @@ import org.basex.data.Serializer;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ValuesToken;
-import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -20,6 +19,7 @@ import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
+import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 

@@ -58,7 +58,7 @@ public final class ServerProcess extends Thread {
   /** Output stream. */
   private PrintOutput out;
   /** Current command. */
-  private Command cmd;
+  private Command command;
   /** Query id counter. */
   private int id;
   /** Running of thread. */
@@ -118,7 +118,7 @@ public final class ServerProcess extends Thread {
   @Override
   public void run() {
     log.write(this, "LOGIN " + context.user.name, OK);
-    String input = null;
+    String cmd = null;
     running = true;
     try {
       while(running) {
@@ -127,42 +127,38 @@ public final class ServerProcess extends Thread {
           final ServerCmd sc = ServerCmd.get(b);
           if(sc == CREATE) {
             create();
-            continue;
-          }
-          if(sc == ADD) {
+          } else if(sc == ADD) {
             add();
             continue;
-          }
-          if(sc == WATCH) {
+          } else if(sc == WATCH) {
             watch();
             continue;
-          }
-          if(sc == UNWATCH) {
+          } else if(sc == UNWATCH) {
             unwatch();
             continue;
-          }
-          if(sc != CMD) {
+          } else if(sc != CMD) {
             query(sc);
             continue;
+          } else {
+            // database command
+            cmd = new ByteList().add(b).add(in.content().toArray()).toString();
           }
-
-          // database command
-          input = new ByteList().add(b).add(in.content().toArray()).toString();
         } catch(final IOException ex) {
           // this exception is thrown for each session if the server is stopped
           exit();
           break;
         }
+        if(cmd == null) continue;
 
         // parse input and create command instance
         final Performance perf = new Performance();
-        cmd = null;
+        command = null;
         try {
-          cmd = new CommandParser(input, context).parseSingle();
+          command = new CommandParser(cmd, context).parseSingle();
         } catch(final QueryException ex) {
           // log invalid command
           final String msg = ex.getMessage();
-          log.write(this, input, INFOERROR + msg);
+          log.write(this, cmd, INFOERROR + msg);
           // send 0 to mark end of potential result
           out.write(0);
           // send {INFO}0
@@ -173,31 +169,31 @@ public final class ServerProcess extends Thread {
         }
 
         // stop console
-        if(cmd instanceof Exit) {
+        if(command instanceof Exit) {
           exit();
           running = false;
           break;
         }
 
         // start timeout
-        cmd.startTimeout(context.prop.num(Prop.TIMEOUT));
+        command.startTimeout(context.prop.num(Prop.TIMEOUT));
 
-        final String c = cmd.toString().replace('\r', ' ').replace('\n', ' ');
-        log.write(this, c);
+        log.write(this,
+            command.toString().replace('\r', ' ').replace('\n', ' '));
 
         // execute command and send {RESULT}
         boolean ok = true;
         String info = null;
         try {
-          cmd.execute(context, out);
-          info = cmd.info();
+          command.execute(context, out);
+          info = command.info();
         } catch(final BaseXException ex) {
           ok = false;
           info = ex.getMessage();
           if(info.startsWith(PROGERR)) info = SERVERTIMEOUT;
         }
         // stop timeout
-        cmd.stopTimeout();
+        command.stopTimeout();
 
         // send 0 to mark end of result
         out.write(0);
@@ -206,7 +202,7 @@ public final class ServerProcess extends Thread {
       }
       if(!running) log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final IOException ex) {
-      log.write(this, input, INFOERROR + ex.getMessage());
+      log.write(this, cmd, INFOERROR + ex.getMessage());
       Util.stack(ex);
       exit();
     }
@@ -231,7 +227,7 @@ public final class ServerProcess extends Thread {
         }
       }
       new Close().execute(context);
-      if(cmd != null) cmd.stop();
+      if(command != null) command.stop();
       context.delete(this);
       socket.close();
     } catch(final Exception ex) {

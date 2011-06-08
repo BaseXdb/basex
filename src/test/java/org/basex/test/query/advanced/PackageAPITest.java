@@ -14,9 +14,9 @@ import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.util.Err;
-import org.basex.query.util.repo.PkgParser;
-import org.basex.query.util.repo.PkgValidator;
-import org.basex.query.util.repo.RepoManager;
+import org.basex.query.util.pkg.PkgParser;
+import org.basex.query.util.pkg.PkgValidator;
+import org.basex.query.util.pkg.RepoManager;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenObjMap;
 import org.basex.util.TokenSet;
@@ -29,7 +29,9 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public class PackageAPITest extends AdvancedQueryTest {
+public final class PackageAPITest extends AdvancedQueryTest {
+  /** Test repository. */
+  protected static final String REPO = "etc/test/repo/";
   /** Context. */
   protected static Context ctx;
 
@@ -37,7 +39,7 @@ public class PackageAPITest extends AdvancedQueryTest {
   @Before
   public void setUpBeforeClass() {
     ctx = new Context();
-    ctx.repo.init("etc/repo");
+    ctx.repo.init(REPO);
   }
 
   /** Tests repository initialization. */
@@ -256,19 +258,19 @@ public class PackageAPITest extends AdvancedQueryTest {
       check(ex, Err.PKGNOTEXIST);
     }
     // Try to install a package
-    new RepoInstall("etc/repo/pkg3.xar", null).execute(ctx);
-    final File pkgDir = new File("etc/repo/pkg3");
+    new RepoInstall(REPO + "pkg3.xar", null).execute(ctx);
+    final File pkgDir = new File(REPO + "pkg3");
     assertTrue(pkgDir.exists());
     assertTrue(pkgDir.isDirectory());
-    final File pkgDesc = new File("etc/repo/pkg3/expath-pkg.xml");
+    final File pkgDesc = new File(REPO + "pkg3/expath-pkg.xml");
     assertTrue(pkgDesc.exists());
-    final File modDir1 = new File("etc/repo/pkg3/pkg3");
+    final File modDir1 = new File(REPO + "pkg3/pkg3");
     assertTrue(modDir1.exists());
     assertTrue(modDir1.isDirectory());
-    final File modDir2 = new File("etc/repo/pkg3/pkg3/mod");
+    final File modDir2 = new File(REPO + "pkg3/pkg3/mod");
     assertTrue(modDir2.exists());
     assertTrue(modDir2.isDirectory());
-    final File modFile = new File("etc/repo/pkg3/pkg3/mod/pkg3mod1.xql");
+    final File modFile = new File(REPO + "pkg3/pkg3/mod/pkg3mod1.xql");
     assertTrue(modFile.exists());
 
     // Delete package
@@ -306,34 +308,34 @@ public class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void testDelete() throws BaseXException {
     // Install a package without dependencies (pkg3)
-    new RepoInstall("etc/repo/pkg3.xar", null).execute(ctx);
+    new RepoInstall(REPO + "pkg3.xar", null).execute(ctx);
     // Check if pkg3 is registered in the repo
     assertNotNull(ctx.repo.pkgDict().id(token("pkg3-10.0")) != 0);
     // Check if pkg3 was correctly unzipped
-    final File pkgDir1 = new File("etc/repo/pkg3");
+    final File pkgDir1 = new File(REPO + "pkg3");
     assertTrue(pkgDir1.exists());
     assertTrue(pkgDir1.isDirectory());
-    final File pkgDesc1 = new File("etc/repo/pkg3/expath-pkg.xml");
+    final File pkgDesc1 = new File(REPO + "pkg3/expath-pkg.xml");
     assertTrue(pkgDesc1.exists());
-    final File modDir1 = new File("etc/repo/pkg3/pkg3/mod");
+    final File modDir1 = new File(REPO + "pkg3/pkg3/mod");
     assertTrue(modDir1.exists());
     assertTrue(modDir1.isDirectory());
-    final File modFile1 = new File("etc/repo/pkg3/pkg3/mod/pkg3mod1.xql");
+    final File modFile1 = new File(REPO + "pkg3/pkg3/mod/pkg3mod1.xql");
     assertTrue(modFile1.exists());
     // Install another package (pkg4) with a dependency to pkg3
-    new RepoInstall("etc/repo/pkg4.xar", null).execute(ctx);
+    new RepoInstall(REPO + "pkg4.xar", null).execute(ctx);
     // Check if pkg4 is registered in the repo
     assertNotNull(ctx.repo.pkgDict().id(token("pkg4-2.0")) != 0);
     // Check if pkg3 was correctly unzipped
-    final File pkgDir2 = new File("etc/repo/pkg4");
+    final File pkgDir2 = new File(REPO + "pkg4");
     assertTrue(pkgDir2.exists());
     assertTrue(pkgDir2.isDirectory());
-    final File pkgDesc2 = new File("etc/repo/pkg4/expath-pkg.xml");
+    final File pkgDesc2 = new File(REPO + "pkg4/expath-pkg.xml");
     assertTrue(pkgDesc2.exists());
-    final File modDir2 = new File("etc/repo/pkg4/pkg4/mod");
+    final File modDir2 = new File(REPO + "pkg4/pkg4/mod");
     assertTrue(modDir2.exists());
     assertTrue(modDir2.isDirectory());
-    final File modFile2 = new File("etc/repo/pkg4/pkg4/mod/pkg4mod1.xql");
+    final File modFile2 = new File(REPO + "pkg4/pkg4/mod/pkg4mod1.xql");
     assertTrue(modFile2.exists());
     // Try to delete pkg3
     try {

@@ -33,10 +33,10 @@ public abstract class ANode extends Item {
   /** Static node counter. */
   // [CG] XQuery/ID: move to query context?
   private static int sid;
-
   /** Unique node id. */
-  protected final int id = ++sid;
-  /** Text value. */
+  public final int id = ++sid;
+
+  /** Cached string value. */
   protected byte[] val;
   /** Parent node. */
   protected ANode par;
@@ -88,6 +88,7 @@ public abstract class ANode extends Item {
 
   /**
    * Returns the node name.
+   * This function must only be called for element and attribute nodes.
    * @return name
    */
   public byte[] nname() {
@@ -96,6 +97,7 @@ public abstract class ANode extends Item {
 
   /**
    * Returns the node name.
+   * This function must only be called for element and attribute nodes.
    * @return name
    */
   public QNm qname() {
@@ -103,15 +105,8 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the node id.
-   * @return id
-   */
-  public final int id() {
-    return id;
-  }
-
-  /**
    * Returns a temporary node name.
+   * This function must only be called for element and attribute nodes.
    * @param nm temporary qname
    * @return name
    */
