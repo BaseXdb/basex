@@ -270,8 +270,8 @@ public final class JaxRxTest {
    */
   @Test
   public void put2() throws IOException {
-    put("/jax-rx", new FileInputStream("etc/xml/input.xml"));
-    put("/jax-rx", new FileInputStream("etc/xml/input.xml"));
+    put("/jax-rx", new FileInputStream("etc/test/input.xml"));
+    put("/jax-rx", new FileInputStream("etc/test/input.xml"));
     assertEquals("XML", get("/jax-rx?query=//title/text()&wrap=no"));
     delete("/jax-rx");
   }
@@ -297,7 +297,7 @@ public final class JaxRxTest {
    */
   @Test
   public void delete1() throws IOException {
-    put("/jax-rx", new FileInputStream("etc/xml/input.xml"));
+    put("/jax-rx", new FileInputStream("etc/test/input.xml"));
     // delete database
     assertContains(delete("/jax-rx"), "Database '");
     // no database left
