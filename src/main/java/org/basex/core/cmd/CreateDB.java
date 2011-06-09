@@ -143,6 +143,8 @@ public final class CreateDB extends ACreate {
     final Performance p = new Performance();
     ctx.register(true);
     try {
+      // close open database
+      new Close().run(ctx);
       ctx.openDB(xml(parser, name, ctx));
     } catch(final IOException ex) {
       throw new BaseXException(ex);
