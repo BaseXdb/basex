@@ -81,71 +81,45 @@ public final class CreateDB extends ACreate {
   }
 
   /**
-   * Creates an empty database.
-   * @param name name of the database
-   * @param ctx database context
-   * @return database instance
-   * @throws IOException I/O exception
-   */
-  public static Data empty(final String name, final Context ctx)
-      throws IOException {
-    return xml(Parser.emptyParser(), name, ctx);
-  }
-
-  /**
-   * Creates a database for the specified file.
-   * @param io input reference
-   * @param name name of the database
-   * @param ctx database context
-   * @return database instance
-   * @throws IOException I/O exception
-   */
-  public static synchronized Data xml(final IO io, final String name,
-      final Context ctx) throws IOException {
-
-    if(!ctx.user.perm(User.CREATE))
-      throw new IOException(Util.info(PERMNO, CmdPerm.CREATE));
-    if(!io.exists()) throw new BuildException(FILEWHICH, io);
-    return xml(new DirParser(io, ctx.prop), name, ctx);
-  }
-
-  /**
-   * Creates a database for the specified file.
+   * Creates a database instance from the specified input stream
+   * and assigns it to the specified database context.
    * @param name name of the database
    * @param input input stream
-   * @param ctx database context
+   * @param ctx return database context
    * @return info string
    * @throws BaseXException database exception
    */
-  public static synchronized String xml(final String name,
+  public static synchronized String create(final String name,
       final InputStream input, final Context ctx) throws BaseXException {
 
     final InputStream is = input instanceof BufferedInputStream ||
       input instanceof BufferInput ? input : new BufferedInputStream(input);
     final SAXSource sax = new SAXSource(new InputSource(is));
-    return xml(name, new SAXWrapper(sax, ctx.prop), ctx);
+    return create(name, new SAXWrapper(sax, ctx.prop), ctx);
   }
 
   /**
-   * Creates a database for the specified file.
+   * Creates a database instance from the specified parser
+   * and assigns it to the specified database context.
    * @param name name of the database
    * @param parser parser
-   * @param ctx database context
+   * @param ctx return database context
    * @return info string
    * @throws BaseXException database exception
    */
-  public static synchronized String xml(final String name,
+  public static synchronized String create(final String name,
       final Parser parser, final Context ctx) throws BaseXException {
-
-    if(!ctx.user.perm(User.CREATE))
-      throw new BaseXException(PERMNO, CmdPerm.CREATE);
 
     final Performance p = new Performance();
     ctx.register(true);
     try {
-      // close open database
-      new Close().run(ctx);
-      ctx.openDB(xml(parser, name, ctx));
+      // close current database instance
+      final Data data = ctx.data;
+      if(data != null) {
+        Close.close(data, ctx);
+        ctx.closeDB();
+      }
+      ctx.openDB(xml(name, parser, ctx));
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     } finally {
@@ -155,15 +129,46 @@ public final class CreateDB extends ACreate {
   }
 
   /**
-   * Creates a database instance from the specified parser.
-   * @param parser input parser
+   * Returns an empty database instance.
    * @param name name of the database
    * @param ctx database context
-   * @return database instance
+   * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final Parser parser, final String name,
+  public static Data empty(final String name, final Context ctx)
+      throws IOException {
+    return xml(name, Parser.emptyParser(), ctx);
+  }
+
+  /**
+   * Returns a database instance for the specified input.
+   * @param name name of the database
+   * @param input input reference
+   * @param ctx database context
+   * @return new database instance
+   * @throws IOException I/O exception
+   */
+  public static synchronized Data xml(final String name, final IO input,
       final Context ctx) throws IOException {
+
+    if(!input.exists()) throw new BuildException(FILEWHICH, input);
+    return xml(name, new DirParser(input, ctx.prop), ctx);
+  }
+
+  /**
+   * Returns a database instance from the specified parser.
+   * @param name name of the database
+   * @param parser input parser
+   * @param ctx database context
+   * @return new database instance
+   * @throws IOException I/O exception
+   */
+  public static synchronized Data xml(final String name, final Parser parser,
+      final Context ctx) throws IOException {
+
+    // check permissions
+    if(!ctx.user.perm(User.CREATE))
+      throw new IOException(Util.info(PERMNO, CmdPerm.CREATE));
 
     // create main memory database instance
     final Prop prop = ctx.prop;
@@ -190,10 +195,10 @@ public final class CreateDB extends ACreate {
   }
 
   /**
-   * Creates a main memory database for the specified parser.
+   * Returns a main memory database instance from the specified parser.
    * @param parser input parser
    * @param ctx database context
-   * @return database instance
+   * @return new database instance
    * @throws IOException I/O exception
    */
   public static synchronized Data xml(final Parser parser, final Context ctx)
@@ -205,10 +210,10 @@ public final class CreateDB extends ACreate {
   }
 
   /**
-   * Creates a main memory database from the specified input reference.
+   * Returns a main memory database instance for the specified input reference.
    * @param io input reference
    * @param ctx database context
-   * @return database instance
+   * @return new database instance
    * @throws IOException I/O exception
    */
   public static synchronized Data xml(final IO io, final Context ctx)
@@ -218,10 +223,10 @@ public final class CreateDB extends ACreate {
   }
 
   /**
-   * Creates a main memory database from the specified SAX source.
+   * Returns a main memory database instance from the specified SAX source.
    * @param sax sax source
    * @param ctx database context
-   * @return database instance
+   * @return new database instance
    * @throws IOException I/O exception
    */
   public static synchronized Data xml(final SAXSource sax, final Context ctx)

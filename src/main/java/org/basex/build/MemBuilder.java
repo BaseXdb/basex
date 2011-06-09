@@ -7,7 +7,7 @@ import org.basex.data.MemData;
 import org.basex.io.IO;
 
 /**
- * This class creates a database instance in main-memory.
+ * This class creates a database instance in main memory.
  * The storage layout is described in the {@link Data} class.
  *
  * @author BaseX Team 2005-11, BSD License

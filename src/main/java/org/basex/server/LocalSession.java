@@ -42,7 +42,7 @@ public final class LocalSession extends Session {
   @Override
   public void create(final String name, final InputStream input)
     throws BaseXException {
-    info = CreateDB.xml(name, input, ctx);
+    info = CreateDB.create(name, input, ctx);
   }
 
   @Override

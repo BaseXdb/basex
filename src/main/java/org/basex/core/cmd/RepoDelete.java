@@ -35,7 +35,7 @@ public class RepoDelete extends Command {
     try {
       new RepoManager(context).delete(args[0], ii);
       return info(REPODEL, args[0]);
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       Util.debug(ex);
       return error(ex.getMessage());
     }

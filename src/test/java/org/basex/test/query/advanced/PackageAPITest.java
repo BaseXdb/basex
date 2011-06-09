@@ -341,7 +341,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     try {
       new RepoManager(ctx).delete("pkg3", null);
       fail("Package involved in a dependency was deleted.");
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       check(ex, Err.PKGDEP);
     }
     // Try to delete pkg4 (use package name)

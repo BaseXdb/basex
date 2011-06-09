@@ -50,7 +50,7 @@ public final class EventStressTest {
     startSignal.countDown(); // start all clients
     try {
       stopSignal.await();
-    } catch(InterruptedException e) {
+    } catch(final InterruptedException e) {
       return;
     }
   }
@@ -72,7 +72,7 @@ public final class EventStressTest {
     startSignal.countDown(); // start all clients
     try {
       stopSignal.await();
-    } catch(InterruptedException e) {
+    } catch(final InterruptedException e) {
       return;
     }
   }
@@ -89,7 +89,7 @@ public final class EventStressTest {
       for(int i = 0; i < NUM; ++i) {
         try {
           session.execute("drop event " + NAME + i);
-        } catch(BaseXException e) { }
+        } catch(final BaseXException e) { }
       }
     } finally {
       session.close();

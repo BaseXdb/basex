@@ -17,7 +17,7 @@ import org.basex.util.TokenList;
  * <p>This class builds an index for text contents in a compressed trie:</p>
  *
  * <ol>
- * <li> The tokens are indexed in a main-memory tree structure.</li>
+ * <li> The tokens are indexed in a main memory tree structure.</li>
  * <li> If main memory is full, data is written as sorted list to disk.</li>
  * <li> The temporary index instances are merged and written to disk.</li>
  * </ol>

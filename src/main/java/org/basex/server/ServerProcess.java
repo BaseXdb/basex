@@ -294,8 +294,8 @@ public final class ServerProcess extends Thread {
     try {
       final WrapInputStream is = new WrapInputStream(in);
       final String info = is.curr() == -1 ?
-        CreateDB.xml(name, Parser.emptyParser(), context) :
-        CreateDB.xml(name, is, context);
+        CreateDB.create(name, Parser.emptyParser(), context) :
+        CreateDB.create(name, is, context);
       info(true, info, perf);
     } catch(final BaseXException ex) {
       info(false, ex.getMessage(), perf);

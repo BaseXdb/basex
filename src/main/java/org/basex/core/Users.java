@@ -25,7 +25,8 @@ import org.basex.util.Util;
  */
 public final class Users {
   /** User array. */
-  private List<User> list = Collections.synchronizedList(new ArrayList<User>());
+  private final List<User> list =
+    Collections.synchronizedList(new ArrayList<User>());
   /** Filename; set to {@code null} if the instance handles local users. */
   private File file;
 

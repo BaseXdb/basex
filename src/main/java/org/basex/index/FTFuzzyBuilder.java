@@ -12,7 +12,7 @@ import org.basex.util.IntList;
  * in an ordered table:</p>
  *
  * <ol>
- * <li> The tokens are indexed in a main-memory tree structure.</li>
+ * <li> The tokens are indexed in a main memory tree structure.</li>
  * <li> If main memory is full, the index is written to disk.</li>
  * <li> The temporary index instances are merged.</li>
  * </ol>
