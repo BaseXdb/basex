@@ -30,7 +30,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public String getLocalName() {
-    return getNodeName();
+    return Token.string(Token.ln(node.nname()));
   }
 
   @Override
@@ -60,13 +60,8 @@ public final class BXAttr extends BXNode implements Attr {
   }
 
   @Override
-  public BXElem getParentNode() {
-    return null;
-  }
-
-  @Override
   public BXElem getOwnerElement() {
-    return getParentNode();
+    return (BXElem) getParentNode();
   }
 
   @Override
@@ -92,7 +87,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public void setValue(final String value) {
-    error();
+    readOnly();
   }
 
   @Override

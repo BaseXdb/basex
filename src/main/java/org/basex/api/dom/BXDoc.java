@@ -40,7 +40,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXNode adoptNode(final Node source) {
-    error();
+    readOnly();
     return null;
   }
 
@@ -89,7 +89,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public EntityReference createEntityReference(final String name) {
-    error();
+    readOnly();
     return null;
   }
 
@@ -186,19 +186,19 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public void normalizeDocument() {
-    error();
+    readOnly();
   }
 
   @Override
   public BXNode renameNode(final Node n, final String namespaceURI,
       final String qualifiedName) {
-    error();
+    readOnly();
     return null;
   }
 
   @Override
   public void setDocumentURI(final String documentURI) {
-    error();
+    readOnly();
   }
 
   @Override

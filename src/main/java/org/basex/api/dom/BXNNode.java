@@ -41,7 +41,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
   }
 
   @Override
-  public BXNode setNamedItem(final Node arg) {
+  public BXNode setNamedItem(final Node node) {
     Util.notimplemented();
     return null;
   }
@@ -53,7 +53,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
   }
 
   @Override
-  public BXNode setNamedItemNS(final Node arg) {
+  public BXNode setNamedItemNS(final Node node) {
     Util.notimplemented();
     return null;
   }

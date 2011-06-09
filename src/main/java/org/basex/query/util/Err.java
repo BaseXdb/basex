@@ -134,8 +134,7 @@ public enum Err {
   /** FOHC0002: Evaluation exception. */
   HTMLERR(FOHC, 2, "Error parsing entity as XML or HTML."),
   /** FOHC003: Evaluation exception. */
-  SRCATTR(FOHC, 3, "The src attribute on the body element is mutually"
-      + "exclusive with all other attributes (except the media-type)"),
+  SRCATTR(FOHC, 3, "No attribute beside 'src' and 'media-type' allowed."),
   /** FOHC0004: Evaluation exception. */
   REQINV(FOHC, 4, "The request element is not valid: %"),
   /** FOHC005: Evaluation exception. */
@@ -281,7 +280,7 @@ public enum Err {
   SERUNKNOWN(SEPM, 17, "Serialization: unknown element %."),
 
   /** XPDY0002: Parsing exception. */
-  VAREMPTY(XPDY, 2, "No value assigned to \"%\"."),
+  VAREMPTY(XPDY, 2, "No value assigned to %."),
   /** XPDY0002: Evaluation Exception. */
   XPNOCTX(XPDY, 2, "No context item set for '%'."),
   /** XPDY0050: Evaluation exception. */

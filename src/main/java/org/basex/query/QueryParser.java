@@ -986,7 +986,7 @@ public class QueryParser extends InputParser {
     ForLet[] fl = null;
     boolean comma = false;
 
-    do {
+    while(true) {
       final boolean fr = wsConsumeWs(FOR, DOLLAR, NOFOR);
       boolean score = !fr && wsConsumeWs(LET, SCORE, NOLET);
       if(score) wsCheck(SCORE);
@@ -1008,25 +1008,26 @@ public class QueryParser extends InputParser {
         final Expr e = check(single(), NOVARDECL);
         ctx.vars.add(var);
 
-        if(fl == null) fl = new ForLet[1];
-        else fl = Arrays.copyOf(fl, fl.length + 1);
-        if(sc != null) {
-          if(sc.name.eq(name) || ps != null && sc.name.eq(ps.name))
-            error(DUPLVAR, sc);
-          ctx.vars.add(sc);
-        }
         if(ps != null) {
-          if(name.eq(ps.name)) error(DUPLVAR, name);
+          if(name.eq(ps.name)) error(DUPLVAR, var);
           ctx.vars.add(ps);
         }
+        if(sc != null) {
+          if(name.eq(sc.name)) error(DUPLVAR, var);
+          if(ps != null && ps.name.eq(sc.name)) error(DUPLVAR, ps);
+          ctx.vars.add(sc);
+        }
+
+        fl = fl == null ? new ForLet[1] : Arrays.copyOf(fl, fl.length + 1);
         fl[fl.length - 1] = fr ? new For(input(), e, var, ps, sc) :
           new Let(input(), e, var, score);
 
         score = false;
         comma = true;
       } while(wsConsume(COMMA));
+
       comma = false;
-    } while(true);
+    }
   }
 
   /**

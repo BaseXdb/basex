@@ -98,7 +98,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getFirstChild() {
-    return finish(node.children().next());
+    return toJava(node.children().next());
   }
 
   @Override
@@ -106,7 +106,7 @@ public abstract class BXNode implements Node {
     ANode n = null;
     final AxisIter ai = node.children();
     for(ANode t; (t = ai.next()) != null;) n = t;
-    return finish(n);
+    return toJava(n);
   }
 
   @Override
@@ -116,17 +116,17 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getNextSibling() {
-    return finish(node.follSibl().next());
+    return toJava(node.follSibl().next());
   }
 
   @Override
   public BXNode getPreviousSibling() {
-    return finish(node.precSibl().next());
+    return toJava(node.precSibl().next());
   }
 
   @Override
-  public BXNode getParentNode() {
-    return finish(node.parent());
+  public final BXNode getParentNode() {
+    return toJava(node.parent());
   }
 
   /**
@@ -134,7 +134,7 @@ public abstract class BXNode implements Node {
    * @param n node instance
    * @return resulting node
    */
-  private BXNode finish(final ANode n) {
+  private BXNode toJava(final ANode n) {
     return n != null ? n.toJava() : null;
   }
 
@@ -178,7 +178,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode appendChild(final Node newChild) {
-    error();
+    readOnly();
     return null;
   }
 
@@ -194,7 +194,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode insertBefore(final Node newChild, final Node refChild) {
-    error();
+    readOnly();
     return null;
   }
 
@@ -205,7 +205,7 @@ public abstract class BXNode implements Node {
   }
 
   @Override
-  public final boolean isEqualNode(final Node arg) {
+  public final boolean isEqualNode(final Node cmp) {
     Util.notimplemented();
     return false;
   }
@@ -224,40 +224,40 @@ public abstract class BXNode implements Node {
 
   @Override
   public final void normalize() {
-    error();
+    readOnly();
   }
 
   @Override
   public final BXNode removeChild(final Node oldChild) {
-    error();
+    readOnly();
     return null;
   }
 
   @Override
   public final BXNode replaceChild(final Node newChild, final Node oldChild) {
-    error();
+    readOnly();
     return null;
   }
 
   @Override
   public final void setNodeValue(final String nodeValue) {
-    error();
+    readOnly();
   }
 
   @Override
   public final void setPrefix(final String prefix) {
-    error();
+    readOnly();
   }
 
   @Override
   public final void setTextContent(final String textContent) {
-    error();
+    readOnly();
   }
 
   @Override
   public final Object setUserData(final String key, final Object dat,
       final UserDataHandler handler) {
-    error();
+    readOnly();
     return null;
   }
 
@@ -304,7 +304,7 @@ public abstract class BXNode implements Node {
   /**
    * Throws a DOM modification exception.
    */
-  protected final void error() {
+  protected final void readOnly() {
     throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }

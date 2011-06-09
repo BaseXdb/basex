@@ -45,7 +45,7 @@ abstract class BXChar extends BXNode implements CharacterData {
   }
 
   @Override
-  public final void appendData(final String arg) {
+  public final void appendData(final String value) {
     Util.notimplemented();
   }
 
@@ -55,12 +55,13 @@ abstract class BXChar extends BXNode implements CharacterData {
   }
 
   @Override
-  public final void insertData(final int off, final String arg) {
+  public final void insertData(final int off, final String value) {
     Util.notimplemented();
   }
 
   @Override
-  public final void replaceData(final int off, final int c, final String arg) {
+  public final void replaceData(final int off, final int count,
+      final String value) {
     Util.notimplemented();
   }
 

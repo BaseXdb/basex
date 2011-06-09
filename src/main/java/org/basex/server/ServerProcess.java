@@ -273,8 +273,8 @@ public final class ServerProcess extends Thread {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder("[");
-    tb.add(socket.getInetAddress().getHostAddress()).add(':');
-    tb.add(socket.getPort());
+    tb.add(socket.getInetAddress().getHostAddress());
+    tb.add(':').addExt(socket.getPort()).add(']');
     if(context.data != null) tb.add(": ").add(context.data.meta.name);
     return tb.toString();
   }

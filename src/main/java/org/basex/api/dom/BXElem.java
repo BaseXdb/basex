@@ -30,7 +30,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public String getLocalName() {
-    return getNodeName();
+    return Token.string(Token.ln(node.nname()));
   }
 
   @Override
@@ -103,57 +103,57 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public void removeAttribute(final String name) {
-    error();
+    readOnly();
   }
 
   @Override
   public void removeAttributeNS(final String uri, final String ln) {
-    error();
+    readOnly();
   }
 
   @Override
   public BXAttr removeAttributeNode(final Attr oldAttr) {
-    error();
+    readOnly();
     return null;
   }
 
   @Override
   public void setAttribute(final String name, final String value) {
-    error();
+    readOnly();
   }
 
   @Override
   public void setAttributeNS(final String uri, final String qn,
       final String value) {
-    error();
+    readOnly();
   }
 
   @Override
   public BXAttr setAttributeNode(final Attr at) {
-    error();
+    readOnly();
     return null;
   }
 
   @Override
   public BXAttr setAttributeNodeNS(final Attr at) {
-    error();
+    readOnly();
     return null;
   }
 
   @Override
   public void setIdAttribute(final String name, final boolean isId) {
-    error();
+    readOnly();
   }
 
   @Override
   public void setIdAttributeNS(final String uri, final String ln,
       final boolean isId) {
-    error();
+    readOnly();
   }
 
   @Override
   public void setIdAttributeNode(final Attr at, final boolean isId) {
-    error();
+    readOnly();
   }
 
   /**
