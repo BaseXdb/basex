@@ -104,8 +104,8 @@ public final class BXJaxRx implements JaxRx {
       @Override
       String code() {
         // get root directory for files
-        final String root = System.getProperty(JaxRxServer.JAXRXPATH) + "/";
-        final IO io = IO.get(root + file);
+        final String root = System.getProperty(JaxRxServer.JAXRXPATH) + '/';
+        final IO io = IO.get(root + file.trim());
 
         // file not found...
         if(!io.exists()) {
