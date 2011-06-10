@@ -33,7 +33,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.FNSimple;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
@@ -651,13 +651,13 @@ public abstract class W3CTS {
       } else {
         // assign document
         final String dbname = IO.get(src).dbname();
-        FunDef def = FunDef.DOC;
+        Function def = Function.DOC;
         // updates: drop updated document or open updated database
         if(updating()) {
           if(first) {
             new DropDB(dbname).execute(context);
           } else {
-            def = FunDef.OPEN;
+            def = Function.OPEN;
             src = dbname;
           }
         }
