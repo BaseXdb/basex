@@ -191,8 +191,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final boolean duplicates() {
-    return false;
+  public final boolean iterable() {
+    return true;
   }
 
   /**

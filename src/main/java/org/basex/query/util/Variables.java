@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
+import org.basex.query.QueryParser;
 import org.basex.query.item.QNm;
 
 /**
@@ -73,8 +74,8 @@ public final class Variables extends ExprInfo {
   }
 
   /**
-   * Checks if all functions have been correctly declared, and initializes
-   * all function calls.
+   * Checks if all global variables have been correctly declared.
+   * Called by the {@link QueryParser}.
    * @throws QueryException query exception
    */
   public void check() throws QueryException {

@@ -31,7 +31,7 @@ import org.basex.util.Reflect;
 import org.basex.util.TokenBuilder;
 
 /**
- * Container for global function declarations.
+ * Container for global, user-defined function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -124,9 +124,9 @@ public final class Functions extends ExprInfo {
 
     // add function call for function that has not been defined yet
     if(Types.find(name, false) == null) {
-      return new TypedFunc(add(qp.input(), name, add(new Func(qp.input(), name,
-          new Var[args.length], null, false), qp), args),
-          FunType.arity(args.length));
+      return new TypedFunc(add(qp.input(), name, add(
+          new Func(qp.input(), name, new Var[args.length], null, false),
+          qp), args), FunType.arity(args.length));
     }
     return null;
   }

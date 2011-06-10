@@ -19,8 +19,8 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 abstract class Set extends Arr {
-  /** Duplicate flag; {@code true} if arguments contain duplicates. */
-  protected boolean dupl;
+  /** Iterable flag. */
+  protected boolean iterable = true;
 
   /**
    * Constructor.
@@ -35,7 +35,7 @@ abstract class Set extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     type = SeqType.NOD_ZM;
     super.comp(ctx);
-    for(final Expr e : expr) dupl |= e.duplicates();
+    for(final Expr e : expr) iterable &= e.iterable();
     return this;
   }
 
@@ -43,7 +43,7 @@ abstract class Set extends Arr {
   public final NodeIter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[expr.length];
     for(int e = 0; e != expr.length; ++e) iter[e] = ctx.iter(expr[e]);
-    return dupl ? eval(iter).sort() : iter(iter);
+    return iterable ? iter(iter) : eval(iter).sort();
   }
 
   /**
@@ -62,8 +62,8 @@ abstract class Set extends Arr {
   protected abstract NodeIter iter(final Iter[] iter);
 
   @Override
-  public boolean duplicates() {
-    return false;
+  public boolean iterable() {
+    return true;
   }
 
   /**

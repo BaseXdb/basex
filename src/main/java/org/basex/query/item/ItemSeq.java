@@ -66,8 +66,8 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public boolean duplicates() {
-    return true;
+  public boolean iterable() {
+    return false;
   }
 
   @Override

@@ -35,7 +35,6 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.Updates;
-import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.NSLocal;
 import org.basex.query.util.Var;
@@ -214,7 +213,7 @@ public final class QueryContext extends Progress {
       try {
         value = initExpr.value(this);
       } catch(final QueryException ex) {
-        if(ex.err() != Err.XPNOCTX) throw ex;
+        if(ex.err() != XPNOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
         CTXINIT.thrw(((ParseExpr) initExpr).input, ex.getMessage());
       }

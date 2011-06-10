@@ -107,7 +107,7 @@ public class AxisStep extends Preds {
     if(this instanceof IterPosStep) return this;
 
     // use iterator for simple positional predicate
-    return iterable() ? new IterPosStep(this) : this;
+    return useIterator() ? new IterPosStep(this) : this;
   }
 
   @Override

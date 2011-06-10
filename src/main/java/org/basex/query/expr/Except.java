@@ -40,7 +40,7 @@ public final class Except extends Set {
       }
     }
     // results must always be sorted
-    return expr.length == 1 && !dupl ? expr[0] : this;
+    return expr.length == 1 && iterable ? expr[0] : this;
   }
 
   @Override

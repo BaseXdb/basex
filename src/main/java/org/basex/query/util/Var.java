@@ -96,8 +96,7 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Checks if all functions have been correctly declared, and initializes
-   * all function calls.
+   * Checks if the variable has been correctly declared.
    * @throws QueryException query exception
    */
   public void check() throws QueryException {

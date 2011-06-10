@@ -105,8 +105,8 @@ public final class DBNodeSeq extends Seq {
   }
 
   @Override
-  public boolean duplicates() {
-    return false;
+  public boolean iterable() {
+    return true;
   }
 
   @Override

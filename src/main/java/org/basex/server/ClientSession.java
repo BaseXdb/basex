@@ -139,6 +139,7 @@ public final class ClientSession extends Session {
       send(name);
       send(input);
     } catch(final IOException ex) {
+      ex.printStackTrace();
       throw new BaseXException(ex);
     }
   }

@@ -12,7 +12,7 @@ import org.basex.query.item.Value;
 import org.basex.util.InputInfo;
 
 /**
- * This class assembles common error messages.
+ * This class contains all query error messages.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
