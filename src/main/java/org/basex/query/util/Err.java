@@ -160,6 +160,8 @@ public enum Err {
   CANNOTDELPKG(PACK, 8, "Package cannot be deleted. "),
   /** PACK0009: Evaluation exception. */
   PKGDEP(PACK, 9, "Package % depends on package %"),
+  /** PACK0010: Evaluation exception. */
+  PKGNOTSUPP(PACK, 10, "Package is not supported by current version of BaseX."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

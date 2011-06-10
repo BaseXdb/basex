@@ -174,6 +174,17 @@ public final class PackageAPITest extends AdvancedQueryTest {
   }
 
   /**
+   * Tests package with dependency on an older version of BaseX.
+   */
+  @Test
+  public void notSupported() {
+    error(desc("http://www.pkg5.com", "pkg5", "12.0",
+        "<dependency processor='basex' "
+            + "semver='5.0'/>"), Err.PKGNOTSUPP,
+        "Unsupported package not detected.");
+  }
+
+  /**
    * Tests package with component which is already installed as part of another
    * version of the same package.
    */

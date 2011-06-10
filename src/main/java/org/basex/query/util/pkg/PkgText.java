@@ -69,7 +69,7 @@ public interface PkgText {
   /** Invalid element. */
   String WHICHELEM = "Invalid element %";
   /** Secondary package missing. */
-  String MISSSECOND = "Name of secondary package missing";
+  String MISSSECOND = "Dependency not completely specified.";
   /** Component missing. */
   String MISSCOMP = "Component '%' not specified";
 }

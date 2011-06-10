@@ -6,9 +6,12 @@ import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.util.pkg.Package.Component;
@@ -19,7 +22,6 @@ import org.basex.util.TokenSet;
 /**
  * Package validator. This class executes some essential checks before the
  * installation of a package.
- *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -56,20 +58,27 @@ public final class PkgValidator {
   }
 
   /**
-   * Checks dependency elements and if packages involved in dependencies are
-   * already installed.
+   * Checks dependency elements, if packages involved in dependencies are
+   * already installed and if processor dependencies are fulfilled.
    * @param pkg package
    * @throws QueryException query exception
    */
   private void checkDepends(final Package pkg) throws QueryException {
+    final List<Dependency> procs = new ArrayList<Package.Dependency>();
     for(final Dependency dep : pkg.dep) {
       // First check of dependency elements are consistently defined in the
       // descriptor
-      if(dep.pkg == null) PKGDESCINV.thrw(input, MISSSECOND);
-      // If dependency element is defined consistently, check if it is already
-      // installed
-      if(getDepPkg(dep) == null) PKGNOTINSTALLED.thrw(input, dep.pkg);
+      if(dep.pkg == null && dep.processor == null) PKGDESCINV.thrw(input,
+          MISSSECOND);
+      // If dependency involves a package, check if this package or an
+      // appropriate version of it is installed
+      if(dep.pkg != null && getDepPkg(dep) == null) PKGNOTINSTALLED.thrw(input,
+          dep.pkg);
+      // If dependency involves a processor, add it to the list with processor
+      // dependencies
+      if(dep.processor != null) procs.add(dep);
     }
+    if(procs.size() != 0) checkProcs(procs);
   }
 
   /**
@@ -84,57 +93,91 @@ public final class PkgValidator {
     for(final byte[] nextPkg : context.repo.pkgDict().keys())
       if(nextPkg != null && startsWith(nextPkg, dep.pkg))
         instVers.add(getVersion(nextPkg));
+    // Check if an appropriate version is already installed
+    final byte[] version = getAvailVersion(dep, instVers);
+    return version == null ? null : dep.getName(version);
+  }
 
-    if(instVers.size() == 0) return null;
+  /**
+   * Checks if current version of BaseX is among the processor dependencies.
+   * @param procs processor dependencies
+   * @throws QueryException query exception
+   */
+  private void checkProcs(final List<Dependency> procs) throws QueryException {
+    boolean isSupported = false;
+    for(final Dependency d : procs) {
+      if(!eq(lc(d.processor), lc(token(Text.NAME)))) {
+        isSupported = false;
+        break;
+      }
+      // extract basex version
+      final int idx = Text.VERSION.indexOf(" ");
+      final String v = idx == -1 ? Text.VERSION
+          : Text.VERSION.substring(0, idx);
+      final TokenSet currentVers = new TokenSet();
+      currentVers.add(token(v));
+      // Check if current version of basex is acceptable for the dependency
+      isSupported = (getAvailVersion(d, currentVers) == null) ? false : true;
+    }
+    if(!isSupported) PKGNOTSUPP.thrw(input);
+  }
+
+  /**
+   * Checks compatibility of dependency version with installed version.
+   * @param dep dependency
+   * @param currentVers current versions - either currently installed versions
+   *          for a package or current version of BaseX
+   * @return available appropriate version
+   */
+  private byte[] getAvailVersion(final Dependency dep,
+      final TokenSet currentVers) {
+    if(currentVers.size() == 0) return null;
     if(dep.versions != null) {
-      // Get acceptable versions for secondary package
+      // Get acceptable versions for secondary package/processor
       final TokenSet versList = new TokenSet();
       for(final byte[] v : split(dep.versions, ' '))
         versList.add(v);
       // Check if any acceptable version is already installed
       for(final byte[] v : versList)
-        if(instVers.id(v) != 0) return dep.getName(v);
+        if(currentVers.id(v) != 0) return v;
     } else if(dep.semver != null) {
-      // Version template - if secondary package is installed, its version must
+      // Version template - version of secondary package or BaseX version must
       // be compatible with the defined template
       final PkgVersion semVer = new PkgVersion(dep.semver);
-      for(final byte[] v : instVers)
-        if(new PkgVersion(v).isCompatible(semVer)) return dep.getName(v);
+      for(final byte[] v : currentVers)
+        if(new PkgVersion(v).isCompatible(semVer)) return v;
     } else if(dep.semverMin != null && dep.semverMax != null) {
-      // Version templates for minimal and maximal acceptable version - if
-      // secondary package is installed, its version must be equal or above the
-      // minimal and strictly below the maximal
+      // Version templates for minimal and maximal acceptable version - version
+      // of secondary package or BaseX version must be equal or above
+      // the minimal and strictly below the maximal
       final PkgVersion min = new PkgVersion(dep.semverMin);
       final PkgVersion max = new PkgVersion(dep.semverMax);
-      for(final byte[] nextVer : instVers) {
+      for(final byte[] nextVer : currentVers) {
         final PkgVersion v = new PkgVersion(nextVer);
-        if(v.compareTo(min) >= 0 && v.compareTo(max) < 0)
-          return dep.getName(nextVer);
+        if(v.compareTo(min) >= 0 && v.compareTo(max) < 0) return nextVer;
       }
     } else if(dep.semverMin != null) {
-      // Version template for minimal acceptable version - if secondary package
-      // is installed, its version must be either compatible with this template
+      // Version template for minimal acceptable version - version of secondary
+      // package or BaseX version must be either compatible with this template
       // or greater than it
       final PkgVersion semVer = new PkgVersion(dep.semverMin);
-      for(final byte[] nextVer : instVers) {
+      for(final byte[] nextVer : currentVers) {
         final PkgVersion v = new PkgVersion(nextVer);
-        if(v.isCompatible(semVer) || v.compareTo(semVer) >= 0)
-          return dep.getName(nextVer);
+        if(v.isCompatible(semVer) || v.compareTo(semVer) >= 0) return nextVer;
       }
     } else if(dep.semverMax != null) {
-      // Version template for maximal acceptable version - if secondary package
-      // is installed, its version must be either compatible with this template
+      // Version template for maximal acceptable version - version of secondary
+      // package or BaseX version must be either compatible with this template
       // or smaller than it
       final PkgVersion semVer = new PkgVersion(dep.semverMax);
-      for(final byte[] nextVer : instVers) {
+      for(final byte[] nextVer : currentVers) {
         final PkgVersion v = new PkgVersion(nextVer);
-        if(v.isCompatible(semVer) || v.compareTo(semVer) <= 0)
-          return dep.getName(nextVer);
+        if(v.isCompatible(semVer) || v.compareTo(semVer) <= 0) return nextVer;
       }
     } else {
       // No versioning attribute is specified => any version of the secondary
       // package is acceptable
-      return dep.getName(instVers.keys()[0]);
+      return currentVers.keys()[0];
     }
     return null;
   }
@@ -182,68 +225,6 @@ public final class PkgValidator {
       }
     }
     return false;
-  }
-
-  /**
-   * Checks if secondary package, i.e. package involved in a dependency is
-   * already installed and if yes - returns its unique name.
-   * @param dep dependency
-   * @return result
-   */
-  public byte[] getDepPkgOrig(final Dependency dep) {
-    // Get installed versions of secondary package
-    final TokenSet instVers = getInstalledVersions(dep.pkg);
-    if(instVers.size() == 0) return null;
-    if(dep.versions != null) {
-      // Get acceptable versions for secondary package
-      final TokenSet accept = getAcceptVersions(dep.versions);
-      // Check if any acceptable version is already installed
-      for(final byte[] nextVer : accept)
-        if(instVers.id(nextVer) != 0) return dep.getName(nextVer);
-    } else if(dep.semver != null) {
-      // Version template - if secondary package is installed, its version must
-      // be compatible with the defined template
-      final PkgVersion semVer = new PkgVersion(dep.semver);
-      for(final byte[] v : instVers)
-        if(new PkgVersion(v).isCompatible(semVer)) return dep.getName(v);
-    } else if(dep.semverMin != null && dep.semverMax == null) {
-      // Version template for minimal acceptable version - if secondary package
-      // is installed, its version must be either compatible with this template
-      // or greater than it
-      final PkgVersion semVer = new PkgVersion(dep.semverMin);
-      for(final byte[] nextVer : instVers) {
-        final PkgVersion v = new PkgVersion(nextVer);
-        if(v.isCompatible(semVer) || v.compareTo(semVer) >= 0)
-          return dep.getName(nextVer);
-      }
-    } else if(dep.semverMin == null && dep.semverMax != null) {
-      // Version template for maximal acceptable version - if secondary package
-      // is installed, its version must be either compatible with this template
-      // or smaller than it
-      final PkgVersion semVer = new PkgVersion(dep.semverMax);
-      for(final byte[] nextVer : instVers) {
-        final PkgVersion v = new PkgVersion(nextVer);
-        if(v.isCompatible(semVer) || v.compareTo(semVer) <= 0)
-          return dep.getName(nextVer);
-      }
-    } else if(dep.semverMin != null && dep.semverMax != null) {
-      // Version templates for minimal and maximal acceptable version - if
-      // secondary package is installed, its version must be equal or above the
-      // minimal and strictly below the maximal
-      final PkgVersion min = new PkgVersion(dep.semverMin);
-      final PkgVersion max = new PkgVersion(dep.semverMax);
-      for(final byte[] nextVer : instVers) {
-        final PkgVersion v = new PkgVersion(nextVer);
-        if(v.compareTo(min) >= 0 && v.compareTo(max) < 0)
-          return dep.getName(nextVer);
-      }
-    } else if(dep.versions == null && dep.semver == null
-        && dep.semverMin == null && dep.semverMax == null) {
-      // No versioning attribute is specified => any version of the secondary
-      // package is acceptable
-      return dep.getName(instVers.keys()[0]);
-    }
-    return null;
   }
 
   /**
