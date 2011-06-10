@@ -5,7 +5,7 @@ import static org.basex.query.item.SeqType.*;
 
 import java.util.HashMap;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.FunType;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.InputInfo;
@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public enum FunDef {
+public enum Function {
 
   /* FNAcc functions. */
 
@@ -144,27 +144,27 @@ public enum FunDef {
 
   /** XQuery function. */
   FILTER(FNFunc.class, "filter(function,seq)", ITEM_ZM,
-      FunType.get(new SeqType[] { ITEM }, BLN).seq(), ITEM_ZM),
+      FuncType.get(new SeqType[] { ITEM }, BLN).seq(), ITEM_ZM),
   /** XQuery function. */
   FUNCNAME(FNFunc.class, "function-name(function)", QNM_ZO,
-      FunType.ANY_FUN.seq()),
+      FuncType.ANY_FUN.seq()),
   /** XQuery function. */
   FUNCARITY(FNFunc.class, "function-arity(function)", ITR,
-      FunType.ANY_FUN.seq()),
+      FuncType.ANY_FUN.seq()),
   /** XQuery function. */
   MAP(FNFunc.class, "map(function,seq)", ITEM_ZM,
-      FunType.get(new SeqType[] { ITEM }, ITEM_ZM).seq(), ITEM_ZM),
+      FuncType.get(new SeqType[] { ITEM }, ITEM_ZM).seq(), ITEM_ZM),
   /** XQuery function. */
   MAPPAIRS(FNFunc.class, "map-pairs(function,seq1,seq2)", ITEM_ZM,
-      FunType.get(new SeqType[] { ITEM, ITEM }, ITEM_ZM).seq(),
+      FuncType.get(new SeqType[] { ITEM, ITEM }, ITEM_ZM).seq(),
       ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   FOLDLEFT(FNFunc.class, "fold-left(function,zero,seq)", ITEM_ZM,
-      FunType.get(new SeqType[] { ITEM_ZM, ITEM }, ITEM_ZM).seq(),
+      FuncType.get(new SeqType[] { ITEM_ZM, ITEM }, ITEM_ZM).seq(),
       ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   FOLDRIGHT(FNFunc.class, "fold-right(function,zero,seq)", ITEM_ZM,
-      FunType.get(new SeqType[] { ITEM, ITEM_ZM }, ITEM_ZM).seq(),
+      FuncType.get(new SeqType[] { ITEM, ITEM_ZM }, ITEM_ZM).seq(),
       ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   PARTAPP(FNFunc.class, "partial-apply(function,arg[,pos])", FUN_O, 2,
@@ -546,20 +546,20 @@ public enum FunDef {
 
   /** XQuery function. */
   SORTWITH(FNHof.class, "sort-with(lt-fun,seq)", ITEM_ZM,
-      FunType.get(new SeqType[] { ITEM, ITEM }, BLN).seq(), ITEM_ZM),
+      FuncType.get(new SeqType[] { ITEM, ITEM }, BLN).seq(), ITEM_ZM),
   /** XQuery function. */
   HOFID(FNHof.class, "id(expr)", ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   CONST(FNHof.class, "const(return,ignore)", ITEM_ZM, ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   UNTIL(FNHof.class, "until(pred,func,start)", ITEM_ZM,
-      FunType.get(new SeqType[] { ITEM_ZM }, BLN).seq(),
-      FunType.get(new SeqType[] { ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM),
+      FuncType.get(new SeqType[] { ITEM_ZM }, BLN).seq(),
+      FuncType.get(new SeqType[] { ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM),
   /** XQuery function. */
   FOLDLEFT1(FNHof.class, "fold-left1(function,non-empty-seq)", ITEM_ZM,
-      FunType.get(new SeqType[] { ITEM_ZM, ITEM }, ITEM_ZM).seq(), ITEM_OM),
+      FuncType.get(new SeqType[] { ITEM_ZM, ITEM }, ITEM_ZM).seq(), ITEM_OM),
   /** XQuery Function. */
-  ITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM, FunType.arity(1).seq(),
+  ITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM, FuncType.arity(1).seq(),
       ITEM_ZM),
 
   /* FNHttp functions (EXPath). */
@@ -622,8 +622,8 @@ public enum FunDef {
    * Mapping between function classes and namespace URIs.
    * If no mapping exists, {@link #FNURI} will be assumed as default mapping.
    */
-  private static final HashMap<Class<? extends Fun>, byte[]> URIS =
-    new HashMap<Class<? extends Fun>, byte[]>();
+  private static final HashMap<Class<? extends FuncCall>, byte[]> URIS =
+    new HashMap<Class<? extends FuncCall>, byte[]>();
 
   // initialization of class/uri mappings
   static {
@@ -640,7 +640,7 @@ public enum FunDef {
   }
 
   /** Function classes. */
-  final Class<? extends Fun> func;
+  final Class<? extends FuncCall> func;
   /** Descriptions. */
   final String desc;
   /** Minimum number of arguments. */
@@ -659,8 +659,8 @@ public enum FunDef {
    * @param r return type
    * @param typ arguments types
    */
-  private FunDef(final Class<? extends Fun> fun, final String dsc,
-      final SeqType r, final SeqType... typ) {
+  private Function(final Class<? extends FuncCall> fun,
+      final String dsc, final SeqType r, final SeqType... typ) {
     this(fun, dsc, r, typ.length, typ);
   }
 
@@ -673,8 +673,8 @@ public enum FunDef {
    * the function can have a variable number of maximum arguments
    * @param typ arguments types
    */
-  private FunDef(final Class<? extends Fun> fun, final String dsc,
-      final SeqType r, final int m, final SeqType... typ) {
+  private Function(final Class<? extends FuncCall> fun,
+      final String dsc, final SeqType r, final int m, final SeqType... typ) {
 
     func = fun;
     desc = dsc;
@@ -690,9 +690,9 @@ public enum FunDef {
    * @param arg arguments
    * @return function
    */
-  public Fun get(final InputInfo ii, final Expr... arg) {
-    return (Fun) Reflect.get(Reflect.find(
-        func, InputInfo.class, FunDef.class, Expr[].class), ii, this, arg);
+  public FuncCall get(final InputInfo ii, final Expr... arg) {
+    return (FuncCall) Reflect.get(Reflect.find(
+        func, InputInfo.class, Function.class, Expr[].class), ii, this, arg);
   }
 
   /**
@@ -709,7 +709,7 @@ public enum FunDef {
    * @param arity number of arguments
    * @return function type
    */
-  public FunType type(final int arity) {
+  public FuncType type(final int arity) {
     final SeqType[] arg = new SeqType[arity];
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);
@@ -718,7 +718,7 @@ public enum FunDef {
     } else {
       System.arraycopy(args, 0, arg, 0, arity);
     }
-    return FunType.get(arg, ret);
+    return FuncType.get(arg, ret);
   }
 
   @Override

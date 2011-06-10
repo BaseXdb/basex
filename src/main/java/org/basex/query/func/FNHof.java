@@ -8,7 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.FItem;
-import org.basex.query.item.FunType;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
@@ -22,14 +22,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class FNHof extends Fun {
+public final class FNHof extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNHof(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNHof(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -162,14 +162,14 @@ public final class FNHof extends Fun {
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
     if(!f.func() || ((FItem) f).arity() != a)
-      Err.type(this, FunType.arity(a), f);
+      Err.type(this, FuncType.arity(a), f);
 
     return (FItem) f;
   }
 
   @Override
   public boolean uses(final Use u) {
-    return def == FunDef.PARTAPP && u == Use.CTX || u == Use.X30 ||
+    return def == Function.PARTAPP && u == Use.CTX || u == Use.X30 ||
         super.uses(u);
   }
 }

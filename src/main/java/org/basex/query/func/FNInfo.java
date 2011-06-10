@@ -24,14 +24,14 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNInfo extends Fun {
+public final class FNInfo extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNInfo(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNInfo(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -101,19 +101,19 @@ public final class FNInfo extends Fun {
 
   @Override
   public Expr cmp(final QueryContext ctx) {
-    if(def == FunDef.TRACE) type = expr[0].type();
+    if(def == Function.TRACE) type = expr[0].type();
     return this;
   }
 
   @Override
   public boolean vacuous() {
-    return def == FunDef.ERROR;
+    return def == Function.ERROR;
   }
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (def == FunDef.ENV || def == FunDef.ENVS) ||
-      u == Use.CTX && (def == FunDef.ERROR || def == FunDef.TRACE) ||
+    return u == Use.X30 && (def == Function.ENV || def == Function.ENVS) ||
+      u == Use.CTX && (def == Function.ERROR || def == Function.TRACE) ||
       super.uses(u);
   }
 }

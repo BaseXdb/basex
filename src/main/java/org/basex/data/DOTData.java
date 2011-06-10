@@ -75,8 +75,8 @@ final class DOTData {
     { "FF6666", org.basex.query.expr.Try.class },
     { "FF6666", org.basex.query.expr.Catch.class },
     // orange
-    { "AA9988", org.basex.query.expr.Func.class },
-    { "776655", org.basex.query.util.Functions.class },
+    { "AA9988", org.basex.query.expr.UserFunc.class },
+    { "776655", org.basex.query.util.UserFuncs.class },
     { "CC6600", org.basex.query.path.Path.class },
     { "FF9900", org.basex.query.expr.Preds.class },
     // green
@@ -90,8 +90,8 @@ final class DOTData {
     { "66CC66", org.basex.query.util.Var.class },
     { "66CC66", org.basex.query.expr.Cast.class },
     // cyan
-    { "009999", org.basex.query.expr.FuncCall.class },
-    { "00BBBB", org.basex.query.func.Fun.class },
+    { "009999", org.basex.query.expr.UserFuncCall.class },
+    { "00BBBB", org.basex.query.func.FuncCall.class },
     { "00BBBB", org.basex.query.expr.Root.class },
     { "00BBBB", org.basex.query.expr.VarRef.class },
     { "00BBBB", org.basex.query.expr.IndexAccess.class },
@@ -107,8 +107,8 @@ final class DOTData {
     { "Comparison", org.basex.query.expr.CmpV.class },
     { "Comparison", org.basex.query.expr.CmpR.class },
     { "FLWOR", org.basex.query.expr.FLWR.class },
-    { "Declaration", org.basex.query.expr.Func.class },
-    { "Function", org.basex.query.func.Fun.class },
+    { "Declaration", org.basex.query.expr.UserFunc.class },
+    { "Function", org.basex.query.func.FuncCall.class },
     { null, org.basex.query.path.Path.class },
     { "Step", org.basex.query.path.AxisStep.class },
     { "Variables", org.basex.query.util.VarList.class },

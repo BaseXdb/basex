@@ -14,14 +14,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNMath extends Fun {
+public final class FNMath extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNMath(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNMath(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -64,6 +64,7 @@ public final class FNMath extends Fun {
   @Override
   public boolean uses(final Use u) {
     // random() is non-deterministic; don't pre-evaluate
-    return u == Use.X30 || u == Use.CTX && def == FunDef.RAND || super.uses(u);
+    return u == Use.X30 || u == Use.CTX && def == Function.RAND ||
+      super.uses(u);
   }
 }

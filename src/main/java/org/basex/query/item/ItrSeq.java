@@ -99,11 +99,9 @@ public final class ItrSeq extends Seq {
    * @param t type
    * @return value
    */
-  public static Value get(final int[] val, final Type t) {
-    if(val.length < 2) return val.length == 0 ? Empty.SEQ : Itr.get(val[0], t);
-    final long[] nv = new long[val.length];
-    for(int i = 0; i < nv.length; i++) nv[i] = val[i];
-    return new ItrSeq(nv, t);
+  public static Value get(final long[] val, final Type t) {
+    return val.length == 0 ? Empty.SEQ : val.length == 1 ? Itr.get(val[0], t) :
+      new ItrSeq(val, t);
   }
 
   /**

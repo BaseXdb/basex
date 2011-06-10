@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Func;
+import org.basex.query.expr.UserFunc;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import static org.basex.query.QueryTokens.*;
@@ -19,9 +19,9 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class FunType implements Type {
+public class FuncType implements Type {
   /** Any function type. */
-  public static final FunType ANY_FUN = new FunType(null, null);
+  public static final FuncType ANY_FUN = new FuncType(null, null);
 
   /** Argument types. */
   public final SeqType[] args;
@@ -36,7 +36,7 @@ public class FunType implements Type {
    * @param arg argument types
    * @param rt return type
    */
-  FunType(final SeqType[] arg, final SeqType rt) {
+  FuncType(final SeqType[] arg, final SeqType rt) {
     args = arg;
     ret = rt;
   }
@@ -103,8 +103,8 @@ public class FunType implements Type {
   @Override
   public boolean instance(final Type t) {
     // the only non-function super-type of function is item()
-    if(!(t instanceof FunType)) return t == AtomType.ITEM;
-    final FunType ft = (FunType) t;
+    if(!(t instanceof FuncType)) return t == AtomType.ITEM;
+    final FuncType ft = (FuncType) t;
 
     // takes care of FunType.ANY
     if(this == ft || ft == ANY_FUN) return true;
@@ -122,9 +122,9 @@ public class FunType implements Type {
    * @param ret return type
    * @return function type
    */
-  public static FunType get(final SeqType[] args, final SeqType ret) {
+  public static FuncType get(final SeqType[] args, final SeqType ret) {
     if(args == null || ret == null) return ANY_FUN;
-    return new FunType(args, ret);
+    return new FuncType(args, ret);
   }
 
   /**
@@ -132,7 +132,7 @@ public class FunType implements Type {
    * @param a number of arguments
    * @return function type
    */
-  public static FunType arity(final int a) {
+  public static FuncType arity(final int a) {
     final SeqType[] args = new SeqType[a];
     Arrays.fill(args, SeqType.ITEM_ZM);
     return get(args, SeqType.ITEM_ZM);
@@ -143,13 +143,13 @@ public class FunType implements Type {
    * @param f user-defined function
    * @return function type
    */
-  public static FunType get(final Func f) {
+  public static FuncType get(final UserFunc f) {
     final SeqType[] at = new SeqType[f.args.length];
     for(int a = 0; a < at.length; a++) {
       at[a] = f.args[a] == null || f.args[a].type == null ?
           SeqType.ITEM_ZM : f.args[a].type;
     }
-    return new FunType(at, f.ret == null ? SeqType.ITEM_ZM : f.ret);
+    return new FuncType(at, f.ret == null ? SeqType.ITEM_ZM : f.ret);
   }
 
   @Override

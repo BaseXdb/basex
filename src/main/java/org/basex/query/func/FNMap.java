@@ -18,14 +18,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class FNMap extends Fun {
+public final class FNMap extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNMap(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNMap(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 

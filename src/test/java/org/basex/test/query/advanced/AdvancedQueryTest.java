@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Err;
@@ -103,7 +103,7 @@ abstract class AdvancedQueryTest {
    * types are supported.
    * @return function name
    */
-  protected String check(final FunDef def) {
+  protected String check(final Function def) {
     final String desc = def.toString();
     final String name = desc.replaceAll("\\(.*", "");
 

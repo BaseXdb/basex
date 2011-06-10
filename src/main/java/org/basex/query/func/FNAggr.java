@@ -20,14 +20,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNAggr extends Fun {
+public final class FNAggr extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNAggr(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNAggr(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -58,12 +58,15 @@ public final class FNAggr extends Fun {
   }
 
   @Override
-  public Expr cmp(final QueryContext ctx) {
+  public Expr cmp(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
+    final long c = e.size();
     switch(def) {
       case CNT:
-        final long c = e.size();
-        return c >= 0 && !ctx.grouping ? Itr.get(c) : this;
+        return c >= 0 && !ctx.grouping && !e.uses(Use.CTX) ? Itr.get(c) : this;
+      case SUM:
+        return c == 0 && !e.uses(Use.CTX) ? expr.length == 2 ? expr[1] :
+          Itr.get(0) : this;
       default:
         return this;
     }

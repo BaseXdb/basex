@@ -18,7 +18,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class PartFunApp extends Func {
+public final class PartFunApp extends UserFunc {
 
   /**
    * Function constructor for static calls.

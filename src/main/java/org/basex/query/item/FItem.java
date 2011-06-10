@@ -17,7 +17,6 @@ import org.basex.util.Util;
  * @author Leo Woerteler
  */
 public abstract class FItem extends Item {
-
   /**
    * Constructor.
    * @param t type
@@ -83,7 +82,7 @@ public abstract class FItem extends Item {
    * @return coerced item
    * @throws QueryException query exception
    */
-  public abstract FItem coerceTo(final FunType ft, final QueryContext ctx,
+  public abstract FItem coerceTo(final FuncType ft, final QueryContext ctx,
       final InputInfo ii) throws QueryException;
 
   @Override

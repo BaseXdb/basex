@@ -9,7 +9,7 @@ import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ValuesToken;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -36,37 +36,49 @@ public final class CmpG extends Cmp {
     /** General comparison: less or equal. */
     LE("<=", CmpV.Op.LE) {
       @Override
-      public Op invert() { return Op.GE; }
+      public Op swap() { return Op.GE; }
+      @Override
+      public Op invert() { return Op.LT; }
     },
 
     /** General comparison: less. */
     LT("<", CmpV.Op.LT) {
       @Override
-      public Op invert() { return Op.GT; }
+      public Op swap() { return Op.GT; }
+      @Override
+      public Op invert() { return Op.GE; }
     },
 
     /** General comparison: greater of equal. */
     GE(">=", CmpV.Op.GE) {
       @Override
-      public Op invert() { return Op.LE; }
+      public Op swap() { return Op.LE; }
+      @Override
+      public Op invert() { return Op.LT; }
     },
 
     /** General comparison: greater. */
     GT(">", CmpV.Op.GT) {
       @Override
-      public Op invert() { return Op.LT; }
+      public Op swap() { return Op.LT; }
+      @Override
+      public Op invert() { return Op.LE; }
     },
 
     /** General comparison: equal. */
     EQ("=", CmpV.Op.EQ) {
       @Override
-      public Op invert() { return Op.EQ; }
+      public Op swap() { return Op.EQ; }
+      @Override
+      public Op invert() { return Op.NE; }
     },
 
     /** General comparison: not equal. */
     NE("!=", CmpV.Op.NE) {
       @Override
-      public Op invert() { return Op.NE; }
+      public Op swap() { return Op.NE; }
+      @Override
+      public Op invert() { return Op.EQ; }
     };
 
     /** String representation. */
@@ -85,6 +97,12 @@ public final class CmpG extends Cmp {
     }
 
     /**
+     * Swaps the comparator.
+     * @return swapped comparator
+     */
+    public abstract Op swap();
+
+    /**
      * Inverts the comparator.
      * @return inverted comparator
      */
@@ -95,7 +113,7 @@ public final class CmpG extends Cmp {
   }
 
   /** Comparator. */
-  Op op;
+  protected Op op;
   /** Index expression. */
   private IndexAccess[] iacc = {};
   /** Flag for atomic evaluation. */
@@ -119,7 +137,7 @@ public final class CmpG extends Cmp {
 
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
-      op = op.invert();
+      op = op.swap();
       ctx.compInfo(OPTSWAP, this);
     }
     for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].addText(ctx);
@@ -131,10 +149,10 @@ public final class CmpG extends Cmp {
       e = optPre(Bln.FALSE, ctx);
     } else if(values()) {
       e = preEval(ctx);
-    } else if(e1.isFun(FunDef.CNT)) {
+    } else if(e1.isFun(Function.CNT)) {
       e = count(op.op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-    } else if(e1.isFun(FunDef.POS)) {
+    } else if(e1.isFun(Function.POS)) {
       if(e2 instanceof Range && op.op == CmpV.Op.EQ) {
         // position() CMP range
         final long[] rng = ((Range) e2).range(ctx);
@@ -154,6 +172,13 @@ public final class CmpG extends Cmp {
     atomic = e1.type().zeroOrOne() && e2.type().zeroOrOne();
     type = SeqType.BLN;
     return e;
+  }
+
+  @Override
+  public Expr compEbv(final QueryContext ctx) {
+    // e.g.: exists(...) = true() -> exists(...)
+    return op == Op.EQ && expr[1] == Bln.TRUE &&
+      expr[0].type().eq(SeqType.BLN) ? expr[0] : this;
   }
 
   @Override
@@ -231,6 +256,12 @@ public final class CmpG extends Cmp {
         a.type == AtomType.QNM || b.type == AtomType.QNM))
       XPTYPECMP.thrw(input, a.type, b.type);
     return op.op.e(input, a, b);
+  }
+
+  @Override
+  public CmpG invert() {
+    return expr[0].size() != 1 || expr[1].size() != 1 ? this :
+      new CmpG(input, expr[0], expr[1], op.invert());
   }
 
   /**

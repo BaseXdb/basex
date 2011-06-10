@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.SeqType;
 import org.basex.util.Array;
@@ -50,6 +50,6 @@ public abstract class Logical extends Arr {
    */
   protected final Expr single() {
     return expr[0].type().eq(SeqType.BLN) ? expr[0] :
-      FunDef.BOOLEAN.get(input, expr[0]);
+      Function.BOOLEAN.get(input, expr[0]);
   }
 }

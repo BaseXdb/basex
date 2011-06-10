@@ -21,9 +21,9 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class Fun extends Arr {
+public abstract class FuncCall extends Arr {
   /** Function definition. */
-  public FunDef def;
+  public Function def;
 
   /**
    * Constructor.
@@ -31,7 +31,8 @@ public abstract class Fun extends Arr {
    * @param fd function definition
    * @param args arguments
    */
-  protected Fun(final InputInfo ii, final FunDef fd, final Expr... args) {
+  protected FuncCall(final InputInfo ii, final Function fd,
+      final Expr... args) {
     super(ii, args);
     def = fd;
     type = def.ret;
@@ -70,7 +71,7 @@ public abstract class Fun extends Arr {
   }
 
   @Override
-  public boolean isFun(final FunDef f) {
+  public boolean isFun(final Function f) {
     return def == f;
   }
 

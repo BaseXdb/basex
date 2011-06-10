@@ -27,14 +27,14 @@ import org.basex.util.XMLToken;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNQName extends Fun {
+public final class FNQName extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNQName(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNQName(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -160,6 +160,6 @@ public final class FNQName extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && def == FunDef.INSCOPE || super.uses(u);
+    return u == Use.CTX && def == Function.INSCOPE || super.uses(u);
   }
 }

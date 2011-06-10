@@ -87,7 +87,7 @@ public final class MixedPath extends Path {
     for(int ex = 0; ex < el; ex++) {
       final Expr e = step[ex];
       final boolean last = ex + 1 == el;
-      final ItemCache ii = new ItemCache();
+      final ItemCache ic = new ItemCache();
       ctx.size = res.size();
       ctx.pos = 1;
       // this flag indicates if the resulting items contain nodes
@@ -100,20 +100,20 @@ public final class MixedPath extends Path {
         final Iter ir = ctx.iter(e);
         for(Item i; (i = ir.next()) != null;) {
           // set node flag
-          if(ii.size() == 0) nodes = i.node();
+          if(ic.size() == 0) nodes = i.node();
           // check if both nodes and atomic values occur in last result
           else if(last && nodes != i.node()) EVALNODESVALS.thrw(input);
-          ii.add(i);
+          ic.add(i);
         }
         ctx.pos++;
       }
       if(nodes) {
         // remove potential duplicates from node sets
         final NodeCache nc = new NodeCache().random();
-        for(Item it; (it = ii.next()) != null;) nc.add((ANode) it);
+        for(Item it; (it = ic.next()) != null;) nc.add((ANode) it);
         res = nc.finish().cache();
       } else {
-        res = ii;
+        res = ic;
       }
     }
     return res;

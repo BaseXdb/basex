@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -32,7 +32,9 @@ public final class CmpV extends Cmp {
         return v != Item.UNDEF && v <= 0;
       }
       @Override
-      public Op invert() { return GE; }
+      public Op swap() { return GE; }
+      @Override
+      public Op invert() { return GT; }
     },
 
     /** Item comparison:less. */
@@ -44,7 +46,9 @@ public final class CmpV extends Cmp {
         return v != Item.UNDEF && v < 0;
       }
       @Override
-      public Op invert() { return GT; }
+      public Op swap() { return GT; }
+      @Override
+      public Op invert() { return GE; }
     },
 
     /** Item comparison:greater of equal. */
@@ -56,7 +60,9 @@ public final class CmpV extends Cmp {
         return v != Item.UNDEF && v >= 0;
       }
       @Override
-      public Op invert() { return LE; }
+      public Op swap() { return LE; }
+      @Override
+      public Op invert() { return LT; }
     },
 
     /** Item comparison:greater. */
@@ -68,7 +74,9 @@ public final class CmpV extends Cmp {
         return v != Item.UNDEF && v > 0;
       }
       @Override
-      public Op invert() { return LT; }
+      public Op swap() { return LT; }
+      @Override
+      public Op invert() { return LE; }
     },
 
     /** Item comparison:equal. */
@@ -79,7 +87,9 @@ public final class CmpV extends Cmp {
         return a.eq(ii, b);
       }
       @Override
-      public Op invert() { return EQ; }
+      public Op swap() { return EQ; }
+      @Override
+      public Op invert() { return NE; }
     },
 
     /** Item comparison:not equal. */
@@ -90,7 +100,9 @@ public final class CmpV extends Cmp {
         return !a.eq(ii, b);
       }
       @Override
-      public Op invert() { return NE; }
+      public Op swap() { return NE; }
+      @Override
+      public Op invert() { return EQ; }
     };
 
     /** String representation. */
@@ -114,6 +126,12 @@ public final class CmpV extends Cmp {
         throws QueryException;
 
     /**
+     * Swaps the comparator.
+     * @return swapped comparator
+     */
+    public abstract Op swap();
+
+    /**
      * Inverts the comparator.
      * @return inverted comparator
      */
@@ -124,7 +142,7 @@ public final class CmpV extends Cmp {
   }
 
   /** Comparator. */
-  Op op;
+  private Op op;
 
   /**
    * Constructor.
@@ -144,7 +162,7 @@ public final class CmpV extends Cmp {
 
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
-      op = op.invert();
+      op = op.swap();
       ctx.compInfo(OPTSWAP, this);
     }
     for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].addText(ctx);
@@ -156,16 +174,23 @@ public final class CmpV extends Cmp {
       e = optPre(null, ctx);
     } else if(values()) {
       e = preEval(ctx);
-    } else if(e1.isFun(FunDef.CNT)) {
+    } else if(e1.isFun(Function.CNT)) {
       e = count(op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-    } else if(e1.isFun(FunDef.POS)) {
+    } else if(e1.isFun(Function.POS)) {
       // position() CMP number
       e = Pos.get(op, e2, e, input);
       if(e != this) ctx.compInfo(OPTWRITE, this);
     }
-    type = SeqType.BLN;
+    type = SeqType.BLN_ZO;
     return e;
+  }
+
+  @Override
+  public Expr compEbv(final QueryContext ctx) {
+    // e.g.: exists(...) eq true() -> exists(...)
+    return op == Op.EQ && expr[1] == Bln.TRUE &&
+      expr[0].type().eq(SeqType.BLN) ? expr[0] : this;
   }
 
   @Override
@@ -179,6 +204,12 @@ public final class CmpV extends Cmp {
 
     if(!a.comparable(b)) XPTYPECMP.thrw(input, a.type, b.type);
     return Bln.get(op.e(input, a, b));
+  }
+
+  @Override
+  public CmpV invert() {
+    return expr[0].size() != 1 || expr[1].size() != 1 ? this :
+      new CmpV(input, expr[0], expr[1], op.invert());
   }
 
   @Override

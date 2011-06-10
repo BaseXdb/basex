@@ -28,14 +28,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNSeq extends Fun {
+public final class FNSeq extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNSeq(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNSeq(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -138,17 +138,17 @@ public final class FNSeq extends Fun {
   public Expr cmp(final QueryContext ctx) {
     // static typing:
     // index-of will create integers, insert-before might add new types
-    if(def == FunDef.INDEXOF || def == FunDef.INSBEF) return this;
+    if(def == Function.INDEXOF || def == Function.INSBEF) return this;
 
     // all other types will return existing types
     final Type t = expr[0].type().type;
     SeqType.Occ o = SeqType.Occ.ZM;
 
     // head will return at most one item
-    if(def == FunDef.HEAD) o = SeqType.Occ.ZO;
+    if(def == Function.HEAD) o = SeqType.Occ.ZO;
 
     // at most one returned item
-    if(def == FunDef.SUBSEQ && expr[0].type().one()) o = SeqType.Occ.ZO;
+    if(def == Function.SUBSEQ && expr[0].type().one()) o = SeqType.Occ.ZO;
 
     type = SeqType.get(t, o);
     return this;
@@ -387,7 +387,7 @@ public final class FNSeq extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (def == FunDef.HEAD || def == FunDef.TAIL) ||
+    return u == Use.X30 && (def == Function.HEAD || def == Function.TAIL) ||
       super.uses(u);
   }
 }

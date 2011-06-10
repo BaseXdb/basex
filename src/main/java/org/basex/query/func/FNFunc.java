@@ -3,14 +3,14 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.DynFunCall;
+import org.basex.query.expr.DynFuncCall;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.PartFunApp;
 import org.basex.query.expr.VarRef;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Empty;
 import org.basex.query.item.FItem;
-import org.basex.query.item.FunType;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Value;
@@ -25,14 +25,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class FNFunc extends Fun {
+public final class FNFunc extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNFunc(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNFunc(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -52,8 +52,8 @@ public final class FNFunc extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case FUNCARITY: return Itr.get(getFun(0, FunType.ANY_FUN, ctx).arity());
-      case FUNCNAME:  return getFun(0, FunType.ANY_FUN, ctx).fName();
+      case FUNCARITY: return Itr.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
+      case FUNCNAME:  return getFun(0, FuncType.ANY_FUN, ctx).fName();
       case PARTAPP:   return partApp(ctx, ii);
       default:        return super.item(ctx, ii);
     }
@@ -68,13 +68,13 @@ public final class FNFunc extends Fun {
    */
   private Item partApp(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final FItem f = getFun(0, FunType.ANY_FUN, ctx);
+    final FItem f = getFun(0, FuncType.ANY_FUN, ctx);
     final long pos = expr.length == 2 ? 0 : checkItr(expr[2], ctx) - 1;
 
     final int arity = f.arity();
     if(pos < 0 || pos >= arity) INVPOS.thrw(ii, f.name(), pos + 1);
 
-    final FunType ft = (FunType) f.type;
+    final FuncType ft = (FuncType) f.type;
     final Var[] vars = new Var[arity - 1];
     final Expr[] vals = new Expr[arity];
     vals[(int) pos] = expr[1];
@@ -84,7 +84,7 @@ public final class FNFunc extends Fun {
       vals[j] = new VarRef(ii, vars[i]);
     }
 
-    return new PartFunApp(ii, new DynFunCall(ii, f, vals),
+    return new PartFunApp(ii, new DynFuncCall(ii, f, vals),
         vars).comp(ctx).item(ctx, ii);
   }
 
@@ -196,7 +196,7 @@ public final class FNFunc extends Fun {
     final FItem f = withArity(0, 2, ctx);
     final Value xs = expr[2].value(ctx);
     // evaluate start value lazily if it's passed straight through
-    if(xs.size() == 0) return expr[1].iter(ctx);
+    if(xs.empty()) return expr[1].iter(ctx);
 
     Value res = expr[1].value(ctx);
     for(long i = xs.size(); --i >= 0;)
@@ -213,7 +213,7 @@ public final class FNFunc extends Fun {
    * @return function item
    * @throws QueryException query exception
    */
-  private FItem getFun(final int p, final FunType t, final QueryContext ctx)
+  private FItem getFun(final int p, final FuncType t, final QueryContext ctx)
       throws QueryException {
     return (FItem) checkType(checkItem(expr[p], ctx), t);
   }
@@ -230,14 +230,14 @@ public final class FNFunc extends Fun {
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
     if(!f.func() || ((FItem) f).arity() != a)
-      Err.type(this, FunType.arity(a), f);
+      Err.type(this, FuncType.arity(a), f);
 
     return (FItem) f;
   }
 
   @Override
   public boolean uses(final Use u) {
-    return def == FunDef.PARTAPP && u == Use.CTX || u == Use.X30 ||
+    return def == Function.PARTAPP && u == Use.CTX || u == Use.X30 ||
         super.uses(u);
   }
 }

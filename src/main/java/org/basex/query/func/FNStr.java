@@ -26,14 +26,14 @@ import org.basex.util.XMLToken;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNStr extends Fun {
+public final class FNStr extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNStr(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNStr(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -223,9 +223,9 @@ public final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Item trans(final QueryContext ctx) throws QueryException {
-    final int[] tok =  cps(checkEStr(expr[0], ctx));
-    final int[] srch = cps(checkStr(expr[1], ctx));
-    final int[] rep =  cps(checkStr(expr[2], ctx));
+    final long[] tok =  cps(checkEStr(expr[0], ctx));
+    final long[] srch = cps(checkStr(expr[1], ctx));
+    final long[] rep =  cps(checkStr(expr[2], ctx));
 
     final TokenBuilder tmp = new TokenBuilder(tok.length);
     for(int i = 0; i < tok.length; ++i) {
@@ -233,9 +233,9 @@ public final class FNStr extends Fun {
       while(++j < srch.length && tok[i] != srch[j]);
       if(j < srch.length) {
         if(j >= rep.length) continue;
-        tmp.add(rep[j]);
+        tmp.add((int) rep[j]);
       } else {
-        tmp.add(tok[i]);
+        tmp.add((int) tok[i]);
       }
     }
     return Str.get(tmp.finish());
@@ -302,7 +302,7 @@ public final class FNStr extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == FunDef.STRJOIN && expr.length == 1 ||
+    return u == Use.X30 && def == Function.STRJOIN && expr.length == 1 ||
       super.uses(u);
   }
 }

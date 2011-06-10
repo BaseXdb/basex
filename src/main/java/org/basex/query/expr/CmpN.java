@@ -84,7 +84,7 @@ public final class CmpN extends Arr {
   public CmpN(final InputInfo ii, final Expr e1, final Expr e2, final Op o) {
     super(ii, e1, e2);
     op = o;
-    type = SeqType.BLN;
+    type = SeqType.BLN_ZO;
   }
 
   @Override

@@ -20,7 +20,7 @@ import org.basex.util.ft.FTOpt;
  * @author BaseX Team 2005-11, BSD License
  * @author Oliver Egli
  */
-public final class FNSent extends Fun {
+public final class FNSent extends FuncCall {
   /** Word lists. */
   private static final HashMap<String, SentList> LISTS =
     new HashMap<String, SentList>();
@@ -31,7 +31,7 @@ public final class FNSent extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  public FNSent(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNSent(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 

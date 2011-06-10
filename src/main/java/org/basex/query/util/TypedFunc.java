@@ -2,8 +2,8 @@ package org.basex.query.util;
 
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
-import org.basex.query.func.FunJava;
-import org.basex.query.item.FunType;
+import org.basex.query.func.JavaFunc;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.SeqType;
 
 /**
@@ -16,7 +16,7 @@ public final class TypedFunc {
   /** Function expression. */
   public final Expr fun;
   /** Function type. */
-  public final FunType type;
+  public final FuncType type;
 
   /**
    * Constructor.
@@ -25,7 +25,7 @@ public final class TypedFunc {
    * @param args argument types
    */
   public TypedFunc(final Expr f, final SeqType ret, final SeqType... args) {
-    this(f, FunType.get(args, ret));
+    this(f, FuncType.get(args, ret));
   }
 
   /**
@@ -33,7 +33,7 @@ public final class TypedFunc {
    * @param f function expression
    * @param ft function type
    */
-  public TypedFunc(final Expr f, final FunType ft) {
+  public TypedFunc(final Expr f, final FuncType ft) {
     fun = f;
     type = ft;
   }
@@ -61,7 +61,7 @@ public final class TypedFunc {
    * @param f java function
    * @return typed function
    */
-  public static TypedFunc java(final FunJava f) {
-    return new TypedFunc(f, FunType.arity(f.expr.length));
+  public static TypedFunc java(final JavaFunc f) {
+    return new TypedFunc(f, FuncType.arity(f.expr.length));
   }
 }

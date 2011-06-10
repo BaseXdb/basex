@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.Fun;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.FuncCall;
+import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -51,20 +51,20 @@ public final class If extends Arr {
     // if A then true() else false() -> boolean(A)
     if(expr[1] == Bln.TRUE && expr[2] == Bln.FALSE) {
       ctx.compInfo(OPTWRITE, this);
-      return FunDef.BOOLEAN.get(input, expr[0]);
+      return Function.BOOLEAN.get(input, expr[0]);
     }
 
     // if A then false() else true() -> not(A)
     if(expr[1].type().eq(SeqType.BLN) && expr[2] == Bln.TRUE) {
       ctx.compInfo(OPTWRITE, this);
-      final Expr e = FunDef.NOT.get(input, expr[0]);
+      final Expr e = Function.NOT.get(input, expr[0]);
       return expr[1] == Bln.FALSE ? e : new Or(input, e, expr[1]);
     }
 
     // if not(A) then B else C -> if A then C else B
-    if(expr[0].isFun(FunDef.NOT)) {
+    if(expr[0].isFun(Function.NOT)) {
       ctx.compInfo(OPTWRITE, this);
-      expr[0] = ((Fun) expr[0]).expr[0];
+      expr[0] = ((FuncCall) expr[0]).expr[0];
       final Expr tmp = expr[1];
       expr[1] = expr[2];
       expr[2] = tmp;

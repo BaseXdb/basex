@@ -35,7 +35,7 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.Updates;
-import org.basex.query.util.Functions;
+import org.basex.query.util.UserFuncs;
 import org.basex.query.util.NSLocal;
 import org.basex.query.util.Var;
 import org.basex.query.util.Variables;
@@ -58,7 +58,7 @@ import org.basex.util.ft.FTOpt;
  */
 public final class QueryContext extends Progress {
   /** Functions. */
-  public final Functions funcs = new Functions();
+  public final UserFuncs funcs = new UserFuncs();
   /** Variables. */
   public final Variables vars = new Variables();
   /** Namespaces. */

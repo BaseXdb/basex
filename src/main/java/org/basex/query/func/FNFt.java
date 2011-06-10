@@ -30,7 +30,7 @@ import org.basex.util.ft.FTOpt;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNFt extends Fun {
+public final class FNFt extends FuncCall {
   /** Marker element. */
   private static final byte[] MARK = token("mark");
 
@@ -40,7 +40,7 @@ public final class FNFt extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  public FNFt(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNFt(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -169,8 +169,8 @@ public final class FNFt extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  static Iter search(final Data data, final byte[] str, final Fun fun,
-      final QueryContext ctx) throws QueryException {
+  static Iter search(final Data data, final byte[] str,
+      final FuncCall fun, final QueryContext ctx) throws QueryException {
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
     if(!data.meta.ftindex) NOIDX.thrw(fun.input, fun);
@@ -188,6 +188,6 @@ public final class FNFt extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && def == FunDef.SEARCH || super.uses(u);
+    return u == Use.CTX && def == Function.SEARCH || super.uses(u);
   }
 }
