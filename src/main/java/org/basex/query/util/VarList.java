@@ -71,8 +71,7 @@ public final class VarList extends ExprInfo {
   }
 
   /**
-   * Checks if all functions have been correctly declared, and initializes
-   * all function calls.
+   * Checks if all variables have been correctly declared.
    * @throws QueryException query exception
    */
   public void check() throws QueryException {

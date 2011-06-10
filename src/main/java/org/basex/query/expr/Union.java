@@ -43,7 +43,7 @@ public final class Union extends Set {
 
     // results must always be sorted
     return expr.length == 0 ? Empty.SEQ :
-      expr.length == 1 && !dupl ? expr[0] : this;
+      expr.length == 1 && iterable ? expr[0] : this;
   }
 
   @Override

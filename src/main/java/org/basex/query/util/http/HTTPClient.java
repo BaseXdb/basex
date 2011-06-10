@@ -452,7 +452,7 @@ public final class HTTPClient {
     // Write headers
     for(final byte[] headerName : part.headers.keys()) {
       final TokenBuilder hdrTb = new TokenBuilder();
-      hdrTb.add(headerName).add(": ".getBytes()).add(
+      hdrTb.add(headerName).add(": ").add(
           part.headers.get(headerName)).add(CRLF);
       out.write(hdrTb.finish());
     }

@@ -210,12 +210,13 @@ public abstract class Expr extends ExprInfo {
   public abstract SeqType type();
 
   /**
-   * Returns true if the expression might yield duplicates and unsorted
-   * results. This method is called e.g. by {@link Union} or {@link AxisPath}.
+   * Returns true if the expression is iterable, i.e., if it does not contain
+   * any duplicates and if all results are sorted.
+   * This method is called e.g. by {@link AxisPath}.
    * @return result of check
    */
-  public boolean duplicates() {
-    return !type().zeroOrOne();
+  public boolean iterable() {
+    return type().zeroOrOne();
   }
 
   /**

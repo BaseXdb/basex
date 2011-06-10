@@ -363,7 +363,8 @@ public final class FNGen extends Fun {
   }
 
   @Override
-  public boolean duplicates() {
-    return def != FunDef.COLL && super.duplicates();
+  public boolean iterable() {
+    // collections will never yield duplicates
+    return def == FunDef.COLL || super.iterable();
   }
 }

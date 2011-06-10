@@ -80,8 +80,8 @@ public final class Empty extends Value {
   }
 
   @Override
-  public boolean duplicates() {
-    return false;
+  public boolean iterable() {
+    return true;
   }
 
   @Override

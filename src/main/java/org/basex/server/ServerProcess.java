@@ -118,27 +118,26 @@ public final class ServerProcess extends Thread {
   @Override
   public void run() {
     log.write(this, "LOGIN " + context.user.name, OK);
-    String cmd = null;
     running = true;
+
+    String cmd = null;
+    ServerCmd sc = null;
     try {
       while(running) {
         try {
           final byte b = in.readByte();
-          final ServerCmd sc = ServerCmd.get(b);
+          sc = get(b);
+          cmd = null;
           if(sc == CREATE) {
             create();
           } else if(sc == ADD) {
             add();
-            continue;
           } else if(sc == WATCH) {
             watch();
-            continue;
           } else if(sc == UNWATCH) {
             unwatch();
-            continue;
-          } else if(sc != CMD) {
+          } else if(sc != COMMAND) {
             query(sc);
-            continue;
           } else {
             // database command
             cmd = new ByteList().add(b).add(in.content().toArray()).toString();
@@ -148,7 +147,7 @@ public final class ServerProcess extends Thread {
           exit();
           break;
         }
-        if(cmd == null) continue;
+        if(sc != COMMAND) continue;
 
         // parse input and create command instance
         final Performance perf = new Performance();
@@ -202,7 +201,7 @@ public final class ServerProcess extends Thread {
       }
       if(!running) log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final IOException ex) {
-      log.write(this, cmd, INFOERROR + ex.getMessage());
+      log.write(this, sc == COMMAND ? cmd : sc, INFOERROR + ex.getMessage());
       Util.stack(ex);
       exit();
     }
@@ -288,8 +287,7 @@ public final class ServerProcess extends Thread {
   private void create() throws IOException {
     final Performance perf = new Performance();
     final String name = in.readString();
-    log.write(this, ServerCmd.CREATE + " " +
-        CmdCreate.DATABASE + " " + name + " [...]");
+    log.write(this, CREATE + " " + CmdCreate.DATABASE + " " + name + " [...]");
 
     try {
       final WrapInputStream is = new WrapInputStream(in);
@@ -327,7 +325,7 @@ public final class ServerProcess extends Thread {
     final Performance perf = new Performance();
     final String name = in.readString();
     final String path = in.readString();
-    final StringBuilder sb = new StringBuilder(ServerCmd.ADD + " ");
+    final StringBuilder sb = new StringBuilder(ADD + " ");
     if(!name.isEmpty()) sb.append(AS + ' ' + name + ' ');
     if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
     log.write(this, sb.append("[...]"));

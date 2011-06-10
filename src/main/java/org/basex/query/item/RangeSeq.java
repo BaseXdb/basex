@@ -56,8 +56,8 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean duplicates() {
-    return false;
+  public boolean iterable() {
+    return true;
   }
 
   @Override

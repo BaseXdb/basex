@@ -61,8 +61,8 @@ public final class Root extends Simple {
   }
 
   @Override
-  public boolean duplicates() {
-    return false;
+  public boolean iterable() {
+    return true;
   }
 
   @Override

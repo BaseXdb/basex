@@ -30,7 +30,7 @@ public enum ServerCmd {
   /** Code for unwatching an event: {name}0. */
   UNWATCH(11),
   /** Code for running a database command: {command}0. */
-  CMD(-1);
+  COMMAND(-1);
 
   /** Control code (soon obsolete). */
   public int code;
@@ -52,6 +52,6 @@ public enum ServerCmd {
   static ServerCmd get(final byte b) {
     for(final ServerCmd s : values()) if(s.code == b) return s;
     // current default for unknown codes: database command.
-    return CMD;
+    return COMMAND;
   }
 }

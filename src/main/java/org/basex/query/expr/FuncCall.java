@@ -15,7 +15,7 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * Function call.
+ * Function call for user-defined functions.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -32,7 +32,7 @@ public final class FuncCall extends Arr {
    * @param nm function name
    * @param arg arguments
    */
-  public FuncCall(final InputInfo ii, final QNm nm, final Expr[] arg) {
+  public FuncCall(final InputInfo ii, final QNm nm, final Expr... arg) {
     super(ii, arg);
     name = nm;
   }
@@ -47,6 +47,7 @@ public final class FuncCall extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    // compile all arguments
     super.comp(ctx);
 
     // Inline if result and arguments are all values.
@@ -68,16 +69,9 @@ public final class FuncCall extends Arr {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final int al = expr.length;
-    final Value[] args = new Value[al];
-    // evaluate arguments
-    for(int a = 0; a < al; ++a) args[a] = expr[a].value(ctx);
-    // move variables to stack
-    final int s = ctx.vars.size();
-    for(int a = 0; a < al; ++a) {
-      ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
-    }
-    // evaluate function and reset variable scope
+
+    // cache arguments, evaluate function and reset variable scope
+    final int s = cache(ctx);
     final Item it = func.item(ctx, ii);
     ctx.vars.reset(s);
     return it;
@@ -85,16 +79,8 @@ public final class FuncCall extends Arr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final int al = expr.length;
-    final Value[] args = new Value[al];
-    // evaluate arguments
-    for(int a = 0; a < al; ++a) args[a] = expr[a].value(ctx);
-    // move variables to stack
-    final int s = ctx.vars.size();
-    for(int a = 0; a < al; ++a) {
-      ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
-    }
-    // evaluate function and reset variable scope
+    // cache arguments, evaluate function and reset variable scope
+    final int s = cache(ctx);
     final Value v = func.value(ctx);
     ctx.vars.reset(s);
     return v;
@@ -104,6 +90,25 @@ public final class FuncCall extends Arr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     // [LW] make result streamable
     return value(ctx).iter();
+  }
+
+  /**
+   * Evaluates and binds the function arguments.
+   * @param ctx query context
+   * @return old variable stack position
+   * @throws QueryException query exception
+   */
+  private int cache(final QueryContext ctx) throws QueryException {
+    final int al = expr.length;
+    final Value[] args = new Value[al];
+    // evaluate arguments
+    for(int a = 0; a < al; ++a) args[a] = expr[a].value(ctx);
+    // move variables to stack
+    final int s = ctx.vars.size();
+    for(int a = 0; a < al; ++a) {
+      ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
+    }
+    return s;
   }
 
   @Override

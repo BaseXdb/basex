@@ -68,7 +68,7 @@ public abstract class Preds extends ParseExpr {
    * if a single {@code last()} predicate is specified.
    * @return result of check
    */
-  protected boolean iterable() {
+  protected boolean useIterator() {
     // position predicate
     pos = pred[0] instanceof Pos ? (Pos) pred[0] : null;
     last = pred[0].isFun(FunDef.LAST);

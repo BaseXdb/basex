@@ -280,4 +280,11 @@ public final class FNDb extends Fun {
     return u == Use.CTX && (def == FunDef.TEXT || def == FunDef.ATTR ||
         def == FunDef.FULLTEXT || def == FunDef.EVENT) || super.uses(u);
   }
+
+  @Override
+  public boolean iterable() {
+    // index functions will always yield ordered and duplicate-free results
+    return def == FunDef.OPEN || def == FunDef.TEXT ||
+      def == FunDef.ATTR || def == FunDef.FULLTEXT || super.iterable();
+  }
 }
