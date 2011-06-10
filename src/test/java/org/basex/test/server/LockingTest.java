@@ -2,7 +2,11 @@ package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -178,6 +182,25 @@ public final class LockingTest {
     for(int i = 0; i < TESTS; ++i) cl[i] = new Client();
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
+  }
+
+  /**
+   * Create db method test.
+   * @throws Exception exception
+   */
+  @Test
+  public void createDBTest() throws Exception {
+    InputStream bais =
+      new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
+    session1.create("database", bais);
+    bais =
+      new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
+    session1.create("database2", bais);
+    session1.execute("drop db database");
+    bais =
+      new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
+    session1.create("database2", bais);
+    session1.execute("drop db database2");
   }
 
   /**
