@@ -10,7 +10,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
- * Logical expression.
+ * Logical expression, extended by {@link And} and {@link Or}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

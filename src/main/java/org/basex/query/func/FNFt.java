@@ -48,7 +48,7 @@ public final class FNFt extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case COUNT: return count(ctx);
+      case FTCOUNT: return count(ctx);
       default:    return super.item(ctx, ii);
     }
   }
@@ -56,10 +56,10 @@ public final class FNFt extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case SEARCH:  return search(ctx);
-      case SCORE:   return score(ctx);
-      case MARK:    return mark(ctx, false);
-      case EXTRACT: return mark(ctx, true);
+      case FTSEARCH:  return search(ctx);
+      case FTSCORE:   return score(ctx);
+      case FTMARK:    return mark(ctx, false);
+      case FTEXTRACT: return mark(ctx, true);
       default:      return super.iter(ctx);
     }
   }
@@ -188,6 +188,6 @@ public final class FNFt extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && def == Function.SEARCH || super.uses(u);
+    return u == Use.CTX && def == Function.FTSEARCH || super.uses(u);
   }
 }

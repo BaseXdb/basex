@@ -53,7 +53,7 @@ public final class FNMath extends FuncCall {
       case ATAN2: return Dbl.get(atan2(d, e));
       case POW:   return Dbl.get(d == 1 ? 1 : pow(d, e));
       // project-specific
-      case RAND:  return Dbl.get(random());
+      case RANDOM:  return Dbl.get(random());
       case SINH:  return Dbl.get(sinh(d));
       case COSH:  return Dbl.get(cosh(d));
       case TANH:  return Dbl.get(tanh(d));
@@ -64,7 +64,7 @@ public final class FNMath extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     // random() is non-deterministic; don't pre-evaluate
-    return u == Use.X30 || u == Use.CTX && def == Function.RAND ||
+    return u == Use.X30 || u == Use.CTX && def == Function.RANDOM ||
       super.uses(u);
   }
 }

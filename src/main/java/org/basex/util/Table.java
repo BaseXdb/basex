@@ -140,11 +140,11 @@ public final class Table {
       tb.add(s);
       for(int i = 0; i < is; ++i) tb.add(' ');
     }
-    tb.nl();
+    tb.add(NL);
     for(int u = 0; u < sz; ++u) {
       for(int i = 0; i < ind[u] + (u + 1 == sz ? 0 : DIST); ++i) tb.add('-');
     }
-    tb.nl();
+    tb.add(NL);
     for(final TokenList e : contents) {
       for(int u = 0; u < sz; ++u) {
         final byte[] s = e.get(u);
@@ -158,10 +158,10 @@ public final class Table {
         }
         for(int i = 0; i < DIST; ++i) tb.add(' ');
       }
-      tb.nl();
+      tb.add(NL);
     }
     if(description != null) {
-      tb.nl().add(contents.size() + " " + description + DOT);
+      tb.add(NL).add(contents.size() + " " + description + DOT);
     }
     return tb.finish();
   }
@@ -173,7 +173,7 @@ public final class Table {
       tb.add(b);
       tb.add('\t');
     }
-    tb.nl();
+    tb.add(NL);
     for(final TokenList e : contents) {
       for(final byte[] b : e) {
         tb.add(b);

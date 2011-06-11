@@ -149,8 +149,8 @@ public final class CmpG extends Cmp {
       e = optPre(Bln.FALSE, ctx);
     } else if(values()) {
       e = preEval(ctx);
-    } else if(e1.isFun(Function.CNT)) {
-      e = count(op.op);
+    } else if(e1.isFun(Function.COUNT)) {
+      e = compCount(op.op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFun(Function.POS)) {
       if(e2 instanceof Range && op.op == CmpV.Op.EQ) {
@@ -162,6 +162,10 @@ public final class CmpG extends Cmp {
         e = Pos.get(op.op, e2, e, input);
       }
       if(e != this) ctx.compInfo(OPTWRITE, this);
+    } else if(e1.type().eq(SeqType.BLN) && (op == Op.EQ && e2 == Bln.FALSE ||
+        op == Op.NE && e2 == Bln.TRUE)) {
+      // (A = false()) -> not(A)
+      e = Function.NOT.get(input, e1);
     } else {
       // rewrite path CMP number
       e = CmpR.get(this);
@@ -177,7 +181,9 @@ public final class CmpG extends Cmp {
   @Override
   public Expr compEbv(final QueryContext ctx) {
     // e.g.: exists(...) = true() -> exists(...)
-    return op == Op.EQ && expr[1] == Bln.TRUE &&
+    // checking one direction is sufficient, as operators may have been swapped
+    return (op == Op.EQ && expr[1] == Bln.TRUE ||
+            op == Op.NE && expr[1] == Bln.FALSE) &&
       expr[0].type().eq(SeqType.BLN) ? expr[0] : this;
   }
 

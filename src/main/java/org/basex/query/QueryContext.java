@@ -400,7 +400,7 @@ public final class QueryContext extends Progress {
     if(!inf) return;
     if(!firstOpt) info.add(QUERYSEP);
     firstOpt = false;
-    info.addExt(string, ext).nl();
+    info.addExt(string, ext).add(NL);
   }
 
   /**
@@ -409,8 +409,8 @@ public final class QueryContext extends Progress {
    */
   public void evalInfo(final byte[] string) {
     if(!inf) return;
-    if(firstEval) info.nl().add(QUERYEVAL).nl();
-    info.add(QUERYSEP).add(string).nl();
+    if(firstEval) info.add(NL).add(QUERYEVAL).add(NL);
+    info.add(QUERYSEP).add(string).add(NL);
     firstEval = false;
   }
 

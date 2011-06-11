@@ -181,7 +181,7 @@ public final class FNSimple extends FuncCall {
       if(!e.type().mayBeNum()) ex = e;
     } else if(def == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
-      if(e.type().type.node()) ex = e;
+      if(e.type().type.node() || e.size() > 0) ex = e;
     }
     if(ex != this) ctx.compInfo(QueryText.OPTWRITE, this);
     return ex;

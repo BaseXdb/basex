@@ -164,10 +164,10 @@ public final class QueryException extends Exception {
   public String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
     if(lineCol != null) {
-      tb.add(STOPPED + ' ').addExt(LINEINFO, lineCol[0]);
+      tb.add(STOPPED).add(' ').addExt(LINEINFO, lineCol[0]);
       if(lineCol[1] != 0) tb.add(QueryTokens.SEP).addExt(COLINFO, lineCol[1]);
       if(file != null) tb.add(' ').addExt(FILEINFO, file);
-      tb.add(COL).nl();
+      tb.add(COL).add(NL);
     }
     final String c = code();
     if(!c.isEmpty()) tb.add('[').add(c).add("] ");

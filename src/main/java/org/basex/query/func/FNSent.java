@@ -40,7 +40,7 @@ public final class FNSent extends FuncCall {
       throws QueryException {
     switch(def) {
       case SENT:     return polarity(ctx, false);
-      case NORMSENT: return polarity(ctx, true);
+      case SENTNORM: return polarity(ctx, true);
       default:       return super.item(ctx, ii);
     }
   }

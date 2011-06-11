@@ -106,11 +106,12 @@ final class IndexStats {
    */
   private void print(final TokenBuilder tb, final byte[][] txt, final int[] ocs,
       final int len) {
+
     for(int o = 0; o < ocs.length; ++o) {
       if(txt[o].length == 0) continue;
       tb.add("  ").add(txt[o]);
       for(int j = 0; j < len - txt[o].length; ++j) tb.add(' ');
-      tb.addLong(ocs[o]).add('x').nl();
+      tb.addLong(ocs[o]).add('x').add(NL);
     }
   }
 }

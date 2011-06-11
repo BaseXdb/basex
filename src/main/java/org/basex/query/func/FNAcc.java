@@ -51,7 +51,7 @@ public final class FNAcc extends FuncCall {
         return number(ctx.iter(e), ctx);
       case STRLEN:
         return Itr.get(len(checkEStr(e, ctx)));
-      case NRMSTR:
+      case NORMSPC:
         return Str.get(norm(checkEStr(e, ctx)));
       case URIQNM:
         it = e.item(ctx, input);

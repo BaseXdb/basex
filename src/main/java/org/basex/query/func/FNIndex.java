@@ -28,7 +28,7 @@ public final class FNIndex extends TokenSet {
   private Function[] funcs;
 
   /**
-   * Gets the function instance.
+   * Returns the singleton instance.
    * @return instance
    */
   public static FNIndex get() {

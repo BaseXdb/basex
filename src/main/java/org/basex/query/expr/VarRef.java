@@ -39,6 +39,7 @@ public final class VarRef extends ParseExpr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     var = ctx.vars.get(var);
     type = var.type();
+    size = var.size();
 
     // return if variable expression has not yet been assigned
     Expr e = var.expr();

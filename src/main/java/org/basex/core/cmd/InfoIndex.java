@@ -100,10 +100,10 @@ public final class InfoIndex extends AInfo {
   private static byte[] info(final String ds, final IndexType it,
       final Data data, final boolean avl) {
 
-    final TokenBuilder tb = new TokenBuilder(ds).nl();
+    final TokenBuilder tb = new TokenBuilder(ds).add(NL);
     if(avl) tb.add(data.info(it));
     else tb.addExt(LI + INDNOTAVL, it);
-    return tb.nl().finish();
+    return tb.add(NL).finish();
   }
 
   @Override

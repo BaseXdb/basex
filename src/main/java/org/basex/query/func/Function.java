@@ -33,7 +33,7 @@ public enum Function {
   /** XQuery function. */
   STRLEN(FNAcc.class, "string-length([item])", ITR, 0, STR_ZO),
   /** XQuery function. */
-  NRMSTR(FNAcc.class, "normalize-space([string])", STR, 0, STR_ZO),
+  NORMSPC(FNAcc.class, "normalize-space([string])", STR, 0, STR_ZO),
   /** XQuery function. */
   URIQNM(FNAcc.class, "namespace-uri-from-QName(qname)", URI_ZO, QNM_ZO),
 
@@ -42,7 +42,7 @@ public enum Function {
   /** XQuery function. */
   AVG(FNAggr.class, "avg(item)", AAT_ZO, AAT_ZM),
   /** XQuery function. */
-  CNT(FNAggr.class, "count(item)", ITR, ITEM_ZM),
+  COUNT(FNAggr.class, "count(item)", ITR, ITEM_ZM),
   /** XQuery function. */
   MAX(FNAggr.class, "max(item[,coll])", AAT_ZO, 1, AAT_ZM, STR),
   /** XQuery function. */
@@ -217,9 +217,9 @@ public enum Function {
   /** XQuery function. */
   TRACE(FNInfo.class, "trace(item,msg)", ITEM_ZM, ITEM_ZM, STR),
   /** XQuery function. */
-  ENV(FNInfo.class, "environment-variable(string)", STR_ZO, STR),
+  ENVAR(FNInfo.class, "environment-variable(string)", STR_ZO, STR),
   /** XQuery function. */
-  ENVS(FNInfo.class, "available-environment-variables()", STR_ZM),
+  ENVARS(FNInfo.class, "available-environment-variables()", STR_ZM),
 
   /* FNNode functions. */
 
@@ -442,7 +442,7 @@ public enum Function {
   LOG10(FNMath.class, "log10(number)", DBL_ZO, DBL_ZO),
 
   /** XQuery math function (project specific). */
-  RAND(FNMath.class, "random()", DBL),
+  RANDOM(FNMath.class, "random()", DBL),
   /** XQuery math function (project specific). */
   E(FNMath.class, "e()", DBL),
   /** XQuery math function (project specific). */
@@ -531,16 +531,16 @@ public enum Function {
   /* FNFt functions. */
 
   /** Database function: searches the full-text index. */
-  SEARCH(FNFt.class, "search(node,string)", NOD_ZM, NOD, STR),
+  FTSEARCH(FNFt.class, "search(node,string)", NOD_ZM, NOD, STR),
   /** Database function: counts the hits of a full-text request. */
-  COUNT(FNFt.class, "count(nodes)", ITR, NOD_ZM),
+  FTCOUNT(FNFt.class, "count(nodes)", ITR, NOD_ZM),
   /** Database function: marks the hits of a full-text request. */
-  MARK(FNFt.class, "mark(nodes[,tag])", NOD_ZM, 1, NOD_ZM, STR),
+  FTMARK(FNFt.class, "mark(nodes[,tag])", NOD_ZM, 1, NOD_ZM, STR),
   /** Database function: extracts full-text results. */
-  EXTRACT(FNFt.class, "extract(nodes[,tag[,length]])", NOD_ZM, 1, ITEM_ZM, STR,
-      ITR),
+  FTEXTRACT(FNFt.class, "extract(nodes[,tag[,length]])", NOD_ZM, 1,
+      ITEM_ZM, STR, ITR),
   /** Database function: returns the full-text score. */
-  SCORE(FNFt.class, "score(items)", DBL_ZM, ITEM_ZM),
+  FTSCORE(FNFt.class, "score(items)", DBL_ZM, ITEM_ZM),
 
   /* FNHof functions. */
 
@@ -573,7 +573,7 @@ public enum Function {
   /** Sentiment function: returns a text sentiment. */
   SENT(FNSent.class, "polarity(string,uri)", DBL, STR, STR),
   /** Sentiment function: returns a normed polarity value. */
-  NORMSENT(FNSent.class, "normed-polarity(string,uri)", DBL, STR, STR),
+  SENTNORM(FNSent.class, "normed-polarity(string,uri)", DBL, STR, STR),
 
   /* FNUtil functions. */
 
@@ -600,23 +600,23 @@ public enum Function {
   /** Utility function: gets the bytes from the given xs:base64Binary data. */
   TO_BYTES(FNUtil.class, "to-bytes(base64)", BYT_ZM, B64),
 
-  /* FNZIP functions. */
+  /* FNZip functions (EXPath). */
 
   /** XQuery function */
-  BENTRY(FNZip.class, "binary-entry(path,entry)", B64, STR, STR),
+  ZIPBIN(FNZip.class, "binary-entry(path,entry)", B64, STR, STR),
   /** XQuery function */
-  TEXTENTRY(FNZip.class, "text-entry(path,entry[,encoding])", STR, 2, STR, STR,
+  ZIPTEXT(FNZip.class, "text-entry(path,entry[,encoding])", STR, 2, STR, STR,
       STR),
   /** XQuery function */
-  HTMLENTRY(FNZip.class, "html-entry(path,entry)", NOD, STR, STR),
+  ZIPHTML(FNZip.class, "html-entry(path,entry)", NOD, STR, STR),
   /** XQuery function */
-  XMLENTRY(FNZip.class, "xml-entry(path,entry)", NOD, STR, STR),
+  ZIPXML(FNZip.class, "xml-entry(path,entry)", NOD, STR, STR),
   /** XQuery function */
-  ENTRIES(FNZip.class, "entries(path)", ELM, STR),
+  ZIPENTRIES(FNZip.class, "entries(path)", ELM, STR),
   /** XQuery function */
   ZIPFILE(FNZip.class, "zip-file(zip)", EMP, ELM),
   /** XQuery function */
-  UPDATE(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR);
+  ZIPUPDATE(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR);
 
   /**
    * Mapping between function classes and namespace URIs.

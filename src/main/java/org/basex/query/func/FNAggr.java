@@ -37,7 +37,7 @@ public final class FNAggr extends FuncCall {
 
     final Iter iter = ctx.iter(expr[0]);
     switch(def) {
-      case CNT:
+      case COUNT:
         long c = iter.size();
         if(c == -1) do ++c; while(iter.next() != null);
         return Itr.get(c);
@@ -62,7 +62,7 @@ public final class FNAggr extends FuncCall {
     final Expr e = expr[0];
     final long c = e.size();
     switch(def) {
-      case CNT:
+      case COUNT:
         return c >= 0 && !ctx.grouping && !e.uses(Use.CTX) ? Itr.get(c) : this;
       case SUM:
         return c == 0 && !e.uses(Use.CTX) ? expr.length == 2 ? expr[1] :
