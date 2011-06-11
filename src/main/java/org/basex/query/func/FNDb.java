@@ -43,14 +43,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNDb extends Fun {
+public final class FNDb extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNDb(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNDb(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -272,19 +272,19 @@ public final class FNDb extends Fun {
 
   @Override
   public boolean vacuous() {
-    return def == FunDef.EVENT;
+    return def == Function.EVENT;
   }
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (def == FunDef.TEXT || def == FunDef.ATTR ||
-        def == FunDef.FULLTEXT || def == FunDef.EVENT) || super.uses(u);
+    return u == Use.CTX && (def == Function.TEXT || def == Function.ATTR ||
+        def == Function.FULLTEXT || def == Function.EVENT) || super.uses(u);
   }
 
   @Override
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
-    return def == FunDef.OPEN || def == FunDef.TEXT ||
-      def == FunDef.ATTR || def == FunDef.FULLTEXT || super.iterable();
+    return def == Function.OPEN || def == Function.TEXT ||
+      def == Function.ATTR || def == Function.FULLTEXT || super.iterable();
   }
 }

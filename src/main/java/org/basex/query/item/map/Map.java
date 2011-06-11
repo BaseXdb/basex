@@ -14,7 +14,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Flt;
 import org.basex.query.item.FItem;
-import org.basex.query.item.FunType;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.MapType;
@@ -177,7 +177,7 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Map coerceTo(final FunType ft, final QueryContext ctx,
+  public Map coerceTo(final FuncType ft, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
     if(!(ft instanceof MapType) || !hasType((MapType) ft))
       throw Err.cast(ii, ft, this);

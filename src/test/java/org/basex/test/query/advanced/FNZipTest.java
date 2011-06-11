@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.basex.core.Prop;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -59,7 +59,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testBinaryEntry() throws Exception {
-    final String fun = check(FunDef.BENTRY);
+    final String fun = check(Function.ZIPBIN);
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
     contains("xs:hexBinary(" + fun + "('" + ZIP + "', '" + ENTRY1 + "'))",
         "610A61626F");
@@ -74,7 +74,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testTextEntry() throws Exception {
-    final String fun = check(FunDef.TEXTENTRY);
+    final String fun = check(Function.ZIPTEXT);
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'US-ASCII')");
     error(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'xyz')", Err.ZIPFAIL);
@@ -88,7 +88,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testXMLEntry() throws Exception {
-    final String fun = check(FunDef.XMLENTRY);
+    final String fun = check(Function.ZIPXML);
     query(fun + "('" + ZIP + "', '" + ENTRY2 + "')");
     query(fun + "('" + ZIP + "', '" + ENTRY2 + "')//title/text()", "XML");
   }
@@ -99,7 +99,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testEntries() throws Exception {
-    final String fun = check(FunDef.ENTRIES);
+    final String fun = check(Function.ZIPENTRIES);
     query(fun + "('" + ZIP + "')");
   }
 
@@ -109,7 +109,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testZipFile() throws Exception {
-    final String fun = check(FunDef.ZIPFILE);
+    final String fun = check(Function.ZIPFILE);
     // check first file
     query(fun + "(" + zipParams("<entry name='one'/>") + ")");
     checkZipEntry("one", new byte[0]);
@@ -146,7 +146,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void testUpdateEntries() throws Exception {
-    final String fun = check(FunDef.UPDATE);
+    final String fun = check(Function.ZIPUPDATE);
     String list = query("zip:entries('" + ZIP + "')");
 
     // create and compare identical zip file

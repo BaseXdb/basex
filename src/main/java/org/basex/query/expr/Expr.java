@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import org.basex.data.ExprInfo;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -193,7 +193,14 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr remove(final Var v);
 
   /**
-   * Compiles and simplifies effective boolean values tests.
+   * <p>This method is called at compile time by expressions that perform
+   * effective boolean value tests (e.g. {@link If} or {@link Preds}).
+   * If the arguments of the called expression return a boolean anyway,
+   * the expression will be simplified.</p>
+   * <p>Example in {@link CmpV}:
+   * {@code if($x eq true())} is rewritten to {@code if($x)}, if {@code $x}
+   * will always yield a single boolean.</p>
+   *
    * @param ctx query context
    * @return optimized expression
    */
@@ -260,7 +267,7 @@ public abstract class Expr extends ExprInfo {
    * @return function, or {@code null}
    */
   @SuppressWarnings("unused")
-  public boolean isFun(final FunDef f) {
+  public boolean isFun(final Function f) {
     return false;
   }
 

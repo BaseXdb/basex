@@ -21,14 +21,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNAcc extends Fun {
+public final class FNAcc extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNAcc(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNAcc(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -51,7 +51,7 @@ public final class FNAcc extends Fun {
         return number(ctx.iter(e), ctx);
       case STRLEN:
         return Itr.get(len(checkEStr(e, ctx)));
-      case NRMSTR:
+      case NORMSPC:
         return Str.get(norm(checkEStr(e, ctx)));
       case URIQNM:
         it = e.item(ctx, input);
@@ -88,7 +88,7 @@ public final class FNAcc extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    final boolean pos = def == FunDef.POS || def == FunDef.LAST;
+    final boolean pos = def == Function.POS || def == Function.LAST;
     return u == Use.CTX && (pos || expr.length == 0) ||
       u == Use.POS && pos || super.uses(u);
   }

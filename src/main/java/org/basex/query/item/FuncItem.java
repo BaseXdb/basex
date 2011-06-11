@@ -6,7 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import static org.basex.query.QueryTokens.*;
-import org.basex.query.expr.DynFunCall;
+import org.basex.query.expr.DynFuncCall;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.VarRef;
 import org.basex.query.iter.Iter;
@@ -22,7 +22,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class FunItem extends FItem {
+public final class FuncItem extends FItem {
   /** Variables. */
   private final Var[] vars;
   /** Function expression. */
@@ -43,8 +43,8 @@ public final class FunItem extends FItem {
    * @param t function type
    * @param cst cast flag
    */
-  public FunItem(final QNm n, final Var[] arg, final Expr body,
-      final FunType t, final boolean cst) {
+  public FuncItem(final QNm n, final Var[] arg, final Expr body,
+      final FuncType t, final boolean cst) {
     super(t);
     name = n;
     vars = arg;
@@ -60,7 +60,7 @@ public final class FunItem extends FItem {
    * @param cl variables in the closure
    * @param cst cast flag
    */
-  public FunItem(final Var[] arg, final Expr body, final FunType t,
+  public FuncItem(final Var[] arg, final Expr body, final FuncType t,
       final VarList cl, final boolean cst) {
     this(null, arg, body, t, cst);
     if(cl != null)
@@ -135,7 +135,7 @@ public final class FunItem extends FItem {
 
   @Override
   public String toString() {
-    final FunType ft = (FunType) type;
+    final FuncType ft = (FuncType) type;
     final StringBuilder sb = new StringBuilder(FUNCTION).append('(');
     for(final Var v : vars)
       sb.append(v).append(v == vars[vars.length - 1] ? "" : ", ");
@@ -161,24 +161,24 @@ public final class FunItem extends FItem {
    * @param t type to coerce to
    * @return coerced function item
    */
-  public static FunItem coerce(final QueryContext ctx, final InputInfo ii,
-      final FunItem fun, final FunType t) {
+  public static FuncItem coerce(final QueryContext ctx, final InputInfo ii,
+      final FuncItem fun, final FuncType t) {
     final Var[] vars = new Var[fun.vars.length];
     final Expr[] refs = new Expr[vars.length];
     for(int i = vars.length; i-- > 0;) {
       vars[i] = ctx.uniqueVar(ii, t.args[i]);
       refs[i] = new VarRef(ii, vars[i]);
     }
-    return new FunItem(fun.name, vars, new DynFunCall(ii, fun, refs), t,
+    return new FuncItem(fun.name, vars, new DynFuncCall(ii, fun, refs), t,
         fun.cast != null);
   }
 
   @Override
-  public FItem coerceTo(final FunType ft, final QueryContext ctx,
+  public FItem coerceTo(final FuncType ft, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
     if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
-    return type.instance(ft) ? this : FunItem.coerce(ctx, ii, this, ft);
+    return type.instance(ft) ? this : FuncItem.coerce(ctx, ii, this, ft);
   }
 
   @Override

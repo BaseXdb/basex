@@ -37,14 +37,14 @@ import org.basex.util.StringList;
  * @author Rositsa Shadura
  * @author Christian Gruen
  */
-public final class FNFile extends Fun {
+public final class FNFile extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNFile(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNFile(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 

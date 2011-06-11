@@ -25,10 +25,10 @@ public final class FNIndex extends TokenSet {
   /** Singleton instance. */
   private static final FNIndex INSTANCE = new FNIndex();
   /** Function classes. */
-  private FunDef[] funcs;
+  private Function[] funcs;
 
   /**
-   * Gets the function instance.
+   * Returns the singleton instance.
    * @return instance
    */
   public static FNIndex get() {
@@ -39,8 +39,8 @@ public final class FNIndex extends TokenSet {
    * Constructor, registering XQuery functions.
    */
   private FNIndex() {
-    funcs = new FunDef[CAP];
-    for(final FunDef def : FunDef.values()) {
+    funcs = new Function[CAP];
+    for(final Function def : Function.values()) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
       final int i = add(full(def.uri(), ln));
@@ -58,17 +58,17 @@ public final class FNIndex extends TokenSet {
    * @return function instance
    * @throws QueryException query exception
    */
-  public Fun get(final byte[] name, final byte[] uri, final Expr[] args,
-      final QueryParser qp) throws QueryException {
+  public FuncCall get(final byte[] name, final byte[] uri,
+      final Expr[] args, final QueryParser qp) throws QueryException {
 
     final int id = id(full(uri, name));
     if(id == 0) return null;
 
     // create function
-    final FunDef fl = funcs[id];
+    final Function fl = funcs[id];
     if(!eq(fl.uri(), uri)) return null;
 
-    final Fun f = fl.get(qp.input(), args);
+    final FuncCall f = fl.get(qp.input(), args);
     if(!qp.ctx.xquery3 && f.uses(Use.X30)) qp.error(FEATURE11);
     // check number of arguments
     if(args.length < fl.min || args.length > fl.max) qp.error(XPARGS, fl);

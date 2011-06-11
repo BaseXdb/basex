@@ -6,7 +6,7 @@ import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   @Test
   public void testSearch() throws BaseXException, QueryException {
     // test arguments
-    final String fun = check(FunDef.SEARCH);
+    final String fun = check(Function.FTSEARCH);
 
     // check index results
     query(fun + "(., 'assignments')", "Assignments");
@@ -59,7 +59,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void testCount() throws QueryException {
-    final String fun = check(FunDef.COUNT);
+    final String fun = check(Function.FTCOUNT);
     query(fun + "(())", "0");
     query(fun + "(//*[text() contains text '1'])", "1");
     query(fun + "(//li[text() contains text 'exercise'])", "2");
@@ -73,7 +73,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void testMark() throws QueryException {
-    final String fun = check(FunDef.MARK);
+    final String fun = check(Function.FTMARK);
 
     query(fun + "(//*[text() contains text '1'])",
       "<li>Exercise <mark>1</mark></li>");
@@ -95,7 +95,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void testExtract() throws QueryException {
-    final String fun = check(FunDef.EXTRACT);
+    final String fun = check(Function.FTEXTRACT);
     query(fun + "(//*[text() contains text '1'])",
       "<li>Exercise <mark>1</mark></li>");
     query(fun + "(//*[text() contains text '2'], 'b', 20)",
@@ -113,7 +113,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   @Test
   public void testScore() throws QueryException {
     // test arguments
-    final String fun = check(FunDef.SCORE);
+    final String fun = check(Function.FTSCORE);
     query(fun + "(ft:search(., '2'))", "1");
     query(fun + "(ft:search(., 'XML'))", "1 0.5");
   }

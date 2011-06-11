@@ -34,14 +34,14 @@ import org.basex.util.Util;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class FNUtil extends Fun {
+public final class FNUtil extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNUtil(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNUtil(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -341,7 +341,7 @@ public final class FNUtil extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (def == FunDef.MB || def == FunDef.MS
-        || def == FunDef.EVAL || def == FunDef.RUN) || super.uses(u);
+    return u == Use.CTX && (def == Function.MB || def == Function.MS
+        || def == Function.EVAL || def == Function.RUN) || super.uses(u);
   }
 }

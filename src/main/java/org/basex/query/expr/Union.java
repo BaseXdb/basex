@@ -6,7 +6,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
-import org.basex.query.item.AtomType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
@@ -36,8 +35,8 @@ public final class Union extends Set {
     for(int e = 0; e != expr.length; ++e) {
       // remove empty operands
       if(expr[e].empty()) {
+        ctx.compInfo(OPTREMOVE, desc(), expr[e]);
         expr = Array.delete(expr, e--);
-        ctx.compInfo(OPTREMOVE, desc(), AtomType.EMP);
       }
     }
 

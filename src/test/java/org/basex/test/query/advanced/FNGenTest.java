@@ -1,7 +1,7 @@
 package org.basex.test.query.advanced;
 
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.util.Err;
 import org.junit.Test;
 
@@ -21,7 +21,7 @@ public final class FNGenTest extends AdvancedQueryTest {
    */
   @Test
   public void testUnparsedText() throws QueryException {
-    final String fun = check(FunDef.PARSETXT);
+    final String fun = check(Function.PARSETXT);
     contains(fun + "('" + TEXT + "')", "?&gt;&lt;html");
     contains(fun + "('" + TEXT + "', 'US-ASCII')", "?&gt;&lt;html");
     error(fun + "('" + TEXT + "', 'xyz')", Err.WRONGINPUT);
@@ -33,7 +33,7 @@ public final class FNGenTest extends AdvancedQueryTest {
    */
   @Test
   public void testParseXML() throws QueryException {
-    final String fun = check(FunDef.PARSEXML);
+    final String fun = check(Function.PARSEXML);
     contains(fun + "('<x>a</x>')//text()", "a");
   }
 
@@ -43,7 +43,7 @@ public final class FNGenTest extends AdvancedQueryTest {
    */
   @Test
   public void testSerialize() throws QueryException {
-    final String fun = check(FunDef.SERIALIZE);
+    final String fun = check(Function.SERIALIZE);
     contains(fun + "(<x/>)", "&lt;x/&gt;");
     contains(fun + "(<x/>, " + serialParams("") + ")", "&lt;x/&gt;");
     contains(fun + "(<x>a</x>, " +

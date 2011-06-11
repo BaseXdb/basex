@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import org.basex.gui.GUIConstants;
 import org.basex.query.QueryTokens;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.util.Util;
 import org.basex.util.XMLToken;
 
@@ -42,7 +42,7 @@ public final class XQuerySyntax extends BaseXSyntax {
         final String s = (String) f.get(null);
         for(final String ss : s.split("-")) KEYS.add(ss);
       }
-      for(final FunDef f : FunDef.values()) {
+      for(final Function f : Function.values()) {
         final String s = f.toString();
         for(final String ss : s.substring(0, s.indexOf("(")).split("-"))
           FUNC.add(ss);

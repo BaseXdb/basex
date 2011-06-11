@@ -12,7 +12,7 @@ import java.util.Arrays;
  */
 public final class TokenBuilder {
   /** Half new line. */
-  public static final byte HL = 0x01;
+  public static final byte HLINE = 0x01;
   /** Bold flag. */
   public static final byte BOLD = 0x02;
   /** Standard flag. */
@@ -20,7 +20,7 @@ public final class TokenBuilder {
   /** Mark flag. */
   public static final byte MARK = 0x04;
   /** New line. */
-  public static final byte NL = 0x0a;
+  public static final byte NLINE = 0x0a;
 
   /** Character array. */
   private byte[] chars;
@@ -87,8 +87,8 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a bold flag.
-   * This flag is evaluated by the text renderer in the frontend.
+   * Adds a bold flag. This method should only be called to control text
+   * rendering in the visual front end.
    * @return self reference
    */
   public TokenBuilder bold() {
@@ -96,8 +96,8 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a norm flag.
-   * This flag is evaluated by the text renderer in the frontend.
+   * Adds a norm flag. This method should only be called to control text
+   * rendering in the visual front end.
    * @return self reference
    */
   public TokenBuilder norm() {
@@ -105,21 +105,21 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a new line.
-   * This flag is evaluated by the text renderer in the frontend.
+   * Adds a new line. This method should only be called to control text
+   * rendering in the visual front end.
    * @return self reference
    */
-  public TokenBuilder nl() {
-    return addByte(NL);
+  public TokenBuilder nline() {
+    return addByte(NLINE);
   }
 
   /**
-   * Adds a half new line.
-   * This flag is evaluated by the text renderer in the frontend.
+   * Adds a half new line. This method should only be called to control text
+   * rendering in the visual front end.
    * @return self reference
    */
-  public TokenBuilder hl() {
-    return addByte(HL);
+  public TokenBuilder hline() {
+    return addByte(HLINE);
   }
 
   /**

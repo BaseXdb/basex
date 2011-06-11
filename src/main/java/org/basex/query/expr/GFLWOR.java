@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -255,7 +255,7 @@ public class GFLWOR extends ParseExpr {
       final ForLet f = fl[tar[t]];
       Expr e = tests[t].remove(f.var);
       // wrap test with boolean() if the result is numeric
-      if(e.type().mayBeNum()) e = FunDef.BOOLEAN.get(input, e);
+      if(e.type().mayBeNum()) e = Function.BOOLEAN.get(input, e);
       // attach predicates to axis path or filter, or create a new filter
       if(f.expr instanceof AxisPath) {
         f.expr = ((AxisPath) f.expr).addPreds(e);

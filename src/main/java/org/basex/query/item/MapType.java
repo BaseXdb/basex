@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class MapType extends FunType {
+public final class MapType extends FuncType {
   /** Key type of the map. */
   public final AtomType keyType;
   /** The general map type. */

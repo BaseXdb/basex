@@ -2,8 +2,8 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV.Op;
-import org.basex.query.func.Fun;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.FuncCall;
+import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.path.AxisPath;
@@ -15,7 +15,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-abstract class Cmp extends Arr {
+public abstract class Cmp extends Arr {
   /**
    * Constructor.
    * @param ii input info
@@ -31,7 +31,7 @@ abstract class Cmp extends Arr {
    * The operator itself needs to be swapped by the calling expression.
    * @return resulting expression
    */
-  protected boolean swap() {
+  protected final boolean swap() {
     // move value or path without root to second position
     final boolean swap = expr[0].value() && !expr[1].value() ||
       expr[0] instanceof AxisPath && ((AxisPath) expr[0]).root != null &&
@@ -46,12 +46,19 @@ abstract class Cmp extends Arr {
   }
 
   /**
-   * Rewrites a {@code count()} function.
+   * If possible, inverts the operands of the expression.
+   * @return original or modified expression
+   */
+  public abstract Cmp invert();
+
+  /**
+   * This method is called if the first operand of the comparison
+   * expression is a {@code count()} function.
    * @param o comparison operator
    * @return resulting expression
    * @throws QueryException query exception
    */
-  protected Expr count(final Op o) throws QueryException {
+  protected final Expr compCount(final Op o) throws QueryException {
     // evaluate argument
     final Expr a = expr[1];
     if(!a.item()) return this;
@@ -67,10 +74,10 @@ abstract class Cmp extends Arr {
        o == Op.EQ && v != (int) v) return Bln.FALSE;
     // EXISTS: c > (v<1), c >= (v<=1), c != (v=0)
     if(o == Op.GT && v < 1 || o == Op.GE && v <= 1 || o == Op.NE && v == 0)
-      return FunDef.EXISTS.get(input, ((Fun) expr[0]).expr);
+      return Function.EXISTS.get(input, ((FuncCall) expr[0]).expr);
     // EMPTY: c < (v<=1), c <= (v<1), c = (v=0)
     if(o == Op.LT && v <= 1 || o == Op.LE && v < 1 || o == Op.EQ && v == 0)
-      return FunDef.EMPTY.get(input, ((Fun) expr[0]).expr);
+      return Function.EMPTY.get(input, ((FuncCall) expr[0]).expr);
 
     return this;
   }

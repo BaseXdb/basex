@@ -24,7 +24,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class Func extends Single {
+public class UserFunc extends Single {
   /** Function name. */
   public final QNm name;
   /** Return type. */
@@ -46,7 +46,7 @@ public class Func extends Single {
    * @param r return type
    * @param d declaration flag
    */
-  public Func(final InputInfo ii, final QNm n, final Var[] a,
+  public UserFunc(final InputInfo ii, final QNm n, final Var[] a,
       final SeqType r, final boolean d) {
     super(ii, null);
     name = n;

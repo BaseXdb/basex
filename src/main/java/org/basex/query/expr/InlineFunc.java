@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.FunItem;
-import org.basex.query.item.FunType;
+import org.basex.query.item.FuncItem;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -21,7 +21,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class InlineFunc extends Func {
+public final class InlineFunc extends UserFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -42,10 +42,10 @@ public final class InlineFunc extends Func {
   }
 
   @Override
-  public FunItem item(final QueryContext ctx, final InputInfo ii) {
-    final FunType ft = FunType.get(this);
+  public FuncItem item(final QueryContext ctx, final InputInfo ii) {
+    final FuncType ft = FuncType.get(this);
     final boolean c = ft.ret != null && !expr.type().instance(ft.ret);
-    return new FunItem(args, expr, ft, ctx.vars.local(), c);
+    return new FuncItem(args, expr, ft, ctx.vars.local(), c);
   }
 
   @Override

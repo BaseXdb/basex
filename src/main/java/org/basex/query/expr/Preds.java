@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.path.AxisStep;
@@ -71,7 +71,7 @@ public abstract class Preds extends ParseExpr {
   protected boolean useIterator() {
     // position predicate
     pos = pred[0] instanceof Pos ? (Pos) pred[0] : null;
-    last = pred[0].isFun(FunDef.LAST);
+    last = pred[0].isFun(Function.LAST);
 
     boolean np1 = true;
     boolean np2 = true;

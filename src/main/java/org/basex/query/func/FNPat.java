@@ -30,7 +30,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNPat extends Fun {
+public final class FNPat extends FuncCall {
   /** Function namespace. */
   private static final Uri U_FN = Uri.uri(FNURI);
 
@@ -59,7 +59,7 @@ public final class FNPat extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  public FNPat(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNPat(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -311,6 +311,6 @@ public final class FNPat extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == FunDef.ANALZYE || super.uses(u);
+    return u == Use.X30 && def == Function.ANALZYE || super.uses(u);
   }
 }

@@ -323,16 +323,16 @@ public abstract class Path extends ParseExpr {
 
       final int name = data.tagindex.id(curr.test.name.ln());
 
-      final ArrayList<PathNode> out = new ArrayList<PathNode>();
+      final ArrayList<PathNode> al = new ArrayList<PathNode>();
       for(final PathNode pn : data.pthindex.desc(in, desc)) {
         if(pn.kind == Data.ELEM && name == pn.name) {
           // skip test if a tag is found on different levels
-          if(out.size() != 0 && out.get(0).level() != pn.level()) return null;
-          out.add(pn);
+          if(al.size() != 0 && al.get(0).level() != pn.level()) return null;
+          al.add(pn);
         }
       }
-      if(out.size() == 0) return null;
-      in = out;
+      if(al.size() == 0) return null;
+      in = al;
     }
     return in;
   }

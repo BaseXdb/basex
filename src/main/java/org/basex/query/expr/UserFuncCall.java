@@ -20,11 +20,11 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FuncCall extends Arr {
+public final class UserFuncCall extends Arr {
   /** Function name. */
   private final QNm name;
   /** Function reference. */
-  private Func func;
+  private UserFunc func;
 
   /**
    * Function constructor.
@@ -32,7 +32,7 @@ public final class FuncCall extends Arr {
    * @param nm function name
    * @param arg arguments
    */
-  public FuncCall(final InputInfo ii, final QNm nm, final Expr... arg) {
+  public UserFuncCall(final InputInfo ii, final QNm nm, final Expr... arg) {
     super(ii, arg);
     name = nm;
   }
@@ -41,7 +41,7 @@ public final class FuncCall extends Arr {
    * Initializes the function call after all functions have been declared.
    * @param f function reference
    */
-  public void init(final Func f) {
+  public void init(final UserFunc f) {
     func = f;
   }
 

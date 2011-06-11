@@ -32,7 +32,7 @@ public final class Types {
 
     if(!atom && type.uri() == Uri.EMPTY) {
       final byte[] ln = type.ln();
-      if(eq(ln, token(FUNCTION))) return FunType.ANY_FUN;
+      if(eq(ln, token(FUNCTION))) return FuncType.ANY_FUN;
       if(eq(ln, MAP)) return MapType.ANY_MAP;
     }
 

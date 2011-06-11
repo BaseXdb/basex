@@ -52,7 +52,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNZip extends Fun {
+public final class FNZip extends FuncCall {
   /** Function namespace. */
   private static final Uri U_ZIP = Uri.uri(ZIPURI);
   /** Element: zip:file. */
@@ -80,7 +80,7 @@ public final class FNZip extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  public FNZip(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNZip(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -90,13 +90,13 @@ public final class FNZip extends Fun {
 
     checkAdmin(ctx);
     switch(def) {
-      case BENTRY:    return binaryEntry(ctx);
-      case TEXTENTRY: return textEntry(ctx);
-      case HTMLENTRY: return xmlEntry(ctx, true);
-      case XMLENTRY:  return xmlEntry(ctx, false);
-      case ENTRIES:   return entries(ctx);
+      case ZIPBIN:    return binaryEntry(ctx);
+      case ZIPTEXT: return textEntry(ctx);
+      case ZIPHTML: return xmlEntry(ctx, true);
+      case ZIPXML:  return xmlEntry(ctx, false);
+      case ZIPENTRIES:   return entries(ctx);
       case ZIPFILE:   return zipFile(ctx);
-      case UPDATE:    return updateEntries(ctx);
+      case ZIPUPDATE:    return updateEntries(ctx);
       default: return super.item(ctx, ii);
     }
   }

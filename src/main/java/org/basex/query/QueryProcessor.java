@@ -19,7 +19,7 @@ import org.basex.data.Serializer;
 import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
 import org.basex.query.expr.Expr;
-import org.basex.query.func.FunJava;
+import org.basex.query.func.JavaFunc;
 import org.basex.query.item.Atm;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
@@ -161,7 +161,7 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void bind(final String n, final Object o) throws QueryException {
-    final Expr ex = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
+    final Expr ex = o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null);
     // remove optional $ prefix
     final QNm nm = new QNm(token(n.indexOf('$') == 0 ? n.substring(1) : n));
     ctx.ns.uri(nm);
@@ -185,7 +185,7 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void context(final Object o) throws QueryException {
-    ctx.initExpr = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
+    ctx.initExpr = o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null);
   }
 
   /**
