@@ -60,6 +60,12 @@ public interface PkgText {
   /** Attribute file. */
   byte[] FILE = token("file");
 
+  /** Jar descriptor children. */
+  /** <jar/> element. */
+  byte[] JAR = token("jar");
+  /** <function/> element. */
+  byte[] FUNC = token("function");
+
   /** Not expected initialization error. */
   String NOTEXP = "Missing package descriptor for package '%'";
   /** Attribute missing. */
@@ -72,4 +78,8 @@ public interface PkgText {
   String MISSSECOND = "Dependency not completely specified.";
   /** Component missing. */
   String MISSCOMP = "Component '%' not specified";
+  /** No jars registered. */
+  String NOJARS = "No jars specified";
+  /** No public classes registered. */
+  String NOCLASS = "No public classes specified";
 }

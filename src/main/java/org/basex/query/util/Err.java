@@ -162,6 +162,10 @@ public enum Err {
   PKGDEP(PACK, 9, "Package % depends on package %"),
   /** PACK0010: Evaluation exception. */
   PKGNOTSUPP(PACK, 10, "Package is not supported by current version of BaseX."),
+  /** PACK0011: Evaluation exception. */
+  JARDESCINV(PACK, 11, "Jar descriptor: %."),
+  /** PACK0012: Evaluation exception. */
+  JARREADFAIL(PACK, 12, "Reading jar descriptor failed: %"),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
