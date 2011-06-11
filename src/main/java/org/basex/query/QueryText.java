@@ -42,6 +42,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTWRITE = "rewriting %";
   /** Optimization info. */
+  String OPTFLAT = "flattening %";
+  /** Optimization info. */
   String OPTREMOVE = "%: removing %";
   /** Optimization info. */
   String OPTFORLET = "moving for/let clauses";
@@ -55,6 +57,8 @@ public interface QueryText {
   String OPTINLINE = "inlining function %(...)";
   /** Optimization info. */
   String OPTWHERE = "rewriting where clause to predicate(s)";
+  /** Optimization info. */
+  String OPTPRED = "rewriting % to predicate(s)";
   /** Optimization info. */
   String OPTCAST = "removing redundant % cast.";
   /** Optimization info. */

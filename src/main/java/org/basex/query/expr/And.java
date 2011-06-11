@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
@@ -57,6 +58,7 @@ public final class And extends Logical {
     if(ps != null) expr = Array.add(expr, ps);
     if(cr != null) expr = Array.add(expr, cr);
     if(ex.length != expr.length) ctx.compInfo(OPTWRITE, this);
+    compFlatten(ctx);
 
     // return single expression if it yields a boolean
     return expr.length == 1 ? single() : this;

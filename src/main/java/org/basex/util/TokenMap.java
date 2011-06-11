@@ -1,8 +1,8 @@
 package org.basex.util;
 
 /**
- * This is a simple hash map, extending the even simpler
- * {@link TokenSet hash set}.
+ * This is an efficient hash map for tokens,
+ * extending the {@link TokenSet hash set}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

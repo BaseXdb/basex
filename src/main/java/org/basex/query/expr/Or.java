@@ -49,6 +49,7 @@ public final class Or extends Logical {
     }
     if(ex.length != expr.length) ctx.compInfo(OPTWRITE, this);
     expr = ex;
+    compFlatten(ctx);
 
     // return single expression if it yields a boolean
     return expr.length == 1 ? single() : this;

@@ -7,7 +7,7 @@ import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 
 /**
- * This is a simple hash set, storing keys in byte arrays.
+ * This is an efficient hash set, storing keys in byte arrays.
  * The {@link TokenMap} class extends it to a hash map.
  *
  * @author BaseX Team 2005-11, BSD License

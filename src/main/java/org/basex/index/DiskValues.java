@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.IntList;
+import org.basex.util.IntMap;
 import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -33,7 +34,7 @@ public final class DiskValues implements Index {
   /** Cache tokens. */
   private final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  private final byte[][] ctext;
+  private IntMap<byte[]> ctext = new IntMap<byte[]>();
 
   /**
    * Constructor, initializing the index structure.
@@ -59,7 +60,6 @@ public final class DiskValues implements Index {
     idxl = new DataAccess(d.meta.file(pref + 'l'));
     idxr = new DataAccess(d.meta.file(pref + 'r'));
     size = idxl.read4();
-    ctext = new byte[size][];
   }
 
   @Override
@@ -197,10 +197,11 @@ public final class DiskValues implements Index {
       final long pos = idxr.read5(m * 5L);
       idxl.readNum(pos);
       final int pre = idxl.readNum();
-      byte[] txt = ctext[m];
-      if(ctext[m] == null) {
+      // get text from cache, of add entry to cache
+      byte[] txt = ctext.get(m);
+      if(txt == null) {
         txt = data.text(pre, text);
-        ctext[m] = txt;
+        ctext.add(m, txt);
       }
       final int d = diff(txt, key);
       if(d == 0) return pos;

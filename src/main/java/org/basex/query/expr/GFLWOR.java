@@ -91,12 +91,12 @@ public class GFLWOR extends ParseExpr {
       // bind variable if it contains a value or occurs only once
       if(flt.expr.value() || count(flt.var, f) == 1) flt.bind(ctx);
 
-      /* ...or if all inner clauses are LET clauses. This rewriting would
+      /* ...or if all inner clauses return only one item. This rewriting would
        * disallow repeated evaluations of the same expression, but it prevents
        * index-based rewritings (e.g. for XMark 9)
-      boolean let = true;
-      for(int g = f + 1; g < fl.length; g++) let &= fl[g] instanceof Let;
-      if(flt.expr.value() || count(flt.var, f) == 1 && let) flt.bind(ctx);
+      boolean one = true;
+      for(int g = f + 1; g < fl.length; g++) one &= fl[g].size() == 1;
+      if(flt.expr.value() || count(flt.var, f) == 1 && one) flt.bind(ctx);
       */
     }
 

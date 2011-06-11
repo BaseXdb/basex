@@ -123,11 +123,10 @@ public final class FNSimple extends FuncCall {
 
     switch(def) {
       case EMPTY:
-        return e.size() != -1 && !e.uses(Use.CTX) ?
-            Bln.get(e.size() == 0) : this;
       case EXISTS:
-        return e.size() != -1 && !e.uses(Use.CTX) ?
-            Bln.get(e.size() != 0) : this;
+        // context-based expressions (e.g.: error()) will be dropped
+        return e.size() == -1 || e.uses(Use.CTX) ? this :
+          Bln.get(def == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
         if(expr[0].type().eq(SeqType.BLN)) return e;

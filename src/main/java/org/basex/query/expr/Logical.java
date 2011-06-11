@@ -1,6 +1,9 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
+import java.util.ArrayList;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
@@ -41,6 +44,25 @@ public abstract class Logical extends Arr {
       expr = Array.delete(expr, e--);
     }
     return expr.length == 0 ? Bln.get(and) : this;
+  }
+
+  /**
+   * Flattens nested logical expressions.
+   * @param ctx query context
+   */
+  protected final void compFlatten(final QueryContext ctx) {
+    // flatten nested expressions
+    final ArrayList<Expr> tmp = new ArrayList<Expr>(expr.length);
+    for(int p = 0; p < expr.length; ++p) {
+      if(expr[p].getClass().isInstance(this)) {
+        final Expr[] ex = ((Logical) expr[p]).expr;
+        for(int i = 0; i < ex.length; i++) tmp.add(ex[i]);
+        ctx.compInfo(OPTFLAT, expr[p]);
+      } else {
+        tmp.add(expr[p]);
+      }
+    }
+    if(expr.length != tmp.size()) expr = tmp.toArray(new Expr[tmp.size()]);
   }
 
   /**
