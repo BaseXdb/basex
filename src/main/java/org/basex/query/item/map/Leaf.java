@@ -1,6 +1,7 @@
 package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
+import static org.basex.query.QueryTokens.*;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -187,5 +188,10 @@ final class Leaf extends TrieNode {
   @Override
   int hash(final InputInfo ii) throws QueryException {
     return 31 * hash + value.hash(ii);
+  }
+
+  @Override
+  StringBuilder toString(final StringBuilder sb) {
+    return sb.append(key).append(ASSIGN).append(value).append(", ");
   }
 }
