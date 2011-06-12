@@ -52,7 +52,7 @@ public final class Or extends Logical {
     compFlatten(ctx);
 
     // return single expression if it yields a boolean
-    return expr.length == 1 ? single() : this;
+    return expr.length == 1 ? compBln(expr[0]) : this;
   }
 
   @Override

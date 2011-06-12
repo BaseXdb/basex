@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.SeqType;
 import org.basex.util.Array;
@@ -31,11 +30,11 @@ public abstract class Logical extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+    for(final Expr e : expr) checkUp(e, ctx);
 
     final boolean and = this instanceof And;
     for(int e = 0; e < expr.length; ++e) {
-      expr[e] = expr[e].compEbv(ctx);
+      expr[e] = expr[e].comp(ctx).compEbv(ctx);
       if(!expr[e].value()) continue;
 
       // atomic items can be pre-evaluated
@@ -63,15 +62,5 @@ public abstract class Logical extends Arr {
       }
     }
     if(expr.length != tmp.size()) expr = tmp.toArray(new Expr[tmp.size()]);
-  }
-
-  /**
-   * Returns an equivalent for the logical expression, assuming that only
-   * one operand exists.
-   * @return resulting expression
-   */
-  protected final Expr single() {
-    return expr[0].type().eq(SeqType.BLN) ? expr[0] :
-      Function.BOOLEAN.get(input, expr[0]);
   }
 }

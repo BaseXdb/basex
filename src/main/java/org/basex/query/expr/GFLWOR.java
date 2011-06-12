@@ -253,9 +253,9 @@ public class GFLWOR extends ParseExpr {
     // bind tests to the corresponding variables
     for(int t = 0; t < tests.length; ++t) {
       final ForLet f = fl[tar[t]];
+      // remove variable reference and optionally wrap test with boolean()
       Expr e = tests[t].remove(f.var);
-      // wrap test with boolean() if the result is numeric
-      if(e.type().mayBeNum()) e = Function.BOOLEAN.get(input, e);
+      e = Function.BOOLEAN.get(input, e).compEbv(ctx);
       // attach predicates to axis path or filter, or create a new filter
       if(f.expr instanceof AxisPath) {
         f.expr = ((AxisPath) f.expr).addPreds(e);

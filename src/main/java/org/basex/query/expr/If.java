@@ -51,7 +51,7 @@ public final class If extends Arr {
     // if A then true() else false() -> boolean(A)
     if(expr[1] == Bln.TRUE && expr[2] == Bln.FALSE) {
       ctx.compInfo(OPTWRITE, this);
-      return Function.BOOLEAN.get(input, expr[0]);
+      return compBln(expr[0]);
     }
 
     // if A then false() else true() -> not(A)

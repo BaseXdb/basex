@@ -148,6 +148,9 @@ public final class FNSimple extends FuncCall {
           // simplify: not('a' = 'b') -> 'a' != 'b'
           final Cmp c = ((Cmp) e).invert();
           return c == e ? this : c;
+        } else if(e.isFun(Function.NOT)) {
+          // simplify: not(not(A)) -> boolean(A)
+          return compBln(((FuncCall) e).expr[0]);
         } else {
           // simplify, e.g.: not(boolean(A)) -> not(A)
           expr[0] = e.compEbv(ctx);

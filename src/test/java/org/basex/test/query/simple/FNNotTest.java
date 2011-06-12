@@ -122,14 +122,19 @@ public final class FNNotTest extends QueryTest {
         "not(fn:boolean((1, 2, 3, current-time())[1] treat as xs:integer)) " +
         "eq false()" },
 
-      { "not 1", bool(false), "not(<X/> = <X/>)" },
-      { "not 2", bool(true), "not(<X/> != <X/>)" },
-      { "not 3", bool(false), "not(<X>a</X> < <X>b</X>)" },
-      { "not 4", bool(true), "not(<X>a</X> > <X>b</X>)" },
-      { "not 5", bool(false), "not(<X>a</X> >= <X>a</X>)" },
-      { "not 6", bool(false), "not(<X>a</X> <= <X>a</X>)" },
-      { "not 7", bool(false), "not((<X>b</X>,<X>a</X>) <= <X>a</X>)" },
-      { "not 8", bool(false), "not((<X>b</X>,<X>a</X>) >= <X>a</X>)" },
+      { "not  1", bool(false), "not(<X/> = <X/>)" },
+      { "not  2", bool(true), "not(<X/> != <X/>)" },
+      { "not  3", bool(false), "not(<X>a</X> < <X>b</X>)" },
+      { "not  4", bool(true), "not(<X>a</X> > <X>b</X>)" },
+      { "not  5", bool(false), "not(<X>a</X> >= <X>a</X>)" },
+      { "not  6", bool(false), "not(<X>a</X> <= <X>a</X>)" },
+      { "not  7", bool(false), "not((<X>b</X>,<X>a</X>) <= <X>a</X>)" },
+      { "not  8", bool(false), "not((<X>b</X>,<X>a</X>) >= <X>a</X>)" },
+      { "not  9", bool(true), "not(not(<X/>))" },
+      { "not 10", bool(false, true),
+        "for $b in (true(),false()) return not($b)" },
+      { "not 11", bool(true, false),
+        "for $b in (true(),false()) return not(not($b))" },
     };
   }
 }
