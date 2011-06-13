@@ -1,5 +1,6 @@
 package org.basex.query.item.map;
 
+import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryException;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
@@ -266,5 +267,12 @@ final class List extends TrieNode {
     }
     // all entries were found
     return true;
+  }
+
+  @Override
+  StringBuilder toString(final StringBuilder sb) {
+    for(int i = size; --i >= 0;)
+      sb.append(keys[i]).append(ASSIGN).append(values[i]).append(", ");
+    return sb;
   }
 }
