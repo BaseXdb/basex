@@ -66,6 +66,10 @@ public final class SimpleTest extends QueryTest {
       { "Or 3", bool(false), "not(<a/>) or (not(<a/>) or not(<a/>))" },
 
       { "Seq 1", itr(), "((( )  )    )" },
+      { "Seq 2", itr(1), "((( 1 )  )    )" },
+      { "Seq 3", itr(1, 2), "((( 1,2 )  )    )" },
+      { "Seq 4", itr(1, 2, 3), "(1, (( 2,3 )  )    )" },
+      { "Seq 5", itr(1, 2, 3, 4), "(1, (( 2,3 )  ),4   )" },
 
       { "SeqError 1", "()()" },
       { "SeqError 2", "() ()" },

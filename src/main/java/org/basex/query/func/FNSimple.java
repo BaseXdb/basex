@@ -129,10 +129,7 @@ public final class FNSimple extends FuncCall {
           Bln.get(def == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
-        if(expr[0].type().eq(SeqType.BLN)) return e;
-        // simplify, e.g.: boolean(exists(A)) -> boolean(A)
-        expr[0] = e.compEbv(ctx);
-        return this;
+        return e.type().eq(SeqType.BLN) ? e : this;
       case NOT:
         if(e.isFun(Function.EMPTY)) {
           // simplify: not(empty(A)) -> exists(A)

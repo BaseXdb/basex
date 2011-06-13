@@ -129,8 +129,13 @@ public final class FNUtil extends FuncCall {
    * @throws QueryException query exception
    */
   private Value bytes(final QueryContext ctx) throws QueryException {
-    return ItrSeq.get(((B64) checkType(expr[0].item(ctx, input),
-        AtomType.B64)).toJava(), AtomType.BYT);
+    final byte[] bytes = ((B64) checkType(expr[0].item(ctx, input),
+        AtomType.B64)).toJava();
+
+    final int bl = bytes.length;
+    final long[] tmp = new long[bl];
+    for(int i = 0; i < bl; i++) tmp[i] = bytes[i];
+    return ItrSeq.get(tmp, AtomType.BYT);
   }
 
   /**

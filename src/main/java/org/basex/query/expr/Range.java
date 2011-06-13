@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryTokens.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
@@ -42,6 +44,7 @@ public final class Range extends Arr {
       if(v != null) {
         size = v[1] - v[0] + 1;
         // use iterative evaluation at runtime instead of range sequence
+        // to avoid prevent intermediary result materialization
         e = size < 1 ? Empty.SEQ : size == 1 ? Itr.get(v[0]) : this;
       }
     }
@@ -91,6 +94,6 @@ public final class Range extends Arr {
 
   @Override
   public String toString() {
-    return toString(" " + QueryTokens.TO + " ");
+    return PAR1 + toString(" " + QueryTokens.TO + " ") + PAR2;
   }
 }

@@ -4,6 +4,7 @@ import org.basex.data.ExprInfo;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -105,7 +106,8 @@ public abstract class Expr extends ExprInfo {
       throws QueryException;
 
   /**
-   * Tests if this is an empty sequence.
+   * Tests if this is an empty sequence. This function is only overwritten
+   * by the {@link Empty} class, which represents the empty sequence.
    * @return result of check
    */
   public boolean empty() {

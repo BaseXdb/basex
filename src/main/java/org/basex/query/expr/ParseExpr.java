@@ -62,10 +62,8 @@ public abstract class ParseExpr extends Expr {
     final Iter ir = iter(ctx);
     final Item it = ir.next();
     if(it == null || ir.size() == 1) return it;
-
     final Item n = ir.next();
-    if(n != null) XPSEQ.thrw(ii, PAR1 + it + SEP + n +
-        (ir.next() != null ? SEP + DOTS : "") + PAR2);
+    if(n != null) XPSEQ.thrw(ii, this);
     return it;
   }
 
@@ -97,6 +95,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public final Item test(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Item it = ebv(ctx, input);
     return (it.num() ? it.dbl(input) == ctx.pos : it.bool(input)) ? it : null;
   }

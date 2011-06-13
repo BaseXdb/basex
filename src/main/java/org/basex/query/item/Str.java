@@ -83,11 +83,6 @@ public class Str extends Item {
   }
 
   @Override
-  public SeqType type() {
-    return SeqType.STR;
-  }
-
-  @Override
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Str)) return false;
     final Str i = (Str) cmp;

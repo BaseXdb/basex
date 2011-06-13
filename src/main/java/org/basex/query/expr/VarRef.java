@@ -104,6 +104,11 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof VarRef  && var.sameAs(((VarRef) cmp).var);
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, NAM, token(var.toString()));
   }
