@@ -56,6 +56,23 @@ public final class SimpleTest extends QueryTest {
       { "If 10", itr(2), "if(boolean(<x/>) = false()) then 1 else 2" },
       { "If 11", itr(1), "if(boolean(<x/>) != false()) then 1 else 2" },
       { "If 12", "if(<x/> = true()) then 1 else 2" },
+
+      { "And 1", bool(true), "<a/> and <a/>" },
+      { "And 2", bool(true), "<a/> and (<a/> and <a/>)" },
+      { "And 3", bool(false), "<a/> and (<a/> and not(<a/>))" },
+
+      { "Or 1", bool(true), "<a/> or <a/>" },
+      { "Or 2", bool(true), "<a/> or (<a/> or <a/>)" },
+      { "Or 3", bool(false), "not(<a/>) or (not(<a/>) or not(<a/>))" },
+
+      { "Seq 1", itr(), "((( )  )    )" },
+      { "Seq 2", itr(1), "((( 1 )  )    )" },
+      { "Seq 3", itr(1, 2), "((( 1,2 )  )    )" },
+      { "Seq 4", itr(1, 2, 3), "(1, (( 2,3 )  )    )" },
+      { "Seq 5", itr(1, 2, 3, 4), "(1, (( 2,3 )  ),4   )" },
+
+      { "SeqError 1", "()()" },
+      { "SeqError 2", "() ()" },
     };
   }
 }

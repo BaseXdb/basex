@@ -123,17 +123,13 @@ public final class FNSimple extends FuncCall {
 
     switch(def) {
       case EMPTY:
-        return e.size() != -1 && !e.uses(Use.CTX) ?
-            Bln.get(e.size() == 0) : this;
       case EXISTS:
-        return e.size() != -1 && !e.uses(Use.CTX) ?
-            Bln.get(e.size() != 0) : this;
+        // context-based expressions (e.g.: error()) will be dropped
+        return e.size() == -1 || e.uses(Use.CTX) ? this :
+          Bln.get(def == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
-        if(expr[0].type().eq(SeqType.BLN)) return e;
-        // simplify, e.g.: boolean(exists(A)) -> boolean(A)
-        expr[0] = e.compEbv(ctx);
-        return this;
+        return e.type().eq(SeqType.BLN) ? e : this;
       case NOT:
         if(e.isFun(Function.EMPTY)) {
           // simplify: not(empty(A)) -> exists(A)
@@ -149,6 +145,9 @@ public final class FNSimple extends FuncCall {
           // simplify: not('a' = 'b') -> 'a' != 'b'
           final Cmp c = ((Cmp) e).invert();
           return c == e ? this : c;
+        } else if(e.isFun(Function.NOT)) {
+          // simplify: not(not(A)) -> boolean(A)
+          return compBln(((FuncCall) e).expr[0]);
         } else {
           // simplify, e.g.: not(boolean(A)) -> not(A)
           expr[0] = e.compEbv(ctx);

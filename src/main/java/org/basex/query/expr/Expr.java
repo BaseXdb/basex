@@ -4,6 +4,7 @@ import org.basex.data.ExprInfo;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -12,6 +13,7 @@ import org.basex.query.path.AxisPath;
 import org.basex.query.path.MixedPath;
 import org.basex.query.util.IndexContext;
 import org.basex.query.util.Var;
+import org.basex.query.util.VarList;
 import org.basex.util.InputInfo;
 
 /**
@@ -105,7 +107,8 @@ public abstract class Expr extends ExprInfo {
       throws QueryException;
 
   /**
-   * Tests if this is an empty sequence.
+   * Tests if this is an empty sequence. This function is only overwritten
+   * by the {@link Empty} class, which represents the empty sequence.
    * @return result of check
    */
   public boolean empty() {
@@ -280,5 +283,26 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public Expr addText(final QueryContext ctx) throws QueryException {
     return this;
+  }
+
+  /**
+   * Checks if this expression has free variables.
+   * @param ctx the query context on the level of this expression
+   * @return {@code true} if there are variables which are used but not declared
+   *         in this expression, {@code false} otherwise
+   */
+  public boolean hasFreeVars(final QueryContext ctx) {
+
+    final VarList global = ctx.vars.global();
+    for(int i = global.size; --i >= 0;) {
+      if(count(global.vars[i]) > 0) return true;
+    }
+
+    final VarList vars = ctx.vars.local();
+    for(int i = vars.size; --i >= 0;) {
+      if(count(vars.vars[i]) > 0) return true;
+    }
+
+    return false;
   }
 }

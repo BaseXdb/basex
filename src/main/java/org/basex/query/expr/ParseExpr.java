@@ -10,6 +10,7 @@ import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
+import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
@@ -61,10 +62,8 @@ public abstract class ParseExpr extends Expr {
     final Iter ir = iter(ctx);
     final Item it = ir.next();
     if(it == null || ir.size() == 1) return it;
-
     final Item n = ir.next();
-    if(n != null) XPSEQ.thrw(ii, PAR1 + it + SEP + n +
-        (ir.next() != null ? SEP + DOTS : "") + PAR2);
+    if(n != null) XPSEQ.thrw(ii, this);
     return it;
   }
 
@@ -96,6 +95,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public final Item test(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Item it = ebv(ctx, input);
     return (it.num() ? it.dbl(input) == ctx.pos : it.bool(input)) ? it : null;
   }
@@ -131,6 +131,17 @@ public abstract class ParseExpr extends Expr {
   protected final Expr optPre(final Expr opt, final QueryContext ctx) {
     if(opt != this) ctx.compInfo(QueryText.OPTPRE, this);
     return opt == null ? Empty.SEQ : opt;
+  }
+
+  /**
+   * Returns a boolean equivalent for the specified expression.
+   * If the specified expression yields a boolean value anyway, it will be
+   * returned as is. Otherwise, it will be wrapped into a boolean function.
+   * @param e expression to be rewritten
+   * @return expression
+   */
+  protected final Expr compBln(final Expr e) {
+    return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(input, e);
   }
 
   // VALIDITY CHECKS ==========================================================

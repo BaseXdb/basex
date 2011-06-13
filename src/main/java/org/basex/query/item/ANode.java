@@ -420,11 +420,6 @@ public abstract class ANode extends Item {
     }
   }
 
-  @Override
-  public final SeqType type() {
-    return SeqType.NOD;
-  }
-
   /**
    * Returns this Node's node type.
    * @return node type

@@ -556,7 +556,7 @@ public enum Err {
   /** XQST0049: Parsing exception. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
   /** XQST0054: Parsing exception. */
-  XPSTACK(XQST, 54, "Circular variable declaration?"),
+  XPSTACK(XQST, 54, "Stack Overflow: Circular variable declaration?"),
   /** XQST0055: Parsing exception. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057: Parsing exception. */

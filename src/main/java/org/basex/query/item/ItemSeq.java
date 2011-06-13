@@ -78,26 +78,6 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token(Util.name(this)), SIZE, Token.token(size));
-    for(int v = 0; v != Math.min(size, 5); ++v) item[v].plan(ser);
-    ser.closeElement();
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(PAR1);
-    for(int i = 0; i < size; ++i) {
-      sb.append((i != 0 ? SEP : "") + item[i]);
-      if(sb.length() > 32 && i + 1 != size) {
-        sb.append(SEP + DOTS);
-        break;
-      }
-    }
-    return sb.append(PAR2).toString();
-  }
-
-  @Override
   public int writeTo(final Item[] arr, final int start) {
     System.arraycopy(item, 0, arr, start, (int) size);
     return (int) size;
@@ -112,5 +92,12 @@ public final class ItemSeq extends Seq {
   public boolean homogenous() {
     // [LW] really check it?
     return false;
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(Token.token(Util.name(this)), SIZE, Token.token(size));
+    for(int v = 0; v != Math.min(size, 5); ++v) item[v].plan(ser);
+    ser.closeElement();
   }
 }

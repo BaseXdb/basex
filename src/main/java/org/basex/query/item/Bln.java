@@ -105,11 +105,6 @@ public final class Bln extends Item {
   }
 
   @Override
-  public SeqType type() {
-    return SeqType.BLN;
-  }
-
-  @Override
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof Bln && val == ((Bln) cmp).val;
   }

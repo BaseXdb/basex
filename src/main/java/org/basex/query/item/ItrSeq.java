@@ -6,12 +6,11 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.SeqType.Occ;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -94,34 +93,43 @@ public final class ItrSeq extends Seq {
   }
 
   /**
-   * Creates a value containing the given integers in the given order.
+   * Creates a sequence with the specified integers.
    * @param val integers
-   * @param t type
+   * @param type type
    * @return value
    */
-  public static Value get(final long[] val, final Type t) {
-    return val.length == 0 ? Empty.SEQ : val.length == 1 ? Itr.get(val[0], t) :
-      new ItrSeq(val, t);
+  public static Value get(final long[] val, final Type type) {
+    return val.length == 0 ? Empty.SEQ : val.length == 1 ?
+        Itr.get(val[0], type) : new ItrSeq(val, type);
   }
 
   /**
-   * Creates a value containing the given integers in the given order.
-   * @param val integers
-   * @param t type
+   * Creates a sequence with the integers in the specified expressions.
+   * @param expr expressions
+   * @param size size of resulting sequence
+   * @param type type
    * @return value
+   * @throws QueryException query exception
    */
-  public static Value get(final byte[] val, final Type t) {
-    if(val.length < 2) return val.length == 0 ? Empty.SEQ : Itr.get(val[0], t);
-    final long[] nv = new long[val.length];
-    for(int i = 0; i < nv.length; i++) nv[i] = val[i];
-    return new ItrSeq(nv, t);
-  }
+  public static Value get(final Expr[] expr, final long size, final Type type)
+      throws QueryException {
 
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder(QueryTokens.PAR1);
-    for(int i = 0; i < vals.length; i++)
-      tb.add(i > 0 ? ", " : "").addLong(vals[i]);
-    return tb.add(QueryTokens.PAR2).toString();
+    final long[] tmp = new long[(int) size];
+    int t = 0;
+    for(final Expr e : expr) {
+      // speed up construction for items and integer sequences
+      if(e instanceof Item) {
+        tmp[t++] = ((Item) e).itr(null);
+      } else if(e instanceof ItrSeq) {
+        final ItrSeq val = (ItrSeq) e;
+        final long vs = val.size();
+        for(int v = 0; v < vs; v++) tmp[t++] = val.vals[v];
+      } else {
+        final Value val = (Value) e;
+        final long vs = val.size();
+        for(int v = 0; v < vs; v++) tmp[t++] = val.itemAt(v).itr(null);
+      }
+    }
+    return get(tmp, type);
   }
 }

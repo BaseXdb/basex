@@ -44,7 +44,7 @@ public abstract class Value extends Expr {
   public abstract ValueIter iter();
 
   @Override
-  public Value value(final QueryContext ctx) {
+  public final Value value(final QueryContext ctx) {
     return this;
   }
 
@@ -150,7 +150,7 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public Expr remove(final Var v) {
+  public final Expr remove(final Var v) {
     return this;
   }
 

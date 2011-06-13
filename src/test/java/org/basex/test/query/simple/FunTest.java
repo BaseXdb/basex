@@ -2,6 +2,7 @@ package org.basex.test.query.simple;
 
 /**
  * XQuery functions tests.
+ * Most tests verify if queries are correctly optimized.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -63,6 +64,12 @@ public final class FunTest extends QueryTest {
         "count((for $a in (1,2) let $b := <b/> return $b)/.)" },
       { "count 38", itr(2), "count(//desc/1)" },
       { "count 39", itr(4), "count(//desc/(1,2))" },
+
+      { "empty 1", bool(false), "empty(math:random())" },
+      { "empty 2", bool(false, false), "for $x in 1 to 2 return empty($x)" },
+
+      { "exists 1", bool(true), "exists(math:random())" },
+      { "exists 2", bool(true, true), "for $x in 1 to 2 return exists($x)" },
 
       { "contains 1", "contains(.)" },
       { "contains 2", "contains(. .)" },

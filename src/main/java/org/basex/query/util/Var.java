@@ -236,6 +236,13 @@ public final class Var extends ParseExpr {
   }
 
   @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof Var)) return false;
+    final Var v = (Var) cmp;
+    return name.eq(v.name) && type().eq(v.type());
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, NAM, Token.token(toString()));
     if(expr != null) expr.plan(ser);
