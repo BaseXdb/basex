@@ -71,6 +71,15 @@ public final class VarList extends ExprInfo {
   }
 
   /**
+   * Checks if the given variable is in this list.
+   * @param v variable
+   * @return {@code true} if the variable was found, {@code false} otherwise
+   */
+  public boolean contains(final Var v) {
+    return indexOf(v) != -1;
+  }
+
+  /**
    * Checks if all variables have been correctly declared.
    * @throws QueryException query exception
    */

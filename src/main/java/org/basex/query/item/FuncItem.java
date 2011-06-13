@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -14,7 +13,8 @@ import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.query.util.VarList;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import static org.basex.util.Token.*;
+import org.basex.util.Util;
 
 /**
  * Function item.
@@ -63,8 +63,13 @@ public final class FuncItem extends FItem {
   public FuncItem(final Var[] arg, final Expr body, final FuncType t,
       final VarList cl, final boolean cst) {
     this(null, arg, body, t, cst);
-    if(cl != null)
-      for(int i = 0; i < cl.size; i++) closure.set(cl.vars[i].copy());
+    if(cl != null) {
+      for(int i = cl.size; --i >= 0;) {
+        final Var v = cl.vars[i];
+        if(body.count(v) != 0 && !closure.contains(v))
+          closure.set(v.copy());
+      }
+    }
   }
 
   @Override
@@ -77,16 +82,29 @@ public final class FuncItem extends FItem {
     return name;
   }
 
+  /**
+   * Binds all variables to the context.
+   * @param ctx query context
+   * @param args argument values
+   * @return old size of the variable stack
+   * @throws QueryException query exception
+   */
+  private int bindVars(final QueryContext ctx, final Value[] args)
+      throws QueryException {
+    final int s = ctx.vars.size();
+    for(int i = closure.size; --i >= 0;)
+      ctx.vars.add(closure.vars[i].copy());
+    for(int a = vars.length; --a >= 0;)
+      ctx.vars.add(vars[a].bind(args[a], ctx).copy());
+    return s;
+  }
+
   @Override
   public Value invValue(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
     // move variables to stack
-    final int s = ctx.vars.size();
-    for(int i = closure.size; i-- > 0;)
-      ctx.vars.add(closure.vars[i].copy());
-    for(int a = vars.length; a-- > 0;)
-      ctx.vars.add(vars[a].bind(args[a], ctx).copy());
+    final int s = bindVars(ctx, args);
 
     // evaluate function
     final Value cv = ctx.value;
@@ -114,11 +132,7 @@ public final class FuncItem extends FItem {
       final Value... args) throws QueryException {
 
     // move variables to stack
-    final int s = ctx.vars.size();
-    for(int i = closure.size; i-- > 0;)
-      ctx.vars.add(closure.vars[i].copy());
-    for(int a = vars.length; a-- > 0;)
-      ctx.vars.add(vars[a].bind(args[a], ctx).copy());
+    final int s = bindVars(ctx, args);
 
     // evaluate function
     final Value cv = ctx.value;
@@ -183,10 +197,9 @@ public final class FuncItem extends FItem {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token(FUNC));
-    ser.openElement(VAR);
+    ser.openElement(token(Util.name(this)), token(TYPE),
+        token(type.toString()));
     for(final Var v : vars) v.plan(ser);
-    ser.closeElement();
     expr.plan(ser);
     ser.closeElement();
   }

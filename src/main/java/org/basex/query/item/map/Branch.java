@@ -233,4 +233,10 @@ final class Branch extends TrieNode {
     // everything OK
     return true;
   }
+
+  @Override
+  StringBuilder toString(final StringBuilder sb) {
+    for(int i = 0; i < KIDS; i++) if(kids[i] != null) kids[i].toString(sb);
+    return sb;
+  }
 }

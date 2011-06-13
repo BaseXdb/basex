@@ -183,7 +183,8 @@ public class DBNode extends ANode {
     if(type != NodeType.DOC) return EMPTY;
     final String dir = data.meta.path;
     final String name = string(data.text(pre, true));
-    return token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
+    return token(dir == null || dir.isEmpty()
+        ? name : IO.get(dir).merge(name).url());
   }
 
   @Override
