@@ -294,6 +294,44 @@ public final class PackageAPITest extends AdvancedQueryTest {
   }
 
   /**
+   * Tests installing of a package containing a jar file.
+   * @throws BaseXException database exception
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testInstallJar() throws BaseXException, QueryException {
+    // Install package
+    new RepoInstall(REPO + "testJar.xar", null).execute(ctx);
+    // Ensure package was properly installed
+    final File pkgDir = new File(REPO + "testJar");
+    assertTrue(pkgDir.exists());
+    assertTrue(pkgDir.isDirectory());
+    final File pkgDesc = new File(REPO + "testJar/expath-pkg.xml");
+    assertTrue(pkgDesc.exists());
+    final File jarDesc = new File(REPO + "testJar/basex.xml");
+    assertTrue(jarDesc.exists());
+    final File modDir = new File(REPO + "testJar/jar");
+    assertTrue(modDir.exists());
+    assertTrue(modDir.isDirectory());
+    final File jar = new File(REPO + "testJar/jar/test.jar");
+    assertTrue(jar.exists());
+    final File wrapper = new File(REPO + "testJar/jar/wrapper.xq");
+    assertTrue(wrapper.exists());
+    // Use package
+    final QueryProcessor qp1 = new QueryProcessor(
+        "import module namespace j='jar';\nj:print('test')", ctx);
+    assertEquals(qp1.execute().toString(), "test");
+    qp1.execute();
+    // Delete package
+    wrapper.delete();
+    jar.delete();
+    modDir.delete();
+    jarDesc.delete();
+    pkgDesc.delete();
+    pkgDir.delete();
+  }
+
+  /**
    * Tests usage of installed packages.
    * @throws QueryException query exception
    */

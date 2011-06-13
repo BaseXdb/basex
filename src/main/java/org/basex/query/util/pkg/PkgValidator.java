@@ -106,7 +106,7 @@ public final class PkgValidator {
   private void checkProcs(final List<Dependency> procs) throws QueryException {
     boolean isSupported = false;
     for(final Dependency d : procs) {
-      if(!eq(lc(d.processor), lc(token(Text.NAME)))) {
+      if(!eq(lc(d.processor), token(Text.NAMELC))) {
         isSupported = false;
         break;
       }

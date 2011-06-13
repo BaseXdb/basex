@@ -11,6 +11,10 @@ import static org.basex.util.Token.*;
 public interface PkgText {
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg.xml";
+  /**Jar descriptor. */
+  String JARDESC = "basex.xml";
+  /** Jar path prefix. */
+  String JARPREF = "jar:file:";
 
   /** <package/> root element. */
   /** Element package. */
