@@ -721,7 +721,7 @@ public class QueryParser extends InputParser {
     if(pkgsLoaded.id(pkgName) != 0) return;
     // Find package in package dictionary
     final byte[] pkgDir = ctx.context.repo.pkgDict().get(pkgName);
-    if(pkgDir == null) error(PKGNOTINSTALLED);
+    if(pkgDir == null) error(NECPKGNOTINST);
     // Parse package descriptor
     final File pkgDesc = new File(new File(ctx.context.prop.get(Prop.REPOPATH),
         string(pkgDir)), PkgText.DESCRIPTOR);
@@ -741,7 +741,7 @@ public class QueryParser extends InputParser {
       // We consider only package dependencies here
       final byte[] depPkg = new PkgValidator(ctx.context, input()).getDepPkg(d);
       if(depPkg == null) {
-        error(PKGNOTINSTALLED, string(d.pkg));
+        error(NECPKGNOTINST, string(d.pkg));
       } else {
         if(pkgsToLoad.id(depPkg) != 0) error(CIRCMODULE);
         loadPackage(depPkg, pkgsToLoad, pkgsLoaded);

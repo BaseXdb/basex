@@ -145,9 +145,9 @@ public enum Err {
   /** PACK0001: Evaluation exception. */
   PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
   /** PACK0002: Evaluation exception. */
-  PKGINSTALLED(PACK, 2, "Package is already installed."),
+  PKGINST(PACK, 2, "Package is already installed."),
   /** PACK0003: Evaluation exception. */
-  PKGNOTINSTALLED(PACK, 3, "Necessary package '%' is not installed."),
+  NECPKGNOTINST(PACK, 3, "Necessary package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
   PKGDESCINV(PACK, 4, "Package descriptor: %."),
   /** PACK0005: Evaluation exception. */
@@ -166,6 +166,8 @@ public enum Err {
   JARDESCINV(PACK, 11, "Jar descriptor: %."),
   /** PACK0012: Evaluation exception. */
   JARREADFAIL(PACK, 12, "Reading jar descriptor failed: %"),
+  /** PACK0013: Evaluation exception. */
+  PKGNOTINST(PACK, 13, "Package '%' is not installed."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

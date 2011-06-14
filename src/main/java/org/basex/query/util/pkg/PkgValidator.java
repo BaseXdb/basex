@@ -50,7 +50,7 @@ public final class PkgValidator {
   public void check(final Package pkg) throws QueryException {
     // Check if package is already installed
     if(context.repo.pkgDict().get(pkg.getUniqueName()) != null)
-      PKGINSTALLED.thrw(input);
+      PKGINST.thrw(input);
     // Check package dependencies
     checkDepends(pkg);
     // Check package components
@@ -72,7 +72,7 @@ public final class PkgValidator {
           MISSSECOND);
       // If dependency involves a package, check if this package or an
       // appropriate version of it is installed
-      if(dep.pkg != null && getDepPkg(dep) == null) PKGNOTINSTALLED.thrw(input,
+      if(dep.pkg != null && getDepPkg(dep) == null) NECPKGNOTINST.thrw(input,
           dep.pkg);
       // If dependency involves a processor, add it to the list with processor
       // dependencies
@@ -205,7 +205,6 @@ public final class PkgValidator {
    */
   private boolean isInstalled(final Component comp, final byte[] name)
       throws QueryException {
-
     // Get packages in which the module's namespace is found
     final TokenSet pkgs = context.repo.nsDict().get(comp.uri);
     if(pkgs == null) return false;

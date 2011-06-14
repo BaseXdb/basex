@@ -69,6 +69,6 @@ public final class JarParser {
    * @return result of check
    */
   private static boolean eqNS(final byte[] cmp, final QNm name) {
-    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryTokens.PKGURI);
+    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryTokens.PACKURI);
   }
 }
