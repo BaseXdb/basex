@@ -21,7 +21,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
-import org.basex.query.util.Namespaces;
+import org.basex.query.util.NSLocal;
 import org.basex.util.TokenBuilder;
 import static org.basex.util.Token.*;
 
@@ -35,7 +35,7 @@ final class IterStreamReader implements XMLStreamReader {
   /** Properties. */
   private static final Properties PROPS = new Properties();
   /** Namespaces references. */
-  private final Namespaces ns = new Namespaces();
+  private final NSLocal ns = new NSLocal();
   /** Result iterator. */
   private final Iter result;
   /** Next flag. */

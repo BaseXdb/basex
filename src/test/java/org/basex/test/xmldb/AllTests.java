@@ -36,7 +36,7 @@ public final class AllTests {
   static final String PW = ADMIN;
 
   /** Test document. */
-  static final String DOCPATH = "etc/xml/";
+  static final String DOCPATH = "etc/test/";
   /** Test document. */
   static final String DOC1 = "first.xml";
   /** Test document. */

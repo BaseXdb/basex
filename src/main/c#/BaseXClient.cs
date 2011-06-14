@@ -1,5 +1,5 @@
 /*
- * C# client for BaseX.
+ * Language Binding for BaseX.
  * Works with BaseX 6.3.1 and later
  * Documentation: http://basex.org/api
  *
@@ -11,6 +11,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace BaseXClient
 {
@@ -20,14 +21,19 @@ namespace BaseXClient
     public NetworkStream stream;
     private TcpClient socket;
     private string info = "";
+    private string ehost;
     private int bpos;
     private int bsize;
+    private TcpClient esocket;
+    private NetworkStream estream;
+    private Dictionary<string, EventNotification> en;
 
     /** see readme.txt */
     public Session(string host, int port, string username, string pw)
     {
       socket = new TcpClient(host, port);
       stream = socket.GetStream();
+      ehost = host;
       string ts = Receive();
       Send(username);
       Send(MD5(MD5(pw) + ts));
@@ -71,9 +77,9 @@ namespace BaseXClient
       Send(name);
       while (true)
       {
-      	int t = s.ReadByte();
-      	if (t == -1) break;
-      	stream.WriteByte(Convert.ToByte(t));
+          int t = s.ReadByte();
+          if (t == -1) break;
+          stream.WriteByte(Convert.ToByte(t));
       }
       stream.WriteByte(0);
       info = Receive();
@@ -91,9 +97,9 @@ namespace BaseXClient
       Send(target);
       while (true)
       {
-      	int t = s.ReadByte();
-      	if (t == -1) break;
-      	stream.WriteByte(Convert.ToByte(t));
+          int t = s.ReadByte();
+          if (t == -1) break;
+          stream.WriteByte(Convert.ToByte(t));
       }
       stream.WriteByte(0);
       info = Receive();
@@ -101,6 +107,68 @@ namespace BaseXClient
       {
         throw new IOException(info);
       }
+    }
+    
+    /* Watches an event. */
+    public void Watch(string name, EventNotification notify)
+    {
+      stream.WriteByte(10);
+      Send(name);
+      if(esocket == null)
+      {    
+        int eport = Convert.ToInt32(Receive());
+        en = new Dictionary<string, EventNotification>();
+        esocket = new TcpClient(ehost, eport);
+        estream = esocket.GetStream();
+        string id = Receive();
+        byte[] msg = System.Text.Encoding.UTF8.GetBytes(id);
+        estream.Write(msg, 0, msg.Length);
+        estream.WriteByte(0);
+        new Thread(Listen).Start();
+      }
+      info = Receive();
+      if(!Ok())
+      {
+        throw new IOException(info);
+      }
+      en.Add(name, notify);
+    }
+    
+    /** Listens to event socket */
+    private void Listen() 
+    {
+      while (true)
+      {
+        String name = readS();
+        String val = readS();
+        en[name].Update(val);
+      }
+    }
+    
+    /** Returns event message */
+    private string readS() 
+    {
+      MemoryStream ms = new MemoryStream();
+      while (true) 
+      {
+        int b = estream.ReadByte();
+        if (b == 0) break;
+        ms.WriteByte((byte) b);
+      }
+      return System.Text.Encoding.UTF8.GetString(ms.ToArray()); 
+    }
+    
+    /* Unwatches an event. */
+    public void Unwatch(string name)
+    {
+      stream.WriteByte(11);
+      Send(name);
+      info = Receive();
+      if(!Ok())
+      {
+        throw new IOException(info);
+      }
+      en.Remove(name);
     }
 
     /** see readme.txt */
@@ -116,6 +184,10 @@ namespace BaseXClient
     public void Close()
     {
       Send("exit");
+      if (esocket != null) 
+      {
+        esocket.Close();
+      }
       socket.Close();
     }
 
@@ -254,4 +326,9 @@ namespace BaseXClient
       return s;
     }
   }
+    
+  interface EventNotification 
+    {
+        void Update(string data);
+    }
 }

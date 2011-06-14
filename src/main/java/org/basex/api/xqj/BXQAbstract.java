@@ -18,7 +18,7 @@ import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunJava;
+import org.basex.query.func.JavaFunc;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -127,7 +127,7 @@ abstract class BXQAbstract {
     if(t == null && v instanceof BXQItem) return ((BXQItem) v).it;
 
     // get xquery mapping
-    final Type e = FunJava.type(v);
+    final Type e = JavaFunc.type(v);
     if(e == AtomType.JAVA) throw new BXQException(CONV, Util.name(v));
 
     try {
