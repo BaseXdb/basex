@@ -8,10 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.basex.core.BaseXException;
-import org.basex.core.Command;
-import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
+import org.basex.server.ClientSession;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
@@ -31,14 +29,6 @@ public class BXAllDatabasesResource extends BXResource implements
     //MakeCollectionableResource, PutableResource, GetableResource, PropFindableResource {
     FolderResource {
 
-  /**
-   * Constructor.
-   * @param c database context
-   */
-  public BXAllDatabasesResource(final Context c) {
-    ctx = c;
-  }
-
   @Override
   public Date getModifiedDate() {
     // TODO Auto-generated method stub
@@ -52,16 +42,38 @@ public class BXAllDatabasesResource extends BXResource implements
 
   @Override
   public Resource child(final String childName) {
-    return new BXDocumentResource(ctx, childName);
+    try {
+      final ClientSession cs = login(user, pass);
+      try {
+        return new BXDocumentResource(childName, user, pass);
+      } finally {
+        cs.close();
+      }
+    } catch(Exception e) {
+      // [DP] WebDAV: error handling
+      e.printStackTrace();
+      return null;
+    }
   }
 
   @Override
   public List<? extends Resource> getChildren() {
     final List<BXResource> dbs = new ArrayList<BXResource>();
-    for(final String d : listDatabases(ctx))
-      dbs.add(isCollection(ctx, d) ?
-          new BXCollectionDatabaseResource(ctx, d) :
-          new BXDocumentResource(ctx, d));
+    try {
+      final ClientSession cs = login(user, pass);
+      try {
+        for(final String d : listDatabases(cs))
+          dbs.add(isCollection(cs, d) ?
+              new BXCollectionDatabaseResource(d) :
+ new BXDocumentResource(d, user, pass));
+      } finally {
+        cs.close();
+      }
+    } catch(final Exception e) {
+      // [DP] WebDAV: error handling
+      e.printStackTrace();
+      return null;
+    }
     return dbs;
   }
 
@@ -75,16 +87,17 @@ public class BXAllDatabasesResource extends BXResource implements
   @Override
   public Resource createNew(final String newName, final InputStream inputStream,
       final Long length, final String contentType) {
-    final String dbname = dbname(newName);
-    if(!Command.validName(dbname, false)) return null;
-    try {
-      CreateDB.xml(dbname, inputStream, ctx);
-      return new BXDocumentResource(ctx, dbname);
-    } catch(BaseXException e) {
-      // [DP] WebDAV: error handling
-      e.printStackTrace();
-      return null;
-    }
+//    final String dbname = dbname(newName);
+//    if(!Command.validName(dbname, false)) return null;
+//    try {
+//      CreateDB.create(dbname, inputStream, ctx);
+//      return new BXDocumentResource(cs, dbname);
+//    } catch(BaseXException e) {
+//      // [DP] WebDAV: error handling
+//      e.printStackTrace();
+//      return null;
+//    }
+    return null;
   }
 
   @Override

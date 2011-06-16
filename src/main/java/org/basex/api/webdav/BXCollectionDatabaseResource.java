@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.basex.core.Context;
+import org.basex.server.ClientSession;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
@@ -29,11 +31,9 @@ public class BXCollectionDatabaseResource extends BXResource implements
 
   /**
    * Constructor.
-   * @param c database context
    * @param n database name
    */
-  public BXCollectionDatabaseResource(final Context c, final String n) {
-    ctx = c;
+  public BXCollectionDatabaseResource(final String n) {
     dbname = n;
   }
 
