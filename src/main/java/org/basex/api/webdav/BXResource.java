@@ -18,6 +18,8 @@ public abstract class BXResource implements Resource {
 
   protected String user;
   protected String pass;
+  /** Resource factory. */
+  protected BXResourceFactory fact;
 
   @Override
   public Object authenticate(final String user, final String password) {

@@ -1,24 +1,18 @@
 package org.basex.api.webdav;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.server.ClientSession;
 import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Util;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
-
-import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.HttpManager;
 import com.bradmcevoy.http.ServletRequest;
 import com.bradmcevoy.http.ServletResponse;

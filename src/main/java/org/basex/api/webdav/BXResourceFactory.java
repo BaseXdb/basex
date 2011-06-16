@@ -21,17 +21,14 @@ import com.bradmcevoy.http.ResourceFactory;
  * @author Dimitar Popov
  */
 public class BXResourceFactory implements ResourceFactory {
+  /** XML mime type. */
+  static final String MIMETYPEXML = "text/xml";
 
   @Override
   public Resource getResource(final String host, final String p) {
     final Path path = Path.path(p);
-
     // root
     if(path.isRoot()) return new BXAllDatabasesResource();
-
-    final String[] steps = path.getParts();
-
-    // TODO collection
     return null;
   }
 

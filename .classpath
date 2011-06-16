@@ -18,15 +18,15 @@
 	<classpathentry kind="lib" path="lib/xmldb-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/xqj-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/jersey-core-1.4.jar"/>
-	<classpathentry kind="lib" path="/home/insane/Development/uni/eclipse_ws/basex-api/lib/slf4j-jdk14-1.6.1.jar"/>
-	<classpathentry kind="lib" path="/home/insane/Development/uni/eclipse_ws/basex-api/lib/commons-codec-1.5.jar"/>
-	<classpathentry kind="lib" path="/home/insane/Development/uni/eclipse_ws/basex-api/lib/mime-util-2.1.3.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/basex"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/milton-api-1.5.10.jar" sourcepath="/home/insane/Development/uni/milton/milton-api/src/main/java"/>
-	<classpathentry kind="lib" path="lib/milton-servlet-1.5.10.jar" sourcepath="/home/insane/Development/uni/milton/milton-servlet/src/main/java"/>
+	<classpathentry kind="lib" path="lib/milton-api-1.5.10.jar"/>
+	<classpathentry kind="lib" path="lib/milton-servlet-1.5.10.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.5.jar"/>
+	<classpathentry kind="lib" path="lib/mime-util-2.1.3.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/basex"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

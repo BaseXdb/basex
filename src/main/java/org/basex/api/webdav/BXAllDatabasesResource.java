@@ -1,7 +1,6 @@
 package org.basex.api.webdav;
 
 import static org.basex.api.webdav.BXResourceFactory.*;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -9,15 +8,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.basex.server.ClientSession;
-
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Resource;
-import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing the list of all databases.
@@ -26,8 +21,9 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
  * @author Dimitar Popov
  */
 public class BXAllDatabasesResource extends BXResource implements
-    //MakeCollectionableResource, PutableResource, GetableResource, PropFindableResource {
-    FolderResource {
+  FolderResource {
+    // MakeCollectionableResource, PutableResource, GetableResource,
+    // PropFindableResource {
 
   @Override
   public Date getModifiedDate() {
@@ -45,7 +41,7 @@ public class BXAllDatabasesResource extends BXResource implements
     try {
       final ClientSession cs = login(user, pass);
       try {
-        return new BXDocumentResource(childName, user, pass);
+        return new BXDocumentDatabase(childName, user, pass);
       } finally {
         cs.close();
       }
@@ -58,14 +54,15 @@ public class BXAllDatabasesResource extends BXResource implements
 
   @Override
   public List<? extends Resource> getChildren() {
-    final List<BXResource> dbs = new ArrayList<BXResource>();
     try {
+      final List<BXResource> dbs = new ArrayList<BXResource>();
       final ClientSession cs = login(user, pass);
       try {
         for(final String d : listDatabases(cs))
           dbs.add(isCollection(cs, d) ?
-              new BXCollectionDatabaseResource(d) :
- new BXDocumentResource(d, user, pass));
+              new BXCollectionDatabase(d) :
+              new BXDocumentDatabase(d, user, pass));
+        return dbs;
       } finally {
         cs.close();
       }
@@ -74,12 +71,10 @@ public class BXAllDatabasesResource extends BXResource implements
       e.printStackTrace();
       return null;
     }
-    return dbs;
   }
 
   @Override
-  public CollectionResource createCollection(final String newName)
-      throws NotAuthorizedException, ConflictException, BadRequestException {
+  public CollectionResource createCollection(final String newName) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -125,23 +120,12 @@ public class BXAllDatabasesResource extends BXResource implements
   }
 
   @Override
-  public void copyTo(final CollectionResource toCollection, final String name)
-      throws NotAuthorizedException, BadRequestException, ConflictException {
-    // TODO Auto-generated method stub
-
+  public void copyTo(final CollectionResource toCollection, final String name) {
   }
 
   @Override
-  public void delete() throws NotAuthorizedException, ConflictException,
-      BadRequestException {
-    // TODO Auto-generated method stub
-
-  }
+  public void delete() { }
 
   @Override
-  public void moveTo(final CollectionResource rDest, final String name)
-      throws ConflictException, NotAuthorizedException, BadRequestException {
-    // TODO Auto-generated method stub
-
-  }
+  public void moveTo(final CollectionResource rDest, final String name) { }
 }
