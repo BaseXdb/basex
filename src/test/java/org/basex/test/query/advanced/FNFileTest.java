@@ -147,7 +147,7 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void testDelete() throws QueryException {
-    final String fun = check(Function.DELETE);
+    final String fun = check(Function.DELETEFILE);
     query("file:create-directory('" + PATH3 + "')");
     query(fun + "('" + PATH3 + "')");
     query("file:create-directory('" + PATH3 + "')");

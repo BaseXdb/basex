@@ -478,6 +478,8 @@ public enum Function {
   NODEPRE(FNDb.class, "node-pre(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: sends result to connected clients. */
   EVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
+  /** Database function: delete all database documents specified by $path. */
+  DELETE(FNDb.class, "delete(path)", EMP, STR),
 
   /* FNFile functions (EXPath). */
 
@@ -507,7 +509,7 @@ public enum Function {
   /** XQuery function */
   CREATEDIR(FNFile.class, "create-directory(path)", EMP, STR),
   /** XQuery function */
-  DELETE(FNFile.class, "delete(path)", EMP, STR),
+  DELETEFILE(FNFile.class, "delete(path)", EMP, STR),
   /** XQuery function */
   READTEXT(FNFile.class, "read-text(path[,encoding])", STR, 1, STR, STR),
   /** XQuery function */

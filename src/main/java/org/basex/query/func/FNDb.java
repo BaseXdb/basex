@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
@@ -35,6 +36,7 @@ import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -77,6 +79,7 @@ public final class FNDb extends FuncCall {
       case OPENPRE: return open(ctx, false);
       case SYSTEM:  return system(ctx);
       case INFO:    return info(ctx);
+      case DELETE:  return delete(ctx);
       default:      return super.item(ctx, ii);
     }
   }
@@ -211,12 +214,25 @@ public final class FNDb extends FuncCall {
   }
 
   /**
+   * Performs the delete function.
+   * @param ctx query context
+   * @return delete result
+   * @throws QueryException query exception
+   */
+  private Item delete(final QueryContext ctx) throws QueryException {
+    final Data data = ctx.context.data;
+    final int[] docs = data.doc(string(checkStr(expr[0], ctx)));
+    Delete.delete(ctx.context, docs);
+    return null;
+  }
+
+  /**
    * Performs the system function.
    * @param ctx query context
    * @return iterator
    */
   private Str system(final QueryContext ctx) {
-    return Str.get(delete(Info.info(ctx.context), '\r'));
+    return Str.get(Token.delete(Info.info(ctx.context), '\r'));
   }
 
   /**
@@ -236,7 +252,7 @@ public final class FNDb extends FuncCall {
       final boolean create = ctx.context.user.perm(User.CREATE);
       info = InfoDB.db(checkData(ctx).meta, false, true, create);
     }
-    return Str.get(delete(info, '\r'));
+    return Str.get(Token.delete(info, '\r'));
   }
 
   /**
