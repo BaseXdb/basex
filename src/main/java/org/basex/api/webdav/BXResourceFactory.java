@@ -1,8 +1,11 @@
 package org.basex.api.webdav;
 
 import static org.basex.api.webdav.WebDAVServer.*;
+import static org.basex.util.Token.*;
 
 import java.io.IOException;
+
+import javax.xml.bind.ParseConversionEvent;
 
 import org.basex.core.BaseXException;
 import org.basex.server.ClientQuery;
@@ -23,12 +26,17 @@ import com.bradmcevoy.http.ResourceFactory;
 public class BXResourceFactory implements ResourceFactory {
   /** XML mime type. */
   static final String MIMETYPEXML = "text/xml";
+  /** File path separator. */
+  static final String DIRSEP = System.getProperty("file.separator");
 
   @Override
   public Resource getResource(final String host, final String p) {
     final Path path = Path.path(p);
     // root
     if(path.isRoot()) return new BXAllDatabasesResource();
+    final String[] parts = path.getParts();
+    if(path.getLength() == 1) return new BXCollectionDatabase(parts[0]);
+    else if(path.getLength() > 1) return new BXFolder(parts[0], p);
     return null;
   }
 
@@ -38,11 +46,11 @@ public class BXResourceFactory implements ResourceFactory {
    * @return a list of database names
    * @throws BaseXException query exception
    */
-  static StringList listDatabases(final ClientSession cs)
-      throws BaseXException {
+  static StringList listDatabases(final ClientSession cs) throws BaseXException {
     final StringList result = new StringList();
     final ClientQuery q = cs.query("db:list()");
-    while(q.more()) result.add(q.next());
+    while(q.more())
+      result.add(q.next());
     return result;
   }
 
@@ -95,8 +103,7 @@ public class BXResourceFactory implements ResourceFactory {
    * @return object representing the new client session
    * @throws IOException I/O exception
    */
-  static ClientSession login(final String u, final String p)
-      throws IOException {
+  static ClientSession login(final String u, final String p) throws IOException {
     final String host = System.getProperty(DBHOST);
     final int port = Integer.parseInt(System.getProperty(DBPORT));
     String user = System.getProperty(DBUSER);

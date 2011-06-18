@@ -59,9 +59,10 @@ public class BXAllDatabasesResource extends BXResource implements
       final ClientSession cs = login(user, pass);
       try {
         for(final String d : listDatabases(cs))
-          dbs.add(isCollection(cs, d) ?
-              new BXCollectionDatabase(d) :
-              new BXDocumentDatabase(d, user, pass));
+//          dbs.add(isCollection(cs, d) ?
+//              new BXCollectionDatabase(d) :
+//              new BXDocumentDatabase(d, user, pass));
+        dbs.add(new BXCollectionDatabase(d, user, pass));
         return dbs;
       } finally {
         cs.close();

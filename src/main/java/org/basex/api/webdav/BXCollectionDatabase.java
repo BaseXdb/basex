@@ -1,7 +1,9 @@
 package org.basex.api.webdav;
 
+import static org.basex.api.webdav.BXResourceFactory.*;
 import static org.basex.util.Token.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import java.util.Map;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
+import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
 
 import org.basex.core.cmd.Open;
@@ -30,12 +33,19 @@ import com.bradmcevoy.http.Resource;
  * @author Dimitar Popov
  */
 public class BXCollectionDatabase extends BXDatabase implements FolderResource {
+
+  public BXCollectionDatabase(final String n) {
+    dbname = n;
+  }
+
   /**
    * Constructor.
    * @param n database name
    */
-  public BXCollectionDatabase(final String n) {
+  public BXCollectionDatabase(final String n, String u, String p) {
     dbname = n;
+    user = u;
+    pass = p;
   }
 
   @Override
@@ -52,37 +62,47 @@ public class BXCollectionDatabase extends BXDatabase implements FolderResource {
 
   @Override
   public List<? extends Resource> getChildren() {
-    // final List<BXResource> dbs = new ArrayList<BXResource>();
-    // final TokenObjMap<IntList> dirs = new TokenObjMap<IntList>();
-    // try {
-    // new Open(dbname).execute(ctx);
-    // for(final int pre : ctx.doc()) {
-    // final byte[] doc = ctx.data.text(pre, true);
-    // final int idx = indexOf(doc, token(Prop.DIRSEP));
-    // if(idx <= 0)
-    // dbs.add(new BXDocument(dbname, string(doc), pre, ctx));
-    // else {
-    // // Folder
-    // final byte[] dir = substring(doc, 0, idx);
-    // if(dirs.get(dir) == null) dirs.add(dir, new IntList());
-    // dirs.get(dir).add(pre);
-    // }
-    // }
-    // for(final byte[] d : dirs)
-    // dbs.add(new BXFolder(dbname, dirs.get(d).toArray(), string(d), ctx));
-    //
-    // new Close().execute(ctx);
-    // } catch(BaseXException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // }
-    // return dbs;
-    return null;
+    final List<BXResource> ch = new ArrayList<BXResource>();
+    final List<String> paths = new ArrayList<String>();
+    try {
+      final ClientSession cs = login(user, pass);
+      try {
+        // Get all documents within this collection
+        ClientQuery q = cs.query("collection('" + dbname + "')/doc-name()");
+        while(q.more()) {
+          final String next = q.next();
+          // Find first occurrence of file separator
+          final int firstSep = next.indexOf(DIRSEP);
+          // No occurence => this is a document
+          if(firstSep <= 0) ch.add(new BXDocument(dbname, next, user, pass));
+          else {
+            // Folder name + its children
+            final String folder = next.substring(firstSep + 1);
+            // Second occurence of file separator
+            final int secSep = folder.indexOf(DIRSEP);
+            // Folder name
+            final String folderName = folder.substring(0, secSep);
+            // Path from root to folder
+            final String folderPath = dbname + DIRSEP + folderName;
+            if(!paths.contains(folderPath)) paths.add(folderPath);
+          }
+        }
+        // Create folders
+        for(final String f : paths)
+          ch.add(new BXFolder(dbname, f, user, pass));
+      } finally {
+        cs.close();
+      }
+    } catch(Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return ch;
   }
 
   @Override
-  public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) {
+  public Resource createNew(final String newName,
+      final InputStream inputStream, final Long length, final String contentType) {
     // TODO Auto-generated method stub
     return null;
   }
