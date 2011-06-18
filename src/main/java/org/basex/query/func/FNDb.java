@@ -2,11 +2,10 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
@@ -36,6 +35,7 @@ import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Database functions.
@@ -182,10 +182,31 @@ public final class FNDb extends FuncCall {
    * Performs the list function.
    * @param ctx query context
    * @return iterator
+   * @throws QueryException query exception
    */
-  private Iter list(final QueryContext ctx) {
+  private Iter list(final QueryContext ctx) throws QueryException {
     final ItemCache ii = new ItemCache();
-    for(final String s : List.list(ctx.context)) ii.add(Str.get(s));
+    if(expr.length == 0) {
+      for(final String s : List.list(ctx.context)) ii.add(Str.get(s));
+    } else {
+      final byte[] str = checkStr(expr[0], ctx);
+      final int s = indexOf(str, '/');
+      final byte[] db = s == -1 ? str : substring(str, 0, s);
+      final String path = string(s == -1 ? EMPTY : substring(str, s + 1));
+
+      final Data data = ctx.resource.data(db, input);
+      if(!data.empty()) {
+        for(final int pre : path == null ? data.doc() : data.doc(path))
+          ii.add(Str.get(data.text(pre, true)));
+      }
+      try {
+        Close.close(data, ctx.context);
+      } catch(IOException ex) {
+        // [DP] List function: what exception should be thrown?
+        Util.debug(ex);
+        NODB.thrw(input, string(db));
+      }
+    }
     return ii;
   }
 
