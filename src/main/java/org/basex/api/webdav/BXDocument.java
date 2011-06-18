@@ -1,7 +1,5 @@
 package org.basex.api.webdav;
 
-import static org.basex.api.webdav.BXResourceFactory.*;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;

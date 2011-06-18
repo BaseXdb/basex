@@ -89,7 +89,7 @@ public class WebDAVServer extends Main {
 
     final String p = System.getProperty(WEBDAVPORT);
     final int port = p == null ?
-        context.prop.num(Prop.WEBDAVPORT) : Integer.parseInt(p);
+        8985/* context.prop.num(Prop.WEBDAVPORT) */ : Integer.parseInt(p);
     jetty = new Server(port);
     jetty.setHandler(h);
     try {

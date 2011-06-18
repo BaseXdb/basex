@@ -38,6 +38,18 @@ public class BXCollectionDatabase extends BXDatabase implements FolderResource {
     dbname = n;
   }
 
+  /**
+   * Constructor.
+   * @param n database name
+   * @param u user name
+   * @param p user password
+   */
+  public BXCollectionDatabase(final String n, final String u, final String p) {
+    dbname = n;
+    user = u;
+    pass = p;
+  }
+
   @Override
   public CollectionResource createCollection(final String newName) {
     // TODO Auto-generated method stub
