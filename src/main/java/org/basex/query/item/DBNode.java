@@ -105,6 +105,11 @@ public class DBNode extends ANode {
   }
 
   @Override
+  public byte[] docName() {
+    return data.text(pre, true);
+  }
+
+  @Override
   public Data data() {
     return data;
   }

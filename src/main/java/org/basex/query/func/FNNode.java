@@ -100,6 +100,10 @@ public final class FNNode extends FuncCall {
             QueryTokens.ID).addLong(checkNode(it).id).finish());
       case CHILDREN:
         return Bln.get(it != null && checkNode(it).children().next() != null);
+      case DOCNAME:
+        if(it == null || it.type != NodeType.DOC) return Str.ZERO;
+        n = checkNode(it);
+        return Str.get(n.docName());
       default:
         return super.item(ctx, ii);
     }
