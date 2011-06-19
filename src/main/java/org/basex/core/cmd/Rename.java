@@ -3,8 +3,10 @@ package org.basex.core.cmd;
 import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
 
+import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.util.TokenList;
 
 /**
  * Evaluates the 'rename' command and renames document or document paths
@@ -25,13 +27,27 @@ public final class Rename extends ACreate {
 
   @Override
   protected boolean run() {
-    final Data data = context.data;
-    final byte[] src = token(path(args[0]));
-    final byte[] trg = token(path(args[1]));
+    final TokenList unchanged = new TokenList();
+    final int c = rename(context, token(path(args[0])), token(path(args[1])),
+        unchanged);
+    for(final byte[] d : unchanged) info(NAMEINVALID, d);
+    info(PATHRENAMED, c, perf);
+    return unchanged.size() == 0;
+  }
 
-    boolean ok = true;
+  /**
+   * Rename document or document paths.
+   * @param ctx database context
+   * @param src source path
+   * @param trg target path
+   * @param r documents which cannot be renamed will be stored here
+   * @return number of successfully renamed documents
+   */
+  public static int rename(final Context ctx, final byte[] src,
+      final byte[] trg, final TokenList r) {
+    final Data data = ctx.data;
     int c = 0;
-    for(final int doc : data.doc(args[0])) {
+    for(final int doc : data.doc(string(src))) {
       final byte[] path = data.text(doc, true);
       byte[] target = trg;
       byte[] name = substring(path, src.length);
@@ -41,17 +57,14 @@ public final class Rename extends ACreate {
         target = trg.length != 0 ? concat(trg, SLASH, name) : name;
       }
       if(target.length == 0) {
-        info(NAMEINVALID, target);
-        ok = false;
+        r.add(path);
       } else {
         data.replace(doc, Data.DOC, target);
-        c++;
+        ++c;
       }
     }
     // data was changed: update context
     if(c != 0) data.flush();
-
-    info(PATHRENAMED, c, perf);
-    return ok;
+    return c;
   }
 }

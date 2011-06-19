@@ -75,7 +75,7 @@ public final class FNFile extends FuncCall {
       case APPENDBIN:   return writeBinary(path, ctx, true);
       case COPY:        return transfer(path, ctx, true);
       case CREATEDIR:   return createDirectory(path);
-      case DELETEFILE:      return del(path);
+      case DELETEFILE:  return del(path);
       case MOVE:        return transfer(path, ctx, false);
       case READBIN:     return readBinary(path);
       case READTEXT:    return readText(path, ctx);

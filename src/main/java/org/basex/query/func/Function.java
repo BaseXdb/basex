@@ -480,6 +480,8 @@ public enum Function {
   EVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
   /** Database function: delete all database documents specified by $path. */
   DELETE(FNDb.class, "delete(path)", EMP, STR),
+  /** Database function: rename documents specified by $path to $newpath. */
+  RENAME(FNDb.class, "rename(path,newpath)", EMP, STR, STR),
 
   /* FNFile functions (EXPath). */
 

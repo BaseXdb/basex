@@ -11,6 +11,7 @@ import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
+import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
 import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
@@ -37,6 +38,7 @@ import org.basex.query.path.NameTest;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenList;
 import org.basex.util.Util;
 
 /**
@@ -80,6 +82,7 @@ public final class FNDb extends FuncCall {
       case SYSTEM:  return system(ctx);
       case INFO:    return info(ctx);
       case DELETE:  return delete(ctx);
+      case RENAME:  return rename(ctx);
       default:      return super.item(ctx, ii);
     }
   }
@@ -205,7 +208,7 @@ public final class FNDb extends FuncCall {
       try {
         Close.close(data, ctx.context);
       } catch(IOException ex) {
-        // [DP] List function: what exception should be thrown?
+        // [DP] List: what exception should be thrown?
         Util.debug(ex);
         NODB.thrw(input, string(db));
       }
@@ -224,6 +227,22 @@ public final class FNDb extends FuncCall {
     if(data == null) NODBCTX.thrw(input, Function.DELETE.desc);
     final int[] docs = data.doc(string(checkStr(expr[0], ctx)));
     Delete.delete(ctx.context, docs);
+    return null;
+  }
+
+  /**
+   * Performs the rename function.
+   * @param ctx query context
+   * @return rename result
+   * @throws QueryException query exception
+   */
+  private Item rename(final QueryContext ctx) throws QueryException {
+    final Data data = ctx.context.data;
+    if(data == null) NODBCTX.thrw(input, Function.RENAME.desc);
+    final TokenList unchanged = new TokenList();
+    Rename.rename(ctx.context, checkStr(expr[0], ctx), checkStr(expr[1], ctx),
+        unchanged);
+    // [DP] Rename: what exception should be thrown if unchanged is not empty?
     return null;
   }
 
