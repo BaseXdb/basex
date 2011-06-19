@@ -221,6 +221,7 @@ public final class FNDb extends FuncCall {
    */
   private Item delete(final QueryContext ctx) throws QueryException {
     final Data data = ctx.context.data;
+    if(data == null) NODBCTX.thrw(input, Function.DELETE.desc);
     final int[] docs = data.doc(string(checkStr(expr[0], ctx)));
     Delete.delete(ctx.context, docs);
     return null;
