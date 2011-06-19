@@ -2,6 +2,7 @@ package org.basex.api.webdav;
 
 import static org.basex.api.webdav.BXResourceFactory.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.basex.core.BaseXException;
+import org.basex.core.cmd.DropDB;
 import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
 
@@ -85,7 +88,7 @@ public class BXCollectionDatabase extends BXDatabase implements FolderResource {
         cs.close();
       }
     } catch(Exception e) {
-      // TODO Auto-generated catch block
+      // [RS] WebDav Error Handling
       e.printStackTrace();
     }
     return ch;
@@ -105,7 +108,18 @@ public class BXCollectionDatabase extends BXDatabase implements FolderResource {
 
   @Override
   public void delete() {
-    // TODO
+    try {
+      ClientSession cs = login(user, pass);
+      try {
+        cs.execute(new DropDB(dbname));
+      } finally {
+        cs.close();
+      }
+    } catch(Exception e) {
+      // [RS] WebDav Error Handling
+      e.printStackTrace();
+    }
+    
   }
 
   @Override
