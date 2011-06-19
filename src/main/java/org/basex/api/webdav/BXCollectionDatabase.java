@@ -2,7 +2,6 @@ package org.basex.api.webdav;
 
 import static org.basex.api.webdav.BXResourceFactory.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -10,8 +9,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.basex.core.BaseXException;
+import org.basex.core.cmd.Add;
 import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Open;
 import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
 
@@ -51,8 +51,23 @@ public class BXCollectionDatabase extends BXDatabase implements FolderResource {
 
   @Override
   public CollectionResource createCollection(final String newName) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      ClientSession cs = login(user, pass);
+      try {
+        // Open database
+        cs.execute(new Open(dbname));
+        // Create a folder in the database which contains a dummy xml document -
+        // EMPTY.xml. This is needed because BaseX is not aware of folders, only
+        // of xml files
+        cs.execute(new Add("<empty/>", "EMPTY.xml", newName));
+      } finally {
+        cs.close();
+      }
+    } catch(Exception e) {
+      // [RS] WebDav Error Handling
+      e.printStackTrace();
+    }
+    return new BXFolder(dbname, newName, user, pass);
   }
 
   @Override
@@ -97,8 +112,21 @@ public class BXCollectionDatabase extends BXDatabase implements FolderResource {
   @Override
   public Resource createNew(final String newName, final InputStream inputStream,
       final Long length, final String contentType) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      ClientSession cs = login(user, pass);
+      // Open database
+      try {
+      cs.execute(new Open(dbname));
+      // Add document to databse
+      cs.add(newName, "", inputStream);
+      } finally {
+        cs.close();
+      }
+    } catch(Exception e) {
+      // [RS] WebDav Error Handling
+      e.printStackTrace();
+    }
+    return new BXDocument(dbname, newName, user, pass);
   }
 
   @Override
@@ -119,7 +147,7 @@ public class BXCollectionDatabase extends BXDatabase implements FolderResource {
       // [RS] WebDav Error Handling
       e.printStackTrace();
     }
-    
+
   }
 
   @Override

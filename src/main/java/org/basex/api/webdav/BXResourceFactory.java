@@ -34,20 +34,19 @@ public class BXResourceFactory implements ResourceFactory {
     if(path.isRoot()) return new BXAllDatabasesResource();
     final String[] parts = path.getParts();
     if(path.getLength() == 1) return new BXCollectionDatabase(parts[0]);
-    final String f = p.substring(p.indexOf(parts[1]), p.length());
+    String f = p.substring(p.indexOf(parts[1]), p.length());
+    if(f.endsWith(DIRSEP)) f = f.substring(0, f.length() - 1);
     try {
       final ClientSession cs = BXResource.login(a.getUser(), a.getPassword());
       try {
         // Check if there is a document in the collection having this path
         final ClientQuery q1 = cs.query("count(collection('" + parts[0]
             + "')/.[doc-name()='" + f + "'])");
-        if(parseInt(q1.next()) == 1) return new BXDocument(parts[0],
-            p.substring(p.indexOf(parts[1]), p.length()));
+        if(parseInt(q1.next()) == 1) return new BXDocument(parts[0], f);
         // Check if there are paths in the collection starting with this path
         final ClientQuery q2 = cs.query("count(collection('" + parts[0]
             + "')/.[starts-with(doc-name(), '" + f + "')])");
-        if(parseInt(q2.next()) > 0) return new BXFolder(parts[0], p.substring(
-            p.indexOf(parts[1]), p.length() - 1));
+        if(parseInt(q2.next()) > 0) return new BXFolder(parts[0], f);
       } finally {
         cs.close();
       }

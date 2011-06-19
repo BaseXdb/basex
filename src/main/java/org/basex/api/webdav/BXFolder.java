@@ -1,5 +1,6 @@
 package org.basex.api.webdav;
 
+import static java.lang.Integer.*;
 import static org.basex.api.webdav.BXResourceFactory.*;
 
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Open;
 import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
@@ -57,14 +59,47 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public CollectionResource createCollection(final String arg0) {
-    // TODO Auto-generated method stub
-    return null;
+  public CollectionResource createCollection(final String folder) {
+    final String newFolder = path + DIRSEP + folder;
+    try {
+      ClientSession cs = login(user, pass);
+      try {
+        // Open database
+        cs.execute(new Open(db));
+        cs.execute(new Add("<empty/>", "EMPTY.xml", newFolder));
+      } finally {
+        cs.close();
+      }
+    } catch(Exception e) {
+      // [RS] WebDav Error Handling
+      e.printStackTrace();
+    }
+    return new BXFolder(db, newFolder, user, pass);
   }
 
   @Override
-  public Resource child(final String arg0) {
-    // TODO Auto-generated method stub
+  public Resource child(final String childName) {
+    try {
+      ClientSession cs = login(user, pass);
+      // Search for documents with the given name
+      try {
+        final String docPath = path + DIRSEP + childName;
+        ClientQuery q1 = cs.query("count(collection('" + db
+            + "')/.[doc-name()='" + path + DIRSEP + childName + "'])");
+        if(parseInt(q1.next()) == 1) return new BXDocument(db, docPath, user,
+            pass);
+        final String folderPath = path + DIRSEP + childName;
+        ClientQuery q2 = cs.query("count(collection('" + db
+            + "')/.[starts-with(doc-name(),'" + folderPath + DIRSEP + "')])");
+        if(parseInt(q2.next()) > 0) return new BXFolder(db, folderPath, user,
+            pass);
+      } finally {
+        cs.close();
+      }
+    } catch(Exception e) {
+      // [RS] WebDav Error Handling
+      e.printStackTrace();
+    }
     return null;
   }
 
@@ -76,9 +111,9 @@ public class BXFolder extends BXResource implements FolderResource {
       final ClientSession cs = login(user, pass);
       try {
         // List children of this folder
-        ClientQuery q = cs.query("collection('" + db + "')" +
-            "/.[starts-with(doc-name(),'" + path + "')]" +
-            "/substring-after(doc-name(),'" + path + "/')");
+        ClientQuery q = cs.query("collection('" + db + "')"
+            + "/.[starts-with(doc-name(),'" + path + "')]"
+            + "/substring-after(doc-name(),'" + path + "/')");
         while(q.more()) {
           final String nextPath = q.next();
           final int sepIdx = nextPath.indexOf(DIRSEP);
@@ -117,9 +152,22 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource createNew(final String arg0, final InputStream arg1,
+  public Resource createNew(final String doc, final InputStream io,
       final Long arg2, final String arg3) {
-    // TODO Auto-generated method stub
+    try {
+      ClientSession cs = login(user, pass);
+      try {
+        // Open database
+        cs.execute(new Open(db));
+        // Add new document
+        cs.add(doc, path, io);
+      } finally {
+        cs.close();
+      }
+    } catch(Exception e) {
+      // [RS] WebDav Error Handling
+      e.printStackTrace();
+    }
     return null;
   }
 
