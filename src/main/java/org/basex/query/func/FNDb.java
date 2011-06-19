@@ -222,7 +222,7 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item delete(final QueryContext ctx) throws QueryException {
-    final Data data = checkData(ctx);
+    final Data data = checkDbData(ctx);
     final int[] docs = data.doc(string(checkStr(expr[0], ctx)));
     Delete.delete(ctx.context, docs);
     return null;
@@ -235,7 +235,7 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item rename(final QueryContext ctx) throws QueryException {
-    final Data data = checkData(ctx);
+    final Data data = checkDbData(ctx);
     final byte[] src = checkStr(expr[0], ctx);
     Rename.rename(data, src, checkStr(expr[1], ctx), data.doc(string(src)));
     // [DP] Rename: what exception should be thrown if rem is not empty?
@@ -263,10 +263,10 @@ public final class FNDb extends FuncCall {
       final byte[] tp = checkStr(expr[0], ctx);
       final CmdIndexInfo cmd = InfoIndex.info(string(tp));
       if(cmd == null) NOIDX.thrw(input, this);
-      info = InfoIndex.info(cmd, checkData(ctx));
+      info = InfoIndex.info(cmd, checkDbData(ctx));
     } else {
       final boolean create = ctx.context.user.perm(User.CREATE);
-      info = InfoDB.db(checkData(ctx).meta, false, true, create);
+      info = InfoDB.db(checkDbData(ctx).meta, false, true, create);
     }
     return Str.get(Token.delete(info, '\r'));
   }
