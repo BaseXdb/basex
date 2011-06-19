@@ -219,12 +219,11 @@ public final class FNDb extends FuncCall {
   /**
    * Performs the delete function.
    * @param ctx query context
-   * @return delete result
+   * @return {@code null}
    * @throws QueryException query exception
    */
   private Item delete(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.context.data;
-    if(data == null) NODBCTX.thrw(input, Function.DELETE.desc);
+    final Data data = checkData(ctx);
     final int[] docs = data.doc(string(checkStr(expr[0], ctx)));
     Delete.delete(ctx.context, docs);
     return null;
@@ -233,16 +232,14 @@ public final class FNDb extends FuncCall {
   /**
    * Performs the rename function.
    * @param ctx query context
-   * @return rename result
+   * @return {@code null}
    * @throws QueryException query exception
    */
   private Item rename(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.context.data;
-    if(data == null) NODBCTX.thrw(input, Function.RENAME.desc);
-    final TokenList unchanged = new TokenList();
-    Rename.rename(ctx.context, checkStr(expr[0], ctx), checkStr(expr[1], ctx),
-        unchanged);
-    // [DP] Rename: what exception should be thrown if unchanged is not empty?
+    final Data data = checkData(ctx);
+    final TokenList rem = new TokenList();
+    Rename.rename(data, checkStr(expr[0], ctx), checkStr(expr[1], ctx), rem);
+    // [DP] Rename: what exception should be thrown if rem is not empty?
     return null;
   }
 

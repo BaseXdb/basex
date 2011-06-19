@@ -34,7 +34,7 @@ public final class Replace extends ACreate {
     // check if path was found
     if(docs.length == 0) return error(FILEWHICH, path);
     // check if path points exclusively to files
-    for(final int doc : data.doc(args[0])) {
+    for(final int doc : docs) {
       if(!eq(data.text(doc, true), src)) return error(DIRERR, path);
     }
     // check if input exists

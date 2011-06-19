@@ -466,7 +466,7 @@ public enum Function {
   ATTR(FNDb.class, "attribute(string[,name])", NOD_ZM, 1, ITEM, STR),
   /** Database function: searches the full-text index. */
   FULLTEXT(FNDb.class, "fulltext(string)", NOD_ZM, STR),
-  /** Database function: lists all database. */
+  /** Database function: lists all databases or a path. */
   LIST(FNDb.class, "list([path])", STR_ZM, 0, STR),
   /** Database function: lists system information. */
   SYSTEM(FNDb.class, "system()", STR),
