@@ -6,6 +6,11 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
 
+import org.basex.core.BaseXException;
+import org.basex.core.cmd.Open;
+import org.basex.server.ClientQuery;
+import org.basex.server.ClientSession;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FileItem;
@@ -61,17 +66,25 @@ public class BXDocument extends BXResource implements FileResource {
 
   @Override
   public String getName() {
-    
     final int idx  = docpath.lastIndexOf(DIRSEP);
-    
     return idx < 0 ? docpath : docpath.substring(idx+1, docpath.length());
   }
 
   @Override
   public void delete() throws NotAuthorizedException, ConflictException,
       BadRequestException {
-    // TODO Auto-generated method stub
-
+    try {
+      ClientSession cs = login(user, pass);
+      try {
+        cs.execute(new Open(dbname));
+        cs.query("db:delete('" + docpath + "')").execute();
+      } finally {
+        cs.close();
+      }
+    } catch(Exception e) {
+      // [RS] WebDAV: error handling
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -82,8 +95,7 @@ public class BXDocument extends BXResource implements FileResource {
 
   @Override
   public String getContentType(String arg0) {
-    // TODO Auto-generated method stub
-    return null;
+    return MIMETYPEXML;
   }
 
   @Override
@@ -93,11 +105,20 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public void sendContent(OutputStream arg0, Range arg1,
+  public void sendContent(OutputStream out, Range arg1,
       Map<String, String> arg2, String arg3) throws IOException,
       NotAuthorizedException, BadRequestException {
-    // TODO Auto-generated method stub
-
+    ClientSession cs = login(user, pass);
+    cs.setOutputStream(out);
+    try {
+      cs.query("collection('" + dbname + DIRSEP + docpath + "')").execute();
+      //out.flush();
+    } catch(BaseXException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } finally {
+      cs.close();
+    }
   }
 
   @Override

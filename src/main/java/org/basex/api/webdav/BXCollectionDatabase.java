@@ -41,16 +41,6 @@ public class BXCollectionDatabase extends BXDatabase implements FolderResource {
   /**
    * Constructor.
    * @param n database name
-   */
-  public BXCollectionDatabase(final String n, String u, String p) {
-    dbname = n;
-    user = u;
-    pass = p;
-  }
-
-  /**
-   * Constructor.
-   * @param n database name
    * @param u user name
    * @param p user password
    */
@@ -88,15 +78,9 @@ public class BXCollectionDatabase extends BXDatabase implements FolderResource {
           // No occurence => this is a document
           if(firstSep <= 0) ch.add(new BXDocument(dbname, next, user, pass));
           else {
-            // Folder name + its children
-            final String folder = next.substring(firstSep + 1);
-            // Second occurence of file separator
-            final int secSep = folder.indexOf(DIRSEP);
             // Folder name
-            final String folderName = folder.substring(0, secSep);
-            // Path from root to folder
-            final String folderPath = dbname + DIRSEP + folderName;
-            if(!paths.contains(folderPath)) paths.add(folderPath);
+            final String folderName = next.substring(0, firstSep);
+            if(!paths.contains(folderName)) paths.add(folderName);
           }
         }
         // Create folders
