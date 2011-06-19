@@ -2,7 +2,6 @@ package org.basex.api.webdav;
 
 import static org.basex.api.webdav.BXResourceFactory.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -10,8 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.basex.core.BaseXException;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Open;
 import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
@@ -21,10 +18,13 @@ import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Resource;
-import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
+/**
+ * WebDAV resource representing a folder within a collection database.
+ * @author BaseX Team 2005-11, BSD License
+ * @author Rositsa Shadura
+ * @author Dimitar Popov
+ */
 public class BXFolder extends BXResource implements FolderResource {
   /** Database name. */
   private final String db;
@@ -57,14 +57,13 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public CollectionResource createCollection(String arg0)
-      throws NotAuthorizedException, ConflictException, BadRequestException {
+  public CollectionResource createCollection(final String arg0) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Resource child(String arg0) {
+  public Resource child(final String arg0) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -83,6 +82,7 @@ public class BXFolder extends BXResource implements FolderResource {
         while(q.more()) {
           final String nextPath = q.next();
           final int sepIdx = nextPath.indexOf(DIRSEP);
+          // Document
           if(sepIdx <= 0) ch.add(new BXDocument(db, path + DIRSEP + nextPath,
               user, pass));
           else {
@@ -92,7 +92,6 @@ public class BXFolder extends BXResource implements FolderResource {
             if(!paths.contains(folderPath)) paths.add(folderPath);
           }
         }
-        // Create folders
         for(final String f : paths)
           ch.add(new BXFolder(db, f, user, pass));
       } finally {
@@ -118,27 +117,26 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource createNew(String arg0, InputStream arg1, Long arg2,
-      String arg3) throws IOException, ConflictException,
-      NotAuthorizedException, BadRequestException {
+  public Resource createNew(final String arg0, final InputStream arg1,
+      final Long arg2, final String arg3) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void copyTo(CollectionResource arg0, String arg1)
-      throws NotAuthorizedException, BadRequestException, ConflictException {
+  public void copyTo(final CollectionResource arg0, final String arg1) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void delete() throws NotAuthorizedException, ConflictException,
-      BadRequestException {
+  public void delete() {
     try {
       ClientSession cs = login(user, pass);
       try {
+        // Open database
         cs.execute(new Open(db));
+        // Delete folder from database
         cs.query("db:delete('" + path + "')").execute();
       } finally {
         cs.close();
@@ -156,30 +154,26 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public String getContentType(String arg0) {
+  public String getContentType(final String arg0) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Long getMaxAgeSeconds(Auth arg0) {
+  public Long getMaxAgeSeconds(final Auth arg0) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void sendContent(OutputStream arg0, Range arg1,
-      Map<String, String> arg2, String arg3) throws IOException,
-      NotAuthorizedException, BadRequestException {
+  public void sendContent(final OutputStream arg0, final Range arg1,
+      final Map<String, String> arg2, final String arg3) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public void moveTo(CollectionResource arg0, String arg1)
-      throws ConflictException, NotAuthorizedException, BadRequestException {
+  public void moveTo(final CollectionResource arg0, final String arg1) {
     // TODO Auto-generated method stub
-
   }
 
   @Override

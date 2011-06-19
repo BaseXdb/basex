@@ -1,6 +1,7 @@
 package org.basex.api.webdav;
 
 import static org.basex.api.webdav.BXResourceFactory.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
@@ -8,7 +9,6 @@ import java.util.Map;
 
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Open;
-import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
 
 import com.bradmcevoy.http.Auth;
@@ -16,10 +16,13 @@ import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FileItem;
 import com.bradmcevoy.http.FileResource;
 import com.bradmcevoy.http.Range;
-import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
+/**
+ * WebDAV resource representing an XML document.
+ * @author BaseX Team 2005-11, BSD License
+ * @author Rositsa Shadura
+ * @author Dimitar Popov
+ */
 public class BXDocument extends BXResource implements FileResource {
   /** Database containing the document. */
   private final String dbname;
@@ -52,8 +55,7 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public void copyTo(CollectionResource arg0, String arg1)
-      throws NotAuthorizedException, BadRequestException, ConflictException {
+  public void copyTo(final CollectionResource arg0, final String arg1) {
     // TODO Auto-generated method stub
 
   }
@@ -67,12 +69,11 @@ public class BXDocument extends BXResource implements FileResource {
   @Override
   public String getName() {
     final int idx  = docpath.lastIndexOf(DIRSEP);
-    return idx < 0 ? docpath : docpath.substring(idx+1, docpath.length());
+    return idx < 0 ? docpath : docpath.substring(idx + 1, docpath.length());
   }
 
   @Override
-  public void delete() throws NotAuthorizedException, ConflictException,
-      BadRequestException {
+  public void delete() {
     try {
       ClientSession cs = login(user, pass);
       try {
@@ -94,20 +95,19 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public String getContentType(String arg0) {
+  public String getContentType(final String arg0) {
     return MIMETYPEXML;
   }
 
   @Override
-  public Long getMaxAgeSeconds(Auth arg0) {
+  public Long getMaxAgeSeconds(final Auth arg0) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void sendContent(OutputStream out, Range arg1,
-      Map<String, String> arg2, String arg3) throws IOException,
-      NotAuthorizedException, BadRequestException {
+  public void sendContent(final OutputStream out, final Range arg1,
+      final Map<String, String> arg2, final String arg3) throws IOException {
     ClientSession cs = login(user, pass);
     cs.setOutputStream(out);
     try {
@@ -122,15 +122,14 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public void moveTo(CollectionResource arg0, String arg1)
-      throws ConflictException, NotAuthorizedException, BadRequestException {
+  public void moveTo(final CollectionResource arg0, final String arg1) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public String processForm(Map<String, String> arg0, Map<String, FileItem> arg1)
-      throws BadRequestException, NotAuthorizedException, ConflictException {
+  public String processForm(final Map<String, String> arg0,
+      final Map<String, FileItem> arg1) {
     // TODO Auto-generated method stub
     return null;
   }

@@ -1,10 +1,9 @@
 package org.basex.api.webdav;
 
-import static org.basex.api.webdav.BXResourceFactory.*;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.basex.core.Text;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Open;

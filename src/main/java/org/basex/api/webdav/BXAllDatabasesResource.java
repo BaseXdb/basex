@@ -1,6 +1,5 @@
 package org.basex.api.webdav;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -8,9 +7,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.basex.core.BaseXException;
 import org.basex.core.cmd.CreateDB;
 import org.basex.server.ClientSession;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
@@ -80,6 +79,7 @@ public class BXAllDatabasesResource extends BXResource implements
     try {
       ClientSession cs = login(user, pass);
       try {
+        // Create a new database
         cs.execute(new CreateDB(newName));
       } finally {
         cs.close();
@@ -92,24 +92,14 @@ public class BXAllDatabasesResource extends BXResource implements
   }
 
   @Override
-  public Resource createNew(final String newName,
-      final InputStream inputStream, final Long length, final String contentType) {
-    // final String dbname = dbname(newName);
-    // if(!Command.validName(dbname, false)) return null;
-    // try {
-    // CreateDB.create(dbname, inputStream, ctx);
-    // return new BXDocumentResource(cs, dbname);
-    // } catch(BaseXException e) {
-    // // [DP] WebDAV: error handling
-    // e.printStackTrace();
-    // return null;
-    // }
+  public Resource createNew(final String newName, final InputStream inputStream,
+      final Long length, final String contentType) {
     return null;
   }
 
   @Override
   public void sendContent(final OutputStream out, final Range range,
-      final Map<String, String> params, final String contentType) {}
+      final Map<String, String> params, final String contentType) { }
 
   @Override
   public Long getMaxAgeSeconds(final Auth auth) {
@@ -132,11 +122,12 @@ public class BXAllDatabasesResource extends BXResource implements
   }
 
   @Override
-  public void copyTo(final CollectionResource toCollection, final String name) {}
+  public void copyTo(final CollectionResource toCollection,
+      final String name) { }
 
   @Override
-  public void delete() {}
+  public void delete() { }
 
   @Override
-  public void moveTo(final CollectionResource rDest, final String name) {}
+  public void moveTo(final CollectionResource rDest, final String name) { }
 }
