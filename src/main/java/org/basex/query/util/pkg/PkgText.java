@@ -67,8 +67,8 @@ public interface PkgText {
   /** Jar descriptor children. */
   /** <jar/> element. */
   byte[] JAR = token("jar");
-  /** <function/> element. */
-  byte[] FUNC = token("function");
+  /** <class/> element. */
+  byte[] CLASS = token("class");
 
   /** Not expected initialization error. */
   String NOTEXP = "Missing package descriptor for package '%'";
