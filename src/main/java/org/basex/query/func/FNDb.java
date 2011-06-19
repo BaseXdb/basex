@@ -38,7 +38,6 @@ import org.basex.query.path.NameTest;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.TokenList;
 import org.basex.util.Util;
 
 /**
@@ -237,8 +236,8 @@ public final class FNDb extends FuncCall {
    */
   private Item rename(final QueryContext ctx) throws QueryException {
     final Data data = checkData(ctx);
-    final TokenList rem = new TokenList();
-    Rename.rename(data, checkStr(expr[0], ctx), checkStr(expr[1], ctx), rem);
+    final byte[] src = checkStr(expr[0], ctx);
+    Rename.rename(data, src, checkStr(expr[1], ctx), data.doc(string(src)));
     // [DP] Rename: what exception should be thrown if rem is not empty?
     return null;
   }

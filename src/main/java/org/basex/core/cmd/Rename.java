@@ -2,8 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
-
-import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.util.TokenList;
@@ -27,11 +25,12 @@ public final class Rename extends ACreate {
 
   @Override
   protected boolean run() {
-    final TokenList unchanged = new TokenList();
-    final int c = rename(context.data, token(path(args[0])),
-        token(path(args[1])), unchanged);
+    final String src = path(args[0]);
+    final int[] docs = context.data.doc(src);
+    final TokenList unchanged = rename(context.data, token(src),
+        token(path(args[1])), docs);
     for(final byte[] d : unchanged) info(NAMEINVALID, d);
-    info(PATHRENAMED, c, perf);
+    info(PATHRENAMED, docs.length - unchanged.size(), perf);
     return unchanged.size() == 0;
   }
 
@@ -40,13 +39,13 @@ public final class Rename extends ACreate {
    * @param data database
    * @param src source path
    * @param trg target path
-   * @param r documents which cannot be renamed will be stored here
-   * @return number of successfully renamed documents
+   * @param docs documents to be renamed
+   * @return documents which were NOT renamed
    */
-  public static int rename(final Data data, final byte[] src,
-      final byte[] trg, final TokenList r) {
-    int c = 0;
-    for(final int doc : data.doc(string(src))) {
+  public static TokenList rename(final Data data, final byte[] src,
+      final byte[] trg, final int[] docs) {
+    final TokenList remaining = new TokenList();
+    for(final int doc : docs) {
       final byte[] path = data.text(doc, true);
       byte[] target = trg;
       byte[] name = substring(path, src.length);
@@ -56,14 +55,13 @@ public final class Rename extends ACreate {
         target = trg.length != 0 ? concat(trg, SLASH, name) : name;
       }
       if(target.length == 0) {
-        r.add(path);
+        remaining.add(path);
       } else {
         data.replace(doc, Data.DOC, target);
-        ++c;
       }
     }
     // data was changed: update context
-    if(c != 0) data.flush();
-    return c;
+    if(docs.length - remaining.size() > 0) data.flush();
+    return remaining;
   }
 }
