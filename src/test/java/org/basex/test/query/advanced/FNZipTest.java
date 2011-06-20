@@ -161,17 +161,19 @@ public final class FNZipTest extends AdvancedQueryTest {
 
     // new file has no entries
     list = list.replaceAll("<zip:dir.*</zip:dir>", "");
-    error(fun + "(" + list + ", '" + TMPZIP + "')", Err.ZIPFAIL);
+    error(fun + "(" + list + ", '" + new File(TMPZIP).getCanonicalPath() + "')",
+        Err.ZIPFAIL);
   }
 
   /**
    * Returns a zip archive description.
    * @param arg zip arguments
    * @return parameter string
+   * @throws IOException IO exception
    */
-  protected static String zipParams(final String arg) {
-    return "<file xmlns='http://expath.org/ns/zip' href='" + TMPZIP + "'>" +
-      arg + "</file>";
+  protected static String zipParams(final String arg) throws IOException {
+    return "<file xmlns='http://expath.org/ns/zip' href='" +
+    new File(TMPZIP).getCanonicalPath() + "'>" + arg + "</file>";
   }
 
   /**
