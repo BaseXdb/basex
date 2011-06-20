@@ -325,6 +325,18 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Returns the database data reference.
+   * @param ctx query context
+   * @return data reference
+   * @throws QueryException query exception if no database context
+   */
+  public final Data checkDbData(final QueryContext ctx) throws QueryException {
+    final Data data = ctx.context.data;
+    if(data == null) NODBCTX.thrw(input, this);
+    return data;
+  }
+
+  /**
    * Checks if the specified expression yields a non-empty item.
    * @param e expression to be evaluated
    * @param ctx query context

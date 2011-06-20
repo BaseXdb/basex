@@ -2,15 +2,16 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
+import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
 import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
@@ -36,6 +37,8 @@ import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Database functions.
@@ -77,6 +80,8 @@ public final class FNDb extends FuncCall {
       case OPENPRE: return open(ctx, false);
       case SYSTEM:  return system(ctx);
       case INFO:    return info(ctx);
+      case DELETE:  return delete(ctx);
+      case RENAME:  return rename(ctx);
       default:      return super.item(ctx, ii);
     }
   }
@@ -182,11 +187,59 @@ public final class FNDb extends FuncCall {
    * Performs the list function.
    * @param ctx query context
    * @return iterator
+   * @throws QueryException query exception
    */
-  private Iter list(final QueryContext ctx) {
+  private Iter list(final QueryContext ctx) throws QueryException {
     final ItemCache ii = new ItemCache();
-    for(final String s : List.list(ctx.context)) ii.add(Str.get(s));
+    if(expr.length == 0) {
+      for(final String s : List.list(ctx.context)) ii.add(Str.get(s));
+    } else {
+      final byte[] str = checkStr(expr[0], ctx);
+      final int s = indexOf(str, '/');
+      final byte[] db = s == -1 ? str : substring(str, 0, s);
+      final String path = string(s == -1 ? EMPTY : substring(str, s + 1));
+
+      final Data data = ctx.resource.data(db, input);
+      if(!data.empty()) {
+        for(final int pre : path == null ? data.doc() : data.doc(path))
+          ii.add(Str.get(data.text(pre, true)));
+      }
+      try {
+        Close.close(data, ctx.context);
+      } catch(IOException ex) {
+        // [DP] List: what exception should be thrown?
+        Util.debug(ex);
+        NODB.thrw(input, string(db));
+      }
+    }
     return ii;
+  }
+
+  /**
+   * Performs the delete function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item delete(final QueryContext ctx) throws QueryException {
+    final Data data = checkDbData(ctx);
+    final int[] docs = data.doc(string(checkStr(expr[0], ctx)));
+    Delete.delete(ctx.context, docs);
+    return null;
+  }
+
+  /**
+   * Performs the rename function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item rename(final QueryContext ctx) throws QueryException {
+    final Data data = checkDbData(ctx);
+    final byte[] src = checkStr(expr[0], ctx);
+    Rename.rename(data, src, checkStr(expr[1], ctx), data.doc(string(src)));
+    // [DP] Rename: what exception should be thrown if rem is not empty?
+    return null;
   }
 
   /**
@@ -195,7 +248,7 @@ public final class FNDb extends FuncCall {
    * @return iterator
    */
   private Str system(final QueryContext ctx) {
-    return Str.get(delete(Info.info(ctx.context), '\r'));
+    return Str.get(Token.delete(Info.info(ctx.context), '\r'));
   }
 
   /**
@@ -210,12 +263,12 @@ public final class FNDb extends FuncCall {
       final byte[] tp = checkStr(expr[0], ctx);
       final CmdIndexInfo cmd = InfoIndex.info(string(tp));
       if(cmd == null) NOIDX.thrw(input, this);
-      info = InfoIndex.info(cmd, checkData(ctx));
+      info = InfoIndex.info(cmd, checkDbData(ctx));
     } else {
       final boolean create = ctx.context.user.perm(User.CREATE);
-      info = InfoDB.db(checkData(ctx).meta, false, true, create);
+      info = InfoDB.db(checkDbData(ctx).meta, false, true, create);
     }
-    return Str.get(delete(info, '\r'));
+    return Str.get(Token.delete(info, '\r'));
   }
 
   /**
