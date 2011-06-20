@@ -1,16 +1,18 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
+import java.util.ArrayList;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.SeqType;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
- * Logical expression.
+ * Logical expression, extended by {@link And} and {@link Or}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -28,11 +30,11 @@ public abstract class Logical extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+    for(final Expr e : expr) checkUp(e, ctx);
 
     final boolean and = this instanceof And;
     for(int e = 0; e < expr.length; ++e) {
-      expr[e] = expr[e].compEbv(ctx);
+      expr[e] = expr[e].comp(ctx).compEbv(ctx);
       if(!expr[e].value()) continue;
 
       // atomic items can be pre-evaluated
@@ -44,12 +46,21 @@ public abstract class Logical extends Arr {
   }
 
   /**
-   * Returns an equivalent for the logical expression, assuming that only
-   * one operand exists.
-   * @return resulting expression
+   * Flattens nested logical expressions.
+   * @param ctx query context
    */
-  protected final Expr single() {
-    return expr[0].type().eq(SeqType.BLN) ? expr[0] :
-      FunDef.BOOLEAN.get(input, expr[0]);
+  protected final void compFlatten(final QueryContext ctx) {
+    // flatten nested expressions
+    final ArrayList<Expr> tmp = new ArrayList<Expr>(expr.length);
+    for(int p = 0; p < expr.length; ++p) {
+      if(expr[p].getClass().isInstance(this)) {
+        final Expr[] ex = ((Logical) expr[p]).expr;
+        for(int i = 0; i < ex.length; i++) tmp.add(ex[i]);
+        ctx.compInfo(OPTFLAT, expr[p]);
+      } else {
+        tmp.add(expr[p]);
+      }
+    }
+    if(expr.length != tmp.size()) expr = tmp.toArray(new Expr[tmp.size()]);
   }
 }

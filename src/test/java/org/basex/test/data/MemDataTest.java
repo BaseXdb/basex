@@ -12,11 +12,12 @@ import org.basex.core.cmd.XQuery;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.io.IOContent;
+import org.basex.util.Token;
 
 /** Test index updates when using memory storage ({@link MemData}). */
 public final class MemDataTest {
   /** XML document. */
-  private static final byte[] XML = "<a><b>test</b><c/></a>".getBytes();
+  private static final byte[] XML = Token.token("<a><b>test</b><c/></a>");
   /** Database context. */
   private static final Context CTX = new Context();
   /** Tested {@link MemData} instance. */

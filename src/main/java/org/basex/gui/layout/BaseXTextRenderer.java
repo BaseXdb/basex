@@ -298,9 +298,9 @@ final class BaseXTextRenderer extends BaseXBack {
    */
   private boolean next() {
     final int ch = text.curr();
-    if(ch == TokenBuilder.NL || ch == TokenBuilder.HL) {
+    if(ch == TokenBuilder.NLINE || ch == TokenBuilder.HLINE) {
       x = off;
-      y += fontH >> (ch == TokenBuilder.NL ? 0 : 1);
+      y += fontH >> (ch == TokenBuilder.NLINE ? 0 : 1);
       return true;
     }
     x += wordW;

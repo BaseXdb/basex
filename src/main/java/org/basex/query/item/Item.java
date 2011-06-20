@@ -181,7 +181,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public SeqType type() {
+  public final SeqType type() {
     return type.seq();
   }
 
@@ -191,8 +191,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final boolean duplicates() {
-    return false;
+  public final boolean iterable() {
+    return true;
   }
 
   /**

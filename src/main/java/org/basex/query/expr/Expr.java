@@ -3,7 +3,8 @@ package org.basex.query.expr;
 import org.basex.data.ExprInfo;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -12,6 +13,7 @@ import org.basex.query.path.AxisPath;
 import org.basex.query.path.MixedPath;
 import org.basex.query.util.IndexContext;
 import org.basex.query.util.Var;
+import org.basex.query.util.VarList;
 import org.basex.util.InputInfo;
 
 /**
@@ -105,7 +107,8 @@ public abstract class Expr extends ExprInfo {
       throws QueryException;
 
   /**
-   * Tests if this is an empty sequence.
+   * Tests if this is an empty sequence. This function is only overwritten
+   * by the {@link Empty} class, which represents the empty sequence.
    * @return result of check
    */
   public boolean empty() {
@@ -193,7 +196,14 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr remove(final Var v);
 
   /**
-   * Compiles and simplifies effective boolean values tests.
+   * <p>This method is called at compile time by expressions that perform
+   * effective boolean value tests (e.g. {@link If} or {@link Preds}).
+   * If the arguments of the called expression return a boolean anyway,
+   * the expression will be simplified.</p>
+   * <p>Example in {@link CmpV}:
+   * {@code if($x eq true())} is rewritten to {@code if($x)}, if {@code $x}
+   * will always yield a single boolean.</p>
+   *
    * @param ctx query context
    * @return optimized expression
    */
@@ -210,12 +220,13 @@ public abstract class Expr extends ExprInfo {
   public abstract SeqType type();
 
   /**
-   * Returns true if the expression might yield duplicates and unsorted
-   * results. This method is called e.g. by {@link Union} or {@link AxisPath}.
+   * Returns true if the expression is iterable, i.e., if it does not contain
+   * any duplicates and if all results are sorted.
+   * This method is called e.g. by {@link AxisPath}.
    * @return result of check
    */
-  public boolean duplicates() {
-    return !type().zeroOrOne();
+  public boolean iterable() {
+    return type().zeroOrOne();
   }
 
   /**
@@ -259,7 +270,7 @@ public abstract class Expr extends ExprInfo {
    * @return function, or {@code null}
    */
   @SuppressWarnings("unused")
-  public boolean isFun(final FunDef f) {
+  public boolean isFun(final Function f) {
     return false;
   }
 
@@ -272,5 +283,26 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public Expr addText(final QueryContext ctx) throws QueryException {
     return this;
+  }
+
+  /**
+   * Checks if this expression has free variables.
+   * @param ctx the query context on the level of this expression
+   * @return {@code true} if there are variables which are used but not declared
+   *         in this expression, {@code false} otherwise
+   */
+  public boolean hasFreeVars(final QueryContext ctx) {
+
+    final VarList global = ctx.vars.global();
+    for(int i = global.size; --i >= 0;) {
+      if(count(global.vars[i]) > 0) return true;
+    }
+
+    final VarList vars = ctx.vars.local();
+    for(int i = vars.size; --i >= 0;) {
+      if(count(vars.vars[i]) > 0) return true;
+    }
+
+    return false;
   }
 }

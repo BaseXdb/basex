@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -91,12 +91,12 @@ public class GFLWOR extends ParseExpr {
       // bind variable if it contains a value or occurs only once
       if(flt.expr.value() || count(flt.var, f) == 1) flt.bind(ctx);
 
-      /* ...or if all inner clauses are LET clauses. This rewriting would
+      /* ...or if all inner clauses return only one item. This rewriting would
        * disallow repeated evaluations of the same expression, but it prevents
        * index-based rewritings (e.g. for XMark 9)
-      boolean let = true;
-      for(int g = f + 1; g < fl.length; g++) let &= fl[g] instanceof Let;
-      if(flt.expr.value() || count(flt.var, f) == 1 && let) flt.bind(ctx);
+      boolean one = true;
+      for(int g = f + 1; g < fl.length; g++) one &= fl[g].size() == 1;
+      if(flt.expr.value() || count(flt.var, f) == 1 && one) flt.bind(ctx);
       */
     }
 
@@ -253,9 +253,9 @@ public class GFLWOR extends ParseExpr {
     // bind tests to the corresponding variables
     for(int t = 0; t < tests.length; ++t) {
       final ForLet f = fl[tar[t]];
+      // remove variable reference and optionally wrap test with boolean()
       Expr e = tests[t].remove(f.var);
-      // wrap test with boolean() if the result is numeric
-      if(e.type().mayBeNum()) e = FunDef.BOOLEAN.get(input, e);
+      e = Function.BOOLEAN.get(input, e).compEbv(ctx);
       // attach predicates to axis path or filter, or create a new filter
       if(f.expr instanceof AxisPath) {
         f.expr = ((AxisPath) f.expr).addPreds(e);

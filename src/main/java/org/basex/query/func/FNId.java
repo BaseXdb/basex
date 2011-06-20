@@ -23,14 +23,14 @@ import org.basex.util.TokenList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNId extends Fun {
+public final class FNId extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNId(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNId(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -202,7 +202,7 @@ public final class FNId extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == FunDef.ELID ||
+    return u == Use.X30 && def == Function.ELID ||
       u == Use.CTX && expr.length == 1 || super.uses(u);
   }
 }

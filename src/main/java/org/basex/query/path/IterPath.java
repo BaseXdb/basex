@@ -99,9 +99,4 @@ final class IterPath extends AxisPath {
       }
     };
   }
-
-  @Override
-  public boolean duplicates() {
-    return false;
-  }
 }

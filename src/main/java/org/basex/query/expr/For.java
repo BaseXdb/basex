@@ -57,6 +57,7 @@ public final class For extends ForLet {
     expr = checkUp(expr, ctx).comp(ctx);
     type = expr.type();
     size = expr.size();
+    var.size = 1;
     var.ret = ctx.grouping ? SeqType.get(type.type, SeqType.Occ.ZM) :
       type.type.seq();
 

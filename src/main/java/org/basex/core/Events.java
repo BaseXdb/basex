@@ -93,7 +93,7 @@ public final class Events extends HashMap<String, Sessions> {
 
     final String[] events = keySet().toArray(new String[size()]);
     Arrays.sort(events);
-    for(final String name : events) tb.nl().add(LI).add(name);
+    for(final String name : events) tb.add(NL).add(LI).add(name);
     return tb.toString();
   }
 

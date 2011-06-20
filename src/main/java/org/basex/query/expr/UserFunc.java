@@ -24,7 +24,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class Func extends Single {
+public class UserFunc extends Single {
   /** Function name. */
   public final QNm name;
   /** Return type. */
@@ -36,7 +36,10 @@ public class Func extends Single {
   /** Updating flag. */
   public boolean updating;
   /** Cast flag. */
-  public boolean cast;
+  private boolean cast;
+
+  /** Compilation flag. */
+  private boolean compiled;
 
   /**
    * Function constructor.
@@ -46,8 +49,8 @@ public class Func extends Single {
    * @param r return type
    * @param d declaration flag
    */
-  public Func(final InputInfo ii, final QNm n, final Var[] a, final SeqType r,
-      final boolean d) {
+  public UserFunc(final InputInfo ii, final QNm n, final Var[] a,
+      final SeqType r, final boolean d) {
     super(ii, null);
     name = n;
     ret = r;
@@ -76,6 +79,9 @@ public class Func extends Single {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    if(compiled) return this;
+    compiled = true;
+
     final int s = ctx.vars.size();
     for(final Var v : args) ctx.vars.add(v);
     expr = expr.comp(ctx);
@@ -100,7 +106,6 @@ public class Func extends Single {
     ctx.value = null;
     final Item it = expr.item(ctx, ii);
     ctx.value = cv;
-
     // optionally promote return value to target type
     return cast ? ret.cast(it, this, false, ctx, input) : it;
   }
@@ -112,6 +117,7 @@ public class Func extends Single {
     ctx.value = null;
     final Value v = expr.value(ctx);
     ctx.value = cv;
+    // optionally promote return value to target type
     return cast ? ret.promote(v, ctx, input) : v;
   }
 

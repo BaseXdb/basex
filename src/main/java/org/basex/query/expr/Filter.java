@@ -93,7 +93,7 @@ public class Filter extends Preds {
     // faster runtime evaluation of variable counters (array[$pos] ...)
     final boolean off = pred.length == 1 && pred[0].type().num() &&
       !pred[0].uses(Use.CTX);
-    final boolean iter = !off && iterable();
+    final boolean iter = !off && useIterator();
 
     // iterator for simple positional predicate
     return off || iter ? new IterPosFilter(this, off) : this;

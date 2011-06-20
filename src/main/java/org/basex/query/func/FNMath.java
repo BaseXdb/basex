@@ -14,14 +14,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNMath extends Fun {
+public final class FNMath extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNMath(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNMath(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -53,7 +53,7 @@ public final class FNMath extends Fun {
       case ATAN2: return Dbl.get(atan2(d, e));
       case POW:   return Dbl.get(d == 1 ? 1 : pow(d, e));
       // project-specific
-      case RAND:  return Dbl.get(random());
+      case RANDOM:  return Dbl.get(random());
       case SINH:  return Dbl.get(sinh(d));
       case COSH:  return Dbl.get(cosh(d));
       case TANH:  return Dbl.get(tanh(d));
@@ -64,6 +64,7 @@ public final class FNMath extends Fun {
   @Override
   public boolean uses(final Use u) {
     // random() is non-deterministic; don't pre-evaluate
-    return u == Use.X30 || u == Use.CTX && def == FunDef.RAND || super.uses(u);
+    return u == Use.X30 || u == Use.CTX && def == Function.RANDOM ||
+      super.uses(u);
   }
 }

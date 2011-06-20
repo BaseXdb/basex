@@ -135,11 +135,6 @@ public class Itr extends Item {
   }
 
   @Override
-  public final SeqType type() {
-    return SeqType.ITR;
-  }
-
-  @Override
   public final int hash(final InputInfo ii) {
     return (int) val;
   }

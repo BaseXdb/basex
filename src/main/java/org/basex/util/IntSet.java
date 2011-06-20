@@ -3,7 +3,7 @@ package org.basex.util;
 import java.util.Arrays;
 
 /**
- * This is a simple hash set, storing keys in byte arrays.
+ * This is an efficient hash set, storing keys in a simple integer array.
  * The {@link IntMap} class extends it to a hash map.
  *
  * @author BaseX Team 2005-11, BSD License

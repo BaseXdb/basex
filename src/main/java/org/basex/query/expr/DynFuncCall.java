@@ -5,7 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FItem;
-import org.basex.query.item.FunType;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
@@ -22,14 +22,14 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class DynFunCall extends Arr {
+public final class DynFuncCall extends Arr {
   /**
    * Function constructor.
    * @param ii input info
    * @param fun function expression
    * @param arg arguments
    */
-  public DynFunCall(final InputInfo ii, final Expr fun, final Expr[] arg) {
+  public DynFuncCall(final InputInfo ii, final Expr fun, final Expr[] arg) {
     super(ii, Array.add(arg, fun));
   }
 
@@ -37,11 +37,12 @@ public final class DynFunCall extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     final Type t = expr[expr.length - 1].type().type;
-    if(t instanceof FunType) {
-      final FunType ft = (FunType) t;
+    if(t instanceof FuncType) {
+      final FuncType ft = (FuncType) t;
       if(ft.ret != null) type = ft.ret;
     }
 
+    // maps can only contain fully evaluated Values, so this is safe
     if(values() && expr[expr.length - 1] instanceof Map)
       return optPre(value(ctx), ctx);
 
@@ -85,7 +86,7 @@ public final class DynFunCall extends Arr {
   private FItem getFun(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[expr.length - 1], ctx);
     if(!it.func() || ((FItem) it).arity() != expr.length - 1)
-      Err.type(this, FunType.arity(expr.length - 1), it);
+      Err.type(this, FuncType.arity(expr.length - 1), it);
     return (FItem) it;
   }
 

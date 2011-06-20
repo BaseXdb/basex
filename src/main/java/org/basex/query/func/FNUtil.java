@@ -34,14 +34,14 @@ import org.basex.util.Util;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class FNUtil extends Fun {
+public final class FNUtil extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNUtil(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNUtil(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -129,8 +129,13 @@ public final class FNUtil extends Fun {
    * @throws QueryException query exception
    */
   private Value bytes(final QueryContext ctx) throws QueryException {
-    return ItrSeq.get(((B64) checkType(expr[0].item(ctx, input),
-        AtomType.B64)).toJava(), AtomType.BYT);
+    final byte[] bytes = ((B64) checkType(expr[0].item(ctx, input),
+        AtomType.B64)).toJava();
+
+    final int bl = bytes.length;
+    final long[] tmp = new long[bl];
+    for(int i = 0; i < bl; i++) tmp[i] = bytes[i];
+    return ItrSeq.get(tmp, AtomType.BYT);
   }
 
   /**
@@ -341,7 +346,7 @@ public final class FNUtil extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (def == FunDef.MB || def == FunDef.MS
-        || def == FunDef.EVAL || def == FunDef.RUN) || super.uses(u);
+    return u == Use.CTX && (def == Function.MB || def == Function.MS
+        || def == Function.EVAL || def == Function.RUN) || super.uses(u);
   }
 }

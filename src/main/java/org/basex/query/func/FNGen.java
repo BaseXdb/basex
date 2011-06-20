@@ -41,7 +41,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNGen extends Fun {
+public final class FNGen extends FuncCall {
   /** Output namespace. */
   private static final Uri U_ZIP = Uri.uri(OUTPUTURI);
   /** Element: output:serialization-parameter. */
@@ -54,7 +54,7 @@ public final class FNGen extends Fun {
    * @param f function definition
    * @param e arguments
    */
-  public FNGen(final InputInfo ii, final FunDef f, final Expr[] e) {
+  public FNGen(final InputInfo ii, final Function f, final Expr[] e) {
     super(ii, f, e);
   }
 
@@ -86,12 +86,12 @@ public final class FNGen extends Fun {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    return def == FunDef.COLL ? collection(ctx) : super.value(ctx);
+    return def == Function.COLL ? collection(ctx) : super.value(ctx);
   }
 
   @Override
   public Expr cmp(final QueryContext ctx) {
-    if(def == FunDef.DATA &&  expr.length == 1) {
+    if(def == Function.DATA &&  expr.length == 1) {
       final SeqType t = expr[0].type();
       type = t.type.node() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
@@ -322,7 +322,7 @@ public final class FNGen extends Fun {
    * @throws SerializerException serializer exception
    * @throws QueryException query exception
    */
-  static SerializerProp serialPar(final Fun fun, final int arg,
+  static SerializerProp serialPar(final FuncCall fun, final int arg,
       final QueryContext ctx) throws SerializerException, QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
@@ -353,17 +353,18 @@ public final class FNGen extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.UPD && def == FunDef.PUT || u == Use.X30 && (
-        def == FunDef.DATA && expr.length == 0 ||
-        def == FunDef.PARSETXT || def == FunDef.PARSETXTLIN ||
-        def == FunDef.PARSETXTAVL || def == FunDef.PARSEXML ||
-        def == FunDef.URICOLL || def == FunDef.SERIALIZE) ||
-        u == Use.CTX && def == FunDef.DATA && expr.length == 0 ||
+    return u == Use.UPD && def == Function.PUT || u == Use.X30 && (
+        def == Function.DATA && expr.length == 0 ||
+        def == Function.PARSETXT || def == Function.PARSETXTLIN ||
+        def == Function.PARSETXTAVL || def == Function.PARSEXML ||
+        def == Function.URICOLL || def == Function.SERIALIZE) ||
+        u == Use.CTX && def == Function.DATA && expr.length == 0 ||
         super.uses(u);
   }
 
   @Override
-  public boolean duplicates() {
-    return def != FunDef.COLL && super.duplicates();
+  public boolean iterable() {
+    // collections will never yield duplicates
+    return def == Function.COLL || super.iterable();
   }
 }

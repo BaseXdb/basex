@@ -19,14 +19,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNNum extends Fun {
+public final class FNNum extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNNum(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNNum(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -154,7 +154,7 @@ public final class FNNum extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == FunDef.ROUND && expr.length == 2 ||
+    return u == Use.X30 && def == Function.ROUND && expr.length == 2 ||
       super.uses(u);
   }
 }

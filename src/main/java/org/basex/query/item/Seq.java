@@ -1,5 +1,6 @@
 package org.basex.query.item;
 
+import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -69,5 +70,18 @@ public abstract class Seq extends Value {
     int h = 1;
     for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(ii);
     return h;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(PAR1);
+    for(int i = 0; i < size; ++i) {
+      sb.append((i != 0 ? SEP : "") + itemAt(i));
+      if(sb.length() <= 32 || i + 1 == size) continue;
+      // output is chopped to prevent too long error strings
+      sb.append(SEP + DOTS);
+      break;
+    }
+    return sb.append(PAR2).toString();
   }
 }

@@ -81,9 +81,4 @@ public final class Uri extends Str {
       return false;
     }
   }
-
-  @Override
-  public SeqType type() {
-    return SeqType.URI;
-  }
 }

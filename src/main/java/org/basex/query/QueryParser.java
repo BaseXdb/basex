@@ -23,7 +23,7 @@ import org.basex.query.expr.CDoc;
 import org.basex.query.expr.CElem;
 import org.basex.query.expr.CPI;
 import org.basex.query.expr.CTxt;
-import org.basex.query.expr.DynFunCall;
+import org.basex.query.expr.DynFuncCall;
 import org.basex.query.expr.InlineFunc;
 import org.basex.query.expr.LitFunc;
 import org.basex.query.expr.LitMap;
@@ -45,7 +45,7 @@ import org.basex.query.expr.Extension;
 import org.basex.query.expr.Filter;
 import org.basex.query.expr.For;
 import org.basex.query.expr.ForLet;
-import org.basex.query.expr.Func;
+import org.basex.query.expr.UserFunc;
 import org.basex.query.expr.GFLWOR;
 import org.basex.query.expr.If;
 import org.basex.query.expr.Instance;
@@ -87,7 +87,7 @@ import org.basex.query.func.VarDef;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Empty;
-import org.basex.query.item.FunType;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.Itr;
 import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
@@ -838,7 +838,7 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAR2);
 
-    final Func func = new Func(ii, name, args, optAsType(), true);
+    final UserFunc func = new UserFunc(ii, name, args, optAsType(), true);
     func.updating = up;
 
     ctx.funcs.add(func, this);
@@ -1698,7 +1698,7 @@ public class QueryParser extends InputParser {
 
         final Var[] part = new Var[args.length];
         final boolean pt = partial(args, part);
-        e = new DynFunCall(input(), e, args);
+        e = new DynFuncCall(input(), e, args);
         if(pt) e = new PartFunApp(input(), e, part);
       }
     } while(e != old);
@@ -2468,7 +2468,7 @@ public class QueryParser extends InputParser {
               if(!wsConsume(PAR2)) error(FUNCMISS, type.atom());
             }
             wsCheck(AS);
-            t = FunType.get(args, sequenceType());
+            t = FuncType.get(args, sequenceType());
           }
         } else if(!wsConsume(PAR2)) {
           error(FUNCMISS, type.atom());

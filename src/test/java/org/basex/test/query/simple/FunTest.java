@@ -2,6 +2,7 @@ package org.basex.test.query.simple;
 
 /**
  * XQuery functions tests.
+ * Most tests verify if queries are correctly optimized.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -19,15 +20,15 @@ public final class FunTest extends QueryTest {
       { "false 1", bool(false), "false()" },
       { "true 2", bool(true), "true()" },
 
-      { "count 1", "count()" },
-      { "count 2", "count(1, 1)" },
-      { "count 3", bool(false), "count(1[.]) eq 0" },
-      { "count 4", bool(false), "count(1[.]) <= 0" },
-      { "count 5", bool(false), "count(1[.]) < 0" },
-      { "count 6", bool(true), "count(1[.]) != 0" },
-      { "count 7", bool(true), "count(1[.]) >= 0" },
-      { "count 8", bool(true), "count(1[.]) > 0" },
-      { "count 9", bool(true), "count(1[.]) = 1" },
+      { "count  1", "count()" },
+      { "count  2", "count(1, 1)" },
+      { "count  3", bool(false), "count(1[.]) eq 0" },
+      { "count  4", bool(false), "count(1[.]) <= 0" },
+      { "count  5", bool(false), "count(1[.]) < 0" },
+      { "count  6", bool(true), "count(1[.]) != 0" },
+      { "count  7", bool(true), "count(1[.]) >= 0" },
+      { "count  8", bool(true), "count(1[.]) > 0" },
+      { "count  9", bool(true), "count(1[.]) = 1" },
       { "count 10", bool(true), "count(1[.]) le 1" },
       { "count 11", bool(false), "count(1[.]) < 1" },
       { "count 12", bool(false), "count(1[.]) != 1" },
@@ -63,6 +64,12 @@ public final class FunTest extends QueryTest {
         "count((for $a in (1,2) let $b := <b/> return $b)/.)" },
       { "count 38", itr(2), "count(//desc/1)" },
       { "count 39", itr(4), "count(//desc/(1,2))" },
+
+      { "empty 1", bool(false), "empty(math:random())" },
+      { "empty 2", bool(false, false), "for $x in 1 to 2 return empty($x)" },
+
+      { "exists 1", bool(true), "exists(math:random())" },
+      { "exists 2", bool(true, true), "for $x in 1 to 2 return exists($x)" },
 
       { "contains 1", "contains(.)" },
       { "contains 2", "contains(. .)" },

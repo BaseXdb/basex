@@ -5,6 +5,9 @@ import java.util.Stack;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
+import org.basex.query.expr.Cmp;
+import org.basex.query.expr.CmpG;
+import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -26,14 +29,14 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNSimple extends Fun {
+public final class FNSimple extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNSimple(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNSimple(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -69,7 +72,7 @@ public final class FNSimple extends Fun {
     switch(def) {
       case ONEORMORE:
         final Value val = ctx.value(expr[0]);
-        if(val.size() == 0) throw EXPECTOM.thrw(input);
+        if(val.empty()) throw EXPECTOM.thrw(input);
         return val;
       case UNORDER:
         return ctx.value(expr[0]);
@@ -119,22 +122,34 @@ public final class FNSimple extends Fun {
     final Expr e = expr[0];
 
     switch(def) {
+      case EMPTY:
+      case EXISTS:
+        // context-based expressions (e.g.: error()) will be dropped
+        return e.size() == -1 || e.uses(Use.CTX) ? this :
+          Bln.get(def == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
-        expr[0] = e.compEbv(ctx);
-        return expr[0].type().eq(SeqType.BLN) ? e : this;
+        // simplify, e.g.: if(boolean(A)) -> if(A)
+        return e.type().eq(SeqType.BLN) ? e : this;
       case NOT:
-        if(e.isFun(FunDef.EMPTY)) {
+        if(e.isFun(Function.EMPTY)) {
           // simplify: not(empty(A)) -> exists(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
-          expr = ((Fun) e).expr;
-          def = FunDef.EXISTS;
-        } else if(e.isFun(FunDef.EXISTS)) {
+          expr = ((FuncCall) e).expr;
+          def = Function.EXISTS;
+        } else if(e.isFun(Function.EXISTS)) {
           // simplify: not(exists(A)) -> empty(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
-          expr = ((Fun) e).expr;
-          def = FunDef.EMPTY;
+          expr = ((FuncCall) e).expr;
+          def = Function.EMPTY;
+        } else if(e instanceof CmpV || e instanceof CmpG) {
+          // simplify: not('a' = 'b') -> 'a' != 'b'
+          final Cmp c = ((Cmp) e).invert();
+          return c == e ? this : c;
+        } else if(e.isFun(Function.NOT)) {
+          // simplify: not(not(A)) -> boolean(A)
+          return compBln(((FuncCall) e).expr[0]);
         } else {
-          // simplify: not(boolean(A)) -> not(A)
+          // simplify, e.g.: not(boolean(A)) -> not(A)
           expr[0] = e.compEbv(ctx);
         }
         return this;
@@ -160,12 +175,12 @@ public final class FNSimple extends Fun {
     final Expr e = expr[0];
 
     Expr ex = this;
-    if(def == FunDef.BOOLEAN) {
+    if(def == Function.BOOLEAN) {
       // (test)[boolean(A)] -> (test)[A]
       if(!e.type().mayBeNum()) ex = e;
-    } else if(def == FunDef.EXISTS) {
+    } else if(def == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
-      if(e.type().type.node()) ex = e;
+      if(e.type().type.node() || e.size() > 0) ex = e;
     }
     if(ex != this) ctx.compInfo(QueryText.OPTWRITE, this);
     return ex;

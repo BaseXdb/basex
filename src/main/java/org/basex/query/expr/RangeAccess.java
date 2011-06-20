@@ -58,8 +58,8 @@ public final class RangeAccess extends Simple {
   }
 
   @Override
-  public boolean duplicates() {
-    return ictx.dupl;
+  public boolean iterable() {
+    return ictx.iterable;
   }
 
   @Override

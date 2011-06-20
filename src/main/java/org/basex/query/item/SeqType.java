@@ -161,7 +161,7 @@ public final class SeqType {
   /** Zero or one duration. */
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZO);
   /** Single function. */
-  public static final SeqType FUN_O = FunType.ANY_FUN.seq();
+  public static final SeqType FUN_O = FuncType.ANY_FUN.seq();
   /** Single function. */
   public static final SeqType MAP_O = new SeqType(
       MapType.get(AtomType.AAT, ITEM_ZM));

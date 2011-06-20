@@ -18,7 +18,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class PartFunApp extends Func {
+public final class PartFunApp extends UserFunc {
 
   /**
    * Function constructor for static calls.
@@ -57,8 +57,7 @@ public final class PartFunApp extends Func {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     // defer creation of function item because of closure
-    // [LW] can we skip this if closure is empty?
-    return new InlineFunc(input, ret, args, expr);
+    return new InlineFunc(input, ret, args, expr).comp(ctx);
   }
 
   @Override

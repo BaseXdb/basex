@@ -1,9 +1,7 @@
 package org.basex.query.item.map;
 
 import static org.basex.query.util.Err.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -14,7 +12,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Flt;
 import org.basex.query.item.FItem;
-import org.basex.query.item.FunType;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.MapType;
@@ -26,7 +24,6 @@ import org.basex.query.iter.ItemCache;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -84,7 +81,10 @@ public final class Map extends FItem {
    */
   private Item key(final Item it, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
-    if(it == null) XPEMPTY.thrw(ii, desc());
+    if(it == null) throw XPEMPTY.thrw(ii, desc());
+
+    // function items can't be keys
+    if(it instanceof FItem) throw FNATM.thrw(ii, it.desc());
 
     // NaN can't be stored as key, as it isn't equal to anything
     if(it == Flt.NAN || it == Dbl.NAN) return null;
@@ -162,22 +162,14 @@ public final class Map extends FItem {
 
   @Override
   public String toString() {
-    try {
-      final TokenBuilder tb = new TokenBuilder("map { ");
-      final Value ks = keys();
-      for(long i = 0, len = ks.size(); i < len; i++) {
-        final Item k = ks.itemAt(i);
-        if(tb.size() > 6) tb.add(", ");
-        tb.add(k.toString()).add(":=").add(get(k, null).toString());
-      }
-      return tb.add(" }").toString();
-    } catch(final QueryException ex) {
-      throw Util.notexpected(ex);
-    }
+    final StringBuilder sb = root.toString(new StringBuilder("map{ "));
+    // remove superfluous comma
+    if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
+    return sb.append("}").toString();
   }
 
   @Override
-  public Map coerceTo(final FunType ft, final QueryContext ctx,
+  public Map coerceTo(final FuncType ft, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
     if(!(ft instanceof MapType) || !hasType((MapType) ft))
       throw Err.cast(ii, ft, this);

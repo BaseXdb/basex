@@ -96,8 +96,7 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Checks if all functions have been correctly declared, and initializes
-   * all function calls.
+   * Checks if the variable has been correctly declared.
    * @throws QueryException query exception
    */
   public void check() throws QueryException {
@@ -234,6 +233,13 @@ public final class Var extends ParseExpr {
   @Override
   public SeqType type() {
     return type != null ? type : expr != null ? expr.type() : ret;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof Var)) return false;
+    final Var v = (Var) cmp;
+    return name.eq(v.name) && type().eq(v.type());
   }
 
   @Override

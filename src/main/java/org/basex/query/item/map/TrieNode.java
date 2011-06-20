@@ -58,6 +58,8 @@ abstract class TrieNode {
     public TrieNode insert(final int h, final Item k, final Value v,
         final int l, final InputInfo i) throws QueryException {
       return new Leaf(h, k, v); }
+    @Override
+    StringBuilder toString(final StringBuilder sb) { return sb; }
   };
 
   /** Size of this node. */
@@ -255,4 +257,11 @@ abstract class TrieNode {
    */
   abstract boolean deep(final InputInfo ii, final TrieNode o)
       throws QueryException;
+
+  /**
+   * Recursive helper for {@link Map#toString()}.
+   * @param sb string builder
+   * @return reference to {@code sb}
+   */
+  abstract StringBuilder toString(final StringBuilder sb);
 }

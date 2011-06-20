@@ -2,10 +2,12 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
+import java.util.ArrayList;
+
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FunDef;
+import org.basex.query.func.Function;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.path.AxisStep;
@@ -57,6 +59,21 @@ public abstract class Preds extends ParseExpr {
         pred = Array.delete(pred, p--);
       } else {
         pred[p] = pr;
+
+        // replace AND expression with predicates
+        if(pred[p] instanceof And) {
+          ctx.compInfo(OPTPRED, pred[p].desc());
+          final Expr[] and = ((And) pred[p]).expr;
+          final int m = and.length - 1;
+          final ArrayList<Expr> tmp = new ArrayList<Expr>(pred.length + m);
+          for(int i = 0; i < p; i++) tmp.add(pred[i]);
+          for(int i = 0; i < and.length; i++) {
+            // wrap test with boolean() if the result is numeric
+            tmp.add(Function.BOOLEAN.get(input, and[i]).compEbv(ctx));
+          }
+          for(int i = p + 1; i < pred.length; i++) tmp.add(pred[i]);
+          pred = tmp.toArray(new Expr[tmp.size()]);
+        }
       }
     }
     return e;
@@ -68,10 +85,10 @@ public abstract class Preds extends ParseExpr {
    * if a single {@code last()} predicate is specified.
    * @return result of check
    */
-  protected boolean iterable() {
+  protected boolean useIterator() {
     // position predicate
     pos = pred[0] instanceof Pos ? (Pos) pred[0] : null;
-    last = pred[0].isFun(FunDef.LAST);
+    last = pred[0].isFun(Function.LAST);
 
     boolean np1 = true;
     boolean np2 = true;

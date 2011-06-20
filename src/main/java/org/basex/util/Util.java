@@ -34,14 +34,14 @@ public final class Util {
   public static String bug(final String[] ext) {
     final TokenBuilder tb = new TokenBuilder(
       "Potential bug? Improper use? Your feedback is welcome:");
-    tb.nl().add("Contact: ").add(MAIL);
-    tb.nl().add("Version: ").add(TITLE);
-    tb.nl().add("Java: ").add(System.getProperty("java.vendor"));
+    tb.add(NL).add("Contact: ").add(MAIL);
+    tb.add(NL).add("Version: ").add(TITLE);
+    tb.add(NL).add("Java: ").add(System.getProperty("java.vendor"));
     tb.add(", ").add(System.getProperty("java.version"));
-    tb.nl().add("OS: ").add(System.getProperty("os.name"));
+    tb.add(NL).add("OS: ").add(System.getProperty("os.name"));
     tb.add(", ").add(System.getProperty("os.arch"));
-    tb.nl().add("Stack Trace: ");
-    for(final String e : ext) tb.nl().add(e);
+    tb.add(NL).add("Stack Trace: ");
+    for(final String e : ext) tb.add(NL).add(e);
     return tb.toString();
   }
 

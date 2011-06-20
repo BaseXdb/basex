@@ -58,15 +58,15 @@ public class AxisPath extends Path {
     // evaluate number of results
     size = size(ctx);
     type = SeqType.get(step[step.length - 1].type().type, size);
-    return iterable() ? new IterPath(input, root, step, type, size) : this;
+    return useIterator() ? new IterPath(input, root, step, type, size) : this;
   }
 
   /**
-   * Checks if the path is iterable.
+   * Checks if the path can be rewritten for iterative evaluation.
    * @return resulting operator
    */
-  private boolean iterable() {
-    if(root == null || root.uses(Use.VAR) || root.duplicates()) return false;
+  private boolean useIterator() {
+    if(root == null || root.uses(Use.VAR) || !root.iterable()) return false;
 
     final int sl = step.length;
     for(int s = 0; s < sl; ++s) {
@@ -157,11 +157,11 @@ public class AxisPath extends Path {
       if(!stp.axis.down) break;
 
       // check if resulting index path will be duplicate free
-      final boolean d = pathNodes(data, s) == null;
+      final boolean i = pathNodes(data, s) != null;
 
       // choose cheapest index access
       for(int p = 0; p < stp.pred.length; ++p) {
-        final IndexContext ic = new IndexContext(ctx, data, stp, d);
+        final IndexContext ic = new IndexContext(ctx, data, stp, i);
         if(!stp.pred[p].indexAccessible(ic)) continue;
 
         if(ic.costs() == 0) {
@@ -386,8 +386,8 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public boolean duplicates() {
-    return false;
+  public boolean iterable() {
+    return true;
   }
 
   @Override

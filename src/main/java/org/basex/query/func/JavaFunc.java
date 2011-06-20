@@ -38,12 +38,12 @@ import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 
 /**
- * Java function definition.
+ * Java function binding.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FunJava extends Arr {
+public final class JavaFunc extends Arr {
   /** New keyword. */
   private static final String NEW = "new";
   /** Input Java types. */
@@ -76,7 +76,7 @@ public final class FunJava extends Arr {
    * @param m Java method/field
    * @param a arguments
    */
-  public FunJava(final InputInfo ii, final Class<?> c, final String m,
+  public JavaFunc(final InputInfo ii, final Class<?> c, final String m,
       final Expr[] a) {
     super(ii, a);
     cls = c;
@@ -88,7 +88,7 @@ public final class FunJava extends Arr {
     final Value[] arg = new Value[expr.length];
     for(int a = 0; a < expr.length; ++a) {
       arg[a] = expr[a].value(ctx);
-      if(arg[a].size() == 0) XPEMPTY.thrw(input, desc());
+      if(arg[a].empty()) XPEMPTY.thrw(input, desc());
     }
 
     Object result = null;

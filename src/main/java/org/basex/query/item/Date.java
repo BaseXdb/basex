@@ -234,11 +234,6 @@ public abstract class Date extends Item {
   }
 
   @Override
-  public final SeqType type() {
-    return SeqType.DAT;
-  }
-
-  @Override
   public final String toString() {
     return Util.info("\"%\"", atom(null));
   }

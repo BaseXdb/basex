@@ -175,8 +175,10 @@ public abstract class QueryTest {
    * @param b boolean value
    * @return iterator
    */
-  static ItemCache bool(final boolean b) {
-    return item(Bln.get(b));
+  static ItemCache bool(final boolean... b) {
+    final ItemCache ii = new ItemCache();
+    for(final boolean bb : b) ii.add(Bln.get(bb));
+    return ii;
   }
 
   /**

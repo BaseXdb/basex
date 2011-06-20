@@ -220,11 +220,6 @@ public final class QNm extends Item {
   }
 
   @Override
-  public SeqType type() {
-    return SeqType.QNM;
-  }
-
-  @Override
   public String toString() {
     return "\"" + Token.string(val) + "\"";
   }

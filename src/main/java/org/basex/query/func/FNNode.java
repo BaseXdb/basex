@@ -21,14 +21,14 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FNNode extends Fun {
+public final class FNNode extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNNode(final InputInfo ii, final FunDef f, final Expr... e) {
+  public FNNode(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
@@ -107,8 +107,8 @@ public final class FNNode extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (def == FunDef.GENID || expr.length == 0 &&
-        (def == FunDef.DOCURI || def == FunDef.NODENAME)) ||
+    return u == Use.X30 && (def == Function.GENID || expr.length == 0 &&
+        (def == Function.DOCURI || def == Function.NODENAME)) ||
         u == Use.CTX && expr.length == 0 || super.uses(u);
   }
 }

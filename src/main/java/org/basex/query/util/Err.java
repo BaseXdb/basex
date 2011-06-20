@@ -12,7 +12,7 @@ import org.basex.query.item.Value;
 import org.basex.util.InputInfo;
 
 /**
- * This class assembles common error messages.
+ * This class contains all query error messages.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -550,7 +550,7 @@ public enum Err {
   /** XQST0049: Parsing exception. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
   /** XQST0054: Parsing exception. */
-  XPSTACK(XQST, 54, "Circular variable declaration?"),
+  XPSTACK(XQST, 54, "Stack Overflow: Circular variable declaration?"),
   /** XQST0055: Parsing exception. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057: Parsing exception. */

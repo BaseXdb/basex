@@ -16,6 +16,7 @@ import org.basex.util.Array;
  * accessible or not.
  *
  * @author BaseX Team 2005-11, BSD License
+ * @author Christian Gruen
  * @author Sebastian Gath
  */
 public final class IndexContext {
@@ -25,8 +26,8 @@ public final class IndexContext {
   public final Data data;
   /** Index Step. */
   public final AxisStep step;
-  /** Flag for potential duplicates. */
-  public final boolean dupl;
+  /** Flag for iterative evaluation. */
+  public final boolean iterable;
 
   /** Costs of index access: smaller is better, 0 means no results. */
   private int costs;
@@ -40,14 +41,14 @@ public final class IndexContext {
    * @param c query context
    * @param d data reference
    * @param s index step
-   * @param l duplicate flag
+   * @param i iterable flag
    */
   public IndexContext(final QueryContext c, final Data d, final AxisStep s,
-      final boolean l) {
+      final boolean i) {
     ctx = c;
     data = d;
     step = s;
-    dupl = l;
+    iterable = i;
   }
 
   /**

@@ -39,6 +39,7 @@ public final class VarRef extends ParseExpr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     var = ctx.vars.get(var);
     type = var.type();
+    size = var.size();
 
     // return if variable expression has not yet been assigned
     Expr e = var.expr();
@@ -53,8 +54,9 @@ public final class VarRef extends ParseExpr {
      * If a variable is pre-evaluated, it may not be available for further
      * optimizations (index access, count, ...). On the other hand, repeated
      * evaluation of the same expression is avoided. */
+    // [CG][LW] document / clean up the logic here
     if(var.global || ctx.nsElem.length != 0 || ns.size() != 0 ||
-        var.type != null || e.uses(Use.CNS) || e instanceof FuncCall) {
+        var.type != null || e.uses(Use.CNS) || e instanceof UserFuncCall) {
       e = var.value(ctx);
     }
 
@@ -100,6 +102,11 @@ public final class VarRef extends ParseExpr {
   @Override
   public Expr remove(final Var v) {
     return var.is(v) ? new Context(input) : this;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof VarRef  && var.sameAs(((VarRef) cmp).var);
   }
 
   @Override

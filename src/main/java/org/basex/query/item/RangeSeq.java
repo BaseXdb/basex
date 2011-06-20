@@ -56,19 +56,8 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean duplicates() {
-    return false;
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(Token.token(Util.name(this)),
-        MIN, Token.token(start), MAX, Token.token(start + size - 1));
-  }
-
-  @Override
-  public String toString() {
-    return PAR1 + start + ' ' + TO + ' ' + (start + size - 1) + PAR2;
+  public boolean iterable() {
+    return true;
   }
 
   @Override
@@ -85,5 +74,16 @@ public final class RangeSeq extends Seq {
   @Override
   public boolean homogenous() {
     return true;
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.emptyElement(Token.token(Util.name(this)),
+        MIN, Token.token(start), MAX, Token.token(start + size - 1));
+  }
+
+  @Override
+  public String toString() {
+    return PAR1 + start + ' ' + TO + ' ' + (start + size - 1) + PAR2;
   }
 }

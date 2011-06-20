@@ -12,13 +12,13 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.FuncCall;
-import org.basex.query.expr.Func;
+import org.basex.query.expr.UserFuncCall;
+import org.basex.query.expr.UserFunc;
 import org.basex.query.func.FNIndex;
-import org.basex.query.func.Fun;
-import org.basex.query.func.FunDef;
-import org.basex.query.func.FunJava;
-import org.basex.query.item.FunType;
+import org.basex.query.func.FuncCall;
+import org.basex.query.func.Function;
+import org.basex.query.func.JavaFunc;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
@@ -31,16 +31,16 @@ import org.basex.util.Reflect;
 import org.basex.util.TokenBuilder;
 
 /**
- * Container for global function declarations.
+ * Container for global, user-defined function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Functions extends ExprInfo {
+public final class UserFuncs extends ExprInfo {
   /** Cached function call. */
-  private FuncCall[][] calls = { };
+  private UserFuncCall[][] calls = { };
   /** Local functions. */
-  private Func[] func = { };
+  private UserFunc[] func = { };
 
   /**
    * Returns the number of functions.
@@ -104,13 +104,13 @@ public final class Functions extends ExprInfo {
       final Class<?> cls = Reflect.find(java.substring(0, i));
       if(cls == null) qp.error(FUNCJAVA, java);
       final String mth = java.substring(i + 1);
-      return TypedFunc.java(new FunJava(qp.input(), cls, mth, args));
+      return TypedFunc.java(new JavaFunc(qp.input(), cls, mth, args));
     }
 
     // check predefined functions
-    final Fun fun = FNIndex.get().get(ln, uri, args, qp);
+    final FuncCall fun = FNIndex.get().get(ln, uri, args, qp);
     if(fun != null) {
-      ctx.updating |= fun.def == FunDef.PUT;
+      ctx.updating |= fun.def == Function.PUT;
       return new TypedFunc(fun, fun.def.type(args.length));
     }
 
@@ -119,14 +119,14 @@ public final class Functions extends ExprInfo {
       final QNm qn = func[l].name;
       if(eq(ln, qn.ln()) && eq(uri, qn.uri().atom()) && args.length ==
         func[l].args.length) return new TypedFunc(add(qp.input(), qn, l, args),
-            FunType.get(func[l]));
+            FuncType.get(func[l]));
     }
 
     // add function call for function that has not been defined yet
     if(Types.find(name, false) == null) {
-      return new TypedFunc(add(qp.input(), name, add(new Func(qp.input(), name,
-          new Var[args.length], null, false), qp), args),
-          FunType.arity(args.length));
+      return new TypedFunc(add(qp.input(), name, add(
+          new UserFunc(qp.input(), name, new Var[args.length], null, false),
+          qp), args), FuncType.arity(args.length));
     }
     return null;
   }
@@ -139,9 +139,9 @@ public final class Functions extends ExprInfo {
    * @param arg arguments
    * @return new function call
    */
-  private FuncCall add(final InputInfo ii, final QNm nm, final int id,
+  private UserFuncCall add(final InputInfo ii, final QNm nm, final int id,
       final Expr[] arg) {
-    final FuncCall call = new FuncCall(ii, nm, arg);
+    final UserFuncCall call = new UserFuncCall(ii, nm, arg);
     calls[id] = Array.add(calls[id], call);
     return call;
   }
@@ -153,7 +153,9 @@ public final class Functions extends ExprInfo {
    * @return function id
    * @throws QueryException query exception
    */
-  public int add(final Func fun, final QueryParser qp) throws QueryException {
+  public int add(final UserFunc fun, final QueryParser qp)
+      throws QueryException {
+
     final QNm name = fun.name;
 
     final byte[] uri = name.uri().atom();
@@ -182,7 +184,7 @@ public final class Functions extends ExprInfo {
     }
     // add function skeleton
     func = Array.add(func, fun);
-    calls = Array.add(calls, new FuncCall[0]);
+    calls = Array.add(calls, new UserFuncCall[0]);
     return func.length - 1;
   }
 
@@ -194,9 +196,9 @@ public final class Functions extends ExprInfo {
   public void check() throws QueryException {
     // initialize function calls
     for(int i = 0; i < func.length; ++i) {
-      for(final FuncCall c : calls[i]) c.init(func[i]);
+      for(final UserFuncCall c : calls[i]) c.init(func[i]);
     }
-    for(final Func f : func) f.check();
+    for(final UserFunc f : func) f.check();
   }
 
   /**

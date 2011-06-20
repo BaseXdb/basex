@@ -16,24 +16,25 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * Pre-defined functions.
+ * Function call for built-in functions.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class Fun extends Arr {
+public abstract class FuncCall extends Arr {
   /** Function definition. */
-  public FunDef def;
+  public Function def;
 
   /**
    * Constructor.
    * @param ii input info
-   * @param d function definition
-   * @param e arguments
+   * @param fd function definition
+   * @param args arguments
    */
-  protected Fun(final InputInfo ii, final FunDef d, final Expr... e) {
-    super(ii, e);
-    def = d;
+  protected FuncCall(final InputInfo ii, final Function fd,
+      final Expr... args) {
+    super(ii, args);
+    def = fd;
     type = def.ret;
   }
 
@@ -70,7 +71,7 @@ public abstract class Fun extends Arr {
   }
 
   @Override
-  public boolean isFun(final FunDef f) {
+  public boolean isFun(final Function f) {
     return def == f;
   }
 
