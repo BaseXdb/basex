@@ -467,7 +467,7 @@ public enum Function {
   /** Database function: searches the full-text index. */
   FULLTEXT(FNDb.class, "fulltext(string)", NOD_ZM, STR),
   /** Database function: lists all database. */
-  LIST(FNDb.class, "list()", STR_ZM),
+  LIST(FNDb.class, "list([path])", STR_ZM, 0, STR),
   /** Database function: lists system information. */
   SYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */

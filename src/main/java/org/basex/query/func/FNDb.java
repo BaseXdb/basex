@@ -182,11 +182,24 @@ public final class FNDb extends FuncCall {
    * Performs the list function.
    * @param ctx query context
    * @return iterator
+   * @throws QueryException query exception
    */
-  private Iter list(final QueryContext ctx) {
-    final ItemCache ii = new ItemCache();
-    for(final String s : List.list(ctx.context)) ii.add(Str.get(s));
-    return ii;
+  private Iter list(final QueryContext ctx) throws QueryException {
+    final ItemCache ic = new ItemCache();
+    if(expr.length == 0) {
+      for(final String s : List.list(ctx.context)) ic.add(Str.get(s));
+    } else {
+      final byte[] str = checkStr(expr[0], ctx);
+      final int s = indexOf(str, '/');
+      final byte[] db = s == -1 ? str : substring(str, 0, s);
+      final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
+
+      // retrieve data instance; will be closed after query execution
+      final Data data = ctx.resource.data(db, input);
+      for(final int pre : data.doc(string(path)))
+        ic.add(Str.get(data.text(pre, true)));
+    }
+    return ic;
   }
 
   /**
