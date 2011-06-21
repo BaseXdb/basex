@@ -24,13 +24,10 @@ import com.bradmcevoy.http.Resource;
  */
 public class BXAllDatabasesResource extends BXResource implements
     FolderResource {
-  // MakeCollectionableResource, PutableResource, GetableResource,
-  // PropFindableResource {
 
-  @Override
-  public Date getModifiedDate() {
-    // TODO Auto-generated method stub
-    return null;
+  /** Constructor. */
+  public BXAllDatabasesResource() {
+    super(null, null);
   }
 
   @Override
@@ -43,8 +40,8 @@ public class BXAllDatabasesResource extends BXResource implements
     try {
       final ClientSession cs = login(user, pass);
       try {
-        return listDatabases(cs).contains(childName) ? new BXCollectionDatabase(
-            childName, user, pass) : null;
+        return listDatabases(cs).contains(childName) ?
+            new BXDatabase(childName, user, pass) : null;
       } finally {
         cs.close();
       }
@@ -62,7 +59,7 @@ public class BXAllDatabasesResource extends BXResource implements
       final ClientSession cs = login(user, pass);
       try {
         for(final String d : listDatabases(cs))
-          dbs.add(new BXCollectionDatabase(d, user, pass));
+          dbs.add(new BXDatabase(d, user, pass));
         return dbs;
       } finally {
         cs.close();
@@ -70,17 +67,17 @@ public class BXAllDatabasesResource extends BXResource implements
     } catch(final Exception e) {
       // [DP] WebDAV: error handling
       e.printStackTrace();
-      return null;
     }
+    return null;
   }
 
   @Override
   public CollectionResource createCollection(final String newName) {
     try {
-      ClientSession cs = login(user, pass);
+      final ClientSession cs = login(user, pass);
       try {
-        // Create a new database
-        cs.execute(new CreateDB(newName));
+        cs.execute(new CreateDB(dbname(newName)));
+        return new BXDatabase(newName, user, pass);
       } finally {
         cs.close();
       }
@@ -88,46 +85,72 @@ public class BXAllDatabasesResource extends BXResource implements
       // [RS] WebDAV: error handling
       e.printStackTrace();
     }
-    return new BXCollectionDatabase(newName, user, pass);
+    return null;
   }
 
   @Override
   public Resource createNew(final String newName, final InputStream inputStream,
       final Long length, final String contentType) {
+    if(supported(contentType)) {
+      try {
+        final ClientSession cs = login(user, pass);
+        try {
+          final String dbname = dbname(newName);
+          cs.create(dbname, inputStream);
+          return new BXDatabase(dbname, user, pass);
+        } finally {
+          cs.close();
+        }
+      } catch(Exception e) {
+        // [RS] WebDAV: error handling
+        e.printStackTrace();
+      }
+    }
     return null;
   }
 
   @Override
   public void sendContent(final OutputStream out, final Range range,
-      final Map<String, String> params, final String contentType) { }
+      final Map<String, String> params, final String contentType) {
+    // this method must do nothing
+  }
 
   @Override
   public Long getMaxAgeSeconds(final Auth auth) {
+    // this method must do nothing
     return null;
   }
 
   @Override
   public String getContentType(final String accepts) {
+    // this method must do nothing
     return null;
   }
 
   @Override
   public Long getContentLength() {
+    // this method must do nothing
     return null;
   }
 
   @Override
   public Date getCreateDate() {
+    // this method must do nothing
     return null;
   }
 
   @Override
-  public void copyTo(final CollectionResource toCollection,
-      final String name) { }
+  public void copyTo(final CollectionResource toCollection, final String name) {
+    // this method must do nothing
+  }
 
   @Override
-  public void delete() { }
+  public void delete() {
+    // this method must do nothing
+  }
 
   @Override
-  public void moveTo(final CollectionResource rDest, final String name) { }
+  public void moveTo(final CollectionResource rDest, final String name) {
+    // this method must do nothing
+  }
 }

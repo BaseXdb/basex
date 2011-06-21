@@ -2,14 +2,13 @@ package org.basex.api.webdav;
 
 import static java.lang.Integer.*;
 import static org.basex.api.webdav.WebDAVServer.*;
-
 import java.io.IOException;
+import java.util.Date;
 
 import org.basex.core.BaseXException;
 import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
 import org.basex.util.StringList;
-
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Request.Method;
@@ -22,14 +21,28 @@ import com.bradmcevoy.http.Resource;
  * @author Dimitar Popov
  */
 public abstract class BXResource implements Resource {
+  /** File path separator. */
+  static final char DIRSEP = '/';
   /** XML mime type. */
   static final String MIMETYPEXML = "text/xml";
   /** User name. */
   protected String user;
   /** User password. */
   protected String pass;
-  /** Resource factory. */
-  protected BXResourceFactory fact;
+  /** Database. */
+  protected final String db;
+  /** Resource path (without leading '/'). */
+  protected final String path;
+
+  /**
+   * Constructor.
+   * @param d database name
+   * @param p resource path
+   */
+  public BXResource(final String d, final String p) {
+    db = d;
+    path = stripLeadingSlash(p);
+  }
 
   @Override
   public Object authenticate(final String u, final String p) {
@@ -64,6 +77,17 @@ public abstract class BXResource implements Resource {
     return null;
   }
 
+  @Override
+  public String getName() {
+    final int idx = path.lastIndexOf(DIRSEP);
+    return idx < 0 ? path : path.substring(idx + 1, path.length());
+  }
+
+  @Override
+  public Date getModifiedDate() {
+    return null;
+  }
+
   /**
    * List all databases.
    * @param cs session
@@ -74,21 +98,8 @@ public abstract class BXResource implements Resource {
       throws BaseXException {
     final StringList result = new StringList();
     final ClientQuery q = cs.query("db:list()");
-    while(q.more())
-      result.add(q.next());
+    while(q.more()) result.add(q.next());
     return result;
-  }
-
-  /**
-   * Number of documents in the specified database.
-   * @param cs session
-   * @param db database name
-   * @return number of documents
-   * @throws BaseXException query exception
-   */
-  static int docNum(final ClientSession cs, final String db)
-      throws BaseXException {
-    return parseInt(cs.query("count(collection('" + db + "'))").execute());
   }
 
   /**
@@ -97,7 +108,7 @@ public abstract class BXResource implements Resource {
    * @return valid database name
    */
   static String dbname(final String n) {
-    final int i = n.lastIndexOf(".");
+    final int i = n.lastIndexOf('.');
     return (i != -1 ? n.substring(0, i) : n).replaceAll("[^\\w-]", "");
   }
 
@@ -105,7 +116,7 @@ public abstract class BXResource implements Resource {
    * Login to the database server.
    * @param u user name
    * @param p user password
-   * @return object representing the new client session
+   * @return new client session
    * @throws IOException I/O exception
    */
   static ClientSession login(final String u, final String p)
@@ -119,5 +130,66 @@ public abstract class BXResource implements Resource {
       pass = p;
     }
     return new ClientSession(host, port, user, pass);
+  }
+
+  /**
+   * Login to the database server.
+   * @param a authentication
+   * @return new client session
+   * @throws IOException I/O exception
+   */
+  static ClientSession login(final Auth a) throws IOException {
+    return a == null ? login(null, null) : login(a.getUser(), a.getPassword());
+  }
+
+  /**
+   * Create a folder or document resource.
+   * @param cs active client session
+   * @param db database name
+   * @param path resource path
+   * @return requested resource or {@code null} if it does not exist
+   * @throws BaseXException query exception
+   */
+  static Resource resource(final ClientSession cs, final String db,
+      final String path) throws BaseXException {
+    final String dbpath = db + DIRSEP + path;
+    // check if there is a document in the collection having this path
+    final ClientQuery d = cs.query(
+        "declare variable $d as xs:string external; " +
+        "declare variable $p as xs:string external; " +
+        "count(db:list($d)[. = $p])");
+    d.bind("$d", dbpath);
+    d.bind("$p", path);
+    if(parseInt(d.execute()) == 1) return new BXDocument(db, path);
+
+    // check if there are paths in the collection starting with this path
+    final ClientQuery f = cs.query(
+        "declare variable $d as xs:string external; " +
+        "declare variable $p as xs:string external; " +
+        "count(db:list($d)[starts-with(., $p)])");
+    f.bind("$d", dbpath);
+    f.bind("$p", path);
+    if(parseInt(f.execute()) > 0) return new BXFolder(db, path);
+    return null;
+  }
+
+  /**
+   * String leading slash if available.
+   * @param s string to modify
+   * @return string without leading slash
+   */
+  static String stripLeadingSlash(final String s) {
+    return s != null && s.length() > 0 && s.charAt(0) == DIRSEP ?
+        s.substring(1) : s;
+  }
+
+  /**
+   * Check if content type is supported.
+   * @param ctype content type
+   * @return {@code true} if BaseX can handle the content type
+   */
+  static boolean supported(final String ctype) {
+    // [DP] additional content types can be supported in the future
+    return ctype != null && ctype.indexOf(MIMETYPEXML) >= 0;
   }
 }

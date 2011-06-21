@@ -1,16 +1,14 @@
 package org.basex.api.webdav;
 
-import static org.basex.api.webdav.BXResourceFactory.*;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
-
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
+import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
-
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FileItem;
@@ -24,61 +22,41 @@ import com.bradmcevoy.http.Range;
  * @author Dimitar Popov
  */
 public class BXDocument extends BXResource implements FileResource {
-  /** Database containing the document. */
-  private final String dbname;
-  /** Path to document in database. */
-  private final String docpath;
-
   /**
    * Constructor.
-   * @param db database name
-   * @param path path to document
+   * @param dbname database name
+   * @param docpath path to document
    */
-  public BXDocument(final String db, final String path) {
-    dbname = db;
-    docpath = path;
+  public BXDocument(final String dbname, final String docpath) {
+    super(dbname, docpath);
   }
 
   /**
    * Constructor.
-   * @param db name of database this document belongs to.
-   * @param path document path to root
+   * @param dbname name of database this document belongs to.
+   * @param docpath document path to root
    * @param u user name
    * @param p password
    */
-  public BXDocument(final String db, final String path, final String u,
+  public BXDocument(final String dbname, final String docpath, final String u,
       final String p) {
-    dbname = db;
-    docpath = path;
+    this(dbname, docpath);
     user = u;
     pass = p;
   }
 
   @Override
-  public void copyTo(final CollectionResource arg0, final String arg1) {
+  public void copyTo(final CollectionResource toCollection, final String name) {
     // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public Date getModifiedDate() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String getName() {
-    final int idx  = docpath.lastIndexOf(DIRSEP);
-    return idx < 0 ? docpath : docpath.substring(idx + 1, docpath.length());
   }
 
   @Override
   public void delete() {
     try {
-      ClientSession cs = login(user, pass);
+      final ClientSession cs = login(user, pass);
       try {
-        cs.execute(new Open(dbname));
-        cs.query("db:delete('" + docpath + "')").execute();
+        cs.execute(new Open(db));
+        cs.execute(new Delete(path));
       } finally {
         cs.close();
       }
@@ -95,26 +73,30 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public String getContentType(final String arg0) {
+  public String getContentType(final String accepts) {
     return MIMETYPEXML;
   }
 
   @Override
-  public Long getMaxAgeSeconds(final Auth arg0) {
+  public Long getMaxAgeSeconds(final Auth auth) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void sendContent(final OutputStream out, final Range arg1,
-      final Map<String, String> arg2, final String arg3) throws IOException {
-    ClientSession cs = login(user, pass);
-    cs.setOutputStream(out);
+  public void sendContent(final OutputStream out, final Range range,
+      final Map<String, String> params, final String contentType)
+      throws IOException {
+    final ClientSession cs = login(user, pass);
     try {
-      cs.query("collection('" + dbname + DIRSEP + docpath + "')").execute();
-      //out.flush();
+      cs.setOutputStream(out);
+      final ClientQuery q = cs.query(
+          "declare variable $path as xs:string external; " +
+          "collection($path)");
+      q.bind("$path", db + DIRSEP + path);
+      q.execute();
     } catch(BaseXException e) {
-      // TODO Auto-generated catch block
+      // [RS] WebDAV: error handling
       e.printStackTrace();
     } finally {
       cs.close();
@@ -122,14 +104,13 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public void moveTo(final CollectionResource arg0, final String arg1) {
+  public void moveTo(final CollectionResource rDest, final String name) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public String processForm(final Map<String, String> arg0,
-      final Map<String, FileItem> arg1) {
+  public String processForm(final Map<String, String> parameters,
+      final Map<String, FileItem> files) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -139,5 +120,4 @@ public class BXDocument extends BXResource implements FileResource {
     // TODO Auto-generated method stub
     return null;
   }
-
 }

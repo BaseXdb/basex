@@ -23,6 +23,14 @@ import com.bradmcevoy.http.Resource;
 public final class BXNotAuthorizedResource extends BXResource implements
     FolderResource {
 
+  /** The only instance of this class. */
+  public static final Resource NOAUTH = new BXNotAuthorizedResource();
+
+  /** Constructor. */
+  private BXNotAuthorizedResource() {
+    super(null, null);
+  }
+
   @Override
   public Object authenticate(final String u, final String p) {
     return null;
@@ -36,11 +44,6 @@ public final class BXNotAuthorizedResource extends BXResource implements
 
   @Override
   public String getName() {
-    return null;
-  }
-
-  @Override
-  public Date getModifiedDate() {
     return null;
   }
 
