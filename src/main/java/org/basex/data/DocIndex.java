@@ -94,7 +94,7 @@ final class DocIndex {
 
     // normalize paths
     final String np = path.replaceAll("[\\\\//]+", "/").replaceAll("^/|/$", "");
-    final byte[] exact = lc(concat(SLASH, token(np)));
+    final byte[] exact = concat(SLASH, Prop.WIN ? lc(token(np)) : token(np));
     final byte[] start = endsWith(exact, SLASH) ? exact : concat(exact, SLASH);
 
     // relevant paths: start from the first hit and return all subsequent hits

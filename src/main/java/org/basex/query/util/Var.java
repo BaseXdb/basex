@@ -24,17 +24,18 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class Var extends ParseExpr {
-  /** Expected return type. */
-  public SeqType ret = SeqType.ITEM_ZM;
   /** Variable name. */
   public final QNm name;
+  /** Variable ID. */
+  public final int id;
+
+  /** Expected return type. */
+  public SeqType ret;
   /** Global flag. */
   public boolean global;
   /** Declaration flag. */
   public boolean declared;
 
-  /** Variable ID. */
-  public final int id;
   /** Bound value. */
   private Value value;
   /** Bound expression. */
@@ -205,6 +206,7 @@ public final class Var extends ParseExpr {
     v.global = global;
     v.value = value;
     v.expr = expr;
+    v.type = type;
     v.ret = ret;
     return v;
   }
@@ -232,7 +234,8 @@ public final class Var extends ParseExpr {
 
   @Override
   public SeqType type() {
-    return type != null ? type : expr != null ? expr.type() : ret;
+    return ret != null ? ret : type != null ? type :
+      expr != null ? expr.type() : SeqType.ITEM_ZM;
   }
 
   @Override

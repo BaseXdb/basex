@@ -61,12 +61,13 @@ public final class FNAggr extends FuncCall {
   public Expr cmp(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
     final long c = e.size();
+    if(c < 0 || e.uses(Use.CTX)) return this;
+
     switch(def) {
       case COUNT:
-        return c >= 0 && !ctx.grouping && !e.uses(Use.CTX) ? Itr.get(c) : this;
+        return Itr.get(c);
       case SUM:
-        return c == 0 && !e.uses(Use.CTX) ? expr.length == 2 ? expr[1] :
-          Itr.get(0) : this;
+        return c == 0 ? expr.length == 2 ? expr[1] : Itr.get(0) : this;
       default:
         return this;
     }
