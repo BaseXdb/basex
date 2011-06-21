@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
@@ -214,7 +213,7 @@ public final class PkgValidator {
         // Installed package is a different one, not just a different version
         // of the current one
         final byte[] pkgDir = context.repo.pkgDict().get(nextPkg);
-        final File pkgDesc = new File(new File(context.prop.get(Prop.REPOPATH),
+        final File pkgDesc = new File(new File(context.repo.path,
             string(pkgDir)), DESCRIPTOR);
         final IOFile io = new IOFile(pkgDesc);
         final Package pkg = new PkgParser(context, input).parse(io);

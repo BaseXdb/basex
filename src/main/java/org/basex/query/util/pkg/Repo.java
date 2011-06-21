@@ -32,6 +32,8 @@ public final class Repo {
   private final Context context;
   /** Initialization flag (the repository can only be initialized once). */
   private boolean init;
+  /** Repo path. */
+  public String path;
 
   /**
    * Constructor.
@@ -69,7 +71,8 @@ public final class Repo {
     init = true;
 
     if(repo != null) context.prop.set(Prop.REPOPATH, repo);
-    final File repoDir = new File(context.prop.get(Prop.REPOPATH));
+    if(repo != null) path = repo;
+    final File repoDir = new File(path);
     final File[] dirs = repoDir.listFiles();
     if(dirs == null) return;
     for(final File dir : dirs) if(dir.isDirectory()) readPkg(dir);

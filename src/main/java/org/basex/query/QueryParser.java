@@ -13,7 +13,6 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.basex.core.Prop;
 import org.basex.core.cmd.Set;
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
@@ -723,13 +722,13 @@ public class QueryParser extends InputParser {
     final byte[] pkgDir = ctx.context.repo.pkgDict().get(pkgName);
     if(pkgDir == null) error(NECPKGNOTINST);
     // Parse package descriptor
-    final File pkgDesc = new File(new File(ctx.context.prop.get(Prop.REPOPATH),
+    final File pkgDesc = new File(new File(ctx.context.repo.path,
         string(pkgDir)), PkgText.DESCRIPTOR);
     if(!pkgDesc.exists()) Util.errln(PkgText.NOTEXP, string(pkgName));
     final Package pkg = new PkgParser(ctx.context, input()).parse(new IOFile(
         pkgDesc));
     // Check if package contains a jar descriptor
-    final File jarDesc = new File(new File(ctx.context.prop.get(Prop.REPOPATH),
+    final File jarDesc = new File(new File(ctx.context.repo.path,
         string(pkgDir)), PkgText.JARDESC);
     // Add jars to classpath
     if(jarDesc.exists()) loadJars(jarDesc, pkgDir, pkg.abbrev);
@@ -750,7 +749,7 @@ public class QueryParser extends InputParser {
     }
     for(final Component comp : pkg.comps) {
       final byte[] path = token(new File(new File(new File(
-          ctx.context.prop.get(Prop.REPOPATH), string(pkgDir)),
+          ctx.context.repo.path, string(pkgDir)),
           string(pkg.abbrev)), string(comp.file)).toString());
       module(path, Uri.uri(comp.uri));
     }
@@ -775,7 +774,7 @@ public class QueryParser extends InputParser {
     for(final byte[] jar : desc.jars) {
       // Assumes that jar is in the directory containing the xquery modules
       final String path = new File(new File(new File(
-          ctx.context.prop.get(Prop.REPOPATH), string(pkgDir)),
+          ctx.context.repo.path, string(pkgDir)),
           string(modDir)), string(jar)).toString();
       try {
         urls[i++] = new URL(PkgText.JARPREF + path + "!/");
