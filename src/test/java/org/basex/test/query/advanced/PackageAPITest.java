@@ -85,7 +85,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /** Test for already installed package. */
   @Test
   public void alreadyInstalled() {
-    error(desc("http://www.pkg1.com", "pkg1", "12.0", ""), Err.PKGINSTALLED,
+    error(desc("http://www.pkg1.com", "pkg1", "12.0", ""), Err.PKGINST,
         "Installed package not detected.");
   }
 
@@ -98,7 +98,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc("http://www.pkg5.com", "pkg5", "12.0",
             "<dependency package='http://www.pkg4.com'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+        Err.NECPKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -110,7 +110,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc("http://www.pkg5.com", "pkg5", "12.0",
             "<dependency package='http://www.pkg1.com' versions='1.0 7.0'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+        Err.NECPKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -122,7 +122,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc("http://www.pkg5.com", "pkg5", "12.0",
             "<dependency package='http://www.pkg1.com' versions='12.7'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+        Err.NECPKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -134,7 +134,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc("http://www.pkg5.com", "pkg5", "12.0",
             "<dependency package='http://www.pkg1.com' versions='12.7'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+        Err.NECPKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -146,7 +146,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     error(
         desc("http://www.pkg5.com", "pkg5", "12.0",
             "<dependency package='http://www.pkg1.com' semver-max='11'/>"),
-        Err.PKGNOTINSTALLED, "Missing dependency not detected.");
+        Err.NECPKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -157,7 +157,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void notInstalledMinMax() {
     error(desc("http://www.pkg5.com", "pkg5", "12.0",
         "<dependency package='http://www.pkg1.com' semver-min='5.7' "
-            + "semver-max='11'/>"), Err.PKGNOTINSTALLED,
+            + "semver-max='11'/>"), Err.NECPKGNOTINST,
         "Missing dependency not detected.");
   }
 
@@ -171,6 +171,17 @@ public final class PackageAPITest extends AdvancedQueryTest {
         desc("http://www.pkg5.com", "pkg5", "12.0",
         "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"),
         Err.MODISTALLED, "Already installed component not detected.");
+  }
+
+  /**
+   * Tests package with dependency on an older version of BaseX.
+   */
+  @Test
+  public void notSupported() {
+    error(desc("http://www.pkg5.com", "pkg5", "12.0",
+        "<dependency processor='basex' "
+            + "semver='5.0'/>"), Err.PKGNOTSUPP,
+        "Unsupported package not detected.");
   }
 
   /**
@@ -283,6 +294,44 @@ public final class PackageAPITest extends AdvancedQueryTest {
   }
 
   /**
+   * Tests installing of a package containing a jar file.
+   * @throws BaseXException database exception
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testInstallJar() throws BaseXException, QueryException {
+    // Install package
+    new RepoInstall(REPO + "testJar.xar", null).execute(ctx);
+    // Ensure package was properly installed
+    final File pkgDir = new File(REPO + "testJar");
+    assertTrue(pkgDir.exists());
+    assertTrue(pkgDir.isDirectory());
+    final File pkgDesc = new File(REPO + "testJar/expath-pkg.xml");
+    assertTrue(pkgDesc.exists());
+    final File jarDesc = new File(REPO + "testJar/basex.xml");
+    assertTrue(jarDesc.exists());
+    final File modDir = new File(REPO + "testJar/jar");
+    assertTrue(modDir.exists());
+    assertTrue(modDir.isDirectory());
+    final File jar = new File(REPO + "testJar/jar/test.jar");
+    assertTrue(jar.exists());
+    final File wrapper = new File(REPO + "testJar/jar/wrapper.xq");
+    assertTrue(wrapper.exists());
+    // Use package
+    final QueryProcessor qp1 = new QueryProcessor(
+        "import module namespace j='jar';\nj:print('test')", ctx);
+    assertEquals(qp1.execute().toString(), "test");
+    qp1.execute();
+    // Delete package
+    wrapper.delete();
+    jar.delete();
+    modDir.delete();
+    jarDesc.delete();
+    pkgDesc.delete();
+    pkgDir.delete();
+  }
+
+  /**
    * Tests usage of installed packages.
    * @throws QueryException query exception
    */
@@ -307,6 +356,13 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   @Test
   public void testDelete() throws BaseXException {
+    // Try to delete a package which is not installed
+    try {
+      new RepoManager(ctx).delete("xyz", null);
+      fail("Not installed package not detected.");
+    } catch(QueryException ex) {
+      check(ex, Err.PKGNOTINST);
+    }
     // Install a package without dependencies (pkg3)
     new RepoInstall(REPO + "pkg3.xar", null).execute(ctx);
     // Check if pkg3 is registered in the repo
