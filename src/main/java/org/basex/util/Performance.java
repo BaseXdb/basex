@@ -93,7 +93,7 @@ public final class Performance {
     if(size > 1L << 30 + off) return (size + (1L << 29) >> 30) + " GB";
     if(size > 1L << 20 + off) return (size + (1L << 19) >> 20) + " MB";
     if(size > 1L << 10 + off) return (size + (1L <<  9) >> 10) + " KB";
-    return size + (det ? " Bytes" : " B");
+    return size + (det ? " Byte"  + (size == 1 ? "" : "s") : " B");
   }
 
   /**

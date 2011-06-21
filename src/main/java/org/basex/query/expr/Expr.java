@@ -161,7 +161,7 @@ public abstract class Expr extends ExprInfo {
    * <ul>
    * <li> {@link GFLWOR#comp} to rewrite where clauses as predicates and
    *  remove statically bound or unused clauses</li>
-   * <li> {@link GFLWOR#compForLet} to relocate static LET clauses.</li>
+   * <li> {@link GFLWOR#compHoist} to hoist independent variables</li>
    * </ul>
    * @param v variable to be checked
    * @return number of occurrences

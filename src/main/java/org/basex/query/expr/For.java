@@ -57,14 +57,16 @@ public final class For extends ForLet {
     expr = checkUp(expr, ctx).comp(ctx);
     type = expr.type();
     size = expr.size();
-    var.size = 1;
-    var.ret = ctx.grouping ? SeqType.get(type.type, SeqType.Occ.ZM) :
-      type.type.seq();
+    if(ctx.grouping) {
+      var.ret = SeqType.get(type.type, SeqType.Occ.ZM);
+    } else {
+      var.size = Math.min(1, size);
+      var.ret = type.type.seq();
+    }
 
     ctx.vars.add(var);
     if(pos   != null) ctx.vars.add(pos);
     if(score != null) ctx.vars.add(score);
-
     return this;
   }
 
