@@ -481,6 +481,8 @@ public interface QueryTokens {
   byte[] SENTURI = token(Text.URL + "/sent");
   /** Higher-order URI. */
   byte[] HOFURI = token(Text.URL + "/hof");
+  /** Package URI. */
+  byte[] PACKURI = token(Text.URL + "/pkg");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");

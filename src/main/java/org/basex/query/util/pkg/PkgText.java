@@ -11,6 +11,10 @@ import static org.basex.util.Token.*;
 public interface PkgText {
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg.xml";
+  /**Jar descriptor. */
+  String JARDESC = "basex.xml";
+  /** Jar path prefix. */
+  String JARPREF = "jar:file:";
 
   /** <package/> root element. */
   /** Element package. */
@@ -60,6 +64,12 @@ public interface PkgText {
   /** Attribute file. */
   byte[] FILE = token("file");
 
+  /** Jar descriptor children. */
+  /** <jar/> element. */
+  byte[] JAR = token("jar");
+  /** <class/> element. */
+  byte[] CLASS = token("class");
+
   /** Not expected initialization error. */
   String NOTEXP = "Missing package descriptor for package '%'";
   /** Attribute missing. */
@@ -69,7 +79,11 @@ public interface PkgText {
   /** Invalid element. */
   String WHICHELEM = "Invalid element %";
   /** Secondary package missing. */
-  String MISSSECOND = "Name of secondary package missing";
+  String MISSSECOND = "Dependency not completely specified.";
   /** Component missing. */
   String MISSCOMP = "Component '%' not specified";
+  /** No jars registered. */
+  String NOJARS = "No jars specified";
+  /** No public classes registered. */
+  String NOCLASS = "No public classes specified";
 }

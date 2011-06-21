@@ -6,7 +6,10 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.core.Command;
+import org.basex.core.CommandBuilder;
 import org.basex.core.User;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdRepo;
 import org.basex.query.util.pkg.Package;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
@@ -45,4 +48,8 @@ public class RepoList extends Command {
     return true;
   }
 
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.REPO + " " + CmdRepo.LIST).args();
+  }
 }

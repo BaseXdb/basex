@@ -14,7 +14,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
@@ -80,26 +79,28 @@ public final class RepoManager {
    */
   public void delete(final String pkg, final InputInfo ii)
       throws QueryException {
+    boolean found = false;
     for(final byte[] nextPkg : ctx.repo.pkgDict()) {
       if(nextPkg != null) {
         final byte[] dir = ctx.repo.pkgDict().get(nextPkg);
         if(eq(Package.getName(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
           // A package can be deleted either by its name or by its directory
           // name
+          found = true;
+          // Check if package to be deleted participates in a dependency
           final byte[] primPkg = getPrimary(nextPkg, ii);
           if(primPkg == null) {
             // Clean package repository
-            final File f = new File(ctx.prop.get(Prop.REPOPATH), string(dir));
+            final File f = new File(ctx.repo.path, string(dir));
             final File desc = new File(f, DESCRIPTOR);
             ctx.repo.remove(new PkgParser(ctx, ii).parse(new IOFile(desc)));
             // Package does not participate in a dependency => delete it
             deleteFromDisc(f, ii);
-          } else {
-            PKGDEP.thrw(ii, string(primPkg), pkg);
-          }
+          } else PKGDEP.thrw(ii, string(primPkg), pkg);
         }
       }
     }
+    if(!found) PKGNOTINST.thrw(ii, pkg);
   }
 
   /**
@@ -149,7 +150,7 @@ public final class RepoManager {
    * @return repository path
    */
   private File repoPath() {
-    return new File(ctx.prop.get(Prop.REPOPATH));
+    return new File(ctx.repo.path);
   }
 
   /**
@@ -186,7 +187,7 @@ public final class RepoManager {
     for(final byte[] nextPkg : ctx.repo.pkgDict()) {
       if(nextPkg != null && !eq(nextPkg, pkgName)) {
         // Check only packages different from the current one
-        final File desc = new File(new File(ctx.prop.get(Prop.REPOPATH),
+        final File desc = new File(new File(ctx.repo.path,
             string(ctx.repo.pkgDict().get(nextPkg))), DESCRIPTOR);
         final Package pkg = new PkgParser(ctx, ii).parse(new IOFile(desc));
         for(final Dependency dep : pkg.dep)
