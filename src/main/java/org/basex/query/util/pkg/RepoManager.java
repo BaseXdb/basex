@@ -50,8 +50,8 @@ public final class RepoManager {
   public void install(final String path, final InputInfo ii)
       throws QueryException {
 
-    // Check repository
-    createRepo();
+    // Check repository if not done yet
+    new File(ctx.repo.path).mkdirs();
     // Check package existence
     final File pkgFile = new File(path);
     if(!pkgFile.exists()) PKGNOTEXIST.thrw(ii, path);
@@ -95,7 +95,7 @@ public final class RepoManager {
             final File desc = new File(f, DESCRIPTOR);
             ctx.repo.remove(new PkgParser(ctx, ii).parse(new IOFile(desc)));
             // Package does not participate in a dependency => delete it
-            deleteFromDisc(f, ii);
+            if(!new IOFile(f).delete()) CANNOTDELPKG.thrw(ii);
           } else PKGDEP.thrw(ii, string(primPkg), pkg);
         }
       }
@@ -104,19 +104,13 @@ public final class RepoManager {
   }
 
   /**
-   * Checks if repository already exists and if not creates it.
-   */
-  private void createRepo() {
-    repoPath().mkdirs();
-  }
-
-  /**
    * Unzips a package in the package repository.
    * @param xar package archive
    * @throws IOException I/O exception
    */
   private void unzip(final ZipFile xar) throws IOException {
-    final File dir = new File(repoPath(), extractPkgName(xar.getName()));
+    final File repo = new File(ctx.repo.path);
+    final File dir = new File(repo, extractPkgName(xar.getName()));
     dir.mkdir();
 
     final Enumeration<? extends ZipEntry> en = xar.entries();
@@ -143,14 +137,6 @@ public final class RepoManager {
         }
       }
     }
-  }
-
-  /**
-   * Returns the path to the repository.
-   * @return repository path
-   */
-  private File repoPath() {
-    return new File(ctx.repo.path);
   }
 
   /**
@@ -197,19 +183,4 @@ public final class RepoManager {
     }
     return null;
   }
-
-  /**
-   * Deletes a package recursively.
-   * @param dir package directory
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private void deleteFromDisc(final File dir, final InputInfo ii)
-      throws QueryException {
-    final File[] files = dir.listFiles();
-    if(files != null) for(final File f : files) deleteFromDisc(f, ii);
-    if(!dir.delete()) CANNOTDELPKG.thrw(ii);
-  }
-
-
 }
