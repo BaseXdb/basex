@@ -1,23 +1,64 @@
 package org.basex.test.server;
 
+import static org.basex.util.Token.*;
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+
+import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.core.Command;
+import org.basex.core.Commands.CmdIndex;
+import org.basex.core.Commands.CmdSet;
+import org.basex.core.Context;
 import org.basex.core.Text;
-import org.basex.core.cmd.*;
-import org.basex.core.Commands.*;
+import org.basex.core.cmd.Add;
+import org.basex.core.cmd.AlterDB;
+import org.basex.core.cmd.AlterUser;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateBackup;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.CreateIndex;
+import org.basex.core.cmd.CreateUser;
+import org.basex.core.cmd.Cs;
+import org.basex.core.cmd.Delete;
+import org.basex.core.cmd.DropBackup;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.DropIndex;
+import org.basex.core.cmd.DropUser;
+import org.basex.core.cmd.Export;
+import org.basex.core.cmd.Find;
+import org.basex.core.cmd.Get;
+import org.basex.core.cmd.Grant;
+import org.basex.core.cmd.Help;
+import org.basex.core.cmd.Info;
+import org.basex.core.cmd.InfoDB;
+import org.basex.core.cmd.InfoIndex;
+import org.basex.core.cmd.InfoStorage;
+import org.basex.core.cmd.Kill;
+import org.basex.core.cmd.List;
+import org.basex.core.cmd.ListDB;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Optimize;
+import org.basex.core.cmd.OptimizeAll;
+import org.basex.core.cmd.Password;
+import org.basex.core.cmd.Rename;
+import org.basex.core.cmd.Replace;
+import org.basex.core.cmd.Restore;
+import org.basex.core.cmd.Run;
+import org.basex.core.cmd.Set;
+import org.basex.core.cmd.ShowUsers;
+import org.basex.core.cmd.XQuery;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
+import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Session;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.basex.util.Token.*;
 
 /**
  * This class tests the database commands.
@@ -53,17 +94,18 @@ public class CmdTest {
     CONTEXT.close();
   }
 
-  /**
-   * Creates the database.
-   * @throws BaseXException database exception
-   */
-  @Before
-  public final void before() throws BaseXException {
-    session.execute(new DropDB(NAME));
-    session.execute(new DropDB(NAME2));
-    session.execute(new DropUser(NAME));
-    session.execute(new DropUser(NAME2));
-  }
+//  /**
+// [MS] [CG] please see if this was needed.
+//   * Creates the database.
+//   * @throws BaseXException database exception
+//   */
+//  @Before
+//  public final void before() throws BaseXException {
+//    session.execute(new DropDB(NAME));
+//    session.execute(new DropDB(NAME2));
+//    session.execute(new DropUser(NAME));
+//    session.execute(new DropUser(NAME2));
+//  }
 
   /**
    * Creates the database.
@@ -71,7 +113,10 @@ public class CmdTest {
    */
   @After
   public final void after() throws BaseXException {
-    before();
+    session.execute(new DropDB(NAME));
+    session.execute(new DropDB(NAME2));
+    session.execute(new DropUser(NAME));
+    session.execute(new DropUser(NAME2));
   }
 
   /** Command test. */
@@ -115,21 +160,29 @@ public class CmdTest {
     ok(new Close());
   }
 
-  /** Command test. */
+  /** Create Backup Test.
+   * Using glob Syntax. */
   @Test
   public final void createBackup() {
     no(new CreateBackup(NAME));
     ok(new CreateDB(NAME));
     ok(new CreateDB(NAME2));
     ok(new CreateBackup(NAME));
+    ok(new Restore(NAME));
     ok(new Close());
     ok(new Restore(NAME));
     ok(new CreateBackup(NAME));
+    ok(new Restore(NAME));
     ok(new DropBackup(NAME));
     ok(new CreateBackup(NAME + "*"));
     ok(new Restore(NAME2));
     ok(new DropBackup(NAME + "*"));
     no(new Restore(":"));
+    ok(new CreateBackup(NAME + "?," + NAME));
+    ok(new DropBackup(NAME2));
+    ok(new Restore(NAME));
+    no(new Restore(NAME + "?"));
+    ok(new DropBackup(NAME));
   }
 
   /** Command test. */
@@ -144,6 +197,7 @@ public class CmdTest {
     no(new CreateDB(""));
     no(new CreateDB(" "));
     no(new CreateDB(":"));
+    no(new CreateDB("*?"));
     no(new CreateDB("/"));
   }
 
@@ -208,6 +262,11 @@ public class CmdTest {
     no(new Open(NAME2));
     no(new DropDB(":"));
     no(new DropDB(""));
+
+    ok(new CreateDB(NAME));
+    ok(new CreateDB(NAME2));
+    ok(new DropDB(NAME + "," + NAME2));
+    no(new DropDB(NAME + ", " + ":"));
   }
 
   /** Command test. */
@@ -225,9 +284,14 @@ public class CmdTest {
     ok(new CreateUser(NAME, "test"));
     ok(new CreateUser(NAME2, "test"));
     ok(new DropUser(NAME));
-    ok(new DropUser(NAME + "*"));
+    ok(new DropUser(NAME2, "*"));
+    ok(new DropUser(NAME2));
     no(new DropUser(""));
     no(new DropUser(NAME2, ":"));
+
+    ok(new CreateUser(NAME, "test"));
+    ok(new CreateUser(NAME2, "test"));
+    ok(new DropUser(NAME + "," + NAME2));
   }
 
   /** Command test. */
@@ -260,10 +324,14 @@ public class CmdTest {
   @Test
   public final void grant() {
     ok(new CreateUser(NAME2, "test"));
+    ok(new CreateUser(NAME, "test"));
     no(new Grant("something", NAME2));
-    ok(new Grant("none", NAME2));
+    ok(new Grant("none", NAME + "*", "*"));
     no(new Grant("all", NAME2));
-    ok(new DropUser(NAME2));
+    no(new Grant("all", ":*?", ":*:"));
+    ok(new DropUser(NAME + "," + NAME2));
+    no(new Grant("all", NAME));
+    no(new Grant("all", NAME + "*", ":"));
   }
 
   /** Command test. */
@@ -306,11 +374,22 @@ public class CmdTest {
     ok(new InfoStorage("// li", null));
   }
 
-  /** Command test. */
+  /** Kill test.
+   * @throws IOException on Server error.*/
   @Test
-  public final void kill() {
+  public final void kill() throws IOException {
     no(new Kill("admin"));
-    no(new Kill("hans"));
+    no(new Kill("admin2"));
+    no(new Kill("ha*"));
+    ok(new CreateUser(NAME2, "test"));
+    BaseXServer bxs = new BaseXServer();
+    ClientSession cs = new ClientSession(CONTEXT, NAME2, "test");
+    ok(new Kill(NAME2));
+    no(new Kill(NAME2 + "?"));
+    ok(new Kill(NAME + "?"));
+    cs.close();
+    bxs.quit(false);
+    ok(new DropUser(NAME2));
   }
 
   /** Command test. */

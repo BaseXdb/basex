@@ -8,6 +8,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdSet;
+import org.basex.core.cmd.Add;
 import org.basex.core.cmd.AlterUser;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -19,6 +20,7 @@ import org.basex.core.cmd.DropUser;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Export;
 import org.basex.core.cmd.Find;
+import org.basex.core.cmd.Get;
 import org.basex.core.cmd.Grant;
 import org.basex.core.cmd.Help;
 import org.basex.core.cmd.InfoDB;
@@ -30,6 +32,11 @@ import org.basex.core.cmd.ListDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.Password;
+import org.basex.core.cmd.Rename;
+import org.basex.core.cmd.Replace;
+import org.basex.core.cmd.RepoDelete;
+import org.basex.core.cmd.RepoInstall;
+import org.basex.core.cmd.RepoList;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
@@ -49,6 +56,11 @@ import org.junit.Test;
 public final class PermissionTest {
   /** Name of test database and user. */
   static final String NAME = Util.name(PermissionTest.class);
+  /** Name of the database to be renamed. */
+  private static final String RENAMED = Util.name(PermissionTest.class) + "r";
+  /** Test repository. **/
+  protected static final String REPO = "etc/test/repo/";
+
   /** Server reference. */
   static BaseXServer server;
   /** Socket reference. */
@@ -66,7 +78,10 @@ public final class PermissionTest {
       if(server.context.users.get(NAME) != null) {
         ok(new DropUser(NAME), adminSession);
       }
+
       ok(new CreateUser(NAME, NAME), adminSession);
+      ok(new CreateDB(RENAMED), adminSession);
+      server.context.repo.init(REPO);
       testSession = new ClientSession(server.context, NAME, NAME);
     } catch(final Exception ex) {
       fail(ex.toString());
@@ -89,6 +104,14 @@ public final class PermissionTest {
     no(new InfoDB(), testSession);
     no(new InfoIndex(), testSession);
     no(new InfoStorage(), testSession);
+    no(new Get("DBPATH"), testSession);
+    no(new Set("DBPATH", "forbidden"), testSession);
+
+    // Repo Stuff
+    no(new RepoInstall(REPO, null), testSession);
+    no(new RepoDelete(REPO, null), testSession);
+    no(new RepoList(), testSession);
+
     // XQuery read
     no(new XQuery("//xml"), testSession);
     no(new Find(NAME), testSession);
@@ -97,6 +120,7 @@ public final class PermissionTest {
     no(new XQuery("for $item in doc('" + NAME + "')//xml return rename" +
       " node $item as 'null'"), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
+    no(new Rename(RENAMED, RENAMED + "2"), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -118,14 +142,24 @@ public final class PermissionTest {
     ok(new ListDB(NAME), testSession);
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
+    ok(new Get("DBPATH"), testSession);
+    no(new Set("DBPATH", "forbidden"), testSession);
     // XQuery read
     ok(new XQuery("//xml"), testSession);
     ok(new Find(NAME), testSession);
+
+    // Repo Stuff
+    no(new RepoInstall(REPO, null), testSession);
+    no(new RepoDelete(REPO, null), testSession);
+    no(new RepoList(), testSession);
+
     // XQuery update
     no(new XQuery("for $item in doc('" + NAME + "')//xml return rename" +
       " node $item as 'null'"), testSession);
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
+    no(new Replace(RENAMED, "<xml />"), testSession);
+    no(new Rename(RENAMED, RENAMED + "2"), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -143,6 +177,20 @@ public final class PermissionTest {
   @Test
   public void writePermsNeeded() {
     ok(new Grant("write", NAME), adminSession);
+    ok(new Rename(RENAMED, RENAMED + "2"), testSession);
+    ok(new Rename(RENAMED + "2", RENAMED), testSession);
+
+    // Replace Test
+    ok(new Close(), testSession);
+    ok(new Open(RENAMED), testSession);
+    ok(new Add("<xml>1</xml>", NAME + ".xml"), testSession);
+    ok(new Optimize(), testSession);
+    ok(new Replace(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
+
+    // Repo Stuff
+    no(new RepoInstall(REPO, null), testSession);
+    no(new RepoDelete(REPO, null), testSession);
+    no(new RepoList(), testSession);
 
     // XQuery Update
     ok(new Set(CmdSet.QUERYINFO, false), testSession);
@@ -179,6 +227,12 @@ public final class PermissionTest {
       ok(new CreateIndex(cmd), testSession);
     }
     ok(new DropDB(NAME), testSession);
+
+    // Repo Stuff
+    no(new RepoInstall(REPO, null), testSession);
+    no(new RepoDelete(REPO, null), testSession);
+    no(new RepoList(), testSession);
+
     no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
     no(new Export("."), testSession);
@@ -206,6 +260,11 @@ public final class PermissionTest {
     ok(new Close(), testSession);
     ok(new Close(), adminSession);
     ok(new DropDB(NAME), adminSession);
+    // Repo Stuff
+    ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
+    ok(new RepoList(), testSession);
+    ok(new RepoDelete("pkg3", null), testSession);
+
   }
 
   /** Tests some usability stuff. */
@@ -232,6 +291,7 @@ public final class PermissionTest {
 
   /**
    * Assumes that this command fails.
+   * [MS] does not check whether it fails *really* due to permissions
    * @param cmd command reference
    * @param s session
    */
@@ -247,6 +307,7 @@ public final class PermissionTest {
   @AfterClass
   public static void stop() {
     try {
+      adminSession.execute(new DropDB(RENAMED));
       adminSession.close();
     } catch(final Exception ex) {
       fail(ex.toString());

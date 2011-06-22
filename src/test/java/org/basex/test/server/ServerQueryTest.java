@@ -100,14 +100,11 @@ public final class ServerQueryTest {
       cs.execute("xquery " + WRAPPER + "1").replaceAll("\\r", ""));
   }
 
-  /** Runs an erroneous query command. */
-  @Test
-  public void commandError() {
-    try {
+  /** Runs an erroneous query command.
+   * @throws BaseXException expected exception */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public void commandError() throws BaseXException {
       cs.execute("xquery (");
-      fail("Error expected.");
-    } catch(final BaseXException ex) {
-    }
   }
 
   /** Runs a query and retrieves the result as string.
@@ -236,13 +233,12 @@ public final class ServerQueryTest {
     cq.close();
   }
 
-  /** Runs a query with an external variable declaration. */
-  @Test
-  public void queryBind2() {
-    try {
-      cs.query("declare variable $a external; $a").next();
-      fail("Error expected.");
-    } catch(final BaseXException ex) { }
+  /** Runs a query with an external variable declaration.
+   * @throws BaseXException exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public void queryBind2() throws BaseXException {
+    cs.query("declare variable $a external; $a").next();
   }
 
   /** Runs a query with an external variable declaration.
@@ -285,20 +281,17 @@ public final class ServerQueryTest {
     final ClientQuery cq = cs.query("1 to 2");
     cq.execute();
     final String info = cq.info();
-    if(!info.contains(QUERYTOTAL)) {
-      fail("'Total Time' not contained in '" + info + "'.");
-    }
+    assertTrue("Total Time not contained in '" + info + "'.",
+        info.contains(QUERYTOTAL));
     cq.close();
   }
 
-  /** Runs an erroneous query. */
-  @Test
-  public void queryError() {
-    try {
+  /** Runs an erroneous query.
+   * @throws BaseXException expected exception*/
+  @Test(expected = org.basex.core.BaseXException.class)
+  public void queryError() throws BaseXException {
       final ClientQuery cq = cs.query("(");
       cq.next();
-      fail("Error expected.");
-    } catch(final BaseXException ex) { }
   }
 
   /** Runs an erroneous query. */
@@ -311,16 +304,15 @@ public final class ServerQueryTest {
     }
   }
 
-  /** Runs an erroneous query. */
-  @Test
-  public void queryError3() {
-    try {
+  /** Runs an erroneous query.
+   * @throws BaseXException expected exception*/
+  @Test(expected = org.basex.core.BaseXException.class)
+
+  public void queryError3() throws BaseXException {
       final ClientQuery cq = cs.query("(1,'a')[. eq 1]");
       cq.init();
       assertEquals("1", cq.next());
       cq.next();
-      fail("Error expected.");
-    } catch(final BaseXException ex) { }
   }
 
   /** Runs two queries in parallel.
