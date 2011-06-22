@@ -19,7 +19,6 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.Restore;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
@@ -158,9 +157,7 @@ public final class DialogOpen extends Dialog {
     } else if(cmp == copy) {
       final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
       if(!dc.ok() || dc.input().equals(db)) return;
-      setCursor(GUIConstants.CURSORWAIT);
       DialogProgress.execute(this, "", new Copy(db, dc.input()));
-      setCursor(GUIConstants.CURSORARROW);
       refresh = true;
     } else if(cmp == drop) {
       if(db.isEmpty() || !Dialog.confirm(gui, Util.info(DROPCONF, db))) return;
@@ -177,13 +174,9 @@ public final class DialogOpen extends Dialog {
       }
       action(null);
     } else if(cmp == backup) {
-      setCursor(GUIConstants.CURSORWAIT);
       DialogProgress.execute(this, "", new CreateBackup(db));
-      setCursor(GUIConstants.CURSORARROW);
     } else if(cmp == restore) {
-      setCursor(GUIConstants.CURSORWAIT);
       DialogProgress.execute(this, "", new Restore(db));
-      setCursor(GUIConstants.CURSORARROW);
     } else {
       // update components
       ok = ctx.prop.dbexists(db);

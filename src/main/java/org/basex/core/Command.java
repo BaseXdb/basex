@@ -130,14 +130,6 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Checks if the command needs to reopen a database.
-   * @return string of db or null
-   */
-  public String reOpen() {
-    return null;
-  }
-
-  /**
    * Returns true if this class returns a progress value.
    * Used by the progress bar in the visualization.
    * @return result of check

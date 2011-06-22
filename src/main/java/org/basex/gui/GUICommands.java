@@ -72,9 +72,9 @@ public enum GUICommands implements GUICommand {
       final String in = gui.gprop.get(GUIProp.CREATEPATH);
       final String db = gui.gprop.get(GUIProp.CREATENAME);
       if(in.isEmpty()) {
-        DialogProgress.execute(gui, PROGCREATE, new CreateDB(db));
+        DialogProgress.execute(dialog, PROGCREATE, new CreateDB(db));
       } else {
-        DialogProgress.execute(gui, PROGCREATE, new CreateDB(db, in));
+        DialogProgress.execute(dialog, PROGCREATE, new CreateDB(db, in));
       }
     }
   },
@@ -107,7 +107,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final DialogAdd dialog = new DialogAdd(gui);
-      if(dialog.ok()) DialogProgress.execute(gui, "", dialog.cmd());
+      if(dialog.ok()) DialogProgress.execute(dialog, "", dialog.cmd());
     }
   },
 
@@ -116,7 +116,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final DialogInput d = new DialogInput("", DROPTITLE, gui, 0);
-      if(d.ok()) DialogProgress.execute(gui, "", new Delete(d.input()));
+      if(d.ok()) DialogProgress.execute(d, "", new Delete(d.input()));
     }
   },
 
@@ -173,7 +173,7 @@ public enum GUICommands implements GUICommand {
           d.meta.textindex = ind[0];
           d.meta.attrindex = ind[1];
           d.meta.ftindex   = ind[2];
-          DialogProgress.execute(gui, INFOOPT, new Optimize());
+          DialogProgress.execute(info, INFOOPT, new Optimize());
         } else {
           Command[] cmd = {};
           if(ind[0] != d.meta.pathindex)
@@ -185,7 +185,7 @@ public enum GUICommands implements GUICommand {
           if(ind[3] != d.meta.ftindex)
             cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
 
-          DialogProgress.execute(gui, PROGINDEX, cmd);
+          DialogProgress.execute(info, PROGINDEX, cmd);
         }
       }
     }

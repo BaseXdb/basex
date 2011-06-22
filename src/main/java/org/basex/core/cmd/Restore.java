@@ -143,11 +143,6 @@ public final class Restore extends Command {
   }
 
   @Override
-  public String reOpen() {
-    return args[0];
-  }
-
-  @Override
   public boolean supportsProg() {
     return true;
   }

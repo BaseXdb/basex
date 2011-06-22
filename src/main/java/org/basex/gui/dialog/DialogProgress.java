@@ -5,12 +5,13 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
 import org.basex.core.Command;
 import org.basex.core.cmd.Close;
-import org.basex.core.cmd.Open;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
@@ -110,46 +111,48 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
   /**
    * Runs the specified commands, decorated by a progress dialog.
-   * @param gui reference to the main window
+   * @param d reference to the dialog window
    * @param t dialog title
    * @param cmds commands to be run
    */
-  public static void execute(final GUI gui, final String t,
+  public static void execute(final Dialog d, final String t,
       final Command... cmds) {
 
     // start database creation thread
     new Thread() {
       @Override
       public void run() {
-        exec(gui, t, cmds);
+        exec(d, t, cmds);
       }
     }.start();
   }
 
   /**
    * Runs the specified commands, decorated by a progress dialog.
-   * @param gui reference to the main window
+   * @param d reference to the dialog window
    * @param t dialog title
    * @param cmds commands to be run
    */
-  static void exec(final GUI gui, final String t, final Command... cmds) {
-    String open = "";
-    if(gui.context.data != null) open = gui.context.data.meta.name;
+  static void exec(final Dialog d, final String t, final Command... cmds) {
+    GUI gui = d.gui;
+    gui.setCursor(GUIConstants.CURSORWAIT);
+    d.setCursor(GUIConstants.CURSORWAIT);
     for(final Command cmd : cmds) {
       if(cmd.newData()) {
         new Close().run(gui.context);
         gui.notify.init();
       }
-
       // execute command
       final Performance perf = new Performance();
       final DialogProgress wait = new DialogProgress(gui, t, cmd);
+      gui.setFocusable(false);
+      d.setEnabled(false);
+      //d.setFocusable(false);
       wait.setAlwaysOnTop(true);
       gui.updating = cmd.updating(gui.context);
       final boolean ok = cmd.run(gui.context);
       gui.updating = false;
       final String info = cmd.info();
-      wait.dispose();
 
       final String time = perf.toString();
       gui.info.setInfo(info, cmd, time, ok);
@@ -158,10 +161,13 @@ public final class DialogProgress extends Dialog implements ActionListener {
       if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
 
       // initialize views
-      String db = cmd.reOpen();
-      if(db != null && open.equals(db)) new Open(db).run(gui.context);
       if(cmd.newData()) gui.notify.init();
       else if(cmd.updating(gui.context)) gui.notify.update();
+      wait.dispose();
+      gui.setCursor(GUIConstants.CURSORARROW);
+      d.setCursor(GUIConstants.CURSORARROW);
+      gui.setFocusable(true);
+      d.setEnabled(true);
     }
   }
 
@@ -177,7 +183,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
     new Thread() {
       @Override
       public void run() {
-        exec(d.gui, t, cmd);
+        exec(d, t, cmd);
         d.action(null);
       }
     }.start();
