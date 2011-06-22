@@ -57,6 +57,7 @@ import org.basex.server.Session;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -94,18 +95,20 @@ public class CmdTest {
     CONTEXT.close();
   }
 
-//  /**
-// [MS] [CG] please see if this was needed.
-//   * Creates the database.
-//   * @throws BaseXException database exception
-//   */
-//  @Before
-//  public final void before() throws BaseXException {
-//    session.execute(new DropDB(NAME));
-//    session.execute(new DropDB(NAME2));
-//    session.execute(new DropUser(NAME));
-//    session.execute(new DropUser(NAME2));
-//  }
+  /**
+ [MS] [CG] please see if this is needed.
+ [LK] i'd say it's safer to delete old databases to avoid oddities and
+     simplify test case composition - not that expensive anyway
+   * Creates the database.
+   * @throws BaseXException database exception
+   */
+  @Before
+  public final void before() throws BaseXException {
+    session.execute(new DropDB(NAME));
+    session.execute(new DropDB(NAME2));
+    session.execute(new DropUser(NAME));
+    session.execute(new DropUser(NAME2));
+  }
 
   /**
    * Creates the database.
@@ -113,10 +116,7 @@ public class CmdTest {
    */
   @After
   public final void after() throws BaseXException {
-    session.execute(new DropDB(NAME));
-    session.execute(new DropDB(NAME2));
-    session.execute(new DropUser(NAME));
-    session.execute(new DropUser(NAME2));
+    before();
   }
 
   /** Command test. */
