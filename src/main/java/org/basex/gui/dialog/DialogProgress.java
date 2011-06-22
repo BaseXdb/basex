@@ -133,6 +133,8 @@ public final class DialogProgress extends Dialog implements ActionListener {
    * @param cmds commands to be run
    */
   static void exec(final GUI gui, final String t, final Command... cmds) {
+    String open = "";
+    if(gui.context.data != null) open = gui.context.data.meta.name;
     for(final Command cmd : cmds) {
       if(cmd.newData()) {
         new Close().run(gui.context);
@@ -157,7 +159,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
       // initialize views
       String db = cmd.reOpen();
-      if(db != null) new Open(db).run(gui.context);
+      if(db != null && open.equals(db)) new Open(db).run(gui.context);
       if(cmd.newData()) gui.notify.init();
       else if(cmd.updating(gui.context)) gui.notify.update();
     }
