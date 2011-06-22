@@ -1,10 +1,9 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert into as first primitive.
@@ -13,22 +12,41 @@ import org.basex.util.InputInfo;
  * @author Lukas Kircher
  */
 public final class InsertIntoFirst extends InsertBase {
+
   /**
    * Constructor.
-   * @param ii input info
-   * @param n target node
-   * @param copy copy of nodes to be inserted
+   * @param p pre
+   * @param d data
+   * @param i input info
+   * @param c node copy
    */
-  public InsertIntoFirst(final InputInfo ii, final ANode n,
-      final NodeCache copy) {
-    super(PrimitiveType.INSERTINTOFIRST, ii, n, copy);
+  public InsertIntoFirst(final int p, final Data d, final InputInfo i,
+      final NodeCache c) {
+    super(PrimitiveType.INSERTINTOFIRST, p, d, i, c);
   }
 
   @Override
-  public void apply(final int add) {
-    final DBNode n = (DBNode) node;
-    final int pre = n.pre + add;
-    final Data d = n.data;
-    d.insert(pre + d.attSize(pre, d.kind(pre)), pre, md);
+  public void apply() {
+    super.apply();
+    data.insert(pre + data.attSize(pre, data.kind(pre)), pre, md);
+  }
+
+  @Override
+  public boolean checkTextAdjacency(final int c) {
+    /* Text node adjacency can only occur at the end of the insertion sequence
+     * as this is inserted before all other siblings - no left sibling to merge
+     * with.
+     */
+    if(md.kind(md.meta.size - 1) != Data.TEXT) return false;
+
+    // take pre value shifts into account
+    final int p = pre + c;
+    final int loc = p + data.attSize(p, data.kind(p)) + md.meta.size - 1;
+    return mergeTexts(data, loc , loc + 1);
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + getTargetDBNode() + ", " + insert + "]";
   }
 }

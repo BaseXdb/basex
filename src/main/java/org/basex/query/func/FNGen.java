@@ -163,7 +163,8 @@ public final class FNGen extends FuncCall {
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.valid()) UPFOURI.thrw(input, file);
-    ctx.updates.add(new Put(input, nd, u, ctx), ctx);
+    final DBNode target = ctx.updates.determineDataRef(nd, ctx);
+    ctx.updates.add(new Put(input, target.pre, target.data, u, ctx), ctx);
 
     return null;
   }

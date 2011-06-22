@@ -1,4 +1,4 @@
-package org.basex.query.up;
+package org.basex.query.up.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
@@ -8,6 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.iter.Iter;
@@ -17,7 +18,7 @@ import org.basex.query.up.primitives.InsertAttribute;
 import org.basex.query.up.primitives.InsertBefore;
 import org.basex.query.up.primitives.InsertInto;
 import org.basex.query.up.primitives.InsertIntoFirst;
-import org.basex.query.up.primitives.Primitive;
+import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 
@@ -83,23 +84,27 @@ public final class Insert extends Update {
         UPTRGTYP.thrw(input);
     }
 
-    Primitive up = null;
+    UpdatePrimitive up = null;
+    DBNode dbn;
     // no update primitive is created if node list is empty
     if(aList.size() > 0) {
       final ANode targ = before || after ? par : n;
       if(targ.type != NodeType.ELM)
         (before || after ? UPATTELM : UPATTELM2).thrw(input);
 
-      up = new InsertAttribute(input, targ, checkNS(aList, targ, ctx));
+      dbn = ctx.updates.determineDataRef(targ, ctx);
+      up = new InsertAttribute(dbn.pre, dbn.data, input,
+          checkNS(aList, targ, ctx));
       ctx.updates.add(up, ctx);
     }
 
     // no update primitive is created if node list is empty
     if(cList.size() > 0) {
-      if(before) up = new InsertBefore(input, n, cList);
-      else if(after) up = new InsertAfter(input, n, cList);
-      else if(first) up = new InsertIntoFirst(input, n, cList);
-      else up = new InsertInto(input, n, cList, last);
+      dbn = ctx.updates.determineDataRef(n, ctx);
+      if(before) up = new InsertBefore(dbn.pre, dbn.data, input, cList);
+      else if(after) up = new InsertAfter(dbn.pre, dbn.data, input, cList);
+      else if(first) up = new InsertIntoFirst(dbn.pre, dbn.data, input, cList);
+      else up = new InsertInto(dbn.pre, dbn.data, input, cList, last);
       ctx.updates.add(up, ctx);
     }
     return null;

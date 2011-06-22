@@ -1,8 +1,10 @@
-package org.basex.query.up;
+package org.basex.query.up.expr;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.util.Err.*;
+
 import java.io.IOException;
+
 import org.basex.data.MemData;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -10,12 +12,14 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Let;
+import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ValueIter;
+import org.basex.query.up.ContextModifier;
+import org.basex.query.up.TransformModifier;
 import org.basex.query.util.DataBuilder;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -70,7 +74,7 @@ public final class Transform extends Arr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
-    final Updates pu = new Updates(true);
+    final TransformModifier pu = new TransformModifier();
     for(final Let fo : copies) {
       final Iter ir = ctx.iter(fo.expr);
       final Item i = ir.next();
@@ -86,11 +90,11 @@ public final class Transform extends Arr {
       ctx.copiedNods.add(md);
     }
 
-    final Updates tmp = ctx.updates;
-    ctx.updates = pu;
+    final ContextModifier tmp = ctx.updates.mod;
+    ctx.updates.mod = pu;
     expr[0].value(ctx);
-    ctx.updates.apply(ctx);
-    ctx.updates = tmp;
+    ctx.updates.applyUpdates(ctx);
+    ctx.updates.mod = tmp;
 
     final Value v = ctx.value(expr[1]);
     ctx.vars.reset(s);

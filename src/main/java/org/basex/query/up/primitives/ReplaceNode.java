@@ -4,76 +4,77 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.NodeType;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 
 /**
- * Replace primitive.
+ * Replace node primitive.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public final class ReplaceNode extends NodeCopy {
+
   /**
    * Constructor.
-   * @param ii input info
-   * @param n target node
-   * @param rep replace nodes
+   * @param p pre
+   * @param d data
+   * @param i input info
+   * @param c node copy
    */
-  public ReplaceNode(final InputInfo ii, final ANode n,
-      final NodeCache rep) {
-    super(PrimitiveType.REPLACENODE, ii, n, rep);
+  public ReplaceNode(final int p, final Data d, final InputInfo i,
+      final NodeCache c) {
+    super(PrimitiveType.REPLACENODE, p, d, i, c);
   }
 
   @Override
-  public void apply(final int add) {
-    final DBNode n = (DBNode) node;
-    final Data d = n.data;
-    int pre = n.pre + add;
-    final int kind = d.kind(pre);
-    final int par = d.parent(pre, kind);
+  public void apply() {
+    final int kind = data.kind(pre);
+    final int par = data.parent(pre, kind);
+    shifts = data.size(pre, kind) - md.meta.size;
 
-    if(n.type == NodeType.TXT && md.meta.size == 1 && md.kind(0) == Data.TEXT) {
+    if(kind == Data.TEXT && md.meta.size == 1 && md.kind(0) == Data.TEXT) {
       // overwrite existing text node
-      d.replace(pre, Data.TEXT, md.text(0, true));
+      data.replace(pre, Data.TEXT, md.text(0, true));
     } else {
-      if(d.ns.size() == 0 && md.ns.size() == 0) {
+      if(data.ns.size() == 0 && md.ns.size() == 0) {
         // replaces table nodes directly if no namespaces are specified
-        d.replace(pre, md);
+        data.replace(pre, md);
       } else {
-        d.delete(pre);
-        if(n.type == NodeType.ATT) d.insertAttr(pre, par, md);
-        else d.insert(pre, par, md);
-      }
-
-      // text merging applies for both replace methods
-      // [LK] if necessary, please add an example in XQUPTest to check this code
-      if(!mergeTexts(d, pre - 1, pre)) {
-        pre += md.meta.size;
-        mergeTexts(d, pre - 1, pre);
+        data.delete(pre);
+        if(kind == Data.ATTR) data.insertAttr(pre, par, md);
+        else data.insert(pre, par, md);
       }
     }
-  }
-
-  @Override
-  public void merge(final Primitive p) throws QueryException {
-    UPMULTREPL.thrw(input, node);
   }
 
   @Override
   public void update(final NamePool pool) {
     if(md == null) return;
     add(pool);
-    pool.remove(node);
+    pool.remove(getTargetDBNode());
   }
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + node + ", " + insert + "]";
+    return Util.name(this) + "[" + getTargetDBNode() + ", " + insert + "]";
+  }
+
+  @Override
+  public boolean checkTextAdjacency(final int c) {
+    final int p = pre + c;
+    final int affectedPre = p;
+    boolean merged = mergeTexts(data, affectedPre - 1, affectedPre);
+    merged |= mergeTexts(data, affectedPre + md.meta.size - 1,
+        affectedPre + md.meta.size);
+
+    return merged;
+  }
+
+  @Override
+  public void merge(final UpdatePrimitive p) throws QueryException {
+    UPMULTREPL.thrw(input, getTargetDBNode());
   }
 }
