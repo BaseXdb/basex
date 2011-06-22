@@ -16,7 +16,6 @@ import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.List;
-import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Restore;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
@@ -183,16 +182,8 @@ public final class DialogOpen extends Dialog {
       setCursor(GUIConstants.CURSORARROW);
     } else if(cmp == restore) {
       setCursor(GUIConstants.CURSORWAIT);
-      if(db.equals(opendb)) {
-        new Close().run(gui.context);
-        gui.notify.init();
-      }
       DialogProgress.execute(this, "", new Restore(db));
       setCursor(GUIConstants.CURSORARROW);
-      if(db.equals(opendb)) {
-        new Open(db).run(gui.context);
-        gui.notify.init();
-      }
     } else {
       // update components
       ok = ctx.prop.dbexists(db);

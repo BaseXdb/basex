@@ -9,6 +9,7 @@ import javax.swing.JProgressBar;
 import javax.swing.Timer;
 import org.basex.core.Command;
 import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Open;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -155,6 +156,8 @@ public final class DialogProgress extends Dialog implements ActionListener {
       if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
 
       // initialize views
+      String db = cmd.reOpen();
+      if(db != null) new Open(db).run(gui.context);
       if(cmd.newData()) gui.notify.init();
       else if(cmd.updating(gui.context)) gui.notify.update();
     }
