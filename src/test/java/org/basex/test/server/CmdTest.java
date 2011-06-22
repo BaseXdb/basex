@@ -3,9 +3,6 @@ package org.basex.test.server;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-
-import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Commands.CmdIndex;
@@ -35,7 +32,6 @@ import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.InfoStorage;
-import org.basex.core.cmd.Kill;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.ListDB;
 import org.basex.core.cmd.Open;
@@ -51,7 +47,6 @@ import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
-import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -78,14 +73,29 @@ public class CmdTest {
   /** Test name. */
   private static final String NAME = Util.name(CmdTest.class);
   /** Test name. */
-  private static final String NAME2 = NAME + "2";
+  protected static final String NAME2 = NAME + "2";
   /** Socket reference. */
   static Session session;
 
-  /** Starts the server. */
+  /** Starts the server.
+   * @throws BaseXException database exception
+  */
   @BeforeClass
-  public static void start() {
+  public static void start() throws BaseXException {
     session = new LocalSession(CONTEXT);
+    cleanUp();
+  }
+
+  /**
+   * Deletes the potentially already existing DBs.
+   * DBs & User {@link #NAME} and {@link #NAME2}
+   * @throws BaseXException exception
+   */
+  protected static void cleanUp() throws BaseXException {
+    session.execute(new DropDB(NAME));
+    session.execute(new DropDB(NAME2));
+    session.execute(new DropUser(NAME));
+    session.execute(new DropUser(NAME2));
   }
 
   /** Removes test databases and closes the database context. */
@@ -94,18 +104,6 @@ public class CmdTest {
     CONTEXT.close();
   }
 
-  /**
-   * Deletes the potentially already existing DBs.
-   * DBs & User {@link #NAME} and {@link #NAME2}
-   * @throws BaseXException database exception
-   */
-  @BeforeClass
-  public static final void before() throws BaseXException {
-    session.execute(new DropDB(NAME));
-    session.execute(new DropDB(NAME2));
-    session.execute(new DropUser(NAME));
-    session.execute(new DropUser(NAME2));
-  }
 
   /**
    * Creates the database.
@@ -113,7 +111,7 @@ public class CmdTest {
    */
   @After
   public final void after() throws BaseXException {
-    before();
+    cleanUp();
   }
 
   /** Command test. */
@@ -371,24 +369,6 @@ public class CmdTest {
     ok(new InfoStorage("// li", null));
   }
 
-  /** Kill test.
-   * @throws IOException on Server error.*/
-  @Test
-  public final void kill() throws IOException {
-    no(new Kill("admin"));
-    no(new Kill("admin2"));
-    no(new Kill("ha*"));
-    ok(new CreateUser(NAME2, "test"));
-    BaseXServer bxs = new BaseXServer();
-    ClientSession cs = new ClientSession(CONTEXT, NAME2, "test");
-    ok(new Kill(NAME2));
-    no(new Kill(NAME2 + "?"));
-    ok(new Kill(NAME + "?"));
-    cs.close();
-    bxs.quit(false);
-    ok(new DropUser(NAME2));
-  }
-
   /** Command test. */
   @Test
   public final void list() {
@@ -549,7 +529,7 @@ public class CmdTest {
    * Assumes that this command is successful.
    * @param cmd command reference
    */
-  private void ok(final Command cmd) {
+  protected void ok(final Command cmd) {
     try {
       session.execute(cmd);
     } catch(final BaseXException ex) {
@@ -561,7 +541,7 @@ public class CmdTest {
    * Assumes that this command fails.
    * @param cmd command reference
    */
-  private void no(final Command cmd) {
+  protected void no(final Command cmd) {
     try {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");
