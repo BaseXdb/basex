@@ -1,4 +1,4 @@
-package org.basex.query.up;
+package org.basex.query.up.expr;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
@@ -10,6 +10,7 @@ import org.basex.query.expr.CElem;
 import org.basex.query.expr.CFrag;
 import org.basex.query.expr.CPI;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
@@ -69,7 +70,8 @@ public final class Rename extends Update {
       final byte[] uri = test.uri(rename.pref(), ctx);
       if(uri != null && !eq(rename.uri().atom(), uri)) UPNSCONFL.thrw(input);
     }
-    ctx.updates.add(new RenameNode(input, targ, rename), ctx);
+    final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
+    ctx.updates.add(new RenameNode(dbn.pre, dbn.data, input, rename), ctx);
     return null;
   }
 

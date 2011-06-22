@@ -1,4 +1,4 @@
-package org.basex.query.up;
+package org.basex.query.up.expr;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
