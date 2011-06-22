@@ -105,7 +105,7 @@ public final class PermissionTest {
     no(new InfoIndex(), testSession);
     no(new InfoStorage(), testSession);
     no(new Get("DBPATH"), testSession);
-    no(new Set("DBPATH", "forbidden"), testSession);
+    no(new Set(CmdSet.QUERYINFO, false), testSession);
 
     // Repo Stuff
     no(new RepoInstall(REPO, null), testSession);
@@ -143,7 +143,7 @@ public final class PermissionTest {
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
     ok(new Get("DBPATH"), testSession);
-    no(new Set("DBPATH", "forbidden"), testSession);
+    ok(new Set(CmdSet.QUERYINFO, false), testSession);
     // XQuery read
     ok(new XQuery("//xml"), testSession);
     ok(new Find(NAME), testSession);
@@ -193,7 +193,6 @@ public final class PermissionTest {
     no(new RepoList(), testSession);
 
     // XQuery Update
-    ok(new Set(CmdSet.QUERYINFO, false), testSession);
     ok(new XQuery("for $item in doc('" + NAME + "')//xml return rename" +
         " node $item as 'null'"), testSession);
     ok(new Optimize(), testSession);
