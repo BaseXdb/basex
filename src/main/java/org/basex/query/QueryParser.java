@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -129,6 +128,7 @@ import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
+import org.basex.util.JarClassLoader;
 import org.basex.util.Reflect;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -775,13 +775,13 @@ public class QueryParser extends InputParser {
       final String path = new File(new File(pkgDir, string(modDir)),
           string(jar)).toString();
       try {
-        urls[i++] = new URL(PkgText.JARPREF + path + "!/");
+        urls[i++] = new URL(PkgText.FILEPREF + path);
       } catch(MalformedURLException ex) {
         Util.errln(ex.getMessage());
       }
     }
     // Add jars to classpath
-    Reflect.setJarLoader(new URLClassLoader(urls));
+    Reflect.setJarLoader(new JarClassLoader(urls));
     // Load public classes
     for(final byte[] c : desc.classes)
           ctx.ns.add(new QNm(concat(token("java:"), c)), input());
