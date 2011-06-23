@@ -9,9 +9,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
 import org.basex.core.Command;
-import org.basex.core.cmd.Close;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
@@ -110,9 +108,10 @@ public final class DialogProgress extends Dialog implements ActionListener {
   }
 
   /**
-   * Runs the specified commands, decorated by a progress dialog.
+   * Runs the specified commands, decorated by a progress dialog, and
+   * calls {@link Dialog#action} if the dialog is closed.
    * @param d reference to the dialog window
-   * @param t dialog title
+   * @param t dialog title (may be an empty string)
    * @param cmds commands to be run
    */
   public static void execute(final Dialog d, final String t,
@@ -122,68 +121,39 @@ public final class DialogProgress extends Dialog implements ActionListener {
     new Thread() {
       @Override
       public void run() {
-        exec(d, t, cmds);
-      }
-    }.start();
-  }
+        d.setEnabled(false);
 
-  /**
-   * Runs the specified commands, decorated by a progress dialog.
-   * @param d reference to the dialog window
-   * @param t dialog title
-   * @param cmds commands to be run
-   */
-  static void exec(final Dialog d, final String t, final Command... cmds) {
-    GUI gui = d.gui;
-    gui.setCursor(GUIConstants.CURSORWAIT);
-    d.setCursor(GUIConstants.CURSORWAIT);
-    for(final Command cmd : cmds) {
-      if(cmd.newData()) {
-        new Close().run(gui.context);
-        gui.notify.init();
-      }
-      // execute command
-      final Performance perf = new Performance();
-      final DialogProgress wait = new DialogProgress(gui, t, cmd);
-      gui.setFocusable(false);
-      d.setEnabled(false);
-      //d.setFocusable(false);
-      wait.setAlwaysOnTop(true);
-      gui.updating = cmd.updating(gui.context);
-      final boolean ok = cmd.run(gui.context);
-      gui.updating = false;
-      final String info = cmd.info();
+        GUI gui = d.gui;
+        for(final Command cmd : cmds) {
+          // reset views
+          final boolean newData = cmd.newData(gui.context);
+          if(newData) gui.notify.init();
 
-      final String time = perf.toString();
-      gui.info.setInfo(info, cmd, time, ok);
-      gui.info.reset();
-      gui.status.setText(Util.info(PROCTIME, time));
-      if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
+          // open wait dialog
+          final DialogProgress wait = new DialogProgress(gui, t, cmd);
+          wait.setAlwaysOnTop(true);
 
-      // initialize views
-      if(cmd.newData()) gui.notify.init();
-      else if(cmd.updating(gui.context)) gui.notify.update();
-      wait.dispose();
-      gui.setCursor(GUIConstants.CURSORARROW);
-      d.setCursor(GUIConstants.CURSORARROW);
-      gui.setFocusable(true);
-      d.setEnabled(true);
-    }
-  }
+          // execute command
+          final Performance perf = new Performance();
+          gui.updating = cmd.updating(gui.context);
+          final boolean ok = cmd.run(gui.context);
+          gui.updating = false;
+          final String info = cmd.info();
 
-  /**
-   * Runs the specified commands, decorated by a progress dialog.
-   * @param d dialog window
-   * @param t dialog title
-   * @param cmd commands to be run
-   */
-  public static void execute(final Dialog d, final String t,
-      final Command cmd) {
-    // start database creation thread
-    new Thread() {
-      @Override
-      public void run() {
-        exec(d, t, cmd);
+          // return status information
+          final String time = perf.toString();
+          gui.info.setInfo(info, cmd, time, ok);
+          gui.info.reset();
+          gui.status.setText(Util.info(PROCTIME, time));
+          if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
+          // close wait dialog
+          wait.dispose();
+
+          // initialize views if database was closed before
+          if(newData) gui.notify.init();
+          else if(cmd.updating(gui.context)) gui.notify.update();
+        }
+        d.setEnabled(true);
         d.action(null);
       }
     }.start();

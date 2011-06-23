@@ -151,11 +151,9 @@ public final class TableView extends View implements Runnable {
   public void run() {
     zoomstep = ZOOM.length;
     while(--zoomstep >= 0) {
-      if(tdata.rows != null) {
       scroll.height(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
       repaint();
       Performance.sleep(25);
-      }
     }
     gui.updating = false;
     focus();

@@ -11,7 +11,6 @@ import javax.swing.border.EtchedBorder;
 import org.basex.core.Context;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.CreateBackup;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
@@ -137,15 +136,26 @@ public final class DialogOpen extends Dialog {
   public void action(final Object cmp) {
     final Context ctx = gui.context;
     final String db = choice.getValue().trim();
-    final String opendb = ctx.data != null ? ctx.data.meta.name : null;
     ok = true;
-    if(refresh) choice.setData(List.list(ctx).toArray());
-    refresh = false;
+    if(refresh) {
+      // rebuild databases and focus list chooser
+      choice.setData(List.list(ctx).toArray());
+      choice.requestFocusInWindow();
+      refresh = false;
+    }
+
+    // [CG] only close database if it equals the database to be changed
+    //   optionally, reopen database
+
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
       final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, 1);
       if(!dr.ok() || dr.input().equals(db)) return;
+      refresh = true;
+      DialogProgress.execute(this, "", new AlterDB(db, dr.input()));
+
+      /* ??
       final AlterDB cmd = new AlterDB(db, dr.input());
       if(cmd.run(ctx)) {
         gui.notify.init();
@@ -154,25 +164,17 @@ public final class DialogOpen extends Dialog {
       }
       choice.setData(List.list(ctx).toArray());
       action(null);
+      */
+
     } else if(cmp == copy) {
       final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
       if(!dc.ok() || dc.input().equals(db)) return;
-      DialogProgress.execute(this, "", new Copy(db, dc.input()));
       refresh = true;
+      DialogProgress.execute(this, "", new Copy(db, dc.input()));
     } else if(cmp == drop) {
       if(db.isEmpty() || !Dialog.confirm(gui, Util.info(DROPCONF, db))) return;
-      if(db.equals(opendb)) {
-        new Close().run(ctx);
-        gui.notify.init();
-      }
-      DropDB.drop(db, ctx.prop);
-      choice.setData(List.list(ctx).toArray());
-      choice.requestFocusInWindow();
-      if(choice.getValue().isEmpty()) {
-        doc.setText("");
-        detail.setText(Token.EMPTY);
-      }
-      action(null);
+      refresh = true;
+      DialogProgress.execute(this, "", new DropDB(db));
     } else if(cmp == backup) {
       DialogProgress.execute(this, "", new CreateBackup(db));
     } else if(cmp == restore) {
