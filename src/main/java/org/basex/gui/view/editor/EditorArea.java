@@ -102,9 +102,7 @@ final class EditorArea extends BaseXEditor {
       final String qu = in.length == 0 ? "()" : string(in);
       exec = !module(in);
       if(exec && (force || gui.gprop.is(GUIProp.EXECRT))) {
-        view.startWait();
-        view.stop.setEnabled(true);
-        gui.execute(new XQuery(qu), false);
+        gui.execute(false, new XQuery(qu));
       } else {
         final QueryContext ctx = new QueryContext(gui.context);
         try {

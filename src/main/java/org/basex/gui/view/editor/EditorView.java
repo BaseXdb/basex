@@ -70,9 +70,9 @@ public final class EditorView extends View {
   /** Thread counter. */
   int threadID;
 
-  /** Current error file. */
+  /** File in which the most recent error occurred. */
   String errFile;
-  /** Current error position. */
+  /** Most recent error position. */
   int errPos;
 
   /** Header string. */
@@ -401,15 +401,19 @@ public final class EditorView extends View {
   }
 
   /**
-   * Starts a waiting thread, which shows a waiting info after a short timeout.
+   * Starts a thread, which shows a waiting info after a short timeout.
    */
-  void startWait() {
+  public void start() {
     final int thread = ++threadID;
     new Thread() {
       @Override
       public void run() {
         Performance.sleep(200);
-        if(thread == threadID) info.setText(INFOWAIT, Msg.SUCCESS);
+        if(thread == threadID) {
+          info.setToolTipText(null);
+          info.setText(INFOWAIT, Msg.SUCCESS);
+          stop.setEnabled(true);
+        }
       }
     }.start();
   }
@@ -434,9 +438,7 @@ public final class EditorView extends View {
    * @return {@code false} if confirmation was canceled
    */
   public boolean confirm() {
-    for(final EditorArea edit : editors()) {
-      if(!confirm(edit)) return false;
-    }
+    for(final EditorArea edit : editors()) if(!confirm(edit)) return false;
     return true;
   }
 
