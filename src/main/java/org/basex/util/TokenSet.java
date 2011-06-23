@@ -37,6 +37,14 @@ public class TokenSet implements Iterable<byte[]> {
 
   /**
    * Constructor.
+   * @param init initial tokens
+   */
+  public TokenSet(final byte[]... init) {
+    for(final byte[] i : init) add(i);
+  }
+
+  /**
+   * Constructor.
    * @param in input stream
    * @throws IOException I/O exception
    */
