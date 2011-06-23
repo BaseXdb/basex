@@ -661,8 +661,10 @@ public class QueryParser extends InputParser {
             if(pkg != null) loadPackage(pkg, new TokenSet(), new TokenSet());
           }
         } else {
-          // check if pre-declared modules can be parsed
+          // compare with static modules
           boolean found = false;
+          for(final byte[] u : MODULES) found |= eq(uri, u);
+          // check if pre-declared modules can be parsed
           for(final byte[] path : ctx.modDeclared) {
             if(eq(ctx.modDeclared.get(path), uri)) {
               module(path, name.uri());
