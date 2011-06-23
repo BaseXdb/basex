@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -94,13 +93,12 @@ public final class Restore extends Command {
         if(e.isDirectory()) {
           path.mkdir();
         } else {
-          BufferedOutputStream bos = null;
+          FileOutputStream fos = null;
           try {
-            bos = new BufferedOutputStream(new FileOutputStream(path));
-            int c;
-            while((c = zis.read(data)) != -1) bos.write(data, 0, c);
+            fos = new FileOutputStream(path);
+            for(int c; (c = zis.read(data)) != -1;) fos.write(data, 0, c);
           } finally {
-            if(bos != null) try { bos.close(); } catch(final IOException ee) { }
+            if(fos != null) try { fos.close(); } catch(final IOException ee) { }
           }
         }
       }

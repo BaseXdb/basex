@@ -276,16 +276,18 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void dropUser() {
-    ok(new CreateUser(NAME, "test"));
-    ok(new CreateUser(NAME2, "test"));
+    ok(new CreateUser(NAME, NAME));
+    ok(new CreateUser(NAME2, NAME));
+
     ok(new DropUser(NAME));
-    ok(new DropUser(NAME2, "*"));
     ok(new DropUser(NAME2));
     no(new DropUser(""));
     no(new DropUser(NAME2, ":"));
 
-    ok(new CreateUser(NAME, "test"));
-    ok(new CreateUser(NAME2, "test"));
+    ok(new CreateDB(NAME));
+    ok(new CreateUser(NAME, NAME));
+    ok(new CreateUser(NAME2, NAME));
+    ok(new DropUser(NAME2, NAME + "*"));
     ok(new DropUser(NAME + "," + NAME2));
   }
 

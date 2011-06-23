@@ -221,7 +221,7 @@ public abstract class Command extends Progress {
     final StringList sl = new StringList();
     for(final IOFile f : prop.dbpath().children(pat)) {
       final String n = f.name();
-      if(!n.startsWith(".")) sl.add(n);
+      if(!n.contains(".")) sl.add(n);
     }
     return sl.toArray();
   }

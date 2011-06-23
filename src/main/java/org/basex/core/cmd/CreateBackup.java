@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -93,15 +92,14 @@ public final class CreateBackup extends Command {
       tf = files.length;
       for(final File f : files) {
         of++;
-        BufferedInputStream bis = null;
+        FileInputStream fis = null;
         try {
-          bis = new BufferedInputStream(new FileInputStream(f), IO.BLOCKSIZE);
+          fis = new FileInputStream(f);
           zos.putNextEntry(new ZipEntry(in.getName() + '/' + f.getName()));
-          int c;
-          while((c = bis.read(data)) != -1) zos.write(data, 0, c);
+          for(int c; (c = fis.read(data)) != -1;) zos.write(data, 0, c);
           zos.closeEntry();
         } finally {
-          if(bis != null) try { bis.close(); } catch(final IOException e) { }
+          if(fis != null) try { fis.close(); } catch(final IOException e) { }
         }
       }
       zos.close();
