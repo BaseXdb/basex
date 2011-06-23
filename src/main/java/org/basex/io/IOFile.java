@@ -58,8 +58,26 @@ public final class IOFile extends IO {
    * @param dir directory
    * @param n file name
    */
+  public IOFile(final String dir, final String n) {
+    this(new File(dir, n));
+  }
+
+  /**
+   * Constructor.
+   * @param dir directory
+   * @param n file name
+   */
   public IOFile(final File dir, final String n) {
     this(new File(dir, n));
+  }
+
+  /**
+   * Constructor.
+   * @param dir directory
+   * @param n file name
+   */
+  public IOFile(final IOFile dir, final String n) {
+    this(new File(dir.file, n));
   }
 
   @Override
@@ -164,12 +182,35 @@ public final class IOFile extends IO {
     return f.contains(":") ? IO.get(f) : new IOFile(new File(dir(), f));
   }
 
-  @Override
+  /**
+   * Recursively creates the directory.
+   * @return contents
+   */
   public boolean md() {
-    return file.mkdirs();
+    return !file.exists() && file.mkdirs();
   }
 
-  @Override
+  /**
+   * Returns the parent directory.
+   * @return directory
+   */
+  public IOFile parent() {
+    return new IOFile(file.getParentFile());
+  }
+
+  /**
+   * Returns the children of a path.
+   * @return children
+   */
+  public IOFile[] children() {
+    return children(".*");
+  }
+
+  /**
+   * Returns the children of a path that match the specified regular expression.
+   * @param pattern pattern
+   * @return children
+   */
   public IOFile[] children(final String pattern) {
     final File[] ch = file.listFiles();
     if(ch == null) return new IOFile[] {};
@@ -183,7 +224,11 @@ public final class IOFile extends IO {
     return io.toArray(new IOFile[io.size()]);
   }
 
-  @Override
+  /**
+   * Writes the specified file contents.
+   * @param c contents
+   * @throws IOException I/O exception
+   */
   public void write(final byte[] c) throws IOException {
     FileOutputStream out = null;
     try {
@@ -195,13 +240,21 @@ public final class IOFile extends IO {
     }
   }
 
-  @Override
+  /**
+   * Deletes the IO reference.
+   * @return success flag
+   */
   public boolean delete() {
-    if(isDir()) for(final IO ch : children()) if(!ch.delete()) return false;
-    return file.delete();
+    boolean ok = true;
+    if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
+    return file.delete() && ok;
   }
 
-  @Override
+  /**
+   * Renames the specified IO reference.
+   * @param trg target reference
+   * @return success flag
+   */
   public boolean rename(final IO trg) {
     return trg instanceof IOFile && file.renameTo(((IOFile) trg).file);
   }

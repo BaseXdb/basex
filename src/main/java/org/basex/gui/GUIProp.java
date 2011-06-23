@@ -15,8 +15,6 @@ import org.basex.util.StringList;
  * @author Christian Gruen
  */
 public final class GUIProp extends AProp {
-  // The following properties will be saved to disk:
-
   // DATABASE & PROGRAM PATHS =================================================
 
   /** Default GUI Font. */

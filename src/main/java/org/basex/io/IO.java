@@ -6,7 +6,6 @@ import java.io.InputStream;
 import org.basex.data.Data;
 import org.basex.util.ByteList;
 import org.basex.util.Token;
-import org.basex.util.Util;
 import org.xml.sax.InputSource;
 
 /**
@@ -191,15 +190,7 @@ public abstract class IO {
   }
 
   /**
-   * Creates the directory.
-   * @return contents
-   */
-  public boolean md() {
-    return false;
-  }
-
-  /**
-   * Chops the path and the XML suffix of the specified filename
+   * Chops the path and the file suffix of the specified filename
    * and returns the database name.
    * @return database name
    */
@@ -247,52 +238,6 @@ public abstract class IO {
    */
   public String dir() {
     return isDir() ? path() : path.substring(0, path.lastIndexOf('/') + 1);
-  }
-
-  /**
-   * Returns the children of a path.
-   * @return children
-   */
-  public final IO[] children() {
-    return children(".*");
-  }
-
-  /**
-   * Returns the children of a path that match the specified regular expression.
-   * @param pattern pattern
-   * @return children
-   */
-  @SuppressWarnings("unused")
-  public IO[] children(final String pattern) {
-    return new IO[] {};
-  }
-
-  /**
-   * Writes the specified file contents.
-   * @param c contents
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public void write(final byte[] c) throws IOException {
-    Util.notexpected();
-  }
-
-  /**
-   * Deletes the IO reference.
-   * @return success flag
-   */
-  public boolean delete() {
-    return false;
-  }
-
-  /**
-   * Renames the specified IO reference.
-   * @param trg target reference
-   * @return success flag
-   */
-  @SuppressWarnings("unused")
-  public boolean rename(final IO trg) {
-    return false;
   }
 
   /**

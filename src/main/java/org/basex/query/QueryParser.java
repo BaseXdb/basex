@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -718,27 +717,31 @@ public class QueryParser extends InputParser {
    */
   private void loadPackage(final byte[] pkgName, final TokenSet pkgsToLoad,
       final TokenSet pkgsLoaded) throws QueryException {
-    // Return if package is already loaded
+
+    // return if package is already loaded
     if(pkgsLoaded.id(pkgName) != 0) return;
-    // Find package in package dictionary
+
+    // find package in package dictionary
     final byte[] pDir = ctx.context.repo.pkgDict().get(pkgName);
     if(pDir == null) error(NECPKGNOTINST);
-    final File pkgDir = ctx.context.repo.path(string(pDir));
+    final IOFile pkgDir = ctx.context.repo.path(string(pDir));
 
-    // Parse package descriptor
+    // parse package descriptor
     final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
-    if(!pkgDesc.exists()) Util.errln(PkgText.NOTEXP, string(pkgName));
+    if(!pkgDesc.exists()) Util.debug(PkgText.NOTEXP, string(pkgName));
+
     final Package pkg = new PkgParser(ctx.context, input()).parse(pkgDesc);
-    // Check if package contains a jar descriptor
+    // check if package contains a jar descriptor
     final IO jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
-    // Add jars to classpath
-    if(jarDesc.exists()) loadJars(jarDesc, pkgDir, pkg.abbrev);
-    // Package has dependencies -> they have to be loaded first => put package
+    // add jars to classpath
+    if(jarDesc.exists()) loadJars(jarDesc, pkgDir, string(pkg.abbrev));
+
+    // package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
     if(pkg.dep.size() != 0) pkgsToLoad.add(pkgName);
     for(final Dependency d : pkg.dep) {
       if(d.pkg != null) {
-      // We consider only package dependencies here
+      // we consider only package dependencies here
       final byte[] depPkg = new PkgValidator(ctx.context, input()).getDepPkg(d);
       if(depPkg == null) {
         error(NECPKGNOTINST, string(d.pkg));
@@ -749,9 +752,9 @@ public class QueryParser extends InputParser {
      }
     }
     for(final Component comp : pkg.comps) {
-      final byte[] path = token(new File(new File(pkgDir, string(pkg.abbrev)),
-          string(comp.file)).toString());
-      module(path, Uri.uri(comp.uri));
+      final String path = new IOFile(new IOFile(pkgDir, string(pkg.abbrev)),
+          string(comp.file)).path();
+      module(token(path), Uri.uri(comp.uri));
     }
     if(pkgsToLoad.id(pkgName) != 0) pkgsToLoad.delete(pkgName);
     pkgsLoaded.add(pkgName);
@@ -764,27 +767,27 @@ public class QueryParser extends InputParser {
    * @param modDir module directory
    * @throws QueryException query exception
    */
-  private void loadJars(final IO jarDesc,
-      final File pkgDir, final byte[] modDir) throws QueryException {
+  private void loadJars(final IO jarDesc, final IOFile pkgDir,
+      final String modDir) throws QueryException {
+
     final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
     final URL[] urls = new URL[desc.jars.size()];
-    // Collect jar files
-    int i = 0;
-    for(final byte[] jar : desc.jars) {
-      // Assumes that jar is in the directory containing the xquery modules
-      final String path = new File(new File(pkgDir, string(modDir)),
-          string(jar)).toString();
-      try {
-        urls[i++] = new URL(PkgText.JARPREF + path + "!/");
-      } catch(MalformedURLException ex) {
-        Util.errln(ex.getMessage());
+    // collect jar files
+    try {
+      int i = 0;
+      for(final byte[] jar : desc.jars) {
+        // assumes that jar is in the directory containing the xquery modules
+        final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(jar));
+          urls[i++] = new URL(PkgText.JARPREF + path + "!/");
       }
+    } catch(final MalformedURLException ex) {
+      Util.debug(ex.getMessage());
     }
-    // Add jars to classpath
+    // add jars to classpath
     Reflect.setJarLoader(new URLClassLoader(urls));
-    // Load public classes
+    // load public classes
     for(final byte[] c : desc.classes)
-          ctx.ns.add(new QNm(concat(token("java:"), c)), input());
+      ctx.ns.add(new QNm(concat(token("java:"), c)), input());
   }
 
   /**
@@ -1298,12 +1301,9 @@ public class QueryParser extends InputParser {
       return e;
     }
 
-    // [CG] XQFT: FTIgnoreOption
     final FTExpr select = ftSelection(false);
-    // Expr ignore = null;
     if(wsConsumeWs(WITHOUT)) {
       wsCheck(CONTENT);
-      // ignore = union();
       union();
       error(FTIGNORE);
     }
@@ -1588,7 +1588,7 @@ public class QueryParser extends InputParser {
     return AxisStep.get(input(), Axis.DESCORSELF, Test.NOD);
   }
 
-  // Methods for query suggestions
+  // methods for query suggestions
 
   /**
    * Performs an optional check init.
@@ -1734,7 +1734,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * [121] Parses a FilterExpr. [124] Parses a Predicate.
+   * Parses the "FilterExpr" rule.
+   * Parses the "Predicate" rule.
    * @return postfix expression
    * @throws QueryException query exception
    */
@@ -1743,7 +1744,6 @@ public class QueryParser extends InputParser {
     do {
       old = e;
       if(wsConsume(BR1)) {
-        // PredicateList
         if(e == null) error(PREDMISSING);
         Expr[] pred = { };
         do {
@@ -1752,7 +1752,6 @@ public class QueryParser extends InputParser {
         } while(wsConsume(BR1));
         e = new Filter(input(), e, pred);
       } else if(e != null) {
-        // DynamicFunctionInvocation
         final Expr[] args = argumentList(e);
         if(args == null) break;
 
@@ -1858,10 +1857,7 @@ public class QueryParser extends InputParser {
    */
   private Expr functionItem() throws QueryException {
     final int pos = qp;
-
-    // InlineFunction
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
-
       final int s = ctx.vars.size();
       final Var[] args = paramList();
       wsCheck(PAR2);
@@ -1869,13 +1865,10 @@ public class QueryParser extends InputParser {
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
       ctx.vars.reset(s);
-
       return new InlineFunc(input(), type, args, body);
     }
-
     qp = pos;
 
-    // LiteralFunctionItem
     skipWS();
     final byte[] fn = qName(null);
     if(fn.length > 0 && consume(HASH)) {
@@ -2476,7 +2469,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * [169] Parses an ItemType.
+   * Parses the "ItemType" rule.
    * @return item type
    * @throws QueryException query exception
    */

@@ -45,12 +45,14 @@ public final class Reflect {
       try {
         if(c == null) {
           try {
-          c = Class.forName(n);
-          classes.put(n, c);
-          return c;
-          } catch (ClassNotFoundException e) {
-            if(jarLoader != null) c = Class.forName(n, true, jarLoader);
+            c = Class.forName(n);
             classes.put(n, c);
+            return c;
+          } catch (final ClassNotFoundException ex) {
+            if(jarLoader != null) {
+              c = Class.forName(n, true, jarLoader);
+              classes.put(n, c);
+            }
             return c;
           }
         }

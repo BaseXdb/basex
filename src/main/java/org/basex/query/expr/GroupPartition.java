@@ -148,7 +148,7 @@ final class GroupPartition {
     final int ngl = ngv.length;
     if(ngl == 0) return;
 
-    // Adds the current non-grouping variable bindings to the p-th partition.
+    // adds the current non-grouping variable bindings to the p-th partition.
     if(p == items.size()) items.add(new ItemCache[ngl]);
     final ItemCache[] sq = items.get(p);
 

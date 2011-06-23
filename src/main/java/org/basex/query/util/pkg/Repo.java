@@ -81,19 +81,12 @@ public final class Repo {
   }
 
   /**
-   * Creates the repository directory, if not done yet.
-   */
-  public void create() {
-    if(!path.exists()) path.mkdirs();
-  }
-
-  /**
    * Returns the path to the specified repository package.
    * @param pkg package
    * @return file reference
    */
-  public File path(final String pkg) {
-    return new File(path, pkg);
+  public IOFile path(final String pkg) {
+    return new IOFile(path, pkg);
   }
 
   /**
@@ -102,7 +95,7 @@ public final class Repo {
    * @param pkg deleted package
    */
   public synchronized void remove(final Package pkg) {
-    // Delete package from namespace dictionary
+    // delete package from namespace dictionary
     for(final Component comp : pkg.comps) {
       final byte[] ns = comp.uri;
       final TokenSet pkgs = nsDict.get(ns);
@@ -112,7 +105,7 @@ public final class Repo {
         nsDict.delete(ns);
       }
     }
-    // Delete package from package dictionary
+    // delete package from package dictionary
     pkgDict.delete(pkg.getUniqueName());
   }
 
@@ -122,7 +115,7 @@ public final class Repo {
    * @param dir new package directory
    */
   public synchronized void add(final Package pkg, final String dir) {
-    // Update namespace dictionary
+    // update namespace dictionary
     for(final Component comp : pkg.comps) {
       if(nsDict.id(comp.uri) == 0) {
         final TokenSet vals = new TokenSet();
@@ -132,7 +125,7 @@ public final class Repo {
         nsDict.get(comp.uri).add(pkg.getUniqueName());
       }
     }
-    // Update package dictionary
+    // update package dictionary
     pkgDict.add(pkg.getUniqueName(), token(dir));
   }
 
@@ -146,9 +139,9 @@ public final class Repo {
     if(desc.exists()) {
       try {
         final Package pkg = new PkgParser(context, null).parse(desc);
-        // Read package components
+        // read package components
         for(final Component comp : pkg.comps) {
-          // Add component's namespace to namespace dictionary
+          // add component's namespace to namespace dictionary
           if(comp.uri != null) {
             if(nsDict.get(comp.uri) != null) {
               nsDict.get(comp.uri).add(pkg.getUniqueName());
@@ -159,7 +152,7 @@ public final class Repo {
             }
           }
         }
-        // Add package to package dictionary
+        // add package to package dictionary
         pkgDict.add(pkg.getUniqueName(), token(dir.getName()));
       } catch(final QueryException ex) {
         Util.errln(ex.getMessage());

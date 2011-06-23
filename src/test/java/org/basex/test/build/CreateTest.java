@@ -7,6 +7,7 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.After;
@@ -42,7 +43,7 @@ public final class CreateTest {
   // finds the first document in the xml folder
   static {
     String file = "";
-    for(final IO c : IO.get(FOLDER).children()) {
+    for(final IOFile c : new IOFile(FOLDER).children()) {
       if(c.name().endsWith(IO.XMLSUFFIX)) {
         file = c.name();
         break;

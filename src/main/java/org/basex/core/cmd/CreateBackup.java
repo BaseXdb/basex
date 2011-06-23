@@ -2,15 +2,10 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Prop;
@@ -18,6 +13,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
+import org.basex.io.Zip;
 import org.basex.util.Util;
 
 /**
@@ -30,10 +26,6 @@ public final class CreateBackup extends Command {
   /** Date format. */
   private static final SimpleDateFormat DATE = new SimpleDateFormat(
       "yyyy-MM-dd-HH-mm-ss");
-  /** Counter for outstanding files. */
-  private int of;
-  /** Counter of total files. */
-  private int tf;
 
   /**
    * Default constructor.
@@ -73,42 +65,17 @@ public final class CreateBackup extends Command {
    * @return success flag
    */
   private boolean backup(final String db, final Prop pr) {
-    ZipOutputStream zos = null;
     try {
       final File in = pr.dbpath(db);
       final File file = pr.dbpath(db + "-" + DATE.format(new Date()) +
           IO.ZIPSUFFIX);
-      final byte[] data = new byte[IO.BLOCKSIZE];
 
-      // Create output stream for zipping; use fast compression
-      zos = new ZipOutputStream(new BufferedOutputStream(
-          new FileOutputStream(file)));
-      zos.setLevel(1);
-      zos.putNextEntry(new ZipEntry(in.getName() + '/'));
-      zos.closeEntry();
-
-      // Process each file
-      final File[] files = in.listFiles();
-      tf = files.length;
-      for(final File f : files) {
-        of++;
-        FileInputStream fis = null;
-        try {
-          fis = new FileInputStream(f);
-          zos.putNextEntry(new ZipEntry(in.getName() + '/' + f.getName()));
-          for(int c; (c = fis.read(data)) != -1;) zos.write(data, 0, c);
-          zos.closeEntry();
-        } finally {
-          if(fis != null) try { fis.close(); } catch(final IOException e) { }
-        }
-      }
-      zos.close();
+      final Zip zip = progress(new Zip(file));
+      zip.zip(in);
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);
       return false;
-    } finally {
-      if(zos != null) try { zos.close(); } catch(final IOException e) { }
     }
   }
 
@@ -120,11 +87,6 @@ public final class CreateBackup extends Command {
   @Override
   public boolean supportsProg() {
     return true;
-  }
-
-  @Override
-  protected double prog() {
-    return (double) of / tf;
   }
 
   @Override

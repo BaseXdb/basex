@@ -60,7 +60,7 @@ public final class XQUPTest extends QueryTest {
 
     // XQUP expressions return an empty iterator thus every test query q which
     // name starts with 'xxx' is an update query.
-    // The test query following q represents the actual test.
+    // the test query following q represents the actual test.
     queries = new Object[][] {
       // merge text nodes
       { "xxxMERGEins", empty(),

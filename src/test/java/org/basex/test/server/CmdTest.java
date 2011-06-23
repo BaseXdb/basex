@@ -46,7 +46,7 @@ import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Nodes;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.server.LocalSession;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -294,7 +294,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void export() {
-    final IO io = IO.get(FN);
+    final IOFile io = new IOFile(FN);
     no(new Export(io.path()));
     ok(new CreateDB(NAME, FILE));
     ok(new Export("."));
@@ -465,7 +465,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void run() {
-    final IO io = IO.get("test.xq");
+    final IOFile io = new IOFile("test.xq");
     no(new Run(io.path()));
     try {
       io.write(token("// li"));

@@ -13,6 +13,7 @@ import org.basex.core.Users;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Util;
 import org.basex.util.ft.Language;
 
@@ -147,9 +148,9 @@ public final class MetaData {
    * @return database size
    */
   public long dbsize() {
-    final File dir = prop.dbpath(name);
+    final IOFile dir = new IOFile(prop.dbpath(name));
     long len = 0;
-    if(dir.exists()) for(final File f : dir.listFiles()) len += f.length();
+    for(final IO io : dir.children()) len += io.length();
     return len;
   }
 

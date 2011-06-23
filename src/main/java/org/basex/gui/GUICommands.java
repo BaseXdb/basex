@@ -44,6 +44,7 @@ import org.basex.gui.dialog.DialogServer;
 import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.util.Array;
@@ -127,7 +128,7 @@ public enum GUICommands implements GUICommand {
       final DialogExport dialog = new DialogExport(gui);
       if(!dialog.ok()) return;
 
-      final IO root = IO.get(dialog.path());
+      final IOFile root = new IOFile(dialog.path());
 
       // check if existing files will be overwritten
       if(root.exists()) {

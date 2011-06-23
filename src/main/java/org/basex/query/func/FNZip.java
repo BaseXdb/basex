@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -25,7 +26,9 @@ import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.io.IOFile;
 import org.basex.io.TextInput;
+import org.basex.io.Zip;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -158,7 +161,7 @@ public final class FNZip extends FuncCall {
     final String file = string(checkStr(expr[0], ctx));
 
     // check file path
-    final IO path = IO.get(file);
+    final IOFile path = new IOFile(file);
     if(!path.exists()) ZIPNOTFOUND.thrw(input, file);
     // loop through file
     ZipFile zf = null;
@@ -266,7 +269,7 @@ public final class FNZip extends FuncCall {
     } finally {
       if(fos != null) {
         try { fos.close(); } catch(final IOException ex) { }
-        if(!ok) IO.get(file).delete();
+        if(!ok) new IOFile(file).delete();
       }
     }
     return null;
@@ -316,7 +319,7 @@ public final class FNZip extends FuncCall {
       } else {
         if(src != null) {
           // write file to zip archive
-          if(!IO.get(src).exists()) ZIPNOTFOUND.thrw(input, src);
+          if(!new IOFile(src).exists()) ZIPNOTFOUND.thrw(input, src);
 
           BufferedInputStream bis = null;
           try {
@@ -407,14 +410,14 @@ public final class FNZip extends FuncCall {
     final String in = attribute(elm, A_HREF, true);
 
     // target and temporary output file
-    final IO target = IO.get(string(checkStr(expr[1], ctx)));
-    IO out;
+    final IOFile target = new IOFile(string(checkStr(expr[1], ctx)));
+    IOFile out;
     do {
-      out = IO.get(target.path() + new Random().nextInt(0x7FFFFFFF));
+      out = new IOFile(target.path() + new Random().nextInt(0x7FFFFFFF));
     } while(out.exists());
 
     // open zip file
-    if(!IO.get(in).exists()) ZIPNOTFOUND.thrw(input, in);
+    if(!new IOFile(in).exists()) ZIPNOTFOUND.thrw(input, in);
     ZipFile zf = null;
     boolean ok = true;
     try {
@@ -474,8 +477,6 @@ public final class FNZip extends FuncCall {
     final StringList sl = new StringList();
     final Iterator<String> it = paths.iterator();
     while(it.hasNext()) sl.add(it.next());
-
-    //paths.sort(true, true);
     return sl;
   }
 
@@ -505,49 +506,15 @@ public final class FNZip extends FuncCall {
   private byte[] entry(final QueryContext ctx) throws QueryException {
     final String file = string(checkStr(expr[0], ctx));
     final String path = string(checkStr(expr[1], ctx));
-    if(!IO.get(file).exists()) ZIPNOTFOUND.thrw(input, file);
+    if(!new IOFile(file).exists()) ZIPNOTFOUND.thrw(input, file);
 
-    ZipFile zf = null;
     try {
-      zf = new ZipFile(file);
-      return read(zf, path);
+      return new Zip(new File(file)).read(path);
     } catch(final FileNotFoundException ex) {
       throw ZIPNOTFOUND.thrw(input, file + '/' + path);
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
-    } finally {
-      if(zf != null) try { zf.close(); } catch(final IOException e) { }
     }
-  }
-
-  /**
-   * Reads and returns a zip file entry.
-   * @param zf zip file
-   * @param path file to be read
-   * @return resulting byte array
-   * @throws IOException I/O exception
-   */
-  public static byte[] read(final ZipFile zf, final String path)
-      throws IOException {
-
-    final ZipEntry ze = zf.getEntry(path);
-    if(ze == null) throw new FileNotFoundException(path);
-
-    final InputStream zis = zf.getInputStream(ze);
-    final int s = (int) ze.getSize();
-    if(s >= 0) {
-      // known size: pre-allocate and fill array
-      final byte[] data = new byte[s];
-      int c, o = 0;
-      while(s - o != 0 && (c = zis.read(data, o, s - o)) != -1) o += c;
-      return data;
-    }
-    // unknown size: use byte list
-    final byte[] data = new byte[IO.BLOCKSIZE];
-    final ByteList bl = new ByteList();
-    int c;
-    while((c = zis.read(data)) != -1) bl.add(data, 0, c);
-    return bl.toArray();
   }
 
   @Override

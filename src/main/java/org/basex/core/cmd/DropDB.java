@@ -3,13 +3,13 @@ package org.basex.core.cmd;
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 
-import java.io.File;
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
+import org.basex.io.IOFile;
 
 /**
  * Evaluates the 'drop database' command and deletes a database.
@@ -74,18 +74,14 @@ public final class DropDB extends Command {
   public static synchronized boolean drop(final String db,
       final String pat, final Prop pr) {
 
-    final File path = pr.dbpath(db);
-    final File[] files = path.listFiles();
-    // path not found/no permissions...
-    if(!path.exists() || files == null) return false;
-
-    for(final File sub : files) {
-      if(pat == null || sub.getName().matches(pat))
-        if(!sub.delete()) {
-          return false;
-        }
+    final IOFile path = new IOFile(pr.dbpath(db));
+    boolean ok = path.exists();
+    // try to delete all files
+    for(final IOFile sub : path.children()) {
+      if(pat == null || sub.name().matches(pat)) ok &= sub.delete();
     }
-    return pat != null || path.delete();
+    // only delete directory if no pattern was specified
+    return (pat != null || path.delete()) && ok;
   }
 
   @Override

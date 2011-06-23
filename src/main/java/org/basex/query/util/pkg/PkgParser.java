@@ -105,14 +105,14 @@ public final class PkgParser {
       else PKGDESCINV.thrw(input, Util.info(WHICHATTR, name));
     }
 
-    // Check mandatory attributes
+    // check mandatory attributes
     if(p.name == null)
       PKGDESCINV.thrw(input, Util.info(MISSATTR, NAME, root));
     if(p.version == null)
       PKGDESCINV.thrw(input, Util.info(MISSATTR, VERSION, root));
     if(eq(root, MODULE)) return;
 
-    // Check mandatory attributes in version 1.0
+    // check mandatory attributes in version 1.0
     if(p.abbrev == null)
       PKGDESCINV.thrw(input, Util.info(MISSATTR, ABBREV, root));
     if(p.spec == null)
@@ -178,7 +178,7 @@ public final class PkgParser {
       else PKGDESCINV.thrw(input, Util.info(WHICHELEM, name));
     }
 
-    // Check mandatory children
+    // check mandatory children
     if(c.uri == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, NSPC));
     if(c.file == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, FILE));
     return c;

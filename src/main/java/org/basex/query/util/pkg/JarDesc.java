@@ -8,7 +8,6 @@ import org.basex.util.TokenList;
  * @author Rositsa Shadura
  */
 public final class JarDesc {
-
   /** List of jar files. */
   public final TokenList jars = new TokenList();
   /** List of public classes. */

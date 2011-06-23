@@ -47,12 +47,12 @@ public final class PkgValidator {
    * @throws QueryException query exception
    */
   public void check(final Package pkg) throws QueryException {
-    // Check if package is already installed
+    // check if package is already installed
     if(context.repo.pkgDict().get(pkg.getUniqueName()) != null)
       PKGINST.thrw(input);
-    // Check package dependencies
+    // check package dependencies
     checkDepends(pkg);
-    // Check package components
+    // check package components
     checkComps(pkg);
   }
 
@@ -65,15 +65,15 @@ public final class PkgValidator {
   private void checkDepends(final Package pkg) throws QueryException {
     final List<Dependency> procs = new ArrayList<Package.Dependency>();
     for(final Dependency dep : pkg.dep) {
-      // First check of dependency elements are consistently defined in the
+      // first check of dependency elements are consistently defined in the
       // descriptor
       if(dep.pkg == null && dep.processor == null) PKGDESCINV.thrw(input,
           MISSSECOND);
-      // If dependency involves a package, check if this package or an
+      // if dependency involves a package, check if this package or an
       // appropriate version of it is installed
       if(dep.pkg != null && getDepPkg(dep) == null) NECPKGNOTINST.thrw(input,
           dep.pkg);
-      // If dependency involves a processor, add it to the list with processor
+      // if dependency involves a processor, add it to the list with processor
       // dependencies
       if(dep.processor != null) procs.add(dep);
     }
@@ -87,12 +87,12 @@ public final class PkgValidator {
    * @return result
    */
   public byte[] getDepPkg(final Dependency dep) {
-    // Get installed versions of secondary package
+    // get installed versions of secondary package
     final TokenSet instVers = new TokenSet();
     for(final byte[] nextPkg : context.repo.pkgDict().keys())
       if(nextPkg != null && startsWith(nextPkg, dep.pkg))
         instVers.add(getVersion(nextPkg));
-    // Check if an appropriate version is already installed
+    // check if an appropriate version is already installed
     final byte[] version = getAvailVersion(dep, instVers);
     return version == null ? null : dep.getName(version);
   }
@@ -109,14 +109,14 @@ public final class PkgValidator {
         isSupported = false;
         break;
       }
-      // extract basex version
+      // extract version
       final int idx = Text.VERSION.indexOf(" ");
       final String v = idx == -1 ? Text.VERSION
           : Text.VERSION.substring(0, idx);
       final TokenSet currentVers = new TokenSet();
       currentVers.add(token(v));
-      // Check if current version of basex is acceptable for the dependency
-      isSupported = (getAvailVersion(d, currentVers) == null) ? false : true;
+      // check if current version is acceptable for the dependency
+      isSupported = getAvailVersion(d, currentVers) == null ? false : true;
     }
     if(!isSupported) PKGNOTSUPP.thrw(input);
   }
@@ -132,21 +132,21 @@ public final class PkgValidator {
       final TokenSet currentVers) {
     if(currentVers.size() == 0) return null;
     if(dep.versions != null) {
-      // Get acceptable versions for secondary package/processor
+      // get acceptable versions for secondary package/processor
       final TokenSet versList = new TokenSet();
       for(final byte[] v : split(dep.versions, ' '))
         versList.add(v);
-      // Check if any acceptable version is already installed
+      // check if any acceptable version is already installed
       for(final byte[] v : versList)
         if(currentVers.id(v) != 0) return v;
     } else if(dep.semver != null) {
-      // Version template - version of secondary package or BaseX version must
+      // version template - version of secondary package or BaseX version must
       // be compatible with the defined template
       final PkgVersion semVer = new PkgVersion(dep.semver);
       for(final byte[] v : currentVers)
         if(new PkgVersion(v).isCompatible(semVer)) return v;
     } else if(dep.semverMin != null && dep.semverMax != null) {
-      // Version templates for minimal and maximal acceptable version - version
+      // version templates for minimal and maximal acceptable version - version
       // of secondary package or BaseX version must be equal or above
       // the minimal and strictly below the maximal
       final PkgVersion min = new PkgVersion(dep.semverMin);
@@ -156,7 +156,7 @@ public final class PkgValidator {
         if(v.compareTo(min) >= 0 && v.compareTo(max) < 0) return nextVer;
       }
     } else if(dep.semverMin != null) {
-      // Version template for minimal acceptable version - version of secondary
+      // version template for minimal acceptable version - version of secondary
       // package or BaseX version must be either compatible with this template
       // or greater than it
       final PkgVersion semVer = new PkgVersion(dep.semverMin);
@@ -165,7 +165,7 @@ public final class PkgValidator {
         if(v.isCompatible(semVer) || v.compareTo(semVer) >= 0) return nextVer;
       }
     } else if(dep.semverMax != null) {
-      // Version template for maximal acceptable version - version of secondary
+      // version template for maximal acceptable version - version of secondary
       // package or BaseX version must be either compatible with this template
       // or smaller than it
       final PkgVersion semVer = new PkgVersion(dep.semverMax);
@@ -174,7 +174,7 @@ public final class PkgValidator {
         if(v.isCompatible(semVer) || v.compareTo(semVer) <= 0) return nextVer;
       }
     } else {
-      // No versioning attribute is specified => any version of the secondary
+      // no versioning attribute is specified => any version of the secondary
       // package is acceptable
       return currentVers.keys()[0];
     }
@@ -204,13 +204,13 @@ public final class PkgValidator {
    */
   private boolean isInstalled(final Component comp, final byte[] name)
       throws QueryException {
-    // Get packages in which the module's namespace is found
+    // get packages in which the module's namespace is found
     final TokenSet pkgs = context.repo.nsDict().get(comp.uri);
     if(pkgs == null) return false;
 
     for(final byte[] nextPkg : pkgs) {
       if(nextPkg != null && !eq(Package.getName(nextPkg), name)) {
-        // Installed package is a different one, not just a different version
+        // installed package is a different one, not just a different version
         // of the current one
         final String pkgDir = string(context.repo.pkgDict().get(nextPkg));
         final IO pkgDesc = new IOFile(context.repo.path(pkgDir), DESCRIPTOR);

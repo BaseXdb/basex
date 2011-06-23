@@ -17,6 +17,7 @@ import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 
 /**
  * Add document dialog.
@@ -98,7 +99,7 @@ public final class DialogAdd extends Dialog {
    * Opens a file dialog to choose an XML document or directory.
    */
   void choose() {
-    final IO io = new BaseXFileChooser(DIALOGFC, path.getText(), gui).
+    final IOFile io = new BaseXFileChooser(DIALOGFC, path.getText(), gui).
       select(BaseXFileChooser.Mode.FDOPEN);
     if(io != null) path.setText(io.path());
     action(null);

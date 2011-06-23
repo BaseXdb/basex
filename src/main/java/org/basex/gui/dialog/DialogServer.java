@@ -122,7 +122,7 @@ public final class DialogServer extends Dialog {
     tabs.add(SESSIONS, sess);
     tabs.add(LOCALLOGS, logs);
 
-    // Server Tab
+    // server tab
     conn.border(8).layout(new BorderLayout(0, 32));
 
     start = new BaseXButton(BUTTONSTART, this);
@@ -192,7 +192,7 @@ public final class DialogServer extends Dialog {
     p.add(l);
     conn.add(p, BorderLayout.SOUTH);
 
-    // Session Tab
+    // session tab
     sess.border(8).layout(new BorderLayout());
     sese = new BaseXEditor(false, this);
     sese.setFont(start.getFont());
@@ -218,7 +218,7 @@ public final class DialogServer extends Dialog {
     p.add(refreshSess, BorderLayout.EAST);
     sess.add(p, BorderLayout.SOUTH);
 
-    // Logging Tab
+    // logging tab
     logs.border(8).layout(new BorderLayout());
     delete = new BaseXButton(BUTTONDELETE, this);
     deleteAll = new BaseXButton(BUTTONDELALL, this);

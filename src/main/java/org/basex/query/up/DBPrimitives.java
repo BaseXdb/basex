@@ -119,7 +119,7 @@ final class DBPrimitives extends Primitives {
     int c = 0;
     while(ni < l - 1) {
       final int pre = nodes.get(ni++);
-      // If a node is deleted or replaced ...
+      // if a node is deleted or replaced ...
       if(op.get(pre).updatesDestroyIdentity()) {
         final int followingAxisPre = pre + d.size(pre, d.kind(pre));
         // mark obsolete target nodes on the descendant axis.
@@ -131,7 +131,7 @@ final class DBPrimitives extends Primitives {
     }
     // in case nothing changed on the pending update list, return
     if(c == 0) return;
-    // Create a new list that contains necessary targets only
+    // create a new list that contains necessary targets only
     final IntList newNodes = new IntList(nodes.size() - c);
     for(int i = 0; i < nodes.size(); i++) {
       final int pre = nodes.get(i);

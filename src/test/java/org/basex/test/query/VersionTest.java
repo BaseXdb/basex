@@ -19,7 +19,7 @@ public final class VersionTest {
    */
   @Test
   public void testCompatible() {
-    // Case 1: template = 3
+    // case 1: template = 3
     final PkgVersion semVer1 = new PkgVersion(token("3"));
     assertTrue(new PkgVersion(token("3.0")).isCompatible(semVer1));
     assertTrue(new PkgVersion(token("3.1")).isCompatible(semVer1));
@@ -29,7 +29,7 @@ public final class VersionTest {
     assertFalse(new PkgVersion(token("4")).isCompatible(semVer1));
     assertFalse(new PkgVersion(token("2.7.4")).isCompatible(semVer1));
 
-    // Case 2: template = 3.5
+    // case 2: template = 3.5
     final PkgVersion semVer2 = new PkgVersion(token("3.5"));
     assertTrue(new PkgVersion(token("3.5")).isCompatible(semVer2));
     assertTrue(new PkgVersion(token("3.5.45")).isCompatible(semVer2));
@@ -37,7 +37,7 @@ public final class VersionTest {
     assertFalse(new PkgVersion(token("2.7.4")).isCompatible(semVer2));
     assertFalse(new PkgVersion(token("3.4")).isCompatible(semVer2));
 
-    // Case 3: template = 3.4.7
+    // case 3: template = 3.4.7
     final PkgVersion semVer3 = new PkgVersion(token("3.4.7"));
     assertTrue(new PkgVersion(token("3.4.7")).isCompatible(semVer3));
     assertFalse(new PkgVersion(token("3.4")).isCompatible(semVer3));
@@ -51,7 +51,7 @@ public final class VersionTest {
    */
   @Test
   public void testCompatGreater() {
-    // Case 1: template = 3
+    // case 1: template = 3
     final PkgVersion semVer1 = new PkgVersion(token("3"));
     final PkgVersion v1 = new PkgVersion(token("3"));
     assertTrue(v1.isCompatible(semVer1) || v1.compareTo(semVer1) > 0);
@@ -62,7 +62,7 @@ public final class VersionTest {
     final PkgVersion v4 = new PkgVersion(token("2.6"));
     assertFalse(v4.isCompatible(semVer1) || v4.compareTo(semVer1) > 0);
 
-    // Case 2: template = 3.5
+    // case 2: template = 3.5
     final PkgVersion semVer2 = new PkgVersion(token("3.5"));
     final PkgVersion vv1 = new PkgVersion(token("3.5"));
     assertTrue(vv1.isCompatible(semVer2) || vv1.compareTo(semVer2) > 0);
@@ -75,7 +75,7 @@ public final class VersionTest {
     final PkgVersion vv5 = new PkgVersion(token("3.6"));
     assertTrue(vv5.isCompatible(semVer2) || vv5.compareTo(semVer2) > 0);
 
-    // Case 3: template = 3.4.7
+    // case 3: template = 3.4.7
     final PkgVersion semVer3 = new PkgVersion(token("3.4.7"));
     final PkgVersion vvv1 = new PkgVersion(token("3.4.7"));
     assertTrue(vvv1.isCompatible(semVer3) || vvv1.compareTo(semVer3) > 0);
@@ -101,7 +101,7 @@ public final class VersionTest {
    */
   @Test
   public void testCompatSmaller() {
-    // Case 1: template = 3
+    // case 1: template = 3
     final PkgVersion semVer1 = new PkgVersion(token("3"));
     final PkgVersion v1 = new PkgVersion(token("3"));
     assertTrue(v1.isCompatible(semVer1) || v1.compareTo(semVer1) < 0);
@@ -112,7 +112,7 @@ public final class VersionTest {
     final PkgVersion v4 = new PkgVersion(token("4.6.55"));
     assertFalse(v4.isCompatible(semVer1) || v4.compareTo(semVer1) < 0);
 
-    // Case 2: template = 3.5
+    // case 2: template = 3.5
     final PkgVersion semVer2 = new PkgVersion(token("3.5"));
     final PkgVersion vv1 = new PkgVersion(token("3.5"));
     assertTrue(vv1.isCompatible(semVer2) || vv1.compareTo(semVer2) < 0);
@@ -127,7 +127,7 @@ public final class VersionTest {
     final PkgVersion vv6 = new PkgVersion(token("6"));
     assertFalse(vv6.isCompatible(semVer2) || vv6.compareTo(semVer2) < 0);
 
-    // Case 3: template = 3.4.7
+    // case 3: template = 3.4.7
     final PkgVersion semVer3 = new PkgVersion(token("3.4.7"));
     final PkgVersion vvv1 = new PkgVersion(token("3.4.7"));
     assertTrue(vvv1.isCompatible(semVer3) || vvv1.compareTo(semVer3) < 0);

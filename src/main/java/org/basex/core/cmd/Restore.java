@@ -1,18 +1,15 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
+import org.basex.io.Zip;
 import org.basex.util.StringList;
 import org.basex.util.Util;
 
@@ -26,11 +23,6 @@ public final class Restore extends Command {
   /** Date pattern. */
   private static final String PATTERN =
     "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
-
-  /** Counter for outstanding files. */
-  private int of;
-  /** Counter of total files. */
-  private int tf;
   /** States if current database was closed. */
   private boolean closed;
 
@@ -74,41 +66,12 @@ public final class Restore extends Command {
    * @return success flag
    */
   private boolean restore(final File file, final Prop pr) {
-    ZipInputStream zis = null;
     try {
-      // count number of files
-      zis = new ZipInputStream(new BufferedInputStream(
-          new FileInputStream(file)));
-      while(zis.getNextEntry() != null) tf++;
-      zis.close();
-      // reopen zip stream
-      zis = new ZipInputStream(new BufferedInputStream(
-          new FileInputStream(file)));
-
-      final byte[] data = new byte[IO.BLOCKSIZE];
-      ZipEntry e;
-      while((e = zis.getNextEntry()) != null) {
-        of++;
-        final File path = pr.dbpath(e.getName());
-        if(e.isDirectory()) {
-          path.mkdir();
-        } else {
-          FileOutputStream fos = null;
-          try {
-            fos = new FileOutputStream(path);
-            for(int c; (c = zis.read(data)) != -1;) fos.write(data, 0, c);
-          } finally {
-            if(fos != null) try { fos.close(); } catch(final IOException ee) { }
-          }
-        }
-      }
-      zis.close();
+      progress(new Zip(file)).unzip(pr.dbpath());
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);
       return false;
-    } finally {
-      if(zis != null) try { zis.close(); } catch(final IOException e) { }
     }
   }
 
@@ -121,10 +84,10 @@ public final class Restore extends Command {
   public static StringList list(final String db, final Context ctx) {
     final StringList list = new StringList();
 
-    final IO dir = ctx.prop.dbpath();
+    final IOFile dir = ctx.prop.dbpath();
     if(!dir.exists()) return list;
 
-    for(final IO f : dir.children()) {
+    for(final IOFile f : dir.children()) {
       if(f.name().matches(db + PATTERN + IO.ZIPSUFFIX)) list.add(f.path());
     }
     list.sort(false, false);
@@ -145,10 +108,5 @@ public final class Restore extends Command {
   @Override
   public boolean supportsProg() {
     return true;
-  }
-
-  @Override
-  protected double prog() {
-    return (double) of / tf;
   }
 }
