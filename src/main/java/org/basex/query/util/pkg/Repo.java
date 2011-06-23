@@ -7,6 +7,7 @@ import java.io.File;
 
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.util.pkg.Package.Component;
@@ -33,7 +34,7 @@ public final class Repo {
   /** Initialization flag (the repository can only be initialized once). */
   private boolean init;
   /** Repo path. */
-  public String path;
+  public String path = Prop.HOME + Text.NAME + "Repo";
 
   /**
    * Constructor.
