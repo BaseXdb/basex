@@ -51,12 +51,12 @@ public final class RepoManager {
       throws QueryException {
 
     // Check repository if not done yet
-    new File(ctx.repo.path).mkdirs();
+    ctx.repo.create();
     // Check package existence
     final File pkgFile = new File(path);
     if(!pkgFile.exists()) PKGNOTEXIST.thrw(ii, path);
     // Check package name - must be a .xar file
-    checkPkgName(path, ii);
+    if(!path.endsWith(IO.XARSUFFIX)) INVPKGNAME.thrw(ii);
 
     try {
       final ZipFile xar = new ZipFile(pkgFile);
@@ -88,12 +88,12 @@ public final class RepoManager {
           // name
           found = true;
           // Check if package to be deleted participates in a dependency
-          final byte[] primPkg = getPrimary(nextPkg, ii);
+          final byte[] primPkg = primary(nextPkg, ii);
           if(primPkg == null) {
             // Clean package repository
-            final File f = new File(ctx.repo.path, string(dir));
-            final File desc = new File(f, DESCRIPTOR);
-            ctx.repo.remove(new PkgParser(ctx, ii).parse(new IOFile(desc)));
+            final File f = ctx.repo.path(string(dir));
+            final IOFile desc = new IOFile(f, DESCRIPTOR);
+            ctx.repo.remove(new PkgParser(ctx, ii).parse(desc));
             // Package does not participate in a dependency => delete it
             if(!new IOFile(f).delete()) CANNOTDELPKG.thrw(ii);
           } else PKGDEP.thrw(ii, string(primPkg), pkg);
@@ -109,8 +109,7 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private void unzip(final ZipFile xar) throws IOException {
-    final File repo = new File(ctx.repo.path);
-    final File dir = new File(repo, extractPkgName(xar.getName()));
+    final File dir = ctx.repo.path(extractPkgName(xar.getName()));
     dir.mkdir();
 
     final Enumeration<? extends ZipEntry> en = xar.entries();
@@ -140,18 +139,6 @@ public final class RepoManager {
   }
 
   /**
-   * Checks if package to be installed is a .xar archive.
-   * @param pkgName package name
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private static void checkPkgName(final String pkgName, final InputInfo ii)
-      throws QueryException {
-
-    if(!pkgName.endsWith(IO.XARSUFFIX)) INVPKGNAME.thrw(ii);
-  }
-
-  /**
    * Extracts package name from package path.
    * @param path package path
    * @return package name
@@ -168,17 +155,17 @@ public final class RepoManager {
    * @return package depending on the current one
    * @throws QueryException query exception
    */
-  private byte[] getPrimary(final byte[] pkgName, final InputInfo ii)
+  private byte[] primary(final byte[] pkgName, final InputInfo ii)
       throws QueryException {
     for(final byte[] nextPkg : ctx.repo.pkgDict()) {
       if(nextPkg != null && !eq(nextPkg, pkgName)) {
         // Check only packages different from the current one
-        final File desc = new File(new File(ctx.repo.path,
+        final IOFile desc = new IOFile(ctx.repo.path(
             string(ctx.repo.pkgDict().get(nextPkg))), DESCRIPTOR);
-        final Package pkg = new PkgParser(ctx, ii).parse(new IOFile(desc));
+        final Package pkg = new PkgParser(ctx, ii).parse(desc);
+        final byte[] name = Package.getName(pkgName);
         for(final Dependency dep : pkg.dep)
-          if(eq(dep.pkg, Package.getName(pkgName)))
-            return Package.getName(nextPkg);
+          if(eq(dep.pkg, name)) return Package.getName(nextPkg);
       }
     }
     return null;

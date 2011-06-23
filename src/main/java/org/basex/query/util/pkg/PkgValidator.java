@@ -5,12 +5,12 @@ import static org.basex.query.util.pkg.Package.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.basex.core.Context;
 import org.basex.core.Text;
+import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.util.pkg.Package.Component;
@@ -212,11 +212,9 @@ public final class PkgValidator {
       if(nextPkg != null && !eq(Package.getName(nextPkg), name)) {
         // Installed package is a different one, not just a different version
         // of the current one
-        final byte[] pkgDir = context.repo.pkgDict().get(nextPkg);
-        final File pkgDesc = new File(new File(context.repo.path,
-            string(pkgDir)), DESCRIPTOR);
-        final IOFile io = new IOFile(pkgDesc);
-        final Package pkg = new PkgParser(context, input).parse(io);
+        final String pkgDir = string(context.repo.pkgDict().get(nextPkg));
+        final IO pkgDesc = new IOFile(context.repo.path(pkgDir), DESCRIPTOR);
+        final Package pkg = new PkgParser(context, input).parse(pkgDesc);
         for(final Component nextComp : pkg.comps) {
           if(nextComp.getName().equals(comp.getName())) return true;
         }

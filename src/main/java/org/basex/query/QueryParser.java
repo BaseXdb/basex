@@ -719,17 +719,16 @@ public class QueryParser extends InputParser {
     // Return if package is already loaded
     if(pkgsLoaded.id(pkgName) != 0) return;
     // Find package in package dictionary
-    final byte[] pkgDir = ctx.context.repo.pkgDict().get(pkgName);
-    if(pkgDir == null) error(NECPKGNOTINST);
+    final byte[] pDir = ctx.context.repo.pkgDict().get(pkgName);
+    if(pDir == null) error(NECPKGNOTINST);
+    final File pkgDir = ctx.context.repo.path(string(pDir));
+
     // Parse package descriptor
-    final File pkgDesc = new File(new File(ctx.context.repo.path,
-        string(pkgDir)), PkgText.DESCRIPTOR);
+    final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
     if(!pkgDesc.exists()) Util.errln(PkgText.NOTEXP, string(pkgName));
-    final Package pkg = new PkgParser(ctx.context, input()).parse(new IOFile(
-        pkgDesc));
+    final Package pkg = new PkgParser(ctx.context, input()).parse(pkgDesc);
     // Check if package contains a jar descriptor
-    final File jarDesc = new File(new File(ctx.context.repo.path,
-        string(pkgDir)), PkgText.JARDESC);
+    final IO jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
     // Add jars to classpath
     if(jarDesc.exists()) loadJars(jarDesc, pkgDir, pkg.abbrev);
     // Package has dependencies -> they have to be loaded first => put package
@@ -748,9 +747,8 @@ public class QueryParser extends InputParser {
      }
     }
     for(final Component comp : pkg.comps) {
-      final byte[] path = token(new File(new File(new File(
-          ctx.context.repo.path, string(pkgDir)),
-          string(pkg.abbrev)), string(comp.file)).toString());
+      final byte[] path = token(new File(new File(pkgDir, string(pkg.abbrev)),
+          string(comp.file)).toString());
       module(path, Uri.uri(comp.uri));
     }
     if(pkgsToLoad.id(pkgName) != 0) pkgsToLoad.delete(pkgName);
@@ -764,18 +762,16 @@ public class QueryParser extends InputParser {
    * @param modDir module directory
    * @throws QueryException query exception
    */
-  private void loadJars(final File jarDesc,
-      final byte[] pkgDir, final byte[] modDir) throws QueryException {
-    final JarDesc desc = new JarParser(ctx.context, input()).parse(new IOFile(
-        jarDesc));
+  private void loadJars(final IO jarDesc,
+      final File pkgDir, final byte[] modDir) throws QueryException {
+    final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
     final URL[] urls = new URL[desc.jars.size()];
     // Collect jar files
     int i = 0;
     for(final byte[] jar : desc.jars) {
       // Assumes that jar is in the directory containing the xquery modules
-      final String path = new File(new File(new File(
-          ctx.context.repo.path, string(pkgDir)),
-          string(modDir)), string(jar)).toString();
+      final String path = new File(new File(pkgDir, string(modDir)),
+          string(jar)).toString();
       try {
         urls[i++] = new URL(PkgText.JARPREF + path + "!/");
       } catch(MalformedURLException ex) {
