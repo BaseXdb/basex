@@ -11,6 +11,7 @@ import org.basex.core.cmd.RepoDelete;
 import org.basex.core.cmd.RepoInstall;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.util.Err;
@@ -270,27 +271,12 @@ public final class PackageAPITest extends AdvancedQueryTest {
     }
     // Try to install a package
     new RepoInstall(REPO + "pkg3.xar", null).execute(ctx);
-    final File pkgDir = new File(REPO + "pkg3");
-    assertTrue(pkgDir.exists());
-    assertTrue(pkgDir.isDirectory());
-    final File pkgDesc = new File(REPO + "pkg3/expath-pkg.xml");
-    assertTrue(pkgDesc.exists());
-    final File modDir1 = new File(REPO + "pkg3/pkg3");
-    assertTrue(modDir1.exists());
-    assertTrue(modDir1.isDirectory());
-    final File modDir2 = new File(REPO + "pkg3/pkg3/mod");
-    assertTrue(modDir2.exists());
-    assertTrue(modDir2.isDirectory());
-    final File modFile = new File(REPO + "pkg3/pkg3/mod/pkg3mod1.xql");
-    assertTrue(modFile.exists());
-
-    // Delete package
-    modFile.delete();
-    modDir2.delete();
-    modDir1.delete();
-    pkgDesc.delete();
-    pkgDir.delete();
-
+    assertTrue(dir("pkg3"));
+    assertTrue(file("pkg3/expath-pkg.xml"));
+    assertTrue(dir("pkg3/pkg3"));
+    assertTrue(dir("pkg3/pkg3/mod"));
+    assertTrue(file("pkg3/pkg3/mod/pkg3mod1.xql"));
+    assertTrue(new IOFile(REPO + "pkg3").delete());
   }
 
   /**
@@ -303,32 +289,20 @@ public final class PackageAPITest extends AdvancedQueryTest {
     // Install package
     new RepoInstall(REPO + "testJar.xar", null).execute(ctx);
     // Ensure package was properly installed
-    final File pkgDir = new File(REPO + "testJar");
-    assertTrue(pkgDir.exists());
-    assertTrue(pkgDir.isDirectory());
-    final File pkgDesc = new File(REPO + "testJar/expath-pkg.xml");
-    assertTrue(pkgDesc.exists());
-    final File jarDesc = new File(REPO + "testJar/basex.xml");
-    assertTrue(jarDesc.exists());
-    final File modDir = new File(REPO + "testJar/jar");
-    assertTrue(modDir.exists());
-    assertTrue(modDir.isDirectory());
-    final File jar = new File(REPO + "testJar/jar/test.jar");
-    assertTrue(jar.exists());
-    final File wrapper = new File(REPO + "testJar/jar/wrapper.xq");
-    assertTrue(wrapper.exists());
+    assertTrue(dir("testJar"));
+    assertTrue(file("testJar/expath-pkg.xml"));
+    assertTrue(file("testJar/basex.xml"));
+    assertTrue(dir("testJar/jar"));
+    assertTrue(file("testJar/jar/test.jar"));
+    assertTrue(file("testJar/jar/wrapper.xq"));
+
     // Use package
     final QueryProcessor qp1 = new QueryProcessor(
         "import module namespace j='jar';\nj:print('test')", ctx);
     assertEquals(qp1.execute().toString(), "test");
     qp1.execute();
     // Delete package
-    wrapper.delete();
-    jar.delete();
-    modDir.delete();
-    jarDesc.delete();
-    pkgDesc.delete();
-    pkgDir.delete();
+    new IOFile(REPO + "testJar").delete();
   }
 
   /**
@@ -365,34 +339,27 @@ public final class PackageAPITest extends AdvancedQueryTest {
     }
     // Install a package without dependencies (pkg3)
     new RepoInstall(REPO + "pkg3.xar", null).execute(ctx);
+
     // Check if pkg3 is registered in the repo
     assertNotNull(ctx.repo.pkgDict().id(token("pkg3-10.0")) != 0);
     // Check if pkg3 was correctly unzipped
-    final File pkgDir1 = new File(REPO + "pkg3");
-    assertTrue(pkgDir1.exists());
-    assertTrue(pkgDir1.isDirectory());
-    final File pkgDesc1 = new File(REPO + "pkg3/expath-pkg.xml");
-    assertTrue(pkgDesc1.exists());
-    final File modDir1 = new File(REPO + "pkg3/pkg3/mod");
-    assertTrue(modDir1.exists());
-    assertTrue(modDir1.isDirectory());
-    final File modFile1 = new File(REPO + "pkg3/pkg3/mod/pkg3mod1.xql");
-    assertTrue(modFile1.exists());
+    assertTrue(dir("pkg3"));
+    assertTrue(file("pkg3/expath-pkg.xml"));
+    assertTrue(dir("pkg3/pkg3"));
+    assertTrue(dir("pkg3/pkg3/mod"));
+    assertTrue(file("pkg3/pkg3/mod/pkg3mod1.xql"));
+
     // Install another package (pkg4) with a dependency to pkg3
     new RepoInstall(REPO + "pkg4.xar", null).execute(ctx);
     // Check if pkg4 is registered in the repo
     assertNotNull(ctx.repo.pkgDict().id(token("pkg4-2.0")) != 0);
-    // Check if pkg3 was correctly unzipped
-    final File pkgDir2 = new File(REPO + "pkg4");
-    assertTrue(pkgDir2.exists());
-    assertTrue(pkgDir2.isDirectory());
-    final File pkgDesc2 = new File(REPO + "pkg4/expath-pkg.xml");
-    assertTrue(pkgDesc2.exists());
-    final File modDir2 = new File(REPO + "pkg4/pkg4/mod");
-    assertTrue(modDir2.exists());
-    assertTrue(modDir2.isDirectory());
-    final File modFile2 = new File(REPO + "pkg4/pkg4/mod/pkg4mod1.xql");
-    assertTrue(modFile2.exists());
+    // Check if pkg4 was correctly unzipped
+    assertTrue(dir("pkg4"));
+    assertTrue(file("pkg4/expath-pkg.xml"));
+    assertTrue(dir("pkg4/pkg4"));
+    assertTrue(dir("pkg4/pkg4/mod"));
+    assertTrue(file("pkg4/pkg4/mod/pkg4mod1.xql"));
+
     // Try to delete pkg3
     try {
       new RepoManager(ctx).delete("pkg3", null);
@@ -404,13 +371,33 @@ public final class PackageAPITest extends AdvancedQueryTest {
     new RepoDelete("http://www.pkg4.com", null).execute(ctx);
     // Check if pkg4 is unregistered from the repo
     assertTrue(ctx.repo.pkgDict().id(token("pkg4-2.0")) == 0);
+
     // Check if pkg4 directory was deleted
-    assertTrue(!pkgDir2.exists());
+    assertTrue(!dir("pkg4"));
     // Try to delete pkg3 (use package dir)
     new RepoDelete("pkg3", null).execute(ctx);
     // Check if pkg3 is unregistered from the repo
     assertTrue(ctx.repo.pkgDict().id(token("pkg3-10.0")) == 0);
-    // Check if pkg4 directory was deleted
-    assertTrue(!pkgDir1.exists());
+    // Check if pkg3 directory was deleted
+    assertTrue(!dir("pkg3"));
+  }
+
+  /**
+   * Checks if the specified path points to a file.
+   * @param path file path
+   * @return result of check
+   */
+  private boolean file(final String path) {
+    final File file = new File(REPO + path);
+    return file.exists() && !file.isDirectory();
+  }
+
+  /**
+   * Checks if the specified path points to a directory.
+   * @param path file path
+   * @return result of check
+   */
+  private boolean dir(final String path) {
+    return new File(REPO + path).isDirectory();
   }
 }
