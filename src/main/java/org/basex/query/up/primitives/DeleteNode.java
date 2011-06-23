@@ -1,7 +1,7 @@
 package org.basex.query.up.primitives;
 
+import org.basex.data.Data;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.ANode;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -12,29 +12,45 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class DeleteNode extends Primitive {
+public final class DeleteNode extends StructuralUpdate {
+
   /**
    * Constructor.
-   * @param ii input info
-   * @param n expression target node
+   * @param p pre
+   * @param d data
+   * @param i input info
    */
-  public DeleteNode(final InputInfo ii, final ANode n) {
-    super(PrimitiveType.DELETENODE, ii, n);
+  public DeleteNode(final int p, final Data d, final InputInfo i) {
+    super(PrimitiveType.DELETENODE, p, d, i);
   }
 
   @Override
-  public void apply(final int add) {
-    final DBNode n = (DBNode) node;
-    n.data.delete(n.pre + add);
+  public void merge(final UpdatePrimitive p) {
+    /* Multiple delete primitives can operate on the same
+     * target node.
+     */
+  }
+
+  @Override
+  public void apply() {
+    shifts = -1 * data.size(pre, data.kind(pre));
+    data.delete(pre);
+  }
+
+  @Override
+  public boolean checkTextAdjacency(final int c) {
+    // take pre value shifts into account
+    final int p = pre + c;
+    return mergeTexts(data, p - 1, p);
   }
 
   @Override
   public void update(final NamePool pool) {
-    pool.remove(node);
+    pool.remove(new DBNode(data, pre));
   }
 
   @Override
   public String toString() {
-    return Util.info("%[%]", Util.name(this), node);
+    return Util.name(this) + "[" + getTargetDBNode() + "]";
   }
 }

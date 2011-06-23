@@ -1,4 +1,4 @@
-package org.basex.query.up;
+package org.basex.query.up.expr;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.FComm;
 import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
@@ -16,7 +17,7 @@ import org.basex.query.item.NodeType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
-import org.basex.query.up.primitives.ReplaceElemContent;
+import org.basex.query.up.primitives.ReplaceElementContent;
 import org.basex.query.up.primitives.ReplaceNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.util.InputInfo;
@@ -60,6 +61,7 @@ public final class Replace extends Update {
     if(!(i instanceof ANode) || tp == NodeType.DOC || t.next() != null)
       UPTRGMULT.thrw(input);
     final ANode targ = (ANode) i;
+    final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
 
     // replace node
     final NodeCache aList = c.atts;
@@ -71,8 +73,8 @@ public final class Replace extends Update {
       if(tp == NodeType.PI) FPI.parse(txt, input);
 
       ctx.updates.add(tp == NodeType.ELM ?
-          new ReplaceElemContent(input, targ, txt) :
-          new ReplaceValue(input, targ, txt), ctx);
+          new ReplaceElementContent(dbn.pre, dbn.data, input, txt) :
+          new ReplaceValue(dbn.pre, dbn.data, input, txt), ctx);
     } else {
       final ANode par = targ.parent();
       if(par == null) UPNOPAR.thrw(input, i);
@@ -85,7 +87,7 @@ public final class Replace extends Update {
         if(aList.size() > 0) UPWRELM.thrw(input);
       }
       // conforms to specification: insertion sequence may be empty
-      ctx.updates.add(new ReplaceNode(input, targ, list), ctx);
+      ctx.updates.add(new ReplaceNode(dbn.pre, dbn.data, input, list), ctx);
     }
     return null;
   }

@@ -1,12 +1,14 @@
-package org.basex.query.up;
+package org.basex.query.up.expr;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.DeleteNode;
 import org.basex.util.InputInfo;
@@ -36,7 +38,8 @@ public final class Delete extends Update {
       final ANode n = (ANode) i;
       // nodes without parents are ignored
       if(n.parent() == null) continue;
-      ctx.updates.add(new DeleteNode(input, n), ctx);
+      final DBNode dbn = ctx.updates.determineDataRef(n, ctx);
+      ctx.updates.add(new DeleteNode(dbn.pre, dbn.data, input), ctx);
     }
     return null;
   }

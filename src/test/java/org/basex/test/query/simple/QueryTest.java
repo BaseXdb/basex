@@ -1,9 +1,10 @@
 package org.basex.test.query.simple;
 
 import static org.junit.Assert.*;
+
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.core.Command;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
