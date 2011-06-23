@@ -21,7 +21,7 @@ public enum Err {
   /** BASX0001: Evaluation exception. */
   NOIDX(BASX, 1, "Unknown index '%'."),
   /** BASX0002: Evaluation exception. */
-  NODBCTX(BASX, 2, "%: Database context needed."),
+  NODBCTX(BASX, 2, "%: database context needed."),
   /** BASX0003: Evaluation exception. */
   NODB(BASX, 3, "Database '%' not found."),
   /** BASX0004: Evaluation exception. */
@@ -145,9 +145,9 @@ public enum Err {
   /** PACK0001: Evaluation exception. */
   PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
   /** PACK0002: Evaluation exception. */
-  PKGINSTALLED(PACK, 2, "Package is already installed."),
+  PKGINST(PACK, 2, "Package is already installed."),
   /** PACK0003: Evaluation exception. */
-  PKGNOTINSTALLED(PACK, 3, "Necessary package '%' is not installed."),
+  NECPKGNOTINST(PACK, 3, "Necessary package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
   PKGDESCINV(PACK, 4, "Package descriptor: %."),
   /** PACK0005: Evaluation exception. */
@@ -160,6 +160,14 @@ public enum Err {
   CANNOTDELPKG(PACK, 8, "Package cannot be deleted. "),
   /** PACK0009: Evaluation exception. */
   PKGDEP(PACK, 9, "Package % depends on package %"),
+  /** PACK0010: Evaluation exception. */
+  PKGNOTSUPP(PACK, 10, "Package is not supported by current version of BaseX."),
+  /** PACK0011: Evaluation exception. */
+  JARDESCINV(PACK, 11, "Jar descriptor: %."),
+  /** PACK0012: Evaluation exception. */
+  JARREADFAIL(PACK, 12, "Reading jar descriptor failed: %"),
+  /** PACK0013: Evaluation exception. */
+  PKGNOTINST(PACK, 13, "Package '%' is not installed."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
@@ -550,7 +558,7 @@ public enum Err {
   /** XQST0049: Parsing exception. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
   /** XQST0054: Parsing exception. */
-  XPSTACK(XQST, 54, "Stack Overflow: Circular variable declaration?"),
+  XPSTACK(XQST, 54, "Stack Overflow: circular variable declaration?"),
   /** XQST0055: Parsing exception. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057: Parsing exception. */

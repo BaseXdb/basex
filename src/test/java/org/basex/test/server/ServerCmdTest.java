@@ -1,10 +1,17 @@
 package org.basex.test.server;
 
 import static org.basex.core.Text.*;
+
+import java.io.IOException;
+
 import org.basex.BaseXServer;
+import org.basex.core.cmd.CreateUser;
+import org.basex.core.cmd.Kill;
 import org.basex.server.ClientSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
@@ -25,6 +32,7 @@ public final class ServerCmdTest extends CmdTest {
 
     try {
       session = new ClientSession(CONTEXT, ADMIN, ADMIN);
+      cleanUp();
     } catch(final Exception ex) {
       fail(ex.toString());
     }
@@ -41,4 +49,18 @@ public final class ServerCmdTest extends CmdTest {
     // stop server instance
     server.stop();
   }
+  /** Kill test.
+   * @throws IOException on Server error.*/
+  @Test
+  public void kill() throws IOException {
+    no(new Kill("admin"));
+    no(new Kill("admin2"));
+    no(new Kill("ha*"));
+    ok(new CreateUser(NAME2, "test"));
+    ClientSession cs = new ClientSession(CONTEXT, NAME2, "test");
+    ok(new Kill(NAME2));
+    no(new Kill(NAME2 + "?"));
+    cs.close();
+  }
+
 }

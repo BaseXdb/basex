@@ -53,6 +53,15 @@ public final class IOFile extends IO {
     file = f;
   }
 
+  /**
+   * Constructor.
+   * @param dir directory
+   * @param n file name
+   */
+  public IOFile(final File dir, final String n) {
+    this(new File(dir, n));
+  }
+
   @Override
   public void cache() throws IOException {
     final DataInputStream dis = new DataInputStream(new FileInputStream(file));

@@ -69,7 +69,7 @@ public final class Quantifier extends ParseExpr {
 
   /**
    * Performs a recursive iteration on the specified variable position.
-   * @param ctx root reference
+   * @param ctx query context
    * @param it iterator
    * @param p variable position
    * @return satisfied flag

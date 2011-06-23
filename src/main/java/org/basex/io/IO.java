@@ -319,8 +319,7 @@ public abstract class IO {
     final ByteList bl = new ByteList();
     final InputStream bis = i instanceof BufferedInputStream ||
       i instanceof BufferInput ? i : new BufferedInputStream(i);
-    int b;
-    while((b = bis.read()) != -1) bl.add(b);
+    for(int b; (b = bis.read()) != -1;) bl.add(b);
     bis.close();
     cont = bl.toArray();
     return cont;

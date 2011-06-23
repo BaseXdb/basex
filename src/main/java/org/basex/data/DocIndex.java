@@ -48,8 +48,8 @@ final class DocIndex {
 
   /**
    * Returns the pre values of all document nodes.
-   * @param data data reference
    * A single dummy node is returned if the database is empty.
+   * @param data data reference
    * @return document nodes
    */
   int[] doc(final Data data) {
@@ -94,8 +94,7 @@ final class DocIndex {
 
     // normalize paths
     final String np = path.replaceAll("[\\\\//]+", "/").replaceAll("^/|/$", "");
-    byte[] exact = concat(SLASH, token(np));
-    if(Prop.WIN) exact = lc(exact);
+    final byte[] exact = concat(SLASH, Prop.WIN ? lc(token(np)) : token(np));
     final byte[] start = endsWith(exact, SLASH) ? exact : concat(exact, SLASH);
 
     // relevant paths: start from the first hit and return all subsequent hits

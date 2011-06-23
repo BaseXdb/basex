@@ -32,13 +32,16 @@ public final class Repo {
   private final Context context;
   /** Initialization flag (the repository can only be initialized once). */
   private boolean init;
+  /** Repository path. */
+  private File path;
 
   /**
    * Constructor.
-   * @param ctx context
+   * @param ctx database context
    */
   public Repo(final Context ctx) {
     context = ctx;
+    path = new File(ctx.prop.get(Prop.REPOPATH));
   }
 
   /**
@@ -68,11 +71,29 @@ public final class Repo {
     if(init) return;
     init = true;
 
-    if(repo != null) context.prop.set(Prop.REPOPATH, repo);
-    final File repoDir = new File(context.prop.get(Prop.REPOPATH));
-    final File[] dirs = repoDir.listFiles();
+    if(repo != null) {
+      context.prop.set(Prop.REPOPATH, repo);
+      path = new File(repo);
+    }
+    final File[] dirs = path.listFiles();
     if(dirs == null) return;
     for(final File dir : dirs) if(dir.isDirectory()) readPkg(dir);
+  }
+
+  /**
+   * Creates the repository directory, if not done yet.
+   */
+  public void create() {
+    if(!path.exists()) path.mkdirs();
+  }
+
+  /**
+   * Returns the path to the specified repository package.
+   * @param pkg package
+   * @return file reference
+   */
+  public File path(final String pkg) {
+    return new File(path, pkg);
   }
 
   /**
@@ -121,11 +142,10 @@ public final class Repo {
    * @param dir package directory
    */
   private void readPkg(final File dir) {
-    final File desc = new File(dir, DESCRIPTOR);
+    final IOFile desc = new IOFile(dir, DESCRIPTOR);
     if(desc.exists()) {
-      final IOFile io = new IOFile(desc);
       try {
-        final Package pkg = new PkgParser(context, null).parse(io);
+        final Package pkg = new PkgParser(context, null).parse(desc);
         // Read package components
         for(final Component comp : pkg.comps) {
           // Add component's namespace to namespace dictionary

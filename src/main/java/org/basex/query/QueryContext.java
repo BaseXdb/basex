@@ -170,7 +170,7 @@ public final class QueryContext extends Progress {
 
   /**
    * Constructor.
-   * @param ctx context reference
+   * @param ctx database context
    */
   public QueryContext(final Context ctx) {
     resource = new QueryResources(this);
@@ -327,12 +327,12 @@ public final class QueryContext extends Progress {
    */
   protected void plan(final Serializer ser) throws IOException {
     // only show root node if functions or variables exist
-    //final boolean r = funcs.size() != 0 || vars.global().size != 0;
-    ser.openElement(PLAN);
+    final boolean r = funcs.size() != 0 || vars.global().size != 0;
+    if(r) ser.openElement(PLAN);
     funcs.plan(ser);
     vars.plan(ser);
     root.plan(ser);
-    ser.closeElement();
+    if(r) ser.closeElement();
   }
 
   /**
@@ -377,7 +377,7 @@ public final class QueryContext extends Progress {
 
   /**
    * Copies properties of the specified context.
-   * @param ctx context
+   * @param ctx query context
    */
   public void copy(final QueryContext ctx) {
     baseURI = ctx.baseURI;

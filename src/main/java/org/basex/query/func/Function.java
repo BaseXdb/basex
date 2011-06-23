@@ -4,6 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.item.SeqType.*;
 
 import java.util.HashMap;
+
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.SeqType;
@@ -625,18 +626,21 @@ public enum Function {
   private static final HashMap<Class<? extends FuncCall>, byte[]> URIS =
     new HashMap<Class<? extends FuncCall>, byte[]>();
 
-  // initialization of class/uri mappings
+  // initialization of class/uri mappings and statically known modules
   static {
-    URIS.put(FNDb.class,   DBURI);
-    URIS.put(FNFile.class, FILEURI);
-    URIS.put(FNFt.class,   FTURI);
-    URIS.put(FNHof.class,  HOFURI);
-    URIS.put(FNHttp.class, HTTPURI);
+    // W3 functions
     URIS.put(FNMap.class,  MAPURI);
     URIS.put(FNMath.class, MATHURI);
+    // EXPath functions
+    URIS.put(FNFile.class, FILEURI);
+    URIS.put(FNHttp.class, HTTPURI);
+    URIS.put(FNZip.class,  ZIPURI);
+    // Internal functions
+    URIS.put(FNDb.class,   DBURI);
+    URIS.put(FNFt.class,   FTURI);
+    URIS.put(FNHof.class,  HOFURI);
     URIS.put(FNSent.class, SENTURI);
     URIS.put(FNUtil.class, UTILURI);
-    URIS.put(FNZip.class,  ZIPURI);
   }
 
   /** Function classes. */

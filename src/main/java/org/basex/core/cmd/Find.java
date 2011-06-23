@@ -35,7 +35,7 @@ public final class Find extends AQuery {
   /**
    * Creates an XQuery representation for the specified query.
    * @param query query
-   * @param ctx context reference
+   * @param ctx database context
    * @param root root flag
    * @return query
    */

@@ -11,16 +11,13 @@ import javax.swing.border.EtchedBorder;
 import org.basex.core.Context;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.CreateBackup;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.List;
-import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Restore;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
@@ -139,15 +136,26 @@ public final class DialogOpen extends Dialog {
   public void action(final Object cmp) {
     final Context ctx = gui.context;
     final String db = choice.getValue().trim();
-    final String opendb = ctx.data != null ? ctx.data.meta.name : null;
     ok = true;
-    if(refresh) choice.setData(List.list(ctx).toArray());
-    refresh = false;
+    if(refresh) {
+      // rebuild databases and focus list chooser
+      choice.setData(List.list(ctx).toArray());
+      choice.requestFocusInWindow();
+      refresh = false;
+    }
+
+    // [CG] only close database if it equals the database to be changed
+    //   optionally, reopen database
+
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
       final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, 1);
       if(!dr.ok() || dr.input().equals(db)) return;
+      refresh = true;
+      DialogProgress.execute(this, "", new AlterDB(db, dr.input()));
+
+      /* ??
       final AlterDB cmd = new AlterDB(db, dr.input());
       if(cmd.run(ctx)) {
         gui.notify.init();
@@ -156,43 +164,21 @@ public final class DialogOpen extends Dialog {
       }
       choice.setData(List.list(ctx).toArray());
       action(null);
+      */
+
     } else if(cmp == copy) {
       final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
       if(!dc.ok() || dc.input().equals(db)) return;
-      setCursor(GUIConstants.CURSORWAIT);
-      DialogProgress.execute(this, "", new Copy(db, dc.input()));
-      setCursor(GUIConstants.CURSORARROW);
       refresh = true;
+      DialogProgress.execute(this, "", new Copy(db, dc.input()));
     } else if(cmp == drop) {
       if(db.isEmpty() || !Dialog.confirm(gui, Util.info(DROPCONF, db))) return;
-      if(db.equals(opendb)) {
-        new Close().run(ctx);
-        gui.notify.init();
-      }
-      DropDB.drop(db, ctx.prop);
-      choice.setData(List.list(ctx).toArray());
-      choice.requestFocusInWindow();
-      if(choice.getValue().isEmpty()) {
-        doc.setText("");
-        detail.setText(Token.EMPTY);
-      }
-      action(null);
+      refresh = true;
+      DialogProgress.execute(this, "", new DropDB(db));
     } else if(cmp == backup) {
-      setCursor(GUIConstants.CURSORWAIT);
       DialogProgress.execute(this, "", new CreateBackup(db));
-      setCursor(GUIConstants.CURSORARROW);
     } else if(cmp == restore) {
-      setCursor(GUIConstants.CURSORWAIT);
-      if(db.equals(opendb)) {
-        new Close().run(gui.context);
-        gui.notify.init();
-      }
       DialogProgress.execute(this, "", new Restore(db));
-      setCursor(GUIConstants.CURSORARROW);
-      if(db.equals(opendb)) {
-        new Open(db).run(gui.context);
-        gui.notify.init();
-      }
     } else {
       // update components
       ok = ctx.prop.dbexists(db);

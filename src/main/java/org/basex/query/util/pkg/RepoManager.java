@@ -14,7 +14,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
@@ -51,13 +50,13 @@ public final class RepoManager {
   public void install(final String path, final InputInfo ii)
       throws QueryException {
 
-    // Check repository
-    createRepo();
+    // Check repository if not done yet
+    ctx.repo.create();
     // Check package existence
     final File pkgFile = new File(path);
     if(!pkgFile.exists()) PKGNOTEXIST.thrw(ii, path);
     // Check package name - must be a .xar file
-    checkPkgName(path, ii);
+    if(!path.endsWith(IO.XARSUFFIX)) INVPKGNAME.thrw(ii);
 
     try {
       final ZipFile xar = new ZipFile(pkgFile);
@@ -80,33 +79,28 @@ public final class RepoManager {
    */
   public void delete(final String pkg, final InputInfo ii)
       throws QueryException {
+    boolean found = false;
     for(final byte[] nextPkg : ctx.repo.pkgDict()) {
       if(nextPkg != null) {
         final byte[] dir = ctx.repo.pkgDict().get(nextPkg);
         if(eq(Package.getName(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
           // A package can be deleted either by its name or by its directory
           // name
-          final byte[] primPkg = getPrimary(nextPkg, ii);
+          found = true;
+          // Check if package to be deleted participates in a dependency
+          final byte[] primPkg = primary(nextPkg, ii);
           if(primPkg == null) {
             // Clean package repository
-            final File f = new File(ctx.prop.get(Prop.REPOPATH), string(dir));
-            final File desc = new File(f, DESCRIPTOR);
-            ctx.repo.remove(new PkgParser(ctx, ii).parse(new IOFile(desc)));
+            final File f = ctx.repo.path(string(dir));
+            final IOFile desc = new IOFile(f, DESCRIPTOR);
+            ctx.repo.remove(new PkgParser(ctx, ii).parse(desc));
             // Package does not participate in a dependency => delete it
-            deleteFromDisc(f, ii);
-          } else {
-            PKGDEP.thrw(ii, string(primPkg), pkg);
-          }
+            if(!new IOFile(f).delete()) CANNOTDELPKG.thrw(ii);
+          } else PKGDEP.thrw(ii, string(primPkg), pkg);
         }
       }
     }
-  }
-
-  /**
-   * Checks if repository already exists and if not creates it.
-   */
-  private void createRepo() {
-    repoPath().mkdirs();
+    if(!found) PKGNOTINST.thrw(ii, pkg);
   }
 
   /**
@@ -115,7 +109,7 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private void unzip(final ZipFile xar) throws IOException {
-    final File dir = new File(repoPath(), extractPkgName(xar.getName()));
+    final File dir = ctx.repo.path(extractPkgName(xar.getName()));
     dir.mkdir();
 
     final Enumeration<? extends ZipEntry> en = xar.entries();
@@ -145,26 +139,6 @@ public final class RepoManager {
   }
 
   /**
-   * Returns the path to the repository.
-   * @return repository path
-   */
-  private File repoPath() {
-    return new File(ctx.prop.get(Prop.REPOPATH));
-  }
-
-  /**
-   * Checks if package to be installed is a .xar archive.
-   * @param pkgName package name
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private static void checkPkgName(final String pkgName, final InputInfo ii)
-      throws QueryException {
-
-    if(!pkgName.endsWith(IO.XARSUFFIX)) INVPKGNAME.thrw(ii);
-  }
-
-  /**
    * Extracts package name from package path.
    * @param path package path
    * @return package name
@@ -181,34 +155,19 @@ public final class RepoManager {
    * @return package depending on the current one
    * @throws QueryException query exception
    */
-  private byte[] getPrimary(final byte[] pkgName, final InputInfo ii)
+  private byte[] primary(final byte[] pkgName, final InputInfo ii)
       throws QueryException {
     for(final byte[] nextPkg : ctx.repo.pkgDict()) {
       if(nextPkg != null && !eq(nextPkg, pkgName)) {
         // Check only packages different from the current one
-        final File desc = new File(new File(ctx.prop.get(Prop.REPOPATH),
+        final IOFile desc = new IOFile(ctx.repo.path(
             string(ctx.repo.pkgDict().get(nextPkg))), DESCRIPTOR);
-        final Package pkg = new PkgParser(ctx, ii).parse(new IOFile(desc));
+        final Package pkg = new PkgParser(ctx, ii).parse(desc);
+        final byte[] name = Package.getName(pkgName);
         for(final Dependency dep : pkg.dep)
-          if(eq(dep.pkg, Package.getName(pkgName)))
-            return Package.getName(nextPkg);
+          if(eq(dep.pkg, name)) return Package.getName(nextPkg);
       }
     }
     return null;
   }
-
-  /**
-   * Deletes a package recursively.
-   * @param dir package directory
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private void deleteFromDisc(final File dir, final InputInfo ii)
-      throws QueryException {
-    final File[] files = dir.listFiles();
-    if(files != null) for(final File f : files) deleteFromDisc(f, ii);
-    if(!dir.delete()) CANNOTDELPKG.thrw(ii);
-  }
-
-
 }

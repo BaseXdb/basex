@@ -37,7 +37,7 @@ public final class Users {
   public Users(final boolean global) {
     if(!global) return;
 
-    file = new File(Prop.HOME + IO.BASEXSUFFIX + "perm");
+    file = new File(Prop.HOME, IO.BASEXSUFFIX + "perm");
     if(!file.exists()) {
       // create default admin user with all rights
       list.add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
@@ -186,15 +186,15 @@ public final class Users {
     for(final User user : list) {
       if(users != null) if(users.get(user.name) == null) continue;
 
-      final TokenList entry = new TokenList();
-      entry.add(user.name);
-      entry.add(user.perm(User.READ) ? "X" : "");
-      entry.add(user.perm(User.WRITE) ? "X" : "");
+      final TokenList tl = new TokenList();
+      tl.add(user.name);
+      tl.add(user.perm(User.READ) ? "X" : "");
+      tl.add(user.perm(User.WRITE) ? "X" : "");
       if(sz == 5) {
-        entry.add(user.perm(User.CREATE) ? "X" : "");
-        entry.add(user.perm(User.ADMIN) ? "X" : "");
+        tl.add(user.perm(User.CREATE) ? "X" : "");
+        tl.add(user.perm(User.ADMIN) ? "X" : "");
       }
-      table.contents.add(entry);
+      table.contents.add(tl);
     }
     table.sort();
     table.toTop(token(ADMIN));

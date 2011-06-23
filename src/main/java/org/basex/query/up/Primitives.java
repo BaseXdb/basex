@@ -74,7 +74,7 @@ abstract class Primitives {
 
   /**
    * Checks updates for violations.
-   * @param ctx query context reference
+   * @param ctx query context
    * @throws QueryException query exception
    */
   protected abstract void check(final QueryContext ctx) throws QueryException;

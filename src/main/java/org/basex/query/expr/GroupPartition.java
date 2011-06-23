@@ -175,7 +175,7 @@ final class GroupPartition {
 
   /**
    * Returns grouped variables.
-   * @param ctx context
+   * @param ctx query context
    * @param ret return expression
    * @param ks key list
    * @param vs value list

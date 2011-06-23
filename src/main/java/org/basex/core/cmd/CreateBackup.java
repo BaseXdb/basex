@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +18,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
@@ -80,9 +80,10 @@ public final class CreateBackup extends Command {
           IO.ZIPSUFFIX);
       final byte[] data = new byte[IO.BLOCKSIZE];
 
-      // OutputStream for zipping
+      // Create output stream for zipping; use fast compression
       zos = new ZipOutputStream(new BufferedOutputStream(
           new FileOutputStream(file)));
+      zos.setLevel(1);
       zos.putNextEntry(new ZipEntry(in.getName() + '/'));
       zos.closeEntry();
 
@@ -91,20 +92,20 @@ public final class CreateBackup extends Command {
       tf = files.length;
       for(final File f : files) {
         of++;
-        BufferedInputStream bis = null;
+        FileInputStream fis = null;
         try {
-          bis = new BufferedInputStream(new FileInputStream(f), IO.BLOCKSIZE);
+          fis = new FileInputStream(f);
           zos.putNextEntry(new ZipEntry(in.getName() + '/' + f.getName()));
-          int c;
-          while((c = bis.read(data)) != -1) zos.write(data, 0, c);
+          for(int c; (c = fis.read(data)) != -1;) zos.write(data, 0, c);
           zos.closeEntry();
         } finally {
-          if(bis != null) try { bis.close(); } catch(final IOException e) { }
+          if(fis != null) try { fis.close(); } catch(final IOException e) { }
         }
       }
       zos.close();
       return true;
     } catch(final IOException ex) {
+      Util.debug(ex);
       return false;
     } finally {
       if(zos != null) try { zos.close(); } catch(final IOException e) { }
