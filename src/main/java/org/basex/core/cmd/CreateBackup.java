@@ -19,6 +19,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
@@ -80,9 +81,10 @@ public final class CreateBackup extends Command {
           IO.ZIPSUFFIX);
       final byte[] data = new byte[IO.BLOCKSIZE];
 
-      // OutputStream for zipping
+      // Create output stream for zipping; use fast compression
       zos = new ZipOutputStream(new BufferedOutputStream(
           new FileOutputStream(file)));
+      zos.setLevel(1);
       zos.putNextEntry(new ZipEntry(in.getName() + '/'));
       zos.closeEntry();
 
@@ -105,6 +107,7 @@ public final class CreateBackup extends Command {
       zos.close();
       return true;
     } catch(final IOException ex) {
+      Util.debug(ex);
       return false;
     } finally {
       if(zos != null) try { zos.close(); } catch(final IOException e) { }
