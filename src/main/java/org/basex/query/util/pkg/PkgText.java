@@ -14,7 +14,7 @@ public interface PkgText {
   /**Jar descriptor. */
   String JARDESC = "basex.xml";
   /** Jar path prefix. */
-  String JARPREF = "jar:file:";
+  String FILEPREF = "file:";
 
   /** <package/> root element. */
   /** Element package. */
