@@ -17,7 +17,7 @@ public interface PkgText {
   /**Jar descriptor. */
   String JARDESC = Text.NAMELC + IO.XMLSUFFIX;
   /** Jar path prefix. */
-  String JARPREF = "jar:file:";
+  String FILEPREF = "file:";
 
   /** <package/> root element. */
   /** Element package. */

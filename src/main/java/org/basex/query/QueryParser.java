@@ -8,7 +8,6 @@ import static org.basex.util.ft.FTFlag.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -128,6 +127,7 @@ import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
+import org.basex.util.JarClassLoader;
 import org.basex.util.Reflect;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -767,29 +767,28 @@ public class QueryParser extends InputParser {
    * @param modDir module directory
    * @throws QueryException query exception
    */
-  private void loadJars(final IO jarDesc, final IOFile pkgDir,
-      final String modDir) throws QueryException {
+  private void loadJars(final IO jarDesc,
+      final IOFile pkgDir, final String modDir) throws QueryException {
 
     final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
     final URL[] urls = new URL[desc.jars.size()];
-    // collect jar files
-    try {
-      int i = 0;
-      for(final byte[] jar : desc.jars) {
-        // assumes that jar is in the directory containing the xquery modules
-        final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(jar));
-          urls[i++] = new URL(PkgText.JARPREF + path + "!/");
+    // Collect jar files
+    int i = 0;
+    for(final byte[] jar : desc.jars) {
+      // Assumes that jar is in the directory containing the xquery modules
+      final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(jar));
+      try {
+        urls[i++] = new URL(PkgText.FILEPREF + path);
+      } catch(MalformedURLException ex) {
+        Util.debug(ex.getMessage());
       }
-    } catch(final MalformedURLException ex) {
-      Util.debug(ex.getMessage());
     }
-    // add jars to classpath
-    Reflect.setJarLoader(new URLClassLoader(urls));
-    // load public classes
+    // Add jars to classpath
+    Reflect.setJarLoader(new JarClassLoader(urls));
+    // Load public classes
     for(final byte[] c : desc.classes)
-      ctx.ns.add(new QNm(concat(token("java:"), c)), input());
+          ctx.ns.add(new QNm(concat(token("java:"), c)), input());
   }
-
   /**
    * Parses the "VarDecl" rule.
    * @throws QueryException query exception

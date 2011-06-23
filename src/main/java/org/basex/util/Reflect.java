@@ -2,7 +2,6 @@ package org.basex.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 
 /**
@@ -20,7 +19,7 @@ public final class Reflect {
   private static HashMap<String, Class<?>> classes =
     new HashMap<String, Class<?>>();
   /** Class loader for jars. */
-  private static URLClassLoader jarLoader;
+  public static JarClassLoader jarLoader;
 
   /** Hidden constructor. */
   private Reflect() { }
@@ -173,7 +172,7 @@ public final class Reflect {
    * Sets the class loader for jars.
    * @param l loader
    */
-  public static void setJarLoader(final URLClassLoader l) {
+  public static void setJarLoader(final JarClassLoader l) {
     jarLoader = l;
   }
 }
