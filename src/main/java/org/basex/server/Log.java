@@ -37,7 +37,7 @@ public final class Log {
 
   /**
    * Constructor.
-   * @param ctx context reference
+   * @param ctx database context
    * @param q quiet flag (no logging)
    */
   public Log(final Context ctx, final boolean q) {

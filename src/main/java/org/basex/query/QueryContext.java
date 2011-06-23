@@ -170,7 +170,7 @@ public final class QueryContext extends Progress {
 
   /**
    * Constructor.
-   * @param ctx context reference
+   * @param ctx database context
    */
   public QueryContext(final Context ctx) {
     resource = new QueryResources(this);
@@ -377,7 +377,7 @@ public final class QueryContext extends Progress {
 
   /**
    * Copies properties of the specified context.
-   * @param ctx context
+   * @param ctx query context
    */
   public void copy(final QueryContext ctx) {
     baseURI = ctx.baseURI;

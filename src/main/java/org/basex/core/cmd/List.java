@@ -71,7 +71,7 @@ public final class List extends Command {
 
   /**
    * Returns a list of all databases.
-   * @param ctx context reference
+   * @param ctx database context
    * @return available databases
    */
   public static StringList list(final Context ctx) {

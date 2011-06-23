@@ -87,7 +87,7 @@ public abstract class Command extends Progress {
   /**
    * Runs the command without permission, data and concurrency checks.
    * Should be called with care, and only by other database commands.
-   * @param ctx query context
+   * @param ctx database context
    * @return result of check
    */
   public final boolean run(final Context ctx) {
@@ -113,7 +113,7 @@ public abstract class Command extends Progress {
 
   /**
    * Checks if the command performs updates/write operations.
-   * @param ctx context reference
+   * @param ctx database context
    * @return result of check
    */
   @SuppressWarnings("unused")
@@ -124,7 +124,7 @@ public abstract class Command extends Progress {
   /**
    * Returns true if this command will change the {@link Context#data}
    * reference. This method is required by the progress dialog in the frontend.
-   * @param ctx context reference
+   * @param ctx database context
    * @return result of check
    */
   @SuppressWarnings("unused")
@@ -303,7 +303,7 @@ public abstract class Command extends Progress {
 
   /**
    * Runs the command without permission, data and concurrency checks.
-   * @param ctx query context
+   * @param ctx database context
    * @param os output stream
    * @return result of check
    */

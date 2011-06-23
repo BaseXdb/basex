@@ -34,7 +34,7 @@ public final class PkgParser {
 
   /**
    * Constructor.
-   * @param ctx context
+   * @param ctx database context
    * @param ii input info
    */
   public PkgParser(final Context ctx, final InputInfo ii) {

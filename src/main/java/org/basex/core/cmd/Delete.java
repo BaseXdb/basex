@@ -31,7 +31,7 @@ public final class Delete extends ACreate {
 
   /**
    * Deletes the specified nodes.
-   * @param ctx query context
+   * @param ctx database context
    * @param docs documents to be deleted
    */
   public static void delete(final Context ctx, final int... docs) {

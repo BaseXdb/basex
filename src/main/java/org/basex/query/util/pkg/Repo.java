@@ -37,7 +37,7 @@ public final class Repo {
 
   /**
    * Constructor.
-   * @param ctx context
+   * @param ctx database context
    */
   public Repo(final Context ctx) {
     context = ctx;
@@ -71,7 +71,7 @@ public final class Repo {
     init = true;
 
     if(repo != null) context.prop.set(Prop.REPOPATH, repo);
-    if(repo != null) path = repo;
+    path = context.prop.get(Prop.REPOPATH);
     final File repoDir = new File(path);
     final File[] dirs = repoDir.listFiles();
     if(dirs == null) return;

@@ -51,7 +51,7 @@ public class AxisPath extends Path {
 
   /**
    * If possible, converts this path expression to a path iterator.
-   * @param ctx context reference
+   * @param ctx query context
    * @return resulting operator
    */
   protected AxisPath finish(final QueryContext ctx) {

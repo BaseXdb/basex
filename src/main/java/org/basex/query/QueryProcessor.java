@@ -276,7 +276,7 @@ public final class QueryProcessor extends Progress {
 
   /**
    * Checks if the specified query performs updates.
-   * @param ctx context reference
+   * @param ctx database context
    * @param qu query string
    * @return result of check
    */

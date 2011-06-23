@@ -29,7 +29,7 @@ public final class JarParser {
 
   /**
    * Constructor.
-   * @param ctx context
+   * @param ctx database context
    * @param ii input info
    */
   public JarParser(final Context ctx, final InputInfo ii) {

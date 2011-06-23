@@ -21,7 +21,7 @@ public abstract class AGUI extends JFrame {
 
   /**
    * Default constructor.
-   * @param ctx context reference
+   * @param ctx database context
    * @param gprops gui properties
    */
   protected AGUI(final Context ctx, final GUIProp gprops) {

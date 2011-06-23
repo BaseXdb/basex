@@ -123,7 +123,7 @@ public final class GUI extends AGUI {
 
   /**
    * Default constructor.
-   * @param ctx context reference
+   * @param ctx database context
    * @param gprops gui properties
    */
   public GUI(final Context ctx, final GUIProp gprops) {
