@@ -99,10 +99,8 @@ public final class QueryResources {
     }
 
     try {
-      // open database
-      final Data d = Open.open(in, ctx.context);
-      addData(d);
-      return d;
+      // open and add new data reference
+      return addData(Open.open(in, ctx.context));
     } catch(final IOException ex) {
       throw NODB.thrw(ii, in);
     }
@@ -135,8 +133,7 @@ public final class QueryResources {
     // retrieve and add new data reference
     Data d = doc(in, ctx.baseURI == Uri.EMPTY, col, ii);
     if(d == null) d = doc(ctx.base().merge(in).path(), true, col, ii);
-    addData(d);
-    return d;
+    return addData(d);
   }
 
   /**
@@ -227,14 +224,16 @@ public final class QueryResources {
   /**
    * Adds a data reference to the global list.
    * @param d data reference to be added
+   * @return data reference
    */
-  private void addData(final Data d) {
+  private Data addData(final Data d) {
     if(datas == data.length) {
       final Data[] tmp = new Data[Array.newSize(datas)];
       System.arraycopy(data, 0, tmp, 0, datas);
       data = tmp;
     }
     data[datas++] = d;
+    return d;
   }
 
   /**

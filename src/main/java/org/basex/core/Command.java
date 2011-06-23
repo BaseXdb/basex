@@ -122,16 +122,19 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Checks if the command updates the data reference.
+   * Returns true if this command will change the {@link Context#data}
+   * reference. This method is required by the progress dialog in the frontend.
+   * @param ctx context reference
    * @return result of check
    */
-  public boolean newData() {
+  @SuppressWarnings("unused")
+  public boolean newData(final Context ctx) {
     return false;
   }
 
   /**
-   * Returns true if this class returns a progress value.
-   * Used by the progress bar in the visualization.
+   * Returns true if this command returns a progress value.
+   * This method is required by the progress dialog in the frontend.
    * @return result of check
    */
   public boolean supportsProg() {
@@ -140,7 +143,7 @@ public abstract class Command extends Progress {
 
   /**
    * Returns true if this command can be stopped.
-   * Used by the progress bar in the visualization.
+   * This method is required by the progress dialog in the frontend.
    * @return result of check
    */
   public boolean stoppable() {
@@ -254,13 +257,14 @@ public abstract class Command extends Progress {
   /**
    * Closes the specified database if it is currently opened and only
    * pinned once.
+   * @param ctx database context
    * @param db database to be closed
    * @return closed flag
    */
-  protected final boolean close(final String db) {
-    final boolean close = context.data != null &&
-      db.equals(context.data.meta.name) && context.datas.pins(db) == 1;
-    if(close) new Close().run(context);
+  protected static final boolean close(final Context ctx, final String db) {
+    final boolean close = ctx.data != null &&
+      db.equals(ctx.data.meta.name) && ctx.datas.pins(db) == 1;
+    if(close) new Close().run(ctx);
     return close;
   }
 

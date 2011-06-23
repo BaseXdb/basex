@@ -32,6 +32,8 @@ public final class Restore extends Command {
   private int of;
   /** Counter of total files. */
   private int tf;
+  /** States if current database was closed. */
+  private boolean closed;
 
   /**
    * Default constructor.
@@ -57,9 +59,8 @@ public final class Restore extends Command {
     if(!file.exists()) return error(DBBACKNF, db);
 
     // close database if it's currently opened and not opened by others
-    final boolean closed = close(db);
-
-    // check if database is pinned
+    if(!closed) closed = close(context, db);
+    // check if database is still pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to restore database
@@ -135,6 +136,12 @@ public final class Restore extends Command {
   @Override
   protected String tit() {
     return BUTTONRESTORE;
+  }
+
+  @Override
+  public boolean newData(final Context ctx) {
+    closed = close(ctx, args[0]);
+    return closed;
   }
 
   @Override

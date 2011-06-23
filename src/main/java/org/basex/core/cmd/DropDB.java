@@ -6,6 +6,7 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
@@ -37,7 +38,7 @@ public final class DropDB extends Command {
     boolean ok = true;
     for(final String db : dbs) {
       // close database if it's currently opened
-      close(db);
+      close(context, db);
       // check if database is still pinned
       if(context.pinned(db)) {
         info(DBLOCKED, db);
@@ -85,6 +86,11 @@ public final class DropDB extends Command {
         }
     }
     return pat != null || path.delete();
+  }
+
+  @Override
+  public boolean newData(final Context ctx) {
+    return close(ctx, args[0]);
   }
 
   @Override

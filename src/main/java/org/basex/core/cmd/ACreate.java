@@ -7,6 +7,7 @@ import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Command;
+import org.basex.core.Context;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -29,7 +30,7 @@ abstract class ACreate extends Command {
   /** Builder instance. */
   private Builder builder;
   /** Flag for creating new data instances. */
-  private boolean newData;
+  private boolean closing;
 
   /**
    * Protected constructor, specifying command arguments.
@@ -37,7 +38,7 @@ abstract class ACreate extends Command {
    */
   protected ACreate(final String... a) {
     this(User.CREATE, a);
-    newData = true;
+    closing = true;
   }
 
   /**
@@ -50,8 +51,9 @@ abstract class ACreate extends Command {
   }
 
   @Override
-  public boolean newData() {
-    return newData;
+  public boolean newData(final Context ctx) {
+    if(closing) new Close().run(ctx);
+    return closing;
   }
 
   @Override

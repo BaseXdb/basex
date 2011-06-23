@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
@@ -15,6 +16,9 @@ import org.basex.core.Commands.CmdAlter;
  * @author Christian Gruen
  */
 public final class AlterDB extends Command {
+  /** States if current database was closed. */
+  private boolean closed;
+
   /**
    * Default constructor.
    * @param db database
@@ -38,8 +42,8 @@ public final class AlterDB extends Command {
     if(prop.dbexists(name)) return error(DBEXISTS, name);
 
     // close database if it's currently opened and not opened by others
-    final boolean closed = close(db);
-    // database is currently locked
+    if(!closed) closed = close(context, db);
+    // check if database is still pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to alter database
@@ -57,6 +61,12 @@ public final class AlterDB extends Command {
   public static synchronized boolean alter(final String db,
       final String dbnew, final Prop pr) {
     return pr.dbpath(db).renameTo(pr.dbpath(dbnew));
+  }
+
+  @Override
+  public boolean newData(final Context ctx) {
+    closed = close(ctx, args[0]);
+    return closed;
   }
 
   @Override
