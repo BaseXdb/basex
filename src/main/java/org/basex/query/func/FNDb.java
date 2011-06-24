@@ -129,8 +129,9 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter text(final QueryContext ctx) throws QueryException {
-    final IndexContext ic = new IndexContext(ctx, checkData(ctx), null, true);
-    return new IndexAccess(input, expr[0], IndexType.TEXT, ic).iter(ctx);
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    final IndexContext ic = new IndexContext(ctx, data, null, true);
+    return new IndexAccess(input, expr[1], IndexType.TEXT, ic).iter(ctx);
   }
 
   /**
@@ -140,15 +141,16 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter attribute(final QueryContext ctx) throws QueryException {
-    final IndexContext ic = new IndexContext(ctx, checkData(ctx), null, true);
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    final IndexContext ic = new IndexContext(ctx, data, null, true);
     final IndexAccess ia = new IndexAccess(
-        input, expr[0], IndexType.ATTRIBUTE, ic);
+        input, expr[1], IndexType.ATTRIBUTE, ic);
 
     // return iterator if no name test is specified
-    if(expr.length < 2) return ia.iter(ctx);
+    if(expr.length < 3) return ia.iter(ctx);
 
     // parse and compile the name test
-    final Item name = checkEmpty(expr[1].item(ctx, input));
+    final Item name = checkEmpty(expr[2].item(ctx, input));
     final QNm nm = new QNm(checkStr(name, ctx), ctx, input);
 
     final NameTest nt = new NameTest(nm, NameTest.Name.STD, true, input);
@@ -175,7 +177,8 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter fulltext(final QueryContext ctx) throws QueryException {
-    return FNFt.search(checkData(ctx), checkStr(expr[0], ctx), this, ctx);
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    return FNFt.search(data, checkStr(expr[1], ctx), this, ctx);
   }
 
   /**
@@ -218,15 +221,20 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Str info(final QueryContext ctx) throws QueryException {
-    byte[] info;
-    if(expr.length == 1) {
-      final byte[] tp = checkStr(expr[0], ctx);
-      final CmdIndexInfo cmd = InfoIndex.info(string(tp));
-      if(cmd == null) NOIDX.thrw(input, this);
-      info = InfoIndex.info(cmd, checkData(ctx));
+    final byte[] info;
+    if(expr.length == 0) {
+      info = Info.info(ctx.context);
     } else {
-      final boolean create = ctx.context.user.perm(User.CREATE);
-      info = InfoDB.db(checkData(ctx).meta, false, true, create);
+      final Data d = ctx.resource.data(checkStr(expr[0], ctx), input);
+      if(expr.length == 1) {
+        final boolean create = ctx.context.user.perm(User.CREATE);
+        info = InfoDB.db(d.meta, false, true, create);
+      } else {
+        final byte[] tp = checkStr(expr[1], ctx);
+        final CmdIndexInfo cmd = InfoIndex.info(string(tp));
+        if(cmd == null) NOIDX.thrw(input, this);
+        info = InfoIndex.info(cmd, d);
+      }
     }
     return Str.get(delete(info, '\r'));
   }
