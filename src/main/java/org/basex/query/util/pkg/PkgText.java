@@ -16,8 +16,6 @@ public interface PkgText {
   String DESCRIPTOR = "expath-pkg" + IO.XMLSUFFIX;
   /**Jar descriptor. */
   String JARDESC = Text.NAMELC + IO.XMLSUFFIX;
-  /** Jar path prefix. */
-  String FILEPREF = "file:";
 
   /** <package/> root element. */
   /** Element package. */

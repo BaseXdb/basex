@@ -24,8 +24,6 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
-  /** File prefix. */
-  private static final String FILEPREF = "file:";
   /** File reference. */
   private final File file;
 

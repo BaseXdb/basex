@@ -778,7 +778,7 @@ public class QueryParser extends InputParser {
       // Assumes that jar is in the directory containing the xquery modules
       final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(jar));
       try {
-        urls[i++] = new URL(PkgText.FILEPREF + path);
+        urls[i++] = new URL(IO.FILEPREF + path);
       } catch(MalformedURLException ex) {
         Util.debug(ex.getMessage());
       }

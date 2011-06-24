@@ -33,6 +33,8 @@ public abstract class IO {
   public static final String TXTSUFFIX = ".txt";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
+  /** File prefix. */
+  public static final String FILEPREF = "file:";
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =
@@ -99,7 +101,7 @@ public abstract class IO {
   public static IO get(final String s) {
     if(s == null) return new IOFile("");
     if(s.startsWith("<")) return new IOContent(Token.token(s));
-    if(!s.contains("://") || s.startsWith("file:")) return new IOFile(s);
+    if(!s.contains("://") || s.startsWith(FILEPREF)) return new IOFile(s);
     return new IOUrl(s);
   }
 
