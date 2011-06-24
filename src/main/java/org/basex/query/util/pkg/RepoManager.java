@@ -123,7 +123,8 @@ public final class RepoManager {
         final Package pkg = new PkgParser(ctx, ii).parse(desc);
         final byte[] name = Package.name(pkgName);
         for(final Dependency dep : pkg.dep)
-          if(eq(dep.pkg, name)) return Package.name(nextPkg);
+          // Check only package dependencies
+          if(dep.pkg != null && eq(dep.pkg, name)) return Package.name(nextPkg);
       }
     }
     return null;
