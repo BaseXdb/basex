@@ -142,7 +142,6 @@ public final class Repo {
         // read package components
         for(final Component comp : pkg.comps) {
           // add component's namespace to namespace dictionary
-          System.out.println("=> " + string(comp.uri));
           if(comp.uri != null) {
             if(nsDict.id(comp.uri) != 0) {
               nsDict.get(comp.uri).add(name);
