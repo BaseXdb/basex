@@ -63,7 +63,7 @@ public abstract class Compare {
    */
   public static void main(final String[] args) throws Exception {
     // write temporary XSLT query context to disk
-    if(xsltMode) IO.get(TMPCTX).write(Token.token("<x/>"));
+    if(xsltMode) new IOFile(TMPCTX).write(Token.token("<x/>"));
 
     // loop through all queries
     final BufferedReader br = new BufferedReader(
@@ -77,8 +77,8 @@ public abstract class Compare {
     br.close();
 
     // delete temporary files
-    IO.get(TMP).delete();
-    IO.get(TMPCTX).delete();
+    new IOFile(TMP).delete();
+    new IOFile(TMPCTX).delete();
   }
 
   /**
@@ -96,7 +96,8 @@ public abstract class Compare {
     }
 
     // write XQuery or XSLT to temporary file
-    IO.get(TMP).write(xsltMode ? Util.inf(XSLT, query) : Token.token(query));
+    new IOFile(TMP).write(xsltMode ? Util.inf(XSLT, query) :
+      Token.token(query));
 
     boolean same = true;
     for(final String[] proc : PROCS) {

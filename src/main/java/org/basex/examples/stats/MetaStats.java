@@ -46,10 +46,10 @@ public final class MetaStats extends Statistics {
     //add(tl, "max(for $d in //* return count($d/@*))");
     tl.add("xxx");
     // total number of element names
-    tl.add(data.tags.size());
+    tl.add(data.tagindex.size());
     //add(tl, "count(distinct-values(for $d in //* return name($d)))");
     // total number of attribute names
-    tl.add(data.atts.size());
+    tl.add(data.atnindex.size());
     //add(tl, "count(distinct-values(for $d in //@* return name($d)))");
     // total number of namespace URIs
     tl.add(data.ns.size());
@@ -61,9 +61,7 @@ public final class MetaStats extends Statistics {
     //add(tl, "sum(for $d in //@* return string-length($d) + 1)");
     // database size
     tl.add(format(data.meta.dbsize()));
-    // document height
-    tl.add(data.meta.height);
     // number of documents
-    tl.add(data.meta.ndocs);
+    tl.add(data.doc().length);
   }
 }
