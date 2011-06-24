@@ -28,6 +28,7 @@ import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.TextInput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -214,8 +215,8 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
     context.prop.set(Prop.CHOP, false);
 
-    new Check(path + input).execute(context);
-    data = context.data;
+    //new Check(path + input).execute(context);
+    data = CreateDB.xml(new IOFile(path + input), context);
 
     final Nodes root = new Nodes(0, data);
     Util.outln(NL + Util.name(this) + " Test Suite " +
@@ -344,7 +345,7 @@ public abstract class W3CTS {
       final Nodes state = new Nodes(nodes.list[n], nodes.data);
 
       final String inname = text("*:query/@name", state);
-      context.query = IO.get(queries + pth + inname + IO.XQSUFFIX);
+      context.query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
       final String in = read(context.query);
       String er = null;
       ItemCache iter = null;
@@ -421,7 +422,7 @@ public abstract class W3CTS {
       final TokenList result = new TokenList();
       for(int o = 0; o < expOut.size(); ++o) {
         final String resFile = string(data.atom(expOut.list[o]));
-        final IO exp = IO.get(expected + pth + resFile);
+        final IOFile exp = new IOFile(expected + pth + resFile);
         result.add(read(exp));
       }
 
@@ -650,7 +651,7 @@ public abstract class W3CTS {
         expr = coll(nm, qp);
       } else {
         // assign document
-        final String dbname = IO.get(src).dbname();
+        final String dbname = new IOFile(src).dbname();
         Function def = Function.DOC;
         // updates: drop updated document or open updated database
         if(updating()) {
@@ -715,7 +716,7 @@ public abstract class W3CTS {
 
     for(int c = 0; c < nod.size(); ++c) {
       final String file = pth + string(data.atom(nod.list[c])) + IO.XQSUFFIX;
-      final String in = read(IO.get(queries + file));
+      final String in = read(new IOFile(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
       final Value val = xq.value();
       qp.bind(string(data.atom(var.list[c])), val);
@@ -751,7 +752,7 @@ public abstract class W3CTS {
    */
   private String error(final String nm, final String error) {
     final String error2 = expected + nm + ".log";
-    final IO file = IO.get(error2);
+    final IO file = new IOFile(error2);
     return file.exists() ? error + "/" + read(file) : error;
   }
 
