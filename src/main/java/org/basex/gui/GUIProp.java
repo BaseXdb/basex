@@ -4,6 +4,7 @@ import java.awt.Font;
 import org.basex.core.AProp;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.StringList;
 
 /**
@@ -179,7 +180,7 @@ public final class GUIProp extends AProp {
    * Refreshes the list of recent query files and updates the query path.
    * @param file new file
    */
-  public void recent(final IO file) {
+  public void recent(final IOFile file) {
     final StringList sl = new StringList();
 
     String path = null;

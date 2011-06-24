@@ -103,7 +103,7 @@ public final class Zip extends Progress {
         if(ze.isDirectory()) {
           trg.md();
         } else {
-          trg.parent().md();
+          new IOFile(trg.dir()).md();
           OutputStream out = null;
           try {
             out = new FileOutputStream(trg.path());

@@ -67,15 +67,6 @@ public final class IOFile extends IO {
    * @param dir directory
    * @param n file name
    */
-  public IOFile(final File dir, final String n) {
-    this(new File(dir, n));
-  }
-
-  /**
-   * Constructor.
-   * @param dir directory
-   * @param n file name
-   */
   public IOFile(final IOFile dir, final String n) {
     this(new File(dir.file, n));
   }
@@ -178,8 +169,8 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public IO merge(final String f) {
-    return f.contains(":") ? IO.get(f) : new IOFile(new File(dir(), f));
+  public IOFile merge(final String f) {
+    return f.contains(":") ? new IOFile(f) : new IOFile(dir(), f);
   }
 
   /**
@@ -190,12 +181,9 @@ public final class IOFile extends IO {
     return !file.exists() && file.mkdirs();
   }
 
-  /**
-   * Returns the parent directory.
-   * @return directory
-   */
-  public IOFile parent() {
-    return new IOFile(file.getParentFile());
+  @Override
+  public String dir() {
+    return isDir() ? path : path.substring(0, path.lastIndexOf('/') + 1);
   }
 
   /**

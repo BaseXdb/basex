@@ -10,7 +10,6 @@ import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
-import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
@@ -62,7 +61,7 @@ public final class Export extends Command {
     final HashSet<String> exported = new HashSet<String>();
     for(final int pre : data.doc()) {
       // create file path
-      final IO file = root.merge(Token.string(data.text(pre, true)));
+      final IOFile file = root.merge(Token.string(data.text(pre, true)));
       // create dir if necessary
       final IOFile dir = new IOFile(file.dir());
       if(!dir.exists()) dir.md();

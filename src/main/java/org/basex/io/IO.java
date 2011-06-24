@@ -85,8 +85,8 @@ public abstract class IO {
    */
   protected final void init(final String p) {
     path = p;
-    // use timer if no name is given
-    final String n = path.substring(path.lastIndexOf('/') + 1);
+    final String n = p.substring(p.lastIndexOf('/') + 1);
+    // use current time if no name is given
     name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) +
         XMLSUFFIX : n;
   }
@@ -237,7 +237,7 @@ public abstract class IO {
    * @return chopped filename
    */
   public String dir() {
-    return isDir() ? path() : path.substring(0, path.lastIndexOf('/') + 1);
+    return "";
   }
 
   /**

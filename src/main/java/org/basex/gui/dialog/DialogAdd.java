@@ -50,7 +50,7 @@ public final class DialogAdd extends Dialog {
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
-    final IO in = IO.get(gui.gprop.get(GUIProp.CREATEPATH));
+    final IOFile in = new IOFile(gui.gprop.get(GUIProp.CREATEPATH));
     path = new BaseXTextField(in.dir(), this);
     path.addKeyListener(keys);
     p.add(path);

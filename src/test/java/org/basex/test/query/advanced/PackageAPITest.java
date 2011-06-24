@@ -228,7 +228,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertTrue(dir("pkg3/pkg3"));
     assertTrue(dir("pkg3/pkg3/mod"));
     assertTrue(file("pkg3/pkg3/mod/pkg3mod1.xql"));
-    assertTrue(new IOFile(REPO + "pkg3").delete());
+    assertTrue(new IOFile(REPO, "pkg3").delete());
   }
 
   /**

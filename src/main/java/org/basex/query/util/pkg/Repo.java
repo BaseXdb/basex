@@ -3,8 +3,6 @@ package org.basex.query.util.pkg;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
-import java.io.File;
-
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
@@ -33,7 +31,7 @@ public final class Repo {
   /** Initialization flag (the repository can only be initialized once). */
   private boolean init;
   /** Repository path. */
-  private File path;
+  private IOFile path;
 
   /**
    * Constructor.
@@ -41,7 +39,7 @@ public final class Repo {
    */
   public Repo(final Context ctx) {
     context = ctx;
-    path = new File(ctx.prop.get(Prop.REPOPATH));
+    path = new IOFile(ctx.prop.get(Prop.REPOPATH));
   }
 
   /**
@@ -73,11 +71,9 @@ public final class Repo {
 
     if(repo != null) {
       context.prop.set(Prop.REPOPATH, repo);
-      path = new File(repo);
+      path = new IOFile(repo);
     }
-    final File[] dirs = path.listFiles();
-    if(dirs == null) return;
-    for(final File dir : dirs) if(dir.isDirectory()) readPkg(dir);
+    for(final IOFile dir : path.children()) if(dir.isDir()) readPkg(dir);
   }
 
   /**
@@ -134,7 +130,7 @@ public final class Repo {
    * namespace-dictionary and packages - to package dictionary.
    * @param dir package directory
    */
-  private void readPkg(final File dir) {
+  private void readPkg(final IOFile dir) {
     final IOFile desc = new IOFile(dir, DESCRIPTOR);
     if(desc.exists()) {
       try {
@@ -153,7 +149,7 @@ public final class Repo {
           }
         }
         // add package to package dictionary
-        pkgDict.add(pkg.getUniqueName(), token(dir.getName()));
+        pkgDict.add(pkg.getUniqueName(), token(dir.name()));
       } catch(final QueryException ex) {
         Util.errln(ex.getMessage());
       }
