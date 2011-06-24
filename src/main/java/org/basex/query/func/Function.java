@@ -462,11 +462,12 @@ public enum Function {
   /** Database function: opens a specific database node. */
   OPENID(FNDb.class, "open-id(string,id)", NOD_ZM, STR, ITR),
   /** Database function: searches the text index. */
-  TEXT(FNDb.class, "text(string)", NOD_ZM, ITEM),
+  TEXT(FNDb.class, "text(string,string)", NOD_ZM, STR, ITEM),
   /** Database function: searches the attribute index. */
-  ATTR(FNDb.class, "attribute(string[,name])", NOD_ZM, 1, ITEM, STR),
+  ATTR(FNDb.class, "attribute(string,string[,name])", NOD_ZM, 2, STR, ITEM,
+      STR),
   /** Database function: searches the full-text index. */
-  FULLTEXT(FNDb.class, "fulltext(string)", NOD_ZM, STR),
+  FULLTEXT(FNDb.class, "fulltext(string,string)", NOD_ZM, STR, STR),
   /** Database function: lists all database. */
   LIST(FNDb.class, "list([path])", STR_ZM, 0, STR),
   /** Database function: lists system information. */
