@@ -55,8 +55,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertNotNull(nsDict.get(token("ns1")));
     assertNotNull(nsDict.get(token("ns2")));
     assertNotNull(nsDict.get(token("ns3")));
-    TokenSet ts = new TokenSet();
-    ts = nsDict.get(token("ns1"));
+    TokenSet ts = nsDict.get(token("ns1"));
     assertEquals(ts.size(), 2);
     assertTrue(ts.id(token("http://www.pkg1.com-12.0")) != 0);
     assertTrue(ts.id(token("http://www.pkg2.com-10.0")) != 0);

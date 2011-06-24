@@ -76,7 +76,7 @@ public final class RepoManager {
     for(final byte[] nextPkg : ctx.repo.pkgDict()) {
       if(nextPkg != null) {
         final byte[] dir = ctx.repo.pkgDict().get(nextPkg);
-        if(eq(Package.getName(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
+        if(eq(Package.name(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
           // A package can be deleted either by its name or by its directory
           // name
           found = true;
@@ -121,9 +121,9 @@ public final class RepoManager {
         final IOFile desc = new IOFile(ctx.repo.path(
             string(ctx.repo.pkgDict().get(nextPkg))), DESCRIPTOR);
         final Package pkg = new PkgParser(ctx, ii).parse(desc);
-        final byte[] name = Package.getName(pkgName);
+        final byte[] name = Package.name(pkgName);
         for(final Dependency dep : pkg.dep)
-          if(eq(dep.pkg, name)) return Package.getName(nextPkg);
+          if(eq(dep.pkg, name)) return Package.name(nextPkg);
       }
     }
     return null;

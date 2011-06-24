@@ -53,36 +53,16 @@ public final class PkgParser {
     try {
       ANode node = childElements(new DBNode(io, context.prop)).next();
 
-      // tries to guess if the package is based on an obsolete packaging API
-      final boolean legacy = legacy(node);
-      // if yes, retrieves child node
-      if(legacy) node = childElements(node).next();
-
       // checks root node
-      final byte[] root = legacy ? MODULE : PACKAGE;
-      if(!eqNS(root, node.qname()))
+      if(!eqNS(PACKAGE, node.qname()))
         PKGDESCINV.thrw(input, Util.info(WHICHELEM, node.qname()));
 
-      parseAttributes(node, pkg, root);
+      parseAttributes(node, pkg, PACKAGE);
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
       throw PKGREADFAIL.thrw(input, ex.getMessage());
     }
-  }
-
-  /**
-   * Tries to guess if the package is based on an obsolete packaging API.
-   * This check will be removed in future versions.
-   * @param node root node
-   * @return result of check
-   */
-  private boolean legacy(final ANode node) {
-    final AxisIter ch = childElements(node);
-    for(ANode next; (next = ch.next()) != null;) {
-      if(eqNS(MODULE, next.qname())) return true;
-    }
-    return false;
   }
 
   /**
@@ -110,9 +90,6 @@ public final class PkgParser {
       PKGDESCINV.thrw(input, Util.info(MISSATTR, NAME, root));
     if(p.version == null)
       PKGDESCINV.thrw(input, Util.info(MISSATTR, VERSION, root));
-    if(eq(root, MODULE)) return;
-
-    // check mandatory attributes in version 1.0
     if(p.abbrev == null)
       PKGDESCINV.thrw(input, Util.info(MISSATTR, ABBREV, root));
     if(p.spec == null)

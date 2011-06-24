@@ -723,12 +723,12 @@ public class QueryParser extends InputParser {
 
     // find package in package dictionary
     final byte[] pDir = ctx.context.repo.pkgDict().get(pkgName);
-    if(pDir == null) error(NECPKGNOTINST);
+    if(pDir == null) error(NECPKGNOTINST, pkgName);
     final IOFile pkgDir = ctx.context.repo.path(string(pDir));
 
     // parse package descriptor
     final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
-    if(!pkgDesc.exists()) Util.debug(PkgText.NOTEXP, string(pkgName));
+    if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, string(pkgName));
 
     final Package pkg = new PkgParser(ctx.context, input()).parse(pkgDesc);
     // check if package contains a jar descriptor
@@ -742,7 +742,7 @@ public class QueryParser extends InputParser {
     for(final Dependency d : pkg.dep) {
       if(d.pkg != null) {
       // we consider only package dependencies here
-      final byte[] depPkg = new PkgValidator(ctx.context, input()).getDepPkg(d);
+      final byte[] depPkg = new PkgValidator(ctx.context, input()).depPkg(d);
       if(depPkg == null) {
         error(NECPKGNOTINST, string(d.pkg));
       } else {

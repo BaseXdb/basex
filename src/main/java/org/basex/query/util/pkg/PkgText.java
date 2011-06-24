@@ -22,8 +22,6 @@ public interface PkgText {
   /** <package/> root element. */
   /** Element package. */
   byte[] PACKAGE = token("package");
-  /** Element module. */
-  byte[] MODULE = token("module");
 
   /** <package/> attributes. */
   /** Attribute name. */
@@ -74,7 +72,7 @@ public interface PkgText {
   byte[] CLASS = token("class");
 
   /** Not expected initialization error. */
-  String NOTEXP = "Missing package descriptor for package '%'";
+  String MISSDESC = "Missing package descriptor for package '%'";
   /** Attribute missing. */
   String MISSATTR = "'%' attribute missing in '%' element";
   /** Invalid attribute. */

@@ -20,14 +20,15 @@ import org.basex.util.Util;
  */
 public final class Repo {
   /**
-   * Namespace-dictionary - contains all namespaces available in the repository
-   * and the packages in which they are found.
+   * Namespace-dictionary with all namespaces (unique names) available
+   * in the repository, and the packages in which they are found.
    */
   private final TokenObjMap<TokenSet> nsDict = new TokenObjMap<TokenSet>();
   /** Package dictionary with installed packages and their directories. */
   private final TokenMap pkgDict = new TokenMap();
   /** Context. */
   private final Context context;
+
   /** Initialization flag (the repository can only be initialized once). */
   private boolean init;
   /** Repository path. */
@@ -73,7 +74,9 @@ public final class Repo {
       context.prop.set(Prop.REPOPATH, repo);
       path = new IOFile(repo);
     }
-    for(final IOFile dir : path.children()) if(dir.isDir()) readPkg(dir);
+    for(final IOFile dir : path.children()) {
+      if(dir.isDir()) readPkg(dir);
+    }
   }
 
   /**
@@ -91,18 +94,19 @@ public final class Repo {
    * @param pkg deleted package
    */
   public synchronized void remove(final Package pkg) {
+    final byte[] name = pkg.uniqueName();
     // delete package from namespace dictionary
     for(final Component comp : pkg.comps) {
-      final byte[] ns = comp.uri;
-      final TokenSet pkgs = nsDict.get(ns);
+      final byte[] uri = comp.uri;
+      final TokenSet pkgs = nsDict.get(uri);
       if(pkgs.size() > 1) {
-        pkgs.delete(pkg.getUniqueName());
+        pkgs.delete(name);
       } else {
-        nsDict.delete(ns);
+        nsDict.delete(uri);
       }
     }
     // delete package from package dictionary
-    pkgDict.delete(pkg.getUniqueName());
+    pkgDict.delete(name);
   }
 
   /**
@@ -111,18 +115,17 @@ public final class Repo {
    * @param dir new package directory
    */
   public synchronized void add(final Package pkg, final String dir) {
+    final byte[] name = pkg.uniqueName();
     // update namespace dictionary
     for(final Component comp : pkg.comps) {
       if(nsDict.id(comp.uri) == 0) {
-        final TokenSet vals = new TokenSet();
-        vals.add(pkg.getUniqueName());
-        nsDict.add(comp.uri, vals);
+        nsDict.add(comp.uri, new TokenSet(name));
       } else {
-        nsDict.get(comp.uri).add(pkg.getUniqueName());
+        nsDict.get(comp.uri).add(name);
       }
     }
     // update package dictionary
-    pkgDict.add(pkg.getUniqueName(), token(dir));
+    pkgDict.add(name, token(dir));
   }
 
   /**
@@ -135,26 +138,26 @@ public final class Repo {
     if(desc.exists()) {
       try {
         final Package pkg = new PkgParser(context, null).parse(desc);
+        final byte[] name = pkg.uniqueName();
         // read package components
         for(final Component comp : pkg.comps) {
           // add component's namespace to namespace dictionary
+          System.out.println("=> " + string(comp.uri));
           if(comp.uri != null) {
-            if(nsDict.get(comp.uri) != null) {
-              nsDict.get(comp.uri).add(pkg.getUniqueName());
+            if(nsDict.id(comp.uri) != 0) {
+              nsDict.get(comp.uri).add(name);
             } else {
-              final TokenSet vals = new TokenSet();
-              vals.add(pkg.getUniqueName());
-              nsDict.add(comp.uri, vals);
+              nsDict.add(comp.uri, new TokenSet(name));
             }
           }
         }
         // add package to package dictionary
-        pkgDict.add(pkg.getUniqueName(), token(dir.name()));
+        pkgDict.add(name, token(dir.name()));
       } catch(final QueryException ex) {
         Util.errln(ex.getMessage());
       }
     } else {
-      Util.errln(NOTEXP, dir);
+      Util.errln(MISSDESC, dir);
     }
   }
 }

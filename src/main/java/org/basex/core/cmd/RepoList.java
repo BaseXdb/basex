@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
@@ -38,8 +37,8 @@ public class RepoList extends Command {
     for(final byte[] p : context.repo.pkgDict()) {
       if(p != null) {
         final TokenList tl = new TokenList();
-        tl.add(string(Package.getName(p)));
-        tl.add(string(Package.getVersion(p)));
+        tl.add(Package.name(p));
+        tl.add(Package.version(p));
         t.contents.add(tl);
       }
     }

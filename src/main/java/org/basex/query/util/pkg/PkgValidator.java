@@ -48,7 +48,7 @@ public final class PkgValidator {
    */
   public void check(final Package pkg) throws QueryException {
     // check if package is already installed
-    if(context.repo.pkgDict().get(pkg.getUniqueName()) != null)
+    if(context.repo.pkgDict().get(pkg.uniqueName()) != null)
       PKGINST.thrw(input);
     // check package dependencies
     checkDepends(pkg);
@@ -67,12 +67,12 @@ public final class PkgValidator {
     for(final Dependency dep : pkg.dep) {
       // first check of dependency elements are consistently defined in the
       // descriptor
-      if(dep.pkg == null && dep.processor == null) PKGDESCINV.thrw(input,
-          MISSSECOND);
+      if(dep.pkg == null && dep.processor == null)
+        PKGDESCINV.thrw(input, MISSSECOND);
       // if dependency involves a package, check if this package or an
       // appropriate version of it is installed
-      if(dep.pkg != null && getDepPkg(dep) == null) NECPKGNOTINST.thrw(input,
-          dep.pkg);
+      if(dep.pkg != null && depPkg(dep) == null)
+        NECPKGNOTINST.thrw(input, dep.pkg);
       // if dependency involves a processor, add it to the list with processor
       // dependencies
       if(dep.processor != null) procs.add(dep);
@@ -86,15 +86,15 @@ public final class PkgValidator {
    * @param dep dependency
    * @return result
    */
-  public byte[] getDepPkg(final Dependency dep) {
+  public byte[] depPkg(final Dependency dep) {
     // get installed versions of secondary package
     final TokenSet instVers = new TokenSet();
     for(final byte[] nextPkg : context.repo.pkgDict().keys())
       if(nextPkg != null && startsWith(nextPkg, dep.pkg))
-        instVers.add(getVersion(nextPkg));
+        instVers.add(version(nextPkg));
     // check if an appropriate version is already installed
-    final byte[] version = getAvailVersion(dep, instVers);
-    return version == null ? null : dep.getName(version);
+    final byte[] version = availVersion(dep, instVers);
+    return version == null ? null : dep.name(version);
   }
 
   /**
@@ -103,22 +103,19 @@ public final class PkgValidator {
    * @throws QueryException query exception
    */
   private void checkProcs(final List<Dependency> procs) throws QueryException {
-    boolean isSupported = false;
+    boolean supported = false;
     for(final Dependency d : procs) {
       if(!eq(lc(d.processor), token(Text.NAMELC))) {
-        isSupported = false;
+        supported = false;
         break;
       }
       // extract version
-      final int idx = Text.VERSION.indexOf(" ");
-      final String v = idx == -1 ? Text.VERSION
-          : Text.VERSION.substring(0, idx);
-      final TokenSet currentVers = new TokenSet();
-      currentVers.add(token(v));
+      final int i = Text.VERSION.indexOf(" ");
+      final String v = i == -1 ? Text.VERSION : Text.VERSION.substring(0, i);
       // check if current version is acceptable for the dependency
-      isSupported = getAvailVersion(d, currentVers) == null ? false : true;
+      supported = availVersion(d, new TokenSet(token(v))) != null;
     }
-    if(!isSupported) PKGNOTSUPP.thrw(input);
+    if(!supported) PKGNOTSUPP.thrw(input);
   }
 
   /**
@@ -128,17 +125,14 @@ public final class PkgValidator {
    *          for a package or current version of BaseX
    * @return available appropriate version
    */
-  private byte[] getAvailVersion(final Dependency dep,
+  private byte[] availVersion(final Dependency dep,
       final TokenSet currentVers) {
     if(currentVers.size() == 0) return null;
     if(dep.versions != null) {
       // get acceptable versions for secondary package/processor
-      final TokenSet versList = new TokenSet();
-      for(final byte[] v : split(dep.versions, ' '))
-        versList.add(v);
+      final TokenSet versList = new TokenSet(split(dep.versions, ' '));
       // check if any acceptable version is already installed
-      for(final byte[] v : versList)
-        if(currentVers.id(v) != 0) return v;
+      for(final byte[] v : versList) if(currentVers.id(v) != 0) return v;
     } else if(dep.semver != null) {
       // version template - version of secondary package or BaseX version must
       // be compatible with the defined template
@@ -190,7 +184,7 @@ public final class PkgValidator {
   private void checkComps(final Package pkg) throws QueryException {
     // modules other than xquery could be supported in future
     for(final Component comp : pkg.comps) {
-      if(isInstalled(comp, pkg.name)) MODISTALLED.thrw(input, comp.getName());
+      if(isInstalled(comp, pkg.name)) MODISTALLED.thrw(input, comp.name());
     }
   }
 
@@ -209,42 +203,17 @@ public final class PkgValidator {
     if(pkgs == null) return false;
 
     for(final byte[] nextPkg : pkgs) {
-      if(nextPkg != null && !eq(Package.getName(nextPkg), name)) {
+      if(nextPkg != null && !eq(Package.name(nextPkg), name)) {
         // installed package is a different one, not just a different version
         // of the current one
         final String pkgDir = string(context.repo.pkgDict().get(nextPkg));
         final IO pkgDesc = new IOFile(context.repo.path(pkgDir), DESCRIPTOR);
         final Package pkg = new PkgParser(context, input).parse(pkgDesc);
         for(final Component nextComp : pkg.comps) {
-          if(nextComp.getName().equals(comp.getName())) return true;
+          if(nextComp.name().equals(comp.name())) return true;
         }
       }
     }
     return false;
-  }
-
-  /**
-   * Returns installed versions of package.
-   * @param pkgName package name
-   * @return installed versions
-   */
-  public TokenSet getInstalledVersions(final byte[] pkgName) {
-    final TokenSet versions = new TokenSet();
-    for(final byte[] nextPkg : context.repo.pkgDict().keys())
-      if(nextPkg != null && startsWith(nextPkg, pkgName))
-        versions.add(getVersion(nextPkg));
-    return versions;
-  }
-
-  /**
-   * Extracts the acceptable versions for a secondary package.
-   * @param versions versions' set
-   * @return list with acceptable versions
-   */
-  public static TokenSet getAcceptVersions(final byte[] versions) {
-    final TokenSet versList = new TokenSet();
-    for(final byte[] v : split(versions, ' '))
-      versList.add(v);
-    return versList;
   }
 }

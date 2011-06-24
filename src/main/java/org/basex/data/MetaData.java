@@ -34,7 +34,7 @@ public final class MetaData {
 
   /** Encoding of XML document. */
   public String encoding = UTF8;
-  /** Path to original input documents. */
+  /** Path to original input. */
   public String path = "";
   /** Size of original documents. */
   public long filesize;
@@ -125,16 +125,16 @@ public final class MetaData {
       // match filename of database instance
       in = new DataInput(file(db, DATAINFO, pr));
       String str = "", k;
-      IO f = null;
+      IO p = null;
       long t = 0;
       while(!(k = string(in.readBytes())).isEmpty()) {
         final String v = string(in.readBytes());
         if(k.equals(DBSTR)) str = v;
-        else if(k.equals(DBFNAME)) f = IO.get(v);
+        else if(k.equals(DBFNAME)) p = IO.get(v);
         else if(k.equals(DBTIME)) t = toLong(v);
       }
-      return f != null && f.eq(IO.get(path)) && STORAGE.equals(str) &&
-        f.date() == t;
+      return p != null && p.eq(IO.get(path)) && STORAGE.equals(str) &&
+        p.date() == t;
     } catch(final IOException ex) {
       Util.debug(ex);
       return false;
