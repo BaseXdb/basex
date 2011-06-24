@@ -3,6 +3,7 @@ package org.basex.test.query.advanced;
 import static org.basex.core.Text.*;
 
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
@@ -98,15 +99,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // run function without and with index
     new DropIndex("text").execute(CONTEXT);
-    query(fun + "('XML')", "XML");
+    query(fun + "('db', 'XML')", "XML");
     new CreateIndex("text").execute(CONTEXT);
-    query(fun + "('XML')", "XML");
-    query(fun + "('XXX')", "");
-
-    // run function on closed database
-    new Close().execute(CONTEXT);
-    query("db:open('db')/" + fun + "('XML')", "XML");
-    error(fun + "('XXX')", Err.NODBCTX);
+    query(fun + "('db', 'XML')", "XML");
+    query(fun + "('db', 'XXX')", "");
   }
 
   /**
@@ -120,17 +116,12 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // run function without and with index
     new DropIndex("attribute").execute(CONTEXT);
-    query("data(" + fun + "('0'))", "0");
+    query("data(" + fun + "('db', '0'))", "0");
     new CreateIndex("attribute").execute(CONTEXT);
-    query("data(" + fun + "('0'))", "0");
-    query("data(" + fun + "('0', 'id'))", "0");
-    query("data(" + fun + "('0', 'XXX'))", "");
-    query(fun + "('XXX')", "");
-
-    // run function on closed database
-    new Close().execute(CONTEXT);
-    query("data(db:open('db')/" + fun + "('0'))", "0");
-    error("data(" + fun + "('XXX'))", Err.NODBCTX);
+    query("data(" + fun + "('db', '0'))", "0");
+    query("data(" + fun + "('db', '0', 'id'))", "0");
+    query("data(" + fun + "('db', '0', 'XXX'))", "");
+    query(fun + "('db', 'XXX')", "");
   }
 
   /**
@@ -144,15 +135,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // run function without and with index
     new DropIndex("fulltext").execute(CONTEXT);
-    error(fun + "('assignments')", Err.NOIDX);
+    error(fun + "('db', 'assignments')", Err.NOIDX);
     new CreateIndex("fulltext").execute(CONTEXT);
-    query(fun + "('assignments')", "Assignments");
-    query(fun + "('XXX')", "");
-
-    // run function on closed database
-    new Close().execute(CONTEXT);
-    query("db:open('db')/" + fun + "('assignments')", "Assignments");
-    error(fun + "('XXX')", Err.NODBCTX);
+    query(fun + "('db', 'assignments')", "Assignments");
+    query(fun + "('db', 'XXX')", "");
   }
 
   /**
@@ -170,6 +156,20 @@ public final class FNDbTest extends AdvancedQueryTest {
     contains(fun + "()", "daz db dba");
     new DropDB("daz").execute(CONTEXT);
     new DropDB("dba").execute(CONTEXT);
+  }
+
+  /**
+   * Test method for the db:list(string) function.
+   * @throws QueryException query exception
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testListDb() throws QueryException, BaseXException {
+    final String fun = check(Function.LIST);
+
+    // add documents
+    new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
+    contains(fun + "('db')", "test/");
   }
 
   /**
@@ -216,23 +216,17 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(Function.INFO);
 
     // standard test
-    contains(fun + "()", INFOON);
+    contains(fun + "('db')", INFOON);
 
     // drop indexes and check index queries
     final String[] types = { "text", "attribute", "fulltext" };
     for(final String type : types) new DropIndex(type).execute(CONTEXT);
-    for(final String type : types) query(fun + "('" + type + "')");
+    for(final String type : types) query(fun + "('db', '" + type + "')");
     // create indexes and check index queries
     for(final String type : types) new CreateIndex(type).execute(CONTEXT);
-    for(final String type : types) query(fun + "('" + type + "')");
+    for(final String type : types) query(fun + "('db', '" + type + "')");
     // check name indexes
-    query(fun + "('tag')");
-    query(fun + "('attname')");
-
-    // run function on closed database
-    new Close().execute(CONTEXT);
-    contains("db:open('db')/" + fun + "()", INFOON);
-    contains("db:open('db')/" + fun + "('tag')", ":");
-    error(fun + "('tag')", Err.NODBCTX);
+    query(fun + "('db', 'tag')");
+    query(fun + "('db', 'attname')");
   }
 }
