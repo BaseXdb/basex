@@ -761,7 +761,7 @@ public enum AtomType implements Type {
 
   @Override
   public SeqType seq() {
-    // cannot be statically instantiated due to circular dependency
+    // cannot be statically instantiated due to circular dependencies
     if(seq == null) seq = new SeqType(this);
     return seq;
   }

@@ -260,13 +260,13 @@ public enum Language {
    * @return result of check
    */
   public static boolean supported(final Language lang, final boolean stem) {
-    // Use default language if no language was specified
+    // use default language if no language was specified
     final Language ln = lang != null ? lang : Language.DEFAULT;
-    // Check tokenizers
+    // check tokenizers
     boolean supp = false;
     for(final Tokenizer t : Tokenizer.IMPL) supp |= t.supports(ln);
     if(!supp || !stem) return supp;
-    // Check stemmers (if applied)
+    // check stemmers (if applied)
     for(final Stemmer s : Stemmer.IMPL) if(s.supports(ln)) return true;
     return false;
   }

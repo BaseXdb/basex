@@ -29,7 +29,7 @@ final class WordnetStemmer extends Stemmer {
   private static final Object DICT;
 
   static {
-    // Don't try to find the other classes if Dictionary is not found:
+    // don't try to find the other classes if Dictionary is not found:
     if(Reflect.available(PKG)) {
       FIND_STEMS = null;
       CTR = null;

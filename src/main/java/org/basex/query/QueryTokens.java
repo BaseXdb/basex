@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.util.Token.*;
 
 import org.basex.core.Text;
+import org.basex.util.TokenSet;
 
 /**
  * This class contains common tokens for the query implementations.
@@ -462,25 +463,25 @@ public interface QueryTokens {
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns";
-  /** ZIP URI.*/
-  byte[] ZIPURI = token(EXPATH + "/zip");
-  /** HTTP Client URI. */
-  byte[] HTTPURI = token(EXPATH + "/http");
   /** File module URI. */
   byte[] FILEURI = token(EXPATH + "/file");
+  /** HTTP Client URI. */
+  byte[] HTTPURI = token(EXPATH + "/http");
   /** Package API URI. */
   byte[] PKGURI = token(EXPATH + "/pkg");
+  /** ZIP URI.*/
+  byte[] ZIPURI = token(EXPATH + "/zip");
 
-  /** Utility module URI. */
-  byte[] UTILURI = token(Text.URL + "/util");
   /** Database module URI. */
   byte[] DBURI = token(Text.URL + "/db");
   /** Full-text module URI. */
   byte[] FTURI = token(Text.URL + "/ft");
-  /** Sentiment URI. */
-  byte[] SENTURI = token(Text.URL + "/sent");
   /** Higher-order URI. */
   byte[] HOFURI = token(Text.URL + "/hof");
+  /** Sentiment URI. */
+  byte[] SENTURI = token(Text.URL + "/sent");
+  /** Utility module URI. */
+  byte[] UTILURI = token(Text.URL + "/util");
   /** Package URI. */
   byte[] PACKURI = token(Text.URL + "/pkg");
 
@@ -488,6 +489,9 @@ public interface QueryTokens {
   byte[] JAVAPRE = token("java:");
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
+
+  /** Static modules. */
+  TokenSet MODULES = new TokenSet(FILEURI, HTTPURI, PKGURI, ZIPURI);
 
   // QUERY PLAN ===============================================================
 

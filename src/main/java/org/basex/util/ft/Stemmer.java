@@ -15,7 +15,7 @@ public abstract class Stemmer extends LanguageImpl {
 
   /** Load stemmers and order them by precedence. */
   static {
-    // Built-in stemmers
+    // built-in stemmers
     IMPL.add(new EnglishStemmer(null));
     IMPL.add(new GermanStemmer(null));
 

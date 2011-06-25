@@ -35,15 +35,13 @@ public final class Prop extends AProp {
   /** Directory for storing the property files, database directory, etc. */
   public static final String HOME = Util.homeDir() + '/';
 
-  // The following properties will be saved to disk:
-
   /** Property information. */
   static final String PROPHEADER = "# Property File." + NL
       + "# You can set additional options at the end of the file." + NL;
   /** Property information. */
   static final String PROPUSER = "# User defined section";
 
-  // DATABASE & PROGRAM PATHS =================================================
+  // DATABASE & PROGRAM PATHS (will be written to disk) =======================
 
   /** Database path. */
   public static final Object[] DBPATH =

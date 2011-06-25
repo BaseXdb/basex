@@ -287,7 +287,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if this expression has free variables.
-   * @param ctx the query context on the level of this expression
+   * @param ctx query context on the level of this expression
    * @return {@code true} if there are variables which are used but not declared
    *         in this expression, {@code false} otherwise
    */

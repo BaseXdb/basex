@@ -123,7 +123,7 @@ public final class GUI extends AGUI {
 
   /**
    * Default constructor.
-   * @param ctx context reference
+   * @param ctx database context
    * @param gprops gui properties
    */
   public GUI(final Context ctx, final GUIProp gprops) {
@@ -298,10 +298,10 @@ public final class GUI extends AGUI {
       // run as command: command mode or exclamation mark as first character
       final int i = cmd ? 0 : 1;
       if(i == in.length()) return;
+
       try {
         // parse and run all commands
-        for(final Command c : new CommandParser(in.substring(i),
-            context).parse()) if(!exec(c, true)) break;
+        execute(true, new CommandParser(in.substring(i), context).parse());
       } catch(final QueryException ex) {
         if(!info.visible()) GUICommands.SHOWINFO.execute(this);
         info.setInfo(ex.getMessage(), null, null, false);
@@ -311,7 +311,7 @@ public final class GUI extends AGUI {
       xquery(in, true);
     } else {
       final String qu = Find.find(in, context, gprop.is(GUIProp.FILTERRT));
-      execute(new XQuery(qu), true);
+      execute(true, new XQuery(qu));
     }
   }
 
@@ -328,7 +328,7 @@ public final class GUI extends AGUI {
     final int u = ns.uri(Token.EMPTY, 0);
     if(u != 0) in = Util.info("declare default element namespace \"%\"; %",
         ns.uri(u), in);
-    execute(new XQuery(in), main);
+    execute(main, new XQuery(in));
   }
 
   /**
@@ -337,20 +337,24 @@ public final class GUI extends AGUI {
    * @param cmd command to be launched
    */
   public void execute(final Command cmd) {
-    execute(cmd, true);
+    execute(true, cmd);
   }
 
   /**
-   * Launches the specified command in a separate thread.
+   * Launches the specified commands in a separate thread.
    * The command is ignored if an update operation takes place.
-   * @param cmd command to be launched
    * @param main call from main window
+   * @param cmd command to be launched
    */
-  public void execute(final Command cmd, final boolean main) {
+  public void execute(final boolean main, final Command... cmd) {
+    // ignore command if updates take place
     if(updating) return;
+
     new Thread() {
       @Override
-      public void run() { exec(cmd, main); }
+      public void run() {
+        for(final Command c : cmd) if(!exec(c, main)) break;
+      }
     }.start();
   }
 
@@ -393,8 +397,12 @@ public final class GUI extends AGUI {
       updating = up;
 
       // resets the query editor
-      if(main && query.visible()) query.reset();
+      if(query.visible()) {
+        if(main) query.reset();
+        else if(c instanceof XQuery) query.start();
+      }
 
+      // evaluate command
       String inf = null;
       try {
         c.execute(context, ao);

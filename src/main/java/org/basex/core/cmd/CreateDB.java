@@ -85,7 +85,7 @@ public final class CreateDB extends ACreate {
    * and assigns it to the specified database context.
    * @param name name of the database
    * @param input input stream
-   * @param ctx return database context
+   * @param ctx database context
    * @return info string
    * @throws BaseXException database exception
    */
@@ -103,7 +103,7 @@ public final class CreateDB extends ACreate {
    * and assigns it to the specified database context.
    * @param name name of the database
    * @param parser parser
-   * @param ctx return database context
+   * @param ctx database context
    * @return info string
    * @throws BaseXException database exception
    */

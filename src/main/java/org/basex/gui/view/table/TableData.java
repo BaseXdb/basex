@@ -29,7 +29,7 @@ final class TableData {
   /** Maximum number for sorting data. */
   private static final byte[] MAXNUM = token(Double.MAX_VALUE);
 
-  /** Context reference. */
+  /** Database context. */
   final Context context;
   /** Root nodes. */
   TokenList roots;
@@ -77,7 +77,7 @@ final class TableData {
 
   /**
    * Initializes the table data.
-   * @param ctx context
+   * @param ctx database context
    * @param pr gui properties
    */
   TableData(final Context ctx, final GUIProp pr) {

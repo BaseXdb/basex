@@ -39,6 +39,7 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.BoolList;
 import org.basex.util.Performance;
 import org.basex.util.Util;
@@ -70,9 +71,9 @@ public final class EditorView extends View {
   /** Thread counter. */
   int threadID;
 
-  /** Current error file. */
+  /** File in which the most recent error occurred. */
   String errFile;
-  /** Current error position. */
+  /** Most recent error position. */
   int errPos;
 
   /** Header string. */
@@ -181,7 +182,7 @@ public final class EditorView extends View {
         final ActionListener al = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent ac) {
-            open(IO.get(ac.getActionCommand()));
+            open(new IOFile(ac.getActionCommand()));
           }
         };
         if(gui.gprop.strings(GUIProp.QUERIES).length == 0) {
@@ -201,7 +202,7 @@ public final class EditorView extends View {
         EditorArea edit = getEditor();
         if(errFile != null) {
           edit = find(IO.get(errFile), false);
-          if(edit == null) edit = open(IO.get(errFile));
+          if(edit == null) edit = open(new IOFile(errFile));
           tabs.setSelectedComponent(edit);
           edit.error = errPos;
         }
@@ -289,7 +290,7 @@ public final class EditorView extends View {
     final BaseXFileChooser fc = new BaseXFileChooser(GUIOPEN,
         gui.gprop.get(GUIProp.XQPATH), gui);
     fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
-    final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
+    final IOFile file = fc.select(BaseXFileChooser.Mode.FOPEN);
     if(file != null) {
       open(file);
       getEditor().opened = true;
@@ -318,7 +319,7 @@ public final class EditorView extends View {
       new BaseXFileChooser(GUISAVEAS, edit.file.path(), gui);
     fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
 
-    final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
+    final IOFile file = fc.select(BaseXFileChooser.Mode.FSAVE);
     if(file == null) return false;
     edit.file = file;
     edit.setSyntax(file);
@@ -339,7 +340,7 @@ public final class EditorView extends View {
    * @param file query file
    * @return opened editor
    */
-  public EditorArea open(final IO file) {
+  public EditorArea open(final IOFile file) {
     if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
 
     EditorArea edit = find(file, true);
@@ -401,15 +402,19 @@ public final class EditorView extends View {
   }
 
   /**
-   * Starts a waiting thread, which shows a waiting info after a short timeout.
+   * Starts a thread, which shows a waiting info after a short timeout.
    */
-  void startWait() {
+  public void start() {
     final int thread = ++threadID;
     new Thread() {
       @Override
       public void run() {
         Performance.sleep(200);
-        if(thread == threadID) info.setText(INFOWAIT, Msg.SUCCESS);
+        if(thread == threadID) {
+          info.setToolTipText(null);
+          info.setText(INFOWAIT, Msg.SUCCESS);
+          stop.setEnabled(true);
+        }
       }
     }.start();
   }
@@ -434,9 +439,7 @@ public final class EditorView extends View {
    * @return {@code false} if confirmation was canceled
    */
   public boolean confirm() {
-    for(final EditorArea edit : editors()) {
-      if(!confirm(edit)) return false;
-    }
+    for(final EditorArea edit : editors()) if(!confirm(edit)) return false;
     return true;
   }
 
@@ -508,7 +511,7 @@ public final class EditorView extends View {
    * Choose a unique tab file.
    * @return io reference
    */
-  private IO newTabFile() {
+  private IOFile newTabFile() {
     // collect numbers of existing files
     final BoolList bl = new BoolList();
     for(final EditorArea edit : editors()) {
@@ -521,7 +524,7 @@ public final class EditorView extends View {
     while(++c < bl.size() && bl.get(c));
     // create io reference
     final String dir = gui.gprop.get(GUIProp.XQPATH);
-    return IO.get(dir + EDITORFILE + (c == 1 ? "" : c));
+    return new IOFile(dir, EDITORFILE + (c == 1 ? "" : c));
   }
 
   /**

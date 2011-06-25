@@ -127,8 +127,7 @@ public final class FNQName extends FuncCall {
    * @return prefix sequence
    */
   private Iter inscope(final QueryContext ctx, final ANode node) {
-    final TokenSet pref = new TokenSet();
-    pref.add(XML);
+    final TokenSet pref = new TokenSet(XML);
 
     byte[] emp = null;
     ANode n = node;

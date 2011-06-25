@@ -682,6 +682,7 @@ public interface Text {
   String EVENTUNWAT = lang("ad_eventdet");
 
   // REPO COMMANDS ========================================================
+
   /** Package deleted. */
   String REPODEL = lang("repo_delete");
   /** Package installed. */
@@ -734,8 +735,6 @@ public interface Text {
 
   /** Error info. */
   String INFOBROSERERR = lang("info_browsererror");
-
-  // The following strings are dynamically bound by the SET command
 
   /** Info on query info. */
  String INFOQUERY = lang("info_query");

@@ -107,7 +107,7 @@ public final class PermissionTest {
     no(new Get("DBPATH"), testSession);
     no(new Set(CmdSet.QUERYINFO, false), testSession);
 
-    // Repo Stuff
+    // repo Stuff
     no(new RepoInstall(REPO, null), testSession);
     no(new RepoDelete(REPO, null), testSession);
     no(new RepoList(), testSession);
@@ -148,7 +148,7 @@ public final class PermissionTest {
     ok(new XQuery("//xml"), testSession);
     ok(new Find(NAME), testSession);
 
-    // Repo Stuff
+    // repo Stuff
     no(new RepoInstall(REPO, null), testSession);
     no(new RepoDelete(REPO, null), testSession);
     no(new RepoList(), testSession);
@@ -180,14 +180,14 @@ public final class PermissionTest {
     ok(new Rename(RENAMED, RENAMED + "2"), testSession);
     ok(new Rename(RENAMED + "2", RENAMED), testSession);
 
-    // Replace Test
+    // replace Test
     ok(new Close(), testSession);
     ok(new Open(RENAMED), testSession);
     ok(new Add("<xml>1</xml>", NAME + ".xml"), testSession);
     ok(new Optimize(), testSession);
     ok(new Replace(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
 
-    // Repo Stuff
+    // repo Stuff
     no(new RepoInstall(REPO, null), testSession);
     no(new RepoDelete(REPO, null), testSession);
     no(new RepoList(), testSession);
@@ -227,7 +227,7 @@ public final class PermissionTest {
     }
     ok(new DropDB(NAME), testSession);
 
-    // Repo Stuff
+    // repo Stuff
     no(new RepoInstall(REPO, null), testSession);
     no(new RepoDelete(REPO, null), testSession);
     no(new RepoList(), testSession);
@@ -259,7 +259,8 @@ public final class PermissionTest {
     ok(new Close(), testSession);
     ok(new Close(), adminSession);
     ok(new DropDB(NAME), adminSession);
-    // Repo Stuff
+
+    // repo Stuff
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     ok(new RepoDelete("pkg3", null), testSession);

@@ -14,7 +14,6 @@ import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
@@ -60,8 +59,7 @@ public final class QueryResources {
     if(!ctx.context.perm(User.READ, d.meta)) PERMNO.thrw(null, CmdPerm.READ);
 
     // assign initial context value
-    ctx.value = d.empty() ? Empty.SEQ :
-      DBNodeSeq.get(nodes.list, d, nodes.root, nodes.root);
+    ctx.value = DBNodeSeq.get(nodes.list, d, nodes.root, nodes.root);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set

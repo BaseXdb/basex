@@ -123,7 +123,7 @@ public final class ResponseHandler {
     final ItemCache payloads = new ItemCache();
     final ANode body;
     final boolean s = statusOnly != null && Bln.parse(statusOnly, ii);
-    // Multipart response
+    // multipart response
     if(startsWith(contentType, token("multipart"))) {
       final byte[] boundary = extractBoundary(conn.getContentType(), ii);
       final NodeCache a = new NodeCache();
@@ -132,7 +132,7 @@ public final class ResponseHandler {
       body = new FElem(new QNm(MULTIPART, HTTPURI), extractParts(
           conn.getInputStream(), s, payloads, concat(token("--"), boundary),
           prop, ii), a, EMPTY, new Atts().add(HTTP, HTTPURI), null);
-      // Single part response
+      // single part response
     } else {
       body = createBody(contentType);
       if(!s) payloads.add(
@@ -143,11 +143,11 @@ public final class ResponseHandler {
               contentType, prop, ii));
     }
 
-    // Construct <http:response/>
+    // construct <http:response/>
     final FElem responseEl = new FElem(new QNm(RESPONSE, HTTPURI), hdrs, attrs,
         EMPTY, new Atts().add(HTTP, HTTPURI), null);
     responseEl.children.add(body);
-    // Result
+    // result
     final ItemCache result = new ItemCache();
     result.add(responseEl);
     result.add(payloads.finish());
@@ -271,7 +271,7 @@ public final class ResponseHandler {
       final Prop prop, final InputInfo ii) throws IOException, QueryException {
 
     try {
-      // Read first line of multipart content
+      // read first line of multipart content
       byte[] next = readLine(io);
       // RFC 1341: Preamble shall be ignored -> read till 1st boundary
       while(next != null && !eq(sep, next))
@@ -311,23 +311,23 @@ public final class ResponseHandler {
       final boolean statusOnly, final ItemCache payloads, final byte[] sep,
       final byte[] end, final Prop prop, final InputInfo ii)
       throws IOException, QueryException {
-    // Content type of part payload - if not defined by header 'Content-Type',
+    // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
     byte[] partContType = TXT_PLAIN;
     String charset = null;
     final byte[] firstLine = readLine(io);
-    // Last line is reached:
+    // last line is reached:
     if(firstLine == null || eq(firstLine, end)) return null;
     final NodeCache partCh = new NodeCache();
     if(firstLine.length == 0) {
-      // Part has no headers
+      // part has no headers
       final byte[] p = extractPartPayload(io, sep, end, null);
       if(!statusOnly) payloads.add(interpretPayload(p, partContType, prop, ii));
     } else {
       // extract headers:
       byte[] nextHdr = firstLine;
       while(nextHdr != null && nextHdr.length > 0) {
-        // Extract charset from header 'Content-Type'
+        // extract charset from header 'Content-Type'
         if(startsWith(lc(nextHdr), CONT_TYPE_LC))
           charset = extractCharset(string(nextHdr));
         // parse header:
@@ -441,7 +441,7 @@ public final class ResponseHandler {
     if(index == -1) REQINV.thrw(info, "No separation boundary specified");
     String b = c.substring(index + 9); // 9 for "boundary="
     if(b.charAt(0) == '"') {
-      // If the boundary is enclosed in quotes, strip them
+      // if the boundary is enclosed in quotes, strip them
       index = b.lastIndexOf('"');
       b = b.substring(1, index);
     }
@@ -454,7 +454,7 @@ public final class ResponseHandler {
    * @return charset charset
    */
   private static String extractCharset(final String c) {
-    // Content type is unknown
+    // content type is unknown
     if(c == null) return null;
     final int index = c.toLowerCase().lastIndexOf("charset=");
     if(index == -1) return null;

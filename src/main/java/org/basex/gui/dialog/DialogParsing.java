@@ -142,7 +142,7 @@ public final class DialogParsing extends BaseXBack {
     xmlopts.add(new BaseXLabel(CHOPPINGINFO, false, false).border(0, 0, 8, 0));
     xmlopts.add(new BaseXLabel());
 
-    // CatalogResolving
+    // catalog resolver
     final boolean rsen = CatalogResolverWrapper.available();
     final BaseXBack fl = new BaseXBack(new TableLayout(2, 2, 8, 0));
     usecat.setEnabled(rsen);

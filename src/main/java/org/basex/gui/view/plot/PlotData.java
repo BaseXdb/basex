@@ -17,7 +17,7 @@ import org.basex.util.TokenList;
  * @author Lukas Kircher
  */
 final class PlotData {
-  /** Context reference. */
+  /** Database context. */
   final Context context;
   /** The x axis of the plot. */
   final PlotAxis xAxis;
@@ -30,7 +30,7 @@ final class PlotData {
 
   /**
    * Default constructor.
-   * @param ctx context reference
+   * @param ctx database context
    */
   PlotData(final Context ctx) {
     xAxis = new PlotAxis(this);
@@ -91,21 +91,21 @@ final class PlotData {
   /**
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting.
-   * @param ctx context to be displayed
+   * @param nodes nodes to be displayed
    * @param sub determine descendant nodes of given context nodes
    */
-  void refreshItems(final Nodes ctx, final boolean sub) {
+  void refreshItems(final Nodes nodes, final boolean sub) {
     final Data data = context.data;
     final IntList tmpPres = new IntList();
     final int itmID = data.tagindex.id(item);
 
     if(!sub) {
-      pres = ctx.list;
+      pres = nodes.list;
       Arrays.sort(pres);
       return;
     }
 
-    final int[] contextPres = ctx.list;
+    final int[] contextPres = nodes.list;
     for(int p : contextPres) {
       final int nl = p + data.size(p, Data.ELEM);
       while(p < nl) {

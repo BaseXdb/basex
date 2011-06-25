@@ -37,7 +37,7 @@ public final class Users {
   public Users(final boolean global) {
     if(!global) return;
 
-    file = new File(Prop.HOME + IO.BASEXSUFFIX + "perm");
+    file = new File(Prop.HOME, IO.BASEXSUFFIX + "perm");
     if(!file.exists()) {
       // create default admin user with all rights
       list.add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));

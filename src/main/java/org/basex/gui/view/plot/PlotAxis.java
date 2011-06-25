@@ -155,9 +155,7 @@ final class PlotAxis {
     while(i < vl && vals[i].length == 0) co[tmpI[i++]] = -1;
 
     // count number of unique values
-    final TokenSet set = new TokenSet();
-    for(final byte[] v : vals) set.add(v);
-    nrCats = set.size();
+    nrCats = new TokenSet(vals).size();
     if(i > 0) --nrCats;
 
     // get first/last category for axis caption

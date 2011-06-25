@@ -116,8 +116,8 @@ final class AggregatedNodeUpdates {
    * deleted, all other operations on this node have no effect at all.
    */
   private void prepareExecution() {
-    for(int i = 0; i < prim.length; i++) {
-      final PrimitiveType t = prim[i].type;
+    for(final UpdatePrimitive p : prim) {
+      final PrimitiveType t = p.type;
       del |= t == DELETENODE;
       rep |= t == REPLACENODE;
     }
@@ -146,8 +146,8 @@ final class AggregatedNodeUpdates {
     }
 
     // determine if internal/external text node adjacency possible
-    for(int i = 0; i < prim.length; i++) {
-      final PrimitiveType t = prim[i].type;
+    for(final UpdatePrimitive p : prim) {
+      final PrimitiveType t = p.type;
       del |= t == DELETENODE;
       rep |= t == REPLACENODE;
       adjEXT |= del || rep || t == INSERTBEFORE || t == INSERTAFTER;

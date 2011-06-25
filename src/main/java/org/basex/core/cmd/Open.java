@@ -51,7 +51,8 @@ public final class Open extends Command {
   }
 
   @Override
-  public boolean newData() {
+  public boolean newData(final Context ctx) {
+    new Close().run(ctx);
     return true;
   }
 
