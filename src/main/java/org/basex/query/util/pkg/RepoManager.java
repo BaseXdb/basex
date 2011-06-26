@@ -47,8 +47,6 @@ public final class RepoManager {
     // check package existence
     final File pkgFile = new File(path);
     if(!pkgFile.exists()) PKGNOTEXIST.thrw(ii, path);
-    // check package name - must be a .xar file
-    if(!path.endsWith(IO.XARSUFFIX)) INVPKGNAME.thrw(ii);
 
     // check repository if not done yet
     try {
@@ -103,7 +101,11 @@ public final class RepoManager {
    */
   private static String extractPkgName(final String path) {
     final int i = path.lastIndexOf(File.separator);
-    return path.substring(i + 1, path.length() - IO.XARSUFFIX.length());
+    int suffixLen = 0;
+    if(path.endsWith(IO.XARSUFFIX)) suffixLen = IO.XARSUFFIX.length();
+    else if(path.endsWith(IO.ZIPSUFFIX)) suffixLen = IO.ZIPSUFFIX.length();
+    else if(path.endsWith(IO.GZSUFFIX)) suffixLen = IO.GZSUFFIX.length();
+    return path.substring(i + 1, path.length() - suffixLen);
   }
 
   /**
