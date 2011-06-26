@@ -175,6 +175,13 @@ public abstract class IO {
   public abstract BufferInput buffer() throws IOException;
 
   /**
+   * Returns a simple input stream for the input.
+   * @return input stream
+   * @throws IOException I/O exception
+   */
+  public abstract InputStream inputStream() throws IOException;
+
+  /**
    * Merges two filenames.
    * @param fn file name/path to be merged
    * @return contents

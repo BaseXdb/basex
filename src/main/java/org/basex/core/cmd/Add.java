@@ -100,12 +100,13 @@ public final class Add extends ACreate {
    * @param input XML input stream
    * @param ctx database context
    * @param cmd calling command
+   * @param lock if {@code true}, register a write lock in context
    * @return info string
    * @throws BaseXException database exception
    */
   public static String add(final String name, final String target,
-      final InputStream input, final Context ctx, final Add cmd)
-      throws BaseXException {
+      final InputStream input, final Context ctx, final Add cmd,
+      final boolean lock) throws BaseXException {
 
     final Data data = ctx.data;
     if(data == null) return PROCNODB;
@@ -117,10 +118,10 @@ public final class Add extends ACreate {
     final SAXSource sax = new SAXSource(new InputSource(is));
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
     try {
-      ctx.register(true);
+      if(lock) ctx.register(true);
       return add(parser, ctx, trg, name, cmd);
     } finally {
-      ctx.unregister(true);
+      if(lock) ctx.unregister(true);
     }
   }
 

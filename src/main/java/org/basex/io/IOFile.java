@@ -157,6 +157,11 @@ public final class IOFile extends IO {
   }
 
   @Override
+  public InputStream inputStream() throws IOException {
+    return is;
+  }
+
+  @Override
   public BufferInput buffer() throws IOException {
     // return file stream
     if(is == null) return new BufferInput(path);

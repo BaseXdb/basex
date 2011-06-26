@@ -20,6 +20,7 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
+import org.basex.core.cmd.Replace;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
 import org.basex.io.WrapInputStream;
@@ -136,6 +137,8 @@ public final class ServerProcess extends Thread {
             watch();
           } else if(sc == UNWATCH) {
             unwatch();
+          } else if(sc == REPLACE) {
+            replace();
           } else if(sc != COMMAND) {
             query(sc);
           } else {
@@ -332,7 +335,26 @@ public final class ServerProcess extends Thread {
 
     try {
       final WrapInputStream is = new WrapInputStream(in);
-      info(true, Add.add(name, path, is, context, null), perf);
+      info(true, Add.add(name, path, is, context, null, true), perf);
+    } catch(final BaseXException ex) {
+      info(false, ex.getMessage(), perf);
+    }
+    out.flush();
+  }
+
+  /**
+   * Replace a document in a database.
+   * @throws IOException I/O exception
+   */
+  private void replace() throws IOException {
+    final Performance perf = new Performance();
+    final String path = in.readString();
+    final StringBuilder sb = new StringBuilder(REPLACE + " ");
+    if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
+    log.write(this, sb.append("[...]"));
+    try {
+      final WrapInputStream is = new WrapInputStream(in);
+      info(true, Replace.replace(path, is, context, true), perf);
     } catch(final BaseXException ex) {
       info(false, ex.getMessage(), perf);
     }

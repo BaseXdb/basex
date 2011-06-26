@@ -1,6 +1,7 @@
 package org.basex.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import org.xml.sax.InputSource;
 
@@ -30,8 +31,13 @@ final class IOUrl extends IO {
   }
 
   @Override
+  public InputStream inputStream() throws IOException {
+    return new URL(path).openStream();
+  }
+
+  @Override
   public BufferInput buffer() throws IOException {
-    return new BufferInput(new URL(path).openStream());
+    return new BufferInput(inputStream());
   }
 
   @Override

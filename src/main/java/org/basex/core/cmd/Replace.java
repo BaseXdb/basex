@@ -3,9 +3,14 @@ package org.basex.core.cmd;
 import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
 
+import java.io.InputStream;
+
+import org.basex.core.BaseXException;
+import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
@@ -25,38 +30,59 @@ public final class Replace extends ACreate {
 
   @Override
   protected boolean run() {
-    final Data data = context.data;
-    String path = path(args[0]);
-    if(path.isEmpty()) return error(DIRERR, path);
-
-    final byte[] src = token(path);
-    final int[] docs = data.doc(args[0]);
-    // check if path was found
-    if(docs.length == 0) return error(FILEWHICH, path);
-    // check if path points exclusively to files
-    for(final int doc : data.doc(args[0])) {
-      if(!eq(data.text(doc, true), src)) return error(DIRERR, path);
-    }
     // check if input exists
     final IO io = IO.get(args[1]);
     if(!io.exists()) return error(FILEWHICH, io);
 
-    // delete documents
-    for(int d = docs.length - 1; d >= 0; d--) data.delete(docs[d]);
+    try {
+      return info(replace(args[0], io.inputStream(), context, false), perf);
+    } catch(final Exception ex) {
+      return error(ex.getMessage());
+    }
+  }
 
-    String target = "";
+  /**
+   * Replace the specified document with a new content.
+   * @param p path to replace
+   * @param input new content
+   * @param ctx database context
+   * @param lock if {@code true}, register a write lock in context
+   * @return info string
+   * @throws BaseXException database exception
+   */
+  public static String replace(final String p, final InputStream input,
+      final Context ctx, final boolean lock) throws BaseXException {
+    final Data data = ctx.data;
+    String path = path(p);
+    if(path.isEmpty()) return Util.info(DIRERR, path);
+
+    final byte[] src = token(path);
+    final int[] docs = data.doc(p);
+    // check if path was found
+    if(docs.length == 0) return Util.info(FILEWHICH, path);
+    // check if path points exclusively to files
+    for(final int doc : docs) {
+      if(!eq(data.text(doc, true), src)) return Util.info(DIRERR, path);
+    }
+
+    final String target;
     final int i = path.lastIndexOf('/');
     if(i != -1) {
       target = path.substring(0, i);
       path = path.substring(i + 1);
+    } else {
+      target = "";
     }
 
-    final Add add = new Add(args[1], path, target);
-    if(!add.run(context)) {
-      context.update();
-      data.flush();
-      return error(add.info());
+    try {
+      if(lock) ctx.register(true);
+      // delete documents
+      for(int d = docs.length - 1; d >= 0; d--) data.delete(docs[d]);
+      // add new document
+      Add.add(path, target, input, ctx, null, false);
+    } finally {
+      if(lock) ctx.unregister(true);
     }
-    return info(PATHREPLACED, docs.length, perf);
+    return Util.info(PATHREPLACED, docs.length);
   }
 }
