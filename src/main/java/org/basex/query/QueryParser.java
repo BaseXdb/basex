@@ -730,7 +730,7 @@ public class QueryParser extends InputParser {
     final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
     if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, string(pkgName));
 
-    final Package pkg = new PkgParser(ctx.context, input()).parse(pkgDesc);
+    final Package pkg = new PkgParser(ctx.context.repo, input()).parse(pkgDesc);
     // check if package contains a jar descriptor
     final IO jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
     // add jars to classpath
@@ -742,7 +742,8 @@ public class QueryParser extends InputParser {
     for(final Dependency d : pkg.dep) {
       if(d.pkg != null) {
       // we consider only package dependencies here
-      final byte[] depPkg = new PkgValidator(ctx.context, input()).depPkg(d);
+      final byte[] depPkg = new PkgValidator(
+          ctx.context.repo, input()).depPkg(d);
       if(depPkg == null) {
         error(NECPKGNOTINST, string(d.pkg));
       } else {

@@ -33,17 +33,16 @@ public class AggregatedDatabaseUpdates {
   /** Pre values of target nodes. */
   protected IntList nodes;
   /** Mapping between pre values of the target nodes and all update primitives
-   * which operate on this target.
-   */
+   * which operate on this target. */
   protected final IntMap<AggregatedNodeUpdates> updatePrimitives =
     new IntMap<AggregatedNodeUpdates>();
 
   /**
-   * Constuctor.
+   * Constructor.
    * @param d data reference
    */
   public AggregatedDatabaseUpdates(final Data d) {
-    this.data = d;
+    data = d;
   }
 
   /**

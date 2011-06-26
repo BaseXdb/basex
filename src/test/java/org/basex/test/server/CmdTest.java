@@ -323,7 +323,8 @@ public class CmdTest {
     ok(new CreateUser(NAME2, "test"));
     ok(new CreateUser(NAME, "test"));
     no(new Grant("something", NAME2));
-    ok(new Grant("none", NAME + "*", "*"));
+    ok(new CreateDB(NAME));
+    ok(new Grant("none", NAME + "*", NAME + "*"));
     no(new Grant("all", NAME2));
     no(new Grant("all", ":*?", ":*:"));
     ok(new DropUser(NAME + "," + NAME2));

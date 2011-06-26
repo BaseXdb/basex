@@ -14,11 +14,14 @@ import org.basex.util.TokenSet;
 import org.basex.util.Util;
 
 /**
- * Repository.
+ * Repository manager.
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
 public final class Repo {
+  /** Context. */
+  public final Context context;
+
   /**
    * Namespace-dictionary with all namespaces (unique names) available
    * in the repository, and the packages in which they are found.
@@ -26,8 +29,6 @@ public final class Repo {
   private final TokenObjMap<TokenSet> nsDict = new TokenObjMap<TokenSet>();
   /** Package dictionary with installed packages and their directories. */
   private final TokenMap pkgDict = new TokenMap();
-  /** Context. */
-  private final Context context;
 
   /** Initialization flag (the repository can only be initialized once). */
   private boolean init;
@@ -137,7 +138,7 @@ public final class Repo {
     final IOFile desc = new IOFile(dir, DESCRIPTOR);
     if(desc.exists()) {
       try {
-        final Package pkg = new PkgParser(context, null).parse(desc);
+        final Package pkg = new PkgParser(context.repo, null).parse(desc);
         final byte[] name = pkg.uniqueName();
         // read package components
         for(final Component comp : pkg.comps) {

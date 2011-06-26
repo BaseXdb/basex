@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -504,14 +503,14 @@ public final class FNZip extends FuncCall {
    * @throws QueryException query exception
    */
   private byte[] entry(final QueryContext ctx) throws QueryException {
-    final String file = string(checkStr(expr[0], ctx));
+    final IOFile file = new IOFile(string(checkStr(expr[0], ctx)));
     final String path = string(checkStr(expr[1], ctx));
-    if(!new IOFile(file).exists()) ZIPNOTFOUND.thrw(input, file);
+    if(!file.exists()) ZIPNOTFOUND.thrw(input, file);
 
     try {
-      return new Zip(new File(file)).read(path);
+      return new Zip(file).read(path);
     } catch(final FileNotFoundException ex) {
-      throw ZIPNOTFOUND.thrw(input, file + '/' + path);
+      throw ZIPNOTFOUND.thrw(input, file + "/" + path);
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     }

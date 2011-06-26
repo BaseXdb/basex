@@ -215,7 +215,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void testRepoInstall() throws BaseXException {
     // try to install non-existing package
     try {
-      new RepoManager(ctx).install("etc/pkg", null);
+      new RepoManager(ctx.repo).install("etc/pkg", null);
       fail("Not existing package not detected.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGNOTEXIST);
@@ -287,7 +287,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void testDelete() throws BaseXException {
     // try to delete a package which is not installed
     try {
-      new RepoManager(ctx).delete("xyz", null);
+      new RepoManager(ctx.repo).delete("xyz", null);
       fail("Not installed package not detected.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGNOTINST);
@@ -317,7 +317,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // try to delete pkg3
     try {
-      new RepoManager(ctx).delete("pkg3", null);
+      new RepoManager(ctx.repo).delete("pkg3", null);
       fail("Package involved in a dependency was deleted.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGDEP);
@@ -367,7 +367,8 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   private static void ok(final IO desc) {
     try {
-      new PkgValidator(ctx, null).check(new PkgParser(ctx, null).parse(desc));
+      new PkgValidator(ctx.repo, null).check(
+         new PkgParser(ctx.repo, null).parse(desc));
     } catch(final QueryException ex) {
       fail("Unexpected exception thrown: " + ex);
     }
@@ -381,7 +382,8 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   private static void error(final IO desc, final Err err, final String exp) {
     try {
-      new PkgValidator(ctx, null).check(new PkgParser(ctx, null).parse(desc));
+      new PkgValidator(ctx.repo, null).check(
+         new PkgParser(ctx.repo, null).parse(desc));
       fail(exp);
     } catch(final QueryException ex) {
       check(ex, err);

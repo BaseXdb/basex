@@ -13,6 +13,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.Zip;
 import org.basex.util.Util;
 
@@ -67,8 +68,8 @@ public final class CreateBackup extends Command {
   private boolean backup(final String db, final Prop pr) {
     try {
       final File in = pr.dbpath(db);
-      final File file = pr.dbpath(db + "-" + DATE.format(new Date()) +
-          IO.ZIPSUFFIX);
+      final IOFile file = new IOFile(pr.dbpath(db + "-" +
+          DATE.format(new Date()) + IO.ZIPSUFFIX));
 
       final Zip zip = progress(new Zip(file));
       zip.zip(in);

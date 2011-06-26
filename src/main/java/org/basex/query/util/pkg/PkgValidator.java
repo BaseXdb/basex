@@ -8,7 +8,6 @@ import static org.basex.util.Token.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.basex.core.Context;
 import org.basex.core.Text;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -25,18 +24,18 @@ import org.basex.util.TokenSet;
  * @author Rositsa Shadura
  */
 public final class PkgValidator {
-  /** Database context. */
-  private final Context context;
+  /** Repository context. */
+  private final Repo repo;
   /** Input info. */
   private final InputInfo input;
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param r repository context
    * @param ii input info
    */
-  public PkgValidator(final Context ctx, final InputInfo ii) {
-    context = ctx;
+  public PkgValidator(final Repo r, final InputInfo ii) {
+    repo = r;
     input = ii;
   }
 
@@ -48,8 +47,7 @@ public final class PkgValidator {
    */
   public void check(final Package pkg) throws QueryException {
     // check if package is already installed
-    if(context.repo.pkgDict().get(pkg.uniqueName()) != null)
-      PKGINST.thrw(input);
+    if(repo.pkgDict().get(pkg.uniqueName()) != null) PKGINST.thrw(input);
     // check package dependencies
     checkDepends(pkg);
     // check package components
@@ -89,7 +87,7 @@ public final class PkgValidator {
   public byte[] depPkg(final Dependency dep) {
     // get installed versions of secondary package
     final TokenSet instVers = new TokenSet();
-    for(final byte[] nextPkg : context.repo.pkgDict().keys())
+    for(final byte[] nextPkg : repo.pkgDict().keys())
       if(nextPkg != null && startsWith(nextPkg, dep.pkg))
         instVers.add(version(nextPkg));
     // check if an appropriate version is already installed
@@ -199,16 +197,16 @@ public final class PkgValidator {
   private boolean isInstalled(final Component comp, final byte[] name)
       throws QueryException {
     // get packages in which the module's namespace is found
-    final TokenSet pkgs = context.repo.nsDict().get(comp.uri);
+    final TokenSet pkgs = repo.nsDict().get(comp.uri);
     if(pkgs == null) return false;
 
     for(final byte[] nextPkg : pkgs) {
       if(nextPkg != null && !eq(Package.name(nextPkg), name)) {
         // installed package is a different one, not just a different version
         // of the current one
-        final String pkgDir = string(context.repo.pkgDict().get(nextPkg));
-        final IO pkgDesc = new IOFile(context.repo.path(pkgDir), DESCRIPTOR);
-        final Package pkg = new PkgParser(context, input).parse(pkgDesc);
+        final String pkgDir = string(repo.pkgDict().get(nextPkg));
+        final IO pkgDesc = new IOFile(repo.path(pkgDir), DESCRIPTOR);
+        final Package pkg = new PkgParser(repo, input).parse(pkgDesc);
         for(final Component nextComp : pkg.comps) {
           if(nextComp.name().equals(comp.name())) return true;
         }

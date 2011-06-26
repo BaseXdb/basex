@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
-import org.basex.core.Context;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
@@ -27,18 +26,18 @@ import org.basex.util.Util;
  * @author Rositsa Shadura
  */
 public final class PkgParser {
-  /** Context. */
-  private final Context context;
+  /** Repository context. */
+  private final Repo repo;
   /** Input info. */
   private final InputInfo input;
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param r repository context
    * @param ii input info
    */
-  public PkgParser(final Context ctx, final InputInfo ii) {
-    context = ctx;
+  public PkgParser(final Repo r, final InputInfo ii) {
+    repo = r;
     input = ii;
   }
 
@@ -51,7 +50,7 @@ public final class PkgParser {
   public Package parse(final IO io) throws QueryException {
     final Package pkg = new Package();
     try {
-      ANode node = childElements(new DBNode(io, context.prop)).next();
+      ANode node = childElements(new DBNode(io, repo.context.prop)).next();
 
       // checks root node
       if(!eqNS(PACKAGE, node.qname()))
@@ -61,7 +60,7 @@ public final class PkgParser {
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
-      throw PKGREADFAIL.thrw(input, ex.getMessage());
+      throw PKGREADFAIL.thrw(input, io.name(), ex.getMessage());
     }
   }
 

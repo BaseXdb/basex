@@ -47,7 +47,7 @@ public abstract class UpdatePrimitive implements Comparable<UpdatePrimitive> {
 
   @Override
   public int compareTo(final UpdatePrimitive p) {
-    return this.type.ordinal() - p.type.ordinal();
+    return type.ordinal() - p.type.ordinal();
   }
 
   /**

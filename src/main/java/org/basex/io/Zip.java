@@ -1,16 +1,13 @@
 package org.basex.io;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
@@ -26,7 +23,7 @@ import org.basex.util.ByteList;
  */
 public final class Zip extends Progress {
   /** Archive. */
-  private final File archive;
+  private final IO archive;
   /** Total files in a zip operation. */
   private int total;
   /** Current file in a zip operation. */
@@ -36,7 +33,7 @@ public final class Zip extends Progress {
    * Constructor.
    * @param file archive file
    */
-  public Zip(final File file) {
+  public Zip(final IO file) {
     archive = file;
   }
 
@@ -46,10 +43,15 @@ public final class Zip extends Progress {
    * @throws IOException I/O exception
    */
   public int size() throws IOException {
-    final ZipFile zf = new ZipFile(archive);
-    final int c = zf.size();
-    zf.close();
-    return c;
+    int c = 0;
+    ZipInputStream in = null;
+    try {
+      in = new ZipInputStream(archive.buffer());
+      while(in.getNextEntry() != null) c++;
+      return c;
+    } finally {
+      if(in != null) try { in.close(); } catch(final IOException e) { }
+    }
   }
 
   /**
@@ -59,28 +61,29 @@ public final class Zip extends Progress {
    * @throws IOException I/O exception
    */
   public byte[] read(final String path) throws IOException {
-    final ZipFile zf = new ZipFile(archive);
-    final ZipEntry ze = zf.getEntry(path);
-    if(ze == null) throw new FileNotFoundException(path);
-
+    ZipInputStream in = null;
     try {
-      final InputStream in = zf.getInputStream(ze);
-      final int s = (int) ze.getSize();
-      if(s >= 0) {
-        // known size: pre-allocate and fill array
-        final byte[] data = new byte[s];
-        int c, o = 0;
-        while(s - o != 0 && (c = in.read(data, o, s - o)) != -1) o += c;
-        return data;
+      in = new ZipInputStream(archive.buffer());
+      for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
+        if(!path.equals(ze.getName())) continue;
+        final int s = (int) ze.getSize();
+        if(s >= 0) {
+          // known size: pre-allocate and fill array
+          final byte[] data = new byte[s];
+          int c, o = 0;
+          while(s - o != 0 && (c = in.read(data, o, s - o)) != -1) o += c;
+          return data;
+        }
+        // unknown size: use byte list
+        final byte[] data = new byte[IO.BLOCKSIZE];
+        final ByteList bl = new ByteList();
+        for(int c; (c = in.read(data)) != -1;) bl.add(data, 0, c);
+        return bl.toArray();
       }
-      // unknown size: use byte list
-      final byte[] data = new byte[IO.BLOCKSIZE];
-      final ByteList bl = new ByteList();
-      for(int c; (c = in.read(data)) != -1;) bl.add(data, 0, c);
-      return bl.toArray();
     } finally {
-      zf.close();
+      if(in != null) try { in.close(); } catch(final IOException e) { }
     }
+    throw new FileNotFoundException(path);
   }
 
   /**
@@ -94,9 +97,7 @@ public final class Zip extends Progress {
     total = size();
     curr = 0;
     try {
-      in = new ZipInputStream(new BufferedInputStream(
-           new FileInputStream(archive)));
-
+      in = new ZipInputStream(archive.buffer());
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         curr++;
         final IOFile trg = new IOFile(target, ze.getName());
@@ -119,11 +120,14 @@ public final class Zip extends Progress {
   }
 
   /**
-   * Zips the specified source.
-   * @param source source to be zipped
+   * Zips the specified source directory.
+   * @param source source directory to be zipped
    * @throws IOException I/O exception
    */
   public void zip(final File source) throws IOException {
+    if(!(archive instanceof IOFile))
+      throw new FileNotFoundException(archive.path());
+
     final byte[] data = new byte[IO.BLOCKSIZE];
     ZipOutputStream out = null;
     curr = 0;
@@ -131,7 +135,7 @@ public final class Zip extends Progress {
     try {
       // create output stream for zipping; use fast compression
       out = new ZipOutputStream(new BufferedOutputStream(
-          new FileOutputStream(archive)));
+          new FileOutputStream(((IOFile) archive).path())));
       out.setLevel(1);
       out.putNextEntry(new ZipEntry(source.getName() + '/'));
       out.closeEntry();

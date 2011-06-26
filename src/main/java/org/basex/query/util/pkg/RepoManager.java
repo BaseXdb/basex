@@ -4,10 +4,8 @@ import static org.basex.query.util.Err.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.io.IOException;
 
-import org.basex.core.Context;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
@@ -24,15 +22,15 @@ import org.basex.util.Util;
  * @author Rositsa Shadura
  */
 public final class RepoManager {
-  /** Database context. */
-  private final Context ctx;
+  /** Repository context. */
+  private final Repo repo;
 
   /**
    * Constructor.
-   * @param c database context
+   * @param r repository context
    */
-  public RepoManager(final Context c) {
-    ctx = c;
+  public RepoManager(final Repo r) {
+    repo = r;
   }
 
   /**
@@ -44,23 +42,31 @@ public final class RepoManager {
   public void install(final String path, final InputInfo ii)
       throws QueryException {
 
-    // check package existence
-    final File pkgFile = new File(path);
-    if(!pkgFile.exists()) PKGNOTEXIST.thrw(ii, path);
-    // check package name - must be a .xar file
-    if(!path.endsWith(IO.XARSUFFIX)) INVPKGNAME.thrw(ii);
-
-    // check repository if not done yet
+    // check if package exists, and cache contents
+    final IO io = IO.get(path);
+    IOContent cont = null;
     try {
-      final Zip zip = new Zip(pkgFile);
-      final byte[] cont = zip.read(DESCRIPTOR);
-      final Package pkg = new PkgParser(ctx, ii).parse(new IOContent(cont));
-      new PkgValidator(ctx, ii).check(pkg);
-      zip.unzip(ctx.repo.path(extractPkgName(pkgFile.getPath())));
-      ctx.repo.add(pkg, extractPkgName(pkgFile.getPath()));
+      cont = new IOContent(io.content());
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw PKGREADFAIL.thrw(ii, ex.getMessage());
+      PKGNOTEXIST.thrw(ii, path);
+    }
+
+    try {
+      // parse and validate repository
+      final Zip zip = new Zip(cont);
+      final byte[] desc = zip.read(DESCRIPTOR);
+      final Package pkg = new PkgParser(repo, ii).parse(new IOContent(desc));
+      new PkgValidator(repo, ii).check(pkg);
+
+      // treat everything after last dot as file suffix
+      final String name = io.name().replaceAll("\\.[^.]+$", "");
+      // unzip files and register repository
+      zip.unzip(repo.path(name));
+      repo.add(pkg, name);
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      PKGREADFAIL.thrw(ii, io.name(), ex.getMessage());
     }
   }
 
@@ -73,9 +79,9 @@ public final class RepoManager {
   public void delete(final String pkg, final InputInfo ii)
       throws QueryException {
     boolean found = false;
-    for(final byte[] nextPkg : ctx.repo.pkgDict()) {
+    for(final byte[] nextPkg : repo.pkgDict()) {
       if(nextPkg != null) {
-        final byte[] dir = ctx.repo.pkgDict().get(nextPkg);
+        final byte[] dir = repo.pkgDict().get(nextPkg);
         if(eq(Package.name(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
           // A package can be deleted either by its name or by its directory
           // name
@@ -84,9 +90,9 @@ public final class RepoManager {
           final byte[] primPkg = primary(nextPkg, ii);
           if(primPkg == null) {
             // clean package repository
-            final IOFile f = ctx.repo.path(string(dir));
+            final IOFile f = repo.path(string(dir));
             final IOFile desc = new IOFile(f, DESCRIPTOR);
-            ctx.repo.remove(new PkgParser(ctx, ii).parse(desc));
+            repo.remove(new PkgParser(repo, ii).parse(desc));
             // package does not participate in a dependency => delete it
             if(!f.delete()) CANNOTDELPKG.thrw(ii);
           } else PKGDEP.thrw(ii, string(primPkg), pkg);
@@ -94,16 +100,6 @@ public final class RepoManager {
       }
     }
     if(!found) PKGNOTINST.thrw(ii, pkg);
-  }
-
-  /**
-   * Extracts package name from package path.
-   * @param path package path
-   * @return package name
-   */
-  private static String extractPkgName(final String path) {
-    final int i = path.lastIndexOf(File.separator);
-    return path.substring(i + 1, path.length() - IO.XARSUFFIX.length());
   }
 
   /**
@@ -115,12 +111,12 @@ public final class RepoManager {
    */
   private byte[] primary(final byte[] pkgName, final InputInfo ii)
       throws QueryException {
-    for(final byte[] nextPkg : ctx.repo.pkgDict()) {
+    for(final byte[] nextPkg : repo.pkgDict()) {
       if(nextPkg != null && !eq(nextPkg, pkgName)) {
         // check only packages different from the current one
-        final IOFile desc = new IOFile(ctx.repo.path(
-            string(ctx.repo.pkgDict().get(nextPkg))), DESCRIPTOR);
-        final Package pkg = new PkgParser(ctx, ii).parse(desc);
+        final IOFile desc = new IOFile(repo.path(
+            string(repo.pkgDict().get(nextPkg))), DESCRIPTOR);
+        final Package pkg = new PkgParser(repo, ii).parse(desc);
         final byte[] name = Package.name(pkgName);
         for(final Dependency dep : pkg.dep)
           // Check only package dependencies

@@ -67,7 +67,7 @@ public final class Restore extends Command {
    */
   private boolean restore(final File file, final Prop pr) {
     try {
-      progress(new Zip(file)).unzip(pr.dbpath());
+      progress(new Zip(new IOFile(file))).unzip(pr.dbpath());
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

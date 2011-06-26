@@ -33,7 +33,7 @@ public final class DeleteNode extends StructuralUpdate {
 
   @Override
   public void apply() {
-    shifts = -1 * data.size(pre, data.kind(pre));
+    shifts = -data.size(pre, data.kind(pre));
     data.delete(pre);
   }
 

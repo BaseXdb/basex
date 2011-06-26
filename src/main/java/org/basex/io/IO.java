@@ -21,8 +21,6 @@ public abstract class IO {
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery file suffix. */
   public static final String XQSUFFIX = ".xq";
-  /** XQuery Archive file suffix. */
-  public static final String XARSUFFIX = ".xar";
   /** XML file suffix. */
   public static final String XMLSUFFIX = ".xml";
   /** ZIP file suffix. */
@@ -259,16 +257,14 @@ public abstract class IO {
   /**
    * Caches the contents of the specified input stream.
    * @param i input stream
-   * @return cached contents
    * @throws IOException I/O exception
    */
-  protected final byte[] cache(final InputStream i) throws IOException {
+  protected final void cache(final InputStream i) throws IOException {
     final ByteList bl = new ByteList();
     final InputStream bis = i instanceof BufferedInputStream ||
       i instanceof BufferInput ? i : new BufferedInputStream(i);
     for(int b; (b = bis.read()) != -1;) bl.add(b);
     bis.close();
     cont = bl.toArray();
-    return cont;
   }
 }

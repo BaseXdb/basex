@@ -155,13 +155,13 @@ public enum Err {
   /** PACK0006: Evaluation exception. */
   MODISTALLED(PACK, 6, "Module % is already installed within another package."),
   /** PACK0007: Evaluation exception. */
-  PKGREADFAIL(PACK, 7, "Reading package descriptor failed: %"),
+  PKGREADFAIL(PACK, 7, "Package '%' could not be parsed: %"),
   /** PACK0008: Evaluation exception. */
-  CANNOTDELPKG(PACK, 8, "Package cannot be deleted. "),
+  CANNOTDELPKG(PACK, 8, "Package cannot be deleted."),
   /** PACK0009: Evaluation exception. */
   PKGDEP(PACK, 9, "Package % depends on package %"),
   /** PACK0010: Evaluation exception. */
-  PKGNOTSUPP(PACK, 10, "Package is not supported by current version of BaseX."),
+  PKGNOTSUPP(PACK, 10, "Package is not supported by database version."),
   /** PACK0011: Evaluation exception. */
   JARDESCINV(PACK, 11, "Jar descriptor: %."),
   /** PACK0012: Evaluation exception. */
