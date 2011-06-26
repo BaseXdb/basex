@@ -4,7 +4,10 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 
 import org.basex.core.Command;
+import org.basex.core.CommandBuilder;
 import org.basex.core.User;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdRepo;
 import org.basex.query.QueryException;
 import org.basex.query.util.pkg.RepoManager;
 import org.basex.util.InputInfo;
@@ -33,11 +36,16 @@ public class RepoDelete extends Command {
   @Override
   protected boolean run() throws IOException {
     try {
-      new RepoManager(context).delete(args[0], ii);
+      new RepoManager(context.repo).delete(args[0], ii);
       return info(REPODEL, args[0]);
     } catch(final QueryException ex) {
       Util.debug(ex);
       return error(ex.getMessage());
     }
+  }
+
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.REPO + " " + CmdRepo.DELETE).args();
   }
 }

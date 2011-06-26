@@ -36,13 +36,13 @@ public final class MixedPath extends Path {
 
   @Override
   protected Expr compPath(final QueryContext ctx) throws QueryException {
-    for(final Expr e : step) checkUp(e, ctx);
-    final AxisStep s = voidStep(step);
-    if(s != null) COMPSELF.thrw(input, s);
+    for(final Expr s : step) checkUp(s, ctx);
+    final AxisStep v = voidStep(step);
+    if(v != null) COMPSELF.thrw(input, v);
 
-    for(int e = 0; e != step.length; ++e) {
-      step[e] = step[e].comp(ctx);
-      if(step[e].empty()) return Empty.SEQ;
+    for(int s = 0; s != step.length; ++s) {
+      step[s] = step[s].comp(ctx);
+      if(step[s].empty()) return Empty.SEQ;
     }
     optSteps(ctx);
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -47,7 +48,10 @@ public final class Group extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(final Var g : groupby) g.comp(ctx);
+    for(final Var g : groupby) {
+      g.comp(ctx);
+      if(g.ret != null) g.ret = SeqType.get(g.ret.type, 1);
+    }
     return this;
   }
 

@@ -135,7 +135,7 @@ public final class QueryContext extends Progress {
   /** Copied nodes, resulting from transform expression. */
   public final Set<Data> copiedNods = new HashSet<Data>();
   /** Pending updates. */
-  public Updates updates = new Updates(false);
+  public Updates updates = new Updates();
   /** Indicates if this query performs updates. */
   public boolean updating;
 
@@ -170,7 +170,7 @@ public final class QueryContext extends Progress {
 
   /**
    * Constructor.
-   * @param ctx context reference
+   * @param ctx database context
    */
   public QueryContext(final Context ctx) {
     resource = new QueryResources(this);
@@ -309,7 +309,7 @@ public final class QueryContext extends Progress {
       final Value v = value(root);
 
       if(updating) {
-        updates.apply(this);
+        updates.applyUpdates(this);
         if(context.data != null) context.update();
       }
       return v;
@@ -327,12 +327,12 @@ public final class QueryContext extends Progress {
    */
   protected void plan(final Serializer ser) throws IOException {
     // only show root node if functions or variables exist
-    //final boolean r = funcs.size() != 0 || vars.global().size != 0;
-    ser.openElement(PLAN);
+    final boolean r = funcs.size() != 0 || vars.global().size != 0;
+    if(r) ser.openElement(PLAN);
     funcs.plan(ser);
     vars.plan(ser);
     root.plan(ser);
-    ser.closeElement();
+    if(r) ser.closeElement();
   }
 
   /**
@@ -377,7 +377,7 @@ public final class QueryContext extends Progress {
 
   /**
    * Copies properties of the specified context.
-   * @param ctx context
+   * @param ctx query context
    */
   public void copy(final QueryContext ctx) {
     baseURI = ctx.baseURI;

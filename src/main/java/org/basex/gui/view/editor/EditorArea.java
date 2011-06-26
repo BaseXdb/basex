@@ -9,6 +9,7 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -27,7 +28,7 @@ final class EditorArea extends BaseXEditor {
   private final EditorView view;
 
   /** File in tab. */
-  IO file;
+  IOFile file;
   /** Flag for modified content. */
   boolean mod;
   /** Opened flag; states if file was opened from disk. */
@@ -49,7 +50,7 @@ final class EditorArea extends BaseXEditor {
    * @param v view reference
    * @param f file reference
    */
-  EditorArea(final EditorView v, final IO f) {
+  EditorArea(final EditorView v, final IOFile f) {
     super(true, v.gui);
     view = v;
     file = f;
@@ -102,9 +103,7 @@ final class EditorArea extends BaseXEditor {
       final String qu = in.length == 0 ? "()" : string(in);
       exec = !module(in);
       if(exec && (force || gui.gprop.is(GUIProp.EXECRT))) {
-        view.startWait();
-        view.stop.setEnabled(true);
-        gui.execute(new XQuery(qu), false);
+        gui.execute(false, new XQuery(qu));
       } else {
         final QueryContext ctx = new QueryContext(gui.context);
         try {

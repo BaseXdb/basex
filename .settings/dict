@@ -272,3 +272,5 @@ arity
 malformed
 versioning
 validator
+zipping
+unzip

@@ -1,4 +1,4 @@
-package org.basex.test.data;
+package org.basex.test.query.xqup;
 
 import static org.junit.Assert.*;
 
@@ -15,19 +15,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Stress Testing the fast replace feature where blocks on disks are directly
+ * Stress Testing the fast replace feature where blocks on disk are directly
  * overwritten.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class FastReplaceTest {
+public final class XQUPFastReplace {
   /** Database context. */
   public static final Context CONTEXT = new Context();
   /** Test document. */
   public static final String DOC = "etc/test/xmark.xml";
   /** Test database name. */
-  public static final String DBNAME = Util.name(FastReplaceTest.class);
+  public static final String DBNAME = Util.name(XQUPFastReplace.class);
 
   /**
    * Creates the db based on xmark.xml.

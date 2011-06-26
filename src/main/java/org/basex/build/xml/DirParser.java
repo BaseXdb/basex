@@ -68,7 +68,8 @@ public final class DirParser extends Parser {
    */
   private void parse(final Builder b, final IO io) throws IOException {
     if(io.isDir()) {
-      for(final IO f : io.children()) parse(b, f);
+      // only {@link IOFile} instances can have children
+      for(final IO f : ((IOFile) io).children()) parse(b, f);
     } else {
       file = io;
       if(!b.meta.prop.is(Prop.ADDARCHIVES) && file.archive()) return;

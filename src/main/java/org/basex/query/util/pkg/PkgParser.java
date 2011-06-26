@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
-import org.basex.core.Context;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
@@ -27,18 +26,18 @@ import org.basex.util.Util;
  * @author Rositsa Shadura
  */
 public final class PkgParser {
-  /** Context. */
-  private final Context context;
+  /** Repository context. */
+  private final Repo repo;
   /** Input info. */
   private final InputInfo input;
 
   /**
    * Constructor.
-   * @param ctx context
+   * @param r repository context
    * @param ii input info
    */
-  public PkgParser(final Context ctx, final InputInfo ii) {
-    context = ctx;
+  public PkgParser(final Repo r, final InputInfo ii) {
+    repo = r;
     input = ii;
   }
 
@@ -51,38 +50,18 @@ public final class PkgParser {
   public Package parse(final IO io) throws QueryException {
     final Package pkg = new Package();
     try {
-      ANode node = childElements(new DBNode(io, context.prop)).next();
-
-      // tries to guess if the package is based on an obsolete packaging API
-      final boolean legacy = legacy(node);
-      // if yes, retrieves child node
-      if(legacy) node = childElements(node).next();
+      ANode node = childElements(new DBNode(io, repo.context.prop)).next();
 
       // checks root node
-      final byte[] root = legacy ? MODULE : PACKAGE;
-      if(!eqNS(root, node.qname()))
+      if(!eqNS(PACKAGE, node.qname()))
         PKGDESCINV.thrw(input, Util.info(WHICHELEM, node.qname()));
 
-      parseAttributes(node, pkg, root);
+      parseAttributes(node, pkg, PACKAGE);
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
-      throw PKGREADFAIL.thrw(input, ex.getMessage());
+      throw PKGREADFAIL.thrw(input, io.name(), ex.getMessage());
     }
-  }
-
-  /**
-   * Tries to guess if the package is based on an obsolete packaging API.
-   * This check will be removed in future versions.
-   * @param node root node
-   * @return result of check
-   */
-  private boolean legacy(final ANode node) {
-    final AxisIter ch = childElements(node);
-    for(ANode next; (next = ch.next()) != null;) {
-      if(eqNS(MODULE, next.qname())) return true;
-    }
-    return false;
   }
 
   /**
@@ -105,14 +84,11 @@ public final class PkgParser {
       else PKGDESCINV.thrw(input, Util.info(WHICHATTR, name));
     }
 
-    // Check mandatory attributes
+    // check mandatory attributes
     if(p.name == null)
       PKGDESCINV.thrw(input, Util.info(MISSATTR, NAME, root));
     if(p.version == null)
       PKGDESCINV.thrw(input, Util.info(MISSATTR, VERSION, root));
-    if(eq(root, MODULE)) return;
-
-    // Check mandatory attributes in version 1.0
     if(p.abbrev == null)
       PKGDESCINV.thrw(input, Util.info(MISSATTR, ABBREV, root));
     if(p.spec == null)
@@ -178,7 +154,7 @@ public final class PkgParser {
       else PKGDESCINV.thrw(input, Util.info(WHICHELEM, name));
     }
 
-    // Check mandatory children
+    // check mandatory children
     if(c.uri == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, NSPC));
     if(c.file == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, FILE));
     return c;

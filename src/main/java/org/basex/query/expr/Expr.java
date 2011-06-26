@@ -161,7 +161,7 @@ public abstract class Expr extends ExprInfo {
    * <ul>
    * <li> {@link GFLWOR#comp} to rewrite where clauses as predicates and
    *  remove statically bound or unused clauses</li>
-   * <li> {@link GFLWOR#compForLet} to relocate static LET clauses.</li>
+   * <li> {@link GFLWOR#compHoist} to hoist independent variables</li>
    * </ul>
    * @param v variable to be checked
    * @return number of occurrences
@@ -287,7 +287,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if this expression has free variables.
-   * @param ctx the query context on the level of this expression
+   * @param ctx query context on the level of this expression
    * @return {@code true} if there are variables which are used but not declared
    *         in this expression, {@code false} otherwise
    */

@@ -40,7 +40,7 @@ abstract class LanguageImpl extends FTIterator
 
   @Override
   public final int compareTo(final LanguageImpl o) {
-    // Higher precedence value = better
+    // higher precedence value = better
     return o.prec() - prec();
   }
 

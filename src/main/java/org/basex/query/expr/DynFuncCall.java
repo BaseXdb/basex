@@ -79,7 +79,7 @@ public final class DynFuncCall extends Arr {
 
   /**
    * Evaluates and checks the function item.
-   * @param ctx context
+   * @param ctx query context
    * @return function item
    * @throws QueryException query exception
    */

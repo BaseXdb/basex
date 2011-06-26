@@ -71,7 +71,7 @@ public abstract class Builder extends Progress {
     atts = new Names(cats);
   }
 
-  // Public Methods ============================================================
+  // PUBLIC METHODS ===========================================================
 
   /**
    * Builds the database.

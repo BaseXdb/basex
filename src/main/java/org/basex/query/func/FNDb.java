@@ -129,8 +129,9 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter text(final QueryContext ctx) throws QueryException {
-    final IndexContext ic = new IndexContext(ctx, checkData(ctx), null, true);
-    return new IndexAccess(input, expr[0], IndexType.TEXT, ic).iter(ctx);
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    final IndexContext ic = new IndexContext(ctx, data, null, true);
+    return new IndexAccess(input, expr[1], IndexType.TEXT, ic).iter(ctx);
   }
 
   /**
@@ -140,15 +141,16 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter attribute(final QueryContext ctx) throws QueryException {
-    final IndexContext ic = new IndexContext(ctx, checkData(ctx), null, true);
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    final IndexContext ic = new IndexContext(ctx, data, null, true);
     final IndexAccess ia = new IndexAccess(
-        input, expr[0], IndexType.ATTRIBUTE, ic);
+        input, expr[1], IndexType.ATTRIBUTE, ic);
 
     // return iterator if no name test is specified
-    if(expr.length < 2) return ia.iter(ctx);
+    if(expr.length < 3) return ia.iter(ctx);
 
     // parse and compile the name test
-    final Item name = checkEmpty(expr[1].item(ctx, input));
+    final Item name = checkEmpty(expr[2].item(ctx, input));
     final QNm nm = new QNm(checkStr(name, ctx), ctx, input);
 
     final NameTest nt = new NameTest(nm, NameTest.Name.STD, true, input);
@@ -175,18 +177,32 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter fulltext(final QueryContext ctx) throws QueryException {
-    return FNFt.search(checkData(ctx), checkStr(expr[0], ctx), this, ctx);
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    return FNFt.search(data, checkStr(expr[1], ctx), this, ctx);
   }
 
   /**
    * Performs the list function.
    * @param ctx query context
    * @return iterator
+   * @throws QueryException query exception
    */
-  private Iter list(final QueryContext ctx) {
-    final ItemCache ii = new ItemCache();
-    for(final String s : List.list(ctx.context)) ii.add(Str.get(s));
-    return ii;
+  private Iter list(final QueryContext ctx) throws QueryException {
+    final ItemCache ic = new ItemCache();
+    if(expr.length == 0) {
+      for(final String s : List.list(ctx.context)) ic.add(Str.get(s));
+    } else {
+      final byte[] str = checkStr(expr[0], ctx);
+      final int s = indexOf(str, '/');
+      final byte[] db = s == -1 ? str : substring(str, 0, s);
+      final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
+
+      // retrieve data instance; will be closed after query execution
+      final Data data = ctx.resource.data(db, input);
+      for(final int pre : data.doc(string(path)))
+        ic.add(Str.get(data.text(pre, true)));
+    }
+    return ic;
   }
 
   /**
@@ -205,15 +221,16 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Str info(final QueryContext ctx) throws QueryException {
-    byte[] info;
+    final byte[] info;
+    final Data d = ctx.resource.data(checkStr(expr[0], ctx), input);
     if(expr.length == 1) {
-      final byte[] tp = checkStr(expr[0], ctx);
+      final boolean create = ctx.context.user.perm(User.CREATE);
+      info = InfoDB.db(d.meta, false, true, create);
+    } else {
+      final byte[] tp = checkStr(expr[1], ctx);
       final CmdIndexInfo cmd = InfoIndex.info(string(tp));
       if(cmd == null) NOIDX.thrw(input, this);
-      info = InfoIndex.info(cmd, checkData(ctx));
-    } else {
-      final boolean create = ctx.context.user.perm(User.CREATE);
-      info = InfoDB.db(checkData(ctx).meta, false, true, create);
+      info = InfoIndex.info(cmd, d);
     }
     return Str.get(delete(info, '\r'));
   }

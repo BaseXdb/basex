@@ -29,7 +29,7 @@ public final class JarParser {
 
   /**
    * Constructor.
-   * @param ctx context
+   * @param ctx database context
    * @param ii input info
    */
   public JarParser(final Context ctx, final InputInfo ii) {
@@ -51,7 +51,7 @@ public final class JarParser {
       for(ANode next; (next = ch.next()) != null;) {
         final QNm name = next.qname();
         if(eqNS(JAR, name)) desc.jars.add(next.atom());
-        else if(eqNS(FUNC, name)) desc.classes.add(next.atom());
+        else if(eqNS(CLASS, name)) desc.classes.add(next.atom());
       }
       if(desc.jars.size() == 0) JARDESCINV.thrw(input, NOJARS);
       else if(desc.classes.size() == 0) JARDESCINV.thrw(input, NOCLASS);

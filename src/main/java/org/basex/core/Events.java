@@ -27,7 +27,7 @@ import org.basex.util.Util;
  */
 public final class Events extends HashMap<String, Sessions> {
   /** Event file. */
-  private final File file = new File(Prop.HOME + IO.BASEXSUFFIX + "events");
+  private final File file = new File(Prop.HOME, IO.BASEXSUFFIX + "events");
 
   /**
    * Constructor.

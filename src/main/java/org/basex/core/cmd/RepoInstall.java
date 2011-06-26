@@ -1,9 +1,13 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 
 import org.basex.core.Command;
+import org.basex.core.CommandBuilder;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdRepo;
 import org.basex.core.User;
 import org.basex.query.QueryException;
 import org.basex.query.util.pkg.RepoManager;
@@ -33,11 +37,16 @@ public final class RepoInstall extends Command {
   @Override
   protected boolean run() throws IOException {
     try {
-      new RepoManager(context).install(args[0], ii);
+      new RepoManager(context.repo).install(args[0], ii);
       return info(REPOINST, args[0], perf);
     } catch(final QueryException ex) {
       Util.debug(ex);
       return error(ex.getMessage());
     }
+  }
+
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.REPO + " " + CmdRepo.INSTALL).args();
   }
 }

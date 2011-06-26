@@ -6,7 +6,6 @@ import java.io.InputStream;
 import org.basex.data.Data;
 import org.basex.util.ByteList;
 import org.basex.util.Token;
-import org.basex.util.Util;
 import org.xml.sax.InputSource;
 
 /**
@@ -22,8 +21,6 @@ public abstract class IO {
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery file suffix. */
   public static final String XQSUFFIX = ".xq";
-  /** XQuery Archive file suffix. */
-  public static final String XARSUFFIX = ".xar";
   /** XML file suffix. */
   public static final String XMLSUFFIX = ".xml";
   /** ZIP file suffix. */
@@ -34,6 +31,8 @@ public abstract class IO {
   public static final String TXTSUFFIX = ".txt";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
+  /** File prefix. */
+  public static final String FILEPREF = "file:";
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =
@@ -86,8 +85,8 @@ public abstract class IO {
    */
   protected final void init(final String p) {
     path = p;
-    // use timer if no name is given
-    final String n = path.substring(path.lastIndexOf('/') + 1);
+    final String n = p.substring(p.lastIndexOf('/') + 1);
+    // use current time if no name is given
     name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) +
         XMLSUFFIX : n;
   }
@@ -100,7 +99,7 @@ public abstract class IO {
   public static IO get(final String s) {
     if(s == null) return new IOFile("");
     if(s.startsWith("<")) return new IOContent(Token.token(s));
-    if(!s.contains("://") || s.startsWith("file:")) return new IOFile(s);
+    if(!s.contains("://") || s.startsWith(FILEPREF)) return new IOFile(s);
     return new IOUrl(s);
   }
 
@@ -191,15 +190,7 @@ public abstract class IO {
   }
 
   /**
-   * Creates the directory.
-   * @return contents
-   */
-  public boolean md() {
-    return false;
-  }
-
-  /**
-   * Chops the path and the XML suffix of the specified filename
+   * Chops the path and the file suffix of the specified filename
    * and returns the database name.
    * @return database name
    */
@@ -246,53 +237,7 @@ public abstract class IO {
    * @return chopped filename
    */
   public String dir() {
-    return isDir() ? path() : path.substring(0, path.lastIndexOf('/') + 1);
-  }
-
-  /**
-   * Returns the children of a path.
-   * @return children
-   */
-  public final IO[] children() {
-    return children(".*");
-  }
-
-  /**
-   * Returns the children of a path that match the specified regular expression.
-   * @param pattern pattern
-   * @return children
-   */
-  @SuppressWarnings("unused")
-  public IO[] children(final String pattern) {
-    return new IO[] {};
-  }
-
-  /**
-   * Writes the specified file contents.
-   * @param c contents
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public void write(final byte[] c) throws IOException {
-    Util.notexpected();
-  }
-
-  /**
-   * Deletes the IO reference.
-   * @return success flag
-   */
-  public boolean delete() {
-    return false;
-  }
-
-  /**
-   * Renames the specified IO reference.
-   * @param trg target reference
-   * @return success flag
-   */
-  @SuppressWarnings("unused")
-  public boolean rename(final IO trg) {
-    return false;
+    return "";
   }
 
   /**
@@ -312,17 +257,14 @@ public abstract class IO {
   /**
    * Caches the contents of the specified input stream.
    * @param i input stream
-   * @return cached contents
    * @throws IOException I/O exception
    */
-  protected final byte[] cache(final InputStream i) throws IOException {
+  protected final void cache(final InputStream i) throws IOException {
     final ByteList bl = new ByteList();
     final InputStream bis = i instanceof BufferedInputStream ||
       i instanceof BufferInput ? i : new BufferedInputStream(i);
-    int b;
-    while((b = bis.read()) != -1) bl.add(b);
+    for(int b; (b = bis.read()) != -1;) bl.add(b);
     bis.close();
     cont = bl.toArray();
-    return cont;
   }
 }

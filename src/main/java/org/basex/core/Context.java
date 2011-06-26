@@ -69,7 +69,7 @@ public final class Context {
 
   /**
    * Constructor. {@link #user} reference must be set after calling this.
-   * @param ctx parent context
+   * @param ctx parent database context
    * @param s server process
    */
   public Context(final Context ctx, final ServerProcess s) {

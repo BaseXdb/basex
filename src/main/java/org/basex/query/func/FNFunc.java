@@ -90,7 +90,7 @@ public final class FNFunc extends FuncCall {
 
   /**
    * Maps a function onto a sequence of items.
-   * @param ctx context
+   * @param ctx query context
    * @return sequence of results
    * @throws QueryException exception
    */
@@ -209,7 +209,7 @@ public final class FNFunc extends FuncCall {
    * Checks the type of the given function item.
    * @param p position
    * @param t type
-   * @param ctx context
+   * @param ctx query context
    * @return function item
    * @throws QueryException query exception
    */

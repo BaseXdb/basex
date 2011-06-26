@@ -1,10 +1,9 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert after primitive.
@@ -13,22 +12,45 @@ import org.basex.util.InputInfo;
  * @author Lukas Kircher
  */
 public final class InsertAfter extends InsertBase {
+
   /**
    * Constructor.
-   * @param ii input info
-   * @param n target node
-   * @param copy copy of nodes to be inserted
+   * @param p pre
+   * @param d data
+   * @param i input info
+   * @param c insert copy
    */
-  public InsertAfter(final InputInfo ii, final ANode n, final NodeCache copy) {
-    super(PrimitiveType.INSERTAFTER, ii, n, copy);
+  public InsertAfter(final int p, final Data d, final InputInfo i,
+      final NodeCache c) {
+    super(PrimitiveType.INSERTAFTER, p, d, i, c);
   }
 
   @Override
-  public void apply(final int add) {
-    final DBNode n = (DBNode) node;
-    final Data d = n.data;
-    final int pre = n.pre + add;
-    final int k = d.kind(pre);
-    d.insert(pre + d.size(pre, k), d.parent(pre, k), md);
+  public void apply() {
+    super.apply();
+
+    final int k = data.kind(pre);
+    data.insert(pre + data.size(pre, k), data.parent(pre, k), md);
+  }
+
+  @Override
+  public boolean checkTextAdjacency(final int c) {
+    final int p = pre + c;
+    // size of og target node
+    final int ps = data.size(p, data.kind(p));
+    final int affectedPre = p + ps;
+    boolean merged = false;
+    final int mds = md.meta.size;
+    if(md.kind(0) == Data.TEXT)
+      merged = mergeTexts(data, affectedPre - 1, affectedPre);
+    if(!merged && md.kind(mds - 1) == Data.TEXT)
+      merged |= mergeTexts(data, affectedPre + mds - 1, affectedPre + mds);
+
+    return merged;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + getTargetDBNode() + ", " + insert + "]";
   }
 }

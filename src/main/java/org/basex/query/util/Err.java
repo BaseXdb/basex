@@ -21,7 +21,7 @@ public enum Err {
   /** BASX0001: Evaluation exception. */
   NOIDX(BASX, 1, "Unknown index '%'."),
   /** BASX0002: Evaluation exception. */
-  NODBCTX(BASX, 2, "%: Database context needed."),
+  NODBCTX(BASX, 2, "%: database context needed."),
   /** BASX0003: Evaluation exception. */
   NODB(BASX, 3, "Database '%' not found."),
   /** BASX0004: Evaluation exception. */
@@ -155,13 +155,13 @@ public enum Err {
   /** PACK0006: Evaluation exception. */
   MODISTALLED(PACK, 6, "Module % is already installed within another package."),
   /** PACK0007: Evaluation exception. */
-  PKGREADFAIL(PACK, 7, "Reading package descriptor failed: %"),
+  PKGREADFAIL(PACK, 7, "Package '%' could not be parsed: %"),
   /** PACK0008: Evaluation exception. */
-  CANNOTDELPKG(PACK, 8, "Package cannot be deleted. "),
+  CANNOTDELPKG(PACK, 8, "Package cannot be deleted."),
   /** PACK0009: Evaluation exception. */
   PKGDEP(PACK, 9, "Package % depends on package %"),
   /** PACK0010: Evaluation exception. */
-  PKGNOTSUPP(PACK, 10, "Package is not supported by current version of BaseX."),
+  PKGNOTSUPP(PACK, 10, "Package is not supported by database version."),
   /** PACK0011: Evaluation exception. */
   JARDESCINV(PACK, 11, "Jar descriptor: %."),
   /** PACK0012: Evaluation exception. */
@@ -558,7 +558,7 @@ public enum Err {
   /** XQST0049: Parsing exception. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
   /** XQST0054: Parsing exception. */
-  XPSTACK(XQST, 54, "Stack Overflow: Circular variable declaration?"),
+  XPSTACK(XQST, 54, "Stack Overflow: circular variable declaration?"),
   /** XQST0055: Parsing exception. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057: Parsing exception. */

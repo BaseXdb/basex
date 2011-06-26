@@ -50,7 +50,7 @@ public final class InfoStorage extends AQuery {
       result = null;
     } else {
       int ps = 0;
-      int pe = data.meta.size;
+      int pe = 1000;
 
       if(start != null) {
         if(end != null) {

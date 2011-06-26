@@ -11,7 +11,7 @@ import org.basex.data.DOTSerializer;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -138,7 +138,7 @@ abstract class AQuery extends Command {
 
   /**
    * Checks if the query performs updates.
-   * @param ctx context reference
+   * @param ctx database context
    * @param qu query
    * @return result of check
    */
@@ -204,7 +204,7 @@ abstract class AQuery extends Command {
 
         final String dot = context.query == null ? "plan.dot" :
             context.query.name().replaceAll("\\..*?$", ".dot");
-        IO.get(dot).write(ao.toArray());
+        new IOFile(dot).write(ao.toArray());
 
         if(prop.is(Prop.DOTDISPLAY))
           new ProcessBuilder(prop.get(Prop.DOTTY), dot).start();

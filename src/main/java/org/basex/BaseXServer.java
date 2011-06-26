@@ -8,7 +8,7 @@ import java.net.Socket;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.BufferInput;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Log;
@@ -42,7 +42,7 @@ public class BaseXServer extends Main {
   /** Flag for server activity. */
   boolean running;
   /** Stop file. */
-  IO stop;
+  IOFile stop;
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
@@ -137,8 +137,8 @@ public class BaseXServer extends Main {
    * @param port server port
    * @return stop file
    */
-  private static IO stopFile(final int port) {
-    return IO.get(Prop.TMP + Util.name(BaseXServer.class) + port);
+  private static IOFile stopFile(final int port) {
+    return new IOFile(Prop.TMP, Util.name(BaseXServer.class) + port);
   }
 
   @Override
@@ -290,7 +290,7 @@ public class BaseXServer extends Main {
    * @param eport event port
    */
   public static void stop(final int port, final int eport) {
-    final IO stop = stopFile(port);
+    final IOFile stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
       new Socket(LOCALHOST, eport);

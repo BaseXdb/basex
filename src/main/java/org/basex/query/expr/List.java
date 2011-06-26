@@ -50,13 +50,15 @@ public final class List extends Arr {
     type = SeqType.EMP;
     boolean v = true;
     for(final Expr e : expr) {
-      if(e.empty()) continue;
+      // check if all expressions are values
+      v &= e.value();
+      // skip expression that will not add any results
+      if(e.size() == 0) continue;
       // evaluate sequence type
       final SeqType et = e.type();
       type = type == SeqType.EMP ? et :
         SeqType.get(et.type == type.type ? et.type : AtomType.ITEM,
             et.mayBeZero() && type.mayBeZero() ? Occ.ZM : Occ.OM);
-      v &= e.value();
     }
 
     // return cached integer sequence, cached values or self reference

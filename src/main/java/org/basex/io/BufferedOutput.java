@@ -22,15 +22,15 @@ public final class BufferedOutput extends OutputStream {
 
   /**
    * Constructor with a default buffer size.
-   * @param outstream the OutputStream we operate on
+   * @param out the stream to write to
    */
-  public BufferedOutput(final OutputStream outstream) {
-    this(outstream, IO.BLOCKSIZE);
+  public BufferedOutput(final OutputStream out) {
+    this(out, IO.BLOCKSIZE);
   }
 
   /**
    * Constructor with a specific buffer size.
-   * @param out the OutputStream we operate on
+   * @param out the stream to write to
    * @param bufs buffer size
    */
   public BufferedOutput(final OutputStream out, final int bufs) {

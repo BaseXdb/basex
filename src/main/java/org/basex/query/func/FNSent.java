@@ -47,7 +47,7 @@ public final class FNSent extends FuncCall {
 
   /**
    * Calculates the polarity value of a string.
-   * @param ctx context
+   * @param ctx query context
    * @param norm flag for normalizing results
    * @return resulting item
    * @throws QueryException query exception
