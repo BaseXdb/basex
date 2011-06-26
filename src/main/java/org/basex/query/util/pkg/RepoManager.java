@@ -59,8 +59,7 @@ public final class RepoManager {
       final Package pkg = new PkgParser(repo, ii).parse(new IOContent(desc));
       new PkgValidator(repo, ii).check(pkg);
 
-      // treat everything after last dot as file suffix
-      final String name = io.name().replaceAll("\\.[^.]+$", "");
+      final String name = string(pkg.uniqueName()).replaceAll("[^\\w.-]", "");
       // unzip files and register repository
       zip.unzip(repo.path(name));
       repo.add(pkg, name);

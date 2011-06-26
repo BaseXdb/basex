@@ -69,6 +69,9 @@ public interface PkgText {
   /** <class/> element. */
   byte[] CLASS = token("class");
 
+  /** Directory. */
+  String DIR = "Directory";
+
   /** Not expected initialization error. */
   String MISSDESC = "Missing package descriptor for package '%'";
   /** Attribute missing. */

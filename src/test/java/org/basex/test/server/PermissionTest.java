@@ -263,7 +263,7 @@ public final class PermissionTest {
     // repo Stuff
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
-    ok(new RepoDelete("pkg3", null), testSession);
+    ok(new RepoDelete("http://www.pkg3.com", null), testSession);
 
   }
 
