@@ -158,6 +158,23 @@ public final class ClientSession extends Session {
   }
 
   /**
+   * Replace a document in an open database.
+   * @param path document(s) to replace
+   * @param input new content
+   * @throws BaseXException exception
+   */
+  public void replace(final String path, final InputStream input)
+      throws BaseXException {
+    try {
+      sout.write(ServerCmd.REPLACE.code);
+      send(path);
+      send(input);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  /**
    * Watches an event.
    * @param name event name
    * @param notifier event notification
