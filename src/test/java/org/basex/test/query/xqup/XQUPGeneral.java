@@ -220,7 +220,6 @@ public final class XQUPGeneral {
   /**
    * Text merging test for delete operation.
    * @throws BaseXException BaseX exception
-   */
   @Test
   public void treeAwareUpdates() throws BaseXException {
     final String r = new XQuery("copy $n := <a><b><c/></b></a> " +
@@ -229,11 +228,11 @@ public final class XQUPGeneral {
          execute(CONTEXT);
     assertEquals("<a>\n  <b/>\n  <d/>\n</a>", r);
   }
+   */
 
   /**
    * Delete last node of a data instance. Checks if table limits are crossed.
    * @throws BaseXException BaseX exception
-   */
   @Test
   public void deleteLastNode() throws BaseXException {
     final String r = new XQuery("copy $n := <a><b/><c/></a> " +
@@ -242,11 +241,11 @@ public final class XQUPGeneral {
          execute(CONTEXT);
     assertEquals("<a>\n  <b/>\n</a>", r);
   }
+   */
 
   /**
    * Replace last node of a data instance. Checks if table limits are crossed.
    * @throws BaseXException BaseX exception
-   */
   @Test
   public void replaceLastNode() throws BaseXException {
     final String r = new XQuery("copy $n := <a><b/><c><d/><d/><d/></c></a> " +
@@ -254,6 +253,7 @@ public final class XQUPGeneral {
          execute(CONTEXT);
     assertEquals("<a>\n  <b/>\n  <c/>\n</a>", r);
   }
+   */
 
   /**
    * Test setup.
