@@ -18,7 +18,7 @@ import org.xmldb.api.base.XMLDBException;
  * @author Christian Gruen
  */
 public final class BXDatabase implements Database, BXXMLDBText {
-  /** Context reference. */
+  /** Database context. */
   private final Context ctx = new Context();
 
   @Override
