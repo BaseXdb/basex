@@ -14,8 +14,8 @@ import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 import com.bradmcevoy.http.HttpManager;
-import com.bradmcevoy.http.ServletRequest;
-import com.bradmcevoy.http.ServletResponse;
+import com.bradmcevoy.http.Request;
+import com.bradmcevoy.http.Response;
 
 /**
  * This is the starter class for running the WebDAV server. A database server
@@ -75,8 +75,8 @@ public class WebDAVServer extends Main {
           final HttpServletResponse response, final int dispatch)
           throws IOException, ServletException {
 
-        final ServletRequest req = new ServletRequest(request);
-        final ServletResponse res = new ServletResponse(response);
+        final Request req = new BXServletRequest(request);
+        final Response res = new BXServletResponse(response);
 
         try {
           m.process(req, res);
