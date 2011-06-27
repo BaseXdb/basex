@@ -31,7 +31,7 @@ public class AggregatedDatabaseUpdates {
   /** Data reference. */
   private final Data data;
   /** Pre values of target nodes. */
-  protected IntList nodes;
+  protected IntList nodes = new IntList(0);
   /** Mapping between pre values of the target nodes and all update primitives
    * which operate on this target. */
   protected final IntMap<AggregatedNodeUpdates> updatePrimitives =
