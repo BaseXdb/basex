@@ -150,8 +150,9 @@ public enum Err {
   NECPKGNOTINST(PACK, 3, "Necessary package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
   PKGDESCINV(PACK, 4, "Package descriptor: %."),
-  /** PACK0005: Evaluation exception. */
-  INVPKGNAME(PACK, 5, "Package must be a .xar file."),
+//  /** PACK0005: Evaluation exception. */
+// [MS] can be deleted
+//  INVPKGNAME(PACK, 5, "Package must be a .xar file."),
   /** PACK0006: Evaluation exception. */
   MODISTALLED(PACK, 6, "Module % is already installed within another package."),
   /** PACK0007: Evaluation exception. */
