@@ -7,8 +7,9 @@ import java.util.Map;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
-import org.basex.server.ClientQuery;
-import org.basex.server.ClientSession;
+import org.basex.server.Query;
+import org.basex.server.Session;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FileItem;
@@ -53,12 +54,12 @@ public class BXDocument extends BXResource implements FileResource {
   @Override
   public void delete() {
     try {
-      final ClientSession cs = login(user, pass);
+      final Session s = BXResourceFactory.login(user, pass);
       try {
-        cs.execute(new Open(db));
-        cs.execute(new Delete(path));
+        s.execute(new Open(db));
+        s.execute(new Delete(path));
       } finally {
-        cs.close();
+        s.close();
       }
     } catch(Exception e) {
       // [RS] WebDAV: error handling
@@ -87,10 +88,10 @@ public class BXDocument extends BXResource implements FileResource {
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType)
       throws IOException {
-    final ClientSession cs = login(user, pass);
+    final Session s = BXResourceFactory.login(user, pass);
     try {
-      cs.setOutputStream(out);
-      final ClientQuery q = cs.query(
+      s.setOutputStream(out);
+      final Query q = s.query(
           "declare variable $path as xs:string external; " +
           "collection($path)");
       q.bind("$path", db + DIRSEP + path);
@@ -99,7 +100,7 @@ public class BXDocument extends BXResource implements FileResource {
       // [RS] WebDAV: error handling
       e.printStackTrace();
     } finally {
-      cs.close();
+      s.close();
     }
   }
 

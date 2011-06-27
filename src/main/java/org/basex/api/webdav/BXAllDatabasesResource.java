@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.core.cmd.CreateDB;
-import org.basex.server.ClientSession;
+import org.basex.server.Session;
 
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
@@ -38,7 +38,7 @@ public class BXAllDatabasesResource extends BXResource implements
   @Override
   public Resource child(final String childName) {
     try {
-      final ClientSession cs = login(user, pass);
+      final Session cs = BXResourceFactory.login(user, pass);
       try {
         return listDatabases(cs).contains(childName) ?
             new BXDatabase(childName, user, pass) : null;
@@ -56,13 +56,13 @@ public class BXAllDatabasesResource extends BXResource implements
   public List<? extends Resource> getChildren() {
     try {
       final List<BXResource> dbs = new ArrayList<BXResource>();
-      final ClientSession cs = login(user, pass);
+      final Session s = BXResourceFactory.login(user, pass);
       try {
-        for(final String d : listDatabases(cs))
+        for(final String d : listDatabases(s))
           dbs.add(new BXDatabase(d, user, pass));
         return dbs;
       } finally {
-        cs.close();
+        s.close();
       }
     } catch(final Exception e) {
       // [DP] WebDAV: error handling
@@ -74,12 +74,12 @@ public class BXAllDatabasesResource extends BXResource implements
   @Override
   public CollectionResource createCollection(final String newName) {
     try {
-      final ClientSession cs = login(user, pass);
+      final Session s = BXResourceFactory.login(user, pass);
       try {
-        cs.execute(new CreateDB(dbname(newName)));
+        s.execute(new CreateDB(dbname(newName)));
         return new BXDatabase(newName, user, pass);
       } finally {
-        cs.close();
+        s.close();
       }
     } catch(Exception e) {
       // [RS] WebDAV: error handling
@@ -93,13 +93,13 @@ public class BXAllDatabasesResource extends BXResource implements
       final Long length, final String contentType) {
     if(supported(contentType)) {
       try {
-        final ClientSession cs = login(user, pass);
+        final Session s = BXResourceFactory.login(user, pass);
         try {
           final String dbname = dbname(newName);
-          cs.create(dbname, inputStream);
+          s.create(dbname, inputStream);
           return new BXDatabase(dbname, user, pass);
         } finally {
-          cs.close();
+          s.close();
         }
       } catch(Exception e) {
         // [RS] WebDAV: error handling

@@ -8,7 +8,8 @@ import java.util.Map;
 import org.basex.core.Text;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
-import org.basex.server.ClientSession;
+import org.basex.server.Session;
+
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.Range;
 
@@ -46,12 +47,12 @@ public class BXDatabase extends BXFolder {
   public Date getModifiedDate() {
     try {
       final String info;
-      final ClientSession cs = login(user, pass);
+      final Session s = BXResourceFactory.login(user, pass);
       try {
-        cs.execute(new Open(db));
-        info = cs.query("db:info()").execute();
+        s.execute(new Open(db));
+        info = s.query("db:info()").execute();
       } finally {
-        cs.close();
+        s.close();
       }
       // parse the timestamp
       final String timestamp = "Time Stamp: ";
@@ -81,11 +82,11 @@ public class BXDatabase extends BXFolder {
   @Override
   public void delete() {
     try {
-      final ClientSession cs = login(user, pass);
+      final Session s = BXResourceFactory.login(user, pass);
       try {
-        cs.execute(new DropDB(db));
+        s.execute(new DropDB(db));
       } finally {
-        cs.close();
+        s.close();
       }
     } catch(Exception e) {
       // [RS] WebDAV: error handling
@@ -98,6 +99,7 @@ public class BXDatabase extends BXFolder {
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType) {
     // TODO Auto-generated method stub
+    // may not be needed to be implemented
   }
 
   @Override

@@ -10,8 +10,9 @@ import java.util.Map;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
-import org.basex.server.ClientQuery;
-import org.basex.server.ClientSession;
+import org.basex.server.Query;
+import org.basex.server.Session;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
@@ -51,14 +52,14 @@ public class BXFolder extends BXResource implements FolderResource {
   @Override
   public CollectionResource createCollection(final String folder) {
     try {
-      final ClientSession cs = login(user, pass);
+      final Session s = BXResourceFactory.login(user, pass);
       try {
         final String newFolder = path + DIRSEP + folder;
-        cs.execute(new Open(db));
-        cs.execute(new Add("<empty/>", "EMPTY.xml", newFolder));
+        s.execute(new Open(db));
+        s.execute(new Add("<empty/>", "EMPTY.xml", newFolder));
         return new BXFolder(db, newFolder, user, pass);
       } finally {
-        cs.close();
+        s.close();
       }
     } catch(Exception e) {
       // [RS] WebDAV: error handling
@@ -70,11 +71,11 @@ public class BXFolder extends BXResource implements FolderResource {
   @Override
   public Resource child(final String childName) {
     try {
-      final ClientSession cs = login(user, pass);
+      final Session s = BXResourceFactory.login(user, pass);
       try {
-        return resource(cs, db, path + DIRSEP + childName);
+        return resource(s, db, path + DIRSEP + childName);
       } finally {
-        cs.close();
+        s.close();
       }
     } catch(Exception e) {
       // [RS] WebDav Error Handling
@@ -88,9 +89,9 @@ public class BXFolder extends BXResource implements FolderResource {
     final List<BXResource> ch = new ArrayList<BXResource>();
     final HashSet<String> paths = new HashSet<String>();
     try {
-      final ClientSession cs = login(user, pass);
+      final Session s = BXResourceFactory.login(user, pass);
       try {
-        final ClientQuery q = cs.query(
+        final Query q = s.query(
             "declare variable $d as xs:string external; " +
             "declare variable $p as xs:string external; " +
             "for $r in db:list($d) return substring-after($r,$p)");
@@ -111,7 +112,7 @@ public class BXFolder extends BXResource implements FolderResource {
           }
         }
       } finally {
-        cs.close();
+        s.close();
       }
     } catch(Exception e) {
       // [RS] WebDAV: error handling
@@ -125,13 +126,13 @@ public class BXFolder extends BXResource implements FolderResource {
       final Long length, final String contentType) {
     if(supported(contentType)) {
       try {
-        final ClientSession cs = login(user, pass);
+        final Session s = BXResourceFactory.login(user, pass);
         try {
-          cs.execute(new Open(db));
-          cs.add(newName, path, inputStream);
+          s.execute(new Open(db));
+          s.add(newName, path, inputStream);
           return new BXDocument(db, path + DIRSEP + newName, user, pass);
         } finally {
-          cs.close();
+          s.close();
         }
       } catch(Exception e) {
         // [RS] WebDAV: error handling
@@ -149,12 +150,12 @@ public class BXFolder extends BXResource implements FolderResource {
   @Override
   public void delete() {
     try {
-      final ClientSession cs = login(user, pass);
+      final Session s = BXResourceFactory.login(user, pass);
       try {
-        cs.execute(new Open(db));
-        cs.execute(new Delete(path));
+        s.execute(new Open(db));
+        s.execute(new Delete(path));
       } finally {
-        cs.close();
+        s.close();
       }
     } catch(Exception e) {
       // [RS] WebDAV: error handling

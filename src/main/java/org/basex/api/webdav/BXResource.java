@@ -2,12 +2,11 @@ package org.basex.api.webdav;
 
 import static java.lang.Integer.*;
 import static org.basex.api.webdav.WebDAVServer.*;
-import java.io.IOException;
 import java.util.Date;
 
 import org.basex.core.BaseXException;
-import org.basex.server.ClientQuery;
-import org.basex.server.ClientSession;
+import org.basex.server.Query;
+import org.basex.server.Session;
 import org.basex.util.StringList;
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
@@ -90,14 +89,14 @@ public abstract class BXResource implements Resource {
 
   /**
    * List all databases.
-   * @param cs session
+   * @param s session
    * @return a list of database names
    * @throws BaseXException query exception
    */
-  static StringList listDatabases(final ClientSession cs)
+  static StringList listDatabases(final Session s)
       throws BaseXException {
     final StringList result = new StringList();
-    final ClientQuery q = cs.query("db:list()");
+    final Query q = s.query("db:list()");
     while(q.more()) result.add(q.next());
     return result;
   }
@@ -113,48 +112,18 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Login to the database server.
-   * @param u user name
-   * @param p user password
-   * @return new client session
-   * @throws IOException I/O exception
-   */
-  static ClientSession login(final String u, final String p)
-      throws IOException {
-    final String host = System.getProperty(DBHOST);
-    final int port = Integer.parseInt(System.getProperty(DBPORT));
-    String user = System.getProperty(DBUSER);
-    String pass = System.getProperty(DBPASS);
-    if(user == null) {
-      user = u;
-      pass = p;
-    }
-    return new ClientSession(host, port, user, pass);
-  }
-
-  /**
-   * Login to the database server.
-   * @param a authentication
-   * @return new client session
-   * @throws IOException I/O exception
-   */
-  static ClientSession login(final Auth a) throws IOException {
-    return a == null ? login(null, null) : login(a.getUser(), a.getPassword());
-  }
-
-  /**
    * Create a folder or document resource.
-   * @param cs active client session
+   * @param s active client session
    * @param db database name
    * @param path resource path
    * @return requested resource or {@code null} if it does not exist
    * @throws BaseXException query exception
    */
-  static Resource resource(final ClientSession cs, final String db,
+  static Resource resource(final Session s, final String db,
       final String path) throws BaseXException {
     final String dbpath = db + DIRSEP + path;
     // check if there is a document in the collection having this path
-    final ClientQuery d = cs.query(
+    final Query d = s.query(
         "declare variable $d as xs:string external; " +
         "declare variable $p as xs:string external; " +
         "count(db:list($d)[. = $p])");
@@ -163,7 +132,7 @@ public abstract class BXResource implements Resource {
     if(parseInt(d.execute()) == 1) return new BXDocument(db, path);
 
     // check if there are paths in the collection starting with this path
-    final ClientQuery f = cs.query(
+    final Query f = s.query(
         "declare variable $d as xs:string external; " +
         "declare variable $p as xs:string external; " +
         "count(db:list($d)[starts-with(., $p)])");

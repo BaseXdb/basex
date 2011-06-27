@@ -44,10 +44,13 @@ public class WebDAVServer extends Main {
     "  -r<dbport>  BaseX server port" + NL +
     "  -u<dbuser>  BaseX user name" + NL +
     "  -p<dbpass>  BaseX user password" + NL +
-    "  -w<webdavport>  WebDAV server port";
+    "  -w<webdavport>  WebDAV server port" + NL +
+    "  -s          Stand-alone: access local databases directly";
 
   /** HTTP server. */
   private final Server jetty;
+  /** Stand-alone flag: no remote BaseX server. */
+  private boolean standalone;
 
   /**
    * Main method, launching the WebDAV implementation.
@@ -67,7 +70,7 @@ public class WebDAVServer extends Main {
     set(DBHOST, context.prop.get(Prop.HOST));
     set(DBPORT, Integer.toString(context.prop.num(Prop.SERVERPORT)));
 
-    final HttpManager m = new HttpManager(new BXResourceFactory());
+    final HttpManager m = new HttpManager(new BXResourceFactory(standalone));
     final Handler h = new AbstractHandler() {
       @SuppressWarnings("unused")
       @Override
@@ -123,6 +126,7 @@ public class WebDAVServer extends Main {
         case 'u': set(DBUSER, a.string()); break;
         case 'p': set(DBPASS, a.string()); break;
         case 'w': set(WEBDAVPORT, a.string()); break;
+        case 's': standalone = true; break;
         default: break;
       }
     }
