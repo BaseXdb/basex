@@ -94,14 +94,17 @@ final class QueryProcess extends Progress {
 
   /**
    * Serializes the next item and tests if more items can be returned.
+   * @return {@code true} if a new item was serialized
    * @throws IOException Exception
    * @throws QueryException query exception
    */
-  void next() throws IOException, QueryException {
+  boolean next() throws IOException, QueryException {
     if(xml == null) init();
     xml.init();
     final Item it = iter.next();
-    if(it != null) next(it);
+    if(it == null) return false;
+    next(it);
+    return true;
   }
 
   /**

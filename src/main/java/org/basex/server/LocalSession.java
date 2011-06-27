@@ -9,7 +9,6 @@ import org.basex.core.Context;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Replace;
-import org.basex.core.cmd.XQuery;
 import org.basex.query.QueryException;
 import org.basex.util.Util;
 
@@ -22,6 +21,8 @@ import org.basex.util.Util;
 public final class LocalSession extends Session {
   /** Database context. */
   private final Context ctx;
+  /** Currently running query. */
+  private Query q;
 
   /**
    * Constructor.
@@ -61,11 +62,18 @@ public final class LocalSession extends Session {
 
   @Override
   public Query query(final String query) throws BaseXException {
-    return null;
+    if(q != null) q.close();
+    q = out == null ?
+        new LocalQuery(query, ctx) :
+        new LocalQuery(query, ctx, out);
+    return q;
   }
 
   @Override
   public void close() {
+    try {
+      if(q != null) q.close();
+    } catch(BaseXException ex) { Util.debug(ex); }
   }
 
   @Override

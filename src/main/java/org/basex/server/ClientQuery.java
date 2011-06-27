@@ -86,6 +86,7 @@ public final class ClientQuery extends Query {
     try {
       cs.sout.write(cmd.code);
       cs.send(arg);
+      // [DP] potential out-of-memory if iterating over a set of large documents
       final BufferInput bi = new BufferInput(cs.sin);
       final ByteList bl = bi.content();
       if(!cs.ok(bi)) throw new BaseXException(bi.readString());
