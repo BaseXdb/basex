@@ -8,6 +8,7 @@ import java.util.Map;
 import org.basex.core.Text;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
+import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.Range;
@@ -48,8 +49,12 @@ public class BXDatabase extends BXFolder {
       final String info;
       final ClientSession cs = login(user, pass);
       try {
-        cs.execute(new Open(db));
-        info = cs.query("db:info()").execute();
+        //cs.execute(new Open(db));
+        //info = cs.query("db:info()").execute();
+        ClientQuery q = cs.query("declare variable $p as xs:string external; "
+            + "db:info($p)");
+        q.bind("$p", db);
+        info = q.execute();
       } finally {
         cs.close();
       }

@@ -24,7 +24,8 @@ public class BXResourceFactory implements ResourceFactory {
 
     final Path p = Path.path(dbpath);
     // the root is requested
-    if(p.isRoot()) return new BXAllDatabasesResource();
+    if(p.isRoot())
+      return new BXAllDatabasesResource(a.getUser(), a.getPassword());
 
     final String db = p.getFirst();
 

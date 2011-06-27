@@ -5,6 +5,9 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.Add;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.server.ClientQuery;
@@ -46,8 +49,37 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public void copyTo(final CollectionResource toCollection, final String name) {
-    // TODO Auto-generated method stub
+  public void copyTo(final CollectionResource target, final String name) {
+    try {
+      ClientSession cs = login(user, pass);
+      try {
+        if(target instanceof BXAllDatabasesResource) {
+          // Document is copied to the root directory => new database has to be
+          // created
+          final String dbName = name.endsWith("xml") ? name.substring(0,
+              name.length() - 4) : name;
+          // Get contents of this document
+          ClientQuery q = cs.query("declare variable $doc as xs:string external; "
+              + "collection($doc)");
+          q.bind("$doc", db + DIRSEP + path);
+          String doc = q.execute();
+          // Create a new datatabase with this document
+          cs.execute(new CreateDB(dbName, doc));
+        } else if(target instanceof BXDatabase) {
+          // Document is copied to a database
+          if(((BXDatabase) target).db.equals(db)) {
+            // Document is copied to the root if its own database
+          }
+        } else if(target instanceof BXFolder) {
+          // Document is copied to a folder within a database
+        }
+      } finally {
+        cs.close();
+      }
+    } catch(Exception ex) {
+      // [RS] WebDAV: error handling
+      ex.printStackTrace();
+    }
   }
 
   @Override
@@ -90,9 +122,8 @@ public class BXDocument extends BXResource implements FileResource {
     final ClientSession cs = login(user, pass);
     try {
       cs.setOutputStream(out);
-      final ClientQuery q = cs.query(
-          "declare variable $path as xs:string external; " +
-          "collection($path)");
+      final ClientQuery q = cs.query("declare variable $path as xs:string external; "
+          + "collection($path)");
       q.bind("$path", db + DIRSEP + path);
       q.execute();
     } catch(BaseXException e) {

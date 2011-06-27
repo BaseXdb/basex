@@ -25,9 +25,20 @@ import com.bradmcevoy.http.Resource;
 public class BXAllDatabasesResource extends BXResource implements
     FolderResource {
 
-  /** Constructor. */
-  public BXAllDatabasesResource() {
+  /** User name. */
+  private String u;
+  /** Password. */
+  private String p;
+
+  /**
+   * Constructor.
+   * @param u user name
+   * @param p password
+   */
+  public BXAllDatabasesResource(final String u, final String p) {
     super(null, null);
+    this.u = u;
+    this.p = p;
   }
 
   @Override
@@ -38,10 +49,10 @@ public class BXAllDatabasesResource extends BXResource implements
   @Override
   public Resource child(final String childName) {
     try {
-      final ClientSession cs = login(user, pass);
+      final ClientSession cs = login(u, p);
       try {
-        return listDatabases(cs).contains(childName) ?
-            new BXDatabase(childName, user, pass) : null;
+        return listDatabases(cs).contains(childName) ? new BXDatabase(
+            childName, u, p) : null;
       } finally {
         cs.close();
       }
@@ -56,10 +67,10 @@ public class BXAllDatabasesResource extends BXResource implements
   public List<? extends Resource> getChildren() {
     try {
       final List<BXResource> dbs = new ArrayList<BXResource>();
-      final ClientSession cs = login(user, pass);
+      final ClientSession cs = login(u, p);
       try {
         for(final String d : listDatabases(cs))
-          dbs.add(new BXDatabase(d, user, pass));
+          dbs.add(new BXDatabase(d, u, p));
         return dbs;
       } finally {
         cs.close();
@@ -74,10 +85,10 @@ public class BXAllDatabasesResource extends BXResource implements
   @Override
   public CollectionResource createCollection(final String newName) {
     try {
-      final ClientSession cs = login(user, pass);
+      final ClientSession cs = login(u, p);
       try {
         cs.execute(new CreateDB(dbname(newName)));
-        return new BXDatabase(newName, user, pass);
+        return new BXDatabase(newName, u, p);
       } finally {
         cs.close();
       }
@@ -89,15 +100,15 @@ public class BXAllDatabasesResource extends BXResource implements
   }
 
   @Override
-  public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) {
+  public Resource createNew(final String newName,
+      final InputStream inputStream, final Long length, final String contentType) {
     if(supported(contentType)) {
       try {
-        final ClientSession cs = login(user, pass);
+        final ClientSession cs = login(u, p);
         try {
           final String dbname = dbname(newName);
           cs.create(dbname, inputStream);
-          return new BXDatabase(dbname, user, pass);
+          return new BXDatabase(dbname, u, p);
         } finally {
           cs.close();
         }

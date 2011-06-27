@@ -2,6 +2,7 @@ package org.basex.api.webdav;
 
 import static java.lang.Integer.*;
 import static org.basex.api.webdav.WebDAVServer.*;
+
 import java.io.IOException;
 import java.util.Date;
 
@@ -9,6 +10,7 @@ import org.basex.core.BaseXException;
 import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
 import org.basex.util.StringList;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Request.Method;
@@ -25,6 +27,8 @@ public abstract class BXResource implements Resource {
   static final char DIRSEP = '/';
   /** XML mime type. */
   static final String MIMETYPEXML = "text/xml";
+  /** Zip mime type. */
+  static final String MIMETYPEZIP = "application/zip";
   /** User name. */
   protected String user;
   /** User password. */
@@ -37,7 +41,9 @@ public abstract class BXResource implements Resource {
   /**
    * Constructor.
    * @param d database name
-   * @param p resource path
+   * @param pth resource path
+   * @param u user name
+   * @param p password
    */
   public BXResource(final String d, final String p) {
     db = d;
@@ -46,8 +52,10 @@ public abstract class BXResource implements Resource {
 
   @Override
   public Object authenticate(final String u, final String p) {
-    this.user = u;
-    this.pass = p;
+    if(u != null) {
+      this.user = u;
+      this.pass = p;
+    }
     return u;
   }
 
@@ -94,11 +102,11 @@ public abstract class BXResource implements Resource {
    * @return a list of database names
    * @throws BaseXException query exception
    */
-  static StringList listDatabases(final ClientSession cs)
-      throws BaseXException {
+  static StringList listDatabases(final ClientSession cs) throws BaseXException {
     final StringList result = new StringList();
     final ClientQuery q = cs.query("db:list()");
-    while(q.more()) result.add(q.next());
+    while(q.more())
+      result.add(q.next());
     return result;
   }
 
@@ -119,8 +127,7 @@ public abstract class BXResource implements Resource {
    * @return new client session
    * @throws IOException I/O exception
    */
-  static ClientSession login(final String u, final String p)
-      throws IOException {
+  static ClientSession login(final String u, final String p) throws IOException {
     final String host = System.getProperty(DBHOST);
     final int port = Integer.parseInt(System.getProperty(DBPORT));
     String user = System.getProperty(DBUSER);
@@ -143,7 +150,7 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Create a folder or document resource.
+   * Creates a folder or document resource.
    * @param cs active client session
    * @param db database name
    * @param path resource path
@@ -154,19 +161,17 @@ public abstract class BXResource implements Resource {
       final String path) throws BaseXException {
     final String dbpath = db + DIRSEP + path;
     // check if there is a document in the collection having this path
-    final ClientQuery d = cs.query(
-        "declare variable $d as xs:string external; " +
-        "declare variable $p as xs:string external; " +
-        "count(db:list($d)[. = $p])");
+    final ClientQuery d = cs.query("declare variable $d as xs:string external; "
+        + "declare variable $p as xs:string external; "
+        + "count(db:list($d)[. = $p])");
     d.bind("$d", dbpath);
     d.bind("$p", path);
     if(parseInt(d.execute()) == 1) return new BXDocument(db, path);
 
     // check if there are paths in the collection starting with this path
-    final ClientQuery f = cs.query(
-        "declare variable $d as xs:string external; " +
-        "declare variable $p as xs:string external; " +
-        "count(db:list($d)[starts-with(., $p)])");
+    final ClientQuery f = cs.query("declare variable $d as xs:string external; "
+        + "declare variable $p as xs:string external; "
+        + "count(db:list($d)[starts-with(., $p)])");
     f.bind("$d", dbpath);
     f.bind("$p", path);
     if(parseInt(f.execute()) > 0) return new BXFolder(db, path);
@@ -179,8 +184,8 @@ public abstract class BXResource implements Resource {
    * @return string without leading slash
    */
   static String stripLeadingSlash(final String s) {
-    return s != null && s.length() > 0 && s.charAt(0) == DIRSEP ?
-        s.substring(1) : s;
+    return s != null && s.length() > 0 && s.charAt(0) == DIRSEP ? s.substring(1)
+        : s;
   }
 
   /**
@@ -190,6 +195,7 @@ public abstract class BXResource implements Resource {
    */
   static boolean supported(final String ctype) {
     // [DP] additional content types can be supported in the future
-    return ctype != null && ctype.indexOf(MIMETYPEXML) >= 0;
+    return ctype != null
+        && (ctype.indexOf(MIMETYPEXML) >= 0 || ctype.indexOf(MIMETYPEZIP) >= 0);
   }
 }

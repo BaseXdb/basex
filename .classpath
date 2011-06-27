@@ -21,7 +21,7 @@
 	<classpathentry kind="lib" path="lib/commons-io-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/milton-api-1.5.10.jar" sourcepath="/home/insane/Development/uni/milton/milton-api/src/main/java"/>
+	<classpathentry kind="lib" path="lib/milton-api-1.5.10.jar" sourcepath="/home/hermione/Uni Konstanz/Information Engineering/SS 2011/WebDAV/milton-api.zip"/>
 	<classpathentry kind="lib" path="lib/milton-servlet-1.5.10.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.6.1.jar"/>

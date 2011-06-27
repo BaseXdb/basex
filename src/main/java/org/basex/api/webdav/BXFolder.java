@@ -90,10 +90,9 @@ public class BXFolder extends BXResource implements FolderResource {
     try {
       final ClientSession cs = login(user, pass);
       try {
-        final ClientQuery q = cs.query(
-            "declare variable $d as xs:string external; " +
-            "declare variable $p as xs:string external; " +
-            "for $r in db:list($d) return substring-after($r,$p)");
+        final ClientQuery q = cs.query("declare variable $d as xs:string external; "
+            + "declare variable $p as xs:string external; "
+            + "for $r in db:list($d) return substring-after($r,$p)");
         q.bind("$d", db + DIRSEP + path);
         q.bind("$p", path);
         while(q.more()) {
@@ -121,14 +120,21 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) {
+  public Resource createNew(final String newName,
+      final InputStream inputStream, final Long length, final String contentType) {
     if(supported(contentType)) {
       try {
         final ClientSession cs = login(user, pass);
         try {
           cs.execute(new Open(db));
-          cs.add(newName, path, inputStream);
+          final String docPath = path.isEmpty() ? newName : path + DIRSEP
+              + newName;
+          // Check if document with this path already exists
+          if(resource(cs, db, docPath) != null) {
+            cs.replace(docPath, inputStream);
+          } else {
+            cs.add(newName, path, inputStream);
+          }
           return new BXDocument(db, path + DIRSEP + newName, user, pass);
         } finally {
           cs.close();
