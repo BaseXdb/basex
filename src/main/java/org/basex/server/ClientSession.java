@@ -157,12 +157,7 @@ public final class ClientSession extends Session {
     }
   }
 
-  /**
-   * Replace a document in an open database.
-   * @param path document(s) to replace
-   * @param input new content
-   * @throws BaseXException exception
-   */
+  @Override
   public void replace(final String path, final InputStream input)
       throws BaseXException {
     try {

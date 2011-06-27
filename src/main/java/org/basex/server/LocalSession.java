@@ -8,6 +8,8 @@ import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.Replace;
+import org.basex.core.cmd.XQuery;
 import org.basex.query.QueryException;
 import org.basex.util.Util;
 
@@ -52,8 +54,13 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  public Query query(final String query) {
-    Util.notimplemented();
+  public void replace(final String path, final InputStream input)
+      throws BaseXException {
+    info = Replace.replace(path, input, ctx, true);
+  }
+
+  @Override
+  public Query query(final String query) throws BaseXException {
     return null;
   }
 
