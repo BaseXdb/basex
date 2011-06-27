@@ -30,21 +30,24 @@ public class BXFolder extends BXResource implements FolderResource {
    * Constructor.
    * @param dbname database name
    * @param folderPath path to folder
+   * @param f resource factory
    */
-  public BXFolder(final String dbname, final String folderPath) {
-    super(dbname, folderPath);
+  public BXFolder(final String dbname, final String folderPath,
+      final BXResourceFactory f) {
+    super(dbname, folderPath, f);
   }
 
   /**
    * Constructor.
    * @param dbname database name
    * @param folderPath path to folder
+   * @param f resource factory
    * @param u user name
    * @param p password
    */
-  public BXFolder(final String dbname, final String folderPath, final String u,
-      final String p) {
-    this(dbname, folderPath);
+  public BXFolder(final String dbname, final String folderPath,
+      final BXResourceFactory f, final String u, final String p) {
+    this(dbname, folderPath, f);
     user = u;
     pass = p;
   }
@@ -52,12 +55,12 @@ public class BXFolder extends BXResource implements FolderResource {
   @Override
   public CollectionResource createCollection(final String folder) {
     try {
-      final Session s = BXResourceFactory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
-        final String newFolder = path + DIRSEP + folder;
+        final String newFolder = path + SEP + folder;
         s.execute(new Open(db));
         s.execute(new Add("<empty/>", "EMPTY.xml", newFolder));
-        return new BXFolder(db, newFolder, user, pass);
+        return new BXFolder(db, newFolder, factory, user, pass);
       } finally {
         s.close();
       }
@@ -71,9 +74,9 @@ public class BXFolder extends BXResource implements FolderResource {
   @Override
   public Resource child(final String childName) {
     try {
-      final Session s = BXResourceFactory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
-        return resource(s, db, path + DIRSEP + childName);
+        return factory.resource(s, db, path + SEP + childName);
       } finally {
         s.close();
       }
@@ -89,25 +92,25 @@ public class BXFolder extends BXResource implements FolderResource {
     final List<BXResource> ch = new ArrayList<BXResource>();
     final HashSet<String> paths = new HashSet<String>();
     try {
-      final Session s = BXResourceFactory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
         final Query q = s.query(
             "declare variable $d as xs:string external; " +
             "declare variable $p as xs:string external; " +
             "for $r in db:list($d) return substring-after($r,$p)");
-        q.bind("$d", db + DIRSEP + path);
+        q.bind("$d", db + SEP + path);
         q.bind("$p", path);
         while(q.more()) {
           final String p = stripLeadingSlash(q.next());
-          final int ix = p.indexOf(DIRSEP);
+          final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
-            ch.add(new BXDocument(db, path + DIRSEP + p, user, pass));
+            ch.add(new BXDocument(db, path + SEP + p, factory, user, pass));
           } else {
-            final String folder = path + DIRSEP + p.substring(0, ix);
+            final String folder = path + SEP + p.substring(0, ix);
             if(!paths.contains(folder)) {
               paths.add(folder);
-              ch.add(new BXFolder(db, folder, user, pass));
+              ch.add(new BXFolder(db, folder, factory, user, pass));
             }
           }
         }
@@ -126,11 +129,16 @@ public class BXFolder extends BXResource implements FolderResource {
       final Long length, final String contentType) {
     if(supported(contentType)) {
       try {
-        final Session s = BXResourceFactory.login(user, pass);
+        final Session s = factory.login(user, pass);
         try {
           s.execute(new Open(db));
-          s.add(newName, path, inputStream);
-          return new BXDocument(db, path + DIRSEP + newName, user, pass);
+          final String doc = path.isEmpty() ? newName : path + SEP + newName;
+          // Check if document with this path already exists
+          if(factory.resource(s, db, doc) == null)
+            s.add(newName, path, inputStream);
+          else
+            s.replace(doc, inputStream);
+          return new BXDocument(db, path + SEP + newName, factory, user, pass);
         } finally {
           s.close();
         }
@@ -150,7 +158,7 @@ public class BXFolder extends BXResource implements FolderResource {
   @Override
   public void delete() {
     try {
-      final Session s = BXResourceFactory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
         s.execute(new Open(db));
         s.execute(new Delete(path));

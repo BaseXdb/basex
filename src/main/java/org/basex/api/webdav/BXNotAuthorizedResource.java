@@ -28,7 +28,7 @@ public final class BXNotAuthorizedResource extends BXResource implements
 
   /** Constructor. */
   private BXNotAuthorizedResource() {
-    super(null, null);
+    super(null, null, null);
   }
 
   @Override

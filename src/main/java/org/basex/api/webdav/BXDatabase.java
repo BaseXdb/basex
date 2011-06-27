@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.Map;
 import org.basex.core.Text;
 import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Open;
+import org.basex.server.Query;
 import org.basex.server.Session;
 
 import com.bradmcevoy.http.CollectionResource;
@@ -27,30 +27,35 @@ public class BXDatabase extends BXFolder {
   /**
    * Constructor.
    * @param dbname database name
+   * @param f resource factory
    */
-  public BXDatabase(final String dbname) {
-    super(dbname, "");
+  public BXDatabase(final String dbname, final BXResourceFactory f) {
+    super(dbname, "", f);
   }
 
   /**
    * Constructor.
    * @param dbname database name
+   * @param f resource factory
    * @param u user name
    * @param p user password
    */
-  public BXDatabase(final String dbname, final String u,
-      final String p) {
-    super(dbname, "", u, p);
+  public BXDatabase(final String dbname, final BXResourceFactory f,
+      final String u, final String p) {
+    super(dbname, "", f, u, p);
   }
 
   @Override
   public Date getModifiedDate() {
     try {
       final String info;
-      final Session s = BXResourceFactory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
-        s.execute(new Open(db));
-        info = s.query("db:info()").execute();
+        final Query q = s.query(
+            "declare variable $p as xs:string external; " +
+            "db:info($p)");
+        q.bind("$p", db);
+        info = q.execute();
       } finally {
         s.close();
       }
@@ -58,7 +63,8 @@ public class BXDatabase extends BXFolder {
       final String timestamp = "Time Stamp: ";
       final int p = info.indexOf(timestamp);
       if(p >= 0) {
-        final String date = info.substring(p + timestamp.length(),
+        final String date = info.substring(
+            p + timestamp.length(),
             info.indexOf(Text.NL, p));
         if(date.length() > 0) return DATEFORMAT.parse(date);
       }
@@ -82,7 +88,7 @@ public class BXDatabase extends BXFolder {
   @Override
   public void delete() {
     try {
-      final Session s = BXResourceFactory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
         s.execute(new DropDB(db));
       } finally {

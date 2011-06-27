@@ -1,9 +1,6 @@
 package org.basex.api.webdav;
 
-import static java.lang.Integer.*;
-import static org.basex.api.webdav.WebDAVServer.*;
 import java.util.Date;
-
 import org.basex.core.BaseXException;
 import org.basex.server.Query;
 import org.basex.server.Session;
@@ -21,9 +18,11 @@ import com.bradmcevoy.http.Resource;
  */
 public abstract class BXResource implements Resource {
   /** File path separator. */
-  static final char DIRSEP = '/';
+  static final char SEP = '/';
   /** XML mime type. */
   static final String MIMETYPEXML = "text/xml";
+  /** Zip mime type. */
+  static final String MIMETYPEZIP = "application/zip";
   /** User name. */
   protected String user;
   /** User password. */
@@ -32,21 +31,27 @@ public abstract class BXResource implements Resource {
   protected final String db;
   /** Resource path (without leading '/'). */
   protected final String path;
+  /** Reference to the resource factory. */
+  protected final BXResourceFactory factory;
 
   /**
    * Constructor.
    * @param d database name
    * @param p resource path
+   * @param f resource factory
    */
-  public BXResource(final String d, final String p) {
+  public BXResource(final String d, final String p, final BXResourceFactory f) {
     db = d;
     path = stripLeadingSlash(p);
+    factory = f;
   }
 
   @Override
   public Object authenticate(final String u, final String p) {
-    this.user = u;
-    this.pass = p;
+    if(u != null) {
+      this.user = u;
+      this.pass = p;
+    }
     return u;
   }
 
@@ -78,7 +83,7 @@ public abstract class BXResource implements Resource {
 
   @Override
   public String getName() {
-    final int idx = path.lastIndexOf(DIRSEP);
+    final int idx = path.lastIndexOf(SEP);
     return idx < 0 ? path : path.substring(idx + 1, path.length());
   }
 
@@ -93,7 +98,7 @@ public abstract class BXResource implements Resource {
    * @return a list of database names
    * @throws BaseXException query exception
    */
-  static StringList listDatabases(final Session s)
+  static StringList listDbs(final Session s)
       throws BaseXException {
     final StringList result = new StringList();
     final Query q = s.query("db:list()");
@@ -112,43 +117,12 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Create a folder or document resource.
-   * @param s active client session
-   * @param db database name
-   * @param path resource path
-   * @return requested resource or {@code null} if it does not exist
-   * @throws BaseXException query exception
-   */
-  static Resource resource(final Session s, final String db,
-      final String path) throws BaseXException {
-    final String dbpath = db + DIRSEP + path;
-    // check if there is a document in the collection having this path
-    final Query d = s.query(
-        "declare variable $d as xs:string external; " +
-        "declare variable $p as xs:string external; " +
-        "count(db:list($d)[. = $p])");
-    d.bind("$d", dbpath);
-    d.bind("$p", path);
-    if(parseInt(d.execute()) == 1) return new BXDocument(db, path);
-
-    // check if there are paths in the collection starting with this path
-    final Query f = s.query(
-        "declare variable $d as xs:string external; " +
-        "declare variable $p as xs:string external; " +
-        "count(db:list($d)[starts-with(., $p)])");
-    f.bind("$d", dbpath);
-    f.bind("$p", path);
-    if(parseInt(f.execute()) > 0) return new BXFolder(db, path);
-    return null;
-  }
-
-  /**
    * String leading slash if available.
    * @param s string to modify
    * @return string without leading slash
    */
   static String stripLeadingSlash(final String s) {
-    return s != null && s.length() > 0 && s.charAt(0) == DIRSEP ?
+    return s != null && s.length() > 0 && s.charAt(0) == SEP ?
         s.substring(1) : s;
   }
 

@@ -24,10 +24,17 @@ import com.bradmcevoy.http.Resource;
  */
 public class BXAllDatabasesResource extends BXResource implements
     FolderResource {
-
-  /** Constructor. */
-  public BXAllDatabasesResource() {
-    super(null, null);
+  /**
+   * Constructor.
+   * @param f resource factory
+   * @param u user name
+   * @param p password
+   */
+  public BXAllDatabasesResource(final BXResourceFactory f, final String u,
+      final String p) {
+    super(null, null, f);
+    user = u;
+    pass = p;
   }
 
   @Override
@@ -38,10 +45,10 @@ public class BXAllDatabasesResource extends BXResource implements
   @Override
   public Resource child(final String childName) {
     try {
-      final Session cs = BXResourceFactory.login(user, pass);
+      final Session cs = factory.login(user, pass);
       try {
-        return listDatabases(cs).contains(childName) ?
-            new BXDatabase(childName, user, pass) : null;
+        return listDbs(cs).contains(childName) ?
+            new BXDatabase(childName, factory, user, pass) : null;
       } finally {
         cs.close();
       }
@@ -56,10 +63,10 @@ public class BXAllDatabasesResource extends BXResource implements
   public List<? extends Resource> getChildren() {
     try {
       final List<BXResource> dbs = new ArrayList<BXResource>();
-      final Session s = BXResourceFactory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
-        for(final String d : listDatabases(s))
-          dbs.add(new BXDatabase(d, user, pass));
+        for(final String d : listDbs(s))
+          dbs.add(new BXDatabase(d, factory, user, pass));
         return dbs;
       } finally {
         s.close();
@@ -74,10 +81,10 @@ public class BXAllDatabasesResource extends BXResource implements
   @Override
   public CollectionResource createCollection(final String newName) {
     try {
-      final Session s = BXResourceFactory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
         s.execute(new CreateDB(dbname(newName)));
-        return new BXDatabase(newName, user, pass);
+        return new BXDatabase(newName, factory, user, pass);
       } finally {
         s.close();
       }
@@ -93,11 +100,11 @@ public class BXAllDatabasesResource extends BXResource implements
       final Long length, final String contentType) {
     if(supported(contentType)) {
       try {
-        final Session s = BXResourceFactory.login(user, pass);
+        final Session s = factory.login(user, pass);
         try {
           final String dbname = dbname(newName);
           s.create(dbname, inputStream);
-          return new BXDatabase(dbname, user, pass);
+          return new BXDatabase(dbname, factory, user, pass);
         } finally {
           s.close();
         }

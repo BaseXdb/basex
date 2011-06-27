@@ -28,7 +28,7 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class BXCollection implements Collection, BXXMLDBText {
-  /** Context reference. */
+  /** Database context. */
   Context ctx;
 
   /**
