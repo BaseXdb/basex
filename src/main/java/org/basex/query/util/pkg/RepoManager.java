@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.basex.io.IO;
@@ -63,6 +64,10 @@ public final class RepoManager {
       // unzip files and register repository
       zip.unzip(repo.path(name));
       repo.add(pkg, name);
+
+    } catch(final FileNotFoundException ex1) {
+      Util.debug(ex1);
+      PKGREADFAIL.thrw(ii, io.name(), ex1.getMessage() + " not found");
     } catch(final IOException ex) {
       Util.debug(ex);
       PKGREADFAIL.thrw(ii, io.name(), ex.getMessage());
