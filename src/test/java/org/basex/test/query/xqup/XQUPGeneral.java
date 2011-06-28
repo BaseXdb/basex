@@ -47,7 +47,7 @@ public final class XQUPGeneral {
     execute(CONTEXT);
     final String r = new XQuery("(//item[@id='item0']/location/text())[1]").
     execute(CONTEXT);
-    assertEquals("United Statesfoo", r);
+    assertEquals("United Statesfoo", n(r));
   }
 
   /**
@@ -65,7 +65,7 @@ public final class XQUPGeneral {
     execute(CONTEXT);
     final String r = new XQuery("(//item[@id='item0']/location/text())[1]").
     execute(CONTEXT);
-    assertEquals("United Statesfoo", r);
+    assertEquals("United Statesfoo", n(r));
   }
 
   /**
@@ -84,7 +84,7 @@ public final class XQUPGeneral {
     final String r = new XQuery("let $i := //item[@id='item0'] return " +
       "(($i/location/text())[1], ($i/quantity/text())[1])").
     execute(CONTEXT);
-    assertEquals("fooUnited States1foo", r);
+    assertEquals("fooUnited States1foo", n(r));
   }
 
   /**
@@ -102,7 +102,7 @@ public final class XQUPGeneral {
     final String r = new XQuery("let $i := //item[@id='item0'] return " +
       "($i/location/text())[1]").
     execute(CONTEXT);
-    assertEquals("fooUnited States", r);
+    assertEquals("fooUnited States", n(r));
   }
 
   /**
@@ -119,7 +119,7 @@ public final class XQUPGeneral {
     execute(CONTEXT);
     final String r = new XQuery("//item[@id='item0']/location/text()").
     execute(CONTEXT);
-    assertEquals("foo", r);
+    assertEquals("foo", n(r));
   }
 
   /**
@@ -138,7 +138,7 @@ public final class XQUPGeneral {
     execute(CONTEXT);
     final String r = new XQuery("(//item[@id='item0']/location/text())[1]").
     execute(CONTEXT);
-    assertEquals("United Statesfoo", r);
+    assertEquals("United Statesfoo", n(r));
   }
 
   /**
@@ -154,7 +154,7 @@ public final class XQUPGeneral {
         execute(CONTEXT);
     final String r = new XQuery("(//item[@id='item0']/location/text())[1]").
       execute(CONTEXT);
-    assertEquals("United Statesfoo", r);
+    assertEquals("United Statesfoo", n(r));
   }
 
   /**
@@ -175,7 +175,7 @@ public final class XQUPGeneral {
     final String r = new XQuery("let $i := //item[@id='item0']/location " +
         "return ($i/text(), ($i/../text())[2])").
         execute(CONTEXT);
-    assertEquals("faafoofoo", r);
+    assertEquals("faafoofoo", n(r));
   }
 
   /**
@@ -188,7 +188,7 @@ public final class XQUPGeneral {
         "modify (delete node $c//d, insert node 'bb' after ($c//d)[1]) " +
         "return count($c//text()), $c//text()").
          execute(CONTEXT);
-    assertEquals("1aabbcc", r);
+    assertEquals("1aabbcc", n(r));
   }
 
   /**
@@ -201,7 +201,7 @@ public final class XQUPGeneral {
         "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
         "return count($c//text()), $c//text()").
          execute(CONTEXT);
-    assertEquals("1aabbcc", r);
+    assertEquals("1aabbcc", n(r));
   }
 
   /**
@@ -214,46 +214,46 @@ public final class XQUPGeneral {
         "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
         "return count($c//text()), $c//text()").
          execute(CONTEXT);
-    assertEquals("1aabbcc", r);
+    assertEquals("1aabbcc", n(r));
   }
 
   /**
    * Text merging test for delete operation.
    * @throws BaseXException BaseX exception
+   */
   @Test
   public void treeAwareUpdates() throws BaseXException {
     final String r = new XQuery("copy $n := <a><b><c/></b></a> " +
         "modify (replace value of node $n/b with (), " +
         "insert node <d/> into $n/b, insert node <d/> after $n/b) return $n").
          execute(CONTEXT);
-    assertEquals("<a>\n  <b/>\n  <d/>\n</a>", r);
+    assertEquals("<a><b/><d/></a>", n(r));
   }
-   */
 
   /**
    * Delete last node of a data instance. Checks if table limits are crossed.
    * @throws BaseXException BaseX exception
+   */
   @Test
   public void deleteLastNode() throws BaseXException {
     final String r = new XQuery("copy $n := <a><b/><c/></a> " +
         "modify (delete node $n//c) " +
         "return $n").
          execute(CONTEXT);
-    assertEquals("<a>\n  <b/>\n</a>", r);
+    assertEquals("<a><b/></a>", n(r));
   }
-   */
 
   /**
    * Replace last node of a data instance. Checks if table limits are crossed.
    * @throws BaseXException BaseX exception
+   */
   @Test
   public void replaceLastNode() throws BaseXException {
     final String r = new XQuery("copy $n := <a><b/><c><d/><d/><d/></c></a> " +
         "modify (replace node $n//c with <c/>) return $n").
          execute(CONTEXT);
-    assertEquals("<a>\n  <b/>\n  <c/>\n</a>", r);
+    assertEquals("<a><b/><c/></a>", n(r));
   }
-   */
 
   /**
    * Test setup.
@@ -276,5 +276,15 @@ public final class XQUPGeneral {
       e.printStackTrace();
     }
     CONTEXT.close();
+  }
+
+  /**
+   * Normalizes a given string - removes CR and LF.
+   * @param s string
+   * @return normalized string
+   */
+  public static String n(final String s) {
+    final String n = s.replaceAll("(\\r|\\n) *", "");
+    return n;
   }
 }
