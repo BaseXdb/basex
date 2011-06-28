@@ -10,6 +10,7 @@ import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
 import org.basex.server.EventNotifier;
+import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -24,10 +25,11 @@ import org.junit.Test;
  * @author Andreas Weiler
  */
 public final class EventTest {
+  /** Event name. */
+  static final String NAME = Util.name(EventTest.class);
+
   /** Return value of function db:event. */
   private static final String RETURN = "ABCDEFGHIJKLMNOP";
-  /** Event name. */
-  private static final String NAME = "event";
   /** Event count. */
   private static final int EVENT_COUNT = 50;
   /** Client count. */

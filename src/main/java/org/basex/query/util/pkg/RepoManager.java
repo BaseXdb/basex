@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
@@ -56,22 +55,37 @@ public final class RepoManager {
     try {
       // parse and validate repository
       final Zip zip = new Zip(cont);
-      final byte[] desc = zip.read(DESCRIPTOR);
-      final Package pkg = new PkgParser(repo, ii).parse(new IOContent(desc));
+      final byte[] dsc = zip.read(DESCRIPTOR);
+      final Package pkg = new PkgParser(repo, ii).parse(new IOContent(dsc));
       new PkgValidator(repo, ii).check(pkg);
 
-      final String name = string(pkg.uniqueName()).replaceAll("[^\\w.-]", "");
-      // unzip files and register repository
-      zip.unzip(repo.path(name));
-      repo.add(pkg, name);
-
-    } catch(final FileNotFoundException ex1) {
-      Util.debug(ex1);
-      PKGREADFAIL.thrw(ii, io.name(), ex1.getMessage() + " not found");
+      // choose unique directory, unzip files and register repository
+      final IOFile file = uniqueDir(
+          string(pkg.uniqueName()).replaceAll("[^\\w.-]+", "-"));
+      zip.unzip(file);
+      repo.add(pkg, file.name());
+    } catch(final FileNotFoundException ex) {
+      Util.debug(ex);
+      PKGREADFNF.thrw(ii, io.name(), ex.getMessage());
     } catch(final IOException ex) {
       Util.debug(ex);
       PKGREADFAIL.thrw(ii, io.name(), ex.getMessage());
     }
+  }
+
+  /**
+   * Returns a unique directory for the specified package.
+   * @param n name
+   * @return unique directory
+   */
+  private IOFile uniqueDir(final String n) {
+    String nm = n;
+    int c = 0;
+    do {
+      final IOFile io = repo.path(nm);
+      if(!io.exists()) return io;
+      nm = n + '-' + ++c;
+    } while(true);
   }
 
   /**

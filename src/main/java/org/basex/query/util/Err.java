@@ -136,7 +136,7 @@ public enum Err {
   /** FOHC003: Evaluation exception. */
   SRCATTR(FOHC, 3, "No attribute beside 'src' and 'media-type' allowed."),
   /** FOHC0004: Evaluation exception. */
-  REQINV(FOHC, 4, "The request element is not valid: %"),
+  REQINV(FOHC, 4, "The request element is not valid: %."),
   /** FOHC005: Evaluation exception. */
   NOURL(FOHC, 5, "No URL specified."),
   /** FOHC006: Evaluation exception. */
@@ -150,25 +150,24 @@ public enum Err {
   NECPKGNOTINST(PACK, 3, "Necessary package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
   PKGDESCINV(PACK, 4, "Package descriptor: %."),
-//  /** PACK0005: Evaluation exception. */
-// [MS] can be deleted
-//  INVPKGNAME(PACK, 5, "Package must be a .xar file."),
+  /** PACK0004: Evaluation exception. */
+  MODISTALLED(PACK, 5, "Module % is already installed within another package."),
   /** PACK0006: Evaluation exception. */
-  MODISTALLED(PACK, 6, "Module % is already installed within another package."),
+  PKGREADFAIL(PACK, 6, "Package '%' could not be parsed: %."),
+  /** PACK0006: Evaluation exception. */
+  PKGREADFNF(PACK, 6, "Package '%' could not be parsed: '%' not found."),
   /** PACK0007: Evaluation exception. */
-  PKGREADFAIL(PACK, 7, "Package '%' could not be parsed: %"),
+  CANNOTDELPKG(PACK, 7, "Package cannot be deleted."),
   /** PACK0008: Evaluation exception. */
-  CANNOTDELPKG(PACK, 8, "Package cannot be deleted."),
+  PKGDEP(PACK, 8, "Package % depends on package %."),
   /** PACK0009: Evaluation exception. */
-  PKGDEP(PACK, 9, "Package % depends on package %"),
+  PKGNOTSUPP(PACK, 9, "Package is not supported by database version."),
   /** PACK0010: Evaluation exception. */
-  PKGNOTSUPP(PACK, 10, "Package is not supported by database version."),
+  JARDESCINV(PACK, 10, "Jar descriptor: %."),
   /** PACK0011: Evaluation exception. */
-  JARDESCINV(PACK, 11, "Jar descriptor: %."),
+  JARREADFAIL(PACK, 11, "Reading jar descriptor failed: %."),
   /** PACK0012: Evaluation exception. */
-  JARREADFAIL(PACK, 12, "Reading jar descriptor failed: %"),
-  /** PACK0013: Evaluation exception. */
-  PKGNOTINST(PACK, 13, "Package '%' is not installed."),
+  PKGNOTINST(PACK, 12, "Package '%' is not installed."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
@@ -229,18 +228,18 @@ public enum Err {
   REGERR(FORX, 4, "Regular expression: '%'."),
 
   /** FOTY0012: Type exception. */
-  NOTYP(FOTY, 12, "Item doesn't have a typed value: %"),
+  NOTYP(FOTY, 12, "Item doesn't have a typed value: %."),
   /** FOTY0013: Type exception. */
-  FNATM(FOTY, 13, "Function items can't be atomized: %"),
+  FNATM(FOTY, 13, "Function items can't be atomized: %."),
   /** FOTY0013: Type exception. */
-  FNEQ(FOTY, 13, "Function items don't have a defined equality: %"),
+  FNEQ(FOTY, 13, "Function items don't have a defined equality: %."),
   /** FOTY0013: Type exception. */
-  FNSTR(FOTY, 14, "Function items don't have a string representation: %"),
+  FNSTR(FOTY, 14, "Function items don't have a string representation: %."),
   /** FOTY0013: Type exception. */
-  FNCMP(FOTY, 15, "Function items can't be compared: %"),
+  FNCMP(FOTY, 15, "Function items can't be compared: %."),
 
   /** FOFU0001: Invalid value of $argNum in call to fn:partial-apply. */
-  INVPOS(FOFU, 1, "Illegal argument position for %: %"),
+  INVPOS(FOFU, 1, "Illegal argument position for %: %."),
 
   /** FOUP0001: Evaluation exception. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),

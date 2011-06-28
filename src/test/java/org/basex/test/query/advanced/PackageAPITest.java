@@ -420,6 +420,6 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @return normalized path
    */
   private static String normalize(final String path) {
-    return path.replaceAll("[^\\w.-]", "");
+    return path.replaceAll("[^\\w.-]+", "-");
   }
 }
