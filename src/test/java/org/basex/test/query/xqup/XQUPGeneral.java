@@ -284,7 +284,6 @@ public final class XQUPGeneral {
    * @return normalized string
    */
   public static String n(final String s) {
-    final String n = s.replaceAll("(\\r|\\n) *", "");
-    return n;
+    return s.replaceAll("(\\r|\\n) *", "");
   }
 }
