@@ -17,7 +17,6 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  * @author Lukas Kircher
  */
 public class DatabaseModifier extends ContextModifier {
-
   /**
    * Constructor.
    */

@@ -13,7 +13,6 @@ import org.basex.util.Util;
  * @author Lukas Kircher
  */
 public final class DeleteNode extends StructuralUpdate {
-
   /**
    * Constructor.
    * @param p pre

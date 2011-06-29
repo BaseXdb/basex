@@ -122,7 +122,6 @@ public final class Order extends ParseExpr {
    * @author Leo Woerteler
    */
   class OrderedIter extends Iter {
-
     /** Sort keys. */
     ArrayList<Item[]> kl;
     /** Values to sort. */

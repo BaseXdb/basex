@@ -98,7 +98,6 @@ public final class FNFunc extends FuncCall {
     final FItem f = withArity(0, 1, ctx);
     final Iter xs = expr[1].iter(ctx);
     return new Iter() {
-
       /** Results. */
       Iter ys = Empty.ITER;
 
@@ -148,7 +147,6 @@ public final class FNFunc extends FuncCall {
     final Iter xs = expr[1].iter(ctx);
     final Iter ys = expr[2].iter(ctx);
     return new Iter() {
-
       /** Results. */
       Iter zs = Empty.ITER;
 

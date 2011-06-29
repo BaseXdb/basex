@@ -16,7 +16,6 @@ import org.basex.util.Util;
  * @author Lukas Kircher
  */
 public final class ReplaceNode extends NodeCopy {
-
   /**
    * Constructor.
    * @param p pre

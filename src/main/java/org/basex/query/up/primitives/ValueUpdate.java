@@ -12,7 +12,6 @@ import org.basex.util.InputInfo;
  * @author Lukas Kircher
  */
 public abstract class ValueUpdate extends UpdatePrimitive {
-
   /**
    * Constructor.
    * @param t type

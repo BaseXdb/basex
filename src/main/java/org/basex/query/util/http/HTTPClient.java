@@ -35,7 +35,6 @@ import org.basex.util.TokenMap;
  * @author Rositsa Shadura
  */
 public final class HTTPClient {
-
   /** Request attribute: HTTP method. */
   private static final byte[] METHOD = token("method");
   /** Request attribute: username. */

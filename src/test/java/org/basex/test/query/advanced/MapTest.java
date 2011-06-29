@@ -10,7 +10,6 @@ import org.junit.Test;
  * @author Leo Woerteler
  */
 public class MapTest extends AdvancedQueryTest {
-
   /** A map as key should lead to FOTY0013. */
   @Test public void mapAsKeyTest() {
     error("declare variable $m := map { 'a' := 'b' };" +

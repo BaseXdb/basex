@@ -7,8 +7,7 @@ import org.junit.Test;
  * @author Leo Woerteler
  */
 public class FuncItemTest extends QueryPlanTest {
-
-  /** Checks if the identity function is precompiled. */
+  /** Checks if the identity function is pre-compiled. */
   @Test public void idTest() {
     check("function($x) { $x }(42)",
         "42",
@@ -16,7 +15,7 @@ public class FuncItemTest extends QueryPlanTest {
     );
   }
 
-  /** Checks if a function literal is precompiled. */
+  /** Checks if a function literal is pre-compiled. */
   @Test public void literalTest() {
     check("lower-case#1('FooBar')",
         "foobar",
@@ -24,7 +23,7 @@ public class FuncItemTest extends QueryPlanTest {
     );
   }
 
-  /** Checks if a partial application is precompiled. */
+  /** Checks if a partial application is pre-compiled. */
   @Test public void partAppTest() {
     check("starts-with('foobar', ?)('foo')",
         "true",
@@ -42,14 +41,14 @@ public class FuncItemTest extends QueryPlanTest {
     );
   }
 
-  /** Checks that the Y combinator is precompiled. */
+  /** Checks that the Y combinator is pre-compiled. */
   @Test public void yCombinatorTest() {
     check("function($f) {" +
         "  let $loop := function($x) { $f(function() { $x($x) }) }" +
         "  return $loop($loop)" +
         "}(function($f) { 42 })",
         "42",
-        // both outer inline functions are precompiled
+        // both outer inline functions are pre-compiled
         "exists(//DynFuncCall)",
         "every $f in outermost(//DynFuncCall)/* satisfies" +
         "  $f instance of element(FuncItem)"

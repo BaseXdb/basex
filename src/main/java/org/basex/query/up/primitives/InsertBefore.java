@@ -12,7 +12,6 @@ import org.basex.util.Util;
  * @author Lukas Kircher
  */
 public final class InsertBefore extends InsertBase {
-
   /**
    * Constructor.
    * @param p pre

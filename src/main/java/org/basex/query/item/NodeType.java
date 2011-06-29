@@ -33,7 +33,6 @@ import org.w3c.dom.Text;
  * @author Leo Woerteler
  */
 public enum NodeType implements Type {
-
   /** Node type. */
   NOD("node", AtomType.ITEM),
 

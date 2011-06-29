@@ -168,7 +168,6 @@ public class IdPreMap {
  * @author Dimitar Popov
  */
 class IntListExt extends IntList {
-
   /**
    * Constructor, specifying an initial array capacity.
    * @param c array capacity

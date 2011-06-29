@@ -11,7 +11,6 @@ import org.basex.util.InputInfo;
  * @author Lukas Kircher
  */
 public abstract class InsertBase extends NodeCopy {
-
   /**
    * Constructor.
    * @param t type

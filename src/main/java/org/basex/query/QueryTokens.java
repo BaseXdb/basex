@@ -341,6 +341,8 @@ public interface QueryTokens {
   /** Parser token. */
   String CONCAT = "||";
   /** Parser token. */
+  String CONCAT2 = "~";
+  /** Parser token. */
   String ASSIGN = ":=";
   /** Parser token. */
   String BR1 = "[";

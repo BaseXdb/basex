@@ -21,7 +21,6 @@ import org.basex.util.TokenList;
  * @author Rositsa Shadura
  */
 public class RepoList extends Command {
-
   /**
    * Constructor.
    */
