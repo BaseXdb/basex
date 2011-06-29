@@ -30,6 +30,7 @@ import org.basex.query.expr.Catch;
 import org.basex.query.expr.CmpG;
 import org.basex.query.expr.CmpN;
 import org.basex.query.expr.CmpV;
+import org.basex.query.expr.Concat;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.DynFuncCall;
 import org.basex.query.expr.Except;
@@ -622,9 +623,9 @@ public class QueryParser extends InputParser {
     }
     final byte[] ns = stringLiteral();
     if(ns.length == 0) error(NSEMPTY);
-    if(wsConsumeWs(AT)) do
-      stringLiteral();
-    while(wsConsumeWs(COMMA));
+    if(wsConsumeWs(AT)) {
+      do stringLiteral(); while(wsConsumeWs(COMMA));
+    }
     error(IMPLSCHEMA);
   }
 
@@ -945,10 +946,8 @@ public class QueryParser extends InputParser {
     }
 
     if(!wsConsume(COMMA)) return e;
-    Expr[] l = { e};
-    do
-      l = add(l, single());
-    while(wsConsume(COMMA));
+    Expr[] l = { e };
+    do l = add(l, single()); while(wsConsume(COMMA));
     return new List(input(), l);
   }
 
@@ -998,9 +997,7 @@ public class QueryParser extends InputParser {
     if(ctx.xquery3 && wsConsumeWs(GROUP)) {
       wsCheck(BY);
       ap = qp;
-      do
-        group = groupSpec(group);
-      while(wsConsume(COMMA));
+      do group = groupSpec(group); while(wsConsume(COMMA));
       alter = GRPBY;
     }
 
@@ -1011,9 +1008,7 @@ public class QueryParser extends InputParser {
     if(stable || wsConsumeWs(ORDER)) {
       wsCheck(BY);
       ap = qp;
-      do
-        order = orderSpec(order);
-      while(wsConsume(COMMA));
+      do order = orderSpec(order); while(wsConsume(COMMA));
       if(order != null) order = Array.add(order, new OrderByStable(input()));
       alter = ORDERBY;
     }
@@ -1240,10 +1235,8 @@ public class QueryParser extends InputParser {
     final Expr e = and();
     if(!wsConsumeWs(OR)) return e;
 
-    Expr[] list = { e};
-    do
-      list = add(list, and());
-    while(wsConsumeWs(OR));
+    Expr[] list = { e };
+    do list = add(list, and()); while(wsConsumeWs(OR));
     return new Or(input(), list);
   }
 
@@ -1256,10 +1249,8 @@ public class QueryParser extends InputParser {
     final Expr e = comparison();
     if(!wsConsumeWs(AND)) return e;
 
-    Expr[] list = { e};
-    do
-      list = add(list, comparison());
-    while(wsConsumeWs(AND));
+    Expr[] list = { e };
+    do list = add(list, comparison()); while(wsConsumeWs(AND));
     return new And(input(), list);
   }
 
@@ -1290,10 +1281,10 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr ftContains() throws QueryException {
-    final Expr e = range();
+    final Expr e = stringConcat();
 
     final int p = qp;
-    // use "=>" as shortcut for full-text expressions
+    // use "=>" and "<-" as unofficial shortcuts for full-text expressions
     if(consume('=') && consume('>') || consume('<') && consume('-')) {
       skipWS();
     } else if(!wsConsumeWs(CONTAINS) || !wsConsumeWs(TEXT)) {
@@ -1308,6 +1299,20 @@ public class QueryParser extends InputParser {
       error(FTIGNORE);
     }
     return new FTContains(e, select, input());
+  }
+
+  /**
+   * Parses the "StringConcatExpr" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr stringConcat() throws QueryException {
+    Expr e = range();
+    if(!consume(CONCAT)) return e;
+
+    Expr[] list = { e };
+    do list = add(list, range()); while(wsConsumeWs(CONCAT));
+    return new Concat(input(), list);
   }
 
   /**
@@ -1361,13 +1366,23 @@ public class QueryParser extends InputParser {
    */
   private Expr union() throws QueryException {
     final Expr e = intersect();
-    if(e == null || !wsConsumeWs(UNION) && !wsConsume(PIPE)) return e;
-
-    Expr[] list = { e};
-    do
-      list = add(list, intersect());
-    while(wsConsumeWs(UNION) || wsConsume(PIPE));
+    if(e == null || !isUnion()) return e;
+    Expr[] list = { e };
+    do list = add(list, intersect()); while(isUnion());
     return new Union(input(), list);
+  }
+
+  /**
+   * Checks if a union operator is found.
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean isUnion() throws QueryException {
+    if(wsConsumeWs(UNION)) return true;
+    final int p = qp;
+    if(consume(PIPE) && !consume(PIPE)) return true;
+    qp = p;
+    return false;
   }
 
   /**
@@ -1379,16 +1394,12 @@ public class QueryParser extends InputParser {
     final Expr e = instanceoff();
 
     if(wsConsumeWs(INTERSECT)) {
-      Expr[] list = { e};
-      do
-        list = add(list, instanceoff());
-      while(wsConsumeWs(INTERSECT));
+      Expr[] list = { e };
+      do list = add(list, instanceoff()); while(wsConsumeWs(INTERSECT));
       return new InterSect(input(), list);
     } else if(wsConsumeWs(EXCEPT)) {
-      Expr[] list = { e};
-      do
-        list = add(list, instanceoff());
-      while(wsConsumeWs(EXCEPT));
+      Expr[] list = { e };
+      do list = add(list, instanceoff()); while(wsConsumeWs(EXCEPT));
       return new Except(input(), list);
     } else {
       return e;
@@ -2355,7 +2366,7 @@ public class QueryParser extends InputParser {
     final Expr e = expr();
     wsCheck(BRACE2);
     return new CElem(input(), name, new Atts(), true, e == null ? new Expr[0]
-        : new Expr[] { e});
+        : new Expr[] { e });
   }
 
   /**
@@ -2707,10 +2718,8 @@ public class QueryParser extends InputParser {
     final FTExpr e = ftAnd(prg);
     if(!wsConsumeWs(FTOR)) return e;
 
-    FTExpr[] list = { e};
-    do
-      list = Array.add(list, ftAnd(prg));
-    while(wsConsumeWs(FTOR));
+    FTExpr[] list = { e };
+    do list = Array.add(list, ftAnd(prg)); while(wsConsumeWs(FTOR));
     return new FTOr(input(), list);
   }
 
@@ -2724,10 +2733,8 @@ public class QueryParser extends InputParser {
     final FTExpr e = ftMildNot(prg);
     if(!wsConsumeWs(FTAND)) return e;
 
-    FTExpr[] list = { e};
-    do
-      list = Array.add(list, ftMildNot(prg));
-    while(wsConsumeWs(FTAND));
+    FTExpr[] list = { e };
+    do list = Array.add(list, ftMildNot(prg)); while(wsConsumeWs(FTAND));
     return new FTAnd(input(), list);
   }
 
@@ -2774,8 +2781,7 @@ public class QueryParser extends InputParser {
 
     final FTOpt fto = new FTOpt();
     boolean found = false;
-    while(ftMatchOption(fto))
-      found = true;
+    while(ftMatchOption(fto)) found = true;
 
     // check if specified language is not available
     if(!Language.supported(fto.ln, fto.is(ST) && fto.sd == null)) error(

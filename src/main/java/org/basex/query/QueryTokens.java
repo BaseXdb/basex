@@ -339,6 +339,8 @@ public interface QueryTokens {
   String[] UPDATES = { INSERT, DELETE, RENAME, REPLACE, MODULE };
 
   /** Parser token. */
+  String CONCAT = "||";
+  /** Parser token. */
   String ASSIGN = ":=";
   /** Parser token. */
   String BR1 = "[";
