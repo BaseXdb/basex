@@ -26,16 +26,21 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.ANode;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
+import org.basex.query.up.primitives.Add;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
+import org.basex.util.TokenList;
 
 /**
  * Database functions.
@@ -77,6 +82,7 @@ public final class FNDb extends FuncCall {
       case OPENPRE: return open(ctx, false);
       case SYSTEM:  return system(ctx);
       case INFO:    return info(ctx);
+      case ADD:     return add(ctx);
       default:      return super.item(ctx, ii);
     }
   }
@@ -233,6 +239,57 @@ public final class FNDb extends FuncCall {
       info = InfoIndex.info(cmd, d);
     }
     return Str.get(delete(info, '\r'));
+  }
+
+  /**
+   * Performs the add function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item add(final QueryContext ctx) throws QueryException {
+    final byte[] path = expr.length == 4 ?
+        concat(checkStr(expr[3], ctx), token("/")) : null;
+
+    final NodeCache c = new NodeCache();
+    final TokenList p = new TokenList();
+
+    final Iter iter = ctx.iter(expr[1]);
+    for(Item i; (i = iter.next()) != null;) {
+      final ANode nd = checkNode(i);
+      if(nd == null || nd.type != NodeType.DOC) UPFOTYPE.thrw(input, i);
+      c.add(nd);
+      p.add(nd.docName());
+    }
+
+    if(p.size() == 1) {
+      if (expr.length > 2) {
+        final byte[] name = checkStr(expr[2], ctx);
+        if(path == null) p.set(name, 0);
+        else {
+          final TokenBuilder tb = new TokenBuilder();
+          if(path.length > 0) {
+            tb.add(path);
+            tb.add('/');
+          }
+          tb.add(name);
+          p.set(tb.finish(), 0);
+        }
+      }
+    } else if(p.size() > 1 && path != null) {
+      for(int i = 0; i < p.size(); ++i) {
+        byte[] doc = p.get(i);
+        final int pos = lastIndexOf(doc, '/');
+        if(pos > 0) doc = subtoken(doc, pos + 1);
+        p.set(concat(path, doc), i);
+      }
+    }
+
+    if(c.size() > 0) {
+      final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+      ctx.updates.add(new Add(data, input, c, p, ctx.context), ctx);
+    }
+    return null;
   }
 
   /**

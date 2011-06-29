@@ -482,6 +482,9 @@ public enum Function {
   NODEPRE(FNDb.class, "node-pre(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: sends result to connected clients. */
   EVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
+  /** Database function: add document(s) to a database. */
+  ADD(FNDb.class, "add(name,nodes[,name[,path]])", EMP, 2, STR, DOC_OM, STR,
+      STR),
 
   /* FNFile functions (EXPath). */
 

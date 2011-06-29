@@ -110,7 +110,7 @@ public final class UserFuncs extends ExprInfo {
     // check predefined functions
     final FuncCall fun = FNIndex.get().get(ln, uri, args, qp);
     if(fun != null) {
-      ctx.updating |= fun.def == Function.PUT;
+      ctx.updating |= fun.def == Function.PUT || fun.def == Function.ADD;
       return new TypedFunc(fun, fun.def.type(args.length));
     }
 

@@ -31,7 +31,7 @@ public abstract class InsertBase extends NodeCopy {
   }
 
   @Override
-  public final void merge(final UpdatePrimitive p) {
+  public void merge(final UpdatePrimitive p) {
     insert.add(((NodeCopy) p).insert.get(0));
   }
 }
