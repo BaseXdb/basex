@@ -82,7 +82,9 @@ public final class ClientQuery extends Query {
    * @return result
    * @throws BaseXException command exception
    */
-  ByteList exec(final ServerCmd cmd, final String arg) throws BaseXException {
+  private ByteList exec(final ServerCmd cmd, final String arg)
+      throws BaseXException {
+
     try {
       cs.sout.write(cmd.code);
       cs.send(arg);
@@ -101,7 +103,7 @@ public final class ClientQuery extends Query {
    * @return string, or {@code null} if result was sent to output stream.
    * @throws BaseXException command exception
    */
-  String print(final ByteList bl) throws BaseXException {
+  private String print(final ByteList bl) throws BaseXException {
     if(cs.out == null) return bl.toString();
     try {
       if(bl.size() != 0) cs.out.write(bl.toArray());
