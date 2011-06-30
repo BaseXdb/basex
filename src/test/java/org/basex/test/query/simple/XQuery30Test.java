@@ -50,6 +50,12 @@ public final class XQuery30Test extends QueryTest {
         "declare variable $a := 1; for $b in 1 group by $a return $b" },
       { "FLWOR 11", itr(1),
         "for $x in (1,1) let $y := () group by $x order by $y return 1" },
+
+      { "Concat 1", str("ab"), "'a'||'b'" },
+      { "Concat 2", str("ab"), "'a' || 'b'" },
+      { "Concat 3", str("abc"), "'a' || 'b' || 'c'" },
+      { "Concat 4", str("1true3"), "1 || true() || '3'" },
+
     };
   }
 }

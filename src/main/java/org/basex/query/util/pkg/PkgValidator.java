@@ -47,7 +47,8 @@ public final class PkgValidator {
    */
   public void check(final Package pkg) throws QueryException {
     // check if package is already installed
-    if(repo.pkgDict().get(pkg.uniqueName()) != null) PKGINST.thrw(input);
+    final byte[] name = pkg.uniqueName();
+    if(repo.pkgDict().get(name) != null) PKGINST.thrw(input, name);
     // check package dependencies
     checkDepends(pkg);
     // check package components

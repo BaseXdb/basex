@@ -50,7 +50,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.6.3 beta";
+  String VERSION = "6.7-RC1";
   /** Company info. */
   String COMPANY = NAME + " Team";
   /** Title and version. */
@@ -521,8 +521,6 @@ public interface Text {
   String DBOPENED = lang("db_opened");
   /** Database exported. */
   String DBEXPORTED = lang("db_exported");
-  /** Database not exported. */
-  String DBNOTEXPORTED = lang("db_notexported");
   /** Database not deleted. */
   String DBNOTDELETED = lang("db_notdeleted");
   /** Database exists already. */
@@ -680,13 +678,10 @@ public interface Text {
   String EVENTWAT = lang("ad_eventatt");
   /** Unwatch Event. */
   String EVENTUNWAT = lang("ad_eventdet");
-
-  // REPO COMMANDS ========================================================
-
   /** Package deleted. */
-  String REPODEL = lang("repo_delete");
+  String REPODEL = lang("ad_repodelete");
   /** Package installed. */
-  String REPOINST = lang("repo_install");
+  String REPOINST = lang("ad_repoinstall");
 
   // GENERAL COMMANDS =========================================================
 
@@ -1318,8 +1313,6 @@ public interface Text {
   String OVERFILE = lang("dx_overfile");
   /** Dialog title for exporting nodes. */
   String OUTINDENT = lang("dx_indent");
-  /** Dialog title for exporting nodes. */
-  String INVPATH = lang("dx_invpath");
 
   /** Dialog title for inserting new data. */
   String INSERTTITLE = lang("dn_title");

@@ -39,7 +39,6 @@ import org.basex.util.TokenBuilder;
  * @author Rositsa Shadura
  */
 public final class ResponseHandler {
-
   /** Response element. */
   /** http:response element. */
   private static final byte[] RESPONSE = token("http:response");

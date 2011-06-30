@@ -19,7 +19,6 @@ import org.basex.util.Token;
  * @author Leo Woerteler
  */
 public final class PartFunApp extends UserFunc {
-
   /**
    * Function constructor for static calls.
    * @param ii input info

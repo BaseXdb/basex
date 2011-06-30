@@ -10,8 +10,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public abstract class InsertBase extends NodeCopy {
-
+abstract class InsertBase extends NodeCopy {
   /**
    * Constructor.
    * @param t type
@@ -20,7 +19,7 @@ public abstract class InsertBase extends NodeCopy {
    * @param i input info
    * @param nc node copy
    */
-  public InsertBase(final PrimitiveType t, final int p, final Data d,
+  protected InsertBase(final PrimitiveType t, final int p, final Data d,
       final InputInfo i, final NodeCache nc) {
     super(t, p, d, i, nc);
   }

@@ -13,7 +13,6 @@ import org.basex.util.Util;
  * @author Lukas Kircher
  */
 public final class DeleteNode extends StructuralUpdate {
-
   /**
    * Constructor.
    * @param p pre
@@ -27,8 +26,7 @@ public final class DeleteNode extends StructuralUpdate {
   @Override
   public void merge(final UpdatePrimitive p) {
     /* Multiple delete primitives can operate on the same
-     * target node.
-     */
+     * target node. */
   }
 
   @Override
@@ -51,6 +49,6 @@ public final class DeleteNode extends StructuralUpdate {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + getTargetDBNode() + "]";
+    return Util.name(this) + "[" + targetNode() + "]";
   }
 }

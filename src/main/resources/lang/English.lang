@@ -124,7 +124,6 @@ dq_question=Save changes to %?
 dx_outdir=Output directory
 dx_overfile=Directory is not empty.
 dx_indent=Indent with whitespaces
-dx_invpath=Invalid path.
 
 dp_title=Preferences
 dp_dbpath=Database Path (databases must be manually moved)
@@ -383,7 +382,6 @@ db_norestore='%' could not be restored.
 db_notopened=Database '%' could not be opened.
 db_opened=Database '%' opened in %.
 db_exported=Database '%' exported in %.
-db_notexported=Database could not be exported to '%'.
 db_notdeleted=File '%' could not be deleted.
 db_exists=Database '%' exists already.
 db_backdrop=Backup files '%' were dropped.
@@ -465,6 +463,8 @@ ad_eventalr=Already watching event '%'.
 ad_eventnouw=Event '%' was not watched.
 ad_eventatt=Watching event '%'.
 ad_eventdet=Event '%' unwatched.
+ad_repodelete=Package '%' deleted.
+ad_repoinstall=Package '%' installed in %.
 
 # General Commands
 gc_setwhich=Unknown option '%'
@@ -511,10 +511,6 @@ info_off=OFF
 info_error=Error
 info_entries=% entries
 info_browsererror=Failed to open a browser.\nPlease manually open the URL:\n\n%
-
-#Repo commands
-repo_delete=Package '%' deleted.
-repo_install=Package '%' installed in %.
 
 # Command Help
 ch_nohelp=Sorry, no help available.

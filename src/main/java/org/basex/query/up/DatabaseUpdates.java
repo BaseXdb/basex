@@ -27,21 +27,21 @@ import org.basex.util.IntMap;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public class AggregatedDatabaseUpdates {
+final class DatabaseUpdates {
   /** Data reference. */
   private final Data data;
   /** Pre values of target nodes. */
-  protected IntList nodes;
+  protected IntList nodes = new IntList(0);
   /** Mapping between pre values of the target nodes and all update primitives
    * which operate on this target. */
-  protected final IntMap<AggregatedNodeUpdates> updatePrimitives =
-    new IntMap<AggregatedNodeUpdates>();
+  protected final IntMap<NodeUpdates> updatePrimitives =
+    new IntMap<NodeUpdates>();
 
   /**
    * Constructor.
    * @param d data reference
    */
-  public AggregatedDatabaseUpdates(final Data d) {
+  DatabaseUpdates(final Data d) {
     data = d;
   }
 
@@ -50,11 +50,11 @@ public class AggregatedDatabaseUpdates {
    * @param p update primitive
    * @throws QueryException query exception
    */
-  public void add(final UpdatePrimitive p) throws QueryException {
+  void add(final UpdatePrimitive p) throws QueryException {
     final int pre = p.pre;
-    AggregatedNodeUpdates pc = updatePrimitives.get(pre);
+    NodeUpdates pc = updatePrimitives.get(pre);
     if(pc == null) {
-      pc = new AggregatedNodeUpdates();
+      pc = new NodeUpdates();
       updatePrimitives.add(pre, pc);
     }
     pc.add(p);
@@ -65,7 +65,7 @@ public class AggregatedDatabaseUpdates {
    * process is aborted.
    * @throws QueryException query exception
    */
-  protected final void check() throws QueryException {
+  protected void check() throws QueryException {
     // get and sort keys (pre/id values)
     final int s = updatePrimitives.size();
     nodes = new IntList(s);
@@ -74,7 +74,7 @@ public class AggregatedDatabaseUpdates {
     nodes.sort();
 
     for(int i = 0; i < s; ++i) {
-      final AggregatedNodeUpdates ups = updatePrimitives.get(nodes.get(i));
+      final NodeUpdates ups = updatePrimitives.get(nodes.get(i));
       for(final UpdatePrimitive p : ups.prim) {
         if(p instanceof NodeCopy) ((NodeCopy) p).prepare();
         /* check if the identity of all target nodes of fn:put operations is
@@ -122,7 +122,7 @@ public class AggregatedDatabaseUpdates {
     final IntList il = new IntList();
 
     for(final int pre : pres) {
-      final AggregatedNodeUpdates ups = updatePrimitives.get(pre);
+      final NodeUpdates ups = updatePrimitives.get(pre);
       if(ups != null)
         for(final UpdatePrimitive up : ups.prim) up.update(pool);
 
@@ -212,10 +212,10 @@ public class AggregatedDatabaseUpdates {
      * and resolve text adjacency issues after the next container on the
      * preceding axis has been executed.
      */
-    AggregatedNodeUpdates recent = null;
+    NodeUpdates recent = null;
     // apply updates from the highest to the lowest pre value
     for(int i = nodes.size() - 1; i >= 0; i--) {
-      final AggregatedNodeUpdates current = updatePrimitives.get(nodes.get(i));
+      final NodeUpdates current = updatePrimitives.get(nodes.get(i));
       // first run, no recent container
       if(recent == null)
         current.makePrimitivesEffective();
@@ -244,7 +244,7 @@ public class AggregatedDatabaseUpdates {
    * @return true if ancestor deleted
    */
   protected boolean ancestorDeleted(final int n) {
-    final AggregatedNodeUpdates up = updatePrimitives.get(n);
+    final NodeUpdates up = updatePrimitives.get(n);
     if(up != null && up.updatesDestroyIdentity(n)) return true;
 
     final int p = data.parent(n, data.kind(n));

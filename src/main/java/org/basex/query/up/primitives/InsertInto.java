@@ -12,7 +12,6 @@ import org.basex.util.Util;
  * @author Lukas Kircher
  */
 public final class InsertInto extends InsertBase {
-
   /**
    * Constructor.
    * @param p pre
@@ -31,7 +30,7 @@ public final class InsertInto extends InsertBase {
   public void apply() {
     super.apply();
 
-    int loc = pre + data.size(pre, data.kind(pre));
+    final int loc = pre + data.size(pre, data.kind(pre));
     data.insert(loc, pre, md);
   }
 
@@ -59,6 +58,6 @@ public final class InsertInto extends InsertBase {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + getTargetDBNode() + ", " + insert + "]";
+    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }

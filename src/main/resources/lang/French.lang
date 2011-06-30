@@ -124,7 +124,6 @@ dq_question=Enregistrer les modifications à % ?
 dx_outdir=Dossier de sortie
 dx_overfile=Dossier n'est pas vide.
 dx_indent=Indenter par des espaces
-dx_invpath=Chemin invalide.
 
 dp_title=Préférences
 dp_dbpath=Emplacement de la base de données (doivent être déplacées manuellement)
@@ -383,7 +382,6 @@ db_norestore='%' could not be restored.
 db_notopened=Impossible d'ouvrir la base de données '%'.
 db_opened=Base de données '%' ouverte dans %.
 db_exported=Base de données '%' exportée dans %.
-db_notexported=Impossible d'exporter la base de données à '%'.
 db_notdeleted=Impossible de supprimer le fichier '%'.
 db_exists=La base de données '%' existe déjà.
 db_backdrop=Backup files '%' were dropped.
@@ -465,6 +463,8 @@ ad_eventalr=Already watching event '%'.
 ad_eventnouw=Event '%' was not watched.
 ad_eventatt=Watching event '%'.
 ad_eventdet=Event '%' unwatched.
+ad_repodelete=Package '%' deleted.
+ad_repoinstall=Package '%' installed in %.
 
 # Commandes générales
 gc_setwhich=Unknown option '%'

@@ -4,8 +4,8 @@ import static org.basex.query.util.Err.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
@@ -55,19 +55,37 @@ public final class RepoManager {
     try {
       // parse and validate repository
       final Zip zip = new Zip(cont);
-      final byte[] desc = zip.read(DESCRIPTOR);
-      final Package pkg = new PkgParser(repo, ii).parse(new IOContent(desc));
+      final byte[] dsc = zip.read(DESCRIPTOR);
+      final Package pkg = new PkgParser(repo, ii).parse(new IOContent(dsc));
       new PkgValidator(repo, ii).check(pkg);
 
-      // treat everything after last dot as file suffix
-      final String name = io.name().replaceAll("\\.[^.]+$", "");
-      // unzip files and register repository
-      zip.unzip(repo.path(name));
-      repo.add(pkg, name);
+      // choose unique directory, unzip files and register repository
+      final IOFile file = uniqueDir(
+          string(pkg.uniqueName()).replaceAll("[^\\w.-]+", "-"));
+      zip.unzip(file);
+      repo.add(pkg, file.name());
+    } catch(final FileNotFoundException ex) {
+      Util.debug(ex);
+      PKGREADFNF.thrw(ii, io.name(), ex.getMessage());
     } catch(final IOException ex) {
       Util.debug(ex);
       PKGREADFAIL.thrw(ii, io.name(), ex.getMessage());
     }
+  }
+
+  /**
+   * Returns a unique directory for the specified package.
+   * @param n name
+   * @return unique directory
+   */
+  private IOFile uniqueDir(final String n) {
+    String nm = n;
+    int c = 0;
+    do {
+      final IOFile io = repo.path(nm);
+      if(!io.exists()) return io;
+      nm = n + '-' + ++c;
+    } while(true);
   }
 
   /**
@@ -80,26 +98,25 @@ public final class RepoManager {
       throws QueryException {
     boolean found = false;
     for(final byte[] nextPkg : repo.pkgDict()) {
-      if(nextPkg != null) {
-        final byte[] dir = repo.pkgDict().get(nextPkg);
-        if(eq(Package.name(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
-          // A package can be deleted either by its name or by its directory
-          // name
-          found = true;
-          // check if package to be deleted participates in a dependency
-          final byte[] primPkg = primary(nextPkg, ii);
-          if(primPkg == null) {
-            // clean package repository
-            final IOFile f = repo.path(string(dir));
-            final IOFile desc = new IOFile(f, DESCRIPTOR);
-            repo.remove(new PkgParser(repo, ii).parse(desc));
-            // package does not participate in a dependency => delete it
-            if(!f.delete()) CANNOTDELPKG.thrw(ii);
-          } else PKGDEP.thrw(ii, string(primPkg), pkg);
-        }
+      if(nextPkg == null) continue;
+
+      final byte[] dir = repo.pkgDict().get(nextPkg);
+      if(eq(Package.name(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
+        // a package can be deleted either by its name or by its directory name
+        found = true;
+        // check if package to be deleted participates in a dependency
+        final byte[] primPkg = primary(nextPkg, ii);
+        if(primPkg != null) PKGDEP.thrw(ii, string(primPkg), pkg);
+
+        // clean package repository
+        final IOFile f = repo.path(string(dir));
+        final IOFile desc = new IOFile(f, DESCRIPTOR);
+        repo.remove(new PkgParser(repo, ii).parse(desc));
+        // package does not participate in a dependency => delete it
+        if(!f.delete()) CANNOTDELPKG.thrw(ii);
       }
     }
-    if(!found) PKGNOTINST.thrw(ii, pkg);
+    if(!found) PKGNOTEXIST.thrw(ii, pkg);
   }
 
   /**

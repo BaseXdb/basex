@@ -12,7 +12,6 @@ import org.basex.util.Util;
  * @author Lukas Kircher
  */
 public final class InsertIntoFirst extends InsertBase {
-
   /**
    * Constructor.
    * @param p pre
@@ -47,6 +46,6 @@ public final class InsertIntoFirst extends InsertBase {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + getTargetDBNode() + ", " + insert + "]";
+    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }

@@ -124,7 +124,6 @@ dq_question=% への変更を保存しますか。
 dx_outdir=出力ディレクトリ
 dx_overfile=ファイルは上書きされます。
 dx_indent=スペースでインデント
-dx_invpath=不正なパス
 
 dp_title=設定
 dp_dbpath=データベースパス (データベースを手動で移動する必要があります。)
@@ -383,7 +382,6 @@ db_norestore='%' could not be restored.
 db_notopened=データベースを開けませんでした。
 db_opened=データベース "%" が % を開きました。
 db_exported=データベース "%" が % に出力しました。
-db_notexported=Database could not be exported to '%'.
 db_notdeleted=ファイル '%' を削除できませんでした。
 db_exists=同じ名前のデータベース "%" が存在します。
 db_backdrop=Backup files '%' were dropped.
@@ -465,6 +463,8 @@ ad_eventalr=Already watching event '%'.
 ad_eventnouw=Event '%' was not watched.
 ad_eventatt=Watching event '%'.
 ad_eventdet=Event '%' unwatched.
+ad_repodelete=Package '%' deleted.
+ad_repoinstall=Package '%' installed in %.
 
 # General Commands
 gc_setwhich=Unknown option '%'

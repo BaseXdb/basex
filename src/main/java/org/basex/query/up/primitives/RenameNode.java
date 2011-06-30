@@ -18,7 +18,7 @@ import org.basex.util.Util;
  */
 public final class RenameNode extends ValueUpdate {
   /** New name. */
-  final QNm name;
+  private final QNm name;
 
   /**
    * Constructor.
@@ -40,18 +40,18 @@ public final class RenameNode extends ValueUpdate {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREN.thrw(input, getTargetDBNode());
+    UPMULTREN.thrw(input, targetNode());
   }
 
   @Override
   public void update(final NamePool pool) {
-    final DBNode node = getTargetDBNode();
+    final DBNode node = targetNode();
     pool.add(name, node.type);
     pool.remove(node);
   }
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + getTargetDBNode() + ", " + name + "]";
+    return Util.name(this) + "[" + targetNode() + ", " + name + "]";
   }
 }

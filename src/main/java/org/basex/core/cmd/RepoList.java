@@ -20,7 +20,6 @@ import org.basex.util.TokenList;
  * @author Rositsa Shadura
  */
 public class RepoList extends Command {
-
   /**
    * Constructor.
    */
@@ -32,16 +31,16 @@ public class RepoList extends Command {
   protected boolean run() throws IOException {
     final Table t = new Table();
     t.description = PACKAGES;
-    t.header.add(INFODBNAME);
     t.header.add(DataText.TABLEURI);
     t.header.add(VERSINFO);
+    t.header.add(DIALOGFC);
 
     for(final byte[] p : context.repo.pkgDict()) {
       if(p != null) {
         final TokenList tl = new TokenList();
-        tl.add(context.repo.pkgDict().get(p));
         tl.add(Package.name(p));
         tl.add(Package.version(p));
+        tl.add(context.repo.pkgDict().get(p));
         t.contents.add(tl);
       }
     }

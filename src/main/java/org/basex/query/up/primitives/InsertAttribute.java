@@ -13,7 +13,6 @@ import org.basex.util.Util;
  * @author Lukas Kircher
  */
 public final class InsertAttribute extends InsertBase {
-
   /**
    * Constructor.
    * @param p pre
@@ -45,6 +44,6 @@ public final class InsertAttribute extends InsertBase {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + getTargetDBNode() + ", " + insert + "]";
+    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }

@@ -67,24 +67,6 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
   }
 
   /**
-   * Copies the rectangle.
-   * @return rectangle
-   */
-  MapRect copy() {
-    final MapRect rect = new MapRect(x, y, w, h, pre, level);
-    rect.pos = pos;
-    rect.type = type;
-    rect.thumb = thumb;
-    rect.thumbal = thumbal;
-    rect.thumbfh = thumbfh;
-    rect.thumblh = thumblh;
-    rect.thumbf = thumbf;
-    rect.thumbsw = thumbsw;
-    rect.leaf = leaf;
-    return rect;
-  }
-
-  /**
    * Verifies if the specified rectangle is contained inside the rectangle.
    * @param r rectangle
    * @return result of comparison

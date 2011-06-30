@@ -18,14 +18,8 @@ import org.basex.query.up.primitives.UpdatePrimitive;
 public abstract class ContextModifier {
   /** Update primitives, aggregated separately for each database which is
    * referenced during a snapshot. */
-  private Map<Data, AggregatedDatabaseUpdates> pendingUpdates;
-
-  /**
-   * Constructor.
-   */
-  public ContextModifier() {
-    pendingUpdates = new HashMap<Data, AggregatedDatabaseUpdates>();
-  }
+  private final Map<Data, DatabaseUpdates> pendingUpdates =
+    new HashMap<Data, DatabaseUpdates>();
 
   /**
    * Adds an update primitive to this context modifier.
@@ -33,17 +27,25 @@ public abstract class ContextModifier {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public void add(final UpdatePrimitive p, final QueryContext ctx)
-  throws QueryException {
+  abstract void add(final UpdatePrimitive p, final QueryContext ctx)
+    throws QueryException;
+
+  /**
+   * Adds an update primitive to this context modifier.
+   * Will be called by {@link #add(UpdatePrimitive, QueryContext)}.
+   * @param p update primitive
+   * @throws QueryException query exception
+   */
+  protected void add(final UpdatePrimitive p) throws QueryException {
     final Data data = p.data;
-    AggregatedDatabaseUpdates dbp = pendingUpdates.get(data);
+    DatabaseUpdates dbp = pendingUpdates.get(data);
     if(dbp == null) {
-      dbp = new AggregatedDatabaseUpdates(data);
+      dbp = new DatabaseUpdates(data);
       pendingUpdates.put(data, dbp);
     }
     dbp.add(p);
   }
+
 
   /**
    * Checks constraints and applies all update primitives to the databases if
@@ -51,22 +53,20 @@ public abstract class ContextModifier {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public void applyUpdates(final QueryContext ctx) throws QueryException {
+  void applyUpdates(final QueryContext ctx) throws QueryException {
     // constraints are checked first. no updates are applied if any problems
     // are found
-    for(final AggregatedDatabaseUpdates c : pendingUpdates.values()) c.check();
-    for(final AggregatedDatabaseUpdates c : pendingUpdates.values())
-      c.apply(ctx);
+    for(final DatabaseUpdates c : pendingUpdates.values()) c.check();
+    for(final DatabaseUpdates c : pendingUpdates.values()) c.apply(ctx);
   }
 
   /**
    * Returns the total number of node updates.
    * @return number of updates
    */
-  public int size() {
+  int size() {
     int s = 0;
-    for(final AggregatedDatabaseUpdates c : pendingUpdates.values())
-      s += c.nodes.size();
+    for(final DatabaseUpdates c : pendingUpdates.values()) s += c.nodes.size();
     return s;
   }
 }
