@@ -47,8 +47,14 @@ public final class Add extends InsertBase {
   @Override
   public void merge(final UpdatePrimitive p) {
     if(p instanceof Add) {
-      final NodeCache newdocs = ((Add) p).docs;
-      for(ANode i; (i = newdocs.next()) != null;) docs.add(i);
+      final Add a = (Add) p;
+      final NodeCache newdocs = a.docs;
+      final TokenList newpaths = a.paths;
+      ANode n;
+      for(int i = 0; (n = newdocs.next()) != null; ++i) {
+        docs.add(n);
+        paths.add(newpaths.get(i));
+      }
     } else {
       Util.notexpected(p);
     }
