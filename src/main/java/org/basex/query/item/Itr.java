@@ -140,7 +140,7 @@ public class Itr extends Item {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
+  public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Itr)) return false;
     final Itr i = (Itr) cmp;
     return type == i.type && val == i.val;
@@ -169,7 +169,7 @@ public class Itr extends Item {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return string(atom(null));
   }
 }

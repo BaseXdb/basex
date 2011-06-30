@@ -49,15 +49,6 @@ public final class MapType extends FuncType {
     return (Map) it;
   }
 
-  @Override
-  public boolean instance(final Type t) {
-//    if(t instanceof MapType) {
-//      final MapType mt = (MapType) t;
-//      return mt.keyType.instance(keyType) && ret.instance(mt.ret);
-//    }
-    return super.instance(t);
-  }
-
   /**
    * Creates a new map type.
    * @param key key type

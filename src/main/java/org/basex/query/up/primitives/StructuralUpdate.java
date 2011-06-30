@@ -34,7 +34,7 @@ public abstract class StructuralUpdate extends UpdatePrimitive {
    * to the number of inserted nodes by this primitive.
    * @return number of pre value shifts
    */
-  public int getPreShifts() {
+  public final int preShifts() {
     return shifts;
   }
 

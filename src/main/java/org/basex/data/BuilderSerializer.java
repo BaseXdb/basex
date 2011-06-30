@@ -31,12 +31,12 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public void text(final byte[] b, final FTPos ftp) throws IOException {
+  public final void text(final byte[] b, final FTPos ftp) throws IOException {
     text(b);
   }
 
   @Override
-  public void text(final byte[] b) throws IOException {
+  public final void text(final byte[] b) throws IOException {
     finish();
     build.text(b);
   }
@@ -48,17 +48,17 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public void pi(final byte[] n, final byte[] v) throws IOException {
+  public final void pi(final byte[] n, final byte[] v) throws IOException {
     build.pi(concat(n, new byte[]{ ' ' }, v));
   }
 
   @Override
-  public void item(final byte[] b) throws IOException {
+  public final void item(final byte[] b) throws IOException {
     text(b);
   }
 
   @Override
-  protected void finish() throws IOException {
+  protected final void finish() throws IOException {
     if(open) {
       build.startElem(tag, att);
       att.reset();
@@ -67,7 +67,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected void empty() throws IOException {
+  protected final void empty() throws IOException {
     if(open) {
       build.emptyElem(tag, att);
       open = false;
@@ -79,18 +79,18 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public void comment(final byte[] b) throws IOException {
+  public final void comment(final byte[] b) throws IOException {
     build.comment(b);
   }
 
   @Override
-  protected void close(final byte[] t) throws IOException {
+  protected final void close(final byte[] t) throws IOException {
     build.endElem(t);
     tag = null;
   }
 
   @Override
-  public void attribute(final byte[] n, final byte[] v)
+  public final void attribute(final byte[] n, final byte[] v)
       throws IOException {
     if(startsWith(n, XMLNS)) {
       if(n.length == 5) {
@@ -109,22 +109,22 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected void closeDoc() throws IOException {
+  protected final void closeDoc() throws IOException {
     build.endDoc();
   }
 
   @Override
-  public void openResult() throws IOException {
+  public final void openResult() throws IOException {
     // ignore this
   }
 
   @Override
-  public void closeResult() throws IOException {
+  public final void closeResult() throws IOException {
     // ignore this
   }
 
   @Override
-  protected void cls() throws IOException {
+  protected final void cls() throws IOException {
     // ignore this
   }
 }

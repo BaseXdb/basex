@@ -83,14 +83,14 @@ public class Str extends Item {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
+  public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Str)) return false;
     final Str i = (Str) cmp;
     return type == i.type && Token.eq(val, i.val);
   }
 
   @Override
-  public String toJava() {
+  public final String toJava() {
     return Token.string(val);
   }
 

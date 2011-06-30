@@ -7,7 +7,7 @@ package org.basex.query;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public class QueryError extends Error {
+public final class QueryError extends Error {
   /**
    * Constructor.
    *

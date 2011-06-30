@@ -45,7 +45,7 @@ public abstract class NodeCopy extends StructuralUpdate {
    * Prepares this update primitive before execution. This includes i.e. the
    * preparation of insertion sequences.
    */
-  public void prepare() {
+  public final void prepare() {
     // build main memory representation of nodes to be copied
     md = new MemData(data);
     final NodeCache seq = new NodeCache();

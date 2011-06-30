@@ -54,7 +54,7 @@ public class AxisPath extends Path {
    * @param ctx query context
    * @return resulting operator
    */
-  protected AxisPath finish(final QueryContext ctx) {
+  protected final AxisPath finish(final QueryContext ctx) {
     // evaluate number of results
     size = size(ctx);
     type = SeqType.get(step[step.length - 1].type().type, size);
@@ -86,7 +86,7 @@ public class AxisPath extends Path {
   }
 
   @Override
-  protected Expr compPath(final QueryContext ctx) throws QueryException {
+  protected final Expr compPath(final QueryContext ctx) throws QueryException {
     for(final Expr s : step) checkUp(s, ctx);
 
     // merge two axis paths
@@ -352,7 +352,7 @@ public class AxisPath extends Path {
    * @param i index
    * @return step
    */
-  public AxisStep step(final int i) {
+  public final AxisStep step(final int i) {
     return (AxisStep) step[i];
   }
 
@@ -386,7 +386,7 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public boolean iterable() {
+  public final boolean iterable() {
     return true;
   }
 

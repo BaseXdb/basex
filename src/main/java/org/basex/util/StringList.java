@@ -95,7 +95,7 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   @Override
-  public Iterator<String> iterator() {
+  public final Iterator<String> iterator() {
     return new Iterator<String>() {
       private int c = -1;
       @Override

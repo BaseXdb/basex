@@ -26,7 +26,7 @@ public abstract class Bin extends Item {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
+  public final byte[] atom(final InputInfo ii) {
     return atom();
   }
 

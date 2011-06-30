@@ -36,7 +36,7 @@ public abstract class ContextModifier {
    * @param p update primitive
    * @throws QueryException query exception
    */
-  protected void add(final UpdatePrimitive p) throws QueryException {
+  protected final void add(final UpdatePrimitive p) throws QueryException {
     final Data data = p.data;
     DatabaseUpdates dbp = pendingUpdates.get(data);
     if(dbp == null) {
@@ -53,7 +53,7 @@ public abstract class ContextModifier {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  void applyUpdates(final QueryContext ctx) throws QueryException {
+  final void applyUpdates(final QueryContext ctx) throws QueryException {
     // constraints are checked first. no updates are applied if any problems
     // are found
     for(final DatabaseUpdates c : pendingUpdates.values()) c.check();
@@ -64,7 +64,7 @@ public abstract class ContextModifier {
    * Returns the total number of node updates.
    * @return number of updates
    */
-  int size() {
+  final int size() {
     int s = 0;
     for(final DatabaseUpdates c : pendingUpdates.values()) s += c.nodes.size();
     return s;

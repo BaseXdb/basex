@@ -229,7 +229,7 @@ final class NodeUpdates {
       p.apply();
 
       if(p instanceof StructuralUpdate)
-        sd += ((StructuralUpdate) p).getPreShifts();
+        sd += ((StructuralUpdate) p).preShifts();
     }
 
     /* Internal text node adjacency is resolved and the number of pre value
@@ -270,7 +270,7 @@ final class NodeUpdates {
      * which are kept track off by c.
      */
     final InsertBefore ib = (InsertBefore) find(INSERTBEFORE);
-    int c = ib == null ? 0 : ib.getPreShifts();
+    int c = ib == null ? 0 : ib.preShifts();
     for(int i = prim.length - 1; i >= 0; i--) {
       if(prim[i] instanceof StructuralUpdate) {
         final StructuralUpdate p = (StructuralUpdate) prim[i];
@@ -285,7 +285,7 @@ final class NodeUpdates {
             merged++;
             c--;
           }
-          c += p.getPreShifts();
+          c += p.preShifts();
         }
       }
     }
@@ -325,7 +325,7 @@ final class NodeUpdates {
             c--;
         }
         // consider amount of nodes deleted/inserted by the current primitive
-        c += p.getPreShifts();
+        c += p.preShifts();
       }
     }
   }

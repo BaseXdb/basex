@@ -17,7 +17,7 @@ public class TokenMap extends TokenSet {
    * @param key key
    * @param val value
    */
-  public void add(final byte[] key, final byte[] val) {
+  public final void add(final byte[] key, final byte[] val) {
     // array bounds are checked before array is resized..
     final int i = add(key);
     values[Math.abs(i)] = val;
@@ -28,7 +28,7 @@ public class TokenMap extends TokenSet {
    * @param key key to be found
    * @return value or {@code null} if nothing was found
    */
-  public byte[] get(final byte[] key) {
+  public final byte[] get(final byte[] key) {
     return key != null ? values[id(key)] : null;
   }
 
@@ -37,18 +37,18 @@ public class TokenMap extends TokenSet {
    * @param p value index
    * @return value
    */
-  public byte[] value(final int p) {
+  public final byte[] value(final int p) {
     return values[p];
   }
 
   @Override
-  protected void rehash() {
+  protected final void rehash() {
     super.rehash();
     values = Array.copyOf(values, size << 1);
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     final TokenBuilder tb = new TokenBuilder("TokenMap[");
     final byte[][] ks = keys();
     for(int i = 0; i < ks.length; i++) {

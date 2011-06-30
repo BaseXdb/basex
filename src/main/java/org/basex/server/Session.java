@@ -89,7 +89,7 @@ public abstract class Session {
    * {@code null} is specified.
    * @param output client output stream.
    */
-  public void setOutputStream(final OutputStream output) {
+  public final void setOutputStream(final OutputStream output) {
     out = output;
   }
 

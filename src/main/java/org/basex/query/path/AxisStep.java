@@ -79,7 +79,7 @@ public class AxisStep extends Preds {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public final Expr comp(final QueryContext ctx) throws QueryException {
     if(!test.comp(ctx)) return Empty.SEQ;
 
     // leaf flag indicates that a context node can be replaced by a text() step

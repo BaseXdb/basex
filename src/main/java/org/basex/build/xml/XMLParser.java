@@ -36,7 +36,7 @@ public class XMLParser extends FileParser {
   }
 
   @Override
-  public void parse() throws IOException {
+  public final void parse() throws IOException {
     // loop until all tokens have been processed
     scanner.more();
     while(true) {
@@ -158,12 +158,12 @@ public class XMLParser extends FileParser {
   }
 
   @Override
-  public String det() {
+  public final String det() {
     return scanner.det();
   }
 
   @Override
-  public double prog() {
+  public final double prog() {
     return scanner.prog();
   }
 }
