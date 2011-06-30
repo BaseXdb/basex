@@ -102,7 +102,7 @@ public interface Text {
     "  -p<num>    Set server port" + NL +
     "  -P<pass>   Specify user password" + NL +
     "  -q<expr>   Execute XQuery expression" + NL +
-    "  -s<pars>  Set serialization parameter(s)" + NL +
+    "  -s<pars>   Set serialization parameter(s)" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -v/V       Show (all) process info" + NL +
     "  -w         Retain whitespaces from source files" + NL +
