@@ -248,8 +248,13 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item add(final QueryContext ctx) throws QueryException {
-    final byte[] path = expr.length == 4 ?
-        concat(checkStr(expr[3], ctx), token("/")) : null;
+    final byte[] path;
+    if(expr.length == 4) {
+      final byte[] s = checkStr(expr[3], ctx);
+      path = s.length > 0 ? concat(s, token("/")) : s;
+    } else {
+      path = null;
+    }
 
     final NodeCache c = new NodeCache();
     final TokenList p = new TokenList();
