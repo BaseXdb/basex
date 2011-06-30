@@ -60,7 +60,7 @@ public final class Add extends InsertBase {
 
     final int k = data.kind(pre);
     data.insert(pre + data.size(pre, k), -1, md);
-    ctx.update();
+    if(ctx.data != null) ctx.update();
   }
 
   @Override

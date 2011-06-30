@@ -268,10 +268,7 @@ public final class FNDb extends FuncCall {
         if(path == null) p.set(name, 0);
         else {
           final TokenBuilder tb = new TokenBuilder();
-          if(path.length > 0) {
-            tb.add(path);
-            tb.add('/');
-          }
+          if(path.length > 0) tb.add(path);
           tb.add(name);
           p.set(tb.finish(), 0);
         }
