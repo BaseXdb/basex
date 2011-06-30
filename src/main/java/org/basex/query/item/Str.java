@@ -90,12 +90,12 @@ public class Str extends Item {
   }
 
   @Override
-  public final String toString() {
-    return Util.info("\"%\"", val);
+  public String toJava() {
+    return Token.string(val);
   }
 
   @Override
-  public String toJava() {
-    return Token.string(val);
+  public final String toString() {
+    return Util.info("\"%\"", val);
   }
 }

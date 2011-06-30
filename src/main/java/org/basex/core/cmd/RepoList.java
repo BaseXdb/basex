@@ -11,7 +11,6 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdRepo;
 import org.basex.data.DataText;
 import org.basex.query.util.pkg.Package;
-import org.basex.query.util.pkg.PkgText;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
 
@@ -32,16 +31,16 @@ public class RepoList extends Command {
   protected boolean run() throws IOException {
     final Table t = new Table();
     t.description = PACKAGES;
-    t.header.add(PkgText.DIR);
     t.header.add(DataText.TABLEURI);
     t.header.add(VERSINFO);
+    t.header.add(DIALOGFC);
 
     for(final byte[] p : context.repo.pkgDict()) {
       if(p != null) {
         final TokenList tl = new TokenList();
-        tl.add(context.repo.pkgDict().get(p));
         tl.add(Package.name(p));
         tl.add(Package.version(p));
+        tl.add(context.repo.pkgDict().get(p));
         t.contents.add(tl);
       }
     }

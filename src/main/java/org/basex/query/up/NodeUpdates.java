@@ -41,12 +41,12 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-
-final class AggregatedNodeUpdates {
+final class NodeUpdates {
   /** Container for update primitives. In most cases there will only be a sinlge
    * update operation per target node, hence it's convenient to initialize this
    * container with a size of one. */
   protected UpdatePrimitive[] prim = new UpdatePrimitive[1];
+
   /** The corresponding node is target of a delete primitive. */
   private boolean del;
   /** The corresponding node is target of a replace primitive. */
@@ -62,7 +62,7 @@ final class AggregatedNodeUpdates {
    * @param p primitive
    * @throws QueryException query exception
    */
-  public void add(final UpdatePrimitive p) throws QueryException {
+  void add(final UpdatePrimitive p) throws QueryException {
     // container is initialized with one empty space
     if(prim[0] == null) {
       prim[0] = p;
@@ -155,8 +155,7 @@ final class AggregatedNodeUpdates {
     }
 
     /* Update primitives are executed in a strict order,
-     * see {@link PrimitiveType}.
-     */
+     * see {@link PrimitiveType}. */
     Arrays.sort(prim);
   }
 
@@ -167,11 +166,10 @@ final class AggregatedNodeUpdates {
    * @param pre pre value of node to check
    * @return node identity with given pre value is destroyed
    */
-  public boolean updatesDestroyIdentity(final int pre) {
+  boolean updatesDestroyIdentity(final int pre) {
     /* if this containers target node is destroyed we don't have to
      * check for eventual replace element content expressions, which
-     * only affect the child axis.
-     */
+     * only affect the child axis. */
     return ((del || rep) && prim[0].pre == pre) ||
     destroyedNodeIdentities().contains(pre);
   }
@@ -216,18 +214,13 @@ final class AggregatedNodeUpdates {
     return d;
   }
 
-  @Override
-  public String toString() {
-    return Util.name(this);
-  }
-
   /**
    * Makes all primitives in this container effective and returns the total
    * number of pre value shifts as a result of structural updates.
    * @return number of pre value shifts
    * @throws QueryException exception
    */
-  public int makePrimitivesEffective() throws QueryException {
+  int makePrimitivesEffective() throws QueryException {
     prepareExecution();
     int sd = 0;
 
@@ -313,7 +306,7 @@ final class AggregatedNodeUpdates {
    * target pre value. These shifts are a product of the next container on
    * the preceding sibling axis. The 'left sibling container'.
    */
-  public void resolveExternalTextNodeAdjacency(final int preShifts) {
+  void resolveExternalTextNodeAdjacency(final int preShifts) {
     if(!adjEXT) return;
 
     // take pre value shifts into account
@@ -335,5 +328,10 @@ final class AggregatedNodeUpdates {
         c += p.getPreShifts();
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this);
   }
 }

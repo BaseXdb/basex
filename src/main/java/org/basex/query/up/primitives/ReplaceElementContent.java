@@ -38,7 +38,7 @@ public final class ReplaceElementContent extends StructuralUpdate {
      * returns number of attributes + 1, so d.attSize + value.length is
      * correct new size as only a text node is (evtl.) inserted
      */
-    shifts = (data.attSize(loc, data.kind(loc)) + value.length) -
+    shifts = data.attSize(loc, data.kind(loc)) + value.length -
     data.size(loc, data.kind(loc));
 
     if(pre + data.size(pre, Data.ELEM) == loc + 1 &&
@@ -58,16 +58,16 @@ public final class ReplaceElementContent extends StructuralUpdate {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPV.thrw(input, getTargetDBNode());
-  }
-
-  @Override
-  public String toString() {
-    return Util.info("%[%, %]", Util.name(this), getTargetDBNode(), value);
+    UPMULTREPV.thrw(input, targetNode());
   }
 
   @Override
   public boolean checkTextAdjacency(final int c) {
     return false;
+  }
+
+  @Override
+  public String toString() {
+    return Util.info("%[%, %]", Util.name(this), targetNode(), value);
   }
 }

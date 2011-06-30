@@ -50,7 +50,8 @@ public final class PkgParser {
   public Package parse(final IO io) throws QueryException {
     final Package pkg = new Package();
     try {
-      ANode node = childElements(new DBNode(io, repo.context.prop)).next();
+      final DBNode doc = new DBNode(io, repo.context.prop);
+      final ANode node = childElements(doc).next();
 
       // checks root node
       if(!eqNS(PACKAGE, node.qname()))

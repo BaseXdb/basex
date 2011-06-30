@@ -781,7 +781,7 @@ public class QueryParser extends InputParser {
       final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(jar));
       try {
         urls[i++] = new URL(IO.FILEPREF + path);
-      } catch(MalformedURLException ex) {
+      } catch(final MalformedURLException ex) {
         Util.debug(ex.getMessage());
       }
     }
@@ -1307,7 +1307,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr stringConcat() throws QueryException {
-    Expr e = range();
+    final Expr e = range();
     if(!consume(CONCAT) && !consume(CONCAT2)) return e;
 
     Expr[] list = { e };

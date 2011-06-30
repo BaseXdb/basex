@@ -292,7 +292,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       new RepoManager(ctx.repo).delete("xyz", null);
       fail("Not installed package not detected.");
     } catch(final QueryException ex) {
-      check(ex, Err.PKGNOTINST);
+      check(ex, Err.PKGNOTEXIST);
     }
     // install a package without dependencies (pkg3)
     new RepoInstall(REPO + "pkg3.xar", null).execute(ctx);

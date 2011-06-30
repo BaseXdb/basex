@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
 
 /**
@@ -11,7 +10,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public abstract class ValueUpdate extends UpdatePrimitive {
+abstract class ValueUpdate extends UpdatePrimitive {
   /**
    * Constructor.
    * @param t type
@@ -19,11 +18,8 @@ public abstract class ValueUpdate extends UpdatePrimitive {
    * @param d data
    * @param info input info
    */
-  public ValueUpdate(final PrimitiveType t, final int p, final Data d,
+  protected ValueUpdate(final PrimitiveType t, final int p, final Data d,
       final InputInfo info) {
     super(t, p, d, info);
   }
-
-  @Override
-  public void update(final NamePool pool) { }
 }

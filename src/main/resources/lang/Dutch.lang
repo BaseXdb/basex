@@ -460,10 +460,11 @@ ad_eventcreate=Event '%' was created.
 ad_eventknown=Event '%' already exists.
 ad_eventno=Event '%' is unknown.
 ad_eventalr=Already watching event '%'.
-ad_eventalr=Already watching event '%'.
 ad_eventnouw=Event '%' was not watched.
 ad_eventatt=Watching event '%'.
 ad_eventdet=Event '%' unwatched.
+ad_repodelete=Package '%' deleted.
+ad_repoinstall=Package '%' installed in %.
 
 # General Commands
 gc_setwhich=Onbekende optie '%'

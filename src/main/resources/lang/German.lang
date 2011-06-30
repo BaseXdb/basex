@@ -348,11 +348,11 @@ pc_indextxt=Indiziere Texte
 pc_indexatt=Indiziere Attribute
 pc_indexftx=Indiziere Volltext
 pc_parse="%" (% Knoten eingelesen)
-pc_created=Datenbank '%' erzeugt (%).
+pc_created=Die Datenbank '%' wurde erzeugt (%).
 pc_added=Pfad '%' hinzugefügt (%).
-pc_deleted=% Dokument(e) gelöscht (%).
+pc_deleted=% Dokument(e) wurden gelöscht (%).
 pc_renamed=% Dokumentpfad(e) umbenannt (%).
-pc_replaced=% Dokument(e) ersetzt (%).
+pc_replaced=% Dokument(e) wurden ersetzt (%).
 pc_filenf="%" wurde nicht gefunden.
 pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
@@ -365,9 +365,9 @@ pc_direrr="%" verweist auf ein Verzeichnis.
 db_no=Die Datenbank '%' wurde nicht gefunden.
 db_invalid=Der Name '%' ist ungültig.
 db_locked=Die Datenbank '%' ist gerade gesperrt.
-db_closed=Datenbank '%' wurde geschlossen.
+db_closed=Die Datenbank '%' wurde geschlossen.
 db_closeerr=Die Datenbank '%' konnte nicht geschlossen werden.
-db_optimized=Datenbank '%' optimiert (%).
+db_optimized=Die Datenbank '%' wurde optimiert (%).
 db_dropped=Die Datenbank '%' wurde gelöscht.
 db_notdropped=Keine database wurde gelöscht.
 db_droperror=Die Datenbank '%' konnte nicht gelöscht werden.
@@ -463,6 +463,8 @@ ad_eventalr=Event '%' wird schon beobachtet.
 ad_eventnouw=Event '%' wurde nicht beobachtet.
 ad_eventatt=Beobachte Event '%'.
 ad_eventdet=Von Event '%' abgemeldet.
+ad_repodelete=Das Paket '%' wurde gelöscht.
+ad_repoinstall=Das Paket '%' wurde installiert (%).
 
 # General Commands
 gc_setwhich=Unbekannte Option '%'
@@ -509,10 +511,6 @@ info_off=AUS
 info_error=Fehler
 info_entries=% Einträge
 info_browsererror=Browser konnte nicht geöffnet werden. Bitte die URL von Hand im Browser öffnen:\n\n%
-
-#Repo commands
-repo_delete=Paket '%' wurde gelöscht.
-repo_install=Paket '%' wurde in % installiert.
 
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.

@@ -74,16 +74,16 @@ public final class Put extends UpdatePrimitive {
   }
 
   @Override
-  public String toString() {
-    return Util.name(this) + "[" + getTargetDBNode() + ", " + uri[0] + "]";
-  }
-
-  @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
     final int l = uri.length;
-    Uri[] t = new Uri[l + 1];
+    final Uri[] t = new Uri[l + 1];
     System.arraycopy(uri, 0, t, 0, l);
     t[l] = ((Put) p).uri[0];
     uri = t;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + targetNode() + ", " + uri[0] + "]";
   }
 }

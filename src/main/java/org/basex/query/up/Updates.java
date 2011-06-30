@@ -42,10 +42,10 @@ import org.basex.util.TokenSet;
  * 3. Primitives are kept separately for each database that is addressed. This
  *    way we can operate on PRE values instead of node IDs, skip mapping
  *    overhead and further optimize the update process.
- *    {@link AggregatedDatabaseUpdates}
+ *    {@link DatabaseUpdates}
  * 4. Primitives are further kept separately for each database node - each
  *    individual target PRE value. There's a specific container for this:
- *    {@link AggregatedNodeUpdates}
+ *    {@link NodeUpdates}
  * 5. Transform expressions are executed in an 'isolated' updating environment,
  *    see {@link TransformModifier}. All the other updates are executed by
  *    a {@link DatabaseModifier}.
@@ -64,7 +64,7 @@ import org.basex.util.TokenSet;
  *         structural changes of the table - which occur each time a node is
  *         inserted or deleted, for more see {@link PrimitiveType}.
  *      2. For each specific target node, updates which are collected in a
- *         {@link AggregatedNodeUpdates} container are executed in a specific
+ *         {@link NodeUpdates} container are executed in a specific
  *         order, depending on their type {@link PrimitiveType}. This order
  *         relates more or less to the XQUF specification, at least it leads to
  *         the same result.
@@ -73,7 +73,7 @@ import org.basex.util.TokenSet;
  *         Model). Adjacent text nodes can only be a result of structural
  *         updates. With our approach this takes some extra effort, but can be
  *         carried out on-the-fly, applying the two following steps:
- *         1. An {@link AggregatedNodeUpdates} container holds all update
+ *         1. An {@link NodeUpdates} container holds all update
  *            primitives for a specific database node N. If all updates with
  *            target N (all updates in the current container) are carried out,
  *            text node adjacency can only occur on the child axis, or the
@@ -109,11 +109,10 @@ import org.basex.util.TokenSet;
  *  can be among the deleted nodes as a result of a 'replace element content'
  *  statement.
  *
- *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public class Updates {
+public final class Updates {
   /** Current context modifier. */
   public ContextModifier mod;
   /** Mapping between fragment IDs and the temorary data instances created
@@ -129,7 +128,8 @@ public class Updates {
    * @throws QueryException query exception
    */
   public void add(final UpdatePrimitive up, final QueryContext ctx)
-  throws QueryException {
+      throws QueryException {
+
     if(mod == null) mod = new DatabaseModifier();
 
     // check for duplicate Put target URIs
@@ -158,7 +158,7 @@ public class Updates {
 
     // determine highest ancestor node
     ANode anc = target;
-    AxisIter it = target.anc();
+    final AxisIter it = target.anc();
     ANode p;
     while((p = it.next()) != null)
       anc = p;
@@ -184,7 +184,7 @@ public class Updates {
   }
 
   /**
-   * Determines recursively the pre value for a given fragment node within the
+   * Recursively determines the pre value for a given fragment node within the
    * corresponding data reference.
    * @param node current
    * @param trgID ID of fragment for which we calculate the pre value
@@ -225,7 +225,6 @@ public class Updates {
    * @return #updates
    */
   public int size() {
-    if(mod == null) return 0;
-    return mod.size();
+    return mod == null ? 0 : mod.size();
   }
 }

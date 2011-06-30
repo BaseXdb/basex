@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
  */
 public abstract class StructuralUpdate extends UpdatePrimitive {
   /** Number of pre value shifts on the table introduced by this primitive. */
-  public int shifts;
+  protected int shifts;
 
   /**
    * Constructor.
@@ -23,7 +23,7 @@ public abstract class StructuralUpdate extends UpdatePrimitive {
    * @param d data
    * @param i input info
    */
-  public StructuralUpdate(final PrimitiveType t, final int p,
+  protected StructuralUpdate(final PrimitiveType t, final int p,
       final Data d, final InputInfo i) {
     super(t, p, d, i);
   }
@@ -61,7 +61,7 @@ public abstract class StructuralUpdate extends UpdatePrimitive {
    * @param b node pre value
    * @return true if nodes have been merged
    */
-  public static boolean mergeTexts(final Data d, final int a, final int b) {
+  protected static boolean mergeTexts(final Data d, final int a, final int b) {
     // some pre value checks to prevent database errors
     final int s = d.meta.size;
     if(a >= s || b >= s) return false;

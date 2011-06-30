@@ -41,7 +41,7 @@ public abstract class UpdatePrimitive implements Comparable<UpdatePrimitive> {
    * Creates a {@link DBNode} instance from the target node information.
    * @return DBNode
    */
-  public DBNode getTargetDBNode() {
+  public DBNode targetNode() {
     return new DBNode(data, pre);
   }
 

@@ -53,12 +53,7 @@ public final class ReplaceNode extends NodeCopy {
   public void update(final NamePool pool) {
     if(md == null) return;
     add(pool);
-    pool.remove(getTargetDBNode());
-  }
-
-  @Override
-  public String toString() {
-    return Util.name(this) + "[" + getTargetDBNode() + ", " + insert + "]";
+    pool.remove(targetNode());
   }
 
   @Override
@@ -74,6 +69,11 @@ public final class ReplaceNode extends NodeCopy {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPL.thrw(input, getTargetDBNode());
+    UPMULTREPL.thrw(input, targetNode());
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }

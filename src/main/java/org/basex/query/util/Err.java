@@ -143,7 +143,7 @@ public enum Err {
   /** PACK0001: Evaluation exception. */
   PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
   /** PACK0002: Evaluation exception. */
-  PKGINST(PACK, 2, "Package is already installed."),
+  PKGINST(PACK, 2, "Package '%' is already installed."),
   /** PACK0003: Evaluation exception. */
   NECPKGNOTINST(PACK, 3, "Necessary package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
@@ -157,15 +157,13 @@ public enum Err {
   /** PACK0007: Evaluation exception. */
   CANNOTDELPKG(PACK, 7, "Package cannot be deleted."),
   /** PACK0008: Evaluation exception. */
-  PKGDEP(PACK, 8, "Package % depends on package %."),
+  PKGDEP(PACK, 8, "Package '%' depends on package '%'."),
   /** PACK0009: Evaluation exception. */
   PKGNOTSUPP(PACK, 9, "Package is not supported by database version."),
   /** PACK0010: Evaluation exception. */
   JARDESCINV(PACK, 10, "Jar descriptor: %."),
   /** PACK0011: Evaluation exception. */
   JARREADFAIL(PACK, 11, "Reading jar descriptor failed: %."),
-  /** PACK0012: Evaluation exception. */
-  PKGNOTINST(PACK, 12, "Package '%' is not installed."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

@@ -43,11 +43,11 @@ public final class ReplaceValue extends ValueUpdate {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPV.thrw(input, getTargetDBNode());
+    UPMULTREPV.thrw(input, targetNode());
   }
 
   @Override
   public String toString() {
-    return Util.info("%[%, %]", Util.name(this), getTargetDBNode(), value);
+    return Util.info("%[%, %]", Util.name(this), targetNode(), value);
   }
 }

@@ -463,6 +463,8 @@ ad_eventalr=Already watching event '%'.
 ad_eventnouw=Event '%' was not watched.
 ad_eventatt=Watching event '%'.
 ad_eventdet=Event '%' unwatched.
+ad_repodelete=Package '%' deleted.
+ad_repoinstall=Package '%' installed in %.
 
 # General Commands
 gc_setwhich=Unknown option '%'
@@ -509,10 +511,6 @@ info_off=OFF
 info_error=Error
 info_entries=% entries
 info_browsererror=Failed to open a browser.\nPlease manually open the URL:\n\n%
-
-#Repo commands
-repo_delete=Package '%' deleted.
-repo_install=Package '%' installed in %.
 
 # Command Help
 ch_nohelp=Sorry, no help available.

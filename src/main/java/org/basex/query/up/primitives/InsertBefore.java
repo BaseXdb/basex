@@ -45,6 +45,6 @@ public final class InsertBefore extends InsertBase {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + getTargetDBNode() + ", " + insert + "]";
+    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }
