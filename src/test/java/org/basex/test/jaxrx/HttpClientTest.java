@@ -669,14 +669,17 @@ public final class HttpClientTest {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
+
+    final String test = "\u0442\u0435\u0441\u0442";
+
     // Set content type
     conn.contentType = "text/plain; charset=CP1251";
     // set content encoded in CP1251
-    conn.content = Charset.forName("CP1251").encode("тест").array();
+    conn.content = Charset.forName("CP1251").encode(test).array();
     final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
         context.prop, null);
     // compare results
-    assertTrue(eq(i.get(1).atom(null), token("тест")));
+    assertTrue(eq(i.get(1).atom(null), token(test)));
   }
 
   /**
