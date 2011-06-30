@@ -169,8 +169,7 @@ final class DatabaseUpdates {
       // content expression ...
       final int[] destroyed = updatePrimitives.get(pre).
       destroyedNodeIdentities().toArray();
-      for(int i = 0; i < destroyed.length; i++) {
-        final int pd = destroyed[i];
+      for(final int pd : destroyed) {
         final int followingAxisPre = pd + data.size(pd, data.kind(pd));
         // mark obsolete target nodes on the descendant axis.
         while(ni < l && nodes.get(ni) < followingAxisPre) {

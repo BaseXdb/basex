@@ -70,12 +70,11 @@ final class NodeUpdates {
     }
 
     /* If a primitive with the same type has already been added to
-     * the list, merge both primitives together.
-     */
+     * the list, merge both primitives together. */
     final PrimitiveType pt = p.type;
-    for(int i = 0; i < prim.length; i++) {
-      if(prim[i].type == pt) {
-        prim[i].merge(p);
+    for(final UpdatePrimitive up : prim) {
+      if(up.type == pt) {
+        up.merge(p);
         return;
       }
     }
@@ -170,7 +169,7 @@ final class NodeUpdates {
     /* if this containers target node is destroyed we don't have to
      * check for eventual replace element content expressions, which
      * only affect the child axis. */
-    return ((del || rep) && prim[0].pre == pre) ||
+    return (del || rep) && prim[0].pre == pre ||
     destroyedNodeIdentities().contains(pre);
   }
 
@@ -224,8 +223,7 @@ final class NodeUpdates {
     prepareExecution();
     int sd = 0;
 
-    for(int i = 0; i < prim.length; i++) {
-      final UpdatePrimitive p = prim[i];
+    for(final UpdatePrimitive p : prim) {
       p.apply();
 
       if(p instanceof StructuralUpdate)
