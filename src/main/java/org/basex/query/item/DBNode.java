@@ -376,8 +376,8 @@ public class DBNode extends ANode {
       private final DBNode node = copy();
       int k = data.kind(pre);
       private final int pp = data.parent(pre, k);
-      final int s = pp + data.size(pp, data.kind(pp));
-      int p = pre + data.size(pre, k);
+      final int s = pp == -1 ? 0 : pp + data.size(pp, data.kind(pp));
+      int p = pp == -1 ? 0 : pre + data.size(pre, k);
 
       @Override
       public ANode next() {
