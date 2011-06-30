@@ -140,7 +140,7 @@ public final class BaseXClient {
       // initialize event socket
       esocket = new Socket();
       esocket.connect(new InetSocketAddress(ehost, eport), 5000);
-      OutputStream os = esocket.getOutputStream();
+      final OutputStream os = esocket.getOutputStream();
       receive(in, os);
       os.write(0);
       os.flush();
@@ -164,10 +164,10 @@ public final class BaseXClient {
             final BufferedInputStream bi = new BufferedInputStream(is);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             receive(bi, baos);
-            String name = baos.toString("UTF-8");
+            final String name = baos.toString("UTF-8");
             baos = new ByteArrayOutputStream();
             receive(bi, baos);
-            String data = baos.toString("UTF-8");
+            final String data = baos.toString("UTF-8");
             notifiers.get(name).notify(data);
           }
         } catch(final Exception ex) { }
