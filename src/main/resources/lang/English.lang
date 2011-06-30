@@ -124,7 +124,6 @@ dq_question=Save changes to %?
 dx_outdir=Output directory
 dx_overfile=Directory is not empty.
 dx_indent=Indent with whitespaces
-dx_invpath=Invalid path.
 
 dp_title=Preferences
 dp_dbpath=Database Path (databases must be manually moved)
@@ -383,7 +382,6 @@ db_norestore='%' could not be restored.
 db_notopened=Database '%' could not be opened.
 db_opened=Database '%' opened in %.
 db_exported=Database '%' exported in %.
-db_notexported=Database could not be exported to '%'.
 db_notdeleted=File '%' could not be deleted.
 db_exists=Database '%' exists already.
 db_backdrop=Backup files '%' were dropped.

@@ -5,7 +5,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -310,18 +309,6 @@ public abstract class ParseExpr extends Expr {
     final Value v = ctx.value;
     if(v == null) XPNOCTX.thrw(input, this);
     return v;
-  }
-
-  /**
-   * Returns the data reference.
-   * @param ctx query context
-   * @return data reference
-   * @throws QueryException query exception
-   */
-  public final Data checkData(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.data();
-    if(data == null) NODBCTX.thrw(input, this);
-    return data;
   }
 
   /**

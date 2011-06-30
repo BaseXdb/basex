@@ -124,7 +124,6 @@ dq_question=Änderungen speichern in %?
 dx_outdir=Ausgabeverzeichnis
 dx_overfile=Verzeichnis ist nicht leer.
 dx_indent=Mit Leerzeichen einrücken
-dx_invpath=Ungültiger Pfad.
 
 dp_title=Einstellungen
 dp_dbpath=Datenbank-Pfad (Dateien müssen manuell verschoben werden)
@@ -383,7 +382,6 @@ db_norestore='%' konnte nicht wiederhergestellt werden.
 db_notopened=Die Datenbank '%' konnte nicht geöffnet werden.
 db_opened=Datenbank '%' geöffnet (%).
 db_exported=Datenbank '%' exportiert (%).
-db_notexported=Die Datenbank konnte nicht nach '%' exportiert werden.
 db_notdeleted=Die Datei '%' konnte nicht gelöscht werden.
 db_exists=Die Datenbank '%' existiert schon.
 db_backdrop=Backup-Dateien '%' wurden gelöscht.

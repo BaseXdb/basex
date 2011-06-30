@@ -521,8 +521,6 @@ public interface Text {
   String DBOPENED = lang("db_opened");
   /** Database exported. */
   String DBEXPORTED = lang("db_exported");
-  /** Database not exported. */
-  String DBNOTEXPORTED = lang("db_notexported");
   /** Database not deleted. */
   String DBNOTDELETED = lang("db_notdeleted");
   /** Database exists already. */
@@ -1318,8 +1316,6 @@ public interface Text {
   String OVERFILE = lang("dx_overfile");
   /** Dialog title for exporting nodes. */
   String OUTINDENT = lang("dx_indent");
-  /** Dialog title for exporting nodes. */
-  String INVPATH = lang("dx_invpath");
 
   /** Dialog title for inserting new data. */
   String INSERTTITLE = lang("dn_title");

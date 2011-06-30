@@ -182,19 +182,6 @@ public enum NodeType implements Type {
   }
 
   /**
-   * Throws an exception if the specified item can't be converted to a number.
-   * @param it item
-   * @param ii input info
-   * @return item argument
-   * @throws QueryException query exception
-   */
-  Item checkNum(final Item it, final InputInfo ii)
-      throws QueryException {
-    return it.type == AtomType.URI || !it.str() && !it.num() && !it.unt() &&
-      it.type != AtomType.BLN ? error(it, ii) : it;
-  }
-
-  /**
    * Throws a casting exception.
    * @param it item to be included in the error message
    * @param ii input info

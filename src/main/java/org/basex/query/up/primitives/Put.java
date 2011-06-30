@@ -86,13 +86,4 @@ public final class Put extends UpdatePrimitive {
     t[l] = ((Put) p).uri[0];
     uri = t;
   }
-
-  /**
-   * Returns the number of different uris for this target node, hence the
-   * number of distinct locations it will be serialized to in the end.
-   * @return number of uris
-   */
-  public int uriSize() {
-    return uri.length;
-  }
 }

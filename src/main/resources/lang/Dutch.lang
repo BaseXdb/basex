@@ -124,7 +124,6 @@ dq_question=Bewaar wijzigingen in %?
 dx_outdir=Output folder
 dx_overfile=Folder is niet leeg.
 dx_indent=Inspringen met whitespace tekens
-dx_invpath=Niet bestaand pad.
 
 dp_title=Voorkeuren
 dp_dbpath=Database pad (databases moeten handmatig verplaatst worden)
@@ -383,7 +382,6 @@ db_norestore='%' kon niet teruggezet worden.
 db_notopened=Database '%' kon niet geopend worden.
 db_opened=Database '%' geopend in %.
 db_exported=Database '%' geëxporteerd in %.
-db_notexported=Database kon niet naar '%' geëxporteerd worden.
 db_notdeleted=Bestand '%' kon niet verwijderd worden.
 db_exists=Database bestaat '%' al.
 db_backdrop=Backup bestanden '%' zijn verwijderd.

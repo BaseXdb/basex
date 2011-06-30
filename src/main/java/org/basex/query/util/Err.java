@@ -38,8 +38,6 @@ public enum Err {
   NOEVENT(BASX, 9, "Event '%' is unknown."),
   /** BASX0010: Parsing exception. */
   NOOPTION(BASX, 10, "Unknown database option '%'."),
-  /** BASX0011: Parsing exception. */
-  INVOPTION(BASX, 11, "Invalid value for database option '%'."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -685,8 +683,6 @@ public enum Err {
   UPEXPECTT(XUST, 2, "Updating expression expected in modify clause."),
   /** XUST0002: Parsing exception. */
   UPEXPECTF(XUST, 2, "Updating expression expected in function declaration."),
-  /** XUST0002: Parsing exception. */
-  UPEXPFUN(XUST, 2, "Updating expression expected in %."),
   /** XUST0003: Parsing exception. */
   DUPLREVAL(XUST, 3, "Duplicate 'revalidation' declaration."),
   /** XUST0026: Parsing exception. */
