@@ -28,15 +28,6 @@ public class BXDatabase extends BXFolder {
    * Constructor.
    * @param dbname database name
    * @param f resource factory
-   */
-  public BXDatabase(final String dbname, final BXResourceFactory f) {
-    super(dbname, "", f);
-  }
-
-  /**
-   * Constructor.
-   * @param dbname database name
-   * @param f resource factory
    * @param u user name
    * @param p user password
    */

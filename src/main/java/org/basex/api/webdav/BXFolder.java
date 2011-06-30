@@ -31,23 +31,12 @@ public class BXFolder extends BXResource implements FolderResource {
    * @param dbname database name
    * @param folderPath path to folder
    * @param f resource factory
-   */
-  public BXFolder(final String dbname, final String folderPath,
-      final BXResourceFactory f) {
-    super(dbname, folderPath, f);
-  }
-
-  /**
-   * Constructor.
-   * @param dbname database name
-   * @param folderPath path to folder
-   * @param f resource factory
    * @param u user name
    * @param p password
    */
   public BXFolder(final String dbname, final String folderPath,
       final BXResourceFactory f, final String u, final String p) {
-    this(dbname, folderPath, f);
+    super(dbname, folderPath, f);
     user = u;
     pass = p;
   }
@@ -76,7 +65,7 @@ public class BXFolder extends BXResource implements FolderResource {
     try {
       final Session s = factory.login(user, pass);
       try {
-        return factory.resource(s, db, path + SEP + childName);
+        return factory.resource(s, db, path + SEP + childName, user, pass);
       } finally {
         s.close();
       }
@@ -94,10 +83,9 @@ public class BXFolder extends BXResource implements FolderResource {
     try {
       final Session s = factory.login(user, pass);
       try {
-        final Query q = s.query(
-            "declare variable $d as xs:string external; " +
-            "declare variable $p as xs:string external; " +
-            "for $r in db:list($d) return substring-after($r,$p)");
+        final Query q = s.query("declare variable $d as xs:string external; "
+            + "declare variable $p as xs:string external; "
+            + "for $r in db:list($d) return substring-after($r,$p)");
         q.bind("$d", db + SEP + path);
         q.bind("$p", path);
         while(q.more()) {
@@ -125,8 +113,8 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) {
+  public Resource createNew(final String newName,
+      final InputStream inputStream, final Long length, final String contentType) {
     if(supported(contentType)) {
       try {
         final Session s = factory.login(user, pass);
@@ -134,10 +122,9 @@ public class BXFolder extends BXResource implements FolderResource {
           s.execute(new Open(db));
           final String doc = path.isEmpty() ? newName : path + SEP + newName;
           // Check if document with this path already exists
-          if(factory.resource(s, db, doc) == null)
-            s.add(newName, path, inputStream);
-          else
-            s.replace(doc, inputStream);
+          if(factory.resource(s, db, doc, user, pass) == null) s.add(newName,
+              path, inputStream);
+          else s.replace(doc, inputStream);
           return new BXDocument(db, path + SEP + newName, factory, user, pass);
         } finally {
           s.close();
@@ -151,8 +138,24 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public void copyTo(final CollectionResource toCollection, final String name) {
-    // TODO Auto-generated method stub
+  public void copyTo(final CollectionResource target, final String name) {
+    try {
+      final Session s = factory.login(user, pass);
+      try {
+        if(target instanceof BXAllDatabasesResource) {
+          // Folder is moved to the root directory -> a new collection database
+          // is created which contains the folder's documents/folders
+        } else if(target instanceof BXDatabase) {
+
+        } else if(target instanceof BXFolder) {
+
+        }
+      } finally {
+        s.close();
+      }
+    } catch(Exception ex) {
+
+    }
   }
 
   @Override
@@ -196,8 +199,27 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public void moveTo(final CollectionResource rDest, final String name) {
-    // TODO Auto-generated method stub
+  public void moveTo(final CollectionResource target, final String name) {
+    try {
+      final Session s = factory.login(user, pass);
+      try {
+        if(target instanceof BXAllDatabasesResource) {
+
+        } else if(target instanceof BXDatabase) {
+          if(((BXDatabase) target).db.equals(db)) {
+            // Folder is moved within the same database
+
+          }
+
+        } else if(target instanceof BXFolder) {
+
+        }
+      } finally {
+        s.close();
+      }
+    } catch(Exception ex) {
+
+    }
   }
 
   @Override
