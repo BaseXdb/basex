@@ -111,7 +111,7 @@ public final class NamespaceTest {
           "  )," +
           "  $target := $input-context/works[1]/employee[1]" +
           "return insert nodes $source into $target", context).execute();
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       assertEquals("XUTY0004", ex.code());
     }
     fail("should throw XUTY0004");
