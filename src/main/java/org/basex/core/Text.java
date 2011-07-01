@@ -328,7 +328,7 @@ public interface Text {
   /** Command help. */
   String[] HELPSHOW = {
     "[" + CmdShow.BACKUPS + "|" + CmdShow.DATABASES + "|" + CmdShow.EVENTS +
-    "|" + CmdShow.SESSIONS + "|" + CmdShow.USERS + "|" + "]",
+    "|" + CmdShow.SESSIONS + "|" + CmdShow.USERS + "]",
     lang("ch_show1"),
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
