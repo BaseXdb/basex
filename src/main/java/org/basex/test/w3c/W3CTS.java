@@ -106,8 +106,8 @@ public abstract class W3CTS {
   private boolean reporting;
   /** Verbose flag. */
   private boolean verbose;
-  /** Debug flag. */
-  private boolean debug;
+  /** Minimum time to include query in performance statistics. */
+  private int timer;
   /** Minimum conformance. */
   private boolean minimum;
   /** Print compilation steps. */
@@ -163,15 +163,15 @@ public abstract class W3CTS {
     final Args arg = new Args(args, this,
         " Test Suite [options] [pat]" + NL +
         " [pat] perform only tests with the specified pattern" + NL +
-        " -c print compilation steps" + NL +
-        " -d show debugging info" + NL +
-        " -h show this help" + NL +
-        " -m minimum conformance" + NL +
-        " -g <test-group> test group to test" + NL +
-        " -C include tests that depend on the current time" + NL +
-        " -p change path" + NL +
-        " -r create report" + NL +
-        " -v verbose output");
+        " -c     print compilation steps" + NL +
+        " -h     show this help" + NL +
+        " -m     minimum conformance" + NL +
+        " -g     <test-group> test group to test" + NL +
+        " -C     run tests depending on current time" + NL +
+        " -p     change path" + NL +
+        " -r     create report" + NL +
+        " -t[ms] list slowest queries" + NL +
+        " -v     verbose output");
 
     while(arg.more()) {
       if(arg.dash()) {
@@ -183,14 +183,14 @@ public abstract class W3CTS {
           currTime = true;
         } else if(c == 'c') {
           compile = true;
-        } else if(c == 'd') {
-          debug = true;
         } else if(c == 'm') {
           minimum = true;
         } else if(c == 'g') {
           group = arg.string();
         } else if(c == 'p') {
           path = arg.string() + "/";
+        } else if(c == 't') {
+          timer = arg.num();
         } else if(c == 'v') {
           verbose = true;
         } else {
@@ -498,18 +498,6 @@ public abstract class W3CTS {
               ic.reset();
               final ItemCache ia = toIter(string(actual), frag);
               if(FNSimple.deep(null, ia, ic)) break;
-
-              if(debug) {
-                iter.reset();
-                ic.reset();
-                final XMLSerializer ser = new XMLSerializer(System.out);
-                Util.outln(NL + "=== " + testid + " ===");
-                for(Item it; (it = ic.next()) != null;) it.serialize(ser);
-                Util.outln(NL + "=== " + NAME + " ===");
-                for(Item it; (it = iter.next()) != null;) it.serialize(ser);
-                Util.outln();
-              }
-            } catch(final IOException ex) {
             } catch(final Throwable ex) {
               System.err.println("\n" + outname + ":");
               ex.printStackTrace();
@@ -588,11 +576,16 @@ public abstract class W3CTS {
       logReport.append(NL);
     }
 
+    // print verbose/timing information
+    final long nano = perf.getTime();
+    final boolean slow = nano / 1000000 > timer;
     if(verbose) {
-      final long t = perf.getTime();
-      if(t > 100000000) Util.out(": " + Performance.getTimer(t, 1));
+      if(slow) Util.out(": " + Performance.getTimer(nano, 1));
       Util.outln();
+    } else if(slow) {
+      Util.out(NL + "- " + outname + ": " + Performance.getTimer(nano, 1));
     }
+
     return single == null || !outname.equals(single);
   }
 
