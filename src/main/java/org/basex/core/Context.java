@@ -80,6 +80,7 @@ public final class Context {
     lock = ctx.lock;
     users = ctx.users;
     repo = ctx.repo;
+    this.prop.set(Prop.EVENTPORT, ctx.prop.num(Prop.EVENTPORT));
   }
 
   /**
