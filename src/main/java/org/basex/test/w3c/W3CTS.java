@@ -106,8 +106,8 @@ public abstract class W3CTS {
   private boolean reporting;
   /** Verbose flag. */
   private boolean verbose;
-  /** Minimum time to include query in performance statistics. */
-  private int timer;
+  /** Minimum time in ms to include query in performance statistics. */
+  private int timer = Integer.MAX_VALUE;
   /** Minimum conformance. */
   private boolean minimum;
   /** Print compilation steps. */
@@ -806,10 +806,9 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   private void write(final BufferedWriter bw, final String f) throws Exception {
-    final BufferedReader br = new BufferedReader(new
-        InputStreamReader(new FileInputStream(f), UTF8));
-    String line;
-    while((line = br.readLine()) != null) {
+    final BufferedReader br = new BufferedReader(
+        new InputStreamReader(new FileInputStream(f), UTF8));
+    for(String line; (line = br.readLine()) != null;) {
       bw.write(line);
       bw.write(NL);
     }

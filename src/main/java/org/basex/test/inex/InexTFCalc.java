@@ -73,9 +73,7 @@ public final class InexTFCalc {
     // cache queries
     final BufferedReader br = new BufferedReader(new FileReader(WORDS));
     words = new StringList();
-    String l;
-    while((l = br.readLine()) != null)
-        words.add(l);
+    for(String l; (l = br.readLine()) != null;) words.add(l);
     br.close();
 
     freq = new int[words.size()];

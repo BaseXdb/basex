@@ -112,8 +112,7 @@ public final class InexSubmit {
     queries = new StringList();
     tid = new StringList();
 
-    String l;
-    while((l = br.readLine()) != null) {
+    for(String l; (l = br.readLine()) != null;) {
       final int i1 = l.indexOf(';');
       final int i2 = l.indexOf(';', i1 + 1);
       final int i3 = l.lastIndexOf(';');
@@ -132,7 +131,7 @@ public final class InexSubmit {
     if(!parseArguments(args)) return;
 
     final BufferedReader brt = new BufferedReader(new FileReader(TIMES));
-    while((l = brt.readLine()) != null) {
+    for(String l; (l = brt.readLine()) != null;) {
       final int index = l.indexOf(';');
       qt[c] = Double.parseDouble(l.substring(0, index));
       qressizes[c++] = Integer.parseInt(l.substring(index + 1));
@@ -353,16 +352,15 @@ public final class InexSubmit {
 
     final int numdb = 10;
     final double[] qut = new double[nqueries * numdb];
-    String l;
     int i = 0;
-    while((l = bf[0].readLine()) != null) {
+    for(String l; (l = bf[0].readLine()) != null;) {
       qut[i++] = Double.parseDouble(l.substring(0, l.indexOf(';')));
     }
     bf[0].close();
 
     for(int j = 1; j < bf.length; ++j) {
       i = 0;
-      while((l = bf[j].readLine()) != null) {
+      for(String l; (l = bf[j].readLine()) != null;) {
         qut[i] = Math.min(qut[i], Double.parseDouble(l));
         ++i;
       }
@@ -379,7 +377,7 @@ public final class InexSubmit {
     final BufferedReader br = new BufferedReader(new FileReader(SUBMISSION));
     final PrintOutput o = new PrintOutput(SUBMISSIONU);
     i = 0;
-    while((l = br.readLine()) != null) {
+    for(String l; (l = br.readLine()) != null;) {
       if(l.contains("<topic topic-id=")) {
         final int s = l.indexOf("total_time_ms=\"") +
           "total_time_ms=\"".length();
@@ -451,12 +449,11 @@ public final class InexSubmit {
     final FileInputStream fis = new FileInputStream(file);
     final InputStreamReader isr = new InputStreamReader(fis, "UTF8");
     final BufferedReader br = new BufferedReader(isr);
-    String line = null;
     String t = "";
     String ty = "";
 
     final PrintOutput out = new PrintOutput(QUERIES);
-    while((line = br.readLine()) != null) {
+    for(String line; (line = br.readLine()) != null;) {
       if(line.indexOf("topic ct_no") > -1) {
         // extract topic id
         int s0 = line.indexOf('"');

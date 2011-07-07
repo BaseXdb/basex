@@ -88,9 +88,8 @@ public final class InexTest {
     // cache queries
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
     queries = new StringList();
-    String l;
     int c = 0;
-    while((l = br.readLine()) != null) {
+    for(String l; (l = br.readLine()) != null;) {
       if(quindex == -1 || ++c == quindex) {
         queries.add(l.substring(l.lastIndexOf(';') + 1));
       }

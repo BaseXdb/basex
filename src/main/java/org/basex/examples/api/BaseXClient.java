@@ -127,10 +127,9 @@ public final class BaseXClient {
    * @throws IOException I/O exception
    */
   private void send(final InputStream input) throws IOException {
-    int l;
     final BufferedInputStream bis = new BufferedInputStream(input);
     final BufferedOutputStream bos = new BufferedOutputStream(out);
-    while((l = bis.read()) != -1) bos.write(l);
+    for(int l; (l = bis.read()) != -1;) bos.write(l);
     bos.write(0);
     bos.flush();
     info = receive();

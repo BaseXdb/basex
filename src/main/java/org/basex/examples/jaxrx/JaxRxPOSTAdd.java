@@ -48,10 +48,7 @@ public final class JaxRxPOSTAdd {
 
     // Send document to server
     System.out.println("\n* Send document...");
-    int i;
-    while((i = in.read()) != -1) {
-      out.write(i);
-    }
+    for(int i; (i = in.read()) != -1;) out.write(i);
     in.close();
     out.close();
 

@@ -56,11 +56,10 @@ public final class InexSingle {
    * @throws Exception exception
    */
   public static void convert(final String subfile) throws Exception {
-    String l;
     final HashMap<String, String> hs = new HashMap<String, String>();
 
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
-    while((l = br.readLine()) != null) {
+    for(String l; (l = br.readLine()) != null;) {
       final int i1 = l.indexOf(';');
       final int i2 = l.indexOf(';', i1 + 1);
       hs.put(l.substring(0, i1), l.substring(i1 + 1, i2));
@@ -72,7 +71,7 @@ public final class InexSingle {
       "1" + ".xml";
     System.out.println("........ Creating: " + subfileN);
     final BufferedWriter out = new BufferedWriter(new FileWriter(subfileN));
-    while((l = in.readLine()) != null) {
+    for(String l; (l = in.readLine()) != null;) {
       if(l.contains("<topic topic-id=")) {
         final int i1 = l.indexOf("\"");
         final int i2 = l.indexOf("\"", i1 + 1);
@@ -100,10 +99,9 @@ public final class InexSingle {
 
     // cache queries
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
-    String l;
     int c = 0;
     String query = "";
-    while((l = br.readLine()) != null) {
+    for(String l; (l = br.readLine()) != null;) {
       if(++c == quindex) {
         query = l.substring(l.lastIndexOf(';') + 1).replaceAll("\"", "'");
       }

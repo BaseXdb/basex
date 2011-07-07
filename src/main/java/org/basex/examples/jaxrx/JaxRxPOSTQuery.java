@@ -66,8 +66,7 @@ public final class JaxRxPOSTQuery {
           conn.getInputStream(), "UTF-8"));
 
       // Print all lines of the result
-      String line;
-      while((line = br.readLine()) != null) {
+      for(String line; (line = br.readLine()) != null;) {
         System.out.println(line);
       }
       br.close();
