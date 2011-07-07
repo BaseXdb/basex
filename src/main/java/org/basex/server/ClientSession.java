@@ -42,16 +42,17 @@ public final class ClientSession extends Session {
   /** Event notifications. */
   final Map<String, EventNotifier> notifiers =
     Collections.synchronizedMap(new HashMap<String, EventNotifier>());
-  /** Socket reference. */
-  final Socket socket;
-  /** Server output. */
+  /** Server output (buffered). */
   final PrintOutput sout;
   /** Server input. */
   final InputStream sin;
-  /** Socket event reference. */
-  Socket esocket;
+
+  /** Socket reference. */
+  private final Socket socket;
   /** Socket host name. */
-  String ehost;
+  private final String ehost;
+  /** Socket event reference. */
+  private Socket esocket;
 
   /**
    * Constructor, specifying the database context and the

@@ -15,9 +15,9 @@ import org.basex.util.ByteList;
  */
 public final class ClientQuery extends Query {
   /** Client session. */
-  final ClientSession cs;
+  private final ClientSession cs;
   /** Query id. */
-  final String id;
+  private final String id;
   /** Next result. */
   ByteList next;
 
@@ -62,17 +62,31 @@ public final class ClientQuery extends Query {
 
   @Override
   public String execute() throws BaseXException {
-    return print(exec(ServerCmd.EXEC, id));
-  }
-
-  @Override
-  public String info() throws BaseXException {
-    return print(exec(ServerCmd.INFO, id));
+    try {
+      cs.sout.write(ServerCmd.EXEC.code);
+      cs.send(id);
+      final BufferInput bi = new BufferInput(cs.sin);
+      String s = null;
+      if(cs.out == null) {
+        s = bi.content().toString();
+      } else {
+        for(byte l; (l = bi.readByte()) != 0;) cs.out.write(l);
+      }
+      if(!cs.ok(bi)) throw new BaseXException(bi.readString());
+      return s;
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
   }
 
   @Override
   public String close() throws BaseXException {
     return print(exec(ServerCmd.CLOSE, id));
+  }
+
+  @Override
+  public String info() throws BaseXException {
+    return exec(ServerCmd.INFO, id).toString();
   }
 
   /**
@@ -106,7 +120,7 @@ public final class ClientQuery extends Query {
   private String print(final ByteList bl) throws BaseXException {
     if(cs.out == null) return bl.toString();
     try {
-      if(bl.size() != 0) cs.out.write(bl.toArray());
+      cs.out.write(bl.toArray());
       return null;
     } catch(final IOException ex) {
       throw new BaseXException(ex);
