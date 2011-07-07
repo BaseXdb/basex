@@ -1,9 +1,11 @@
 package org.basex.server;
 
 import java.io.IOException;
+import java.io.OutputStream;
+
 import org.basex.core.BaseXException;
+import org.basex.io.ArrayOutput;
 import org.basex.io.BufferInput;
-import org.basex.util.ByteList;
 
 /**
  * This class defines all methods for iteratively evaluating queries with the
@@ -19,7 +21,7 @@ public final class ClientQuery extends Query {
   /** Query id. */
   private final String id;
   /** Next result. */
-  ByteList next;
+  private ArrayOutput next;
 
   /**
    * Standard constructor.
@@ -31,49 +33,47 @@ public final class ClientQuery extends Query {
       throws BaseXException {
 
     cs = session;
-    id = exec(ServerCmd.QUERY, query).toString();
+    id = string(ServerCmd.QUERY, query).toString();
+  }
+
+  @Override
+  public String info() throws BaseXException {
+    return string(ServerCmd.INFO, id).toString();
   }
 
   @Override
   public void bind(final String n, final String v, final String t)
       throws BaseXException {
-    exec(ServerCmd.BIND, id + '\0' + n + '\0' + v + '\0' +
+    execute(ServerCmd.BIND, id + '\0' + n + '\0' + v + '\0' +
         (t == null ? "" : t));
   }
 
   @Override
   public String init() throws BaseXException {
-    return print(exec(ServerCmd.INIT, id));
+    return execute(ServerCmd.INIT, id);
+  }
+
+  @Override
+  public String execute() throws BaseXException {
+    return execute(ServerCmd.EXEC, id);
   }
 
   @Override
   public boolean more() throws BaseXException {
-    next = exec(ServerCmd.NEXT, id);
+    next = string(ServerCmd.NEXT, id);
     return next.size() != 0;
   }
 
   @Override
   public String next() throws BaseXException {
     if(next == null) more();
-    final ByteList bl = next;
+    final ArrayOutput ao = next;
     next = null;
-    return print(bl);
-  }
+    if(cs.out == null) return ao.toString();
 
-  @Override
-  public String execute() throws BaseXException {
     try {
-      cs.sout.write(ServerCmd.EXEC.code);
-      cs.send(id);
-      final BufferInput bi = new BufferInput(cs.sin);
-      String s = null;
-      if(cs.out == null) {
-        s = bi.content().toString();
-      } else {
-        for(byte l; (l = bi.readByte()) != 0;) cs.out.write(l);
-      }
-      if(!cs.ok(bi)) throw new BaseXException(bi.readString());
-      return s;
+      cs.out.write(ao.toArray());
+      return null;
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
@@ -81,48 +81,55 @@ public final class ClientQuery extends Query {
 
   @Override
   public String close() throws BaseXException {
-    return print(exec(ServerCmd.CLOSE, id));
-  }
-
-  @Override
-  public String info() throws BaseXException {
-    return exec(ServerCmd.INFO, id).toString();
+    return execute(ServerCmd.CLOSE, id);
   }
 
   /**
-   * Executes the specified command.
+   * Executes a command.
    * @param cmd server command
    * @param arg argument
-   * @return result
+   * @return string, or {@code null} if result was sent to output stream.
    * @throws BaseXException command exception
    */
-  private ByteList exec(final ServerCmd cmd, final String arg)
+  private String execute(final ServerCmd cmd, final String arg)
       throws BaseXException {
+
+    if(cs.out == null) return string(cmd, arg).toString();
+    exec(cmd, arg, cs.out);
+    return null;
+  }
+
+  /**
+   * Executes a command and returns the result as string.
+   * @param cmd server command
+   * @param arg argument
+   * @return string, or {@code null} if result was sent to output stream.
+   * @throws BaseXException command exception
+   */
+  private ArrayOutput string(final ServerCmd cmd, final String arg)
+      throws BaseXException {
+
+    final ArrayOutput ao = new ArrayOutput();
+    exec(cmd, arg, ao);
+    return ao;
+  }
+
+  /**
+   * Executes a command and sends the result to the specified output stream.
+   * @param cmd server command
+   * @param arg argument
+   * @param os target output stream
+   * @throws BaseXException command exception
+   */
+  private void exec(final ServerCmd cmd, final String arg,
+      final OutputStream os) throws BaseXException {
 
     try {
       cs.sout.write(cmd.code);
       cs.send(arg);
       final BufferInput bi = new BufferInput(cs.sin);
-      final ByteList bl = bi.content();
+      for(byte l; (l = bi.readByte()) != 0;) os.write(l);
       if(!cs.ok(bi)) throw new BaseXException(bi.readString());
-      return bl;
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
-  }
-
-  /**
-   * Returns the specified result.
-   * @param bl result
-   * @return string, or {@code null} if result was sent to output stream.
-   * @throws BaseXException command exception
-   */
-  private String print(final ByteList bl) throws BaseXException {
-    if(cs.out == null) return bl.toString();
-    try {
-      // suppress void operation to potentially closed output streams
-      if(bl.size() != 0) cs.out.write(bl.toArray());
-      return null;
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }

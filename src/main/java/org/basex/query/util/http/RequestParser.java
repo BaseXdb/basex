@@ -113,8 +113,7 @@ public final class RequestParser {
    */
   private static void parseAttrs(final ANode element, final TokenMap attrs) {
     final AxisIter elAttrs = element.attributes();
-    ANode attr = null;
-    while((attr = elAttrs.next()) != null) {
+    for(ANode attr; (attr = elAttrs.next()) != null;) {
       attrs.add(attr.nname(), attr.atom());
     }
   }
@@ -129,11 +128,10 @@ public final class RequestParser {
     ANode n = null;
     while((n = i.next()) != null && eq(n.nname(), HDR)) {
       final AxisIter hdrAttrs = n.attributes();
-      ANode attr = null;
       byte[] name = null;
       byte[] value = null;
 
-      while((attr = hdrAttrs.next()) != null) {
+      for(ANode attr; (attr = hdrAttrs.next()) != null;) {
         if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
         if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
 
@@ -165,10 +163,8 @@ public final class RequestParser {
       // no linked resource for setting request content
       if(contItem == null) {
         // content is set from <http:body/> children
-        ANode n;
         final AxisMoreIter i = body.children();
-        while((n = i.next()) != null)
-          bodyContent.add(n);
+        for(ANode n; (n = i.next()) != null;) bodyContent.add(n);
       } else {
         // content is set from $bodies parameter
         bodyContent.add(contItem);
@@ -191,15 +187,14 @@ public final class RequestParser {
     parseAttrs(multipart, attrs);
     if(attrs.get(MEDIATYPE) == null) REQINV.thrw(ii,
         "Attribute media-type of http:multipart is mandatory");
-    ANode n;
     final AxisMoreIter i = multipart.children();
     if(contItems == null) {
       // content is set from <http:body/> children of <http:part/> elements
-      while((n = i.next()) != null)
+      for(ANode n; (n = i.next()) != null;)
         parts.add(parsePart(n, null, ii));
     } else {
       // content is set from $bodies parameter
-      while((n = i.next()) != null)
+      for(ANode n; (n = i.next()) != null;)
         parts.add(parsePart(n, contItems.next(), ii));
     }
   }

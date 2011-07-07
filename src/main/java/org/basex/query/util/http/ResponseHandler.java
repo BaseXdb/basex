@@ -219,8 +219,7 @@ public final class ResponseHandler {
     final BufferedInputStream bis = new BufferedInputStream(io);
     try {
       final ByteList bl = new ByteList();
-      int i = 0;
-      while((i = bis.read()) != -1) bl.add(i);
+      for(int i = 0; (i = bis.read()) != -1;) bl.add(i);
       return TextInput.content(new IOContent(bl.toArray()), cs).finish();
     } finally {
       bis.close();
@@ -366,8 +365,7 @@ public final class ResponseHandler {
    */
   private static byte[] readLine(final InputStream in) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
-    int b;
-    while((b = in.read()) != -1) {
+    for(int b; (b = in.read()) != -1;) {
       // RFC 1341: a line ends with CRLF
       if(b == '\r') {
         while(true) {
