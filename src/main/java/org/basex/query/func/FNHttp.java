@@ -42,9 +42,7 @@ public final class FNHttp extends FuncCall {
     if(expr.length == 3) {
       final Iter bodies = expr[2].iter(ctx);
       cache = new ItemCache();
-      Item i;
-      while((i = bodies.next()) != null)
-        cache.add(i);
+      for(Item i; (i = bodies.next()) != null;) cache.add(i);
     }
 
     // send HTTP request

@@ -66,8 +66,7 @@ public final class Lang {
       } else {
         final BufferedReader br = new BufferedReader(new InputStreamReader(
             is, Token.UTF8));
-        String line;
-        while((line = br.readLine()) != null) {
+        for(String line; (line = br.readLine()) != null;) {
           final int i = line.indexOf('=');
           if(i == -1 || line.startsWith("#")) continue;
           final String key = line.substring(0, i);

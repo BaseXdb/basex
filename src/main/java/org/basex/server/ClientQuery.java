@@ -120,7 +120,8 @@ public final class ClientQuery extends Query {
   private String print(final ByteList bl) throws BaseXException {
     if(cs.out == null) return bl.toString();
     try {
-      cs.out.write(bl.toArray());
+      // suppress void operation to potentially closed output streams
+      if(bl.size() != 0) cs.out.write(bl.toArray());
       return null;
     } catch(final IOException ex) {
       throw new BaseXException(ex);

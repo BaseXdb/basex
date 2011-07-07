@@ -232,8 +232,7 @@ public final class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   private void send(final InputStream input) throws IOException {
-    int l;
-    while((l = input.read()) != -1) sout.write(l);
+    for(int b; (b = input.read()) != -1;) sout.write(b);
     sout.write(0);
     sout.flush();
     final BufferInput bi = new BufferInput(sin);
@@ -281,8 +280,7 @@ public final class ClientSession extends Session {
     try {
       send(cmd);
       final BufferInput bi = new BufferInput(sin);
-      int l;
-      while((l = bi.read()) != 0) os.write(l);
+      for(int b; (b = bi.read()) != 0;) os.write(b);
       info = bi.readString();
       if(!ok(bi)) throw new BaseXException(info);
     } catch(final IOException ex) {

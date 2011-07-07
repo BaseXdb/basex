@@ -159,9 +159,7 @@ public final class Updates {
     // determine highest ancestor node
     ANode anc = target;
     final AxisIter it = target.anc();
-    ANode p;
-    while((p = it.next()) != null)
-      anc = p;
+    for(ANode p; (p = it.next()) != null;) anc = p;
 
     /* See if this ancestor has already been added to the pending update list.
      * In this case a database has already been created.
@@ -195,19 +193,17 @@ public final class Updates {
       return 0;
 
     int s = 1;
-    ANode n;
     AxisIter it = node.attributes();
-    while((n = it.next()) != null) {
+    for(ANode n; (n = it.next()) != null;) {
       final int st = preSteps(n, trgID);
       if(st == 0) return s;
       s += st;
     }
 
     it = node.children();
-    while((n = it.next()) != null && n.id <= trgID) {
+    for(ANode n; (n = it.next()) != null && n.id <= trgID;) {
       s += preSteps(n, trgID);
     }
-
     return s;
   }
 

@@ -701,8 +701,7 @@ public abstract class Data {
         final List<NSNode> cand = new LinkedList<NSNode>();
         NSNode cn = ns.root;
         cand.add(cn);
-        int cI;
-        while((cI = cn.fnd(par)) > -1) {
+        for(int cI; (cI = cn.fnd(par)) > -1;) {
           // add candidate to stack
           cn = cn.ch[cI];
           cand.add(0, cn);
