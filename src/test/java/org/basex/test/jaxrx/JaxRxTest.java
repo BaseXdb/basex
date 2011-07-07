@@ -412,9 +412,7 @@ public final class JaxRxTest {
     if(is != null) {
       // send input stream if it not empty
       final BufferedInputStream bis = new BufferedInputStream(is);
-      int i;
-      while((i = bis.read()) != -1)
-        bos.write(i);
+      for(int i; (i = bis.read()) != -1;) bos.write(i);
       bis.close();
       bos.close();
     }
@@ -444,9 +442,7 @@ public final class JaxRxTest {
     conn.setRequestProperty("Content-Type", "application/xml");
     final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
     final BufferedInputStream bis = new BufferedInputStream(is);
-    int i;
-    while((i = bis.read()) != -1)
-      bos.write(i);
+    for(int i; (i = bis.read()) != -1;) bos.write(i);
     bis.close();
     bos.close();
     try {
