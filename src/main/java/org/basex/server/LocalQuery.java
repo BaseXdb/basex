@@ -134,6 +134,8 @@ public class LocalQuery extends Query {
    * @return {@code null} if query output is directly sent to an output stream
    */
   private String output() {
+    // if another output stream is specified, the query process has already
+    // written the data, so there is nothing to output
     if(buf == null) return null;
     final String result = string(buf.toByteArray());
     buf.reset();
