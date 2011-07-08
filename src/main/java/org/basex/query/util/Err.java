@@ -119,7 +119,7 @@ public enum Err {
   PATHINVALID(FOFL, 9999, "Invalid file path: '%'."),
 
   /** FOZP0001: Evaluation exception. */
-  ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
+  ZIPNOTFOUND(FOZP, 1, "Path '%' is not found."),
   /** FOZP0002: Evaluation exception. */
   ZIPINVALID(FOZP, 2, "% element: % attribute expected."),
   /** FOZP0002: Evaluation exception. */
@@ -134,7 +134,7 @@ public enum Err {
   /** FOHC003: Evaluation exception. */
   SRCATTR(FOHC, 3, "No attribute beside 'src' and 'media-type' allowed."),
   /** FOHC0004: Evaluation exception. */
-  REQINV(FOHC, 4, "The request element is not valid: %."),
+  REQINV(FOHC, 4, "The request element is invalid: %."),
   /** FOHC005: Evaluation exception. */
   NOURL(FOHC, 5, "No URL specified."),
   /** FOHC006: Evaluation exception. */
@@ -224,15 +224,15 @@ public enum Err {
   REGERR(FORX, 4, "Regular expression: '%'."),
 
   /** FOTY0012: Type exception. */
-  NOTYP(FOTY, 12, "Item doesn't have a typed value: %."),
+  NOTYP(FOTY, 12, "Item has no typed value: %."),
   /** FOTY0013: Type exception. */
-  FNATM(FOTY, 13, "Function items can't be atomized: %."),
+  FNATM(FOTY, 13, "Function items cannot be atomized: %."),
   /** FOTY0013: Type exception. */
-  FNEQ(FOTY, 13, "Function items don't have a defined equality: %."),
+  FNEQ(FOTY, 13, "Function items have no defined equality: %."),
   /** FOTY0013: Type exception. */
-  FNSTR(FOTY, 14, "Function items don't have a string representation: %."),
+  FNSTR(FOTY, 14, "Function items have no string representation: %."),
   /** FOTY0013: Type exception. */
-  FNCMP(FOTY, 15, "Function items can't be compared: %."),
+  FNCMP(FOTY, 15, "Function items cannot be compared: %."),
 
   /** FOFU0001: Invalid value of $argNum in call to fn:partial-apply. */
   INVPOS(FOFU, 1, "Illegal argument position for %: %."),
@@ -247,7 +247,7 @@ public enum Err {
   /** FTDY0016: Evaluation exception. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),
   /** FTDY0017: Evaluation exception. */
-  FTMILD(FTDY, 17, "Invalid mild not selection."),
+  FTMILD(FTDY, 17, "Invalid 'mild not' selection."),
   /** FTDY0020: Evaluation exception. */
   FTREG(FTDY, 20, "Invalid wildcard syntax: '%'."),
 
@@ -437,7 +437,7 @@ public enum Err {
   INTEXP(XPST, 3, "Integer expected."),
 
   /** XPST0005: Parsing exception. */
-  COMPSELF(XPST, 5, "Warning: '%' will not yield any results."),
+  COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
 
   /** XPST0008: Parsing exception. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
@@ -470,8 +470,8 @@ public enum Err {
   XPSEQ(XPTY, 4, "No sequence % allowed."),
   /** XPTY0004: Typing exception. */
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
-  /** XPTY0004: Typing exception. */
-  XPINVPROM(XPTY, 4, "Can't promote type % to %: %."),
+  /** XPTY0004: Promoting exception. */
+  XPINVPROM(XPTY, 4, "Cannot promote type % to %: %."),
   /** XPTY0004: Typing exception. */
   XPCAST(XPTY, 4, "Invalid %(%) cast."),
   /** XPTY0004: Typing Exception. */
@@ -864,7 +864,7 @@ public enum Err {
   }
 
   /**
-   * Throws a type cast exception.
+   * Throws a type promoting exception.
    * @param ii input info
    * @param t expression cast type
    * @param v value

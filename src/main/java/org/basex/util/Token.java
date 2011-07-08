@@ -49,6 +49,8 @@ public final class Token {
   public static final byte[] ONE = { '1' };
   /** Slash. */
   public static final byte[] SLASH = { '/' };
+  /** Colon. */
+  public static final byte[] COLON = { ':' };
 
   /** Hex codes. */
   public static final byte[] HEX = token("0123456789ABCDEF");

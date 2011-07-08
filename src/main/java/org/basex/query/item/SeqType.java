@@ -302,7 +302,7 @@ public final class SeqType {
   }
 
   /**
-   * Casts the specified value.
+   * Promotes the specified value.
    * @param val value to be cast
    * @param ctx query context
    * @param ii input info
