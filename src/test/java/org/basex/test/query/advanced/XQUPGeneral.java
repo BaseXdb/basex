@@ -20,10 +20,11 @@ public final class XQUPGeneral extends AdvancedQueryTest {
 
   /**
    * Creates a database.
+   * @param input input database string, if null, then use default.
    * @throws Exception exception
    */
-  private void createDB() throws Exception {
-    new CreateDB(DBNAME, DOC).execute(CONTEXT);
+  private void createDB(final String input) throws Exception {
+    new CreateDB(DBNAME, input == null ? DOC : input).execute(CONTEXT);
   }
 
   /**
@@ -32,7 +33,7 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void textMerging01() throws Exception {
-    createDB();
+    createDB(null);
     query("insert node 'foo' into //item[@id='item0']/location");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
   }
@@ -45,7 +46,7 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void textMerging02() throws Exception {
-    createDB();
+    createDB(null);
     query("insert node 'foo' into //item[@id='item0']/location," +
       "insert node <a/> before //item[@id='item0']");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
@@ -58,7 +59,7 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void textMerging03() throws Exception {
-    createDB();
+    createDB(null);
 
     query("let $i := //item[@id='item0'] return (insert node 'foo' as " +
       "first into $i/location, insert node 'foo' before $i/location, " +
@@ -75,7 +76,7 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void textMerging04() throws Exception {
-    createDB();
+    createDB(null);
 
     query("let $i := //item[@id='item0'] return insert node 'foo' " +
       "before $i/location/text()");
@@ -90,7 +91,7 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void textMerging05() throws Exception {
-    createDB();
+    createDB(null);
 
     query("let $i := //item[@id='item0']/location return " +
         "(insert node 'foo' into $i, delete node $i/text())");
@@ -103,7 +104,7 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void textMerging06() throws Exception {
-    createDB();
+    createDB(null);
 
     query("let $i := //item[@id='item0']/location return " +
         "(insert node <n/> into $i, insert node 'foo' as last into $i)");
@@ -118,7 +119,7 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void textMerging07() throws Exception {
-    createDB();
+    createDB(null);
 
     query("let $i := //item[@id='item0']/location return " +
         "insert node 'foo' after $i/text()");
@@ -131,7 +132,7 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void textMerging08() throws Exception {
-    createDB();
+    createDB(null);
 
     query("let $i := //item[@id='item0'] return " +
         "(insert node 'foo' after $i/location)");
@@ -205,6 +206,17 @@ public final class XQUPGeneral extends AdvancedQueryTest {
   public void replaceLastNode() throws Exception {
     query("copy $n := <a><b/><c><d/><d/><d/></c></a> " +
         "modify (replace node $n//c with <c/>) return $n", "<a><b/><c/></a>");
+  }
+
+  /**
+   * Replaces the value of the documents root node. Related to
+   * github issue #141.
+   * @throws Exception exception
+   */
+  @Test
+  public void replaceValueOfEmptyRoot() throws Exception {
+    createDB("<a/>");
+    query("replace value of node /a with 'a'");
   }
 
   /**
