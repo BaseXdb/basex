@@ -583,6 +583,9 @@ public enum Function {
   EVAL(FNUtil.class, "eval(string)", ITEM_ZM, STR_ZO),
   /** Utility function: evaluates the specified query file. */
   RUN(FNUtil.class, "run(string)", ITEM_ZM, STR),
+  /** Utility function: performs an XSLT transformation. */
+  XSLT(FNUtil.class, "xslt(input, template[, params])", NOD_ZO, 2,
+      NOD_ZO, NOD_ZO, NOD_ZO),
   /** Utility function: formats a string using the printf syntax. */
   FORMAT(FNUtil.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
   /** Utility function: returns the memory consumption in mb. */

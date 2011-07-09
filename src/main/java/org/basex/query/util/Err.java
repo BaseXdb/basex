@@ -477,6 +477,8 @@ public enum Err {
   /** XPTY0004: Typing Exception. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
   /** XPTY0004: Typing Exception. */
+  STRNODTYPE(XPTY, 4, "%: xs:string or node() expected, % found."),
+  /** XPTY0004: Typing Exception. */
   SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
   /** XPTY0004: Typing exception. */
   XPEMPTY(XPTY, 4, "%: no empty sequence allowed."),

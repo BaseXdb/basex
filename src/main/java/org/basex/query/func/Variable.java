@@ -10,12 +10,12 @@ import org.basex.query.item.Value;
 import org.basex.query.util.Var;
 
 /**
- * XQuery variables specified in modules.
+ * Statically available XQuery variables.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public enum VarDef {
+public enum Variable {
 
   /* FNFile variables. */
 
@@ -35,7 +35,7 @@ public enum VarDef {
    * @param name name
    * @param val item value
    */
-  private VarDef(final byte[] uri, final String name, final Value val) {
+  private Variable(final byte[] uri, final String name, final Value val) {
     qname = new QNm(token(name), uri);
     value = val;
   }
@@ -45,7 +45,7 @@ public enum VarDef {
    * @param ctx query context
    */
   public static void init(final QueryContext ctx) {
-    for(final VarDef v : values()) {
+    for(final Variable v : values()) {
       ctx.vars.setGlobal(Var.create(ctx, null, v.qname, v.value));
     }
   }

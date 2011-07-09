@@ -1,10 +1,7 @@
 package org.basex.io;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import org.basex.data.Data;
-import org.basex.util.ByteList;
 import org.basex.util.Token;
 import org.xml.sax.InputSource;
 
@@ -252,19 +249,5 @@ public abstract class IO {
   @Override
   public String toString() {
     return path;
-  }
-
-  /**
-   * Caches the contents of the specified input stream.
-   * @param i input stream
-   * @throws IOException I/O exception
-   */
-  protected final void cache(final InputStream i) throws IOException {
-    final ByteList bl = new ByteList();
-    final InputStream bis = i instanceof BufferedInputStream ||
-      i instanceof BufferInput ? i : new BufferedInputStream(i);
-    for(int b; (b = bis.read()) != -1;) bl.add(b);
-    bis.close();
-    cont = bl.toArray();
   }
 }
