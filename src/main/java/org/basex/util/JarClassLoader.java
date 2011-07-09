@@ -17,11 +17,12 @@ import java.util.jar.JarFile;
  * does not offer a fine and easy way to delete open jars. The source code was
  * taken from
  * http://snipplr.com/view/24224/class-loader-which-close-opened-jar-files/ and
- * slighly modified.
+ * slightly modified.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public class JarClassLoader extends URLClassLoader {
+public final class JarClassLoader extends URLClassLoader {
   /** Jar files to close. */
   private final HashSet<String> setJarFileNames2Close = new HashSet<String>();
 

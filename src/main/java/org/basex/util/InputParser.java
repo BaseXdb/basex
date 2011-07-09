@@ -140,7 +140,7 @@ public abstract class InputParser {
    * Creates input information.
    * @return input information
    */
-  public InputInfo input() {
+  public final InputInfo input() {
     return new InputInfo(this);
   }
 }

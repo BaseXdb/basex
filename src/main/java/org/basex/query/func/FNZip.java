@@ -323,8 +323,7 @@ public final class FNZip extends FuncCall {
           BufferedInputStream bis = null;
           try {
             bis = new BufferedInputStream(new FileInputStream(src));
-            int c;
-            while((c = bis.read(data)) != -1) zos.write(data, 0, c);
+            for(int c; (c = bis.read(data)) != -1;) zos.write(data, 0, c);
           } finally {
             if(bis != null) try { bis.close(); } catch(final IOException e) { }
           }
@@ -342,8 +341,7 @@ public final class FNZip extends FuncCall {
           if(ze != null) {
             // add old zip entry
             final InputStream zis = zf.getInputStream(ze);
-            int c;
-            while((c = zis.read(data)) != -1) zos.write(data, 0, c);
+            for(int c; (c = zis.read(data)) != -1;) zos.write(data, 0, c);
           } else if(n != null) {
             // write new binary content to archive
             final boolean hex = M_HEX.equals(m);

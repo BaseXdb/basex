@@ -105,12 +105,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public byte[] docName() {
-    return data.text(pre, true);
-  }
-
-  @Override
-  public Data data() {
+  public final Data data() {
     return data;
   }
 
@@ -121,7 +116,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public long itr(final InputInfo ii) throws QueryException {
+  public final long itr(final InputInfo ii) throws QueryException {
     final boolean txt = type == NodeType.TXT || type == NodeType.COM;
     if(txt || type == NodeType.ATT) {
       final long l = data.textItr(pre, txt);
@@ -131,7 +126,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public double dbl(final InputInfo ii) throws QueryException {
+  public final double dbl(final InputInfo ii) throws QueryException {
     final boolean txt = type == NodeType.TXT || type == NodeType.COM;
     if(txt || type == NodeType.ATT) {
       final double d = data.textDbl(pre, txt);
@@ -357,7 +352,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public AxisIter foll() {
+  public final AxisIter foll() {
     return new AxisIter() {
       private final DBNode node = copy();
       final int s = data.meta.size;
@@ -376,13 +371,13 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public AxisIter follSibl() {
+  public final AxisIter follSibl() {
     return new AxisIter() {
       private final DBNode node = copy();
       int k = data.kind(pre);
       private final int pp = data.parent(pre, k);
-      final int s = pp + data.size(pp, data.kind(pp));
-      int p = pre + data.size(pre, k);
+      final int s = pp == -1 ? 0 : pp + data.size(pp, data.kind(pp));
+      int p = pp == -1 ? 0 : pre + data.size(pre, k);
 
       @Override
       public ANode next() {

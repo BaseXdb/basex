@@ -156,8 +156,7 @@ public final class MAB2Parser extends FileParser {
     final TokenObjMap<MAB2Entry> ids = new TokenObjMap<MAB2Entry>();
 
     int i = 0;
-    byte[] id;
-    while((id = id(input)) != null) {
+    for(byte[] id; (id = id(input)) != null;) {
       final long pos = off;
       final byte[] par = par(input);
 
@@ -252,8 +251,7 @@ public final class MAB2Parser extends FileParser {
   private byte[] ident(final DataAccess in) {
     in.read1();
     int l = 0;
-    byte b;
-    while((b = in.read1()) >= ' ') CACHE[l++] = b;
+    for(byte b; (b = in.read1()) >= ' ';) CACHE[l++] = b;
     return Arrays.copyOf(CACHE, l);
   }
 

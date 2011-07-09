@@ -19,7 +19,7 @@ import org.basex.util.TokenList;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public class RepoList extends Command {
+public final class RepoList extends Command {
   /**
    * Constructor.
    */

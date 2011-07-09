@@ -404,6 +404,21 @@ public interface QueryTokens {
   byte[] ID = token("id");
   /** IDRef token. */
   byte[] IDREF = token("idref");
+  /** Error token. */
+  byte[] ECODE = token("code");
+  /** Error token. */
+  byte[] EVALUE = token("value");
+  /** Error token. */
+  byte[] EDESC = token("description");
+  /** Error token. */
+  byte[] EMODULE = token("module");
+  /** Error token. */
+  byte[] ELINENUM = token("line-number");
+  /** Error token. */
+  byte[] ECOLNUM = token("column-number");
+
+  /** Error prefix. */
+  byte[] ERR = token("err");
   /** FN token. */
   byte[] FN = token("fn");
   /** Math token. */

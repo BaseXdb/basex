@@ -25,8 +25,6 @@ public final class XMLSerializer extends Serializer {
   private static final SerializerProp PROPS = new SerializerProp();
   /** New line. */
   private static final byte[] NL = token(Prop.NL);
-  /** Colon. */
-  private static final byte[] COL = { ':' };
 
   /** HTML: elements with an empty content model. */
   private static final TokenList EMPTIES = new TokenList();
@@ -183,7 +181,7 @@ public final class XMLSerializer extends Serializer {
 
     // open results element
     if(wrap) {
-      openElement(wPre.length != 0 ? concat(wPre, COL, RESULTS) : RESULTS);
+      openElement(wPre.length != 0 ? concat(wPre, COLON, RESULTS) : RESULTS);
       namespace(wPre, wUri);
       finishElement();
     }
@@ -206,7 +204,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void openResult() throws IOException {
     if(wrap) {
-      openElement(wPre.length != 0 ? concat(wPre, COL, RESULT) : RESULT);
+      openElement(wPre.length != 0 ? concat(wPre, COLON, RESULT) : RESULT);
       ind = false;
     }
   }
@@ -225,7 +223,7 @@ public final class XMLSerializer extends Serializer {
     print(n);
 
     final byte[] tagatt = mth == M_XML || tags.size() == 0 ? EMPTY :
-      concat(lc(tags.get(tags.size() - 1)), COL, lc(n));
+      concat(lc(tags.get(tags.size() - 1)), COLON, lc(n));
 
     // don't append value for boolean attributes
     if(mth == M_HTML && BOOLEAN.id(tagatt) != 0) return;

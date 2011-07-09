@@ -1,3 +1,27 @@
+Version 6.7 (June 30, 2011):
+
+  Main Features:
+  [ADD] Native support for the EXPath Packaging system:
+        http://docs.basex.org/wiki/Packaging
+  [ADD] Client/server event notification:
+        http://docs.basex.org/wiki/Events
+  [ADD] Persistent document index added to speed up
+        access to large collections
+  
+  XQuery:
+  [ADD] New database and full-text functions:
+        http://docs.basex.org/wiki/Database_Functions
+        http://docs.basex.org/wiki/Full-Text_Functions
+  [ADD] Event function added to fire events
+  [MOD] Index optimizations, better cost estimations
+  
+  Commands:
+  [ADD] Glob syntax introduced to database commands:
+        http://docs.basex.org/wiki/Commands
+  [ADD] New commands added: REPLACE, RENAME,
+        REPO DELETE/INSTALL/LIST, CREATE/DROP EVENT
+  [MOD] BACKUP optimized, renamed to CREATE BACKUP
+
 Version 6.6.2 (May 13, 2011) Linuxtag release:
 
   API:
@@ -18,6 +42,7 @@ Version 6.6.2 (May 13, 2011) Linuxtag release:
   [MOD] XQuery Update optimizations for replacing nodes;
         tree-aware updates.
   [MOD] XQuery optimizations to avoid materialization of sequences.
+
   GUI:
   [ADD] Multiple editor tabs added
   [ADD] Database management: copy databases

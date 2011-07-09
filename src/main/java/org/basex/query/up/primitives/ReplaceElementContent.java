@@ -33,20 +33,29 @@ public final class ReplaceElementContent extends StructuralUpdate {
 
   @Override
   public void apply() {
-    final int loc = pre + data.attSize(pre, Data.ELEM);
-    /* attributes of target node are not affected - d.attSize
-     * returns number of attributes + 1, so d.attSize + value.length is
-     * correct new size as only a text node is (evtl.) inserted
+    /*
+     * Kind is hard coded because the target of a replace element content
+     * expression can only be an element node.
      */
-    shifts = data.attSize(loc, data.kind(loc)) + value.length -
-    data.size(loc, data.kind(loc));
+    final int kind = Data.ELEM;
+    final int loc = pre + data.attSize(pre, kind);
 
-    if(pre + data.size(pre, Data.ELEM) == loc + 1 &&
+    /*
+     * Attributes are not affected by this expression.
+     *
+     * As a result of this expression all child nodes are deleted and replaced
+     * by either a single text node or no node at all (depends on wheter the
+     * replacing value is an empty string or not).
+     */
+    shifts = data.size(pre, kind) - data.attSize(pre, kind) - 1 +
+      value.length == 0 ? 0 : 1;
+
+    if(pre + data.size(pre, kind) == loc + 1 &&
         data.kind(loc) == Data.TEXT) {
       // overwrite existing text node
       data.replace(loc, Data.TEXT, value);
     } else {
-      while(pre + data.size(pre, Data.ELEM) > loc) data.delete(loc);
+      while(pre + data.size(pre, kind) > loc) data.delete(loc);
       if(value.length > 0) {
         final MemData md = new MemData(data);
         md.text(0, loc - pre, value, Data.TEXT);

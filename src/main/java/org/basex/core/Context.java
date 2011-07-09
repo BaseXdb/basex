@@ -80,6 +80,8 @@ public final class Context {
     lock = ctx.lock;
     users = ctx.users;
     repo = ctx.repo;
+    prop.set(Prop.EVENTPORT, ctx.prop.num(Prop.EVENTPORT));
+    prop.set(Prop.TIMEOUT, ctx.prop.num(Prop.TIMEOUT));
   }
 
   /**
@@ -132,8 +134,8 @@ public final class Context {
    */
   public void closeDB() {
     data = null;
-    set(null, null);
     copied = null;
+    set(null, null);
   }
 
   /**

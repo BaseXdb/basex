@@ -188,7 +188,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public AxisIter follSibl() {
+  public final AxisIter follSibl() {
     return new AxisIter() {
       /** Iterator. */
       private AxisIter ai;

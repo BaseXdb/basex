@@ -41,12 +41,12 @@ public abstract class UpdatePrimitive implements Comparable<UpdatePrimitive> {
    * Creates a {@link DBNode} instance from the target node information.
    * @return DBNode
    */
-  public DBNode targetNode() {
+  public final DBNode targetNode() {
     return new DBNode(data, pre);
   }
 
   @Override
-  public int compareTo(final UpdatePrimitive p) {
+  public final int compareTo(final UpdatePrimitive p) {
     return type.ordinal() - p.type.ordinal();
   }
 

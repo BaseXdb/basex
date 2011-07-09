@@ -61,6 +61,21 @@ public final class InlineFunc extends UserFunc {
   }
 
   @Override
+  public boolean uses(final Use u) {
+    return u == Use.X30 || super.uses(u);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    return false;
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    throw Util.notexpected(v);
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     for(int i = 0; i < args.length; ++i) {
@@ -80,20 +95,5 @@ public final class InlineFunc extends UserFunc {
     tb.append(PAR2).append(' ');
     if(ret != null) tb.append("as ").append(ret.toString()).append(' ');
     return tb.append("{ ").append(expr).append(" }").toString();
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || super.uses(u);
-  }
-
-  @Override
-  public boolean removable(final Var v) {
-    return false;
-  }
-
-  @Override
-  public Expr remove(final Var v) {
-    throw Util.notexpected(v);
   }
 }

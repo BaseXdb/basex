@@ -359,7 +359,7 @@ public abstract class Data {
    * @param pre pre value
    * @return attribute value
    */
-  public byte[] attValue(final int att, final int pre) {
+  public final byte[] attValue(final int att, final int pre) {
     final int a = pre + attSize(pre, kind(pre));
     int p = pre;
     while(++p != a) if(name(p) == att) return text(p, false);
@@ -701,8 +701,7 @@ public abstract class Data {
         final List<NSNode> cand = new LinkedList<NSNode>();
         NSNode cn = ns.root;
         cand.add(cn);
-        int cI;
-        while((cI = cn.fnd(par)) > -1) {
+        for(int cI; (cI = cn.fnd(par)) > -1;) {
           // add candidate to stack
           cn = cn.ch[cI];
           cand.add(0, cn);
@@ -1036,7 +1035,7 @@ public abstract class Data {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return toString(0, meta.size);
   }
 }

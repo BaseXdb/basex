@@ -50,7 +50,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.7-RC1";
+  String VERSION = "6.7.1 beta";
   /** Company info. */
   String COMPANY = NAME + " Team";
   /** Title and version. */
@@ -102,7 +102,7 @@ public interface Text {
     "  -p<num>    Set server port" + NL +
     "  -P<pass>   Specify user password" + NL +
     "  -q<expr>   Execute XQuery expression" + NL +
-    "  -s<pars>  Set serialization parameter(s)" + NL +
+    "  -s<pars>   Set serialization parameter(s)" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -v/V       Show (all) process info" + NL +
     "  -w         Retain whitespaces from source files" + NL +
@@ -328,7 +328,7 @@ public interface Text {
   /** Command help. */
   String[] HELPSHOW = {
     "[" + CmdShow.BACKUPS + "|" + CmdShow.DATABASES + "|" + CmdShow.EVENTS +
-    "|" + CmdShow.SESSIONS + "|" + CmdShow.USERS + "|" + "]",
+    "|" + CmdShow.SESSIONS + "|" + CmdShow.USERS + "]",
     lang("ch_show1"),
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +

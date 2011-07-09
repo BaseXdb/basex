@@ -532,7 +532,7 @@ public class CmdTest {
    * Assumes that this command is successful.
    * @param cmd command reference
    */
-  protected void ok(final Command cmd) {
+  protected final void ok(final Command cmd) {
     try {
       session.execute(cmd);
     } catch(final BaseXException ex) {
@@ -544,7 +544,7 @@ public class CmdTest {
    * Assumes that this command fails.
    * @param cmd command reference
    */
-  protected void no(final Command cmd) {
+  protected final void no(final Command cmd) {
     try {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");

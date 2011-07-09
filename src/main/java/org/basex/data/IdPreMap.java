@@ -142,7 +142,7 @@ public class IdPreMap {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     final StringBuilder b = new StringBuilder();
 
     b.append("pres, ids, incs, oids");

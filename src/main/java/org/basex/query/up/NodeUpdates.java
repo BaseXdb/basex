@@ -70,12 +70,11 @@ final class NodeUpdates {
     }
 
     /* If a primitive with the same type has already been added to
-     * the list, merge both primitives together.
-     */
+     * the list, merge both primitives together. */
     final PrimitiveType pt = p.type;
-    for(int i = 0; i < prim.length; i++) {
-      if(prim[i].type == pt) {
-        prim[i].merge(p);
+    for(final UpdatePrimitive up : prim) {
+      if(up.type == pt) {
+        up.merge(p);
         return;
       }
     }
@@ -170,7 +169,7 @@ final class NodeUpdates {
     /* if this containers target node is destroyed we don't have to
      * check for eventual replace element content expressions, which
      * only affect the child axis. */
-    return ((del || rep) && prim[0].pre == pre) ||
+    return (del || rep) && prim[0].pre == pre ||
     destroyedNodeIdentities().contains(pre);
   }
 
@@ -224,12 +223,11 @@ final class NodeUpdates {
     prepareExecution();
     int sd = 0;
 
-    for(int i = 0; i < prim.length; i++) {
-      final UpdatePrimitive p = prim[i];
+    for(final UpdatePrimitive p : prim) {
       p.apply();
 
       if(p instanceof StructuralUpdate)
-        sd += ((StructuralUpdate) p).getPreShifts();
+        sd += ((StructuralUpdate) p).preShifts();
     }
 
     /* Internal text node adjacency is resolved and the number of pre value
@@ -270,7 +268,7 @@ final class NodeUpdates {
      * which are kept track off by c.
      */
     final InsertBefore ib = (InsertBefore) find(INSERTBEFORE);
-    int c = ib == null ? 0 : ib.getPreShifts();
+    int c = ib == null ? 0 : ib.preShifts();
     for(int i = prim.length - 1; i >= 0; i--) {
       if(prim[i] instanceof StructuralUpdate) {
         final StructuralUpdate p = (StructuralUpdate) prim[i];
@@ -285,7 +283,7 @@ final class NodeUpdates {
             merged++;
             c--;
           }
-          c += p.getPreShifts();
+          c += p.preShifts();
         }
       }
     }
@@ -325,7 +323,7 @@ final class NodeUpdates {
             c--;
         }
         // consider amount of nodes deleted/inserted by the current primitive
-        c += p.getPreShifts();
+        c += p.preShifts();
       }
     }
   }

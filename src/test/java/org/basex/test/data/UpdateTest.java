@@ -73,7 +73,7 @@ public abstract class UpdateTest {
    * Creates the database.
    */
   @Before
-  public void setUp() {
+  public final void setUp() {
     exec(new CreateDB(DBNAME, TESTFILE));
     size = CONTEXT.data.meta.size;
   }
@@ -82,7 +82,7 @@ public abstract class UpdateTest {
    * Deletes the test database.
    */
   @After
-  public void tearDown() {
+  public final void tearDown() {
     if(mainmem) return;
     exec(new Close());
     exec(new DropDB(DBNAME));
@@ -91,7 +91,7 @@ public abstract class UpdateTest {
   /**
    * Reloads the database.
    */
-  protected void reload() {
+  protected final void reload() {
     if(mainmem) return;
     exec(new Close());
     exec(new Open(DBNAME));
@@ -102,7 +102,7 @@ public abstract class UpdateTest {
    * @param exp expected value
    * @param act actual value
    */
-  protected void assertByteArraysEqual(final byte[] exp, final byte[] act) {
+  protected final void assertArraysEquals(final byte[] exp, final byte[] act) {
     assertEquals("array lengths don't equal", exp.length, act.length);
     for(int i = 0; i < exp.length; ++i) assertEquals(exp[i], act[i]);
   }
@@ -111,7 +111,7 @@ public abstract class UpdateTest {
    * Tests for correct data size.
    */
   @Test
-  public void testSize() {
+  public final void testSize() {
     assertEquals("Unexpected size!", size, CONTEXT.data.meta.size);
     reload();
     assertEquals("Unexpected size!", size, CONTEXT.data.meta.size);

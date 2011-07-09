@@ -32,7 +32,7 @@ public abstract class AGUI extends JFrame {
   }
 
   @Override
-  public void setTitle(final String title) {
+  public final void setTitle(final String title) {
     final String t = title == null || title.isEmpty() ? "" : " - " + title;
     super.setTitle(Text.TITLE + t);
   }
@@ -41,7 +41,7 @@ public abstract class AGUI extends JFrame {
    * Sets a cursor.
    * @param c cursor to be set
    */
-  public void cursor(final Cursor c) {
+  public final void cursor(final Cursor c) {
     cursor(c, false);
   }
 
@@ -50,7 +50,7 @@ public abstract class AGUI extends JFrame {
    * @param c cursor to be set
    * @param force new cursor
    */
-  public void cursor(final Cursor c, final boolean force) {
+  public final void cursor(final Cursor c, final boolean force) {
     final Cursor cc = getCursor();
     if(cc != c && (cc != CURSORWAIT || force)) setCursor(c);
   }

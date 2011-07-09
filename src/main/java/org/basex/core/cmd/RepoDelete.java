@@ -19,7 +19,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public class RepoDelete extends Command {
+public final class RepoDelete extends Command {
   /** Input info. */
   private final InputInfo ii;
 

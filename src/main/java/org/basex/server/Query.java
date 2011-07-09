@@ -63,7 +63,7 @@ public abstract class Query {
 
   /**
    * Returns the query info.
-   * @return item string or {@code null}.
+   * @return query info
    * @throws BaseXException command exception
    */
   public abstract String info() throws BaseXException;

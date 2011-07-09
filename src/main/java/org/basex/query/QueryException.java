@@ -101,6 +101,14 @@ public final class QueryException extends Exception {
   }
 
   /**
+   * Returns the file.
+   * @return error line
+   */
+  public IO file() {
+    return file;
+  }
+
+  /**
    * Returns suggestions for code completions.
    * @return suggestions
    */

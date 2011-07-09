@@ -2622,39 +2622,15 @@ public class QueryParser extends InputParser {
         }
       } while(wsConsumeWs(PIPE));
 
-      Var[] var = { };
-      final int s = ctx.vars.size();
-      if(wsConsume(PAR1)) {
-        var = addVar(var);
-        if(wsConsume(COMMA)) {
-          var = addVar(var);
-          if(wsConsume(COMMA)) {
-            var = addVar(var);
-          }
-        }
-        wsCheck(PAR2);
-      }
-      final Expr ex = enclosed(NOENCLEXPR);
-      ctx.vars.reset(s);
-      ct = Array.add(ct, new Catch(input(), ex, codes, var));
+      final Catch c = new Catch(input(), codes, ctx);
+      final int s = c.prepare(ctx);
+      c.expr = enclosed(NOENCLEXPR);
+      c.finish(s, ctx);
+
+      ct = Array.add(ct, c);
     } while(wsConsumeWs(CATCH));
 
     return new Try(input(), tr, ct);
-  }
-
-  /**
-   * Adds a variable to the specified array.
-   * @param vars input variables
-   * @return new variable array
-   * @throws QueryException query exception
-   */
-  private Var[] addVar(final Var[] vars) throws QueryException {
-    final Var v = Var.create(ctx, input(), varName());
-    for(final Var vr : vars)
-      if(v.name.eq(vr.name)) error(DUPLVAR, v);
-    ctx.vars.add(v);
-    final Var[] var = Array.add(vars, v);
-    return var;
   }
 
   /**

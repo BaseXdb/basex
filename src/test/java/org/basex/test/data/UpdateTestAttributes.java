@@ -22,12 +22,12 @@ public final class UpdateTestAttributes extends UpdateTest {
     data.rename(7, Data.ATTR, NAME, Token.EMPTY);
     data.replace(7, Data.ATTR, JUNIT);
     assertEquals(size, data.meta.size);
-    assertByteArraysEqual(NAME, data.name(7, Data.ATTR));
-    assertByteArraysEqual(JUNIT, data.text(7, false));
+    assertArraysEquals(NAME, data.name(7, Data.ATTR));
+    assertArraysEquals(JUNIT, data.text(7, false));
     reload();
     assertEquals(size, data.meta.size);
-    assertByteArraysEqual(NAME, data.name(7, Data.ATTR));
-    assertByteArraysEqual(JUNIT, data.text(7, false));
+    assertArraysEquals(NAME, data.name(7, Data.ATTR));
+    assertArraysEquals(JUNIT, data.text(7, false));
   }
 
   /**
@@ -39,10 +39,10 @@ public final class UpdateTestAttributes extends UpdateTest {
     data.rename(8, Data.ATTR, NAME, Token.EMPTY);
     data.replace(8, Data.ATTR, JUNIT);
     assertEquals(size, data.meta.size);
-    assertByteArraysEqual(JUNIT, data.text(8, false));
+    assertArraysEquals(JUNIT, data.text(8, false));
     reload();
     assertEquals(size, data.meta.size);
-    assertByteArraysEqual(JUNIT, data.text(8, false));
+    assertArraysEquals(JUNIT, data.text(8, false));
   }
 
   /**
@@ -65,8 +65,8 @@ public final class UpdateTestAttributes extends UpdateTest {
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(10, data.parent(11, Data.TEXT));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(FOO, data.name(9, Data.ATTR));
-    assertByteArraysEqual(JUNIT, data.text(9, false));
+    assertArraysEquals(FOO, data.name(9, Data.ATTR));
+    assertArraysEquals(JUNIT, data.text(9, false));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(size + 1, data.size(0, Data.DOC));
@@ -76,7 +76,7 @@ public final class UpdateTestAttributes extends UpdateTest {
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(10, data.parent(11, Data.TEXT));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(FOO, data.name(9, Data.ATTR));
-    assertByteArraysEqual(JUNIT, data.text(9, false));
+    assertArraysEquals(FOO, data.name(9, Data.ATTR));
+    assertArraysEquals(JUNIT, data.text(9, false));
   }
 }
