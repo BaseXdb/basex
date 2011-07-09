@@ -227,7 +227,9 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
    */
   private void serialize(final OutputStream os) throws XQException {
     try {
-      serialize(it, new XMLSerializer(os));
+      final XMLSerializer xml = new XMLSerializer(os);
+      serialize(it, xml);
+      xml.close();
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

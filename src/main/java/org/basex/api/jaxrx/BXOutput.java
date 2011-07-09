@@ -104,8 +104,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       // loop through all results
       int c = 0;
       cq.init();
-      while(++c < s + m && cq.more())
-        if(c >= s) cq.next();
+      while(++c < s + m && cq.more()) if(c >= s) cq.next();
       return null;
     } catch(final BaseXException ex) {
       throw new JaxRxException(status(ex), ex.getMessage());
@@ -124,6 +123,6 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
    */
   private int status(final Exception ex) {
     final String msg = ex.getMessage();
-    return msg != null && (msg.contains(Text.PERMNO.substring(2))) ? 403 : 404;
+    return msg != null && msg.contains(Text.PERMNO.substring(2)) ? 403 : 404;
   }
 }

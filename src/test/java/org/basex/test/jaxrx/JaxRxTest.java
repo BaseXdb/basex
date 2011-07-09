@@ -24,12 +24,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This class provides a framework for JAX-RX tests.
+ * This class tests the JAX-RX implementation.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-@SuppressWarnings("all")
 public final class JaxRxTest {
   /** Opening result. */
   private static final String WRAP1 = "<jax-rx:results xmlns:jax-rx="
@@ -413,9 +412,7 @@ public final class JaxRxTest {
     if(is != null) {
       // send input stream if it not empty
       final BufferedInputStream bis = new BufferedInputStream(is);
-      int i;
-      while((i = bis.read()) != -1)
-        bos.write(i);
+      for(int i; (i = bis.read()) != -1;) bos.write(i);
       bis.close();
       bos.close();
     }
@@ -445,9 +442,7 @@ public final class JaxRxTest {
     conn.setRequestProperty("Content-Type", "application/xml");
     final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
     final BufferedInputStream bis = new BufferedInputStream(is);
-    int i;
-    while((i = bis.read()) != -1)
-      bos.write(i);
+    for(int i; (i = bis.read()) != -1;) bos.write(i);
     bis.close();
     bos.close();
     try {
@@ -485,9 +480,7 @@ public final class JaxRxTest {
   private String read(final InputStream is) throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     final BufferedInputStream bis = new BufferedInputStream(is);
-    int i;
-    while((i = bis.read()) != -1)
-      baos.write(i);
+    for(int i; (i = bis.read()) != -1;) baos.write(i);
     bis.close();
     return baos.toString();
   }
