@@ -104,8 +104,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       // loop through all results
       int c = 0;
       cq.init();
-      while(++c < s + m && cq.more())
-        if(c >= s) cq.next();
+      while(++c < s + m && cq.more()) if(c >= s) cq.next();
       return null;
     } catch(final BaseXException ex) {
       throw new JaxRxException(status(ex), ex.getMessage());

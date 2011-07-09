@@ -24,7 +24,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Type;
-import org.basex.util.TokenBuilder;
+import org.basex.util.ByteList;
 import org.basex.util.Util;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -147,12 +147,11 @@ abstract class BXQAbstract {
   protected final byte[] content(final Reader r) throws BXQException {
     valid(r, XMLReader.class);
     try {
-      final TokenBuilder tb = new TokenBuilder();
+      final ByteList bl = new ByteList();
       final BufferedReader br = new BufferedReader(r);
-      int i = 0;
-      while((i = br.read()) != -1) tb.add((char) i);
+      for(int i; (i = br.read()) != -1;) bl.add(i);
       br.close();
-      return tb.finish();
+      return bl.toArray();
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -169,8 +168,7 @@ abstract class BXQAbstract {
     try {
       final ByteArrayOutputStream bos = new ByteArrayOutputStream();
       final BufferedInputStream bis = new BufferedInputStream(is);
-      int i = 0;
-      while((i = bis.read()) != -1) bos.write(i);
+      for(int i; (i = bis.read()) != -1;) bos.write(i);
       bis.close();
       return bos.toByteArray();
     } catch(final IOException ex) {

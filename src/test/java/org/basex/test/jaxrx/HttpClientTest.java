@@ -52,7 +52,6 @@ import org.basex.query.util.http.Request;
 import org.basex.query.util.http.RequestParser;
 import org.basex.query.util.http.ResponseHandler;
 import org.basex.query.util.http.Request.Part;
-import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -60,6 +59,7 @@ import org.junit.Test;
 
 /**
  * This class tests the HTTP Client.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -866,10 +866,9 @@ public final class HttpClientTest {
     final FElem response = (FElem) res.get(0);
     assertNotNull(response.attributes());
     final NodeIter resAttr = response.attributes();
-    ANode attr = null;
-    while((attr = resAttr.next()) != null) {
-      if(Token.eq(attr.nname(), STATUS)) assertTrue(eq(attr.atom(),
-          token(expStatus)));
+    for(ANode attr; (attr = resAttr.next()) != null;) {
+      if(eq(attr.nname(), STATUS))
+        assertTrue(eq(attr.atom(), token(expStatus)));
     }
   }
 }

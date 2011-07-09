@@ -113,6 +113,11 @@ public final class JaxRxServer extends BaseXServer {
     if(jetty != null) jetty.stop();
   }
 
+  @Override
+  public void stop() {
+    quit(false);
+  }
+
   /**
    * Sets the specified value if property has not been set yet.
    * @param key property key
