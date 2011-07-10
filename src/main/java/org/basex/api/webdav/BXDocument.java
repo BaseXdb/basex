@@ -57,6 +57,14 @@ public class BXDocument extends BXResource implements FileResource {
           // Document is copied to a folder within a database
           addToFolder(s, ((BXFolder) target).db, name,
               ((BXFolder) target).path);
+          if(factory.resource(s, ((BXFolder) target).db,
+              ((BXFolder) target).path + SEP + EMPTYXML, user, pass) != null) {
+            // If target folder contains EMPTY.xml, delete it
+            // 1) Open database
+            s.execute(new Open(((BXFolder) target).db));
+            // 2) Delete EMPTY.xml
+            s.execute(new Delete(((BXFolder) target).path + SEP + "EMPTY.xml"));
+          }
         }
       } finally {
         s.close();
