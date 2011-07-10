@@ -93,9 +93,10 @@ public final class Xslt {
    * @param xsl style sheet
    * @param params parameters, or {@code null}
    * @return transformed result
+   * @throws Exception exception
    */
   private byte[] transformSaxon(final IO in, final IO xsl,
-      final TokenObjMap<Object> params) {
+      final TokenObjMap<Object> params) throws Exception {
 
     // create transformer
     final ArrayOutput ao = new ArrayOutput();
@@ -104,9 +105,6 @@ public final class Xslt {
     final Source xslt = new SAXSource(xsl.inputSource());
     final Object xe = invoke(xc, "compile", xslt);
     final Object xt = invoke(xe, "load");
-    if(xt == null) throw new NullPointerException(
-        "No Saxon XSLT transformer found.");
-
     final Object xb = invoke(xp, "newDocumentBuilder");
     final Source input = new SAXSource(in.inputSource());
     invoke(xt, "setInitialContextNode", invoke(xb, "build", input));

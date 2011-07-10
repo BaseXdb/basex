@@ -174,9 +174,10 @@ public final class Reflect {
    * @param method method to run
    * @param args arguments
    * @return result of method call
+   * @throws Exception exception
    */
   public static Object invoke(final Object object, final String method,
-      final Object... args) {
+      final Object... args) throws Exception {
 
     if(object == null) return null;
 
@@ -208,7 +209,7 @@ public final class Reflect {
         m = method(c, method, clz);
       }
     }
-    return invoke(m, object, args);
+    return m.invoke(object, args);
   }
 
   /**

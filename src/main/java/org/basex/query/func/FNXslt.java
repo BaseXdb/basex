@@ -4,6 +4,8 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
@@ -71,7 +73,9 @@ public final class FNXslt extends FuncCall {
       return new DBNode(new IOContent(result), ctx.context.prop);
     } catch(final Exception ex) {
       Util.debug(ex);
-      throw NODOC.thrw(input, ex);
+      // return cause of reflection error, or error itself
+      throw NODOC.thrw(input, ex instanceof InvocationTargetException ?
+          ex.getCause() : ex);
     }
   }
 
