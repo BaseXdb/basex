@@ -605,8 +605,8 @@ public enum Function {
   /* FNXslt functions. */
 
   /** XSLT function: performs an XSLT transformation. */
-  TRANSFORM(FNXslt.class, "transform(input, template[,params[,output]])",
-      NOD_ZO, 2, ITEM, ITEM, NOD_ZO, NOD_ZO),
+  TRANSFORM(FNXslt.class, "transform(input, template[,params])",
+      NOD, 2, ITEM, ITEM, NOD_ZO),
 
   /* FNZip functions (EXPath). */
 

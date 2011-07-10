@@ -39,9 +39,6 @@ public final class Xslt {
   /** Saxon Serializer. */
   private static final Constructor<?> SAXONSER =
     find(find(S9API + "Serializer"), OutputStream.class);
-  /** Saxon Serializer. */
-  private static final Class<?> SAXONPROPS =
-    find(S9API + "Serializer$Property");
   /** Saxon flag. */
   public static final boolean SAXON = SAXONPROC != null;
 
@@ -50,16 +47,14 @@ public final class Xslt {
    * @param in input
    * @param xsl style sheet
    * @param params parameters
-   * @param output serialization parameters
    * @return transformed result
    * @throws Exception exception
    */
   public byte[] transform(final IO in, final IO xsl,
-      final TokenObjMap<Object> params, final TokenObjMap<Object> output)
-      throws Exception {
+      final TokenObjMap<Object> params) throws Exception {
 
-    return SAXON ? transformSaxon(in, xsl, params, output) :
-      transformJava(in, xsl, params, output);
+    return SAXON ? transformSaxon(in, xsl, params) :
+      transformJava(in, xsl, params);
   }
 
   /**
@@ -67,29 +62,28 @@ public final class Xslt {
    * @param in input
    * @param xsl style sheet
    * @param params parameters, or {@code null}
-   * @param output serialization parameters, or {@code null}
    * @return transformed result
    * @throws Exception exception
    */
   private byte[] transformJava(final IO in, final IO xsl,
-      final TokenObjMap<Object> params, final TokenObjMap<Object> output)
-      throws Exception {
+      final TokenObjMap<Object> params) throws Exception {
 
+    // create transformer
     final TransformerFactory tc = TransformerFactory.newInstance();
     final Transformer tr =  tc.newTransformer(
         new StreamSource(new ByteArrayInputStream(xsl.content())));
 
+    // bind parameters
     for(final byte[] key : params) {
       tr.setParameter(string(key), params.get(key));
     }
-    for(final byte[] key : output) {
-      tr.setOutputProperty(string(key), output.get(key).toString());
-    }
 
+    // create serializer
     final ArrayOutput ao = new ArrayOutput();
+
+    // do transformation and return result
     tr.transform(new StreamSource(new ByteArrayInputStream(in.content())),
         new StreamResult(ao));
-
     return ao.toArray();
   }
 
@@ -98,13 +92,12 @@ public final class Xslt {
    * @param in input
    * @param xsl style sheet
    * @param params parameters, or {@code null}
-   * @param output serialization parameters, or {@code null}
    * @return transformed result
    */
   private byte[] transformSaxon(final IO in, final IO xsl,
-      final TokenObjMap<Object> params, final TokenObjMap<Object> output) {
+      final TokenObjMap<Object> params) {
 
-    // execute transformation
+    // create transformer
     final ArrayOutput ao = new ArrayOutput();
     final Object xp = get(SAXONPROC, true);
     final Object xc = invoke(xp, "newXsltCompiler");
@@ -121,14 +114,6 @@ public final class Xslt {
     // create serializer
     final Object xs = get(SAXONSER, ao);
     invoke(xt, "setDestination", xs);
-    for(final byte[] key : output) {
-      final String k = string(key);
-      for(final Object p : SAXONPROPS.getEnumConstants()) {
-        if(p.toString().equals(k)) {
-          invoke(xs, "setOutputProperty", p, output.get(key).toString());
-        }
-      }
-    }
 
     // bind parameters
     for(final byte[] key : params) {

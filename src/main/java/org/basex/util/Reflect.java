@@ -189,7 +189,7 @@ public final class Reflect {
     if(m == null) {
       // method not found: replace arguments with first interfaces
       for(int a = 0; a < args.length; a++) {
-        Class<?>[] ic = clz[a].getInterfaces();
+        final Class<?>[] ic = clz[a].getInterfaces();
         if(ic.length != 0) clz[a] = ic[0];
       }
       m = method(c, method, clz);
@@ -198,7 +198,7 @@ public final class Reflect {
         // method not found: replace arguments with super classes
         boolean same = true;
         for(int a = 0; a < args.length; a++) {
-          Class<?> ic = clz[a].getSuperclass();
+          final Class<?> ic = clz[a].getSuperclass();
           if(ic != null && ic != Object.class) {
             clz[a] = ic;
             same = false;

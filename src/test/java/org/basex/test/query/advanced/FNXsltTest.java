@@ -39,7 +39,7 @@ public final class FNXsltTest extends AdvancedQueryTest {
    */
   private static String wrap(final String content) {
     return "<xsl:stylesheet version='1.0'" +
-    " xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>" + content +
-    "</xsl:stylesheet>";
+      " xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>" + content +
+      "</xsl:stylesheet>";
   }
 }

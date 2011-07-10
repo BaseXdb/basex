@@ -35,9 +35,6 @@ public final class FNXslt extends FuncCall {
   private static final Uri U_XSLT = Uri.uri(XSLTURI);
   /** Element: parameters. */
   private static final QNm E_PARAM = new QNm(token("parameters"), U_XSLT);
-  /** Element: serialization-parameters. */
-  private static final QNm E_OUTPUT =
-    new QNm(token("serialization-parameters"), U_XSLT);
 
   /**
    * Constructor.
@@ -69,9 +66,8 @@ public final class FNXslt extends FuncCall {
       final IO in = read(expr[0], ctx);
       final IO xsl = read(expr[1], ctx);
       final TokenObjMap<Object> map = xsltParams(2, E_PARAM, ctx);
-      final TokenObjMap<Object> out = xsltParams(3, E_OUTPUT, ctx);
 
-      final byte[] result = new Xslt().transform(in, xsl, map, out);
+      final byte[] result = new Xslt().transform(in, xsl, map);
       return new DBNode(new IOContent(result), ctx.context.prop);
     } catch(final Exception ex) {
       Util.debug(ex);
