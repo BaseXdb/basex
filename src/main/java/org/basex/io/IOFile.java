@@ -144,10 +144,24 @@ public final class IOFile extends IO {
 
   @Override
   public boolean archive() {
+    return isSuffix(ZIPSUFFIXES);
+  }
+
+  @Override
+  public boolean xml() {
+    return isSuffix(XMLSUFFIXES);
+  }
+
+  /**
+   * Tests if the file suffix matches the specified suffixed.
+   * @param suffixes suffixes to compare with
+   * @return result of check
+   */
+  private boolean isSuffix(final String[] suffixes) {
     final int i = path.lastIndexOf('.');
     if(i == -1) return false;
     final String suf = path.substring(i).toLowerCase();
-    for(final String z : ZIPSUFFIXES) if(suf.equals(z)) return true;
+    for(final String z : suffixes) if(suf.equals(z)) return true;
     return false;
   }
 

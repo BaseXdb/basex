@@ -9,21 +9,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.CRC32;
 
-import org.basex.data.XMLSerializer;
-import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
-import org.basex.io.IOContent;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.B64;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.ItrSeq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
@@ -32,9 +27,7 @@ import org.basex.util.Array;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.Performance;
-import org.basex.util.TokenMap;
 import org.basex.util.Util;
-import org.basex.util.XSLT;
 
 /**
  * Project specific functions.
@@ -69,7 +62,6 @@ public final class FNUtil extends FuncCall {
     switch(def) {
       case EVAL: return eval(ctx);
       case RUN: return run(ctx);
-      case XSLT: return run(ctx);
       case TO_BYTES: return bytes(ctx);
       default: return super.value(ctx);
     }
@@ -79,7 +71,6 @@ public final class FNUtil extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case XSLT: return xslt(ctx);
       case FORMAT: return format(ctx);
       case MB: return mb(ctx);
       case MS: return ms(ctx);
@@ -130,53 +121,6 @@ public final class FNUtil extends FuncCall {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
       throw NODOC.thrw(input, ex);
-    }
-  }
-
-  /**
-   * Performs the xslt function.
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  private ANode xslt(final QueryContext ctx) throws QueryException {
-    try {
-      final IO in = read(expr[0], ctx);
-      final IO tpl = read(expr[1], ctx);
-
-      final TokenMap map = new TokenMap();
-      if(expr.length == 3) {
-        checkNode(expr[2].item(ctx, input));
-        // [CG] process parameters...
-      }
-
-      final byte[] out = new XSLT().transform(in, tpl, map);
-      return new DBNode(new IOContent(out), ctx.context.prop);
-    } catch(final Exception ex) {
-      throw NODOC.thrw(input, ex);
-    }
-  }
-
-  /**
-   * Returns the input reference of the specified input.
-   * @param e expression to be evaluated
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   * @throws Exception exception
-   */
-  private IO read(final Expr e, final QueryContext ctx) throws Exception {
-    final Item in = checkEmpty(e.item(ctx, input));
-    if(in.node()) {
-      final ArrayOutput ao = new ArrayOutput();
-      final XMLSerializer xml = new XMLSerializer(ao);
-      in.serialize(xml);
-      xml.close();
-      return new IOContent(ao.toArray());
-    } else if(in.str()) {
-      return IO.get(string(in.atom(input)));
-    } else {
-      throw STRNODTYPE.thrw(input, this, in.type);
     }
   }
 
@@ -238,7 +182,6 @@ public final class FNUtil extends FuncCall {
     Performance.gc(2);
     final double d = Performance.mem() - l;
 
-    // [LW][CG] (why) is that necessary?
     // loop through all results to avoid premature result disposal
     final Iter ir = val.iter();
     while(ir.next() != null);
@@ -404,7 +347,7 @@ public final class FNUtil extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (def == Function.MB || def == Function.MS
-        || def == Function.EVAL || def == Function.RUN) || super.uses(u);
+    return u == Use.CTX && (def == Function.EVAL || def == Function.RUN ||
+      def == Function.MB || def == Function.MS) || super.uses(u);
   }
 }

@@ -583,9 +583,6 @@ public enum Function {
   EVAL(FNUtil.class, "eval(string)", ITEM_ZM, STR_ZO),
   /** Utility function: evaluates the specified query file. */
   RUN(FNUtil.class, "run(string)", ITEM_ZM, STR),
-  /** Utility function: performs an XSLT transformation. */
-  XSLT(FNUtil.class, "xslt(input, template[, params])", NOD_ZO, 2,
-      NOD_ZO, NOD_ZO, NOD_ZO),
   /** Utility function: formats a string using the printf syntax. */
   FORMAT(FNUtil.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
   /** Utility function: returns the memory consumption in mb. */
@@ -604,6 +601,12 @@ public enum Function {
   CRC32(FNUtil.class, "crc32(str)", HEX, STR),
   /** Utility function: gets the bytes from the given xs:base64Binary data. */
   TO_BYTES(FNUtil.class, "to-bytes(base64)", BYT_ZM, B64),
+
+  /* FNXslt functions. */
+
+  /** XSLT function: performs an XSLT transformation. */
+  TRANSFORM(FNXslt.class, "transform(input, template[,params[,output]])",
+      NOD_ZO, 2, ITEM, ITEM, NOD_ZO, NOD_ZO),
 
   /* FNZip functions (EXPath). */
 
@@ -645,6 +648,7 @@ public enum Function {
     URIS.put(FNHof.class,  HOFURI);
     URIS.put(FNSent.class, SENTURI);
     URIS.put(FNUtil.class, UTILURI);
+    URIS.put(FNXslt.class, XSLTURI);
   }
 
   /** Function classes. */

@@ -23,6 +23,7 @@ public final class NSGlobal {
     NS.add(MATH, MATHURI);
     NS.add(XML, XMLURI);
     NS.add(UTIL, UTILURI);
+    NS.add(XSLT, XSLTURI);
     NS.add(DB, DBURI);
     NS.add(FT, FTURI);
     NS.add(FILE, FILEURI);

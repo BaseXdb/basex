@@ -37,6 +37,9 @@ public abstract class IO {
   /** ZIP suffixes. */
   public static final String[] ZIPSUFFIXES =
     { ZIPSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods", ".gz" };
+  /** XML suffixes. */
+  public static final String[] XMLSUFFIXES =
+    { XMLSUFFIX, ".xsl", ".xslt" };
   /** HTML suffixes. */
   public static final String[] HTMLSUFFIXES =
     { ".xhtml", ".html", ".htm" };
@@ -183,6 +186,14 @@ public abstract class IO {
    * @return result of check
    */
   public boolean archive() {
+    return false;
+  }
+
+  /**
+   * Checks if this file contains XML.
+   * @return result of check
+   */
+  public boolean xml() {
     return false;
   }
 

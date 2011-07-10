@@ -443,6 +443,8 @@ public interface QueryTokens {
   byte[] SENT = token("sent");
   /** Util token. */
   byte[] UTIL = token("util");
+  /** XSLT token. */
+  byte[] XSLT = token("xslt");
   /** ZIP token. */
   byte[] ZIP = token("zip");
   /** HOF token. */
@@ -501,6 +503,8 @@ public interface QueryTokens {
   byte[] SENTURI = token(Text.URL + "/sent");
   /** Utility module URI. */
   byte[] UTILURI = token(Text.URL + "/util");
+  /** XSLT module URI. */
+  byte[] XSLTURI = token(Text.URL + "/xslt");
   /** Package URI. */
   byte[] PACKURI = token(Text.URL + "/pkg");
 

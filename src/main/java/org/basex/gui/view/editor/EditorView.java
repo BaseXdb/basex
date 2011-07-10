@@ -316,13 +316,12 @@ public final class EditorView extends View {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
     final BaseXFileChooser fc =
-      new BaseXFileChooser(GUISAVEAS, edit.file.path(), gui);
+      new BaseXFileChooser(GUISAVEAS, edit.file().path(), gui);
     fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
 
     final IOFile file = fc.select(BaseXFileChooser.Mode.FSAVE);
     if(file == null) return false;
-    edit.file = file;
-    edit.setSyntax(file);
+    edit.file(file);
     save(edit);
     return true;
   }
@@ -357,7 +356,7 @@ public final class EditorView extends View {
     try {
       edit.setText(file.content());
       edit.opened = true;
-      edit.file = file;
+      edit.file(file);
       gui.gprop.recent(file);
       refresh(false, true);
       if(gui.gprop.is(GUIProp.EXECRT)) edit.query();
@@ -472,7 +471,7 @@ public final class EditorView extends View {
     refreshMark();
     if(edit.mod == mod && !force) return;
 
-    String title = edit.file.name();
+    String title = edit.file().name();
     if(mod) title += "*";
     edit.label.setText(title);
     edit.mod = mod;
@@ -487,7 +486,7 @@ public final class EditorView extends View {
    */
   EditorArea find(final IO file, final boolean opened) {
     for(final EditorArea edit : editors()) {
-      if(edit.file.eq(file) && (!opened || edit.opened)) return edit;
+      if(edit.file().eq(file) && (!opened || edit.opened)) return edit;
     }
     return null;
   }
@@ -498,9 +497,9 @@ public final class EditorView extends View {
    */
   private void save(final EditorArea edit) {
     try {
-      edit.file.write(getEditor().getText());
+      edit.file().write(getEditor().getText());
       edit.opened = true;
-      gui.gprop.recent(edit.file);
+      gui.gprop.recent(edit.file());
       refresh(false, true);
     } catch(final IOException ex) {
       Dialog.error(gui, NOTSAVED);
@@ -516,7 +515,7 @@ public final class EditorView extends View {
     final BoolList bl = new BoolList();
     for(final EditorArea edit : editors()) {
       if(edit.opened) continue;
-      final String n = edit.file.name().substring(EDITORFILE.length());
+      final String n = edit.file().name().substring(EDITORFILE.length());
       bl.set(true, n.isEmpty() ? 1 : Integer.parseInt(n));
     }
     // find first free file number
@@ -590,7 +589,7 @@ public final class EditorView extends View {
   private boolean confirm(final EditorArea edit) {
     if(edit.mod) {
       final Boolean ok = Dialog.yesNoCancel(gui,
-          Util.info(XQUERYCONF, edit.file.name()));
+          Util.info(XQUERYCONF, edit.file().name()));
       if(ok == null || ok && !save()) return false;
     }
     return true;

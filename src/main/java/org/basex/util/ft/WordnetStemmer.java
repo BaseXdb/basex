@@ -38,7 +38,7 @@ final class WordnetStemmer extends Stemmer {
       final Class<?> dict = Reflect.find(PKG + ".Dictionary");
       final Class<?> wn = Reflect.find(PKG + ".morph.WordnetStemmer");
       CTR = Reflect.find(wn, Reflect.find(PKG + ".IDictionary"));
-      FIND_STEMS = Reflect.find(wn, "findStems", String.class);
+      FIND_STEMS = Reflect.method(wn, "findStems", String.class);
       DICT = newDict(dict);
     }
   }
@@ -52,7 +52,7 @@ final class WordnetStemmer extends Stemmer {
     try {
       final Constructor<?> ctr = Reflect.find(dct, URL.class);
       final Object dict = Reflect.get(ctr, new URL("file", null, PATH));
-      return Reflect.invoke(Reflect.find(dct, "open"), dict);
+      return Reflect.invoke(Reflect.method(dct, "open"), dict);
     } catch(final Exception ex) {
       return null;
     }

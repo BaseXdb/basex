@@ -2,12 +2,15 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
+
 import org.basex.query.QueryContext;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.util.Var;
+import org.basex.util.Xslt;
 
 /**
  * Statically available XQuery variables.
@@ -17,12 +20,15 @@ import org.basex.query.util.Var;
  */
 public enum Variable {
 
-  /* FNFile variables. */
-
-  /** XQuery function */
+  /** File variable. */
   FILEDIRSEP(FILEURI, "directory-separator", Str.get(File.separator)),
-  /** XQuery function */
-  FILEPATHSEP(FILEURI, "path-separator", Str.get(File.pathSeparator));
+  /** File variable. */
+  FILEPATHSEP(FILEURI, "path-separator", Str.get(File.pathSeparator)),
+
+  /** XSLT variable. */
+  XSLTPROC(XSLTURI, "processor", Str.get(Xslt.SAXON ? "Saxon" : "Java")),
+  /** XSLT variable. */
+  XSLTVERSION(XSLTURI, "version", Str.get(Xslt.SAXON ? "2.0" : "1.0"));
 
   /** Variable name. */
   final QNm qname;

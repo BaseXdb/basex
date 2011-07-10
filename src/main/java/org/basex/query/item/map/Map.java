@@ -1,6 +1,7 @@
 package org.basex.query.item.map;
 
 import static org.basex.query.util.Err.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -21,9 +22,11 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
 
 /**
@@ -33,17 +36,15 @@ import org.basex.util.Util;
  * @author Leo Woerteler
  */
 public final class Map extends FItem {
+  /** the empty map. */
+  public static final Map EMPTY = new Map(TrieNode.EMPTY);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
 
   /** Wrapped immutable map. */
   private final TrieNode root;
-  /** the empty map. */
-  public static final Map EMPTY = new Map(TrieNode.EMPTY);
-
   /** Key sequence. */
   private Value keys;
-
   /** Size. */
   private Itr size;
 
@@ -161,14 +162,6 @@ public final class Map extends FItem {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = root.toString(new StringBuilder("map{ "));
-    // remove superfluous comma
-    if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
-    return sb.append("}").toString();
-  }
-
-  @Override
   public Map coerceTo(final FuncType ft, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
     if(!(ft instanceof MapType) || !hasType((MapType) ft))
@@ -248,6 +241,24 @@ public final class Map extends FItem {
     return root.deep(ii, o.root);
   }
 
+  /**
+   * Converts the map to a map with tokens as keys and java objects as values.
+   * @param ii input info
+   * @return token map
+   * @throws QueryException query exception
+   */
+  public TokenObjMap<Object> tokenJavaMap(final InputInfo ii)
+      throws QueryException {
+
+    final TokenObjMap<Object> tm = new TokenObjMap<Object>();
+    final ValueIter vi = keys().iter();
+    for(Item k; (k = vi.next()) != null;) {
+      if(!k.str()) FUNCMP.thrw(ii, desc(), AtomType.STR, k.type);
+      tm.add(k.atom(null), get(k, ii).toJava());
+    }
+    return tm;
+  }
+
   @Override
   public int hash(final InputInfo ii) throws QueryException {
     return root.hash(ii);
@@ -275,5 +286,13 @@ public final class Map extends FItem {
       Util.notexpected(ex);
     }
     ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = root.toString(new StringBuilder("map{ "));
+    // remove superfluous comma
+    if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
+    return sb.append("}").toString();
   }
 }

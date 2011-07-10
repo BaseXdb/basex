@@ -45,12 +45,12 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public String toString() {
-    return Token.string(val);
+  public void plan(final Serializer ser) throws IOException {
+    ser.emptyElement(this, VAL, val);
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, VAL, val);
+  public String toString() {
+    return Token.string(val);
   }
 }

@@ -48,7 +48,7 @@ final class LuceneStemmer extends Stemmer {
    */
   private static void add(final Language lang, final String path) {
     final Class<?> clz = Reflect.find(PKG + '.' + path + "Stemmer");
-    final Method m = Reflect.find(clz, "stem", String.class);
+    final Method m = Reflect.method(clz, "stem", String.class);
     CLASSES.put(lang, new StemmerClass(clz, m));
   }
 

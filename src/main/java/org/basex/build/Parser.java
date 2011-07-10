@@ -68,8 +68,8 @@ public abstract class Parser extends Progress {
     final String parser = prop.get(Prop.PARSER).toLowerCase();
     if(parser.equals(DataText.M_HTML)) return new HTMLParser(io, target, prop);
     if(parser.equals(DataText.M_TEXT)) return new TextParser(io, target, prop);
-    if(parser.equals(DataText.M_CSV)) return new CSVParser(io, target, prop);
     if(parser.equals(DataText.M_MAB2)) return new MAB2Parser(io, target, prop);
+    if(parser.equals(DataText.M_CSV)) return new CSVParser(io, target, prop);
     return xmlParser(io, prop, target);
   }
 

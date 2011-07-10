@@ -42,9 +42,9 @@ final class SnowballStemmer extends Stemmer {
     final Class<?> clz = Reflect.find(
         PKG + ".ext." + lang.toString().toLowerCase() + "Stemmer");
     CLASSES.put(lang, new StemmerClass(clz,
-        Reflect.find(clz, "setCurrent", String.class),
-        Reflect.find(clz, "stem"),
-        Reflect.find(clz, "getCurrent")));
+        Reflect.method(clz, "setCurrent", String.class),
+        Reflect.method(clz, "stem"),
+        Reflect.method(clz, "getCurrent")));
   }
 
   /**
