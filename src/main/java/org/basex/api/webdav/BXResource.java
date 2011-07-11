@@ -23,6 +23,8 @@ public abstract class BXResource implements Resource {
   static final String MIMETYPEXML = "text/xml";
   /** Zip mime type. */
   static final String MIMETYPEZIP = "application/zip";
+  /** Dummy xml file.*/
+  static final String EMPTYXML = "EMPTY.xml";
   /** User name. */
   protected String user;
   /** User password. */

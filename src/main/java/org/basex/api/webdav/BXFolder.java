@@ -52,7 +52,7 @@ public class BXFolder extends BXResource implements FolderResource {
       try {
         final String newFolder = path + SEP + folder;
         s.execute(new Open(db));
-        s.execute(new Add("<empty/>", "EMPTY.xml", newFolder));
+        s.execute(new Add("<empty/>", EMPTYXML, newFolder));
         return new BXFolder(db, newFolder, factory, user, pass);
       } finally {
         s.close();
@@ -97,7 +97,8 @@ public class BXFolder extends BXResource implements FolderResource {
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
-            ch.add(new BXDocument(db, path + SEP + p, factory, user, pass));
+            if(!p.equals(EMPTYXML)) ch.add(new BXDocument(db,
+                path + SEP + p, factory, user, pass));
           } else {
             final String folder = path + SEP + p.substring(0, ix);
             if(!paths.contains(folder)) {
@@ -129,6 +130,9 @@ public class BXFolder extends BXResource implements FolderResource {
           if(factory.resource(s, db, doc, user, pass) == null) s.add(newName,
               path, inputStream);
           else s.replace(doc, inputStream);
+          if(factory.resource(s, db, path + SEP + EMPTYXML, user, pass) != null)
+          // If folder contains EMPTY.xml, delete it
+          s.execute(new Delete(path + SEP + EMPTYXML));
           return new BXDocument(db, path + SEP + newName, factory, user, pass);
         } finally {
           s.close();
@@ -297,7 +301,7 @@ public class BXFolder extends BXResource implements FolderResource {
     q.bind("$src", db + SEP + path);
     q.bind("$srcdb", db + SEP);
     q.bind("$trgdb", trgdb);
-    q.bind("$trgdir", trgdir);
+    q.bind("$trgdir", trgdir.isEmpty() ? "" : trgdir + SEP);
     q.bind("$prefix", prefix);
     q.execute();
   }
