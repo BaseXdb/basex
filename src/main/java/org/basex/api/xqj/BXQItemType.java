@@ -5,7 +5,7 @@ import java.net.URI;
 import javax.xml.namespace.QName;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQSequenceType;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Type;
@@ -146,7 +146,7 @@ final class BXQItemType implements XQItemType {
     if(type == AtomType.ITEM) throw new BXQException(TYPE);
 
     final Type t = base != -1 ? BASE[base] : type;
-    return new QName(Token.string(QueryTokens.XSURI),
+    return new QName(Token.string(QueryText.XSURI),
         Token.string(t.nam()));
   }
 

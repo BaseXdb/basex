@@ -369,7 +369,8 @@ public final class BaseXClient {
     }
 
     /**
-     * Returns the query info.
+     * Returns query info as a string, regardless of whether an output stream
+     * was specified.
      * @return query info
      * @throws IOException I/O exception
      */

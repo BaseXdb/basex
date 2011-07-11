@@ -9,7 +9,7 @@ import org.xmldb.api.modules.BinaryResource;
 import org.xmldb.api.modules.XMLResource;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
-import org.basex.build.xml.DOCWrapper;
+import org.basex.build.xml.DOMWrapper;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Delete;
@@ -187,7 +187,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     // insert document
     try {
       final Parser p = cont instanceof Document ?
-        new DOCWrapper((Document) cont, id) :
+        new DOMWrapper((Document) cont, id) :
         Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop, "");
 
       final Data data = ctx.data;
