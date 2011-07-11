@@ -10,7 +10,7 @@ import org.basex.io.BufferInput;
 /**
  * This class defines all methods for iteratively evaluating queries with the
  * client/server architecture. All sent data is received by the
- * {@link ServerProcess} and interpreted by the {@link QueryProcess}.
+ * {@link ClientListener} and interpreted by the {@link QueryListener}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

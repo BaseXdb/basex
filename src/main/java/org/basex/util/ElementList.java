@@ -1,7 +1,8 @@
 package org.basex.util;
 
 /**
- * This is an abstract class for storing elements of any kind.
+ * This is an abstract class for storing elements of any kind in an array-based
+ * list.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

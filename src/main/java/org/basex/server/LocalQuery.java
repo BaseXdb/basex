@@ -11,7 +11,7 @@ import org.basex.query.QueryException;
 
 /**
  * This class defines all methods for iteratively evaluating queries locally.
- * All data is interpreted by the {@link QueryProcess}.
+ * All data is interpreted by the {@link QueryListener}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
@@ -19,7 +19,7 @@ import org.basex.query.QueryException;
  */
 public class LocalQuery extends Query {
   /** Active query process. */
-  private final QueryProcess qp;
+  private final QueryListener qp;
   /** Buffer output; {@code null} if an {@link OutputStream} is specified. */
   private final ByteArrayOutputStream buf;
   /** Iterator flag. */
@@ -34,7 +34,7 @@ public class LocalQuery extends Query {
   public LocalQuery(final String q, final Context ctx) throws BaseXException {
     buf = new ByteArrayOutputStream();
     try {
-      qp = new QueryProcess(q, PrintOutput.get(buf), ctx);
+      qp = new QueryListener(q, PrintOutput.get(buf), ctx);
     } catch(QueryException ex) {
       throw new BaseXException(ex);
     }
@@ -52,7 +52,7 @@ public class LocalQuery extends Query {
       throws BaseXException {
     buf = null;
     try {
-      qp = new QueryProcess(q, PrintOutput.get(o), ctx);
+      qp = new QueryListener(q, PrintOutput.get(o), ctx);
     } catch(QueryException ex) {
       throw new BaseXException(ex);
     }

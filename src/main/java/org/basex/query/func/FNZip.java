@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedInputStream;
@@ -354,9 +354,12 @@ public final class FNZip extends FuncCall {
             } else {
               // serialize new nodes
               try {
+                // [CG] update zip files: remove zip namespace
                 final XMLSerializer xml =
                   new XMLSerializer(zos, serialPar(node, ctx));
-                do n.serialize(xml); while((n = ch.next()) != null);
+                do {
+                  n.serialize(xml);
+                } while((n = ch.next()) != null);
                 xml.close();
               } catch(final SerializerException ex) {
                 throw new QueryException(input, ex);

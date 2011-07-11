@@ -1,5 +1,6 @@
 package org.basex.test.query.advanced;
 
+import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,7 +11,6 @@ import java.util.zip.ZipFile;
 import org.basex.core.Prop;
 import org.basex.query.func.Function;
 import org.basex.query.util.Err;
-import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -58,7 +58,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws Exception database exception
    */
   @Test
-  public void testBinaryEntry() throws Exception {
+  public void binaryEntry() throws Exception {
     final String fun = check(Function.ZIPBIN);
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
     contains("xs:hexBinary(" + fun + "('" + ZIP + "', '" + ENTRY1 + "'))",
@@ -69,11 +69,11 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:binary-entry() function.
+   * Test method for the zip:text-entry() function.
    * @throws Exception database exception
    */
   @Test
-  public void testTextEntry() throws Exception {
+  public void textEntry() throws Exception {
     final String fun = check(Function.ZIPTEXT);
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
     query(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'US-ASCII')");
@@ -83,11 +83,11 @@ public final class FNZipTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the zip:binary-entry() function.
+   * Test method for the zip:xml-entry() function.
    * @throws Exception database exception
    */
   @Test
-  public void testXMLEntry() throws Exception {
+  public void xmlEntry() throws Exception {
     final String fun = check(Function.ZIPXML);
     query(fun + "('" + ZIP + "', '" + ENTRY2 + "')");
     query(fun + "('" + ZIP + "', '" + ENTRY2 + "')//title/text()", "XML");
@@ -98,7 +98,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws Exception database exception
    */
   @Test
-  public void testEntries() throws Exception {
+  public void entries() throws Exception {
     final String fun = check(Function.ZIPENTRIES);
     query(fun + "('" + ZIP + "')");
   }
@@ -108,7 +108,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws Exception database exception
    */
   @Test
-  public void testZipFile() throws Exception {
+  public void zipFile() throws Exception {
     final String fun = check(Function.ZIPFILE);
     // check first file
     query(fun + "(" + zipParams("<entry name='one'/>") + ")");
@@ -131,6 +131,10 @@ public final class FNZipTest extends AdvancedQueryTest {
     query(fun + "(" + zipParams("<dir name='a'><entry name='b' src='" +
         TMPFILE + "'/></dir>") + ")");
     checkZipEntry("a/b", new byte[] { '!' });
+    /* [CG] update zip files: remove zip namespace
+    query(fun + "(" + zipParams("<entry name='seven'><a/></entry>") + ")");
+    checkZipEntry("seven", token("<a/>"));
+    */
 
     // error: no entry specified
     error(fun + "(" + zipParams("") + ")", Err.ZIPFAIL);
@@ -145,7 +149,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void testUpdateEntries() throws Exception {
+  public void updateEntries() throws Exception {
     final String fun = check(Function.ZIPUPDATE);
     String list = query("zip:entries('" + ZIP + "')");
 
@@ -161,8 +165,8 @@ public final class FNZipTest extends AdvancedQueryTest {
 
     // new file has no entries
     list = list.replaceAll("<zip:dir.*</zip:dir>", "");
-    error(fun + "(" + list + ", '" + new File(TMPZIP).getCanonicalPath() + "')",
-        Err.ZIPFAIL);
+    error(fun + "(" + list + ", '" +
+        new File(TMPZIP).getCanonicalPath() + "')", Err.ZIPFAIL);
   }
 
   /**
@@ -193,7 +197,9 @@ public final class FNZipTest extends AdvancedQueryTest {
       final InputStream is = zf.getInputStream(ze);
       final byte[] dt = new byte[(int) ze.getSize()];
       is.read(dt);
-      assertTrue("Wrong file contents: " + file, Token.eq(data, dt));
+      assertTrue("Wrong contents in file \"" + file + "\":" + Prop.NL +
+          "Expected: " + string(data) + Prop.NL + "Found: " + string(dt),
+          eq(data, dt));
     } finally {
       if(zf != null) zf.close();
     }

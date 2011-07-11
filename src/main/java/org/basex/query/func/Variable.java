@@ -1,28 +1,34 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
+
 import org.basex.query.QueryContext;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.util.Var;
+import org.basex.util.Xslt;
 
 /**
- * XQuery variables specified in modules.
+ * Statically available XQuery variables.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public enum VarDef {
+public enum Variable {
 
-  /* FNFile variables. */
-
-  /** XQuery function */
+  /** File variable. */
   FILEDIRSEP(FILEURI, "directory-separator", Str.get(File.separator)),
-  /** XQuery function */
-  FILEPATHSEP(FILEURI, "path-separator", Str.get(File.pathSeparator));
+  /** File variable. */
+  FILEPATHSEP(FILEURI, "path-separator", Str.get(File.pathSeparator)),
+
+  /** XSLT variable. */
+  XSLTPROC(XSLTURI, "processor", Str.get(Xslt.SAXON ? "Saxon" : "Java")),
+  /** XSLT variable. */
+  XSLTVERSION(XSLTURI, "version", Str.get(Xslt.SAXON ? "2.0" : "1.0"));
 
   /** Variable name. */
   final QNm qname;
@@ -35,7 +41,7 @@ public enum VarDef {
    * @param name name
    * @param val item value
    */
-  private VarDef(final byte[] uri, final String name, final Value val) {
+  private Variable(final byte[] uri, final String name, final Value val) {
     qname = new QNm(token(name), uri);
     value = val;
   }
@@ -45,7 +51,7 @@ public enum VarDef {
    * @param ctx query context
    */
   public static void init(final QueryContext ctx) {
-    for(final VarDef v : values()) {
+    for(final Variable v : values()) {
       ctx.vars.setGlobal(Var.create(ctx, null, v.qname, v.value));
     }
   }

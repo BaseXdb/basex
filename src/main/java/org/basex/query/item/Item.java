@@ -1,7 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import org.basex.data.Serializer;

@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
@@ -15,12 +15,14 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
+import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
+import org.basex.query.item.map.Map;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -388,5 +390,16 @@ public abstract class ParseExpr extends Expr {
    */
   public final void checkAdmin(final QueryContext ctx) throws QueryException {
     if(!ctx.context.user.perm(User.ADMIN)) PERMNO.thrw(input, CmdPerm.ADMIN);
+  }
+
+  /**
+   * Assures that the given (non-{@code null}) item is a map.
+   * @param it item to check
+   * @return the map
+   * @throws QueryException if the item is not a map
+   */
+  public Map checkMap(final Item it) throws QueryException {
+    if(it instanceof Map) return (Map) it;
+    throw Err.type(this, MapType.ANY_MAP, it);
   }
 }

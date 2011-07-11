@@ -8,13 +8,15 @@ import org.basex.core.Command;
 import org.basex.io.ArrayOutput;
 
 /**
- * This class defines methods for evaluating commands via the client/server
- * architecture or locally.
- * The results of database commands are returned as strings.
- * If an output stream is specified in the constructor or with
- * {@link #setOutputStream(OutputStream)}, results are only serialized
+ * <p>This class defines methods for evaluating commands, either locally or
+ * via the client/server architecture.</p>
+ *
+ * <p>The results of database commands are returned as strings. If an output
+ * stream is specified in the constructor or with
+ * {@link #setOutputStream(OutputStream)}, results are instead serialized
  * to that stream.
- * The class is implemented by {@link ClientSession} and {@link LocalSession}.
+ * The class is implemented by the {@link ClientSession} and
+ * {@link LocalSession} classes.</p>
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -26,7 +28,8 @@ public abstract class Session {
   protected OutputStream out;
 
   /**
-   * Executes a {@link Command} instance.
+   * Executes a {@link Command} and returns the result as string or serializes
+   * it to the specified output stream.
    * @param command command to be executed
    * @return result
    * @throws BaseXException database exception
@@ -38,7 +41,8 @@ public abstract class Session {
   }
 
   /**
-   * Executes a command and returns the result as string.
+   * Executes a command and returns the result as string or serializes
+   * it to the specified output stream.
    * @param command command to be parsed
    * @return result
    * @throws BaseXException database exception
@@ -50,7 +54,7 @@ public abstract class Session {
   }
 
   /**
-   * Creates a query object.
+   * Returns a query object for the specified query string.
    * @param query query string
    * @return query
    * @throws BaseXException database exception
@@ -67,7 +71,7 @@ public abstract class Session {
     throws BaseXException;
 
   /**
-   * Adds a document to an open database.
+   * Adds a document to the opened database.
    * @param name name of document
    * @param target target path
    * @param input xml input
@@ -86,7 +90,8 @@ public abstract class Session {
       throws BaseXException;
 
   /**
-   * Returns command info.
+   * Returns command info as a string, regardless of whether an output stream
+   * was specified.
    * @return command info
    */
   public final String info() {
@@ -94,8 +99,8 @@ public abstract class Session {
   }
 
   /**
-   * Specifies an output stream. The output stream is invalidated if
-   * {@code null} is specified.
+   * Specifies an output stream. The output stream can be invalidated by
+   * passing on {@code null} as argument.
    * @param output client output stream.
    */
   public final void setOutputStream(final OutputStream output) {

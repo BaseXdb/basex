@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import org.basex.io.IO;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.NodeType;
@@ -190,6 +190,6 @@ public final class PkgParser {
    * @return result of check
    */
   private static boolean eqNS(final byte[] cmp, final QNm name) {
-    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryTokens.PKGURI);
+    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryText.PKGURI);
   }
 }

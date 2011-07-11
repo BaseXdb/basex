@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
 
 /**
- * File reference, wrapped into an IO representation.
+ * {@link IO} reference, representing a local file.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -144,21 +144,30 @@ public final class IOFile extends IO {
 
   @Override
   public boolean archive() {
+    return isSuffix(ZIPSUFFIXES);
+  }
+
+  @Override
+  public boolean xml() {
+    return isSuffix(XMLSUFFIXES);
+  }
+
+  /**
+   * Tests if the file suffix matches the specified suffixed.
+   * @param suffixes suffixes to compare with
+   * @return result of check
+   */
+  private boolean isSuffix(final String[] suffixes) {
     final int i = path.lastIndexOf('.');
     if(i == -1) return false;
     final String suf = path.substring(i).toLowerCase();
-    for(final String z : ZIPSUFFIXES) if(suf.equals(z)) return true;
+    for(final String z : suffixes) if(suf.equals(z)) return true;
     return false;
   }
 
   @Override
   public InputSource inputSource() {
     return is == null ? new InputSource(url()) : new InputSource(is);
-  }
-
-  @Override
-  public InputStream inputStream() throws IOException {
-    return is;
   }
 
   @Override
@@ -256,7 +265,7 @@ public final class IOFile extends IO {
     if(!path.startsWith("/")) {
       pre += '/';
       if(path.length() < 2 || path.charAt(1) != ':') {
-        // [CG] IO paths: check is HOME reference is really needed here
+        // [CG] IO paths: check if the HOME reference is really needed here
         pre += "/" + Prop.HOME.replace('\\', '/');
         if(!pre.endsWith("/")) pre += '/';
       }

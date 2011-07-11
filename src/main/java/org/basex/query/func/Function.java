@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.item.SeqType.*;
 
 import java.util.HashMap;
@@ -611,6 +611,12 @@ public enum Function {
   /** Utility function: gets the bytes from the given xs:base64Binary data. */
   TO_BYTES(FNUtil.class, "to-bytes(base64)", BYT_ZM, B64),
 
+  /* FNXslt functions. */
+
+  /** XSLT function: performs an XSLT transformation. */
+  TRANSFORM(FNXslt.class, "transform(input,stylesheet[,params])",
+      NOD, 2, ITEM, ITEM, NOD_ZO),
+
   /* FNZip functions (EXPath). */
 
   /** XQuery function */
@@ -651,6 +657,7 @@ public enum Function {
     URIS.put(FNHof.class,  HOFURI);
     URIS.put(FNSent.class, SENTURI);
     URIS.put(FNUtil.class, UTILURI);
+    URIS.put(FNXslt.class, XSLTURI);
   }
 
   /** Function classes. */

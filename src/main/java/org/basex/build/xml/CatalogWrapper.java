@@ -14,7 +14,7 @@ import org.xml.sax.XMLReader;
  * @author BaseX Team 2005-11, BSD License
  * @author Michael Seiferle
  */
-public final class CatalogResolverWrapper {
+public final class CatalogWrapper {
   /** Package declaration for CatalogManager. */
   private static final Class<?> CMP = find(
     "org.apache.xml.resolver.CatalogManager",
@@ -27,7 +27,7 @@ public final class CatalogResolverWrapper {
   private static final Object CM = get(CMP);
 
   /** Hidden constructor. */
-  private CatalogResolverWrapper() { }
+  private CatalogWrapper() { }
 
   /**
    * Checks if a CatalogResolver is available.
@@ -45,11 +45,11 @@ public final class CatalogResolverWrapper {
    */
   public static void set(final XMLReader reader, final String cat) {
     if(CM == null) return;
-    invoke(find(CMP, "setIgnoreMissingProperties", boolean.class), CM, true);
-    invoke(find(CMP, "setCatalogFiles", String.class), CM, cat);
-    invoke(find(CMP, "setPreferPublic", boolean.class), CM, true);
-    invoke(find(CMP, "setUseStaticCatalog", boolean.class), CM, false);
-    invoke(find(CMP, "setVerbosity", int.class), CM, 0);
+    invoke(method(CMP, "setIgnoreMissingProperties", boolean.class), CM, true);
+    invoke(method(CMP, "setCatalogFiles", String.class), CM, cat);
+    invoke(method(CMP, "setPreferPublic", boolean.class), CM, true);
+    invoke(method(CMP, "setUseStaticCatalog", boolean.class), CM, false);
+    invoke(method(CMP, "setVerbosity", int.class), CM, 0);
     reader.setEntityResolver((EntityResolver) get(CRP, CM));
   }
 }

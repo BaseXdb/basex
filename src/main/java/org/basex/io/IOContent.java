@@ -1,13 +1,11 @@
 package org.basex.io;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import org.basex.util.Token;
 import org.xml.sax.InputSource;
 
 /**
- * Byte contents, wrapped into an IO representation.
+ * {@link IO} reference, representing a byte array.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -36,12 +34,7 @@ public final class IOContent extends IO {
 
   @Override
   public InputSource inputSource() {
-    return new InputSource(inputStream());
-  }
-
-  @Override
-  public InputStream inputStream() {
-    return new ByteArrayInputStream(cont);
+    return new InputSource(new ByteArrayInputStream(cont));
   }
 
   @Override

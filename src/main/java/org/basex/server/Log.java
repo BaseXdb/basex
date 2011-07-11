@@ -1,29 +1,30 @@
 package org.basex.server;
 
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
- * Management of logging.
+ * This class writes logging information to disk.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  */
 public final class Log {
   /** Date format. */
-  private static final SimpleDateFormat DATE =
-    new SimpleDateFormat("yyyy-MM-dd");
+  private static final DateFormat DATE = new SimpleDateFormat("yyyy-MM-dd");
   /** Time format. */
-  private static final SimpleDateFormat TIME =
-    new SimpleDateFormat("HH:mm:ss.SSS");
+  private static final DateFormat TIME = new SimpleDateFormat("HH:mm:ss.SSS");
 
   /** Quiet flag. */
   private final boolean quiet;

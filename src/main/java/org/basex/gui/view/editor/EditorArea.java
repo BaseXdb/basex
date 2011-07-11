@@ -8,7 +8,6 @@ import org.basex.core.cmd.XQuery;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXEditor;
-import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -26,9 +25,9 @@ final class EditorArea extends BaseXEditor {
   final BaseXLabel label;
   /** View reference. */
   private final EditorView view;
-
   /** File in tab. */
-  IOFile file;
+  private IOFile file;
+
   /** Flag for modified content. */
   boolean mod;
   /** Opened flag; states if file was opened from disk. */
@@ -55,7 +54,6 @@ final class EditorArea extends BaseXEditor {
     view = v;
     file = f;
     label = new BaseXLabel(f.name());
-    setSyntax(f);
   }
 
   @Override
@@ -96,7 +94,7 @@ final class EditorArea extends BaseXEditor {
     gui.context.query = file;
     last = in;
 
-    if(file.name().endsWith(IO.XMLSUFFIX)) {
+    if(file.xml()) {
       view.info("", true);
       exec = false;
     } else {
@@ -122,6 +120,23 @@ final class EditorArea extends BaseXEditor {
    */
   void query() {
     release(true);
+  }
+
+  /**
+   * Returns the currently assigned file.
+   * @return file
+   */
+  IOFile file() {
+    return file;
+  }
+
+  /**
+   * Sets the file reference.
+   * @param f file
+   */
+  void file(final IOFile f) {
+    file = f;
+    setSyntax(file);
   }
 
   /**

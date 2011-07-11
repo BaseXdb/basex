@@ -9,7 +9,7 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.QNm;
@@ -69,6 +69,6 @@ public final class JarParser {
    * @return result of check
    */
   private static boolean eqNS(final byte[] cmp, final QNm name) {
-    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryTokens.PACKURI);
+    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryText.PACKURI);
   }
 }

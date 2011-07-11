@@ -38,8 +38,10 @@ public enum Err {
   NOEVENT(BASX, 9, "Event '%' is unknown."),
   /** BASX0010: Parsing exception. */
   NOOPTION(BASX, 10, "Unknown database option '%'."),
-  /** BASX0011: Evaluation exception. */
-  DOCTRGMULT(BASX, 11, "Singled document is expected as replace target."),
+  /** BASX11: Parsing exception. */
+  PARWHICH(BASX, 11, "Unexpected element: %."),
+  /** BASX0012: Evaluation exception. */
+  DOCTRGMULT(BASX, 12, "Singled document is expected as replace target."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -479,6 +481,10 @@ public enum Err {
   /** XPTY0004: Typing Exception. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
   /** XPTY0004: Typing Exception. */
+  STRNODTYPE(XPTY, 4, "%: xs:string or node() expected, % found."),
+  /** XPTY0004: Typing Exception. */
+  NODFUNTYPE(XPTY, 4, "%: node() or map expected, % found."),
+  /** XPTY0004: Typing Exception. */
   SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
   /** XPTY0004: Typing exception. */
   XPEMPTY(XPTY, 4, "%: no empty sequence allowed."),
@@ -768,75 +774,44 @@ public enum Err {
 
   /**
    * Error types.
+   *
+   * @author BaseX Team 2005-11, BSD License
    * @author Leo Woerteler
    */
   public static enum ErrType {
-    /** BASX Error type. */
-    BASX,
-    /** FOAR Error type. */
-    FOAR,
-    /** FOCA Error type. */
-    FOCA,
-    /** FOCH Error type. */
-    FOCH,
-    /** FODC Error type. */
-    FODC,
-    /** FODF Error type. */
-    FODF,
-    /** FODT Error type. */
-    FODT,
-    /** FOER Error type. */
-    FOER,
-    /** FOFL Error type. */
-    FOFL,
-    /** FOFU Error type. */
-    FOFU,
-    /** FOHP Error type. */
-    FOHC,
-    /** FONS Error type. */
-    FONS,
-    /** FORG Error type. */
-    FORG,
-    /** FORX Error type. */
-    FORX,
-    /** FOTY Error type. */
-    FOTY,
-    /** FOUP Error type. */
-    FOUP,
-    /** FOZP Error type. */
-    FOZP,
-    /** FTDY Error type. */
-    FTDY,
-    /** FTST Error type. */
-    FTST,
-    /** PACK Error type. */
-    PACK,
-    /** SEPM Error type. */
-    SEPM,
-    /** SERE Error type. */
-    SERE,
-    /** SEPM Error type. */
-    SESU,
-    /** XPDY Error type. */
-    XPDY,
-    /** XPST Error type. */
-    XPST,
-    /** XPTY Error type. */
-    XPTY,
-    /** XQDY Error type. */
-    XQDY,
-    /** XQST Error type. */
-    XQST,
-    /** XQTY Error type. */
-    XQTY,
-    /** XQTD Error type. */
-    XTDE,
-    /** XUDY Error type. */
-    XUDY,
-    /** XUST Error type. */
-    XUST,
-    /** XUTY Error type. */
-    XUTY;
+    /** BASX Error type. */ BASX,
+    /** FOAR Error type. */ FOAR,
+    /** FOCA Error type. */ FOCA,
+    /** FOCH Error type. */ FOCH,
+    /** FODC Error type. */ FODC,
+    /** FODF Error type. */ FODF,
+    /** FODT Error type. */ FODT,
+    /** FOER Error type. */ FOER,
+    /** FOFL Error type. */ FOFL,
+    /** FOFU Error type. */ FOFU,
+    /** FOHP Error type. */ FOHC,
+    /** FONS Error type. */ FONS,
+    /** FORG Error type. */ FORG,
+    /** FORX Error type. */ FORX,
+    /** FOTY Error type. */ FOTY,
+    /** FOUP Error type. */ FOUP,
+    /** FOZP Error type. */ FOZP,
+    /** FTDY Error type. */ FTDY,
+    /** FTST Error type. */ FTST,
+    /** PACK Error type. */ PACK,
+    /** SEPM Error type. */ SEPM,
+    /** SERE Error type. */ SERE,
+    /** SEPM Error type. */ SESU,
+    /** XPDY Error type. */ XPDY,
+    /** XPST Error type. */ XPST,
+    /** XPTY Error type. */ XPTY,
+    /** XQDY Error type. */ XQDY,
+    /** XQST Error type. */ XQST,
+    /** XQTY Error type. */ XQTY,
+    /** XQTD Error type. */ XTDE,
+    /** XUDY Error type. */ XUDY,
+    /** XUST Error type. */ XUST,
+    /** XUTY Error type. */ XUTY;
   }
 
   /**

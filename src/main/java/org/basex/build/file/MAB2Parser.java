@@ -8,8 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.basex.build.BuildException;
-import org.basex.build.FileParser;
-import org.basex.build.ParserProp;
+import org.basex.build.SingleParser;
 import org.basex.core.Prop;
 import org.basex.io.DataAccess;
 import org.basex.io.IO;
@@ -28,7 +27,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class MAB2Parser extends FileParser {
+public final class MAB2Parser extends SingleParser {
   /** Encoding of MAB2 input. */
   private static final String ENCODING = "iso-8859-1";
   /** Temporary token builder. */
@@ -140,7 +139,7 @@ public final class MAB2Parser extends FileParser {
     }
 
     // create input reference
-    final DataAccess input = new DataAccess(new File(file.path()));
+    final DataAccess input = new DataAccess(new File(src.path()));
 
     // check beginning of input file
     if(input.read1() != '#' || input.read1() != '#' || input.read1() != '#') {

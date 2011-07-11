@@ -71,7 +71,8 @@ final class BXDocBuilder extends DocumentBuilder {
   @Override
   public Document parse(final InputSource is) throws IOException {
     final String id = is.getSystemId();
-    final SAXWrapper p = new SAXWrapper(new SAXSource(parser, is), ctx.prop);
+    final SAXSource ss = new SAXSource(parser, is);
+    final SAXWrapper p = new SAXWrapper(ss, "", ctx.prop);
     final Data data = MemBuilder.build(p, ctx.prop, id == null ? "" : id);
     return new BXDoc(new DBNode(data, 0));
   }

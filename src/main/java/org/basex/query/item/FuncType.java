@@ -7,7 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.UserFunc;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;

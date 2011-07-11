@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -27,6 +27,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
+import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.Put;
@@ -34,6 +35,7 @@ import org.basex.query.util.Err;
 import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenObjMap;
 
 /**
  * Generating functions.
@@ -326,28 +328,35 @@ public final class FNGen extends FuncCall {
   static SerializerProp serialPar(final FuncCall fun, final int arg,
       final QueryContext ctx) throws SerializerException, QueryException {
 
-    final TokenBuilder tb = new TokenBuilder();
-
     // check if enough arguments are available
+    TokenObjMap<Object> tm = new TokenObjMap<Object>();
     if(arg < fun.expr.length) {
       // retrieve parameters
       final Item it = fun.expr[arg].item(ctx, fun.input);
       if(it != null) {
-        // check root node
-        ANode node = (ANode) fun.checkType(it, NodeType.ELM);
-        if(!node.qname().eq(E_PARAM)) SERUNKNOWN.thrw(fun.input, node.qname());
-
-        // interpret query parameters
-        final AxisIter ai = node.children();
-        while((node = ai.next()) != null) {
-          if(tb.size() != 0) tb.add(',');
-          final QNm name = node.qname();
-          if(!name.uri().eq(U_ZIP)) SERUNKNOWN.thrw(fun.input, name);
-          tb.add(name.ln()).add('=').add(node.atom());
+        if(it instanceof Map) {
+          tm = ((Map) it).tokenJavaMap(fun.input);
+        } else {
+          // check root node
+          ANode n = (ANode) fun.checkType(it, NodeType.ELM);
+          if(!n.qname().eq(E_PARAM)) SERUNKNOWN.thrw(fun.input, n.qname());
+          // interpret query parameters
+          final AxisIter ai = n.children();
+          while((n = ai.next()) != null) {
+            final QNm qn = n.qname();
+            if(!qn.uri().eq(U_ZIP)) SERUNKNOWN.thrw(fun.input, qn);
+            tm.add(qn.ln(), n.atom());
+          }
         }
       }
     }
+
     // use default parameters if no parameters have been assigned
+    final TokenBuilder tb = new TokenBuilder();
+    for(final byte[] key : tm) {
+      if(tb.size() != 0) tb.add(',');
+      tb.add(key).add('=').addExt(tm.get(key));
+    }
     return tb.size() == 0 ? ctx.serProp(true) :
       new SerializerProp(tb.toString());
   }

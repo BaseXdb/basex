@@ -1,22 +1,20 @@
-package org.basex.build.xml;
+package org.basex.build;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
-import org.basex.build.Builder;
-import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.util.Util;
 
 /**
- * This class parses the tokens that are delivered by the
- * {@link XMLScanner} and sends them to the specified database builder.
+ * This class recursively scans files and directories and parses all
+ * relevant files.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DirParser extends Parser {
+public final class DirParser extends TargetParser {
   /** File pattern. */
   private final Pattern filter;
   /** Properties. */
@@ -31,39 +29,39 @@ public final class DirParser extends Parser {
 
   /**
    * Constructor.
-   * @param f file reference
+   * @param source source path
    * @param pr database properties
    */
-  public DirParser(final IO f, final Prop pr) {
-    this(f, pr, "");
+  public DirParser(final IO source, final Prop pr) {
+    this(source, "", pr);
   }
 
   /**
    * Constructor, specifying a target path.
-   * @param path file reference
+   * @param source source path
+   * @param target target path
    * @param pr database properties
-   * @param t target path
    */
-  public DirParser(final IO path, final Prop pr, final String t) {
-    super(path, t);
+  public DirParser(final IO source, final String target, final Prop pr) {
+    super(source, target);
     prop = pr;
-    final String dir = path.dir();
+    final String dir = source.dir();
     root = dir.endsWith("/") ? dir : dir + '/';
-    filter = !path.isDir() ? null :
+    filter = !source.isDir() ? null :
       Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));
   }
 
   @Override
-  public void parse(final Builder b) throws IOException {
-    b.meta.filesize = 0;
-    b.meta.path = file.path();
-    parse(b, file);
+  public void parse(final Builder build) throws IOException {
+    build.meta.filesize = 0;
+    build.meta.path = src.path();
+    parse(build, src);
   }
 
   /**
    * Parses the specified file or its children.
    * @param b builder
-   * @param io input
+   * @param io current input
    * @throws IOException I/O exception
    */
   private void parse(final Builder b, final IO io) throws IOException {
@@ -71,18 +69,18 @@ public final class DirParser extends Parser {
       // only {@link IOFile} instances can have children
       for(final IO f : ((IOFile) io).children()) parse(b, f);
     } else {
-      file = io;
-      if(!b.meta.prop.is(Prop.ADDARCHIVES) && file.archive()) return;
+      src = io;
+      if(!b.meta.prop.is(Prop.ADDARCHIVES) && src.archive()) return;
 
       while(io.more()) {
         final String nm = Prop.WIN ? io.name().toLowerCase() : io.name();
         if(filter != null && !filter.matcher(nm).matches()) continue;
-        b.meta.filesize += file.length();
+        b.meta.filesize += src.length();
 
         // use global target as prefix
-        String targ = !target.isEmpty() ? target + '/' : "";
-        final String name = file.name();
-        String path = file.path();
+        String targ = !trg.isEmpty() ? trg + '/' : "";
+        final String name = src.name();
+        String path = src.path();
         // add relative path without root (prefix) and file name (suffix)
         if(path.endsWith('/' + name)) {
           path = path.substring(0, path.length() - name.length());

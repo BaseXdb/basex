@@ -11,7 +11,7 @@ import java.util.HashMap;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.server.ServerProcess;
+import org.basex.server.ClientListener;
 import org.basex.server.Sessions;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -111,7 +111,7 @@ public final class Events extends HashMap<String, Sessions> {
     // event was not found
     if(sess == null) return false;
 
-    for(final ServerProcess srv : sess) {
+    for(final ClientListener srv : sess) {
       // ignore active client
       if(srv == ctx.session) continue;
       try {

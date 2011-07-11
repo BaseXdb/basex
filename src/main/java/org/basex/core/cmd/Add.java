@@ -1,15 +1,13 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.Builder;
+import org.basex.build.DirParser;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
-import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandBuilder;
@@ -79,7 +77,7 @@ public final class Add extends ACreate {
     }
 
     final String trg = path(args[2]);
-    final DirParser p = new DirParser(io, context.prop, trg);
+    final DirParser p = new DirParser(io, trg, context.prop);
     try {
       return info(add(p, context, trg, name, this));
     } catch(final BaseXException ex) {
@@ -97,7 +95,7 @@ public final class Add extends ACreate {
    * @param name name of document. If {@code null}, the name of the input
    *   will be used
    * @param target target. If {@code null}, target will be set to root
-   * @param input XML input stream
+   * @param input XML input source
    * @param ctx database context
    * @param cmd calling command
    * @param lock if {@code true}, register a write lock in context
@@ -105,7 +103,7 @@ public final class Add extends ACreate {
    * @throws BaseXException database exception
    */
   public static String add(final String name, final String target,
-      final InputStream input, final Context ctx, final Add cmd,
+      final InputSource input, final Context ctx, final Add cmd,
       final boolean lock) throws BaseXException {
 
     final Data data = ctx.data;
@@ -114,8 +112,7 @@ public final class Add extends ACreate {
     String trg = path(target);
     if(!trg.isEmpty()) trg = trg + '/';
 
-    final BufferedInputStream is = new BufferedInputStream(input);
-    final SAXSource sax = new SAXSource(new InputSource(is));
+    final SAXSource sax = new SAXSource(input);
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
     try {
       if(lock) ctx.register(true);
@@ -141,11 +138,11 @@ public final class Add extends ACreate {
 
     final Performance p = new Performance();
     final String path = target + (target.isEmpty() ? "/" : "") +
-        (name == null ? parser.file.name() : name);
+        (name == null ? parser.src.name() : name);
 
     // create disk instances for large documents
     // test does not work for input streams and directories
-    final long fl = parser.file.length();
+    final long fl = parser.src.length();
     boolean large = false;
     final Runtime rt = Runtime.getRuntime();
     if(fl > rt.freeMemory() / 3) {

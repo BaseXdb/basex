@@ -1,6 +1,6 @@
 package org.basex.query;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
@@ -84,7 +84,7 @@ import org.basex.query.ft.FTWords;
 import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
-import org.basex.query.func.VarDef;
+import org.basex.query.func.Variable;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
@@ -3308,7 +3308,7 @@ public class QueryParser extends InputParser {
     // dynamically assign variables from function modules
     if(v == null && !declVars) {
       declVars = true;
-      VarDef.init(ctx);
+      Variable.init(ctx);
       v = ctx.vars.get(name);
     }
     if(v == null) error(err, '$' + string(name.atom()));

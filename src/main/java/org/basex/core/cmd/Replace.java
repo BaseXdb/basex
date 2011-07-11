@@ -3,14 +3,13 @@ package org.basex.core.cmd;
 import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
 
-import java.io.InputStream;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.util.Util;
+import org.xml.sax.InputSource;
 
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
@@ -35,7 +34,7 @@ public final class Replace extends ACreate {
     if(!io.exists()) return error(FILEWHICH, io);
 
     try {
-      return info(replace(args[0], io.inputStream(), context, false), perf);
+      return info(replace(args[0], io.inputSource(), context, false), perf);
     } catch(final Exception ex) {
       return error(ex.getMessage());
     }
@@ -50,7 +49,7 @@ public final class Replace extends ACreate {
    * @return info string
    * @throws BaseXException database exception
    */
-  public static String replace(final String p, final InputStream input,
+  public static String replace(final String p, final InputSource input,
       final Context ctx, final boolean lock) throws BaseXException {
     final Data data = ctx.data;
     String path = path(p);

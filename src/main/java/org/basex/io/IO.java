@@ -1,10 +1,7 @@
 package org.basex.io;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import org.basex.data.Data;
-import org.basex.util.ByteList;
 import org.basex.util.Token;
 import org.xml.sax.InputSource;
 
@@ -40,6 +37,9 @@ public abstract class IO {
   /** ZIP suffixes. */
   public static final String[] ZIPSUFFIXES =
     { ZIPSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods", ".gz" };
+  /** XML suffixes. */
+  public static final String[] XMLSUFFIXES =
+    { XMLSUFFIX, ".xsl", ".xslt" };
   /** HTML suffixes. */
   public static final String[] HTMLSUFFIXES =
     { ".xhtml", ".html", ".htm" };
@@ -92,12 +92,27 @@ public abstract class IO {
   }
 
   /**
-   * Constructor.
-   * @param s source
+   * <p>Returns an {@link IO} representation for the specified string. The type
+   * of the returned {@link IO} instance is dynamically chosen; it depends
+   * on the string value:</p>
+   * <ul>
+   * <li>{@link IOContent}: if the string starts with an angle bracket (&lt;)
+   *   or if it is a {@code null} reference, it is interpreted as XML fragment
+   *   and handled as byte array</li>
+   * <li>{@link IOFile}: if the string starts with <code>file:</code>, or if it
+   *   does not contain the substring <code>://</code>, it is interpreted as
+   *   local file instance</li>
+   * <li>{@link IOUrl}: otherwise, it is handled as URL</li>
+   * </ul>
+   * If the content of the string value is known in advance, it is advisable
+   * to call the direct constructors of the correspondent sub class.
+   *
+   * @param source source string
    * @return IO reference
    */
-  public static IO get(final String s) {
-    if(s == null) return new IOFile("");
+  public static IO get(final String source) {
+    if(source == null) return new IOContent(Token.EMPTY);
+    final String s = source.trim();
     if(s.startsWith("<")) return new IOContent(Token.token(s));
     if(!s.contains("://") || s.startsWith(FILEPREF)) return new IOFile(s);
     return new IOUrl(s);
@@ -175,13 +190,6 @@ public abstract class IO {
   public abstract BufferInput buffer() throws IOException;
 
   /**
-   * Returns a simple input stream for the input.
-   * @return input stream
-   * @throws IOException I/O exception
-   */
-  public abstract InputStream inputStream() throws IOException;
-
-  /**
    * Merges two filenames.
    * @param fn file name/path to be merged
    * @return contents
@@ -193,6 +201,14 @@ public abstract class IO {
    * @return result of check
    */
   public boolean archive() {
+    return false;
+  }
+
+  /**
+   * Checks if this file contains XML.
+   * @return result of check
+   */
+  public boolean xml() {
     return false;
   }
 
@@ -259,19 +275,5 @@ public abstract class IO {
   @Override
   public String toString() {
     return path;
-  }
-
-  /**
-   * Caches the contents of the specified input stream.
-   * @param i input stream
-   * @throws IOException I/O exception
-   */
-  protected final void cache(final InputStream i) throws IOException {
-    final ByteList bl = new ByteList();
-    final InputStream bis = i instanceof BufferedInputStream ||
-      i instanceof BufferInput ? i : new BufferedInputStream(i);
-    for(int b; (b = bis.read()) != -1;) bl.add(b);
-    bis.close();
-    cont = bl.toArray();
   }
 }

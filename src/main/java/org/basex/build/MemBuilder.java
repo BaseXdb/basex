@@ -35,7 +35,7 @@ public final class MemBuilder extends Builder {
    */
   public static Data build(final Parser parser, final Prop prop)
       throws IOException {
-    return build(parser, prop, parser.file.name());
+    return build(parser, prop, parser.src.name());
   }
 
   /**
@@ -60,7 +60,7 @@ public final class MemBuilder extends Builder {
     meta.textindex = true;
     meta.attrindex = true;
     meta.ftindex = false;
-    final IO file = parser.file;
+    final IO file = parser.src;
     meta.path = file != null ? file.path() : "";
     meta.filesize = file != null ? file.length() : 0;
     meta.time = file != null ? file.date() : System.currentTimeMillis();

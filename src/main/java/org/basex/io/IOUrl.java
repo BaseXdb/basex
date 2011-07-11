@@ -1,12 +1,15 @@
 package org.basex.io;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import org.basex.util.ByteList;
 import org.xml.sax.InputSource;
 
 /**
- * URL reference, wrapped into an IO representation.
+ * {@link IO} reference, representing a URL.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -22,7 +25,11 @@ final class IOUrl extends IO {
 
   @Override
   public void cache() throws IOException {
-    cache(new URL(path).openStream());
+    final ByteList bl = new ByteList();
+    final InputStream bis = new BufferedInputStream(new URL(path).openStream());
+    for(int b; (b = bis.read()) != -1;) bl.add(b);
+    bis.close();
+    cont = bl.toArray();
   }
 
   @Override
@@ -31,13 +38,8 @@ final class IOUrl extends IO {
   }
 
   @Override
-  public InputStream inputStream() throws IOException {
-    return new URL(path).openStream();
-  }
-
-  @Override
   public BufferInput buffer() throws IOException {
-    return new BufferInput(inputStream());
+    return new BufferInput(new URL(path).openStream());
   }
 
   @Override

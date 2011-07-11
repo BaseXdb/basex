@@ -18,14 +18,12 @@ import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 
 /**
- * This class parses an XML document via a conventional SAX parser.
- * Would be the easiest solution, but some large file cannot be parsed
- * with the default parser.
+ * This class converts an DOM document instance to a database representation.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DOCWrapper extends Parser {
+public final class DOMWrapper extends Parser {
   /** Name of the document. */
   private final String filename;
   /** Root document. */
@@ -35,12 +33,12 @@ public final class DOCWrapper extends Parser {
 
   /**
    * Constructor.
-   * @param d document instance
+   * @param doc document instance
    * @param fn filename
    */
-  public DOCWrapper(final Document d, final String fn) {
+  public DOMWrapper(final Document doc, final String fn) {
     super(fn);
-    root = d;
+    root = doc;
     filename = fn;
   }
 

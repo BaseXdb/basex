@@ -11,9 +11,10 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Replace;
 import org.basex.query.QueryException;
 import org.basex.util.Util;
+import org.xml.sax.InputSource;
 
 /**
- * This wrapper executes commands locally.
+ * This class offers methods to locally execute database commands.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -51,13 +52,13 @@ public final class LocalSession extends Session {
   @Override
   public void add(final String name, final String target,
       final InputStream input) throws BaseXException {
-    info = Add.add(name, target, input, ctx, null, true);
+    info = Add.add(name, target, new InputSource(input), ctx, null, true);
   }
 
   @Override
   public void replace(final String path, final InputStream input)
       throws BaseXException {
-    info = Replace.replace(path, input, ctx, true);
+    info = Replace.replace(path, new InputSource(input), ctx, true);
   }
 
   @Override
