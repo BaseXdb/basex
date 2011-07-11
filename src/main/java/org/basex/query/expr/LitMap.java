@@ -2,7 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.map.Map;
@@ -59,6 +59,6 @@ public final class LitMap extends Arr {
 
   @Override
   public String desc() {
-    return QueryTokens.MAPSTR;
+    return QueryText.MAPSTR;
   }
 }

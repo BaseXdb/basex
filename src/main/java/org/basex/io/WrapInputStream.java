@@ -21,10 +21,10 @@ public final class WrapInputStream extends InputStream {
 
   /**
    * Constructor.
-   * @param in input stream to be wrapped
+   * @param in buffer input to be wrapped
    * @throws IOException I/O exception
    */
-  public WrapInputStream(final InputStream in) throws IOException {
+  public WrapInputStream(final BufferInput in) throws IOException {
     input = in;
     read();
   }

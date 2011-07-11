@@ -6,7 +6,7 @@ import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.util.InputInfo;
 import org.basex.util.ft.FTLexer;
 
@@ -46,12 +46,12 @@ public final class FTOrder extends FTFilter {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(QueryTokens.ORDERED), TRUE);
+    ser.openElement(this, token(QueryText.ORDERED), TRUE);
     super.plan(ser);
   }
 
   @Override
   public String toString() {
-    return super.toString() + QueryTokens.ORDERED;
+    return super.toString() + QueryText.ORDERED;
   }
 }

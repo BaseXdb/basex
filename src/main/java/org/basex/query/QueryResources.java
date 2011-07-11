@@ -22,7 +22,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
- * This class provides access to resources.
+ * This class provides access to resources used by an XQuery expression.
  *
  * @author BaseX Team 2005-11, BSD License
  */

@@ -10,7 +10,7 @@ import org.basex.api.dom.BXElem;
 import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
 import org.basex.build.MemBuilder;
-import org.basex.build.xml.DOCWrapper;
+import org.basex.build.xml.DOMWrapper;
 import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -71,7 +71,7 @@ public enum NodeType implements Type {
 
       if(o instanceof Document) {
         try {
-          final DOCWrapper p = new DOCWrapper((Document) o, "");
+          final DOMWrapper p = new DOMWrapper((Document) o, "");
           return new DBNode(MemBuilder.build(p, new Prop(false)), 0);
         } catch(final IOException ex) {
           UNDOC.thrw(ii, ex);

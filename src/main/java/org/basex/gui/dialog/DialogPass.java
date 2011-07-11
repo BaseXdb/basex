@@ -55,7 +55,7 @@ final class DialogPass extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    final String nm = new String(pass.getPassword());
+    final String nm = pass();
     ok = !nm.isEmpty() && nm.matches("[^ ;'\\\"]*");
     info.setText(ok || nm.isEmpty() ? null :
       Util.info(INVALID, SERVERPW), Msg.ERROR);

@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;

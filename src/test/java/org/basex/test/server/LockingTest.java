@@ -17,6 +17,7 @@ import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -190,15 +191,13 @@ public final class LockingTest {
    */
   @Test
   public void createDBTest() throws Exception {
-    InputStream bais =
-      new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
+    final byte[] hello = Token.token("<xml>Hello World!</xml>");
+    InputStream bais = new ByteArrayInputStream(hello);
     session1.create("database", bais);
-    bais =
-      new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
+    bais = new ByteArrayInputStream(hello);
     session1.create("database2", bais);
     session1.execute("drop db database");
-    bais =
-      new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
+    bais = new ByteArrayInputStream(hello);
     session1.create("database2", bais);
     session1.execute("drop db database2");
   }

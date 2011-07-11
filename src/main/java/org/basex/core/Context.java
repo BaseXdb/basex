@@ -6,7 +6,7 @@ import org.basex.data.MetaData;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.util.pkg.Repo;
-import org.basex.server.ServerProcess;
+import org.basex.server.ClientListener;
 import org.basex.server.Sessions;
 
 /**
@@ -32,7 +32,7 @@ public final class Context {
   public final Repo repo;
 
   /** Session reference. */
-  public ServerProcess session;
+  public ClientListener session;
   /** User reference. */
   public User user;
   /** Current query file. */
@@ -72,7 +72,7 @@ public final class Context {
    * @param ctx parent database context
    * @param s server process
    */
-  public Context(final Context ctx, final ServerProcess s) {
+  public Context(final Context ctx, final ClientListener s) {
     session = s;
     datas = ctx.datas;
     events = ctx.events;
@@ -212,7 +212,7 @@ public final class Context {
    * Adds the specified session.
    * @param s session to be added
    */
-  public void add(final ServerProcess s) {
+  public void add(final ClientListener s) {
     sessions.add(s);
   }
 
@@ -220,7 +220,7 @@ public final class Context {
    * Removes the specified session.
    * @param s session to be removed
    */
-  public void delete(final ServerProcess s) {
+  public void delete(final ClientListener s) {
     sessions.remove(s);
   }
 

@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -97,7 +97,7 @@ public final class FNNode extends FuncCall {
         return n;
       case GENID:
         return it == null ? Str.ZERO : Str.get(new TokenBuilder(
-            QueryTokens.ID).addLong(checkNode(it).id).finish());
+            QueryText.ID).addLong(checkNode(it).id).finish());
       case CHILDREN:
         return Bln.get(it != null && checkNode(it).children().next() != null);
       default:

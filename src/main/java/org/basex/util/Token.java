@@ -5,12 +5,11 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 
 /**
- * This class provides convenience operations for handling so-called
- * 'Tokens'. Tokens in this project are nothing else than UTF8 encoded strings,
- * stored in a byte array.
+ * <p>This class provides convenience operations for handling 'Tokens'.
+ * Tokens are UTF-8 encoded strings, stored in a byte array.</p>
  *
- * Note that, to guarantee a consistent string representation, all string
- * conversions should be done via the methods of this class.
+ * <p>Note that, to guarantee a consistent string representation, all string
+ * conversions should be done via the methods of this class.</p>
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

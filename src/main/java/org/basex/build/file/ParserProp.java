@@ -1,4 +1,4 @@
-package org.basex.build;
+package org.basex.build.file;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;

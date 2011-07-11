@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
 
 /**
- * File reference, wrapped into an IO representation.
+ * {@link IO} reference, representing a local file.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -265,7 +265,7 @@ public final class IOFile extends IO {
     if(!path.startsWith("/")) {
       pre += '/';
       if(path.length() < 2 || path.charAt(1) != ':') {
-        // [CG] IO paths: check is HOME reference is really needed here
+        // [CG] IO paths: check if the HOME reference is really needed here
         pre += "/" + Prop.HOME.replace('\\', '/');
         if(!pre.endsWith("/")) pre += '/';
       }

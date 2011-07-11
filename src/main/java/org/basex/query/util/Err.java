@@ -772,75 +772,44 @@ public enum Err {
 
   /**
    * Error types.
+   *
+   * @author BaseX Team 2005-11, BSD License
    * @author Leo Woerteler
    */
   public static enum ErrType {
-    /** BASX Error type. */
-    BASX,
-    /** FOAR Error type. */
-    FOAR,
-    /** FOCA Error type. */
-    FOCA,
-    /** FOCH Error type. */
-    FOCH,
-    /** FODC Error type. */
-    FODC,
-    /** FODF Error type. */
-    FODF,
-    /** FODT Error type. */
-    FODT,
-    /** FOER Error type. */
-    FOER,
-    /** FOFL Error type. */
-    FOFL,
-    /** FOFU Error type. */
-    FOFU,
-    /** FOHP Error type. */
-    FOHC,
-    /** FONS Error type. */
-    FONS,
-    /** FORG Error type. */
-    FORG,
-    /** FORX Error type. */
-    FORX,
-    /** FOTY Error type. */
-    FOTY,
-    /** FOUP Error type. */
-    FOUP,
-    /** FOZP Error type. */
-    FOZP,
-    /** FTDY Error type. */
-    FTDY,
-    /** FTST Error type. */
-    FTST,
-    /** PACK Error type. */
-    PACK,
-    /** SEPM Error type. */
-    SEPM,
-    /** SERE Error type. */
-    SERE,
-    /** SEPM Error type. */
-    SESU,
-    /** XPDY Error type. */
-    XPDY,
-    /** XPST Error type. */
-    XPST,
-    /** XPTY Error type. */
-    XPTY,
-    /** XQDY Error type. */
-    XQDY,
-    /** XQST Error type. */
-    XQST,
-    /** XQTY Error type. */
-    XQTY,
-    /** XQTD Error type. */
-    XTDE,
-    /** XUDY Error type. */
-    XUDY,
-    /** XUST Error type. */
-    XUST,
-    /** XUTY Error type. */
-    XUTY;
+    /** BASX Error type. */ BASX,
+    /** FOAR Error type. */ FOAR,
+    /** FOCA Error type. */ FOCA,
+    /** FOCH Error type. */ FOCH,
+    /** FODC Error type. */ FODC,
+    /** FODF Error type. */ FODF,
+    /** FODT Error type. */ FODT,
+    /** FOER Error type. */ FOER,
+    /** FOFL Error type. */ FOFL,
+    /** FOFU Error type. */ FOFU,
+    /** FOHP Error type. */ FOHC,
+    /** FONS Error type. */ FONS,
+    /** FORG Error type. */ FORG,
+    /** FORX Error type. */ FORX,
+    /** FOTY Error type. */ FOTY,
+    /** FOUP Error type. */ FOUP,
+    /** FOZP Error type. */ FOZP,
+    /** FTDY Error type. */ FTDY,
+    /** FTST Error type. */ FTST,
+    /** PACK Error type. */ PACK,
+    /** SEPM Error type. */ SEPM,
+    /** SERE Error type. */ SERE,
+    /** SEPM Error type. */ SESU,
+    /** XPDY Error type. */ XPDY,
+    /** XPST Error type. */ XPST,
+    /** XPTY Error type. */ XPTY,
+    /** XQDY Error type. */ XQDY,
+    /** XQST Error type. */ XQST,
+    /** XQTY Error type. */ XQTY,
+    /** XQTD Error type. */ XTDE,
+    /** XUDY Error type. */ XUDY,
+    /** XUST Error type. */ XUST,
+    /** XUTY Error type. */ XUTY;
   }
 
   /**

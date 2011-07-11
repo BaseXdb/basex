@@ -14,7 +14,7 @@ import org.xml.sax.XMLReader;
  * @author BaseX Team 2005-11, BSD License
  * @author Michael Seiferle
  */
-public final class CatalogResolverWrapper {
+public final class CatalogWrapper {
   /** Package declaration for CatalogManager. */
   private static final Class<?> CMP = find(
     "org.apache.xml.resolver.CatalogManager",
@@ -27,7 +27,7 @@ public final class CatalogResolverWrapper {
   private static final Object CM = get(CMP);
 
   /** Hidden constructor. */
-  private CatalogResolverWrapper() { }
+  private CatalogWrapper() { }
 
   /**
    * Checks if a CatalogResolver is available.

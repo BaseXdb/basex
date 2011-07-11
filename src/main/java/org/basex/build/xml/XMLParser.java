@@ -4,35 +4,35 @@ import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.BuildException;
-import org.basex.build.FileParser;
+import org.basex.build.SingleParser;
 import org.basex.build.BuildText.Type;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 
 /**
  * This class parses the tokens that are delivered by the {@link XMLScanner} and
- * sends them to the specified database builder.
+ * sends them to the specified database builder. This class offers a more
+ * tolerant alternative to Java's internal SAX parser, which is used by the
+ * {@link SAXWrapper} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class XMLParser extends FileParser {
+public class XMLParser extends SingleParser {
   /** Scanner reference. */
   private final XMLScanner scanner;
 
   /**
-   * Creates a new XMLParser instance for collection creation.
-   * The length of the rootPath is passed in to correctly chop
-   * the relative path inside the collection.
-   * @param io parser input
-   * @param tar target for collection adding
+   * Constructor.
+   * @param source document source
+   * @param target target path
    * @param pr database properties
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO io, final String tar, final Prop pr)
+  public XMLParser(final IO source, final String target, final Prop pr)
       throws IOException {
-    super(io, tar);
-    scanner = new XMLScanner(io, pr);
+    super(source, target);
+    scanner = new XMLScanner(source, pr);
   }
 
   @Override

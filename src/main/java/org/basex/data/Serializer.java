@@ -1,7 +1,7 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.util.Atts;

@@ -16,13 +16,13 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
 /**
- * Container for processes executing a query with iterative results.
+ * Server-side query session in the client-server architecture.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-final class QueryProcess extends Progress {
+final class QueryListener extends Progress {
   /** Performance. */
   private final Performance perf = new Performance();
   /** Query processor. */
@@ -53,7 +53,7 @@ final class QueryProcess extends Progress {
    * @param c database context
    * @throws QueryException query exception
    */
-  QueryProcess(final String qu, final PrintOutput po, final Context c)
+  QueryListener(final String qu, final PrintOutput po, final Context c)
       throws QueryException {
 
     qp = new QueryProcessor(qu, c);

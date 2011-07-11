@@ -30,16 +30,16 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
- * Single session for a client-server connection.
+ * Server-side client session in the client-server architecture.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class ServerProcess extends Thread {
-  /** Active query processes. */
-  private final HashMap<String, QueryProcess> queries =
-    new HashMap<String, QueryProcess>();
+public final class ClientListener extends Thread {
+  /** Active queries. */
+  private final HashMap<String, QueryListener> queries =
+    new HashMap<String, QueryListener>();
   /** Database context. */
   private final Context context;
   /** Socket reference. */
@@ -61,7 +61,7 @@ public final class ServerProcess extends Thread {
   private Command command;
   /** Query id counter. */
   private int id;
-  /** Running of thread. */
+  /** Indicates if the server thread is running. */
   private boolean running;
 
   /**
@@ -70,10 +70,10 @@ public final class ServerProcess extends Thread {
    * @param c database context
    * @param l log reference
    */
-  public ServerProcess(final Socket s, final Context c, final Log l) {
+  public ClientListener(final Socket s, final Context c, final Log l) {
     context = new Context(c, this);
-    log = l;
     socket = s;
+    log = l;
   }
 
   /**
@@ -140,7 +140,7 @@ public final class ServerProcess extends Thread {
             query(sc);
           } else {
             // database command
-            cmd = new ByteList().add(b).add(in.content().toArray()).toString();
+            cmd = new ByteList().add(b).add(in.token().toArray()).toString();
           }
         } catch(final IOException ex) {
           // this exception is thrown for each session if the server is stopped
@@ -212,7 +212,7 @@ public final class ServerProcess extends Thread {
    */
   public void exit() {
     // close remaining query processes
-    for(final QueryProcess q : queries.values()) {
+    for(final QueryListener q : queries.values()) {
       try { q.close(true); } catch(final IOException ex) { }
     }
 
@@ -236,7 +236,7 @@ public final class ServerProcess extends Thread {
   }
 
   /**
-   * Returns the user of the current process.
+   * Returns the user of this session.
    * @return user reference
    */
   public User user() {
@@ -254,7 +254,7 @@ public final class ServerProcess extends Thread {
   }
 
   /**
-   * Sends a notification.
+   * Sends a notification to the client.
    * @param name event name
    * @param msg event message
    * @throws IOException I/O exception
@@ -281,6 +281,23 @@ public final class ServerProcess extends Thread {
   // PRIVATE METHODS ==========================================================
 
   /**
+   * Returns user feedback.
+   * @param ok success flag
+   * @param info information string
+   * @param perf performance reference
+   * @throws IOException I/O exception
+   */
+  private void info(final boolean ok, final String info,
+      final Performance perf) throws IOException {
+
+    // write feedback to log file
+    log.write(this, ok ? OK : INFOERROR + info, perf);
+    // send {MSG}0 and (0|1) as (success|error) flag
+    out.writeString(info);
+    send(ok);
+  }
+
+  /**
    * Creates a database.
    * @throws IOException I/O exception
    */
@@ -298,23 +315,6 @@ public final class ServerProcess extends Thread {
     } catch(final BaseXException ex) {
       info(false, ex.getMessage(), perf);
     }
-  }
-
-  /**
-   * Returns user feedback.
-   * @param ok success flag
-   * @param info information string
-   * @param perf performance reference
-   * @throws IOException I/O exception
-   */
-  private void info(final boolean ok, final String info,
-      final Performance perf) throws IOException {
-
-    // write feedback to log file
-    log.write(this, ok ? OK : INFOERROR + info, perf);
-    // send {MSG}0 and (0|1) as (success|error) flag
-    out.writeString(info);
-    send(ok);
   }
 
   /**
@@ -340,7 +340,7 @@ public final class ServerProcess extends Thread {
   }
 
   /**
-   * Watch an event.
+   * Watches an event.
    * @throws IOException I/O exception
    */
   private void watch() throws IOException {
@@ -370,7 +370,7 @@ public final class ServerProcess extends Thread {
   }
 
   /**
-   * Unwatch an event.
+   * Unwatches an event.
    * @throws IOException I/O exception
    */
   private void unwatch() throws IOException {
@@ -402,12 +402,12 @@ public final class ServerProcess extends Thread {
     // iterator argument
     String arg = in.readString();
 
-    QueryProcess qp = null;
+    QueryListener qp = null;
     String err = null;
     try {
       if(sc == QUERY) {
         final String query = arg;
-        qp = new QueryProcess(query, out, context);
+        qp = new QueryListener(query, out, context);
         arg = Integer.toString(id++);
         queries.put(arg, qp);
         // send {ID}0
@@ -466,7 +466,7 @@ public final class ServerProcess extends Thread {
   }
 
   /**
-   * Sends a success flag (0 = true, 1 = false) to the client.
+   * Sends a success flag to the client (0: true, 1: false).
    * @param ok success flag
    * @throws IOException I/O exception
    */

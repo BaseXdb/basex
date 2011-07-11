@@ -19,9 +19,9 @@ import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
 /**
- * This wrapper sends commands to the server instance over a socket
- * connection. It extends the {@link Session} class:
- *
+ * This class offers methods to execute database commands via the
+ * client/server architecture. Commands are sent to the server instance over
+ * a socket connection:
  * <ul>
  * <li> A socket instance is created by the constructor.</li>
  * <li> The {@link #execute} method sends database commands to the server.

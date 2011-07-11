@@ -9,7 +9,7 @@ import org.basex.util.ByteList;
 import org.xml.sax.InputSource;
 
 /**
- * URL reference, wrapped into an IO representation.
+ * {@link IO} reference, representing a URL.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

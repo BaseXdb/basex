@@ -19,6 +19,8 @@ import org.xml.sax.XMLReader;
 
 /**
  * This class uses TagSoup to convert HTML input to well-formed XML.
+ * If TagSoup is not found in the classpath, the original document is passed on.
+ *
  * TagSoup was written by John Cowan and is based on the Apache 2.0 License:
  * {@code http://home.ccil.org/~cowan/XML/tagsoup/}.
  *
@@ -43,14 +45,14 @@ public final class HTMLParser extends XMLParser {
 
   /**
    * Constructor.
-   * @param f file reference
-   * @param tar target for collection adding
+   * @param source document source
+   * @param target target path
    * @param pr database properties
    * @throws IOException I/O exception
    */
-  public HTMLParser(final IO f, final String tar, final Prop pr)
+  public HTMLParser(final IO source, final String target, final Prop pr)
       throws IOException {
-    super(toXML(f), tar, pr);
+    super(toXML(source), target, pr);
   }
 
   /**
@@ -67,7 +69,7 @@ public final class HTMLParser extends XMLParser {
       byte[] content = io.content();
       final ArrayInput ai = new ArrayInput(content);
       String enc = ai.encoding();
-      content = ai.content().toArray();
+      content = ai.token().toArray();
 
       // looks for a charset definition
       final byte[] encoding = token("charset=");

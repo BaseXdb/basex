@@ -13,7 +13,7 @@ import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Log;
 import org.basex.server.LoginException;
-import org.basex.server.ServerProcess;
+import org.basex.server.ClientListener;
 import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -118,7 +118,7 @@ public class BaseXServer extends Main {
     while(running) {
       try {
         final Socket s = socket.accept();
-        final ServerProcess sp = new ServerProcess(s, context, log);
+        final ClientListener sp = new ClientListener(s, context, log);
         if(stop.exists()) {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit(false);
@@ -321,7 +321,7 @@ public class BaseXServer extends Main {
           }
           final BufferInput bi = new BufferInput(es.getInputStream());
           final long id = Long.parseLong(bi.readString());
-          for(final ServerProcess s : context.sessions) {
+          for(final ClientListener s : context.sessions) {
             if(s.getId() == id) {
               s.register(es);
               break;
