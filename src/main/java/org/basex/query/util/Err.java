@@ -38,6 +38,8 @@ public enum Err {
   NOEVENT(BASX, 9, "Event '%' is unknown."),
   /** BASX0010: Parsing exception. */
   NOOPTION(BASX, 10, "Unknown database option '%'."),
+  /** BASX0011: Evaluation exception. */
+  DOCTRGMULT(BASX, 11, "Singled document is expected as replace target."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),

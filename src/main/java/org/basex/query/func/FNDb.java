@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.core.cmd.Rename.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -7,6 +8,7 @@ import java.io.IOException;
 
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
+import org.basex.core.cmd.ACreate;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
@@ -37,8 +39,11 @@ import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
 import org.basex.query.up.primitives.Add;
+import org.basex.query.up.primitives.DeleteNode;
+import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
@@ -77,13 +82,16 @@ public final class FNDb extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case EVENT:   return event(ctx);
-      case OPENID:  return open(ctx, true);
-      case OPENPRE: return open(ctx, false);
-      case SYSTEM:  return system(ctx);
-      case INFO:    return info(ctx);
-      case ADD:     return add(ctx);
-      default:      return super.item(ctx, ii);
+      case EVENT:      return event(ctx);
+      case OPENID:     return open(ctx, true);
+      case OPENPRE:    return open(ctx, false);
+      case SYSTEM:     return system(ctx);
+      case INFO:       return info(ctx);
+      case ADD:        return add(ctx);
+      case DELETE:     return delete(ctx);
+      case RENAME:     return rename(ctx);
+      case REPLACEDOC: return replace(ctx);
+      default:         return super.item(ctx, ii);
     }
   }
 
@@ -217,7 +225,7 @@ public final class FNDb extends FuncCall {
    * @return iterator
    */
   private Str system(final QueryContext ctx) {
-    return Str.get(delete(Info.info(ctx.context), '\r'));
+    return Str.get(Token.delete(Info.info(ctx.context), '\r'));
   }
 
   /**
@@ -238,7 +246,7 @@ public final class FNDb extends FuncCall {
       if(cmd == null) NOIDX.thrw(input, this);
       info = InfoIndex.info(cmd, d);
     }
-    return Str.get(delete(info, '\r'));
+    return Str.get(Token.delete(info, '\r'));
   }
 
   /**
@@ -250,8 +258,8 @@ public final class FNDb extends FuncCall {
   private Item add(final QueryContext ctx) throws QueryException {
     final byte[] path;
     if(expr.length == 4) {
-      final byte[] s = checkStr(expr[3], ctx);
-      path = s.length > 0 ? concat(s, token("/")) : s;
+      final String s = ACreate.path(string(checkStr(expr[3], ctx)));
+      path = token(s.isEmpty() ? s : s + '/');
     } else {
       path = null;
     }
@@ -264,7 +272,7 @@ public final class FNDb extends FuncCall {
       final ANode nd = checkNode(i);
       if(nd == null || nd.type != NodeType.DOC) UPFOTYPE.thrw(input, i);
       c.add(nd);
-      p.add(nd.docName());
+      p.add(EMPTY);
     }
 
     if(p.size() == 1) {
@@ -291,6 +299,70 @@ public final class FNDb extends FuncCall {
       final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
       ctx.updates.add(new Add(data, input, c, p, ctx.context), ctx);
     }
+    return null;
+  }
+
+  /**
+   * Performs the replace function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item replace(final QueryContext ctx) throws QueryException {
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    final String path = ACreate.path(string(checkStr(expr[1], ctx)));
+    final ANode doc = checkNode(checkItem(expr[2], ctx));
+
+    // collect all old documents
+    final int[] old = data.doc(path);
+    if(old.length > 0) {
+      final int pre = old[0];
+      if(old.length > 1 || !eq(data.text(pre, true), token(path)))
+        DOCTRGMULT.thrw(input);
+      ctx.updates.add(new DeleteNode(pre, data, input), ctx);
+    }
+
+    final NodeCache c = new NodeCache(); c.add(doc);
+    final TokenList p = new TokenList(1); p.add(token(path));
+    ctx.updates.add(new Add(data, input, c, p, ctx.context), ctx);
+
+    return null;
+  }
+
+  /**
+   * Performs the delete function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item delete(final QueryContext ctx) throws QueryException {
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    final String path = string(checkStr(expr[1], ctx));
+
+    final int[] docs = data.doc(path);
+    for(final int pre : docs)
+      ctx.updates.add(new DeleteNode(pre, data, input), ctx);
+
+    return null;
+  }
+
+  /**
+   * Performs the rename function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item rename(final QueryContext ctx) throws QueryException {
+    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    final byte[] path = checkStr(expr[1], ctx);
+    final byte[] newpath = checkStr(expr[2], ctx);
+
+    final int[] docs = data.doc(string(path));
+    for(final int pre : docs) {
+      final byte[] nm = newName(data, pre, path, newpath);
+      ctx.updates.add(new ReplaceValue(pre, data, input, nm), ctx);
+    }
+
     return null;
   }
 

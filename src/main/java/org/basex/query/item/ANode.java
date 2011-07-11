@@ -427,8 +427,4 @@ public abstract class ANode extends Item {
   public final NodeType ndType() {
     return (NodeType) type;
   }
-
-  public byte[] docName() {
-    return Token.EMPTY;
-  }
 }

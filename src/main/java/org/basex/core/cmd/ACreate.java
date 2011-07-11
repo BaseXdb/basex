@@ -26,7 +26,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-abstract class ACreate extends Command {
+public abstract class ACreate extends Command {
   /** Builder instance. */
   private Builder builder;
   /** Flag for creating new data instances. */
@@ -156,7 +156,7 @@ abstract class ACreate extends Command {
    * @param path input path
    * @return normalized path
    */
-  protected static final String path(final String path) {
+  public static final String path(final String path) {
     return path.replaceAll("[\\\\/]+", "/").replaceAll("^/|/$", "");
   }
 }
