@@ -1,14 +1,15 @@
 package org.basex.query.func;
 
+import static org.basex.core.cmd.ACreate.*;
 import static org.basex.core.cmd.Rename.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
-import org.basex.core.cmd.ACreate;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
@@ -28,13 +29,11 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
@@ -44,8 +43,6 @@ import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 
 /**
  * Database functions.
@@ -256,48 +253,19 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item add(final QueryContext ctx) throws QueryException {
-    final byte[] path;
-    if(expr.length == 4) {
-      final String s = ACreate.path(string(checkStr(expr[3], ctx)));
-      path = token(s.isEmpty() ? s : s + '/');
-    } else {
-      path = null;
-    }
+    final byte[] name = expr.length < 3 ? null :
+      token(path(string(checkStr(expr[2], ctx))));
+    final byte[] path = expr.length < 4 ? null :
+      token(path(string(checkStr(expr[3], ctx))));
 
-    final NodeCache c = new NodeCache();
-    final TokenList p = new TokenList();
-
+    // get all items representing document(s):
+    final ArrayList<Item> docs = new ArrayList<Item>();
     final Iter iter = ctx.iter(expr[1]);
-    for(Item i; (i = iter.next()) != null;) {
-      final ANode nd = checkNode(i);
-      if(nd == null || nd.type != NodeType.DOC) UPFOTYPE.thrw(input, i);
-      c.add(nd);
-      p.add(EMPTY);
-    }
+    for(Item i; (i = iter.next()) != null;) docs.add(i);
 
-    if(p.size() == 1) {
-      if (expr.length > 2) {
-        final byte[] name = checkStr(expr[2], ctx);
-        if(path == null) p.set(name, 0);
-        else {
-          final TokenBuilder tb = new TokenBuilder();
-          if(path.length > 0) tb.add(path);
-          tb.add(name);
-          p.set(tb.finish(), 0);
-        }
-      }
-    } else if(p.size() > 1 && path != null) {
-      for(int i = 0; i < p.size(); ++i) {
-        byte[] doc = p.get(i);
-        final int pos = lastIndexOf(doc, '/');
-        if(pos > 0) doc = subtoken(doc, pos + 1);
-        p.set(concat(path, doc), i);
-      }
-    }
-
-    if(c.size() > 0) {
+    if(docs.size() > 0) {
       final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
-      ctx.updates.add(new Add(data, input, c, p, ctx.context), ctx);
+      ctx.updates.add(new Add(data, input, docs, name, path, ctx.context), ctx);
     }
     return null;
   }
@@ -309,22 +277,43 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item replace(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
-    final String path = ACreate.path(string(checkStr(expr[1], ctx)));
-    final ANode doc = checkNode(checkItem(expr[2], ctx));
+    final String path = path(string(checkStr(expr[0], ctx)));
+
+    // the first step of the path should be the database name
+    final int pos = path.indexOf('/');
+    if(pos <= 0) NODB.thrw(input, path);
+    final byte[] db = token(path.substring(0, pos));
+    final Data data = ctx.resource.data(db, input);
+
+    // replace: source and target path are the same
+    final String src = path.substring(pos + 1);
+    final byte[] trg = token(src);
+
+    final Item doc = checkItem(expr[1], ctx);
 
     // collect all old documents
-    final int[] old = data.doc(path);
+    final int[] old = data.doc(src);
     if(old.length > 0) {
       final int pre = old[0];
-      if(old.length > 1 || !eq(data.text(pre, true), token(path)))
+      if(old.length > 1 || !eq(data.text(pre, true), trg))
         DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
 
-    final NodeCache c = new NodeCache(); c.add(doc);
-    final TokenList p = new TokenList(1); p.add(token(path));
-    ctx.updates.add(new Add(data, input, c, p, ctx.context), ctx);
+    final byte[] trgname;
+    final byte[] trgpath;
+    final int p = lastIndexOf(trg, '/');
+    if(p < 0) {
+      trgname = trg;
+      trgpath = null;
+    } else {
+      trgname = subtoken(trg, p + 1);
+      trgpath = subtoken(trg, 0, p);
+    }
+
+    final ArrayList<Item> docs = new ArrayList<Item>(); docs.add(doc);
+    final Add add = new Add(data, input, docs, trgname, trgpath, ctx.context);
+    ctx.updates.add(add, ctx);
 
     return null;
   }
@@ -336,10 +325,17 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item delete(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
-    final String path = string(checkStr(expr[1], ctx));
+    final String path = path(string(checkStr(expr[0], ctx)));
 
-    final int[] docs = data.doc(path);
+    // the first step of the path should be the database name
+    final int pos = path.indexOf('/');
+    if(pos <= 0) NODB.thrw(input, path);
+    final byte[] db = token(path.substring(0, pos));
+    final Data data = ctx.resource.data(db, input);
+
+    final String trg = path.substring(pos + 1);
+
+    final int[] docs = data.doc(trg);
     for(final int pre : docs)
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
 
@@ -353,13 +349,20 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item rename(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
-    final byte[] path = checkStr(expr[1], ctx);
-    final byte[] newpath = checkStr(expr[2], ctx);
+    final String path = path(string(checkStr(expr[0], ctx)));
 
-    final int[] docs = data.doc(string(path));
+    // the first step of the path should be the database name
+    final int pos = path.indexOf('/');
+    if(pos <= 0) NODB.thrw(input, path);
+    final byte[] db = token(path.substring(0, pos));
+    final Data data = ctx.resource.data(db, input);
+
+    final byte[] src = token(path.substring(pos + 1));
+    final byte[] trg = token(path(string(checkStr(expr[1], ctx))));
+
+    final int[] docs = data.doc(string(src));
     for(final int pre : docs) {
-      final byte[] nm = newName(data, pre, path, newpath);
+      final byte[] nm = newName(data, pre, src, trg);
       ctx.updates.add(new ReplaceValue(pre, data, input, nm), ctx);
     }
 

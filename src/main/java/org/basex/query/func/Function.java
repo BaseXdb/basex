@@ -484,11 +484,11 @@ public enum Function {
   ADD(FNDb.class, "add(name,nodes[,name[,path]])", EMP, 2, STR, DOC_OM, STR,
       STR),
   /** Database function: delete document(s) from a database. */
-  DELETE(FNDb.class, "delete(name,path)", EMP, STR, STR),
+  DELETE(FNDb.class, "delete(path)", EMP, STR),
   /** Database function: rename document(s). */
-  RENAME(FNDb.class, "rename(name,path,newpath", EMP, STR, STR, STR),
+  RENAME(FNDb.class, "rename(path,newpath", EMP, STR, STR),
   /** Database function: replace document(s). */
-  REPLACEDOC(FNDb.class, "replace(name,path,item)", EMP, STR, STR, ITEM),
+  REPLACEDOC(FNDb.class, "replace(path,item)", EMP, STR, ITEM),
 
   /* FNFile functions (EXPath). */
 

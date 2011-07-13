@@ -64,7 +64,7 @@ public abstract class StructuralUpdate extends UpdatePrimitive {
   protected static boolean mergeTexts(final Data d, final int a, final int b) {
     // some pre value checks to prevent database errors
     final int s = d.meta.size;
-    if(a >= s || b >= s) return false;
+    if(a >= s || b >= s || a < 0 || b < 0) return false;
     if(d.kind(a) != Data.TEXT || d.kind(b) != Data.TEXT) return false;
     if(d.parent(a, Data.TEXT) != d.parent(b, Data.TEXT)) return false;
 

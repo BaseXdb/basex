@@ -170,8 +170,20 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void testAdd() throws QueryException {
     final String fun = check(Function.ADD);
 
-    query(fun + "('db', document { <root/> }, 'test1')");
-    query("count(collection('db/test1')) eq 1", "true");
+    query(fun + "('db', document { <root/> }, 'test1.xml')");
+    query("count(collection('db/test1.xml')/root) eq 1", "true");
+
+    query(fun + "('db', document { <root/> }, 'test2.xml', 'test')");
+    query("count(collection('db/test/test2.xml')/root) eq 1", "true");
+
+    query(fun + "('db', 'etc/test/input.xml', '', 'test')");
+    query("count(collection('db/test/input.xml')/html) eq 1", "true");
+
+    query(fun + "('db', 'etc/test/input.xml', 'test3.xml', 'test')");
+    query("count(collection('db/test/test3.xml')/html) eq 1", "true");
+
+    query(fun + "('db', 'etc/test/dir', '', 'test/dir')");
+    query("count(collection('db/test/dir')) gt 0", "true");
   }
 
   /**
@@ -184,9 +196,14 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(Function.REPLACEDOC);
 
     new Add("etc/test/input.xml", null, "test").execute(CONTEXT);
-    query(fun + "('db', 'test/input.xml', document { <root/> })");
+
+    query(fun + "('db/test/input.xml', document { <root/> })");
     query("count(collection('db/test/input.xml')/html) eq 0", "true");
     query("count(collection('db/test/input.xml')/root) eq 1", "true");
+
+    query(fun + "('db/test/input.xml', 'etc/test/input.xml')");
+    query("count(collection('db/test/input.xml')/html) eq 1", "true");
+    query("count(collection('db/test/input.xml')/root) eq 0", "true");
   }
 
   /**
@@ -198,10 +215,10 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void testDelete() throws QueryException, BaseXException {
     final String fun = check(Function.DELETE);
 
-    // add documents with certain prefix
     new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
-    query(fun + "('db', 'test')", "");
-    query("count(collection('db/newtest')) eq 0", "true");
+
+    query(fun + "('db/test')", "");
+    query("count(collection('db/test')) eq 0", "true");
   }
 
   /**
@@ -213,9 +230,9 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void testRename() throws QueryException, BaseXException {
     final String fun = check(Function.RENAME);
 
-    // add documents with certain prefix
     new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
-    query(fun + "('db', 'test', 'newtest')", "");
+
+    query(fun + "('db/test', 'newtest')", "");
     query("count(collection('db/newtest')) gt 0", "true");
   }
 
