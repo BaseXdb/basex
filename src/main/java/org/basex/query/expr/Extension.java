@@ -55,4 +55,10 @@ public final class Extension extends Single {
     for(final Expr p : pragmas) sb.append(p).append(' ');
     return sb.append(BRACE1 + ' ' + expr + ' ' + BRACE2).toString();
   }
+
+  @Override
+  Expr markTailCalls() {
+    expr = expr.markTailCalls();
+    return this;
+  }
 }

@@ -126,4 +126,10 @@ public final class TypeSwitch extends ParseExpr {
     return new TokenBuilder(TYPESWITCH + PAR1 + ts + PAR2 + ' ').addSep(
         cases, SEP).toString();
   }
+
+  @Override
+  Expr markTailCalls() {
+    for(int i = 0; i < cases.length; i++) cases[i] = cases[i].markTailCalls();
+    return this;
+  }
 }
