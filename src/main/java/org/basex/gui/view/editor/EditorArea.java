@@ -54,6 +54,7 @@ final class EditorArea extends BaseXEditor {
     view = v;
     file = f;
     label = new BaseXLabel(f.name());
+    setSyntax(f);
   }
 
   @Override
