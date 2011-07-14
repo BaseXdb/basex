@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class TailFuncCall extends AFuncCall {
+public final class TailFuncCall extends UserFuncCall {
   /**
    * Constructor.
    * @param ii input info
@@ -66,7 +66,8 @@ public final class TailFuncCall extends AFuncCall {
    * @throws QueryException query exception
    */
   private void checkHeight(final QueryContext ctx) throws QueryException {
-    if(ctx.tailCalls++ > ctx.maxCalls) throw new Continuation(args(ctx));
+    if(ctx.maxCalls >= 0 && ctx.tailCalls++ > ctx.maxCalls)
+      throw new Continuation(args(ctx));
   }
 
 }

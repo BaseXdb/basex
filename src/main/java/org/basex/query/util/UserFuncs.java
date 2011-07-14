@@ -10,12 +10,11 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
-import org.basex.query.expr.AFuncCall;
+import org.basex.query.expr.UserFuncCall;
 import org.basex.query.expr.BaseFuncCall;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.UserFunc;
-import org.basex.query.expr.UserFuncCall;
 import org.basex.query.func.FNIndex;
 import org.basex.query.func.FuncCall;
 import org.basex.query.func.Function;
@@ -40,7 +39,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class UserFuncs extends ExprInfo {
   /** Cached function call. */
-  private AFuncCall[][] calls = { };
+  private UserFuncCall[][] calls = { };
   /** Local functions. */
   private UserFunc[] func = { };
 
@@ -121,31 +120,29 @@ public final class UserFuncs extends ExprInfo {
       final QNm qn = func[l].name;
       if(eq(ln, qn.ln()) && eq(uri, qn.uri().atom()) && args.length ==
         func[l].args.length) return new TypedFunc(
-            add(ctx, qp.input(), qn, l, args), FuncType.get(func[l]));
+            add(qp.input(), qn, l, args), FuncType.get(func[l]));
     }
 
     // add function call for function that has not been defined yet
     if(Types.find(name, false) == null) {
-      return new TypedFunc(add(ctx, qp.input(), name, add(
-          new UserFunc(qp.input(), name, new Var[args.length], null, false),
-          qp), args), FuncType.arity(args.length));
+      return new TypedFunc(add(qp.input(), name, add(new UserFunc(qp.input(),
+          name, new Var[args.length], null, false), qp), args),
+          FuncType.arity(args.length));
     }
     return null;
   }
 
   /**
    * Registers and returns a new function call.
-   * @param ctx query context
    * @param ii input info
    * @param nm function name
    * @param id function id
    * @param arg arguments
    * @return new function call
    */
-  private AFuncCall add(final QueryContext ctx, final InputInfo ii,
-      final QNm nm, final int id, final Expr[] arg) {
-    final AFuncCall call = ctx.maxCalls < 0 ?
-        new UserFuncCall(ii, nm, arg) : new BaseFuncCall(ii, nm, arg);
+  private UserFuncCall add(final InputInfo ii, final QNm nm, final int id,
+      final Expr[] arg) {
+    final UserFuncCall call = new BaseFuncCall(ii, nm, arg);
     calls[id] = Array.add(calls[id], call);
     return call;
   }
@@ -188,7 +185,7 @@ public final class UserFuncs extends ExprInfo {
     }
     // add function skeleton
     func = Array.add(func, fun);
-    calls = Array.add(calls, new AFuncCall[0]);
+    calls = Array.add(calls, new UserFuncCall[0]);
     return func.length - 1;
   }
 
@@ -200,7 +197,7 @@ public final class UserFuncs extends ExprInfo {
   public void check() throws QueryException {
     // initialize function calls
     for(int i = 0; i < func.length; ++i) {
-      for(final AFuncCall c : calls[i]) c.init(func[i]);
+      for(final UserFuncCall c : calls[i]) c.init(func[i]);
     }
     for(final UserFunc f : func) f.check();
   }
