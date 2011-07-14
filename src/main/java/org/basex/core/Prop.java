@@ -172,7 +172,7 @@ public final class Prop extends AProp {
   /** Maximum number of index occurrences to print. */
   public static final Object[] MAXSTAT = { "MAXSTAT", 15 };
   /** Flag for tail-call optimization. */
-  public static final Object[] TAILCALLS = { "TAILCALLS", 20 };
+  public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
 
   // STATIC PROPERTIES ========================================================
 
