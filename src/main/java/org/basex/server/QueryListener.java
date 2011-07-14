@@ -119,12 +119,20 @@ final class QueryListener extends Progress {
   }
 
   /**
-   * Returns the query info.
+   * Prints the query info.
    * @throws IOException Exception
    */
-  void info() throws IOException {
+  void printInfo() throws IOException {
+    out.print(info());
+  }
+
+  /**
+   * Returns the query info.
+   * @return query info
+   */
+  byte[] info() {
     initInfo();
-    out.print(info.finish());
+    return info.finish();
   }
 
   /**

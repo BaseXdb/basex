@@ -458,7 +458,7 @@ public final class ClientListener extends Thread {
         } else if(sc == EXEC) {
           qp.execute();
         } else if(sc == INFO) {
-          qp.info();
+          qp.printInfo();
         } else if(sc == CLOSE) {
           qp.close(false);
           queries.remove(arg);

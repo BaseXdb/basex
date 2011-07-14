@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 
 import org.basex.core.BaseXException;
 import org.basex.server.Query;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -17,9 +17,11 @@ import org.junit.Test;
  */
 public final class ClientSessionOutTest extends ClientSessionTest {
   /** Initializes the test. */
-  @BeforeClass
-  public static void start() {
+  @Override
+  @Before
+  public void startSession() {
     out = new ByteArrayOutputStream();
+    super.startSession();
   }
 
   /** Runs a query and retrieves the result as string.

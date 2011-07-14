@@ -18,20 +18,25 @@ import org.basex.query.QueryException;
  * @author Dimitar Popov
  */
 public class LocalQuery extends Query {
-  /** Active query process. */
+  /** Active query listener. */
   private final QueryListener qp;
   /** Buffer output; {@code null} if an {@link OutputStream} is specified. */
   private final ByteArrayOutputStream buf;
   /** Iterator flag. */
   private boolean ready;
+  /** Owning local session. */
+  private LocalSession session;
 
   /**
    * Constructor. Query output will be returned by each called methods.
+   * @param s owning session
    * @param q query string
    * @param ctx database context
    * @throws BaseXException query exception
    */
-  public LocalQuery(final String q, final Context ctx) throws BaseXException {
+  LocalQuery(final LocalSession s, final String q, final Context ctx)
+      throws BaseXException {
+    session = s;
     buf = new ByteArrayOutputStream();
     try {
       qp = new QueryListener(q, PrintOutput.get(buf), ctx);
@@ -43,13 +48,15 @@ public class LocalQuery extends Query {
   /**
    * Constructor. Query output will be written to the provided output stream.
    * All methods will return {@code null}.
+   * @param s owning session
    * @param q query string
    * @param ctx database context
    * @param o output stream to write query output
    * @throws BaseXException query exception
    */
-  public LocalQuery(final String q, final Context ctx, final OutputStream o)
-      throws BaseXException {
+  LocalQuery(final LocalSession s, final String q, final Context ctx,
+      final OutputStream o) throws BaseXException {
+    session = s;
     buf = null;
     try {
       qp = new QueryListener(q, PrintOutput.get(o), ctx);
@@ -111,16 +118,21 @@ public class LocalQuery extends Query {
 
   @Override
   public String info() throws BaseXException {
-    try {
-      qp.info();
-    } catch(IOException ex) {
-      throw new BaseXException(ex);
-    }
-    return output();
+    return string(qp.info());
   }
 
   @Override
   public String close() throws BaseXException {
+    session.removeQuery(this);
+    return closeListener();
+  }
+
+  /**
+   * Close the query listener.
+   * @return output
+   * @throws BaseXException IO exception
+   */
+  String closeListener() throws BaseXException {
     try {
       qp.close(false);
     } catch(IOException ex) {
