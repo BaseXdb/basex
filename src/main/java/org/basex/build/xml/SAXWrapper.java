@@ -8,7 +8,7 @@ import java.io.Reader;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-import org.basex.build.FileParser;
+import org.basex.build.SingleParser;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -19,14 +19,15 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
 /**
- * This class parses an XML document with Java's default SAX parser. Note that
- * large file cannot be parsed with the default parser due to entity handling
- * (e.g. the DBLP data).
+ * This class parses an XML document with Java's internal SAX parser. Note that
+ * not all files cannot be parsed with the default parser; for example, the
+ * DBLP documents contain too many entities and cause an out of memory error.
+ * The internal {@link XMLParser} can be used as alternative.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class SAXWrapper extends FileParser {
+public final class SAXWrapper extends SingleParser {
   /** External DTD parsing. */
   private static final String EXTDTD =
     "http://apache.org/xml/features/nonvalidating/load-external-dtd";
@@ -40,9 +41,9 @@ public final class SAXWrapper extends FileParser {
   int line = 1;
 
   /** SAX handler reference. */
-  private SAXHandler sax;
+  private SAXHandler saxh;
   /** Optional XML reader. */
-  private final SAXSource src;
+  private final SAXSource saxs;
   /** File length. */
   private long length;
   /** Properties. */
@@ -50,46 +51,37 @@ public final class SAXWrapper extends FileParser {
 
   /**
    * Constructor.
-   * @param s sax source
+   * @param source sax source
+   * @param target target path to insert into
    * @param pr Properties
    */
-  public SAXWrapper(final SAXSource s, final Prop pr) {
-    this(s, IO.get(s.getSystemId()).name(), "", pr);
-  }
-
-  /**
-   * Constructor.
-   * @param s sax source
-   * @param n name
-   * @param ta target to insert into
-   * @param pr Properties
-   */
-  public SAXWrapper(final SAXSource s, final String n, final String ta,
+  public SAXWrapper(final SAXSource source, final String target,
       final Prop pr) {
-    super(io(s, n), ta);
-    src = s;
+    super(IO.get(source.getSystemId()), target);
+    saxs = source;
     prop = pr;
   }
 
   /**
-   * Returns IO reference.
-   * @param s sax source
-   * @param n name
-   * @return io
+   * Constructor.
+   * @param source sax source
+   * @param name name
+   * @param target target to insert into
+   * @param pr Properties
    */
-  private static IO io(final SAXSource s, final String n) {
-    final IO io = IO.get(s.getSystemId());
-    io.name(n);
-    return io;
+  public SAXWrapper(final SAXSource source, final String name,
+      final String target, final Prop pr) {
+    this(source, target, pr);
+    src.name(name);
   }
 
   @Override
   public void parse() throws IOException {
-    final InputSource is = wrap(src.getInputSource());
-    final String input = src.getSystemId() == null ? "..." : src.getSystemId();
+    final InputSource is = wrap(saxs.getInputSource());
+    final String in = saxs.getSystemId() == null ? "..." : saxs.getSystemId();
 
     try {
-      XMLReader r = src.getXMLReader();
+      XMLReader r = saxs.getXMLReader();
       if(r == null) {
         final SAXParserFactory f = SAXParserFactory.newInstance();
         f.setFeature(EXTDTD, prop.is(Prop.DTD));
@@ -100,19 +92,19 @@ public final class SAXWrapper extends FileParser {
         r = f.newSAXParser().getXMLReader();
       }
 
-      sax = new SAXHandler(builder);
+      saxh = new SAXHandler(builder);
       final String cat = prop.get(Prop.CATFILE);
-      if(!cat.isEmpty()) CatalogResolverWrapper.set(r, cat);
+      if(!cat.isEmpty()) CatalogWrapper.set(r, cat);
 
-      r.setDTDHandler(sax);
-      r.setContentHandler(sax);
-      r.setProperty(LEXHANDLER, sax);
-      r.setErrorHandler(sax);
+      r.setDTDHandler(saxh);
+      r.setContentHandler(saxh);
+      r.setProperty(LEXHANDLER, saxh);
+      r.setErrorHandler(saxh);
 
       if(is != null) r.parse(is);
-      else r.parse(src.getSystemId());
+      else r.parse(saxs.getSystemId());
     } catch(final SAXParseException ex) {
-      final String msg = Util.info(SCANPOS, input, ex.getLineNumber(),
+      final String msg = Util.info(SCANPOS, in, ex.getLineNumber(),
           ex.getColumnNumber()) + ": " + ex.getMessage();
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
@@ -123,15 +115,15 @@ public final class SAXWrapper extends FileParser {
       // occurs, e.g. if document encoding is invalid:
       // prefix message with source id
       String msg = ex.getMessage();
-      if(input != null) msg = "\"" + input + "\": " + msg;
+      if(in != null) msg = "\"" + in + "\": " + msg;
       // wrap and return original message
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
     } finally {
       try {
-        final InputStream in = is.getByteStream();
-        if(in != null) in.close();
+        final InputStream ist = is.getByteStream();
+        if(ist != null) ist.close();
         final Reader r = is.getCharacterStream();
         if(r != null) r.close();
       } catch(final IOException ex) {
@@ -147,10 +139,10 @@ public final class SAXWrapper extends FileParser {
    * @throws IOException I/O exception
    */
   private InputSource wrap(final InputSource is) throws IOException {
-    if(!(file instanceof IOFile) || is == null || is.getByteStream() != null
+    if(!(src instanceof IOFile) || is == null || is.getByteStream() != null
         || is.getSystemId() == null || is.getSystemId().isEmpty()) return is;
 
-    final InputSource in = new InputSource(new FileInputStream(file.path()) {
+    final InputSource in = new InputSource(new FileInputStream(src.path()) {
       @Override
       public int read(final byte[] b, final int off, final int len)
           throws IOException {
@@ -160,20 +152,20 @@ public final class SAXWrapper extends FileParser {
         return i;
       }
     });
-    src.setInputSource(in);
-    src.setSystemId(is.getSystemId());
-    length = file.length();
+    saxs.setInputSource(in);
+    saxs.setSystemId(is.getSystemId());
+    length = src.length();
     return in;
   }
 
   @Override
   public String det() {
-    return length == 0 ? super.det() : Util.info(SCANPOS, file.name(), line);
+    return length == 0 ? super.det() : Util.info(SCANPOS, src.name(), line);
   }
 
   @Override
   public double prog() {
-    return length == 0 ? sax == null ? 0 : sax.nodes / 3000000d % 1
+    return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000d % 1
         : (double) counter / length;
   }
 }

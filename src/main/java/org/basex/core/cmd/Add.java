@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.Builder;
+import org.basex.build.DirParser;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
-import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandBuilder;
@@ -79,7 +79,7 @@ public final class Add extends ACreate {
     }
 
     final String trg = path(args[2]);
-    final DirParser p = new DirParser(io, context.prop, trg);
+    final DirParser p = new DirParser(io, trg, context.prop);
     try {
       return info(add(p, context, trg, name, this));
     } catch(final BaseXException ex) {
@@ -140,11 +140,11 @@ public final class Add extends ACreate {
 
     final Performance p = new Performance();
     final String path = target + (target.isEmpty() ? "/" : "") +
-        (name == null ? parser.file.name() : name);
+        (name == null ? parser.src.name() : name);
 
     // create disk instances for large documents
     // test does not work for input streams and directories
-    final long fl = parser.file.length();
+    final long fl = parser.src.length();
     boolean large = false;
     final Runtime rt = Runtime.getRuntime();
     if(fl > rt.freeMemory() / 3) {

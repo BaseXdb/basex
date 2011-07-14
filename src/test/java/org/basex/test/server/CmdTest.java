@@ -46,7 +46,7 @@ import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Nodes;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.server.LocalSession;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -294,7 +294,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void export() {
-    final IO io = IO.get(FN);
+    final IOFile io = new IOFile(FN);
     no(new Export(io.path()));
     ok(new CreateDB(NAME, FILE));
     ok(new Export("."));
@@ -323,7 +323,8 @@ public class CmdTest {
     ok(new CreateUser(NAME2, "test"));
     ok(new CreateUser(NAME, "test"));
     no(new Grant("something", NAME2));
-    ok(new Grant("none", NAME + "*", "*"));
+    ok(new CreateDB(NAME));
+    ok(new Grant("none", NAME + "*", NAME + "*"));
     no(new Grant("all", NAME2));
     no(new Grant("all", ":*?", ":*:"));
     ok(new DropUser(NAME + "," + NAME2));
@@ -465,7 +466,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void run() {
-    final IO io = IO.get("test.xq");
+    final IOFile io = new IOFile("test.xq");
     no(new Run(io.path()));
     try {
       io.write(token("// li"));
@@ -531,7 +532,7 @@ public class CmdTest {
    * Assumes that this command is successful.
    * @param cmd command reference
    */
-  protected void ok(final Command cmd) {
+  protected final void ok(final Command cmd) {
     try {
       session.execute(cmd);
     } catch(final BaseXException ex) {
@@ -543,7 +544,7 @@ public class CmdTest {
    * Assumes that this command fails.
    * @param cmd command reference
    */
-  protected void no(final Command cmd) {
+  protected final void no(final Command cmd) {
     try {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");

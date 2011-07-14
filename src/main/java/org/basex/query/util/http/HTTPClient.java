@@ -35,7 +35,6 @@ import org.basex.util.TokenMap;
  * @author Rositsa Shadura
  */
 public final class HTTPClient {
-
   /** Request attribute: HTTP method. */
   private static final byte[] METHOD = token("method");
   /** Request attribute: username. */
@@ -205,10 +204,10 @@ public final class HTTPClient {
   private static void setContentType(final HttpURLConnection conn,
       final Request r) {
     final byte[] contTypeHdr = r.headers.get(lc(token(CONT_TYPE)));
-    // If header "Content-Type" is set explicitly by the user, its value is used
+    // if header "Content-Type" is set explicitly by the user, its value is used
     if(contTypeHdr != null) {
       conn.setRequestProperty(CONT_TYPE, string(contTypeHdr));
-      // Otherwise @media-type of <http:body/> is considered
+      // otherwise @media-type of <http:body/> is considered
     } else {
       final String mediaType = string(r.payloadAttrs.get(MEDIATYPE));
       if(r.isMultipart) {
@@ -292,9 +291,9 @@ public final class HTTPClient {
     final byte[] mediaType = payloadAtts.get(MEDIATYPE);
     byte[] method = payloadAtts.get(METHOD);
     final byte[] src = payloadAtts.get(SRC);
-    // No resource to set the content from
+    // no resource to set the content from
     if(src == null) {
-      // Default value @method is determined by @media-type
+      // default value @method is determined by @media-type
       if(method == null) {
         if(eq(mediaType, APPL_XHTML)) method = token(M_XHTML);
         else if(eq(mediaType, APPL_XML) || eq(mediaType, APPL_EXT_XML)
@@ -302,10 +301,10 @@ public final class HTTPClient {
             || endsWith(mediaType, MIME_XML_SUFFIX)) method = token(M_XML);
         else if(eq(mediaType, TXT_HTML)) method = token(M_HTML);
         else if(startsWith(mediaType, MIME_TEXT_PREFIX)) method = token(M_TEXT);
-        // Default serialization method is XML
+        // default serialization method is XML
         else method = token(M_XML);
       }
-      // Write content depending on the method
+      // write content depending on the method
       if(eq(method, BASE64)) {
         writeBase64(payload, out, ii);
       } else if(eq(method, HEXBIN)) {
@@ -314,7 +313,7 @@ public final class HTTPClient {
         write(payload, payloadAtts, method, out);
       }
     } else {
-      // If the src attribute is present, the content is set as the content of
+      // if the src attribute is present, the content is set as the content of
       // the linked resource
       writeResource(src, out);
     }
@@ -372,7 +371,7 @@ public final class HTTPClient {
   private static void write(final ItemCache payload,
       final TokenMap payloadAttrs, final byte[] method, final OutputStream out)
       throws IOException {
-    // Extract serialization parameters
+    // extract serialization parameters
     final TokenBuilder tb = new TokenBuilder();
     tb.add(token("method=")).add(method);
     final byte[][] keys = payloadAttrs.keys();
@@ -383,7 +382,7 @@ public final class HTTPClient {
     }
     final SerializerProp prop = new SerializerProp(tb.toString());
     final XMLSerializer xml = new XMLSerializer(out, prop);
-    // Serialize items according to the parameters
+    // serialize items according to the parameters
     try {
       payload.serialize(xml);
     } finally {
@@ -444,12 +443,12 @@ public final class HTTPClient {
   private static void writePart(final Part part, final OutputStream out,
       final byte[] boundary, final InputInfo ii) throws IOException,
       QueryException {
-    // Write boundary preceded by "--"
+    // write boundary preceded by "--"
     final TokenBuilder boundTb = new TokenBuilder();
     boundTb.add("--").add(boundary).add(CRLF);
     out.write(boundTb.finish());
 
-    // Write headers
+    // write headers
     for(final byte[] headerName : part.headers.keys()) {
       final TokenBuilder hdrTb = new TokenBuilder();
       hdrTb.add(headerName).add(": ").add(
@@ -458,7 +457,7 @@ public final class HTTPClient {
     }
     out.write(CRLF);
 
-    // Write content
+    // write content
     writePayload(part.bodyContent, part.bodyAttrs, out, ii);
     out.write(CRLF);
   }

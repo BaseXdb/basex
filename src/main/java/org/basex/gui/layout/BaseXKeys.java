@@ -14,7 +14,6 @@ import java.awt.event.KeyEvent;
  * @author Leo Woerteler
  */
 public enum BaseXKeys {
-
   /** Find search term.  */ FIND(SC, VK_F, true),
   /** Find next hit.     */ FINDNEXT(SC, VK_G, true),
   /** Find next hit.     */ FINDNEXT2(MAC ? SC : 0, VK_F3, true),

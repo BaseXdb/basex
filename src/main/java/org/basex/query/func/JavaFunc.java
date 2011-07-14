@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static javax.xml.datatype.DatatypeConstants.*;
 import java.io.IOException;

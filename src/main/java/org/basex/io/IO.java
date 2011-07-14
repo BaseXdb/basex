@@ -1,12 +1,8 @@
 package org.basex.io;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import org.basex.data.Data;
-import org.basex.util.ByteList;
 import org.basex.util.Token;
-import org.basex.util.Util;
 import org.xml.sax.InputSource;
 
 /**
@@ -22,8 +18,6 @@ public abstract class IO {
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery file suffix. */
   public static final String XQSUFFIX = ".xq";
-  /** XQuery Archive file suffix. */
-  public static final String XARSUFFIX = ".xar";
   /** XML file suffix. */
   public static final String XMLSUFFIX = ".xml";
   /** ZIP file suffix. */
@@ -34,6 +28,8 @@ public abstract class IO {
   public static final String TXTSUFFIX = ".txt";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
+  /** File prefix. */
+  public static final String FILEPREF = "file:";
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =
@@ -41,6 +37,9 @@ public abstract class IO {
   /** ZIP suffixes. */
   public static final String[] ZIPSUFFIXES =
     { ZIPSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods", ".gz" };
+  /** XML suffixes. */
+  public static final String[] XMLSUFFIXES =
+    { XMLSUFFIX, ".xsl", ".xslt" };
   /** HTML suffixes. */
   public static final String[] HTMLSUFFIXES =
     { ".xhtml", ".html", ".htm" };
@@ -86,21 +85,36 @@ public abstract class IO {
    */
   protected final void init(final String p) {
     path = p;
-    // use timer if no name is given
-    final String n = path.substring(path.lastIndexOf('/') + 1);
+    final String n = p.substring(p.lastIndexOf('/') + 1);
+    // use current time if no name is given
     name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) +
         XMLSUFFIX : n;
   }
 
   /**
-   * Constructor.
-   * @param s source
+   * <p>Returns an {@link IO} representation for the specified string. The type
+   * of the returned {@link IO} instance is dynamically chosen; it depends
+   * on the string value:</p>
+   * <ul>
+   * <li>{@link IOContent}: if the string starts with an angle bracket (&lt;)
+   *   or if it is a {@code null} reference, it is interpreted as XML fragment
+   *   and handled as byte array</li>
+   * <li>{@link IOFile}: if the string starts with <code>file:</code>, or if it
+   *   does not contain the substring <code>://</code>, it is interpreted as
+   *   local file instance</li>
+   * <li>{@link IOUrl}: otherwise, it is handled as URL</li>
+   * </ul>
+   * If the content of the string value is known in advance, it is advisable
+   * to call the direct constructors of the correspondent sub class.
+   *
+   * @param source source string
    * @return IO reference
    */
-  public static IO get(final String s) {
-    if(s == null) return new IOFile("");
+  public static IO get(final String source) {
+    if(source == null) return new IOContent(Token.EMPTY);
+    final String s = source.trim();
     if(s.startsWith("<")) return new IOContent(Token.token(s));
-    if(!s.contains("://") || s.startsWith("file:")) return new IOFile(s);
+    if(!s.contains("://") || s.startsWith(FILEPREF)) return new IOFile(s);
     return new IOUrl(s);
   }
 
@@ -191,15 +205,15 @@ public abstract class IO {
   }
 
   /**
-   * Creates the directory.
-   * @return contents
+   * Checks if this file contains XML.
+   * @return result of check
    */
-  public boolean md() {
+  public boolean xml() {
     return false;
   }
 
   /**
-   * Chops the path and the XML suffix of the specified filename
+   * Chops the path and the file suffix of the specified filename
    * and returns the database name.
    * @return database name
    */
@@ -246,53 +260,7 @@ public abstract class IO {
    * @return chopped filename
    */
   public String dir() {
-    return isDir() ? path() : path.substring(0, path.lastIndexOf('/') + 1);
-  }
-
-  /**
-   * Returns the children of a path.
-   * @return children
-   */
-  public final IO[] children() {
-    return children(".*");
-  }
-
-  /**
-   * Returns the children of a path that match the specified regular expression.
-   * @param pattern pattern
-   * @return children
-   */
-  @SuppressWarnings("unused")
-  public IO[] children(final String pattern) {
-    return new IO[] {};
-  }
-
-  /**
-   * Writes the specified file contents.
-   * @param c contents
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public void write(final byte[] c) throws IOException {
-    Util.notexpected();
-  }
-
-  /**
-   * Deletes the IO reference.
-   * @return success flag
-   */
-  public boolean delete() {
-    return false;
-  }
-
-  /**
-   * Renames the specified IO reference.
-   * @param trg target reference
-   * @return success flag
-   */
-  @SuppressWarnings("unused")
-  public boolean rename(final IO trg) {
-    return false;
+    return "";
   }
 
   /**
@@ -307,21 +275,5 @@ public abstract class IO {
   @Override
   public String toString() {
     return path;
-  }
-
-  /**
-   * Caches the contents of the specified input stream.
-   * @param i input stream
-   * @return cached contents
-   * @throws IOException I/O exception
-   */
-  protected final byte[] cache(final InputStream i) throws IOException {
-    final ByteList bl = new ByteList();
-    final InputStream bis = i instanceof BufferedInputStream ||
-      i instanceof BufferInput ? i : new BufferedInputStream(i);
-    for(int b; (b = bis.read()) != -1;) bl.add(b);
-    bis.close();
-    cont = bl.toArray();
-    return cont;
   }
 }

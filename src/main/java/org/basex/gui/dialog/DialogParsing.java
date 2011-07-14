@@ -4,10 +4,10 @@ import static org.basex.core.Text.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import org.basex.build.ParserProp;
 import org.basex.build.file.CSVParser;
 import org.basex.build.file.HTMLParser;
-import org.basex.build.xml.CatalogResolverWrapper;
+import org.basex.build.file.ParserProp;
+import org.basex.build.xml.CatalogWrapper;
 import org.basex.core.Prop;
 import org.basex.data.DataText;
 import org.basex.gui.GUIConstants;
@@ -142,8 +142,8 @@ public final class DialogParsing extends BaseXBack {
     xmlopts.add(new BaseXLabel(CHOPPINGINFO, false, false).border(0, 0, 8, 0));
     xmlopts.add(new BaseXLabel());
 
-    // CatalogResolving
-    final boolean rsen = CatalogResolverWrapper.available();
+    // catalog resolver
+    final boolean rsen = CatalogWrapper.available();
     final BaseXBack fl = new BaseXBack(new TableLayout(2, 2, 8, 0));
     usecat.setEnabled(rsen);
     fl.add(usecat);
@@ -237,7 +237,7 @@ public final class DialogParsing extends BaseXBack {
       final boolean uc = usecat.isSelected();
       intparse.setEnabled(!uc);
       entities.setEnabled(ip);
-      usecat.setEnabled(!ip && CatalogResolverWrapper.available());
+      usecat.setEnabled(!ip && CatalogWrapper.available());
       cfile.setEnabled(uc);
       browsec.setEnabled(uc);
     }

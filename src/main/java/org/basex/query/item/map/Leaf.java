@@ -1,7 +1,7 @@
 package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;

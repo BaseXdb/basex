@@ -39,6 +39,7 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.BoolList;
 import org.basex.util.Performance;
 import org.basex.util.Util;
@@ -181,7 +182,7 @@ public final class EditorView extends View {
         final ActionListener al = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent ac) {
-            open(IO.get(ac.getActionCommand()));
+            open(new IOFile(ac.getActionCommand()));
           }
         };
         if(gui.gprop.strings(GUIProp.QUERIES).length == 0) {
@@ -201,7 +202,7 @@ public final class EditorView extends View {
         EditorArea edit = getEditor();
         if(errFile != null) {
           edit = find(IO.get(errFile), false);
-          if(edit == null) edit = open(IO.get(errFile));
+          if(edit == null) edit = open(new IOFile(errFile));
           tabs.setSelectedComponent(edit);
           edit.error = errPos;
         }
@@ -289,7 +290,7 @@ public final class EditorView extends View {
     final BaseXFileChooser fc = new BaseXFileChooser(GUIOPEN,
         gui.gprop.get(GUIProp.XQPATH), gui);
     fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
-    final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
+    final IOFile file = fc.select(BaseXFileChooser.Mode.FOPEN);
     if(file != null) {
       open(file);
       getEditor().opened = true;
@@ -315,13 +316,12 @@ public final class EditorView extends View {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
     final BaseXFileChooser fc =
-      new BaseXFileChooser(GUISAVEAS, edit.file.path(), gui);
+      new BaseXFileChooser(GUISAVEAS, edit.file().path(), gui);
     fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
 
-    final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
+    final IOFile file = fc.select(BaseXFileChooser.Mode.FSAVE);
     if(file == null) return false;
-    edit.file = file;
-    edit.setSyntax(file);
+    edit.file(file);
     save(edit);
     return true;
   }
@@ -339,7 +339,7 @@ public final class EditorView extends View {
    * @param file query file
    * @return opened editor
    */
-  public EditorArea open(final IO file) {
+  public EditorArea open(final IOFile file) {
     if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
 
     EditorArea edit = find(file, true);
@@ -356,7 +356,7 @@ public final class EditorView extends View {
     try {
       edit.setText(file.content());
       edit.opened = true;
-      edit.file = file;
+      edit.file(file);
       gui.gprop.recent(file);
       refresh(false, true);
       if(gui.gprop.is(GUIProp.EXECRT)) edit.query();
@@ -471,7 +471,7 @@ public final class EditorView extends View {
     refreshMark();
     if(edit.mod == mod && !force) return;
 
-    String title = edit.file.name();
+    String title = edit.file().name();
     if(mod) title += "*";
     edit.label.setText(title);
     edit.mod = mod;
@@ -486,7 +486,7 @@ public final class EditorView extends View {
    */
   EditorArea find(final IO file, final boolean opened) {
     for(final EditorArea edit : editors()) {
-      if(edit.file.eq(file) && (!opened || edit.opened)) return edit;
+      if(edit.file().eq(file) && (!opened || edit.opened)) return edit;
     }
     return null;
   }
@@ -497,9 +497,9 @@ public final class EditorView extends View {
    */
   private void save(final EditorArea edit) {
     try {
-      edit.file.write(getEditor().getText());
+      edit.file().write(getEditor().getText());
       edit.opened = true;
-      gui.gprop.recent(edit.file);
+      gui.gprop.recent(edit.file());
       refresh(false, true);
     } catch(final IOException ex) {
       Dialog.error(gui, NOTSAVED);
@@ -510,12 +510,12 @@ public final class EditorView extends View {
    * Choose a unique tab file.
    * @return io reference
    */
-  private IO newTabFile() {
+  private IOFile newTabFile() {
     // collect numbers of existing files
     final BoolList bl = new BoolList();
     for(final EditorArea edit : editors()) {
       if(edit.opened) continue;
-      final String n = edit.file.name().substring(EDITORFILE.length());
+      final String n = edit.file().name().substring(EDITORFILE.length());
       bl.set(true, n.isEmpty() ? 1 : Integer.parseInt(n));
     }
     // find first free file number
@@ -523,7 +523,7 @@ public final class EditorView extends View {
     while(++c < bl.size() && bl.get(c));
     // create io reference
     final String dir = gui.gprop.get(GUIProp.XQPATH);
-    return IO.get(dir + EDITORFILE + (c == 1 ? "" : c));
+    return new IOFile(dir, EDITORFILE + (c == 1 ? "" : c));
   }
 
   /**
@@ -589,7 +589,7 @@ public final class EditorView extends View {
   private boolean confirm(final EditorArea edit) {
     if(edit.mod) {
       final Boolean ok = Dialog.yesNoCancel(gui,
-          Util.info(XQUERYCONF, edit.file.name()));
+          Util.info(XQUERYCONF, edit.file().name()));
       if(ok == null || ok && !save()) return false;
     }
     return true;

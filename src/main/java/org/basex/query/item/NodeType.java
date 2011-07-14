@@ -10,7 +10,7 @@ import org.basex.api.dom.BXElem;
 import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
 import org.basex.build.MemBuilder;
-import org.basex.build.xml.DOCWrapper;
+import org.basex.build.xml.DOMWrapper;
 import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -33,7 +33,6 @@ import org.w3c.dom.Text;
  * @author Leo Woerteler
  */
 public enum NodeType implements Type {
-
   /** Node type. */
   NOD("node", AtomType.ITEM),
 
@@ -72,7 +71,7 @@ public enum NodeType implements Type {
 
       if(o instanceof Document) {
         try {
-          final DOCWrapper p = new DOCWrapper((Document) o, "");
+          final DOMWrapper p = new DOMWrapper((Document) o, "");
           return new DBNode(MemBuilder.build(p, new Prop(false)), 0);
         } catch(final IOException ex) {
           UNDOC.thrw(ii, ex);
@@ -180,19 +179,6 @@ public enum NodeType implements Type {
     // cannot be statically instantiated due to circular dependency
     if(seq == null) seq = new SeqType(this);
     return seq;
-  }
-
-  /**
-   * Throws an exception if the specified item can't be converted to a number.
-   * @param it item
-   * @param ii input info
-   * @return item argument
-   * @throws QueryException query exception
-   */
-  Item checkNum(final Item it, final InputInfo ii)
-      throws QueryException {
-    return it.type == AtomType.URI || !it.str() && !it.num() && !it.unt() &&
-      it.type != AtomType.BLN ? error(it, ii) : it;
   }
 
   /**

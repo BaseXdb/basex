@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.item.SeqType.*;
 
 import java.util.HashMap;
@@ -462,17 +462,18 @@ public enum Function {
   /** Database function: opens a specific database node. */
   OPENID(FNDb.class, "open-id(string,id)", NOD_ZM, STR, ITR),
   /** Database function: searches the text index. */
-  TEXT(FNDb.class, "text(string)", NOD_ZM, ITEM),
+  TEXT(FNDb.class, "text(string,string)", NOD_ZM, STR, ITEM),
   /** Database function: searches the attribute index. */
-  ATTR(FNDb.class, "attribute(string[,name])", NOD_ZM, 1, ITEM, STR),
+  ATTR(FNDb.class, "attribute(string,string[,name])", NOD_ZM, 2, STR, ITEM,
+      STR),
   /** Database function: searches the full-text index. */
-  FULLTEXT(FNDb.class, "fulltext(string)", NOD_ZM, STR),
+  FULLTEXT(FNDb.class, "fulltext(string,string)", NOD_ZM, STR, STR),
   /** Database function: lists all database. */
   LIST(FNDb.class, "list([path])", STR_ZM, 0, STR),
   /** Database function: lists system information. */
   SYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */
-  INFO(FNDb.class, "info([type])", STR, 0, STR),
+  INFO(FNDb.class, "info(string[,type])", STR, 1, STR, STR),
   /** Database function: returns the node ids of database nodes. */
   NODEID(FNDb.class, "node-id(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: returns the pre values of database nodes. */
@@ -601,6 +602,12 @@ public enum Function {
   /** Utility function: gets the bytes from the given xs:base64Binary data. */
   TO_BYTES(FNUtil.class, "to-bytes(base64)", BYT_ZM, B64),
 
+  /* FNXslt functions. */
+
+  /** XSLT function: performs an XSLT transformation. */
+  TRANSFORM(FNXslt.class, "transform(input,stylesheet[,params])",
+      NOD, 2, ITEM, ITEM, NOD_ZO),
+
   /* FNZip functions (EXPath). */
 
   /** XQuery function */
@@ -635,12 +642,13 @@ public enum Function {
     URIS.put(FNFile.class, FILEURI);
     URIS.put(FNHttp.class, HTTPURI);
     URIS.put(FNZip.class,  ZIPURI);
-    // Internal functions
+    // internal functions
     URIS.put(FNDb.class,   DBURI);
     URIS.put(FNFt.class,   FTURI);
     URIS.put(FNHof.class,  HOFURI);
     URIS.put(FNSent.class, SENTURI);
     URIS.put(FNUtil.class, UTILURI);
+    URIS.put(FNXslt.class, XSLTURI);
   }
 
   /** Function classes. */

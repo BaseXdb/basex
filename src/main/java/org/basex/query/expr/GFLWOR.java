@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.data.Serializer;

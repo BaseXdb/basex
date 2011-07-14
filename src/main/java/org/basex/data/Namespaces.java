@@ -143,7 +143,21 @@ public final class Namespaces {
    * @return number of uri references
    */
   public int size() {
+    /* [LK] returns the size of the uri container - if we delete nodes from
+     * the namespace structure via this.delete(pre,s) the container size isn't
+     * changed at all, as only NSNodes in the range pre,pre+s-1 are deleted.
+     * COUNTERINTUITIVE?
+     */
     return uri.size();
+  }
+
+  /**
+   * Returns whether the namespace root node has any children, which means this
+   * function returns whether there are any namespace declarations at all.
+   * @return true if namespace declarations exist.
+   */
+  public boolean rootEmpty() {
+    return root.ch.length == 0;
   }
 
   /**
@@ -236,7 +250,7 @@ public final class Namespaces {
   void delete(final int pre, final int size) {
     NSNode nd = current.find(pre);
     if(nd.pre == pre) nd = nd.par;
-    while(nd != root) {
+    while(nd != null) {
       nd.delete(pre, size);
       nd = nd.par;
     }

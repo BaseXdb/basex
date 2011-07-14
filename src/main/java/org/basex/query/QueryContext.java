@@ -1,7 +1,7 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -135,7 +135,7 @@ public final class QueryContext extends Progress {
   /** Copied nodes, resulting from transform expression. */
   public final Set<Data> copiedNods = new HashSet<Data>();
   /** Pending updates. */
-  public Updates updates = new Updates(false);
+  public Updates updates = new Updates();
   /** Indicates if this query performs updates. */
   public boolean updating;
 
@@ -309,7 +309,7 @@ public final class QueryContext extends Progress {
       final Value v = value(root);
 
       if(updating) {
-        updates.apply(this);
+        updates.applyUpdates(this);
         if(context.data != null) context.update();
       }
       return v;

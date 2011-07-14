@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -19,7 +19,6 @@ import org.basex.util.Token;
  * @author Leo Woerteler
  */
 public final class PartFunApp extends UserFunc {
-
   /**
    * Function constructor for static calls.
    * @param ii input info

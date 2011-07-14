@@ -3,8 +3,7 @@ package org.basex.build.file;
 import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
 import java.io.IOException;
-import org.basex.build.FileParser;
-import org.basex.build.ParserProp;
+import org.basex.build.SingleParser;
 import org.basex.core.Prop;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
@@ -44,7 +43,7 @@ import org.basex.util.XMLToken;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class CSVParser extends FileParser {
+public final class CSVParser extends SingleParser {
   /** Separators. */
   public static final String[] SEPARATORS = { "comma", "semicolon", "tab" };
   /** Formats. */
@@ -113,7 +112,7 @@ public final class CSVParser extends FileParser {
     builder.startElem(CSV, atts);
 
     final TokenBuilder tb = new TokenBuilder();
-    final BufferInput bi = new BufferInput(file.path());
+    final BufferInput bi = new BufferInput(src.path());
     bi.encoding(encoding);
 
     boolean quoted = false, open = true;

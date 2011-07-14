@@ -57,7 +57,7 @@ public final class DiskBuilder extends Builder {
     DropDB.drop(name, prop);
     prop.dbpath(name).mkdirs();
 
-    final IO file = parser.file;
+    final IO file = parser.src;
     meta = new MetaData(name, prop);
     meta.path = file != null ? file.path() : "";
     meta.filesize = file != null ? file.length() : 0;

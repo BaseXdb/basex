@@ -1,13 +1,12 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
- * Insert into (as last) primitive.
+ * Insert into and insert into as last primitive.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
@@ -15,26 +14,54 @@ import org.basex.util.InputInfo;
 public final class InsertInto extends InsertBase {
   /**
    * Constructor.
-   * @param ii input info
-   * @param n target node
-   * @param copy copy of nodes to be inserted
-   * @param last explicit last flag
+   * @param p pre
+   * @param d data
+   * @param i input info
+   * @param nc node copy
+   * @param l insert into as last
    */
-  public InsertInto(final InputInfo ii, final ANode n, final NodeCache copy,
-      final boolean last) {
-    super(last ? PrimitiveType.INSERTINTOLAST : PrimitiveType.INSERTINTO,
-        ii, n, copy);
+  public InsertInto(final int p, final Data d, final InputInfo i,
+      final NodeCache nc, final boolean l) {
+    super(l ? PrimitiveType.INSERTINTOLAST :
+      PrimitiveType.INSERTINTO, p, d, i, nc);
   }
 
   @Override
-  public void apply(final int add) {
-    final DBNode n = (DBNode) node;
-    final Data d = n.data;
-    int pre = n.pre + d.size(n.pre, d.kind(n.pre)) + add;
-    d.insert(pre, n.pre, md);
-    if(!mergeTexts(d, pre - 1, pre)) {
-      pre += md.meta.size;
-      mergeTexts(d, pre - 1, pre);
+  public void apply() {
+    super.apply();
+
+    /* TODO [LK] add checks for this loc attribute: if they exceed the
+     * table limit -> add general loc() method or similar for all update
+     * primitives. + Create test cases.
+     */
+    final int loc = pre + data.size(pre, data.kind(pre));
+    data.insert(loc, pre, md);
+  }
+
+  @Override
+  public boolean checkTextAdjacency(final int c) {
+    /* No adjacent text nodes possible if nothing has been
+     * inserted by this primitive
+     */
+    if(md.meta.size == 0) return false;
+
+    // take pre value shifts into account after updates on the preceding,
+    // preceding sibling and ancestor axis
+    final int p = pre + c;
+    final int affectedPre = p + data.size(p, data.kind(p)) - md.meta.size;
+    boolean merged = false;
+    if(md.kind(0) == Data.TEXT)
+      merged = mergeTexts(data, affectedPre - 1, affectedPre);
+    if(!merged && md.kind(md.meta.size - 1) == Data.TEXT) {
+      final int f = affectedPre + md.meta.size;
+      merged = mergeTexts(data, f - 1, f);
     }
+
+    return merged;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }

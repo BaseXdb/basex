@@ -21,7 +21,6 @@ import org.basex.util.TokenMap;
  * @author Rositsa Shadura
  */
 public final class RequestParser {
-
   /** http:header element. */
   private static final byte[] HDR = token("http:header");
   /** Header attribute: name. */
@@ -72,12 +71,12 @@ public final class RequestParser {
     checkRequest(r, ii);
     final ANode payload = parseHdrs(request.children(), r.headers);
     final byte[] httpMethod = lc(r.attrs.get(METHOD));
-    // It is an error if content is set for HTTP verbs which must be empty
+    // it is an error if content is set for HTTP verbs which must be empty
     if((eq(TRACE, httpMethod) || eq(DELETE, httpMethod))
         && (payload != null || bodies != null)) REQINV.thrw(ii,
         "Body not expected for method " + string(httpMethod));
     if(payload != null) {
-      // Single part request
+      // single part request
       if(eq(payload.nname(), BODY)) {
         Item it = null;
         if(bodies != null) {
@@ -89,13 +88,13 @@ public final class RequestParser {
         }
         parseBody(payload, it, r.payloadAttrs, r.bodyContent, ii);
         r.isMultipart = false;
-        // Multipart request
+        // multipart request
       } else if(eq(payload.nname(), MULTIPART)) {
         int i = 0;
         final AxisMoreIter ch = payload.children();
         while(ch.next() != null)
           i++;
-        // Number of items in $bodies must be equal to number of body
+        // number of items in $bodies must be equal to number of body
         // descriptors
         if(bodies != null && bodies.size() != i) REQINV.thrw(ii,
             "Number of items with request body content differs "
@@ -114,8 +113,7 @@ public final class RequestParser {
    */
   private static void parseAttrs(final ANode element, final TokenMap attrs) {
     final AxisIter elAttrs = element.attributes();
-    ANode attr = null;
-    while((attr = elAttrs.next()) != null) {
+    for(ANode attr; (attr = elAttrs.next()) != null;) {
       attrs.add(attr.nname(), attr.atom());
     }
   }
@@ -130,11 +128,10 @@ public final class RequestParser {
     ANode n = null;
     while((n = i.next()) != null && eq(n.nname(), HDR)) {
       final AxisIter hdrAttrs = n.attributes();
-      ANode attr = null;
       byte[] name = null;
       byte[] value = null;
 
-      while((attr = hdrAttrs.next()) != null) {
+      for(ANode attr; (attr = hdrAttrs.next()) != null;) {
         if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
         if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
 
@@ -163,15 +160,13 @@ public final class RequestParser {
     parseAttrs(body, attrs);
     checkBody(body, attrs, ii);
     if(attrs.get(SRC) == null) {
-      // No linked resource for setting request content
+      // no linked resource for setting request content
       if(contItem == null) {
-        // Content is set from <http:body/> children
-        ANode n;
+        // content is set from <http:body/> children
         final AxisMoreIter i = body.children();
-        while((n = i.next()) != null)
-          bodyContent.add(n);
+        for(ANode n; (n = i.next()) != null;) bodyContent.add(n);
       } else {
-        // Content is set from $bodies parameter
+        // content is set from $bodies parameter
         bodyContent.add(contItem);
       }
     }
@@ -192,15 +187,14 @@ public final class RequestParser {
     parseAttrs(multipart, attrs);
     if(attrs.get(MEDIATYPE) == null) REQINV.thrw(ii,
         "Attribute media-type of http:multipart is mandatory");
-    ANode n;
     final AxisMoreIter i = multipart.children();
     if(contItems == null) {
-      // Content is set from <http:body/> children of <http:part/> elements
-      while((n = i.next()) != null)
+      // content is set from <http:body/> children of <http:part/> elements
+      for(ANode n; (n = i.next()) != null;)
         parts.add(parsePart(n, null, ii));
     } else {
-      // Content is set from $bodies parameter
-      while((n = i.next()) != null)
+      // content is set from $bodies parameter
+      for(ANode n; (n = i.next()) != null;)
         parts.add(parsePart(n, contItems.next(), ii));
     }
   }
@@ -232,7 +226,7 @@ public final class RequestParser {
     // @method denotes the HTTP verb and is mandatory
     if(r.attrs.get(METHOD) == null) REQINV.thrw(ii,
         "Attribute method is mandatory");
-    // Check parameters needed in case of authorization
+    // check parameters needed in case of authorization
     final byte[] sendAuth = r.attrs.get(SENDAUTH);
     if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
       final byte[] usrname = r.attrs.get(USRNAME);
@@ -258,7 +252,7 @@ public final class RequestParser {
     if(bodyAttrs.get(MEDIATYPE) == null) REQINV.thrw(ii,
         "Attribute media-type of http:body is mandatory");
 
-    // If src attribute is used to set the content of the body, no
+    // if src attribute is used to set the content of the body, no
     // other attributes must be specified and no content must be present
     if(bodyAttrs.get(SRC) != null
         && (bodyAttrs.size() > 2 || body.children().more())) SRCATTR.thrw(ii);

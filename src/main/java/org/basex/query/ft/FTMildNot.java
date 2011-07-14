@@ -1,7 +1,7 @@
 package org.basex.query.ft;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
 import org.basex.query.QueryContext;

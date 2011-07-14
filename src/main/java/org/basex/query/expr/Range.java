@@ -1,10 +1,10 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -94,6 +94,6 @@ public final class Range extends Arr {
 
   @Override
   public String toString() {
-    return PAR1 + toString(" " + QueryTokens.TO + " ") + PAR2;
+    return PAR1 + toString(" " + QueryText.TO + " ") + PAR2;
   }
 }

@@ -57,7 +57,7 @@ public final class ServerCmdTest extends CmdTest {
     no(new Kill("admin2"));
     no(new Kill("ha*"));
     ok(new CreateUser(NAME2, "test"));
-    ClientSession cs = new ClientSession(CONTEXT, NAME2, "test");
+    final ClientSession cs = new ClientSession(CONTEXT, NAME2, "test");
     ok(new Kill(NAME2));
     no(new Kill(NAME2 + "?"));
     cs.close();

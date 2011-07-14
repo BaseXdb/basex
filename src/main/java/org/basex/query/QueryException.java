@@ -101,6 +101,14 @@ public final class QueryException extends Exception {
   }
 
   /**
+   * Returns the file.
+   * @return error line
+   */
+  public IO file() {
+    return file;
+  }
+
+  /**
    * Returns suggestions for code completions.
    * @return suggestions
    */
@@ -165,7 +173,7 @@ public final class QueryException extends Exception {
     final TokenBuilder tb = new TokenBuilder();
     if(lineCol != null) {
       tb.add(STOPPED).add(' ').addExt(LINEINFO, lineCol[0]);
-      if(lineCol[1] != 0) tb.add(QueryTokens.SEP).addExt(COLINFO, lineCol[1]);
+      if(lineCol[1] != 0) tb.add(QueryText.SEP).addExt(COLINFO, lineCol[1]);
       if(file != null) tb.add(' ').addExt(FILEINFO, file);
       tb.add(COL).add(NL);
     }

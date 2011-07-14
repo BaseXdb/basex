@@ -21,7 +21,6 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.io.IO;
 import org.basex.io.IOFile;
 
 /**
@@ -67,7 +66,7 @@ public final class DialogExport extends Dialog {
     p.add(out);
     p.add(new BaseXLabel());
 
-    final String dir = IO.get(gui.context.data.meta.path).dir();
+    final String dir = new IOFile(gui.context.data.meta.path).dir();
     path = new BaseXTextField(dir, this);
     path.addKeyListener(keys);
     p.add(path);
@@ -148,7 +147,7 @@ public final class DialogExport extends Dialog {
    * Opens a file dialog to choose an XML document or directory.
    */
   void choose() {
-    final IO io = new BaseXFileChooser(DIALOGFC, path.getText(), gui).
+    final IOFile io = new BaseXFileChooser(DIALOGFC, path.getText(), gui).
       select(BaseXFileChooser.Mode.DOPEN);
     if(io != null) path.setText(io.path());
   }
@@ -163,10 +162,9 @@ public final class DialogExport extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    final IO io = IO.get(path());
-    final boolean file = io instanceof IOFile;
-    ok = !path().isEmpty() && file;
-    info.setText(!ok && !file ? INVPATH : io.children().length > 0 ? OVERFILE
+    final IOFile io = new IOFile(path());
+    ok = !path().isEmpty();
+    info.setText(io.children().length > 0 ? OVERFILE
         : null, ok ? Msg.WARN : Msg.ERROR);
     enableOK(buttons, BUTTONOK, ok);
   }

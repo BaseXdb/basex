@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.util.Err.XPATT;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.item.FDoc;
 import org.basex.query.item.NodeType;
 import org.basex.util.InputInfo;
@@ -40,7 +40,7 @@ public final class CDoc extends CFrag {
 
   @Override
   public String desc() {
-    return info(QueryTokens.DOCUMENT);
+    return info(QueryText.DOCUMENT);
   }
 
   @Override

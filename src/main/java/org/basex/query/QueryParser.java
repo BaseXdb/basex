@@ -1,15 +1,13 @@
 package org.basex.query;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -32,6 +30,7 @@ import org.basex.query.expr.Catch;
 import org.basex.query.expr.CmpG;
 import org.basex.query.expr.CmpN;
 import org.basex.query.expr.CmpV;
+import org.basex.query.expr.Concat;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.DynFuncCall;
 import org.basex.query.expr.Except;
@@ -85,7 +84,7 @@ import org.basex.query.ft.FTWords;
 import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
-import org.basex.query.func.VarDef;
+import org.basex.query.func.Variable;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
@@ -107,11 +106,11 @@ import org.basex.query.path.KindTest;
 import org.basex.query.path.NameTest;
 import org.basex.query.path.Path;
 import org.basex.query.path.Test;
-import org.basex.query.up.Delete;
-import org.basex.query.up.Insert;
-import org.basex.query.up.Rename;
-import org.basex.query.up.Replace;
-import org.basex.query.up.Transform;
+import org.basex.query.up.expr.Delete;
+import org.basex.query.up.expr.Insert;
+import org.basex.query.up.expr.Rename;
+import org.basex.query.up.expr.Replace;
+import org.basex.query.up.expr.Transform;
 import org.basex.query.util.Err;
 import org.basex.query.util.NSLocal;
 import org.basex.query.util.TypedFunc;
@@ -129,6 +128,7 @@ import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
+import org.basex.util.JarClassLoader;
 import org.basex.util.Reflect;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -623,9 +623,9 @@ public class QueryParser extends InputParser {
     }
     final byte[] ns = stringLiteral();
     if(ns.length == 0) error(NSEMPTY);
-    if(wsConsumeWs(AT)) do
-      stringLiteral();
-    while(wsConsumeWs(COMMA));
+    if(wsConsumeWs(AT)) {
+      do stringLiteral(); while(wsConsumeWs(COMMA));
+    }
     error(IMPLSCHEMA);
   }
 
@@ -718,28 +718,33 @@ public class QueryParser extends InputParser {
    */
   private void loadPackage(final byte[] pkgName, final TokenSet pkgsToLoad,
       final TokenSet pkgsLoaded) throws QueryException {
-    // Return if package is already loaded
-    if(pkgsLoaded.id(pkgName) != 0) return;
-    // Find package in package dictionary
-    final byte[] pDir = ctx.context.repo.pkgDict().get(pkgName);
-    if(pDir == null) error(NECPKGNOTINST);
-    final File pkgDir = ctx.context.repo.path(string(pDir));
 
-    // Parse package descriptor
+    // return if package is already loaded
+    if(pkgsLoaded.id(pkgName) != 0) return;
+
+    // find package in package dictionary
+    final byte[] pDir = ctx.context.repo.pkgDict().get(pkgName);
+    if(pDir == null) error(NECPKGNOTINST, pkgName);
+    final IOFile pkgDir = ctx.context.repo.path(string(pDir));
+
+    // parse package descriptor
     final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
-    if(!pkgDesc.exists()) Util.errln(PkgText.NOTEXP, string(pkgName));
-    final Package pkg = new PkgParser(ctx.context, input()).parse(pkgDesc);
-    // Check if package contains a jar descriptor
+    if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, string(pkgName));
+
+    final Package pkg = new PkgParser(ctx.context.repo, input()).parse(pkgDesc);
+    // check if package contains a jar descriptor
     final IO jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
-    // Add jars to classpath
-    if(jarDesc.exists()) loadJars(jarDesc, pkgDir, pkg.abbrev);
-    // Package has dependencies -> they have to be loaded first => put package
+    // add jars to classpath
+    if(jarDesc.exists()) loadJars(jarDesc, pkgDir, string(pkg.abbrev));
+
+    // package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
     if(pkg.dep.size() != 0) pkgsToLoad.add(pkgName);
     for(final Dependency d : pkg.dep) {
       if(d.pkg != null) {
-      // We consider only package dependencies here
-      final byte[] depPkg = new PkgValidator(ctx.context, input()).getDepPkg(d);
+      // we consider only package dependencies here
+      final byte[] depPkg = new PkgValidator(
+          ctx.context.repo, input()).depPkg(d);
       if(depPkg == null) {
         error(NECPKGNOTINST, string(d.pkg));
       } else {
@@ -749,9 +754,9 @@ public class QueryParser extends InputParser {
      }
     }
     for(final Component comp : pkg.comps) {
-      final byte[] path = token(new File(new File(pkgDir, string(pkg.abbrev)),
-          string(comp.file)).toString());
-      module(path, Uri.uri(comp.uri));
+      final String path = new IOFile(new IOFile(pkgDir, string(pkg.abbrev)),
+          string(comp.file)).path();
+      module(token(path), Uri.uri(comp.uri));
     }
     if(pkgsToLoad.id(pkgName) != 0) pkgsToLoad.delete(pkgName);
     pkgsLoaded.add(pkgName);
@@ -765,28 +770,27 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void loadJars(final IO jarDesc,
-      final File pkgDir, final byte[] modDir) throws QueryException {
+      final IOFile pkgDir, final String modDir) throws QueryException {
+
     final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
     final URL[] urls = new URL[desc.jars.size()];
     // Collect jar files
     int i = 0;
     for(final byte[] jar : desc.jars) {
       // Assumes that jar is in the directory containing the xquery modules
-      final String path = new File(new File(pkgDir, string(modDir)),
-          string(jar)).toString();
+      final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(jar));
       try {
-        urls[i++] = new URL(PkgText.JARPREF + path + "!/");
-      } catch(MalformedURLException ex) {
-        Util.errln(ex.getMessage());
+        urls[i++] = new URL(IO.FILEPREF + path);
+      } catch(final MalformedURLException ex) {
+        Util.debug(ex.getMessage());
       }
     }
     // Add jars to classpath
-    Reflect.setJarLoader(new URLClassLoader(urls));
+    Reflect.setJarLoader(new JarClassLoader(urls));
     // Load public classes
     for(final byte[] c : desc.classes)
           ctx.ns.add(new QNm(concat(token("java:"), c)), input());
   }
-
   /**
    * Parses the "VarDecl" rule.
    * @throws QueryException query exception
@@ -942,10 +946,8 @@ public class QueryParser extends InputParser {
     }
 
     if(!wsConsume(COMMA)) return e;
-    Expr[] l = { e};
-    do
-      l = add(l, single());
-    while(wsConsume(COMMA));
+    Expr[] l = { e };
+    do l = add(l, single()); while(wsConsume(COMMA));
     return new List(input(), l);
   }
 
@@ -995,9 +997,7 @@ public class QueryParser extends InputParser {
     if(ctx.xquery3 && wsConsumeWs(GROUP)) {
       wsCheck(BY);
       ap = qp;
-      do
-        group = groupSpec(group);
-      while(wsConsume(COMMA));
+      do group = groupSpec(group); while(wsConsume(COMMA));
       alter = GRPBY;
     }
 
@@ -1008,9 +1008,7 @@ public class QueryParser extends InputParser {
     if(stable || wsConsumeWs(ORDER)) {
       wsCheck(BY);
       ap = qp;
-      do
-        order = orderSpec(order);
-      while(wsConsume(COMMA));
+      do order = orderSpec(order); while(wsConsume(COMMA));
       if(order != null) order = Array.add(order, new OrderByStable(input()));
       alter = ORDERBY;
     }
@@ -1237,10 +1235,8 @@ public class QueryParser extends InputParser {
     final Expr e = and();
     if(!wsConsumeWs(OR)) return e;
 
-    Expr[] list = { e};
-    do
-      list = add(list, and());
-    while(wsConsumeWs(OR));
+    Expr[] list = { e };
+    do list = add(list, and()); while(wsConsumeWs(OR));
     return new Or(input(), list);
   }
 
@@ -1253,10 +1249,8 @@ public class QueryParser extends InputParser {
     final Expr e = comparison();
     if(!wsConsumeWs(AND)) return e;
 
-    Expr[] list = { e};
-    do
-      list = add(list, comparison());
-    while(wsConsumeWs(AND));
+    Expr[] list = { e };
+    do list = add(list, comparison()); while(wsConsumeWs(AND));
     return new And(input(), list);
   }
 
@@ -1287,10 +1281,10 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr ftContains() throws QueryException {
-    final Expr e = range();
+    final Expr e = stringConcat();
 
     final int p = qp;
-    // use "=>" as shortcut for full-text expressions
+    // use "=>" and "<-" as unofficial shortcuts for full-text expressions
     if(consume('=') && consume('>') || consume('<') && consume('-')) {
       skipWS();
     } else if(!wsConsumeWs(CONTAINS) || !wsConsumeWs(TEXT)) {
@@ -1298,16 +1292,27 @@ public class QueryParser extends InputParser {
       return e;
     }
 
-    // [CG] XQFT: FTIgnoreOption
     final FTExpr select = ftSelection(false);
-    // Expr ignore = null;
     if(wsConsumeWs(WITHOUT)) {
       wsCheck(CONTENT);
-      // ignore = union();
       union();
       error(FTIGNORE);
     }
     return new FTContains(e, select, input());
+  }
+
+  /**
+   * Parses the "StringConcatExpr" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr stringConcat() throws QueryException {
+    final Expr e = range();
+    if(!consume(CONCAT) && !consume(CONCAT2)) return e;
+
+    Expr[] list = { e };
+    do list = add(list, range()); while(wsConsume(CONCAT) || consume(CONCAT2));
+    return new Concat(input(), list);
   }
 
   /**
@@ -1361,13 +1366,23 @@ public class QueryParser extends InputParser {
    */
   private Expr union() throws QueryException {
     final Expr e = intersect();
-    if(e == null || !wsConsumeWs(UNION) && !wsConsume(PIPE)) return e;
-
-    Expr[] list = { e};
-    do
-      list = add(list, intersect());
-    while(wsConsumeWs(UNION) || wsConsume(PIPE));
+    if(e == null || !isUnion()) return e;
+    Expr[] list = { e };
+    do list = add(list, intersect()); while(isUnion());
     return new Union(input(), list);
+  }
+
+  /**
+   * Checks if a union operator is found.
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean isUnion() throws QueryException {
+    if(wsConsumeWs(UNION)) return true;
+    final int p = qp;
+    if(consume(PIPE) && !consume(PIPE)) return true;
+    qp = p;
+    return false;
   }
 
   /**
@@ -1379,16 +1394,12 @@ public class QueryParser extends InputParser {
     final Expr e = instanceoff();
 
     if(wsConsumeWs(INTERSECT)) {
-      Expr[] list = { e};
-      do
-        list = add(list, instanceoff());
-      while(wsConsumeWs(INTERSECT));
+      Expr[] list = { e };
+      do list = add(list, instanceoff()); while(wsConsumeWs(INTERSECT));
       return new InterSect(input(), list);
     } else if(wsConsumeWs(EXCEPT)) {
-      Expr[] list = { e};
-      do
-        list = add(list, instanceoff());
-      while(wsConsumeWs(EXCEPT));
+      Expr[] list = { e };
+      do list = add(list, instanceoff()); while(wsConsumeWs(EXCEPT));
       return new Except(input(), list);
     } else {
       return e;
@@ -1588,7 +1599,7 @@ public class QueryParser extends InputParser {
     return AxisStep.get(input(), Axis.DESCORSELF, Test.NOD);
   }
 
-  // Methods for query suggestions
+  // methods for query suggestions
 
   /**
    * Performs an optional check init.
@@ -1734,7 +1745,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * [121] Parses a FilterExpr. [124] Parses a Predicate.
+   * Parses the "FilterExpr" rule.
+   * Parses the "Predicate" rule.
    * @return postfix expression
    * @throws QueryException query exception
    */
@@ -1743,7 +1755,6 @@ public class QueryParser extends InputParser {
     do {
       old = e;
       if(wsConsume(BR1)) {
-        // PredicateList
         if(e == null) error(PREDMISSING);
         Expr[] pred = { };
         do {
@@ -1752,7 +1763,6 @@ public class QueryParser extends InputParser {
         } while(wsConsume(BR1));
         e = new Filter(input(), e, pred);
       } else if(e != null) {
-        // DynamicFunctionInvocation
         final Expr[] args = argumentList(e);
         if(args == null) break;
 
@@ -1858,10 +1868,7 @@ public class QueryParser extends InputParser {
    */
   private Expr functionItem() throws QueryException {
     final int pos = qp;
-
-    // InlineFunction
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
-
       final int s = ctx.vars.size();
       final Var[] args = paramList();
       wsCheck(PAR2);
@@ -1869,13 +1876,10 @@ public class QueryParser extends InputParser {
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
       ctx.vars.reset(s);
-
       return new InlineFunc(input(), type, args, body);
     }
-
     qp = pos;
 
-    // LiteralFunctionItem
     skipWS();
     final byte[] fn = qName(null);
     if(fn.length > 0 && consume(HASH)) {
@@ -2362,7 +2366,7 @@ public class QueryParser extends InputParser {
     final Expr e = expr();
     wsCheck(BRACE2);
     return new CElem(input(), name, new Atts(), true, e == null ? new Expr[0]
-        : new Expr[] { e});
+        : new Expr[] { e });
   }
 
   /**
@@ -2476,7 +2480,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * [169] Parses an ItemType.
+   * Parses the "ItemType" rule.
    * @return item type
    * @throws QueryException query exception
    */
@@ -2618,39 +2622,15 @@ public class QueryParser extends InputParser {
         }
       } while(wsConsumeWs(PIPE));
 
-      Var[] var = { };
-      final int s = ctx.vars.size();
-      if(wsConsume(PAR1)) {
-        var = addVar(var);
-        if(wsConsume(COMMA)) {
-          var = addVar(var);
-          if(wsConsume(COMMA)) {
-            var = addVar(var);
-          }
-        }
-        wsCheck(PAR2);
-      }
-      final Expr ex = enclosed(NOENCLEXPR);
-      ctx.vars.reset(s);
-      ct = Array.add(ct, new Catch(input(), ex, codes, var));
+      final Catch c = new Catch(input(), codes, ctx);
+      final int s = c.prepare(ctx);
+      c.expr = enclosed(NOENCLEXPR);
+      c.finish(s, ctx);
+
+      ct = Array.add(ct, c);
     } while(wsConsumeWs(CATCH));
 
     return new Try(input(), tr, ct);
-  }
-
-  /**
-   * Adds a variable to the specified array.
-   * @param vars input variables
-   * @return new variable array
-   * @throws QueryException query exception
-   */
-  private Var[] addVar(final Var[] vars) throws QueryException {
-    final Var v = Var.create(ctx, input(), varName());
-    for(final Var vr : vars)
-      if(v.name.eq(vr.name)) error(DUPLVAR, v);
-    ctx.vars.add(v);
-    final Var[] var = Array.add(vars, v);
-    return var;
   }
 
   /**
@@ -2714,10 +2694,8 @@ public class QueryParser extends InputParser {
     final FTExpr e = ftAnd(prg);
     if(!wsConsumeWs(FTOR)) return e;
 
-    FTExpr[] list = { e};
-    do
-      list = Array.add(list, ftAnd(prg));
-    while(wsConsumeWs(FTOR));
+    FTExpr[] list = { e };
+    do list = Array.add(list, ftAnd(prg)); while(wsConsumeWs(FTOR));
     return new FTOr(input(), list);
   }
 
@@ -2731,10 +2709,8 @@ public class QueryParser extends InputParser {
     final FTExpr e = ftMildNot(prg);
     if(!wsConsumeWs(FTAND)) return e;
 
-    FTExpr[] list = { e};
-    do
-      list = Array.add(list, ftMildNot(prg));
-    while(wsConsumeWs(FTAND));
+    FTExpr[] list = { e };
+    do list = Array.add(list, ftMildNot(prg)); while(wsConsumeWs(FTAND));
     return new FTAnd(input(), list);
   }
 
@@ -2781,8 +2757,7 @@ public class QueryParser extends InputParser {
 
     final FTOpt fto = new FTOpt();
     boolean found = false;
-    while(ftMatchOption(fto))
-      found = true;
+    while(ftMatchOption(fto)) found = true;
 
     // check if specified language is not available
     if(!Language.supported(fto.ln, fto.is(ST) && fto.sd == null)) error(
@@ -3333,7 +3308,7 @@ public class QueryParser extends InputParser {
     // dynamically assign variables from function modules
     if(v == null && !declVars) {
       declVars = true;
-      VarDef.init(ctx);
+      Variable.init(ctx);
       v = ctx.vars.get(name);
     }
     if(v == null) error(err, '$' + string(name.atom()));

@@ -2,16 +2,18 @@ package org.basex.query.up.primitives;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.query.QueryException;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
+import org.basex.query.item.FTxt;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.query.util.DataBuilder;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * Abstract update primitive which holds a copy of nodes to be inserted.
@@ -19,7 +21,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public abstract class NodeCopy extends Primitive {
+public abstract class NodeCopy extends StructuralUpdate {
   /** Nodes to be inserted. */
   protected final List<NodeCache> insert = new ArrayList<NodeCache>(1);
   /** Final copy of insertion nodes. */
@@ -27,31 +29,32 @@ public abstract class NodeCopy extends Primitive {
 
   /**
    * Constructor.
-   * @param pt update type
-   * @param ii input info
-   * @param n target node
-   * @param nc nodes to be inserted
+   * @param t type
+   * @param p pre
+   * @param d data
+   * @param i input info
+   * @param nc node copy
    */
-  protected NodeCopy(final PrimitiveType pt, final InputInfo ii, final ANode n,
-      final NodeCache nc) {
-    super(pt, ii, n);
+  protected NodeCopy(final PrimitiveType t, final int p, final Data d,
+      final InputInfo i, final NodeCache nc) {
+    super(t, p, d, i);
     insert.add(nc);
   }
 
-  @Override
-  public void prepare() throws QueryException {
-    // ignore fragment nodes
-    if(!(node instanceof DBNode)) return;
-
+  /**
+   * Prepares this update primitive before execution. This includes i.e. the
+   * preparation of insertion sequences.
+   */
+  public final void prepare() {
     // build main memory representation of nodes to be copied
-    md = new MemData(((DBNode) node).data);
+    md = new MemData(data);
     final NodeCache seq = new NodeCache();
     for(final NodeCache nc : insert) {
       for(ANode i; (i = nc.next()) != null;) seq.add(i);
     }
     // text nodes still need to be merged. two adjacent iterators may
     // lead to two adjacent text nodes
-    new DataBuilder(md).build(mergeText(seq));
+    new DataBuilder(md).build(mergeNodeCacheText(seq));
   }
 
   /**
@@ -60,13 +63,37 @@ public abstract class NodeCopy extends Primitive {
    * @param pool name pool
    */
   protected final void add(final NamePool pool) {
-    for(int pre = 0; pre < md.meta.size; ++pre) {
-      final int k = md.kind(pre);
-      if(k != Data.ATTR && k != Data.ELEM || md.parent(pre, k) > -1) continue;
-      final int u = md.uri(pre, k);
-      final QNm qnm = new QNm(md.name(pre, k));
+    for(int p = 0; p < md.meta.size; ++p) {
+      final int k = md.kind(p);
+      if(k != Data.ATTR && k != Data.ELEM || md.parent(p, k) > -1) continue;
+      final int u = md.uri(p, k);
+      final QNm qnm = new QNm(md.name(p, k));
       if(u != 0) qnm.uri(md.ns.uri(u));
       pool.add(qnm, ANode.type(k));
     }
+  }
+
+  /**
+   * Merges all adjacent text nodes in the given sequence.
+   * @param n iterator
+   * @return iterator with merged text nodes
+   */
+  protected static NodeCache mergeNodeCacheText(final NodeCache n) {
+    final NodeCache s = new NodeCache();
+    ANode i = n.next();
+    while(i != null) {
+      if(i.type == NodeType.TXT) {
+        final TokenBuilder tb = new TokenBuilder();
+        while(i != null && i.type == NodeType.TXT) {
+          tb.add(i.atom());
+          i = n.next();
+        }
+        s.add(new FTxt(tb.finish(), null));
+      } else {
+        s.add(i);
+        i = n.next();
+      }
+    }
+    return s;
   }
 }

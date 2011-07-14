@@ -179,7 +179,7 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   @Override
-  public Iterator<byte[]> iterator() {
+  public final Iterator<byte[]> iterator() {
     return new Iterator<byte[]>() {
       private int c;
       @Override

@@ -31,7 +31,9 @@ public abstract class QueryPlanTest {
    * @param res result
    * @param pr queries on the query plan
    */
-  protected void check(final String qu, final String res, final String... pr) {
+  protected final void check(final String qu, final String res,
+      final String... pr) {
+
     final QueryProcessor qp = new QueryProcessor(qu, CTX);
     try {
       // parse compiled query plan

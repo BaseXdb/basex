@@ -1,6 +1,6 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.util.Token;
@@ -45,12 +45,12 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public String toString() {
-    return Token.string(val);
+  public void plan(final Serializer ser) throws IOException {
+    ser.emptyElement(this, VAL, val);
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, VAL, val);
+  public String toString() {
+    return Token.string(val);
   }
 }

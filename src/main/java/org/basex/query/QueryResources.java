@@ -14,6 +14,7 @@ import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
@@ -21,7 +22,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
- * This class provides access to resources.
+ * This class provides access to resources used by an XQuery expression.
  *
  * @author BaseX Team 2005-11, BSD License
  */
@@ -59,7 +60,9 @@ public final class QueryResources {
     if(!ctx.context.perm(User.READ, d.meta)) PERMNO.thrw(null, CmdPerm.READ);
 
     // assign initial context value
-    ctx.value = DBNodeSeq.get(nodes.list, d, nodes.root, nodes.root);
+    // (if database only contains an empty root node, assign empty sequence)
+    ctx.value = d.empty() ? Empty.SEQ :
+      DBNodeSeq.get(nodes.list, d, nodes.root, nodes.root);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set

@@ -19,7 +19,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public class RepoDelete extends Command {
+public final class RepoDelete extends Command {
   /** Input info. */
   private final InputInfo ii;
 
@@ -36,7 +36,7 @@ public class RepoDelete extends Command {
   @Override
   protected boolean run() throws IOException {
     try {
-      new RepoManager(context).delete(args[0], ii);
+      new RepoManager(context.repo).delete(args[0], ii);
       return info(REPODEL, args[0]);
     } catch(final QueryException ex) {
       Util.debug(ex);

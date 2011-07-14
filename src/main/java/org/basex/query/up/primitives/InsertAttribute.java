@@ -1,10 +1,10 @@
 package org.basex.query.up.primitives;
 
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
+import org.basex.data.Data;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert attribute primitive.
@@ -15,24 +15,35 @@ import org.basex.util.InputInfo;
 public final class InsertAttribute extends InsertBase {
   /**
    * Constructor.
-   * @param ii input info
-   * @param n target node
-   * @param copy insertion nods
+   * @param p pre
+   * @param d data
+   * @param i input info
+   * @param c node copy
    */
-  public InsertAttribute(final InputInfo ii, final ANode n,
-      final NodeCache copy) {
-    super(PrimitiveType.INSERTATTR, ii, n, copy);
+  public InsertAttribute(final int p, final Data d,
+      final InputInfo i, final NodeCache c) {
+    super(PrimitiveType.INSERTATTR, p, d, i, c);
   }
 
   @Override
-  public void apply(final int add) {
-    final DBNode n = (DBNode) node;
-    n.data.insertAttr(n.pre + 1, n.pre, md);
+  public void apply() {
+    super.apply();
+    data.insertAttr(pre + 1, pre, md);
   }
 
   @Override
   public void update(final NamePool pool) {
     if(md == null) return;
     add(pool);
+  }
+
+  @Override
+  public boolean checkTextAdjacency(final int c) {
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }

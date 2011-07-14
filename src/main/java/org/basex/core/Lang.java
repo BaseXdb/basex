@@ -2,7 +2,6 @@ package org.basex.core;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,6 +13,8 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -65,8 +66,7 @@ public final class Lang {
       } else {
         final BufferedReader br = new BufferedReader(new InputStreamReader(
             is, Token.UTF8));
-        String line;
-        while((line = br.readLine()) != null) {
+        for(String line; (line = br.readLine()) != null;) {
           final int i = line.indexOf('=');
           if(i == -1 || line.startsWith("#")) continue;
           final String key = line.substring(0, i);
@@ -150,9 +150,9 @@ public final class Lang {
           creds.add(credits(cont));
         }
       } else {
-        for(final File f : new File(url.getFile()).listFiles()) {
-          langs.add(f.getName().replaceAll("." + SUFFIX, ""));
-          creds.add(credits(new IOFile(f).content()));
+        for(final IO f : new IOFile(url.getFile()).children()) {
+          langs.add(f.name().replaceAll("." + SUFFIX, ""));
+          creds.add(credits(f.content()));
         }
       }
     } catch(final IOException ex) {

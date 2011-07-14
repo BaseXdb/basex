@@ -7,7 +7,7 @@ import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -100,13 +100,13 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(QueryTokens.WINDOW), token(unit.toString()));
+    ser.openElement(this, token(QueryText.WINDOW), token(unit.toString()));
     win.plan(ser);
     super.plan(ser);
   }
 
   @Override
   public String toString() {
-    return super.toString() + QueryTokens.WINDOW + " " + win + " " + unit;
+    return super.toString() + QueryText.WINDOW + " " + win + " " + unit;
   }
 }

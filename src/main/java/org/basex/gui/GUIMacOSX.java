@@ -48,9 +48,9 @@ public final class GUIMacOSX {
    * @throws Exception if any error occurs.
    */
   public GUIMacOSX() throws Exception {
-    // Name for the dock icon and the application menu
+    // name for the dock icon and the application menu
     System.setProperty(P_ABOUT_NAME, NAME);
-    // Show menu in the screen menu instead of inside the application window
+    // show menu in the screen menu instead of inside the application window
     System.setProperty(P_SCREEN_MENU_BAR, "true");
 
     // load native java classes...

@@ -16,6 +16,8 @@ import org.basex.util.ByteList;
 
 /**
  * This class serves as a buffered wrapper for textual input streams.
+ * In contrast to default input streams, the value {@code 0}
+ * (instead of {@code -1}) indicates the end of the stream.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -29,6 +31,7 @@ public class BufferInput extends InputStream {
   protected int pos;
   /** Input length. */
   protected long length;
+
   /** Current buffer size. */
   private int size;
   /** Number of read bytes. */
@@ -105,13 +108,13 @@ public class BufferInput extends InputStream {
 
   /**
    * Sets a new encoding.
-   * @param e encoding
+   * @param encoding encoding
    * @throws IOException IO Exception
    */
-  public final void encoding(final String e) throws IOException {
+  public final void encoding(final String encoding) throws IOException {
     try {
-      enc = normEncoding(e, enc);
-      csd = Charset.forName(e).newDecoder();
+      enc = normEncoding(encoding, enc);
+      csd = Charset.forName(encoding).newDecoder();
     } catch(final Exception ex) {
       throw new IOException(ex.toString());
     }
@@ -123,7 +126,7 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the next byte, or 0 if all bytes have been read.
+   * Returns the next byte, or {@code 0} if all bytes have been read.
    * @return next byte
    * @throws IOException I/O exception
    */
@@ -136,23 +139,22 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Reads a string from the input stream, suffixed by a 0 byte.
+   * Reads a string from the input stream, suffixed by a {@code 0} byte.
    * @return string
    * @throws IOException IO Exception
    */
   public final String readString() throws IOException {
-    return content().toString();
+    return token().toString();
   }
 
   /**
-   * Reads a token from the input stream, suffixed by a 0 byte.
-   * @return resulting byte list
+   * Reads a token from the input stream, suffixed by a {@code 0} byte.
+   * @return token
    * @throws IOException IO Exception
    */
-  public final ByteList content() throws IOException {
+  public final ByteList token() throws IOException {
     final ByteList bl = new ByteList();
-    byte l;
-    while((l = readByte()) != 0) bl.add(l);
+    for(byte l; (l = readByte()) != 0;) bl.add(l);
     return bl;
   }
 
@@ -167,8 +169,8 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the next character, 0 if all bytes have been read or
-   * a negative character value -1 if the read byte is invalid.
+   * Returns the next character, or {@code 0} if all bytes have been read.
+   * Erroneous characters are ignored.
    * @return next character
    * @throws IOException I/O exception
    */
@@ -211,7 +213,7 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Number of read bytes.
+   * Returns the number of read bytes.
    * @return read bytes
    */
   final int size() {
@@ -219,8 +221,8 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Length of input.
-   * @return read bytes
+   * Returns the input length.
+   * @return input length
    */
   final long length() {
     return length;

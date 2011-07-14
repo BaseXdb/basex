@@ -5,12 +5,11 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 
 /**
- * This class provides convenience operations for handling so-called
- * 'Tokens'. Tokens in this project are nothing else than UTF8 encoded strings,
- * stored in a byte array.
+ * <p>This class provides convenience operations for handling 'Tokens'.
+ * Tokens are UTF-8 encoded strings, stored in a byte array.</p>
  *
- * Note that, to guarantee a consistent string representation, all string
- * conversions should be done via the methods of this class.
+ * <p>Note that, to guarantee a consistent string representation, all string
+ * conversions should be done via the methods of this class.</p>
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -49,6 +48,8 @@ public final class Token {
   public static final byte[] ONE = { '1' };
   /** Slash. */
   public static final byte[] SLASH = { '/' };
+  /** Colon. */
+  public static final byte[] COLON = { ':' };
 
   /** Hex codes. */
   public static final byte[] HEX = token("0123456789ABCDEF");
@@ -717,18 +718,6 @@ public final class Token {
    */
   public static int indexOf(final byte[] token, final byte[] sub) {
     return indexOf(token, sub, 0);
-  }
-
-  /**
-   * Returns the last position of the specified character or -1.
-   * @param token token
-   * @param sub token to be found
-   * @return result of test
-   */
-  public static int lastIndexOf(final byte[] token, final byte[] sub) {
-    for(int t = token.length - 1, s = sub.length - 1; t >= 0 && s >= 0;
-      --t, --s) if(token[t] == sub[s]) return t;
-    return -1;
   }
 
   /**

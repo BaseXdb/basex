@@ -10,7 +10,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -44,7 +44,7 @@ public final class CSVTest {
    */
   @AfterClass
   public static void after() {
-    IO.get(Prop.TMP + NAME).delete();
+    new IOFile(Prop.TMP, NAME).delete();
   }
 
   /**
@@ -119,6 +119,6 @@ public final class CSVTest {
    * @throws IOException I/O exception
    */
   private void write(final String data) throws IOException {
-    IO.get(Prop.TMP + NAME).write(token(data));
+    new IOFile(Prop.TMP, NAME).write(token(data));
   }
 }

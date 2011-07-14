@@ -8,7 +8,7 @@ import javax.swing.filechooser.FileFilter;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Util;
 
 /**
@@ -79,8 +79,8 @@ public final class BaseXFileChooser {
    * @param mode type defined by {@link Mode}
    * @return resulting input reference
    */
-  public IO select(final Mode mode) {
-    IO io = null;
+  public IOFile select(final Mode mode) {
+    IOFile io = null;
     if(fd != null) {
       if(mode == Mode.FDOPEN) fd.setFile(" ");
       fd.setMode(mode == Mode.FSAVE || mode == Mode.DSAVE ?
@@ -90,7 +90,7 @@ public final class BaseXFileChooser {
       if(f == null) return null;
 
       final String dir = fd.getDirectory();
-      return IO.get(mode == Mode.DOPEN || mode == Mode.DSAVE ? dir :
+      return new IOFile(mode == Mode.DOPEN || mode == Mode.DSAVE ? dir :
         dir + "/" + fd.getFile());
     }
 
@@ -113,13 +113,13 @@ public final class BaseXFileChooser {
         break;
     }
     if(state != JFileChooser.APPROVE_OPTION) return null;
-    io = IO.get(fc.getSelectedFile().getPath());
+    io = new IOFile(fc.getSelectedFile().getPath());
 
     if(mode != Mode.FSAVE) return io;
 
     // add file suffix to file to be saved
     if(suffix != null && io.path().indexOf(".") == -1)
-      io = IO.get(io.path() + suffix);
+      io = new IOFile(io.path() + suffix);
 
     // show replace dialog
     return !io.exists() || Dialog.confirm(gui, Util.info(FILEREPLACE, io)) ?

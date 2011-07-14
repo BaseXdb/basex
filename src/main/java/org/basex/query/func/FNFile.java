@@ -179,7 +179,7 @@ public final class FNFile extends FuncCall {
     final String path = string(checkStr(expr[0], ctx));
     final File dir = new File(path);
 
-    // Check if not a directory
+    // check if not a directory
     if(!dir.isDirectory()) NOTDIR.thrw(input, path);
 
     final boolean rec = optionalBool(1, ctx);

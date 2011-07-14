@@ -19,6 +19,7 @@ import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.StringList;
 import org.basex.util.Util;
 
@@ -157,7 +158,7 @@ public final class DialogCreate extends Dialog {
     fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
     fc.addFilter(CREATEZIPDESC, IO.ZIPSUFFIXES);
 
-    final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
+    final IOFile file = fc.select(BaseXFileChooser.Mode.FDOPEN);
     if(file != null) {
       path.setText(file.path());
       dbname.setText(file.dbname().replaceAll("[^\\w-]", ""));

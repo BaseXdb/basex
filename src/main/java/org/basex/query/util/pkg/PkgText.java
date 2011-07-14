@@ -2,6 +2,9 @@ package org.basex.query.util.pkg;
 
 import static org.basex.util.Token.*;
 
+import org.basex.core.Text;
+import org.basex.io.IO;
+
 /**
  * This class assembles textual information for package handling.
  *
@@ -10,17 +13,13 @@ import static org.basex.util.Token.*;
  */
 public interface PkgText {
   /** Package descriptor. */
-  String DESCRIPTOR = "expath-pkg.xml";
+  String DESCRIPTOR = "expath-pkg" + IO.XMLSUFFIX;
   /**Jar descriptor. */
-  String JARDESC = "basex.xml";
-  /** Jar path prefix. */
-  String JARPREF = "jar:file:";
+  String JARDESC = Text.NAMELC + IO.XMLSUFFIX;
 
   /** <package/> root element. */
   /** Element package. */
   byte[] PACKAGE = token("package");
-  /** Element module. */
-  byte[] MODULE = token("module");
 
   /** <package/> attributes. */
   /** Attribute name. */
@@ -71,7 +70,7 @@ public interface PkgText {
   byte[] CLASS = token("class");
 
   /** Not expected initialization error. */
-  String NOTEXP = "Missing package descriptor for package '%'";
+  String MISSDESC = "Missing package descriptor for package '%'";
   /** Attribute missing. */
   String MISSATTR = "'%' attribute missing in '%' element";
   /** Invalid attribute. */

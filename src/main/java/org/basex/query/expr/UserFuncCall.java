@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -50,8 +49,8 @@ public final class UserFuncCall extends Arr {
     // compile all arguments
     super.comp(ctx);
 
-    // Inline if result and arguments are all values.
-    // Currently, only functions with values as
+    // inline if result and arguments are all values.
+    // currently, only functions with values as
     // return expressions are supported; otherwise, recursive functions
     // might not be correctly evaluated
     func.comp(ctx);
@@ -61,7 +60,7 @@ public final class UserFuncCall extends Arr {
       ctx.compInfo(OPTINLINE, func.name.atom());
       return func.value(ctx);
     }
-    // User-defined functions are not pre-evaluated to avoid various issues
+    // user-defined functions are not pre-evaluated to avoid various issues
     // with recursive functions
     type = func.type();
     return this;

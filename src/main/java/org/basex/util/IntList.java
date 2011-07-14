@@ -3,7 +3,7 @@ package org.basex.util;
 import java.util.Arrays;
 
 /**
- * This is a simple container for int values.
+ * This is a simple container for native integers.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

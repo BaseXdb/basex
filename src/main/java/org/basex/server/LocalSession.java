@@ -12,7 +12,7 @@ import org.basex.query.QueryException;
 import org.basex.util.Util;
 
 /**
- * This wrapper executes commands locally.
+ * This class offers methods to locally execute database commands.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

@@ -10,6 +10,7 @@ import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.After;
@@ -44,7 +45,7 @@ public final class AddDeleteTest {
 
   static {
     int fc = 0;
-    for(final IO c : IO.get(FLDR).children()) {
+    for(final IOFile c : new IOFile(FLDR).children()) {
       if(c.name().endsWith(IO.XMLSUFFIX)) ++fc;
     }
     FCNT = fc;
@@ -173,7 +174,7 @@ public final class AddDeleteTest {
    */
   @Test
   public void testBrokenAdd() throws Exception {
-    final IO io = IO.get(Prop.TMP + DBNAME);
+    final IOFile io = new IOFile(Prop.TMP, DBNAME);
     io.write(Token.token("<x"));
     try {
       new Add(io.path()).execute(CONTEXT);
@@ -189,7 +190,7 @@ public final class AddDeleteTest {
    */
   @Test
   public void testBrokenCreate() throws Exception {
-    final IO io = IO.get(Prop.TMP + DBNAME);
+    final IOFile io = new IOFile(Prop.TMP, DBNAME);
     io.write(Token.token("<x"));
     try {
       new CreateDB(DBNAME, io.path()).execute(CONTEXT);

@@ -1,10 +1,9 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Insert before primitive.
@@ -15,24 +14,37 @@ import org.basex.util.InputInfo;
 public final class InsertBefore extends InsertBase {
   /**
    * Constructor.
-   * @param ii input info
-   * @param n target node
-   * @param copy copy of nodes to be inserted
+   * @param p pre
+   * @param d data
+   * @param i input info
+   * @param c node copy
    */
-  public InsertBefore(final InputInfo ii, final ANode n, final NodeCache copy) {
-    super(PrimitiveType.INSERTBEFORE, ii, n, copy);
+  public InsertBefore(final int p, final Data d, final InputInfo i,
+      final NodeCache c) {
+    super(PrimitiveType.INSERTBEFORE, p, d, i, c);
   }
 
   @Override
-  public void apply(final int add) {
-    final DBNode n = (DBNode) node;
-    final Data d = n.data;
-    final int pre = n.pre;
-    d.insert(pre, d.parent(pre, d.kind(pre)), md);
+  public void apply() {
+    super.apply();
+    data.insert(pre, data.parent(pre, data.kind(pre)), md);
   }
 
   @Override
-  public int addend() {
-    return md.meta.size;
+  public boolean checkTextAdjacency(final int c) {
+    final int p = pre + c;
+    boolean merged = false;
+    final int mds = md.meta.size;
+    if(md.kind(0) == Data.TEXT)
+      merged = mergeTexts(data, p - 1, p);
+    if(!merged && md.kind(mds - 1) == Data.TEXT)
+      merged |= mergeTexts(data, p + mds - 1, p + mds);
+
+    return merged;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }

@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,7 +122,6 @@ public final class Order extends ParseExpr {
    * @author Leo Woerteler
    */
   class OrderedIter extends Iter {
-
     /** Sort keys. */
     ArrayList<Item[]> kl;
     /** Values to sort. */

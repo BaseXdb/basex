@@ -123,7 +123,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
       public void run() {
         d.setEnabled(false);
 
-        GUI gui = d.gui;
+        final GUI gui = d.gui;
         for(final Command cmd : cmds) {
           // reset views
           final boolean newData = cmd.newData(gui.context);

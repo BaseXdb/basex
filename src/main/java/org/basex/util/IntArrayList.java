@@ -3,7 +3,7 @@ package org.basex.util;
 import java.util.Iterator;
 
 /**
- * This is a simple container for int arrays.
+ * This is a simple container for native integer arrays.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

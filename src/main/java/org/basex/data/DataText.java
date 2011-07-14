@@ -25,7 +25,7 @@ public interface DataText {
   String DBTIME = "TIME";
   /** Number of nodes. */
   String DBSIZE = "SIZE";
-  /** File name. */
+  /** Path to original document. */
   String DBFNAME = "FNAME";
   /** File size. */
   String DBFSIZE = "FSIZE";

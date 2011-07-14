@@ -38,8 +38,8 @@ public enum Err {
   NOEVENT(BASX, 9, "Event '%' is unknown."),
   /** BASX0010: Parsing exception. */
   NOOPTION(BASX, 10, "Unknown database option '%'."),
-  /** BASX0011: Parsing exception. */
-  INVOPTION(BASX, 11, "Invalid value for database option '%'."),
+  /** BASX11: Parsing exception. */
+  PARWHICH(BASX, 11, "Unexpected element: %."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -121,7 +121,7 @@ public enum Err {
   PATHINVALID(FOFL, 9999, "Invalid file path: '%'."),
 
   /** FOZP0001: Evaluation exception. */
-  ZIPNOTFOUND(FOZP, 1, "Path '%' not found."),
+  ZIPNOTFOUND(FOZP, 1, "Path '%' is not found."),
   /** FOZP0002: Evaluation exception. */
   ZIPINVALID(FOZP, 2, "% element: % attribute expected."),
   /** FOZP0002: Evaluation exception. */
@@ -136,7 +136,7 @@ public enum Err {
   /** FOHC003: Evaluation exception. */
   SRCATTR(FOHC, 3, "No attribute beside 'src' and 'media-type' allowed."),
   /** FOHC0004: Evaluation exception. */
-  REQINV(FOHC, 4, "The request element is not valid: %"),
+  REQINV(FOHC, 4, "The request element is invalid: %."),
   /** FOHC005: Evaluation exception. */
   NOURL(FOHC, 5, "No URL specified."),
   /** FOHC006: Evaluation exception. */
@@ -145,29 +145,27 @@ public enum Err {
   /** PACK0001: Evaluation exception. */
   PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
   /** PACK0002: Evaluation exception. */
-  PKGINST(PACK, 2, "Package is already installed."),
+  PKGINST(PACK, 2, "Package '%' is already installed."),
   /** PACK0003: Evaluation exception. */
   NECPKGNOTINST(PACK, 3, "Necessary package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
   PKGDESCINV(PACK, 4, "Package descriptor: %."),
-  /** PACK0005: Evaluation exception. */
-  INVPKGNAME(PACK, 5, "Package must be a .xar file."),
+  /** PACK0004: Evaluation exception. */
+  MODISTALLED(PACK, 5, "Module % is already installed within another package."),
   /** PACK0006: Evaluation exception. */
-  MODISTALLED(PACK, 6, "Module % is already installed within another package."),
+  PKGREADFAIL(PACK, 6, "Package '%' could not be parsed: %."),
+  /** PACK0006: Evaluation exception. */
+  PKGREADFNF(PACK, 6, "Package '%' could not be parsed: '%' not found."),
   /** PACK0007: Evaluation exception. */
-  PKGREADFAIL(PACK, 7, "Reading package descriptor failed: %"),
+  CANNOTDELPKG(PACK, 7, "Package cannot be deleted."),
   /** PACK0008: Evaluation exception. */
-  CANNOTDELPKG(PACK, 8, "Package cannot be deleted. "),
+  PKGDEP(PACK, 8, "Package '%' depends on package '%'."),
   /** PACK0009: Evaluation exception. */
-  PKGDEP(PACK, 9, "Package % depends on package %"),
+  PKGNOTSUPP(PACK, 9, "Package is not supported by database version."),
   /** PACK0010: Evaluation exception. */
-  PKGNOTSUPP(PACK, 10, "Package is not supported by current version of BaseX."),
+  JARDESCINV(PACK, 10, "Jar descriptor: %."),
   /** PACK0011: Evaluation exception. */
-  JARDESCINV(PACK, 11, "Jar descriptor: %."),
-  /** PACK0012: Evaluation exception. */
-  JARREADFAIL(PACK, 12, "Reading jar descriptor failed: %"),
-  /** PACK0013: Evaluation exception. */
-  PKGNOTINST(PACK, 13, "Package '%' is not installed."),
+  JARREADFAIL(PACK, 11, "Reading jar descriptor failed: %."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
@@ -228,18 +226,18 @@ public enum Err {
   REGERR(FORX, 4, "Regular expression: '%'."),
 
   /** FOTY0012: Type exception. */
-  NOTYP(FOTY, 12, "Item doesn't have a typed value: %"),
+  NOTYP(FOTY, 12, "Item has no typed value: %."),
   /** FOTY0013: Type exception. */
-  FNATM(FOTY, 13, "Function items can't be atomized: %"),
+  FNATM(FOTY, 13, "Function items cannot be atomized: %."),
   /** FOTY0013: Type exception. */
-  FNEQ(FOTY, 13, "Function items don't have a defined equality: %"),
+  FNEQ(FOTY, 13, "Function items have no defined equality: %."),
   /** FOTY0013: Type exception. */
-  FNSTR(FOTY, 14, "Function items don't have a string representation: %"),
+  FNSTR(FOTY, 14, "Function items have no string representation: %."),
   /** FOTY0013: Type exception. */
-  FNCMP(FOTY, 15, "Function items can't be compared: %"),
+  FNCMP(FOTY, 15, "Function items cannot be compared: %."),
 
   /** FOFU0001: Invalid value of $argNum in call to fn:partial-apply. */
-  INVPOS(FOFU, 1, "Illegal argument position for %: %"),
+  INVPOS(FOFU, 1, "Illegal argument position for %: %."),
 
   /** FOUP0001: Evaluation exception. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
@@ -251,7 +249,7 @@ public enum Err {
   /** FTDY0016: Evaluation exception. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),
   /** FTDY0017: Evaluation exception. */
-  FTMILD(FTDY, 17, "Invalid mild not selection."),
+  FTMILD(FTDY, 17, "Invalid 'mild not' selection."),
   /** FTDY0020: Evaluation exception. */
   FTREG(FTDY, 20, "Invalid wildcard syntax: '%'."),
 
@@ -441,7 +439,7 @@ public enum Err {
   INTEXP(XPST, 3, "Integer expected."),
 
   /** XPST0005: Parsing exception. */
-  COMPSELF(XPST, 5, "Warning: '%' will not yield any results."),
+  COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
 
   /** XPST0008: Parsing exception. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
@@ -474,12 +472,16 @@ public enum Err {
   XPSEQ(XPTY, 4, "No sequence % allowed."),
   /** XPTY0004: Typing exception. */
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
-  /** XPTY0004: Typing exception. */
-  XPINVPROM(XPTY, 4, "Can't promote type % to %: %."),
+  /** XPTY0004: Promoting exception. */
+  XPINVPROM(XPTY, 4, "Cannot promote type % to %: %."),
   /** XPTY0004: Typing exception. */
   XPCAST(XPTY, 4, "Invalid %(%) cast."),
   /** XPTY0004: Typing Exception. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
+  /** XPTY0004: Typing Exception. */
+  STRNODTYPE(XPTY, 4, "%: xs:string or node() expected, % found."),
+  /** XPTY0004: Typing Exception. */
+  NODFUNTYPE(XPTY, 4, "%: node() or map expected, % found."),
   /** XPTY0004: Typing Exception. */
   SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
   /** XPTY0004: Typing exception. */
@@ -685,8 +687,6 @@ public enum Err {
   UPEXPECTT(XUST, 2, "Updating expression expected in modify clause."),
   /** XUST0002: Parsing exception. */
   UPEXPECTF(XUST, 2, "Updating expression expected in function declaration."),
-  /** XUST0002: Parsing exception. */
-  UPEXPFUN(XUST, 2, "Updating expression expected in %."),
   /** XUST0003: Parsing exception. */
   DUPLREVAL(XUST, 3, "Duplicate 'revalidation' declaration."),
   /** XUST0026: Parsing exception. */
@@ -772,75 +772,44 @@ public enum Err {
 
   /**
    * Error types.
+   *
+   * @author BaseX Team 2005-11, BSD License
    * @author Leo Woerteler
    */
   public static enum ErrType {
-    /** BASX Error type. */
-    BASX,
-    /** FOAR Error type. */
-    FOAR,
-    /** FOCA Error type. */
-    FOCA,
-    /** FOCH Error type. */
-    FOCH,
-    /** FODC Error type. */
-    FODC,
-    /** FODF Error type. */
-    FODF,
-    /** FODT Error type. */
-    FODT,
-    /** FOER Error type. */
-    FOER,
-    /** FOFL Error type. */
-    FOFL,
-    /** FOFU Error type. */
-    FOFU,
-    /** FOHP Error type. */
-    FOHC,
-    /** FONS Error type. */
-    FONS,
-    /** FORG Error type. */
-    FORG,
-    /** FORX Error type. */
-    FORX,
-    /** FOTY Error type. */
-    FOTY,
-    /** FOUP Error type. */
-    FOUP,
-    /** FOZP Error type. */
-    FOZP,
-    /** FTDY Error type. */
-    FTDY,
-    /** FTST Error type. */
-    FTST,
-    /** PACK Error type. */
-    PACK,
-    /** SEPM Error type. */
-    SEPM,
-    /** SERE Error type. */
-    SERE,
-    /** SEPM Error type. */
-    SESU,
-    /** XPDY Error type. */
-    XPDY,
-    /** XPST Error type. */
-    XPST,
-    /** XPTY Error type. */
-    XPTY,
-    /** XQDY Error type. */
-    XQDY,
-    /** XQST Error type. */
-    XQST,
-    /** XQTY Error type. */
-    XQTY,
-    /** XQTD Error type. */
-    XTDE,
-    /** XUDY Error type. */
-    XUDY,
-    /** XUST Error type. */
-    XUST,
-    /** XUTY Error type. */
-    XUTY;
+    /** BASX Error type. */ BASX,
+    /** FOAR Error type. */ FOAR,
+    /** FOCA Error type. */ FOCA,
+    /** FOCH Error type. */ FOCH,
+    /** FODC Error type. */ FODC,
+    /** FODF Error type. */ FODF,
+    /** FODT Error type. */ FODT,
+    /** FOER Error type. */ FOER,
+    /** FOFL Error type. */ FOFL,
+    /** FOFU Error type. */ FOFU,
+    /** FOHP Error type. */ FOHC,
+    /** FONS Error type. */ FONS,
+    /** FORG Error type. */ FORG,
+    /** FORX Error type. */ FORX,
+    /** FOTY Error type. */ FOTY,
+    /** FOUP Error type. */ FOUP,
+    /** FOZP Error type. */ FOZP,
+    /** FTDY Error type. */ FTDY,
+    /** FTST Error type. */ FTST,
+    /** PACK Error type. */ PACK,
+    /** SEPM Error type. */ SEPM,
+    /** SERE Error type. */ SERE,
+    /** SEPM Error type. */ SESU,
+    /** XPDY Error type. */ XPDY,
+    /** XPST Error type. */ XPST,
+    /** XPTY Error type. */ XPTY,
+    /** XQDY Error type. */ XQDY,
+    /** XQST Error type. */ XQST,
+    /** XQTY Error type. */ XQTY,
+    /** XQTD Error type. */ XTDE,
+    /** XUDY Error type. */ XUDY,
+    /** XUST Error type. */ XUST,
+    /** XUTY Error type. */ XUTY;
   }
 
   /**
@@ -870,7 +839,7 @@ public enum Err {
   }
 
   /**
-   * Throws a type cast exception.
+   * Throws a type promoting exception.
    * @param ii input info
    * @param t expression cast type
    * @param v value

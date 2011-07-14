@@ -29,7 +29,7 @@ public final class UpdateTestText extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.atom(4));
+    assertArraysEquals(JUNIT, data.atom(4));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.TEXT));
@@ -38,7 +38,7 @@ public final class UpdateTestText extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.atom(4));
+    assertArraysEquals(JUNIT, data.atom(4));
   }
 
   /**
@@ -57,7 +57,7 @@ public final class UpdateTestText extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.atom(4));
+    assertArraysEquals(JUNIT, data.atom(4));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.TEXT));
@@ -66,7 +66,7 @@ public final class UpdateTestText extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.atom(4));
+    assertArraysEquals(JUNIT, data.atom(4));
   }
 
   /**
@@ -85,7 +85,7 @@ public final class UpdateTestText extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.atom(4));
+    assertArraysEquals(JUNIT, data.atom(4));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.TEXT));
@@ -94,7 +94,7 @@ public final class UpdateTestText extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.atom(4));
+    assertArraysEquals(JUNIT, data.atom(4));
   }
 
   /**
@@ -109,7 +109,7 @@ public final class UpdateTestText extends UpdateTest {
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.TEXT, data.kind(9));
     assertEquals(6, data.parent(9, Data.TEXT));
-    assertByteArraysEqual(JUNIT, data.atom(9));
+    assertArraysEquals(JUNIT, data.atom(9));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
@@ -117,7 +117,7 @@ public final class UpdateTestText extends UpdateTest {
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.TEXT, data.kind(9));
     assertEquals(6, data.parent(9, Data.TEXT));
-    assertByteArraysEqual(JUNIT, data.atom(9));
+    assertArraysEquals(JUNIT, data.atom(9));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
@@ -134,7 +134,7 @@ public final class UpdateTestText extends UpdateTest {
     insertText(6, 2, JUNIT, Data.TEXT);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertByteArraysEqual(JUNIT, data.atom(11));
+    assertArraysEquals(JUNIT, data.atom(11));
     assertEquals(6, data.parent(11, Data.TEXT));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -143,7 +143,7 @@ public final class UpdateTestText extends UpdateTest {
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertByteArraysEqual(JUNIT, data.atom(11));
+    assertArraysEquals(JUNIT, data.atom(11));
     assertEquals(6, data.parent(11, Data.TEXT));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -161,7 +161,7 @@ public final class UpdateTestText extends UpdateTest {
     insertText(6, 0, JUNIT, Data.TEXT);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertByteArraysEqual(JUNIT, data.atom(11));
+    assertArraysEquals(JUNIT, data.atom(11));
     assertEquals(6, data.parent(11, Data.TEXT));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -169,7 +169,7 @@ public final class UpdateTestText extends UpdateTest {
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertByteArraysEqual(JUNIT, data.atom(11));
+    assertArraysEquals(JUNIT, data.atom(11));
     assertEquals(6, data.parent(11, Data.TEXT));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -211,10 +211,10 @@ public final class UpdateTestText extends UpdateTest {
     final Data data = CONTEXT.data;
     data.replace(10, Data.TEXT, JUNIT);
     assertEquals(Data.TEXT, data.kind(10));
-    assertByteArraysEqual(JUNIT, data.text(10, true));
+    assertArraysEquals(JUNIT, data.text(10, true));
     reload();
     assertEquals(Data.TEXT, data.kind(10));
-    assertByteArraysEqual(JUNIT, data.text(10, true));
+    assertArraysEquals(JUNIT, data.text(10, true));
   }
 
   /**

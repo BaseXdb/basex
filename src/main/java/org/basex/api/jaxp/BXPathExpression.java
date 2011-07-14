@@ -103,7 +103,9 @@ final class BXPathExpression implements XPathExpression {
 
     try {
       final ArrayOutput ao = new ArrayOutput();
-      item.serialize(new XMLSerializer(ao));
+      final XMLSerializer xml = new XMLSerializer(ao);
+      item.serialize(xml);
+      xml.close();
       final String val = ao.toString();
       if(res == XPathConstants.NUMBER) return Double.valueOf(val);
       if(res == XPathConstants.STRING) return val;

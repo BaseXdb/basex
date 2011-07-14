@@ -16,6 +16,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIMacOSX;
 import org.basex.gui.GUIProp;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Args;
 import org.basex.util.Util;
 
@@ -77,7 +78,7 @@ public final class BaseXGUI {
         // open specified document or database
         if(file != null) {
           final String input = file.replace('\\', '/');
-          final IO io = IO.get(input);
+          final IOFile io = new IOFile(input);
           boolean xq = false;
           for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
           if(xq) {

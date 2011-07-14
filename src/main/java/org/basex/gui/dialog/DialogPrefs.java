@@ -17,7 +17,7 @@ import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 
 /**
  * Dialog window for changing some project's preferences.
@@ -70,7 +70,7 @@ public final class DialogPrefs extends Dialog {
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final IO file = new BaseXFileChooser(DIALOGFC, path.getText(),
+        final IOFile file = new BaseXFileChooser(DIALOGFC, path.getText(),
             gui).select(BaseXFileChooser.Mode.DOPEN);
         if(file != null) path.setText(file.dir());
       }

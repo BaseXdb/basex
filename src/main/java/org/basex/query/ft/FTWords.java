@@ -1,6 +1,6 @@
 package org.basex.query.ft;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 

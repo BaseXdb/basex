@@ -7,7 +7,7 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.data.Data;
-import org.basex.server.ServerProcess;
+import org.basex.server.ClientListener;
 import org.basex.util.Util;
 
 /**
@@ -46,7 +46,7 @@ public final class DropUser extends AUser {
 
     // drop global user
     if(db == null) {
-      for(final ServerProcess s : context.sessions) {
+      for(final ClientListener s : context.sessions) {
         if(s.user().name.equals(user)) return !info(USERLOG, user);
       }
       context.users.drop(context.users.get(user));

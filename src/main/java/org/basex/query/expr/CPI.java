@@ -4,7 +4,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
@@ -57,7 +57,7 @@ public final class CPI extends CFrag {
 
   @Override
   public String desc() {
-    return info(QueryTokens.PI);
+    return info(QueryText.PI);
   }
 
   @Override

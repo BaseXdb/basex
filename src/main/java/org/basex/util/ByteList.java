@@ -29,15 +29,6 @@ public final class ByteList extends ElementList {
   }
 
   /**
-   * Returns the entry at the specified position.
-   * @param p position
-   * @return entry
-   */
-  public byte get(final int p) {
-    return list[p];
-  }
-
-  /**
    * Adds an entry to the array.
    * @param e entry to be added
    * @return self reference

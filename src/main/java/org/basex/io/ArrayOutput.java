@@ -61,6 +61,6 @@ public final class ArrayOutput extends PrintOutput {
 
   @Override
   public String toString() {
-    return Token.string(toArray());
+    return Token.string(buf, 0, size);
   }
 }

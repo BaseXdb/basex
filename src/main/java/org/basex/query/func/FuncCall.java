@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -39,7 +39,7 @@ public abstract class FuncCall extends Arr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public final Expr comp(final QueryContext ctx) throws QueryException {
     // compile all arguments
     super.comp(ctx);
     // skip functions based on context or with non-values as arguments
@@ -65,13 +65,13 @@ public abstract class FuncCall extends Arr {
    * @return atomized item
    * @throws QueryException query exception
    */
-  protected Item atom(final Item it) throws QueryException {
+  protected final Item atom(final Item it) throws QueryException {
     return it.node() ? it.type == NodeType.PI || it.type == NodeType.COM ?
         Str.get(it.atom(input)) : new Atm(it.atom(input)) : it;
   }
 
   @Override
-  public boolean isFun(final Function f) {
+  public final boolean isFun(final Function f) {
     return def == f;
   }
 

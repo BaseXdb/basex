@@ -3,8 +3,7 @@ package org.basex.build.file;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import org.basex.build.FileParser;
-import org.basex.build.ParserProp;
+import org.basex.build.SingleParser;
 import org.basex.core.Prop;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
@@ -32,7 +31,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class TextParser extends FileParser {
+public final class TextParser extends SingleParser {
   /** Text element. */
   private static final byte[] TEXT = token("text");
   /** Line element. */
@@ -65,7 +64,7 @@ public final class TextParser extends FileParser {
   public void parse() throws IOException {
     builder.startElem(TEXT, atts);
 
-    final BufferInput bi = new BufferInput(file.path());
+    final BufferInput bi = new BufferInput(src.path());
     bi.encoding(encoding);
 
     final TokenBuilder tb = new TokenBuilder();

@@ -61,9 +61,7 @@ public abstract class AProp {
       BufferedReader br = null;
       try {
         br = new BufferedReader(new FileReader(file));
-        String line = null;
-
-        while((line = br.readLine()) != null) {
+        for(String line; (line = br.readLine()) != null;) {
           line = line.trim();
           if(line.isEmpty() || line.charAt(0) == '#') continue;
           final int d = line.indexOf('=');
@@ -148,10 +146,10 @@ public abstract class AProp {
       // caches options specified by the user
       if(file.exists()) {
         br = new BufferedReader(new FileReader(file));
-        String line = null;
-        while((line = br.readLine()) != null)
+        for(String line; (line = br.readLine()) != null;) {
           if(line.equals(PROPUSER)) break;
-        while((line = br.readLine()) != null) {
+        }
+        for(String line; (line = br.readLine()) != null;) {
           user.append(line);
           user.append(NL);
         }

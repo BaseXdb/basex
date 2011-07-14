@@ -148,7 +148,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
     throw ioe;
   }
 
-  // Entity Resolver
+  // EntityResolver
   /* public InputSource resolveEntity(String pub, String sys) { } */
 
   // DTDHandler

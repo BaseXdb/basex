@@ -37,7 +37,7 @@ public final class RepoInstall extends Command {
   @Override
   protected boolean run() throws IOException {
     try {
-      new RepoManager(context).install(args[0], ii);
+      new RepoManager(context.repo).install(args[0], ii);
       return info(REPOINST, args[0], perf);
     } catch(final QueryException ex) {
       Util.debug(ex);

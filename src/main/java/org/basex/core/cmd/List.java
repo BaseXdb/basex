@@ -8,7 +8,7 @@ import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.data.MetaData;
 import org.basex.io.DataInput;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
@@ -76,7 +76,7 @@ public final class List extends Command {
    */
   public static StringList list(final Context ctx) {
     final StringList db = new StringList();
-    for(final IO f : ctx.prop.dbpath().children()) {
+    for(final IOFile f : ctx.prop.dbpath().children()) {
       if(f.name().startsWith(".")) continue;
       if(f.isDir()) db.add(f.name());
     }

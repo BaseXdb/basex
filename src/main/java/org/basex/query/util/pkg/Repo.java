@@ -3,8 +3,6 @@ package org.basex.query.util.pkg;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
-import java.io.File;
-
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
@@ -16,24 +14,26 @@ import org.basex.util.TokenSet;
 import org.basex.util.Util;
 
 /**
- * Repository.
+ * Repository manager.
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
 public final class Repo {
+  /** Context. */
+  public final Context context;
+
   /**
-   * Namespace-dictionary - contains all namespaces available in the repository
-   * and the packages in which they are found.
+   * Namespace-dictionary with all namespaces (unique names) available
+   * in the repository, and the packages in which they are found.
    */
   private final TokenObjMap<TokenSet> nsDict = new TokenObjMap<TokenSet>();
   /** Package dictionary with installed packages and their directories. */
   private final TokenMap pkgDict = new TokenMap();
-  /** Context. */
-  private final Context context;
+
   /** Initialization flag (the repository can only be initialized once). */
   private boolean init;
   /** Repository path. */
-  private File path;
+  private IOFile path;
 
   /**
    * Constructor.
@@ -41,7 +41,7 @@ public final class Repo {
    */
   public Repo(final Context ctx) {
     context = ctx;
-    path = new File(ctx.prop.get(Prop.REPOPATH));
+    path = new IOFile(ctx.prop.get(Prop.REPOPATH));
   }
 
   /**
@@ -73,18 +73,11 @@ public final class Repo {
 
     if(repo != null) {
       context.prop.set(Prop.REPOPATH, repo);
-      path = new File(repo);
+      path = new IOFile(repo);
     }
-    final File[] dirs = path.listFiles();
-    if(dirs == null) return;
-    for(final File dir : dirs) if(dir.isDirectory()) readPkg(dir);
-  }
-
-  /**
-   * Creates the repository directory, if not done yet.
-   */
-  public void create() {
-    if(!path.exists()) path.mkdirs();
+    for(final IOFile dir : path.children()) {
+      if(dir.isDir()) readPkg(dir);
+    }
   }
 
   /**
@@ -92,8 +85,8 @@ public final class Repo {
    * @param pkg package
    * @return file reference
    */
-  public File path(final String pkg) {
-    return new File(path, pkg);
+  public IOFile path(final String pkg) {
+    return new IOFile(path, pkg);
   }
 
   /**
@@ -102,18 +95,19 @@ public final class Repo {
    * @param pkg deleted package
    */
   public synchronized void remove(final Package pkg) {
-    // Delete package from namespace dictionary
+    final byte[] name = pkg.uniqueName();
+    // delete package from namespace dictionary
     for(final Component comp : pkg.comps) {
-      final byte[] ns = comp.uri;
-      final TokenSet pkgs = nsDict.get(ns);
+      final byte[] uri = comp.uri;
+      final TokenSet pkgs = nsDict.get(uri);
       if(pkgs.size() > 1) {
-        pkgs.delete(pkg.getUniqueName());
+        pkgs.delete(name);
       } else {
-        nsDict.delete(ns);
+        nsDict.delete(uri);
       }
     }
-    // Delete package from package dictionary
-    pkgDict.delete(pkg.getUniqueName());
+    // delete package from package dictionary
+    pkgDict.delete(name);
   }
 
   /**
@@ -122,18 +116,17 @@ public final class Repo {
    * @param dir new package directory
    */
   public synchronized void add(final Package pkg, final String dir) {
-    // Update namespace dictionary
+    final byte[] name = pkg.uniqueName();
+    // update namespace dictionary
     for(final Component comp : pkg.comps) {
       if(nsDict.id(comp.uri) == 0) {
-        final TokenSet vals = new TokenSet();
-        vals.add(pkg.getUniqueName());
-        nsDict.add(comp.uri, vals);
+        nsDict.add(comp.uri, new TokenSet(name));
       } else {
-        nsDict.get(comp.uri).add(pkg.getUniqueName());
+        nsDict.get(comp.uri).add(name);
       }
     }
-    // Update package dictionary
-    pkgDict.add(pkg.getUniqueName(), token(dir));
+    // update package dictionary
+    pkgDict.add(name, token(dir));
   }
 
   /**
@@ -141,31 +134,30 @@ public final class Repo {
    * namespace-dictionary and packages - to package dictionary.
    * @param dir package directory
    */
-  private void readPkg(final File dir) {
+  private void readPkg(final IOFile dir) {
     final IOFile desc = new IOFile(dir, DESCRIPTOR);
     if(desc.exists()) {
       try {
-        final Package pkg = new PkgParser(context, null).parse(desc);
-        // Read package components
+        final Package pkg = new PkgParser(context.repo, null).parse(desc);
+        final byte[] name = pkg.uniqueName();
+        // read package components
         for(final Component comp : pkg.comps) {
-          // Add component's namespace to namespace dictionary
+          // add component's namespace to namespace dictionary
           if(comp.uri != null) {
-            if(nsDict.get(comp.uri) != null) {
-              nsDict.get(comp.uri).add(pkg.getUniqueName());
+            if(nsDict.id(comp.uri) != 0) {
+              nsDict.get(comp.uri).add(name);
             } else {
-              final TokenSet vals = new TokenSet();
-              vals.add(pkg.getUniqueName());
-              nsDict.add(comp.uri, vals);
+              nsDict.add(comp.uri, new TokenSet(name));
             }
           }
         }
-        // Add package to package dictionary
-        pkgDict.add(pkg.getUniqueName(), token(dir.getName()));
+        // add package to package dictionary
+        pkgDict.add(name, token(dir.name()));
       } catch(final QueryException ex) {
         Util.errln(ex.getMessage());
       }
     } else {
-      Util.errln(NOTEXP, dir);
+      Util.errln(MISSDESC, dir);
     }
   }
 }

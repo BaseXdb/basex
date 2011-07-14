@@ -8,12 +8,12 @@ import java.net.Socket;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.BufferInput;
-import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Log;
 import org.basex.server.LoginException;
-import org.basex.server.ServerProcess;
+import org.basex.server.ClientListener;
 import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -42,7 +42,7 @@ public class BaseXServer extends Main {
   /** Flag for server activity. */
   boolean running;
   /** Stop file. */
-  IO stop;
+  IOFile stop;
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
@@ -118,7 +118,7 @@ public class BaseXServer extends Main {
     while(running) {
       try {
         final Socket s = socket.accept();
-        final ServerProcess sp = new ServerProcess(s, context, log);
+        final ClientListener sp = new ClientListener(s, context, log);
         if(stop.exists()) {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit(false);
@@ -137,8 +137,8 @@ public class BaseXServer extends Main {
    * @param port server port
    * @return stop file
    */
-  private static IO stopFile(final int port) {
-    return IO.get(Prop.TMP + Util.name(BaseXServer.class) + port);
+  private static IOFile stopFile(final int port) {
+    return new IOFile(Prop.TMP, Util.name(BaseXServer.class) + port);
   }
 
   @Override
@@ -290,7 +290,7 @@ public class BaseXServer extends Main {
    * @param eport event port
    */
   public static void stop(final int port, final int eport) {
-    final IO stop = stopFile(port);
+    final IOFile stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
       new Socket(LOCALHOST, eport);
@@ -321,7 +321,7 @@ public class BaseXServer extends Main {
           }
           final BufferInput bi = new BufferInput(es.getInputStream());
           final long id = Long.parseLong(bi.readString());
-          for(final ServerProcess s : context.sessions) {
+          for(final ClientListener s : context.sessions) {
             if(s.getId() == id) {
               s.register(es);
               break;

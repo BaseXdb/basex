@@ -1,6 +1,6 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -47,15 +47,6 @@ public final class MapType extends FuncType {
     if(!it.map() || !((Map) it).hasType(this)) throw Err.cast(ii, this, it);
 
     return (Map) it;
-  }
-
-  @Override
-  public boolean instance(final Type t) {
-//    if(t instanceof MapType) {
-//      final MapType mt = (MapType) t;
-//      return mt.keyType.instance(keyType) && ret.instance(mt.ret);
-//    }
-    return super.instance(t);
   }
 
   /**

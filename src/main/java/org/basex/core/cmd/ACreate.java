@@ -107,13 +107,13 @@ abstract class ACreate extends Command {
       abort();
       final String msg = ex.getMessage();
       return error(msg != null && msg.length() != 0 ? msg :
-        Util.info(PARSEERR, p.file));
+        Util.info(PARSEERR, p.src));
     } catch(final Exception ex) {
-      // Known exceptions:
+      // known exceptions:
       // - IllegalArgumentException (UTF8, zip files)
       Util.debug(ex);
       abort();
-      return error(Util.info(PARSEERR, p.file));
+      return error(Util.info(PARSEERR, p.src));
     }
   }
 

@@ -1,6 +1,6 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -65,7 +65,7 @@ public abstract class Seq extends Value {
   public final int hash(final InputInfo ii) throws QueryException {
     // final hash function because equivalent sequences *must* produce the
     // same hash value, otherwise they get lost in hash maps.
-    // Example: hash(RangeSeq(1 to 3)) == hash(ItrSeq(1, 2, 3))
+    // example: hash(RangeSeq(1 to 3)) == hash(ItrSeq(1, 2, 3))
     //                                 == hash(ItemSeq(Itr(1), Itr(2), Itr(3)))
     int h = 1;
     for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(ii);

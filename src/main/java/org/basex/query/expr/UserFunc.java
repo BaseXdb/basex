@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -63,7 +62,7 @@ public class UserFunc extends Single {
    * Checks the function for updating behavior.
    * @throws QueryException query exception
    */
-  public void check() throws QueryException {
+  public final void check() throws QueryException {
     if(!declared || expr == null) FUNCUNKNOWN.thrw(input, name.atom());
 
     final boolean u = expr.uses(Use.UPD);

@@ -2,7 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.item.FComm;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
@@ -44,7 +44,7 @@ public final class CComm extends CFrag {
 
   @Override
   public String desc() {
-    return info(QueryTokens.COMMENT);
+    return info(QueryText.COMMENT);
   }
 
   @Override

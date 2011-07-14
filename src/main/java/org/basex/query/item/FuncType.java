@@ -7,7 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.UserFunc;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
-import static org.basex.query.QueryTokens.*;
+import static org.basex.query.QueryText.*;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -42,43 +42,43 @@ public class FuncType implements Type {
   }
 
   @Override
-  public boolean dat() {
+  public final boolean dat() {
     return false;
   }
 
   @Override
-  public boolean dur() {
+  public final boolean dur() {
     return false;
   }
 
   @Override
-  public boolean node() {
+  public final boolean node() {
     return false;
   }
 
   @Override
-  public boolean num() {
+  public final boolean num() {
     return false;
   }
 
   @Override
-  public SeqType seq() {
+  public final SeqType seq() {
     if(seq == null) seq = new SeqType(this);
     return seq;
   }
 
   @Override
-  public boolean str() {
+  public final boolean str() {
     return false;
   }
 
   @Override
-  public boolean unt() {
+  public final boolean unt() {
     return false;
   }
 
   @Override
-  public boolean func() {
+  public final boolean func() {
     return true;
   }
 
@@ -96,12 +96,12 @@ public class FuncType implements Type {
   }
 
   @Override
-  public Item e(final Object o, final InputInfo ii) {
+  public final Item e(final Object o, final InputInfo ii) {
     throw Util.notexpected(o);
   }
 
   @Override
-  public boolean instance(final Type t) {
+  public final boolean instance(final Type t) {
     // the only non-function super-type of function is item()
     if(!(t instanceof FuncType)) return t == AtomType.ITEM;
     final FuncType ft = (FuncType) t;
@@ -152,23 +152,12 @@ public class FuncType implements Type {
     return new FuncType(at, f.ret == null ? SeqType.ITEM_ZM : f.ret);
   }
 
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
-    if(this == ANY_FUN) {
-      tb.add('*').add(')');
-    } else {
-      tb.addSep(args, ", ").add(") as ").add(ret.toString());
-    }
-    return tb.toString();
-  }
-
   /**
    * Sets the types of the given variables.
    * @param vars variables to type
    * @return the variables for convenience
    */
-  public Var[] type(final Var[] vars) {
+  public final Var[] type(final Var[] vars) {
     if(this != ANY_FUN) {
       for(int v = 0; v < vars.length; v++)
         if(vars[v] != null && args[v] != SeqType.ITEM_ZM)
@@ -180,5 +169,16 @@ public class FuncType implements Type {
   @Override
   public boolean map() {
     return false;
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
+    if(this == ANY_FUN) {
+      tb.add('*').add(')');
+    } else {
+      tb.addSep(args, ", ").add(") as ").add(ret.toString());
+    }
+    return tb.toString();
   }
 }

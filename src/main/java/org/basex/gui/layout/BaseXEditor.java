@@ -191,8 +191,7 @@ public class BaseXEditor extends BaseXPanel {
    */
   public final void setSyntax(final IO file) {
     // choose XML or XQuery highlighter
-    setSyntax(file.name().endsWith(IO.XMLSUFFIX) ? new XMLSyntax() :
-      new XQuerySyntax());
+    setSyntax(file.xml() ? new XMLSyntax() : new XQuerySyntax());
   }
 
   /**

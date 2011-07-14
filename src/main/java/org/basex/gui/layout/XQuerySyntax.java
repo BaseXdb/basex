@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import org.basex.gui.GUIConstants;
-import org.basex.query.QueryTokens;
+import org.basex.query.QueryText;
 import org.basex.query.func.Function;
 import org.basex.util.Util;
 import org.basex.util.XMLToken;
@@ -37,7 +37,7 @@ public final class XQuerySyntax extends BaseXSyntax {
   // initialize xquery keys
   static {
     try {
-      for(final Field f : QueryTokens.class.getFields()) {
+      for(final Field f : QueryText.class.getFields()) {
         if(f.getName().equals("IGNORE")) break;
         final String s = (String) f.get(null);
         for(final String ss : s.split("-")) KEYS.add(ss);

@@ -5,11 +5,9 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.item.MapType;
 import org.basex.query.item.Value;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -124,17 +122,6 @@ public final class FNMap extends FuncCall {
   private Bln contains(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return getMap(ctx).contains(expr[1].item(ctx, ii), ii);
-  }
-
-  /**
-   * Assures that the given (non-{@code null}) item is a map.
-   * @param it item to check
-   * @return the map
-   * @throws QueryException if the item is not a map
-   */
-  private Map checkMap(final Item it) throws QueryException {
-    if(it instanceof Map) return (Map) it;
-    throw Err.type(this, MapType.ANY_MAP, it);
   }
 
   /**
