@@ -123,4 +123,11 @@ public final class If extends Arr {
     return IF + '(' + expr[0] + ") " + THEN + ' ' + expr[1] + ' ' +
       ELSE + ' ' + expr[2];
   }
+
+  @Override
+  Expr markTailCalls() {
+    expr[1] = expr[1].markTailCalls();
+    expr[2] = expr[2].markTailCalls();
+    return this;
+  }
 }

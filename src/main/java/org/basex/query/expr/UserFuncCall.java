@@ -5,10 +5,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
+import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -19,11 +17,50 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class UserFuncCall extends Arr {
+public abstract class UserFuncCall extends Arr {
+  /**
+   * A continuation that's thrown to free stack frames.
+   * @author Leo Woerteler
+   */
+  public final class Continuation extends RuntimeException {
+    /** Arguments. */
+    private final Var[] args;
+
+    /**
+     * Constructor.
+     * @param arg arguments
+     */
+    public Continuation(final Var[] arg) {
+      args = arg;
+    }
+
+    /**
+     * Getter for the continuation function.
+     * @return the next function to call
+     */
+    Expr getFunc() {
+      return func;
+    }
+
+    /**
+     * Getter for the function arguments.
+     * @return the next function call's arguments
+     */
+    Var[] getArgs() {
+      return args;
+    }
+
+    @Override
+    public synchronized Continuation fillInStackTrace() {
+      // ignore this for efficiency reasons
+      return this;
+    }
+  }
+
   /** Function name. */
-  private final QNm name;
+  final QNm name;
   /** Function reference. */
-  private UserFunc func;
+  UserFunc func;
 
   /**
    * Function constructor.
@@ -66,49 +103,33 @@ public final class UserFuncCall extends Arr {
     return this;
   }
 
-  @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
-    // cache arguments, evaluate function and reset variable scope
-    final int s = cache(ctx);
-    final Item it = func.item(ctx, ii);
-    ctx.vars.reset(s);
-    return it;
-  }
-
-  @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    // cache arguments, evaluate function and reset variable scope
-    final int s = cache(ctx);
-    final Value v = func.value(ctx);
-    ctx.vars.reset(s);
-    return v;
-  }
-
-  @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    // [LW] make result streamable
-    return value(ctx).iter();
+  /**
+   * Adds the given arguments to the variable stack.
+   * @param ctx query context
+   * @param vs variables to add
+   * @return old stack size
+   */
+  int addArgs(final QueryContext ctx, final Var[] vs) {
+    // move variables to stack
+    final int s = ctx.vars.size();
+    for(int a = 0; a < vs.length; a++)
+      ctx.vars.add(vs[a]);
+    return s;
   }
 
   /**
-   * Evaluates and binds the function arguments.
+   * Evaluates all function arguments.
    * @param ctx query context
-   * @return old variable stack position
+   * @return argument values
    * @throws QueryException query exception
    */
-  private int cache(final QueryContext ctx) throws QueryException {
+  Var[] args(final QueryContext ctx) throws QueryException {
     final int al = expr.length;
-    final Value[] args = new Value[al];
+    final Var[] args = new Var[al];
     // evaluate arguments
-    for(int a = 0; a < al; ++a) args[a] = expr[a].value(ctx);
-    // move variables to stack
-    final int s = ctx.vars.size();
-    for(int a = 0; a < al; ++a) {
-      ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
-    }
-    return s;
+    for(int a = 0; a < al; ++a)
+      args[a] = func.args[a].bind(expr[a].value(ctx), ctx).copy();
+    return args;
   }
 
   @Override

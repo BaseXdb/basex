@@ -159,6 +159,11 @@ public final class QueryContext extends Progress {
   /** Initial context value. */
   Expr initExpr;
 
+  /** Number of successive tail calls. */
+  public int tailCalls;
+  /** Maximum number of successive tail calls. */
+  public final int maxCalls;
+
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();
   /** Info flag. */
@@ -179,6 +184,7 @@ public final class QueryContext extends Progress {
     xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
+    maxCalls = ctx.prop.num(Prop.TAILCALLS);
   }
 
   /**

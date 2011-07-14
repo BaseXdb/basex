@@ -91,4 +91,11 @@ public final class FLWR extends GFLWOR {
       }
     };
   }
+
+  @Override
+  Expr markTailCalls() {
+    for(final ForLet f : fl) if(f instanceof For) return this;
+    ret = ret.markTailCalls();
+    return this;
+  }
 }

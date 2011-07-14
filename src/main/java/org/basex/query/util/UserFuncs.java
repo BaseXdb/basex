@@ -10,9 +10,10 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
+import org.basex.query.expr.UserFuncCall;
+import org.basex.query.expr.BaseFuncCall;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.UserFuncCall;
 import org.basex.query.expr.UserFunc;
 import org.basex.query.func.FNIndex;
 import org.basex.query.func.FuncCall;
@@ -118,15 +119,15 @@ public final class UserFuncs extends ExprInfo {
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].name;
       if(eq(ln, qn.ln()) && eq(uri, qn.uri().atom()) && args.length ==
-        func[l].args.length) return new TypedFunc(add(qp.input(), qn, l, args),
-            FuncType.get(func[l]));
+        func[l].args.length) return new TypedFunc(
+            add(qp.input(), qn, l, args), FuncType.get(func[l]));
     }
 
     // add function call for function that has not been defined yet
     if(Types.find(name, false) == null) {
-      return new TypedFunc(add(qp.input(), name, add(
-          new UserFunc(qp.input(), name, new Var[args.length], null, false),
-          qp), args), FuncType.arity(args.length));
+      return new TypedFunc(add(qp.input(), name, add(new UserFunc(qp.input(),
+          name, new Var[args.length], null, false), qp), args),
+          FuncType.arity(args.length));
     }
     return null;
   }
@@ -141,7 +142,7 @@ public final class UserFuncs extends ExprInfo {
    */
   private UserFuncCall add(final InputInfo ii, final QNm nm, final int id,
       final Expr[] arg) {
-    final UserFuncCall call = new UserFuncCall(ii, nm, arg);
+    final UserFuncCall call = new BaseFuncCall(ii, nm, arg);
     calls[id] = Array.add(calls[id], call);
     return call;
   }
