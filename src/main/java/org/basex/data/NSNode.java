@@ -118,19 +118,31 @@ final class NSNode {
    * Deletes nodes in the specified range (p .. p + sz - 1) and updates the
    * following pre values
    * @param p pre value
-   * @param sz number of nodes to be deleted
+   * @param sz number of nodes to be deleted, or actually the size of the pre
+   * value which is to be deleted
    */
   void delete(final int p, final int sz) {
+    // find the pre value which must be deleted
     int s = fnd(p);
+    /* if the node is not directly contained as a child, either start at array
+     * index 0 or proceed with the next node in the child array to search for
+     * descendants of pre
+     */
     if(s == -1 || ch[s].pre != p) ++s;
-    int num = 0;
+    // first pre value which is not deleted
     final int upper = p + sz;
+    // number of nodes to be deleted
+    int num = 0;
+    // determine number of nodes to be deleted
     for(int i = s; i < size && ch[i].pre < upper; ++i, ++num);
+    // new size of child array
     size -= num;
-    if(num > 0) System.arraycopy(ch, s + num, ch, s, size - s);
-    // Calling update is not enough as only descendants of this NSNode
-    // are updated and not all nodes on the following axis
-    // update(s, -sz);
+
+    // if all nodes are deleted, just create an empty array
+    if(size == 0) ch = new NSNode[0];
+
+    // otherwise remove nodes from the child array
+    else if(num > 0) System.arraycopy(ch, s + num, ch, s, size - s);
   }
 
   /**

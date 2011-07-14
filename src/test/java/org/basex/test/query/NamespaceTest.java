@@ -11,6 +11,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -25,6 +26,8 @@ import org.junit.Test;
 public final class NamespaceTest {
   /** Database context. */
   private static final Context CONTEXT = new Context();
+  /** Default database name. */
+  private static final String DBNAME = Util.name(NamespaceTest.class);
 
   /** Test documents. */
   private static String[][] docs = {
@@ -437,6 +440,30 @@ public final class NamespaceTest {
   }
 
   /**
+   * Deletes the document node and checks if namespace nodes of descendants
+   * are deleted as well. F.i. adding a document via JAX-RX/PUT deletes a
+   * document node if the given document/name is already stored in the target
+   * collection. If the test fails, this may lead to superfluous namespace
+   * nodes.
+   */
+  @Test
+  public void deleteDocumentNode() {
+    try {
+
+      new Open("d2").execute(CONTEXT);
+      CONTEXT.data.delete(0);
+      assertEquals(true, CONTEXT.data.ns.rootEmpty());
+
+    } catch (final Exception ex) {
+      fail(ex.getMessage());
+    } finally {
+      try {
+        new Close().execute(CONTEXT);
+      } catch(final BaseXException ex) { }
+    }
+  }
+
+  /**
    * Creates the database context.
    * @throws BaseXException database exception
    */
@@ -467,6 +494,8 @@ public final class NamespaceTest {
     for(final String[] doc : docs) {
       new DropDB(doc[0]).execute(CONTEXT);
     }
+    new DropDB(DBNAME).execute(CONTEXT);
+
     CONTEXT.close();
   }
 
