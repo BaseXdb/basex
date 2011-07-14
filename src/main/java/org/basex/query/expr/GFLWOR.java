@@ -134,7 +134,9 @@ public class GFLWOR extends ParseExpr {
     // remove declarations of statically bound or unused variables
     for(int f = 0; f < fl.length; ++f) {
       final ForLet l = fl[f];
-      if(l.var.expr() != null || l.simple(true) && count(l.var, f) == 0) {
+      // context-sensitive operations could have side-effects, leave them alone
+      if(l.var.expr() != null || l.simple(true) && !l.expr.uses(Use.CTX)
+          && count(l.var, f) == 0) {
         ctx.compInfo(OPTVAR, l.var);
         fl = Array.delete(fl, f--);
       }
@@ -185,8 +187,8 @@ public class GFLWOR extends ParseExpr {
    * @param ctx query context
    */
   private void compHoist(final QueryContext ctx) {
-    // modification counter
-    int m = 0;
+    boolean mod = false;
+
     for(int i = 1; i < fl.length; i++) {
       final ForLet in = fl[i];
       // move clauses upwards that contain a single value.
@@ -194,16 +196,22 @@ public class GFLWOR extends ParseExpr {
       // or fragment constructors creating unique nodes are ignored
       if(in.size() != 1 || in.uses(Use.CTX) || in.uses(Use.CNS)) continue;
 
-      // find most outer clause that declares no variables that are used in the
+      // find outermost clause that declares no variables that are used in the
       // inner clause
       int p = -1;
-      for(int o = i; o-- != 0 && in.count(fl[o]) == 0; p = o);
+      for(int o = i; --o >= 0 && in.count(fl[o]) == 0;)
+        // only move if a for clause is skipped, avoids superfluous reorderings
+        if(fl[o] instanceof For) p = o;
+
       if(p == -1) continue;
 
       // move clause
       Array.move(fl, p, 1, i - p);
       fl[p] = in;
-      if(m++ == 0) ctx.compInfo(OPTFORLET);
+      if(!mod) {
+        ctx.compInfo(OPTFORLET);
+        mod = true;
+      }
     }
   }
 
