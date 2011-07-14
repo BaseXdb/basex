@@ -97,4 +97,10 @@ public final class TypeCase extends Single {
     if(var.name != null) tb.add(' ');
     return tb.add(var + " " + RETURN + ' ' + expr).toString();
   }
+
+  @Override
+  TypeCase markTailCalls() {
+    expr = expr.markTailCalls();
+    return this;
+  }
 }

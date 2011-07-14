@@ -72,8 +72,8 @@ public final class Set extends AGet {
       prop.set(key, b);
       v = AInfo.flag(b);
     } else if(type instanceof Integer) {
-      v = "0";
       prop.set(key, Integer.parseInt(val));
+      v = String.valueOf(prop.get(key));
     } else if(type instanceof String) {
       prop.set(key, val);
     } else {
