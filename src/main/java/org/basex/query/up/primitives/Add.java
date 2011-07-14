@@ -122,6 +122,11 @@ public final class Add extends InsertBase {
     }
   }
 
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + targetNode() + "]";
+  }
+
   /**
    * Last document in the database.
    * @param data database
