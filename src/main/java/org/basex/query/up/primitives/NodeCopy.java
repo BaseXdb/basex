@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.NodeType;
@@ -44,8 +45,10 @@ public abstract class NodeCopy extends StructuralUpdate {
   /**
    * Prepares this update primitive before execution. This includes i.e. the
    * preparation of insertion sequences.
+   * @throws QueryException exception during preparation of data
    */
-  public final void prepare() {
+  @SuppressWarnings("unused")
+  public void prepare() throws QueryException {
     // build main memory representation of nodes to be copied
     md = new MemData(data);
     final NodeCache seq = new NodeCache();

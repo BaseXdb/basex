@@ -81,6 +81,15 @@ public abstract class Session {
       final InputStream input) throws BaseXException;
 
   /**
+   * Replace a document in an open database.
+   * @param path document(s) to replace
+   * @param input new content
+   * @throws BaseXException exception
+   */
+  public abstract void replace(final String path, final InputStream input)
+      throws BaseXException;
+
+  /**
    * Returns command info as a string, regardless of whether an output stream
    * was specified.
    * @return command info

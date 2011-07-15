@@ -32,14 +32,7 @@ public final class Rename extends ACreate {
     boolean ok = true;
     int c = 0;
     for(final int doc : data.doc(args[0])) {
-      final byte[] path = data.text(doc, true);
-      byte[] target = trg;
-      byte[] name = substring(path, src.length);
-      if(name.length != 0) {
-        // change file path: replace all paths with the target path
-        if(startsWith(name, '/')) name = substring(name, 1);
-        target = trg.length != 0 ? concat(trg, SLASH, name) : name;
-      }
+      final byte[] target = newName(data, doc, src, trg);
       if(target.length == 0) {
         info(NAMEINVALID, target);
         ok = false;
@@ -53,5 +46,26 @@ public final class Rename extends ACreate {
 
     info(PATHRENAMED, c, perf);
     return ok;
+  }
+
+  /**
+   * Generate a new name for a document.
+   * @param d data
+   * @param pre pre value of the document
+   * @param src source path
+   * @param trg target path
+   * @return new name
+   */
+  public static byte[] newName(final Data d, final int pre, final byte[] src,
+      final byte[] trg) {
+    final byte[] path = d.text(pre, true);
+    byte[] target = trg;
+    byte[] name = substring(path, src.length);
+    if(name.length != 0) {
+      // change file path: replace all paths with the target path
+      if(startsWith(name, '/')) name = substring(name, 1);
+      target = trg.length != 0 ? concat(trg, SLASH, name) : name;
+    }
+    return target;
   }
 }

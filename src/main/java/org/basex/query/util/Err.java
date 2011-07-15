@@ -40,6 +40,8 @@ public enum Err {
   NOOPTION(BASX, 10, "Unknown database option '%'."),
   /** BASX11: Parsing exception. */
   PARWHICH(BASX, 11, "Unexpected element: %."),
+  /** BASX0012: Evaluation exception. */
+  DOCTRGMULT(BASX, 12, "Singled document is expected as replace target."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
