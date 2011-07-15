@@ -76,7 +76,7 @@ abstract class AQuery extends Command {
         comp += per.getTime();
         if(i == 0) plan(true);
 
-        final PrintOutput po = i == 0 && ser ? out : new NullOutput(!ser);
+        final PrintOutput po = i == 0 && ser ? out : new NullOutput();
         XMLSerializer xml;
 
         if(context.prop.is(Prop.CACHEQUERY)) {
