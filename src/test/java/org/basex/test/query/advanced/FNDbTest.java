@@ -150,6 +150,10 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void testList() throws QueryException, BaseXException {
     final String fun = check(Function.LIST);
 
+    // add documents
+    new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
+    contains(fun + "('db')", "test/");
+
     // create two other database and compare substring
     new CreateDB("daz").execute(CONTEXT);
     new CreateDB("dba").execute(CONTEXT);
@@ -159,17 +163,89 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:list(string) function.
+   * Test method for the db:add() function.
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testAdd() throws QueryException {
+    final String fun = check(Function.ADD);
+
+    query(fun + "('db', document { <root/> }, 'test1.xml')");
+    query("count(collection('db/test1.xml')/root) eq 1", "true");
+
+    query(fun + "('db', document { <root/> }, 'test2.xml', 'test')");
+    query("count(collection('db/test/test2.xml')/root) eq 1", "true");
+
+    query(fun + "('db', 'etc/test/input.xml', '', 'test')");
+    query("count(collection('db/test/input.xml')/html) eq 1", "true");
+
+    query(fun + "('db', 'etc/test/input.xml', 'test3.xml', 'test')");
+    query("count(collection('db/test/test3.xml')/html) eq 1", "true");
+
+    query(fun + "('db', 'etc/test/dir', '', 'test/dir')");
+    query("count(collection('db/test/dir')) gt 0", "true");
+  }
+
+  /**
+   * Test method for the db:replace() function.
    * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void testListDb() throws QueryException, BaseXException {
-    final String fun = check(Function.LIST);
+  public void testReplace() throws QueryException, BaseXException {
+    final String fun = check(Function.REPLACEDOC);
 
-    // add documents
+    new Add("etc/test/input.xml", null, "test").execute(CONTEXT);
+
+    query(fun + "('db/test/input.xml', document { <root/> })");
+    query("count(collection('db/test/input.xml')/html) eq 0", "true");
+    query("count(collection('db/test/input.xml')/root) eq 1", "true");
+
+    query(fun + "('db/test/input.xml', 'etc/test/input.xml')");
+    query("count(collection('db/test/input.xml')/html) eq 1", "true");
+    query("count(collection('db/test/input.xml')/root) eq 0", "true");
+  }
+
+  /**
+   * Test method for the db:delete() function.
+   * @throws QueryException query exception
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testDelete() throws QueryException, BaseXException {
+    final String fun = check(Function.DELETE);
+
     new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
-    contains(fun + "('db')", "test/");
+
+    query(fun + "('db/test')", "");
+    query("count(collection('db/test')) eq 0", "true");
+  }
+
+  /**
+   * Test method for the db:rename() function.
+   * @throws QueryException query exception
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void testRename() throws QueryException, BaseXException {
+    final String fun = check(Function.RENAME);
+
+    new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
+
+    query(fun + "('db/test', 'newtest')", "");
+    query("count(collection('db/newtest')) gt 0", "true");
+  }
+
+  /**
+   * Test method for the db:optimize() function.
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testOptimize() throws QueryException {
+    final String fun = check(Function.OPTIMIZE);
+
+    query(fun + "('db')");
+    query(fun + "('db', true())");
   }
 
   /**

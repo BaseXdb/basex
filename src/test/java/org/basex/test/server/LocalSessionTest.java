@@ -32,6 +32,5 @@ public class LocalSessionTest extends SessionTest {
   @Before
   public void startSession() {
     session = new LocalSession(context, out);
-    if(out != null) out.reset();
   }
 }

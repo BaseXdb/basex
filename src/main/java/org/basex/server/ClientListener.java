@@ -20,6 +20,7 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
+import org.basex.core.cmd.Replace;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
 import org.basex.io.WrapInputStream;
@@ -28,6 +29,7 @@ import org.basex.util.ByteList;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.xml.sax.InputSource;
 
 /**
  * Server-side client session in the client-server architecture.
@@ -136,6 +138,8 @@ public final class ClientListener extends Thread {
             watch();
           } else if(sc == UNWATCH) {
             unwatch();
+          } else if(sc == REPLACE) {
+            replace();
           } else if(sc != COMMAND) {
             query(sc);
           } else {
@@ -331,8 +335,27 @@ public final class ClientListener extends Thread {
     log.write(this, sb.append("[...]"));
 
     try {
-      final WrapInputStream is = new WrapInputStream(in);
-      info(true, Add.add(name, path, is, context, null), perf);
+      final InputSource is = new InputSource(new WrapInputStream(in));
+      info(true, Add.add(name, path, is, context, null, true), perf);
+    } catch(final BaseXException ex) {
+      info(false, ex.getMessage(), perf);
+    }
+    out.flush();
+  }
+
+  /**
+   * Replace a document in a database.
+   * @throws IOException I/O exception
+   */
+  private void replace() throws IOException {
+    final Performance perf = new Performance();
+    final String path = in.readString();
+    final StringBuilder sb = new StringBuilder(REPLACE + " ");
+    if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
+    log.write(this, sb.append("[...]"));
+    try {
+      final InputSource is = new InputSource(new WrapInputStream(in));
+      info(true, Replace.replace(path, is, context, true), perf);
     } catch(final BaseXException ex) {
       info(false, ex.getMessage(), perf);
     }
@@ -435,7 +458,7 @@ public final class ClientListener extends Thread {
         } else if(sc == EXEC) {
           qp.execute();
         } else if(sc == INFO) {
-          qp.info();
+          qp.printInfo();
         } else if(sc == CLOSE) {
           qp.close(false);
           queries.remove(arg);

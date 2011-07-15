@@ -29,6 +29,8 @@ public enum ServerCmd {
   WATCH(10),
   /** Code for unwatching an event: {name}0. */
   UNWATCH(11),
+  /** Code for replacing a document in a database: {path}0{input}0. */
+  REPLACE(12),
   /** Code for running a database command: {command}0. */
   COMMAND(-1);
 

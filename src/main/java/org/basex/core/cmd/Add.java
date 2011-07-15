@@ -1,9 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.Builder;
 import org.basex.build.DirParser;
@@ -97,15 +95,16 @@ public final class Add extends ACreate {
    * @param name name of document. If {@code null}, the name of the input
    *   will be used
    * @param target target. If {@code null}, target will be set to root
-   * @param input XML input stream
+   * @param input XML input source
    * @param ctx database context
    * @param cmd calling command
+   * @param lock if {@code true}, register a write lock in context
    * @return info string
    * @throws BaseXException database exception
    */
   public static String add(final String name, final String target,
-      final InputStream input, final Context ctx, final Add cmd)
-      throws BaseXException {
+      final InputSource input, final Context ctx, final Add cmd,
+      final boolean lock) throws BaseXException {
 
     final Data data = ctx.data;
     if(data == null) return PROCNODB;
@@ -113,14 +112,13 @@ public final class Add extends ACreate {
     String trg = path(target);
     if(!trg.isEmpty()) trg = trg + '/';
 
-    final BufferedInputStream is = new BufferedInputStream(input);
-    final SAXSource sax = new SAXSource(new InputSource(is));
+    final SAXSource sax = new SAXSource(input);
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
     try {
-      ctx.register(true);
+      if(lock) ctx.register(true);
       return add(parser, ctx, trg, name, cmd);
     } finally {
-      ctx.unregister(true);
+      if(lock) ctx.unregister(true);
     }
   }
 

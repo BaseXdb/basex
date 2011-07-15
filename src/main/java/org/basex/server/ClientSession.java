@@ -158,6 +158,18 @@ public final class ClientSession extends Session {
     }
   }
 
+  @Override
+  public void replace(final String path, final InputStream input)
+      throws BaseXException {
+    try {
+      sout.write(ServerCmd.REPLACE.code);
+      send(path);
+      send(input);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
   /**
    * Watches an event.
    * @param name event name
