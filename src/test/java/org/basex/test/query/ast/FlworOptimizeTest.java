@@ -60,4 +60,42 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "every $for in //For satisfies exactly-one(//Let) << $for"
     );
   }
+
+  /** Tests the relocation of a static let clause. */
+  @Test public void dontSwapTest() {
+    check("let $n := 42 + floor(math:random())," +
+        "    $d := $n idiv 3," +
+        "    $m := $n mod 3 " +
+        "return $d * $m + $d * $m",
+
+        "0",
+        "//Let[@var eq '$n'] << //Let[@var eq '$d']",
+        "//Let[@var eq '$d'] << //Let[@var eq '$m']"
+    );
+  }
+
+  /** Tests the relocation of a static let clause. */
+  @Test public void dontSwapTest2() {
+    check("for $n in (23, 42)" +
+        "let $d := $n idiv 3," +
+        "    $m := $n mod 3 " +
+        "return $d * $m + $d * $m",
+
+        "28 0",
+        "//For << //Let[@var eq '$d']",
+        "//Let[@var eq '$d'] << //Let[@var eq '$m']"
+    );
+  }
+
+  /** Tests the relocation of a static let clause. */
+  @Test public void dontRemoveSideEffectsTest() {
+    check("for $n in (23, 42)" +
+        "let $d := $n idiv 3," +
+        "    $o := floor(math:random()) " +
+        "return $d",
+
+        "7 14",
+        "exists(//Let[@var eq '$o'])"
+    );
+  }
 }
