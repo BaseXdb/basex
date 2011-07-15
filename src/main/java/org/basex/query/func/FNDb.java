@@ -8,12 +8,15 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.basex.core.BaseXException;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
+import org.basex.core.cmd.Optimize;
+import org.basex.core.cmd.OptimizeAll;
 import org.basex.data.Data;
 import org.basex.data.SerializerException;
 import org.basex.data.XMLSerializer;
@@ -43,6 +46,7 @@ import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Database functions.
@@ -88,6 +92,7 @@ public final class FNDb extends FuncCall {
       case DELETE:     return delete(ctx);
       case RENAME:     return rename(ctx);
       case REPLACEDOC: return replace(ctx);
+      case OPTIMIZE:   return optimize(ctx);
       default:         return super.item(ctx, ii);
     }
   }
@@ -232,6 +237,8 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Str info(final QueryContext ctx) throws QueryException {
+    checkRead(ctx);
+
     final byte[] info;
     final Data d = ctx.resource.data(checkStr(expr[0], ctx), input);
     if(expr.length == 1) {
@@ -253,6 +260,8 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item add(final QueryContext ctx) throws QueryException {
+    checkWrite(ctx);
+
     final byte[] name = expr.length < 3 ? null :
       token(path(string(checkStr(expr[2], ctx))));
     final byte[] path = expr.length < 4 ? null :
@@ -277,6 +286,8 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item replace(final QueryContext ctx) throws QueryException {
+    checkWrite(ctx);
+
     final String path = path(string(checkStr(expr[0], ctx)));
 
     // the first step of the path should be the database name
@@ -325,6 +336,8 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item delete(final QueryContext ctx) throws QueryException {
+    checkWrite(ctx);
+
     final String path = path(string(checkStr(expr[0], ctx)));
 
     // the first step of the path should be the database name
@@ -349,6 +362,8 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item rename(final QueryContext ctx) throws QueryException {
+    checkWrite(ctx);
+
     final String path = path(string(checkStr(expr[0], ctx)));
 
     // the first step of the path should be the database name
@@ -366,6 +381,25 @@ public final class FNDb extends FuncCall {
       ctx.updates.add(new ReplaceValue(pre, data, input, nm), ctx);
     }
 
+    return null;
+  }
+
+  /**
+   * Performs the optimize function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item optimize(final QueryContext ctx) throws QueryException {
+    checkWrite(ctx);
+
+    final boolean all = expr.length == 2 ? checkBln(expr[1], ctx) : false;
+    ctx.resource.data(checkStr(expr[0], ctx), input);
+    try {
+      (all ? new OptimizeAll() : new Optimize()).execute(ctx.context);
+    } catch(final BaseXException e) {
+      Util.errln(e);
+    }
     return null;
   }
 

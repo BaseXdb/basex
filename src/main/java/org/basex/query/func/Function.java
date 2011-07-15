@@ -489,6 +489,8 @@ public enum Function {
   RENAME(FNDb.class, "rename(path,newpath", EMP, STR, STR),
   /** Database function: replace document(s). */
   REPLACEDOC(FNDb.class, "replace(path,item)", EMP, STR, ITEM),
+  /** Database function: optimize database structures. */
+  OPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
 
   /* FNFile functions (EXPath). */
 

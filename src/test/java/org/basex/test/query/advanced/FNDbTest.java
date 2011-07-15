@@ -237,6 +237,18 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for the db:optimize() function.
+   * @throws QueryException query exception
+   */
+  @Test
+  public void testOptimize() throws QueryException {
+    final String fun = check(Function.OPTIMIZE);
+
+    query(fun + "('db')");
+    query(fun + "('db', true())");
+  }
+
+  /**
    * Test method for db:node-pre() function.
    * @throws QueryException database exception
    */
