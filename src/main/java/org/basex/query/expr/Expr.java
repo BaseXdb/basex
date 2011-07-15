@@ -292,23 +292,20 @@ public abstract class Expr extends ExprInfo {
    *         in this expression, {@code false} otherwise
    */
   public boolean hasFreeVars(final QueryContext ctx) {
-
     final VarList global = ctx.vars.global();
     for(int i = global.size; --i >= 0;) {
       if(count(global.vars[i]) > 0) return true;
     }
-
     final VarList vars = ctx.vars.local();
     for(int i = vars.size; --i >= 0;) {
       if(count(vars.vars[i]) > 0) return true;
     }
-
     return false;
   }
 
   /**
    * Finds and marks tail calls, enabling TCO.
-   * @return The expression, with tail calls marked
+   * @return the expression, with tail calls marked
    */
   Expr markTailCalls() {
     return this;

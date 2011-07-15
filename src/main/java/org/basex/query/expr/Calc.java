@@ -33,11 +33,12 @@ public enum Calc {
     public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
-      final boolean t1 = a.unt() || a.num();
-      final boolean t2 = b.unt() || b.num();
+      final Type ta = a.type, tb = b.type;
+      final boolean t1 = ta.num() || ta.unt();
+      final boolean t2 = tb.num() || tb.unt();
       if(t1 ^ t2) errNum(ii, !t1 ? a : b);
       if(t1 && t2) {
-        final Type t = type(a, b);
+        final Type t = type(ta, tb);
         if(t == ITR) {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
@@ -49,9 +50,8 @@ public enum Calc {
         return Dec.get(a.dec(ii).add(b.dec(ii)));
       }
 
-      final Type ta = a.type, tb = b.type;
       if(ta == tb) {
-        if(!a.dur()) errNum(ii, !t1 ? a : b);
+        if(!ta.dur()) errNum(ii, !t1 ? a : b);
         if(ta == YMD) return new YMd((YMd) a, (YMd) b, true);
         if(ta == DTD) return new DTd((DTd) a, (DTd) b, true);
       }
@@ -78,23 +78,23 @@ public enum Calc {
     public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
-      final boolean t1 = a.unt() || a.num();
-      final boolean t2 = b.unt() || b.num();
+      final Type ta = a.type, tb = b.type;
+      final boolean t1 = ta.num() || ta.unt();
+      final boolean t2 = tb.num() || tb.unt();
       if(t1 ^ t2) errNum(ii, !t1 ? a : b);
       if(t1 && t2) {
-        final Type t = type(a, b);
+        final Type t = type(ta, tb);
         if(t == ITR) {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
           checkRange(ii, l1 - (double) l2);
           return Itr.get(l1 - l2);
         }
-        if(t == FLT) return Flt.get(a.flt(ii) - b.flt(ii));
         if(t == DBL) return Dbl.get(a.dbl(ii) - b.dbl(ii));
+        if(t == FLT) return Flt.get(a.flt(ii) - b.flt(ii));
         return Dec.get(a.dec(ii).subtract(b.dec(ii)));
       }
 
-      final Type ta = a.type, tb = b.type;
       if(ta == tb) {
         if(ta == DTM || ta == DAT || ta == TIM)
           return new DTd((Date) a, (Date) b);
@@ -121,35 +121,35 @@ public enum Calc {
 
       final Type ta = a.type, tb = b.type;
       if(ta == YMD) {
-        if(!b.num()) errNum(ii, b);
+        if(!tb.num()) errNum(ii, b);
         return new YMd((Dur) a, b.dbl(ii), true, ii);
       }
       if(tb == YMD) {
-        if(!a.num()) errNum(ii, a);
+        if(!ta.num()) errNum(ii, a);
         return new YMd((Dur) b, a.dbl(ii), true, ii);
       }
       if(ta == DTD) {
-        if(!b.num()) errNum(ii, b);
+        if(!tb.num()) errNum(ii, b);
         return new DTd((Dur) a, b.dbl(ii), true, ii);
       }
       if(tb == DTD) {
-        if(!a.num()) errNum(ii, a);
+        if(!ta.num()) errNum(ii, a);
         return new DTd((Dur) b, a.dbl(ii), true, ii);
       }
 
-      final boolean t1 = a.unt() || a.num();
-      final boolean t2 = b.unt() || b.num();
+      final boolean t1 = ta.num() || ta.unt();
+      final boolean t2 = tb.num() || tb.unt();
       if(t1 ^ t2) errType(ii, ta, b);
       if(t1 && t2) {
-        final Type t = type(a, b);
+        final Type t = type(ta, tb);
         if(t == ITR) {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
           checkRange(ii, l1 * (double) l2);
           return Itr.get(l1 * l2);
         }
-        if(t == FLT) return Flt.get(a.flt(ii) * b.flt(ii));
         if(t == DBL) return Dbl.get(a.dbl(ii) * b.dbl(ii));
+        if(t == FLT) return Flt.get(a.flt(ii) * b.flt(ii));
         return Dec.get(a.dec(ii).multiply(b.dec(ii)));
       }
       errNum(ii, !t1 ? a : b);
@@ -179,16 +179,16 @@ public enum Calc {
         }
       }
       if(ta == YMD) {
-        if(!b.num()) errNum(ii, b);
+        if(!tb.num()) errNum(ii, b);
         return new YMd((Dur) a, b.dbl(ii), false, ii);
       }
       if(ta == DTD) {
-        if(!b.num()) errNum(ii, b);
+        if(!tb.num()) errNum(ii, b);
         return new DTd((Dur) a, b.dbl(ii), false, ii);
       }
 
       checkNum(ii, a, b);
-      final Type t = type(a, b);
+      final Type t = type(ta, tb);
       if(t == DBL) return Dbl.get(a.dbl(ii) / b.dbl(ii));
       if(t == FLT) return Flt.get(a.flt(ii) / b.flt(ii));
 
@@ -212,7 +212,8 @@ public enum Calc {
       if(d2 == 0) DIVZERO.thrw(ii, a);
       final double d = d1 / d2;
       if(Double.isNaN(d) || Double.isInfinite(d)) DIVFLOW.thrw(ii, d1, d2);
-      return Itr.get(type(a, b) == ITR ? a.itr(ii) / b.itr(ii) : (long) d);
+      final Type ta = a.type, tb = b.type;
+      return Itr.get(type(ta, tb) == ITR ? a.itr(ii) / b.itr(ii) : (long) d);
     }
   },
 
@@ -223,10 +224,9 @@ public enum Calc {
         throws QueryException {
 
       checkNum(ii, a, b);
-      final Type t = type(a, b);
+      final Type t = type(a.type, b.type);
       if(t == DBL) return Dbl.get(a.dbl(ii) % b.dbl(ii));
       if(t == FLT) return Flt.get(a.flt(ii) % b.flt(ii));
-
       if(t == ITR) {
         final long b1 = a.itr(ii);
         final long b2 = b.itr(ii);
@@ -266,15 +266,14 @@ public enum Calc {
 
   /**
    * Returns the numeric type with the highest precedence.
-   * @param a first item
-   * @param b second item
+   * @param a first item type
+   * @param b second item type
    * @return type
    */
-  static final Type type(final Item a, final Item b) {
-    final Type ta = a.type, tb = b.type;
-    if(ta == DBL || tb == DBL || a.unt() || b.unt()) return DBL;
-    if(ta == FLT || tb == FLT) return FLT;
-    if(ta == DEC || tb == DEC) return DEC;
+  static final Type type(final Type a, final Type b) {
+    if(a == DBL || b == DBL || a.unt() || b.unt()) return DBL;
+    if(a == FLT || b == FLT) return FLT;
+    if(a == DEC || b == DEC) return DEC;
     return ITR;
   }
 
