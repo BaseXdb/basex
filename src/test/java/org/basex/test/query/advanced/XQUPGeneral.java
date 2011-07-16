@@ -7,7 +7,7 @@ import org.junit.AfterClass;
 import org.junit.Test;
 
 /**
- * General test of the XQuery Update Facility implementation.
+ * General tests of the XQuery Update Facility implementation.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
@@ -171,9 +171,10 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void textMerging11() throws Exception {
-    query("copy $c := <n>aa<d/><d/>cc</n> " +
-        "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
-        "return count($c//text()), $c//text()", "1aabbcc");
+    query(
+      "copy $c := <n>aa<d/><d/>cc</n> " +
+      "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
+      "return count($c//text()), $c//text()", "1aabbcc");
   }
 
   /**
@@ -182,10 +183,11 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void treeAwareUpdates() throws Exception {
-    query("copy $n := <a><b><c/></b></a> " +
-        "modify (replace value of node $n/b with (), " +
-        "insert node <d/> into $n/b, insert node <d/> after $n/b) return $n",
-        "<a><b/><d/></a>");
+    query(
+      "copy $n := <a><b><c/></b></a> " +
+      "modify (replace value of node $n/b with (), " +
+      "insert node <d/> into $n/b, insert node <d/> after $n/b) return $n",
+      "<a><b/><d/></a>");
   }
 
   /**
@@ -194,7 +196,8 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void deleteLastNode() throws Exception {
-    query("copy $n := <a><b/><c/></a> modify (delete node $n//c) return $n",
+    query(
+      "copy $n := <a><b/><c/></a> modify (delete node $n//c) return $n",
       "<a><b/></a>");
   }
 
@@ -204,8 +207,10 @@ public final class XQUPGeneral extends AdvancedQueryTest {
    */
   @Test
   public void replaceLastNode() throws Exception {
-    query("copy $n := <a><b/><c><d/><d/><d/></c></a> " +
-        "modify (replace node $n//c with <c/>) return $n", "<a><b/><c/></a>");
+    query(
+      "copy $n := <a><b/><c><d/><d/><d/></c></a> " +
+      "modify (replace node $n//c with <c/>) return $n",
+      "<a><b/><c/></a>");
   }
 
   /**
@@ -217,6 +222,41 @@ public final class XQUPGeneral extends AdvancedQueryTest {
   public void replaceValueOfEmptyRoot() throws Exception {
     createDB("<a/>");
     query("replace value of node /a with 'a'");
+    query("/", "<a>a</a>");
+  }
+
+  /**
+   * Insertion into an empty element.
+   * @throws Exception exception
+   */
+  @Test
+  public void emptyInsert1() throws Exception {
+    query(
+      "copy $x := <X/> modify insert nodes <A/> into $x return $x",
+      "<X><A/></X>");
+  }
+
+  /**
+   * Insertion into an empty document.
+   * @throws Exception exception
+   */
+  @Test
+  public void emptyInsert2() throws Exception {
+    query(
+      "copy $x := document {()} modify insert nodes <X/> into $x return $x",
+      "<X/>");
+  }
+
+  /**
+   * Insertion into an empty document.
+   * @throws Exception exception
+   */
+  @Test
+  public void emptyInsert3() throws Exception {
+    createDB("<a/>");
+    query("delete node /a");
+    query("insert nodes <X/> into doc('" + DBNAME + "')");
+    query("/", "<X/>");
   }
 
   /**

@@ -134,7 +134,7 @@ public abstract class Data {
    * @return result of check
    */
   public final boolean empty() {
-    return meta.size == 1;
+    return meta.size == 1 && kind(0) == DOC;
   }
 
   /**
@@ -673,7 +673,7 @@ public abstract class Data {
     meta.update();
 
     // indicates if database is empty (dummy node will be deleted)
-    final boolean empty = empty();
+    final boolean empty = empty() && data.kind(0) == DOC;
     // indicates if update will change entries in document index
     final boolean struct = ipre != meta.size || empty;
     if(struct) meta.docindex = false;
