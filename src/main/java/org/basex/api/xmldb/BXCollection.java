@@ -17,6 +17,7 @@ import org.basex.core.cmd.Open;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.io.IOContent;
+import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 
@@ -117,7 +118,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public int getResourceCount() throws XMLDBException {
     check();
-    return ctx.data.doc().length;
+    return ctx.data.doc().size();
   }
 
   @Override
@@ -125,8 +126,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     final StringList sl = new StringList();
     final Data data = ctx.data;
-    for(final int pre : data.doc()) {
-      sl.add(Token.string(data.text(pre, true)));
+    final IntList il = data.doc();
+    for(int i = 0, is = il.size(); i < is; i++) {
+      sl.add(Token.string(data.text(il.get(i), true)));
     }
     return sl.toArray();
   }
@@ -160,7 +162,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
     // find correct value and remove the node
-    Delete.delete(ctx, getResource(del.getId()).pre);
+    final IntList il = new IntList();
+    il.add(getResource(del.getId()).pre);
+    Delete.delete(ctx, il);
   }
 
   @Override
@@ -205,7 +209,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
     if(id == null) return null;
     final Data data = ctx.data;
     final byte[] idd = Token.token(id);
-    for(final int pre : data.doc()) {
+    final IntList il = data.doc();
+    for(int i = 0, is = il.size(); i < is; i++) {
+      final int pre = il.get(i);
       if(Token.eq(data.text(pre, true), idd))
         return new BXXMLResource(data, pre, id, this);
     }
