@@ -24,10 +24,10 @@ import org.junit.Test;
  * @author Tim Petrowsky
  */
 public abstract class UpdateTest {
-  /** Test file we do updates with. */
-  private static final String TESTFILE = "etc/test/test.xml";
   /** Test database name. */
   private static final String DBNAME = Util.name(UpdateTest.class);
+  /** Test file we do updates with. */
+  private static final String TESTFILE = "etc/test/test.xml";
   /** Main memory flag. */
   private static boolean mainmem;
 
