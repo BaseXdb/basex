@@ -17,9 +17,10 @@ import org.basex.util.Args;
 import org.basex.util.Util;
 
 /**
- * This class benchmarks delete operations.
+ * This class offers utility methods to perform simple benchmarks.
  *
  * @author BaseX Team 2005-11, BSD License
+ * @author Christian Gruen
  */
 public abstract class Benchmark {
   /** Database context. */

@@ -11,6 +11,7 @@ import org.basex.util.Performance;
  * number of threads and queries.
  *
  * @author BaseX Team 2005-11, BSD License
+ * @author Christian Gruen
  */
 public final class ServerMemTest {
   /** Number of clients. */

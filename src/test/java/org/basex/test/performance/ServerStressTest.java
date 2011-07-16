@@ -8,10 +8,11 @@ import org.basex.util.Performance;
 import org.basex.util.Util;
 
 /**
- * This class performs a client/server stress test with a specified
+ * This class performs a client/server stress tests with a specified
  * number of threads and queries.
  *
  * @author BaseX Team 2005-11, BSD License
+ * @author Christian Gruen
  */
 public final class ServerStressTest {
   /** Verbose flag. */

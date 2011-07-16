@@ -1,11 +1,13 @@
 package org.basex.test.performance;
 
 import org.basex.core.Context;
+import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.util.Performance;
 
@@ -13,8 +15,11 @@ import org.basex.util.Performance;
  * This class adds and retrieves documents in a collection.
  *
  * @author BaseX Team 2005-11, BSD License
+ * @author Christian Gruen
  */
 public final class CollStressTest {
+  /** Create-only fag. */
+  private static boolean createonly = true;
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of documents to be added. */
@@ -27,6 +32,8 @@ public final class CollStressTest {
    */
   public static void main(final String[] args) throws Exception {
     System.out.println("=== CollStressTest ===");
+
+    new Set(Prop.INTPARSE, true).execute(CONTEXT);
 
     // Create test database
     System.out.println("\n* Create test database.");
@@ -41,6 +48,8 @@ public final class CollStressTest {
       new Add("<xml/>", Integer.toString(i)).execute(CONTEXT);
     }
     System.out.println("\n* " + SIZE + " documents added: " + perf);
+
+    if(createonly) return;
 
     // Request specific documents
     for(int i = 0; i < SIZE; i++) {
