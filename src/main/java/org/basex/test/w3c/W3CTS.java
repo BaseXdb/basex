@@ -651,7 +651,7 @@ public abstract class W3CTS {
           if(first) {
             new DropDB(dbname).execute(context);
           } else {
-            def = Function.OPEN;
+            def = Function.DBOPEN;
             src = dbname;
           }
         }
