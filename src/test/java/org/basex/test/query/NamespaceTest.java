@@ -429,6 +429,18 @@ public final class NamespaceTest {
         "<foo xmlns='xyz'><bar/><baz/></foo>");
   }
 
+
+  /** Test query.
+   * Detects general problems with namespace references.
+   */
+  @Test
+  public void insertTransformX() {
+    query(
+        "copy $foo := <foo/> modify insert nodes (<bar/>)" +
+        "into $foo return $foo",
+        "<foo><bar/></foo>");
+  }
+
   /** Test query.
    * Detects wrong namespace references.
    */
@@ -525,7 +537,7 @@ public final class NamespaceTest {
       // quotes are replaced by apostrophes to simplify comparison
       final String res = result.replaceAll("\\\"", "'");
       final String exp = expected.replaceAll("\\\"", "'");
-      if(!exp.equals(res)) fail("\n" + res + "\n" + exp + " expected");
+      if(!exp.equals(res)) fail("\nExpected: " + exp + "\nFound: " + res);
     } catch(final BaseXException ex) {
       fail(ex.getMessage());
     }

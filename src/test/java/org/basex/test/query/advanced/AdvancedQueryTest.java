@@ -41,9 +41,9 @@ abstract class AdvancedQueryTest {
    * @param result query result
    * @throws QueryException database exception
    */
-  protected static void query(final String query, final String result)
+  protected static void query(final String query, final Object result)
       throws QueryException {
-    assertEquals(result, query(query));
+    assertEquals(result.toString(), query(query));
   }
 
   /**

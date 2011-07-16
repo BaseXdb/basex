@@ -9,6 +9,8 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
+import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
 import org.basex.query.util.Err;
@@ -25,6 +27,18 @@ import org.junit.Test;
 public final class FNDbTest extends AdvancedQueryTest {
   /** Test file. */
   private static final String FILE = "etc/test/input.xml";
+  /** Test folder. */
+  private static final String FLDR = "etc/test/dir";
+  /** Number of XML files for folder. */
+  private static final int NFLDR;
+
+  static {
+    int fc = 0;
+    for(final IOFile c : new IOFile(FLDR).children()) {
+      if(c.name().endsWith(IO.XMLSUFFIX)) ++fc;
+    }
+    NFLDR = fc;
+  }
 
   /**
    * Initializes a test.
@@ -151,7 +165,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(Function.DBLIST);
 
     // add documents
-    new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
+    new Add(FLDR, "docs", "test").execute(CONTEXT);
     contains(fun + "('db')", "test/");
 
     // create two other database and compare substring
@@ -171,19 +185,19 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(Function.DBADD);
 
     query(fun + "('db', document { <root/> }, 'test1.xml')");
-    query("count(collection('db/test1.xml')/root) eq 1", "true");
+    query("count(collection('db/test1.xml')/root)", "1");
 
     query(fun + "('db', document { <root/> }, 'test2.xml', 'test')");
-    query("count(collection('db/test/test2.xml')/root) eq 1", "true");
+    query("count(collection('db/test/test2.xml')/root)", "1");
 
     query(fun + "('db', 'etc/test/input.xml', '', 'test')");
-    query("count(collection('db/test/input.xml')/html) eq 1", "true");
+    query("count(collection('db/test/input.xml')/html)", "1");
 
     query(fun + "('db', 'etc/test/input.xml', 'test3.xml', 'test')");
-    query("count(collection('db/test/test3.xml')/html) eq 1", "true");
+    query("count(collection('db/test/test3.xml')/html)", "1");
 
-    query(fun + "('db', 'etc/test/dir', '', 'test/dir')");
-    query("count(collection('db/test/dir')) gt 0", "true");
+    query(fun + "('db', '" + FLDR + "', '', 'test/dir')");
+    query("count(collection('db/test/dir'))", NFLDR);
   }
 
   /**
@@ -202,8 +216,8 @@ public final class FNDbTest extends AdvancedQueryTest {
     query("count(collection('db/test/input.xml')/root) eq 1", "true");
 
     query(fun + "('db', 'test/input.xml', 'etc/test/input.xml')");
-    query("count(collection('db/test/input.xml')/html) eq 1", "true");
-    query("count(collection('db/test/input.xml')/root) eq 0", "true");
+    query("count(collection('db/test/input.xml')/html)", "1");
+    query("count(collection('db/test/input.xml')/root)", "0");
   }
 
   /**
@@ -215,10 +229,10 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void testDelete() throws QueryException, BaseXException {
     final String fun = check(Function.DBDELETE);
 
-    new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
+    new Add(FLDR, "docs", "test").execute(CONTEXT);
 
     query(fun + "('db', 'test')", "");
-    query("count(collection('db/test')) eq 0", "true");
+    query("count(collection('db/test'))", "0");
   }
 
   /**
@@ -230,11 +244,12 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void testRename() throws QueryException, BaseXException {
     final String fun = check(Function.DBRENAME);
 
-    new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
+    new Add(FLDR, "docs", "test").execute(CONTEXT);
+    query("count(collection('db/test'))", NFLDR);
 
     query(fun + "('db', 'test', 'newtest')", "");
-    query("count(collection('db/test')) eq 0", "true");
-    query("count(collection('db/newtest')) gt 0", "true");
+    query("count(collection('db/test'))", "0");
+    query("count(collection('db/newtest'))", NFLDR);
   }
 
   /**
