@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
@@ -122,12 +124,14 @@ public final class DataOutput extends OutputStream {
    * @param array array to be written
    * @throws IOException I/O exception
    */
-  public void writeDiffs(final int[] array) throws IOException {
-    writeNum(array.length);
+  public void writeDiffs(final IntList array) throws IOException {
+    final int al = array.size();
+    writeNum(al);
     int c = 0;
-    for(final int a : array) {
-      writeNum(a - c);
-      c = a;
+    for(int a = 0; a < al; a++) {
+      int t = array.get(a);
+      writeNum(t - c);
+      c = t;
     }
   }
 

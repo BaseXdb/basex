@@ -22,7 +22,7 @@ final class DocIndex {
   /** Mapping between document paths and pre values. */
   private int[] order;
   /** Pre values of document nodes. */
-  private int[] docs;
+  private IntList docs;
 
   /**
    * Opens the metadata for the current database and returns the table size.
@@ -31,7 +31,7 @@ final class DocIndex {
    * @throws IOException I/O exception
    */
   public boolean read(final DataInput in) throws IOException {
-    docs = in.readDiffs();
+    docs = new IntList(in.readDiffs());
     return true;
   }
 
@@ -52,15 +52,13 @@ final class DocIndex {
    * @param data data reference
    * @return document nodes
    */
-  int[] doc(final Data data) {
+  synchronized IntList doc(final Data data) {
     if(docs == null || !data.meta.docindex) {
-      docs = null;
       order = null;
       paths = null;
-      final IntList il = new IntList();
+      docs = new IntList();
       final int is = data.meta.size;
-      for(int i = 0; i < is; i += data.size(i, Data.DOC)) il.add(i);
-      docs = il.toArray();
+      for(int i = 0; i < is; i += data.size(i, Data.DOC)) docs.add(i);
       data.meta.docindex = true;
       data.meta.dirty = true;
     }
@@ -73,20 +71,20 @@ final class DocIndex {
    * @param data data reference
    * @return root nodes
    */
-  int[] doc(final String path, final Data data) {
+  synchronized IntList doc(final String path, final Data data) {
     // no documents: return empty list
-    if(data.empty()) return new int[] {};
+    if(data.empty()) return new IntList(0);
 
     // empty path: return all documents
     doc(data);
     if(path.isEmpty()) return docs;
 
     // initialize and sort document paths
-    final int ds = docs.length;
+    final int ds = docs.size();
     if(paths == null) {
       paths = new byte[ds][];
       for(int d = 0; d < ds; d++) {
-        final byte[] txt = data.text(docs[d], true);
+        final byte[] txt = data.text(docs.get(d), true);
         paths[d] = concat(SLASH, Prop.WIN ? lc(txt) : txt);
       }
       order = Array.createOrder(paths, false, true);
@@ -101,9 +99,9 @@ final class DocIndex {
     final IntList il = new IntList();
     for(int p = find(exact); p < paths.length; p++) {
       if(eq(paths[p], exact) || startsWith(paths[p], start))
-        il.add(docs[order[p]]);
+        il.add(docs.get(order[p]));
     }
-    return il.sort().toArray();
+    return il.sort();
   }
 
   /**

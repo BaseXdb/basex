@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.util.IntList;
 
 /**
  * Evaluates the 'rename' command and renames document or document paths
@@ -31,7 +32,9 @@ public final class Rename extends ACreate {
 
     boolean ok = true;
     int c = 0;
-    for(final int doc : data.doc(args[0])) {
+    final IntList il = data.doc(args[0]);
+    for(int i = 0, is = il.size(); i < is; i++) {
+      final int doc = il.get(i);
       final byte[] target = newName(data, doc, src, trg);
       if(target.length == 0) {
         info(NAMEINVALID, target);

@@ -18,6 +18,7 @@ import org.basex.index.Names;
 import org.basex.io.IO;
 import org.basex.io.TableAccess;
 import org.basex.util.Atts;
+import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 
@@ -191,7 +192,7 @@ public abstract class Data {
    * A single dummy node is returned if the database is empty.
    * @return root nodes
    */
-  public final int[] doc() {
+  public final IntList doc() {
     return docindex.doc(this);
   }
 
@@ -200,7 +201,7 @@ public abstract class Data {
    * @param input input path
    * @return root nodes
    */
-  public final int[] doc(final String input) {
+  public final IntList doc(final String input) {
     return docindex.doc(input, this);
   }
 

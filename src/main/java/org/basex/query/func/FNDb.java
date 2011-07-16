@@ -44,6 +44,7 @@ import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
+import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
@@ -210,8 +211,10 @@ public final class FNDb extends FuncCall {
 
       // retrieve data instance; will be closed after query execution
       final Data data = ctx.resource.data(db, input);
-      for(final int pre : data.doc(string(path)))
-        ic.add(Str.get(data.text(pre, true)));
+      final IntList il = data.doc(string(path));
+      for(int i = 0, is = il.size(); i < is; i++) {
+        ic.add(Str.get(data.text(il.get(i), true)));
+      }
     }
     return ic;
   }
@@ -287,10 +290,10 @@ public final class FNDb extends FuncCall {
     final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
-    final int[] old = data.doc(string(trg));
-    if(old.length > 0) {
-      final int pre = old[0];
-      if(old.length > 1 || !eq(data.text(pre, true), trg))
+    final IntList old = data.doc(string(trg));
+    if(old.size() > 0) {
+      final int pre = old.get(0);
+      if(old.size() > 1 || !eq(data.text(pre, true), trg))
         DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
@@ -325,7 +328,9 @@ public final class FNDb extends FuncCall {
 
     final Data data = data(0, ctx);
     final byte[] target = path(checkStr(expr[1], ctx));
-    for(final int pre : data.doc(string(target))) {
+    final IntList il = data.doc(string(target));
+    for(int i = 0, is = il.size(); i < is; i++) {
+      final int pre = il.get(i);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
     return null;
@@ -345,7 +350,9 @@ public final class FNDb extends FuncCall {
     final byte[] target = path(checkStr(expr[2], ctx));
 
     // the first step of the path should be the database name
-    for(final int pre : data.doc(string(source))) {
+    final IntList il = data.doc(string(source));
+    for(int i = 0, is = il.size(); i < is; i++) {
+      final int pre = il.get(i);
       final byte[] trg = ACreate.newName(data, pre, source, target);
       if(trg.length == 0) EMPTYPATH.thrw(input, this);
       ctx.updates.add(new ReplaceValue(pre, data, input, trg), ctx);

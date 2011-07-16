@@ -17,6 +17,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.util.DataBuilder;
 import org.basex.util.InputInfo;
+import org.basex.util.IntList;
 import org.basex.util.Util;
 
 /**
@@ -105,14 +106,15 @@ public final class Add extends InsertBase {
     }
 
     // set new names, if needed
-    final int[] pres = md.doc();
-    if(pres.length == 1 && name != null) {
+    final IntList pres = md.doc();
+    if(pres.size() == 1 && name != null) {
       // name is specified and a single document is added: set the name
       final byte[] nm = path == null ? name : concat(path, SLASH, name);
-      md.replace(pres[0], Data.DOC, nm);
+      md.replace(pres.get(0), Data.DOC, nm);
     } else if(path != null) {
       // path is specified: replace the path of each new document
-      for(final int d : pres) {
+      for(int i = 0, is = pres.size(); i < is; i++) {
+        final int d = pres.get(i);
         final byte[] old = md.text(d, true);
         final int p = lastIndexOf(old, '/');
         final byte[] nm = p < 0 ? old : subtoken(old, p + 1);
@@ -127,8 +129,8 @@ public final class Add extends InsertBase {
    * @return pre value of the last document or {@code 0} if database is empty
    */
   private static int lastDoc(final Data data) {
-    final int[] docs = data.doc();
-    return docs.length == 0 ? 0 : docs[docs.length - 1];
+    final IntList docs = data.doc();
+    return docs.size() == 0 ? 0 : docs.get(docs.size() - 1);
   }
 
   @Override

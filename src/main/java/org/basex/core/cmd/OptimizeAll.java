@@ -15,6 +15,7 @@ import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
+import org.basex.util.IntList;
 import org.basex.util.Util;
 
 /**
@@ -127,9 +128,8 @@ public final class OptimizeAll extends ACreate {
           pre++;
         }
       };
-      for(final int root : old.doc()) {
-        ser.node(old, root);
-      }
+      final IntList il = old.doc();
+      for(int i = 0, is = il.size(); i < is; i++) ser.node(old, il.get(i));
     }
   }
 }

@@ -8,6 +8,7 @@ import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
+import org.basex.util.IntList;
 import org.basex.util.Util;
 import org.xml.sax.InputSource;
 
@@ -56,12 +57,13 @@ public final class Replace extends ACreate {
     if(path.isEmpty()) return Util.info(DIRERR, path);
 
     final byte[] src = token(path);
-    final int[] docs = data.doc(p);
+    final IntList docs = data.doc(p);
     // check if path was found
-    if(docs.length == 0) return Util.info(FILEWHICH, path);
+    if(docs.size() == 0) return Util.info(FILEWHICH, path);
     // check if path points exclusively to files
-    for(final int doc : docs) {
-      if(!eq(data.text(doc, true), src)) return Util.info(DIRERR, path);
+    final IntList il = data.doc();
+    for(int i = 0, is = il.size(); i < is; i++) {
+      if(!eq(data.text(il.get(i), true), src)) return Util.info(DIRERR, path);
     }
 
     final String target;
@@ -76,12 +78,12 @@ public final class Replace extends ACreate {
     try {
       if(lock) ctx.register(true);
       // delete documents
-      for(int d = docs.length - 1; d >= 0; d--) data.delete(docs[d]);
+      for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
       // add new document
       Add.add(path, target, input, ctx, null, false);
     } finally {
       if(lock) ctx.unregister(true);
     }
-    return Util.info(PATHREPLACED, docs.length);
+    return Util.info(PATHREPLACED, docs.size());
   }
 }

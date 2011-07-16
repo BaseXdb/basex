@@ -9,6 +9,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
+import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.Util;
 
@@ -49,12 +50,12 @@ public final class DBNodeSeq extends Seq {
    * @param c indicates if values include all document nodes
    * @return resulting item or sequence
    */
-  public static Value get(final int[] v, final Data d, final boolean docs,
+  public static Value get(final IntList v, final Data d, final boolean docs,
       final boolean c) {
 
-    final int s = v.length;
-    return s == 0 ? Empty.SEQ : s == 1 ? new DBNode(d, v[0]) :
-      new DBNodeSeq(v, d, docs ? NodeType.DOC : NodeType.NOD, c);
+    final int s = v.size();
+    return s == 0 ? Empty.SEQ : s == 1 ? new DBNode(d, v.get(0)) :
+      new DBNodeSeq(v.toArray(), d, docs ? NodeType.DOC : NodeType.NOD, c);
   }
 
   @Override

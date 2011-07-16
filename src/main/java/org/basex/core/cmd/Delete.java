@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.util.IntList;
 
 /**
  * Evaluates the 'delete' command and deletes documents from a collection.
@@ -24,9 +25,9 @@ public final class Delete extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data;
-    final int[] docs = data.doc(args[0]);
+    final IntList docs = data.doc(args[0]);
     delete(context, docs);
-    return info(PATHDELETED, docs.length, perf);
+    return info(PATHDELETED, docs.size(), perf);
   }
 
   /**
@@ -34,13 +35,13 @@ public final class Delete extends ACreate {
    * @param ctx database context
    * @param docs documents to be deleted
    */
-  public static void delete(final Context ctx, final int... docs) {
+  public static void delete(final Context ctx, final IntList docs) {
     // data was changed: update context
-    if(docs.length == 0) return;
+    if(docs.size() == 0) return;
 
     // loop through all documents in reverse order
     final Data data = ctx.data;
-    for(int d = docs.length - 1; d >= 0; d--) data.delete(docs[d]);
+    for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
     ctx.update();
     data.flush();
   }

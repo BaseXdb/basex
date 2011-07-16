@@ -51,6 +51,7 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
 import org.basex.util.Array;
+import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -138,8 +139,9 @@ public enum GUICommands implements GUICommand {
         IO file = null;
         boolean overwrite = false;
         final Data d = gui.context.data;
-        for(final int pre : d.doc()) {
-          file = root.merge(Token.string(d.text(pre, true)));
+        final IntList il = d.doc();
+        for(int i = 0, is = il.size(); i < is; i++) {
+          file = root.merge(Token.string(d.text(il.get(i), true)));
           if(file.exists()) {
             if(overwrite) {
               // more than one file will be overwritten; check remaining tests
@@ -844,7 +846,8 @@ public enum GUICommands implements GUICommand {
       for(final int pre : ctx.current.list) r &= ctx.data.kind(pre) == Data.DOC;
       if(r) {
         // if yes, jump to database root
-        gui.notify.context(new Nodes(ctx.data.doc(), ctx.data), false, null);
+        gui.notify.context(
+            new Nodes(ctx.data.doc().toArray(), ctx.data), false, null);
       } else {
         // otherwise, jump to parent nodes
         gui.execute(new Cs(".."));
@@ -865,7 +868,8 @@ public enum GUICommands implements GUICommand {
       final Context ctx = gui.context;
       if(ctx.root()) return;
       // if yes, jump to database root
-      gui.notify.context(new Nodes(ctx.data.doc(), ctx.data), false, null);
+      gui.notify.context(
+          new Nodes(ctx.data.doc().toArray(), ctx.data), false, null);
     }
 
     @Override

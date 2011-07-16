@@ -7,6 +7,7 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
+import org.basex.util.IntList;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
 import org.basex.util.Util;
@@ -41,7 +42,9 @@ public final class ListDB extends Command {
 
     try {
       final Data data = Open.open(db, context);
-      for(final int pre : data.doc(path)) {
+      final IntList il = data.doc(path);
+      for(int i = 0, is = il.size(); i < is; i++) {
+        final int pre = il.get(i);
         final TokenList tl = new TokenList(2);
         tl.add(data.text(pre, true));
         tl.add(data.size(pre, Data.DOC));

@@ -25,7 +25,7 @@ public final class StorageTest {
   /** Database name. */
   private static final String DBNAME = Util.name(StorageTest.class);
   /** Database XML file. */
-  private static final String DBFILE = "etc/xml/" + DBNAME + ".zip";
+  private static final String DBFILE = "etc/test/factbook.zip";
   /** Select Germany. */
   private static final String SELECT = "//country[@name='Germany']";
   /** Delete Germany. */
