@@ -53,7 +53,7 @@ public final class ReplaceElementContent extends StructuralUpdate {
     if(pre + data.size(pre, kind) == loc + 1 &&
         data.kind(loc) == Data.TEXT) {
       // overwrite existing text node
-      data.replace(loc, Data.TEXT, value);
+      data.update(loc, Data.TEXT, value);
     } else {
       while(pre + data.size(pre, kind) > loc) data.delete(loc);
       if(value.length > 0) {

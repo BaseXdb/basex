@@ -68,7 +68,7 @@ public abstract class StructuralUpdate extends UpdatePrimitive {
     if(d.kind(a) != Data.TEXT || d.kind(b) != Data.TEXT) return false;
     if(d.parent(a, Data.TEXT) != d.parent(b, Data.TEXT)) return false;
 
-    d.replace(a, Data.TEXT, concat(d.text(a, true), d.text(b, true)));
+    d.update(a, Data.TEXT, concat(d.text(a, true), d.text(b, true)));
     d.delete(b);
     return true;
   }

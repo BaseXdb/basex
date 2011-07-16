@@ -110,7 +110,7 @@ public final class Add extends InsertBase {
     if(pres.size() == 1 && name != null) {
       // name is specified and a single document is added: set the name
       final byte[] nm = path == null ? name : concat(path, SLASH, name);
-      md.replace(pres.get(0), Data.DOC, nm);
+      md.update(pres.get(0), Data.DOC, nm);
     } else if(path != null) {
       // path is specified: replace the path of each new document
       for(int i = 0, is = pres.size(); i < is; i++) {
@@ -118,7 +118,7 @@ public final class Add extends InsertBase {
         final byte[] old = md.text(d, true);
         final int p = lastIndexOf(old, '/');
         final byte[] nm = p < 0 ? old : subtoken(old, p + 1);
-        md.replace(d, Data.DOC, concat(path, SLASH, nm));
+        md.update(d, Data.DOC, concat(path, SLASH, nm));
       }
     }
   }

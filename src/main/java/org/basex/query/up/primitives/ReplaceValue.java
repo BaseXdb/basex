@@ -37,7 +37,7 @@ public final class ReplaceValue extends ValueUpdate {
       // empty text nodes must be removed
       data.delete(pre);
     } else {
-      data.replace(pre, kind, value);
+      data.update(pre, kind, value);
     }
   }
 

@@ -19,8 +19,8 @@ public final class UpdateTestAttributes extends UpdateTest {
   @Test
   public void testUpdateAttribute() {
     final Data data = CONTEXT.data;
-    data.rename(7, Data.ATTR, NAME, Token.EMPTY);
-    data.replace(7, Data.ATTR, JUNIT);
+    data.update(7, Data.ATTR, NAME, Token.EMPTY);
+    data.update(7, Data.ATTR, JUNIT);
     assertEquals(size, data.meta.size);
     assertArraysEquals(NAME, data.name(7, Data.ATTR));
     assertArraysEquals(JUNIT, data.text(7, false));
@@ -36,8 +36,8 @@ public final class UpdateTestAttributes extends UpdateTest {
   @Test
   public void testUpdateAttribute2() {
     final Data data = CONTEXT.data;
-    data.rename(8, Data.ATTR, NAME, Token.EMPTY);
-    data.replace(8, Data.ATTR, JUNIT);
+    data.update(8, Data.ATTR, NAME, Token.EMPTY);
+    data.update(8, Data.ATTR, JUNIT);
     assertEquals(size, data.meta.size);
     assertArraysEquals(JUNIT, data.text(8, false));
     reload();

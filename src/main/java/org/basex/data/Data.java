@@ -478,10 +478,11 @@ public abstract class Data {
    * @param name new tag, attribute or pi name
    * @param uri uri
    */
-  public final void rename(final int pre, final int kind, final byte[] name,
+  public final void update(final int pre, final int kind, final byte[] name,
       final byte[] uri) {
 
-    meta.update();
+    meta.update(false);
+
     if(kind == PI) {
       text(pre, trim(concat(name, SPACE, atom(pre))), true);
     } else {
@@ -508,8 +509,8 @@ public abstract class Data {
    * @param kind node kind
    * @param value value to be updated (tag name, text, comment, pi)
    */
-  public final void replace(final int pre, final int kind, final byte[] value) {
-    meta.update();
+  public final void update(final int pre, final int kind, final byte[] value) {
+    meta.update(false);
     text(pre, kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value,
         kind != ATTR);
   }
@@ -520,7 +521,7 @@ public abstract class Data {
    * @param data replace data
    */
   public final void replace(final int rpre, final Data data) {
-    meta.update();
+    meta.update(true);
 
     // check if attribute size of parent must be updated
     final int dsize = data.meta.size;
@@ -591,7 +592,7 @@ public abstract class Data {
    * @param pre pre value of the node to delete
    */
   public final void delete(final int pre) {
-    meta.update();
+    meta.update(true);
 
     // size of the subtree to delete
     int k = kind(pre);
@@ -646,7 +647,7 @@ public abstract class Data {
    * @param data data instance to copy from
    */
   public final void insertAttr(final int pre, final int par, final Data data) {
-    meta.update();
+    meta.update(true);
     insert(pre, par, data);
     attSize(par, ELEM, attSize(par, ELEM) + data.meta.size);
   }
@@ -659,7 +660,10 @@ public abstract class Data {
    * @param data data instance to copy from
    */
   public final void insert(final int ipre, final int ipar, final Data data) {
-    meta.update();
+    // indicates if data is added at the end of the table
+    final boolean struct = ipre != meta.size;
+    meta.update(struct);
+    if(!struct) docindex.add(this, ipre);
 
     final int[] preStack = new int[IO.MAXHEIGHT];
     int l = 0;

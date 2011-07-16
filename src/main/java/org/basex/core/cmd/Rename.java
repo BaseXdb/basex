@@ -40,7 +40,7 @@ public final class Rename extends ACreate {
         info(NAMEINVALID, target);
         ok = false;
       } else {
-        data.replace(doc, Data.DOC, target);
+        data.update(doc, Data.DOC, target);
         c++;
       }
     }

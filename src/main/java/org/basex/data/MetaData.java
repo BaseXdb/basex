@@ -189,8 +189,10 @@ public final class MetaData {
 
   /**
    * Notifies the meta structures of an update and invalidates the indexes.
+   * @param struct structural update: number of data entries is changed,
+   *   or update did not occur at the end of the table
    */
-  void update() {
+  void update(final boolean struct) {
     // update database timestamp
     time = System.currentTimeMillis();
     uptodate = false;
@@ -199,7 +201,7 @@ public final class MetaData {
     textindex = false;
     attrindex = false;
     ftindex = false;
-    docindex = false;
+    if(struct) docindex = false;
   }
 
   /**
@@ -246,7 +248,7 @@ public final class MetaData {
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
     if(!istorage.equals(ISTORAGE)) {
       oldindex = true;
-      update();
+      update(true);
     }
   }
 

@@ -66,6 +66,17 @@ final class DocIndex {
   }
 
   /**
+   * Adds a pre value to the end of the node list, and invalidates the
+   * name mappings.
+   * @param data data reference
+   * @param pre pre value
+   */
+  void add(final Data data, final int pre) {
+    doc(data).add(pre);
+    paths = null;
+  }
+
+  /**
    * Returns the pre values of all document nodes matching the specified path.
    * @param path input path
    * @param data data reference
