@@ -62,6 +62,6 @@ public final class MetaStats extends Statistics {
     // database size
     tl.add(format(data.meta.dbsize()));
     // number of documents
-    tl.add(data.doc().length);
+    tl.add(data.doc().size());
   }
 }

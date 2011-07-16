@@ -18,7 +18,7 @@ public final class CollStressTest {
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of documents to be added. */
-  private static final int SIZE = 1000;
+  private static final int SIZE = 10000;
 
   /**
    * Runs the example code.
@@ -26,7 +26,7 @@ public final class CollStressTest {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    System.out.println("=== CollectionTest ===");
+    System.out.println("=== CollStressTest ===");
 
     // Create test database
     System.out.println("\n* Create test database.");
