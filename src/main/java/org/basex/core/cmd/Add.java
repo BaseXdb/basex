@@ -110,7 +110,7 @@ public final class Add extends ACreate {
     if(data == null) return PROCNODB;
 
     String trg = path(target);
-    if(!trg.isEmpty()) trg = trg + '/';
+    if(!trg.isEmpty()) trg += '/';
 
     final SAXSource sax = new SAXSource(input);
     final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
@@ -132,7 +132,7 @@ public final class Add extends ACreate {
    * @return info string
    * @throws BaseXException database exception
    */
-  public static String add(final Parser parser, final Context ctx,
+  private static String add(final Parser parser, final Context ctx,
       final String target, final String name, final Add cmd)
       throws BaseXException {
 

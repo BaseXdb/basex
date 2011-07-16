@@ -112,8 +112,7 @@ public abstract class UserFuncCall extends Arr {
   int addArgs(final QueryContext ctx, final Var[] vs) {
     // move variables to stack
     final int s = ctx.vars.size();
-    for(int a = 0; a < vs.length; a++)
-      ctx.vars.add(vs[a]);
+    for(final Var v : vs) ctx.vars.add(v);
     return s;
   }
 

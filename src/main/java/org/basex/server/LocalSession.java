@@ -26,7 +26,7 @@ public final class LocalSession extends Session {
   /** Database context. */
   private final Context ctx;
   /** Currently running query. */
-  private LinkedList<LocalQuery> queries;
+  private final LinkedList<LocalQuery> queries;
 
   /**
    * Constructor.
@@ -83,7 +83,7 @@ public final class LocalSession extends Session {
         i.next().closeListener();
         i.remove();
       }
-    } catch(BaseXException ex) { Util.debug(ex); }
+    } catch(final BaseXException ex) { Util.debug(ex); }
   }
 
   @Override

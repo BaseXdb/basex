@@ -1,10 +1,12 @@
 package org.basex.query.item;
 
+import static org.basex.data.DataText.*;
+
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.Util;
 
 /**
  * String item.
@@ -96,6 +98,16 @@ public class Str extends Item {
 
   @Override
   public final String toString() {
-    return Util.info("\"%\"", val);
+    final ByteList tb = new ByteList();
+    tb.add('"');
+    for(final byte v : val) {
+      switch(v) {
+        case '&': tb.add(E_AMP); break;
+        case '>': tb.add(E_GT); break;
+        case '<': tb.add(E_LT); break;
+        default: tb.add(v);
+      }
+    }
+    return tb.add('"').toString();
   }
 }

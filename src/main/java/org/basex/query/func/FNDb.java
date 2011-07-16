@@ -1,16 +1,15 @@
 package org.basex.query.func;
 
-import static org.basex.core.cmd.ACreate.*;
-import static org.basex.core.cmd.Rename.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.basex.core.BaseXException;
+import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
+import org.basex.core.cmd.ACreate;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
@@ -46,7 +45,6 @@ import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.Util;
 
 /**
  * Database functions.
@@ -68,14 +66,14 @@ public final class FNDb extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case OPEN:     return open(ctx).iter();
-      case TEXT:     return text(ctx);
-      case ATTR:     return attribute(ctx);
-      case FULLTEXT: return fulltext(ctx);
-      case LIST:     return list(ctx);
-      case NODEID:   return node(ctx, true);
-      case NODEPRE:  return node(ctx, false);
-      default:       return super.iter(ctx);
+      case DBOPEN:     return open(ctx).iter();
+      case DBTEXT:     return text(ctx);
+      case DBATTR:     return attribute(ctx);
+      case DBFULLTEXT: return fulltext(ctx);
+      case DBLIST:     return list(ctx);
+      case DBNODEID:   return node(ctx, true);
+      case DBNODEPRE:  return node(ctx, false);
+      default:         return super.iter(ctx);
     }
   }
 
@@ -83,16 +81,16 @@ public final class FNDb extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case EVENT:      return event(ctx);
-      case OPENID:     return open(ctx, true);
-      case OPENPRE:    return open(ctx, false);
-      case SYSTEM:     return system(ctx);
-      case INFO:       return info(ctx);
-      case ADD:        return add(ctx);
-      case DELETE:     return delete(ctx);
-      case RENAME:     return rename(ctx);
-      case REPLACEDOC: return replace(ctx);
-      case OPTIMIZE:   return optimize(ctx);
+      case DBEVENT:    return event(ctx);
+      case DBOPENID:   return open(ctx, true);
+      case DBOPENPRE:  return open(ctx, false);
+      case DBSYSTEM:   return system(ctx);
+      case DBINFO:     return info(ctx);
+      case DBADD:      return add(ctx);
+      case DBDELETE:   return delete(ctx);
+      case DBRENAME:   return rename(ctx);
+      case DBREPLACE:  return replace(ctx);
+      case DBOPTIMIZE: return optimize(ctx);
       default:         return super.item(ctx, ii);
     }
   }
@@ -100,8 +98,8 @@ public final class FNDb extends FuncCall {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case OPEN:     return open(ctx);
-      default:       return super.value(ctx);
+      case DBOPEN: return open(ctx);
+      default:     return super.value(ctx);
     }
   }
 
@@ -131,7 +129,7 @@ public final class FNDb extends FuncCall {
   private DBNode open(final QueryContext ctx, final boolean id)
       throws QueryException {
 
-    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
+    final Data data = data(0, ctx);
     final int v = (int) checkItr(expr[1], ctx);
     final int pre = id ? data.pre(v) : v;
     if(pre < 0 || pre >= data.meta.size) IDINVALID.thrw(input, this, v);
@@ -145,8 +143,7 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter text(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
-    final IndexContext ic = new IndexContext(ctx, data, null, true);
+    final IndexContext ic = new IndexContext(ctx, data(0, ctx), null, true);
     return new IndexAccess(input, expr[1], IndexType.TEXT, ic).iter(ctx);
   }
 
@@ -157,8 +154,7 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter attribute(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
-    final IndexContext ic = new IndexContext(ctx, data, null, true);
+    final IndexContext ic = new IndexContext(ctx, data(0, ctx), null, true);
     final IndexAccess ia = new IndexAccess(
         input, expr[1], IndexType.ATTRIBUTE, ic);
 
@@ -193,8 +189,7 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter fulltext(final QueryContext ctx) throws QueryException {
-    final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
-    return FNFt.search(data, checkStr(expr[1], ctx), this, ctx);
+    return FNFt.search(data(0, ctx), checkStr(expr[1], ctx), this, ctx);
   }
 
   /**
@@ -239,16 +234,16 @@ public final class FNDb extends FuncCall {
   private Str info(final QueryContext ctx) throws QueryException {
     checkRead(ctx);
 
+    final Data data = data(0, ctx);
     final byte[] info;
-    final Data d = ctx.resource.data(checkStr(expr[0], ctx), input);
     if(expr.length == 1) {
       final boolean create = ctx.context.user.perm(User.CREATE);
-      info = InfoDB.db(d.meta, false, true, create);
+      info = InfoDB.db(data.meta, false, true, create);
     } else {
       final byte[] tp = checkStr(expr[1], ctx);
       final CmdIndexInfo cmd = InfoIndex.info(string(tp));
       if(cmd == null) NOIDX.thrw(input, this);
-      info = InfoIndex.info(cmd, d);
+      info = InfoIndex.info(cmd, data);
     }
     return Str.get(Token.delete(info, '\r'));
   }
@@ -262,18 +257,17 @@ public final class FNDb extends FuncCall {
   private Item add(final QueryContext ctx) throws QueryException {
     checkWrite(ctx);
 
-    final byte[] name = expr.length < 3 ? null :
-      token(path(string(checkStr(expr[2], ctx))));
-    final byte[] path = expr.length < 4 ? null :
-      token(path(string(checkStr(expr[3], ctx))));
+    final Data data = data(0, ctx);
+    final byte[] name = expr.length < 3 ? null : path(checkStr(expr[2], ctx));
+    final byte[] path = expr.length < 4 ? null : path(checkStr(expr[3], ctx));
 
     // get all items representing document(s):
-    final ArrayList<Item> docs = new ArrayList<Item>();
+    final ArrayList<Item> docs = new ArrayList<Item>(
+        (int) Math.max(expr[1].size(), 1));
     final Iter iter = ctx.iter(expr[1]);
     for(Item i; (i = iter.next()) != null;) docs.add(i);
 
     if(docs.size() > 0) {
-      final Data data = ctx.resource.data(checkStr(expr[0], ctx), input);
       ctx.updates.add(new Add(data, input, docs, name, path, ctx.context), ctx);
     }
     return null;
@@ -288,22 +282,12 @@ public final class FNDb extends FuncCall {
   private Item replace(final QueryContext ctx) throws QueryException {
     checkWrite(ctx);
 
-    final String path = path(string(checkStr(expr[0], ctx)));
-
-    // the first step of the path should be the database name
-    final int pos = path.indexOf('/');
-    if(pos <= 0) NODB.thrw(input, path);
-    final byte[] db = token(path.substring(0, pos));
-    final Data data = ctx.resource.data(db, input);
-
-    // replace: source and target path are the same
-    final String src = path.substring(pos + 1);
-    final byte[] trg = token(src);
-
-    final Item doc = checkItem(expr[1], ctx);
+    final Data data = data(0, ctx);
+    final byte[] trg = path(checkStr(expr[1], ctx));
+    final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
-    final int[] old = data.doc(src);
+    final int[] old = data.doc(string(trg));
     if(old.length > 0) {
       final int pre = old[0];
       if(old.length > 1 || !eq(data.text(pre, true), trg))
@@ -322,7 +306,8 @@ public final class FNDb extends FuncCall {
       trgpath = subtoken(trg, 0, p);
     }
 
-    final ArrayList<Item> docs = new ArrayList<Item>(); docs.add(doc);
+    final ArrayList<Item> docs = new ArrayList<Item>(1);
+    docs.add(doc);
     final Add add = new Add(data, input, docs, trgname, trgpath, ctx.context);
     ctx.updates.add(add, ctx);
 
@@ -338,20 +323,11 @@ public final class FNDb extends FuncCall {
   private Item delete(final QueryContext ctx) throws QueryException {
     checkWrite(ctx);
 
-    final String path = path(string(checkStr(expr[0], ctx)));
-
-    // the first step of the path should be the database name
-    final int pos = path.indexOf('/');
-    if(pos <= 0) NODB.thrw(input, path);
-    final byte[] db = token(path.substring(0, pos));
-    final Data data = ctx.resource.data(db, input);
-
-    final String trg = path.substring(pos + 1);
-
-    final int[] docs = data.doc(trg);
-    for(final int pre : docs)
+    final Data data = data(0, ctx);
+    final byte[] target = path(checkStr(expr[1], ctx));
+    for(final int pre : data.doc(string(target))) {
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
-
+    }
     return null;
   }
 
@@ -364,23 +340,16 @@ public final class FNDb extends FuncCall {
   private Item rename(final QueryContext ctx) throws QueryException {
     checkWrite(ctx);
 
-    final String path = path(string(checkStr(expr[0], ctx)));
+    final Data data = data(0, ctx);
+    final byte[] source = path(checkStr(expr[1], ctx));
+    final byte[] target = path(checkStr(expr[2], ctx));
 
     // the first step of the path should be the database name
-    final int pos = path.indexOf('/');
-    if(pos <= 0) NODB.thrw(input, path);
-    final byte[] db = token(path.substring(0, pos));
-    final Data data = ctx.resource.data(db, input);
-
-    final byte[] src = token(path.substring(pos + 1));
-    final byte[] trg = token(path(string(checkStr(expr[1], ctx))));
-
-    final int[] docs = data.doc(string(src));
-    for(final int pre : docs) {
-      final byte[] nm = newName(data, pre, src, trg);
-      ctx.updates.add(new ReplaceValue(pre, data, input, nm), ctx);
+    for(final int pre : data.doc(string(source))) {
+      final byte[] trg = ACreate.newName(data, pre, source, target);
+      if(trg.length == 0) EMPTYPATH.thrw(input, this);
+      ctx.updates.add(new ReplaceValue(pre, data, input, trg), ctx);
     }
-
     return null;
   }
 
@@ -393,18 +362,19 @@ public final class FNDb extends FuncCall {
   private Item optimize(final QueryContext ctx) throws QueryException {
     checkWrite(ctx);
 
-    final boolean all = expr.length == 2 ? checkBln(expr[1], ctx) : false;
-    ctx.resource.data(checkStr(expr[0], ctx), input);
-    try {
-      (all ? new OptimizeAll() : new Optimize()).execute(ctx.context);
-    } catch(final BaseXException e) {
-      Util.errln(e);
-    }
+    // [DP] I've rewritten this a little; yet, the optimize code will
+    //   probably have to be moved to static methods to avoid that
+    //   the command is executed on the global data instance.
+
+    final boolean all = expr.length == 2 && checkBln(expr[1], ctx);
+    data(0, ctx);
+    final Command cmd = all ? new OptimizeAll() : new Optimize();
+    if(!cmd.run(ctx.context)) DBERR.thrw(input, cmd.info());
     return null;
   }
 
   /**
-   * Performs the node-id function.
+   * Performs the node-pre and node-id function.
    * @param ctx query context
    * @param id id flag
    * @return iterator
@@ -457,19 +427,45 @@ public final class FNDb extends FuncCall {
 
   @Override
   public boolean vacuous() {
-    return def == Function.EVENT;
+    return def == Function.DBEVENT;
   }
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (def == Function.TEXT || def == Function.ATTR ||
-        def == Function.FULLTEXT || def == Function.EVENT) || super.uses(u);
+    return u == Use.CTX && (def == Function.DBTEXT || def == Function.DBATTR ||
+      def == Function.DBFULLTEXT || def == Function.DBEVENT) || super.uses(u);
   }
 
   @Override
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
-    return def == Function.OPEN || def == Function.TEXT ||
-      def == Function.ATTR || def == Function.FULLTEXT || super.iterable();
+    return def == Function.DBOPEN || def == Function.DBTEXT ||
+      def == Function.DBATTR || def == Function.DBFULLTEXT || super.iterable();
+  }
+
+  /**
+   * Returns the data instance for the specified argument.
+   * @param arg argument
+   * @param ctx query context
+   * @return data instance
+   * @throws QueryException query exception
+   */
+  private Data data(final int arg, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = checkEmpty(expr[arg].item(ctx, input));
+    if(it.node()) return checkDBNode(it).data;
+    if(it.str())  return ctx.resource.data(it.atom(input), input);
+    throw STRNODTYPE.thrw(input, this, it.type);
+  }
+
+  /**
+   * Normalizes the database path.
+   * Removes duplicate, leading and trailing slashes
+   * @param path input path
+   * @return normalized path
+   */
+  private static byte[] path(final byte[] path) {
+    return token(ACreate.path(string(path)));
   }
 }

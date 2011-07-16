@@ -45,8 +45,11 @@ import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
+import org.basex.query.func.Function;
 import org.basex.query.item.ANode;
+import org.basex.query.item.Itr;
 import org.basex.query.item.NodeType;
+import org.basex.query.item.Str;
 import org.basex.util.Array;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -957,6 +960,8 @@ public enum GUICommands implements GUICommand {
    * @return function string
    */
   static String openPre(final Nodes n, final int i) {
-    return "db:open-pre('" + n.data.meta.name + "', " + n.list[i] + ")";
+    System.out.println("? ");
+    return Function.DBOPENPRE.get(null, Str.get(n.data.meta.name),
+        Itr.get(n.list[i])).toString();
   }
 }

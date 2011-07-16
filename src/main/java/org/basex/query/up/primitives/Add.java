@@ -21,6 +21,7 @@ import org.basex.util.Util;
 
 /**
  * Add primitive.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
@@ -28,9 +29,9 @@ public final class Add extends InsertBase {
   /** Documents to add. */
   private final List<Item> docs;
   /** New document name (used only for adding a single document). */
-  private byte[] name;
+  private final byte[] name;
   /** Path to which new document(s) will be added. */
-  private byte[] path;
+  private final byte[] path;
   /** Database context. */
   private final Context ctx;
 
@@ -45,6 +46,7 @@ public final class Add extends InsertBase {
    */
   public Add(final Data trg, final InputInfo i, final List<Item> d,
       final byte[] n, final byte[] p, final Context c) {
+
     super(PrimitiveType.INSERTAFTER, lastDoc(trg), trg, i, null);
     docs = d;
     name = n == null || n.length == 0 ? null : n;
@@ -60,8 +62,7 @@ public final class Add extends InsertBase {
   @Override
   public void merge(final UpdatePrimitive p) {
     if(p instanceof Add) {
-      final Add a = (Add) p;
-      docs.addAll(a.docs);
+      docs.addAll(((Add) p).docs);
     } else {
       Util.notexpected(p);
     }
@@ -70,9 +71,7 @@ public final class Add extends InsertBase {
   @Override
   public void apply() {
     super.apply();
-
-    final int k = data.kind(pre);
-    data.insert(pre + data.size(pre, k), -1, md);
+    data.insert(pre + data.size(pre, data.kind(pre)), -1, md);
     if(ctx.data != null) ctx.update();
   }
 
@@ -85,7 +84,7 @@ public final class Add extends InsertBase {
       if(d.node()) {
         // adding a document node
         final ANode doc = (ANode) d;
-        if(doc.ndType() != NodeType.DOC) UPFOTYPE.thrw(input, doc);
+        if(doc.ndType() != NodeType.DOC) UPDOCTYPE.thrw(input, doc);
         docData = new MemData(data);
         new DataBuilder(docData).build(doc);
       } else if(d.str()) {
@@ -96,7 +95,7 @@ public final class Add extends InsertBase {
         final MemBuilder b = new MemBuilder(p, ctx.prop);
         try {
           docData = b.build(data.meta.random());
-        } catch(IOException e) {
+        } catch(final IOException e) {
           throw DOCERR.thrw(input, docpath);
         }
       } else {
@@ -122,18 +121,18 @@ public final class Add extends InsertBase {
     }
   }
 
-  @Override
-  public String toString() {
-    return Util.name(this) + "[" + targetNode() + "]";
-  }
-
   /**
-   * Last document in the database.
+   * Returns the last document in the database.
    * @param data database
    * @return pre value of the last document or {@code 0} if database is empty
    */
   private static int lastDoc(final Data data) {
     final int[] docs = data.doc();
     return docs.length == 0 ? 0 : docs[docs.length - 1];
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + targetNode() + "]";
   }
 }

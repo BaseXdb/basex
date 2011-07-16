@@ -134,11 +134,9 @@ public final class FNXslt extends FuncCall {
       in.serialize(xml);
       xml.close();
       return new IOContent(ao.toArray());
-    } else if(in.str()) {
-      return IO.get(string(in.atom(input)));
-    } else {
-      throw STRNODTYPE.thrw(input, this, in.type);
     }
+    if(in.str()) return IO.get(string(in.atom(input)));
+    throw STRNODTYPE.thrw(input, this, in.type);
   }
 
   @Override

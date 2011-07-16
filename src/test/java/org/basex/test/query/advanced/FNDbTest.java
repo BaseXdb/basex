@@ -51,7 +51,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testOpen() throws QueryException, BaseXException {
-    final String fun = check(Function.OPEN);
+    final String fun = check(Function.DBOPEN);
     query("count(" + fun + "('db'))", "1");
     query("count(" + fun + "('db/'))", "1");
 
@@ -72,7 +72,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testOpenPre() throws QueryException {
-    final String fun = check(Function.OPENPRE);
+    final String fun = check(Function.DBOPENPRE);
     query(fun + "('db', 0)//title/text()", "XML");
     error(fun + "('db', -1)", Err.IDINVALID);
   }
@@ -83,7 +83,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testOpenId() throws QueryException {
-    final String fun = check(Function.OPENID);
+    final String fun = check(Function.DBOPENID);
     query(fun + "('db', 0)//title/text()", "XML");
     error(fun + "('db', -1)", Err.IDINVALID);
   }
@@ -95,7 +95,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testText() throws QueryException, BaseXException {
-    final String fun = check(Function.TEXT);
+    final String fun = check(Function.DBTEXT);
 
     // run function without and with index
     new DropIndex("text").execute(CONTEXT);
@@ -112,7 +112,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testAttribute() throws QueryException, BaseXException {
-    final String fun = check(Function.ATTR);
+    final String fun = check(Function.DBATTR);
 
     // run function without and with index
     new DropIndex("attribute").execute(CONTEXT);
@@ -131,7 +131,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testIndex() throws QueryException, BaseXException {
-    final String fun = check(Function.FULLTEXT);
+    final String fun = check(Function.DBFULLTEXT);
 
     // run function without and with index
     new DropIndex("fulltext").execute(CONTEXT);
@@ -148,7 +148,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testList() throws QueryException, BaseXException {
-    final String fun = check(Function.LIST);
+    final String fun = check(Function.DBLIST);
 
     // add documents
     new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
@@ -168,7 +168,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testAdd() throws QueryException {
-    final String fun = check(Function.ADD);
+    final String fun = check(Function.DBADD);
 
     query(fun + "('db', document { <root/> }, 'test1.xml')");
     query("count(collection('db/test1.xml')/root) eq 1", "true");
@@ -193,15 +193,15 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testReplace() throws QueryException, BaseXException {
-    final String fun = check(Function.REPLACEDOC);
+    final String fun = check(Function.DBREPLACE);
 
     new Add("etc/test/input.xml", null, "test").execute(CONTEXT);
 
-    query(fun + "('db/test/input.xml', document { <root/> })");
+    query(fun + "('db', 'test/input.xml', document { <root/> })");
     query("count(collection('db/test/input.xml')/html) eq 0", "true");
     query("count(collection('db/test/input.xml')/root) eq 1", "true");
 
-    query(fun + "('db/test/input.xml', 'etc/test/input.xml')");
+    query(fun + "('db', 'test/input.xml', 'etc/test/input.xml')");
     query("count(collection('db/test/input.xml')/html) eq 1", "true");
     query("count(collection('db/test/input.xml')/root) eq 0", "true");
   }
@@ -213,11 +213,11 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testDelete() throws QueryException, BaseXException {
-    final String fun = check(Function.DELETE);
+    final String fun = check(Function.DBDELETE);
 
     new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
 
-    query(fun + "('db/test')", "");
+    query(fun + "('db', 'test')", "");
     query("count(collection('db/test')) eq 0", "true");
   }
 
@@ -228,11 +228,11 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testRename() throws QueryException, BaseXException {
-    final String fun = check(Function.RENAME);
+    final String fun = check(Function.DBRENAME);
 
     new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
 
-    query(fun + "('db/test', 'newtest')", "");
+    query(fun + "('db', 'test', 'newtest')", "");
     query("count(collection('db/newtest')) gt 0", "true");
   }
 
@@ -242,7 +242,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testOptimize() throws QueryException {
-    final String fun = check(Function.OPTIMIZE);
+    final String fun = check(Function.DBOPTIMIZE);
 
     query(fun + "('db')");
     query(fun + "('db', true())");
@@ -254,7 +254,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testNodePre() throws QueryException {
-    final String fun = check(Function.NODEPRE);
+    final String fun = check(Function.DBNODEPRE);
     query(fun + "(/html)", "1");
     query(fun + "(/ | /html)", "0 1");
   }
@@ -265,7 +265,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void testNode() throws QueryException {
-    final String fun = check(Function.NODEID);
+    final String fun = check(Function.DBNODEID);
     query(fun + "(/html)", "1");
     query(fun + "(/ | /html)", "0 1");
   }
@@ -277,7 +277,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void testSystem() throws QueryException {
     // wrong arguments
-    final String fun = check(Function.SYSTEM);
+    final String fun = check(Function.DBSYSTEM);
     contains(fun + "()", INFOON);
   }
 
@@ -289,7 +289,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void testInfo() throws QueryException, BaseXException {
     // wrong arguments
-    final String fun = check(Function.INFO);
+    final String fun = check(Function.DBINFO);
 
     // standard test
     contains(fun + "('db')", INFOON);

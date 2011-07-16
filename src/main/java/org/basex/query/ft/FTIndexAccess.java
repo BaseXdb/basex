@@ -8,14 +8,15 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Simple;
+import org.basex.query.func.Function;
 import org.basex.query.item.FTNode;
 import org.basex.query.item.ANode;
+import org.basex.query.item.Str;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.IndexContext;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
 
 /**
  * FTContains expression with index access.
@@ -99,7 +100,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    return new TokenBuilder("db:fulltext('").add(ictx.data.meta.name).
-      add("', ").addExt(ftexpr).add(')').toString();
+    return Function.DBFULLTEXT.get(input, Str.get(ictx.data.meta.name),
+        ftexpr).toString();
   }
 }

@@ -25,7 +25,7 @@ public class LocalQuery extends Query {
   /** Iterator flag. */
   private boolean ready;
   /** Owning local session. */
-  private LocalSession session;
+  private final LocalSession session;
 
   /**
    * Constructor. Query output will be returned by each called methods.
@@ -40,7 +40,7 @@ public class LocalQuery extends Query {
     buf = new ByteArrayOutputStream();
     try {
       qp = new QueryListener(q, PrintOutput.get(buf), ctx);
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
   }
@@ -60,7 +60,7 @@ public class LocalQuery extends Query {
     buf = null;
     try {
       qp = new QueryListener(q, PrintOutput.get(o), ctx);
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
   }
@@ -70,7 +70,7 @@ public class LocalQuery extends Query {
       throws BaseXException {
     try {
       qp.bind(n, v, t);
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
   }
@@ -79,7 +79,7 @@ public class LocalQuery extends Query {
   public String init() throws BaseXException {
     try {
       qp.init();
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       throw new BaseXException(ex);
     }
     return output();
@@ -90,7 +90,7 @@ public class LocalQuery extends Query {
     try {
       ready = true;
       return qp.next();
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       throw new BaseXException(ex);
     }
   }
@@ -100,7 +100,7 @@ public class LocalQuery extends Query {
     try {
       if(ready) ready = false;
       else qp.next();
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       throw new BaseXException(ex);
     }
     return output();
@@ -110,7 +110,7 @@ public class LocalQuery extends Query {
   public String execute() throws BaseXException {
     try {
       qp.execute();
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       throw new BaseXException(ex);
     }
     return output();
@@ -135,7 +135,7 @@ public class LocalQuery extends Query {
   String closeListener() throws BaseXException {
     try {
       qp.close(false);
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
     return output();
