@@ -1,13 +1,11 @@
 package org.basex.test.performance;
 
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
-import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.util.Performance;
 
@@ -18,12 +16,10 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public final class CollStressTest {
-  /** Create-only fag. */
-  private static boolean createonly = true;
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of documents to be added. */
-  private static final int SIZE = 10000;
+  private static final int SIZE = 1000;
 
   /**
    * Runs the example code.
@@ -32,8 +28,6 @@ public final class CollStressTest {
    */
   public static void main(final String[] args) throws Exception {
     System.out.println("=== CollStressTest ===");
-
-    new Set(Prop.INTPARSE, true).execute(CONTEXT);
 
     // Create test database
     System.out.println("\n* Create test database.");
@@ -48,8 +42,6 @@ public final class CollStressTest {
       new Add("<xml/>", Integer.toString(i)).execute(CONTEXT);
     }
     System.out.println("\n* " + SIZE + " documents added: " + perf);
-
-    if(createonly) return;
 
     // Request specific documents
     for(int i = 0; i < SIZE; i++) {
