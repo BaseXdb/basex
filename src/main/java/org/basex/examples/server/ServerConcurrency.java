@@ -30,7 +30,7 @@ public final class ServerConcurrency {
    */
   void run() throws Exception {
 
-    System.out.println("=== ServerConcurrencyExample ===");
+    System.out.println("=== ServerConcurrency ===");
 
     // ------------------------------------------------------------------------
     // Start server

@@ -20,7 +20,7 @@ public final class ServerCommands {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerExample ===");
+    System.out.println("=== ServerCommands ===");
 
     // ------------------------------------------------------------------------
     // Start server on default port 1984

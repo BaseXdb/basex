@@ -30,7 +30,7 @@ public final class ServerAndLocal {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerLocalExample ===");
+    System.out.println("=== ServerAndLocal ===");
 
     // ------------------------------------------------------------------------
     // Start server

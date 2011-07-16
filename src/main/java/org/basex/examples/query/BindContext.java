@@ -25,7 +25,7 @@ public final class BindContext {
     /** Database context. */
     Context context = new Context();
 
-    System.out.println("=== BindVariable ===");
+    System.out.println("=== BindContext ===");
 
     // ------------------------------------------------------------------------
     // Specify query to be executed

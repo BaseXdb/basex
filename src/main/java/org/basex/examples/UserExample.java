@@ -20,7 +20,7 @@ public final class UserExample {
     /** Database context. */
     final Context context = new Context();
 
-    System.out.println("=== AdministrationExample ===");
+    System.out.println("=== UserExample ===");
 
     // ----------------------------------------------------------------------
     // Create a database

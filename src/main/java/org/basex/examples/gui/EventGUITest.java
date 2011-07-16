@@ -26,6 +26,7 @@ import org.basex.util.Util;
 
 /**
  * This class tests the event mechanism with a gui.
+ *
  * @author BaseX Team 2005-11, BSD License
  */
 public final class EventGUITest extends JFrame {

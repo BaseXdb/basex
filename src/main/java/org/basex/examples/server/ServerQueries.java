@@ -20,7 +20,7 @@ public final class ServerQueries {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerQueryExample ===");
+    System.out.println("=== ServerQueries ===");
 
     // ------------------------------------------------------------------------
     // Start server
