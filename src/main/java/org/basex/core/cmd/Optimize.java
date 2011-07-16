@@ -34,7 +34,52 @@ public final class Optimize extends ACreate {
   @Override
   protected boolean run() {
     final Data d = context.data;
+    final MetaData m = d.meta;
+    size = m.size;
 
+    try {
+      optimize(d, prop, this);
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
+
+    return info(DBOPTIMIZED, m.name, perf);
+  }
+
+  @Override
+  public double prog() {
+    return (double) pre / size;
+  }
+
+  @Override
+  public boolean stoppable() {
+    return false;
+  }
+
+  @Override
+  public String det() {
+    return INFOSTATS;
+  }
+
+  /**
+   * Optimize data structures.
+   * @param d data
+   * @param p database properties
+   * @throws IOException IO exception during index rebuild
+   */
+  public static void optimize(final Data d, final Prop p) throws IOException {
+    optimize(d, p, null);
+  }
+
+  /**
+   * Optimize data structures.
+   * @param d data
+   * @param p database properties
+   * @param c calling command (can be null)
+   * @throws IOException IO exception during index rebuild
+   */
+  private static void optimize(final Data d, final Prop p, final Optimize c)
+      throws IOException {
     // refresh indexes
     d.pthindex.init();
     d.tagindex.init();
@@ -44,12 +89,11 @@ public final class Optimize extends ACreate {
 
     final int[] parStack = new int[IO.MAXHEIGHT];
     final int[] tagStack = new int[IO.MAXHEIGHT];
-    final boolean path = prop.is(Prop.PATHINDEX);
+    final boolean path = p.is(Prop.PATHINDEX);
     int level = 0;
     int h = 0, n = 0;
 
-    size = m.size;
-    for(pre = 0; pre < size; ++pre) {
+    for(int pre = 0; pre < m.size; ++pre) {
       final byte kind = (byte) d.kind(pre);
       final int par = d.parent(pre, kind);
       while(level > 0 && parStack[level - 1] > par) --level;
@@ -74,6 +118,7 @@ public final class Optimize extends ACreate {
         if(path) d.pthindex.index(0, kind, level);
       }
       if(h < level) h = level;
+      if(c != null) c.pre = pre;
     }
     m.ndocs = n;
     m.pathindex = path;
@@ -81,29 +126,11 @@ public final class Optimize extends ACreate {
 
     try {
       // global property check can be skipped as soon as id/pre mapping exists
-      if(m.textindex || prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT,      d);
-      if(m.attrindex || prop.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, d);
-      if(m.ftindex   || prop.is(Prop.FTINDEX))   index(IndexType.FULLTEXT,  d);
-    } catch(final IOException ex) {
-      Util.debug(ex);
+      if(m.textindex || p.is(Prop.TEXTINDEX)) index(IndexType.TEXT,      d, c);
+      if(m.attrindex || p.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, d, c);
+      if(m.ftindex   || p.is(Prop.FTINDEX))   index(IndexType.FULLTEXT,  d, c);
+    } finally {
+      d.flush();
     }
-    d.flush();
-
-    return info(DBOPTIMIZED, m.name, perf);
-  }
-
-  @Override
-  public double prog() {
-    return (double) pre / size;
-  }
-
-  @Override
-  public boolean stoppable() {
-    return false;
-  }
-
-  @Override
-  public String det() {
-    return INFOSTATS;
   }
 }

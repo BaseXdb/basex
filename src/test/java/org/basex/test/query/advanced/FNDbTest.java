@@ -233,6 +233,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     new Add("etc/test/dir", "docs", "test").execute(CONTEXT);
 
     query(fun + "('db', 'test', 'newtest')", "");
+    query("count(collection('db/test')) eq 0", "true");
     query("count(collection('db/newtest')) gt 0", "true");
   }
 

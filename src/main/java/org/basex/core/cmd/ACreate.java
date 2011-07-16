@@ -138,6 +138,18 @@ public abstract class ACreate extends Command {
    */
   protected final void index(final IndexType type, final Data data)
       throws IOException {
+    index(type, data, this);
+  }
+
+  /**
+   * Builds the specified index.
+   * @param type index to be built
+   * @param data data reference
+   * @param cmd calling command
+   * @throws IOException I/O exception
+   */
+  protected static void index(final IndexType type, final Data data,
+      final ACreate cmd) throws IOException {
 
     if(data instanceof MemData) return;
     IndexBuilder ib = null;
@@ -149,7 +161,7 @@ public abstract class ACreate extends Command {
       default:        throw Util.notexpected();
     }
     data.closeIndex(type);
-    data.setIndex(type, progress(ib).build());
+    data.setIndex(type, (cmd == null ? ib : cmd.progress(ib)).build());
   }
 
   /**
