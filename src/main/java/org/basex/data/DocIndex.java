@@ -54,8 +54,7 @@ final class DocIndex {
    */
   synchronized IntList doc(final Data data) {
     if(docs == null || !data.meta.docindex) {
-      order = null;
-      paths = null;
+      update();
       docs = new IntList();
       final int is = data.meta.size;
       for(int i = 0; i < is; i += data.size(i, Data.DOC)) docs.add(i);
@@ -66,14 +65,37 @@ final class DocIndex {
   }
 
   /**
-   * Adds a pre value to the end of the node list, and invalidates the
-   * name mappings.
+   * Adds a pre value to the end of the node list.
    * @param data data reference
    * @param pre pre value
    */
   void add(final Data data, final int pre) {
     doc(data).add(pre);
+    update();
+  }
+
+  /**
+   * Deletes the specified pre value.
+   * @param data data reference
+   * @param pre pre value
+   * @param size number of deleted nodes
+   */
+  void delete(final Data data, final int pre, final int size) {
+    final IntList il = doc(data);
+    int i = il.sortedIndexOf(pre);
+    if(i < 0) i = -i - 1;
+    else il.delete(i);
+    final int is = il.size();
+    for(; i < is; i++) il.set(il.get(i) - size, i);
+    update();
+  }
+
+  /**
+   * Discards the document paths.
+   */
+  void update() {
     paths = null;
+    order = null;
   }
 
   /**

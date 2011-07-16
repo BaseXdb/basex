@@ -472,7 +472,7 @@ public abstract class Data {
   // UPDATE OPERATIONS ========================================================
 
   /**
-   * Renames (updates) an element, attribute or pi name.
+   * Updates (renames) an element, attribute or pi name.
    * @param pre pre value
    * @param kind node kind
    * @param name new tag, attribute or pi name
@@ -481,7 +481,7 @@ public abstract class Data {
   public final void update(final int pre, final int kind, final byte[] name,
       final byte[] uri) {
 
-    meta.update(false);
+    meta.update();
 
     if(kind == PI) {
       text(pre, trim(concat(name, SPACE, atom(pre))), true);
@@ -504,13 +504,16 @@ public abstract class Data {
   }
 
   /**
-   * Replaces the value of a single text, comment, pi or attribute node.
+   * Updates (replaces) the value of a single text, comment, pi or
+   * attribute node.
    * @param pre pre value to be replaced
    * @param kind node kind
    * @param value value to be updated (tag name, text, comment, pi)
    */
   public final void update(final int pre, final int kind, final byte[] value) {
-    meta.update(false);
+    meta.update();
+    if(kind == DOC) docindex.update();
+
     text(pre, kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value,
         kind != ATTR);
   }
@@ -521,7 +524,8 @@ public abstract class Data {
    * @param data replace data
    */
   public final void replace(final int rpre, final Data data) {
-    meta.update(true);
+    meta.update();
+    meta.docindex = false;
 
     // check if attribute size of parent must be updated
     final int dsize = data.meta.size;
@@ -592,11 +596,16 @@ public abstract class Data {
    * @param pre pre value of the node to delete
    */
   public final void delete(final int pre) {
-    meta.update(true);
+    meta.update();
 
     // size of the subtree to delete
     int k = kind(pre);
     int s = size(pre, k);
+    final boolean empty = pre == 0 && s == meta.size;
+
+    // update document index: delete specified entry
+    docindex.delete(this, pre, s);
+
     ns.delete(pre, s);
 
     // reduce size of ancestors
@@ -618,12 +627,11 @@ public abstract class Data {
 
     // preserve empty root node
     int p = pre;
-    final boolean empty = p == 0 && s == meta.size;
     if(empty) {
       ++p;
       --s;
-    } else {
-      if(kind(p) == DOC) --meta.ndocs;
+    } else if(kind(p) == DOC) {
+      --meta.ndocs;
     }
 
     // delete node from table structure and reduce document size
@@ -647,7 +655,9 @@ public abstract class Data {
    * @param data data instance to copy from
    */
   public final void insertAttr(final int pre, final int par, final Data data) {
-    meta.update(true);
+    meta.update();
+    meta.docindex = false;
+
     insert(pre, par, data);
     attSize(par, ELEM, attSize(par, ELEM) + data.meta.size);
   }
@@ -660,10 +670,13 @@ public abstract class Data {
    * @param data data instance to copy from
    */
   public final void insert(final int ipre, final int ipar, final Data data) {
-    // indicates if data is added at the end of the table
-    final boolean struct = ipre != meta.size;
-    meta.update(struct);
-    if(!struct) docindex.add(this, ipre);
+    meta.update();
+
+    // indicates if database is empty (dummy node will be deleted)
+    final boolean empty = empty();
+    // indicates if update will change entries in document index
+    final boolean struct = ipre != meta.size || empty;
+    if(struct) meta.docindex = false;
 
     final int[] preStack = new int[IO.MAXHEIGHT];
     int l = 0;
@@ -747,6 +760,8 @@ public abstract class Data {
           meta.ndocs++;
           ns.open();
           preStack[l++] = pre;
+          // update document index: add new document node to index
+          if(!struct) docindex.add(this, pre);
           break;
         case ELEM:
           // add element
@@ -813,7 +828,7 @@ public abstract class Data {
     ns.update(ipre, ms, true, newNodes);
 
     // delete old empty root node
-    if(size(0, DOC) == 1) delete(0);
+    if(empty) delete(0);
   }
 
   /**

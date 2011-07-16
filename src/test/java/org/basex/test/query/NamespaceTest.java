@@ -525,7 +525,7 @@ public final class NamespaceTest {
       // quotes are replaced by apostrophes to simplify comparison
       final String res = result.replaceAll("\\\"", "'");
       final String exp = expected.replaceAll("\\\"", "'");
-      if(!exp.equals(res)) fail("\n" + res + "\n" + exp + " expected");
+      if(!exp.equals(res)) fail("\nExpected: " + exp + "\nFound: " + res);
     } catch(final BaseXException ex) {
       fail(ex.getMessage());
     }

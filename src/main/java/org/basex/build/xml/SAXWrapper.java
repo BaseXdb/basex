@@ -88,7 +88,7 @@ public final class SAXWrapper extends SingleParser {
         f.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
         f.setNamespaceAware(true);
         f.setValidating(false);
-        //f.setXIncludeAware(true);
+        f.setXIncludeAware(true);
         r = f.newSAXParser().getXMLReader();
       }
 

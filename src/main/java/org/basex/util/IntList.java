@@ -85,6 +85,14 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Deletes the specified element.
+   * @param i element to be deleted
+   */
+  public final void delete(final int i) {
+    Array.move(list, i + 1, -1, --size - i);
+  }
+
+  /**
    * Pops the uppermost element from the stack.
    * @return the popped element
    */
