@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.cmd.ACreate;
@@ -17,6 +16,7 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.OptimizeAll;
 import org.basex.data.Data;
+import org.basex.data.DiskData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.SerializerException;
@@ -369,14 +369,20 @@ public final class FNDb extends FuncCall {
   private Item optimize(final QueryContext ctx) throws QueryException {
     checkWrite(ctx);
 
-    // [DP] I've rewritten this a little; yet, the optimize code will
-    //   probably have to be moved to static methods to avoid that
-    //   the command is executed on the global data instance.
-
     final boolean all = expr.length == 2 && checkBln(expr[1], ctx);
-    data(0, ctx);
-    final Command cmd = all ? new OptimizeAll() : new Optimize();
-    if(!cmd.run(ctx.context)) DBERR.thrw(input, cmd.info());
+    final Data data = data(0, ctx);
+
+    try {
+      if(all) {
+        if(!(data instanceof DiskData)) PROCMM.thrw(input);
+        if(ctx.context.datas.pins(data.meta.name) > 1) DBLOCKED.thrw(input);
+        OptimizeAll.optimizeAll((DiskData) data, data.meta.prop);
+      } else {
+        Optimize.optimize(data, data.meta.prop);
+      }
+    } catch(IOException e) {
+      DBERR.thrw(input, e.getMessage());
+    }
     return null;
   }
 
