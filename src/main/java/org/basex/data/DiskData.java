@@ -117,7 +117,7 @@ public final class DiskData extends Data {
     out.writeString(DBNS);
     ns.write(out);
     out.writeString(DBDOCS);
-    docindex.write(this, out);
+    docindex.write(out);
     out.write(0);
     out.close();
   }
@@ -159,7 +159,7 @@ public final class DiskData extends Data {
         if(ftxindex != null) { ftxindex.close(); ftxindex = null; }
         break;
       default:
-        // path index will not be closed
+        // other indexes will not be closed
         break;
     }
   }

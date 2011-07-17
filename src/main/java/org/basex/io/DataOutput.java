@@ -129,7 +129,7 @@ public final class DataOutput extends OutputStream {
     writeNum(al);
     int c = 0;
     for(int a = 0; a < al; a++) {
-      int t = array.get(a);
+      final int t = array.get(a);
       writeNum(t - c);
       c = t;
     }

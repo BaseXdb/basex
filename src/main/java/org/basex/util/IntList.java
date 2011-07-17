@@ -55,7 +55,7 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Returns the element at the specified index.
+   * Returns the element at the specified index position.
    * @param i index
    * @return element
    */
@@ -64,7 +64,7 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Sets an element at the specified index.
+   * Sets an element at the specified index position.
    * @param e element to be set
    * @param i index
    */
@@ -85,11 +85,42 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Inserts elements at the specified index position.
+   * @param e elements to be inserted
+   * @param i index
+   */
+  public final void insert(final int[] e, final int i) {
+    final int l = e.length;
+    if(l == 0) return;
+    if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
+    Array.move(list, i, l, size - i);
+    System.arraycopy(e, 0, list, i, l);
+    size += l;
+  }
+
+  /**
    * Deletes the specified element.
    * @param i element to be deleted
    */
   public final void delete(final int i) {
     Array.move(list, i + 1, -1, --size - i);
+  }
+
+  /**
+   * Adds a difference to all elements starting from the specified index.
+   * @param e difference
+   * @param i index
+   */
+  public final void move(final int e, final int i) {
+    for(int a = i; a < size; a++) list[a] += e;
+  }
+
+  /**
+   * Returns the uppermost element from the stack.
+   * @return the uppermost element
+   */
+  public final int peek() {
+    return list[size - 1];
   }
 
   /**

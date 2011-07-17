@@ -185,16 +185,16 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(Function.DBADD);
 
     query(fun + "('db', document { <root/> }, 'test1.xml')");
-    query("count(collection('db/test1.xml')/root) eq 1", "true");
+    query("count(collection('db/test1.xml')/root)", "1");
 
     query(fun + "('db', document { <root/> }, 'test2.xml', 'test')");
-    query("count(collection('db/test/test2.xml')/root) eq 1", "true");
+    query("count(collection('db/test/test2.xml')/root)", "1");
 
     query(fun + "('db', 'etc/test/input.xml', '', 'test')");
-    query("count(collection('db/test/input.xml')/html) eq 1", "true");
+    query("count(collection('db/test/input.xml')/html)", "1");
 
     query(fun + "('db', 'etc/test/input.xml', 'test3.xml', 'test')");
-    query("count(collection('db/test/test3.xml')/html) eq 1", "true");
+    query("count(collection('db/test/test3.xml')/html)", "1");
 
     query(fun + "('db', '" + FLDR + "', '', 'test/dir')");
     query("count(collection('db/test/dir'))", NFLDR);
@@ -212,12 +212,12 @@ public final class FNDbTest extends AdvancedQueryTest {
     new Add("etc/test/input.xml", null, "test").execute(CONTEXT);
 
     query(fun + "('db', 'test/input.xml', document { <root/> })");
-    query("count(collection('db/test/input.xml')/html) eq 0", "true");
-    query("count(collection('db/test/input.xml')/root) eq 1", "true");
+    query("count(collection('db/test/input.xml')/html)", "0");
+    query("count(collection('db/test/input.xml')/root)", "1");
 
     query(fun + "('db', 'test/input.xml', 'etc/test/input.xml')");
-    query("count(collection('db/test/input.xml')/html) eq 1", "true");
-    query("count(collection('db/test/input.xml')/root) eq 0", "true");
+    query("count(collection('db/test/input.xml')/html)", "1");
+    query("count(collection('db/test/input.xml')/root)", "0");
   }
 
   /**
@@ -232,7 +232,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     new Add(FLDR, "docs", "test").execute(CONTEXT);
 
     query(fun + "('db', 'test')", "");
-    query("count(collection('db/test')) eq 0", "true");
+    query("count(collection('db/test'))", "0");
   }
 
   /**

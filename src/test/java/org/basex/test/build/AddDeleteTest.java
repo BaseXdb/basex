@@ -141,7 +141,7 @@ public final class AddDeleteTest {
     new Add(FLDR, null, "foo/pub").execute(CONTEXT);
     assertEquals(NFLDR, CONTEXT.doc().length);
     new Delete("foo").execute(CONTEXT);
-    assertEquals(0, CONTEXT.doc().length);
+    assertEquals(1, CONTEXT.doc().length);
     new Add(FILE, null, "/foo///bar////").execute(CONTEXT);
     new Add(FLDR, null, "foobar").execute(CONTEXT);
     new Delete("foo").execute(CONTEXT);

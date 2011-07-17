@@ -237,6 +237,6 @@ public final class PathSummary implements Index {
 
   @Override
   public byte[] info() {
-    return EMPTY;
+    throw Util.notexpected();
   }
 }

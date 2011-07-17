@@ -5,10 +5,14 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.core.Prop;
+import org.basex.index.Index;
+import org.basex.index.IndexIterator;
+import org.basex.index.IndexToken;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.IntList;
+import org.basex.util.Util;
 
 /**
  * This class contains references to all document nodes in a database.
@@ -16,7 +20,9 @@ import org.basex.util.IntList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class DocIndex {
+final class DocIndex implements Index {
+  /** Data reference. */
+  private final Data data;
   /** Sorted document paths. */
   private byte[][] paths;
   /** Mapping between document paths and pre values. */
@@ -25,34 +31,39 @@ final class DocIndex {
   private IntList docs;
 
   /**
-   * Opens the metadata for the current database and returns the table size.
+   * Constructor.
+   * @param d data reference
+   */
+  DocIndex(final Data d) {
+    data = d;
+  }
+
+  /**
+   * Reads the document index.
    * @param in input stream
    * @return success flag
    * @throws IOException I/O exception
    */
-  public boolean read(final DataInput in) throws IOException {
+  boolean read(final DataInput in) throws IOException {
     docs = new IntList(in.readDiffs());
     return true;
   }
 
   /**
-   * Writes permissions to disk.
-   * @param data data reference
-   * @param out output stream; if set to null, the global rights are written
+   * Writes the document index.
+   * @param out output stream
    * @throws IOException I/O exception
    */
-  public void write(final Data data, final DataOutput out) throws IOException {
-    doc(data);
-    out.writeDiffs(docs);
+  void write(final DataOutput out) throws IOException {
+    out.writeDiffs(doc());
   }
 
   /**
    * Returns the pre values of all document nodes.
    * A single dummy node is returned if the database is empty.
-   * @param data data reference
    * @return document nodes
    */
-  synchronized IntList doc(final Data data) {
+  synchronized IntList doc() {
     if(docs == null || !data.meta.docindex) {
       update();
       docs = new IntList();
@@ -64,30 +75,69 @@ final class DocIndex {
     return docs;
   }
 
+  @Override
+  public IndexIterator ids(final IndexToken token) {
+    throw Util.notexpected();
+  }
+
+  @Override
+  public int nrIDs(final IndexToken token) {
+    throw Util.notexpected();
+  }
+
+  @Override
+  public void close() { }
+
+  @Override
+  public byte[] info() {
+    return EMPTY;
+  }
+
   /**
-   * Adds a pre value to the end of the node list.
-   * @param data data reference
-   * @param pre pre value
+   * Adds entries to the index and updates subsequent nodes.
+   * @param pre insertion position
+   * @param d data reference to be inserted
    */
-  void add(final Data data, final int pre) {
-    doc(data).add(pre);
+  void insert(final int pre, final Data d) {
+    // find all document nodes
+    final int dsize = d.meta.size;
+    final IntList pres = new IntList();
+    for(int dpre = 0; dpre < dsize;) {
+      final int k = d.kind(dpre);
+      if(k == Data.DOC) pres.add(pre + dpre);
+      dpre += d.size(dpre, k);
+    }
+
+    final IntList doc = doc();
+    int i = doc.sortedIndexOf(pre);
+    if(i < 0) i = -i - 1;
+    doc.insert(pres.toArray(), i);
+    doc.move(dsize, i + pres.size());
     update();
   }
 
   /**
-   * Deletes the specified pre value.
-   * @param data data reference
+   * Deletes the specified entry and updates subsequent nodes.
    * @param pre pre value
    * @param size number of deleted nodes
    */
-  void delete(final Data data, final int pre, final int size) {
-    final IntList il = doc(data);
-    int i = il.sortedIndexOf(pre);
+  void delete(final int pre, final int size) {
+    final IntList doc = doc();
+    int i = doc.sortedIndexOf(pre);
     if(i < 0) i = -i - 1;
-    else il.delete(i);
-    final int is = il.size();
-    for(; i < is; i++) il.set(il.get(i) - size, i);
+    else doc.delete(i);
+    doc.move(-size, i);
     update();
+  }
+
+  /**
+   * Replaces entries in the index.
+   * @param pre insertion position
+   * @param d data reference to be copied
+   */
+  void replace(final int pre, final Data d) {
+    delete(pre, d.meta.size);
+    insert(pre, d);
   }
 
   /**
@@ -101,23 +151,22 @@ final class DocIndex {
   /**
    * Returns the pre values of all document nodes matching the specified path.
    * @param path input path
-   * @param data data reference
    * @return root nodes
    */
-  synchronized IntList doc(final String path, final Data data) {
+  synchronized IntList doc(final String path) {
     // no documents: return empty list
     if(data.empty()) return new IntList(0);
 
     // empty path: return all documents
-    doc(data);
-    if(path.isEmpty()) return docs;
+    final IntList doc = doc();
+    if(path.isEmpty()) return doc;
 
     // initialize and sort document paths
-    final int ds = docs.size();
+    final int ds = doc.size();
     if(paths == null) {
       paths = new byte[ds][];
       for(int d = 0; d < ds; d++) {
-        final byte[] txt = data.text(docs.get(d), true);
+        final byte[] txt = data.text(doc.get(d), true);
         paths[d] = concat(SLASH, Prop.WIN ? lc(txt) : txt);
       }
       order = Array.createOrder(paths, false, true);
@@ -132,7 +181,7 @@ final class DocIndex {
     final IntList il = new IntList();
     for(int p = find(exact); p < paths.length; p++) {
       if(eq(paths[p], exact) || startsWith(paths[p], start))
-        il.add(docs.get(order[p]));
+        il.add(doc.get(order[p]));
     }
     return il.sort();
   }
