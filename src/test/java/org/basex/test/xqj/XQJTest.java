@@ -26,7 +26,8 @@ import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQStaticContext;
 import junit.framework.TestCase;
-import org.basex.io.ArrayOutput;
+
+import org.basex.io.out.ArrayOutput;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;

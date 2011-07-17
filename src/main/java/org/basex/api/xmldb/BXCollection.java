@@ -17,9 +17,9 @@ import org.basex.core.cmd.Open;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.io.IOContent;
-import org.basex.util.IntList;
-import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.list.IntList;
+import org.basex.util.list.StringList;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API.

@@ -8,7 +8,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.basex.data.DataText;
-import org.basex.data.SerializerProp;
+import org.basex.io.serial.SerializerProp;
 import org.basex.server.ClientSession;
 import org.basex.server.LoginException;
 import org.basex.util.Util;

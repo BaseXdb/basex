@@ -22,8 +22,9 @@ import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.util.NSLocal;
-import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.IntList;
+
 import static org.basex.util.Token.*;
 
 /**
