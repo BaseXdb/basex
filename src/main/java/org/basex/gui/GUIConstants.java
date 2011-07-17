@@ -13,7 +13,6 @@ import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
-import org.basex.io.IO;
 
 /**
  * GUI Constants used in different views.
@@ -235,8 +234,8 @@ public final class GUIConstants {
   /** Second mark color, custom alpha value. */
   public static Color colormark2A;
 
-  /** Cached treemap colors. */
-  public static final Color[] COLORS = new Color[IO.MAXHEIGHT];
+  /** Cached color gradient. */
+  private static final Color[] COLORS = new Color[100];
 
   // FONTS ====================================================================
 
@@ -301,7 +300,7 @@ public final class GUIConstants {
     colormark4 = new Color(col(r, 1), col(g, 40), col(b, 80));
 
     // create color array
-    for(int l = 1; l < 257; ++l) {
+    for(int l = 1; l < COLORS.length + 1; ++l) {
       COLORS[l - 1] = new Color(Math.max(255 - l * r, 0),
         Math.max(255 - l * g, 0), Math.max(255 - l * b, 0));
     }
@@ -317,13 +316,12 @@ public final class GUIConstants {
   }
 
   /**
-   * Converts color value with specified factor.
-   * @param c color
-   * @param f factor
-   * @return converted color value
+   * Returns the specified color from the color gradient.
+   * @param i color index
+   * @return color
    */
-  private static int col(final int c, final int f) {
-    return Math.max(0, 255 - c * f / 10);
+  public static Color color(final int i) {
+    return COLORS[Math.min(COLORS.length - 1, i)];
   }
 
   /**
@@ -357,5 +355,15 @@ public final class GUIConstants {
     if(f == lfont) return lwidth;
     if(f == dfont) return dwidth;
     return new Container().getFontMetrics(f).getWidths();
+  }
+
+  /**
+   * Converts color value with specified factor.
+   * @param c color
+   * @param f factor
+   * @return converted color value
+   */
+  private static int col(final int c, final int f) {
+    return Math.max(0, 255 - c * f / 10);
   }
 }

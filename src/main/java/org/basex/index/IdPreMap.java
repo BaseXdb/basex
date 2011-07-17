@@ -80,10 +80,10 @@ public class IdPreMap {
         incs.inc(k, c);
       }
     } else {
-      pres.set(pre, i);
-      incs.set(inc, i);
-      ids.set(id, i);
-      oids.set(oid, i);
+      pres.set(i, pre);
+      incs.set(i, inc);
+      ids.set(i, id);
+      oids.set(i, oid);
     }
   }
 
@@ -135,10 +135,10 @@ public class IdPreMap {
         incs.inc(k, c);
       }
     } else {
-      pres.set(pre, i);
-      incs.set(inc, i);
-      ids.set(id, i);
-      oids.set(oid, i);
+      pres.set(i, pre);
+      incs.set(i, inc);
+      ids.set(i, id);
+      oids.set(i, oid);
     }
   }
 

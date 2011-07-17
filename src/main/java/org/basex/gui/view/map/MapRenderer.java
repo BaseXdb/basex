@@ -296,7 +296,7 @@ final class MapRenderer {
     int yy = ys;
     int wl = 0, ll = 0; // word and line length
 
-    final Color textc = COLORS[r.level + 4];
+    final Color textc = color(r.level + 4);
     g.setColor(textc);
     int lastl = 0, count = -1;
     int ct = 0, pp = 0, sl = 0, pl = 0;
@@ -422,7 +422,7 @@ final class MapRenderer {
     double ll = 0; // line length
     double e = 0;
 
-    final Color textc = COLORS[r.level + 4];
+    final Color textc = color(r.level + 4);
     int count = 0;
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
@@ -736,11 +736,11 @@ final class MapRenderer {
     int yy = y + 28 + fs * nl + 4 < mr.y + mr.h ? y + 28 :
       y - mr.y - 4 > fs * nl ? y - fs * nl : mr.y + mr.h - 4 - fs * nl;
 
-    g.setColor(COLORS[10]);
+    g.setColor(color(10));
     g.drawRect(xx - 3, yy - fs - 1, ww + 3, fs * nl + 7);
-    g.setColor(COLORS[0]);
+    g.setColor(color(0));
     g.fillRect(xx - 2, yy - fs, ww + 2, fs * nl + 6);
-    g.setColor(COLORS[20]);
+    g.setColor(color(20));
     wl = 0;
     final int is = tl.size();
     for(int i = 0; i < is; ++i) {
@@ -755,7 +755,7 @@ final class MapRenderer {
       if(i == ul) {
         g.drawLine(xx + wl, yy + 1, xx + wl + (pm ? l - sw : l), yy + 1);
       }
-      g.setColor(COLORS[24]);
+      g.setColor(color(24));
       wl += l + sw;
     }
   }

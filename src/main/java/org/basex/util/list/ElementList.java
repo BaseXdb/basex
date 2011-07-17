@@ -49,6 +49,14 @@ public abstract class ElementList {
   }
 
   /**
+   * Tests is the container has no elements.
+   * @return result of check
+   */
+  public final boolean empty() {
+    return size == 0;
+  }
+
+  /**
    * Resets the array size.
    */
   public final void reset() {

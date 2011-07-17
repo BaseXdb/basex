@@ -58,7 +58,7 @@ public final class FTScope extends FTFilter {
       final int p = pos(sm.s, lex);
       final int s = bl.size();
       if(p < s && bl.get(p) && p == pos(sm.e, lex)) return false;
-      bl.set(true, p);
+      bl.set(p, true);
     }
     return c > 1;
   }

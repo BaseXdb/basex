@@ -59,7 +59,7 @@ public final class DiskData extends Data {
         else if(k.equals(DBATTS)) atnindex = new Names(in, cats);
         else if(k.equals(DBPATH)) pthindex = new PathSummary(in);
         else if(k.equals(DBNS))   ns = new Namespaces(in);
-        else if(k.equals(DBDOCS)) meta.docindex = docindex.read(in);
+        else if(k.equals(DBDOCS)) docindex.read(in);
       }
       // open data and indexes
       init();

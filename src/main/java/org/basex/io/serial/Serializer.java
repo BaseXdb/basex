@@ -8,7 +8,6 @@ import org.basex.data.Data;
 import org.basex.data.ExprInfo;
 import org.basex.data.FTPos;
 import org.basex.data.FTPosData;
-import org.basex.io.IO;
 import org.basex.util.Atts;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
@@ -292,9 +291,9 @@ public abstract class Serializer {
 
     boolean doc = false;
     final TokenList nsp = data.ns.size() != 0 ? new TokenList() : null;
-    final int[] parStack = new int[IO.MAXHEIGHT];
-    final byte[][] names = new byte[IO.MAXHEIGHT][];
-    names[0] = ns(EMPTY);
+    final IntList pars = new IntList();
+    final TokenList names = new TokenList();
+    names.set(0, ns(EMPTY));
 
     int l = 0;
     int p = pre;
@@ -306,7 +305,7 @@ public abstract class Serializer {
       final int r = data.parent(p, k);
 
       // close opened elements...
-      while(l > 0 && parStack[l - 1] >= r) {
+      while(l > 0 && pars.get(l - 1) >= r) {
         closeElement();
         --l;
       }
@@ -331,7 +330,7 @@ public abstract class Serializer {
         openElement(name);
 
         // add namespace definitions
-        byte[] empty = names[l];
+        byte[] empty = names.get(l);
         if(nsp != null) {
           // collect namespaces from database
           nsp.reset();
@@ -370,8 +369,8 @@ public abstract class Serializer {
         while(++p != as) {
           attribute(data.name(p, Data.ATTR), data.text(p, false));
         }
-        parStack[l++] = r;
-        names[l] = empty;
+        pars.set(l++, r);
+        names.set(l, empty);
       }
     }
 

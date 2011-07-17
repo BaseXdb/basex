@@ -13,7 +13,8 @@ import org.basex.util.Util;
 import org.basex.util.list.IntList;
 
 /**
- * This class contains references to all document nodes in a database.
+ * This index contains references to all document nodes in a database.
+ * It is incrementally updated if the database is modified.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -21,12 +22,12 @@ import org.basex.util.list.IntList;
 public final class DocIndex implements Index {
   /** Data reference. */
   private final Data data;
+  /** Pre values of document nodes. */
+  private IntList docs;
   /** Sorted document paths. */
   private byte[][] paths;
   /** Mapping between document paths and pre values. */
   private int[] order;
-  /** Pre values of document nodes. */
-  private IntList docs;
 
   /**
    * Constructor.
@@ -43,7 +44,7 @@ public final class DocIndex implements Index {
    * @throws IOException I/O exception
    */
   public boolean read(final DataInput in) throws IOException {
-    docs = new IntList(in.readDiffs());
+    docs = in.readDiffs();
     return true;
   }
 
@@ -62,12 +63,11 @@ public final class DocIndex implements Index {
    * @return document nodes
    */
   public synchronized IntList doc() {
-    if(docs == null || !data.meta.docindex) {
+    if(docs == null) {
       update();
       docs = new IntList();
       final int is = data.meta.size;
       for(int i = 0; i < is; i += data.size(i, Data.DOC)) docs.add(i);
-      data.meta.docindex = true;
       data.meta.dirty = true;
     }
     return docs;
@@ -109,7 +109,7 @@ public final class DocIndex implements Index {
     final IntList doc = doc();
     int i = doc.sortedIndexOf(pre);
     if(i < 0) i = -i - 1;
-    doc.insert(pres.toArray(), i);
+    doc.insert(i, pres.toArray());
     doc.move(dsize, i + pres.size());
     update();
   }

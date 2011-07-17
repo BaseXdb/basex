@@ -71,14 +71,14 @@ public class IndexTree {
       final int c = Token.diff(key, keys.get(n));
       if(c == 0) {
         if(exist) {
-          values.set(Num.add(values.get(n), value), n);
+          values.set(n, Num.add(values.get(n), value));
         } else {
           final int i = maps.get(Num.num(n));
           if(i < 0) {
             maps.add(Num.num(n), values.size());
             values.add(Num.newNum(value));
           } else {
-            values.set(Num.add(values.get(i), value), i);
+            values.set(i, Num.add(values.get(i), value));
           }
         }
         return n;
@@ -200,7 +200,7 @@ public class IndexTree {
    * @param val left node
    */
   private void l(final int nd, final int val) {
-    tree.set(val, (nd << 1) + nd);
+    tree.set((nd << 1) + nd, val);
   }
 
   /**
@@ -209,7 +209,7 @@ public class IndexTree {
    * @param val right node
    */
   private void r(final int nd, final int val) {
-    tree.set(val, (nd << 1) + nd + 1);
+    tree.set((nd << 1) + nd + 1, val);
   }
 
   /**
@@ -218,7 +218,7 @@ public class IndexTree {
    * @param val parent node
    */
   private void p(final int nd, final int val) {
-    tree.set(val, (nd << 1) + nd + 2);
+    tree.set((nd << 1) + nd + 2, val);
   }
 
   /**
@@ -227,44 +227,44 @@ public class IndexTree {
    */
   private void a(final int nd) {
     int n = nd;
-    mod.set(true, n);
+    mod.set(n, true);
 
     while(n != -1 && n != root && mod.get(p(n))) {
       if(p(n) == l(p(p(n)))) {
         final int y = r(p(p(n)));
         if(y != -1 && mod.get(y)) {
-          mod.set(false, p(n));
-          mod.set(false, y);
-          mod.set(true, p(p(n)));
+          mod.set(p(n), false);
+          mod.set(y, false);
+          mod.set(p(p(n)), true);
           n = p(p(n));
         } else {
           if(n == r(p(n))) {
             n = p(n);
             rl(n);
           }
-          mod.set(false, p(n));
-          mod.set(true, p(p(n)));
+          mod.set(p(n), false);
+          mod.set(p(p(n)), true);
           if(p(p(n)) != -1) rr(p(p(n)));
         }
       } else {
         final int y = l(p(p(n)));
         if(y != -1 && mod.get(y)) {
-          mod.set(false, p(n));
-          mod.set(false, y);
-          mod.set(true, p(p(n)));
+          mod.set(p(n), false);
+          mod.set(y, false);
+          mod.set(p(p(n)), true);
           n = p(p(n));
         } else {
           if(n == l(p(n))) {
             n = p(n);
             rr(n);
           }
-          mod.set(false, p(n));
-          mod.set(true, p(p(n)));
+          mod.set(p(n), false);
+          mod.set(p(p(n)), true);
           if(p(p(n)) != -1) rl(p(p(n)));
         }
       }
     }
-    mod.set(false, root);
+    mod.set(root, false);
   }
 
   /**

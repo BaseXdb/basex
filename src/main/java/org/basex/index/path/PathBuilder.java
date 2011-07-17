@@ -27,7 +27,6 @@ public final class PathBuilder extends IndexBuilder {
 
     final IntList st = new IntList();
     final PathSummary path = new PathSummary();
-    int h = 0;
     for(pre = 0; pre < size; ++pre) {
       final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);
@@ -44,7 +43,6 @@ public final class PathBuilder extends IndexBuilder {
       } else {
         path.index(0, kind, st.size());
       }
-      h = Math.max(h, st.size());
     }
     data.meta.pathindex = true;
     return path;

@@ -35,7 +35,7 @@ public final class PathNode {
    * @param k node kind
    * @param p parent node
    */
-  public PathNode(final int t, final byte k, final PathNode p) {
+  PathNode(final int t, final byte k, final PathNode p) {
     ch = new PathNode[0];
     size = 1;
     name = (short) t;
@@ -49,7 +49,7 @@ public final class PathNode {
    * @param p parent node
    * @throws IOException I/O exception
    */
-  public PathNode(final DataInput in, final PathNode p) throws IOException {
+  PathNode(final DataInput in, final PathNode p) throws IOException {
     name = (short) in.readNum();
     kind = in.readByte();
     size = in.readNum();
@@ -65,7 +65,7 @@ public final class PathNode {
    * @param k node kind
    * @return node reference
    */
-  public PathNode index(final int n, final byte k) {
+  PathNode index(final int n, final byte k) {
     for(final PathNode c : ch) {
       if(c.kind == k && c.name == n) {
         c.size++;

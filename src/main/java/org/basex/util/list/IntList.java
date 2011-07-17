@@ -70,10 +70,10 @@ public class IntList extends ElementList {
 
   /**
    * Sets an element at the specified index position.
-   * @param e element to be set
    * @param i index
+   * @param e element to be set
    */
-  public final void set(final int e, final int i) {
+  public final void set(final int i, final int e) {
     if(i >= list.length) list = Arrays.copyOf(list, newSize(i + 1));
     list[i] = e;
     size = Math.max(size, i + 1);
@@ -91,10 +91,10 @@ public class IntList extends ElementList {
 
   /**
    * Inserts elements at the specified index position.
-   * @param e elements to be inserted
    * @param i index
+   * @param e elements to be inserted
    */
-  public final void insert(final int[] e, final int i) {
+  public final void insert(final int i, final int[] e) {
     final int l = e.length;
     if(l == 0) return;
     if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));

@@ -50,10 +50,10 @@ public final class IntArrayList extends ElementList implements Iterable<int[]> {
 
   /**
    * Sets an element at the specified index.
-   * @param e element to be set
    * @param i index
+   * @param e element to be set
    */
-  public void set(final int[] e, final int i) {
+  public void set(final int i, final int[] e) {
     if(i >= list.length) list = Array.copyOf(list, newSize(i + 1));
     list[i] = e;
     size = Math.max(size, i + 1);

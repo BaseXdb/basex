@@ -81,10 +81,10 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   /**
    * Sets an element at the specified index.
-   * @param e element to be set
    * @param i index
+   * @param e element to be set
    */
-  public void set(final byte[] e, final int i) {
+  public void set(final int i, final byte[] e) {
     if(i >= list.length) list = Array.copyOf(list, newSize(i + 1));
     list[i] = e;
     size = Math.max(size, i + 1);

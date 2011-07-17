@@ -312,7 +312,7 @@ public final class BaseXLayout {
     final int tw = width(g, tt);
     final int th = g.getFontMetrics().getHeight();
     final int xx = Math.min(w - tw - 8, x);
-    g.setColor(GUIConstants.COLORS[c]);
+    g.setColor(GUIConstants.color(c));
     g.fillRect(xx - 1, y - th, tw + 4, th);
     g.setColor(GUIConstants.color1);
     g.drawString(tt, xx, y - 4);

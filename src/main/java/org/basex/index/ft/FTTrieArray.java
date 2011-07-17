@@ -70,7 +70,7 @@ final class FTTrieArray {
     tmp[ip] = ti;
     // copy remain
     System.arraycopy(cnn, ip, tmp, ip + 1, tmp.length - ip - 1);
-    next.set(tmp, cn);
+    next.set(cn, tmp);
     return ip;
   }
 
@@ -145,7 +145,7 @@ final class FTTrieArray {
           // but current has a longer value
           // update value of currentNode.value with intersection
           final int[] oe = new int [3 + off.length];
-          tokens.set(is, cnn[0]);
+          tokens.set(cnn[0], is);
           oe[0] = cnn[0];
           System.arraycopy(off, 0, oe, 3, off.length);
           oe[2] = s;
@@ -154,13 +154,13 @@ final class FTTrieArray {
           tokens.add(r1);
           next.add(cnn);
           oe[1] = next.size() - 1;
-          next.set(oe, cn);
+          next.set(cn, oe);
           return next.size() - 1;
         }
         // char1 != null && char2 != null
         // value of current node and value to insert have only one common
         // letter update value of current node with intersection
-        tokens.set(is, cnn[0]);
+        tokens.set(cnn[0], is);
         int[] ne = new int[5];
         ne[0] = cnn[0];
         //if(r2[0] < r1[0]) {
@@ -173,7 +173,7 @@ final class FTTrieArray {
         }
         ne[3] = 0;
         ne[4] = 0;
-        next.set(ne, cn);
+        next.set(cn, ne);
 
         ne = new int[2 + off.length];
         ne[0] = tokens.size();

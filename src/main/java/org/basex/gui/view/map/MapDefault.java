@@ -1,11 +1,11 @@
 package org.basex.gui.view.map;
 
-import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
@@ -53,7 +53,7 @@ final class MapDefault extends MapPainter {
 
       r.pos = view.gui.context.marked.ftpos != null ?
           view.gui.context.marked.ftpos.get(data, pre) : null;
-      g.setColor(mark ? col : COLORS[lvl]);
+      g.setColor(mark ? col : GUIConstants.color(lvl));
 
       if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 ||
           ViewData.leaf(prop, data, pre)) {
@@ -67,10 +67,11 @@ final class MapDefault extends MapPainter {
       }
 
       if(!full) {
-        col = mark ? colormark3 : COLORS[lvl + 2];
+        col = mark ? GUIConstants.colormark3 : GUIConstants.color(lvl + 2);
         g.setColor(col);
         g.drawRect(r.x, r.y, r.w, r.h);
-        col = mark ? colormark4 : COLORS[Math.max(0, lvl - 2)];
+        col = mark ? GUIConstants.colormark4 :
+          GUIConstants.color(Math.max(0, lvl - 2));
         g.setColor(col);
         g.drawLine(r.x + r.w, r.y, r.x + r.w, r.y + r.h);
         g.drawLine(r.x, r.y + r.h, r.x + r.w, r.y + r.h);
@@ -100,11 +101,11 @@ final class MapDefault extends MapPainter {
             ViewData.path(data, pre) : ViewData.tag(prop, data, pre);
 
       g.setColor(Color.black);
-      g.setFont(font);
+      g.setFont(GUIConstants.font);
       BaseXLayout.chopString(g, name, rect.x, rect.y, rect.w, fsz);
     } else {
-      g.setColor(COLORS[Math.min(255, rect.level * 2 + 8)]);
-      g.setFont(mfont);
+      g.setColor(GUIConstants.color(rect.level * 2 + 8));
+      g.setFont(GUIConstants.mfont);
       final byte[] text = ViewData.content(data, pre, false);
 
       rect.thumb = MapRenderer.calcHeight(g, rect, text, fsz) >= rect.h;

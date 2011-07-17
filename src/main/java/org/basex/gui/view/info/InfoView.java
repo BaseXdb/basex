@@ -283,10 +283,10 @@ public final class InfoView extends View {
     // draw all bars
     for(int i = 0; i < l - 1; ++i) {
       final int bx = w - bw + bs * i;
-      g.setColor(COLORS[(i == focus ? 3 : 2) + i * 2]);
+      g.setColor(color((i == focus ? 3 : 2) + i * 2));
       final int p = Math.max(1, stat.get(i) * bh / m);
       g.fillRect(bx, by + bh - p, bs, p);
-      g.setColor(COLORS[8]);
+      g.setColor(color(8));
       g.drawRect(bx, by + bh - p, bs, p - 1);
     }
   }

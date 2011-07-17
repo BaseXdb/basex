@@ -47,10 +47,10 @@ public final class BoolList extends ElementList {
 
   /**
    * Sets an element at the specified index.
-   * @param e element to be set
    * @param i index
+   * @param e element to be set
    */
-  public void set(final boolean e, final int i) {
+  public void set(final int i, final boolean e) {
     if(i >= list.length) list = Arrays.copyOf(list, newSize(i + 1));
     list[i] = e;
     size = Math.max(size, i + 1);
