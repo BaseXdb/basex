@@ -82,6 +82,7 @@ public final class Context {
     repo = ctx.repo;
     prop.set(Prop.EVENTPORT, ctx.prop.num(Prop.EVENTPORT));
     prop.set(Prop.TIMEOUT, ctx.prop.num(Prop.TIMEOUT));
+    prop.set(Prop.PARALLEL, ctx.prop.num(Prop.PARALLEL));
   }
 
   /**
