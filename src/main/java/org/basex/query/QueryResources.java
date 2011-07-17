@@ -20,7 +20,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
+import org.basex.util.list.IntList;
 
 /**
  * This class provides access to resources used by an XQuery expression.

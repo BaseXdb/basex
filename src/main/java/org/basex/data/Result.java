@@ -2,6 +2,8 @@ package org.basex.data;
 
 import java.io.IOException;
 
+import org.basex.io.serial.Serializer;
+
 /**
  * This is an interface for query results.
  *

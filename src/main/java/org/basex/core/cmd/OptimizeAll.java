@@ -9,14 +9,14 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
-import org.basex.data.BuilderSerializer;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
-import org.basex.data.Serializer;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
-import org.basex.util.IntList;
+import org.basex.io.serial.BuilderSerializer;
+import org.basex.io.serial.Serializer;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * Evaluates the 'optimize all' command and rebuilds all data structures of

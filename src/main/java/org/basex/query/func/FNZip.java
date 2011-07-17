@@ -20,14 +20,14 @@ import java.util.zip.ZipOutputStream;
 import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
 import org.basex.core.Prop;
-import org.basex.data.SerializerException;
-import org.basex.data.SerializerProp;
-import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
-import org.basex.io.TextInput;
 import org.basex.io.Zip;
+import org.basex.io.in.TextInput;
+import org.basex.io.serial.SerializerException;
+import org.basex.io.serial.SerializerProp;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -43,10 +43,10 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.AxisIter;
-import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ByteList;
+import org.basex.util.list.StringList;
 
 /**
  * Functions on zip files.

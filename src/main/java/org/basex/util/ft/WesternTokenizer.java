@@ -4,10 +4,10 @@ import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 import java.util.Arrays;
 import java.util.EnumSet;
-import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * Full-text tokenizer.

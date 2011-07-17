@@ -2,10 +2,11 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import org.basex.data.Serializer;
+
+import org.basex.io.serial.Serializer;
 import org.basex.query.iter.NodeCache;
-import org.basex.util.TokenMap;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenMap;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

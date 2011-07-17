@@ -4,8 +4,8 @@ import static org.basex.core.Text.*;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.StringList;
 
 /**
  * This class organizes all currently opened database sessions.

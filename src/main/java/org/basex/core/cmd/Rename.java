@@ -5,7 +5,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.basex.util.IntList;
+import org.basex.util.list.IntList;
 
 /**
  * Evaluates the 'rename' command and renames document or document paths

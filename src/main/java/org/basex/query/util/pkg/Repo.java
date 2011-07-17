@@ -8,10 +8,10 @@ import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.util.pkg.Package.Component;
-import org.basex.util.TokenMap;
-import org.basex.util.TokenObjMap;
-import org.basex.util.TokenSet;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenMap;
+import org.basex.util.hash.TokenObjMap;
+import org.basex.util.hash.TokenSet;
 
 /**
  * Repository manager.

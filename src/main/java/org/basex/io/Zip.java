@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.basex.core.Progress;
-import org.basex.util.ByteList;
+import org.basex.util.list.ByteList;
 
 
 /**

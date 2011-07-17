@@ -14,8 +14,8 @@ import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
-import org.basex.io.BufferInput;
-import org.basex.io.PrintOutput;
+import org.basex.io.in.BufferInput;
+import org.basex.io.out.PrintOutput;
 import org.basex.util.Token;
 
 /**

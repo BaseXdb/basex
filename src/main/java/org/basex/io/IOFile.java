@@ -13,8 +13,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.basex.core.Prop;
-import org.basex.util.StringList;
+import org.basex.io.in.BufferInput;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
 
 /**

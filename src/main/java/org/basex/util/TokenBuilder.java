@@ -3,6 +3,9 @@ package org.basex.util;
 import static org.basex.util.Token.*;
 import java.util.Arrays;
 
+import org.basex.util.list.ByteList;
+import org.basex.util.list.ElementList;
+
 /**
  * This class serves as an efficient constructor for byte arrays.
  * It bears some resemblance to Java's {@link java.lang.StringBuilder}.

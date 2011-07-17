@@ -10,15 +10,15 @@ import java.util.Arrays;
 import org.basex.build.BuildException;
 import org.basex.build.SingleParser;
 import org.basex.core.Prop;
-import org.basex.io.DataAccess;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
-import org.basex.util.ByteList;
+import org.basex.io.out.PrintOutput;
+import org.basex.io.random.DataAccess;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenMap;
-import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenMap;
+import org.basex.util.hash.TokenObjMap;
+import org.basex.util.list.ByteList;
 
 /**
  * This class parses files in the MAB2 format

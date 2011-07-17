@@ -12,8 +12,8 @@ import org.basex.query.item.QNm;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenSet;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenSet;
 
 /**
  * Global expression context.

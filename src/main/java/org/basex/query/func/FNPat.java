@@ -20,9 +20,9 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.Atts;
-import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ByteList;
 
 /**
  * String pattern functions.

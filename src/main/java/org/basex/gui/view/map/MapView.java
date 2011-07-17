@@ -20,11 +20,11 @@ import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
-import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
-import org.basex.util.TokenList;
 import org.basex.util.ft.FTLexer;
+import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
 
 /**
  * This view is a TreeMap implementation.

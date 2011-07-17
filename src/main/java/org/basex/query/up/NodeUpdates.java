@@ -12,8 +12,8 @@ import org.basex.query.up.primitives.InsertBefore;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.StructuralUpdate;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.util.IntList;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * This container holds all update primitives for a specific database node.

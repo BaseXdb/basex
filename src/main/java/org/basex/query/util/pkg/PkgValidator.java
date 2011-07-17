@@ -15,7 +15,7 @@ import org.basex.query.QueryException;
 import org.basex.query.util.pkg.Package.Component;
 import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenSet;
+import org.basex.util.hash.TokenSet;
 
 /**
  * Package validator. This class executes some essential checks before the

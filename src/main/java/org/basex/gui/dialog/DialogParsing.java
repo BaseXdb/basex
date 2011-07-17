@@ -21,7 +21,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
-import org.basex.util.StringList;
+import org.basex.util.list.StringList;
 
 /**
  * Parsing options dialog.

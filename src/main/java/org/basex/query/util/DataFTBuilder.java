@@ -7,9 +7,9 @@ import org.basex.data.FTPosData;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.ANode;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTSpan;
+import org.basex.util.list.TokenList;
 
 /**
  * Class for constructing decorated full-text nodes.

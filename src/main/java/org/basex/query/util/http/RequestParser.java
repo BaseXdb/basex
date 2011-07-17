@@ -13,7 +13,7 @@ import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.AxisMoreIter;
 import org.basex.query.util.http.Request.Part;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenMap;
+import org.basex.util.hash.TokenMap;
 
 /**
  * Request parser.

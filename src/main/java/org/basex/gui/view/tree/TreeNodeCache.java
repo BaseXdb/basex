@@ -2,7 +2,7 @@ package org.basex.gui.view.tree;
 
 import java.util.ArrayList;
 import org.basex.data.Data;
-import org.basex.util.IntList;
+import org.basex.util.list.IntList;
 
 /**
  * This class determines nodes per level and caches them.

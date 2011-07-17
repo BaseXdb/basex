@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.basex.util.ByteList;
+import org.basex.io.in.BufferInput;
+import org.basex.util.list.ByteList;
 import org.xml.sax.InputSource;
 
 /**

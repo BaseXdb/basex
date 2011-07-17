@@ -24,10 +24,10 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXEditor;
-import org.basex.io.DataInput;
-import org.basex.util.StringList;
+import org.basex.io.in.DataInput;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * Open database dialog.

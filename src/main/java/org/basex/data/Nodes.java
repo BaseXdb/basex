@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.io.ArrayOutput;
-import org.basex.util.IntList;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.Serializer;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * This class stores node references of a database in an ascending order.

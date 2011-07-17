@@ -8,8 +8,8 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
-import org.basex.data.Serializer;
-import org.basex.index.FTIndexIterator;
+import org.basex.index.ft.FTIndexIterator;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -22,11 +22,11 @@ import org.basex.query.util.IndexContext;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
-import org.basex.util.TokenSet;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.Scoring;
+import org.basex.util.hash.TokenSet;
+import org.basex.util.list.TokenList;
 
 /**
  * FTWords expression.

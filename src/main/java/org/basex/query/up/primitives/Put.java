@@ -6,10 +6,10 @@ import static org.basex.query.util.Err.*;
 import java.io.IOException;
 
 import org.basex.data.Data;
-import org.basex.data.SerializerProp;
-import org.basex.data.XMLSerializer;
 import org.basex.io.IOFile;
-import org.basex.io.PrintOutput;
+import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.SerializerProp;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;

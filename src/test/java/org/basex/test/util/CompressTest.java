@@ -9,8 +9,8 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.util.Compress;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 import org.basex.util.Util;
+import org.basex.util.list.TokenList;
 import org.junit.Test;
 
 /**

@@ -4,14 +4,14 @@ import static org.basex.query.QueryText.*;
 
 import java.io.IOException;
 import org.basex.data.Data;
-import org.basex.data.Serializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * Sequence, containing at least two ordered database nodes.

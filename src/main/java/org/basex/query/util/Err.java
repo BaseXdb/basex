@@ -3,7 +3,7 @@ package org.basex.query.util;
 import static org.basex.query.util.Err.ErrType.*;
 
 import org.basex.core.Text;
-import org.basex.data.SerializerException;
+import org.basex.io.serial.SerializerException;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;

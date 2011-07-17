@@ -16,7 +16,6 @@ import org.basex.core.cmd.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
-import org.basex.data.XMLSerializer;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -28,7 +27,8 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
+import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 

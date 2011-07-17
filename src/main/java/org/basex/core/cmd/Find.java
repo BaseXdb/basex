@@ -6,11 +6,11 @@ import org.basex.core.Context;
 import org.basex.data.MetaData;
 import org.basex.query.path.Axis;
 import org.basex.util.Array;
-import org.basex.util.BoolList;
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
+import org.basex.util.list.BoolList;
+import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.

@@ -1,11 +1,11 @@
 package org.basex.index;
 
-import org.basex.util.BoolList;
-import org.basex.util.IntList;
-import org.basex.util.TokenIntMap;
 import org.basex.util.Num;
 import org.basex.util.Token;
-import org.basex.util.TokenList;
+import org.basex.util.hash.TokenIntMap;
+import org.basex.util.list.BoolList;
+import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
 
 /**
  * This class indexes keys in a balanced binary tree, including their id
@@ -15,17 +15,19 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-class IndexTree {
+public class IndexTree {
   /** Factor for resize. */
-  static final double FACTOR = 1.2;
+  protected static final double FACTOR = 1.2;
+
   /** Keys saved in the tree. */
-  final TokenList keys = new TokenList(FACTOR);
+  public final TokenList keys = new TokenList(FACTOR);
   /** Compressed id values. */
-  TokenList values = new TokenList(FACTOR);
+  public TokenList values = new TokenList(FACTOR);
+
   /** Mapping for using existing tree. */
-  TokenIntMap maps = new TokenIntMap();
+  protected TokenIntMap maps = new TokenIntMap();
   /** Current iterator node. */
-  int cn;
+  protected int cn;
 
   /** Tree structure [left, right, parent]. */
   private final IntList tree = new IntList(FACTOR);
@@ -42,7 +44,7 @@ class IndexTree {
    * @param value value to be indexes
    * @return int node
    */
-  final int index(final byte[] key, final int value) {
+  public final int index(final byte[] key, final int value) {
     return index(key, value, true);
   }
 
@@ -55,7 +57,9 @@ class IndexTree {
    * @param exist flag for using existing index
    * @return int node
    */
-  final int index(final byte[] key, final int value, final boolean exist) {
+  public final int index(final byte[] key, final int value,
+      final boolean exist) {
+
     // index is empty.. create root node
     if(root == -1) {
       root = n(key, value, -1, exist);
@@ -100,7 +104,7 @@ class IndexTree {
    * Returns the number of entries.
    * @return number of entries
    */
-  final int size() {
+  public final int size() {
     return values.size();
   }
 
@@ -108,7 +112,7 @@ class IndexTree {
    * Initializes the index iterator.
    * will be removed to save memory.
    */
-  final void init() {
+  public final void init() {
     cn = root;
     if(cn != -1) while(l(cn) != -1) cn = l(cn);
   }
@@ -117,7 +121,7 @@ class IndexTree {
    * Checks if the iterator returns more keys.
    * @return true if more keys exist
    */
-  final boolean more() {
+  public final boolean more() {
     return cn != -1;
   }
 
@@ -125,7 +129,7 @@ class IndexTree {
    * Returns the next pointer.
    * @return next pointer
    */
-  final int next() {
+  public final int next() {
     ln = cn;
     if(r(cn) != -1) {
       cn = r(cn);

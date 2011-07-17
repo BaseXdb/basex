@@ -7,11 +7,11 @@ import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.data.MetaData;
-import org.basex.io.DataInput;
 import org.basex.io.IOFile;
-import org.basex.util.StringList;
+import org.basex.io.in.DataInput;
 import org.basex.util.Table;
-import org.basex.util.TokenList;
+import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * Evaluates the 'list' command and shows all available databases.

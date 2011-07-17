@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.basex.core.BaseXException;
-import org.basex.io.ArrayOutput;
-import org.basex.io.BufferInput;
+import org.basex.io.in.BufferInput;
+import org.basex.io.out.ArrayOutput;
 
 /**
  * This class defines all methods for iteratively evaluating queries with the

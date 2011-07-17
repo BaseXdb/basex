@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.SortedMap;
 import org.basex.core.Prop;
-import org.basex.data.SerializerProp;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
@@ -22,6 +21,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IOFile;
+import org.basex.io.serial.SerializerProp;
 
 /**
  * Dialog window for changing some project's preferences.

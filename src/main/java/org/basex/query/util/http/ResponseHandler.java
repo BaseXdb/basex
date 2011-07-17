@@ -13,7 +13,7 @@ import org.basex.build.file.HTMLParser;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
 import org.basex.io.IOContent;
-import org.basex.io.TextInput;
+import org.basex.io.in.TextInput;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.B64;
@@ -28,9 +28,9 @@ import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.Atts;
-import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ByteList;
 
 /**
  * HTTP response handler. Reads HTTP response and constructs the

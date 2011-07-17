@@ -1,7 +1,8 @@
 package org.basex.index;
 
 import java.util.Arrays;
-import org.basex.util.TokenSet;
+
+import org.basex.util.hash.TokenSet;
 
 /**
  * This class caches sizes and pointers from index results.
@@ -9,7 +10,7 @@ import org.basex.util.TokenSet;
  * @author BaseX Team 2005-11, BSD License
  * @author Sebastian Gath
  */
-final class IndexCache extends TokenSet {
+public final class IndexCache extends TokenSet {
   /** Number of position values. */
   private int[] sizes = new int[CAP];
   /** Pointer on token data. */
@@ -21,7 +22,7 @@ final class IndexCache extends TokenSet {
    * @param s size
    * @param p pointer
    */
-  void add(final byte[] key, final int s, final long p) {
+  public void add(final byte[] key, final int s, final long p) {
     final int i = add(key);
     if(i > 0) {
       sizes[i] = s;
@@ -34,7 +35,7 @@ final class IndexCache extends TokenSet {
    * @param id key to be found
    * @return size
    */
-  int size(final int id) {
+  public int size(final int id) {
     return sizes[id];
   }
 
@@ -43,7 +44,7 @@ final class IndexCache extends TokenSet {
    * @param id key to be found
    * @return pointer
    */
-  long pointer(final int id) {
+  public long pointer(final int id) {
     return pointers[id];
   }
 

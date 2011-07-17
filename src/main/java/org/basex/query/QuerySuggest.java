@@ -4,12 +4,12 @@ import static org.basex.util.Token.*;
 import java.util.ArrayList;
 import java.util.Stack;
 import org.basex.data.Data;
-import org.basex.data.PathNode;
+import org.basex.index.path.PathNode;
 import org.basex.query.path.Axis;
 import org.basex.query.path.Test;
 import org.basex.query.util.Err;
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.StringList;
 
 /**
  * This class analyzes the current path and gives suggestions for code

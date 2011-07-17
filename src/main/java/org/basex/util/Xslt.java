@@ -14,8 +14,9 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
+import org.basex.io.out.ArrayOutput;
+import org.basex.util.hash.TokenObjMap;
 
 /**
  * This class performs XSLT transformations with Java's internal

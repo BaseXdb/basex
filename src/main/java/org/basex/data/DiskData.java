@@ -6,16 +6,17 @@ import java.io.IOException;
 
 import org.basex.build.DiskBuilder;
 import org.basex.core.Prop;
-import org.basex.index.FTIndex;
 import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.index.ft.FTIndex;
+import org.basex.index.path.PathSummary;
+import org.basex.index.value.DiskValues;
 import org.basex.index.Names;
-import org.basex.index.DiskValues;
-import org.basex.io.DataAccess;
-import org.basex.io.DataInput;
-import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.io.TableDiskAccess;
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
+import org.basex.io.random.DataAccess;
+import org.basex.io.random.TableDiskAccess;
 import org.basex.util.Compress;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -117,7 +118,7 @@ public final class DiskData extends Data {
     out.writeString(DBNS);
     ns.write(out);
     out.writeString(DBDOCS);
-    docindex.write(this, out);
+    docindex.write(out);
     out.write(0);
     out.close();
   }
@@ -159,7 +160,7 @@ public final class DiskData extends Data {
         if(ftxindex != null) { ftxindex.close(); ftxindex = null; }
         break;
       default:
-        // path index will not be closed
+        // other indexes will not be closed
         break;
     }
   }

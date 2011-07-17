@@ -12,8 +12,8 @@ import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
-import org.basex.util.StringList;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * Rename database/drop documents dialog.

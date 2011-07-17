@@ -2,9 +2,9 @@ package org.basex.query.iter;
 
 import java.io.IOException;
 import org.basex.data.Result;
-import org.basex.data.Serializer;
-import org.basex.data.XMLSerializer;
-import org.basex.io.ArrayOutput;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.Serializer;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Value;

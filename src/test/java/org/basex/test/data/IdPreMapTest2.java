@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.basex.data.IdPreMap;
-import org.basex.util.IntList;
+import org.basex.index.IdPreMap;
 import org.basex.util.Performance;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 import org.junit.Before;
 import org.junit.Test;
 

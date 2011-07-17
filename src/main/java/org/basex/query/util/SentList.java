@@ -3,9 +3,9 @@ package org.basex.query.util;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 import javax.xml.parsers.SAXParserFactory;
-import org.basex.util.TokenSet;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
+import org.basex.util.hash.TokenSet;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 

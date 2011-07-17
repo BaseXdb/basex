@@ -7,8 +7,8 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
 import org.basex.index.Names;
-import org.basex.util.IntList;
-import org.basex.util.TokenList;
+import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
 
 /**
  * An additional layer which prepares the data for the scatter plot.

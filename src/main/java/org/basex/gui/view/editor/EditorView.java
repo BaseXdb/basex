@@ -40,9 +40,9 @@ import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.util.BoolList;
 import org.basex.util.Performance;
 import org.basex.util.Util;
+import org.basex.util.list.BoolList;
 
 /**
  * This view allows the input and evaluation of queries and documents.

@@ -10,10 +10,10 @@ import java.util.Random;
 import org.basex.build.BuildException;
 import org.basex.core.Prop;
 import org.basex.core.Users;
-import org.basex.io.DataInput;
-import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.util.Util;
 import org.basex.util.ft.Language;
 

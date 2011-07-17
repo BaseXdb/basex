@@ -3,7 +3,8 @@ package org.basex.query.item.map;
 import static org.basex.query.util.Err.*;
 
 import java.io.IOException;
-import org.basex.data.Serializer;
+
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import static org.basex.query.QueryText.*;
@@ -26,8 +27,8 @@ import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenObjMap;
 
 /**
  * The map item.

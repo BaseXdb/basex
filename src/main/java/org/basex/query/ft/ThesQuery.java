@@ -3,7 +3,7 @@ package org.basex.query.ft;
 import java.util.ArrayList;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * Simple Thesaurus entry for full-text requests.

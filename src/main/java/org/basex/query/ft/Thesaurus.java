@@ -13,9 +13,9 @@ import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenObjMap;
-import org.basex.util.TokenMap;
-import org.basex.util.TokenList;
+import org.basex.util.hash.TokenMap;
+import org.basex.util.hash.TokenObjMap;
+import org.basex.util.list.TokenList;
 
 /**
  * Simple Thesaurus for full-text requests.

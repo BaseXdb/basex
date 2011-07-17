@@ -15,11 +15,11 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.index.FTBuilder;
 import org.basex.index.IndexBuilder;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.PathBuilder;
-import org.basex.index.ValueBuilder;
+import org.basex.index.ft.FTBuilder;
+import org.basex.index.path.PathBuilder;
+import org.basex.index.value.ValueBuilder;
 import org.basex.util.Util;
 
 /**

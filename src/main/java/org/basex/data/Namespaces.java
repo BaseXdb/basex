@@ -7,15 +7,15 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.basex.io.DataInput;
-import org.basex.io.DataOutput;
 import org.basex.io.IO;
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.util.Table;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
-import org.basex.util.TokenObjMap;
-import org.basex.util.TokenSet;
+import org.basex.util.hash.TokenObjMap;
+import org.basex.util.hash.TokenSet;
+import org.basex.util.list.TokenList;
 
 /**
  * This class contains the namespaces of a database.

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.io.PrintOutput;
+import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryException;
 
 /**

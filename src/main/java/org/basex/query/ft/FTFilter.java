@@ -3,7 +3,7 @@ package org.basex.query.ft;
 import java.io.IOException;
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
-import org.basex.data.Serializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNode;

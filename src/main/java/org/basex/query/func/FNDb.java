@@ -17,10 +17,10 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.OptimizeAll;
 import org.basex.data.Data;
-import org.basex.data.SerializerException;
-import org.basex.data.XMLSerializer;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.io.ArrayOutput;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.SerializerException;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -44,8 +44,8 @@ import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
 import org.basex.util.Token;
+import org.basex.util.list.IntList;
 
 /**
  * Database functions.

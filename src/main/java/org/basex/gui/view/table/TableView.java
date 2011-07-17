@@ -21,9 +21,9 @@ import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.list.IntList;
 
 /**
  * This view creates a flat table view on the database contents.

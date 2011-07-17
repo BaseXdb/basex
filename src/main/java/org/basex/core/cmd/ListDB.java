@@ -7,10 +7,10 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
-import org.basex.util.IntList;
 import org.basex.util.Table;
-import org.basex.util.TokenList;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
 
 /**
  * Evaluates the 'list' command and shows all documents in a database.
