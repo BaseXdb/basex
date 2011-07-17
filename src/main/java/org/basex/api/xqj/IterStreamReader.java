@@ -22,6 +22,7 @@ import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.util.NSLocal;
+import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 import static org.basex.util.Token.*;
 
@@ -454,11 +455,9 @@ final class IterStreamReader implements XMLStreamReader {
     /** Data size. */
     private final int s;
     /** Parent stack. */
-    private final int[] parent = new int[IO.MAXHEIGHT];
+    private final IntList parent = new IntList();
     /** Pre stack. */
-    private final int[] pre = new int[IO.MAXHEIGHT];
-    /** Current level. */
-    private int l;
+    private final IntList pre = new IntList();
     /** Current pre value. */
     private int p;
 
@@ -474,7 +473,7 @@ final class IterStreamReader implements XMLStreamReader {
 
     @Override
     boolean hasNext() {
-      return p < s || l > 0;
+      return p < s || pre.size() > 0;
     }
 
     @Override
@@ -487,7 +486,7 @@ final class IterStreamReader implements XMLStreamReader {
       final Data data = dbnode.data;
       final int k = data.kind(p);
       final int pa = data.parent(p, k);
-      if(l > 0 && parent[l - 1] >= pa) {
+      if(parent.size() > 0 && parent.peek() >= pa) {
         endElem();
         return;
       }
@@ -498,7 +497,8 @@ final class IterStreamReader implements XMLStreamReader {
      * Processes the end of an element.
      */
     private void endElem() {
-      dbnode.set(pre[--l], Data.ELEM);
+      dbnode.set(pre.pop(), Data.ELEM);
+      parent.pop();
       kind = END_ELEMENT;
     }
 
@@ -510,8 +510,8 @@ final class IterStreamReader implements XMLStreamReader {
     private void finish(final int k, final int pa) {
       dbnode.set(p, k);
       if(k == Data.ELEM) {
-        pre[l] = p;
-        parent[l++] = pa;
+        pre.push(p);
+        parent.push(pa);
       }
       p += dbnode.data.attSize(p, k);
       type();
