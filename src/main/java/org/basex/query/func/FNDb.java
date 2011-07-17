@@ -380,8 +380,8 @@ public final class FNDb extends FuncCall {
       } else {
         Optimize.optimize(data, data.meta.prop);
       }
-    } catch(IOException e) {
-      DBERR.thrw(input, e.getMessage());
+    } catch(final IOException ex) {
+      DBERR.thrw(input, ex.getMessage());
     }
     return null;
   }
@@ -445,8 +445,14 @@ public final class FNDb extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (def == Function.DBTEXT || def == Function.DBATTR ||
-      def == Function.DBFULLTEXT || def == Function.DBEVENT) || super.uses(u);
+    final boolean up =
+      def == Function.DBADD || def == Function.DBDELETE ||
+      def == Function.DBRENAME || def == Function.DBREPLACE ||
+      def == Function.DBOPTIMIZE;
+    return
+      u == Use.CTX && (def == Function.DBTEXT || def == Function.DBATTR ||
+        def == Function.DBFULLTEXT || def == Function.DBEVENT) ||
+      u == Use.UPD && up || super.uses(u);
   }
 
   @Override

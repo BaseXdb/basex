@@ -363,13 +363,14 @@ public final class FNGen extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.UPD && def == Function.PUT || u == Use.X30 && (
-        def == Function.DATA && expr.length == 0 ||
+    return
+      u == Use.UPD && def == Function.PUT ||
+      u == Use.X30 && (def == Function.DATA && expr.length == 0 ||
         def == Function.PARSETXT || def == Function.PARSETXTLIN ||
         def == Function.PARSETXTAVL || def == Function.PARSEXML ||
         def == Function.URICOLL || def == Function.SERIALIZE) ||
-        u == Use.CTX && def == Function.DATA && expr.length == 0 ||
-        super.uses(u);
+      u == Use.CTX && (def == Function.DATA && expr.length == 0 ||
+        def == Function.PUT) && expr.length == 0 || super.uses(u);
   }
 
   @Override

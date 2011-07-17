@@ -14,6 +14,7 @@ import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
 import org.basex.query.util.Err;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +26,8 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class FNDbTest extends AdvancedQueryTest {
+  /** Test database name. */
+  private static final String DBNAME = Util.name(FNDbTest.class);
   /** Test file. */
   private static final String FILE = "etc/test/input.xml";
   /** Test folder. */
@@ -169,11 +172,11 @@ public final class FNDbTest extends AdvancedQueryTest {
     contains(fun + "('db')", "test/");
 
     // create two other database and compare substring
-    new CreateDB("daz").execute(CONTEXT);
-    new CreateDB("dba").execute(CONTEXT);
-    contains(fun + "()", "daz db dba");
-    new DropDB("daz").execute(CONTEXT);
-    new DropDB("dba").execute(CONTEXT);
+    new CreateDB(DBNAME + 1).execute(CONTEXT);
+    new CreateDB(DBNAME + 2).execute(CONTEXT);
+    contains(fun + "()", (DBNAME + 1) + ' ' + (DBNAME + 2));
+    new DropDB(DBNAME + 1).execute(CONTEXT);
+    new DropDB(DBNAME + 2).execute(CONTEXT);
   }
 
   /**
