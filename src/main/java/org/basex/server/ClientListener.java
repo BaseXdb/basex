@@ -181,6 +181,7 @@ public final class ClientListener extends Thread {
         // start timeout
         command.startTimeout(context.prop.num(Prop.TIMEOUT));
 
+        System.out.println("=> " + command);
         log.write(this,
             command.toString().replace('\r', ' ').replace('\n', ' '));
 

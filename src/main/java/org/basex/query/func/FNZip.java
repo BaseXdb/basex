@@ -92,14 +92,14 @@ public final class FNZip extends FuncCall {
 
     checkAdmin(ctx);
     switch(def) {
-      case ZIPBIN:    return binaryEntry(ctx);
-      case ZIPTEXT: return textEntry(ctx);
-      case ZIPHTML: return xmlEntry(ctx, true);
-      case ZIPXML:  return xmlEntry(ctx, false);
-      case ZIPENTRIES:   return entries(ctx);
-      case ZIPFILE:   return zipFile(ctx);
-      case ZIPUPDATE:    return updateEntries(ctx);
-      default: return super.item(ctx, ii);
+      case ZIPBIN:     return binaryEntry(ctx);
+      case ZIPTEXT:    return textEntry(ctx);
+      case ZIPHTML:    return xmlEntry(ctx, true);
+      case ZIPXML:     return xmlEntry(ctx, false);
+      case ZIPENTRIES: return entries(ctx);
+      case ZIPFILE:    return zipFile(ctx);
+      case ZIPUPDATE:  return updateEntries(ctx);
+      default:         return super.item(ctx, ii);
     }
   }
 
