@@ -173,7 +173,7 @@ final class DatabaseUpdates {
         final int followingAxisPre = pd + data.size(pd, data.kind(pd));
         // mark obsolete target nodes on the descendant axis.
         while(ni < l && nodes.get(ni) < followingAxisPre) {
-          nodes.set(-1, ni++);
+          nodes.set(ni++, -1);
           c++;
         }
       }

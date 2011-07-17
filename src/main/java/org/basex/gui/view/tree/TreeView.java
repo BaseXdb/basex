@@ -2,6 +2,7 @@ package org.basex.gui.view.tree;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Transparency;
@@ -402,9 +403,9 @@ public final class TreeView extends View implements TreeConstants {
         break;
       case DESCENDANTS:
         final int alphaD = 0xDD000000;
-        final int rgbD = COLORS[6].getRGB();
+        final int rgbD = color(6).getRGB();
         fillColor = new Color(rgbD + alphaD, true);
-        borderColor = COLORS[8];
+        borderColor = color(8);
         textColor = Color.WHITE;
         fill = !marked;
         border = true;
@@ -416,13 +417,13 @@ public final class TreeView extends View implements TreeConstants {
         break;
       case PARENT:
       default:
-        fillColor = COLORS[6];
+        fillColor = color(6);
         textColor = Color.WHITE;
         fill = !br && !marked;
         border = !br;
         if(h < 4) {
           fillColor = SMALL_SPACE_COLOR;
-          borderColor = COLORS[8];
+          borderColor = color(8);
           txt = false;
         }
         break;
@@ -483,7 +484,7 @@ public final class TreeView extends View implements TreeConstants {
    */
   private Color getColorPerLevel(final int l, final boolean fill) {
     final int till = l < CHANGE_COLOR_TILL ? l : CHANGE_COLOR_TILL;
-    return fill ? COLORS[till] : COLORS[till + 2];
+    return fill ? color(till) : color(till + 2);
   }
 
   /**
@@ -640,7 +641,7 @@ public final class TreeView extends View implements TreeConstants {
       final int lv, final TreeRect r, final int pre) {
     final int y = getYperLevel(lv);
     final int np = getBigRectPosition(rn, lv, pre, r);
-    g.setColor(nodeHeight < 4 ? SMALL_SPACE_COLOR : COLORS[7]);
+    g.setColor(nodeHeight < 4 ? SMALL_SPACE_COLOR : color(7));
     g.drawLine(np, y, np, y + nodeHeight);
     return np;
   }
@@ -656,7 +657,7 @@ public final class TreeView extends View implements TreeConstants {
   private void drawParentConnection(final Graphics g, final int lv,
       final TreeRect r, final int px, final int brx) {
     final int y = getYperLevel(lv);
-    g.setColor(COLORS[7]);
+    g.setColor(color(7));
     g.drawLine(px, getYperLevel(lv + 1) - 1, brx == -1 ? (2 * r.x + r.w) / 2
         : brx, y + nodeHeight + 1);
   }
@@ -732,17 +733,17 @@ public final class TreeView extends View implements TreeConstants {
     final String s = Token.string(tr.getText(gui.context, rn, pre));
     final int w = BaseXLayout.width(g, s);
 
-    g.setColor(COLORS[8]);
+    g.setColor(color(8));
 
     if(root) {
       g.fillRect(x, y + h, w + 2, fontHeight + 2);
-      g.setColor(COLORS[6]);
+      g.setColor(color(6));
       g.drawRect(x - 1, y + h + 1, w + 3, fontHeight + 1);
       g.setColor(Color.WHITE);
       g.drawString(s, r.x + 1, (int) (y + h + (float) fontHeight) - 2);
     } else {
       g.fillRect(r.x, y - fontHeight, w + 2, fontHeight);
-      g.setColor(COLORS[6]);
+      g.setColor(color(6));
       g.drawRect(r.x - 1, y - fontHeight - 1, w + 3, fontHeight + 1);
       g.setColor(Color.WHITE);
       g.drawString(s, r.x + 1, (int) (y - h / (float) fontHeight) - 2);
@@ -844,7 +845,7 @@ public final class TreeView extends View implements TreeConstants {
         case CONNECTION:
           break;
         default:
-          final int rgb = COLORS[7].getRGB();
+          final int rgb = color(7).getRGB();
           final int alpha = 0x33000000;
           g.setColor(nodeHeight < 4 ? SMALL_SPACE_COLOR : new Color(
               rgb + alpha, false));
@@ -884,11 +885,11 @@ public final class TreeView extends View implements TreeConstants {
     switch(t) {
       case CONNECTION:
         alpha = 0x20000000;
-        rgb = COLORS[4].getRGB();
+        rgb = color(4).getRGB();
         return new Color(rgb + alpha, true);
       default:
         alpha = 0x60000000;
-        rgb = COLORS[8].getRGB();
+        rgb = color(8).getRGB();
         return new Color(rgb + alpha, true);
     }
   }

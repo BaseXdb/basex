@@ -2,6 +2,7 @@ package org.basex.index.path;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -9,7 +10,6 @@ import org.basex.data.Data;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
-import org.basex.io.IO;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.io.serial.Serializer;
@@ -25,8 +25,8 @@ import org.basex.util.list.TokenList;
  * @author Christian Gruen
  */
 public final class PathSummary implements Index {
-  /** Parent stack for building the summary. */
-  private final PathNode[] stack = new PathNode[IO.MAXHEIGHT];
+  /** Node stack for building the summary. */
+  private final ArrayList<PathNode> stack = new ArrayList<PathNode>();
   /** Root node. */
   private PathNode root;
 
@@ -45,14 +45,6 @@ public final class PathSummary implements Index {
   }
 
   /**
-   * Initializes the data structures. This method is called if a new path
-   * summary is built.
-   */
-  public void init() {
-    root = null;
-  }
-
-  /**
    * Writes the path summary to the specified output.
    * @param out output stream
    * @throws IOException I/O exception
@@ -62,7 +54,15 @@ public final class PathSummary implements Index {
     if(root != null) root.write(out);
   }
 
-  // Path Summary creation ====================================================
+  // Creation =================================================================
+
+  /**
+   * Initializes the data structures. This method is called if a new path
+   * summary is built.
+   */
+  public void init() {
+    root = null;
+  }
 
   /**
    * Adds an entry.
@@ -73,13 +73,18 @@ public final class PathSummary implements Index {
   public void index(final int n, final byte k, final int l) {
     if(root == null) {
       root = new PathNode(n, k, null);
-      stack[0] = root;
+      stack.add(root);
     } else {
-      stack[l] = stack[l - 1].index(n, k);
+      final PathNode pn = stack.get(l - 1).index(n, k);
+      if(l < stack.size()) {
+        stack.set(l, pn);
+      } else {
+        stack.add(pn);
+      }
     }
   }
 
-  // Path Summary traversal ===================================================
+  // Traversal ================================================================
 
   /**
    * Returns all children or descendants of the specified nodes.

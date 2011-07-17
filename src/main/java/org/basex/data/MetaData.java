@@ -54,8 +54,6 @@ public final class MetaData {
   public boolean ftindex;
   /** Flag for activated path summary. */
   public boolean pathindex = true;
-  /** Flag for up-to-date document index. */
-  public boolean docindex;
 
   /** Flag for wildcard indexing. */
   public boolean wildcards;

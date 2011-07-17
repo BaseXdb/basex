@@ -3,11 +3,12 @@ package org.basex.io.serial;
 import static org.basex.data.DataText.*;
 import static org.basex.io.serial.DOTData.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.basex.data.ExprInfo;
 import org.basex.data.FTPos;
-import org.basex.io.IO;
 import org.basex.io.out.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -26,7 +27,7 @@ public final class DOTSerializer extends Serializer {
   private final PrintOutput out;
 
   /** Cached children. */
-  private final IntList[] children = new IntList[IO.MAXHEIGHT];
+  private final ArrayList<IntList> children = new ArrayList<IntList>();
   /** Cached attributes. */
   private final TokenBuilder tb = new TokenBuilder();
   /** Cached nodes. */
@@ -49,7 +50,6 @@ public final class DOTSerializer extends Serializer {
    */
   public DOTSerializer(final PrintOutput o, final boolean c)
       throws IOException {
-    for(int i = 0; i < IO.MAXHEIGHT; ++i) children[i] = new IntList();
     out = o;
     compact = c;
     out.println(HEADER);
@@ -91,7 +91,7 @@ public final class DOTSerializer extends Serializer {
   public void close(final byte[] t) throws IOException {
     if(--level < 0) return;
     final int c = nodes.get(level);
-    final IntList il = children[level];
+    final IntList il = child(level);
     final int is = il.size();
     for(int i = 0; i < is; ++i) out.println(Util.info(DOTLINK, c, il.get(i)));
     color = null;
@@ -145,9 +145,19 @@ public final class DOTSerializer extends Serializer {
       txt = txt.replaceAll("\\\\n\\w+:", "\\\\n");
     }
     out.println(Util.info(DOTNODE, count, txt, col));
-    nodes.set(count, level);
-    if(level > 0) children[level - 1].add(count);
+    nodes.set(level, count);
+    if(level > 0) child(level - 1).add(count);
     ++count;
+  }
+
+  /**
+   * Returns the children from the stack.
+   * @param i index
+   * @return children
+   */
+  private IntList child(final int i) {
+    while(i >= children.size()) children.add(new IntList());
+    return children.get(i);
   }
 
   @Override

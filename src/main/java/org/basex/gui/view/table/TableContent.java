@@ -101,9 +101,9 @@ final class TableContent extends BaseXBack {
       final boolean rf = pre == rfocus;
       final int col = rm ? rf ? 5 : 4 : 3;
       if(rm || rf) {
-        g.setColor(GUIConstants.COLORS[col]);
+        g.setColor(GUIConstants.color(col));
         g.fillRect(0, posY - 1, w, rowH);
-        g.setColor(GUIConstants.COLORS[col + 4]);
+        g.setColor(GUIConstants.color(col + 4));
         g.drawLine(0, posY - 1, w, posY - 1);
       }
       g.setColor(Color.black);
@@ -158,7 +158,7 @@ final class TableContent extends BaseXBack {
         if(focusStr != null) {
           final int sw = BaseXLayout.width(g, focusStr) + 8;
           if(fx > w - sw - 2) fx = w - sw - 2;
-          g.setColor(GUIConstants.COLORS[col + 2]);
+          g.setColor(GUIConstants.color(col + 2));
           g.fillRect(fx - 2, posY, sw, rowH - 1);
           g.setColor(Color.black);
           BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw, fsz);

@@ -1,14 +1,16 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
+
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.io.IO;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * Evaluates the 'optimize' command and optimizes the data structures of
@@ -87,37 +89,38 @@ public final class Optimize extends ACreate {
     final MetaData m = d.meta;
     m.dirty = true;
 
-    final int[] parStack = new int[IO.MAXHEIGHT];
-    final int[] tagStack = new int[IO.MAXHEIGHT];
+    final IntList pars = new IntList();
+    final IntList tags = new IntList();
     final boolean path = p.is(Prop.PATHINDEX);
-    int level = 0;
-    int h = 0, n = 0;
+    int n = 0;
 
     for(int pre = 0; pre < m.size; ++pre) {
       final byte kind = (byte) d.kind(pre);
       final int par = d.parent(pre, kind);
-      while(level > 0 && parStack[level - 1] > par) --level;
-
+      while(!pars.empty() && pars.peek() > par) {
+        pars.pop();
+        tags.pop();
+      }
       if(kind == Data.DOC) {
-        parStack[level++] = pre;
-        if(path) d.pthindex.index(0, kind, level);
+        pars.push(pre);
+        tags.push(0);
+        if(path) d.pthindex.index(0, kind, pars.size());
         ++n;
       } else if(kind == Data.ELEM) {
         final int id = d.name(pre);
         d.tagindex.index(d.tagindex.key(id), null, true);
-        if(path) d.pthindex.index(id, kind, level);
-        tagStack[level] = id;
-        parStack[level++] = pre;
+        if(path) d.pthindex.index(id, kind, pars.size());
+        pars.push(pre);
+        tags.push(id);
       } else if(kind == Data.ATTR) {
         final int id = d.name(pre);
         d.atnindex.index(d.atnindex.key(id), d.text(pre, false), true);
-        if(path) d.pthindex.index(id, kind, level);
+        if(path) d.pthindex.index(id, kind, pars.size());
       } else {
         final byte[] txt = d.text(pre, true);
-        if(kind == Data.TEXT) d.tagindex.index(tagStack[level - 1], txt);
-        if(path) d.pthindex.index(0, kind, level);
+        if(kind == Data.TEXT) d.tagindex.index(tags.peek(), txt);
+        if(path) d.pthindex.index(0, kind, pars.size());
       }
-      if(h < level) h = level;
       if(c != null) c.pre = pre;
     }
     m.ndocs = n;

@@ -217,7 +217,7 @@ abstract class AQuery extends Command {
         info(ao.toString());
       }
     } catch(final Exception ex) {
-      Util.debug(ex);
+      Util.stack(ex);
     }
   }
 

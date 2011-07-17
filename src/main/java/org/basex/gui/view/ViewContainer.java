@@ -280,7 +280,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     ((Graphics2D) g).setStroke(STROKE);
 
     if(!out) {
-      g.setColor(COLORS[10]);
+      g.setColor(color(10));
       g.drawRect(p.x, p.y, source.getWidth() - 1, source.getHeight() - 1);
     }
     final int ac = AlphaComposite.SRC_OVER;
@@ -289,10 +289,10 @@ public final class ViewContainer extends BaseXBack implements Runnable {
       ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));
       g.fillRect(p.x, p.y, source.getWidth(), source.getHeight());
     } else if(orient != null) {
-      g.setColor(COLORS[16]);
+      g.setColor(color(16));
       g.drawRect(pos[0], pos[1], pos[2] - 1, pos[3] - 1);
       ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));
-      g.setColor(COLORS[8]);
+      g.setColor(color(8));
       g.fillRect(pos[0], pos[1], pos[2], pos[3]);
     }
   }

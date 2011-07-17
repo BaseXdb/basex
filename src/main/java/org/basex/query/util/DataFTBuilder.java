@@ -90,13 +90,13 @@ final class DataFTBuilder {
         // remove leading characters of first text
         final double l = first.length + last.length;
         final int ll = Math.min(first.length, (int) (first.length / l * len));
-        tl.set(concat(DOTS, subtoken(first, ll)), 0);
+        tl.set(0, concat(DOTS, subtoken(first, ll)));
         len -= ll;
       }
       if(last != EMPTY && len > 0) {
         // remove trailing characters of last text
         final int ll = Math.min(last.length, len);
-        tl.set(concat(subtoken(last, 0, last.length - ll), DOTS), ts - 1);
+        tl.set(ts - 1, concat(subtoken(last, 0, last.length - ll), DOTS));
         len -= ll;
       }
       // still too much text: shorten inner texts
@@ -105,8 +105,8 @@ final class DataFTBuilder {
         // skip elements, marked texts and too short text snippets
         if(txt == null || tl.get(t - 1) == null) continue;
         final int ll = Math.min(txt.length, len);
-        tl.set(concat(subtoken(txt, 0, (txt.length - ll) / 2), DOTS,
-            subtoken(txt, (txt.length + ll) / 2)), t);
+        tl.set(t, concat(subtoken(txt, 0, (txt.length - ll) / 2), DOTS,
+                subtoken(txt, (txt.length + ll) / 2)));
         len -= ll;
       }
     }

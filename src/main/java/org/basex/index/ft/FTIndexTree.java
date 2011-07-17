@@ -40,8 +40,8 @@ final class FTIndexTree extends IndexTree {
     if(os == keys.size()) {
       final int i = cf > 0 ? maps.get(Num.num(n)) : n;
       if(poss.size() > i && poss.get(i) != null) {
-        poss.set(Num.add(poss.get(i), pos), i);
-        numpre.set(numpre.get(i) + 1, i);
+        poss.set(i, Num.add(poss.get(i), pos));
+        numpre.set(i, numpre.get(i) + 1);
         return;
       }
     }

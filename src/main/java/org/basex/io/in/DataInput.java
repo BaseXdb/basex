@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import org.basex.util.Token;
+import org.basex.util.list.IntList;
 
 /**
  * This is an input stream for project specific data types.
@@ -58,12 +59,12 @@ public final class DataInput extends BufferInput {
    * @return integer array
    * @throws IOException IO Exception
    */
-  public int[] readDiffs() throws IOException {
+  public IntList readDiffs() throws IOException {
     final int[] array = new int[readNum()];
     for(int a = 0; a < array.length; ++a) {
       array[a] = (a == 0 ? 0 : array[a - 1]) + readNum();
     }
-    return array;
+    return new IntList(array);
   }
 
   /**

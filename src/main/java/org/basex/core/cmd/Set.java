@@ -67,7 +67,7 @@ public final class Set extends AGet {
 
     String v = val;
     if(type instanceof Boolean) {
-      final boolean b = val == null ? !((Boolean) type).booleanValue() :
+      final boolean b = val == null || val.isEmpty() ? !((Boolean) type) :
         val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
       prop.set(key, b);
       v = AInfo.flag(b);

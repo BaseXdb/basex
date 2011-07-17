@@ -54,8 +54,6 @@ public abstract class IO {
   /** Entries per block (default: 256). */
   public static final int ENTRIES = BLOCKSIZE >>> NODEPOWER;
 
-  /** Maximum supported tree height. */
-  public static final int MAXHEIGHT = 1 << 8;
   /** Maximum number of attributes (see bit layout in {@link Data} class). */
   public static final int MAXATTS = 0x1F;
   /** Offset for inlining numbers (see bit layout in {@link Data} class). */
