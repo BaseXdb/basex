@@ -184,17 +184,20 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void testAdd() throws QueryException {
     final String fun = check(Function.DBADD);
 
-    query(fun + "('db', document { <root/> }, 'test1.xml')");
+    query(fun + "('db', '<root/>', 'test1.xml')");
     query("count(collection('db/test1.xml')/root)", "1");
 
-    query(fun + "('db', document { <root/> }, 'test2.xml', 'test')");
-    query("count(collection('db/test/test2.xml')/root)", "1");
+    query(fun + "('db', document { <root/> }, 'test2.xml')");
+    query("count(collection('db/test2.xml')/root)", "1");
+
+    query(fun + "('db', document { <root/> }, 'test3.xml', 'test')");
+    query("count(collection('db/test/test3.xml')/root)", "1");
 
     query(fun + "('db', 'etc/test/input.xml', '', 'test')");
     query("count(collection('db/test/input.xml')/html)", "1");
 
-    query(fun + "('db', 'etc/test/input.xml', 'test3.xml', 'test')");
-    query("count(collection('db/test/test3.xml')/html)", "1");
+    query(fun + "('db', 'etc/test/input.xml', 'test4.xml', 'test')");
+    query("count(collection('db/test/test4.xml')/html)", "1");
 
     query(fun + "('db', '" + FLDR + "', '', 'test/dir')");
     query("count(collection('db/test/dir'))", NFLDR);
@@ -211,13 +214,17 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     new Add("etc/test/input.xml", null, "test").execute(CONTEXT);
 
-    query(fun + "('db', 'test/input.xml', document { <root/> })");
+    query(fun + "('db', 'test/input.xml', '<root1/>')");
     query("count(collection('db/test/input.xml')/html)", "0");
-    query("count(collection('db/test/input.xml')/root)", "1");
+    query("count(collection('db/test/input.xml')/root1)", "1");
+
+    query(fun + "('db', 'test/input.xml', document { <root2/> })");
+    query("count(collection('db/test/input.xml')/root1)", "0");
+    query("count(collection('db/test/input.xml')/root2)", "1");
 
     query(fun + "('db', 'test/input.xml', 'etc/test/input.xml')");
     query("count(collection('db/test/input.xml')/html)", "1");
-    query("count(collection('db/test/input.xml')/root)", "0");
+    query("count(collection('db/test/input.xml')/root2)", "0");
   }
 
   /**
