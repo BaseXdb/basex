@@ -2,7 +2,7 @@ package org.basex.index;
 
 import org.basex.data.Data;
 import org.basex.data.PathSummary;
-import org.basex.io.IO;
+import org.basex.util.IntList;
 
 /**
  * This interface defines the functions which are needed for building
@@ -24,26 +24,26 @@ public final class PathBuilder extends IndexBuilder {
   public Index build() {
     abort();
 
-    final int[] stack = new int[IO.MAXHEIGHT];
+    final IntList st = new IntList();
     final PathSummary path = new PathSummary();
-    int h = 0, l = 0;
+    int h = 0;
     for(pre = 0; pre < size; ++pre) {
       final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);
-      while(l > 0 && stack[l - 1] > par) --l;
+      while(st.size() > 0 && st.peek() > par) st.pop();
 
       if(kind == Data.DOC) {
-        stack[l++] = pre;
-        path.index(0, kind, l);
+        st.push(pre);
+        path.index(0, kind, st.size());
       } else if(kind == Data.ELEM) {
-        path.index(data.name(pre), kind, l);
-        stack[l++] = pre;
+        path.index(data.name(pre), kind, st.size());
+        st.push(pre);
       } else if(kind == Data.ATTR) {
-        path.index(data.name(pre), kind, l);
+        path.index(data.name(pre), kind, st.size());
       } else {
-        path.index(0, kind, l);
+        path.index(0, kind, st.size());
       }
-      if(h < l) h = l;
+      h = Math.max(h, st.size());
     }
     data.meta.pathindex = true;
     return path;
