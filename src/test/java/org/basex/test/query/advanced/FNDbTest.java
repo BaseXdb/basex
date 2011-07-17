@@ -248,6 +248,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query("count(collection('db/test'))", NFLDR);
 
     query(fun + "('db', 'test', 'newtest')", "");
+    query("count(collection('db/test'))", "0");
     query("count(collection('db/newtest'))", NFLDR);
   }
 

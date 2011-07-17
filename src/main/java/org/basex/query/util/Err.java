@@ -46,6 +46,10 @@ public enum Err {
   EMPTYPATH(BASX, 13, "%: Empty path specified."),
   /** BASX0014: Evaluation exception. */
   DBERR(BASX, 14, "%"),
+  /** BASX0015: Evaluation exception. */
+  PROCMM(BASX, 15, Text.PROCMM),
+  /** BASX0016: Evaluation exception. */
+  DBLOCKED(BASX, 16, Text.DBLOCKED),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
