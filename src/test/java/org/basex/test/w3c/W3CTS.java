@@ -24,12 +24,12 @@ import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.Nodes;
-import org.basex.data.SerializerProp;
-import org.basex.data.XMLSerializer;
-import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.io.TextInput;
+import org.basex.io.in.TextInput;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.SerializerProp;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.expr.Expr;
@@ -45,8 +45,8 @@ import org.basex.query.iter.ItemCache;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 import org.basex.util.Util;
+import org.basex.util.list.TokenList;
 
 /**
  * XQuery Test Suite wrapper.

@@ -11,8 +11,8 @@ import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Table;
 import org.basex.util.Token;
-import org.basex.util.TokenList;
 import org.basex.util.Util;
+import org.basex.util.list.TokenList;
 
 /**
  * This class assembles statistics on the specified database.

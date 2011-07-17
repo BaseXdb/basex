@@ -19,17 +19,17 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
-import org.basex.data.SerializerProp;
-import org.basex.data.XMLSerializer;
-import org.basex.io.PrintOutput;
+import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.SerializerProp;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
 import org.basex.server.ClientSession;
 import org.basex.util.Args;
 import org.basex.util.Performance;
-import org.basex.util.StringList;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * Simple INEX database test.

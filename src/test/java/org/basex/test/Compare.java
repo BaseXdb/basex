@@ -6,6 +6,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.ByteList;
+import org.basex.util.list.StringList;
 
 /**
  * This class compares query results with other query processors.

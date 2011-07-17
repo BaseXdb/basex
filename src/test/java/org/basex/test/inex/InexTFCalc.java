@@ -14,11 +14,11 @@ import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
-import org.basex.io.PrintOutput;
+import org.basex.io.out.PrintOutput;
 import org.basex.util.Args;
 import org.basex.util.Performance;
-import org.basex.util.StringList;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * Simple word frequency collector for INEXDBtests.

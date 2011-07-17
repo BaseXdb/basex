@@ -3,7 +3,7 @@ package org.basex.test.stats;
 import static org.basex.data.DataText.*;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * This class prints meta statistics.

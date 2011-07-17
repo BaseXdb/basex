@@ -5,8 +5,8 @@ import static org.basex.util.Token.string;
 import java.io.File;
 import java.io.IOException;
 import org.basex.core.BaseXException;
-import org.basex.io.DataInput;
-import org.basex.util.TokenList;
+import org.basex.io.in.DataInput;
+import org.basex.util.list.TokenList;
 
 /**
  * This class prints storage statistics.

@@ -11,7 +11,7 @@ import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.Set;
 import org.basex.util.Token;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * This class prints index statistics.
