@@ -8,13 +8,13 @@ import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.basex.data.SerializerProp;
-import org.basex.data.XMLSerializer;
 import org.basex.io.IOFile;
-import org.basex.io.PrintOutput;
-import org.basex.util.IntList;
+import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.SerializerProp;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * Evaluates the 'export' command and saves the currently opened database

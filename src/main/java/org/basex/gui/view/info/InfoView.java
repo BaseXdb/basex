@@ -16,10 +16,10 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.util.IntList;
 import org.basex.util.Performance;
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.IntList;
+import org.basex.util.list.StringList;
 
 /**
  * This view displays query information.

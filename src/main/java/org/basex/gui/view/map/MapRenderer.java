@@ -8,11 +8,11 @@ import java.awt.Graphics;
 import java.util.Arrays;
 import org.basex.data.FTPos;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.util.BoolList;
-import org.basex.util.IntList;
-import org.basex.util.TokenList;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTSpan;
+import org.basex.util.list.BoolList;
+import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
 
 /**
  * This class assembles utility methods for painting rectangle contents.

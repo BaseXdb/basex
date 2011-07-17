@@ -12,10 +12,10 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
-import org.basex.io.TextInput;
+import org.basex.io.in.TextInput;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenMap;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenMap;
 
 /**
  * This class scans an XML document and creates atomic tokens.

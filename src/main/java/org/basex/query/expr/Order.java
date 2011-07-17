@@ -4,7 +4,8 @@ import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.basex.data.Serializer;
+
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;

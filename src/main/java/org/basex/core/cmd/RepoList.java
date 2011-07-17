@@ -12,7 +12,7 @@ import org.basex.core.Commands.CmdRepo;
 import org.basex.data.DataText;
 import org.basex.query.util.pkg.Package;
 import org.basex.util.Table;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * Evaluates the 'repo list' command.

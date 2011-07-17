@@ -16,9 +16,9 @@ import java.util.jar.JarFile;
 
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * This class loads language specific texts when the {@link #lang}

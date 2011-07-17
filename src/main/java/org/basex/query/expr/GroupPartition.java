@@ -11,9 +11,9 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
-import org.basex.util.IntMap;
-import org.basex.util.TokenSet;
+import org.basex.util.hash.IntMap;
+import org.basex.util.hash.TokenSet;
+import org.basex.util.list.IntList;
 
 /**
  * Stores the grouping for a group by clause.

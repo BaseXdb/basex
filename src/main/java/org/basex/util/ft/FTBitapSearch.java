@@ -4,7 +4,7 @@ import java.util.BitSet;
 import java.util.NoSuchElementException;
 import org.basex.query.QueryException;
 import org.basex.query.ft.FTTokens;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * Generalized search algorithm based on the Bitap string matching algorithm.

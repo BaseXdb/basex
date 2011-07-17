@@ -8,8 +8,8 @@ import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.XQuery;
-import org.basex.data.BuilderSerializer;
 import org.basex.data.Data;
+import org.basex.io.serial.BuilderSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 

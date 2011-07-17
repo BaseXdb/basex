@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
-import org.basex.io.ArrayOutput;
+import org.basex.io.out.ArrayOutput;
 
 /**
  * <p>This class defines methods for evaluating commands, either locally or

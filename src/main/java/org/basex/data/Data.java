@@ -10,17 +10,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.basex.core.cmd.InfoStorage;
+import org.basex.index.DocIndex;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.index.path.PathSummary;
 import org.basex.index.Names;
 import org.basex.io.IO;
-import org.basex.io.TableAccess;
+import org.basex.io.random.TableAccess;
 import org.basex.util.Atts;
-import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenMap;
+import org.basex.util.hash.TokenMap;
+import org.basex.util.list.IntList;
 
 /**
  * This class provides access to the database storage.

@@ -17,8 +17,8 @@ import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.util.DataBuilder;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * Add primitive.

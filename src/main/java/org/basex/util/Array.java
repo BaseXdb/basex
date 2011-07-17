@@ -2,6 +2,8 @@ package org.basex.util;
 
 import java.util.Arrays;
 
+import org.basex.util.list.IntList;
+
 /**
  * This class provides convenience methods for handling arrays
  * and serves as an extension to the {@link Arrays} class of Java.

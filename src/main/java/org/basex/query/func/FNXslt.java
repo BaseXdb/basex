@@ -6,10 +6,10 @@ import static org.basex.util.Token.*;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.basex.data.XMLSerializer;
-import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -22,9 +22,9 @@ import org.basex.query.item.Uri;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
 import org.basex.util.Xslt;
+import org.basex.util.hash.TokenObjMap;
 
 /**
  * Project specific functions.

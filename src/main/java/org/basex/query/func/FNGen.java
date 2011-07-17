@@ -6,13 +6,13 @@ import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import org.basex.data.Data;
-import org.basex.data.SerializerException;
-import org.basex.data.SerializerProp;
-import org.basex.data.XMLSerializer;
-import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
-import org.basex.io.TextInput;
+import org.basex.io.in.TextInput;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.SerializerException;
+import org.basex.io.serial.SerializerProp;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -32,10 +32,10 @@ import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
-import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenObjMap;
+import org.basex.util.hash.TokenObjMap;
+import org.basex.util.list.ByteList;
 
 /**
  * Generating functions.

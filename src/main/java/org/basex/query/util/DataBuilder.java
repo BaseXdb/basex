@@ -12,7 +12,7 @@ import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.Atts;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * Class for building memory-based database nodes.

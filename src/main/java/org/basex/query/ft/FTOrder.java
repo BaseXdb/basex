@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
-import org.basex.data.Serializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryText;
 import org.basex.util.InputInfo;

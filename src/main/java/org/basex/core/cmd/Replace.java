@@ -8,8 +8,8 @@ import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
-import org.basex.util.IntList;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 import org.xml.sax.InputSource;
 
 /**

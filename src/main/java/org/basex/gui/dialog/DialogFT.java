@@ -15,9 +15,9 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
-import org.basex.util.StringList;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.Language;
+import org.basex.util.list.StringList;
 
 /**
  * Full-text creation dialog.

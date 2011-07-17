@@ -10,8 +10,8 @@ import org.basex.core.User;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.Zip;
-import org.basex.util.StringList;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * Evaluates the 'restore' command and restores a backup of a database.

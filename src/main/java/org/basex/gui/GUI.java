@@ -49,7 +49,7 @@ import org.basex.gui.view.plot.PlotView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
-import org.basex.io.ArrayOutput;
+import org.basex.io.out.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;

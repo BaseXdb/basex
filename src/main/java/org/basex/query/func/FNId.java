@@ -15,7 +15,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * ID functions.

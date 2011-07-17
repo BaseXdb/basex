@@ -5,8 +5,8 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.SingleParser;
 import org.basex.core.Prop;
-import org.basex.io.BufferInput;
 import org.basex.io.IO;
+import org.basex.io.in.BufferInput;
 import org.basex.util.TokenBuilder;
 
 /**

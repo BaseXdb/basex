@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import org.basex.util.list.ByteList;
+
 /**
  * This class compresses and decompresses tokens. It is inspired by the
  * Huffman coding, but was simplified to speed up processing.
@@ -7,9 +9,7 @@ package org.basex.util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Compress {
-  /** Byte list. */
-  private final ByteList bl = new ByteList();
+public final class Compress extends ByteList {
   /** Temporary value, or current position. */
   private int c;
   /** Offset. */
@@ -23,9 +23,9 @@ public final class Compress {
   public byte[] pack(final byte[] txt) {
     // initialize compression
     final int tl = txt.length;
-    bl.reset();
-    Num.set(bl.list, tl, 0);
-    bl.size = Num.length(tl);
+    reset();
+    Num.set(list, tl, 0);
+    size = Num.length(tl);
     c = 0;
     o = 0;
 
@@ -54,8 +54,8 @@ public final class Compress {
         push(b << 4, 12);
       }
     }
-    if(o != 0) bl.add(c);
-    return bl.size() < tl ? bl.toArray() : txt;
+    if(o != 0) add(c);
+    return size() < tl ? toArray() : txt;
   }
 
   /**
@@ -69,7 +69,7 @@ public final class Compress {
       cc |= (bb & 1) << oo;
       bb >>= 1;
       if(++oo == 8) {
-        bl.add(cc);
+        add(cc);
         oo = 0;
         cc = 0;
       }
@@ -85,8 +85,8 @@ public final class Compress {
    */
   public synchronized byte[] unpack(final byte[] txt) {
     // initialize decompression
-    bl.list = txt;
-    bl.size = txt.length;
+    list = txt;
+    size = txt.length;
     c = Num.length(txt, 0);
     o = 0;
 
@@ -124,7 +124,7 @@ public final class Compress {
   private int pull(final int s) {
     int oo = o, cc = c, x = 0;
     for(int i = 0; i < s; i++) {
-      if((bl.list[cc] & 1 << oo) != 0) x |= 1 << i;
+      if((list[cc] & 1 << oo) != 0) x |= 1 << i;
       if(++oo == 8) {
         oo = 0;
         ++cc;
@@ -140,7 +140,7 @@ public final class Compress {
    * @return result
    */
   private boolean pull() {
-    final boolean b = (bl.list[c] & 1 << o) != 0;
+    final boolean b = (list[c] & 1 << o) != 0;
     if(++o == 8) {
       o = 0;
       ++c;

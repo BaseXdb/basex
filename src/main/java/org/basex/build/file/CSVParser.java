@@ -5,12 +5,12 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.build.SingleParser;
 import org.basex.core.Prop;
-import org.basex.io.BufferInput;
 import org.basex.io.IO;
+import org.basex.io.in.BufferInput;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 import org.basex.util.Util;
 import org.basex.util.XMLToken;
+import org.basex.util.list.TokenList;
 
 /**
  * This class parses files in the CSV format

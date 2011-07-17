@@ -18,8 +18,8 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenSet;
 import org.basex.util.XMLToken;
+import org.basex.util.hash.TokenSet;
 
 /**
  * QName functions.

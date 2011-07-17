@@ -5,11 +5,11 @@ import static org.junit.Assert.*;
 import java.util.NoSuchElementException;
 import org.basex.query.QueryException;
 import org.basex.query.ft.FTTokens;
-import org.basex.util.TokenList;
 import org.basex.util.ft.FTBitapSearch;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
 import org.basex.util.ft.FTIterator;
 import org.basex.util.ft.FTSpan;
+import org.basex.util.list.TokenList;
 import org.junit.Before;
 import org.junit.Test;
 

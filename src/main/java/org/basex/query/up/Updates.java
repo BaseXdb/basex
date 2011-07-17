@@ -13,8 +13,8 @@ import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.DataBuilder;
-import org.basex.util.IntMap;
-import org.basex.util.TokenSet;
+import org.basex.util.hash.IntMap;
+import org.basex.util.hash.TokenSet;
 
 /**
  * ***** Implementation of the W3C XQUERY UPDATE FACILITY 1.0 *****

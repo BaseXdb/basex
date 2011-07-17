@@ -14,8 +14,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Iterator;
 import org.basex.core.Prop;
-import org.basex.data.SerializerProp;
-import org.basex.data.XMLSerializer;
+import org.basex.io.serial.SerializerProp;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.B64;
@@ -27,7 +27,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.http.Request.Part;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenMap;
+import org.basex.util.hash.TokenMap;
 
 /**
  * HTTP Client.

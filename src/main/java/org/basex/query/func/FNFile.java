@@ -10,11 +10,11 @@ import java.util.regex.Pattern;
 
 import org.basex.core.Prop;
 import org.basex.core.cmd.Copy;
-import org.basex.data.SerializerException;
-import org.basex.data.XMLSerializer;
 import org.basex.io.IOFile;
-import org.basex.io.PrintOutput;
-import org.basex.io.TextInput;
+import org.basex.io.in.TextInput;
+import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.SerializerException;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -28,7 +28,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
-import org.basex.util.StringList;
+import org.basex.util.list.StringList;
 
 /**
  * Functions on files and directories.

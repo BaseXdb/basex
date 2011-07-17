@@ -3,9 +3,10 @@ package org.basex.data;
 import org.basex.core.Prop;
 import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.MemValues;
+import org.basex.index.path.PathSummary;
+import org.basex.index.value.MemValues;
 import org.basex.index.Names;
-import org.basex.io.TableMemAccess;
+import org.basex.io.random.TableMemAccess;
 import org.basex.util.Token;
 
 /**

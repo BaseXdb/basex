@@ -51,10 +51,10 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
 import org.basex.util.Array;
-import org.basex.util.IntList;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
+import org.basex.util.list.StringList;
 
 /**
  * This enumeration encapsulates all commands that are triggered by

@@ -1,8 +1,8 @@
 package org.basex.util.ft;
 
 import java.util.EnumSet;
-import org.basex.data.XMLSerializer;
 import org.basex.index.IndexToken;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.ft.FTFilter;
 import org.basex.util.Token;
 

@@ -3,9 +3,9 @@ package org.basex.gui.view;
 import static org.basex.data.DataText.*;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
-import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.IntList;
 
 /**
  * This class assembles some database access methods which are used

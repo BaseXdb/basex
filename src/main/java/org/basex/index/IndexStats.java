@@ -12,7 +12,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class IndexStats {
+public final class IndexStats {
   /** Number of entries to print. */
   private final int max;
   /** Minimum occurrences. */
@@ -32,7 +32,7 @@ final class IndexStats {
    * Default constructor.
    * @param d data reference
    */
-  IndexStats(final Data d) {
+  public IndexStats(final Data d) {
     max = d.meta.prop.num(Prop.MAXSTAT);
     occMin = new int[max];
     occMax = new int[max];
@@ -50,7 +50,7 @@ final class IndexStats {
    * @param oc number of occurrences
    * @return result of check
    */
-  boolean adding(final int oc) {
+  public boolean adding(final int oc) {
     co = oc;
     ++size;
     return oc > occMax[max - 1] || oc < occMin[max - 1];
@@ -60,7 +60,7 @@ final class IndexStats {
    * Adds the specified token.
    * @param tx token to be added
    */
-  void add(final byte[] tx) {
+  public void add(final byte[] tx) {
     final boolean dsc = co > occMax[max - 1];
     final byte[][] txt = dsc ? txtMax : txtMin;
     final int[] ocs = dsc ? occMax : occMin;
@@ -79,7 +79,7 @@ final class IndexStats {
    * Prints the list to the specified token builder.
    * @param tb token builder reference
    */
-  void print(final TokenBuilder tb) {
+  public void print(final TokenBuilder tb) {
     tb.add(IDXENTRIES + size + NL);
     int m = 0;
     int c = 0;

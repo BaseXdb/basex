@@ -14,8 +14,8 @@ import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.util.IntList;
-import org.basex.util.IntMap;
+import org.basex.util.hash.IntMap;
+import org.basex.util.list.IntList;
 
 /**
  * This class holds all updates for a specific database. Before applied,

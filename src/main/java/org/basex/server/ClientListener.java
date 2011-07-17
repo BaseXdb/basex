@@ -21,14 +21,14 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
-import org.basex.io.BufferInput;
-import org.basex.io.PrintOutput;
-import org.basex.io.WrapInputStream;
+import org.basex.io.in.BufferInput;
+import org.basex.io.in.WrapInputStream;
+import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.util.ByteList;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.list.ByteList;
 import org.xml.sax.InputSource;
 
 /**

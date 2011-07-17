@@ -32,7 +32,7 @@ import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
-import org.basex.util.IntList;
+import org.basex.util.list.IntList;
 
 /**
  * A scatter plot visualization of the database.

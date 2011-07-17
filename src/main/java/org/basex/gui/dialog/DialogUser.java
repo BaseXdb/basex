@@ -22,11 +22,11 @@ import org.basex.gui.layout.BaseXTable;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.server.Session;
-import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.Token;
-import org.basex.util.TokenList;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * Panel for displaying information about global/local users.

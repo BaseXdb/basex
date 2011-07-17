@@ -5,7 +5,7 @@ import org.basex.core.AProp;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.util.StringList;
+import org.basex.util.list.StringList;
 
 /**
  * This class contains properties which are used in the GUI. They are

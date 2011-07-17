@@ -24,11 +24,11 @@ import org.basex.gui.layout.BaseXPanel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.index.Names;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * This is a simple user search panel.

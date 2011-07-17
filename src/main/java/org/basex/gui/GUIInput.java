@@ -18,7 +18,7 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QuerySuggest;
-import org.basex.util.StringList;
+import org.basex.util.list.StringList;
 
 /**
  * This class offers a text field for keyword and XQuery input.

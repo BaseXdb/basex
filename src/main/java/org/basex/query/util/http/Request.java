@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.basex.query.iter.ItemCache;
-import org.basex.util.TokenMap;
+import org.basex.util.hash.TokenMap;
 
 /**
  * Container for parsed data from <http:request/>.
