@@ -1,20 +1,23 @@
 package org.basex.build;
 
-import static org.basex.core.Text.*;
 import static org.basex.build.BuildText.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Namespaces;
-import org.basex.data.PathSummary;
 import org.basex.index.Names;
+import org.basex.index.path.PathSummary;
 import org.basex.io.IO;
 import org.basex.util.Atts;
 import org.basex.util.Performance;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * This class provides an interface for building database instances.
@@ -48,9 +51,9 @@ public abstract class Builder extends Progress {
   protected int spos;
 
   /** Parent stack. */
-  private final int[] preStack = new int[IO.MAXHEIGHT];
+  private final IntList pstack = new IntList();
   /** Tag stack. */
-  private final int[] tagStack = new int[IO.MAXHEIGHT];
+  private final IntList tstack = new IntList();
   /** Size stack. */
   private boolean inDoc;
   /** Current tree height. */
@@ -84,7 +87,7 @@ public abstract class Builder extends Progress {
 
     // add document node and parse document
     parser.parse(this);
-    if(lvl != 0) error(DOCOPEN, parser.detail(), tags.key(tagStack[lvl]));
+    if(lvl != 0) error(DOCOPEN, parser.detail(), tags.key(tstack.get(lvl)));
 
     meta.lastid = meta.size - 1;
     // no nodes inserted: add default document node
@@ -103,7 +106,7 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void startDoc(final byte[] value) throws IOException {
-    preStack[lvl++] = meta.size;
+    pstack.set(lvl++, meta.size);
     if(meta.pathindex) path.index(0, Data.DOC, lvl);
     addDoc(value);
     ns.open();
@@ -114,7 +117,7 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void endDoc() throws IOException {
-    final int pre = preStack[--lvl];
+    final int pre = pstack.get(--lvl);
     setSize(pre, meta.size - pre);
     meta.ndocs++;
     ns.close(meta.size);
@@ -155,7 +158,7 @@ public abstract class Builder extends Progress {
       throws IOException {
 
     addElem(name, att);
-    ns.close(preStack[lvl]);
+    ns.close(pstack.get(lvl));
   }
 
   /**
@@ -166,10 +169,10 @@ public abstract class Builder extends Progress {
   public final void endElem(final byte[] name) throws IOException {
     checkStop();
 
-    if(--lvl == 0 || tags.id(name) != tagStack[lvl])
-      error(CLOSINGTAG, parser.detail(), name, tags.key(tagStack[lvl]));
+    if(--lvl == 0 || tags.id(name) != tstack.get(lvl))
+      error(CLOSINGTAG, parser.detail(), name, tags.key(tstack.get(lvl)));
 
-    final int pre = preStack[lvl];
+    final int pre = pstack.get(lvl);
     setSize(pre, meta.size - pre);
     ns.close(pre);
   }
@@ -318,11 +321,11 @@ public abstract class Builder extends Progress {
     // cache pre value
     final int pre = meta.size;
     // remember tag id and parent reference
-    tagStack[lvl] = n;
-    preStack[lvl] = pre;
+    tstack.set(lvl, n);
+    pstack.set(lvl, pre);
 
     // get and store element references
-    final int dis = lvl != 0 ? pre - preStack[lvl - 1] : 1;
+    final int dis = lvl != 0 ? pre - pstack.get(lvl - 1) : 1;
     final int as = att.size;
     final boolean ne = ns.open();
     int u = ns.uri(name, true);
@@ -339,7 +342,7 @@ public abstract class Builder extends Progress {
     if(lvl != 0) {
       if(lvl > 1) {
         // set leaf node information in index
-        tags.stat(tagStack[lvl - 1]).leaf = false;
+        tags.stat(tstack.get(lvl - 1)).leaf = false;
       } else if(inDoc) {
         // don't allow more than one root node
         error(MOREROOTS, parser.detail(), name);
@@ -380,12 +383,12 @@ public abstract class Builder extends Progress {
       throws IOException {
 
     // text node processing for statistics
-    if(kind == Data.TEXT) tags.index(tagStack[lvl - 1], value);
+    if(kind == Data.TEXT) tags.index(tstack.get(lvl - 1), value);
     // set leaf node information in index
-    else if(lvl > 1) tags.stat(tagStack[lvl - 1]).leaf = false;
+    else if(lvl > 1) tags.stat(tstack.get(lvl - 1)).leaf = false;
 
     if(meta.pathindex) path.index(0, kind, lvl);
-    addText(value, lvl == 0 ? 1 : meta.size - preStack[lvl - 1], kind);
+    addText(value, lvl == 0 ? 1 : meta.size - pstack.get(lvl - 1), kind);
   }
 
   /**

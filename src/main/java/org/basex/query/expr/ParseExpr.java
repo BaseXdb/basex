@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.core.User;
-import org.basex.core.Commands.CmdPerm;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -177,6 +176,22 @@ public abstract class ParseExpr extends Expr {
       if(u && s == 2 || !u && s == 1) UPNOT.thrw(input, desc());
       s = u ? 1 : 2;
     }
+  }
+
+  /**
+   * Checks if the specified expression yields a boolean.
+   * Returns the boolean or throws an exception.
+   * @param e expression to be checked
+   * @param ctx query context
+   * @return boolean
+   * @throws QueryException query exception
+   */
+  public final boolean checkBln(final Expr e, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = checkNoEmpty(e.item(ctx, input), AtomType.BLN);
+    if(!it.unt() && it.type != AtomType.BLN) Err.type(this, AtomType.BLN, it);
+    return it.bool(input);
   }
 
   /**
@@ -389,7 +404,39 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final void checkAdmin(final QueryContext ctx) throws QueryException {
-    if(!ctx.context.user.perm(User.ADMIN)) PERMNO.thrw(input, CmdPerm.ADMIN);
+    checkPerm(ctx, User.ADMIN);
+  }
+
+  /**
+   * Checks if the current user has write permissions. If negative, an
+   * exception is thrown.
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  public final void checkWrite(final QueryContext ctx) throws QueryException {
+    checkPerm(ctx, User.WRITE);
+  }
+
+  /**
+   * Checks if the current user has read permissions. If negative, an
+   * exception is thrown.
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  public final void checkRead(final QueryContext ctx) throws QueryException {
+    checkPerm(ctx, User.READ);
+  }
+
+  /**
+   * Checks if the current user has given permissions. If negative, an
+   * exception is thrown.
+   * @param ctx query context
+   * @param p permission
+   * @throws QueryException query exception
+   */
+  private void checkPerm(final QueryContext ctx, final byte p)
+      throws QueryException {
+    if(!ctx.context.user.perm(p)) PERMNO.thrw(input, p);
   }
 
   /**

@@ -10,7 +10,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
 import org.basex.io.IO;
 import org.basex.util.Table;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * Evaluates the 'show backups' command and shows available backups.

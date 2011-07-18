@@ -338,7 +338,7 @@ final class BaseXTextRenderer extends BaseXBack {
         while(text.more()) {
           final int cw = charW(g, text.curr());
           if(text.marked()) {
-            g.setColor(GUIConstants.COLORS[3]);
+            g.setColor(GUIConstants.color(3));
             g.fillRect(xx, y - fontH + 4, cw, fontH);
           }
           xx += cw;
@@ -351,7 +351,7 @@ final class BaseXTextRenderer extends BaseXBack {
         for(int c = 0; c < search.length(); ++c) {
           cw += charW(g, search.charAt(c));
         }
-        g.setColor(GUIConstants.COLORS[text.cursor() == text.pos() ? 5 : 2]);
+        g.setColor(GUIConstants.color(text.cursor() == text.pos() ? 5 : 2));
         g.fillRect(x, y - fontH + 4, cw, fontH);
       }
 
@@ -463,16 +463,15 @@ final class BaseXTextRenderer extends BaseXBack {
   }
 
   /**
-   * Returns the width of the specified character.
+   * Returns the width of the specified codepoint.
    * @param g graphics reference
-   * @param ch character
+   * @param cp character
    * @return width
    */
-  private int charW(final Graphics g, final int ch) {
-    return ch == '\t' ? fwidth[' '] * BaseXTextTokens.TAB : ch < ' ' ? 0 :
-      ch < 256 || g == null ? fwidth[ch & 0xFF] :
-      ch >= 0xD800 && ch <= 0xDC00 ? 0 :
-      g.getFontMetrics().charWidth(ch);
+  private int charW(final Graphics g, final int cp) {
+    return cp < ' ' || g == null ?  cp == '\t' ?
+      fwidth[' '] * BaseXTextTokens.TAB : 0 : cp < 256 ? fwidth[cp] :
+      cp >= 0xD800 && cp <= 0xDC00 ? 0 : g.getFontMetrics().charWidth(cp);
   }
 
   /**

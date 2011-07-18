@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.io.ArrayOutput;
-import org.basex.util.IntList;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.Serializer;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * This class stores node references of a database in an ascending order.
@@ -99,16 +101,13 @@ public final class Nodes implements Result {
    * @return self reference
    */
   public Nodes checkRoot() {
-    final int[] docs = data.doc();
-    if(list == docs) {
-      root = true;
-    } else if(list.length != docs.length) {
+    final IntList docs = data.doc();
+    if(list.length != docs.size()) {
       root = false;
     } else {
       int c = -1;
-      while(++c < list.length && list[c] == docs[c]);
+      while(++c < list.length && list[c] == docs.get(c));
       root = c == list.length;
-      if(root) list = docs;
     }
     return this;
   }

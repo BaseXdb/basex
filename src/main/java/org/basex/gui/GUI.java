@@ -49,7 +49,7 @@ import org.basex.gui.view.plot.PlotView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
-import org.basex.io.ArrayOutput;
+import org.basex.io.out.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -381,14 +381,14 @@ public final class GUI extends AGUI {
       final Performance perf = new Performance();
 
       // reset current context if realtime filter is activated
+      final Data data = context.data;
       if(gprop.is(GUIProp.FILTERRT) && context.current != null &&
           !context.root()) {
-          context.current = new Nodes(context.data.doc(), context.data);
+          context.current = new Nodes(data.doc().toArray(), data);
       }
 
       // cache some variables before executing the command
       final Nodes current = context.current;
-      final Data data = context.data;
       command = c;
 
       // execute command and cache result

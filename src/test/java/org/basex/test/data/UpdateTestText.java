@@ -209,7 +209,7 @@ public final class UpdateTestText extends UpdateTest {
   @Test
   public void testUpdateText() {
     final Data data = CONTEXT.data;
-    data.replace(10, Data.TEXT, JUNIT);
+    data.update(10, Data.TEXT, JUNIT);
     assertEquals(Data.TEXT, data.kind(10));
     assertArraysEquals(JUNIT, data.text(10, true));
     reload();

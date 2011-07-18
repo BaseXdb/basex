@@ -20,6 +20,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
+import org.basex.util.list.IntList;
 
 /**
  * This class provides access to resources used by an XQuery expression.
@@ -62,7 +63,7 @@ public final class QueryResources {
     // assign initial context value
     // (if database only contains an empty root node, assign empty sequence)
     ctx.value = d.empty() ? Empty.SEQ :
-      DBNodeSeq.get(nodes.list, d, nodes.root, nodes.root);
+      DBNodeSeq.get(new IntList(nodes.list), d, nodes.root, nodes.root);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set

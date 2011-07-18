@@ -2,7 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import org.basex.data.Serializer;
+
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Value;
@@ -125,5 +126,11 @@ public final class TypeSwitch extends ParseExpr {
   public String toString() {
     return new TokenBuilder(TYPESWITCH + PAR1 + ts + PAR2 + ' ').addSep(
         cases, SEP).toString();
+  }
+
+  @Override
+  Expr markTailCalls() {
+    for(int i = 0; i < cases.length; i++) cases[i] = cases[i].markTailCalls();
+    return this;
   }
 }

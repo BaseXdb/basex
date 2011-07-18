@@ -2,7 +2,7 @@ package org.basex.gui.view.folder;
 
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.io.IO;
+import org.basex.util.list.IntList;
 
 /**
  * This is an iterator for the folder nodes.
@@ -22,7 +22,7 @@ final class FolderIterator {
   int pre;
 
   /** Stack for parent nodes. */
-  private final int[] parents = new int[IO.MAXHEIGHT];
+  private final IntList parents = new IntList();
   /** Panel height. */
   private final int height;
   /** Flag for a found context node. */
@@ -119,14 +119,14 @@ final class FolderIterator {
       kind = data.kind(pre);
       final int p = data.parent(pre, kind);
       // search current root
-      while(p < par && level > 0) par = parents[--level];
+      while(p < par && level > 0) par = parents.get(--level);
       if(p < par) break;
       if(p == par) {
         // store child as new root
         kind = data.kind(par);
 
         if((kind == Data.ELEM || kind == Data.DOC) && open[pre]) {
-          parents[level++] = par;
+          parents.set(level++, par);
           par = pre;
           ll = level;
         } else {

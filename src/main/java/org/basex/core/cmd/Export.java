@@ -8,12 +8,13 @@ import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.basex.data.SerializerProp;
-import org.basex.data.XMLSerializer;
 import org.basex.io.IOFile;
-import org.basex.io.PrintOutput;
+import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.SerializerProp;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * Evaluates the 'export' command and saves the currently opened database
@@ -59,7 +60,9 @@ public final class Export extends Command {
     root.md();
 
     final HashSet<String> exported = new HashSet<String>();
-    for(final int pre : data.doc()) {
+    final IntList il = data.doc();
+    for(int i = 0, is = il.size(); i < is; i++) {
+      final int pre = il.get(i);
       // create file path
       final IOFile file = root.merge(Token.string(data.text(pre, true)));
       // create dir if necessary

@@ -6,11 +6,11 @@ import java.io.File;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.io.DataInput;
-import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.util.TokenSet;
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenSet;
 
 /**
  * Simple stop words set for full-text requests.

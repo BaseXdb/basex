@@ -36,7 +36,7 @@ public final class ReplaceNode extends NodeCopy {
 
     if(kind == Data.TEXT && md.meta.size == 1 && md.kind(0) == Data.TEXT) {
       // overwrite existing text node
-      data.replace(pre, Data.TEXT, md.text(0, true));
+      data.update(pre, Data.TEXT, md.text(0, true));
     } else {
       if(data.ns.size() == 0 && md.ns.size() == 0) {
         // replaces table nodes directly if no namespaces are specified

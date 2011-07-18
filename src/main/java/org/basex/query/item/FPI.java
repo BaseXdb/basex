@@ -3,7 +3,8 @@ package org.basex.query.item;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import org.basex.data.Serializer;
+
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;

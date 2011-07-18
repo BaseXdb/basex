@@ -456,30 +456,41 @@ public enum Function {
   /* FNDb functions. */
 
   /** Database function: opens a database. */
-  OPEN(FNDb.class, "open(string)", NOD_ZM, STR),
+  DBOPEN(FNDb.class, "open(database)", NOD_ZM, STR),
   /** Database function: opens a specific database node. */
-  OPENPRE(FNDb.class, "open-pre(string,pre)", NOD_ZM, STR, ITR),
+  DBOPENPRE(FNDb.class, "open-pre(database,pre)", NOD_ZM, ITEM, ITR),
   /** Database function: opens a specific database node. */
-  OPENID(FNDb.class, "open-id(string,id)", NOD_ZM, STR, ITR),
+  DBOPENID(FNDb.class, "open-id(database,id)", NOD_ZM, ITEM, ITR),
   /** Database function: searches the text index. */
-  TEXT(FNDb.class, "text(string,string)", NOD_ZM, STR, ITEM),
+  DBTEXT(FNDb.class, "text(database,string)", NOD_ZM, ITEM, ITEM),
   /** Database function: searches the attribute index. */
-  ATTR(FNDb.class, "attribute(string,string[,name])", NOD_ZM, 2, STR, ITEM,
-      STR),
+  DBATTR(FNDb.class, "attribute(database,string[,name])", NOD_ZM, 2,
+      ITEM, ITEM, STR),
   /** Database function: searches the full-text index. */
-  FULLTEXT(FNDb.class, "fulltext(string,string)", NOD_ZM, STR, STR),
+  DBFULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
   /** Database function: lists all database. */
-  LIST(FNDb.class, "list([path])", STR_ZM, 0, STR),
+  DBLIST(FNDb.class, "list([path])", STR_ZM, 0, STR),
   /** Database function: lists system information. */
-  SYSTEM(FNDb.class, "system()", STR),
+  DBSYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */
-  INFO(FNDb.class, "info(string[,type])", STR, 1, STR, STR),
+  DBINFO(FNDb.class, "info(database[,type])", STR, 1, ITEM, STR),
   /** Database function: returns the node ids of database nodes. */
-  NODEID(FNDb.class, "node-id(nodes)", ITR_ZM, NOD_ZM),
+  DBNODEID(FNDb.class, "node-id(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: returns the pre values of database nodes. */
-  NODEPRE(FNDb.class, "node-pre(nodes)", ITR_ZM, NOD_ZM),
+  DBNODEPRE(FNDb.class, "node-pre(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: sends result to connected clients. */
-  EVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
+  DBEVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
+  /** Database function: add document(s) to a database. */
+  DBADD(FNDb.class, "add(database,nodes[,name[,path]])", EMP, 2,
+      STR, DOC_ZM, STR, STR),
+  /** Database function: delete document(s) from a database. */
+  DBDELETE(FNDb.class, "delete(database,path)", EMP, ITEM, STR),
+  /** Database function: rename document(s). */
+  DBRENAME(FNDb.class, "rename(database,path,newpath)", EMP, STR, STR, STR),
+  /** Database function: replace document(s). */
+  DBREPLACE(FNDb.class, "replace(database,path,item)", EMP, ITEM, STR, ITEM),
+  /** Database function: optimize database structures. */
+  DBOPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
 
   /* FNFile functions (EXPath). */
 
@@ -682,7 +693,7 @@ public enum Function {
    * @param dsc description
    * @param r return type
    * @param m minimum number of arguments; if the value is negative,
-   * the function can have a variable number of maximum arguments
+   *   the maximum number of arguments is variable
    * @param typ arguments types
    */
   private Function(final Class<? extends FuncCall> fun,

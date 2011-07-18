@@ -2,7 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import org.basex.data.Serializer;
+
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.FuncCall;
@@ -122,5 +123,12 @@ public final class If extends Arr {
   public String toString() {
     return IF + '(' + expr[0] + ") " + THEN + ' ' + expr[1] + ' ' +
       ELSE + ' ' + expr[2];
+  }
+
+  @Override
+  Expr markTailCalls() {
+    expr[1] = expr[1].markTailCalls();
+    expr[2] = expr[2].markTailCalls();
+    return this;
   }
 }

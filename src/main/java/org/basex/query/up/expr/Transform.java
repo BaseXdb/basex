@@ -6,7 +6,7 @@ import static org.basex.query.util.Err.*;
 import java.io.IOException;
 
 import org.basex.data.MemData;
-import org.basex.data.Serializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;

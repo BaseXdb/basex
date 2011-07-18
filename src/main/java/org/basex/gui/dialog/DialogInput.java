@@ -12,8 +12,8 @@ import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
-import org.basex.util.StringList;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * Rename database/drop documents dialog.
@@ -101,7 +101,7 @@ public final class DialogInput extends Dialog {
         if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
       }
     } else {
-      final int docs = in.isEmpty() ? 0 : gui.context.data.doc(in).length;
+      final int docs = in.isEmpty() ? 0 : gui.context.data.doc(in).size();
       msg = Util.info(DELETEPATH, docs);
       ok = docs != 0;
     }

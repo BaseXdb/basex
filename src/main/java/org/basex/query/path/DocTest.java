@@ -9,8 +9,8 @@ import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.iter.ValueIter;
-import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.IntList;
 
 /**
  * Document test for database nodes.

@@ -173,6 +173,8 @@ public final class SeqType {
   public static final SeqType DOC_O = NodeType.DOC.seq();
   /** Zero or one document node. */
   public static final SeqType DOC_ZO = new SeqType(NodeType.DOC, Occ.ZO);
+  /** Zero or more document node. */
+  public static final SeqType DOC_ZM = new SeqType(NodeType.DOC, Occ.ZM);
   /** One element node. */
   public static final SeqType ELM = NodeType.ELM.seq();
   /** Zero or one element node. */

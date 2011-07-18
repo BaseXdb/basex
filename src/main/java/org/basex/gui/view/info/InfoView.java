@@ -16,10 +16,10 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.util.IntList;
 import org.basex.util.Performance;
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.IntList;
+import org.basex.util.list.StringList;
 
 /**
  * This view displays query information.
@@ -283,10 +283,10 @@ public final class InfoView extends View {
     // draw all bars
     for(int i = 0; i < l - 1; ++i) {
       final int bx = w - bw + bs * i;
-      g.setColor(COLORS[(i == focus ? 3 : 2) + i * 2]);
+      g.setColor(color((i == focus ? 3 : 2) + i * 2));
       final int p = Math.max(1, stat.get(i) * bh / m);
       g.fillRect(bx, by + bh - p, bs, p);
-      g.setColor(COLORS[8]);
+      g.setColor(color(8));
       g.drawRect(bx, by + bh - p, bs, p - 1);
     }
   }

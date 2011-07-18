@@ -45,12 +45,16 @@ import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
+import org.basex.query.func.Function;
 import org.basex.query.item.ANode;
+import org.basex.query.item.Itr;
 import org.basex.query.item.NodeType;
+import org.basex.query.item.Str;
 import org.basex.util.Array;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
+import org.basex.util.list.StringList;
 
 /**
  * This enumeration encapsulates all commands that are triggered by
@@ -135,8 +139,9 @@ public enum GUICommands implements GUICommand {
         IO file = null;
         boolean overwrite = false;
         final Data d = gui.context.data;
-        for(final int pre : d.doc()) {
-          file = root.merge(Token.string(d.text(pre, true)));
+        final IntList il = d.doc();
+        for(int i = 0, is = il.size(); i < is; i++) {
+          file = root.merge(Token.string(d.text(il.get(i), true)));
           if(file.exists()) {
             if(overwrite) {
               // more than one file will be overwritten; check remaining tests
@@ -841,7 +846,8 @@ public enum GUICommands implements GUICommand {
       for(final int pre : ctx.current.list) r &= ctx.data.kind(pre) == Data.DOC;
       if(r) {
         // if yes, jump to database root
-        gui.notify.context(new Nodes(ctx.data.doc(), ctx.data), false, null);
+        gui.notify.context(
+            new Nodes(ctx.data.doc().toArray(), ctx.data), false, null);
       } else {
         // otherwise, jump to parent nodes
         gui.execute(new Cs(".."));
@@ -862,7 +868,8 @@ public enum GUICommands implements GUICommand {
       final Context ctx = gui.context;
       if(ctx.root()) return;
       // if yes, jump to database root
-      gui.notify.context(new Nodes(ctx.data.doc(), ctx.data), false, null);
+      gui.notify.context(
+          new Nodes(ctx.data.doc().toArray(), ctx.data), false, null);
     }
 
     @Override
@@ -957,6 +964,8 @@ public enum GUICommands implements GUICommand {
    * @return function string
    */
   static String openPre(final Nodes n, final int i) {
-    return "db:open-pre('" + n.data.meta.name + "', " + n.list[i] + ")";
+    System.out.println("? ");
+    return Function.DBOPENPRE.get(null, Str.get(n.data.meta.name),
+        Itr.get(n.list[i])).toString();
   }
 }

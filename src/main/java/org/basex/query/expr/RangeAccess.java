@@ -4,10 +4,10 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Data;
-import org.basex.data.Serializer;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.IndexIterator;
 import org.basex.index.RangeToken;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -71,8 +71,8 @@ public final class RangeAccess extends Simple {
 
   @Override
   public String toString() {
-    return new TokenBuilder("db:open(\"").add(ictx.data.meta.name).
-      add("\")/db:range(").addExt(ind.min).add(SEP).addExt(ind.max).
-      add(SEP).addExt(ind.ind).add(')').toString();
+    return new TokenBuilder("db:").addExt(ind.type().toString().toLowerCase()).
+      add("-range(").addExt(ind.min).add(SEP).
+      addExt(ind.max).add(')').toString();
   }
 }

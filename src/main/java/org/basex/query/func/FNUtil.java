@@ -24,10 +24,10 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.util.Array;
-import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.Performance;
 import org.basex.util.Util;
+import org.basex.util.list.ByteList;
 
 /**
  * Project specific functions.

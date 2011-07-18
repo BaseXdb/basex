@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map.Entry;
 import org.basex.data.ExprInfo;
-import org.basex.data.Serializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.ft.ThesQuery;
 
 /**

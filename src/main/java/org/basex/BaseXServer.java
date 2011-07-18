@@ -7,8 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.io.BufferInput;
 import org.basex.io.IOFile;
+import org.basex.io.in.BufferInput;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Log;
@@ -17,9 +17,9 @@ import org.basex.server.ClientListener;
 import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Performance;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * This is the starter class for running the database server. It handles

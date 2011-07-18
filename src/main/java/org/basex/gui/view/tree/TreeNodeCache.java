@@ -2,7 +2,7 @@ package org.basex.gui.view.tree;
 
 import java.util.ArrayList;
 import org.basex.data.Data;
-import org.basex.util.IntList;
+import org.basex.util.list.IntList;
 
 /**
  * This class determines nodes per level and caches them.
@@ -39,12 +39,12 @@ final class TreeNodeCache implements TreeConstants {
         maxLevel = l + 1;
       } else {
         final int ts = data.meta.size;
-        final int[] roots = data.doc();
+        final IntList roots = data.doc();
         alil.add(new IntList());
-        for(int i = 0; i < roots.length; ++i) {
-          final int root = roots[i];
+        for(int i = 0, is = roots.size(); i < is; ++i) {
+          final int root = roots.get(i);
           alil.get(0).add(root);
-          final int sh = i + 1 == roots.length ? ts : roots[i + 1];
+          final int sh = i + 1 == roots.size() ? ts : roots.get(i + 1);
           for(int p = root + 1; p < sh; ++p) {
             final int k = data.kind(p);
             if(!atts && k == Data.ATTR || ONLY_ELEMENT_NODES

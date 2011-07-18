@@ -12,7 +12,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.util.Table;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * Evaluates the 'info storage' command and returns the table representation

@@ -14,7 +14,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
-import org.basex.io.TableDiskAccess;
+import org.basex.io.random.TableDiskAccess;
 import org.basex.util.Util;
 import static org.junit.Assert.*;
 import static org.basex.data.DataText.*;

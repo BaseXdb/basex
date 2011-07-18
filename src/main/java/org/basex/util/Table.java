@@ -7,6 +7,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
+import org.basex.util.list.BoolList;
+import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
+
 /**
  * This is a table representation for textual table output.
  * It should be guaranteed that the {@link #header} object has the

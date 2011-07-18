@@ -2,8 +2,8 @@ package org.basex.data;
 
 import java.io.IOException;
 import java.util.Arrays;
-import org.basex.io.DataInput;
-import org.basex.io.DataOutput;
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.util.TokenBuilder;
 
 /**

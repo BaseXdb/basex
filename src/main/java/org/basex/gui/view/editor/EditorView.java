@@ -40,9 +40,9 @@ import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.util.BoolList;
 import org.basex.util.Performance;
 import org.basex.util.Util;
+import org.basex.util.list.BoolList;
 
 /**
  * This view allows the input and evaluation of queries and documents.
@@ -516,7 +516,7 @@ public final class EditorView extends View {
     for(final EditorArea edit : editors()) {
       if(edit.opened) continue;
       final String n = edit.file().name().substring(EDITORFILE.length());
-      bl.set(true, n.isEmpty() ? 1 : Integer.parseInt(n));
+      bl.set(n.isEmpty() ? 1 : Integer.parseInt(n), true);
     }
     // find first free file number
     int c = 0;

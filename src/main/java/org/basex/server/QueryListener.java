@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
-import org.basex.data.XMLSerializer;
-import org.basex.io.PrintOutput;
+import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -94,14 +94,17 @@ final class QueryListener extends Progress {
 
   /**
    * Serializes the next item and tests if more items can be returned.
+   * @return {@code true} if a new item was serialized
    * @throws IOException Exception
    * @throws QueryException query exception
    */
-  void next() throws IOException, QueryException {
+  boolean next() throws IOException, QueryException {
     if(xml == null) init();
     xml.init();
     final Item it = iter.next();
-    if(it != null) next(it);
+    if(it == null) return false;
+    next(it);
+    return true;
   }
 
   /**
@@ -116,12 +119,20 @@ final class QueryListener extends Progress {
   }
 
   /**
-   * Returns the query info.
+   * Prints the query info.
    * @throws IOException Exception
    */
-  void info() throws IOException {
+  void printInfo() throws IOException {
+    out.print(info());
+  }
+
+  /**
+   * Returns the query info.
+   * @return query info
+   */
+  byte[] info() {
     initInfo();
-    out.print(info.finish());
+    return info.finish();
   }
 
   /**

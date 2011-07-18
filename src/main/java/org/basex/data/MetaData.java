@@ -10,10 +10,10 @@ import java.util.Random;
 import org.basex.build.BuildException;
 import org.basex.core.Prop;
 import org.basex.core.Users;
-import org.basex.io.DataInput;
-import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.util.Util;
 import org.basex.util.ft.Language;
 
@@ -54,8 +54,6 @@ public final class MetaData {
   public boolean ftindex;
   /** Flag for activated path summary. */
   public boolean pathindex = true;
-  /** Flag for up-to-date document index. */
-  public boolean docindex;
 
   /** Flag for wildcard indexing. */
   public boolean wildcards;
@@ -199,7 +197,6 @@ public final class MetaData {
     textindex = false;
     attrindex = false;
     ftindex = false;
-    docindex = false;
   }
 
   /**

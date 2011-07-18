@@ -2,8 +2,8 @@ package org.basex.query.util;
 
 import java.util.Arrays;
 import org.basex.query.item.Value;
-import org.basex.util.ElementList;
 import org.basex.util.Util;
+import org.basex.util.list.ElementList;
 
 /**
  * This is a simple container for values.

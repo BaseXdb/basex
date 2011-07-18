@@ -5,7 +5,7 @@ import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.util.Array;
-import org.basex.util.TokenSet;
+import org.basex.util.hash.TokenSet;
 
 /**
  * Axis component of the scatter plot visualization.

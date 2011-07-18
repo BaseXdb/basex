@@ -3,7 +3,6 @@ package org.basex.query.up;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -14,8 +13,8 @@ import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.DataBuilder;
-import org.basex.util.IntMap;
-import org.basex.util.TokenSet;
+import org.basex.util.hash.IntMap;
+import org.basex.util.hash.TokenSet;
 
 /**
  * ***** Implementation of the W3C XQUERY UPDATE FACILITY 1.0 *****
@@ -117,7 +116,7 @@ public final class Updates {
   public ContextModifier mod;
   /** Mapping between fragment IDs and the temorary data instances created
    * to apply updates on the corresponding fragments. */
-  private final IntMap<Data> fragmentIDs = new IntMap<Data>();
+  private final IntMap<MemData> fragmentIDs = new IntMap<MemData>();
   /** Set which contains all URIs which are targeted during a snapshot. */
   private final TokenSet putUris = new TokenSet();
 
@@ -165,11 +164,11 @@ public final class Updates {
      * In this case a database has already been created.
      */
     final int ancID = anc.id;
-    Data data = fragmentIDs.get(ancID);
+    MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
       data =  new MemData(ctx.context.prop);
-      new DataBuilder((MemData) data).context(ctx).build(anc);
+      new DataBuilder(data).context(ctx).build(anc);
       // create a mapping between the fragment id and the data reference
       fragmentIDs.add(ancID, data);
     }

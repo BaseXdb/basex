@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.basex.data.Data;
-import org.basex.data.PathNode;
-import org.basex.data.Serializer;
+import org.basex.index.path.PathNode;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CAttr;
@@ -27,7 +27,7 @@ import org.basex.query.path.Test.Name;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenList;
+import org.basex.util.list.TokenList;
 
 /**
  * Path expression.

@@ -5,23 +5,24 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Serializer;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ValuesToken;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.func.Function;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Str;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
 
 /**
  * This index class retrieves texts and attribute values from the index.
@@ -141,8 +142,7 @@ public final class IndexAccess extends Single {
 
   @Override
   public String toString() {
-    return new TokenBuilder("db:open('").add(ictx.data.meta.name).
-      add("')/db:").addExt(itype.toString().toLowerCase()).
-      add(PAR1).addExt(expr).add(PAR2).toString();
+    return (itype == IndexType.TEXT ? Function.DBTEXT : Function.DBATTR).get(
+        input, Str.get(ictx.data.meta.name), expr).toString();
   }
 }

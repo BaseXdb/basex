@@ -13,8 +13,8 @@ import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Set;
 import org.basex.query.QueryException;
 import org.basex.server.Session;
-import org.basex.util.StringList;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * This is the abstract main class for all starter classes.

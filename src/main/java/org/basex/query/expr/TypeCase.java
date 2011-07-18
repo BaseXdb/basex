@@ -2,7 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import org.basex.data.Serializer;
+
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Value;
@@ -96,5 +97,11 @@ public final class TypeCase extends Single {
     final TokenBuilder tb = new TokenBuilder(var.type == null ? DEFAULT : CASE);
     if(var.name != null) tb.add(' ');
     return tb.add(var + " " + RETURN + ' ' + expr).toString();
+  }
+
+  @Override
+  TypeCase markTailCalls() {
+    expr = expr.markTailCalls();
+    return this;
   }
 }

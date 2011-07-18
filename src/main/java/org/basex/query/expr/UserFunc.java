@@ -3,7 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import org.basex.data.Serializer;
+
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.AtomType;
@@ -85,6 +86,9 @@ public class UserFunc extends Single {
     for(final Var v : args) ctx.vars.add(v);
     expr = expr.comp(ctx);
     ctx.vars.reset(s);
+
+    // convert all function calls in tail position to proper tail calls
+    expr.markTailCalls();
 
     // remove redundant cast
     if(ret != null && (ret.type == AtomType.BLN || ret.type == AtomType.FLT ||

@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
-import org.basex.io.ArrayOutput;
+import org.basex.io.out.ArrayOutput;
 
 /**
  * <p>This class defines methods for evaluating commands, either locally or
@@ -79,6 +79,15 @@ public abstract class Session {
    */
   public abstract void add(final String name, final String target,
       final InputStream input) throws BaseXException;
+
+  /**
+   * Replace a document in an open database.
+   * @param path document(s) to replace
+   * @param input new content
+   * @throws BaseXException exception
+   */
+  public abstract void replace(final String path, final InputStream input)
+      throws BaseXException;
 
   /**
    * Returns command info as a string, regardless of whether an output stream

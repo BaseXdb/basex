@@ -82,6 +82,7 @@ public final class Context {
     repo = ctx.repo;
     prop.set(Prop.EVENTPORT, ctx.prop.num(Prop.EVENTPORT));
     prop.set(Prop.TIMEOUT, ctx.prop.num(Prop.TIMEOUT));
+    prop.set(Prop.PARALLEL, ctx.prop.num(Prop.PARALLEL));
   }
 
   /**
@@ -105,7 +106,7 @@ public final class Context {
    * @return result of check
    */
   public int[] doc() {
-    return current.root ? current.list : data.doc();
+    return current.root ? current.list : data.doc().toArray();
   }
 
   /**
@@ -125,7 +126,8 @@ public final class Context {
   public void openDB(final Data d, final String path) {
     data = d;
     copied = null;
-    set(new Nodes(path == null ? d.doc() : d.doc(path), d), new Nodes(d));
+    set(new Nodes((path == null ? d.doc() : d.doc(path)).toArray(), d),
+        new Nodes(d));
     current.root = path == null;
   }
 
@@ -153,7 +155,7 @@ public final class Context {
    * Updates references to the document nodes.
    */
   public void update() {
-    current = new Nodes(data.doc(), data);
+    current = new Nodes(data.doc().toArray(), data);
     current.root = true;
   }
 

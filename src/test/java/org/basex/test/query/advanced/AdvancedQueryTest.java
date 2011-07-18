@@ -41,9 +41,9 @@ abstract class AdvancedQueryTest {
    * @param result query result
    * @throws QueryException database exception
    */
-  protected static void query(final String query, final String result)
+  protected static void query(final String query, final Object result)
       throws QueryException {
-    assertEquals(result, query(query));
+    assertEquals(result.toString(), query(query));
   }
 
   /**
@@ -130,7 +130,7 @@ abstract class AdvancedQueryTest {
       // skip test if all types are arbitrary
       if((def.min > 0 || al != 0) && (any == 0 || any != al)) {
         final String query = qu.append(")").toString();
-        if(in) error(query, Err.XPTYPE, Err.NODBCTX);
+        if(in) error(query, Err.XPTYPE, Err.NODBCTX, Err.NODB);
         else error(query, Err.XPARGS);
       }
     }

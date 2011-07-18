@@ -3,7 +3,7 @@ package org.basex.query.util;
 import static org.basex.query.util.Err.ErrType.*;
 
 import org.basex.core.Text;
-import org.basex.data.SerializerException;
+import org.basex.io.serial.SerializerException;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;
@@ -38,8 +38,18 @@ public enum Err {
   NOEVENT(BASX, 9, "Event '%' is unknown."),
   /** BASX0010: Parsing exception. */
   NOOPTION(BASX, 10, "Unknown database option '%'."),
-  /** BASX11: Parsing exception. */
+  /** BASX0011: Parsing exception. */
   PARWHICH(BASX, 11, "Unexpected element: %."),
+  /** BASX0012: Evaluation exception. */
+  DOCTRGMULT(BASX, 12, "Single document is expected as replace target."),
+  /** BASX0013: Evaluation exception. */
+  EMPTYPATH(BASX, 13, "%: Empty path specified."),
+  /** BASX0014: Evaluation exception. */
+  DBERR(BASX, 14, "%"),
+  /** BASX0015: Evaluation exception. */
+  PROCMM(BASX, 15, Text.PROCMM),
+  /** BASX0016: Evaluation exception. */
+  DBLOCKED(BASX, 16, Text.DBLOCKED),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -241,6 +251,8 @@ public enum Err {
 
   /** FOUP0001: Evaluation exception. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
+  /** FOUP0001: Evaluation exception. */
+  UPDOCTYPE(FOUP, 1, "Document expected, % found."),
   /** FOUP0002: Evaluation exception. */
   UPFOURI(FOUP, 2, "No valid URI: \"%\"."),
   /** FOUP0002: Evaluation exception. */

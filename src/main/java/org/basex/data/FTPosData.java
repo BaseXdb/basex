@@ -2,7 +2,7 @@ package org.basex.data;
 
 import java.util.Arrays;
 import org.basex.util.Array;
-import org.basex.util.IntList;
+import org.basex.util.list.IntList;
 
 /**
  * This class provides a container for query full-text positions,

@@ -93,7 +93,7 @@ public class BaseXEditor extends BaseXPanel {
     Undo un = null;
     if(edit) {
       setBackground(Color.white);
-      setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.COLORS[6]));
+      setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.color(6)));
       un = new Undo();
     } else {
       mode(Fill.NONE);

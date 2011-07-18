@@ -10,10 +10,10 @@ import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUIProp;
 import org.basex.index.Names;
 import org.basex.util.Array;
-import org.basex.util.BoolList;
-import org.basex.util.IntList;
-import org.basex.util.StringList;
-import org.basex.util.TokenList;
+import org.basex.util.list.BoolList;
+import org.basex.util.list.IntList;
+import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * This is a container for the table data.

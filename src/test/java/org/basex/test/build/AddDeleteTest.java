@@ -41,14 +41,14 @@ public final class AddDeleteTest {
   private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
 
   /** Number of XML files for folder. */
-  private static final int FCNT;
+  private static final int NFLDR;
 
   static {
     int fc = 0;
     for(final IOFile c : new IOFile(FLDR).children()) {
       if(c.name().endsWith(IO.XMLSUFFIX)) ++fc;
     }
-    FCNT = fc;
+    NFLDR = fc;
   }
 
   /**
@@ -129,7 +129,7 @@ public final class AddDeleteTest {
   @Test
   public void testAddFolder() throws BaseXException {
     new Add(FLDR).execute(CONTEXT);
-    assertEquals(FCNT, CONTEXT.doc().length);
+    assertEquals(NFLDR, CONTEXT.doc().length);
   }
 
   /**
@@ -139,10 +139,13 @@ public final class AddDeleteTest {
   @Test
   public void deletePath() throws BaseXException {
     new Add(FLDR, null, "foo/pub").execute(CONTEXT);
+    assertEquals(NFLDR, CONTEXT.doc().length);
+    new Delete("foo").execute(CONTEXT);
+    assertEquals(1, CONTEXT.doc().length);
     new Add(FILE, null, "/foo///bar////").execute(CONTEXT);
     new Add(FLDR, null, "foobar").execute(CONTEXT);
     new Delete("foo").execute(CONTEXT);
-    assertEquals(FCNT, CONTEXT.doc().length);
+    assertEquals(NFLDR, CONTEXT.doc().length);
   }
 
   /**
@@ -155,7 +158,7 @@ public final class AddDeleteTest {
     new Add(FILE).execute(CONTEXT);
     new Delete("input.xml").execute(CONTEXT);
     new Delete("folder/input.xml").execute(CONTEXT);
-    assertEquals(FCNT - 1, CONTEXT.doc().length);
+    assertEquals(NFLDR - 1, CONTEXT.doc().length);
   }
 
   /**

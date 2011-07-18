@@ -5,12 +5,12 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
-import org.basex.data.Serializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
-import org.basex.util.BoolList;
 import org.basex.util.InputInfo;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTUnit;
+import org.basex.util.list.BoolList;
 
 /**
  * FTScope expression.
@@ -58,7 +58,7 @@ public final class FTScope extends FTFilter {
       final int p = pos(sm.s, lex);
       final int s = bl.size();
       if(p < s && bl.get(p) && p == pos(sm.e, lex)) return false;
-      bl.set(true, p);
+      bl.set(p, true);
     }
     return c > 1;
   }

@@ -13,9 +13,9 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
-import org.basex.util.IntSet;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
+import org.basex.util.hash.IntSet;
+import org.basex.util.list.TokenList;
 
 /**
  * Formatter for decimal numbers.

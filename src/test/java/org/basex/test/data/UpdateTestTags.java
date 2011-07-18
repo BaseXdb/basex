@@ -173,7 +173,7 @@ public final class UpdateTestTags extends UpdateTest {
   @Test
   public void testUpdateTagName() {
     final Data data = CONTEXT.data;
-    data.rename(6, Data.ELEM, JUNIT, Token.EMPTY);
+    data.update(6, Data.ELEM, JUNIT, Token.EMPTY);
     assertEquals(Data.ELEM, data.kind(6));
     assertArraysEquals(JUNIT, data.name(6, Data.ELEM));
     reload();

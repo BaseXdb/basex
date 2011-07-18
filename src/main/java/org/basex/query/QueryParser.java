@@ -12,9 +12,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import org.basex.core.cmd.Set;
-import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
+import org.basex.io.serial.SerializerProp;
 import org.basex.query.expr.And;
 import org.basex.query.expr.Arith;
 import org.basex.query.expr.CAttr;
@@ -128,18 +128,18 @@ import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
-import org.basex.util.JarClassLoader;
+import org.basex.util.JarLoader;
 import org.basex.util.Reflect;
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
-import org.basex.util.TokenSet;
 import org.basex.util.Util;
 import org.basex.util.XMLToken;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.FTUnit;
 import org.basex.util.ft.Language;
 import org.basex.util.ft.StopWords;
+import org.basex.util.hash.TokenSet;
+import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * Simple query parser; can be overwritten to support more complex parsings.
@@ -786,7 +786,7 @@ public class QueryParser extends InputParser {
       }
     }
     // Add jars to classpath
-    Reflect.setJarLoader(new JarClassLoader(urls));
+    Reflect.setJarLoader(new JarLoader(urls));
     // Load public classes
     for(final byte[] c : desc.classes)
           ctx.ns.add(new QNm(concat(token("java:"), c)), input());

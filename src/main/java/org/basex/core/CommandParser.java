@@ -71,8 +71,8 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.Levenshtein;
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.StringList;
 
 /**
  * This is a parser for command strings, creating {@link Command} instances.

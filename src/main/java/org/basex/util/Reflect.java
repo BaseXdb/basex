@@ -19,7 +19,7 @@ public final class Reflect {
   private static HashMap<String, Class<?>> classes =
     new HashMap<String, Class<?>>();
   /** Class loader for jars. */
-  public static JarClassLoader jarLoader;
+  public static JarLoader jarLoader;
 
   /** Hidden constructor. */
   private Reflect() { }
@@ -216,7 +216,7 @@ public final class Reflect {
    * Sets the class loader for jars.
    * @param l loader
    */
-  public static void setJarLoader(final JarClassLoader l) {
+  public static void setJarLoader(final JarLoader l) {
     jarLoader = l;
   }
 }

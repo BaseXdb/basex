@@ -7,13 +7,13 @@ import org.basex.core.Prop;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
-import org.basex.util.TokenList;
-import org.basex.util.TokenObjMap;
 import org.basex.util.ft.FTBitapSearch;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
 import org.basex.util.ft.FTIterator;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
+import org.basex.util.hash.TokenObjMap;
+import org.basex.util.list.TokenList;
 
 /**
  * This class performs the full-text tokenization.

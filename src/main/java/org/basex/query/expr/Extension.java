@@ -2,7 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-import org.basex.data.Serializer;
+
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.Iter;
@@ -54,5 +55,11 @@ public final class Extension extends Single {
     final StringBuilder sb = new StringBuilder();
     for(final Expr p : pragmas) sb.append(p).append(' ');
     return sb.append(BRACE1 + ' ' + expr + ' ' + BRACE2).toString();
+  }
+
+  @Override
+  Expr markTailCalls() {
+    expr = expr.markTailCalls();
+    return this;
   }
 }

@@ -14,8 +14,8 @@ import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
-import org.basex.io.BufferInput;
-import org.basex.io.PrintOutput;
+import org.basex.io.in.BufferInput;
+import org.basex.io.out.PrintOutput;
 import org.basex.util.Token;
 
 /**
@@ -152,6 +152,18 @@ public final class ClientSession extends Session {
       sout.write(ServerCmd.ADD.code);
       send(name);
       send(target);
+      send(input);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  @Override
+  public void replace(final String path, final InputStream input)
+      throws BaseXException {
+    try {
+      sout.write(ServerCmd.REPLACE.code);
+      send(path);
       send(input);
     } catch(final IOException ex) {
       throw new BaseXException(ex);

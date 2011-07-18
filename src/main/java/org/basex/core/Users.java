@@ -9,13 +9,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.basex.io.DataInput;
-import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.util.StringList;
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
 import org.basex.util.Table;
-import org.basex.util.TokenList;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * This class organizes all users.

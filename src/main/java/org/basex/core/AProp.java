@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import org.basex.io.IO;
 import org.basex.util.Levenshtein;
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * This class assembles properties which are used all around the project. They

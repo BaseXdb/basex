@@ -98,4 +98,10 @@ public final class Switch extends Arr {
     }
     return sb.toString();
   }
+
+  @Override
+  Expr markTailCalls() {
+    for(int i = 2; i < expr.length; i++) expr[i] = expr[i].markTailCalls();
+    return this;
+  }
 }

@@ -9,14 +9,14 @@ import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.Close;
 import org.basex.data.Data;
 import org.basex.data.Result;
-import org.basex.io.ArrayOutput;
 import org.basex.io.IOFile;
-import org.basex.io.NullOutput;
-import org.basex.io.PrintOutput;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.out.NullOutput;
+import org.basex.io.out.PrintOutput;
 import org.basex.util.Performance;
-import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * This class provides the architecture for all internal command

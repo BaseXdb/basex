@@ -19,12 +19,11 @@ import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.io.IO;
-import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
-import org.basex.util.TokenList;
 import org.basex.util.ft.FTLexer;
+import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
 
 /**
  * This view is a TreeMap implementation.
@@ -348,7 +347,7 @@ public final class MapView extends View implements Runnable {
 
     final GUIProp gprop = gui.gprop;
     if(gprop.num(GUIProp.MAPOFFSETS) == 0) {
-      g.setColor(COLORS[32]);
+      g.setColor(color(32));
       int pre = mainRects.size;
       int par = ViewData.parent(data, f.pre);
       while(--pre >= 0) {
@@ -620,7 +619,7 @@ public final class MapView extends View implements Runnable {
     final int size = data.meta.size;
     textLen = new int[size];
 
-    final int[] parStack = new int[IO.MAXHEIGHT];
+    final IntList pars = new IntList();
     int l = 0;
 
     for(int pre = 0; pre < size; ++pre) {
@@ -628,19 +627,19 @@ public final class MapView extends View implements Runnable {
       final int par = data.parent(pre, kind);
 
       final int ll = l;
-      while(l > 0 && parStack[l - 1] > par) {
-        textLen[parStack[l - 1]] += textLen[parStack[l]];
+      while(l > 0 && pars.get(l - 1) > par) {
+        textLen[pars.get(l - 1)] += textLen[pars.get(l)];
         --l;
       }
-      if(l > 0 && ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
-      parStack[l] = pre;
+      if(l > 0 && ll != l) textLen[pars.get(l - 1)] += textLen[pars.get(l)];
+      pars.set(l, pre);
 
       if(kind == Data.DOC || kind == Data.ELEM) {
-        parStack[++l] = 0;
+        pars.set(++l, 0);
       } else {
         textLen[pre] = data.textLen(pre, kind != Data.ATTR);
       }
     }
-    while(--l >= 0) textLen[parStack[l]] += textLen[parStack[l + 1]];
+    while(--l >= 0) textLen[pars.get(l)] += textLen[pars.get(l + 1)];
   }
 }

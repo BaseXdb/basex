@@ -2,9 +2,9 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.io.DataInput;
-import org.basex.io.DataOutput;
-import org.basex.util.TokenSet;
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
+import org.basex.util.hash.TokenSet;
 
 /**
  * This class provides statistics for a tag or attribute name and its contents.

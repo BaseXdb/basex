@@ -18,9 +18,9 @@ import org.basex.gui.layout.BaseXRadio;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.util.StringList;
 import org.basex.util.Util;
 import org.basex.util.XMLToken;
+import org.basex.util.list.StringList;
 
 /**
  * Dialog window for inserting new database nodes.

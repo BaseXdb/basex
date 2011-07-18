@@ -9,10 +9,10 @@ import org.basex.query.QueryException;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Date;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
 import org.basex.util.Reflect;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.list.IntList;
 
 /**
  * Abstract class for formatting data in different languages.

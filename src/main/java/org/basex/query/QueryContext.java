@@ -17,10 +17,10 @@ import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.data.Serializer;
-import org.basex.data.SerializerException;
-import org.basex.data.SerializerProp;
 import org.basex.io.IO;
+import org.basex.io.serial.Serializer;
+import org.basex.io.serial.SerializerException;
+import org.basex.io.serial.SerializerProp;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
@@ -41,14 +41,14 @@ import org.basex.query.util.Var;
 import org.basex.query.util.Variables;
 import org.basex.query.util.format.DecFormatter;
 import org.basex.util.InputInfo;
-import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenMap;
-import org.basex.util.TokenObjMap;
 import org.basex.util.Util;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
+import org.basex.util.hash.TokenMap;
+import org.basex.util.hash.TokenObjMap;
+import org.basex.util.list.IntList;
 
 /**
  * This abstract query expression provides the architecture for a compiled
@@ -159,6 +159,11 @@ public final class QueryContext extends Progress {
   /** Initial context value. */
   Expr initExpr;
 
+  /** Number of successive tail calls. */
+  public int tailCalls;
+  /** Maximum number of successive tail calls. */
+  public final int maxCalls;
+
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();
   /** Info flag. */
@@ -179,6 +184,7 @@ public final class QueryContext extends Progress {
     xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
+    maxCalls = ctx.prop.num(Prop.TAILCALLS);
   }
 
   /**

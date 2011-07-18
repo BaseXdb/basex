@@ -10,16 +10,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.basex.core.cmd.InfoStorage;
+import org.basex.index.DocIndex;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.index.path.PathSummary;
 import org.basex.index.Names;
 import org.basex.io.IO;
-import org.basex.io.TableAccess;
+import org.basex.io.random.TableAccess;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenMap;
+import org.basex.util.hash.TokenMap;
+import org.basex.util.list.IntList;
 
 /**
  * This class provides access to the database storage.
@@ -90,7 +93,7 @@ public abstract class Data {
   /** Path summary. */
   public PathSummary pthindex;
   /** Document index. */
-  public DocIndex docindex = new DocIndex();
+  public DocIndex docindex = new DocIndex(this);
 
   /** Index reference for a name attribute. */
   public int nameID;
@@ -133,7 +136,7 @@ public abstract class Data {
    * @return result of check
    */
   public final boolean empty() {
-    return meta.size == 1;
+    return meta.size == 1 && kind(0) == DOC;
   }
 
   /**
@@ -191,8 +194,8 @@ public abstract class Data {
    * A single dummy node is returned if the database is empty.
    * @return root nodes
    */
-  public final int[] doc() {
-    return docindex.doc(this);
+  public final IntList doc() {
+    return docindex.doc();
   }
 
   /**
@@ -200,8 +203,8 @@ public abstract class Data {
    * @param input input path
    * @return root nodes
    */
-  public final int[] doc(final String input) {
-    return docindex.doc(input, this);
+  public final IntList doc(final String input) {
+    return docindex.doc(input);
   }
 
   /**
@@ -471,16 +474,17 @@ public abstract class Data {
   // UPDATE OPERATIONS ========================================================
 
   /**
-   * Renames (updates) an element, attribute or pi name.
+   * Updates (renames) an element, attribute or pi name.
    * @param pre pre value
    * @param kind node kind
    * @param name new tag, attribute or pi name
    * @param uri uri
    */
-  public final void rename(final int pre, final int kind, final byte[] name,
+  public final void update(final int pre, final int kind, final byte[] name,
       final byte[] uri) {
 
     meta.update();
+
     if(kind == PI) {
       text(pre, trim(concat(name, SPACE, atom(pre))), true);
     } else {
@@ -502,13 +506,16 @@ public abstract class Data {
   }
 
   /**
-   * Replaces the value of a single text, comment, pi or attribute node.
+   * Updates (replaces) the value of a single text, comment, pi or
+   * attribute node.
    * @param pre pre value to be replaced
    * @param kind node kind
    * @param value value to be updated (tag name, text, comment, pi)
    */
-  public final void replace(final int pre, final int kind, final byte[] value) {
+  public final void update(final int pre, final int kind, final byte[] value) {
     meta.update();
+    if(kind == DOC) docindex.update();
+
     text(pre, kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value,
         kind != ATTR);
   }
@@ -520,8 +527,8 @@ public abstract class Data {
    */
   public final void replace(final int rpre, final Data data) {
     meta.update();
+    docindex.replace(rpre, data);
 
-    // check if attribute size of parent must be updated
     final int dsize = data.meta.size;
     buffer(dsize);
 
@@ -595,6 +602,11 @@ public abstract class Data {
     // size of the subtree to delete
     int k = kind(pre);
     int s = size(pre, k);
+    final boolean empty = pre == 0 && s == meta.size;
+    // update document index: delete specified entry
+    if(!empty) docindex.delete(pre, s);
+
+    // update namespaces
     ns.delete(pre, s);
 
     // reduce size of ancestors
@@ -616,12 +628,11 @@ public abstract class Data {
 
     // preserve empty root node
     int p = pre;
-    final boolean empty = p == 0 && s == meta.size;
     if(empty) {
       ++p;
       --s;
-    } else {
-      if(kind(p) == DOC) --meta.ndocs;
+    } else if(kind(p) == DOC) {
+      --meta.ndocs;
     }
 
     // delete node from table structure and reduce document size
@@ -645,7 +656,6 @@ public abstract class Data {
    * @param data data instance to copy from
    */
   public final void insertAttr(final int pre, final int par, final Data data) {
-    meta.update();
     insert(pre, par, data);
     attSize(par, ELEM, attSize(par, ELEM) + data.meta.size);
   }
@@ -659,12 +669,14 @@ public abstract class Data {
    */
   public final void insert(final int ipre, final int ipar, final Data data) {
     meta.update();
+    // update document index: insert new document nodes
+    docindex.insert(ipre, data);
 
-    final int[] preStack = new int[IO.MAXHEIGHT];
-    int l = 0;
+    // indicates if database only contains a dummy node
+    final boolean dummy = empty() && data.kind(0) == DOC;
+    final int dsize = data.meta.size;
 
-    final int ms = data.meta.size;
-    final int buf = Math.min(ms, IO.BLOCKSIZE >> IO.NODEPOWER);
+    final int buf = Math.min(dsize, IO.BLOCKSIZE >> IO.NODEPOWER);
     // resize buffer to cache more entries
     buffer(buf);
 
@@ -680,23 +692,25 @@ public abstract class Data {
     } while(n.pre <= ipar && ipar < n.pre + size(n.pre, ELEM));
 
     // loop through all entries
-    int mdpre = -1;
+    final IntList preStack = new IntList();
+    int dpre = -1;
     final NSNode t = ns.current;
     final Set<NSNode> newNodes = new HashSet<NSNode>();
-    while(++mdpre != ms) {
-      if(mdpre != 0 && mdpre % buf == 0) insert(ipre + mdpre - buf);
 
-      final int mdk = data.kind(mdpre);
-      final int mdpar = data.parent(mdpre, mdk);
-      final int pre = ipre + mdpre;
-      final int dis = mdpar >= 0 ? mdpre - mdpar : pre - ipar;
+    while(++dpre != dsize) {
+      if(dpre != 0 && dpre % buf == 0) insert(ipre + dpre - buf);
+
+      final int pre = ipre + dpre;
+      final int dkind = data.kind(dpre);
+      final int dpar = data.parent(dpre, dkind);
+      final int dis = dpar >= 0 ? dpre - dpar : pre - ipar;
       final int par = pre - dis;
 
       // find nearest namespace node on the ancestor axis of the insert
       // location. possible candidates for this node are collected and
       // the match with the highest pre value between ancestors and candidates
       // is determined.
-      if(mdpre == 0) {
+      if(dpre == 0) {
         // collect possible candidates for namespace root
         final List<NSNode> cand = new LinkedList<NSNode>();
         NSNode cn = ns.root;
@@ -733,21 +747,23 @@ public abstract class Data {
         ns.setNearestRoot(cn, par);
       }
 
-      while(l > 0 && preStack[l - 1] > par) ns.close(preStack[--l]);
+      while(preStack.size() != 0 && preStack.peek() > par)
+        ns.close(preStack.pop());
 
-      switch(mdk) {
+      switch(dkind) {
         case DOC:
           // add document
-          doc(pre, data.size(mdpre, mdk), data.text(mdpre, true));
+          final int s = data.size(dpre, dkind);
+          doc(pre, s, data.text(dpre, true));
           meta.ndocs++;
           ns.open();
-          preStack[l++] = pre;
+          preStack.push(pre);
           break;
         case ELEM:
           // add element
           boolean ne = false;
-          if(data.nsFlag(mdpre)) {
-            final Atts at = data.ns(mdpre);
+          if(data.nsFlag(dpre)) {
+            final Atts at = data.ns(dpre);
             for(int a = 0; a < at.size; ++a) {
               final byte[] old = nsScope.get(at.key[a]);
               if(old == null || !eq(old, at.val[a])) {
@@ -763,35 +779,35 @@ public abstract class Data {
             }
           }
           ns.open();
-          byte[] nm = data.name(mdpre, mdk);
-          elem(dis, tagindex.index(nm, null, false), data.attSize(mdpre, mdk),
-              data.size(mdpre, mdk), ns.uri(nm, true), ne);
-          preStack[l++] = pre;
+          byte[] nm = data.name(dpre, dkind);
+          elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
+              data.size(dpre, dkind), ns.uri(nm, true), ne);
+          preStack.push(pre);
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          text(pre, dis, data.text(mdpre, true), mdk);
+          text(pre, dis, data.text(dpre, true), dkind);
           break;
         case ATTR:
           // add attribute
-          nm = data.name(mdpre, mdk);
-          if(data.nsFlag(mdpre)) {
-            ns.add(par, l == 0 ? ipar : preStack[l - 1], pref(nm),
-                data.ns.uri(data.uri(mdpre, mdk)));
+          nm = data.name(dpre, dkind);
+          if(data.nsFlag(dpre)) {
+            ns.add(par, preStack.size() == 0 ? ipar : preStack.peek(), pref(nm),
+                data.ns.uri(data.uri(dpre, dkind)));
             table.write2(ipar, 1, 1 << 15 | name(ipar));
           }
           attr(pre, dis, atnindex.index(nm, null, false),
-              data.text(mdpre, false), ns.uri(nm, false), false);
+              data.text(dpre, false), ns.uri(nm, false), false);
           break;
       }
     }
 
-    while(l > 0) ns.close(preStack[--l]);
+    while(preStack.size() != 0) ns.close(preStack.pop());
     ns.setRoot(t);
 
-    if(bp != 0) insert(ipre + mdpre - 1 - (mdpre - 1) % buf);
+    if(bp != 0) insert(ipre + dpre - 1 - (dpre - 1) % buf);
     // reset buffer to old size
     buffer(1);
 
@@ -799,16 +815,16 @@ public abstract class Data {
     int p = ipar;
     while(p >= 0) {
       final int k = kind(p);
-      size(p, k, size(p, k) + ms);
+      size(p, k, size(p, k) + dsize);
       p = parent(p, k);
     }
-    updateDist(ipre + ms, ms);
+    updateDist(ipre + dsize, dsize);
 
     // NSNodes have to be checked for pre value shifts after insert
-    ns.update(ipre, ms, true, newNodes);
+    ns.update(ipre, dsize, true, newNodes);
 
     // delete old empty root node
-    if(size(0, DOC) == 1) delete(0);
+    if(dummy) delete(0);
   }
 
   /**
