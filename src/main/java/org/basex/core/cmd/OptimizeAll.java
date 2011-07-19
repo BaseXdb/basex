@@ -91,6 +91,7 @@ public final class OptimizeAll extends ACreate {
       throws IOException {
     final String tname = recreate(old, p, null);
     final String oldname = old.meta.name;
+    old.close();
     return DropDB.drop(oldname, p) && AlterDB.alter(tname, oldname, p);
   }
 
