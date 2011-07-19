@@ -451,7 +451,7 @@ public final class FNDb extends FuncCall {
       def == Function.DBOPTIMIZE;
     return
       u == Use.CTX && (def == Function.DBTEXT || def == Function.DBATTR ||
-        def == Function.DBFULLTEXT || def == Function.DBEVENT) ||
+        def == Function.DBFULLTEXT || def == Function.DBEVENT || up) ||
       u == Use.UPD && up || super.uses(u);
   }
 
