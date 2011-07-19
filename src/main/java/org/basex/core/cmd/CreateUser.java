@@ -1,9 +1,8 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import org.basex.core.CommandBuilder;
-import org.basex.core.Command;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 
@@ -13,14 +12,14 @@ import org.basex.core.Commands.CmdCreate;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class CreateUser extends Command {
+public final class CreateUser extends AUser {
   /**
    * Default constructor.
    * @param name user name
    * @param pw password
    */
   public CreateUser(final String name, final String pw) {
-    super(User.ADMIN, name, pw);
+    super(name, pw);
   }
 
   @Override
@@ -28,9 +27,7 @@ public final class CreateUser extends Command {
     final String user = args[0];
     final String pass = args[1];
     if(!validName(user, false)) return error(NAMEINVALID, user);
-
-    return pass == null || pass.isEmpty() ? error(PASSNO, user) :
-      context.users.create(user, pass) ?
+    return !isMD5(pass) ? error(USERMD5) : context.users.create(user, pass) ?
       info(USERCREATE, user) : error(USERKNOWN, user);
   }
 

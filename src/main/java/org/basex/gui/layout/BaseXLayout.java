@@ -62,13 +62,23 @@ public final class BaseXLayout {
   }
 
   /**
-   * Returns the class reference of the specified container.
+   * Returns the GUI reference of the specified container.
    * @param cont input container
    * @return gui
    */
-  private static GUI gui(final Component cont) {
+  static GUI gui(final Component cont) {
     final Container c = cont.getParent();
     return c == null || c instanceof GUI ? (GUI) c : gui(c);
+  }
+
+  /**
+   * Returns the dialog reference of the specified container.
+   * @param cont input container
+   * @return gui
+   */
+  static Dialog dialog(final Component cont) {
+    final Container c = cont.getParent();
+    return c == null || c instanceof Dialog ? (Dialog) c : dialog(c);
   }
 
   /**
@@ -125,6 +135,8 @@ public final class BaseXLayout {
         try {
           for(final File fl : (List<File>) support.getTransferable().
               getTransferData(DataFlavor.javaFileListFlavor)) dnd.drop(fl);
+          final Dialog d = dialog(comp);
+          if(d != null) d.action(null);
           return true;
         } catch(Exception ex) {
           Util.errln(ex);

@@ -18,10 +18,19 @@ import org.basex.io.IOFile;
 abstract class AUser extends Command {
   /**
    * Protected constructor, specifying command arguments.
+   * @param f command flags
+   * @param a arguments
+   */
+  protected AUser(final int f, final String... a) {
+    super(f, a);
+  }
+
+  /**
+   * Protected constructor, specifying command arguments.
    * @param a arguments
    */
   protected AUser(final String... a) {
-    super(User.ADMIN, a);
+    this(User.ADMIN, a);
   }
 
   /**
@@ -73,10 +82,22 @@ abstract class AUser extends Command {
   }
 
   /**
+   * Checks if the specified string is a valid MD5 hash value.
+   * @param md5 string to be checked
+   * @return result of check
+   */
+  protected boolean isMD5(final String md5) {
+    return md5 != null && md5.matches("[0-9a-f]{32}");
+  }
+
+  /**
    * Runs the command for the specified user and database.
    * @param user user to be modified
    * @param db database to be modified
    * @return success flag
    */
-  protected abstract boolean run(final String user, final String db);
+  @SuppressWarnings("unused")
+  protected boolean run(final String user, final String db) {
+    return true;
+  }
 }

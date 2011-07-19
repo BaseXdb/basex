@@ -145,14 +145,16 @@ public final class DialogProgress extends Dialog implements ActionListener {
           gui.info.setInfo(info, cmd, time, ok);
           gui.info.reset();
           gui.status.setText(Util.info(PROCTIME, time));
-          if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
-          // close wait dialog
+
+          // close progress window and show error if command failed
           wait.dispose();
+          if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
 
           // initialize views if database was closed before
           if(newData) gui.notify.init();
           else if(cmd.updating(gui.context)) gui.notify.update();
         }
+
         d.setEnabled(true);
         d.action(null);
       }

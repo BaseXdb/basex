@@ -654,8 +654,8 @@ public interface Text {
   String USERALTER = lang("ad_useralter");
   /** User unknown. */
   String USERKNOWN = lang("ad_userknown");
-  /** No password specified. */
-  String PASSNO = lang("ad_passno");
+  /** Password is no valid MD5 hash. */
+  String USERMD5 = lang("ad_usermd5");
   /** Admin user. */
   String USERADMIN = lang("ad_admin");
   /** Killed sessions. */

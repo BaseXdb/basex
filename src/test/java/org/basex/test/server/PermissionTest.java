@@ -42,6 +42,7 @@ import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
+import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -79,7 +80,7 @@ public final class PermissionTest {
         ok(new DropUser(NAME), adminSession);
       }
 
-      ok(new CreateUser(NAME, NAME), adminSession);
+      ok(new CreateUser(NAME, Token.md5(NAME)), adminSession);
       ok(new CreateDB(RENAMED), adminSession);
       server.context.repo.init(REPO);
       testSession = new ClientSession(server.context, NAME, NAME);
@@ -95,7 +96,7 @@ public final class PermissionTest {
     ok(new Close(), adminSession);
     ok(new Grant("none", NAME), adminSession);
 
-    ok(new Password(NAME), testSession);
+    ok(new Password(Token.md5(NAME)), testSession);
     ok(new Help("list"), testSession);
     ok(new Close(), testSession);
     no(new ListDB(NAME), testSession);
@@ -124,13 +125,13 @@ public final class PermissionTest {
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
-    no(new CreateUser(NAME, NAME), testSession);
+    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
     no(new DropUser(NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, NAME), testSession);
+    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
   }
 
   /** Tests all commands where read permission is needed. */
@@ -163,14 +164,14 @@ public final class PermissionTest {
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
-    no(new CreateUser(NAME, NAME), testSession);
+    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
     no(new DropUser(NAME), testSession);
     no(new Export("."), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, NAME), testSession);
+    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
   }
 
   /** Tests all commands where write permission is needed. */
@@ -205,14 +206,14 @@ public final class PermissionTest {
     }
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new DropDB(NAME), testSession);
-    no(new CreateUser(NAME, NAME), testSession);
+    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
     no(new DropUser(NAME), testSession);
     no(new Export("."), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, NAME), testSession);
+    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
   }
 
   /** Tests all commands where create permission is needed. */
@@ -232,14 +233,14 @@ public final class PermissionTest {
     no(new RepoDelete(REPO, null), testSession);
     no(new RepoList(), testSession);
 
-    no(new CreateUser(NAME, NAME), testSession);
+    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
     no(new DropUser(NAME), testSession);
     no(new Export("."), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, NAME), testSession);
+    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
   }
 
   /** Tests all commands where admin permission is needed. */
@@ -249,12 +250,12 @@ public final class PermissionTest {
     if(server.context.users.get("test2") != null) {
       ok(new DropUser("test2"), testSession);
     }
-    ok(new CreateUser("test2", NAME), testSession);
+    ok(new CreateUser("test2", Token.md5(NAME)), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);
     ok(new ShowUsers(), testSession);
     ok(new Grant("admin", "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);
-    ok(new AlterUser(NAME, NAME), testSession);
+    ok(new AlterUser(NAME, Token.md5(NAME)), testSession);
     ok(new DropUser("test2"), testSession);
     ok(new Close(), testSession);
     ok(new Close(), adminSession);

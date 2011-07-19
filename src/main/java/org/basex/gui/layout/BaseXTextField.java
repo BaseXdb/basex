@@ -98,7 +98,9 @@ public class BaseXTextField extends JTextField {
 
     BaseXLayout.addDrop(this, new DropHandler() {
       @Override
-      public void drop(final File file) { setText(file.getPath()); }
+      public void drop(final File file) {
+        setText(file.getPath());
+      }
     });
   }
 

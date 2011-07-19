@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import org.basex.core.Command;
 
 /**
  * Evaluates the 'password' command and alters the user's password.
@@ -9,7 +8,7 @@ import org.basex.core.Command;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Password extends Command {
+public final class Password extends AUser {
   /**
    * Default constructor.
    * @param pw password
@@ -22,7 +21,7 @@ public final class Password extends Command {
   protected boolean run() {
     final String user = context.user.name;
     final String pass = args[0];
-    return pass != null && !pass.isEmpty() && context.users.alter(user, pass) ?
-        info(USERALTER, user) : error(PASSNO, user);
+    return isMD5(pass) && context.users.alter(user, pass) ?
+        info(USERALTER, user) : error(USERMD5);
   }
 }

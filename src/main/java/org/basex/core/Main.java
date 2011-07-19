@@ -1,6 +1,8 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Random;
@@ -108,7 +110,7 @@ public abstract class Main implements Runnable {
 
         if(i != -1) {
           Util.out(SERVERPW + COLS);
-          cmd.args[i] = password();
+          cmd.args[i] = md5(password());
         }
         if(!execute(cmd, verbose)) return false;
       }
