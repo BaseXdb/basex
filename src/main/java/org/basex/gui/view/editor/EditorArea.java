@@ -2,12 +2,14 @@ package org.basex.gui.view.editor;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+
 import org.basex.core.cmd.XQuery;
 import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXEditor;
+import org.basex.gui.layout.BaseXLabel;
 import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -24,7 +26,7 @@ final class EditorArea extends BaseXEditor {
   /** File label. */
   final BaseXLabel label;
   /** View reference. */
-  private final EditorView view;
+  final EditorView view;
   /** File in tab. */
   private IOFile file;
 

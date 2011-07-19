@@ -3,6 +3,7 @@ package org.basex.gui.layout;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -11,13 +12,20 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
+
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.TransferHandler;
+
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
@@ -98,6 +106,45 @@ public final class BaseXLayout {
    */
   static void addInteraction(final Component comp, final Window win) {
     addInteraction(comp, win, null);
+  }
+
+  /**
+   * Adds drag and drop functionality.
+   * @param comp component
+   * @param dnd drag and drop handler
+   */
+  public static void addDrop(final JComponent comp, final DropHandler dnd) {
+    comp.setTransferHandler(new TransferHandler() {
+      @Override
+      public boolean canImport(final TransferSupport support) {
+        return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+      }
+      @Override
+      @SuppressWarnings("unchecked")
+      public boolean importData(final TransferSupport support) {
+        try {
+          for(final File fl : (List<File>) support.getTransferable().
+              getTransferData(DataFlavor.javaFileListFlavor)) dnd.drop(fl);
+          return true;
+        } catch(Exception ex) {
+          Util.errln(ex);
+          return false;
+        }
+      }
+    });
+  }
+
+  /**
+   * Drag and drop handler.
+   * @author BaseX Team 2005-11, BSD License
+   * @author Christian Gruen
+   */
+  public abstract static class DropHandler {
+    /**
+     * Drops a file.
+     * @param file file to be dropped
+     */
+    public abstract void drop(final File file);
   }
 
   /**

@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.Window;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -8,7 +9,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+
 import javax.swing.JTextField;
+
+import org.basex.gui.layout.BaseXLayout.DropHandler;
 
 /**
  * Project specific text field implementation.
@@ -89,6 +94,11 @@ public class BaseXTextField extends JTextField {
           area.find(text, false);
         repaint();
       }
+    });
+
+    BaseXLayout.addDrop(this, new DropHandler() {
+      @Override
+      public void drop(final File file) { setText(file.getPath()); }
     });
   }
 
