@@ -16,7 +16,6 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.OptimizeAll;
 import org.basex.data.Data;
-import org.basex.data.DiskData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.SerializerException;
@@ -374,14 +373,12 @@ public final class FNDb extends FuncCall {
 
     try {
       if(all) {
-        if(!(data instanceof DiskData)) PROCMM.thrw(input);
-        if(ctx.context.datas.pins(data.meta.name) > 1) DBLOCKED.thrw(input);
-        OptimizeAll.optimizeAll((DiskData) data, data.meta.prop);
+        OptimizeAll.optimizeAll(data, ctx.context, null);
       } else {
         Optimize.optimize(data, data.meta.prop);
       }
-    } catch(final IOException ex) {
-      DBERR.thrw(input, ex.getMessage());
+    } catch(final Exception ex) {
+      DBERR.thrw(input, ex);
     }
     return null;
   }
