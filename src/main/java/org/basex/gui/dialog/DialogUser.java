@@ -182,7 +182,7 @@ final class DialogUser extends BaseXBack {
         setData();
       } else if(cmp == create || cmp == user || cmp == pass) {
         final String u = user.getText();
-        final String p = new String(pass.getPassword());
+        final String p = Token.md5(new String(pass.getPassword()));
         sess.execute(new CreateUser(u, p));
         msg = sess.info();
         setData();
@@ -206,7 +206,7 @@ final class DialogUser extends BaseXBack {
         final DialogPass dp = new DialogPass(dia.gui);
         if(dp.ok()) {
           sess.execute(new AlterUser(table.getValueAt(
-              table.getSelectedRow(), 0).toString(), dp.pass()));
+              table.getSelectedRow(), 0).toString(), Token.md5(dp.pass())));
           msg = sess.info();
         }
       } else if(cmp == add) {
