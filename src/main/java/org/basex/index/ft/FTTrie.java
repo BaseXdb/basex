@@ -270,9 +270,6 @@ final class FTTrie extends FTIndex {
       has to be re-init each time (before calling method). */
   private FTIndexIterator idata;
 
-  /** Counts number of chars skip per astericsWildCardTraversing. */
-  private int skippedChars;
-
   /**
    * Looks up a node with value, which matches the ending.
    * The parameter lastFound shows whether chars were found in last recursive
@@ -319,8 +316,6 @@ final class FTTrie extends FTIndex {
     // skip all chars, equal to first char
     while(i + ending.length < node[0] + 1 && node[i + 1] == ending[0]) ++i;
 
-    skippedChars += i - nod - 1;
-
     while(i < node[0] + 1 && j < ending.length && node[i] == ending[j]) {
       ++i;
       ++j;
@@ -330,17 +325,13 @@ final class FTTrie extends FTIndex {
     // not processed all chars from node, but all chars from
     // ending were processed or root
     if(id == 0 || j == ending.length && i < node[0] + 1) {
-      if(!more(node)) {
-        skippedChars = 0;
-        return;
-      }
+      if(!more(node)) return;
 
       //final int[] nextNodes = getNextNodes(ne);
       // preorder search in trie
       for(int t = node[0] + 1; t < node.length - 1; t += 2) {
         wc(node[t], ending, false, 1, 0, fast);
       }
-      skippedChars = 0;
       return;
     }
 
@@ -348,8 +339,6 @@ final class FTTrie extends FTIndex {
       // all chars form node and all chars from ending done
       idata = FTIndexIterator.union(
           iter(tdid, node[node.length - 1], inB, fast), idata);
-
-      skippedChars = 0;
 
       // node has successors and is leaf node: preorder search in trie
       // preorder search in trie
@@ -363,10 +352,8 @@ final class FTTrie extends FTIndex {
     if(j < ending.length && i < node[0] + 1) {
       // still chars from node and still chars from ending left, pointer = 0 and
       // restart searching
-      if(!more(node)) {
-        skippedChars = 0;
-        return;
-      }
+      if(!more(node)) return;
+
       // restart searching at node, but value-position i
       wc(id, ending, false, i + 1, 0, fast);
       return;
@@ -375,10 +362,8 @@ final class FTTrie extends FTIndex {
     // all chars from node processed, but not all chars from processed
     if(j < ending.length && i == node[0] + 1) {
       // move pointer and go on
-      if(!more(node)) {
-        skippedChars = 0;
-        return;
-      }
+      if(!more(node)) return;
+
       // preorder search in trie
       for(int t = node[0] + 1; t < node.length - 1; t += 2) {
         // compare only first char from ending

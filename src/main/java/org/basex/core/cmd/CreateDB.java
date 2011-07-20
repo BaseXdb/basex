@@ -178,7 +178,7 @@ public final class CreateDB extends ACreate {
     if(ctx.pinned(name)) throw new IOException(Util.info(DBLOCKED, name));
 
     // build database and index structures
-    final Builder builder = new DiskBuilder(parser, prop, ctx.mprop);
+    final Builder builder = new DiskBuilder(parser, ctx);
     try {
       final Data data = builder.build(name);
       if(prop.is(Prop.TEXTINDEX)) data.setIndex(IndexType.TEXT,

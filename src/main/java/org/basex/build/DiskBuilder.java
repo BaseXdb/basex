@@ -3,8 +3,8 @@ package org.basex.build;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 
+import org.basex.core.Context;
 import org.basex.core.MainProp;
-import org.basex.core.Prop;
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
@@ -49,13 +49,12 @@ public final class DiskBuilder extends Builder {
   /**
    * Constructor.
    * @param parse parser
-   * @param pr properties
-   * @param mpr main properties
+   * @param ctx database context
    */
-  public DiskBuilder(final Parser parse, final Prop pr, final MainProp mpr) {
-    super(parse, pr);
+  public DiskBuilder(final Parser parse, final Context ctx) {
+    super(parse, ctx.prop);
     comp = new Compress();
-    mprop = mpr;
+    mprop = ctx.mprop;
   }
 
   @Override

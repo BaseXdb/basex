@@ -61,9 +61,9 @@ public final class BlockAccessTest {
   @Before
   public void setUp() {
     try {
-      final Prop prop = CONTEXT.prop;
-      final Parser parser = Parser.xmlParser(IO.get(TESTFILE), prop, "");
-      data = new DiskBuilder(parser, prop, CONTEXT.mprop).build(DBNAME);
+      final Parser parser = Parser.xmlParser(
+          IO.get(TESTFILE), CONTEXT.prop, "");
+      data = new DiskBuilder(parser, CONTEXT).build(DBNAME);
       size = data.meta.size;
       data.close();
       tda = new TableDiskAccess(data.meta, DATATBL);

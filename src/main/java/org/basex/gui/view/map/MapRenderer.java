@@ -426,7 +426,6 @@ final class MapRenderer {
     int count = 0;
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
-    int cchars = 0;
     for(int i = 0; i < data[0].length; ++i) {
       wl = (int) (data[0][i] * r.thumbf);
       e += data[0][i] * r.thumbf - wl;
@@ -437,7 +436,6 @@ final class MapRenderer {
       }
       sl += data[0][i];
       pl += data[0][i];
-      cchars += data[0][i];
       // check if rectangle fits in line - don't split token and dot
       if(ll + wl + r.thumbsw * (psl < data[1].length
           && sl == data[1][psl] ? 1 : 0) >= ww) {

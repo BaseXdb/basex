@@ -84,7 +84,7 @@ public abstract class ACreate extends Command {
       if(context.pinned(db)) return error(DBLOCKED, db);
 
       final boolean mem = prop.is(Prop.MAINMEM);
-      builder = mem ? new MemBuilder(p, prop) : new DiskBuilder(p, prop, mprop);
+      builder = mem ? new MemBuilder(p, prop) : new DiskBuilder(p, context);
 
       Data data = progress(builder).build(db);
       if(mem) {
