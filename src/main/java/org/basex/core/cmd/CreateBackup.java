@@ -25,8 +25,8 @@ import org.basex.util.Util;
  */
 public final class CreateBackup extends Command {
   /** Date format. */
-  private static final SimpleDateFormat DATE = new SimpleDateFormat(
-      "yyyy-MM-dd-HH-mm-ss");
+  private static final SimpleDateFormat DATE =
+    new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
   /**
    * Default constructor.

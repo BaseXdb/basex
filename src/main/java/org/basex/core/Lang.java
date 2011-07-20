@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import static org.basex.core.Text.*;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -72,7 +73,7 @@ public final class Lang {
           final String key = line.substring(0, i);
           String val = line.substring(i + 1);
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-          if(Prop.langkeys) val = "[" + key + ": " + val + "]";
+          if(Prop.langkeys) val = "[" + key + COLS + val + "]";
           if(TETXTS.get(key) == null) {
             TETXTS.put(key, val);
           } else if(chk) {

@@ -97,19 +97,21 @@ public final class ClientListener extends Thread {
       final String us = in.readString();
       final String pw = in.readString();
       context.user = context.users.get(us);
-      final boolean ok = context.user != null &&
+      running = context.user != null &&
         md5(string(context.user.password) + ts).equals(pw);
 
-      if(ok) {
-        start();
+      // write log information
+      if(running) {
+        log.write(this, "LOGIN " + context.user.name, OK);
+        // send {OK}
+        send(true);
       } else if(!us.isEmpty()) {
-        // log failed login and delay feedback
-        log.write(this, SERVERLOGIN + ": " + us);
-        Performance.sleep(2000);
+        log.write(this, SERVERLOGIN + COLS + us);
       }
-      // send {OK}
-      send(ok);
-      return ok;
+      // start listener thread
+      start();
+      // return result flag
+      return running;
     } catch(final IOException ex) {
       Util.stack(ex);
       log.write(ex.getMessage());
@@ -119,11 +121,9 @@ public final class ClientListener extends Thread {
 
   @Override
   public void run() {
-    log.write(this, "LOGIN " + context.user.name, OK);
-    running = true;
-
-    String cmd = null;
     ServerCmd sc = null;
+    String cmd = null;
+
     try {
       while(running) {
         try {
@@ -277,7 +277,7 @@ public final class ClientListener extends Thread {
     final TokenBuilder tb = new TokenBuilder("[");
     tb.add(socket.getInetAddress().getHostAddress());
     tb.add(':').addExt(socket.getPort()).add(']');
-    if(context.data != null) tb.add(": ").add(context.data.meta.name);
+    if(context.data != null) tb.add(COLS).add(context.data.meta.name);
     return tb.toString();
   }
 
@@ -492,7 +492,7 @@ public final class ClientListener extends Thread {
    * @param ok success flag
    * @throws IOException I/O exception
    */
-  private void send(final boolean ok) throws IOException {
+  void send(final boolean ok) throws IOException {
     out.write(ok ? 0 : 1);
     out.flush();
   }

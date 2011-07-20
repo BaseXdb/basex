@@ -28,7 +28,7 @@ public abstract class AInfo extends Command {
    */
   protected static void format(final TokenBuilder tb, final String key,
       final String val) {
-    tb.add(' ').add(key).add(": ").add(val).add(NL);
+    tb.add(' ').add(key).add(COLS).add(val).add(NL);
   }
 
   /**

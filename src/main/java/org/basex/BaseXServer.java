@@ -5,20 +5,23 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
+import org.basex.server.ClientDelayer;
+import org.basex.server.ClientListener;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Log;
 import org.basex.server.LoginException;
-import org.basex.server.ClientListener;
 import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenIntMap;
 import org.basex.util.list.StringList;
 
 /**
@@ -30,6 +33,9 @@ import org.basex.util.list.StringList;
  * @author Andreas Weiler
  */
 public class BaseXServer extends Main {
+  /** Flag for server activity. */
+  public boolean running;
+
   /** Quiet mode (no logging). */
   protected boolean quiet;
   /** Start as daemon. */
@@ -39,13 +45,13 @@ public class BaseXServer extends Main {
 
   /** Event server socket. */
   ServerSocket esocket;
-  /** Flag for server activity. */
-  boolean running;
   /** Stop file. */
   IOFile stop;
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
+  /** Blocked clients. */
+  public final TokenIntMap failed = new TokenIntMap();
   /** Server socket. */
   private ServerSocket socket;
   /** User query. */
@@ -118,12 +124,21 @@ public class BaseXServer extends Main {
     while(running) {
       try {
         final Socket s = socket.accept();
-        final ClientListener sp = new ClientListener(s, context, log);
+        final ClientListener cl = new ClientListener(s, context, log);
         if(stop.exists()) {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit(false);
-        } else if(sp.init()) {
-          context.add(sp);
+        } else {
+          final byte[] address = s.getInetAddress().getAddress();
+          if(cl.init()) {
+            failed.delete(address);
+            context.add(cl);
+          } else {
+            int delay = failed.get(address);
+            delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
+            failed.add(address, delay);
+            new ClientDelayer(delay, cl, this);
+          }
         }
       } catch(final IOException ex) {
         // socket was closed..

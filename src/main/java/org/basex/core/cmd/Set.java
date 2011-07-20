@@ -45,7 +45,7 @@ public final class Set extends AGet {
 
       final CmdSet[] cs = CmdSet.values();
       for(int c = 0; c < cs.length; ++c) if(cs[c] == s) key = STRINGS[c];
-      return info(key + ": " + val);
+      return info(key + COLS + val);
     } catch(final Exception ex) {
       Util.debug(ex);
       return error(SETVAL, key, val);
