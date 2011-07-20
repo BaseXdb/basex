@@ -85,5 +85,6 @@ public enum PrimitiveType {
   /** Put.                     */ PUT,
   /** Replace node.            */ REPLACENODE,
   /** Delete.                  */ DELETENODE,
-  /** Insert before.           */ INSERTBEFORE
+  /** Insert before.           */ INSERTBEFORE,
+  /** Optimize.                */ OPTIMIZE
 }

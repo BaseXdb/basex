@@ -13,8 +13,6 @@ import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
-import org.basex.core.cmd.Optimize;
-import org.basex.core.cmd.OptimizeAll;
 import org.basex.data.Data;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.out.ArrayOutput;
@@ -40,6 +38,7 @@ import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
 import org.basex.query.up.primitives.Add;
 import org.basex.query.up.primitives.DeleteNode;
+import org.basex.query.up.primitives.Optimize;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
@@ -371,15 +370,7 @@ public final class FNDb extends FuncCall {
     final boolean all = expr.length == 2 && checkBln(expr[1], ctx);
     final Data data = data(0, ctx);
 
-    try {
-      if(all) {
-        OptimizeAll.optimizeAll(data, ctx.context, null);
-      } else {
-        Optimize.optimize(data, data.meta.prop);
-      }
-    } catch(final Exception ex) {
-      DBERR.thrw(input, ex);
-    }
+    ctx.updates.add(new Optimize(data, ctx.context, all, input), ctx);
     return null;
   }
 
