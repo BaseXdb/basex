@@ -3,6 +3,7 @@ package org.basex.test.performance;
 import static org.basex.core.Text.*;
 import static java.lang.System.*;
 import org.basex.BaseXServer;
+import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -51,9 +52,8 @@ public abstract class Benchmark {
     if(!parseArguments(args)) return false;
 
     // Check if server is (not) running
-    server = !local &&
-      !BaseXServer.ping(LOCALHOST, context.prop.num(Prop.SERVERPORT)) ?
-          new BaseXServer("") : null;
+    server = !local && !BaseXServer.ping(LOCALHOST,
+        context.mprop.num(MainProp.SERVERPORT)) ? new BaseXServer("") : null;
 
     session = local ? new LocalSession(context) :
       new ClientSession(context, "admin", "admin");
