@@ -1,6 +1,8 @@
 package org.basex.api.xmldb;
 
 import static org.basex.core.Text.*;
+
+import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -33,7 +35,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
     // create database context
     final String name = getCollectionName(uri);
-    final boolean exists = ctx.prop.dbexists(name);
+    final boolean exists = ctx.mprop.dbexists(name);
     return exists ? new BXCollection(name, exists, ctx) : null;
   }
 
@@ -80,7 +82,8 @@ public final class BXDatabase implements Database, BXXMLDBText {
       final String main = uri.startsWith(XMLDB) ? uri : XMLDB + uri;
       if(main.startsWith(XMLDBURI)) {
         final String host = main.substring(XMLDBURI.length());
-        final String lh = "localhost:" + ctx.prop.num(Prop.SERVERPORT) + "/";
+        final String lh = "localhost:" +
+          ctx.mprop.num(MainProp.SERVERPORT) + "/";
         if(host.startsWith(lh)) return host.substring(lh.length());
       }
     }

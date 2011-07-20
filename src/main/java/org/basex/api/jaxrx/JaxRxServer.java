@@ -8,6 +8,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.basex.BaseXServer;
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.server.ClientSession;
@@ -68,8 +69,8 @@ public final class JaxRxServer extends BaseXServer {
     if(!success || service) return;
 
     // set default ports and paths
-    set(JAXRXPATH, context.prop.get(Prop.JAXRXPATH), false);
-    set(SERVERPORT, context.prop.num(Prop.SERVERPORT), false);
+    set(JAXRXPATH, context.mprop.get(MainProp.JAXRXPATH), false);
+    set(SERVERPORT, context.mprop.num(MainProp.SERVERPORT), false);
     set(SERIALIZER, context.prop.get(Prop.SERIALIZER), false);
 
     // retrieve password on command-line if only the user was specified
@@ -99,7 +100,7 @@ public final class JaxRxServer extends BaseXServer {
 
     // start Jetty server (if not done yet)
     try {
-      jetty = new JettyServer(context.prop.num(Prop.JAXRXPORT));
+      jetty = new JettyServer(context.mprop.num(MainProp.JAXRXPORT));
       Util.outln(JAXRX + ' ' + SERVERSTART);
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -190,7 +191,7 @@ public final class JaxRxServer extends BaseXServer {
           daemon = true;
         } else if(c == 'j') {
           // parse JAX-RX server port
-          context.prop.set(Prop.JAXRXPORT, arg.num());
+          context.mprop.set(MainProp.JAXRXPORT, arg.num());
         } else if(c == 'p') {
           // parse server port
           set(SERVERPORT, arg.num(), true);
@@ -217,8 +218,8 @@ public final class JaxRxServer extends BaseXServer {
       } else {
         arg.check(false);
         if(arg.string().equalsIgnoreCase("stop")) {
-          stop(context.prop.num(Prop.SERVERPORT),
-               context.prop.num(Prop.EVENTPORT));
+          stop(context.mprop.num(MainProp.SERVERPORT),
+               context.mprop.num(MainProp.EVENTPORT));
           return false;
         }
       }
