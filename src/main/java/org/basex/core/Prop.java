@@ -71,14 +71,16 @@ public final class Prop extends AProp {
 
   /** Server timeout in seconds; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
+  /** Debug mode. */
+  public static final Object[] DEBUG = { "DEBUG", false };
 
   // TRANSIENT OPTIONS ========================================================
 
   /** The following options are not saved to disk; don't remove this flag. */
   public static final Object[] SKIP = { "SKIP", true };
 
-  /** Debug mode. */
-  public static final Object[] DEBUG = { "DEBUG", false };
+  /** Defines the number of parallel readers. */
+  public static final Object[] PARALLEL = { "PARALLEL", 8 };
 
   /** Detailed query information. */
   public static final Object[] QUERYINFO = { "QUERYINFO", false };
@@ -111,9 +113,6 @@ public final class Prop extends AProp {
   public static final Object[] FORCECREATE = { "FORCECREATE", false };
   /** Default XQuery version. */
   public static final Object[] XQUERY3 = { "XQUERY3", true };
-
-  /** Defines the number of parallel readers. */
-  public static final Object[] PARALLEL = { "PARALLEL", 8 };
 
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };
