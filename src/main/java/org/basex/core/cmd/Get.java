@@ -24,7 +24,8 @@ public final class Get extends AGet {
   @Override
   protected boolean run() throws IOException {
     final String key = args[0].toUpperCase();
-    final Object type = prop.get(key);
+    Object type = prop.get(key);
+    if(type == null && !context.client()) type = mprop.get(key);
     if(type == null) return whichKey();
     out.println(key + COLS + type);
     return true;

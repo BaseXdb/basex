@@ -239,7 +239,7 @@ final class FTTrieBuilder extends FTBuilder {
       c += 5;
     }
     tmp.close();
-    DropDB.drop(md.name, DATAFTX + 't' + IO.BASEXSUFFIX, md.prop);
+    DropDB.drop(md.path, DATAFTX + 't' + IO.BASEXSUFFIX);
   }
 
   /**

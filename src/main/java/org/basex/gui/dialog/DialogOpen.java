@@ -144,9 +144,6 @@ public final class DialogOpen extends Dialog {
       refresh = false;
     }
 
-    // [CG] only close database if it equals the database to be changed
-    //   optionally, reopen database
-
     if(cmp == open) {
       close();
     } else if(cmp == rename) {
@@ -154,18 +151,6 @@ public final class DialogOpen extends Dialog {
       if(!dr.ok() || dr.input().equals(db)) return;
       refresh = true;
       DialogProgress.execute(this, "", new AlterDB(db, dr.input()));
-
-      /* ??
-      final AlterDB cmd = new AlterDB(db, dr.input());
-      if(cmd.run(ctx)) {
-        gui.notify.init();
-      } else {
-        Dialog.error(gui, cmd.info());
-      }
-      choice.setData(List.list(ctx).toArray());
-      action(null);
-      */
-
     } else if(cmp == copy) {
       final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
       if(!dc.ok() || dc.input().equals(db)) return;
@@ -181,12 +166,12 @@ public final class DialogOpen extends Dialog {
       DialogProgress.execute(this, "", new Restore(db));
     } else {
       // update components
-      ok = ctx.prop.dbexists(db);
+      ok = ctx.mprop.dbexists(db);
       enableOK(buttons, BUTTONDROP, ok);
       if(ok) {
         doc.setText(db);
         DataInput in = null;
-        final MetaData meta = new MetaData(db, ctx.prop);
+        final MetaData meta = new MetaData(db, ctx.prop, ctx.mprop);
         try {
           in = new DataInput(meta.file(DATAINFO));
           meta.read(in);

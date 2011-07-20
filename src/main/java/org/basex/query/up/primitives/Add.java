@@ -95,7 +95,7 @@ public final class Add extends InsertBase {
         final DirParser p = new DirParser(io, ctx.prop);
         final MemBuilder b = new MemBuilder(p, ctx.prop);
         try {
-          docData = b.build(data.meta.random());
+          docData = b.build(ctx.mprop.random(data.meta.name));
         } catch(final IOException e) {
           throw DOCERR.thrw(input, docpath);
         }

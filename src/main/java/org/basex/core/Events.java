@@ -113,7 +113,7 @@ public final class Events extends HashMap<String, Sessions> {
 
     for(final ClientListener srv : sess) {
       // ignore active client
-      if(srv == ctx.session) continue;
+      if(srv == ctx.listener) continue;
       try {
         srv.notify(name, msg);
       } catch(final IOException ex) {

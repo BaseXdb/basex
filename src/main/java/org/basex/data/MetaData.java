@@ -5,13 +5,12 @@ import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
 
 import org.basex.build.BuildException;
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.Users;
 import org.basex.io.IO;
-import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Util;
@@ -26,6 +25,8 @@ import org.basex.util.ft.Language;
 public final class MetaData {
   /** Properties. */
   public final Prop prop;
+  /** Path to database. Set to {@code null} for main memory instances. */
+  public final File path;
 
   /** Database name. */
   public String name;
@@ -35,7 +36,7 @@ public final class MetaData {
   /** Encoding of XML document. */
   public String encoding = UTF8;
   /** Path to original input. */
-  public String path = "";
+  public String original = "";
   /** Size of original documents. */
   public long filesize;
   /** Number of XML documents. */
@@ -88,10 +89,12 @@ public final class MetaData {
    * Constructor, specifying the database name.
    * @param db database name
    * @param pr database properties
+   * @param mprop main properties
    */
-  public MetaData(final String db, final Prop pr) {
-    name = db;
+  public MetaData(final String db, final Prop pr, final MainProp mprop) {
+    path = mprop != null ? mprop.dbpath(db) : null;
     prop = pr;
+    name = db;
     chop = prop.is(Prop.CHOP);
     entity = prop.is(Prop.ENTITY);
     pathindex = prop.is(Prop.PATHINDEX);
@@ -108,20 +111,20 @@ public final class MetaData {
    * Checks if the specified file path refers to the specified database.
    * @param path file path
    * @param db database name
-   * @param pr database properties
+   * @param mprop main properties
    * @return result of check
    */
   public static boolean found(final String path, final String db,
-      final Prop pr) {
+      final MainProp mprop) {
 
     // true is returned if path and database name are equal and if the db exists
-    final boolean exists = pr.dbpath(db).exists();
+    final boolean exists = mprop.dbpath(db).exists();
     if(!exists || path.equals(db)) return exists;
 
     DataInput in = null;
     try {
       // match filename of database instance
-      in = new DataInput(file(db, DATAINFO, pr));
+      in = new DataInput(file(mprop.dbpath(db), DATAINFO));
       String str = "", k;
       IO p = null;
       long t = 0;
@@ -146,43 +149,28 @@ public final class MetaData {
    * @return database size
    */
   public long dbsize() {
-    final IOFile dir = new IOFile(prop.dbpath(name));
     long len = 0;
-    for(final IO io : dir.children()) len += io.length();
+    for(final File io : path.listFiles()) len += io.length();
     return len;
   }
 
   /**
-   * Adds the database suffix to the specified filename and creates
-   * a file instance.
+   * Returns a file instance for the specified database file.
    * @param fn filename
    * @return database filename
    */
   public File file(final String fn) {
-    return file(name, fn, prop);
-  }
-
-  /**
-   * Returns a random temporary name for the current database.
-   * @return random name
-   */
-  public String random() {
-    String nm;
-    do {
-      nm = name + '_' + new Random().nextInt(0x7FFFFFFF);
-    } while(prop.dbexists(nm));
-    return nm;
+    return file(path, fn);
   }
 
   /**
    * Creates a database file instance.
-   * @param db name of the database
+   * @param path database path
    * @param fn filename
-   * @param pr database properties
    * @return database filename
    */
-  private static File file(final String db, final String fn, final Prop pr) {
-    return new File(pr.dbpath(db), fn + IO.BASEXSUFFIX);
+  private static File file(final File path, final String fn) {
+    return new File(path, fn + IO.BASEXSUFFIX);
   }
 
   /**
@@ -216,7 +204,7 @@ public final class MetaData {
         if(k.equals(DBSTR))         storage    = v;
         else if(k.equals(IDBSTR))   istorage   = v;
         else if(k.equals(DBSIZE))   size       = toInt(v);
-        else if(k.equals(DBFNAME))  path       = v;
+        else if(k.equals(DBFNAME))  original       = v;
         else if(k.equals(DBFSIZE))  filesize   = toLong(v);
         else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
         else if(k.equals(DBFTDC))   diacritics = toBool(v);
@@ -264,7 +252,7 @@ public final class MetaData {
   void write(final DataOutput out) throws IOException {
     writeInfo(out, DBSTR,    STORAGE);
     writeInfo(out, IDBSTR,   ISTORAGE);
-    writeInfo(out, DBFNAME,  path);
+    writeInfo(out, DBFNAME,  original);
     writeInfo(out, DBFSIZE,  filesize);
     writeInfo(out, DBNDOCS,  ndocs);
     writeInfo(out, DBENC,    encoding);

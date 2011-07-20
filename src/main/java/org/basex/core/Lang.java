@@ -48,7 +48,7 @@ public final class Lang {
   private Lang() { }
 
   /** Reads the language file. */
-  static { read(Prop.language, CHECK); }
+  static { read(Util.language, CHECK); }
 
   /**
    * Reads the specified language file.
@@ -73,7 +73,7 @@ public final class Lang {
           final String key = line.substring(0, i);
           String val = line.substring(i + 1);
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-          if(Prop.langkeys) val = "[" + key + COLS + val + "]";
+          if(Util.langkeys) val = "[" + key + COLS + val + "]";
           if(TETXTS.get(key) == null) {
             TETXTS.put(key, val);
           } else if(chk) {
@@ -98,7 +98,7 @@ public final class Lang {
       if(CHECK && check.size() != 0) {
         final Iterator<String> it = check.keySet().iterator();
         while(it.hasNext()) Util.errln("%." + SUFFIX + ": '%' not used",
-            Prop.language, it.next());
+            Util.language, it.next());
       }
       return null;
     }
@@ -106,7 +106,7 @@ public final class Lang {
     final String val = TETXTS.get(key);
     if(val == null) {
       if(TETXTS.size() != 0) Util.errln("%." + SUFFIX + ": '%' missing",
-          Prop.language, key);
+          Util.language, key);
       return "[" + key + "]";
     }
     if(CHECK) check.remove(key);

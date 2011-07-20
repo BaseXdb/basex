@@ -18,6 +18,8 @@ import javax.swing.WindowConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+
+import org.basex.core.AProp;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
@@ -509,7 +511,26 @@ public final class GUI extends AGUI {
   * @param val value
   */
  public void set(final Object[] pr, final Object val) {
-   if(!context.prop.sameAs(pr, val)) {
+   set(context.prop, pr, val);
+ }
+
+ /**
+  * Sets an admin property and displays the command in the info view.
+  * @param pr property to be set
+  * @param val value
+  */
+ public void setAdmin(final Object[] pr, final Object val) {
+   set(context.prop, pr, val);
+ }
+
+ /**
+  * Sets a property and displays the command in the info view.
+  * @param prop property instance
+  * @param pr property to be set
+  * @param val value
+  */
+ private void set(final AProp prop, final Object[] pr, final Object val) {
+   if(!prop.sameAs(pr, val)) {
      final Set cmd = new Set(pr, val);
      cmd.run(context);
      info.setInfo(cmd.info(), cmd, null, true);

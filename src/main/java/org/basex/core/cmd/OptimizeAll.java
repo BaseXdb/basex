@@ -100,10 +100,12 @@ public final class OptimizeAll extends ACreate {
     if(ctx.datas.pins(m.name) > 1) throw new BaseXException(DBLOCKED, m.name);
 
     // find unique temporary database name
-    final String tname = m.random();
+    final String tname = ctx.mprop.random(m.name);
 
     // build database and index structures
-    final DiskBuilder builder = new DiskBuilder(new DBParser(old, cmd), m.prop);
+    final DiskBuilder builder = new DiskBuilder(new DBParser(old, cmd),
+        m.prop, ctx.mprop);
+
     try {
       final DiskData d = builder.build(tname);
       if(m.textindex || ctx.prop.is(Prop.TEXTINDEX))
@@ -125,9 +127,9 @@ public final class OptimizeAll extends ACreate {
     }
     Close.close(data, ctx);
 
-    if(!DropDB.drop(m.name, ctx.prop))
+    if(!DropDB.drop(m.name, ctx.mprop))
       throw new BaseXException(DBDROPERROR, m.name);
-    if(!AlterDB.alter(tname, m.name, ctx.prop))
+    if(!AlterDB.alter(tname, m.name, ctx.mprop))
       throw new BaseXException(DBNOTALTERED, tname);
   }
 
@@ -149,7 +151,7 @@ public final class OptimizeAll extends ACreate {
      * @param c calling command (can be {@code null})
      */
     protected DBParser(final DiskData d, final OptimizeAll c) {
-      super(d.meta.path.isEmpty() ? null : IO.get(d.meta.path));
+      super(d.meta.original.isEmpty() ? null : IO.get(d.meta.original));
       data = d;
       cmd = c;
     }

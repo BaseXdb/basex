@@ -2,6 +2,8 @@ package org.basex.build;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
@@ -39,6 +41,8 @@ public final class DiskBuilder extends Builder {
   /** Attribute value pointer. */
   private long vallen;
 
+  /** Admin properties. */
+  protected final MainProp mprop;
   /** Text compressor. */
   private final Compress comp;
 
@@ -46,20 +50,22 @@ public final class DiskBuilder extends Builder {
    * Constructor.
    * @param parse parser
    * @param pr properties
+   * @param mpr main properties
    */
-  public DiskBuilder(final Parser parse, final Prop pr) {
+  public DiskBuilder(final Parser parse, final Prop pr, final MainProp mpr) {
     super(parse, pr);
     comp = new Compress();
+    mprop = mpr;
   }
 
   @Override
   public DiskData build(final String name) throws IOException {
-    DropDB.drop(name, prop);
-    prop.dbpath(name).mkdirs();
+    DropDB.drop(name, mprop);
+    mprop.dbpath(name).mkdirs();
 
     final IO file = parser.src;
-    meta = new MetaData(name, prop);
-    meta.path = file != null ? file.path() : "";
+    meta = new MetaData(name, prop, mprop);
+    meta.original = file != null ? file.path() : "";
     meta.filesize = file != null ? file.length() : 0;
     meta.time = file != null ? file.date() : System.currentTimeMillis();
     meta.dirty = true;
@@ -97,7 +103,7 @@ public final class DiskBuilder extends Builder {
     } catch(final IOException ex) {
       Util.debug(ex);
     }
-    DropDB.drop(meta.name, meta.prop);
+    DropDB.drop(meta.name, mprop);
   }
 
   @Override

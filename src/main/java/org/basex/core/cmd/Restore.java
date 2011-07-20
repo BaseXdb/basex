@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import org.basex.core.Command;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -40,7 +39,7 @@ public final class Restore extends Command {
     if(!validName(db, false)) return error(NAMEINVALID, db);
 
     // find backup file with or without date suffix
-    File file = prop.dbpath(db + IO.ZIPSUFFIX);
+    File file = mprop.dbpath(db + IO.ZIPSUFFIX);
     if(!file.exists()) {
       final StringList list = list(db, context);
       if(list.size() != 0) file = new File(list.get(0));
@@ -55,19 +54,18 @@ public final class Restore extends Command {
     if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to restore database
-    return restore(file, prop) && (!closed || new Open(db).run(context)) ?
+    return restore(file) && (!closed || new Open(db).run(context)) ?
         info(DBRESTORE, file.getName(), perf) : error(DBNORESTORE, db);
   }
 
   /**
    * Restores the specified database.
    * @param file file
-   * @param pr database properties
    * @return success flag
    */
-  private boolean restore(final File file, final Prop pr) {
+  private boolean restore(final File file) {
     try {
-      progress(new Zip(new IOFile(file))).unzip(pr.dbpath());
+      progress(new Zip(new IOFile(file))).unzip(mprop.dbpath());
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);
@@ -84,7 +82,7 @@ public final class Restore extends Command {
   public static StringList list(final String db, final Context ctx) {
     final StringList list = new StringList();
 
-    final IOFile dir = ctx.prop.dbpath();
+    final IOFile dir = ctx.mprop.dbpath();
     if(!dir.exists()) return list;
 
     for(final IOFile f : dir.children()) {

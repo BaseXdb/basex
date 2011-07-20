@@ -305,8 +305,7 @@ public abstract class FTBuilder extends IndexBuilder {
 
   @Override
   public final void abort() {
-    DropDB.drop(data.meta.name, DATAFTX + ".*" + IO.BASEXSUFFIX,
-        data.meta.prop);
+    DropDB.drop(data.meta.path, DATAFTX + ".*" + IO.BASEXSUFFIX);
     data.meta.ftindex = false;
   }
 

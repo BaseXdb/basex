@@ -45,6 +45,8 @@ public abstract class Command extends Progress {
   protected PrintOutput out;
   /** Database properties. */
   protected Prop prop;
+  /** Main properties. */
+  protected MainProp mprop;
 
   /** Flags for controlling command processing. */
   private final int flags;
@@ -219,7 +221,7 @@ public abstract class Command extends Progress {
   protected final String[] databases(final String name) {
     final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) : name;
     final StringList sl = new StringList();
-    for(final IOFile f : prop.dbpath().children(pat)) {
+    for(final IOFile f : mprop.dbpath().children(pat)) {
       final String n = f.name();
       if(!n.contains(".")) sl.add(n);
     }
@@ -311,6 +313,7 @@ public abstract class Command extends Progress {
     perf = new Performance();
     context = ctx;
     prop = ctx.prop;
+    mprop = ctx.mprop;
     out = PrintOutput.get(os);
 
     try {

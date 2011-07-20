@@ -7,6 +7,8 @@ import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.server.LoginException;
@@ -20,6 +22,10 @@ import org.basex.server.LoginException;
  * @author Christian Gruen
  */
 public final class Util {
+  /** Language (applied after restart). */
+  public static String language = MainProp.LANG[1].toString();
+  /** Flag for showing language keys. */
+  public static boolean langkeys;
   /** Debug mode. */
   public static boolean debug;
 

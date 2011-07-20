@@ -54,7 +54,7 @@ public final class DirParser extends TargetParser {
   @Override
   public void parse(final Builder build) throws IOException {
     build.meta.filesize = 0;
-    build.meta.path = src.path();
+    build.meta.original = src.path();
     parse(build, src);
   }
 

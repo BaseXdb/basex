@@ -77,7 +77,7 @@ public final class Add extends ACreate {
     }
 
     final String trg = path(args[2]);
-    final DirParser p = new DirParser(io, trg, context.prop);
+    final DirParser p = new DirParser(io, trg, prop);
     try {
       return info(add(p, context, trg, name, this));
     } catch(final BaseXException ex) {
@@ -152,8 +152,8 @@ public final class Add extends ACreate {
 
     // create random database name
     final Data data = ctx.data;
-    final String dbname = large ? data.meta.random() : path;
-    final Builder build = large ? new DiskBuilder(parser, ctx.prop) :
+    final String dbname = large ? ctx.mprop.random(data.meta.name) : path;
+    final Builder build = large ? new DiskBuilder(parser, ctx.prop, ctx.mprop) :
       new MemBuilder(parser, ctx.prop);
     if(cmd != null) cmd.build = build;
 
@@ -173,7 +173,7 @@ public final class Add extends ACreate {
     } finally {
       // close and drop intermediary database instance
       if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
-      if(large) DropDB.drop(dbname, ctx.prop);
+      if(large) DropDB.drop(dbname, ctx.mprop);
     }
   }
 

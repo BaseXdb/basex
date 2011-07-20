@@ -55,7 +55,7 @@ final class ValueMerger {
     } else {
       dv.close();
       dk.close();
-      DropDB.drop(data.meta.name, pref + '.' + IO.BASEXSUFFIX, data.meta.prop);
+      DropDB.drop(data.meta.path, pref + '.' + IO.BASEXSUFFIX);
     }
   }
 }

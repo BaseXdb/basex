@@ -5,7 +5,7 @@ import org.basex.util.Util;
 
 /**
  * Management of executing read/write processes.
- * Supports multiple readers, limited by {@link Prop#PARALLEL},
+ * Supports multiple readers, limited by {@link MainProp#PARALLEL},
  * and single writers (readers/writer lock).
  *
  * @author BaseX Team 2005-11, BSD License
@@ -49,7 +49,8 @@ final class Lock {
                 writer = true;
                 break;
               }
-            } else if(readers < Math.max(ctx.prop.num(Prop.PARALLEL), 1)) {
+            } else if(readers <
+                Math.max(ctx.mprop.num(MainProp.PARALLEL), 1)) {
               ++readers;
               break;
             }

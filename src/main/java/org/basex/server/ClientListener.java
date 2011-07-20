@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.basex.build.Parser;
+import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Command;
-import org.basex.core.Prop;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.User;
 import org.basex.core.cmd.Add;
@@ -179,7 +179,7 @@ public final class ClientListener extends Thread {
         }
 
         // start timeout
-        command.startTimeout(context.prop.num(Prop.TIMEOUT));
+        command.startTimeout(context.mprop.num(MainProp.TIMEOUT));
         log.write(this,
             command.toString().replace('\r', ' ').replace('\n', ' '));
 
@@ -371,7 +371,7 @@ public final class ClientListener extends Thread {
 
     // initialize server-based event handling
     if(events == null) {
-      out.writeString(Integer.toString(context.prop.num(Prop.EVENTPORT)));
+      out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));
       out.writeString(Long.toString(getId()));
       events = new ArrayList<String>();
     }

@@ -42,7 +42,7 @@ public final class Log {
    * @param q quiet flag (no logging)
    */
   public Log(final Context ctx, final boolean q) {
-    dir = ctx.prop.dbpath(".logs");
+    dir = ctx.mprop.dbpath(".logs");
     quiet = q;
     if(!q) create(new Date());
   }

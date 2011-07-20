@@ -143,7 +143,7 @@ public final class PermissionTest {
     ok(new ListDB(NAME), testSession);
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
-    ok(new Get("DBPATH"), testSession);
+    ok(new Get(CmdSet.QUERYINFO), testSession);
     ok(new Set(CmdSet.QUERYINFO, false), testSession);
     // XQuery read
     ok(new XQuery("//xml"), testSession);

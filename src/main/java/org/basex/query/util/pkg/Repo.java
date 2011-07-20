@@ -3,8 +3,8 @@ package org.basex.query.util.pkg;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.MainProp;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.util.pkg.Package.Component;
@@ -41,7 +41,7 @@ public final class Repo {
    */
   public Repo(final Context ctx) {
     context = ctx;
-    path = new IOFile(ctx.prop.get(Prop.REPOPATH));
+    path = new IOFile(ctx.mprop.get(MainProp.REPOPATH));
   }
 
   /**
@@ -72,7 +72,7 @@ public final class Repo {
     init = true;
 
     if(repo != null) {
-      context.prop.set(Prop.REPOPATH, repo);
+      context.mprop.set(MainProp.REPOPATH, repo);
       path = new IOFile(repo);
     }
     for(final IOFile dir : path.children()) {

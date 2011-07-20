@@ -3,9 +3,10 @@ package org.basex.server;
 import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 import java.io.IOException;
+
+import org.basex.core.MainProp;
 import org.basex.core.Context;
 import org.basex.core.Progress;
-import org.basex.core.Prop;
 import org.basex.io.out.PrintOutput;
 import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
@@ -65,7 +66,7 @@ final class QueryListener extends Progress {
     }
     out = po;
     ctx = c;
-    startTimeout(ctx.prop.num(Prop.TIMEOUT));
+    startTimeout(ctx.mprop.num(MainProp.TIMEOUT));
   }
 
   /**

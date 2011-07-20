@@ -69,7 +69,7 @@ public final class DropIndex extends ACreate {
       data.closeIndex(index);
       data.meta.dirty = true;
       data.flush();
-      return DropDB.drop(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
+      return DropDB.drop(data.meta.name, pat + "." + IO.BASEXSUFFIX, mprop) ?
           info(INDDROP, index, perf) : error(INDDROPERROR, index);
     } catch(final IOException ex) {
       Util.debug(ex);

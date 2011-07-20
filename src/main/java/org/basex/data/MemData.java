@@ -29,7 +29,7 @@ public final class MemData extends Data {
   public MemData(final Names tag, final Names att, final Namespaces n,
       final PathSummary s, final Prop pr) {
 
-    meta = new MetaData("", pr);
+    meta = new MetaData("", pr, null);
     table = new TableMemAccess(meta, null, 16);
     txtindex = new MemValues();
     atvindex = new MemValues();

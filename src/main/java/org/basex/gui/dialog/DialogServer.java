@@ -7,9 +7,9 @@ import java.io.File;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.basex.BaseXServer;
+import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.ShowDatabases;
@@ -100,7 +100,7 @@ public final class DialogServer extends Dialog {
   /** Combobox for log files. */
   private final BaseXCombo logc;
   /** String for log dir. */
-  private final File logdir = ctx.prop.dbpath(".logs");
+  private final File logdir = ctx.mprop.dbpath(".logs");
   /** ClientSession. */
   private ClientSession cs;
   /** Boolean for check is server is running. */
@@ -131,12 +131,13 @@ public final class DialogServer extends Dialog {
     disconnect = new BaseXButton(BUTTONDISCONNECT, this);
     BaseXButton.setMnemonics(start, stop, connect, disconnect);
 
-    host = new BaseXTextField(ctx.prop.get(Prop.HOST), this);
+    host = new BaseXTextField(ctx.mprop.get(MainProp.HOST), this);
     host.addKeyListener(keys);
-    ports = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.SERVERPORT)),
-        this);
+    ports = new BaseXTextField(Integer.toString(
+        ctx.mprop.num(MainProp.SERVERPORT)), this);
     ports.addKeyListener(keys);
-    portc = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.PORT)), this);
+    portc = new BaseXTextField(Integer.toString(
+        ctx.mprop.num(MainProp.PORT)), this);
     portc.addKeyListener(keys);
     loguser = new BaseXTextField(gui.gprop.get(GUIProp.SERVERUSER), this);
     loguser.addKeyListener(keys);
@@ -277,8 +278,8 @@ public final class DialogServer extends Dialog {
    * @return boolean success
    */
   private boolean ping(final boolean local) {
-    return BaseXServer.ping(local ? LOCALHOST : ctx.prop.get(Prop.HOST),
-        ctx.prop.num(local ? Prop.SERVERPORT : Prop.PORT));
+    return BaseXServer.ping(local ? LOCALHOST : ctx.mprop.get(MainProp.HOST),
+        ctx.mprop.num(local ? MainProp.SERVERPORT : MainProp.PORT));
   }
 
   @Override
@@ -290,9 +291,9 @@ public final class DialogServer extends Dialog {
     try {
       if(cmp == start || cmp == ports) {
         final int p = Integer.parseInt(ports.getText());
-        gui.set(Prop.SERVERPORT, p);
+        gui.setAdmin(MainProp.SERVERPORT, p);
         if(host.getText().equals(LOCALHOST)) {
-          gui.set(Prop.PORT, p);
+          gui.setAdmin(MainProp.PORT, p);
           portc.setText(ports.getText());
         }
         msg = BaseXServer.start(p, BaseXServer.class);
@@ -302,8 +303,8 @@ public final class DialogServer extends Dialog {
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {
-        if(running) BaseXServer.stop(ctx.prop.num(Prop.SERVERPORT),
-            ctx.prop.num(Prop.EVENTPORT));
+        if(running) BaseXServer.stop(ctx.mprop.num(MainProp.SERVERPORT),
+            ctx.mprop.num(MainProp.EVENTPORT));
         running = ping(true);
         connected = connected && ping(false);
         if(!connected) msg = SERVERSTOPPED;
@@ -313,8 +314,8 @@ public final class DialogServer extends Dialog {
           cmp == host || cmp == portc) {
         gui.gprop.set(GUIProp.SERVERUSER, loguser.getText());
         final String pw = new String(logpass.getPassword());
-        gui.set(Prop.HOST, host.getText());
-        gui.set(Prop.PORT, Integer.parseInt(portc.getText()));
+        gui.setAdmin(MainProp.HOST, host.getText());
+        gui.setAdmin(MainProp.PORT, Integer.parseInt(portc.getText()));
         cs = new ClientSession(ctx, gui.gprop.get(GUIProp.SERVERUSER), pw);
         user.setSess(cs);
         dbsP.setSess(cs);
@@ -415,7 +416,7 @@ public final class DialogServer extends Dialog {
       logpass.setText("");
       connect.setEnabled(false);
     }
-    ctx.prop.write();
+    ctx.mprop.write();
   }
 
   /**

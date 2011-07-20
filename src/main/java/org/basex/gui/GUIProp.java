@@ -8,9 +8,8 @@ import org.basex.io.IOFile;
 import org.basex.util.list.StringList;
 
 /**
- * This class contains properties which are used in the GUI. They are
- * initially read from and finally written to disk, except for the properties
- * following the {@link #SKIP} flag.
+ * This class contains properties which are used in the GUI.
+ * They are also stored in the project's home directory.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -151,11 +150,6 @@ public final class GUIProp extends AProp {
   public static final Object[] XQUERY = { "XQUERY", new String[0] };
   /** Last XQuery files. */
   public static final Object[] QUERIES = { "QUERIES", new String[0] };
-
-  // CONFIG OPTIONS ===========================================================
-
-  /** The following options are not saved to disk; don't remove this flag. */
-  public static final Object[] SKIP = { "SKIP", true };
 
   /** Flag for displaying the menu in the GUI window. */
   public static final Object[] SHOWMENU = { "SHOWMENU", true };

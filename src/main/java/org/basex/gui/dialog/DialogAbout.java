@@ -8,7 +8,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import org.basex.core.Prop;
+
+import org.basex.core.MainProp;
 import org.basex.core.Text;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -55,7 +56,7 @@ public final class DialogAbout extends Dialog {
     pp.add(new BaseXLabel(CONTRIBUTE1));
     pp.add(new BaseXLabel(CONTRIBUTE2));
     pp.add(Box.createVerticalStrut(7));
-    final String lang = main.context.prop.get(Prop.LANG);
+    final String lang = main.context.mprop.get(MainProp.LANG);
     pp.add(new BaseXLabel(TRANSLATION + DialogPrefs.creds(lang)));
     p.add(pp, BorderLayout.EAST);
     add(p, BorderLayout.NORTH);

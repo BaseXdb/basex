@@ -5,6 +5,7 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 
 import org.basex.build.DiskBuilder;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
@@ -41,13 +42,13 @@ public final class DiskData extends Data {
   /**
    * Default constructor.
    * @param db name of database
-   * @param pr database properties
+   * @param ctx database context
    * @throws IOException IO Exception
    */
-  public DiskData(final String db, final Prop pr) throws IOException {
-    meta = new MetaData(db, pr);
+  public DiskData(final String db, final Context ctx) throws IOException {
+    meta = new MetaData(db, ctx.prop, ctx.mprop);
 
-    final int cats = pr.num(Prop.CATEGORIES);
+    final int cats = ctx.prop.num(Prop.CATEGORIES);
     final DataInput in = new DataInput(meta.file(DATAINFO));
     try {
       // read meta data and indexes

@@ -36,7 +36,7 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data;
-      export(context.prop, data, args[0]);
+      export(prop, data, args[0]);
       return info(DBEXPORTED, data.meta.name, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
