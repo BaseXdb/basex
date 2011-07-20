@@ -249,7 +249,7 @@ public final class InfoView extends View {
 
     final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     final int f = focus == -1 ? l - 1 : focus;
-    timer.setText(strings.get(f) + ": " +
+    timer.setText(strings.get(f) + COLS +
         Performance.getTimer(stat.get(f) * 10000L * runs, runs));
     repaint();
   }

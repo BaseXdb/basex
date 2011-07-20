@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import org.basex.core.Lang;
 import org.basex.core.Prop;
+import org.basex.core.cmd.Close;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -131,8 +132,11 @@ public final class DialogPrefs extends Dialog {
   @Override
   public void close() {
     final Prop prop = gui.context.prop;
-    prop.set(Prop.DBPATH, path.getText());
     prop.set(Prop.LANG, lang.getSelectedItem().toString());
+    // new database path: close existing database
+    final String dbpath = path.getText().trim();
+    if(!prop.get(Prop.DBPATH).equals(dbpath)) gui.execute(new Close());
+    prop.set(Prop.DBPATH, dbpath);
     prop.write();
     final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.MOUSEFOCUS, focus.isSelected());

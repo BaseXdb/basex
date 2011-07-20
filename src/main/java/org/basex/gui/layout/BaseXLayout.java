@@ -138,7 +138,7 @@ public final class BaseXLayout {
           final Dialog d = dialog(comp);
           if(d != null) d.action(null);
           return true;
-        } catch(Exception ex) {
+        } catch(final Exception ex) {
           Util.errln(ex);
           return false;
         }
