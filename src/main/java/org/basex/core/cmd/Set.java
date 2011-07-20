@@ -36,7 +36,7 @@ public final class Set extends AGet {
   @Override
   protected boolean run() {
     String key = args[0].toUpperCase();
-    String val = args[1];
+    final String val = args[1];
 
     CmdSet s = null;
     try { s = Enum.valueOf(CmdSet.class, key); } catch(final Exception ex) { }
