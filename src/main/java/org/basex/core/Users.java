@@ -105,7 +105,6 @@ public final class Users {
     return true;
   }
 
-
   /**
    * Changes the password of a user.
    * @param usern user name

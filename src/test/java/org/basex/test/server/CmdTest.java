@@ -104,7 +104,6 @@ public class CmdTest {
     CONTEXT.close();
   }
 
-
   /**
    * Creates the database.
    * @throws BaseXException database exception

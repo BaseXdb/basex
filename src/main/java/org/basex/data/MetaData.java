@@ -203,7 +203,7 @@ public final class MetaData {
    * Drops the specified database files.
    * Should only be called if database is disk-based.
    * @param pat file pattern, or {@code null} if all files are to be deleted
-   * @return database filename
+   * @return result of check
    */
   public synchronized boolean drop(final String pat) {
     return path != null && DropDB.drop(path, pat + IO.BASEXSUFFIX);

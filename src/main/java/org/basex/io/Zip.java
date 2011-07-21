@@ -14,9 +14,8 @@ import java.util.zip.ZipOutputStream;
 import org.basex.core.Progress;
 import org.basex.util.list.ByteList;
 
-
 /**
- * Contains utility classes for zip files.
+ * Contains methods for zipping and unzipping archives.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
