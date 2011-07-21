@@ -24,6 +24,8 @@ public final class TableDiskAccess extends TableAccess {
   private final Buffers bm = new Buffers();
   /** File storing all blocks. */
   private final RandomAccessFile file;
+  /** Filename prefix. */
+  protected final String pref;
 
   /** FirstPre values (sorted ascending; length={@link #allBlocks}). */
   private int[] fpres;
@@ -53,10 +55,11 @@ public final class TableDiskAccess extends TableAccess {
   public TableDiskAccess(final MetaData md, final String pf)
       throws IOException {
 
-    super(md, pf);
+    super(md);
+    pref = pf;
 
     // read meta and index data
-    final DataInput in = new DataInput(meta.file(pf + 'i'));
+    final DataInput in = new DataInput(meta.dbfile(pf + 'i'));
     allBlocks  = in.readNum();
     blocks     = in.readNum();
     fpres      = in.readNums();
@@ -75,7 +78,7 @@ public final class TableDiskAccess extends TableAccess {
     in.close();
 
     // initialize data file
-    file = new RandomAccessFile(meta.file(pf), "rw");
+    file = new RandomAccessFile(meta.dbfile(pf), "rw");
     readIndex(0);
   }
 
@@ -83,7 +86,7 @@ public final class TableDiskAccess extends TableAccess {
   public synchronized void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
     if(!dirty) return;
-    final DataOutput out = new DataOutput(meta.file(pref + 'i'));
+    final DataOutput out = new DataOutput(meta.dbfile(pref + 'i'));
     out.writeNum(allBlocks);
     out.writeNum(blocks);
     out.writeNums(fpres);

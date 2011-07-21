@@ -46,10 +46,10 @@ public final class DiskData extends Data {
    * @throws IOException IO Exception
    */
   public DiskData(final String db, final Context ctx) throws IOException {
-    meta = new MetaData(db, ctx.prop, ctx.mprop);
+    meta = new MetaData(db, ctx);
 
     final int cats = ctx.prop.num(Prop.CATEGORIES);
-    final DataInput in = new DataInput(meta.file(DATAINFO));
+    final DataInput in = new DataInput(meta.dbfile(DATAINFO));
     try {
       // read meta data and indexes
       meta.read(in);
@@ -98,8 +98,8 @@ public final class DiskData extends Data {
   @Override
   public void init() throws IOException {
     table = new TableDiskAccess(meta, DATATBL);
-    texts = new DataAccess(meta.file(DATATXT));
-    values = new DataAccess(meta.file(DATAATV));
+    texts = new DataAccess(meta.dbfile(DATATXT));
+    values = new DataAccess(meta.dbfile(DATAATV));
     super.init();
   }
 
@@ -108,7 +108,7 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   private void write() throws IOException {
-    final DataOutput out = new DataOutput(meta.file(DATAINFO));
+    final DataOutput out = new DataOutput(meta.dbfile(DATAINFO));
     meta.write(out);
     out.writeString(DBTAGS);
     tagindex.write(out);

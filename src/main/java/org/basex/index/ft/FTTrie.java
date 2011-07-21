@@ -66,9 +66,9 @@ final class FTTrie extends FTIndex {
    */
   protected FTTrie(final Data d) throws IOException {
     super(d);
-    inA = new DataAccess(d.meta.file(DATAFTX + 'a'));
-    inB = new DataAccess(d.meta.file(DATAFTX + 'b'));
-    inC = new DataAccess(d.meta.file(DATAFTX + 'c'));
+    inA = new DataAccess(d.meta.dbfile(DATAFTX + 'a'));
+    inB = new DataAccess(d.meta.dbfile(DATAFTX + 'b'));
+    inC = new DataAccess(d.meta.dbfile(DATAFTX + 'c'));
   }
 
   @Override

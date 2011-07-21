@@ -5,10 +5,8 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Prop;
-import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.index.IndexBuilder;
-import org.basex.io.IO;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Num;
 import org.basex.util.Performance;
@@ -305,7 +303,7 @@ public abstract class FTBuilder extends IndexBuilder {
 
   @Override
   public final void abort() {
-    DropDB.drop(data.meta.path, DATAFTX + ".*" + IO.BASEXSUFFIX);
+    data.meta.drop(DATAFTX + ".*");
     data.meta.ftindex = false;
   }
 

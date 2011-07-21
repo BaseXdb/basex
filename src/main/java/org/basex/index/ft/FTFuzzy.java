@@ -72,9 +72,9 @@ final class FTFuzzy extends FTIndex {
     super(d);
 
     // cache token length index
-    inY = new DataAccess(d.meta.file(DATAFTX + 'y'));
-    inZ = new DataAccess(d.meta.file(DATAFTX + 'z'));
-    inX = new DataAccess(d.meta.file(DATAFTX + 'x'));
+    inY = new DataAccess(d.meta.dbfile(DATAFTX + 'y'));
+    inZ = new DataAccess(d.meta.dbfile(DATAFTX + 'z'));
+    inX = new DataAccess(d.meta.dbfile(DATAFTX + 'x'));
     for(int i = 0; i < tp.length; ++i) tp[i] = -1;
     int is = inX.read1();
     while(--is >= 0) {

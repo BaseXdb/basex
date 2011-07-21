@@ -91,11 +91,11 @@ public final class Add extends InsertBase {
       } else if(d.str()) {
         // adding file(s) from a path
         final String docpath = string(d.atom(input));
-        final IO io = IO.get(docpath);
-        final DirParser p = new DirParser(io, ctx.prop);
-        final MemBuilder b = new MemBuilder(p, ctx.prop);
+        final String nm = ctx.mprop.random(data.meta.name);
+        final DirParser p = new DirParser(IO.get(docpath), ctx.prop);
+        final MemBuilder b = new MemBuilder(nm, p, ctx.prop);
         try {
-          docData = b.build(ctx.mprop.random(data.meta.name));
+          docData = b.build();
         } catch(final IOException e) {
           throw DOCERR.thrw(input, docpath);
         }

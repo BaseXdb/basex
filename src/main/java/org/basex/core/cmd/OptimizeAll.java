@@ -103,9 +103,10 @@ public final class OptimizeAll extends ACreate {
     final String tname = ctx.mprop.random(m.name);
 
     // build database and index structures
-    final DiskBuilder builder = new DiskBuilder(new DBParser(old, cmd), ctx);
+    final DiskBuilder builder = new DiskBuilder(tname,
+        new DBParser(old, cmd), ctx);
     try {
-      final DiskData d = builder.build(tname);
+      final DiskData d = builder.build();
       if(m.textindex || ctx.prop.is(Prop.TEXTINDEX))
         index(IndexType.TEXT, d, cmd);
       if(m.attrindex || ctx.prop.is(Prop.ATTRINDEX))

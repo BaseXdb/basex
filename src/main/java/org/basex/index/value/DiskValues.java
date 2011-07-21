@@ -63,8 +63,8 @@ public final class DiskValues implements Index {
       throws IOException {
     data = d;
     text = txt;
-    idxl = new DataAccess(d.meta.file(pref + 'l'));
-    idxr = new DataAccess(d.meta.file(pref + 'r'));
+    idxl = new DataAccess(d.meta.dbfile(pref + 'l'));
+    idxr = new DataAccess(d.meta.dbfile(pref + 'r'));
     size = idxl.read4();
   }
 

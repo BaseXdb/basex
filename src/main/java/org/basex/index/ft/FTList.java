@@ -46,8 +46,8 @@ abstract class FTList {
    */
   protected FTList(final Data d, final int p, final char ss, final char ds)
       throws IOException {
-    files = d.meta.file(DATAFTX + p + ss);
-    filed = d.meta.file(DATAFTX + p + ds);
+    files = d.meta.dbfile(DATAFTX + p + ss);
+    filed = d.meta.dbfile(DATAFTX + p + ds);
     str = new DataAccess(files);
     dat = new DataAccess(filed);
   }

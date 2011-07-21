@@ -153,13 +153,13 @@ public final class Add extends ACreate {
     // create random database name
     final Data data = ctx.data;
     final String dbname = large ? ctx.mprop.random(data.meta.name) : path;
-    final Builder build = large ? new DiskBuilder(parser, ctx) :
-      new MemBuilder(parser, ctx.prop);
+    final Builder build = large ? new DiskBuilder(dbname, parser, ctx) :
+      new MemBuilder(dbname, parser, ctx.prop);
     if(cmd != null) cmd.build = build;
 
     Data tmp = null;
     try {
-      tmp = build.build(dbname);
+      tmp = build.build();
       // ignore empty fragments
       if(tmp.meta.size > 1) {
         data.insert(data.meta.size, -1, tmp);

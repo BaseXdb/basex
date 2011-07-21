@@ -63,7 +63,7 @@ public final class BlockAccessTest {
     try {
       final Parser parser = Parser.xmlParser(
           IO.get(TESTFILE), CONTEXT.prop, "");
-      data = new DiskBuilder(parser, CONTEXT).build(DBNAME);
+      data = new DiskBuilder(DBNAME, parser, CONTEXT).build();
       size = data.meta.size;
       data.close();
       tda = new TableDiskAccess(data.meta, DATATBL);

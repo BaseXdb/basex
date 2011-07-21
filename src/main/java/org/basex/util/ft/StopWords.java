@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.io.IO;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -33,7 +34,7 @@ public final class StopWords extends TokenSet {
    */
   public StopWords(final Data data, final String file) throws IOException {
     if(!data.meta.prop.get(Prop.STOPWORDS).isEmpty()) read(IO.get(file), false);
-    final DataOutput out = new DataOutput(data.meta.file(DATASWL));
+    final DataOutput out = new DataOutput(data.meta.dbfile(DATASWL));
     write(out);
     out.close();
   }
@@ -44,12 +45,13 @@ public final class StopWords extends TokenSet {
    */
   public void comp(final Data data) {
     // no data reference, or stop words have already been defined..
-    if(data == null || size() != 0) return;
+    if(data == null || size() != 0 || data instanceof MemData) return;
+
     // try to parse the stop words file of the current database
     try {
-      final File file = data.meta.file(DATASWL);
+      final File file = data.meta.dbfile(DATASWL);
       if(!file.exists()) return;
-      final DataInput in = new DataInput(data.meta.file(DATASWL));
+      final DataInput in = new DataInput(data.meta.dbfile(DATASWL));
       try {
         read(in);
       } finally {

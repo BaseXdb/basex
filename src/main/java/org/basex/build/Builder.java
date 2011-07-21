@@ -40,6 +40,9 @@ public abstract class Builder extends Progress {
   protected final Parser parser;
   /** Property instance. */
   protected final Prop prop;
+  /** Database name. */
+  protected final String name;
+
   /** Tag name index. */
   protected final Names tags;;
   /** Attribute name index. */
@@ -63,12 +66,14 @@ public abstract class Builder extends Progress {
 
   /**
    * Constructor.
+   * @param nm name of database
    * @param parse parser
    * @param pr properties
    */
-  protected Builder(final Parser parse, final Prop pr) {
+  protected Builder(final String nm, final Parser parse, final Prop pr) {
     parser = parse;
     prop = pr;
+    name = nm;
     final int cats = pr.num(Prop.CATEGORIES);
     tags = new Names(cats);
     atts = new Names(cats);
@@ -78,10 +83,9 @@ public abstract class Builder extends Progress {
 
   /**
    * Builds the database.
-   * @param name name of database
    * @throws IOException I/O exception
    */
-  protected final void parse(final String name) throws IOException {
+  protected final void parse() throws IOException {
     final Performance perf = Util.debug ? new Performance() : null;
     Util.debug(tit() + DOTS);
 
@@ -135,42 +139,42 @@ public abstract class Builder extends Progress {
 
   /**
    * Opens a new element node.
-   * @param name tag name
+   * @param nm tag name
    * @param att attributes
    * @return preValue of the created node
    * @throws IOException I/O exception
    */
-  public final int startElem(final byte[] name, final Atts att)
+  public final int startElem(final byte[] nm, final Atts att)
       throws IOException {
 
-    final int pre = addElem(name, att);
+    final int pre = addElem(nm, att);
     ++lvl;
     return pre;
   }
 
   /**
    * Stores an empty element.
-   * @param name tag name
+   * @param nm tag name
    * @param att attributes
    * @throws IOException I/O exception
    */
-  public final void emptyElem(final byte[] name, final Atts att)
+  public final void emptyElem(final byte[] nm, final Atts att)
       throws IOException {
 
-    addElem(name, att);
+    addElem(nm, att);
     ns.close(pstack.get(lvl));
   }
 
   /**
    * Closes an element.
-   * @param name tag name
+   * @param nm tag name
    * @throws IOException I/O exception
    */
-  public final void endElem(final byte[] name) throws IOException {
+  public final void endElem(final byte[] nm) throws IOException {
     checkStop();
 
-    if(--lvl == 0 || tags.id(name) != tstack.get(lvl))
-      error(CLOSINGTAG, parser.detail(), name, tags.key(tstack.get(lvl)));
+    if(--lvl == 0 || tags.id(nm) != tstack.get(lvl))
+      error(CLOSINGTAG, parser.detail(), nm, tags.key(tstack.get(lvl)));
 
     final int pre = pstack.get(lvl);
     setSize(pre, meta.size - pre);
@@ -241,11 +245,10 @@ public abstract class Builder extends Progress {
 
   /**
    * Builds the database by running the specified parser.
-   * @param db name of the database
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public abstract Data build(final String db) throws IOException;
+  public abstract Data build() throws IOException;
 
   /**
    * Closes open references.
@@ -264,25 +267,25 @@ public abstract class Builder extends Progress {
    * Adds an element node to the database. This method stores a preliminary
    * size value; if this node has further descendants, {@link #setSize} must
    * be called to set the final size value.
-   * @param name the tag name reference
+   * @param nm the tag name reference
    * @param uri namespace uri reference
    * @param dist distance to parent
    * @param asize number of attributes
    * @param ne namespace flag
    * @throws IOException I/O exception
    */
-  protected abstract void addElem(int name, int uri, int dist, int asize,
+  protected abstract void addElem(int nm, int uri, int dist, int asize,
       boolean ne) throws IOException;
 
   /**
    * Adds an attribute to the database.
-   * @param name attribute name
+   * @param nm attribute name
    * @param value attribute value
    * @param dist distance to parent
    * @param uri namespace uri reference
    * @throws IOException I/O exception
    */
-  protected abstract void addAttr(int name, byte[] value, int dist, int uri)
+  protected abstract void addAttr(int nm, byte[] value, int dist, int uri)
     throws IOException;
 
   /**
@@ -307,14 +310,14 @@ public abstract class Builder extends Progress {
 
   /**
    * Adds an element node to the storage.
-   * @param name tag name
+   * @param nm tag name
    * @param att attributes
    * @return pre value of the created node
    * @throws IOException I/O exception
    */
-  private int addElem(final byte[] name, final Atts att) throws IOException {
+  private int addElem(final byte[] nm, final Atts att) throws IOException {
     // get tag reference
-    int n = tags.index(name, null, true);
+    int n = tags.index(nm, null, true);
 
     if(meta.pathindex) path.index(n, Data.ELEM, lvl);
 
@@ -328,7 +331,7 @@ public abstract class Builder extends Progress {
     final int dis = lvl != 0 ? pre - pstack.get(lvl - 1) : 1;
     final int as = att.size;
     final boolean ne = ns.open();
-    int u = ns.uri(name, true);
+    int u = ns.uri(nm, true);
     addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, ne);
 
     // get and store attribute references
@@ -345,7 +348,7 @@ public abstract class Builder extends Progress {
         tags.stat(tstack.get(lvl - 1)).leaf = false;
       } else if(inDoc) {
         // don't allow more than one root node
-        error(MOREROOTS, parser.detail(), name);
+        error(MOREROOTS, parser.detail(), nm);
       }
     }
     if(meta.size != 1) inDoc = true;

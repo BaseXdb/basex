@@ -172,15 +172,15 @@ public final class CreateDB extends ACreate {
 
     // create main memory database instance
     final Prop prop = ctx.prop;
-    if(prop.is(Prop.MAINMEM)) return MemBuilder.build(parser, prop, name);
+    if(prop.is(Prop.MAINMEM)) return MemBuilder.build(name, parser, ctx.prop);
 
     // database is currently locked by another process
     if(ctx.pinned(name)) throw new IOException(Util.info(DBLOCKED, name));
 
     // build database and index structures
-    final Builder builder = new DiskBuilder(parser, ctx);
+    final Builder builder = new DiskBuilder(name, parser, ctx);
     try {
-      final Data data = builder.build(name);
+      final Data data = builder.build();
       if(prop.is(Prop.TEXTINDEX)) data.setIndex(IndexType.TEXT,
         new ValueBuilder(data, true).build());
       if(prop.is(Prop.ATTRINDEX)) data.setIndex(IndexType.ATTRIBUTE,

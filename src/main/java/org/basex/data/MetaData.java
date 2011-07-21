@@ -1,15 +1,18 @@
 package org.basex.data;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.basex.build.BuildException;
+import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.Users;
+import org.basex.core.cmd.DropDB;
 import org.basex.io.IO;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -25,8 +28,6 @@ import org.basex.util.ft.Language;
 public final class MetaData {
   /** Properties. */
   public final Prop prop;
-  /** Path to database. Set to {@code null} for main memory instances. */
-  public final File path;
 
   /** Database name. */
   public String name;
@@ -85,6 +86,26 @@ public final class MetaData {
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
 
+  /** Database path. Set to {@code null} for main memory instances. */
+  private final File path;
+
+  /**
+   * Constructor, specifying the database properties.
+   * @param pr database properties
+   */
+  public MetaData(final Prop pr) {
+    this("", pr, null);
+  }
+
+  /**
+   * Constructor, specifying the database name and context.
+   * @param db database name
+   * @param ctx database context
+   */
+  public MetaData(final String db, final Context ctx) {
+    this(db, ctx.prop, ctx.mprop);
+  }
+
   /**
    * Constructor, specifying the database name.
    * @param db database name
@@ -107,6 +128,8 @@ public final class MetaData {
     users = new Users(false);
   }
 
+  // STATIC METHODS ==========================================================
+
   /**
    * Checks if the specified file path refers to the specified database.
    * @param path file path
@@ -117,25 +140,35 @@ public final class MetaData {
   public static boolean found(final String path, final String db,
       final MainProp mprop) {
 
-    // true is returned if path and database name are equal and if the db exists
-    final boolean exists = mprop.dbpath(db).exists();
+    // return true if the database exists and if the
+    // specified path and database name equal each other
+    final File file = mprop.dbpath(db);
+    final boolean exists = file.exists();
     if(!exists || path.equals(db)) return exists;
 
+    final IO io = IO.get(path);
     DataInput in = null;
     try {
-      // match filename of database instance
-      in = new DataInput(file(mprop.dbpath(db), DATAINFO));
-      String str = "", k;
-      IO p = null;
-      long t = 0;
-      while(!(k = string(in.readBytes())).isEmpty()) {
+      // return true if the storage version is up-to-date and
+      // if the original and the specified file path and date are equal
+      in = new DataInput(file(file, DATAINFO));
+      boolean ok = true;
+      int i = 3;
+      String k;
+      while(i != 0 && !(k = string(in.readBytes())).isEmpty()) {
         final String v = string(in.readBytes());
-        if(k.equals(DBSTR)) str = v;
-        else if(k.equals(DBFNAME)) p = IO.get(v);
-        else if(k.equals(DBTIME)) t = toLong(v);
+        if(k.equals(DBSTR)) {
+          ok &= STORAGE.equals(v);
+          i--;
+        } else if(k.equals(DBFNAME)) {
+          ok &= io.eq(IO.get(v));
+          i--;
+        } else if(k.equals(DBTIME)) {
+          ok &= io.date() == toLong(v);
+          i--;
+        }
       }
-      return p != null && p.eq(IO.get(path)) && STORAGE.equals(str) &&
-        p.date() == t;
+      return i == 0 && ok;
     } catch(final IOException ex) {
       Util.debug(ex);
       return false;
@@ -144,47 +177,36 @@ public final class MetaData {
     }
   }
 
+  // PUBLIC METHODS ===========================================================
+
   /**
    * Returns the size of the database.
    * @return database size
    */
   public long dbsize() {
     long len = 0;
-    for(final File io : path.listFiles()) len += io.length();
+    if(path != null) for(final File io : path.listFiles()) len += io.length();
     return len;
   }
 
   /**
    * Returns a file instance for the specified database file.
+   * Should only be called if database is disk-based.
    * @param fn filename
    * @return database filename
    */
-  public File file(final String fn) {
+  public File dbfile(final String fn) {
     return file(path, fn);
   }
 
   /**
-   * Creates a database file instance.
-   * @param path database path
-   * @param fn filename
+   * Drops the specified database files.
+   * Should only be called if database is disk-based.
+   * @param pat file pattern, or {@code null} if all files are to be deleted
    * @return database filename
    */
-  private static File file(final File path, final String fn) {
-    return new File(path, fn + IO.BASEXSUFFIX);
-  }
-
-  /**
-   * Notifies the meta structures of an update and invalidates the indexes.
-   */
-  void update() {
-    // update database timestamp
-    time = System.currentTimeMillis();
-    uptodate = false;
-    dirty = true;
-    // reset of flags might be skipped if id/pre mapping is supported
-    textindex = false;
-    attrindex = false;
-    ftindex = false;
+  public synchronized boolean drop(final String pat) {
+    return path != null && DropDB.drop(path, pat + IO.BASEXSUFFIX);
   }
 
   /**
@@ -202,9 +224,10 @@ public final class MetaData {
       } else {
         final String v = string(in.readBytes());
         if(k.equals(DBSTR))         storage    = v;
+        else if(k.equals(DBFNAME))  original   = v;
+        else if(k.equals(DBTIME))   time       = toLong(v);
         else if(k.equals(IDBSTR))   istorage   = v;
         else if(k.equals(DBSIZE))   size       = toInt(v);
-        else if(k.equals(DBFNAME))  original       = v;
         else if(k.equals(DBFSIZE))  filesize   = toLong(v);
         else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
         else if(k.equals(DBFTDC))   diacritics = toBool(v);
@@ -223,7 +246,6 @@ public final class MetaData {
         else if(k.equals(DBSCMAX))  maxscore   = toInt(v);
         else if(k.equals(DBSCMIN))  minscore   = toInt(v);
         else if(k.equals(DBSCTYPE)) scoring    = toInt(v);
-        else if(k.equals(DBTIME))   time       = toLong(v);
         else if(k.equals(DBUTD))    uptodate   = toBool(v);
         else if(k.equals(DBLID))    lastid     = toInt(v);
       }
@@ -236,23 +258,15 @@ public final class MetaData {
   }
 
   /**
-   * Converts the specified string to a boolean value.
-   * @param v value
-   * @return result
-   */
-  private boolean toBool(final String v) {
-    return v.equals("1");
-  }
-
-  /**
    * Writes the meta data to the specified output stream.
    * @param out output stream
    * @throws IOException IO Exception
    */
   void write(final DataOutput out) throws IOException {
     writeInfo(out, DBSTR,    STORAGE);
-    writeInfo(out, IDBSTR,   ISTORAGE);
     writeInfo(out, DBFNAME,  original);
+    writeInfo(out, DBTIME,   time);
+    writeInfo(out, IDBSTR,   ISTORAGE);
     writeInfo(out, DBFSIZE,  filesize);
     writeInfo(out, DBNDOCS,  ndocs);
     writeInfo(out, DBENC,    encoding);
@@ -267,16 +281,40 @@ public final class MetaData {
     writeInfo(out, DBFTST,   stemming);
     writeInfo(out, DBFTCS,   casesens);
     writeInfo(out, DBFTDC,   diacritics);
-    if(language != null) writeInfo(out, DBFTLN, language.name());
     writeInfo(out, DBSCMAX,  maxscore);
     writeInfo(out, DBSCMIN,  minscore);
     writeInfo(out, DBSCTYPE, scoring);
-    writeInfo(out, DBTIME,   time);
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);
+    if(language != null) writeInfo(out, DBFTLN, language.name());
     out.writeString(DBPERM);
     users.write(out);
     out.write(0);
+  }
+
+  /**
+   * Notifies the meta structures of an update and invalidates the indexes.
+   */
+  void update() {
+    // update database timestamp
+    time = System.currentTimeMillis();
+    uptodate = false;
+    dirty = true;
+    // reset of flags might be skipped if id/pre mapping is supported
+    textindex = false;
+    attrindex = false;
+    ftindex = false;
+  }
+
+  // PRIVATE METHODS ==========================================================
+
+  /**
+   * Converts the specified string to a boolean value.
+   * @param v value
+   * @return result
+   */
+  private boolean toBool(final String v) {
+    return v.equals("1");
   }
 
   /**
@@ -314,5 +352,15 @@ public final class MetaData {
       final String v) throws IOException {
     out.writeString(k);
     out.writeString(v);
+  }
+
+  /**
+   * Creates a database file instance.
+   * @param path database path
+   * @param fn filename
+   * @return database filename
+   */
+  private static File file(final File path, final String fn) {
+    return new File(path, fn + IO.BASEXSUFFIX);
   }
 }

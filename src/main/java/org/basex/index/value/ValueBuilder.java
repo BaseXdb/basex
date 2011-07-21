@@ -4,11 +4,9 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.index.IndexBuilder;
 import org.basex.index.IndexTree;
-import org.basex.io.IO;
 import org.basex.io.out.DataOutput;
 import org.basex.io.random.DataAccess;
 import org.basex.util.Num;
@@ -100,8 +98,8 @@ public final class ValueBuilder extends IndexBuilder {
    */
   private void merge() throws IOException {
     final String f = text ? DATATXT : DATAATV;
-    final DataOutput outL = new DataOutput(data.meta.file(f + 'l'));
-    final DataOutput outR = new DataOutput(data.meta.file(f + 'r'));
+    final DataOutput outL = new DataOutput(data.meta.dbfile(f + 'l'));
+    final DataOutput outR = new DataOutput(data.meta.dbfile(f + 'r'));
     outL.write4(0);
 
     // initialize cached index iterators
@@ -154,7 +152,7 @@ public final class ValueBuilder extends IndexBuilder {
     outL.close();
 
     // write number of entries to first position
-    final DataAccess da = new DataAccess(data.meta.file(f + 'l'));
+    final DataAccess da = new DataAccess(data.meta.dbfile(f + 'l'));
     da.writeInt(sz);
     da.close();
   }
@@ -167,8 +165,8 @@ public final class ValueBuilder extends IndexBuilder {
    */
   private void write(final String name, final boolean all) throws IOException {
     // write id arrays and references
-    final DataOutput outL = new DataOutput(data.meta.file(name + 'l'));
-    final DataOutput outR = new DataOutput(data.meta.file(name + 'r'));
+    final DataOutput outL = new DataOutput(data.meta.dbfile(name + 'l'));
+    final DataOutput outR = new DataOutput(data.meta.dbfile(name + 'r'));
     outL.write4(index.size());
 
     final IntList il = new IntList();
@@ -195,7 +193,7 @@ public final class ValueBuilder extends IndexBuilder {
 
     // temporarily write texts
     if(!all) {
-      final DataOutput outT = new DataOutput(data.meta.file(name + 't'));
+      final DataOutput outT = new DataOutput(data.meta.dbfile(name + 't'));
       index.init();
       while(index.more()) outT.writeToken(index.keys.get(index.next()));
       outT.close();
@@ -227,8 +225,7 @@ public final class ValueBuilder extends IndexBuilder {
 
   @Override
   public void abort() {
-    final String f = text ? DATATXT : DATAATV;
-    DropDB.drop(data.meta.path, f + ".+" + IO.BASEXSUFFIX);
+    data.meta.drop((text ? DATATXT : DATAATV) + ".+");
     if(text) data.meta.textindex = false;
     else data.meta.attrindex = false;
   }

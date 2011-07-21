@@ -88,7 +88,7 @@ public class DBNode extends ANode {
    * @throws IOException I/O exception
    */
   public DBNode(final Parser parser, final Prop prop) throws IOException {
-    this(MemBuilder.build(parser, prop, ""), 0);
+    this(MemBuilder.build("", parser, prop), 0);
   }
 
   /**

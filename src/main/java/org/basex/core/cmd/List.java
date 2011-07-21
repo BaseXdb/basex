@@ -43,9 +43,9 @@ public final class List extends Command {
       String file = null;
       long size = 0;
       int ndocs = 0;
-      final MetaData meta = new MetaData(name, prop, mprop);
+      final MetaData meta = new MetaData(name, context);
       try {
-        in = new DataInput(meta.file(DATAINFO));
+        in = new DataInput(meta.dbfile(DATAINFO));
         meta.read(in);
         size = meta.dbsize();
         ndocs = meta.ndocs;

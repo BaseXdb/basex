@@ -44,7 +44,7 @@ public final class TableOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public TableOutput(final MetaData md, final String fn) throws IOException {
-    os = new FileOutputStream(md.file(fn));
+    os = new FileOutputStream(md.dbfile(fn));
     meta = md;
     file = fn;
   }
@@ -72,7 +72,7 @@ public final class TableOutput extends OutputStream {
 
     DataOutput dt = null;
     try {
-      dt = new DataOutput(meta.file(file + 'i'));
+      dt = new DataOutput(meta.dbfile(file + 'i'));
       dt.writeNum(bcount);
       dt.writeNum(bcount);
       dt.writeNums(firstPres.toArray());

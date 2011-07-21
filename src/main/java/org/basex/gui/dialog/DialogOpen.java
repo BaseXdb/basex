@@ -171,9 +171,9 @@ public final class DialogOpen extends Dialog {
       if(ok) {
         doc.setText(db);
         DataInput in = null;
-        final MetaData meta = new MetaData(db, ctx.prop, ctx.mprop);
+        final MetaData meta = new MetaData(db, ctx);
         try {
-          in = new DataInput(meta.file(DATAINFO));
+          in = new DataInput(meta.dbfile(DATAINFO));
           meta.read(in);
           detail.setText(InfoDB.db(meta, true, true, true));
         } catch(final IOException ex) {

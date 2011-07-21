@@ -63,19 +63,7 @@ public final class DropDB extends Command {
    */
   public static synchronized boolean drop(final String db,
       final MainProp mprop) {
-    return drop(db, null, mprop);
-  }
-
-  /**
-   * Drops a database directory.
-   * @param db database to delete
-   * @param pat file pattern
-   * @param mprop main properties
-   * @return success of operation
-   */
-  public static synchronized boolean drop(final String db,
-      final String pat, final MainProp mprop) {
-    return drop(mprop.dbpath(db), pat);
+    return drop(mprop.dbpath(db), null);
   }
 
   /**

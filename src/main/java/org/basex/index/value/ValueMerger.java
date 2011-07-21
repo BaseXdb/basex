@@ -2,9 +2,7 @@ package org.basex.index.value;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
-import org.basex.io.IO;
 import org.basex.io.in.DataInput;
 
 /**
@@ -37,7 +35,7 @@ final class ValueMerger {
    */
   ValueMerger(final Data d, final boolean txt, final int i) throws IOException {
     pref = (txt ? DATATXT : DATAATV) + i;
-    dk = new DataInput(d.meta.file(pref + 't'));
+    dk = new DataInput(d.meta.dbfile(pref + 't'));
     dv = new DiskValues(d, txt, pref);
     data = d;
     next();
@@ -55,7 +53,7 @@ final class ValueMerger {
     } else {
       dv.close();
       dk.close();
-      DropDB.drop(data.meta.path, pref + '.' + IO.BASEXSUFFIX);
+      data.meta.drop(pref + '.');
     }
   }
 }
