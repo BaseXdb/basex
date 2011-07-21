@@ -195,7 +195,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
         Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop, "");
 
       final Data data = ctx.data;
-      data.insert(data.meta.size, -1, MemBuilder.build(p, ctx.prop, id));
+      data.insert(data.meta.size, -1, MemBuilder.build(id, p, ctx.prop));
       ctx.update();
       data.flush();
     } catch(final IOException ex) {
