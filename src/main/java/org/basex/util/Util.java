@@ -23,7 +23,7 @@ import org.basex.server.LoginException;
  */
 public final class Util {
   /** Language (applied after restart). */
-  public static String language = MainProp.LANG[1].toString();
+  public static String language = MainProp.LANGUAGE[1].toString();
   /** Flag for showing language keys. */
   public static boolean langkeys;
   /** Debug mode. */
