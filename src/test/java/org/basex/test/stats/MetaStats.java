@@ -54,10 +54,10 @@ public final class MetaStats extends Statistics {
     // total number of namespace URIs
     tl.add(data.ns.size());
     // total string length of text nodes
-    tl.add(ctx.data.meta.file(DATATXT).length());
+    tl.add(ctx.data.meta.dbfile(DATATXT).length());
     //add(tl, "sum(for $d in //text() return string-length($d) + 1)");
     // total string length of attribute values
-    tl.add(ctx.data.meta.file(DATAATV).length());
+    tl.add(ctx.data.meta.dbfile(DATAATV).length());
     //add(tl, "sum(for $d in //@* return string-length($d) + 1)");
     // database size
     tl.add(format(data.meta.dbsize()));

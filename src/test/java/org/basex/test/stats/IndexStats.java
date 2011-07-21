@@ -86,7 +86,7 @@ public final class IndexStats extends Statistics {
     final double time = Token.toInt(p.toString().replaceAll("\\..* ms", ""));
     tl.add(Double.toString(time / 1000.0).replace('.', ','));
     long l = 0;
-    for(final String d : dbf) l += ctx.data.meta.file(d).length();
+    for(final String d : dbf) l += ctx.data.meta.dbfile(d).length();
 
     String inf = exec(new InfoIndex(index));
     final Matcher m = INDEX.matcher(inf);
