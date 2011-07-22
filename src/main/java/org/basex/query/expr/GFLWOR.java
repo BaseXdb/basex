@@ -1,8 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
@@ -17,6 +17,7 @@ import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
+import org.basex.util.list.ObjList;
 
 /**
  * GFLWOR clause.
@@ -275,10 +276,10 @@ public class GFLWOR extends ParseExpr {
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
 
     // evaluate pre grouping tuples
-    ArrayList<Item[]> keys = null;
+    ObjList<Item[]> keys = null;
     ValueList vals = null;
     if(order != null) {
-      keys = new ArrayList<Item[]>();
+      keys = new ObjList<Item[]>();
       vals = new ValueList();
     }
     if(group != null) group.init(fl, order);
@@ -304,7 +305,7 @@ public class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   private void iter(final QueryContext ctx, final Iter[] it, final int p,
-      final ArrayList<Item[]> ks, final ValueList vs) throws QueryException {
+      final ObjList<Item[]> ks, final ValueList vs) throws QueryException {
     final boolean more = p + 1 != fl.length;
     while(it[p].next() != null) {
       if(more) {

@@ -7,14 +7,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 import org.basex.core.Prop;
 import org.basex.io.in.BufferInput;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
 
@@ -216,7 +217,7 @@ public final class IOFile extends IO {
     final File[] ch = file.listFiles();
     if(ch == null) return new IOFile[] {};
 
-    final ArrayList<IOFile> io = new ArrayList<IOFile>(ch.length);
+    final ObjList<IOFile> io = new ObjList<IOFile>(ch.length);
     final Pattern p = Pattern.compile(pattern,
         Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
     for(final File f : ch) {
@@ -297,14 +298,25 @@ public final class IOFile extends IO {
         fn.substring(1) : fn;
   }
 
+
+  /**
+   * Converts a file filter (glob) to a regular expression.
+   * @param glob filter
+   * @return regular expression
+   */
+  public static String regex(final String glob) {
+    return regex(glob, true);
+  }
+
   /**
    * Converts a file filter (glob) to a regular expression. A filter may
    * contain asterisks (*) and question marks (?); commas (,) are used to
    * separate multiple filters.
    * @param glob filter
+   * @param sub accept substring in the result
    * @return regular expression
    */
-  public static String regex(final String glob) {
+  public static String regex(final String glob, final boolean sub) {
     final StringBuilder sb = new StringBuilder();
     for(final String g : glob.split(",")) {
       boolean suf = false;
@@ -334,7 +346,7 @@ public final class IOFile extends IO {
         }
         sb.append(ch);
       }
-      if(!suf) sb.append(".*");
+      if(!suf && sub) sb.append(".*");
     }
     return Prop.WIN ? sb.toString().toLowerCase() : sb.toString();
   }

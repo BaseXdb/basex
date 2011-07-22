@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,8 @@ public final class DialogCreate extends Dialog {
   private final BaseXTextField path;
   /** Document filter. */
   private final BaseXTextField filter;
+  /** Add ZIP archives. */
+  private final BaseXCheckBox archives;
   /** Database name. */
   private final BaseXTextField dbname;
   /** Database info. */
@@ -70,7 +73,7 @@ public final class DialogCreate extends Dialog {
     // create panels
     final BaseXBack p1 = new BaseXBack(new BorderLayout()).border(8);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(6, 2, 8, 0));
+    final BaseXBack p = new BaseXBack(new TableLayout(7, 2, 8, 0));
     p.add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
     p.add(new BaseXLabel());
 
@@ -85,6 +88,11 @@ public final class DialogCreate extends Dialog {
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
     p.add(browse);
+
+    archives = new BaseXCheckBox(CREATEARCHIVES,
+        prop.is(Prop.ADDARCHIVES), this);
+    p.add(archives);
+    p.add(new BaseXLabel());
 
     p.add(new BaseXLabel(CREATEPATTERN + COL, true, true).border(8, 0, 4, 0));
     p.add(new BaseXLabel());

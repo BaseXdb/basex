@@ -654,8 +654,8 @@ public interface Text {
   String USERALTER = lang("ad_useralter");
   /** User unknown. */
   String USERKNOWN = lang("ad_userknown");
-  /** No password specified. */
-  String PASSNO = lang("ad_passno");
+  /** Password is no valid MD5 hash. */
+  String USERMD5 = lang("ad_usermd5");
   /** Admin user. */
   String USERADMIN = lang("ad_admin");
   /** Killed sessions. */
@@ -1135,6 +1135,8 @@ public interface Text {
   String CREATEDTD = lang("dc_dtd");
   /** Internal parser. */
   String CREATEINTPARSE = lang("dc_intparse");
+  /** Parse archives. */
+  String CREATEARCHIVES = lang("dc_archives");
   /** SAX parsing information. */
   String CREATEFORMAT = lang("dc_createformat") + COLS;
 
@@ -1397,10 +1399,11 @@ public interface Text {
   String DEVELOPER = lang("da_dev") + ": Christian Gr\u00FCn";
   /** Contributors info. */
   String CONTRIBUTE1 = lang("da_cont1") +
-  ": Andreas Weiler, Michael Seiferle, Lukas Kircher,";
+  ": Michael Seiferle, Alexander Holupirek,";
   /** Developer names. */
-  String CONTRIBUTE2 = "Leo W\u00F6rteler, Alexander Holupirek, " +
-    lang("da_cont2");
+  String CONTRIBUTE2 = "Leo W\u00F6rteler, Rositsa Shadura, Dimitar Popov,";
+  /** Developer names. */
+  String CONTRIBUTE3 = "Lukas Kircher, Andreas Weiler " + lang("da_cont2");
   /** Translation. */
   String TRANSLATION = lang("da_translation") + COLS;
 

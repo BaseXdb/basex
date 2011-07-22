@@ -18,8 +18,12 @@ import org.basex.server.Sessions;
  * @author Christian Gruen
  */
 public final class Context {
+  /** Client listener. Set to {@code null} in standalone/server mode. */
+  public final ClientListener listener;
   /** Database properties. */
-  public final Prop prop = new Prop(true);
+  public final Prop prop = new Prop();
+  /** Main properties. */
+  public final MainProp mprop;
   /** Client connections. */
   public final Sessions sessions;
   /** Event pool. */
@@ -31,8 +35,6 @@ public final class Context {
   /** Package repository. */
   public final Repo repo;
 
-  /** Session reference. */
-  public ClientListener session;
   /** User reference. */
   public User user;
   /** Current query file. */
@@ -58,31 +60,31 @@ public final class Context {
    * Constructor.
    */
   public Context() {
+    listener = null;
+    mprop = new MainProp();
     datas = new Datas();
     events = new Events();
     sessions = new Sessions();
     lock = new Lock(this);
     users = new Users(true);
-    user = users.get(ADMIN);
     repo = new Repo(this);
+    user = users.get(ADMIN);
   }
 
   /**
    * Constructor. {@link #user} reference must be set after calling this.
    * @param ctx parent database context
-   * @param s server process
+   * @param cl client listener
    */
-  public Context(final Context ctx, final ClientListener s) {
-    session = s;
+  public Context(final Context ctx, final ClientListener cl) {
+    listener = cl;
+    mprop = ctx.mprop;
     datas = ctx.datas;
     events = ctx.events;
     sessions = ctx.sessions;
     lock = ctx.lock;
     users = ctx.users;
     repo = ctx.repo;
-    prop.set(Prop.EVENTPORT, ctx.prop.num(Prop.EVENTPORT));
-    prop.set(Prop.TIMEOUT, ctx.prop.num(Prop.TIMEOUT));
-    prop.set(Prop.PARALLEL, ctx.prop.num(Prop.PARALLEL));
   }
 
   /**
@@ -94,7 +96,15 @@ public final class Context {
   }
 
   /**
-   * Returns true if the current node set contains all documents.
+   * Returns {@code true} if the current context belongs to a client user.
+   * @return result of check
+   */
+  public boolean client() {
+    return listener != null;
+  }
+
+  /**
+   * Returns {@code true} if the current node set contains all documents.
    * @return result of check
    */
   public boolean root() {

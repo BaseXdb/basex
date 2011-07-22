@@ -1,8 +1,8 @@
 package org.basex.gui.view.tree;
 
-import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * This class determines nodes per level and caches them.
@@ -22,8 +22,7 @@ final class TreeNodeCache implements TreeConstants {
    * @param atts show attributes
    */
   TreeNodeCache(final Data data, final boolean atts) {
-
-      final ArrayList<IntList> alil = new ArrayList<IntList>();
+      final ObjList<IntList> alil = new ObjList<IntList>();
 
       if(USE_CHILDITERATOR) {
         IntList parList = new IntList(1);
@@ -60,51 +59,8 @@ final class TreeNodeCache implements TreeConstants {
         }
         maxLevel = alil.size();
       }
-      nodes = alil.toArray(new IntList[maxLevel]);
+      nodes = alil.toArray(new IntList[alil.size()]);
   }
-
-  // old version using meta.height
-  //
-  // /**
-  // * This constructor invokes methods to cache all document nodes.
-  // * @param data data reference
-  // */
-  // TreeNodeCache(final Data data) {
-  // maxLevel = data.meta.height + 1;
-  //
-  // if(USE_CHILDITERATOR) {
-  // IntList parList = new IntList(1);
-  // parList.add(0);
-  // nodes = new IntList[maxLevel];
-  // int l = 0;
-  // while(maxLevel > l) {
-  // nodes[l++] = parList;
-  // parList = getNextNodeLine(parList, data);
-  // }
-  // } else {
-  // final IntList[] li = new IntList[maxLevel];
-  // for(int i = 0; i < maxLevel; ++i)
-  // li[i] = new IntList();
-  // final int ts = data.meta.size;
-  // final int[] roots = data.doc();
-  // for(int i = 0; i < roots.length; ++i) {
-  // final int root = roots[i];
-  // li[0].add(root);
-  // final int sh = i + 1 == roots.length ? ts : roots[i + 1];
-  // for(int p = root + 1; p < sh; ++p) {
-  // final int k = data.kind(p);
-  // if(!SHOW_ATTR && k == Data.ATTR || ONLY_ELEMENT_NODES
-  // & k != Data.ELEM) continue;
-  // int lv = 0;
-  // final int par = data.parent(p, k);
-  // while(par != li[lv].get(li[lv].size() - 1))
-  // ++lv;
-  // li[lv + 1].add(p);
-  // }
-  // }
-  // nodes = li;
-  // }
-  // }
 
   /**
    * Saves node line in parentList.
@@ -136,16 +92,10 @@ final class TreeNodeCache implements TreeConstants {
   private int getMinIndex(final int lv, final int lp, final int rp) {
     final int l = 0;
     final int r = nodes[lv].size() - 1;
-
     int min = searchPreIndex(lv, lp, rp, l, r);
-
     if(min == -1) return min;
-
     final int[] n = nodes[lv].toArray();
-
-    while(min-- > 0 && n[min] > lp)
-      ;
-
+    while(min-- > 0 && n[min] > lp);
     return min + 1;
   }
 
@@ -171,29 +121,22 @@ final class TreeNodeCache implements TreeConstants {
 
     // level pair
     bo[rl] = new TreeBorder(rl, ri, 1);
-
     final int np = pre + d.size(pre, d.kind(pre));
     int h = 1;
 
     for(int i = rl + 1; i < maxLevel; ++i) {
-
       final int min = getMinIndex(i, pre, np);
-
       if(min == -1) break;
-
       int c = 0;
-
       for(int j = min; j < nodes[i].size(); ++j)
         if(nodes[i].get(j) < np) ++c;
         else break;
-
       bo[i] = new TreeBorder(i, min, c);
       ++h;
     }
 
     final TreeBorder[] bon = new TreeBorder[h];
     System.arraycopy(bo, rl, bon, 0, h);
-
     return bon;
   }
 

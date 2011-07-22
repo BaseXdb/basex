@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
@@ -25,8 +24,8 @@ import org.basex.util.Util;
  */
 public final class CreateBackup extends Command {
   /** Date format. */
-  private static final SimpleDateFormat DATE = new SimpleDateFormat(
-      "yyyy-MM-dd-HH-mm-ss");
+  private static final SimpleDateFormat DATE =
+    new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
   /**
    * Default constructor.
@@ -47,8 +46,8 @@ public final class CreateBackup extends Command {
     // loop through all databases
     boolean ok = true;
     for(final String db : dbs) {
-      if(!prop.dbpath(db).isDirectory()) continue;
-      if(backup(db, prop)) {
+      if(!mprop.dbpath(db).isDirectory()) continue;
+      if(backup(db)) {
         // backup was successful
         info(DBBACKUP, db, perf);
       } else {
@@ -62,13 +61,12 @@ public final class CreateBackup extends Command {
   /**
    * Backups the specified database.
    * @param db database name
-   * @param pr database properties
    * @return success flag
    */
-  private boolean backup(final String db, final Prop pr) {
+  private boolean backup(final String db) {
     try {
-      final File in = pr.dbpath(db);
-      final IOFile file = new IOFile(pr.dbpath(db + "-" +
+      final File in = mprop.dbpath(db);
+      final IOFile file = new IOFile(mprop.dbpath(db + "-" +
           DATE.format(new Date()) + IO.ZIPSUFFIX));
 
       final Zip zip = progress(new Zip(file));

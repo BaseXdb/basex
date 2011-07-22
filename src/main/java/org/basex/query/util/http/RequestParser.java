@@ -3,17 +3,16 @@ package org.basex.query.util.http;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.List;
-
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.AxisMoreIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.util.http.Request.Part;
 import org.basex.util.InputInfo;
 import org.basex.util.hash.TokenMap;
+import org.basex.util.list.ObjList;
 
 /**
  * Request parser.
@@ -182,8 +181,8 @@ public final class RequestParser {
    * @throws QueryException query exception
    */
   private static void parseMultipart(final ANode multipart,
-      final ItemCache contItems, final TokenMap attrs, final List<Part> parts,
-      final InputInfo ii) throws QueryException {
+      final ItemCache contItems, final TokenMap attrs,
+      final ObjList<Part> parts, final InputInfo ii) throws QueryException {
     parseAttrs(multipart, attrs);
     if(attrs.get(MEDIATYPE) == null) REQINV.thrw(ii,
         "Attribute media-type of http:multipart is mandatory");

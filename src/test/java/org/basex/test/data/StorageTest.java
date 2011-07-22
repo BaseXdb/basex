@@ -47,7 +47,7 @@ public final class StorageTest {
   public void setUp() throws BaseXException {
     ctx = new Context();
     new CreateDB(DBNAME, DBFILE).execute(ctx);
-    tbl = new File(ctx.prop.dbpath(DBNAME).toString() + "/tbl.basex");
+    tbl = new File(ctx.mprop.dbpath(DBNAME).toString() + "/tbl.basex");
   }
 
   /**

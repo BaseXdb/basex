@@ -1,8 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
@@ -14,6 +14,7 @@ import org.basex.query.path.AxisStep;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
+import org.basex.util.list.ObjList;
 
 /**
  * Abstract predicate expression, implemented by {@link Filter} and
@@ -65,7 +66,7 @@ public abstract class Preds extends ParseExpr {
           ctx.compInfo(OPTPRED, pred[p].desc());
           final Expr[] and = ((And) pred[p]).expr;
           final int m = and.length - 1;
-          final ArrayList<Expr> tmp = new ArrayList<Expr>(pred.length + m);
+          final ObjList<Expr> tmp = new ObjList<Expr>(pred.length + m);
           for(int i = 0; i < p; i++) tmp.add(pred[i]);
           for(final Expr a : and) {
             // wrap test with boolean() if the result is numeric

@@ -34,7 +34,7 @@ public final class Check extends Command {
 
     final String path = args[0];
     final String name = IO.get(path).dbname();
-    final Command cmd = MetaData.found(path, name, context.prop) ?
+    final Command cmd = MetaData.found(path, name, mprop) ?
       new Open(name) : new CreateDB(name, path);
     final boolean ok = cmd.run(context);
     final String msg = cmd.info().trim();
@@ -58,8 +58,8 @@ public final class Check extends Command {
     // check if database is already opened
     final Data data = ctx.pin(name);
     if(data != null) {
-      final IO in = IO.get(data.meta.path);
-      final boolean found = !data.meta.path.isEmpty() && in.eq(io) &&
+      final IO in = IO.get(data.meta.original);
+      final boolean found = !data.meta.original.isEmpty() && in.eq(io) &&
         io.date() == in.date();
       if(found && ctx.perm(User.READ, data.meta)) return data;
       Close.close(data, ctx);
@@ -67,7 +67,7 @@ public final class Check extends Command {
     }
 
     // if found, an existing database is opened
-    return MetaData.found(path, name, ctx.prop) ? Open.open(name, ctx) :
+    return MetaData.found(path, name, ctx.mprop) ? Open.open(name, ctx) :
       // if flag is set to true, a new database instance is created on disk
       ctx.prop.is(Prop.FORCECREATE) ? CreateDB.xml(name, io, ctx) :
         // otherwise, a main memory instance is created

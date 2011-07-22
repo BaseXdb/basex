@@ -3,6 +3,7 @@ package org.basex.gui.layout;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -11,19 +12,30 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
+
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Util;
+import org.basex.util.list.ObjList;
 
 /**
  * This class assembles layout and paint methods which are frequently
@@ -54,13 +66,23 @@ public final class BaseXLayout {
   }
 
   /**
-   * Returns the class reference of the specified container.
+   * Returns the GUI reference of the specified container.
    * @param cont input container
    * @return gui
    */
-  private static GUI gui(final Component cont) {
+  static GUI gui(final Component cont) {
     final Container c = cont.getParent();
     return c == null || c instanceof GUI ? (GUI) c : gui(c);
+  }
+
+  /**
+   * Returns the dialog reference of the specified container.
+   * @param cont input container
+   * @return gui
+   */
+  static Dialog dialog(final Component cont) {
+    final Container c = cont.getParent();
+    return c == null || c instanceof Dialog ? (Dialog) c : dialog(c);
   }
 
   /**
@@ -98,6 +120,58 @@ public final class BaseXLayout {
    */
   static void addInteraction(final Component comp, final Window win) {
     addInteraction(comp, win, null);
+  }
+
+  /**
+   * Adds drag and drop functionality.
+   * @param comp component
+   * @param dnd drag and drop handler
+   */
+  public static void addDrop(final JComponent comp, final DropHandler dnd) {
+    comp.setDropTarget(new DropTarget(comp,
+        DnDConstants.ACTION_COPY_OR_MOVE, null, true, null) {
+      @Override
+      public synchronized void drop(final DropTargetDropEvent dtde) {
+        dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+        final Transferable tr = dtde.getTransferable();
+        for(final Object o : contents(tr)) dnd.drop(o);
+        comp.requestFocusInWindow();
+      }
+    });
+  }
+
+  /**
+   * Returns the contents of the specified transferable.
+   * @param tr transferable
+   * @return contents
+   */
+  @SuppressWarnings("unchecked")
+  public static ObjList<Object> contents(final Transferable tr) {
+    final ObjList<Object> list = new ObjList<Object>();
+    try {
+      if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+        for(final File fl : (List<File>)
+            tr.getTransferData(DataFlavor.javaFileListFlavor)) list.add(fl);
+      } else if(tr.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        list.add(tr.getTransferData(DataFlavor.stringFlavor));
+      }
+    } catch(final Exception ex) {
+      Util.stack(ex);
+    }
+    return list;
+  }
+
+  /**
+   * Drag and drop handler.
+   * @author BaseX Team 2005-11, BSD License
+   * @author Christian Gruen
+   */
+  public abstract static class DropHandler {
+    /**
+     * Drops a file.
+     * @param obj object to be dropped
+     */
+    public abstract void drop(final Object obj);
   }
 
   /**

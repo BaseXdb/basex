@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -64,7 +65,7 @@ public final class FNInfo extends FuncCall {
             final Item i = ir.next();
             if(i != null) {
               final TokenBuilder tb = new TokenBuilder(s);
-              if(s.length != 0) tb.add(": ");
+              if(s.length != 0) tb.add(COLS);
               tb.add(i.toString());
               // if GUI is used, or if user is no admin, trace info is cached
               if(Prop.gui || !ctx.context.user.perm(User.ADMIN)) {

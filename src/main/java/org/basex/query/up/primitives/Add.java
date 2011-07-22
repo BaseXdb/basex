@@ -2,9 +2,7 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-import java.util.List;
 import org.basex.build.DirParser;
 import org.basex.build.MemBuilder;
 import org.basex.core.Context;
@@ -19,6 +17,7 @@ import org.basex.query.util.DataBuilder;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * Add primitive.
@@ -28,7 +27,7 @@ import org.basex.util.list.IntList;
  */
 public final class Add extends InsertBase {
   /** Documents to add. */
-  private final List<Item> docs;
+  private final ObjList<Item> docs;
   /** New document name (used only for adding a single document). */
   private final byte[] name;
   /** Path to which new document(s) will be added. */
@@ -45,7 +44,7 @@ public final class Add extends InsertBase {
    * @param p document(s) path
    * @param c database context
    */
-  public Add(final Data trg, final InputInfo i, final List<Item> d,
+  public Add(final Data trg, final InputInfo i, final ObjList<Item> d,
       final byte[] n, final byte[] p, final Context c) {
 
     super(PrimitiveType.INSERTAFTER, lastDoc(trg), trg, i, null);
@@ -62,11 +61,7 @@ public final class Add extends InsertBase {
 
   @Override
   public void merge(final UpdatePrimitive p) {
-    if(p instanceof Add) {
-      docs.addAll(((Add) p).docs);
-    } else {
-      Util.notexpected(p);
-    }
+    for(final Item d : ((Add) p).docs) docs.add(d);
   }
 
   @Override
@@ -91,11 +86,11 @@ public final class Add extends InsertBase {
       } else if(d.str()) {
         // adding file(s) from a path
         final String docpath = string(d.atom(input));
-        final IO io = IO.get(docpath);
-        final DirParser p = new DirParser(io, ctx.prop);
-        final MemBuilder b = new MemBuilder(p, ctx.prop);
+        final String nm = ctx.mprop.random(data.meta.name);
+        final DirParser p = new DirParser(IO.get(docpath), ctx.prop);
+        final MemBuilder b = new MemBuilder(nm, p, ctx.prop);
         try {
-          docData = b.build(data.meta.random());
+          docData = b.build();
         } catch(final IOException e) {
           throw DOCERR.thrw(input, docpath);
         }

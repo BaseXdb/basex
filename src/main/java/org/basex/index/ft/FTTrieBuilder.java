@@ -3,10 +3,8 @@ package org.basex.index.ft;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
-import org.basex.io.IO;
 import org.basex.io.out.DataOutput;
 import org.basex.io.random.DataAccess;
 import org.basex.util.list.IntArrayList;
@@ -76,8 +74,8 @@ final class FTTrieBuilder extends FTBuilder {
 
     // merges temporary index files
     writeIndex(csize++);
-    final DataOutput outB = new DataOutput(data.meta.file(DATAFTX + 'b'));
-    final DataOutput outT = new DataOutput(data.meta.file(DATAFTX + 't'));
+    final DataOutput outB = new DataOutput(data.meta.dbfile(DATAFTX + 'b'));
+    final DataOutput outT = new DataOutput(data.meta.dbfile(DATAFTX + 't'));
     final IntList ind = new IntList();
 
     // open all temporary sorted lists
@@ -131,7 +129,7 @@ final class FTTrieBuilder extends FTBuilder {
     if(scm == 0) hash.init();
     else hash.initIter();
 
-    final DataOutput outB = new DataOutput(data.meta.file(DATAFTX + 'b'));
+    final DataOutput outB = new DataOutput(data.meta.dbfile(DATAFTX + 'b'));
     while(hash.more()) {
       final int p = hash.next();
       final byte[] tok = hash.key();
@@ -147,8 +145,8 @@ final class FTTrieBuilder extends FTBuilder {
     final TokenList tokens = index.tokens;
     final IntArrayList next = index.next;
 
-    final DataOutput outA = new DataOutput(data.meta.file(DATAFTX + 'a'));
-    final DataOutput outC = new DataOutput(data.meta.file(DATAFTX + 'c'));
+    final DataOutput outA = new DataOutput(data.meta.dbfile(DATAFTX + 'a'));
+    final DataOutput outC = new DataOutput(data.meta.dbfile(DATAFTX + 'c'));
 
     // write root node (token length and bytes)
     outA.write1(1);
@@ -185,9 +183,9 @@ final class FTTrieBuilder extends FTBuilder {
    */
   private void writeSplitTrie(final IntList roots) throws IOException {
     final MetaData md = data.meta;
-    final DataOutput outA = new DataOutput(md.file(DATAFTX + 'a'));
-    final DataOutput outC = new DataOutput(md.file(DATAFTX + 'c'));
-    final DataAccess outT = new DataAccess(md.file(DATAFTX + 't'));
+    final DataOutput outA = new DataOutput(md.dbfile(DATAFTX + 'a'));
+    final DataOutput outC = new DataOutput(md.dbfile(DATAFTX + 'c'));
+    final DataAccess outT = new DataAccess(md.dbfile(DATAFTX + 't'));
     final int[] root = new int[roots.size()];
     int rp = 0;
 
@@ -232,14 +230,14 @@ final class FTTrieBuilder extends FTBuilder {
     outC.write4(0);
     outC.close();
 
-    final DataAccess tmp = new DataAccess(md.file(DATAFTX + 'a'));
+    final DataAccess tmp = new DataAccess(md.dbfile(DATAFTX + 'a'));
     long c = 2;
     for(final int r : root) {
       tmp.writeInt(c, r);
       c += 5;
     }
     tmp.close();
-    DropDB.drop(md.name, DATAFTX + 't' + IO.BASEXSUFFIX, md.prop);
+    md.drop(DATAFTX + 't');
   }
 
   /**
@@ -312,8 +310,8 @@ final class FTTrieBuilder extends FTBuilder {
   @Override
   protected void writeIndex(final int cs) throws IOException {
     final String f = DATAFTX + (merge ? cs : "");
-    final DataOutput outA = new DataOutput(data.meta.file(f + 'a'));
-    final DataOutput outB = new DataOutput(data.meta.file(f + 'b'));
+    final DataOutput outA = new DataOutput(data.meta.dbfile(f + 'a'));
+    final DataOutput outB = new DataOutput(data.meta.dbfile(f + 'b'));
 
     if(scm == 0) hash.init();
     else hash.initIter();

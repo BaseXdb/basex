@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
-import org.basex.io.out.DataOutput;
 
 /**
  * This class allows main memory access to the database table representation.
@@ -14,55 +13,23 @@ import org.basex.io.out.DataOutput;
  */
 public final class TableMemAccess extends TableAccess {
   /** Long buffer array. */
-  private long[] buf1;
+  private long[] buf1 = new long[16];
   /** Long buffer array. */
-  private long[] buf2;
+  private long[] buf2 = new long[16];
 
   /**
    * Stores the table in long arrays.
    * @param md meta data
-   * @param pf file prefix
-   * @param s array size
    */
-  public TableMemAccess(final MetaData md, final String pf, final int s) {
-    super(md, pf);
-    buf1 = new long[s];
-    buf2 = new long[s];
+  public TableMemAccess(final MetaData md) {
+    super(md);
   }
 
   @Override
   public void flush() { }
 
   @Override
-  public void close() throws IOException {
-    if(dirty && pref != null) {
-      DataOutput out = new DataOutput(meta.file(pref + 'i'));
-
-      final int blocks = (meta.size + IO.ENTRIES - 1) / IO.ENTRIES;
-      out.writeNum(blocks);
-      out.writeNum(blocks);
-      out.writeNum(meta.size);
-
-      final int[] array = new int[blocks];
-      for(int b = 0, c = 0; b < blocks; ++b, c += IO.ENTRIES) array[b] = c;
-      out.writeNums(array);
-      for(int b = 0; b < blocks; ++b) array[b] = b;
-      out.writeNums(array);
-      out.close();
-      out = new DataOutput(meta.file(pref));
-      final byte[] data = new byte[IO.BLOCKSIZE];
-      int a = 0;
-      for(int b = 0; b < blocks; ++b) {
-        for(int p = 0; p < IO.BLOCKSIZE && a < meta.size; p += 16, ++a) {
-          copy(buf1[a], data, p);
-          copy(buf2[a], data, p + 8);
-        }
-        out.writeBytes(data);
-      }
-      out.close();
-      dirty = false;
-    }
-  }
+  public void close() throws IOException { }
 
   @Override
   public int read1(final int p, final int o) {
@@ -173,22 +140,5 @@ public final class TableMemAccess extends TableAccess {
        (v[i + 2] & 0xFFL) << 40 | (v[i + 3] & 0xFFL) << 32 |
        (v[i + 4] & 0xFFL) << 24 | (v[i + 5] & 0xFFL) << 16 |
        (v[i + 6] & 0xFFL) <<  8 | v[i + 7] & 0xFFL;
-  }
-
-  /**
-   * Copies a long value to the specified byte array.
-   * @param v long value
-   * @param a array
-   * @param p position
-   */
-  private void copy(final long v, final byte[] a, final int p) {
-    a[p    ] = (byte) (v >> 56);
-    a[p + 1] = (byte) (v >> 48);
-    a[p + 2] = (byte) (v >> 40);
-    a[p + 3] = (byte) (v >> 32);
-    a[p + 4] = (byte) (v >> 24);
-    a[p + 5] = (byte) (v >> 16);
-    a[p + 6] = (byte) (v >>  8);
-    a[p + 7] = (byte) v;
   }
 }

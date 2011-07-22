@@ -14,19 +14,15 @@ import org.basex.io.IO;
 public abstract class TableAccess {
   /** Meta data. */
   protected final MetaData meta;
-  /** Filename prefix. */
-  protected final String pref;
   /** Dirty index flag. */
   protected boolean dirty;
 
   /**
    * Constructor.
    * @param md meta data
-   * @param pf file prefix
    */
-  protected TableAccess(final MetaData md, final String pf) {
+  protected TableAccess(final MetaData md) {
     meta = md;
-    pref = pf;
   }
 
   /**

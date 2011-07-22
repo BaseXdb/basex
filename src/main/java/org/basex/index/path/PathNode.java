@@ -2,7 +2,6 @@ package org.basex.index.path;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import org.basex.core.Text;
 import org.basex.data.Data;
 import org.basex.io.in.DataInput;
@@ -10,6 +9,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ObjList;
 
 /**
  * This class represents a node of the path summary.
@@ -99,7 +99,7 @@ public final class PathNode {
    * Recursively adds the node and its descendants to the specified list.
    * @param nodes node list
    */
-  void addDesc(final ArrayList<PathNode> nodes) {
+  void addDesc(final ObjList<PathNode> nodes) {
     // [CG] DATA: check for duplicates?
     // if(!nodes.contains(nodes)) nodes.add(this);
     nodes.add(this);

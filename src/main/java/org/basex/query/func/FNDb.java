@@ -4,19 +4,15 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
+import org.basex.core.User;
 import org.basex.core.cmd.ACreate;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
-import org.basex.core.cmd.Optimize;
-import org.basex.core.cmd.OptimizeAll;
 import org.basex.data.Data;
-import org.basex.data.DiskData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.SerializerException;
@@ -25,12 +21,12 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
-import org.basex.query.item.DBNodeSeq;
+import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
@@ -41,11 +37,13 @@ import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
 import org.basex.query.up.primitives.Add;
 import org.basex.query.up.primitives.DeleteNode;
+import org.basex.query.up.primitives.Optimize;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * Database functions.
@@ -265,7 +263,7 @@ public final class FNDb extends FuncCall {
     final byte[] path = expr.length < 4 ? null : path(checkStr(expr[3], ctx));
 
     // get all items representing document(s):
-    final ArrayList<Item> docs = new ArrayList<Item>(
+    final ObjList<Item> docs = new ObjList<Item>(
         (int) Math.max(expr[1].size(), 1));
     final Iter iter = ctx.iter(expr[1]);
     for(Item i; (i = iter.next()) != null;) docs.add(i);
@@ -309,7 +307,7 @@ public final class FNDb extends FuncCall {
       trgpath = subtoken(trg, 0, p);
     }
 
-    final ArrayList<Item> docs = new ArrayList<Item>(1);
+    final ObjList<Item> docs = new ObjList<Item>(1);
     docs.add(doc);
     final Add add = new Add(data, input, docs, trgname, trgpath, ctx.context);
     ctx.updates.add(add, ctx);
@@ -372,17 +370,7 @@ public final class FNDb extends FuncCall {
     final boolean all = expr.length == 2 && checkBln(expr[1], ctx);
     final Data data = data(0, ctx);
 
-    try {
-      if(all) {
-        if(!(data instanceof DiskData)) PROCMM.thrw(input);
-        if(ctx.context.datas.pins(data.meta.name) > 1) DBLOCKED.thrw(input);
-        OptimizeAll.optimizeAll((DiskData) data, data.meta.prop);
-      } else {
-        Optimize.optimize(data, data.meta.prop);
-      }
-    } catch(final IOException ex) {
-      DBERR.thrw(input, ex.getMessage());
-    }
+    ctx.updates.add(new Optimize(data, ctx.context, all, input), ctx);
     return null;
   }
 
@@ -451,7 +439,7 @@ public final class FNDb extends FuncCall {
       def == Function.DBOPTIMIZE;
     return
       u == Use.CTX && (def == Function.DBTEXT || def == Function.DBATTR ||
-        def == Function.DBFULLTEXT || def == Function.DBEVENT) ||
+        def == Function.DBFULLTEXT || def == Function.DBEVENT || up) ||
       u == Use.UPD && up || super.uses(u);
   }
 

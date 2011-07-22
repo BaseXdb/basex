@@ -88,7 +88,7 @@ public class DBNode extends ANode {
    * @throws IOException I/O exception
    */
   public DBNode(final Parser parser, final Prop prop) throws IOException {
-    this(MemBuilder.build(parser, prop, ""), 0);
+    this(MemBuilder.build("", parser, prop), 0);
   }
 
   /**
@@ -181,7 +181,7 @@ public class DBNode extends ANode {
   @Override
   public final byte[] base() {
     if(type != NodeType.DOC) return EMPTY;
-    final String dir = data.meta.path;
+    final String dir = data.meta.original;
     final String name = string(data.text(pre, true));
     return token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
   }

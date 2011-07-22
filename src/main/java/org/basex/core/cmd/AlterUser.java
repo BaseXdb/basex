@@ -2,8 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Command;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
 
@@ -13,14 +11,14 @@ import org.basex.core.Commands.CmdAlter;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class AlterUser extends Command {
+public final class AlterUser extends AUser {
   /**
    * Default constructor.
    * @param name user name
    * @param pw password
    */
   public AlterUser(final String name, final String pw) {
-    super(User.ADMIN, name, pw);
+    super(name, pw);
   }
 
   @Override
@@ -28,8 +26,7 @@ public final class AlterUser extends Command {
     final String user = args[0];
     final String pass = args[1];
     if(!validName(user, false)) return error(NAMEINVALID, user);
-    return pass == null || pass.isEmpty() ? error(PASSNO, user) :
-      context.users.alter(user, pass) ?
+    return !isMD5(pass) ? error(USERMD5) : context.users.alter(user, pass) ?
       info(USERALTER, user) : error(USERNO, user);
   }
 

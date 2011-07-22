@@ -104,7 +104,6 @@ public class CmdTest {
     CONTEXT.close();
   }
 
-
   /**
    * Creates the database.
    * @throws BaseXException database exception
@@ -141,9 +140,9 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void alterUser() {
-    ok(new CreateUser(NAME2, NAME2));
-    ok(new AlterUser(NAME2, "test"));
-    no(new AlterUser(":", NAME2));
+    ok(new CreateUser(NAME2, md5(NAME2)));
+    ok(new AlterUser(NAME2, md5("test")));
+    no(new AlterUser(":", md5(NAME2)));
   }
 
   /** Command test. */
@@ -209,8 +208,8 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void createUser() {
-    ok(new CreateUser(NAME2, "test"));
-    no(new CreateUser(NAME2, "test"));
+    ok(new CreateUser(NAME2, md5("test")));
+    no(new CreateUser(NAME2, md5("test")));
     ok(new DropUser(NAME2));
     no(new CreateUser("", ""));
     no(new CreateUser(":", ""));
@@ -276,8 +275,8 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void dropUser() {
-    ok(new CreateUser(NAME, NAME));
-    ok(new CreateUser(NAME2, NAME));
+    ok(new CreateUser(NAME, md5(NAME)));
+    ok(new CreateUser(NAME2, md5(NAME)));
 
     ok(new DropUser(NAME));
     ok(new DropUser(NAME2));
@@ -285,8 +284,8 @@ public class CmdTest {
     no(new DropUser(NAME2, ":"));
 
     ok(new CreateDB(NAME));
-    ok(new CreateUser(NAME, NAME));
-    ok(new CreateUser(NAME2, NAME));
+    ok(new CreateUser(NAME, md5(NAME)));
+    ok(new CreateUser(NAME2, md5(NAME)));
     ok(new DropUser(NAME2, NAME + "*"));
     ok(new DropUser(NAME + "," + NAME2));
   }
@@ -320,8 +319,8 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void grant() {
-    ok(new CreateUser(NAME2, "test"));
-    ok(new CreateUser(NAME, "test"));
+    ok(new CreateUser(NAME2, md5("test")));
+    ok(new CreateUser(NAME, md5("test")));
     no(new Grant("something", NAME2));
     ok(new CreateDB(NAME));
     ok(new Grant("none", NAME + "*", NAME + "*"));
@@ -411,7 +410,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void password() {
-    ok(new Password("admin"));
+    ok(new Password(md5("admin")));
     no(new Password(""));
   }
 

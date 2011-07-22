@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.basex.build.DiskBuilder;
 import org.basex.build.Parser;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
@@ -31,7 +32,7 @@ public final class BlockAccessTest {
   /** Test database name. */
   private static final String DBNAME = Util.name(BlockAccessTest.class);
   /** Test file we do updates with. */
-  private static final Prop PROP = new Prop(true);
+  private static final Context CONTEXT = new Context();
   /** BlockStorage. */
   private TableDiskAccess tda;
   /** Data reference. */
@@ -50,8 +51,8 @@ public final class BlockAccessTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    PROP.set(Prop.TEXTINDEX, false);
-    PROP.set(Prop.ATTRINDEX, false);
+    CONTEXT.prop.set(Prop.TEXTINDEX, false);
+    CONTEXT.prop.set(Prop.ATTRINDEX, false);
   }
 
   /**
@@ -60,8 +61,9 @@ public final class BlockAccessTest {
   @Before
   public void setUp() {
     try {
-      final Parser parser = Parser.xmlParser(IO.get(TESTFILE), PROP, "");
-      data = new DiskBuilder(parser, PROP).build(DBNAME);
+      final Parser parser = Parser.xmlParser(
+          IO.get(TESTFILE), CONTEXT.prop, "");
+      data = new DiskBuilder(DBNAME, parser, CONTEXT).build();
       size = data.meta.size;
       data.close();
       tda = new TableDiskAccess(data.meta, DATATBL);
@@ -85,7 +87,7 @@ public final class BlockAccessTest {
   public void tearDown() {
     try {
       if(tda != null) tda.close();
-      DropDB.drop(DBNAME, PROP);
+      DropDB.drop(DBNAME, CONTEXT.mprop);
     } catch(final Exception ex) {
       Util.stack(ex);
     }

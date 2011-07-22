@@ -5,20 +5,24 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import org.basex.core.MainProp;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
+import org.basex.server.ClientDelayer;
+import org.basex.server.ClientListener;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Log;
 import org.basex.server.LoginException;
-import org.basex.server.ClientListener;
 import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenIntMap;
 import org.basex.util.list.StringList;
 
 /**
@@ -30,6 +34,9 @@ import org.basex.util.list.StringList;
  * @author Andreas Weiler
  */
 public class BaseXServer extends Main {
+  /** Flag for server activity. */
+  public boolean running;
+
   /** Quiet mode (no logging). */
   protected boolean quiet;
   /** Start as daemon. */
@@ -39,13 +46,13 @@ public class BaseXServer extends Main {
 
   /** Event server socket. */
   ServerSocket esocket;
-  /** Flag for server activity. */
-  boolean running;
   /** Stop file. */
   IOFile stop;
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
+  /** Blocked clients. */
+  public final TokenIntMap failed = new TokenIntMap();
   /** Server socket. */
   private ServerSocket socket;
   /** User query. */
@@ -68,7 +75,7 @@ public class BaseXServer extends Main {
     super(args);
     check(success);
 
-    final int port = context.prop.num(Prop.SERVERPORT);
+    final int port = context.mprop.num(MainProp.SERVERPORT);
     if(service) {
       Util.outln(start(port, getClass(), args));
       Performance.sleep(1000);
@@ -85,7 +92,7 @@ public class BaseXServer extends Main {
       log = new Log(context, quiet);
       log.write(SERVERSTART);
       socket = new ServerSocket(port);
-      esocket = new ServerSocket(context.prop.num(Prop.EVENTPORT));
+      esocket = new ServerSocket(context.mprop.num(MainProp.EVENTPORT));
       stop = stopFile(port);
 
       // guarantee correct shutdown...
@@ -118,12 +125,21 @@ public class BaseXServer extends Main {
     while(running) {
       try {
         final Socket s = socket.accept();
-        final ClientListener sp = new ClientListener(s, context, log);
+        final ClientListener cl = new ClientListener(s, context, log);
         if(stop.exists()) {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit(false);
-        } else if(sp.init()) {
-          context.add(sp);
+        } else {
+          final byte[] address = s.getInetAddress().getAddress();
+          if(cl.init()) {
+            failed.delete(address);
+            context.add(cl);
+          } else {
+            int delay = failed.get(address);
+            delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
+            failed.add(address, delay);
+            new ClientDelayer(delay, cl, this);
+          }
         }
       } catch(final IOException ex) {
         // socket was closed..
@@ -179,19 +195,19 @@ public class BaseXServer extends Main {
           commands = arg.remaining();
         } else if(c == 'd') {
           // activate debug mode
-          context.prop.set(Prop.DEBUG, true);
+          context.mprop.set(MainProp.DEBUG, true);
         } else if(c == 'D') {
           // hidden flag: daemon mode
           daemon = true;
         } else if(c == 'e') {
           // parse event port
-          context.prop.set(Prop.EVENTPORT, arg.num());
+          context.mprop.set(MainProp.EVENTPORT, arg.num());
         } else if(c == 'i') {
           // activate interactive mode
           console = true;
         } else if(c == 'p') {
           // parse server port
-          context.prop.set(Prop.SERVERPORT, arg.num());
+          context.mprop.set(MainProp.SERVERPORT, arg.num());
         } else if(c == 's') {
           // set service flag
           service = !daemon;
@@ -204,14 +220,15 @@ public class BaseXServer extends Main {
       } else {
         arg.check(false);
         if(arg.string().equalsIgnoreCase("stop")) {
-          stop(context.prop.num(Prop.SERVERPORT),
-              context.prop.num(Prop.EVENTPORT));
+          stop(context.mprop.num(MainProp.SERVERPORT),
+              context.mprop.num(MainProp.EVENTPORT));
           Performance.sleep(1000);
           return false;
         }
       }
     }
-    if(context.prop.num(Prop.SERVERPORT) == context.prop.num(Prop.EVENTPORT)) {
+    if(context.mprop.num(MainProp.SERVERPORT) ==
+       context.mprop.num(MainProp.EVENTPORT)) {
       arg.check(error(null, SERVERPORTS));
     }
     return arg.finish();
@@ -223,8 +240,8 @@ public class BaseXServer extends Main {
   public void stop() {
     try {
       stop.write(Token.EMPTY);
-      new Socket(LOCALHOST, context.prop.num(Prop.EVENTPORT));
-      new Socket(LOCALHOST, context.prop.num(Prop.SERVERPORT));
+      new Socket(LOCALHOST, context.mprop.num(MainProp.EVENTPORT));
+      new Socket(LOCALHOST, context.mprop.num(MainProp.SERVERPORT));
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));
     }

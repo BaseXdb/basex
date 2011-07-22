@@ -21,7 +21,7 @@ final class SplitAlgo extends MapAlgo {
    * @param ns start array position
    * @param ne end array position
    * @param sw weight of this recursion level
-   * @return ArrayList containing rectangles
+   * @return rectangles
    */
   private MapRects calcMap(final MapRect r, final MapList ml,
       final int ns, final int ne, final double sw) {

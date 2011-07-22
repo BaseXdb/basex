@@ -64,6 +64,7 @@ dc_target=Target Path
 dc_advtitle=データベースオプション
 dc_chop=空白を取り除く
 dc_intparse=内部XMLパーサーを使用
+dc_archives=Parse files within archives
 dc_createformat=Input format
 dc_entities=実体のパース
 dc_dtd=DTDのパース
@@ -115,7 +116,7 @@ dr_empty=An empty database will be created
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
-dd_question=データベース '%' を削除します。
+dd_question=% database(s) will be dropped.
 dd_sure=よろしいですか。
 
 dx_question=本当に削除しますか。
@@ -451,7 +452,7 @@ ad_useralter=ユーザー '%' のパスワードを変更しました。
 ad_userdrop=ユーザー '%' は削除されました。
 ad_userdropon=User '%' dropped from database '%'.
 ad_userlog=ユーザー '%' は現在ログインしています。
-ad_passno=パスワードが入力されていません。
+ad_usermd5=Password is no valid MD5 hash.
 ad_admin=Admin ユーザーは編集できません。
 ad_kill=% セッションが切断されました。
 ad_killself='%' 自身のセッションを切断する事は出来ません。

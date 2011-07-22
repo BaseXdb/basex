@@ -32,7 +32,7 @@ import org.basex.util.Reflect;
 import org.basex.util.TokenBuilder;
 
 /**
- * Container for global, user-defined function.
+ * Container for a global, user-defined function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -112,8 +112,8 @@ public final class UserFuncs extends ExprInfo {
     final FuncCall fun = FNIndex.get().get(ln, uri, args, qp);
     if(fun != null) {
       ctx.updating |= fun.def == Function.PUT || fun.def == Function.DBADD ||
-          fun.def == Function.DBDELETE || fun.def == Function.DBRENAME ||
-          fun.def == Function.DBREPLACE;
+        fun.def == Function.DBDELETE || fun.def == Function.DBRENAME ||
+        fun.def == Function.DBREPLACE || fun.def == Function.DBOPTIMIZE;
       return new TypedFunc(fun, fun.def.type(args.length));
     }
 

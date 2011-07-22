@@ -10,8 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,15 +24,17 @@ import javax.swing.event.ChangeListener;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.GUIMenu;
 import org.basex.gui.GUIProp;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXLayout.DropHandler;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
@@ -43,6 +45,7 @@ import org.basex.io.IOFile;
 import org.basex.util.Performance;
 import org.basex.util.Util;
 import org.basex.util.list.BoolList;
+import org.basex.util.list.ObjList;
 
 /**
  * This view allows the input and evaluation of queries and documents.
@@ -236,6 +239,12 @@ public final class EditorView extends View {
         gui.refreshControls();
         refreshMark();
         if(gui.gprop.is(GUIProp.EXECRT)) edit.query();
+      }
+    });
+    BaseXLayout.addDrop(this, new DropHandler() {
+      @Override
+      public void drop(final Object file) {
+        if(file instanceof File) open(new IOFile((File) file));
       }
     });
   }
@@ -600,7 +609,7 @@ public final class EditorView extends View {
    * @return editors
    */
   public EditorArea[] editors() {
-    final ArrayList<EditorArea> edits = new ArrayList<EditorArea>();
+    final ObjList<EditorArea> edits = new ObjList<EditorArea>();
     for(final Component c : tabs.getComponents()) {
       if(c instanceof EditorArea) edits.add((EditorArea) c);
     }

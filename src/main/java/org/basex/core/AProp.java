@@ -119,7 +119,6 @@ public abstract class AProp {
           final Object obj = f.get(null);
           if(!(obj instanceof Object[])) continue;
           final String key = ((Object[]) obj)[0].toString();
-          if(key.equals(Prop.SKIP[0])) break;
           ok &= read.contains(key);
         }
         if(!ok) err.addExt("Saving properties in \"%\"..." + NL, filename);
@@ -150,8 +149,7 @@ public abstract class AProp {
           if(line.equals(PROPUSER)) break;
         }
         for(String line; (line = br.readLine()) != null;) {
-          user.append(line);
-          user.append(NL);
+          user.append(line).append(NL);
         }
       }
     } catch(final Exception ex) {
@@ -169,7 +167,6 @@ public abstract class AProp {
         final Object obj = f.get(null);
         if(!(obj instanceof Object[])) continue;
         final String key = ((Object[]) obj)[0].toString();
-        if(key.equals(Prop.SKIP[0])) break;
 
         final Object val = props.get(key);
         if(val instanceof String[]) {

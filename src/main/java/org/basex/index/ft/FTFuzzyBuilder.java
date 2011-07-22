@@ -70,9 +70,9 @@ final class FTFuzzyBuilder extends FTBuilder {
     if(!merge) return;
 
     // merges temporary index files
-    final DataOutput outX = new DataOutput(data.meta.file(DATAFTX + 'x'));
-    final DataOutput outY = new DataOutput(data.meta.file(DATAFTX + 'y'));
-    final DataOutput outZ = new DataOutput(data.meta.file(DATAFTX + 'z'));
+    final DataOutput outX = new DataOutput(data.meta.dbfile(DATAFTX + 'x'));
+    final DataOutput outY = new DataOutput(data.meta.dbfile(DATAFTX + 'y'));
+    final DataOutput outZ = new DataOutput(data.meta.dbfile(DATAFTX + 'z'));
     final IntList ind = new IntList();
 
     // open all temporary sorted lists
@@ -141,9 +141,9 @@ final class FTFuzzyBuilder extends FTBuilder {
   @Override
   protected void writeIndex(final int cs) throws IOException {
     final String s = DATAFTX + (merge ? cs : "");
-    final DataOutput outX = new DataOutput(data.meta.file(s + 'x'));
-    final DataOutput outY = new DataOutput(data.meta.file(s + 'y'));
-    final DataOutput outZ = new DataOutput(data.meta.file(s + 'z'));
+    final DataOutput outX = new DataOutput(data.meta.dbfile(s + 'x'));
+    final DataOutput outY = new DataOutput(data.meta.dbfile(s + 'y'));
+    final DataOutput outZ = new DataOutput(data.meta.dbfile(s + 'z'));
 
     final IntList ind = new IntList();
     long dr = 0;

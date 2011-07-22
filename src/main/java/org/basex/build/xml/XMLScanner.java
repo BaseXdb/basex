@@ -1023,7 +1023,7 @@ final class XMLScanner extends Progress {
    */
   private BuildException error(final String e, final Object... a)
       throws BuildException {
-    throw new BuildException(det() + ": " + e, a);
+    throw new BuildException(det() + COLS + e, a);
   }
 
   @Override

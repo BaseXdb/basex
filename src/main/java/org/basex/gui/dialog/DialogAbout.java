@@ -1,14 +1,21 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URI;
+
 import javax.swing.Box;
 import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import org.basex.core.Prop;
+
+import org.basex.core.MainProp;
 import org.basex.core.Text;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -16,6 +23,7 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
+import org.basex.util.Util;
 
 /**
  * Dialog window for displaying information about the project.
@@ -39,10 +47,22 @@ public final class DialogAbout extends Dialog {
     final BaseXLabel label = new BaseXLabel();
     label.setIcon(BaseXLayout.icon("logo"));
     label.setVerticalAlignment(SwingConstants.TOP);
+    label.setCursor(GUIConstants.CURSORHAND);
+    label.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(final MouseEvent e) {
+        try {
+          Desktop.getDesktop().browse(new URI(URL));
+        } catch(final Exception ex) {
+          Dialog.error(gui, Util.info(INFOBROSERERR, URL));
+        }
+      }
+    });
+
     p.add(label, BorderLayout.WEST);
 
     final BaseXBack pp = new BaseXBack(GUIConstants.Fill.NONE).layout(
-        new TableLayout(15, 1));
+        new TableLayout(16, 1));
 
     pp.add(new BaseXLabel(Text.TITLE, false, true));
     pp.add(new BaseXLabel(Text.URL));
@@ -54,8 +74,9 @@ public final class DialogAbout extends Dialog {
     pp.add(Box.createVerticalStrut(7));
     pp.add(new BaseXLabel(CONTRIBUTE1));
     pp.add(new BaseXLabel(CONTRIBUTE2));
+    pp.add(new BaseXLabel(CONTRIBUTE3));
     pp.add(Box.createVerticalStrut(7));
-    final String lang = main.context.prop.get(Prop.LANG);
+    final String lang = main.context.mprop.get(MainProp.LANGUAGE);
     pp.add(new BaseXLabel(TRANSLATION + DialogPrefs.creds(lang)));
     p.add(pp, BorderLayout.EAST);
     add(p, BorderLayout.NORTH);

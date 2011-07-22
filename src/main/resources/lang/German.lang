@@ -64,6 +64,7 @@ dc_target=Zielpfad
 dc_advtitle=Datenbank-Optionen
 dc_chop=Leerzeichen entfernen
 dc_intparse=Internen XML-Parser benutzen
+dc_archives=Archivdateien parsen
 dc_createformat=Eingabe-Format
 dc_entities=Parsen von Entities
 dc_dtd=Parsen von DTDs
@@ -115,7 +116,7 @@ dr_empty=Eine leere Datenbank wird erstellt
 dr_delete=% Dokumente werden gelöscht
 
 dd_title=Datenbankmanagement
-dd_question=Die Datenbank '%' wird gelöscht.
+dd_question=% Datenbank(en) werden gelöscht.
 dd_sure=Sind Sie sicher?
 
 dx_question=Möchten Sie wirklich löschen?
@@ -451,7 +452,7 @@ ad_useralter=Passwort von Benutzer '%' geändert.
 ad_userdrop=Benutzer '%' entfernt.
 ad_userdropon=Benutzer '%' von Datenbank '%' entfernt.
 ad_userlog=Benutzer '%' ist gerade eingeloggt.
-ad_passno=Kein Passwort angegeben.
+ad_usermd5=Passwort ist kein gültiger MD5-Hash.
 ad_admin=Admin-Benutzer kann nicht modifiziert werden.
 ad_kill=% Verbindungen beendet.
 ad_killself='%' kann sich nicht selbst beenden.

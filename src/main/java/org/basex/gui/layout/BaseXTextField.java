@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.Window;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -8,7 +9,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JTextField;
+
+import org.basex.gui.layout.BaseXLayout.DropHandler;
 
 /**
  * Project specific text field implementation.
@@ -18,7 +22,7 @@ import javax.swing.JTextField;
  */
 public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
-  public static final int DWIDTH = 260;
+  public static final int DWIDTH = 280;
   /** Last input. */
   String last = "";
   /** Text area to search in. */
@@ -88,6 +92,14 @@ public class BaseXTextField extends JTextField {
         if(!control(e) && Character.isDefined(ch) && !ENTER.is(e))
           area.find(text, false);
         repaint();
+      }
+    });
+
+    setDragEnabled(true);
+    BaseXLayout.addDrop(this, new DropHandler() {
+      @Override
+      public void drop(final Object object) {
+        replaceSelection(object.toString());
       }
     });
   }

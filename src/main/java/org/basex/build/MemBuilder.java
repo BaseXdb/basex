@@ -19,11 +19,12 @@ public final class MemBuilder extends Builder {
 
   /**
    * Constructor.
+   * @param nm name of database
    * @param parse parser
    * @param pr properties
    */
-  public MemBuilder(final Parser parse, final Prop pr) {
-    super(parse, pr);
+  public MemBuilder(final String nm, final Parser parse, final Prop pr) {
+    super(nm, parse, pr);
   }
 
   /**
@@ -35,24 +36,24 @@ public final class MemBuilder extends Builder {
    */
   public static Data build(final Parser parser, final Prop prop)
       throws IOException {
-    return build(parser, prop, parser.src.name());
+    return build(parser.src.name(), parser, prop);
   }
 
   /**
    * Builds a main memory database instance.
+   * @param name name of database
    * @param parser parser
    * @param prop properties
-   * @param name name of database
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public static MemData build(final Parser parser, final Prop prop,
-      final String name) throws IOException {
-    return new MemBuilder(parser, prop).build(name);
+  public static MemData build(final String name, final Parser parser,
+      final Prop prop) throws IOException {
+    return new MemBuilder(name, parser, prop).build();
   }
 
   @Override
-  public MemData build(final String name) throws IOException {
+  public MemData build() throws IOException {
     data = new MemData(tags, atts, ns, path, prop);
     meta = data.meta;
     meta.name = name;
@@ -61,11 +62,11 @@ public final class MemBuilder extends Builder {
     meta.attrindex = true;
     meta.ftindex = false;
     final IO file = parser.src;
-    meta.path = file != null ? file.path() : "";
+    meta.original = file != null ? file.path() : "";
     meta.filesize = file != null ? file.length() : 0;
     meta.time = file != null ? file.date() : System.currentTimeMillis();
 
-    parse(name);
+    parse();
     data.init();
     return data;
   }
@@ -81,16 +82,16 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addElem(final int dist, final int name, final int asize,
+  protected void addElem(final int dist, final int nm, final int asize,
       final int uri, final boolean ne) {
-    data.elem(dist, name, asize, asize, uri, ne);
+    data.elem(dist, nm, asize, asize, uri, ne);
     data.insert(meta.size);
   }
 
   @Override
-  protected void addAttr(final int name, final byte[] value, final int dist,
+  protected void addAttr(final int nm, final byte[] value, final int dist,
       final int uri) {
-    data.attr(meta.size, dist, name, value, uri, false);
+    data.attr(meta.size, dist, nm, value, uri, false);
     data.insert(meta.size);
   }
 

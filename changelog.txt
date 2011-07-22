@@ -51,7 +51,6 @@ Version 6.6.2 (May 13, 2011) Linuxtag release:
   [ADD] Internal XML parser: HTML entities added
   [FIX] Glob syntax: support for multiple file suffixes
 
-
 Version 6.6.1 (Mar 30, 2011) XML Prague release:
 
   XQuery:

@@ -366,7 +366,7 @@ public final class PlotView extends View {
             ya += 2 * textH - gui.gprop.num(GUIProp.PLOTDOTS);
           }
           if(xa > w - lw)
-            BaseXLayout.drawTooltip(g, name + ": " + label, xa, ya, ww, 10);
+            BaseXLayout.drawTooltip(g, name + COLS + label, xa, ya, ww, 10);
           else {
             BaseXLayout.drawTooltip(g, name, xa, ya - textH, ww, 10);
             BaseXLayout.drawTooltip(g, label, xa, ya, ww, 10);

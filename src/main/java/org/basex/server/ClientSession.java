@@ -9,10 +9,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Command;
-import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.in.BufferInput;
 import org.basex.io.out.PrintOutput;
@@ -79,7 +79,7 @@ public final class ClientSession extends Session {
    */
   public ClientSession(final Context context, final String user,
       final String pw, final OutputStream output) throws IOException {
-    this(context.prop.get(Prop.HOST), context.prop.num(Prop.PORT),
+    this(context.mprop.get(MainProp.HOST), context.mprop.num(MainProp.PORT),
         user, pw, output);
   }
 

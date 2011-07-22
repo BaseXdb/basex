@@ -99,7 +99,7 @@ public final class VarList extends ExprInfo {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i < size; ++i)
-      sb.append((i == 0 ? "" : Text.NL) + i + ": " + vars[i]);
+      sb.append((i == 0 ? "" : Text.NL) + i + Text.COLS + vars[i]);
     return sb.toString();
   }
 }

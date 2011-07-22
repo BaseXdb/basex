@@ -10,7 +10,6 @@ import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.io.IO;
 import org.basex.util.Util;
 
 /**
@@ -69,8 +68,8 @@ public final class DropIndex extends ACreate {
       data.closeIndex(index);
       data.meta.dirty = true;
       data.flush();
-      return DropDB.drop(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
-          info(INDDROP, index, perf) : error(INDDROPERROR, index);
+      return data.meta.drop(pat + '.') ? info(INDDROP, index, perf) :
+        error(INDDROPERROR, index);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(ex.getMessage());

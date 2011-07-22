@@ -2,6 +2,8 @@ package org.basex;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.MainProp;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Check;
@@ -83,7 +85,7 @@ public class BaseX extends Main {
         Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
         u = console();
       }
-      if(writeProps) context.prop.write();
+      if(writeProps) context.mprop.write();
       quit(u);
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));
@@ -144,7 +146,7 @@ public class BaseX extends Main {
             commands = arg.remaining();
           } else if(c == 'd') {
             // activate debug mode
-            context.prop.set(Prop.DEBUG, true);
+            context.mprop.set(MainProp.DEBUG, true);
           } else if(c == 'D' && sa()) {
             // hidden option: show dot query graph
             arg.check(set(Prop.DOTPLAN, true));
@@ -153,14 +155,14 @@ public class BaseX extends Main {
             input = arg.string();
           } else if(c == 'n' && !sa()) {
             // set server name
-            context.prop.set(Prop.HOST, arg.string());
+            context.mprop.set(MainProp.HOST, arg.string());
           } else if(c == 'o') {
             // specify file for result output
             out = new PrintOutput(arg.string());
             if(session != null) session.setOutputStream(out);
           } else if(c == 'p' && !sa()) {
             // set server port
-            context.prop.set(Prop.PORT, arg.num());
+            context.mprop.set(MainProp.PORT, arg.num());
           } else if(c == 'P' && !sa()) {
             // specify password
             pass = arg.string();

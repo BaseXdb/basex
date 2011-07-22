@@ -82,7 +82,7 @@ public final class BaseXGUI {
           boolean xq = false;
           for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
           if(xq) {
-            gui.query.open(io);
+            gui.editor.open(io);
           } else {
             gui.execute(new Check(input));
             gprop.set(GUIProp.CREATEPATH, io.path());
@@ -101,15 +101,10 @@ public final class BaseXGUI {
     try {
       // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
       UIManager.getInstalledLookAndFeels();
-      // set specified look & feel
-      final boolean java = prop.is(GUIProp.JAVALOOK);
-      UIManager.setLookAndFeel(java ?
-          UIManager.getCrossPlatformLookAndFeelClassName() :
-          UIManager.getSystemLookAndFeelClassName());
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
-
-      if(java) {
+      // set specified look & feel
+      if(prop.is(GUIProp.JAVALOOK)) {
         // use non-bold fonts in Java's look & feel
         final UIDefaults def = UIManager.getDefaults();
         final Enumeration<?> en = def.keys();
@@ -118,6 +113,8 @@ public final class BaseXGUI {
           final Object v = def.get(k);
           if(v instanceof Font) def.put(k, ((Font) v).deriveFont(Font.PLAIN));
         }
+      } else {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       }
     } catch(final Exception ex) {
       Util.stack(ex);

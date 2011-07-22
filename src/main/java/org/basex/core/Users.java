@@ -91,7 +91,7 @@ public final class Users {
   public synchronized boolean create(final String usern, final String pass) {
     // check if user exists already
     return get(usern) == null &&
-      create(new User(usern, token(md5(pass)), User.WRITE));
+      create(new User(usern, token(pass), User.WRITE));
   }
 
   /**
@@ -105,7 +105,6 @@ public final class Users {
     return true;
   }
 
-
   /**
    * Changes the password of a user.
    * @param usern user name
@@ -117,7 +116,7 @@ public final class Users {
     final User user = get(usern);
     if(user == null) return false;
 
-    user.password = token(md5(pass));
+    user.password = token(pass);
     write();
     return true;
   }

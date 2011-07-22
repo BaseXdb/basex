@@ -429,7 +429,6 @@ public final class NamespaceTest {
         "<foo xmlns='xyz'><bar/><baz/></foo>");
   }
 
-
   /** Test query.
    * Detects general problems with namespace references.
    */

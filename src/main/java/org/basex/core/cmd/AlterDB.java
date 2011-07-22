@@ -1,10 +1,11 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
+import org.basex.core.MainProp;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
@@ -37,9 +38,9 @@ public final class AlterDB extends Command {
     if(!validName(name, false)) return error(NAMEINVALID, name);
 
     // database does not exist
-    if(!prop.dbexists(db)) return error(DBNOTFOUND, db);
+    if(!mprop.dbexists(db)) return error(DBNOTFOUND, db);
     // target database exists already
-    if(prop.dbexists(name)) return error(DBEXISTS, name);
+    if(mprop.dbexists(name)) return error(DBEXISTS, name);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, db);
@@ -47,8 +48,8 @@ public final class AlterDB extends Command {
     if(context.pinned(db)) return error(DBLOCKED, db);
 
     // try to alter database
-    return alter(db, name, prop) && (!closed || new Open(name).run(context)) ?
-        info(DBALTERED, db, name) : error(DBNOTALTERED, db);
+    return alter(db, name, mprop) && (!closed || new Open(name).run(context)) ?
+      info(DBALTERED, db, name) : error(DBNOTALTERED, db);
   }
 
   /**
@@ -59,7 +60,7 @@ public final class AlterDB extends Command {
    * @return success flag
    */
   public static synchronized boolean alter(final String db,
-      final String dbnew, final Prop pr) {
+      final String dbnew, final MainProp pr) {
     return pr.dbpath(db).renameTo(pr.dbpath(dbnew));
   }
 

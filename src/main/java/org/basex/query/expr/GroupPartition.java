@@ -1,19 +1,20 @@
 package org.basex.query.expr;
 
-import java.util.ArrayList;
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
-import static org.basex.query.util.Err.*;
 import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.hash.IntMap;
 import org.basex.util.hash.TokenSet;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * Stores the grouping for a group by clause.
@@ -37,9 +38,9 @@ final class GroupPartition {
   private Var[] pgngv;
 
   /** Group partitioning. */
-  private final ArrayList<GroupNode> part = new ArrayList<GroupNode>();
+  private final ObjList<GroupNode> part = new ObjList<GroupNode>();
   /** Resulting sequence for non-grouping variables. */
-  private final ArrayList<ItemCache[]> items;
+  private final ObjList<ItemCache[]> items;
   /** HashValue, position (with overflow bucket). */
   private final IntMap<IntList> hashes = new IntMap<IntList>();
 
@@ -69,7 +70,7 @@ final class GroupPartition {
       if(ng) ngv[i++] = v;
     }
 
-    items = ngv.length != 0 ? new ArrayList<ItemCache[]>() : null;
+    items = ngv.length != 0 ? new ObjList<ItemCache[]>() : null;
     input = ii;
   }
 
@@ -182,7 +183,7 @@ final class GroupPartition {
    * @return iterator on the result set
    * @throws QueryException query exception
    */
-  Iter ret(final QueryContext ctx, final Expr ret, final ArrayList<Item[]> ks,
+  Iter ret(final QueryContext ctx, final Expr ret, final ObjList<Item[]> ks,
       final ValueList vs) throws QueryException {
     final ItemCache ic = new ItemCache();
     if(pggv == null) cacheRet(ctx);

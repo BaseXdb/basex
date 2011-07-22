@@ -43,13 +43,13 @@ public final class List extends Command {
       String file = null;
       long size = 0;
       int ndocs = 0;
-      final MetaData meta = new MetaData(name, prop);
+      final MetaData meta = new MetaData(name, context);
       try {
-        in = new DataInput(meta.file(DATAINFO));
+        in = new DataInput(meta.dbfile(DATAINFO));
         meta.read(in);
         size = meta.dbsize();
         ndocs = meta.ndocs;
-        if(context.perm(User.READ, meta)) file = meta.path.toString();
+        if(context.perm(User.READ, meta)) file = meta.original.toString();
       } catch(final IOException ex) {
         file = INFODBERR;
       } finally {
@@ -76,7 +76,7 @@ public final class List extends Command {
    */
   public static StringList list(final Context ctx) {
     final StringList db = new StringList();
-    for(final IOFile f : ctx.prop.dbpath().children()) {
+    for(final IOFile f : ctx.mprop.dbpath().children()) {
       if(f.name().startsWith(".")) continue;
       if(f.isDir()) db.add(f.name());
     }

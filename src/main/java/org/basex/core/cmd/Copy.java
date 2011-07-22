@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.basex.core.Command;
-import org.basex.core.Prop;
 import org.basex.core.User;
 
 /**
@@ -41,24 +40,23 @@ public final class Copy extends Command {
     if(!validName(newdb, false)) return error(NAMEINVALID, newdb);
 
     // database does not exist
-    if(!prop.dbexists(db)) return error(DBNOTFOUND, db);
+    if(!mprop.dbexists(db)) return error(DBNOTFOUND, db);
     // target database exists already
-    if(prop.dbexists(newdb)) return error(DBEXISTS, newdb);
+    if(mprop.dbexists(newdb)) return error(DBEXISTS, newdb);
 
     // try to copy database
-    return copy(db, newdb, prop) ? info(DBCOPY, db, perf) : error(DBNOCOPY, db);
+    return copy(db, newdb) ? info(DBCOPY, db, perf) : error(DBNOCOPY, db);
   }
 
   /**
    * Copies the specified database.
    * @param db database name
    * @param newdb new database name
-   * @param pr database properties
    * @return success flag
    */
-  private boolean copy(final String db, final String newdb, final Prop pr) {
-    final File src = pr.dbpath(db);
-    final File trg = pr.dbpath(newdb);
+  private boolean copy(final String db, final String newdb) {
+    final File src = mprop.dbpath(db);
+    final File trg = mprop.dbpath(newdb);
 
     // return false if source cannot be opened, or target cannot be created
     final String[] files = src.list();
@@ -75,7 +73,7 @@ public final class Copy extends Command {
       }
     }
     // drop new database if error occurred
-    if(!ok) DropDB.drop(newdb, pr);
+    if(!ok) DropDB.drop(newdb, mprop);
     return ok;
   }
 

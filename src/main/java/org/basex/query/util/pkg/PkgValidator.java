@@ -5,9 +5,6 @@ import static org.basex.query.util.pkg.Package.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.basex.core.Text;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -16,6 +13,7 @@ import org.basex.query.util.pkg.Package.Component;
 import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.InputInfo;
 import org.basex.util.hash.TokenSet;
+import org.basex.util.list.ObjList;
 
 /**
  * Package validator. This class executes some essential checks before the
@@ -62,7 +60,7 @@ public final class PkgValidator {
    * @throws QueryException query exception
    */
   private void checkDepends(final Package pkg) throws QueryException {
-    final List<Dependency> procs = new ArrayList<Package.Dependency>();
+    final ObjList<Dependency> procs = new ObjList<Package.Dependency>();
     for(final Dependency dep : pkg.dep) {
       // first check of dependency elements are consistently defined in the
       // descriptor
@@ -101,7 +99,9 @@ public final class PkgValidator {
    * @param procs processor dependencies
    * @throws QueryException query exception
    */
-  private void checkProcs(final List<Dependency> procs) throws QueryException {
+  private void checkProcs(final ObjList<Dependency> procs)
+      throws QueryException {
+
     boolean supported = false;
     for(final Dependency d : procs) {
       if(!eq(lc(d.processor), token(Text.NAMELC))) {

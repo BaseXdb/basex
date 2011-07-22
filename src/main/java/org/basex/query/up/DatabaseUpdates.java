@@ -228,11 +228,11 @@ final class DatabaseUpdates {
     recent.resolveExternalTextNodeAdjacency(0);
 
     data.flush();
-    if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.path.isEmpty()) {
+    if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {
-        Export.export(ctx.context.prop, data, data.meta.path);
+        Export.export(ctx.context.prop, data, data.meta.original);
       } catch(final IOException ex) {
-        UPPUTERR.thrw(null, data.meta.path);
+        UPPUTERR.thrw(null, data.meta.original);
       }
     }
   }

@@ -1,20 +1,20 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 import static org.basex.server.ServerCmd.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.basex.build.Parser;
 import org.basex.core.BaseXException;
-import org.basex.core.CommandParser;
-import org.basex.core.Context;
 import org.basex.core.Command;
-import org.basex.core.Prop;
+import org.basex.core.CommandParser;
 import org.basex.core.Commands.CmdCreate;
+import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.core.User;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
@@ -29,6 +29,7 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.ByteList;
+import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
 
 /**
@@ -54,7 +55,7 @@ public final class ClientListener extends Thread {
   /** Output for events. */
   private PrintOutput eout;
   /** Active events. */
-  private ArrayList<String> events;
+  private StringList events;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
@@ -97,19 +98,21 @@ public final class ClientListener extends Thread {
       final String us = in.readString();
       final String pw = in.readString();
       context.user = context.users.get(us);
-      final boolean ok = context.user != null &&
+      running = context.user != null &&
         md5(string(context.user.password) + ts).equals(pw);
 
-      if(ok) {
-        start();
+      // write log information
+      if(running) {
+        log.write(this, "LOGIN " + context.user.name, OK);
+        // send {OK}
+        send(true);
       } else if(!us.isEmpty()) {
-        // log failed login and delay feedback
-        log.write(this, SERVERLOGIN + ": " + us);
-        Performance.sleep(2000);
+        log.write(this, SERVERLOGIN + COLS + us);
       }
-      // send {OK}
-      send(ok);
-      return ok;
+      // start listener thread
+      start();
+      // return result flag
+      return running;
     } catch(final IOException ex) {
       Util.stack(ex);
       log.write(ex.getMessage());
@@ -119,11 +122,9 @@ public final class ClientListener extends Thread {
 
   @Override
   public void run() {
-    log.write(this, "LOGIN " + context.user.name, OK);
-    running = true;
-
-    String cmd = null;
     ServerCmd sc = null;
+    String cmd = null;
+
     try {
       while(running) {
         try {
@@ -179,7 +180,7 @@ public final class ClientListener extends Thread {
         }
 
         // start timeout
-        command.startTimeout(context.prop.num(Prop.TIMEOUT));
+        command.startTimeout(context.mprop.num(MainProp.TIMEOUT));
         log.write(this,
             command.toString().replace('\r', ' ').replace('\n', ' '));
 
@@ -277,7 +278,7 @@ public final class ClientListener extends Thread {
     final TokenBuilder tb = new TokenBuilder("[");
     tb.add(socket.getInetAddress().getHostAddress());
     tb.add(':').addExt(socket.getPort()).add(']');
-    if(context.data != null) tb.add(": ").add(context.data.meta.name);
+    if(context.data != null) tb.add(COLS).add(context.data.meta.name);
     return tb.toString();
   }
 
@@ -371,9 +372,9 @@ public final class ClientListener extends Thread {
 
     // initialize server-based event handling
     if(events == null) {
-      out.writeString(Integer.toString(context.prop.num(Prop.EVENTPORT)));
+      out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));
       out.writeString(Long.toString(getId()));
-      events = new ArrayList<String>();
+      events = new StringList();
     }
 
     final Sessions s = context.events.get(name);
@@ -404,7 +405,7 @@ public final class ClientListener extends Thread {
     String message = "";
     if(ok) {
       s.remove(this);
-      events.remove(name);
+      events.delete(name);
       message = EVENTUNWAT;
     } else if(s == null) {
       message = EVENTNO;
@@ -492,7 +493,7 @@ public final class ClientListener extends Thread {
    * @param ok success flag
    * @throws IOException I/O exception
    */
-  private void send(final boolean ok) throws IOException {
+  void send(final boolean ok) throws IOException {
     out.write(ok ? 0 : 1);
     out.flush();
   }

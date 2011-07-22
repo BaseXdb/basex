@@ -46,7 +46,6 @@ public abstract class ContextModifier {
     dbp.add(p);
   }
 
-
   /**
    * Checks constraints and applies all update primitives to the databases if
    * no constraints are hurt.

@@ -33,7 +33,7 @@ public final class ShowBackups extends Command {
     table.header.add(INFODBNAME);
     table.header.add(INFODBSIZE);
 
-    for(final IO f : prop.dbpath().children()) {
+    for(final IO f : mprop.dbpath().children()) {
       if(!f.name().endsWith(IO.ZIPSUFFIX)) continue;
       final TokenList tl = new TokenList();
       tl.add(f.name());

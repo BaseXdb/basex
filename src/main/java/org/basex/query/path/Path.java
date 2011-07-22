@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.path.Axis.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.basex.data.Data;
@@ -27,6 +26,7 @@ import org.basex.query.path.Test.Name;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
+import org.basex.util.list.ObjList;
 import org.basex.util.list.TokenList;
 
 /**
@@ -169,7 +169,7 @@ public abstract class Path extends ParseExpr {
     if(data == null || !data.meta.pathindex || !data.meta.uptodate ||
         !data.single()) return -1;
 
-    ArrayList<PathNode> nodes = data.pthindex.root();
+    ObjList<PathNode> nodes = data.pthindex.root();
     long m = 1;
     for(int s = 0; s < step.length; s++) {
       final AxisStep curr = checkStep(s);
@@ -259,7 +259,7 @@ public abstract class Path extends ParseExpr {
       if(curr == null || curr.axis != Axis.DESC || curr.uses(Use.POS)) continue;
 
       // check if child steps can be retrieved for current step
-      ArrayList<PathNode> nodes = pathNodes(data, s);
+      ObjList<PathNode> nodes = pathNodes(data, s);
       if(nodes == null) continue;
 
       ctx.compInfo(OPTCHILD, step[s]);
@@ -309,11 +309,11 @@ public abstract class Path extends ParseExpr {
    * @param l last step to be checked
    * @return path nodes
    */
-  protected ArrayList<PathNode> pathNodes(final Data data, final int l) {
+  protected ObjList<PathNode> pathNodes(final Data data, final int l) {
     // skip request if no path index exists or might be out-of-date
     if(!data.meta.pathindex || !data.meta.uptodate) return null;
 
-    ArrayList<PathNode> in = data.pthindex.root();
+    ObjList<PathNode> in = data.pthindex.root();
     for(int s = 0; s <= l; ++s) {
       final AxisStep curr = checkStep(s);
       if(curr == null) return null;
@@ -323,7 +323,7 @@ public abstract class Path extends ParseExpr {
 
       final int name = data.tagindex.id(curr.test.name.ln());
 
-      final ArrayList<PathNode> al = new ArrayList<PathNode>();
+      final ObjList<PathNode> al = new ObjList<PathNode>();
       for(final PathNode pn : data.pthindex.desc(in, desc)) {
         if(pn.kind == Data.ELEM && name == pn.name) {
           // skip test if a tag is found on different levels

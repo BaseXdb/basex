@@ -1,5 +1,6 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
 import java.io.IOException;
 
 import org.basex.core.User;
@@ -23,9 +24,10 @@ public final class Get extends AGet {
   @Override
   protected boolean run() throws IOException {
     final String key = args[0].toUpperCase();
-    final Object type = prop.get(key);
+    Object type = prop.get(key);
+    if(type == null && !context.client()) type = mprop.get(key);
     if(type == null) return whichKey();
-    out.println(key + ": " + type);
+    out.println(key + COLS + type);
     return true;
   }
 }

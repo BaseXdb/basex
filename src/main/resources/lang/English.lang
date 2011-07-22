@@ -64,6 +64,7 @@ dc_target=Target path
 dc_advtitle=Create Database
 dc_chop=Chop whitespaces
 dc_intparse=Use internal XML parser
+dc_archives=Parse files within archives
 dc_createformat=Input format
 dc_entities=Parse Entities
 dc_dtd=Parse DTDs
@@ -115,7 +116,7 @@ dr_empty=An empty database will be created
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
-dd_question=Database '%' will be dropped.
+dd_question=% database(s) will be dropped.
 dd_sure=Are you sure?
 
 dx_question=Do you really want to delete?
@@ -451,7 +452,7 @@ ad_useralter=Password of user '%' changed.
 ad_userdrop=User '%' dropped.
 ad_userdropon=User '%' dropped from '%'.
 ad_userlog=User '%' is currently logged in.
-ad_passno=No password specified.
+ad_usermd5=Password is no valid MD5 hash.
 ad_admin=Admin user cannot be modified.
 ad_kill=% sessions killed.
 ad_killself='%' cannot kill itself.

@@ -64,6 +64,7 @@ dc_target=Target path
 dc_advtitle=Creëer database
 dc_chop=Verwijder whitespaces
 dc_intparse=Gebruik interne XML parser
+dc_archives=Parse files within archives
 dc_createformat=Input format
 dc_entities=Parseer entities
 dc_dtd=Parseer DTDs
@@ -115,7 +116,7 @@ dr_empty=Een lege database wordt gemaakt
 dr_delete=% documenten worden verwijderd
 
 dd_title=Manage databases
-dd_question=Database '%' zal verwijderd worden.
+dd_question=% database(s) zal verwijderd worden.
 dd_sure=Weet je het zeker?
 
 dx_question=Wil je echt verwijderen?
@@ -451,7 +452,7 @@ ad_useralter=Wachtwoord van gebruiker '%' veranderd.
 ad_userdrop=Gebruiker '%' verwijderd.
 ad_userdropon=Gebruiker '%' verwijderd uit '%'.
 ad_userlog=Gebruiker '%' is momenteel ingelogd.
-ad_passno=Geen wachtwoord opgegeven.
+ad_usermd5=Password is no valid MD5 hash.
 ad_admin=Admin gebruiker kan niet gewijzigd worden.
 ad_kill=% sessies gestopt.
 ad_killself='%' kan zichzelf niet stoppen.

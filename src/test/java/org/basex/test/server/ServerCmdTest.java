@@ -8,6 +8,7 @@ import org.basex.BaseXServer;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Kill;
 import org.basex.server.ClientSession;
+import org.basex.util.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -56,7 +57,7 @@ public final class ServerCmdTest extends CmdTest {
     no(new Kill("admin"));
     no(new Kill("admin2"));
     no(new Kill("ha*"));
-    ok(new CreateUser(NAME2, "test"));
+    ok(new CreateUser(NAME2, Token.md5("test")));
     final ClientSession cs = new ClientSession(CONTEXT, NAME2, "test");
     ok(new Kill(NAME2));
     no(new Kill(NAME2 + "?"));

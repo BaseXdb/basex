@@ -3,13 +3,14 @@ package org.basex.core.cmd;
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 
+import java.io.File;
+
+import org.basex.core.MainProp;
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
-import org.basex.io.IOFile;
 
 /**
  * Evaluates the 'drop database' command and deletes a database.
@@ -43,7 +44,7 @@ public final class DropDB extends Command {
       if(context.pinned(db)) {
         info(DBLOCKED, db);
         ok = false;
-      } else if(!drop(db, prop)) {
+      } else if(!drop(db, mprop)) {
         // dropping was not successful
         info(DBDROPERROR, db);
         ok = false;
@@ -57,28 +58,28 @@ public final class DropDB extends Command {
   /**
    * Deletes the specified database.
    * @param db database name
-   * @param pr database properties
+   * @param mprop main properties
    * @return success flag
    */
-  public static synchronized boolean drop(final String db, final Prop pr) {
-    return drop(db, null, pr);
+  public static synchronized boolean drop(final String db,
+      final MainProp mprop) {
+    return drop(mprop.dbpath(db), null);
   }
 
   /**
    * Drops a database directory.
-   * @param db database to delete
+   * @param path database path
    * @param pat file pattern
-   * @param pr database properties
    * @return success of operation
    */
-  public static synchronized boolean drop(final String db,
-      final String pat, final Prop pr) {
-
-    final IOFile path = new IOFile(pr.dbpath(db));
+  public static synchronized boolean drop(final File path, final String pat) {
     boolean ok = path.exists();
     // try to delete all files
-    for(final IOFile sub : path.children()) {
-      if(pat == null || sub.name().matches(pat)) ok &= sub.delete();
+    final File[] files = path.listFiles();
+    if(files != null) {
+      for(final File sub : files) {
+        if(pat == null || sub.getName().matches(pat)) ok &= sub.delete();
+      }
     }
     // only delete directory if no pattern was specified
     return (pat != null || path.delete()) && ok;

@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -281,20 +280,14 @@ public final class QueryProcessor extends Progress {
    * @return result of check
    */
   public static boolean updating(final Context ctx, final String qu) {
-    // quick check for update keywords
-    for(final String s : UPDATES) {
-      if(qu.indexOf(s) != -1) {
-        // keyword found; parse query to get sure
-        try {
-          final QueryProcessor qp = new QueryProcessor(qu, ctx);
-          qp.parse();
-          return qp.ctx.updating;
-        } catch(final QueryException ex) {
-          return true;
-        }
-      }
+    // keyword found; parse query to get sure
+    try {
+      final QueryProcessor qp = new QueryProcessor(qu, ctx);
+      qp.parse();
+      return qp.ctx.updating;
+    } catch(final QueryException ex) {
+      return true;
     }
-    return false;
   }
 
   /**

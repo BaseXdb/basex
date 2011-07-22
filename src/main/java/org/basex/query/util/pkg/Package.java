@@ -3,10 +3,9 @@ package org.basex.query.util.pkg;
 import static org.basex.util.Token.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ObjList;
 
 /**
  * Package.
@@ -16,9 +15,9 @@ import org.basex.util.TokenBuilder;
  */
 public final class Package {
   /** List of dependencies. */
-  public final List<Dependency> dep = new ArrayList<Dependency>();
+  public final ObjList<Dependency> dep = new ObjList<Dependency>();
   /** Package components. */
-  public final List<Component> comps = new ArrayList<Component>();
+  public final ObjList<Component> comps = new ObjList<Component>();
   /** Package short name. */
   public byte[] abbrev;
   /** Package uri. */

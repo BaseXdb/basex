@@ -1,13 +1,9 @@
 package org.basex.core;
 
-import java.io.File;
-
-import org.basex.io.IOFile;
 import org.basex.util.Util;
 
 /**
- * This class assembles properties which are used all around the project. They
- * are initially read from and finally written to disk.
+ * This class assembles properties which are used all around the project.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -36,49 +32,12 @@ public final class Prop extends AProp {
   public static final String HOME = Util.homeDir() + '/';
 
   /** Property information. */
-  static final String PROPHEADER = "# Property File." + NL
-      + "# You can set additional options at the end of the file." + NL;
+  static final String PROPHEADER = "# Property File." + Prop.NL
+      + "# You can set additional options at the end of the file." + Prop.NL;
   /** Property information. */
   static final String PROPUSER = "# User defined section";
 
-  // DATABASE & PROGRAM PATHS (will be written to disk) =======================
-
-  /** Database path. */
-  public static final Object[] DBPATH =
-    { "DBPATH", HOME + Text.NAME + "Data" };
-  /** Web path. */
-  public static final Object[] JAXRXPATH =
-    { "JAXRXPATH", HOME + Text.NAME + "Web" };
-  /** Package repository path. */
-  public static final Object[] REPOPATH =
-    { "REPOPATH", HOME + Text.NAME + "Repo"};
-
-  /** Language name. */
-  public static final Object[] LANG = { "LANG", "English" };
-  /** Flag to include key names in the language strings. */
-  public static final Object[] LANGKEYS = { "LANGKEYS", false };
-
-  /** Client/server communication: host, used for connecting new clients. */
-  public static final Object[] HOST = { "HOST", Text.LOCALHOST };
-  /** Client/server communication: port, used for connecting new clients. */
-  public static final Object[] PORT = { "PORT", 1984 };
-  /** Client/server communication: port, used for starting the server. */
-  public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
-  /** Client/server communication: port, used for starting the JAX-RX server. */
-  public static final Object[] JAXRXPORT = { "JAXRXPORT", 8984 };
-  /** Client/server communication: port, used for sending events. */
-  public static final Object[] EVENTPORT = { "EVENTPORT", 1985 };
-
-  /** Server timeout in seconds; deactivated if set to 0. */
-  public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
-
-  // TRANSIENT OPTIONS ========================================================
-
-  /** The following options are not saved to disk; don't remove this flag. */
-  public static final Object[] SKIP = { "SKIP", true };
-
-  /** Debug mode. */
-  public static final Object[] DEBUG = { "DEBUG", false };
+  // OPTIONS ==================================================================
 
   /** Detailed query information. */
   public static final Object[] QUERYINFO = { "QUERYINFO", false };
@@ -111,9 +70,6 @@ public final class Prop extends AProp {
   public static final Object[] FORCECREATE = { "FORCECREATE", false };
   /** Default XQuery version. */
   public static final Object[] XQUERY3 = { "XQUERY3", true };
-
-  /** Defines the number of parallel readers. */
-  public static final Object[] PARALLEL = { "PARALLEL", 8 };
 
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };
@@ -176,58 +132,13 @@ public final class Prop extends AProp {
 
   // STATIC PROPERTIES ========================================================
 
-  /** Root properties. */
-  private static Prop root;
   /** GUI mode. */
   public static boolean gui;
 
-  /** Language (applied after restart). */
-  static String language = LANG[1].toString();
-  /** Flag for showing language keys. */
-  static boolean langkeys;
-
   /**
    * Constructor.
-   * @param read properties from disk
    */
-  public Prop(final boolean read) {
-    super(read ? "" : null);
-    if(root == null) root = this;
-    if(read) finish();
-  }
-
-  /**
-   * Returns a file instance for the current database path.
-   * @param db name of the database
-   * @return database filename
-   */
-  public File dbpath(final String db) {
-    return new File(get(DBPATH), db);
-  }
-
-  /**
-   * Returns the current database path.
-   * @return database filename
-   */
-  public IOFile dbpath() {
-    return new IOFile(get(DBPATH));
-  }
-
-  /**
-   * Checks if the specified database exists.
-   * @param db name of the database
-   * @return result of check
-   */
-  public boolean dbexists(final String db) {
-    return !db.isEmpty() && dbpath(db).exists();
-  }
-
-  @Override
-  protected void finish() {
-    if(this != root) return;
-    // set some static properties
-    Prop.language = get(Prop.LANG);
-    Prop.langkeys = is(Prop.LANGKEYS);
-    Util.debug = is(Prop.DEBUG);
+  public Prop() {
+    super(null);
   }
 }

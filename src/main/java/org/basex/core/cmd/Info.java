@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.MainProp;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -34,15 +36,15 @@ public final class Info extends AInfo {
    * @return info string
    */
   public static byte[] info(final Context context) {
-    final Prop prop = context.prop;
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INFOGENERAL + NL);
     format(tb, VERSINFO, VERSION);
     if(context.user.perm(User.CREATE)) {
       Performance.gc(3);
-      format(tb, INFODBPATH, prop.get(Prop.DBPATH));
+      format(tb, INFODBPATH, context.mprop.get(MainProp.DBPATH));
       format(tb, INFOMEM, Performance.getMem());
     }
+    final Prop prop = context.prop;
     tb.add(NL + INFOCREATE + NL);
     format(tb, INFOCHOP, flag(prop.is(Prop.CHOP)));
     format(tb, INFOENTITY, flag(prop.is(Prop.ENTITY)));
