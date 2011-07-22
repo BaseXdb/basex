@@ -454,6 +454,8 @@ public interface QueryText {
   byte[] MAP = token(MAPSTR);
   /** Package token. */
   byte[] PKG = token("pkg");
+  /** SQL token. */
+  byte[] SQL = token("sql");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
@@ -508,6 +510,8 @@ public interface QueryText {
   byte[] XSLTURI = token(Text.URL + "/xslt");
   /** Package URI. */
   byte[] PACKURI = token(Text.URL + "/pkg");
+  /** SQL Module URI. */
+  byte[] SQLURI = token(Text.URL + "/sql");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
@@ -515,7 +519,7 @@ public interface QueryText {
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
 
   /** Static modules. */
-  TokenSet MODULES = new TokenSet(FILEURI, HTTPURI, PKGURI, ZIPURI);
+  TokenSet MODULES = new TokenSet(FILEURI, HTTPURI, PKGURI, ZIPURI, SQLURI);
 
   // QUERY PLAN ===============================================================
 

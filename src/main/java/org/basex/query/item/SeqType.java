@@ -100,6 +100,8 @@ public final class SeqType {
   public static final SeqType FLT = AtomType.FLT.seq();
   /** Zero or one double. */
   public static final SeqType DBL_ZO = new SeqType(AtomType.DBL, Occ.ZO);
+  /** One decimal number. */
+  public static final SeqType DEC = AtomType.DEC.seq();
   /** Zero or one decimal number. */
   public static final SeqType DEC_ZO = new SeqType(AtomType.DEC, Occ.ZO);
   /** Single number; for simplicity, numbers are summarized by this type. */
@@ -181,6 +183,8 @@ public final class SeqType {
   public static final SeqType ELM_ZO = new SeqType(NodeType.ELM, Occ.ZO);
   /** Zero or more element nodes. */
   public static final SeqType ELM_ZM = new SeqType(NodeType.ELM, Occ.ZM);
+  /** Single integer. */
+  public static final SeqType INT = AtomType.INT.seq();
 
   /** Sequence type. */
   public final Type type;
