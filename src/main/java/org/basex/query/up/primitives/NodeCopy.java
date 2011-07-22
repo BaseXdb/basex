@@ -1,8 +1,5 @@
 package org.basex.query.up.primitives;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
@@ -15,6 +12,7 @@ import org.basex.query.up.NamePool;
 import org.basex.query.util.DataBuilder;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ObjList;
 
 /**
  * Abstract update primitive which holds a copy of nodes to be inserted.
@@ -24,7 +22,7 @@ import org.basex.util.TokenBuilder;
  */
 public abstract class NodeCopy extends StructuralUpdate {
   /** Nodes to be inserted. */
-  protected final List<NodeCache> insert = new ArrayList<NodeCache>(1);
+  protected final ObjList<NodeCache> insert = new ObjList<NodeCache>(1);
   /** Final copy of insertion nodes. */
   protected MemData md;
 

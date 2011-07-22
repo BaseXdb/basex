@@ -1,14 +1,16 @@
 package org.basex.query;
 
 import static org.basex.util.Token.*;
-import java.util.ArrayList;
+
 import java.util.Stack;
+
 import org.basex.data.Data;
 import org.basex.index.path.PathNode;
 import org.basex.query.path.Axis;
 import org.basex.query.path.Test;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
 
 /**
@@ -22,11 +24,11 @@ public final class QuerySuggest extends QueryParser {
   /** Data reference. */
   private final Data data;
   /** All current path nodes. */
-  private Stack<ArrayList<PathNode>> stack;
+  private Stack<ObjList<PathNode>> stack;
   /** All current path nodes. */
-  private ArrayList<PathNode> all;
+  private ObjList<PathNode> all;
   /** Current path nodes. */
-  private ArrayList<PathNode> curr;
+  private ObjList<PathNode> curr;
   /** Hide flag. */
   private boolean show;
   /** Last tag name. */
@@ -65,13 +67,13 @@ public final class QuerySuggest extends QueryParser {
     if(stack != null && !stack.empty() || !data.meta.pathindex) return;
     all = data.pthindex.root();
     curr = all;
-    stack = new Stack<ArrayList<PathNode>>();
+    stack = new Stack<ObjList<PathNode>>();
   }
 
   @Override
   protected void checkAxis(final Axis axis) {
     all = axis != Axis.CHILD && axis != Axis.DESC || !data.meta.pathindex ?
-      new ArrayList<PathNode>() : data.pthindex.desc(curr, axis == Axis.DESC);
+      new ObjList<PathNode>() : data.pthindex.desc(curr, axis == Axis.DESC);
     curr = all;
     show = true;
   }
@@ -93,7 +95,7 @@ public final class QuerySuggest extends QueryParser {
   private void checkTest(final boolean eq) {
     if(tag == null) return;
 
-    final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+    final ObjList<PathNode> tmp = new ObjList<PathNode>();
     boolean s = false;
     for(final PathNode p : all) {
       final byte[] nm = p.token(data);
@@ -111,7 +113,7 @@ public final class QuerySuggest extends QueryParser {
     if(stack == null) return;
     if(open) {
       checkTest(true);
-      final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+      final ObjList<PathNode> tmp = new ObjList<PathNode>();
       for(final PathNode p : curr) tmp.add(p);
       stack.add(tmp);
       checkAxis(Axis.CHILD);

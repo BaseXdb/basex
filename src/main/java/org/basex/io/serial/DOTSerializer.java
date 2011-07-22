@@ -5,7 +5,6 @@ import static org.basex.io.serial.DOTData.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.basex.data.ExprInfo;
 import org.basex.data.FTPos;
@@ -13,6 +12,7 @@ import org.basex.io.out.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * This class serializes trees in the DOT syntax.
@@ -27,7 +27,7 @@ public final class DOTSerializer extends Serializer {
   private final PrintOutput out;
 
   /** Cached children. */
-  private final ArrayList<IntList> children = new ArrayList<IntList>();
+  private final ObjList<IntList> children = new ObjList<IntList>();
   /** Cached attributes. */
   private final TokenBuilder tb = new TokenBuilder();
   /** Cached nodes. */

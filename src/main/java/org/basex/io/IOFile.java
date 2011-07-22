@@ -7,14 +7,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 import org.basex.core.Prop;
 import org.basex.io.in.BufferInput;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
 
@@ -216,7 +217,7 @@ public final class IOFile extends IO {
     final File[] ch = file.listFiles();
     if(ch == null) return new IOFile[] {};
 
-    final ArrayList<IOFile> io = new ArrayList<IOFile>(ch.length);
+    final ObjList<IOFile> io = new ObjList<IOFile>(ch.length);
     final Pattern p = Pattern.compile(pattern,
         Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
     for(final File f : ch) {

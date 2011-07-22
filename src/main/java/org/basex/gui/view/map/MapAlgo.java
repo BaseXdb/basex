@@ -36,7 +36,7 @@ abstract class MapAlgo {
    * @param l children array
    * @param ns start array position
    * @param ne end array position
-   * @return ArrayList holding laid out rectangles
+   * @return rectangles
    */
   abstract MapRects calcMap(final MapRect r, final MapList l, final int ns,
       final int ne);

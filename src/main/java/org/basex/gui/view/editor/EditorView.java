@@ -12,7 +12,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +45,7 @@ import org.basex.io.IOFile;
 import org.basex.util.Performance;
 import org.basex.util.Util;
 import org.basex.util.list.BoolList;
+import org.basex.util.list.ObjList;
 
 /**
  * This view allows the input and evaluation of queries and documents.
@@ -243,7 +243,9 @@ public final class EditorView extends View {
     });
     BaseXLayout.addDrop(this, new DropHandler() {
       @Override
-      public void drop(final File file) { open(new IOFile(file)); }
+      public void drop(final Object file) {
+        if(file instanceof File) open(new IOFile((File) file));
+      }
     });
   }
 
@@ -607,7 +609,7 @@ public final class EditorView extends View {
    * @return editors
    */
   public EditorArea[] editors() {
-    final ArrayList<EditorArea> edits = new ArrayList<EditorArea>();
+    final ObjList<EditorArea> edits = new ObjList<EditorArea>();
     for(final Component c : tabs.getComponents()) {
       if(c instanceof EditorArea) edits.add((EditorArea) c);
     }

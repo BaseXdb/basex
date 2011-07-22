@@ -4,7 +4,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.basex.data.Data;
 import org.basex.index.Index;
@@ -15,6 +14,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.util.Array;
 import org.basex.util.Util;
+import org.basex.util.list.ObjList;
 import org.basex.util.list.TokenList;
 
 /**
@@ -26,7 +26,7 @@ import org.basex.util.list.TokenList;
  */
 public final class PathSummary implements Index {
   /** Node stack for building the summary. */
-  private final ArrayList<PathNode> stack = new ArrayList<PathNode>();
+  private final ObjList<PathNode> stack = new ObjList<PathNode>();
   /** Root node. */
   private PathNode root;
 
@@ -75,12 +75,7 @@ public final class PathSummary implements Index {
       root = new PathNode(n, k, null);
       stack.add(root);
     } else {
-      final PathNode pn = stack.get(l - 1).index(n, k);
-      if(l < stack.size()) {
-        stack.set(l, pn);
-      } else {
-        stack.add(pn);
-      }
+      stack.set(l, stack.get(l - 1).index(n, k));
     }
   }
 
@@ -92,10 +87,10 @@ public final class PathSummary implements Index {
    * @param desc if false, return only children
    * @return descendant nodes
    */
-  public ArrayList<PathNode> desc(final ArrayList<PathNode> in,
+  public ObjList<PathNode> desc(final ObjList<PathNode> in,
       final boolean desc) {
 
-    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+    final ObjList<PathNode> out = new ObjList<PathNode>();
     for(final PathNode n : in) {
       for(final PathNode c : n.ch) {
         if(desc) c.addDesc(out);
@@ -110,8 +105,8 @@ public final class PathSummary implements Index {
    * @param in input nodes
    * @return parent nodes
    */
-  public ArrayList<PathNode> parent(final ArrayList<PathNode> in) {
-    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+  public ObjList<PathNode> parent(final ObjList<PathNode> in) {
+    final ObjList<PathNode> out = new ObjList<PathNode>();
     for(final PathNode n : in) if(!out.contains(n.par)) out.add(n.par);
     return out;
   }
@@ -120,8 +115,8 @@ public final class PathSummary implements Index {
    * Returns the root node.
    * @return root node
    */
-  public ArrayList<PathNode> root() {
-    final ArrayList<PathNode> out = new ArrayList<PathNode>();
+  public ObjList<PathNode> root() {
+    final ObjList<PathNode> out = new ObjList<PathNode>();
     out.add(root);
     return out;
   }
@@ -134,7 +129,7 @@ public final class PathSummary implements Index {
    * @param k node kind
    * @param desc if false, return only children
    */
-  public void desc(final PathNode in, final ArrayList<PathNode> out,
+  public void desc(final PathNode in, final ObjList<PathNode> out,
       final int t, final int k, final boolean desc) {
 
     for(final PathNode n : in.ch) {
@@ -172,7 +167,7 @@ public final class PathSummary implements Index {
   public TokenList desc(final TokenList tl, final Data data, final boolean d,
       final boolean o) {
     // follow the specified descendant/child steps
-    ArrayList<PathNode> in = desc(root(), true);
+    ObjList<PathNode> in = desc(root(), true);
 
     for(final byte[] i : tl) {
       final boolean att = startsWith(i, '@');
@@ -180,7 +175,7 @@ public final class PathSummary implements Index {
       final int id = att ? data.atnindex.id(substring(i, 1)) :
         data.tagindex.id(i);
 
-      final ArrayList<PathNode> out = new ArrayList<PathNode>();
+      final ObjList<PathNode> out = new ObjList<PathNode>();
       for(final PathNode n : in) {
         if(n.name != id || n.kind != kind) continue;
         for(final PathNode c : n.ch) {

@@ -4,10 +4,9 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import org.basex.core.User;
 import org.basex.core.Commands.CmdIndexInfo;
+import org.basex.core.User;
 import org.basex.core.cmd.ACreate;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
@@ -22,12 +21,12 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
-import org.basex.query.item.DBNodeSeq;
+import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
@@ -44,6 +43,7 @@ import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * Database functions.
@@ -263,7 +263,7 @@ public final class FNDb extends FuncCall {
     final byte[] path = expr.length < 4 ? null : path(checkStr(expr[3], ctx));
 
     // get all items representing document(s):
-    final ArrayList<Item> docs = new ArrayList<Item>(
+    final ObjList<Item> docs = new ObjList<Item>(
         (int) Math.max(expr[1].size(), 1));
     final Iter iter = ctx.iter(expr[1]);
     for(Item i; (i = iter.next()) != null;) docs.add(i);
@@ -307,7 +307,7 @@ public final class FNDb extends FuncCall {
       trgpath = subtoken(trg, 0, p);
     }
 
-    final ArrayList<Item> docs = new ArrayList<Item>(1);
+    final ObjList<Item> docs = new ObjList<Item>(1);
     docs.add(doc);
     final Add add = new Add(data, input, docs, trgname, trgpath, ctx.context);
     ctx.updates.add(add, ctx);

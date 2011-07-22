@@ -228,7 +228,7 @@ public enum GUICommands implements GUICommand {
   EDITNEW(GUIXQNEW + DOTS, "% shift N", GUIXQNEWTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.query.newFile();
+      gui.editor.newFile();
     }
   },
 
@@ -236,7 +236,7 @@ public enum GUICommands implements GUICommand {
   EDITOPEN(GUIXQOPEN + DOTS, "% R", GUIXQOPENTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.query.open();
+      gui.editor.open();
     }
   },
 
@@ -244,12 +244,12 @@ public enum GUICommands implements GUICommand {
   EDITSAVE(GUISAVE, "% S", GUISAVETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.query.save();
+      gui.editor.save();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.query != null && gui.query.saveable());
+      b.setEnabled(gui.editor != null && gui.editor.saveable());
     }
   },
 
@@ -257,7 +257,7 @@ public enum GUICommands implements GUICommand {
   EDITSAVEAS(GUISAVEAS + DOTS, "% shift S", GUISAVETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.query.saveAs();
+      gui.editor.saveAs();
     }
   },
 
@@ -265,7 +265,7 @@ public enum GUICommands implements GUICommand {
   EDITCLOSE(GUIXQCLOSE, "% shift W", GUIXQCLOSETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.query.close(null);
+      gui.editor.close(null);
     }
   },
 

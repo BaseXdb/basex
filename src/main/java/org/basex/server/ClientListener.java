@@ -1,20 +1,20 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 import static org.basex.server.ServerCmd.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.basex.build.Parser;
-import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
-import org.basex.core.CommandParser;
-import org.basex.core.Context;
 import org.basex.core.Command;
+import org.basex.core.CommandParser;
 import org.basex.core.Commands.CmdCreate;
+import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.core.User;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
@@ -29,6 +29,7 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.ByteList;
+import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
 
 /**
@@ -54,7 +55,7 @@ public final class ClientListener extends Thread {
   /** Output for events. */
   private PrintOutput eout;
   /** Active events. */
-  private ArrayList<String> events;
+  private StringList events;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
@@ -373,7 +374,7 @@ public final class ClientListener extends Thread {
     if(events == null) {
       out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));
       out.writeString(Long.toString(getId()));
-      events = new ArrayList<String>();
+      events = new StringList();
     }
 
     final Sessions s = context.events.get(name);
@@ -404,7 +405,7 @@ public final class ClientListener extends Thread {
     String message = "";
     if(ok) {
       s.remove(this);
-      events.remove(name);
+      events.delete(name);
       message = EVENTUNWAT;
     } else if(s == null) {
       message = EVENTNO;

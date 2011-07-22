@@ -2,9 +2,7 @@ package org.basex.query.up;
 
 import static org.basex.query.up.primitives.PrimitiveType.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -14,6 +12,7 @@ import org.basex.query.up.primitives.StructuralUpdate;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * This container holds all update primitives for a specific database node.
@@ -128,7 +127,7 @@ final class NodeUpdates {
       /* If a node is replaced, an eventual delete operation
          is removed, as the actual node identity has been replaced. */
       final PrimitiveType dominantOp = rep ? REPLACENODE : DELETENODE;
-      final List<UpdatePrimitive> up = new ArrayList<UpdatePrimitive>();
+      final ObjList<UpdatePrimitive> up = new ObjList<UpdatePrimitive>();
 
       /*
        * If a node is deleted or replaced, all other operations performing on
@@ -140,8 +139,7 @@ final class NodeUpdates {
         final PrimitiveType t = p.type;
         if(t == INSERTBEFORE || t == INSERTAFTER || t == dominantOp) up.add(p);
       }
-      prim = new UpdatePrimitive[up.size()];
-      up.toArray(prim);
+      prim = up.toArray(new UpdatePrimitive[up.size()]);
     }
 
     // determine if internal/external text node adjacency possible

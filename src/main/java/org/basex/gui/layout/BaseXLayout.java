@@ -13,6 +13,10 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -24,7 +28,6 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.TransferHandler;
 
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
@@ -32,6 +35,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Util;
+import org.basex.util.list.ObjList;
 
 /**
  * This class assembles layout and paint methods which are frequently
@@ -124,26 +128,37 @@ public final class BaseXLayout {
    * @param dnd drag and drop handler
    */
   public static void addDrop(final JComponent comp, final DropHandler dnd) {
-    comp.setTransferHandler(new TransferHandler() {
+    comp.setDropTarget(new DropTarget(comp,
+        DnDConstants.ACTION_COPY_OR_MOVE, null, true, null) {
       @Override
-      public boolean canImport(final TransferSupport support) {
-        return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
-      }
-      @Override
-      @SuppressWarnings("unchecked")
-      public boolean importData(final TransferSupport support) {
-        try {
-          for(final File fl : (List<File>) support.getTransferable().
-              getTransferData(DataFlavor.javaFileListFlavor)) dnd.drop(fl);
-          final Dialog d = dialog(comp);
-          if(d != null) d.action(null);
-          return true;
-        } catch(final Exception ex) {
-          Util.errln(ex);
-          return false;
-        }
+      public synchronized void drop(final DropTargetDropEvent dtde) {
+        dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+        final Transferable tr = dtde.getTransferable();
+        for(final Object o : contents(tr)) dnd.drop(o);
+        comp.requestFocusInWindow();
       }
     });
+  }
+
+  /**
+   * Returns the contents of the specified transferable.
+   * @param tr transferable
+   * @return contents
+   */
+  @SuppressWarnings("unchecked")
+  public static ObjList<Object> contents(final Transferable tr) {
+    final ObjList<Object> list = new ObjList<Object>();
+    try {
+      if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+        for(final File fl : (List<File>)
+            tr.getTransferData(DataFlavor.javaFileListFlavor)) list.add(fl);
+      } else if(tr.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        list.add(tr.getTransferData(DataFlavor.stringFlavor));
+      }
+    } catch(final Exception ex) {
+      Util.stack(ex);
+    }
+    return list;
   }
 
   /**
@@ -154,9 +169,9 @@ public final class BaseXLayout {
   public abstract static class DropHandler {
     /**
      * Drops a file.
-     * @param file file to be dropped
+     * @param obj object to be dropped
      */
-    public abstract void drop(final File file);
+    public abstract void drop(final Object obj);
   }
 
   /**

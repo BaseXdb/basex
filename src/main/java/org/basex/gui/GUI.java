@@ -75,7 +75,7 @@ public final class GUI extends AGUI {
   /** Filter button. */
   public final BaseXButton filter;
   /** Search view. */
-  public final EditorView query;
+  public final EditorView editor;
   /** Info view. */
   public final InfoView info;
 
@@ -240,11 +240,11 @@ public final class GUI extends AGUI {
     // create views
     notify = new ViewNotifier(this);
     text = new TextView(notify);
-    query = new EditorView(notify);
+    editor = new EditorView(notify);
     info = new InfoView(notify);
 
     // create panels for closed and opened database mode
-    views = new ViewContainer(this, text, query, info,
+    views = new ViewContainer(this, text, editor, info,
         new FolderView(notify), new PlotView(notify), new TableView(notify),
         new MapView(notify), new TreeView(notify), new ExploreView(notify)
     );
@@ -277,7 +277,7 @@ public final class GUI extends AGUI {
   @Override
   public void dispose() {
     // close opened queries
-    if(!query.confirm()) return;
+    if(!editor.confirm()) return;
 
     final boolean max = getExtendedState() == MAXIMIZED_BOTH;
     gprop.set(GUIProp.MAXSTATE, max);
@@ -399,9 +399,9 @@ public final class GUI extends AGUI {
       updating = up;
 
       // resets the query editor
-      if(query.visible()) {
-        if(main) query.reset();
-        else if(c instanceof XQuery) query.start();
+      if(editor.visible()) {
+        if(main) editor.reset();
+        else if(c instanceof XQuery) editor.start();
       }
 
       // evaluate command
@@ -423,8 +423,8 @@ public final class GUI extends AGUI {
 
       // show feedback in query editor
       boolean feedback = main;
-      if(!main && query.visible() && c instanceof XQuery) {
-        query.info(inf.startsWith(PROGERR) ? PROGERR : inf, ok);
+      if(!main && editor.visible() && c instanceof XQuery) {
+        editor.info(inf.startsWith(PROGERR) ? PROGERR : inf, ok);
         feedback = true;
       }
 

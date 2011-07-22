@@ -9,7 +9,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 
 import javax.swing.JTextField;
 
@@ -96,10 +95,11 @@ public class BaseXTextField extends JTextField {
       }
     });
 
+    setDragEnabled(true);
     BaseXLayout.addDrop(this, new DropHandler() {
       @Override
-      public void drop(final File file) {
-        setText(file.getPath());
+      public void drop(final Object object) {
+        replaceSelection(object.toString());
       }
     });
   }

@@ -82,7 +82,7 @@ public final class BaseXGUI {
           boolean xq = false;
           for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
           if(xq) {
-            gui.query.open(io);
+            gui.editor.open(io);
           } else {
             gui.execute(new Check(input));
             gprop.set(GUIProp.CREATEPATH, io.path());

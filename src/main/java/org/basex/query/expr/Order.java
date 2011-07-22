@@ -1,8 +1,9 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Array.*;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.basex.io.serial.Serializer;
@@ -12,9 +13,9 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
-import static org.basex.util.Array.*;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ObjList;
 
 /**
  * Order by expression.
@@ -27,7 +28,7 @@ public final class Order extends ParseExpr {
   final OrderBy[] ob;
 
   /** Keys to sort by. */
-  ArrayList<Item[]> keys;
+  ObjList<Item[]> keys;
   /** Values to sort. */
   ValueList values;
 
@@ -58,7 +59,7 @@ public final class Order extends ParseExpr {
    * @param vs value list
    * @return reference to this object for convenience
    */
-  Order set(final ArrayList<Item[]> ks, final ValueList vs) {
+  Order set(final ObjList<Item[]> ks, final ValueList vs) {
     keys = ks;
     values = vs;
     return this;
@@ -72,7 +73,7 @@ public final class Order extends ParseExpr {
    * @param vs value list
    * @throws QueryException query exception
    */
-  void add(final QueryContext ctx, final Expr e, final ArrayList<Item[]> ks,
+  void add(final QueryContext ctx, final Expr e, final ObjList<Item[]> ks,
       final ValueList vs) throws QueryException {
     final Item[] k = new Item[ob.length];
     for(int o = k.length; o-- > 0;) k[o] = ob[o].key(ctx, ks.size());
@@ -124,7 +125,7 @@ public final class Order extends ParseExpr {
    */
   class OrderedIter extends Iter {
     /** Sort keys. */
-    ArrayList<Item[]> kl;
+    ObjList<Item[]> kl;
     /** Values to sort. */
     ValueList vl;
     /** End position. */
@@ -144,7 +145,7 @@ public final class Order extends ParseExpr {
      * @param vs values
      * @param n number of order-bys
      */
-    public OrderedIter(final ArrayList<Item[]> ks, final ValueList vs,
+    public OrderedIter(final ObjList<Item[]> ks, final ValueList vs,
         final int n) {
       kl = ks;
       vl = vs;

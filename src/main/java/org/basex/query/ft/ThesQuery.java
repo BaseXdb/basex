@@ -1,8 +1,8 @@
 package org.basex.query.ft;
 
-import java.util.ArrayList;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
+import org.basex.util.list.ObjList;
 import org.basex.util.list.TokenList;
 
 /**
@@ -13,7 +13,7 @@ import org.basex.util.list.TokenList;
  */
 public final class ThesQuery {
   /** Thesaurus root references. */
-  private final ArrayList<Thesaurus> thes = new ArrayList<Thesaurus>(1);
+  private final ObjList<Thesaurus> thes = new ObjList<Thesaurus>(1);
 
   /**
    * Adds two thesaurus definitions.
