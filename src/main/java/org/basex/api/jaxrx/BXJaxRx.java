@@ -54,19 +54,19 @@ public final class BXJaxRx implements JaxRx {
   }
 
   @Override
-  public StreamingOutput get(final ResourcePath rp) {
-    return new BXOutput(rp) {
+  public StreamingOutput get(final ResourcePath path) {
+    return new BXOutput(path) {
       @Override
       String code() throws IOException {
         final XMLSerializer xml = new XMLSerializer(out,
-            new SerializerProp(serial(rp)));
+            new SerializerProp(serial(path)));
 
-        if(rp.getDepth() != 0) {
-          final String all = rp.getResourcePath();
+        if(path.getDepth() != 0) {
+          final String all = path.getResourcePath();
 
           final Table table = new Table(exec(new ListDB(all), null));
           xml.openElement(Token.token(JAXRX + ":" + "database"),
-              Token.token("name"), Token.token(rp.getResource(0)),
+              Token.token("name"), Token.token(path.getResource(0)),
             Token.token("documents"), Token.token(table.contents.size()));
 
           for(final TokenList l : table.contents) {
@@ -92,8 +92,8 @@ public final class BXJaxRx implements JaxRx {
   }
 
   @Override
-  public StreamingOutput query(final String query, final ResourcePath rp) {
-    return new BXOutput(rp) {
+  public StreamingOutput query(final String query, final ResourcePath path) {
+    return new BXOutput(path) {
       @Override
       String code() {
         return query(query);
@@ -102,8 +102,8 @@ public final class BXJaxRx implements JaxRx {
   }
 
   @Override
-  public StreamingOutput run(final String file, final ResourcePath rp) {
-    return new BXOutput(rp) {
+  public StreamingOutput run(final String file, final ResourcePath path) {
+    return new BXOutput(path) {
       @Override
       String code() {
         // get root directory for files
@@ -127,8 +127,8 @@ public final class BXJaxRx implements JaxRx {
   }
 
   @Override
-  public StreamingOutput command(final String cmd, final ResourcePath rp) {
-    return new BXOutput(rp) {
+  public StreamingOutput command(final String cmd, final ResourcePath path) {
+    return new BXOutput(path) {
       @Override
       String code() throws IOException {
         // perform command
@@ -140,24 +140,24 @@ public final class BXJaxRx implements JaxRx {
           new XMLSerializer(out, new SerializerProp(serial(path)));
         xml.text(Token.delete(ao.toArray(), '\r'));
         xml.close();
-        return cs.info();
+        return session.info();
       }
     };
   }
 
   @Override
-  public String add(final InputStream input, final ResourcePath rp) {
-    return new BXCode(rp) {
+  public String add(final InputStream input, final ResourcePath path) {
+    return new BXCode(path) {
       @Override
       String code() {
         // open database
         try {
-          cs.execute(new Open(db(rp)));
+          session.execute(new Open(db(path)));
         } catch(final BaseXException ex) {
           throw new JaxRxException(404, ex.getMessage());
         }
-        add(input, rp, cs);
-        return cs.info();
+        add(input, path, session);
+        return session.info();
       }
     }.run();
   }
@@ -165,46 +165,46 @@ public final class BXJaxRx implements JaxRx {
   /**
    * Adds a document to the database.
    * @param input input stream
-   * @param rp resource path
-   * @param cs client session
+   * @param path resource path
+   * @param session session
    */
-  void add(final InputStream input, final ResourcePath rp,
-      final Session cs) {
+  void add(final InputStream input, final ResourcePath path,
+      final Session session) {
 
-    final int d = rp.getDepth();
-    final String name = rp.getResource(d - 1);
+    final int d = path.getDepth();
+    final String name = path.getResource(d - 1);
     final StringBuilder target = new StringBuilder();
     for(int i = 1; i < d - 1; i++) {
-      target.append('/').append(rp.getResource(i));
+      target.append('/').append(path.getResource(i));
     }
     try {
-      cs.add(name, target.toString(), input);
+      session.add(name, target.toString(), input);
     } catch(final BaseXException ex) {
       throw new JaxRxException(400, ex.getMessage());
     }
   }
 
   @Override
-  public String update(final InputStream input, final ResourcePath rp) {
-    return new BXCode(rp) {
+  public String update(final InputStream input, final ResourcePath path) {
+    return new BXCode(path) {
       @Override
       String code() {
         try {
-          final int d = rp.getDepth();
+          final int d = path.getDepth();
           // create new database
           if(d == 1) {
-            cs.create(db(rp), input);
+            session.create(db(path), input);
           } else {
             // add document to database
-            cs.execute(new Open(db(rp)));
+            session.execute(new Open(db(path)));
             final StringBuilder target = new StringBuilder();
             for(int i = 1; i < d; i++) {
-              target.append('/').append(rp.getResource(i));
+              target.append('/').append(path.getResource(i));
             }
-            cs.execute(new Delete(target.toString()));
-            add(input, rp, cs);
+            session.execute(new Delete(target.toString()));
+            add(input, path, session);
           }
-          return cs.info();
+          return session.info();
         } catch(final BaseXException ex) {
           // return exception if process failed
           throw new JaxRxException(400, ex.getMessage());
@@ -214,19 +214,19 @@ public final class BXJaxRx implements JaxRx {
   }
 
   @Override
-  public String delete(final ResourcePath rp) {
-    return new BXCode(rp) {
+  public String delete(final ResourcePath path) {
+    return new BXCode(path) {
       @Override
       String code() {
-        final boolean root = rp.getDepth() == 1;
+        final boolean root = path.getDepth() == 1;
         try {
           if(root) {
-            cs.execute(new DropDB(db(rp)));
+            session.execute(new DropDB(db(path)));
           } else {
-            cs.execute(new Open(db(rp)));
-            cs.execute(new Delete(path(rp)));
+            session.execute(new Open(db(path)));
+            session.execute(new Delete(path(path)));
           }
-          return cs.info();
+          return session.info();
         } catch(final BaseXException ex) {
           // return exception if process failed
           if(root) throw new JaxRxException(ex);

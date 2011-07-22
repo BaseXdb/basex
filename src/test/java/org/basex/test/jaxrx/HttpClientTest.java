@@ -354,8 +354,7 @@ public final class HttpClientTest {
 
     // check parts
     final Iterator<Part> i = r.parts.iterator();
-    Part part = null;
-    part = i.next();
+    Part part = i.next();
     assertTrue(part.headers.size() == 2);
     assertTrue(part.bodyContent.size() == 1);
     assertTrue(part.bodyAttrs.size() == 1);

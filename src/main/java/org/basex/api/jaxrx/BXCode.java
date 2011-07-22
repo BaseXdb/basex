@@ -4,31 +4,67 @@ import static org.jaxrx.core.JaxRxConstants.*;
 
 import java.io.IOException;
 
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
+import org.basex.core.Context;
 import org.basex.data.DataText;
 import org.basex.io.serial.SerializerProp;
+import org.basex.server.LocalSession;
+import org.basex.server.LoginException;
 import org.basex.server.Session;
+import org.basex.util.Util;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
 import org.jaxrx.core.ResourcePath;
 
+import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
+
 /**
  * Wrapper class for running JAX-RX code.
- * 
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 abstract class BXCode {
-  /** Client session. */
-  final Session cs;
+  /** Context used to create local sessions.
+   * A local session will be created if {@link JaxRxServer#LOCAL} is set
+   * to {@code true}. Please note that no other {@link Context} instance should
+   * be created in parallel. */
+  private static final Context CONTEXT = Boolean.parseBoolean(
+      System.getProperty(JaxRxServer.LOCAL)) ? new Context() : null;
+  /** Session. */
+  final Session session;
 
   /**
-   * Constructor, creating a new client session instance with user name and
-   * password.
+   * Constructor, creating a new user session.
    * @param path {@link ResourcePath} containing path, user identity and user
-   *          credentials.
+   * credentials.
    */
   BXCode(final ResourcePath path) {
-    cs = SessionFactory.getSession(path);
+    session = getSession(path);
+  }
+
+  /**
+   * Creates a new session.
+   * @param path provides authentication information for client sessions
+   * @return a local or client session depending upon properties.
+   */
+  static Session getSession(final ResourcePath path) {
+    if(CONTEXT != null) return new LocalSession(CONTEXT);
+
+    try {
+      return JaxRxServer.login(path);
+    } catch(final LoginException ex) {
+      final ResponseBuilder rb = new ResponseBuilderImpl();
+      rb.header(HttpHeaders.WWW_AUTHENTICATE, "Basic ");
+      rb.status(401);
+      rb.entity("Username/password is wrong.");
+      throw new JaxRxException(rb.build());
+    } catch(final Exception ex) {
+      Util.stack(ex);
+      throw new JaxRxException(ex);
+    }
   }
 
   /**
@@ -50,7 +86,7 @@ abstract class BXCode {
       throw new JaxRxException(ex);
     } finally {
       try {
-        cs.close();
+        session.close();
       } catch(final Exception ex) { /**/}
     }
   }
@@ -68,13 +104,13 @@ abstract class BXCode {
   /**
    * Converts the specified query parameter to a positive integer. Throws an
    * exception if the string is smaller than 1 or cannot be converted.
-   * @param rp resource path
+   * @param path resource path
    * @param qp query parameter
    * @param def default value
    * @return integer
    */
-  int num(final ResourcePath rp, final QueryParameter qp, final int def) {
-    final String val = rp.getValue(qp);
+  int num(final ResourcePath path, final QueryParameter qp, final int def) {
+    final String val = path.getValue(qp);
     if(val == null) return def;
 
     try {

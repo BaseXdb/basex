@@ -40,6 +40,8 @@ public final class JaxRxServer extends BaseXServer {
   static final String SERVERPORT = "org.basex.serverport";
   /** Configuration: JAX-RX path. */
   static final String JAXRXPATH = "org.basex.jaxrxpath";
+  /** Configuration: local flag. */
+  static final String LOCAL = "org.basex.jaxrx.local";
   /** Configuration: serializer options. */
   static final String SERIALIZER = "org.jaxrx.parameter.output";
   /** JAX-RX String. */

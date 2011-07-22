@@ -2,7 +2,6 @@ package org.basex.api.xqj;
 
 import static org.basex.util.Token.*;
 
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 
@@ -28,6 +27,7 @@ import org.basex.query.iter.NodeCache;
 import org.basex.query.util.NSLocal;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * XML Stream Reader implementation.
@@ -524,9 +524,9 @@ final class IterStreamReader implements XMLStreamReader {
   /** Reader for traversing {@link FNode} instances. */
   private final class FNodeReader extends NodeReader {
     /** Axis iterator. */
-    private final ArrayList<AxisIter> iter = new ArrayList<AxisIter>();
+    private final ObjList<AxisIter> iter = new ObjList<AxisIter>();
     /** Node stack. */
-    private final ArrayList<ANode> nodes = new ArrayList<ANode>();
+    private final ObjList<ANode> nodes = new ObjList<ANode>();
     /** Stack level. */
     private int l;
 
@@ -540,15 +540,10 @@ final class IterStreamReader implements XMLStreamReader {
     boolean hasNext() {
       final ANode n = iter.get(l).next();
       if(n != null) {
-        while(l >= nodes.size()) nodes.add(null);
         nodes.set(l, n);
         node = n;
         type();
-        if(kind == START_ELEMENT) {
-          ++l;
-          while(l >= iter.size()) iter.add(null);
-          iter.set(l, n.children());
-        }
+        if(kind == START_ELEMENT) iter.set(++l, n.children());
       } else {
         if(--l < 0) return false;
         node = nodes.get(l);
