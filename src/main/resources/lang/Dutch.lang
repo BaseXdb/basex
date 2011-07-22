@@ -64,6 +64,7 @@ dc_target=Target path
 dc_advtitle=Creëer database
 dc_chop=Verwijder whitespaces
 dc_intparse=Gebruik interne XML parser
+dc_archives=Parse files within archives
 dc_createformat=Input format
 dc_entities=Parseer entities
 dc_dtd=Parseer DTDs

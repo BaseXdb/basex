@@ -64,6 +64,7 @@ dc_target=Zielpfad
 dc_advtitle=Datenbank-Optionen
 dc_chop=Leerzeichen entfernen
 dc_intparse=Internen XML-Parser benutzen
+dc_archives=Archivdateien parsen
 dc_createformat=Eingabe-Format
 dc_entities=Parsen von Entities
 dc_dtd=Parsen von DTDs

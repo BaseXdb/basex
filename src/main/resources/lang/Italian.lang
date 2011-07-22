@@ -64,6 +64,7 @@ dc_target=Target Path
 dc_advtitle=Crea base di dati
 dc_chop=Taglia gli spazi
 dc_intparse=Usa il parser XML interno
+dc_archives=Parse files within archives
 dc_createformat=Input format
 dc_entities=Analizza le entità
 dc_dtd=Analizza la DTD

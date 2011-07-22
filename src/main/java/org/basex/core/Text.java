@@ -1135,6 +1135,8 @@ public interface Text {
   String CREATEDTD = lang("dc_dtd");
   /** Internal parser. */
   String CREATEINTPARSE = lang("dc_intparse");
+  /** Parse archives. */
+  String CREATEARCHIVES = lang("dc_archives");
   /** SAX parsing information. */
   String CREATEFORMAT = lang("dc_createformat") + COLS;
 
