@@ -116,7 +116,7 @@ dr_empty=Een lege database wordt gemaakt
 dr_delete=% documenten worden verwijderd
 
 dd_title=Manage databases
-dd_question=Database '%' zal verwijderd worden.
+dd_question=% database(s) zal verwijderd worden.
 dd_sure=Weet je het zeker?
 
 dx_question=Wil je echt verwijderen?

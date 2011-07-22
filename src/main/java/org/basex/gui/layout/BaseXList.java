@@ -8,16 +8,23 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
+
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.MouseInputAdapter;
+
+import org.basex.core.Prop;
 import org.basex.gui.dialog.Dialog;
+import org.basex.io.IOFile;
 import org.basex.util.Token;
+import org.basex.util.list.IntList;
+import org.basex.util.list.StringList;
 
 /**
- * Combination of TextField and a List, communicating with each other.
+ * Combination of text field and a list, communicating with each other.
  * List entries are automatically completed if they match the first characters
  * of the typed in text. Moreover, the cursor keys can be used to scroll
  * through the list, and list entries can be chosen with mouse clicks.
@@ -25,9 +32,11 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class BaseXListChooser extends BaseXBack {
+public final class BaseXList extends BaseXBack {
   /** Scroll pane. */
   private final JScrollPane scroll;
+  /** Single choice. */
+  final boolean single;
   /** Text field. */
   final BaseXTextField text;
   /** List. */
@@ -42,9 +51,20 @@ public final class BaseXListChooser extends BaseXBack {
    * @param choice the input values for the list
    * @param d dialog reference
    */
-  public BaseXListChooser(final String[] choice, final Dialog d) {
+  public BaseXList(final String[] choice, final Dialog d) {
+    this(choice, d, true);
+  }
+
+  /**
+   * Default constructor.
+   * @param choice the input values for the list
+   * @param d dialog reference
+   * @param s only allow single choices
+   */
+  public BaseXList(final String[] choice, final Dialog d, final boolean s) {
     // cache list values
     values = choice.clone();
+    single = s;
 
     // checks if list is purely numeric
     for(final String v : values) num = num && v.matches("[0-9]+");
@@ -62,29 +82,43 @@ public final class BaseXListChooser extends BaseXBack {
 
       @Override
       public void keyPressed(final KeyEvent e) {
-        final int op = list.getSelectedIndex();
-        int np = op;
         final int page = getHeight() / getFont().getSize();
+        final int[] inds = list.getSelectedIndices();
+        final int op1 = inds.length == 0 ? -1 : inds[0];
+        final int op2 = inds.length == 0 ? -1 : inds[inds.length - 1];
+        int np1 = op1, np2 = op2;
 
         if(NEXTLINE.is(e)) {
-          np = Math.min(op + 1, values.length - 1);
+          np2 = Math.min(op2 + 1, values.length - 1);
         } else if(PREVLINE.is(e)) {
-          np = Math.max(op - 1, 0);
+          np1 = Math.max(op1 - 1, 0);
         } else if(NEXTPAGE.is(e)) {
-          np = Math.min(op + page, values.length - 1);
+          np2 = Math.min(op2 + page, values.length - 1);
         } else if(PREVPAGE.is(e)) {
-          np = Math.max(op - page, 0);
+          np1 = Math.max(op1 - page, 0);
         } else if(TEXTSTART.is(e)) {
-          np = 0;
+          np1 = 0;
         } else if(TEXTEND.is(e)) {
-          np = values.length - 1;
+          np2 = values.length - 1;
+        } else {
+          return;
         }
+
+        final IntList il = new IntList();
+        for(int n = np1; n <= np2; n++) il.add(n);
         // choose new list value
-        if(op != np && np < values.length) {
-          list.setSelectedValue(values[np], true);
-          text.setText(values[np]);
+        final int nv = op2 != np2 ? np2 : np1;
+        final String val = values[nv];
+        list.setSelectedValue(val, true);
+        if(e.isShiftDown() && !single) {
+          if(!Arrays.equals(inds, il.toArray())) {
+            list.setSelectedIndices(il.toArray());
+            text.setText("");
+          }
+        } else {
+          list.setSelectedIndex(nv);
+          text.setText(val);
           text.selectAll();
-          typed = false;
         }
       }
 
@@ -105,16 +139,25 @@ public final class BaseXListChooser extends BaseXBack {
           typed = false;
 
           final String txt = text.getText().trim().toLowerCase();
-          int i = 0;
-          for(i = 0; i < values.length; ++i) {
-            final String txt2 = values[i].toLowerCase();
-            if(txt2.startsWith(txt)) break;
+          final boolean glob = txt.matches("^.*[*?,].*$");
+          final String regex = glob ? IOFile.regex(txt, false) : null;
+
+          final IntList il = new IntList();
+          for(int i = 0; i < values.length; ++i) {
+            final String db = Prop.WIN ? values[i].toLowerCase() : values[i];
+            if(glob) {
+              if(db.matches(regex)) il.add(i);
+            } else if(db.startsWith(txt)) {
+              final int c = text.getCaretPosition();
+              list.setSelectedValue(values[i], true);
+              text.setText(values[i]);
+              text.select(c, values[i].length());
+              break;
+            }
           }
-          if(i < values.length) {
-            final int c = text.getCaretPosition();
-            list.setSelectedValue(values[i], true);
-            text.setText(values[i]);
-            text.select(c, values[i].length());
+          if(glob) {
+            list.setSelectedValue(values[il.get(0)], true);
+            list.setSelectedIndices(il.toArray());
           }
         }
         d.action(null);
@@ -129,9 +172,10 @@ public final class BaseXListChooser extends BaseXBack {
       }
       @Override
       public void mousePressed(final MouseEvent e) {
-        final Object i = list.getSelectedValue();
-        if(i == null) return;
-        text.setText(i.toString());
+        final Object[] i = list.getSelectedValues();
+        if(i.length == 0) return;
+
+        text.setText(i.length == 1 ? i[0].toString() : "");
         text.requestFocusInWindow();
         text.selectAll();
         d.action(null);
@@ -151,7 +195,7 @@ public final class BaseXListChooser extends BaseXBack {
 
     list = new JList(choice);
     list.setFocusable(false);
-    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    if(s) list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.addMouseListener(mouse);
     list.addMouseMotionListener(mouse);
     text.setFont(list.getFont());
@@ -184,11 +228,29 @@ public final class BaseXListChooser extends BaseXBack {
   }
 
   /**
-   * Returns the value of the text field.
+   * Returns all list choices.
+   * @return list index entry
+   */
+  public String[] getList() {
+    return values;
+  }
+
+  /**
+   * Returns the first (or only) chosen value of the text field.
    * @return text field value
    */
   public String getValue() {
     return text.getText();
+  }
+
+  /**
+   * Returns all selected values.
+   * @return text field value
+   */
+  public StringList getValues() {
+    final StringList sl = new StringList();
+    for(final Object o : list.getSelectedValues()) sl.add(o.toString());
+    return sl;
   }
 
   /**
@@ -199,9 +261,8 @@ public final class BaseXListChooser extends BaseXBack {
   public int getNum() {
     final int i = Token.toInt(text.getText());
     if(i != Integer.MIN_VALUE) return i;
-
     final Object value = list.getSelectedValue();
-    return value != null ? Integer.parseInt(value.toString()) : 0;
+    return value != null ? Token.toInt(value.toString()) : 0;
   }
 
   /**

@@ -44,7 +44,7 @@ public abstract class Builder extends Progress {
   protected final String name;
 
   /** Tag name index. */
-  protected final Names tags;;
+  protected final Names tags;
   /** Attribute name index. */
   protected final Names atts;
 

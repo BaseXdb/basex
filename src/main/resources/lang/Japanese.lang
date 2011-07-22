@@ -116,7 +116,7 @@ dr_empty=An empty database will be created
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
-dd_question=データベース '%' を削除します。
+dd_question=% database(s) will be dropped.
 dd_sure=よろしいですか。
 
 dx_question=本当に削除しますか。

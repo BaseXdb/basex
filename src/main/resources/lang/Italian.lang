@@ -116,7 +116,7 @@ dr_empty=An empty database will be created
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
-dd_question=La base di dati '%' verrà cancellata.
+dd_question=% base/i di dati verràn cancellata.
 dd_sure=Sei sicuro?
 
 dx_question=Cancellare. Sei sicuro?

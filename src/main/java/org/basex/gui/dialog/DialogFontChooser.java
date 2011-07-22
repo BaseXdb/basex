@@ -6,7 +6,7 @@ import java.awt.GraphicsEnvironment;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXListChooser;
+import org.basex.gui.layout.BaseXList;
 import org.basex.gui.layout.TableLayout;
 
 /**
@@ -21,13 +21,13 @@ public final class DialogFontChooser extends Dialog {
     { "8", "10", "12", "14", "16", "18", "20", "22", "24", "32" };
 
   /** Font name chooser. */
-  private final BaseXListChooser font;
+  private final BaseXList font;
   /** Font name chooser. */
-  private final BaseXListChooser font2;
+  private final BaseXList font2;
   /** Font type chooser. */
-  private final BaseXListChooser type;
+  private final BaseXList type;
   /** Font size chooser. */
-  private final BaseXListChooser size;
+  private final BaseXList size;
 
   /**
    * Default constructor.
@@ -40,16 +40,16 @@ public final class DialogFontChooser extends Dialog {
       getAvailableFontFamilyNames();
 
     final BaseXBack p = new BaseXBack(new TableLayout(1, 4, 8, 6));
-    font = new BaseXListChooser(fonts, this);
+    font = new BaseXList(fonts, this);
     font.setSize(150, 112);
     p.add(font);
-    font2 = new BaseXListChooser(fonts, this);
+    font2 = new BaseXList(fonts, this);
     font2.setSize(150, 112);
     p.add(font2);
-    type = new BaseXListChooser(FONTTYPES, this);
+    type = new BaseXList(FONTTYPES, this);
     type.setSize(80, 112);
     p.add(type);
-    size = new BaseXListChooser(FTSZ, this);
+    size = new BaseXList(FTSZ, this);
     size.setSize(50, 112);
     p.add(size);
 

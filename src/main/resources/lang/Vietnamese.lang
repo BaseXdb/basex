@@ -116,7 +116,7 @@ dr_empty=An empty database will be created
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
-dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.
+dd_question=% database(s) will be dropped.
 dd_sure=Bạn chắc không?
 
 dx_question=Bạn thực sự muốn xóa?

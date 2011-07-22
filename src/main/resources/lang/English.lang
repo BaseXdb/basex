@@ -116,7 +116,7 @@ dr_empty=An empty database will be created
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
-dd_question=Database '%' will be dropped.
+dd_question=% database(s) will be dropped.
 dd_sure=Are you sure?
 
 dx_question=Do you really want to delete?

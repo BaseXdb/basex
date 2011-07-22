@@ -116,7 +116,7 @@ dr_empty=Eine leere Datenbank wird erstellt
 dr_delete=% Dokumente werden gelöscht
 
 dd_title=Datenbankmanagement
-dd_question=Die Datenbank '%' wird gelöscht.
+dd_question=% Datenbank(en) werden gelöscht.
 dd_sure=Sind Sie sicher?
 
 dx_question=Möchten Sie wirklich löschen?

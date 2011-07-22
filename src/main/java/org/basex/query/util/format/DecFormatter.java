@@ -27,7 +27,7 @@ public final class DecFormatter extends FormatUtil {
   /** Decimal-digit-family (mandatory-digit-sign). */
   private final String digits;
   /** Active characters. */
-  private final String active;;
+  private final String active;
 
   /** Infinity. */
   private String inf = "Infinity";
