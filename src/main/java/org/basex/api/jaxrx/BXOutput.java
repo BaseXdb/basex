@@ -2,13 +2,15 @@ package org.basex.api.jaxrx;
 
 import java.io.OutputStream;
 import java.util.Scanner;
+
 import javax.ws.rs.core.StreamingOutput;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
-import org.basex.server.ClientQuery;
+import org.basex.server.Query;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
 import org.jaxrx.core.ResourcePath;
@@ -81,7 +83,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
     final int s = num(path, QueryParameter.START, 1);
     final int m = num(path, QueryParameter.COUNT, Integer.MAX_VALUE - s);
 
-    ClientQuery cq = null;
+    Query cq = null;
     try {
       cs.execute(new Set(Prop.SERIALIZER, serial(path)));
       cs.setOutputStream(out);
