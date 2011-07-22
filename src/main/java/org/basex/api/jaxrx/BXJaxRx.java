@@ -2,10 +2,13 @@ package org.basex.api.jaxrx;
 
 import static org.basex.core.Text.*;
 import static org.jaxrx.core.JaxRxConstants.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+
 import javax.ws.rs.core.StreamingOutput;
+
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
@@ -16,7 +19,7 @@ import org.basex.io.IO;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.SerializerProp;
 import org.basex.io.serial.XMLSerializer;
-import org.basex.server.ClientSession;
+import org.basex.server.Session;
 import org.basex.util.Table;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -166,7 +169,7 @@ public final class BXJaxRx implements JaxRx {
    * @param cs client session
    */
   void add(final InputStream input, final ResourcePath rp,
-      final ClientSession cs) {
+      final Session cs) {
 
     final int d = rp.getDepth();
     final String name = rp.getResource(d - 1);
