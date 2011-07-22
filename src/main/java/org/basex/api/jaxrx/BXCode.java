@@ -4,29 +4,22 @@ import static org.jaxrx.core.JaxRxConstants.*;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
 import org.basex.data.DataText;
 import org.basex.io.serial.SerializerProp;
-import org.basex.server.ClientSession;
-import org.basex.server.LoginException;
-import org.basex.util.Util;
+import org.basex.server.Session;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
 import org.jaxrx.core.ResourcePath;
 
-import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
-
 /**
  * Wrapper class for running JAX-RX code.
- *
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 abstract class BXCode {
   /** Client session. */
-  final ClientSession cs;
+  final Session cs;
 
   /**
    * Constructor, creating a new client session instance with user name and
@@ -35,18 +28,7 @@ abstract class BXCode {
    *          credentials.
    */
   BXCode(final ResourcePath path) {
-    try {
-      cs = JaxRxServer.login(path);
-    } catch(final LoginException ex) {
-      final ResponseBuilder rb = new ResponseBuilderImpl();
-      rb.header(HttpHeaders.WWW_AUTHENTICATE, "Basic ");
-      rb.status(401);
-      rb.entity("Username/password is wrong.");
-      throw new JaxRxException(rb.build());
-    } catch(final Exception ex) {
-      Util.stack(ex);
-      throw new JaxRxException(ex);
-    }
+    cs = SessionFactory.getSession(path);
   }
 
   /**
@@ -101,8 +83,8 @@ abstract class BXCode {
     } catch(final NumberFormatException ex) {
       /* exception follows for both branches. */
     }
-    throw new JaxRxException(400,
-        "Parameter '" + qp + "' is no valid integer: " + val);
+    throw new JaxRxException(400, "Parameter '" + qp
+        + "' is no valid integer: " + val);
   }
 
   /**
