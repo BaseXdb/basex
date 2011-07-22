@@ -61,11 +61,7 @@ public final class Add extends InsertBase {
 
   @Override
   public void merge(final UpdatePrimitive p) {
-    if(p instanceof Add) {
-      for(final Item d : docs) docs.add(d);
-    } else {
-      Util.notexpected(p);
-    }
+    for(final Item d : ((Add) p).docs) docs.add(d);
   }
 
   @Override
