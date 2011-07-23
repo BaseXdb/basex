@@ -64,6 +64,7 @@ dc_target=Target Path
 dc_advtitle=Crea base di dati
 dc_chop=Taglia gli spazi
 dc_intparse=Usa il parser XML interno
+dc_archives=Parse files within archives
 dc_createformat=Input format
 dc_entities=Analizza le entità
 dc_dtd=Analizza la DTD
@@ -115,7 +116,7 @@ dr_empty=An empty database will be created
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
-dd_question=La base di dati '%' verrà cancellata.
+dd_question=% base/i di dati verràn cancellata.
 dd_sure=Sei sicuro?
 
 dx_question=Cancellare. Sei sicuro?

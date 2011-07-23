@@ -30,7 +30,7 @@ public final class XQUPFastReplace extends AdvancedQueryTest {
    */
   @Before
   public void setUp() throws Exception {
-    new CreateDB(DBNAME, DOC).execute(CONTEXT);;
+    new CreateDB(DBNAME, DOC).execute(CONTEXT);
     query("let $items := /site/regions//item " +
       "for $i in 1 to 10 " +
       "return (insert node $items into /site/regions, " +

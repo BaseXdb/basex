@@ -64,6 +64,7 @@ dc_target=Target Path
 dc_advtitle=Tạo cơ sở dữ liệu
 dc_chop=Cắt hết khoảng trống
 dc_intparse=Sử dụng bộ phân tích XML nội bộ
+dc_archives=Parse files within archives
 dc_createformat=Input format
 dc_entities=Phân tích Entities
 dc_dtd=Phân tích DTDs
@@ -115,7 +116,7 @@ dr_empty=An empty database will be created
 dr_delete=% documents will be deleted
 
 dd_title=Manage Databases
-dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.
+dd_question=% database(s) will be dropped.
 dd_sure=Bạn chắc không?
 
 dx_question=Bạn thực sự muốn xóa?

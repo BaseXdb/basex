@@ -13,15 +13,12 @@ import org.basex.gui.dialog.Dialog;
  * @author Christian Gruen
  */
 public final class BaseXPassword extends JPasswordField {
-  /** Default width of text fields. */
-  private static final int DWIDTH = 260;
-
   /**
    * Constructor.
    * @param win parent window
    */
   public BaseXPassword(final Window win) {
-    BaseXLayout.setWidth(this, DWIDTH);
+    BaseXLayout.setWidth(this, BaseXTextField.DWIDTH);
     BaseXLayout.addInteraction(this, win);
 
     if(!(win instanceof Dialog)) return;

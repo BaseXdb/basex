@@ -10,7 +10,7 @@ import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXListChooser;
+import org.basex.gui.layout.BaseXList;
 import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.layout.TableLayout;
 
@@ -22,7 +22,7 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogMapLayout extends Dialog {
   /** Map layouts. */
-  private final BaseXListChooser algo;
+  private final BaseXList algo;
   /** Layout slider. */
   private final BaseXSlider sizeSlider;
   /** Show attributes. */
@@ -42,7 +42,7 @@ public final class DialogMapLayout extends Dialog {
     final BaseXBack p = new BaseXBack(new TableLayout(4, 1, 0, 8));
 
     // create list
-    algo = new BaseXListChooser(MAPALG, this);
+    algo = new BaseXList(MAPALG, this);
     p.add(algo);
 
     // create drop down
