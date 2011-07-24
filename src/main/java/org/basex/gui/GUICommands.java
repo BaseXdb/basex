@@ -445,14 +445,14 @@ public enum GUICommands implements GUICommand {
   SHOWXQUERY(GUISHOWXQUERY, "% E", GUISHOWXQUERYTT, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWXQUERY);
+      gui.gprop.invert(GUIProp.SHOWEDITOR);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWXQUERY));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWEDITOR));
     }
   },
 

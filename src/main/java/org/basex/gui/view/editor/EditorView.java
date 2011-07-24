@@ -278,12 +278,12 @@ public final class EditorView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWXQUERY);
+    return gui.gprop.is(GUIProp.SHOWEDITOR);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWXQUERY, v);
+    gui.gprop.set(GUIProp.SHOWEDITOR, v);
   }
 
   @Override
