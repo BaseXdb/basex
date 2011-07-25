@@ -2,7 +2,8 @@ package org.basex.util.list;
 
 import java.util.Arrays;
 import java.util.Iterator;
-
+import java.util.RandomAccess;
+import org.basex.util.Array;
 import org.basex.util.Util;
 
 /**
@@ -69,6 +70,14 @@ public final class ObjList<E> extends ElementList implements Iterable<E> {
     if(i >= list.length) list = Arrays.copyOf(list, newSize(i + 1));
     list[i] = e;
     size = Math.max(size, i + 1);
+  }
+
+  /**
+   * Deletes the specified element.
+   * @param i element to be deleted
+   */
+  public void delete(final int i) {
+    Array.move(list, i + 1, -1, --size - i);
   }
 
   /**
