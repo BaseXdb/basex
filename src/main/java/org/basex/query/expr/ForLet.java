@@ -74,4 +74,17 @@ public abstract class ForLet extends Single {
   public final boolean uses(final Use u) {
     return u == Use.VAR || super.uses(u);
   }
+
+  /**
+   * Checks if the given variable is declared by this clause.
+   * @param v variable
+   * @return declaration flag
+   */
+  public abstract boolean declares(final Var v);
+
+  /**
+   * Gathers all variables declared by this clause.
+   * @return variables
+   */
+  public abstract Var[] vars();
 }

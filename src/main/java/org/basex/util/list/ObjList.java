@@ -13,7 +13,8 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class ObjList<E> extends ElementList implements Iterable<E> {
+public final class ObjList<E> extends ElementList
+    implements Iterable<E>, RandomAccess {
   /** Element container. */
   protected Object[] list;
 
@@ -123,5 +124,11 @@ public final class ObjList<E> extends ElementList implements Iterable<E> {
       @Override
       public void remove() { Util.notexpected(); }
     };
+  }
+
+  @Override
+  public String toString() {
+    // no implicit copying of the list
+    return getClass().getSimpleName() + Arrays.asList(list).subList(0, size);
   }
 }
