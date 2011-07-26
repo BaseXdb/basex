@@ -15,7 +15,7 @@ import static java.lang.Double.isNaN;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Dbl extends Item {
+public final class Dbl extends Num {
   /** Invalid value. */
   public static final Dbl NAN = new Dbl(Double.NaN);
   /** Zero value. */
@@ -104,11 +104,6 @@ public final class Dbl extends Item {
   }
 
   @Override
-  public int hash(final InputInfo ii) {
-    return (int) val;
-  }
-
-  @Override
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof Dbl && val == ((Dbl) cmp).val ||
       this == NAN && cmp == NAN;
@@ -131,10 +126,5 @@ public final class Dbl extends Item {
       if(Token.eq(trim(val), NINF)) return Double.NEGATIVE_INFINITY;
       throw ZERO.castErr(val, ii);
     }
-  }
-
-  @Override
-  public String toString() {
-    return string(atom(null));
   }
 }

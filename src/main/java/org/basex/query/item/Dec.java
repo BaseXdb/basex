@@ -16,7 +16,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Dec extends Item {
+public final class Dec extends Num {
   /** Zero value. */
   private static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Decimal value. */
@@ -116,11 +116,6 @@ public final class Dec extends Item {
     return type == AtomType.ULN ? new BigInteger(val.toString()) : val;
   }
 
-  @Override
-  public int hash(final InputInfo ii) {
-    return val.intValue();
-  }
-
   /**
    * Converts the given double into a decimal value.
    * @param val value to be converted
@@ -153,10 +148,5 @@ public final class Dec extends Item {
     } catch(final NumberFormatException ex) {
       throw ZERO.castErr(val, ii);
     }
-  }
-
-  @Override
-  public String toString() {
-    return string(atom(null));
   }
 }
