@@ -139,4 +139,14 @@ public final class Let extends ForLet {
     sb.append(var).append(' ').append(ASSIGN).append(' ').append(expr);
     return sb.toString();
   }
+
+  @Override
+  public boolean declares(final Var v) {
+    return var.is(v);
+  }
+
+  @Override
+  public Var[] vars() {
+    return new Var[]{ var };
+  }
 }
