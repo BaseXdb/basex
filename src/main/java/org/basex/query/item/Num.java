@@ -36,8 +36,13 @@ abstract class Num extends Item {
 
   @Override
   public final int hash(final InputInfo ii) {
-    long bits = Double.doubleToLongBits(dbl(ii));
-    return (int) (bits ^ (bits >>> 32));
+    // makes sure the hashing is good for very small and very big numbers
+    final long l = itr(ii);
+    int h = (int) (Float.floatToIntBits(flt(ii)) ^ l ^ (l >>> 32));
+
+    // this part ensures better distribution of bits (from java.util.HashMap)
+    h ^= (h >>> 20) ^ (h >>> 12);
+    return h ^ (h >>> 7) ^ (h >>> 4);
   }
 
   @Override
