@@ -31,7 +31,7 @@ import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
 import org.basex.gui.dialog.DialogEdit;
 import org.basex.gui.dialog.DialogExport;
-import org.basex.gui.dialog.DialogFontChooser;
+import org.basex.gui.dialog.DialogFonts;
 import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogInfo;
 import org.basex.gui.dialog.DialogInsert;
@@ -717,7 +717,7 @@ public enum GUICommands implements GUICommand {
   FONTS(GUIFONTS, null, GUIFONTSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogFontChooser(gui);
+      new DialogFonts(gui);
     }
   },
 

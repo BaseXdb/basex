@@ -15,7 +15,7 @@ import org.basex.gui.layout.TableLayout;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DialogFontChooser extends Dialog {
+public final class DialogFonts extends Dialog {
   /** Predefined font sizes. */
   private static final String[] FTSZ =
     { "8", "10", "12", "14", "16", "18", "20", "22", "24", "32" };
@@ -33,7 +33,7 @@ public final class DialogFontChooser extends Dialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogFontChooser(final GUI main) {
+  public DialogFonts(final GUI main) {
     super(main, FONTTITLE, false);
 
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
