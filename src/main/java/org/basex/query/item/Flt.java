@@ -1,8 +1,6 @@
 package org.basex.query.item;
 
 import static java.lang.Double.isNaN;
-import static org.basex.util.Token.*;
-
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -15,7 +13,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Flt extends Item {
+public final class Flt extends Num {
   /** Invalid value. */
   public static final Flt NAN = new Flt(Float.NaN);
   /** Zero value. */
@@ -89,11 +87,6 @@ public final class Flt extends Item {
   }
 
   @Override
-  public int hash(final InputInfo ii) {
-    return (int) val;
-  }
-
-  @Override
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof Flt && val == ((Flt) cmp).val ||
       this == NAN && cmp == NAN;
@@ -116,10 +109,5 @@ public final class Flt extends Item {
       if(Token.eq(Token.trim(val), Token.NINF)) return Float.NEGATIVE_INFINITY;
       throw ZERO.castErr(val, ii);
     }
-  }
-
-  @Override
-  public String toString() {
-    return string(atom(null));
   }
 }
