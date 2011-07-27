@@ -106,11 +106,11 @@ public final class ClientListener extends Thread {
         log.write(this, "LOGIN " + context.user.name, OK);
         // send {OK}
         send(true);
+        // start listener thread
+        start();
       } else if(!us.isEmpty()) {
-        log.write(this, SERVERLOGIN + COLS + us);
+        log.write(this, SERVERDENIED + COLS + us);
       }
-      // start listener thread
-      start();
       // return result flag
       return running;
     } catch(final IOException ex) {

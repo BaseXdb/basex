@@ -78,7 +78,7 @@ public final class SAXWrapper extends SingleParser {
   @Override
   public void parse() throws IOException {
     final InputSource is = wrap(saxs.getInputSource());
-    final String in = saxs.getSystemId() == null ? "..." : saxs.getSystemId();
+    final String in = saxs.getSystemId() == null ? DOTS : saxs.getSystemId();
 
     try {
       XMLReader r = saxs.getXMLReader();

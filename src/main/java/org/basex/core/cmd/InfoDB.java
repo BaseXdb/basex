@@ -65,7 +65,6 @@ public final class InfoDB extends AInfo {
     format(tb, INFOENCODING, meta.encoding);
     format(tb, INFONDOCS, Integer.toString(meta.ndocs));
     format(tb, INFOCHOP, flag(meta.chop));
-    format(tb, INFOENTITY, flag(meta.entity));
 
     if(index) {
       tb.add(NL).addExt(header, INFOINDEX);

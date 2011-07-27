@@ -142,7 +142,7 @@ public final class Util {
   public static String server(final Exception ex) {
     debug(ex);
     if(ex instanceof BindException) return SERVERBIND;
-    else if(ex instanceof LoginException) return SERVERLOGIN;
+    else if(ex instanceof LoginException) return SERVERDENIED;
     else if(ex instanceof ConnectException) return SERVERERROR;
     else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
     else if(ex instanceof SocketException) return SERVERBIND;

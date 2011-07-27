@@ -50,6 +50,14 @@ public abstract class Parser extends Progress {
    */
   public abstract void parse(final Builder build) throws IOException;
 
+  /**
+   * Returns parser information.
+   * @return info string
+   */
+  public String info() {
+    return "";
+  }
+
   // STATIC METHODS ===========================================================
 
   /**

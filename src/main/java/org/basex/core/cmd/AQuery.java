@@ -137,7 +137,7 @@ abstract class AQuery extends Command {
   }
 
   /**
-   * Checks if the query performs updates.
+   * Checks if the query might perform updates.
    * @param ctx database context
    * @param qu query
    * @return result of check

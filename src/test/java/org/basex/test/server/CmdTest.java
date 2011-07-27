@@ -121,7 +121,6 @@ public class CmdTest {
     ok(new CreateDB(NAME));
     ok(new Add(FILE, FN));
     ok(new Add(FILE, FN, "target"));
-    ok(new Add(FLDR, "xml"));
     no(new Add(FILE, "\\"));
     no(new Add(FILE, "/"));
   }
@@ -502,7 +501,7 @@ public class CmdTest {
 
   /** Command test. */
   @Test
-  public final void xQuery() {
+  public final void xquery() {
     no(new XQuery("/"));
     ok(new CreateDB(NAME, FILE));
     ok(new XQuery("/"));

@@ -30,13 +30,17 @@ public final class AddDeleteTest {
   /** Test database name. */
   private static final String DBNAME = Util.name(AddDeleteTest.class);
   /** Test file. */
-  private static final String FILE = "etc/test/input.xml";
+  private static final String DIR = "etc/test/";
+  /** Test file. */
+  private static final String FILE = DIR + "input.xml";
+  /** Test file. */
+  private static final String CORRUPT = DIR + "corrupt.xml";
   /** Test folder. */
-  private static final String FLDR = "etc/test/dir";
+  private static final String FLDR = DIR + "dir";
   /** Test ZIP file. */
-  private static final String ZIPFILE = "etc/test/xml.zip";
+  private static final String ZIPFILE = DIR + "xml.zip";
   /** Test GZIP file. */
-  private static final String GZIPFILE = "etc/test/xml.gz";
+  private static final String GZIPFILE = DIR + "xml.gz";
   /** Test XML fragment. */
   private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
 
@@ -70,20 +74,20 @@ public final class AddDeleteTest {
   }
 
   /**
-   * Adds an XML fragment to the database.
-   * 1) with name and w/o target
-   * 2) with name and target set
-   * 3) w/o name and target set
+   * <p>Adds an XML fragment to the database.</p><ol>
+   * <li> with name and w/o target</li>
+   * <li> with name and target set</li>
+   * <li> w/o name and target set</li></ol>
    * @throws BaseXException database exception
    */
   @Test
-  public void testAddXMLString() throws BaseXException {
+  public void addXMLString() throws BaseXException {
     new Add(XMLFRAG, "index.xml").execute(CONTEXT);
-    assertEquals(1, CONTEXT.doc().length);
+    assertEquals(1, docs());
     new Add(XMLFRAG, "index2.xml", "a/b/c").execute(CONTEXT);
-    assertEquals(2, CONTEXT.doc().length);
+    assertEquals(2, docs());
     new Add(XMLFRAG, null, "a/d/c").execute(CONTEXT);
-    assertEquals(3, CONTEXT.doc().length);
+    assertEquals(3, docs());
   }
 
   /**
@@ -91,9 +95,9 @@ public final class AddDeleteTest {
    * @throws BaseXException exception
    */
   @Test
-  public void testAddFile() throws BaseXException {
+  public void addFile() throws BaseXException {
     new Add(FILE).execute(CONTEXT);
-    assertEquals(1, CONTEXT.doc().length);
+    assertEquals(1, docs());
   }
 
   /**
@@ -101,13 +105,14 @@ public final class AddDeleteTest {
    * @throws BaseXException exception
    */
   @Test
-  public void testAddZip() throws BaseXException {
+  public void addZip() throws BaseXException {
     new Add(ZIPFILE, null, "target").execute(CONTEXT);
-    assertEquals(4, CONTEXT.doc().length);
+    assertEquals(4, docs());
     // do not add archives
     new Set(Prop.ADDARCHIVES, false).execute(CONTEXT);
     new Add(ZIPFILE).execute(CONTEXT);
-    assertEquals(4, CONTEXT.doc().length);
+    assertEquals(4, docs());
+    new Set(Prop.ADDARCHIVES, true).execute(CONTEXT);
   }
 
   /**
@@ -115,11 +120,11 @@ public final class AddDeleteTest {
    * @throws BaseXException exception
    */
   @Test
-  public void testAddGzip() throws BaseXException {
+  public void addGzip() throws BaseXException {
     new Add(GZIPFILE).execute(CONTEXT);
     new Add(GZIPFILE, null, "bar").execute(CONTEXT);
     new Delete("bar").execute(CONTEXT);
-    assertEquals(1, CONTEXT.doc().length);
+    assertEquals(1, docs());
   }
 
   /**
@@ -127,9 +132,9 @@ public final class AddDeleteTest {
    * @throws BaseXException exception
    */
   @Test
-  public void testAddFolder() throws BaseXException {
+  public void addFolder() throws BaseXException {
     new Add(FLDR).execute(CONTEXT);
-    assertEquals(NFLDR, CONTEXT.doc().length);
+    assertEquals(NFLDR, docs());
   }
 
   /**
@@ -139,13 +144,13 @@ public final class AddDeleteTest {
   @Test
   public void deletePath() throws BaseXException {
     new Add(FLDR, null, "foo/pub").execute(CONTEXT);
-    assertEquals(NFLDR, CONTEXT.doc().length);
+    assertEquals(NFLDR, docs());
     new Delete("foo").execute(CONTEXT);
-    assertEquals(1, CONTEXT.doc().length);
+    assertEquals(0, docs());
     new Add(FILE, null, "/foo///bar////").execute(CONTEXT);
     new Add(FLDR, null, "foobar").execute(CONTEXT);
     new Delete("foo").execute(CONTEXT);
-    assertEquals(NFLDR, CONTEXT.doc().length);
+    assertEquals(NFLDR, docs());
   }
 
   /**
@@ -158,7 +163,7 @@ public final class AddDeleteTest {
     new Add(FILE).execute(CONTEXT);
     new Delete("input.xml").execute(CONTEXT);
     new Delete("folder/input.xml").execute(CONTEXT);
-    assertEquals(NFLDR - 1, CONTEXT.doc().length);
+    assertEquals(NFLDR - 1, docs());
   }
 
   /**
@@ -166,7 +171,7 @@ public final class AddDeleteTest {
    * @throws BaseXException expected.
    */
   @Test(expected = BaseXException.class)
-  public void testAddFileFail() throws BaseXException {
+  public void addFileFail() throws BaseXException {
     new Add(FILE + "/doesnotexist").execute(CONTEXT);
   }
 
@@ -176,7 +181,12 @@ public final class AddDeleteTest {
    * @throws Exception exception
    */
   @Test
-  public void testBrokenAdd() throws Exception {
+  public void addCorrupt() throws Exception {
+    try {
+      new Add("<x").execute(CONTEXT);
+      fail("Broken file was added to the database.");
+    } catch(final Exception ex) { }
+
     final IOFile io = new IOFile(Prop.TMP, DBNAME);
     io.write(Token.token("<x"));
     try {
@@ -192,7 +202,12 @@ public final class AddDeleteTest {
    * @throws Exception exception
    */
   @Test
-  public void testBrokenCreate() throws Exception {
+  public void createCorrupt() throws Exception {
+    try {
+      new CreateDB(DBNAME, "<x").execute(CONTEXT);
+      fail("Broken file was added to the database.");
+    } catch(final Exception ex) { }
+
     final IOFile io = new IOFile(Prop.TMP, DBNAME);
     io.write(Token.token("<x"));
     try {
@@ -200,5 +215,37 @@ public final class AddDeleteTest {
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
     assertTrue(io.delete());
+  }
+
+  /**
+   * Skips a corrupt file.
+   * @throws Exception exception
+   */
+  @Test
+  public void skipCorrupt() throws Exception {
+    final IOFile io = new IOFile(Prop.TMP, DBNAME);
+    io.write(Token.token("<x"));
+
+    new Set(Prop.SKIPCORRUPT, true).execute(CONTEXT);
+    assertEquals(0, CONTEXT.data.doc("").size());
+    new Add("<x").execute(CONTEXT);
+    new Add(CORRUPT).execute(CONTEXT);
+    assertEquals(0, CONTEXT.data.doc("").size());
+    new Set(Prop.SKIPCORRUPT, false).execute(CONTEXT);
+
+    try {
+      new Add("<x").execute(CONTEXT);
+      fail("Broken file was added to the database.");
+    } catch(final Exception ex) { }
+
+    assertTrue(io.delete());
+  }
+
+  /**
+   * Returns the number of documents in the current database.
+   * @return number of documents
+   */
+  private int docs() {
+    return CONTEXT.data.doc("").size();
   }
 }

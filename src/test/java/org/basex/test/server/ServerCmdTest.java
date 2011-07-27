@@ -50,6 +50,7 @@ public final class ServerCmdTest extends CmdTest {
     // stop server instance
     server.stop();
   }
+
   /** Kill test.
    * @throws IOException on Server error.*/
   @Test
@@ -63,5 +64,4 @@ public final class ServerCmdTest extends CmdTest {
     no(new Kill(NAME2 + "?"));
     cs.close();
   }
-
 }

@@ -190,8 +190,8 @@ public abstract class Data {
   }
 
   /**
-   * Returns the document nodes.
-   * A single dummy node is returned if the database is empty.
+   * Returns the pre values of all document nodes.
+   * A single dummy is returned if the database is empty.
    * @return root nodes
    */
   public final IntList doc() {
@@ -199,7 +199,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns the document nodes for the specified path.
+   * Returns the pre values of the document nodes for the specified path.
    * @param input input path
    * @return root nodes
    */

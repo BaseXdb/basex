@@ -8,7 +8,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.basex.core.Context;
 import org.basex.core.Progress;
@@ -104,7 +103,8 @@ public final class QueryContext extends Progress {
   public Tim time;
 
   /** Decimal-format declarations. */
-  public TokenObjMap<DecFormatter> decFormats = new TokenObjMap<DecFormatter>();
+  public final TokenObjMap<DecFormatter> decFormats =
+    new TokenObjMap<DecFormatter>();
   /** Default function namespace. */
   public byte[] nsFunc = FNURI;
   /** Default element namespace. */
@@ -133,10 +133,10 @@ public final class QueryContext extends Progress {
   public byte ftoknum;
 
   /** Copied nodes, resulting from transform expression. */
-  public final Set<Data> copiedNods = new HashSet<Data>();
+  public final HashSet<Data> copiedNods = new HashSet<Data>();
   /** Pending updates. */
-  public Updates updates = new Updates();
-  /** Indicates if this query performs updates. */
+  public final Updates updates = new Updates();
+  /** Indicates if this query might perform updates. */
   public boolean updating;
 
   /** Compilation flag: current node has leaves. */
@@ -313,7 +313,6 @@ public final class QueryContext extends Progress {
   public Value value() throws QueryException {
     try {
       final Value v = value(root);
-
       if(updating) {
         updates.applyUpdates(this);
         if(context.data != null) context.update();

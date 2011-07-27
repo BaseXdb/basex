@@ -1,11 +1,18 @@
 package org.basex.build;
 
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.util.regex.Pattern;
+
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.io.IOFile;
+import org.basex.io.in.BufferInput;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * This class recursively scans files and directories and parses all
@@ -15,12 +22,20 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class DirParser extends TargetParser {
+  /** Number of skipped files to log. */
+  private static final int SKIPLOG = 10;
+  /** Skipped files. */
+  private final StringList skipped = new StringList();
   /** File pattern. */
   private final Pattern filter;
   /** Properties. */
   private final Prop prop;
   /** Initial file path. */
   private final String root;
+  /** Parse archives in directories. */
+  private final boolean archives;
+  /** Skip corrupt files in directories. */
+  private final boolean skip;
 
   /** Parser reference. */
   private Parser parser;
@@ -45,8 +60,10 @@ public final class DirParser extends TargetParser {
   public DirParser(final IO source, final String target, final Prop pr) {
     super(source, target);
     prop = pr;
-    final String dir = source.dir();
-    root = dir.endsWith("/") ? dir : dir + '/';
+    final String parent = source.dir();
+    root = parent.endsWith("/") ? parent : parent + '/';
+    skip = prop.is(Prop.SKIPCORRUPT);
+    archives = prop.is(Prop.ADDARCHIVES);
     filter = !source.isDir() ? null :
       Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));
   }
@@ -70,8 +87,9 @@ public final class DirParser extends TargetParser {
       for(final IO f : ((IOFile) io).children()) parse(b, f);
     } else {
       src = io;
-      if(!b.meta.prop.is(Prop.ADDARCHIVES) && src.archive()) return;
+      if(!archives && src.archive()) return;
 
+      // multiple archive files may be parsed in this loop
       while(io.more()) {
         final String nm = Prop.WIN ? io.name().toLowerCase() : io.name();
         if(filter != null && !filter.matcher(nm).matches()) continue;
@@ -87,13 +105,50 @@ public final class DirParser extends TargetParser {
           if(path.startsWith(root)) path = path.substring(root.length());
           targ = (targ + path).replace("//", "/");
         }
-        parser = Parser.fileParser(io, prop, targ);
-        parser.parse(b);
 
+        // parse file twice to ensure that it is well-formed
+        boolean ok = true;
+        IO in = io;
+        if(skip) {
+          BufferInput bi = null;
+          try {
+            // cache file contents to allow or speed up a second run
+            bi = io.buffer();
+            in = new IOContent(bi.token().toArray());
+            in.name(io.name());
+            parser = Parser.fileParser(in, prop, targ);
+            MemBuilder.build("", parser, prop);
+          } catch(final IOException ex) {
+            Util.debug(ex.getMessage());
+            skipped.add(io.path());
+            ok = false;
+          } finally {
+            if(bi != null) try { bi.close(); } catch(final Exception ex) { }
+          }
+        }
+        parser = Parser.fileParser(in, prop, targ);
+
+        if(ok) parser.parse(b);
         if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
       }
     }
   }
+
+  @Override
+  public String info() {
+    final TokenBuilder sb = new TokenBuilder();
+    if(skipped.size() != 0) {
+      sb.add(SKIPCORRUPT).add(COL).add(NL);
+      final int s = skipped.size();
+      for(int i = 0; i < s && i < SKIPLOG; i++) {
+        sb.add(LI).add(skipped.get(i)).add(NL);
+      }
+      if(s > SKIPLOG) {
+        sb.add(LI).addExt(SKIPINFO, s - SKIPLOG).add(NL);
+      }
+    }
+    return sb.toString();
+  };
 
   @Override
   public String det() {

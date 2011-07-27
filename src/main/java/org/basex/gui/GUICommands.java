@@ -76,11 +76,8 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = gui.gprop.get(GUIProp.CREATEPATH);
       final String db = gui.gprop.get(GUIProp.CREATENAME);
-      if(in.isEmpty()) {
-        DialogProgress.execute(dialog, PROGCREATE, new CreateDB(db));
-      } else {
-        DialogProgress.execute(dialog, PROGCREATE, new CreateDB(db, in));
-      }
+      DialogProgress.execute(dialog, PROGCREATE,
+          new CreateDB(db, in.isEmpty() ? null : in));
     }
   },
 
