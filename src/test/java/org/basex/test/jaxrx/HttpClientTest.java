@@ -858,6 +858,7 @@ public final class HttpClientTest {
    */
   private void checkResponse(final Command c, final int expStatus,
       final int itemsCount) throws QueryException {
+
     assertTrue(c.result() instanceof ValueIter);
     final ValueIter res = (ValueIter) c.result();
     assertEquals(itemsCount, res.size());
@@ -866,8 +867,9 @@ public final class HttpClientTest {
     assertNotNull(response.attributes());
     final NodeIter resAttr = response.attributes();
     for(ANode attr; (attr = resAttr.next()) != null;) {
-      if(eq(attr.nname(), STATUS))
+      if(eq(attr.nname(), STATUS)) {
         assertTrue(eq(attr.atom(), token(expStatus)));
+      }
     }
   }
 }

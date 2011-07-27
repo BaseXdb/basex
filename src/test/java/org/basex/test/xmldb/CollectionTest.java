@@ -311,7 +311,7 @@ public class CollectionTest extends TestCase {
 
     // the following tests are database specific...
     assertEquals(AllTests.COLL, coll.getProperty("name"));
-    assertEquals("false", coll.getProperty("entity"));
+    assertEquals("true", coll.getProperty("chop"));
   }
 
   @Test
