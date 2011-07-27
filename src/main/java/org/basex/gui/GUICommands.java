@@ -354,7 +354,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       // disallow deletion of empty node set or root node
-      b.setEnabled(updatable(gui.context.marked, Data.DOC));
+      b.setEnabled(updatable(gui.context.marked));
     }
   },
 

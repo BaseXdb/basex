@@ -97,7 +97,7 @@ public abstract class ANode extends Item {
 
   /**
    * Returns the node name.
-   * This function must only be called for element and attribute nodes.
+   * This function must only be called for elements, attributes and pi's.
    * @return name
    */
   public QNm qname() {
@@ -106,7 +106,7 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a temporary node name.
-   * This function must only be called for element and attribute nodes.
+   * This function must only be called for elements, attributes and pi's.
    * @param nm temporary qname
    * @return name
    */
