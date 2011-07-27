@@ -2,19 +2,17 @@ package org.basex.test.w3c;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Check;
@@ -28,6 +26,7 @@ import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.in.TextInput;
 import org.basex.io.out.ArrayOutput;
+import org.basex.io.out.PrintOutput;
 import org.basex.io.serial.SerializerProp;
 import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
@@ -75,8 +74,6 @@ public abstract class W3CTS {
   /** Data reference. */
   protected Data data;
 
-  /** History path. */
-  private final String pathhis;
   /** Log file. */
   private final String pathlog;
   /** Test suite input. */
@@ -150,7 +147,6 @@ public abstract class W3CTS {
   public W3CTS(final String nm) {
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
-    pathhis = testid.toLowerCase() + ".hist";
     pathlog = testid.toLowerCase() + ".log";
   }
 
@@ -209,9 +205,6 @@ public abstract class W3CTS {
     report = path + "ReportingResults/";
     sources = path + "TestSources/";
 
-    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    final String dat = sdf.format(Calendar.getInstance().getTime());
-
     final Performance perf = new Performance();
     context.prop.set(Prop.CHOP, false);
 
@@ -252,7 +245,7 @@ public abstract class W3CTS {
 
     if(reporting) {
       Util.outln("Delete old results...");
-      delete(new File[] { new File(results) });
+      new IOFile(results).delete();
     }
 
     if(verbose) Util.outln();
@@ -272,36 +265,30 @@ public abstract class W3CTS {
 
     final String time = perf.getTimer();
     Util.outln("Writing log file..." + NL);
-    BufferedWriter bw = new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(path + pathlog), UTF8));
-    bw.write("TEST RESULTS ==================================================");
-    bw.write(NL + NL + "Total #Queries: " + total + NL);
-    bw.write("Correct / Empty Results: " + ok + " / " + ok2 + NL);
-    bw.write("Conformance (w/Empty Results): ");
-    bw.write(pc(ok, total) + " / " + pc(ok + ok2, total) + NL);
-    bw.write("Wrong Results / Errors: " + err + " / " + err2 + NL);
-    bw.write("WRONG =========================================================");
-    bw.write(NL + NL + logErr + NL);
-    bw.write("WRONG (ERRORS) ================================================");
-    bw.write(NL + NL + logErr2 + NL);
-    bw.write("CORRECT? (EMPTY) ==============================================");
-    bw.write(NL + NL + logOK2 + NL);
-    bw.write("CORRECT =======================================================");
-    bw.write(NL + NL + logOK + NL);
-    bw.write("===============================================================");
-    bw.close();
-
-    bw = new BufferedWriter(new FileWriter(path + pathhis, true));
-    bw.write(dat + "\t" + ok + "\t" + ok2 + "\t" + err + "\t" + err2 + NL);
-    bw.close();
+    PrintOutput po = new PrintOutput(path + pathlog);
+    po.println("TEST RESULTS ________________________________________________");
+    po.println(NL + "Total #Queries: " + total);
+    po.println("Correct / Empty Results: " + ok + " / " + ok2);
+    po.print("Conformance (w/Empty Results): ");
+    po.println(pc(ok, total) + " / " + pc(ok + ok2, total));
+    po.println("Wrong Results / Errors: " + err + " / " + err2 + NL);
+    po.println("WRONG _______________________________________________________");
+    po.print(NL + logErr);
+    po.println("WRONG (ERRORS) ______________________________________________");
+    po.print(NL + logErr2);
+    po.println("CORRECT? (EMPTY) ____________________________________________");
+    po.print(NL + logOK2);
+    po.println("CORRECT _____________________________________________________");
+    po.print(NL + logOK);
+    po.println("_____________________________________________________________");
+    po.close();
 
     if(reporting) {
-      bw = new BufferedWriter(new OutputStreamWriter(
-          new FileOutputStream(report + NAME + IO.XMLSUFFIX), UTF8));
-      write(bw, report + NAME + "Pre" + IO.XMLSUFFIX);
-      bw.write(logReport.toString());
-      write(bw, report + NAME + "Pos" + IO.XMLSUFFIX);
-      bw.close();
+      po = new PrintOutput(report + NAME + IO.XMLSUFFIX);
+      print(po, report + NAME + "Pre" + IO.XMLSUFFIX);
+      po.print(logReport.toString());
+      print(po, report + NAME + "Pos" + IO.XMLSUFFIX);
+      po.close();
     }
 
     Util.outln("Total #Queries: " + total);
@@ -789,29 +776,14 @@ public abstract class W3CTS {
   }
 
   /**
-   * Recursively deletes a directory.
-   * @param pth deletion path
-   */
-  void delete(final File[] pth) {
-    for(final File f : pth) {
-      if(f.isDirectory()) delete(f.listFiles());
-      f.delete();
-    }
-  }
-
-  /**
    * Adds the specified file to the writer.
-   * @param bw writer
+   * @param po writer
    * @param f file path
    * @throws Exception exception
    */
-  private void write(final BufferedWriter bw, final String f) throws Exception {
-    final BufferedReader br = new BufferedReader(
-        new InputStreamReader(new FileInputStream(f), UTF8));
-    for(String line; (line = br.readLine()) != null;) {
-      bw.write(line);
-      bw.write(NL);
-    }
+  private void print(final PrintOutput po, final String f) throws Exception {
+    final BufferedReader br = new BufferedReader(new FileReader(f));
+    for(String line; (line = br.readLine()) != null;) po.println(line);
     br.close();
   }
 
