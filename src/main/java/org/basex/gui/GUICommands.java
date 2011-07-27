@@ -871,7 +871,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(!gui.context.root());
+      b.setEnabled(gui.context.current != null && !gui.context.root());
     }
   },
 
