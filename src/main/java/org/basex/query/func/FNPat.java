@@ -50,8 +50,8 @@ public final class FNPat extends FuncCall {
   private static final Pattern CLASSES =
     Pattern.compile(".*?\\[([a-zA-Z])-([a-zA-Z]).*");
   /** Excluded classes pattern. */
-  private static final Pattern EXCLASSES =
-    Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\]");
+  private static final Pattern EX =
+    Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\].*");
 
   /**
    * Constructor.
@@ -290,9 +290,9 @@ public final class FNPat extends FuncCall {
         }
 
         // remove excluded characters in classes
-        while(true) {
-          final Matcher mt = EXCLASSES.matcher(str);
-          if(!mt.matches()) break;
+        String old = "";
+        for(Matcher mt; (mt = EX.matcher(str)).matches() && !old.equals(str);) {
+          old = str;
           final String in = mt.group(1);
           final String ex = mt.group(2);
           String out = in;
