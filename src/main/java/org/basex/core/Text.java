@@ -50,7 +50,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.7.1 beta";
+  String VERSION = "6.7.1 RC1";
   /** Company info. */
   String COMPANY = NAME + " Team";
   /** Title and version. */
