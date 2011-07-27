@@ -182,17 +182,13 @@ public final class AddDeleteTest {
    */
   @Test
   public void addCorrupt() throws Exception {
-    try {
-      new Add("<x").execute(CONTEXT);
-      fail("Broken file was added to the database.");
-    } catch(final Exception ex) { }
-
     final IOFile io = new IOFile(Prop.TMP, DBNAME);
     io.write(Token.token("<x"));
     try {
       new Add(io.path()).execute(CONTEXT);
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
+
     assertTrue(io.delete());
   }
 

@@ -119,24 +119,24 @@ public final class TextInput {
    * @return true if everything went alright
    */
   public boolean add(final byte[] val, final boolean s) {
-    if(s) a(new ArrayInput(Token.SPACE));
-    a(new ArrayInput(val));
-    if(s) a(new ArrayInput(Token.SPACE));
-    return ip < 20;
+    if(s) add(new ArrayInput(Token.SPACE));
+    add(new ArrayInput(val));
+    if(s) add(new ArrayInput(Token.SPACE));
+    return ip < 32;
   }
 
   /**
    * Inserts a cached input buffer.
    * @param ci buffer to be added
    */
-  private void a(final ArrayInput ci) {
+  private void add(final ArrayInput ci) {
     if(++ip == in.length) in = Arrays.copyOf(in, ip << 1);
     in[ip] = ci;
     ci.encoding();
   }
 
   /**
-   * Finishes file input.
+   * Finishes the file input.
    * @throws IOException I/O exception
    */
   public void close() throws IOException {

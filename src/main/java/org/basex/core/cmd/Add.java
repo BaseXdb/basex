@@ -173,6 +173,7 @@ public final class Add extends ACreate {
       throw new BaseXException(ex);
     } finally {
       // close and drop intermediary database instance
+      try { build.close(); } catch(final IOException e) { }
       if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
       if(large) DropDB.drop(dbname, ctx.mprop);
     }

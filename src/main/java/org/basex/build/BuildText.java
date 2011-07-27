@@ -28,7 +28,7 @@ public interface BuildText {
   String LIMITATTS = "%: Too many different attribute names (limit: %).";
 
   /** Parser error. */
-  String PARSEINVALID = "%: % expected, % found.";
+  String PARSEINV = "%: % expected, % found.";
   /** Parser error. */
   String DOCOPEN = "%: Closing tag </%> expected.";
 

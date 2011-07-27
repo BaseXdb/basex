@@ -21,6 +21,11 @@ import org.basex.util.Atts;
  * @author Christian Gruen
  */
 public abstract class Parser extends Progress {
+  /** Empty parser. */
+  private static final Parser DUMMY = new Parser((IO) null) {
+    @Override
+    public void parse(final Builder build) { /* empty */ }
+  };
   /** Source document, or {@code null}. */
   public IO src;
   /** Temporary attribute array.
@@ -51,6 +56,13 @@ public abstract class Parser extends Progress {
   public abstract void parse(final Builder build) throws IOException;
 
   /**
+   * Closes the parser.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  public void close() throws IOException { }
+
+  /**
    * Returns parser information.
    * @return info string
    */
@@ -65,10 +77,7 @@ public abstract class Parser extends Progress {
    * @return parser
    */
   public static Parser emptyParser() {
-    return new Parser((IO) null) {
-      @Override
-      public void parse(final Builder build) { /* empty */ }
-    };
+    return DUMMY;
   }
 
   /**

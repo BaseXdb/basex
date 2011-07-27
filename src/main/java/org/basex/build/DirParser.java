@@ -159,4 +159,9 @@ public final class DirParser extends TargetParser {
   public double prog() {
     return parser != null ? parser.progress() : 0;
   }
+
+  @Override
+  public void close() throws IOException {
+    if(parser != null) parser.close();
+  }
 }

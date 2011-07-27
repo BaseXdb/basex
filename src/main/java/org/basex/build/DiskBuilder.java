@@ -112,6 +112,7 @@ public final class DiskBuilder extends Builder {
     if(xout != null) xout.close();
     if(vout != null) vout.close();
     if(sout != null) sout.close();
+    parser.close();
     tout = null;
     xout = null;
     vout = null;
