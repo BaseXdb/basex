@@ -255,6 +255,12 @@ public final class QueryProcessor extends Progress {
       }
       ctx.props = null;
     }
+    // close all connections to relational databases
+    try {
+      ctx.depot.closeAll();
+    } catch(QueryException e) {
+
+    }
   }
 
   /**

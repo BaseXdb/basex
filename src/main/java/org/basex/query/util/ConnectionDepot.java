@@ -1,5 +1,12 @@
 package org.basex.query.util;
 
+import static org.basex.query.util.Err.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import org.basex.query.QueryException;
 import org.basex.util.hash.IntMap;
 
 /**
@@ -43,11 +50,38 @@ public final class ConnectionDepot {
   }
 
   /**
+   * Closes all opened connections.
+   * @throws QueryException query exception
+   */
+  public void closeAll() throws QueryException {
+    for(int i = 0; i < conns.size(); i++) {
+      final int key = conns.key(i);
+      final Object obj = conns.get(key);
+      if(obj != null) {
+        try {
+          if(obj instanceof Connection) ((Connection) obj).close();
+          else ((PreparedStatement) obj).close();
+        } catch(final SQLException ex) {
+          throw SQLEXC.thrw(null, ex.getMessage());
+        }
+      }
+    }
+  }
+
+  /**
    * Returns connection or prepared statement with the given id.
    * @param id id
    * @return connection or prepared statement
    */
   public Object get(final int id) {
     return conns.get(id);
+  }
+
+  /**
+   * Returns the number of opened connections and prepared statements.
+   * @return result
+   */
+  public int size() {
+    return conns.size();
   }
 }

@@ -550,6 +550,12 @@ public enum Function {
   PREPARE(FNSql.class, "prepare(id,statement)", INT, 2, INT, STR),
   /** XQuery function */
   EXECUTE(FNSql.class, "execute(id[,params])", ELM_ZM, 2, INT, ITEM_ZM),
+  /** XQuery function */
+  CLOSE(FNSql.class, "close(id)", EMP, 1, INT),
+  /** XQuery function */
+  COMMIT(FNSql.class, "commit(id)", EMP, 1, INT),
+  /** XQuery function */
+  ROLLBACK(FNSql.class, "rollback(id)", EMP, 1, INT),
 
 
   /* FNFt functions. */

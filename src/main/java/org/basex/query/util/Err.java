@@ -177,8 +177,10 @@ public enum Err {
   /** PACK0011: Evaluation exception. */
   JARREADFAIL(PACK, 11, "Reading jar descriptor failed: %."),
 
-  /** PACK0001: Evaluation exception. */
+  /** XSQL0001: Evaluation exception. */
   SQLEXC(XSQL, 1, "An SQL exception occurred: '%'"),
+  /** XSQL0002: Evaluation exception. */
+  NOCONN(XSQL, 2, "No opened connection with id %"),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

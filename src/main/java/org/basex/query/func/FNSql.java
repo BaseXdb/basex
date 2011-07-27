@@ -13,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -23,15 +22,17 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
+import org.basex.query.item.Jav;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
+import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 
 /**
  * Functions on relational databases.
- *
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -70,6 +71,12 @@ public final class FNSql extends FuncCall {
         return connect(ctx);
       case PREPARE:
         return prepare(ctx);
+      case CLOSE:
+        return close(ctx);
+      case COMMIT:
+        return commit(ctx);
+      case ROLLBACK:
+        return rollback(ctx);
       default:
         return super.item(ctx, ii);
     }
@@ -131,9 +138,9 @@ public final class FNSql extends FuncCall {
     // Look up id in depot
     final Object obj = ctx.depot.get(toInt(id.atom(input)));
     // Execute
+    if(obj == null) throw Err.NOCONN.thrw(input, toInt(id.atom(input)));
     return obj instanceof Connection ? executeQuery((Connection) obj, ctx)
         : executePrepStmt((PreparedStatement) obj, ctx);
-
   }
 
   /**
@@ -187,31 +194,79 @@ public final class FNSql extends FuncCall {
    * @param rs result set
    * @return sequence of elements <tuple/> each of which represents a row from
    *         the result set
+   * @throws QueryException query exception
    */
-  private NodeCache buildResult(final ResultSet rs) {
+  private NodeCache buildResult(final ResultSet rs) throws QueryException {
     try {
-      // Collect columns' names
       final ResultSetMetaData metadata = rs.getMetaData();
       final int columnCount = metadata.getColumnCount();
-      final ArrayList<String> columns = new ArrayList<String>();
-      for(int i = 1; i < columnCount + 1; i++)
-        columns.add(metadata.getColumnLabel(i));
       final NodeCache tuples = new NodeCache();
       while(rs.next()) {
+        // For each row in the result set create an element </tuple>
         final NodeCache a = new NodeCache();
-        for(int k = 0; k < columns.size(); k++) {
-          String label = columns.get(k);
-          a.add(new FAttr(new QNm(token(label), EMPTY),
-              token(rs.getString(label)), null));
+        for(int k = 1; k <= columnCount; k++) {
+          // Set columns as attributes of element </tuple>
+          final String label = metadata.getColumnLabel(k);
+          final Object value = rs.getObject(label);
+          if(value != null) a.add(new FAttr(new QNm(token(label), EMPTY),
+              new Jav(value).atom(input), null));
         }
         tuples.add(new FElem(new QNm(TUPLE, SQLURI), null, a, null,
             new Atts().add(SQL, SQLURI), null));
       }
       return tuples;
     } catch(final SQLException ex) {
-      // TODO: error handling
-      ex.printStackTrace();
-      return null;
+      throw SQLEXC.thrw(input, ex.getMessage());
     }
+  }
+
+  /**
+   * Closes a connection to a relational database.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Item close(final QueryContext ctx) throws QueryException {
+    final Item id = checkType(expr[0].item(ctx, input), AtomType.INT);
+    try {
+      final int connId = toInt(id.atom(input));
+      ((Connection) ctx.depot.get(connId)).close();
+      ctx.depot.remove(connId);
+    } catch(SQLException ex) {
+      throw SQLEXC.thrw(input, ex.getMessage());
+    }
+    return null;
+  }
+
+  /**
+   * Commits all changes made during last transcation.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Item commit(final QueryContext ctx) throws QueryException {
+    final Item id = checkType(expr[0].item(ctx, input), AtomType.INT);
+    try {
+      ((Connection) ctx.depot.get(toInt(id.atom(input)))).commit();
+    } catch(SQLException ex) {
+      throw SQLEXC.thrw(input, ex.getMessage());
+    }
+    return null;
+  }
+
+  /**
+   * Rollbacks all changes made during last transaction.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Item rollback(final QueryContext ctx) throws QueryException {
+    final Item id = checkType(expr[0].item(ctx, input), AtomType.INT);
+    try {
+      ((Connection) ctx.depot.get(toInt(id.atom(input)))).rollback();
+    } catch(SQLException ex) {
+      throw SQLEXC.thrw(input, ex.getMessage());
+    }
+    return null;
   }
 }
