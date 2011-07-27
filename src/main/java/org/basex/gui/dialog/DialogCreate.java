@@ -115,7 +115,7 @@ public final class DialogCreate extends DialogImport {
 
   @Override
   public void action(final Object cmp) {
-    boolean valid = action(cmp, true);
+    final boolean valid = action(cmp, true);
     ft.action(ftxindex.isSelected());
 
     final String pth = path.getText().trim();

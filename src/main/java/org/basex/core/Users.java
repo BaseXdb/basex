@@ -26,7 +26,7 @@ import org.basex.util.list.TokenList;
 public final class Users {
   /** User array. */
   private final List<User> list =
-    Collections.synchronizedList(new ArrayList<User>());
+    Collections.synchronizedList(new ArrayList<User>(0));
   /** Filename; set to {@code null} if the instance handles local users. */
   private File file;
 
@@ -39,7 +39,7 @@ public final class Users {
 
     file = new File(Prop.HOME, IO.BASEXSUFFIX + "perm");
     if(!file.exists()) {
-      // create default admin user with all rights
+      // define default admin user with all rights
       list.add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
     } else {
       DataInput in = null;
