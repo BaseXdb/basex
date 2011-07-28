@@ -1366,10 +1366,10 @@ public class QueryParser extends InputParser {
    */
   private Expr stringConcat() throws QueryException {
     final Expr e = range();
-    if(!consume(CONCAT) && !consume(CONCAT2)) return e;
+    if(!consume(CONCAT)) return e;
 
     Expr[] list = { e };
-    do list = add(list, range()); while(wsConsume(CONCAT) || consume(CONCAT2));
+    do list = add(list, range()); while(wsConsume(CONCAT));
     return new Concat(input(), list);
   }
 

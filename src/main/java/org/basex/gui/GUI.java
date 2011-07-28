@@ -386,7 +386,7 @@ public final class GUI extends AGUI {
       final Data data = context.data;
       if(gprop.is(GUIProp.FILTERRT) && context.current != null &&
           !context.root()) {
-          context.current = new Nodes(data.doc().toArray(), data);
+        context.current = new Nodes(data.doc().toArray(), data).checkRoot();
       }
 
       // cache some variables before executing the command
