@@ -55,6 +55,8 @@ public interface Text {
   String COMPANY = NAME + " Team";
   /** Title and version. */
   String TITLE = NAME + ' ' + VERSION;
+  /** Default language. */
+  String LANGUAGE = "English";
 
   // CONSOLE INFO =============================================================
 
