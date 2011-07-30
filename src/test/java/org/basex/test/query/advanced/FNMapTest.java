@@ -88,10 +88,11 @@ public final class FNMapTest extends AdvancedQueryTest {
   @Test
   public void testKeys() throws QueryException {
     final String fun = check(Function.MAPKEYS);
-    query(fun + "(map:new(for $i in 1 to 3 return map:entry($i,$i+1)))",
+    query("for $i in " + fun + "(map:new(" +
+        "for $i in 1 to 3 return map:entry($i, $i+1))) order by $i return $i",
       "1 2 3");
     query("let $map := map:new(for $i in 1 to 3 return map:entry($i, $i + 1))" +
-      "for $k in " + fun + "($map) return map:get($map, $k)",
+      "for $k in " + fun + "($map) order by $k return map:get($map, $k)",
       "2 3 4");
   }
 

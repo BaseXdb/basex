@@ -58,6 +58,11 @@ public class XMLParser extends SingleParser {
     builder.encoding(scanner.encoding);
   }
 
+  @Override
+  public void close() throws IOException {
+    scanner.close();
+  }
+
   /**
    * Parses an XML tag.
    * @throws IOException I/O exception
@@ -129,9 +134,8 @@ public class XMLParser extends SingleParser {
    * @throws IOException I/O exception
    */
   private boolean consume(final Type t) throws IOException {
-    if(scanner.type != t) throw new BuildException(PARSEINVALID, det(),
-        t.string, scanner.type.string);
-    return scanner.more();
+    if(scanner.type == t) return scanner.more();
+    throw new BuildException(PARSEINV, det(), t.string, scanner.type.string);
   }
 
   /**
@@ -142,11 +146,12 @@ public class XMLParser extends SingleParser {
    * @throws IOException I/O exception
    */
   private byte[] consumeToken(final Type t) throws IOException {
-    if(scanner.type != t) throw new BuildException(PARSEINVALID, det(),
-        t.string, scanner.type.string);
-    final byte[] tok = scanner.token.finish();
-    scanner.more();
-    return tok;
+    if(scanner.type == t) {
+      final byte[] tok = scanner.token.finish();
+      scanner.more();
+      return tok;
+    }
+    throw new BuildException(PARSEINV, det(), t.string, scanner.type.string);
   }
 
   /**

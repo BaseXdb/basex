@@ -291,9 +291,9 @@ public final class DialogServer extends Dialog {
     try {
       if(cmp == start || cmp == ports) {
         final int p = Integer.parseInt(ports.getText());
-        gui.setAdmin(MainProp.SERVERPORT, p);
+        gui.setMain(MainProp.SERVERPORT, p);
         if(host.getText().equals(LOCALHOST)) {
-          gui.setAdmin(MainProp.PORT, p);
+          gui.setMain(MainProp.PORT, p);
           portc.setText(ports.getText());
         }
         msg = BaseXServer.start(p, BaseXServer.class);
@@ -314,8 +314,8 @@ public final class DialogServer extends Dialog {
           cmp == host || cmp == portc) {
         gui.gprop.set(GUIProp.SERVERUSER, loguser.getText());
         final String pw = new String(logpass.getPassword());
-        gui.setAdmin(MainProp.HOST, host.getText());
-        gui.setAdmin(MainProp.PORT, Integer.parseInt(portc.getText()));
+        gui.setMain(MainProp.HOST, host.getText());
+        gui.setMain(MainProp.PORT, Integer.parseInt(portc.getText()));
         cs = new ClientSession(ctx, gui.gprop.get(GUIProp.SERVERUSER), pw);
         user.setSess(cs);
         dbsP.setSess(cs);
@@ -368,6 +368,9 @@ public final class DialogServer extends Dialog {
     } catch(final Exception ex) {
       icon = Msg.ERROR;
       msg = Util.server(ex);
+
+      ex.printStackTrace();
+
       if(msg.equals(Util.info(PERMNO, CmdPerm.values()[4]))) {
         try {
           cs.execute(new Exit());

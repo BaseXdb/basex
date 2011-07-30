@@ -31,7 +31,7 @@ import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
 import org.basex.gui.dialog.DialogEdit;
 import org.basex.gui.dialog.DialogExport;
-import org.basex.gui.dialog.DialogFontChooser;
+import org.basex.gui.dialog.DialogFonts;
 import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogInfo;
 import org.basex.gui.dialog.DialogInsert;
@@ -76,11 +76,8 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = gui.gprop.get(GUIProp.CREATEPATH);
       final String db = gui.gprop.get(GUIProp.CREATENAME);
-      if(in.isEmpty()) {
-        DialogProgress.execute(dialog, PROGCREATE, new CreateDB(db));
-      } else {
-        DialogProgress.execute(dialog, PROGCREATE, new CreateDB(db, in));
-      }
+      DialogProgress.execute(dialog, PROGCREATE,
+          new CreateDB(db, in.isEmpty() ? null : in));
     }
   },
 
@@ -357,7 +354,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       // disallow deletion of empty node set or root node
-      b.setEnabled(updatable(gui.context.marked, Data.DOC));
+      b.setEnabled(updatable(gui.context.marked));
     }
   },
 
@@ -717,7 +714,7 @@ public enum GUICommands implements GUICommand {
   FONTS(GUIFONTS, null, GUIFONTSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogFontChooser(gui);
+      new DialogFonts(gui);
     }
   },
 
@@ -846,8 +843,9 @@ public enum GUICommands implements GUICommand {
       for(final int pre : ctx.current.list) r &= ctx.data.kind(pre) == Data.DOC;
       if(r) {
         // if yes, jump to database root
-        gui.notify.context(
-            new Nodes(ctx.data.doc().toArray(), ctx.data), false, null);
+        final Nodes nodes = new Nodes(ctx.data.doc().toArray(), ctx.data);
+        nodes.root = true;
+        gui.notify.context(nodes, false, null);
       } else {
         // otherwise, jump to parent nodes
         gui.execute(new Cs(".."));
@@ -856,7 +854,8 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.context.current != null && !gui.context.root());
+      b.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
+          gui.context.current != null && !gui.context.root());
     }
   },
 
@@ -867,14 +866,15 @@ public enum GUICommands implements GUICommand {
       // skip operation for root context
       final Context ctx = gui.context;
       if(ctx.root()) return;
-      // if yes, jump to database root
-      gui.notify.context(
-          new Nodes(ctx.data.doc().toArray(), ctx.data), false, null);
+      // jump to database root
+      final Nodes nodes = new Nodes(ctx.data.doc().toArray(), ctx.data);
+      nodes.root = true;
+      gui.notify.context(nodes, false, null);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(!gui.context.root());
+      b.setEnabled(gui.context.current != null && !gui.context.root());
     }
   },
 
@@ -964,7 +964,6 @@ public enum GUICommands implements GUICommand {
    * @return function string
    */
   static String openPre(final Nodes n, final int i) {
-    System.out.println("? ");
     return Function.DBOPENPRE.get(null, Str.get(n.data.meta.name),
         Itr.get(n.list[i])).toString();
   }

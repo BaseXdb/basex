@@ -72,7 +72,8 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  public void close() {
+  public void close() throws IOException {
+    parser.close();
   }
 
   @Override

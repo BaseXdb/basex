@@ -77,13 +77,12 @@ public final class Prop extends AProp {
   public static final Object[] DTD = { "DTD", false };
   /** Path to XML Catalog file. */
   public static final Object[] CATFILE = { "CATFILE", "" };
-  /** Flag for entity parsing in internal parser. */
-  public static final Object[] ENTITY = { "ENTITY", false };
   /** Define import parser. */
-  public static final Object[] PARSER = { "PARSER", "XML" };
+  public static final Object[] PARSER = { "PARSER", "xml" };
   /** Define parser options. */
   public static final Object[] PARSEROPT = { "PARSEROPT",
-    "encoding=UTF-8,lines=true,format=verbose,header=false,separator=comma" };
+    "flat=false,encoding=UTF-8,lines=true,format=verbose,header=false," +
+    "separator=comma" };
 
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };
@@ -106,6 +105,8 @@ public final class Prop extends AProp {
   public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
   /** Flag for adding archives to a database. */
   public static final Object[] ADDARCHIVES = { "ADDARCHIVES", true };
+  /** Flag for skipping corrupt files. */
+  public static final Object[] SKIPCORRUPT = { "SKIPCORRUPT", false };
 
   /** Flag for creating a wildcard index. */
   public static final Object[] WILDCARDS = { "WILDCARDS", false };
@@ -116,7 +117,7 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Language for full-text search index. */
-  public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
+  public static final Object[] LANGUAGE = { "LANGUAGE", "EN" };
   /** Flag for full-text scoring algorithm.
       Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] SCORING = { "SCORING", 0 };

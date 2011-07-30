@@ -54,8 +54,6 @@ final class XMLScanner extends Progress {
   private final TokenMap ents = new TokenMap();
   /** Index for all PEReferences. */
   private final TokenMap pents = new TokenMap();
-  /** Entity flag. */
-  private final boolean entity;
   /** DTD flag. */
   private final boolean dtd;
 
@@ -83,7 +81,6 @@ final class XMLScanner extends Progress {
     for(int e = 0; e < ENTITIES.length; e += 2) {
       ents.add(token(ENTITIES[e]), token(ENTITIES[e + 1]));
     }
-    entity = pr.is(Prop.ENTITY);
     dtd = pr.is(Prop.DTD);
 
     String enc = null;
@@ -478,7 +475,6 @@ final class XMLScanner extends Progress {
             ch >= 'A' && ch <= 'F');
         if(!m && !h) {
           completeRef(ent);
-          if(entity) error(INVALIDENTITY, ent);
           return QUESTION;
         }
         n *= b;
@@ -487,21 +483,15 @@ final class XMLScanner extends Progress {
         ent.add(ch = nextChar());
       } while(ch != ';');
 
-      if(!valid(n)) {
-        if(entity) error(INVALIDENTITY, ent);
-        return QUESTION;
-      }
+      if(!valid(n)) return QUESTION;
       ent.reset();
       ent.add(n);
       return ent.finish();
     }
 
     // scans predefined entities // [68]
-    final byte[] name = name(entity);
-    if(!consume(';')) {
-      if(entity) error(INVALIDENTITY, name);
-      return QUESTION;
-    }
+    final byte[] name = name(false);
+    if(!consume(';')) return QUESTION;
 
     if(!f) return concat(AMPER, name, SEMI);
 
@@ -514,13 +504,8 @@ final class XMLScanner extends Progress {
         }
       }
       en = HTMLENTS.get(name);
-      if(en == null) {
-        // unknown entity: return empty string if
-        if(entity) error(UNKNOWNENTITY, name);
-        return QUESTION;
-      }
     }
-    return en;
+    return en == null ? QUESTION : en;
   }
 
   /**
@@ -531,11 +516,10 @@ final class XMLScanner extends Progress {
   private byte[] peRef() throws IOException {
     // scans predefined entities
     final byte[] name = name(true);
-    if(!consume(';')) error(INVALIDENTITY, name);
+    consume(';');
 
     final byte[] en = pents.get(name);
     if(en != null) return en;
-    if(entity) error(UNKNOWNENTITY, name);
     return name;
   }
 
@@ -1019,10 +1003,10 @@ final class XMLScanner extends Progress {
    * @param e error message
    * @param a error arguments
    * @return build exception (indicates that an error is raised)
-   * @throws BuildException build exception
+   * @throws IOException I/O exception
    */
   private BuildException error(final String e, final Object... a)
-      throws BuildException {
+      throws IOException {
     throw new BuildException(det() + COLS + e, a);
   }
 

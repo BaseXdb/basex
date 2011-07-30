@@ -150,7 +150,8 @@ public final class DialogOpen extends Dialog {
     final StringList dbs = choice.getValues();
     final String db = choice.getValue().trim();
     final ObjList<Command> cmds = new ObjList<Command>();
-    ok = dbs.size() > 0;
+    boolean o = dbs.size() > 0;
+    ok = manage || o;
 
     if(cmp == open) {
       close();
@@ -174,11 +175,11 @@ public final class DialogOpen extends Dialog {
       for(final String s : dbs) cmds.add(new Restore(s));
     } else {
       // update components
-      enableOK(buttons, BUTTONOPEN, ok);
-      enableOK(buttons, BUTTONBACKUP, ok);
-      enableOK(buttons, BUTTONDROP, ok);
-      ok = ctx.mprop.dbexists(db);
-      if(ok) {
+      enableOK(buttons, BUTTONOPEN, o);
+      enableOK(buttons, BUTTONBACKUP, o);
+      enableOK(buttons, BUTTONDROP, o);
+      o = ctx.mprop.dbexists(db);
+      if(o) {
         // refresh info view
         DataInput in = null;
         final MetaData meta = new MetaData(db, ctx);
@@ -188,16 +189,16 @@ public final class DialogOpen extends Dialog {
           detail.setText(InfoDB.db(meta, true, true, true));
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
-          ok = manage;
+          o = manage;
         } finally {
           if(in != null) try { in.close(); } catch(final IOException ex) { }
         }
       }
-      enableOK(buttons, BUTTONRENAME, ok);
-      enableOK(buttons, BUTTONCOPY, ok);
-      ok = true;
-      for(final String s : dbs) ok &= Restore.list(s, ctx).size() != 0;
-      enableOK(buttons, BUTTONRESTORE, ok);
+      enableOK(buttons, BUTTONRENAME, o);
+      enableOK(buttons, BUTTONCOPY, o);
+      o = true;
+      for(final String s : dbs) o &= Restore.list(s, ctx).size() != 0;
+      enableOK(buttons, BUTTONRESTORE, o);
     }
 
     // run all commands

@@ -1,6 +1,9 @@
 package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,10 +11,12 @@ import java.io.Reader;
 
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
+
 import org.basex.build.SingleParser;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.util.Util;
 import org.xml.sax.InputSource;
@@ -78,7 +83,7 @@ public final class SAXWrapper extends SingleParser {
   @Override
   public void parse() throws IOException {
     final InputSource is = wrap(saxs.getInputSource());
-    final String in = saxs.getSystemId() == null ? "..." : saxs.getSystemId();
+    final String in = saxs.getSystemId() == null ? DOTS : saxs.getSystemId();
 
     try {
       XMLReader r = saxs.getXMLReader();
@@ -133,29 +138,54 @@ public final class SAXWrapper extends SingleParser {
   }
 
   /**
-   * Wraps the input source with a stream which counts the number of read bytes.
+   * Wraps the input source with a stream which counts the number of read bytes
+   * and parsed lines.
    * @param is input source
    * @return resulting stream
    * @throws IOException I/O exception
    */
   private InputSource wrap(final InputSource is) throws IOException {
-    if(!(src instanceof IOFile) || is == null || is.getByteStream() != null
-        || is.getSystemId() == null || is.getSystemId().isEmpty()) return is;
+    if(is == null) return is;
 
-    final InputSource in = new InputSource(new FileInputStream(src.path()) {
+    // choose input stream
+    final InputStream in;
+    if(is.getByteStream() != null) {
+      in = is.getByteStream();
+    } else if(is.getSystemId() == null || is.getSystemId().isEmpty()) {
+      return is;
+    } else if(src instanceof IOFile) {
+      in = new FileInputStream(src.path());
+    } else if(src instanceof IOContent) {
+      in = new ByteArrayInputStream(src.content());
+    } else {
+      return is;
+    }
+    // retrieve/estimate number of bytes to be read
+    length = src.length();
+    if(length == 0) length = in.available();
+
+    // create wrapper
+    final InputSource tmp = new InputSource(new InputStream() {
+      final InputStream buffer = in instanceof ByteArrayInputStream ? in :
+        new BufferedInputStream(in);
+
       @Override
-      public int read(final byte[] b, final int off, final int len)
-          throws IOException {
-        final int i = super.read(b, off, len);
-        for(int o = off; o < len; ++o) if(b[off + o] == '\n') ++line;
-        counter += i;
+      public int read() throws IOException {
+        final int i = buffer.read();
+        if(i == '\n') ++line;
+        ++counter;
         return i;
       }
+
+      @Override
+      public void close() throws IOException {
+        buffer.close();
+      }
     });
-    saxs.setInputSource(in);
+
+    saxs.setInputSource(tmp);
     saxs.setSystemId(is.getSystemId());
-    length = src.length();
-    return in;
+    return tmp;
   }
 
   @Override

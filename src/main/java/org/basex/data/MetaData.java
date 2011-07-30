@@ -46,8 +46,6 @@ public final class MetaData {
   public long time;
   /** Flag for whitespace chopping. */
   public boolean chop;
-  /** Flag for entity parsing. */
-  public boolean entity;
   /** Flag for activated text index. */
   public boolean textindex;
   /** Flag for activated attribute value index. */
@@ -117,7 +115,6 @@ public final class MetaData {
     prop = pr;
     name = db;
     chop = prop.is(Prop.CHOP);
-    entity = prop.is(Prop.ENTITY);
     pathindex = prop.is(Prop.PATHINDEX);
     wildcards = prop.is(Prop.WILDCARDS);
     stemming = prop.is(Prop.STEMMING);
@@ -233,7 +230,6 @@ public final class MetaData {
         else if(k.equals(DBFTDC))   diacritics = toBool(v);
         else if(k.equals(DBENC))    encoding   = v;
         else if(k.equals(DBCHOP))   chop       = toBool(v);
-        else if(k.equals(DBENTITY)) entity     = toBool(v);
         else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
         else if(k.equals(DBTXTIDX)) textindex  = toBool(v);
         else if(k.equals(DBATVIDX)) attrindex  = toBool(v);
@@ -272,7 +268,6 @@ public final class MetaData {
     writeInfo(out, DBENC,    encoding);
     writeInfo(out, DBSIZE,   size);
     writeInfo(out, DBCHOP,   chop);
-    writeInfo(out, DBENTITY, entity);
     writeInfo(out, DBPTHIDX, pathindex);
     writeInfo(out, DBTXTIDX, textindex);
     writeInfo(out, DBATVIDX, attrindex);

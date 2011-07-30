@@ -140,6 +140,8 @@ public enum Err {
   ZIPFAIL(FOZP, 3, "Operation failed: %."),
 
   /** FOHC0001: Evaluation exception. */
+  HTTPFNF(FOHC, 1, "Not found: %."),
+  /** FOHC0001: Evaluation exception. */
   HTTPERR(FOHC, 1, "An HTTP error occurred: %."),
   /** FOHC0002: Evaluation exception. */
   HTMLERR(FOHC, 2, "Error parsing entity as XML or HTML."),

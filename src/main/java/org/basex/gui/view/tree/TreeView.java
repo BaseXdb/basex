@@ -1172,7 +1172,7 @@ public final class TreeView extends View implements TreeConstants {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating || gui.context.focused == -1) return;
-    if(e.getWheelRotation() > 0) gui.notify.context(new Nodes(
+    if(e.getWheelRotation() <= 0) gui.notify.context(new Nodes(
         gui.context.focused, gui.context.data), false, null);
     else gui.notify.hist(false);
   }

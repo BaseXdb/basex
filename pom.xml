@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.basex</groupId>
   <artifactId>basex</artifactId>
-  <version>6.7.1-SNAPSHOT</version>
+  <version>6.7.2-SNAPSHOT</version>
   <name>BaseX</name>
   <url>http://basex.org</url>
   <properties>

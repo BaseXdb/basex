@@ -381,13 +381,13 @@ public final class Token {
     new java.text.DecimalFormatSymbols(java.util.Locale.US);
   /** Scientific double output. */
   private static final java.text.DecimalFormat SD =
-    new java.text.DecimalFormat("0.0################E0##", LOC);
+    new java.text.DecimalFormat("0.0##################E0", LOC);
   /** Decimal double output. */
   private static final java.text.DecimalFormat DD =
     new java.text.DecimalFormat("#####0.0################", LOC);
   /** Scientific float output. */
   private static final java.text.DecimalFormat SF =
-    new java.text.DecimalFormat("0.0####E0##", LOC);
+    new java.text.DecimalFormat("0.0######E0", LOC);
   /** Decimal float output. */
   private static final java.text.DecimalFormat DF =
     new java.text.DecimalFormat("#####0.0######", LOC);

@@ -50,8 +50,8 @@ public final class FNPat extends FuncCall {
   private static final Pattern CLASSES =
     Pattern.compile(".*?\\[([a-zA-Z])-([a-zA-Z]).*");
   /** Excluded classes pattern. */
-  private static final Pattern EXCLASSES =
-    Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\]");
+  private static final Pattern EX =
+    Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\].*");
 
   /**
    * Constructor.
@@ -274,35 +274,34 @@ public final class FNPat extends FuncCall {
       if(b == '\\' && i + 1 != pt.length && pt[i + 1] == ' ') bl.add(b);
     }
 
-    String str = bl.toString();
-    if((m & Pattern.LITERAL) == 0 && str.indexOf('[') != -1 &&
-        str.indexOf('-') != -1) {
-      // replace classes by single characters to support Unicode matches
-      while(true) {
-        final Matcher mt = CLASSES.matcher(str);
-        if(!mt.matches()) break;
-        final char c1 = mt.group(1).charAt(0);
-        final char c2 = mt.group(2).charAt(0);
-        final TokenBuilder tb2 = new TokenBuilder("[");
-        for(char c = c1; c <= c2; ++c) tb2.add(c);
-        str = str.replaceAll("\\[" + c1 + "-" + c2, tb2.toString());
-      }
-
-      // remove excluded characters in classes
-      while(true) {
-        final Matcher mt = EXCLASSES.matcher(str);
-        if(!mt.matches()) break;
-        final String in = mt.group(1);
-        final String ex = mt.group(2);
-        String out = in;
-        for(int e = 0; e < ex.length(); ++e) {
-          out = out.replaceAll(ex.substring(e, e + 1), "");
-        }
-        str = str.replaceAll("\\[" + in + "-\\[.*?\\]", "[" + out);
-      }
-    }
-
     try {
+      String str = bl.toString();
+      if((m & Pattern.LITERAL) == 0 && str.indexOf('[') != -1 &&
+          str.indexOf('-') != -1) {
+        // replace classes by single characters to support Unicode matches
+        while(true) {
+          final Matcher mt = CLASSES.matcher(str);
+          if(!mt.matches()) break;
+          final char c1 = mt.group(1).charAt(0);
+          final char c2 = mt.group(2).charAt(0);
+          final TokenBuilder tb2 = new TokenBuilder("[");
+          for(char c = c1; c <= c2; ++c) tb2.add(c);
+          str = str.replaceAll("\\[" + c1 + "-" + c2, tb2.toString());
+        }
+
+        // remove excluded characters in classes
+        String old = "";
+        for(Matcher mt; (mt = EX.matcher(str)).matches() && !old.equals(str);) {
+          old = str;
+          final String in = mt.group(1);
+          final String ex = mt.group(2);
+          String out = in;
+          for(int e = 0; e < ex.length(); ++e) {
+            out = out.replaceAll(ex.substring(e, e + 1), "");
+          }
+          str = str.replaceAll("\\[" + in + "-\\[.*?\\]", "[" + out);
+        }
+      }
       return Pattern.compile(str, m);
     } catch(final Exception ex) {
       throw REGINV.thrw(input, pt);

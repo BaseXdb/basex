@@ -5,12 +5,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import org.basex.gui.AGUI;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
 
@@ -22,11 +19,11 @@ import org.basex.gui.layout.BaseXPanel;
  */
 final class ViewMover extends BaseXPanel {
   /** Size of splitter. */
-  private static final int SIZE = 8;
+  private static final int SIZE = 9;
   /** Flag if current mover is active. */
   boolean active;
-  /** Close button. */
-  final BaseXButton close;
+  /* Close button.
+  final BaseXButton close; */
 
   /**
    * Constructor.
@@ -34,13 +31,14 @@ final class ViewMover extends BaseXPanel {
    */
   ViewMover(final AGUI main) {
     super(HELPMOVER, main);
-    this.setLayout(new BorderLayout());
+    setLayout(new BorderLayout());
     BaseXLayout.setHeight(this, SIZE);
     addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
     setCursor(GUIConstants.CURSORMOVE);
 
+    /*
     close = new BaseXButton(gui, "editclose", null);
     close.setRolloverIcon(BaseXLayout.icon("cmd-editclose2"));
     close.border(2, 2, 2, 2);
@@ -57,8 +55,8 @@ final class ViewMover extends BaseXPanel {
         ((ViewPanel) getParent()).delete();
       }
     });
-
     add(close, BorderLayout.EAST);
+    */
   }
 
   @Override
@@ -101,7 +99,7 @@ final class ViewMover extends BaseXPanel {
     repaint();
   }
 
-  @Override
+  /*@Override
   public void mouseEntered(final MouseEvent e) {
     close.setVisible(true);
   }
@@ -115,5 +113,5 @@ final class ViewMover extends BaseXPanel {
     final Point p = getLocationOnScreen();
     if(x < p.x || y < p.y || x >= p.x + getWidth() || y >= p.y + getHeight())
       close.setVisible(false);
-  }
+  }*/
 }

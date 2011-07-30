@@ -369,10 +369,10 @@ public abstract class Builder extends Progress {
    * @param value value
    * @param limit limit
    * @param msg message
-   * @throws BuildException build exception
+   * @throws IOException I/O exception
    */
   private void limit(final int value, final int limit, final String msg)
-      throws BuildException {
+      throws IOException {
     if(value >= limit) error(msg, parser.detail(), limit);
   }
 
@@ -398,10 +398,9 @@ public abstract class Builder extends Progress {
    * Throws an error message.
    * @param msg message
    * @param ext message extension
-   * @throws BuildException build exception
+   * @throws IOException I/O exception
    */
-  private static void error(final String msg, final Object... ext)
-      throws BuildException {
+  private void error(final String msg, final Object... ext) throws IOException {
     throw new BuildException(msg, ext);
   }
 }

@@ -102,7 +102,7 @@ public abstract class ACreate extends Command {
         if(prop.is(Prop.FTINDEX))   index(IndexType.FULLTEXT,  data);
         data.flush();
       }
-      return info(DBCREATED, db, perf);
+      return info(p.info() + DBCREATED, db, perf);
     } catch(final ProgressException ex) {
       throw ex;
     } catch(final IOException ex) {

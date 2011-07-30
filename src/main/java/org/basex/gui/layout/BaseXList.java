@@ -8,8 +8,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
-
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -111,10 +109,8 @@ public final class BaseXList extends BaseXBack {
         final String val = values[nv];
         list.setSelectedValue(val, true);
         if(e.isShiftDown() && !single) {
-          if(!Arrays.equals(inds, il.toArray())) {
-            list.setSelectedIndices(il.toArray());
-            text.setText("");
-          }
+          list.setSelectedIndices(il.toArray());
+          text.setText("");
         } else {
           list.setSelectedIndex(nv);
           text.setText(val);

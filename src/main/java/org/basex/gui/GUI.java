@@ -386,7 +386,7 @@ public final class GUI extends AGUI {
       final Data data = context.data;
       if(gprop.is(GUIProp.FILTERRT) && context.current != null &&
           !context.root()) {
-          context.current = new Nodes(data.doc().toArray(), data);
+        context.current = new Nodes(data.doc().toArray(), data).checkRoot();
       }
 
       // cache some variables before executing the command
@@ -515,12 +515,12 @@ public final class GUI extends AGUI {
  }
 
  /**
-  * Sets an admin property and displays the command in the info view.
+  * Sets a main property and displays the command in the info view.
   * @param pr property to be set
   * @param val value
   */
- public void setAdmin(final Object[] pr, final Object val) {
-   set(context.prop, pr, val);
+ public void setMain(final Object[] pr, final Object val) {
+   set(context.mprop, pr, val);
  }
 
  /**

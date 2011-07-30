@@ -137,6 +137,7 @@ public final class Add extends ACreate {
       throws BaseXException {
 
     final Performance p = new Performance();
+    final String input = name == null ? parser.src.path() : name;
     final String path = target + (target.isEmpty() ? "/" : "") +
         (name == null ? parser.src.name() : name);
 
@@ -166,12 +167,13 @@ public final class Add extends ACreate {
         ctx.update();
         data.flush();
       }
-      return Util.info(PATHADDED, path, p);
+      return Util.info(parser.info() + PATHADDED, input, p);
     } catch(final IOException ex) {
       Util.debug(ex);
       throw new BaseXException(ex);
     } finally {
       // close and drop intermediary database instance
+      try { build.close(); } catch(final IOException e) { }
       if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
       if(large) DropDB.drop(dbname, ctx.mprop);
     }
