@@ -36,7 +36,6 @@ import org.basex.query.func.FNSimple;
 import org.basex.query.func.Function;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
@@ -336,7 +335,6 @@ public abstract class W3CTS {
       final String in = read(context.query);
       String er = null;
       ItemCache iter = null;
-      boolean doc = true;
 
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
@@ -381,10 +379,7 @@ public abstract class W3CTS {
         final XMLSerializer xml = new XMLSerializer(ao, sp);
 
         iter = xq.value().cache();
-        for(Item it; (it = iter.next()) != null;) {
-          doc &= it.type == NodeType.DOC;
-          it.serialize(xml);
-        }
+        for(Item it; (it = iter.next()) != null;) it.serialize(xml);
         xml.close();
       } catch(final Exception ex) {
         if(!(ex instanceof QueryException || ex instanceof IOException)) {
@@ -585,7 +580,7 @@ public abstract class W3CTS {
   private ItemCache toIter(final String xml, final boolean frag) {
     final ItemCache it = new ItemCache();
     try {
-      String str = frag ? "<X>" + xml + "</X>" : xml;
+      final String str = frag ? "<X>" + xml + "</X>" : xml;
       final Data d = CreateDB.xml(IO.get(str), context);
 
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p)))

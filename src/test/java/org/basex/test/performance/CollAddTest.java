@@ -36,7 +36,7 @@ public final class CollAddTest {
     cmd.execute(CONTEXT);
     System.out.print(cmd.info());
 
-    Performance perf = new Performance();
+    final Performance perf = new Performance();
 
     // Add documents
     for(int i = 0; i < SIZE; i++) {

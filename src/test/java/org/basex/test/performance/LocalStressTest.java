@@ -43,7 +43,7 @@ public final class LocalStressTest {
   public static void main(final String[] args) throws Exception {
     System.out.println("=== LocalStressTest ===");
 
-    Performance perf = new Performance();
+    final Performance perf = new Performance();
 
     // Create test database
     System.out.println("\n* Create test database.");

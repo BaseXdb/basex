@@ -55,7 +55,7 @@ public class StorageStats extends Statistics {
   void analyze(final TokenList tl) throws BaseXException {
     try {
       analyzeTBLI(ctx.data.meta.dbfile(DATATBL + 'i'), tl);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       throw new BaseXException(e);
     }
   }

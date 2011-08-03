@@ -88,9 +88,9 @@ public final class IndexStats extends Statistics {
     long l = 0;
     for(final String d : dbf) l += ctx.data.meta.dbfile(d).length();
 
-    String inf = exec(new InfoIndex(index));
+    final String inf = exec(new InfoIndex(index));
     final Matcher m = INDEX.matcher(inf);
-    String entries = m.find() ? m.group(1) : "xxx";
+    final String entries = m.find() ? m.group(1) : "xxx";
 
     exec(new DropIndex(index));
     return new String[] { format(l), entries };
