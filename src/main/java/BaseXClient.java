@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Java client for BaseX.
  * Works with BaseX 6.3.1 and later
- * Documentation: http://basex.org/api
+ * Documentation: http://docs.basex.org/wiki/Clients
  *
  * (C) BaseX Team 2005-11, BSD License
  */
@@ -45,11 +45,13 @@ public final class BaseXClient {
    */
   public BaseXClient(final String host, final int port, final String usern,
       final String pw) throws IOException {
+
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
     in = new BufferedInputStream(socket.getInputStream());
     out = socket.getOutputStream();
     ehost = host;
+
     // receive timestamp
     final String ts = receive();
     // send {Username}0 and hashed {Password/Timestamp}0
@@ -70,7 +72,7 @@ public final class BaseXClient {
       throws IOException {
     // send {Command}0
     send(cmd);
-    receive(o);
+    receive(in, o);
     info = receive();
     if(!ok()) throw new IOException(info);
   }
@@ -131,8 +133,8 @@ public final class BaseXClient {
    * @param notifier event notification
    * @throws IOException I/O exception
    */
-  public void watch(final String name,
-      final EventNotifier notifier) throws IOException {
+  public void watch(final String name, final EventNotifier notifier)
+      throws IOException {
     out.write(10);
     send(name);
     if(esocket == null) {
@@ -239,7 +241,7 @@ public final class BaseXClient {
    */
   String receive() throws IOException {
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
-    receive(os);
+    receive(in, os);
     return os.toString("UTF-8");
   }
 
@@ -254,30 +256,15 @@ public final class BaseXClient {
 
   /**
    * Receives a string and writes it to the specified output stream.
-   * @param bis input stream
-   * @param o output stream
+   * @param is input stream
+   * @param os output stream
    * @throws IOException I/O exception
    */
-  void receive(final BufferedInputStream bis,
-      final OutputStream o) throws IOException {
+  void receive(final InputStream is, final OutputStream os) throws IOException {
     while(true) {
-      final int b = bis.read();
+      final int b = is.read();
       if(b == 0 || b == -1) break;
-      o.write(b);
-    }
-  }
-
-  /**
-   * Receives a string and writes it to the specified output stream.
-   * @param o output stream
-   * @throws IOException I/O exception
-   */
-  private void receive(final OutputStream o) throws IOException {
-    out.flush();
-    while(true) {
-      final int b = in.read();
-      if(b == 0 || b == -1) break;
-      o.write(b);
+      os.write(b);
     }
   }
 
