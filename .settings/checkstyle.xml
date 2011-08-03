@@ -5,7 +5,7 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: basex checkstyle
+    Checkstyle-Configuration: BaseX Checkstyle
     Description: none
 -->
 <module name="Checker">
@@ -107,9 +107,10 @@
     <module name="GenericWhitespace"/>
     <module name="Regexp">
       <property name="format" value="[ \t]+$"/>
-      <property name="illegalPattern" value="true"/>
       <property name="message" value="Trailing whitespace"/>
+      <property name="illegalPattern" value="true"/>
     </module>
+    <module name="OuterTypeFilename"/>
   </module>
   <module name="StrictDuplicateCode">
     <property name="severity" value="ignore"/>
