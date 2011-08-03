@@ -10,15 +10,20 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Language Binding for BaseX.
+ * Java client for BaseX.
  * Works with BaseX 6.3.1 and later
- * Documentation: http://basex.org/api
+ * Documentation: http://docs.basex.org/wiki/Clients
  *
- * @author BaseX Team 2005-11, BSD License
+ * (C) BaseX Team 2005-11, BSD License
  */
 public final class BaseXClient {
+  /** Event notifications. */
+  final Map<String, EventNotifier> notifiers =
+    new HashMap<String, EventNotifier>();
   /** Output stream. */
   final OutputStream out;
   /** Socket. */
@@ -27,6 +32,10 @@ public final class BaseXClient {
   private final BufferedInputStream in;
   /** Command info. */
   private String info;
+  /** Socket event reference. */
+  Socket esocket;
+  /** Socket host name. */
+  String ehost;
 
   /**
    * Constructor.
@@ -43,6 +52,7 @@ public final class BaseXClient {
     socket.connect(new InetSocketAddress(host, port), 5000);
     in = new BufferedInputStream(socket.getInputStream());
     out = socket.getOutputStream();
+    ehost = host;
 
     // receive timestamp
     final String ts = receive();
@@ -64,7 +74,7 @@ public final class BaseXClient {
       throws IOException {
     // send {Command}0
     send(cmd);
-    receive(o);
+    receive(in, o);
     info = receive();
     if(!ok()) throw new IOException(info);
   }
@@ -76,9 +86,9 @@ public final class BaseXClient {
    * @throws IOException Exception
    */
   public String execute(final String cmd) throws IOException {
-    final OutputStream os = new ByteArrayOutputStream();
+    final ByteArrayOutputStream os = new ByteArrayOutputStream();
     execute(cmd, os);
-    return os.toString();
+    return os.toString("UTF-8");
   }
 
   /**
@@ -99,7 +109,6 @@ public final class BaseXClient {
    */
   public void create(final String name, final InputStream input)
       throws IOException {
-
     out.write(8);
     send(name);
     send(input);
@@ -107,18 +116,80 @@ public final class BaseXClient {
 
   /**
    * Adds a database.
-   * @param name name of database
+   * @param name name of document
    * @param target target path
    * @param input xml input
    * @throws IOException I/O exception
    */
   public void add(final String name, final String target,
       final InputStream input) throws IOException {
-
     out.write(9);
     send(name);
     send(target);
     send(input);
+  }
+
+  /**
+   * Watches an event.
+   * @param name event name
+   * @param notifier event notification
+   * @throws IOException I/O exception
+   */
+  public void watch(final String name, final EventNotifier notifier)
+      throws IOException {
+    out.write(10);
+    send(name);
+    if(esocket == null) {
+      final int eport = Integer.parseInt(receive());
+      // initialize event socket
+      esocket = new Socket();
+      esocket.connect(new InetSocketAddress(ehost, eport), 5000);
+      final OutputStream os = esocket.getOutputStream();
+      receive(in, os);
+      os.write(0);
+      os.flush();
+      listen(esocket.getInputStream());
+    }
+    info = receive();
+    if(!ok()) throw new IOException(info);
+    notifiers.put(name, notifier);
+  }
+
+  /**
+   * Starts the listener thread.
+   * @param is input stream
+   */
+  private void listen(final InputStream is) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          while(true) {
+            final BufferedInputStream bi = new BufferedInputStream(is);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            receive(bi, baos);
+            final String name = baos.toString("UTF-8");
+            baos = new ByteArrayOutputStream();
+            receive(bi, baos);
+            final String data = baos.toString("UTF-8");
+            notifiers.get(name).notify(data);
+          }
+        } catch(final Exception ex) { }
+      }
+    }.start();
+  }
+
+  /**
+   * Unwatches an event.
+   * @param name event name
+   * @throws IOException I/O exception
+   */
+  public void unwatch(final String name) throws IOException {
+    out.write(11);
+    send(name);
+    info = receive();
+    if(!ok()) throw new IOException(info);
+    notifiers.remove(name);
   }
 
   /**
@@ -129,7 +200,7 @@ public final class BaseXClient {
   private void send(final InputStream input) throws IOException {
     final BufferedInputStream bis = new BufferedInputStream(input);
     final BufferedOutputStream bos = new BufferedOutputStream(out);
-    for(int l; (l = bis.read()) != -1;) bos.write(l);
+    for(int b; (b = bis.read()) != -1;) bos.write(b);
     bos.write(0);
     bos.flush();
     info = receive();
@@ -151,6 +222,7 @@ public final class BaseXClient {
   public void close() throws IOException {
     send("exit");
     out.flush();
+    if(esocket != null) esocket.close();
     socket.close();
   }
 
@@ -170,9 +242,9 @@ public final class BaseXClient {
    * @throws IOException I/O exception
    */
   String receive() throws IOException {
-    final OutputStream os = new ByteArrayOutputStream();
-    receive(os);
-    return os.toString();
+    final ByteArrayOutputStream os = new ByteArrayOutputStream();
+    receive(in, os);
+    return os.toString("UTF-8");
   }
 
   /**
@@ -186,15 +258,15 @@ public final class BaseXClient {
 
   /**
    * Receives a string and writes it to the specified output stream.
-   * @param o output stream
+   * @param is input stream
+   * @param os output stream
    * @throws IOException I/O exception
    */
-  private void receive(final OutputStream o) throws IOException {
-    out.flush();
+  void receive(final InputStream is, final OutputStream os) throws IOException {
     while(true) {
-      final int b = in.read();
+      final int b = is.read();
       if(b == 0 || b == -1) break;
-      o.write(b);
+      os.write(b);
     }
   }
 
@@ -277,16 +349,17 @@ public final class BaseXClient {
     }
 
     /**
-     * Returns the complete result.
+     * Returns the whole result of the query.
      * @return query result
-     * @throws IOException I/O exception
+     * @throws IOException I/O Exception
      */
     public String execute() throws IOException {
       return exec(5, id);
     }
 
     /**
-     * Returns the query info.
+     * Returns query info as a string, regardless of whether an output stream
+     * was specified.
      * @return query info
      * @throws IOException I/O exception
      */
@@ -314,12 +387,22 @@ public final class BaseXClient {
      */
     private String exec(final int cmd, final String arg)
         throws IOException {
-
       out.write(cmd);
       send(arg);
       final String s = receive();
       if(!ok()) throw new IOException(receive());
       return s;
     }
+  }
+
+  /**
+   * Interface for event notifications.
+   */
+  public interface EventNotifier {
+    /**
+     * Invoked when a database event was fired.
+     * @param value event string
+     */
+    void notify(final String value);
   }
 }

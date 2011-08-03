@@ -6,23 +6,19 @@ import java.io.InputStream;
 
 /**
  * This example shows how documents can be added to databases.
- * Documentation: http://basex.org/api
+ * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License
  */
 public final class AddExample {
+  /** Hidden default constructor. */
+  private AddExample() { }
+
   /**
    * Main method.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new AddExample();
-  }
-
-  /**
-   * Constructor.
-   */
-  private AddExample() {
     try {
       // create session
       BaseXClient session =
@@ -30,7 +26,7 @@ public final class AddExample {
 
       try {
         // create empty database
-        session.execute("create db testdb");
+        session.execute("create db database");
         System.out.println(session.info());
 
         // define input stream
@@ -50,10 +46,10 @@ public final class AddExample {
 
         // run query on database
         System.out.println();
-        System.out.println(session.execute("xquery collection('testdb')"));
+        System.out.println(session.execute("xquery collection('database')"));
 
         // drop database
-        session.execute("drop db testdb");
+        session.execute("drop db database");
 
       } catch(IOException ex) {
         // print exception
