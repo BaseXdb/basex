@@ -277,7 +277,7 @@ public final class Order extends ParseExpr {
     private int m(final int[] o, final int a, final int b, final int c)
         throws QueryException {
       final Item[] ka = kl.get(o[a]), kb = kl.get(o[b]), kc = kl.get(o[c]);
-      return d(ka, kb) < 0 ? (d(kb, kc) < 0 ? b : d(ka, kc) < 0 ? c : a) :
+      return d(ka, kb) < 0 ? d(kb, kc) < 0 ? b : d(ka, kc) < 0 ? c : a :
           d(kb, kc) > 0 ? b : d(ka, kc) > 0 ? c : a;
     }
   }

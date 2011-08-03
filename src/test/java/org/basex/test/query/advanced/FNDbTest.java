@@ -174,7 +174,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     // create two other database and compare substring
     new CreateDB(DBNAME + 1).execute(CONTEXT);
     new CreateDB(DBNAME + 2).execute(CONTEXT);
-    contains(fun + "()", DBNAME + 1 + ' ' + (DBNAME + 2));
+    contains(fun + "()", DBNAME + 1 + ' ' + DBNAME + 2);
     new DropDB(DBNAME + 1).execute(CONTEXT);
     new DropDB(DBNAME + 2).execute(CONTEXT);
   }
