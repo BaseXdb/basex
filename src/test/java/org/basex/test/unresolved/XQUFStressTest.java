@@ -17,9 +17,7 @@ public final class XQUFStressTest {
   private static final boolean VERBOSE = false;
 
   /** Current context. */
-  Context ctx = new Context();
-  /** Query string. */
-  final String query = "delete nodes //n";
+  private final Context ctx = new Context();
   /** Number of runs. */
   private static final int RUNS = 100;
   /** Number of node updates. */

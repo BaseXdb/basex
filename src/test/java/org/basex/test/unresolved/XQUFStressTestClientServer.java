@@ -139,7 +139,7 @@ public final class XQUFStressTestClientServer {
   }
 
   /** Single client. */
-  final class Client extends Thread {
+  static final class Client extends Thread {
     /** Client session. */
     private ClientSession session;
     /** Query to be executed by this client. */
