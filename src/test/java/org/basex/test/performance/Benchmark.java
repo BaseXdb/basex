@@ -194,7 +194,7 @@ public abstract class Benchmark {
           totalMax = arg.num();
           out.println("- total maximum #ms: " + totalMax);
         } else {
-          arg.check(false);
+          arg.ok(false);
         }
       } else {
         input = arg.string();

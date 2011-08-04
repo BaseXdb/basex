@@ -110,7 +110,7 @@ public final class InexTFCalc {
         if(ca == 'd') {
           databases.add(arg.string());
         } else {
-          arg.check(false);
+          arg.ok(false);
         }
       }
     }

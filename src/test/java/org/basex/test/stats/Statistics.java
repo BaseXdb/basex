@@ -119,11 +119,11 @@ public abstract class Statistics {
           debug = true;
         } else if(ch == 'o') {
           final String[] kp = arg.string().split("=", 2);
-          arg.check(new Set(kp[0], kp[1]).run(ctx));
+          arg.ok(new Set(kp[0], kp[1]).run(ctx));
         } else if(ch == 't') {
           tab = true;
         } else {
-          arg.check(false);
+          arg.ok(false);
         }
       } else {
         db = arg.string();

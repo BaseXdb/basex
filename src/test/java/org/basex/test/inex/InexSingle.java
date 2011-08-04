@@ -159,16 +159,16 @@ public final class InexSingle {
           if(c == 'q') {
             quiet = true;
           } else {
-            arg.check(false);
+            arg.ok(false);
           }
         } else {
           quindex = arg.num();
         }
       }
     } catch(final Exception ex) {
-      arg.check(false);
+      arg.ok(false);
     }
-    if(quindex == -1) arg.check(false);
+    if(quindex == -1) arg.ok(false);
 
     return arg.finish();
   }

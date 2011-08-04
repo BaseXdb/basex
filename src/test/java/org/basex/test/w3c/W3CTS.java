@@ -189,7 +189,7 @@ public abstract class W3CTS {
         } else if(c == 'v') {
           verbose = true;
         } else {
-          arg.check(false);
+          arg.ok(false);
         }
       } else {
         single = arg.string();

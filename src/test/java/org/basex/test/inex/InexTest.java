@@ -213,10 +213,10 @@ public final class InexTest {
         } else if(c == 'b') {
           budget = arg.num();
         } else {
-          arg.check(false);
+          arg.ok(false);
         }
       } else {
-        arg.check(false);
+        arg.ok(false);
       }
     }
     if(!arg.finish()) return false;
