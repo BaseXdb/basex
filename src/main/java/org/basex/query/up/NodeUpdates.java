@@ -44,7 +44,7 @@ final class NodeUpdates {
   /** Container for update primitives. In most cases there will only be a sinlge
    * update operation per target node, hence it's convenient to initialize this
    * container with a size of one. */
-  protected UpdatePrimitive[] prim = new UpdatePrimitive[1];
+  UpdatePrimitive[] prim = new UpdatePrimitive[1];
 
   /** The corresponding node is target of a delete primitive. */
   private boolean del;
@@ -185,13 +185,9 @@ final class NodeUpdates {
       final PrimitiveType t = p.type;
       switch(t) {
         case DELETENODE:
-          d.add(p.pre);
-          break;
-
         case REPLACENODE:
           d.add(p.pre);
           break;
-
         case REPLACEELEMCONT:
           final Data data = p.data;
           final int pre = p.pre;
@@ -203,7 +199,6 @@ final class NodeUpdates {
             ipre += data.size(ipre, data.kind(ipre));
           }
           break;
-
         default:
       }
     }

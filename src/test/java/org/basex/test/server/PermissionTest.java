@@ -60,7 +60,7 @@ public final class PermissionTest {
   /** Name of the database to be renamed. */
   private static final String RENAMED = Util.name(PermissionTest.class) + "r";
   /** Test repository. **/
-  protected static final String REPO = "etc/test/repo/";
+  static final String REPO = "etc/test/repo/";
 
   /** Server reference. */
   static BaseXServer server;

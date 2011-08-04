@@ -10,10 +10,10 @@ import org.basex.util.list.ByteList;
  * @author Christian Gruen
  */
 public final class Compress extends ByteList {
-  /** Temporary value, or current position. */
-  private int c;
-  /** Offset. */
-  private int o;
+  /** Temporary value. */
+  private int pc;
+  /** Pack offset. */
+  private int po;
 
   /**
    * Compresses the specified text.
@@ -26,8 +26,8 @@ public final class Compress extends ByteList {
     reset();
     Num.set(list, tl, 0);
     size = Num.length(tl);
-    c = 0;
-    o = 0;
+    pc = 0;
+    po = 0;
 
     // write packer version bit (0)
     push(0, 1);
@@ -54,7 +54,7 @@ public final class Compress extends ByteList {
         push(b << 4, 12);
       }
     }
-    if(o != 0) add(c);
+    if(po != 0) add(pc);
     return size() < tl ? toArray() : txt;
   }
 
@@ -64,7 +64,7 @@ public final class Compress extends ByteList {
    * @param s number of bits
    */
   private void push(final int b, final int s) {
-    int bb = b, oo = o, cc = c;
+    int bb = b, oo = po, cc = pc;
     for(int i = 0; i < s; i++) {
       cc |= (bb & 1) << oo;
       bb >>= 1;
@@ -74,9 +74,14 @@ public final class Compress extends ByteList {
         cc = 0;
       }
     }
-    o = oo;
-    c = cc;
+    po = oo;
+    pc = cc;
   }
+
+  /** Current unpack position. */
+  private int uc;
+  /** UNpack offset. */
+  private int uo;
 
   /**
    * Decompresses the specified text.
@@ -87,8 +92,8 @@ public final class Compress extends ByteList {
     // initialize decompression
     list = txt;
     size = txt.length;
-    c = Num.length(txt, 0);
-    o = 0;
+    uc = Num.length(txt, 0);
+    uo = 0;
 
     // read packer bit
     pull();
@@ -122,7 +127,7 @@ public final class Compress extends ByteList {
    * @return result
    */
   private int pull(final int s) {
-    int oo = o, cc = c, x = 0;
+    int oo = uo, cc = uc, x = 0;
     for(int i = 0; i < s; i++) {
       if((list[cc] & 1 << oo) != 0) x |= 1 << i;
       if(++oo == 8) {
@@ -130,8 +135,8 @@ public final class Compress extends ByteList {
         ++cc;
       }
     }
-    o = oo;
-    c = cc;
+    uo = oo;
+    uc = cc;
     return x;
   }
 
@@ -140,10 +145,10 @@ public final class Compress extends ByteList {
    * @return result
    */
   private boolean pull() {
-    final boolean b = (list[c] & 1 << o) != 0;
-    if(++o == 8) {
-      o = 0;
-      ++c;
+    final boolean b = (list[uc] & 1 << uo) != 0;
+    if(++uo == 8) {
+      uo = 0;
+      ++uc;
     }
     return b;
   }

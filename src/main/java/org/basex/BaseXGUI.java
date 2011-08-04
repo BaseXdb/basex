@@ -61,9 +61,7 @@ public final class BaseXGUI {
 
     // read properties
     context.prop.set(Prop.CACHEQUERY, true);
-    Prop.gui = true;
     final GUIProp gprop = new GUIProp();
-
     GUIConstants.init(gprop);
 
     SwingUtilities.invokeLater(new Runnable() {

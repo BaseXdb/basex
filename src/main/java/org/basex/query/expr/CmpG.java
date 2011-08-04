@@ -112,7 +112,7 @@ public final class CmpG extends Cmp {
   }
 
   /** Comparator. */
-  protected Op op;
+  Op op;
   /** Index expression. */
   private IndexAccess[] iacc = {};
   /** Flag for atomic evaluation. */

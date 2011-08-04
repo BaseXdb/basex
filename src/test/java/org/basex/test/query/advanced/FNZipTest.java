@@ -2,10 +2,11 @@ package org.basex.test.query.advanced;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
+
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.basex.core.Prop;
@@ -194,9 +195,9 @@ public final class FNZipTest extends AdvancedQueryTest {
       zf = new ZipFile(TMPZIP);
       final ZipEntry ze = zf.getEntry(file);
       assertTrue("File not found: " + file, ze != null);
-      final InputStream is = zf.getInputStream(ze);
+      final DataInputStream is = new DataInputStream(zf.getInputStream(ze));
       final byte[] dt = new byte[(int) ze.getSize()];
-      is.read(dt);
+      is.readFully(dt);
       assertTrue("Wrong contents in file \"" + file + "\":" + Prop.NL +
           "Expected: " + string(data) + Prop.NL + "Found: " + string(dt),
           eq(data, dt));

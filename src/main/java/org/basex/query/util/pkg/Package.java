@@ -26,10 +26,6 @@ public final class Package {
   byte[] version;
   /** Version of packaging specification the package conforms to. */
   byte[] spec;
-  /** Package description. */
-  byte[] title;
-  /** URI to find more information about the package. */
-  byte[] home;
 
   /**
    * Returns unique package name consisting of package uri and package version.
@@ -99,10 +95,6 @@ public final class Package {
     public byte[] uri;
     /** Component file. */
     public byte[] file;
-    /** Component type. */
-    byte[] type;
-    /** Public import URI. */
-    byte[] importUri;
 
     /**
      * Extracts component's file name from component's path.

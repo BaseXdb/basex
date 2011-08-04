@@ -108,9 +108,7 @@ public final class PkgParser {
     final AxisIter ch = childElements(node);
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
-      if(eqNS(TITLE, name))       p.title = next.atom();
-      else if(eqNS(HOME, name))   p.home = next.atom();
-      else if(eqNS(DEPEND, name)) p.dep.add(parseDependency(next));
+      if(eqNS(DEPEND, name)) p.dep.add(parseDependency(next));
       else if(eqNS(XQUERY, name)) p.comps.add(parseComp(next));
     }
   }
@@ -146,11 +144,9 @@ public final class PkgParser {
   private Component parseComp(final ANode node) throws QueryException {
     final AxisIter ch = childElements(node);
     final Component c = new Component();
-    c.type = XQUERY;
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
-      if(eqNS(IMPURI, name))    c.importUri = next.atom();
-      else if(eqNS(NSPC, name)) c.uri = next.atom();
+      if(eqNS(NSPC, name)) c.uri = next.atom();
       else if(eqNS(FILE, name)) c.file = next.atom();
       else PKGDESCINV.thrw(input, Util.info(WHICHELEM, name));
     }

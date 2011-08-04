@@ -432,7 +432,7 @@ public final class FolderView extends View {
     if(gui.context.focused == -1) gui.context.focused = 0;
     final int focusPre = gui.context.focused;
     final Data data = gui.context.data;
-    int kind = data.kind(focusPre);
+    final int kind = data.kind(focusPre);
 
     final boolean right = NEXT.is(e);
     boolean down = NEXTLINE.is(e);
@@ -443,10 +443,8 @@ public final class FolderView extends View {
         opened[focusPre] = right;
         final int s = data.meta.size;
         for(int pre = focusPre + 1;
-          pre != s && data.parent(pre, data.kind(pre)) >= focusPre;
-          pre += 1) {
+          pre != s && data.parent(pre, data.kind(pre)) >= focusPre; pre++) {
           opened[pre] = right;
-          kind = data.kind(pre);
         }
         refreshHeight();
         repaint();

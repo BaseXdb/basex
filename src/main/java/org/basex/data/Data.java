@@ -166,7 +166,7 @@ public abstract class Data {
    * @param token index token reference
    * @return id array
    */
-  public final synchronized IndexIterator ids(final IndexToken token) {
+  public final IndexIterator ids(final IndexToken token) {
     switch(token.type()) {
       case TEXT:      return txtindex.ids(token);
       case ATTRIBUTE: return atvindex.ids(token);
@@ -180,7 +180,7 @@ public abstract class Data {
    * @param token text to be found
    * @return number of hits
    */
-  public final synchronized int nrIDs(final IndexToken token) {
+  public final int nrIDs(final IndexToken token) {
     switch(token.type()) {
       case TEXT:      return txtindex.nrIDs(token);
       case ATTRIBUTE: return atvindex.nrIDs(token);
@@ -212,7 +212,7 @@ public abstract class Data {
    * @param type index type
    * @return info
    */
-  public final synchronized byte[] info(final IndexType type) {
+  public final byte[] info(final IndexType type) {
     switch(type) {
       case TAG:       return tagindex.info();
       case ATTNAME:   return atnindex.info();

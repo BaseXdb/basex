@@ -102,9 +102,7 @@ public final class CSVParser extends SingleParser {
     simple = s.equals(FORMATS[0]);
     if(!simple && !s.equals(FORMATS[1])) throw new IOException(
         Util.info(SETVAL, ParserProp.FORMAT[0], s));
-
-    s = props.get(ParserProp.ENCODING);
-    encoding = s != null ? s : UTF8;
+    encoding = props.get(ParserProp.ENCODING);
   }
 
   @Override

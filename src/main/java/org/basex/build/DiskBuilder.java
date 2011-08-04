@@ -42,7 +42,7 @@ public final class DiskBuilder extends Builder {
   private long vallen;
 
   /** Admin properties. */
-  protected final MainProp mprop;
+  final MainProp mprop;
   /** Text compressor. */
   private final Compress comp;
 

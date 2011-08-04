@@ -214,7 +214,7 @@ public final class ClientListener extends Thread {
   /**
    * Exits the session.
    */
-  public void exit() {
+  public synchronized void exit() {
     // close remaining query processes
     for(final QueryListener q : queries.values()) {
       try { q.close(true); } catch(final IOException ex) { }

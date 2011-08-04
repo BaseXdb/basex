@@ -56,8 +56,7 @@ public final class TextParser extends SingleParser {
     // set parser properties
     final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
     lines = props.is(ParserProp.LINES);
-    final String e = props.get(ParserProp.ENCODING);
-    encoding = e != null ? e : UTF8;
+    encoding = props.get(ParserProp.ENCODING);
   }
 
   @Override

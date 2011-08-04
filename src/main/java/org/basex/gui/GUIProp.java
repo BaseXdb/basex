@@ -168,6 +168,7 @@ public final class GUIProp extends AProp {
   public GUIProp() {
     super("gui");
     recent(null);
+    Prop.gui = true;
   }
 
   /**

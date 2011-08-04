@@ -35,7 +35,11 @@ abstract class Set extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     type = SeqType.NOD_ZM;
     super.comp(ctx);
-    for(final Expr e : expr) iterable &= e.iterable();
+    for(final Expr e : expr) {
+      if(e.iterable()) continue;
+      iterable = false;
+      break;
+    }
     return this;
   }
 

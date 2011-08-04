@@ -33,9 +33,9 @@ import org.junit.Test;
  */
 public final class PackageAPITest extends AdvancedQueryTest {
   /** Test repository. */
-  protected static final String REPO = "etc/test/repo/";
+  private static final String REPO = "etc/test/repo/";
   /** Context. */
-  protected static Context ctx;
+  private Context ctx;
 
   /** Prepare test. */
   @Before
@@ -370,7 +370,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Checks if the specified package descriptor results in an error.
    * @param desc descriptor
    */
-  private static void ok(final IO desc) {
+  private void ok(final IO desc) {
     try {
       new PkgValidator(ctx.repo, null).check(
          new PkgParser(ctx.repo, null).parse(desc));
@@ -385,7 +385,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @param err expected error
    * @param exp information on expected error
    */
-  private static void error(final IO desc, final Err err, final String exp) {
+  private void error(final IO desc, final Err err, final String exp) {
     try {
       new PkgValidator(ctx.repo, null).check(
          new PkgParser(ctx.repo, null).parse(desc));
