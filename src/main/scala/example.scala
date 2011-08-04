@@ -14,7 +14,7 @@ object example {
    */
   def main(args: Array[String]) {
     // initialize timer
-    val time = System.nanoTime()
+    val time = System.nanoTime
 
     // create session
     val session = new BaseXClient("localhost", 1984, "admin", "admin")
@@ -27,10 +27,10 @@ object example {
     session.execute("xquery 1 to 10", out)
 
     // close session
-    session.close()
+    session.close
 
     // print time needed
-    val ms = (System.nanoTime() - time) / 1000000d
+    val ms = (System.nanoTime - time) / 1000000d
     println("\n\n" + ms + " ms")
   }
 }

@@ -21,15 +21,15 @@ import java.util._
  */
 class BaseXClient(host: String, port: Int, usern: String, pw: String) {
   var inf = ""
-  val socket = new Socket()
+  val socket = new Socket
   socket.connect(new InetSocketAddress(host, port), 5000)
-  val in = new BufferedInputStream(socket.getInputStream())
-  val out = socket.getOutputStream()
+  val in = new BufferedInputStream(socket.getInputStream)
+  val out = socket.getOutputStream
 
-  val ts = receive()
+  val ts = receive
   send(usern)
   send(md5(md5(pw) + ts))
-  if(!ok()) throw new IOException("Access denied.")
+  if(!ok) throw new IOException("Access denied.")
 
   /**
    * Executes a command and serializes the result to an output stream.
@@ -40,8 +40,8 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
   def execute(cmd: String, os: OutputStream) {
     send(cmd)
     receive(in, os)
-    inf = receive()
-    if(!ok()) throw new IOException(inf)
+    inf = receive
+    if(!ok) throw new IOException(inf)
   }
 
   /**
@@ -51,7 +51,7 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
    * @throws IOException I/O Exception
    */
   def execute(cmd: String) : String = {
-    val os = new ByteArrayOutputStream()
+    val os = new ByteArrayOutputStream
     execute(cmd, os)
     os.toString("UTF-8")
   }
@@ -91,7 +91,6 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
     send(target)
     send(input)
   }
-
   /**
    * Returns command information.
    * @return string info
@@ -106,8 +105,8 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
    */
   def close() {
     send("exit")
-    out.flush()
-    socket.close()
+    out.flush
+    socket.close
   }
 
   /**
@@ -119,11 +118,11 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
     val is = new BufferedInputStream(input)
     val os = new BufferedOutputStream(out)
     var b = 0
-    while({ b = is.read(); b != -1 }) os.write(b)
+    while({ b = is.read; b != -1 }) os.write(b)
     os.write(0)
-    os.flush()
-    inf = receive()
-    if(!ok()) throw new IOException(inf)
+    os.flush
+    inf = receive
+    if(!ok) throw new IOException(inf)
   }
 
   /**
@@ -132,8 +131,8 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
    * @throws IOException I/O Exception
    */
   private def ok() : Boolean = {
-    out.flush()
-    in.read() == 0
+    out.flush
+    in.read == 0
   }
 
   /**
@@ -142,7 +141,7 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
    * @throws IOException I/O exception
    */
   private def receive() : String = {
-    val os = new ByteArrayOutputStream()
+    val os = new ByteArrayOutputStream
     receive(in, os)
     os.toString("UTF-8")
   }
@@ -164,7 +163,7 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
    */
   private def receive(is: InputStream, os: OutputStream) {
     var b = 0
-    while({ b = is.read(); b != 0 && b != -1 }) os.write(b)
+    while({ b = is.read; b != 0 && b != -1 }) os.write(b)
   }
 
   /**
@@ -173,20 +172,20 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
    * @return String
    */
   private def md5(pw: String) : String = {
-    val sb = new StringBuilder()
+    val sb = new StringBuilder
     try {
       val md = MessageDigest.getInstance("MD5")
-      md.update(pw.getBytes())
-      for(b <- md.digest()) {
+      md.update(pw.getBytes)
+      for(b <- md.digest) {
         val s = Integer.toHexString(b & 0xFF)
-        if(s.length() == 1) sb.append('0')
+        if(s.length == 1) sb.append('0')
         sb.append(s)
       }
     } catch {
-      case ex: NoSuchAlgorithmException => ex.printStackTrace()
+      case ex: NoSuchAlgorithmException => ex.printStackTrace
       case ex : Exception => throw ex
     }
-    sb.toString()
+    sb.toString
   }
 
   /**
@@ -224,7 +223,7 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
      */
     def more() : Boolean = {
       nxt = exec(1, id)
-      nxt.length() != 0
+      nxt.length != 0
     }
 
     /**
@@ -261,7 +260,7 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
      */
     def close() : String = {
       val s = exec(2, id)
-      out.flush()
+      out.flush
       s
     }
 
@@ -275,8 +274,8 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
     private def exec(cmd: Int, arg: String) : String = {
       out.write(cmd)
       send(arg)
-      val s = receive()
-      if(!ok()) throw new IOException(receive())
+      val s = receive
+      if(!ok) throw new IOException(receive)
       s
     }
   }

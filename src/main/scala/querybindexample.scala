@@ -25,12 +25,12 @@ object querybindexample {
     query.bind("$name", "number");
 
     // print result
-    println(query.execute())
+    println(query.execute)
 
     // close query instance
-    print(query.close())
+    print(query.close)
 
     // close session
-    session.close()
+    session.close
   }
 }

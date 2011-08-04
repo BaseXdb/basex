@@ -215,10 +215,10 @@ public final class JaxRxServer extends BaseXServer {
           // suppress logging
           quiet = true;
         } else {
-          arg.check(false);
+          arg.ok(false);
         }
       } else {
-        arg.check(false);
+        arg.ok(false);
         if(arg.string().equalsIgnoreCase("stop")) {
           stop(context.mprop.num(MainProp.SERVERPORT),
                context.mprop.num(MainProp.EVENTPORT));

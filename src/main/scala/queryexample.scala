@@ -21,15 +21,15 @@ object queryexample {
     val query = session.query(input)
 
     // initialize iterator
-    print(query.init())
+    print(query.init)
 
     // loop through all results
-    while(query.more()) println(query.next())
+    while(query.more) println(query.next)
 
     // close query instance
-    print(query.close())
+    print(query.close)
 
     // close session
-    session.close()
+    session.close
   }
 }

@@ -17,30 +17,30 @@ object addexample {
 
     // create empty database
     session.execute("create db database")
-    println(session.info())
+    println(session.info)
 
     // define input stream
-    var bais = new ByteArrayInputStream("<x>Hello World!</x>".getBytes())
+    var bais = new ByteArrayInputStream("<x>Hello World!</x>".getBytes)
 
     // add document
     session.add("world.xml", "/world", bais)
-    println(session.info())
+    println(session.info)
 
     // define input stream
-    bais = new ByteArrayInputStream("<x>Hello Universe!</x>".getBytes())
+    bais = new ByteArrayInputStream("<x>Hello Universe!</x>".getBytes)
 
     // add document
     session.add("universe.xml", "", bais)
-    println(session.info())
+    println(session.info)
 
     // run query on database
-    println()
+    println
     println(session.execute("xquery collection('database')"))
 
     // drop database
     session.execute("drop db database")
 
     // close session
-    session.close()
+    session.close
   }
 }

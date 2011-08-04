@@ -16,11 +16,11 @@ object createexample {
     val session = new BaseXClient("localhost", 1984, "admin", "admin")
 
     // define input stream
-    val bais = new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes())
+    val bais = new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes)
 
     // create new database
     session.create("database", bais)
-    println(session.info())
+    println(session.info)
 
     // run query on database
     println(session.execute("xquery doc('database')"))
@@ -29,6 +29,6 @@ object createexample {
     session.execute("drop db database")
 
     // close session
-    session.close()
+    session.close
   }
 }
