@@ -19,6 +19,7 @@ import java.util.jar.JarFile;
  * http://snipplr.com/view/24224/class-loader-which-close-opened-jar-files/ and
  * slightly modified.
  *
+ * @author Vitali Yemialyanchyk, www.stopka.us
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -37,6 +38,7 @@ public final class JarLoader extends URLClassLoader {
   /**
    * Closes the class loader.
    */
+  @Override
   public void close() {
     setJarFileNames2Close.clear();
     closeClassLoader(this);
