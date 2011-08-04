@@ -21,23 +21,23 @@ public final class JaxRxAll {
 
     // Create a database
     // Run all JAX-RX examples
-    new JaxRxPUT();
+    JaxRxPUT.run();
     System.out.println();
 
     // Send a query via GET
-    new JaxRxGET();
+    JaxRxGET.run();
     System.out.println();
 
     // Send a query via POST
-    new JaxRxPOSTQuery();
+    JaxRxPOSTQuery.run();
     System.out.println();
 
     // Add a document
-    new JaxRxPOSTAdd();
+    JaxRxPOSTAdd.run();
     System.out.println();
 
     // Delete a document
-    new JaxRxDELETE();
+    JaxRxDELETE.run();
     System.out.println();
 
     // Stop servers

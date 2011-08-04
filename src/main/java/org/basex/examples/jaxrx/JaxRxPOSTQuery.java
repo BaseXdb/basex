@@ -16,10 +16,10 @@ import org.basex.api.jaxrx.JaxRxServer;
  */
 public final class JaxRxPOSTQuery {
   /**
-   * Constructor.
+   * Runs the example.
    * @throws IOException I/O exception
    */
-  JaxRxPOSTQuery() throws IOException {
+  static void run() throws IOException {
     System.out.println("=== POST: execute a query ===");
 
     // The java URL connection to the resource
@@ -86,7 +86,7 @@ public final class JaxRxPOSTQuery {
     // Start servers
     JaxRxServer jaxrx = new JaxRxServer();
     // Run example
-    new JaxRxPOSTQuery();
+    run();
     // Stop servers
     jaxrx.stop();
   }

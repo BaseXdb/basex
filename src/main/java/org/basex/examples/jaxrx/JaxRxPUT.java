@@ -18,10 +18,10 @@ import org.basex.api.jaxrx.JaxRxServer;
  */
 public final class JaxRxPUT {
   /**
-   * Constructor.
+   * Runs the example.
    * @throws IOException I/O exception
    */
-  JaxRxPUT() throws IOException {
+  static void run() throws IOException {
     System.out.println("=== PUT: create a new database ===");
 
     // The java URL connection to the resource
@@ -65,7 +65,7 @@ public final class JaxRxPUT {
     // Start servers
     JaxRxServer jaxrx = new JaxRxServer();
     // Run example
-    new JaxRxPUT();
+    run();
     // Stop servers
     jaxrx.stop();
   }

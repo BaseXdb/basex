@@ -13,10 +13,10 @@ import org.basex.api.jaxrx.JaxRxServer;
  */
 public final class JaxRxDELETE {
   /**
-   * Constructor.
+   * Runs the example.
    * @throws IOException I/O exception
    */
-  JaxRxDELETE() throws IOException {
+  static void run() throws IOException {
     System.out.println("=== DELETE: delete a document or database ===");
 
     // The java URL connection to the resource
@@ -59,7 +59,7 @@ public final class JaxRxDELETE {
     // Start servers
     JaxRxServer jaxrx = new JaxRxServer();
     // Run example
-    new JaxRxDELETE();
+    run();
     // Stop servers
     jaxrx.stop();
   }

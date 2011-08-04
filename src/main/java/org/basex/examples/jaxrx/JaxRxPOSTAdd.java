@@ -18,10 +18,10 @@ import org.basex.api.jaxrx.JaxRxServer;
  */
 public final class JaxRxPOSTAdd {
   /**
-   * Constructor.
+   * Runs the example.
    * @throws IOException I/O exception
    */
-  JaxRxPOSTAdd() throws IOException {
+  static void run() throws IOException {
     System.out.println("=== POST: add a document to a database ===");
 
     // The java URL connection to the resource
@@ -70,7 +70,7 @@ public final class JaxRxPOSTAdd {
     // Start servers
     JaxRxServer jaxrx = new JaxRxServer();
     // Run example
-    new JaxRxPOSTAdd();
+    run();
     // Stop servers
     jaxrx.stop();
   }
