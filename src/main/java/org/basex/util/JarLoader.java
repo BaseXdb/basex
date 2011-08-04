@@ -38,7 +38,6 @@ public final class JarLoader extends URLClassLoader {
   /**
    * Closes the class loader.
    */
-  @Override
   public void close() {
     setJarFileNames2Close.clear();
     closeClassLoader(this);
