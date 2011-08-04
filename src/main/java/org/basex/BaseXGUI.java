@@ -130,7 +130,7 @@ public final class BaseXGUI {
     final Args arg = new Args(args, this, GUIINFO, Util.info(CONSOLE, GUIMODE));
     while(arg.more()) {
       if(arg.dash()) {
-        arg.check(false);
+        arg.ok(false);
       } else {
         file = file == null ? arg.string() : file + " " + arg.string();
       }

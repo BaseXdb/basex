@@ -215,10 +215,10 @@ public class BaseXServer extends Main {
           // suppress logging
           quiet = true;
         } else {
-          arg.check(false);
+          arg.ok(false);
         }
       } else {
-        arg.check(false);
+        arg.ok(false);
         if(arg.string().equalsIgnoreCase("stop")) {
           stop(context.mprop.num(MainProp.SERVERPORT),
               context.mprop.num(MainProp.EVENTPORT));
@@ -229,7 +229,7 @@ public class BaseXServer extends Main {
     }
     if(context.mprop.num(MainProp.SERVERPORT) ==
        context.mprop.num(MainProp.EVENTPORT)) {
-      arg.check(error(null, SERVERPORTS));
+      arg.ok(error(null, SERVERPORTS));
     }
     return arg.finish();
   }

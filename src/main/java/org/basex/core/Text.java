@@ -94,7 +94,7 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-npPU] [-dosvVwz] [-cq] [file]" + NL +
+    " [-dnopPsUvVwz] [-cq] [file]" + NL +
     "  [file]     Execute XQuery file" + NL +
     "  -b<pars>   Bind external XQuery variables" + NL +
     "  -c<cmd>    Execute database command(s)" + NL +
