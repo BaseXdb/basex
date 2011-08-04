@@ -72,7 +72,7 @@ public final class HttpClientTest {
   private static final byte[] METHOD = token("method");
 
   /** Database context. */
-  protected static Context context;
+  static Context context;
   /** JAX-RX server. */
   private static JaxRxServer jaxrx;
 

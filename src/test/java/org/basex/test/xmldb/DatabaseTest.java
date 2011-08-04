@@ -18,14 +18,12 @@ import junit.framework.TestCase;
 @SuppressWarnings("all")
 public class DatabaseTest extends TestCase {
   /** Database. */
-  private static Database database;
+  private Database database;
 
   @Before
   @Override
   protected void setUp() throws Exception {
-    if(database != null) return;
-    final Class<?> c = Class.forName(AllTests.DRIVER);
-    database = (Database) c.newInstance();
+    database = (Database) Class.forName(AllTests.DRIVER).newInstance();
   }
 
   @Test

@@ -8,17 +8,14 @@ import java.io.IOException;
  * @author BaseX Team 2005-11, BSD License
  */
 public final class EventExample {
+  /** Hidden default constructor. */
+  private EventExample() { }
 
   /**
    * Main method.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new EventExample();
-  }
-
-  /** Constructor. */
-  private EventExample() {
     try {
       BaseXClient session1 =
         new BaseXClient("localhost", 1984, "admin", "admin");
@@ -42,8 +39,7 @@ public final class EventExample {
   /**
    * Implementation of the event notifier interface.
    */
-  private class Notifier implements BaseXClient.EventNotifier {
-
+  private static class Notifier implements BaseXClient.EventNotifier {
     /** Constructor. */
     public Notifier() { }
 
