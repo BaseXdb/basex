@@ -24,6 +24,7 @@ import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
 import org.basex.query.item.Jav;
 import org.basex.query.item.QNm;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.util.Err;
@@ -171,17 +172,25 @@ public final class FNSql extends FuncCall {
    */
   private NodeCache executePrepStmt(final PreparedStatement stmt,
       final QueryContext ctx) throws QueryException {
-    final Iter iter = expr[1].iter(ctx);
-    Item next = null;
+    // final ItemCache iter = (ItemCache)expr[1].iter(ctx);
+    // Item next = null;
     int index = 1;
     try {
-      // Set prepare statement's parameters
-      while((next = iter.next()) != null) {
-        if(next.toJava() instanceof BigInteger) {
+      for(int e = 1; e < expr.length; e++) {
+        final Item item = expr[e].item(ctx, input);
+        final Object next = item == null ? null : item.toJava();
+        if(next instanceof BigInteger) {
           // Needed because JDBC accepts only BigDecimal
-          stmt.setObject(index++, new BigDecimal((BigInteger) next.toJava()));
-        } else stmt.setObject(index++, next.toJava());
+          stmt.setObject(index++, new BigDecimal((BigInteger) next));
+        } else stmt.setObject(index++, next);
       }
+      // Set prepare statement's parameters
+      // while((next = iter.next()) != null) {
+      // if(next.toJava() instanceof BigInteger) {
+      // // Needed because JDBC accepts only BigDecimal
+      // stmt.setObject(index++, new BigDecimal((BigInteger) next.toJava()));
+      // } else stmt.setObject(index++, next.toJava());
+      // }
       final boolean result = stmt.execute();
       return result ? buildResult(stmt.getResultSet()) : new NodeCache();
     } catch(final SQLException ex) {
