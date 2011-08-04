@@ -10,7 +10,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.util.Var;
-import org.basex.util.Xslt;
 
 /**
  * Statically available XQuery variables.
@@ -26,9 +25,9 @@ public enum Variable {
   FILEPATHSEP(FILEURI, "path-separator", Str.get(File.pathSeparator)),
 
   /** XSLT variable. */
-  XSLTPROC(XSLTURI, "processor", Str.get(Xslt.SAXON ? "Saxon" : "Java")),
+  XSLTPROC(XSLTURI, "processor", Str.get(FNXslt.SAXON ? "Saxon" : "Java")),
   /** XSLT variable. */
-  XSLTVERSION(XSLTURI, "version", Str.get(Xslt.SAXON ? "2.0" : "1.0"));
+  XSLTVERSION(XSLTURI, "version", Str.get(FNXslt.SAXON ? "2.0" : "1.0"));
 
   /** Variable name. */
   final QNm qname;

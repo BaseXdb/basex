@@ -2,9 +2,16 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Reflect.*;
 import static org.basex.util.Token.*;
 
+import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.basex.io.IO;
 import org.basex.io.IOContent;
@@ -23,7 +30,6 @@ import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
-import org.basex.util.Xslt;
 import org.basex.util.hash.TokenObjMap;
 
 /**
@@ -33,10 +39,18 @@ import org.basex.util.hash.TokenObjMap;
  * @author Christian Gruen
  */
 public final class FNXslt extends FuncCall {
+  /** Saxon factory class. */
+  private static final String SAXONIMPL = "net.sf.saxon.TransformerFactoryImpl";
   /** Util namespace. */
   private static final Uri U_XSLT = Uri.uri(XSLTURI);
   /** Element: parameters. */
   private static final QNm E_PARAM = new QNm(token("parameters"), U_XSLT);
+  /** Saxon flag. */
+  static final boolean SAXON = find(SAXONIMPL) != null;
+
+  static {
+    if(SAXON) System.setProperty(TransformerFactory.class.getName(), SAXONIMPL);
+  }
 
   /**
    * Constructor.
@@ -69,7 +83,7 @@ public final class FNXslt extends FuncCall {
       final IO xsl = read(expr[1], ctx);
       final TokenObjMap<Object> map = xsltParams(2, E_PARAM, ctx);
 
-      final byte[] result = new Xslt().transform(in, xsl, map);
+      final byte[] result = transform(in, xsl, map);
       return new DBNode(new IOContent(result), ctx.context.prop);
     } catch(final Exception ex) {
       Util.debug(ex);
@@ -142,5 +156,33 @@ public final class FNXslt extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     return u == Use.CTX && def == Function.TRANSFORM || super.uses(u);
+  }
+
+  /**
+   * Uses Java's XSLT implementation to perform an XSL transformation.
+   * @param in input
+   * @param xsl style sheet
+   * @param par parameters
+   * @return transformed result
+   * @throws Exception exception
+   */
+  private byte[] transform(final IO in, final IO xsl,
+      final TokenObjMap<Object> par) throws Exception {
+
+    // create transformer
+    final TransformerFactory tc = TransformerFactory.newInstance();
+    final Transformer tr =  tc.newTransformer(
+        new StreamSource(new ByteArrayInputStream(xsl.content())));
+
+    // bind parameters
+    for(final byte[] key : par) tr.setParameter(string(key), par.get(key));
+
+    // create serializer
+    final ArrayOutput ao = new ArrayOutput();
+
+    // do transformation and return result
+    tr.transform(new StreamSource(new ByteArrayInputStream(in.content())),
+        new StreamResult(ao));
+    return ao.toArray();
   }
 }
