@@ -95,19 +95,8 @@ public final class FNXslt extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
-      case TRANSFORM: return xslt(ctx);
-      default: return super.item(ctx, ii);
-    }
-  }
 
-  /**
-   * Performs the xslt function.
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  private ANode xslt(final QueryContext ctx) throws QueryException {
+    checkAdmin(ctx);
     try {
       final IO in = read(expr[0], ctx);
       final IO xsl = read(expr[1], ctx);

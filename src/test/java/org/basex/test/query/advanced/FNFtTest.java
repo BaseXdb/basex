@@ -37,7 +37,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    * @throws QueryException  query exception
    */
   @Test
-  public void testSearch() throws BaseXException, QueryException {
+  public void ftSearch() throws BaseXException, QueryException {
     // test arguments
     final String fun = check(Function.FTSEARCH);
 
@@ -58,7 +58,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testCount() throws QueryException {
+  public void ftCount() throws QueryException {
     final String fun = check(Function.FTCOUNT);
     query(fun + "(())", "0");
     query(fun + "(//*[text() contains text '1'])", "1");
@@ -72,7 +72,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testMark() throws QueryException {
+  public void ftMark() throws QueryException {
     final String fun = check(Function.FTMARK);
 
     query(fun + "(//*[text() contains text '1'])",
@@ -94,7 +94,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testExtract() throws QueryException {
+  public void ftExtract() throws QueryException {
     final String fun = check(Function.FTEXTRACT);
     query(fun + "(//*[text() contains text '1'])",
       "<li>Exercise <mark>1</mark></li>");
@@ -111,7 +111,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testScore() throws QueryException {
+  public void ftScore() throws QueryException {
     // test arguments
     final String fun = check(Function.FTSCORE);
     query(fun + "(ft:search(., '2'))", "1");

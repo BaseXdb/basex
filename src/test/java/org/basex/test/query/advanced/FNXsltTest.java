@@ -18,7 +18,7 @@ public final class FNXsltTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void processor() throws QueryException {
+  public void xsltProcessor() throws QueryException {
     final String fun = check(Variable.XSLTPROC);
     assertTrue(!query(fun).isEmpty());
   }
@@ -28,7 +28,7 @@ public final class FNXsltTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void version() throws QueryException {
+  public void xsltVersion() throws QueryException {
     final String fun = check(Variable.XSLTVERSION);
     assertTrue(!query(fun).isEmpty());
   }
@@ -38,7 +38,7 @@ public final class FNXsltTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void transform() throws QueryException {
+  public void xsltTransform() throws QueryException {
     final String fun = check(Function.TRANSFORM);
 
     final String doc = "<a/>";

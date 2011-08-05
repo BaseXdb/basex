@@ -17,7 +17,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testEval() throws QueryException {
+  public void utilEval() throws QueryException {
     final String fun = check(Function.EVAL);
     query(fun + "('1')", "1");
     query(fun + "('1 + 2')", "3");
@@ -31,7 +31,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testRun() throws QueryException {
+  public void utilRun() throws QueryException {
     final String fun = check(Function.RUN);
     query(fun + "('etc/test/input.xq')", "XML");
     error(fun + "('etc/test/xxx.xq')", Err.UNDOC);
@@ -42,7 +42,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testMB() throws QueryException {
+  public void utilMB() throws QueryException {
     final String fun = check(Function.MB);
     query(fun + "(())");
     query(fun + "(1 to 1000, false())");
@@ -54,7 +54,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testMS() throws QueryException {
+  public void utilMS() throws QueryException {
     final String fun = check(Function.MS);
     query(fun + "(())");
     query(fun + "(1 to 1000, false())");
@@ -66,7 +66,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testToBase() throws QueryException {
+  public void utilToBase() throws QueryException {
     final String fun = check(Function.TO_BASE);
     query(fun + "(4, 2)", "100");
     query(fun + "(65535, 2)", "1111111111111111");
@@ -87,7 +87,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testFromBase() throws QueryException {
+  public void utilFromBase() throws QueryException {
     final String fun = check(Function.FRM_BASE);
     query(fun + "('100', 2)", "4");
     query(fun + "('1111111111111111', 2)", "65535");
@@ -110,7 +110,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testHashing() throws QueryException {
+  public void utilHashing() throws QueryException {
     final String md5 = check(Function.MD5);
     final String sha1 = check(Function.SHA1);
     query(md5 + "('')", "D41D8CD98F00B204E9800998ECF8427E");
@@ -128,7 +128,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testCRC32() throws QueryException {
+  public void utilCRC32() throws QueryException {
     final String fun = check(Function.CRC32);
     query(fun + "('')", "00000000");
     query(fun + "('BaseX')", "4C06FC7F");
@@ -139,7 +139,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
    * @throws QueryException database exception
    */
   @Test
-  public void testToBytes() throws QueryException {
+  public void utilToBytes() throws QueryException {
     final String fun = check(Function.TO_BYTES);
     query(fun + "(xs:base64Binary('QmFzZVggaXMgY29vbA=='))",
       "66 97 115 101 88 32 105 115 32 99 111 111 108");
