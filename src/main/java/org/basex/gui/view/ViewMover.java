@@ -22,8 +22,6 @@ final class ViewMover extends BaseXPanel {
   private static final int SIZE = 9;
   /** Flag if current mover is active. */
   boolean active;
-  /* Close button.
-  final BaseXButton close; */
 
   /**
    * Constructor.
@@ -37,26 +35,6 @@ final class ViewMover extends BaseXPanel {
     addMouseListener(this);
     addMouseMotionListener(this);
     setCursor(GUIConstants.CURSORMOVE);
-
-    /*
-    close = new BaseXButton(gui, "editclose", null);
-    close.setRolloverIcon(BaseXLayout.icon("cmd-editclose2"));
-    close.border(2, 2, 2, 2);
-    close.setContentAreaFilled(false);
-    close.setFocusable(false);
-    close.setVisible(false);
-    close.setCursor(GUIConstants.CURSORARROW);
-    close.addMouseListener(this);
-    close.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent e) {
-        active = false;
-        close.setVisible(false);
-        ((ViewPanel) getParent()).delete();
-      }
-    });
-    add(close, BorderLayout.EAST);
-    */
   }
 
   @Override
@@ -98,20 +76,4 @@ final class ViewMover extends BaseXPanel {
     active = false;
     repaint();
   }
-
-  /*@Override
-  public void mouseEntered(final MouseEvent e) {
-    close.setVisible(true);
-  }
-
-  @Override
-  public void mouseExited(final MouseEvent e) {
-    // this method is called, if the mouse enters the close button and the
-    // absolute position of the mouse should be checked
-    final int x = e.getXOnScreen();
-    final int y = e.getYOnScreen();
-    final Point p = getLocationOnScreen();
-    if(x < p.x || y < p.y || x >= p.x + getWidth() || y >= p.y + getHeight())
-      close.setVisible(false);
-  }*/
 }
