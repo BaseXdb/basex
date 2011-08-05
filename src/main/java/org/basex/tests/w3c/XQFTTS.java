@@ -1,4 +1,4 @@
-package org.basex.test.w3c;
+package org.basex.tests.w3c;
 
 import java.util.HashMap;
 

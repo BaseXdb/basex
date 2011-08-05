@@ -1,4 +1,4 @@
-package org.basex.test.performance;
+package org.basex.tests.performance;
 
 import java.io.IOException;
 import java.util.Random;
@@ -15,10 +15,10 @@ import org.basex.util.Performance;
  */
 public final class ServerMemTest {
   /** Number of clients. */
-  private static final int NCLIENTS = 100;
+  private static final int NCLIENTS = 200;
   /** Number of parallel readers. */
-  private static final int PARALLEL = 100;
-  /** Query to be run ("%" serves as placeholder for dynamic content). */
+  private static final int PARALLEL = 200;
+  /** Query to be run ("%" may be used as placeholder for dynamic content). */
   private static final String QUERY =
     "(for $i in 1 to 50000 order by $i return $i)[1]";
 

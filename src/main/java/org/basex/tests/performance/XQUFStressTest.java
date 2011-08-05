@@ -1,4 +1,4 @@
-package org.basex.test.unresolved;
+package org.basex.tests.performance;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -8,22 +8,23 @@ import org.basex.core.cmd.XQuery;
 import org.basex.util.Util;
 
 /**
- * Performs bulk updates with BaseX standalone version.
+ * Performs bulk updates with standalone version.
  *
  * @author BaseX Team 2005-11, BSD License
+ * @author Lukas Kircher
  */
 public final class XQUFStressTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
-
-  /** Current context. */
-  private final Context ctx = new Context();
   /** Number of runs. */
   private static final int RUNS = 100;
   /** Number of node updates. */
   private static final int NRNODES = 100;
   /** Basic database name for each test. */
-  private static final String DBNAME = "TESTXQUF";
+  private static final String DBNAME = Util.name(XQUFStressTest.class);
+
+  /** Current context. */
+  private final Context ctx = new Context();
 
   /**
    * Performs a delete test.
@@ -94,6 +95,8 @@ public final class XQUFStressTest {
    * @param args args
    */
   public static void main(final String[] args) {
+    System.out.println("=== XQUFStressTest ===");
+
     for(int i = 0; i < RUNS; i++)
       new XQUFStressTest().insertBefore();
     for(int i = 0; i < RUNS; i++)

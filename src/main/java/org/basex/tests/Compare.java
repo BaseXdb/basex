@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.tests;
 
 import java.io.*;
 import java.util.ArrayList;

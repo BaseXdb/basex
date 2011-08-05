@@ -1,4 +1,4 @@
-package org.basex.test.stats;
+package org.basex.tests.inex;
 
 import static org.basex.data.DataText.*;
 import java.util.regex.Matcher;

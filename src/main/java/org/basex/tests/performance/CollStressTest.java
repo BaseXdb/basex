@@ -1,4 +1,4 @@
-package org.basex.test.performance;
+package org.basex.tests.performance;
 
 import org.basex.core.Context;
 import org.basex.core.cmd.Add;
@@ -52,12 +52,6 @@ public final class CollStressTest {
     // Close database
     new Close().execute(CONTEXT);
 
-    // Request specific documents (open database by XQuery processor)
-    for(int i = 0; i < SIZE; i++) {
-      new XQuery("collection('test/" + i + "')").execute(CONTEXT);
-    }
-    System.out.println("\n* Request specific documents (db closed): " + perf);
-
     new Open("test").execute(CONTEXT);
 
     // Loop through all documents
@@ -72,6 +66,12 @@ public final class CollStressTest {
     new XQuery("for $i in 0 to " + (SIZE - 1) + " " +
       "return collection(concat('test/', $i))").execute(CONTEXT);
     System.out.println("\n* Loop through documents (db closed): " + perf);
+
+    // Request specific documents (open database by XQuery processor)
+    for(int i = 0; i < SIZE; i++) {
+      new XQuery("collection('test/" + i + "')").execute(CONTEXT);
+    }
+    System.out.println("\n* Request specific documents (db closed): " + perf);
 
     new DropDB("test").execute(CONTEXT);
   }

@@ -1,4 +1,5 @@
-package org.basex.test.performance;
+package org.basex.tests.performance;
+
 
 /**
  * This class benchmarks delete operations.

@@ -1,4 +1,4 @@
-package org.basex.test.w3c;
+package org.basex.tests.w3c;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;

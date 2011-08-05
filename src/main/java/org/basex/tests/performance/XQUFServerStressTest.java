@@ -1,7 +1,6 @@
-package org.basex.test.unresolved;
+package org.basex.tests.performance;
 
 import java.io.IOException;
-import java.util.Random;
 import org.basex.BaseXServer;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
@@ -14,23 +13,22 @@ import org.basex.util.Util;
  * Testing concurrent XQUF statements on a single database.
  *
  * @author BaseX Team 2005-11, BSD License
+ * @author Lukas Kircher
  */
-public final class XQUFStressTestClientServer {
+public final class XQUFServerStressTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
+  /** Number of queries per client. */
+  private static final int NQUERIES = 100;
+  /** Number of clients. */
+  private static final int NCLIENTS = 100;
+  /** Database name. */
+  private static final String DBNAME = Util.name(XQUFServerStressTest.class);
+  /** Number of runs. */
+  private static final int RUNS = 1;
 
   /** Server. */
-  BaseXServer server;
-  /** Number of queries per client. */
-  static final int NQUERIES = 50;
-  /** Number of clients. */
-  static final int NCLIENTS = 50;
-  /** Database name. */
-  static final String DBNAME = "XQUFStress";
-  /** Random number generator. */
-  static final Random RND = new Random();
-  /** Number of runs. */
-  static final int RUNS = 1;
+  private BaseXServer server;
 
   /**
    * Starting test.
@@ -178,6 +176,8 @@ public final class XQUFStressTestClientServer {
    * @param args args
    */
   public static void main(final String[] args) {
-    new XQUFStressTestClientServer().startTest();
+    System.out.println("=== XQUFServerStressTest ===");
+
+    new XQUFServerStressTest().startTest();
   }
  }

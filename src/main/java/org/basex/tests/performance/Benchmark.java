@@ -1,4 +1,4 @@
-package org.basex.test.performance;
+package org.basex.tests.performance;
 
 import static org.basex.core.Text.*;
 import static java.lang.System.*;
@@ -31,7 +31,7 @@ public abstract class Benchmark {
   /** Session. */
   private Session session;
   /** Input document. */
-  private String input = "etc/xml/factbook.xml";
+  private String input = "etc/factbook.zip";
   /** Number of runs. */
   private int runs = 1;
   /** Maximum number of milliseconds to wait for any query. */

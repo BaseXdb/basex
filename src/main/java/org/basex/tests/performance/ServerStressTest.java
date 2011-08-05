@@ -1,4 +1,4 @@
-package org.basex.test.performance;
+package org.basex.tests.performance;
 
 import java.io.IOException;
 import java.util.Random;
@@ -22,9 +22,11 @@ public final class ServerStressTest {
   /** Number of runs per client. */
   private static final int NQUERIES = 50;
   /** Input document. */
-  private static final String INPUT = "etc/xml/factbook.xml";
-  /** Query to be run ("%" serves as placeholder for dynamic content). */
+  private static final String INPUT = "etc/factbook.zip";
+  /** Query to be run ("%" may be used as placeholder for dynamic content). */
   private static final String QUERY = "(doc('test')//text())[position() = %]";
+  /** Maximum position to retrieve. */
+  private static final int MAX = 10000;
 
   /** Server reference. */
   static BaseXServer server;
@@ -117,7 +119,7 @@ public final class ServerStressTest {
           Performance.sleep((long) (50 * RND.nextDouble()));
 
           // Return nth text of the database
-          final int n = (RND.nextInt() & 0xFF) + 1;
+          final int n = (RND.nextInt() % MAX) + 1;
           final String qu = Util.info(QUERY, n);
           final String result = session.execute("xquery " + qu);
 

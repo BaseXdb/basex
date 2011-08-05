@@ -1,4 +1,4 @@
-package org.basex.test.performance;
+package org.basex.tests.performance;
 
 import java.util.Random;
 import org.basex.core.BaseXException;
@@ -20,13 +20,15 @@ public final class LocalStressTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Number of clients. */
-  private static final int NCLIENTS = 100;
+  private static final int NCLIENTS = 50;
   /** Number of runs per client. */
-  private static final int NQUERIES = 100;
+  private static final int NQUERIES = 50;
   /** Input document. */
-  private static final String INPUT = "etc/xml/factbook.xml";
-  /** Query to be run ("%" serves as placeholder for dynamic content). */
+  private static final String INPUT = "etc/factbook.zip";
+  /** Query to be run ("%" may be used as placeholder for dynamic content). */
   private static final String QUERY = "(//text())[position() = %]";
+  /** Maximum position to retrieve. */
+  private static final int MAX = 10000;
 
   /** Global context. */
   static final Context CONTEXT = new Context();
@@ -87,7 +89,7 @@ public final class LocalStressTest {
           Performance.sleep((long) (50 * RND.nextDouble()));
 
           // Return nth text of the database
-          final int n = (RND.nextInt() & 0xFF) + 1;
+          final int n = (RND.nextInt() % MAX) + 1;
           final String qu = Util.info(QUERY, n);
           final String result = new XQuery(qu).execute(CONTEXT);
 

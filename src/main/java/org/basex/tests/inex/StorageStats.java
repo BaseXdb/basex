@@ -1,4 +1,4 @@
-package org.basex.test.stats;
+package org.basex.tests.inex;
 
 import static org.basex.data.DataText.DATATBL;
 import static org.basex.util.Token.string;

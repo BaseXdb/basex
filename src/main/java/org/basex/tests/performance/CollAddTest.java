@@ -1,4 +1,4 @@
-package org.basex.test.performance;
+package org.basex.tests.performance;
 
 import org.basex.core.Command;
 import org.basex.core.Context;
@@ -18,7 +18,7 @@ public final class CollAddTest {
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of documents to be added. */
-  private static final int SIZE = 8000;
+  private static final int SIZE = 10000;
 
   /**
    * Runs the example code.
@@ -37,20 +37,6 @@ public final class CollAddTest {
     System.out.print(cmd.info());
 
     final Performance perf = new Performance();
-
-    // Add documents
-    for(int i = 0; i < SIZE; i++) {
-      new Add("<xml/>", Integer.toString(i)).execute(CONTEXT);
-    }
-    System.out.println("\n* " + SIZE + " documents added: " + perf);
-
-    // Create test database
-    System.out.println("\n* Create test database.");
-    cmd = new CreateDB("test");
-    cmd.execute(CONTEXT);
-    System.out.print(cmd.info());
-
-    perf.getTimer();
 
     // Add documents
     for(int i = 0; i < SIZE; i++) {

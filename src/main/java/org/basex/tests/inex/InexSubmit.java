@@ -1,7 +1,7 @@
-package org.basex.test.inex;
+package org.basex.tests.inex;
 
 import static org.basex.core.Text.*;
-import static org.basex.test.inex.InexTest.*;
+import static org.basex.tests.inex.InexTest.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedReader;
 import java.io.File;
