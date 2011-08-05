@@ -1,7 +1,9 @@
 package org.basex.test.query.advanced;
 
+import static org.junit.Assert.*;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
+import org.basex.query.func.Variable;
 import org.junit.Test;
 
 /**
@@ -12,11 +14,31 @@ import org.junit.Test;
  */
 public final class FNXsltTest extends AdvancedQueryTest {
   /**
+   * Test method for the xslt:processor() function.
+   * @throws QueryException database exception
+   */
+  @Test
+  public void processor() throws QueryException {
+    final String fun = check(Variable.XSLTPROC);
+    assertTrue(!query(fun).isEmpty());
+  }
+
+  /**
+   * Test method for the xslt:version() function.
+   * @throws QueryException database exception
+   */
+  @Test
+  public void version() throws QueryException {
+    final String fun = check(Variable.XSLTVERSION);
+    assertTrue(!query(fun).isEmpty());
+  }
+
+  /**
    * Test method for the xslt:transform() function.
    * @throws QueryException database exception
    */
   @Test
-  public void testXSLT() throws QueryException {
+  public void transform() throws QueryException {
     final String fun = check(Function.TRANSFORM);
 
     final String doc = "<a/>";

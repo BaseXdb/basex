@@ -39,17 +39,47 @@ import org.basex.util.hash.TokenObjMap;
  * @author Christian Gruen
  */
 public final class FNXslt extends FuncCall {
-  /** Saxon factory class. */
-  private static final String SAXONIMPL = "net.sf.saxon.TransformerFactoryImpl";
   /** Util namespace. */
   private static final Uri U_XSLT = Uri.uri(XSLTURI);
   /** Element: parameters. */
   private static final QNm E_PARAM = new QNm(token("parameters"), U_XSLT);
-  /** Saxon flag. */
-  static final boolean SAXON = find(SAXONIMPL) != null;
+
+  /** XSLT implementations. */
+  private static final String[] IMPL = {
+    "", "Java", "1.0",
+    "net.sf.saxon.TransformerFactoryImpl", "Saxon HE", "2.0",
+    "com.saxonica.config.ProfessionalTransformerFactory", "Saxon PE", "2.0",
+    "com.saxonica.config.EnterpriseTransformerFactory", "Saxon EE", "2.0"
+  };
+  /** Implementation offset. */
+  private static final int OFFSET;
 
   static {
-    if(SAXON) System.setProperty(TransformerFactory.class.getName(), SAXONIMPL);
+    final String fac = TransformerFactory.class.getName();
+    final String impl = System.getProperty(fac);
+    // system property has already been set
+    if(System.getProperty(fac) != null) {
+      // modify processor and version
+      IMPL[1] = impl;
+      IMPL[2] = "Unknown";
+      OFFSET = 0;
+    } else {
+      // search for existing processors
+      int s = IMPL.length - 3;
+      while(s != 0 && find(IMPL[s]) == null) s -= 3;
+      OFFSET = s;
+      // set processor, or use default processor
+      if(s != 0) System.setProperty(fac, IMPL[s]);
+    }
+  }
+
+  /**
+   * Returns details on the XSLT implementation.
+   * @param name name flag
+   * @return string
+   */
+  static String get(final boolean name) {
+    return IMPL[OFFSET + (name ? 1 : 2)];
   }
 
   /**

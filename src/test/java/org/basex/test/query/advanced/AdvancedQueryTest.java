@@ -6,6 +6,7 @@ import org.basex.core.Context;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.func.Function;
+import org.basex.query.func.Variable;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Err;
@@ -94,6 +95,16 @@ abstract class AdvancedQueryTest {
     if(!str.contains(sub)) {
       fail("'" + sub + "' not contained in '" + str + "'.");
     }
+  }
+
+  /**
+   * Returns the variable name.
+   * @param def function definition
+   * types are supported.
+   * @return function name
+   */
+  protected String check(final Variable def) {
+    return def.toString().replaceAll("\\(.*", "");
   }
 
   /**
