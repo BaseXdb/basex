@@ -137,7 +137,7 @@ public final class QueryProcessor extends Progress {
    * @param t data type
    * @throws QueryException query exception
    */
-  public void bind(final String n, final String o, final String t)
+  public void bind(final String n, final Object o, final String t)
       throws QueryException {
 
     Object obj = o;
@@ -145,7 +145,7 @@ public final class QueryProcessor extends Progress {
       final QNm type = new QNm(token(t));
       if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
       final Type typ = Types.find(type, true);
-      if(typ != null) obj = typ.e(o, null);
+      if(typ != null) obj = typ.e(obj, null);
       else NOTYPE.thrw(null, type);
     }
     bind(n, obj);

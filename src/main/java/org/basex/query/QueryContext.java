@@ -251,46 +251,6 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Evaluates the expression with the specified context set.
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  protected Result eval() throws QueryException {
-    // evaluates the query
-    final Iter ir = iter();
-    final ItemCache ic = new ItemCache();
-    Item it;
-
-    // check if all results belong to the database of the input context
-    if(nodes != null) {
-      final IntList pre = new IntList();
-
-      while((it = ir.next()) != null) {
-        checkStop();
-        if(!(it instanceof DBNode)) break;
-        if(it.data() != nodes.data) break;
-        pre.add(((DBNode) it).pre);
-      }
-
-      // completed... return standard nodeset with full-text positions
-      final int ps = pre.size();
-      if(it == null) return ps == 0 ? ic :
-          new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
-
-      // otherwise, add nodes to standard iterator
-      for(int p = 0; p < ps; ++p) ic.add(new DBNode(nodes.data, pre.get(p)));
-      ic.add(it);
-    }
-
-    // use standard iterator
-    while((it = ir.next()) != null) {
-      checkStop();
-      ic.add(it);
-    }
-    return ic;
-  }
-
-  /**
    * Returns a result iterator.
    * @return result iterator
    * @throws QueryException query exception
@@ -323,6 +283,46 @@ public final class QueryContext extends Progress {
       Util.debug(ex);
       throw XPSTACK.thrw(null);
     }
+  }
+
+  /**
+   * Evaluates the expression with the specified context set.
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  Result eval() throws QueryException {
+    // evaluates the query
+    final Iter ir = iter();
+    final ItemCache ic = new ItemCache();
+    Item it;
+
+    // check if all results belong to the database of the input context
+    if(nodes != null) {
+      final IntList pre = new IntList();
+
+      while((it = ir.next()) != null) {
+        checkStop();
+        if(!(it instanceof DBNode)) break;
+        if(it.data() != nodes.data) break;
+        pre.add(((DBNode) it).pre);
+      }
+
+      // completed... return standard nodeset with full-text positions
+      final int ps = pre.size();
+      if(it == null) return ps == 0 ? ic :
+          new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
+
+      // otherwise, add nodes to standard iterator
+      for(int p = 0; p < ps; ++p) ic.add(new DBNode(nodes.data, pre.get(p)));
+      ic.add(it);
+    }
+
+    // use standard iterator
+    while((it = ir.next()) != null) {
+      checkStop();
+      ic.add(it);
+    }
+    return ic;
   }
 
   /**

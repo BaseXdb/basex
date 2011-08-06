@@ -76,7 +76,7 @@ final class QueryListener extends Progress {
    * @param t type
    * @throws QueryException query exception
    */
-  void bind(final String n, final String o, final String t)
+  void bind(final String n, final Object o, final String t)
       throws QueryException {
     qp.bind(n, o, t);
   }
