@@ -10,16 +10,17 @@ import org.basex.util.Atts;
 
 /**
  * A serializer that pipes the events directly through to a builder.
+ *
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public class BuilderSerializer extends Serializer {
-  /** Current tag's name. */
+  /** Current tag name. */
   private byte[] tag;
   /** True while being in an open tag. */
   private boolean open;
   /** Attribute cache. */
   private final Atts att = new Atts();
-
   /** The builder. */
   private final Builder build;
 

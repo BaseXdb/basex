@@ -1,9 +1,10 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query.func;
 
 import static org.junit.Assert.*;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
 import org.basex.query.func.Variable;
+import org.basex.test.query.AdvancedQueryTest;
 import org.junit.Test;
 
 /**

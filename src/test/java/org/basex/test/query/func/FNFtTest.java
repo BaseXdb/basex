@@ -1,4 +1,4 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query.func;
 
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.CreateDB;
@@ -7,6 +7,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
+import org.basex.test.query.AdvancedQueryTest;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;

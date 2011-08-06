@@ -3,6 +3,7 @@ package org.basex.test.query.simple;
 import org.basex.core.AProp;
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
+import org.basex.test.query.QueryTest;
 import org.junit.Test;
 
 /**

@@ -1,4 +1,4 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query.func;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
@@ -12,6 +12,7 @@ import java.util.zip.ZipFile;
 import org.basex.core.Prop;
 import org.basex.query.func.Function;
 import org.basex.query.util.Err;
+import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

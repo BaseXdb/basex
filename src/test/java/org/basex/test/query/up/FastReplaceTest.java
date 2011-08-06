@@ -1,4 +1,4 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query.up;
 
 import static org.junit.Assert.*;
 
@@ -6,6 +6,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.query.QueryException;
+import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,11 +19,11 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class XQUPFastReplace extends AdvancedQueryTest {
+public final class FastReplaceTest extends AdvancedQueryTest {
   /** Test document. */
   public static final String DOC = "etc/test/xmark.xml";
   /** Test database name. */
-  public static final String DBNAME = Util.name(XQUPFastReplace.class);
+  public static final String DBNAME = Util.name(FastReplaceTest.class);
 
   /**
    * Creates the db based on xmark.xml.

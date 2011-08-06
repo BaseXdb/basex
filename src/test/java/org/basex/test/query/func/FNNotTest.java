@@ -1,4 +1,6 @@
-package org.basex.test.query.simple;
+package org.basex.test.query.func;
+
+import org.basex.test.query.QueryTest;
 
 /**
  * XQuery functions tests.

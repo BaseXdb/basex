@@ -1,4 +1,6 @@
-package org.basex.test.query.simple;
+package org.basex.test.query.func;
+
+import org.basex.test.query.QueryTest;
 
 /**
  * XQuery functions tests.
@@ -7,7 +9,7 @@ package org.basex.test.query.simple;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class FunTest extends QueryTest {
+public final class FuncTest extends QueryTest {
   /** Constructor. */
   static {
     doc =

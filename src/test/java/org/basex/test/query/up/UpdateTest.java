@@ -1,7 +1,8 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query.up;
 
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
+import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -12,11 +13,11 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class XQUPGeneral extends AdvancedQueryTest {
+public final class UpdateTest extends AdvancedQueryTest {
   /** Test document. */
   public static final String DOC = "etc/test/xmark.xml";
   /** Test database name. */
-  public static final String DBNAME = Util.name(XQUPGeneral.class);
+  public static final String DBNAME = Util.name(UpdateTest.class);
 
   /**
    * Creates a database.

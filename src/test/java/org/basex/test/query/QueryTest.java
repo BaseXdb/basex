@@ -1,4 +1,4 @@
-package org.basex.test.query.simple;
+package org.basex.test.query;
 
 import static org.junit.Assert.*;
 
@@ -17,6 +17,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
+import org.basex.test.query.simple.XQUPTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -127,7 +128,7 @@ public abstract class QueryTest {
    * Creates a container for the specified node values.
    * @return node array
    */
-  static ItemCache empty() {
+  public static ItemCache empty() {
     return new ItemCache(new Item[] {}, 0);
   }
 
@@ -136,7 +137,7 @@ public abstract class QueryTest {
    * @param nodes node values
    * @return node array
    */
-  static Nodes node(final int... nodes) {
+  public static Nodes node(final int... nodes) {
     return new Nodes(nodes);
   }
 
@@ -145,7 +146,7 @@ public abstract class QueryTest {
    * @param str string
    * @return iterator
    */
-  static ItemCache str(final String... str) {
+  public static ItemCache str(final String... str) {
     final ItemCache ii = new ItemCache();
     for(final String s : str) ii.add(Str.get(s));
     return ii;
@@ -156,7 +157,7 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  static ItemCache dbl(final double d) {
+  public static ItemCache dbl(final double d) {
     return item(Dbl.get(d));
   }
 
@@ -165,7 +166,7 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  static ItemCache itr(final long... d) {
+  public static ItemCache itr(final long... d) {
     final ItemCache ii = new ItemCache();
     for(final long dd : d) ii.add(Itr.get(dd));
     return ii;
@@ -176,7 +177,7 @@ public abstract class QueryTest {
    * @param b boolean value
    * @return iterator
    */
-  static ItemCache bool(final boolean... b) {
+  public static ItemCache bool(final boolean... b) {
     final ItemCache ii = new ItemCache();
     for(final boolean bb : b) ii.add(Bln.get(bb));
     return ii;

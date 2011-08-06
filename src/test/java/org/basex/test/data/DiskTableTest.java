@@ -21,16 +21,16 @@ import static org.junit.Assert.*;
 import static org.basex.data.DataText.*;
 
 /**
- * This class tests the update functionality of the BlockStorage.
+ * This class tests the update functionality of the block storage.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Tim Petrowsky
  */
-public final class BlockAccessTest {
+public final class DiskTableTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "etc/test/xmark.xml";
   /** Test database name. */
-  private static final String DBNAME = Util.name(BlockAccessTest.class);
+  private static final String DBNAME = Util.name(DiskTableTest.class);
   /** Test file we do updates with. */
   private static final Context CONTEXT = new Context();
   /** BlockStorage. */

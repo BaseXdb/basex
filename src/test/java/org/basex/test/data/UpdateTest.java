@@ -2,14 +2,16 @@ package org.basex.test.data;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
+
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.core.Command;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
+import org.basex.data.Data;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -18,7 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This class tests the update features of the Data class.
+ * This class tests the update features of the {@link Data} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Tim Petrowsky

@@ -1,4 +1,4 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query.expr;
 
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;

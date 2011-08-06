@@ -1,6 +1,7 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query.expr;
 
 import org.basex.query.util.Err;
+import org.basex.test.query.AdvancedQueryTest;
 import org.junit.Test;
 
 /**

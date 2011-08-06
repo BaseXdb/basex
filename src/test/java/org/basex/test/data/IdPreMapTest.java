@@ -18,13 +18,13 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
-public final class IdPreMapTest2 {
+public final class IdPreMapTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Number of update operations to execute in each test. */
-  private static final int ITERATIONS = 300;
+  private static final int ITERATIONS = 200;
   /** Initial number of records. */
-  private static final int BASEID = 700;
+  private static final int BASEID = 2000;
   /** Random number generator. */
   private static final Random RANDOM = new Random();
   /** ID -> PRE map to compare to. */

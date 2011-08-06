@@ -1,4 +1,4 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query.func;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,7 @@ import org.basex.core.Prop;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
 import org.basex.query.util.Err;
+import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.BeforeClass;
 import org.junit.Test;

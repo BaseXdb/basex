@@ -1,4 +1,4 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query;
 
 import static org.junit.Assert.*;
 import java.io.IOException;
@@ -17,18 +17,18 @@ import org.basex.query.util.Err;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-abstract class AdvancedQueryTest {
+public abstract class AdvancedQueryTest {
   /** Database context. */
   protected static final Context CONTEXT = new Context();
 
   /**
    * Runs the specified query.
-   * @param qu query
+   * @param query query string
    * @return result
    * @throws QueryException database exception
    */
-  protected static String query(final String qu) throws QueryException {
-    final QueryProcessor qp = new QueryProcessor(qu, CONTEXT);
+  protected static String query(final String query) throws QueryException {
+    final QueryProcessor qp = new QueryProcessor(query, CONTEXT);
     try {
       return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
     } finally {
@@ -38,7 +38,7 @@ abstract class AdvancedQueryTest {
 
   /**
    * Checks if a query yields the specified string.
-   * @param query query to be run
+   * @param query query string
    * @param result query result
    * @throws QueryException database exception
    */
@@ -49,7 +49,7 @@ abstract class AdvancedQueryTest {
 
   /**
    * Checks if a query yields the specified error code.
-   * @param query query to be run
+   * @param query query string
    * @param result query result
    * @throws QueryException database exception
    */
@@ -60,7 +60,7 @@ abstract class AdvancedQueryTest {
 
   /**
    * Checks if a query yields the specified error code.
-   * @param query query to be run
+   * @param query query string
    * @param error expected error
    */
   protected static void error(final String query, final Err... error) {

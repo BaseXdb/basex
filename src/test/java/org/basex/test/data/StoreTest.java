@@ -19,9 +19,9 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class ReplaceTest {
+public final class StoreTest {
   /** Test database name. */
-  private static final String DBNAME = Util.name(ReplaceTest.class);
+  private static final String DBNAME = Util.name(StoreTest.class);
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of runs per client. */

@@ -10,20 +10,21 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
+import org.basex.data.DataText;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * This class tests the stability of the Data storage.
+ * This class tests the stability of the data storage.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
-public final class StorageTest {
+public final class TableTest {
   /** Database name. */
-  private static final String DBNAME = Util.name(StorageTest.class);
+  private static final String DBNAME = Util.name(TableTest.class);
   /** Database XML file. */
   private static final String DBFILE = "etc/test/factbook.zip";
   /** Select Germany. */
@@ -47,7 +48,7 @@ public final class StorageTest {
   public void setUp() throws BaseXException {
     ctx = new Context();
     new CreateDB(DBNAME, DBFILE).execute(ctx);
-    tbl = new File(ctx.mprop.dbpath(DBNAME).toString() + "/tbl.basex");
+    tbl = ctx.data.meta.dbfile(DataText.DATATBL);
   }
 
   /**

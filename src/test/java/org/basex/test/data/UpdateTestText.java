@@ -7,7 +7,7 @@ import org.basex.data.MemData;
 import org.junit.Test;
 
 /**
- * This class tests the update features of the Data class.
+ * This class tests the update features of the {@link Data} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Tim Petrowsky

@@ -1,4 +1,4 @@
-package org.basex.test.query.advanced;
+package org.basex.test.query.expr;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
@@ -18,6 +18,7 @@ import org.basex.query.util.Err;
 import org.basex.query.util.pkg.PkgParser;
 import org.basex.query.util.pkg.PkgValidator;
 import org.basex.query.util.pkg.RepoManager;
+import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Reflect;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
