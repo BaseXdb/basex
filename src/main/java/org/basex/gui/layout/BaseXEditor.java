@@ -460,7 +460,6 @@ public class BaseXEditor extends BaseXPanel {
     } else if(NEXTLINE.is(e)) {
       down(1, marking);
     } else if(COMMENT.is(e)) {
-      System.out.println("?");
       text.comment(rend.getSyntax());
     } else {
       consumed = false;

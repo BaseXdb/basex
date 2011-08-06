@@ -339,18 +339,17 @@ public final class BaseXTextTokens {
       min = ps < ms ? ps : ms;
       max = ps > ms ? ps : ms;
       // marked
+      int mn = Math.max(min + start.length(), max - end.length());
       if(indexOf(text, token(start), min) == min &&
-         indexOf(text, token(end), Math.max(0, max - end.length())) ==
-         max - end.length()) {
-
+         indexOf(text, token(end), mn) == mn) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(text, 0, min);
-        tb.add(text, min + 2, max - 2);
+        tb.add(text, min + start.length(), max - end.length());
         tb.add(text, max, size);
         text = tb.finish();
         size = tb.size();
         ms = min;
-        me = max - 4;
+        me = max - start.length() - end.length();
         ps = me;
         add = false;
       }
@@ -365,7 +364,7 @@ public final class BaseXTextTokens {
       pos(min);
       add(start);
       ms = min;
-      me = max + 4;
+      me = max + start.length() + end.length();
       ps = me;
     }
   }
