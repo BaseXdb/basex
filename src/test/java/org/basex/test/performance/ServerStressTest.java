@@ -1,11 +1,13 @@
-package org.basex.tests.performance;
+package org.basex.test.performance;
 
 import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
+import org.basex.core.Text;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
 import org.basex.util.Util;
+import org.junit.Test;
 
 /**
  * This class performs a client/server stress tests with a specified
@@ -15,18 +17,12 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class ServerStressTest {
-  /** Verbose flag. */
-  private static final boolean VERBOSE = false;
-  /** Number of clients. */
-  private static final int NCLIENTS = 50;
-  /** Number of runs per client. */
-  private static final int NQUERIES = 50;
   /** Input document. */
   private static final String INPUT = "etc/factbook.zip";
   /** Query to be run ("%" may be used as placeholder for dynamic content). */
   private static final String QUERY = "(doc('test')//text())[position() = %]";
   /** Maximum position to retrieve. */
-  private static final int MAX = 10000;
+  private static final int MAX = 1000;
 
   /** Server reference. */
   static BaseXServer server;
@@ -36,52 +32,63 @@ public final class ServerStressTest {
   static int counter;
 
   /**
-   * Runs the example code.
-   * @param args (ignored) command-line arguments
+   * Runs the test.
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
-    System.out.println("=== ServerStressTest ===");
-
-    final Performance perf = new Performance();
-
-    // Run server instance
-    System.out.println("\n* Start server.");
-    server = new BaseXServer("-z");
-
-    // Create test database
-    System.out.println("\n* Create test database.");
-
-    final ClientSession cs = newSession();
-    cs.execute("create db test " + INPUT);
-    System.out.print(cs.info());
-    cs.close();
-
-    // Run clients
-    System.out.println("\n* Run " + NCLIENTS + " client threads.");
-    final Client[] cl = new Client[NCLIENTS];
-    for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client();
-    for(final Client c : cl) c.start();
-    for(final Client c : cl) c.join();
-    stopServer();
-
-    System.out.println("\n* Time: " + perf);
+  @Test
+  public void clients20runs20() throws Exception {
+    run(20, 20);
   }
 
   /**
-   * Stops the server.
+   * Runs the test.
    * @throws Exception exception
    */
-  static void stopServer() throws Exception {
-    // Drop database and stop server
-    System.out.println("\n* Stop server and drop test database.");
+  @Test
+  public void clients20runs200() throws Exception {
+    run(20, 200);
+  }
+
+  /**
+   * Runs the test.
+   * @throws Exception exception
+   */
+  @Test
+  public void clients200runs20() throws Exception {
+    run(200, 20);
+  }
+
+  /**
+   * Runs the test.
+   * @throws Exception exception
+   */
+  @Test
+  public void clients200runs200() throws Exception {
+    run(200, 200);
+  }
+
+  /**
+   * Runs the stress test.
+   * @param clients number of clients
+   * @param runs number of runs per client
+   * @throws Exception exception
+   */
+  private void run(final int clients, final int runs) throws Exception {
+    // Run server instance
+    server = new BaseXServer("-z");
+
+    // Create test database
     final ClientSession cs = newSession();
-    try {
-      cs.execute("drop db test");
-    } catch(final Exception ex) {
-      System.out.println(cs.info());
-      ex.printStackTrace();
-    }
+    cs.execute("create db test " + INPUT);
+
+    // Run clients
+    final Client[] cl = new Client[clients];
+    for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
+    for(final Client c : cl) c.start();
+    for(final Client c : cl) c.join();
+
+    // Drop database and stop server
+    cs.execute("drop db test");
     cs.close();
     server.stop();
   }
@@ -92,39 +99,37 @@ public final class ServerStressTest {
    * @throws IOException exception
    */
   static ClientSession newSession() throws IOException {
-    return new ClientSession("localhost", 1984, "admin", "admin");
+    return new ClientSession("localhost", 1984, Text.ADMIN, Text.ADMIN);
   }
 
   /** Single client. */
   static final class Client extends Thread {
     /** Client session. */
     private ClientSession session;
+    /** Number of runs. */
+    private final int runs;
 
     /**
-     * Default constructor.
+     * Constructor.
+     * @param r number of runs
+     * @throws Exception exception
      */
-    public Client() {
-      try {
-        session = newSession();
-      } catch(final IOException ex) {
-        ex.printStackTrace();
-      }
+    public Client(final int r) throws Exception {
+      runs = r;
+      session = newSession();
     }
 
     @Override
     public void run() {
       try {
         // Perform some queries
-        for(int i = 0; i < NQUERIES; ++i) {
+        for(int i = 0; i < runs; ++i) {
           Performance.sleep((long) (50 * RND.nextDouble()));
 
           // Return nth text of the database
           final int n = (RND.nextInt() % MAX) + 1;
           final String qu = Util.info(QUERY, n);
-          final String result = session.execute("xquery " + qu);
-
-          if(VERBOSE) System.out.println("[" + counter++ + "] Thread " +
-              getId() + ", Pos " + n + ": " + result);
+          session.execute("xquery " + qu);
         }
         session.close();
       } catch(final Exception ex) {

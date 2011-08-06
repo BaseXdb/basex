@@ -1,10 +1,11 @@
-package org.basex.tests.performance;
+package org.basex.test.performance;
 
 import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
+import org.basex.core.Text;
 import org.basex.server.ClientSession;
-import org.basex.util.Performance;
+import org.junit.Test;
 
 /**
  * This class performs a client/server memory stress tests with a specified
@@ -14,10 +15,6 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public final class ServerMemTest {
-  /** Number of clients. */
-  private static final int NCLIENTS = 200;
-  /** Number of parallel readers. */
-  private static final int PARALLEL = 200;
   /** Query to be run ("%" may be used as placeholder for dynamic content). */
   private static final String QUERY =
     "(for $i in 1 to 50000 order by $i return $i)[1]";
@@ -28,31 +25,59 @@ public final class ServerMemTest {
   static final Random RND = new Random();
 
   /**
-   * Runs the example code.
-   * @param args (ignored) command-line arguments
+   * Runs the test.
    * @throws Exception exception
    */
-  public static void main(final String[] args) throws Exception {
-    System.out.println("=== ServerMemTest ===");
+  @Test
+  public void clients20parallel20() throws Exception {
+    run(20, 20);
+  }
 
-    final Performance perf = new Performance();
+  /**
+   * Runs the test.
+   * @throws Exception exception
+   */
+  @Test
+  public void clients20parallel200() throws Exception {
+    run(20, 200);
+  }
 
+  /**
+   * Runs the test.
+   * @throws Exception exception
+   */
+  @Test
+  public void clients200parallel20() throws Exception {
+    run(200, 20);
+  }
+
+  /**
+   * Runs the test.
+   * @throws Exception exception
+   */
+  @Test
+  public void clients200parallel200() throws Exception {
+    run(200, 200);
+  }
+
+  /**
+   * Runs the stress test.
+   * @param clients number of clients
+   * @param parallel number of parallel runs
+   * @throws Exception exception
+   */
+  private void run(final int clients, final int parallel) throws Exception {
     // Run server instance
-    System.out.println("\n* Start server with " + PARALLEL + " readers.");
-    server = new BaseXServer("-zcset parallel " + PARALLEL);
+    server = new BaseXServer("-zcset parallel " + parallel);
 
     // Run clients
-    System.out.println("\n* Run " + NCLIENTS + " client threads.");
-    final Client[] cl = new Client[NCLIENTS];
-    for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client();
+    final Client[] cl = new Client[clients];
+    for(int i = 0; i < clients; ++i) cl[i] = new Client();
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
 
     // Stop server
-    System.out.println("\n* Stop server.");
     server.stop();
-
-    System.out.println("\n* Time: " + perf);
   }
 
   /**
@@ -61,7 +86,7 @@ public final class ServerMemTest {
    * @throws IOException exception
    */
   static ClientSession newSession() throws IOException {
-    return new ClientSession("localhost", 1984, "admin", "admin");
+    return new ClientSession("localhost", 1984, Text.ADMIN, Text.ADMIN);
   }
 
   /** Single client. */
@@ -69,9 +94,7 @@ public final class ServerMemTest {
     /** Client session. */
     private ClientSession session;
 
-    /**
-     * Default constructor.
-     */
+    /** Default constructor. */
     public Client() {
       try {
         session = newSession();
