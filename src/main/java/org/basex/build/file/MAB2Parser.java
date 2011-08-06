@@ -219,7 +219,7 @@ public final class MAB2Parser extends SingleParser {
       if(in.read1() != '\n') continue;
       final int n = in.read1();
       if(n == '0' && in.read1() == '0' && in.read1() == '1') {
-        off = in.pos() - 3;
+        off = in.cursor() - 3;
         return ident(in);
       }
     }

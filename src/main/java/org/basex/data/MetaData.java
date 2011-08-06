@@ -152,8 +152,8 @@ public final class MetaData {
       boolean ok = true;
       int i = 3;
       String k;
-      while(i != 0 && !(k = string(in.readBytes())).isEmpty()) {
-        final String v = string(in.readBytes());
+      while(i != 0 && !(k = string(in.readToken())).isEmpty()) {
+        final String v = string(in.readToken());
         if(k.equals(DBSTR)) {
           ok &= STORAGE.equals(v);
           i--;
@@ -214,12 +214,12 @@ public final class MetaData {
   public void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
     while(true) {
-      final String k = string(in.readBytes());
+      final String k = string(in.readToken());
       if(k.isEmpty()) break;
       if(k.equals(DBPERM)) {
         users.read(in);
       } else {
-        final String v = string(in.readBytes());
+        final String v = string(in.readToken());
         if(k.equals(DBSTR))         storage    = v;
         else if(k.equals(DBFNAME))  original   = v;
         else if(k.equals(DBTIME))   time       = toLong(v);

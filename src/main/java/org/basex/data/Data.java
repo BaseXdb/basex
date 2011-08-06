@@ -126,7 +126,7 @@ public abstract class Data {
   public abstract void close() throws IOException;
 
   /**
-   * Flushes the table data.
+   * Flushes the database.
    */
   public abstract void flush();
 

@@ -68,7 +68,7 @@ public final class StatsKey {
     } else if(kind == Kind.CAT) {
       cats = new TokenSet();
       final int cl = in.readNum();
-      for(int i = 0; i < cl; ++i) cats.add(in.readBytes());
+      for(int i = 0; i < cl; ++i) cats.add(in.readToken());
     }
     counter = in.readNum();
     leaf = in.readBool();

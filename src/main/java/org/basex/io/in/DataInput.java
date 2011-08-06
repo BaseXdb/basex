@@ -3,6 +3,8 @@ package org.basex.io.in;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+
+import org.basex.util.Num;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
 
@@ -24,7 +26,7 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads a boolean value from the input stream.
+   * Reads a boolean value.
    * @return boolean value
    * @throws IOException IO Exception
    */
@@ -33,11 +35,11 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads a byte array from the input stream.
+   * Reads a token.
    * @return byte array
    * @throws IOException IO Exception
    */
-  public byte[] readBytes() throws IOException {
+  public byte[] readToken() throws IOException {
     final int l = readNum();
     if(l == 0) return Token.EMPTY;
     final byte[] array = new byte[l];
@@ -46,16 +48,16 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads a double from the input stream.
+   * Reads a double value.
    * @return byte array
    * @throws IOException IO Exception
    */
   public double readDouble() throws IOException {
-    return Token.toDouble(readBytes());
+    return Token.toDouble(readToken());
   }
 
   /**
-   * Reads an distance-mapped integer array from the input stream.
+   * Reads a distance-mapped integer array.
    * @return integer array
    * @throws IOException IO Exception
    */
@@ -68,7 +70,7 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads an integer array from the input stream.
+   * Reads a compressed integer array.
    * @return integer array
    * @throws IOException IO Exception
    */
@@ -77,7 +79,7 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads an integer array with the specified size from the input stream.
+   * Reads compressed integer values of the specified size.
    * @param s array size
    * @return integer array
    * @throws IOException IO Exception
@@ -89,19 +91,19 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads a double byte array from the input stream.
+   * Reads a token array.
    * @return double array
    * @throws IOException IO Exception
    */
-  public byte[][] readBytesArray() throws IOException {
+  public byte[][] readTokens() throws IOException {
     final int l = readNum();
     final byte[][] array = new byte[l][];
-    for(int i = 0; i < l; ++i) array[i] = readBytes();
+    for(int i = 0; i < l; ++i) array[i] = readToken();
     return array;
   }
 
   /**
-   * Reads and decompresses an integer value from the input stream.
+   * Reads a compressed integer value; see {@link Num} for more.
    * @return read value
    * @throws IOException IO Exception
    */
@@ -120,7 +122,7 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads an array of longs with the specified size from the input stream.
+   * Reads an array of long values.
    * @param s array size
    * @return array of longs
    * @throws IOException IO Exception
@@ -132,7 +134,7 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Read a long value from the input stream.
+   * Read a long value.
    * @return read value
    * @throws IOException IO Exception
    */

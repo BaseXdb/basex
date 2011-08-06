@@ -62,8 +62,8 @@ public final class Users {
   public synchronized void read(final DataInput in) throws IOException {
     final int s = in.readNum();
     for(int u = 0; u < s; ++u) {
-      final User user = new User(string(in.readBytes()),
-        in.readBytes(), in.readNum());
+      final User user = new User(string(in.readToken()),
+        in.readToken(), in.readNum());
       list.add(user);
     }
   }
