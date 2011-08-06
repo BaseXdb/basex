@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 
 import org.basex.BaseXServer;
+import org.basex.core.Text;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Kill;
 import org.basex.server.ClientSession;
@@ -55,8 +56,8 @@ public final class ServerCmdTest extends CmdTest {
    * @throws IOException on Server error.*/
   @Test
   public void kill() throws IOException {
-    no(new Kill("admin"));
-    no(new Kill("admin2"));
+    no(new Kill(Text.ADMIN));
+    no(new Kill(Text.ADMIN + "2"));
     no(new Kill("ha*"));
     ok(new CreateUser(NAME2, Token.md5("test")));
     final ClientSession cs = new ClientSession(CONTEXT, NAME2, "test");

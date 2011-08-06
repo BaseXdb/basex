@@ -240,71 +240,61 @@ public final class DiskData extends Data {
   // UPDATE OPERATIONS ========================================================
 
   @Override
-  protected void text(final int pre, final byte[] val, final boolean text) {
+  protected void delete(final int pre, final boolean text) {
+    // old entry (offset or value)
+    final long old = textOff(pre);
+    // fill unused space with zero-bytes
+    if(!num(old)) (text ? texts : values).free(old & IO.OFFCOMP - 1, 0);
+  }
+
+  @Override
+  protected void text(final int pre, final byte[] value, final boolean text) {
     // reference to text store
     final DataAccess store = text ? texts : values;
     // file length
     final long len = store.length();
 
     // new entry (offset or value)
-    final long v = toSimpleInt(val);
+    final long v = toSimpleInt(value);
     // flag for inlining numeric value
     final boolean vn = v != Integer.MIN_VALUE;
     // text to be stored (null if value will be inlined)
-    final byte[] txt = vn ? null : comp.pack(val);
+    final byte[] vl = vn ? null : comp.pack(value);
 
     // old entry (offset or value)
     final long old = textOff(pre);
-    // old offset, and offset to which entry will be written
-    long off = old & IO.OFFCOMP - 1;
-
-    // analyze old entry: chop entry, or fill unused space with zero-bytes
+    // find text store offset
+    final long off;
     if(num(old)) {
       // numeric entry: append new entry at the end
       off = len;
     } else {
       // text size (0 if value will be inlined)
-      int ts = vn ? 0 : txt.length + Num.length(txt.length);
-      // old text size (available space)
-      int os = store.readNum(off) + (int) (store.cursor() - off);
-
-      // extend available space by subsequent zero-bytes
-      store.cursor(off + os);
-      for(; off + os < len && os < ts && store.read1() == 0; os++);
-
-      if(off + os == len) {
-        // entry is placed last: reset file length (discard last entry)
-        store.length(off);
-      } else {
-        if(os < ts) {
-          // gap is too small for new entry...
-          // reset cursor to overwrite entry with zero-bytes
-          store.cursor(off);
-          ts = 0;
-          // place new entry after last entry
-          off = len;
-        }
-        // fill gap with zero-bytes for future updates
-        store.cursor(off + ts);
-        while(ts++ < os) store.write1(0);
-      }
+      final int l = vn ? 0 : vl.length + Num.length(vl.length);
+      off = store.free(old & IO.OFFCOMP - 1, l);
     }
 
     // store new entry
     if(vn) {
-      // integer values is inlined (stored in the table)
+      // inline integer value
       textOff(pre, v | IO.OFFNUM);
     } else {
-      store.writeToken(off, txt);
-      textOff(pre, off | (txt == val ? 0 : IO.OFFCOMP));
+      store.writeToken(off, vl);
+      textOff(pre, vl == value ? off : off | IO.OFFCOMP);
     }
   }
 
   @Override
-  protected long index(final byte[] val, final int pre, final boolean text) {
+  protected long index(final int pre, final byte[] value, final boolean text) {
+    // inline integer value...
+    final long v = toSimpleInt(value);
+    if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
+
+    // store text
     final DataAccess store = text ? texts : values;
-    final long oo = store.length();
-    store.writeToken(oo, val);
-    return oo;
+    final long off = store.length();
+    final byte[] val = comp.pack(value);
+    store.writeToken(off, val);
+    return val == value ? off : off | IO.OFFCOMP;
   }
 }

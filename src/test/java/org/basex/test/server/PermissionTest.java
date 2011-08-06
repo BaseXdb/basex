@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
+import org.basex.core.Text;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdSet;
 import org.basex.core.cmd.Add;
@@ -246,14 +247,14 @@ public final class PermissionTest {
   /** Tests all commands where admin permission is needed. */
   @Test
   public void adminPermsNeeded() {
-    ok(new Grant("admin", NAME), adminSession);
+    ok(new Grant(Text.ADMIN, NAME), adminSession);
     if(server.context.users.get("test2") != null) {
       ok(new DropUser("test2"), testSession);
     }
     ok(new CreateUser("test2", Token.md5(NAME)), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);
     ok(new ShowUsers(), testSession);
-    ok(new Grant("admin", "test2"), testSession);
+    ok(new Grant(Text.ADMIN, "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);
     ok(new AlterUser(NAME, Token.md5(NAME)), testSession);
     ok(new DropUser("test2"), testSession);

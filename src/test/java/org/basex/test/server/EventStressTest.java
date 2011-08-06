@@ -5,6 +5,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
+import org.basex.core.Text;
 import org.basex.server.ClientSession;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -83,8 +84,8 @@ public final class EventStressTest {
    */
   @After
   public void cleanUp() throws IOException {
-    final ClientSession session = new ClientSession("localhost", 1984, "admin",
-        "admin", null);
+    final ClientSession session = new ClientSession("localhost", 1984,
+        Text.ADMIN, Text.ADMIN, null);
     try {
       for(int i = 0; i < NUM; ++i) {
         try {
@@ -116,7 +117,8 @@ public final class EventStressTest {
      */
     public Client(final String c, final CountDownLatch start,
         final CountDownLatch stop) throws IOException {
-      session = new ClientSession("localhost", 1984, "admin", "admin", null);
+      session = new ClientSession("localhost", 1984,
+          Text.ADMIN, Text.ADMIN, null);
       cmd = c;
       startSignal = start;
       stopSignal = stop;

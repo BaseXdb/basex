@@ -602,9 +602,13 @@ public abstract class Data {
     // size of the subtree to delete
     int k = kind(pre);
     int s = size(pre, k);
+    // indicates if database is empty
     final boolean empty = pre == 0 && s == meta.size;
     // update document index: delete specified entry
     if(!empty) docindex.delete(pre, s);
+
+    /// explicitly delete text or attribute value
+    if(k != DOC && k != ELEM) delete(pre, k != ATTR);
 
     // update namespaces
     ns.delete(pre, s);
@@ -891,6 +895,22 @@ public abstract class Data {
     if(kind == ELEM) table.write1(pre, 0, value << 3 | ELEM);
   }
 
+  /**
+   * Inserts the internal buffer to the storage
+   * without updating the table structure.
+   * @param pre insert position
+   */
+  public final void insert(final int pre) {
+    table.insert(pre, buffer());
+  }
+
+  /**
+   * Deletes the specified text entry.
+   * @param pre pre value
+   * @param text text (text, comment or pi) or attribute flag
+   */
+  protected abstract void delete(final int pre, final boolean text);
+
   // INSERTS WITHOUT TABLE UPDATES ============================================
 
   /** Buffer for caching new table entries. */
@@ -908,15 +928,6 @@ public abstract class Data {
   }
 
   /**
-   * Inserts the internal buffer to the storage
-   * without updating the table structure.
-   * @param pre insert position
-   */
-  public final void insert(final int pre) {
-    table.insert(pre, buffer());
-  }
-
-  /**
    * Adds a document entry to the internal update buffer.
    * @param pre pre value
    * @param size node size
@@ -924,7 +935,7 @@ public abstract class Data {
    */
   public final void doc(final int pre, final int size, final byte[] value) {
     final int i = newID();
-    final long v = index(value, pre, true);
+    final long v = index(pre, value, true);
     s(DOC); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(size >> 24); s(size >> 16); s(size >> 8); s(size);
@@ -965,7 +976,7 @@ public abstract class Data {
 
     // build and insert new entry
     final int i = newID();
-    final long v = index(value, pre, true);
+    final long v = index(pre, value, true);
     s(kind); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(dist >> 24); s(dist >> 16); s(dist >> 8); s(dist);
@@ -986,7 +997,7 @@ public abstract class Data {
 
     // add attribute to text storage
     final int i = newID();
-    final long v = index(value, pre, false);
+    final long v = index(pre, value, false);
     final int n = ne ? 1 << 7 : 0;
     s(Math.min(IO.MAXATTS, dist) << 3 | ATTR);
     s(n | (byte) (name >> 8)); s(name); s(v >> 32);
@@ -1031,12 +1042,12 @@ public abstract class Data {
 
   /**
    * Indexes a text and returns the reference.
-   * @param value text to be indexed
    * @param pre pre value
+   * @param value text to be indexed
    * @param text text/attribute flag
    * @return reference
    */
-  protected abstract long index(final byte[] value, final int pre,
+  protected abstract long index(final int pre, final byte[] value,
       final boolean text);
 
   /**

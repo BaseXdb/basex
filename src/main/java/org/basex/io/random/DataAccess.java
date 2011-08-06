@@ -303,6 +303,45 @@ public final class DataAccess {
     }
   }
 
+  /**
+   * Returns the offset to a free slot for writing an entry with the
+   * specified length. Fills the original space with zero-bytes to facilitate
+   * future write operations.
+   * @param pos original offset
+   * @param size size of new text entry
+   * @return new offset to store text
+   */
+  public long free(final long pos, final int size) {
+    // old text size (available space)
+    int os = readNum(pos) + (int) (cursor() - pos);
+
+    // extend available space by subsequent zero-bytes
+    cursor(pos + os);
+    for(; pos + os < len && os < size && read1() == 0; os++);
+
+    long o = pos;
+    if(pos + os == len) {
+      // entry is placed last: reset file length (discard last entry)
+      length(pos);
+    } else {
+      int t = size;
+      if(os < size) {
+        // gap is too small for new entry...
+        // reset cursor to overwrite entry with zero-bytes
+        cursor(pos);
+        t = 0;
+        // place new entry after last entry
+        o = len;
+      } else {
+        // gap is large enough: set cursor to overwrite remaining bytes
+        cursor(pos + size);
+      }
+      // fill gap with zero-bytes for future updates
+      while(t++ < os) write1(0);
+    }
+    return o;
+  }
+
   // PRIVATE METHODS ==========================================================
 
   /**
