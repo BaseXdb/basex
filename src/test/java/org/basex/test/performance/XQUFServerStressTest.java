@@ -126,7 +126,7 @@ public final class XQUFServerStressTest {
    * @throws Exception exception
    */
   static ClientSession newSession() throws Exception {
-    return new ClientSession("localhost", 1984, Text.ADMIN, Text.ADMIN);
+    return new ClientSession(server.context, Text.ADMIN, Text.ADMIN);
   }
 
   /** Single client. */

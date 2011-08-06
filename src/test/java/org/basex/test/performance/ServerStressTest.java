@@ -99,7 +99,7 @@ public final class ServerStressTest {
    * @throws IOException exception
    */
   static ClientSession newSession() throws IOException {
-    return new ClientSession("localhost", 1984, Text.ADMIN, Text.ADMIN);
+    return new ClientSession(server.context, Text.ADMIN, Text.ADMIN);
   }
 
   /** Single client. */

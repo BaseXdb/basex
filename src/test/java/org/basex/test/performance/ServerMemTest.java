@@ -1,6 +1,5 @@
 package org.basex.test.performance;
 
-import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
 import org.basex.core.Text;
@@ -80,27 +79,17 @@ public final class ServerMemTest {
     server.stop();
   }
 
-  /**
-   * Returns a session instance.
-   * @return session
-   * @throws IOException exception
-   */
-  static ClientSession newSession() throws IOException {
-    return new ClientSession("localhost", 1984, Text.ADMIN, Text.ADMIN);
-  }
-
   /** Single client. */
   static final class Client extends Thread {
     /** Client session. */
     private ClientSession session;
 
-    /** Default constructor. */
-    public Client() {
-      try {
-        session = newSession();
-      } catch(final IOException ex) {
-        ex.printStackTrace();
-      }
+    /**
+     * Default constructor.
+     * @throws Exception exception
+     */
+    public Client() throws Exception {
+      session = new ClientSession(server.context, Text.ADMIN, Text.ADMIN);
     }
 
     @Override
