@@ -500,9 +500,17 @@ final class BaseXTextRenderer extends BaseXBack {
 
   /**
    * Sets a syntax highlighter.
-   * @param s syntax reference
+   * @param s syntax highlighter
    */
   void setSyntax(final BaseXSyntax s) {
     syntax = s;
+  }
+
+  /**
+   * Returns the syntax highlighter.
+   * @return syntax highlighter
+   */
+  BaseXSyntax getSyntax() {
+    return syntax;
   }
 }

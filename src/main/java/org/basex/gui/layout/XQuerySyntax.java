@@ -109,4 +109,14 @@ public final class XQuerySyntax extends BaseXSyntax {
     // letters and numbers
     return Color.black;
   }
+
+  @Override
+  public String commentOpen() {
+    return "(:";
+  }
+
+  @Override
+  public String commentEnd() {
+    return ":)";
+  }
 }

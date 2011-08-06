@@ -323,6 +323,53 @@ public final class BaseXTextTokens {
     size = tb.size();
   }
 
+
+  /**
+   * (Un)comments highlighted text or line.
+   * @param syntax syntax highlighter
+   */
+  void comment(final BaseXSyntax syntax) {
+    final String start = syntax.commentOpen();
+    final String end = syntax.commentEnd();
+    boolean add = true;
+    int min = ps;
+    int max = ps;
+
+    if(ms != -1) {
+      min = ps < ms ? ps : ms;
+      max = ps > ms ? ps : ms;
+      // marked
+      if(indexOf(text, token(start), min) == min &&
+         indexOf(text, token(end), Math.max(0, max - end.length())) ==
+         max - end.length()) {
+
+        final TokenBuilder tb = new TokenBuilder();
+        tb.add(text, 0, min);
+        tb.add(text, min + 2, max - 2);
+        tb.add(text, max, size);
+        text = tb.finish();
+        size = tb.size();
+        ms = min;
+        me = max - 4;
+        ps = me;
+        add = false;
+      }
+    } else {
+      while(min > 0 && text[min - 1] != '\n') --min;
+      while(max < size() && text[max] != '\n') ++max;
+    }
+
+    if(add) {
+      pos(max);
+      add(end);
+      pos(min);
+      add(start);
+      ms = min;
+      me = max + 4;
+      ps = me;
+    }
+  }
+
   /**
    * Deletes the current character.
    * Assumes that the current position allows a deletion.

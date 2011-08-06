@@ -42,4 +42,14 @@ public final class XMLSyntax extends BaseXSyntax {
     }
     return Color.black;
   }
+
+  @Override
+  public String commentOpen() {
+    return "<!--";
+  }
+
+  @Override
+  public String commentEnd() {
+    return "-->";
+  }
 }

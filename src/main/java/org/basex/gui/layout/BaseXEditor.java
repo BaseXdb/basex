@@ -419,13 +419,14 @@ public class BaseXEditor extends BaseXPanel {
     }
 
     final boolean marking = e.isShiftDown() &&
-      !DELNEXT.is(e) && !DELPREV.is(e) &&  !PASTE2.is(e);
+      !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e);
     final boolean nomark = text.start() == -1;
     if(marking && nomark) text.startMark();
     boolean down = true;
     boolean consumed = true;
 
     // operations that consider the last text mark..
+    final byte[] txt = text.text;
     if(NEXTWORD.is(e)) {
       text.nextToken(marking);
     } else if(PREVWORD.is(e)) {
@@ -458,11 +459,13 @@ public class BaseXEditor extends BaseXPanel {
       down = false;
     } else if(NEXTLINE.is(e)) {
       down(1, marking);
+    } else if(COMMENT.is(e)) {
+      System.out.println("?");
+      text.comment(rend.getSyntax());
     } else {
       consumed = false;
     }
 
-    final byte[] txt = text.text;
     if(marking) {
       // refresh scroll position
       text.endMark();

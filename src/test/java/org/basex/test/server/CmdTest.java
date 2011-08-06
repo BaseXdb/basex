@@ -409,7 +409,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void password() {
-    ok(new Password(md5("admin")));
+    ok(new Password(md5(Text.ADMIN)));
     no(new Password(""));
   }
 
