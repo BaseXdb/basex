@@ -38,7 +38,7 @@ public final class InfoIndex extends AInfo {
 
   @Override
   protected boolean run() throws IOException {
-    final Data data = context.data;
+    final Data data = context.data();
     if(args[0] != null) {
       final CmdIndexInfo ci = getOption(CmdIndexInfo.class);
       if(ci == null) return error(CMDUNKNOWN, this);

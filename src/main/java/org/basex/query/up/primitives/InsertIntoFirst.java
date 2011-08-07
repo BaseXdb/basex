@@ -31,7 +31,7 @@ public final class InsertIntoFirst extends InsertBase {
   }
 
   @Override
-  public boolean checkTextAdjacency(final int c) {
+  public boolean adjacentTexts(final int c) {
     /* Text node adjacency can only occur at the end of the insertion sequence
      * as this is inserted before all other siblings - no left sibling to merge
      * with.

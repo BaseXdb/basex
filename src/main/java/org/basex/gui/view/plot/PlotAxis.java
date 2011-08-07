@@ -90,7 +90,7 @@ final class PlotAxis {
     byte[] b = token(attribute);
     tag = !contains(b, '@');
     b = delete(b, '@');
-    final Data data = plotData.context.data;
+    final Data data = plotData.context.data();
     attrID = (tag ? data.tagindex : data.atnindex).id(b);
     refreshAxis();
     return true;
@@ -102,7 +102,7 @@ final class PlotAxis {
    * is of kind TEXT, it is treated as INT.
    */
   void refreshAxis() {
-    final Data data = plotData.context.data;
+    final Data data = plotData.context.data();
     final StatsKey key = tag ? data.tagindex.stat(attrID) :
       data.atnindex.stat(attrID);
     if(key == null) return;
@@ -246,7 +246,7 @@ final class PlotAxis {
    * @return item value
    */
   byte[] getValue(final int pre) {
-    final Data data = plotData.context.data;
+    final Data data = plotData.context.data();
     final int limit = pre + data.size(pre, Data.ELEM);
     for(int p = pre; p < limit; ++p) {
       final int kind = data.kind(p);

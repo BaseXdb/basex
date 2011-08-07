@@ -39,7 +39,7 @@ public final class InsertInto extends InsertBase {
   }
 
   @Override
-  public boolean checkTextAdjacency(final int c) {
+  public boolean adjacentTexts(final int c) {
     /* No adjacent text nodes possible if nothing has been
      * inserted by this primitive
      */

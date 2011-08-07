@@ -77,7 +77,7 @@ public abstract class UpdateTest {
   @Before
   public final void setUp() {
     exec(new CreateDB(DBNAME, TESTFILE));
-    size = CONTEXT.data.meta.size;
+    size = CONTEXT.data().meta.size;
   }
 
   /**
@@ -114,9 +114,9 @@ public abstract class UpdateTest {
    */
   @Test
   public final void testSize() {
-    assertEquals("Unexpected size!", size, CONTEXT.data.meta.size);
+    assertEquals("Unexpected size!", size, CONTEXT.data().meta.size);
     reload();
-    assertEquals("Unexpected size!", size, CONTEXT.data.meta.size);
+    assertEquals("Unexpected size!", size, CONTEXT.data().meta.size);
   }
 
   /**

@@ -40,11 +40,6 @@ public final class Context {
   /** Current query file. */
   public IO query;
 
-  /** Data reference. */
-  public Data data;
-  /** Node context. */
-  public Nodes current;
-
   // GUI references
   /** Marked nodes. */
   public Nodes marked;
@@ -53,8 +48,14 @@ public final class Context {
   /** Focused node. */
   public int focused = -1;
 
+  /** Database path. */
+  private String path;
+  /** Node context. */
+  private Nodes current;
   /** Process locking. */
   private final Lock lock;
+  /** Data reference. */
+  private Data data;
 
   /**
    * Constructor.
@@ -111,6 +112,36 @@ public final class Context {
     return current != null && current.root;
   }
 
+
+  /**
+   * Returns the current data reference.
+   * @return data reference
+   */
+  public Data data() {
+    return data;
+  }
+
+  /**
+   * Returns the current node context.
+   * @return node set
+   */
+  public Nodes current() {
+    if(current == null && data != null) {
+      final int[] root = (path == null ? data.doc() : data.doc(path)).toArray();
+      current = new Nodes(root, data);
+      current.root = path == null;
+    }
+    return current;
+  }
+
+  /**
+   * Sets the current node context.
+   * @param curr node set
+   */
+  public void current(final Nodes curr) {
+    current = curr;
+  }
+
   /**
    * Returns all document nodes.
    * @return result of check
@@ -131,18 +162,17 @@ public final class Context {
    * Sets the specified data instance as current database and restricts
    * the context nodes to the given path.
    * @param d data reference
-   * @param path database path
+   * @param p database path
    */
-  public void openDB(final Data d, final String path) {
+  public void openDB(final Data d, final String p) {
     data = d;
+    path = p;
     copied = null;
-    set(new Nodes((path == null ? d.doc() : d.doc(path)).toArray(), d),
-        new Nodes(d));
-    current.root = path == null;
+    set(null, new Nodes(d));
   }
 
   /**
-   * Removes the current database context.
+   * Resets the current database context.
    */
   public void closeDB() {
     data = null;
@@ -162,11 +192,10 @@ public final class Context {
   }
 
   /**
-   * Updates references to the document nodes.
+   * Invalidates the current node set.
    */
   public void update() {
-    current = new Nodes(data.doc().toArray(), data);
-    current.root = true;
+    current = null;
   }
 
   /**

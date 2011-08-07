@@ -84,7 +84,7 @@ public abstract class QueryTest {
         c.execute(context);
         final Result val = c.result();
         if(cmp instanceof Nodes) {
-          ((Nodes) cmp).data = context.data;
+          ((Nodes) cmp).data = context.data();
         }
         if(!correct || !val.sameAs(cmp)) {
           sb.append("-- " + qu[0] + ": " + query);

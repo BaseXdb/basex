@@ -61,7 +61,7 @@ public final class DialogEdit extends Dialog {
     BaseXBack pp = new BaseXBack(new BorderLayout());
 
     final Context context = gui.context;
-    final Data data = context.data;
+    final Data data = context.data();
     kind = data.kind(pre);
 
     final String title = Util.info(EDITTEXT, EDITKIND[kind]);

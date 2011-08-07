@@ -72,7 +72,7 @@ public final class Add extends ACreate {
       io.name(name);
     } else if(io instanceof IOContent) {
       // if no name exists, set database name as document name
-      name = context.data.meta.name + IO.XMLSUFFIX;
+      name = context.data().meta.name + IO.XMLSUFFIX;
       io.name(name);
     }
 
@@ -106,7 +106,7 @@ public final class Add extends ACreate {
       final InputSource input, final Context ctx, final Add cmd,
       final boolean lock) throws BaseXException {
 
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     if(data == null) return PROCNODB;
 
     String trg = path(target);
@@ -152,7 +152,7 @@ public final class Add extends ACreate {
     }
 
     // create random database name
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     final String dbname = large ? ctx.mprop.random(data.meta.name) : path;
     final Builder build = large ? new DiskBuilder(dbname, parser, ctx) :
       new MemBuilder(dbname, parser, ctx.prop);

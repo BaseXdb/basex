@@ -62,9 +62,9 @@ public final class ViewNotifier {
    */
   public void init() {
     final Context ctx = gui.context;
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     if(data != null) {
-      cont[0] = ctx.current;
+      cont[0] = ctx.current();
       marked[0] = new Nodes(data);
 
       // if a large database is opened, the user is asked if complex
@@ -103,7 +103,7 @@ public final class ViewNotifier {
     gui.context.focused = pre;
     for(final View v : view) if(v != vw && v.visible()) v.refreshFocus();
     if(pre != -1) {
-      gui.status.setText(Token.string(ViewData.path(gui.context.data, pre)));
+      gui.status.setText(Token.string(ViewData.path(gui.context.data(), pre)));
     }
   }
 
@@ -138,7 +138,7 @@ public final class ViewNotifier {
     final Context context = gui.context;
     Nodes nodes = context.marked;
     if(mode == 0) {
-      nodes = new Nodes(f, context.data);
+      nodes = new Nodes(f, context.data());
     } else if(mode == 1) {
       nodes.union(new int[] { f });
     } else {
@@ -180,9 +180,9 @@ public final class ViewNotifier {
    */
   public void context(final Nodes nodes, final boolean quick, final View vw) {
     final Context context = gui.context;
-    final Nodes n = new Nodes(new int[0], context.data, context.marked.ftpos);
+    final Nodes n = new Nodes(new int[0], context.data(), context.marked.ftpos);
 
-    if(!cont[hist].sameAs(quick ? context.current : context.marked)) {
+    if(!cont[hist].sameAs(quick ? context.current() : context.marked)) {
       checkHist();
       if(!quick) {
         // add new entry
@@ -196,8 +196,8 @@ public final class ViewNotifier {
         // check if current node set has already been cached
         // add new entry
         queries[hist] = "";
-        marked[hist] = new Nodes(context.data);
-        cont[++hist] = context.current;
+        marked[hist] = new Nodes(context.data());
+        cont[++hist] = context.current();
       }
       maxhist = hist;
     }
@@ -213,10 +213,11 @@ public final class ViewNotifier {
    */
   public void update() {
     final Context context = gui.context;
-    if(context.data == null) return;
+    final Data data = context.data();
+    if(data == null) return;
     hist = 0;
     maxhist = 0;
-    context.marked = new Nodes(new int[0], context.data);
+    context.marked = new Nodes(data);
     for(final View v : view) if(v.visible()) v.refreshUpdate();
     gui.refreshControls();
   }

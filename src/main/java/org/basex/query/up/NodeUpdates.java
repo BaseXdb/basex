@@ -272,7 +272,7 @@ final class NodeUpdates {
          */
         if(p.type != INSERTAFTER && p.type != INSERTBEFORE &&
             p.type != REPLACENODE && p.type != DELETENODE) {
-          if(p.checkTextAdjacency(c)) {
+          if(p.adjacentTexts(c)) {
             merged++;
             c--;
           }
@@ -312,7 +312,7 @@ final class NodeUpdates {
         // only check primitives which can lead to external text node adjacency
         if(p.type == INSERTAFTER || p.type == INSERTBEFORE ||
             p.type == DELETENODE || p.type == REPLACENODE) {
-          if(p.checkTextAdjacency(c))
+          if(p.adjacentTexts(c))
             c--;
         }
         // consider amount of nodes deleted/inserted by the current primitive

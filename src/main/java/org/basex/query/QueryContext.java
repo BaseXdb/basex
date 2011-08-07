@@ -180,7 +180,7 @@ public final class QueryContext extends Progress {
   public QueryContext(final Context ctx) {
     resource = new QueryResources(this);
     context = ctx;
-    nodes = ctx.current;
+    nodes = ctx.current();
     xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
@@ -275,7 +275,7 @@ public final class QueryContext extends Progress {
       final Value v = value(root);
       if(updating) {
         updates.applyUpdates(this);
-        if(context.data != null) context.update();
+        if(context.data() != null) context.update();
       }
       return v;
 

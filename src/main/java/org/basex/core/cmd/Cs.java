@@ -22,10 +22,8 @@ public final class Cs extends AQuery {
   protected boolean run() {
     queryNodes();
     if(result == null) return false;
-
     if(result.size() != 0) {
-      final Nodes nodes = (Nodes) result;
-      context.current = nodes.checkRoot();
+      context.current(((Nodes) result).checkRoot());
     }
     return true;
   }

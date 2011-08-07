@@ -114,7 +114,7 @@ public final class TextView extends View implements ActionListener {
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    setText(gui.context.current);
+    setText(gui.context.current());
   }
 
   @Override
@@ -175,7 +175,7 @@ public final class TextView extends View implements ActionListener {
     }
     area.setText(buf, size);
     header.setText(TEXTTIT + (out.finished() ? RESULTCHOP : ""));
-    home.setEnabled(gui.context.data != null);
+    home.setEnabled(gui.context.data() != null);
     refresh = true;
     if(!out.finished()) {
       cmd = null;

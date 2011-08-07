@@ -278,7 +278,7 @@ public final class ClientListener extends Thread {
     final TokenBuilder tb = new TokenBuilder("[");
     tb.add(socket.getInetAddress().getHostAddress());
     tb.add(':').addExt(socket.getPort()).add(']');
-    if(context.data != null) tb.add(COLS).add(context.data.meta.name);
+    if(context.data() != null) tb.add(COLS).add(context.data().meta.name);
     return tb.toString();
   }
 

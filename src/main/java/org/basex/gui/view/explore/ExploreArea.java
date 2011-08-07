@@ -94,7 +94,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     if(!main.visible() || data == null) return;
 
     final boolean pi = data.meta.pathindex;
@@ -105,7 +105,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     if(!pi) return;
 
     all.help(HELPSEARCHXML);
-    addKeys(gui.context.data);
+    addKeys(gui.context.data());
     panel.revalidate();
     panel.repaint();
   }
@@ -198,7 +198,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         final BaseXCombo combo = (BaseXCombo) source;
         panel.remove(cp + 1);
 
-        final Data data = gui.context.data;
+        final Data data = gui.context.data();
         final boolean selected = combo.getSelectedIndex() != 0;
         if(selected) {
           final String item = combo.getSelectedItem().toString();
@@ -244,7 +244,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    */
   void query(final boolean force) {
     final TokenBuilder tb = new TokenBuilder();
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
 
     final int cs = panel.getComponentCount();
     for(int c = 0; c < cs; c += 2) {

@@ -23,7 +23,7 @@ public final class Close extends Command {
 
   @Override
   protected boolean run() {
-    final Data data = context.data;
+    final Data data = context.data();
     if(data == null) return true;
 
     try {

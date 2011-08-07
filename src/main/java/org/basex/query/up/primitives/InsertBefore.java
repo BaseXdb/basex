@@ -31,7 +31,7 @@ public final class InsertBefore extends InsertBase {
   }
 
   @Override
-  public boolean checkTextAdjacency(final int c) {
+  public boolean adjacentTexts(final int c) {
     final int p = pre + c;
     boolean merged = false;
     final int mds = md.meta.size;

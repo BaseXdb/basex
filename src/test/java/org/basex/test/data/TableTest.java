@@ -48,7 +48,7 @@ public final class TableTest {
   public void setUp() throws BaseXException {
     ctx = new Context();
     new CreateDB(DBNAME, DBFILE).execute(ctx);
-    tbl = ctx.data.meta.dbfile(DataText.DATATBL);
+    tbl = ctx.data().meta.dbfile(DataText.DATATBL);
   }
 
   /**

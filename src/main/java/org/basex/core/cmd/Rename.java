@@ -26,7 +26,7 @@ public final class Rename extends ACreate {
 
   @Override
   protected boolean run() {
-    final Data data = context.data;
+    final Data data = context.data();
     final byte[] src = token(path(args[0]));
     final byte[] trg = token(path(args[1]));
 

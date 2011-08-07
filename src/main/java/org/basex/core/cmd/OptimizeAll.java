@@ -47,7 +47,7 @@ public final class OptimizeAll extends ACreate {
   @Override
   protected boolean run() throws IOException {
     try {
-      final Data data = context.data;
+      final Data data = context.data();
       optimizeAll(data, context, this);
 
       final Open open = new Open(data.meta.name);

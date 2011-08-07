@@ -220,7 +220,7 @@ public final class BaseXLayout {
       @Override
       public void keyPressed(final KeyEvent e) {
         // browse back/forward
-        if(gui.context.data != null) {
+        if(gui.context.data() != null) {
           if(GOBACK.is(e)) {
             GUICommands.GOBACK.execute(gui);
           } else if(GOFORWARD.is(e)) {

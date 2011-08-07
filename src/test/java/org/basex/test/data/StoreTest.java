@@ -55,7 +55,7 @@ public final class StoreTest {
   @Test
   public void replace() throws Exception {
     new CreateDB(DBNAME, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
-    final long size = CONTEXT.data.meta.dbfile(DataText.DATATXT).length();
+    final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
     for(int n = 0; n < NQUERIES; n++) {
       final String qu =
           "for $a in //text() " +
@@ -73,7 +73,7 @@ public final class StoreTest {
   @Test
   public void deleteInsertTwo() throws Exception {
     new CreateDB(DBNAME, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
-    final long size = CONTEXT.data.meta.dbfile(DataText.DATATXT).length();
+    final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int n = 0; n < NQUERIES; n++) {
       String qu = "for $a in //text() return delete node $a";
@@ -93,7 +93,7 @@ public final class StoreTest {
   @Test
   public void deleteInsert() throws Exception {
     new CreateDB(DBNAME, "<X>abc</X>").execute(CONTEXT);
-    final long size = CONTEXT.data.meta.dbfile(DataText.DATATXT).length();
+    final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int i = 0; i < NQUERIES; i++) {
       new XQuery("delete node //text()").execute(CONTEXT);
@@ -107,6 +107,6 @@ public final class StoreTest {
    * @param old old size
    */
   private void check(final long old) {
-    assertEquals(old, CONTEXT.data.meta.dbfile(DataText.DATATXT).length());
+    assertEquals(old, CONTEXT.data().meta.dbfile(DataText.DATATXT).length());
   }
 }

@@ -52,7 +52,8 @@ public final class Replace extends ACreate {
    */
   public static String replace(final String p, final InputSource input,
       final Context ctx, final boolean lock) throws BaseXException {
-    final Data data = ctx.data;
+
+    final Data data = ctx.data();
     String path = path(p);
     if(path.isEmpty()) return Util.info(DIRERR, path);
 
