@@ -45,7 +45,7 @@ public final class ReplaceTest {
     // Create test database
     new CreateDB(DBNAME, "<X><A>1</A><A>1</A></X>").execute(CONTEXT);
 
-    long len1 = CONTEXT.data.meta.dbfile(DataText.DATATXT).length();
+    long len1 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
     // deactivate flushing to speed up querying
     new Set(Prop.FORCEFLUSH, false).execute(CONTEXT);
@@ -61,7 +61,7 @@ public final class ReplaceTest {
     // perform final, flushed replacement
     new Set(Prop.FORCEFLUSH, true).execute(CONTEXT);
 
-    long len2 = CONTEXT.data.meta.dbfile(DataText.DATATXT).length();
+    long len2 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
     assertEquals(len1, len2);
 
     // Drop database

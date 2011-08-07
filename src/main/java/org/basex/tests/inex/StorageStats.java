@@ -54,7 +54,7 @@ public class StorageStats extends Statistics {
   @Override
   void analyze(final TokenList tl) throws BaseXException {
     try {
-      analyzeTBLI(ctx.data.meta.dbfile(DATATBL + 'i'), tl);
+      analyzeTBLI(ctx.data().meta.dbfile(DATATBL + 'i'), tl);
     } catch(final IOException e) {
       throw new BaseXException(e);
     }

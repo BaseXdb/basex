@@ -51,7 +51,7 @@ public final class CollAddTest {
   }
 
   /**
-   * Adds 1000 documents.
+   * Adds 10000 documents.
    * @throws Exception exception
    */
   @Test
@@ -60,7 +60,7 @@ public final class CollAddTest {
   }
 
   /**
-   * Adds 1000 documents.
+   * Adds 100000 documents.
    * @throws Exception exception
    */
   @Test
