@@ -64,7 +64,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
   @Override
   public String getName() {
-    return ctx.data.meta.name;
+    return ctx.data().meta.name;
   }
 
   @Override
@@ -118,14 +118,14 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public int getResourceCount() throws XMLDBException {
     check();
-    return ctx.data.doc().size();
+    return ctx.data().doc().size();
   }
 
   @Override
   public String[] listResources() throws XMLDBException {
     check();
     final StringList sl = new StringList();
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     final IntList il = data.doc();
     for(int i = 0, is = il.size(); i < is; i++) {
       sl.add(Token.string(data.text(il.get(i), true)));
@@ -155,7 +155,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     // resource is no relevant xml resource
     final BXXMLResource del = checkXML(res);
-    final Data data = ctx.data;
+    final Data data = ctx.data();
 
     // check if data instance refers to another database
     if(del.data != data && del.data != null) throw new XMLDBException(
@@ -194,7 +194,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
         new DOMWrapper((Document) cont, id) :
         Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop, "");
 
-      final Data data = ctx.data;
+      final Data data = ctx.data();
       data.insert(data.meta.size, -1, MemBuilder.build(id, p, ctx.prop));
       ctx.update();
       data.flush();
@@ -207,7 +207,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public BXXMLResource getResource(final String id) throws XMLDBException {
     check();
     if(id == null) return null;
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     final byte[] idd = Token.token(id);
     final IntList il = data.doc();
     for(int i = 0, is = il.size(); i < is; i++) {
@@ -243,7 +243,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public String getProperty(final String key) throws XMLDBException {
     check();
     try {
-      return MetaData.class.getField(key).get(ctx.data.meta).toString();
+      return MetaData.class.getField(key).get(ctx.data().meta).toString();
     } catch(final Exception ex) {
       return null;
     }
@@ -254,7 +254,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       throws XMLDBException {
     check();
     try {
-      final MetaData md = ctx.data.meta;
+      final MetaData md = ctx.data().meta;
       final Field f = MetaData.class.getField(key);
       final Object k = f.get(md);
 
