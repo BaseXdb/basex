@@ -337,7 +337,7 @@ final class BaseXTextRenderer extends BaseXBack {
         final int p = text.pos();
         while(text.more()) {
           final int cw = charW(g, text.curr());
-          if(text.marked()) {
+          if(text.inMark()) {
             g.setColor(GUIConstants.color(3));
             g.fillRect(xx, y - fontH + 4, cw, fontH);
           }

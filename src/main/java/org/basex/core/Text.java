@@ -791,11 +791,11 @@ public interface Text {
   /** Menu entry. */
   String MENUDB = lang("m_db");
   /** Menu entry. */
-  String MENUEDIT = lang("m_edit");
-  /** Menu entry. */
   String MENUQUERY = lang("m_query");
   /** Menu entry. */
   String MENUVIEW = lang("m_view");
+  /** Menu entry. */
+  String MENUNODES = lang("m_nodes");
   /** Menu entry. */
   String MENUOPTIONS = lang("m_options");
   /** Menu entry. */

@@ -8,9 +8,9 @@ version=Versie
 
 # Menu Commands
 m_db=Database
-m_edit=Wijzig
 m_query=Query
 m_view=View
+m_nodes=Nodes
 m_options=Opties
 m_help=Help
 

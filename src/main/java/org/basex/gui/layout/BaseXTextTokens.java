@@ -335,7 +335,7 @@ public final class BaseXTextTokens {
     int min = ps;
     int max = ps;
 
-    if(ms != -1) {
+    if(marked()) {
       min = ps < ms ? ps : ms;
       max = ps > ms ? ps : ms;
       // marked
@@ -376,8 +376,8 @@ public final class BaseXTextTokens {
   void delete() {
     if(size == 0) return;
     final TokenBuilder tb = new TokenBuilder();
-    final int s = ms != -1 ? Math.min(ms, me) : ps;
-    final int e = ms != -1 ? Math.max(ms, me) : ps + cl(text, ps);
+    final int s = marked() ? Math.min(ms, me) : ps;
+    final int e = marked() ? Math.max(ms, me) : ps + cl(text, ps);
     tb.add(text, 0, s);
     if(e < size) tb.add(text, e, size);
     text = tb.finish();
@@ -395,7 +395,7 @@ public final class BaseXTextTokens {
    * @return true if mark was reset
    */
   private boolean noMark(final boolean mark, final boolean max) {
-    final boolean rs = !mark && ms != -1;
+    final boolean rs = !mark && marked();
     if(rs) {
       ps = max ^ ms < me ? ms : me;
       noMark();
@@ -436,6 +436,14 @@ public final class BaseXTextTokens {
   }
 
   /**
+   * Tests if some text is marked.
+   * @return result of check
+   */
+  boolean marked() {
+    return ms != -1;
+  }
+
+  /**
    * Checks the validity of the mark.
    */
   void checkMark() {
@@ -447,15 +455,15 @@ public final class BaseXTextTokens {
    * @return result of check
    */
   boolean markStart() {
-    if(ms == -1) return false;
-    return marked() || (ms < me ? ms >= ps && ms < pe : me >= ps && me < pe);
+    return marked() &&
+        (inMark() || (ms < me ? ms >= ps && ms < pe : me >= ps && me < pe));
   }
 
   /**
    * Tests if the current position is marked.
    * @return result of check
    */
-  boolean marked() {
+  boolean inMark() {
     return ms < me ? ps >= ms && ps < me : ps >= me && ps < ms;
   }
 
@@ -464,7 +472,7 @@ public final class BaseXTextTokens {
    * @return substring
    */
   String copy() {
-    if(ms == -1) return "";
+    if(!marked()) return "";
     final TokenBuilder tb = new TokenBuilder();
     final int e = ms < me ? me : ms;
     for(int s = ms < me ? ms : me; s < e; s += cl(text, s)) {
