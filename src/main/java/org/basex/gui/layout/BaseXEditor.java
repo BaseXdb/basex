@@ -301,9 +301,8 @@ public class BaseXEditor extends BaseXPanel {
   public void mouseClicked(final MouseEvent e) {
     if(!SwingUtilities.isMiddleMouseButton(e)) return;
     if(!paste()) return;
-    rend.calc();
-    showCursor(2);
-    release(false);
+    finish();
+    repaint();
   }
 
   @Override
@@ -323,9 +322,9 @@ public class BaseXEditor extends BaseXPanel {
     requestFocusInWindow();
     cursor(true);
 
-    if(!SwingUtilities.isLeftMouseButton(e)) {
-      if(!text.marked()) rend.select(scroll.pos(), e.getPoint(), false);
-    } else {
+    if(SwingUtilities.isMiddleMouseButton(e)) copy();
+
+    if(SwingUtilities.isLeftMouseButton(e)) {
       final int c = e.getClickCount();
       if(c == 1) {
         // selection mode
@@ -335,6 +334,8 @@ public class BaseXEditor extends BaseXPanel {
       } else {
         selectLine();
       }
+    } else if(!text.marked()) {
+      rend.select(scroll.pos(), e.getPoint(), false);
     }
   }
 
