@@ -27,7 +27,6 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.layout.BaseXLayout.DropHandler;
 import org.basex.io.IO;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Undo;
@@ -104,15 +103,6 @@ public class BaseXEditor extends BaseXPanel {
       new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
         new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
       new GUICommand[] { new CopyCmd(), null, new AllCmd() });
-
-    BaseXLayout.addDrop(this, new DropHandler() {
-      @Override
-      public void drop(final Object object) {
-        if(!paste(object.toString())) return;
-        finish();
-        repaint();
-      }
-    });
   }
 
   /**
