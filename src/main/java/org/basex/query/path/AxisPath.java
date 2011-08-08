@@ -98,7 +98,7 @@ public class AxisPath extends Path {
       for(final Expr s : steps) st = Array.add(st, s);
       steps = st;
       // refresh root context
-      ctx.compInfo(OPTPATH);
+      ctx.compInfo(OPTMERGE);
       ctx.value = root(ctx);
     }
     final AxisStep s = voidStep(steps);

@@ -600,7 +600,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTDESC = "optimizing descendant-or-self step(s)";
   /** Optimization info. */
-  String OPTPATH = "merging axis paths";
+  String OPTMERGE = "merging axis paths";
   /** Optimization info. */
   String OPTPRE = "pre-evaluating %";
   /** Optimization info. */
@@ -631,6 +631,8 @@ public interface QueryText {
   String OPTPREF = "skipping namespace test for \"%\"";
   /** Optimization info. */
   String OPTNAME = "removing unknown tag/attribute %";
+  /** Optimization info. */
+  String OPTPATH = "removing non-existing path %";
   /** Optimization info. */
   String OPTTXTINDEX = "applying text index";
   /** Optimization info. */
