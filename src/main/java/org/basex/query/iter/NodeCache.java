@@ -278,8 +278,8 @@ public final class NodeCache extends AxisIter {
    */
   private int m(final int a, final int b, final int c) {
     return item[a].diff(item[b]) < 0 ?
-      (item[b].diff(item[c]) < 0 ? b : item[a].diff(item[c]) < 0 ? c : a) :
-       item[b].diff(item[c]) > 0 ? b : item[a].diff(item[c]) > 0 ? c : a;
+      item[b].diff(item[c]) < 0 ? b : item[a].diff(item[c]) < 0 ? c : a :
+      item[b].diff(item[c]) > 0 ? b : item[a].diff(item[c]) > 0 ? c : a;
   }
 
   /**

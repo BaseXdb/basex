@@ -38,9 +38,9 @@ public final class EventTest {
   /** Server reference. */
   private static BaseXServer server;
   /** Admin session. */
-  private static ClientSession session;
+  private ClientSession session;
   /** Control client sessions. */
-  private static ClientSession[] sessions = new ClientSession[CLIENTS];
+  private final ClientSession[] sessions = new ClientSession[CLIENTS];
 
   /** Starts the server. */
   @BeforeClass

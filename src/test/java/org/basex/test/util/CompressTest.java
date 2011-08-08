@@ -9,7 +9,6 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.util.Compress;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
 import org.basex.util.list.TokenList;
 import org.junit.Test;
 
@@ -20,11 +19,6 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class CompressTest {
-  /** Verbose flag. */
-  private static final boolean VERBOSE = false;
-  /** Number of occurrences. */
-  private static int[] occ = new int[256];
-
   /** Test. */
   @Test
   public void test1() {
@@ -113,13 +107,9 @@ public final class CompressTest {
    * @param tokens test tokens
    */
   private void test(final byte[]... tokens) {
-    int tl = 0;
-    int cl = 0;
     final Compress comp = new Compress();
     for(final byte[] token : tokens) {
       final byte[] cpr = comp.pack(token);
-      tl += token.length;
-      cl += cpr.length;
       if(token != cpr) {
         final byte[] pln = comp.unpack(cpr);
         if(!eq(token, pln)) {
@@ -127,12 +117,6 @@ public final class CompressTest {
               Arrays.toString(pln));
         }
       }
-    }
-    if(VERBOSE) {
-      for(final byte[] token : tokens) {
-        for(final byte t : token) occ[t & 0xFF]++;
-      }
-      Util.outln((cl == tl ? "= " : "+ ") + tl + " -> " + cl);
     }
   }
 }

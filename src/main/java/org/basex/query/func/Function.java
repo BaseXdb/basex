@@ -244,6 +244,8 @@ public enum Function {
   GENID(FNNode.class, "generate-id([node])", STR, 0, NOD_ZO),
   /** XQuery function. */
   CHILDREN(FNNode.class, "has-children(node)", BLN, NOD_ZM),
+  /** XQuery function. */
+  PATH(FNNode.class, "path([node])", STR_ZO, 0, NOD_ZO),
 
   /* FNNum functions. */
 

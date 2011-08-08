@@ -47,7 +47,6 @@ public final class Info extends AInfo {
     final Prop prop = context.prop;
     tb.add(NL + INFOCREATE + NL);
     format(tb, INFOCHOP, flag(prop.is(Prop.CHOP)));
-    format(tb, INFOENTITY, flag(prop.is(Prop.ENTITY)));
 
     tb.add(NL + INFOINDEX + NL);
     format(tb, INFOPATHINDEX, flag(prop.is(Prop.PATHINDEX)));

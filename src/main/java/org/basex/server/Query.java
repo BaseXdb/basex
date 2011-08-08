@@ -30,7 +30,7 @@ public abstract class Query {
    * @param t data type
    * @throws BaseXException command exception
    */
-  public abstract void bind(final String n, final String v, final String t)
+  public abstract void bind(final String n, final Object v, final String t)
       throws BaseXException;
 
   /**

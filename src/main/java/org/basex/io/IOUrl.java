@@ -2,7 +2,6 @@ package org.basex.io;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import org.basex.io.in.BufferInput;
@@ -27,9 +26,13 @@ final class IOUrl extends IO {
   @Override
   public void cache() throws IOException {
     final ByteList bl = new ByteList();
-    final InputStream bis = new BufferedInputStream(new URL(path).openStream());
-    for(int b; (b = bis.read()) != -1;) bl.add(b);
-    bis.close();
+    BufferedInputStream bis = null;
+    try {
+      bis = new BufferedInputStream(new URL(path).openStream());
+      for(int b; (b = bis.read()) != -1;) bl.add(b);
+    } finally {
+      if(bis != null) try { bis.close(); } catch(final IOException ex) { }
+    }
     cont = bl.toArray();
   }
 

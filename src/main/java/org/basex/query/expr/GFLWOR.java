@@ -68,11 +68,11 @@ public class GFLWOR extends ParseExpr {
    * @return GFLWOR instance
    */
   public static GFLWOR get(final ForLet[] f, final Expr w, final OrderBy[] o,
-      final Var[] g, final Expr r, final InputInfo ii) {
+      final Var[][] g, final Expr r, final InputInfo ii) {
 
     if(o == null && g == null) return new FLWR(f, w, r, ii);
     final Order ord = o == null ? null : new Order(ii, o);
-    final Group grp = g == null ? null : new Group(ii, g);
+    final Group grp = g == null ? null : new Group(ii, g[0], g[1], g[2]);
     return new GFLWOR(f, w, ord, grp, r, ii);
   }
 
@@ -282,7 +282,7 @@ public class GFLWOR extends ParseExpr {
       keys = new ObjList<Item[]>();
       vals = new ValueList();
     }
-    if(group != null) group.init(fl, order);
+    if(group != null) group.init(order);
     iter(ctx, iter, 0, keys, vals);
     ctx.vars.reset(vs);
 

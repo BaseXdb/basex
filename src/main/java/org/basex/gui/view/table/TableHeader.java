@@ -292,7 +292,7 @@ final class TableHeader extends BaseXPanel {
   private void chooseRoot(final MouseEvent e) {
     if(tdata.roots.size() == 0) return;
 
-    final Data data = view.gui.context.data;
+    final Data data = view.gui.context.data();
     final JPopupMenu popup = new JPopupMenu();
     final byte[] root = data.tagindex.key(tdata.root);
     for(final byte[] en : tdata.roots) {

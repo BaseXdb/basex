@@ -8,9 +8,9 @@ version=Versie
 
 # Menu Commands
 m_db=Database
-m_edit=Wijzig
 m_query=Query
 m_view=View
+m_nodes=Nodes
 m_options=Opties
 m_help=Help
 
@@ -65,9 +65,9 @@ dc_advtitle=Creëer database
 dc_chop=Verwijder whitespaces
 dc_intparse=Gebruik interne XML parser
 dc_archives=Parse files within archives
+dc_corrupt=Skip corrupt (non-well-formed) files
 dc_createformat=Input format
-dc_entities=Parseer entities
-dc_dtd=Parseer DTDs
+dc_dtd=Parse DTDs and entities
 dc_usecat=Gebruik XML Catalog bestand
 dc_usecathlp=Om 'catalog resolving' te kunnen gebruiken moet de
 dc_usecathlp2=Apache XML Commons Resolver in je classpath staan.
@@ -356,6 +356,8 @@ pc_renamed=% document(s) renamed in %.
 pc_replaced=% document(s) replaced in %.
 pc_filenf=Bestand of folder "%" niet gevonden.
 pc_pathnf=Bestand of folder niet gevonden.
+pc_skipped=Skipped
+pc_skipinfo=% more file(s) skipped
 pc_dbnf=Geef de database een naam.
 pc_langnf=Taal '%' wordt niet ondersteund.
 pc_err="%" voldoet niet aan de grammatica.
@@ -395,7 +397,7 @@ in_notdropped=Index '%' kon niet verwijderd worden.
 in_notavl=Niet beschikbaar
 
 # Server Info
-srv_login=Toegang geweigerd.
+srv_denied=Toegang geweigerd.
 srv_connect=Communicatie met de server mislukt.
 srv_timeout=Timeout overschreden.
 srv_bind=Server loopt al of toegang ontzegd.
@@ -491,7 +493,6 @@ info_dberror=kon niet worden geopend.
 info_query=Query info
 info_debug=Debug mode
 info_chop=Whitespace afkappen
-info_entities=Entity parsing
 info_serialize=Serialiseren
 info_tags=Tags
 info_atts=Attributen

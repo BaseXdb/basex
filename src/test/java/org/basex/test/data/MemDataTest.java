@@ -14,7 +14,12 @@ import org.basex.data.MemData;
 import org.basex.io.IOContent;
 import org.basex.util.Token;
 
-/** Test index updates when using memory storage ({@link MemData}). */
+/**
+ * Test index updates when using memory storage ({@link MemData}).
+ *
+ * @author BaseX Team 2005-11, BSD License
+ * @author Dimitar Popov
+ */
 public final class MemDataTest {
   /** XML document. */
   private static final byte[] XML = Token.token("<a><b>test</b><c/></a>");

@@ -14,6 +14,6 @@ public final class LoginException extends IOException {
    * Constructor.
    */
   LoginException() {
-    super(SERVERLOGIN);
+    super(SERVERDENIED);
   }
 }

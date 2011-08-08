@@ -5,6 +5,8 @@ import org.junit.Test;
 
 /**
  * Tests for rewritings of FLWOR-expressions.
+ *
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public final class FlworOptimizeTest extends QueryPlanTest {

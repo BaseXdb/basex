@@ -26,7 +26,7 @@ public final class MainProp extends AProp {
     { "REPOPATH", Prop.HOME + Text.NAME + "Repo" };
 
   /** Language name. */
-  public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
+  public static final Object[] LANGUAGE = { "LANGUAGE", Text.LANGUAGE };
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };
 

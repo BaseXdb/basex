@@ -2,9 +2,16 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Reflect.*;
 import static org.basex.util.Token.*;
 
+import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.basex.io.IO;
 import org.basex.io.IOContent;
@@ -23,7 +30,6 @@ import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
-import org.basex.util.Xslt;
 import org.basex.util.hash.TokenObjMap;
 
 /**
@@ -38,6 +44,44 @@ public final class FNXslt extends FuncCall {
   /** Element: parameters. */
   private static final QNm E_PARAM = new QNm(token("parameters"), U_XSLT);
 
+  /** XSLT implementations. */
+  private static final String[] IMPL = {
+    "", "Java", "1.0",
+    "net.sf.saxon.TransformerFactoryImpl", "Saxon HE", "2.0",
+    "com.saxonica.config.ProfessionalTransformerFactory", "Saxon PE", "2.0",
+    "com.saxonica.config.EnterpriseTransformerFactory", "Saxon EE", "2.0"
+  };
+  /** Implementation offset. */
+  private static final int OFFSET;
+
+  static {
+    final String fac = TransformerFactory.class.getName();
+    final String impl = System.getProperty(fac);
+    // system property has already been set
+    if(System.getProperty(fac) != null) {
+      // modify processor and version
+      IMPL[1] = impl;
+      IMPL[2] = "Unknown";
+      OFFSET = 0;
+    } else {
+      // search for existing processors
+      int s = IMPL.length - 3;
+      while(s != 0 && find(IMPL[s]) == null) s -= 3;
+      OFFSET = s;
+      // set processor, or use default processor
+      if(s != 0) System.setProperty(fac, IMPL[s]);
+    }
+  }
+
+  /**
+   * Returns details on the XSLT implementation.
+   * @param name name flag
+   * @return string
+   */
+  static String get(final boolean name) {
+    return IMPL[OFFSET + (name ? 1 : 2)];
+  }
+
   /**
    * Constructor.
    * @param ii input info
@@ -51,25 +95,14 @@ public final class FNXslt extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
-      case TRANSFORM: return xslt(ctx);
-      default: return super.item(ctx, ii);
-    }
-  }
 
-  /**
-   * Performs the xslt function.
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  private ANode xslt(final QueryContext ctx) throws QueryException {
+    checkAdmin(ctx);
     try {
       final IO in = read(expr[0], ctx);
       final IO xsl = read(expr[1], ctx);
       final TokenObjMap<Object> map = xsltParams(2, E_PARAM, ctx);
 
-      final byte[] result = new Xslt().transform(in, xsl, map);
+      final byte[] result = transform(in, xsl, map);
       return new DBNode(new IOContent(result), ctx.context.prop);
     } catch(final Exception ex) {
       Util.debug(ex);
@@ -142,5 +175,33 @@ public final class FNXslt extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     return u == Use.CTX && def == Function.TRANSFORM || super.uses(u);
+  }
+
+  /**
+   * Uses Java's XSLT implementation to perform an XSL transformation.
+   * @param in input
+   * @param xsl style sheet
+   * @param par parameters
+   * @return transformed result
+   * @throws Exception exception
+   */
+  private byte[] transform(final IO in, final IO xsl,
+      final TokenObjMap<Object> par) throws Exception {
+
+    // create transformer
+    final TransformerFactory tc = TransformerFactory.newInstance();
+    final Transformer tr =  tc.newTransformer(
+        new StreamSource(new ByteArrayInputStream(xsl.content())));
+
+    // bind parameters
+    for(final byte[] key : par) tr.setParameter(string(key), par.get(key));
+
+    // create serializer
+    final ArrayOutput ao = new ArrayOutput();
+
+    // do transformation and return result
+    tr.transform(new StreamSource(new ByteArrayInputStream(in.content())),
+        new StreamResult(ao));
+    return ao.toArray();
   }
 }

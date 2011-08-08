@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import org.basex.util.ft.FTFlag;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.WesternTokenizer;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -29,13 +28,7 @@ public final class WesternTokenizerTest {
   private static final int FTWC = 16;
 
   /** Full-text options to use. */
-  private FTOpt opt;
-
-  /** Setup method. */
-  @Before
-  public void setUp() {
-    opt = new FTOpt();
-  }
+  private final FTOpt opt = new FTOpt();
 
   /** Test text to tokenize. */
   private static final byte[] TEXT = token("\\Tést.*\\tÄSte\\\\Toast\\.");

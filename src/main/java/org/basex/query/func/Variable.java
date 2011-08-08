@@ -9,8 +9,9 @@ import org.basex.query.QueryContext;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
+import org.basex.query.util.NSGlobal;
 import org.basex.query.util.Var;
-import org.basex.util.Xslt;
+import org.basex.util.TokenBuilder;
 
 /**
  * Statically available XQuery variables.
@@ -26,9 +27,9 @@ public enum Variable {
   FILEPATHSEP(FILEURI, "path-separator", Str.get(File.pathSeparator)),
 
   /** XSLT variable. */
-  XSLTPROC(XSLTURI, "processor", Str.get(Xslt.SAXON ? "Saxon" : "Java")),
+  XSLTPROC(XSLTURI, "processor", Str.get(FNXslt.get(true))),
   /** XSLT variable. */
-  XSLTVERSION(XSLTURI, "version", Str.get(Xslt.SAXON ? "2.0" : "1.0"));
+  XSLTVERSION(XSLTURI, "version", Str.get(FNXslt.get(false)));
 
   /** Variable name. */
   final QNm qname;
@@ -54,5 +55,11 @@ public enum Variable {
     for(final Variable v : values()) {
       ctx.vars.setGlobal(Var.create(ctx, null, v.qname, v.value));
     }
+  }
+
+  @Override
+  public final String toString() {
+    final byte[] pre = NSGlobal.prefix(qname.uri().atom());
+    return new TokenBuilder("$").add(pre).add(':').add(qname.ln()).toString();
   }
 }

@@ -114,7 +114,7 @@ public final class CreateDB extends ACreate {
     ctx.register(true);
     try {
       // close current database instance
-      final Data data = ctx.data;
+      final Data data = ctx.data();
       if(data != null) {
         Close.close(data, ctx);
         ctx.closeDB();

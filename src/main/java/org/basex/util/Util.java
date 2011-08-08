@@ -7,8 +7,6 @@ import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
-import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.server.LoginException;
@@ -23,7 +21,7 @@ import org.basex.server.LoginException;
  */
 public final class Util {
   /** Language (applied after restart). */
-  public static String language = MainProp.LANGUAGE[1].toString();
+  public static String language = LANGUAGE;
   /** Flag for showing language keys. */
   public static boolean langkeys;
   /** Debug mode. */
@@ -142,7 +140,7 @@ public final class Util {
   public static String server(final Exception ex) {
     debug(ex);
     if(ex instanceof BindException) return SERVERBIND;
-    else if(ex instanceof LoginException) return SERVERLOGIN;
+    else if(ex instanceof LoginException) return SERVERDENIED;
     else if(ex instanceof ConnectException) return SERVERERROR;
     else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
     else if(ex instanceof SocketException) return SERVERBIND;

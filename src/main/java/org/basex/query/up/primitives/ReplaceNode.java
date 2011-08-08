@@ -57,7 +57,7 @@ public final class ReplaceNode extends NodeCopy {
   }
 
   @Override
-  public boolean checkTextAdjacency(final int c) {
+  public boolean adjacentTexts(final int c) {
     final int p = pre + c;
     final int affectedPre = p;
     boolean merged = mergeTexts(data, affectedPre - 1, affectedPre);

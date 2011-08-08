@@ -37,7 +37,7 @@ public final class FNHof extends FuncCall {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
       case SORTWITH: return sortWith(ctx);
-      case HOFID:    return expr[0].iter(ctx);
+      case HOFID:
       case CONST:    return expr[0].iter(ctx);
       case UNTIL:    return until(ctx).iter();
       case ITERATE:  return iterate(ctx);
@@ -50,7 +50,7 @@ public final class FNHof extends FuncCall {
     switch(def) {
       case FOLDLEFT1: return foldLeft1(ctx);
       case UNTIL:     return until(ctx);
-      case HOFID:     return expr[0].value(ctx);
+      case HOFID:
       case CONST:     return expr[0].value(ctx);
       default:        return super.value(ctx);
     }
@@ -60,7 +60,7 @@ public final class FNHof extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case HOFID: return expr[0].item(ctx, ii);
+      case HOFID:
       case CONST: return expr[0].item(ctx, ii);
       default:    return super.item(ctx, ii);
     }

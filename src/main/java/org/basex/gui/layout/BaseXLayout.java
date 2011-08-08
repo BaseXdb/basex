@@ -200,14 +200,13 @@ public final class BaseXLayout {
       comp.addKeyListener(new KeyAdapter() {
         @Override
         public void keyPressed(final KeyEvent e) {
-          if(e.getSource() instanceof BaseXCombo) {
-            if(((BaseXCombo) e.getSource()).isPopupVisible()) return;
-          }
+          final Object s = e.getSource();
+          if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible())
+            return;
+
           // process key events
           if(ENTER.is(e)) {
-            final Object s = e.getSource();
-            if(!(s instanceof BaseXButton || s instanceof BaseXEditor))
-              d.close();
+            if(!(s instanceof BaseXButton)) d.close();
           } else if(ESCAPE.is(e)) {
             d.cancel();
           }
@@ -221,7 +220,7 @@ public final class BaseXLayout {
       @Override
       public void keyPressed(final KeyEvent e) {
         // browse back/forward
-        if(gui.context.data != null) {
+        if(gui.context.data() != null) {
           if(GOBACK.is(e)) {
             GUICommands.GOBACK.execute(gui);
           } else if(GOFORWARD.is(e)) {

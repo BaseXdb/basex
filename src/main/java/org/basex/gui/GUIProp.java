@@ -69,7 +69,7 @@ public final class GUIProp extends AProp {
   /** Flag for activated plot view. */
   public static final Object[] SHOWPLOT = { "SHOWPLOT", false };
   /** Flag for activated xquery view. */
-  public static final Object[] SHOWXQUERY = { "SHOWXQUERY", true };
+  public static final Object[] SHOWEDITOR = { "SHOWEDITOR", true };
   /** Flag for activated tree view. */
   public static final Object[] SHOWTREE = { "SHOWTREE", false };
 
@@ -168,6 +168,7 @@ public final class GUIProp extends AProp {
   public GUIProp() {
     super("gui");
     recent(null);
+    Prop.gui = true;
   }
 
   /**

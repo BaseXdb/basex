@@ -1,6 +1,7 @@
 package org.basex.gui.view;
 
 import static org.basex.core.Text.*;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -18,9 +19,9 @@ import org.basex.gui.layout.BaseXPanel;
  */
 final class ViewMover extends BaseXPanel {
   /** Size of splitter. */
-  private static final int SIZE = 8;
+  private static final int SIZE = 9;
   /** Flag if current mover is active. */
-  private boolean active;
+  boolean active;
 
   /**
    * Constructor.
@@ -28,6 +29,7 @@ final class ViewMover extends BaseXPanel {
    */
   ViewMover(final AGUI main) {
     super(HELPMOVER, main);
+    setLayout(new BorderLayout());
     BaseXLayout.setHeight(this, SIZE);
     addKeyListener(this);
     addMouseListener(this);
@@ -67,6 +69,7 @@ final class ViewMover extends BaseXPanel {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+    if(!active) return;
     Component comp = this;
     while(!((comp = comp.getParent()) instanceof ViewContainer));
     ((ViewContainer) comp).dropPanel();

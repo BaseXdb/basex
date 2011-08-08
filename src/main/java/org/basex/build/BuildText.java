@@ -28,7 +28,7 @@ public interface BuildText {
   String LIMITATTS = "%: Too many different attribute names (limit: %).";
 
   /** Parser error. */
-  String PARSEINVALID = "%: % expected, % found.";
+  String PARSEINV = "%: % expected, % found.";
   /** Parser error. */
   String DOCOPEN = "%: Closing tag </%> expected.";
 
@@ -68,10 +68,6 @@ public interface BuildText {
   String DECLENCODE = "Invalid encoding.";
   /** Scanner error. */
   String DECLSTANDALONE = "Invalid standalone attribute in declaration.";
-  /** Scanner error. */
-  String UNKNOWNENTITY = "Unknown entity '&%;'. Try 'set entity off'.";
-  /** Scanner error. */
-  String INVALIDENTITY = "Invalid entity '&%...'. Try 'set entity off'.";
   /** Scanner error. */
   String TYPEAFTER = "Misplaced document type definition.";
   /** Parser error. */
@@ -181,21 +177,21 @@ public interface BuildText {
 
   /** Token types. */
   enum Type {
-    /** Text node.              */ TEXT("Text"),
-    /** Comment.                */ COMMENT("Comment"),
-    /** Document type.          */ DTD("Document type"),
-    /** Processing instruction. */ PI("Processing instruction"),
+    /** Text node.              */ TEXT("text"),
+    /** Comment.                */ COMMENT("comment"),
+    /** Document type.          */ DTD("document type"),
+    /** Processing instruction. */ PI("processing instruction"),
     /** Opening bracket.        */ L_BR("'<'"),
-    /** Tag name.               */ TAGNAME("Tag name"),
-    /** Attribute name.         */ ATTNAME("Attribute name"),
+    /** Tag name.               */ TAGNAME("tag name"),
+    /** Attribute name.         */ ATTNAME("attribute name"),
     /** Closing bracket.        */ R_BR("'>'"),
-    /** Whitespace.             */ WS("Whitespace"),
-    /** Attribute value.        */ ATTVALUE("Attribute value"),
+    /** Whitespace.             */ WS("whitespace"),
+    /** Attribute value.        */ ATTVALUE("attribute value"),
     /** Empty bracket.          */ L_BR_CLOSE("'</'"),
     /** Closing end bracket.    */ CLOSE_R_BR("'/>'"),
     /** Equal sign.             */ EQ("'='"),
-    /** End of file.            */ EOF("End of File"),
-    /** Quote.                  */ QUOTE("Quote");
+    /** End of file.            */ EOF("end of file"),
+    /** Quote.                  */ QUOTE("quote");
 
     /** String representation of token type. */
     public final String string;

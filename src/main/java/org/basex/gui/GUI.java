@@ -201,7 +201,8 @@ public final class GUI extends AGUI {
             pop.setVisible(false);
           }
         };
-        final int i = context.data == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
+        final int i = context.data() == null ? 2 :
+          gprop.num(GUIProp.SEARCHMODE);
         final String[] hs = gprop.strings(i == 0 ? GUIProp.SEARCH : i == 1 ?
             GUIProp.XQUERY : GUIProp.COMMANDS);
         for(final String en : hs) {
@@ -325,7 +326,7 @@ public final class GUI extends AGUI {
    */
   public void xquery(final String qu, final boolean main) {
     // check and add default namespace
-    final Namespaces ns = context.data.ns;
+    final Namespaces ns = context.data().ns;
     String in = qu.trim().isEmpty() ? "()" : qu;
     final int u = ns.uri(Token.EMPTY, 0);
     if(u != 0) in = Util.info("declare default element namespace \"%\"; %",
@@ -383,14 +384,12 @@ public final class GUI extends AGUI {
       final Performance perf = new Performance();
 
       // reset current context if realtime filter is activated
-      final Data data = context.data;
-      if(gprop.is(GUIProp.FILTERRT) && context.current != null &&
-          !context.root()) {
-          context.current = new Nodes(data.doc().toArray(), data);
-      }
+      final Data data = context.data();
+      if(gprop.is(GUIProp.FILTERRT) && context.current() != null &&
+          !context.root()) context.update();
 
       // cache some variables before executing the command
-      final Nodes current = context.current;
+      final Nodes current = context.current();
       command = c;
 
       // execute command and cache result
@@ -445,7 +444,7 @@ public final class GUI extends AGUI {
           text.setText(ao, c);
         }
 
-        final Data ndata = context.data;
+        final Data ndata = context.data();
         Nodes marked = context.marked;
 
         if(ndata != data) {
@@ -455,7 +454,7 @@ public final class GUI extends AGUI {
           // update command
           notify.update();
         } else if(result != null) {
-          final Nodes nd = context.current;
+          final Nodes nd = context.current();
           final boolean flt = gprop.is(GUIProp.FILTERRT);
           if(flt || nd != null && !nd.sameAs(current)) {
             // refresh context if at least one node was found
@@ -515,12 +514,12 @@ public final class GUI extends AGUI {
  }
 
  /**
-  * Sets an admin property and displays the command in the info view.
+  * Sets a main property and displays the command in the info view.
   * @param pr property to be set
   * @param val value
   */
- public void setAdmin(final Object[] pr, final Object val) {
-   set(context.prop, pr, val);
+ public void setMain(final Object[] pr, final Object val) {
+   set(context.mprop, pr, val);
  }
 
  /**
@@ -609,7 +608,7 @@ public final class GUI extends AGUI {
     context.prop.set(Prop.QUERYINFO, inf);
     context.prop.set(Prop.XMLPLAN, inf);
 
-    final Data data = context.data;
+    final Data data = context.data();
     final int t = mode.getSelectedIndex();
     final int s = data == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
 
@@ -626,7 +625,7 @@ public final class GUI extends AGUI {
     toolbar.refresh();
     menu.refresh();
 
-    final int i = context.data == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
+    final int i = context.data() == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
     final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) : i == 1 ?
         gprop.strings(GUIProp.XQUERY) : gprop.strings(GUIProp.COMMANDS);
     hist.setEnabled(hs.length != 0);

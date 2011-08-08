@@ -31,11 +31,10 @@ final class DatabaseUpdates {
   /** Data reference. */
   private final Data data;
   /** Pre values of target nodes. */
-  protected IntList nodes = new IntList(0);
+  IntList nodes = new IntList(0);
   /** Mapping between pre values of the target nodes and all update primitives
    * which operate on this target. */
-  protected final IntMap<NodeUpdates> updatePrimitives =
-    new IntMap<NodeUpdates>();
+  final IntMap<NodeUpdates> updatePrimitives = new IntMap<NodeUpdates>();
 
   /**
    * Constructor.

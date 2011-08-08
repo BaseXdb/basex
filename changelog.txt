@@ -1,3 +1,35 @@
+Version 6.7.1 (July 28, 2011):
+
+  XQuery:
+  - New database functions for adding, deleting, renaming
+    and replacing documents, and optimizing databases:
+    http://docs.basex.org/wiki/Database_Functions
+  - XSLT transformations via Java or Saxon:
+    http://docs.basex.org/wiki/XSLT_Functions
+  - All XQuery 3.0 functions are now supported:
+    http://docs.basex.org/wiki/XQuery_3.0
+  - Tail-call optimizations to speed up recursive functions
+
+  Storage:
+  - Use ADDARCHIVES to parse files within archives
+  - Use SKIPCORRUPT to skip non-well-formed files when
+    creating a database: http://docs.basex.org/wiki/Options
+  - Max. level depth limit (256) removed
+  - The document index is now incrementally updated
+
+  GUI:
+  - "Manage Database" dialog now supports operations on
+    multiple databases and the command-line glob syntax:
+    http://docs.basex.org/wiki/Commands#Glob_Syntax
+  - Drag and drop operations introduced for opening new files
+    and copying file paths
+
+  Client/Server:
+  - Delay clients that repeatedly fail to login
+  - All remaining plain-text password operations now use
+    MD5 to send and log passwords
+
+
 Version 6.7 (June 30, 2011):
 
   Main Features:
@@ -21,6 +53,7 @@ Version 6.7 (June 30, 2011):
   [ADD] New commands added: REPLACE, RENAME,
         REPO DELETE/INSTALL/LIST, CREATE/DROP EVENT
   [MOD] BACKUP optimized, renamed to CREATE BACKUP
+
 
 Version 6.6.2 (May 13, 2011) Linuxtag release:
 
@@ -50,6 +83,7 @@ Version 6.6.2 (May 13, 2011) Linuxtag release:
   Core:
   [ADD] Internal XML parser: HTML entities added
   [FIX] Glob syntax: support for multiple file suffixes
+
 
 Version 6.6.1 (Mar 30, 2011) XML Prague release:
 

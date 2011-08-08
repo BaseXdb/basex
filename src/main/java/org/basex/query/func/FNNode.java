@@ -1,5 +1,7 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
@@ -11,9 +13,12 @@ import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
+import org.basex.query.iter.AxisIter;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.TokenList;
 
 /**
  * Node functions.
@@ -100,9 +105,56 @@ public final class FNNode extends FuncCall {
             QueryText.ID).addLong(checkNode(it).id).finish());
       case CHILDREN:
         return Bln.get(it != null && checkNode(it).children().next() != null);
+      case PATH:
+        if(it == null) return null;
+        return path(it);
       default:
         return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Performs the path function.
+   * @param it item to be resolved
+   * @return resulting iterator
+   * @throws QueryException query exception
+   */
+  private Str path(final Item it) throws QueryException {
+    final TokenList tl = new TokenList();
+    ANode n = checkNode(it);
+    while(n.parent() != null) {
+      int i = 1;
+      final TokenBuilder tb = new TokenBuilder();
+      if(n.type == NodeType.ATT) {
+        tb.add("@\"");
+        final QNm qnm = n.qname();
+        if(qnm.uri().atom().length != 0) tb.add(qnm.uri().atom());
+        tb.add("\":").add(qnm.ln());
+      } else if(n.type == NodeType.ELM) {
+        final QNm qnm = n.qname();
+        final AxisIter ai = n.precSibl();
+        for(ANode fs; (fs = ai.next()) != null;) if(fs.qname().eq(qnm)) i++;
+        tb.addExt("\"%\":%[%]", qnm.uri().atom(), qnm.ln(), i);
+      } else if(n.type == NodeType.COM || n.type == NodeType.TXT) {
+        final AxisIter ai = n.precSibl();
+        for(ANode fs; (fs = ai.next()) != null;) if(fs.type == n.type) i++;
+        tb.addExt(n.type() + "[%]", i);
+      } else if(n.type == NodeType.PI) {
+        final QNm qnm = n.qname();
+        final AxisIter ai = n.precSibl();
+        for(ANode fs; (fs = ai.next()) != null;) {
+          if(fs.type == n.type && fs.qname().eq(qnm)) i++;
+        }
+        tb.addExt("%(\"%\")[%]", n.type.nam(), qnm.ln(), i);
+      }
+      tl.add(tb.finish());
+      n = n.parent();
+    }
+    if(n.type != NodeType.DOC) IDDOC.thrw(input);
+
+    final TokenBuilder tb = new TokenBuilder();
+    for(int i = tl.size() - 1; i >= 0; --i) tb.add('/').add(tl.get(i));
+    return Str.get(tb.size() == 0 ? Token.SLASH : tb.finish());
   }
 
   @Override

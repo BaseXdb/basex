@@ -4,6 +4,8 @@ import org.junit.Test;
 
 /**
  * Tests for compiling function items.
+ *
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItemTest extends QueryPlanTest {

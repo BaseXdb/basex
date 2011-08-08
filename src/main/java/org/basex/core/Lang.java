@@ -56,6 +56,7 @@ public final class Lang {
    * @param chk check flag
    */
   private static synchronized void read(final String lang, final boolean chk) {
+    BufferedReader br = null;
     try {
       if(DISALLOW) throw new Error("Language file was accessed.");
       if(chk) check = new HashMap<String, Boolean>();
@@ -65,8 +66,7 @@ public final class Lang {
       if(is == null) {
         Util.errln("%." + SUFFIX + " not found.", lang);
       } else {
-        final BufferedReader br = new BufferedReader(new InputStreamReader(
-            is, Token.UTF8));
+        br = new BufferedReader(new InputStreamReader(is, Token.UTF8));
         for(String line; (line = br.readLine()) != null;) {
           final int i = line.indexOf('=');
           if(i == -1 || line.startsWith("#")) continue;
@@ -81,10 +81,11 @@ public final class Lang {
           }
           if(chk) check.put(key, true);
         }
-        br.close();
       }
     } catch(final IOException ex) {
       Util.errln(ex);
+    } finally {
+      if(br != null) try { br.close(); } catch(final IOException ex) { }
     }
   }
 

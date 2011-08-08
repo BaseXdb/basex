@@ -56,6 +56,11 @@ public final class MAB2Parser extends SingleParser {
   /** Temporary build data. */
   private final byte[][] inst = new byte[50][];
 
+  /** Flat database creation. */
+  private final boolean flat;
+  /** Input to be parsed. */
+  private final DataAccess input;
+
   /** Temporary build data. */
   private byte[] mvID;
   /** Temporary build data. */
@@ -101,23 +106,21 @@ public final class MAB2Parser extends SingleParser {
   /** Maximum id. */
   private int maxid;
 
-  /** Flat database creation. */
-  private final boolean flat;
-
   /**
    * Constructor.
-   * @param path file path
-   * @param ta database target
+   * @param source source data
+   * @param target database target
    * @param prop database properties
    * @throws IOException I/O exception
    */
-  public MAB2Parser(final IO path, final String ta, final Prop prop)
+  public MAB2Parser(final IO source, final String target, final Prop prop)
       throws IOException {
 
-    super(path, ta);
+    super(source, target);
     // set parser properties
     final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
     flat = props.is(ParserProp.FLAT);
+    input = new DataAccess(new File(source.path()));
   }
 
   @Override
@@ -137,9 +140,6 @@ public final class MAB2Parser extends SingleParser {
       final int id = toInt(mvids.value(i));
       if(maxid < id) maxid = id;
     }
-
-    // create input reference
-    final DataAccess input = new DataAccess(new File(src.path()));
 
     // check beginning of input file
     if(input.read1() != '#' || input.read1() != '#' || input.read1() != '#') {
@@ -191,13 +191,8 @@ public final class MAB2Parser extends SingleParser {
       }
       if(entry.size != 0 && pos != 0 && !flat) builder.endElem(MEDIUM);
     }
-
-    if(Util.debug) {
-      Util.err("\nCreate Titles: %/%\n", p, Performance.getMem());
-    }
-
+    if(Util.debug) Util.err("\nCreate Titles: %/%\n", p, Performance.getMem());
     builder.endElem(LIBRARY);
-    input.close();
 
     // write the mediovis ids back to disk
     final PrintOutput out = new PrintOutput("mvids.dat");
@@ -207,6 +202,11 @@ public final class MAB2Parser extends SingleParser {
       out.println(mvids.value(i));
     }
     out.close();
+  }
+
+  @Override
+  public void close() throws IOException {
+    input.close();
   }
 
   /**
@@ -219,7 +219,7 @@ public final class MAB2Parser extends SingleParser {
       if(in.read1() != '\n') continue;
       final int n = in.read1();
       if(n == '0' && in.read1() == '0' && in.read1() == '1') {
-        off = in.pos() - 3;
+        off = in.cursor() - 3;
         return ident(in);
       }
     }

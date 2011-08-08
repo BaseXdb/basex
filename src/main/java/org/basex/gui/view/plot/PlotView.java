@@ -296,7 +296,7 @@ public final class PlotView extends View {
 
     g.setFont(font);
     g.setColor(Color.black);
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     final boolean nd = data == null || !data.meta.pathindex;
     if(nd || plotWidth - sz < 0 || plotHeight - sz < 0) {
       BaseXLayout.drawCenter(g, nd ? NODATA : NOSPACE, w, h / 2 - MARGIN[0]);
@@ -401,7 +401,7 @@ public final class PlotView extends View {
    * Draws marked nodes.
    */
   private void createMarkedNodes() {
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     markedImg = new BufferedImage(getWidth(), getHeight(),
         Transparency.BITMASK);
     final Graphics gi = markedImg.getGraphics();
@@ -816,7 +816,7 @@ public final class PlotView extends View {
   public void refreshContext(final boolean more, final boolean quick) {
     // all plot data is recalculated, assignments stay the same
     plotData.refreshItems(nextContext != null && more && rightClick ?
-        nextContext : gui.context.current, !more || !rightClick);
+        nextContext : gui.context.current(), !more || !rightClick);
     plotData.xAxis.log = gui.gprop.is(GUIProp.PLOTXLOG);
     plotData.xAxis.refreshAxis();
     plotData.yAxis.log = gui.gprop.is(GUIProp.PLOTYLOG);
@@ -839,7 +839,7 @@ public final class PlotView extends View {
   public void refreshInit() {
     plotData = null;
 
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     if(data == null || !visible()) return;
 
     plotData = new PlotData(gui.context);
@@ -1074,7 +1074,7 @@ public final class PlotView extends View {
       if(selectionBox.contains(x, y)) il.add(plotData.pres[i]);
     }
 
-    gui.notify.mark(new Nodes(il.toArray(), gui.context.data), this);
+    gui.notify.mark(new Nodes(il.toArray(), gui.context.data()), this);
     nextContext = gui.context.marked;
     drawSubNodes = false;
     markingChanged = true;
@@ -1102,7 +1102,7 @@ public final class PlotView extends View {
     if(r) { rightClick = true; return; }
     // no item is focused. no nodes marked after mouse click
     if(gui.context.focused == -1) {
-      gui.notify.mark(new Nodes(gui.context.data), this);
+      gui.notify.mark(new Nodes(gui.context.data()), this);
       return;
     }
 
@@ -1119,12 +1119,12 @@ public final class PlotView extends View {
     } else if(e.getClickCount() == 2) {
       // context change also self implied, thus right click set to true
       rightClick = true;
-      final Nodes marked = new Nodes(gui.context.data);
+      final Nodes marked = new Nodes(gui.context.data());
       marked.union(il);
       gui.notify.context(marked, false, null);
       // simple mouse click
     } else {
-      final Nodes marked = new Nodes(il, gui.context.data);
+      final Nodes marked = new Nodes(il, gui.context.data());
       gui.notify.mark(marked, this);
     }
     nextContext = gui.context.marked;

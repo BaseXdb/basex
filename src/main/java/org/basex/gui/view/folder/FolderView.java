@@ -82,7 +82,7 @@ public final class FolderView extends View {
   public void refreshInit() {
     scroll.pos(0);
 
-    if(gui.context.data == null) {
+    if(gui.context.data() == null) {
       opened = null;
     } else if(visible()) {
       refreshOpenedNodes();
@@ -95,7 +95,7 @@ public final class FolderView extends View {
    * Refreshes opened nodes.
    */
   private void refreshOpenedNodes() {
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     opened = new boolean[data.meta.size];
     final int is = data.meta.size;
     for(int pre = 0; pre < is; ++pre) {
@@ -114,7 +114,7 @@ public final class FolderView extends View {
     if(pre == -1) return;
 
     // jump to the currently marked node
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     final int par = data.parent(pre, data.kind(pre));
     // open node if it's not visible
     jumpTo(pre, par != -1 && !opened[par]);
@@ -126,7 +126,7 @@ public final class FolderView extends View {
     startY = 0;
     scroll.pos(0);
 
-    final Nodes curr = gui.context.current;
+    final Nodes curr = gui.context.current();
     if(more && curr.size() != 0) jumpTo(curr.list[0], true);
     refreshHeight();
     repaint();
@@ -144,7 +144,7 @@ public final class FolderView extends View {
   @Override
   public void refreshUpdate() {
     if(opened == null) return;
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     if(opened.length < data.meta.size)
       opened = Arrays.copyOf(opened, data.meta.size);
 
@@ -196,7 +196,7 @@ public final class FolderView extends View {
     totalW = getWidth() - (treeH > getHeight() ? scroll.getWidth() : 0);
 
     final FolderIterator it = new FolderIterator(this, startY + 5, getHeight());
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     while(it.more()) {
       final int kind = data.kind(it.pre);
       final boolean elem = kind == Data.ELEM || kind == Data.DOC;
@@ -215,7 +215,7 @@ public final class FolderView extends View {
    */
   private void drawString(final Graphics g, final int pre, final int x,
       final int y) {
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     final Nodes marked = gui.context.marked;
 
     final int kind = data.kind(pre);
@@ -275,7 +275,7 @@ public final class FolderView extends View {
     if(opened == null) return false;
 
     final FolderIterator it = new FolderIterator(this, startY + 3, getHeight());
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     while(it.more()) {
       if(y > it.y && y <= it.y + lineH) {
         Cursor c = CURSORARROW;
@@ -306,7 +306,7 @@ public final class FolderView extends View {
       int p = pre;
       while(p > 0) {
         opened[p] = true;
-        p = ViewData.parent(gui.context.data, p);
+        p = ViewData.parent(gui.context.data(), p);
       }
       refreshHeight();
     }
@@ -431,8 +431,8 @@ public final class FolderView extends View {
     int focus = focusedPos == -1 ? 0 : focusedPos;
     if(gui.context.focused == -1) gui.context.focused = 0;
     final int focusPre = gui.context.focused;
-    final Data data = gui.context.data;
-    int kind = data.kind(focusPre);
+    final Data data = gui.context.data();
+    final int kind = data.kind(focusPre);
 
     final boolean right = NEXT.is(e);
     boolean down = NEXTLINE.is(e);
@@ -443,10 +443,8 @@ public final class FolderView extends View {
         opened[focusPre] = right;
         final int s = data.meta.size;
         for(int pre = focusPre + 1;
-          pre != s && data.parent(pre, data.kind(pre)) >= focusPre;
-          pre += 1) {
+          pre != s && data.parent(pre, data.kind(pre)) >= focusPre; pre++) {
           opened[pre] = right;
-          kind = data.kind(pre);
         }
         refreshHeight();
         repaint();
@@ -482,7 +480,7 @@ public final class FolderView extends View {
 
     // calculate new tree position
     gui.context.focused = -1;
-    final Nodes curr = gui.context.current;
+    final Nodes curr = gui.context.current();
     int pre = curr.list[0];
     final FolderIterator it = new FolderIterator(this);
     while(it.more() && focus-- != 0) pre = it.pre;

@@ -119,11 +119,14 @@ public final class Args {
   }
 
   /**
-   * Set ok flag.
-   * @param o ok flag
+   * Combines the specified boolean with the {@link #ok} flag with the AND
+   * operator, and returns the result.
+   * @param o ok flag to be combined
+   * @return resulting ok flag
    */
-  public void check(final boolean o) {
-    ok = o;
+  public boolean ok(final boolean o) {
+    ok &= o;
+    return ok;
   }
 
   /**

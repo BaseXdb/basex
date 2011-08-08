@@ -72,7 +72,7 @@ public final class Add extends ACreate {
       io.name(name);
     } else if(io instanceof IOContent) {
       // if no name exists, set database name as document name
-      name = context.data.meta.name + IO.XMLSUFFIX;
+      name = context.data().meta.name + IO.XMLSUFFIX;
       io.name(name);
     }
 
@@ -106,7 +106,7 @@ public final class Add extends ACreate {
       final InputSource input, final Context ctx, final Add cmd,
       final boolean lock) throws BaseXException {
 
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     if(data == null) return PROCNODB;
 
     String trg = path(target);
@@ -137,6 +137,7 @@ public final class Add extends ACreate {
       throws BaseXException {
 
     final Performance p = new Performance();
+    final String input = name == null ? parser.src.path() : name;
     final String path = target + (target.isEmpty() ? "/" : "") +
         (name == null ? parser.src.name() : name);
 
@@ -151,7 +152,7 @@ public final class Add extends ACreate {
     }
 
     // create random database name
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     final String dbname = large ? ctx.mprop.random(data.meta.name) : path;
     final Builder build = large ? new DiskBuilder(dbname, parser, ctx) :
       new MemBuilder(dbname, parser, ctx.prop);
@@ -166,12 +167,13 @@ public final class Add extends ACreate {
         ctx.update();
         data.flush();
       }
-      return Util.info(PATHADDED, path, p);
+      return Util.info(parser.info() + PATHADDED, input, p);
     } catch(final IOException ex) {
       Util.debug(ex);
       throw new BaseXException(ex);
     } finally {
       // close and drop intermediary database instance
+      try { build.close(); } catch(final IOException e) { }
       if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
       if(large) DropDB.drop(dbname, ctx.mprop);
     }

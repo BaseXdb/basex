@@ -62,7 +62,7 @@ public class TokenSet implements Iterable<byte[]> {
    * @throws IOException I/O exception
    */
   public final void read(final DataInput in) throws IOException {
-    keys = in.readBytesArray();
+    keys = in.readTokens();
     next = in.readNums();
     bucket = in.readNums();
     size = in.readNum();

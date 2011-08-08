@@ -49,12 +49,14 @@ public interface Text {
   String UPDATE_URL = URL + "/products/download/all-downloads/";
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
-  /** Code version. */
-  String VERSION = "6.7.1 beta";
+  /** Code version (must contain major, minor and optional patch number). */
+  String VERSION = "6.7.2 beta";
   /** Company info. */
   String COMPANY = NAME + " Team";
   /** Title and version. */
   String TITLE = NAME + ' ' + VERSION;
+  /** Default language. */
+  String LANGUAGE = "English";
 
   // CONSOLE INFO =============================================================
 
@@ -92,7 +94,7 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-npPU] [-dosvVwz] [-cq] [file]" + NL +
+    " [-dnopPsUvVwz] [-cq] [file]" + NL +
     "  [file]     Execute XQuery file" + NL +
     "  -b<pars>   Bind external XQuery variables" + NL +
     "  -c<cmd>    Execute database command(s)" + NL +
@@ -157,7 +159,7 @@ public interface Text {
   /** Connection error. */
   String SERVERERROR = lang("srv_connect");
   /** Access denied. */
-  String SERVERLOGIN = lang("srv_login");
+  String SERVERDENIED = lang("srv_denied");
   /** User name. */
   String SERVERUSER = lang("srv_user");
   /** Password. */
@@ -474,6 +476,10 @@ public interface Text {
   String FILEWHICH = lang("pc_filenf");
   /** Path not found. */
   String PATHWHICH = lang("pc_pathnf");
+  /** Skipped corrupt files. */
+  String SKIPCORRUPT = lang("pc_skipped");
+  /** Info on skipped corrupt files. */
+  String SKIPINFO = lang("pc_skipinfo");
   /** Missing database name. */
   String DBWHICH = lang("pc_dbnf");
   /** Language not supported. */
@@ -739,8 +745,6 @@ public interface Text {
   String INFOSERIALIZE = lang("info_serialize");
   /** Info on whitespace chopping. */
   String INFOCHOP = lang("info_chop");
-  /** Info on entity parsing. */
-  String INFOENTITY = lang("info_entities");
   /** Info on text indexing. */
   String INFOTEXTINDEX = lang("info_txtindex");
   /** Info on attribute indexing. */
@@ -787,11 +791,11 @@ public interface Text {
   /** Menu entry. */
   String MENUDB = lang("m_db");
   /** Menu entry. */
-  String MENUEDIT = lang("m_edit");
-  /** Menu entry. */
   String MENUQUERY = lang("m_query");
   /** Menu entry. */
   String MENUVIEW = lang("m_view");
+  /** Menu entry. */
+  String MENUNODES = lang("m_nodes");
   /** Menu entry. */
   String MENUOPTIONS = lang("m_options");
   /** Menu entry. */
@@ -1129,14 +1133,14 @@ public interface Text {
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Whitespaces information. */
   String CREATECHOP = lang("dc_chop");
-  /** Entities information. */
-  String CREATEENTITIES = lang("dc_entities");
   /** DTD information. */
   String CREATEDTD = lang("dc_dtd");
   /** Internal parser. */
   String CREATEINTPARSE = lang("dc_intparse");
   /** Parse archives. */
   String CREATEARCHIVES = lang("dc_archives");
+  /** Skip corrupt files. */
+  String CREATECORRUPT = lang("dc_corrupt");
   /** SAX parsing information. */
   String CREATEFORMAT = lang("dc_createformat") + COLS;
 

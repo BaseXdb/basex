@@ -19,6 +19,7 @@ import java.util.jar.JarFile;
  * http://snipplr.com/view/24224/class-loader-which-close-opened-jar-files/ and
  * slightly modified.
  *
+ * @author Vitali Yemialyanchyk, www.stopka.us
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */

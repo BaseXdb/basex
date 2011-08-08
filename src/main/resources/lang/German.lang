@@ -8,9 +8,9 @@ version=Version
 
 # Menu Commands
 m_db=Datenbank
-m_edit=Bearbeiten
-m_view=Ansicht
 m_query=Anfrage
+m_view=Ansicht
+m_nodes=Knoten
 m_options=Optionen
 m_help=Hilfe
 
@@ -65,9 +65,9 @@ dc_advtitle=Datenbank-Optionen
 dc_chop=Leerzeichen entfernen
 dc_intparse=Internen XML-Parser benutzen
 dc_archives=Archivdateien parsen
+dc_corrupt=Skip corrupt (non-well-formed) files
 dc_createformat=Eingabe-Format
-dc_entities=Parsen von Entities
-dc_dtd=Parsen von DTDs
+dc_dtd=Parsen von DTDs und Entities
 dc_usecat=Use XML Catalog file
 dc_usecathlp=To enable catalog resolving make sure the
 dc_usecathlp2=Apache XML Commons Resolver is on your classpath.
@@ -356,6 +356,8 @@ pc_renamed=% Dokumentpfad(e) umbenannt (%).
 pc_replaced=% Dokument(e) wurden ersetzt (%).
 pc_filenf=Die Datei "%" wurde nicht gefunden.
 pc_pathnf=Datei oder Verzeichnis nicht gefunden.
+pc_skipped=Übersprungen
+pc_skipinfo=% weitere Datei(en) übersprungen
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
 pc_langnf=Sprache '%' wird nicht unterstützt.
 pc_err="%" konnte nicht eingelesen werden.
@@ -395,7 +397,7 @@ in_notdropped=Index '%' konnte nicht gelöscht werden.
 in_notavl=Nicht verfügbar
 
 # Server Info
-srv_login=Zugriff wurde verweigert.
+srv_denied=Zugriff wurde verweigert.
 srv_connect=Server ist nicht erreichbar.
 srv_timeout=Prozess hat Time-Out überschritten.
 srv_bind=Server läuft, oder der Zugriff wurde untersagt.
@@ -491,7 +493,6 @@ info_dberror=konnte nicht geöffnet werden.
 info_query=Anfrage-Info
 info_debug=Debug-Modus
 info_chop=Entfernung von Leerzeichen
-info_entities=Parsen von Entities
 info_serialize=Serialisierung
 info_tags=Tags
 info_atts=Attribute

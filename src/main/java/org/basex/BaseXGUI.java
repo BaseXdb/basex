@@ -61,9 +61,7 @@ public final class BaseXGUI {
 
     // read properties
     context.prop.set(Prop.CACHEQUERY, true);
-    Prop.gui = true;
     final GUIProp gprop = new GUIProp();
-
     GUIConstants.init(gprop);
 
     SwingUtilities.invokeLater(new Runnable() {
@@ -130,7 +128,7 @@ public final class BaseXGUI {
     final Args arg = new Args(args, this, GUIINFO, Util.info(CONSOLE, GUIMODE));
     while(arg.more()) {
       if(arg.dash()) {
-        arg.check(false);
+        arg.ok(false);
       } else {
         file = file == null ? arg.string() : file + " " + arg.string();
       }

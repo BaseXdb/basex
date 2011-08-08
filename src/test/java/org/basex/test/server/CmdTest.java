@@ -121,7 +121,6 @@ public class CmdTest {
     ok(new CreateDB(NAME));
     ok(new Add(FILE, FN));
     ok(new Add(FILE, FN, "target"));
-    ok(new Add(FLDR, "xml"));
     no(new Add(FILE, "\\"));
     no(new Add(FILE, "/"));
   }
@@ -221,11 +220,11 @@ public class CmdTest {
     no(new Cs("//li"));
     ok(new CreateDB(NAME, FILE));
     ok(new Cs("//  li"));
-    ok(CONTEXT.current, 2);
+    ok(CONTEXT.current(), 2);
     ok(new Cs("."));
-    ok(CONTEXT.current, 2);
+    ok(CONTEXT.current(), 2);
     ok(new Cs("/"));
-    ok(CONTEXT.current, 1);
+    ok(CONTEXT.current(), 1);
   }
 
   /** Command test. */
@@ -410,7 +409,7 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void password() {
-    ok(new Password(md5("admin")));
+    ok(new Password(md5(Text.ADMIN)));
     no(new Password(""));
   }
 
@@ -502,7 +501,7 @@ public class CmdTest {
 
   /** Command test. */
   @Test
-  public final void xQuery() {
+  public final void xquery() {
     no(new XQuery("/"));
     ok(new CreateDB(NAME, FILE));
     ok(new XQuery("/"));

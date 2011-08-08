@@ -29,4 +29,20 @@ public abstract class BaseXSyntax {
    * @return color
    */
   public abstract Color getColor(final BaseXTextTokens tokens);
+
+  /**
+   * Returns the start of a comment.
+   * @return comment start
+   */
+  public String commentOpen() {
+    return "";
+  }
+
+  /**
+   * Returns the end of a comment.
+   * @return comment end
+   */
+  public String commentEnd() {
+    return "";
+  }
 }

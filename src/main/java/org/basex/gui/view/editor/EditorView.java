@@ -84,7 +84,7 @@ public final class EditorView extends View {
   /** Scroll Pane. */
   private final BaseXBack south;
   /** Execute button. */
-  private final BaseXButton go;
+  final BaseXButton go;
   /** Filter button. */
   private final BaseXButton filter;
 
@@ -220,6 +220,7 @@ public final class EditorView extends View {
       @Override
      public void actionPerformed(final ActionEvent e) {
         stop.setEnabled(false);
+        go.setEnabled(false);
         info.setText(OK, Msg.SUCCESS);
         gui.stop();
       }
@@ -278,12 +279,12 @@ public final class EditorView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWXQUERY);
+    return gui.gprop.is(GUIProp.SHOWEDITOR);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWXQUERY, v);
+    gui.gprop.set(GUIProp.SHOWEDITOR, v);
   }
 
   @Override
@@ -417,11 +418,18 @@ public final class EditorView extends View {
     new Thread() {
       @Override
       public void run() {
+        // prevent updating queries from interruption as this may corrupt
+        // the database
+        if(gui.updating)
+          go.setEnabled(false);
+
         Performance.sleep(200);
         if(thread == threadID) {
           info.setToolTipText(null);
           info.setText(INFOWAIT, Msg.SUCCESS);
-          stop.setEnabled(true);
+          // only allow non-updating queries to be interrupted
+          if(!gui.updating)
+            stop.setEnabled(true);
         }
       }
     }.start();
@@ -440,6 +448,7 @@ public final class EditorView extends View {
         ok ? Msg.SUCCESS : Msg.ERROR);
     info.setToolTipText(ok ? null : inf);
     stop.setEnabled(false);
+    go.setEnabled(true);
   }
 
   /**

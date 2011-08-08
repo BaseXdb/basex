@@ -69,7 +69,7 @@ public final class TableView extends View implements Runnable {
     tdata.rootRows = null;
     tdata.rows = null;
 
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     if(!visible() || data == null || !data.meta.pathindex) return;
     tdata.init(data);
     refreshContext(true, false);
@@ -107,7 +107,7 @@ public final class TableView extends View implements Runnable {
     final Context context = gui.context;
     final Nodes marked = context.marked;
     if(marked.size() != 0) {
-      final int p = tdata.getRoot(context.data, marked.list[0]);
+      final int p = tdata.getRoot(context.data(), marked.list[0]);
       if(p != -1) setPos(p);
     }
     repaint();
@@ -207,7 +207,7 @@ public final class TableView extends View implements Runnable {
     if(valid) {
       final int pre = tdata.rows.get(l);
       final Context context = gui.context;
-      final TableIterator it = new TableIterator(context.data, tdata);
+      final TableIterator it = new TableIterator(context.data(), tdata);
       final int c = tdata.column(getWidth() - BaseXBar.SIZE, tdata.mouseX);
       it.init(pre);
       while(it.more()) {
@@ -260,12 +260,12 @@ public final class TableView extends View implements Runnable {
       }
     } else {
       if(pre != -1) {
-        final TableIterator it = new TableIterator(context.data, tdata);
+        final TableIterator it = new TableIterator(context.data(), tdata);
         final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
         it.init(pre);
         while(it.more()) {
           if(it.col == c) {
-            gui.notify.mark(new Nodes(it.pre, context.data), null);
+            gui.notify.mark(new Nodes(it.pre, context.data()), null);
             return;
           }
         }
@@ -296,7 +296,7 @@ public final class TableView extends View implements Runnable {
     if(tdata.rows == null) return;
 
     final int lines = (getHeight() - header.getHeight()) / tdata.rowH;
-    final int oldPre = tdata.getRoot(gui.context.data, gui.context.focused);
+    final int oldPre = tdata.getRoot(gui.context.data(), gui.context.focused);
     int pre = oldPre;
 
     final IntList rows = tdata.rows;

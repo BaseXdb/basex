@@ -7,7 +7,7 @@ import org.basex.data.MemData;
 import org.junit.Test;
 
 /**
- * This class tests the update features of the Data class.
+ * This class tests the update features of the {@link Data} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Tim Petrowsky
@@ -19,7 +19,7 @@ public final class UpdateTestText extends UpdateTest {
    */
   @Test
   public void testInsertTextAsOnly1() throws IOException {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(3, 0, JUNIT, Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -47,7 +47,7 @@ public final class UpdateTestText extends UpdateTest {
    */
   @Test
   public void testInsertTextAsOnly2() throws IOException {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(3, 1, JUNIT, Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -75,7 +75,7 @@ public final class UpdateTestText extends UpdateTest {
    */
   @Test
   public void testInsertTextAsOnly3() throws IOException {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(3, 2, JUNIT, Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -103,7 +103,7 @@ public final class UpdateTestText extends UpdateTest {
    */
   @Test
   public void testInsertTextAfterAttsAsFirst() throws IOException {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(6, 1, JUNIT, Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -129,7 +129,7 @@ public final class UpdateTestText extends UpdateTest {
    */
   @Test
   public void testInsertTextAfterAttsAsSecond() throws IOException {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(6, 2, JUNIT, Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -156,7 +156,7 @@ public final class UpdateTestText extends UpdateTest {
    */
   @Test
   public void testInsertTextAfterAttsAsLast() throws IOException {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(6, 0, JUNIT, Data.TEXT);
     assertEquals(size + 1, data.meta.size);
@@ -208,7 +208,7 @@ public final class UpdateTestText extends UpdateTest {
    */
   @Test
   public void testUpdateText() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     data.update(10, Data.TEXT, JUNIT);
     assertEquals(Data.TEXT, data.kind(10));
     assertArraysEquals(JUNIT, data.text(10, true));
@@ -228,7 +228,7 @@ public final class UpdateTestText extends UpdateTest {
   private void insertText(final int par, final int pos, final byte[] val,
       final byte kind) throws IOException {
 
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     int pre = par;
     int k = data.kind(pre);
     if(pos == 0) {
@@ -243,7 +243,7 @@ public final class UpdateTestText extends UpdateTest {
         data.kind(pre - 1)) == par && data.kind(pre - 1) == Data.TEXT))
       throw new IOException("May not insert TEXT before/after TEXT!");
 
-    final MemData md = new MemData(CONTEXT.data);
+    final MemData md = new MemData(CONTEXT.data());
     md.text(0, pre - par, val, kind);
     md.insert(0);
     data.insert(pre, par, md);

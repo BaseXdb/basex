@@ -103,10 +103,10 @@ public final class FNUtil extends FuncCall {
   private Value eval(final QueryContext ctx, final byte[] qu)
       throws QueryException {
 
-    final QueryContext qt = new QueryContext(ctx.context);
-    qt.parse(string(qu));
-    qt.compile();
-    return qt.value();
+    final QueryContext qc = new QueryContext(ctx.context);
+    qc.parse(string(qu));
+    qc.compile();
+    return qc.value();
   }
 
   /**

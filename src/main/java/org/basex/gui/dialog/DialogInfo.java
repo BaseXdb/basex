@@ -63,7 +63,7 @@ public final class DialogInfo extends Dialog {
     tab1.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(8, 8, 8, 8)));
 
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     final MetaData meta = data.meta;
 
     final Font f = tab1.getFont();
@@ -232,7 +232,7 @@ public final class DialogInfo extends Dialog {
     opt = cmp == optimize;
     if(opt) close();
     if(ft != null) ft.action(indexes[3].isSelected());
-    enableOK(buttons, BUTTONOPT, !gui.context.data.meta.uptodate);
+    enableOK(buttons, BUTTONOPT, !gui.context.data().meta.uptodate);
   }
 
   @Override

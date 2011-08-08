@@ -101,7 +101,7 @@ public final class DialogInput extends Dialog {
         if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
       }
     } else {
-      final int docs = in.isEmpty() ? 0 : gui.context.data.doc(in).size();
+      final int docs = in.isEmpty() ? 0 : gui.context.data().doc(in).size();
       msg = Util.info(DELETEPATH, docs);
       ok = docs != 0;
     }

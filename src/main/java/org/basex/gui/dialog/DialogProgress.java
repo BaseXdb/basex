@@ -2,7 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,6 +25,8 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class DialogProgress extends Dialog implements ActionListener {
+  /** Maximum value of progress bar. */
+  private static final int MAX = 500;
   /** Refresh action. */
   private final Timer timer = new Timer(100, this);
   /** Information label. */
@@ -36,8 +37,6 @@ public final class DialogProgress extends Dialog implements ActionListener {
   private final Command command;
   /** Progress bar. */
   private final JProgressBar bar;
-  /** Current progress length. */
-  private final int ww;
 
   /**
    * Default constructor.
@@ -52,15 +51,12 @@ public final class DialogProgress extends Dialog implements ActionListener {
     set(info, BorderLayout.NORTH);
 
     if(cmd.supportsProg()) {
-      ww = 320;
-      bar = new JProgressBar(0, ww);
-      bar.setPreferredSize(new Dimension(ww, 16));
+      bar = new JProgressBar(0, MAX);
       set(bar, BorderLayout.CENTER);
     } else {
-      BaseXLayout.setWidth(info, 500);
       bar = null;
-      ww = 0;
     }
+    BaseXLayout.setWidth(info, MAX);
 
     final BaseXBack s = new BaseXBack(new BorderLayout()).border(10, 0, 0, 0);
     final BaseXBack m = new BaseXBack(new TableLayout(1, 2, 5, 0));
@@ -104,7 +100,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
     final String detail = command.detail();
     info.setText(detail.isEmpty() ? " " : detail);
     mem.repaint();
-    if(bar != null) bar.setValue((int) (command.progress() * ww));
+    if(bar != null) bar.setValue((int) (command.progress() * MAX));
   }
 
   /**

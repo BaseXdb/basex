@@ -406,7 +406,7 @@ public class IntList extends ElementList {
    */
   private int m(final int a, final int b, final int c) {
     return list[a] < list[b] ?
-      (list[b] < list[c] ? b : list[a] < list[c] ? c : a) :
+      list[b] < list[c] ? b : list[a] < list[c] ? c : a :
       list[b] > list[c] ? b : list[a] > list[c] ? c : a;
   }
 

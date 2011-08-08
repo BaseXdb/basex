@@ -24,7 +24,7 @@ public final class Delete extends ACreate {
 
   @Override
   protected boolean run() {
-    final Data data = context.data;
+    final Data data = context.data();
     final IntList docs = data.doc(args[0]);
     delete(context, docs);
     return info(PATHDELETED, docs.size(), perf);
@@ -40,7 +40,7 @@ public final class Delete extends ACreate {
     if(docs.size() == 0) return;
 
     // loop through all documents in reverse order
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
     ctx.update();
     data.flush();

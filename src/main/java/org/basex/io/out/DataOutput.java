@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.basex.io.IO;
+import org.basex.util.Num;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
 
@@ -16,7 +17,6 @@ import org.basex.util.list.IntList;
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
- * @author Tim Petrowsky
  */
 public final class DataOutput extends OutputStream {
   /** The underlying output stream. */
@@ -25,17 +25,15 @@ public final class DataOutput extends OutputStream {
   private long size;
 
   /**
-   * Constructor writing to an output stream.
-   * Writes to the stream will not be buffered.
-   * @param out Output Stream to operate on
+   * Constructor, specifying an output stream.
+   * @param out output stream to operate on
    */
   public DataOutput(final OutputStream out) {
     os = out;
   }
 
   /**
-   * Convenience constructor.
-   * A default buffer size will be used.
+   * Constructor, specifying a file.
    * @param db name of the database
    * @throws IOException I/O exception
    */
@@ -44,7 +42,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Convenience constructor with a specified buffer size.
+   * Constructor, specifying a file and a buffer size.
    * The specified buffer size is used.
    * @param db name of the database
    * @param bufs size of the buffer to use
@@ -61,7 +59,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified bytes to the output stream.
+   * Writes a byte array.
    * @param bytes array to be written
    * @throws IOException I/O exception
    */
@@ -70,7 +68,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes a boolean value to the output stream.
+   * Writes a boolean value.
    * @param b boolean value
    * @throws IOException I/O exception
    */
@@ -79,7 +77,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes a string to the output stream.
+   * Writes a string.
    * @param s string
    * @throws IOException I/O exception
    */
@@ -88,7 +86,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified token to the output stream.
+   * Writes a token.
    * @param tok array to be written
    * @return number of written bytes
    * @throws IOException I/O exception
@@ -100,7 +98,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified double value to the output stream.
+   * Writes a double value.
    * @param num array to be written
    * @return number of written bytes
    * @throws IOException I/O exception
@@ -110,8 +108,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified tokens to the output stream; {@code null} references
-   * are replaced by an empty array.
+   * Writes tokens. {@code null} references are replaced by an empty array.
    * @param array array to be written
    * @throws IOException I/O exception
    */
@@ -121,7 +118,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified array as distances to the output stream.
+   * Writes distances between integers.
    * @param array array to be written
    * @throws IOException I/O exception
    */
@@ -137,7 +134,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified nums to the output stream.
+   * Writes compressed numbers; see {@link Num} for more.
    * @param array array to be written
    * @throws IOException I/O exception
    */
@@ -147,7 +144,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Compresses and writes an integer value to the specified output stream.
+   * Writes a compressed integer value; see {@link Num} for more.
    * By compressing, the size of the database files is reduced.
    * @param v value to be written
    * @return number of written values
@@ -171,7 +168,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified longs to the output stream.
+   * Writes long values.
    * NOTE: the long values are not compressed!
    * @param array array to be written
    * @throws IOException I/O exception
@@ -182,7 +179,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes a long value to the specified output stream.
+   * Writes a long value.
    * @param v value to be written
    * @throws IOException I/O exception
    */
@@ -198,7 +195,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes an integer value to the specified output stream.
+   * Writes an integer value.
    * @param v value to be written
    * @throws IOException I/O exception
    */
@@ -210,7 +207,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes a byte value to the specified output stream.
+   * Writes a byte value.
    * @param v value to be written
    * @throws IOException I/O exception
    */
@@ -219,7 +216,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes a short value to the specified output stream.
+   * Writes a short value.
    * @param v value to be written
    * @throws IOException I/O exception
    */
@@ -229,7 +226,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes an long value to the specified output stream.
+   * Writes 5 bytes of a long value.
    * @param v value to be written
    * @throws IOException I/O exception
    */

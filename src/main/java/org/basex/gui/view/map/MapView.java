@@ -108,7 +108,7 @@ public final class MapView extends View implements Runnable {
     textLen = null;
     zoomStep = 0;
 
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     final GUIProp gprop = gui.gprop;
     if(data != null && visible()) {
       painter = new MapDefault(this, gprop);
@@ -144,7 +144,7 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
     // use simple zooming animation for result node filtering
-    final Nodes context = gui.context.current;
+    final Nodes context = gui.context.current();
     final int hist = gui.notify.hist;
     final boolean page = !more && rectHist[hist + 1] != null &&
       rectHist[hist + 1].pre == 0 || more && (context.size() != 1 ||
@@ -160,7 +160,7 @@ public final class MapView extends View implements Runnable {
 
     // calculate map
     calc(new MapRect(0, 0, getWidth(), getHeight(), 0, 0),
-        gui.context.current, mainMap);
+        gui.context.current(), mainMap);
     repaint();
   }
 
@@ -312,7 +312,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void paintComponent(final Graphics g) {
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     if(data == null) return;
 
     if(mainRects == null || mainRects.size == 0 || mainRects.get(0).w == 0) {
@@ -527,7 +527,7 @@ public final class MapView extends View implements Runnable {
     if(mh < 0) my -= mh = -mh;
     selBox = new MapRect(mx, my, mw, mh);
 
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     final IntList il = new IntList();
     int np = 0;
     final int rl = mainRects.size;
@@ -555,7 +555,7 @@ public final class MapView extends View implements Runnable {
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating || gui.context.focused == -1) return;
     if(e.getWheelRotation() <= 0) {
-      final Nodes m = new Nodes(gui.context.focused, gui.context.data);
+      final Nodes m = new Nodes(gui.context.focused, gui.context.data());
       gui.context.marked = m;
       gui.notify.context(m, false, null);
     } else {
@@ -613,7 +613,7 @@ public final class MapView extends View implements Runnable {
   private void initLen() {
     painter.reset();
 
-    final Data data = gui.context.current.data;
+    final Data data = gui.context.data();
     if(textLen != null || gui.gprop.num(GUIProp.MAPWEIGHT) == 0) return;
 
     final int size = data.meta.size;

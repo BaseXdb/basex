@@ -59,7 +59,7 @@ public final class DataAccess {
    * Returns the current file position.
    * @return position in the file
    */
-  public long pos() {
+  public long cursor() {
     return buffer(false).pos + off;
   }
 
@@ -85,7 +85,7 @@ public final class DataAccess {
    * @return result of check
    */
   public boolean more() {
-    return pos() < len;
+    return cursor() < len;
   }
 
   /**
@@ -94,6 +94,16 @@ public final class DataAccess {
    */
   public synchronized byte read1() {
     return (byte) read();
+  }
+
+  /**
+   * Reads a byte value from the specified position.
+   * @param p position
+   * @return integer value
+   */
+  public synchronized byte read1(final long p) {
+    cursor(p);
+    return read1();
   }
 
   /**
@@ -194,7 +204,7 @@ public final class DataAccess {
    */
   public synchronized byte[] readBytes(final int l) {
     final byte[] b = new byte[l];
-    for(int i = 0; i < b.length; ++i) b[i] = (byte) read();
+    for(int i = 0; i < b.length; ++i) b[i] = read1();
     return b;
   }
 
@@ -237,35 +247,99 @@ public final class DataAccess {
   }
 
   /**
+   * Writes a byte to the current position.
+   * @param v value to be written
+   */
+  public void write1(final int v) {
+    write(v);
+  }
+
+  /**
+   * Writes an integer value to the specified position.
+   * @param p write position
+   * @param v byte array to be appended
+   */
+  public void write4(final long p, final int v) {
+    cursor(p);
+    write4(v);
+  }
+
+  /**
+   * Writes an integer value to the current position.
+   * @param v value to be written
+   */
+  public void write4(final int v) {
+    write(v >>> 24);
+    write(v >>> 16);
+    write(v >>>  8);
+    write(v);
+  }
+
+  /**
    * Appends a value to the file and return it's offset.
    * @param p write position
    * @param v byte array to be appended
    */
-  public void writeBytes(final long p, final byte[] v) {
+  public void writeToken(final long p, final byte[] v) {
     cursor(p);
     writeNum(v.length);
     for(final byte b : v) write(b);
   }
 
   /**
-   * Writes an integer value to the specified output stream.
-   * @param p write position
-   * @param v byte array to be appended
+   * Appends a value to the file and return it's offset.
+   * @param v number to be appended
    */
-  public void writeInt(final long p, final int v) {
-    cursor(p);
-    writeInt(v);
+  public void writeNum(final int v) {
+    if(v < 0 || v > 0x3FFFFFFF) {
+      write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
+    } else if(v > 0x3FFF) {
+      write(v >>> 24 | 0x80); write(v >>> 16);
+      write(v >>> 8); write(v);
+    } else if(v > 0x3F) {
+      write(v >>> 8 | 0x40); write(v);
+    } else {
+      write(v);
+    }
   }
 
   /**
-   * Writes an integer value to the specified output stream.
-   * @param v value to be written
+   * Returns the offset to a free slot for writing an entry with the
+   * specified length. Fills the original space with zero-bytes to facilitate
+   * future write operations.
+   * @param pos original offset
+   * @param size size of new text entry
+   * @return new offset to store text
    */
-  public void writeInt(final int v) {
-    write(v >>> 24);
-    write(v >>> 16);
-    write(v >>>  8);
-    write(v);
+  public long free(final long pos, final int size) {
+    // old text size (available space)
+    int os = readNum(pos) + (int) (cursor() - pos);
+
+    // extend available space by subsequent zero-bytes
+    cursor(pos + os);
+    for(; pos + os < len && os < size && read1() == 0; os++);
+
+    long o = pos;
+    if(pos + os == len) {
+      // entry is placed last: reset file length (discard last entry)
+      length(pos);
+    } else {
+      int t = size;
+      if(os < size) {
+        // gap is too small for new entry...
+        // reset cursor to overwrite entry with zero-bytes
+        cursor(pos);
+        t = 0;
+        // place new entry after last entry
+        o = len;
+      } else {
+        // gap is large enough: set cursor to overwrite remaining bytes
+        cursor(pos + size);
+      }
+      // fill gap with zero-bytes for future updates
+      while(t++ < os) write1(0);
+    }
+    return o;
   }
 
   // PRIVATE METHODS ==========================================================
@@ -279,23 +353,6 @@ public final class DataAccess {
     file.seek(bf.pos);
     file.write(bf.data);
     bf.dirty = false;
-  }
-
-  /**
-   * Appends a value to the file and return it's offset.
-   * @param v number to be appended
-   */
-  private void writeNum(final int v) {
-    if(v < 0 || v > 0x3FFFFFFF) {
-      write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
-    } else if(v > 0x3FFF) {
-      write(v >>> 24 | 0x80); write(v >>> 16);
-      write(v >>> 8); write(v);
-    } else if(v > 0x3F) {
-      write(v >>> 8 | 0x40); write(v);
-    } else {
-      write(v);
-    }
   }
 
   /**
@@ -313,9 +370,10 @@ public final class DataAccess {
    */
   private void write(final int b) {
     final Buffer bf = buffer(off == IO.BLOCKSIZE);
-    bf.data[off++] = (byte) b;
-    length(Math.max(len, bf.pos + off));
     bf.dirty = true;
+    bf.data[off++] = (byte) b;
+    final long nl = bf.pos + off;
+    if(nl > len) length(nl);
   }
 
   /**

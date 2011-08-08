@@ -96,13 +96,13 @@ public abstract class ACreate extends Command {
         final Open open = new Open(db);
         if(!open.run(context)) return error(open.info());
 
-        data = context.data;
+        data = context.data();
         if(prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT,      data);
         if(prop.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, data);
         if(prop.is(Prop.FTINDEX))   index(IndexType.FULLTEXT,  data);
         data.flush();
       }
-      return info(DBCREATED, db, perf);
+      return info(p.info() + DBCREATED, db, perf);
     } catch(final ProgressException ex) {
       throw ex;
     } catch(final IOException ex) {

@@ -72,11 +72,11 @@ public final class IndexContext {
     final AxisPath path = orig.invertPath(root, step);
     if(!text) {
       // add attribute step
-      final AxisStep s = orig.step(orig.step.length - 1);
+      final AxisStep s = orig.step(orig.steps.length - 1);
       if(s.test.name != null) {
         Expr[] steps = { AxisStep.get(s.input, Axis.SELF, s.test) };
-        for(final Expr e : path.step) steps = Array.add(steps, e);
-        path.step = steps;
+        for(final Expr e : path.steps) steps = Array.add(steps, e);
+        path.steps = steps;
       }
     }
     return path;

@@ -31,7 +31,7 @@ import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
 import org.basex.gui.dialog.DialogEdit;
 import org.basex.gui.dialog.DialogExport;
-import org.basex.gui.dialog.DialogFontChooser;
+import org.basex.gui.dialog.DialogFonts;
 import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogInfo;
 import org.basex.gui.dialog.DialogInsert;
@@ -76,11 +76,8 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = gui.gprop.get(GUIProp.CREATEPATH);
       final String db = gui.gprop.get(GUIProp.CREATENAME);
-      if(in.isEmpty()) {
-        DialogProgress.execute(dialog, PROGCREATE, new CreateDB(db));
-      } else {
-        DialogProgress.execute(dialog, PROGCREATE, new CreateDB(db, in));
-      }
+      DialogProgress.execute(dialog, PROGCREATE,
+          new CreateDB(db, in.isEmpty() ? null : in));
     }
   },
 
@@ -138,7 +135,7 @@ public enum GUICommands implements GUICommand {
       if(root.exists()) {
         IO file = null;
         boolean overwrite = false;
-        final Data d = gui.context.data;
+        final Data d = gui.context.data();
         final IntList il = d.doc();
         for(int i = 0, is = il.size(); i < is; i++) {
           file = root.merge(Token.string(d.text(il.get(i), true)));
@@ -163,7 +160,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.context.data != null && !gui.context.data.empty());
+      b.setEnabled(gui.context.data() != null && !gui.context.data().empty());
     }
   },
 
@@ -173,7 +170,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogInfo info = new DialogInfo(gui);
       if(info.ok()) {
-        final Data d = gui.context.data;
+        final Data d = gui.context.data();
         final boolean[] ind = info.indexes();
         if(info.opt) {
           d.meta.textindex = ind[0];
@@ -284,7 +281,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final int pre = gui.context.marked.list[0];
-      final byte[] txt = ViewData.path(gui.context.data, pre);
+      final byte[] txt = ViewData.path(gui.context.data(), pre);
       // copy path to clipboard
       final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
       clip.setContents(new StringSelection(Token.string(txt)), null);
@@ -357,7 +354,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       // disallow deletion of empty node set or root node
-      b.setEnabled(updatable(gui.context.marked, Data.DOC));
+      b.setEnabled(updatable(gui.context.marked));
     }
   },
 
@@ -429,7 +426,7 @@ public enum GUICommands implements GUICommand {
       if(marked.size() == 0) {
         final int pre = gui.context.focused;
         if(pre == -1) return;
-        marked = new Nodes(pre, ctx.data);
+        marked = new Nodes(pre, ctx.data());
       }
       gui.notify.context(marked, false, null);
     }
@@ -445,14 +442,14 @@ public enum GUICommands implements GUICommand {
   SHOWXQUERY(GUISHOWXQUERY, "% E", GUISHOWXQUERYTT, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWXQUERY);
+      gui.gprop.invert(GUIProp.SHOWEDITOR);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWXQUERY));
+      b.setSelected(gui.gprop.is(GUIProp.SHOWEDITOR));
     }
   },
 
@@ -684,15 +681,15 @@ public enum GUICommands implements GUICommand {
       final boolean root = ctx.root();
       if(!rt) {
         if(!root) {
-          gui.notify.context(new Nodes(0, ctx.data), true, null);
-          gui.notify.mark(ctx.current, null);
+          gui.notify.context(new Nodes(0, ctx.data()), true, null);
+          gui.notify.mark(ctx.current(), null);
         }
       } else {
         if(root) {
-          gui.notify.mark(new Nodes(ctx.data), null);
+          gui.notify.mark(new Nodes(ctx.data()), null);
         } else {
           final Nodes mark = ctx.marked;
-          ctx.marked = new Nodes(ctx.data);
+          ctx.marked = new Nodes(ctx.data());
           gui.notify.context(mark, true, null);
         }
       }
@@ -717,7 +714,7 @@ public enum GUICommands implements GUICommand {
   FONTS(GUIFONTS, null, GUIFONTSTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogFontChooser(gui);
+      new DialogFonts(gui);
     }
   },
 
@@ -842,12 +839,13 @@ public enum GUICommands implements GUICommand {
       final Context ctx = gui.context;
       if(ctx.root()) return;
       // check if all nodes are document nodes
-      boolean r = true;
-      for(final int pre : ctx.current.list) r &= ctx.data.kind(pre) == Data.DOC;
-      if(r) {
+      boolean doc = true;
+      final Data data = ctx.data();
+      for(final int pre : ctx.current().list) doc &= data.kind(pre) == Data.DOC;
+      if(doc) {
         // if yes, jump to database root
-        gui.notify.context(
-            new Nodes(ctx.data.doc().toArray(), ctx.data), false, null);
+        ctx.update();
+        gui.notify.context(ctx.current(), false, null);
       } else {
         // otherwise, jump to parent nodes
         gui.execute(new Cs(".."));
@@ -856,7 +854,8 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(gui.context.current != null && !gui.context.root());
+      b.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
+          gui.context.data() != null && !gui.context.root());
     }
   },
 
@@ -867,14 +866,14 @@ public enum GUICommands implements GUICommand {
       // skip operation for root context
       final Context ctx = gui.context;
       if(ctx.root()) return;
-      // if yes, jump to database root
-      gui.notify.context(
-          new Nodes(ctx.data.doc().toArray(), ctx.data), false, null);
+      // jump to database root
+      ctx.update();
+      gui.notify.context(ctx.current(), false, null);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(!gui.context.root());
+      b.setEnabled(gui.context.data() != null && !gui.context.root());
     }
   },
 
@@ -916,7 +915,7 @@ public enum GUICommands implements GUICommand {
 
   @Override
   public void refresh(final GUI gui, final AbstractButton b) {
-    b.setEnabled(!data || gui.context.data != null);
+    b.setEnabled(!data || gui.context.data() != null);
   }
 
   @Override
@@ -964,7 +963,6 @@ public enum GUICommands implements GUICommand {
    * @return function string
    */
   static String openPre(final Nodes n, final int i) {
-    System.out.println("? ");
     return Function.DBOPENPRE.get(null, Str.get(n.data.meta.name),
         Itr.get(n.list[i])).toString();
   }

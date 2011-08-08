@@ -66,7 +66,7 @@ public class LocalQuery extends Query {
   }
 
   @Override
-  public void bind(final String n, final String v, final String t)
+  public void bind(final String n, final Object v, final String t)
       throws BaseXException {
     try {
       qp.bind(n, v, t);

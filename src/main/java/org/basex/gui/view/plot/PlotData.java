@@ -45,7 +45,7 @@ final class PlotData {
    * @return key array
    */
   TokenList getItems() {
-    final Data data = context.data;
+    final Data data = context.data();
     final TokenList tl = new TokenList();
     if(data.meta.pathindex) {
       for(final byte[] k : data.pthindex.desc(EMPTY, data, true, true)) {
@@ -61,7 +61,7 @@ final class PlotData {
    * @return key array
    */
   TokenList getCategories(final byte[] it) {
-    final Data data = context.data;
+    final Data data = context.data();
     final TokenList tl = new TokenList();
     if(data.meta.pathindex) {
       for(final byte[] k : data.pthindex.desc(it, data, true, false)) {
@@ -84,7 +84,7 @@ final class PlotData {
     final byte[] b = token(newItem);
     if(eq(b, item)) return false;
     item = b;
-    refreshItems(context.current, true);
+    refreshItems(context.current(), true);
     return true;
   }
 
@@ -95,7 +95,7 @@ final class PlotData {
    * @param sub determine descendant nodes of given context nodes
    */
   void refreshItems(final Nodes nodes, final boolean sub) {
-    final Data data = context.data;
+    final Data data = context.data();
     final IntList tmpPres = new IntList();
     final int itmID = data.tagindex.id(item);
 

@@ -39,7 +39,7 @@ public final class Events extends HashMap<String, Sessions> {
     try {
       in = new DataInput(file);
       final int s = in.readNum();
-      for(int u = 0; u < s; ++u) put(string(in.readBytes()), new Sessions());
+      for(int u = 0; u < s; ++u) put(string(in.readToken()), new Sessions());
     } catch(final IOException ex) {
       Util.errln(ex);
     } finally {

@@ -101,12 +101,8 @@ public class Str extends Item {
     final ByteList tb = new ByteList();
     tb.add('"');
     for(final byte v : val) {
-      switch(v) {
-        case '&': tb.add(E_AMP); break;
-        case '>': tb.add(E_GT); break;
-        case '<': tb.add(E_LT); break;
-        default: tb.add(v);
-      }
+      if(v == '&') tb.add(E_AMP);
+      else tb.add(v);
     }
     return tb.add('"').toString();
   }

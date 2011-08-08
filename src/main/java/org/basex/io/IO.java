@@ -236,6 +236,7 @@ public abstract class IO {
    */
   public final void name(final String n) {
     name = n;
+    if(path.isEmpty()) path = n;
   }
 
   /**

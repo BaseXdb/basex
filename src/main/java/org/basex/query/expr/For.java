@@ -166,4 +166,20 @@ public final class For extends ForLet {
     if(score != null) sb.append(SCORE + " " + score + " ");
     return sb.append(IN + " " + expr).toString();
   }
+
+  @Override
+  public boolean declares(final Var v) {
+    return var.is(v) || pos != null && pos.is(v)
+        || score != null && score.is(v);
+  }
+
+  @Override
+  public Var[] vars() {
+    if(pos != null) {
+      if(score != null) return new Var[]{ var, pos, score };
+      return new Var[]{ var, pos };
+    }
+    if(score != null) return new Var[]{ var, score };
+    return new Var[]{ var };
+  }
 }

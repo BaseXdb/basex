@@ -160,7 +160,7 @@ public final class FuncItem extends FItem {
 
   @Override
   public boolean uses(final Use u) {
-    return super.uses(u);
+    return expr.uses(u);
   }
 
   @Override

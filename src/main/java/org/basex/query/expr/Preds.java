@@ -25,7 +25,7 @@ import org.basex.util.list.ObjList;
  */
 public abstract class Preds extends ParseExpr {
   /** Predicates. */
-  public Expr[] pred;
+  public Expr[] preds;
   /** Compilation: first predicate uses last function. */
   public boolean last;
   /** Compilation: first predicate uses position. */
@@ -38,16 +38,16 @@ public abstract class Preds extends ParseExpr {
    */
   public Preds(final InputInfo ii, final Expr[] p) {
     super(ii);
-    pred = p;
+    preds = p;
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(final Expr p : pred) checkUp(p, ctx);
+    for(final Expr p : preds) checkUp(p, ctx);
 
     Expr e = this;
-    for(int p = 0; p < pred.length; ++p) {
-      Expr pr = pred[p].comp(ctx).compEbv(ctx);
+    for(int p = 0; p < preds.length; ++p) {
+      Expr pr = preds[p].comp(ctx).compEbv(ctx);
       pr = Pos.get(CmpV.Op.EQ, pr, pr, input);
 
       if(pr.value()) {
@@ -57,23 +57,23 @@ public abstract class Preds extends ParseExpr {
           break;
         }
         ctx.compInfo(OPTREMOVE, desc(), pr);
-        pred = Array.delete(pred, p--);
+        preds = Array.delete(preds, p--);
       } else {
-        pred[p] = pr;
+        preds[p] = pr;
 
         // replace AND expression with predicates
-        if(pred[p] instanceof And) {
-          ctx.compInfo(OPTPRED, pred[p].desc());
-          final Expr[] and = ((And) pred[p]).expr;
+        if(preds[p] instanceof And) {
+          ctx.compInfo(OPTPRED, preds[p].desc());
+          final Expr[] and = ((And) preds[p]).expr;
           final int m = and.length - 1;
-          final ObjList<Expr> tmp = new ObjList<Expr>(pred.length + m);
-          for(int i = 0; i < p; i++) tmp.add(pred[i]);
+          final ObjList<Expr> tmp = new ObjList<Expr>(preds.length + m);
+          for(int i = 0; i < p; i++) tmp.add(preds[i]);
           for(final Expr a : and) {
             // wrap test with boolean() if the result is numeric
             tmp.add(Function.BOOLEAN.get(input, a).compEbv(ctx));
           }
-          for(int i = p + 1; i < pred.length; i++) tmp.add(pred[i]);
-          pred = tmp.toArray(new Expr[tmp.size()]);
+          for(int i = p + 1; i < preds.length; i++) tmp.add(preds[i]);
+          preds = tmp.toArray(new Expr[tmp.size()]);
         }
       }
     }
@@ -88,17 +88,17 @@ public abstract class Preds extends ParseExpr {
    */
   protected boolean useIterator() {
     // position predicate
-    pos = pred[0] instanceof Pos ? (Pos) pred[0] : null;
-    last = pred[0].isFun(Function.LAST);
+    pos = preds[0] instanceof Pos ? (Pos) preds[0] : null;
+    last = preds[0].isFun(Function.LAST);
 
     boolean np1 = true;
     boolean np2 = true;
-    for(int p = 0; p < pred.length; p++) {
-      final boolean np = !pred[p].type().mayBeNum() && !pred[p].uses(Use.POS);
+    for(int p = 0; p < preds.length; p++) {
+      final boolean np = !preds[p].type().mayBeNum() && !preds[p].uses(Use.POS);
       np1 &= np;
       if(p > 0) np2 &= np;
     }
-    return np1 || pos != null && np2 || last && pred.length == 1;
+    return np1 || pos != null && np2 || last && preds.length == 1;
   }
 
   /**
@@ -113,7 +113,7 @@ public abstract class Preds extends ParseExpr {
 
     // set context item and position
     ctx.value = it;
-    for(final Expr p : pred) {
+    for(final Expr p : preds) {
       final Item i = p.test(ctx, input);
       if(i == null) return false;
       // item accepted.. adopt last scoring value
@@ -124,7 +124,7 @@ public abstract class Preds extends ParseExpr {
 
   @Override
   public boolean uses(final Use u) {
-    for(final Expr p : pred) {
+    for(final Expr p : preds) {
       if(u == Use.POS && p.type().mayBeNum() || p.uses(u)) return true;
     }
     return false;
@@ -133,31 +133,31 @@ public abstract class Preds extends ParseExpr {
   @Override
   public int count(final Var v) {
     int c = 0;
-    for(final Expr p : pred) c += p.count(v);
+    for(final Expr p : preds) c += p.count(v);
     return c;
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final Expr p : pred) if(p.count(v) != 0) return false;
+    for(final Expr p : preds) if(p.count(v) != 0) return false;
     return true;
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(int p = 0; p < pred.length; ++p) pred[p] = pred[p].remove(v);
+    for(int p = 0; p < preds.length; ++p) preds[p] = preds[p].remove(v);
     return this;
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    for(final Expr p : pred) p.plan(ser);
+    for(final Expr p : preds) p.plan(ser);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final Expr e : pred) sb.append("[" + e + "]");
+    for(final Expr e : preds) sb.append("[" + e + "]");
     return sb.toString();
   }
 }

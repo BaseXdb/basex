@@ -2,7 +2,8 @@ package org.basex.util.list;
 
 import java.util.Arrays;
 import java.util.Iterator;
-
+import java.util.RandomAccess;
+import org.basex.util.Array;
 import org.basex.util.Util;
 
 /**
@@ -12,9 +13,10 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class ObjList<E> extends ElementList implements Iterable<E> {
+public final class ObjList<E> extends ElementList
+    implements Iterable<E>, RandomAccess {
   /** Element container. */
-  protected Object[] list;
+  Object[] list;
 
   /**
    * Default constructor.
@@ -72,6 +74,14 @@ public final class ObjList<E> extends ElementList implements Iterable<E> {
   }
 
   /**
+   * Deletes the specified element.
+   * @param i element to be deleted
+   */
+  public void delete(final int i) {
+    Array.move(list, i + 1, -1, --size - i);
+  }
+
+  /**
    * Returns an array with all elements.
    * @return array
   @SuppressWarnings("unchecked")
@@ -114,5 +124,11 @@ public final class ObjList<E> extends ElementList implements Iterable<E> {
       @Override
       public void remove() { Util.notexpected(); }
     };
+  }
+
+  @Override
+  public String toString() {
+    // no implicit copying of the list
+    return getClass().getSimpleName() + Arrays.asList(list).subList(0, size);
   }
 }

@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * This class tests the update features of the Data class.
+ * This class tests the update features of the {@link Data} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Tim Petrowsky
@@ -16,7 +16,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    */
   @Test
   public void testSimpleNodeDelete() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParSize = data.size(2, Data.ELEM);
@@ -41,7 +41,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    */
   @Test
   public void testCascadingDelete() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     data.delete(2);
@@ -63,7 +63,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    */
   @Test
   public void testCascadingDelete2() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(4, Data.ELEM);
@@ -88,7 +88,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    */
   @Test
   public void testDeleteAttribute() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(6, Data.ELEM);
     data.delete(7);
@@ -115,7 +115,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    */
   @Test
   public void testDeleteText() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     data.delete(10);
     assertEquals(size - 1, data.meta.size);
     reload();

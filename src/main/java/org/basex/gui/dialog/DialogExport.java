@@ -66,7 +66,7 @@ public final class DialogExport extends Dialog {
     p.add(out);
     p.add(new BaseXLabel());
 
-    final String dir = new IOFile(gui.context.data.meta.original).dir();
+    final String dir = new IOFile(gui.context.data().meta.original).dir();
     path = new BaseXTextField(dir, this);
     path.addKeyListener(keys);
     p.add(path);
@@ -93,7 +93,7 @@ public final class DialogExport extends Dialog {
     }
 
     encoding = new BaseXCombo(this, ENCODINGS);
-    String enc = gui.context.data.meta.encoding;
+    String enc = gui.context.data().meta.encoding;
     boolean f = false;
     for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {

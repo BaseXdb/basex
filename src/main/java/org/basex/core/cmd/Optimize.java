@@ -35,7 +35,7 @@ public final class Optimize extends ACreate {
 
   @Override
   protected boolean run() {
-    final Data d = context.data;
+    final Data d = context.data();
     final MetaData m = d.meta;
     size = m.size;
 

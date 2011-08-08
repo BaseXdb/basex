@@ -31,8 +31,8 @@ public final class FNHttp extends FuncCall {
     checkAdmin(ctx);
 
     // get request node
-     final ANode request = expr[0].item(ctx, input) == null ? null :
-       checkNode(expr[0].item(ctx, input));
+    final ANode request = expr[0].item(ctx, input) == null ? null :
+      checkNode(expr[0].item(ctx, input));
 
     // get HTTP URI
     final byte[] href = expr.length >= 2 ?

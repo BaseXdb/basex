@@ -130,7 +130,6 @@ final class MapLayout {
 
     // skip too small rectangles and meta data in file systems
     if(w < off && h < off || w <= 2 || h <= 2) {
-      r.leaf = true;
       rectangles.add(r);
       return;
     }
@@ -139,7 +138,6 @@ final class MapLayout {
     final MapList ch = children(r.pre);
     final int cs = ch.size();
     if(cs != 0) {
-      r.leaf = false;
       makeMap(new MapRect(x, y, w, h, r.pre, r.level + 1), ch, 0, cs - 1);
     }
   }

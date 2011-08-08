@@ -30,7 +30,7 @@ public final class DropIndex extends ACreate {
 
   @Override
   protected boolean run() {
-    final Data data = context.data;
+    final Data data = context.data();
     if(data instanceof MemData) return error(PROCMM);
 
     final CmdIndex ci = getOption(CmdIndex.class);
@@ -64,7 +64,7 @@ public final class DropIndex extends ACreate {
    */
   private boolean drop(final IndexType index, final String pat) {
     try {
-      final Data data = context.data;
+      final Data data = context.data();
       data.closeIndex(index);
       data.meta.dirty = true;
       data.flush();

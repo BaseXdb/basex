@@ -95,7 +95,9 @@ import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.item.SeqType.Occ;
+import org.basex.query.item.map.Map;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
@@ -138,6 +140,7 @@ import org.basex.util.ft.FTUnit;
 import org.basex.util.ft.Language;
 import org.basex.util.ft.StopWords;
 import org.basex.util.hash.TokenSet;
+import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
 import org.basex.util.list.TokenList;
 
@@ -993,11 +996,53 @@ public class QueryParser extends InputParser {
       alter = NOWHERE;
     }
 
-    Var[] group = null;
+    Var[][] group = null;
     if(ctx.xquery3 && wsConsumeWs(GROUP)) {
       wsCheck(BY);
       ap = qp;
-      do group = groupSpec(group); while(wsConsume(COMMA));
+      Var[] grp = null;
+      do grp = groupSpec(fl, grp); while(wsConsume(COMMA));
+
+      // find all non-grouping variables that aren't shadowed
+      final ObjList<Var> ng = new ObjList<Var>();
+      Map ngp = Map.EMPTY;
+      for(final ForLet f : fl) {
+        vars: for(final Var v : f.vars()) {
+          final Value old = ngp.get(v.name, null);
+          final int pos = old.item() ? (int) old.itemAt(0).itr(null) : -1;
+
+          // number of entries is expected to be tiny, so linear search is fast
+          for(final Var g : grp) {
+            if(v.is(g)) {
+              if(pos >= 0) {
+                ng.delete(pos);
+                ngp = ngp.delete(old.itemAt(0), null);
+              }
+              continue vars;
+            }
+          }
+
+          if(pos >= 0) ng.set(pos, v);
+          else {
+            ng.add(v);
+            ngp = ngp.insert(v.name, Itr.get(ng.size() - 1), null);
+          }
+        }
+      }
+
+      // add new copies for all non-grouping variables
+      final Var[] ngrp = new Var[ng.size()];
+      for(int i = ng.size(); --i >= 0;) {
+        final Var v = ng.get(i);
+
+        // if one groups variables such as $x as xs:integer, then the resulting
+        // sequence isn't compatible with the type and can't be assigned
+        ngrp[i] = Var.create(ctx, input(), v.name, v.type != null
+            && v.type.one() ? SeqType.get(v.type.type, Occ.OM) : null);
+        ctx.vars.add(ngrp[i]);
+      }
+
+      group = new Var[][]{ grp, ng.toArray(new Var[ng.size()]), ngrp };
       alter = GRPBY;
     }
 
@@ -1103,17 +1148,30 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "GroupingSpec" rule.
+   * @param fl for/let clauses
    * @param group grouping specification
    * @return new group array
    * @throws QueryException query exception
    */
-  private Var[] groupSpec(final Var[] group) throws QueryException {
+  private Var[] groupSpec(final ForLet[] fl, final Var[] group)
+      throws QueryException {
     final Var v = checkVar(varName(), GVARNOTDEFINED);
+
+    // the grouping variable has to be declared by the same FLWOR expression
+    boolean dec = false;
+    for(final ForLet f : fl) {
+      if(f.declares(v)) {
+        dec = true;
+        break;
+      }
+    }
+    if(!dec) throw GVARNOTDEFINED.thrw(input(), v);
+
     if(wsConsumeWs(COLLATION)) {
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
-    return group == null ? new Var[] { v} : Array.add(group, v);
+    return group == null ? new Var[] { v } : Array.add(group, v);
   }
 
   /**
@@ -1308,10 +1366,10 @@ public class QueryParser extends InputParser {
    */
   private Expr stringConcat() throws QueryException {
     final Expr e = range();
-    if(!consume(CONCAT) && !consume(CONCAT2)) return e;
+    if(!consume(CONCAT)) return e;
 
     Expr[] list = { e };
-    do list = add(list, range()); while(wsConsume(CONCAT) || consume(CONCAT2));
+    do list = add(list, range()); while(wsConsume(CONCAT));
     return new Concat(input(), list);
   }
 

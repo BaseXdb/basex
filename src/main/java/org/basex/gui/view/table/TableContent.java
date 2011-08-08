@@ -64,7 +64,7 @@ final class TableContent extends BaseXBack {
     final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
 
     final Context context = tdata.context;
-    final Data data = context.data;
+    final Data data = context.data();
     final int focus = gui.context.focused;
     final int rfocus = tdata.getRoot(data, focus);
     int mpos = 0;
