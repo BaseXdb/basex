@@ -43,7 +43,7 @@ public class Filter extends Preds {
     if(root.empty()) return optPre(null, ctx);
     // convert filters without position predicates to axis paths
     if(root instanceof AxisPath && !super.uses(Use.POS))
-      return ((AxisPath) root).copy().addPreds(pred).comp(ctx);
+      return ((AxisPath) root).copy().addPreds(preds).comp(ctx);
 
     final Value cv = ctx.value;
     ctx.value = null;
@@ -52,7 +52,7 @@ public class Filter extends Preds {
     if(e != this) return e;
 
     // no predicates.. return root; otherwise, do some advanced compilations
-    return pred.length == 0 ? root : comp2(ctx);
+    return preds.length == 0 ? root : comp2(ctx);
   }
 
   /**
@@ -84,7 +84,7 @@ public class Filter extends Preds {
     if(!super.uses(Use.POS)) return new IterFilter(this);
 
     // one single position() or last() function specified:
-    if(pred.length == 1 && (last || pos != null)) {
+    if(preds.length == 1 && (last || pos != null)) {
       // return single value
       if(root.value() && t.one() && (last || pos.min == 1 && pos.max == 1)) {
         return optPre(root, ctx);
@@ -92,8 +92,8 @@ public class Filter extends Preds {
     }
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
-    final boolean off = pred.length == 1 && pred[0].type().num() &&
-      !pred[0].uses(Use.CTX);
+    final boolean off = preds.length == 1 && preds[0].type().num() &&
+      !preds[0].uses(Use.CTX);
     final boolean iter = !off && useIterator();
 
     // iterator for simple positional predicate
@@ -112,7 +112,7 @@ public class Filter extends Preds {
     for(Item i; (i = iter.next()) != null;) ic.add(i);
 
     // evaluate predicates
-    for(final Expr p : pred) {
+    for(final Expr p : preds) {
       final long is = ic.size();
       ctx.size = is;
       ctx.pos = 1;
@@ -136,7 +136,7 @@ public class Filter extends Preds {
    * @return self reference
    */
   public final Filter addPred(final Expr p) {
-    pred = Array.add(pred, p);
+    preds = Array.add(preds, p);
     return this;
   }
 

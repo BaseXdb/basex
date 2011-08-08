@@ -349,7 +349,7 @@ public final class CmpG extends Cmp {
     // accept only single axis steps as first expression
     final AxisPath path = (AxisPath) expr;
     // path must contain no root node
-    return path.root != null ? null : path.step(path.step.length - 1);
+    return path.root != null ? null : path.step(path.steps.length - 1);
   }
 
   @Override

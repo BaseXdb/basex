@@ -17,7 +17,7 @@ final class IterFilter extends Filter {
    * @param f original filter
    */
   IterFilter(final Filter f) {
-    super(f.input, f.root, f.pred);
+    super(f.input, f.root, f.preds);
     type = f.type;
   }
 

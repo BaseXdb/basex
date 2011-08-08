@@ -82,6 +82,27 @@ public final class PathSummary implements Index {
   // Traversal ================================================================
 
   /**
+   * Returns the root node.
+   * @return root node
+   */
+  public ObjList<PathNode> root() {
+    final ObjList<PathNode> out = new ObjList<PathNode>();
+    out.add(root);
+    return out;
+  }
+
+  /**
+   * Returns all parents of the specified nodes.
+   * @param in input nodes
+   * @return parent nodes
+   */
+  public ObjList<PathNode> parent(final ObjList<PathNode> in) {
+    final ObjList<PathNode> out = new ObjList<PathNode>();
+    for(final PathNode n : in) if(!out.contains(n.par)) out.add(n.par);
+    return out;
+  }
+
+  /**
    * Returns all children or descendants of the specified nodes.
    * @param in input nodes
    * @param desc if false, return only children
@@ -100,45 +121,18 @@ public final class PathSummary implements Index {
     return out;
   }
 
-  /**
-   * Returns all parents of the specified nodes.
-   * @param in input nodes
-   * @return parent nodes
-   */
-  public ObjList<PathNode> parent(final ObjList<PathNode> in) {
-    final ObjList<PathNode> out = new ObjList<PathNode>();
-    for(final PathNode n : in) if(!out.contains(n.par)) out.add(n.par);
-    return out;
-  }
 
   /**
-   * Returns the root node.
-   * @return root node
-   */
-  public ObjList<PathNode> root() {
-    final ObjList<PathNode> out = new ObjList<PathNode>();
-    out.add(root);
-    return out;
-  }
-
-  /**
-   * Adds nodes to the hash set if they comply to the specified arguments.
-   * @param in input node
-   * @param out output nodes
-   * @param t name reference
+   * Returns all children or descendants of the specified nodes with the
+   * specified tag or attribute value.
+   * @param n name reference
    * @param k node kind
-   * @param desc if false, return only children
+   * @return descendant nodes
    */
-  public void desc(final PathNode in, final ObjList<PathNode> out,
-      final int t, final int k, final boolean desc) {
-
-    for(final PathNode n : in.ch) {
-      if(desc) desc(n, out, t, k, desc);
-      if(k == -1 && n.kind != Data.ATTR || k == n.kind &&
-          (t == 0 || t == n.name)) {
-        out.add(n);
-      }
-    }
+  public ObjList<PathNode> desc(final int n, final int k) {
+    final ObjList<PathNode> out = new ObjList<PathNode>();
+    for(final PathNode c : root.ch) c.addDesc(out, n, k);
+    return out;
   }
 
   /**
@@ -203,6 +197,28 @@ public final class PathSummary implements Index {
     if(!o) out.sort(false);
     return out;
   }
+
+  /**
+   * Adds nodes to the hash set if they comply to the specified arguments.
+   * @param in input node
+   * @param out output nodes
+   * @param t name reference
+   * @param k node kind
+   * @param desc if false, return only children
+   */
+  public void add(final PathNode in, final ObjList<PathNode> out,
+      final int t, final int k, final boolean desc) {
+
+    for(final PathNode n : in.ch) {
+      if(desc) add(n, out, t, k, desc);
+      if(k == -1 && n.kind != Data.ATTR || k == n.kind &&
+          (t == 0 || t == n.name)) {
+        out.add(n);
+      }
+    }
+  }
+
+  // Info =====================================================================
 
   /**
    * Returns information on the path summary.

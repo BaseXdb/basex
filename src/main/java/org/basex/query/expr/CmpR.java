@@ -171,7 +171,7 @@ public final class CmpR extends Single {
     if(!ic.data.meta.uptodate || ic.data.ns.size() != 0) return null;
 
     final AxisPath path = (AxisPath) expr;
-    final int st = path.step.length;
+    final int st = path.steps.length;
 
     AxisStep step = null;
     if(text) {

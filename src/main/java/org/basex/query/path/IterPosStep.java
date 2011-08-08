@@ -20,7 +20,7 @@ final class IterPosStep extends AxisStep {
    * @param s step reference
    */
   IterPosStep(final AxisStep s) {
-    super(s.input, s.axis, s.test, s.pred);
+    super(s.input, s.axis, s.test, s.preds);
     last = s.last;
     pos = s.pos;
   }

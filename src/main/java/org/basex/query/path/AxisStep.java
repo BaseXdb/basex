@@ -46,7 +46,7 @@ public class AxisStep extends Preds {
    * @return step
    */
   public static AxisStep get(final AxisStep s) {
-    return get(s.input, s.axis, s.test, s.pred);
+    return get(s.input, s.axis, s.test, s.preds);
   }
 
   /**
@@ -103,7 +103,7 @@ public class AxisStep extends Preds {
     if(e != this || e instanceof IterStep) return e;
 
     // no positional predicates.. use simple iterator
-    if(!uses(Use.POS)) return new IterStep(input, axis, test, pred);
+    if(!uses(Use.POS)) return new IterStep(input, axis, test, preds);
 
     // don't re-optimize step
     if(this instanceof IterPosStep) return this;
@@ -122,7 +122,7 @@ public class AxisStep extends Preds {
     for(ANode n; (n = ai.next()) != null;) if(test.eval(n)) nc.add(n.finish());
 
     // evaluate predicates
-    for(final Expr p : pred) {
+    for(final Expr p : preds) {
       ctx.size = nc.size();
       ctx.pos = 1;
       int c = 0;
@@ -148,7 +148,7 @@ public class AxisStep extends Preds {
    * @return result of check
    */
   public final boolean simple(final Axis ax, final boolean name) {
-    return axis == ax && pred.length == 0 &&
+    return axis == ax && preds.length == 0 &&
       (name ? test.test == Test.Name.NAME : test == Test.NOD);
   }
 
@@ -162,7 +162,7 @@ public class AxisStep extends Preds {
       final Data data) {
 
     // skip steps with predicates or different namespaces
-    if(pred.length != 0 || data.ns.globalNS() == null) return null;
+    if(preds.length != 0 || data.ns.globalNS() == null) return null;
 
     // check restrictions on node type
     int kind = -1, name = 0;
@@ -186,29 +186,29 @@ public class AxisStep extends Preds {
 
     final ObjList<PathNode> out = new ObjList<PathNode>();
     for(final PathNode pn : nodes) {
-      data.pthindex.desc(pn, out, name, kind, desc);
+      data.pthindex.add(pn, out, name, kind, desc);
     }
     return out;
   }
 
   /**
    * Adds predicates to the step.
-   * @param preds predicates to be added
+   * @param prds predicates to be added
    * @return resulting step instance
    */
-  final AxisStep addPreds(final Expr... preds) {
-    for(final Expr p : preds) pred = Array.add(pred, p);
-    return get(input, axis, test, pred);
+  final AxisStep addPreds(final Expr... prds) {
+    for(final Expr p : prds) preds = Array.add(preds, p);
+    return get(input, axis, test, preds);
   }
 
   @Override
   public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof AxisStep)) return false;
     final AxisStep st = (AxisStep) cmp;
-    if(pred.length != st.pred.length || axis != st.axis ||
+    if(preds.length != st.preds.length || axis != st.axis ||
         !test.sameAs(st.test)) return false;
-    for(int p = 0; p < pred.length; ++p) {
-      if(!pred[p].sameAs(st.pred[p])) return false;
+    for(int p = 0; p < preds.length; ++p) {
+      if(!preds[p].sameAs(st.preds[p])) return false;
     }
     return true;
   }

@@ -32,7 +32,7 @@ public final class DBNodeSeq extends Seq {
    * @param p pre values
    * @param d data reference
    * @param t node type
-   * @param c indicates if pre values include all document nodes
+   * @param c indicates if pre values represent all document nodes of a database
    */
   private DBNodeSeq(final int[] p, final Data d, final Type t,
       final boolean c) {
