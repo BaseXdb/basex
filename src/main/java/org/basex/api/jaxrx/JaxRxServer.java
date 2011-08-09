@@ -59,7 +59,7 @@ public final class JaxRxServer extends BaseXServer {
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new JaxRxServer(args);
+    if(new JaxRxServer(args).failed()) System.exit(1);
   }
 
   /**
@@ -68,7 +68,7 @@ public final class JaxRxServer extends BaseXServer {
    */
   public JaxRxServer(final String... args) {
     super(args);
-    if(!success || service) return;
+    if(failed || service) return;
 
     // set default ports and paths
     set(JAXRXPATH, context.mprop.get(MainProp.JAXRXPATH), false);
