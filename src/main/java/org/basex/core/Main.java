@@ -31,11 +31,11 @@ public abstract class Main implements Runnable {
   private static final boolean NOCONSOLE = System.console() == null;
   /** Database context. */
   public final Context context = new Context();
-  /** Successful command line parsing. */
-  protected final boolean success;
+
   /** Output file for queries. */
   protected OutputStream out = System.out;
-
+  /** Flag for failed operations. */
+  protected boolean failed;
   /** Console mode. */
   protected boolean console;
   /** Session. */
@@ -48,8 +48,7 @@ public abstract class Main implements Runnable {
    * @param args command-line arguments
    */
   protected Main(final String[] args) {
-    success = parseArguments(args);
-    check(success);
+    if(failed(parseArguments(args))) return;
     verbose |= console;
 
     // guarantee correct shutdown...
@@ -59,6 +58,14 @@ public abstract class Main implements Runnable {
         context.close();
       }
     });
+  }
+
+  /**
+   * Returns {@code true} if the class call failed.
+   * @return failed flag
+   */
+  public boolean failed() {
+    return failed;
   }
 
   /**
@@ -207,9 +214,11 @@ public abstract class Main implements Runnable {
   /**
    * Leaves with 1 as exit code if the specified flag is {@code false}.
    * @param ok ok flag
+   * @return negated flag
    */
-  protected static void check(final boolean ok) {
-    if(!ok) System.exit(1);
+  protected boolean failed(final boolean ok) {
+    failed = !ok;
+    return failed;
   }
 
   /**

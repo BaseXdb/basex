@@ -52,7 +52,7 @@ public class BaseXServer extends Main {
   /** EventsListener. */
   private final EventListener events = new EventListener();
   /** Blocked clients. */
-  public final TokenIntMap failed = new TokenIntMap();
+  public final TokenIntMap blocked = new TokenIntMap();
   /** Server socket. */
   private ServerSocket socket;
   /** User query. */
@@ -64,7 +64,7 @@ public class BaseXServer extends Main {
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new BaseXServer(args);
+    if(new BaseXServer(args).failed()) System.exit(1);
   }
 
   /**
@@ -73,7 +73,7 @@ public class BaseXServer extends Main {
    */
   public BaseXServer(final String... args) {
     super(args);
-    check(success);
+    if(failed) return;
 
     final int port = context.mprop.num(MainProp.SERVERPORT);
     if(service) {
@@ -86,7 +86,7 @@ public class BaseXServer extends Main {
       // execute command-line arguments
       if(commands != null) {
         final Boolean b = execute(commands);
-        check(b == null || b);
+        if(failed(b == null || b)) return;
       }
 
       log = new Log(context, quiet);
@@ -114,7 +114,7 @@ public class BaseXServer extends Main {
     } catch(final Exception ex) {
       if(log != null) log.write(ex.getMessage());
       Util.errln(Util.server(ex));
-      check(false);
+      failed = true;
     }
   }
 
@@ -132,12 +132,12 @@ public class BaseXServer extends Main {
         } else {
           final byte[] address = s.getInetAddress().getAddress();
           if(cl.init()) {
-            failed.delete(address);
+            blocked.delete(address);
             context.add(cl);
           } else {
-            int delay = failed.get(address);
+            int delay = blocked.get(address);
             delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
-            failed.add(address, delay);
+            blocked.add(address, delay);
             new ClientDelayer(delay, cl, this);
           }
         }
