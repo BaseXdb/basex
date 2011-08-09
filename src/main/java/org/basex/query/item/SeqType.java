@@ -68,6 +68,9 @@ public final class SeqType {
     }
   }
 
+  /** The general map type. */
+  public static final MapType ANY_MAP = new MapType(AtomType.AAT,
+      SeqType.ITEM_ZM);
   /** Zero items. */
   public static final SeqType EMP = new SeqType(AtomType.EMP, Occ.Z);
   /** Single item. */
@@ -166,7 +169,7 @@ public final class SeqType {
   public static final SeqType MAP_O = new SeqType(
       MapType.get(AtomType.AAT, ITEM_ZM));
   /** Single function. */
-  public static final SeqType MAP_ZM = new SeqType(MapType.ANY_MAP, Occ.ZM);
+  public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZM);
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZM);
   /** One document node. */
