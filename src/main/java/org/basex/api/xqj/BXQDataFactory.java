@@ -320,7 +320,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     final BXQSequence s = (BXQSequence) seq;
     s.opened();
     try {
-      return new BXQSequence(s.result.finish().cache(), this);
+      return new BXQSequence(s.result.value().cache(), this);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

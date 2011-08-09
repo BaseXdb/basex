@@ -169,7 +169,7 @@ abstract class BXQDynamicContext extends BXQAbstract
 
     valid(s, XQSequence.class);
     try {
-      bind(qn, ((BXQSequence) s).result.finish(), null);
+      bind(qn, ((BXQSequence) s).result.value(), null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -263,7 +263,7 @@ abstract class BXQDynamicContext extends BXQAbstract
       qp.parse();
       qctx.compile();
       Iter iter = qctx.iter();
-      if(sc.scrollable) iter = iter.finish().cache();
+      if(sc.scrollable) iter = iter.value().cache();
       return new BXQSequence(iter, this, (BXQConnection) par);
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
