@@ -64,7 +64,7 @@ public abstract class Main implements Runnable {
    * Returns {@code true} if the class call failed.
    * @return failed flag
    */
-  public boolean failed() {
+  public final boolean failed() {
     return failed;
   }
 
@@ -216,7 +216,7 @@ public abstract class Main implements Runnable {
    * @param ok ok flag
    * @return negated flag
    */
-  protected boolean failed(final boolean ok) {
+  protected final boolean failed(final boolean ok) {
     failed = !ok;
     return failed;
   }

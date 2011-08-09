@@ -126,6 +126,10 @@ public final class CSVParser extends SingleParser {
             continue;
           }
         }
+        while(ch == 0x0D) {
+          ch = bi.readChar();
+          if(ch != 0x0A) tb.add(0x0A);
+        }
         if(ch != 0x0D) tb.add(ch);
       } else if(ch == separator) {
         if(open) {
@@ -133,12 +137,17 @@ public final class CSVParser extends SingleParser {
           open = false;
         }
         add(tb);
+      } else if(ch == 0x0D) {
+        ch = bi.readChar();
+        if(ch == 0x0A) continue;
+        finish(tb, open);
+        open = true;
       } else if(ch == 0x0A) {
         finish(tb, open);
         open = true;
       } else if(ch == '"') {
         quoted = true;
-      } else if(ch != 0x0D) {
+      } else {
         tb.add(ch);
       }
       ch = 0;
@@ -197,16 +206,18 @@ public final class CSVParser extends SingleParser {
       return;
     }
 
-    byte[] tag = simple ? ENTRY : headers.get(col);
-    if(tag == null) {
-      addHeader(COLUMN);
-      tag = headers.get(col);
+    byte[] t;
+    if(simple) {
+      t = ENTRY;
+    } else {
+      if(col == headers.size()) addHeader(COLUMN);
+      t = headers.get(col);
     }
 
     if(tb.size() != 0 || simple) {
-      builder.startElem(tag, atts);
+      builder.startElem(t, atts);
       builder.text(tb.finish());
-      builder.endElem(tag);
+      builder.endElem(t);
       tb.reset();
     }
     ++col;
