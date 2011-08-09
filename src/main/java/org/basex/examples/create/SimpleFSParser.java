@@ -42,7 +42,7 @@ public final class SimpleFSParser extends Parser {
     b.startDoc(token(src.name()));
     b.startElem(FSML, atts.reset());
     parse(new File(src.path()), b);
-    b.endElem(FSML);
+    b.endElem();
     b.endDoc();
   }
 
@@ -71,6 +71,6 @@ public final class SimpleFSParser extends Parser {
         b.emptyElem(FILE, atts);
       }
     }
-    b.endElem(DIR);
+    b.endElem();
   }
 }
