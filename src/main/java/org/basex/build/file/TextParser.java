@@ -73,7 +73,7 @@ public final class TextParser extends SingleParser {
       if(ch == 0x0A && lines) {
         builder.startElem(LINE, atts);
         builder.text(tb.finish());
-        builder.endElem(LINE);
+        builder.endElem();
         tb.reset();
       } else if(ch != 0x0D) {
         tb.add(ch);
@@ -81,6 +81,6 @@ public final class TextParser extends SingleParser {
     }
     bi.close();
     if(!lines) builder.text(tb.finish());
-    builder.endElem(TEXT);
+    builder.endElem();
   }
 }

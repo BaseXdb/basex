@@ -87,7 +87,7 @@ public class BuilderSerializer extends Serializer {
 
   @Override
   protected final void close(final byte[] t) throws IOException {
-    build.endElem(t);
+    build.endElem();
     tag = null;
   }
 

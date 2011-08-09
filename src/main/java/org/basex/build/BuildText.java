@@ -14,9 +14,9 @@ public interface BuildText {
   /** Builder error. */
   String AFTERROOT = "%: No text allowed after closed root tag.";
   /** Builder error: Tag Mismatch. */
-  String CLOSINGTAG = "%: </%> found, </%> expected.";
-  /** Builder error: Tag Mismatch. */
   String MOREROOTS = "%: More than one root node: '<%>'";
+  /** Builder error. */
+  String DOCOPEN = "%: Closing tag </%> expected.";
 
   /** Builder error. */
   String LIMITNS = "%: Too many different namespaces (limit: %).";
@@ -29,8 +29,8 @@ public interface BuildText {
 
   /** Parser error. */
   String PARSEINV = "%: % expected, % found.";
-  /** Parser error. */
-  String DOCOPEN = "%: Closing tag </%> expected.";
+  /** Parser error: Tag Mismatch. */
+  String CLOSINGTAG = "%: </%> found, </%> expected.";
 
   /** Scanner error. */
   String DOCEMPTY = "Document is empty.";

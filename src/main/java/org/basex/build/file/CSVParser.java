@@ -155,7 +155,7 @@ public final class CSVParser extends SingleParser {
     bi.close();
 
     finish(tb, open);
-    builder.endElem(CSV);
+    builder.endElem();
   }
 
   /**
@@ -186,9 +186,7 @@ public final class CSVParser extends SingleParser {
     }
     add(tb);
     if(close) {
-      if(simple || row != 0) {
-        builder.endElem(row == 0 ? HEADER : RECORD);
-      }
+      if(simple || row != 0) builder.endElem();
       ++row;
     }
     col = 0;
@@ -217,7 +215,7 @@ public final class CSVParser extends SingleParser {
     if(tb.size() != 0 || simple) {
       builder.startElem(t, atts);
       builder.text(tb.finish());
-      builder.endElem(t);
+      builder.endElem();
       tb.reset();
     }
     ++col;
