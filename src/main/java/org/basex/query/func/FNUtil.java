@@ -14,7 +14,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.AtomType;
-import org.basex.query.item.B64;
+import org.basex.query.item.Bin;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
@@ -52,7 +52,7 @@ public final class FNUtil extends FuncCall {
     switch(def) {
       case EVAL: return eval(ctx).iter();
       case RUN: return run(ctx).iter();
-      case TO_BYTES: return bytes(ctx).iter();
+      case TO_BYTES: return toBytes(ctx).iter();
       default: return super.iter(ctx);
     }
   }
@@ -62,7 +62,7 @@ public final class FNUtil extends FuncCall {
     switch(def) {
       case EVAL: return eval(ctx);
       case RUN: return run(ctx);
-      case TO_BYTES: return bytes(ctx);
+      case TO_BYTES: return toBytes(ctx);
       default: return super.value(ctx);
     }
   }
@@ -122,22 +122,6 @@ public final class FNUtil extends FuncCall {
     } catch(final IOException ex) {
       throw NODOC.thrw(input, ex);
     }
-  }
-
-  /**
-   * Extracts the bytes from the given xs:base64Binary data.
-   * @param ctx query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  private Value bytes(final QueryContext ctx) throws QueryException {
-    final byte[] bytes = ((B64) checkType(expr[0].item(ctx, input),
-        AtomType.B64)).toJava();
-
-    final int bl = bytes.length;
-    final long[] tmp = new long[bl];
-    for(int i = 0; i < bl; i++) tmp[i] = bytes[i];
-    return ItrSeq.get(tmp, AtomType.BYT);
   }
 
   /**
@@ -343,6 +327,23 @@ public final class FNUtil extends FuncCall {
     for(int i = res.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8)
       res[i] = (byte) (c & 0xFF);
     return new Hex(res);
+  }
+
+  /**
+   * Extracts the bytes from the given item.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Value toBytes(final QueryContext ctx) throws QueryException {
+    final Item it = checkEmpty(expr[0].item(ctx, input));
+    final byte[] bytes = it instanceof Bin ? ((Bin) it).toJava() :
+      it.atom(input);
+
+    final int bl = bytes.length;
+    final long[] tmp = new long[bl];
+    for(int i = 0; i < bl; i++) tmp[i] = bytes[i];
+    return ItrSeq.get(tmp, AtomType.BYT);
   }
 
   @Override

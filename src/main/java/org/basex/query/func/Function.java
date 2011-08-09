@@ -613,7 +613,7 @@ public enum Function {
   /** Utility function: calculates the CRC32 hash of the given xs:string. */
   CRC32(FNUtil.class, "crc32(str)", HEX, STR),
   /** Utility function: gets the bytes from the given xs:base64Binary data. */
-  TO_BYTES(FNUtil.class, "to-bytes(base64)", BYT_ZM, B64),
+  TO_BYTES(FNUtil.class, "to-bytes(item)", BYT_ZM, ITEM),
 
   /* FNXslt functions. */
 
