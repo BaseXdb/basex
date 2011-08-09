@@ -7,8 +7,6 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.iter.RangeIter;
-import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -38,11 +36,6 @@ public final class RangeSeq extends Seq {
     final Object[] obj = new Object[(int) size];
     for(int s = 0; s < size; ++s) obj[s] = Itr.get(start + s);
     return obj;
-  }
-
-  @Override
-  public ValueIter iter() {
-    return new RangeIter(start, start + size - 1);
   }
 
   @Override

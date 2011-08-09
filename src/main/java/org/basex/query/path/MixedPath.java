@@ -111,7 +111,7 @@ public final class MixedPath extends Path {
         // remove potential duplicates from node sets
         final NodeCache nc = new NodeCache().random();
         for(Item it; (it = ic.next()) != null;) nc.add((ANode) it);
-        res = nc.finish().cache();
+        res = nc.value().cache();
       } else {
         res = ic;
       }

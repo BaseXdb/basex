@@ -146,5 +146,8 @@ public final class FNUtilTest extends AdvancedQueryTest {
       "66 97 115 101 88 32 105 115 32 99 111 111 108");
     query(fun + "(xs:base64Binary(xs:hexBinary('4261736558')))",
       "66 97 115 101 88");
+    query(fun + "('a')", "97");
+    query("count(" + fun + "('a\u00f4c'))", "4");
+    query("count(" + fun + "(123))", "3");
   }
 }

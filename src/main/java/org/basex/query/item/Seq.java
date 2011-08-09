@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 
 /**
@@ -59,6 +60,23 @@ public abstract class Seq extends Value {
   public final Item test(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return ebv(ctx, ii);
+  }
+
+  @Override
+  public final ValueIter iter() {
+    return new ValueIter() {
+      int c;
+      @Override
+      public Item get(final long i) { return itemAt(i); }
+      @Override
+      public Item next() { return c < size ? itemAt(c++) : null; }
+      @Override
+      public boolean reset() { c = 0; return true; }
+      @Override
+      public long size() { return size; }
+      @Override
+      public Value value() { return Seq.this; }
+    };
   }
 
   @Override

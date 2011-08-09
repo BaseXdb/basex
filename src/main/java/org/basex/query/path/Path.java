@@ -296,9 +296,9 @@ public abstract class Path extends ParseExpr {
       break;
     }
 
-    // check existence of child steps
-    for(int s = 0; s < path.steps.length; ++s) {
-      // invert if axis is not a child or has predicates
+    // check if the all children in the path exist
+    LOOP: for(int s = 0; s < path.steps.length; ++s) {
+      // only verify child steps; ignore namespaces
       final AxisStep st = path.axisStep(s);
       if(st == null || st.axis != Axis.CHILD) break;
       if(st.test.test == Name.ALL || st.test.test == null) continue;
@@ -306,14 +306,11 @@ public abstract class Path extends ParseExpr {
 
       // check if one of the addressed nodes is on the correct level
       final int name = data.tagindex.id(st.test.name.ln());
-      boolean found = false;
       for(final PathNode pn : data.pthindex.desc(name, Data.ELEM)) {
-        found |= pn.level() == s + 1;
+        if(pn.level() == s + 1) continue LOOP;
       }
-      if(!found) {
-        ctx.compInfo(OPTPATH, this);
-        return Empty.SEQ;
-      }
+      ctx.compInfo(OPTPATH, this);
+      return Empty.SEQ;
     }
     return path;
   }

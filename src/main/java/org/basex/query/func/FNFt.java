@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
+
 import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.query.QueryContext;
@@ -10,13 +11,13 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.ft.FTIndexAccess;
 import org.basex.query.ft.FTWords;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.ValueIter;
 import org.basex.query.util.DataBuilder;
 import org.basex.query.util.Err;
 import org.basex.query.util.IndexContext;
@@ -107,7 +108,7 @@ public final class FNFt extends FuncCall {
     return new Iter() {
       final FTPosData ftd = new FTPosData();
       Iter ir;
-      ItemCache ii;
+      ValueIter ii;
 
       @Override
       public Item next() throws QueryException {
@@ -122,7 +123,7 @@ public final class FNFt extends FuncCall {
           if(ir == null) ir = ctx.iter(expr[0]);
           final Item it = ir.next();
           if(it != null) {
-            ii = DataBuilder.mark(checkDBNode(it), mark, len, ctx);
+            ii = DataBuilder.mark(checkDBNode(it), mark, len, ctx).iter();
           }
           ctx.ftpos = tmp;
           if(it == null) return null;

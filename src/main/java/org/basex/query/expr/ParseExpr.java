@@ -14,7 +14,6 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
-import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.AtomType;
@@ -73,7 +72,7 @@ public abstract class ParseExpr extends Expr {
       final Value v = item(ctx, input);
       return v == null ? Empty.SEQ : v;
     }
-    return ctx.iter(this).finish();
+    return ctx.iter(this).value();
   }
 
   @Override
@@ -447,6 +446,6 @@ public abstract class ParseExpr extends Expr {
    */
   public Map checkMap(final Item it) throws QueryException {
     if(it instanceof Map) return (Map) it;
-    throw Err.type(this, MapType.ANY_MAP, it);
+    throw Err.type(this, SeqType.ANY_MAP, it);
   }
 }

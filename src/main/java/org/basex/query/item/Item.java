@@ -35,19 +35,7 @@ public abstract class Item extends Value {
 
   @Override
   public final ValueIter iter() {
-    return new ValueIter() {
-      private boolean more;
-      @Override
-      public Item next() { return (more ^= true) ? Item.this : null; }
-      @Override
-      public long size() { return 1; }
-      @Override
-      public Item get(final long i) { return Item.this; }
-      @Override
-      public boolean reset() { return !(more = false); }
-      @Override
-      public Value finish() { return Item.this; }
-    };
+    return new ItemIter(this);
   }
 
   @Override
@@ -275,5 +263,32 @@ public abstract class Item extends Value {
   @Override
   public final boolean homogenous() {
     return true;
+  }
+
+  /**
+   * Item iterator.
+   * @author BaseX Team 2005-11, BSD License
+   * @author Christian Gruen
+   */
+  private static final class ItemIter extends ValueIter {
+    /** Item. */
+    private final Item item;
+    /** Requested flag. */
+    private boolean req;
+    /**
+     * Constructor.
+     * @param it item
+     */
+    ItemIter(final Item it) { item = it; }
+    @Override
+    public Item next() { if(req) return null; req = true; return item; }
+    @Override
+    public long size() { return 1; }
+    @Override
+    public Item get(final long i) { return item; }
+    @Override
+    public boolean reset() { req = false; return true; }
+    @Override
+    public Value value() { return item; }
   }
 }

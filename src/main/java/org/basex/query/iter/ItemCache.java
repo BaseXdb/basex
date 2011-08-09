@@ -141,7 +141,7 @@ public final class ItemCache extends ValueIter implements Result {
   }
 
   @Override
-  public Value finish() {
+  public Value value() {
     return Seq.get(item, size);
   }
 

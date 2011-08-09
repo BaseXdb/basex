@@ -68,9 +68,6 @@ public final class SeqType {
     }
   }
 
-  /** The general map type. */
-  public static final MapType ANY_MAP = new MapType(AtomType.AAT,
-      SeqType.ITEM_ZM);
   /** Zero items. */
   public static final SeqType EMP = new SeqType(AtomType.EMP, Occ.Z);
   /** Single item. */
@@ -165,11 +162,6 @@ public final class SeqType {
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZO);
   /** Single function. */
   public static final SeqType FUN_O = FuncType.ANY_FUN.seq();
-  /** Single function. */
-  public static final SeqType MAP_O = new SeqType(
-      MapType.get(AtomType.AAT, ITEM_ZM));
-  /** Single function. */
-  public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZM);
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZM);
   /** One document node. */
@@ -184,6 +176,15 @@ public final class SeqType {
   public static final SeqType ELM_ZO = new SeqType(NodeType.ELM, Occ.ZO);
   /** Zero or more element nodes. */
   public static final SeqType ELM_ZM = new SeqType(NodeType.ELM, Occ.ZM);
+
+  /** The general map type. */
+  public static final MapType ANY_MAP = new MapType(AtomType.AAT,
+      SeqType.ITEM_ZM);
+  /** Single function. */
+  public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZM);
+  /** Single function. */
+  public static final SeqType MAP_O = new SeqType(
+      MapType.get(AtomType.AAT, ITEM_ZM));
 
   /** Sequence type. */
   public final Type type;
@@ -338,7 +339,7 @@ public final class SeqType {
       ic.add(check(instance(n, ii) ? n : type.e(n, ctx, ii), ii));
     }
 
-    return ic.finish();
+    return ic.value();
   }
 
   /**

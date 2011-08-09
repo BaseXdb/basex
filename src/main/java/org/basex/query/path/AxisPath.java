@@ -114,10 +114,10 @@ public class AxisPath extends Path {
     // retrieve data reference
     final Data data = ctx.data();
     if(data != null && ctx.value.type == NodeType.DOC) {
-      // check children path rewriting
-      Expr e = children(ctx, data);
       // check index access
-      if(e == this) e = index(ctx, data);
+      Expr e = index(ctx, data);
+      // check children path rewriting
+      if(e == this) e = children(ctx, data);
       // return optimized expression
       if(e != this) return e.comp(ctx);
     }
@@ -262,8 +262,8 @@ public class AxisPath extends Path {
       if(ls >= 0) {
         result.steps[ls] = result.step(ls).addPreds(newPreds);
         // add inverted path as predicate to last step
-        if(invSteps.length != 0) result.steps[ls] = result.step(ls).addPreds(
-            Path.get(input, null, invSteps));
+        if(invSteps.length != 0) result.steps[ls] =
+            result.step(ls).addPreds(Path.get(input, null, invSteps));
       }
 
       // add remaining steps

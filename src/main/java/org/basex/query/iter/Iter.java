@@ -60,7 +60,7 @@ public abstract class Iter {
    * @return sequence
    * @throws QueryException query exception
    */
-  public Value finish() throws QueryException {
+  public Value value() throws QueryException {
     // check if sequence is empty
     Item i = next();
     if(i == null) return Empty.SEQ;

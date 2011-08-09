@@ -54,7 +54,7 @@ public final class Map extends FItem {
    * @param m map
    */
   public Map(final TrieNode m) {
-    super(MapType.ANY_MAP);
+    super(SeqType.ANY_MAP);
     root = m;
   }
 
@@ -218,7 +218,7 @@ public final class Map extends FItem {
     if(keys == null) {
       final ItemCache res = new ItemCache(root.size);
       root.keys(res);
-      keys = res.finish();
+      keys = res.value();
     }
     return keys;
   }
