@@ -2174,6 +2174,8 @@ public class QueryParser extends InputParser {
           } else if(c == 0x0A || c == 0x09) {
             ++qp;
             tb.add(' ');
+          } else if(c == 0x0D) {
+            ++qp;
           } else {
             entity(tb);
           }

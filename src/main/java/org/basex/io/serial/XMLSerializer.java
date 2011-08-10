@@ -332,6 +332,11 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void ch(final int ch) throws IOException {
+    if(ch == '\n') {
+      print(NL);
+      return;
+    }
+
     if(mth == M_HTML) {
       if(script) {
         print(ch);
