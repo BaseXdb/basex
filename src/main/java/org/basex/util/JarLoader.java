@@ -49,7 +49,7 @@ public final class JarLoader extends URLClassLoader {
    * Cleans up jar file factory cache.
    * @return result
    */
-  @SuppressWarnings({ "nls", "unchecked"})
+  @SuppressWarnings({ "nls", "unchecked" })
   public boolean cleanupJarFileFactory() {
     boolean res = false;
     Class<?> classJarURLConnection = null;
@@ -163,7 +163,7 @@ public final class JarLoader extends URLClassLoader {
    * @param cl class loader
    * @return result
    */
-  @SuppressWarnings({ "nls", "unchecked"})
+  @SuppressWarnings({ "nls", "unchecked" })
   public boolean closeClassLoader(final ClassLoader cl) {
     boolean res = false;
     if(cl == null) {
@@ -238,7 +238,7 @@ public final class JarLoader extends URLClassLoader {
    * @param cl class loader
    * @return result
    */
-  @SuppressWarnings({ "nls", "unchecked"})
+  @SuppressWarnings({ "nls", "unchecked" })
   public boolean finalizeNativeLibs(final ClassLoader cl) {
     boolean res = false;
     final Class<?> classClassLoader = ClassLoader.class;

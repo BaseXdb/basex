@@ -39,7 +39,7 @@ public final class CComm extends CFrag {
       tb.add(it.atom(ii));
       more = true;
     }
-    return new FComm(FComm.parse(tb.finish(), input), null);
+    return new FComm(FComm.parse(tb.finish(), input));
   }
 
   @Override

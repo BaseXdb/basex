@@ -11,7 +11,6 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.query.QueryException;
 import org.basex.query.func.Function;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
@@ -64,11 +63,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:open() function.
-   * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void dbOpen() throws QueryException, BaseXException {
+  public void dbOpen() throws BaseXException {
     final String fun = check(Function.DBOPEN);
     query("count(" + fun + "('db'))", "1");
     query("count(" + fun + "('db/'))", "1");
@@ -86,10 +84,9 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:open-pre() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void dbOpenPre() throws QueryException {
+  public void dbOpenPre() {
     final String fun = check(Function.DBOPENPRE);
     query(fun + "('db', 0)//title/text()", "XML");
     error(fun + "('db', -1)", Err.IDINVALID);
@@ -97,10 +94,9 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:open-id() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void dbOpenId() throws QueryException {
+  public void dbOpenId() {
     final String fun = check(Function.DBOPENID);
     query(fun + "('db', 0)//title/text()", "XML");
     error(fun + "('db', -1)", Err.IDINVALID);
@@ -108,11 +104,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:text() function.
-   * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void dbText() throws QueryException, BaseXException {
+  public void dbText() throws BaseXException {
     final String fun = check(Function.DBTEXT);
 
     // run function without and with index
@@ -125,11 +120,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:attribute() function.
-   * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void dbAttribute() throws QueryException, BaseXException {
+  public void dbAttribute() throws BaseXException {
     final String fun = check(Function.DBATTR);
 
     // run function without and with index
@@ -144,11 +138,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:fulltext() function.
-   * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void dbIndex() throws QueryException, BaseXException {
+  public void dbIndex() throws BaseXException {
     final String fun = check(Function.DBFULLTEXT);
 
     // run function without and with index
@@ -161,11 +154,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:list() function.
-   * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void dbList() throws QueryException, BaseXException {
+  public void dbList() throws BaseXException {
     final String fun = check(Function.DBLIST);
 
     // add documents
@@ -182,10 +174,9 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:add() function.
-   * @throws QueryException query exception
    */
   @Test
-  public void dbAdd() throws QueryException {
+  public void dbAdd() {
     final String fun = check(Function.DBADD);
 
     query(fun + "('db', '<root/>', 'test1.xml')");
@@ -209,11 +200,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:replace() function.
-   * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void dbReplace() throws QueryException, BaseXException {
+  public void dbReplace() throws BaseXException {
     final String fun = check(Function.DBREPLACE);
 
     new Add("etc/test/input.xml", null, "test").execute(CONTEXT);
@@ -233,11 +223,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:delete() function.
-   * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void dbDelete() throws QueryException, BaseXException {
+  public void dbDelete() throws BaseXException {
     final String fun = check(Function.DBDELETE);
 
     new Add(FLDR, "docs", "test").execute(CONTEXT);
@@ -248,11 +237,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:rename() function.
-   * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void dbRename() throws QueryException, BaseXException {
+  public void dbRename() throws BaseXException {
     final String fun = check(Function.DBRENAME);
 
     new Add(FLDR, "docs", "test").execute(CONTEXT);
@@ -265,10 +253,9 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:optimize() function.
-   * @throws QueryException query exception
    */
   @Test
-  public void dbOptimize() throws QueryException {
+  public void dbOptimize() {
     final String fun = check(Function.DBOPTIMIZE);
 
     query(fun + "('db')");
@@ -277,10 +264,9 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for db:node-pre() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void dbNodePre() throws QueryException {
+  public void dbNodePre() {
     final String fun = check(Function.DBNODEPRE);
     query(fun + "(/html)", "1");
     query(fun + "(/ | /html)", "0 1");
@@ -288,10 +274,9 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for db:node-id() and db:node-pre() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void dbNode() throws QueryException {
+  public void dbNode() {
     final String fun = check(Function.DBNODEID);
     query(fun + "(/html)", "1");
     query(fun + "(/ | /html)", "0 1");
@@ -299,10 +284,9 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:system() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void dbSystem() throws QueryException {
+  public void dbSystem() {
     // wrong arguments
     final String fun = check(Function.DBSYSTEM);
     contains(fun + "()", INFOON);
@@ -310,11 +294,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
   /**
    * Test method for the db:info() function.
-   * @throws QueryException query exception
    * @throws BaseXException database exception
    */
   @Test
-  public void dbInfo() throws QueryException, BaseXException {
+  public void dbInfo() throws BaseXException {
     // wrong arguments
     final String fun = check(Function.DBINFO);
 

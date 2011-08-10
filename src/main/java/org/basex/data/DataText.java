@@ -104,6 +104,8 @@ public interface DataText {
   /** Method. */
   String M_CSV = "csv";
   /** Method. */
+  String M_JSON = "json";
+  /** Method. */
   String M_MAB2 = "mab2";
   /** Method. */
   String M_TEXT = "text";

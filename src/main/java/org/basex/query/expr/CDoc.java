@@ -29,12 +29,11 @@ public final class CDoc extends CFrag {
   public FDoc item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Constr con = new Constr(ii, ctx, expr);
-    if(con.errAtt || con.atts.size() != 0) XPATT.thrw(ii);
+    final Constr c = new Constr(ii, ctx, expr);
+    if(c.errAtt || c.atts.size() != 0) XPATT.thrw(ii);
 
-    final FDoc doc = new FDoc(con.children, con.base);
-    for(int n = 0; n < con.children.size(); ++n)
-      con.children.get(n).parent(doc);
+    final FDoc doc = new FDoc(c.children, c.base);
+    for(int n = 0; n < c.children.size(); ++n) c.children.get(n).parent(doc);
     return doc;
   }
 

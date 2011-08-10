@@ -80,7 +80,7 @@ public final class CAttr extends CFrag {
     byte[] val = tb.finish();
     if(eq(pre, XML) && eq(ln, ID)) val = norm(val);
 
-    return new FAttr(name, val, null);
+    return new FAttr(name, val);
   }
 
   /**

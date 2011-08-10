@@ -28,23 +28,20 @@ public final class FPI extends FNode {
    * Constructor.
    * @param n name
    * @param v value
-   * @param p parent
    */
-  public FPI(final QNm n, final byte[] v, final ANode p) {
+  public FPI(final QNm n, final byte[] v) {
     super(NodeType.PI);
     name = n;
     val = v;
-    par = p;
   }
 
   /**
-   * Constructor for DOM nodes (partial).
-   * Provided by Erdal Karaca.
+   * Constructor for DOM nodes.
+   * Originally provided by Erdal Karaca.
    * @param pi DOM node
-   * @param parent parent reference
    */
-  FPI(final ProcessingInstruction pi, final ANode parent) {
-    this(new QNm(token(pi.getTarget())), token(pi.getData()), parent);
+  public FPI(final ProcessingInstruction pi) {
+    this(new QNm(token(pi.getTarget())), token(pi.getData()));
   }
 
   @Override
@@ -63,8 +60,8 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public FPI copy() {
-    return new FPI(name, val, par);
+  public FNode copy() {
+    return new FPI(name, val).parent(par);
   }
 
   @Override

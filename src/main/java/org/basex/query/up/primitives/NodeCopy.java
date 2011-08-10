@@ -89,7 +89,7 @@ public abstract class NodeCopy extends StructuralUpdate {
           tb.add(i.atom());
           i = n.next();
         }
-        s.add(new FTxt(tb.finish(), null));
+        s.add(new FTxt(tb.finish()));
       } else {
         s.add(i);
         i = n.next();

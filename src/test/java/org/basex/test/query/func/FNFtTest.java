@@ -5,7 +5,6 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
-import org.basex.query.QueryException;
 import org.basex.query.func.Function;
 import org.basex.test.query.AdvancedQueryTest;
 import org.junit.AfterClass;
@@ -35,10 +34,9 @@ public final class FNFtTest extends AdvancedQueryTest {
   /**
    * Test method for the 'ft:search()' function.
    * @throws BaseXException database exception
-   * @throws QueryException  query exception
    */
   @Test
-  public void ftSearch() throws BaseXException, QueryException {
+  public void ftSearch() throws BaseXException {
     // test arguments
     final String fun = check(Function.FTSEARCH);
 
@@ -56,10 +54,9 @@ public final class FNFtTest extends AdvancedQueryTest {
 
   /**
    * Test method for the 'ft:count()' function.
-   * @throws QueryException query exception
    */
   @Test
-  public void ftCount() throws QueryException {
+  public void ftCount() {
     final String fun = check(Function.FTCOUNT);
     query(fun + "(())", "0");
     query(fun + "(//*[text() contains text '1'])", "1");
@@ -70,10 +67,9 @@ public final class FNFtTest extends AdvancedQueryTest {
 
   /**
    * Test method for the 'ft:mark()' function.
-   * @throws QueryException query exception
    */
   @Test
-  public void ftMark() throws QueryException {
+  public void ftMark() {
     final String fun = check(Function.FTMARK);
 
     query(fun + "(//*[text() contains text '1'])",
@@ -92,10 +88,9 @@ public final class FNFtTest extends AdvancedQueryTest {
 
   /**
    * Test method for the 'ft:extract()' function.
-   * @throws QueryException query exception
    */
   @Test
-  public void ftExtract() throws QueryException {
+  public void ftExtract() {
     final String fun = check(Function.FTEXTRACT);
     query(fun + "(//*[text() contains text '1'])",
       "<li>Exercise <mark>1</mark></li>");
@@ -109,10 +104,9 @@ public final class FNFtTest extends AdvancedQueryTest {
 
   /**
    * Test method for the 'ft:score()' function.
-   * @throws QueryException query exception
    */
   @Test
-  public void ftScore() throws QueryException {
+  public void ftScore() {
     // test arguments
     final String fun = check(Function.FTSCORE);
     query(fun + "(ft:search(., '2'))", "1");

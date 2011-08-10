@@ -15,12 +15,12 @@ import org.basex.core.Prop;
 import org.basex.io.IOContent;
 import org.basex.io.in.TextInput;
 import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
 import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
+import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
@@ -115,22 +115,23 @@ public final class ResponseHandler {
   public static ValueIter getResponse(final HttpURLConnection conn,
       final byte[] statusOnly, final byte[] mediaTypeOvr, final Prop prop,
       final InputInfo ii) throws IOException, QueryException {
+
     final NodeCache attrs = extractAttrs(conn);
     final NodeCache hdrs = extractHdrs(conn);
     final byte[] contentType = mediaTypeOvr == null ?
         extractContentType(conn.getContentType()) : mediaTypeOvr;
     final ItemCache payloads = new ItemCache();
-    final ANode body;
+    final FNode body;
     final boolean s = statusOnly != null && Bln.parse(statusOnly, ii);
     // multipart response
     if(startsWith(contentType, token("multipart"))) {
       final byte[] boundary = extractBoundary(conn.getContentType(), ii);
       final NodeCache a = new NodeCache();
-      a.add(new FAttr(new QNm(MEDIATYPE, EMPTY), contentType, null));
-      a.add(new FAttr(new QNm(BOUNDARY, EMPTY), boundary, null));
+      a.add(new FAttr(new QNm(MEDIATYPE, EMPTY), contentType));
+      a.add(new FAttr(new QNm(BOUNDARY, EMPTY), boundary));
       body = new FElem(new QNm(MULTIPART, HTTPURI), extractParts(
           conn.getInputStream(), s, payloads, concat(token("--"), boundary),
-          prop, ii), a, EMPTY, new Atts().add(HTTP, HTTPURI), null);
+          prop, ii), a, new Atts().add(HTTP, HTTPURI), EMPTY);
       // single part response
     } else {
       body = createBody(contentType);
@@ -144,8 +145,8 @@ public final class ResponseHandler {
 
     // construct <http:response/>
     final FElem responseEl = new FElem(new QNm(RESPONSE, HTTPURI), hdrs, attrs,
-        EMPTY, new Atts().add(HTTP, HTTPURI), null);
-    responseEl.children.add(body);
+        new Atts().add(HTTP, HTTPURI), EMPTY);
+    responseEl.add(body);
     // result
     final ItemCache result = new ItemCache();
     result.add(responseEl);
@@ -163,10 +164,8 @@ public final class ResponseHandler {
   private static NodeCache extractAttrs(final HttpURLConnection conn)
       throws IOException {
     final NodeCache a = new NodeCache();
-    a.add(new FAttr(new QNm(STATUS, EMPTY),
-        token(conn.getResponseCode()), null));
-    a.add(new FAttr(new QNm(MSG, EMPTY),
-        token(conn.getResponseMessage()), null));
+    a.add(new FAttr(new QNm(STATUS, EMPTY), token(conn.getResponseCode())));
+    a.add(new FAttr(new QNm(MSG, EMPTY), token(conn.getResponseMessage())));
 
     return a;
   }
@@ -182,12 +181,11 @@ public final class ResponseHandler {
     final NodeCache h = new NodeCache();
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
-        final FElem hdr = new FElem(new QNm(HEADER, HTTPURI), null, null, null,
+        final FElem hdr = new FElem(new QNm(HEADER, HTTPURI),
             new Atts().add(HTTP, HTTPURI), null);
-        hdr.atts.add(new FAttr(new QNm(HDR_NAME, EMPTY),
-            token(headerName), hdr));
-        hdr.atts.add(new FAttr(new QNm(HDR_VALUE, EMPTY),
-            token(conn.getHeaderField(headerName)), hdr));
+        hdr.add(new FAttr(new QNm(HDR_NAME, EMPTY), token(headerName)));
+        hdr.add(new FAttr(new QNm(HDR_VALUE, EMPTY),
+            token(conn.getHeaderField(headerName))));
         h.add(hdr);
       }
     }
@@ -200,9 +198,9 @@ public final class ResponseHandler {
    * @return body
    */
   private static FElem createBody(final byte[] mediaType) {
-    final FElem b = new FElem(new QNm(BODY, HTTPURI), null, null, null,
+    final FElem b = new FElem(new QNm(BODY, HTTPURI),
         new Atts().add(HTTP, HTTPURI), null);
-    b.atts.add(new FAttr(new QNm(MEDIATYPE, EMPTY), mediaType, null));
+    b.add(new FAttr(new QNm(MEDIATYPE, EMPTY), mediaType));
     return b;
   }
 
@@ -316,7 +314,11 @@ public final class ResponseHandler {
     final byte[] firstLine = readLine(io);
     // last line is reached:
     if(firstLine == null || eq(firstLine, end)) return null;
-    final NodeCache partCh = new NodeCache();
+
+    final FElem root = new FElem(new QNm(PART, EMPTY),
+        new Atts().add(HTTP, HTTPURI), EMPTY);
+
+    //final NodeCache partCh = new NodeCache();
     if(firstLine.length == 0) {
       // part has no headers
       final byte[] p = extractPartPayload(io, sep, end, null);
@@ -338,10 +340,10 @@ public final class ResponseHandler {
             final byte[] value = trim(substring(nextHdr, pos + 1,
                 nextHdr.length));
             // construct attributes
-            final FElem hdr = new FElem(new QNm(HEADER, HTTPURI), null);
-            hdr.atts.add(new FAttr(new QNm(HDR_NAME, EMPTY), name, null));
-            hdr.atts.add(new FAttr(new QNm(HDR_VALUE, EMPTY), value, null));
-            partCh.add(hdr);
+            final FElem hdr = new FElem(new QNm(HEADER, HTTPURI));
+            hdr.add(new FAttr(new QNm(HDR_NAME, EMPTY), name));
+            hdr.add(new FAttr(new QNm(HDR_VALUE, EMPTY), value));
+            root.add(hdr);
             if(eq(lc(name), CONT_TYPE_LC)) partContType = value;
           }
         }
@@ -352,9 +354,8 @@ public final class ResponseHandler {
         payloads.add(interpretPayload(p, partContType, prop, ii));
       }
     }
-    partCh.add(createBody(partContType));
-    return new FElem(new QNm(PART, EMPTY), partCh, null, EMPTY, new Atts().add(
-        HTTP, HTTPURI), null);
+    root.add(createBody(partContType));
+    return root;
   }
 
   /**

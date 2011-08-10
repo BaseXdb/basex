@@ -225,9 +225,16 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final void parent(final ANode p) {
+  public DBNode parent(final ANode p) {
     root = p;
     par = p;
+    return this;
+  }
+
+  @Override
+  public final boolean hasChildren() {
+    int k = data.kind(pre);
+    return data.attSize(pre, k) != data.size(pre, k);
   }
 
   @Override

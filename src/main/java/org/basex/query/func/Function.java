@@ -583,6 +583,13 @@ public enum Function {
   SENDREQUEST(FNHttp.class, "send-request(request[,href,[bodies]])", ITEM_ZM, 1,
       NOD, STR_ZO, ITEM_ZM),
 
+  /* FNJson functions. */
+
+  /** JSON function: convert JSON to XML. */
+  JPARSE(FNJson.class, "parse(string)", NOD, STR),
+  /** JSON function: convert XML to JSON. */
+  JSERIALIZE(FNJson.class, "serialize(node)", STR, NOD),
+
   /* FNSent functions. */
 
   /** Sentiment function: returns a text sentiment. */
@@ -659,6 +666,7 @@ public enum Function {
     URIS.put(FNDb.class,   DBURI);
     URIS.put(FNFt.class,   FTURI);
     URIS.put(FNHof.class,  HOFURI);
+    URIS.put(FNJson.class, JSONURI);
     URIS.put(FNSent.class, SENTURI);
     URIS.put(FNUtil.class, UTILURI);
     URIS.put(FNXslt.class, XSLTURI);

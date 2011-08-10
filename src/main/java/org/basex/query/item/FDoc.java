@@ -33,8 +33,8 @@ public final class FDoc extends FNode {
   }
 
   /**
-   * Constructor for DOM nodes (partial).
-   * Provided by Erdal Karaca.
+   * Constructor for DOM nodes.
+   * Originally provided by Erdal Karaca.
    * @param doc DOM node
    * @param b base uri
    */

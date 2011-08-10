@@ -54,7 +54,7 @@ public final class Constr {
       final Iter iter = ctx.iter(e);
       while(add(ctx, iter.next(), ii));
     }
-    if(text.size() != 0) children.add(new FTxt(text.finish(), null));
+    if(text.size() != 0) children.add(new FTxt(text.finish()));
   }
 
   /**
@@ -103,7 +103,7 @@ public final class Constr {
       } else {
         // add text node
         if(text.size() != 0) {
-          children.add(new FTxt(text.finish(), null));
+          children.add(new FTxt(text.finish()));
           text.reset();
         }
         node = node.copy();

@@ -1,5 +1,6 @@
 package org.basex.test.query.up;
 
+import org.basex.core.BaseXException;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.test.query.AdvancedQueryTest;
@@ -22,9 +23,9 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Creates a database.
    * @param input input database string, if null, then use default.
-   * @throws Exception exception
+   * @throws BaseXException database exception
    */
-  private void createDB(final String input) throws Exception {
+  private void createDB(final String input) throws BaseXException {
     new CreateDB(DBNAME, input == null ? DOC : input).execute(CONTEXT);
   }
 
@@ -146,10 +147,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Text merging test for delete operation.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging09() throws Exception {
+  public void textMerging09() {
     query("copy $c := <n>aa<d/><d/>cc</n> " +
         "modify (delete node $c//d, insert node 'bb' after ($c//d)[1]) " +
         "return count($c//text()), $c//text()", "1aabbcc");
@@ -157,10 +157,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Text merging test for delete operation.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging10() throws Exception {
+  public void textMerging10() {
     query("copy $c := <n>aa<d/><d/>cc</n> " +
         "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
         "return count($c//text()), $c//text()", "1aabbcc");
@@ -168,10 +167,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Text merging test for delete operation.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging11() throws Exception {
+  public void textMerging11() {
     query(
       "copy $c := <n>aa<d/><d/>cc</n> " +
       "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
@@ -180,10 +178,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Text merging test for delete operation.
-   * @throws Exception exception
    */
   @Test
-  public void treeAwareUpdates() throws Exception {
+  public void treeAwareUpdates() {
     query(
       "copy $n := <a><b><c/></b></a> " +
       "modify (replace value of node $n/b with (), " +
@@ -193,10 +190,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Delete last node of a data instance. Checks if table limits are crossed.
-   * @throws Exception exception
    */
   @Test
-  public void deleteLastNode() throws Exception {
+  public void deleteLastNode() {
     query(
       "copy $n := <a><b/><c/></a> modify (delete node $n//c) return $n",
       "<a><b/></a>");
@@ -204,10 +200,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Replace last node of a data instance. Checks if table limits are crossed.
-   * @throws Exception exception
    */
   @Test
-  public void replaceLastNode() throws Exception {
+  public void replaceLastNode() {
     query(
       "copy $n := <a><b/><c><d/><d/><d/></c></a> " +
       "modify (replace node $n//c with <c/>) return $n",
@@ -217,10 +212,10 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Replaces the value of the documents root node. Related to
    * github issue #141.
-   * @throws Exception exception
+   * @throws BaseXException database exception
    */
   @Test
-  public void replaceValueOfEmptyRoot() throws Exception {
+  public void replaceValueOfEmptyRoot() throws BaseXException {
     createDB("<a/>");
     query("replace value of node /a with 'a'");
     query("/", "<a>a</a>");
@@ -228,10 +223,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Insertion into an empty element.
-   * @throws Exception exception
    */
   @Test
-  public void emptyInsert1() throws Exception {
+  public void emptyInsert1() {
     query(
       "copy $x := <X/> modify insert nodes <A/> into $x return $x",
       "<X><A/></X>");
@@ -239,10 +233,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Insertion into an empty document.
-   * @throws Exception exception
    */
   @Test
-  public void emptyInsert2() throws Exception {
+  public void emptyInsert2() {
     query(
       "copy $x := document {()} modify insert nodes <X/> into $x return $x",
       "<X/>");
@@ -250,10 +243,10 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Insertion into an empty document.
-   * @throws Exception exception
+   * @throws BaseXException database exception
    */
   @Test
-  public void emptyInsert3() throws Exception {
+  public void emptyInsert3() throws BaseXException {
     createDB("<a/>");
     query("delete node /a");
     query("insert nodes <X/> into doc('" + DBNAME + "')");

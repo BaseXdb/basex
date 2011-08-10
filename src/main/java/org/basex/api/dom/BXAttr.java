@@ -92,13 +92,23 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public BXText getFirstChild() {
-    return new BXText(new FTxt(node.atom(), node));
+    return new BXText(text());
   }
 
   @Override
   public BXNList getChildNodes() {
     final NodeCache nb = new NodeCache();
-    nb.add(new FTxt(node.atom(), node));
+    nb.add(text());
     return new BXNList(nb);
+  }
+
+  /**
+   * Returns the attribute value as text node.
+   * @return text node
+   */
+  private FTxt text() {
+    final FTxt n = new FTxt(node.atom());
+    n.parent(node);
+    return n;
   }
 }

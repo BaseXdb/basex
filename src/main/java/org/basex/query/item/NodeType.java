@@ -40,8 +40,7 @@ public enum NodeType implements Type {
   TXT("text", NOD) {
     @Override
     public ANode e(final Object o, final InputInfo ii) {
-      return o instanceof BXText ? ((BXText) o).getNod() :
-        new FTxt((Text) o, null);
+      return o instanceof BXText ? ((BXText) o).getNod() : new FTxt((Text) o);
     }
   },
 
@@ -50,7 +49,7 @@ public enum NodeType implements Type {
     @Override
     public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXPI ? ((BXPI) o).getNod() :
-        new FPI((ProcessingInstruction) o, null);
+        new FPI((ProcessingInstruction) o);
     }
   },
 
@@ -91,8 +90,7 @@ public enum NodeType implements Type {
   ATT("attribute", NOD) {
     @Override
     public ANode e(final Object o, final InputInfo ii) {
-      return o instanceof BXAttr ? ((BXAttr) o).getNod() :
-        new FAttr((Attr) o, null);
+      return o instanceof BXAttr ? ((BXAttr) o).getNod() : new FAttr((Attr) o);
     }
   },
 
@@ -101,7 +99,7 @@ public enum NodeType implements Type {
     @Override
     public ANode e(final Object o, final InputInfo ii) {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
-        new FComm((Comment) o, null);
+        new FComm((Comment) o);
     }
   };
 

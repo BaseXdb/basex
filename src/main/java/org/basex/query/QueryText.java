@@ -446,6 +446,8 @@ public interface QueryText {
   byte[] ZIP = token("zip");
   /** HOF token. */
   byte[] HOF = token("hof");
+  /** JSON token. */
+  byte[] JSON = token("json");
   /** MAP token. */
   byte[] MAP = token(MAPSTR);
   /** Package token. */
@@ -496,6 +498,8 @@ public interface QueryText {
   byte[] FTURI = token(Text.URL + "/ft");
   /** Higher-order URI. */
   byte[] HOFURI = token(Text.URL + "/hof");
+  /** JSON URI. */
+  byte[] JSONURI = token(Text.URL + "/json");
   /** Sentiment URI. */
   byte[] SENTURI = token(Text.URL + "/sent");
   /** Utility module URI. */

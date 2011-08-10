@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
-import org.basex.query.QueryException;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -41,10 +40,9 @@ public final class FastReplaceTest extends AdvancedQueryTest {
 
   /**
    * Replaces blocks of equal size distributed over the document.
-   * @throws QueryException query exception
    */
   @Test
-  public void replaceEqualBlocks() throws QueryException {
+  public void replaceEqualBlocks() {
     query("for $i in //item/location/text() " +
       "return replace node $i with $i");
     query("count(//item)", "186");
@@ -52,10 +50,9 @@ public final class FastReplaceTest extends AdvancedQueryTest {
 
   /**
    * Replaces blocks of equal size distributed over the document.
-   * @throws QueryException query exception
    */
   @Test
-  public void replaceEqualBlocks2() throws QueryException {
+  public void replaceEqualBlocks2() {
     query("for $i in //item return replace node $i with $i");
     query("count(//item)", "186");
   }
@@ -64,10 +61,9 @@ public final class FastReplaceTest extends AdvancedQueryTest {
    * Replaces blocks where the new subtree is smaller than the old one. Find
    * the smallest //item node in the database and replace each //item with
    * this.
-   * @throws QueryException query exception
    */
   @Test
-  public void replaceWithSmallerTree() throws QueryException {
+  public void replaceWithSmallerTree() {
     final String id =
       query("let $newitem := (let $c := min(for $i in //item " +
         "return count($i/descendant-or-self::node())) " +
@@ -87,10 +83,9 @@ public final class FastReplaceTest extends AdvancedQueryTest {
    * Replaces blocks where the new subtree is bigger than the old one. Find
    * the biggest //item node in the database and replace each //item with
    * this.
-   * @throws QueryException query exception
    */
   @Test
-  public void replaceWithBiggerTree() throws QueryException {
+  public void replaceWithBiggerTree() {
     query("let $newitem := (let $c := max(for $i in //item " +
       "return count($i/descendant-or-self::node())) " +
       "return for $i in //item where " +
@@ -104,10 +99,9 @@ public final class FastReplaceTest extends AdvancedQueryTest {
    * Replaces blocks where the new subtree is bigger than the old one. Find
    * the biggest //item node in the database and replace the last item in the
    * database with this.
-   * @throws QueryException query exception
    */
   @Test
-  public void replaceSingleWithBiggerTree() throws QueryException {
+  public void replaceSingleWithBiggerTree() {
     query("let $newitem := (let $c := max(for $i in //item " +
       "return count($i/descendant-or-self::node())) " +
       "return for $i in //item where " +
@@ -120,10 +114,9 @@ public final class FastReplaceTest extends AdvancedQueryTest {
    * Replaces blocks where the new subtree is bigger than the old one. Find
    * the biggest //item node in the database and replace the last item in the
    * database with this.
-   * @throws QueryException query exception
    */
   @Test
-  public void replaceSingleWithSmallerTree() throws QueryException {
+  public void replaceSingleWithSmallerTree() {
     final String id =
       query("let $newitem := (let $c := min(for $i in //item " +
         "return count($i/descendant-or-self::node())) " +
@@ -137,10 +130,9 @@ public final class FastReplaceTest extends AdvancedQueryTest {
   /**
    * Replaces a single attribute with two attributes. Checks for correct
    * updating of the parent's attribute size.
-   * @throws QueryException query exception
    */
   @Test
-  public void replaceAttributes() throws QueryException {
+  public void replaceAttributes() {
     query("replace node (//item)[1]/attribute() with " +
       "(attribute att1 {'0'}, attribute att2 {'1'})");
     query("(//item)[1]/attribute()", " att1=\"0\" att2=\"1\"");
@@ -149,10 +141,9 @@ public final class FastReplaceTest extends AdvancedQueryTest {
   /**
    * Replaces a single attribute with two attributes for each item. Checks for
    * correct updating of the parent's attribute size.
-   * @throws QueryException query exception
    */
   @Test
-  public void replaceAttributes2() throws QueryException {
+  public void replaceAttributes2() {
     query("for $i in //item return replace node $i/attribute() with " +
     "(attribute att1 {'0'}, attribute att2 {'1'})");
     query("//item/attribute()");

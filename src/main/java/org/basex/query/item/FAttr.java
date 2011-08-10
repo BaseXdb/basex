@@ -19,26 +19,23 @@ public final class FAttr extends FNode {
   private final QNm name;
 
   /**
-   * Constructor, specifying a parent.
+   * Default constructor.
    * @param n name
    * @param v value
-   * @param p parent
    */
-  public FAttr(final QNm n, final byte[] v, final ANode p) {
+  public FAttr(final QNm n, final byte[] v) {
     super(NodeType.ATT);
     name = n;
     val = v;
-    par = p;
   }
 
   /**
-   * Constructor for DOM nodes (partial).
-   * Provided by Erdal Karaca.
+   * Constructor for DOM nodes.
+   * Originally provided by Erdal Karaca.
    * @param attr DOM node
-   * @param p parent reference
    */
-  FAttr(final Attr attr, final ANode p) {
-    this(new QNm(token(attr.getName())), token(attr.getValue()), p);
+  public FAttr(final Attr attr) {
+    this(new QNm(token(attr.getName())), token(attr.getValue()));
   }
 
   @Override
@@ -52,8 +49,8 @@ public final class FAttr extends FNode {
   }
 
   @Override
-  public FAttr copy() {
-    return new FAttr(name, val, par);
+  public FNode copy() {
+    return new FAttr(name, val).parent(par);
   }
 
   @Override

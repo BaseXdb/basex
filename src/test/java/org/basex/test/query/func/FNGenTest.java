@@ -1,6 +1,5 @@
 package org.basex.test.query.func;
 
-import org.basex.query.QueryException;
 import org.basex.query.func.Function;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
@@ -18,10 +17,9 @@ public final class FNGenTest extends AdvancedQueryTest {
 
   /**
    * Test method for the fn:unparsed-text() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void fnUnparsedText() throws QueryException {
+  public void fnUnparsedText() {
     final String fun = check(Function.PARSETXT);
     contains(fun + "('" + TEXT + "')", "?&gt;&lt;html");
     contains(fun + "('" + TEXT + "', 'US-ASCII')", "?&gt;&lt;html");
@@ -30,20 +28,18 @@ public final class FNGenTest extends AdvancedQueryTest {
 
   /**
    * Test method for the fn:parse-xml() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void fnParseXML() throws QueryException {
+  public void fnParseXML() {
     final String fun = check(Function.PARSEXML);
     contains(fun + "('<x>a</x>')//text()", "a");
   }
 
   /**
    * Test method for the fn:serialize() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void fnSerialize() throws QueryException {
+  public void fnSerialize() {
     final String fun = check(Function.SERIALIZE);
     contains(fun + "(<x/>)", "&lt;x/&gt;");
     contains(fun + "(<x/>, " + serialParams("") + ")", "&lt;x/&gt;");

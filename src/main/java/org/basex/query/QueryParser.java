@@ -145,7 +145,7 @@ import org.basex.util.list.StringList;
 import org.basex.util.list.TokenList;
 
 /**
- * Simple query parser; can be overwritten to support more complex parsings.
+ * Parser for XQuery expressions.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -202,9 +202,8 @@ public class QueryParser extends InputParser {
    * @param c query context
    */
   public QueryParser(final String q, final QueryContext c) {
-    super(q);
+    super(q, c.base());
     ctx = c;
-    file = c.base();
   }
 
   /**
@@ -3361,7 +3360,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException if the variable isn't defined
    */
   private Var checkVar(final QNm name, final Err err) throws QueryException {
-
     Var v = ctx.vars.get(name);
     // dynamically assign variables from function modules
     if(v == null && !declVars) {
