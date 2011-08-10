@@ -2150,8 +2150,8 @@ public class QueryParser extends InputParser {
       boolean simple = true;
       do {
         while(!consume(delim)) {
-          final char c = curr();
-          if(c == '{') {
+          final char ch = curr();
+          if(ch == '{') {
             if(next() == '{') {
               tb.add(consume());
               consume();
@@ -2165,17 +2165,18 @@ public class QueryParser extends InputParser {
               }
               tb.reset();
             }
-          } else if(c == '}') {
-            ++qp;
+          } else if(ch == '}') {
+            consume();
             check('}');
             tb.add('}');
-          } else if(c == '<' || c == 0) {
+          } else if(ch == '<' || ch == 0) {
             error(NOQUOTE, found());
-          } else if(c == 0x0A || c == 0x09) {
-            ++qp;
+          } else if(ch == '\n' || ch == '\t') {
             tb.add(' ');
-          } else if(c == 0x0D) {
-            ++qp;
+            consume();
+          } else if(ch == '\r') {
+            if(next() != '\n') tb.add(' ');
+            consume();
           } else {
             entity(tb);
           }
@@ -2353,8 +2354,12 @@ public class QueryParser extends InputParser {
     final TokenBuilder tb = new TokenBuilder();
     while(true) {
       while(not(']')) {
-        final char c = consume();
-        if(c != '\r') tb.add(c);
+        char ch = consume();
+        if(ch == '\r') {
+          ch = '\n';
+          if(curr(ch)) consume();
+        }
+        tb.add(ch);
       }
       consume();
       if(curr(']') && next() == '>') {
@@ -3277,16 +3282,16 @@ public class QueryParser extends InputParser {
       tb.ent = true;
     } else {
       final char c = consume();
-      int cp = c;
+      int ch = c;
       if(Character.isHighSurrogate(c) && curr() != 0
           && Character.isLowSurrogate(curr())) {
-        cp = Character.toCodePoint(c, consume());
+        ch = Character.toCodePoint(c, consume());
       }
-      if(cp == 0x0d) {
-        cp = 0x0a;
-        if(curr(cp)) consume();
+      if(ch == '\r') {
+        ch = '\n';
+        if(curr(ch)) consume();
       }
-      tb.add(cp);
+      tb.add(ch);
     }
   }
 
