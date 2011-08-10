@@ -356,8 +356,7 @@ public abstract class W3CTS {
       try {
         files.add(file(nodes("*:input-file", state),
             nodes("*:input-file/@variable", state), xq, n == 0));
-        files.add(file(nodes("*:defaultCollection", state),
-            null, xq, n == 0));
+        files.add(file(nodes("*:defaultCollection", state), null, xq, n == 0));
 
         var(nodes("*:input-URI", state),
             nodes("*:input-URI/@variable", state), xq);
@@ -377,7 +376,6 @@ public abstract class W3CTS {
         sp.set(SerializerProp.S_INDENT, context.prop.is(Prop.CHOP) ?
             DataText.YES : DataText.NO);
         final XMLSerializer xml = new XMLSerializer(ao, sp);
-
         iter = xq.value().cache();
         for(Item it; (it = iter.next()) != null;) it.serialize(xml);
         xml.close();
@@ -466,8 +464,10 @@ public abstract class W3CTS {
           inspect |= s < cmpFiles.list.length &&
             eq(data.atom(cmpFiles.list[s]), INSPECT);
 
-          final byte[] res = result.get(s), actual = ao.toArray();
-          if(res.length == ao.size() && eq(res, actual)) break;
+          // normalize results
+          final byte[] res = delete(result.get(s), '\r');
+          final byte[] actual = delete(ao.toArray(), '\r');
+          if(eq(res, actual)) break;
 
           if(xml || frag) {
             iter.reset();
@@ -497,8 +497,7 @@ public abstract class W3CTS {
             logErr.append(norm(ao.toString()));
             logErr.append(NL);
             logErr.append(NL);
-            addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"),
-                ao.toString());
+            addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"), ao.toString());
           }
           correct = false;
           ++err;
@@ -509,8 +508,7 @@ public abstract class W3CTS {
             logOK.append(norm(ao.toString()));
             logOK.append(NL);
             logOK.append(NL);
-            addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"),
-                ao.toString());
+            addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"), ao.toString());
           }
           ++ok;
         }
@@ -789,7 +787,7 @@ public abstract class W3CTS {
    */
   private String read(final IO f) {
     try {
-      return TextInput.content(f).toString().replaceAll("\r\n?", "\n");
+      return TextInput.content(f).toString();
     } catch(final IOException ex) {
       Util.errln(ex);
       return "";
