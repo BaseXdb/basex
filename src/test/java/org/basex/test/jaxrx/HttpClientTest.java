@@ -43,7 +43,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
@@ -526,10 +525,8 @@ public final class HttpClientTest {
         "http://www.test.com"));
     req1.payloadAttrs.add(MEDIATYPE, token("text/xml"));
     // Node child
-    final NodeCache ch1 = new NodeCache();
-    ch1.add(new FTxt(token("a"), null));
-    final FElem e1 = new FElem(new QNm(token("a")),
-        ch1, null, null, null, null);
+    final FElem e1 = new FElem(new QNm(token("a")));
+    e1.add(new FTxt(token("a")));
     req1.bodyContent.add(e1);
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
@@ -543,10 +540,8 @@ public final class HttpClientTest {
         "http://www.test.com"));
     req2.payloadAttrs.add(MEDIATYPE, token("text/plain"));
     // Node child
-    final NodeCache ch2 = new NodeCache();
-    ch2.add(new FTxt(token("a"), null));
-    final FElem e2 = new FElem(new QNm(token("a")),
-        ch2, null, null, null, null);
+    final FElem e2 = new FElem(new QNm(token("a")));
+    e2.add(new FTxt(token("a")));
     req2.bodyContent.add(e2);
     // String item child
     req2.bodyContent.add(Str.get("<b>b</b>"));
@@ -560,10 +555,8 @@ public final class HttpClientTest {
     req3.payloadAttrs.add(MEDIATYPE, token("text/xml"));
     req3.payloadAttrs.add(token("method"), token("text"));
     // Node child
-    final NodeCache ch3 = new NodeCache();
-    ch3.add(new FTxt(token("a"), null));
-    final FElem e3 = new FElem(new QNm(token("a")),
-        ch3, null, null, null, null);
+    final FElem e3 = new FElem(new QNm(token("a")));
+    e3.add(new FTxt(token("a")));
     req3.bodyContent.add(e3);
     // String item child
     req3.bodyContent.add(Str.get("<b>b</b>"));
@@ -590,9 +583,8 @@ public final class HttpClientTest {
     // Case 2: content is a node
     final Request req2 = new Request();
     req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
-    final NodeCache ch = new NodeCache();
-    ch.add(new FTxt(token("dGVzdA=="), null));
-    final FElem e3 = new FElem(new QNm(token("a")), ch, null, null, null, null);
+    final FElem e3 = new FElem(new QNm(token("a")));
+    e3.add(new FTxt(token("dGVzdA==")));
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
@@ -619,9 +611,8 @@ public final class HttpClientTest {
     // Case 2: content is a node
     final Request req2 = new Request();
     req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
-    final NodeCache ch = new NodeCache();
-    ch.add(new FTxt(token("74657374"), null));
-    final FElem e3 = new FElem(new QNm(token("a")), ch, null, null, null, null);
+    final FElem e3 = new FElem(new QNm(token("a")));
+    e3.add(new FTxt(token("74657374")));
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
