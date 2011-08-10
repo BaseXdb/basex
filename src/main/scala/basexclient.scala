@@ -91,6 +91,7 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
     send(target)
     send(input)
   }
+
   /**
    * Returns command information.
    * @return string info
