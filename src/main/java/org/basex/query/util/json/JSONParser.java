@@ -30,9 +30,9 @@ public final class JSONParser extends InputParser {
   private static final QNm E_JSON = new QNm(JSON);
   /** Element: pair. */
   private static final QNm E_PAIR = new QNm(PAIR);
-  /** Element: pair. */
+  /** Element: item. */
   private static final QNm E_ITEM = new QNm(ITEM);
-  /** Element: name. */
+  /** Attribute: name. */
   private static final QNm A_NAME = new QNm(NAME);
   /** Attribute: type. */
   private static final QNm A_TYPE = new QNm(TYPE);

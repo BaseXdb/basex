@@ -175,7 +175,7 @@ public interface DataText {
   byte[] JSON = token("json");
   /** Value: pair. */
   byte[] PAIR = token("pair");
-  /** Value: pair. */
+  /** Value: item. */
   byte[] ITEM = token("item");
   /** Value: type. */
   byte[] TYPE = token("type");
