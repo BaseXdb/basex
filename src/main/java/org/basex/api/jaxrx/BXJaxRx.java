@@ -1,6 +1,7 @@
 package org.basex.api.jaxrx;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import static org.jaxrx.core.JaxRxConstants.*;
 
 import java.io.IOException;
@@ -65,24 +66,22 @@ public final class BXJaxRx implements JaxRx {
           final String all = path.getResourcePath();
 
           final Table table = new Table(exec(new ListDB(all), null));
-          xml.openElement(Token.token(JAXRX + ":" + "database"),
-              Token.token("name"), Token.token(path.getResource(0)),
-            Token.token("documents"), Token.token(table.contents.size()));
+          xml.openElement(token(JAXRX + ":" + "database"),
+            token("name"), token(path.getResource(0)),
+            token("documents"), token(table.contents.size()));
 
           for(final TokenList l : table.contents) {
-            xml.emptyElement(Token.token(JAXRX + ":" + "document"),
-                Token.token("path"), l.get(0),
-                Token.token("nodes"), l.get(1));
+            xml.emptyElement(token(JAXRX + ":" + "document"),
+                token("path"), l.get(0), token("nodes"), l.get(1));
           }
           xml.closeElement();
         } else {
           // retrieve list of databases
           final Table table = new Table(exec(new List(), null));
           for(final TokenList l : table.contents) {
-            xml.emptyElement(Token.token(JAXRX + ":" + "database"),
-                Token.token("name"), l.get(0),
-                Token.token("documents"), l.get(1),
-                Token.token("size"), l.get(2));
+            xml.emptyElement(token(JAXRX + ":" + "database"),
+                token("name"), l.get(0), token("documents"), l.get(1),
+                token("size"), l.get(2));
           }
         }
         xml.close();
@@ -117,7 +116,7 @@ public final class BXJaxRx implements JaxRx {
 
         try {
           // perform query
-          return query(Token.string(io.content()));
+          return query(string(io.content()));
         } catch(final IOException ex) {
           // file could not be opened for some other reason...
           throw new JaxRxException(400, ex.getMessage());
