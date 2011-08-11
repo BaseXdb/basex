@@ -4,7 +4,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 
-import org.basex.data.FTPos;
 import org.basex.data.Result;
 import org.basex.util.Util;
 import org.xml.sax.ContentHandler;
@@ -30,8 +29,6 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private LexicalHandler lexical;
   /** Content handler reference. */
   private final Result result;
-  /** Caches a tag name. */
-  private String tag;
   /** Caches attributes. */
   private AttributesImpl atts;
 
@@ -145,47 +142,31 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void start(final byte[] t) {
-    tag = string(t);
+  protected void startOpen(final byte[] t) {
     atts = new AttributesImpl();
   }
 
   @Override
-  protected void empty() throws IOException {
-    finish();
+  protected void finishOpen() throws IOException {
     try {
-      content.endElement("", tag, tag);
+      content.startElement("", string(tag), string(tag), atts);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }
   }
 
   @Override
-  protected void finish() throws IOException {
+  protected void finishClose(final boolean empty) throws IOException {
+    if(empty) finishOpen();
     try {
-      content.startElement("", tag, tag, atts);
+      content.endElement("", string(tag), string(tag));
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }
   }
 
   @Override
-  protected void close(final byte[] t) throws IOException {
-    try {
-      tag = string(t);
-      content.endElement("", tag, tag);
-    } catch(final SAXException ex) {
-      throw new IOException(ex.getMessage());
-    }
-  }
-
-  @Override
-  protected void cls() {
-  }
-
-  @Override
-  public void text(final byte[] b) throws IOException {
-    finishElement();
+  public void finishText(final byte[] b) throws IOException {
     final char[] c = string(b).toCharArray();
     try {
       content.characters(c, 0, c.length);
@@ -195,13 +176,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void text(final byte[] b, final FTPos ftp) throws IOException {
-    text(b);
-  }
-
-  @Override
-  public void comment(final byte[] t) throws IOException {
-    finishElement();
+  public void finishComment(final byte[] t) throws IOException {
     try {
       final char[] c = string(t).toCharArray();
       if(lexical != null) lexical.comment(c, 0, t.length);
@@ -211,8 +186,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void pi(final byte[] n, final byte[] v) throws IOException {
-    finishElement();
+  public void finishPi(final byte[] n, final byte[] v) throws IOException {
     try {
       content.processingInstruction(string(n), string(v));
     } catch(final SAXException ex) {
@@ -221,8 +195,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void item(final byte[] b) throws IOException {
-    finishElement();
+  public void finishItem(final byte[] b) throws IOException {
     throw new IOException("Can't serialize atomic items.");
   }
 }

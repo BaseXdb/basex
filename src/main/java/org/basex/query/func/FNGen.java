@@ -313,7 +313,7 @@ public final class FNGen extends FuncCall {
     } catch(final IOException ex) {
       SERANY.thrw(input, ex);
     }
-    return Str.get(ao.toArray());
+    return Str.get(delete(ao.toArray(), '\r'));
   }
 
   /**

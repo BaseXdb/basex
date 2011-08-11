@@ -76,8 +76,25 @@ public interface DataText {
   String DBATTS = "ATTS";
   /** Path summary. */
   String DBPATH = "PATH";
-  /** Tags. */
+  /** Namespace. */
   String DBNS = "NS";
+
+  // DATABASE FILES ===========================================================
+
+  /** Database - Info. */
+  String DATAINF = "inf";
+  /** Database - Tokens. */
+  String DATATBL = "tbl";
+  /** Database - Temporary Size References. */
+  String DATATMP = "tmp";
+  /** Database - Text index. */
+  String DATATXT = "txt";
+  /** Database - Attribute value index. */
+  String DATAATV = "atv";
+  /** Database - Full-text index. */
+  String DATAFTX = "ftx";
+  /** Database - Stopword list. */
+  String DATASWL = "swl";
 
   // XML SERIALIZATION ========================================================
 
@@ -95,6 +112,7 @@ public interface DataText {
   String V40 = "4.0";
   /** Version. */
   String V401 = "4.01";
+
   /** Method. */
   String M_XML = "xml";
   /** Method. */
@@ -104,15 +122,28 @@ public interface DataText {
   /** Method. */
   String M_CSV = "csv";
   /** Method. */
-  String M_JSON = "json";
-  /** Method. */
   String M_MAB2 = "mab2";
   /** Method. */
   String M_TEXT = "text";
+
   /** Normalization. */
   String NFC = "NFC";
   /** Normalization. */
   String NONE = "none";
+
+  /** Document declaration. */
+  String DOCDECL1 = "xml version=\"";
+  /** Document declaration. */
+  String DOCDECL2 = "\" encoding=\"";
+  /** Document declaration. */
+  String DOCDECL3 = "\" standalone=\"";
+
+  /** Doctype output. */
+  String DOCTYPE = "<!DOCTYPE ";
+  /** Doctype system keyword. */
+  String SYSTEM = "SYSTEM";
+  /** Doctype public keyword. */
+  String PUBLIC = "PUBLIC";
 
   /** Ampersand entity. */
   byte[] E_AMP = token("&amp;");
@@ -140,40 +171,52 @@ public interface DataText {
   /** Size tag. */
   byte[] SIZE = token("size");
 
-  /** Document declaration. */
-  String DOCDECL1 = "xml version=\"";
-  /** Document declaration. */
-  String DOCDECL2 = "\" encoding=\"";
-  /** Document declaration. */
-  String DOCDECL3 = "\" standalone=\"";
-  /** Doctype output. */
-  String DOCTYPE = "<!DOCTYPE ";
-  /** Doctype system keyword. */
-  String SYSTEM = "SYSTEM";
-  /** Doctype public keyword. */
-  String PUBLIC = "PUBLIC";
+  /** Value: json. */
+  byte[] JSON = token("json");
+  /** Value: pair. */
+  byte[] PAIR = token("pair");
+  /** Value: pair. */
+  byte[] ITEM = token("item");
+  /** Value: type. */
+  byte[] TYPE = token("type");
+
+  /** Value: string type. */
+  byte[] STR = token("string");
+  /** Value: number type. */
+  byte[] NUM = token("number");
+  /** Value: object type. */
+  byte[] OBJ = token("object");
+  /** Value: array type. */
+  byte[] ARR = token("array");
+  /** Value: boolean type. */
+  byte[] BOOL = token("boolean");
+  /** Value: null type. */
+  byte[] NULL = token("null");
 
   /** Comment output. */
-  byte[] COM1 = token("<!--");
+  byte[] COMM_O = token("<!--");
   /** Comment output. */
-  byte[] COM2 = token("-->");
+  byte[] COMM_C = token("-->");
+
   /** PI output. */
-  byte[] PI1 = token("<?");
+  byte[] PI_O = token("<?");
   /** PI output. */
-  byte[] PI2 = token("?>");
+  byte[] PI_C = token("?>");
 
   /** Element output. */
-  byte[] ELEM1 = { '<' };
+  byte[] ELEM_O = { '<' };
   /** Element output. */
-  byte[] ELEM2 = { '>' };
+  byte[] ELEM_C = { '>' };
   /** Element output. */
-  byte[] ELEM3 = token("</");
+  byte[] ELEM_OS = token("</");
   /** Element output. */
-  byte[] ELEM4 = token("/>");
+  byte[] ELEM_SC = token("/>");
+
   /** Attribute output. */
   byte[] ATT1 = token("=\"");
   /** Attribute output. */
   byte[] ATT2 = token("\"");
+
   /** Document output. */
   byte[] DOC = token("doc()");
   /** Text output. */
@@ -185,9 +228,9 @@ public interface DataText {
   /** Attribute output. */
   byte[] ATT = { '@' };
   /** CDATA output. */
-  byte[] CDATA1 = token("<![CDATA[");
+  byte[] CDATA_O = token("<![CDATA[");
   /** CDATA output. */
-  byte[] CDATA2 = token("]]>");
+  byte[] CDATA_C = token("]]>");
 
   /** HTML: head element. */
   byte[] HEAD = token("head");
@@ -201,6 +244,8 @@ public interface DataText {
   byte[] CONTENT = token("content");
   /** HTML: charset attribute value. */
   byte[] CHARSET = token("; charset=");
+
+  // ERRORS ===================================================================
 
   /** Serialization error. */
   String SERVAL = "Parameter '%' must be [%";
@@ -234,21 +279,4 @@ public interface DataText {
   byte[] TABLEURI = token("URI");
   /** Table kinds. */
   byte[][] TABLEKINDS = tokens("DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  ");
-
-  // DATABASE FILES ===========================================================
-
-  /** Database - Info. */
-  String DATAINFO = "inf";
-  /** Database - Tokens. */
-  String DATATBL = "tbl";
-  /** Database - Temporary Size References. */
-  String DATATMP = "tmp";
-  /** Database - Text index. */
-  String DATATXT = "txt";
-  /** Database - Attribute value index. */
-  String DATAATV = "atv";
-  /** Database - Full-text index. */
-  String DATAFTX = "ftx";
-  /** Database - Stopword list. */
-  String DATASWL = "swl";
 }

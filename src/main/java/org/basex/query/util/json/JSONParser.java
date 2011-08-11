@@ -1,5 +1,6 @@
 package org.basex.query.util.json;
 
+import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
@@ -10,12 +11,11 @@ import org.basex.query.item.FTxt;
 import org.basex.query.item.QNm;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
- * Parser for JSON expressions.
+ * Parser for converting JSON to XML.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -27,27 +27,15 @@ public final class JSONParser extends InputParser {
   private static final String INVALEXP = "Char \"%\" found, % expected";
 
   /** Element: json. */
-  private static final QNm E_JSON = new QNm(token("json"));
+  private static final QNm E_JSON = new QNm(JSON);
   /** Element: pair. */
-  private static final QNm E_PAIR = new QNm(token("pair"));
+  private static final QNm E_PAIR = new QNm(PAIR);
   /** Element: pair. */
-  private static final QNm E_ITEM = new QNm(token("item"));
+  private static final QNm E_ITEM = new QNm(ITEM);
   /** Element: name. */
-  private static final QNm A_NAME = new QNm(token("name"));
+  private static final QNm A_NAME = new QNm(NAME);
   /** Attribute: type. */
-  private static final QNm A_TYPE = new QNm(token("type"));
-  /** Value: string. */
-  private static final byte[] STR = token("string");
-  /** Value: string. */
-  private static final byte[] NUM = token("number");
-  /** Value: object. */
-  private static final byte[] OBJ = token("object");
-  /** Value: array. */
-  private static final byte[] ARR = token("array");
-  /** Value: boolean. */
-  private static final byte[] BOOL = token("boolean");
-  /** Value: null. */
-  private static final byte[] NULL = token("null");
+  private static final QNm A_TYPE = new QNm(TYPE);
 
   /** Token builder. */
   private final TokenBuilder tb = new TokenBuilder();
@@ -60,7 +48,7 @@ public final class JSONParser extends InputParser {
    * @param ii input info
    */
   public JSONParser(final byte[] q, final InputInfo ii) {
-    super(Token.string(q));
+    super(string(q));
     input = ii;
   }
 
@@ -71,22 +59,28 @@ public final class JSONParser extends InputParser {
    */
   public ANode parse() throws QueryException {
     final FElem root = new FElem(E_JSON);
-    root.add(new FAttr(A_TYPE, OBJ));
-    object(root);
+    if(object(root)) {
+      root.add(new FAttr(A_TYPE, OBJ));
+    } else if(array(root)) {
+      root.add(new FAttr(A_TYPE, ARR));
+    } else {
+      error(INVALEXP, curr(), "\"{\" or \"[\"");
+    }
+    skipWS();
+    if(more()) error(INVALEXP, curr(), "end of file");
     return root;
   }
 
   /**
    * Parses an object.
    * @param root root node
+   * @return success flag
    * @throws QueryException query exception
    */
-  private void object(final FElem root)
-      throws QueryException {
-
-    if(!wsConsume('{')) return;
+  private boolean object(final FElem root) throws QueryException {
+    if(!wsConsume('{')) return false;
     do {
-      final byte[] key = string();
+      final byte[] key = str();
       if(key == null) {
         if(root.hasChildren()) error(INVALEXP, curr(), '"');
         break;
@@ -98,20 +92,23 @@ public final class JSONParser extends InputParser {
       root.add(pair);
     } while(wsConsume(','));
     wsCheck('}');
+    return true;
   }
 
   /**
    * Parses an array.
    * @param root root node
+   * @return success flag
    * @throws QueryException query exception
    */
-  private void array(final FElem root) throws QueryException {
-    if(!wsConsume('[')) return;
+  private boolean array(final FElem root) throws QueryException {
+    if(!wsConsume('[')) return false;
     do {
       final FElem item = new FElem(E_ITEM);
       if(value(item, root.hasChildren())) root.add(item);
     } while(wsConsume(','));
     wsCheck(']');
+    return true;
   }
 
   /**
@@ -129,7 +126,8 @@ public final class JSONParser extends InputParser {
     byte[] type;
     if(ch == '"') {
       type = STR;
-      root.add(new FTxt(string()));
+      final byte[] str = str();
+      if(str.length != 0) root.add(new FTxt(str));
     } else if(digit(ch) || ch == '-') {
       type = NUM;
       root.add(new FTxt(number()));
@@ -158,7 +156,7 @@ public final class JSONParser extends InputParser {
    * @return resulting string
    * @throws QueryException query exception
    */
-  private byte[] string() throws QueryException {
+  private byte[] str() throws QueryException {
     if(!wsConsume('"')) return null;
     tb.reset();
     while(more()) {
@@ -247,7 +245,7 @@ public final class JSONParser extends InputParser {
   }
 
   /**
-   * Consumes the surrounding whitespace and the specified character.
+   * Consumes leading whitespaces and the specified character.
    * @param c character to consume
    * @return true if token was found
    */
@@ -257,7 +255,7 @@ public final class JSONParser extends InputParser {
   }
 
   /**
-   * Consumes all whitespace characters from the remaining query.
+   * Consumes consecutive whitespace characters.
    * @return true if whitespaces were found
    */
   private boolean skipWS() {
@@ -294,8 +292,7 @@ public final class JSONParser extends InputParser {
   }
 
   /**
-   * Skips whitespaces, raises an error if the specified string cannot be
-   * consumed.
+   * Raises an error with the specified message.
    * @param msg error message
    * @param ext error details
    * @return build exception

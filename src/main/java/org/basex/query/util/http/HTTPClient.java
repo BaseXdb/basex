@@ -385,7 +385,7 @@ public final class HTTPClient {
     try {
       payload.serialize(xml);
     } finally {
-      xml.cls();
+      xml.close();
     }
   }
 

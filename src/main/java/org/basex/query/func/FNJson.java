@@ -1,9 +1,18 @@
 package org.basex.query.func;
 
+import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
+
+import java.io.IOException;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.JSONSerializer;
+import org.basex.io.serial.SerializerException;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
+import org.basex.query.item.Str;
 import org.basex.query.util.json.JSONParser;
 import org.basex.util.InputInfo;
 
@@ -31,8 +40,19 @@ public final class FNJson extends FuncCall {
       case JPARSE:
         return new JSONParser(checkStr(expr[0], ctx), input).parse();
       case JSERIALIZE:
-        checkNode(expr[0].item(ctx, input));
-        return null;
+        final ANode node = checkNode(checkItem(expr[0], ctx));
+        final ArrayOutput ao = new ArrayOutput();
+        try {
+          // run serialization
+          final JSONSerializer json = new JSONSerializer(ao, ctx.serProp(true));
+          node.serialize(json);
+          json.close();
+        } catch(final SerializerException ex) {
+          throw new QueryException(input, ex);
+        } catch(final IOException ex) {
+          SERANY.thrw(input, ex);
+        }
+        return Str.get(delete(ao.toArray(), '\r'));
       default:
         return super.item(ctx, ii);
     }

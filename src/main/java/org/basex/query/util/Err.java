@@ -52,6 +52,8 @@ public enum Err {
   DBLOCKED(BASX, 16, Text.DBLOCKED),
   /** BASEX0017: Evaluation exception. */
   JSONPARSE(BASX, 17, "JSON Parser: %."),
+  /** BASEX0018: Serialization exception. */
+  JSONSER(BASX, 18, "JSON Serialization: %."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),

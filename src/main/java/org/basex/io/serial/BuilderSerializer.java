@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.build.Builder;
-import org.basex.data.FTPos;
 import org.basex.util.Atts;
 
 /**
@@ -15,10 +14,6 @@ import org.basex.util.Atts;
  * @author Leo Woerteler
  */
 public class BuilderSerializer extends Serializer {
-  /** Current tag name. */
-  private byte[] tag;
-  /** True while being in an open tag. */
-  private boolean open;
   /** Attribute cache. */
   private final Atts att = new Atts();
   /** The builder. */
@@ -33,62 +28,40 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public final void text(final byte[] b, final FTPos ftp) throws IOException {
-    text(b);
-  }
-
-  @Override
-  public final void text(final byte[] b) throws IOException {
-    finish();
+  public final void finishText(final byte[] b) throws IOException {
     build.text(b);
   }
 
   @Override
-  protected void start(final byte[] t) throws IOException {
-    tag = t;
-    open = true;
+  protected void startOpen(final byte[] t) throws IOException {
   }
 
   @Override
-  public final void pi(final byte[] n, final byte[] v) throws IOException {
-    build.pi(concat(n, new byte[]{ ' ' }, v));
+  public final void finishPi(final byte[] n, final byte[] v)
+      throws IOException {
+    build.pi(concat(n, SPACE, v));
   }
 
   @Override
-  public final void item(final byte[] b) throws IOException {
+  public final void finishItem(final byte[] b) throws IOException {
     text(b);
   }
 
   @Override
-  protected final void finish() throws IOException {
-    if(open) {
-      build.startElem(tag, att);
-      att.reset();
-      open = false;
-    }
-  }
-
-  @Override
-  protected final void empty() throws IOException {
-    if(open) {
-      build.emptyElem(tag, att);
-      open = false;
-    } else {
-      close(tag);
-    }
-    tag = null;
+  protected final void finishOpen() throws IOException {
+    build.startElem(tag, att);
     att.reset();
   }
 
   @Override
-  public final void comment(final byte[] b) throws IOException {
-    build.comment(b);
+  protected final void finishClose(final boolean empty) throws IOException {
+    if(empty) build.emptyElem(tag, att);
+    else build.endElem();
   }
 
   @Override
-  protected final void close(final byte[] t) throws IOException {
-    build.endElem();
-    tag = null;
+  public final void finishComment(final byte[] b) throws IOException {
+    build.comment(b);
   }
 
   @Override
@@ -113,20 +86,5 @@ public class BuilderSerializer extends Serializer {
   @Override
   protected final void closeDoc() throws IOException {
     build.endDoc();
-  }
-
-  @Override
-  public final void openResult() throws IOException {
-    // ignore this
-  }
-
-  @Override
-  public final void closeResult() throws IOException {
-    // ignore this
-  }
-
-  @Override
-  protected final void cls() throws IOException {
-    // ignore this
   }
 }

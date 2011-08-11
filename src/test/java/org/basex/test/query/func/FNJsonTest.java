@@ -12,16 +12,13 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class FNJsonTest extends AdvancedQueryTest {
-  /** Sample files. */
-  private static final String[][] FILES = {
-    { "", "<json type=\"object\"/>" },
+  /** JSON snippets. */
+  private static final String[][] TOXML = {
     { "{" },
     { "{}", "<json type=\"object\"/>" },
     { "  { } ", "<json type=\"object\"/>" },
     { "{ \"" },
-    { "{ \"\\u0000\" : 0 }" },
     { "{ \"\\c\" : 0 }" },
-    { "{ \"\\b\" : 0 }" },
     { "{ \"\\t\" : 0 }",
       "...<pair name=\"&#x09;\" type=\"number\">0</pair>"  },
     { "{ \"a\" :0 }",
@@ -54,13 +51,30 @@ public final class FNJsonTest extends AdvancedQueryTest {
     { "{ \"a\" : 0 }}" },
   };
 
+  /** XML snippets. */
+  private static final String[][] TOJSON = {
+    { "<a/>" }, // invalid tag
+    { "<json/>" }, // no type specified
+    { "<json type='o'/>" }, // invalid type
+    { "<json type='object'/>", "{}" },
+    { "<json type='array'/>", "[]" },
+    { "<json type='number'>1</json>" }, // no text allowed in json tag
+    { "<json type='array'><item type='null'/></json>", "[null]" },
+    { "<json type='array'><item type='number'/></json>" }, // value needed
+    { "<json type='array'><item type='boolean'/></json>" }, // value needed
+    { "<json type='array'><item type='null'>x</item></json>" }, // no value
+    { "<json type='array'><item type='string'/></json>", "[\"\"]" },
+    { "<json type='array'><item type='string'>x</item></json>", "[\"x\"]" },
+    { "<json type='array'><item type='number'>1</item></json>", "[1]" },
+  };
+
   /**
    * Test method for the json:parse() function.
    */
   @Test
   public void jsonParse() {
     final String fun = check(Function.JPARSE);
-    for(final String[] f : FILES) {
+    for(final String[] f : TOXML) {
       final String qu = fun + "('" + f[0] + "')";
       if(f.length == 1) {
         error(qu, Err.JSONPARSE);
@@ -77,6 +91,16 @@ public final class FNJsonTest extends AdvancedQueryTest {
    */
   @Test
   public void jsonSerialize() {
-    check(Function.JSERIALIZE);
+    final String fun = check(Function.JSERIALIZE);
+    for(final String[] f : TOJSON) {
+      final String qu = fun + "(" + f[0] + ")";
+      if(f.length == 1) {
+        error(qu, Err.JSONSER);
+      } else if(f[1].startsWith("...")) {
+        contains(qu, f[1].substring(3));
+      } else {
+        query(qu, f[1]);
+      }
+    }
   }
 }

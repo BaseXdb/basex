@@ -328,7 +328,7 @@ public final class NamespaceTest {
     query(
         "insert node doc('d3') into doc('d1')/x",
         "doc('d1')/x/*/*",
-        "<b:y xmlns:b='bb' xmlns:a='aa'/>");
+        "<b:y xmlns:b='bb'/>");
   }
 
   /**

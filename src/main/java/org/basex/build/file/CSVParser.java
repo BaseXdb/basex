@@ -126,23 +126,23 @@ public final class CSVParser extends SingleParser {
             continue;
           }
         }
-        while(ch == 0x0D) {
+        while(ch == '\r') {
           ch = bi.readChar();
-          if(ch != 0x0A) tb.add(0x0A);
+          if(ch != '\n') tb.add('\n');
         }
-        if(ch != 0x0D) tb.add(ch);
+        if(ch != '\r') tb.add(ch);
       } else if(ch == separator) {
         if(open) {
           open();
           open = false;
         }
         add(tb);
-      } else if(ch == 0x0D) {
+      } else if(ch == '\r') {
         ch = bi.readChar();
-        if(ch == 0x0A) continue;
+        if(ch == '\n') continue;
         finish(tb, open);
         open = true;
-      } else if(ch == 0x0A) {
+      } else if(ch == '\n') {
         finish(tb, open);
         open = true;
       } else if(ch == '"') {

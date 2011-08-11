@@ -48,7 +48,8 @@ public abstract class AdvancedQueryTest {
     final String res = query(query);
     final String exp = result.toString();
     if(!res.equals(exp))
-      fail("Wrong result.\n[Q] " + query + "\n[E] " + result + "\n[F] " + res);
+      fail("Wrong result:\n[Q] " + query + "\n[E] \u00bb" + result +
+          "\u00ab\n[F] \u00bb" + res + "\u00ab");
   }
 
   /**
@@ -71,7 +72,9 @@ public abstract class AdvancedQueryTest {
   protected static void error(final String query, final Err... error) {
     final QueryProcessor qp = new QueryProcessor(query, CONTEXT);
     try {
-      qp.execute().toString().replaceAll("(\\r|\\n) *", "");
+      final String res = qp.execute().toString().replaceAll("(\\r|\\n) *", "");
+      fail("Query did not fail:\n" + query + "\n[E] " +
+          error[0] + "...\n[F] " + res);
     } catch(final QueryException ex) {
       check(ex, error);
     } finally {

@@ -24,7 +24,7 @@ import org.basex.util.list.TokenList;
  */
 public final class XMLSerializer extends Serializer {
   /** Default serialization parameters. */
-  private static final SerializerProp PROPS = new SerializerProp();
+  static final SerializerProp PROPS = new SerializerProp();
   /** New line. */
   private static final byte[] NL = token(Prop.NL);
 
@@ -164,7 +164,7 @@ public final class XMLSerializer extends Serializer {
     // print document declaration
     if(mth != M_HTML && mth != M_TEXT) {
       if(decl) {
-        print(PI1);
+        print(PI_O);
         print(DOCDECL1);
         print(version);
         print(DOCDECL2);
@@ -174,7 +174,7 @@ public final class XMLSerializer extends Serializer {
           print(sa);
         }
         print(ATT2);
-        print(PI2);
+        print(PI_C);
         ind = indent;
       } else if(!sa.equals(OMIT) || version.equals(V11) && docsys != null) {
         SERSTAND.thrwSerial();
@@ -185,7 +185,6 @@ public final class XMLSerializer extends Serializer {
     if(wrap) {
       openElement(wPre.length != 0 ? concat(wPre, COLON, RESULTS) : RESULTS);
       namespace(wPre, wUri);
-      finishElement();
     }
   }
 
@@ -224,8 +223,8 @@ public final class XMLSerializer extends Serializer {
     print(' ');
     print(n);
 
-    final byte[] tagatt = mth == M_XML || tags.size() == 0 ? EMPTY :
-      concat(lc(tags.get(tags.size() - 1)), COLON, lc(n));
+    final byte[] tagatt = mth == M_XML || level() == 0 ? EMPTY :
+      concat(lc(tags.peek()), COLON, lc(n));
 
     // don't append value for boolean attributes
     if(mth == M_HTML && BOOLEAN.id(tagatt) != 0) return;
@@ -252,12 +251,12 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  public void text(final byte[] b) throws IOException {
-    finishElement();
-
-    if(cdata.size() != 0 && cdata.contains(tags.get(tags.size() - 1)) &&
-        mth != M_HTML && mth != M_TEXT) {
-      print(CDATA1);
+  public void finishText(final byte[] b) throws IOException {
+    if(cdata.size() == 0 || !cdata.contains(tags.peek()) ||
+        mth == M_HTML || mth == M_TEXT) {
+      for(int k = 0; k < b.length; k += cl(b, k)) ch(cp(b, k));
+    } else {
+      print(CDATA_O);
       int c = 0;
       for(int k = 0; k < b.length; k += cl(b, k)) {
         final int ch = cp(b, k);
@@ -265,24 +264,20 @@ public final class XMLSerializer extends Serializer {
           ++c;
         } else {
           if(c > 1 && ch == '>') {
-            print(CDATA2);
-            print(CDATA1);
+            print(CDATA_C);
+            print(CDATA_O);
           }
           c = 0;
         }
         print(ch);
       }
-      print(CDATA2);
-    } else {
-      for(int k = 0; k < b.length; k += cl(b, k)) ch(cp(b, k));
+      print(CDATA_C);
     }
     ind = false;
   }
 
   @Override
-  public void text(final byte[] b, final FTPos ftp) throws IOException {
-    finishElement();
-
+  public void finishText(final byte[] b, final FTPos ftp) throws IOException {
     final FTLexer lex = new FTLexer().sc().init(b);
     while(lex.hasNext()) {
       final FTSpan span = lex.next();
@@ -295,31 +290,28 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  public void comment(final byte[] n) throws IOException {
+  public void finishComment(final byte[] n) throws IOException {
     if(mth == M_TEXT) return;
-    finishElement();
     if(ind) indent(true);
-    print(COM1);
+    print(COMM_O);
     print(n);
-    print(COM2);
+    print(COMM_C);
   }
 
   @Override
-  public void pi(final byte[] n, final byte[] v) throws IOException {
+  public void finishPi(final byte[] n, final byte[] v) throws IOException {
     if(mth == M_TEXT) return;
-    finishElement();
     if(ind) indent(true);
     if(mth == M_HTML && contains(v, '>')) SERPI.thrwSerial();
-    print(PI1);
+    print(PI_O);
     print(n);
     print(' ');
     print(v);
-    print(mth == M_HTML ? ELEM2 : PI2);
+    print(mth == M_HTML ? ELEM_C : PI_C);
   }
 
   @Override
-  public void item(final byte[] b) throws IOException {
-    finishElement();
+  public void finishItem(final byte[] b) throws IOException {
     if(ind) print(' ');
     for(int k = 0; k < b.length; k += cl(b, k)) ch(cp(b, k));
     ind = format;
@@ -342,7 +334,7 @@ public final class XMLSerializer extends Serializer {
         print(ch);
         return;
       }
-      if(ch < 0x20 && ch != 0x09 && ch != 0x0A && ch != 0x0D) return;
+      if(ch < ' ' && ch != '\t' && ch != '\n' && ch != '\r') return;
       if(ch > 0x7F && ch < 0xA0) SERILL.thrwSerial(Integer.toHexString(ch));
       if(ch == 0xA0) {
         print(E_NBSP);
@@ -352,16 +344,14 @@ public final class XMLSerializer extends Serializer {
 
     if(!format) {
       print(ch);
+    } else if(ch < ' ' && ch != '\t' && ch != '\n' || ch > 0x7F && ch < 0xA0) {
+      hex(ch);
     } else {
-      if(ch < 0x20 && ch != 0x09 && ch != 0x0A || ch > 0x7F && ch < 0xA0) {
-        hex(ch);
-      } else {
-        switch(ch) {
-          case '&': print(E_AMP); break;
-          case '>': print(E_GT); break;
-          case '<': print(E_LT); break;
-          default : print(ch);
-        }
+      switch(ch) {
+        case '&': print(E_AMP); break;
+        case '>': print(E_GT); break;
+        case '<': print(E_LT); break;
+        default : print(ch);
       }
     }
   }
@@ -372,11 +362,11 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  protected void start(final byte[] t) throws IOException {
+  protected void startOpen(final byte[] t) throws IOException {
     if(mth == M_TEXT) return;
 
-    if(tags.size() == 1 && docsys != null) {
-      if(ind) indent(false);
+    if(level() == 0 && docsys != null) {
+      if(ind) indent(true);
       print(DOCTYPE);
       if(mth == M_HTML) print(M_HTML);
       else print(t);
@@ -386,13 +376,13 @@ public final class XMLSerializer extends Serializer {
         print(" " + SYSTEM);
       }
       print(" \"" + docsys + "\"");
-      print(ELEM2);
+      print(ELEM_C);
       print(NL);
       docsys = null;
     }
 
-    if(ind) indent(false);
-    print(ELEM1);
+    if(ind) indent(true);
+    print(ELEM_O);
     print(t);
     ind = indent;
 
@@ -406,39 +396,40 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  protected void empty() throws IOException {
+  protected void finishOpen() throws IOException {
+    if(mth != M_TEXT) print(ELEM_C);
+  }
+
+  @Override
+  protected void finishClose(final boolean empty) throws IOException {
     if(mth == M_TEXT) return;
-    if(mth == M_XML) {
-      print(ELEM4);
-    } else {
-      final byte[] tag = tags.get(tags.size());
-      final boolean empty = EMPTIES.contains(lc(tag));
-      if(mth == M_XHTML && empty) {
-        print(' ');
-        print(ELEM4);
+
+    boolean close = !empty;
+    if(empty) {
+      if(mth == M_XML) {
+        print(ELEM_SC);
       } else {
-        print(ELEM2);
-        if(mth == M_HTML && empty) return;
-        ind = false;
-        close(tag);
+        final boolean e = EMPTIES.contains(lc(tag));
+        if(mth == M_XHTML && e) {
+          print(' ');
+          print(ELEM_SC);
+        } else {
+          print(ELEM_C);
+          if(mth == M_HTML && e) return;
+          ind = false;
+          close = true;
+        }
       }
     }
-  }
 
-  @Override
-  protected void finish() throws IOException {
-    if(mth != M_TEXT) print(ELEM2);
-  }
-
-  @Override
-  protected void close(final byte[] t) throws IOException {
-    if(mth == M_TEXT) return;
-    if(ind) indent(true);
-    print(ELEM3);
-    print(t);
-    print(ELEM2);
-    ind = indent;
-    if(mth == M_HTML) script &= !SCRIPTS.contains(lc(t));
+    if(close) {
+      if(ind) indent(true);
+      print(ELEM_OS);
+      print(tag);
+      print(ELEM_C);
+      ind = indent;
+      if(mth == M_HTML) script &= !SCRIPTS.contains(lc(tag));
+    }
   }
 
   /**
@@ -533,6 +524,7 @@ public final class XMLSerializer extends Serializer {
 
   // HTML Serializer: cache elements
   static {
+    // elements with an empty content model
     EMPTIES.add(token("area"));
     EMPTIES.add(token("base"));
     EMPTIES.add(token("br"));
@@ -546,8 +538,10 @@ public final class XMLSerializer extends Serializer {
     EMPTIES.add(token("frame"));
     EMPTIES.add(token("isindex"));
     EMPTIES.add(token("param"));
+    // script elements
     SCRIPTS.add(token("script"));
     SCRIPTS.add(token("style"));
+    // boolean attributes
     BOOLEAN.add(token("area:nohref"));
     BOOLEAN.add(token("button:disabled"));
     BOOLEAN.add(token("dir:compact"));
@@ -572,6 +566,7 @@ public final class XMLSerializer extends Serializer {
     BOOLEAN.add(token("textarea:readonly"));
     BOOLEAN.add(token("th:nowrap"));
     BOOLEAN.add(token("ul:compact"));
+    // URI attributes
     URIS.add(token("a:href"));
     URIS.add(token("a:name"));
     URIS.add(token("applet:codebase"));

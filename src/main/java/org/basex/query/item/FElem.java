@@ -213,7 +213,7 @@ public final class FElem extends FNode {
     if(name.hasUri()) ser.namespace(name.pref(), name.uri().atom());
 
     // serialize all namespaces at top level...
-    if(ser.level() == 1) {
+    if(ser.level() == 0) {
       final Atts nns = nsScope();
       for(int a = 0; a < nns.size; ++a) ser.namespace(nns.key[a], nns.val[a]);
     } else if(ns != null) {
