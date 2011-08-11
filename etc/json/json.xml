@@ -1,0 +1,254 @@
+<files>
+  <json type="object">
+    <pair name="glossary" type="object">
+      <pair name="title" type="string">example glossary</pair>
+      <pair name="GlossDiv" type="object">
+        <pair name="title" type="string">S</pair>
+        <pair name="GlossList" type="object">
+          <pair name="GlossEntry" type="object">
+            <pair name="ID" type="string">SGML</pair>
+            <pair name="SortAs" type="string">SGML</pair>
+            <pair name="GlossTerm" type="string">Standard Generalized Markup Language</pair>
+            <pair name="Acronym" type="string">SGML</pair>
+            <pair name="Abbrev" type="string">ISO 8879:1986</pair>
+            <pair name="GlossDef" type="object">
+              <pair name="para" type="string">A meta-markup language, used to create markup languages such as DocBook.</pair>
+              <pair name="GlossSeeAlso" type="array">
+                <item type="string">GML</item>
+                <item type="string">XML</item>
+              </pair>
+            </pair>
+            <pair name="GlossSee" type="string">markup</pair>
+          </pair>
+        </pair>
+      </pair>
+    </pair>
+  </json>
+  <json type="object">
+    <pair name="menu" type="object">
+      <pair name="id" type="string">file</pair>
+      <pair name="value" type="string">File</pair>
+      <pair name="popup" type="object">
+        <pair name="menuitem" type="array">
+          <item type="object">
+            <pair name="value" type="string">New</pair>
+            <pair name="onclick" type="string">CreateNewDoc()</pair>
+          </item>
+          <item type="object">
+            <pair name="value" type="string">Open</pair>
+            <pair name="onclick" type="string">OpenDoc()</pair>
+          </item>
+          <item type="object">
+            <pair name="value" type="string">Close</pair>
+            <pair name="onclick" type="string">CloseDoc()</pair>
+          </item>
+        </pair>
+      </pair>
+    </pair>
+  </json>
+  <json type="object">
+    <pair name="menu" type="object">
+      <pair name="header" type="string">SVG Viewer</pair>
+      <pair name="items" type="array">
+        <item type="object">
+          <pair name="id" type="string">Open</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">OpenNew</pair>
+          <pair name="label" type="string">Open New</pair>
+        </item>
+        <item type="null"/>
+        <item type="object">
+          <pair name="id" type="string">ZoomIn</pair>
+          <pair name="label" type="string">Zoom In</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">ZoomOut</pair>
+          <pair name="label" type="string">Zoom Out</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">OriginalView</pair>
+          <pair name="label" type="string">Original View</pair>
+        </item>
+        <item type="null"/>
+        <item type="object">
+          <pair name="id" type="string">Quality</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">Pause</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">Mute</pair>
+        </item>
+        <item type="null"/>
+        <item type="object">
+          <pair name="id" type="string">Find</pair>
+          <pair name="label" type="string">Find...</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">FindAgain</pair>
+          <pair name="label" type="string">Find Again</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">Copy</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">CopyAgain</pair>
+          <pair name="label" type="string">Copy Again</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">CopySVG</pair>
+          <pair name="label" type="string">Copy SVG</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">ViewSVG</pair>
+          <pair name="label" type="string">View SVG</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">ViewSource</pair>
+          <pair name="label" type="string">View Source</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">SaveAs</pair>
+          <pair name="label" type="string">Save As</pair>
+        </item>
+        <item type="null"/>
+        <item type="object">
+          <pair name="id" type="string">Help</pair>
+        </item>
+        <item type="object">
+          <pair name="id" type="string">About</pair>
+          <pair name="label" type="string">About Adobe CVG Viewer...</pair>
+        </item>
+      </pair>
+    </pair>
+  </json>
+  <json type="object">
+    <pair name="web-app" type="object">
+      <pair name="servlet" type="array">
+        <item type="object">
+          <pair name="servlet-name" type="string">cofaxCDS</pair>
+          <pair name="servlet-class" type="string">org.cofax.cds.CDSServlet</pair>
+          <pair name="init-param" type="object">
+            <pair name="configGlossary:installationAt" type="string">Philadelphia, PA</pair>
+            <pair name="configGlossary:adminEmail" type="string">ksm@pobox.com</pair>
+            <pair name="configGlossary:poweredBy" type="string">Cofax</pair>
+            <pair name="configGlossary:poweredByIcon" type="string">/images/cofax.gif</pair>
+            <pair name="configGlossary:staticPath" type="string">/content/static</pair>
+            <pair name="templateProcessorClass" type="string">org.cofax.WysiwygTemplate</pair>
+            <pair name="templateLoaderClass" type="string">org.cofax.FilesTemplateLoader</pair>
+            <pair name="templatePath" type="string">templates</pair>
+            <pair name="templateOverridePath" type="string"/>
+            <pair name="defaultListTemplate" type="string">listTemplate.htm</pair>
+            <pair name="defaultFileTemplate" type="string">articleTemplate.htm</pair>
+            <pair name="useJSP" type="boolean">false</pair>
+            <pair name="jspListTemplate" type="string">listTemplate.jsp</pair>
+            <pair name="jspFileTemplate" type="string">articleTemplate.jsp</pair>
+            <pair name="cachePackageTagsTrack" type="number">200</pair>
+            <pair name="cachePackageTagsStore" type="number">200</pair>
+            <pair name="cachePackageTagsRefresh" type="number">60</pair>
+            <pair name="cacheTemplatesTrack" type="number">100</pair>
+            <pair name="cacheTemplatesStore" type="number">50</pair>
+            <pair name="cacheTemplatesRefresh" type="number">15</pair>
+            <pair name="cachePagesTrack" type="number">200</pair>
+            <pair name="cachePagesStore" type="number">100</pair>
+            <pair name="cachePagesRefresh" type="number">10</pair>
+            <pair name="cachePagesDirtyRead" type="number">10</pair>
+            <pair name="searchEngineListTemplate" type="string">forSearchEnginesList.htm</pair>
+            <pair name="searchEngineFileTemplate" type="string">forSearchEngines.htm</pair>
+            <pair name="searchEngineRobotsDb" type="string">WEB-INF/robots.db</pair>
+            <pair name="useDataStore" type="boolean">true</pair>
+            <pair name="dataStoreClass" type="string">org.cofax.SqlDataStore</pair>
+            <pair name="redirectionClass" type="string">org.cofax.SqlRedirection</pair>
+            <pair name="dataStoreName" type="string">cofax</pair>
+            <pair name="dataStoreDriver" type="string">com.microsoft.jdbc.sqlserver.SQLServerDriver</pair>
+            <pair name="dataStoreUrl" type="string">jdbc:microsoft:sqlserver://LOCALHOST:1433;DatabaseName=goon</pair>
+            <pair name="dataStoreUser" type="string">sa</pair>
+            <pair name="dataStorePassword" type="string">dataStoreTestQuery</pair>
+            <pair name="dataStoreTestQuery" type="string">SET NOCOUNT ON;select test='test';</pair>
+            <pair name="dataStoreLogFile" type="string">/usr/local/tomcat/logs/datastore.log</pair>
+            <pair name="dataStoreInitConns" type="number">10</pair>
+            <pair name="dataStoreMaxConns" type="number">100</pair>
+            <pair name="dataStoreConnUsageLimit" type="number">100</pair>
+            <pair name="dataStoreLogLevel" type="string">debug</pair>
+            <pair name="maxUrlLength" type="number">500</pair>
+          </pair>
+        </item>
+        <item type="object">
+          <pair name="servlet-name" type="string">cofaxEmail</pair>
+          <pair name="servlet-class" type="string">org.cofax.cds.EmailServlet</pair>
+          <pair name="init-param" type="object">
+            <pair name="mailHost" type="string">mail1</pair>
+            <pair name="mailHostOverride" type="string">mail2</pair>
+          </pair>
+        </item>
+        <item type="object">
+          <pair name="servlet-name" type="string">cofaxAdmin</pair>
+          <pair name="servlet-class" type="string">org.cofax.cds.AdminServlet</pair>
+        </item>
+        <item type="object">
+          <pair name="servlet-name" type="string">fileServlet</pair>
+          <pair name="servlet-class" type="string">org.cofax.cds.FileServlet</pair>
+        </item>
+        <item type="object">
+          <pair name="servlet-name" type="string">cofaxTools</pair>
+          <pair name="servlet-class" type="string">org.cofax.cms.CofaxToolsServlet</pair>
+          <pair name="init-param" type="object">
+            <pair name="templatePath" type="string">toolstemplates/</pair>
+            <pair name="log" type="number">1</pair>
+            <pair name="logLocation" type="string">/usr/local/tomcat/logs/CofaxTools.log</pair>
+            <pair name="logMaxSize" type="string"/>
+            <pair name="dataLog" type="number">1</pair>
+            <pair name="dataLogLocation" type="string">/usr/local/tomcat/logs/dataLog.log</pair>
+            <pair name="dataLogMaxSize" type="string"/>
+            <pair name="removePageCache" type="string">/content/admin/remove?cache=pages&amp;id=</pair>
+            <pair name="removeTemplateCache" type="string">/content/admin/remove?cache=templates&amp;id=</pair>
+            <pair name="fileTransferFolder" type="string">/usr/local/tomcat/webapps/content/fileTransferFolder</pair>
+            <pair name="lookInContext" type="number">1</pair>
+            <pair name="adminGroupID" type="number">4</pair>
+            <pair name="betaServer" type="boolean">true</pair>
+          </pair>
+        </item>
+      </pair>
+      <pair name="servlet-mapping" type="object">
+        <pair name="cofaxCDS" type="string">/</pair>
+        <pair name="cofaxEmail" type="string">/cofaxutil/aemail/*</pair>
+        <pair name="cofaxAdmin" type="string">/admin/*</pair>
+        <pair name="fileServlet" type="string">/static/*</pair>
+        <pair name="cofaxTools" type="string">/tools/*</pair>
+      </pair>
+      <pair name="taglib" type="object">
+        <pair name="taglib-uri" type="string">cofax.tld</pair>
+        <pair name="taglib-location" type="string">/WEB-INF/tlds/cofax.tld</pair>
+      </pair>
+    </pair>
+  </json>
+  <json type="object">
+    <pair name="widget" type="object">
+      <pair name="debug" type="string">on</pair>
+      <pair name="window" type="object">
+        <pair name="title" type="string">Sample Konfabulator Widget</pair>
+        <pair name="name" type="string">main_window</pair>
+        <pair name="width" type="number">500</pair>
+        <pair name="height" type="number">500</pair>
+      </pair>
+      <pair name="image" type="object">
+        <pair name="src" type="string">Images/Sun.png</pair>
+        <pair name="name" type="string">sun1</pair>
+        <pair name="hOffset" type="number">250</pair>
+        <pair name="vOffset" type="number">250</pair>
+        <pair name="alignment" type="string">center</pair>
+      </pair>
+      <pair name="text" type="object">
+        <pair name="data" type="string">Click Here</pair>
+        <pair name="size" type="number">36</pair>
+        <pair name="style" type="string">bold</pair>
+        <pair name="name" type="string">text1</pair>
+        <pair name="hOffset" type="number">250</pair>
+        <pair name="vOffset" type="number">100</pair>
+        <pair name="alignment" type="string">center</pair>
+        <pair name="onMouseUp" type="string">sun1.opacity = (sun1.opacity / 100) * 90;</pair>
+      </pair>
+    </pair>
+  </json>
+</files>
