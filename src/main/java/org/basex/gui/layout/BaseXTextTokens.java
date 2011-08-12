@@ -339,7 +339,7 @@ public final class BaseXTextTokens {
       min = ps < ms ? ps : ms;
       max = ps > ms ? ps : ms;
       // marked
-      int mn = Math.max(min + start.length(), max - end.length());
+      final int mn = Math.max(min + start.length(), max - end.length());
       if(indexOf(text, token(start), min) == min &&
          indexOf(text, token(end), mn) == mn) {
         final TokenBuilder tb = new TokenBuilder();

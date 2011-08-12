@@ -233,7 +233,7 @@ public class DBNode extends ANode {
 
   @Override
   public final boolean hasChildren() {
-    int k = data.kind(pre);
+    final int k = data.kind(pre);
     return data.attSize(pre, k) != data.size(pre, k);
   }
 

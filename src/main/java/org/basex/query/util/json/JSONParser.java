@@ -168,7 +168,7 @@ public final class JSONParser extends InputParser {
           int i = 0;
           for(int s = 0; s < 4; s++) {
             ch = consume();
-            i *= 0x10;
+            i <<= 4;
             if(ch >= '0' && ch <= '9') i += ch - 0x30;
             else if(ch >= 'A' && ch <= 'F') i += ch - 0x37;
             else if(ch >= 'a' && ch <= 'f') i += ch - 0x57;

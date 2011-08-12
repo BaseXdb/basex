@@ -33,9 +33,8 @@ public final class JSONSerializer extends Serializer {
   private final BoolList comma = new BoolList();
   /** Types. */
   private final TokenList types = new TokenList();
-
-  /** Current name. */
-  private byte[] name;
+  /** Current key. */
+  private byte[] key;
 
   /**
    * Constructor.
@@ -54,8 +53,8 @@ public final class JSONSerializer extends Serializer {
   }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException {
-    name = null;
+  protected void startOpen(final byte[] name) throws IOException {
+    key = null;
     types.set(level(), null);
   }
 
@@ -64,24 +63,24 @@ public final class JSONSerializer extends Serializer {
     if(!tag(PAIR) && !tag(ITEM) && !tag(JSON)) error("Invalid tag: \"%\"", tag);
 
     final int level = level();
-    if(comma.get(level)) out.print(",");
+    if(comma.get(level)) print(',');
 
     if(!tag(JSON)) {
       comma.set(level, true);
       indent(true);
     }
     if(tag(PAIR)) {
-      if(name == null) error("No name specified");
-      out.print("\"");
-      out.print(name);
-      out.print("\": ");
+      if(key == null) error("No name specified");
+      print('"');
+      print(key);
+      print("\": ");
     }
 
     final byte[] type = types.get(level);
     if(type == null) error("No type specified");
     if(!eq(type, ARR) && !eq(type, OBJ)) return;
 
-    out.print(eq(type, ARR) ? "[" : "{");
+    print(eq(type, ARR) ? '[' : '{');
     comma.set(level + 1, false);
   }
 
@@ -95,9 +94,9 @@ public final class JSONSerializer extends Serializer {
 
     if(empty) {
       if(eq(type, NULL)) {
-        out.print(NULL);
+        print(NULL);
       } else if(eq(type, STR)) {
-        out.print("\"\"");
+        print("\"\"");
       } else if(!eq(type, OBJ) && !eq(type, ARR)) {
         if(eq(type, NUM) || eq(type, BOOL)) {
           error("Value needed for % type", type);
@@ -109,34 +108,51 @@ public final class JSONSerializer extends Serializer {
       if(struct) indent(true);
     }
     if(!struct) return;
-    out.print(eq(type, ARR) ? "]" : "}");
+    print(eq(type, ARR) ? ']' : '}');
   }
 
   @Override
-  public void attribute(final byte[] n, final byte[] v) throws IOException {
-    if(eq(n, TYPE)) {
-      types.set(level(), v);
-    } else if(eq(n, NAME)) {
-      if(tag(PAIR)) name = v;
+  public void attribute(final byte[] name, final byte[] value)
+      throws IOException {
+
+    if(eq(name, TYPE)) {
+      types.set(level(), value);
+    } else if(eq(name, NAME)) {
+      if(tag(PAIR)) key = value;
     } else {
-      error("Invalid attribute: \"%\"", n);
+      error("Invalid attribute: \"%\"", name);
     }
   }
 
   @Override
-  public void finishText(final byte[] b) throws IOException {
-    if(trim(b).length == 0) return;
+  public void finishText(final byte[] text) throws IOException {
+    if(trim(text).length == 0) return;
     if(tag(PAIR) || tag(ITEM)) {
       final byte[] type = types.get(level() - 1);
       if(eq(type, STR)) {
-        out.print("\"");
-        out.print(b);
-        out.print("\"");
+        print('"');
+        for(final byte ch : text) {
+          if(ch == '\b') {
+            print("\\b");
+          } else if(ch == '\f') {
+            print("\\f");
+          } else if(ch == '\n') {
+            print("\\n");
+          } else if(ch == '\r') {
+            print("\\r");
+          } else if(ch == '\t') {
+            print("\\t");
+          } else {
+            print(ch);
+          }
+        }
+        print('"');
       } else if(eq(type, BOOL)) {
-        if(!eq(b, TRUE) && !eq(b, FALSE)) error("Invalid boolean value", b);
-        out.print(b);
+        if(!eq(text, TRUE) && !eq(text, FALSE))
+          error("Invalid boolean value", text);
+        print(text);
       } else if(eq(type, NUM)) {
-        out.print(b);
+        print(text);
       } else if(eq(type, NULL)) {
         error("No value expected after \"null\"");
       } else {
@@ -148,27 +164,28 @@ public final class JSONSerializer extends Serializer {
   }
 
   @Override
-  public void finishComment(final byte[] b) throws IOException {
+  public void finishComment(final byte[] value) throws IOException {
     error("Comment cannot be serialized.");
   }
 
   @Override
-  public void finishPi(final byte[] n, final byte[] v) throws IOException {
+  public void finishPi(final byte[] name, final byte[] value)
+      throws IOException {
     error("Processing instruction cannot be serialized.");
   }
 
   @Override
-  public void finishItem(final byte[] b) throws IOException {
+  public void finishItem(final byte[] value) throws IOException {
     error("Item cannot be serialized.");
   }
 
   /**
    * Returns if the current tag equals the specified tag.
-   * @param t tag to be compared
+   * @param name tag to be compared
    * @return result of check
    */
-  private boolean tag(final byte[] t) {
-    return eq(tag, t);
+  private boolean tag(final byte[] name) {
+    return eq(tag, name);
   }
 
   /**
@@ -177,9 +194,9 @@ public final class JSONSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void indent(final boolean nl) throws IOException {
-    if(nl) out.print(Prop.NL);
+    if(nl) print(Prop.NL);
     final int ls = level() * indents;
-    for(int l = 0; l < ls; ++l) out.print(tab);
+    for(int l = 0; l < ls; ++l) print(tab);
   }
 
   /**
@@ -193,5 +210,46 @@ public final class JSONSerializer extends Serializer {
   private QueryException error(final String msg, final Object... ext)
       throws SerializerException {
     throw JSONSER.thrwSerial(Util.inf(msg, ext));
+  }
+
+  /**
+   * Writes a string in the current encoding.
+   * @param s string to be printed
+   * @throws IOException I/O exception
+   */
+  private void print(final String s) throws IOException {
+    print(token(s));
+  }
+
+  /**
+   * Writes a token in the current encoding.
+   * @param token token to be printed
+   * @throws IOException I/O exception
+   */
+  private void print(final byte[] token) throws IOException {
+    for(final byte b : token) out.write(b);
+  }
+
+  /**
+   * Writes a character in the current encoding.
+   * @param ch character to be printed
+   * @throws IOException I/O exception
+   */
+  private void print(final int ch) throws IOException {
+    if(ch <= 0x7F) {
+      out.write(ch);
+    } else if(ch <= 0x7FF) {
+      out.write(ch >>  6 & 0x1F | 0xC0);
+      out.write(ch >>  0 & 0x3F | 0x80);
+    } else if(ch <= 0xFFFF) {
+      out.write(ch >> 12 & 0x0F | 0xE0);
+      out.write(ch >>  6 & 0x3F | 0x80);
+      out.write(ch >>  0 & 0x3F | 0x80);
+    } else {
+      out.write(ch >> 18 & 0x07 | 0xF0);
+      out.write(ch >> 12 & 0x3F | 0x80);
+      out.write(ch >>  6 & 0x3F | 0x80);
+      out.write(ch >>  0 & 0x3F | 0x80);
+    }
   }
 }
