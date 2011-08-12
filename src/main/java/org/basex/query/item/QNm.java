@@ -9,6 +9,7 @@ import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.basex.util.XMLToken;
 
 /**
@@ -20,7 +21,7 @@ import org.basex.util.XMLToken;
 public final class QNm extends Item {
   /** URI. */
   private Uri uri;
-  /** String data. */
+  /** Local part and optional prefix. */
   private byte[] val;
   /** Namespace index. */
   private int ns;
@@ -221,6 +222,6 @@ public final class QNm extends Item {
 
   @Override
   public String toString() {
-    return "\"" + Token.string(val) + "\"";
+    return Util.info("\"%\"", val);
   }
 }
