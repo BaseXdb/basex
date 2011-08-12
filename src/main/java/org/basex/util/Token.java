@@ -32,6 +32,8 @@ public final class Token {
   public static final byte[] TRUE = token("true");
   /** Token 'false'. */
   public static final byte[] FALSE = token("false");
+  /** Token 'null'. */
+  public static final byte[] NULL = token("null");
   /** Token 'NaN'. */
   public static final byte[] NAN = token("NaN");
   /** Token 'INF'. */
@@ -1203,7 +1205,7 @@ public final class Token {
    * @return hex representation
    */
   public static byte[] hex(final byte[] val, final boolean uc) {
-    final int u = uc ? '7' : 'W';
+    final int u = uc ? 0x37 : 0x57;
     final byte[] data = new byte[val.length << 1];
     for(int d = 0, c = 0; d < val.length; d++) {
       int b = val[d] >> 4 & 0x0F;

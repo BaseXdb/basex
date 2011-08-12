@@ -184,14 +184,12 @@ public interface DataText {
   byte[] STR = token("string");
   /** Value: number type. */
   byte[] NUM = token("number");
-  /** Value: object type. */
-  byte[] OBJ = token("object");
-  /** Value: array type. */
-  byte[] ARR = token("array");
   /** Value: boolean type. */
   byte[] BOOL = token("boolean");
-  /** Value: null type. */
-  byte[] NULL = token("null");
+  /** Value: array type. */
+  byte[] ARR = token("array");
+  /** Value: object type. */
+  byte[] OBJ = token("object");
 
   /** Comment output. */
   byte[] COMM_O = token("<!--");

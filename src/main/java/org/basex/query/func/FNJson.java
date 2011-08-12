@@ -13,7 +13,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
-import org.basex.query.util.json.JSONParser;
+import org.basex.query.util.json.JSONConverter;
 import org.basex.util.InputInfo;
 
 /**
@@ -38,7 +38,7 @@ public final class FNJson extends FuncCall {
       throws QueryException {
     switch(def) {
       case JPARSE:
-        return new JSONParser(checkStr(expr[0], ctx), input).parse();
+        return new JSONConverter().parse(checkStr(expr[0], ctx), input);
       case JSERIALIZE:
         final ANode node = checkNode(checkItem(expr[0], ctx));
         final ArrayOutput ao = new ArrayOutput();

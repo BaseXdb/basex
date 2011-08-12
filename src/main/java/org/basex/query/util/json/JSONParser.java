@@ -1,14 +1,8 @@
 package org.basex.query.util.json;
 
-import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.FAttr;
-import org.basex.query.item.FElem;
-import org.basex.query.item.FTxt;
-import org.basex.query.item.QNm;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.TokenBuilder;
@@ -26,23 +20,12 @@ public final class JSONParser extends InputParser {
   /** Error: invalid and expected character. */
   private static final String INVALEXP = "Char \"%\" found, % expected";
 
-  /** Element: json. */
-  private static final QNm E_JSON = new QNm(JSON);
-  /** Element: pair. */
-  private static final QNm E_PAIR = new QNm(PAIR);
-  /** Element: item. */
-  private static final QNm E_ITEM = new QNm(ITEM);
-  /** Attribute: name. */
-  private static final QNm A_NAME = new QNm(NAME);
-  /** Attribute: type. */
-  private static final QNm A_TYPE = new QNm(TYPE);
-
   /** Token builder. */
   private final TokenBuilder tb = new TokenBuilder();
   /** Input info. */
   private final InputInfo input;
 
-  /***
+  /**
    * Constructor.
    * @param q query
    * @param ii input info
@@ -57,98 +40,72 @@ public final class JSONParser extends InputParser {
    * @return resulting node
    * @throws QueryException query exception
    */
-  public ANode parse() throws QueryException {
-    final FElem root = new FElem(E_JSON);
-    if(object(root)) {
-      root.add(new FAttr(A_TYPE, OBJ));
-    } else if(array(root)) {
-      root.add(new FAttr(A_TYPE, ARR));
-    } else {
-      error(INVALEXP, curr(), "\"{\" or \"[\"");
-    }
+  public JStruct parse() throws QueryException {
+    JStruct root = object();
+    if(root == null) root = array();
+    if(root == null) error(INVALEXP, curr(), "\"{\" or \"[\"");
     skipWS();
     if(more()) error(INVALEXP, curr(), "end of file");
     return root;
   }
 
   /**
-   * Parses an object.
-   * @param root root node
+   * Returns an object.
    * @return success flag
    * @throws QueryException query exception
    */
-  private boolean object(final FElem root) throws QueryException {
-    if(!wsConsume('{')) return false;
+  private JObject object() throws QueryException {
+    if(!wsConsume('{')) return null;
+    final JObject o = new JObject();
     do {
       final byte[] key = str();
       if(key == null) {
-        if(root.hasChildren()) error(INVALEXP, curr(), '"');
+        if(o.size() != 0) error(INVALEXP, curr(), '"');
         break;
       }
-      final FElem pair = new FElem(E_PAIR);
-      pair.add(new FAttr(A_NAME, key));
       wsCheck(':');
-      value(pair, true);
-      root.add(pair);
+      o.add(key, value(true));
     } while(wsConsume(','));
     wsCheck('}');
-    return true;
+    return o;
   }
 
   /**
    * Parses an array.
-   * @param root root node
    * @return success flag
    * @throws QueryException query exception
    */
-  private boolean array(final FElem root) throws QueryException {
-    if(!wsConsume('[')) return false;
+  private JArray array() throws QueryException {
+    if(!wsConsume('[')) return null;
+    final JArray a = new JArray();
     do {
-      final FElem item = new FElem(E_ITEM);
-      if(value(item, root.hasChildren())) root.add(item);
+      final JValue val = value(a.size() != 0);
+      if(val != null) a.add(val);
     } while(wsConsume(','));
     wsCheck(']');
-    return true;
+    return a;
   }
 
   /**
    * Parses a value.
-   * @param root root node
    * @param mand mandatory flag
    * @return success flag
    * @throws QueryException query exception
    */
-  private boolean value(final FElem root, final boolean mand)
-      throws QueryException {
-
+  private JValue value(final boolean mand) throws QueryException {
     skipWS();
     final char ch = curr();
-    byte[] type;
-    if(ch == '"') {
-      type = STR;
-      final byte[] str = str();
-      if(str.length != 0) root.add(new FTxt(str));
-    } else if(digit(ch) || ch == '-') {
-      type = NUM;
-      root.add(new FTxt(number()));
-    } else if(ch == '{') {
-      type = OBJ;
-      object(root);
-    } else if(ch == '[') {
-      type = ARR;
-      array(root);
-    } else if(ch == 't' || ch == 'f') {
-      type = BOOL;
-      root.add(new FTxt(bool()));
-    } else if(ch == 'n') {
-      type = NULL;
+    if(digit(ch) || ch == '-') return new JNumber(number());
+    if(ch == '"') return new JString(str());
+    if(ch == '{') return object();
+    if(ch == '[') return array();
+    if(ch == 't' || ch == 'f') return new JBoolean(bool());
+    if(ch == 'n') {
       for(final byte b : NULL) check((char) b);
-    } else {
-      if(mand) error(INVALEXP, curr(), '"');
-      return false;
+      return new JNull();
     }
-    root.add(new FAttr(A_TYPE, type));
-    return true;
+    if(mand) error(INVALEXP, curr(), '"');
+    return null;
   }
 
   /**
@@ -185,7 +142,7 @@ public final class JSONParser extends InputParser {
           ch = '\r';
         } else if(ch == 't') {
           ch = '\t';
-        } else if("\"/".indexOf(ch) == -1) {
+        } else if("\\\"/".indexOf(ch) == -1) {
           error(INVALID, (char) ch);
         }
       }
