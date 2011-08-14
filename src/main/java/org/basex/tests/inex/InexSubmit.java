@@ -3,6 +3,7 @@ package org.basex.tests.inex;
 import static org.basex.core.Text.*;
 import static org.basex.tests.inex.InexTest.*;
 import static org.basex.util.Token.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,8 +12,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.StringTokenizer;
-import org.basex.core.Context;
+
 import org.basex.core.Command;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.List;
@@ -20,8 +22,8 @@ import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
@@ -85,7 +87,7 @@ public final class InexSubmit {
   /** PrintOutput for the submission file. */
   private PrintOutput sub;
   /** XMLSerializer for the submission file. */
-  private XMLSerializer xml;
+  private Serializer xml;
   /** Number of query times. */
   private int c;
 
@@ -262,7 +264,7 @@ public final class InexSubmit {
 
     final SerializerProp sp = new SerializerProp();
     sp.set(SerializerProp.S_DOCTYPE_SYSTEM, "efficiency-submission.dtd");
-    xml = new XMLSerializer(sub, sp);
+    xml = Serializer.get(sub, sp);
 
     // print header in output file
     xml.openElement(token("efficiency-submission"),

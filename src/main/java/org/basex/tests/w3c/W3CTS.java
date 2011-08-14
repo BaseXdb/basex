@@ -27,8 +27,8 @@ import org.basex.io.IOFile;
 import org.basex.io.in.TextInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.expr.Expr;
@@ -375,7 +375,7 @@ public abstract class W3CTS {
         final SerializerProp sp = new SerializerProp();
         sp.set(SerializerProp.S_INDENT, context.prop.is(Prop.CHOP) ?
             DataText.YES : DataText.NO);
-        final XMLSerializer xml = new XMLSerializer(ao, sp);
+        final Serializer xml = Serializer.get(ao, sp);
         iter = xq.value().cache();
         for(Item it; (it = iter.next()) != null;) it.serialize(xml);
         xml.close();
