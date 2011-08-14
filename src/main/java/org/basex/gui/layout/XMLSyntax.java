@@ -39,7 +39,7 @@ public final class XMLSyntax extends BaseXSyntax {
 
       if(ch == '=' || ch == '>' || ch == '/') return BLUE;
       if(elem) {
-        elem = false;
+        if(ch <= ' ') elem = false;
         return BLUE;
       }
       return PINK;

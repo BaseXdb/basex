@@ -116,7 +116,7 @@ public final class JSONSerializer extends OutputSerializer {
       print('"');
       for(final byte ch : text) ch(ch);
       print('"');
-    } else if(eq(type, BOOL) || eq(type, NUM)) {
+    } else if(eq(type, BOOL, NUM)) {
       print(text);
     } else if(trim(text).length != 0) {
       error("Element <%> is typed as \"%\" and cannot have a value",
@@ -128,15 +128,11 @@ public final class JSONSerializer extends OutputSerializer {
   protected void finishEmpty() throws IOException {
     finishOpen();
     byte[] type = types.get(level);
-    if(eq(type, ARR)) {
-      print(']');
-    } else if(eq(type, OBJ)) {
-      print('}');
-    } else if(eq(type, STR)) {
+    if(eq(type, STR)) {
       print("\"\"");
     } else if(eq(type, NULL)) {
       print(NULL);
-    } else {
+    } else if(!eq(type, OBJ, ARR)) {
       error("Value expected for type \"%\"", type);
     }
     finishClose();
@@ -171,17 +167,19 @@ public final class JSONSerializer extends OutputSerializer {
 
   @Override
   public void finishComment(final byte[] value) throws IOException {
+    error("Comments cannot be serialized");
   }
 
   @Override
   public void finishPi(final byte[] name, final byte[] value)
       throws IOException {
+    error("Processing instructions cannot be serialized");
   }
 
   @Override
   public void finishItem(final byte[] value) throws IOException {
+    error("Items cannot be serialized");
   }
-
 
   /**
    * Prints some indentation.

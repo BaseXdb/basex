@@ -433,7 +433,7 @@ public abstract class OutputSerializer extends Serializer {
   protected final void print(final String s) throws IOException {
     // comparison by reference
     if(enc == UTF8) {
-      print(token(s));
+      for(final byte b : token(s)) out.write(b);
     } else if(enc == UTF16BE || enc == UTF16LE) {
       final boolean l = enc == UTF16LE;
       for(int i = 0; i < s.length(); ++i) {
