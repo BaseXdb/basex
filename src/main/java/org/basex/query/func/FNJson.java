@@ -4,9 +4,13 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.JSONSerializer;
+import org.basex.io.serial.JsonMLSerializer;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
+import org.basex.io.serial.SerializerProp;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -40,22 +44,38 @@ public final class FNJson extends FuncCall {
       case JPARSE:
         return new JSONConverter().parse(checkStr(expr[0], ctx), input);
       case JSERIALIZE:
-        final ANode node = checkNode(checkItem(expr[0], ctx));
-        final ArrayOutput ao = new ArrayOutput();
-        try {
-          // run serialization
-          final JSONSerializer json =
-              new JSONSerializer(ao, ctx.serProp(false));
-          node.serialize(json);
-          json.close();
-        } catch(final SerializerException ex) {
-          throw new QueryException(input, ex);
-        } catch(final IOException ex) {
-          SERANY.thrw(input, ex);
-        }
-        return Str.get(delete(ao.toArray(), '\r'));
+        return serialize(false, ctx);
+      case JSERIALIZEML:
+        return serialize(true, ctx);
       default:
         return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Serializes the specified XML document to JSON/JsonML.
+   * @param ml ml flag
+   * @param ctx query context
+   * @return serialized document
+   * @throws QueryException query exception
+   */
+  private Str serialize(final boolean ml, final QueryContext ctx)
+      throws QueryException {
+
+    final ANode node = checkNode(checkItem(expr[0], ctx));
+    final ArrayOutput ao = new ArrayOutput();
+    try {
+      // run serialization
+      final SerializerProp props = ctx.serProp(false);
+      final Serializer json = ml ? new JsonMLSerializer(ao, props) :
+          new JSONSerializer(ao, props);
+      node.serialize(json);
+      json.close();
+    } catch(final SerializerException ex) {
+      throw new QueryException(input, ex);
+    } catch(final IOException ex) {
+      SERANY.thrw(input, ex);
+    }
+    return Str.get(delete(ao.toArray(), '\r'));
   }
 }

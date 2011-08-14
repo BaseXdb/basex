@@ -589,6 +589,8 @@ public enum Function {
   JPARSE(FNJson.class, "parse(string)", NOD, STR),
   /** JSON function: convert XML to JSON. */
   JSERIALIZE(FNJson.class, "serialize(node)", STR, NOD),
+  /** JSON function: convert XML to JsonML. */
+  JSERIALIZEML(FNJson.class, "serialize-ml(node)", STR, NOD),
 
   /* FNSent functions. */
 

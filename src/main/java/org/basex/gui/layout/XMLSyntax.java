@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import static org.basex.data.DataText.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 
@@ -53,12 +54,12 @@ public final class XMLSyntax extends BaseXSyntax {
   }
 
   @Override
-  public String commentOpen() {
-    return "<!--";
+  public byte[] commentOpen() {
+    return COMM_O;
   }
 
   @Override
-  public String commentEnd() {
-    return "-->";
+  public byte[] commentEnd() {
+    return COMM_C;
   }
 }

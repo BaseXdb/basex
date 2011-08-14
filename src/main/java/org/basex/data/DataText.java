@@ -128,6 +128,8 @@ public interface DataText {
   String M_TEXT = "text";
   /** Method. */
   String M_JSON = "json";
+  /** Method. */
+  String M_JSONML = "jsonml";
 
   /** Normalization. */
   String NFC = "NFC";
@@ -194,6 +196,10 @@ public interface DataText {
   byte[] COMM_O = token("<!--");
   /** Comment output. */
   byte[] COMM_C = token("-->");
+  /** XQuery comment. */
+  byte[] XQCOMM_O = token("(:");
+  /** XQuery comment. */
+  byte[] XQCOMM_C = token(":)");
 
   /** PI output. */
   byte[] PI_O = token("<?");

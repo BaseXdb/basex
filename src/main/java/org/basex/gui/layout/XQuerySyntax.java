@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import static org.basex.data.DataText.*;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -111,12 +112,12 @@ public final class XQuerySyntax extends BaseXSyntax {
   }
 
   @Override
-  public String commentOpen() {
-    return "(:";
+  public byte[] commentOpen() {
+    return XQCOMM_O;
   }
 
   @Override
-  public String commentEnd() {
-    return ":)";
+  public byte[] commentEnd() {
+    return XQCOMM_C;
   }
 }

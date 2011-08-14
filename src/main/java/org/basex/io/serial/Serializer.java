@@ -52,8 +52,9 @@ public abstract class Serializer {
 
     if(props != null) {
       final String m = props.check(
-          S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON);
+          S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML);
       if(M_JSON.equals(m)) return new JSONSerializer(os, props);
+      if(M_JSONML.equals(m)) return new JsonMLSerializer(os, props);
       if(M_TEXT.equals(m)) return new TextSerializer(os, props);
       if(M_HTML.equals(m)) return new HTMLSerializer(os, props);
       if(M_XHTML.equals(m)) return new XHTMLSerializer(os, props);

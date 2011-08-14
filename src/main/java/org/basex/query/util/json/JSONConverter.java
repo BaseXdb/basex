@@ -78,6 +78,7 @@ public final class JSONConverter {
   public ANode parse(final byte[] q, final InputInfo ii) throws QueryException {
     final JStruct node = new JSONParser(q, ii).parse();
     // find unique data types
+    types.add(JSON, node.getClass());
     analyze(node);
     // create XML fragment
     final FElem root = create(JSON, node);

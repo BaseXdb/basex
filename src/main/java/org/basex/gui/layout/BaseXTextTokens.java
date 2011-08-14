@@ -329,8 +329,8 @@ public final class BaseXTextTokens {
    * @param syntax syntax highlighter
    */
   void comment(final BaseXSyntax syntax) {
-    final String start = syntax.commentOpen();
-    final String end = syntax.commentEnd();
+    final byte[] start = syntax.commentOpen();
+    final byte[] end = syntax.commentEnd();
     boolean add = true;
     int min = ps;
     int max = ps;
@@ -339,17 +339,17 @@ public final class BaseXTextTokens {
       min = ps < ms ? ps : ms;
       max = ps > ms ? ps : ms;
       // marked
-      final int mn = Math.max(min + start.length(), max - end.length());
-      if(indexOf(text, token(start), min) == min &&
-         indexOf(text, token(end), mn) == mn) {
+      final int mn = Math.max(min + start.length, max - end.length);
+      if(indexOf(text, start, min) == min &&
+         indexOf(text, end, mn) == mn) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(text, 0, min);
-        tb.add(text, min + start.length(), max - end.length());
+        tb.add(text, min + start.length, max - end.length);
         tb.add(text, max, size);
         text = tb.finish();
         size = tb.size();
         ms = min;
-        me = max - start.length() - end.length();
+        me = max - start.length - end.length;
         ps = me;
         add = false;
       }
@@ -360,11 +360,11 @@ public final class BaseXTextTokens {
 
     if(add) {
       pos(max);
-      add(end);
+      add(string(end));
       pos(min);
-      add(start);
+      add(string(start));
       ms = min;
-      me = max + start.length() + end.length();
+      me = max + start.length + end.length;
       ps = me;
     }
   }
