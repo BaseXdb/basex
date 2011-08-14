@@ -1,10 +1,12 @@
 package org.basex.examples.query;
 
 import java.io.IOException;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Result;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -153,7 +155,7 @@ public final class RunQueries {
 
     // ------------------------------------------------------------------------
     // Create an XML serializer
-    XMLSerializer xml = proc.getSerializer(System.out);
+    Serializer xml = proc.getSerializer(System.out);
 
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents
