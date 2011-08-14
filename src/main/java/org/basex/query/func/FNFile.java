@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,17 +14,17 @@ import org.basex.core.cmd.Copy;
 import org.basex.io.IOFile;
 import org.basex.io.in.TextInput;
 import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
@@ -348,8 +349,7 @@ public final class FNFile extends FuncCall {
       final PrintOutput out = PrintOutput.get(
           new FileOutputStream(path, append));
       try {
-        final XMLSerializer xml = new XMLSerializer(out,
-            FNGen.serialPar(this, 2, ctx));
+        final Serializer xml = Serializer.get(out, serialPar(this, 2, ctx));
         for(Item it; (it = ir.next()) != null;) it.serialize(xml);
         xml.close();
       } catch(final SerializerException ex) {

@@ -27,9 +27,9 @@ import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.io.Zip;
 import org.basex.io.in.TextInput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -358,8 +358,8 @@ public final class FNZip extends FuncCall {
               // serialize new nodes
               try {
                 // [CG] update zip files: remove zip namespace
-                final XMLSerializer xml =
-                  new XMLSerializer(zos, serialPar(node, ctx));
+                final Serializer xml =
+                  Serializer.get(zos, serialPar(node, ctx));
                 do {
                   n.serialize(xml);
                 } while((n = ch.next()) != null);

@@ -1,10 +1,10 @@
 package org.basex.gui.layout;
 
+import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
-import org.basex.gui.GUIConstants;
 
 /**
- * This abstract class defines syntax highlighting of text panels.
+ * This class defines syntax highlighting for XML files.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -14,6 +14,8 @@ public final class XMLSyntax extends BaseXSyntax {
   private int quote;
   /** Tag flag. */
   private boolean tag;
+  /** Flag for printing element name. */
+  private boolean elem;
 
   @Override
   public void init() {
@@ -27,18 +29,25 @@ public final class XMLSyntax extends BaseXSyntax {
     if(tag) {
       if(quote != 0) {
         if(quote == ch) quote = 0;
-        return GUIConstants.COLORERROR;
+        return RED;
       }
       if(ch == '"' || ch == '\'') {
         quote = ch;
-        return GUIConstants.COLORERROR;
+        return RED;
       }
       if(ch == '>') tag = false;
-      return GUIConstants.color(12);
+
+      if(ch == '=' || ch == '>' || ch == '/') return BLUE;
+      if(elem) {
+        elem = false;
+        return BLUE;
+      }
+      return PINK;
     }
     if(ch == '<') {
       tag = true;
-      return GUIConstants.color(12);
+      elem = true;
+      return BLUE;
     }
     return Color.black;
   }

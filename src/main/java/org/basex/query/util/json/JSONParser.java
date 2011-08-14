@@ -9,7 +9,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
- * Parser for converting JSON to XML.
+ * <p>This class converts a JSON document to a tree representation.</p>
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -257,6 +257,8 @@ public final class JSONParser extends InputParser {
    */
   private QueryException error(final String msg, final Object... ext)
       throws QueryException {
-    throw JSONPARSE.thrw(input, Util.inf(msg, ext));
+
+    int[] lc = new InputInfo(this).lineCol();
+    throw JSONPARSE.thrw(input, lc[0], lc[1], Util.inf(msg, ext));
   }
 }

@@ -1,5 +1,7 @@
 package org.basex.query.util.json;
 
+import static org.basex.data.DataText.*;
+
 import org.basex.util.list.TokenList;
 
 /**
@@ -29,5 +31,10 @@ final class JObject extends JStruct {
    */
   byte[] name(final int p) {
     return names.get(p);
+  }
+
+  @Override
+  byte[] type() {
+    return OBJ;
   }
 }

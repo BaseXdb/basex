@@ -5,25 +5,23 @@ import static org.basex.io.serial.DOTData.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.basex.data.ExprInfo;
-import org.basex.io.out.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
 import org.basex.util.list.ObjList;
 
 /**
- * This class serializes trees in the DOT syntax.
+ * This class serializes data in the DOT syntax.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DOTSerializer extends Serializer {
+public final class DOTSerializer extends OutputSerializer {
   /** Compact representation. */
   private final boolean compact;
-  /** Output stream. */
-  private final PrintOutput out;
 
   /** Cached children. */
   private final ObjList<IntList> children = new ObjList<IntList>();
@@ -39,15 +37,16 @@ public final class DOTSerializer extends Serializer {
 
   /**
    * Constructor, defining colors for the dot output.
-   * @param o output stream
+   * @param os output stream
    * @param c compact representation
    * @throws IOException I/O exception
    */
-  public DOTSerializer(final PrintOutput o, final boolean c)
+  public DOTSerializer(final OutputStream os, final boolean c)
       throws IOException {
-    out = o;
+
+    super(os, PROPS);
     compact = c;
-    out.println(HEADER);
+    print(HEADER);
   }
 
   @Override
@@ -69,12 +68,20 @@ public final class DOTSerializer extends Serializer {
   }
 
   @Override
-  public void finishClose(final boolean empty) throws IOException {
-    if(empty) finishOpen();
-    final int c = nodes.get(level());
-    final IntList il = child(level());
+  protected void finishEmpty() throws IOException {
+    finishOpen();
+    finishClose();
+  }
+
+  @Override
+  protected void finishClose() throws IOException {
+    final int c = nodes.get(level);
+    final IntList il = child(level);
     final int is = il.size();
-    for(int i = 0; i < is; ++i) out.println(Util.info(DOTLINK, c, il.get(i)));
+    for(int i = 0; i < is; ++i) {
+      indent();
+      print(Util.info(DOTLINK, c, il.get(i)));
+    }
     color = null;
     il.reset();
   }
@@ -102,8 +109,9 @@ public final class DOTSerializer extends Serializer {
   }
 
   @Override
-  public void cls() throws IOException {
-    out.println(FOOTER);
+  public void close() throws IOException {
+    indent();
+    print(FOOTER);
   }
 
   /**
@@ -114,12 +122,11 @@ public final class DOTSerializer extends Serializer {
    */
   private void print(final byte[] t, final String col) throws IOException {
     String txt = string(chop(t, 60)).replaceAll("\"|\\r|\\n", "'");
-    if(compact) {
-      txt = txt.replaceAll("\\\\n\\w+:", "\\\\n");
-    }
-    out.println(Util.info(DOTNODE, count, txt, col));
-    nodes.set(level(), count);
-    if(level() > 0) child(level() - 1).add(count);
+    if(compact) txt = txt.replaceAll("\\\\n\\w+:", "\\\\n");
+    indent();
+    print(Util.info(DOTNODE, count, txt, col));
+    nodes.set(level, count);
+    if(level > 0) child(level - 1).add(count);
     ++count;
   }
 

@@ -114,17 +114,20 @@ public interface DataText {
   String V401 = "4.01";
 
   /** Method. */
+  String M_CSV = "csv";
+  /** Method. */
+  String M_MAB2 = "mab2";
+
+  /** Method. */
   String M_XML = "xml";
   /** Method. */
   String M_XHTML = "xhtml";
   /** Method. */
   String M_HTML = "html";
   /** Method. */
-  String M_CSV = "csv";
-  /** Method. */
-  String M_MAB2 = "mab2";
-  /** Method. */
   String M_TEXT = "text";
+  /** Method. */
+  String M_JSON = "json";
 
   /** Normalization. */
   String NFC = "NFC";
@@ -173,10 +176,6 @@ public interface DataText {
 
   /** Value: json. */
   byte[] JSON = token("json");
-  /** Value: pair. */
-  byte[] PAIR = token("pair");
-  /** Value: item. */
-  byte[] ITEM = token("item");
   /** Value: type. */
   byte[] TYPE = token("type");
 

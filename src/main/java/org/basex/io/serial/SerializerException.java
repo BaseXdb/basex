@@ -5,7 +5,7 @@ import org.basex.core.BaseXException;
 import org.basex.query.util.Err;
 
 /**
- * This class indicates exceptions during query serialization.
+ * This class signals that an exception occurred during query serialization.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

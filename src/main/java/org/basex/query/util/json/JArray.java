@@ -1,5 +1,7 @@
 package org.basex.query.util.json;
 
+import static org.basex.data.DataText.*;
+
 /**
  * JSON array.
  *
@@ -7,4 +9,8 @@ package org.basex.query.util.json;
  * @author Christian Gruen
  */
 final class JArray extends JStruct {
+  @Override
+  byte[] type() {
+    return ARR;
+  }
 }

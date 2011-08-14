@@ -350,12 +350,12 @@ public final class BaseXLayout {
   public static void drawCell(final Graphics g, final int xs,
       final int xe, final int ys, final int ye, final boolean focus) {
 
-    g.setColor(COLORBUTTON);
+    g.setColor(GRAY);
     g.drawRect(xs, ys, xe - xs - 1, ye - ys - 1);
     g.setColor(Color.white);
     g.drawRect(xs + 1, ys + 1, xe - xs - 3, ye - ys - 3);
 
-    fill(g, focus ? COLORCELL : Color.white, COLORCELL,
+    fill(g, focus ? LGRAY : Color.white, LGRAY,
         xs + 2, ys + 2, xe - 1, ye - 1);
   }
 

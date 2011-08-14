@@ -17,7 +17,7 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * This class serializes trees via SAX.
+ * This class serializes data via SAX.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -156,8 +156,13 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishClose(final boolean empty) throws IOException {
-    if(empty) finishOpen();
+  protected void finishEmpty() throws IOException {
+    finishOpen();
+    finishClose();
+  }
+
+  @Override
+  protected void finishClose() throws IOException {
     try {
       content.endElement("", string(tag), string(tag));
     } catch(final SAXException ex) {

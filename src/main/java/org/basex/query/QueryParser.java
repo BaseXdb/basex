@@ -196,7 +196,7 @@ public class QueryParser extends InputParser {
   /** Declaration flag. */
   private boolean declVars;
 
-  /***
+  /**
    * Constructor.
    * @param q query
    * @param c query context
@@ -1213,18 +1213,16 @@ public class QueryParser extends InputParser {
     Expr[] cases;
     while(true) {
       cases = new Expr[0];
-      while(wsConsumeWs(CASE))
-        cases = add(cases, single());
+      while(wsConsumeWs(CASE)) cases = add(cases, single());
       if(cases.length == 0) break;
 
       wsCheck(RETURN);
       final Expr ret = single();
-      for(final Expr c : cases)
-        exprs = add(add(exprs, c), ret);
+      for(final Expr c : cases) exprs = add(add(exprs, c), ret);
     }
 
     // add default case
-    if(exprs.length == 1) error(WRONGEND, CASE);
+    if(exprs.length == 1) error(WRONGCHAR, CASE, found());
     wsCheck(DEFAULT);
     wsCheck(RETURN);
     exprs = add(exprs, single());
@@ -3387,7 +3385,7 @@ public class QueryParser extends InputParser {
    */
   private boolean not(final char ch) throws QueryException {
     final char c = curr();
-    if(c == 0) error(WRONGEND, ch);
+    if(c == 0) error(WRONGCHAR, ch, found());
     return c != ch;
   }
 

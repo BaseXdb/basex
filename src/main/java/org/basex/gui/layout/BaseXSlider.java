@@ -109,12 +109,12 @@ public final class BaseXSlider extends BaseXPanel {
     final int h = getHeight();
     final int hh = h / 2;
 
-    g.setColor(hasFocus() ? Color.white : GUIConstants.COLORCELL);
+    g.setColor(hasFocus() ? Color.white : GUIConstants.LGRAY);
     g.fillRect(0, hh - 2, w, 4);
     g.setColor(Color.black);
     g.drawLine(0, hh - 2, w, hh - 2);
     g.drawLine(0, hh - 2, 0, hh + 2);
-    g.setColor(GUIConstants.COLORBUTTON);
+    g.setColor(GUIConstants.GRAY);
     g.drawLine(w - 1, hh - 2, w - 1, hh + 2);
     g.drawLine(0, hh + 2, w, hh + 2);
 

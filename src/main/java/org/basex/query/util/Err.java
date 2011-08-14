@@ -39,21 +39,17 @@ public enum Err {
   /** BASX0010: Parsing exception. */
   NOOPTION(BASX, 10, "Unknown database option '%'."),
   /** BASX0011: Parsing exception. */
-  PARWHICH(BASX, 11, "Unexpected element: %."),
+  PARWHICH(BASX, 11, "Unknown element: %."),
   /** BASX0012: Evaluation exception. */
   DOCTRGMULT(BASX, 12, "Single document is expected as replace target."),
   /** BASX0013: Evaluation exception. */
   EMPTYPATH(BASX, 13, "%: Empty path specified."),
   /** BASX0014: Evaluation exception. */
   DBERR(BASX, 14, "%"),
-  /** BASX0015: Evaluation exception. */
-  PROCMM(BASX, 15, Text.PROCMM),
-  /** BASX0016: Evaluation exception. */
-  DBLOCKED(BASX, 16, Text.DBLOCKED),
   /** BASEX0017: Evaluation exception. */
-  JSONPARSE(BASX, 17, "JSON Parser: %."),
+  JSONPARSE(BASX, 15, "JSON Parser (%:%): %."),
   /** BASEX0018: Serialization exception. */
-  JSONSER(BASX, 18, "JSON Serialization: %."),
+  JSONSER(BASX, 16, "JSON Serialization: %."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -342,8 +338,6 @@ public enum Err {
   NOEXPR(XPST, 3, "Expecting expression."),
   /** XPST0003: Parsing exception. */
   WRONGCHAR(XPST, 3, "Expecting \"%\"%."),
-  /** XPST0003: Parsing exception. */
-  WRONGEND(XPST, 3, "Expecting \"%\"."),
   /** XPST0003: Parsing exception. */
   INVENTITY(XPST, 3, "Invalid entity \"%\"."),
   /** XPST0003: Parsing exception. */

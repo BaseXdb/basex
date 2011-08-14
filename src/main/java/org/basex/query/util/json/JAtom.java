@@ -25,10 +25,4 @@ abstract class JAtom extends JValue {
   final byte[] value() {
     return value;
   }
-
-  /**
-   * Returns the value type.
-   * @return value
-   */
-  abstract byte[] type();
 }

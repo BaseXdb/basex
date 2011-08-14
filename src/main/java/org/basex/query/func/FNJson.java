@@ -44,7 +44,8 @@ public final class FNJson extends FuncCall {
         final ArrayOutput ao = new ArrayOutput();
         try {
           // run serialization
-          final JSONSerializer json = new JSONSerializer(ao, ctx.serProp(true));
+          final JSONSerializer json =
+              new JSONSerializer(ao, ctx.serProp(false));
           node.serialize(json);
           json.close();
         } catch(final SerializerException ex) {

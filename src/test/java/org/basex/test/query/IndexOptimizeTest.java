@@ -1,7 +1,9 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
+
 import java.io.IOException;
+
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
@@ -12,6 +14,7 @@ import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.Set;
 import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -203,7 +206,7 @@ public final class IndexOptimizeTest {
     QueryProcessor qp = new QueryProcessor(query, CONTEXT);
     try {
       ArrayOutput ao = new ArrayOutput();
-      XMLSerializer xml = qp.getSerializer(ao);
+      Serializer xml = qp.getSerializer(ao);
       qp.execute().serialize(xml);
       qp.close();
       final String info = qp.info();

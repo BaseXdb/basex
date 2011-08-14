@@ -189,8 +189,8 @@ public class BaseXEditor extends BaseXPanel {
    * @param file file reference
    */
   public final void setSyntax(final IO file) {
-    // choose XML or XQuery highlighter
-    setSyntax(file.xml() ? new XMLSyntax() : new XQuerySyntax());
+    setSyntax(file.name().endsWith(IO.JSONSUFFIX) ? new JSONSyntax() :
+      file.xml() ? new XMLSyntax() : new XQuerySyntax());
   }
 
   /**

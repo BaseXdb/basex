@@ -236,12 +236,12 @@ public final class BaseXDSlider extends BaseXPanel {
     final Polygon pol = new Polygon(
         new int[] { r.xs + 11, r.xs + 5, r.xs + 5, r.xs + 11 },
         new int[] { hh - 5, hh - 1, hh, hh + 5 }, 4);
-    g.setColor(focus ? color5 : COLORBUTTON);
+    g.setColor(focus ? color5 : GRAY);
     g.fillPolygon(pol);
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);
 
-    g.setColor(focus ? Color.black : COLORDARK);
+    g.setColor(focus ? Color.black : DGRAY);
     g.drawLine(r.xs + 11, hh - 5, r.xs + 11, hh + 4);
     g.drawLine(r.xs + 11, hh - 5, r.xs + 6, hh - 1);
     g.drawLine(r.xe + 5, hh - 5, r.xe + 5, hh + 4);

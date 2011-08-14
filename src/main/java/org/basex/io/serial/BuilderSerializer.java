@@ -54,9 +54,13 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void finishClose(final boolean empty) throws IOException {
-    if(empty) build.emptyElem(tag, att);
-    else build.endElem();
+  protected void finishEmpty() throws IOException {
+    build.emptyElem(tag, att);
+  }
+
+  @Override
+  protected void finishClose() throws IOException {
+    build.endElem();
   }
 
   @Override

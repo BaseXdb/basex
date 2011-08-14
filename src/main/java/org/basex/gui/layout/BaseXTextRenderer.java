@@ -321,13 +321,13 @@ final class BaseXTextRenderer extends BaseXBack {
     final int ch = text.curr();
     if(y > 0 && y < h) {
       if(ch == TokenBuilder.MARK) {
-        color = GUIConstants.COLORFT;
+        color = GUIConstants.GREEN;
         high = true;
       }
 
       // mark error
       if(text.error()) {
-        g.setColor(GUIConstants.COLORERRHIGH);
+        g.setColor(GUIConstants.LRED);
         g.fillRect(x, y - fontH + 4, wordW, fontH);
       }
 

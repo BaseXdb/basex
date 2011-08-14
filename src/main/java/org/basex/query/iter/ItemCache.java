@@ -1,6 +1,7 @@
 package org.basex.query.iter;
 
 import java.io.IOException;
+
 import org.basex.data.Result;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;

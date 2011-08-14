@@ -7,4 +7,9 @@ package org.basex.query.util.json;
  * @author Christian Gruen
  */
 abstract class JValue {
+  /**
+   * Returns the value type.
+   * @return value
+   */
+  abstract byte[] type();
 }

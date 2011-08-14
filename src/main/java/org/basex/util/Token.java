@@ -264,7 +264,7 @@ public final class Token {
       (token[pos + 2] & 0x3F) << 6 | token[pos + 3] & 0x3F;
   }
 
-  /*** Character lengths. */
+  /** Character lengths. */
   private static final int[] CHLEN = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 4
   };
@@ -638,6 +638,17 @@ public final class Token {
     if(tl != token1.length) return false;
     for(int t = 0; t != tl; ++t) if(token2[t] != token1[t]) return false;
     return true;
+  }
+
+  /**
+   * Compares several tokens for equality.
+   * @param token token
+   * @param tokens tokens to be compared
+   * @return true if the arrays are equal
+   */
+  public static boolean eq(final byte[] token, final byte[]... tokens) {
+    for(final byte[] t : tokens) if(eq(token, t)) return true;
+    return false;
   }
 
   /**

@@ -1,8 +1,11 @@
 package org.basex.io.serial;
 
 import static org.basex.util.Token.*;
+import static org.basex.data.DataText.*;
+import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.basex.data.Data;
 import org.basex.data.ExprInfo;
@@ -19,8 +22,12 @@ import org.basex.util.list.TokenList;
  * @author Christian Gruen
  */
 public abstract class Serializer {
+  /** Default serialization parameters. */
+  protected static final SerializerProp PROPS = new SerializerProp();
   /** Stack of opened tags. */
   protected final TokenList tags = new TokenList();
+  /** Current level. */
+  protected int level;
   /** Current tag. */
   protected byte[] tag;
   /** Declare namespaces flag. */
@@ -32,6 +39,27 @@ public abstract class Serializer {
   private final IntList nsl = new IntList();
   /** Indicates if an element has not been completely opened yet. */
   private boolean elem;
+
+  /**
+   * Returns a specific serializer.
+   * @param os output stream reference
+   * @param props serialization properties (can be {@code null})
+   * @return serializer
+   * @throws IOException I/O exception
+   */
+  public static Serializer get(final OutputStream os,
+      final SerializerProp props) throws IOException {
+
+    if(props != null) {
+      final String m = props.check(
+          S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON);
+      if(M_JSON.equals(m)) return new JSONSerializer(os, props);
+      if(M_TEXT.equals(m)) return new TextSerializer(os, props);
+      if(M_HTML.equals(m)) return new HTMLSerializer(os, props);
+      if(M_XHTML.equals(m)) return new XHTMLSerializer(os, props);
+    }
+    return new XMLSerializer(os, props);
+  }
 
   // ABSTRACT METHODS =========================================================
 
@@ -58,11 +86,16 @@ public abstract class Serializer {
   protected abstract void finishOpen() throws IOException;
 
   /**
-   * Closes an element.
-   * @param empty empty tag
+   * Closes an empty element.
    * @throws IOException I/O exception
    */
-  protected abstract void finishClose(final boolean empty) throws IOException;
+  protected abstract void finishEmpty() throws IOException;
+
+  /**
+   * Closes an element.
+   * @throws IOException I/O exception
+   */
+  protected abstract void finishClose() throws IOException;
 
   /**
    * Serializes a text.
@@ -188,9 +221,14 @@ public abstract class Serializer {
    */
   public final void closeElement() throws IOException {
     ns.size = nsl.pop();
-    if(!elem) tag = tags.pop();
-    finishClose(elem);
-    elem = false;
+    if(elem) {
+      finishEmpty();
+      elem = false;
+    } else {
+      tag = tags.pop();
+      level--;
+      finishClose();
+    }
   }
 
   /**
@@ -216,16 +254,6 @@ public abstract class Serializer {
   public final void emptyElement(final ExprInfo expr, final byte[]... a)
       throws IOException {
     emptyElement(name(expr), a);
-  }
-
-  /**
-   * Closes the serializer.
-   * @throws IOException I/O exception
-   */
-  public final void close() throws IOException {
-    cls();
-    if(level() > 0) throw new IOException("<" +
-        string(tags.peek()) + "> still opened");
   }
 
   /**
@@ -336,7 +364,7 @@ public abstract class Serializer {
             }
             pp = data.parent(pp, data.kind(pp));
           } while(pp >= 0 && data.kind(pp) == Data.ELEM &&
-              l == 0 && level() == 1);
+              l == 0 && level == 1);
 
           // check namespace of current element
           final byte[] key = pref(name);
@@ -390,7 +418,12 @@ public abstract class Serializer {
     text(b);
   }
 
-  // PROTECTED METHODS ========================================================
+  // OVERWRITABLE METHODS =====================================================
+
+  /**
+   * Resets the serializer (indentation, etc).
+   */
+  public void reset() { }
 
   /**
    * Starts a result.
@@ -411,7 +444,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void cls() throws IOException { }
+  public void close() throws IOException { }
 
   /**
    * Opens a document.
@@ -446,5 +479,6 @@ public abstract class Serializer {
     elem = false;
     finishOpen();
     tags.push(tag);
+    level++;
   }
 }

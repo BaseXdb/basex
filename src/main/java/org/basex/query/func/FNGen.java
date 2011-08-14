@@ -1,40 +1,34 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.in.TextInput;
 import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.ANode;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
-import org.basex.query.item.map.Map;
-import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
-import org.basex.util.hash.TokenObjMap;
 import org.basex.util.list.ByteList;
 
 /**
@@ -44,12 +38,6 @@ import org.basex.util.list.ByteList;
  * @author Christian Gruen
  */
 public final class FNGen extends FuncCall {
-  /** Output namespace. */
-  private static final Uri U_ZIP = Uri.uri(OUTPUTURI);
-  /** Element: output:serialization-parameter. */
-  private static final QNm E_PARAM =
-    new QNm(token("serialization-parameters"), U_ZIP);
-
   /**
    * Constructor.
    * @param ii input info
@@ -305,7 +293,7 @@ public final class FNGen extends FuncCall {
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
-      final XMLSerializer xml = new XMLSerializer(ao, serialPar(this, 1, ctx));
+      final Serializer xml = Serializer.get(ao, serialPar(this, 1, ctx));
       node.serialize(xml);
       xml.close();
     } catch(final SerializerException ex) {
@@ -314,51 +302,6 @@ public final class FNGen extends FuncCall {
       SERANY.thrw(input, ex);
     }
     return Str.get(delete(ao.toArray(), '\r'));
-  }
-
-  /**
-   * Creates serializer properties.
-   * @param fun calling function
-   * @param arg argument with parameters
-   * @param ctx query context
-   * @return serialization parameters
-   * @throws SerializerException serializer exception
-   * @throws QueryException query exception
-   */
-  static SerializerProp serialPar(final FuncCall fun, final int arg,
-      final QueryContext ctx) throws SerializerException, QueryException {
-
-    // check if enough arguments are available
-    TokenObjMap<Object> tm = new TokenObjMap<Object>();
-    if(arg < fun.expr.length) {
-      // retrieve parameters
-      final Item it = fun.expr[arg].item(ctx, fun.input);
-      if(it != null) {
-        if(it instanceof Map) {
-          tm = ((Map) it).tokenJavaMap(fun.input);
-        } else {
-          // check root node
-          ANode n = (ANode) fun.checkType(it, NodeType.ELM);
-          if(!n.qname().eq(E_PARAM)) SERUNKNOWN.thrw(fun.input, n.qname());
-          // interpret query parameters
-          final AxisIter ai = n.children();
-          while((n = ai.next()) != null) {
-            final QNm qn = n.qname();
-            if(!qn.uri().eq(U_ZIP)) SERUNKNOWN.thrw(fun.input, qn);
-            tm.add(qn.ln(), n.atom());
-          }
-        }
-      }
-    }
-
-    // use default parameters if no parameters have been assigned
-    final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] key : tm) {
-      if(tb.size() != 0) tb.add(',');
-      tb.add(key).add('=').addExt(tm.get(key));
-    }
-    return tb.size() == 0 ? ctx.serProp(true) :
-      new SerializerProp(tb.toString());
   }
 
   @Override

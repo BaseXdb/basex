@@ -1,255 +1,258 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
-import org.basex.core.Prop;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryException;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenMap;
+import org.basex.util.hash.TokenSet;
 import org.basex.util.list.BoolList;
 import org.basex.util.list.TokenList;
 
 /**
- * This class serializes trees as JSON.
+ * This class serializes data as JSON.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class JSONSerializer extends Serializer {
-  /** Output stream. */
-  private final PrintOutput out;
-  /** Number of spaces to indent. */
-  private final int indents;
-  /** Tabular character. */
-  private final String tab;
-
+public final class JSONSerializer extends OutputSerializer {
+  /** Supported data types. */
+  private static final byte[][] TYPES = { BOOL, NUM, NULL, ARR, OBJ, STR };
+  /** Cached data types. */
+  private final TokenSet[] typeCache = new TokenSet[TYPES.length];
   /** Comma flag. */
   private final BoolList comma = new BoolList();
   /** Types. */
   private final TokenList types = new TokenList();
-  /** Current key. */
-  private byte[] key;
 
   /**
    * Constructor.
-   * @param ao array output
+   * @param os output stream reference
    * @param props serialization properties
    * @throws IOException I/O exception
    */
-  public JSONSerializer(final ArrayOutput ao, final SerializerProp props)
+  public JSONSerializer(final OutputStream os, final SerializerProp props)
       throws IOException {
-
-    out = PrintOutput.get(ao);
-    final SerializerProp p = props == null ? XMLSerializer.PROPS : props;
-    indents = Math.max(0, toInt(p.get(S_INDENTS)));
-    tab = String.valueOf(p.check(S_TABULATOR, YES, NO).equals(YES) ?
-        '\t' : ' ');
+    super(os, props);
+    for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
   }
 
   @Override
   protected void startOpen(final byte[] name) throws IOException {
-    key = null;
-    types.set(level(), null);
-  }
-
-  @Override
-  protected void finishOpen() throws IOException {
-    if(!tag(PAIR) && !tag(ITEM) && !tag(JSON)) error("Invalid tag: \"%\"", tag);
-
-    final int level = level();
-    if(comma.get(level)) print(',');
-
-    if(!tag(JSON)) {
-      comma.set(level, true);
-      indent(true);
-    }
-    if(tag(PAIR)) {
-      if(key == null) error("No name specified");
-      print('"');
-      print(key);
-      print("\": ");
-    }
-
-    final byte[] type = types.get(level);
-    if(type == null) error("No type specified");
-    if(!eq(type, ARR) && !eq(type, OBJ)) return;
-
-    print(eq(type, ARR) ? '[' : '{');
+    if(level == 0 && !eq(name, JSON)) error("<%> expected as root node", JSON);
+    types.set(level, null);
     comma.set(level + 1, false);
-  }
-
-  @Override
-  protected void finishClose(final boolean empty) throws IOException {
-    if(empty) finishOpen();
-
-    final byte[] type = types.get(level());
-    if(type == null) return;
-    final boolean struct = eq(type, ARR) || eq(type, OBJ);
-
-    if(empty) {
-      if(eq(type, NULL)) {
-        print(NULL);
-      } else if(eq(type, STR)) {
-        print("\"\"");
-      } else if(!eq(type, OBJ) && !eq(type, ARR)) {
-        if(eq(type, NUM) || eq(type, BOOL)) {
-          error("Value needed for % type", type);
-        } else {
-          error("Invalid type: \"%\"", type);
-        }
-      }
-    } else {
-      if(struct) indent(true);
-    }
-    if(!struct) return;
-    print(eq(type, ARR) ? ']' : '}');
   }
 
   @Override
   public void attribute(final byte[] name, final byte[] value)
       throws IOException {
 
+    if(level == 0) {
+      final int tl = typeCache.length;
+      for(int t = 0; t < tl; t++) {
+        if(eq(name, TYPES[t])) {
+          for(final byte[] b : split(value, ' ')) typeCache[t].add(b);
+          return;
+        }
+      }
+    }
     if(eq(name, TYPE)) {
-      types.set(level(), value);
-    } else if(eq(name, NAME)) {
-      if(tag(PAIR)) key = value;
+      types.set(level, value);
+      if(!eq(value, TYPES))
+        error("Element <%> has invalid type \"%\"", tag, value);
     } else {
-      error("Invalid attribute: \"%\"", name);
+      error("Element <%> has invalid attribute \"%\"", tag, name);
+    }
+  }
+
+  @Override
+  protected void finishOpen() throws IOException {
+    if(comma.get(level)) print(',');
+    else comma.set(level, true);
+
+    if(level > 0) {
+      indent(level);
+      byte[] par = types.get(level - 1);
+      if(eq(par, OBJ)) {
+        print('"');
+        print(name(tag));
+        print("\": ");
+      } else if(!eq(par, ARR)) {
+        error("Element <%> is typed as \"%\" and cannot be nested",
+            tags.get(level - 1), par);
+      }
+    }
+
+    byte[] type = types.get(level);
+    if(type == null) {
+      int t = -1;
+      final int tl = typeCache.length;
+      while(++t < tl && typeCache[t].id(tag) == 0);
+      if(t != tl) type = TYPES[t];
+      else type = STR;
+      types.set(level,  type);
+    }
+
+    if(eq(type, OBJ)) {
+      print('{');
+    } else if(eq(type, ARR)) {
+      print('[');
+    } else if(level == 0) {
+      error("Element <%> must be typed as \"%\" or \"%\"", JSON, OBJ, ARR);
     }
   }
 
   @Override
   public void finishText(final byte[] text) throws IOException {
-    if(trim(text).length == 0) return;
-    if(tag(PAIR) || tag(ITEM)) {
-      final byte[] type = types.get(level() - 1);
-      if(eq(type, STR)) {
-        print('"');
-        for(final byte ch : text) {
-          if(ch == '\b') {
-            print("\\b");
-          } else if(ch == '\f') {
-            print("\\f");
-          } else if(ch == '\n') {
-            print("\\n");
-          } else if(ch == '\r') {
-            print("\\r");
-          } else if(ch == '\t') {
-            print("\\t");
-          } else {
-            print(ch);
-          }
-        }
-        print('"');
-      } else if(eq(type, BOOL)) {
-        if(!eq(text, TRUE) && !eq(text, FALSE))
-          error("Invalid boolean value", text);
-        print(text);
-      } else if(eq(type, NUM)) {
-        print(text);
-      } else if(eq(type, NULL)) {
-        error("No value expected after \"null\"");
-      } else {
-        error("Invalid type: \"%\"", type);
-      }
+    byte[] type = types.get(level - 1);
+    if(eq(type, STR)) {
+      print('"');
+      for(final byte ch : text) ch(ch);
+      print('"');
+    } else if(eq(type, BOOL) || eq(type, NUM)) {
+      print(text);
+    } else if(trim(text).length != 0) {
+      error("Element <%> is typed as \"%\" and cannot have a value",
+          tags.get(level - 1), type);
+    }
+  }
+
+  @Override
+  protected void finishEmpty() throws IOException {
+    finishOpen();
+    byte[] type = types.get(level);
+    if(eq(type, ARR)) {
+      print(']');
+    } else if(eq(type, OBJ)) {
+      print('}');
+    } else if(eq(type, STR)) {
+      print("\"\"");
+    } else if(eq(type, NULL)) {
+      print(NULL);
     } else {
-      error("No text allowed in \"%\" tag", tag);
+      error("Value expected for type \"%\"", type);
+    }
+    finishClose();
+  }
+
+  @Override
+  protected void finishClose() throws IOException {
+    final byte[] type = types.get(level);
+    if(eq(type, ARR)) {
+      indent(level);
+      print(']');
+    } else if(eq(type, OBJ)) {
+      indent(level);
+      print('}');
+    }
+  }
+
+  @Override
+  protected void ch(final int ch) throws IOException {
+    switch(ch) {
+      case '\b': print("\\b");  break;
+      case '\f': print("\\f");  break;
+      case '\n': print("\\n");  break;
+      case '\r': print("\\r");  break;
+      case '\t': print("\\t");  break;
+      case '"':  print("\\\""); break;
+      case '/':  print("\\/");  break;
+      case '\\': print("\\\\"); break;
+      default:   print(ch);     break;
     }
   }
 
   @Override
   public void finishComment(final byte[] value) throws IOException {
-    error("Comment cannot be serialized.");
   }
 
   @Override
   public void finishPi(final byte[] name, final byte[] value)
       throws IOException {
-    error("Processing instruction cannot be serialized.");
   }
 
   @Override
   public void finishItem(final byte[] value) throws IOException {
-    error("Item cannot be serialized.");
   }
 
-  /**
-   * Returns if the current tag equals the specified tag.
-   * @param name tag to be compared
-   * @return result of check
-   */
-  private boolean tag(final byte[] name) {
-    return eq(tag, name);
-  }
 
   /**
-   * Prints the text declaration to the output stream.
-   * @param nl newline
+   * Prints some indentation.
+   * @param lvl level
    * @throws IOException I/O exception
    */
-  private void indent(final boolean nl) throws IOException {
-    if(nl) print(Prop.NL);
-    final int ls = level() * indents;
+  protected void indent(final int lvl) throws IOException {
+    print(NL);
+    final int ls = lvl * indents;
     for(int l = 0; l < ls; ++l) print(tab);
   }
 
   /**
-   * Skips whitespaces, raises an error if the specified string cannot be
-   * consumed.
+   * Converts an XML element name to a JSON name.
+   * @param name name
+   * @return cached QName
+   */
+  private byte[] name(final byte[] name) {
+    // convert name to valid XML representation
+    final TokenBuilder tb = new TokenBuilder();
+    int uc = 0;
+    // mode: 0=normal, 1=unicode, 2=underscore, 3=building unicode
+    int mode = 0;
+    for(int n = 0; n < name.length;) {
+      final int cp = cp(name, n);
+      if(mode >= 3) {
+        uc = (uc << 4) + cp - (cp >= '0' && cp <= '9' ? '0' : 0x37);
+        if(++mode == 7) {
+          tb.add(uc);
+          mode = 0;
+        }
+      } else if(cp == '_') {
+        // limit underscore counter
+        if(++mode == 3) {
+          tb.add('_');
+          mode = 0;
+          continue;
+        }
+      } else if(mode == 1) {
+        // unicode
+        mode = 3;
+        continue;
+      } else if(mode == 2) {
+        // underscore
+        tb.add('_');
+        mode = 0;
+        continue;
+      } else {
+        // normal character
+        tb.add(cp);
+        mode = 0;
+      }
+      n += cl(name, n);
+    }
+    if(mode == 2) {
+      tb.add('_');
+    } else if(mode > 0 && tb.size() != 0) {
+      tb.add('?');
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Raises an error with the specified message.
    * @param msg error message
    * @param ext error details
    * @return build exception
-   * @throws SerializerException serializer exception
+   * @throws IOException I/O exception
    */
   private QueryException error(final String msg, final Object... ext)
-      throws SerializerException {
+      throws IOException {
     throw JSONSER.thrwSerial(Util.inf(msg, ext));
-  }
-
-  /**
-   * Writes a string in the current encoding.
-   * @param s string to be printed
-   * @throws IOException I/O exception
-   */
-  private void print(final String s) throws IOException {
-    print(token(s));
-  }
-
-  /**
-   * Writes a token in the current encoding.
-   * @param token token to be printed
-   * @throws IOException I/O exception
-   */
-  private void print(final byte[] token) throws IOException {
-    for(final byte b : token) out.write(b);
-  }
-
-  /**
-   * Writes a character in the current encoding.
-   * @param ch character to be printed
-   * @throws IOException I/O exception
-   */
-  private void print(final int ch) throws IOException {
-    if(ch <= 0x7F) {
-      out.write(ch);
-    } else if(ch <= 0x7FF) {
-      out.write(ch >>  6 & 0x1F | 0xC0);
-      out.write(ch >>  0 & 0x3F | 0x80);
-    } else if(ch <= 0xFFFF) {
-      out.write(ch >> 12 & 0x0F | 0xE0);
-      out.write(ch >>  6 & 0x3F | 0x80);
-      out.write(ch >>  0 & 0x3F | 0x80);
-    } else {
-      out.write(ch >> 18 & 0x07 | 0xF0);
-      out.write(ch >> 12 & 0x3F | 0x80);
-      out.write(ch >>  6 & 0x3F | 0x80);
-      out.write(ch >>  0 & 0x3F | 0x80);
-    }
   }
 }

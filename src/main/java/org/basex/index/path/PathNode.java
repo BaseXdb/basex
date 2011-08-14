@@ -132,7 +132,7 @@ public final class PathNode {
     }
   }
 
-  /***
+  /**
    * Returns the level of the path node.
    * @return level
    */

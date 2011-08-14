@@ -2,25 +2,28 @@ package org.basex.gui.view.text;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+
 import javax.swing.Box;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXFileChooser;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXEditor;
+import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.layout.XMLSyntax;
