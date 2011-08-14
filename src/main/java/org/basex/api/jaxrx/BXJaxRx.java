@@ -18,8 +18,8 @@ import org.basex.core.cmd.ListDB;
 import org.basex.core.cmd.Open;
 import org.basex.io.IO;
 import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.server.Session;
 import org.basex.util.Table;
 import org.basex.util.Token;
@@ -59,7 +59,7 @@ public final class BXJaxRx implements JaxRx {
     return new BXOutput(path) {
       @Override
       String code() throws IOException {
-        final XMLSerializer xml = new XMLSerializer(out,
+        final Serializer xml = Serializer.get(out,
             new SerializerProp(serial(path)));
 
         if(path.getDepth() != 0) {
@@ -135,8 +135,8 @@ public final class BXJaxRx implements JaxRx {
         exec(cmd, ao);
 
         // serialize output and remove carriage returns
-        final XMLSerializer xml =
-          new XMLSerializer(out, new SerializerProp(serial(path)));
+        final Serializer xml =
+          Serializer.get(out, new SerializerProp(serial(path)));
         xml.text(Token.delete(ao.toArray(), '\r'));
         xml.close();
         return session.info();

@@ -2,6 +2,7 @@ package org.basex.api.xmldb;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 import org.basex.data.Result;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.XMLSerializer;
