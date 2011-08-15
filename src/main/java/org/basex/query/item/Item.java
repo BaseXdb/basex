@@ -206,11 +206,7 @@ public abstract class Item extends Value {
    * @throws IOException I/O exception
    */
   public void serialize(final Serializer ser) throws IOException {
-    try {
-      ser.item(atom(null));
-    } catch(final QueryException ex) {
-      throw new IOException(ex.getMessage(), ex);
-    }
+    ser.item(this);
   }
 
   /**

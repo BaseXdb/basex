@@ -9,7 +9,7 @@ import java.io.OutputStream;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class TextSerializer extends OutputSerializer {
+public class TextSerializer extends OutputSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.util.json.JSONConverter;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -121,7 +122,7 @@ public final class JSONSerializer extends OutputSerializer {
     byte[] type = types.get(level - 1);
     if(eq(type, STR)) {
       print('"');
-      for(final byte ch : text) ch(ch);
+      for(final byte ch : text) code(ch);
       print('"');
     } else if(eq(type, BOOL, NUM)) {
       print(text);
@@ -158,7 +159,7 @@ public final class JSONSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void ch(final int ch) throws IOException {
+  protected void code(final int ch) throws IOException {
     switch(ch) {
       case '\b': print("\\b");  break;
       case '\f': print("\\f");  break;
@@ -184,7 +185,7 @@ public final class JSONSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishItem(final byte[] value) throws IOException {
+  public void finishItem(final Item value) throws IOException {
     error("Items cannot be serialized");
   }
 
@@ -194,7 +195,7 @@ public final class JSONSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   protected void indent(final int lvl) throws IOException {
-    print(NL);
+    print('\n');
     final int ls = lvl * indents;
     for(int l = 0; l < ls; ++l) print(tab);
   }

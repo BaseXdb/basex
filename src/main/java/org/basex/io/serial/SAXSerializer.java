@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.data.Result;
+import org.basex.query.item.Item;
 import org.basex.util.Util;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
@@ -200,7 +201,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void finishItem(final byte[] b) throws IOException {
-    throw new IOException("Can't serialize atomic items.");
+  public void finishItem(final Item b) throws IOException {
+    throw new IOException("Items cannot be serialized");
   }
 }

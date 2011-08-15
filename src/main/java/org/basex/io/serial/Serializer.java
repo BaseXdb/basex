@@ -1,9 +1,10 @@
 package org.basex.io.serial;
 
-import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -11,6 +12,8 @@ import org.basex.data.Data;
 import org.basex.data.ExprInfo;
 import org.basex.data.FTPos;
 import org.basex.data.FTPosData;
+import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.util.Atts;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
@@ -52,12 +55,13 @@ public abstract class Serializer {
 
     if(props != null) {
       final String m = props.check(
-          S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML);
-      if(M_JSON.equals(m)) return new JSONSerializer(os, props);
+          S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_RAW);
+      if(M_RAW.equals(m))    return new RawSerializer(os, props);
+      if(M_JSON.equals(m))   return new JSONSerializer(os, props);
       if(M_JSONML.equals(m)) return new JsonMLSerializer(os, props);
-      if(M_TEXT.equals(m)) return new TextSerializer(os, props);
-      if(M_HTML.equals(m)) return new HTMLSerializer(os, props);
-      if(M_XHTML.equals(m)) return new XHTMLSerializer(os, props);
+      if(M_TEXT.equals(m))   return new TextSerializer(os, props);
+      if(M_HTML.equals(m))   return new HTMLSerializer(os, props);
+      if(M_XHTML.equals(m))  return new XHTMLSerializer(os, props);
     }
     return new XMLSerializer(os, props);
   }
@@ -126,7 +130,7 @@ public abstract class Serializer {
    * @param b text bytes
    * @throws IOException I/O exception
    */
-  public abstract void finishItem(final byte[] b) throws IOException;
+  public abstract void finishItem(final Item b) throws IOException;
 
   // IMPLEMENTED METHODS ======================================================
 
@@ -166,9 +170,23 @@ public abstract class Serializer {
    * @param b text bytes
    * @throws IOException I/O exception
    */
-  public final void item(final byte[] b) throws IOException {
+  public final void item(final Item b) throws IOException {
     finishElement();
     finishItem(b);
+  }
+
+  /**
+   * Returns the string representation of the specified item.
+   * @param it item to be atomized
+   * @return string
+   * @throws IOException I/O exception
+   */
+  protected final byte[] atom(final Item it) throws IOException {
+    try {
+      return it.atom(null);
+    } catch(final QueryException ex) {
+      throw new IOException(ex.getMessage(), ex);
+    }
   }
 
   /**
@@ -276,7 +294,7 @@ public abstract class Serializer {
    * @param pre namespace prefix
    * @return URI if found, {@code null} otherwise
    */
-  public final byte[] ns(final byte[] pre) {
+  private byte[] ns(final byte[] pre) {
     for(int i = ns.size - 1; i >= 0; i--)
       if(eq(ns.key[i], pre)) return ns.val[i];
     return null;
@@ -401,7 +419,7 @@ public abstract class Serializer {
    * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
-  public final void text(final byte[] b, final FTPos ftp) throws IOException {
+  private void text(final byte[] b, final FTPos ftp) throws IOException {
     finishElement();
     finishText(b, ftp);
   }

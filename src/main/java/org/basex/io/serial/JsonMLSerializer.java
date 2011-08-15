@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.util.Util;
 
 /**
@@ -43,7 +44,7 @@ public final class JsonMLSerializer extends OutputSerializer {
     }
     print('[');
     print('"');
-    for(final byte ch : ln(name)) ch(ch);
+    for(final byte ch : ln(name)) code(ch);
     print('"');
     att = false;
   }
@@ -58,9 +59,9 @@ public final class JsonMLSerializer extends OutputSerializer {
       att = true;
     }
     print('"');
-    for(final byte ch : name) ch(ch);
+    for(final byte ch : name) code(ch);
     print("\":\"");
-    for(final byte ch : value) ch(ch);
+    for(final byte ch : value) code(ch);
     print("\"");
   }
 
@@ -78,7 +79,7 @@ public final class JsonMLSerializer extends OutputSerializer {
     print(',');
     indent();
     print('"');
-    for(final byte ch : text) ch(ch);
+    for(final byte ch : text) code(ch);
     print('"');
   }
 
@@ -95,7 +96,7 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void ch(final int ch) throws IOException {
+  protected void code(final int ch) throws IOException {
     switch(ch) {
       case '\b': print("\\b");  break;
       case '\f': print("\\f");  break;
@@ -119,7 +120,7 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishItem(final byte[] value) throws IOException {
+  public void finishItem(final Item value) throws IOException {
     error("Items cannot be serialized");
   }
 

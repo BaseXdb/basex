@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenSet;
 import org.basex.util.list.TokenList;
 
@@ -21,6 +22,8 @@ public class HTMLSerializer extends OutputSerializer {
   private static final TokenList SCRIPTS = new TokenList();
   /** HTML: boolean attributes. */
   private static final TokenSet BOOLEAN = new TokenSet();
+  /** Flag for printing content type. */
+  private int ct;
 
   /**
    * Constructor, specifying serialization options.
@@ -35,28 +38,26 @@ public class HTMLSerializer extends OutputSerializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) throws IOException {
-    print(' ');
-    print(n);
-
     // don't append value for boolean attributes
     final byte[] tagatt = concat(lc(tag), COLON, lc(n));
     if(BOOLEAN.id(tagatt) != 0 && eq(n, v)) return;
     // escape URI attributes
     final byte[] val = escape && URIS.id(tagatt) != 0 ? escape(v) : v;
 
+    print(' ');
+    print(n);
     print(ATT1);
     for(int k = 0; k < val.length; k += cl(val, k)) {
       final int ch = cp(val, k);
       if(ch == '<' || ch == '&' &&
           val[Math.min(k + 1, val.length - 1)] == '{') {
         print(ch);
+      } else if(ch == '"') {
+        print(E_QU);
+      } else if(ch == 0x9 || ch == 0xA) {
+        hex(ch);
       } else {
-        switch(ch) {
-          case '"': print(E_QU);  break;
-          case 0x9:
-          case 0xA: hex(ch); break;
-          default:  ch(ch);
-        }
+        code(ch);
       }
     }
     print(ATT2);
@@ -82,32 +83,11 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void ch(final int ch) throws IOException {
-    if(ch == '\n') {
-      print(NL);
-      return;
-    }
-    if(script) {
-      print(ch);
-      return;
-    }
-    if(ch < ' ' && ch != '\t' && ch != '\n' && ch != '\r') return;
-    if(ch > 0x7F && ch < 0xA0) SERILL.thrwSerial(Integer.toHexString(ch));
-    if(ch == 0xA0) {
-      print(E_NBSP);
-      return;
-    }
-
-    if(ch < ' ' && ch != '\t' && ch != '\n' || ch > 0x7F && ch < 0xA0) {
-      hex(ch);
-    } else {
-      switch(ch) {
-        case '&': print(E_AMP); break;
-        case '>': print(E_GT); break;
-        case '<': print(E_LT); break;
-        default : print(ch);
-      }
-    }
+  protected void code(final int ch) throws IOException {
+    if(script) print(ch);
+    else if(ch > 0x7F && ch < 0xA0) SERILL.thrwSerial(Integer.toHexString(ch));
+    else if(ch == 0xA0) print(E_NBSP);
+    else super.code(ch);
   }
 
   @Override
@@ -118,16 +98,18 @@ public class HTMLSerializer extends OutputSerializer {
     print(t);
     ind = indent;
     script = SCRIPTS.contains(lc(t));
+    if(content && eq(lc(tag), HEAD)) ct++;
+  }
 
-    // subsequent content type elements are currently ignored
-    if(content && eq(lc(t), HEAD)) {
-      emptyElement(META, HTTPEQUIV, CONTTYPE, CONTENT,
-          concat(token(media), CHARSET, token(enc)));
-    }
+  @Override
+  protected void finishOpen() throws IOException {
+    super.finishOpen();
+    if(ct(false)) return;
   }
 
   @Override
   protected void finishEmpty() throws IOException {
+    if(ct(true)) return;
     print(ELEM_C);
     if(EMPTIES.contains(lc(tag))) return;
     ind = false;
@@ -138,6 +120,27 @@ public class HTMLSerializer extends OutputSerializer {
   protected void finishClose() throws IOException {
     super.finishClose();
     script &= !SCRIPTS.contains(lc(tag));
+  }
+
+  /**
+   * Prints the content type declaration.
+   * @param empty empty flag
+   * @return {@code true} if declaration was printed
+   * @throws IOException I/O exception
+   */
+  private boolean ct(final boolean empty) throws IOException {
+    if(ct != 1) return false;
+    ct++;
+    if(empty) finishOpen();
+    level++;
+    startOpen(META);
+    attribute(HTTPEQUIV, CONTTYPE);
+    attribute(CONTENT,
+        new TokenBuilder(media).add(CHARSET).addExt(encoding).finish());
+    print(ELEM_C);
+    level--;
+    if(empty) finishClose();
+    return true;
   }
 
   // HTML Serializer: cache elements

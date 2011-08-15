@@ -1,15 +1,18 @@
 package org.basex.io.serial;
 
-import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+
 import org.basex.core.Prop;
 import org.basex.data.FTPos;
 import org.basex.io.out.PrintOutput;
+import org.basex.query.item.Item;
 import org.basex.util.TokenBuilder;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTSpan;
@@ -23,9 +26,6 @@ import org.basex.util.list.TokenList;
  * @author Christian Gruen
  */
 public abstract class OutputSerializer extends Serializer {
-  /** New line. */
-  protected static final byte[] NL = token(Prop.NL);
-
   /** (X)HTML: elements with an empty content model. */
   protected static final TokenList EMPTIES = new TokenList();
   /** (X)HTML: URI attributes. */
@@ -51,9 +51,13 @@ public abstract class OutputSerializer extends Serializer {
   protected final boolean content;
   /** Media type. */
   protected final String media;
-  /** Encoding. */
-  protected final String enc;
+  /** Charset. */
+  protected final Charset encoding;
+  /** New line. */
+  protected final byte[] nl;
 
+  /** UTF8 flag. */
+  private final boolean utf8;
   /** Output stream. */
   private final PrintOutput out;
 
@@ -101,7 +105,9 @@ public abstract class OutputSerializer extends Serializer {
     p.check(S_NORMALIZATION_FORM, NFC, NONE);
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
-    enc     = normEncoding(p.get(S_ENCODING), null);
+    final String enc = normEncoding(p.get(S_ENCODING), null);
+    utf8 = enc == UTF8;
+    encoding = Charset.forName(enc);
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
     media   = p.get(S_MEDIA_TYPE);
@@ -110,6 +116,7 @@ public abstract class OutputSerializer extends Serializer {
     escape  = p.check(S_ESCAPE_URI_ATTRIBUTES, YES, NO).equals(YES);
     content = p.check(S_INCLUDE_CONTENT_TYPE, YES, NO).equals(YES);
     undecl  = p.check(S_UNDECLARE_PREFIXES, YES, NO).equals(YES);
+    nl = utf8 ? token(Prop.NL) : Prop.NL.getBytes(encoding);
 
     if(!maps.isEmpty()) SERMAP.thrwSerial(maps);
     if(!supported(enc)) SERENCODING.thrwSerial(enc);
@@ -201,14 +208,13 @@ public abstract class OutputSerializer extends Serializer {
     for(int k = 0; k < v.length; k += cl(v, k)) {
       final int ch = cp(v, k);
       if(!format) {
-        ch(ch);
+        print(ch);
+      } else if(ch == '"') {
+        print(E_QU);
+      } else if(ch == 0x9 || ch == 0xA) {
+        hex(ch);
       } else {
-        switch(ch) {
-          case '"': print(E_QU);  break;
-          case 0x9:
-          case 0xA: hex(ch); break;
-          default:  ch(ch);
-        }
+        code(ch);
       }
     }
     print(ATT2);
@@ -217,7 +223,7 @@ public abstract class OutputSerializer extends Serializer {
   @Override
   public void finishText(final byte[] b) throws IOException {
     if(cdata.size() == 0 || !cdata.contains(tags.peek())) {
-      for(int k = 0; k < b.length; k += cl(b, k)) ch(cp(b, k));
+      for(int k = 0; k < b.length; k += cl(b, k)) code(cp(b, k));
     } else {
       print(CDATA_O);
       int c = 0;
@@ -247,7 +253,7 @@ public abstract class OutputSerializer extends Serializer {
       if(!span.special && ftp.contains(span.pos))
         print((char) TokenBuilder.MARK);
       final byte[] t = span.text;
-      for(int k = 0; k < t.length; k += cl(t, k)) ch(cp(t, k));
+      for(int k = 0; k < t.length; k += cl(t, k)) code(cp(t, k));
     }
     ind = false;
   }
@@ -271,34 +277,32 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void finishItem(final byte[] b) throws IOException {
+  public void finishItem(final Item it) throws IOException {
     if(ind) print(' ');
-    for(int k = 0; k < b.length; k += cl(b, k)) ch(cp(b, k));
+    byte[] atom = atom(it);
+    for(int a = 0; a < atom.length; a += cl(atom, a)) code(cp(atom, a));
     ind = format;
     item = true;
   }
 
   /**
-   * Prints a single character.
-   * @param ch character to be printed
+   * Encode the specified character before printing it.
+   * @param ch character to be encoded and printed
    * @throws IOException I/O exception
    */
-  protected void ch(final int ch) throws IOException {
-    if(ch == '\n') {
-      print(NL);
-      return;
-    }
+  protected void code(final int ch) throws IOException {
     if(!format) {
       print(ch);
-    } else if(ch < ' ' && ch != '\t' && ch != '\n' || ch > 0x7F && ch < 0xA0) {
+    } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch > 0x7F && ch < 0xA0) {
       hex(ch);
+    } else if(ch == '&') {
+      print(E_AMP);
+    } else if(ch == '>') {
+      print(E_GT);
+    } else if(ch == '<') {
+      print(E_LT);
     } else {
-      switch(ch) {
-        case '&': print(E_AMP); break;
-        case '>': print(E_GT); break;
-        case '<': print(E_LT); break;
-        default : print(ch);
-      }
+      print(ch);
     }
   }
 
@@ -334,7 +338,7 @@ public abstract class OutputSerializer extends Serializer {
     }
     print(" \"" + docsys + "\"");
     print(ELEM_C);
-    print(NL);
+    print(nl);
     docsys = null;
   }
 
@@ -366,7 +370,7 @@ public abstract class OutputSerializer extends Serializer {
     if(item) {
       item = false;
     } else {
-      print(NL);
+      print(nl);
       final int ls = level * indents;
       for(int l = 0; l < ls; ++l) print(tab);
     }
@@ -385,17 +389,14 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Writes a token in the current encoding.
-   * @param token token to be printed
+   * Writes a character in the current encoding. Converts newlines to the
+   * operating system default.
+   * @param ch character to be printed
    * @throws IOException I/O exception
    */
-  protected final void print(final byte[] token) throws IOException {
-    // comparison by reference
-    if(enc == UTF8) {
-      for(final byte b : token) out.write(b);
-    } else {
-      print(string(token));
-    }
+  protected final void print(final int ch) throws IOException {
+    if(ch == '\n') out.write(nl);
+    else write(ch);
   }
 
   /**
@@ -403,9 +404,9 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character to be printed
    * @throws IOException I/O exception
    */
-  protected final void print(final int ch) throws IOException {
+  protected void write(final int ch) throws IOException {
     // comparison by reference
-    if(enc == UTF8) {
+    if(utf8) {
       if(ch <= 0x7F) {
         out.write(ch);
       } else if(ch <= 0x7FF) {
@@ -422,7 +423,21 @@ public abstract class OutputSerializer extends Serializer {
         out.write(ch >>  0 & 0x3F | 0x80);
       }
     } else {
-      print(new TokenBuilder(4).add(ch).toString());
+      out.write(new TokenBuilder(4).add(ch).toString().getBytes(encoding));
+    }
+  }
+
+  /**
+   * Writes a token in the current encoding.
+   * @param token token to be printed
+   * @throws IOException I/O exception
+   */
+  protected final void print(final byte[] token) throws IOException {
+    // comparison by reference
+    if(utf8) {
+      for(final byte b : token) out.write(b);
+    } else {
+      out.write(string(token).getBytes(encoding));
     }
   }
 
@@ -433,17 +448,10 @@ public abstract class OutputSerializer extends Serializer {
    */
   protected final void print(final String s) throws IOException {
     // comparison by reference
-    if(enc == UTF8) {
+    if(utf8) {
       for(final byte b : token(s)) out.write(b);
-    } else if(enc == UTF16BE || enc == UTF16LE) {
-      final boolean l = enc == UTF16LE;
-      for(int i = 0; i < s.length(); ++i) {
-        final char ch = s.charAt(i);
-        out.write(l ? ch & 0xFF : ch >>> 8);
-        out.write(l ? ch >>> 8 : ch & 0xFF);
-      }
     } else {
-      out.write(s.getBytes(enc));
+      out.write(s.getBytes(encoding));
     }
   }
 

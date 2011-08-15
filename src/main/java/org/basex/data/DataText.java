@@ -130,6 +130,8 @@ public interface DataText {
   String M_JSON = "json";
   /** Method. */
   String M_JSONML = "jsonml";
+  /** Method. */
+  String M_RAW = "raw";
 
   /** Normalization. */
   String NFC = "NFC";

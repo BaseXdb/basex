@@ -5,7 +5,9 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.build.Builder;
+import org.basex.query.item.Item;
 import org.basex.util.Atts;
+import org.basex.util.Util;
 
 /**
  * A serializer that pipes the events directly through to a builder.
@@ -43,8 +45,8 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public final void finishItem(final byte[] b) throws IOException {
-    text(b);
+  public final void finishItem(final Item b) throws IOException {
+    Util.notexpected();
   }
 
   @Override
