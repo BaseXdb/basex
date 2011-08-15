@@ -1,7 +1,9 @@
 package org.basex.data;
 
+import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.Arrays;
+
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.TokenBuilder;
@@ -189,7 +191,7 @@ final class NSNode {
   private void print(final TokenBuilder tb, final int l, final Namespaces ns,
       final int s, final int e) {
     if(pre >= s && pre <= e) {
-      tb.add('\n');
+      tb.add(NL);
       for(int i = 0; i < l; ++i) tb.add("  ");
       tb.add("Pre[" + pre + "] ");
       for(int i = 0; i < vals.length; i += 2) {

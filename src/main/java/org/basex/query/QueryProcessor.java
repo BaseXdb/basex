@@ -16,7 +16,6 @@ import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.JavaFunc;
 import org.basex.query.item.Atm;
@@ -49,7 +48,7 @@ public final class QueryProcessor extends Progress {
    * @param cx database context
    */
   public QueryProcessor(final String qu, final Context cx) {
-    this(qu, cx.current, cx);
+    this(qu, cx.current(), cx);
   }
 
   /**
@@ -137,7 +136,7 @@ public final class QueryProcessor extends Progress {
    * @param t data type
    * @throws QueryException query exception
    */
-  public void bind(final String n, final String o, final String t)
+  public void bind(final String n, final Object o, final String t)
       throws QueryException {
 
     Object obj = o;
@@ -145,7 +144,7 @@ public final class QueryProcessor extends Progress {
       final QNm type = new QNm(token(t));
       if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
       final Type typ = Types.find(type, true);
-      if(typ != null) obj = typ.e(o, null);
+      if(typ != null) obj = typ.e(obj, null);
       else NOTYPE.thrw(null, type);
     }
     bind(n, obj);
@@ -196,12 +195,12 @@ public final class QueryProcessor extends Progress {
    * @throws IOException query exception
    * @throws QueryException query exception
    */
-  public XMLSerializer getSerializer(final OutputStream os) throws IOException,
+  public Serializer getSerializer(final OutputStream os) throws IOException,
       QueryException {
 
     compile();
     try {
-      return new XMLSerializer(os, ctx.serProp(true));
+      return Serializer.get(os, ctx.serProp(true));
     } catch(final SerializerException ex) {
       throw new QueryException(null, ex);
     }

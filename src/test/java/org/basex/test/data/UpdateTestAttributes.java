@@ -7,7 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * This class tests the update features of the Data class.
+ * This class tests the update features of the {@link Data} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Tim Petrowsky
@@ -18,7 +18,7 @@ public final class UpdateTestAttributes extends UpdateTest {
    */
   @Test
   public void testUpdateAttribute() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     data.update(7, Data.ATTR, NAME, Token.EMPTY);
     data.update(7, Data.ATTR, JUNIT);
     assertEquals(size, data.meta.size);
@@ -35,7 +35,7 @@ public final class UpdateTestAttributes extends UpdateTest {
    */
   @Test
   public void testUpdateAttribute2() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     data.update(8, Data.ATTR, NAME, Token.EMPTY);
     data.update(8, Data.ATTR, JUNIT);
     assertEquals(size, data.meta.size);
@@ -50,10 +50,10 @@ public final class UpdateTestAttributes extends UpdateTest {
    */
   @Test
   public void testAddAttribute() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
 
-    final MemData md = new MemData(CONTEXT.data);
+    final MemData md = new MemData(CONTEXT.data());
     md.attr(0, 1, data.atnindex.index(FOO, null, false), JUNIT, 0, false);
     md.insert(0);
     data.insertAttr(9, 6, md);

@@ -10,8 +10,6 @@ import org.basex.gui.view.ViewRect;
  * @author Christian Gruen
  */
 final class MapRect extends ViewRect implements Comparable<MapRect> {
-  /** File Type. */
-  short type = -1;
   /** Thumbnail view. */
   boolean thumb;
   /** Full-text position values. */
@@ -26,8 +24,6 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
   double thumbf;
   /** Width of a space between two thumbnails. */
   double thumbsw;
-  /** Leaf node flag. */
-  boolean leaf;
 
   /**
    * Simple rectangle constructor.

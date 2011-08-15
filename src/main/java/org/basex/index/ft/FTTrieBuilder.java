@@ -233,7 +233,7 @@ final class FTTrieBuilder extends FTBuilder {
     final DataAccess tmp = new DataAccess(md.dbfile(DATAFTX + 'a'));
     long c = 2;
     for(final int r : root) {
-      tmp.writeInt(c, r);
+      tmp.write4(c, r);
       c += 5;
     }
     tmp.close();

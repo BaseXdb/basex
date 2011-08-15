@@ -47,12 +47,12 @@ final class IterPath extends AxisPath {
       public ANode next() throws QueryException {
         if(iter == null) {
           if(expr == null) {
-            expr = step;
+            expr = steps;
             if(root != null) {
               // add root as first expression
-              expr = new Expr[step.length + 1];
+              expr = new Expr[steps.length + 1];
               expr[0] = root;
-              System.arraycopy(step, 0, expr, 1, step.length);
+              System.arraycopy(steps, 0, expr, 1, steps.length);
             }
           }
           // create iterator array

@@ -72,7 +72,7 @@ public final class GUIInput extends BaseXTextField {
             sl.add(txt);
 
             final GUIProp gprop = gui.gprop;
-            final int i = main.context.data == null ? 2 :
+            final int i = main.context.data() == null ? 2 :
               gprop.num(GUIProp.SEARCHMODE);
             final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) :
               i == 1 ? gprop.strings(GUIProp.XQUERY) :
@@ -136,7 +136,7 @@ public final class GUIInput extends BaseXTextField {
    */
   boolean cmdMode() {
     return gui.gprop.num(GUIProp.SEARCHMODE) == 2 ||
-      gui.context.data == null || getText().startsWith("!");
+      gui.context.data() == null || getText().startsWith("!");
   }
 
   /**
@@ -195,7 +195,7 @@ public final class GUIInput extends BaseXTextField {
    * @param query query input
    */
   private void queryPopup(final String query) {
-    final Data data = gui.context.data;
+    final Data data = gui.context.data();
     if(data == null || !data.meta.pathindex) return;
 
     StringList sl = null;

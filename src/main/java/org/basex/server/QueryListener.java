@@ -2,13 +2,14 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
+
 import java.io.IOException;
 
-import org.basex.core.MainProp;
 import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.core.Progress;
 import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.XMLSerializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -39,7 +40,7 @@ final class QueryListener extends Progress {
   private int hits;
 
   /** Serializer. */
-  private XMLSerializer xml;
+  private Serializer xml;
   /** Monitored flag. */
   private boolean monitored;
   /** Iterator. */
@@ -76,7 +77,7 @@ final class QueryListener extends Progress {
    * @param t type
    * @throws QueryException query exception
    */
-  void bind(final String n, final String o, final String t)
+  void bind(final String n, final Object o, final String t)
       throws QueryException {
     qp.bind(n, o, t);
   }
@@ -101,7 +102,7 @@ final class QueryListener extends Progress {
    */
   boolean next() throws IOException, QueryException {
     if(xml == null) init();
-    xml.init();
+    xml.reset();
     final Item it = iter.next();
     if(it == null) return false;
     next(it);

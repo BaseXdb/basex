@@ -65,9 +65,9 @@ final class FTFuzzyList extends FTList {
 
     final byte[] t = str.readBytes(ptok, ctl);
     // skip pointer
-    size = str.read4(str.pos() + 5);
+    size = str.read4(str.cursor() + 5);
     // position will always fit in an integer...
-    ptok = (int) str.pos();
+    ptok = (int) str.cursor();
     return t;
   }
 }

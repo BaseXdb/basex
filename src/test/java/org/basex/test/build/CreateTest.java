@@ -155,7 +155,7 @@ public final class CreateTest {
    * @return database name
    */
   private String dbName() {
-    return CONTEXT.data.meta.name;
+    return CONTEXT.data().meta.name;
   }
 
   /**
@@ -163,6 +163,6 @@ public final class CreateTest {
    * @return first document name
    */
   private String docName() {
-    return Token.string(CONTEXT.data.text(CONTEXT.current.list[0], true));
+    return Token.string(CONTEXT.data().text(CONTEXT.current().list[0], true));
   }
 }

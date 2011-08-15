@@ -43,7 +43,7 @@ public final class DocIndex implements Index {
    * @return success flag
    * @throws IOException I/O exception
    */
-  public boolean read(final DataInput in) throws IOException {
+  public synchronized boolean read(final DataInput in) throws IOException {
     docs = in.readDiffs();
     return true;
   }
@@ -141,7 +141,7 @@ public final class DocIndex implements Index {
   /**
    * Discards the document paths.
    */
-  public void update() {
+  public synchronized void update() {
     paths = null;
     order = null;
   }

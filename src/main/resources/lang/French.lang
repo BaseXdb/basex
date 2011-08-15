@@ -8,9 +8,9 @@ version=Version
 
 # Commandes menu
 m_db=Base de données
-m_edit=Edition
 m_view=Vue
 m_query=Requête
+m_nodes=Noeuds
 m_options=Options
 m_help=Aide
 

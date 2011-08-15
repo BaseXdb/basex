@@ -142,7 +142,7 @@ final class GroupPartition {
       if(items != null) {
         final ItemCache[] ii = items.get(i);
         for(int j = 0; j < ii.length; ++j) {
-          ctx.vars.add(ngv[1][j].copy().bind(ii[j].finish(), ctx));
+          ctx.vars.add(ngv[1][j].copy().bind(ii[j].value(), ctx));
         }
       }
       if(order != null) {

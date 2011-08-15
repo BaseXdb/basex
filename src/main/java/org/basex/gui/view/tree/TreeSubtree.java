@@ -26,11 +26,11 @@ final class TreeSubtree {
 
   /**
    * Generates subtree borders.
-   * @param c context
+   * @param ctx context
    */
-  void generateBorders(final Context c) {
-    final Data d = c.current.data;
-    final int[] roots = c.current.list;
+  void generateBorders(final Context ctx) {
+    final Data d = ctx.data();
+    final int[] roots = ctx.current().list;
     final int rl = roots.length;
     if(rl == 0) return;
     border = new TreeBorder[rl][];

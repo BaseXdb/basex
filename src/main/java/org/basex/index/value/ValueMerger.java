@@ -49,7 +49,7 @@ final class ValueMerger {
   void next() throws IOException {
     values = dv.nextValues();
     if(values.length != 0) {
-      key = dk.readBytes();
+      key = dk.readToken();
     } else {
       dv.close();
       dk.close();

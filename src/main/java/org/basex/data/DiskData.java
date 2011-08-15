@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
@@ -19,7 +20,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.io.random.DataAccess;
 import org.basex.io.random.TableDiskAccess;
 import org.basex.util.Compress;
-import org.basex.util.Token;
+import org.basex.util.Num;
 import org.basex.util.Util;
 
 /**
@@ -49,12 +50,12 @@ public final class DiskData extends Data {
     meta = new MetaData(db, ctx);
 
     final int cats = ctx.prop.num(Prop.CATEGORIES);
-    final DataInput in = new DataInput(meta.dbfile(DATAINFO));
+    final DataInput in = new DataInput(meta.dbfile(DATAINF));
     try {
       // read meta data and indexes
       meta.read(in);
       while(true) {
-        final String k = Token.string(in.readBytes());
+        final String k = string(in.readToken());
         if(k.isEmpty()) break;
         if(k.equals(DBTAGS))      tagindex = new Names(in, cats);
         else if(k.equals(DBATTS)) atnindex = new Names(in, cats);
@@ -108,7 +109,7 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   private void write() throws IOException {
-    final DataOutput out = new DataOutput(meta.dbfile(DATAINFO));
+    final DataOutput out = new DataOutput(meta.dbfile(DATAINF));
     meta.write(out);
     out.writeString(DBTAGS);
     tagindex.write(out);
@@ -126,6 +127,7 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void flush() {
+    if(!meta.prop.is(Prop.FORCEFLUSH)) return;
     try {
       if(meta.dirty) write();
       table.flush();
@@ -139,7 +141,7 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void close() throws IOException {
-    flush();
+    if(meta.dirty) write();
     table.close();
     texts.close();
     values.close();
@@ -181,25 +183,25 @@ public final class DiskData extends Data {
   @Override
   public byte[] text(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? Token.token((int) o) : txt(o, text);
+    return num(o) ? token((int) o) : txt(o, text);
   }
 
   @Override
   public long textItr(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? o & IO.OFFNUM - 1 : Token.toLong(txt(o, text));
+    return num(o) ? o & IO.OFFNUM - 1 : toLong(txt(o, text));
   }
 
   @Override
   public double textDbl(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? o & IO.OFFNUM - 1 : Token.toDouble(txt(o, text));
+    return num(o) ? o & IO.OFFNUM - 1 : toDouble(txt(o, text));
   }
 
   @Override
   public int textLen(final int pre, final boolean text) {
     final long o = textOff(pre);
-    if(num(o)) return Token.numDigits((int) o);
+    if(num(o)) return numDigits((int) o);
     final DataAccess da = text ? texts : values;
     final int l = da.readNum(o & IO.OFFCOMP - 1);
     // compressed: next number contains number of compressed bytes
@@ -236,46 +238,63 @@ public final class DiskData extends Data {
   }
 
   // UPDATE OPERATIONS ========================================================
+
   @Override
-  protected void text(final int pre, final byte[] val, final boolean txt) {
-    final long v = Token.toSimpleInt(val);
-    if(v != Integer.MIN_VALUE) {
-      // integer values are stored directly into the table
+  protected void delete(final int pre, final boolean text) {
+    // old entry (offset or value)
+    final long old = textOff(pre);
+    // fill unused space with zero-bytes
+    if(!num(old)) (text ? texts : values).free(old & IO.OFFCOMP - 1, 0);
+  }
+
+  @Override
+  protected void text(final int pre, final byte[] value, final boolean text) {
+    // reference to text store
+    final DataAccess store = text ? texts : values;
+    // file length
+    final long len = store.length();
+
+    // new entry (offset or value)
+    final long v = toSimpleInt(value);
+    // flag for inlining numeric value
+    final boolean vn = v != Integer.MIN_VALUE;
+    // text to be stored (null if value will be inlined)
+    final byte[] vl = vn ? null : comp.pack(value);
+
+    // old entry (offset or value)
+    final long old = textOff(pre);
+    // find text store offset
+    final long off;
+    if(num(old)) {
+      // numeric entry: append new entry at the end
+      off = len;
+    } else {
+      // text size (0 if value will be inlined)
+      final int l = vn ? 0 : vl.length + Num.length(vl.length);
+      off = store.free(old & IO.OFFCOMP - 1, l);
+    }
+
+    // store new entry
+    if(vn) {
+      // inline integer value
       textOff(pre, v | IO.OFFNUM);
     } else {
-      final DataAccess da = txt ? texts : values;
-      final byte[] pack = comp.pack(val);
-
-      // old text
-      final long old = textOff(pre);
-      // old offset
-      long o = old & IO.OFFCOMP - 1;
-
-      if(!num(old)) {
-        // handle non-numeric entry
-        final int len = da.readNum(o);
-        if(da.pos() + len == da.length()) {
-          // set new file length if entry is placed last
-          da.length(da.pos() + pack.length);
-        } else if(pack.length > len) {
-          // otherwise, if new text is longer than the old, append text
-          o = da.length();
-        }
-      } else {
-        // if old text was numeric, append text at the end
-        o = da.length();
-      }
-
-      da.writeBytes(o, pack);
-      textOff(pre, o | (pack == val ? 0 : IO.OFFCOMP));
+      store.writeToken(off, vl);
+      textOff(pre, vl == value ? off : off | IO.OFFCOMP);
     }
   }
 
   @Override
-  protected long index(final byte[] txt, final int pre, final boolean text) {
-    final DataAccess da = text ? texts : values;
-    final long off = da.length();
-    da.writeBytes(off, txt);
-    return off;
+  protected long index(final int pre, final byte[] value, final boolean text) {
+    // inline integer value...
+    final long v = toSimpleInt(value);
+    if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
+
+    // store text
+    final DataAccess store = text ? texts : values;
+    final long off = store.length();
+    final byte[] val = comp.pack(value);
+    store.writeToken(off, val);
+    return val == value ? off : off | IO.OFFCOMP;
   }
 }

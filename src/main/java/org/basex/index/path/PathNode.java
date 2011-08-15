@@ -100,10 +100,20 @@ public final class PathNode {
    * @param nodes node list
    */
   void addDesc(final ObjList<PathNode> nodes) {
-    // [CG] DATA: check for duplicates?
-    // if(!nodes.contains(nodes)) nodes.add(this);
     nodes.add(this);
     for(final PathNode n : ch) n.addDesc(nodes);
+  }
+
+  /**
+   * Recursively adds the node and its descendants to the specified list
+   * with the specified name.
+   * @param nodes node list
+   * @param n name reference
+   * @param k node kind
+   */
+  void addDesc(final ObjList<PathNode> nodes, final int n, final int k) {
+    if(n == name && k == kind) nodes.add(this);
+    for(final PathNode pn : ch) pn.addDesc(nodes, n, k);
   }
 
   /**
@@ -122,7 +132,7 @@ public final class PathNode {
     }
   }
 
-  /***
+  /**
    * Returns the level of the path node.
    * @return level
    */

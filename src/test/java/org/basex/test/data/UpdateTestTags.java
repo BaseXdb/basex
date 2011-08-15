@@ -7,7 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * This class tests the update features of the Data class.
+ * This class tests the update features of the {@link Data} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Tim Petrowsky
@@ -18,7 +18,7 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void testInsertTagAsOnly1() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 0, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -44,7 +44,7 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void testInsertTagAsOnly2() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 1, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -70,7 +70,7 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void testInsertTagAsOnly3() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 2, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -96,7 +96,7 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void testInsertTagAfterAttsAsFirst() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 1, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -121,7 +121,7 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void testInsertTagAfterAttsAsSecond() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 2, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -147,7 +147,7 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void testInsertTagAfterAttsAsLast() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 0, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
@@ -172,7 +172,7 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void testUpdateTagName() {
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     data.update(6, Data.ELEM, JUNIT, Token.EMPTY);
     assertEquals(Data.ELEM, data.kind(6));
     assertArraysEquals(JUNIT, data.name(6, Data.ELEM));
@@ -199,7 +199,7 @@ public final class UpdateTestTags extends UpdateTest {
   private void insertTag(final int par, final int pos,
       final byte[] name, final int kind) {
     int root = par;
-    final Data data = CONTEXT.data;
+    final Data data = CONTEXT.data();
     if(pos == 0) {
       root = par + data.size(par, kind);
     } else {
@@ -212,8 +212,8 @@ public final class UpdateTestTags extends UpdateTest {
         ++currPos;
       }
     }
-    final MemData md = new MemData(CONTEXT.data);
-    md.elem(1, CONTEXT.data.tagindex.index(name, null, false), 1, 1, 0, false);
+    final MemData md = new MemData(data);
+    md.elem(1, data.tagindex.index(name, null, false), 1, 1, 0, false);
     md.insert(0);
     data.insert(root, par, md);
   }

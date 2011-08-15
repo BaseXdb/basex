@@ -19,5 +19,5 @@ public abstract class ValueIter extends Iter {
   @Override
   public abstract boolean reset();
   @Override
-  public abstract Value finish();
+  public abstract Value value();
 }

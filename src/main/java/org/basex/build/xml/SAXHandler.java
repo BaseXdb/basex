@@ -65,7 +65,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
 
     try {
       finishText();
-      builder.endElem(token(qn));
+      builder.endElem();
     } catch(final IOException ex) {
       error(ex);
     }

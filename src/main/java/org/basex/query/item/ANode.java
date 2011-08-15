@@ -213,10 +213,15 @@ public abstract class ANode extends Item {
   /**
    * Sets the parent node.
    * @param p parent node
+   * @return self reference
    */
-  public void parent(final ANode p) {
-    par = p;
-  }
+  public abstract ANode parent(final ANode p);
+
+  /**
+   * Returns true if the node has children.
+   * @return result of test
+   */
+  public abstract boolean hasChildren();
 
   /**
    * Returns the value of the specified attribute, or {@code null}.

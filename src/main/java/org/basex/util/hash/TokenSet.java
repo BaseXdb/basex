@@ -62,7 +62,7 @@ public class TokenSet implements Iterable<byte[]> {
    * @throws IOException I/O exception
    */
   public final void read(final DataInput in) throws IOException {
-    keys = in.readBytesArray();
+    keys = in.readTokens();
     next = in.readNums();
     bucket = in.readNums();
     size = in.readNum();
@@ -117,7 +117,7 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
-   * Returns the id of the specified key or 0 if key was not found.
+   * Returns the id of the specified key or 0 if the key does not exist.
    * @param key key to be found
    * @return id or 0 if nothing was found
    */

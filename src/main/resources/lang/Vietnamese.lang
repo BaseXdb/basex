@@ -8,9 +8,9 @@ version=Phiên bản
 
 # Menu Commands
 m_db=Cơ sở dữ liệu
-m_edit=Soạn thảo
-m_view=Xem nhìn
 m_query=Hỏi
+m_view=Xem nhìn
+m_nodes=Nút
 m_options=Lựa chọn
 m_help=Giúp đỡ
 

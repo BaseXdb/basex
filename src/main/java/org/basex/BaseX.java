@@ -2,7 +2,8 @@ package org.basex;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-
+import java.util.HashMap;
+import java.util.Map;
 import org.basex.core.MainProp;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -45,16 +46,16 @@ public class BaseX extends Main {
    * @param args command-line arguments
    */
   public static void main(final String... args) {
-    new BaseX(args);
+    if(new BaseX(args).failed()) System.exit(1);
   }
 
   /**
    * Constructor.
    * @param args command-line arguments
    */
-  protected BaseX(final String... args) {
+  public BaseX(final String... args) {
     super(args);
-    check(success);
+    if(failed) return;
     run();
   }
 
@@ -65,31 +66,32 @@ public class BaseX extends Main {
 
       boolean u = false;
       if(input != null) {
-        check(execute(new Check(input), verbose));
+        if(failed(execute(new Check(input), verbose))) return;
       }
 
       if(file != null) {
         // query file contents
         context.query = IO.get(file);
         final String qu = content();
-        check(qu != null && execute(new XQuery(qu), verbose));
+        failed(qu != null && execute(new XQuery(qu), verbose));
       } else if(query != null) {
         // query file contents
-        check(execute(new XQuery(query), verbose));
+        failed(execute(new XQuery(query), verbose));
       } else if(commands != null) {
         // execute command-line arguments
         final Boolean b = execute(commands);
-        check(b == null || b);
+        failed(b == null || b);
       } else {
         // enter interactive mode
         Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
         u = console();
       }
+      if(failed) return;
       if(writeProps) context.mprop.write();
       quit(u);
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));
-      check(false);
+      failed = true;
     }
   }
 
@@ -131,6 +133,7 @@ public class BaseX extends Main {
     final StringBuilder serial = new StringBuilder();
     final StringBuilder bind = new StringBuilder();
     try {
+      final HashMap<Object[], Object> options = new HashMap<Object[], Object>();
       final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO,
           Util.info(CONSOLE, sa() ? LOCALMODE : CLIENTMODE));
       while(arg.more()) {
@@ -140,7 +143,7 @@ public class BaseX extends Main {
             // set/add variable binding
             if(bind.length() != 0) bind.append(',');
             bind.append(arg.string());
-            arg.check(set(Prop.BINDINGS, bind));
+            options.put(Prop.BINDINGS, bind);
           } else if(c == 'c') {
             // specify command to be evaluated
             commands = arg.remaining();
@@ -149,7 +152,7 @@ public class BaseX extends Main {
             context.mprop.set(MainProp.DEBUG, true);
           } else if(c == 'D' && sa()) {
             // hidden option: show dot query graph
-            arg.check(set(Prop.DOTPLAN, true));
+            options.put(Prop.DOTPLAN, true);
           } else if(c == 'i' && sa()) {
             // open initial file or database
             input = arg.string();
@@ -171,15 +174,15 @@ public class BaseX extends Main {
             query = arg.remaining();
           } else if(c == 'r') {
             // hidden option: parse number of runs
-            arg.check(set(Prop.RUNS, arg.string()));
+            options.put(Prop.RUNS, arg.string());
           } else if(c == 's') {
             // set/add serialization parameter
             if(serial.length() != 0) serial.append(',');
             serial.append(arg.string());
-            arg.check(set(Prop.SERIALIZER, serial));
+            options.put(Prop.SERIALIZER, serial);
           } else if(c == 'u') {
             // activate write-back for updates
-            arg.check(set(Prop.WRITEBACK, true));
+            options.put(Prop.WRITEBACK, true);
           } else if(c == 'U' && !sa()) {
             // specify user name
             user = arg.string();
@@ -189,31 +192,36 @@ public class BaseX extends Main {
           } else if(c == 'V') {
             // show query info
             verbose = true;
-            arg.check(set(Prop.QUERYINFO, true));
+            options.put(Prop.QUERYINFO, true);
           } else if(c == 'w') {
             // activate write-back for updates
-            arg.check(set(Prop.CHOP, false));
+            options.put(Prop.CHOP, false);
           } else if(c == 'W') {
             // hidden option: write properties before exit
             writeProps = true;
           } else if(c == 'x' && sa()) {
             // hidden option: show original query plan
-            arg.check(set(Prop.COMPPLAN, false));
+            options.put(Prop.COMPPLAN, false);
           } else if(c == 'X') {
             // hidden option: show xml query plan
-            arg.check(set(Prop.XMLPLAN, true));
+            options.put(Prop.XMLPLAN, true);
             verbose = true;
           } else if(c == 'z') {
             // turn off result serialization
-            arg.check(set(Prop.SERIALIZE, false));
+            options.put(Prop.SERIALIZE, false);
           } else {
-            arg.check(false);
+            arg.ok(false);
           }
         } else {
           file = file == null ? arg.string() : file + " " + arg.string();
         }
       }
       console = file == null && commands == null && query == null;
+
+      // set cached options
+      for(final Map.Entry<Object[], Object> entry : options.entrySet()) {
+        if(!arg.ok(set(entry.getKey(), entry.getValue()))) break;
+      }
       return arg.finish();
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));

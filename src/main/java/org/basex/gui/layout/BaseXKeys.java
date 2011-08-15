@@ -57,7 +57,7 @@ public enum BaseXKeys {
                          */ DELLINESTART(SC | (MAC ? 0 : SHF),
                              VK_BACK_SPACE, true),
   /** Delete line to end.
-   *                     */ DELLINEEND(SC | (MAC ? 0 : SHF), VK_DELETE, true),
+                         */ DELLINEEND(SC | (MAC ? 0 : SHF), VK_DELETE, true),
   /** Delete backwards.  */ DELPREV(VK_BACK_SPACE),
   /** Delete.            */ DELNEXT(VK_DELETE),
 
@@ -75,7 +75,9 @@ public enum BaseXKeys {
   /** Decrease size.     */ DECFONT(SC, VK_MINUS, true),
   /** Standard size.     */ NORMFONT(SC, VK_0, true),
   /** Jump to input bar. */ INPUT1(SC, VK_L, true),
-  /** Jump to input bar. */ INPUT2(VK_F6, true);
+  /** Jump to input bar. */ INPUT2(VK_F6, true),
+
+  /** (Un)comment.       */ COMMENT(SC, VK_SLASH, false);
 
   /** Modifiers. */
   private final int mod;

@@ -9,7 +9,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.SeqType.Occ;
-import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -42,24 +41,6 @@ public final class ItrSeq extends Seq {
   @Override
   public Item itemAt(final long pos) {
     return Itr.get(vals[(int) pos], type);
-  }
-
-  @Override
-  public ValueIter iter() {
-    return new ValueIter() {
-      /** Position of this iterator. */
-      int pos;
-      @Override
-      public Value finish() { return ItrSeq.this; }
-      @Override
-      public Item get(final long i) { return itemAt(i); }
-      @Override
-      public Item next() { return pos < size() ? itemAt(pos++) : null; }
-      @Override
-      public boolean reset() { pos = 0; return true; }
-      @Override
-      public long size() { return vals.length; }
-    };
   }
 
   @Override

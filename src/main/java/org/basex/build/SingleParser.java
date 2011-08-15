@@ -12,7 +12,7 @@ import org.basex.io.IO;
  */
 public abstract class SingleParser extends TargetParser {
   /** Builder reference. */
-  protected Builder builder;
+  public Builder builder;
 
   /**
    * Constructor.

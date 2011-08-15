@@ -8,9 +8,9 @@ version=Version
 
 # Menu Commands
 m_db=データベース
-m_edit=編集
-m_view=ビュー
 m_query=クエリー　　
+m_view=ビュー
+m_nodes=ノード
 m_options=オプション
 m_help=ヘルプ
 

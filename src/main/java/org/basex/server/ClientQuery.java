@@ -42,7 +42,7 @@ public final class ClientQuery extends Query {
   }
 
   @Override
-  public void bind(final String n, final String v, final String t)
+  public void bind(final String n, final Object v, final String t)
       throws BaseXException {
     execute(ServerCmd.BIND, id + '\0' + n + '\0' + v + '\0' +
         (t == null ? "" : t));

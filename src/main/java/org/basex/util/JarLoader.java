@@ -19,6 +19,7 @@ import java.util.jar.JarFile;
  * http://snipplr.com/view/24224/class-loader-which-close-opened-jar-files/ and
  * slightly modified.
  *
+ * @author Vitali Yemialyanchyk, www.stopka.us
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -48,7 +49,7 @@ public final class JarLoader extends URLClassLoader {
    * Cleans up jar file factory cache.
    * @return result
    */
-  @SuppressWarnings({ "nls", "unchecked"})
+  @SuppressWarnings({ "nls", "unchecked" })
   public boolean cleanupJarFileFactory() {
     boolean res = false;
     Class<?> classJarURLConnection = null;
@@ -162,7 +163,7 @@ public final class JarLoader extends URLClassLoader {
    * @param cl class loader
    * @return result
    */
-  @SuppressWarnings({ "nls", "unchecked"})
+  @SuppressWarnings({ "nls", "unchecked" })
   public boolean closeClassLoader(final ClassLoader cl) {
     boolean res = false;
     if(cl == null) {
@@ -237,7 +238,7 @@ public final class JarLoader extends URLClassLoader {
    * @param cl class loader
    * @return result
    */
-  @SuppressWarnings({ "nls", "unchecked"})
+  @SuppressWarnings({ "nls", "unchecked" })
   public boolean finalizeNativeLibs(final ClassLoader cl) {
     boolean res = false;
     final Class<?> classClassLoader = ClassLoader.class;

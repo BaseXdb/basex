@@ -126,6 +126,7 @@ public final class SAXWrapper extends SingleParser {
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
     } finally {
+      if(is == null) return;
       try {
         final InputStream ist = is.getByteStream();
         if(ist != null) ist.close();

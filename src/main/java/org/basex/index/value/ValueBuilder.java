@@ -153,7 +153,7 @@ public final class ValueBuilder extends IndexBuilder {
 
     // write number of entries to first position
     final DataAccess da = new DataAccess(data.meta.dbfile(f + 'l'));
-    da.writeInt(sz);
+    da.write4(sz);
     da.close();
   }
 

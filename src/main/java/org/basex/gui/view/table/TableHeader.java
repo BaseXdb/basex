@@ -117,7 +117,7 @@ final class TableHeader extends BaseXPanel {
       g.setColor(Color.white);
       g.fillRect((int) x + 1, hh, (int) ce - (int) x - 2, hh - 2);
       g.drawLine((int) ce - 1, hh - 1, (int) ce - 1, h - 2);
-      g.setColor(COLORBUTTON);
+      g.setColor(GRAY);
       g.drawLine((int) ce, hh - 1, (int) ce, h - 2);
 
       // draw headers
@@ -292,7 +292,7 @@ final class TableHeader extends BaseXPanel {
   private void chooseRoot(final MouseEvent e) {
     if(tdata.roots.size() == 0) return;
 
-    final Data data = view.gui.context.data;
+    final Data data = view.gui.context.data();
     final JPopupMenu popup = new JPopupMenu();
     final byte[] root = data.tagindex.key(tdata.root);
     for(final byte[] en : tdata.roots) {

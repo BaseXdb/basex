@@ -80,7 +80,7 @@ final class FolderIterator {
     y += view.lineH;
     if(y > height) return false;
 
-    final Data data = view.gui.context.data;
+    final Data data = view.gui.context.data();
     if(data == null) return false;
     final int kind = data.kind(pre);
     return mode == 2 || (kind == Data.ELEM || kind == Data.DOC) &&
@@ -92,7 +92,7 @@ final class FolderIterator {
    * @return true for more data
    */
   private boolean moreCS() {
-    final Nodes current = view.gui.context.current;
+    final Nodes current = view.gui.context.current();
     if(current == null || ++cp >= current.size()) return false;
     par = current.list[cp];
     pre = par;

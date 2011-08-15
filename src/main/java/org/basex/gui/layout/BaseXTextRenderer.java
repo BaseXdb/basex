@@ -321,13 +321,13 @@ final class BaseXTextRenderer extends BaseXBack {
     final int ch = text.curr();
     if(y > 0 && y < h) {
       if(ch == TokenBuilder.MARK) {
-        color = GUIConstants.COLORFT;
+        color = GUIConstants.GREEN;
         high = true;
       }
 
       // mark error
       if(text.error()) {
-        g.setColor(GUIConstants.COLORERRHIGH);
+        g.setColor(GUIConstants.LRED);
         g.fillRect(x, y - fontH + 4, wordW, fontH);
       }
 
@@ -337,7 +337,7 @@ final class BaseXTextRenderer extends BaseXBack {
         final int p = text.pos();
         while(text.more()) {
           final int cw = charW(g, text.curr());
-          if(text.marked()) {
+          if(text.inMark()) {
             g.setColor(GUIConstants.color(3));
             g.fillRect(xx, y - fontH + 4, cw, fontH);
           }
@@ -500,9 +500,17 @@ final class BaseXTextRenderer extends BaseXBack {
 
   /**
    * Sets a syntax highlighter.
-   * @param s syntax reference
+   * @param s syntax highlighter
    */
   void setSyntax(final BaseXSyntax s) {
     syntax = s;
+  }
+
+  /**
+   * Returns the syntax highlighter.
+   * @return syntax highlighter
+   */
+  BaseXSyntax getSyntax() {
+    return syntax;
   }
 }

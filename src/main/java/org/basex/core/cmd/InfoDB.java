@@ -34,7 +34,7 @@ public final class InfoDB extends AInfo {
   @Override
   protected boolean run() throws IOException {
     final boolean create = context.user.perm(User.CREATE);
-    out.print(db(context.data.meta, false, true, create));
+    out.print(db(context.data().meta, false, true, create));
     return true;
   }
 

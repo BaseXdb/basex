@@ -96,7 +96,7 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-    MENUDB, MENUEDIT, MENUVIEW, MENUQUERY, MENUOPTIONS, MENUHELP
+    MENUDB, MENUQUERY, MENUVIEW, MENUNODES, MENUOPTIONS, MENUHELP
   };
 
   /**
@@ -109,15 +109,15 @@ public final class GUIConstants {
     SERVER, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : EXIT
   }, {
-    COPY, PASTE, DELETE, INSERT, EDIT, EMPTY,
-    COPYPATH, FILTER
+    SHOWXQUERY, SHOWINFO, EMPTY,
+    EDITNEW, EDITOPEN, EDITSAVE, EDITSAVEAS, EDITCLOSE
   }, {
     SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, EMPTY,
     SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER, SHOWPLOT, SHOWTABLE,
     SHOWEXPLORE, EMPTY, FULL
   }, {
-    SHOWXQUERY, SHOWINFO, EMPTY,
-    EDITNEW, EDITOPEN, EDITSAVE, EDITSAVEAS, EDITCLOSE
+    COPY, PASTE, DELETE, INSERT, EDIT, EMPTY,
+    COPYPATH, FILTER
   }, {
     RTEXEC, RTFILTER, EMPTY,
     COLOR, FONTS, MAPLAYOUT, TREEOPTIONS, Prop.MAC ? null : EMPTY,
@@ -188,20 +188,23 @@ public final class GUIConstants {
 
   // COLORS ===================================================================
 
-  /** Error color. */
-  public static final Color COLORERROR = new Color(208, 0, 0);
-  /** Error highlight color. */
-  public static final Color COLORERRHIGH = new Color(255, 200, 180);
-
   /** Cell color. */
-  public static final Color COLORCELL = new Color(224, 224, 224);
+  public static final Color LGRAY = new Color(224, 224, 224);
   /** Button color. */
-  public static final Color COLORBUTTON = new Color(160, 160, 160);
+  public static final Color GRAY = new Color(160, 160, 160);
   /** Background color. */
-  public static final Color COLORDARK = new Color(64, 64, 64);
+  public static final Color DGRAY = new Color(64, 64, 64);
 
-  /** Colors of full-text hits. */
-  public static final Color COLORFT = new Color(0, 192, 0);
+  /** Color for control characters. */
+  public static final Color RED = new Color(208, 0, 0);
+  /** Color for highlighting errors. */
+  public static final Color LRED = new Color(255, 200, 180);
+  /** Color for highlighting full-text hits. */
+  public static final Color GREEN = new Color(0, 176, 0);
+  /** Color for highlighting quotes. */
+  public static final Color BLUE = new Color(0, 64, 192);
+  /** Color for control characters. */
+  public static final Color PINK = new Color(160, 0, 160);
 
   /** Bright GUI color. */
   public static Color color1 = Color.white;

@@ -15,9 +15,10 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Iterator;
+
 import org.basex.core.Prop;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.B64;
@@ -187,8 +188,7 @@ public final class HTTPClient {
   private static void setConnectionProps(final HttpURLConnection conn,
       final Request r, final InputInfo ii) throws ProtocolException,
       QueryException {
-    if(r != null && (r.bodyContent != null ||
-        r.parts.size() != 0)) conn.setDoOutput(true);
+    if(r.bodyContent != null || r.parts.size() != 0) conn.setDoOutput(true);
     conn.setRequestMethod(string(r.attrs.get(METHOD)).toUpperCase());
     final byte[] timeout = r.attrs.get(TIMEOUT);
     if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
@@ -211,8 +211,8 @@ public final class HTTPClient {
     } else {
       final String mediaType = string(r.payloadAttrs.get(MEDIATYPE));
       if(r.isMultipart) {
-        final String b = string(r.payloadAttrs.get(BOUNDARY));
-        final String boundary = b != null ? b : DEFAULT_BOUND;
+        final byte[] b = r.payloadAttrs.get(BOUNDARY);
+        final String boundary = b != null ? string(b) : DEFAULT_BOUND;
         final StringBuilder sb = new StringBuilder();
         sb.append(mediaType).append("; ").append("boundary=").append(boundary);
         conn.setRequestProperty(CONT_TYPE, sb.toString());
@@ -330,6 +330,7 @@ public final class HTTPClient {
   private static void writeBase64(final ItemCache payload,
       final OutputStream out, final InputInfo ii) throws IOException,
       QueryException {
+
     for(int i = 0; i < payload.size(); i++) {
       final Item item = payload.get(i);
       if(item instanceof B64) {
@@ -350,6 +351,7 @@ public final class HTTPClient {
    */
   private static void writeHex(final ItemCache payload, final OutputStream out,
       final InputInfo ii) throws IOException, QueryException {
+
     for(int i = 0; i < payload.size(); i++) {
       final Item item = payload.get(i);
       if(item instanceof Hex) {
@@ -371,22 +373,22 @@ public final class HTTPClient {
   private static void write(final ItemCache payload,
       final TokenMap payloadAttrs, final byte[] method, final OutputStream out)
       throws IOException {
+
     // extract serialization parameters
     final TokenBuilder tb = new TokenBuilder();
     tb.add(token("method=")).add(method);
     final byte[][] keys = payloadAttrs.keys();
     for(final byte[] key : keys) {
-      if(!eq(key, SRC) && !eq(key, MEDIATYPE)
-          && !eq(key, METHOD)) tb.add(',').
-          add(key).add('=').add(payloadAttrs.get(key));
+      if(!eq(key, SRC) && !eq(key, MEDIATYPE) && !eq(key, METHOD))
+        tb.add(',').add(key).add('=').add(payloadAttrs.get(key));
     }
-    final SerializerProp prop = new SerializerProp(tb.toString());
-    final XMLSerializer xml = new XMLSerializer(out, prop);
     // serialize items according to the parameters
+    final SerializerProp prop = new SerializerProp(tb.toString());
+    final Serializer xml = Serializer.get(out, prop);
     try {
       payload.serialize(xml);
     } finally {
-      xml.cls();
+      xml.close();
     }
   }
 

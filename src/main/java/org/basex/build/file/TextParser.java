@@ -56,8 +56,7 @@ public final class TextParser extends SingleParser {
     // set parser properties
     final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
     lines = props.is(ParserProp.LINES);
-    final String e = props.get(ParserProp.ENCODING);
-    encoding = e != null ? e : UTF8;
+    encoding = props.get(ParserProp.ENCODING);
   }
 
   @Override
@@ -71,10 +70,10 @@ public final class TextParser extends SingleParser {
     while(true) {
       final int ch = bi.readChar();
       if(ch == 0) break;
-      if(ch == 0x0A && lines) {
+      if(ch == '\n' && lines) {
         builder.startElem(LINE, atts);
         builder.text(tb.finish());
-        builder.endElem(LINE);
+        builder.endElem();
         tb.reset();
       } else if(ch != 0x0D) {
         tb.add(ch);
@@ -82,6 +81,6 @@ public final class TextParser extends SingleParser {
     }
     bi.close();
     if(!lines) builder.text(tb.finish());
-    builder.endElem(TEXT);
+    builder.endElem();
   }
 }

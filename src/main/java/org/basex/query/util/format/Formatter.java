@@ -196,9 +196,6 @@ public abstract class Formatter extends FormatUtil {
             err = dat;
             break;
           case 'Z':
-            num = gc.getTimezone();
-            pres = token("01:01");
-            break;
           case 'z':
             num = gc.getTimezone();
             pres = token("01:01");

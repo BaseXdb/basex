@@ -36,13 +36,13 @@ public final class MixedPath extends Path {
 
   @Override
   protected Expr compPath(final QueryContext ctx) throws QueryException {
-    for(final Expr s : step) checkUp(s, ctx);
-    final AxisStep v = voidStep(step);
+    for(final Expr s : steps) checkUp(s, ctx);
+    final AxisStep v = voidStep(steps);
     if(v != null) COMPSELF.thrw(input, v);
 
-    for(int s = 0; s != step.length; ++s) {
-      step[s] = step[s].comp(ctx);
-      if(step[s].empty()) return Empty.SEQ;
+    for(int s = 0; s != steps.length; ++s) {
+      steps[s] = steps[s].comp(ctx);
+      if(steps[s].empty()) return Empty.SEQ;
     }
     optSteps(ctx);
 
@@ -55,7 +55,7 @@ public final class MixedPath extends Path {
     }
 
     size = size(ctx);
-    type = SeqType.get(step[step.length - 1].type().type, size);
+    type = SeqType.get(steps[steps.length - 1].type().type, size);
     return this;
   }
 
@@ -83,9 +83,9 @@ public final class MixedPath extends Path {
     // creates an initial item cache
     Iter res = ctx.value.iter();
     // loop through all expressions
-    final int el = step.length;
+    final int el = steps.length;
     for(int ex = 0; ex < el; ex++) {
-      final Expr e = step[ex];
+      final Expr e = steps[ex];
       final boolean last = ex + 1 == el;
       final ItemCache ic = new ItemCache();
       ctx.size = res.size();
@@ -111,7 +111,7 @@ public final class MixedPath extends Path {
         // remove potential duplicates from node sets
         final NodeCache nc = new NodeCache().random();
         for(Item it; (it = ic.next()) != null;) nc.add((ANode) it);
-        res = nc.finish().cache();
+        res = nc.value().cache();
       } else {
         res = ic;
       }
@@ -122,19 +122,19 @@ public final class MixedPath extends Path {
   @Override
   public int count(final Var v) {
     int c = 0;
-    for(final Expr e : step) c += e.count(v);
+    for(final Expr e : steps) c += e.count(v);
     return c + super.count(v);
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final Expr e : step) if(e.uses(Use.VAR)) return false;
+    for(final Expr e : steps) if(e.uses(Use.VAR)) return false;
     return true;
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(int e = 0; e != step.length; ++e) step[e] = step[e].remove(v);
+    for(int e = 0; e != steps.length; ++e) steps[e] = steps[e].remove(v);
     return super.remove(v);
   }
 }

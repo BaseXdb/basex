@@ -90,9 +90,9 @@ public final class List extends Arr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final ItemCache ic = new ItemCache(Math.max(expr.length, 2));
+    final ItemCache ic = new ItemCache();
     for(final Expr e : expr) ic.add(ctx.value(e));
-    return ic.finish();
+    return ic.value();
   }
 
   @Override

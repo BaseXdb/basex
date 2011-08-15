@@ -1,10 +1,12 @@
 package org.basex.api.jaxp;
 
 import java.io.IOException;
+
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
+
 import org.basex.api.dom.BXNList;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;

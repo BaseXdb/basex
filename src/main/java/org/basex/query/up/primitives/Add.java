@@ -55,7 +55,7 @@ public final class Add extends InsertBase {
   }
 
   @Override
-  public boolean checkTextAdjacency(final int c) {
+  public boolean adjacentTexts(final int c) {
     return false;
   }
 
@@ -68,7 +68,6 @@ public final class Add extends InsertBase {
   public void apply() {
     super.apply();
     data.insert(pre + data.size(pre, data.kind(pre)), -1, md);
-    if(ctx.data != null) ctx.update();
   }
 
   @Override

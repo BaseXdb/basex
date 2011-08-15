@@ -96,7 +96,7 @@ public abstract class ACreate extends Command {
         final Open open = new Open(db);
         if(!open.run(context)) return error(open.info());
 
-        data = context.data;
+        data = context.data();
         if(prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT,      data);
         if(prop.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, data);
         if(prop.is(Prop.FTINDEX))   index(IndexType.FULLTEXT,  data);

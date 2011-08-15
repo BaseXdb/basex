@@ -71,7 +71,7 @@ public final class ReplaceElementContent extends StructuralUpdate {
   }
 
   @Override
-  public boolean checkTextAdjacency(final int c) {
+  public boolean adjacentTexts(final int c) {
     return false;
   }
 

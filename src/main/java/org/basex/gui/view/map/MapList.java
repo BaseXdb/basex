@@ -75,7 +75,7 @@ final class MapList extends IntList {
     }
   }
 
-  /***
+  /**
    * Returns the numeric weight for the specified input, or 1 as minimum.
    * @param textLen array holding pre values to text lengths
    * @param data data reference

@@ -95,7 +95,7 @@ public final class BaseXDSlider extends BaseXPanel {
   @Override
   public void mouseMoved(final MouseEvent e) {
     mouX = e.getX();
-    final Range r = new Range();
+    final Range r = new Range(this);
     left = mouX >= r.xs && mouX <= r.xs + ARROW;
     right = mouX >= r.xe && mouX <= r.xe + ARROW;
     center = mouX + ARROW > r.xs && mouX < r.xe;
@@ -112,7 +112,7 @@ public final class BaseXDSlider extends BaseXPanel {
   public void mouseDragged(final MouseEvent e) {
     if(!left && !right && !center) return;
 
-    final Range r = new Range();
+    final Range r = new Range(this);
     final double prop = r.dist * (mouX - e.getX()) / r.w;
 
     if(left) {
@@ -216,7 +216,7 @@ public final class BaseXDSlider extends BaseXPanel {
     g.drawLine(w - 1, hh - 4, w - 1, hh + 4);
     g.drawLine(0, hh + 4, w, hh + 4);
 
-    final Range r = new Range();
+    final Range r = new Range(this);
     BaseXLayout.drawCell(g, r.xs, r.xe + ARROW, 2, h - 2, false);
 
     if(r.xs + ARROW < r.xe) {
@@ -236,12 +236,12 @@ public final class BaseXDSlider extends BaseXPanel {
     final Polygon pol = new Polygon(
         new int[] { r.xs + 11, r.xs + 5, r.xs + 5, r.xs + 11 },
         new int[] { hh - 5, hh - 1, hh, hh + 5 }, 4);
-    g.setColor(focus ? color5 : COLORBUTTON);
+    g.setColor(focus ? color5 : GRAY);
     g.fillPolygon(pol);
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);
 
-    g.setColor(focus ? Color.black : COLORDARK);
+    g.setColor(focus ? Color.black : DGRAY);
     g.drawLine(r.xs + 11, hh - 5, r.xs + 11, hh + 4);
     g.drawLine(r.xs + 11, hh - 5, r.xs + 6, hh - 1);
     g.drawLine(r.xe + 5, hh - 5, r.xe + 5, hh + 4);
@@ -290,19 +290,22 @@ public final class BaseXDSlider extends BaseXPanel {
   }
 
   /** Range class. */
-  private class Range {
+  private static class Range {
     /** Range distance. */ double dist;
     /** Start position. */ int xs;
     /** End position.   */ int xe;
     /** Slider width.   */ int w;
 
-    /** Constructor. */
-    Range() {
-      w = getWidth() - LABELW - ARROW * 2;
-      dist = encode(totMax - totMin);
-      xs = (int) (encode(min - totMin) * w / dist);
-      xe = (totMin == totMax ? w :
-        (int) (encode(max - totMin) * w / dist)) + ARROW;
+    /**
+     * Constructor.
+     * @param s slider reference
+     */
+    Range(final BaseXDSlider s) {
+      w = s.getWidth() - LABELW - ARROW * 2;
+      dist = s.encode(s.totMax - s.totMin);
+      xs = (int) (s.encode(s.min - s.totMin) * w / dist);
+      xe = (s.totMin == s.totMax ? w :
+        (int) (s.encode(s.max - s.totMin) * w / dist)) + ARROW;
     }
   }
 }

@@ -32,7 +32,7 @@ final class DocTest extends Test {
   }
 
   /**
-   * Returns a document test. This test will only be called by
+   * Returns a document test. This test will only be utilized by
    * {@link AxisPath#index} if all context values are database nodes.
    * @param ctx query context
    * @param data data reference
@@ -45,8 +45,7 @@ final class DocTest extends Test {
     // adopt nodes from existing sequence
     if(ctx.value instanceof DBNodeSeq) {
       final DBNodeSeq seq = (DBNodeSeq) ctx.value;
-      if(seq.complete) return Test.DOC;
-      return new DocTest(new Nodes(seq.pres, data));
+      return seq.complete ? Test.DOC : new DocTest(new Nodes(seq.pres, data));
     }
 
     // loop through all documents and add pre values of documents

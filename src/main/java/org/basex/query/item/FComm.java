@@ -24,22 +24,19 @@ public final class FComm extends FNode {
   /**
    * Constructor.
    * @param t text value
-   * @param p parent
    */
-  public FComm(final byte[] t, final ANode p) {
+  public FComm(final byte[] t) {
     super(NodeType.COM);
     val = t;
-    par = p;
   }
 
   /**
-   * Constructor for DOM nodes (partial).
-   * Provided by Erdal Karaca.
+   * Constructor for DOM nodes.
+   * Originally provided by Erdal Karaca.
    * @param com DOM node
-   * @param parent parent reference
    */
-  FComm(final Comment com, final ANode parent) {
-    this(Token.token(com.getData()), parent);
+  FComm(final Comment com) {
+    this(Token.token(com.getData()));
   }
 
   @Override
@@ -48,8 +45,8 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public FComm copy() {
-    return new FComm(val.clone(), par);
+  public FNode copy() {
+    return new FComm(val.clone()).parent(par);
   }
 
   @Override

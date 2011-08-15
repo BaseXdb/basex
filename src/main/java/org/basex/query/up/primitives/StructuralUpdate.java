@@ -50,7 +50,7 @@ public abstract class StructuralUpdate extends UpdatePrimitive {
    * axis of this target node
    * @return adjacent text nodes have been found and merged
    */
-  public abstract boolean checkTextAdjacency(final int c);
+  public abstract boolean adjacentTexts(final int c);
 
   /**
    * Merges two adjacent text nodes in a database. The two node arguments must

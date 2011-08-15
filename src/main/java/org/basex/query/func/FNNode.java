@@ -104,7 +104,7 @@ public final class FNNode extends FuncCall {
         return it == null ? Str.ZERO : Str.get(new TokenBuilder(
             QueryText.ID).addLong(checkNode(it).id).finish());
       case CHILDREN:
-        return Bln.get(it != null && checkNode(it).children().next() != null);
+        return Bln.get(it != null && checkNode(it).hasChildren());
       case PATH:
         if(it == null) return null;
         return path(it);

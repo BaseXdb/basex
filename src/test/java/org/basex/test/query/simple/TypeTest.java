@@ -1,5 +1,7 @@
 package org.basex.test.query.simple;
 
+import org.basex.test.query.QueryTest;
+
 /**
  * XQuery type tests.
  *

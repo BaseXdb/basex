@@ -264,8 +264,8 @@ public abstract class Command extends Progress {
    * @return closed flag
    */
   protected static final boolean close(final Context ctx, final String db) {
-    final boolean close = ctx.data != null &&
-      db.equals(ctx.data.meta.name) && ctx.datas.pins(db) == 1;
+    final boolean close = ctx.data() != null &&
+      db.equals(ctx.data().meta.name) && ctx.datas.pins(db) == 1;
     if(close) new Close().run(ctx);
     return close;
   }
@@ -282,7 +282,7 @@ public abstract class Command extends Progress {
    */
   private boolean exec(final Context ctx, final OutputStream os) {
     // check if data reference is available
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     if(data == null && (flags & DATAREF) != 0) return error(PROCNODB);
 
     // check permissions

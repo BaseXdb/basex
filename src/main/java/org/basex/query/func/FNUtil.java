@@ -14,7 +14,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.AtomType;
-import org.basex.query.item.B64;
+import org.basex.query.item.Bin;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
@@ -23,6 +23,7 @@ import org.basex.query.item.ItrSeq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.ValueIter;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Performance;
@@ -52,7 +53,7 @@ public final class FNUtil extends FuncCall {
     switch(def) {
       case EVAL: return eval(ctx).iter();
       case RUN: return run(ctx).iter();
-      case TO_BYTES: return bytes(ctx).iter();
+      case TO_BYTES: return toBytes(ctx);
       default: return super.iter(ctx);
     }
   }
@@ -62,7 +63,7 @@ public final class FNUtil extends FuncCall {
     switch(def) {
       case EVAL: return eval(ctx);
       case RUN: return run(ctx);
-      case TO_BYTES: return bytes(ctx);
+      case TO_BYTES: return toBytes(ctx).value();
       default: return super.value(ctx);
     }
   }
@@ -103,10 +104,10 @@ public final class FNUtil extends FuncCall {
   private Value eval(final QueryContext ctx, final byte[] qu)
       throws QueryException {
 
-    final QueryContext qt = new QueryContext(ctx.context);
-    qt.parse(string(qu));
-    qt.compile();
-    return qt.value();
+    final QueryContext qc = new QueryContext(ctx.context);
+    qc.parse(string(qu));
+    qc.compile();
+    return qc.value();
   }
 
   /**
@@ -122,22 +123,6 @@ public final class FNUtil extends FuncCall {
     } catch(final IOException ex) {
       throw NODOC.thrw(input, ex);
     }
-  }
-
-  /**
-   * Extracts the bytes from the given xs:base64Binary data.
-   * @param ctx query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  private Value bytes(final QueryContext ctx) throws QueryException {
-    final byte[] bytes = ((B64) checkType(expr[0].item(ctx, input),
-        AtomType.B64)).toJava();
-
-    final int bl = bytes.length;
-    final long[] tmp = new long[bl];
-    for(int i = 0; i < bl; i++) tmp[i] = bytes[i];
-    return ItrSeq.get(tmp, AtomType.BYT);
   }
 
   /**
@@ -176,7 +161,7 @@ public final class FNUtil extends FuncCall {
 
     // create (and, optionally, cache) result value
     Value val = ctx.value(expr[0]);
-    if(c) val = val.cache().finish();
+    if(c) val = val.cache().value();
 
     // measure resulting memory consumption
     Performance.gc(2);
@@ -343,6 +328,40 @@ public final class FNUtil extends FuncCall {
     for(int i = res.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8)
       res[i] = (byte) (c & 0xFF);
     return new Hex(res);
+  }
+
+  /**
+   * Extracts the bytes from the given item.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Iter toBytes(final QueryContext ctx) throws QueryException {
+    final Item it = checkEmpty(expr[0].item(ctx, input));
+    final byte[] bytes = it instanceof Bin ? ((Bin) it).toJava() :
+      it.atom(input);
+
+    return new ValueIter() {
+      final int bl = bytes.length;
+      int pos;
+
+      @Override
+      public Value value() {
+        final long[] tmp = new long[bl - pos];
+        for(int i = 0; i < tmp.length; i++) tmp[i] = bytes[pos + i];
+        return ItrSeq.get(tmp, AtomType.BYT);
+      }
+      @Override
+      public Item get(final long i) {
+        return Itr.get(bytes[pos], AtomType.BYT);
+      }
+      @Override
+      public Item next() { return pos < size() ? get(pos++) : null; }
+      @Override
+      public boolean reset() { pos = 0; return true; }
+      @Override
+      public long size() { return bl; }
+    };
   }
 
   @Override

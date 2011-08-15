@@ -189,10 +189,10 @@ public final class MAB2Parser extends SingleParser {
       for(int j = 0; j < entry.size; ++j) {
         addEntry(input, entry.children[j], 0, l);
       }
-      if(entry.size != 0 && pos != 0 && !flat) builder.endElem(MEDIUM);
+      if(entry.size != 0 && pos != 0 && !flat) builder.endElem();
     }
     if(Util.debug) Util.err("\nCreate Titles: %/%\n", p, Performance.getMem());
-    builder.endElem(LIBRARY);
+    builder.endElem();
 
     // write the mediovis ids back to disk
     final PrintOutput out = new PrintOutput("mvids.dat");
@@ -219,7 +219,7 @@ public final class MAB2Parser extends SingleParser {
       if(in.read1() != '\n') continue;
       final int n = in.read1();
       if(n == '0' && in.read1() == '0' && in.read1() == '1') {
-        off = in.pos() - 3;
+        off = in.cursor() - 3;
         return ident(in);
       }
     }
@@ -413,7 +413,7 @@ public final class MAB2Parser extends SingleParser {
         add(GENRE, genres.get(mvID));
         add(STATUS, status.get(bibID));
         add(LENDINGS, lendings.get(bibID));
-        if(sb == 0 || flat) builder.endElem(MEDIUM);
+        if(sb == 0 || flat) builder.endElem();
         return title;
       }
     }
@@ -429,7 +429,7 @@ public final class MAB2Parser extends SingleParser {
     if(cont == null) return;
     builder.startElem(tag, atts.reset());
     builder.text(utf8(cont, ENCODING));
-    builder.endElem(tag);
+    builder.endElem();
   }
 
   /**

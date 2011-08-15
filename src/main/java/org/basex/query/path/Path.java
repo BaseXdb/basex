@@ -18,6 +18,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.expr.Root;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.Empty;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
@@ -39,7 +40,7 @@ public abstract class Path extends ParseExpr {
   /** Root expression. */
   public Expr root;
   /** Path steps. */
-  public Expr[] step;
+  public Expr[] steps;
 
   /**
    * Constructor.
@@ -50,7 +51,7 @@ public abstract class Path extends ParseExpr {
   protected Path(final InputInfo ii, final Expr r, final Expr[] s) {
     super(ii);
     root = r;
-    step = s;
+    steps = s;
   }
 
   /**
@@ -116,7 +117,7 @@ public abstract class Path extends ParseExpr {
   public final boolean uses(final Use use) {
     // initial context will be used as input
     if(use == Use.CTX) return root == null || root.uses(use);
-    for(final Expr s : step) if(s.uses(use)) return true;
+    for(final Expr s : steps) if(s.uses(use)) return true;
     return root != null && root.uses(use);
   }
 
@@ -126,19 +127,19 @@ public abstract class Path extends ParseExpr {
    */
   protected void optSteps(final QueryContext ctx) {
     boolean opt = false;
-    Expr[] stp = step;
-    for(int l = 1; l < stp.length; ++l) {
-      if(!(stp[l - 1] instanceof AxisStep &&
-           stp[l] instanceof AxisStep)) continue;
+    Expr[] st = steps;
+    for(int l = 1; l < st.length; ++l) {
+      if(!(st[l - 1] instanceof AxisStep &&
+           st[l] instanceof AxisStep)) continue;
 
-      final AxisStep prev = (AxisStep) stp[l - 1];
-      final AxisStep curr = (AxisStep) stp[l];
+      final AxisStep prev = (AxisStep) st[l - 1];
+      final AxisStep curr = (AxisStep) st[l];
       if(!prev.simple(DESCORSELF, false)) continue;
 
       if(curr.axis == CHILD && !curr.uses(Use.POS)) {
         // descendant-or-self::node()/child::X -> descendant::X
-        Array.move(stp, l, -1, stp.length - l);
-        stp = Arrays.copyOf(stp, stp.length - 1);
+        Array.move(st, l, -1, st.length - l);
+        st = Arrays.copyOf(st, st.length - 1);
         curr.axis = DESC;
         opt = true;
       } else if(curr.axis == ATTR && !curr.uses(Use.POS)) {
@@ -150,12 +151,12 @@ public abstract class Path extends ParseExpr {
     if(opt) ctx.compInfo(OPTDESC);
 
     // set atomic type for single attribute steps to speedup predicate tests
-    if(root == null && stp.length == 1 && stp[0] instanceof AxisPath) {
-      final AxisStep curr = (AxisStep) stp[0];
+    if(root == null && st.length == 1 && st[0] instanceof AxisPath) {
+      final AxisStep curr = (AxisStep) st[0];
       if(curr.axis == ATTR && curr.test.test == Name.STD)
         curr.type = SeqType.NOD_ZO;
     }
-    step = stp;
+    steps = st;
   }
 
   /**
@@ -171,13 +172,13 @@ public abstract class Path extends ParseExpr {
 
     ObjList<PathNode> nodes = data.pthindex.root();
     long m = 1;
-    for(int s = 0; s < step.length; s++) {
-      final AxisStep curr = checkStep(s);
+    for(int s = 0; s < steps.length; s++) {
+      final AxisStep curr = axisStep(s);
       if(curr != null) {
         nodes = curr.size(nodes, data);
         if(nodes == null) return -1;
-      } else if(s + 1 == step.length) {
-        m = step[s].size();
+      } else if(s + 1 == steps.length) {
+        m = steps[s].size();
       } else {
         // stop if a non-axis step is not placed last
         return -1;
@@ -191,12 +192,12 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Checks if the location path contains steps that will never yield results.
-   * @param steps step array
+   * @param stps step array
    * @return empty step, or {@code null}
    */
-  protected AxisStep voidStep(final Expr[] steps) {
-    for(int l = 0; l < steps.length; ++l) {
-      final AxisStep s = checkStep(l);
+  protected AxisStep voidStep(final Expr[] stps) {
+    for(int l = 0; l < stps.length; ++l) {
+      final AxisStep s = axisStep(l);
       if(s == null) continue;
       final Axis sa = s.axis;
       if(l == 0) {
@@ -209,7 +210,7 @@ public abstract class Path extends ParseExpr {
              s.test != Test.NOD && s.test != Test.DOC)) return s;
         }
       } else {
-        final AxisStep ls = checkStep(l - 1);
+        final AxisStep ls = axisStep(l - 1);
         if(ls == null) continue;
         final Axis lsa = ls.axis;
         if(sa == SELF || sa == DESCORSELF) {
@@ -248,21 +249,25 @@ public abstract class Path extends ParseExpr {
    * @param data data reference
    * @return path
    */
-  protected Path children(final QueryContext ctx, final Data data) {
-    for(int s = 0; s < step.length; ++s) {
+  protected Expr children(final QueryContext ctx, final Data data) {
+    // skip path check if no path index exists, or if it is out-of-dated
+    if(!data.meta.pathindex || !data.meta.uptodate) return this;
+
+    Path path = this;
+    for(int s = 0; s < steps.length; ++s) {
       // don't allow predicates in preceding location steps
-      final AxisStep prev = s > 0 ? checkStep(s - 1) : null;
-      if(prev != null && prev.pred.length != 0) break;
+      final AxisStep prev = s > 0 ? axisStep(s - 1) : null;
+      if(prev != null && prev.preds.length != 0) break;
 
       // ignore axes other than descendant, or position predicates
-      final AxisStep curr = checkStep(s);
+      final AxisStep curr = axisStep(s);
       if(curr == null || curr.axis != Axis.DESC || curr.uses(Use.POS)) continue;
 
       // check if child steps can be retrieved for current step
       ObjList<PathNode> nodes = pathNodes(data, s);
       if(nodes == null) continue;
 
-      ctx.compInfo(OPTCHILD, step[s]);
+      ctx.compInfo(OPTCHILD, steps[s]);
 
       // cache child steps
       final TokenList tl = new TokenList();
@@ -277,19 +282,37 @@ public abstract class Path extends ParseExpr {
 
       // build new steps
       int ts = tl.size();
-      final Expr[] steps = new Expr[ts + step.length - s - 1];
+      final Expr[] stps = new Expr[ts + steps.length - s - 1];
       for(int t = 0; t < ts; ++t) {
         final Expr[] preds = t == ts - 1 ?
-            ((AxisStep) step[s]).pred : new Expr[0];
+            ((AxisStep) steps[s]).preds : new Expr[0];
         final byte[] n = tl.get(ts - t - 1);
         final NameTest nt = n == null ? new NameTest(false, input) :
           new NameTest(new QNm(n), Name.NAME, false, input);
-        steps[t] = AxisStep.get(input, Axis.CHILD, nt, preds);
+        stps[t] = AxisStep.get(input, Axis.CHILD, nt, preds);
       }
-      while(++s < step.length) steps[ts++] = step[s];
-      return get(input, root, steps);
+      while(++s < steps.length) stps[ts++] = steps[s];
+      path = get(input, root, stps);
+      break;
     }
-    return this;
+
+    // check if the all children in the path exist
+    LOOP: for(int s = 0; s < path.steps.length; ++s) {
+      // only verify child steps; ignore namespaces
+      final AxisStep st = path.axisStep(s);
+      if(st == null || st.axis != Axis.CHILD) break;
+      if(st.test.test == Name.ALL || st.test.test == null) continue;
+      if(st.test.test != Name.NAME) break;
+
+      // check if one of the addressed nodes is on the correct level
+      final int name = data.tagindex.id(st.test.name.ln());
+      for(final PathNode pn : data.pthindex.desc(name, Data.ELEM)) {
+        if(pn.level() == s + 1) continue LOOP;
+      }
+      ctx.compInfo(OPTPATH, this);
+      return Empty.SEQ;
+    }
+    return path;
   }
 
   /**
@@ -298,8 +321,8 @@ public abstract class Path extends ParseExpr {
    * @param i index
    * @return step
    */
-  public AxisStep checkStep(final int i) {
-    return step[i] instanceof AxisStep ? (AxisStep) step[i] : null;
+  public AxisStep axisStep(final int i) {
+    return steps[i] instanceof AxisStep ? (AxisStep) steps[i] : null;
   }
 
   /**
@@ -315,7 +338,7 @@ public abstract class Path extends ParseExpr {
 
     ObjList<PathNode> in = data.pthindex.root();
     for(int s = 0; s <= l; ++s) {
-      final AxisStep curr = checkStep(s);
+      final AxisStep curr = axisStep(s);
       if(curr == null) return null;
       final boolean desc = curr.axis == Axis.DESC;
       if(!desc && curr.axis != Axis.CHILD || curr.test.test != Name.NAME)
@@ -343,8 +366,8 @@ public abstract class Path extends ParseExpr {
    * @return resulting path instance
    */
   public final Path addPreds(final Expr... pred) {
-    step[step.length - 1] = checkStep(step.length - 1).addPreds(pred);
-    return get(input, root, step);
+    steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(pred);
+    return get(input, root, steps);
   }
 
   @Override
@@ -368,7 +391,7 @@ public abstract class Path extends ParseExpr {
   public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     if(root != null) root.plan(ser);
-    for(final Expr s : step) s.plan(ser);
+    for(final Expr s : steps) s.plan(ser);
     ser.closeElement();
   }
 
@@ -376,7 +399,7 @@ public abstract class Path extends ParseExpr {
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
     if(root != null) sb.append(root);
-    for(final Expr s : step) sb.append((sb.length() != 0 ? "/" : "") + s);
+    for(final Expr s : steps) sb.append((sb.length() != 0 ? "/" : "") + s);
     return sb.toString();
   }
 }

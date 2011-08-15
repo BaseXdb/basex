@@ -36,7 +36,7 @@ public final class DeleteNode extends StructuralUpdate {
   }
 
   @Override
-  public boolean checkTextAdjacency(final int c) {
+  public boolean adjacentTexts(final int c) {
     // take pre value shifts into account
     final int p = pre + c;
     return mergeTexts(data, p - 1, p);

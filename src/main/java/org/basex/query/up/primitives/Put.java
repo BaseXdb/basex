@@ -8,8 +8,8 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.io.IOFile;
 import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -55,7 +55,7 @@ public final class Put extends UpdatePrimitive {
         // try to reproduce non-chopped documents correctly
         pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
 
-        node.serialize(new XMLSerializer(out, pr));
+        node.serialize(Serializer.get(out, pr));
       } catch(final IOException ex) {
         UPPUTERR.thrw(input, path(i));
       } finally {

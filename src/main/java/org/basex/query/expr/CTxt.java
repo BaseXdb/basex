@@ -45,7 +45,7 @@ public final class CTxt extends CFrag {
       more = true;
     } while((it = iter.next()) != null);
 
-    return new FTxt(tb.finish(), null);
+    return new FTxt(tb.finish());
   }
 
   @Override

@@ -2,6 +2,7 @@ package org.basex.data;
 
 import java.io.IOException;
 import java.util.Arrays;
+
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.io.out.ArrayOutput;

@@ -94,7 +94,7 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-npPU] [-dosvVwz] [-cq] [file]" + NL +
+    " [-dnopPsUvVwz] [-cq] [file]" + NL +
     "  [file]     Execute XQuery file" + NL +
     "  -b<pars>   Bind external XQuery variables" + NL +
     "  -c<cmd>    Execute database command(s)" + NL +
@@ -791,11 +791,11 @@ public interface Text {
   /** Menu entry. */
   String MENUDB = lang("m_db");
   /** Menu entry. */
-  String MENUEDIT = lang("m_edit");
-  /** Menu entry. */
   String MENUQUERY = lang("m_query");
   /** Menu entry. */
   String MENUVIEW = lang("m_view");
+  /** Menu entry. */
+  String MENUNODES = lang("m_nodes");
   /** Menu entry. */
   String MENUOPTIONS = lang("m_options");
   /** Menu entry. */

@@ -180,7 +180,7 @@ public final class QueryContext extends Progress {
   public QueryContext(final Context ctx) {
     resource = new QueryResources(this);
     context = ctx;
-    nodes = ctx.current;
+    nodes = ctx.current();
     xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
@@ -251,18 +251,53 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Returns a result iterator.
+   * @return result iterator
+   * @throws QueryException query exception
+   */
+  public Iter iter() throws QueryException {
+    try {
+      // evaluate lazily if no updates are possible
+      return updating ? value().iter() : iter(root);
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
+      throw XPSTACK.thrw(null);
+    }
+  }
+
+  /**
+   * Returns the result value.
+   * @return result value
+   * @throws QueryException query exception
+   */
+  public Value value() throws QueryException {
+    try {
+      final Value v = value(root);
+      if(updating) {
+        updates.applyUpdates(this);
+        if(context.data() != null) context.update();
+      }
+      return v;
+
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
+      throw XPSTACK.thrw(null);
+    }
+  }
+
+  /**
    * Evaluates the expression with the specified context set.
    * @return resulting value
    * @throws QueryException query exception
    */
-  protected Result eval() throws QueryException {
+  Result eval() throws QueryException {
     // evaluates the query
     final Iter ir = iter();
     final ItemCache ic = new ItemCache();
     Item it;
 
     // check if all results belong to the database of the input context
-    if(nodes != null) {
+    if(serProp == null && nodes != null) {
       final IntList pre = new IntList();
 
       while((it = ir.next()) != null) {
@@ -288,41 +323,6 @@ public final class QueryContext extends Progress {
       ic.add(it);
     }
     return ic;
-  }
-
-  /**
-   * Returns a result iterator.
-   * @return result iterator
-   * @throws QueryException query exception
-   */
-  public Iter iter() throws QueryException {
-    try {
-      // evaluate lazily if no updates are possible
-      return updating ? value().iter() : iter(root);
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw XPSTACK.thrw(null);
-    }
-  }
-
-  /**
-   * Returns the result value.
-   * @return result value
-   * @throws QueryException query exception
-   */
-  public Value value() throws QueryException {
-    try {
-      final Value v = value(root);
-      if(updating) {
-        updates.applyUpdates(this);
-        if(context.data != null) context.update();
-      }
-      return v;
-
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw XPSTACK.thrw(null);
-    }
   }
 
   /**

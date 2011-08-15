@@ -198,7 +198,7 @@ public abstract class Date extends Item {
     return y > 0 ? s : -s;
   }
 
-  /***
+  /**
    * Returns days per month, considering leap years.
    * @param y year
    * @param m month
@@ -208,7 +208,7 @@ public abstract class Date extends Item {
     return DAYS[m] + (m == 1 ? leap(y) : 0);
   }
 
-  /***
+  /**
    * Adds an offset for a leap year.
    * @param y year
    * @return result of check

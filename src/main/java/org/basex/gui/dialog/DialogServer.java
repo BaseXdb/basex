@@ -186,10 +186,10 @@ public final class DialogServer extends Dialog {
 
     p = new BaseXBack(new TableLayout(2, 1));
     BaseXLabel l = new BaseXLabel(SERVERINFO1);
-    l.setForeground(GUIConstants.COLORDARK);
+    l.setForeground(GUIConstants.DGRAY);
     p.add(l);
     l = new BaseXLabel(SERVERINFO2);
-    l.setForeground(GUIConstants.COLORDARK);
+    l.setForeground(GUIConstants.DGRAY);
     p.add(l);
     conn.add(p, BorderLayout.SOUTH);
 

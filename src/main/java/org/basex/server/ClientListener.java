@@ -214,7 +214,7 @@ public final class ClientListener extends Thread {
   /**
    * Exits the session.
    */
-  public void exit() {
+  public synchronized void exit() {
     // close remaining query processes
     for(final QueryListener q : queries.values()) {
       try { q.close(true); } catch(final IOException ex) { }
@@ -278,7 +278,7 @@ public final class ClientListener extends Thread {
     final TokenBuilder tb = new TokenBuilder("[");
     tb.add(socket.getInetAddress().getHostAddress());
     tb.add(':').addExt(socket.getPort()).add(']');
-    if(context.data != null) tb.add(COLS).add(context.data.meta.name);
+    if(context.data() != null) tb.add(COLS).add(context.data().meta.name);
     return tb.toString();
   }
 

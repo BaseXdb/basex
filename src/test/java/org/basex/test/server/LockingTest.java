@@ -95,7 +95,6 @@ public final class LockingTest {
    */
   @Test
   public void createTest() throws Exception {
-
     // first thread
     final Thread t1 = new Thread() {
       @Override

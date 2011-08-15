@@ -161,7 +161,7 @@ public final class TreeView extends View implements TreeConstants {
   @Override
   public void paintComponent(final Graphics g) {
     final Context c = gui.context;
-    final Data data = c.data;
+    final Data data = c.data();
     if(data == null) return;
     if(showAttsChanged()) paintType = Refresh.INIT;
     if(slimToTextChanged() && paintType == Refresh.VOID)
@@ -170,7 +170,7 @@ public final class TreeView extends View implements TreeConstants {
     super.paintComponent(g);
     gui.painting = true;
 
-    roots = gui.context.current.list;
+    roots = gui.context.current().list;
     if(roots.length == 0) return;
 
     for(int i = 0; !showAtts && i < roots.length; ++i) {
@@ -390,7 +390,7 @@ public final class TreeView extends View implements TreeConstants {
       case HIGHLIGHT:
         borderColor = color5;
         final int alpha = 0xDD000000;
-        final int rgb = GUIConstants.COLORCELL.getRGB();
+        final int rgb = GUIConstants.LGRAY.getRGB();
         fillColor = new Color(rgb + alpha, true);
         if(h > 4) border = true;
         fill = !br && !marked;
@@ -544,7 +544,7 @@ public final class TreeView extends View implements TreeConstants {
         }
       }
     }
-    gui.notify.mark(new Nodes(list.toArray(), gui.context.data), this);
+    gui.notify.mark(new Nodes(list.toArray(), gui.context.data()), this);
   }
 
   /**
@@ -681,7 +681,7 @@ public final class TreeView extends View implements TreeConstants {
     final boolean root = roots[rn] == pre;
     final int height = sub.getSubtreeHeight(rn);
 
-    final Data d = gui.context.data;
+    final Data d = gui.context.data();
     final int k = d.kind(pre);
     final int size = d.size(pre, k);
 
@@ -764,7 +764,7 @@ public final class TreeView extends View implements TreeConstants {
       final int lv, final TreeRect r, final int pre, final int px,
       final Draw t) {
 
-    final Data d = gui.context.current.data;
+    final Data d = gui.context.data();
     final boolean br = tr.bigRect(sub, rn, lv);
 
     if(!br && t != Draw.CONNECTION) drawRectangle(g, rn, lv, r, pre, t);
@@ -858,7 +858,7 @@ public final class TreeView extends View implements TreeConstants {
 
       if(lvv + 1 < sub.getSubtreeHeight(rn)
           && !tr.bigRect(sub, rn, lvv + 1)) {
-        final Data d = gui.context.current.data;
+        final Data d = gui.context.data();
         for(int j = start; j < start + bo.size; ++j) {
           final int pre = sub.getPrePerIndex(rn, lvv, j);
           final int pos = getBigRectPosition(rn, lvv, pre, r);
@@ -1143,7 +1143,7 @@ public final class TreeView extends View implements TreeConstants {
       if(flv >= sub.getSubtreeHeight(frn)) return;
 
       if(tr.bigRect(sub, frn, flv)) {
-        final Nodes ns = new Nodes(gui.context.data);
+        final Nodes ns = new Nodes(gui.context.data());
         int sum = getHitBigRectNodesNum(frn, flv, frect);
         final int fix = sub.getPreIndex(frn, flv, fpre);
         if(fix + sum + 1 == sub.levelSize(frn, flv)) ++sum;
@@ -1173,7 +1173,7 @@ public final class TreeView extends View implements TreeConstants {
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating || gui.context.focused == -1) return;
     if(e.getWheelRotation() <= 0) gui.notify.context(new Nodes(
-        gui.context.focused, gui.context.data), false, null);
+        gui.context.focused, gui.context.data()), false, null);
     else gui.notify.hist(false);
   }
 

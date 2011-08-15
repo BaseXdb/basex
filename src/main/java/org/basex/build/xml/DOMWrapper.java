@@ -81,7 +81,7 @@ public final class DOMWrapper extends Parser {
       } else {
         stack.pop();
         if(stack.empty()) break;
-        builder.endElem(token(stack.peek().curr().getNodeName()));
+        builder.endElem();
       }
     }
     builder.endDoc();

@@ -19,6 +19,8 @@ import static org.basex.core.Prop.NL;
 
 /**
  * Abstract test class for properties on the Query Plan.
+ *
+ * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
 public abstract class QueryPlanTest {
@@ -54,7 +56,7 @@ public abstract class QueryPlanTest {
       CTX.openDB(plan);
       for(final String p : pr) {
         if(!new XQuery(p).execute(CTX).equals("true"))
-          fail(p + ":" + NL + qp.ctx.root + NL + NL
+          fail(p + ":" + NL + qp.ctx.root + NL
               + new XQuery("/").execute(CTX));
       }
     } catch(final QueryException e) {

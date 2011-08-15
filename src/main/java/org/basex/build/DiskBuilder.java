@@ -36,13 +36,8 @@ public final class DiskBuilder extends Builder {
   /** Output stream for temporary values. */
   private DataOutput sout;
 
-  /** Text pointer. */
-  private long txtlen;
-  /** Attribute value pointer. */
-  private long vallen;
-
   /** Admin properties. */
-  protected final MainProp mprop;
+  final MainProp mprop;
   /** Text compressor. */
   private final Compress comp;
 
@@ -180,18 +175,14 @@ public final class DiskBuilder extends Builder {
       throws IOException {
 
     // inline integer values...
-    long v = Token.toSimpleInt(value);
+    final long v = Token.toSimpleInt(value);
     if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
 
-    // compress text
-    final byte[] cpr = comp.pack(value);
-    if(text) {
-      v = txtlen;
-      txtlen += xout.writeToken(cpr);
-    } else {
-      v = vallen;
-      vallen += vout.writeToken(cpr);
-    }
-    return cpr != value ? v | IO.OFFCOMP : v;
+    // store text
+    final DataOutput store = text ? xout : vout;
+    final long off = store.size();
+    final byte[] val = comp.pack(value);
+    store.writeToken(val);
+    return val == value ? off : off | IO.OFFCOMP;
   }
 }

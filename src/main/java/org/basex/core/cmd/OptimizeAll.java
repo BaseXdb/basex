@@ -47,7 +47,7 @@ public final class OptimizeAll extends ACreate {
   @Override
   protected boolean run() throws IOException {
     try {
-      final Data data = context.data;
+      final Data data = context.data();
       optimizeAll(data, context, this);
 
       final Open open = new Open(data.meta.name);
@@ -159,8 +159,8 @@ public final class OptimizeAll extends ACreate {
     public void parse(final Builder build) throws IOException {
       final Serializer ser = new BuilderSerializer(build) {
         @Override
-        protected void start(final byte[] t) throws IOException {
-          super.start(t);
+        protected void startOpen(final byte[] t) throws IOException {
+          super.startOpen(t);
           if(cmd != null) cmd.pre++;
         }
 

@@ -583,6 +583,17 @@ public enum Function {
   SENDREQUEST(FNHttp.class, "send-request(request[,href,[bodies]])", ITEM_ZM, 1,
       NOD, STR_ZO, ITEM_ZM),
 
+  /* FNJson functions. */
+
+  /** JSON function: convert JSON to XML. */
+  JPARSE(FNJson.class, "parse(string)", NOD, STR),
+  /** JSON function: convert JSON to XML. */
+  JPARSEML(FNJson.class, "parse-ml(string)", NOD, STR),
+  /** JSON function: convert XML to JSON. */
+  JSERIALIZE(FNJson.class, "serialize(node)", STR, NOD),
+  /** JSON function: convert XML to JsonML. */
+  JSERIALIZEML(FNJson.class, "serialize-ml(node)", STR, NOD),
+
   /* FNSent functions. */
 
   /** Sentiment function: returns a text sentiment. */
@@ -613,7 +624,7 @@ public enum Function {
   /** Utility function: calculates the CRC32 hash of the given xs:string. */
   CRC32(FNUtil.class, "crc32(str)", HEX, STR),
   /** Utility function: gets the bytes from the given xs:base64Binary data. */
-  TO_BYTES(FNUtil.class, "to-bytes(base64)", BYT_ZM, B64),
+  TO_BYTES(FNUtil.class, "to-bytes(item)", BYT_ZM, ITEM),
 
   /* FNXslt functions. */
 
@@ -659,6 +670,7 @@ public enum Function {
     URIS.put(FNDb.class,   DBURI);
     URIS.put(FNFt.class,   FTURI);
     URIS.put(FNHof.class,  HOFURI);
+    URIS.put(FNJson.class, JSONURI);
     URIS.put(FNSent.class, SENTURI);
     URIS.put(FNUtil.class, UTILURI);
     URIS.put(FNXslt.class, XSLTURI);

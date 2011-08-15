@@ -15,9 +15,9 @@ import org.basex.util.TokenBuilder;
  */
 public abstract class FNode extends ANode {
   /** Child nodes. */
-  public NodeCache children;
+  protected NodeCache children;
   /** Attributes. */
-  public NodeCache atts;
+  protected NodeCache atts;
 
   /**
    * Constructor.
@@ -25,6 +25,17 @@ public abstract class FNode extends ANode {
    */
   protected FNode(final NodeType t) {
     super(t);
+  }
+
+  /**
+   * Adds a node to this node.
+   * @param node node to be added
+   * @return self reference
+   */
+  public FNode add(final ANode node) {
+    (node.type == NodeType.ATT ? atts : children).add(node);
+    node.parent(this);
+    return this;
   }
 
   @Override
@@ -108,6 +119,17 @@ public abstract class FNode extends ANode {
   @Override
   public final AxisMoreIter children() {
     return iter(children);
+  }
+
+  @Override
+  public FNode parent(final ANode p) {
+    par = p;
+    return this;
+  }
+
+  @Override
+  public final boolean hasChildren() {
+    return children.size() != 0;
   }
 
   /**
