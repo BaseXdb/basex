@@ -23,6 +23,14 @@ public final class FDoc extends FNode {
 
   /**
    * Constructor.
+   * @param b base uri
+   */
+  public FDoc(final byte[] b) {
+    this(new NodeCache(), b);
+  }
+
+  /**
+   * Constructor.
    * @param ch children
    * @param b base uri
    */
@@ -39,7 +47,7 @@ public final class FDoc extends FNode {
    * @param b base uri
    */
   FDoc(final DocumentFragment doc, final byte[] b) {
-    this(new NodeCache(), b);
+    this(b);
     final Node elem = doc.getFirstChild();
     if(elem != null && elem instanceof Element)
       children.add(new FElem((Element) elem, this, new TokenMap()));

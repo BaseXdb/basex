@@ -16,7 +16,7 @@ import org.basex.util.Util;
  */
 public final class JSONParser extends InputParser {
   /** Error: invalid character. */
-  private static final String INVALID = "Invalid char (%)";
+  private static final String INVALID = "Invalid character: \"%\"";
   /** Error: invalid and expected character. */
   private static final String INVALEXP = "Char \"%\" found, % expected";
 
@@ -143,7 +143,7 @@ public final class JSONParser extends InputParser {
         } else if(ch == 't') {
           ch = '\t';
         } else if("\\\"/".indexOf(ch) == -1) {
-          error(INVALID, (char) ch);
+          error(INVALID, "\\" + (char) ch);
         }
       }
       tb.add(ch);

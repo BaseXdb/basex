@@ -23,15 +23,16 @@ import org.basex.util.hash.TokenObjMap;
  *
  * <ol>
  * <li>The resulting document has a {@code <json/>} root node.</li>
- * <li>JSON keys are represented as elements:
+ * <li>Names (keys) of objects are represented as elements:
  * <ol>
- *   <li>Empty keys and values of arrays (which have no keys) are represented
- *       by a single underscore <code>&lt;_&gt;...&lt;/_&gt;</code>).</li>
- *   <li>Underscores in the key are rewritten to two underscores ({@code __}).
+ *   <li>Empty names are represented by a single underscore
+ *       (<code>&lt;_&gt;...&lt;/_&gt;</code>).</li>
+ *   <li>Underscore characters are rewritten to two underscores ({@code __}).
  *   </li>
  *   <li>A character that cannot be represented as NCName character is
  *       rewritten to an underscore and its four-digit Unicode.</li>
  * </ol></li>
+ * <li>As arrays have no names, {@code <value/>} is used as element name.
  * <li>JSON values are represented as text nodes.</li>
  * <li>The types of values are represented in attributes:
  * <ol>
@@ -40,12 +41,12 @@ import org.basex.util.hash.TokenObjMap;
  *       {@code type} attribute.</li>
  *   <li>The <i>string</i> type is omitted, as it is treated as default type.
  *   </li>
- *   <li>If a key has the same type throughout the whole document, the
- *       {@code type} attribute will be omitted. Instead, the key will be
- *       listed in additional, type-specific attributes in the root node.
- *       The attributes are named by their type (<i>number</i>, <i>boolean</i>,
- *       <i>null</i>, <i>object</i> or <i>array</i>) and will contain all
- *       relevant keys as value, separated by whitespaces.</li>
+ *   <li>If a name has the same type throughout the document, the {@code type}
+ *       attribute will be omitted. Instead, the name will be listed in
+ *       additional, type-specific attributes in the root node. The attributes
+ *       are named by their type in the plural (<i>numbers</i>, <i>booleans</i>,
+ *       <i>nulls</i>, <i>objects</i> and <i>arrays</i>), and the attribute
+ *       value contains all names with that type, separated by whitespaces.</li>
  * </ol></li>
  * </ol>
  *
@@ -53,8 +54,11 @@ import org.basex.util.hash.TokenObjMap;
  * @author Christian Gruen
  */
 public final class JSONConverter {
-  /** Names of data types. */
-  private static final byte[][] NAMES = { BOOL, NUM, NULL, ARR, OBJ };
+  /** Plural. */
+  private static final byte[] S = { 's' };
+  /** Global data type attributes. */
+  private static final byte[][] ATTRS = { concat(BOOL, S), concat(NUM, S),
+    concat(NULL, S), concat(ARR, S), concat(OBJ, S) };
   /** Names of data type classes. */
   private static final Class<?>[] CLASSES = {
       JBoolean.class, JNumber.class, JNull.class, JArray.class, JObject.class
@@ -64,19 +68,27 @@ public final class JSONConverter {
 
   /** Cached names. */
   private final TokenObjMap<QNm> qnames = new TokenObjMap<QNm>();
-  /** Cached names. */
-  private final TokenObjMap<Class<? extends JValue>> types =
-      new TokenObjMap<Class<? extends JValue>>();
+  /** Cached types. */
+  private final TokenObjMap<Class<?>> types = new TokenObjMap<Class<?>>();
+  /** Input info. */
+  private final InputInfo input;
+
+  /**
+   * Constructor.
+   * @param ii input info
+   */
+  public JSONConverter(final InputInfo ii) {
+    input = ii;
+  }
 
   /**
    * Parses the input.
    * @param q query
-   * @param ii input info
    * @return resulting node
    * @throws QueryException query exception
    */
-  public ANode parse(final byte[] q, final InputInfo ii) throws QueryException {
-    final JStruct node = new JSONParser(q, ii).parse();
+  public ANode parse(final byte[] q) throws QueryException {
+    final JStruct node = new JSONParser(q, input).parse();
     // find unique data types
     types.add(JSON, node.getClass());
     analyze(node);
@@ -93,15 +105,12 @@ public final class JSONConverter {
    * @param value node to be analyzed
    */
   private void analyze(final JValue value) {
-    if(value instanceof JArray) {
-      final JArray n = (JArray) value;
-      for(int s = 0; s < n.size(); s++) analyze(n.value(s));
-    } else if(value instanceof JObject) {
-      final JObject n = (JObject) value;
+    if(value instanceof JStruct) {
+      final JStruct n = (JStruct) value;
       for(int s = 0; s < n.size(); s++) {
-        if(n.name(s).length == 0) continue;
-        final byte[] name = convert(n.name(s));
-        final Class<? extends JValue> clz = n.value(s).getClass();
+        final boolean obj = value instanceof JObject;
+        final byte[] name = convert(obj ? ((JObject) n).name(s) : VALUE);
+        final Class<?> clz = n.value(s).getClass();
         final Class<?> type = types.get(name);
         if(type == null) {
           types.add(name, clz);
@@ -130,7 +139,7 @@ public final class JSONConverter {
       if(type) root.add(new FAttr(Q_TYPE, value.type()));
       final JStruct n = (JStruct) value;
       for(int s = 0; s < n.size(); s++) {
-        root.add(create(obj ? ((JObject) n).name(s) : EMPTY, n.value(s)));
+        root.add(create(obj ? ((JObject) n).name(s) : VALUE, n.value(s)));
       }
     } else {
       final JAtom a = (JAtom) value;
@@ -150,7 +159,7 @@ public final class JSONConverter {
     for(int b = 0; b < builders.length; b++) builders[b] = new TokenBuilder();
 
     for(int i = 1; i <= types.size(); i++) {
-      final Class<? extends JValue> clz = types.value(i);
+      final Class<?> clz = types.value(i);
       for(int b = 0; b < builders.length; b++) {
         if(clz == CLASSES[b]) {
           if(builders[b].size() != 0) builders[b].add(' ');
@@ -159,11 +168,9 @@ public final class JSONConverter {
         }
       }
     }
-
     for(int b = 0; b < builders.length; b++) {
       if(builders[b].size() == 0) continue;
-      final byte[] name = convert(NAMES[b]);
-      root.add(new FAttr(qname(name), builders[b].trim().finish()));
+      root.add(new FAttr(qname(ATTRS[b]), builders[b].trim().finish()));
     }
   }
 

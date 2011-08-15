@@ -358,10 +358,11 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Prints some indentation.
+   * Indents the next text.
    * @throws IOException I/O exception
    */
   protected final void indent() throws IOException {
+    if(!indent) return;
     if(item) {
       item = false;
     } else {

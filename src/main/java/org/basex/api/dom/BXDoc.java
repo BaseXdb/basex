@@ -9,7 +9,6 @@ import org.basex.query.item.FPI;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
-import org.basex.query.iter.NodeCache;
 import org.basex.util.Util;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
@@ -68,7 +67,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXDocFrag createDocumentFragment() {
-    return new BXDocFrag(new FDoc(new NodeCache(), node.base()));
+    return new BXDocFrag(new FDoc(node.base()));
   }
 
   @Override

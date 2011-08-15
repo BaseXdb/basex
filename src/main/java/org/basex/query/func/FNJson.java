@@ -18,6 +18,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.util.json.JSONConverter;
+import org.basex.query.util.json.JsonMLConverter;
 import org.basex.util.InputInfo;
 
 /**
@@ -42,7 +43,9 @@ public final class FNJson extends FuncCall {
       throws QueryException {
     switch(def) {
       case JPARSE:
-        return new JSONConverter().parse(checkStr(expr[0], ctx), input);
+        return new JSONConverter(input).parse(checkStr(expr[0], ctx));
+      case JPARSEML:
+        return new JsonMLConverter(input).parse(checkStr(expr[0], ctx));
       case JSERIALIZE:
         return serialize(false, ctx);
       case JSERIALIZEML:

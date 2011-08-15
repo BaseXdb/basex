@@ -161,35 +161,37 @@ public interface DataText {
   /** HTML: Non-breaking space entity. */
   byte[] E_NBSP = token("&nbsp;");
 
-  /** Results tag. */
+  /** Token: results. */
   byte[] RESULTS = token("results");
-  /** Result tag. */
+  /** Token: result. */
   byte[] RESULT = token("result");
-  /** Path tag. */
+  /** Token: path. */
   byte[] PATH = token("path");
-  /** Name tag. */
+  /** Token: name. */
   byte[] NAME = token("name");
-  /** Node tag. */
+  /** Token: node. */
   byte[] NODE = token("node");
-  /** Kind attribute. */
+  /** Token: kind. */
   byte[] KIND = token("kind");
-  /** Size tag. */
+  /** Token: size. */
   byte[] SIZE = token("size");
 
-  /** Value: json. */
+  /** Token: json. */
   byte[] JSON = token("json");
-  /** Value: type. */
+  /** Token: type. */
   byte[] TYPE = token("type");
+  /** Token: value. */
+  byte[] VALUE = token("value");
 
-  /** Value: string type. */
+  /** Token: string. */
   byte[] STR = token("string");
-  /** Value: number type. */
+  /** Token: number. */
   byte[] NUM = token("number");
-  /** Value: boolean type. */
+  /** Token: boolean. */
   byte[] BOOL = token("boolean");
-  /** Value: array type. */
+  /** Token: array. */
   byte[] ARR = token("array");
-  /** Value: object type. */
+  /** Token: object. */
   byte[] OBJ = token("object");
 
   /** Comment output. */

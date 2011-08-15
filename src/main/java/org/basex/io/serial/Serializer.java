@@ -205,9 +205,7 @@ public abstract class Serializer {
    * @param v value
    * @throws IOException I/O exception
    */
-  public final void namespace(final byte[] n, final byte[] v)
-      throws IOException {
-
+  public void namespace(final byte[] n, final byte[] v) throws IOException {
     if(!undecl && n.length != 0 && v.length == 0) return;
     final byte[] uri = ns(n);
     if(uri == null || !eq(uri, v)) {

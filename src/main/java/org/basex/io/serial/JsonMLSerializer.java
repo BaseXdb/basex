@@ -1,6 +1,7 @@
 package org.basex.io.serial;
 
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,7 +10,12 @@ import org.basex.query.QueryException;
 import org.basex.util.Util;
 
 /**
- * This class serializes data according to the JsonML specification.
+ * This class serializes data as described in the
+ * <a href="http://jsonml.org">JsonML</a> specification.
+ * JsonML can be used to transform any XML document to JSON and back.
+ * Note, however, that namespaces, comments and processing instructions will be
+ * discarded in the transformation process. More details are found in the
+ * <a href="http://jsonml.org/XML/">JsonML documentation</a>.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -35,8 +41,9 @@ public final class JsonMLSerializer extends OutputSerializer {
       print(',');
       indent();
     }
-    print("[ \"");
-    for(final byte ch : name) ch(ch);
+    print('[');
+    print('"');
+    for(final byte ch : ln(name)) ch(ch);
     print('"');
     att = false;
   }
@@ -45,25 +52,25 @@ public final class JsonMLSerializer extends OutputSerializer {
   public void attribute(final byte[] name, final byte[] value)
       throws IOException {
 
-    print(',');
+    print(", ");
     if(!att) {
-      print(" {");
+      print("{");
       att = true;
     }
-    indent(level + 1);
     print('"');
     for(final byte ch : name) ch(ch);
-    print("\": \"");
+    print("\":\"");
     for(final byte ch : value) ch(ch);
     print("\"");
   }
 
   @Override
+  public void namespace(final byte[] n, final byte[] v) throws IOException {
+  }
+
+  @Override
   protected void finishOpen() throws IOException {
-    if(att) {
-      indent(level + 1);
-      print("}");
-    }
+    if(att) print("}");
   }
 
   @Override
@@ -78,12 +85,12 @@ public final class JsonMLSerializer extends OutputSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     finishOpen();
-    finishClose();
+    print(']');
+    //finishClose();
   }
 
   @Override
   protected void finishClose() throws IOException {
-    indent();
     print(']');
   }
 
@@ -104,13 +111,11 @@ public final class JsonMLSerializer extends OutputSerializer {
 
   @Override
   public void finishComment(final byte[] value) throws IOException {
-    error("Comments cannot be serialized");
   }
 
   @Override
   public void finishPi(final byte[] name, final byte[] value)
       throws IOException {
-    error("Processing instructions cannot be serialized");
   }
 
   @Override
@@ -119,14 +124,13 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   /**
-   * Prints some indentation.
-   * @param lvl level
+   * Indents the next text.
    * @throws IOException I/O exception
    */
-  protected void indent(final int lvl) throws IOException {
-    print(NL);
-    final int ls = lvl * indents;
-    for(int l = 0; l < ls; ++l) print(tab);
+  protected void ind() throws IOException {
+    ++level;
+    indent();
+    --level;
   }
 
   /**

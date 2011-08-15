@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.basex.query.QueryException;
+import org.basex.query.util.json.JSONConverter;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
@@ -16,12 +17,18 @@ import org.basex.util.list.BoolList;
 import org.basex.util.list.TokenList;
 
 /**
- * This class serializes data as JSON.
+ * This class serializes data as JSON. The input must conform to the rules
+ * defined in the {@link JSONConverter} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class JSONSerializer extends OutputSerializer {
+  /** Plural. */
+  private static final byte[] S = { 's' };
+  /** Global data type attributes. */
+  private static final byte[][] ATTRS = { concat(BOOL, S), concat(NUM, S),
+    concat(NULL, S), concat(ARR, S), concat(OBJ, S), concat(STR, S) };
   /** Supported data types. */
   private static final byte[][] TYPES = { BOOL, NUM, NULL, ARR, OBJ, STR };
   /** Cached data types. */
@@ -57,7 +64,7 @@ public final class JSONSerializer extends OutputSerializer {
     if(level == 0) {
       final int tl = typeCache.length;
       for(int t = 0; t < tl; t++) {
-        if(eq(name, TYPES[t])) {
+        if(eq(name, ATTRS[t])) {
           for(final byte[] b : split(value, ' ')) typeCache[t].add(b);
           return;
         }

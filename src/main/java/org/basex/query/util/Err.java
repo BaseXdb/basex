@@ -46,10 +46,12 @@ public enum Err {
   EMPTYPATH(BASX, 13, "%: Empty path specified."),
   /** BASX0014: Evaluation exception. */
   DBERR(BASX, 14, "%"),
-  /** BASEX0017: Evaluation exception. */
-  JSONPARSE(BASX, 15, "JSON Parser (%:%): %."),
-  /** BASEX0018: Serialization exception. */
-  JSONSER(BASX, 16, "JSON Serialization: %."),
+  /** BASEX0015: Evaluation exception. */
+  JSONPARSE(BASX, 15, "JSON parser (%:%): %."),
+  /** BASEX0015: Evaluation exception. */
+  JSONMLPARSE(BASX, 15, "JsonML converter: %."),
+  /** BASEX0016: Serialization exception. */
+  JSONSER(BASX, 16, "JSON serialization: %."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
