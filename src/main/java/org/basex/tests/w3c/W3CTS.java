@@ -464,21 +464,20 @@ public abstract class W3CTS {
           inspect |= s < cmpFiles.list.length &&
             eq(data.atom(cmpFiles.list[s]), INSPECT);
 
-          // normalize results
-          final byte[] res = delete(result.get(s), '\r');
-          final byte[] actual = delete(ao.toArray(), '\r');
-          if(eq(res, actual)) break;
+          // normalize newlines
+          final String expect =
+              string(result.get(s)).replaceAll("\r\n|\r|\n", Prop.NL);
+          final String actual = ao.toString();
+          if(expect.equals(actual)) break;
 
           if(xml || frag) {
             iter.reset();
-
             try {
-              final ItemCache ic = toIter(string(res).replaceAll(
+              final ItemCache ic = toIter(expect.replaceAll(
                   "^<\\?xml.*?\\?>", "").trim(), frag);
               if(FNSimple.deep(null, iter, ic)) break;
-
               ic.reset();
-              final ItemCache ia = toIter(string(actual), frag);
+              final ItemCache ia = toIter(actual, frag);
               if(FNSimple.deep(null, ia, ic)) break;
             } catch(final Throwable ex) {
               System.err.println("\n" + outname + ":");
