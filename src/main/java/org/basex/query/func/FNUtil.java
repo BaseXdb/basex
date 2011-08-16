@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 import java.util.zip.CRC32;
 
 import org.basex.io.IO;
@@ -80,6 +81,7 @@ public final class FNUtil extends FuncCall {
       case MD5: return hash(ctx, "MD5");
       case SHA1: return hash(ctx, "SHA");
       case CRC32: return crc32(ctx);
+      case UUID: return uuid();
       default: return super.item(ctx, ii);
     }
   }
@@ -364,9 +366,18 @@ public final class FNUtil extends FuncCall {
     };
   }
 
+  /**
+   * Creates a random UUID.
+   * @return random UUID
+   */
+  private Str uuid() {
+    return Str.get(UUID.randomUUID());
+  }
+
   @Override
   public boolean uses(final Use u) {
     return u == Use.CTX && (def == Function.EVAL || def == Function.RUN ||
-      def == Function.MB || def == Function.MS) || super.uses(u);
+      def == Function.MB || def == Function.MS || def == Function.UUID) ||
+      super.uses(u);
   }
 }

@@ -625,6 +625,8 @@ public enum Function {
   CRC32(FNUtil.class, "crc32(str)", HEX, STR),
   /** Utility function: gets the bytes from the given xs:base64Binary data. */
   TO_BYTES(FNUtil.class, "to-bytes(item)", BYT_ZM, ITEM),
+  /** Utility function: returns a random unique id. */
+  UUID(FNUtil.class, "uuid()", STR),
 
   /* FNXslt functions. */
 
