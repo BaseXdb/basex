@@ -1,5 +1,7 @@
 package org.basex.test.query.func;
 
+import static org.junit.Assert.*;
+
 import org.basex.query.func.Function;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
@@ -139,5 +141,16 @@ public final class FNUtilTest extends AdvancedQueryTest {
     query(fun + "('a')", "97");
     query("count(" + fun + "('a\u00f4c'))", "4");
     query("count(" + fun + "(123))", "3");
+  }
+
+  /**
+   * Test method for the util:uuid() function.
+   */
+  @Test
+  public void utilUuid() {
+    final String fun = check(Function.UUID);
+    final String s1 = query(fun + "()");
+    final String s2 = query(fun + "()");
+    assertTrue(!s1.equals(s2));
   }
 }
