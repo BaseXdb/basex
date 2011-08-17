@@ -160,11 +160,11 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   @Override
   public Iterator<byte[]> iterator() {
     return new Iterator<byte[]>() {
-      private int c = -1;
+      private int c;
       @Override
-      public boolean hasNext() { return ++c < size; }
+      public boolean hasNext() { return c < size; }
       @Override
-      public byte[] next() { return list[c]; }
+      public byte[] next() { return list[c++]; }
       @Override
       public void remove() { Util.notexpected(); }
     };
