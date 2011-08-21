@@ -62,9 +62,8 @@ public final class Replace extends ACreate {
     // check if path was found
     if(docs.size() == 0) return Util.info(FILEWHICH, path);
     // check if path points exclusively to files
-    final IntList il = data.doc();
-    for(int i = 0, is = il.size(); i < is; i++) {
-      if(!eq(data.text(il.get(i), true), src)) return Util.info(DIRERR, path);
+    for(int i = 0, is = docs.size(); i < is; i++) {
+      if(!eq(data.text(docs.get(i), true), src)) return Util.info(DIRERR, path);
     }
 
     final String target;
