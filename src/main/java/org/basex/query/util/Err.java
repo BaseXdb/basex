@@ -183,6 +183,10 @@ public enum Err {
   SQLEXC(XSQL, 1, "An SQL exception occurred: '%'"),
   /** XSQL0002: Evaluation exception. */
   NOCONN(XSQL, 2, "No opened connection with id %"),
+  /** XSQL0003: Evaluation exception. */
+  PARAMS(XSQL, 3, "Number of parameters differs from number of placeholders"),
+  /** XSQL0004: Evaluation exception. */
+  NOPARAMTYPE(XSQL, 4, "No parameter type specified."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

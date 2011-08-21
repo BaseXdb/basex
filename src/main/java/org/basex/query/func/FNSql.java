@@ -7,24 +7,32 @@ import static org.basex.util.Token.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.sql.Types;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.Bln;
 import org.basex.query.item.Dec;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
 import org.basex.query.item.Jav;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.AxisIter;
+import org.basex.query.iter.AxisMoreIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.util.Err;
@@ -41,6 +49,28 @@ public final class FNSql extends FuncCall {
 
   /** sql:tuple element. */
   private static final byte[] TUPLE = token("sql:tuple");
+  /** parameter attribute: type. */
+  private static final byte[] TYPE = token("type");
+  /** parameter attribute: null. */
+  private static final byte[] NULL = token("null");
+  /** Type int. */
+  private static final String INT = "int";
+  /** Type string. */
+  private static final String STRING = "string";
+  /** Type boolean. */
+  private static final String BOOL = "boolean";
+  /** Type date. */
+  private static final String DATE = "date";
+  /** Type double. */
+  private static final String DOUBLE = "double";
+  /** Type float. */
+  private static final String FLOAT = "float";
+  /** Type short. */
+  private static final String SHORT = "short";
+  /** Type time. */
+  private static final String TIME = "time";
+  /** Type timestamp. */
+  private static final String TIMESTAMP = "timestamp";
 
   /**
    * Constructor.
@@ -141,7 +171,7 @@ public final class FNSql extends FuncCall {
     // Execute
     if(obj == null) throw Err.NOCONN.thrw(input, toInt(id.atom(input)));
     return obj instanceof Connection ? executeQuery((Connection) obj, ctx)
-        : executePrepStmt((PreparedStatement) obj, ctx);
+        : executePrepStmt2((PreparedStatement) obj, ctx);
   }
 
   /**
@@ -193,6 +223,113 @@ public final class FNSql extends FuncCall {
       // }
       final boolean result = stmt.execute();
       return result ? buildResult(stmt.getResultSet()) : new NodeCache();
+    } catch(final SQLException ex) {
+      throw SQLEXC.thrw(input, ex.getMessage());
+    }
+  }
+
+  private NodeCache executePrepStmt2(final PreparedStatement stmt,
+      final QueryContext ctx) throws QueryException {
+    // Get parameters for prepared statement
+    final ANode params = (ANode) checkType(expr[1].item(ctx, input),
+        NodeType.ELM);
+    try {
+      final int placeCount = stmt.getParameterMetaData().getParameterCount();
+      // Check if number of parameters equals number of place holders
+      if(placeCount != countParams(params)) PARAMS.thrw(input);
+      else setParameters(params.children(), stmt);
+      final boolean result = stmt.execute();
+      return result ? buildResult(stmt.getResultSet()) : new NodeCache();
+    } catch(final SQLException ex) {
+      throw SQLEXC.thrw(input, ex.getMessage());
+    }
+  }
+
+  /**
+   * Counts the numbers of <parameter/> elements.
+   * @param params element <param/>
+   * @return number of parameters
+   */
+  private int countParams(final ANode params) {
+    final AxisIter ch = params.children();
+    int count = 0;
+    while(ch.next() != null)
+      count++;
+    return count;
+  }
+
+  /**
+   * Sets the parameters of a prepared statement.
+   * @param params parameters
+   * @param stmt prepared statement
+   * @throws QueryException query exception
+   */
+  private void setParameters(final AxisMoreIter params,
+      final PreparedStatement stmt) throws QueryException {
+    int index = 1;
+    for(ANode next; ((next = params.next()) != null);) {
+      final AxisIter attrs = next.attributes();
+      byte[] paramType = null;
+      byte[] isNull = null;
+      for(ANode attr; ((attr = attrs.next()) != null);) {
+        if(eq(attr.nname(), TYPE)) paramType = attr.atom();
+        if(eq(attr.nname(), NULL)) isNull = attr.atom();
+        if(paramType == null) try {
+          NOPARAMTYPE.thrw(input);
+        } catch(QueryException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+        else setParameter(index++, stmt, string(paramType),
+            string(next.atom()), Bln.parse(isNull, input));
+      }
+
+    }
+  }
+
+  /**
+   * Sets the parameter with the given index.
+   * @param index parameter index
+   * @param stmt prepared statement
+   * @param paramType parameter type
+   * @param value parameter value
+   * @param isNull 
+   * @throws QueryException query exception
+   */
+  private void setParameter(final int index, final PreparedStatement stmt,
+      final String paramType, final String value, final boolean isNull)
+      throws QueryException {
+    try {
+      if(paramType.equals(BOOL)) {
+        if(isNull) stmt.setNull(index, Types.BOOLEAN);
+        else stmt.setBoolean(index, Boolean.parseBoolean(value));
+      } else if(paramType.equals(DATE)) {
+        if(isNull) stmt.setNull(index, Types.DATE);
+        else stmt.setDate(index, Date.valueOf(value));
+      } else if(paramType.equals(DOUBLE)) {
+        if(isNull) stmt.setNull(index, Types.DOUBLE);
+        else stmt.setDouble(index, Double.parseDouble(value));
+      } else if(paramType.equals(FLOAT)) {
+        if(isNull) stmt.setNull(index, Types.FLOAT);
+        else stmt.setFloat(index, Float.parseFloat(value));
+      } else if(paramType.equals(INT)) {
+        if(isNull) stmt.setNull(index, Types.INTEGER);
+        else stmt.setInt(index, Integer.parseInt(value));
+      } else if(paramType.equals(SHORT)) {
+        if(isNull) stmt.setNull(index, Types.SMALLINT);
+        else stmt.setShort(index, Short.parseShort(value));
+      } else if(paramType.equals(STRING)) {
+        if(isNull) stmt.setNull(index, Types.VARCHAR);
+        else stmt.setString(index, value);
+      } else if(paramType.equals(TIME)) {
+        if(isNull) stmt.setNull(index, Types.TIME);
+        else stmt.setTime(index, Time.valueOf(value));
+      } else if(paramType.equals(TIMESTAMP)) {
+        if(isNull) stmt.setNull(index, Types.TIMESTAMP);
+        else stmt.setTimestamp(index, Timestamp.valueOf(value));
+      } else {
+        // TODO: error
+      }
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
