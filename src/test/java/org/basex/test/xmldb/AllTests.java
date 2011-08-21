@@ -94,7 +94,7 @@ public final class AllTests {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        DropDB.drop(COLL, ctx.prop);
+        DropDB.drop(COLL, ctx.mprop);
       }
     });
   }

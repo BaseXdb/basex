@@ -23,9 +23,9 @@ import junit.framework.TestCase;
 @SuppressWarnings("all")
 public class XPathQueryServiceTest extends TestCase {
   /** Collection. */
-  private static Collection coll;
+  private Collection coll;
   /** Resource. */
-  private static XPathQueryService serv;
+  private XPathQueryService serv;
 
   @Before
   @Override

@@ -4,23 +4,19 @@ import java.io.InputStream;
 
 /**
  * This example shows how new databases can be created.
- * Documentation: http://basex.org/api
+ * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License
  */
 public final class CreateExample {
+  /** Hidden default constructor. */
+  private CreateExample() { }
+
   /**
    * Main method.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new CreateExample();
-  }
-
-  /**
-   * Constructor.
-   */
-  private CreateExample() {
     try {
       // create session
       BaseXClient session =

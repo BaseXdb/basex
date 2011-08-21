@@ -17,8 +17,9 @@ import org.basex.core.cmd.Open;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.io.IOContent;
-import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.list.IntList;
+import org.basex.util.list.StringList;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API.
@@ -63,7 +64,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
   @Override
   public String getName() {
-    return ctx.data.meta.name;
+    return ctx.data().meta.name;
   }
 
   @Override
@@ -117,16 +118,17 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public int getResourceCount() throws XMLDBException {
     check();
-    return ctx.data.doc().length;
+    return ctx.data().doc().size();
   }
 
   @Override
   public String[] listResources() throws XMLDBException {
     check();
     final StringList sl = new StringList();
-    final Data data = ctx.data;
-    for(final int pre : data.doc()) {
-      sl.add(Token.string(data.text(pre, true)));
+    final Data data = ctx.data();
+    final IntList il = data.doc();
+    for(int i = 0, is = il.size(); i < is; i++) {
+      sl.add(Token.string(data.text(il.get(i), true)));
     }
     return sl.toArray();
   }
@@ -153,14 +155,16 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     // resource is no relevant xml resource
     final BXXMLResource del = checkXML(res);
-    final Data data = ctx.data;
+    final Data data = ctx.data();
 
     // check if data instance refers to another database
     if(del.data != data && del.data != null) throw new XMLDBException(
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
     // find correct value and remove the node
-    Delete.delete(ctx, getResource(del.getId()).pre);
+    final IntList il = new IntList();
+    il.add(getResource(del.getId()).pre);
+    Delete.delete(ctx, il);
   }
 
   @Override
@@ -190,8 +194,8 @@ public final class BXCollection implements Collection, BXXMLDBText {
         new DOMWrapper((Document) cont, id) :
         Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop, "");
 
-      final Data data = ctx.data;
-      data.insert(data.meta.size, -1, MemBuilder.build(p, ctx.prop, id));
+      final Data data = ctx.data();
+      data.insert(data.meta.size, -1, MemBuilder.build(id, p, ctx.prop));
       ctx.update();
       data.flush();
     } catch(final IOException ex) {
@@ -203,9 +207,11 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public BXXMLResource getResource(final String id) throws XMLDBException {
     check();
     if(id == null) return null;
-    final Data data = ctx.data;
+    final Data data = ctx.data();
     final byte[] idd = Token.token(id);
-    for(final int pre : data.doc()) {
+    final IntList il = data.doc();
+    for(int i = 0, is = il.size(); i < is; i++) {
+      final int pre = il.get(i);
       if(Token.eq(data.text(pre, true), idd))
         return new BXXMLResource(data, pre, id, this);
     }
@@ -237,7 +243,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public String getProperty(final String key) throws XMLDBException {
     check();
     try {
-      return MetaData.class.getField(key).get(ctx.data.meta).toString();
+      return MetaData.class.getField(key).get(ctx.data().meta).toString();
     } catch(final Exception ex) {
       return null;
     }
@@ -248,7 +254,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       throws XMLDBException {
     check();
     try {
-      final MetaData md = ctx.data.meta;
+      final MetaData md = ctx.data().meta;
       final Field f = MetaData.class.getField(key);
       final Object k = f.get(md);
 

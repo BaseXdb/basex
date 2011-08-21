@@ -31,9 +31,9 @@ import junit.framework.TestCase;
 @SuppressWarnings("all")
 public class XMLResourceTest extends TestCase {
   /** Collection. */
-  private static Collection coll;
+  private Collection coll;
   /** Resource. */
-  private static XMLResource res;
+  private XMLResource res;
 
   @Before
   @Override

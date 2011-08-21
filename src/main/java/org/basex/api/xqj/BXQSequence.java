@@ -1,11 +1,13 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.util.Properties;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
 import javax.xml.transform.sax.SAXResult;
@@ -16,13 +18,14 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
-import org.basex.data.SAXSerializer;
-import org.basex.data.XMLSerializer;
-import org.basex.io.ArrayOutput;
+
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.SAXSerializer;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.Iter;
 import org.basex.util.Util;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;

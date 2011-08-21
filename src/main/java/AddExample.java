@@ -4,23 +4,19 @@ import java.io.InputStream;
 
 /**
  * This example shows how documents can be added to databases.
- * Documentation: http://basex.org/api
+ * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License
  */
 public final class AddExample {
+  /** Hidden default constructor. */
+  private AddExample() { }
+
   /**
    * Main method.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new AddExample();
-  }
-
-  /**
-   * Constructor.
-   */
-  private AddExample() {
     try {
       // create session
       BaseXClient session =

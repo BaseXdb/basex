@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Properties;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
-import org.basex.core.Prop;
+
+import org.basex.core.MainProp;
 import org.basex.core.Text;
 import org.basex.util.Util;
 
@@ -31,8 +32,8 @@ public final class BXQDataSource implements XQDataSource {
   public BXQDataSource() {
     props.setProperty(USER, Text.ADMIN);
     props.setProperty(PASSWORD, Text.ADMIN);
-    props.setProperty(SERVERNAME, Prop.HOST[1].toString());
-    props.setProperty(PORT, Prop.PORT[1].toString());
+    props.setProperty(SERVERNAME, MainProp.HOST[1].toString());
+    props.setProperty(PORT, MainProp.PORT[1].toString());
   }
 
   @Override

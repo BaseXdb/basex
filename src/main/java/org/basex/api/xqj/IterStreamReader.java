@@ -1,21 +1,24 @@
 package org.basex.api.xqj;
 
+import static org.basex.util.Token.*;
+
 import java.util.NoSuchElementException;
 import java.util.Properties;
+
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import org.basex.api.jaxp.BXNamespaceContext;
 import org.basex.data.Data;
-import org.basex.io.IO;
 import org.basex.query.QueryException;
+import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.AxisIter;
@@ -23,7 +26,8 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.util.NSLocal;
 import org.basex.util.TokenBuilder;
-import static org.basex.util.Token.*;
+import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * XML Stream Reader implementation.
@@ -454,11 +458,9 @@ final class IterStreamReader implements XMLStreamReader {
     /** Data size. */
     private final int s;
     /** Parent stack. */
-    private final int[] parent = new int[IO.MAXHEIGHT];
+    private final IntList parent = new IntList();
     /** Pre stack. */
-    private final int[] pre = new int[IO.MAXHEIGHT];
-    /** Current level. */
-    private int l;
+    private final IntList pre = new IntList();
     /** Current pre value. */
     private int p;
 
@@ -474,7 +476,7 @@ final class IterStreamReader implements XMLStreamReader {
 
     @Override
     boolean hasNext() {
-      return p < s || l > 0;
+      return p < s || pre.size() > 0;
     }
 
     @Override
@@ -487,7 +489,7 @@ final class IterStreamReader implements XMLStreamReader {
       final Data data = dbnode.data;
       final int k = data.kind(p);
       final int pa = data.parent(p, k);
-      if(l > 0 && parent[l - 1] >= pa) {
+      if(parent.size() > 0 && parent.peek() >= pa) {
         endElem();
         return;
       }
@@ -498,7 +500,8 @@ final class IterStreamReader implements XMLStreamReader {
      * Processes the end of an element.
      */
     private void endElem() {
-      dbnode.set(pre[--l], Data.ELEM);
+      dbnode.set(pre.pop(), Data.ELEM);
+      parent.pop();
       kind = END_ELEMENT;
     }
 
@@ -510,8 +513,8 @@ final class IterStreamReader implements XMLStreamReader {
     private void finish(final int k, final int pa) {
       dbnode.set(p, k);
       if(k == Data.ELEM) {
-        pre[l] = p;
-        parent[l++] = pa;
+        pre.push(p);
+        parent.push(pa);
       }
       p += dbnode.data.attSize(p, k);
       type();
@@ -521,29 +524,29 @@ final class IterStreamReader implements XMLStreamReader {
   /** Reader for traversing {@link FNode} instances. */
   private final class FNodeReader extends NodeReader {
     /** Axis iterator. */
-    private final AxisIter[] iter = new AxisIter[IO.MAXHEIGHT];
+    private final ObjList<AxisIter> iter = new ObjList<AxisIter>();
     /** Node stack. */
-    private final ANode[] nodes = new ANode[IO.MAXHEIGHT];
+    private final ObjList<ANode> nodes = new ObjList<ANode>();
     /** Stack level. */
     private int l;
 
     /** Constructor. */
     FNodeReader() {
-      iter[0] = ((FNode) node).self();
+      iter.add(((FNode) node).self());
       hasNext();
     }
 
     @Override
     boolean hasNext() {
-      final ANode n = iter[l].next();
+      final ANode n = iter.get(l).next();
       if(n != null) {
-        nodes[l] = n;
+        nodes.set(l, n);
         node = n;
         type();
-        if(kind == START_ELEMENT) iter[++l] = n.children();
+        if(kind == START_ELEMENT) iter.set(++l, n.children());
       } else {
         if(--l < 0) return false;
-        node = nodes[l];
+        node = nodes.get(l);
         kind = END_ELEMENT;
       }
       return true;

@@ -9,7 +9,7 @@
 -- Portability : portable
 --
 -- This example shows how database commands can be executed.
--- Documentation: http://basex.org/api
+-- Documentation: http://docs.basex.org/wiki/Clients
 --
 -------------------------------------------------------------------------------
 

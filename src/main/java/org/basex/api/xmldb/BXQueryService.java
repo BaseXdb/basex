@@ -70,7 +70,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
   @Override
   public BXResourceSet query(final String query) throws XMLDBException {
-    return query(coll.ctx.current, query);
+    return query(coll.ctx.current(), query);
   }
 
   @Override

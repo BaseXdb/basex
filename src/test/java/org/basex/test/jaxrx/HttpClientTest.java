@@ -1,5 +1,6 @@
 package org.basex.test.jaxrx;
 
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -24,7 +25,6 @@ import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.Text;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
@@ -43,7 +43,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
@@ -72,7 +71,7 @@ public final class HttpClientTest {
   private static final byte[] METHOD = token("method");
 
   /** Database context. */
-  protected static Context context;
+  static Context context;
   /** JAX-RX server. */
   private static JaxRxServer jaxrx;
 
@@ -83,7 +82,7 @@ public final class HttpClientTest {
   public static void setUpBeforeClass() {
     context = new Context();
     context.prop.set(Prop.CACHEQUERY, true);
-    jaxrx = new JaxRxServer("-U" + Text.ADMIN + " -P" + Text.ADMIN + " -z");
+    jaxrx = new JaxRxServer("-U" + ADMIN + " -P" + ADMIN + " -z");
   }
 
   /**
@@ -354,8 +353,7 @@ public final class HttpClientTest {
 
     // check parts
     final Iterator<Part> i = r.parts.iterator();
-    Part part = null;
-    part = i.next();
+    Part part = i.next();
     assertTrue(part.headers.size() == 2);
     assertTrue(part.bodyContent.size() == 1);
     assertTrue(part.bodyAttrs.size() == 1);
@@ -499,17 +497,18 @@ public final class HttpClientTest {
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
     HTTPClient.setRequestContent(fakeConn.getOutputStream(), req, null);
-    final String expResult = "--boundary42\r\n"
-        + "Content-Type: text/plain; charset=us-ascii\r\n\r\n"
-        + "...plain text version of message goes here....\n\r\n"
-        + "--boundary42\r\n" + "Content-Type: text/richtext\r\n\r\n"
-        + ".... richtext version of same message goes here ...\r\n"
-        + "--boundary42\r\n" + "Content-Type: text/x-whatever\r\n\r\n"
-        + ".... fanciest formatted version of same  message  goes  here...\r\n"
-        + "--boundary42--\r\n";
+    final String expResult = "--boundary42" + NL
+        + "Content-Type: text/plain; charset=us-ascii" + NL + NL
+        + "...plain text version of message goes here...." + NL + NL
+        + "--boundary42" + NL + "Content-Type: text/richtext" + NL + NL
+        + ".... richtext version of same message goes here ..." + NL
+        + "--boundary42" + NL + "Content-Type: text/x-whatever" + NL + NL
+        + ".... fanciest formatted version of same  message  goes  here..." + NL
+        + "--boundary42--" + NL;
     // Compare results
-    assertTrue(expResult.equalsIgnoreCase(
-        fakeConn.getOutputStream().toString()));
+
+    final String fake = fakeConn.getOutputStream().toString();
+    assertTrue(expResult.equals(fake));
   }
 
   /**
@@ -527,10 +526,8 @@ public final class HttpClientTest {
         "http://www.test.com"));
     req1.payloadAttrs.add(MEDIATYPE, token("text/xml"));
     // Node child
-    final NodeCache ch1 = new NodeCache();
-    ch1.add(new FTxt(token("a"), null));
-    final FElem e1 = new FElem(new QNm(token("a")),
-        ch1, null, null, null, null);
+    final FElem e1 = new FElem(new QNm(token("a")));
+    e1.add(new FTxt(token("a")));
     req1.bodyContent.add(e1);
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
@@ -544,10 +541,8 @@ public final class HttpClientTest {
         "http://www.test.com"));
     req2.payloadAttrs.add(MEDIATYPE, token("text/plain"));
     // Node child
-    final NodeCache ch2 = new NodeCache();
-    ch2.add(new FTxt(token("a"), null));
-    final FElem e2 = new FElem(new QNm(token("a")),
-        ch2, null, null, null, null);
+    final FElem e2 = new FElem(new QNm(token("a")));
+    e2.add(new FTxt(token("a")));
     req2.bodyContent.add(e2);
     // String item child
     req2.bodyContent.add(Str.get("<b>b</b>"));
@@ -561,10 +556,8 @@ public final class HttpClientTest {
     req3.payloadAttrs.add(MEDIATYPE, token("text/xml"));
     req3.payloadAttrs.add(token("method"), token("text"));
     // Node child
-    final NodeCache ch3 = new NodeCache();
-    ch3.add(new FTxt(token("a"), null));
-    final FElem e3 = new FElem(new QNm(token("a")),
-        ch3, null, null, null, null);
+    final FElem e3 = new FElem(new QNm(token("a")));
+    e3.add(new FTxt(token("a")));
     req3.bodyContent.add(e3);
     // String item child
     req3.bodyContent.add(Str.get("<b>b</b>"));
@@ -591,9 +584,8 @@ public final class HttpClientTest {
     // Case 2: content is a node
     final Request req2 = new Request();
     req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
-    final NodeCache ch = new NodeCache();
-    ch.add(new FTxt(token("dGVzdA=="), null));
-    final FElem e3 = new FElem(new QNm(token("a")), ch, null, null, null, null);
+    final FElem e3 = new FElem(new QNm(token("a")));
+    e3.add(new FTxt(token("dGVzdA==")));
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
@@ -620,9 +612,8 @@ public final class HttpClientTest {
     // Case 2: content is a node
     final Request req2 = new Request();
     req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
-    final NodeCache ch = new NodeCache();
-    ch.add(new FTxt(token("74657374"), null));
-    final FElem e3 = new FElem(new QNm(token("a")), ch, null, null, null, null);
+    final FElem e3 = new FElem(new QNm(token("a")));
+    e3.add(new FTxt(token("74657374")));
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
@@ -714,15 +705,14 @@ public final class HttpClientTest {
 
     conn.headers = hdrs;
     conn.contentType = "multipart/alternative; boundary=\"boundary42\"";
-    conn.content = token("--boundary42\r\n"
-        + "Content-Type: text/plain; charset=us-ascii\r\n\r\n"
-        + "...plain text version of message goes here....\r\n\r\n"
-        + "--boundary42\r\n" + "Content-Type: text/richtext\r\n\r\n"
-
-        + ".... richtext version of same message goes here ...\r\n"
-        + "--boundary42\r\n" + "Content-Type: text/x-whatever\r\n\r\n"
+    conn.content = token("--boundary42" + NL
+        + "Content-Type: text/plain; charset=us-ascii" + NL + NL
+        + "...plain text version of message goes here...." + NL + NL
+        + "--boundary42" + NL + "Content-Type: text/richtext" + NL + NL
+        + ".... richtext version of same message goes here ..." + NL
+        + "--boundary42" + NL + "Content-Type: text/x-whatever" + NL + NL
         + ".... fanciest formatted version of same  "
-        + "message  goes  here\n...\r\n" + "--boundary42--");
+        + "message  goes  here" + NL + "..." + NL + "--boundary42--");
     final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
         context.prop, null);
 
@@ -802,15 +792,15 @@ public final class HttpClientTest {
     conn.contentType = "multipart/mixed; boundary=\"simple boundary\"";
     // Response to be read
     conn.content = token("This is the preamble.  "
-        + "It is to be ignored, though it\r\n"
-        + "is a handy place for mail composers to include an\r\n"
-        + "explanatory note to non-MIME compliant readers.\r\n"
-        + "--simple boundary\r\n\r\n"
-        + "This is implicitly typed plain ASCII text.\r\n"
-        + "It does NOT end with a linebreak.\r\n" + "--simple boundary\r\n"
-        + "Content-type: text/plain; charset=us-ascii\r\n\r\n"
-        + "This is explicitly typed plain ASCII text.\r\n"
-        + "It DOES end with a linebreak.\r\n\r\n" + "--simple boundary--\r\n"
+        + "It is to be ignored, though it" + NL
+        + "is a handy place for mail composers to include an" + NL
+        + "explanatory note to non-MIME compliant readers." + NL
+        + "--simple boundary" + NL + NL
+        + "This is implicitly typed plain ASCII text." + NL
+        + "It does NOT end with a linebreak." + NL + "--simple boundary" + NL
+        + "Content-type: text/plain; charset=us-ascii" + NL + NL
+        + "This is explicitly typed plain ASCII text." + NL
+        + "It DOES end with a linebreak." + NL + NL + "--simple boundary--" + NL
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
     final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
@@ -859,6 +849,7 @@ public final class HttpClientTest {
    */
   private void checkResponse(final Command c, final int expStatus,
       final int itemsCount) throws QueryException {
+
     assertTrue(c.result() instanceof ValueIter);
     final ValueIter res = (ValueIter) c.result();
     assertEquals(itemsCount, res.size());
@@ -867,8 +858,9 @@ public final class HttpClientTest {
     assertNotNull(response.attributes());
     final NodeIter resAttr = response.attributes();
     for(ANode attr; (attr = resAttr.next()) != null;) {
-      if(eq(attr.nname(), STATUS))
+      if(eq(attr.nname(), STATUS)) {
         assertTrue(eq(attr.atom(), token(expStatus)));
+      }
     }
   }
 }

@@ -6,7 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.basex.core.Main;
-import org.basex.core.Prop;
+import org.basex.core.MainProp;
 import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Util;
@@ -67,12 +67,11 @@ public class WebDAVServer extends Main {
   public WebDAVServer(final String... args) {
     super(args);
 
-    set(DBHOST, context.prop.get(Prop.HOST));
-    set(DBPORT, Integer.toString(context.prop.num(Prop.SERVERPORT)));
+    set(DBHOST, context.mprop.get(MainProp.HOST));
+    set(DBPORT, Integer.toString(context.mprop.num(MainProp.SERVERPORT)));
 
     final HttpManager m = new HttpManager(new BXResourceFactory(standalone));
     final Handler h = new AbstractHandler() {
-      @SuppressWarnings("unused")
       @Override
       public void handle(final String target, final HttpServletRequest request,
           final HttpServletResponse response, final int dispatch)

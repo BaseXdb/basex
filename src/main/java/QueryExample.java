@@ -3,14 +3,14 @@ import java.io.IOException;
 /**
  * This example shows how queries can be executed in an iterative manner.
  * The database server must be started first to make this example work.
- * Documentation: http://basex.org/api
+ * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License
  */
 public final class QueryExample {
-
   /** Hidden default constructor. */
   private QueryExample() { }
+
   /**
    * Main method.
    * @param args command-line arguments

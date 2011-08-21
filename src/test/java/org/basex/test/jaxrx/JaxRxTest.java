@@ -31,10 +31,8 @@ import org.junit.Test;
  */
 public final class JaxRxTest {
   /** Opening result. */
-  private static final String WRAP1 = "<jax-rx:results xmlns:jax-rx="
-      + "\"http://jax-rx.sourceforge.net\">";
-  /** Closing result. */
-  private static final String WRAP2 = "</jax-rx:results>";
+  private static final String WRAP = "<jax-rx:results xmlns:jax-rx="
+      + "\"http://jax-rx.sourceforge.net\"/>";
   /** Root path. */
   private static final String ROOT = "http://localhost:8984/basex/jax-rx";
   /** JAX-RX server. */
@@ -71,7 +69,7 @@ public final class JaxRxTest {
    */
   @Test
   public void get2() throws Exception {
-    assertEquals(WRAP1 + WRAP2, get("?query=()"));
+    assertEquals(WRAP, get("?query=()"));
   }
 
   /**

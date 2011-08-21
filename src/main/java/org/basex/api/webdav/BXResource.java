@@ -4,7 +4,7 @@ import java.util.Date;
 import org.basex.core.BaseXException;
 import org.basex.server.Query;
 import org.basex.server.Session;
-import org.basex.util.StringList;
+import org.basex.util.list.StringList;
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Request.Method;

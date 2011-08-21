@@ -29,7 +29,7 @@ final class BXCollectionManagementService implements
 
   /**
    * Default constructor.
-   * @param c Collection reference
+   * @param c collection reference
    */
   BXCollectionManagementService(final BXCollection c) {
     coll = c;

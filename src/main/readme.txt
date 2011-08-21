@@ -13,7 +13,7 @@ DESCRIPTION --------------------------------------------------------------------
  database server.
 
  A socket connection will be established by the constructor, which expects a
- hostname, port, username and password as arguments.
+ host, port, user name and password as arguments.
 
  For the execution of commands you need to call the execute() method with the
  database command as argument. The method returns the result or throws
@@ -37,7 +37,7 @@ CLASS STRUCTURE ----------------------------------------------------------------
 class Session:
 
   // Creates and returns session with host, port, user name and password
-  constructor(String host, int port, String name, String password)
+  Session(String host, int port, String name, String password)
 
   // Executes a command and returns the result
   String execute(String command)
@@ -48,6 +48,18 @@ class Session:
   // Creates a database from an input stream
   void create(String name, InputStream in)
 
+  // Adds a document to the current database from an input stream
+  void add(String name, String target, InputStream in)
+
+  // Replaces a document with the specified input stream
+  void replace(String path, InputStream in)
+
+  // Watches the specified events
+  void watch(String name, Event notifier) 
+
+  // Unwatches the specified events
+  void unwatch(String name) 
+
   // Returns process information
   String info()
 
@@ -57,7 +69,7 @@ class Session:
 class Query:
 
   // Creates query object with session and query
-  contructor(Session s, String query)
+  constructor(Session s, String query)
 
   // Binds an external variable
   void bind(String name, String value)
@@ -80,7 +92,6 @@ class Query:
   // Closes the iterator and query
   String close()
 
-
 TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
 
  {...} = string; \n = single byte
@@ -95,7 +106,10 @@ TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
  Client transfer:
  - command:       -> {command} \0
  - create:        -> \8 {name} \0 {input} \0
- - add:           -> \9 {name} \0 {target} \0 {input} \0
+ - add:           -> \9 {name} \0 {path} \0 {input} \0
+ - watch:         -> \10 {name} \0
+ - unwatch:       -> \10 {name} \0
+ - replace:       -> \12 {path} \0 {input} \0
  - query: start   -> \0 {query} \0
           bind    -> \3 {id} \0 {variable} \0 {value}\0 {type}\0
           execute -> \5 {id} \0

@@ -2,13 +2,15 @@ package org.basex.api.jaxrx;
 
 import java.io.OutputStream;
 import java.util.Scanner;
+
 import javax.ws.rs.core.StreamingOutput;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
-import org.basex.server.ClientQuery;
+import org.basex.server.Query;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
 import org.jaxrx.core.ResourcePath;
@@ -41,13 +43,15 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
     if(path != null) {
       try {
         // open database if a resource path was specified
-        if(path.getDepth() != 0) cs.execute(new Open(path.getResourcePath()));
+        if(path.getDepth() != 0) {
+          session.execute(new Open(path.getResourcePath()));
+        }
       } catch(final BaseXException ex) {
         throw new JaxRxException(status(ex), ex.getMessage());
       }
       try {
         // set serialization parameters
-        cs.execute(new Set(Prop.SERIALIZER, serial(path)));
+        session.execute(new Set(Prop.SERIALIZER, serial(path)));
       } catch(final BaseXException ex) {
         throw new JaxRxException(400, ex.getMessage());
       }
@@ -63,9 +67,9 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
    * @return result, or {@code null} if output stream was specified
    */
   final String exec(final Object command, final OutputStream os) {
-    cs.setOutputStream(os);
+    session.setOutputStream(os);
     try {
-      return cs.execute(command.toString());
+      return session.execute(command.toString());
     } catch(final BaseXException ex) {
       throw new JaxRxException(400, ex.getMessage());
     }
@@ -81,13 +85,13 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
     final int s = num(path, QueryParameter.START, 1);
     final int m = num(path, QueryParameter.COUNT, Integer.MAX_VALUE - s);
 
-    ClientQuery cq = null;
+    Query cq = null;
     try {
-      cs.execute(new Set(Prop.SERIALIZER, serial(path)));
-      cs.setOutputStream(out);
+      session.execute(new Set(Prop.SERIALIZER, serial(path)));
+      session.setOutputStream(out);
 
       // create query instance
-      cq = cs.query(query.isEmpty() ? "." : query);
+      cq = session.query(query.isEmpty() ? "." : query);
       final String var = path.getValue(QueryParameter.VAR);
       if(var != null) {
         // bind external variables

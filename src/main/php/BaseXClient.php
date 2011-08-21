@@ -2,7 +2,7 @@
 /*
  * PHP client for BaseX.
  * Works with BaseX 6.3.1 and later
- * Documentation: http://basex.org/api
+ * Documentation: http://docs.basex.org/wiki/Clients
  * 
  * (C) BaseX Team 2005-11, BSD License
  */

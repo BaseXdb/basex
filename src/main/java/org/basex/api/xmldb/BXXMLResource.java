@@ -1,6 +1,7 @@
 package org.basex.api.xmldb;
 
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -8,12 +9,13 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.SAXParserFactory;
+
 import org.basex.api.dom.BXDoc;
 import org.basex.data.Data;
 import org.basex.data.Result;
-import org.basex.data.XMLSerializer;
-import org.basex.io.ArrayOutput;
 import org.basex.io.IOFile;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.item.DBNode;
 import org.basex.util.TokenBuilder;
 import org.w3c.dom.Document;
