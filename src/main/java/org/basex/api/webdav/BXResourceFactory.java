@@ -1,6 +1,5 @@
 package org.basex.api.webdav;
 
-import static java.lang.Integer.*;
 import static org.basex.api.webdav.BXResource.*;
 import static org.basex.api.webdav.BXNotAuthorizedResource.*;
 import static org.basex.api.webdav.WebDAVServer.*;
@@ -12,7 +11,6 @@ import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
-import org.basex.server.Query;
 import org.basex.server.Session;
 
 import com.bradmcevoy.common.Path;
@@ -119,22 +117,11 @@ public class BXResourceFactory implements ResourceFactory {
    */
   Resource resource(final Session s, final String db, final String path,
       final String u, final String p) throws BaseXException {
-    final String dbpath = db + SEP + path;
     // check if there is a document in the collection having this path
-    final Query q1 = s.query("declare variable $d as xs:string external; "
-        + "declare variable $p as xs:string external; "
-        + "count(db:list($d)[. = $p])");
-    q1.bind("$d", dbpath);
-    q1.bind("$p", path);
-    if(parseInt(q1.execute()) == 1) return new BXDocument(db, path, this, u, p);
+    if(countExact(s, db, path) > 0) return new BXDocument(db, path, this, u, p);
 
     // check if there are paths in the collection starting with this path
-    final Query q2 = s.query("declare variable $d as xs:string external; "
-        + "declare variable $p as xs:string external; "
-        + "count(db:list($d)[starts-with(., $p)])");
-    q2.bind("$d", dbpath);
-    q2.bind("$p", path);
-    if(parseInt(q2.execute()) > 0) return new BXFolder(db, path, this, u, p);
+    if(count(s, db, path) > 0) return new BXFolder(db, path, this, u, p);
     return null;
   }
 }
