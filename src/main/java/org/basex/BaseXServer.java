@@ -3,8 +3,10 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 import org.basex.core.MainProp;
 import org.basex.core.Main;
@@ -91,8 +93,15 @@ public class BaseXServer extends Main {
 
       log = new Log(context, quiet);
       log.write(SERVERSTART);
-      socket = new ServerSocket(port);
-      esocket = new ServerSocket(context.mprop.num(MainProp.EVENTPORT));
+      socket = new ServerSocket();
+      socket.setReuseAddress(true);
+      SocketAddress endpoint = new InetSocketAddress(port);
+      socket.bind(endpoint);
+
+      esocket = new ServerSocket();
+      esocket.setReuseAddress(true);
+      endpoint = new InetSocketAddress(context.mprop.num(MainProp.EVENTPORT));
+      esocket.bind(endpoint);
       stop = stopFile(port);
 
       // guarantee correct shutdown...
