@@ -3,6 +3,8 @@ package org.basex.query.up.primitives;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.Iterator;
+
 import org.basex.build.DirParser;
 import org.basex.build.MemBuilder;
 import org.basex.core.Context;
@@ -18,6 +20,7 @@ import org.basex.util.InputInfo;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
 import org.basex.util.list.ObjList;
+import org.basex.util.list.TokenList;
 
 /**
  * Add primitive.
@@ -28,10 +31,10 @@ import org.basex.util.list.ObjList;
 public final class Add extends InsertBase {
   /** Documents to add. */
   private final ObjList<Item> docs;
-  /** New document name (used only for adding a single document). */
-  private final byte[] name;
-  /** Path to which new document(s) will be added. */
-  private final byte[] path;
+  /** New document names. */
+  private final TokenList names;
+  /** Paths to which the new document(s) will be added. */
+  private final TokenList paths;
   /** Database context. */
   private final Context ctx;
 
@@ -49,8 +52,15 @@ public final class Add extends InsertBase {
 
     super(PrimitiveType.INSERTAFTER, lastDoc(trg), trg, i, null);
     docs = d;
-    name = n == null || n.length == 0 ? null : n;
-    path = p == null || p.length == 0 ? null : p;
+    final int ndocs = docs.size();
+    final byte[] name = ndocs > 1 || n == null || n.length == 0 ? null : n;
+    final byte[] path = p == null || p.length == 0 ? null : p;
+    names = new TokenList(ndocs);
+    paths = new TokenList(ndocs);
+    for(int j = 0; j < ndocs; ++j) {
+      names.add(name);
+      paths.add(path);
+    }
     ctx = c;
   }
 
@@ -60,8 +70,16 @@ public final class Add extends InsertBase {
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-    for(final Item d : ((Add) p).docs) docs.add(d);
+  public void merge(final UpdatePrimitive u) {
+    final Add a = (Add) u;
+    final Iterator<Item> d = a.docs.iterator();
+    final Iterator<byte[]> n = a.names.iterator();
+    final Iterator<byte[]> p = a.paths.iterator();
+    while(d.hasNext()) {
+      docs.add(d.next());
+      names.add(n.next());
+      paths.add(p.next());
+    }
   }
 
   @Override
@@ -74,47 +92,68 @@ public final class Add extends InsertBase {
   public void prepare() throws QueryException {
     // build data with all documents, to prevent dirty reads
     md = new MemData(data);
-    for(final Item d : docs) {
-      final MemData docData;
-      if(d.node()) {
-        // adding a document node
-        final ANode doc = (ANode) d;
-        if(doc.ndType() != NodeType.DOC) UPDOCTYPE.thrw(input, doc);
-        docData = new MemData(data);
-        new DataBuilder(docData).build(doc);
-      } else if(d.str()) {
-        // adding file(s) from a path
-        final String docpath = string(d.atom(input));
-        final String nm = ctx.mprop.random(data.meta.name);
-        final DirParser p = new DirParser(IO.get(docpath), ctx.prop);
-        final MemBuilder b = new MemBuilder(nm, p, ctx.prop);
-        try {
-          docData = b.build();
-        } catch(final IOException e) {
-          throw DOCERR.thrw(input, docpath);
-        }
-      } else {
-        throw STRNODTYPE.thrw(input, this, d.type);
+
+    final Iterator<Item> d = docs.iterator();
+    final Iterator<byte[]> n = names.iterator();
+    final Iterator<byte[]> p = paths.iterator();
+
+    while(d.hasNext())
+      md.insert(md.meta.size, -1, docData(d.next(),  n.next(), p.next()));
+  }
+
+  /**
+   * Create a {@link Data} instance for the specified document.
+   * @param doc item representing document(s)
+   * @param name document name or {@code null} (ignored, if {@code doc}
+   * represents multiple documents)
+   * @param path document path or {@code null}
+   * @return {@link Data} instance from the parsed document(s)
+   * @throws QueryException if {@code doc} does not represent valid document(s)
+   */
+  private Data docData(final Item doc, final byte[] name, final byte[] path)
+      throws QueryException {
+    final MemData docData;
+
+    if(doc.node()) {
+      // adding a document node
+      final ANode nd = (ANode) doc;
+      if(nd.ndType() != NodeType.DOC) UPDOCTYPE.thrw(input, nd);
+      docData = new MemData(data);
+      new DataBuilder(docData).build(nd);
+    } else if(doc.str()) {
+      // adding file(s) from a path
+      final String docpath = string(doc.atom(input));
+      final String nm = ctx.mprop.random(data.meta.name);
+      final DirParser p = new DirParser(IO.get(docpath), ctx.prop);
+      final MemBuilder b = new MemBuilder(nm, p, ctx.prop);
+      try {
+        docData = b.build();
+      } catch(final IOException e) {
+        throw DOCERR.thrw(input, docpath);
       }
-      md.insert(md.meta.size, -1, docData);
+    } else {
+      STRNODTYPE.thrw(input, this, doc.type);
+      return null;
     }
 
-    // set new names, if needed
-    final IntList pres = md.doc();
+    // modify name and path, if needed
+    final IntList pres = docData.doc();
     if(pres.size() == 1 && name != null) {
       // name is specified and a single document is added: set the name
       final byte[] nm = path == null ? name : concat(path, SLASH, name);
-      md.update(pres.get(0), Data.DOC, nm);
+      docData.update(pres.get(0), Data.DOC, nm);
     } else if(path != null) {
       // path is specified: replace the path of each new document
       for(int i = 0, is = pres.size(); i < is; i++) {
         final int d = pres.get(i);
-        final byte[] old = md.text(d, true);
+        final byte[] old = docData.text(d, true);
         final int p = lastIndexOf(old, '/');
         final byte[] nm = p < 0 ? old : subtoken(old, p + 1);
-        md.update(d, Data.DOC, concat(path, SLASH, nm));
+        docData.update(d, Data.DOC, concat(path, SLASH, nm));
       }
     }
+
+    return docData;
   }
 
   /**
