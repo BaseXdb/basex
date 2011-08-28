@@ -52,9 +52,8 @@ public class BXAllDatabasesResource extends BXResource implements
       } finally {
         cs.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }
@@ -71,9 +70,8 @@ public class BXAllDatabasesResource extends BXResource implements
       } finally {
         s.close();
       }
-    } catch(final Exception e) {
-      // [DP] WebDAV: error handling
-      e.printStackTrace();
+    } catch(final Exception ex) {
+      handle(ex);
     }
     return null;
   }
@@ -88,9 +86,8 @@ public class BXAllDatabasesResource extends BXResource implements
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }
@@ -108,9 +105,8 @@ public class BXAllDatabasesResource extends BXResource implements
         } finally {
           s.close();
         }
-      } catch(Exception e) {
-        // [RS] WebDAV: error handling
-        e.printStackTrace();
+      } catch(Exception ex) {
+        handle(ex);
       }
     }
     return null;

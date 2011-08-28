@@ -42,9 +42,8 @@ public class BXDatabase extends BXFolder {
       final String info;
       final Session s = factory.login(user, pass);
       try {
-        final Query q = s.query(
-            "declare variable $p as xs:string external; " +
-            "db:info($p)");
+        final Query q = s.query("declare variable $p as xs:string external; "
+            + "db:info($p)");
         q.bind("$p", db);
         info = q.execute();
       } finally {
@@ -54,14 +53,12 @@ public class BXDatabase extends BXFolder {
       final String timestamp = "Time Stamp: ";
       final int p = info.indexOf(timestamp);
       if(p >= 0) {
-        final String date = info.substring(
-            p + timestamp.length(),
+        final String date = info.substring(p + timestamp.length(),
             info.indexOf(Text.NL, p));
         if(date.length() > 0) return DATEFORMAT.parse(date);
       }
-    } catch(Exception e) {
-      e.printStackTrace();
-      // [DP] WebDAV: error handling
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }
@@ -85,23 +82,19 @@ public class BXDatabase extends BXFolder {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
-
   }
 
   @Override
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType) {
-    // TODO Auto-generated method stub
     // may not be needed to be implemented
   }
 
   @Override
   public String getContentType(final String accepts) {
-    // TODO Auto-generated method stub
     return null;
   }
 

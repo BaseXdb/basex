@@ -85,9 +85,8 @@ public class BXDocument extends BXResource implements FileResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
   }
 
@@ -100,9 +99,8 @@ public class BXDocument extends BXResource implements FileResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
   }
 
@@ -122,9 +120,8 @@ public class BXDocument extends BXResource implements FileResource {
           + "collection($path)");
       q.bind("$path", db + SEP + path);
       q.execute();
-    } catch(BaseXException e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(BaseXException ex) {
+      handle(ex);
     } finally {
       s.close();
     }
@@ -166,9 +163,8 @@ public class BXDocument extends BXResource implements FileResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
   }
 

@@ -9,6 +9,7 @@ import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.server.Query;
 import org.basex.server.Session;
+import org.basex.util.Util;
 import org.basex.util.list.StringList;
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
@@ -156,12 +157,20 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Count the number of documents starting with a certain prefix.
+   * Prints exception message to standard error.
+   * @param ex exception
+   */
+  static void handle(final Exception ex) {
+    Util.errln(ex.getMessage());
+  }
+
+  /**
+   * Count documents which paths start with the given path.
    * @param s active client session
-   * @param db database name
-   * @param path resource path
+   * @param db database
+   * @param path path
    * @return number of documents
-   * @throws BaseXException query exception
+   * @throws BaseXException database exception
    */
   static int count(final Session s, final String db, final String path)
       throws BaseXException {
@@ -180,7 +189,7 @@ public abstract class BXResource implements Resource {
    * @param db database name
    * @param path resource path
    * @return number of documents
-   * @throws BaseXException query exception
+   * @throws BaseXException database exception
    */
   static int countExact(final Session s, final String db, final String path)
       throws BaseXException {

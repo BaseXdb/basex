@@ -84,9 +84,8 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }
@@ -100,9 +99,8 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDav Error Handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }
@@ -137,9 +135,8 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
     return ch;
   }
@@ -165,9 +162,8 @@ public class BXFolder extends BXResource implements FolderResource {
         } finally {
           s.close();
         }
-      } catch(Exception e) {
-        // [RS] WebDAV: error handling
-        e.printStackTrace();
+      } catch(Exception ex) {
+        handle(ex);
       }
     }
     return null;
@@ -182,9 +178,8 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
   }
 
@@ -210,9 +205,8 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
   }
 
@@ -253,9 +247,8 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
   }
 

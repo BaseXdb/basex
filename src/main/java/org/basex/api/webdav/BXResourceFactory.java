@@ -63,9 +63,8 @@ public class BXResourceFactory implements ResourceFactory {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [DP] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }
