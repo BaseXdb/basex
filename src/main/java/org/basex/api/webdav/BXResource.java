@@ -4,6 +4,7 @@ import static java.lang.Integer.*;
 
 import java.util.Date;
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.server.Query;
@@ -208,6 +209,24 @@ public abstract class BXResource implements Resource {
     // path contains dummy document
     s.execute(new Open(db));
     s.execute(new Delete(dummy));
+    return true;
+  }
+
+  /**
+   * Check a folder for a dummy document and create it.
+   * @param s active client session
+   * @param db database name
+   * @param p path
+   * @return {@code true} if dummy document did not exist
+   * @throws BaseXException query exception
+   */
+  static boolean createDummy(final Session s, final String db, final String p)
+      throws BaseXException {
+    final String dummy = p + SEP + DUMMY;
+    if(count(s, db, dummy) > 0) return false;
+
+    s.execute(new Open(db));
+    s.execute(new Add(DUMMYCONTENT, DUMMY, p));
     return true;
   }
 }

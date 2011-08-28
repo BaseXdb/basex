@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.core.BaseXException;
-import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Rename;
 import org.basex.server.Query;
@@ -81,8 +79,7 @@ public class BXFolder extends BXResource implements FolderResource {
       final Session s = factory.login(user, pass);
       try {
         final String newFolder = path + SEP + folder;
-        s.execute(new Open(db));
-        s.execute(new Add(DUMMYCONTENT, DUMMY, newFolder));
+        createDummy(s, db, newFolder);
         return new BXFolder(db, newFolder, factory, user, pass);
       } finally {
         s.close();
@@ -127,8 +124,8 @@ public class BXFolder extends BXResource implements FolderResource {
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
-            if(!p.equals(DUMMY)) ch.add(new BXDocument(db,
-                path + SEP + p, factory, user, pass));
+            if(!p.equals(DUMMY))
+              ch.add(new BXDocument(db, path + SEP + p, factory, user, pass));
           } else {
             final String folder = path + SEP + p.substring(0, ix);
             if(!paths.contains(folder)) {
@@ -159,15 +156,12 @@ public class BXFolder extends BXResource implements FolderResource {
           // check if document with this path already exists
           if(count(s, db, doc) == 0) {
             s.add(newName, path, inputStream);
-
-            // check if folder contains the dummy document
-            final String dummy = path + SEP + DUMMY;
-            if(count(s, db, dummy) > 0) s.execute(new Delete(dummy));
+            deleteDummy(s, db, path);
           } else {
             s.replace(doc, inputStream);
           }
 
-          return new BXDocument(db, path + SEP + newName, factory, user, pass);
+          return new BXDocument(db, doc, factory, user, pass);
         } finally {
           s.close();
         }
@@ -177,6 +171,21 @@ public class BXFolder extends BXResource implements FolderResource {
       }
     }
     return null;
+  }
+
+  @Override
+  public void delete() {
+    try {
+      final Session s = factory.login(user, pass);
+      try {
+        delete(s);
+      } finally {
+        s.close();
+      }
+    } catch(Exception e) {
+      // [RS] WebDAV: error handling
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -198,20 +207,6 @@ public class BXFolder extends BXResource implements FolderResource {
           add(s, trg.db, trg.path, path.substring(0, path.lastIndexOf(SEP)));
           deleteDummy(s, trg.db, trg.path);
         }
-      } finally {
-        s.close();
-      }
-    } catch(Exception ex) {
-
-    }
-  }
-
-  @Override
-  public void delete() {
-    try {
-      final Session s = factory.login(user, pass);
-      try {
-        delete(s);
       } finally {
         s.close();
       }
@@ -258,8 +253,9 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
-
+    } catch(Exception e) {
+      // [RS] WebDAV: error handling
+      e.printStackTrace();
     }
   }
 
