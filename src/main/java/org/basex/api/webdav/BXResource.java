@@ -161,7 +161,15 @@ public abstract class BXResource implements Resource {
    */
   static void handle(final Exception ex) {
     Util.errln(ex.getMessage());
-   * @throws BaseXException query exception
+  }
+
+  /**
+   * Count documents which paths start with the given path.
+   * @param s active client session
+   * @param db database
+   * @param path path
+   * @return number of documents
+   * @throws BaseXException database exception
    */
   static int count(final Session s, final String db, final String path)
       throws BaseXException {
@@ -180,7 +188,7 @@ public abstract class BXResource implements Resource {
    * @param db database name
    * @param path resource path
    * @return number of documents
-   * @throws BaseXException query exception
+   * @throws BaseXException database exception
    */
   static int countExact(final Session s, final String db, final String path)
       throws BaseXException {

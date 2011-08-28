@@ -85,7 +85,7 @@ public class BXDocument extends BXResource implements FileResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
+    } catch(Exception ex) {
       handle(ex);
     }
   }
@@ -163,9 +163,8 @@ public class BXDocument extends BXResource implements FileResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
+    } catch(Exception ex) {
       handle(ex);
-      e.printStackTrace();
     }
   }
 
