@@ -70,8 +70,7 @@ public class BXDocument extends BXResource implements FileResource {
         s.close();
       }
     } catch(Exception ex) {
-      // [RS] WebDAV: error handling
-      ex.printStackTrace();
+      handle(ex);
     }
   }
 
@@ -85,15 +84,13 @@ public class BXDocument extends BXResource implements FileResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
   }
 
   @Override
   public Long getContentLength() {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -104,7 +101,6 @@ public class BXDocument extends BXResource implements FileResource {
 
   @Override
   public Long getMaxAgeSeconds(final Auth auth) {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -119,9 +115,8 @@ public class BXDocument extends BXResource implements FileResource {
           + "collection($path)");
       q.bind("$path", db + SEP + path);
       q.execute();
-    } catch(BaseXException e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(BaseXException ex) {
+      handle(ex);
     } finally {
       s.close();
     }
@@ -167,20 +162,19 @@ public class BXDocument extends BXResource implements FileResource {
         s.close();
       }
     } catch(Exception ex) {
-      // [RS] WebDAV: error handling
+      handle(ex);
     }
   }
 
   @Override
   public String processForm(final Map<String, String> parameters,
       final Map<String, FileItem> files) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Date getCreateDate() {
-    // TODO Auto-generated method stub
+
     return null;
   }
 

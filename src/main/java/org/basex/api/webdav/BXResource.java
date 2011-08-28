@@ -4,6 +4,7 @@ import java.util.Date;
 import org.basex.core.BaseXException;
 import org.basex.server.Query;
 import org.basex.server.Session;
+import org.basex.util.Util;
 import org.basex.util.list.StringList;
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
@@ -136,5 +137,13 @@ public abstract class BXResource implements Resource {
   static boolean supported(final String ctype) {
     // [DP] additional content types can be supported in the future
     return ctype != null && ctype.indexOf(MIMETYPEXML) >= 0;
+  }
+
+  /**
+   * Prints exception message to standard error.
+   * @param ex exception
+   */
+  static void handle(final Exception ex) {
+    Util.errln(ex.getMessage());
   }
 }

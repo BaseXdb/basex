@@ -57,9 +57,8 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }
@@ -73,9 +72,8 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDav Error Handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }
@@ -110,9 +108,8 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
     return ch;
   }
@@ -137,9 +134,8 @@ public class BXFolder extends BXResource implements FolderResource {
         } finally {
           s.close();
         }
-      } catch(Exception e) {
-        // [RS] WebDAV: error handling
-        e.printStackTrace();
+      } catch(Exception ex) {
+        handle(ex);
       }
     }
     return null;
@@ -191,34 +187,29 @@ public class BXFolder extends BXResource implements FolderResource {
       } finally {
         s.close();
       }
-    } catch(Exception e) {
-      // [RS] WebDAV: error handling
-      e.printStackTrace();
+    } catch(Exception ex) {
+      handle(ex);
     }
   }
 
   @Override
   public Long getContentLength() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public String getContentType(final String accepts) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Long getMaxAgeSeconds(final Auth auth) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType) {
-    // TODO Auto-generated method stub
   }
 
   @Override
@@ -276,7 +267,6 @@ public class BXFolder extends BXResource implements FolderResource {
 
   @Override
   public Date getCreateDate() {
-    // TODO Auto-generated method stub
     return null;
   }
 
