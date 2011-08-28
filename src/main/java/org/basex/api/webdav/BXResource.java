@@ -1,7 +1,11 @@
 package org.basex.api.webdav;
 
+import static java.lang.Integer.*;
+
 import java.util.Date;
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.Delete;
+import org.basex.core.cmd.Open;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -25,7 +29,9 @@ public abstract class BXResource implements Resource {
   /** Zip mime type. */
   static final String MIMETYPEZIP = "application/zip";
   /** Dummy xml file.*/
-  static final String EMPTYXML = "EMPTY.xml";
+  static final String DUMMY = "EMPTY.xml";
+  /** Dummy xml content.*/
+  static final String DUMMYCONTENT = "<empty/>";
   /** User name. */
   protected String user;
   /** User password. */
@@ -96,6 +102,16 @@ public abstract class BXResource implements Resource {
   }
 
   /**
+   * Delete the document.
+   * @param s current session
+   * @throws BaseXException database exception
+   */
+  protected void delete(final Session s) throws BaseXException {
+    s.execute(new Open(db));
+    s.execute(new Delete(path));
+  }
+
+  /**
    * List all databases.
    * @param s session
    * @return a list of database names
@@ -145,5 +161,54 @@ public abstract class BXResource implements Resource {
    */
   static void handle(final Exception ex) {
     Util.errln(ex.getMessage());
+   * @throws BaseXException query exception
+   */
+  static int count(final Session s, final String db, final String path)
+      throws BaseXException {
+    final String dbpath = db + SEP + path;
+    final Query q = s.query("declare variable $d as xs:string external; "
+        + "declare variable $p as xs:string external; "
+        + "count(db:list($d)[starts-with(., $p)])");
+    q.bind("$d", dbpath);
+    q.bind("$p", path);
+    return parseInt(q.execute());
+  }
+
+  /**
+   * Count the number of documents which have a given name.
+   * @param s active client session
+   * @param db database name
+   * @param path resource path
+   * @return number of documents
+   * @throws BaseXException query exception
+   */
+  static int countExact(final Session s, final String db, final String path)
+      throws BaseXException {
+    final String dbpath = db + SEP + path;
+    final Query q1 = s.query("declare variable $d as xs:string external; "
+        + "declare variable $p as xs:string external; "
+        + "count(db:list($d)[. = $p])");
+    q1.bind("$d", dbpath);
+    q1.bind("$p", path);
+    return parseInt(q1.execute());
+  }
+
+  /**
+   * Check a folder for a dummy document and delete it.
+   * @param s active client session
+   * @param db database name
+   * @param p path
+   * @return {@code true} if dummy document existed
+   * @throws BaseXException query exception
+   */
+  static boolean deleteDummy(final Session s, final String db, final String p)
+      throws BaseXException {
+    final String dummy = p + SEP + DUMMY;
+    if(count(s, db, dummy) <= 0) return false;
+
+    // path contains dummy document
+    s.execute(new Open(db));
+    s.execute(new Delete(dummy));
+    return true;
   }
 }

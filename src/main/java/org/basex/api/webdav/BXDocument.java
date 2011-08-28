@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Rename;
 import org.basex.server.Query;
@@ -42,34 +41,51 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
+  public Long getContentLength() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Date getCreateDate() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Long getMaxAgeSeconds(final Auth auth) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public String processForm(final Map<String, String> parameters,
+      final Map<String, FileItem> files) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public void copyTo(final CollectionResource target, final String name) {
     try {
-      Session s = factory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
         if(target instanceof BXAllDatabasesResource) {
-          // Document is copied to the root directory => new database has to be
-          // created
+          // document is copied to the root: create new database with it
           createDb(s, name);
         } else if(target instanceof BXDatabase) {
-          // Document is copied to a database
-          addToDb(s, ((BXDatabase) target).db, name);
+          // document is copied to a database
+          add(s, ((BXDatabase) target).db, name);
         } else if(target instanceof BXFolder) {
-          // Document is copied to a folder within a database
-          addToFolder(s, ((BXFolder) target).db, name,
-              ((BXFolder) target).path);
-          if(factory.resource(s, ((BXFolder) target).db,
-              ((BXFolder) target).path + SEP + EMPTYXML, user, pass) != null) {
-            // If target folder contains EMPTY.xml, delete it
-            // 1) Open database
-            s.execute(new Open(((BXFolder) target).db));
-            // 2) Delete EMPTY.xml
-            s.execute(new Delete(((BXFolder) target).path + SEP + "EMPTY.xml"));
-          }
+          // document is copied to a folder within a database
+          final BXFolder trg = (BXFolder) target;
+          add(s, trg.db, name, trg.path);
+          deleteDummy(s, trg.db, trg.path);
         }
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(Exception e) {
       handle(ex);
     }
   }
@@ -79,8 +95,7 @@ public class BXDocument extends BXResource implements FileResource {
     try {
       final Session s = factory.login(user, pass);
       try {
-        s.execute(new Open(db));
-        s.execute(new Delete(path));
+        delete(s);
       } finally {
         s.close();
       }
@@ -90,18 +105,8 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   @Override
-  public Long getContentLength() {
-    return null;
-  }
-
-  @Override
   public String getContentType(final String accepts) {
     return MIMETYPEXML;
-  }
-
-  @Override
-  public Long getMaxAgeSeconds(final Auth auth) {
-    return null;
   }
 
   @Override
@@ -125,86 +130,72 @@ public class BXDocument extends BXResource implements FileResource {
   @Override
   public void moveTo(final CollectionResource target, final String name) {
     try {
-      // Open a session
-      Session s = factory.login(user, pass);
+      final Session s = factory.login(user, pass);
       try {
         if(target instanceof BXAllDatabasesResource) {
-          // Document is moved to the root directory -> a new collection with
-          // this document will be created
+          // document is moved to the root: create new database with it
           createDb(s, name);
-          // Delete document from its current database
-          delete();
+          delete(s);
         } else if(target instanceof BXDatabase) {
-          if(((BXDatabase) target).db.equals(db)) {
-            // Document is moved to the root of the database to which it belongs
+          final BXDatabase trg = (BXDatabase) target;
+          if(trg.db.equals(db)) {
+            // document is moved to the root of the database to which it belongs
             s.execute(new Open(db));
             s.execute(new Rename(path, name));
           } else {
-            // Document is moved to another database
-            addToDb(s, ((BXDatabase) target).db, name);
-            // Delete document from its current database
-            delete();
+            // document is moved to another database
+            add(s, trg.db, name);
+            delete(s);
           }
         } else if(target instanceof BXFolder) {
-          if(((BXFolder) target).db.equals(db)) {
-            // Document is moved in another folder in the same database
+          final BXFolder trg = (BXFolder) target;
+          if(trg.db.equals(db)) {
+            // document is moved in another folder in the same database
             s.execute(new Open(db));
-            s.execute(new Rename(path, ((BXFolder) target).path + SEP + name));
+            s.execute(new Rename(path, trg.path + SEP + name));
           } else {
-            // Document is moved to a folder in another database
-            addToFolder(s, ((BXFolder) target).db, name,
-                ((BXFolder) target).path);
-            // Delete document from its current database
-            delete();
+            // document is moved to a folder in another database
+            add(s, trg.db, name, trg.path);
+            deleteDummy(s, trg.db, trg.path);
+            delete(s);
           }
         }
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(Exception e) {
       handle(ex);
+      e.printStackTrace();
     }
   }
 
-  @Override
-  public String processForm(final Map<String, String> parameters,
-      final Map<String, FileItem> files) {
-    return null;
-  }
-
-  @Override
-  public Date getCreateDate() {
-
-    return null;
-  }
 
   /**
    * Creates a database with the given document.
    * @param s current session
-   * @param docName document name
+   * @param d document name
    * @throws BaseXException database exception
    */
-  private void createDb(final Session s, final String docName)
+  private void createDb(final Session s, final String d)
       throws BaseXException {
-    final String dbName = docName.endsWith("xml") ? docName.substring(0,
-        docName.length() - 4) : docName;
-    // Get contents of this document
+    final String nm = d.endsWith(".xml") ? d.substring(0, d.length() - 4) : d;
+    // get content of this document
     final Query q = s.query("declare variable $doc as xs:string external; "
         + "collection($doc)");
     q.bind("$doc", db + SEP + path);
     final String doc = q.execute();
-    // Create a new datatabase with this document
-    s.execute(new CreateDB(dbName, doc));
+    // create a new database with this document
+    s.execute(new CreateDB(nm, doc));
   }
 
   /**
-   * Adds a document to the root of a database.
+   * Copy a document to the root of a database.
    * @param s current session
    * @param dbName database name
    * @param name name of document in new database
    * @throws BaseXException database exception
    */
-  private void addToDb(final Session s, final String dbName, final String name)
+  private void add(final Session s, final String dbName, final String name)
       throws BaseXException {
     final Query q = s.query("declare variable $db as xs:string external; "
         + "declare variable $doc as xs:string external; "
@@ -217,14 +208,14 @@ public class BXDocument extends BXResource implements FileResource {
   }
 
   /**
-   * Adds a document to a folder in a database.
+   * Copy a document to a folder in a database.
    * @param s current session
    * @param dbName database name
    * @param name name of document in new database
    * @param folderPath path to folder
    * @throws BaseXException database exception
    */
-  private void addToFolder(final Session s, final String dbName,
+  private void add(final Session s, final String dbName,
       final String name, final String folderPath) throws BaseXException {
     final Query q = s.query("declare variable $db as xs:string external; "
         + "declare variable $doc as xs:string external; "
