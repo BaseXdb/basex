@@ -18,8 +18,8 @@ import org.basex.util.Util;
 public final class Set extends AGet {
   /** Info strings (same order as options defined in {@link CmdSet}). */
   private static final String[] STRINGS = {
-    INFOQUERY, INFODEBUG, INFOSERIALIZE, INFOCHOP, INFOTEXTINDEX,
-    INFOFTINDEX, INFOATTRINDEX, INFOPATHINDEX, INFODBPATH
+    INFOQUERY, INFODEBUG, INFOSERIALIZE, INFOCHOP, "", INFOTEXTINDEX,
+    INFOATTRINDEX, INFOFTINDEX, INFOPATHINDEX, INFODBPATH
   };
 
   /**
