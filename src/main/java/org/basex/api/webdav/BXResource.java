@@ -103,16 +103,6 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Delete the document.
-   * @param s current session
-   * @throws BaseXException database exception
-   */
-  protected void delete(final Session s) throws BaseXException {
-    s.execute(new Open(db));
-    s.execute(new Delete(path));
-  }
-
-  /**
    * List all databases.
    * @param s session
    * @return a list of database names
@@ -162,6 +152,7 @@ public abstract class BXResource implements Resource {
    */
   static void handle(final Exception ex) {
     Util.errln(ex.getMessage());
+    ex.printStackTrace();
   }
 
   /**
@@ -222,17 +213,17 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Check a folder for a dummy document and create it.
+   * Check if a folder is empty and create a dummy document.
    * @param s active client session
    * @param db database name
    * @param p path
-   * @return {@code true} if dummy document did not exist
+   * @return {@code true} if dummy document was created
    * @throws BaseXException query exception
    */
   static boolean createDummy(final Session s, final String db, final String p)
       throws BaseXException {
-    final String dummy = p + SEP + DUMMY;
-    if(count(s, db, dummy) > 0) return false;
+    // check, if path is a folder and is empty
+    if(p.matches("[^/]") || count(s, db, p) > 0) return false;
 
     s.execute(new Open(db));
     s.execute(new Add(DUMMYCONTENT, DUMMY, p));

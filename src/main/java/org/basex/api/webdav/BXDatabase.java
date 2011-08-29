@@ -1,17 +1,16 @@
 package org.basex.api.webdav;
 
-import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
+import org.basex.core.BaseXException;
 import org.basex.core.Text;
+import org.basex.core.cmd.AlterDB;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
 import org.basex.server.Query;
 import org.basex.server.Session;
-
-import com.bradmcevoy.http.CollectionResource;
-import com.bradmcevoy.http.Range;
 
 /**
  * WebDAV resource representing a collection database.
@@ -69,37 +68,25 @@ public class BXDatabase extends BXFolder {
   }
 
   @Override
-  public void copyTo(final CollectionResource toCollection, final String name) {
-    // TODO Auto-generated method stub
+  protected void delete(final Session s) throws BaseXException {
+    s.execute(new Close());
+    s.execute(new DropDB(db));
   }
 
   @Override
-  public void delete() {
-    try {
-      final Session s = factory.login(user, pass);
-      try {
-        s.execute(new DropDB(db));
-      } finally {
-        s.close();
-      }
-    } catch(Exception ex) {
-      handle(ex);
-    }
+  protected void rename(final Session s, final String n) throws BaseXException {
+    s.execute(new AlterDB(db, n));
   }
 
   @Override
-  public void sendContent(final OutputStream out, final Range range,
-      final Map<String, String> params, final String contentType) {
-    // may not be needed to be implemented
+  protected void copyToRoot(final Session s, final String n)
+      throws BaseXException {
+    s.execute(new Copy(db, n));
   }
 
   @Override
-  public String getContentType(final String accepts) {
-    return null;
-  }
-
-  @Override
-  public void moveTo(final CollectionResource rDest, final String name) {
-    // TODO Auto-generated method stub
+  protected void moveToRoot(final Session s, final String n)
+      throws BaseXException {
+    rename(s, n);
   }
 }
