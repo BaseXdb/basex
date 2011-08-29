@@ -5,12 +5,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+
 import org.basex.core.Text;
 import org.basex.core.cmd.DropDB;
 import org.basex.server.Query;
 import org.basex.server.Session;
 
-import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.Range;
 
 /**
@@ -69,10 +69,6 @@ public class BXDatabase extends BXFolder {
   }
 
   @Override
-  public void copyTo(final CollectionResource toCollection, final String name) {
-  }
-
-  @Override
   public void delete() {
     try {
       final Session s = factory.login(user, pass);
@@ -96,9 +92,5 @@ public class BXDatabase extends BXFolder {
   @Override
   public String getContentType(final String accepts) {
     return null;
-  }
-
-  @Override
-  public void moveTo(final CollectionResource rDest, final String name) {
   }
 }

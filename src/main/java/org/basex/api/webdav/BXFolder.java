@@ -254,7 +254,7 @@ public class BXFolder extends BXResource implements FolderResource {
         s.close();
       }
     } catch(Exception ex) {
-
+      handle(ex);
     }
   }
 
