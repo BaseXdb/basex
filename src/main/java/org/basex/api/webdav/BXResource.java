@@ -4,6 +4,7 @@ import static java.lang.Integer.*;
 
 import java.util.Date;
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.server.Query;
@@ -102,16 +103,6 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Delete the document.
-   * @param s current session
-   * @throws BaseXException database exception
-   */
-  protected void delete(final Session s) throws BaseXException {
-    s.execute(new Open(db));
-    s.execute(new Delete(path));
-  }
-
-  /**
    * List all databases.
    * @param s session
    * @return a list of database names
@@ -161,6 +152,7 @@ public abstract class BXResource implements Resource {
    */
   static void handle(final Exception ex) {
     Util.errln(ex.getMessage());
+    ex.printStackTrace();
   }
 
   /**
@@ -217,6 +209,24 @@ public abstract class BXResource implements Resource {
     // path contains dummy document
     s.execute(new Open(db));
     s.execute(new Delete(dummy));
+    return true;
+  }
+
+  /**
+   * Check if a folder is empty and create a dummy document.
+   * @param s active client session
+   * @param db database name
+   * @param p path
+   * @return {@code true} if dummy document was created
+   * @throws BaseXException query exception
+   */
+  static boolean createDummy(final Session s, final String db, final String p)
+      throws BaseXException {
+    // check, if path is a folder and is empty
+    if(p.matches("[^/]") || count(s, db, p) > 0) return false;
+
+    s.execute(new Open(db));
+    s.execute(new Add(DUMMYCONTENT, DUMMY, p));
     return true;
   }
 }

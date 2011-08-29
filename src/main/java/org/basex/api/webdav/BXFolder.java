@@ -9,11 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.core.BaseXException;
-import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
-import org.basex.core.cmd.Rename;
 import org.basex.server.Query;
 import org.basex.server.Session;
 
@@ -29,7 +26,7 @@ import com.bradmcevoy.http.Resource;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXFolder extends BXResource implements FolderResource {
+public class BXFolder extends BXAbstractResource implements FolderResource {
   /**
    * Constructor.
    * @param dbname database name
@@ -40,9 +37,7 @@ public class BXFolder extends BXResource implements FolderResource {
    */
   public BXFolder(final String dbname, final String folderPath,
       final BXResourceFactory f, final String u, final String p) {
-    super(dbname, folderPath, f);
-    user = u;
-    pass = p;
+    super(dbname, folderPath, f, u, p);
   }
 
   @Override
@@ -76,13 +71,43 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
+  public Resource createNew(final String newName, final InputStream inputStream,
+      final Long length, final String contentType) {
+    if(supported(contentType)) {
+      try {
+        final Session s = factory.login(user, pass);
+        try {
+          s.execute(new Open(db));
+          final String doc = path.isEmpty() ? newName : path + SEP + newName;
+          // check if document with this path already exists
+          if(count(s, db, doc) == 0) {
+            s.add(newName, path, inputStream);
+            deleteDummy(s, db, path);
+          } else {
+            s.replace(doc, inputStream);
+          }
+
+          return new BXDocument(db, doc, factory, user, pass);
+        } finally {
+          s.close();
+        }
+      } catch(Exception ex) {
+        handle(ex);
+      }
+    }
+    return null;
+  }
+
+  @Override
   public CollectionResource createCollection(final String folder) {
     try {
       final Session s = factory.login(user, pass);
       try {
+        // [DP] WebDAV: possible optimization would be to rename the dummy, if
+        // the current folder is empty (which not always the case)
+        deleteDummy(s, db, path);
         final String newFolder = path + SEP + folder;
-        s.execute(new Open(db));
-        s.execute(new Add(DUMMYCONTENT, DUMMY, newFolder));
+        createDummy(s, db, newFolder);
         return new BXFolder(db, newFolder, factory, user, pass);
       } finally {
         s.close();
@@ -125,8 +150,8 @@ public class BXFolder extends BXResource implements FolderResource {
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
-            if(!p.equals(DUMMY)) ch.add(new BXDocument(db,
-                path + SEP + p, factory, user, pass));
+            if(!p.equals(DUMMY))
+              ch.add(new BXDocument(db, path + SEP + p, factory, user, pass));
           } else {
             final String folder = path + SEP + p.substring(0, ix);
             if(!paths.contains(folder)) {
@@ -145,129 +170,30 @@ public class BXFolder extends BXResource implements FolderResource {
   }
 
   @Override
-  public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) {
-    if(supported(contentType)) {
-      try {
-        final Session s = factory.login(user, pass);
-        try {
-          s.execute(new Open(db));
-          final String doc = path.isEmpty() ? newName : path + SEP + newName;
-          // check if document with this path already exists
-          if(count(s, db, doc) == 0) {
-            s.add(newName, path, inputStream);
-
-            // check if folder contains the dummy document
-            final String dummy = path + SEP + DUMMY;
-            if(count(s, db, dummy) > 0) s.execute(new Delete(dummy));
-          } else {
-            s.replace(doc, inputStream);
-          }
-
-          return new BXDocument(db, path + SEP + newName, factory, user, pass);
-        } finally {
-          s.close();
-        }
-      } catch(Exception ex) {
-        handle(ex);
-      }
-    }
-    return null;
+  protected void copyToRoot(final Session s, final String n)
+      throws BaseXException {
+    // folder is copied to the root: create new database with it
+    s.execute(new CreateDB(n));
+    add(s, n, "");
   }
 
   @Override
-  public void copyTo(final CollectionResource target, final String name) {
-    try {
-      final Session s = factory.login(user, pass);
-      try {
-        if(target instanceof BXAllDatabasesResource) {
-          // folder is copied to the root: create new database with it
-          s.execute(new CreateDB(name));
-          add(s, name, "", path);
-        } else if(target instanceof BXDatabase) {
-          // folder is copied to a database
-          final BXFolder trg = (BXFolder) target;
-          add(s, trg.db, trg.path, path.substring(0, path.lastIndexOf(SEP)));
-        } else if(target instanceof BXFolder) {
-          // folder is copied to a folder in a database
-          final BXFolder trg = (BXFolder) target;
-          add(s, trg.db, trg.path, path.substring(0, path.lastIndexOf(SEP)));
-          deleteDummy(s, trg.db, trg.path);
-        }
-      } finally {
-        s.close();
-      }
-    } catch(Exception ex) {
-
-    }
-  }
-
-  @Override
-  public void delete() {
-    try {
-      final Session s = factory.login(user, pass);
-      try {
-        delete(s);
-      } finally {
-        s.close();
-      }
-    } catch(Exception ex) {
-      handle(ex);
-    }
-  }
-
-  @Override
-  public void moveTo(final CollectionResource target, final String name) {
-    try {
-      final Session s = factory.login(user, pass);
-      try {
-        if(target instanceof BXAllDatabasesResource) {
-          // folder is moved to the root: create new database with it
-          s.execute(new CreateDB(name));
-          add(s, name, "", path);
-          delete(s);
-        } else if(target instanceof BXDatabase) {
-          final BXDatabase trg = (BXDatabase) target;
-          if(trg.db.equals(db)) {
-            // folder is moved to the root of the database to which it belongs
-            s.execute(new Open(db));
-            s.execute(new Rename(path, name));
-          } else {
-            // folder is moved to the root of another database
-            add(s, trg.db, trg.path, path.substring(0, path.lastIndexOf(SEP)));
-            delete(s);
-          }
-        } else if(target instanceof BXFolder) {
-          final BXFolder trg = (BXFolder) target;
-          if(trg.db.equals(db)) {
-            // folder is moved to a folder in the same database
-            s.execute(new Open(db));
-            s.execute(new Rename(path, trg.path + SEP + name));
-          } else {
-            // folder is moved to a folder in another database
-            add(s, trg.db, trg.path, path.substring(0, path.lastIndexOf(SEP)));
-            deleteDummy(s, trg.db, trg.path);
-            delete(s);
-          }
-        }
-      } finally {
-        s.close();
-      }
-    } catch(Exception ex) {
-      handle(ex);
-    }
+  protected void copyTo(final Session s, final BXFolder f, final String n)
+      throws BaseXException {
+    // folder is copied to a folder in a database
+    add(s, f.db, f.path + SEP + n);
+    deleteDummy(s, f.db, f.path);
   }
 
   /**
-   * Add a folder to specified target.
+   * Add all documents in the folder to another folder.
    * @param s current session
    * @param trgdb target database
-   * @param trgdir target directory
-   * @param prefix prefix
+   * @param trgdir target folder
    * @throws BaseXException database exception
    */
-  private void add(final Session s, final String trgdb, final String trgdir,
-      final String prefix) throws BaseXException {
+  private void add(final Session s, final String trgdb, final String trgdir)
+      throws BaseXException {
     final Query q = s.query("declare variable $src as xs:string external; "
         + "declare variable $srcdb as xs:string external; "
         + "declare variable $trgdb as xs:string external; "
@@ -280,7 +206,7 @@ public class BXFolder extends BXResource implements FolderResource {
     q.bind("$srcdb", db + SEP);
     q.bind("$trgdb", trgdb);
     q.bind("$trgdir", trgdir.isEmpty() ? "" : trgdir + SEP);
-    q.bind("$prefix", prefix  + SEP);
+    q.bind("$prefix", path + SEP);
     q.execute();
   }
 }
