@@ -199,14 +199,15 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
    */
   private void add(final Session s, final String trgdb, final String trgdir)
       throws BaseXException {
-    final Query q = s.query("declare variable $src as xs:string external; "
-        + "declare variable $srcdb as xs:string external; "
-        + "declare variable $trgdb as xs:string external; "
-        + "declare variable $trgdir as xs:string external;"
-        + "declare variable $prefix as xs:string external; "
-        + "for $d in db:list($src) "
-        + "return db:add($trgdb, collection($srcdb || $d), "
-        + "$trgdir || substring-after($d, $prefix))");
+    final Query q = s.query(
+        "declare variable $src as xs:string external; " +
+        "declare variable $srcdb as xs:string external; " +
+        "declare variable $trgdb as xs:string external; " +
+        "declare variable $trgdir as xs:string external; " +
+        "declare variable $prefix as xs:string external; " +
+        "for $d in db:list($src) " +
+        "return db:add($trgdb, collection($srcdb || $d), " +
+        "$trgdir || substring-after($d, $prefix))");
     q.bind("$src", db + SEP + path);
     q.bind("$srcdb", db + SEP);
     q.bind("$trgdb", trgdb);

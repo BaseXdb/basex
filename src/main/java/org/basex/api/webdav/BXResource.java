@@ -124,7 +124,7 @@ public abstract class BXResource implements Resource {
    */
   static String dbname(final String n) {
     final int i = n.lastIndexOf('.');
-    return (i != -1 ? n.substring(0, i) : n).replaceAll("[^\\w-]", "");
+    return (i < 0 ? n : n.substring(0, i)).replaceAll("[^\\w-]", "");
   }
 
   /**
@@ -133,8 +133,7 @@ public abstract class BXResource implements Resource {
    * @return string without leading slash
    */
   static String stripLeadingSlash(final String s) {
-    return s != null && s.length() > 0 && s.charAt(0) == SEP ?
-        s.substring(1) : s;
+    return s == null || s.isEmpty() || s.charAt(0) != SEP ? s : s.substring(1);
   }
 
   /**
@@ -160,16 +159,18 @@ public abstract class BXResource implements Resource {
    * Count documents which paths start with the given path.
    * @param s active client session
    * @param db database
-   * @param path path
+   * @param p path
    * @return number of documents
    * @throws BaseXException database exception
    */
-  static int count(final Session s, final String db, final String path)
+  static int count(final Session s, final String db, final String p)
       throws BaseXException {
+    final String path = stripLeadingSlash(p);
     final String dbpath = db + SEP + path;
-    final Query q = s.query("declare variable $d as xs:string external; "
-        + "declare variable $p as xs:string external; "
-        + "count(db:list($d)[starts-with(., $p)])");
+    final Query q = s.query(
+        "declare variable $d as xs:string external; " +
+        "declare variable $p as xs:string external; " +
+        "count(db:list($d)[starts-with(., $p)])");
     q.bind("$d", dbpath);
     q.bind("$p", path);
     return parseInt(q.execute());
@@ -179,19 +180,21 @@ public abstract class BXResource implements Resource {
    * Count the number of documents which have a given name.
    * @param s active client session
    * @param db database name
-   * @param path resource path
+   * @param p resource path
    * @return number of documents
    * @throws BaseXException database exception
    */
-  static int countExact(final Session s, final String db, final String path)
+  static int countExact(final Session s, final String db, final String p)
       throws BaseXException {
+    final String path = stripLeadingSlash(p);
     final String dbpath = db + SEP + path;
-    final Query q1 = s.query("declare variable $d as xs:string external; "
-        + "declare variable $p as xs:string external; "
-        + "count(db:list($d)[. = $p])");
-    q1.bind("$d", dbpath);
-    q1.bind("$p", path);
-    return parseInt(q1.execute());
+    final Query q = s.query(
+        "declare variable $d as xs:string external; " +
+        "declare variable $p as xs:string external; " +
+        "count(db:list($d)[. = $p])");
+    q.bind("$d", dbpath);
+    q.bind("$p", path);
+    return parseInt(q.execute());
   }
 
   /**

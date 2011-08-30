@@ -43,23 +43,30 @@ public class BXResourceFactory implements ResourceFactory {
   @Override
   public Resource getResource(final String host, final String dbpath) {
     final Auth a = HttpManager.request().getAuthorization();
-    if(a == null && System.getProperty(DBUSER) == null) return NOAUTH;
+    final String u;
+    final String p;
+    if(a == null) {
+      if(System.getProperty(DBUSER) == null) return NOAUTH;
+      u = System.getProperty(DBUSER);
+      p = System.getProperty(DBPASS);
+    } else {
+      u = a.getUser();
+      p = a.getPassword();
+    }
 
-    final Path p = Path.path(dbpath);
+    final Path path = Path.path(dbpath);
     // the root is requested
-    if(p.isRoot()) return new BXAllDatabasesResource(this, a.getUser(),
-        a.getPassword());
+    if(path.isRoot()) return new BXAllDatabasesResource(this, u, p);
 
-    final String db = p.getFirst();
+    final String db = path.getFirst();
 
     try {
-      final Session s = login(a);
+      final Session s = login(u, p);
       try {
         // only the database is requested
-        if(p.getLength() == 1) return listDbs(s).contains(db) ? new BXDatabase(
-            db, this, a.getUser(), a.getPassword()) : null;
-        return resource(s, db, stripLeadingSlash(p.getStripFirst().toString()),
-            a.getUser(), a.getPassword());
+        return path.getLength() == 1 ?
+          listDbs(s).contains(db) ? new BXDatabase(db, this, u, p) : null :
+          resource(s, db, path.getStripFirst().toString(), u, p);
       } finally {
         s.close();
       }
