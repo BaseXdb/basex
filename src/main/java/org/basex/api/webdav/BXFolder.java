@@ -17,8 +17,10 @@ import org.basex.server.Session;
 
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
+import com.bradmcevoy.http.DeletableCollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
+import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
 
 /**
@@ -27,7 +29,8 @@ import com.bradmcevoy.http.Resource;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXFolder extends BXAbstractResource implements FolderResource {
+public class BXFolder extends BXAbstractResource implements FolderResource,
+    DeletableCollectionResource {
   /**
    * Constructor.
    * @param dbname database name
@@ -152,8 +155,8 @@ public class BXFolder extends BXAbstractResource implements FolderResource {
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
-            if(!p.equals(DUMMY))
-              ch.add(new BXDocument(db, path + SEP + p, factory, user, pass));
+            if(!p.equals(DUMMY)) ch.add(new BXDocument(db, path + SEP + p,
+                factory, user, pass));
           } else {
             final String folder = path + SEP + p.substring(0, ix);
             if(!paths.contains(folder)) {
@@ -210,5 +213,10 @@ public class BXFolder extends BXAbstractResource implements FolderResource {
     q.bind("$trgdir", trgdir.isEmpty() ? "" : trgdir + SEP);
     q.bind("$prefix", path + SEP);
     q.execute();
+  }
+
+  @Override
+  public boolean isLockedOutRecursive(final Request request) {
+    return false;
   }
 }
