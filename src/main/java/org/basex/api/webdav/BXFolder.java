@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
 import org.basex.server.Query;
@@ -89,6 +90,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource {
 
           return new BXDocument(db, doc, factory, user, pass);
         } finally {
+          s.execute(new Close());
           s.close();
         }
       } catch(Exception ex) {

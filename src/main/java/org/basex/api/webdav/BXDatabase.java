@@ -68,9 +68,6 @@ public class BXDatabase extends BXFolder {
     return db;
   }
 
-  @Override
-  public void copyTo(final CollectionResource toCollection, final String name) {
-  }
   protected void delete(final Session s) throws BaseXException {
     s.execute(new Close());
     s.execute(new DropDB(db));
@@ -84,7 +81,8 @@ public class BXDatabase extends BXFolder {
   @Override
   protected void copyToRoot(final Session s, final String n)
       throws BaseXException {
-    s.execute(new Copy(db, n));
+    s.execute(new Copy(db, n)); }
+  
   protected void moveToRoot(final Session s, final String n)
       throws BaseXException {
     rename(s, n);

@@ -5,6 +5,7 @@ import static java.lang.Integer.*;
 import java.util.Date;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Add;
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.server.Query;
@@ -209,6 +210,7 @@ public abstract class BXResource implements Resource {
     // path contains dummy document
     s.execute(new Open(db));
     s.execute(new Delete(dummy));
+    s.execute(new Close());
     return true;
   }
 
@@ -227,6 +229,7 @@ public abstract class BXResource implements Resource {
 
     s.execute(new Open(db));
     s.execute(new Add(DUMMYCONTENT, DUMMY, p));
+    s.execute(new Close());
     return true;
   }
 }
