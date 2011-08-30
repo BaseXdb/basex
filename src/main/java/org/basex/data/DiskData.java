@@ -127,7 +127,7 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void flush() {
-    if(!meta.prop.is(Prop.FORCEFLUSH)) return;
+    if(!meta.prop.is(Prop.AUTOFLUSH)) return;
     try {
       if(meta.dirty) write();
       table.flush();

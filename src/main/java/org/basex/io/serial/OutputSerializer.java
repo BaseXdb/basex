@@ -279,7 +279,7 @@ public abstract class OutputSerializer extends Serializer {
   @Override
   public void finishItem(final Item it) throws IOException {
     if(ind) print(' ');
-    byte[] atom = atom(it);
+    final byte[] atom = atom(it);
     for(int a = 0; a < atom.length; a += cl(atom, a)) code(cp(atom, a));
     ind = format;
     item = true;

@@ -258,7 +258,7 @@ public final class JSONParser extends InputParser {
   private QueryException error(final String msg, final Object... ext)
       throws QueryException {
 
-    int[] lc = new InputInfo(this).lineCol();
+    final int[] lc = new InputInfo(this).lineCol();
     throw JSONPARSE.thrw(input, lc[0], lc[1], Util.inf(msg, ext));
   }
 }

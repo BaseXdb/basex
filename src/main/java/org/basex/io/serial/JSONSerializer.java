@@ -87,7 +87,7 @@ public final class JSONSerializer extends OutputSerializer {
 
     if(level > 0) {
       indent(level);
-      byte[] par = types.get(level - 1);
+      final byte[] par = types.get(level - 1);
       if(eq(par, OBJ)) {
         print('"');
         print(name(tag));
@@ -119,7 +119,7 @@ public final class JSONSerializer extends OutputSerializer {
 
   @Override
   public void finishText(final byte[] text) throws IOException {
-    byte[] type = types.get(level - 1);
+    final byte[] type = types.get(level - 1);
     if(eq(type, STR)) {
       print('"');
       for(final byte ch : text) code(ch);
@@ -135,7 +135,7 @@ public final class JSONSerializer extends OutputSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     finishOpen();
-    byte[] type = types.get(level);
+    final byte[] type = types.get(level);
     if(eq(type, STR)) {
       print("\"\"");
     } else if(eq(type, NULL)) {
