@@ -42,8 +42,9 @@ public class BXDatabase extends BXFolder {
       final String info;
       final Session s = factory.login(user, pass);
       try {
-        final Query q = s.query("declare variable $p as xs:string external; "
-            + "db:info($p)");
+        final Query q = s.query(
+            "declare variable $p as xs:string external; " +
+            "db:info($p)");
         q.bind("$p", db);
         info = q.execute();
       } finally {

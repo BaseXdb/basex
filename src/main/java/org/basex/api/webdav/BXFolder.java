@@ -143,9 +143,10 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     try {
       final Session s = factory.login(user, pass);
       try {
-        final Query q = s.query("declare variable $d as xs:string external; "
-            + "declare variable $p as xs:string external; "
-            + "for $r in db:list($d) return substring-after($r,$p)");
+        final Query q = s.query(
+            "declare variable $d as xs:string external; " +
+            "declare variable $p as xs:string external; " +
+            "for $r in db:list($d) return substring-after($r,$p)");
         q.bind("$d", db + SEP + path);
         q.bind("$p", path);
         while(q.more()) {
@@ -153,8 +154,8 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
-            if(!p.equals(DUMMY)) ch.add(new BXDocument(db, path + SEP + p,
-                factory, user, pass));
+            if(!p.equals(DUMMY))
+              ch.add(new BXDocument(db, path + SEP + p, factory, user, pass));
           } else {
             final String folder = path + SEP + p.substring(0, ix);
             if(!paths.contains(folder)) {
