@@ -48,7 +48,7 @@ public final class ReplaceTest {
     long len1 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
     // deactivate flushing to speed up querying
-    new Set(Prop.FORCEFLUSH, false).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
 
     // replace texts with random doubles
     final Random rnd = new Random();
@@ -59,7 +59,7 @@ public final class ReplaceTest {
     }
 
     // perform final, flushed replacement
-    new Set(Prop.FORCEFLUSH, true).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, true).execute(CONTEXT);
 
     long len2 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
     assertEquals(len1, len2);

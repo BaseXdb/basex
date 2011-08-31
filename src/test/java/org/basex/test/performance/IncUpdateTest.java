@@ -40,7 +40,7 @@ public final class IncUpdateTest {
   @Before
   public void init() throws Exception {
     new CreateDB(DBNAME, "<xml/>").execute(CONTEXT);
-    new Set(Prop.FORCEFLUSH, false).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
   }
 
   /**

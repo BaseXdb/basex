@@ -102,7 +102,7 @@ public final class CollAddTest {
    * @throws Exception exception
    */
   private void add(final int n, final boolean flush) throws Exception {
-    new Set(Prop.FORCEFLUSH, flush).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, flush).execute(CONTEXT);
 
     // Create test database
     Command cmd = new CreateDB(DBNAME);

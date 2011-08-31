@@ -37,12 +37,12 @@ public final class CollStressTest {
     final CreateDB cmd = new CreateDB(DBNAME);
     cmd.execute(CONTEXT);
     // Speed up updates and add documents
-    new Set(Prop.FORCEFLUSH, false).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
     new Set(Prop.INTPARSE, true).execute(CONTEXT);
     for(int i = 0; i < SIZE; i++) {
       new Add("<xml/>", Integer.toString(i)).execute(CONTEXT);
     }
-    new Set(Prop.FORCEFLUSH, true).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, true).execute(CONTEXT);
   }
 
   /**
