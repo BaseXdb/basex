@@ -77,10 +77,12 @@ public final class Replace extends ACreate {
 
     try {
       if(lock) ctx.register(true);
-      // delete documents
-      for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
       // add new document
       Add.add(path, target, input, ctx, null, false);
+      // delete old documents if addition was successful
+      for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
+      // flushes changes
+      data.flush();
     } finally {
       if(lock) ctx.unregister(true);
     }
