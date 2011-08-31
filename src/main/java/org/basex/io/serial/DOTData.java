@@ -1,5 +1,6 @@
 package org.basex.io.serial;
 
+import static org.basex.core.Text.*;
 import org.basex.data.ExprInfo;
 import org.basex.util.Util;
 
@@ -15,16 +16,16 @@ final class DOTData {
 
   /** Node entry. */
   static final String HEADER =
-    "digraph BaseXAlgebra {\n" +
-    "  node [shape=box style=bold width=0 height=0];\n" +
-    "  node [fontsize=12 fontname=\"" + FONT + "\"];";
+    "digraph BaseXAlgebra {" + NL +
+    "node [shape=box style=bold width=0 height=0];" + NL +
+    "node [fontsize=12 fontname=\"" + FONT + "\"];";
   /** Node entry. */
   static final String FOOTER = "}";
 
   /** Node entry. */
-  static final String DOTNODE = "  node% [label=\"%\" color=\"#%\"];";
+  static final String DOTNODE = "node% [label=\"%\" color=\"#%\"];";
   /** Link entry. */
-  static final String DOTLINK = "  node% -> node%;";
+  static final String DOTLINK = "node% -> node%;";
   /** Node entry. */
   static final String DOTATTR = "\\n%: %";
 

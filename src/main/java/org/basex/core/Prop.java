@@ -68,8 +68,8 @@ public final class Prop extends AProp {
   public static final Object[] WRITEBACK = { "WRITEBACK", false };
   /** Forces database creation for unknown documents. */
   public static final Object[] FORCECREATE = { "FORCECREATE", false };
-  /** Forces database flushing after updates. */
-  public static final Object[] FORCEFLUSH = { "FORCEFLUSH", true };
+  /** Flushes the database after each update. */
+  public static final Object[] AUTOFLUSH = { "AUTOFLUSH", true };
   /** Default XQuery version. */
   public static final Object[] XQUERY3 = { "XQUERY3", true };
 

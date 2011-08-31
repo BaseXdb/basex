@@ -119,7 +119,7 @@ final class MapRenderer {
       if(draw) {
         // color each full-text hit
         g.setColor(r.pos != null && r.pos.contains(span.pos) &&
-            !span.special ? COLORFT : textc);
+            !span.special ? GREEN : textc);
         g.drawString(string(tok), xx + ll, yy);
       }
       ll += wl;
@@ -347,7 +347,7 @@ final class MapRenderer {
         int cttmp = 0;
         int wltmp = wl / ct;
         while(cttmp < ct) {
-          if(pp - ct + cttmp < ftp.size()) g.setColor(COLORFT);
+          if(pp - ct + cttmp < ftp.size()) g.setColor(GREEN);
 
           while(ll + wltmp >= ww) {
             if(draw) g.fillRect(xx + ll, yy, ww - ll, r.thumbfh);
@@ -446,7 +446,7 @@ final class MapRenderer {
 
       if(draw) {
         // draw word
-        g.setColor(ftp != null && ftp.contains(count) ? COLORFT : textc);
+        g.setColor(ftp != null && ftp.contains(count) ? GREEN : textc);
         g.fillRect((int) (xx + ll), yy, wl, r.thumbfh);
       }
 
@@ -748,7 +748,7 @@ final class MapRenderer {
         wl = 0;
       }
       final boolean pm = !ftChar(tl.get(i)[tl.get(i).length - 1]);
-      if(ttcol.get(i)) g.setColor(COLORFT);
+      if(ttcol.get(i)) g.setColor(GREEN);
       g.drawString(string(tl.get(i)), xx + wl, yy);
       if(i == ul) {
         g.drawLine(xx + wl, yy + 1, xx + wl + (pm ? l - sw : l), yy + 1);

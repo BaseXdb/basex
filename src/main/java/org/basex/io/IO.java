@@ -27,6 +27,8 @@ public abstract class IO {
   public static final String CSVSUFFIX = ".csv";
   /** Text file suffix. */
   public static final String TXTSUFFIX = ".txt";
+  /** JSON file suffix. */
+  public static final String JSONSUFFIX = ".json";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
   /** File prefix. */

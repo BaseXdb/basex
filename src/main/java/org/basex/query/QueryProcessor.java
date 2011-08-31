@@ -16,7 +16,6 @@ import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.JavaFunc;
 import org.basex.query.item.Atm;
@@ -196,12 +195,12 @@ public final class QueryProcessor extends Progress {
    * @throws IOException query exception
    * @throws QueryException query exception
    */
-  public XMLSerializer getSerializer(final OutputStream os) throws IOException,
+  public Serializer getSerializer(final OutputStream os) throws IOException,
       QueryException {
 
     compile();
     try {
-      return new XMLSerializer(os, ctx.serProp(true));
+      return Serializer.get(os, ctx.serProp(true));
     } catch(final SerializerException ex) {
       throw new QueryException(null, ex);
     }

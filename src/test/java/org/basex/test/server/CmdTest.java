@@ -25,6 +25,7 @@ import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.DropUser;
 import org.basex.core.cmd.Export;
 import org.basex.core.cmd.Find;
+import org.basex.core.cmd.Flush;
 import org.basex.core.cmd.Get;
 import org.basex.core.cmd.Grant;
 import org.basex.core.cmd.Help;
@@ -306,6 +307,16 @@ public class CmdTest {
     no(new Find("1"));
     ok(new CreateDB(NAME, FILE));
     ok(new Find("1"));
+  }
+
+  /** Command test. */
+  @Test
+  public final void flush() {
+    no(new Flush());
+    ok(new CreateDB(NAME));
+    ok(new Flush());
+    ok(new Close());
+    no(new Flush());
   }
 
   /** Command test. */

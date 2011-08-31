@@ -167,15 +167,11 @@ public abstract class Builder extends Progress {
 
   /**
    * Closes an element.
-   * @param nm tag name
    * @throws IOException I/O exception
    */
-  public final void endElem(final byte[] nm) throws IOException {
+  public final void endElem() throws IOException {
     checkStop();
-
-    if(--lvl == 0 || tags.id(nm) != tstack.get(lvl))
-      error(CLOSINGTAG, parser.detail(), nm, tags.key(tstack.get(lvl)));
-
+    --lvl;
     final int pre = pstack.get(lvl);
     setSize(pre, meta.size - pre);
     ns.close(pre);

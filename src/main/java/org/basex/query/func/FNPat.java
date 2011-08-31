@@ -17,7 +17,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.ItemCache;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -111,16 +110,14 @@ public final class FNPat extends FuncCall {
     final String str = string(val);
     final Matcher m = p.matcher(str);
 
-    final NodeCache nc = new NodeCache();
-    final FElem root = new FElem(ANALYZE, nc, new NodeCache(), EMPTY,
-        new Atts().add(FN, FNURI), null);
+    final FElem root = new FElem(ANALYZE, new Atts().add(FN, FNURI), EMPTY);
     int s = 0;
     while(m.find()) {
-      if(s != m.start()) nonmatch(str.substring(s, m.start()), root, nc);
-      match(m, str, root, nc, 0);
+      if(s != m.start()) nonmatch(str.substring(s, m.start()), root);
+      match(m, str, root, 0);
       s = m.end();
     }
-    if(s != str.length()) nonmatch(str.substring(s), root, nc);
+    if(s != str.length()) nonmatch(str.substring(s), root);
     return root;
   }
 
@@ -129,32 +126,29 @@ public final class FNPat extends FuncCall {
    * @param m matcher
    * @param str string
    * @param par parent
-   * @param nc child iterator
    * @param g group number
    * @return next group number and position in string
    */
   private int[] match(final Matcher m, final String str, final FElem par,
-      final NodeCache nc, final int g) {
+      final int g) {
 
-    final FElem nd = new FElem(g == 0 ? MATCH : MGROUP, par);
-    if(g > 0) nd.atts.add(new FAttr(NR, token(g), nd));
+    final FElem nd = new FElem(g == 0 ? MATCH : MGROUP);
+    if(g > 0) nd.add(new FAttr(NR, token(g)));
 
     final int start = m.start(g), end = m.end(g), gc = m.groupCount();
     int[] pos = { g + 1, start }; // group and position in string
     while(pos[0] <= gc && m.end(pos[0]) <= end) {
       final int st = m.start(pos[0]);
       if(st >= 0) { // group matched
-        if(pos[1] < st) {
-          nd.children.add(new FTxt(token(str.substring(pos[1], st)), nd));
-        }
-        pos = match(m, str, nd, nd.children, pos[0]);
+        if(pos[1] < st) nd.add(new FTxt(token(str.substring(pos[1], st))));
+        pos = match(m, str, nd, pos[0]);
       } else pos[0]++; // skip it
     }
     if(pos[1] < end) {
-      nd.children.add(new FTxt(token(str.substring(pos[1], end)), nd));
+      nd.add(new FTxt(token(str.substring(pos[1], end))));
       pos[1] = end;
     }
-    nc.add(nd);
+    par.add(nd);
     return pos;
   }
 
@@ -162,13 +156,11 @@ public final class FNPat extends FuncCall {
    * Processes a non-match.
    * @param text text
    * @param par root node
-   * @param nc child iterator
    */
-  private void nonmatch(final String text, final FElem par,
-      final NodeCache nc) {
-    final FElem sub = new FElem(NONMATCH, par);
-    sub.children.add(new FTxt(token(text), sub));
-    nc.add(sub);
+  private void nonmatch(final String text, final FElem par) {
+    final FElem sub = new FElem(NONMATCH);
+    sub.add(new FTxt(token(text)));
+    par.add(sub);
   }
 
   /**

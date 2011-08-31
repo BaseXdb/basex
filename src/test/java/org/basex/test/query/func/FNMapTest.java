@@ -1,6 +1,5 @@
 package org.basex.test.query.func;
 
-import org.basex.query.QueryException;
 import org.basex.query.func.Function;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
@@ -15,10 +14,9 @@ import org.junit.Test;
 public final class FNMapTest extends AdvancedQueryTest {
   /**
    * Test method for the map:new() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void mapNew() throws QueryException {
+  public void mapNew() {
     final String fun = check(Function.MAPNEW);
     query("exists(" + fun + "())", "true");
     query("map:size(" + fun + "())", "0");
@@ -28,10 +26,9 @@ public final class FNMapTest extends AdvancedQueryTest {
 
   /**
    * Test method for the map:entry() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void mapEntry() throws QueryException {
+  public void mapEntry() {
     final String fun = check(Function.MAPENTRY);
     query("exists(" + fun + "('a', 'b'))", "true");
     query("exists(" + fun + "(1, 2))", "true");
@@ -42,10 +39,9 @@ public final class FNMapTest extends AdvancedQueryTest {
 
   /**
    * Test method for the map:get() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void mapGet() throws QueryException {
+  public void mapGet() {
     final String fun = check(Function.MAPGET);
     query(fun + "(map:new(), 1)", "");
     query(fun + "(map:entry(1,2), 1)", "2");
@@ -53,10 +49,9 @@ public final class FNMapTest extends AdvancedQueryTest {
 
   /**
    * Test method for the map:contains() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void mapContains() throws QueryException {
+  public void mapContains() {
     final String fun = check(Function.MAPCONT);
     query(fun + "(map:new(), 1)", "false");
     query(fun + "(map:entry(1,2), 1)", "true");
@@ -64,30 +59,27 @@ public final class FNMapTest extends AdvancedQueryTest {
 
   /**
    * Test method for the map:remove() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void mapRemove() throws QueryException {
+  public void mapRemove() {
     final String fun = check(Function.MAPREM);
     query("map:size(" + fun + "(map:entry(1,2),1))", "0");
   }
 
   /**
    * Test method for the map:size() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void mapSize() throws QueryException {
+  public void mapSize() {
     final String fun = check(Function.MAPSIZE);
     query(fun + "(map:entry(1,2))", "1");
   }
 
   /**
    * Test method for the map:keys() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void mapKeys() throws QueryException {
+  public void mapKeys() {
     final String fun = check(Function.MAPKEYS);
     query("for $i in " + fun + "(map:new(" +
         "for $i in 1 to 3 return map:entry($i, $i+1))) order by $i return $i",
@@ -99,10 +91,9 @@ public final class FNMapTest extends AdvancedQueryTest {
 
   /**
    * Test method for the map:collation() function.
-   * @throws QueryException database exception
    */
   @Test
-  public void mapCollation() throws QueryException {
+  public void mapCollation() {
     final String fun = check(Function.MAPCOLL);
     query(fun + "(map:new())",
         "http://www.w3.org/2005/xpath-functions/collation/codepoint");

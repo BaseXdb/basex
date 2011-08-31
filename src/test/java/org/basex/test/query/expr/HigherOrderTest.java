@@ -1,7 +1,6 @@
 package org.basex.test.query.expr;
 
-import static org.junit.Assert.*;
-import org.basex.query.QueryException;
+import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.junit.Test;
 
@@ -14,20 +13,18 @@ import org.junit.Test;
 public final class HigherOrderTest extends AdvancedQueryTest {
   /**
    * Test for name shadowing.
-   * @throws QueryException exception
    */
   @Test
-  public void shadowingTest() throws QueryException {
+  public void shadowingTest() {
     query("let $x := 1 to 9 return fold-left(" +
         "function($x, $y){$x * 10 + $y}, 0, $x)", "123456789");
   }
 
   /**
    * Test for name heavy currying.
-   * @throws QueryException exception
    */
   @Test
-  public void curryTest() throws QueryException {
+  public void curryTest() {
     query("let $digits := 1 to 9," +
         "$base-cmb := function($b, $n, $d) { $b * $n + $d }," +
         "$dec-cmb := $base-cmb(10, ?, ?)," +
@@ -38,10 +35,9 @@ public final class HigherOrderTest extends AdvancedQueryTest {
 
   /**
    * Test for name heavy currying.
-   * @throws QueryException exception
    */
   @Test
-  public void curryTest2() throws QueryException {
+  public void curryTest2() {
     query("let $digits := 1 to 9," +
         "$base-cmb := function($n, $d) { 10 * $n + $d }," +
         "$from-digits := fold-left($base-cmb, 0, ?)" +
@@ -51,10 +47,9 @@ public final class HigherOrderTest extends AdvancedQueryTest {
 
   /**
    * Test for name heavy currying.
-   * @throws QueryException exception
    */
   @Test
-  public void foldRightTest() throws QueryException {
+  public void foldRightTest() {
     query("declare function local:before-first(" +
         "  $input as item()*," +
         "  $pred as function(item()) as item()*" +
@@ -70,10 +65,9 @@ public final class HigherOrderTest extends AdvancedQueryTest {
 
   /**
    * Test for name heavy currying.
-   * @throws QueryException exception
    */
   @Test
-  public void typeTest() throws QueryException {
+  public void typeTest() {
     query("declare function local:f($x as xs:long, $y as xs:NCName)" +
         "    as element(e) {" +
         "  <e x='{$x}' y='{$y}'/>" +
@@ -85,20 +79,12 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   /**  Test for name heavy currying. */
   @Test
   public void placeHolderTest() {
-    try {
-      fail("succeeded with: " + query("string-join(('a', 'b'), )(',')"));
-    } catch(final QueryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("XPST0003"));
-    }
+    error("string-join(('a', 'b'), )(',')", Err.FUNCMISS);
   }
 
   /**  Test for empty-sequence() as function item. */
   @Test
   public void emptyFunTest() {
-    try {
-      fail("succeeded with: " + query("()()"));
-    } catch(final QueryException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("XPTY0004"));
-    }
+    error("()()", Err.XPEMPTY);
   }
 }

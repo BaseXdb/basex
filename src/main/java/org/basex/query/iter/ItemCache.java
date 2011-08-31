@@ -1,6 +1,7 @@
 package org.basex.query.iter;
 
 import java.io.IOException;
+
 import org.basex.data.Result;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
@@ -141,7 +142,7 @@ public final class ItemCache extends ValueIter implements Result {
   }
 
   @Override
-  public Value finish() {
+  public Value value() {
     return Seq.get(item, size);
   }
 

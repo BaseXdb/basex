@@ -446,6 +446,8 @@ public interface QueryText {
   byte[] ZIP = token("zip");
   /** HOF token. */
   byte[] HOF = token("hof");
+  /** JSON token. */
+  byte[] JSON = token("json");
   /** MAP token. */
   byte[] MAP = token(MAPSTR);
   /** Package token. */
@@ -498,6 +500,8 @@ public interface QueryText {
   byte[] FTURI = token(Text.URL + "/ft");
   /** Higher-order URI. */
   byte[] HOFURI = token(Text.URL + "/hof");
+  /** JSON URI. */
+  byte[] JSONURI = token(Text.URL + "/json");
   /** Sentiment URI. */
   byte[] SENTURI = token(Text.URL + "/sent");
   /** Utility module URI. */
@@ -604,7 +608,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTDESC = "optimizing descendant-or-self step(s)";
   /** Optimization info. */
-  String OPTPATH = "merging axis paths";
+  String OPTMERGE = "merging axis paths";
   /** Optimization info. */
   String OPTPRE = "pre-evaluating %";
   /** Optimization info. */
@@ -635,6 +639,8 @@ public interface QueryText {
   String OPTPREF = "skipping namespace test for \"%\"";
   /** Optimization info. */
   String OPTNAME = "removing unknown tag/attribute %";
+  /** Optimization info. */
+  String OPTPATH = "removing non-existing path %";
   /** Optimization info. */
   String OPTTXTINDEX = "applying text index";
   /** Optimization info. */

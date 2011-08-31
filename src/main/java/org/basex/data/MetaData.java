@@ -148,7 +148,7 @@ public final class MetaData {
     try {
       // return true if the storage version is up-to-date and
       // if the original and the specified file path and date are equal
-      in = new DataInput(file(file, DATAINFO));
+      in = new DataInput(file(file, DATAINF));
       boolean ok = true;
       int i = 3;
       String k;

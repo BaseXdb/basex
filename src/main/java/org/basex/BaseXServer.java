@@ -3,9 +3,9 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import org.basex.core.MainProp;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -52,7 +52,7 @@ public class BaseXServer extends Main {
   /** EventsListener. */
   private final EventListener events = new EventListener();
   /** Blocked clients. */
-  public final TokenIntMap failed = new TokenIntMap();
+  public final TokenIntMap blocked = new TokenIntMap();
   /** Server socket. */
   private ServerSocket socket;
   /** User query. */
@@ -64,7 +64,7 @@ public class BaseXServer extends Main {
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new BaseXServer(args);
+    if(new BaseXServer(args).failed()) System.exit(1);
   }
 
   /**
@@ -73,9 +73,11 @@ public class BaseXServer extends Main {
    */
   public BaseXServer(final String... args) {
     super(args);
-    check(success);
+    if(failed) return;
 
     final int port = context.mprop.num(MainProp.SERVERPORT);
+    final int eport = context.mprop.num(MainProp.EVENTPORT);
+
     if(service) {
       Util.outln(start(port, getClass(), args));
       Performance.sleep(1000);
@@ -86,13 +88,18 @@ public class BaseXServer extends Main {
       // execute command-line arguments
       if(commands != null) {
         final Boolean b = execute(commands);
-        check(b == null || b);
+        if(failed(b == null || b)) return;
       }
 
       log = new Log(context, quiet);
       log.write(SERVERSTART);
-      socket = new ServerSocket(port);
-      esocket = new ServerSocket(context.mprop.num(MainProp.EVENTPORT));
+      socket = new ServerSocket();
+      socket.setReuseAddress(true);
+      socket.bind(new InetSocketAddress(port));
+
+      esocket = new ServerSocket();
+      esocket.setReuseAddress(true);
+      esocket.bind(new InetSocketAddress(eport));
       stop = stopFile(port);
 
       // guarantee correct shutdown...
@@ -114,7 +121,7 @@ public class BaseXServer extends Main {
     } catch(final Exception ex) {
       if(log != null) log.write(ex.getMessage());
       Util.errln(Util.server(ex));
-      check(false);
+      failed = true;
     }
   }
 
@@ -132,12 +139,12 @@ public class BaseXServer extends Main {
         } else {
           final byte[] address = s.getInetAddress().getAddress();
           if(cl.init()) {
-            failed.delete(address);
+            blocked.delete(address);
             context.add(cl);
           } else {
-            int delay = failed.get(address);
+            int delay = blocked.get(address);
             delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
-            failed.add(address, delay);
+            blocked.add(address, delay);
             new ClientDelayer(delay, cl, this);
           }
         }

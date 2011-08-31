@@ -390,7 +390,7 @@ public final class TreeView extends View implements TreeConstants {
       case HIGHLIGHT:
         borderColor = color5;
         final int alpha = 0xDD000000;
-        final int rgb = GUIConstants.COLORCELL.getRGB();
+        final int rgb = GUIConstants.LGRAY.getRGB();
         fillColor = new Color(rgb + alpha, true);
         if(h > 4) border = true;
         fill = !br && !marked;

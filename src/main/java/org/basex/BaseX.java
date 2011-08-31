@@ -46,16 +46,16 @@ public class BaseX extends Main {
    * @param args command-line arguments
    */
   public static void main(final String... args) {
-    new BaseX(args);
+    if(new BaseX(args).failed()) System.exit(1);
   }
 
   /**
    * Constructor.
    * @param args command-line arguments
    */
-  protected BaseX(final String... args) {
+  public BaseX(final String... args) {
     super(args);
-    check(success);
+    if(failed) return;
     run();
   }
 
@@ -66,31 +66,32 @@ public class BaseX extends Main {
 
       boolean u = false;
       if(input != null) {
-        check(execute(new Check(input), verbose));
+        if(failed(execute(new Check(input), verbose))) return;
       }
 
       if(file != null) {
         // query file contents
         context.query = IO.get(file);
         final String qu = content();
-        check(qu != null && execute(new XQuery(qu), verbose));
+        failed(qu != null && execute(new XQuery(qu), verbose));
       } else if(query != null) {
         // query file contents
-        check(execute(new XQuery(query), verbose));
+        failed(execute(new XQuery(query), verbose));
       } else if(commands != null) {
         // execute command-line arguments
         final Boolean b = execute(commands);
-        check(b == null || b);
+        failed(b == null || b);
       } else {
         // enter interactive mode
         Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
         u = console();
       }
+      if(failed) return;
       if(writeProps) context.mprop.write();
       quit(u);
     } catch(final IOException ex) {
       Util.errln(Util.server(ex));
-      check(false);
+      failed = true;
     }
   }
 

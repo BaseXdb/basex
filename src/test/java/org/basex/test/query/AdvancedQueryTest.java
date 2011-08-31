@@ -1,6 +1,7 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
+
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.query.QueryException;
@@ -25,12 +26,14 @@ public abstract class AdvancedQueryTest {
    * Runs the specified query.
    * @param query query string
    * @return result
-   * @throws QueryException database exception
    */
-  protected static String query(final String query) throws QueryException {
+  protected static String query(final String query) {
     final QueryProcessor qp = new QueryProcessor(query, CONTEXT);
     try {
       return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
+    } catch(final QueryException ex) {
+      fail("Query failed:\n" + query + "\nMessage: " + ex.getMessage());
+      return null;
     } finally {
       try { qp.close(); } catch(final IOException e) { }
     }
@@ -40,22 +43,25 @@ public abstract class AdvancedQueryTest {
    * Checks if a query yields the specified string.
    * @param query query string
    * @param result query result
-   * @throws QueryException database exception
    */
-  protected static void query(final String query, final Object result)
-      throws QueryException {
-    assertEquals(result.toString(), query(query));
+  protected static void query(final String query, final Object result) {
+    final String res = query(query);
+    final String exp = result.toString();
+    if(!res.equals(exp))
+      fail("Wrong result:\n[Q] " + query + "\n[E] \u00bb" + result +
+          "\u00ab\n[F] \u00bb" + res + "\u00ab");
   }
 
   /**
-   * Checks if a query yields the specified error code.
+   * Checks if a query yields the specified result.
    * @param query query string
    * @param result query result
-   * @throws QueryException database exception
    */
-  protected static void contains(final String query, final String result)
-      throws QueryException {
-    assertContains(query(query), result);
+  protected static void contains(final String query, final String result) {
+    final String res = query(query);
+    if(!res.contains(result))
+      fail("Result does not contain \"" + result + "\":\n" + query + "\n[E] " +
+          result + "\n[F] " + res);
   }
 
   /**
@@ -64,11 +70,15 @@ public abstract class AdvancedQueryTest {
    * @param error expected error
    */
   protected static void error(final String query, final Err... error) {
+    final QueryProcessor qp = new QueryProcessor(query, CONTEXT);
     try {
-      query(query);
-      fail("[" + error[0] + "] expected for query: " + query);
+      final String res = qp.execute().toString().replaceAll("(\\r|\\n) *", "");
+      fail("Query did not fail:\n" + query + "\n[E] " +
+          error[0] + "...\n[F] " + res);
     } catch(final QueryException ex) {
       check(ex, error);
+    } finally {
+      try { qp.close(); } catch(final IOException e) { }
     }
   }
 
@@ -83,17 +93,6 @@ public abstract class AdvancedQueryTest {
     for(final Err e : error) found |= msg.contains(e.code());
     if(!found) {
       fail("'" + error[0].code() + "' not contained in '" + msg + "'.");
-    }
-  }
-
-  /**
-   * Checks if a string is contained in another string.
-   * @param str string
-   * @param sub sub string
-   */
-  private static void assertContains(final String str, final String sub) {
-    if(!str.contains(sub)) {
-      fail("'" + sub + "' not contained in '" + str + "'.");
     }
   }
 

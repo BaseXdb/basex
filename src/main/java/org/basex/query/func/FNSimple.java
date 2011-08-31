@@ -279,8 +279,8 @@ public final class FNSimple extends FuncCall {
           // compare elements
           if(t1 == NodeType.ELM) {
             // compare number of attributes
-            if(s1.attributes().finish().size() !=
-              s2.attributes().finish().size()) return false;
+            if(s1.attributes().value().size() !=
+              s2.attributes().value().size()) return false;
 
             // compare attributes names and values
             final AxisIter att1 = s1.attributes();

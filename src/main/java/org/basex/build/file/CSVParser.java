@@ -126,19 +126,28 @@ public final class CSVParser extends SingleParser {
             continue;
           }
         }
-        if(ch != 0x0D) tb.add(ch);
+        while(ch == '\r') {
+          ch = bi.readChar();
+          if(ch != '\n') tb.add('\n');
+        }
+        if(ch != '\r') tb.add(ch);
       } else if(ch == separator) {
         if(open) {
           open();
           open = false;
         }
         add(tb);
-      } else if(ch == 0x0A) {
+      } else if(ch == '\r') {
+        ch = bi.readChar();
+        if(ch == '\n') continue;
+        finish(tb, open);
+        open = true;
+      } else if(ch == '\n') {
         finish(tb, open);
         open = true;
       } else if(ch == '"') {
         quoted = true;
-      } else if(ch != 0x0D) {
+      } else {
         tb.add(ch);
       }
       ch = 0;
@@ -146,7 +155,7 @@ public final class CSVParser extends SingleParser {
     bi.close();
 
     finish(tb, open);
-    builder.endElem(CSV);
+    builder.endElem();
   }
 
   /**
@@ -177,9 +186,7 @@ public final class CSVParser extends SingleParser {
     }
     add(tb);
     if(close) {
-      if(simple || row != 0) {
-        builder.endElem(row == 0 ? HEADER : RECORD);
-      }
+      if(simple || row != 0) builder.endElem();
       ++row;
     }
     col = 0;
@@ -197,16 +204,18 @@ public final class CSVParser extends SingleParser {
       return;
     }
 
-    byte[] tag = simple ? ENTRY : headers.get(col);
-    if(tag == null) {
-      addHeader(COLUMN);
-      tag = headers.get(col);
+    byte[] t;
+    if(simple) {
+      t = ENTRY;
+    } else {
+      if(col == headers.size()) addHeader(COLUMN);
+      t = headers.get(col);
     }
 
     if(tb.size() != 0 || simple) {
-      builder.startElem(tag, atts);
+      builder.startElem(t, atts);
       builder.text(tb.finish());
-      builder.endElem(tag);
+      builder.endElem();
       tb.reset();
     }
     ++col;

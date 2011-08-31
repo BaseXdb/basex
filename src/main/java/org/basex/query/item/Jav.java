@@ -3,6 +3,7 @@ package org.basex.query.item;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * String item.
@@ -50,6 +51,6 @@ public final class Jav extends Item {
 
   @Override
   public String toString() {
-    return "\"" + val + "\"";
+    return Util.info("\"%\"", val);
   }
 }

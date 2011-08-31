@@ -8,7 +8,6 @@ import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.iter.ItemCache;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -40,11 +39,6 @@ public final class ItemSeq extends Seq {
     final Object[] obj = new Object[(int) size];
     for(int s = 0; s != size; ++s) obj[s] = item[s].toJava();
     return obj;
-  }
-
-  @Override
-  public ItemCache iter() {
-    return new ItemCache(item, (int) size);
   }
 
   @Override

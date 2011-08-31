@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import static org.basex.data.DataText.*;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -10,7 +11,7 @@ import org.basex.util.Util;
 import org.basex.util.XMLToken;
 
 /**
- * This abstract class defines syntax highlighting of text panels.
+ * This class defines syntax highlighting for XQuery files.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -66,7 +67,7 @@ public final class XQuerySyntax extends BaseXSyntax {
     // opened quote
     if(quote != 0) {
       if(ch == quote) quote = 0;
-      return GUIConstants.COLORERROR;
+      return GUIConstants.RED;
     }
 
     // comment
@@ -84,7 +85,7 @@ public final class XQuerySyntax extends BaseXSyntax {
     // quotes
     if(quote == 0 && (ch == '"' || ch == '\'')) {
       quote = ch;
-      return GUIConstants.COLORERROR;
+      return GUIConstants.RED;
     }
 
     // variables
@@ -99,7 +100,7 @@ public final class XQuerySyntax extends BaseXSyntax {
 
     // special characters
     final String word = text.nextWord();
-    if(KEYS.contains(word)) return GUIConstants.color(16);
+    if(KEYS.contains(word)) return GUIConstants.BLUE;
     // special characters
     if(FUNC.contains(word)) return FUNS;
 
@@ -111,12 +112,12 @@ public final class XQuerySyntax extends BaseXSyntax {
   }
 
   @Override
-  public String commentOpen() {
-    return "(:";
+  public byte[] commentOpen() {
+    return XQCOMM_O;
   }
 
   @Override
-  public String commentEnd() {
-    return ":)";
+  public byte[] commentEnd() {
+    return XQCOMM_C;
   }
 }

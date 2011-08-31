@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -17,6 +18,7 @@ import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
 import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
 import org.basex.core.Prop;
@@ -25,24 +27,25 @@ import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.io.Zip;
 import org.basex.io.in.TextInput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.ANode;
 import org.basex.query.item.B64;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.AxisIter;
+import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.ByteList;
@@ -167,8 +170,8 @@ public final class FNZip extends FuncCall {
     try {
       zf = new ZipFile(file);
       // create result node
-      final FElem root = new FElem(E_FILE, ZIP, ZIPURI);
-      root.atts.add(new FAttr(A_HREF, token(path.path()), root));
+      final FElem root = new FElem(E_FILE, new Atts().add(ZIP, ZIPURI), null);
+      root.add(new FAttr(A_HREF, token(path.path())));
       createEntries(paths(zf).iterator(), root, "");
       return root;
     } catch(final IOException ex) {
@@ -223,9 +226,9 @@ public final class FNZip extends FuncCall {
    * @return element
    */
   private FElem createDir(final FElem par, final String name) {
-    final FElem e = new FElem(E_DIR, par);
-    e.atts.add(new FAttr(A_NAME, token(name), e));
-    par.children.add(e);
+    final FElem e = new FElem(E_DIR);
+    e.add(new FAttr(A_NAME, token(name)));
+    par.add(e);
     return e;
   }
 
@@ -235,9 +238,9 @@ public final class FNZip extends FuncCall {
    * @param name name of directory
    */
   private void createFile(final FElem par, final String name) {
-    final FElem e = new FElem(E_ENTRY, par);
-    e.atts.add(new FAttr(A_NAME, token(name), e));
-    par.children.add(e);
+    final FElem e = new FElem(E_ENTRY);
+    e.add(new FAttr(A_NAME, token(name)));
+    par.add(e);
   }
 
   /**
@@ -355,8 +358,8 @@ public final class FNZip extends FuncCall {
               // serialize new nodes
               try {
                 // [CG] update zip files: remove zip namespace
-                final XMLSerializer xml =
-                  new XMLSerializer(zos, serialPar(node, ctx));
+                final Serializer xml =
+                  Serializer.get(zos, serialPar(node, ctx));
                 do {
                   n.serialize(xml);
                 } while((n = ch.next()) != null);

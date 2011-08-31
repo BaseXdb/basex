@@ -376,7 +376,7 @@ public final class FNSeq extends FuncCall {
         return true;
       }
       @Override
-      public Value finish() {
+      public Value value() {
         final Item[] arr = new Item[(int) val.size()];
         final int written = val.writeTo(arr, 0);
         Array.reverse(arr, 0, written);

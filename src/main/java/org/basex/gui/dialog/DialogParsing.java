@@ -155,8 +155,8 @@ public final class DialogParsing extends BaseXBack {
     xmlopts.add(fl);
     if(!rsen) {
       final BaseXBack rs = new BaseXBack(new TableLayout(2, 1));
-      rs.add(new BaseXLabel(USECATHLP).color(GUIConstants.COLORDARK));
-      rs.add(new BaseXLabel(USECATHLP2).color(GUIConstants.COLORDARK));
+      rs.add(new BaseXLabel(USECATHLP).color(GUIConstants.DGRAY));
+      rs.add(new BaseXLabel(USECATHLP2).color(GUIConstants.DGRAY));
       xmlopts.add(rs);
     }
 

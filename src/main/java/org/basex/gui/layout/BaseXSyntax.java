@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import static org.basex.util.Token.*;
 import java.awt.Color;
 
 /**
@@ -34,15 +35,15 @@ public abstract class BaseXSyntax {
    * Returns the start of a comment.
    * @return comment start
    */
-  public String commentOpen() {
-    return "";
+  public byte[] commentOpen() {
+    return EMPTY;
   }
 
   /**
    * Returns the end of a comment.
    * @return comment end
    */
-  public String commentEnd() {
-    return "";
+  public byte[] commentEnd() {
+    return EMPTY;
   }
 }

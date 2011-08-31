@@ -9,7 +9,6 @@ import org.basex.query.item.FPI;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.ANode;
 import org.basex.query.item.QNm;
-import org.basex.query.iter.NodeCache;
 import org.basex.util.Util;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
@@ -47,34 +46,34 @@ public final class BXDoc extends BXNode implements Document {
   @Override
   public BXAttr createAttribute(final String nm) {
     final QNm name = new QNm(token(nm));
-    return new BXAttr(new FAttr(name, EMPTY, null));
+    return new BXAttr(new FAttr(name, EMPTY));
   }
 
   @Override
   public BXAttr createAttributeNS(final String uri, final String qn) {
     final QNm name = new QNm(token(qn), token(uri));
-    return new BXAttr(new FAttr(name, EMPTY, null));
+    return new BXAttr(new FAttr(name, EMPTY));
   }
 
   @Override
   public BXCData createCDATASection(final String dat) {
-    return new BXCData(new FTxt(token(dat), null));
+    return new BXCData(new FTxt(token(dat)));
   }
 
   @Override
   public BXComm createComment(final String dat) {
-    return new BXComm(new FComm(token(dat), null));
+    return new BXComm(new FComm(token(dat)));
   }
 
   @Override
   public BXDocFrag createDocumentFragment() {
-    return new BXDocFrag(new FDoc(new NodeCache(), node.base()));
+    return new BXDocFrag(new FDoc(node.base()));
   }
 
   @Override
   public BXElem createElement(final String nm) {
     final QNm name = new QNm(token(nm));
-    final FElem elm = new FElem(name, null);
+    final FElem elm = new FElem(name);
     elm.base(node.base());
     return new BXElem(elm);
   }
@@ -82,7 +81,7 @@ public final class BXDoc extends BXNode implements Document {
   @Override
   public BXElem createElementNS(final String uri, final String qn) {
     final QNm name = new QNm(token(qn), token(uri));
-    final FElem elm = new FElem(name, null);
+    final FElem elm = new FElem(name);
     elm.base(node.base());
     return new BXElem(elm);
   }
@@ -95,12 +94,12 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXPI createProcessingInstruction(final String t, final String dat) {
-    return new BXPI(new FPI(new QNm(token(t)), token(dat), null));
+    return new BXPI(new FPI(new QNm(token(t)), token(dat)));
   }
 
   @Override
   public BXText createTextNode(final String dat) {
-    return new BXText(new FTxt(token(dat), null));
+    return new BXText(new FTxt(token(dat)));
   }
 
   @Override

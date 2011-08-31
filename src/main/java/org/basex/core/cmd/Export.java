@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -10,8 +11,8 @@ import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IOFile;
 import org.basex.io.out.PrintOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
@@ -81,7 +82,7 @@ public final class Export extends Command {
 
       // serialize file
       final PrintOutput po = new PrintOutput(path);
-      final XMLSerializer xml = new XMLSerializer(po, sp);
+      final Serializer xml = Serializer.get(po, sp);
       xml.node(data, pre);
       xml.close();
       po.close();

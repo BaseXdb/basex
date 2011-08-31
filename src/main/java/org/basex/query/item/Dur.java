@@ -11,6 +11,7 @@ import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Duration item.
@@ -207,6 +208,6 @@ public class Dur extends Item {
 
   @Override
   public final String toString() {
-    return "\"" + Token.string(atom(null)) + "\"";
+    return Util.info("\"%\"", atom(null));
   }
 }

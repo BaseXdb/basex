@@ -19,6 +19,7 @@ public abstract class InputParser {
   public final String query;
   /** Query length. */
   public final int ql;
+
   /** Optional reference to query input. */
   public IO file;
   /** Current query position. */
@@ -31,8 +32,18 @@ public abstract class InputParser {
    * @param q input query
    */
   public InputParser(final String q) {
+    this(q, null);
+  }
+
+  /**
+   * Constructor.
+   * @param q input query
+   * @param f file
+   */
+  public InputParser(final String q, final IO f) {
     query = q;
     ql = query.length();
+    file = f;
   }
 
   /**

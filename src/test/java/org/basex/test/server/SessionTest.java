@@ -51,7 +51,7 @@ public abstract class SessionTest {
   @Test
   public final void commandSerial1() throws BaseXException {
     session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
-    check("<db:results xmlns:db=\"ns\"></db:results>",
+    check("<db:results xmlns:db=\"ns\"/>",
         session.execute("xquery ()"));
   }
 
@@ -148,9 +148,9 @@ public abstract class SessionTest {
   public void querySerial1() throws BaseXException {
     session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     final Query query = session.query(WRAPPER + "()");
-    check("<db:results xmlns:db=\"ns\">", query.init());
+    check("<db:results xmlns:db=\"ns\"", query.init());
     assertFalse("No result was expected.", query.more());
-    check("</db:results>", query.close());
+    check("/>", query.close());
   }
 
   /** Runs a query with additional serialization parameters.
@@ -159,8 +159,8 @@ public abstract class SessionTest {
   public void querySerial2() throws BaseXException {
     // avoid query evaluation, if more()/next() isn't called
     final Query query = session.query(WRAPPER + "1 to 10000000000000");
-    check("<db:results xmlns:db=\"ns\">", query.init());
-    check("</db:results>", query.close());
+    check("<db:results xmlns:db=\"ns\"", query.init());
+    check("/>", query.close());
   }
 
   /** Runs a query with additional serialization parameters.
@@ -168,8 +168,8 @@ public abstract class SessionTest {
   @Test
   public void querySerial3() throws BaseXException {
     final Query query = session.query(WRAPPER + "1 to 2");
-    check("<db:results xmlns:db=\"ns\">", query.init());
-    check("<db:result>1</db:result>", query.next());
+    check("<db:results xmlns:db=\"ns\"", query.init());
+    check("><db:result>1</db:result>", query.next());
     check("<db:result>2</db:result>", query.next());
     check("</db:results>", query.close());
   }

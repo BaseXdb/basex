@@ -39,17 +39,22 @@ public enum Err {
   /** BASX0010: Parsing exception. */
   NOOPTION(BASX, 10, "Unknown database option '%'."),
   /** BASX0011: Parsing exception. */
-  PARWHICH(BASX, 11, "Unexpected element: %."),
+  PARWHICH(BASX, 11, "Unknown element: %."),
   /** BASX0012: Evaluation exception. */
   DOCTRGMULT(BASX, 12, "Single document is expected as replace target."),
   /** BASX0013: Evaluation exception. */
   EMPTYPATH(BASX, 13, "%: Empty path specified."),
   /** BASX0014: Evaluation exception. */
   DBERR(BASX, 14, "%"),
-  /** BASX0015: Evaluation exception. */
-  PROCMM(BASX, 15, Text.PROCMM),
-  /** BASX0016: Evaluation exception. */
-  DBLOCKED(BASX, 16, Text.DBLOCKED),
+  /** BASEX0015: Evaluation exception. */
+  JSONPARSE(BASX, 15, "JSON parser (%:%): %."),
+  /** BASEX0015: Evaluation exception. */
+  JSONMLPARSE(BASX, 15, "JsonML converter: %."),
+  /** BASEX0016: Serialization exception. */
+  JSONSER(BASX, 16, "JSON serialization: %."),
+  /** BASX0017: Invalid value of $argNum in call to fn:partial-apply. */
+  INVPOS(BASX, 17, "Illegal argument position for %: %."),
+
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -154,6 +159,8 @@ public enum Err {
   /** FOHC006: Evaluation exception. */
   NOPARAMS(FOHC, 6, "Specify request element or HTTP URI."),
 
+  // [RS] please add to http://docs.basex.org/wiki/XQuery_Errors
+
   /** PACK0001: Evaluation exception. */
   PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
   /** PACK0002: Evaluation exception. */
@@ -246,6 +253,8 @@ public enum Err {
   /** FORX0004: Evaluation exception. */
   REGERR(FORX, 4, "Regular expression: '%'."),
 
+  // [LW] please add to http://docs.basex.org/wiki/XQuery_Errors
+
   /** FOTY0012: Type exception. */
   NOTYP(FOTY, 12, "Item has no typed value: %."),
   /** FOTY0013: Type exception. */
@@ -256,9 +265,6 @@ public enum Err {
   FNSTR(FOTY, 14, "Function items have no string representation: %."),
   /** FOTY0013: Type exception. */
   FNCMP(FOTY, 15, "Function items cannot be compared: %."),
-
-  /** FOFU0001: Invalid value of $argNum in call to fn:partial-apply. */
-  INVPOS(FOFU, 1, "Illegal argument position for %: %."),
 
   /** FOUP0001: Evaluation exception. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
@@ -347,8 +353,6 @@ public enum Err {
   NOEXPR(XPST, 3, "Expecting expression."),
   /** XPST0003: Parsing exception. */
   WRONGCHAR(XPST, 3, "Expecting \"%\"%."),
-  /** XPST0003: Parsing exception. */
-  WRONGEND(XPST, 3, "Expecting \"%\"."),
   /** XPST0003: Parsing exception. */
   INVENTITY(XPST, 3, "Invalid entity \"%\"."),
   /** XPST0003: Parsing exception. */
@@ -657,27 +661,29 @@ public enum Err {
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
 
   /** FOFD1340: Parsing exception. */
-  WRONGINT(XTDE, 30, "Wrong integer format: \"%\"."),
+  WRONGINT(FOFD, 1340, "Wrong integer format: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  OPTAFTER(XTDE, 30, "Optional digit follows mandatory digits: \"%\"."),
+  OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  DIFFMAND(XTDE, 30, "Mandatory digits must be of the same group: \"%\"."),
+  DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  GROUPADJ(XTDE, 30, "Adjacent grouping separators: \"%\"."),
+  GROUPADJ(FOFD, 1340, "Adjacent grouping separators: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  GROUPSTART(XTDE, 30, "Picture begins with grouping separator: \"%\"."),
+  GROUPSTART(FOFD, 1340, "Picture begins with grouping separator: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  GROUPEND(XTDE, 30, "Picture ends with grouping separator: \"%\"."),
+  GROUPEND(FOFD, 1340, "Picture ends with grouping separator: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  NOMAND(XTDE, 30, "No mandatory digit specified: \"%\"."),
+  NOMAND(FOFD, 1340, "No mandatory digit specified: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  PICDATE(XTDE, 30, "Invalid picture string: \"%\"."),
+  PICDATE(FOFD, 1340, "Invalid picture string: \"%\"."),
   /** FOFD1340: Evaluation exception. */
-  ORDCLOSED(XTDE, 30, "Ordinal is not closed: \"%\"."),
+  ORDCLOSED(FOFD, 1340, "Ordinal is not closed: \"%\"."),
   /** FOFD1350: Evaluation exception. */
-  PICCOMP(XTDE, 30, "Invalid component in string: \"%\"."),
-  /** XTDE1170: Parsing exception. */
-  WRONGINPUT(XTDE, 1170, "Failed to read \"%\": %."),
+  PICCOMP(FOFD, 1350, "Invalid component in string: \"%\"."),
+  /** FOUT1170: Parsing exception. */
+  WRONGINPUT(FOUT, 1170, "Failed to read \"%\": %."),
+
+  // [CG] check error messages: FOUT1190, FOUT1200, add to Wiki
 
   /** XUDY0009: XQuery Update dynamic exception. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),
@@ -807,15 +813,16 @@ public enum Err {
     /** FODC Error type. */ FODC,
     /** FODF Error type. */ FODF,
     /** FODT Error type. */ FODT,
+    /** FOFD Error type. */ FOFD,
     /** FOER Error type. */ FOER,
     /** FOFL Error type. */ FOFL,
-    /** FOFU Error type. */ FOFU,
     /** FOHP Error type. */ FOHC,
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,
     /** FOTY Error type. */ FOTY,
     /** FOUP Error type. */ FOUP,
+    /** FOFD Error type. */ FOUT,
     /** FOZP Error type. */ FOZP,
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
@@ -829,7 +836,6 @@ public enum Err {
     /** XQDY Error type. */ XQDY,
     /** XQST Error type. */ XQST,
     /** XQTY Error type. */ XQTY,
-    /** XQTD Error type. */ XTDE,
     /** XSQL Error type. */ XSQL,
     /** XUDY Error type. */ XUDY,
     /** XUST Error type. */ XUST,

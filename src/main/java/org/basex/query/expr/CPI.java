@@ -52,7 +52,7 @@ public final class CPI extends CFrag {
     int i = -1;
     while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
     v = substring(v, i);
-    return new FPI(new QNm(nm), FPI.parse(v, input), null);
+    return new FPI(new QNm(nm), FPI.parse(v, input));
   }
 
   @Override

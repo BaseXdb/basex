@@ -17,16 +17,13 @@ import org.basex.util.InputInfo;
 public final class MapType extends FuncType {
   /** Key type of the map. */
   public final AtomType keyType;
-  /** The general map type. */
-  public static final MapType ANY_MAP = new MapType(AtomType.AAT,
-      SeqType.ITEM_ZM);
 
   /**
    * Constructor.
    * @param arg argument type
    * @param rt return type
    */
-  private MapType(final AtomType arg, final SeqType rt) {
+  MapType(final AtomType arg, final SeqType rt) {
     super(new SeqType[]{ arg.seq() }, rt);
     keyType = arg;
   }
@@ -56,7 +53,7 @@ public final class MapType extends FuncType {
    * @return map type
    */
   public static MapType get(final AtomType key, final SeqType val) {
-    if(key == AtomType.AAT && val.eq(SeqType.ITEM_ZM)) return ANY_MAP;
+    if(key == AtomType.AAT && val.eq(SeqType.ITEM_ZM)) return SeqType.ANY_MAP;
     return new MapType(key, val);
   }
 

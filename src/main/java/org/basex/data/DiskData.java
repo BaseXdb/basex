@@ -50,7 +50,7 @@ public final class DiskData extends Data {
     meta = new MetaData(db, ctx);
 
     final int cats = ctx.prop.num(Prop.CATEGORIES);
-    final DataInput in = new DataInput(meta.dbfile(DATAINFO));
+    final DataInput in = new DataInput(meta.dbfile(DATAINF));
     try {
       // read meta data and indexes
       meta.read(in);
@@ -109,7 +109,7 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   private void write() throws IOException {
-    final DataOutput out = new DataOutput(meta.dbfile(DATAINFO));
+    final DataOutput out = new DataOutput(meta.dbfile(DATAINF));
     meta.write(out);
     out.writeString(DBTAGS);
     tagindex.write(out);
@@ -127,7 +127,7 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void flush() {
-    if(!meta.prop.is(Prop.FORCEFLUSH)) return;
+    if(!meta.prop.is(Prop.AUTOFLUSH)) return;
     try {
       if(meta.dirty) write();
       table.flush();

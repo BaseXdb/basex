@@ -226,7 +226,7 @@ public final class PathSummary implements Index {
    * @return info
    */
   public byte[] info(final Data data) {
-    return chop(root.info(data, 0), 1 << 13);
+    return chop(root.info(data, 0), 1 << 20);
   }
 
   /**

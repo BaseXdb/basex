@@ -32,6 +32,8 @@ public final class Token {
   public static final byte[] TRUE = token("true");
   /** Token 'false'. */
   public static final byte[] FALSE = token("false");
+  /** Token 'null'. */
+  public static final byte[] NULL = token("null");
   /** Token 'NaN'. */
   public static final byte[] NAN = token("NaN");
   /** Token 'INF'. */
@@ -262,7 +264,7 @@ public final class Token {
       (token[pos + 2] & 0x3F) << 6 | token[pos + 3] & 0x3F;
   }
 
-  /*** Character lengths. */
+  /** Character lengths. */
   private static final int[] CHLEN = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 4
   };
@@ -636,6 +638,17 @@ public final class Token {
     if(tl != token1.length) return false;
     for(int t = 0; t != tl; ++t) if(token2[t] != token1[t]) return false;
     return true;
+  }
+
+  /**
+   * Compares several tokens for equality.
+   * @param token token
+   * @param tokens tokens to be compared
+   * @return true if the arrays are equal
+   */
+  public static boolean eq(final byte[] token, final byte[]... tokens) {
+    for(final byte[] t : tokens) if(eq(token, t)) return true;
+    return false;
   }
 
   /**
@@ -1203,7 +1216,7 @@ public final class Token {
    * @return hex representation
    */
   public static byte[] hex(final byte[] val, final boolean uc) {
-    final int u = uc ? '7' : 'W';
+    final int u = uc ? 0x37 : 0x57;
     final byte[] data = new byte[val.length << 1];
     for(int d = 0, c = 0; d < val.length; d++) {
       int b = val[d] >> 4 & 0x0F;

@@ -8,6 +8,7 @@ import org.basex.build.SingleParser;
 import org.basex.build.BuildText.Type;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.util.list.TokenList;
 
 /**
  * This class parses the tokens that are delivered by the {@link XMLScanner} and
@@ -21,6 +22,8 @@ import org.basex.io.IO;
 public class XMLParser extends SingleParser {
   /** Scanner reference. */
   private final XMLScanner scanner;
+  /** Opened tags. */
+  private final TokenList tags = new TokenList();
 
   /**
    * Constructor.
@@ -77,7 +80,11 @@ public class XMLParser extends SingleParser {
       final byte[] tag = consumeToken(Type.TAGNAME);
       skipSpace();
 
-      builder.endElem(tag);
+      if(tags.empty()) throw new BuildException(AFTERROOT, det());
+      final byte[] open = tags.pop();
+      if(!eq(open, tag)) throw new BuildException(CLOSINGTAG, det(), tag, open);
+
+      builder.endElem();
       return consume(Type.R_BR);
     }
 
@@ -124,6 +131,7 @@ public class XMLParser extends SingleParser {
       return scanner.more();
     }
     builder.startElem(tag, atts);
+    tags.add(tag);
     return consume(Type.R_BR);
   }
 

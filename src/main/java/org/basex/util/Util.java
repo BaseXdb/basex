@@ -288,6 +288,7 @@ public final class Util {
       return new String(tb.finish(), Prop.ENCODING);
     } catch(final Exception ex) {
       // use default path; not expected to occur
+      stack(ex);
       return tb.toString();
     }
   }

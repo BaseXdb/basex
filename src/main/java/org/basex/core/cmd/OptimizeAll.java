@@ -159,8 +159,8 @@ public final class OptimizeAll extends ACreate {
     public void parse(final Builder build) throws IOException {
       final Serializer ser = new BuilderSerializer(build) {
         @Override
-        protected void start(final byte[] t) throws IOException {
-          super.start(t);
+        protected void startOpen(final byte[] t) throws IOException {
+          super.startOpen(t);
           if(cmd != null) cmd.pre++;
         }
 

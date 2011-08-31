@@ -17,22 +17,19 @@ public final class FTxt extends FNode {
   /**
    * Constructor.
    * @param t text value
-   * @param p parent
    */
-  public FTxt(final byte[] t, final ANode p) {
+  public FTxt(final byte[] t) {
     super(NodeType.TXT);
     val = t;
-    par = p;
   }
 
   /**
-   * Constructor for DOM nodes (partial).
-   * Provided by Erdal Karaca.
+   * Constructor for DOM nodes.
+   * Originally provided by Erdal Karaca.
    * @param txt DOM node
-   * @param parent parent reference
    */
-  FTxt(final Text txt, final ANode parent) {
-    this(Token.token(txt.getData()), parent);
+  FTxt(final Text txt) {
+    this(Token.token(txt.getData()));
   }
 
   @Override
@@ -41,8 +38,8 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public FTxt copy() {
-    return new FTxt(val, par);
+  public FNode copy() {
+    return new FTxt(val).parent(par);
   }
 
   @Override

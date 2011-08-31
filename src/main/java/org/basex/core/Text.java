@@ -303,6 +303,10 @@ public interface Text {
     "[keywords]", lang("ch_find1"), lang("ch_find2")
   };
   /** Command help. */
+  String[] HELPFLUSH = {
+    "", lang("ch_flush1"), lang("ch_flush2")
+  };
+  /** Command help. */
   String[] HELPRUN = {
     "[" + C_PATH + "]", lang("ch_run1"), lang("ch_run2", C_PATH)
   };
@@ -366,7 +370,6 @@ public interface Text {
     LI + CmdSet.DEBUG     + COLS + lang("ch_set22") + NL +
     LI + CmdSet.SERIALIZE + COLS + lang("ch_set23") + NL +
     LI + CmdSet.CHOP      + COLS + lang("ch_set26") + NL +
-    LI + CmdSet.ENTITY    + COLS + lang("ch_set27") + NL +
     LI + CmdSet.TEXTINDEX + COLS + lang("ch_set28") + NL +
     LI + CmdSet.ATTRINDEX + COLS + lang("ch_set29") + NL +
     LI + CmdSet.FTINDEX   + COLS + lang("ch_set31") + NL +
@@ -509,6 +512,8 @@ public interface Text {
   String DBALTERED = lang("db_altered");
   /** Database not dropped. */
   String DBNOTALTERED = lang("db_notaltered");
+  /** Database flushed. */
+  String DBFLUSHED = lang("db_flushed");
   /** Backup of database created. */
   String DBBACKUP = lang("db_backup");
   /** Backup of database not created. */

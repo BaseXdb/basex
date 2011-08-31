@@ -145,7 +145,7 @@ import org.basex.util.list.StringList;
 import org.basex.util.list.TokenList;
 
 /**
- * Simple query parser; can be overwritten to support more complex parsings.
+ * Parser for XQuery expressions.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -196,15 +196,14 @@ public class QueryParser extends InputParser {
   /** Declaration flag. */
   private boolean declVars;
 
-  /***
+  /**
    * Constructor.
    * @param q query
    * @param c query context
    */
   public QueryParser(final String q, final QueryContext c) {
-    super(q);
+    super(q, c.base());
     ctx = c;
-    file = c.base();
   }
 
   /**
@@ -1214,18 +1213,16 @@ public class QueryParser extends InputParser {
     Expr[] cases;
     while(true) {
       cases = new Expr[0];
-      while(wsConsumeWs(CASE))
-        cases = add(cases, single());
+      while(wsConsumeWs(CASE)) cases = add(cases, single());
       if(cases.length == 0) break;
 
       wsCheck(RETURN);
       final Expr ret = single();
-      for(final Expr c : cases)
-        exprs = add(add(exprs, c), ret);
+      for(final Expr c : cases) exprs = add(add(exprs, c), ret);
     }
 
     // add default case
-    if(exprs.length == 1) error(WRONGEND, CASE);
+    if(exprs.length == 1) error(WRONGCHAR, CASE, found());
     wsCheck(DEFAULT);
     wsCheck(RETURN);
     exprs = add(exprs, single());
@@ -2151,8 +2148,8 @@ public class QueryParser extends InputParser {
       boolean simple = true;
       do {
         while(!consume(delim)) {
-          final char c = curr();
-          if(c == '{') {
+          final char ch = curr();
+          if(ch == '{') {
             if(next() == '{') {
               tb.add(consume());
               consume();
@@ -2166,15 +2163,18 @@ public class QueryParser extends InputParser {
               }
               tb.reset();
             }
-          } else if(c == '}') {
-            ++qp;
+          } else if(ch == '}') {
+            consume();
             check('}');
             tb.add('}');
-          } else if(c == '<' || c == 0) {
+          } else if(ch == '<' || ch == 0) {
             error(NOQUOTE, found());
-          } else if(c == 0x0A || c == 0x09) {
-            ++qp;
+          } else if(ch == '\n' || ch == '\t') {
             tb.add(' ');
+            consume();
+          } else if(ch == '\r') {
+            if(next() != '\n') tb.add(' ');
+            consume();
           } else {
             entity(tb);
           }
@@ -2352,8 +2352,12 @@ public class QueryParser extends InputParser {
     final TokenBuilder tb = new TokenBuilder();
     while(true) {
       while(not(']')) {
-        final char c = consume();
-        if(c != '\r') tb.add(c);
+        char ch = consume();
+        if(ch == '\r') {
+          ch = '\n';
+          if(curr(ch)) consume();
+        }
+        tb.add(ch);
       }
       consume();
       if(curr(']') && next() == '>') {
@@ -3276,16 +3280,16 @@ public class QueryParser extends InputParser {
       tb.ent = true;
     } else {
       final char c = consume();
-      int cp = c;
+      int ch = c;
       if(Character.isHighSurrogate(c) && curr() != 0
           && Character.isLowSurrogate(curr())) {
-        cp = Character.toCodePoint(c, consume());
+        ch = Character.toCodePoint(c, consume());
       }
-      if(cp == 0x0d) {
-        cp = 0x0a;
-        if(curr(cp)) consume();
+      if(ch == '\r') {
+        ch = '\n';
+        if(curr(ch)) consume();
       }
-      tb.add(cp);
+      tb.add(ch);
     }
   }
 
@@ -3361,7 +3365,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException if the variable isn't defined
    */
   private Var checkVar(final QNm name, final Err err) throws QueryException {
-
     Var v = ctx.vars.get(name);
     // dynamically assign variables from function modules
     if(v == null && !declVars) {
@@ -3382,7 +3385,7 @@ public class QueryParser extends InputParser {
    */
   private boolean not(final char ch) throws QueryException {
     final char c = curr();
-    if(c == 0) error(WRONGEND, ch);
+    if(c == 0) error(WRONGCHAR, ch, found());
     return c != ch;
   }
 

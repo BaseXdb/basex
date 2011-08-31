@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 import java.util.zip.CRC32;
 
 import org.basex.io.IO;
@@ -14,7 +15,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.AtomType;
-import org.basex.query.item.B64;
+import org.basex.query.item.Bin;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
@@ -23,6 +24,7 @@ import org.basex.query.item.ItrSeq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.ValueIter;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Performance;
@@ -52,7 +54,7 @@ public final class FNUtil extends FuncCall {
     switch(def) {
       case EVAL: return eval(ctx).iter();
       case RUN: return run(ctx).iter();
-      case TO_BYTES: return bytes(ctx).iter();
+      case TO_BYTES: return toBytes(ctx);
       default: return super.iter(ctx);
     }
   }
@@ -62,7 +64,7 @@ public final class FNUtil extends FuncCall {
     switch(def) {
       case EVAL: return eval(ctx);
       case RUN: return run(ctx);
-      case TO_BYTES: return bytes(ctx);
+      case TO_BYTES: return toBytes(ctx).value();
       default: return super.value(ctx);
     }
   }
@@ -79,6 +81,7 @@ public final class FNUtil extends FuncCall {
       case MD5: return hash(ctx, "MD5");
       case SHA1: return hash(ctx, "SHA");
       case CRC32: return crc32(ctx);
+      case UUID: return uuid();
       default: return super.item(ctx, ii);
     }
   }
@@ -125,22 +128,6 @@ public final class FNUtil extends FuncCall {
   }
 
   /**
-   * Extracts the bytes from the given xs:base64Binary data.
-   * @param ctx query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  private Value bytes(final QueryContext ctx) throws QueryException {
-    final byte[] bytes = ((B64) checkType(expr[0].item(ctx, input),
-        AtomType.B64)).toJava();
-
-    final int bl = bytes.length;
-    final long[] tmp = new long[bl];
-    for(int i = 0; i < bl; i++) tmp[i] = bytes[i];
-    return ItrSeq.get(tmp, AtomType.BYT);
-  }
-
-  /**
    * Formats a string according to the specified format.
    * @param ctx query context
    * @return formatted string
@@ -176,7 +163,7 @@ public final class FNUtil extends FuncCall {
 
     // create (and, optionally, cache) result value
     Value val = ctx.value(expr[0]);
-    if(c) val = val.cache().finish();
+    if(c) val = val.cache().value();
 
     // measure resulting memory consumption
     Performance.gc(2);
@@ -345,9 +332,52 @@ public final class FNUtil extends FuncCall {
     return new Hex(res);
   }
 
+  /**
+   * Extracts the bytes from the given item.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Iter toBytes(final QueryContext ctx) throws QueryException {
+    final Item it = checkEmpty(expr[0].item(ctx, input));
+    final byte[] bytes = it instanceof Bin ? ((Bin) it).toJava() :
+      it.atom(input);
+
+    return new ValueIter() {
+      final int bl = bytes.length;
+      int pos;
+
+      @Override
+      public Value value() {
+        final long[] tmp = new long[bl - pos];
+        for(int i = 0; i < tmp.length; i++) tmp[i] = bytes[pos + i];
+        return ItrSeq.get(tmp, AtomType.BYT);
+      }
+      @Override
+      public Item get(final long i) {
+        return Itr.get(bytes[pos], AtomType.BYT);
+      }
+      @Override
+      public Item next() { return pos < size() ? get(pos++) : null; }
+      @Override
+      public boolean reset() { pos = 0; return true; }
+      @Override
+      public long size() { return bl; }
+    };
+  }
+
+  /**
+   * Creates a random UUID.
+   * @return random UUID
+   */
+  private Str uuid() {
+    return Str.get(UUID.randomUUID());
+  }
+
   @Override
   public boolean uses(final Use u) {
     return u == Use.CTX && (def == Function.EVAL || def == Function.RUN ||
-      def == Function.MB || def == Function.MS) || super.uses(u);
+      def == Function.MB || def == Function.MS || def == Function.UUID) ||
+      super.uses(u);
   }
 }

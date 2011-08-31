@@ -116,7 +116,7 @@ public final class NodeCache extends AxisIter {
   }
 
   @Override
-  public Value finish() {
+  public Value value() {
     if(random) sort(sort);
     return Seq.get(item, size);
   }
