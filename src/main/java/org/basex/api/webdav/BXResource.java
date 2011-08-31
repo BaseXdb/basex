@@ -27,7 +27,7 @@ public abstract class BXResource implements Resource {
   /** File path separator. */
   static final char SEP = '/';
   /** XML mime type. */
-  static final String MIMETYPEXML = "text/xml";
+  static final String MIMETYPEXML = "application/xml";
   /** Zip mime type. */
   static final String MIMETYPEZIP = "application/zip";
   /** Dummy xml file.*/
