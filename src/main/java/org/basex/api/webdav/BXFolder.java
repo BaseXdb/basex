@@ -77,28 +77,26 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   @Override
   public Resource createNew(final String newName, final InputStream inputStream,
       final Long length, final String contentType) {
-    if(supported(contentType)) {
+    try {
+      final Session s = factory.login(user, pass);
       try {
-        final Session s = factory.login(user, pass);
-        try {
-          s.execute(new Open(db));
-          final String doc = path.isEmpty() ? newName : path + SEP + newName;
-          // check if document with this path already exists
-          if(count(s, db, doc) == 0) {
-            s.add(newName, path, inputStream);
-            deleteDummy(s, db, path);
-          } else {
-            s.replace(doc, inputStream);
-          }
-
-          return new BXDocument(db, doc, factory, user, pass);
-        } finally {
-          s.execute(new Close());
-          s.close();
+        s.execute(new Open(db));
+        final String doc = path.isEmpty() ? newName : path + SEP + newName;
+        // check if document with this path already exists
+        if(count(s, db, doc) == 0) {
+          s.add(newName, path, inputStream);
+          deleteDummy(s, db, path);
+        } else {
+          s.replace(doc, inputStream);
         }
-      } catch(Exception ex) {
-        handle(ex);
+
+        return new BXDocument(db, doc, factory, user, pass);
+      } finally {
+        s.execute(new Close());
+        s.close();
       }
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }

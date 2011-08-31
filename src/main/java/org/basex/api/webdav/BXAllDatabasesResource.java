@@ -97,20 +97,18 @@ public class BXAllDatabasesResource extends BXResource implements
   @Override
   public Resource createNew(final String newName, final InputStream inputStream,
       final Long length, final String contentType) {
-    if(supported(contentType)) {
+    try {
+      final Session s = factory.login(user, pass);
       try {
-        final Session s = factory.login(user, pass);
-        try {
-          final String dbname = dbname(newName);
-          s.create(dbname, inputStream);
-          return new BXDatabase(dbname, factory, user, pass);
-        } finally {
-          s.execute(new Close());
-          s.close();
-        }
-      } catch(Exception ex) {
-        handle(ex);
+        final String dbname = dbname(newName);
+        s.create(dbname, inputStream);
+        return new BXDatabase(dbname, factory, user, pass);
+      } finally {
+        s.execute(new Close());
+        s.close();
       }
+    } catch(Exception ex) {
+      handle(ex);
     }
     return null;
   }
