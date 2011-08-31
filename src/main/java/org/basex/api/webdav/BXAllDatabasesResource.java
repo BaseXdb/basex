@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.server.Session;
 
@@ -84,6 +85,7 @@ public class BXAllDatabasesResource extends BXResource implements
         s.execute(new CreateDB(dbname(newName)));
         return new BXDatabase(newName, factory, user, pass);
       } finally {
+        s.execute(new Close());
         s.close();
       }
     } catch(Exception ex) {
@@ -103,6 +105,7 @@ public class BXAllDatabasesResource extends BXResource implements
           s.create(dbname, inputStream);
           return new BXDatabase(dbname, factory, user, pass);
         } finally {
+          s.execute(new Close());
           s.close();
         }
       } catch(Exception ex) {
