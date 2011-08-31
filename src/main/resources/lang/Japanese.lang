@@ -483,6 +483,7 @@ info_dbname=データベース名
 info_ndocs=No/Documents
 info_docsize=文書のサイズ
 info_dbsize=データベースサイズ
+info_type=Type
 info_path=文書のパス
 info_time=タイムスタンプ
 info_mem=メインメモリの使用量

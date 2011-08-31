@@ -58,7 +58,7 @@ public final class Replace extends ACreate {
     if(path.isEmpty()) return Util.info(DIRERR, path);
 
     final byte[] src = token(path);
-    final IntList docs = data.doc(p);
+    final IntList docs = data.docs(p);
     // check if path was found
     if(docs.size() == 0) return Util.info(FILEWHICH, path);
     // check if path points exclusively to files

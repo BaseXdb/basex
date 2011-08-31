@@ -483,6 +483,7 @@ info_dbname=Naam
 info_ndocs=Documenten
 info_docsize=Input grootte
 info_dbsize=Grootte
+info_type=Type
 info_path=Input Pad
 info_time=Time stamp
 info_mem=Gebruikt hoofdgeheugen

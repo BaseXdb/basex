@@ -33,7 +33,7 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-public class BaseXServer extends Main {
+public class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
   public boolean running;
 

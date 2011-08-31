@@ -483,6 +483,7 @@ info_dbname=Name
 info_ndocs=Documents
 info_docsize=Input Size
 info_dbsize=Size
+info_type=Type
 info_path=Input Path
 info_time=Time Stamp
 info_mem=Used Main Memory

@@ -483,6 +483,7 @@ info_dbname=Name
 info_ndocs=Anz./Dokumente
 info_docsize=Dokument-Größe
 info_dbsize=Größe
+info_type=Typ
 info_path=Dokumentpfad
 info_time=Zeitstempel
 info_mem=Hauptspeicher

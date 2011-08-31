@@ -136,7 +136,7 @@ public enum GUICommands implements GUICommand {
         IO file = null;
         boolean overwrite = false;
         final Data d = gui.context.data();
-        final IntList il = d.doc();
+        final IntList il = d.docs();
         for(int i = 0, is = il.size(); i < is; i++) {
           file = root.merge(Token.string(d.text(il.get(i), true)));
           if(file.exists()) {
