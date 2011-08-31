@@ -41,7 +41,7 @@ import org.basex.util.InputInfo;
 
 /**
  * Functions on relational databases.
- * 
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -355,9 +355,9 @@ public final class FNSql extends FuncCall {
           final String label = metadata.getColumnLabel(k);
           final Object value = rs.getObject(label);
           if(value != null) a.add(new FAttr(new QNm(token(label), EMPTY),
-              new Jav(value).atom(input), null));
+              new Jav(value).atom(input)));
         }
-        tuples.add(new FElem(new QNm(TUPLE, SQLURI), null, a, null,
+        tuples.add(new FElem(new QNm(TUPLE, SQLURI), null, a,
             new Atts().add(SQL, SQLURI), null));
       }
       return tuples;
