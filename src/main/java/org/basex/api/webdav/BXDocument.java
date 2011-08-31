@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.server.Query;
 import org.basex.server.Session;
@@ -91,6 +92,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
     final String nm = n.endsWith(".xml") ? n.substring(0, n.length() - 4) : n;
     s.execute(new CreateDB(nm));
     add(s, nm, "", n);
+    s.execute(new Close());
   }
 
   @Override

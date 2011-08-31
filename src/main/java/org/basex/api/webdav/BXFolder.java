@@ -180,6 +180,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     // folder is copied to the root: create new database with it
     s.execute(new CreateDB(n));
     add(s, n, "");
+    s.execute(new Close());
   }
 
   @Override
