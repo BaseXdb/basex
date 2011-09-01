@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -37,7 +38,7 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data();
-      export(prop, data, args[0]);
+      export(data, args[0]);
       return info(DBEXPORTED, data.meta.name, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
@@ -48,19 +49,21 @@ public final class Export extends Command {
   /**
    * Exports the current database to the specified path.
    * Files and Folders contained in {@code path} will be possibly overwritten.
-   * @param prop property
    * @param data data reference
    * @param target directory
    * @throws IOException I/O exception
    */
-  public static void export(final Prop prop, final Data data,
-      final String target) throws IOException {
+  public static void export(final Data data, final String target)
+      throws IOException {
 
-    final SerializerProp sp = new SerializerProp(prop.get(Prop.EXPORTER));
+    final String exp = data.meta.prop.get(Prop.EXPORTER);
+    final SerializerProp sp = new SerializerProp(exp);
     final IOFile root = new IOFile(target);
     root.md();
 
     final HashSet<String> exported = new HashSet<String>();
+
+    // export raw files
     final IntList il = data.docs();
     for(int i = 0, is = il.size(); i < is; i++) {
       final int pre = il.get(i);
@@ -70,22 +73,36 @@ public final class Export extends Command {
       final IOFile dir = new IOFile(file.dir());
       if(!dir.exists()) dir.md();
 
-      // attach counter to duplicate file names
-      final String fp = file.path();
-      String path = fp;
-      int c = 1;
-      while(exported.contains(path)) {
-        path = fp.indexOf('.') == -1 ? fp + '(' + ++c + ')' :
-             fp.replaceAll("(.*)\\.(.*)", "$1(" + ++c + ").$2");
-      }
-      exported.add(fp);
-
       // serialize file
-      final PrintOutput po = new PrintOutput(path);
+      final PrintOutput po = new PrintOutput(unique(exported, file.path()));
       final Serializer xml = Serializer.get(po, sp);
       xml.node(data, pre);
       xml.close();
       po.close();
     }
+
+    // export raw files
+    final File bin = data.meta.binaries();
+    for(final String s : new IOFile(bin).descendants()) {
+      final String u = unique(exported, new IOFile(root.path(), s).path());
+      Copy.copy(new File(bin, s), new File(u));
+    }
+  }
+
+  /**
+   * Returns a unique file path.
+   * @param exp exported names
+   * @param fp file path
+   * @return unique path
+   */
+  private static String unique(final HashSet<String> exp, final String fp) {
+    int c = 1;
+    String path = fp;
+    while(exp.contains(path)) {
+      path = fp.indexOf('.') == -1 ? fp + '(' + ++c + ')' :
+           fp.replaceAll("(.*)\\.(.*)", "$1(" + ++c + ").$2");
+    }
+    exp.add(path);
+    return path;
   }
 }

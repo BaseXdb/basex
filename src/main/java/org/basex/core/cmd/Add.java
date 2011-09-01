@@ -66,8 +66,8 @@ public final class Add extends ACreate {
 
     String name = args[1];
     if(name != null && !name.isEmpty()) {
-      // assure that name contains no slashes
-      if(name.matches(".*[\\\\/].*")) return error(NAMEINVALID, args[1]);
+      // assure that the name contains no slashes and is no single or double dot
+      if(name.matches(".*[\\\\/].*|\\.\\.?")) return error(NAMEINVALID, name);
       // set specified document name
       io.name(name);
     } else if(io instanceof IOContent) {

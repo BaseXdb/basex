@@ -274,7 +274,7 @@ public final class QueryContext extends Progress {
     try {
       final Value v = value(root);
       if(updating) {
-        updates.applyUpdates(this);
+        updates.applyUpdates();
         if(context.data() != null) context.update();
       }
       return v;

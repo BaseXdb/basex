@@ -8,7 +8,6 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Export;
 import org.basex.data.Data;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -192,10 +191,9 @@ final class DatabaseUpdates {
 
   /**
    * Applies all updates for this specific database.
-   * @param ctx query context
    * @throws QueryException query exception
    */
-  protected void apply(final QueryContext ctx) throws QueryException {
+  protected void apply() throws QueryException {
     treeAwareUpdates();
 
     /*
@@ -229,7 +227,7 @@ final class DatabaseUpdates {
     data.flush();
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {
-        Export.export(ctx.context.prop, data, data.meta.original);
+        Export.export(data, data.meta.original);
       } catch(final IOException ex) {
         UPPUTERR.thrw(null, data.meta.original);
       }

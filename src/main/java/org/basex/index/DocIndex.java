@@ -177,10 +177,9 @@ public final class DocIndex implements Index {
     final StringList sl = new StringList();
     final String exact = Prop.WIN ? path.toLowerCase() : path;
     final String start = path.endsWith("/") ? exact : exact + '/';
-
     for(final String s : new IOFile(data.meta.binaries()).descendants()) {
       final String lc = Prop.WIN ? s.toLowerCase() : s;
-      if(lc.equals(exact) || lc.startsWith(start)) sl.add(s);
+      if(exact.isEmpty() || lc.equals(exact) || lc.startsWith(start)) sl.add(s);
     }
     return sl;
   }

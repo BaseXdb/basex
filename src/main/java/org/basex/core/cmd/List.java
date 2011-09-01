@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+
+import java.io.File;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Command;
@@ -34,7 +36,7 @@ public final class List extends Command {
 
     final boolean create = context.user.perm(User.CREATE);
     table.header.add(INFODBNAME);
-    table.header.add(INFONDOCS);
+    table.header.add(INFONRES);
     table.header.add(INFODBSIZE);
     if(create) table.header.add(INFOPATH);
 
@@ -55,10 +57,16 @@ public final class List extends Command {
       } finally {
         if(in != null) try { in.close(); } catch(final IOException ex) { }
       }
+
+      // count number of raw files
+      final File bin = new File(mprop.dbpath(name), M_RAW);
+      final int raw = new IOFile(bin).descendants().size();
+
+      // create entry
       if(file != null) {
-        final TokenList tl = new TokenList();
+        final TokenList tl = new TokenList(4);
         tl.add(name);
-        tl.add(ndocs);
+        tl.add(ndocs + raw);
         tl.add(size);
         if(create) tl.add(file);
         table.contents.add(tl);

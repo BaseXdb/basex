@@ -65,15 +65,14 @@ public final class Copy extends Command {
     final StringList files = new IOFile(src).descendants();
     tf = files.size();
     boolean ok = true;
-    for(final String file : files) {
-      of++;
-      try {
+    try {
+      for(final String file : files) {
         copy(new File(src, file), new File(trg, file));
-      } catch(final IOException ex) {
-        Util.debug(ex);
-        ok = false;
-        break;
+        of++;
       }
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      ok = false;
     }
     // drop new database if error occurred
     if(!ok) DropDB.drop(newdb, mprop);
