@@ -97,4 +97,9 @@ public final class InlineFunc extends UserFunc {
     if(ret != null) tb.append("as ").append(ret.toString()).append(' ');
     return tb.append("{ ").append(expr).append(" }").toString();
   }
+
+  @Override
+  boolean tco() {
+    return false;
+  }
 }

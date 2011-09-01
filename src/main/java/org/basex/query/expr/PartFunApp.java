@@ -78,4 +78,9 @@ public final class PartFunApp extends UserFunc {
     for(final Var v : vars) if(v != null) out = Array.add(out, v);
     return out;
   }
+
+  @Override
+  boolean tco() {
+    return false;
+  }
 }
