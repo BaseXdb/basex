@@ -109,9 +109,6 @@ public class WebDAVServer extends Main {
   }
 
   @Override
-  public void run() { }
-
-  @Override
   protected Session session() { return null; }
 
   @Override
