@@ -225,12 +225,12 @@ basex_status(int sfd)
  * In either case it is the responsibility of the caller to free(3) those
  * strings.
  *
- * The returned int is 0 if the command could be processed sucessfully, in that
+ * The returned int is 0 if the command could be processed successfully, in that
  * case the result contains the result string of the command and info holds
  * the processing information.
  * If a value >0 is returned, the command could not be processed successfully,
  * result contains NULL and info contains the database error message.
- * If -1 is interned, an error occured, result and info are set to NULL.
+ * If -1 is interned, an error occurred, result and info are set to NULL.
  *
  *  int | result* | info* |
  * -----+---------+-------|
@@ -250,8 +250,8 @@ basex_status(int sfd)
  * @param command to be processed by BaseX server
  * @param result address at which result from BaseX server is placed
  * @param info address at which info/error message from BaseX server is placed
- * @return int 0 for sucess (result and info contain strings sent from BaseX)
- * -1 in case of failure (result and info are set to NULL), >0 an error occured
+ * @return int 0 for success (result and info contain strings sent from BaseX)
+ * -1 in case of failure (result and info are set to NULL), >0 an error occurred
  * while processing the command (result contains NULL, info contains error
  * message)
  */

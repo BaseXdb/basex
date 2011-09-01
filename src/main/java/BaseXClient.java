@@ -113,7 +113,7 @@ public final class BaseXClient {
   }
 
   /**
-   * Adds a database.
+   * Adds a document to a database.
    * @param name name of document
    * @param target target path
    * @param input xml input
@@ -124,6 +124,19 @@ public final class BaseXClient {
     out.write(9);
     send(name);
     send(target);
+    send(input);
+  }
+
+  /**
+   * Replaces a document in a database.
+   * @param path path to document
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  public void replace(final String path, final InputStream input)
+      throws IOException {
+    out.write(12);
+    send(path);
     send(input);
   }
 
@@ -162,8 +175,8 @@ public final class BaseXClient {
       @Override
       public void run() {
         try {
+          final BufferedInputStream bi = new BufferedInputStream(is);
           while(true) {
-            final BufferedInputStream bi = new BufferedInputStream(is);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             receive(bi, baos);
             final String name = baos.toString("UTF-8");
@@ -198,7 +211,11 @@ public final class BaseXClient {
   private void send(final InputStream input) throws IOException {
     final BufferedInputStream bis = new BufferedInputStream(input);
     final BufferedOutputStream bos = new BufferedOutputStream(out);
-    for(int b; (b = bis.read()) != -1;) bos.write(b);
+    for(int b; (b = bis.read()) != -1;) {
+      // 0x00 and 0xFF will be prefixed by 0xFF
+      if(b == 0x00 || b == 0xFF) bos.write(0xFF);
+      bos.write(b);
+    }
     bos.write(0);
     bos.flush();
     info = receive();

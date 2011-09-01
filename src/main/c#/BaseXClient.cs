@@ -75,18 +75,7 @@ namespace BaseXClient
     {
       stream.WriteByte(8);
       Send(name);
-      while (true)
-      {
-          int t = s.ReadByte();
-          if (t == -1) break;
-          stream.WriteByte(Convert.ToByte(t));
-      }
-      stream.WriteByte(0);
-      info = Receive();
-      if(!Ok())
-      {
-        throw new IOException(info);
-      }
+      Send(s);
     }
     
     /** see readme.txt */
@@ -95,18 +84,15 @@ namespace BaseXClient
       stream.WriteByte(9);
       Send(name);
       Send(target);
-      while (true)
-      {
-          int t = s.ReadByte();
-          if (t == -1) break;
-          stream.WriteByte(Convert.ToByte(t));
-      }
-      stream.WriteByte(0);
-      info = Receive();
-      if(!Ok())
-      {
-        throw new IOException(info);
-      }
+      Send(s);
+    }
+    
+    /** see readme.txt */
+    public void Replace(string path, Stream s)
+    {
+      stream.WriteByte(12);
+      Send(path);
+      Send(s);
     }
     
     /* Watches an event. */
@@ -221,7 +207,7 @@ namespace BaseXClient
     }
 
     /** Receives a string from the socket. */
-    public string Receive()
+    private string Receive()
     {
       MemoryStream ms = new MemoryStream();
       Receive(ms);
@@ -229,12 +215,31 @@ namespace BaseXClient
     }
 
     /** Sends strings to server. */
-    public void Send(string message)
+    private void Send(string message)
     {
       byte[] msg = System.Text.Encoding.UTF8.GetBytes(message);
       stream.Write(msg, 0, msg.Length);
       stream.WriteByte(0);
     }
+
+    /** see readme.txt */
+    private void Send(Stream s)
+    {
+      while (true)
+      {
+          int t = s.ReadByte();
+          if (t == -1) break;
+          if (t == 0x00 || t == 0xFF) stream.WriteByte(Convert.ToByte(0xFF));
+          stream.WriteByte(Convert.ToByte(t));
+      }
+      stream.WriteByte(0);
+      info = Receive();
+      if(!Ok())
+      {
+        throw new IOException(info);
+      }
+    }
+    
 
     /** Returns success check. */
     public bool Ok()
