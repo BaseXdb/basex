@@ -117,7 +117,7 @@ public final class DialogInfo extends Dialog {
             PrintOutput out = null;
             try {
               out = new PrintOutput(file.path());
-              data.pthindex.plan(data, new XMLSerializer(out));
+              data.pthindex.plan(new XMLSerializer(out));
             } catch(final IOException ex) {
               Dialog.error(gui, NOTSAVED);
             } finally {

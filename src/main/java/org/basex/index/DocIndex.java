@@ -75,24 +75,6 @@ public final class DocIndex implements Index {
     return docs;
   }
 
-  @Override
-  public IndexIterator ids(final IndexToken token) {
-    throw Util.notexpected();
-  }
-
-  @Override
-  public int nrIDs(final IndexToken token) {
-    throw Util.notexpected();
-  }
-
-  @Override
-  public void close() { }
-
-  @Override
-  public byte[] info() {
-    return EMPTY;
-  }
-
   /**
    * Adds entries to the index and updates subsequent nodes.
    * @param pre insertion position
@@ -241,5 +223,25 @@ public final class DocIndex implements Index {
       else h = m - 1;
     }
     return l;
+  }
+
+  @Override
+  public void close() { }
+
+  // Unsupported methods ======================================================
+
+  @Override
+  public IndexIterator ids(final IndexToken token) {
+    throw Util.notexpected();
+  }
+
+  @Override
+  public int nrIDs(final IndexToken token) {
+    throw Util.notexpected();
+  }
+
+  @Override
+  public byte[] info() {
+    throw Util.notexpected();
   }
 }

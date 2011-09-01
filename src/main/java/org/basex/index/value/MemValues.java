@@ -56,12 +56,15 @@ public final class MemValues extends TokenSet implements Index {
       public int next() { return ids[i][p]; }
       @Override
       public double score() { return -1; }
+      @Override
+      public int size() { return len[i]; }
     };
   }
 
   @Override
   public int nrIDs(final IndexToken it) {
-    return ids(it).size();
+    final int i = id(it.get());
+    return i == 0 ? 0 : len[i];
   }
 
   @Override

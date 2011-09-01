@@ -120,8 +120,8 @@ public final class PermissionTest {
     no(new Find(NAME), testSession);
     no(new Optimize(), testSession);
     // XQuery update
-    no(new XQuery("for $item in doc('" + NAME + "')//xml return rename" +
-      " node $item as 'null'"), testSession);
+    no(new XQuery("for $item in doc('" + NAME + "')//xml " +
+      "return rename node $item as 'null'"), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new Rename(RENAMED, RENAMED + "2"), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
@@ -158,8 +158,8 @@ public final class PermissionTest {
     no(new RepoList(), testSession);
 
     // XQuery update
-    no(new XQuery("for $item in doc('" + NAME + "')//xml return rename" +
-      " node $item as 'null'"), testSession);
+    no(new XQuery("for $item in doc('" + NAME + "')//xml " +
+      "return rename node $item as 'null'"), testSession);
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new Replace(RENAMED, "<xml />"), testSession);
@@ -198,8 +198,8 @@ public final class PermissionTest {
     no(new RepoList(), testSession);
 
     // XQuery Update
-    ok(new XQuery("for $item in doc('" + NAME + "')//xml return rename" +
-        " node $item as 'null'"), testSession);
+    ok(new XQuery("for $item in doc('" + NAME + "')//xml " +
+        "return rename node $item as 'null'"), testSession);
     ok(new Optimize(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new CreateIndex(cmd), testSession);

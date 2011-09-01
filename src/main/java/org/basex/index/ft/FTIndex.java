@@ -51,19 +51,19 @@ public abstract class FTIndex implements Index {
 
   /**
    * Returns an iterator for an index entry.
-   * @param p pointer on data
-   * @param s number of pre/pos entries
+   * @param off offset on entries
+   * @param size number of pre/pos entries
    * @param da data source
    * @param fast fast evaluation
    * @return iterator
    */
-  final synchronized FTIndexIterator iter(final long p, final int s,
+  final synchronized FTIndexIterator iter(final long off, final int size,
       final DataAccess da, final boolean fast) {
 
     // cache results
-    da.cursor(p);
+    da.cursor(off);
     final IntList vals = new IntList();
-    for(int c = 0, lp = 0; c < s;) {
+    for(int c = 0, lp = 0; c < size;) {
       if(lp == 0) {
         if(scm > 0) vals.add(da.readNum());
         lp = da.readNum();
@@ -71,7 +71,7 @@ public abstract class FTIndex implements Index {
       }
       final int pr = lp;
       vals.add(da.readNum());
-      while(++c < s) {
+      while(++c < size) {
         lp = da.readNum();
         vals.add(lp);
         if(lp != pr) break;
@@ -90,7 +90,6 @@ public abstract class FTIndex implements Index {
         if(lpre == 0) {
           if(scm > 0) sc = (Math.log(vals.get(c++)) - min) / (max - min);
           lpre = vals.get(c++);
-          size = s;
         }
         pre = lpre;
 
@@ -115,8 +114,8 @@ public abstract class FTIndex implements Index {
       }
 
       @Override
-      public synchronized int indexSize() {
-        return s;
+      public synchronized int size() {
+        return size;
       }
 
       @Override
@@ -126,7 +125,7 @@ public abstract class FTIndex implements Index {
 
       @Override
       public String toString() {
-        return Integer.toString(s);
+        return Integer.toString(size);
       }
     };
   }

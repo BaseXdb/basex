@@ -32,8 +32,8 @@ public final class FTNode extends DBNode {
    * @param a full-text matches
    * @param d data reference
    * @param p pre value
-   * @param tis total size indexed results
    * @param tol token length
+   * @param tis total size indexed results
    * @param s score value out of the index
    */
   public FTNode(final FTMatches a, final Data d, final int p, final int tol,

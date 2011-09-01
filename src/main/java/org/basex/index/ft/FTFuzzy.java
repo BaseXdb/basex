@@ -123,7 +123,7 @@ final class FTFuzzy extends FTIndex {
     if(id == 0) {
       final int p = token(tok);
       return p > -1 ? iter(pointer(p, tok.length),
-          size(p, tok.length), inZ, false) : FTIndexIterator.EMP;
+          size(p, tok.length), inZ, false) : FTIndexIterator.FTEMPTY;
     }
     return iter(cache.pointer(id), cache.size(id), inZ, false);
   }
@@ -233,7 +233,7 @@ final class FTFuzzy extends FTIndex {
    * @return int[][] data
    */
   private IndexIterator fuzzy(final byte[] tok, final int k, final boolean f) {
-    FTIndexIterator it = FTIndexIterator.EMP;
+    FTIndexIterator it = FTIndexIterator.FTEMPTY;
     final int tl = tok.length;
     final int e = Math.min(tp.length, tl + k);
     int s = Math.max(1, tl - k) - 1;

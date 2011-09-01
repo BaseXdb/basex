@@ -22,6 +22,7 @@ import org.basex.io.IO;
 import org.basex.io.random.TableAccess;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 import org.basex.util.list.IntList;
 import org.basex.util.list.ObjList;
@@ -92,10 +93,8 @@ public abstract class Data {
   public Names atnindex;
   /** Namespace index. */
   public Namespaces ns;
-  /** Path summary. */
+  /** Path summary index. */
   public PathSummary pthindex;
-  /** Document index. */
-  protected DocIndex docindex = new DocIndex(this);
 
   /** Index reference for a name attribute. */
   public int nameID;
@@ -110,6 +109,8 @@ public abstract class Data {
   protected Index atvindex;
   /** Full-text index instance. */
   protected Index ftxindex;
+  /** Document index. */
+  protected final DocIndex docindex = new DocIndex(this);
 
   /**
    * Dissolves the references to often used tag names and attributes.
@@ -169,12 +170,7 @@ public abstract class Data {
    * @return id array
    */
   public final IndexIterator ids(final IndexToken token) {
-    switch(token.type()) {
-      case TEXT:      return txtindex.ids(token);
-      case ATTRIBUTE: return atvindex.ids(token);
-      case FULLTEXT:  return ftxindex.ids(token);
-      default:        return null;
-    }
+    return index(token.type()).ids(token);
   }
 
   /**
@@ -183,12 +179,7 @@ public abstract class Data {
    * @return number of hits
    */
   public final int nrIDs(final IndexToken token) {
-    switch(token.type()) {
-      case TEXT:      return txtindex.nrIDs(token);
-      case ATTRIBUTE: return atvindex.nrIDs(token);
-      case FULLTEXT:  return ftxindex.nrIDs(token);
-      default:        return Integer.MAX_VALUE;
-    }
+    return index(token.type()).nrIDs(token);
   }
 
   /**
@@ -224,14 +215,23 @@ public abstract class Data {
    * @return info
    */
   public final byte[] info(final IndexType type) {
+    return index(type).info();
+  }
+
+  /**
+   * Returns the index reference for the specified index type.
+   * @param type index type
+   * @return index
+   */
+  protected final Index index(final IndexType type) {
     switch(type) {
-      case TAG:       return tagindex.info();
-      case ATTNAME:   return atnindex.info();
-      case TEXT:      return txtindex.info();
-      case ATTRIBUTE: return atvindex.info();
-      case FULLTEXT:  return ftxindex.info();
-      case PATH:      return pthindex.info(this);
-      default:        return EMPTY;
+      case TAG:       return tagindex;
+      case ATTNAME:   return atnindex;
+      case TEXT:      return txtindex;
+      case ATTRIBUTE: return atvindex;
+      case FULLTEXT:  return ftxindex;
+      case PATH:      return pthindex;
+      default:        throw Util.notexpected();
     }
   }
 

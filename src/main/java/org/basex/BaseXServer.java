@@ -52,7 +52,7 @@ public class BaseXServer extends Main implements Runnable {
   /** EventsListener. */
   private final EventListener events = new EventListener();
   /** Blocked clients. */
-  public final TokenIntMap blocked = new TokenIntMap();
+  private final TokenIntMap blocked = new TokenIntMap();
   /** Server socket. */
   private ServerSocket socket;
   /** User query. */

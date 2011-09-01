@@ -33,7 +33,7 @@ public abstract class Builder extends Progress {
   public MetaData meta;
 
   /** Tree structure. */
-  protected final PathSummary path = new PathSummary();
+  protected final PathSummary path = new PathSummary(null);
   /** Namespace index. */
   protected final Namespaces ns = new Namespaces();
   /** Parser instance. */
