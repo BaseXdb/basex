@@ -72,7 +72,8 @@ public final class BXJaxRx implements JaxRx {
 
           for(final TokenList l : table.contents) {
             xml.emptyElement(token(JAXRX + ":" + "document"),
-                token("path"), l.get(0), token("nodes"), l.get(1));
+                token("path"), l.get(0), token("type"), l.get(1),
+                token("size"), l.get(2));
           }
           xml.closeElement();
         } else {
