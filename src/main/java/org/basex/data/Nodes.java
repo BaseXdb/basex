@@ -102,7 +102,7 @@ public final class Nodes implements Result {
    * @return self reference
    */
   public Nodes checkRoot() {
-    final IntList docs = data.doc();
+    final IntList docs = data.docs();
     if(list.length != docs.size()) {
       root = false;
     } else {

@@ -115,7 +115,7 @@ public final class FNDb extends FuncCall {
     final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
 
     final Data data = ctx.resource.data(db, input);
-    return DBNodeSeq.get(data.doc(string(path)), data, true, s == -1);
+    return DBNodeSeq.get(data.docs(string(path)), data, true, s == -1);
   }
 
   /**
@@ -209,7 +209,7 @@ public final class FNDb extends FuncCall {
 
       // retrieve data instance; will be closed after query execution
       final Data data = ctx.resource.data(db, input);
-      final IntList il = data.doc(string(path));
+      final IntList il = data.docs(string(path));
       for(int i = 0, is = il.size(); i < is; i++) {
         ic.add(Str.get(data.text(il.get(i), true)));
       }
@@ -288,7 +288,7 @@ public final class FNDb extends FuncCall {
     final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
-    final IntList old = data.doc(string(trg));
+    final IntList old = data.docs(string(trg));
     if(old.size() > 0) {
       final int pre = old.get(0);
       if(old.size() > 1 || !eq(data.text(pre, true), trg))
@@ -326,7 +326,7 @@ public final class FNDb extends FuncCall {
 
     final Data data = data(0, ctx);
     final byte[] target = path(checkStr(expr[1], ctx));
-    final IntList il = data.doc(string(target));
+    final IntList il = data.docs(string(target));
     for(int i = 0, is = il.size(); i < is; i++) {
       final int pre = il.get(i);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
@@ -348,7 +348,7 @@ public final class FNDb extends FuncCall {
     final byte[] target = path(checkStr(expr[2], ctx));
 
     // the first step of the path should be the database name
-    final IntList il = data.doc(string(source));
+    final IntList il = data.docs(string(source));
     for(int i = 0, is = il.size(); i < is; i++) {
       final int pre = il.get(i);
       final byte[] trg = ACreate.newName(data, pre, source, target);

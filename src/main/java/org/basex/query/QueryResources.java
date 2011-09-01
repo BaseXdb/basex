@@ -68,7 +68,7 @@ public final class QueryResources {
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
     addCollection(nodes.root ? ctx.value :
-        DBNodeSeq.get(d.doc(), d, true, true), token(d.meta.name));
+        DBNodeSeq.get(d.docs(), d, true, true), token(d.meta.name));
 
     addData(d);
   }
@@ -198,7 +198,7 @@ public final class QueryResources {
    * @param path inner collection path
    */
   private void addCollection(final Data d, final byte[] path) {
-    addCollection(DBNodeSeq.get(d.doc(string(path)), d, true,
+    addCollection(DBNodeSeq.get(d.docs(string(path)), d, true,
         path.length == 0), token(d.meta.name));
   }
 

@@ -189,7 +189,7 @@ public final class WesternTokenizer extends Tokenizer {
   private byte[] get() {
     byte[] n = orig();
     final boolean a = ascii(n);
-    if(!dc) n = dia(n, a);
+    if(!a && !dc) n = dia(n);
     if(uc) n = upper(n, a);
     if(lc || !cs) n = lower(n, a);
     return n;
@@ -277,12 +277,9 @@ public final class WesternTokenizer extends Tokenizer {
    * Removes diacritics from the specified token. This method supports all
    * latin1 characters, including supplements.
    * @param t token to be converted
-   * @param a ascii flag
    * @return converted token
    */
-  private static byte[] dia(final byte[] t, final boolean a) {
-    if(a) return t;
-
+  private static byte[] dia(final byte[] t) {
     // find first character to be normalized
     final int tl = t.length;
     for(int i = 0; i < tl; i += cl(t, i)) {

@@ -197,6 +197,14 @@ public final class MetaData {
   }
 
   /**
+   * Returns the binary directory.
+   * @return binary directory
+   */
+  public File binaries() {
+    return new File(path, M_RAW);
+  }
+
+  /**
    * Drops the specified database files.
    * Should only be called if database is disk-based.
    * @param pat file pattern, or {@code null} if all files are to be deleted

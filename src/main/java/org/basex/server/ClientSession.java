@@ -9,11 +9,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Commands.Cmd;
+import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.io.in.BufferInput;
 import org.basex.io.out.PrintOutput;
 import org.basex.util.Token;
@@ -135,12 +135,12 @@ public final class ClientSession extends Session {
   @Override
   public void create(final String name, final InputStream input)
       throws BaseXException {
+
     try {
       sout.write(ServerCmd.CREATE.code);
       send(name);
       send(input);
     } catch(final IOException ex) {
-      ex.printStackTrace();
       throw new BaseXException(ex);
     }
   }
@@ -148,6 +148,7 @@ public final class ClientSession extends Session {
   @Override
   public void add(final String name, final String target,
       final InputStream input) throws BaseXException {
+
     try {
       sout.write(ServerCmd.ADD.code);
       send(name);
@@ -161,6 +162,7 @@ public final class ClientSession extends Session {
   @Override
   public void replace(final String path, final InputStream input)
       throws BaseXException {
+
     try {
       sout.write(ServerCmd.REPLACE.code);
       send(path);
@@ -244,7 +246,12 @@ public final class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   private void send(final InputStream input) throws IOException {
-    for(int b; (b = input.read()) != -1;) sout.write(b);
+    for(int b; (b = input.read()) != -1;) {
+      // 0x00 and 0xFF are prefixed by 0xFF and
+      // later decoded in {@link ClientInputStream}
+      if(b == 0x00 || b == 0xFF) sout.write(0xFF);
+      sout.write(b);
+    }
     sout.write(0);
     sout.flush();
     final BufferInput bi = new BufferInput(sin);

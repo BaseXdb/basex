@@ -718,6 +718,8 @@ public interface Text {
   String INFODBNAME = lang("info_dbname");
   /** Info on database size. */
   String INFODBSIZE = lang("info_dbsize");
+  /** Info on storage type. */
+  String INFOTYPE = lang("info_type");
   /** Info on path. */
   String INFOPATH = lang("info_path");
   /** Info on database time stamp. */

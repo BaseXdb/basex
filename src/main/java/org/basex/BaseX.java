@@ -56,11 +56,7 @@ public class BaseX extends Main {
   public BaseX(final String... args) {
     super(args);
     if(failed) return;
-    run();
-  }
 
-  @Override
-  public void run() {
     try {
       session();
 

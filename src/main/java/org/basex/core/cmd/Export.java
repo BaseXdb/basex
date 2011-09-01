@@ -61,7 +61,7 @@ public final class Export extends Command {
     root.md();
 
     final HashSet<String> exported = new HashSet<String>();
-    final IntList il = data.doc();
+    final IntList il = data.docs();
     for(int i = 0, is = il.size(); i < is; i++) {
       final int pre = il.get(i);
       // create file path

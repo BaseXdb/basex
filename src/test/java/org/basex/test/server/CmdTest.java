@@ -447,6 +447,9 @@ public class CmdTest {
     ok(new Replace(FN, "<a/>"));
     ok(new Replace(FN, "<a/>"));
     no(new Replace(FN, ""));
+    // a failing replace should not remove existing documents
+    no(new Replace(FN, "<a>"));
+    assertTrue(!ok(new XQuery("doc('" + NAME + "')")).isEmpty());
   }
 
   /** Command test. */
@@ -540,12 +543,14 @@ public class CmdTest {
   /**
    * Assumes that this command is successful.
    * @param cmd command reference
+   * @return result as string
    */
-  protected final void ok(final Command cmd) {
+  protected final String ok(final Command cmd) {
     try {
-      session.execute(cmd);
+      return session.execute(cmd);
     } catch(final BaseXException ex) {
       fail(ex.getMessage());
+      return null;
     }
   }
 

@@ -88,7 +88,7 @@ public class UserFunc extends Single {
     ctx.vars.reset(s);
 
     // convert all function calls in tail position to proper tail calls
-    expr.markTailCalls();
+    if(tco()) expr.markTailCalls();
 
     // remove redundant cast
     if(ret != null && (ret.type == AtomType.BLN || ret.type == AtomType.FLT ||
@@ -147,5 +147,13 @@ public class UserFunc extends Single {
     if(ret != null) tb.add(' ' + AS + ' ' + ret);
     if(expr != null) tb.add(" { " + expr + " }; ");
     return tb.toString();
+  }
+
+  /**
+   * Checks if this function is tail-call optimizable.
+   * @return {@code true} if it is optimizable, {@code false} otherwise
+   */
+  boolean tco() {
+    return true;
   }
 }

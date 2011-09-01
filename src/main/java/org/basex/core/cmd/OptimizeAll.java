@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.basex.build.Builder;
@@ -116,6 +117,9 @@ public final class OptimizeAll extends ACreate {
       d.meta.filesize = m.filesize;
       d.meta.users    = m.users;
       d.meta.dirty    = true;
+      // move binary files
+      final File bin = data.meta.binaries();
+      if(bin.exists()) bin.renameTo(d.meta.binaries());
       d.close();
     } finally {
       try {
@@ -126,6 +130,8 @@ public final class OptimizeAll extends ACreate {
     }
     Close.close(data, ctx);
 
+    // drop old database and rename temporary to final name
+    // usually, no exceptions should be thrown here anymore
     if(!DropDB.drop(m.name, ctx.mprop))
       throw new BaseXException(DBDROPERROR, m.name);
     if(!AlterDB.alter(tname, m.name, ctx.mprop))
@@ -170,7 +176,7 @@ public final class OptimizeAll extends ACreate {
           if(cmd != null) cmd.pre++;
         }
       };
-      final IntList il = data.doc();
+      final IntList il = data.docs();
       for(int i = 0, is = il.size(); i < is; i++) ser.node(data, il.get(i));
     }
   }

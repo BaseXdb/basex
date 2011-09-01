@@ -74,10 +74,10 @@ public final class FNFile extends FuncCall {
     switch(def) {
       case APPEND:      return write(path, ctx, true);
       case APPENDBIN:   return writeBinary(path, ctx, true);
-      case COPY:        return transfer(path, ctx, true);
+      case COPY:        return copy(path, ctx, true);
       case CREATEDIR:   return createDirectory(path);
       case DELETE:      return del(path);
-      case MOVE:        return transfer(path, ctx, false);
+      case MOVE:        return copy(path, ctx, false);
       case READBIN:     return readBinary(path);
       case READTEXT:    return readText(path, ctx);
       case WRITE:       return write(path, ctx, false);
@@ -400,7 +400,7 @@ public final class FNFile extends FuncCall {
    * @return result
    * @throws QueryException query exception
    */
-  private Item transfer(final File src, final QueryContext ctx,
+  private Item copy(final File src, final QueryContext ctx,
       final boolean copy) throws QueryException {
 
     File trg = new File(string(checkStr(expr[1], ctx))).getAbsoluteFile();

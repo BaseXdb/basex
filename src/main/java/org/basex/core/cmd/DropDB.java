@@ -78,7 +78,8 @@ public final class DropDB extends Command {
     final File[] files = path.listFiles();
     if(files != null) {
       for(final File sub : files) {
-        if(pat == null || sub.getName().matches(pat)) ok &= sub.delete();
+        ok &= sub.isDirectory() ? drop(sub, pat) :
+          pat != null && !sub.getName().matches(pat) || sub.delete();
       }
     }
     // only delete directory if no pattern was specified
