@@ -162,8 +162,8 @@ public final class BaseXClient {
       @Override
       public void run() {
         try {
+          final BufferedInputStream bi = new BufferedInputStream(is);
           while(true) {
-            final BufferedInputStream bi = new BufferedInputStream(is);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             receive(bi, baos);
             final String name = baos.toString("UTF-8");
