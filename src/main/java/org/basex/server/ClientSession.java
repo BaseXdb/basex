@@ -9,11 +9,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Commands.Cmd;
+import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.io.in.BufferInput;
 import org.basex.io.out.PrintOutput;
 import org.basex.util.Token;
@@ -247,8 +247,8 @@ public final class ClientSession extends Session {
    */
   private void send(final InputStream input) throws IOException {
     for(int b; (b = input.read()) != -1;) {
-      // 0x00 and 0xFF will be prefixed by 0xFF and
-      // later decoded in {@link WrapInputStream}
+      // 0x00 and 0xFF are prefixed by 0xFF and
+      // later decoded in {@link ClientInputStream}
       if(b == 0x00 || b == 0xFF) sout.write(0xFF);
       sout.write(b);
     }
