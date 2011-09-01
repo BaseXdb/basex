@@ -22,7 +22,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
 import org.basex.io.in.BufferInput;
-import org.basex.io.in.WrapInputStream;
+import org.basex.io.in.ClientInputStream;
 import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
@@ -310,13 +310,14 @@ public final class ClientListener extends Thread {
     final String name = in.readString();
     log.write(this, CREATE + " " + CmdCreate.DATABASE + " " + name + " [...]");
 
+    final ClientInputStream wis = new ClientInputStream(in);
     try {
-      final WrapInputStream is = new WrapInputStream(in);
-      final String info = is.curr() == -1 ?
+      final String info = wis.curr() == -1 ?
         CreateDB.create(name, Parser.emptyParser(), context) :
-        CreateDB.create(name, is, context);
+        CreateDB.create(name, wis, context);
       info(true, info, perf);
     } catch(final BaseXException ex) {
+      wis.close();
       info(false, ex.getMessage(), perf);
     }
   }
@@ -334,10 +335,13 @@ public final class ClientListener extends Thread {
     if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
     log.write(this, sb.append("[...]"));
 
+    final ClientInputStream wis = new ClientInputStream(in);
+    final InputSource is = new InputSource(wis);
     try {
-      final InputSource is = new InputSource(new WrapInputStream(in));
-      info(true, Add.add(name, path, is, context, null, true), perf);
+      final String info = Add.add(name, path, is, context, null, true);
+      info(true, info, perf);
     } catch(final BaseXException ex) {
+      wis.close();
       info(false, ex.getMessage(), perf);
     }
     out.flush();
@@ -353,10 +357,14 @@ public final class ClientListener extends Thread {
     final StringBuilder sb = new StringBuilder(REPLACE + " ");
     if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
     log.write(this, sb.append("[...]"));
+
+    final ClientInputStream wis = new ClientInputStream(in);
     try {
-      final InputSource is = new InputSource(new WrapInputStream(in));
-      info(true, Replace.replace(path, is, context, true), perf);
+      final InputSource is = new InputSource(wis);
+      final String info = Replace.replace(path, is, context, true);
+      info(true, info, perf);
     } catch(final BaseXException ex) {
+      wis.close();
       info(false, ex.getMessage(), perf);
     }
     out.flush();
