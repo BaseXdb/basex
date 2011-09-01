@@ -32,7 +32,6 @@ public class BaseXButton extends JButton {
    */
   public BaseXButton(final String l, final Window win) {
     super(l);
-    setOpaque(false);
     BaseXLayout.addInteraction(this, win);
     if(!(win instanceof Dialog)) return;
 
@@ -62,7 +61,6 @@ public class BaseXButton extends JButton {
    */
   public BaseXButton(final Window gui, final String img, final byte[] hlp) {
     super(BaseXLayout.icon("cmd-" + img));
-    setOpaque(false);
     BaseXLayout.addInteraction(this, gui, hlp);
     if(hlp != null) setToolTipText(Token.string(hlp));
 

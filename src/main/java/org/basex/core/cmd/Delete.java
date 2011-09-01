@@ -25,7 +25,7 @@ public final class Delete extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    final IntList docs = data.doc(args[0]);
+    final IntList docs = data.docs(args[0]);
     delete(context, docs);
     return info(PATHDELETED, docs.size(), perf);
   }

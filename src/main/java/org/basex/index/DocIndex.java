@@ -2,6 +2,7 @@ package org.basex.index;
 
 import static org.basex.util.Token.*;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.basex.core.Prop;
@@ -11,6 +12,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * This index contains references to all document nodes in a database.
@@ -54,7 +56,7 @@ public final class DocIndex implements Index {
    * @throws IOException I/O exception
    */
   public void write(final DataOutput out) throws IOException {
-    out.writeDiffs(doc());
+    out.writeDiffs(docs());
   }
 
   /**
@@ -62,7 +64,7 @@ public final class DocIndex implements Index {
    * A single dummy node is returned if the database is empty.
    * @return document nodes
    */
-  public synchronized IntList doc() {
+  public synchronized IntList docs() {
     if(docs == null) {
       update();
       docs = new IntList();
@@ -106,11 +108,11 @@ public final class DocIndex implements Index {
       dpre += d.size(dpre, k);
     }
 
-    final IntList doc = doc();
-    int i = doc.sortedIndexOf(pre);
+    final IntList il = docs();
+    int i = il.sortedIndexOf(pre);
     if(i < 0) i = -i - 1;
-    doc.insert(i, pres.toArray());
-    doc.move(dsize, i + pres.size());
+    il.insert(i, pres.toArray());
+    il.move(dsize, i + pres.size());
     update();
   }
 
@@ -120,11 +122,11 @@ public final class DocIndex implements Index {
    * @param size number of deleted nodes
    */
   public void delete(final int pre, final int size) {
-    final IntList doc = doc();
-    int i = doc.sortedIndexOf(pre);
+    final IntList il = docs();
+    int i = il.sortedIndexOf(pre);
     if(i < 0) i = -i - 1;
-    else doc.delete(i);
-    doc.move(-size, i);
+    else il.delete(i);
+    il.move(-size, i);
     update();
   }
 
@@ -151,12 +153,12 @@ public final class DocIndex implements Index {
    * @param path input path
    * @return root nodes
    */
-  public synchronized IntList doc(final String path) {
+  public synchronized IntList docs(final String path) {
     // no documents: return empty list
     if(data.empty()) return new IntList(0);
 
     // empty path: return all documents
-    final IntList doc = doc();
+    final IntList doc = docs();
     if(path.isEmpty()) return doc;
 
     // initialize and sort document paths
@@ -182,6 +184,41 @@ public final class DocIndex implements Index {
         il.add(doc.get(order[p]));
     }
     return il.sort();
+  }
+
+
+  /**
+   * Returns the references to all binary files matching the specified path.
+   * @param path input path
+   * @return root nodes
+   */
+  public synchronized ObjList<File> files(final String path) {
+    final File bin = data.meta.binaries();
+    final ObjList<File> files = new ObjList<File>();
+    final File file = new File(bin, path);
+    if(file.exists()) {
+      if(file.isDirectory()) {
+        add(file, files);
+      } else {
+        files.add(file);
+      }
+    }
+    return files;
+  }
+
+  /**
+   * Adds binary files to the specified list.
+   * @param dir current directory
+   * @param files file list
+   */
+  private void add(final File dir, final ObjList<File> files) {
+    for(final File f : dir.listFiles()) {
+      if(f.isDirectory()) {
+        add(f, files);
+      } else {
+        files.add(f);
+      }
+    }
   }
 
   /**

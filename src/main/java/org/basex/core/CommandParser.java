@@ -22,19 +22,20 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.CreateBackup;
 import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.CreateEvent;
+import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Cs;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropBackup;
 import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.DropEvent;
+import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.DropUser;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Export;
 import org.basex.core.cmd.Find;
+import org.basex.core.cmd.Flush;
 import org.basex.core.cmd.Get;
 import org.basex.core.cmd.Grant;
 import org.basex.core.cmd.Help;
@@ -42,8 +43,6 @@ import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.InfoStorage;
-import org.basex.core.cmd.RepoDelete;
-import org.basex.core.cmd.RepoInstall;
 import org.basex.core.cmd.Kill;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.ListDB;
@@ -53,14 +52,16 @@ import org.basex.core.cmd.OptimizeAll;
 import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Rename;
 import org.basex.core.cmd.Replace;
+import org.basex.core.cmd.RepoDelete;
+import org.basex.core.cmd.RepoInstall;
 import org.basex.core.cmd.RepoList;
 import org.basex.core.cmd.Restore;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowBackups;
 import org.basex.core.cmd.ShowDatabases;
-import org.basex.core.cmd.ShowSessions;
 import org.basex.core.cmd.ShowEvents;
+import org.basex.core.cmd.ShowSessions;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IOFile;
@@ -72,6 +73,7 @@ import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
 /**
@@ -146,6 +148,7 @@ public final class CommandParser extends InputParser {
    */
   private Command parse(final Cmd cmd, final boolean s)
       throws QueryException {
+
     switch(cmd) {
       case CREATE:
         switch(consume(CmdCreate.class, cmd)) {
@@ -259,6 +262,8 @@ public final class CommandParser extends InputParser {
         return new Help(hc, form);
       case EXIT:
         return new Exit();
+      case FLUSH:
+        return new Flush();
       case KILL:
         return new Kill(glob(cmd));
       case RESTORE:
@@ -297,7 +302,7 @@ public final class CommandParser extends InputParser {
         break;
       default:
     }
-    return null;
+    throw Util.notexpected("command specified, but not implemented yet");
   }
 
   /**

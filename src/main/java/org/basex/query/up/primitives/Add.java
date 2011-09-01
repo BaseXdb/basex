@@ -137,7 +137,7 @@ public final class Add extends InsertBase {
     }
 
     // modify name and path, if needed
-    final IntList pres = docData.doc();
+    final IntList pres = docData.docs();
     if(pres.size() == 1 && name != null) {
       // name is specified and a single document is added: set the name
       final byte[] nm = path == null ? name : concat(path, SLASH, name);
@@ -162,7 +162,7 @@ public final class Add extends InsertBase {
    * @return pre value of the last document or {@code 0} if database is empty
    */
   private static int lastDoc(final Data data) {
-    final IntList docs = data.doc();
+    final IntList docs = data.docs();
     return docs.size() == 0 ? 0 : docs.get(docs.size() - 1);
   }
 

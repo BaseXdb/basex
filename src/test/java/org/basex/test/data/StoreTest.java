@@ -36,7 +36,7 @@ public final class StoreTest {
     // speed up updates and create initial database
     new Set(Prop.TEXTINDEX, false).execute(CONTEXT);
     new Set(Prop.ATTRINDEX, false).execute(CONTEXT);
-    new Set(Prop.FORCEFLUSH, false).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
   }
 
   /**

@@ -25,6 +25,7 @@ import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.DropUser;
 import org.basex.core.cmd.Export;
 import org.basex.core.cmd.Find;
+import org.basex.core.cmd.Flush;
 import org.basex.core.cmd.Get;
 import org.basex.core.cmd.Grant;
 import org.basex.core.cmd.Help;
@@ -310,6 +311,16 @@ public class CmdTest {
 
   /** Command test. */
   @Test
+  public final void flush() {
+    no(new Flush());
+    ok(new CreateDB(NAME));
+    ok(new Flush());
+    ok(new Close());
+    no(new Flush());
+  }
+
+  /** Command test. */
+  @Test
   public final void get() {
     ok(new Get(CmdSet.CHOP));
     no(new Get(NAME2));
@@ -436,6 +447,9 @@ public class CmdTest {
     ok(new Replace(FN, "<a/>"));
     ok(new Replace(FN, "<a/>"));
     no(new Replace(FN, ""));
+    // a failing replace should not remove existing documents
+    no(new Replace(FN, "<a>"));
+    assertTrue(!ok(new XQuery("doc('" + NAME + "')")).isEmpty());
   }
 
   /** Command test. */
@@ -529,12 +543,14 @@ public class CmdTest {
   /**
    * Assumes that this command is successful.
    * @param cmd command reference
+   * @return result as string
    */
-  protected final void ok(final Command cmd) {
+  protected final String ok(final Command cmd) {
     try {
-      session.execute(cmd);
+      return session.execute(cmd);
     } catch(final BaseXException ex) {
       fail(ex.getMessage());
+      return null;
     }
   }
 

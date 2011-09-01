@@ -264,7 +264,6 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbOptimize() {
     final String fun = check(Function.DBOPTIMIZE);
-
     query(fun + "('db')");
     query(fun + "('db', true())");
   }

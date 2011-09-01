@@ -107,7 +107,7 @@ public final class Add extends ACreate {
       final boolean lock) throws BaseXException {
 
     final Data data = ctx.data();
-    if(data == null) return PROCNODB;
+    if(data == null) throw new BaseXException(PROCNODB);
 
     String trg = path(target);
     if(!trg.isEmpty()) trg += '/';

@@ -6,7 +6,6 @@
 	<artifactId>basex</artifactId>
 	<version>6.7.2-SNAPSHOT</version>
 	<name>BaseX</name>
-	<url>http://basex.org</url>
 	<properties>
     <compileSource>1.6</compileSource>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

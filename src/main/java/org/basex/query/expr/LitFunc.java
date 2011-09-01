@@ -43,4 +43,9 @@ public final class LitFunc extends UserFunc {
     final int par = str.indexOf('(');
     return (par > -1 ? str.substring(0, par) : str) + "#" + args.length;
   }
+
+  @Override
+  boolean tco() {
+    return false;
+  }
 }

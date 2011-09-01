@@ -13,9 +13,9 @@ import java.io.InputStream;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class WrapInputStream extends InputStream {
+public final class ClientInputStream extends InputStream {
   /** Input stream. */
-  private final InputStream input;
+  private final BufferInput input;
   /** Current value. */
   private int curr;
 
@@ -24,7 +24,7 @@ public final class WrapInputStream extends InputStream {
    * @param in buffer input to be wrapped
    * @throws IOException I/O exception
    */
-  public WrapInputStream(final BufferInput in) throws IOException {
+  public ClientInputStream(final BufferInput in) throws IOException {
     input = in;
     read();
   }
@@ -42,7 +42,14 @@ public final class WrapInputStream extends InputStream {
     final int v = curr;
     if(v == -1) return -1;
     curr = input.read();
-    if(curr == 0) curr = -1;
+    if(curr == 0xFF) curr = input.read();
+    else if(curr == 0) curr = -1;
     return v;
+  }
+
+  @Override
+  public void close() throws IOException {
+    while(read() != -1);
+    super.close();
   }
 }

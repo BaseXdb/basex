@@ -32,7 +32,7 @@ public final class Rename extends ACreate {
 
     boolean ok = true;
     int c = 0;
-    final IntList il = data.doc(args[0]);
+    final IntList il = data.docs(args[0]);
     for(int i = 0, is = il.size(); i < is; i++) {
       final int doc = il.get(i);
       final byte[] target = newName(data, doc, src, trg);

@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
-
 import org.basex.core.MainProp;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -35,7 +33,7 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-public class BaseXServer extends Main {
+public class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
   public boolean running;
 
@@ -78,6 +76,8 @@ public class BaseXServer extends Main {
     if(failed) return;
 
     final int port = context.mprop.num(MainProp.SERVERPORT);
+    final int eport = context.mprop.num(MainProp.EVENTPORT);
+
     if(service) {
       Util.outln(start(port, getClass(), args));
       Performance.sleep(1000);
@@ -95,13 +95,11 @@ public class BaseXServer extends Main {
       log.write(SERVERSTART);
       socket = new ServerSocket();
       socket.setReuseAddress(true);
-      SocketAddress endpoint = new InetSocketAddress(port);
-      socket.bind(endpoint);
+      socket.bind(new InetSocketAddress(port));
 
       esocket = new ServerSocket();
       esocket.setReuseAddress(true);
-      endpoint = new InetSocketAddress(context.mprop.num(MainProp.EVENTPORT));
-      esocket.bind(endpoint);
+      esocket.bind(new InetSocketAddress(eport));
       stop = stopFile(port);
 
       // guarantee correct shutdown...

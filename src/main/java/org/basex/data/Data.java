@@ -2,6 +2,7 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,14 +16,15 @@ import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.path.PathSummary;
 import org.basex.index.Names;
+import org.basex.index.path.PathSummary;
 import org.basex.io.IO;
 import org.basex.io.random.TableAccess;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenMap;
 import org.basex.util.list.IntList;
+import org.basex.util.list.ObjList;
 
 /**
  * This class provides access to the database storage.
@@ -93,7 +95,7 @@ public abstract class Data {
   /** Path summary. */
   public PathSummary pthindex;
   /** Document index. */
-  public DocIndex docindex = new DocIndex(this);
+  protected DocIndex docindex = new DocIndex(this);
 
   /** Index reference for a name attribute. */
   public int nameID;
@@ -194,17 +196,26 @@ public abstract class Data {
    * A single dummy is returned if the database is empty.
    * @return root nodes
    */
-  public final IntList doc() {
-    return docindex.doc();
+  public final IntList docs() {
+    return docindex.docs();
   }
 
   /**
    * Returns the pre values of the document nodes for the specified path.
-   * @param input input path
+   * @param path input path
    * @return root nodes
    */
-  public final IntList doc(final String input) {
-    return docindex.doc(input);
+  public final IntList docs(final String path) {
+    return docindex.docs(path);
+  }
+
+  /**
+   * Returns the paths of all binary files matching the specified path.
+   * @param path input path
+   * @return root nodes
+   */
+  public final ObjList<File> files(final String path) {
+    return docindex.files(path);
   }
 
   /**

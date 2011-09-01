@@ -127,8 +127,8 @@ public final class Context {
    */
   public Nodes current() {
     if(current == null && data != null) {
-      final int[] root = (path == null ? data.doc() : data.doc(path)).toArray();
-      current = new Nodes(root, data);
+      current = new Nodes(
+          (path == null ? data.docs() : data.docs(path)).toArray(), data);
       current.root = path == null;
     }
     return current;
@@ -147,7 +147,7 @@ public final class Context {
    * @return result of check
    */
   public int[] doc() {
-    return current.root ? current.list : data.doc().toArray();
+    return current.root ? current.list : data.docs().toArray();
   }
 
   /**

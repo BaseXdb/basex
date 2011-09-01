@@ -26,7 +26,7 @@ import org.basex.util.list.StringList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public abstract class Main implements Runnable {
+public abstract class Main {
   /** Flag for using default standard input. */
   private static final boolean NOCONSOLE = System.console() == null;
   /** Database context. */
