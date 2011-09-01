@@ -2,7 +2,6 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,7 +24,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 import org.basex.util.list.IntList;
-import org.basex.util.list.ObjList;
+import org.basex.util.list.StringList;
 
 /**
  * This class provides access to the database storage.
@@ -205,7 +204,7 @@ public abstract class Data {
    * @param path input path
    * @return root nodes
    */
-  public final ObjList<File> files(final String path) {
+  public final StringList files(final String path) {
     return docindex.files(path);
   }
 

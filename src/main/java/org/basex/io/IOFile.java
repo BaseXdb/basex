@@ -201,7 +201,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns the children of a path.
+   * Returns the children of the path.
    * @return children
    */
   public IOFile[] children() {
@@ -209,7 +209,8 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns the children of a path that match the specified regular expression.
+   * Returns the children of the path that match the specified regular
+   * expression.
    * @param pattern pattern
    * @return children
    */
@@ -224,6 +225,32 @@ public final class IOFile extends IO {
       if(p.matcher(f.getName()).matches()) io.add(new IOFile(f));
     }
     return io.toArray(new IOFile[io.size()]);
+  }
+
+  /**
+   * Returns all descendants of the path.
+   * @return descendants
+   */
+  public synchronized StringList descendants() {
+    final StringList files = new StringList();
+    final File[] ch = file.listFiles();
+    if(ch == null) return files;
+    if(exists()) add(this, files, path().length() + 1);
+    return files;
+  }
+
+  /**
+   * Adds binary files to the specified list.
+   * @param io current file
+   * @param files file list
+   * @param off root prefix
+   */
+  private void add(final IOFile io, final StringList files, final int off) {
+    if(io.isDir()) {
+      for(final IOFile f : io.children()) add(f, files, off);
+    } else {
+      files.add(io.path().substring(off).replace('\\', '/'));
+    }
   }
 
   /**

@@ -49,22 +49,21 @@ public final class ListDB extends Command {
       final IntList il = data.docs(path);
       for(int i = 0, is = il.size(); i < is; i++) {
         final int pre = il.get(i);
-        final TokenList tl = new TokenList(2);
+        final TokenList tl = new TokenList(3);
         tl.add(data.text(pre, true));
         tl.add(DataText.M_XML);
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
       }
       // add binary files to list
-      final int pref = data.meta.binaries().getPath().length() + 1;
-      for(final File f : data.files(path)) {
-        final TokenList tl = new TokenList(2);
-        tl.add(f.getPath().substring(pref).replace('\\', '/'));
+      final File bin = data.meta.binaries();
+      for(final String file : data.files(path)) {
+        final TokenList tl = new TokenList(3);
+        tl.add(file);
         tl.add(DataText.M_RAW);
-        tl.add(f.length());
+        tl.add(new File(bin, file).length());
         table.contents.add(tl);
       }
-
       Close.close(data, context);
     } catch(final IOException ex) {
       Util.debug(ex);
