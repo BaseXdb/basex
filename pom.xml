@@ -29,6 +29,11 @@
 			<name>BaseX Maven Repository</name>
 			<url>http://files.basex.org/maven</url>
 		</repository>
+    <repository>
+      <id>milton</id>
+      <name>Milton Maven Repository</name>
+      <url>http://www.ettrema.com/maven2</url>
+    </repository>
 	</repositories>
 	<organization>
 		<name>BaseX Team</name>
@@ -83,6 +88,16 @@
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
 			<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>com.ettrema</groupId>
+    	<artifactId>milton-api</artifactId>
+    	<version>1.5.10</version>
+    </dependency>
+    <dependency>
+    	<groupId>commons-fileupload</groupId>
+    	<artifactId>commons-fileupload</artifactId>
+    	<version>1.2.2</version>
 		</dependency>
 	</dependencies>
 	<build>
