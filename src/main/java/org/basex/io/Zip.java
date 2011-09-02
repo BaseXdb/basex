@@ -13,6 +13,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.basex.core.Progress;
 import org.basex.util.list.ByteList;
+import org.basex.util.list.StringList;
 
 /**
  * Contains methods for zipping and unzipping archives.
@@ -140,14 +141,14 @@ public final class Zip extends Progress {
       out.closeEntry();
 
       // loop through all files
-      final IO[] files = new IOFile(source).children();
-      total = files.length;
-      for(final IO io : files) {
+      final StringList files = new IOFile(source).descendants();
+      total = files.size();
+      for(final String io : files) {
         curr++;
         FileInputStream in = null;
         try {
-          in = new FileInputStream(io.path());
-          out.putNextEntry(new ZipEntry(source.getName() + '/' + io.name()));
+          in = new FileInputStream(new File(source, io));
+          out.putNextEntry(new ZipEntry(source.getName() + '/' + io));
           for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           out.closeEntry();
         } finally {

@@ -49,14 +49,13 @@ public abstract class ContextModifier {
   /**
    * Checks constraints and applies all update primitives to the databases if
    * no constraints are hurt.
-   * @param ctx query context
    * @throws QueryException query exception
    */
-  final void applyUpdates(final QueryContext ctx) throws QueryException {
+  final void applyUpdates() throws QueryException {
     // constraints are checked first. no updates are applied if any problems
     // are found
     for(final DatabaseUpdates c : pendingUpdates.values()) c.check();
-    for(final DatabaseUpdates c : pendingUpdates.values()) c.apply(ctx);
+    for(final DatabaseUpdates c : pendingUpdates.values()) c.apply();
   }
 
   /**

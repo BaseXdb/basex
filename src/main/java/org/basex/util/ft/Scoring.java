@@ -70,12 +70,13 @@ public final class Scoring {
   }
 
   /**
-   * Returns a tf-idf for the specified values.
-   * Used definition: freq(i, j) / max(l, freq(l, j)) * log(1 + N / n(i)).
-   * The result is multiplied with the {@link #MP} constant to yield
+   * <p>Calculates a TF-IDF value for the specified values.
+   * Used definition:</p>
+   * <p>{@code freq(i, j) / max(l, freq(l, j)) * log(1 + N / n(i))}</p>
+   * <p>The result is multiplied with the {@link #MP} constant to yield
    * integer values. The value {@code 2} is used as minimum score,
    * as the total minimum value will be subtracted by 1 to avoid eventual
-   * {@code 0} scores.
+   * {@code 0} scores.</p>
    * @param freq frequency of the token. TF: freq(i, j)
    * @param mfreq maximum occurrence of a token. TF: max(l, freq(l, j))
    * @param docs number of documents in the collection. IDF: N
@@ -88,17 +89,17 @@ public final class Scoring {
   }
 
   /**
-   * Returns the score for a text node.
-   * Used when no index score is available.
+   * Calculates the score for a text node.
+   * Used if no index score is available.
    * @param npv number of pos values
-   * @param is index size
+   * @param is total number of index entries
    * @param tokl token length
    * @param tl text length
    * @return score value
    */
-  public static double textNode(final double npv, final double is,
-      final double tokl, final double tl) {
-    return max(npv / is, log(tokl * npv + 1) / log(tl + 1));
+  public static double textNode(final int npv, final int is,
+      final int tokl, final int tl) {
+    return max((double) npv / is, log(tokl * npv + 1) / log(tl + 1));
   }
 
   /**

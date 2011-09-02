@@ -36,7 +36,7 @@ public final class MemData extends Data {
     tagindex = tag;
     atnindex = att;
     ns = n;
-    pthindex = s;
+    pthindex = s == null ? new PathSummary(this) : s;
   }
 
   /**
@@ -53,7 +53,7 @@ public final class MemData extends Data {
    * @param pr property reference
    */
   public MemData(final Prop pr) {
-    this(new Names(0), new Names(0), new Namespaces(), new PathSummary(), pr);
+    this(new Names(0), new Names(0), new Namespaces(), null, pr);
   }
 
   @Override

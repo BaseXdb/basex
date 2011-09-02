@@ -181,13 +181,16 @@ public final class DiskValues implements Index {
   private IndexIterator iter(final IntList ids) {
     return new IndexIterator() {
       int p = -1;
+      int s = ids.size();
 
       @Override
-      public boolean more() { return ++p < ids.size(); }
+      public boolean more() { return ++p < s; }
       @Override
       public int next() { return ids.get(p); }
       @Override
       public double score() { return -1; }
+      @Override
+      public int size() { return s; }
     };
   }
 

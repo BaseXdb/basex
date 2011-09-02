@@ -137,9 +137,9 @@ final class FTTrie extends FTIndex {
   private FTIndexIterator iter(final int id, final byte[] token,
       final boolean fast) {
 
-    if(token == null || token.length == 0) return FTIndexIterator.EMP;
+    if(token == null || token.length == 0) return FTIndexIterator.FTEMPTY;
     final int[] node = node(token, id);
-    return node == null ? FTIndexIterator.EMP :
+    return node == null ? FTIndexIterator.FTEMPTY :
       iter(currID, node[node.length - 1], inB, fast);
   }
 
@@ -420,14 +420,14 @@ final class FTTrie extends FTIndex {
     final int currentLength = 0;
     int resultNode;
 
-    FTIndexIterator d = FTIndexIterator.EMP;
+    FTIndexIterator d = FTIndexIterator.FTEMPTY;
     // wildcard not at beginning
     if(posw > 0) {
       // copy part before wildcard
       bw = new byte[posw];
       System.arraycopy(vsn, 0, bw, 0, posw);
       resultNode = wc(id, bw);
-      if(resultNode == -1) return FTIndexIterator.EMP;
+      if(resultNode == -1) return FTIndexIterator.FTEMPTY;
     } else {
       resultNode = 0;
     }
@@ -499,7 +499,7 @@ final class FTTrie extends FTIndex {
       }
 
       // delete data
-      idata = FTIndexIterator.EMP;
+      idata = FTIndexIterator.FTEMPTY;
       wc(resultNode, aw, false, counter[0], 0, fast);
       return FTIndexIterator.union(d, idata);
     }
@@ -520,7 +520,7 @@ final class FTTrie extends FTIndex {
 
       nvsn[l + 1] = '.';
       nvsn[l + 2] = '*';
-      FTIndexIterator tmpres = FTIndexIterator.EMP;
+      FTIndexIterator tmpres = FTIndexIterator.FTEMPTY;
       // append 1 symbol
       // not completely processed (value current node)
       if(rne[0] > counter[0] && resultNode > 0) {
@@ -530,7 +530,7 @@ final class FTTrie extends FTIndex {
       } else if(rne[0] == counter[0] || resultNode == 0) {
         // all chars from nodes[resultNode] are computed
         // any next values existing
-        if(!more(rne)) return FTIndexIterator.EMP;
+        if(!more(rne)) return FTIndexIterator.FTEMPTY;
 
         for(int t = rne[0] + 1; t < rne.length - 1; t += 2) {
           nvsn[l] = (byte) rne[t + 1];
@@ -550,7 +550,7 @@ final class FTTrie extends FTIndex {
       // . wildcards left
       final FTIndexIterator resultData = iter(0, vsn, fast);
       // save nodeValues for recursive method call
-      if(resultData.size != 0 && first) {
+      if(resultData.size() != 0 && first) {
         valuesFound = new byte[] {(byte) rne[counter[0] + 1]};
       }
       return resultData;
@@ -559,9 +559,9 @@ final class FTTrie extends FTIndex {
     if(rne[0] == counter[0] || resultNode == 0) {
       // all chars from nodes[resultNode] are computed
       // any next values existing
-      if(!more(rne)) return FTIndexIterator.EMP;
+      if(!more(rne)) return FTIndexIterator.FTEMPTY;
 
-      FTIndexIterator tmpNode = FTIndexIterator.EMP;
+      FTIndexIterator tmpNode = FTIndexIterator.FTEMPTY;
       aw = new byte[vsn.length - posw];
       System.arraycopy(vsn, posw + 1, aw, 1, aw.length - 1);
 
@@ -583,7 +583,7 @@ final class FTTrie extends FTIndex {
         tmpNode = FTIndexIterator.union(iter(rne[t], aw, fast), tmpNode);
       }
     }
-    return FTIndexIterator.EMP;
+    return FTIndexIterator.FTEMPTY;
   }
 
   /**
@@ -668,9 +668,9 @@ final class FTTrie extends FTIndex {
         // node entry processed complete
         if(vsn.length == i) {
           // leaf node found with appropriate value
-          if(c < d + p + r) return FTIndexIterator.EMP;
+          if(c < d + p + r) return FTIndexIterator.FTEMPTY;
 
-          FTIndexIterator ld = FTIndexIterator.EMP;
+          FTIndexIterator ld = FTIndexIterator.FTEMPTY;
           ld = iter(cdid, cne[cne.length - 1], inB, f);
           for(int t = cne[0] + 1; t < cne.length - 1; t += 2) {
             ld = FTIndexIterator.union(fuzzy(cne[t], null, -1,
@@ -679,7 +679,7 @@ final class FTTrie extends FTIndex {
           return ld;
         }
 
-        FTIndexIterator ld = FTIndexIterator.EMP;
+        FTIndexIterator ld = FTIndexIterator.FTEMPTY;
         byte[] b;
         if(c > d + p + r) {
           // delete char
@@ -737,7 +737,7 @@ final class FTTrie extends FTIndex {
         return ld;
       }
 
-      FTIndexIterator ld = FTIndexIterator.EMP;
+      FTIndexIterator ld = FTIndexIterator.FTEMPTY;
 
       if(c > d + p + r) {
         // paste char
@@ -771,7 +771,7 @@ final class FTTrie extends FTIndex {
 
     int[] ne = null;
     long tdid = -1;
-    FTIndexIterator ld = FTIndexIterator.EMP;
+    FTIndexIterator ld = FTIndexIterator.FTEMPTY;
 
     byte[] b;
     for(int k = cne[0] + 1; k < cne.length - 1; k += 2) {

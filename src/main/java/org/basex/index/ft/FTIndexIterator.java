@@ -14,11 +14,9 @@ import org.basex.util.ft.Scoring;
 public abstract class FTIndexIterator extends IndexIterator {
   /** Each token in the query has a number. */
   int toknum;
-  /** Number of results. */
-  int size;
 
   /** Empty iterator. */
-  static final FTIndexIterator EMP = new FTIndexIterator() {
+  static final FTIndexIterator FTEMPTY = new FTIndexIterator() {
     @Override
     public boolean more() { return false; }
     @Override
@@ -26,9 +24,9 @@ public abstract class FTIndexIterator extends IndexIterator {
     @Override
     public FTMatches matches() { return null; }
     @Override
-    public int indexSize() { return 1; }
-    @Override
     public double score() { return -1; }
+    @Override
+    public int size() { return 0; }
   };
 
   /**
@@ -44,12 +42,6 @@ public abstract class FTIndexIterator extends IndexIterator {
   public void tokenNum(final byte tn) {
     toknum = tn;
   }
-
-  /**
-   * Returns the number of index entries.
-   * @return number of index entries
-   */
-  public abstract int indexSize();
 
   /**
    * Merges two index array iterators.
@@ -92,8 +84,8 @@ public abstract class FTIndexIterator extends IndexIterator {
       }
 
       @Override
-      public synchronized int indexSize() {
-        return i1.indexSize() + i2.indexSize();
+      public synchronized int size() {
+        return i1.size() + i2.size();
       }
 
       @Override
@@ -151,8 +143,8 @@ public abstract class FTIndexIterator extends IndexIterator {
       }
 
       @Override
-      public synchronized int indexSize() {
-        return Math.min(i1.indexSize(), i2.indexSize());
+      public synchronized int size() {
+        return Math.min(i1.size(), i2.size());
       }
 
       @Override

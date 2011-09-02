@@ -9,6 +9,9 @@ import java.io.IOException;
 
 import org.basex.core.Command;
 import org.basex.core.User;
+import org.basex.io.IOFile;
+import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * Evaluates the 'copy' command and creates a copy of a database.
@@ -59,18 +62,17 @@ public final class Copy extends Command {
     final File trg = mprop.dbpath(newdb);
 
     // return false if source cannot be opened, or target cannot be created
-    final String[] files = src.list();
-    if(files == null || !trg.mkdir()) return false;
-    tf = files.length;
+    final StringList files = new IOFile(src).descendants();
+    tf = files.size();
     boolean ok = true;
-    for(final String file : files) {
-      of++;
-      try {
+    try {
+      for(final String file : files) {
         copy(new File(src, file), new File(trg, file));
-      } catch(final IOException ex) {
-        ok = false;
-        break;
+        of++;
       }
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      ok = false;
     }
     // drop new database if error occurred
     if(!ok) DropDB.drop(newdb, mprop);
@@ -87,14 +89,20 @@ public final class Copy extends Command {
       throws IOException {
 
     // optimize buffer size
-    final byte[] buf = new byte[(int) Math.min(src.length(), 1 << 22)];
+    final int bsize = (int) Math.max(1, Math.min(src.length(), 1 << 22));
+    final byte[] buf = new byte[bsize];
+
     FileInputStream fis = null;
     FileOutputStream fos = null;
     try {
+      // create parent directory of target file
+      trg.getParentFile().mkdirs();
       fis = new FileInputStream(src);
       fos = new FileOutputStream(trg);
+      // copy file buffer by buffer
       for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
     } finally {
+      // close file references
       if(fis != null) try { fis.close(); } catch(final IOException ex) { }
       if(fos != null) try { fos.close(); } catch(final IOException ex) { }
     }

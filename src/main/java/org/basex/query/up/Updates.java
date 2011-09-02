@@ -208,11 +208,10 @@ public final class Updates {
 
   /**
    * Executes all updates.
-   * @param ctx query context
    * @throws QueryException query exception
    */
-  public void applyUpdates(final QueryContext ctx) throws QueryException {
-    if(mod != null) mod.applyUpdates(ctx);
+  public void applyUpdates() throws QueryException {
+    if(mod != null) mod.applyUpdates();
   }
 
   /**

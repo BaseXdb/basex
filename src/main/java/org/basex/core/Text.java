@@ -725,7 +725,7 @@ public interface Text {
   /** Info on database time stamp. */
   String INFOTIME = lang("info_time");
   /** Info on number of documents. */
-  String INFONDOCS = lang("info_ndocs");
+  String INFONRES = lang("info_nres");
   /** Info on document size. */
   String INFODOCSIZE = lang("info_docsize");
   /** Document encoding. */

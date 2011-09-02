@@ -68,6 +68,7 @@ public final class MemBuilder extends Builder {
 
     parse();
     data.init();
+    path.finish(data);
     return data;
   }
 

@@ -175,11 +175,11 @@ public final class FTWords extends FTExpr {
               len = t;
               iat = ia;
             } else if(mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS) {
-              if(ia.indexSize() == 0) return null;
+              if(ia.size() == 0) return null;
               len += t;
               iat = FTIndexIterator.intersect(ia, iat, 0);
             } else {
-              if(ia.indexSize() == 0) continue;
+              if(ia.size() == 0) continue;
               len = Math.max(t, len);
               iat = FTIndexIterator.union(ia, iat);
             }
@@ -187,7 +187,7 @@ public final class FTWords extends FTExpr {
           }
         }
         return iat != null && iat.more() ? new FTNode(iat.matches(), data,
-            iat.next(), len, iat.indexSize(), iat.score()) : null;
+            iat.next(), len, iat.size(), iat.score()) : null;
       }
     };
   }
@@ -231,8 +231,9 @@ public final class FTWords extends FTExpr {
         return matches;
       }
       @Override
-      public int indexSize() {
-        return 1;
+      public int size() {
+        // worst case
+        return data.meta.size >>> 1;
       }
     };
   }
