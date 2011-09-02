@@ -46,7 +46,9 @@ import org.basex.server.ClientSession;
 import org.basex.server.Session;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -58,24 +60,28 @@ import org.junit.Test;
  */
 public final class PermissionTest {
   /** Name of test database and user. */
-  static final String NAME = Util.name(PermissionTest.class);
+  private static final String NAME = Util.name(PermissionTest.class);
   /** Name of the database to be renamed. */
   private static final String RENAMED = Util.name(PermissionTest.class) + "r";
   /** Test repository. **/
-  static final String REPO = "etc/test/repo/";
+  private static final String REPO = "etc/test/repo/";
 
   /** Server reference. */
-  static BaseXServer server;
+  private static BaseXServer server;
   /** Socket reference. */
-  static Session adminSession;
+  private Session adminSession;
   /** Socket reference. */
-  static Session testSession;
+  private Session testSession;
 
   /** Starts the server. */
   @BeforeClass
   public static void start() {
     server = new BaseXServer("-z");
+  }
 
+  /** Set up method. */
+  @Before
+  public void setUp() {
     try {
       adminSession = new ClientSession(server.context, ADMIN, ADMIN);
       if(server.context.users.get(NAME) != null) {
@@ -86,6 +92,9 @@ public final class PermissionTest {
       ok(new CreateDB(RENAMED), adminSession);
       server.context.repo.init(REPO);
       testSession = new ClientSession(server.context, NAME, NAME);
+
+      ok(new CreateDB(NAME, "<xml/>"), adminSession);
+      ok(new Close(), adminSession);
     } catch(final Exception ex) {
       fail(ex.toString());
     }
@@ -94,8 +103,6 @@ public final class PermissionTest {
   /** Tests all commands where no permission is needed. */
   @Test
   public void noPermsNeeded() {
-    ok(new CreateDB(NAME, "<xml/>"), adminSession);
-    ok(new Close(), adminSession);
     ok(new Grant("none", NAME), adminSession);
 
     ok(new Password(Token.md5(NAME)), testSession);
@@ -182,6 +189,7 @@ public final class PermissionTest {
   @Test
   public void writePermsNeeded() {
     ok(new Grant("write", NAME), adminSession);
+    ok(new Open(RENAMED), testSession);
     ok(new Rename(RENAMED, RENAMED + "2"), testSession);
     ok(new Rename(RENAMED + "2", RENAMED), testSession);
 
@@ -208,6 +216,8 @@ public final class PermissionTest {
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new DropIndex(cmd), testSession);
     }
+    ok(new Flush(), testSession);
+    ok(new Close(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new DropDB(NAME), testSession);
     no(new CreateUser(NAME, Token.md5(NAME)), testSession);
@@ -218,7 +228,6 @@ public final class PermissionTest {
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
     no(new AlterUser(NAME, Token.md5(NAME)), testSession);
-    ok(new Flush(), testSession);
   }
 
   /** Tests all commands where create permission is needed. */
@@ -308,15 +317,21 @@ public final class PermissionTest {
     }
   }
 
-  /** Stops the server. */
-  @AfterClass
-  public static void stop() {
+  /** Clean up method. */
+  @After
+  public void cleanUp() {
     try {
+      testSession.close();
       adminSession.execute(new DropDB(RENAMED));
       adminSession.close();
     } catch(final Exception ex) {
       fail(ex.toString());
     }
+  }
+
+  /** Stops the server. */
+  @AfterClass
+  public static void stop() {
     // stop server instance
     server.stop();
   }
