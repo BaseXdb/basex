@@ -18,7 +18,7 @@ import org.junit.Test;
  */
 public final class XQUFServerStressTest {
   /** Database name. */
-  private static final String DBNAME = Util.name(XQUFServerStressTest.class);
+  private static final String DB = Util.name(XQUFServerStressTest.class);
   /** Server. */
   private static BaseXServer server;
 
@@ -70,7 +70,7 @@ public final class XQUFServerStressTest {
     insert(clients, runs);
     delete(clients, runs);
     final ClientSession s = newSession();
-    s.execute(new DropDB(DBNAME));
+    s.execute(new DropDB(DB));
     s.close();
     server.stop();
   }
@@ -83,9 +83,9 @@ public final class XQUFServerStressTest {
    */
   private void insert(final int clients, final int runs) throws Exception {
     final ClientSession s = newSession();
-    s.execute(new CreateDB(DBNAME, "<doc/>"));
+    s.execute(new CreateDB(DB, "<doc/>"));
     s.close();
-    run("insert node <node/> into doc('" + DBNAME + "')/doc", clients, runs);
+    run("insert node <node/> into doc('" + DB + "')/doc", clients, runs);
   }
 
   /**
@@ -96,12 +96,12 @@ public final class XQUFServerStressTest {
    */
   private void delete(final int clients, final int runs) throws Exception {
     final ClientSession s = newSession();
-    s.execute(new CreateDB(DBNAME, "<doc/>"));
+    s.execute(new CreateDB(DB, "<doc/>"));
     final int c = 100 + clients * clients;
     s.execute(new XQuery("for $i in 1 to " + c +
-        " return insert node <node/> into doc('" + DBNAME + "')/doc"));
+        " return insert node <node/> into doc('" + DB + "')/doc"));
     s.close();
-    run("delete nodes (doc('" + DBNAME + "')/doc/node)[1]", clients, runs);
+    run("delete nodes (doc('" + DB + "')/doc/node)[1]", clients, runs);
   }
 
   /**

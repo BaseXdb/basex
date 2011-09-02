@@ -24,14 +24,14 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class IncUpdateTest {
+  /** Test database name. */
+  private static final String DB = Util.name(IncUpdateTest.class);
   /** Database context. */
   protected static final Context CONTEXT = new Context();
-  /** Test database name. */
-  public static final String DBNAME = Util.name(IncUpdateTest.class);
   /** Number of steps. */
-  public static final int STEPS = 10;
+  private static final int STEPS = 10;
   /** Maximum number of entries. */
-  public static final int MAX = 2000 / STEPS;
+  private static final int MAX = 2000 / STEPS;
 
   /**
    * Initializes the test.
@@ -39,7 +39,7 @@ public final class IncUpdateTest {
    */
   @Before
   public void init() throws Exception {
-    new CreateDB(DBNAME, "<xml/>").execute(CONTEXT);
+    new CreateDB(DB, "<xml/>").execute(CONTEXT);
     new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
   }
 
@@ -49,7 +49,7 @@ public final class IncUpdateTest {
    */
   @After
   public void finish() throws Exception {
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
   }
 
   /**

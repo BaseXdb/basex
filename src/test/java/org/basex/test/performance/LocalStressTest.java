@@ -20,7 +20,7 @@ import org.junit.Test;
  */
 public final class LocalStressTest {
   /** Test database name. */
-  private static final String DBNAME = Util.name(LocalStressTest.class);
+  private static final String DB = Util.name(LocalStressTest.class);
   /** Input document. */
   private static final String INPUT = "etc/factbook.zip";
   /** Query to be run ("%" may be used as placeholder for dynamic content). */
@@ -79,7 +79,7 @@ public final class LocalStressTest {
    */
   private void run(final int clients, final int runs) throws Exception {
     // Create test database
-    Command cmd = new CreateDB(DBNAME, INPUT);
+    Command cmd = new CreateDB(DB, INPUT);
     cmd.execute(CONTEXT);
 
     // Start clients
@@ -88,7 +88,7 @@ public final class LocalStressTest {
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
     // Drop database
-    cmd = new DropDB(DBNAME);
+    cmd = new DropDB(DB);
     cmd.execute(CONTEXT);
   }
 

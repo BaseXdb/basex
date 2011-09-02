@@ -22,7 +22,7 @@ import org.junit.Test;
  */
 public final class CollStressTest {
   /** Test database name. */
-  private static final String DBNAME = Util.name(CollStressTest.class);
+  private static final String DB = Util.name(CollStressTest.class);
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of documents to be added. */
@@ -34,7 +34,7 @@ public final class CollStressTest {
    */
   @BeforeClass
   public static void init() throws Exception {
-    final CreateDB cmd = new CreateDB(DBNAME);
+    final CreateDB cmd = new CreateDB(DB);
     cmd.execute(CONTEXT);
     // Speed up updates and add documents
     new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
@@ -51,7 +51,7 @@ public final class CollStressTest {
    */
   @AfterClass
   public static void finish() throws Exception {
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
   }
 
   /**
@@ -60,9 +60,9 @@ public final class CollStressTest {
    */
   @Test
   public void specificOpened() throws Exception {
-    new Open(DBNAME).execute(CONTEXT);
+    new Open(DB).execute(CONTEXT);
     for(int i = 0; i < SIZE; i++) {
-      new XQuery("collection('" + DBNAME + "/" + i + "')").execute(CONTEXT);
+      new XQuery("collection('" + DB + "/" + i + "')").execute(CONTEXT);
     }
   }
 
@@ -74,7 +74,7 @@ public final class CollStressTest {
   public void specificClosed() throws Exception {
     new Close().execute(CONTEXT);
     for(int i = 0; i < SIZE; i++) {
-      new XQuery("collection('" + DBNAME + "/" + i + "')").execute(CONTEXT);
+      new XQuery("collection('" + DB + "/" + i + "')").execute(CONTEXT);
     }
   }
 
@@ -84,9 +84,9 @@ public final class CollStressTest {
    */
   @Test
   public void allOpened() throws Exception {
-    new Open(DBNAME).execute(CONTEXT);
+    new Open(DB).execute(CONTEXT);
     new XQuery("for $i in 0 to " + (SIZE - 1) + " " +
-      "return collection(concat('" + DBNAME + "/', $i))").execute(CONTEXT);
+      "return collection(concat('" + DB + "/', $i))").execute(CONTEXT);
   }
 
   /**
@@ -97,6 +97,6 @@ public final class CollStressTest {
   public void allClosed() throws Exception {
     new Close().execute(CONTEXT);
     new XQuery("for $i in 0 to " + (SIZE - 1) + " " +
-      "return collection(concat('" + DBNAME + "/', $i))").execute(CONTEXT);
+      "return collection(concat('" + DB + "/', $i))").execute(CONTEXT);
   }
 }

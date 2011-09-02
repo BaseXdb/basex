@@ -15,7 +15,7 @@ import org.junit.Test;
  */
 public final class XQUFStressTest {
   /** Basic database name for each test. */
-  private static final String DBNAME = Util.name(XQUFStressTest.class);
+  private static final String DB = Util.name(XQUFStressTest.class);
   /** Number of node updates. */
   private static final int NRNODES = 100;
 
@@ -56,7 +56,7 @@ public final class XQUFStressTest {
    */
   private void insert(final int runs) throws Exception {
     for(int r = 0; r < runs; r++) {
-      new CreateDB(DBNAME, "<doc/>").execute(ctx);
+      new CreateDB(DB, "<doc/>").execute(ctx);
       // insert query
       new XQuery("for $i in 1 to " + NRNODES + " return insert node " +
           "<section><page/></section> into /doc").execute(ctx);
@@ -66,7 +66,7 @@ public final class XQUFStressTest {
         "let $par := $page/.. " +
         "return (delete node $page, insert node $page before $par)").
         execute(ctx);
-      new DropDB(DBNAME).execute(ctx);
+      new DropDB(DB).execute(ctx);
     }
   }
 
@@ -103,12 +103,12 @@ public final class XQUFStressTest {
    * @throws Exception exception
    */
   private void delete(final int runs) throws Exception {
-    new CreateDB(DBNAME, "<doc/>").execute(ctx);
+    new CreateDB(DB, "<doc/>").execute(ctx);
     for(int r = 0; r < runs; r++) {
       new XQuery("for $i in 1 to " + NRNODES +
           " return insert node <node/> into /doc").execute(ctx);
       new XQuery("delete nodes //node").execute(ctx);
     }
-    new DropDB(DBNAME).execute(ctx);
+    new DropDB(DB).execute(ctx);
   }
 }

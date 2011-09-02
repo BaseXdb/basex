@@ -23,7 +23,7 @@ import org.junit.Test;
  */
 public final class ReplaceTest {
   /** Test database name. */
-  private static final String DBNAME = Util.name(ReplaceTest.class);
+  private static final String DB = Util.name(ReplaceTest.class);
   /** Number of runs per client. */
   private static final int NQUERIES = 10000;
   /** Global context. */
@@ -43,7 +43,7 @@ public final class ReplaceTest {
     new Set(Prop.ATTRINDEX, false).execute(CONTEXT);
 
     // Create test database
-    new CreateDB(DBNAME, "<X><A>1</A><A>1</A></X>").execute(CONTEXT);
+    new CreateDB(DB, "<X><A>1</A><A>1</A></X>").execute(CONTEXT);
 
     long len1 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
@@ -65,7 +65,7 @@ public final class ReplaceTest {
     assertEquals(len1, len2);
 
     // Drop database
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
     CONTEXT.close();
   }
 }

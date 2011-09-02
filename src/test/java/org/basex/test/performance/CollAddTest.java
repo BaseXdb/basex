@@ -19,7 +19,7 @@ import org.junit.Test;
  */
 public final class CollAddTest {
   /** Test database name. */
-  private static final String DBNAME = Util.name(CollAddTest.class);
+  private static final String DB = Util.name(CollAddTest.class);
   /** Global context. */
   private static final Context CONTEXT = new Context();
 
@@ -105,13 +105,13 @@ public final class CollAddTest {
     new Set(Prop.AUTOFLUSH, flush).execute(CONTEXT);
 
     // Create test database
-    Command cmd = new CreateDB(DBNAME);
+    Command cmd = new CreateDB(DB);
     cmd.execute(CONTEXT);
     // Add documents
     for(int i = 0; i < n; i++) {
       new Add("<xml/>", Integer.toString(i)).execute(CONTEXT);
     }
     // Close database
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
   }
 }
