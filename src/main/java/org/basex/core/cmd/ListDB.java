@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.basex.core.Command;
@@ -56,12 +55,11 @@ public final class ListDB extends Command {
         table.contents.add(tl);
       }
       // add binary files to list
-      final File bin = data.meta.binaries();
       for(final String file : data.files(path)) {
         final TokenList tl = new TokenList(3);
         tl.add(file);
         tl.add(DataText.M_RAW);
-        tl.add(new File(bin, file).length());
+        tl.add(data.meta.binary(file).length());
         table.contents.add(tl);
       }
       Close.close(data, context);

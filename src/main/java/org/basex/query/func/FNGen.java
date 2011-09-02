@@ -271,7 +271,7 @@ public final class FNGen extends FuncCall {
     Uri base = ctx.baseURI;
     if(expr.length == 2) {
       base = Uri.uri(checkEStr(expr[1], ctx));
-      if(!base.valid()) DOCBASE.thrw(input, base);
+      if(!base.valid()) BASEINV.thrw(input, base);
     }
 
     final IO io = new IOContent(cont, string(base.atom()));

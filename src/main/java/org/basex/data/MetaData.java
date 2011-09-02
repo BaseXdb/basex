@@ -219,6 +219,15 @@ public final class MetaData {
   }
 
   /**
+   * Returns the specified binary file.
+   * @param key internal file path (key)
+   * @return binary directory
+   */
+  public IOFile binary(final String key) {
+    return new IOFile(new File(path, M_RAW), key);
+  }
+
+  /**
    * Drops the specified database files.
    * Should only be called if database is disk-based.
    * @param pat file pattern, or {@code null} if all files are to be deleted

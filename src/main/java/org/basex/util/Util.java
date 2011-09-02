@@ -56,7 +56,7 @@ public final class Util {
    */
   public static RuntimeException notexpected(final Object... ext) {
     final TokenBuilder tb = new TokenBuilder("Not expected");
-    if(ext.length != 0) tb.addExt(" (%)", ext);
+    if(ext.length != 0) tb.addExt(": %", ext);
     throw new RuntimeException(tb.add('.').toString());
   }
 

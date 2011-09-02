@@ -90,8 +90,6 @@ public final class SeqType {
   public static final SeqType BLN_ZO = new SeqType(AtomType.BLN, Occ.ZO);
   /** Single xs:base64Binary. */
   public static final SeqType B64 = AtomType.B64.seq();
-  /** Zero or more xs:base64Binary. */
-  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZM);
   /** Double number. */
   public static final SeqType DBL = AtomType.DBL.seq();
   /** Double number. */

@@ -8,12 +8,14 @@ import java.io.IOException;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.User;
 import org.basex.core.cmd.ACreate;
+import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
 import org.basex.data.Data;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.io.IOFile;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.XMLSerializer;
@@ -22,6 +24,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
 import org.basex.query.item.ANode;
+import org.basex.query.item.B64;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Empty;
@@ -36,20 +39,24 @@ import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
 import org.basex.query.up.primitives.Add;
+import org.basex.query.up.primitives.DBDelete;
+import org.basex.query.up.primitives.DBOptimize;
+import org.basex.query.up.primitives.DBPut;
 import org.basex.query.up.primitives.DeleteNode;
-import org.basex.query.up.primitives.Optimize;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
 import org.basex.util.list.ObjList;
+import org.basex.util.list.StringList;
 
 /**
  * Database functions.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
+ * @author Dimitar Popov
  */
 public final class FNDb extends FuncCall {
   /**
@@ -79,6 +86,7 @@ public final class FNDb extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     switch(def) {
       case DBEVENT:    return event(ctx);
       case DBOPENID:   return open(ctx, true);
@@ -90,6 +98,8 @@ public final class FNDb extends FuncCall {
       case DBRENAME:   return rename(ctx);
       case DBREPLACE:  return replace(ctx);
       case DBOPTIMIZE: return optimize(ctx);
+      case DBPUT:      return put(ctx);
+      case DBGET:      return get(ctx);
       default:         return super.item(ctx, ii);
     }
   }
@@ -325,12 +335,16 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final byte[] target = path(checkStr(expr[1], ctx));
-    final IntList il = data.docs(string(target));
-    for(int i = 0, is = il.size(); i < is; i++) {
-      final int pre = il.get(i);
-      ctx.updates.add(new DeleteNode(pre, data, input), ctx);
+    final String target = string(path(checkStr(expr[1], ctx)));
+
+    // delete XML resources
+    final IntList docs = data.docs(target);
+    for(int i = 0, is = docs.size(); i < is; i++) {
+      ctx.updates.add(new DeleteNode(docs.get(i), data, input), ctx);
     }
+    // delete raw resources
+    final StringList raw = Delete.files(data, target);
+    ctx.updates.add(new DBDelete(data, raw, input), ctx);
     return null;
   }
 
@@ -367,11 +381,43 @@ public final class FNDb extends FuncCall {
   private Item optimize(final QueryContext ctx) throws QueryException {
     checkWrite(ctx);
 
-    final boolean all = expr.length == 2 && checkBln(expr[1], ctx);
     final Data data = data(0, ctx);
-
-    ctx.updates.add(new Optimize(data, ctx.context, all, input), ctx);
+    final boolean all = expr.length == 2 && checkBln(expr[1], ctx);
+    ctx.updates.add(new DBOptimize(data, ctx.context, all, input), ctx);
     return null;
+  }
+
+  /**
+   * Performs the put function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item put(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+    final byte[] key = path(checkStr(expr[1], ctx));
+    final byte[] val = checkBin(expr[2], ctx);
+    ctx.updates.add(new DBPut(data, key, val, input), ctx);
+    return null;
+  }
+
+  /**
+   * Performs the get function.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item get(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+    final byte[] key = path(checkStr(expr[1], ctx));
+
+    final IOFile bin = data.meta.binary(string(key));
+    if(!bin.exists()) RESFNF.thrw(input, key);
+    try {
+      return new B64(bin.content());
+    } catch(final IOException ex) {
+      throw IOERR.thrw(input, ex);
+    }
   }
 
   /**
@@ -436,7 +482,7 @@ public final class FNDb extends FuncCall {
     final boolean up =
       def == Function.DBADD || def == Function.DBDELETE ||
       def == Function.DBRENAME || def == Function.DBREPLACE ||
-      def == Function.DBOPTIMIZE;
+      def == Function.DBOPTIMIZE || def == Function.DBPUT;
     return
       u == Use.CTX && (def == Function.DBTEXT || def == Function.DBATTR ||
         def == Function.DBFULLTEXT || def == Function.DBEVENT || up) ||
@@ -471,8 +517,12 @@ public final class FNDb extends FuncCall {
    * Removes duplicate, leading and trailing slashes
    * @param path input path
    * @return normalized path
+   * @throws QueryException query exception
    */
-  private static byte[] path(final byte[] path) {
+  private byte[] path(final byte[] path) throws QueryException {
+    // check if path is valid
+    if(endsWith(path, '.')) RESINV.thrw(input, path);
+    // return normalized path
     return token(ACreate.path(string(path)));
   }
 }

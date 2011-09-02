@@ -28,7 +28,7 @@ public final class AddDeleteTest {
   private static final Context CONTEXT = new Context();
 
   /** Test database name. */
-  private static final String DBNAME = Util.name(AddDeleteTest.class);
+  private static final String DB = Util.name(AddDeleteTest.class);
   /** Test file. */
   private static final String DIR = "etc/test/";
   /** Test file. */
@@ -61,7 +61,7 @@ public final class AddDeleteTest {
    */
   @Before
   public void setUp() throws BaseXException {
-    new CreateDB(DBNAME).execute(CONTEXT);
+    new CreateDB(DB).execute(CONTEXT);
   }
 
   /**
@@ -70,7 +70,7 @@ public final class AddDeleteTest {
    */
   @After
   public void tearDown() throws BaseXException {
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
   }
 
   /**
@@ -182,7 +182,7 @@ public final class AddDeleteTest {
    */
   @Test
   public void addCorrupt() throws Exception {
-    final IOFile io = new IOFile(Prop.TMP, DBNAME);
+    final IOFile io = new IOFile(Prop.TMP, DB);
     io.write(Token.token("<x"));
     try {
       new Add(io.path()).execute(CONTEXT);
@@ -200,14 +200,14 @@ public final class AddDeleteTest {
   @Test
   public void createCorrupt() throws Exception {
     try {
-      new CreateDB(DBNAME, "<x").execute(CONTEXT);
+      new CreateDB(DB, "<x").execute(CONTEXT);
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
 
-    final IOFile io = new IOFile(Prop.TMP, DBNAME);
+    final IOFile io = new IOFile(Prop.TMP, DB);
     io.write(Token.token("<x"));
     try {
-      new CreateDB(DBNAME, io.path()).execute(CONTEXT);
+      new CreateDB(DB, io.path()).execute(CONTEXT);
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
     assertTrue(io.delete());
@@ -219,7 +219,7 @@ public final class AddDeleteTest {
    */
   @Test
   public void skipCorrupt() throws Exception {
-    final IOFile io = new IOFile(Prop.TMP, DBNAME);
+    final IOFile io = new IOFile(Prop.TMP, DB);
     io.write(Token.token("<x"));
 
     new Set(Prop.SKIPCORRUPT, true).execute(CONTEXT);

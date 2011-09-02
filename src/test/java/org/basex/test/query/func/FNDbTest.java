@@ -26,8 +26,8 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class FNDbTest extends AdvancedQueryTest {
-  /** Test database name. */
-  private static final String DBNAME = Util.name(FNDbTest.class);
+  /** Name of test database. */
+  private static final String DB = Util.name(FNDbTest.class);
   /** Test file. */
   private static final String FILE = "etc/test/input.xml";
   /** Test folder. */
@@ -49,7 +49,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Before
   public void initTest() throws BaseXException {
-    new CreateDB("db", FILE).execute(CONTEXT);
+    new CreateDB(DB, FILE).execute(CONTEXT);
   }
 
   /**
@@ -58,7 +58,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @AfterClass
   public static void finish() throws BaseXException {
-    new DropDB("db").execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
   }
 
   /**
@@ -68,18 +68,18 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbOpen() throws BaseXException {
     final String fun = check(Function.DBOPEN);
-    query("count(" + fun + "('db'))", "1");
-    query("count(" + fun + "('db/'))", "1");
+    query("count(" + fun + "('" + DB + "'))", "1");
+    query("count(" + fun + "('" + DB + "/'))", "1");
 
     // close database instance
     new Close().execute(CONTEXT);
-    query("count(" + fun + "(<a>db</a>))", "1");
-    query("count(" + fun + "('db/x'))", "0");
-    query(fun + "('db')//title/text()", "XML");
+    query("count(" + fun + "(<a>" + DB + "</a>))", "1");
+    query("count(" + fun + "('" + DB + "/x'))", "0");
+    query(fun + "('" + DB + "')//title/text()", "XML");
 
     // run function on non-existing database
-    new DropDB("db").execute(CONTEXT);
-    error(fun + "('db')", Err.NODB);
+    new DropDB(DB).execute(CONTEXT);
+    error(fun + "('" + DB + "')", Err.NODB);
   }
 
   /**
@@ -88,8 +88,8 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbOpenPre() {
     final String fun = check(Function.DBOPENPRE);
-    query(fun + "('db', 0)//title/text()", "XML");
-    error(fun + "('db', -1)", Err.IDINVALID);
+    query(fun + "('" + DB + "', 0)//title/text()", "XML");
+    error(fun + "('" + DB + "', -1)", Err.IDINVALID);
   }
 
   /**
@@ -98,8 +98,8 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbOpenId() {
     final String fun = check(Function.DBOPENID);
-    query(fun + "('db', 0)//title/text()", "XML");
-    error(fun + "('db', -1)", Err.IDINVALID);
+    query(fun + "('" + DB + "', 0)//title/text()", "XML");
+    error(fun + "('" + DB + "', -1)", Err.IDINVALID);
   }
 
   /**
@@ -112,10 +112,10 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // run function without and with index
     new DropIndex("text").execute(CONTEXT);
-    query(fun + "('db', 'XML')", "XML");
+    query(fun + "('" + DB + "', 'XML')", "XML");
     new CreateIndex("text").execute(CONTEXT);
-    query(fun + "('db', 'XML')", "XML");
-    query(fun + "('db', 'XXX')", "");
+    query(fun + "('" + DB + "', 'XML')", "XML");
+    query(fun + "('" + DB + "', 'XXX')", "");
   }
 
   /**
@@ -128,12 +128,12 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // run function without and with index
     new DropIndex("attribute").execute(CONTEXT);
-    query("data(" + fun + "('db', '0'))", "0");
+    query("data(" + fun + "('" + DB + "', '0'))", "0");
     new CreateIndex("attribute").execute(CONTEXT);
-    query("data(" + fun + "('db', '0'))", "0");
-    query("data(" + fun + "('db', '0', 'id'))", "0");
-    query("data(" + fun + "('db', '0', 'XXX'))", "");
-    query(fun + "('db', 'XXX')", "");
+    query("data(" + fun + "('" + DB + "', '0'))", "0");
+    query("data(" + fun + "('" + DB + "', '0', 'id'))", "0");
+    query("data(" + fun + "('" + DB + "', '0', 'XXX'))", "");
+    query(fun + "('" + DB + "', 'XXX')", "");
   }
 
   /**
@@ -141,15 +141,15 @@ public final class FNDbTest extends AdvancedQueryTest {
    * @throws BaseXException database exception
    */
   @Test
-  public void dbIndex() throws BaseXException {
+  public void dbFulltext() throws BaseXException {
     final String fun = check(Function.DBFULLTEXT);
 
     // run function without and with index
     new DropIndex("fulltext").execute(CONTEXT);
-    error(fun + "('db', 'assignments')", Err.NOIDX);
+    error(fun + "('" + DB + "', 'assignments')", Err.NOIDX);
     new CreateIndex("fulltext").execute(CONTEXT);
-    query(fun + "('db', 'assignments')", "Assignments");
-    query(fun + "('db', 'XXX')", "");
+    query(fun + "('" + DB + "', 'assignments')", "Assignments");
+    query(fun + "('" + DB + "', 'XXX')", "");
   }
 
   /**
@@ -162,130 +162,14 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // add documents
     new Add(FLDR, "docs", "test").execute(CONTEXT);
-    contains(fun + "('db')", "test/");
+    contains(fun + "('" + DB + "')", "test/");
 
     // create two other database and compare substring
-    new CreateDB(DBNAME + 1).execute(CONTEXT);
-    new CreateDB(DBNAME + 2).execute(CONTEXT);
-    contains(fun + "()", DBNAME + 1 + ' ' + DBNAME + 2);
-    new DropDB(DBNAME + 1).execute(CONTEXT);
-    new DropDB(DBNAME + 2).execute(CONTEXT);
-  }
-
-  /**
-   * Test method for the db:add() function.
-   */
-  @Test
-  public void dbAdd() {
-    final String fun = check(Function.DBADD);
-
-    query(fun + "('db', '<root/>', 'test1.xml')");
-    query("count(collection('db/test1.xml')/root)", "1");
-
-    query(fun + "('db', document { <root/> }, 'test2.xml')");
-    query("count(collection('db/test2.xml')/root)", "1");
-
-    query(fun + "('db', document { <root/> }, 'test3.xml', 'test')");
-    query("count(collection('db/test/test3.xml')/root)", "1");
-
-    query(fun + "('db', 'etc/test/input.xml', '', 'test')");
-    query("count(collection('db/test/input.xml')/html)", "1");
-
-    query(fun + "('db', 'etc/test/input.xml', 'test4.xml', 'test')");
-    query("count(collection('db/test/test4.xml')/html)", "1");
-
-    query(fun + "('db', '" + FLDR + "', '', 'test/dir')");
-    query("count(collection('db/test/dir'))", NFLDR);
-
-    query("for $f in file:list('" + FLDR + "') " +
-          "return " + fun + "('db', $f, '', 'dir')");
-    query("count(collection('db/dir'))", NFLDR);
-
-    query("for $i in 1 to 3 return " + fun + "('db', '<root/>', 'doc' || $i)");
-    query("count(for $i in 1 to 3 return collection('db/doc' || $i))", "3");
-  }
-
-  /**
-   * Test method for the db:replace() function.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void dbReplace() throws BaseXException {
-    final String fun = check(Function.DBREPLACE);
-
-    new Add("etc/test/input.xml", null, "test").execute(CONTEXT);
-
-    query(fun + "('db', 'test/input.xml', '<root1/>')");
-    query("count(collection('db/test/input.xml')/html)", "0");
-    query("count(collection('db/test/input.xml')/root1)", "1");
-
-    query(fun + "('db', 'test/input.xml', document { <root2/> })");
-    query("count(collection('db/test/input.xml')/root1)", "0");
-    query("count(collection('db/test/input.xml')/root2)", "1");
-
-    query(fun + "('db', 'test/input.xml', 'etc/test/input.xml')");
-    query("count(collection('db/test/input.xml')/html)", "1");
-    query("count(collection('db/test/input.xml')/root2)", "0");
-  }
-
-  /**
-   * Test method for the db:delete() function.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void dbDelete() throws BaseXException {
-    final String fun = check(Function.DBDELETE);
-
-    new Add(FLDR, "docs", "test").execute(CONTEXT);
-
-    query(fun + "('db', 'test')", "");
-    query("count(collection('db/test'))", "0");
-  }
-
-  /**
-   * Test method for the db:rename() function.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void dbRename() throws BaseXException {
-    final String fun = check(Function.DBRENAME);
-
-    new Add(FLDR, "docs", "test").execute(CONTEXT);
-    query("count(collection('db/test'))", NFLDR);
-
-    query(fun + "('db', 'test', 'newtest')", "");
-    query("count(collection('db/test'))", "0");
-    query("count(collection('db/newtest'))", NFLDR);
-  }
-
-  /**
-   * Test method for the db:optimize() function.
-   */
-  @Test
-  public void dbOptimize() {
-    final String fun = check(Function.DBOPTIMIZE);
-    query(fun + "('db')");
-    query(fun + "('db', true())");
-  }
-
-  /**
-   * Test method for db:node-pre() function.
-   */
-  @Test
-  public void dbNodePre() {
-    final String fun = check(Function.DBNODEPRE);
-    query(fun + "(/html)", "1");
-    query(fun + "(/ | /html)", "0 1");
-  }
-
-  /**
-   * Test method for db:node-id() and db:node-pre() function.
-   */
-  @Test
-  public void dbNode() {
-    final String fun = check(Function.DBNODEID);
-    query(fun + "(/html)", "1");
-    query(fun + "(/ | /html)", "0 1");
+    new CreateDB(DB + 1).execute(CONTEXT);
+    new CreateDB(DB + 2).execute(CONTEXT);
+    contains(fun + "()", DB + 1 + ' ' + DB + 2);
+    new DropDB(DB + 1).execute(CONTEXT);
+    new DropDB(DB + 2).execute(CONTEXT);
   }
 
   /**
@@ -308,17 +192,172 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String fun = check(Function.DBINFO);
 
     // standard test
-    contains(fun + "('db')", INFOON);
+    contains(fun + "('" + DB + "')", INFOON);
 
     // drop indexes and check index queries
     final String[] types = { "text", "attribute", "fulltext" };
     for(final String type : types) new DropIndex(type).execute(CONTEXT);
-    for(final String type : types) query(fun + "('db', '" + type + "')");
+    for(final String type : types) {
+      query(fun + "('" + DB + "', '" + type + "')");
+    }
     // create indexes and check index queries
     for(final String type : types) new CreateIndex(type).execute(CONTEXT);
-    for(final String type : types) query(fun + "('db', '" + type + "')");
+    for(final String type : types) {
+      query(fun + "('" + DB + "', '" + type + "')");
+    }
     // check name indexes
-    query(fun + "('db', 'tag')");
-    query(fun + "('db', 'attname')");
+    query(fun + "('" + DB + "', 'tag')");
+    query(fun + "('" + DB + "', 'attname')");
+  }
+
+  /**
+   * Test method for db:node-id() function.
+   */
+  @Test
+  public void dbNodeID() {
+    final String fun = check(Function.DBNODEID);
+    query(fun + "(/html)", "1");
+    query(fun + "(/ | /html)", "0 1");
+  }
+
+  /**
+   * Test method for db:node-pre() function.
+   */
+  @Test
+  public void dbNodePre() {
+    final String fun = check(Function.DBNODEPRE);
+    query(fun + "(/html)", "1");
+    query(fun + "(/ | /html)", "0 1");
+  }
+
+  /**
+   * Test method for db:event() function.
+   */
+  @Test
+  public void dbEvent() {
+    final String fun = check(Function.DBEVENT);
+    error(fun + "('x', 'y')", Err.NOEVENT);
+  }
+
+  /**
+   * Test method for the db:add() function.
+   */
+  @Test
+  public void dbAdd() {
+    final String fun = check(Function.DBADD);
+
+    query(fun + "('" + DB + "', '<root/>', 'test1.xml')");
+    query("count(collection('" + DB + "/test1.xml')/root)", "1");
+
+    query(fun + "('" + DB + "', document { <root/> }, 'test2.xml')");
+    query("count(collection('" + DB + "/test2.xml')/root)", "1");
+
+    query(fun + "('" + DB + "', document { <root/> }, 'test3.xml', 'test')");
+    query("count(collection('" + DB + "/test/test3.xml')/root)", "1");
+
+    query(fun + "('" + DB + "', 'etc/test/input.xml', '', 'test')");
+    query("count(collection('" + DB + "/test/input.xml')/html)", "1");
+
+    query(fun + "('" + DB + "', 'etc/test/input.xml', 'test4.xml', 'test')");
+    query("count(collection('" + DB + "/test/test4.xml')/html)", "1");
+
+    query(fun + "('" + DB + "', '" + FLDR + "', '', 'test/dir')");
+    query("count(collection('" + DB + "/test/dir'))", NFLDR);
+
+    query("for $f in file:list('" + FLDR + "') " +
+          "return " + fun + "('" + DB + "', $f, '', 'dir')");
+    query("count(collection('" + DB + "/dir'))", NFLDR);
+
+    query("for $i in 1 to 3 return " + fun + "('" + DB + "', '<root/>'," +
+        "'doc' || $i)");
+    query("count(for $i in 1 to 3 return collection('" + DB + "/doc' || $i))",
+        "3");
+  }
+
+  /**
+   * Test method for the db:delete() function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void dbDelete() throws BaseXException {
+    final String fun = check(Function.DBDELETE);
+
+    new Add(FLDR, "docs", "test").execute(CONTEXT);
+
+    query(fun + "('" + DB + "', 'test')", "");
+    query("count(collection('" + DB + "/test'))", "0");
+  }
+
+  /**
+   * Test method for the db:rename() function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void dbRename() throws BaseXException {
+    final String fun = check(Function.DBRENAME);
+
+    new Add(FLDR, "docs", "test").execute(CONTEXT);
+    query("count(collection('" + DB + "/test'))", NFLDR);
+
+    query(fun + "('" + DB + "', 'test', 'newtest')", "");
+    query("count(collection('" + DB + "/test'))", "0");
+    query("count(collection('" + DB + "/newtest'))", NFLDR);
+  }
+
+  /**
+   * Test method for the db:replace() function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void dbReplace() throws BaseXException {
+    final String fun = check(Function.DBREPLACE);
+
+    new Add("etc/test/input.xml", null, "test").execute(CONTEXT);
+
+    query(fun + "('" + DB + "', 'test/input.xml', '<root1/>')");
+    query("count(collection('" + DB + "/test/input.xml')/html)", "0");
+    query("count(collection('" + DB + "/test/input.xml')/root1)", "1");
+
+    query(fun + "('" + DB + "', 'test/input.xml', document { <root2/> })");
+    query("count(collection('" + DB + "/test/input.xml')/root1)", "0");
+    query("count(collection('" + DB + "/test/input.xml')/root2)", "1");
+
+    query(fun + "('" + DB + "', 'test/input.xml', 'etc/test/input.xml')");
+    query("count(collection('" + DB + "/test/input.xml')/html)", "1");
+    query("count(collection('" + DB + "/test/input.xml')/root2)", "0");
+  }
+
+  /**
+   * Test method for the db:optimize() function.
+   */
+  @Test
+  public void dbOptimize() {
+    final String fun = check(Function.DBOPTIMIZE);
+    query(fun + "('" + DB + "')");
+    query(fun + "('" + DB + "', true())");
+  }
+
+  /**
+   * Test method for the db:get() function.
+   */
+  @Test
+  public void dbGet() {
+    final String fun = check(Function.DBGET);
+    error(fun + "('" + DB + "', 'raw')", Err.RESFNF);
+    query("db:put('" + DB + "', 'raw', xs:hexBinary('41'))");
+    query(fun + "('" + DB + "', 'raw')");
+    query("db:delete('" + DB + "', 'raw')");
+    error(fun + "('" + DB + "', 'raw')", Err.RESFNF);
+  }
+
+  /**
+   * Test method for the db:put() function.
+   */
+  @Test
+  public void dbPut() {
+    final String fun = check(Function.DBPUT);
+    query(fun + "('" + DB + "', 'raw1', xs:hexBinary('41'))");
+    query(fun + "('" + DB + "', 'raw2', 'b')");
+    query(fun + "('" + DB + "', 'raw3', 123)");
   }
 }

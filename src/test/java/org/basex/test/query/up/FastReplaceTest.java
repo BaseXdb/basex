@@ -19,10 +19,10 @@ import org.junit.Test;
  * @author Lukas Kircher
  */
 public final class FastReplaceTest extends AdvancedQueryTest {
-  /** Test document. */
-  public static final String DOC = "etc/test/xmark.xml";
   /** Test database name. */
-  public static final String DBNAME = Util.name(FastReplaceTest.class);
+  private static final String DB = Util.name(FastReplaceTest.class);
+  /** Test document. */
+  private static final String DOC = "etc/test/xmark.xml";
 
   /**
    * Creates the db based on xmark.xml.
@@ -30,7 +30,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
    */
   @Before
   public void setUp() throws Exception {
-    new CreateDB(DBNAME, DOC).execute(CONTEXT);
+    new CreateDB(DB, DOC).execute(CONTEXT);
     query("let $items := /site/regions//item " +
       "for $i in 1 to 10 " +
       "return (insert node $items into /site/regions, " +
@@ -155,7 +155,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
    */
   @AfterClass
   public static void end() throws BaseXException {
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
     CONTEXT.close();
   }
 }

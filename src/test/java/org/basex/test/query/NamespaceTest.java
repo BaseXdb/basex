@@ -23,10 +23,10 @@ import org.junit.Test;
  * @author Lukas Kircher
  */
 public final class NamespaceTest {
+  /** Default database name. */
+  private static final String DB = Util.name(NamespaceTest.class);
   /** Database context. */
   private static final Context CONTEXT = new Context();
-  /** Default database name. */
-  private static final String DBNAME = Util.name(NamespaceTest.class);
 
   /** Test documents. */
   private static String[][] docs = {
@@ -468,7 +468,7 @@ public final class NamespaceTest {
   public static void finish() throws BaseXException {
     // drop all test databases
     for(final String[] db : docs) new DropDB(db[0]).execute(CONTEXT);
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
     CONTEXT.close();
   }
 

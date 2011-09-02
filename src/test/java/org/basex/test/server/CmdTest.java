@@ -238,7 +238,6 @@ public class CmdTest {
     ok(new Delete(FILE));
     ok(new Add(FILE));
     ok(new Delete(FILE));
-    // target need not exist
     ok(new Delete(FILE));
   }
 

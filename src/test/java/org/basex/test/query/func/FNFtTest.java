@@ -7,6 +7,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.query.func.Function;
 import org.basex.test.query.AdvancedQueryTest;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +19,8 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class FNFtTest extends AdvancedQueryTest {
+  /** Name of test database. */
+  private static final String DB = Util.name(FNFtTest.class);
   /** Test file. */
   private static final String FILE = "etc/test/input.xml";
 
@@ -27,7 +30,7 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Before
   public void initTest() throws BaseXException {
-    new CreateDB("db", FILE).execute(CONTEXT);
+    new CreateDB(DB, FILE).execute(CONTEXT);
     new CreateIndex("fulltext").execute(CONTEXT);
   }
 
@@ -119,6 +122,6 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @AfterClass
   public static void finish() throws BaseXException {
-    new DropDB("db").execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
   }
 }
