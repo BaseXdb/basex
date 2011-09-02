@@ -153,7 +153,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public void removeResource(final Resource res) throws XMLDBException {
     check();
 
-    // resource is no relevant xml resource
+    // check if the resource is an xml resource
     final BXXMLResource del = checkXML(res);
     final Data data = ctx.data();
 
@@ -208,14 +208,8 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     if(id == null) return null;
     final Data data = ctx.data();
-    final byte[] idd = Token.token(id);
-    final IntList il = data.docs();
-    for(int i = 0, is = il.size(); i < is; i++) {
-      final int pre = il.get(i);
-      if(Token.eq(data.text(pre, true), idd))
-        return new BXXMLResource(data, pre, id, this);
-    }
-    return null;
+    final IntList il = data.docs(id);
+    return il.size() == 0 ? null : new BXXMLResource(data, il.get(0), id, this);
   }
 
   @Override
