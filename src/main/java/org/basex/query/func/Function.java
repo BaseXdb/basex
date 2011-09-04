@@ -551,7 +551,7 @@ public enum Function {
   /** XQuery function */
   PREPARE(FNSql.class, "prepare(id,statement)", INT, 2, INT, STR),
   /** XQuery function */
-  EXECUTE(FNSql.class, "execute(id,param1[,...])", ELM_ZM, -2, INT, ITEM),
+  EXECUTE(FNSql.class, "execute(id[,parameters])", ELM_ZM, 1, INT, ITEM_ZO),
   /** XQuery function */
   CLOSE(FNSql.class, "close(id)", EMP, 1, INT),
   /** XQuery function */

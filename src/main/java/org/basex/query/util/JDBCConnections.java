@@ -1,35 +1,23 @@
 package org.basex.query.util;
 
-import static org.basex.query.util.Err.*;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.basex.query.QueryException;
+import org.basex.util.Util;
 import org.basex.util.hash.IntMap;
 
 /**
- * Connection depot.
+ * Opened JDBC connections.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public final class ConnectionDepot {
-
-  /** ID counter. */
-  private int counter;
-  /**
-   * Map containing all opened connections and prepared statements with unique
-   * ids.
-   */
-  private IntMap<Object> conns;
-
-  /** Constructor. */
-  public ConnectionDepot() {
-    counter = 0;
-    conns = new IntMap<Object>();
-  }
+public final class JDBCConnections {
+  /** Last inserted id. */
+  private int lastId = -1;
+  /** Map with all open connections and prepared statements with unique ids. */
+  private IntMap<Object> conns = new IntMap<Object>();
 
   /**
    * Adds a connection or prepared statement to depot.
@@ -37,8 +25,8 @@ public final class ConnectionDepot {
    * @return connection/prepared statement id
    */
   public int add(final Object obj) {
-    conns.add(counter, obj);
-    return counter++;
+    conns.add(++lastId, obj);
+    return lastId;
   }
 
   /**
@@ -51,9 +39,8 @@ public final class ConnectionDepot {
 
   /**
    * Closes all opened connections.
-   * @throws QueryException query exception
    */
-  public void closeAll() throws QueryException {
+  public void closeAll() {
     for(int i = 0; i < conns.size(); i++) {
       final int key = conns.key(i);
       final Object obj = conns.get(key);
@@ -62,7 +49,7 @@ public final class ConnectionDepot {
           if(obj instanceof Connection) ((Connection) obj).close();
           else ((PreparedStatement) obj).close();
         } catch(final SQLException ex) {
-          throw SQLEXC.thrw(null, ex.getMessage());
+          Util.debug(ex);
         }
       }
     }
@@ -75,13 +62,5 @@ public final class ConnectionDepot {
    */
   public Object get(final int id) {
     return conns.get(id);
-  }
-
-  /**
-   * Returns the number of opened connections and prepared statements.
-   * @return result
-   */
-  public int size() {
-    return conns.size();
   }
 }

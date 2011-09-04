@@ -194,6 +194,10 @@ public enum Err {
   PARAMS(XSQL, 3, "Number of parameters differs from number of placeholders"),
   /** XSQL0004: Evaluation exception. */
   NOPARAMTYPE(XSQL, 4, "No parameter type specified."),
+  /** XSQL0005: Evaluation exception. */
+  NOTEXPATTR(XSQL, 5, "Not expected attribute: %"),
+  /** XSQL0006: Evaluation exception. */
+  ILLFORMAT(XSQL, 6, "Illegal % format"),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
