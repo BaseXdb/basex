@@ -11,11 +11,12 @@ import java.util.UUID;
 import java.util.zip.CRC32;
 
 import org.basex.io.IO;
+import org.basex.io.IOContent;
+import org.basex.io.in.TextInput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.AtomType;
-import org.basex.query.item.Bin;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
@@ -52,20 +53,20 @@ public final class FNUtil extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case EVAL: return eval(ctx).iter();
-      case RUN: return run(ctx).iter();
+      case EVAL:     return eval(ctx).iter();
+      case RUN:      return run(ctx).iter();
       case TO_BYTES: return toBytes(ctx);
-      default: return super.iter(ctx);
+      default:       return super.iter(ctx);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case EVAL: return eval(ctx);
-      case RUN: return run(ctx);
+      case EVAL:     return eval(ctx);
+      case RUN:      return run(ctx);
       case TO_BYTES: return toBytes(ctx).value();
-      default: return super.value(ctx);
+      default:       return super.value(ctx);
     }
   }
 
@@ -73,16 +74,17 @@ public final class FNUtil extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case FORMAT: return format(ctx);
-      case MB: return mb(ctx);
-      case MS: return ms(ctx);
-      case FRM_BASE: return fromBase(ctx, ii);
-      case TO_BASE: return toBase(ctx, ii);
-      case MD5: return hash(ctx, "MD5");
-      case SHA1: return hash(ctx, "SHA");
-      case CRC32: return crc32(ctx);
-      case UUID: return uuid();
-      default: return super.item(ctx, ii);
+      case FORMAT:    return format(ctx);
+      case MB:        return mb(ctx);
+      case MS:        return ms(ctx);
+      case FRM_BASE:  return fromBase(ctx, ii);
+      case TO_BASE:   return toBase(ctx, ii);
+      case MD5:       return hash(ctx, "MD5");
+      case SHA1:      return hash(ctx, "SHA");
+      case CRC32:     return crc32(ctx);
+      case UUID:      return uuid();
+      case TO_STRING: return toString(ctx);
+      default:        return super.item(ctx, ii);
     }
   }
 
@@ -123,7 +125,7 @@ public final class FNUtil extends FuncCall {
     try {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
-      throw NODOC.thrw(input, ex);
+      throw IOERR.thrw(input, ex);
     }
   }
 
@@ -339,10 +341,7 @@ public final class FNUtil extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter toBytes(final QueryContext ctx) throws QueryException {
-    final Item it = checkEmpty(expr[0].item(ctx, input));
-    final byte[] bytes = it instanceof Bin ? ((Bin) it).toJava() :
-      it.atom(input);
-
+    final byte[] bytes = checkBin(expr[0], ctx);
     return new ValueIter() {
       final int bl = bytes.length;
       int pos;
@@ -364,6 +363,22 @@ public final class FNUtil extends FuncCall {
       @Override
       public long size() { return bl; }
     };
+  }
+
+  /**
+   * Converts the specified data to a string.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Item toString(final QueryContext ctx) throws QueryException {
+    final byte[] val = checkBin(expr[0], ctx);
+    final String enc = expr.length == 2 ? string(checkStr(expr[1], ctx)) : UTF8;
+    try {
+      return Str.get(TextInput.content(new IOContent(val), enc).finish());
+    } catch(final IOException ex) {
+      throw CONVERT.thrw(input, ex);
+    }
   }
 
   /**

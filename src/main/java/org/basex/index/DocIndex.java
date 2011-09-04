@@ -2,17 +2,17 @@ package org.basex.index;
 
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
-import org.basex.util.list.ObjList;
+import org.basex.util.list.StringList;
 
 /**
  * This index contains references to all document nodes in a database.
@@ -73,24 +73,6 @@ public final class DocIndex implements Index {
       data.meta.dirty = true;
     }
     return docs;
-  }
-
-  @Override
-  public IndexIterator ids(final IndexToken token) {
-    throw Util.notexpected();
-  }
-
-  @Override
-  public int nrIDs(final IndexToken token) {
-    throw Util.notexpected();
-  }
-
-  @Override
-  public void close() { }
-
-  @Override
-  public byte[] info() {
-    return EMPTY;
   }
 
   /**
@@ -186,39 +168,20 @@ public final class DocIndex implements Index {
     return il.sort();
   }
 
-
   /**
    * Returns the references to all binary files matching the specified path.
    * @param path input path
    * @return root nodes
    */
-  public synchronized ObjList<File> files(final String path) {
-    final File bin = data.meta.binaries();
-    final ObjList<File> files = new ObjList<File>();
-    final File file = new File(bin, path);
-    if(file.exists()) {
-      if(file.isDirectory()) {
-        add(file, files);
-      } else {
-        files.add(file);
-      }
+  public synchronized StringList files(final String path) {
+    final StringList sl = new StringList();
+    final String exact = Prop.WIN ? path.toLowerCase() : path;
+    final String start = path.endsWith("/") ? exact : exact + '/';
+    for(final String s : new IOFile(data.meta.binaries()).descendants()) {
+      final String lc = Prop.WIN ? s.toLowerCase() : s;
+      if(exact.isEmpty() || lc.equals(exact) || lc.startsWith(start)) sl.add(s);
     }
-    return files;
-  }
-
-  /**
-   * Adds binary files to the specified list.
-   * @param dir current directory
-   * @param files file list
-   */
-  private void add(final File dir, final ObjList<File> files) {
-    for(final File f : dir.listFiles()) {
-      if(f.isDirectory()) {
-        add(f, files);
-      } else {
-        files.add(f);
-      }
-    }
+    return sl;
   }
 
   /**
@@ -241,5 +204,25 @@ public final class DocIndex implements Index {
       else h = m - 1;
     }
     return l;
+  }
+
+  @Override
+  public void close() { }
+
+  // Unsupported methods ======================================================
+
+  @Override
+  public IndexIterator ids(final IndexToken token) {
+    throw Util.notexpected();
+  }
+
+  @Override
+  public int nrIDs(final IndexToken token) {
+    throw Util.notexpected();
+  }
+
+  @Override
+  public byte[] info() {
+    throw Util.notexpected();
   }
 }

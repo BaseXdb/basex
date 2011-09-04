@@ -14,6 +14,7 @@ import org.basex.core.Prop;
 import org.basex.core.Users;
 import org.basex.core.cmd.DropDB;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Util;
@@ -181,9 +182,22 @@ public final class MetaData {
    * @return database size
    */
   public long dbsize() {
-    long len = 0;
-    if(path != null) for(final File io : path.listFiles()) len += io.length();
-    return len;
+    return path != null ? dbsize(new IOFile(path)) : 0;
+  }
+
+  /**
+   * Calculates the database size.
+   * @param io current file
+   * @return file length
+   */
+  private long dbsize(final IOFile io) {
+    long s = 0;
+    if(io.isDir()) {
+      for(final IOFile f : io.children()) s += dbsize(f);
+    } else {
+      s += io.length();
+    }
+    return s;
   }
 
   /**
@@ -202,6 +216,15 @@ public final class MetaData {
    */
   public File binaries() {
     return new File(path, M_RAW);
+  }
+
+  /**
+   * Returns the specified binary file.
+   * @param key internal file path (key)
+   * @return binary directory
+   */
+  public IOFile binary(final String key) {
+    return new IOFile(new File(path, M_RAW), key);
   }
 
   /**

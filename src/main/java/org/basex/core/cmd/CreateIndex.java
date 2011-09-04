@@ -58,7 +58,7 @@ public final class CreateIndex extends ACreate {
           index = IndexType.PATH;
           break;
         default:
-          return false;
+          throw Util.notexpected();
       }
       index(index, data);
       data.flush();

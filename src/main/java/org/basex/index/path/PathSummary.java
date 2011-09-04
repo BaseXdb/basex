@@ -27,21 +27,28 @@ import org.basex.util.list.TokenList;
 public final class PathSummary implements Index {
   /** Node stack for building the summary. */
   private final ObjList<PathNode> stack = new ObjList<PathNode>();
+  /** Data reference. */
+  private Data data;
   /** Root node. */
   private PathNode root;
 
   /**
-   * Default constructor.
+   * Constructor, specifying a data reference.
+   * @param d data reference
    */
-  public PathSummary() { }
+  public PathSummary(final Data d) {
+    data = d;
+  }
 
   /**
    * Constructor, specifying an input file.
+   * @param d data reference
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public PathSummary(final DataInput in) throws IOException {
+  public PathSummary(final Data d, final DataInput in) throws IOException {
     if(in.readBool()) root = new PathNode(in, null);
+    data = d;
   }
 
   /**
@@ -54,15 +61,20 @@ public final class PathSummary implements Index {
     if(root != null) root.write(out);
   }
 
-  // Creation =================================================================
-
   /**
-   * Initializes the data structures. This method is called if a new path
-   * summary is built.
+   * Sets the data reference.
+   * @param d reference
    */
-  public void init() {
+  public void finish(final Data d) {
+    data = d;
+  }
+
+  @Override
+  public void close() {
     root = null;
   }
+
+  // Traversal ================================================================
 
   /**
    * Adds an entry.
@@ -78,8 +90,6 @@ public final class PathSummary implements Index {
       stack.set(l, stack.get(l - 1).index(n, k));
     }
   }
-
-  // Traversal ================================================================
 
   /**
    * Returns the root node.
@@ -121,7 +131,6 @@ public final class PathSummary implements Index {
     return out;
   }
 
-
   /**
    * Returns all children or descendants of the specified nodes with the
    * specified tag or attribute value.
@@ -138,28 +147,24 @@ public final class PathSummary implements Index {
   /**
    * Returns descendant tags and attributes for the specified start key.
    * @param k input key
-   * @param data data reference
    * @param d if false, return only children
    * @param o true/false: sort by occurrence/lexicographically
    * @return children
    */
-  public TokenList desc(final byte[] k, final Data data, final boolean d,
-      final boolean o) {
+  public TokenList desc(final byte[] k, final boolean d, final boolean o) {
     final TokenList tl = new TokenList();
     if(k.length != 0) tl.add(k);
-    return desc(tl, data, d, o);
+    return desc(tl, d, o);
   }
 
   /**
    * Returns descendant tags and attributes for the specified descendant path.
    * @param tl input steps
-   * @param data data reference
    * @param d if false, return only children
    * @param o true/false: sort by occurrence/lexicographically
    * @return children
    */
-  public TokenList desc(final TokenList tl, final Data data, final boolean d,
-      final boolean o) {
+  public TokenList desc(final TokenList tl, final boolean d, final boolean o) {
     // follow the specified descendant/child steps
     ObjList<PathNode> in = desc(root(), true);
 
@@ -220,42 +225,31 @@ public final class PathSummary implements Index {
 
   // Info =====================================================================
 
-  /**
-   * Returns information on the path summary.
-   * @param data data reference
-   * @return info
-   */
-  public byte[] info(final Data data) {
-    return chop(root.info(data, 0), 1 << 20);
+  @Override
+  public byte[] info() {
+    return root != null ? chop(root.info(data, 0), 1 << 20) : EMPTY;
   }
 
   /**
    * Serializes the path node.
-   * @param data data reference
    * @param ser serializer
    * @throws IOException I/O exception
    */
-  public void plan(final Data data, final Serializer ser) throws IOException {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(PATH);
     root.plan(data, ser);
     ser.closeElement();
   }
 
+  // Unsupported methods ======================================================
+
   @Override
-  public IndexIterator ids(final IndexToken tok) {
+  public IndexIterator ids(final IndexToken token) {
     throw Util.notexpected();
   }
 
   @Override
-  public int nrIDs(final IndexToken tok) {
-    throw Util.notexpected();
-  }
-
-  @Override
-  public void close() { }
-
-  @Override
-  public byte[] info() {
+  public int nrIDs(final IndexToken token) {
     throw Util.notexpected();
   }
 }

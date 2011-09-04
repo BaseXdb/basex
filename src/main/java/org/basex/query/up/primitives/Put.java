@@ -18,7 +18,7 @@ import org.basex.util.InputInfo;
 import org.basex.util.Util;
 
 /**
- * Put primitive.
+ * Update primitive for the fn:put() function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher

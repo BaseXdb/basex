@@ -82,8 +82,9 @@ public final class Optimize extends ACreate {
    */
   private static void optimize(final Data d, final Prop p, final Optimize c)
       throws IOException {
+
     // refresh indexes
-    d.pthindex.init();
+    d.pthindex.close();
     d.tagindex.init();
     d.atnindex.init();
     final MetaData m = d.meta;

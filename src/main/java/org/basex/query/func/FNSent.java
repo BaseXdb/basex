@@ -66,7 +66,7 @@ public final class FNSent extends FuncCall {
         list = new SentList(uri);
         LISTS.put(uri, list);
       } catch(final Exception ex) {
-        throw DOCERR.thrw(input, uri);
+        throw IOERR.thrw(input, ex);
       }
     }
 

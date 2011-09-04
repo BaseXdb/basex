@@ -15,10 +15,10 @@ import org.junit.Test;
  * @author Lukas Kircher
  */
 public final class UpdateTest extends AdvancedQueryTest {
-  /** Test document. */
-  public static final String DOC = "etc/test/xmark.xml";
   /** Test database name. */
-  public static final String DBNAME = Util.name(UpdateTest.class);
+  private static final String DB = Util.name(UpdateTest.class);
+  /** Test document. */
+  private static final String DOC = "etc/test/xmark.xml";
 
   /**
    * Creates a database.
@@ -26,7 +26,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    * @throws BaseXException database exception
    */
   private void createDB(final String input) throws BaseXException {
-    new CreateDB(DBNAME, input == null ? DOC : input).execute(CONTEXT);
+    new CreateDB(DB, input == null ? DOC : input).execute(CONTEXT);
   }
 
   /**
@@ -249,7 +249,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void emptyInsert3() throws BaseXException {
     createDB("<a/>");
     query("delete node /a");
-    query("insert nodes <X/> into doc('" + DBNAME + "')");
+    query("insert nodes <X/> into doc('" + DB + "')");
     query("/", "<X/>");
   }
 
@@ -259,7 +259,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @AfterClass
   public static void end() throws Exception {
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
     CONTEXT.close();
   }
 }

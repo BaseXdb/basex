@@ -102,7 +102,7 @@ public final class InfoIndex extends AInfo {
 
     final TokenBuilder tb = new TokenBuilder(ds).add(NL);
     if(avl) tb.add(data.info(it));
-    else tb.addExt(LI + INDNOTAVL, it);
+    else tb.add(LI).addExt(INDNOTAVL, it).add(NL);
     return tb.add(NL).finish();
   }
 

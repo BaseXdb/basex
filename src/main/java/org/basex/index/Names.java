@@ -8,6 +8,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.basex.util.hash.TokenSet;
 
 /**
@@ -18,7 +19,7 @@ import org.basex.util.hash.TokenSet;
  * @author Christian Gruen
  * @author Lukas Kircher
  */
-public final class Names extends TokenSet {
+public final class Names extends TokenSet implements Index {
   /** Statistic information. */
   private StatsKey[] stat;
   /** Maximum number of string categories. */
@@ -97,10 +98,7 @@ public final class Names extends TokenSet {
     return stat[id];
   }
 
-  /**
-   * Returns index information.
-   * @return statistics string
-   */
+  @Override
   public byte[] info() {
     final double[] tl = new double[size];
     int len = 0;
@@ -134,5 +132,20 @@ public final class Names extends TokenSet {
   protected void rehash() {
     super.rehash();
     stat = Arrays.copyOf(stat, size << 1);
+  }
+
+  @Override
+  public void close() { }
+
+  // Unsupported methods ======================================================
+
+  @Override
+  public IndexIterator ids(final IndexToken token) {
+    throw Util.notexpected();
+  }
+
+  @Override
+  public int nrIDs(final IndexToken token) {
+    throw Util.notexpected();
   }
 }

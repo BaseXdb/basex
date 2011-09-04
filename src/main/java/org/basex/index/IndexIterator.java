@@ -7,9 +7,7 @@ package org.basex.index;
  * @author Christian Gruen
  */
 public abstract class IndexIterator {
-  /**
-   * Empty iterator.
-   */
+  /** Empty iterator. */
   public static final IndexIterator EMPTY = new IndexIterator() {
     @Override
     public boolean more() { return false; }
@@ -17,6 +15,8 @@ public abstract class IndexIterator {
     public int next() { return 0; }
     @Override
     public double score() { return -1; }
+    @Override
+    public int size() { return 0; }
   };
 
   /**
@@ -39,11 +39,11 @@ public abstract class IndexIterator {
   public abstract double score();
 
   /**
-   * Returns the number of index results. A new iterator must be created
-   * after this method has been called.
+   * Returns the total number of index results.
+   * The iterator may get exhausted by calling this method.
    * @return result number of results
    */
-  public final int size() {
+  public int size() {
     int c = 0;
     while(more()) ++c;
     return c;

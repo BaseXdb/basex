@@ -54,7 +54,8 @@ public enum Err {
   JSONSER(BASX, 16, "JSON serialization: %."),
   /** BASX0017: Invalid value of $argNum in call to fn:partial-apply. */
   INVPOS(BASX, 17, "Illegal argument position for %: %."),
-
+  /** BASX0018: Evaluation exception. */
+  CONVERT(BASX, 18, "String conversion: %."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -86,9 +87,9 @@ public enum Err {
   /** FODC0002: Evaluation exception. */
   NODEFCOLL(FODC, 2, "No default collection available."),
   /** FODC0002: Evaluation exception. */
-  NODOC(FODC, 2, "%"),
+  IOERR(FODC, 2, "%"),
   /** FODC0002: Evaluation exception. */
-  DOCERR(FODC, 2, "\"%\" could not be opened."),
+  RESFNF(FODC, 2, "Resource \"%\" does not exist."),
   /** FODC0004: Evaluation exception. */
   NOCOLL(FODC, 4, "%"),
   /** FODC0005: Evaluation exception. */
@@ -96,7 +97,9 @@ public enum Err {
   /** FODC0006: Evaluation exception. */
   SAXERR(FODC, 6, "SAX: %."),
   /** FODC0007: Evaluation exception. */
-  DOCBASE(FODC, 7, "Base URI % is invalid."),
+  BASEINV(FODC, 7, "Base URI % is invalid."),
+  /** FODC0007: Evaluation exception. */
+  RESINV(FODC, 7, "Resource path \"%\" is invalid."),
 
   /** FODF1280: Evaluation exception. */
   FORMNUM(FODF, 1280, "Unknown decimal format: %."),
@@ -278,6 +281,10 @@ public enum Err {
   UPFOURI(FOUP, 2, "No valid URI: \"%\"."),
   /** FOUP0002: Evaluation exception. */
   UPPUTERR(FOUP, 2, "\"%\" could not be written."),
+  /** FOUP0002: Evaluation exception. */
+  UPDBPUTERR(FOUP, 2, "Resource \"%\" could not be written."),
+  /** FOUP0002: Evaluation exception. */
+  UPDBDELERR(FOUP, 2, "Resource \"%\" could not be deleted."),
 
   /** FTDY0016: Evaluation exception. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),

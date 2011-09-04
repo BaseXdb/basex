@@ -19,7 +19,7 @@ public abstract class Query {
    * @param v value to be bound
    * @throws BaseXException command exception
    */
-  public final void bind(final String n, final String v) throws BaseXException {
+  public final void bind(final String n, final Object v) throws BaseXException {
     bind(n, v, "");
   }
 

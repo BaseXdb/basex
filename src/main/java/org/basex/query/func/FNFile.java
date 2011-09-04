@@ -364,7 +364,7 @@ public final class FNFile extends FuncCall {
   }
 
   /**
-   * Writes the content of a binary file.
+   * Writes an item to a file.
    * @param path file to be written
    * @param ctx query context
    * @param append append flag
@@ -375,14 +375,11 @@ public final class FNFile extends FuncCall {
       final boolean append) throws QueryException {
 
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
-
     try {
       final FileOutputStream out = new FileOutputStream(path, append);
       try {
         final Iter ir = expr[1].iter(ctx);
-        for(Item it; (it = ir.next()) != null;) {
-          out.write(((B64) checkType(it, AtomType.B64)).toJava());
-        }
+        for(Item it; (it = ir.next()) != null;) out.write(checkBin(it, ctx));
       } finally {
         out.close();
       }

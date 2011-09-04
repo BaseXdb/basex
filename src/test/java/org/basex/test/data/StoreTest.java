@@ -2,6 +2,7 @@ package org.basex.test.data;
 
 import static org.junit.Assert.*;
 
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
@@ -10,6 +11,7 @@ import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.DataText;
 import org.basex.util.Util;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,7 +23,7 @@ import org.junit.Test;
  */
 public final class StoreTest {
   /** Test database name. */
-  private static final String DBNAME = Util.name(StoreTest.class);
+  private static final String DB = Util.name(StoreTest.class);
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of runs per client. */
@@ -41,20 +43,20 @@ public final class StoreTest {
 
   /**
    * Finishes the test.
-   * @throws Exception exception
+   * @throws BaseXException database exception
    */
-  @BeforeClass
-  public static void finish() throws Exception {
-    new DropDB(DBNAME).execute(CONTEXT);
+  @AfterClass
+  public static void finish() throws BaseXException {
+    new DropDB(DB).execute(CONTEXT);
   }
 
   /**
    * Replaces text nodes with random double values.
-   * @throws Exception exception
+   * @throws BaseXException database exception
    */
   @Test
-  public void replace() throws Exception {
-    new CreateDB(DBNAME, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
+  public void replace() throws BaseXException {
+    new CreateDB(DB, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
     final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
     for(int n = 0; n < NQUERIES; n++) {
       final String qu =
@@ -68,11 +70,11 @@ public final class StoreTest {
 
   /**
    * Replaces two text nodes with random integer values.
-   * @throws Exception exception
+   * @throws BaseXException database exception
    */
   @Test
-  public void deleteInsertTwo() throws Exception {
-    new CreateDB(DBNAME, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
+  public void deleteInsertTwo() throws BaseXException {
+    new CreateDB(DB, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
     final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int n = 0; n < NQUERIES; n++) {
@@ -88,11 +90,11 @@ public final class StoreTest {
 
   /**
    * Deletes and inserts a text multiple times.
-   * @throws Exception exception
+   * @throws BaseXException database exception
    */
   @Test
-  public void deleteInsert() throws Exception {
-    new CreateDB(DBNAME, "<X>abc</X>").execute(CONTEXT);
+  public void deleteInsert() throws BaseXException {
+    new CreateDB(DB, "<X>abc</X>").execute(CONTEXT);
     final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int i = 0; i < NQUERIES; i++) {
