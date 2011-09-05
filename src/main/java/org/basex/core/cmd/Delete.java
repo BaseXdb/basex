@@ -1,5 +1,6 @@
 package org.basex.core.cmd;
 
+import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
 
 import org.basex.core.Context;
@@ -7,7 +8,7 @@ import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IOFile;
 import org.basex.util.list.IntList;
-import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * Evaluates the 'delete' command and deletes documents from a collection.
@@ -34,10 +35,10 @@ public final class Delete extends ACreate {
     final IntList docs = data.docs(target);
     delete(context, docs);
     // delete raw resources
-    final StringList sl = files(data, target);
-    delete(data, sl);
+    final TokenList raw = files(data, target);
+    delete(data, raw);
 
-    return info(PATHDELETED, docs.size() + sl.size(), perf);
+    return info(PATHDELETED, docs.size() + raw.size(), perf);
   }
 
   /**
@@ -62,9 +63,9 @@ public final class Delete extends ACreate {
    * @param res resources to be deleted
    * @return {@code null}, or the name of a resource that could not be deleted
    */
-  public static String delete(final Data data, final StringList res) {
-    for(final String key : res) {
-      if(!data.meta.binary(key).delete()) return key;
+  public static byte[] delete(final Data data, final TokenList res) {
+    for(final byte[] key : res) {
+      if(!data.meta.binary(string(key)).delete()) return key;
     }
     return null;
   }
@@ -75,13 +76,12 @@ public final class Delete extends ACreate {
    * @param res resources to be deleted
    * @return resources
    */
-  public static StringList files(final Data data, final String res) {
+  public static TokenList files(final Data data, final String res) {
     // delete raw resources
-    final StringList sl = data.files(res);
+    final TokenList tl = data.files(res);
     // if necessary, delete root directory
     final IOFile bin = data.meta.binary(res);
-    if(bin.isDir()) sl.add(res);
-    delete(data, sl);
-    return sl;
+    if(bin.isDir()) tl.add(res);
+    return tl;
   }
 }

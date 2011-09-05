@@ -471,7 +471,7 @@ public enum Function {
   /** Database function: searches the full-text index. */
   DBFULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
   /** Database function: lists all database. */
-  DBLIST(FNDb.class, "list([path])", STR_ZM, 0, STR),
+  DBLIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
   /** Database function: lists system information. */
   DBSYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */
@@ -494,9 +494,13 @@ public enum Function {
   /** Database function: optimize database structures. */
   DBOPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
   /** Database function: gets a value binary data. */
-  DBGET(FNDb.class, "get(database,key)", B64, STR, STR),
+  DBGET(FNDb.class, "get(database,path)", B64, STR, STR),
   /** Database function: stores binary data. */
-  DBPUT(FNDb.class, "put(database,key,value)", EMP, STR, STR, ITEM),
+  DBPUT(FNDb.class, "put(database,path,value)", EMP, STR, STR, ITEM),
+  /** Database function: checks if the specified resource is an xml document. */
+  DBISXML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
+  /** Database function: checks if the specified resource is a raw file. */
+  DBISRAW(FNDb.class, "is-raw(database,path)", BLN, STR, STR),
 
   /* FNFile functions (EXPath). */
 

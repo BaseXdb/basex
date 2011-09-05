@@ -360,4 +360,24 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(fun + "('" + DB + "', 'raw2', 'b')");
     query(fun + "('" + DB + "', 'raw3', 123)");
   }
+
+  /**
+   * Test method for the db:is-raw() function.
+   */
+  @Test
+  public void dbIsRaw() {
+    final String fun = check(Function.DBISRAW);
+    query(fun + "('" + DB + "', 'x')", "false");
+    // ...
+  }
+
+  /**
+   * Test method for the db:is-xml() function.
+   */
+  @Test
+  public void dbIsXML() {
+    final String fun = check(Function.DBISXML);
+    query(fun + "('" + DB + "', 'x')", "false");
+    // ...
+  }
 }

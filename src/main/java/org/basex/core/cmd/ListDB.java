@@ -1,5 +1,6 @@
 package org.basex.core.cmd;
 
+import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ public final class ListDB extends Command {
     table.header.add(INFODBSIZE);
 
     try {
+      // add xml documents
       final Data data = Open.open(db, context);
       final IntList il = data.docs(path);
       for(int i = 0, is = il.size(); i < is; i++) {
@@ -54,12 +56,12 @@ public final class ListDB extends Command {
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
       }
-      // add binary files to list
-      for(final String file : data.files(path)) {
+      // add binary resources
+      for(final byte[] file : data.files(path)) {
         final TokenList tl = new TokenList(3);
         tl.add(file);
         tl.add(DataText.M_RAW);
-        tl.add(data.meta.binary(file).length());
+        tl.add(data.meta.binary(string(file)).length());
         table.contents.add(tl);
       }
       Close.close(data, context);

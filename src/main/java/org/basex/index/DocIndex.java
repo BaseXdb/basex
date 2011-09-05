@@ -12,7 +12,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
-import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * This index contains references to all document nodes in a database.
@@ -173,15 +173,15 @@ public final class DocIndex implements Index {
    * @param path input path
    * @return root nodes
    */
-  public synchronized StringList files(final String path) {
-    final StringList sl = new StringList();
+  public synchronized TokenList files(final String path) {
+    final TokenList tl = new TokenList();
     final String exact = Prop.WIN ? path.toLowerCase() : path;
     final String start = path.endsWith("/") ? exact : exact + '/';
     for(final String s : new IOFile(data.meta.binaries()).descendants()) {
       final String lc = Prop.WIN ? s.toLowerCase() : s;
-      if(exact.isEmpty() || lc.equals(exact) || lc.startsWith(start)) sl.add(s);
+      if(exact.isEmpty() || lc.equals(exact) || lc.startsWith(start)) tl.add(s);
     }
-    return sl;
+    return tl;
   }
 
   /**
