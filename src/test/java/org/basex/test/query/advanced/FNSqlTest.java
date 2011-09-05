@@ -56,7 +56,7 @@
 //
 ///**
 // * Tests functions on relational databases.
-// * 
+// *
 // * @author BaseX Team 2005-11, BSD License
 // * @author Rositsa Shadura
 // */
@@ -180,7 +180,8 @@
 //  public FakeConnection() {}
 //
 //  @Override
-//  public <T> T unwrap(final Class<T> iface) throws SQLException { return null; }
+//  public <T> T unwrap(final Class<T> iface)
+//    throws SQLException { return null; }
 //
 //  @Override
 //  public boolean isWrapperFor(final Class<?> iface) throws SQLException {
@@ -293,7 +294,8 @@
 //  }
 //
 //  @Override
-//  public void setTypeMap(final Map<String, Class<?>> map) throws SQLException {}
+//  public void setTypeMap(final Map<String, Class<?>> map)
+//    throws SQLException {}
 //
 //  @Override
 //  public void setHoldability(final int holdability) throws SQLException {}
@@ -317,7 +319,8 @@
 //  public void rollback(final Savepoint savepoint) throws SQLException {}
 //
 //  @Override
-//  public void releaseSavepoint(final Savepoint savepoint) throws SQLException {}
+//  public void releaseSavepoint(final Savepoint savepoint)
+//    throws SQLException {}
 //
 //  @Override
 //  public Statement createStatement(final int resultSetType,
@@ -416,7 +419,7 @@
 //  @Override
 //  public void abort(Executor arg0) throws SQLException {
 //    // TODO Auto-generated method stub
-//    
+//
 //  }
 //
 //  @Override
@@ -434,19 +437,19 @@
 //  @Override
 //  public void setNetworkTimeout(Executor arg0, int arg1) throws SQLException {
 //    // TODO Auto-generated method stub
-//    
+//
 //  }
 //
 //  @Override
 //  public void setSchema(String arg0) throws SQLException {
 //    // TODO Auto-generated method stub
-//    
+//
 //  }
 //}
 //
 ///**
 // * Fake statement.
-// * 
+// *
 // * @author BaseX Team 2005-11, BSD License
 // * @author Rositsa Shadura
 // */
@@ -651,7 +654,7 @@
 //  @Override
 //  public void closeOnCompletion() throws SQLException {
 //    // TODO Auto-generated method stub
-//    
+//
 //  }
 //
 //  @Override
@@ -663,7 +666,7 @@
 //
 ///**
 // * Fake prepared statement.
-// * 
+// *
 // * @author BaseX Team 2005-11, BSD License
 // * @author Rositsa Shadura
 // */
@@ -886,7 +889,8 @@
 //      throws SQLException {}
 //
 //  @Override
-//  public void setInt(final int parameterIndex, final int x) throws SQLException {}
+//  public void setInt(final int parameterIndex, final int x)
+//    throws SQLException {}
 //
 //  @Override
 //  public void setLong(final int parameterIndex, final long x)
@@ -957,11 +961,12 @@
 //  public void addBatch() throws SQLException {}
 //
 //  @Override
-//  public void setCharacterStream(final int parameterIndex, final Reader reader,
-//      final int length) throws SQLException {}
+//  public void setCharacterStream(final int parameterIndex,
+//      final Reader reader, final int length) throws SQLException {}
 //
 //  @Override
-//  public void setRef(final int parameterIndex, final Ref x) throws SQLException {}
+//  public void setRef(final int parameterIndex, final Ref x)
+//    throws SQLException {}
 //
 //  @Override
 //  public void setBlob(final int parameterIndex, final Blob x)
@@ -981,12 +986,12 @@
 //  }
 //
 //  @Override
-//  public void setDate(final int parameterIndex, final Date x, final Calendar cal)
-//      throws SQLException {}
+//  public void setDate(final int parameterIndex, final Date x,
+//    final Calendar cal) throws SQLException {}
 //
 //  @Override
-//  public void setTime(final int parameterIndex, final Time x, final Calendar cal)
-//      throws SQLException {}
+//  public void setTime(final int parameterIndex, final Time x,
+//    final Calendar cal) throws SQLException {}
 //
 //  @Override
 //  public void setTimestamp(final int parameterIndex, final Timestamp x,
@@ -997,7 +1002,8 @@
 //      final String typeName) throws SQLException {}
 //
 //  @Override
-//  public void setURL(final int parameterIndex, final URL x) throws SQLException {}
+//  public void setURL(final int parameterIndex, final URL x)
+//    throws SQLException {}
 //
 //  @Override
 //  public ParameterMetaData getParameterMetaData() throws SQLException {
@@ -1013,8 +1019,8 @@
 //      throws SQLException {}
 //
 //  @Override
-//  public void setNCharacterStream(final int parameterIndex, final Reader value,
-//      final long length) throws SQLException {}
+//  public void setNCharacterStream(final int parameterIndex,
+//      final Reader value, final long length) throws SQLException {}
 //
 //  @Override
 //  public void setNClob(final int parameterIndex, final NClob value)
@@ -1049,8 +1055,8 @@
 //      final long length) throws SQLException {}
 //
 //  @Override
-//  public void setCharacterStream(final int parameterIndex, final Reader reader,
-//      final long length) throws SQLException {}
+//  public void setCharacterStream(final int parameterIndex,
+//      final Reader reader, final long length) throws SQLException {}
 //
 //  @Override
 //  public void setAsciiStream(final int parameterIndex, final InputStream x)
@@ -1061,12 +1067,12 @@
 //      throws SQLException {}
 //
 //  @Override
-//  public void setCharacterStream(final int parameterIndex, final Reader reader)
-//      throws SQLException {}
+//  public void setCharacterStream(final int parameterIndex,
+//      final Reader reader) throws SQLException {}
 //
 //  @Override
-//  public void setNCharacterStream(final int parameterIndex, final Reader value)
-//      throws SQLException {}
+//  public void setNCharacterStream(final int parameterIndex,
+//      final Reader value) throws SQLException {}
 //
 //  @Override
 //  public void setClob(final int parameterIndex, final Reader reader)
@@ -1083,7 +1089,7 @@
 //  @Override
 //  public void closeOnCompletion() throws SQLException {
 //    // TODO Auto-generated method stub
-//    
+//
 //  }
 //
 //  @Override
@@ -1209,7 +1215,8 @@
 //  }
 //
 //  @Override
-//  public InputStream getAsciiStream(final int columnIndex) throws SQLException {
+//  public InputStream getAsciiStream(final int columnIndex)
+//    throws SQLException {
 //    return null;
 //  }
 //
@@ -1220,7 +1227,8 @@
 //  }
 //
 //  @Override
-//  public InputStream getBinaryStream(final int columnIndex) throws SQLException {
+//  public InputStream getBinaryStream(final int columnIndex)
+//    throws SQLException {
 //    return null;
 //  }
 //
@@ -1287,7 +1295,8 @@
 //  }
 //
 //  @Override
-//  public Timestamp getTimestamp(final String columnLabel) throws SQLException {
+//  public Timestamp getTimestamp(final String columnLabel)
+//    throws SQLException {
 //    return null;
 //  }
 //
@@ -1348,7 +1357,8 @@
 //  }
 //
 //  @Override
-//  public Reader getCharacterStream(final int columnIndex) throws SQLException {
+//  public Reader getCharacterStream(final int columnIndex)
+//    throws SQLException {
 //    return null;
 //  }
 //
@@ -1364,7 +1374,8 @@
 //  }
 //
 //  @Override
-//  public BigDecimal getBigDecimal(final String columnLabel) throws SQLException {
+//  public BigDecimal getBigDecimal(final String columnLabel)
+//    throws SQLException {
 //    return null;
 //  }
 //
@@ -1481,7 +1492,8 @@
 //      throws SQLException {}
 //
 //  @Override
-//  public void updateInt(final int columnIndex, final int x) throws SQLException {}
+//  public void updateInt(final int columnIndex, final int x)
+//    throws SQLException {}
 //
 //  @Override
 //  public void updateLong(final int columnIndex, final long x)
@@ -1531,7 +1543,8 @@
 //  }
 //
 //  @Override
-//  public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException {
+//  public void updateTimestamp(int columnIndex, Timestamp x)
+//    throws SQLException {
 //    // TODO Auto-generated method stub
 //
 //  }
@@ -1577,7 +1590,8 @@
 //  }
 //
 //  @Override
-//  public void updateBoolean(String columnLabel, boolean x) throws SQLException {
+//  public void updateBoolean(String columnLabel, boolean x)
+//    throws SQLException {
 //    // TODO Auto-generated method stub
 //
 //  }
@@ -1664,8 +1678,8 @@
 //  }
 //
 //  @Override
-//  public void updateBinaryStream(String columnLabel, InputStream x, int length)
-//      throws SQLException {
+//  public void updateBinaryStream(String columnLabel, InputStream x,
+//      int length) throws SQLException {
 //    // TODO Auto-generated method stub
 //
 //  }
@@ -1955,7 +1969,8 @@
 //  }
 //
 //  @Override
-//  public void updateNClob(String columnLabel, NClob nClob) throws SQLException {
+//  public void updateNClob(String columnLabel, NClob nClob)
+//    throws SQLException {
 //    // TODO Auto-generated method stub
 //
 //  }
@@ -2009,7 +2024,8 @@
 //  }
 //
 //  @Override
-//  public Reader getNCharacterStream(final int columnIndex) throws SQLException {
+//  public Reader getNCharacterStream(final int columnIndex)
+//    throws SQLException {
 //    return null;
 //  }
 //
@@ -2044,8 +2060,8 @@
 //      final long length) throws SQLException {}
 //
 //  @Override
-//  public void updateBinaryStream(final String columnLabel, final InputStream x,
-//      final long length) throws SQLException {}
+//  public void updateBinaryStream(final String columnLabel,
+//      final InputStream x, final long length) throws SQLException {}
 //
 //  @Override
 //  public void updateCharacterStream(final String columnLabel,
@@ -2100,8 +2116,8 @@
 //      throws SQLException {}
 //
 //  @Override
-//  public void updateBinaryStream(final String columnLabel, final InputStream x)
-//      throws SQLException {}
+//  public void updateBinaryStream(final String columnLabel,
+//      final InputStream x) throws SQLException {}
 //
 //  @Override
 //  public void updateCharacterStream(final String columnLabel,
@@ -2112,8 +2128,8 @@
 //      throws SQLException {}
 //
 //  @Override
-//  public void updateBlob(final String columnLabel, final InputStream inputStream)
-//      throws SQLException {}
+//  public void updateBlob(final String columnLabel,
+//      final InputStream inputStream) throws SQLException {}
 //
 //  @Override
 //  public void updateClob(final int columnIndex, final Reader reader)
@@ -2146,7 +2162,7 @@
 //
 ///**
 // * Fake result set metadata.
-// * 
+// *
 // * @author BaseX Team 2005-11, BSD License
 // * @author Rositsa Shadura
 // */
@@ -2295,7 +2311,7 @@
 //
 ///**
 // * Tuple.
-// * 
+// *
 // * @author BaseX Team 2005-11, BSD License
 // * @author Rositsa Shadura
 // */
