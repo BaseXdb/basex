@@ -26,7 +26,7 @@ public final class CreateUser extends AUser {
   protected boolean run() {
     final String user = args[0];
     final String pass = args[1];
-    if(!validName(user, false)) return error(NAMEINVALID, user);
+    if(!validDB(user, false)) return error(NAMEINVALID, user);
     return !isMD5(pass) ? error(USERMD5) : context.users.create(user, pass) ?
       info(USERCREATE, user) : error(USERKNOWN, user);
   }

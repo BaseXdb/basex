@@ -65,13 +65,7 @@ public final class DocIndex implements Index {
    * @return document nodes
    */
   public synchronized IntList docs() {
-    if(docs == null) {
-      update();
-      docs = new IntList();
-      final int is = data.meta.size;
-      for(int i = 0; i < is; i += data.size(i, Data.DOC)) docs.add(i);
-      data.meta.dirty = true;
-    }
+    if(docs == null) initDocs();
     return docs;
   }
 
@@ -144,25 +138,17 @@ public final class DocIndex implements Index {
     if(path.isEmpty()) return doc;
 
     // initialize and sort document paths
-    final int ds = doc.size();
-    if(paths == null) {
-      paths = new byte[ds][];
-      for(int d = 0; d < ds; d++) {
-        final byte[] txt = data.text(doc.get(d), true);
-        paths[d] = concat(SLASH, Prop.WIN ? lc(txt) : txt);
-      }
-      order = Array.createOrder(paths, false, true);
-    }
+    if(paths == null) initPaths();
 
     // normalize paths
-    final String np = path.replaceAll("[\\\\//]+", "/").replaceAll("^/|/$", "");
-    final byte[] exact = concat(SLASH, Prop.WIN ? lc(token(np)) : token(np));
-    final byte[] start = endsWith(exact, SLASH) ? exact : concat(exact, SLASH);
+    final byte[] np = token(IOFile.normalize(path));
+    final byte[] exct = concat(SLASH, Prop.WIN ? lc(np) : np);
+    final byte[] pref = concat(exct, SLASH);
 
     // relevant paths: start from the first hit and return all subsequent hits
     final IntList il = new IntList();
-    for(int p = find(exact); p < paths.length; p++) {
-      if(eq(paths[p], exact) || startsWith(paths[p], start))
+    for(int p = find(exct); p < paths.length; p++) {
+      if(eq(paths[p], exct) || startsWith(paths[p], pref))
         il.add(doc.get(order[p]));
     }
     return il.sort();
@@ -175,13 +161,14 @@ public final class DocIndex implements Index {
    */
   public synchronized TokenList files(final String path) {
     final TokenList tl = new TokenList();
-    final String exact = Prop.WIN ? path.toLowerCase() : path;
-    final String start = path.endsWith("/") ? exact : exact + '/';
-    for(final String s : new IOFile(data.meta.binaries()).descendants()) {
-      final String lc = Prop.WIN ? s.toLowerCase() : s;
-      if(exact.isEmpty() || lc.equals(exact) || lc.startsWith(start)) tl.add(s);
+    final String np = IOFile.normalize(path);
+    final String exct = Prop.WIN ? np.toLowerCase() : np;
+    final String pref = exct + '/';
+    for(final String f : new IOFile(data.meta.binaries()).descendants()) {
+      final String lc = Prop.WIN ? f.toLowerCase() : f;
+      if(exct.isEmpty() || lc.equals(exct) || lc.startsWith(pref)) tl.add(f);
     }
-    return tl;
+    return tl.sort(!Prop.WIN);
   }
 
   /**
@@ -206,10 +193,35 @@ public final class DocIndex implements Index {
     return l;
   }
 
+  /**
+   * Initializes the document index.
+   */
+  private synchronized void initDocs() {
+    update();
+    docs = new IntList();
+    final int is = data.meta.size;
+    for(int i = 0; i < is; i += data.size(i, Data.DOC)) docs.add(i);
+    data.meta.dirty = true;
+  }
+
+  /**
+   * Initializes the document paths.
+   */
+  private synchronized void initPaths() {
+    final IntList doc = docs();
+    final int ds = doc.size();
+    paths = new byte[ds][];
+    for(int d = 0; d < ds; d++) {
+      final byte[] txt = data.text(doc.get(d), true);
+      paths[d] = concat(SLASH, Prop.WIN ? lc(txt) : txt);
+    }
+    order = Array.createOrder(paths, false, true);
+  }
+
+  // Inherited ==methods ======================================================
+
   @Override
   public void close() { }
-
-  // Unsupported methods ======================================================
 
   @Override
   public IndexIterator ids(final IndexToken token) {

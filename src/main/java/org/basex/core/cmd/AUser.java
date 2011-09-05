@@ -56,8 +56,8 @@ abstract class AUser extends Command {
     final String u = args[off];
     final String d = off + 1 < args.length ? args[off + 1] : null;
 
-    if(!validName(u, true)) return error(NAMEINVALID, u);
-    if(d != null && !validName(d, true)) return error(NAMEINVALID, d);
+    if(!validDB(u, true)) return error(NAMEINVALID, u);
+    if(d != null && !validDB(d, true)) return error(NAMEINVALID, d);
 
     // retrieve all users; stop if no user is found
     final String[] users = users(u);

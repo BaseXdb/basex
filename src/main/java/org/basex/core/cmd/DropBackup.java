@@ -28,7 +28,7 @@ public final class DropBackup extends Command {
 
   @Override
   protected boolean run() {
-    if(!validName(args[0], true)) return error(NAMEINVALID, args[0]);
+    if(!validDB(args[0], true)) return error(NAMEINVALID, args[0]);
 
     // loop through all databases and drop backups
     for(final String db : databases(args[0])) {

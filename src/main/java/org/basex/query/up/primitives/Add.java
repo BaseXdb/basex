@@ -132,8 +132,7 @@ public final class Add extends InsertBase {
         throw IOERR.thrw(input, ex);
       }
     } else {
-      STRNODTYPE.thrw(input, this, doc.type);
-      return null;
+      throw STRNODTYPE.thrw(input, this, doc.type);
     }
 
     // modify name and path, if needed

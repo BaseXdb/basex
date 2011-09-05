@@ -75,7 +75,7 @@ public abstract class ACreate extends Command {
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
-    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!validDB(db, false)) return error(NAMEINVALID, db);
 
     // close open database
     new Close().run(context);
@@ -163,16 +163,6 @@ public abstract class ACreate extends Command {
     }
     data.closeIndex(type);
     data.setIndex(type, (cmd == null ? ib : cmd.progress(ib)).build());
-  }
-
-  /**
-   * Normalizes the database path.
-   * Removes duplicate, leading and trailing slashes
-   * @param path input path
-   * @return normalized path
-   */
-  public static final String path(final String path) {
-    return path.replaceAll("[\\\\/]+", "/").replaceAll("^/|/$", "");
   }
 
   /**

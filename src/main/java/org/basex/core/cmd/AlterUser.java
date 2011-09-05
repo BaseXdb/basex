@@ -25,7 +25,7 @@ public final class AlterUser extends AUser {
   protected boolean run() {
     final String user = args[0];
     final String pass = args[1];
-    if(!validName(user, false)) return error(NAMEINVALID, user);
+    if(!validDB(user, false)) return error(NAMEINVALID, user);
     return !isMD5(pass) ? error(USERMD5) : context.users.alter(user, pass) ?
       info(USERALTER, user) : error(USERNO, user);
   }

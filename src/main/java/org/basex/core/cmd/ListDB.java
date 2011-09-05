@@ -36,7 +36,7 @@ public final class ListDB extends Command {
     final int s = str.indexOf('/');
     final String db = s == -1 ? str : str.substring(0, s);
     final String path = s == -1 ? "" : str.substring(s + 1);
-    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!validDB(db, false)) return error(NAMEINVALID, db);
 
     final Table table = new Table();
     table.description = INFONRES;

@@ -29,7 +29,7 @@ public final class DropDB extends Command {
 
   @Override
   protected boolean run() {
-    if(!validName(args[0], true)) return error(NAMEINVALID, args[0]);
+    if(!validDB(args[0], true)) return error(NAMEINVALID, args[0]);
 
     // retrieve all databases; return true if no database is found (no error)
     final String[] dbs = databases(args[0]);

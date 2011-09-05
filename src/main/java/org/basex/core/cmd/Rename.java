@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.io.IOFile;
 import org.basex.util.list.IntList;
 
 /**
@@ -27,8 +28,8 @@ public final class Rename extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    final byte[] src = token(path(args[0]));
-    final byte[] trg = token(path(args[1]));
+    final byte[] src = token(IOFile.normalize(args[0]));
+    final byte[] trg = token(IOFile.normalize(args[1]));
 
     boolean ok = true;
     int c = 0;

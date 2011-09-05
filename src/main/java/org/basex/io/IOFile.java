@@ -297,6 +297,21 @@ public final class IOFile extends IO {
     return trg instanceof IOFile && file.renameTo(((IOFile) trg).file);
   }
 
+  /**
+   * Checks if the file reference is valid.
+   * @return result of check
+   */
+  public boolean valid() {
+    // note that not all invalid names can be caught by this test, but the
+    // alternatives (creating a temporary file, etc.) are too expensive
+    try {
+      // the result must not reference a directory
+      return !file.getCanonicalFile().isDirectory();
+    } catch(final IOException ex) {
+      return false;
+    }
+  }
+
   @Override
   public String url() {
     String pre = FILEPREF;
@@ -333,7 +348,6 @@ public final class IOFile extends IO {
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
   }
-
 
   /**
    * Converts a file filter (glob) to a regular expression.
@@ -385,6 +399,16 @@ public final class IOFile extends IO {
       if(!suf && sub) sb.append(".*");
     }
     return Prop.WIN ? sb.toString().toLowerCase() : sb.toString();
+  }
+
+  /**
+   * Normalizes the specified path. Converts backslashes and
+   * removes duplicate, leading and trailing slashes.
+   * @param path input path
+   * @return normalized path
+   */
+  public static String normalize(final String path) {
+    return path.replaceAll("[\\\\/]+", "/").replaceAll("^/|/$", "");
   }
 
   /**

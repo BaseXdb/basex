@@ -97,7 +97,7 @@ public final class DialogInput extends Dialog {
       ok = db.contains(in) || in.equals(old);
       if(ok) msg = Util.info(DBEXISTS, in);
       if(!ok) {
-        ok = Command.validName(in, false);
+        ok = Command.validDB(in, false);
         if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
       }
     } else {

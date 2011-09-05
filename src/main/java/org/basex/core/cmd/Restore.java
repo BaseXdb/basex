@@ -36,7 +36,7 @@ public final class Restore extends Command {
   @Override
   protected boolean run() {
     String db = args[0];
-    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!validDB(db, false)) return error(NAMEINVALID, db);
 
     // find backup file with or without date suffix
     File file = mprop.dbpath(db + IO.ZIPSUFFIX);
