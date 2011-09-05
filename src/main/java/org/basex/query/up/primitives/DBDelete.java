@@ -6,7 +6,7 @@ import org.basex.core.cmd.Delete;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
-import org.basex.util.list.StringList;
+import org.basex.util.list.TokenList;
 
 /**
  * Update primitive for the db:delete() function.
@@ -16,7 +16,7 @@ import org.basex.util.list.StringList;
  */
 public final class DBDelete extends UpdatePrimitive {
   /** Keys. */
-  private final StringList keys;
+  private final TokenList keys;
 
   /**
    * Constructor.
@@ -24,19 +24,19 @@ public final class DBDelete extends UpdatePrimitive {
    * @param k entries to be deleted
    * @param info input info
    */
-  public DBDelete(final Data d, final StringList k, final InputInfo info) {
+  public DBDelete(final Data d, final TokenList k, final InputInfo info) {
     super(PrimitiveType.DBDELETE, -1, d, info);
     keys = k;
   }
 
   @Override
   public void merge(final UpdatePrimitive p) {
-    for(final String key : ((DBDelete) p).keys) keys.add(key);
+    for(final byte[] key : ((DBDelete) p).keys) keys.add(key);
   }
 
   @Override
   public void apply() throws QueryException {
-    final String key = Delete.delete(data,  keys);
+    final byte[] key = Delete.delete(data,  keys);
     if(key != null) UPDBDELERR.thrw(input, key);
   }
 }

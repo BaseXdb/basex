@@ -34,6 +34,7 @@ public final class NSGlobal {
     NS.add(JSON, JSONURI);
     NS.add(MAP, MAPURI);
     NS.add(PKG, PKGURI);
+    NS.add(SQL, SQLURI);
   }
 
   /** Private constructor. */

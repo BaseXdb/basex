@@ -471,7 +471,7 @@ public enum Function {
   /** Database function: searches the full-text index. */
   DBFULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
   /** Database function: lists all database. */
-  DBLIST(FNDb.class, "list([path])", STR_ZM, 0, STR),
+  DBLIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
   /** Database function: lists system information. */
   DBSYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */
@@ -494,9 +494,13 @@ public enum Function {
   /** Database function: optimize database structures. */
   DBOPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
   /** Database function: gets a value binary data. */
-  DBGET(FNDb.class, "get(database,key)", B64, STR, STR),
+  DBGET(FNDb.class, "get(database,path)", B64, STR, STR),
   /** Database function: stores binary data. */
-  DBPUT(FNDb.class, "put(database,key,value)", EMP, STR, STR, ITEM),
+  DBPUT(FNDb.class, "put(database,path,value)", EMP, STR, STR, ITEM),
+  /** Database function: checks if the specified resource is an xml document. */
+  DBISXML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
+  /** Database function: checks if the specified resource is a raw file. */
+  DBISRAW(FNDb.class, "is-raw(database,path)", BLN, STR, STR),
 
   /* FNFile functions (EXPath). */
 
@@ -546,6 +550,23 @@ public enum Function {
   COPY(FNFile.class, "copy(source,target)", EMP, STR, STR),
   /** XQuery function */
   MOVE(FNFile.class, "move(source,target)", EMP, STR, STR),
+
+  /* FNSql functions. */
+
+  /** XQuery function */
+  CONNECT(FNSql.class, "connect(url[,auto-commit[,user[,pass]]]])", INT, 1,
+      STR, BLN_ZO, STR, STR),
+  /** XQuery function */
+  PREPARE(FNSql.class, "prepare(id,statement)", INT, 2, INT, STR),
+  /** XQuery function */
+  EXECUTE(FNSql.class, "execute(id[,parameters])", ELM_ZM, 1, INT, ITEM_ZO),
+  /** XQuery function */
+  CLOSE(FNSql.class, "close(id)", EMP, 1, INT),
+  /** XQuery function */
+  COMMIT(FNSql.class, "commit(id)", EMP, 1, INT),
+  /** XQuery function */
+  ROLLBACK(FNSql.class, "rollback(id)", EMP, 1, INT),
+
 
   /* FNFt functions. */
 
@@ -695,6 +716,7 @@ public enum Function {
     URIS.put(FNSent.class, SENTURI);
     URIS.put(FNUtil.class, UTILURI);
     URIS.put(FNXslt.class, XSLTURI);
+    URIS.put(FNSql.class, SQLURI);
   }
 
   /** Function classes. */

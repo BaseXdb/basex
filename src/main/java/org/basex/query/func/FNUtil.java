@@ -63,10 +63,9 @@ public final class FNUtil extends FuncCall {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case EVAL:     return eval(ctx);
-      case RUN:      return run(ctx);
-      case TO_BYTES: return toBytes(ctx).value();
-      default:       return super.value(ctx);
+      case EVAL: return eval(ctx);
+      case RUN:  return run(ctx);
+      default:   return super.value(ctx);
     }
   }
 
@@ -391,8 +390,9 @@ public final class FNUtil extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (def == Function.EVAL || def == Function.RUN ||
-      def == Function.MB || def == Function.MS || def == Function.UUID) ||
+    return u == Use.CTX && (
+      def == Function.EVAL || def == Function.RUN || def == Function.MB ||
+      def == Function.MS || def == Function.UUID) ||
       super.uses(u);
   }
 }

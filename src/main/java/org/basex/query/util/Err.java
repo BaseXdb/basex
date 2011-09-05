@@ -189,6 +189,19 @@ public enum Err {
   /** PACK0011: Evaluation exception. */
   JARREADFAIL(PACK, 11, "Reading jar descriptor failed: %."),
 
+  /** XSQL0001: Evaluation exception. */
+  SQLEXC(XSQL, 1, "An SQL exception occurred: '%'"),
+  /** XSQL0002: Evaluation exception. */
+  NOCONN(XSQL, 2, "No opened connection with id %"),
+  /** XSQL0003: Evaluation exception. */
+  PARAMS(XSQL, 3, "Number of parameters differs from number of placeholders"),
+  /** XSQL0004: Evaluation exception. */
+  NOPARAMTYPE(XSQL, 4, "No parameter type specified."),
+  /** XSQL0005: Evaluation exception. */
+  NOTEXPATTR(XSQL, 5, "Not expected attribute: %"),
+  /** XSQL0006: Evaluation exception. */
+  ILLFORMAT(XSQL, 6, "Illegal % format"),
+
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
 
@@ -839,6 +852,7 @@ public enum Err {
     /** XQDY Error type. */ XQDY,
     /** XQST Error type. */ XQST,
     /** XQTY Error type. */ XQTY,
+    /** XSQL Error type. */ XSQL,
     /** XUDY Error type. */ XUDY,
     /** XUST Error type. */ XUST,
     /** XUTY Error type. */ XUTY;
