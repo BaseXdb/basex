@@ -140,12 +140,13 @@ public final class Add extends ACreate {
 
     final Performance p = new Performance();
     final String input = name == null ? parser.src.path() : name;
-    final String nm = name == null ? parser.src.name() : name;
-    final String path = target + (target.isEmpty() ? "/" : "") + nm;
-
     // ensure that the name contains no slashes and trailing dots
-    if(nm.endsWith(".") || nm.indexOf('/') != -1 || !new IOFile(path).valid())
-      throw new BaseXException(NAMEINVALID, path);
+    final String nm = name == null ? parser.src.name() : name;
+    if(nm.endsWith(".") || nm.indexOf('/') != -1)
+      throw new BaseXException(NAMEINVALID, nm);
+    final String path = target + (target.isEmpty() ? "/" : "") + nm;
+    // ensure that the path is valid
+    if(!new IOFile(path).valid()) throw new BaseXException(NAMEINVALID, path);
 
     // create disk instances for large documents
     // test does not work for input streams and directories

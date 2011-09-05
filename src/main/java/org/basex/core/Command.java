@@ -175,17 +175,8 @@ public abstract class Command extends Progress {
    * @param glob allow glob syntax
    * @return result of check
    */
-  public static final boolean validDB(final String name, final boolean glob) {
+  public static final boolean validName(final String name, final boolean glob) {
     return name != null && name.matches(glob ? "[-\\w*?,]+" : "[-\\w]+");
-  }
-
-  /**
-   * Checks if the specified file name is valid.
-   * @param name name to be checked
-   * @return result of check
-   */
-  public static final boolean validName(final String name) {
-    return !name.endsWith(".") && name.indexOf('/') == -1;
   }
 
   // PROTECTED METHODS ========================================================

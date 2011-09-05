@@ -36,7 +36,7 @@ public final class Open extends Command {
       path = db.substring(i + 1);
       db = db.substring(0, i);
     }
-    if(!validDB(db, false)) return error(NAMEINVALID, db);
+    if(!validName(db, false)) return error(NAMEINVALID, db);
 
     try {
       final Data data = open(db, context);

@@ -20,7 +20,7 @@ import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
 
 /**
- * {@link IO} reference, representing a local file.
+ * {@link IO} reference, representing a local file or directory path.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -298,12 +298,11 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Checks if the file reference is valid.
+   * Checks if this is a valid file reference.
    * @return result of check
    */
   public boolean valid() {
-    // note that not all invalid names can be caught by this test, but the
-    // alternatives (creating a temporary file, etc.) are too expensive
+    // note that not all invalid names can be caught by this test
     try {
       // the result must not reference a directory
       return !file.getCanonicalFile().isDirectory();

@@ -28,20 +28,23 @@ public final class Rename extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    final byte[] src = token(IOFile.normalize(args[0]));
-    final byte[] trg = token(IOFile.normalize(args[1]));
+    final String src = IOFile.normalize(args[0]);
+    final String trg = IOFile.normalize(args[1]);
+
+    // ensure that the name contains no slashes and trailing dots
+    if(!new IOFile(trg).valid()) return error(NAMEINVALID, trg);
 
     boolean ok = true;
     int c = 0;
     final IntList il = data.docs(args[0]);
     for(int i = 0, is = il.size(); i < is; i++) {
-      final int doc = il.get(i);
-      final byte[] target = newName(data, doc, src, trg);
-      if(target.length == 0) {
+      final int pre = il.get(i);
+      final String target = newName(data, pre, src, trg);
+      if(target.isEmpty()) {
         info(NAMEINVALID, target);
         ok = false;
       } else {
-        data.update(doc, Data.DOC, target);
+        data.update(pre, Data.DOC, token(target));
         c++;
       }
     }
@@ -50,5 +53,27 @@ public final class Rename extends ACreate {
 
     info(PATHRENAMED, c, perf);
     return ok;
+  }
+
+  /**
+   * Generate a new name for a document.
+   * @param d data
+   * @param pre pre value of the document
+   * @param src source path
+   * @param trg target path
+   * @return new name
+   */
+  public static String newName(final Data d, final int pre, final String src,
+      final String trg) {
+
+    final byte[] path = d.text(pre, true);
+    String target = trg;
+    String name = string(substring(path, src.length()));
+    if(!name.isEmpty()) {
+      // change file path: replace all paths with the target path
+      if(name.startsWith("/")) name = name.substring(1);
+      target = !trg.isEmpty() ? trg + '/' + name : name;
+    }
+    return target;
   }
 }

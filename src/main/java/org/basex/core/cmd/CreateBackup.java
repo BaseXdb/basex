@@ -37,7 +37,7 @@ public final class CreateBackup extends Command {
 
   @Override
   protected boolean run() {
-    if(!validDB(args[0], true)) return error(NAMEINVALID, args[0]);
+    if(!validName(args[0], true)) return error(NAMEINVALID, args[0]);
 
     // retrieve all databases
     final String[] dbs = databases(args[0]);

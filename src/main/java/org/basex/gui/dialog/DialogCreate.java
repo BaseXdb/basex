@@ -125,7 +125,7 @@ public final class DialogCreate extends DialogImport {
     String inf = !valid ? PATHWHICH : !ok ? DBWHICH : null;
     Msg icon = Msg.ERROR;
     if(ok) {
-      ok = Command.validDB(nm, false);
+      ok = Command.validName(nm, false);
       if(!ok) {
         inf = Util.info(INVALID, EDITNAME);
       } else if(pth.isEmpty()) {

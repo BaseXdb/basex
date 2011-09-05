@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import org.basex.build.Builder;
@@ -75,7 +74,7 @@ public abstract class ACreate extends Command {
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
-    if(!validDB(db, false)) return error(NAMEINVALID, db);
+    if(!validName(db, false)) return error(NAMEINVALID, db);
 
     // close open database
     new Close().run(context);
@@ -163,27 +162,5 @@ public abstract class ACreate extends Command {
     }
     data.closeIndex(type);
     data.setIndex(type, (cmd == null ? ib : cmd.progress(ib)).build());
-  }
-
-  /**
-   * Generate a new name for a document.
-   * @param d data
-   * @param pre pre value of the document
-   * @param src source path
-   * @param trg target path
-   * @return new name
-   */
-  public static byte[] newName(final Data d, final int pre, final byte[] src,
-      final byte[] trg) {
-
-    final byte[] path = d.text(pre, true);
-    byte[] target = trg;
-    byte[] name = substring(path, src.length);
-    if(name.length != 0) {
-      // change file path: replace all paths with the target path
-      if(startsWith(name, '/')) name = substring(name, 1);
-      target = trg.length != 0 ? concat(trg, SLASH, name) : name;
-    }
-    return target;
   }
 }

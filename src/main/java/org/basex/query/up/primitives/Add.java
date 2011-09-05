@@ -48,13 +48,13 @@ public final class Add extends InsertBase {
    * @param c database context
    */
   public Add(final Data trg, final InputInfo i, final ObjList<Item> d,
-      final byte[] n, final byte[] p, final Context c) {
+      final String n, final String p, final Context c) {
 
     super(PrimitiveType.INSERTAFTER, lastDoc(trg), trg, i, null);
     docs = d;
     final int ndocs = docs.size();
-    final byte[] name = ndocs > 1 || n == null || n.length == 0 ? null : n;
-    final byte[] path = p == null || p.length == 0 ? null : p;
+    final byte[] name = ndocs > 1 || n == null || n.isEmpty() ? null : token(n);
+    final byte[] path = p == null || p.isEmpty() ? null : token(p);
     names = new TokenList(ndocs);
     paths = new TokenList(ndocs);
     for(int j = 0; j < ndocs; ++j) {
