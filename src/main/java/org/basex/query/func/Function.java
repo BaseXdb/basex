@@ -581,6 +581,18 @@ public enum Function {
   ITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM, FuncType.arity(1).seq(),
       ITEM_ZM),
 
+  /* FNCrypto functions (EXPath). */
+
+  /** Cryptographic function: create message authentication code (HMAC) */
+  HMAC(FNCrypto.class, "hmac(string,string,string[,string])", STR, 3, STR, STR,
+      STR, STR_ZO),
+  /** Encrypt message. */
+  ENCRYPT(FNCrypto.class, "encrypt(string, string, string, string)", STR, STR,
+      STR, STR, STR),
+  /** Decrypt message. */
+  DECRYPT(FNCrypto.class, "decrypt(string, string, string, string)", STR, STR,
+      STR, STR, STR),
+
   /* FNHttp functions (EXPath). */
 
   /** XQuery function */
@@ -671,6 +683,7 @@ public enum Function {
     URIS.put(FNMap.class,  MAPURI);
     URIS.put(FNMath.class, MATHURI);
     // EXPath functions
+    URIS.put(FNCrypto.class, CRYPTOURI);
     URIS.put(FNFile.class, FILEURI);
     URIS.put(FNHttp.class, HTTPURI);
     URIS.put(FNZip.class,  ZIPURI);

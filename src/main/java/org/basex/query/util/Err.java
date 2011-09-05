@@ -744,7 +744,11 @@ public enum Err {
   UPCOPYMULT(XUTY, 13,
       "Source expression in copy clause must return a single node."),
   /** XUTY0022: XQuery Update type exception. */
-  UPATTELM2(XUTY, 22, "Insert target must be an element.");
+  UPATTELM2(XUTY, 22, "Insert target must be an element."),
+
+  // * EXPath Cryptographic Module Errors
+  /** CX14: Encoding not supported. */
+  CRYPTOENC(CX, 14, "The encoding method is not supported.");
 
   /** Error type. */
   public final ErrType type;
@@ -805,6 +809,7 @@ public enum Err {
    */
   public static enum ErrType {
     /** BASX Error type. */ BASX,
+    /** CX Error type. (EXPath Cryptographic) */ CX,
     /** FOAR Error type. */ FOAR,
     /** FOCA Error type. */ FOCA,
     /** FOCH Error type. */ FOCH,
