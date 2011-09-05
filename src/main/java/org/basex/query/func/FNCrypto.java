@@ -55,12 +55,12 @@ public class FNCrypto extends FuncCall {
   private Item encrypt(final byte[] in, final byte[] encType, final byte[] key,
       final byte[] algo) throws QueryException {
     final String a = Token.string(algo);
-    SecretKeySpec keyspec = new SecretKeySpec(key, "AES");
+    SecretKeySpec keyspec = new SecretKeySpec(key, "DES");
     byte[] encrypted = new byte[in.length];
 
     try {
 
-      Cipher cip = Cipher.getInstance("AES/ECB/NoPadding");
+      Cipher cip = Cipher.getInstance("DES/CBC/PKCS5Padding");
       cip.init(Cipher.ENCRYPT_MODE, keyspec);
       int tl = cip.update(in, 0, in.length, encrypted, 0);
       tl += cip.doFinal(encrypted, tl);
