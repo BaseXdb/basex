@@ -547,22 +547,6 @@ public final class XQJTest extends TestCase {
    * @throws Exception exception
    */
   @Test
-  public void testBindWithWrongType() throws Exception {
-    final XQConnection conn = conn(drv);
-    final XQExpression expr = conn.createExpression();
-    expr.bindInt(new QName("x"), 21, null);
-    try {
-      expr.executeQuery("declare variable $x as xs:string external; $x");
-      fail("Error expected: bound value has wrong type.");
-    } catch(final XQException ex) { /* ignored */
-    }
-  }
-
-  /**
-   * Bind variable before parsing the query, using a wrong type.
-   * @throws Exception exception
-   */
-  @Test
   public void testBindTwice() throws Exception {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
