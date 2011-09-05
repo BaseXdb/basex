@@ -34,8 +34,9 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.Updates;
-import org.basex.query.util.UserFuncs;
+import org.basex.query.util.JDBCConnections;
 import org.basex.query.util.NSLocal;
+import org.basex.query.util.UserFuncs;
 import org.basex.query.util.Var;
 import org.basex.query.util.Variables;
 import org.basex.query.util.format.DecFormatter;
@@ -78,6 +79,9 @@ public final class QueryContext extends Progress {
   public HashMap<String, String> thes;
   /** Modified properties. */
   public HashMap<String, Object> props;
+
+  /** Opened connections to relational databases. */
+  public JDBCConnections jdbc;
 
   /** Root expression of the query. */
   public Expr root;
@@ -185,6 +189,7 @@ public final class QueryContext extends Progress {
     inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
+    jdbc = new JDBCConnections();
   }
 
   /**

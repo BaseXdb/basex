@@ -551,6 +551,23 @@ public enum Function {
   /** XQuery function */
   MOVE(FNFile.class, "move(source,target)", EMP, STR, STR),
 
+  /* FNSql functions. */
+
+  /** XQuery function */
+  CONNECT(FNSql.class, "connect(url[,auto-commit[,user[,pass]]]])", INT, 1,
+      STR, BLN_ZO, STR, STR),
+  /** XQuery function */
+  PREPARE(FNSql.class, "prepare(id,statement)", INT, 2, INT, STR),
+  /** XQuery function */
+  EXECUTE(FNSql.class, "execute(id[,parameters])", ELM_ZM, 1, INT, ITEM_ZO),
+  /** XQuery function */
+  CLOSE(FNSql.class, "close(id)", EMP, 1, INT),
+  /** XQuery function */
+  COMMIT(FNSql.class, "commit(id)", EMP, 1, INT),
+  /** XQuery function */
+  ROLLBACK(FNSql.class, "rollback(id)", EMP, 1, INT),
+
+
   /* FNFt functions. */
 
   /** Database function: searches the full-text index. */
@@ -686,6 +703,7 @@ public enum Function {
     URIS.put(FNSent.class, SENTURI);
     URIS.put(FNUtil.class, UTILURI);
     URIS.put(FNXslt.class, XSLTURI);
+    URIS.put(FNSql.class, SQLURI);
   }
 
   /** Function classes. */
