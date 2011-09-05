@@ -32,17 +32,11 @@ public class LocalQuery extends Query {
    * @param s owning session
    * @param q query string
    * @param ctx database context
-   * @throws BaseXException query exception
    */
-  LocalQuery(final LocalSession s, final String q, final Context ctx)
-      throws BaseXException {
+  LocalQuery(final LocalSession s, final String q, final Context ctx) {
     session = s;
     buf = new ByteArrayOutputStream();
-    try {
-      qp = new QueryListener(q, PrintOutput.get(buf), ctx);
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
-    }
+    qp = new QueryListener(q, PrintOutput.get(buf), ctx);
   }
 
   /**
@@ -52,17 +46,12 @@ public class LocalQuery extends Query {
    * @param q query string
    * @param ctx database context
    * @param o output stream to write query output
-   * @throws BaseXException query exception
    */
   LocalQuery(final LocalSession s, final String q, final Context ctx,
-      final OutputStream o) throws BaseXException {
+      final OutputStream o) {
     session = s;
     buf = null;
-    try {
-      qp = new QueryListener(q, PrintOutput.get(o), ctx);
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
-    }
+    qp = new QueryListener(q, PrintOutput.get(o), ctx);
   }
 
   @Override

@@ -53,18 +53,9 @@ final class QueryListener extends Progress {
    * @param qu query string
    * @param po output stream
    * @param c database context
-   * @throws QueryException query exception
    */
-  QueryListener(final String qu, final PrintOutput po, final Context c)
-      throws QueryException {
-
+  QueryListener(final String qu, final PrintOutput po, final Context c) {
     qp = new QueryProcessor(qu, c);
-    try {
-      qp.parse();
-    } catch(final QueryException ex) {
-      try { qp.close(); } catch(final Exception e) { }
-      throw ex;
-    }
     out = po;
     ctx = c;
     startTimeout(ctx.mprop.num(MainProp.TIMEOUT));
@@ -90,6 +81,12 @@ final class QueryListener extends Progress {
   void init() throws IOException, QueryException {
     monitored = true;
     ctx.register(qp.ctx.updating);
+    try {
+      qp.parse();
+    } catch(final QueryException ex) {
+      try { qp.close(); } catch(final Exception e) { }
+      throw ex;
+    }
     xml = qp.getSerializer(out);
     iter = qp.iter();
   }

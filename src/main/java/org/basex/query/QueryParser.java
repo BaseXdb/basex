@@ -827,7 +827,7 @@ public class QueryParser extends InputParser {
 
     if(wsConsumeWs(EXTERNAL)) {
       // bind value with new type
-      if(old != null && v.type != null) old.reset(v.type);
+      if(old != null && v.type != null) old.reset(v.type, ctx);
       // bind default value
       if(ctx.xquery3 && wsConsumeWs(ASSIGN)) {
         v.bind(check(single(), NOVARDECL), ctx);
