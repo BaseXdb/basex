@@ -134,7 +134,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
       content = token(value.toString());
     } else if(value instanceof File) {
       try {
-        content = new IOFile((File) value).content();
+        content = new IOFile((File) value).read();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_CONT +
             "\n" + ex.getMessage());

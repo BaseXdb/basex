@@ -117,7 +117,7 @@ public final class BXJaxRx implements JaxRx {
 
         try {
           // perform query
-          return query(string(io.content()));
+          return query(string(io.read()));
         } catch(final IOException ex) {
           // file could not be opened for some other reason...
           throw new JaxRxException(400, ex.getMessage());
