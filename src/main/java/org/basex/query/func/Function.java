@@ -559,13 +559,13 @@ public enum Function {
   /** XQuery function */
   PREPARE(FNSql.class, "prepare(id,statement)", INT, 2, INT, STR),
   /** XQuery function */
-  EXECUTE(FNSql.class, "execute(id[,parameters])", ELM_ZM, 1, INT, ITEM_ZO),
+  EXECUTE(FNSql.class, "execute(id[,item])", ELM_ZM, 1, INT, ITEM_ZO),
   /** XQuery function */
-  CLOSE(FNSql.class, "close(id)", EMP, 1, INT),
+  CLOSE(FNSql.class, "close(id)", EMP, 1, ELM_ZO),
   /** XQuery function */
-  COMMIT(FNSql.class, "commit(id)", EMP, 1, INT),
+  COMMIT(FNSql.class, "commit(id)", EMP, 1, ELM_ZO),
   /** XQuery function */
-  ROLLBACK(FNSql.class, "rollback(id)", EMP, 1, INT),
+  ROLLBACK(FNSql.class, "rollback(id)", EMP, 1, ELM_ZO),
 
 
   /* FNFt functions. */
