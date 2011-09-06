@@ -602,9 +602,9 @@ public enum Function {
   ITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM, FuncType.arity(1).seq(),
       ITEM_ZM),
 
-  /* FNCrypto functions (EXPath). */
+  /* FNCrypto functions (EXPath Cryptographic module). */
 
-  /** Cryptographic function: create message authentication code (HMAC) */
+  /** Create message authentication code (HMAC) */
   HMAC(FNCrypto.class, "hmac(string,string,string[,string])", STR, 3, STR, STR,
       STR, STR_ZO),
   /** Encrypt message. */
@@ -613,6 +613,12 @@ public enum Function {
   /** Decrypt message. */
   DECRYPT(FNCrypto.class, "decrypt(string, string, string, string)", STR, STR,
       STR, STR, STR),
+  /** Generate signature. */
+  GENSIG(FNCrypto.class,
+      "generate-signature(node,string,string,string,string,string[,string[,node]])",
+      NOD, -6, NOD, STR, STR, STR, STR, STR, STR_ZO, STR_ZO),
+  /** Validate signature. */
+  VALSIG(FNCrypto.class, "validate-signature(node)", BLN, NOD),
 
   /* FNHttp functions (EXPath). */
 

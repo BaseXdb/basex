@@ -23,4 +23,14 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "let $e := c:encrypt('" + msg + "','symmetric','aaabbbaa','')" +
         "return c:decrypt($e,'symmetric','aaabbbaa','')", msg);
   }
+
+  /**
+   * Test method for crypto:encrypt and crypto:decrypt.
+   */
+  @Test
+  public void hmac1() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','hmacMd5', 'hex')",
+        "\"4E4748E62B463521F6775FBF921234B5\"");
+  }
 }

@@ -20,11 +20,11 @@ import javax.crypto.spec.SecretKeySpec;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.B64;
-import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
+import org.basex.util.Base64;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 
 /**
  * EXPath Cryptographic Module.
@@ -33,9 +33,21 @@ import org.basex.util.InputInfo;
  */
 public class FNCrypto extends FuncCall {
 
+  /** Token. */
   private static final byte[] SYM = token("symmetric");
+  /** Token. */
   private static final byte[] ASYM = token("asymmetric");
+  /** Token. */
+  private static final byte[] BASE64 = token("base64");
+  /** Token. */
+  private static final byte[] HEX = token("hex");
 
+  /**
+   * Constructor.
+   * @param ii input info
+   * @param fd function
+   * @param args function arguments
+   */
   public FNCrypto(final InputInfo ii, final Function fd, final Expr[] args) {
     super(ii, fd, args);
   }
@@ -59,6 +71,17 @@ public class FNCrypto extends FuncCall {
     }
   }
 
+  /**
+   * Encrypts or decrypts the given input.
+   * @param in input
+   * @param encrType encryption type
+   * @param key secret key
+   * @param algo encryption algorithm
+   * @param encrypt encrypt or decrypt
+   * @param ii input info
+   * @return encrypted or decrypted input
+   * @throws QueryException query exception
+   */
   private Item encryption(final byte[] in, final byte[] encrType,
       final byte[] key, final byte[] algo, final boolean encrypt,
       final InputInfo ii) throws QueryException {
@@ -113,6 +136,16 @@ public class FNCrypto extends FuncCall {
     return Str.get(t);
   }
 
+  /**
+   * Creates a message authentication code (MAC) for the given input.
+   * @param msg input
+   * @param key secret key
+   * @param algo encryption algorithm
+   * @param enc encoding
+   * @param ii input info
+   * @return MAC
+   * @throws QueryException query exception
+   */
   private Item hmac(final byte[] msg, final byte[] key, final byte[] algo,
       final byte[] enc, final InputInfo ii) throws QueryException {
 
@@ -132,11 +165,11 @@ public class FNCrypto extends FuncCall {
     }
 
     // convert to specified encoding, base64 as a standard
-    Item hmac = null;
-    if(enc == null || eq(enc, token("base64")))
-      hmac = new B64(hash);
-    else if(eq(token("hex"), enc))
-      hmac = new Hex(hash);
+    Str hmac = null;
+    if(enc == null || eq(enc, BASE64))
+      hmac = Str.get(Base64.encode(hash));
+    else if(eq(HEX, enc))
+      hmac = Str.get(Token.hex(hash, true));
     else CRYPTOENC.thrw(ii, enc);
 
     return Str.get(hmac.toString());
