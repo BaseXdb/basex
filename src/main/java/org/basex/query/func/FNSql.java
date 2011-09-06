@@ -15,12 +15,11 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Properties;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
@@ -47,24 +46,22 @@ public final class FNSql extends FuncCall {
   private static final byte[] TUPLE = token("sql:tuple");
   /** parameter attribute: type. */
   private static final byte[] TYPE = token("type");
-  /** parameter attribute: null. */
-  private static final byte[] NULL = token("null");
   /** Type int. */
-  private static final byte[] INT = token("int");
+  private static final byte[] INT = AtomType.INT.nam();
   /** Type string. */
-  private static final byte[] STRING = token("string");
+  private static final byte[] STRING = AtomType.STR.nam();
   /** Type boolean. */
-  private static final byte[] BOOL = token("boolean");
+  private static final byte[] BOOL = AtomType.BLN.nam();
   /** Type date. */
-  private static final byte[] DATE = token("date");
+  private static final byte[] DATE = AtomType.DAT.nam();
   /** Type double. */
-  private static final byte[] DOUBLE = token("double");
+  private static final byte[] DOUBLE = AtomType.DBL.nam();
   /** Type float. */
-  private static final byte[] FLOAT = token("float");
+  private static final byte[] FLOAT = AtomType.FLT.nam();
   /** Type short. */
-  private static final byte[] SHORT = token("short");
+  private static final byte[] SHORT = AtomType.SHR.nam();
   /** Type time. */
-  private static final byte[] TIME = token("time");
+  private static final byte[] TIME = AtomType.TIM.nam();
   /** Type timestamp. */
   private static final byte[] TIMESTAMP = token("timestamp");
   /** Tuple. */
@@ -125,16 +122,9 @@ public final class FNSql extends FuncCall {
     // Auto-commit mode
     final boolean autoComm = expr.length < 2 || checkBln(expr[1], ctx);
     try {
-      final Properties prop = new Properties();
-      prop.put("create", "true");
-
-      // Establish a connection to the relational database
-      final Connection conn = DriverManager.getConnection(url, prop);
-
-      /*final Connection conn = expr.length == 4 ? DriverManager.getConnection(
+      final Connection conn = expr.length == 4 ? DriverManager.getConnection(
           url, string(checkStr(expr[2], ctx)), string(checkStr(expr[3], ctx)))
           : DriverManager.getConnection(url);
-          */
       conn.setAutoCommit(autoComm);
       return Itr.get(ctx.jdbc.add(conn));
     } catch(final SQLException ex) {
@@ -362,7 +352,7 @@ public final class FNSql extends FuncCall {
   }
 
   /**
-   * Commits all changes made during last transcation.
+   * Commits all changes made during last transaction.
    * @param ctx query context
    * @return result
    * @throws QueryException query exception
