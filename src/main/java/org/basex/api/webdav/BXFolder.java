@@ -1,5 +1,6 @@
 package org.basex.api.webdav;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -22,6 +23,9 @@ import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
+import com.bradmcevoy.http.exceptions.BadRequestException;
+import com.bradmcevoy.http.exceptions.ConflictException;
+import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing a folder within a collection database.
@@ -77,49 +81,49 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   @Override
   public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) {
+      final Long length, final String contentType) throws IOException,
+    ConflictException, NotAuthorizedException, BadRequestException {
+    Session s = null;
     try {
-      final Session s = factory.login(user, pass);
-      try {
-        s.execute(new Open(db));
-        final String doc = path.isEmpty() ? newName : path + SEP + newName;
-        // check if document with this path already exists
-        if(count(s, db, doc) == 0) {
-          s.add(newName, path, inputStream);
-          deleteDummy(s, db, path);
-        } else {
-          s.replace(doc, inputStream);
-        }
-
-        return new BXDocument(db, doc, factory, user, pass);
-      } finally {
-        s.execute(new Close());
-        s.close();
+      s = factory.login(user, pass);
+      s.execute(new Open(db));
+      final String doc = path.isEmpty() ? newName : path + SEP + newName;
+      // check if document with this path already exists
+      if(count(s, db, doc) == 0) {
+        s.add(newName, path, inputStream);
+        deleteDummy(s, db, path);
+      } else {
+        s.replace(doc, inputStream);
       }
+      s.execute(new Close());
+
+      return new BXDocument(db, doc, factory, user, pass);
     } catch(final Exception ex) {
       handle(ex);
+      throw new BadRequestException(this, ex.getMessage());
+    } finally {
+      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
     }
-    return null;
   }
 
   @Override
-  public CollectionResource createCollection(final String folder) {
+  public CollectionResource createCollection(final String folder) throws
+    NotAuthorizedException, ConflictException, BadRequestException {
+    Session s = null;
     try {
-      final Session s = factory.login(user, pass);
-      try {
-        // [DP] WebDAV: possible optimization would be to rename the dummy, if
-        // the current folder is empty (which not always the case)
-        deleteDummy(s, db, path);
-        final String newFolder = path + SEP + folder;
-        createDummy(s, db, newFolder);
-        return new BXFolder(db, newFolder, factory, user, pass);
-      } finally {
-        s.close();
-      }
+      s = factory.login(user, pass);
+      // [DP] WebDAV: possible optimization would be to rename the dummy, if
+      // the current folder is empty (which not always the case)
+      deleteDummy(s, db, path);
+      final String newFolder = path + SEP + folder;
+      createDummy(s, db, newFolder);
+      return new BXFolder(db, newFolder, factory, user, pass);
     } catch(final Exception ex) {
       handle(ex);
+      throw new BadRequestException(this, ex.getMessage());
+    } finally {
+      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
     }
-    return null;
   }
 
   @Override

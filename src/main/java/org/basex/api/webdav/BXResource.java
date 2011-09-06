@@ -33,7 +33,7 @@ public abstract class BXResource implements Resource {
   /** Zip mime type. */
   static final String MIMETYPEZIP = "application/zip";
   /** Dummy xml file.*/
-  static final String DUMMY = "EMPTY.xml";
+  static final String DUMMY = ".";
   /** Dummy xml content.*/
   static final String DUMMYCONTENT = "<empty/>";
   /** User name. */

@@ -1,5 +1,7 @@
 package org.basex.api.webdav;
 
+import java.io.IOException;
+
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
@@ -10,6 +12,9 @@ import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.CopyableResource;
 import com.bradmcevoy.http.DeletableResource;
 import com.bradmcevoy.http.MoveableResource;
+import com.bradmcevoy.http.exceptions.BadRequestException;
+import com.bradmcevoy.http.exceptions.ConflictException;
+import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing an abstract folder within a collection database.
@@ -37,50 +42,53 @@ public abstract class BXAbstractResource extends BXResource implements
   }
 
   @Override
-  public void delete() {
+  public void delete() throws NotAuthorizedException, ConflictException,
+    BadRequestException {
+    Session s = null;
     try {
-      final Session s = factory.login(user, pass);
-      try {
-        delete(s);
-      } finally {
-        s.close();
-      }
+      s = factory.login(user, pass);
+      delete(s);
     } catch(final Exception ex) {
       handle(ex);
+      throw new BadRequestException(this, ex.getMessage());
+    } finally {
+      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
     }
   }
 
   @Override
-  public void copyTo(final CollectionResource target, final String name) {
+  public void copyTo(final CollectionResource target, final String name) throws
+    NotAuthorizedException, BadRequestException, ConflictException {
+    Session s = null;
     try {
-      final Session s = factory.login(user, pass);
-      try {
-        if(target instanceof BXAllDatabasesResource)
-          copyToRoot(s, name);
-        else if(target instanceof BXFolder)
-          copyTo(s, (BXFolder) target, name);
-      } finally {
-        s.close();
-      }
+      s = factory.login(user, pass);
+      if(target instanceof BXAllDatabasesResource)
+        copyToRoot(s, name);
+      else if(target instanceof BXFolder)
+        copyTo(s, (BXFolder) target, name);
     } catch(final Exception ex) {
       handle(ex);
+      throw new BadRequestException(this, ex.getMessage());
+    } finally {
+      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
     }
   }
 
   @Override
-  public void moveTo(final CollectionResource target, final String name) {
+  public void moveTo(final CollectionResource target, final String name) throws
+    ConflictException, NotAuthorizedException, BadRequestException {
+    Session s = null;
     try {
-      final Session s = factory.login(user, pass);
-      try {
-        if(target instanceof BXAllDatabasesResource)
-          moveToRoot(s, name);
-        else if(target instanceof BXFolder)
-          moveTo(s, (BXFolder) target, name);
-      } finally {
-        s.close();
-      }
+      s = factory.login(user, pass);
+      if(target instanceof BXAllDatabasesResource)
+        moveToRoot(s, name);
+      else if(target instanceof BXFolder)
+        moveTo(s, (BXFolder) target, name);
     } catch(final Exception ex) {
       handle(ex);
+      throw new BadRequestException(this, ex.getMessage());
+    } finally {
+      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
     }
   }
 

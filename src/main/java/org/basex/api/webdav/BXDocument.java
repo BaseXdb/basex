@@ -16,6 +16,9 @@ import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.FileItem;
 import com.bradmcevoy.http.FileResource;
 import com.bradmcevoy.http.Range;
+import com.bradmcevoy.http.exceptions.BadRequestException;
+import com.bradmcevoy.http.exceptions.ConflictException;
+import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing an XML document.
@@ -58,7 +61,8 @@ public class BXDocument extends BXAbstractResource implements FileResource {
 
   @Override
   public String processForm(final Map<String, String> parameters,
-      final Map<String, FileItem> files) {
+      final Map<String, FileItem> files) throws BadRequestException,
+      NotAuthorizedException, ConflictException {
     // TODO Auto-generated method stub
     return null;
   }
@@ -71,18 +75,19 @@ public class BXDocument extends BXAbstractResource implements FileResource {
   @Override
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType)
-      throws IOException {
-
-    final Session s = factory.login(user, pass);
+      throws IOException, NotAuthorizedException, BadRequestException {
+    Session s = null;
     try {
+      s = factory.login(user, pass);
       s.setOutputStream(out);
       final Query q = s.query("collection($path)");
       q.bind("$path", db + SEP + path);
       q.execute();
-    } catch(final BaseXException ex) {
+    } catch(final Exception ex) {
       handle(ex);
+      throw new BadRequestException(this, ex.getMessage());
     } finally {
-      s.close();
+      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
     }
   }
 
