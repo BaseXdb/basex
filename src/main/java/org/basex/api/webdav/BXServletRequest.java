@@ -151,7 +151,7 @@ public class BXServletRequest extends AbstractRequest {
 
   @Override
   public Cookie getCookie(final String name) {
-    for(javax.servlet.http.Cookie c : req.getCookies()) {
+    for(final javax.servlet.http.Cookie c : req.getCookies()) {
       if(c.getName().equals(name)) return new BXServletCookie(c);
     }
     return null;
@@ -160,7 +160,7 @@ public class BXServletRequest extends AbstractRequest {
   @Override
   public List<Cookie> getCookies() {
     final List<Cookie> list = new ArrayList<Cookie>();
-    for(javax.servlet.http.Cookie c : req.getCookies())
+    for(final javax.servlet.http.Cookie c : req.getCookies())
       list.add(new BXServletCookie(c));
     return list;
   }
@@ -189,9 +189,9 @@ public class BXServletRequest extends AbstractRequest {
           params.put(nm, val);
         }
       }
-    } catch(FileUploadException ex) {
+    } catch(final FileUploadException ex) {
       throw new RequestParseException("FileUploadException", ex);
-    } catch(Throwable ex) {
+    } catch(final Throwable ex) {
       throw new RequestParseException(ex.getMessage(), ex);
     }
   }
@@ -293,7 +293,7 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   public InputStream getInputStream() {
     try {
       return wrapped.getInputStream();
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       throw new RuntimeException(ex);
     }
   }
@@ -302,7 +302,7 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   public OutputStream getOutputStream() {
     try {
       return wrapped.getOutputStream();
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       throw new RuntimeException(ex);
     }
   }

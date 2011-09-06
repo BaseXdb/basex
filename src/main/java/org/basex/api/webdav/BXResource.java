@@ -159,42 +159,34 @@ public abstract class BXResource implements Resource {
    * Count documents which paths start with the given path.
    * @param s active client session
    * @param db database
-   * @param p path
+   * @param path path
    * @return number of documents
    * @throws BaseXException database exception
    */
-  static int count(final Session s, final String db, final String p)
+  static int count(final Session s, final String db, final String path)
       throws BaseXException {
-    final String path = stripLeadingSlash(p);
-    final String dbpath = db + SEP + path;
-    final Query q = s.query(
-        "declare variable $d as xs:string external; " +
-        "declare variable $p as xs:string external; " +
-        "count(db:list($d)[starts-with(., $p)])");
-    q.bind("$d", dbpath);
+    final Query q = s.query("count(db:list($d, $p))");
+    q.bind("$d", db);
     q.bind("$p", path);
     return parseInt(q.execute());
   }
 
   /**
-   * Count the number of documents which have a given name.
+   * Checks if a document which has a given name.
    * @param s active client session
    * @param db database name
    * @param p resource path
    * @return number of documents
    * @throws BaseXException database exception
    */
-  static int countExact(final Session s, final String db, final String p)
+  static boolean exists(final Session s, final String db, final String p)
       throws BaseXException {
+
     final String path = stripLeadingSlash(p);
-    final String dbpath = db + SEP + path;
-    final Query q = s.query(
-        "declare variable $d as xs:string external; " +
-        "declare variable $p as xs:string external; " +
-        "count(db:list($d)[. = $p])");
-    q.bind("$d", dbpath);
+    final Query q = s.query("exists(db:list($d, $p)[. = $p])");
+    q.bind("$d", db);
     q.bind("$p", path);
-    return parseInt(q.execute());
+    return Boolean.parseBoolean(q.execute());
   }
 
   /**

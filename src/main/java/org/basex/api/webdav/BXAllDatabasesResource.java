@@ -53,7 +53,7 @@ public class BXAllDatabasesResource extends BXResource implements
       } finally {
         cs.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
     return null;
@@ -88,7 +88,7 @@ public class BXAllDatabasesResource extends BXResource implements
         s.execute(new Close());
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
     return null;
@@ -107,7 +107,7 @@ public class BXAllDatabasesResource extends BXResource implements
         s.execute(new Close());
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
     return null;

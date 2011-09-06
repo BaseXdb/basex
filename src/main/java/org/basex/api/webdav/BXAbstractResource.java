@@ -43,7 +43,7 @@ public abstract class BXAbstractResource extends BXResource implements
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
   }
@@ -60,7 +60,7 @@ public abstract class BXAbstractResource extends BXResource implements
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
   }
@@ -77,7 +77,7 @@ public abstract class BXAbstractResource extends BXResource implements
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
   }

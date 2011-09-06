@@ -105,8 +105,7 @@ public final class JaxRxServer extends BaseXServer {
       jetty = new JettyServer(context.mprop.num(MainProp.JAXRXPORT));
       Util.outln(JAXRX + ' ' + SERVERSTART);
     } catch(final Exception ex) {
-      ex.printStackTrace();
-      Util.server(ex);
+      Util.errln(ex);
     }
   }
 

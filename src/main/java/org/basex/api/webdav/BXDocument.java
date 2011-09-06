@@ -73,12 +73,10 @@ public class BXDocument extends BXAbstractResource implements FileResource {
     final Session s = factory.login(user, pass);
     try {
       s.setOutputStream(out);
-      final Query q = s.query(
-          "declare variable $path as xs:string external; " +
-          "collection($path)");
+      final Query q = s.query("collection($path)");
       q.bind("$path", db + SEP + path);
       q.execute();
-    } catch(BaseXException ex) {
+    } catch(final BaseXException ex) {
       handle(ex);
     } finally {
       s.close();
@@ -113,12 +111,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
    */
   protected void add(final Session s, final String trgdb, final String trgdir,
       final String name) throws BaseXException {
-    final Query q = s.query(
-        "declare variable $db as xs:string external; " +
-        "declare variable $doc as xs:string external; " +
-        "declare variable $name as xs:string external; " +
-        "declare variable $path as xs:string external; " +
-        "db:add($db, collection($doc), $name, $path)");
+    final Query q = s.query("db:add($db, collection($doc), $name, $path)");
     q.bind("$db", trgdb);
     q.bind("$doc", db + SEP + path);
     q.bind("$name", name);

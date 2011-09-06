@@ -42,9 +42,7 @@ public class BXDatabase extends BXFolder {
       final String info;
       final Session s = factory.login(user, pass);
       try {
-        final Query q = s.query(
-            "declare variable $p as xs:string external; " +
-            "db:info($p)");
+        final Query q = s.query("db:info($p)");
         q.bind("$p", db);
         info = q.execute();
       } finally {
@@ -58,7 +56,7 @@ public class BXDatabase extends BXFolder {
             info.indexOf(Text.NL, p));
         if(date.length() > 0) return DATEFORMAT.parse(date);
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
     return null;

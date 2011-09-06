@@ -70,7 +70,7 @@ public class BXResourceFactory implements ResourceFactory {
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
     return null;
@@ -124,7 +124,7 @@ public class BXResourceFactory implements ResourceFactory {
   Resource resource(final Session s, final String db, final String path,
       final String u, final String p) throws BaseXException {
     // check if there is a document in the collection having this path
-    if(countExact(s, db, path) > 0) return new BXDocument(db, path, this, u, p);
+    if(exists(s, db, path)) return new BXDocument(db, path, this, u, p);
 
     // check if there are paths in the collection starting with this path
     if(count(s, db, path) > 0) return new BXFolder(db, path, this, u, p);

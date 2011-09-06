@@ -85,7 +85,7 @@ public class BXServletResponse extends AbstractResponse {
   public OutputStream getOutputStream() {
     try {
       return res.getOutputStream();
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
   }
@@ -95,7 +95,7 @@ public class BXServletResponse extends AbstractResponse {
     try {
       res.flushBuffer();
       res.getOutputStream().flush();
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
   }
@@ -105,7 +105,7 @@ public class BXServletResponse extends AbstractResponse {
     final String u = res.encodeRedirectURL(url);
     try {
       res.sendRedirect(u);
-    } catch(IOException ex) { }
+    } catch(final IOException ex) { }
   }
 
   @Override
@@ -127,7 +127,7 @@ public class BXServletResponse extends AbstractResponse {
       return cookie;
     }
 
-    javax.servlet.http.Cookie c = new javax.servlet.http.Cookie(
+    final javax.servlet.http.Cookie c = new javax.servlet.http.Cookie(
         cookie.getName(), cookie.getValue());
     c.setDomain(cookie.getDomain());
     c.setMaxAge(cookie.getExpiry());
@@ -141,7 +141,8 @@ public class BXServletResponse extends AbstractResponse {
 
   @Override
   public Cookie setCookie(final String name, final String value) {
-    javax.servlet.http.Cookie c = new javax.servlet.http.Cookie(name, value);
+    final javax.servlet.http.Cookie c =
+        new javax.servlet.http.Cookie(name, value);
     res.addCookie(c);
     return new BXServletCookie(c);
   }

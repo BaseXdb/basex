@@ -95,7 +95,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         s.execute(new Close());
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
     return null;
@@ -115,7 +115,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
     return null;
@@ -130,7 +130,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
     return null;
@@ -144,10 +144,8 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       final Session s = factory.login(user, pass);
       try {
         final Query q = s.query(
-            "declare variable $d as xs:string external; " +
-            "declare variable $p as xs:string external; " +
-            "for $r in db:list($d) return substring-after($r,$p)");
-        q.bind("$d", db + SEP + path);
+            "for $r in db:list($d, $p) return substring-after($r,$p)");
+        q.bind("$d", db);
         q.bind("$p", path);
         while(q.more()) {
           final String p = stripLeadingSlash(q.next());
@@ -167,7 +165,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       } finally {
         s.close();
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       handle(ex);
     }
     return ch;
@@ -200,19 +198,13 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   private void add(final Session s, final String trgdb, final String trgdir)
       throws BaseXException {
     final Query q = s.query(
-        "declare variable $src as xs:string external; " +
-        "declare variable $srcdb as xs:string external; " +
-        "declare variable $trgdb as xs:string external; " +
-        "declare variable $trgdir as xs:string external; " +
-        "declare variable $prefix as xs:string external; " +
-        "for $d in db:list($src) " +
-        "return db:add($trgdb, collection($srcdb || $d), " +
-        "$trgdir || substring-after($d, $prefix))");
-    q.bind("$src", db + SEP + path);
-    q.bind("$srcdb", db + SEP);
+        "for $d in db:list($db, $path) " +
+        "return db:add($trgdb, collection($db || '/' || $d), " +
+        "$trgdir || '/' || substring-after($d, $path))");
+    q.bind("$db", db);
+    q.bind("$path", path);
     q.bind("$trgdb", trgdb);
-    q.bind("$trgdir", trgdir.isEmpty() ? "" : trgdir + SEP);
-    q.bind("$prefix", path + SEP);
+    q.bind("$trgdir", trgdir);
     q.execute();
   }
 
