@@ -21,9 +21,8 @@ import org.junit.Test;
 public final class CollectionPathTest {
   /** Database context. */
   private static final Context CONTEXT = new Context();
-
   /** Test database name. */
-  private static final String DBNAME = Util.name(CollectionPathTest.class);
+  private static final String DB = Util.name(CollectionPathTest.class);
   /** Test files. */
   private static final String[] FILES = {
     "etc/test/input.xml", "etc/test/xmark.xml", "etc/test/test.xml"
@@ -37,7 +36,7 @@ public final class CollectionPathTest {
    */
   @BeforeClass
   public static void before() throws BaseXException {
-    new CreateDB(DBNAME).execute(CONTEXT);
+    new CreateDB(DB).execute(CONTEXT);
     for(final String file : FILES) {
       new Add(file, null, "etc/test").execute(CONTEXT);
     }
@@ -50,7 +49,7 @@ public final class CollectionPathTest {
    */
   @AfterClass
   public static void after() throws BaseXException {
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
   }
 
   /**
@@ -60,7 +59,7 @@ public final class CollectionPathTest {
   @Test
   public void testFindDoc() throws Exception {
     final String find =
-      "for $x in collection('" + DBNAME + "/etc/test/xmark.xml') " +
+      "for $x in collection('" + DB + "/etc/test/xmark.xml') " +
       "where $x//location contains text 'uzbekistan' " +
       "return $x";
     final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
@@ -74,7 +73,7 @@ public final class CollectionPathTest {
    */
   @Test
   public void testFindDocs() throws Exception {
-    final String find = "collection('" + DBNAME + "/test/zipped') ";
+    final String find = "collection('" + DB + "/test/zipped') ";
     final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
     assertEquals(4, qp.execute().size());
     qp.close();
@@ -87,7 +86,7 @@ public final class CollectionPathTest {
   @Test
   public void testBaseUri() throws Exception {
     final String find =
-      "for $x in collection('" + DBNAME + "/etc/test/xmark.xml') " +
+      "for $x in collection('" + DB + "/etc/test/xmark.xml') " +
       "return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
     assertEquals(FILES[1], qp.iter().next().toJava());

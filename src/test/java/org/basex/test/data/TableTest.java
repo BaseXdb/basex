@@ -24,7 +24,7 @@ import org.junit.Test;
  */
 public final class TableTest {
   /** Database name. */
-  private static final String DBNAME = Util.name(TableTest.class);
+  private static final String DB = Util.name(TableTest.class);
   /** Database XML file. */
   private static final String DBFILE = "etc/test/factbook.zip";
   /** Select Germany. */
@@ -47,7 +47,7 @@ public final class TableTest {
   @Before
   public void setUp() throws BaseXException {
     ctx = new Context();
-    new CreateDB(DBNAME, DBFILE).execute(ctx);
+    new CreateDB(DB, DBFILE).execute(ctx);
     tbl = ctx.data().meta.dbfile(DataText.DATATBL);
   }
 
@@ -57,7 +57,7 @@ public final class TableTest {
    */
   @After
   public void tearDown() throws BaseXException {
-    new DropDB(DBNAME).execute(ctx);
+    new DropDB(DB).execute(ctx);
   }
 
   /**

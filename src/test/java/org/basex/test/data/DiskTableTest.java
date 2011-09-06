@@ -30,9 +30,10 @@ public final class DiskTableTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "etc/test/xmark.xml";
   /** Test database name. */
-  private static final String DBNAME = Util.name(DiskTableTest.class);
+  private static final String DB = Util.name(DiskTableTest.class);
   /** Test file we do updates with. */
   private static final Context CONTEXT = new Context();
+
   /** BlockStorage. */
   private TableDiskAccess tda;
   /** Data reference. */
@@ -63,7 +64,7 @@ public final class DiskTableTest {
     try {
       final Parser parser = Parser.xmlParser(
           IO.get(TESTFILE), CONTEXT.prop, "");
-      data = new DiskBuilder(DBNAME, parser, CONTEXT).build();
+      data = new DiskBuilder(DB, parser, CONTEXT).build();
       size = data.meta.size;
       data.close();
       tda = new TableDiskAccess(data.meta, DATATBL);
@@ -87,7 +88,7 @@ public final class DiskTableTest {
   public void tearDown() {
     try {
       if(tda != null) tda.close();
-      DropDB.drop(DBNAME, CONTEXT.mprop);
+      DropDB.drop(DB, CONTEXT.mprop);
     } catch(final Exception ex) {
       Util.stack(ex);
     }

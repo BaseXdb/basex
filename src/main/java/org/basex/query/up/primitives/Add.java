@@ -48,13 +48,13 @@ public final class Add extends InsertBase {
    * @param c database context
    */
   public Add(final Data trg, final InputInfo i, final ObjList<Item> d,
-      final byte[] n, final byte[] p, final Context c) {
+      final String n, final String p, final Context c) {
 
     super(PrimitiveType.INSERTAFTER, lastDoc(trg), trg, i, null);
     docs = d;
     final int ndocs = docs.size();
-    final byte[] name = ndocs > 1 || n == null || n.length == 0 ? null : n;
-    final byte[] path = p == null || p.length == 0 ? null : p;
+    final byte[] name = ndocs > 1 || n == null || n.isEmpty() ? null : token(n);
+    final byte[] path = p == null || p.isEmpty() ? null : token(p);
     names = new TokenList(ndocs);
     paths = new TokenList(ndocs);
     for(int j = 0; j < ndocs; ++j) {
@@ -112,14 +112,14 @@ public final class Add extends InsertBase {
    */
   private Data docData(final Item doc, final byte[] name, final byte[] path)
       throws QueryException {
-    final MemData docData;
 
+    final MemData mdata;
     if(doc.node()) {
       // adding a document node
       final ANode nd = (ANode) doc;
       if(nd.ndType() != NodeType.DOC) UPDOCTYPE.thrw(input, nd);
-      docData = new MemData(data);
-      new DataBuilder(docData).build(nd);
+      mdata = new MemData(data);
+      new DataBuilder(mdata).build(nd);
     } else if(doc.str()) {
       // adding file(s) from a path
       final String docpath = string(doc.atom(input));
@@ -127,33 +127,31 @@ public final class Add extends InsertBase {
       final DirParser p = new DirParser(IO.get(docpath), ctx.prop);
       final MemBuilder b = new MemBuilder(nm, p, ctx.prop);
       try {
-        docData = b.build();
-      } catch(final IOException e) {
-        throw DOCERR.thrw(input, docpath);
+        mdata = b.build();
+      } catch(final IOException ex) {
+        throw IOERR.thrw(input, ex);
       }
     } else {
-      STRNODTYPE.thrw(input, this, doc.type);
-      return null;
+      throw STRNODTYPE.thrw(input, this, doc.type);
     }
 
     // modify name and path, if needed
-    final IntList pres = docData.docs();
+    final IntList pres = mdata.docs();
     if(pres.size() == 1 && name != null) {
       // name is specified and a single document is added: set the name
       final byte[] nm = path == null ? name : concat(path, SLASH, name);
-      docData.update(pres.get(0), Data.DOC, nm);
+      mdata.update(pres.get(0), Data.DOC, nm);
     } else if(path != null) {
       // path is specified: replace the path of each new document
       for(int i = 0, is = pres.size(); i < is; i++) {
         final int d = pres.get(i);
-        final byte[] old = docData.text(d, true);
+        final byte[] old = mdata.text(d, true);
         final int p = lastIndexOf(old, '/');
         final byte[] nm = p < 0 ? old : subtoken(old, p + 1);
-        docData.update(d, Data.DOC, concat(path, SLASH, nm));
+        mdata.update(d, Data.DOC, concat(path, SLASH, nm));
       }
     }
-
-    return docData;
+    return mdata;
   }
 
   /**

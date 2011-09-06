@@ -68,7 +68,7 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  public Query query(final String query) throws BaseXException {
+  public LocalQuery query(final String query) throws BaseXException {
     final LocalQuery q = out == null ?
         new LocalQuery(this, query, ctx) :
         new LocalQuery(this, query, ctx, out);

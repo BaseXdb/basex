@@ -3,8 +3,8 @@ package org.basex.io.serial;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.basex.query.item.Bin;
 import org.basex.query.item.Item;
-import org.basex.util.Util;
 
 /**
  * This class serializes data in its internal format: no indentation and entity
@@ -28,7 +28,7 @@ public final class RawSerializer extends TextSerializer {
 
   @Override
   public void finishItem(final Item it) throws IOException {
-    print(Util.inf("%", it.toJava()));
+    print(it instanceof Bin ? ((Bin) it).toJava() : atom(it));
   }
 
   @Override

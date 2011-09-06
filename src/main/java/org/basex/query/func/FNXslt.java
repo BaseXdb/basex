@@ -107,7 +107,7 @@ public final class FNXslt extends FuncCall {
     } catch(final Exception ex) {
       Util.debug(ex);
       // return cause of reflection error, or error itself
-      throw NODOC.thrw(input, ex instanceof InvocationTargetException ?
+      throw IOERR.thrw(input, ex instanceof InvocationTargetException ?
           ex.getCause() : ex);
     }
   }

@@ -23,7 +23,7 @@ import org.junit.Test;
  */
 public final class StoreTest {
   /** Test database name. */
-  private static final String DBNAME = Util.name(StoreTest.class);
+  private static final String DB = Util.name(StoreTest.class);
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of runs per client. */
@@ -47,7 +47,7 @@ public final class StoreTest {
    */
   @AfterClass
   public static void finish() throws BaseXException {
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
   }
 
   /**
@@ -56,7 +56,7 @@ public final class StoreTest {
    */
   @Test
   public void replace() throws BaseXException {
-    new CreateDB(DBNAME, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
+    new CreateDB(DB, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
     final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
     for(int n = 0; n < NQUERIES; n++) {
       final String qu =
@@ -74,7 +74,7 @@ public final class StoreTest {
    */
   @Test
   public void deleteInsertTwo() throws BaseXException {
-    new CreateDB(DBNAME, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
+    new CreateDB(DB, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
     final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int n = 0; n < NQUERIES; n++) {
@@ -94,7 +94,7 @@ public final class StoreTest {
    */
   @Test
   public void deleteInsert() throws BaseXException {
-    new CreateDB(DBNAME, "<X>abc</X>").execute(CONTEXT);
+    new CreateDB(DB, "<X>abc</X>").execute(CONTEXT);
     final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int i = 0; i < NQUERIES; i++) {

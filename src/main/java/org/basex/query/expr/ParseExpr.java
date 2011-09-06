@@ -9,6 +9,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
 import org.basex.query.func.Function;
+import org.basex.query.item.Bin;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
@@ -340,6 +341,19 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression yields a binary item.
+   * @param e expression to be evaluated
+   * @param ctx query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  public final byte[] checkBin(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    final Item it = checkEmpty(e.item(ctx, input));
+    return it instanceof Bin ? ((Bin) it).toJava() : it.atom(input);
+  }
+
+  /**
    * Checks the data type and throws an exception, if necessary.
    * @param it item to be checked
    * @param t type to be checked
@@ -392,7 +406,7 @@ public abstract class ParseExpr extends Expr {
     checkAdmin(ctx);
     final byte[] name = checkStr(e, ctx);
     final IO io = IO.get(string(name));
-    if(!io.exists()) DOCERR.thrw(input, name);
+    if(!io.exists()) RESFNF.thrw(input, name);
     return io;
   }
 

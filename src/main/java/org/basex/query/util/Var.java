@@ -112,12 +112,18 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Sets the specified variable type and resets its value.
+   * Sets the specified variable type.
    * @param t type
+   * @param ctx query context
+   * @throws QueryException query exception
    */
-  public void reset(final SeqType t) {
+  public void reset(final SeqType t, final QueryContext ctx)
+      throws QueryException {
+
     type = t;
-    value = null;
+    if(value != null && !value.type.instance(t.type) && value instanceof Item) {
+      value = type.type.e((Item) value, ctx, input);
+    }
   }
 
   /**

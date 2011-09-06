@@ -11,6 +11,7 @@ import org.basex.query.func.Variable;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Err;
+import org.basex.util.Util;
 
 /**
  * This class contains some methods for performing advanced query tests.
@@ -88,6 +89,7 @@ public abstract class AdvancedQueryTest {
    * @param error expected errors
    */
   protected static void check(final QueryException ex, final Err... error) {
+    if(error.length == 0) Util.notexpected("No error code specified");
     final String msg = ex.getMessage();
     boolean found = false;
     for(final Err e : error) found |= msg.contains(e.code());

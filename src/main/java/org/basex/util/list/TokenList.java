@@ -147,14 +147,16 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   /**
    * Sorts the elements.
    * @param cs respect case sensitivity
+   * @return self reference
    */
-  public void sort(final boolean cs) {
+  public TokenList sort(final boolean cs) {
     Arrays.sort(list, 0, size, new Comparator<byte[]>() {
       @Override
       public int compare(final byte[] s1, final byte[] s2) {
         return cs ? diff(s1, s2) : diff(lc(s1), lc(s2));
       }
     });
+    return this;
   }
 
   @Override

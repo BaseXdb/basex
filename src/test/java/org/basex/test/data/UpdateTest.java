@@ -27,7 +27,7 @@ import org.junit.Test;
  */
 public abstract class UpdateTest {
   /** Test database name. */
-  private static final String DBNAME = Util.name(UpdateTest.class);
+  private static final String DB = Util.name(UpdateTest.class);
   /** Test file we do updates with. */
   private static final String TESTFILE = "etc/test/test.xml";
   /** Main memory flag. */
@@ -76,7 +76,7 @@ public abstract class UpdateTest {
    */
   @Before
   public final void setUp() {
-    exec(new CreateDB(DBNAME, TESTFILE));
+    exec(new CreateDB(DB, TESTFILE));
     size = CONTEXT.data().meta.size;
   }
 
@@ -87,7 +87,7 @@ public abstract class UpdateTest {
   public final void tearDown() {
     if(mainmem) return;
     exec(new Close());
-    exec(new DropDB(DBNAME));
+    exec(new DropDB(DB));
   }
 
   /**
@@ -96,7 +96,7 @@ public abstract class UpdateTest {
   protected final void reload() {
     if(mainmem) return;
     exec(new Close());
-    exec(new Open(DBNAME));
+    exec(new Open(DB));
   }
 
   /**

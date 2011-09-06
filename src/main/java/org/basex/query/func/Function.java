@@ -458,7 +458,7 @@ public enum Function {
   /* FNDb functions. */
 
   /** Database function: opens a database. */
-  DBOPEN(FNDb.class, "open(database)", NOD_ZM, STR),
+  DBOPEN(FNDb.class, "open(database[,path])", NOD_ZM, 1, STR, STR),
   /** Database function: opens a specific database node. */
   DBOPENPRE(FNDb.class, "open-pre(database,pre)", NOD_ZM, ITEM, ITR),
   /** Database function: opens a specific database node. */
@@ -471,7 +471,7 @@ public enum Function {
   /** Database function: searches the full-text index. */
   DBFULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
   /** Database function: lists all database. */
-  DBLIST(FNDb.class, "list([path])", STR_ZM, 0, STR),
+  DBLIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
   /** Database function: lists system information. */
   DBSYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */
@@ -493,6 +493,14 @@ public enum Function {
   DBREPLACE(FNDb.class, "replace(database,path,item)", EMP, ITEM, STR, ITEM),
   /** Database function: optimize database structures. */
   DBOPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
+  /** Database function: gets a value binary data. */
+  DBGET(FNDb.class, "get(database,path)", B64, STR, STR),
+  /** Database function: stores binary data. */
+  DBPUT(FNDb.class, "put(database,path,value)", EMP, STR, STR, ITEM),
+  /** Database function: checks if the specified resource is an xml document. */
+  DBISXML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
+  /** Database function: checks if the specified resource is a raw file. */
+  DBISRAW(FNDb.class, "is-raw(database,path)", BLN, STR, STR),
 
   /* FNFile functions (EXPath). */
 
@@ -533,15 +541,32 @@ public enum Function {
   /** XQuery function */
   WRITE(FNFile.class, "write(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function */
-  WRITEBIN(FNFile.class, "write-binary(path,base64)", EMP, STR, B64_ZM),
+  WRITEBIN(FNFile.class, "write-binary(path,item)", EMP, STR, ITEM_ZM),
   /** XQuery function */
   APPEND(FNFile.class, "append(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function */
-  APPENDBIN(FNFile.class, "append-binary(path,base64)", EMP, STR, B64_ZM),
+  APPENDBIN(FNFile.class, "append-binary(path,item)", EMP, STR, ITEM_ZM),
   /** XQuery function */
   COPY(FNFile.class, "copy(source,target)", EMP, STR, STR),
   /** XQuery function */
   MOVE(FNFile.class, "move(source,target)", EMP, STR, STR),
+
+  /* FNSql functions. */
+
+  /** XQuery function */
+  CONNECT(FNSql.class, "connect(url[,auto-commit[,user[,pass]]]])", INT, 1,
+      STR, BLN_ZO, STR, STR),
+  /** XQuery function */
+  PREPARE(FNSql.class, "prepare(id,statement)", INT, 2, INT, STR),
+  /** XQuery function */
+  EXECUTE(FNSql.class, "execute(id[,parameters])", ELM_ZM, 1, INT, ITEM_ZO),
+  /** XQuery function */
+  CLOSE(FNSql.class, "close(id)", EMP, 1, INT),
+  /** XQuery function */
+  COMMIT(FNSql.class, "commit(id)", EMP, 1, INT),
+  /** XQuery function */
+  ROLLBACK(FNSql.class, "rollback(id)", EMP, 1, INT),
+
 
   /* FNFt functions. */
 
@@ -617,14 +642,16 @@ public enum Function {
   TO_BASE(FNUtil.class, "integer-to-base(num,base)", STR, ITR, ITR),
   /** Utility function: decodes a number from a given base. */
   FRM_BASE(FNUtil.class, "integer-from-base(str,base)", ITR, STR, ITR),
-  /** Utility function: calculates the MD5 hash of the given xs:string. */
+  /** Utility function: calculates the MD5 hash of the given string. */
   MD5(FNUtil.class, "md5(str)", HEX, STR),
-  /** Utility function: calculates the SHA1 hash of the given xs:string. */
+  /** Utility function: calculates the SHA1 hash of the given string. */
   SHA1(FNUtil.class, "sha1(str)", HEX, STR),
-  /** Utility function: calculates the CRC32 hash of the given xs:string. */
+  /** Utility function: calculates the CRC32 hash of the given string. */
   CRC32(FNUtil.class, "crc32(str)", HEX, STR),
-  /** Utility function: gets the bytes from the given xs:base64Binary data. */
+  /** Utility function: gets the bytes from the given data data. */
   TO_BYTES(FNUtil.class, "to-bytes(item)", BYT_ZM, ITEM),
+  /** Utility function: converts the specified bytes to a string. */
+  TO_STRING(FNUtil.class, "to-string(item[,encoding])", STR, 1, ITEM, STR),
   /** Utility function: returns a random unique id. */
   UUID(FNUtil.class, "uuid()", STR),
 
@@ -676,6 +703,7 @@ public enum Function {
     URIS.put(FNSent.class, SENTURI);
     URIS.put(FNUtil.class, UTILURI);
     URIS.put(FNXslt.class, XSLTURI);
+    URIS.put(FNSql.class, SQLURI);
   }
 
   /** Function classes. */

@@ -90,8 +90,6 @@ public final class SeqType {
   public static final SeqType BLN_ZO = new SeqType(AtomType.BLN, Occ.ZO);
   /** Single xs:base64Binary. */
   public static final SeqType B64 = AtomType.B64.seq();
-  /** Zero or more xs:base64Binary. */
-  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZM);
   /** Double number. */
   public static final SeqType DBL = AtomType.DBL.seq();
   /** Double number. */
@@ -100,6 +98,8 @@ public final class SeqType {
   public static final SeqType FLT = AtomType.FLT.seq();
   /** Zero or one double. */
   public static final SeqType DBL_ZO = new SeqType(AtomType.DBL, Occ.ZO);
+  /** One decimal number. */
+  public static final SeqType DEC = AtomType.DEC.seq();
   /** Zero or one decimal number. */
   public static final SeqType DEC_ZO = new SeqType(AtomType.DEC, Occ.ZO);
   /** Single number; for simplicity, numbers are summarized by this type. */
@@ -176,6 +176,8 @@ public final class SeqType {
   public static final SeqType ELM_ZO = new SeqType(NodeType.ELM, Occ.ZO);
   /** Zero or more element nodes. */
   public static final SeqType ELM_ZM = new SeqType(NodeType.ELM, Occ.ZM);
+  /** Single integer. */
+  public static final SeqType INT = AtomType.INT.seq();
 
   /** The general map type. */
   public static final MapType ANY_MAP = new MapType(AtomType.AAT,

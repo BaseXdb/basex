@@ -22,14 +22,12 @@ import org.junit.Test;
 public final class CreateTest {
   /** Database context. */
   private static final Context CONTEXT = new Context();
-
   /** Test database name. */
-  private static final String DBNAME = Util.name(CreateTest.class);
+  private static final String DB = Util.name(CreateTest.class);
   /** Test document name. */
   private static final String DOCNAME = "t.xml";
   /** Target. */
   private static final String TARGET = "target/";
-
   /** Path to test file. */
   private static final String PATH = "etc/test/input.xml";
   /** Test folder. */
@@ -56,7 +54,7 @@ public final class CreateTest {
   private static final String[] INPUTS = { PATH, FRAG, FOLDER };
   /** Names of test inputs (path, folder, fragment). */
   private static final String[] NAMES = {
-    PATH.replaceAll(".*/", ""), DBNAME + IO.XMLSUFFIX, FOLDERFILE
+    PATH.replaceAll(".*/", ""), DB + IO.XMLSUFFIX, FOLDERFILE
   };
 
   /**
@@ -65,43 +63,43 @@ public final class CreateTest {
    */
   @After
   public void tearDown() throws BaseXException {
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DB).execute(CONTEXT);
   }
 
   /**
-   * CREATE DB {DBNAME}.
+   * CREATE DB {DB}.
    * @throws BaseXException exception
    */
   @Test
   public void createDB() throws BaseXException {
-    new CreateDB(DBNAME).execute(CONTEXT);
+    new CreateDB(DB).execute(CONTEXT);
     // check if database name equals argument of create command
-    assertEquals(dbName(), DBNAME);
+    assertEquals(db(), DB);
   }
 
   /**
-   * CREATE DB {DBNAME} {INPUT[]}.
+   * CREATE DB {DB} {INPUT[]}.
    * @throws BaseXException exception
    */
   @Test
   public void createDBWithInput() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
-      new CreateDB(DBNAME, INPUTS[i]).execute(CONTEXT);
+      new CreateDB(DB, INPUTS[i]).execute(CONTEXT);
       // check name of database
-      assertEquals(DBNAME, dbName());
+      assertEquals(DB, db());
       // check name of document
       assertEquals(NAMES[i], docName());
     }
   }
 
   /**
-   * CREATE DB {DBNAME}; ADD {INPUT[]}.
+   * CREATE DB {DB}; ADD {INPUT[]}.
    * @throws BaseXException exception
    */
   @Test
   public void createDBandAdd() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
-      new CreateDB(DBNAME).execute(CONTEXT);
+      new CreateDB(DB).execute(CONTEXT);
       new Add(INPUTS[i]).execute(CONTEXT);
       // check name of document
       assertEquals(NAMES[i], docName());
@@ -109,13 +107,13 @@ public final class CreateTest {
   }
 
   /**
-   * CREATE DB {DBNAME}; ADD AS {DOCNAME} {INPUT[]}.
+   * CREATE DB {DB}; ADD AS {DOCNAME} {INPUT[]}.
    * @throws BaseXException exception
    */
   @Test
   public void createDBandAddAs() throws BaseXException {
     for(final String in : INPUTS) {
-      new CreateDB(DBNAME).execute(CONTEXT);
+      new CreateDB(DB).execute(CONTEXT);
       new Add(in, DOCNAME).execute(CONTEXT);
       // check name of document (first file in folder or specified name)
       assertEquals(in == FOLDER ? FOLDERFILE : DOCNAME, docName());
@@ -123,13 +121,13 @@ public final class CreateTest {
   }
 
   /**
-   * CREATE DB {DBNAME}; ADD TO {TARGET} {INPUT[]}.
+   * CREATE DB {DB}; ADD TO {TARGET} {INPUT[]}.
    * @throws BaseXException exception
    */
   @Test
   public void createDBandAddTo() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
-      new CreateDB(DBNAME).execute(CONTEXT);
+      new CreateDB(DB).execute(CONTEXT);
       new Add(INPUTS[i], null, TARGET).execute(CONTEXT);
       // check name of document
       assertEquals(TARGET + NAMES[i], docName());
@@ -137,13 +135,13 @@ public final class CreateTest {
   }
 
   /**
-   * CREATE DB {DBNAME}; ADD AS {DOCNAME} TO {TARGET} {INPUT[]}.
+   * CREATE DB {DB}; ADD AS {DOCNAME} TO {TARGET} {INPUT[]}.
    * @throws BaseXException exception
    */
   @Test
   public void createDBandAddAsTO() throws BaseXException {
     for(final String in : INPUTS) {
-      new CreateDB(DBNAME).execute(CONTEXT);
+      new CreateDB(DB).execute(CONTEXT);
       new Add(in, DOCNAME, TARGET).execute(CONTEXT);
       // check name of document (first file in folder or specified name)
       assertEquals(TARGET + (in == FOLDER ? FOLDERFILE : DOCNAME), docName());
@@ -154,7 +152,7 @@ public final class CreateTest {
    * Returns the name of the database.
    * @return database name
    */
-  private String dbName() {
+  private String db() {
     return CONTEXT.data().meta.name;
   }
 

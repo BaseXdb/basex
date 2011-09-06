@@ -20,7 +20,7 @@ import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
 
 /**
- * {@link IO} reference, representing a local file.
+ * {@link IO} reference, representing a local file or directory path.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -59,6 +59,15 @@ public final class IOFile extends IO {
    * @param n file name
    */
   public IOFile(final String dir, final String n) {
+    this(new File(dir, n));
+  }
+
+  /**
+   * Constructor.
+   * @param dir directory
+   * @param n file name
+   */
+  public IOFile(final File dir, final String n) {
     this(new File(dir, n));
   }
 
@@ -288,6 +297,21 @@ public final class IOFile extends IO {
     return trg instanceof IOFile && file.renameTo(((IOFile) trg).file);
   }
 
+  /**
+   * Checks if this is a valid file reference.
+   * @return result of check
+   */
+  public boolean valid() {
+    // note that not all invalid names can be caught by this test
+    try {
+      // the result must not reference a directory
+      file.getCanonicalFile();
+      return true;
+    } catch(final IOException ex) {
+      return false;
+    }
+  }
+
   @Override
   public String url() {
     String pre = FILEPREF;
@@ -324,7 +348,6 @@ public final class IOFile extends IO {
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
   }
-
 
   /**
    * Converts a file filter (glob) to a regular expression.
@@ -376,6 +399,16 @@ public final class IOFile extends IO {
       if(!suf && sub) sb.append(".*");
     }
     return Prop.WIN ? sb.toString().toLowerCase() : sb.toString();
+  }
+
+  /**
+   * Normalizes the specified path. Converts backslashes and
+   * removes duplicate, leading and trailing slashes.
+   * @param path input path
+   * @return normalized path
+   */
+  public static String normalize(final String path) {
+    return path.replaceAll("[\\\\/]+", "/").replaceAll("^/|/$", "");
   }
 
   /**

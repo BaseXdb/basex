@@ -3,10 +3,10 @@ package org.basex.core.cmd;
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.transform.sax.SAXSource;
-import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.DirParser;
 import org.basex.build.DiskBuilder;
@@ -151,7 +151,8 @@ public final class CreateDB extends ACreate {
   public static synchronized Data xml(final String name, final IO source,
       final Context ctx) throws IOException {
 
-    if(!source.exists()) throw new BuildException(FILEWHICH, source);
+    if(!source.exists()) throw new FileNotFoundException(
+        Util.info(FILEWHICH, source));
     return xml(name, new DirParser(source, ctx.prop), ctx);
   }
 
@@ -218,7 +219,8 @@ public final class CreateDB extends ACreate {
    */
   public static synchronized Data xml(final IO source, final Context ctx)
       throws IOException {
-    if(!source.exists()) throw new BuildException(FILEWHICH, source.path());
+    if(!source.exists()) throw new FileNotFoundException(
+        Util.info(FILEWHICH, source));
     return xml(new DirParser(source, ctx.prop), ctx);
   }
 
