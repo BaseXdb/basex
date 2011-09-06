@@ -123,9 +123,11 @@ public final class FNDb extends FuncCall {
    */
   private Value open(final QueryContext ctx) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
+    // deprecated solution; slash will later be disallowed
     final int s = indexOf(str, '/');
     final byte[] db = s == -1 ? str : substring(str, 0, s);
-    final byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
+    byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
+    if(expr.length == 2) path = checkStr(expr[1], ctx);
 
     final Data data = ctx.resource.data(db, input);
     return DBNodeSeq.get(data.docs(string(path)), data, true, s == -1);

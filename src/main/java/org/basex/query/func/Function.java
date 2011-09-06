@@ -458,7 +458,7 @@ public enum Function {
   /* FNDb functions. */
 
   /** Database function: opens a database. */
-  DBOPEN(FNDb.class, "open(database)", NOD_ZM, STR),
+  DBOPEN(FNDb.class, "open(database[,path])", NOD_ZM, 1, STR, STR),
   /** Database function: opens a specific database node. */
   DBOPENPRE(FNDb.class, "open-pre(database,pre)", NOD_ZM, ITEM, ITR),
   /** Database function: opens a specific database node. */
