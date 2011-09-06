@@ -364,7 +364,7 @@ public final class EditorView extends View {
     if(edit.opened || edit.mod) edit = addTab();
 
     try {
-      edit.setText(file.content());
+      edit.setText(file.read());
       edit.opened = true;
       edit.file(file);
       gui.gprop.recent(file);

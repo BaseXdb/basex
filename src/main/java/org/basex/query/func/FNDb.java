@@ -39,7 +39,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
-import org.basex.query.up.primitives.Add;
+import org.basex.query.up.primitives.DBAdd;
 import org.basex.query.up.primitives.DBDelete;
 import org.basex.query.up.primitives.DBOptimize;
 import org.basex.query.up.primitives.DBPut;
@@ -331,9 +331,9 @@ public final class FNDb extends FuncCall {
     final Iter iter = ctx.iter(expr[1]);
     for(Item i; (i = iter.next()) != null;) docs.add(i);
 
-    if(docs.size() > 0) {
-      ctx.updates.add(new Add(data, input, docs, name, path, ctx.context), ctx);
-    }
+    if(docs.size() > 0) ctx.updates.add(
+        new DBAdd(data, input, docs, name, path, ctx.context), ctx);
+
     return null;
   }
 
@@ -358,6 +358,9 @@ public final class FNDb extends FuncCall {
         DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
+    // delete raw resources
+    final TokenList raw = Delete.files(data, trg);
+    ctx.updates.add(new DBDelete(data, raw, input), ctx);
 
     final int p = trg.lastIndexOf('/');
     final String name = p < 0 ? trg : trg.substring(p + 1);
@@ -365,9 +368,12 @@ public final class FNDb extends FuncCall {
 
     final ObjList<Item> docs = new ObjList<Item>(1);
     docs.add(doc);
-    final Add add = new Add(data, input, docs, name, path, ctx.context);
-    ctx.updates.add(add, ctx);
+    ctx.updates.add(new DBAdd(data, input, docs, name, path, ctx.context), ctx);
 
+    if(data.meta.binary(path).exists()) {
+      final byte[] val = checkBin(doc, ctx);
+      ctx.updates.add(new DBPut(data, token(trg), val, input), ctx);
+    }
     return null;
   }
 
@@ -466,7 +472,7 @@ public final class FNDb extends FuncCall {
     final IOFile bin = data.meta.binary(key);
     if(!bin.exists()) RESFNF.thrw(input, key);
     try {
-      return new B64(bin.content());
+      return new B64(bin.read());
     } catch(final IOException ex) {
       throw IOERR.thrw(input, ex);
     }

@@ -124,7 +124,7 @@ public abstract class IO {
    * @return contents
    * @throws IOException I/O exception
    */
-  public final byte[] content() throws IOException {
+  public final byte[] read() throws IOException {
     if(cont == null) cache();
     return cont;
   }

@@ -1,7 +1,7 @@
 package org.basex.core.cmd;
 
-import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -58,38 +58,54 @@ public final class Replace extends ACreate {
     if(data == null) throw new BaseXException(PROCNODB);
 
     String path = IOFile.normalize(p);
+    String target = "";
     if(path.isEmpty()) throw new BaseXException(DIRERR, path);
 
     final byte[] src = token(path);
     final IntList docs = data.docs(p);
-    // check if path was found
-    if(docs.size() == 0) throw new BaseXException(FILEWHICH, path);
+    final int is = docs.size();
     // check if path points exclusively to files
-    for(int i = 0, is = docs.size(); i < is; i++) {
+    for(int i = 0; i < is; i++) {
       if(!eq(data.text(docs.get(i), true), src))
         throw new BaseXException(DIRERR, path);
     }
 
-    final String target;
     final int i = path.lastIndexOf('/');
     if(i != -1) {
       target = path.substring(0, i);
       path = path.substring(i + 1);
-    } else {
-      target = "";
     }
 
     try {
       if(lock) ctx.register(true);
-      // add new document
-      Add.add(path, target, input, ctx, null, false);
-      // delete old documents if addition was successful
-      for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
-      // flushes changes
-      data.flush();
+      // replace document
+      if(docs.size() > 0) {
+        // add new document
+        Add.add(path, target, input, ctx, null, false);
+        // delete old documents if addition was successful
+        for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
+        // flushes changes
+        data.flush();
+      }
+      // replace binary
+      if(!replace(data, path, input)) throw new BaseXException(PARSEERR, path);
     } finally {
       if(lock) ctx.unregister(true);
     }
     return Util.info(PATHREPLACED, docs.size());
+  }
+
+  /**
+   * Replace the specified document with a new content.
+   * @param data data reference
+   * @param input new content
+   * @param path file path
+   * @return info string
+   */
+  public static boolean replace(final Data data, final String path,
+      final InputSource input) {
+
+    final IOFile io = data.meta.binary(path);
+    return !io.exists() || Add.add(io, input);
   }
 }

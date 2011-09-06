@@ -122,7 +122,7 @@ public final class FNUtil extends FuncCall {
   private Value run(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     try {
-      return eval(ctx, io.content());
+      return eval(ctx, io.read());
     } catch(final IOException ex) {
       throw IOERR.thrw(input, ex);
     }

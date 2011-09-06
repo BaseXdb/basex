@@ -699,7 +699,7 @@ public class QueryParser extends InputParser {
     final IO io = io(string(path));
     String qu = null;
     try {
-      qu = string(io.content());
+      qu = string(io.read());
     } catch(final IOException ex) {
       error(NOMODULEFILE, io);
     }

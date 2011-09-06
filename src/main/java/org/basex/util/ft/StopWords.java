@@ -70,7 +70,7 @@ public final class StopWords extends TokenSet {
    */
   public boolean read(final IO fl, final boolean e) {
     try {
-      final byte[] content = norm(fl.content());
+      final byte[] content = norm(fl.read());
       final int s = contains(content, ' ') ? ' ' : '\n';
       for(final byte[] sl : split(content, s)) {
         if(e) delete(sl);

@@ -33,7 +33,7 @@ public final class Run extends AQuery {
     context.query = io;
 
     try {
-      return query(Token.string(io.content()));
+      return query(Token.string(io.read()));
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(ex.getMessage());
@@ -43,7 +43,7 @@ public final class Run extends AQuery {
   @Override
   public boolean updating(final Context ctx) {
     try {
-      return updating(ctx, Token.string(IO.get(args[0]).content()));
+      return updating(ctx, Token.string(IO.get(args[0]).read()));
     } catch(final IOException ex) {
       return true;
     }

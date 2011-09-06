@@ -46,7 +46,7 @@ public final class RepoManager {
     final IO io = IO.get(path);
     IOContent cont = null;
     try {
-      cont = new IOContent(io.content());
+      cont = new IOContent(io.read());
     } catch(final IOException ex) {
       Util.debug(ex);
       PKGNOTEXIST.thrw(ii, path);

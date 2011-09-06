@@ -689,7 +689,7 @@ final class XMLScanner extends Progress {
         final TextInput tin = input;
         try {
           final IO file = input.io().merge(name);
-          cont = file.content();
+          cont = file.read();
           input = new TextInput(new IOContent(cont, name));
         } catch(final IOException ex) {
           Util.debug(ex);

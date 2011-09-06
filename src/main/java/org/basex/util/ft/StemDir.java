@@ -19,7 +19,7 @@ public final class StemDir extends TokenMap {
    */
   public boolean read(final IO fl) {
     try {
-      for(final byte[] sl : split(fl.content(), '\n')) {
+      for(final byte[] sl : split(fl.read(), '\n')) {
         byte[] val = null;
         for(final byte[] st : split(norm(sl), ' ')) {
           if(val == null) val = st;

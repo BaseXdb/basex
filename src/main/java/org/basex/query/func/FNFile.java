@@ -288,7 +288,7 @@ public final class FNFile extends FuncCall {
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
 
     try {
-      return new B64(new IOFile(path).content());
+      return new B64(new IOFile(path).read());
     } catch(final IOException ex) {
       throw FILEERROR.thrw(input, ex);
     }
