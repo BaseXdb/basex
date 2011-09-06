@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +14,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.basex.query.QueryContext;
@@ -72,31 +74,40 @@ public class FNCrypto extends FuncCall {
     try {
 
       SecretKeySpec keyspec = new SecretKeySpec(key, "DES");
+      IvParameterSpec iv = new IvParameterSpec(new byte[key.length]);
       // algorithm/mode/padding
       Cipher cip = Cipher.getInstance("DES/CBC/PKCS5Padding");
 
       // encrypt/decrypt
       if(encrypt)
-        cip.init(Cipher.ENCRYPT_MODE, keyspec);
+        cip.init(Cipher.ENCRYPT_MODE, keyspec, iv);
       else
-        cip.init(Cipher.DECRYPT_MODE, keyspec);
+        cip.init(Cipher.DECRYPT_MODE, keyspec, iv);
 
       t = new byte[cip.getOutputSize(in.length)];
       cip.doFinal(t, cip.update(in, 0, in.length, t, 0));
 
     } catch(NoSuchPaddingException e) {
-      CRYPTONOPAD.thrw(ii, algo);
+      e.printStackTrace();
+      CRYPTONOPAD.thrw(ii, e);
     } catch(BadPaddingException e) {
-      CRYPTOBADPAD.thrw(ii, algo);
+      e.printStackTrace();
+      CRYPTOBADPAD.thrw(ii, e);
     } catch(NoSuchAlgorithmException e) {
-      CRYPTOINVALGO.thrw(ii, algo);
+      e.printStackTrace();
+      CRYPTOINVALGO.thrw(ii, e);
     } catch(InvalidKeyException e) {
-      CRYPTOKEYINV.thrw(ii, key);
+      e.printStackTrace();
+      CRYPTOKEYINV.thrw(ii, e);
       // [LK] how to treat this one?
     } catch(ShortBufferException e) {
       e.printStackTrace();
     } catch(IllegalBlockSizeException e) {
-      CRYPTOILLBLO.thrw(ii, in);
+      e.printStackTrace();
+      CRYPTOILLBLO.thrw(ii, e);
+   // [LK] how to treat this one?
+    } catch(InvalidAlgorithmParameterException e) {
+      e.printStackTrace();
     }
 
     return Str.get(t);
