@@ -17,7 +17,7 @@ public final class JDBCConnections {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open connections and prepared statements with unique ids. */
-  private IntMap<Object> conns = new IntMap<Object>();
+  private final IntMap<Object> conns = new IntMap<Object>();
 
   /**
    * Adds a connection or prepared statement to depot.

@@ -305,7 +305,8 @@ public final class IOFile extends IO {
     // note that not all invalid names can be caught by this test
     try {
       // the result must not reference a directory
-      return !file.getCanonicalFile().isDirectory();
+      file.getCanonicalFile();
+      return true;
     } catch(final IOException ex) {
       return false;
     }

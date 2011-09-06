@@ -69,12 +69,13 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbOpen() throws BaseXException {
     final String fun = check(Function.DBOPEN);
     query("count(" + fun + "('" + DB + "'))", "1");
-    query("count(" + fun + "('" + DB + "/'))", "1");
+    query("count(" + fun + "('" + DB + "', ''))", "1");
+    query("count(" + fun + "('" + DB + "', 'unknown'))", "0");
 
     // close database instance
     new Close().execute(CONTEXT);
     query("count(" + fun + "(<a>" + DB + "</a>))", "1");
-    query("count(" + fun + "('" + DB + "/x'))", "0");
+    query("count(" + fun + "('" + DB + "', 'unknown'))", "0");
     query(fun + "('" + DB + "')//title/text()", "XML");
 
     // run function on non-existing database
@@ -359,7 +360,6 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(fun + "('" + DB + "', 'raw1', xs:hexBinary('41'))");
     query(fun + "('" + DB + "', 'raw2', 'b')");
     query(fun + "('" + DB + "', 'raw3', 123)");
-    error(fun + "('" + DB + "', '/', '')", Err.RESINV);
   }
 
   /**

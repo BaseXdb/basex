@@ -142,6 +142,16 @@ public interface Text {
     "  -U<name>  Specify user name" + NL +
     "  -z        Suppress logging";
 
+  /** Start information. */
+  String WEBDAVINFO =
+    " [-hpruw]" + NL +
+    "  -h<dbhost>  BaseX server host" + NL +
+    "  -r<dbport>  BaseX server port" + NL +
+    "  -u<dbuser>  BaseX user name" + NL +
+    "  -p<dbpass>  BaseX user password" + NL +
+    "  -w<webdavport>  WebDAV server port" + NL +
+    "  -s          Stand-alone: access local databases directly";
+
   // SERVER ===================================================================
 
   /** Server was started. */

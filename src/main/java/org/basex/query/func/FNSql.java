@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -23,10 +22,10 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
-import org.basex.query.item.Dec;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
+import org.basex.query.item.Itr;
 import org.basex.query.item.Jav;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -40,6 +39,7 @@ import org.basex.util.InputInfo;
 
 /**
  * Functions on relational databases.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -117,18 +117,18 @@ public final class FNSql extends FuncCall {
    * @return connection id
    * @throws QueryException query exception
    */
-  private Dec connect(final QueryContext ctx) throws QueryException {
+  private Itr connect(final QueryContext ctx) throws QueryException {
     // URL to relational database
     final String url = string(checkStr(expr[0], ctx));
     // Auto-commit mode
-    final boolean autoComm = expr.length == 2 ? checkBln(expr[1], ctx) : true;
+    final boolean autoComm = expr.length < 2 || checkBln(expr[1], ctx);
     try {
       // Establish a connection to the relational database
       final Connection conn = expr.length == 4 ? DriverManager.getConnection(
           url, string(checkStr(expr[2], ctx)), string(checkStr(expr[3], ctx)))
           : DriverManager.getConnection(url);
       conn.setAutoCommit(autoComm);
-      return new Dec(BigDecimal.valueOf(ctx.jdbc.add(conn)), AtomType.INT);
+      return Itr.get(ctx.jdbc.add(conn));
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
@@ -140,14 +140,14 @@ public final class FNSql extends FuncCall {
    * @return prepared statement id
    * @throws QueryException query exception
    */
-  private Dec prepare(final QueryContext ctx) throws QueryException {
+  private Itr prepare(final QueryContext ctx) throws QueryException {
     final Connection conn = connection(ctx, false);
     // Prepared statement
     final byte[] prepStmt = checkStr(expr[1], ctx);
     try {
       // Keep prepared statement in depot
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
-      return new Dec(BigDecimal.valueOf(ctx.jdbc.add(prep)), AtomType.INT);
+      return Itr.get(ctx.jdbc.add(prep));
     } catch(SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
@@ -218,11 +218,11 @@ public final class FNSql extends FuncCall {
    * @param params element <param/>
    * @return number of parameters
    */
-  private int countParams(final ANode params) {
+  private long countParams(final ANode params) {
     final AxisIter ch = params.children();
-    int count = 0;
-    while(ch.next() != null) ++count;
-    return count;
+    long c = ch.size();
+    if(c == -1) do ++c; while(ch.next() != null);
+    return c;
   }
 
   /**
