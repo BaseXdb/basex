@@ -773,7 +773,9 @@ public enum Err {
   /** CX20: Encoding not supported. */
   CRYPTOILLBLO(CX, 20, "Illegal block size."),
   /** CX21: Encoding not supported. */
-  CRYPTOINVALGO(CX, 21, "Algorithm is not supported.");
+  CRYPTOINVALGO(CX, 21, "Algorithm is not supported."),
+  /** CX22: Encoding not supported. */
+  CRYPTODECTYP(CX, 22, "Decryption type is not supported.");
 
   /** Error type. */
   public final ErrType type;
