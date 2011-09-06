@@ -761,7 +761,19 @@ public enum Err {
 
   // * EXPath Cryptographic Module Errors
   /** CX14: Encoding not supported. */
-  CRYPTOENC(CX, 14, "The encoding method is not supported.");
+  CRYPTOENC(CX, 14, "The encoding method is not supported."),
+  /** CX16: Encoding not supported. */
+  CRYPTONOPAD(CX, 16, "No such padding."),
+  /** CX17: Encoding not supported. */
+  CRYPTOBADPAD(CX, 17, "Incorrect padding."),
+  /** CX18: Encoding not supported. */
+  CRYPTOENCTYP(CX, 18, "Encryption type is not supported."),
+  /** CX19: Encoding not supported. */
+  CRYPTOKEYINV(CX, 19, "Secret key is invalid."),
+  /** CX20: Encoding not supported. */
+  CRYPTOILLBLO(CX, 20, "Illegal block size."),
+  /** CX21: Encoding not supported. */
+  CRYPTOINVALGO(CX, 21, "Algorithm is not supported.");
 
   /** Error type. */
   public final ErrType type;

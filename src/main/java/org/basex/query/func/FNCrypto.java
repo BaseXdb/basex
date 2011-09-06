@@ -45,7 +45,7 @@ public class FNCrypto extends FuncCall {
                 : null, ii);
       case ENCRYPT:
         return encrypt(checkStr(expr[0], ctx), checkStr(expr[1], ctx),
-            checkStr(expr[2], ctx), checkStr(expr[3], ctx));
+            checkStr(expr[2], ctx), checkStr(expr[3], ctx), ii);
       case DECRYPT:
       default:
         return super.item(ctx, ii);
@@ -53,30 +53,40 @@ public class FNCrypto extends FuncCall {
   }
 
   private Item encrypt(final byte[] in, final byte[] encType, final byte[] key,
-      final byte[] algo) throws QueryException {
-    final String a = Token.string(algo);
-    SecretKeySpec keyspec = new SecretKeySpec(key, "DES");
-    byte[] encrypted = new byte[in.length];
+      final byte[] algo, final InputInfo ii) throws QueryException {
+    // encryption type must be 'symmetric' or 'asymmetric'
+    if(!Token.eq(encType, Token.token("symmetric")) &&
+        !Token.eq(encType, Token.token("asymmetric"))) {
+      CRYPTOENCTYP.thrw(ii, encType);
+    }
+
+    byte[] keyCon = key;
+//    keyCon = new byte[] { 0x0, 0x1, 0x2, 0x1, 0x2, 0x1, 0x2, 0x1 };
+//    System.out.println(key.length);
+
+    SecretKeySpec keyspec = new SecretKeySpec(keyCon, "DES");
+    byte[] encrypted = null;
 
     try {
 
+      // algorithm/mode/padding
       Cipher cip = Cipher.getInstance("DES/CBC/PKCS5Padding");
       cip.init(Cipher.ENCRYPT_MODE, keyspec);
-      int tl = cip.update(in, 0, in.length, encrypted, 0);
-      tl += cip.doFinal(encrypted, tl);
+      encrypted = new byte[cip.getOutputSize(in.length)];
+      cip.doFinal(encrypted, cip.update(in, 0, in.length, encrypted, 0));
 
-    } catch(NoSuchAlgorithmException e) {
-      e.printStackTrace();
     } catch(NoSuchPaddingException e) {
-      e.printStackTrace();
+      CRYPTONOPAD.thrw(ii, algo);
+    } catch(BadPaddingException e) {
+      CRYPTOBADPAD.thrw(ii, algo);
+    } catch(NoSuchAlgorithmException e) {
+      CRYPTOINVALGO.thrw(ii, algo);
     } catch(InvalidKeyException e) {
-      e.printStackTrace();
+      CRYPTOKEYINV.thrw(ii, key);
     } catch(ShortBufferException e) {
       e.printStackTrace();
     } catch(IllegalBlockSizeException e) {
-      e.printStackTrace();
-    } catch(BadPaddingException e) {
-      e.printStackTrace();
+      CRYPTOILLBLO.thrw(ii, in);
     }
 
     return Str.get(encrypted);
