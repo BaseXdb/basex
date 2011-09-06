@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import org.basex.build.Builder;
@@ -163,37 +162,5 @@ public abstract class ACreate extends Command {
     }
     data.closeIndex(type);
     data.setIndex(type, (cmd == null ? ib : cmd.progress(ib)).build());
-  }
-
-  /**
-   * Normalizes the database path.
-   * Removes duplicate, leading and trailing slashes
-   * @param path input path
-   * @return normalized path
-   */
-  public static final String path(final String path) {
-    return path.replaceAll("[\\\\/]+", "/").replaceAll("^/|/$", "");
-  }
-
-  /**
-   * Generate a new name for a document.
-   * @param d data
-   * @param pre pre value of the document
-   * @param src source path
-   * @param trg target path
-   * @return new name
-   */
-  public static byte[] newName(final Data d, final int pre, final byte[] src,
-      final byte[] trg) {
-
-    final byte[] path = d.text(pre, true);
-    byte[] target = trg;
-    byte[] name = substring(path, src.length);
-    if(name.length != 0) {
-      // change file path: replace all paths with the target path
-      if(startsWith(name, '/')) name = substring(name, 1);
-      target = trg.length != 0 ? concat(trg, SLASH, name) : name;
-    }
-    return target;
   }
 }

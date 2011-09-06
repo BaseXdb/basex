@@ -8,12 +8,12 @@ import java.io.IOException;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Prop;
 import org.basex.core.User;
-import org.basex.core.cmd.ACreate;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
+import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IOFile;
@@ -248,7 +248,7 @@ public final class FNDb extends FuncCall {
    */
   private Bln isRaw(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final String path = string(path(checkStr(expr[1], ctx)));
+    final String path = path(checkStr(expr[1], ctx));
     final IOFile io = data.meta.binary(path);
     return Bln.get(io.exists() && !io.isDir());
   }
@@ -261,9 +261,18 @@ public final class FNDb extends FuncCall {
    */
   private Bln isXML(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final String path = string(path(checkStr(expr[1], ctx)));
-    return Bln.get(data.docs(path).size() == 1);
-    // check if path is exact
+    final String path = path(checkStr(expr[1], ctx));
+    if(path.isEmpty()) return Bln.FALSE;
+
+    // normalize path
+    final byte[] exct = token(Prop.WIN ? path.toLowerCase() : path);
+    final IntList il = data.docs(path);
+    // check if one of the hits is exact, i.e., is no directory entry
+    for(int i = 0; i < il.size(); i++) {
+      final byte[] txt = data.text(il.get(i), true);
+      if(eq(exct, Prop.WIN ? lc(txt) : txt)) return Bln.TRUE;
+    }
+    return Bln.FALSE;
   }
 
   /**
@@ -308,8 +317,10 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final byte[] name = expr.length < 3 ? null : path(checkStr(expr[2], ctx));
-    final byte[] path = expr.length < 4 ? null : path(checkStr(expr[3], ctx));
+    final String name = expr.length < 3 ? null : name(checkStr(expr[2], ctx));
+    // ensure that the path is valid
+    final String path = expr.length < 4 ? null : path(checkStr(expr[3], ctx));
+    if(path != null && !new IOFile(path).valid()) RESINV.thrw(input, path);
 
     // get all items representing document(s):
     final ObjList<Item> docs = new ObjList<Item>(
@@ -333,32 +344,25 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final byte[] trg = path(checkStr(expr[1], ctx));
+    final String trg = path(checkStr(expr[1], ctx));
     final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
-    final IntList old = data.docs(string(trg));
+    final IntList old = data.docs(trg);
     if(old.size() > 0) {
       final int pre = old.get(0);
-      if(old.size() > 1 || !eq(data.text(pre, true), trg))
+      if(old.size() > 1 || !eq(data.text(pre, true), token(trg)))
         DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
 
-    final byte[] trgname;
-    final byte[] trgpath;
-    final int p = lastIndexOf(trg, '/');
-    if(p < 0) {
-      trgname = trg;
-      trgpath = null;
-    } else {
-      trgname = subtoken(trg, p + 1);
-      trgpath = subtoken(trg, 0, p);
-    }
+    final int p = trg.lastIndexOf('/');
+    final String name = p < 0 ? trg : trg.substring(p + 1);
+    final String path = p < 0 ? null : trg.substring(0, p);
 
     final ObjList<Item> docs = new ObjList<Item>(1);
     docs.add(doc);
-    final Add add = new Add(data, input, docs, trgname, trgpath, ctx.context);
+    final Add add = new Add(data, input, docs, name, path, ctx.context);
     ctx.updates.add(add, ctx);
 
     return null;
@@ -374,7 +378,7 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String path = string(path(checkStr(expr[1], ctx)));
+    final String path = path(checkStr(expr[1], ctx));
 
     // delete XML resources
     final IntList docs = data.docs(path);
@@ -397,16 +401,17 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final byte[] source = path(checkStr(expr[1], ctx));
-    final byte[] target = path(checkStr(expr[2], ctx));
+    final String src = path(checkStr(expr[1], ctx));
+    final String trg = path(checkStr(expr[2], ctx));
+    if(!new IOFile(trg).valid()) RESINV.thrw(input, trg);
 
     // the first step of the path should be the database name
-    final IntList il = data.docs(string(source));
+    final IntList il = data.docs(src);
     for(int i = 0, is = il.size(); i < is; i++) {
       final int pre = il.get(i);
-      final byte[] trg = ACreate.newName(data, pre, source, target);
-      if(trg.length == 0) EMPTYPATH.thrw(input, this);
-      ctx.updates.add(new ReplaceValue(pre, data, input, trg), ctx);
+      final String target = Rename.newName(data, pre, src, trg);
+      if(target.isEmpty()) EMPTYPATH.thrw(input, this);
+      ctx.updates.add(new ReplaceValue(pre, data, input, token(target)), ctx);
     }
     return null;
   }
@@ -434,9 +439,11 @@ public final class FNDb extends FuncCall {
    */
   private Item put(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final byte[] key = path(checkStr(expr[1], ctx));
+    final String key = path(checkStr(expr[1], ctx));
+    if(!new IOFile(key).valid()) RESINV.thrw(input, key);
+
     final byte[] val = checkBin(expr[2], ctx);
-    ctx.updates.add(new DBPut(data, key, val, input), ctx);
+    ctx.updates.add(new DBPut(data, token(key), val, input), ctx);
     return null;
   }
 
@@ -448,7 +455,7 @@ public final class FNDb extends FuncCall {
    */
   private Item get(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final String key = string(path(checkStr(expr[1], ctx)));
+    final String key = path(checkStr(expr[1], ctx));
 
     final IOFile bin = data.meta.binary(key);
     if(!bin.exists()) RESFNF.thrw(input, key);
@@ -555,16 +562,26 @@ public final class FNDb extends FuncCall {
   }
 
   /**
+   * Normalizes and checks the specified file name.
+   * @param name input name
+   * @return normalized path
+   * @throws QueryException query exception
+   */
+  private String name(final byte[] name) throws QueryException {
+    // check if path is valid
+    final String nm = string(name);
+    if(nm.endsWith(".") || nm.indexOf('/') != -1) RESINV.thrw(input, name);
+    return nm;
+  }
+
+  /**
    * Normalizes the database path.
    * Removes duplicate, leading and trailing slashes
    * @param path input path
    * @return normalized path
-   * @throws QueryException query exception
    */
-  private byte[] path(final byte[] path) throws QueryException {
-    // check if path is valid
-    if(endsWith(path, '.')) RESINV.thrw(input, path);
+  private String path(final byte[] path) {
     // return normalized path
-    return token(ACreate.path(string(path)));
+    return IOFile.normalize(string(path));
   }
 }

@@ -248,13 +248,6 @@ public abstract class SessionTest {
   /** Runs an erroneous query.
    * @throws BaseXException expected exception*/
   @Test(expected = org.basex.core.BaseXException.class)
-  public void queryError2() throws BaseXException {
-    session.query("(");
-  }
-
-  /** Runs an erroneous query.
-   * @throws BaseXException expected exception*/
-  @Test(expected = org.basex.core.BaseXException.class)
   public void queryError3() throws BaseXException {
       final Query query = session.query("(1,'a')[. eq 1]");
       query.init();

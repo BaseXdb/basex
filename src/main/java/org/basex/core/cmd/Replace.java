@@ -8,6 +8,7 @@ import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
 import org.xml.sax.InputSource;
@@ -56,7 +57,7 @@ public final class Replace extends ACreate {
     final Data data = ctx.data();
     if(data == null) throw new BaseXException(PROCNODB);
 
-    String path = path(p);
+    String path = IOFile.normalize(p);
     if(path.isEmpty()) throw new BaseXException(DIRERR, path);
 
     final byte[] src = token(path);

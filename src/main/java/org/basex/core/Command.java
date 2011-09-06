@@ -169,7 +169,7 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Checks if the specified filename is valid; allows only letters,
+   * Checks if the specified database name is valid; allows only letters,
    * digits, the underscore, and dash.
    * @param name name to be checked
    * @param glob allow glob syntax

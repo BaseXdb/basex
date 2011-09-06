@@ -1,8 +1,11 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
+
 import javax.xml.transform.sax.SAXSource;
+
 import org.basex.build.Builder;
 import org.basex.build.DirParser;
 import org.basex.build.DiskBuilder;
@@ -16,6 +19,7 @@ import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.io.IOFile;
 import org.basex.util.Performance;
 import org.basex.util.Util;
 import org.xml.sax.InputSource;
@@ -66,8 +70,6 @@ public final class Add extends ACreate {
 
     String name = args[1];
     if(name != null && !name.isEmpty()) {
-      // assure that the name contains no slashes and is no single or double dot
-      if(name.matches(".*[\\\\/].*|\\.\\.?")) return error(NAMEINVALID, name);
       // set specified document name
       io.name(name);
     } else if(io instanceof IOContent) {
@@ -76,7 +78,7 @@ public final class Add extends ACreate {
       io.name(name);
     }
 
-    final String trg = path(args[2]);
+    final String trg = IOFile.normalize(args[2]);
     final DirParser p = new DirParser(io, trg, prop);
     try {
       return info(add(p, context, trg, name, this));
@@ -109,7 +111,7 @@ public final class Add extends ACreate {
     final Data data = ctx.data();
     if(data == null) throw new BaseXException(PROCNODB);
 
-    String trg = path(target);
+    String trg = IOFile.normalize(target);
     if(!trg.isEmpty()) trg += '/';
 
     final SAXSource sax = new SAXSource(input);
@@ -138,8 +140,13 @@ public final class Add extends ACreate {
 
     final Performance p = new Performance();
     final String input = name == null ? parser.src.path() : name;
-    final String path = target + (target.isEmpty() ? "/" : "") +
-        (name == null ? parser.src.name() : name);
+    // ensure that the name contains no slashes and trailing dots
+    final String nm = name == null ? parser.src.name() : name;
+    if(nm.endsWith(".") || nm.indexOf('/') != -1)
+      throw new BaseXException(NAMEINVALID, nm);
+    final String path = target + (target.isEmpty() ? "/" : "") + nm;
+    // ensure that the path is valid
+    if(!new IOFile(path).valid()) throw new BaseXException(NAMEINVALID, path);
 
     // create disk instances for large documents
     // test does not work for input streams and directories
