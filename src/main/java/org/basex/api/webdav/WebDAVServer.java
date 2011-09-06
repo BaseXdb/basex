@@ -29,7 +29,7 @@ import com.bradmcevoy.http.Response;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class WebDAVServer extends Main {
+public final class WebDAVServer extends Main {
   /** Configuration: database user. */
   static final String DBUSER = "org.basex.user";
   /** Configuration: database user password. */
