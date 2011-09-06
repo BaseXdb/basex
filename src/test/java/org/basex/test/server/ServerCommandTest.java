@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class ServerCmdTest extends CmdTest {
+public final class ServerCommandTest extends CommandTest {
   /** Server instance. */
   private static BaseXServer server;
 

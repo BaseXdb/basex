@@ -220,11 +220,11 @@ public final class MetaData {
 
   /**
    * Returns the specified binary file.
-   * @param key internal file path (key)
+   * @param pth internal file path
    * @return binary directory
    */
-  public IOFile binary(final String key) {
-    return new IOFile(new File(path, M_RAW), key);
+  public IOFile binary(final String pth) {
+    return new IOFile(binaries(), pth);
   }
 
   /**

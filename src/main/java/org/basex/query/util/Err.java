@@ -285,6 +285,8 @@ public enum Err {
   UPDBPUTERR(FOUP, 2, "Resource \"%\" could not be written."),
   /** FOUP0002: Evaluation exception. */
   UPDBDELERR(FOUP, 2, "Resource \"%\" could not be deleted."),
+  /** FOUP0002: Evaluation exception. */
+  UPDBRENAMEERR(FOUP, 2, "Resource \"%\" could not be renamed."),
 
   /** FTDY0016: Evaluation exception. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),

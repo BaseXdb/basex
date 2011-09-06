@@ -84,5 +84,6 @@ public enum PrimitiveType {
   /** Insert before.           */ INSERTBEFORE,
   /** DBOptimize.              */ DBOPTIMIZE,
   /** DBPut.                   */ DBPUT,
+  /** DBRename.                */ DBRENAME,
   /** DBDelete.                */ DBDELETE
 }

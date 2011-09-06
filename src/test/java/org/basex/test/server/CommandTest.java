@@ -62,7 +62,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class CmdTest {
+public class CommandTest {
   /** Database context. */
   protected static final Context CONTEXT = new Context();
   /** Test file name. */
@@ -72,7 +72,7 @@ public class CmdTest {
   /** Test file. */
   private static final String FILE = FLDR + '/' + FN;
   /** Test name. */
-  private static final String NAME = Util.name(CmdTest.class);
+  private static final String NAME = Util.name(CommandTest.class);
   /** Test name. */
   protected static final String NAME2 = NAME + "2";
   /** Socket reference. */
@@ -433,7 +433,7 @@ public class CmdTest {
     no(new Rename(FN, "/"));
     no(new Rename(FN, ""));
     ok(new Rename(FILE, "xxx"));
-    // target need not exist
+    // source need not exist
     ok(new Rename(FILE, "xxx"));
   }
 
