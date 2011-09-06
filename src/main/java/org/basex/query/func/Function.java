@@ -554,19 +554,18 @@ public enum Function {
   /* FNSql functions. */
 
   /** XQuery function */
-  CONNECT(FNSql.class, "connect(url[,auto-commit[,user[,pass]]]])", INT, 1,
-      STR, BLN_ZO, STR, STR),
+  CONNECT(FNSql.class, "connect(url[,auto-commit[,user[,pass]]]])",
+      ITR, 1, STR, BLN_ZO, STR, STR),
   /** XQuery function */
-  PREPARE(FNSql.class, "prepare(id,statement)", INT, 2, INT, STR),
+  PREPARE(FNSql.class, "prepare(id,statement)", ITR, 2, ITR, STR),
   /** XQuery function */
-  EXECUTE(FNSql.class, "execute(id[,item])", ELM_ZM, 1, INT, ITEM_ZO),
+  EXECUTE(FNSql.class, "execute(id[,item])", ELM_ZM, 1, ITR, ITEM_ZO),
   /** XQuery function */
   CLOSE(FNSql.class, "close(id)", EMP, 1, ELM_ZO),
   /** XQuery function */
   COMMIT(FNSql.class, "commit(id)", EMP, 1, ELM_ZO),
   /** XQuery function */
   ROLLBACK(FNSql.class, "rollback(id)", EMP, 1, ELM_ZO),
-
 
   /* FNFt functions. */
 

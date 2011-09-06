@@ -75,10 +75,10 @@ public final class Rename extends ACreate {
       final String trg) {
 
     // source references a file
-    String path = string(data.text(pre, true));
+    final String path = string(data.text(pre, true));
     if(path.equals(src)) return trg;
     // source references a directory: merge target path and file name
-    String name = path.substring(src.length() + 1);
+    final String name = path.substring(src.length() + 1);
     return !trg.isEmpty() ? trg + '/' + name : name;
   }
 }

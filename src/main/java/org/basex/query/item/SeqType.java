@@ -98,8 +98,6 @@ public final class SeqType {
   public static final SeqType FLT = AtomType.FLT.seq();
   /** Zero or one double. */
   public static final SeqType DBL_ZO = new SeqType(AtomType.DBL, Occ.ZO);
-  /** One decimal number. */
-  public static final SeqType DEC = AtomType.DEC.seq();
   /** Zero or one decimal number. */
   public static final SeqType DEC_ZO = new SeqType(AtomType.DEC, Occ.ZO);
   /** Single number; for simplicity, numbers are summarized by this type. */
@@ -122,12 +120,12 @@ public final class SeqType {
   public static final SeqType QNM = AtomType.QNM.seq();
   /** Zero or one QNames. */
   public static final SeqType QNM_ZO = new SeqType(AtomType.QNM, Occ.ZO);
+  /** Single URI. */
+  public static final SeqType URI = AtomType.URI.seq();
   /** Zero or one URIs. */
   public static final SeqType URI_ZO = new SeqType(AtomType.URI, Occ.ZO);
   /** Zero or more URIs. */
   public static final SeqType URI_ZM = new SeqType(AtomType.URI, Occ.ZM);
-  /** Single URI. */
-  public static final SeqType URI = AtomType.URI.seq();
   /** Single string. */
   public static final SeqType STR = AtomType.STR.seq();
   /** Zero or one strings. */
@@ -176,8 +174,6 @@ public final class SeqType {
   public static final SeqType ELM_ZO = new SeqType(NodeType.ELM, Occ.ZO);
   /** Zero or more element nodes. */
   public static final SeqType ELM_ZM = new SeqType(NodeType.ELM, Occ.ZM);
-  /** Single integer. */
-  public static final SeqType INT = AtomType.INT.seq();
 
   /** The general map type. */
   public static final MapType ANY_MAP = new MapType(AtomType.AAT,

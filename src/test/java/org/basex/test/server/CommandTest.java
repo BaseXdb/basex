@@ -74,7 +74,7 @@ public class CommandTest {
   /** Test name. */
   private static final String NAME = Util.name(CommandTest.class);
   /** Test name. */
-  protected static final String NAME2 = NAME + "2";
+  protected static final String NAME2 = NAME + '2';
   /** Socket reference. */
   static Session session;
 

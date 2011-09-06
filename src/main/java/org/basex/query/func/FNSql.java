@@ -15,18 +15,17 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Properties;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Jav;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.AxisIter;
@@ -44,7 +43,6 @@ import org.basex.util.InputInfo;
  * @author Rositsa Shadura
  */
 public final class FNSql extends FuncCall {
-
   /** sql:tuple element. */
   private static final byte[] TUPLE = token("sql:tuple");
   /** parameter attribute: type. */
@@ -69,6 +67,10 @@ public final class FNSql extends FuncCall {
   private static final byte[] TIME = token("time");
   /** Type timestamp. */
   private static final byte[] TIMESTAMP = token("timestamp");
+  /** Tuple. */
+  private static final QNm Q_TUPLE = new QNm(TUPLE, SQLURI);
+  /** SQL Namespace attribute. */
+  private static final Atts NS_SQL = new Atts().add(SQL, SQLURI);
 
   /**
    * Constructor.
@@ -123,10 +125,16 @@ public final class FNSql extends FuncCall {
     // Auto-commit mode
     final boolean autoComm = expr.length < 2 || checkBln(expr[1], ctx);
     try {
+      final Properties prop = new Properties();
+      prop.put("create", "true");
+
       // Establish a connection to the relational database
-      final Connection conn = expr.length == 4 ? DriverManager.getConnection(
+      final Connection conn = DriverManager.getConnection(url, prop);
+
+      /*final Connection conn = expr.length == 4 ? DriverManager.getConnection(
           url, string(checkStr(expr[2], ctx)), string(checkStr(expr[3], ctx)))
           : DriverManager.getConnection(url);
+          */
       conn.setAutoCommit(autoComm);
       return Itr.get(ctx.jdbc.add(conn));
     } catch(final SQLException ex) {
@@ -148,7 +156,7 @@ public final class FNSql extends FuncCall {
       // Keep prepared statement in depot
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
       return Itr.get(ctx.jdbc.add(prep));
-    } catch(SQLException ex) {
+    } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
   }
@@ -160,8 +168,7 @@ public final class FNSql extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter execute(final QueryContext ctx) throws QueryException {
-    final Item idItem = checkType(expr[0].item(ctx, input), AtomType.INT);
-    final int id = toInt(idItem.atom(input));
+    final int id = (int) checkItr(expr[0].item(ctx, input));
     final Object obj = ctx.jdbc.get(id);
     if(obj == null) throw Err.NOCONN.thrw(input, id);
     // Execute query or prepared statement
@@ -179,12 +186,13 @@ public final class FNSql extends FuncCall {
    */
   private NodeCache executeQuery(final Connection conn, final QueryContext ctx)
       throws QueryException {
+
     final String query = string(checkStr(ctx.iter(expr[1]).next(), ctx));
     try {
       final Statement stmt = conn.createStatement();
       final boolean result = stmt.execute(query);
       return result ? buildResult(stmt.getResultSet()) : new NodeCache();
-    } catch(SQLException ex) {
+    } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
   }
@@ -198,6 +206,7 @@ public final class FNSql extends FuncCall {
    */
   private NodeCache executePrepStmt(final PreparedStatement stmt,
       final QueryContext ctx) throws QueryException {
+
     // Get parameters for prepared statement
     final ANode params = (ANode) checkType(expr[1].item(ctx, input),
         NodeType.ELM);
@@ -233,6 +242,7 @@ public final class FNSql extends FuncCall {
    */
   private void setParameters(final AxisMoreIter params,
       final PreparedStatement stmt) throws QueryException {
+
     int i = 0;
     for(ANode next; (next = params.next()) != null;) {
       final AxisIter attrs = next.attributes();
@@ -326,10 +336,9 @@ public final class FNSql extends FuncCall {
           final Object value = rs.getObject(label);
           // Null values are ignored
           if(value != null) a.add(new FAttr(new QNm(token(label), EMPTY),
-              new Jav(value).atom(input)));
+              token(value.toString())));
         }
-        tuples.add(new FElem(new QNm(TUPLE, SQLURI), null, a, new Atts().add(
-            SQL, SQLURI), null));
+        tuples.add(new FElem(Q_TUPLE, null, a, NS_SQL, null));
       }
       return tuples;
     } catch(final SQLException ex) {
@@ -347,7 +356,7 @@ public final class FNSql extends FuncCall {
     try {
       connection(ctx, true).close();
       return null;
-    } catch(SQLException ex) {
+    } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
   }
@@ -362,7 +371,7 @@ public final class FNSql extends FuncCall {
     try {
       connection(ctx, false).commit();
       return null;
-    } catch(SQLException ex) {
+    } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
   }
@@ -377,7 +386,7 @@ public final class FNSql extends FuncCall {
     try {
       connection(ctx, false).rollback();
       return null;
-    } catch(SQLException ex) {
+    } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
   }
@@ -392,11 +401,16 @@ public final class FNSql extends FuncCall {
    */
   private Connection connection(final QueryContext ctx, final boolean del)
       throws QueryException {
-    final Item id = checkType(expr[0].item(ctx, input), AtomType.INT);
-    final int connId = toInt(id.atom(input));
-    final Object obj = ctx.jdbc.get(connId);
-    if(obj == null || !(obj instanceof Connection)) NOCONN.thrw(input, connId);
-    if(del) ctx.jdbc.remove(connId);
+
+    final int id = (int) checkItr(expr[0].item(ctx, input));
+    final Object obj = ctx.jdbc.get(id);
+    if(obj == null || !(obj instanceof Connection)) NOCONN.thrw(input, id);
+    if(del) ctx.jdbc.remove(id);
     return (Connection) obj;
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.CTX || super.uses(u);
   }
 }
