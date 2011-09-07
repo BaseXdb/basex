@@ -134,7 +134,7 @@ public final class Args {
    * @return success flag
    */
   public boolean finish() {
-    if(!ok) Util.outln((header != null ? header : "") +
+    if(!ok) Util.errln((header != null ? header : "") +
         "Usage: " + Util.name(obj).toLowerCase() + usage);
     return ok;
   }
