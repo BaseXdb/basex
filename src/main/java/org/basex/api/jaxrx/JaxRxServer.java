@@ -2,6 +2,7 @@ package org.basex.api.jaxrx;
 
 import static org.basex.core.Text.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -56,19 +57,26 @@ public final class JaxRxServer extends BaseXServer {
 
   /**
    * Main method, launching the JAX-RX implementation.
+   * Command-line arguments are listed with the {@code -h} argument.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    if(new JaxRxServer(args).failed()) System.exit(1);
+    try {
+      new JaxRxServer(args);
+    } catch(final IOException ex) {
+      Util.errln(ex);
+      System.exit(1);
+    }
   }
 
   /**
    * Constructor.
    * @param args command-line arguments
+   * @throws IOException I/O exception
    */
-  public JaxRxServer(final String... args) {
+  public JaxRxServer(final String... args) throws IOException {
     super(args);
-    if(failed || service) return;
+    if(service || stopped) return;
 
     // set default ports and paths
     set(JAXRXPATH, context.mprop.get(MainProp.JAXRXPATH), false);
@@ -92,7 +100,7 @@ public final class JaxRxServer extends BaseXServer {
       if(!System.getProperty(USER).isEmpty()) login(null).close();
     } catch(final Exception ex) {
       Util.errln(ex.getMessage());
-      quit(false);
+      quit();
       return;
     }
 
@@ -110,14 +118,14 @@ public final class JaxRxServer extends BaseXServer {
   }
 
   @Override
-  public void quit(final boolean u) {
-    super.quit(u);
+  public void quit() throws IOException {
+    super.quit();
     if(jetty != null) jetty.stop();
   }
 
   @Override
-  public void stop() {
-    quit(false);
+  public void stop() throws IOException {
+    quit();
   }
 
   /**
@@ -180,7 +188,7 @@ public final class JaxRxServer extends BaseXServer {
   }
 
   @Override
-  public boolean parseArguments(final String[] args) {
+  public void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, JAXRXINFO, Util.info(CONSOLE, JAXRX));
     boolean daemon = false;
     final StringBuilder serial = new StringBuilder();
@@ -214,17 +222,17 @@ public final class JaxRxServer extends BaseXServer {
           // suppress logging
           quiet = true;
         } else {
-          arg.ok(false);
+          arg.usage();
         }
       } else {
-        arg.ok(false);
         if(arg.string().equalsIgnoreCase("stop")) {
           stop(context.mprop.num(MainProp.SERVERPORT),
                context.mprop.num(MainProp.EVENTPORT));
-          return false;
+          stopped = true;
+        } else {
+          arg.usage();
         }
       }
     }
-    return arg.finish();
   }
 }

@@ -1,5 +1,7 @@
 package org.basex.api.webdav;
 
+import static org.basex.core.Text.*;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -40,6 +42,8 @@ public final class WebDAVServer extends Main {
   static final String DBPORT = "org.basex.serverport";
   /** Configuration: WebDAV server port. */
   static final String WEBDAVPORT = "org.basex.webdavport";
+  /** WebDAV String. */
+  static final String WEBDAV = "WebDAV";
 
   /** HTTP server. */
   private Server jetty;
@@ -48,19 +52,25 @@ public final class WebDAVServer extends Main {
 
   /**
    * Main method, launching the WebDAV implementation.
+   * Command-line arguments are listed with the {@code -h} argument.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    if(new WebDAVServer(args).failed()) System.exit(1);
+    try {
+      new WebDAVServer(args);
+    } catch(final IOException ex) {
+      Util.errln(ex);
+      System.exit(1);
+    }
   }
 
   /**
    * Constructor.
    * @param args command-line arguments
+   * @throws IOException I/O exception
    */
-  public WebDAVServer(final String... args) {
+  public WebDAVServer(final String... args) throws IOException {
     super(args);
-    if(failed) return;
 
     set(DBHOST, context.mprop.get(MainProp.HOST));
     set(DBPORT, Integer.toString(context.mprop.num(MainProp.SERVERPORT)));
@@ -121,8 +131,9 @@ public final class WebDAVServer extends Main {
   protected Session session() { return null; }
 
   @Override
-  protected boolean parseArguments(final String[] args) {
-    final Args arg = new Args(args, this, Text.WEBDAVINFO);
+  protected void parseArguments(final String[] args) throws IOException {
+    final Args arg = new Args(args, this, Text.WEBDAVINFO,
+        Util.info(CONSOLE, WEBDAV));
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
@@ -133,12 +144,11 @@ public final class WebDAVServer extends Main {
           case 's': standalone = true; break;
           case 'U': set(DBUSER, arg.string()); break;
           case 'w': set(WEBDAVPORT, arg.string()); break;
-          default: arg.ok(false);
+          default: arg.usage();
         }
       } else {
-        arg.ok(false);
+        arg.usage();
       }
     }
-    return arg.finish();
   }
 }

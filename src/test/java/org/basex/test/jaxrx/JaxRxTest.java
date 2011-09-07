@@ -40,15 +40,21 @@ public final class JaxRxTest {
 
   // INITIALIZERS =============================================================
 
-  /** Start server. */
+  /**
+   * Start server.
+   * @throws IOException I/O exception
+   */
   @BeforeClass
-  public static void start() {
+  public static void start() throws IOException {
     jaxrx = new JaxRxServer("-U" + Text.ADMIN + " -P" + Text.ADMIN + " -z");
   }
 
-  /** Stop server. */
+  /**
+   * Stop server.
+   * @throws IOException I/O exception
+   */
   @AfterClass
-  public static void stop() {
+  public static void stop() throws IOException {
     jaxrx.stop();
   }
 

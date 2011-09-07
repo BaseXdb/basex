@@ -48,9 +48,9 @@ import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
 import org.basex.query.util.http.HTTPClient;
 import org.basex.query.util.http.Request;
+import org.basex.query.util.http.Request.Part;
 import org.basex.query.util.http.RequestParser;
 import org.basex.query.util.http.ResponseHandler;
-import org.basex.query.util.http.Request.Part;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -77,9 +77,10 @@ public final class HttpClientTest {
 
   /**
    * Prepare test.
+   * @throws IOException I/O exception
    */
   @BeforeClass
-  public static void setUpBeforeClass() {
+  public static void start() throws IOException {
     context = new Context();
     context.prop.set(Prop.CACHEQUERY, true);
     jaxrx = new JaxRxServer("-U" + ADMIN + " -P" + ADMIN + " -z");
@@ -87,9 +88,10 @@ public final class HttpClientTest {
 
   /**
    * Finish test.
+   * @throws IOException I/O exception
    */
   @AfterClass
-  public static void tearDownAfterClass() {
+  public static void stop() throws IOException {
     context.close();
     jaxrx.stop();
   }
