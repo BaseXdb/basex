@@ -8,14 +8,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
 import org.basex.server.Query;
 import org.basex.server.Session;
-
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.DeletableCollectionResource;
@@ -167,6 +165,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
             }
           }
         }
+        q.close();
       } finally {
         s.close();
       }

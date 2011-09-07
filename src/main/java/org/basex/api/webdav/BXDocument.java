@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
-
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.io.IO;
 import org.basex.server.Query;
 import org.basex.server.Session;
-
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.FileItem;
 import com.bradmcevoy.http.FileResource;

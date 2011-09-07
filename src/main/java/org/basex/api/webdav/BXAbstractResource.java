@@ -1,7 +1,6 @@
 package org.basex.api.webdav;
 
 import java.io.IOException;
-
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;

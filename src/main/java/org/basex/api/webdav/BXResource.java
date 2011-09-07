@@ -33,7 +33,7 @@ public abstract class BXResource implements Resource {
   /** Zip mime type. */
   static final String MIMETYPEZIP = "application/zip";
   /** Dummy xml file.*/
-  static final String DUMMY = ".";
+  static final String DUMMY = ".empty";
   /** Dummy xml content.*/
   static final String DUMMYCONTENT = "<empty/>";
   /** User name. */
@@ -114,7 +114,11 @@ public abstract class BXResource implements Resource {
   static StringList listDbs(final Session s) throws BaseXException {
     final StringList result = new StringList();
     final Query q = s.query("db:list()");
-    while(q.more()) result.add(q.next());
+    try {
+      while(q.more()) result.add(q.next());
+    } finally {
+      q.close();
+    }
     return result;
   }
 
