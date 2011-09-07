@@ -10,7 +10,6 @@ import java.io.IOException;
 
 import javax.swing.Box;
 
-import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
@@ -208,8 +207,6 @@ public final class TextView extends View implements ActionListener {
         for(final byte t : txt) if(t < 0 || t > ' ' || Token.ws(t))
           out.write(t);
       }
-    } catch(final BaseXException ex) {
-      Dialog.error(gui, NOTSAVED);
     } catch(final IOException ex) {
       Dialog.error(gui, NOTSAVED);
     } finally {

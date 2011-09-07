@@ -1,16 +1,13 @@
 package org.basex.test.query.ast;
 
-import java.io.IOError;
 import java.io.IOException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Data;
 import org.basex.io.serial.BuilderSerializer;
-import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 
 import static org.junit.Assert.*;
@@ -59,14 +56,10 @@ public abstract class QueryPlanTest {
           fail(p + ":" + NL + qp.ctx.root + NL
               + new XQuery("/").execute(CTX));
       }
-    } catch(final QueryException e) {
-      throw new Error(e.getMessage(), e);
-    } catch(final BaseXException e) {
-      throw new Error(e.getMessage(), e);
-    } catch(final IOException e) {
-      throw new IOError(e);
+    } catch(final Exception ex) {
+      throw new Error(ex.getMessage(), ex);
     } finally {
-      try { qp.close(); } catch(final IOException e) { }
+      try { qp.close(); } catch(final IOException ex) { }
     }
   }
 }
