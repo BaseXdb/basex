@@ -33,6 +33,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
+import org.basex.util.Reflect;
 
 /**
  * Functions on relational databases.
@@ -82,31 +83,37 @@ public final class FNSql extends FuncCall {
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
     switch(def) {
-      case EXECUTE:
-        return execute(ctx);
-      default:
-        return super.iter(ctx);
+      case EXECUTE: return execute(ctx);
+      default:      return super.iter(ctx);
     }
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     checkAdmin(ctx);
     switch(def) {
-      case CONNECT:
-        return connect(ctx);
-      case PREPARE:
-        return prepare(ctx);
-      case CLOSE:
-        return close(ctx);
-      case COMMIT:
-        return commit(ctx);
-      case ROLLBACK:
-        return rollback(ctx);
-      default:
-        return super.item(ctx, ii);
+      case INIT:     return init(ctx);
+      case CONNECT:  return connect(ctx);
+      case PREPARE:  return prepare(ctx);
+      case CLOSE:    return close(ctx);
+      case COMMIT:   return commit(ctx);
+      case ROLLBACK: return rollback(ctx);
+      default:       return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Initializes JDBC with the specified driver.
+   * @param ctx query context
+   * @return connection id
+   * @throws QueryException query exception
+   */
+  private Item init(final QueryContext ctx) throws QueryException {
+    final String driver = string(checkStr(expr[0], ctx));
+    if(Reflect.find(driver) == null) SQLINIT.thrw(input, driver);
+    return null;
   }
 
   /**

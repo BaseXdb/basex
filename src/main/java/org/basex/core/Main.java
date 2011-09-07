@@ -18,9 +18,7 @@ import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
 /**
- * This is the abstract main class for all starter classes.
- * Moreover, it offers some utility methods which are used
- * throughout the project.
+ * This is the abstract main class for the starter classes.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
