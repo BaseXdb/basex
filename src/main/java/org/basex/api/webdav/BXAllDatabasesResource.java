@@ -1,21 +1,23 @@
 package org.basex.api.webdav;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.server.Session;
-
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Resource;
+import com.bradmcevoy.http.exceptions.BadRequestException;
+import com.bradmcevoy.http.exceptions.ConflictException;
+import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing the list of all databases.
@@ -79,39 +81,38 @@ public class BXAllDatabasesResource extends BXResource implements
   }
 
   @Override
-  public CollectionResource createCollection(final String newName) {
+  public CollectionResource createCollection(final String newName) throws
+    NotAuthorizedException, ConflictException, BadRequestException {
+    Session s = null;
     try {
-      final Session s = factory.login(user, pass);
-      try {
-        s.execute(new CreateDB(dbname(newName)));
-        return new BXDatabase(newName, factory, user, pass);
-      } finally {
-        s.execute(new Close());
-        s.close();
-      }
+      s = factory.login(user, pass);
+      s.execute(new CreateDB(dbname(newName)));
+      return new BXDatabase(newName, factory, user, pass);
     } catch(final Exception ex) {
       handle(ex);
+      throw new BadRequestException(this, ex.getMessage());
+    } finally {
+      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
     }
-    return null;
   }
 
   @Override
   public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) {
+      final Long length, final String contentType) throws IOException,
+      ConflictException, NotAuthorizedException, BadRequestException {
+    Session s = null;
     try {
-      final Session s = factory.login(user, pass);
-      try {
-        final String dbname = dbname(newName);
-        s.create(dbname, inputStream);
-        return new BXDatabase(dbname, factory, user, pass);
-      } finally {
-        s.execute(new Close());
-        s.close();
-      }
+      s = factory.login(user, pass);
+      final String dbname = dbname(newName);
+      s.create(dbname, inputStream);
+      s.execute(new Close());
+      return new BXDatabase(dbname, factory, user, pass);
     } catch(final Exception ex) {
       handle(ex);
+      throw new BadRequestException(this, ex.getMessage());
+    } finally {
+      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
     }
-    return null;
   }
 
   @Override

@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.basex.core.BaseXException;
-
 import org.basex.core.Text;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.Close;

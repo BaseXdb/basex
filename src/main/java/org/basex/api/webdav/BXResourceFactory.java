@@ -5,14 +5,12 @@ import static org.basex.api.webdav.BXNotAuthorizedResource.*;
 import static org.basex.api.webdav.WebDAVServer.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Session;
-
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.HttpManager;
