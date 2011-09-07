@@ -95,7 +95,8 @@ public final class CreateDB extends ACreate {
     final InputStream is = input instanceof BufferedInputStream ||
       input instanceof BufferInput ? input : new BufferedInputStream(input);
     final SAXSource sax = new SAXSource(new InputSource(is));
-    return create(name, new SAXWrapper(sax, "", ctx.prop), ctx);
+    return create(name, new SAXWrapper(sax, name + IO.XMLSUFFIX, "",
+        ctx.prop), ctx);
   }
 
   /**
@@ -233,7 +234,7 @@ public final class CreateDB extends ACreate {
    */
   public static synchronized Data xml(final SAXSource source, final Context ctx)
       throws IOException {
-    return xml(new SAXWrapper(source, "", ctx.prop) , ctx);
+    return xml(new SAXWrapper(source, ctx.prop) , ctx);
   }
 
   @Override
