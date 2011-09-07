@@ -18,6 +18,7 @@ import com.bradmcevoy.http.Range;
 
 /**
  * WebDAV resource representing an XML document.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
@@ -70,6 +71,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType)
       throws IOException {
+
     final Session s = factory.login(user, pass);
     try {
       s.setOutputStream(out);
@@ -86,6 +88,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
   @Override
   protected void copyToRoot(final Session s, final String n)
       throws BaseXException {
+
     // document is copied to the root: create new database with it
     final String nm = n.endsWith(".xml") ? n.substring(0, n.length() - 4) : n;
     s.execute(new CreateDB(nm));
@@ -96,6 +99,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
   @Override
   protected void copyTo(final Session s, final BXFolder f, final String n)
       throws BaseXException {
+
     // folder is copied to a folder in a database
     add(s, f.db, f.path, n);
     deleteDummy(s, f.db, f.path);
@@ -111,6 +115,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
    */
   protected void add(final Session s, final String trgdb, final String trgdir,
       final String name) throws BaseXException {
+
     final Query q = s.query("db:add($db, collection($doc), $name, $path)");
     q.bind("$db", trgdb);
     q.bind("$doc", db + SEP + path);

@@ -13,6 +13,7 @@ import com.bradmcevoy.http.MoveableResource;
 
 /**
  * WebDAV resource representing an abstract folder within a collection database.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov

@@ -19,6 +19,7 @@ import com.bradmcevoy.http.Resource;
 
 /**
  * WebDAV resource representing the list of all databases.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov

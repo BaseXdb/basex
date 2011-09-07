@@ -42,7 +42,7 @@ public final class WebDAVServer extends Main {
   static final String WEBDAVPORT = "org.basex.webdavport";
 
   /** HTTP server. */
-  private final Server jetty;
+  private Server jetty;
   /** Stand-alone flag: no remote BaseX server. */
   private boolean standalone = true;
 
@@ -51,7 +51,7 @@ public final class WebDAVServer extends Main {
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new WebDAVServer(args);
+    if(new WebDAVServer(args).failed()) System.exit(1);
   }
 
   /**
@@ -60,6 +60,7 @@ public final class WebDAVServer extends Main {
    */
   public WebDAVServer(final String... args) {
     super(args);
+    if(failed) return;
 
     set(DBHOST, context.mprop.get(MainProp.HOST));
     set(DBPORT, Integer.toString(context.mprop.num(MainProp.SERVERPORT)));
@@ -121,19 +122,23 @@ public final class WebDAVServer extends Main {
 
   @Override
   protected boolean parseArguments(final String[] args) {
-    final Args a = new Args(args, this, Text.WEBDAVINFO);
-    while(a.more()) {
-      final char c = a.next();
-      switch(c) {
-        case 'h': set(DBHOST, a.string()); break;
-        case 'r': set(DBPORT, a.string()); break;
-        case 'u': set(DBUSER, a.string()); break;
-        case 'p': set(DBPASS, a.string()); break;
-        case 'w': set(WEBDAVPORT, a.string()); break;
-        case 's': standalone = true; break;
-        default: break;
+    final Args arg = new Args(args, this, Text.WEBDAVINFO);
+    while(arg.more()) {
+      if(arg.dash()) {
+        final char c = arg.next();
+        switch(c) {
+          case 'n': set(DBHOST, arg.string()); break;
+          case 'P': set(DBPASS, arg.string()); break;
+          case 'r': set(DBPORT, arg.string()); break;
+          case 's': standalone = true; break;
+          case 'U': set(DBUSER, arg.string()); break;
+          case 'w': set(WEBDAVPORT, arg.string()); break;
+          default: arg.ok(false);
+        }
+      } else {
+        arg.ok(false);
       }
     }
-    return true;
+    return arg.finish();
   }
 }

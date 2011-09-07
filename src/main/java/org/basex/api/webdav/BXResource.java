@@ -4,6 +4,7 @@ import static java.lang.Integer.*;
 
 import java.util.Date;
 import org.basex.core.BaseXException;
+import org.basex.core.Text;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
@@ -19,6 +20,7 @@ import com.bradmcevoy.http.Resource;
 
 /**
  * Base class for all WebDAV resources.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
@@ -84,7 +86,7 @@ public abstract class BXResource implements Resource {
 
   @Override
   public String getRealm() {
-    return "BaseX";
+    return Text.NAME;
   }
 
   @Override
@@ -109,8 +111,7 @@ public abstract class BXResource implements Resource {
    * @return a list of database names
    * @throws BaseXException query exception
    */
-  static StringList listDbs(final Session s)
-      throws BaseXException {
+  static StringList listDbs(final Session s) throws BaseXException {
     final StringList result = new StringList();
     final Query q = s.query("db:list()");
     while(q.more()) result.add(q.next());
@@ -172,7 +173,7 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Checks if a document which has a given name.
+   * Checks if a document with the specified name exists.
    * @param s active client session
    * @param db database name
    * @param p resource path
@@ -199,8 +200,9 @@ public abstract class BXResource implements Resource {
    */
   static boolean deleteDummy(final Session s, final String db, final String p)
       throws BaseXException {
+
     final String dummy = p + SEP + DUMMY;
-    if(count(s, db, dummy) <= 0) return false;
+    if(count(s, db, dummy) == 0) return false;
 
     // path contains dummy document
     s.execute(new Open(db));

@@ -15,6 +15,7 @@ import org.basex.server.Session;
 
 /**
  * WebDAV resource representing a collection database.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
