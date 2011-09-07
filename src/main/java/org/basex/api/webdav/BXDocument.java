@@ -8,6 +8,7 @@ import java.util.Map;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
+import org.basex.io.IO;
 import org.basex.server.Query;
 import org.basex.server.Session;
 
@@ -90,7 +91,8 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       throws BaseXException {
 
     // document is copied to the root: create new database with it
-    final String nm = n.endsWith(".xml") ? n.substring(0, n.length() - 4) : n;
+    final String nm = n.endsWith(IO.XMLSUFFIX) ?
+        n.substring(0, n.length() - IO.XMLSUFFIX.length()) : n;
     s.execute(new CreateDB(nm));
     add(s, nm, "", n);
     s.execute(new Close());

@@ -20,6 +20,7 @@ import com.bradmcevoy.http.MoveableResource;
  */
 public abstract class BXAbstractResource extends BXResource implements
     CopyableResource, DeletableResource, MoveableResource {
+
   /**
    * Constructor.
    * @param dbname database name
