@@ -62,7 +62,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class CmdTest {
+public class CommandTest {
   /** Database context. */
   protected static final Context CONTEXT = new Context();
   /** Test file name. */
@@ -72,9 +72,9 @@ public class CmdTest {
   /** Test file. */
   private static final String FILE = FLDR + '/' + FN;
   /** Test name. */
-  private static final String NAME = Util.name(CmdTest.class);
+  private static final String NAME = Util.name(CommandTest.class);
   /** Test name. */
-  protected static final String NAME2 = NAME + "2";
+  protected static final String NAME2 = NAME + '2';
   /** Socket reference. */
   static Session session;
 
@@ -433,7 +433,7 @@ public class CmdTest {
     no(new Rename(FN, "/"));
     no(new Rename(FN, ""));
     ok(new Rename(FILE, "xxx"));
-    // target need not exist
+    // source need not exist
     ok(new Rename(FILE, "xxx"));
   }
 
@@ -446,6 +446,11 @@ public class CmdTest {
     ok(new Replace(FN, "<a/>"));
     ok(new Replace(FN, "<a/>"));
     no(new Replace(FN, ""));
+    // create binary file
+    ok(new XQuery("db:put('" + NAME + "', 'a', 'a')"));
+    ok(new Replace("a", "<b/>"));
+    assertTrue(!ok(new XQuery("db:open('" + NAME + "')")).isEmpty());
+    ok(new XQuery("db:get('" + NAME + "', 'a')"));
     // a failing replace should not remove existing documents
     no(new Replace(FN, "<a>"));
     assertTrue(!ok(new XQuery("doc('" + NAME + "')")).isEmpty());

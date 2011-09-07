@@ -157,7 +157,7 @@ public final class SAXWrapper extends SingleParser {
     } else if(src instanceof IOFile) {
       in = new FileInputStream(src.path());
     } else if(src instanceof IOContent) {
-      in = new ByteArrayInputStream(src.content());
+      in = new ByteArrayInputStream(src.read());
     } else {
       return is;
     }

@@ -28,7 +28,7 @@ import org.basex.util.list.TokenList;
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
-public final class Add extends InsertBase {
+public final class DBAdd extends InsertBase {
   /** Documents to add. */
   private final ObjList<Item> docs;
   /** New document names. */
@@ -47,7 +47,7 @@ public final class Add extends InsertBase {
    * @param p document(s) path
    * @param c database context
    */
-  public Add(final Data trg, final InputInfo i, final ObjList<Item> d,
+  public DBAdd(final Data trg, final InputInfo i, final ObjList<Item> d,
       final String n, final String p, final Context c) {
 
     super(PrimitiveType.INSERTAFTER, lastDoc(trg), trg, i, null);
@@ -71,7 +71,7 @@ public final class Add extends InsertBase {
 
   @Override
   public void merge(final UpdatePrimitive u) {
-    final Add a = (Add) u;
+    final DBAdd a = (DBAdd) u;
     final Iterator<Item> d = a.docs.iterator();
     final Iterator<byte[]> n = a.names.iterator();
     final Iterator<byte[]> p = a.paths.iterator();

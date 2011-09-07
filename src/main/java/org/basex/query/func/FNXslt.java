@@ -191,7 +191,7 @@ public final class FNXslt extends FuncCall {
     // create transformer
     final TransformerFactory tc = TransformerFactory.newInstance();
     final Transformer tr =  tc.newTransformer(
-        new StreamSource(new ByteArrayInputStream(xsl.content())));
+        new StreamSource(new ByteArrayInputStream(xsl.read())));
 
     // bind parameters
     for(final byte[] key : par) tr.setParameter(string(key), par.get(key));
@@ -200,7 +200,7 @@ public final class FNXslt extends FuncCall {
     final ArrayOutput ao = new ArrayOutput();
 
     // do transformation and return result
-    tr.transform(new StreamSource(new ByteArrayInputStream(in.content())),
+    tr.transform(new StreamSource(new ByteArrayInputStream(in.read())),
         new StreamResult(ao));
     return ao.toArray();
   }

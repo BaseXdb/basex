@@ -1,7 +1,7 @@
 package org.basex.core.cmd;
 
-import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 
 import org.basex.core.User;
 import org.basex.data.Data;
@@ -30,16 +30,15 @@ public final class Rename extends ACreate {
     final Data data = context.data();
     final String src = IOFile.normalize(args[0]);
     final String trg = IOFile.normalize(args[1]);
-
     // ensure that the name contains no slashes and trailing dots
     if(!new IOFile(trg).valid()) return error(NAMEINVALID, trg);
 
     boolean ok = true;
     int c = 0;
-    final IntList il = data.docs(args[0]);
+    final IntList il = data.docs(src);
     for(int i = 0, is = il.size(); i < is; i++) {
       final int pre = il.get(i);
-      final String target = newName(data, pre, src, trg);
+      final String target = target(data, pre, src, trg);
       if(target.isEmpty()) {
         info(NAMEINVALID, target);
         ok = false;
@@ -51,29 +50,35 @@ public final class Rename extends ACreate {
     // data was changed: update context
     if(c != 0) data.flush();
 
+    // rename binary resources
+    final IOFile io = data.meta.binary(src);
+    if(io.exists() && !io.rename(data.meta.binary(trg))) {
+      ok = false;
+      info(NAMEINVALID, trg);
+    } else {
+      c++;
+    }
+
     info(PATHRENAMED, c, perf);
     return ok;
   }
 
   /**
-   * Generate a new name for a document.
-   * @param d data
+   * Generates a target path for the specified document.
+   * @param data data reference
    * @param pre pre value of the document
    * @param src source path
    * @param trg target path
    * @return new name
    */
-  public static String newName(final Data d, final int pre, final String src,
+  public static String target(final Data data, final int pre, final String src,
       final String trg) {
 
-    final byte[] path = d.text(pre, true);
-    String target = trg;
-    String name = string(substring(path, src.length()));
-    if(!name.isEmpty()) {
-      // change file path: replace all paths with the target path
-      if(name.startsWith("/")) name = name.substring(1);
-      target = !trg.isEmpty() ? trg + '/' + name : name;
-    }
-    return target;
+    // source references a file
+    final String path = string(data.text(pre, true));
+    if(path.equals(src)) return trg;
+    // source references a directory: merge target path and file name
+    final String name = path.substring(src.length() + 1);
+    return !trg.isEmpty() ? trg + '/' + name : name;
   }
 }

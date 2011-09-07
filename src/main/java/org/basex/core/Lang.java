@@ -154,7 +154,7 @@ public final class Lang {
       } else {
         for(final IO f : new IOFile(url.getFile()).children()) {
           langs.add(f.name().replaceAll("." + SUFFIX, ""));
-          creds.add(credits(f.content()));
+          creds.add(credits(f.read()));
         }
       }
     } catch(final IOException ex) {

@@ -336,7 +336,7 @@ public final class DialogServer extends Dialog {
         byte[] cont = Token.EMPTY;
         if(logc.getSelectedIndex() != -1) {
           final File f = new File(logdir, logc.getSelectedItem().toString());
-          cont = new IOFile(f).content();
+          cont = new IOFile(f).read();
         }
         logt.setText(cont);
         logt.scrollToEnd();

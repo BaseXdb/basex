@@ -300,9 +300,16 @@ public final class FNDbTest extends AdvancedQueryTest {
     new Add(FLDR, "docs", "test").execute(CONTEXT);
     query("count(collection('" + DB + "/test'))", NFLDR);
 
-    query(fun + "('" + DB + "', 'test', 'newtest')", "");
+    // rename document
+    query(fun + "('" + DB + "', 'test', 'newtest')");
     query("count(collection('" + DB + "/test'))", "0");
     query("count(collection('" + DB + "/newtest'))", NFLDR);
+
+    // rename binary file
+    query("db:put('" + DB + "', 'one', '')");
+    query(fun + "('" + DB + "', 'one', 'two')");
+    query("db:get('" + DB + "', 'two')");
+    error("db:get('" + DB + "', 'one')", Err.RESFNF);
   }
 
   /**

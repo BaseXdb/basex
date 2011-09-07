@@ -310,14 +310,14 @@ public final class ClientListener extends Thread {
     final String name = in.readString();
     log.write(this, CREATE + " " + CmdCreate.DATABASE + " " + name + " [...]");
 
-    final ClientInputStream wis = new ClientInputStream(in);
+    final ClientInputStream cis = new ClientInputStream(in);
     try {
-      final String info = wis.curr() == -1 ?
+      final String info = cis.curr() == -1 ?
         CreateDB.create(name, Parser.emptyParser(), context) :
-        CreateDB.create(name, wis, context);
+        CreateDB.create(name, cis, context);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      wis.close();
+      cis.close();
       info(false, ex.getMessage(), perf);
     }
   }
@@ -335,13 +335,13 @@ public final class ClientListener extends Thread {
     if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
     log.write(this, sb.append("[...]"));
 
-    final ClientInputStream wis = new ClientInputStream(in);
-    final InputSource is = new InputSource(wis);
+    final ClientInputStream cis = new ClientInputStream(in);
+    final InputSource is = new InputSource(cis);
     try {
       final String info = Add.add(name, path, is, context, null, true);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      wis.close();
+      cis.close();
       info(false, ex.getMessage(), perf);
     }
     out.flush();
@@ -358,13 +358,13 @@ public final class ClientListener extends Thread {
     if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
     log.write(this, sb.append("[...]"));
 
-    final ClientInputStream wis = new ClientInputStream(in);
+    final ClientInputStream cis = new ClientInputStream(in);
     try {
-      final InputSource is = new InputSource(wis);
+      final InputSource is = new InputSource(cis);
       final String info = Replace.replace(path, is, context, true);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      wis.close();
+      cis.close();
       info(false, ex.getMessage(), perf);
     }
     out.flush();

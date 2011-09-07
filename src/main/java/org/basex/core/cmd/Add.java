@@ -3,6 +3,8 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 
 import javax.xml.transform.sax.SAXSource;
 
@@ -21,6 +23,7 @@ import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.util.Performance;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.xml.sax.InputSource;
 
@@ -184,6 +187,32 @@ public final class Add extends ACreate {
       if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
       if(large) DropDB.drop(dbname, ctx.mprop);
     }
+  }
+
+  /**
+   * Writes data to the specified file.
+   * @param target target file
+   * @param input new content
+   * @return info string
+   */
+  public static boolean add(final IOFile target, final InputSource input) {
+    final TokenBuilder tb = new TokenBuilder();
+    try {
+      final Reader r = input.getCharacterStream();
+      final InputStream is = input.getByteStream();
+      final String  id = input.getSystemId();
+      if(r != null) {
+        for(int c; (c = r.read()) != -1;) tb.add(c);
+      } else if(is != null) {
+        for(int c; (c = is.read()) != -1;) tb.addByte((byte) c);
+      } else if(id != null) {
+        tb.add(IO.get(id).read());
+      }
+      target.write(tb.finish());
+    } catch(final IOException ex) {
+      return false;
+    }
+    return true;
   }
 
   @Override

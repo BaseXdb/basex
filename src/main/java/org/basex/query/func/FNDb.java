@@ -39,10 +39,11 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
-import org.basex.query.up.primitives.Add;
+import org.basex.query.up.primitives.DBAdd;
 import org.basex.query.up.primitives.DBDelete;
 import org.basex.query.up.primitives.DBOptimize;
 import org.basex.query.up.primitives.DBPut;
+import org.basex.query.up.primitives.DBRename;
 import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
@@ -250,7 +251,7 @@ public final class FNDb extends FuncCall {
    */
   private Bln isRaw(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final String path = path(checkStr(expr[1], ctx));
+    final String path = path(1, ctx);
     final IOFile io = data.meta.binary(path);
     return Bln.get(io.exists() && !io.isDir());
   }
@@ -263,7 +264,7 @@ public final class FNDb extends FuncCall {
    */
   private Bln isXML(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final String path = path(checkStr(expr[1], ctx));
+    final String path = path(1, ctx);
     if(path.isEmpty()) return Bln.FALSE;
 
     // normalize path
@@ -321,7 +322,7 @@ public final class FNDb extends FuncCall {
     final Data data = data(0, ctx);
     final String name = expr.length < 3 ? null : name(checkStr(expr[2], ctx));
     // ensure that the path is valid
-    final String path = expr.length < 4 ? null : path(checkStr(expr[3], ctx));
+    final String path = expr.length < 4 ? null : path(3, ctx);
     if(path != null && !new IOFile(path).valid()) RESINV.thrw(input, path);
 
     // get all items representing document(s):
@@ -330,9 +331,9 @@ public final class FNDb extends FuncCall {
     final Iter iter = ctx.iter(expr[1]);
     for(Item i; (i = iter.next()) != null;) docs.add(i);
 
-    if(docs.size() > 0) {
-      ctx.updates.add(new Add(data, input, docs, name, path, ctx.context), ctx);
-    }
+    if(docs.size() > 0) ctx.updates.add(
+        new DBAdd(data, input, docs, name, path, ctx.context), ctx);
+
     return null;
   }
 
@@ -346,7 +347,7 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String trg = path(checkStr(expr[1], ctx));
+    final String trg = path(1, ctx);
     final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
@@ -357,6 +358,9 @@ public final class FNDb extends FuncCall {
         DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
+    // delete raw resources
+    final TokenList raw = Delete.files(data, trg);
+    ctx.updates.add(new DBDelete(data, raw, input), ctx);
 
     final int p = trg.lastIndexOf('/');
     final String name = p < 0 ? trg : trg.substring(p + 1);
@@ -364,9 +368,12 @@ public final class FNDb extends FuncCall {
 
     final ObjList<Item> docs = new ObjList<Item>(1);
     docs.add(doc);
-    final Add add = new Add(data, input, docs, name, path, ctx.context);
-    ctx.updates.add(add, ctx);
+    ctx.updates.add(new DBAdd(data, input, docs, name, path, ctx.context), ctx);
 
+    if(data.meta.binary(path).exists()) {
+      final byte[] val = checkBin(doc, ctx);
+      ctx.updates.add(new DBPut(data, token(trg), val, input), ctx);
+    }
     return null;
   }
 
@@ -380,7 +387,7 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String path = path(checkStr(expr[1], ctx));
+    final String path = path(1, ctx);
 
     // delete XML resources
     final IntList docs = data.docs(path);
@@ -403,18 +410,21 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String src = path(checkStr(expr[1], ctx));
-    final String trg = path(checkStr(expr[2], ctx));
+    final String src = path(1, ctx);
+    final String trg = path(2, ctx);
     if(!new IOFile(trg).valid()) RESINV.thrw(input, trg);
 
     // the first step of the path should be the database name
     final IntList il = data.docs(src);
     for(int i = 0, is = il.size(); i < is; i++) {
       final int pre = il.get(i);
-      final String target = Rename.newName(data, pre, src, trg);
+      final String target = Rename.target(data, pre, src, trg);
       if(target.isEmpty()) EMPTYPATH.thrw(input, this);
       ctx.updates.add(new ReplaceValue(pre, data, input, token(target)), ctx);
     }
+    // rename files
+    ctx.updates.add(new DBRename(data, data.meta.binary(src),
+        data.meta.binary(trg), input), ctx);
     return null;
   }
 
@@ -441,7 +451,7 @@ public final class FNDb extends FuncCall {
    */
   private Item put(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final String key = path(checkStr(expr[1], ctx));
+    final String key = path(1, ctx);
     if(!new IOFile(key).valid()) RESINV.thrw(input, key);
 
     final byte[] val = checkBin(expr[2], ctx);
@@ -457,12 +467,12 @@ public final class FNDb extends FuncCall {
    */
   private Item get(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final String key = path(checkStr(expr[1], ctx));
+    final String key = path(1, ctx);
 
     final IOFile bin = data.meta.binary(key);
     if(!bin.exists()) RESFNF.thrw(input, key);
     try {
-      return new B64(bin.content());
+      return new B64(bin.read());
     } catch(final IOException ex) {
       throw IOERR.thrw(input, ex);
     }
@@ -577,13 +587,14 @@ public final class FNDb extends FuncCall {
   }
 
   /**
-   * Normalizes the database path.
-   * Removes duplicate, leading and trailing slashes
-   * @param path input path
+   * Normalizes the specified expression as normalized database path.
+   * @param i expression index
+   * @param ctx query context
    * @return normalized path
+   * @throws QueryException query exception
    */
-  private String path(final byte[] path) {
-    // return normalized path
-    return IOFile.normalize(string(path));
+  private String path(final int i, final QueryContext ctx)
+      throws QueryException {
+    return IOFile.normalize(string(checkStr(expr[i], ctx)));
   }
 }
