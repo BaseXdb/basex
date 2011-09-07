@@ -2,6 +2,7 @@ package org.basex;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -20,14 +21,20 @@ public final class BaseXClient extends BaseX {
    * @param args command-line arguments
    */
   public static void main(final String... args) {
-    new BaseXClient(args);
+    try {
+      new BaseXClient(args);
+    } catch(final IOException ex) {
+      Util.errln(ex);
+      System.exit(1);
+    }
   }
 
   /**
    * Constructor.
    * @param args command-line arguments
+   * @throws IOException I/O exception
    */
-  public BaseXClient(final String... args) {
+  public BaseXClient(final String... args) throws IOException {
     super(args);
   }
 

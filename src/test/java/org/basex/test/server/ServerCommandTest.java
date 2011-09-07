@@ -27,28 +27,30 @@ public final class ServerCommandTest extends CommandTest {
   /** Server instance. */
   private static BaseXServer server;
 
-  /** Starts the server. */
+  /**
+   * Starts the server.
+   * @throws IOException I/O exception
+   */
   @BeforeClass
-  public static void start() {
+  public static void start() throws IOException {
     server = new BaseXServer("-z");
-    try {
-      session = new ClientSession(CONTEXT, ADMIN, ADMIN);
-      cleanUp();
-    } catch(final Exception ex) {
-      fail(ex.toString());
-    }
+    session = new ClientSession(CONTEXT, ADMIN, ADMIN);
+    cleanUp();
   }
 
-  /** Stops the server. */
+  /**
+   * Stops the server.
+   * @throws IOException I/O exception
+   */
   @AfterClass
-  public static void stop() {
+  public static void stop() throws IOException {
     try {
-      session.close();
+      if(session != null) session.close();
     } catch(final Exception ex) {
       fail(ex.toString());
     }
     // stop server instance
-    server.stop();
+    if(server != null) server.stop();
   }
 
   /**

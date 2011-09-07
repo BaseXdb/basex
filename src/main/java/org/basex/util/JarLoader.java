@@ -56,8 +56,8 @@ public final class JarLoader extends URLClassLoader {
     try {
       classJarURLConnection =
         Class.forName("sun.net.www.protocol.jar.JarURLConnection");
-    } catch(final ClassNotFoundException e) {
-      Util.err(e.getMessage());
+    } catch(final ClassNotFoundException ex) {
+      Util.errln(ex);
     }
     if(classJarURLConnection == null) {
       return res;
@@ -65,8 +65,8 @@ public final class JarLoader extends URLClassLoader {
     Field f = null;
     try {
       f = classJarURLConnection.getDeclaredField("factory");
-    } catch(final NoSuchFieldException e) {
-      Util.err(e.getMessage());
+    } catch(final NoSuchFieldException ex) {
+      Util.errln(ex);
     }
     if(f == null) {
       return res;
@@ -75,8 +75,8 @@ public final class JarLoader extends URLClassLoader {
     Object obj = null;
     try {
       obj = f.get(null);
-    } catch(final IllegalAccessException e) {
-      Util.err(e.getMessage());
+    } catch(final IllegalAccessException ex) {
+      Util.errln(ex);
     }
     if(obj == null) {
       return res;
@@ -90,10 +90,10 @@ public final class JarLoader extends URLClassLoader {
       if(obj instanceof HashMap) {
         fileCache = (HashMap<Object, Object>) obj;
       }
-    } catch(final NoSuchFieldException e) {
-      Util.err(e.getMessage());
-    } catch(final IllegalAccessException e) {
-      Util.err(e.getMessage());
+    } catch(final NoSuchFieldException ex) {
+      Util.errln(ex);
+    } catch(final IllegalAccessException ex) {
+      Util.errln(ex);
     }
     HashMap<Object, Object> urlCache = null;
     try {
@@ -103,10 +103,10 @@ public final class JarLoader extends URLClassLoader {
       if(obj instanceof HashMap) {
         urlCache = (HashMap<Object, Object>) obj;
       }
-    } catch(final NoSuchFieldException e) {
-      Util.err(e.getMessage());
-    } catch(final IllegalAccessException e) {
-      Util.err(e.getMessage());
+    } catch(final NoSuchFieldException ex) {
+      Util.errln(ex);
+    } catch(final IllegalAccessException ex) {
+      Util.errln(ex);
     }
     if(urlCache != null) {
       final HashMap<Object, Object> urlCacheTmp =
@@ -121,8 +121,8 @@ public final class JarLoader extends URLClassLoader {
         if(setJarFileNames2Close.contains(jarFile.getName())) {
           try {
             jarFile.close();
-          } catch(final IOException e) {
-            Util.err(e.getMessage());
+          } catch(final IOException ex) {
+            Util.errln(ex);
           }
           if(fileCache != null) {
             fileCache.remove(urlCache.get(jarFile));
@@ -146,8 +146,8 @@ public final class JarLoader extends URLClassLoader {
         if(setJarFileNames2Close.contains(jarFile.getName())) {
           try {
             jarFile.close();
-          } catch(final IOException e) {
-            Util.err(e.getMessage());
+          } catch(final IOException ex) {
+            Util.errln(ex);
           }
           fileCache.remove(key);
         }
@@ -173,24 +173,24 @@ public final class JarLoader extends URLClassLoader {
     Field f = null;
     try {
       f = classURLClassLoader.getDeclaredField("ucp");
-    } catch(final NoSuchFieldException e1) {
-      Util.err(e1.getMessage());
+    } catch(final NoSuchFieldException ex) {
+      Util.errln(ex);
     }
     if(f != null) {
       f.setAccessible(true);
       Object obj = null;
       try {
         obj = f.get(cl);
-      } catch(final IllegalAccessException e1) {
-        Util.err(e1.getMessage());
+      } catch(final IllegalAccessException ex) {
+        Util.errln(ex);
       }
       if(obj != null) {
         final Object ucp = obj;
         f = null;
         try {
           f = ucp.getClass().getDeclaredField("loaders");
-        } catch(final NoSuchFieldException e1) {
-          Util.err(e1.getMessage());
+        } catch(final NoSuchFieldException ex) {
+          Util.errln(ex);
         }
         if(f != null) {
           f.setAccessible(true);
@@ -198,31 +198,31 @@ public final class JarLoader extends URLClassLoader {
           try {
             loaders = (ArrayList<Object>) f.get(ucp);
             res = true;
-          } catch(final IllegalAccessException e1) {
-            Util.err(e1.getMessage());
+          } catch(final IllegalAccessException ex) {
+            Util.errln(ex);
           }
           for(int i = 0; loaders != null && i < loaders.size(); i++) {
             obj = loaders.get(i);
             f = null;
             try {
               f = obj.getClass().getDeclaredField("jar");
-            } catch(final NoSuchFieldException e) {
-              Util.err(e.getMessage());
+            } catch(final NoSuchFieldException ex) {
+              Util.errln(ex);
             }
             if(f != null) {
               f.setAccessible(true);
               try {
                 obj = f.get(obj);
-              } catch(final IllegalAccessException e1) {
-                Util.err(e1.getMessage());
+              } catch(final IllegalAccessException ex) {
+                Util.errln(ex);
               }
               if(obj instanceof JarFile) {
                 final JarFile jarFile = (JarFile) obj;
                 setJarFileNames2Close.add(jarFile.getName());
                 try {
                   jarFile.close();
-                } catch(final IOException e) {
-                  Util.err(e.getMessage());
+                } catch(final IOException ex) {
+                  Util.errln(ex);
                 }
               }
             }
@@ -245,8 +245,8 @@ public final class JarLoader extends URLClassLoader {
     java.lang.reflect.Field nativeLibraries = null;
     try {
       nativeLibraries = classClassLoader.getDeclaredField("nativeLibraries");
-    } catch(final NoSuchFieldException e1) {
-      Util.err(e1.getMessage());
+    } catch(final NoSuchFieldException ex) {
+      Util.errln(ex);
     }
     if(nativeLibraries == null) {
       return res;
@@ -255,8 +255,8 @@ public final class JarLoader extends URLClassLoader {
     Object obj = null;
     try {
       obj = nativeLibraries.get(cl);
-    } catch(final IllegalAccessException e1) {
-      Util.err(e1.getMessage());
+    } catch(final IllegalAccessException ex) {
+      Util.errln(ex);
     }
     if(!(obj instanceof Vector)) {
       return res;
@@ -267,17 +267,17 @@ public final class JarLoader extends URLClassLoader {
       java.lang.reflect.Method finalize = null;
       try {
         finalize = lib.getClass().getDeclaredMethod("finalize", new Class[0]);
-      } catch(final NoSuchMethodException e) {
-        Util.err(e.getMessage());
+      } catch(final NoSuchMethodException ex) {
+        Util.errln(ex);
       }
       if(finalize != null) {
         finalize.setAccessible(true);
         try {
           finalize.invoke(lib, new Object[0]);
-        } catch(final IllegalAccessException e) {
-          Util.err(e.getMessage());
-        } catch(final InvocationTargetException e) {
-          Util.err(e.getMessage());
+        } catch(final IllegalAccessException ex) {
+          Util.errln(ex);
+        } catch(final InvocationTargetException ex) {
+          Util.errln(ex);
         }
       }
     }

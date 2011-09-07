@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import org.basex.core.BaseXException;
 import org.basex.core.MainProp;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -41,6 +43,8 @@ public class BaseXServer extends Main implements Runnable {
   protected boolean quiet;
   /** Start as daemon. */
   protected boolean service;
+  /** Stopped flag. */
+  protected boolean stopped;
   /** Log. */
   protected Log log;
 
@@ -59,21 +63,27 @@ public class BaseXServer extends Main implements Runnable {
   private String commands;
 
   /**
-   * Main method, launching the server process. Command-line arguments are
-   * listed with the {@code -h} argument.
+   * Main method, launching the server process.
+   * Command-line arguments are listed with the {@code -h} argument.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    if(new BaseXServer(args).failed()) System.exit(1);
+    try {
+      new BaseXServer(args);
+    } catch(final IOException ex) {
+      Util.errln(ex);
+      System.exit(1);
+    }
   }
 
   /**
    * Constructor.
    * @param args command-line arguments
+   * @throws IOException I/O exception
    */
-  public BaseXServer(final String... args) {
+  public BaseXServer(final String... args) throws IOException {
     super(args);
-    if(failed) return;
+    if(stopped) return;
 
     final int port = context.mprop.num(MainProp.SERVERPORT);
     final int eport = context.mprop.num(MainProp.EVENTPORT);
@@ -86,17 +96,14 @@ public class BaseXServer extends Main implements Runnable {
 
     try {
       // execute command-line arguments
-      if(commands != null) {
-        final Boolean b = execute(commands);
-        if(failed(b == null || b)) return;
-      }
+      if(commands != null) execute(commands);
 
       log = new Log(context, quiet);
       log.write(SERVERSTART);
+
       socket = new ServerSocket();
       socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(port));
-
       esocket = new ServerSocket();
       esocket.setReuseAddress(true);
       esocket.bind(new InetSocketAddress(eport));
@@ -117,11 +124,13 @@ public class BaseXServer extends Main implements Runnable {
 
       Util.outln(CONSOLE + (console ? CONSOLE2 : SERVERSTART), SERVERMODE);
 
-      if(console) quit(console());
-    } catch(final Exception ex) {
+      if(console) {
+        console();
+        quit();
+      }
+    } catch(final IOException ex) {
       if(log != null) log.write(ex.getMessage());
-      Util.errln(Util.server(ex));
-      failed = true;
+      throw ex;
     }
   }
 
@@ -135,7 +144,7 @@ public class BaseXServer extends Main implements Runnable {
         final ClientListener cl = new ClientListener(s, context, log);
         if(stop.exists()) {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
-          quit(false);
+          quit();
         } else {
           final byte[] address = s.getInetAddress().getAddress();
           if(cl.init()) {
@@ -165,10 +174,10 @@ public class BaseXServer extends Main implements Runnable {
   }
 
   @Override
-  public void quit(final boolean user) {
+  public void quit() throws IOException {
     if(!running) return;
     running = false;
-    super.quit(user);
+    super.quit();
 
     try {
       // close interactive input if server was stopped by another process
@@ -190,7 +199,7 @@ public class BaseXServer extends Main implements Runnable {
   }
 
   @Override
-  protected boolean parseArguments(final String[] args) {
+  protected void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, SERVERINFO, Util.info(CONSOLE,
         SERVERMODE));
     boolean daemon = false;
@@ -222,36 +231,34 @@ public class BaseXServer extends Main implements Runnable {
           // suppress logging
           quiet = true;
         } else {
-          arg.ok(false);
+          arg.usage();
         }
       } else {
-        arg.ok(false);
         if(arg.string().equalsIgnoreCase("stop")) {
           stop(context.mprop.num(MainProp.SERVERPORT),
               context.mprop.num(MainProp.EVENTPORT));
           Performance.sleep(1000);
-          return false;
+          stopped = true;
+        } else {
+          arg.usage();
         }
       }
     }
+
     if(context.mprop.num(MainProp.SERVERPORT) ==
        context.mprop.num(MainProp.EVENTPORT)) {
-      arg.ok(error(null, SERVERPORTS));
+      throw new BaseXException(SERVERPORTS);
     }
-    return arg.finish();
   }
 
   /**
    * Stops the server of this instance.
+   * @throws IOException I/O exception
    */
-  public void stop() {
-    try {
-      stop.write(Token.EMPTY);
-      new Socket(LOCALHOST, context.mprop.num(MainProp.EVENTPORT));
-      new Socket(LOCALHOST, context.mprop.num(MainProp.SERVERPORT));
-    } catch(final IOException ex) {
-      Util.errln(Util.server(ex));
-    }
+  public void stop() throws IOException {
+    stop.write(Token.EMPTY);
+    new Socket(LOCALHOST, context.mprop.num(MainProp.EVENTPORT));
+    new Socket(LOCALHOST, context.mprop.num(MainProp.SERVERPORT));
   }
 
   // STATIC METHODS ===========================================================
@@ -312,8 +319,9 @@ public class BaseXServer extends Main implements Runnable {
    * Stops the server.
    * @param port server port
    * @param eport event port
+   * @throws IOException I/O exception
    */
-  public static void stop(final int port, final int eport) {
+  public static void stop(final int port, final int eport) throws IOException {
     final IOFile stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
@@ -323,7 +331,7 @@ public class BaseXServer extends Main implements Runnable {
       Util.outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       stop.delete();
-      Util.errln(Util.server(ex));
+      throw ex;
     }
   }
 

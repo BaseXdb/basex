@@ -8,6 +8,8 @@ import java.util.Enumeration;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Check;
@@ -40,22 +42,29 @@ public final class BaseXGUI {
    * An XML document or query file can be specified as argument
    */
   public static void main(final String[] args) {
-    new BaseXGUI(args);
+    try {
+      new BaseXGUI(args);
+    } catch(final BaseXException ex) {
+      Util.errln(ex);
+      System.exit(1);
+    }
   }
 
   /**
    * Constructor.
    * @param args command-line arguments
+   * @throws BaseXException database exception
    */
-  public BaseXGUI(final String[] args) {
-    if(!parseArguments(args)) return;
+  public BaseXGUI(final String[] args) throws BaseXException {
+    parseArguments(args);
 
     // set mac specific properties
     if(Prop.MAC) {
       try {
         osxGUI = new GUIMacOSX();
       } catch(final Exception ex) {
-        Util.errln("Failed to initialize native Mac OS X interface", ex);
+        throw new BaseXException(
+            "Failed to initialize native Mac OS X interface", ex);
       }
     }
 
@@ -122,17 +131,16 @@ public final class BaseXGUI {
   /**
    * Parses the command-line arguments, specified by the user.
    * @param args command-line arguments
-   * @return success flag
+   * @throws BaseXException database exception
    */
-  private boolean parseArguments(final String[] args) {
+  private void parseArguments(final String[] args) throws BaseXException {
     final Args arg = new Args(args, this, GUIINFO, Util.info(CONSOLE, GUIMODE));
     while(arg.more()) {
       if(arg.dash()) {
-        arg.ok(false);
+        arg.usage();
       } else {
         file = file == null ? arg.string() : file + " " + arg.string();
       }
     }
-    return arg.finish();
   }
 }

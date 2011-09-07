@@ -3,6 +3,8 @@ package org.basex.test.server;
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -73,9 +75,12 @@ public final class PermissionTest {
   /** Socket reference. */
   private Session testSession;
 
-  /** Starts the server. */
+  /**
+   * Starts the server.
+   * @throws IOException I/O exception
+   */
   @BeforeClass
-  public static void start() {
+  public static void start() throws IOException {
     server = new BaseXServer("-z");
   }
 
@@ -329,9 +334,12 @@ public final class PermissionTest {
     }
   }
 
-  /** Stops the server. */
+  /**
+   * Stops the server.
+   * @throws IOException I/O exception
+   */
   @AfterClass
-  public static void stop() {
+  public static void stop() throws IOException {
     // stop server instance
     server.stop();
   }
