@@ -2,6 +2,9 @@ package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
+
+import java.io.IOException;
+
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -34,16 +37,15 @@ public final class PoolTest {
   /** Socket reference. */
   static Session session2;
 
-  /** Starts the server. */
+  /**
+   * Starts the server.
+   * @throws Exception exception
+   */
   @BeforeClass
-  public static void start() {
+  public static void start() throws Exception {
     server = new BaseXServer("-z");
-    try {
-      session1 = new ClientSession(server.context, ADMIN, ADMIN);
-      session2 = new ClientSession(server.context, ADMIN, ADMIN);
-    } catch(final Exception ex) {
-      fail(ex.toString());
-    }
+    session1 = new ClientSession(server.context, ADMIN, ADMIN);
+    session2 = new ClientSession(server.context, ADMIN, ADMIN);
   }
 
   /** Create and Drop Tests. */
@@ -83,16 +85,14 @@ public final class PoolTest {
     ok(new DropDB(NAME), session1);
   }
 
-  /** Stops the server. */
+  /**
+   * Stops the server.
+   * @throws IOException I/O exception
+   */
   @AfterClass
-  public static void stop() {
-    try {
-      session1.close();
-      session2.close();
-    } catch(final Exception ex) {
-      fail(ex.toString());
-    }
-    // stop server instance
+  public static void stop() throws IOException {
+    session1.close();
+    session2.close();
     server.stop();
   }
 

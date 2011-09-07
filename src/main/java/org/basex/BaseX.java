@@ -1,13 +1,17 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.basex.core.MainProp;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Main;
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Check;
+import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
 import org.basex.io.in.TextInput;
@@ -41,72 +45,58 @@ public class BaseX extends Main {
   protected String pass;
 
   /**
-   * Main method, launching the standalone console mode.
+   * Main method, launching the standalone mode.
    * Command-line arguments are listed with the {@code -h} argument.
    * @param args command-line arguments
    */
   public static void main(final String... args) {
-    if(new BaseX(args).failed()) System.exit(1);
+    try {
+      new BaseX(args);
+    } catch(final IOException ex) {
+      Util.errln(ex);
+      System.exit(1);
+    }
   }
 
   /**
    * Constructor.
    * @param args command-line arguments
+   * @throws IOException I/O exception
    */
-  public BaseX(final String... args) {
+  public BaseX(final String... args) throws IOException {
     super(args);
-    if(failed) return;
 
-    try {
-      session();
+    // create session to show optional login request
+    session();
 
-      boolean u = false;
-      if(input != null) {
-        if(failed(execute(new Check(input), verbose))) return;
-      }
-
-      if(file != null) {
-        // query file contents
-        context.query = IO.get(file);
-        final String qu = content();
-        failed(qu != null && execute(new XQuery(qu), verbose));
-      } else if(query != null) {
-        // query file contents
-        failed(execute(new XQuery(query), verbose));
-      } else if(commands != null) {
-        // execute command-line arguments
-        final Boolean b = execute(commands);
-        failed(b == null || b);
-      } else {
-        // enter interactive mode
-        Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
-        u = console();
-      }
-      if(failed) return;
-      if(writeProps) context.mprop.write();
-      quit(u);
-    } catch(final IOException ex) {
-      Util.errln(Util.server(ex));
-      failed = true;
+    // open initial document or database
+    if(input != null) {
+      execute(new Check(input), verbose);
     }
-  }
 
-  /**
-   * Reads in a query file and returns the content.
-   * @return file content
-   */
-  private String content() {
-    final IO io = IO.get(file);
-    if(!io.exists()) {
-      Util.errln(INFOERROR + FILEWHICH, file);
+    // open specified file
+    if(file != null) {
+      // query file contents
+      final IO io = IO.get(file);
+      if(!io.exists()) throw new BaseXException(INFOERROR + FILEWHICH, file);
+      query = TextInput.content(io).toString().trim();
+      context.query = io;
+    }
+
+    if(query != null) {
+      // run query
+      execute(new XQuery(query), verbose);
+    } else if(commands != null) {
+      // run command-line arguments
+      execute(commands);
     } else {
-      try {
-        return TextInput.content(io).toString().trim();
-      } catch(final IOException ex) {
-        error(ex, ex.getMessage());
-      }
+      // enter interactive mode
+      Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
+      console();
     }
-    return null;
+
+    if(writeProps) context.mprop.write();
+    quit();
   }
 
   /**
@@ -125,103 +115,103 @@ public class BaseX extends Main {
   }
 
   @Override
-  protected final boolean parseArguments(final String[] args) {
+  protected final void parseArguments(final String[] args) throws IOException {
     final StringBuilder serial = new StringBuilder();
     final StringBuilder bind = new StringBuilder();
-    try {
-      final HashMap<Object[], Object> options = new HashMap<Object[], Object>();
-      final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO,
-          Util.info(CONSOLE, sa() ? LOCALMODE : CLIENTMODE));
-      while(arg.more()) {
-        if(arg.dash()) {
-          final char c = arg.next();
-          if(c == 'b') {
-            // set/add variable binding
-            if(bind.length() != 0) bind.append(',');
-            bind.append(arg.string());
-            options.put(Prop.BINDINGS, bind);
-          } else if(c == 'c') {
-            // specify command to be evaluated
-            commands = arg.remaining();
-          } else if(c == 'd') {
-            // activate debug mode
-            context.mprop.set(MainProp.DEBUG, true);
-          } else if(c == 'D' && sa()) {
-            // hidden option: show dot query graph
-            options.put(Prop.DOTPLAN, true);
-          } else if(c == 'i' && sa()) {
-            // open initial file or database
-            input = arg.string();
-          } else if(c == 'n' && !sa()) {
-            // set server name
-            context.mprop.set(MainProp.HOST, arg.string());
-          } else if(c == 'o') {
-            // specify file for result output
-            out = new PrintOutput(arg.string());
-            if(session != null) session.setOutputStream(out);
-          } else if(c == 'p' && !sa()) {
-            // set server port
-            context.mprop.set(MainProp.PORT, arg.num());
-          } else if(c == 'P' && !sa()) {
-            // specify password
-            pass = arg.string();
-          } else if(c == 'q') {
-            // specify query to be evaluated
-            query = arg.remaining();
-          } else if(c == 'r') {
-            // hidden option: parse number of runs
-            options.put(Prop.RUNS, arg.string());
-          } else if(c == 's') {
-            // set/add serialization parameter
-            if(serial.length() != 0) serial.append(',');
-            serial.append(arg.string());
-            options.put(Prop.SERIALIZER, serial);
-          } else if(c == 'u') {
-            // activate write-back for updates
-            options.put(Prop.WRITEBACK, true);
-          } else if(c == 'U' && !sa()) {
-            // specify user name
-            user = arg.string();
-          } else if(c == 'v') {
-            // show command info
-            verbose = true;
-          } else if(c == 'V') {
-            // show query info
-            verbose = true;
-            options.put(Prop.QUERYINFO, true);
-          } else if(c == 'w') {
-            // activate write-back for updates
-            options.put(Prop.CHOP, false);
-          } else if(c == 'W') {
-            // hidden option: write properties before exit
-            writeProps = true;
-          } else if(c == 'x' && sa()) {
-            // hidden option: show original query plan
-            options.put(Prop.COMPPLAN, false);
-          } else if(c == 'X') {
-            // hidden option: show xml query plan
-            options.put(Prop.XMLPLAN, true);
-            verbose = true;
-          } else if(c == 'z') {
-            // turn off result serialization
-            options.put(Prop.SERIALIZE, false);
-          } else {
-            arg.ok(false);
-          }
-        } else {
-          file = file == null ? arg.string() : file + " " + arg.string();
-        }
-      }
-      console = file == null && commands == null && query == null;
 
-      // set cached options
-      for(final Map.Entry<Object[], Object> entry : options.entrySet()) {
-        if(!arg.ok(set(entry.getKey(), entry.getValue()))) break;
+    final HashMap<Object[], Object> options = new HashMap<Object[], Object>();
+    final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO,
+        Util.info(CONSOLE, sa() ? LOCALMODE : CLIENTMODE));
+    while(arg.more()) {
+      if(arg.dash()) {
+        final char c = arg.next();
+        if(c == 'b') {
+          // set/add variable binding
+          if(bind.length() != 0) bind.append(',');
+          bind.append(arg.string());
+          options.put(Prop.BINDINGS, bind);
+        } else if(c == 'c') {
+          // specify command to be evaluated
+          commands = arg.remaining();
+        } else if(c == 'd') {
+          // activate debug mode
+          context.mprop.set(MainProp.DEBUG, true);
+        } else if(c == 'D' && sa()) {
+          // hidden option: show dot query graph
+          options.put(Prop.DOTPLAN, true);
+        } else if(c == 'i' && sa()) {
+          // open initial file or database
+          input = arg.string();
+        } else if(c == 'n' && !sa()) {
+          // set server name
+          context.mprop.set(MainProp.HOST, arg.string());
+        } else if(c == 'o') {
+          // specify file for result output
+          out = new PrintOutput(arg.string());
+          if(session != null) session.setOutputStream(out);
+        } else if(c == 'p' && !sa()) {
+          // set server port
+          context.mprop.set(MainProp.PORT, arg.num());
+        } else if(c == 'P' && !sa()) {
+          // specify password
+          pass = arg.string();
+        } else if(c == 'q') {
+          // specify query to be evaluated
+          query = arg.remaining();
+        } else if(c == 'r') {
+          // hidden option: parse number of runs
+          options.put(Prop.RUNS, arg.string());
+        } else if(c == 's') {
+          // set/add serialization parameter
+          if(serial.length() != 0) serial.append(',');
+          serial.append(arg.string());
+          options.put(Prop.SERIALIZER, serial);
+        } else if(c == 'u') {
+          // activate write-back for updates
+          options.put(Prop.WRITEBACK, true);
+        } else if(c == 'U' && !sa()) {
+          // specify user name
+          user = arg.string();
+        } else if(c == 'v') {
+          // show command info
+          verbose = true;
+        } else if(c == 'V') {
+          // show query info
+          verbose = true;
+          options.put(Prop.QUERYINFO, true);
+        } else if(c == 'w') {
+          // activate write-back for updates
+          options.put(Prop.CHOP, false);
+        } else if(c == 'W') {
+          // hidden option: write properties before exit
+          writeProps = true;
+        } else if(c == 'x' && sa()) {
+          // hidden option: show original query plan
+          options.put(Prop.COMPPLAN, false);
+        } else if(c == 'X') {
+          // hidden option: show xml query plan
+          options.put(Prop.XMLPLAN, true);
+          verbose = true;
+        } else if(c == 'z') {
+          // turn off result serialization
+          options.put(Prop.SERIALIZE, false);
+        } else {
+          arg.usage();
+        }
+      } else {
+        file = file == null ? arg.string() : file + " " + arg.string();
       }
-      return arg.finish();
-    } catch(final IOException ex) {
-      Util.errln(Util.server(ex));
-      return false;
+    }
+    console = file == null && commands == null && query == null;
+
+    // set cached options
+    for(final Map.Entry<Object[], Object> entry : options.entrySet()) {
+      try {
+        execute(new Set(entry.getKey(), entry.getValue()), false);
+      } catch(final IOException ex) {
+        Util.errln(ex);
+        arg.usage();
+      }
     }
   }
 }

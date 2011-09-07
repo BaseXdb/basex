@@ -16,13 +16,13 @@ public class LocalSessionTest extends SessionTest {
   /** Database context. */
   private static Context context;
 
-  /** Starts the server. */
+  /** Starts the test. */
   @BeforeClass
   public static void startContext() {
     context = new Context();
   }
 
-  /** Stops a session. */
+  /** Stops the test. */
   @AfterClass
   public static void stopContext() {
     context.close();

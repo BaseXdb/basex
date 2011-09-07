@@ -367,7 +367,7 @@ public final class DialogServer extends Dialog {
       }
     } catch(final Exception ex) {
       icon = Msg.ERROR;
-      msg = Util.server(ex);
+      msg = Util.message(ex);
       if(msg.equals(Util.info(PERMNO, CmdPerm.values()[4]))) {
         try {
           cs.execute(new Exit());

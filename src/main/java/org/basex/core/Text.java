@@ -145,12 +145,12 @@ public interface Text {
   /** Start information. */
   String WEBDAVINFO =
     " [-hpruw]" + NL +
-    "  -h<dbhost>  BaseX server host" + NL +
-    "  -r<dbport>  BaseX server port" + NL +
-    "  -u<dbuser>  BaseX user name" + NL +
-    "  -p<dbpass>  BaseX user password" + NL +
-    "  -w<webdavport>  WebDAV server port" + NL +
-    "  -s          Stand-alone: access local databases directly";
+    "  -n<name>    Set server (host) name" + NL +
+    "  -P<dbpass>  Specify user password" + NL +
+    "  -r<num>     Set server port" + NL +
+    "  -s          Start in standalone mode" + NL +
+    "  -U<dbuser>  Specify user name" + NL +
+    "  -w<num>     Set WebDAV server port";
 
   // SERVER ===================================================================
 

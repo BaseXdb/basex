@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import org.basex.core.BaseXException;
+
 /**
  * This class parses command-line arguments.
  *
@@ -16,8 +18,6 @@ public final class Args {
   /** Command-line arguments. */
   private final String args;
 
-  /** OK flag. */
-  private boolean ok = true;
   /** Dash flag. */
   private boolean dash;
   /** Current argument. */
@@ -41,21 +41,11 @@ public final class Args {
   }
 
   /**
-   * Simplified constructor.
-   * @param a arguments
-   * @param o calling object
-   * @param u usage info
-   */
-  public Args(final String[] a, final Object o, final String u) {
-    this(a, o, u, null);
-  }
-
-  /**
    * Checks if more arguments are available.
    * @return result of check
    */
   public boolean more() {
-    while(ok && c < args.length()) {
+    while(c < args.length()) {
       final char ch = args.charAt(c);
       if(ch == ' ') {
         if(dash) dash = false;
@@ -100,10 +90,11 @@ public final class Args {
   /**
    * Returns the next number.
    * @return number as int value
+   * @throws BaseXException database exception
    */
-  public int num() {
+  public int num() throws BaseXException {
     final int i = Token.toInt(string());
-    ok = i != Integer.MIN_VALUE;
+    if(i == Integer.MIN_VALUE) usage();
     return i;
   }
 
@@ -119,25 +110,12 @@ public final class Args {
   }
 
   /**
-   * Combines the specified boolean with the {@link #ok} flag with the AND
-   * operator, and returns the result.
-   * @param o ok flag to be combined
-   * @return resulting ok flag
+   * Throws an exception with the command usage info.
+   * @throws BaseXException database exception
    */
-  public boolean ok(final boolean o) {
-    ok &= o;
-    return ok;
-  }
-
-  /**
-   * Return success flag; if false, print usage message.
-   * @return success flag
-   */
-  public boolean finish() {
-    if(!ok) Util.outln((header != null ? header : "") +
-        "Usage: " + Util.name(obj).toLowerCase() + usage);
-    return ok;
-  }
+  public void usage() throws BaseXException {
+    throw new BaseXException(header +
+        "Usage: " + Util.name(obj).toLowerCase() + usage);  }
 
   @Override
   public String toString() {

@@ -31,7 +31,6 @@ import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
-import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 
@@ -160,7 +159,7 @@ public final class FNSql extends FuncCall {
   private Iter execute(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0].item(ctx, input));
     final Object obj = ctx.jdbc.get(id);
-    if(obj == null) throw Err.NOCONN.thrw(input, id);
+    if(obj == null) throw NOCONN.thrw(input, id);
     // Execute query or prepared statement
     return obj instanceof Connection ?
         executeQuery((Connection) obj, ctx) :
@@ -238,8 +237,7 @@ public final class FNSql extends FuncCall {
       final AxisIter attrs = next.attributes();
       byte[] paramType = null;
       boolean isNull = false;
-      ANode attr;
-      while((attr = attrs.next()) != null) {
+      for(ANode attr; (attr = attrs.next()) != null;) {
         if(eq(attr.nname(), TYPE))
           paramType = attr.atom();
         else if(eq(attr.nname(), NULL))
@@ -325,7 +323,7 @@ public final class FNSql extends FuncCall {
           final String label = metadata.getColumnLabel(k);
           final Object value = rs.getObject(label);
           // Null values are ignored
-          if(value != null) a.add(new FAttr(new QNm(token(label), EMPTY),
+          if(value != null) a.add(new FAttr(new QNm(token(label)),
               token(value.toString())));
         }
         tuples.add(new FElem(Q_TUPLE, null, a, NS_SQL, null));

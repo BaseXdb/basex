@@ -25,15 +25,21 @@ public final class AdminStressTest {
   /** Server reference. */
   static BaseXServer server;
 
-  /** Starts the server. */
+  /**
+   * Starts the server.
+   * @throws IOException I/O exception
+   */
   @BeforeClass
-  public static void start() {
+  public static void start() throws IOException {
     server = new BaseXServer("-z");
   }
 
-  /** Stops the server. */
+  /**
+   * Stops the server.
+   * @throws IOException I/O exception
+   */
   @AfterClass
-  public static void stop() {
+  public static void stop() throws IOException {
     server.stop();
   }
 

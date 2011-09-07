@@ -224,7 +224,7 @@ final class DialogUser extends BaseXBack {
         addUser.requestFocusInWindow();
       }
     } catch(final BaseXException ex) {
-      msg = Util.server(ex);
+      msg = Util.message(ex);
       ok = false;
     }
 

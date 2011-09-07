@@ -3,6 +3,8 @@ package org.basex.test.server;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Commands.CmdIndex;
@@ -79,10 +81,10 @@ public class CommandTest {
   static Session session;
 
   /** Starts the server.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
   */
   @BeforeClass
-  public static void start() throws BaseXException {
+  public static void start() throws IOException {
     session = new LocalSession(CONTEXT);
     cleanUp();
   }

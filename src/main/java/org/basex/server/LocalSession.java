@@ -85,7 +85,9 @@ public final class LocalSession extends Session {
         i.remove();
       }
       execute(new Exit());
-    } catch(final BaseXException ex) { Util.debug(ex); }
+    } catch(final BaseXException ex) {
+      Util.debug(ex);
+    }
   }
 
   @Override

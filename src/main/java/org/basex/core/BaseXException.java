@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import java.io.IOException;
+
 import org.basex.util.Token;
 import org.basex.util.Util;
 
@@ -9,7 +11,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class BaseXException extends Exception {
+public final class BaseXException extends IOException {
   /**
    * Constructs an exception with the specified message and extension.
    * @param s message

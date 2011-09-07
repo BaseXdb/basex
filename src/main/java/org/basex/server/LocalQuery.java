@@ -23,7 +23,7 @@ public class LocalQuery extends Query {
   /** Buffer output; {@code null} if an {@link OutputStream} is specified. */
   private final ByteArrayOutputStream buf;
   /** Iterator flag. */
-  private boolean ready;
+  private boolean more;
   /** Owning local session. */
   private final LocalSession session;
 
@@ -77,7 +77,7 @@ public class LocalQuery extends Query {
   @Override
   public boolean more() throws BaseXException {
     try {
-      ready = true;
+      more = true;
       return qp.next();
     } catch(final Exception ex) {
       throw new BaseXException(ex);
@@ -87,7 +87,7 @@ public class LocalQuery extends Query {
   @Override
   public String next() throws BaseXException {
     try {
-      if(ready) ready = false;
+      if(more) more = false;
       else qp.next();
     } catch(final Exception ex) {
       throw new BaseXException(ex);

@@ -323,7 +323,7 @@ public abstract class Command extends Progress {
       abort();
       return error(PROGERR);
     } catch(final Throwable ex) {
-      // critical, unexpected error
+      // unexpected error
       Performance.gc(2);
       abort();
       if(ex instanceof OutOfMemoryError) {

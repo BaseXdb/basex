@@ -80,7 +80,6 @@ final class QueryListener extends Progress {
    * @throws QueryException query exception
    */
   void init() throws IOException, QueryException {
-    monitored = true;
     try {
       qp.parse();
     } catch(final QueryException ex) {
@@ -88,6 +87,7 @@ final class QueryListener extends Progress {
     } finally {
       try { qp.close(); } catch(final Exception e) { Util.debug(e); }
     }
+    monitored = true;
     ctx.register(qp.ctx.updating);
     xml = qp.getSerializer(out);
     iter = qp.iter();

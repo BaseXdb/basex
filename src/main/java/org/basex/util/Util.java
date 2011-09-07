@@ -120,7 +120,12 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void errln(final Object obj, final Object... ext) {
-    err(obj + NL, ext);
+    if(obj instanceof Exception) {
+      final Exception ex = (Exception) obj;
+      err(message(ex) + NL, ext);
+    } else {
+      err(obj + NL, ext);
+    }
   }
 
   /**
@@ -133,20 +138,20 @@ public final class Util {
   }
 
   /**
-   * Returns a server error message.
-   * @param ex exception reference
+   * Returns a better understandable error message for the specified exception.
+   * @param ex throwable reference
    * @return error message
    */
-  public static String server(final Exception ex) {
+  public static String message(final Exception ex) {
     debug(ex);
+    final String msg = ex.getMessage();
     if(ex instanceof BindException) return SERVERBIND;
     else if(ex instanceof LoginException) return SERVERDENIED;
     else if(ex instanceof ConnectException) return SERVERERROR;
     else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
     else if(ex instanceof SocketException) return SERVERBIND;
-    else if(ex instanceof UnknownHostException)
-      return info(SERVERUNKNOWN, ex.getMessage());
-    return ex.getMessage();
+    else if(ex instanceof UnknownHostException) return info(SERVERUNKNOWN, msg);
+    return msg != null ? msg : ex.toString();
   }
 
   /**
