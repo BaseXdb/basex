@@ -762,6 +762,32 @@ public enum Err {
   UPATTELM2(XUTY, 22, "Insert target must be an element."),
 
   // * EXPath Cryptographic Module Errors
+  /** CX01: Encoding not supported. */
+  CRYPTOCANINV(CX, 1, "Canonicalization algorithm is not supported."),
+  /** CX02: Encoding not supported. */
+  CRYPTODIGINV(CX, 2, "Digest algorithm is not supported."),
+  /** CX03: Encoding not supported. */
+  CRYPTOSIGINV(CX, 3, "Signature algorithm is not supported."),
+  /** CX03: Encoding not supported. */
+  CRYPTOXPINV(CX, 4, "XPath expression is invalid."),
+  /** CX03: Encoding not supported. */
+  CRYPTOINVNM(CX, 5, "Invalid name for $digital-certificate root."),
+  /** CX03: Encoding not supported. */
+  CRYPTOINVCH(CX, 6, "Invalid child element of $digital-certificate."),
+  /** CX03: Encoding not supported. */
+  CRYPTOKSNULL(CX, 7, "Key store is null."),
+  /** CX03: Encoding not supported. */
+  CRYPTOIOERR(CX, 8, "I/O error while reading keystore."),
+  /** CX03: Encoding not supported. */
+  CRYPTOPERMDEN(CX, 9, "Permission denied to read keystore."),
+  /** CX03: Encoding not supported. */
+  CRYPTOKSURLINV(CX, 10, "Keystore URL is invalid."),
+  /** CX03: Encoding not supported. */
+  CRYPTOKSTYPE(CX, 11, "Keystore type is not supported."),
+  /** CX03: Encoding not supported. */
+  CRYPTONOKEY(CX, 12, "Cannot find key for alias in given keystore."),
+  /** CX13: Encoding not supported. */
+  CRYPTOINVHASH(CX, 13, "Hashing algorithm is not supported."),
   /** CX14: Encoding not supported. */
   CRYPTOENC(CX, 14, "The encoding method is not supported."),
   /** CX16: Encoding not supported. */

@@ -1,30 +1,12 @@
 package org.basex.query.func;
 
-import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
-
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
-import org.basex.query.item.Str;
-import org.basex.util.Base64;
+import org.basex.query.util.crypto.DigitalSignature;
+import org.basex.query.util.crypto.Encryption;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * EXPath Cryptographic Module.
@@ -32,15 +14,6 @@ import org.basex.util.Token;
  * @author Lukas Kircher
  */
 public class FNCrypto extends FuncCall {
-
-  /** Token. */
-  private static final byte[] SYM = token("symmetric");
-  /** Token. */
-  private static final byte[] ASYM = token("asymmetric");
-  /** Token. */
-  private static final byte[] BASE64 = token("base64");
-  /** Token. */
-  private static final byte[] HEX = token("hex");
 
   /**
    * Constructor.
@@ -55,123 +28,31 @@ public class FNCrypto extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     switch(def) {
       case HMAC:
-        return hmac(checkStr(expr[0], ctx), checkStr(expr[1], ctx),
-            checkStr(expr[2], ctx), expr.length == 4 ? checkStr(expr[3], ctx)
-                : null, ii);
+        return new Encryption(ii).hmac(checkStr(expr[0], ctx), checkStr(expr[1],
+            ctx), checkStr(expr[2], ctx),
+            expr.length == 4 ? checkStr(expr[3], ctx) : null);
       case ENCRYPT:
-        return encryption(checkStr(expr[0], ctx), checkStr(expr[1], ctx),
-            checkStr(expr[2], ctx), checkStr(expr[3], ctx), true, ii);
+        return new Encryption(ii).encryption(checkStr(expr[0], ctx),
+            checkStr(expr[1], ctx), checkStr(expr[2], ctx),
+            checkStr(expr[3], ctx), true);
       case DECRYPT:
-        return encryption(checkStr(expr[0], ctx), checkStr(expr[1], ctx),
-            checkStr(expr[2], ctx), checkStr(expr[3], ctx), false, ii);
+        return new Encryption(ii).encryption(checkStr(expr[0], ctx),
+            checkStr(expr[1], ctx), checkStr(expr[2], ctx),
+            checkStr(expr[3], ctx), false);
+      case GENSIG:
+        return new DigitalSignature(ii).generateSignature(
+            checkNode(expr[0].item(ctx, ii)), checkStr(expr[1], ctx),
+            checkStr(expr[2], ctx), checkStr(expr[3], ctx),
+            checkStr(expr[4], ctx), checkStr(expr[5], ctx));
+      case VALSIG:
+        return new DigitalSignature(ii).
+            validateSignature(checkNode(expr[0].item(ctx, ii)));
+
       default:
         return super.item(ctx, ii);
     }
-  }
-
-  /**
-   * Encrypts or decrypts the given input.
-   * @param in input
-   * @param encrType encryption type
-   * @param key secret key
-   * @param algo encryption algorithm
-   * @param encrypt encrypt or decrypt
-   * @param ii input info
-   * @return encrypted or decrypted input
-   * @throws QueryException query exception
-   */
-  private Item encryption(final byte[] in, final byte[] encrType,
-      final byte[] key, final byte[] algo, final boolean encrypt,
-      final InputInfo ii) throws QueryException {
- // encryption type must be 'symmetric' or 'asymmetric'
-    if(!eq(encrType, SYM) && !eq(encrType, ASYM))
-      if(encrypt) CRYPTOENCTYP.thrw(ii, encrType);
-      else CRYPTODECTYP.thrw(ii, encrType);
-
-    // [LK] symmetric/asymmetric encryption?
-
-    // transformed input
-    byte[] t = null;
-    try {
-
-      SecretKeySpec keyspec = new SecretKeySpec(key, "DES");
-      IvParameterSpec iv = new IvParameterSpec(new byte[key.length]);
-      // algorithm/mode/padding
-      Cipher cip = Cipher.getInstance("DES/CBC/PKCS5Padding");
-
-      // encrypt/decrypt
-      if(encrypt)
-        cip.init(Cipher.ENCRYPT_MODE, keyspec, iv);
-      else
-        cip.init(Cipher.DECRYPT_MODE, keyspec, iv);
-
-      t = new byte[cip.getOutputSize(in.length)];
-      cip.doFinal(t, cip.update(in, 0, in.length, t, 0));
-
-    } catch(NoSuchPaddingException e) {
-      e.printStackTrace();
-      CRYPTONOPAD.thrw(ii, e);
-    } catch(BadPaddingException e) {
-      e.printStackTrace();
-      CRYPTOBADPAD.thrw(ii, e);
-    } catch(NoSuchAlgorithmException e) {
-      e.printStackTrace();
-      CRYPTOINVALGO.thrw(ii, e);
-    } catch(InvalidKeyException e) {
-      e.printStackTrace();
-      CRYPTOKEYINV.thrw(ii, e);
-      // [LK] how to treat this one?
-    } catch(ShortBufferException e) {
-      e.printStackTrace();
-    } catch(IllegalBlockSizeException e) {
-      e.printStackTrace();
-      CRYPTOILLBLO.thrw(ii, e);
-   // [LK] how to treat this one?
-    } catch(InvalidAlgorithmParameterException e) {
-      e.printStackTrace();
-    }
-
-    return Str.get(t);
-  }
-
-  /**
-   * Creates a message authentication code (MAC) for the given input.
-   * @param msg input
-   * @param key secret key
-   * @param algo encryption algorithm
-   * @param enc encoding
-   * @param ii input info
-   * @return MAC
-   * @throws QueryException query exception
-   */
-  private Item hmac(final byte[] msg, final byte[] key, final byte[] algo,
-      final byte[] enc, final InputInfo ii) throws QueryException {
-
-    // create hash value from input message
-    Key k = new SecretKeySpec(key, string(algo));
-    byte[] hash = null;
-
-    try {
-      Mac mac = Mac.getInstance(string(algo));
-      mac.init(k);
-      hash = mac.doFinal(msg);
-
-    } catch(NoSuchAlgorithmException e) {
-      e.printStackTrace();
-    } catch(InvalidKeyException e) {
-      e.printStackTrace();
-    }
-
-    // convert to specified encoding, base64 as a standard
-    Str hmac = null;
-    if(enc == null || eq(enc, BASE64))
-      hmac = Str.get(Base64.encode(hash));
-    else if(eq(HEX, enc))
-      hmac = Str.get(Token.hex(hash, true));
-    else CRYPTOENC.thrw(ii, enc);
-
-    return Str.get(hmac.toString());
   }
 }
