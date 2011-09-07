@@ -1,6 +1,9 @@
 package org.basex.test.performance;
 
 import static org.basex.core.Text.*;
+
+import java.io.IOException;
+
 import org.basex.BaseXServer;
 import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
@@ -36,10 +39,10 @@ public abstract class Benchmark {
 
   /**
    * Initializes the benchmark.
-   * @throws Exception exception
+   * @throws IOException I/O exception
    */
   @BeforeClass
-  public static void init() throws Exception {
+  public static void init() throws IOException {
     // Check if server is (not) running
     server = !local && !BaseXServer.ping(LOCALHOST,
         CONTEXT.mprop.num(MainProp.SERVERPORT)) ? new BaseXServer("") : null;
@@ -52,11 +55,12 @@ public abstract class Benchmark {
   }
 
   /**
-   * Finishes the benchmark.
+   * Stops the server.
+   * @throws IOException I/O exception
    */
   @AfterClass
-  public static void finish() {
-    if(server != null) server.stop();
+  public static void stop() throws IOException {
+    server.stop();
   }
 
   /**

@@ -155,48 +155,12 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   void run(final String[] args) throws Exception {
-    final Args arg = new Args(args, this,
-        " Test Suite [options] [pat]" + NL +
-        " [pat] perform only tests with the specified pattern" + NL +
-        " -c     print compilation steps" + NL +
-        " -h     show this help" + NL +
-        " -m     minimum conformance" + NL +
-        " -g     <test-group> test group to test" + NL +
-        " -C     run tests depending on current time" + NL +
-        " -p     change path" + NL +
-        " -r     create report" + NL +
-        " -t[ms] list slowest queries" + NL +
-        " -v     verbose output");
-
-    while(arg.more()) {
-      if(arg.dash()) {
-        final char c = arg.next();
-        if(c == 'r') {
-          reporting = true;
-          currTime = true;
-        } else if(c == 'C') {
-          currTime = true;
-        } else if(c == 'c') {
-          compile = true;
-        } else if(c == 'm') {
-          minimum = true;
-        } else if(c == 'g') {
-          group = arg.string();
-        } else if(c == 'p') {
-          path = arg.string() + "/";
-        } else if(c == 't') {
-          timer = arg.num();
-        } else if(c == 'v') {
-          verbose = true;
-        } else {
-          arg.ok(false);
-        }
-      } else {
-        single = arg.string();
-        maxout = Integer.MAX_VALUE;
-      }
+    try {
+      parseArguments(args);
+    } catch(final IOException ex) {
+      Util.errln(ex);
+      System.exit(1);
     }
-    if(!arg.finish()) return;
 
     queries = path + "Queries/XQuery/";
     expected = path + "ExpectedTestResults/";
@@ -828,5 +792,54 @@ public abstract class W3CTS {
    */
   protected boolean updating() {
     return false;
+  }
+
+  /**
+   * Parses the command-line arguments, specified by the user.
+   * @param args command-line arguments
+   * @throws IOException I/O exception
+   */
+  protected final void parseArguments(final String[] args) throws IOException {
+    final Args arg = new Args(args, this,
+        " [options] [pat]" + NL +
+        " [pat] perform only tests with the specified pattern" + NL +
+        " -c     print compilation steps" + NL +
+        " -C     run tests depending on current time" + NL +
+        " -g     <test-group> test group to test" + NL +
+        " -h     show this help" + NL +
+        " -m     minimum conformance" + NL +
+        " -p     change path" + NL +
+        " -r     create report" + NL +
+        " -t[ms] list slowest queries" + NL +
+        " -v     verbose output", Util.info(CONSOLE, Util.name(this)));
+
+    while(arg.more()) {
+      if(arg.dash()) {
+        final char c = arg.next();
+        if(c == 'r') {
+          reporting = true;
+          currTime = true;
+        } else if(c == 'C') {
+          currTime = true;
+        } else if(c == 'c') {
+          compile = true;
+        } else if(c == 'm') {
+          minimum = true;
+        } else if(c == 'g') {
+          group = arg.string();
+        } else if(c == 'p') {
+          path = arg.string() + "/";
+        } else if(c == 't') {
+          timer = arg.num();
+        } else if(c == 'v') {
+          verbose = true;
+        } else {
+          arg.usage();
+        }
+      } else {
+        single = arg.string();
+        maxout = Integer.MAX_VALUE;
+      }
+    }
   }
 }
