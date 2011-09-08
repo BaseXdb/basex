@@ -149,7 +149,6 @@ public final class BaseXClient {
   public void watch(final String name, final EventNotifier notifier)
       throws IOException {
     out.write(10);
-    send(name);
     if(esocket == null) {
       final int eport = Integer.parseInt(receive());
       // initialize event socket
@@ -159,8 +158,11 @@ public final class BaseXClient {
       receive(in, os);
       os.write(0);
       os.flush();
-      listen(esocket.getInputStream());
+      InputStream is = esocket.getInputStream();
+      is.read();
+      listen(is);
     }
+    send(name);
     info = receive();
     if(!ok()) throw new IOException(info);
     notifiers.put(name, notifier);
