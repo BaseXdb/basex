@@ -616,7 +616,7 @@ public enum Function {
   GENSIG(FNCrypto.class,
       "generate-signature" +
       "(node,string,string,string,string,string[,string[,node]])",
-      NOD, -6, NOD, STR, STR, STR, STR, STR, STR_ZO, STR_ZO),
+      NOD, -6, NOD, STR, STR, STR, STR, STR),
   /** Validate signature. */
   VALSIG(FNCrypto.class, "validate-signature(node)", BLN, NOD),
 
