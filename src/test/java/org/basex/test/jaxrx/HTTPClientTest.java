@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.basex.api.jaxrx.JaxRxServer;
+import org.basex.api.BaseXHTTP;
 import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -62,7 +62,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public final class HttpClientTest {
+public final class HTTPClientTest {
   /** Status code. */
   private static final byte[] STATUS = token("status");
   /** Body attribute media-type. */
@@ -72,28 +72,28 @@ public final class HttpClientTest {
 
   /** Database context. */
   static Context context;
-  /** JAX-RX server. */
-  private static JaxRxServer jaxrx;
+  /** HTTP servers. */
+  private static BaseXHTTP http;
 
   /**
    * Prepare test.
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
   @BeforeClass
-  public static void start() throws IOException {
+  public static void start() throws Exception {
     context = new Context();
     context.prop.set(Prop.CACHEQUERY, true);
-    jaxrx = new JaxRxServer("-U" + ADMIN + " -P" + ADMIN + " -z");
+    http = new BaseXHTTP("-c -U" + ADMIN + " -P" + ADMIN + " -z");
   }
 
   /**
    * Finish test.
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
   @AfterClass
-  public static void stop() throws IOException {
+  public static void stop() throws Exception {
     context.close();
-    jaxrx.stop();
+    http.stop();
   }
 
   /**
@@ -631,7 +631,7 @@ public final class HttpClientTest {
   @Test
   public void testWriteFromResource() throws IOException, QueryException {
     // Create a file form which will be read
-    final File f = new File(Prop.TMP + Util.name(HttpClientTest.class));
+    final File f = new File(Prop.TMP + Util.name(HTTPClientTest.class));
     final FileOutputStream out = new FileOutputStream(f);
     out.write(token("test"));
     out.close();

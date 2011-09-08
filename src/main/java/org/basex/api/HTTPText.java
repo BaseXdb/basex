@@ -7,22 +7,14 @@ package org.basex.api;
  * @author Christian Gruen
  */
 public interface HTTPText {
+  /** HTTP String. */
+  String HTTP = "HTTP";
+  /** Configuration: client flag. */
+  String DBCLIENT = "org.basex.client";
   /** Configuration: database user. */
   String DBUSER = "org.basex.user";
   /** Configuration: database user password. */
   String DBPASS = "org.basex.password";
-  /** Configuration: database server port. */
-  String DBPORT = "org.basex.serverport";
-  /** Configuration: client flag. */
-  String DBCLIENT = "org.basex.client";
-
-  /** HTTP String. */
-  String HTTP = "HTTP";
-  /** Configuration: JAX-RX path. */
-  String JAX_RXPATH = "org.basex.jaxrxpath";
   /** Configuration: serializer options. */
   String SERIALIZER = "org.jaxrx.parameter.output";
-
-  /** JAX-RX String. */
-  String JAX_RX = "JAX-RX";
 }

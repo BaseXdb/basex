@@ -1,19 +1,20 @@
 package org.basex.api.jaxrx;
 
-import static org.basex.api.HTTPText.*;
 import static org.jaxrx.core.JaxRxConstants.*;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
-import org.basex.core.Context;
+import org.basex.api.HTTPContext;
+import org.basex.api.HTTPSession;
 import org.basex.data.DataText;
 import org.basex.io.serial.SerializerProp;
-import org.basex.server.LocalSession;
 import org.basex.server.LoginException;
 import org.basex.server.Session;
+import org.basex.util.Base64;
 import org.basex.util.Util;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
@@ -28,14 +29,8 @@ import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
  * @author Christian Gruen
  */
 abstract class BXCode {
-  /** Context used to create local sessions.
-   * A local session will be created if {@link #DBCLIENT} is set
-   * to {@code true}. Please note that no other {@link Context} instance should
-   * be created in parallel. */
-  private static final Context CONTEXT = Boolean.parseBoolean(
-      System.getProperty(DBCLIENT)) ? null : new Context();
   /** Session. */
-  final Session session;
+  protected final Session session;
 
   /**
    * Constructor, creating a new user session.
@@ -43,25 +38,10 @@ abstract class BXCode {
    * credentials.
    */
   BXCode(final ResourcePath path) {
-    session = getSession(path);
-  }
-
-  /**
-   * Creates a new session.
-   * @param path provides authentication information for client sessions
-   * @return a local or client session depending upon properties.
-   */
-  static Session getSession(final ResourcePath path) {
-    if(CONTEXT != null) return new LocalSession(CONTEXT);
-
     try {
-      return JaxRxServer.login(path);
+      session = login(path);
     } catch(final LoginException ex) {
-      final ResponseBuilder rb = new ResponseBuilderImpl();
-      rb.header(HttpHeaders.WWW_AUTHENTICATE, "Basic ");
-      rb.status(401);
-      rb.entity("Username/password is wrong.");
-      throw new JaxRxException(rb.build());
+      throw error("Username/password is wrong.");
     } catch(final Exception ex) {
       Util.stack(ex);
       throw new JaxRxException(ex);
@@ -156,5 +136,58 @@ abstract class BXCode {
           wrap, DataText.YES, DataText.NO).getMessage());
     }
     return ser.replaceAll("^,", "");
+  }
+
+  /**
+   * Logs in and returns a client session.
+   * @param path resource path; may be {@code null}
+   * @return client session
+   * @throws IOException I/O exception
+   */
+  static Session login(final ResourcePath path) throws IOException {
+    final HTTPContext http = HTTPContext.get();
+    final String[] id = updateID(path);
+    final HTTPSession session = http.session(id[0], id[1]);
+    if(!session.valid()) error("No username/password specified.");
+    return session.login();
+  }
+
+  /**
+   * Reads user identity and user credentials from HTTP header.
+   * @param path {@link ResourcePath} instance.
+   * @return login/password combination or {@code null} if no user was
+   *         specified.
+   */
+  private static String[] updateID(final ResourcePath path) {
+    if(path != null) {
+      final HttpHeaders hh = path.getHttpHeaders();
+      final List<String> auth = hh.getRequestHeader(HttpHeaders.AUTHORIZATION);
+
+      if(auth != null) {
+        for(final String value : auth) {
+          final String[] values = value.split(" ");
+          if(values[0].equalsIgnoreCase("basic")) {
+            final String[] cred = Base64.decode(values[1]).split(":", 2);
+            if(cred.length != 2) error("No password specified.");
+            return cred;
+          }
+          throw new JaxRxException(500, "Unsupported authorization mode.");
+        }
+      }
+    }
+    return new String[2];
+  }
+
+  /**
+   * Throws an authentication error.
+   * @param msg error message
+   * @return exception
+   */
+  private static JaxRxException error(final String msg) {
+    final ResponseBuilder rb = new ResponseBuilderImpl();
+    rb.header(HttpHeaders.WWW_AUTHENTICATE, "Basic ");
+    rb.status(401);
+    rb.entity(msg);
+    throw new JaxRxException(rb.build());
   }
 }

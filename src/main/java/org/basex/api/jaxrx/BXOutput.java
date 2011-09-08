@@ -114,9 +114,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       throw new JaxRxException(status(ex), ex.getMessage());
     } finally {
       // close query instance
-      if(cq != null) try {
-        cq.close();
-      } catch(final BaseXException ex) { }
+      if(cq != null) try { cq.close(); } catch(final BaseXException ex) { }
     }
   }
 

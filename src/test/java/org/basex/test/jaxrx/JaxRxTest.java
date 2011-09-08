@@ -15,7 +15,7 @@ import java.net.URL;
 
 import javax.ws.rs.core.HttpHeaders;
 
-import org.basex.api.jaxrx.JaxRxServer;
+import org.basex.api.BaseXHTTP;
 import org.basex.core.Text;
 import org.basex.util.Base64;
 import org.basex.util.Token;
@@ -35,27 +35,27 @@ public final class JaxRxTest {
       + "\"http://jax-rx.sourceforge.net\"/>";
   /** Root path. */
   private static final String ROOT = "http://localhost:8984/basex/jax-rx";
-  /** JAX-RX server. */
-  private static JaxRxServer jaxrx;
+  /** Start servers. */
+  private static BaseXHTTP http;
 
   // INITIALIZERS =============================================================
 
   /**
    * Start server.
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
   @BeforeClass
-  public static void start() throws IOException {
-    jaxrx = new JaxRxServer("-U" + Text.ADMIN + " -P" + Text.ADMIN + " -z");
+  public static void start() throws Exception {
+    http = new BaseXHTTP("-c -U" + Text.ADMIN + " -P" + Text.ADMIN + " -z");
   }
 
   /**
    * Stop server.
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
   @AfterClass
-  public static void stop() throws IOException {
-    jaxrx.stop();
+  public static void stop() throws Exception {
+    http.stop();
   }
 
   // TEST METHODS =============================================================

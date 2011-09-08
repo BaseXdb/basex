@@ -6,6 +6,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 
 import org.basex.BaseXServer;
+import org.basex.api.jaxrx.JaxRxServer;
 import org.basex.api.webdav.WebDAVServer;
 import org.basex.core.MainProp;
 import org.basex.core.Prop;
@@ -25,6 +26,8 @@ public final class BaseXHTTP {
   private BaseXServer server;
   /** WebDAV server. */
   private WebDAVServer webdav;
+  /** JAX-RX server. */
+  private JaxRxServer jaxrx;
   /** Quiet flag. */
   private boolean quiet;
   /** Stopped flag. */
@@ -60,7 +63,7 @@ public final class BaseXHTTP {
 
     if(http.client) server = new BaseXServer(http.context, quiet ? "-z" : "");
     webdav = new WebDAVServer(http);
-    //jaxrx = new JaxRxServer(http);
+    jaxrx = new JaxRxServer(http);
   }
 
   /**
@@ -69,6 +72,7 @@ public final class BaseXHTTP {
    */
   public void stop() throws Exception {
     if(webdav != null) webdav.stop();
+    if(jaxrx != null) jaxrx.stop();
     if(server != null) server.quit();
   }
 
@@ -90,14 +94,13 @@ public final class BaseXHTTP {
   protected void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
     final StringBuilder serial = new StringBuilder();
-    final MainProp mprop = http.context.mprop;
 
+    final MainProp mprop = http.context.mprop;
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
         switch(c) {
           case 'c':
-            http.client = true;
             System.setProperty(DBCLIENT, Boolean.TRUE.toString());
             break;
           case 'd':
@@ -116,7 +119,6 @@ public final class BaseXHTTP {
             final int p = arg.num();
             mprop.set(MainProp.PORT, p);
             mprop.set(MainProp.SERVERPORT, p);
-            System.setProperty(DBPORT, Integer.toString(p));
             break;
           case 'P':
             System.setProperty(DBPASS, arg.string());
@@ -148,5 +150,6 @@ public final class BaseXHTTP {
     if(serial.length() != 0) {
       http.context.prop.set(Prop.SERIALIZER, serial.toString());
     }
+    http.update();
   }
 }

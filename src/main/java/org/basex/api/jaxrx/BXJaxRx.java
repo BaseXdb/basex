@@ -1,6 +1,5 @@
 package org.basex.api.jaxrx;
 
-import static org.basex.api.HTTPText.*;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.jaxrx.core.JaxRxConstants.*;
@@ -11,7 +10,9 @@ import java.util.HashSet;
 
 import javax.ws.rs.core.StreamingOutput;
 
+import org.basex.api.HTTPContext;
 import org.basex.core.BaseXException;
+import org.basex.core.MainProp;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.List;
@@ -108,7 +109,8 @@ public final class BXJaxRx implements JaxRx {
       @Override
       String code() {
         // get root directory for files
-        final String root = System.getProperty(JAX_RXPATH) + '/';
+        final HTTPContext http = HTTPContext.get();
+        final String root = http.context.mprop.get(MainProp.JAXRXPATH) + '/';
         final IO io = IO.get(root + file.trim());
 
         // file not found...

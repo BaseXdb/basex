@@ -11,6 +11,9 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
 /**
  * Code container.
  * @param <E> return type
+ *
+ * @author BaseX Team 2005-11, BSD License
+ * @author Christian Gruen
  */
 public abstract class BXCode<E> {
   /** Resource. */
@@ -24,19 +27,6 @@ public abstract class BXCode<E> {
    */
   public BXCode(final BXResource res) {
     resource = res;
-  }
-
-  /**
-   * Runs the contained code.
-   * @return result
-   */
-  public E evalNoEx() {
-    try {
-      return eval();
-    } catch(final BadRequestException ex) {
-      Util.errln(ex);
-      return null;
-    }
   }
 
   /**
@@ -61,7 +51,20 @@ public abstract class BXCode<E> {
   }
 
   /**
-   * Method to run.
+   * Runs the contained code, throwing no exception.
+   * @return result
+   */
+  public E evalNoEx() {
+    try {
+      return eval();
+    } catch(final BadRequestException ex) {
+      Util.errln(ex);
+      return null;
+    }
+  }
+
+  /**
+   * Method to run, returning some output.
    * @return result
    * @throws IOException I/O exception
    */

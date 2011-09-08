@@ -37,8 +37,8 @@ public class BXResourceFactory implements ResourceFactory {
     final Auth a = HttpManager.request().getAuthorization();
     final String user = a != null ? a.getUser() : null;
     final String pass = a != null ? a.getPassword() : null;
-    final HTTPSession session = new HTTPSession(http, user, pass);
-    if(session.user == null) return NOAUTH;
+    final HTTPSession session = http.session(user, pass);
+    if(!session.valid()) return NOAUTH;
 
     final Path path = Path.path(dbpath);
     // the root is requested

@@ -1,6 +1,5 @@
 package org.basex.api;
 
-import static org.basex.api.HTTPText.*;
 import java.io.IOException;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
@@ -26,12 +25,10 @@ public final class HTTPSession {
    * @param u user
    * @param p password
    */
-  public HTTPSession(final HTTPContext ht, final String u, final String p) {
+  HTTPSession(final HTTPContext ht, final String u, final String p) {
     http = ht;
-    final String su = System.getProperty(DBUSER);
-    final String sp = System.getProperty(DBPASS);
-    user = su != null ? su : u;
-    pass = sp != null ? sp : p;
+    user = http.user != null ? http.user : u;
+    pass = http.pass != null ? http.pass : p;
   }
 
   /**
@@ -51,5 +48,13 @@ public final class HTTPSession {
 
     return http.client ? new ClientSession(http.context, user, pass) :
       new LocalSession(http.context);
+  }
+
+  /**
+   * Checks if username and password is specified.
+   * @return result of check
+   */
+  public boolean valid() {
+    return user != null && pass != null;
   }
 }
