@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
+
+import org.basex.api.HTTPSession;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -30,13 +32,11 @@ public class BXDocument extends BXAbstractResource implements FileResource {
    * Constructor.
    * @param dbname name of database this document belongs to.
    * @param docpath document path to root
-   * @param f resource factory
-   * @param u user name
-   * @param p password
+   * @param s current session
    */
   public BXDocument(final String dbname, final String docpath,
-      final BXResourceFactory f, final String u, final String p) {
-    super(dbname, docpath, f, u, p);
+      final HTTPSession s) {
+    super(dbname, docpath, s);
   }
 
   @Override
@@ -76,7 +76,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       throws IOException, NotAuthorizedException, BadRequestException {
     Session s = null;
     try {
-      s = factory.login(user, pass);
+      s = session.login();
       s.setOutputStream(out);
       final Query q = s.query("collection($path)");
       q.bind("$path", db + SEP + path);

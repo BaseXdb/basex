@@ -1,19 +1,13 @@
 package org.basex.api.webdav;
 
-import static org.basex.core.Text.*;
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.basex.core.Main;
+import org.basex.api.HTTPContext;
 import org.basex.core.MainProp;
-import org.basex.core.Text;
-import org.basex.server.Session;
-import org.basex.util.Args;
-import org.basex.util.Util;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
@@ -31,51 +25,18 @@ import com.bradmcevoy.http.Response;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class WebDAVServer extends Main {
-  /** Configuration: database user. */
-  static final String DBUSER = "org.basex.user";
-  /** Configuration: database user password. */
-  static final String DBPASS = "org.basex.password";
-  /** Configuration: database server host. */
-  static final String DBHOST = "org.basex.serverhost";
-  /** Configuration: database server port. */
-  static final String DBPORT = "org.basex.serverport";
-  /** Configuration: WebDAV server port. */
-  static final String WEBDAVPORT = "org.basex.webdavport";
-  /** WebDAV String. */
-  static final String WEBDAV = "WebDAV";
-
+public final class WebDAVServer {
   /** HTTP server. */
-  private Server jetty;
-  /** Stand-alone flag: no remote BaseX server. */
-  private boolean standalone = true;
-
-  /**
-   * Main method, launching the WebDAV implementation.
-   * Command-line arguments are listed with the {@code -h} argument.
-   * @param args command-line arguments
-   */
-  public static void main(final String[] args) {
-    try {
-      new WebDAVServer(args);
-    } catch(final IOException ex) {
-      Util.errln(ex);
-      System.exit(1);
-    }
-  }
+  private final Server jetty;
 
   /**
    * Constructor.
-   * @param args command-line arguments
-   * @throws IOException I/O exception
+   * @param http HTTP context
+   * @throws Exception exception
    */
-  public WebDAVServer(final String... args) throws IOException {
-    super(args);
+  public WebDAVServer(final HTTPContext http) throws Exception {
+    final HttpManager m = new HttpManager(new BXResourceFactory(http));
 
-    set(DBHOST, context.mprop.get(MainProp.HOST));
-    set(DBPORT, Integer.toString(context.mprop.num(MainProp.SERVERPORT)));
-
-    final HttpManager m = new HttpManager(new BXResourceFactory(standalone));
     final Handler h = new AbstractHandler() {
       @Override
       public void handle(final String target, final HttpServletRequest request,
@@ -94,61 +55,16 @@ public final class WebDAVServer extends Main {
       }
     };
 
-    final String p = System.getProperty(WEBDAVPORT);
-    final int port = p == null ? context.mprop.num(MainProp.WEBDAVPORT) :
-      Integer.parseInt(p);
-
-    jetty = new Server(port);
+    jetty = new Server(http.context.mprop.num(MainProp.WEBDAVPORT));
     jetty.setHandler(h);
-    try {
-      jetty.start();
-    } catch(final Exception ex) {
-      Util.errln(ex);
-    }
-  }
-
-  /**
-   * Store a configuration property as a system property.
-   * @param k property key
-   * @param v property value
-   */
-  private static void set(final String k, final String v) {
-    if(System.getProperty(k) == null) System.setProperty(k, v);
+    jetty.start();
   }
 
   /**
    * Stops the server.
+   * @throws Exception exception
    */
-  public void stop() {
-    try {
-      jetty.stop();
-    } catch(final Exception ex) {
-      Util.errln(ex);
-    }
-  }
-
-  @Override
-  protected Session session() { return null; }
-
-  @Override
-  protected void parseArguments(final String[] args) throws IOException {
-    final Args arg = new Args(args, this, Text.WEBDAVINFO,
-        Util.info(CONSOLE, WEBDAV));
-    while(arg.more()) {
-      if(arg.dash()) {
-        final char c = arg.next();
-        switch(c) {
-          case 'n': set(DBHOST, arg.string()); break;
-          case 'P': set(DBPASS, arg.string()); break;
-          case 'r': set(DBPORT, arg.string()); break;
-          case 's': standalone = true; break;
-          case 'U': set(DBUSER, arg.string()); break;
-          case 'w': set(WEBDAVPORT, arg.string()); break;
-          default: arg.usage();
-        }
-      } else {
-        arg.usage();
-      }
-    }
+  public void stop() throws Exception {
+    jetty.stop();
   }
 }

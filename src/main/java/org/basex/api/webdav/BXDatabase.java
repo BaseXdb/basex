@@ -3,6 +3,8 @@ package org.basex.api.webdav;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.basex.api.HTTPSession;
 import org.basex.core.BaseXException;
 import org.basex.core.Text;
 import org.basex.core.cmd.AlterDB;
@@ -27,20 +29,17 @@ public class BXDatabase extends BXFolder {
   /**
    * Constructor.
    * @param dbname database name
-   * @param f resource factory
-   * @param u user name
-   * @param p user password
+   * @param s current session
    */
-  public BXDatabase(final String dbname, final BXResourceFactory f,
-      final String u, final String p) {
-    super(dbname, "", f, u, p);
+  public BXDatabase(final String dbname, final HTTPSession s) {
+    super(dbname, "", s);
   }
 
   @Override
   public Date getModifiedDate() {
     try {
       final String info;
-      final Session s = factory.login(user, pass);
+      final Session s = session.login();
       try {
         final Query q = s.query("db:info($p)");
         q.bind("$p", db);

@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import org.basex.api.HTTPSession;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -38,13 +40,11 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
    * Constructor.
    * @param dbname database name
    * @param folderPath path to folder
-   * @param f resource factory
-   * @param u user name
-   * @param p password
+   * @param s current session
    */
   public BXFolder(final String dbname, final String folderPath,
-      final BXResourceFactory f, final String u, final String p) {
-    super(dbname, folderPath, f, u, p);
+      final HTTPSession s) {
+    super(dbname, folderPath, s);
   }
 
   @Override
@@ -83,7 +83,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     ConflictException, NotAuthorizedException, BadRequestException {
     Session s = null;
     try {
-      s = factory.login(user, pass);
+      s = session.login();
       s.execute(new Open(db));
       final String doc = path.isEmpty() ? newName : path + SEP + newName;
       // check if document with this path already exists
@@ -95,7 +95,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       }
       s.execute(new Close());
 
-      return new BXDocument(db, doc, factory, user, pass);
+      return new BXDocument(db, doc, session);
     } catch(final Exception ex) {
       handle(ex);
       throw new BadRequestException(this, ex.getMessage());
@@ -109,13 +109,13 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     NotAuthorizedException, ConflictException, BadRequestException {
     Session s = null;
     try {
-      s = factory.login(user, pass);
+      s = session.login();
       // [DP] WebDAV: possible optimization would be to rename the dummy, if
       // the current folder is empty (which not always the case)
       deleteDummy(s, db, path);
       final String newFolder = path + SEP + folder;
       createDummy(s, db, newFolder);
-      return new BXFolder(db, newFolder, factory, user, pass);
+      return new BXFolder(db, newFolder, session);
     } catch(final Exception ex) {
       handle(ex);
       throw new BadRequestException(this, ex.getMessage());
@@ -127,9 +127,9 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   @Override
   public Resource child(final String childName) {
     try {
-      final Session s = factory.login(user, pass);
+      final Session s = session.login();
       try {
-        return factory.resource(s, db, path + SEP + childName, user, pass);
+        return resource(s, db, path + SEP + childName, session);
       } finally {
         s.close();
       }
@@ -144,7 +144,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     final List<BXResource> ch = new ArrayList<BXResource>();
     final HashSet<String> paths = new HashSet<String>();
     try {
-      final Session s = factory.login(user, pass);
+      final Session s = session.login();
       try {
         final Query q = s.query(
             "for $r in db:list($d, $p) return substring-after($r,$p)");
@@ -156,12 +156,12 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
           // check if document or folder
           if(ix < 0) {
             if(!p.equals(DUMMY))
-              ch.add(new BXDocument(db, path + SEP + p, factory, user, pass));
+              ch.add(new BXDocument(db, path + SEP + p, session));
           } else {
             final String folder = path + SEP + p.substring(0, ix);
             if(!paths.contains(folder)) {
               paths.add(folder);
-              ch.add(new BXFolder(db, folder, factory, user, pass));
+              ch.add(new BXFolder(db, folder, session));
             }
           }
         }

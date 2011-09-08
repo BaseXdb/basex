@@ -1,6 +1,8 @@
 package org.basex.api.webdav;
 
 import java.io.IOException;
+
+import org.basex.api.HTTPSession;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
@@ -29,15 +31,11 @@ public abstract class BXAbstractResource extends BXResource implements
    * Constructor.
    * @param dbname database name
    * @param folderPath path to folder
-   * @param f resource factory
-   * @param u user name
-   * @param p password
+   * @param s current session
    */
   public BXAbstractResource(final String dbname, final String folderPath,
-      final BXResourceFactory f, final String u, final String p) {
-    super(dbname, folderPath, f);
-    user = u;
-    pass = p;
+      final HTTPSession s) {
+    super(dbname, folderPath, s);
   }
 
   @Override
@@ -45,7 +43,7 @@ public abstract class BXAbstractResource extends BXResource implements
     BadRequestException {
     Session s = null;
     try {
-      s = factory.login(user, pass);
+      s = session.login();
       delete(s);
     } catch(final Exception ex) {
       handle(ex);
@@ -60,7 +58,7 @@ public abstract class BXAbstractResource extends BXResource implements
     NotAuthorizedException, BadRequestException, ConflictException {
     Session s = null;
     try {
-      s = factory.login(user, pass);
+      s = session.login();
       if(target instanceof BXAllDatabasesResource)
         copyToRoot(s, name);
       else if(target instanceof BXFolder)
@@ -78,7 +76,7 @@ public abstract class BXAbstractResource extends BXResource implements
     ConflictException, NotAuthorizedException, BadRequestException {
     Session s = null;
     try {
-      s = factory.login(user, pass);
+      s = session.login();
       if(target instanceof BXAllDatabasesResource)
         moveToRoot(s, name);
       else if(target instanceof BXFolder)

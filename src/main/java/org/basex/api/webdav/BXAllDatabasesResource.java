@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.basex.api.HTTPSession;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.server.Session;
@@ -30,15 +32,10 @@ public class BXAllDatabasesResource extends BXResource implements
     FolderResource {
   /**
    * Constructor.
-   * @param f resource factory
-   * @param u user name
-   * @param p password
+   * @param s current session
    */
-  public BXAllDatabasesResource(final BXResourceFactory f, final String u,
-      final String p) {
-    super(null, null, f);
-    user = u;
-    pass = p;
+  public BXAllDatabasesResource(final HTTPSession s) {
+    super(null, null, s);
   }
 
   @Override
@@ -49,10 +46,10 @@ public class BXAllDatabasesResource extends BXResource implements
   @Override
   public Resource child(final String childName) {
     try {
-      final Session cs = factory.login(user, pass);
+      final Session cs = session.login();
       try {
         return listDbs(cs).contains(childName) ?
-            new BXDatabase(childName, factory, user, pass) : null;
+            new BXDatabase(childName, session) : null;
       } finally {
         cs.close();
       }
@@ -66,10 +63,10 @@ public class BXAllDatabasesResource extends BXResource implements
   public List<? extends Resource> getChildren() {
     try {
       final List<BXResource> dbs = new ArrayList<BXResource>();
-      final Session s = factory.login(user, pass);
+      final Session s = session.login();
       try {
         for(final String d : listDbs(s))
-          dbs.add(new BXDatabase(d, factory, user, pass));
+          dbs.add(new BXDatabase(d, session));
         return dbs;
       } finally {
         s.close();
@@ -85,9 +82,9 @@ public class BXAllDatabasesResource extends BXResource implements
     NotAuthorizedException, ConflictException, BadRequestException {
     Session s = null;
     try {
-      s = factory.login(user, pass);
+      s = session.login();
       s.execute(new CreateDB(dbname(newName)));
-      return new BXDatabase(newName, factory, user, pass);
+      return new BXDatabase(newName, session);
     } catch(final Exception ex) {
       handle(ex);
       throw new BadRequestException(this, ex.getMessage());
@@ -102,11 +99,11 @@ public class BXAllDatabasesResource extends BXResource implements
       ConflictException, NotAuthorizedException, BadRequestException {
     Session s = null;
     try {
-      s = factory.login(user, pass);
+      s = session.login();
       final String dbname = dbname(newName);
       s.create(dbname, inputStream);
       s.execute(new Close());
-      return new BXDatabase(dbname, factory, user, pass);
+      return new BXDatabase(dbname, session);
     } catch(final Exception ex) {
       handle(ex);
       throw new BadRequestException(this, ex.getMessage());

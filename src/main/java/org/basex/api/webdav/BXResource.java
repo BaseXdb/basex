@@ -3,6 +3,8 @@ package org.basex.api.webdav;
 import static java.lang.Integer.*;
 
 import java.util.Date;
+
+import org.basex.api.HTTPSession;
 import org.basex.core.BaseXException;
 import org.basex.core.Text;
 import org.basex.core.cmd.Add;
@@ -44,19 +46,19 @@ public abstract class BXResource implements Resource {
   protected final String db;
   /** Resource path (without leading '/'). */
   protected final String path;
-  /** Reference to the resource factory. */
-  protected final BXResourceFactory factory;
+  /** Information on current session. */
+  protected final HTTPSession session;
 
   /**
    * Constructor.
    * @param d database name
    * @param p resource path
-   * @param f resource factory
+   * @param s current session
    */
-  public BXResource(final String d, final String p, final BXResourceFactory f) {
+  public BXResource(final String d, final String p, final HTTPSession s) {
     db = d;
     path = stripLeadingSlash(p);
-    factory = f;
+    session = s;
   }
 
   @Override
@@ -232,5 +234,24 @@ public abstract class BXResource implements Resource {
     s.execute(new Add(DUMMYCONTENT, DUMMY, p));
     s.execute(new Close());
     return true;
+  }
+
+  /**
+   * Create a folder or document resource.
+   * @param s active client session
+   * @param db database name
+   * @param path resource path
+   * @param hs current session
+   * @return requested resource or {@code null} if it does not exist
+   * @throws BaseXException query exception
+   */
+  static Resource resource(final Session s, final String db, final String path,
+      final HTTPSession hs) throws BaseXException {
+    // check if there is a document in the collection having this path
+    if(exists(s, db, path)) return new BXDocument(db, path, hs);
+
+    // check if there are paths in the collection starting with this path
+    if(count(s, db, path) > 0) return new BXFolder(db, path, hs);
+    return null;
   }
 }
