@@ -48,14 +48,7 @@ import org.basex.util.hash.TokenObjMap;
  * @author Rositsa Shadura
  */
 public final class FNSql extends FuncCall {
-  /** Element row. */
-  private static final byte[] ROW = token("sql:row");
-  /** Element: column. */
-  private static final byte[] COLUMN = token("sql:column");
-  /** Attribute: name*/
-  private static final byte[] NAME = token("name");
-  /** parameter attribute: type. */
-  private static final byte[] TYPE = token("type");
+  /** Types. */
   /** Type int. */
   private static final byte[] INT = AtomType.INT.nam();
   /** Type string. */
@@ -74,24 +67,36 @@ public final class FNSql extends FuncCall {
   private static final byte[] TIME = AtomType.TIM.nam();
   /** Type timestamp. */
   private static final byte[] TIMESTAMP = token("timestamp");
+
+  /** Names. */
   /** Row. */
-  private static final QNm Q_ROW = new QNm(ROW, SQLURI);
+  private static final QNm Q_ROW = new QNm(token("sql:row"), SQLURI);
   /** Column. */
-  private static final QNm Q_COLUMN = new QNm(COLUMN, SQLURI);
-  /** Attribute name. */
-  private static final QNm Q_NAME = new QNm(NAME, EMPTY) ;
-  /** SQL Namespace attribute. */
-  private static final Atts NS_SQL = new Atts().add(SQL, SQLURI);
-  /** Util namespace. */
-  private static final Uri U_SQL = Uri.uri(SQLURI);
-  /** Element: options. */
-  private static final QNm E_OPS = new QNm(token("options"), U_SQL);
+  private static final QNm Q_COLUMN = new QNm(token("sql:column"), SQLURI);
+  /** Name. */
+  private static final QNm Q_NAME = new QNm(token("name"), EMPTY);
+
+  /** Elements. */
+  /** <sql:options/>. */
+  private static final QNm E_OPS = new QNm(token("options"), SQLURI);
+  /** <sql:parameters/>. */
+  private static final QNm E_PARAMS = new QNm(token("parameters"), SQLURI);
+  /** <sql:parameter/>. */
+  private static final QNm E_PARAM = new QNm(token("parameter"), SQLURI);
+
+  /** Connection options. */
   /** Auto-commit mode. */
-  private static final byte[] AUTO_COMM = token("auto-commit");
+  private static final byte[] AUTO_COMM = token("autocommit");
   /** User. */
   private static final String USER = "user";
   /** Password. */
   private static final String PASS = "password";
+
+  /** Other. */
+  /** SQL Namespace attribute. */
+  private static final Atts NS_SQL = new Atts().add(SQL, SQLURI);
+  /** Attribute "type" of <sql:parameter/>. */
+  private static final byte[] TYPE = token("type");
 
   /**
    * Constructor.
@@ -183,7 +188,7 @@ public final class FNSql extends FuncCall {
   }
 
   /**
-   * Sets connection options.
+   * Parses connection options.
    * @param options options
    * @return connection properties
    */
@@ -207,7 +212,7 @@ public final class FNSql extends FuncCall {
     // Prepared statement
     final byte[] prepStmt = checkStr(expr[1], ctx);
     try {
-      // Keep prepared statement in depot
+      // Keep prepared statement
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
       return Itr.get(ctx.jdbc.add(prep));
     } catch(final SQLException ex) {
@@ -259,10 +264,10 @@ public final class FNSql extends FuncCall {
    */
   private NodeCache executePrepStmt(final PreparedStatement stmt,
       final QueryContext ctx) throws QueryException {
-
     // Get parameters for prepared statement
     final ANode params = (ANode) checkType(expr[1].item(ctx, input),
         NodeType.ELM);
+    if(!params.qname().eq(E_PARAMS)) PARWHICH.thrw(input, params.qname());
     try {
       final int placeCount = stmt.getParameterMetaData().getParameterCount();
       // Check if number of parameters equals number of place holders
@@ -276,8 +281,8 @@ public final class FNSql extends FuncCall {
   }
 
   /**
-   * Counts the numbers of <parameter/> elements.
-   * @param params element <param/>
+   * Counts the numbers of <sql:parameter/> elements.
+   * @param params element <sql:parameter/>
    * @return number of parameters
    */
   private long countParams(final ANode params) {
@@ -297,16 +302,20 @@ public final class FNSql extends FuncCall {
    */
   private void setParameters(final AxisMoreIter params,
       final PreparedStatement stmt) throws QueryException {
-
     int i = 0;
     for(ANode next; (next = params.next()) != null;) {
+      // Check name
+      if(!next.qname().eq(E_PARAM)) PARWHICH.thrw(input, next.qname());
       final AxisIter attrs = next.attributes();
       byte[] paramType = null;
       boolean isNull = false;
       for(ANode attr; (attr = attrs.next()) != null;) {
+        // Attribute "type"
         if(eq(attr.nname(), TYPE)) paramType = attr.atom();
+        // Attribute "null"
         else if(eq(attr.nname(), NULL)) isNull = attr.atom() != null
             && Bln.parse(attr.atom(), input);
+        // Not expected attribute
         else throw NOTEXPATTR.thrw(input, string(attr.nname()));
       }
       if(paramType == null) NOPARAMTYPE.thrw(input);
@@ -328,7 +337,6 @@ public final class FNSql extends FuncCall {
   private void setParam(final int index, final PreparedStatement stmt,
       final byte[] paramType, final String value, final boolean isNull)
       throws QueryException {
-
     try {
       if(eq(BOOL, paramType)) {
         if(isNull) stmt.setNull(index, Types.BOOLEAN);
@@ -396,7 +404,7 @@ public final class FNSql extends FuncCall {
             final NodeCache ch = new NodeCache();
             ch.add(columnValue);
             // Element <sql:column name='...'>...</sql:column>
-            columns.add(new FElem(Q_ROW, ch, attr, NS_SQL, null));
+            columns.add(new FElem(Q_COLUMN, ch, attr, NS_SQL, null));
           }
         }
         rows.add(new FElem(Q_ROW, columns, null, NS_SQL, null));
@@ -462,7 +470,6 @@ public final class FNSql extends FuncCall {
    */
   private Connection connection(final QueryContext ctx, final boolean del)
       throws QueryException {
-
     final int id = (int) checkItr(expr[0].item(ctx, input));
     final Object obj = ctx.jdbc.get(id);
     if(obj == null || !(obj instanceof Connection)) NOCONN.thrw(input, id);
@@ -502,7 +509,7 @@ public final class FNSql extends FuncCall {
     final AxisIter ai = node.children();
     while((node = ai.next()) != null) {
       final QNm qn = node.qname();
-      if(!qn.uri().eq(U_SQL)) PARWHICH.thrw(input, qn);
+      if(!qn.uri().eq(Uri.uri(SQLURI))) PARWHICH.thrw(input, qn);
       tm.add(qn.ln(), node.children().next());
     }
     return tm;
