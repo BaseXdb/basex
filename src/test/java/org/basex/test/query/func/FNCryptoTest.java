@@ -2,7 +2,6 @@ package org.basex.test.query.func;
 
 import org.basex.test.query.AdvancedQueryTest;
 import org.junit.Test;
-import static org.basex.util.Token.*;
 
 /**
  * This class tests the functions of the EXPath Cryptographic module.
@@ -33,4 +32,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "c:hmac('message','key','hmacMd5', 'hex')",
         "\"4E4748E62B463521F6775FBF921234B5\"");
   }
+
+  // ADDITIONAL TESTS
+
+  /*declare namespace c = 'http://expath.org/ns/crypto';
+  c:generate-signature(/n,'','','','','')*/
 }
