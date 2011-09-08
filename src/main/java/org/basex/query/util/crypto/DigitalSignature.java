@@ -46,6 +46,7 @@ import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
 import org.basex.util.InputInfo;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
@@ -152,10 +153,13 @@ public final class DigitalSignature {
 
       // enveloped certificate
       final BXNode bxnode = node.toJava();
-      final DOMSignContext dsc = new DOMSignContext(pk, bxnode);
+      final Node nnode = (Node) bxnode;
+      final DOMSignContext dsc = new DOMSignContext(pk, nnode);
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
       xmlsig.sign(dsc);
-      signedNode = NodeType.NOD.e(bxnode, input);
+      signedNode = NodeType.NOD.e(nnode, input);
+      
+      // use streams instead. DocumentBuilderFactory(node.serialize)
 
     } catch(NoSuchAlgorithmException e) {
       e.printStackTrace();
