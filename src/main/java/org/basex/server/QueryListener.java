@@ -16,7 +16,6 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
 
 /**
  * Server-side query session in the client-server architecture.
@@ -82,10 +81,8 @@ final class QueryListener extends Progress {
   void init() throws IOException, QueryException {
     try {
       qp.parse();
-    } catch(final QueryException ex) {
-      throw ex;
     } finally {
-      try { qp.close(); } catch(final Exception e) { Util.debug(e); }
+      qp.close();
     }
     monitored = true;
     ctx.register(qp.ctx.updating);

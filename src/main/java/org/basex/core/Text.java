@@ -144,7 +144,7 @@ public interface Text {
 
   /** HTTP information. */
   String HTTPINFO =
-    " [-cjnpPsSUz] [stop]" + NL +
+    " [-cdejnpPsSUwz] [stop]" + NL +
     "  stop      Stop existing server" + NL +
     "  -c        Start in client/server mode" + NL +
     "  -d        Activate debugging mode" + NL +
@@ -153,7 +153,7 @@ public interface Text {
     "  -n<name>  Set server (host) name" + NL +
     "  -p<num>   Set database server port" + NL +
     "  -P<pass>  Specify user password" + NL +
-    "  -s        Start as service" + NL +
+    "  -s        Start database as service" + NL +
     "  -S<pars>  Set serialization parameter(s)" + NL +
     "  -U<name>  Specify user name" + NL +
     "  -w<num>   Set WebDAV server port" + NL +

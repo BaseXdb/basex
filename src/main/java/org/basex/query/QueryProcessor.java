@@ -255,7 +255,7 @@ public final class QueryProcessor extends Progress {
       ctx.props = null;
     }
     // close all connections to relational databases
-    ctx.jdbc.closeAll();
+    ctx.jdbc.close();
   }
 
   /**
