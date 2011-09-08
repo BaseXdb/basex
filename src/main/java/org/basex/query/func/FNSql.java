@@ -25,6 +25,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
+import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.NodeType;
@@ -47,8 +48,12 @@ import org.basex.util.hash.TokenObjMap;
  * @author Rositsa Shadura
  */
 public final class FNSql extends FuncCall {
-  /** sql:tuple element. */
-  private static final byte[] TUPLE = token("sql:tuple");
+  /** Element row. */
+  private static final byte[] ROW = token("sql:row");
+  /** Element: column. */
+  private static final byte[] COLUMN = token("sql:column");
+  /** Attribute: name*/
+  private static final byte[] NAME = token("name");
   /** parameter attribute: type. */
   private static final byte[] TYPE = token("type");
   /** Type int. */
@@ -69,8 +74,12 @@ public final class FNSql extends FuncCall {
   private static final byte[] TIME = AtomType.TIM.nam();
   /** Type timestamp. */
   private static final byte[] TIMESTAMP = token("timestamp");
-  /** Tuple. */
-  private static final QNm Q_TUPLE = new QNm(TUPLE, SQLURI);
+  /** Row. */
+  private static final QNm Q_ROW = new QNm(ROW, SQLURI);
+  /** Column. */
+  private static final QNm Q_COLUMN = new QNm(COLUMN, SQLURI);
+  /** Attribute name. */
+  private static final QNm Q_NAME = new QNm(NAME, EMPTY) ;
   /** SQL Namespace attribute. */
   private static final Atts NS_SQL = new Atts().add(SQL, SQLURI);
   /** Util namespace. */
@@ -369,21 +378,30 @@ public final class FNSql extends FuncCall {
     try {
       final ResultSetMetaData metadata = rs.getMetaData();
       final int columnCount = metadata.getColumnCount();
-      final NodeCache tuples = new NodeCache();
+      final NodeCache rows = new NodeCache();
       while(rs.next()) {
-        // For each row in the result set create an element <tuple/>
-        final NodeCache a = new NodeCache();
+        final NodeCache columns = new NodeCache();
         for(int k = 1; k <= columnCount; k++) {
-          // Set columns as attributes of element <tuple/>
+          // For each row add column values as children
           final String label = metadata.getColumnLabel(k);
           final Object value = rs.getObject(label);
           // Null values are ignored
-          if(value != null) a.add(new FAttr(new QNm(token(label)),
-              token(value.toString())));
+          if(value != null) {
+            // Column name
+            final FAttr columnName = new FAttr(Q_NAME, token(label));
+            final NodeCache attr = new NodeCache();
+            attr.add(columnName);
+            // Column value
+            final FTxt columnValue = new FTxt(token(value.toString()));
+            final NodeCache ch = new NodeCache();
+            ch.add(columnValue);
+            // Element <sql:column name='...'>...</sql:column>
+            columns.add(new FElem(Q_ROW, ch, attr, NS_SQL, null));
+          }
         }
-        tuples.add(new FElem(Q_TUPLE, null, a, NS_SQL, null));
+        rows.add(new FElem(Q_ROW, columns, null, NS_SQL, null));
       }
-      return tuples;
+      return rows;
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
