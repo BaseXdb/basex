@@ -18,6 +18,7 @@ import org.basex.util.list.StringList;
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Request.Method;
+import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.Resource;
 
 /**
@@ -38,10 +39,6 @@ public abstract class BXResource implements Resource {
   static final String DUMMY = ".empty";
   /** Dummy xml content.*/
   static final String DUMMYCONTENT = "<empty/>";
-  /** User name. */
-  protected String user;
-  /** User password. */
-  protected String pass;
   /** Database. */
   protected final String db;
   /** Resource path (without leading '/'). */
@@ -64,8 +61,8 @@ public abstract class BXResource implements Resource {
   @Override
   public Object authenticate(final String u, final String p) {
     if(u != null) {
-      this.user = u;
-      this.pass = p;
+      session.user = u;
+      session.pass = p;
     }
     return u;
   }
@@ -73,12 +70,7 @@ public abstract class BXResource implements Resource {
   @Override
   public boolean authorise(final Request request, final Method method,
       final Auth auth) {
-    if(auth != null) {
-      final String u = (String) auth.getTag();
-      // [DP] WebDAV: check if user has sufficient privileges
-      if(u != null) return true;
-    }
-    return false;
+    return auth != null && auth.getTag() != null;
   }
 
   @Override
@@ -113,7 +105,7 @@ public abstract class BXResource implements Resource {
    * @return a list of database names
    * @throws BaseXException query exception
    */
-  static StringList listDbs(final Session s) throws BaseXException {
+  static StringList listDBs(final Session s) throws BaseXException {
     final StringList result = new StringList();
     final Query q = s.query("db:list()");
     try {
@@ -156,10 +148,12 @@ public abstract class BXResource implements Resource {
   /**
    * Prints exception message to standard error.
    * @param ex exception
+   * @return bad request exception
+   * @throws BadRequestException bad request exception
    */
-  static void handle(final Exception ex) {
-    Util.errln(ex.getMessage());
-    ex.printStackTrace();
+  BadRequestException error(final Exception ex) throws BadRequestException {
+    Util.errln(ex);
+    throw new BadRequestException(this, ex.getMessage());
   }
 
   /**

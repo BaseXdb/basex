@@ -1,5 +1,6 @@
 package org.basex.api.jaxrx;
 
+import static org.basex.api.HTTPText.*;
 import static org.jaxrx.core.JaxRxConstants.*;
 
 import java.io.IOException;
@@ -28,11 +29,11 @@ import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
  */
 abstract class BXCode {
   /** Context used to create local sessions.
-   * A local session will be created if {@link JaxRxServer#LOCAL} is set
+   * A local session will be created if {@link #DBCLIENT} is set
    * to {@code true}. Please note that no other {@link Context} instance should
    * be created in parallel. */
   private static final Context CONTEXT = Boolean.parseBoolean(
-      System.getProperty(JaxRxServer.LOCAL)) ? new Context() : null;
+      System.getProperty(DBCLIENT)) ? null : new Context();
   /** Session. */
   final Session session;
 

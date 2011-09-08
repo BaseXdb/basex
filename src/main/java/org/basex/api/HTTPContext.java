@@ -10,7 +10,7 @@ import org.basex.core.Context;
  */
 public final class HTTPContext {
   /** Single instance. */
-  public static final HTTPContext INSTANCE = new HTTPContext();
+  private static final HTTPContext INSTANCE = new HTTPContext();
   /** Database context. */
   public final Context context = new Context();
   /** Client flag: start server or standalone mode. */
@@ -18,4 +18,12 @@ public final class HTTPContext {
 
   /** Private constructor. */
   private HTTPContext() { }
+
+  /**
+   * Returns the singleton instance.
+   * @return singleton instance
+   */
+  public static HTTPContext get() {
+    return INSTANCE;
+  }
 }

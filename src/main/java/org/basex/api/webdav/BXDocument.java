@@ -17,8 +17,6 @@ import com.bradmcevoy.http.FileItem;
 import com.bradmcevoy.http.FileResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing an XML document.
@@ -41,27 +39,22 @@ public class BXDocument extends BXAbstractResource implements FileResource {
 
   @Override
   public Long getContentLength() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Date getCreateDate() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Long getMaxAgeSeconds(final Auth auth) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public String processForm(final Map<String, String> parameters,
-      final Map<String, FileItem> files) throws BadRequestException,
-      NotAuthorizedException, ConflictException {
-    // TODO Auto-generated method stub
+      final Map<String, FileItem> files) throws BadRequestException {
     return null;
   }
 
@@ -73,7 +66,8 @@ public class BXDocument extends BXAbstractResource implements FileResource {
   @Override
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType)
-      throws IOException, NotAuthorizedException, BadRequestException {
+      throws IOException, BadRequestException {
+
     Session s = null;
     try {
       s = session.login();
@@ -82,10 +76,9 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       q.bind("$path", db + SEP + path);
       q.execute();
     } catch(final Exception ex) {
-      handle(ex);
-      throw new BadRequestException(this, ex.getMessage());
+      error(ex);
     } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
+      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
     }
   }
 

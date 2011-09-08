@@ -5,6 +5,7 @@ import static org.basex.api.webdav.BXNotAuthorizedResource.*;
 import org.basex.api.HTTPContext;
 import org.basex.api.HTTPSession;
 import org.basex.server.Session;
+import org.basex.util.Util;
 
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Auth;
@@ -41,7 +42,7 @@ public class BXResourceFactory implements ResourceFactory {
 
     final Path path = Path.path(dbpath);
     // the root is requested
-    if(path.isRoot()) return new BXAllDatabasesResource(session);
+    if(path.isRoot()) return new BXRootResource(session);
 
     final String db = path.getFirst();
 
@@ -50,13 +51,13 @@ public class BXResourceFactory implements ResourceFactory {
       try {
         // only the database is requested
         return path.getLength() == 1 ?
-          listDbs(s).contains(db) ? new BXDatabase(db, session) : null :
+          listDBs(s).contains(db) ? new BXDatabase(db, session) : null :
           resource(s, db, path.getStripFirst().toString(), session);
       } finally {
         s.close();
       }
     } catch(final Exception ex) {
-      handle(ex);
+      Util.errln(ex);
     }
     return null;
   }

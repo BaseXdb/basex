@@ -12,14 +12,14 @@ import org.basex.api.HTTPSession;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.server.Session;
+import org.basex.util.Util;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing the list of all databases.
@@ -28,13 +28,13 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXAllDatabasesResource extends BXResource implements
+public class BXRootResource extends BXResource implements
     FolderResource {
   /**
    * Constructor.
    * @param s current session
    */
-  public BXAllDatabasesResource(final HTTPSession s) {
+  public BXRootResource(final HTTPSession s) {
     super(null, null, s);
   }
 
@@ -48,13 +48,13 @@ public class BXAllDatabasesResource extends BXResource implements
     try {
       final Session cs = session.login();
       try {
-        return listDbs(cs).contains(childName) ?
+        return listDBs(cs).contains(childName) ?
             new BXDatabase(childName, session) : null;
       } finally {
         cs.close();
       }
     } catch(final Exception ex) {
-      handle(ex);
+      Util.errln(ex);
     }
     return null;
   }
@@ -65,38 +65,39 @@ public class BXAllDatabasesResource extends BXResource implements
       final List<BXResource> dbs = new ArrayList<BXResource>();
       final Session s = session.login();
       try {
-        for(final String d : listDbs(s))
+        for(final String d : listDBs(s))
           dbs.add(new BXDatabase(d, session));
         return dbs;
       } finally {
         s.close();
       }
     } catch(final Exception ex) {
-      handle(ex);
+      Util.errln(ex);
     }
     return null;
   }
 
   @Override
-  public CollectionResource createCollection(final String newName) throws
-    NotAuthorizedException, ConflictException, BadRequestException {
+  public CollectionResource createCollection(final String newName)
+      throws BadRequestException {
+
     Session s = null;
     try {
       s = session.login();
       s.execute(new CreateDB(dbname(newName)));
       return new BXDatabase(newName, session);
     } catch(final Exception ex) {
-      handle(ex);
-      throw new BadRequestException(this, ex.getMessage());
+      throw error(ex);
     } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
+      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
     }
   }
 
   @Override
   public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) throws IOException,
-      ConflictException, NotAuthorizedException, BadRequestException {
+      final Long length, final String contentType)
+          throws IOException, BadRequestException {
+
     Session s = null;
     try {
       s = session.login();
@@ -105,10 +106,9 @@ public class BXAllDatabasesResource extends BXResource implements
       s.execute(new Close());
       return new BXDatabase(dbname, session);
     } catch(final Exception ex) {
-      handle(ex);
-      throw new BadRequestException(this, ex.getMessage());
+      throw error(ex);
     } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
+      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
     }
   }
 

@@ -13,15 +13,16 @@ public interface HTTPText {
   String DBPASS = "org.basex.password";
   /** Configuration: database server port. */
   String DBPORT = "org.basex.serverport";
-  /** Configuration: local flag. */
-  String LOCAL = "org.basex.jaxrx.local";
-  /** Configuration: serializer options. */
-  String SERIALIZER = "org.jaxrx.parameter.output";
+  /** Configuration: client flag. */
+  String DBCLIENT = "org.basex.client";
 
   /** HTTP String. */
   String HTTP = "HTTP";
   /** Configuration: JAX-RX path. */
-  String JAXRXPATH = "org.basex.jaxrxpath";
+  String JAX_RXPATH = "org.basex.jaxrxpath";
+  /** Configuration: serializer options. */
+  String SERIALIZER = "org.jaxrx.parameter.output";
+
   /** JAX-RX String. */
-  String JAXRX = "JAX-RX";
+  String JAX_RX = "JAX-RX";
 }

@@ -20,7 +20,7 @@ import org.basex.util.Util;
  */
 public final class BaseXHTTP {
   /** Database context. */
-  private final HTTPContext http = new HTTPContext();
+  private final HTTPContext http = HTTPContext.get();
   /** Database server. */
   private BaseXServer server;
   /** WebDAV server. */
@@ -98,6 +98,7 @@ public final class BaseXHTTP {
         switch(c) {
           case 'c':
             http.client = true;
+            System.setProperty(DBCLIENT, Boolean.TRUE.toString());
             break;
           case 'd':
             mprop.set(MainProp.DEBUG, true);
@@ -112,8 +113,10 @@ public final class BaseXHTTP {
             mprop.set(MainProp.HOST, arg.num());
             break;
           case 'p':
-            mprop.set(MainProp.PORT, arg.num());
-            mprop.set(MainProp.SERVERPORT, arg.num());
+            final int p = arg.num();
+            mprop.set(MainProp.PORT, p);
+            mprop.set(MainProp.SERVERPORT, p);
+            System.setProperty(DBPORT, Integer.toString(p));
             break;
           case 'P':
             System.setProperty(DBPASS, arg.string());

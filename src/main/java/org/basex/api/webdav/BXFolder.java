@@ -16,6 +16,8 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
 import org.basex.server.Query;
 import org.basex.server.Session;
+import org.basex.util.Util;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.DeletableCollectionResource;
@@ -24,8 +26,6 @@ import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing a folder within a collection database.
@@ -36,6 +36,7 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
  */
 public class BXFolder extends BXAbstractResource implements FolderResource,
     DeletableCollectionResource {
+
   /**
    * Constructor.
    * @param dbname database name
@@ -49,38 +50,34 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   @Override
   public Long getContentLength() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public String getContentType(final String accepts) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Date getCreateDate() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Long getMaxAgeSeconds(final Auth auth) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType) {
-    // TODO Auto-generated method stub
   }
 
   @Override
   public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType) throws IOException,
-    ConflictException, NotAuthorizedException, BadRequestException {
+      final Long length, final String contentType)
+          throws IOException, BadRequestException {
+
     Session s = null;
     try {
       s = session.login();
@@ -97,16 +94,16 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
       return new BXDocument(db, doc, session);
     } catch(final Exception ex) {
-      handle(ex);
-      throw new BadRequestException(this, ex.getMessage());
+      throw error(ex);
     } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
+      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
     }
   }
 
   @Override
-  public CollectionResource createCollection(final String folder) throws
-    NotAuthorizedException, ConflictException, BadRequestException {
+  public CollectionResource createCollection(final String folder)
+      throws BadRequestException {
+
     Session s = null;
     try {
       s = session.login();
@@ -117,10 +114,9 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       createDummy(s, db, newFolder);
       return new BXFolder(db, newFolder, session);
     } catch(final Exception ex) {
-      handle(ex);
-      throw new BadRequestException(this, ex.getMessage());
+      throw error(ex);
     } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
+      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
     }
   }
 
@@ -134,7 +130,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         s.close();
       }
     } catch(final Exception ex) {
-      handle(ex);
+      Util.errln(ex);
     }
     return null;
   }
@@ -170,7 +166,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         s.close();
       }
     } catch(final Exception ex) {
-      handle(ex);
+      Util.errln(ex);
     }
     return ch;
   }

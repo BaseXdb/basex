@@ -1,5 +1,6 @@
 package org.basex.api.jaxrx;
 
+import static org.basex.api.HTTPText.*;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.jaxrx.core.JaxRxConstants.*;
@@ -107,7 +108,7 @@ public final class BXJaxRx implements JaxRx {
       @Override
       String code() {
         // get root directory for files
-        final String root = System.getProperty(JaxRxServer.JAXRXPATH) + '/';
+        final String root = System.getProperty(JAX_RXPATH) + '/';
         final IO io = IO.get(root + file.trim());
 
         // file not found...

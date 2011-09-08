@@ -13,6 +13,7 @@ import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
 import org.basex.server.Query;
 import org.basex.server.Session;
+import org.basex.util.Util;
 
 /**
  * WebDAV resource representing a collection database.
@@ -56,7 +57,7 @@ public class BXDatabase extends BXFolder {
         if(date.length() > 0) return DATEFORMAT.parse(date);
       }
     } catch(final Exception ex) {
-      handle(ex);
+      Util.errln(ex);
     }
     return null;
   }

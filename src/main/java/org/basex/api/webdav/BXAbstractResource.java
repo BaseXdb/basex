@@ -14,8 +14,6 @@ import com.bradmcevoy.http.CopyableResource;
 import com.bradmcevoy.http.DeletableResource;
 import com.bradmcevoy.http.MoveableResource;
 import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.ConflictException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
  * WebDAV resource representing an abstract folder within a collection database.
@@ -39,53 +37,50 @@ public abstract class BXAbstractResource extends BXResource implements
   }
 
   @Override
-  public void delete() throws NotAuthorizedException, ConflictException,
-    BadRequestException {
+  public void delete() throws BadRequestException {
     Session s = null;
     try {
       s = session.login();
       delete(s);
     } catch(final Exception ex) {
-      handle(ex);
-      throw new BadRequestException(this, ex.getMessage());
+      error(ex);
     } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
+      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
     }
   }
 
   @Override
-  public void copyTo(final CollectionResource target, final String name) throws
-    NotAuthorizedException, BadRequestException, ConflictException {
+  public void copyTo(final CollectionResource target, final String name)
+      throws BadRequestException {
     Session s = null;
     try {
       s = session.login();
-      if(target instanceof BXAllDatabasesResource)
+      if(target instanceof BXRootResource)
         copyToRoot(s, name);
       else if(target instanceof BXFolder)
         copyTo(s, (BXFolder) target, name);
     } catch(final Exception ex) {
-      handle(ex);
-      throw new BadRequestException(this, ex.getMessage());
+      error(ex);
     } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
+      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
     }
   }
 
   @Override
-  public void moveTo(final CollectionResource target, final String name) throws
-    ConflictException, NotAuthorizedException, BadRequestException {
+  public void moveTo(final CollectionResource target, final String name)
+      throws BadRequestException {
     Session s = null;
     try {
       s = session.login();
-      if(target instanceof BXAllDatabasesResource)
+      if(target instanceof BXRootResource)
         moveToRoot(s, name);
       else if(target instanceof BXFolder)
         moveTo(s, (BXFolder) target, name);
     } catch(final Exception ex) {
-      handle(ex);
+      error(ex);
       throw new BadRequestException(this, ex.getMessage());
     } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { handle(e); }
+      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
     }
   }
 
