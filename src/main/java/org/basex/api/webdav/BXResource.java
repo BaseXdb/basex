@@ -237,15 +237,19 @@ public abstract class BXResource implements Resource {
    * @param path resource path
    * @param hs current session
    * @return requested resource or {@code null} if it does not exist
-   * @throws BaseXException query exception
    */
-  static Resource resource(final Session s, final String db, final String path,
-      final HTTPSession hs) throws BaseXException {
-    // check if there is a document in the collection having this path
-    if(exists(s, db, path)) return new BXDocument(db, path, hs);
+  static BXResource resource(final Session s, final String db,
+      final String path, final HTTPSession hs) {
 
-    // check if there are paths in the collection starting with this path
-    if(count(s, db, path) > 0) return new BXFolder(db, path, hs);
+    try {
+      // check if there is a document in the collection having this path
+      if(exists(s, db, path)) return new BXDocument(db, path, hs);
+
+      // check if there are paths in the collection starting with this path
+      if(count(s, db, path) > 0) return new BXFolder(db, path, hs);
+    } catch(final BaseXException ex) {
+      Util.errln(ex);
+    }
     return null;
   }
 }

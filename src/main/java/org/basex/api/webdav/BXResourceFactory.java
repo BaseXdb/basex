@@ -45,7 +45,6 @@ public class BXResourceFactory implements ResourceFactory {
     if(path.isRoot()) return new BXRootResource(session);
 
     final String db = path.getFirst();
-
     try {
       final Session s = session.login();
       try {

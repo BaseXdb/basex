@@ -39,15 +39,15 @@ public class BXDatabase extends BXFolder {
   @Override
   public Date getModifiedDate() {
     try {
-      final String info;
-      final Session s = session.login();
-      try {
-        final Query q = s.query("db:info($p)");
-        q.bind("$p", db);
-        info = q.execute();
-      } finally {
-        s.close();
-      }
+      final String info = new BXCode<String>(this) {
+        @Override
+        public String get() throws BaseXException {
+          final Query q = s.query("db:info($p)");
+          q.bind("$p", db);
+          return q.execute();
+        }
+      }.eval();
+
       // parse the timestamp
       final String timestamp = "Time Stamp: ";
       final int p = info.indexOf(timestamp);

@@ -1,7 +1,5 @@
 package org.basex.api.webdav;
 
-import java.io.IOException;
-
 import org.basex.api.HTTPSession;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
@@ -38,50 +36,42 @@ public abstract class BXAbstractResource extends BXResource implements
 
   @Override
   public void delete() throws BadRequestException {
-    Session s = null;
-    try {
-      s = session.login();
-      delete(s);
-    } catch(final Exception ex) {
-      error(ex);
-    } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
-    }
+    new BXCode<Object>(this) {
+      @Override
+      public void run() throws BaseXException {
+        delete(s);
+      }
+    }.eval();
   }
 
   @Override
   public void copyTo(final CollectionResource target, final String name)
       throws BadRequestException {
-    Session s = null;
-    try {
-      s = session.login();
-      if(target instanceof BXRootResource)
-        copyToRoot(s, name);
-      else if(target instanceof BXFolder)
-        copyTo(s, (BXFolder) target, name);
-    } catch(final Exception ex) {
-      error(ex);
-    } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
-    }
+
+    new BXCode<Object>(this) {
+      @Override
+      public void run() throws BaseXException {
+        if(target instanceof BXRootResource)
+          copyToRoot(s, name);
+        else if(target instanceof BXFolder)
+          copyTo(s, (BXFolder) target, name);
+      }
+    }.eval();
   }
 
   @Override
   public void moveTo(final CollectionResource target, final String name)
       throws BadRequestException {
-    Session s = null;
-    try {
-      s = session.login();
-      if(target instanceof BXRootResource)
-        moveToRoot(s, name);
-      else if(target instanceof BXFolder)
-        moveTo(s, (BXFolder) target, name);
-    } catch(final Exception ex) {
-      error(ex);
-      throw new BadRequestException(this, ex.getMessage());
-    } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
-    }
+
+    new BXCode<Object>(this) {
+      @Override
+      public void run() throws BaseXException {
+        if(target instanceof BXRootResource)
+          moveToRoot(s, name);
+        else if(target instanceof BXFolder)
+          moveTo(s, (BXFolder) target, name);
+      }
+    }.eval();
   }
 
   /**

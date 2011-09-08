@@ -1,6 +1,5 @@
 package org.basex.api.webdav;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -16,15 +15,12 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
 import org.basex.server.Query;
 import org.basex.server.Session;
-import org.basex.util.Util;
 
 import com.bradmcevoy.http.Auth;
-import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.DeletableCollectionResource;
 import com.bradmcevoy.http.FolderResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Request;
-import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.exceptions.BadRequestException;
 
 /**
@@ -74,74 +70,60 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
-  public Resource createNew(final String newName, final InputStream inputStream,
-      final Long length, final String contentType)
-          throws IOException, BadRequestException {
+  public BXDocument createNew(final String newName, final InputStream input,
+      final Long length, final String contentType) throws BadRequestException {
 
-    Session s = null;
-    try {
-      s = session.login();
-      s.execute(new Open(db));
-      final String doc = path.isEmpty() ? newName : path + SEP + newName;
-      // check if document with this path already exists
-      if(count(s, db, doc) == 0) {
-        s.add(newName, path, inputStream);
-        deleteDummy(s, db, path);
-      } else {
-        s.replace(doc, inputStream);
+    return new BXCode<BXDocument>(this) {
+      @Override
+      public BXDocument get() throws BaseXException {
+        s.execute(new Open(db));
+        final String doc = path.isEmpty() ? newName : path + SEP + newName;
+        // check if document with this path already exists
+        if(count(s, db, doc) == 0) {
+          s.add(newName, path, input);
+          deleteDummy(s, db, path);
+        } else {
+          s.replace(doc, input);
+        }
+        return new BXDocument(db, doc, session);
       }
-      s.execute(new Close());
-
-      return new BXDocument(db, doc, session);
-    } catch(final Exception ex) {
-      throw error(ex);
-    } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
-    }
+    }.eval();
   }
 
   @Override
-  public CollectionResource createCollection(final String folder)
+  public BXFolder createCollection(final String folder)
       throws BadRequestException {
 
-    Session s = null;
-    try {
-      s = session.login();
-      // [DP] WebDAV: possible optimization would be to rename the dummy, if
-      // the current folder is empty (which not always the case)
-      deleteDummy(s, db, path);
-      final String newFolder = path + SEP + folder;
-      createDummy(s, db, newFolder);
-      return new BXFolder(db, newFolder, session);
-    } catch(final Exception ex) {
-      throw error(ex);
-    } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
-    }
-  }
-
-  @Override
-  public Resource child(final String childName) {
-    try {
-      final Session s = session.login();
-      try {
-        return resource(s, db, path + SEP + childName, session);
-      } finally {
-        s.close();
+    return new BXCode<BXFolder>(this) {
+      @Override
+      public BXFolder get() throws BaseXException {
+        // [DP] WebDAV: possible optimization would be to rename the dummy, if
+        // the current folder is empty (which not always the case)
+        deleteDummy(s, db, path);
+        final String newFolder = path + SEP + folder;
+        createDummy(s, db, newFolder);
+        return new BXFolder(db, newFolder, session);
       }
-    } catch(final Exception ex) {
-      Util.errln(ex);
-    }
-    return null;
+    }.eval();
   }
 
   @Override
-  public List<? extends Resource> getChildren() {
-    final List<BXResource> ch = new ArrayList<BXResource>();
-    final HashSet<String> paths = new HashSet<String>();
-    try {
-      final Session s = session.login();
-      try {
+  public BXResource child(final String childName) {
+    return new BXCode<BXResource>(this) {
+      @Override
+      public BXResource get() {
+        return resource(s, db, path + SEP + childName, session);
+      }
+    }.evalNoEx();
+  }
+
+  @Override
+  public List<BXResource> getChildren() {
+    return new BXCode<List<BXResource>>(this) {
+      @Override
+      public List<BXResource> get() throws BaseXException {
+        final List<BXResource> ch = new ArrayList<BXResource>();
+        final HashSet<String> paths = new HashSet<String>();
         final Query q = s.query(
             "for $r in db:list($d, $p) return substring-after($r,$p)");
         q.bind("$d", db);
@@ -162,13 +144,9 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
           }
         }
         q.close();
-      } finally {
-        s.close();
+        return ch;
       }
-    } catch(final Exception ex) {
-      Util.errln(ex);
-    }
-    return ch;
+    }.evalNoEx();
   }
 
   @Override

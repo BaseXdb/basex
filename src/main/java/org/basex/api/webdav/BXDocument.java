@@ -68,18 +68,15 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       final Map<String, String> params, final String contentType)
       throws IOException, BadRequestException {
 
-    Session s = null;
-    try {
-      s = session.login();
-      s.setOutputStream(out);
-      final Query q = s.query("collection($path)");
-      q.bind("$path", db + SEP + path);
-      q.execute();
-    } catch(final Exception ex) {
-      error(ex);
-    } finally {
-      try { if(s != null) s.close(); } catch(final IOException e) { error(e); }
-    }
+    new BXCode<Object>(this) {
+      @Override
+      public void run() throws BaseXException {
+        s.setOutputStream(out);
+        final Query q = s.query("collection($path)");
+        q.bind("$path", db + SEP + path);
+        q.execute();
+      }
+    }.eval();
   }
 
   @Override
