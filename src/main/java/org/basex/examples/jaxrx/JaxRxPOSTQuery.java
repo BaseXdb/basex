@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
 import org.basex.api.jaxrx.JaxRxServer;
 
 /**
@@ -80,9 +81,9 @@ public final class JaxRxPOSTQuery {
    * This method demonstrates the POST method. In this example, a query on a
    * resource is processed.
    * @param args (ignored) command-line arguments
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
-  public static void main(final String... args) throws IOException {
+  public static void main(final String... args) throws Exception {
     // Start servers
     JaxRxServer jaxrx = new JaxRxServer();
     // Run example

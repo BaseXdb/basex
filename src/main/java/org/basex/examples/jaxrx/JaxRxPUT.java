@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
 import org.basex.api.jaxrx.JaxRxServer;
 
 /**
@@ -59,9 +60,9 @@ public final class JaxRxPUT {
    * This method demonstrates the PUT method. In this example, a new XML
    * database is created for the specified document.
    * @param args (ignored) command-line arguments
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
-  public static void main(final String... args) throws IOException {
+  public static void main(final String... args) throws Exception {
     // Start servers
     JaxRxServer jaxrx = new JaxRxServer();
     // Run example

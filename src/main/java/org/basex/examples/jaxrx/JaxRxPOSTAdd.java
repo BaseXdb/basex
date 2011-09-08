@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
 import org.basex.api.jaxrx.JaxRxServer;
 
 /**
@@ -64,9 +65,9 @@ public final class JaxRxPOSTAdd {
    * This method demonstrates the POST method. In this example, a new XML
    * document is added to a database.
    * @param args (ignored) command-line arguments
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
-  public static void main(final String... args) throws IOException {
+  public static void main(final String... args) throws Exception {
     // Start servers
     JaxRxServer jaxrx = new JaxRxServer();
     // Run example
