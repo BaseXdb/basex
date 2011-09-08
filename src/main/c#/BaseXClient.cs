@@ -99,7 +99,6 @@ namespace BaseXClient
     public void Watch(string name, EventNotification notify)
     {
       stream.WriteByte(10);
-      Send(name);
       if(esocket == null)
       {    
         int eport = Convert.ToInt32(Receive());
@@ -110,8 +109,10 @@ namespace BaseXClient
         byte[] msg = System.Text.Encoding.UTF8.GetBytes(id);
         estream.Write(msg, 0, msg.Length);
         estream.WriteByte(0);
+        estrean.ReadByte();
         new Thread(Listen).Start();
       }
+      Send(name);
       info = Receive();
       if(!Ok())
       {
