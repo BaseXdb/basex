@@ -1,6 +1,6 @@
 package org.basex.examples.jaxrx;
 
-import org.basex.api.jaxrx.JaxRxServer;
+import org.basex.api.BaseXHTTP;
 
 /**
  * This class runs all JAX-RX examples.
@@ -17,7 +17,7 @@ public final class JaxRxAll {
    */
   public static void main(final String[] args) throws Exception {
     // Start servers
-    final JaxRxServer jaxrx = new JaxRxServer();
+    final BaseXHTTP http = new BaseXHTTP();
 
     // Create a database
     // Run all JAX-RX examples
@@ -41,6 +41,6 @@ public final class JaxRxAll {
     System.out.println();
 
     // Stop servers
-    jaxrx.stop();
+    http.stop();
   }
 }

@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.basex.api.jaxrx.JaxRxServer;
+import org.basex.api.BaseXHTTP;
 
 /**
  * This class is a simple Java client to demonstrate the JAX-RX implementation.
@@ -64,10 +64,10 @@ public final class JaxRxGET {
    */
   public static void main(final String... args) throws Exception {
     // Start servers
-    JaxRxServer jaxrx = new JaxRxServer();
+    final BaseXHTTP http = new BaseXHTTP();
     // Run example
     run();
     // Stop servers
-    jaxrx.stop();
+    http.stop();
   }
 }
