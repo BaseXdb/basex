@@ -1,12 +1,12 @@
 package org.basex.query.func;
 
+import static java.sql.DriverManager.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -15,6 +15,8 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Properties;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -27,6 +29,9 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
+import org.basex.query.item.SeqType;
+import org.basex.query.item.Uri;
+import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
 import org.basex.query.iter.Iter;
@@ -34,10 +39,10 @@ import org.basex.query.iter.NodeCache;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Reflect;
+import org.basex.util.hash.TokenObjMap;
 
 /**
  * Functions on relational databases.
- *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
@@ -68,6 +73,16 @@ public final class FNSql extends FuncCall {
   private static final QNm Q_TUPLE = new QNm(TUPLE, SQLURI);
   /** SQL Namespace attribute. */
   private static final Atts NS_SQL = new Atts().add(SQL, SQLURI);
+  /** Util namespace. */
+  private static final Uri U_SQL = Uri.uri(SQLURI);
+  /** Element: options. */
+  private static final QNm E_OPS = new QNm(token("options"), U_SQL);
+  /** Auto-commit mode. */
+  private static final byte[] AUTO_COMM = token("auto-commit");
+  /** User. */
+  private static final String USER = "user";
+  /** Password. */
+  private static final String PASS = "password";
 
   /**
    * Constructor.
@@ -125,17 +140,51 @@ public final class FNSql extends FuncCall {
   private Itr connect(final QueryContext ctx) throws QueryException {
     // URL to relational database
     final String url = string(checkStr(expr[0], ctx));
-    // Auto-commit mode
-    final boolean autoComm = expr.length < 2 || checkBln(expr[1], ctx);
     try {
-      final Connection conn = expr.length == 4 ? DriverManager.getConnection(
-          url, string(checkStr(expr[2], ctx)), string(checkStr(expr[3], ctx)))
-          : DriverManager.getConnection(url);
-      conn.setAutoCommit(autoComm);
-      return Itr.get(ctx.jdbc.add(conn));
+      if(expr.length > 2) {
+        // Credentials
+        final String user = string(checkStr(expr[1], ctx));
+        final String pass = string(checkStr(expr[2], ctx));
+        if(expr.length == 4) {
+          // Connection options
+          final TokenObjMap<Object> options = options(3, E_OPS, ctx);
+          boolean autoCommit = true;
+          final Object commit = options.get(AUTO_COMM);
+          if(commit != null) {
+            // Extract auto-commit mode from options
+            autoCommit = Boolean.parseBoolean(commit.toString());
+            options.delete(AUTO_COMM);
+          }
+          // Connection properties
+          final Properties props = connProps(options(3, E_OPS, ctx));
+          props.setProperty(USER, user);
+          props.setProperty(PASS, pass);
+          // Open connection
+          final Connection conn = getConnection(url, props);
+          // Set auto/commit mode
+          conn.setAutoCommit(autoCommit);
+          return Itr.get(ctx.jdbc.add(conn));
+        }
+        return Itr.get(ctx.jdbc.add(getConnection(url, user, pass)));
+      }
+      return Itr.get(ctx.jdbc.add(getConnection(url)));
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
+  }
+
+  /**
+   * Sets connection options.
+   * @param options options
+   * @return connection properties
+   */
+  private Properties connProps(final TokenObjMap<Object> options) {
+    final Properties props = new Properties();
+    for(final byte[] next : options.keys()) {
+      if(next != null) props.setProperty(string(next),
+          options.get(next).toString());
+    }
+    return props;
   }
 
   /**
@@ -168,9 +217,8 @@ public final class FNSql extends FuncCall {
     final Object obj = ctx.jdbc.get(id);
     if(obj == null) throw NOCONN.thrw(input, id);
     // Execute query or prepared statement
-    return obj instanceof Connection ?
-        executeQuery((Connection) obj, ctx) :
-        executePrepStmt((PreparedStatement) obj, ctx);
+    return obj instanceof Connection ? executeQuery((Connection) obj, ctx)
+        : executePrepStmt((PreparedStatement) obj, ctx);
   }
 
   /**
@@ -226,7 +274,9 @@ public final class FNSql extends FuncCall {
   private long countParams(final ANode params) {
     final AxisIter ch = params.children();
     long c = ch.size();
-    if(c == -1) do ++c; while(ch.next() != null);
+    if(c == -1) do
+      ++c;
+    while(ch.next() != null);
     return c;
   }
 
@@ -245,12 +295,10 @@ public final class FNSql extends FuncCall {
       byte[] paramType = null;
       boolean isNull = false;
       for(ANode attr; (attr = attrs.next()) != null;) {
-        if(eq(attr.nname(), TYPE))
-          paramType = attr.atom();
-        else if(eq(attr.nname(), NULL))
-          isNull = attr.atom() != null && Bln.parse(attr.atom(), input);
-        else
-          throw NOTEXPATTR.thrw(input, string(attr.nname()));
+        if(eq(attr.nname(), TYPE)) paramType = attr.atom();
+        else if(eq(attr.nname(), NULL)) isNull = attr.atom() != null
+            && Bln.parse(attr.atom(), input);
+        else throw NOTEXPATTR.thrw(input, string(attr.nname()));
       }
       if(paramType == null) NOPARAMTYPE.thrw(input);
       final byte[] v = next.atom();
@@ -402,6 +450,44 @@ public final class FNSql extends FuncCall {
     if(obj == null || !(obj instanceof Connection)) NOCONN.thrw(input, id);
     if(del) ctx.jdbc.remove(id);
     return (Connection) obj;
+  }
+
+  /**
+   * Extracts connection options.
+   * @param arg argument with options
+   * @param root expected root element
+   * @param ctx query context
+   * @return options
+   * @throws QueryException query exception
+   */
+  private TokenObjMap<Object> options(final int arg, final QNm root,
+      final QueryContext ctx) throws QueryException {
+    // initialize token map
+    final TokenObjMap<Object> tm = new TokenObjMap<Object>();
+    // argument does not exist...
+    if(arg >= expr.length) return tm;
+
+    // empty sequence...
+    final Item it = expr[arg].item(ctx, input);
+    if(it == null) return tm;
+
+    // XQuery map: convert to internal map
+    if(it instanceof Map) return ((Map) it).tokenJavaMap(input);
+    // no element: convert XQuery map to internal map
+    if(!it.type().eq(SeqType.ELM)) throw NODFUNTYPE.thrw(input, this, it.type);
+
+    // parse nodes
+    ANode node = (ANode) it;
+    if(!node.qname().eq(root)) PARWHICH.thrw(input, node.qname());
+
+    // interpret query parameters
+    final AxisIter ai = node.children();
+    while((node = ai.next()) != null) {
+      final QNm qn = node.qname();
+      if(!qn.uri().eq(U_SQL)) PARWHICH.thrw(input, qn);
+      tm.add(qn.ln(), node.children().next());
+    }
+    return tm;
   }
 
   @Override
