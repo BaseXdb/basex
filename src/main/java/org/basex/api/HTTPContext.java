@@ -9,8 +9,13 @@ import org.basex.core.Context;
  * @author Christian Gruen
  */
 public final class HTTPContext {
+  /** Single instance. */
+  public static final HTTPContext INSTANCE = new HTTPContext();
   /** Database context. */
   public final Context context = new Context();
   /** Client flag: start server or standalone mode. */
   public boolean client;
+
+  /** Private constructor. */
+  private HTTPContext() { }
 }
