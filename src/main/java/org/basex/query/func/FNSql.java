@@ -107,7 +107,7 @@ public final class FNSql extends FuncCall {
   /**
    * Initializes JDBC with the specified driver.
    * @param ctx query context
-   * @return connection id
+   * @return {@code null}
    * @throws QueryException query exception
    */
   private Item init(final QueryContext ctx) throws QueryException {
@@ -344,7 +344,7 @@ public final class FNSql extends FuncCall {
   /**
    * Closes a connection to a relational database.
    * @param ctx query context
-   * @return result
+   * @return {@code null}
    * @throws QueryException query exception
    */
   private Item close(final QueryContext ctx) throws QueryException {
@@ -359,7 +359,7 @@ public final class FNSql extends FuncCall {
   /**
    * Commits all changes made during last transaction.
    * @param ctx query context
-   * @return result
+   * @return {@code null}
    * @throws QueryException query exception
    */
   private Item commit(final QueryContext ctx) throws QueryException {
@@ -374,7 +374,7 @@ public final class FNSql extends FuncCall {
   /**
    * Rollbacks all changes made during last transaction.
    * @param ctx query context
-   * @return result
+   * @return {@code null}
    * @throws QueryException query exception
    */
   private Item rollback(final QueryContext ctx) throws QueryException {

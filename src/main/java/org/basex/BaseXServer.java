@@ -8,8 +8,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.basex.core.BaseXException;
-import org.basex.core.MainProp;
+import org.basex.core.Context;
 import org.basex.core.Main;
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
@@ -82,8 +83,25 @@ public class BaseXServer extends Main implements Runnable {
    * @throws IOException I/O exception
    */
   public BaseXServer(final String... args) throws IOException {
-    super(args);
-    if(stopped) return;
+    this(null, args);
+  }
+
+  /**
+   * Constructor.
+   * @param ctx database context
+   * @param args command-line arguments
+   * @throws IOException I/O exception
+   */
+  public BaseXServer(final Context ctx, final String... args)
+      throws IOException {
+
+    super(args, ctx);
+    if(stopped) {
+      stop(context.mprop.num(MainProp.SERVERPORT),
+          context.mprop.num(MainProp.EVENTPORT));
+      Performance.sleep(1000);
+      return;
+    }
 
     final int port = context.mprop.num(MainProp.SERVERPORT);
     final int eport = context.mprop.num(MainProp.EVENTPORT);
@@ -235,9 +253,6 @@ public class BaseXServer extends Main implements Runnable {
         }
       } else {
         if(arg.string().equalsIgnoreCase("stop")) {
-          stop(context.mprop.num(MainProp.SERVERPORT),
-              context.mprop.num(MainProp.EVENTPORT));
-          Performance.sleep(1000);
           stopped = true;
         } else {
           arg.usage();

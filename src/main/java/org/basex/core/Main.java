@@ -27,7 +27,7 @@ public abstract class Main {
   /** Flag for using default standard input. */
   private static final boolean NOCONSOLE = System.console() == null;
   /** Database context. */
-  public final Context context = new Context();
+  public final Context context;
 
   /** Output file for queries. */
   protected OutputStream out = System.out;
@@ -44,6 +44,17 @@ public abstract class Main {
    * @throws IOException I/O exception
    */
   protected Main(final String[] args) throws IOException {
+    this(args, null);
+  }
+
+  /**
+   * Constructor.
+   * @param args command-line arguments
+   * @param ctx database context, or {@code null}
+   * @throws IOException I/O exception
+   */
+  protected Main(final String[] args, final Context ctx) throws IOException {
+    context = ctx != null ? ctx : new Context();
     parseArguments(args);
 
     // console: turn on verbose mode

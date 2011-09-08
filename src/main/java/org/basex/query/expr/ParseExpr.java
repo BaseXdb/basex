@@ -431,16 +431,6 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the current user has read permissions. If negative, an
-   * exception is thrown.
-   * @param ctx query context
-   * @throws QueryException query exception
-   */
-  public final void checkRead(final QueryContext ctx) throws QueryException {
-    checkPerm(ctx, User.READ);
-  }
-
-  /**
    * Checks if the current user has given permissions. If negative, an
    * exception is thrown.
    * @param ctx query context

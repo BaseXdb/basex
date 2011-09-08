@@ -294,8 +294,6 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Str info(final QueryContext ctx) throws QueryException {
-    checkRead(ctx);
-
     final Data data = data(0, ctx);
     final byte[] info;
     if(expr.length == 1) {
@@ -450,6 +448,8 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Item put(final QueryContext ctx) throws QueryException {
+    checkWrite(ctx);
+
     final Data data = data(0, ctx);
     final String key = path(1, ctx);
     if(!new IOFile(key).valid()) RESINV.thrw(input, key);
