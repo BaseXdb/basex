@@ -267,7 +267,6 @@ public final class ClientListener extends Thread {
    */
   public synchronized void notify(final byte[] name, final byte[] msg)
       throws IOException {
-
     eout.print(name);
     eout.write(0);
     eout.print(msg);
@@ -378,7 +377,6 @@ public final class ClientListener extends Thread {
    */
   private void watch() throws IOException {
     final Performance perf = new Performance();
-
     // initialize server-based event handling
     if(events == null) {
       out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));

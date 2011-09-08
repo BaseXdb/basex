@@ -183,8 +183,9 @@ public final class ClientSession extends Session {
 
     try {
       sout.write(ServerCmd.WATCH.code);
-      final BufferInput bi = new BufferInput(sin);
       if(esocket == null) {
+        sout.flush();
+        final BufferInput bi = new BufferInput(sin);
         final int eport = Integer.parseInt(bi.readString());
         // initialize event socket
         esocket = new Socket();
@@ -198,6 +199,7 @@ public final class ClientSession extends Session {
         listen(is);
       }
       send(name);
+      final BufferInput bi = new BufferInput(sin);
       info = bi.readString();
       if(!ok(bi)) throw new IOException(info);
       notifiers.put(name, notifier);
