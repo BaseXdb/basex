@@ -556,8 +556,8 @@ public enum Function {
   /** XQuery function */
   INIT(FNSql.class, "init(class)", EMP, 1, STR),
   /** XQuery function */
-  CONNECT(FNSql.class, "connect(url[,auto-commit[,user[,pass]]]])",
-      ITR, 1, STR, BLN_ZO, STR, STR),
+  CONNECT(FNSql.class, "connect(url[,user[,pass[,options]]]]])",
+      ITR, 1, STR, STR, STR, NOD_ZO),
   /** XQuery function */
   PREPARE(FNSql.class, "prepare(id,statement)", ITR, ITR, STR),
   /** XQuery function */
