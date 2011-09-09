@@ -56,7 +56,7 @@ public class LocalQuery extends Query {
 
   @Override
   public void bind(final String n, final Object v, final String t)
-      throws BaseXException {
+      throws IOException {
     try {
       qp.bind(n, v, t);
     } catch(final QueryException ex) {
@@ -65,53 +65,53 @@ public class LocalQuery extends Query {
   }
 
   @Override
-  public String init() throws BaseXException {
+  public String init() throws IOException {
     try {
       qp.init();
-    } catch(final Exception ex) {
+    } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
     return output();
   }
 
   @Override
-  public boolean more() throws BaseXException {
+  public boolean more() throws IOException {
     try {
       more = true;
       return qp.next();
-    } catch(final Exception ex) {
+    } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
   }
 
   @Override
-  public String next() throws BaseXException {
+  public String next() throws IOException {
     try {
       if(more) more = false;
       else qp.next();
-    } catch(final Exception ex) {
+    } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
     return output();
   }
 
   @Override
-  public String execute() throws BaseXException {
+  public String execute() throws IOException {
     try {
       qp.execute();
-    } catch(final Exception ex) {
+    } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
     return output();
   }
 
   @Override
-  public String info() throws BaseXException {
+  public String info() throws IOException {
     return string(qp.info());
   }
 
   @Override
-  public String close() throws BaseXException {
+  public String close() throws IOException {
     session.removeQuery(this);
     return closeListener();
   }
@@ -119,14 +119,10 @@ public class LocalQuery extends Query {
   /**
    * Close the query listener.
    * @return output
-   * @throws BaseXException IO exception
+   * @throws IOException I/O exception
    */
-  String closeListener() throws BaseXException {
-    try {
-      qp.close(false);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
+  String closeListener() throws IOException {
+    qp.close(false);
     return output();
   }
 

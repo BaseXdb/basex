@@ -55,61 +55,58 @@ public final class ClientSession extends Session {
   private Socket esocket;
 
   /**
-   * Constructor, specifying the database context and the
-   * login and password.
+   * Constructor, specifying login data.
    * @param context database context
    * @param user user name
-   * @param pw password
+   * @param pass password
    * @throws IOException I/O exception
    */
   public ClientSession(final Context context, final String user,
-      final String pw) throws IOException {
-    this(context, user, pw, null);
+      final String pass) throws IOException {
+    this(context, user, pass, null);
   }
 
   /**
-   * Constructor, specifying the database context and the
-   * login and password.
+   * Constructor, specifying login data and an output stream.
    * @param context database context
    * @param user user name
-   * @param pw password
+   * @param pass password
    * @param output client output; if set to {@code null}, results will
    * be returned as strings.
    * @throws IOException I/O exception
    */
   public ClientSession(final Context context, final String user,
-      final String pw, final OutputStream output) throws IOException {
+      final String pass, final OutputStream output) throws IOException {
     this(context.mprop.get(MainProp.HOST), context.mprop.num(MainProp.PORT),
-        user, pw, output);
+        user, pass, output);
   }
 
   /**
-   * Constructor, specifying the server host:port combination and the
-   * login and password.
+   * Constructor, specifying the server host:port combination and login data.
    * @param host server name
    * @param port server port
    * @param user user name
-   * @param pw password
+   * @param pass password
    * @throws IOException I/O exception
    */
   public ClientSession(final String host, final int port,
-      final String user, final String pw) throws IOException {
-    this(host, port, user, pw, null);
+      final String user, final String pass) throws IOException {
+    this(host, port, user, pass, null);
   }
 
   /**
-   * Constructor, specifying the server host:port combination and the
-   * login and password.
+   * Constructor, specifying the server host:port combination, login data and
+   * an output stream.
    * @param host server name
    * @param port server port
    * @param user user name
-   * @param pw password
+   * @param pass password
    * @param output client output; if set to {@code null}, results will
    * be returned as strings.
    * @throws IOException I/O exception
    */
   public ClientSession(final String host, final int port, final String user,
-      final String pw, final OutputStream output) throws IOException {
+      final String pass, final OutputStream output) throws IOException {
 
     super(output);
     ehost = host;
@@ -125,7 +122,7 @@ public final class ClientSession extends Session {
     // send user name and hashed password/timestamp
     sout = PrintOutput.get(socket.getOutputStream());
     send(user);
-    send(Token.md5(Token.md5(pw) + ts));
+    send(Token.md5(Token.md5(pass) + ts));
     sout.flush();
 
     // receive success flag

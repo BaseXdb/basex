@@ -10,11 +10,13 @@ import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
+import org.basex.core.User;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
 import org.basex.query.QueryException;
+import org.basex.util.Token;
 import org.basex.util.Util;
 import org.xml.sax.InputSource;
 
@@ -25,13 +27,13 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class LocalSession extends Session {
+  /** Currently registered queries. */
+  private final LinkedList<LocalQuery> queries = new LinkedList<LocalQuery>();
   /** Database context. */
   private final Context ctx;
-  /** Currently running query. */
-  private final LinkedList<LocalQuery> queries;
 
   /**
-   * Constructor.
+   * Default constructor.
    * @param context context
    */
   public LocalSession(final Context context) {
@@ -39,7 +41,36 @@ public final class LocalSession extends Session {
   }
 
   /**
-   * Constructor.
+   * Constructor, specifying login data.
+   * @param context context
+   * @param user user name
+   * @param pass password
+   * @throws LoginException login exception
+   */
+  public LocalSession(final Context context, final String user,
+      final String pass) throws LoginException {
+    this(context, user, pass, null);
+  }
+
+  /**
+   * Constructor, specifying login data and an output stream.
+   * @param context context
+   * @param user user name
+   * @param pass password
+   * @param output output stream
+   * @throws LoginException login exception
+   */
+  public LocalSession(final Context context, final String user,
+      final String pass, final OutputStream output) throws LoginException {
+
+    this(context, output);
+    final User usr = ctx.users.get(user);
+    if(usr == null || !Token.eq(usr.password, Token.token(Token.md5(pass))))
+      throw new LoginException();
+  }
+
+  /**
+   * Constructor, specifying an output stream.
    * @param context context
    * @param output output stream
    */
@@ -47,7 +78,6 @@ public final class LocalSession extends Session {
     super(output);
     ctx = new Context(context, null);
     ctx.user = context.user;
-    queries = new LinkedList<LocalQuery>();
   }
 
   @Override
