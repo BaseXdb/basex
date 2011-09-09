@@ -69,7 +69,7 @@ public final class JaxRxPOSTAdd {
    */
   public static void main(final String... args) throws Exception {
     // Start servers
-    final BaseXHTTP http = new BaseXHTTP();
+    final BaseXHTTP http = new BaseXHTTP("-W -Uadmin -Padmin");
     // Run example
     run();
     // Stop servers

@@ -17,7 +17,7 @@ public final class JaxRxAll {
    */
   public static void main(final String[] args) throws Exception {
     // Start servers
-    final BaseXHTTP http = new BaseXHTTP();
+    final BaseXHTTP http = new BaseXHTTP("-W -Uadmin -Padmin");
 
     // Create a database
     // Run all JAX-RX examples
