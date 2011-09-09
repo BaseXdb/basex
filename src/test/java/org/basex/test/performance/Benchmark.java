@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import org.basex.BaseXServer;
 import org.basex.core.MainProp;
-import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.Text;
@@ -77,10 +76,10 @@ public abstract class Benchmark {
    * specified number of runs.
    * @param query queries to be evaluated
    * @param r runs the number for the specified number of time
-   * @throws BaseXException exception
+   * @throws IOException I/O exception
    */
   protected void update(final int r, final String query)
-      throws BaseXException {
+      throws IOException {
 
     // loop through number of runs for a single query
     check();
@@ -91,18 +90,18 @@ public abstract class Benchmark {
    * Performs the specified query and returns the result.
    * @param query query to be evaluated
    * @return result
-   * @throws BaseXException exception
+   * @throws IOException I/O exception
    */
-  protected String query(final String query) throws BaseXException {
+  protected String query(final String query) throws IOException {
     check();
     return session.execute(new XQuery(query));
   }
 
   /**
    * Creates or opens the test database.
-   * @throws BaseXException exception
+   * @throws IOException I/O exception
    */
-  private void check() throws BaseXException {
+  private void check() throws IOException {
     session.execute(new Check(input));
   }
 }
