@@ -133,6 +133,11 @@ public final class ClientSession extends Session {
   }
 
   @Override
+  public ClientQuery query(final String query) throws IOException {
+    return new ClientQuery(query, this);
+  }
+
+  @Override
   public void create(final String name, final InputStream input)
       throws IOException {
 
@@ -241,11 +246,6 @@ public final class ClientSession extends Session {
     final BufferInput bi = new BufferInput(sin);
     info = bi.readString();
     if(!ok(bi)) throw new IOException(info);
-  }
-
-  @Override
-  public ClientQuery query(final String query) throws IOException {
-    return new ClientQuery(query, this);
   }
 
   @Override

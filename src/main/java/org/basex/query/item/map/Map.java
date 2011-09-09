@@ -27,6 +27,7 @@ import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenObjMap;
 
@@ -53,7 +54,7 @@ public final class Map extends FItem {
    * Constructor.
    * @param m map
    */
-  public Map(final TrieNode m) {
+  private  Map(final TrieNode m) {
     super(SeqType.ANY_MAP);
     root = m;
   }
@@ -189,19 +190,6 @@ public final class Map extends FItem {
   }
 
   /**
-   * Creates a new singleton map, containing one binding.
-   * @param k key to store
-   * @param val value bound to the key
-   * @param ii input info
-   * @return singleton map
-   * @throws QueryException query exception
-   */
-  public static Map entry(final Item k, final Value val, final InputInfo ii)
-      throws QueryException {
-    return EMPTY.insert(k, val, ii);
-  }
-
-  /**
    * Number of values contained in this map.
    * @return size
    */
@@ -295,5 +283,59 @@ public final class Map extends FItem {
     // remove superfluous comma
     if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
     return sb.append("}").toString();
+  }
+
+  /**
+   * <p>Creates a map from the specified string.
+   * This method is called to bind external maps to XQuery variables.
+   * The passed on string must have the following format:</p>
+   * <ul>
+   * <li>All key/value pairs must be separated by commas.</li>
+   * <li>Keys and values must be separated by a colon.</li>
+   * <li>Keys and values must be enclosed by double quotes and will be
+   *   represented as {@code xs:string} items.</li>
+   * <li>In analogy with XQuery, double quotes within strings must be
+   *   represented by two double quotes.</li>
+   * </ul>
+   * <p>Example: {@code "Key1":"Value1", "Key2":"Value2"}</p>
+   * @param s simplified map string
+   * @return map map string
+   * @throws QueryException query exception
+   */
+  public static Map create(final String s) throws QueryException {
+    Map map = EMPTY;
+    // 0: key, 1: colon, 2: value, 3: comma
+    int state = 0;
+    final TokenBuilder key = new TokenBuilder();
+    final TokenBuilder val = new TokenBuilder();
+    boolean quote = false, error = false;
+    final int pl = s.length();
+    for(int p = 0; p < pl; p++) {
+      char ch = s.charAt(p);
+      if(quote) {
+        if(ch == '"' && (p + 1 == pl || s.charAt(p + 1) != '"')) {
+          quote = false;
+          if(state++ != 2) continue;
+          map = map.insert(Str.get(key.finish()), Str.get(val.finish()), null);
+          key.reset();
+          val.reset();
+        } else {
+          if(ch == '"') ++p;
+          (state == 0 ? key : val).add(ch);
+        }
+      } else {
+        if(ch == ' ') continue;
+        quote = ch == '"';
+        switch(state) {
+          case 0:
+          case 2: error = !quote; break;
+          case 1: error = ch != ':'; state++; break;
+          case 3: error = ch != ','; state = 0; break;
+        }
+      }
+      if(error) INVIN.thrw(null, "'" + ch + "'");
+    }
+    if(quote || state == 1 || state == 2) INVIN.thrw(null, "end of input");
+    return map;
   }
 }

@@ -23,6 +23,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
 import org.basex.query.item.Value;
+import org.basex.query.item.map.Map;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 
@@ -130,7 +131,9 @@ public final class QueryProcessor extends Progress {
   /**
    * Binds an object to a global variable. If the object is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type.
+   * appropriate XQuery type. If {@code "map"} is specified as data type,
+   * the value is interpreted according to the rules specified in
+   * {@link Map#create(String)}.
    * @param n name of variable
    * @param o object to be bound
    * @param t data type
@@ -141,11 +144,15 @@ public final class QueryProcessor extends Progress {
 
     Object obj = o;
     if(t != null && !t.isEmpty()) {
-      final QNm type = new QNm(token(t));
-      if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
-      final Type typ = Types.find(type, true);
-      if(typ != null) obj = typ.e(obj, null);
-      else NOTYPE.thrw(null, type);
+      if(t.equals(QueryText.MAPSTR)) {
+        obj = Map.create(o.toString());
+      } else {
+        final QNm type = new QNm(token(t));
+        if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
+        final Type typ = Types.find(type, true);
+        if(typ != null) obj = typ.e(obj, null);
+        else NOTYPE.thrw(null, type);
+      }
     }
     bind(n, obj);
   }

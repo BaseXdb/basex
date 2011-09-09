@@ -1164,7 +1164,7 @@ public class QueryParser extends InputParser {
         break;
       }
     }
-    if(!dec) throw GVARNOTDEFINED.thrw(input(), v);
+    if(!dec) error(GVARNOTDEFINED, v);
 
     if(wsConsumeWs(COLLATION)) {
       final byte[] coll = stringLiteral();
@@ -2336,7 +2336,7 @@ public class QueryParser extends InputParser {
       }
       consume();
       if(consume('>')) {
-        if(!XMLToken.isNCName(str)) INVALPI.thrw(input(), str);
+        if(!XMLToken.isNCName(str)) error(INVALPI, str);
         return new CPI(input(), Str.get(str), Str.get(tb.finish()));
       }
       tb.add('?');
