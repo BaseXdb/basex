@@ -177,8 +177,11 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       throws IOException {
     final Query q = s.query(
         "for $d in db:list($db, $path) " +
-        "return db:add($trgdb, collection($db || '/' || $d), " +
-        "$trgdir || '/' || substring-after($d, $path))");
+        "let $t := tokenize(substring($d, string-length($path) + 1), '/') " +
+        "let $p := string-join(($trgdir, $t[position() < last()]), '/') " +
+        "let $n := $t[last()] " +
+        "return " +
+        "db:add($trgdb, collection($db||'/'||$d), $n, $p)");
     q.bind("$db", db);
     q.bind("$path", path);
     q.bind("$trgdb", trgdb);

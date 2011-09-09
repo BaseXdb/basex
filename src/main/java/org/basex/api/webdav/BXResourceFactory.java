@@ -40,7 +40,7 @@ public class BXResourceFactory implements ResourceFactory {
     final HTTPSession session = http.session(user, pass);
     if(!session.valid()) return NOAUTH;
 
-    final Path path = Path.path(dbpath);
+    final Path path = Path.path(dbpath).getStripFirst();
     // the root is requested
     if(path.isRoot()) return new BXRootResource(session);
 

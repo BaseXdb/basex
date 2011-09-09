@@ -1,20 +1,9 @@
 package org.basex.api.webdav;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.basex.api.HTTPContext;
 import org.basex.core.MainProp;
-import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-
-import com.bradmcevoy.http.HttpManager;
-import com.bradmcevoy.http.Request;
-import com.bradmcevoy.http.Response;
+import org.mortbay.jetty.servlet.Context;
 
 /**
  * This is the starter class for running the WebDAV server. A database server
@@ -35,28 +24,9 @@ public final class WebDAVServer {
    * @throws Exception exception
    */
   public WebDAVServer(final HTTPContext http) throws Exception {
-    final HttpManager m = new HttpManager(new BXResourceFactory(http));
-
-    final Handler h = new AbstractHandler() {
-      @Override
-      public void handle(final String target, final HttpServletRequest request,
-          final HttpServletResponse response, final int dispatch)
-          throws IOException, ServletException {
-
-        final Request req = new BXServletRequest(request);
-        final Response res = new BXServletResponse(response);
-
-        try {
-          m.process(req, res);
-        } finally {
-          res.getOutputStream().flush();
-          response.flushBuffer();
-        }
-      }
-    };
-
+    WebDAVServlet.http = http;
     jetty = new Server(http.context.mprop.num(MainProp.WEBDAVPORT));
-    jetty.setHandler(h);
+    new Context(jetty, "/").addServlet(WebDAVServlet.class, "/webdav/*");
     jetty.start();
   }
 
