@@ -20,11 +20,10 @@ public final class WebDAVServer {
 
   /**
    * Constructor.
-   * @param http HTTP context
    * @throws Exception exception
    */
-  public WebDAVServer(final HTTPContext http) throws Exception {
-    WebDAVServlet.http = http;
+  public WebDAVServer() throws Exception {
+    final HTTPContext http = HTTPContext.get();
     jetty = new Server(http.context.mprop.num(MainProp.WEBDAVPORT));
     new Context(jetty, "/").addServlet(WebDAVServlet.class, "/webdav/*");
     jetty.start();

@@ -25,12 +25,11 @@ public final class JaxRxServer {
 
   /**
    * Constructor.
-   * @param http HTTP context
    * @throws Exception exception
    */
-  public JaxRxServer(final HTTPContext http) throws Exception {
+  public JaxRxServer() throws Exception {
     // set serializer options (handled within the JAX-RX interface)
-    final Context context = http.context;
+    final Context context = HTTPContext.get().context;
     set(SERIALIZER, context.prop.get(Prop.SERIALIZER), false);
 
     // define path and name of the JAX-RX implementation.

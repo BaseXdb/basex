@@ -21,7 +21,7 @@ public final class HTTPContext {
   String user;
   /** Default password. */
   String pass;
-  /** Client flag: start server or standalone mode. */
+  /** Client flag. Default is {@code false} (standalone mode). */
   boolean client;
 
   /** Private constructor. */
@@ -44,7 +44,7 @@ public final class HTTPContext {
     user = System.getProperty(DBUSER);
     pass = System.getProperty(DBPASS);
     final String c = System.getProperty(DBCLIENT);
-    client = c == null || c.equals("true");
+    client = c != null && c.equals("true");
   }
 
   /**

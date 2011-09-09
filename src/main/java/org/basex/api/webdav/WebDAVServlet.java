@@ -8,7 +8,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.basex.api.HTTPContext;
 import org.basex.core.Text;
 import com.bradmcevoy.http.HttpManager;
 import com.bradmcevoy.http.Request;
@@ -20,10 +19,8 @@ import com.bradmcevoy.http.Response;
  * @author Dimitar Popov
  */
 public class WebDAVServlet implements Servlet {
-  /** HTTP BaseX context. */
-  public static HTTPContext http;
   /** Milton resource manager. */
-  private HttpManager manager = new HttpManager(new BXResourceFactory(http));
+  private HttpManager manager = new HttpManager(new BXResourceFactory());
 
   @Override
   public void init(final ServletConfig config) throws ServletException { }

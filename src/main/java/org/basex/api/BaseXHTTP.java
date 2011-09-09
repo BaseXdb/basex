@@ -62,8 +62,8 @@ public final class BaseXHTTP {
     }
 
     if(http.client) server = new BaseXServer(http.context, quiet ? "-z" : "");
-    webdav = new WebDAVServer(http);
-    jaxrx = new JaxRxServer(http);
+    webdav = new WebDAVServer();
+    jaxrx = new JaxRxServer();
   }
 
   /**

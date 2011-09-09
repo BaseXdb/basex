@@ -21,23 +21,12 @@ import com.bradmcevoy.http.ResourceFactory;
  * @author Dimitar Popov
  */
 public class BXResourceFactory implements ResourceFactory {
-  /** HTTP context. */
-  private final HTTPContext http;
-
-  /**
-   * Constructor.
-   * @param ht HTTP context
-   */
-  public BXResourceFactory(final HTTPContext ht) {
-    http = ht;
-  }
-
   @Override
   public Resource getResource(final String host, final String dbpath) {
     final Auth a = HttpManager.request().getAuthorization();
     final String user = a != null ? a.getUser() : null;
     final String pass = a != null ? a.getPassword() : null;
-    final HTTPSession session = http.session(user, pass);
+    final HTTPSession session = HTTPContext.get().session(user, pass);
     if(!session.valid()) return NOAUTH;
 
     final Path path = Path.path(dbpath).getStripFirst();

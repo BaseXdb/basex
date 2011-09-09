@@ -37,17 +37,8 @@ public final class HTTPSession {
    * @throws IOException I/O exception
    */
   public Session login() throws IOException {
-    /* retrieve host and port information from system properties:
-    final String host = System.getProperty(DBHOST);
-    final int port = Integer.parseInt(System.getProperty(DBPORT));
-
-    // local login: check if user exists
-    final User usr = ctx.users.get(user);
-    if(usr == null || !eq(usr.password, token(md5(pass)))) return null;
-    */
-
     return http.client ? new ClientSession(http.context, user, pass) :
-      new LocalSession(http.context);
+      new LocalSession(http.context, user, pass);
   }
 
   /**
