@@ -30,6 +30,15 @@ public final class JDBCConnections {
   }
 
   /**
+   * Returns connection or prepared statement with the given id.
+   * @param id id
+   * @return connection or prepared statement
+   */
+  public Object get(final int id) {
+    return conns.get(id);
+  }
+
+  /**
    * Removes either a connection or a prepared statement from the depot.
    * @param id connection/prepared statement id
    */
@@ -40,7 +49,7 @@ public final class JDBCConnections {
   /**
    * Closes all opened connections.
    */
-  public void closeAll() {
+  public void close() {
     for(int i = 0; i < conns.size(); i++) {
       final int key = conns.key(i);
       final Object obj = conns.get(key);
@@ -53,14 +62,5 @@ public final class JDBCConnections {
         }
       }
     }
-  }
-
-  /**
-   * Returns connection or prepared statement with the given id.
-   * @param id id
-   * @return connection or prepared statement
-   */
-  public Object get(final int id) {
-    return conns.get(id);
   }
 }

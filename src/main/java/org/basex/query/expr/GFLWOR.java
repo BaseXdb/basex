@@ -136,7 +136,8 @@ public class GFLWOR extends ParseExpr {
     // remove declarations of statically bound or unused variables
     for(int f = 0; f < fl.length; ++f) {
       final ForLet l = fl[f];
-      if(l.var.expr() != null || l.simple(true) && count(l.var, f) == 0) {
+      if(l.var.expr() != null || l.simple(true) && count(l.var, f) == 0 &&
+          !l.expr.uses(Use.CTX)) {
         ctx.compInfo(OPTVAR, l.var);
         fl = Array.delete(fl, f--);
       }

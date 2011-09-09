@@ -197,7 +197,7 @@ public enum Function {
   /** XQuery function. */
   URICOLL(FNGen.class, "uri-collection([uri])", URI_ZM, 0, STR_ZO),
   /** XQuery function. */
-  SERIALIZE(FNGen.class, "serialize(node[,params])", STR, 1, ITEM_ZM, ELM_ZO),
+  SERIALIZE(FNGen.class, "serialize(node[,params])", STR, 1, ITEM_ZM, ITEM),
 
   /* FNId functions. */
 
@@ -554,18 +554,20 @@ public enum Function {
   /* FNSql functions. */
 
   /** XQuery function */
-  CONNECT(FNSql.class, "connect(url[,auto-commit[,user[,pass]]]])",
-      ITR, 1, STR, BLN_ZO, STR, STR),
+  INIT(FNSql.class, "init(class)", EMP, 1, STR),
   /** XQuery function */
-  PREPARE(FNSql.class, "prepare(id,statement)", ITR, 2, ITR, STR),
+  CONNECT(FNSql.class, "connect(url[,user[,pass[,options]]]]])",
+      ITR, 1, STR, STR, STR, NOD_ZO),
+  /** XQuery function */
+  PREPARE(FNSql.class, "prepare(id,statement)", ITR, ITR, STR),
   /** XQuery function */
   EXECUTE(FNSql.class, "execute(id[,item])", ELM_ZM, 1, ITR, ITEM_ZO),
   /** XQuery function */
-  CLOSE(FNSql.class, "close(id)", EMP, 1, ELM_ZO),
+  CLOSE(FNSql.class, "close(id)", EMP, ITR),
   /** XQuery function */
-  COMMIT(FNSql.class, "commit(id)", EMP, 1, ELM_ZO),
+  COMMIT(FNSql.class, "commit(id)", EMP, ITR),
   /** XQuery function */
-  ROLLBACK(FNSql.class, "rollback(id)", EMP, 1, ELM_ZO),
+  ROLLBACK(FNSql.class, "rollback(id)", EMP, ITR),
 
   /* FNFt functions. */
 

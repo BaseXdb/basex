@@ -142,15 +142,22 @@ public interface Text {
     "  -U<name>  Specify user name" + NL +
     "  -z        Suppress logging";
 
-  /** Start information. */
-  String WEBDAVINFO =
-    " [-hpruw]" + NL +
-    "  -n<name>    Set server (host) name" + NL +
-    "  -P<dbpass>  Specify user password" + NL +
-    "  -r<num>     Set server port" + NL +
-    "  -s          Start in standalone mode" + NL +
-    "  -U<dbuser>  Specify user name" + NL +
-    "  -w<num>     Set WebDAV server port";
+  /** HTTP information. */
+  String HTTPINFO =
+    " [-cdejnpPsSUwz] [stop]" + NL +
+    "  stop      Stop existing server" + NL +
+    "  -c        Start in client/server mode" + NL +
+    "  -d        Activate debugging mode" + NL +
+    "  -e<num>   Set event port" + NL +
+    "  -j<num>   Set JAX-RX server port" + NL +
+    "  -n<name>  Set server (host) name" + NL +
+    "  -p<num>   Set database server port" + NL +
+    "  -P<pass>  Specify user password" + NL +
+    "  -s        Start database as service" + NL +
+    "  -S<pars>  Set serialization parameter(s)" + NL +
+    "  -U<name>  Specify user name" + NL +
+    "  -w<num>   Set WebDAV server port" + NL +
+    "  -z        Suppress logging";
 
   // SERVER ===================================================================
 

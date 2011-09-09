@@ -201,6 +201,8 @@ public enum Err {
   NOTEXPATTR(XSQL, 5, "Not expected attribute: %"),
   /** XSQL0006: Evaluation exception. */
   ILLFORMAT(XSQL, 6, "Illegal % format"),
+  /** XSQL0007: Evaluation exception. */
+  SQLINIT(XSQL, 7, "Could not initialize specified driver: '%'"),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),

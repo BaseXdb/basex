@@ -255,6 +255,8 @@ public final class ClientListener extends Thread {
   public synchronized void register(final Socket s) throws IOException {
     esocket = s;
     eout = PrintOutput.get(s.getOutputStream());
+    eout.write(0);
+    eout.flush();
   }
 
   /**
@@ -265,7 +267,6 @@ public final class ClientListener extends Thread {
    */
   public synchronized void notify(final byte[] name, final byte[] msg)
       throws IOException {
-
     eout.print(name);
     eout.write(0);
     eout.print(msg);
@@ -376,15 +377,14 @@ public final class ClientListener extends Thread {
    */
   private void watch() throws IOException {
     final Performance perf = new Performance();
-    final String name = in.readString();
-
     // initialize server-based event handling
     if(events == null) {
       out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));
       out.writeString(Long.toString(getId()));
+      out.flush();
       events = new StringList();
     }
-
+    final String name = in.readString();
     final Sessions s = context.events.get(name);
     final boolean ok = s != null && !s.contains(this);
     String message = "";
