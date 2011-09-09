@@ -1,13 +1,9 @@
 package org.basex.query.util.crypto;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyException;
 import java.security.KeyPair;
@@ -26,7 +22,6 @@ import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.XMLSignature.SignatureValue;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
@@ -34,20 +29,14 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.basex.api.dom.BXNode;
-import org.basex.io.serial.SerializerProp;
-import org.basex.io.serial.XMLSerializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
-import org.basex.query.item.Str;
 import org.basex.util.InputInfo;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * This class generates and validates digital signatures for XML data.
@@ -143,7 +132,7 @@ public final class DigitalSignature {
               Collections.singletonList(ref));
 
       // auto-generated keypair and signature
-      final KeyPairGenerator gen = KeyPairGenerator.getInstance("DSA");
+      final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
       gen.initialize(512);
       final KeyPair kp = gen.generateKeyPair();
       final KeyInfoFactory kif = fac.getKeyInfoFactory();
@@ -152,12 +141,19 @@ public final class DigitalSignature {
       final PrivateKey pk = kp.getPrivate();
 
       // enveloped certificate
-      final BXNode bxnode = node.toJava();
-      final Node nnode = (Node) bxnode;
-      final DOMSignContext dsc = new DOMSignContext(pk, nnode);
+      final Serializer ser = Serializer.
+          get(new FileOutputStream("node.xml"), null);
+      node.serialize(ser);
+      ser.close();
+
+      final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      final Document doc = dbf.newDocumentBuilder().parse(
+          new FileInputStream("node.xml"));
+
+      final DOMSignContext dsc = new DOMSignContext(pk, doc.getDocumentElement());
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
       xmlsig.sign(dsc);
-      signedNode = NodeType.NOD.e(nnode, input);
+      signedNode = NodeType.DOC.e(doc, input);
 
       // use streams instead. DocumentBuilderFactory(node.serialize)
 
