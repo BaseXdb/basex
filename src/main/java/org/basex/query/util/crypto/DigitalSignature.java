@@ -158,7 +158,7 @@ public final class DigitalSignature {
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
       xmlsig.sign(dsc);
       signedNode = NodeType.NOD.e(nnode, input);
-      
+
       // use streams instead. DocumentBuilderFactory(node.serialize)
 
     } catch(NoSuchAlgorithmException e) {
