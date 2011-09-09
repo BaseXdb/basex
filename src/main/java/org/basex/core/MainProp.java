@@ -38,10 +38,8 @@ public final class MainProp extends AProp {
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
   /** Client/server communication: port, used for sending events. */
   public static final Object[] EVENTPORT = { "EVENTPORT", 1985 };
-  /** Client/server communication: port, used for starting the JAX-RX server. */
-  public static final Object[] JAXRXPORT = { "JAXRXPORT", 8984 };
-  /** Client/server communication: port, used for starting the WebDAV server. */
-  public static final Object[] WEBDAVPORT = { "WEBDAVPORT", 8985 };
+  /** Client/server communication: port, used for starting the HTTP server. */
+  public static final Object[] HTTPPORT = { "HTTPPORT", 8984 };
 
   /** Server timeout in seconds; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
