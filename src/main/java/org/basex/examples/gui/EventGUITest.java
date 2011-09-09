@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,7 +20,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
 import org.basex.server.EventNotifier;
 import org.basex.util.Util;
@@ -72,9 +72,9 @@ public final class EventGUITest extends JFrame {
   /**
    * Default Constructor.
    * @param count window counter
-   * @throws Exception exception
+   * @throws IOException I/O exception
    */
-  private EventGUITest(final int count) throws Exception {
+  private EventGUITest(final int count) throws IOException {
     super("Window " + (count + 1));
 
     final JPanel buttons = new JPanel();
@@ -106,7 +106,7 @@ public final class EventGUITest extends JFrame {
         // display updated XML fragment
         try {
           area.setText(session.query("/").execute());
-        } catch(final BaseXException ex) {
+        } catch(final IOException ex) {
           ex.printStackTrace();
         }
       }
@@ -131,7 +131,7 @@ public final class EventGUITest extends JFrame {
               "(replace value of node /Application/Background with $color," +
               " db:event('" + NAME + "', $color))";
             session.query(query).execute();
-          } catch(final BaseXException ex) {
+          } catch(final IOException ex) {
             ex.printStackTrace();
           }
           en.notify(b.getText());

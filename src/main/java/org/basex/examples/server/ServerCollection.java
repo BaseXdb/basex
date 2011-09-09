@@ -1,7 +1,8 @@
 package org.basex.examples.server;
 
+import java.io.IOException;
+
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.XQuery;
 import org.basex.examples.query.QueryCollection;
@@ -78,10 +79,11 @@ public final class ServerCollection {
     server.stop();
   }
 
-  /** This Methods performs a simple path based search in a collection.
-   * @throws BaseXException on error.
+  /**
+   * This Methods performs a simple path based search in a collection.
+   * @throws IOException I/O exception
    */
-  private static void find() throws BaseXException {
+  private static void find() throws IOException {
     // ------------------------------------------------------------------------
     System.out.println("\n* Finding documents in folder /book/chapters/0:");
     System.out.println(session.execute(
@@ -93,9 +95,9 @@ public final class ServerCollection {
   /**
    * This method shows how to modify multiple documents at once.
    * It replaces the title of the matching documents with 1 2 3.
-   * @throws BaseXException on error.
+   * @throws IOException I/O exception
    */
-  private static void modify() throws BaseXException {
+  private static void modify() throws IOException {
     session.execute(new XQuery(
         "for $doc in collection('input/book/chapters/0/')" + " return "
             + "replace value of node $doc/text/title  "
@@ -111,10 +113,10 @@ public final class ServerCollection {
    * @param xmlFragment XML Fragment
    * @param docname document name
    * @param target optional target path
-   * @throws BaseXException on error.
+   * @throws IOException I/O exception
    */
   private static void add(final String xmlFragment, final String docname,
-      final String target) throws BaseXException {
+      final String target) throws IOException {
 
     session.execute(new Add(xmlFragment, docname, target));
   }
