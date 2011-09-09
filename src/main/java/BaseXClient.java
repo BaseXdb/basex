@@ -169,30 +169,6 @@ public final class BaseXClient {
   }
 
   /**
-   * Starts the listener thread.
-   * @param is input stream
-   */
-  private void listen(final InputStream is) {
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          final BufferedInputStream bi = new BufferedInputStream(is);
-          while(true) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            receive(bi, baos);
-            final String name = baos.toString("UTF-8");
-            baos = new ByteArrayOutputStream();
-            receive(bi, baos);
-            final String data = baos.toString("UTF-8");
-            notifiers.get(name).notify(data);
-          }
-        } catch(final Exception ex) { }
-      }
-    }.start();
-  }
-
-  /**
    * Unwatches an event.
    * @param name event name
    * @throws IOException I/O exception
@@ -203,25 +179,6 @@ public final class BaseXClient {
     info = receive();
     if(!ok()) throw new IOException(info);
     notifiers.remove(name);
-  }
-
-  /**
-   * Sends an input stream to the server.
-   * @param input xml input
-   * @throws IOException I/O exception
-   */
-  private void send(final InputStream input) throws IOException {
-    final BufferedInputStream bis = new BufferedInputStream(input);
-    final BufferedOutputStream bos = new BufferedOutputStream(out);
-    for(int b; (b = bis.read()) != -1;) {
-      // 0x00 and 0xFF will be prefixed by 0xFF
-      if(b == 0x00 || b == 0xFF) bos.write(0xFF);
-      bos.write(b);
-    }
-    bos.write(0);
-    bos.flush();
-    info = receive();
-    if(!ok()) throw new IOException(info);
   }
 
   /**
@@ -285,6 +242,49 @@ public final class BaseXClient {
       if(b == 0 || b == -1) break;
       os.write(b);
     }
+  }
+
+  /**
+   * Starts the listener thread.
+   * @param is input stream
+   */
+  private void listen(final InputStream is) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          final BufferedInputStream bi = new BufferedInputStream(is);
+          while(true) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            receive(bi, baos);
+            final String name = baos.toString("UTF-8");
+            baos = new ByteArrayOutputStream();
+            receive(bi, baos);
+            final String data = baos.toString("UTF-8");
+            notifiers.get(name).notify(data);
+          }
+        } catch(final Exception ex) { }
+      }
+    }.start();
+  }
+
+  /**
+   * Sends an input stream to the server.
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  private void send(final InputStream input) throws IOException {
+    final BufferedInputStream bis = new BufferedInputStream(input);
+    final BufferedOutputStream bos = new BufferedOutputStream(out);
+    for(int b; (b = bis.read()) != -1;) {
+      // 0x00 and 0xFF will be prefixed by 0xFF
+      if(b == 0x00 || b == 0xFF) bos.write(0xFF);
+      bos.write(b);
+    }
+    bos.write(0);
+    bos.flush();
+    info = receive();
+    if(!ok()) throw new IOException(info);
   }
 
   /**
