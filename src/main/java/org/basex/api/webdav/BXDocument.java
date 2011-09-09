@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Map;
 
 import org.basex.api.HTTPSession;
-import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.io.IO;
@@ -70,7 +69,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
 
     new BXCode<Object>(this) {
       @Override
-      public void run() throws BaseXException {
+      public void run() throws IOException {
         s.setOutputStream(out);
         final Query q = s.query("collection($path)");
         q.bind("$path", db + SEP + path);
@@ -81,7 +80,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
 
   @Override
   protected void copyToRoot(final Session s, final String n)
-      throws BaseXException {
+      throws IOException {
 
     // document is copied to the root: create new database with it
     final String nm = n.endsWith(IO.XMLSUFFIX) ?
@@ -93,7 +92,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
 
   @Override
   protected void copyTo(final Session s, final BXFolder f, final String n)
-      throws BaseXException {
+      throws IOException {
 
     // folder is copied to a folder in a database
     add(s, f.db, f.path, n);
@@ -106,10 +105,10 @@ public class BXDocument extends BXAbstractResource implements FileResource {
    * @param trgdb target database
    * @param trgdir target directory
    * @param name new name
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   protected void add(final Session s, final String trgdb, final String trgdir,
-      final String name) throws BaseXException {
+      final String name) throws IOException {
 
     final Query q = s.query("db:add($db, collection($doc), $name, $path)");
     q.bind("$db", trgdb);

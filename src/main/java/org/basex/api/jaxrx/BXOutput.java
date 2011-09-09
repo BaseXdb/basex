@@ -1,11 +1,11 @@
 package org.basex.api.jaxrx;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Scanner;
 
 import javax.ws.rs.core.StreamingOutput;
 
-import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Open;
@@ -46,13 +46,13 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
         if(path.getDepth() != 0) {
           session.execute(new Open(path.getResourcePath()));
         }
-      } catch(final BaseXException ex) {
+      } catch(final IOException ex) {
         throw new JaxRxException(status(ex), ex.getMessage());
       }
       try {
         // set serialization parameters
         session.execute(new Set(Prop.SERIALIZER, serial(path)));
-      } catch(final BaseXException ex) {
+      } catch(final IOException ex) {
         throw new JaxRxException(400, ex.getMessage());
       }
     }
@@ -70,7 +70,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
     session.setOutputStream(os);
     try {
       return session.execute(command.toString());
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       throw new JaxRxException(400, ex.getMessage());
     }
   }
@@ -110,11 +110,11 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       cq.init();
       while(++c < s + m && cq.more()) if(c >= s) cq.next();
       return null;
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       throw new JaxRxException(status(ex), ex.getMessage());
     } finally {
       // close query instance
-      if(cq != null) try { cq.close(); } catch(final BaseXException ex) { }
+      if(cq != null) try { cq.close(); } catch(final IOException ex) { }
     }
   }
 

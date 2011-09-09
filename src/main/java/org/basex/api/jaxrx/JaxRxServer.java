@@ -21,7 +21,7 @@ import org.jaxrx.core.JaxRxConstants;
  */
 public final class JaxRxServer {
   /** Jetty server. */
-  private JettyServer jetty;
+  private final JettyServer jetty;
 
   /**
    * Constructor.

@@ -1,12 +1,14 @@
 package org.basex.api.webdav;
 
+import java.io.IOException;
+
 import org.basex.api.HTTPSession;
-import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Rename;
 import org.basex.server.Session;
+
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.CopyableResource;
 import com.bradmcevoy.http.DeletableResource;
@@ -38,7 +40,7 @@ public abstract class BXAbstractResource extends BXResource implements
   public void delete() throws BadRequestException {
     new BXCode<Object>(this) {
       @Override
-      public void run() throws BaseXException {
+      public void run() throws IOException {
         delete(s);
       }
     }.eval();
@@ -50,7 +52,7 @@ public abstract class BXAbstractResource extends BXResource implements
 
     new BXCode<Object>(this) {
       @Override
-      public void run() throws BaseXException {
+      public void run() throws IOException {
         if(target instanceof BXRootResource)
           copyToRoot(s, name);
         else if(target instanceof BXFolder)
@@ -65,7 +67,7 @@ public abstract class BXAbstractResource extends BXResource implements
 
     new BXCode<Object>(this) {
       @Override
-      public void run() throws BaseXException {
+      public void run() throws IOException {
         if(target instanceof BXRootResource)
           moveToRoot(s, name);
         else if(target instanceof BXFolder)
@@ -77,9 +79,9 @@ public abstract class BXAbstractResource extends BXResource implements
   /**
    * Delete document or folder.
    * @param s current session
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  protected void delete(final Session s) throws BaseXException {
+  protected void delete(final Session s) throws IOException {
     s.execute(new Open(db));
     s.execute(new Delete(path));
 
@@ -93,9 +95,9 @@ public abstract class BXAbstractResource extends BXResource implements
    * Rename document or folder.
    * @param s current session
    * @param n new name
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  protected void rename(final Session s, final String n) throws BaseXException {
+  protected void rename(final Session s, final String n) throws IOException {
     s.execute(new Open(db));
     s.execute(new Rename(path, n));
 
@@ -114,29 +116,29 @@ public abstract class BXAbstractResource extends BXResource implements
    * Copy folder to the root, creating a new database.
    * @param s current session
    * @param n new name of the folder (database)
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   protected abstract void copyToRoot(final Session s, final String n)
-      throws BaseXException;
+      throws IOException;
 
   /**
    * Copy folder to another folder.
    * @param s current session
    * @param f target folder
    * @param n new name of the folder
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   protected abstract void copyTo(final Session s, final BXFolder f,
-      final String n) throws BaseXException;
+      final String n) throws IOException;
 
   /**
    * Move folder to the root, creating a new database.
    * @param s current session
    * @param n new name of the folder (database)
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   protected void moveToRoot(final Session s, final String n)
-      throws BaseXException {
+      throws IOException {
     // folder is moved to the root: create new database with it
     copyToRoot(s, n);
     delete(s);
@@ -147,10 +149,10 @@ public abstract class BXAbstractResource extends BXResource implements
    * @param s current session
    * @param f target folder
    * @param n new name of the folder
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   protected void moveTo(final Session s, final BXFolder f, final String n)
-      throws BaseXException {
+      throws IOException {
     if(f.db.equals(db)) {
       // folder is moved to a folder in the same database
       rename(s, f.path + SEP + n);

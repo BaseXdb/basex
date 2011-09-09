@@ -11,7 +11,6 @@ import java.util.HashSet;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.basex.api.HTTPContext;
-import org.basex.core.BaseXException;
 import org.basex.core.MainProp;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
@@ -156,7 +155,7 @@ public final class BXJaxRx implements JaxRx {
         // open database
         try {
           session.execute(new Open(db(path)));
-        } catch(final BaseXException ex) {
+        } catch(final IOException ex) {
           throw new JaxRxException(404, ex.getMessage());
         }
         add(input, path, session);
@@ -182,7 +181,7 @@ public final class BXJaxRx implements JaxRx {
     }
     try {
       session.add(name, target.toString(), input);
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       throw new JaxRxException(400, ex.getMessage());
     }
   }
@@ -208,7 +207,7 @@ public final class BXJaxRx implements JaxRx {
             add(input, path, session);
           }
           return session.info();
-        } catch(final BaseXException ex) {
+        } catch(final IOException ex) {
           // return exception if process failed
           throw new JaxRxException(400, ex.getMessage());
         }
@@ -230,7 +229,7 @@ public final class BXJaxRx implements JaxRx {
             session.execute(new Delete(path(path)));
           }
           return session.info();
-        } catch(final BaseXException ex) {
+        } catch(final IOException ex) {
           // return exception if process failed
           if(root) throw new JaxRxException(ex);
           throw new JaxRxException(404, ex.getMessage());

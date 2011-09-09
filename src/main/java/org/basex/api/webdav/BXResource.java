@@ -2,10 +2,10 @@ package org.basex.api.webdav;
 
 import static java.lang.Integer.*;
 
+import java.io.IOException;
 import java.util.Date;
 
 import org.basex.api.HTTPSession;
-import org.basex.core.BaseXException;
 import org.basex.core.Text;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
@@ -103,9 +103,9 @@ public abstract class BXResource implements Resource {
    * List all databases.
    * @param s session
    * @return a list of database names
-   * @throws BaseXException query exception
+   * @throws IOException I/O exception
    */
-  static StringList listDBs(final Session s) throws BaseXException {
+  static StringList listDBs(final Session s) throws IOException {
     final StringList result = new StringList();
     final Query q = s.query("db:list()");
     try {
@@ -162,10 +162,10 @@ public abstract class BXResource implements Resource {
    * @param db database
    * @param path path
    * @return number of documents
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   static int count(final Session s, final String db, final String path)
-      throws BaseXException {
+      throws IOException {
     final Query q = s.query("count(db:list($d, $p))");
     q.bind("$d", db);
     q.bind("$p", path);
@@ -178,10 +178,10 @@ public abstract class BXResource implements Resource {
    * @param db database name
    * @param p resource path
    * @return number of documents
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   static boolean exists(final Session s, final String db, final String p)
-      throws BaseXException {
+      throws IOException {
 
     final String path = stripLeadingSlash(p);
     final Query q = s.query("exists(db:list($d, $p)[. = $p])");
@@ -196,10 +196,10 @@ public abstract class BXResource implements Resource {
    * @param db database name
    * @param p path
    * @return {@code true} if dummy document existed
-   * @throws BaseXException query exception
+   * @throws IOException I/O exception
    */
   static boolean deleteDummy(final Session s, final String db, final String p)
-      throws BaseXException {
+      throws IOException {
 
     final String dummy = p + SEP + DUMMY;
     if(count(s, db, dummy) == 0) return false;
@@ -217,10 +217,10 @@ public abstract class BXResource implements Resource {
    * @param db database name
    * @param p path
    * @return {@code true} if dummy document was created
-   * @throws BaseXException query exception
+   * @throws IOException I/O exception
    */
   static boolean createDummy(final Session s, final String db, final String p)
-      throws BaseXException {
+      throws IOException {
     // check, if path is a folder and is empty
     if(p.matches("[^/]") || count(s, db, p) > 0) return false;
 
@@ -247,7 +247,7 @@ public abstract class BXResource implements Resource {
 
       // check if there are paths in the collection starting with this path
       if(count(s, db, path) > 0) return new BXFolder(db, path, hs);
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       Util.errln(ex);
     }
     return null;

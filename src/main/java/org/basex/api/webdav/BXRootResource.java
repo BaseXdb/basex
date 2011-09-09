@@ -1,5 +1,6 @@
 package org.basex.api.webdav;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.api.HTTPSession;
-import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 
@@ -45,7 +45,7 @@ public class BXRootResource extends BXResource implements
   public Resource child(final String childName) {
     return new BXCode<BXResource>(this) {
       @Override
-      public BXResource get() throws BaseXException {
+      public BXResource get() throws IOException {
         return listDBs(s).contains(childName) ?
             new BXDatabase(childName, session) : null;
       }
@@ -56,7 +56,7 @@ public class BXRootResource extends BXResource implements
   public List<BXResource> getChildren() {
     return new BXCode<List<BXResource>>(this) {
       @Override
-      public List<BXResource> get() throws BaseXException {
+      public List<BXResource> get() throws IOException {
         final List<BXResource> dbs = new ArrayList<BXResource>();
         for(final String d : listDBs(s)) dbs.add(new BXDatabase(d, session));
         return dbs;
@@ -70,7 +70,7 @@ public class BXRootResource extends BXResource implements
 
     return new BXCode<BXDatabase>(this) {
       @Override
-      public BXDatabase get() throws BaseXException {
+      public BXDatabase get() throws IOException {
         s.execute(new CreateDB(dbname(newName)));
         return new BXDatabase(newName, session);
       }
@@ -83,7 +83,7 @@ public class BXRootResource extends BXResource implements
 
     return new BXCode<BXDatabase>(this) {
       @Override
-      public BXDatabase get() throws BaseXException {
+      public BXDatabase get() throws IOException {
         final String dbname = dbname(newName);
         s.create(dbname, inputStream);
         s.execute(new Close());

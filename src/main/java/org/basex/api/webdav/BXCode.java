@@ -17,7 +17,7 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
  */
 public abstract class BXCode<E> {
   /** Resource. */
-  private BXResource resource;
+  private final BXResource resource;
   /** Session instance. */
   protected Session s;
 

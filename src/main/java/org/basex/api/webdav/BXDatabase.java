@@ -1,11 +1,11 @@
 package org.basex.api.webdav;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.basex.api.HTTPSession;
-import org.basex.core.BaseXException;
 import org.basex.core.Text;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.Close;
@@ -41,7 +41,7 @@ public class BXDatabase extends BXFolder {
     try {
       final String info = new BXCode<String>(this) {
         @Override
-        public String get() throws BaseXException {
+        public String get() throws IOException {
           final Query q = s.query("db:info($p)");
           q.bind("$p", db);
           return q.execute();
@@ -68,25 +68,25 @@ public class BXDatabase extends BXFolder {
   }
 
   @Override
-  protected void delete(final Session s) throws BaseXException {
+  protected void delete(final Session s) throws IOException {
     s.execute(new Close());
     s.execute(new DropDB(db));
   }
 
   @Override
-  protected void rename(final Session s, final String n) throws BaseXException {
+  protected void rename(final Session s, final String n) throws IOException {
     s.execute(new AlterDB(db, n));
   }
 
   @Override
   protected void copyToRoot(final Session s, final String n)
-      throws BaseXException {
+      throws IOException {
     s.execute(new Copy(db, n));
   }
 
   @Override
   protected void moveToRoot(final Session s, final String n)
-      throws BaseXException {
+      throws IOException {
     rename(s, n);
   }
 }

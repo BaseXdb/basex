@@ -1,5 +1,6 @@
 package org.basex.api.webdav;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.api.HTTPSession;
-import org.basex.core.BaseXException;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
@@ -75,7 +75,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
     return new BXCode<BXDocument>(this) {
       @Override
-      public BXDocument get() throws BaseXException {
+      public BXDocument get() throws IOException {
         s.execute(new Open(db));
         final String doc = path.isEmpty() ? newName : path + SEP + newName;
         // check if document with this path already exists
@@ -96,7 +96,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
     return new BXCode<BXFolder>(this) {
       @Override
-      public BXFolder get() throws BaseXException {
+      public BXFolder get() throws IOException {
         // [DP] WebDAV: possible optimization would be to rename the dummy, if
         // the current folder is empty (which not always the case)
         deleteDummy(s, db, path);
@@ -121,7 +121,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   public List<BXResource> getChildren() {
     return new BXCode<List<BXResource>>(this) {
       @Override
-      public List<BXResource> get() throws BaseXException {
+      public List<BXResource> get() throws IOException {
         final List<BXResource> ch = new ArrayList<BXResource>();
         final HashSet<String> paths = new HashSet<String>();
         final Query q = s.query(
@@ -151,7 +151,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   @Override
   protected void copyToRoot(final Session s, final String n)
-      throws BaseXException {
+      throws IOException {
     // folder is copied to the root: create new database with it
     s.execute(new CreateDB(n));
     add(s, n, "");
@@ -160,7 +160,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   @Override
   protected void copyTo(final Session s, final BXFolder f, final String n)
-      throws BaseXException {
+      throws IOException {
     // folder is copied to a folder in a database
     add(s, f.db, f.path + SEP + n);
     deleteDummy(s, f.db, f.path);
@@ -171,10 +171,10 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
    * @param s current session
    * @param trgdb target database
    * @param trgdir target folder
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   private void add(final Session s, final String trgdb, final String trgdir)
-      throws BaseXException {
+      throws IOException {
     final Query q = s.query(
         "for $d in db:list($db, $path) " +
         "return db:add($trgdb, collection($db || '/' || $d), " +
