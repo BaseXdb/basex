@@ -83,7 +83,7 @@ public final class HTTPClientTest {
   public static void start() throws Exception {
     context = new Context();
     context.prop.set(Prop.CACHEQUERY, true);
-    http = new BaseXHTTP("-c -U" + ADMIN + " -P" + ADMIN + " -z");
+    http = new BaseXHTTP("-czWU" + ADMIN + " -P" + ADMIN);
   }
 
   /**

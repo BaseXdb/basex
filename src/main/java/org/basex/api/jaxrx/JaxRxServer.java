@@ -3,12 +3,11 @@ package org.basex.api.jaxrx;
 import static org.basex.api.HTTPText.*;
 
 import org.basex.api.HTTPContext;
-import org.basex.core.Context;
-import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.jaxrx.JettyServer;
 import org.jaxrx.core.JaxRxConstants;
+import org.mortbay.jetty.Server;
 
 /**
  * This is the starter class for running the JAX-RX server, based on the JAX-RX
@@ -20,42 +19,19 @@ import org.jaxrx.core.JaxRxConstants;
  * @author Christian Gruen
  */
 public final class JaxRxServer {
-  /** Jetty server. */
-  private final JettyServer jetty;
-
   /**
    * Constructor.
-   * @throws Exception exception
+   * @param server jetty server
    */
-  public JaxRxServer() throws Exception {
+  public JaxRxServer(final Server server) {
     // set serializer options (handled within the JAX-RX interface)
-    final Context context = HTTPContext.get().context;
-    set(SERIALIZER, context.prop.get(Prop.SERIALIZER), false);
+    final HTTPContext http = HTTPContext.get();
+    System.setProperty(SERIALIZER, http.context.prop.get(Prop.SERIALIZER));
 
     // define path and name of the JAX-RX implementation.
-    set(JaxRxConstants.NAMEPROP, Text.NAMELC, false);
-    set(JaxRxConstants.PATHPROP, BXJaxRx.class.getName(), false);
+    System.setProperty(JaxRxConstants.NAMEPROP, Text.NAMELC);
+    System.setProperty(JaxRxConstants.PATHPROP, BXJaxRx.class.getName());
 
-    // start Jetty server
-    jetty = new JettyServer(context.mprop.num(MainProp.JAXRXPORT));
-  }
-
-  /**
-   * Stops the server.
-   */
-  public void stop()  {
-    jetty.stop();
-  }
-
-  /**
-   * Sets the specified value if property has not been set yet.
-   * @param key property key
-   * @param value property value
-   * @param force force setting
-   */
-  private void set(final String key, final Object value, final boolean force) {
-    if(force || System.getProperty(key) == null) {
-      System.setProperty(key, value.toString());
-    }
+    JettyServer.register(server);
   }
 }

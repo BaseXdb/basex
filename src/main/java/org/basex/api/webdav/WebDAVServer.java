@@ -1,7 +1,5 @@
 package org.basex.api.webdav;
 
-import org.basex.api.HTTPContext;
-import org.basex.core.MainProp;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 
@@ -15,25 +13,11 @@ import org.mortbay.jetty.servlet.Context;
  * @author Dimitar Popov
  */
 public final class WebDAVServer {
-  /** HTTP server. */
-  private final Server jetty;
-
   /**
    * Constructor.
-   * @throws Exception exception
+   * @param jetty jetty server
    */
-  public WebDAVServer() throws Exception {
-    final HTTPContext http = HTTPContext.get();
-    jetty = new Server(http.context.mprop.num(MainProp.WEBDAVPORT));
+  public WebDAVServer(final Server jetty) {
     new Context(jetty, "/").addServlet(WebDAVServlet.class, "/webdav/*");
-    jetty.start();
-  }
-
-  /**
-   * Stops the server.
-   * @throws Exception exception
-   */
-  public void stop() throws Exception {
-    jetty.stop();
   }
 }

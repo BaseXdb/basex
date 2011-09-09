@@ -46,7 +46,7 @@ public final class JaxRxTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    http = new BaseXHTTP("-U" + Text.ADMIN + " -P" + Text.ADMIN + " -z");
+    http = new BaseXHTTP("-czWU" + Text.ADMIN + " -P" + Text.ADMIN);
   }
 
   /**

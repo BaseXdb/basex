@@ -12,6 +12,7 @@ import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.util.Args;
 import org.basex.util.Util;
+import org.mortbay.jetty.Server;
 
 /**
  * This is the abstract main class for the API starter classes.
@@ -22,12 +23,14 @@ import org.basex.util.Util;
 public final class BaseXHTTP {
   /** Database context. */
   private final HTTPContext http = HTTPContext.get();
+  /** Activate WebDAV. */
+  private boolean webdav = true;
+  /** Activate JAX-RX. */
+  private boolean jaxrx = true;
   /** Database server. */
   private BaseXServer server;
-  /** WebDAV server. */
-  private WebDAVServer webdav;
-  /** JAX-RX server. */
-  private JaxRxServer jaxrx;
+  /** HTTP server. */
+  private Server jetty;
   /** Quiet flag. */
   private boolean quiet;
   /** Stopped flag. */
@@ -61,9 +64,17 @@ public final class BaseXHTTP {
       return;
     }
 
-    if(http.client) server = new BaseXServer(http.context, quiet ? "-z" : "");
-    webdav = new WebDAVServer();
-    jaxrx = new JaxRxServer();
+    if(http.client) {
+      server = new BaseXServer(http.context, quiet ? "-z" : "");
+    } else {
+      Util.outln(CONSOLE + SERVERSTART, SERVERMODE);
+    }
+
+    jetty = new Server(http.context.mprop.num(MainProp.HTTPPORT));
+    // [CG] currently, only one of the two servers will work
+    if(webdav) new WebDAVServer(jetty);
+    if(jaxrx) new JaxRxServer(jetty);
+    jetty.start();
   }
 
   /**
@@ -71,8 +82,7 @@ public final class BaseXHTTP {
    * @throws Exception exception
    */
   public void stop() throws Exception {
-    if(webdav != null) webdav.stop();
-    if(jaxrx != null) jaxrx.stop();
+    if(jetty != null) jetty.stop();
     if(server != null) server.quit();
   }
 
@@ -109,8 +119,11 @@ public final class BaseXHTTP {
           case 'e':
             mprop.set(MainProp.EVENTPORT, arg.num());
             break;
-          case 'j':
-            mprop.set(MainProp.JAXRXPORT, arg.num());
+          case 'h':
+            mprop.set(MainProp.HTTPPORT, arg.num());
+            break;
+          case 'J':
+            jaxrx = false;
             break;
           case 'n':
             mprop.set(MainProp.HOST, arg.num());
@@ -130,8 +143,8 @@ public final class BaseXHTTP {
           case 'U':
             System.setProperty(DBUSER, arg.string());
             break;
-          case 'w':
-            mprop.set(MainProp.WEBDAVPORT, arg.num());
+          case 'W':
+            webdav = false;
             break;
           case 'z':
             quiet = true;
