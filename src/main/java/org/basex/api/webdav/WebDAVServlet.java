@@ -15,6 +15,7 @@ import com.bradmcevoy.http.Response;
 
 /**
  * BaseX WebDAV servlet.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */

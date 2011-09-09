@@ -7,7 +7,7 @@ import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.jaxrx.JettyServer;
 import org.jaxrx.core.JaxRxConstants;
-import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.Context;
 
 /**
  * This is the starter class for running the JAX-RX server, based on the JAX-RX
@@ -21,9 +21,9 @@ import org.mortbay.jetty.Server;
 public final class JaxRxServer {
   /**
    * Constructor.
-   * @param server jetty server
+   * @param context server context
    */
-  public JaxRxServer(final Server server) {
+  public JaxRxServer(final Context context) {
     // set serializer options (handled within the JAX-RX interface)
     final HTTPContext http = HTTPContext.get();
     System.setProperty(SERIALIZER, http.context.prop.get(Prop.SERIALIZER));
@@ -32,6 +32,6 @@ public final class JaxRxServer {
     System.setProperty(JaxRxConstants.NAMEPROP, Text.NAMELC);
     System.setProperty(JaxRxConstants.PATHPROP, BXJaxRx.class.getName());
 
-    JettyServer.register(server);
+    JettyServer.register(context);
   }
 }

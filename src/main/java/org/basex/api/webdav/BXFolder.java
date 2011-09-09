@@ -181,7 +181,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         "let $p := string-join(($trgdir, $t[position() < last()]), '/') " +
         "let $n := $t[last()] " +
         "return " +
-        "db:add($trgdb, collection($db||'/'||$d), $n, $p)");
+        "db:add($trgdb, db:open($db, $d), $n, $p)");
     q.bind("$db", db);
     q.bind("$path", path);
     q.bind("$trgdb", trgdb);

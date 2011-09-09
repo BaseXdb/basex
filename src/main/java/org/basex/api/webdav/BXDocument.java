@@ -71,8 +71,9 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       @Override
       public void run() throws IOException {
         s.setOutputStream(out);
-        final Query q = s.query("collection($path)");
-        q.bind("$path", db + SEP + path);
+        final Query q = s.query("db:open($db, $path)");
+        q.bind("$db", db);
+        q.bind("$path", path);
         q.execute();
       }
     }.eval();
@@ -110,9 +111,10 @@ public class BXDocument extends BXAbstractResource implements FileResource {
   protected void add(final Session s, final String trgdb, final String trgdir,
       final String name) throws IOException {
 
-    final Query q = s.query("db:add($db, collection($doc), $name, $path)");
+    final Query q = s.query("db:add($db, db:open($sdb, $spath), $name, $path)");
     q.bind("$db", trgdb);
-    q.bind("$doc", db + SEP + path);
+    q.bind("$sdb", db);
+    q.bind("$spath", path);
     q.bind("$name", name);
     q.bind("$path", trgdir);
     q.execute();

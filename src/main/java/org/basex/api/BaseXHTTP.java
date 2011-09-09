@@ -7,15 +7,17 @@ import java.io.IOException;
 
 import org.basex.BaseXServer;
 import org.basex.api.jaxrx.JaxRxServer;
-import org.basex.api.webdav.WebDAVServer;
+import org.basex.api.rest.RESTServlet;
+import org.basex.api.webdav.WebDAVServlet;
 import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.util.Args;
 import org.basex.util.Util;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.Context;
 
 /**
- * This is the abstract main class for the API starter classes.
+ * This is the main class for the starting the database HTTP services.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -23,10 +25,14 @@ import org.mortbay.jetty.Server;
 public final class BaseXHTTP {
   /** Database context. */
   private final HTTPContext http = HTTPContext.get();
+
   /** Activate WebDAV. */
   private boolean webdav = true;
-  /** Activate JAX-RX. */
+  /** Activate REST (work in progress). */
+  private boolean rest = true;
+  /** Activate JAX-RX (deprecated). */
   private boolean jaxrx = true;
+
   /** Database server. */
   private BaseXServer server;
   /** HTTP server. */
@@ -71,9 +77,10 @@ public final class BaseXHTTP {
     }
 
     jetty = new Server(http.context.mprop.num(MainProp.HTTPPORT));
-    // [CG] currently, only one of the two servers will work
-    if(webdav) new WebDAVServer(jetty);
-    if(jaxrx) new JaxRxServer(jetty);
+    final Context ctx = new Context(jetty, "/");
+    if(rest) ctx.addServlet(RESTServlet.class, "/rest/*");
+    if(webdav) ctx.addServlet(WebDAVServlet.class, "/webdav/*");
+    if(jaxrx) new JaxRxServer(ctx);
     jetty.start();
   }
 
@@ -132,6 +139,9 @@ public final class BaseXHTTP {
             final int p = arg.num();
             mprop.set(MainProp.PORT, p);
             mprop.set(MainProp.SERVERPORT, p);
+            break;
+          case 'R':
+            rest = false;
             break;
           case 'P':
             System.setProperty(DBPASS, arg.string());
