@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
@@ -65,10 +64,10 @@ public final class SemaphoreTest {
 
   /**
    * Runs a test for concurrent database creations.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   @Test
-  public void createTest() throws BaseXException {
+  public void createTest() throws IOException {
     // drops database for clean test
     sess.execute(new DropDB(NAME));
     // create database for clean test
@@ -95,7 +94,7 @@ public final class SemaphoreTest {
   String checkRes(final Command cmd, final Session session) {
     try {
       return session.execute(cmd);
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       fail(ex.toString());
       return null;
     }
@@ -131,7 +130,7 @@ public final class SemaphoreTest {
       try {
         final int t = rand.nextInt(2);
         session.execute(QUERIES[t]);
-      } catch(final BaseXException ex) {
+      } catch(final IOException ex) {
         fail(ex.toString());
       }
     }

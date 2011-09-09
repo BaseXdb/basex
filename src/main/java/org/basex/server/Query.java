@@ -1,6 +1,6 @@
 package org.basex.server;
 
-import org.basex.core.BaseXException;
+import java.io.IOException;
 
 /**
  * <p>This class defines methods for executing queries.
@@ -17,9 +17,9 @@ public abstract class Query {
    * Binds a value to an external variable.
    * @param n name of variable
    * @param v value to be bound
-   * @throws BaseXException command exception
+   * @throws IOException I/O exception
    */
-  public final void bind(final String n, final Object v) throws BaseXException {
+  public final void bind(final String n, final Object v) throws IOException {
     bind(n, v, "");
   }
 
@@ -28,50 +28,50 @@ public abstract class Query {
    * @param n name of variable
    * @param v value to be bound
    * @param t data type
-   * @throws BaseXException command exception
+   * @throws IOException I/O exception
    */
   public abstract void bind(final String n, final Object v, final String t)
-      throws BaseXException;
+      throws IOException;
 
   /**
    * Initializes the query expression and starts serialization.
    * @return result header or {@code null}.
-   * @throws BaseXException command exception
+   * @throws IOException I/O exception
    */
-  public abstract String init() throws BaseXException;
+  public abstract String init() throws IOException;
 
   /**
    * Returns {@code true} if more items are available.
    * @return result of check
-   * @throws BaseXException command exception
+   * @throws IOException I/O exception
    */
-  public abstract boolean more() throws BaseXException;
+  public abstract boolean more() throws IOException;
 
   /**
    * Returns the next item of the query.
    * @return item string or {@code null}.
-   * @throws BaseXException command exception
+   * @throws IOException I/O exception
    */
-  public abstract String next() throws BaseXException;
+  public abstract String next() throws IOException;
 
   /**
    * Returns the complete result of the query.
    * @return item string or {@code null}.
-   * @throws BaseXException command exception
+   * @throws IOException I/O exception
    */
-  public abstract String execute() throws BaseXException;
+  public abstract String execute() throws IOException;
 
   /**
    * Returns query info.
    * @return query info
-   * @throws BaseXException command exception
+   * @throws IOException I/O exception
    */
-  public abstract String info() throws BaseXException;
+  public abstract String info() throws IOException;
 
   /**
    * Finishes result serialization and closes the iterator.
    * @return result footer or {@code null}.
-   * @throws BaseXException command exception
+   * @throws IOException I/O exception
    */
-  public abstract String close() throws BaseXException;
+  public abstract String close() throws IOException;
 }

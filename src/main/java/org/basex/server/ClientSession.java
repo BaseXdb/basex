@@ -134,78 +134,62 @@ public final class ClientSession extends Session {
 
   @Override
   public void create(final String name, final InputStream input)
-      throws BaseXException {
+      throws IOException {
 
-    try {
-      sout.write(ServerCmd.CREATE.code);
-      send(name);
-      send(input);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
+    sout.write(ServerCmd.CREATE.code);
+    send(name);
+    send(input);
   }
 
   @Override
   public void add(final String name, final String target,
-      final InputStream input) throws BaseXException {
+      final InputStream input) throws IOException {
 
-    try {
-      sout.write(ServerCmd.ADD.code);
-      send(name);
-      send(target);
-      send(input);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
+    sout.write(ServerCmd.ADD.code);
+    send(name);
+    send(target);
+    send(input);
   }
 
   @Override
   public void replace(final String path, final InputStream input)
-      throws BaseXException {
+      throws IOException {
 
-    try {
-      sout.write(ServerCmd.REPLACE.code);
-      send(path);
-      send(input);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
+    sout.write(ServerCmd.REPLACE.code);
+    send(path);
+    send(input);
   }
 
   /**
    * Watches an event.
    * @param name event name
    * @param notifier event notification
-   * @throws BaseXException exception
+   * @throws IOException I/O exception
    */
   public void watch(final String name, final EventNotifier notifier)
-      throws BaseXException {
+      throws IOException {
 
-    try {
-      sout.write(ServerCmd.WATCH.code);
-      if(esocket == null) {
-        sout.flush();
-        final BufferInput bi = new BufferInput(sin);
-        final int eport = Integer.parseInt(bi.readString());
-        // initialize event socket
-        esocket = new Socket();
-        esocket.connect(new InetSocketAddress(ehost, eport), 5000);
-        final PrintOutput po = PrintOutput.get(esocket.getOutputStream());
-        po.print(bi.readString());
-        po.write(0);
-        po.flush();
-        InputStream is = esocket.getInputStream();
-        is.read();
-        listen(is);
-      }
-      send(name);
+    sout.write(ServerCmd.WATCH.code);
+    if(esocket == null) {
+      sout.flush();
       final BufferInput bi = new BufferInput(sin);
-      info = bi.readString();
-      if(!ok(bi)) throw new IOException(info);
-      notifiers.put(name, notifier);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
+      final int eport = Integer.parseInt(bi.readString());
+      // initialize event socket
+      esocket = new Socket();
+      esocket.connect(new InetSocketAddress(ehost, eport), 5000);
+      final PrintOutput po = PrintOutput.get(esocket.getOutputStream());
+      po.print(bi.readString());
+      po.write(0);
+      po.flush();
+      InputStream is = esocket.getInputStream();
+      is.read();
+      listen(is);
     }
+    send(name);
+    final BufferInput bi = new BufferInput(sin);
+    info = bi.readString();
+    if(!ok(bi)) throw new IOException(info);
+    notifiers.put(name, notifier);
   }
 
   /**
@@ -221,7 +205,7 @@ public final class ClientSession extends Session {
             final BufferInput bi = new BufferInput(in);
             notifiers.get(bi.readString()).notify(bi.readString());
           }
-        } catch(final Exception ex) { }
+        } catch(final IOException ex) { }
       }
     }.start();
   }
@@ -229,19 +213,15 @@ public final class ClientSession extends Session {
   /**
    * Unwatches an event.
    * @param name event name
-   * @throws BaseXException exception
+   * @throws IOException I/O exception
    */
-  public void unwatch(final String name) throws BaseXException {
-    try {
-      sout.write(ServerCmd.UNWATCH.code);
-      send(name);
-      final BufferInput bi = new BufferInput(sin);
-      info = bi.readString();
-      if(!ok(bi)) throw new IOException(info);
-      notifiers.remove(name);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
+  public void unwatch(final String name) throws IOException {
+    sout.write(ServerCmd.UNWATCH.code);
+    send(name);
+    final BufferInput bi = new BufferInput(sin);
+    info = bi.readString();
+    if(!ok(bi)) throw new IOException(info);
+    notifiers.remove(name);
   }
 
   /**
@@ -264,7 +244,7 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public ClientQuery query(final String query) throws BaseXException {
+  public ClientQuery query(final String query) throws IOException {
     return new ClientQuery(query, this);
   }
 
@@ -298,22 +278,18 @@ public final class ClientSession extends Session {
 
   @Override
   protected void execute(final String cmd, final OutputStream os)
-      throws BaseXException {
+      throws IOException {
 
-    try {
-      send(cmd);
-      final BufferInput bi = new BufferInput(sin);
-      for(int b; (b = bi.read()) != 0;) os.write(b);
-      info = bi.readString();
-      if(!ok(bi)) throw new BaseXException(info);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
+    send(cmd);
+    final BufferInput bi = new BufferInput(sin);
+    for(int b; (b = bi.read()) != 0;) os.write(b);
+    info = bi.readString();
+    if(!ok(bi)) throw new BaseXException(info);
   }
 
   @Override
   protected void execute(final Command cmd, final OutputStream os)
-      throws BaseXException {
+      throws IOException {
     execute(cmd.toString(), os);
   }
 }

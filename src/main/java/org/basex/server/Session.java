@@ -3,7 +3,6 @@ package org.basex.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.io.out.ArrayOutput;
 
@@ -32,9 +31,9 @@ public abstract class Session {
    * it to the specified output stream.
    * @param command command to be executed
    * @return result
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  public final String execute(final Command command) throws BaseXException {
+  public final String execute(final Command command) throws IOException {
     final ArrayOutput ao = out == null ? new ArrayOutput() : null;
     execute(command, ao != null ? ao : out);
     return ao != null ? ao.toString() : null;
@@ -45,9 +44,9 @@ public abstract class Session {
    * it to the specified output stream.
    * @param command command to be parsed
    * @return result
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  public final String execute(final String command) throws BaseXException {
+  public final String execute(final String command) throws IOException {
     final ArrayOutput ao = out == null ? new ArrayOutput() : null;
     execute(command, ao != null ? ao : out);
     return ao != null ? ao.toString() : null;
@@ -57,37 +56,37 @@ public abstract class Session {
    * Returns a query object for the specified query string.
    * @param query query string
    * @return query
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  public abstract Query query(final String query) throws BaseXException;
+  public abstract Query query(final String query) throws IOException;
 
   /**
    * Creates a database.
    * @param name name of database
    * @param input xml input
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   public abstract void create(final String name, final InputStream input)
-    throws BaseXException;
+    throws IOException;
 
   /**
    * Adds a document to the opened database.
    * @param name name of document
    * @param target target path
    * @param input xml input
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   public abstract void add(final String name, final String target,
-      final InputStream input) throws BaseXException;
+      final InputStream input) throws IOException;
 
   /**
    * Replace a document in an open database.
    * @param path document(s) to replace
    * @param input new content
-   * @throws BaseXException exception
+   * @throws IOException I/O exception
    */
   public abstract void replace(final String path, final InputStream input)
-      throws BaseXException;
+      throws IOException;
 
   /**
    * Returns command info as a string, regardless of whether an output stream
@@ -128,17 +127,17 @@ public abstract class Session {
    * Executes a command and prints the result to the specified output stream.
    * @param cmd command to be parsed
    * @param os output stream
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   protected abstract void execute(final String cmd, final OutputStream os)
-    throws BaseXException;
+    throws IOException;
 
   /**
    * Executes a command and prints the result to the specified output stream.
    * @param cmd command to be executed
    * @param os output stream
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   protected abstract void execute(final Command cmd, final OutputStream os)
-    throws BaseXException;
+    throws IOException;
 }

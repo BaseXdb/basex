@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -113,7 +112,7 @@ public final class PoolTest {
   void ok(final Command cmd, final Session session) {
     try {
       session.execute(cmd);
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       fail(ex.getMessage());
     }
   }
@@ -127,7 +126,7 @@ public final class PoolTest {
     try {
       session.execute(cmd);
       fail("Command was supposed to fail.");
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
     }
   }
 }

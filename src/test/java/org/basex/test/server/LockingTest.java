@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
@@ -101,7 +100,7 @@ public final class LockingTest {
       public void run() {
         try {
           session1.execute(new CreateDB(NAME, FILE));
-        } catch(final BaseXException ex) {
+        } catch(final IOException ex) {
         }
       }
     };
@@ -114,7 +113,7 @@ public final class LockingTest {
         try {
           session2.execute(new CreateDB(NAME, FILE));
           fail(FILE + " should still be locked.");
-        } catch(final BaseXException ex) {
+        } catch(final IOException ex) {
         }
       }
     };
@@ -133,19 +132,19 @@ public final class LockingTest {
 
   /**
    * Read/read test.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   @Test
-  public void readReadTest() throws BaseXException {
+  public void readReadTest() throws IOException {
     runTest(true, true);
   }
 
   /**
    * Write/write test.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   @Test
-  public void writeWriteTest() throws BaseXException {
+  public void writeWriteTest() throws IOException {
     runTest(false, false);
     if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
       fail("Not all nodes have been deleted.");
@@ -154,19 +153,19 @@ public final class LockingTest {
 
   /**
    * Write/read test.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   @Test
-  public void writeReadTest() throws BaseXException {
+  public void writeReadTest() throws IOException {
     runTest(false, true);
   }
 
   /**
    * Write/read test.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   @Test
-  public void readWriteTest() throws BaseXException {
+  public void readWriteTest() throws IOException {
     runTest(true, false);
     if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
       fail("Not all nodes have been deleted.");
@@ -205,10 +204,10 @@ public final class LockingTest {
    * Runs the tests.
    * @param read1 perform read/write query in main thread
    * @param read2 perform read/write query in second thread
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   private void runTest(final boolean read1, final boolean read2)
-      throws BaseXException {
+      throws IOException {
 
     new Thread() {
       @Override
@@ -220,7 +219,7 @@ public final class LockingTest {
         } else {
           try {
             session2.execute(new XQuery(WRITE2));
-          } catch(final BaseXException bx) {
+          } catch(final IOException bx) {
             fail("test failed: " + bx.getMessage());
           }
         }
@@ -256,7 +255,7 @@ public final class LockingTest {
   static String checkRes(final Command cmd, final Session session) {
     try {
       return session.execute(cmd);
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       fail(ex.toString());
       return null;
     }

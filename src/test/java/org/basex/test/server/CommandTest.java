@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
-import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdSet;
@@ -92,9 +91,9 @@ public class CommandTest {
   /**
    * Deletes the potentially already existing DBs.
    * DBs & User {@link #NAME} and {@link #NAME2}
-   * @throws BaseXException exception
+   * @throws IOException I/O exception
    */
-  protected static void cleanUp() throws BaseXException {
+  protected static void cleanUp() throws IOException {
     session.execute(new DropDB(NAME));
     session.execute(new DropDB(NAME2));
     session.execute(new DropUser(NAME));
@@ -109,10 +108,10 @@ public class CommandTest {
 
   /**
    * Creates the database.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
   @After
-  public final void after() throws BaseXException {
+  public final void after() throws IOException {
     cleanUp();
   }
 
@@ -554,7 +553,7 @@ public class CommandTest {
   protected final String ok(final Command cmd) {
     try {
       return session.execute(cmd);
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       fail(ex.getMessage());
       return null;
     }
@@ -568,7 +567,7 @@ public class CommandTest {
     try {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
     }
   }
 }

@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdSet;
@@ -303,7 +302,7 @@ public final class PermissionTest {
   private static void ok(final Command cmd, final Session s) {
     try {
       s.execute(cmd);
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       fail(ex.getMessage());
     }
   }
@@ -318,7 +317,7 @@ public final class PermissionTest {
     try {
       s.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
     }
   }
 

@@ -96,10 +96,8 @@ public final class Datas {
    * Closes all data references.
    */
   synchronized void close() {
-    try {
-      for(final PData d : list) d.data.close();
-    } catch(final IOException ex) {
-      Util.debug(ex);
+    for(final PData d : list) {
+      try { d.data.close(); } catch(final IOException ex) { Util.debug(ex); }
     }
     list.clear();
   }

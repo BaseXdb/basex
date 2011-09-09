@@ -1,5 +1,6 @@
 package org.basex.server;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
@@ -85,7 +86,7 @@ public final class LocalSession extends Session {
         i.remove();
       }
       execute(new Exit());
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       Util.debug(ex);
     }
   }
