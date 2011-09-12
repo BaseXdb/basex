@@ -53,7 +53,9 @@ import org.basex.query.util.http.Request.Part;
 import org.basex.query.util.http.RequestParser;
 import org.basex.query.util.http.ResponseHandler;
 import org.basex.util.Util;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -72,6 +74,8 @@ public final class HTTPClientTest {
   private static final byte[] METHOD = token("method");
   /** Example url. */
   private static final String URL = "'http://localhost:8984/rest/books'";
+  /** Carriage return/Line feed. */
+  private static final String CRLF = "\r\n";
 
   /** Database context. */
   static Context context;
@@ -97,6 +101,34 @@ public final class HTTPClientTest {
   public static void stop() throws Exception {
     context.close();
     http.stop();
+  }
+
+  /**
+   * Creates a test database.
+   * @throws BaseXException database exception
+   */
+  @Before
+  public void init() throws BaseXException {
+    final Command put = new XQuery("http:send-request("
+        + "<http:request method='put' status-only='true'>"
+        + "<http:body media-type='text/xml'>" + "<books>" + "<book id='1'>"
+        + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
+        + "<book id='2'>" + "<name>Winnetou</name>" + "<author>May</author>"
+        + "</book>" + "<book id='3'>" + "<name>Tom Sawyer</name>"
+        + "<author>Twain</author>" + "</book>" + "</books>" + "</http:body>"
+        + "</http:request>, " + URL + ")");
+    put.execute(context);
+  }
+
+  /**
+   * Deletes the test database.
+   * @throws BaseXException database exception
+   */
+  @After
+  public void finish() throws BaseXException {
+    final Command delete = new XQuery("http:send-request("
+        + "<http:request method='delete' status-only='true'/>, " + URL + ")");
+    delete.execute(context);
   }
 
   /**
@@ -128,7 +160,7 @@ public final class HTTPClientTest {
         + "<http:request method='post'>"
         + "<http:body media-type='application/query+xml'>"
         + "<query xmlns='" + Text.URL + "/rest'>"
-        + "<text>//book/name</text>"
+        + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
         + "</query>" + "</http:body>"
         + "</http:request>, " + URL + ")");
@@ -141,7 +173,7 @@ public final class HTTPClientTest {
         + "<http:body media-type='application/query+xml'/></http:request>"
         + "," + URL + ","
         + "<query xmlns='" + Text.URL + "/rest'>"
-        + "<text>//book/name</text>"
+        + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
         + "</query>)");
     postQuery2.execute(context);
@@ -502,16 +534,16 @@ public final class HTTPClientTest {
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
     HTTPClient.setRequestContent(fakeConn.getOutputStream(), req, null);
-    final String expResult = "--boundary42" + NL
-        + "Content-Type: text/plain; charset=us-ascii" + NL + NL
-        + "...plain text version of message goes here...." + NL + NL
-        + "--boundary42" + NL + "Content-Type: text/richtext" + NL + NL
-        + ".... richtext version of same message goes here ..." + NL
-        + "--boundary42" + NL + "Content-Type: text/x-whatever" + NL + NL
-        + ".... fanciest formatted version of same  message  goes  here..." + NL
-        + "--boundary42--" + NL;
-    // Compare results
+    final String expResult = "--boundary42" + CRLF
+        + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
+        + "...plain text version of message goes here....\n" + CRLF
+        + "--boundary42" + CRLF + "Content-Type: text/richtext" + CRLF + CRLF
+        + ".... richtext version of same message goes here ..." + CRLF
+        + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
+        + ".... fanciest formatted version of same  message  goes  here..."
+        + CRLF + "--boundary42--" + CRLF;
 
+    // Compare results
     final String fake = fakeConn.getOutputStream().toString();
     assertTrue(expResult.equals(fake));
   }
@@ -710,14 +742,14 @@ public final class HTTPClientTest {
 
     conn.headers = hdrs;
     conn.contentType = "multipart/alternative; boundary=\"boundary42\"";
-    conn.content = token("--boundary42" + NL
-        + "Content-Type: text/plain; charset=us-ascii" + NL + NL
-        + "...plain text version of message goes here...." + NL + NL
-        + "--boundary42" + NL + "Content-Type: text/richtext" + NL + NL
-        + ".... richtext version of same message goes here ..." + NL
-        + "--boundary42" + NL + "Content-Type: text/x-whatever" + NL + NL
+    conn.content = token("--boundary42" + CRLF
+        + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
+        + "...plain text version of message goes here...." + CRLF + CRLF
+        + "--boundary42\r" + NL + "Content-Type: text/richtext" + CRLF + CRLF
+        + ".... richtext version of same message goes here ..." + CRLF
+        + "--boundary42\r" + NL + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version of same  "
-        + "message  goes  here" + NL + "..." + NL + "--boundary42--");
+        + "message  goes  here\n..."  + CRLF + "--boundary42--");
     final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
         context.prop, null);
 
@@ -798,14 +830,16 @@ public final class HTTPClientTest {
     // Response to be read
     conn.content = token("This is the preamble.  "
         + "It is to be ignored, though it" + NL
-        + "is a handy place for mail composers to include an" + NL
-        + "explanatory note to non-MIME compliant readers." + NL
-        + "--simple boundary" + NL + NL
-        + "This is implicitly typed plain ASCII text." + NL
-        + "It does NOT end with a linebreak." + NL + "--simple boundary" + NL
-        + "Content-type: text/plain; charset=us-ascii" + NL + NL
-        + "This is explicitly typed plain ASCII text." + NL
-        + "It DOES end with a linebreak." + NL + NL + "--simple boundary--" + NL
+        + "is a handy place for mail composers to include an" + CRLF
+        + "explanatory note to non-MIME compliant readers." + CRLF
+        + "--simple boundary" + CRLF + CRLF
+        + "This is implicitly typed plain ASCII text." + CRLF
+        + "It does NOT end with a linebreak."
+        +  CRLF + "--simple boundary" + CRLF
+        + "Content-type: text/plain; charset=us-ascii" + CRLF + CRLF
+        + "This is explicitly typed plain ASCII text." + CRLF
+        + "It DOES end with a linebreak." + CRLF
+        +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
     final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
