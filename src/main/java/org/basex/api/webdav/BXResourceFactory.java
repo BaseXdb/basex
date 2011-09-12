@@ -2,8 +2,8 @@ package org.basex.api.webdav;
 
 import static org.basex.api.webdav.BXNotAuthorizedResource.*;
 
-import org.basex.api.HTTPContext;
 import org.basex.api.HTTPSession;
+import org.basex.server.LoginException;
 import org.basex.server.Session;
 import org.basex.util.Util;
 
@@ -26,24 +26,25 @@ public class BXResourceFactory implements ResourceFactory {
     final Auth a = HttpManager.request().getAuthorization();
     final String user = a != null ? a.getUser() : null;
     final String pass = a != null ? a.getPassword() : null;
-    final HTTPSession session = HTTPContext.get().session(user, pass);
-    if(!session.valid()) return NOAUTH;
+    final HTTPSession session = new HTTPSession(user, pass);
 
-    final Path path = Path.path(dbpath).getStripFirst();
-    // the root is requested
-    if(path.isRoot()) return new BXRootResource(session);
-
-    final String db = path.getFirst();
     try {
       final Session s = session.login();
       try {
+        // the root is requested
+        final Path path = Path.path(dbpath).getStripFirst();
+        if(path.isRoot()) return new BXRootResource(session);
+
         // only the database is requested
+        final String db = path.getFirst();
         return path.getLength() == 1 ?
           listDBs(s).contains(db) ? new BXDatabase(db, session) : null :
           resource(s, db, path.getStripFirst().toString(), session);
       } finally {
         s.close();
       }
+    } catch(final LoginException ex) {
+      return BXNotAuthorizedResource.NOAUTH;
     } catch(final Exception ex) {
       Util.errln(ex);
     }

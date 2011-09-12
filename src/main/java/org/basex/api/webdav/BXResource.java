@@ -11,15 +11,17 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
+import org.basex.data.DataText;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
+
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Request.Method;
-import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.Resource;
+import com.bradmcevoy.http.exceptions.BadRequestException;
 
 /**
  * Base class for all WebDAV resources.
@@ -31,10 +33,6 @@ import com.bradmcevoy.http.Resource;
 public abstract class BXResource implements Resource {
   /** File path separator. */
   static final char SEP = '/';
-  /** XML mime type. */
-  static final String MIMETYPEXML = "application/xml";
-  /** Zip mime type. */
-  static final String MIMETYPEZIP = "application/zip";
   /** Dummy xml file.*/
   static final String DUMMY = ".empty";
   /** Dummy xml content.*/
@@ -60,10 +58,7 @@ public abstract class BXResource implements Resource {
 
   @Override
   public Object authenticate(final String u, final String p) {
-    if(u != null) {
-      session.user = u;
-      session.pass = p;
-    }
+    if(u != null) session.update(u, p);
     return u;
   }
 
@@ -142,7 +137,7 @@ public abstract class BXResource implements Resource {
    */
   static boolean supported(final String ctype) {
     // [DP] additional content types can be supported in the future
-    return ctype != null && ctype.indexOf(MIMETYPEXML) >= 0;
+    return ctype != null && ctype.indexOf(DataText.APP_XML) >= 0;
   }
 
   /**
@@ -167,8 +162,8 @@ public abstract class BXResource implements Resource {
   static int count(final Session s, final String db, final String path)
       throws IOException {
     final Query q = s.query("count(db:list($d, $p))");
-    q.bind("$d", db);
-    q.bind("$p", path);
+    q.bind("d", db);
+    q.bind("p", path);
     return parseInt(q.execute());
   }
 
@@ -185,8 +180,8 @@ public abstract class BXResource implements Resource {
 
     final String path = stripLeadingSlash(p);
     final Query q = s.query("exists(db:list($d, $p)[. = $p])");
-    q.bind("$d", db);
-    q.bind("$p", path);
+    q.bind("d", db);
+    q.bind("p", path);
     return Boolean.parseBoolean(q.execute());
   }
 
@@ -243,7 +238,9 @@ public abstract class BXResource implements Resource {
 
     try {
       // check if there is a document in the collection having this path
-      if(exists(s, db, path)) return new BXDocument(db, path, hs);
+      if(exists(s, db, path)) {
+        return new BXDocument(db, path, hs, isRaw(s, db, path));
+      }
 
       // check if there are paths in the collection starting with this path
       if(count(s, db, path) > 0) return new BXFolder(db, path, hs);
@@ -251,5 +248,20 @@ public abstract class BXResource implements Resource {
       Util.errln(ex);
     }
     return null;
+  }
+
+  /**
+   * Checks if the specified path points to a binary resource.
+   * @param s active client session
+   * @param db database name
+   * @param path resource path
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  static boolean isRaw(final Session s, final String db,
+      final String path) throws IOException {
+
+    final String qu = "db:is-raw('" + db + "','" + path + "')";
+    return s.query(qu).execute().equals("true");
   }
 }

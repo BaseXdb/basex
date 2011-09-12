@@ -1,4 +1,4 @@
-package org.basex.test.jaxrx;
+package org.basex.test.rest;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
@@ -25,6 +25,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
@@ -69,6 +70,8 @@ public final class HTTPClientTest {
   private static final byte[] MEDIATYPE = token("media-type");
   /** Body attribute method. */
   private static final byte[] METHOD = token("method");
+  /** Example url. */
+  private static final String URL = "'http://localhost:8984/rest/books'";
 
   /** Database context. */
   static Context context;
@@ -109,7 +112,7 @@ public final class HTTPClientTest {
         + "<book id='2'>" + "<name>Winnetou</name>" + "<author>May</author>"
         + "</book>" + "<book id='3'>" + "<name>Tom Sawyer</name>"
         + "<author>Twain</author>" + "</book>" + "</books>" + "</http:body>"
-        + "</http:request>, 'http://localhost:8984/basex/jax-rx/books')");
+        + "</http:request>, " + URL + ")");
     put.execute(context);
     checkResponse(put, HttpURLConnection.HTTP_CREATED, 1);
   }
@@ -124,9 +127,11 @@ public final class HTTPClientTest {
     final Command postQuery = new XQuery("http:send-request("
         + "<http:request method='post'>"
         + "<http:body media-type='application/query+xml'>"
-        + "<query xmlns='http://jax-rx.sourceforge.net'>"
-        + "<text>//book/name</text>" + "</query>" + "</http:body>"
-        + "</http:request>, 'http://localhost:8984/basex/jax-rx/books')");
+        + "<query xmlns='" + Text.URL + "/rest'>"
+        + "<text>//book/name</text>"
+        + "<parameter name='wrap' value='yes'/>"
+        + "</query>" + "</http:body>"
+        + "</http:request>, " + URL + ")");
     postQuery.execute(context);
     checkResponse(postQuery, HttpURLConnection.HTTP_OK, 2);
 
@@ -134,9 +139,11 @@ public final class HTTPClientTest {
     final Command postQuery2 = new XQuery("http:send-request("
         + "<http:request method='post'>"
         + "<http:body media-type='application/query+xml'/></http:request>"
-        + ",'http://localhost:8984/basex/jax-rx/books',"
-        + "<query xmlns='http://jax-rx.sourceforge.net'>"
-        + "<text>//book/name</text></query>)");
+        + "," + URL + ","
+        + "<query xmlns='" + Text.URL + "/rest'>"
+        + "<text>//book/name</text>"
+        + "<parameter name='wrap' value='yes'/>"
+        + "</query>)");
     postQuery2.execute(context);
     checkResponse(postQuery2, HttpURLConnection.HTTP_OK, 2);
 
@@ -154,7 +161,7 @@ public final class HTTPClientTest {
         + "<http:body media-type='text/xml'>" + "<book id='4'>"
         + "<name>The Celebrated Jumping Frog of Calaveras County</name>"
         + "<author>Twain</author>" + "</book>" + "</http:body>"
-        + "</http:request>, 'http://localhost:8984/basex/jax-rx/books')");
+        + "</http:request>, " + URL + ")");
     postAdd.execute(context);
     checkResponse(postAdd, HttpURLConnection.HTTP_CREATED, 1);
   }
@@ -167,8 +174,7 @@ public final class HTTPClientTest {
   public void testPOSTGet() throws Exception {
     // GET1 - just send a GET request
     final Command get1 = new XQuery("http:send-request("
-        + "<http:request method='get' "
-        + "href='http://localhost:8984/basex/jax-rx/books'/>)");
+        + "<http:request method='get' href=" + URL + "/>)");
     get1.execute(context);
     checkResponse(get1, HttpURLConnection.HTTP_OK, 2);
 
@@ -177,7 +183,7 @@ public final class HTTPClientTest {
     // GET2 - with override-media-type='text/plain'
     final Command get2 = new XQuery("http:send-request("
         + "<http:request method='get' override-media-type='text/plain'/>,"
-        + "'http://localhost:8984/basex/jax-rx/books')");
+        + URL + ")");
     get2.execute(context);
     checkResponse(get2, HttpURLConnection.HTTP_OK, 2);
 
@@ -185,8 +191,7 @@ public final class HTTPClientTest {
 
     // Get3 - with status-only='true'
     final Command get3 = new XQuery("http:send-request("
-        + "<http:request method='get' status-only='true'/>,"
-        + "'http://localhost:8984/basex/jax-rx/books')");
+        + "<http:request method='get' status-only='true'/>," + URL + ")");
     get3.execute(context);
     checkResponse(get3, HttpURLConnection.HTTP_OK, 1);
   }
@@ -199,8 +204,7 @@ public final class HTTPClientTest {
   public void testPOSTDelete() throws Exception {
     // DELETE
     final Command delete = new XQuery("http:send-request("
-        + "<http:request method='delete' status-only='true'/>, "
-        + "'http://localhost:8984/basex/jax-rx/books')");
+        + "<http:request method='delete' status-only='true'/>, " + URL + ")");
     delete.execute(context);
     checkResponse(delete, HttpURLConnection.HTTP_OK, 1);
   }
@@ -241,7 +245,6 @@ public final class HTTPClientTest {
    */
   @Test
   public void testParseRequest() throws IOException, QueryException {
-
     // Simple HTTP request with no errors
     final byte[] req = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "

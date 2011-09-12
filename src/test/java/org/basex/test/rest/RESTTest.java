@@ -1,5 +1,8 @@
-package org.basex.test.jaxrx;
+package org.basex.test.rest;
 
+import static org.basex.api.HTTPText.*;
+import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
 import java.io.BufferedInputStream;
@@ -7,34 +10,43 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import javax.ws.rs.core.HttpHeaders;
-
 import org.basex.api.BaseXHTTP;
+import org.basex.api.rest.RESTText;
 import org.basex.core.Text;
+import org.basex.data.DataText;
 import org.basex.util.Base64;
-import org.basex.util.Token;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This class tests the JAX-RX implementation.
+ * This class tests the REST implementation.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class JaxRxTest {
+public final class RESTTest {
+  /** REST identified. */
+  private static final String NAME = "rest";
+  /** REST URI. */
+  private static final String URI = string(RESTText.RESTURI);
   /** Opening result. */
-  private static final String WRAP = "<jax-rx:results xmlns:jax-rx="
-      + "\"http://jax-rx.sourceforge.net\"/>";
+  private static final String WRAP =
+      "<" + NAME + ":results xmlns:" + NAME + "=\"" + URI + "\"/>";
   /** Root path. */
-  private static final String ROOT = "http://localhost:8984/basex/jax-rx";
+  private static final String ROOT = "http://localhost:8984/" + NAME + '/';
+  /** Input file. */
+  private static final String FILE = "etc/test/input.xml";
+  /** Test database. */
+  private static final String DB = NAME;
   /** Start servers. */
   private static BaseXHTTP http;
 
@@ -66,7 +78,7 @@ public final class JaxRxTest {
    */
   @Test
   public void get() throws Exception {
-    assertEquals("123", get("?query=1+to+3&wrap=no"));
+    assertEquals("1 2 3", get("?query=1+to+3&wrap=no"));
   }
 
   /**
@@ -75,7 +87,7 @@ public final class JaxRxTest {
    */
   @Test
   public void get2() throws Exception {
-    assertEquals(WRAP, get("?query=()"));
+    assertEquals(WRAP, get("?query=()&wrap=yes"));
   }
 
   /**
@@ -84,8 +96,8 @@ public final class JaxRxTest {
    */
   @Test
   public void getBind() throws IOException {
-    assertEquals("123", get("?wrap=no&"
-        + "query=declare+variable+$x+as+xs:integer+external;$x&var=$x=123"));
+    assertEquals("123", get("?"
+        + "query=declare+variable+$x+as+xs:integer+external;$x&$x=123"));
   }
 
   /**
@@ -94,7 +106,7 @@ public final class JaxRxTest {
    */
   @Test
   public void getBind2() throws IOException {
-    assertEquals("124", get("?wrap=no&var=x=123&"
+    assertEquals("124", get("?wrap=no&$x=123&"
         + "query=declare+variable+$x+as+xs:integer+external;$x%2b1"));
   }
 
@@ -108,7 +120,7 @@ public final class JaxRxTest {
         + "query=declare+variable+$a++as+xs:integer+external;"
         + "declare+variable+$b+as+xs:integer+external;"
         + "declare+variable+$c+as+xs:integer+external;" + "$a*$b*$c&"
-        + "var=a=1&var=b=2&var=c=3"));
+        + "$a=1&$b=2&$c=3"));
   }
 
   /** GET Test. */
@@ -126,10 +138,9 @@ public final class JaxRxTest {
   @Test
   public void getErr2() {
     try {
-      get("?query=()&output=wrp=no");
+      get("?query=()&wrp=no");
       fail("Error expected.");
     } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[SEPM0016]");
     }
   }
 
@@ -140,7 +151,6 @@ public final class JaxRxTest {
       get("?query=()&wrap=n");
       fail("Error expected.");
     } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[SEPM0016]");
     }
   }
 
@@ -148,10 +158,9 @@ public final class JaxRxTest {
   @Test
   public void getErr4() {
     try {
-      get("?query=()&output=wrap=no");
+      get("?query=()&method=xxx");
       fail("Error expected.");
     } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[SEPM0016]");
     }
   }
 
@@ -161,10 +170,9 @@ public final class JaxRxTest {
    */
   @Test
   public void postQuery1() throws IOException {
-    assertEquals(
-        "123",
-        postQuery("",
-        "<query><text>123</text><parameter name='wrap' value='no'/></query>"));
+    assertEquals("123",
+        postQuery("", "<query xmlns=\"" + URI + "\">" +
+          "<text>123</text><parameter name='wrap' value='no'/></query>"));
   }
 
   /**
@@ -173,10 +181,9 @@ public final class JaxRxTest {
    */
   @Test
   public void postQuery2() throws IOException {
-    assertEquals(
-        "",
-        postQuery("",
-        "<query><text>()</text><parameter name='wrap' value='no'/></query>"));
+    assertEquals("",
+        postQuery("", "<query xmlns=\"" + URI + "\">" +
+          "<text>()</text><parameter name='wrap' value='no'/></query>"));
   }
 
   /**
@@ -186,11 +193,10 @@ public final class JaxRxTest {
   @Test
   public void postQuery3() throws IOException {
     assertEquals(
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>123",
-        postQuery(
-            "",
-            "<query><text>123</text><parameter name='wrap' value='no'/>"
-       + "<parameter name='output' value='omit-xml-declaration=no'/></query>"));
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?> 123",
+        postQuery("", "<query xmlns=\"" + URI + "\">" +
+          "<text>123</text><parameter name='wrap' value='no'/>" +
+          "<parameter name='omit-xml-declaration' value='no'/></query>"));
   }
 
   /**
@@ -199,15 +205,14 @@ public final class JaxRxTest {
    */
   @Test
   public void postQuery4() throws IOException {
-    assertEquals("<html></html>", postQuery("", "<query>"
-        + "<text><![CDATA[<html/>]]></text>"
-        + "<parameter name='wrap' value='no'/>"
-        + "<parameter name='wrap' value='yes'/>"
-        + "<parameter name='output' value='omit-xml-declaration=no'/>"
-        + "<parameter name='output' value='omit-xml-declaration=yes'/>"
-        + "<output name='omit-xml-declaration' value='no'/>"
-        + "<output name='omit-xml-declaration' value='yes'/>"
-        + "<output name='method' value='xhtml'/>" + "</query>"));
+    assertEquals("<html></html>",
+        postQuery("", "<query xmlns=\"" + URI + "\">" +
+        "<text><![CDATA[<html/>]]></text>" +
+        "<parameter name='wrap' value='yes'/>" +
+        "<parameter name='wrap' value='no'/>" +
+        "<parameter name='omit-xml-declaration' value='no'/>" +
+        "<parameter name='omit-xml-declaration' value='yes'/>" +
+        "<parameter name='method' value='xhtml'/>" + "</query>"));
   }
 
   /**
@@ -216,18 +221,21 @@ public final class JaxRxTest {
    */
   @Test
   public void postQuery5() throws IOException {
-    assertEquals("123", postQuery("", "<query>" + "<text>123</text>"
-        + "<parameter name='wrap' value='no'/>"
-        + "<parameter name='output' value='omit-xml-declaration=no'/>"
-        + "<parameter name='output' value='omit-xml-declaration=yes'/>"
-        + "</query>"));
+    assertEquals("123", postQuery("",
+        "<query xmlns=\"" + URI + "\">" +
+        "<text>123</text>" +
+        "<parameter name='wrap' value='no'/>" +
+        "<parameter name='omit-xml-declaration' value='no'/>" +
+        "<parameter name='omit-xml-declaration' value='yes'/>" +
+        "</query>"));
   }
 
   /** POST Test: execute buggy query. */
   @Test
   public void postQueryErr() {
     try {
-      assertEquals("", postQuery("", "<query><text>(</text></query>"));
+      assertEquals("", postQuery("",
+          "<query xmlns=\"" + URI + "\"><text>(</text></query>"));
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
     }
@@ -239,10 +247,10 @@ public final class JaxRxTest {
    */
   @Test
   public void post1() throws IOException {
-    put("/jax-rx", null);
-    post("/jax-rx", stream("<a>A</a>"));
-    assertEquals("1", get("/jax-rx?query=count(/)&wrap=no"));
-    delete("/jax-rx");
+    put(DB, null);
+    post(DB, stream("<a>A</a>"));
+    assertEquals("1", get(DB + "?query=count(/)"));
+    delete(DB);
   }
 
   /**
@@ -250,10 +258,10 @@ public final class JaxRxTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void put0() throws IOException {
-    put("/jax-rx", null);
-    assertEquals("0", get("/jax-rx?query=count(/)&wrap=no"));
-    delete("/jax-rx");
+  public void put1() throws IOException {
+    put(DB, null);
+    assertEquals("0", get(DB + "?query=count(/)"));
+    delete(DB);
   }
 
   /**
@@ -261,10 +269,10 @@ public final class JaxRxTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void put1() throws IOException {
-    put("/jax-rx", stream("<a>A</a>"));
-    assertEquals("A", get("/jax-rx?query=/*/text()&wrap=no"));
-    delete("/jax-rx");
+  public void put2() throws IOException {
+    put(DB, stream("<a>A</a>"));
+    assertEquals("A", get(DB + "?query=/*/text()"));
+    delete(DB);
   }
 
   /**
@@ -272,11 +280,11 @@ public final class JaxRxTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void put2() throws IOException {
-    put("/jax-rx", new FileInputStream("etc/test/input.xml"));
-    put("/jax-rx", new FileInputStream("etc/test/input.xml"));
-    assertEquals("XML", get("/jax-rx?query=//title/text()&wrap=no"));
-    delete("/jax-rx");
+  public void put3() throws IOException {
+    put(DB, new FileInputStream(FILE));
+    put(DB, new FileInputStream(FILE));
+    assertEquals("XML", get(DB + "?query=//title/text()"));
+    delete(DB);
   }
 
   /**
@@ -284,14 +292,14 @@ public final class JaxRxTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void put3() throws IOException {
-    put("/jax-rx", null);
-    put("/jax-rx/a", stream("<a>A</a>"));
-    put("/jax-rx/b", stream("<b>B</b>"));
-    assertEquals("2", get("/jax-rx?query=count(//text())&wrap=no"));
-    assertEquals("2", get("?query=count(db:open('jax-rx')//text())&wrap=no"));
-    assertEquals("1", get("?query=count(db:open('jax-rx/b')/*)&wrap=no"));
-    delete("/jax-rx");
+  public void put4() throws IOException {
+    put(DB, null);
+    put(DB + "/a", stream("<a>A</a>"));
+    put(DB + "/b", stream("<b>B</b>"));
+    assertEquals("2", get(DB + "?query=count(//text())"));
+    assertEquals("2", get("?query=count(db:open('" + DB + "')//text())"));
+    assertEquals("1", get("?query=count(db:open('" + DB + "/b')/*)"));
+    delete(DB);
   }
 
   /**
@@ -300,11 +308,15 @@ public final class JaxRxTest {
    */
   @Test
   public void delete1() throws IOException {
-    put("/jax-rx", new FileInputStream("etc/test/input.xml"));
+    put(DB, new FileInputStream(FILE));
     // delete database
-    assertContains(delete("/jax-rx"), "Database '");
-    // no database left
-    assertContains(delete("/jax-rx"), "No database");
+    assertEquals(delete(DB).trim(), Util.info(DBDROPPED, DB));
+    try {
+      // no database left
+      delete(DB);
+      fail("Error expected.");
+    } catch(final FileNotFoundException ex) {
+    }
   }
 
   /**
@@ -313,20 +325,24 @@ public final class JaxRxTest {
    */
   @Test
   public void delete2() throws IOException {
-    put("/jax-rx", null);
-    post("/jax-rx/a", stream("<a/>"));
-    post("/jax-rx/a", stream("<a/>"));
-    post("/jax-rx/b", stream("<b/>"));
+    put(DB, null);
+    post(DB + "/a", stream("<a/>"));
+    post(DB + "/a", stream("<a/>"));
+    post(DB + "/b", stream("<b/>"));
     // delete 'a' directory
-    assertContains(delete("/jax-rx/a"), "2 document");
+    assertContains(delete(DB + "/a"), "2 document");
     // delete 'b' directory
-    assertContains(delete("/jax-rx/b"), "1 document");
+    assertContains(delete(DB + "/b"), "1 document");
     // no 'b' directory left
-    assertContains(delete("/jax-rx/b"), "0 document");
+    assertContains(delete(DB + "/b"), "0 document");
     // delete database
-    assertContains(delete("/jax-rx"), "Database '");
-    // no database left
-    assertContains(delete("/jax-rx"), "No database");
+    assertEquals(delete(DB).trim(), Util.info(DBDROPPED, DB));
+    try {
+      // no database left
+      delete(DB);
+      fail("Error expected.");
+    } catch(final FileNotFoundException ex) {
+    }
   }
 
   // PRIVATE METHODS ==========================================================
@@ -377,16 +393,16 @@ public final class JaxRxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod("POST");
-    conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "application/query+xml");
+    conn.setRequestProperty(DataText.CONTENT_TYPE, DataText.APP_QUERYXML);
     // basic authentication example
     final String user = Text.ADMIN;
     final String pw = Text.ADMIN;
     final String userpw = user + ":" + pw;
     final String encoded = Base64.encode(userpw);
-    conn.setRequestProperty("Authorization", "Basic " + encoded);
+    conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' + encoded);
     // send query
     final OutputStream out = conn.getOutputStream();
-    out.write(Token.token(query));
+    out.write(token(query));
     out.close();
 
     try {
@@ -443,7 +459,7 @@ public final class JaxRxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod("POST");
-    conn.setRequestProperty("Content-Type", "application/xml");
+    conn.setRequestProperty(DataText.CONTENT_TYPE, DataText.APP_XML);
     final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
     final BufferedInputStream bis = new BufferedInputStream(is);
     for(int i; (i = bis.read()) != -1;) bos.write(i);
@@ -495,6 +511,6 @@ public final class JaxRxTest {
    * @return stream
    */
   private InputStream stream(final String str) {
-    return new ByteArrayInputStream(Token.token(str));
+    return new ByteArrayInputStream(token(str));
   }
 }

@@ -14,11 +14,11 @@
     <url-pattern>...</url-pattern>
   </servlet-mapping>
   <servlet>
-    <servlet-name>JAX-RX</servlet-name>
+    <servlet-name>REST</servlet-name>
     <servlet-class>...</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>JAX-RX</servlet-name>
+    <servlet-name>REST</servlet-name>
     <url-pattern>...</url-pattern>
   </servlet-mapping>
 </web-app>

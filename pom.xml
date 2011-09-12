@@ -1,161 +1,161 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.basex</groupId>
-	<artifactId>basex-api</artifactId>
-	<version>6.7.2-SNAPSHOT</version>
-	<name>BaseX API</name>
-	<url>http://basex.org</url>
-	<properties>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.basex</groupId>
+  <artifactId>basex-api</artifactId>
+  <version>6.7.2-SNAPSHOT</version>
+  <name>BaseX API</name>
+  <url>http://basex.org</url>
+  <properties>
     <compileSource>1.6</compileSource>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
-	<licenses>
-		<license>
-			<name>BSD License</name>
-			<url>http://www.opensource.org/licenses/bsd-license.php</url>
-		</license>
-	</licenses>
-	<repositories>
-		<repository>
-			<id>central</id>
-			<name>Central Maven Repository</name>
-			<url>http://repo2.maven.org/maven2/</url>
-		</repository>
-		<repository>
-			<id>basex</id>
-			<name>BaseX Maven Repository</name>
-			<url>http://files.basex.org/maven</url>
-		</repository>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+  <licenses>
+    <license>
+      <name>BSD License</name>
+      <url>http://www.opensource.org/licenses/bsd-license.php</url>
+    </license>
+  </licenses>
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>http://repo2.maven.org/maven2/</url>
+    </repository>
+    <repository>
+      <id>basex</id>
+      <name>BaseX Maven Repository</name>
+      <url>http://files.basex.org/maven</url>
+    </repository>
     <repository>
       <id>milton</id>
       <name>Milton Maven Repository</name>
       <url>http://www.ettrema.com/maven2</url>
     </repository>
-	</repositories>
-	<organization>
-		<name>BaseX Team</name>
-		<url>http://www.basex.org</url>
-	</organization>
-	<developers>
-		<developer>
-			<id>cg</id>
-			<name>Christian Gr&#xFC;n</name>
-			<email>christian.gruen@uni-konstanz.de</email>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-	</developers>
-	<mailingLists>
-		<mailingList>
-			<name>BaseX Talk</name>
-			<post>basex-talk@mailman.uni-konstanz.de</post>
-			<archive>https://mailman.uni-konstanz.de/mailman/listinfo/basex-talk</archive>
-		</mailingList>
-	</mailingLists>
+  </repositories>
+  <organization>
+    <name>BaseX Team</name>
+    <url>http://www.basex.org</url>
+  </organization>
+  <developers>
+    <developer>
+      <id>cg</id>
+      <name>Christian Gr&#xFC;n</name>
+      <email>christian.gruen@uni-konstanz.de</email>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  <mailingLists>
+    <mailingList>
+      <name>BaseX Talk</name>
+      <post>basex-talk@mailman.uni-konstanz.de</post>
+      <archive>https://mailman.uni-konstanz.de/mailman/listinfo/basex-talk</archive>
+    </mailingList>
+  </mailingLists>
   <issueManagement>
     <system>GitHub Tracker</system>
     <url>https://github.com/BaseXdb/basex/issues</url>
   </issueManagement>
-	<dependencies>
-		<dependency>
-			<groupId>org.basex</groupId>
-			<artifactId>basex</artifactId>
-			<version>6.7.2-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.xmldb</groupId>
-			<artifactId>xmldb-api</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.xquery</groupId>
-			<artifactId>xqj-api</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jaxrx</groupId>
-			<artifactId>jax-rx</artifactId>
-			<version>1.3.3</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
+  <dependencies>
+    <dependency>
+      <groupId>org.basex</groupId>
+      <artifactId>basex</artifactId>
+      <version>6.7.2-SNAPSHOT</version>
     </dependency>
     <dependency>
-    	<groupId>com.ettrema</groupId>
-    	<artifactId>milton-api</artifactId>
-    	<version>1.6.4</version>
+      <groupId>org.xmldb</groupId>
+      <artifactId>xmldb-api</artifactId>
+      <version>1.0</version>
     </dependency>
     <dependency>
-    	<groupId>commons-fileupload</groupId>
-    	<artifactId>commons-fileupload</artifactId>
-    	<version>1.2.2</version>
-		</dependency>
-	</dependencies>
-	<build>
-		<finalName>${project.artifactId}-${project.version}</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<includes>
-						<include>**/AllTests.java</include>
-						<include>**/XQJTest*.java</include>
-					</includes>
-					<forkMode>always</forkMode>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.1</version>
-				<configuration>
-					<outputDirectory>target</outputDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-		<resources>
-			<resource>
-				<filtering>false</filtering>
-				<directory>${basedir}/src/main/resources</directory>
-			</resource>
-			<resource>
-				<filtering>false</filtering>
-				<directory>${basedir}/src/test/java</directory>
-				<includes>
-					<include>**/xqj.sig</include>
-				</includes>
-			</resource>
-		</resources>
-	</build>
+      <groupId>javax.xml.xquery</groupId>
+      <artifactId>xqj-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty</artifactId>
+      <version>6.1.26</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ettrema</groupId>
+      <artifactId>milton-api</artifactId>
+      <version>1.6.4</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.2.2</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>${project.artifactId}-${project.version}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/AllTests.java</include>
+            <include>**/XQJTest*.java</include>
+          </includes>
+          <forkMode>always</forkMode>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <outputDirectory>target</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <directory>${basedir}/src/main/resources</directory>
+      </resource>
+      <resource>
+        <filtering>false</filtering>
+        <directory>${basedir}/src/test/java</directory>
+        <includes>
+          <include>**/xqj.sig</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>

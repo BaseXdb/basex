@@ -85,7 +85,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         } else {
           s.replace(doc, input);
         }
-        return new BXDocument(db, doc, session);
+        return new BXDocument(db, doc, session, isRaw(s, db, doc));
       }
     }.eval();
   }
@@ -126,15 +126,16 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         final HashSet<String> paths = new HashSet<String>();
         final Query q = s.query(
             "for $r in db:list($d, $p) return substring-after($r,$p)");
-        q.bind("$d", db);
-        q.bind("$p", path);
+        q.bind("d", db);
+        q.bind("p", path);
         while(q.more()) {
           final String p = stripLeadingSlash(q.next());
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
             if(!p.equals(DUMMY))
-              ch.add(new BXDocument(db, path + SEP + p, session));
+              ch.add(new BXDocument(db, path + SEP + p, session,
+                  isRaw(s, db, path + SEP + p)));
           } else {
             final String folder = path + SEP + p.substring(0, ix);
             if(!paths.contains(folder)) {
@@ -182,10 +183,10 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         "let $n := $t[last()] " +
         "return " +
         "db:add($trgdb, db:open($db, $d), $n, $p)");
-    q.bind("$db", db);
-    q.bind("$path", path);
-    q.bind("$trgdb", trgdb);
-    q.bind("$trgdir", trgdir);
+    q.bind("db", db);
+    q.bind("path", path);
+    q.bind("trgdb", trgdb);
+    q.bind("trgdir", trgdir);
     q.execute();
   }
 

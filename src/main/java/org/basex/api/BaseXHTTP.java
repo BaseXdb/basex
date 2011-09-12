@@ -2,19 +2,15 @@ package org.basex.api;
 
 import static org.basex.api.HTTPText.*;
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
-
 import org.basex.BaseXServer;
-import org.basex.api.jaxrx.JaxRxServer;
 import org.basex.api.rest.RESTServlet;
 import org.basex.api.webdav.WebDAVServlet;
+import org.basex.core.Context;
 import org.basex.core.MainProp;
-import org.basex.core.Prop;
 import org.basex.util.Args;
 import org.basex.util.Util;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
 
 /**
  * This is the main class for the starting the database HTTP services.
@@ -23,15 +19,10 @@ import org.mortbay.jetty.servlet.Context;
  * @author Christian Gruen
  */
 public final class BaseXHTTP {
-  /** Database context. */
-  private final HTTPContext http = HTTPContext.get();
-
   /** Activate WebDAV. */
   private boolean webdav = true;
-  /** Activate REST (work in progress). */
+  /** Activate REST. */
   private boolean rest = true;
-  /** Activate JAX-RX (deprecated). */
-  private boolean jaxrx = true;
 
   /** Database server. */
   private BaseXServer server;
@@ -64,23 +55,26 @@ public final class BaseXHTTP {
   public BaseXHTTP(final String... args) throws Exception {
     parseArguments(args);
 
-    final MainProp mprop = http.context.mprop;
+    final Context ctx = HTTPSession.context();
+    final MainProp mprop = ctx.mprop;
     if(stopped) {
       stop(mprop.num(MainProp.SERVERPORT), mprop.num(MainProp.EVENTPORT));
       return;
     }
 
-    if(http.client) {
-      server = new BaseXServer(http.context, quiet ? "-z" : "");
+    if(HTTPSession.client()) {
+      server = new BaseXServer(ctx, quiet ? "-z" : "");
     } else {
       Util.outln(CONSOLE + SERVERSTART, SERVERMODE);
     }
 
-    jetty = new Server(http.context.mprop.num(MainProp.HTTPPORT));
-    final Context ctx = new Context(jetty, "/");
-    if(rest) ctx.addServlet(RESTServlet.class, "/rest/*");
-    if(webdav) ctx.addServlet(WebDAVServlet.class, "/webdav/*");
-    if(jaxrx) new JaxRxServer(ctx);
+    jetty = new Server(mprop.num(MainProp.HTTPPORT));
+    final org.mortbay.jetty.servlet.Context jcontext =
+        new org.mortbay.jetty.servlet.Context(jetty, "/");
+
+    if(rest) jcontext.addServlet(RESTServlet.class, "/rest/*");
+    if(webdav) jcontext.addServlet(WebDAVServlet.class, "/webdav/*");
+
     jetty.start();
   }
 
@@ -110,45 +104,36 @@ public final class BaseXHTTP {
    */
   protected void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
-    final StringBuilder serial = new StringBuilder();
-
-    final MainProp mprop = http.context.mprop;
+    final Context ctx = HTTPSession.context();
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
         switch(c) {
           case 'c':
-            System.setProperty(DBCLIENT, Boolean.TRUE.toString());
+            System.setProperty(DBCLIENT, Boolean.toString(true));
             break;
           case 'd':
-            mprop.set(MainProp.DEBUG, true);
+            ctx.mprop.set(MainProp.DEBUG, true);
             break;
           case 'e':
-            mprop.set(MainProp.EVENTPORT, arg.num());
+            ctx.mprop.set(MainProp.EVENTPORT, arg.num());
             break;
           case 'h':
-            mprop.set(MainProp.HTTPPORT, arg.num());
-            break;
-          case 'J':
-            jaxrx = false;
+            ctx.mprop.set(MainProp.HTTPPORT, arg.num());
             break;
           case 'n':
-            mprop.set(MainProp.HOST, arg.num());
+            ctx.mprop.set(MainProp.HOST, arg.num());
             break;
           case 'p':
             final int p = arg.num();
-            mprop.set(MainProp.PORT, p);
-            mprop.set(MainProp.SERVERPORT, p);
+            ctx.mprop.set(MainProp.PORT, p);
+            ctx.mprop.set(MainProp.SERVERPORT, p);
             break;
           case 'R':
             rest = false;
             break;
           case 'P':
             System.setProperty(DBPASS, arg.string());
-            break;
-          case 'S':
-            if(serial.length() != 0) serial.append(',');
-            serial.append(arg);
             break;
           case 'U':
             System.setProperty(DBUSER, arg.string());
@@ -170,9 +155,5 @@ public final class BaseXHTTP {
         }
       }
     }
-    if(serial.length() != 0) {
-      http.context.prop.set(Prop.SERIALIZER, serial.toString());
-    }
-    http.update();
   }
 }

@@ -11,11 +11,15 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.basex.util.Token;
+
 import com.bradmcevoy.http.AbstractRequest;
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Cookie;
@@ -213,7 +217,7 @@ public class BXServletRequest extends AbstractRequest {
         val = parts[1];
         if(val != null) {
           try {
-            val = URLDecoder.decode(val, "UTF-8");
+            val = URLDecoder.decode(val, Token.UTF8);
           } catch(final UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
           }

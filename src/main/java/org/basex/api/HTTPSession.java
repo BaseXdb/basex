@@ -1,34 +1,70 @@
 package org.basex.api;
 
+import static org.basex.api.HTTPText.*;
+
 import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.basex.core.Context;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
+import org.basex.server.LoginException;
 import org.basex.server.Session;
+import org.basex.util.Base64;
 
 /**
- * This is a container for an HTTP session.
+ * This class offers methods for managing login data and creating database
+ * sessions.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class HTTPSession {
   /** Database context. */
-  public final HTTPContext http;
+  private static final Context CONTEXT = new Context();
   /** User name. */
-  public String user;
+  private String user;
   /** Password. */
-  public String pass;
+  private String pass;
 
   /**
    * Constructor.
-   * @param ht http context
+   * @param req HTTP servlet request
+   * @throws LoginException login exception
+   */
+  public HTTPSession(final HttpServletRequest req) throws LoginException {
+    this(login(req));
+  }
+
+  /**
+   * Constructor.
    * @param u user
    * @param p password
    */
-  HTTPSession(final HTTPContext ht, final String u, final String p) {
-    http = ht;
-    user = http.user != null ? http.user : u;
-    pass = http.pass != null ? http.pass : p;
+  public HTTPSession(final String u, final String p) {
+    this(new String[] { u, p });
+  }
+
+  /**
+   * Constructor.
+   * @param login login data
+   */
+  private HTTPSession(final String[] login) {
+    final String suser = System.getProperty(DBUSER);
+    final String spass = System.getProperty(DBPASS);
+    user = suser != null ? suser : login[0];
+    pass = spass != null ? spass : login[1];
+  }
+
+  /**
+   * Updates the user and password combination.
+   * @param u user
+   * @param p password
+   */
+  public void update(final String u, final String p) {
+    user = u;
+    pass = p;
   }
 
   /**
@@ -37,15 +73,48 @@ public final class HTTPSession {
    * @throws IOException I/O exception
    */
   public Session login() throws IOException {
-    return http.client ? new ClientSession(http.context, user, pass) :
-      new LocalSession(http.context, user, pass);
+    if(user == null || pass == null) throw new LoginException(NOPASSWD);
+    return client() ?
+      new ClientSession(CONTEXT, user, pass) :
+      new LocalSession(CONTEXT, user, pass);
   }
 
   /**
-   * Checks if username and password is specified.
-   * @return result of check
+   * Returns the static database context.
+   * @return database context
    */
-  public boolean valid() {
-    return user != null && pass != null;
+  public static Context context() {
+    return CONTEXT;
+  }
+
+  /**
+   * Indicates if the session will be client-based or local (standalone).
+   * @return database context (default: {@code false}).
+   */
+  public static boolean client() {
+    final String c = System.getProperty(DBCLIENT);
+    return c != null && c.equals(Boolean.toString(true));
+  }
+
+  /**
+   * Returns login data from the HTTP header.
+   * @param req servlet request
+   * @return login/password combination, or two {@code null} strings
+   * @throws LoginException login exception
+   */
+  private static String[] login(final HttpServletRequest req)
+      throws LoginException {
+
+    final String auth = req.getHeader(AUTHORIZATION);
+    if(auth != null) {
+      final String[] values = auth.split(" ");
+      if(values[0].equals(BASIC)) {
+        final String[] cred = Base64.decode(values[1]).split(":", 2);
+        if(cred.length != 2) throw new LoginException(NOPASSWD);
+        return cred;
+      }
+      throw new LoginException(WHICHAUTH, values[0]);
+    }
+    return new String[2];
   }
 }

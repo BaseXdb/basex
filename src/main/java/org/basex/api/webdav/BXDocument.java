@@ -8,6 +8,7 @@ import java.util.Map;
 import org.basex.api.HTTPSession;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
+import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.server.Query;
 import org.basex.server.Session;
@@ -25,15 +26,20 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
  * @author Dimitar Popov
  */
 public class BXDocument extends BXAbstractResource implements FileResource {
+  /** Raw flag. */
+  final boolean raw;
+
   /**
    * Constructor.
    * @param dbname name of database this document belongs to.
    * @param docpath document path to root
    * @param s current session
+   * @param r raw flag
    */
   public BXDocument(final String dbname, final String docpath,
-      final HTTPSession s) {
+      final HTTPSession s, final boolean r) {
     super(dbname, docpath, s);
+    raw = r;
   }
 
   @Override
@@ -59,7 +65,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
 
   @Override
   public String getContentType(final String accepts) {
-    return MIMETYPEXML;
+    return raw ? DataText.APP_OCTET : DataText.APP_XML;
   }
 
   @Override
@@ -71,9 +77,12 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       @Override
       public void run() throws IOException {
         s.setOutputStream(out);
-        final Query q = s.query("db:open($db, $path)");
-        q.bind("$db", db);
-        q.bind("$path", path);
+        final String query = raw ?
+          "declare option output:method 'raw'; db:get($db, $path)" :
+          "db:open($db, $path)";
+        final Query q = s.query(query);
+        q.bind("db", db);
+        q.bind("path", path);
         q.execute();
       }
     }.eval();
@@ -112,11 +121,11 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       final String name) throws IOException {
 
     final Query q = s.query("db:add($db, db:open($sdb, $spath), $name, $path)");
-    q.bind("$db", trgdb);
-    q.bind("$sdb", db);
-    q.bind("$spath", path);
-    q.bind("$name", name);
-    q.bind("$path", trgdir);
+    q.bind("db", trgdb);
+    q.bind("sdb", db);
+    q.bind("spath", path);
+    q.bind("name", name);
+    q.bind("path", trgdir);
     q.execute();
   }
 }

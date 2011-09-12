@@ -43,13 +43,13 @@ public class BXDatabase extends BXFolder {
         @Override
         public String get() throws IOException {
           final Query q = s.query("db:info($p)");
-          q.bind("$p", db);
+          q.bind("p", db);
           return q.execute();
         }
       }.eval();
 
       // parse the timestamp
-      final String timestamp = "Time Stamp: ";
+      final String timestamp = Text.INFOTIME + Text.COLS;
       final int p = info.indexOf(timestamp);
       if(p >= 0) {
         final String date = info.substring(p + timestamp.length(),
