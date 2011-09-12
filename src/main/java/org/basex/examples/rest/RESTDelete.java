@@ -1,4 +1,4 @@
-package org.basex.examples.jaxrx;
+package org.basex.examples.rest;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -7,12 +7,12 @@ import java.net.URL;
 import org.basex.api.BaseXHTTP;
 
 /**
- * This class is a simple Java client to demonstrate the JAX-RX implementation.
+ * This class is a simple Java client to demonstrate the REST implementation.
  * It shows the function of the HTTP DELETE method.
  *
  * @author BaseX Team 2005-11, BSD License
  */
-public final class JaxRxDELETE {
+public final class RESTDelete {
   /**
    * Runs the example.
    * @throws IOException I/O exception
@@ -21,7 +21,7 @@ public final class JaxRxDELETE {
     System.out.println("=== DELETE: delete a document or database ===");
 
     // The java URL connection to the resource
-    URL url = new URL("http://localhost:8984/basex/jax-rx/factbook/input.xml");
+    URL url = new URL("http://localhost:8984/rest/factbook/input.xml");
     System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL
@@ -34,7 +34,7 @@ public final class JaxRxDELETE {
         " (" + conn.getResponseMessage() + ")");
 
     // The java URL connection to the resource
-    url = new URL("http://localhost:8984/basex/jax-rx/factbook");
+    url = new URL("http://localhost:8984/rest/factbook");
     System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL

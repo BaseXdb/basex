@@ -1,4 +1,4 @@
-package org.basex.examples.jaxrx;
+package org.basex.examples.rest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,12 +10,12 @@ import java.net.URL;
 import org.basex.api.BaseXHTTP;
 
 /**
- * This class is a simple Java client to demonstrate the JAX-RX implementation.
+ * This class is a simple Java client to demonstrate the REST implementation.
  * It shows the query function of the HTTP POST method.
  *
  * @author BaseX Team 2005-11, BSD License
  */
-public final class JaxRxPOSTQuery {
+public final class RESTPostQuery {
   /**
    * Runs the example.
    * @throws IOException I/O exception
@@ -24,12 +24,12 @@ public final class JaxRxPOSTQuery {
     System.out.println("=== POST: execute a query ===");
 
     // The java URL connection to the resource
-    URL url = new URL("http://localhost:8984/basex/jax-rx/factbook");
+    URL url = new URL("http://localhost:8984/rest/factbook");
     System.out.println("\n* URL: " + url);
 
     // Query to be sent to the server
     String request =
-      "<query xmlns:jax-rx='http://jax-rx.sourceforge.net'>\n" +
+      "<query xmlns='http://www.basex.org/rest'>\n" +
       "  <text>//city/name</text>\n" +
       "  <parameter name='wrap' value='yes'/>\n" +
       "  <parameter name='count' value='2'/>\n" +

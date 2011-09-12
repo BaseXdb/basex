@@ -1,14 +1,14 @@
-package org.basex.examples.jaxrx;
+package org.basex.examples.rest;
 
 import org.basex.api.BaseXHTTP;
 
 /**
- * This class runs all JAX-RX examples.
+ * This class runs all REST examples.
  * It shows the function of the HTTP DELETE method.
  *
  * @author BaseX Team 2005-11, BSD License
  */
-public final class JaxRxAll {
+public final class RESTAll {
   /**
    * This method demonstrates the available DELETE method. In this example, an
    * an XML database is deleted.
@@ -20,24 +20,24 @@ public final class JaxRxAll {
     final BaseXHTTP http = new BaseXHTTP("-W -Uadmin -Padmin");
 
     // Create a database
-    // Run all JAX-RX examples
-    JaxRxPUT.run();
+    // Run all REST examples
+    RESTPut.run();
     System.out.println();
 
     // Send a query via GET
-    JaxRxGET.run();
+    RESTGet.run();
     System.out.println();
 
     // Send a query via POST
-    JaxRxPOSTQuery.run();
+    RESTPostQuery.run();
     System.out.println();
 
     // Add a document
-    JaxRxPOSTAdd.run();
+    RESTPostAdd.run();
     System.out.println();
 
     // Delete a document
-    JaxRxDELETE.run();
+    RESTDelete.run();
     System.out.println();
 
     // Stop servers

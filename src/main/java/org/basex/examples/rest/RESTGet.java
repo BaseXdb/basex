@@ -1,4 +1,4 @@
-package org.basex.examples.jaxrx;
+package org.basex.examples.rest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,12 +9,12 @@ import java.net.URL;
 import org.basex.api.BaseXHTTP;
 
 /**
- * This class is a simple Java client to demonstrate the JAX-RX implementation.
+ * This class is a simple Java client to demonstrate the REST implementation.
  * It shows the function of the HTTP GET method.
  *
  * @author BaseX Team 2005-11, BSD License
  */
-public final class JaxRxGET {
+public final class RESTGet {
   /**
    * Runs the example.
    * @throws IOException I/O exception
@@ -23,7 +23,7 @@ public final class JaxRxGET {
     System.out.println("=== GET: execute a query ===");
 
     // The java URL connection to the resource
-    String base = "http://localhost:8984/basex/jax-rx/";
+    String base = "http://localhost:8984/rest/";
 
     URL url = new URL(base + "factbook?query=//city/name&count=3");
     System.out.println("\n* URL: " + url);

@@ -1,4 +1,4 @@
-package org.basex.examples.jaxrx;
+package org.basex.examples.rest;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -12,35 +12,40 @@ import java.net.URL;
 import org.basex.api.BaseXHTTP;
 
 /**
- * This class is a simple Java client to demonstrate the JAX-RX implementation.
- * It shows the function of the HTTP PUT method.
+ * This class is a simple Java client to demonstrate the REST implementation.
+ * It shows the add function of the HTTP POST method.
  *
  * @author BaseX Team 2005-11, BSD License
  */
-public final class JaxRxPUT {
+public final class RESTPostAdd {
   /**
    * Runs the example.
    * @throws IOException I/O exception
    */
   static void run() throws IOException {
-    System.out.println("=== PUT: create a new database ===");
+    System.out.println("=== POST: add a document to a database ===");
 
     // The java URL connection to the resource
-    URL url = new URL("http://localhost:8984/basex/jax-rx/factbook");
+    URL url = new URL("http://localhost:8984/rest/factbook/input.xml");
     System.out.println("\n* URL: " + url);
+
+    // File to be sent to the server
+    String doc = "etc/xml/input.xml";
+    System.out.println("\n* Document: " + doc);
 
     // Establish the connection to the URL
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     // Set an output connection
     conn.setDoOutput(true);
     // Set as PUT request
-    conn.setRequestMethod("PUT");
+    conn.setRequestMethod("POST");
+    // Specify content type
+    conn.setRequestProperty("Content-Type", "text/xml");
 
     // Get and cache output stream
     OutputStream out = new BufferedOutputStream(conn.getOutputStream());
     // Create and cache file input stream
-    InputStream in = new BufferedInputStream(
-        new FileInputStream("etc/xml/factbook.xml"));
+    InputStream in = new BufferedInputStream(new FileInputStream(doc));
 
     // Send document to server
     System.out.println("\n* Send document...");
@@ -57,8 +62,8 @@ public final class JaxRxPUT {
   }
 
   /**
-   * This method demonstrates the PUT method. In this example, a new XML
-   * database is created for the specified document.
+   * This method demonstrates the POST method. In this example, a new XML
+   * document is added to a database.
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
