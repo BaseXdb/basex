@@ -50,7 +50,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version (must contain major, minor and optional patch number). */
-  String VERSION = "6.7.2 beta";
+  String VERSION = "6.8 beta";
   /** Company info. */
   String COMPANY = NAME + " Team";
   /** Title and version. */
@@ -139,12 +139,10 @@ public interface Text {
     "  -d        Activate debugging mode" + NL +
     "  -e<num>   Set event port" + NL +
     "  -h<num>   Set HTTP server port" + NL +
-    "  -J        Deactivate JAX-RX" + NL +
     "  -n<name>  Set server (host) name" + NL +
     "  -p<num>   Set database server port" + NL +
     "  -P<pass>  Specify user password" + NL +
     "  -s        Start database as service" + NL +
-    "  -S<pars>  Set serialization parameter(s)" + NL +
     "  -U<name>  Specify user name" + NL +
     "  -W        Deactivate WebDAV" + NL +
     "  -z        Suppress logging";

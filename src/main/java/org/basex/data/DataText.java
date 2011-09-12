@@ -152,6 +152,21 @@ public interface DataText {
   /** Doctype public keyword. */
   String PUBLIC = "PUBLIC";
 
+  /** Content-Type. */
+  String CONTENT_TYPE = "Content-Type";
+  /** Media type: text/html. */
+  String TEXT_HTML = "text/html";
+  /** Media type: text/plain. */
+  String TEXT_PLAIN = "text/plain";
+  /** Media type: text/plain. */
+  String APP_OCTET = "application/octet-stream";
+  /** Media type: application/xml. */
+  String APP_XML = "application/xml";
+  /** Media type: application/json. */
+  String APP_JSON = "application/json";
+  /** Media type: application/query+xml. */
+  String APP_QUERYXML = "application/query+xml";
+  
   /** Ampersand entity. */
   byte[] E_AMP = token("&amp;");
   /** Quote entity. */
@@ -245,8 +260,6 @@ public interface DataText {
   byte[] META = token("meta");
   /** HTML: http-equiv attribute. */
   byte[] HTTPEQUIV = token("http-equiv");
-  /** HTML: Content-Type attribute value. */
-  byte[] CONTTYPE = token("Content-Type");
   /** HTML: content attribute. */
   byte[] CONTENT = token("content");
   /** HTML: charset attribute value. */

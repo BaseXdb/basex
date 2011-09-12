@@ -19,8 +19,8 @@ public final class MainProp extends AProp {
   public static final Object[] DBPATH =
     { "DBPATH", Prop.HOME + Text.NAME + "Data" };
   /** Web path. */
-  public static final Object[] JAXRXPATH =
-    { "JAXRXPATH", Prop.HOME + Text.NAME + "Web" };
+  public static final Object[] HTTPPATH =
+    { "HTTPPATH", Prop.HOME + Text.NAME + "HTTP" };
   /** Package repository path. */
   public static final Object[] REPOPATH =
     { "REPOPATH", Prop.HOME + Text.NAME + "Repo" };

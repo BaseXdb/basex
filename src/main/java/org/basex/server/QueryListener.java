@@ -128,9 +128,20 @@ final class QueryListener extends Progress {
    * Returns the query info.
    * @return query info
    */
-  byte[] info() {
+  String info() {
     initInfo();
-    return info.finish();
+    return info.toString();
+  }
+
+  /**
+   * Returns the serialization options.
+   * @return serialization options
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  String options() throws IOException, QueryException {
+    if(xml == null) init();
+    return qp.ctx.serProp(false).toString();
   }
 
   /**

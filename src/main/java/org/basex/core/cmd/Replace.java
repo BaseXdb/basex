@@ -44,51 +44,50 @@ public final class Replace extends ACreate {
 
   /**
    * Replace the specified document with a new content.
-   * @param p path to replace
+   * @param path path to replace
    * @param input new content
    * @param ctx database context
    * @param lock if {@code true}, register a write lock in context
    * @return info string
    * @throws BaseXException database exception
    */
-  public static String replace(final String p, final InputSource input,
+  public static String replace(final String path, final InputSource input,
       final Context ctx, final boolean lock) throws BaseXException {
 
     final Data data = ctx.data();
     if(data == null) throw new BaseXException(PROCNODB);
 
-    String path = IOFile.normalize(p);
-    String target = "";
-    if(path.isEmpty()) throw new BaseXException(DIRERR, path);
+    String pth = IOFile.normalize(path);
+    String trg = "";
+    if(pth.isEmpty()) throw new BaseXException(DIRERR, pth);
 
-    final byte[] src = token(path);
-    final IntList docs = data.docs(p);
+    final byte[] src = token(pth);
+    final IntList docs = data.docs(path);
     final int is = docs.size();
     // check if path points exclusively to files
     for(int i = 0; i < is; i++) {
       if(!eq(data.text(docs.get(i), true), src))
-        throw new BaseXException(DIRERR, path);
+        throw new BaseXException(DIRERR, pth);
     }
 
-    final int i = path.lastIndexOf('/');
+    final int i = pth.lastIndexOf('/');
     if(i != -1) {
-      target = path.substring(0, i);
-      path = path.substring(i + 1);
+      trg = pth.substring(0, i);
+      pth = pth.substring(i + 1);
     }
 
     try {
       if(lock) ctx.register(true);
-      // replace document
-      if(docs.size() > 0) {
+
+      // replace binary or document
+      if(!replace(data, pth, input)) {
         // add new document
-        Add.add(path, target, input, ctx, null, false);
+        Add.add(pth, trg, input, ctx, null, false);
         // delete old documents if addition was successful
         for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
         // flushes changes
         data.flush();
       }
-      // replace binary
-      if(!replace(data, path, input)) throw new BaseXException(PARSEERR, path);
     } finally {
       if(lock) ctx.unregister(true);
     }
@@ -101,11 +100,14 @@ public final class Replace extends ACreate {
    * @param input new content
    * @param path file path
    * @return info string
+   * @throws BaseXException database exception
    */
   public static boolean replace(final Data data, final String path,
-      final InputSource input) {
+      final InputSource input) throws BaseXException {
 
     final IOFile io = data.meta.binary(path);
-    return !io.exists() || Add.add(io, input);
+    if(!io.exists()) return false;
+    if(!Add.add(io, input)) throw new BaseXException(PARSEERR, path);
+    return true;
   }
 }

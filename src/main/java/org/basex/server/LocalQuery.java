@@ -22,10 +22,11 @@ public class LocalQuery extends Query {
   private final QueryListener qp;
   /** Buffer output; {@code null} if an {@link OutputStream} is specified. */
   private final ByteArrayOutputStream buf;
-  /** Iterator flag. */
-  private boolean more;
   /** Owning local session. */
   private final LocalSession session;
+
+  /** Iterator flag. */
+  private boolean more;
 
   /**
    * Constructor. Query output will be returned by each called methods.
@@ -107,7 +108,16 @@ public class LocalQuery extends Query {
 
   @Override
   public String info() throws IOException {
-    return string(qp.info());
+    return qp.info();
+  }
+
+  @Override
+  public String options() throws IOException {
+    try {
+      return qp.options();
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
+    }
   }
 
   @Override

@@ -42,6 +42,11 @@ public final class ClientQuery extends Query {
   }
 
   @Override
+  public String options() throws IOException {
+    return string(ServerCmd.OPTIONS, id).toString();
+  }
+
+  @Override
   public void bind(final String n, final Object v, final String t)
       throws IOException {
     execute(ServerCmd.BIND, id + '\0' + n + '\0' + v + '\0' +

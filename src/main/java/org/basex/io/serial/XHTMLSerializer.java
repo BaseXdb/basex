@@ -6,8 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.basex.util.TokenBuilder;
-
 /**
  * This class serializes data as XHTML.
  *
@@ -15,9 +13,6 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public class XHTMLSerializer extends OutputSerializer {
-  /** Flag for printing content type. */
-  private int ct;
-
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
@@ -46,12 +41,12 @@ public class XHTMLSerializer extends OutputSerializer {
   @Override
   protected void finishOpen() throws IOException {
     super.finishOpen();
-    if(ct(false)) return;
+    if(ct(false, false)) return;
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    if(ct(true)) return;
+    if(ct(true, false)) return;
     if(EMPTIES.contains(lc(tag))) {
       print(' ');
       print(ELEM_SC);
@@ -60,27 +55,5 @@ public class XHTMLSerializer extends OutputSerializer {
       ind = false;
       finishClose();
     }
-  }
-
-  /**
-   * Prints the content type declaration.
-   * @param empty empty flag
-   * @return {@code true} if declaration was printed
-   * @throws IOException I/O exception
-   */
-  private boolean ct(final boolean empty) throws IOException {
-    if(ct != 1) return false;
-    ct++;
-    if(empty) finishOpen();
-    level++;
-    startOpen(META);
-    attribute(HTTPEQUIV, CONTTYPE);
-    attribute(CONTENT,
-        new TokenBuilder(media).add(CHARSET).addExt(encoding).finish());
-    print(' ');
-    print(ELEM_SC);
-    level--;
-    if(empty) finishClose();
-    return true;
   }
 }

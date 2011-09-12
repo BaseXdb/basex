@@ -32,10 +32,10 @@ public final class Util {
 
   /**
    * Returns an information string for an unexpected exception.
-   * @param ext optional extension
+   * @param ex exception
    * @return dummy object
    */
-  public static String bug(final String[] ext) {
+  public static String bug(final Throwable ex) {
     final TokenBuilder tb = new TokenBuilder(
       "Potential bug? Improper use? Your feedback is welcome:");
     tb.add(NL).add("Contact: ").add(MAIL);
@@ -45,7 +45,7 @@ public final class Util {
     tb.add(NL).add("OS: ").add(System.getProperty("os.name"));
     tb.add(", ").add(System.getProperty("os.arch"));
     tb.add(NL).add("Stack Trace: ");
-    for(final String e : ext) tb.add(NL).add(e);
+    for(final String e : toArray(ex)) tb.add(NL).add(e);
     return tb.toString();
   }
 

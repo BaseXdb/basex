@@ -62,6 +62,13 @@ public abstract class Query {
   public abstract String execute() throws IOException;
 
   /**
+   * Returns the serialization options.
+   * @return serialization options.
+   * @throws IOException I/O exception
+   */
+  public abstract String options() throws IOException;
+
+  /**
    * Returns query info.
    * @return query info
    * @throws IOException I/O exception

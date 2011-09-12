@@ -327,6 +327,7 @@ public final class PermissionTest {
     try {
       testSession.close();
       adminSession.execute(new DropDB(RENAMED));
+      adminSession.execute(new DropDB(NAME));
       adminSession.close();
     } catch(final Exception ex) {
       fail(ex.toString());
