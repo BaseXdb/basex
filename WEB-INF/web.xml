@@ -7,18 +7,18 @@
   <description>BaseX HTTP Server</description>
   <servlet>
     <servlet-name>WebDAV</servlet-name>
-    <servlet-class>...</servlet-class>
+    <servlet-class>org.basex.api.webdav.WebDAVServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>WebDAV</servlet-name>
-    <url-pattern>...</url-pattern>
+    <url-pattern>/webdav/*</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>REST</servlet-name>
-    <servlet-class>...</servlet-class>
+    <servlet-class>org.basex.api.rest.RESTServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>REST</servlet-name>
-    <url-pattern>...</url-pattern>
+    <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 </web-app>
