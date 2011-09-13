@@ -536,7 +536,7 @@ public final class HTTPClientTest {
     HTTPClient.setRequestContent(fakeConn.getOutputStream(), req, null);
     final String expResult = "--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
-        + "...plain text version of message goes here....\n" + CRLF
+        + "...plain text version of message goes here...." + CRLF + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/richtext" + CRLF + CRLF
         + ".... richtext version of same message goes here ..." + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
